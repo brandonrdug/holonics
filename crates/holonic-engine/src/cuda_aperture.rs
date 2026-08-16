@@ -1,16 +1,16 @@
 //! Exact CUDA realization of finite receiver-aperture conic support.
 //!
 //! CUDA owns allocation, launch, and return only. Continuous conics are
-//! transformed into the terminal chart on the host with exact rationals,
+//! transformed into the terminal chart on the cpu with exact rationals,
 //! denominators are cleared, and a conservative arbitrary-precision preflight
 //! admits exact native signed i128 device arithmetic. The changing local-star
 //! witness disproved the present hand-written wider-limb CUDA operators for
 //! both conics and transported segments, so a primitive outside that admitted
-//! carrier is evaluated by the same exact host law and merged before
+//! carrier is evaluated by the same exact cpu law and merged before
 //! whole-face parity admission; it is never rounded or allowed to terminate
-//! the frame. The host law substitutes the terminal chart once and conducts
+//! the frame. The cpu law substitutes the terminal chart once and conducts
 //! integer/projective support; the retained rational implementation is its
-//! independent authority. Exact conic coefficients cross the host/card seam
+//! independent authority. Exact conic coefficients cross the cpu/card seam
 //! in a 128-bit signed-magnitude carrier. The card classifies each finite
 //! aperture member independently; it does not propagate through display
 //! adjacency and it does not evaluate floating point. Admission compares the
@@ -111,7 +111,7 @@ const TILE_EDGE: u32 = 16;
 ///
 /// This is a physical aperture of the present CUDA program, not a bound on
 /// holonic coordinates. Wider terminal faces must be re-charted or refused;
-/// they must never silently become a host rendering path.
+/// they must never silently become a cpu rendering path.
 const MAX_DEVICE_INTERMEDIATE_BITS: u64 = 384;
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_conic_support.ptx"));
 
@@ -462,7 +462,7 @@ impl CudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         receivers: &BTreeSet<ReceiverId>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             BTreeMap<ReceiverId, ReceiverApertureTrace>,
@@ -480,7 +480,7 @@ impl CudaApertureExecutor {
         let mut packed_conics = Vec::new();
         let mut packed_segments = Vec::new();
         let mut device_selected_ordinals = Vec::new();
-        let mut host_primitives = Vec::new();
+        let mut cpu_primitives = Vec::new();
         let mut required_intermediate_bits = 0_u64;
         for (primitive_ordinal, presented) in selected.iter().enumerate() {
             let primitive =
@@ -552,7 +552,7 @@ impl CudaApertureExecutor {
                             segment
                         }));
                     } else {
-                        host_primitives.push((**presented).clone());
+                        cpu_primitives.push((**presented).clone());
                     }
                 }
                 Err(CudaApertureError::IntegerRange { required_bits, .. }) => {
@@ -567,7 +567,7 @@ impl CudaApertureExecutor {
                         );
                     }
                     required_intermediate_bits = required_intermediate_bits.max(required_bits);
-                    host_primitives.push((**presented).clone());
+                    cpu_primitives.push((**presented).clone());
                 }
                 Err(error) => return Err(error),
             }
@@ -732,27 +732,27 @@ impl CudaApertureExecutor {
             }
         }
         let device_launch_nanoseconds = device_execute_started.elapsed().as_nanos();
-        let host_primitive_count = host_primitives.len();
-        let host_conic_count = host_primitives
+        let cpu_primitive_count = cpu_primitives.len();
+        let cpu_conic_count = cpu_primitives
             .iter()
             .filter(|presented| matches!(&presented.primitive, ReceiverPrimitive::Conic(_)))
             .count();
-        let mut host_workers = BigUint::zero();
-        let mut host_trace_nanoseconds = 0_u128;
-        let host_result = if host_primitives.is_empty() {
+        let mut cpu_workers = BigUint::zero();
+        let mut cpu_trace_nanoseconds = 0_u128;
+        let cpu_result = if cpu_primitives.is_empty() {
             None
         } else {
-            let mut host_presentation = presentation.clone();
-            host_presentation.primitives = host_primitives;
-            let host_trace_started = Instant::now();
+            let mut cpu_presentation = presentation.clone();
+            cpu_presentation.primitives = cpu_primitives;
+            let cpu_trace_started = Instant::now();
             let result = trace_receivers_aperture_with_cpu(
-                &host_presentation,
+                &cpu_presentation,
                 specification,
                 receivers,
-                host_executor,
+                cpu_executor,
             )?;
-            host_trace_nanoseconds = host_trace_started.elapsed().as_nanos();
-            host_workers = result.1.workers_used.clone();
+            cpu_trace_nanoseconds = cpu_trace_started.elapsed().as_nanos();
+            cpu_workers = result.1.workers_used.clone();
             Some(result.0)
         };
         let device_wait_started = Instant::now();
@@ -816,15 +816,15 @@ impl CudaApertureExecutor {
         }
         let device_decode_nanoseconds = device_decode_started.elapsed().as_nanos();
         let device_exact_support_evaluations = BigUint::from(query_counts.into_iter().sum::<u64>());
-        let mut host_exact_support_evaluations = BigUint::zero();
+        let mut cpu_exact_support_evaluations = BigUint::zero();
         let mut exact_support_evaluations = device_exact_support_evaluations.clone();
-        let mut host_merge_nanoseconds = 0_u128;
-        if let Some(host_traces) = host_result {
-            let host_merge_started = Instant::now();
-            for host_trace in host_traces.into_values() {
-                exact_support_evaluations += &host_trace.exact_support_queries;
-                host_exact_support_evaluations += &host_trace.exact_support_queries;
-                for section in host_trace.primitive_sections.into_values() {
+        let mut cpu_merge_nanoseconds = 0_u128;
+        if let Some(cpu_traces) = cpu_result {
+            let cpu_merge_started = Instant::now();
+            for cpu_trace in cpu_traces.into_values() {
+                exact_support_evaluations += &cpu_trace.exact_support_queries;
+                cpu_exact_support_evaluations += &cpu_trace.exact_support_queries;
+                for section in cpu_trace.primitive_sections.into_values() {
                     let key = section.key;
                     if primitive_sections.insert(key, section).is_some() {
                         return Err(CudaApertureError::Presentation(
@@ -833,7 +833,7 @@ impl CudaApertureExecutor {
                     }
                 }
             }
-            host_merge_nanoseconds = host_merge_started.elapsed().as_nanos();
+            cpu_merge_nanoseconds = cpu_merge_started.elapsed().as_nanos();
         }
         let mut sections_by_receiver = receivers
             .iter()
@@ -855,12 +855,12 @@ impl CudaApertureExecutor {
                 ))
             })
             .collect::<Result<BTreeMap<_, _>, PresentationError>>()?;
-        let arithmetic = if host_primitive_count == 0 {
+        let arithmetic = if cpu_primitive_count == 0 {
             device_arithmetic.to_owned()
         } else if device_selected_ordinals.is_empty() {
-            "exact host integer-projective".to_owned()
+            "exact cpu integer-projective".to_owned()
         } else {
-            format!("{device_arithmetic} CUDA + exact host integer-projective")
+            format!("{device_arithmetic} CUDA + exact cpu integer-projective")
         };
         Ok((
             traces,
@@ -872,27 +872,27 @@ impl CudaApertureExecutor {
                 device_primitives: BigUint::from(device_selected_ordinals.len()),
                 conics: BigUint::from(conic_count),
                 segments: BigUint::from(segment_count),
-                host_primitives: BigUint::from(host_primitive_count),
-                host_conics: BigUint::from(host_conic_count),
-                host_linear_primitives: BigUint::from(host_primitive_count - host_conic_count),
+                cpu_primitives: BigUint::from(cpu_primitive_count),
+                cpu_conics: BigUint::from(cpu_conic_count),
+                cpu_linear_primitives: BigUint::from(cpu_primitive_count - cpu_conic_count),
                 aperture_members: BigUint::from(pixel_count),
                 device_output_bytes: BigUint::from(output_count * std::mem::size_of::<u32>()),
                 device_threads: BigUint::from(conic_work) + BigUint::from(segment_work),
                 exact_support_evaluations,
                 device_exact_support_evaluations,
-                host_exact_support_evaluations,
+                cpu_exact_support_evaluations,
                 intermediate_bits: BigUint::from(required_intermediate_bits),
                 device_arithmetic: arithmetic,
-                host_workers,
+                cpu_workers,
                 selection_pack_nanoseconds,
                 device_prepare_nanoseconds,
                 device_execute_nanoseconds,
                 device_download_nanoseconds,
                 device_decode_nanoseconds,
-                host_trace_nanoseconds,
-                host_merge_nanoseconds,
+                cpu_trace_nanoseconds,
+                cpu_merge_nanoseconds,
                 wall_nanoseconds: total_started.elapsed().as_nanos(),
-                host_parity: false,
+                cpu_parity: false,
                 execution_backend: ApertureExecutionBackend::HybridCuda.label().to_owned(),
                 admission_candidate_nanoseconds: 0,
                 admission_authority_nanoseconds: 0,
@@ -910,7 +910,7 @@ impl CudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         receivers: &BTreeSet<ReceiverId>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             AdmittedCudaApertureExecutor,
@@ -920,13 +920,13 @@ impl CudaApertureExecutor {
         CudaApertureError,
     > {
         let (candidate, mut receipt) =
-            self.trace(presentation, specification, receivers, host_executor)?;
+            self.trace(presentation, specification, receivers, cpu_executor)?;
         let authority_started = Instant::now();
         let (authority, authority_execution) = trace_receivers_aperture_with_cpu(
             presentation,
             specification,
             receivers,
-            host_executor,
+            cpu_executor,
         )?;
         let authority_nanoseconds = authority_started.elapsed().as_nanos();
         let exact = candidate.iter().all(|(receiver, candidate)| {
@@ -949,7 +949,7 @@ impl CudaApertureExecutor {
         // aperture and reproduces bit-for-bit on any machine, in any frame — headless or scanning
         // out a desktop.
         let candidate_work = CarrierWork::of_candidate(&receipt);
-        let authority_work = CarrierWork::of_host_authority(&receipt);
+        let authority_work = CarrierWork::of_cpu_authority(&receipt);
         // The four-state exact ordering of the two work vectors, taken with nothing declared. It
         // is retained on the receipt whether or not it decided, because `Equal` (a mirror) and
         // `Open` (incomparable kinds of work) are different states that conduct identically.
@@ -959,7 +959,7 @@ impl CudaApertureExecutor {
             None => CarrierAdmission::from_work(&authority_work, &candidate_work),
         };
         let preferred = admission.conducts_through();
-        receipt.host_parity = true;
+        receipt.cpu_parity = true;
         receipt.admission = admission.clone();
         receipt.work_ordering = work_ordering;
         receipt.authority_work = authority_work;
@@ -968,16 +968,16 @@ impl CudaApertureExecutor {
         receipt.admission_candidate_nanoseconds = candidate_nanoseconds;
         receipt.admission_authority_nanoseconds = authority_nanoseconds;
         let initial = match preferred {
-            ApertureExecutionBackend::ExactHost => {
+            ApertureExecutionBackend::ExactCpu => {
                 let required_bits = receipt.intermediate_bits.clone();
-                // The host receipt is rebuilt from the host run, so every field carrying the
+                // The cpu receipt is rebuilt from the cpu run, so every field carrying the
                 // admission's own evidence has to be carried across the swap. Losing it here would
-                // leave the branch where the host was admitted unable to say why — which is the
+                // leave the branch where the cpu was admitted unable to say why — which is the
                 // branch a reader checks first.
                 let carried_admission = std::mem::take(&mut receipt.admission);
                 let carried_authority_work = std::mem::take(&mut receipt.authority_work);
                 let carried_candidate_work = std::mem::take(&mut receipt.candidate_work);
-                receipt = exact_host_receipt(
+                receipt = exact_cpu_receipt(
                     &self.device_name,
                     presentation,
                     specification,
@@ -1014,7 +1014,7 @@ impl CudaApertureExecutor {
     /// **metric-free** product order, which decides only when one carrier dominates the other in
     /// every coordinate and returns [`CarrierAdmission::Open`] otherwise, retaining both. That
     /// default is deliberate: an undeclared metric is not a licence to guess, and guessing is what
-    /// the wall-clock comparison was. On this executor's own material the two carriers trade host
+    /// the wall-clock comparison was. On this executor's own material the two carriers trade cpu
     /// evaluations against device evaluations plus transferred octets, so the product order is
     /// [`ExactOrdering::Open`] whenever the card did any work at all — which is exactly why a
     /// declaration, and not a clock, is what separates them.
@@ -1066,8 +1066,8 @@ impl Drop for CudaApertureExecutor {
 /// being computed, and was discarded in favour of a clock.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CarrierWork {
-    /// Exact support evaluations performed on the host.
-    pub host_evaluations: BigUint,
+    /// Exact support evaluations performed on the cpu.
+    pub cpu_evaluations: BigUint,
     /// Exact support evaluations performed on the device.
     pub device_evaluations: BigUint,
     /// Octets moved across the device boundary in either direction.
@@ -1080,15 +1080,15 @@ impl CarrierWork {
     /// The work the hybrid candidate did, read off its own receipt.
     pub fn of_candidate(receipt: &CudaApertureReceipt) -> Self {
         Self {
-            host_evaluations: receipt.host_exact_support_evaluations.clone(),
+            cpu_evaluations: receipt.cpu_exact_support_evaluations.clone(),
             device_evaluations: receipt.device_exact_support_evaluations.clone(),
             transfer_bytes: receipt.device_output_bytes.clone(),
             intermediate_bits: receipt.intermediate_bits.clone(),
         }
     }
 
-    /// The work the host authority does on the same material, **predicted from the same receipt
-    /// without running it**. The host law evaluates every selected primitive against every
+    /// The work the cpu authority does on the same material, **predicted from the same receipt
+    /// without running it**. The cpu law evaluates every selected primitive against every
     /// aperture member and moves nothing across a device boundary, so its work is the candidate's
     /// total evaluation count with the split collapsed.
     ///
@@ -1096,9 +1096,9 @@ impl CarrierWork {
     /// running the authority either confirms the predicted ordering or refutes it, and a
     /// refutation says the declared law is wrong about this material — information the clock
     /// comparison could not produce at all.
-    pub fn of_host_authority(receipt: &CudaApertureReceipt) -> Self {
+    pub fn of_cpu_authority(receipt: &CudaApertureReceipt) -> Self {
         Self {
-            host_evaluations: receipt.exact_support_evaluations.clone(),
+            cpu_evaluations: receipt.exact_support_evaluations.clone(),
             device_evaluations: BigUint::default(),
             transfer_bytes: BigUint::default(),
             intermediate_bits: receipt.intermediate_bits.clone(),
@@ -1109,7 +1109,7 @@ impl CarrierWork {
     /// [`ExactOrdering`] this body already owns at `crates/holonic-engine/src/exact_value.rs`.
     ///
     /// This is the componentwise (product) order, and it is a **partial** order on purpose. A
-    /// coordinate here is a kind of work, and the kinds are not interconvertible: a host evaluation
+    /// coordinate here is a kind of work, and the kinds are not interconvertible: a cpu evaluation
     /// and a device evaluation are different units, and nothing in the material says how many of one
     /// buys one of the other. So:
     ///
@@ -1128,7 +1128,7 @@ impl CarrierWork {
     /// intermediates exactly did strictly more work per evaluation and the product order may say so.
     pub fn order_against(&self, other: &Self) -> ExactOrdering {
         let coordinates = [
-            self.host_evaluations.cmp(&other.host_evaluations),
+            self.cpu_evaluations.cmp(&other.cpu_evaluations),
             self.device_evaluations.cmp(&other.device_evaluations),
             self.transfer_bytes.cmp(&other.transfer_bytes),
             self.intermediate_bits.cmp(&other.intermediate_bits),
@@ -1146,7 +1146,7 @@ impl CarrierWork {
 
 /// A receiver's declared exchange between kinds of work.
 ///
-/// Host and device evaluations are not the same unit, and nothing in the material says how to
+/// Cpu and device evaluations are not the same unit, and nothing in the material says how to
 /// trade one for the other. `CLAUDE.md` §13 rule 2: *"`dL` is a covector. It becomes a gradient
 /// only under a declared metric: `grad_G L = G⁻¹ dL`, and the metric is a receiver face of
 /// standing, so `G` is a receiver's declaration and never a modelling convenience."*
@@ -1155,7 +1155,7 @@ impl CarrierWork {
 /// admission returns [`CarrierAdmission::Open`]. It is never inferred from a clock.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeclaredCarrierMetric {
-    pub host_evaluation_cost: BigUint,
+    pub cpu_evaluation_cost: BigUint,
     pub device_evaluation_cost: BigUint,
     pub transfer_byte_cost: BigUint,
     /// What one bit of retained width costs this receiver.
@@ -1166,7 +1166,7 @@ pub struct DeclaredCarrierMetric {
     /// the octets it must be able to write down.
     ///
     /// Pricing it here is what joins the two axes that this module's own comment named as
-    /// unjoinable — *"a host evaluation and a device evaluation are different units, and nothing in
+    /// unjoinable — *"a cpu evaluation and a device evaluation are different units, and nothing in
     /// the material says how many of one buys one of the other."* **Nothing in the material says
     /// it, so a receiver declares it.** That is the whole content: the exchange is a declaration,
     /// carried as a value at a call site, and where no receiver declares one the admission returns
@@ -1182,12 +1182,12 @@ impl DeclaredCarrierMetric {
     /// A metric that prices the three traversal coordinates and not width — what this type carried
     /// before the description axis was joined to it.
     pub fn without_width(
-        host_evaluation_cost: BigUint,
+        cpu_evaluation_cost: BigUint,
         device_evaluation_cost: BigUint,
         transfer_byte_cost: BigUint,
     ) -> Self {
         Self {
-            host_evaluation_cost,
+            cpu_evaluation_cost,
             device_evaluation_cost,
             transfer_byte_cost,
             intermediate_bit_cost: BigUint::default(),
@@ -1214,7 +1214,7 @@ impl DeclaredCarrierMetric {
     /// width price is stating what a bit of retained representation buys against an evaluation, and
     /// that statement is the exchange — not an inference, and never a clock.
     pub fn cost_of(&self, work: &CarrierWork) -> BigUint {
-        &work.host_evaluations * &self.host_evaluation_cost
+        &work.cpu_evaluations * &self.cpu_evaluation_cost
             + &work.device_evaluations * &self.device_evaluation_cost
             + &work.transfer_bytes * &self.transfer_byte_cost
             + &work.intermediate_bits * &self.intermediate_bit_cost
@@ -1231,9 +1231,9 @@ impl DeclaredCarrierMetric {
 /// *"dilation is relational, a ratio of frames, never a property of one node."* So there is no
 /// per-carrier cost scalar in this type. There is one pair.
 ///
-/// **The host authority is `d`.** It crosses directly: every support evaluated in one place, no
+/// **The cpu authority is `d`.** It crosses directly: every support evaluated in one place, no
 /// split, no transfer, no merge. **The hybrid candidate is `C`.** It detours — packs, dispatches,
-/// runs the wide primitives back on the host, downloads, merges. Parity has already proved the two
+/// runs the wide primitives back on the cpu, downloads, merges. Parity has already proved the two
 /// share endpoints, which is exactly what makes them an arc and a chord rather than two unrelated
 /// walks.
 ///
@@ -1244,7 +1244,7 @@ impl DeclaredCarrierMetric {
 pub struct CarrierDilation {
     /// `C` — the finding-walk. What the hybrid candidate traversed under the declared metric.
     pub arc: BigUint,
-    /// `d` — the checking-step. What the host authority crosses directly under the same metric.
+    /// `d` — the checking-step. What the cpu authority crosses directly under the same metric.
     pub chord: BigUint,
 }
 
@@ -1276,7 +1276,7 @@ pub enum CarrierAdmission {
     /// `dilation` is `None` when no metric was declared and the admission was taken on the
     /// **metric-free** product order instead — there, one carrier dominates the other in every
     /// coordinate, which is a stronger statement than any single metric makes and forms no pair.
-    ExactHost { dilation: Option<CarrierDilation> },
+    ExactCpu { dilation: Option<CarrierDilation> },
     /// The arc is the shorter walk, `C < d`: the detour paid under this receiver's declaration.
     HybridCuda { dilation: Option<CarrierDilation> },
     /// The carriers are not separated. Either no metric was declared and the work vectors are
@@ -1306,7 +1306,7 @@ impl CarrierAdmission {
             chord: metric.cost_of(authority),
         };
         match dilation.arc.cmp(&dilation.chord) {
-            Ordering::Greater => Self::ExactHost {
+            Ordering::Greater => Self::ExactCpu {
                 dilation: Some(dilation),
             },
             Ordering::Less => Self::HybridCuda {
@@ -1328,21 +1328,21 @@ impl CarrierAdmission {
     pub fn from_work(authority: &CarrierWork, candidate: &CarrierWork) -> Self {
         match candidate.order_against(authority) {
             ExactOrdering::Less => Self::HybridCuda { dilation: None },
-            ExactOrdering::Greater => Self::ExactHost { dilation: None },
+            ExactOrdering::Greater => Self::ExactCpu { dilation: None },
             ExactOrdering::Equal | ExactOrdering::Open => Self::Open,
         }
     }
 
     /// The carrier later conduct takes by default.
     ///
-    /// Under `Open` this is the host authority, because the host law is the reference every parity
+    /// Under `Open` this is the cpu authority, because the cpu law is the reference every parity
     /// gate is taken against and is available unconditionally. That is a retained-plurality default
     /// and not a hidden preference: [`Self::is_open`] reports it, the receipt carries it, and
     /// `trace_through` conducts the other way on request.
     pub fn conducts_through(&self) -> ApertureExecutionBackend {
         match self {
             Self::HybridCuda { .. } => ApertureExecutionBackend::HybridCuda,
-            Self::ExactHost { .. } | Self::Open => ApertureExecutionBackend::ExactHost,
+            Self::ExactCpu { .. } | Self::Open => ApertureExecutionBackend::ExactCpu,
         }
     }
 
@@ -1354,7 +1354,7 @@ impl CarrierAdmission {
     /// includes a decided admission taken on the metric-free product order.
     pub fn dilation(&self) -> Option<&CarrierDilation> {
         match self {
-            Self::ExactHost { dilation } | Self::HybridCuda { dilation } => dilation.as_ref(),
+            Self::ExactCpu { dilation } | Self::HybridCuda { dilation } => dilation.as_ref(),
             Self::Open => None,
         }
     }
@@ -1389,7 +1389,7 @@ impl AdmittedCudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         receivers: &BTreeSet<ReceiverId>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             BTreeMap<ReceiverId, ReceiverApertureTrace>,
@@ -1402,14 +1402,14 @@ impl AdmittedCudaApertureExecutor {
             presentation,
             specification,
             receivers,
-            host_executor,
+            cpu_executor,
         )
     }
 
     /// Conduct through a named carrier regardless of the admission.
     ///
     /// This is what makes [`CarrierAdmission::Open`] a retained plurality rather than a synonym
-    /// for the host: when the declared metric does not separate the carriers, both remain
+    /// for the cpu: when the declared metric does not separate the carriers, both remain
     /// conductible and a caller may take either, or take both and compare across a changed
     /// aperture — which is how the cost law gets graded.
     pub fn trace_through(
@@ -1418,7 +1418,7 @@ impl AdmittedCudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         receivers: &BTreeSet<ReceiverId>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             BTreeMap<ReceiverId, ReceiverApertureTrace>,
@@ -1427,16 +1427,16 @@ impl AdmittedCudaApertureExecutor {
         CudaApertureError,
     > {
         match backend {
-            ApertureExecutionBackend::ExactHost => {
+            ApertureExecutionBackend::ExactCpu => {
                 let started = Instant::now();
                 let (traces, execution) = trace_receivers_aperture_with_cpu(
                     presentation,
                     specification,
                     receivers,
-                    host_executor,
+                    cpu_executor,
                 )?;
                 let wall_nanoseconds = started.elapsed().as_nanos();
-                let receipt = exact_host_receipt(
+                let receipt = exact_cpu_receipt(
                     self.inner.device_name(),
                     presentation,
                     specification,
@@ -1450,15 +1450,15 @@ impl AdmittedCudaApertureExecutor {
             ApertureExecutionBackend::HybridCuda => {
                 let (traces, mut receipt) =
                     self.inner
-                        .trace(presentation, specification, receivers, host_executor)?;
-                receipt.host_parity = true;
+                        .trace(presentation, specification, receivers, cpu_executor)?;
+                receipt.cpu_parity = true;
                 Ok((traces, receipt))
             }
         }
     }
 
     /// Restrict only the structural primitive keys owed by a terminal-tube
-    /// plan. The existing admitted host/card law is reused on the exact
+    /// plan. The existing admitted cpu/card law is reused on the exact
     /// filtered continuous presentation; no device-side approximation or
     /// receiver-wide overtrace is introduced.
     pub fn trace_primitives(
@@ -1466,7 +1466,7 @@ impl AdmittedCudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         primitives: &BTreeSet<PresentedPrimitiveKey>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             BTreeMap<ReceiverId, ReceiverApertureTrace>,
@@ -1501,11 +1501,11 @@ impl AdmittedCudaApertureExecutor {
             .iter()
             .map(|key| key.receiver)
             .collect::<BTreeSet<_>>();
-        self.trace(&selected, specification, &receivers, host_executor)
+        self.trace(&selected, specification, &receivers, cpu_executor)
     }
 
     /// Conducts the admitted hybrid carrier even when the admission timing
-    /// selected the exact host carrier for ordinary presentation. This exists
+    /// selected the exact cpu carrier for ordinary presentation. This exists
     /// for bounded parity and physical-cost measurements; it is not the live
     /// executor selection law.
     pub fn trace_hybrid(
@@ -1513,7 +1513,7 @@ impl AdmittedCudaApertureExecutor {
         presentation: &ContinuousPresentation,
         specification: &TerminalMatrixSpec,
         receivers: &BTreeSet<ReceiverId>,
-        host_executor: &CpuExecutor,
+        cpu_executor: &CpuExecutor,
     ) -> Result<
         (
             BTreeMap<ReceiverId, ReceiverApertureTrace>,
@@ -1522,15 +1522,15 @@ impl AdmittedCudaApertureExecutor {
         CudaApertureError,
     > {
         self.inner
-            .trace(presentation, specification, receivers, host_executor)
+            .trace(presentation, specification, receivers, cpu_executor)
     }
 
     pub fn device_name(&self) -> &str {
         self.inner.device_name()
     }
 
-    /// The carrier later conduct takes by default. Under an `Open` admission this is the host
-    /// authority; consult [`Self::admission`] to tell a decided host admission from an undecided
+    /// The carrier later conduct takes by default. Under an `Open` admission this is the cpu
+    /// authority; consult [`Self::admission`] to tell a decided cpu admission from an undecided
     /// one, because they conduct identically and are not the same state.
     pub fn preferred_backend(&self) -> ApertureExecutionBackend {
         self.admission.conducts_through()
@@ -1544,15 +1544,15 @@ impl AdmittedCudaApertureExecutor {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ApertureExecutionBackend {
-    ExactHost,
+    ExactCpu,
     HybridCuda,
 }
 
 impl ApertureExecutionBackend {
     pub fn label(self) -> &'static str {
         match self {
-            Self::ExactHost => "exact host",
-            Self::HybridCuda => "hybrid CUDA/host",
+            Self::ExactCpu => "exact cpu",
+            Self::HybridCuda => "hybrid CUDA/cpu",
         }
     }
 }
@@ -1566,27 +1566,27 @@ pub struct CudaApertureReceipt {
     pub device_primitives: BigUint,
     pub conics: BigUint,
     pub segments: BigUint,
-    pub host_primitives: BigUint,
-    pub host_conics: BigUint,
-    pub host_linear_primitives: BigUint,
+    pub cpu_primitives: BigUint,
+    pub cpu_conics: BigUint,
+    pub cpu_linear_primitives: BigUint,
     pub aperture_members: BigUint,
     pub device_output_bytes: BigUint,
     pub device_threads: BigUint,
     pub exact_support_evaluations: BigUint,
     pub device_exact_support_evaluations: BigUint,
-    pub host_exact_support_evaluations: BigUint,
+    pub cpu_exact_support_evaluations: BigUint,
     pub intermediate_bits: BigUint,
     pub device_arithmetic: String,
-    pub host_workers: BigUint,
+    pub cpu_workers: BigUint,
     pub selection_pack_nanoseconds: u128,
     pub device_prepare_nanoseconds: u128,
     pub device_execute_nanoseconds: u128,
     pub device_download_nanoseconds: u128,
     pub device_decode_nanoseconds: u128,
-    pub host_trace_nanoseconds: u128,
-    pub host_merge_nanoseconds: u128,
+    pub cpu_trace_nanoseconds: u128,
+    pub cpu_merge_nanoseconds: u128,
     pub wall_nanoseconds: u128,
-    pub host_parity: bool,
+    pub cpu_parity: bool,
     pub execution_backend: String,
     /// Frame-dependent, retained, and never compared to select a carrier. Lawful as a measurement
     /// of difference (§13 rule 2); unlawful as a governor, which is what it used to be.
@@ -1606,7 +1606,7 @@ pub struct CudaApertureReceipt {
     pub display_frame: DisplayFrame,
 }
 
-fn exact_host_receipt(
+fn exact_cpu_receipt(
     device_name: &str,
     presentation: &ContinuousPresentation,
     specification: &TerminalMatrixSpec,
@@ -1620,7 +1620,7 @@ fn exact_host_receipt(
         .iter()
         .filter(|presented| receivers.contains(&presented.receiver))
         .collect::<Vec<_>>();
-    let host_conics = selected
+    let cpu_conics = selected
         .iter()
         .filter(|presented| matches!(&presented.primitive, ReceiverPrimitive::Conic(_)))
         .count();
@@ -1639,28 +1639,28 @@ fn exact_host_receipt(
         device_primitives: BigUint::zero(),
         conics: BigUint::zero(),
         segments: BigUint::zero(),
-        host_primitives: BigUint::from(selected.len()),
-        host_conics: BigUint::from(host_conics),
-        host_linear_primitives: BigUint::from(selected.len() - host_conics),
+        cpu_primitives: BigUint::from(selected.len()),
+        cpu_conics: BigUint::from(cpu_conics),
+        cpu_linear_primitives: BigUint::from(selected.len() - cpu_conics),
         aperture_members: BigUint::from(aperture_members),
         device_output_bytes: BigUint::zero(),
         device_threads: BigUint::zero(),
         exact_support_evaluations: exact_support_evaluations.clone(),
         device_exact_support_evaluations: BigUint::zero(),
-        host_exact_support_evaluations: exact_support_evaluations,
+        cpu_exact_support_evaluations: exact_support_evaluations,
         intermediate_bits: BigUint::zero(),
-        device_arithmetic: "exact host integer-projective".to_owned(),
-        host_workers: workers_used,
+        device_arithmetic: "exact cpu integer-projective".to_owned(),
+        cpu_workers: workers_used,
         selection_pack_nanoseconds: 0,
         device_prepare_nanoseconds: 0,
         device_execute_nanoseconds: 0,
         device_download_nanoseconds: 0,
         device_decode_nanoseconds: 0,
-        host_trace_nanoseconds: wall_nanoseconds,
-        host_merge_nanoseconds: 0,
+        cpu_trace_nanoseconds: wall_nanoseconds,
+        cpu_merge_nanoseconds: 0,
         wall_nanoseconds,
-        host_parity: true,
-        execution_backend: ApertureExecutionBackend::ExactHost.label().to_owned(),
+        cpu_parity: true,
+        execution_backend: ApertureExecutionBackend::ExactCpu.label().to_owned(),
         admission_candidate_nanoseconds: 0,
         admission_authority_nanoseconds: 0,
         admission: CarrierAdmission::Open,
@@ -1955,7 +1955,7 @@ pub enum CudaApertureError {
     },
     #[error("the finite aperture extent exceeds the CUDA carrier")]
     ExtentOverflow,
-    #[error("CUDA conic support differs from the exact host authority")]
+    #[error("CUDA conic support differs from the exact cpu authority")]
     ParityRefused,
     #[error(transparent)]
     Presentation(#[from] PresentationError),
@@ -1975,9 +1975,9 @@ mod tests {
     // Until 2026-08-08 `admit` selected a carrier with `authority_nanoseconds < candidate_nanoseconds`
     // — one unrepeated wall-clock sample, taken once, permanently routing every later trace.
 
-    fn work(host: u32, device: u32, transfer: u32) -> CarrierWork {
+    fn work(cpu: u32, device: u32, transfer: u32) -> CarrierWork {
         CarrierWork {
-            host_evaluations: BigUint::from(host),
+            cpu_evaluations: BigUint::from(cpu),
             device_evaluations: BigUint::from(device),
             transfer_bytes: BigUint::from(transfer),
             intermediate_bits: BigUint::from(64_u32),
@@ -1993,13 +1993,13 @@ mod tests {
     #[test]
     fn a_declared_width_price_changes_the_cost_and_no_price_reproduces_the_inherited_reading() {
         let work = CarrierWork {
-            host_evaluations: BigUint::from(7u32),
+            cpu_evaluations: BigUint::from(7u32),
             device_evaluations: BigUint::from(11u32),
             transfer_bytes: BigUint::from(13u32),
             intermediate_bits: BigUint::from(384u32),
         };
         let traversal_only = metric(2, 3, 5);
-        let inherited = &work.host_evaluations * 2u32
+        let inherited = &work.cpu_evaluations * 2u32
             + &work.device_evaluations * 3u32
             + &work.transfer_bytes * 5u32;
         assert_eq!(traversal_only.cost_of(&work), inherited);
@@ -2020,13 +2020,13 @@ mod tests {
     #[test]
     fn the_width_price_has_a_non_trivial_orbit_on_two_real_carriers() {
         let narrow_but_busy = CarrierWork {
-            host_evaluations: BigUint::from(100u32),
+            cpu_evaluations: BigUint::from(100u32),
             device_evaluations: BigUint::default(),
             transfer_bytes: BigUint::default(),
             intermediate_bits: BigUint::from(8u32),
         };
         let quiet_but_wide = CarrierWork {
-            host_evaluations: BigUint::from(10u32),
+            cpu_evaluations: BigUint::from(10u32),
             device_evaluations: BigUint::default(),
             transfer_bytes: BigUint::default(),
             intermediate_bits: BigUint::from(4096u32),
@@ -2044,9 +2044,9 @@ mod tests {
         );
     }
 
-    fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
+    fn metric(cpu: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
         DeclaredCarrierMetric::without_width(
-            BigUint::from(host),
+            BigUint::from(cpu),
             BigUint::from(device),
             BigUint::from(transfer),
         )
@@ -2067,9 +2067,9 @@ mod tests {
         assert_eq!(admission.dilation(), None);
         assert_eq!(
             admission.conducts_through(),
-            ApertureExecutionBackend::ExactHost,
+            ApertureExecutionBackend::ExactCpu,
             "Open conducts through the authority, and `admission()` is how a caller tells that \
-             from a decided host admission"
+             from a decided cpu admission"
         );
     }
 
@@ -2077,7 +2077,7 @@ mod tests {
     fn a_declared_metric_separates_the_carriers_and_names_the_exact_margin() {
         let authority = work(1_000, 0, 0);
         let candidate = work(100, 100, 64);
-        // host 1 : device 1 : transfer 1 -> authority 1000, candidate 264
+        // cpu 1 : device 1 : transfer 1 -> authority 1000, candidate 264
         let admission = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
         let dilation = admission.dilation().expect("the metric separated them");
         assert_eq!(
@@ -2116,8 +2116,8 @@ mod tests {
         // be a constant wearing a comparison.
         let authority = work(1_000, 0, 0);
         let candidate = work(100, 100, 64);
-        let cheap_host = CarrierAdmission::under(&metric(1, 20, 1), &authority, &candidate);
-        let dilation = cheap_host.dilation().expect("the metric separated them");
+        let cheap_cpu = CarrierAdmission::under(&metric(1, 20, 1), &authority, &candidate);
+        let dilation = cheap_cpu.dilation().expect("the metric separated them");
         assert_eq!(
             dilation.arc,
             BigUint::from(2_164_u32),
@@ -2125,8 +2125,8 @@ mod tests {
         );
         assert_eq!(dilation.chord, BigUint::from(1_000_u32));
         assert_eq!(
-            cheap_host.conducts_through(),
-            ApertureExecutionBackend::ExactHost
+            cheap_cpu.conducts_through(),
+            ApertureExecutionBackend::ExactCpu
         );
         let cheap_device = CarrierAdmission::under(&metric(1, 1, 1), &authority, &candidate);
         assert_eq!(
@@ -2134,7 +2134,7 @@ mod tests {
             ApertureExecutionBackend::HybridCuda
         );
         assert_ne!(
-            cheap_host.conducts_through(),
+            cheap_cpu.conducts_through(),
             cheap_device.conducts_through(),
             "the declared metric, and nothing else, moved the admission"
         );
@@ -2187,31 +2187,31 @@ mod tests {
     }
 
     #[test]
-    fn the_work_vector_is_read_off_the_receipt_and_the_host_prediction_collapses_the_split() {
-        // `of_host_authority` is a PREDICTION taken from the candidate's own receipt without
-        // running the host. That is what makes the cost law falsifiable: the authority run either
+    fn the_work_vector_is_read_off_the_receipt_and_the_cpu_prediction_collapses_the_split() {
+        // `of_cpu_authority` is a PREDICTION taken from the candidate's own receipt without
+        // running the cpu. That is what makes the cost law falsifiable: the authority run either
         // confirms the predicted ordering or refutes it.
-        let mut receipt = exact_host_receipt_for_test();
+        let mut receipt = exact_cpu_receipt_for_test();
         receipt.exact_support_evaluations = BigUint::from(900_u32);
-        receipt.host_exact_support_evaluations = BigUint::from(100_u32);
+        receipt.cpu_exact_support_evaluations = BigUint::from(100_u32);
         receipt.device_exact_support_evaluations = BigUint::from(800_u32);
         receipt.device_output_bytes = BigUint::from(256_u32);
 
         let candidate = CarrierWork::of_candidate(&receipt);
-        assert_eq!(candidate.host_evaluations, BigUint::from(100_u32));
+        assert_eq!(candidate.cpu_evaluations, BigUint::from(100_u32));
         assert_eq!(candidate.device_evaluations, BigUint::from(800_u32));
         assert_eq!(candidate.transfer_bytes, BigUint::from(256_u32));
 
-        let authority = CarrierWork::of_host_authority(&receipt);
+        let authority = CarrierWork::of_cpu_authority(&receipt);
         assert_eq!(
-            authority.host_evaluations,
+            authority.cpu_evaluations,
             BigUint::from(900_u32),
-            "the host law evaluates every support the split shared out"
+            "the cpu law evaluates every support the split shared out"
         );
         assert!(authority.device_evaluations.is_zero());
         assert!(
             authority.transfer_bytes.is_zero(),
-            "the host carrier moves nothing across a device boundary"
+            "the cpu carrier moves nothing across a device boundary"
         );
         assert_ne!(
             candidate, authority,
@@ -2234,7 +2234,7 @@ mod tests {
         );
         assert_eq!(
             CarrierAdmission::from_work(&dominated, &dominating).conducts_through(),
-            ApertureExecutionBackend::ExactHost
+            ApertureExecutionBackend::ExactCpu
         );
         assert_eq!(
             CarrierAdmission::from_work(&dominating, &dominated).dilation(),
@@ -2246,7 +2246,7 @@ mod tests {
 
     #[test]
     fn incomparable_work_vectors_admit_open_and_retain_both_carriers() {
-        // THE FINDING. The two carriers on this executor's own material trade host evaluations
+        // THE FINDING. The two carriers on this executor's own material trade cpu evaluations
         // against device evaluations plus transferred octets. That is not a tie -- the vectors are
         // INCOMPARABLE, and `Equal` and `Open` are different states.
         let authority = work(1_000, 0, 0);
@@ -2254,7 +2254,7 @@ mod tests {
         assert_eq!(
             candidate.order_against(&authority),
             ExactOrdering::Open,
-            "strictly fewer host evaluations, strictly more device work: no product order"
+            "strictly fewer cpu evaluations, strictly more device work: no product order"
         );
         let admission = CarrierAdmission::from_work(&authority, &candidate);
         assert!(admission.is_open(), "both carriers stay retained");
@@ -2266,24 +2266,24 @@ mod tests {
 
     #[test]
     fn the_real_material_work_vectors_are_incomparable_whenever_the_card_did_anything() {
-        // Read off `of_candidate` / `of_host_authority` rather than a hand-built fixture, so this
+        // Read off `of_candidate` / `of_cpu_authority` rather than a hand-built fixture, so this
         // is a statement about the live path and not about the test's own arithmetic.
-        let mut receipt = exact_host_receipt_for_test();
+        let mut receipt = exact_cpu_receipt_for_test();
         receipt.exact_support_evaluations = BigUint::from(900_u32);
-        receipt.host_exact_support_evaluations = BigUint::from(100_u32);
+        receipt.cpu_exact_support_evaluations = BigUint::from(100_u32);
         receipt.device_exact_support_evaluations = BigUint::from(800_u32);
         receipt.device_output_bytes = BigUint::from(256_u32);
         let candidate = CarrierWork::of_candidate(&receipt);
-        let authority = CarrierWork::of_host_authority(&receipt);
+        let authority = CarrierWork::of_cpu_authority(&receipt);
         assert_eq!(candidate.order_against(&authority), ExactOrdering::Open);
 
         // And when the card did nothing, the split collapses and the two carriers are a mirror.
-        receipt.host_exact_support_evaluations = BigUint::from(900_u32);
+        receipt.cpu_exact_support_evaluations = BigUint::from(900_u32);
         receipt.device_exact_support_evaluations = BigUint::zero();
         receipt.device_output_bytes = BigUint::zero();
         assert_eq!(
             CarrierWork::of_candidate(&receipt)
-                .order_against(&CarrierWork::of_host_authority(&receipt)),
+                .order_against(&CarrierWork::of_cpu_authority(&receipt)),
             ExactOrdering::Equal,
         );
     }
@@ -2293,13 +2293,13 @@ mod tests {
         // A measurement without its frame is the absolute-frame defect. Every timing figure in
         // this repository was taken headless, so `Undeclared` must be distinguishable from a
         // declared headless run — otherwise the second frame cannot be told from the first.
-        let receipt = exact_host_receipt_for_test();
+        let receipt = exact_cpu_receipt_for_test();
         assert_eq!(receipt.display_frame, DisplayFrame::Undeclared);
         assert_ne!(DisplayFrame::Undeclared, DisplayFrame::Headless);
         assert_ne!(DisplayFrame::Headless, DisplayFrame::DisplayActive);
     }
 
-    fn exact_host_receipt_for_test() -> CudaApertureReceipt {
+    fn exact_cpu_receipt_for_test() -> CudaApertureReceipt {
         CudaApertureReceipt {
             schema: "holonic-engine.cuda-aperture-receipt.v1".to_owned(),
             device: "test".to_owned(),
@@ -2308,28 +2308,28 @@ mod tests {
             device_primitives: BigUint::default(),
             conics: BigUint::default(),
             segments: BigUint::default(),
-            host_primitives: BigUint::from(1_u32),
-            host_conics: BigUint::default(),
-            host_linear_primitives: BigUint::default(),
+            cpu_primitives: BigUint::from(1_u32),
+            cpu_conics: BigUint::default(),
+            cpu_linear_primitives: BigUint::default(),
             aperture_members: BigUint::from(1_u32),
             device_output_bytes: BigUint::default(),
             device_threads: BigUint::default(),
             exact_support_evaluations: BigUint::default(),
             device_exact_support_evaluations: BigUint::default(),
-            host_exact_support_evaluations: BigUint::default(),
+            cpu_exact_support_evaluations: BigUint::default(),
             intermediate_bits: BigUint::from(64_u32),
             device_arithmetic: "i128".to_owned(),
-            host_workers: BigUint::from(1_u32),
+            cpu_workers: BigUint::from(1_u32),
             selection_pack_nanoseconds: 0,
             device_prepare_nanoseconds: 0,
             device_execute_nanoseconds: 0,
             device_download_nanoseconds: 0,
             device_decode_nanoseconds: 0,
-            host_trace_nanoseconds: 0,
-            host_merge_nanoseconds: 0,
+            cpu_trace_nanoseconds: 0,
+            cpu_merge_nanoseconds: 0,
             wall_nanoseconds: 0,
-            host_parity: false,
-            execution_backend: ApertureExecutionBackend::ExactHost.label().to_owned(),
+            cpu_parity: false,
+            execution_backend: ApertureExecutionBackend::ExactCpu.label().to_owned(),
             admission_candidate_nanoseconds: 0,
             admission_authority_nanoseconds: 0,
             admission: CarrierAdmission::Open,

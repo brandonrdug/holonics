@@ -232,7 +232,7 @@ fn extend_relation_atom(mut position: Place, atom: RelationAtom) -> (Place, u32)
 }
 
 /// Compose one complete ordered event directly from its canonical relation atoms.  This function
-/// is part of the substrate-neutral ABI law so host and device mouths cannot silently choose
+/// is part of the substrate-neutral ABI law so cpu and device mouths cannot silently choose
 /// different event geometry.  `None` means only an empty span or a length overflow.
 pub fn relation_span_node(atoms: &[RelationAtom]) -> Option<Node> {
     let first = atoms.first().copied()?;
@@ -720,7 +720,7 @@ pub struct View<'a> {
 
 impl<'a> View<'a> {
     /// Reborrow one canonical packed active population as its typed rows without allocating or
-    /// interpreting the words as relation light.  This is the CUDA transport inverse of the host
+    /// interpreting the words as relation light.  This is the CUDA transport inverse of the cpu
     /// owner's durable wire: every row wrapper is transparent over whole `u32` words, all extents
     /// close before a slice exists, and ordinary view validation still precedes conduct.
     pub fn from_wire_words(words: &'a [u32]) -> Option<Self> {
@@ -1008,7 +1008,7 @@ impl View<'_> {
     }
 
     /// Allocation-free complete validation retained for substrate callers which have not supplied
-    /// scratch.  Host transactions use `validate_with_scratch`, avoiding this compatibility
+    /// scratch.  Cpu transactions use `validate_with_scratch`, avoiding this compatibility
     /// path's repeated coverage scans.
     pub fn validate(&self) -> Result<(), ValidationError> {
         self.validate_structure()?;

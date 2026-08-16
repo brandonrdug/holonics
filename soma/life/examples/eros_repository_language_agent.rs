@@ -567,7 +567,7 @@ fn main() -> Result<(), String> {
         .unwrap_or(1)
         .min(LOCAL_ORGAN_WORKER_APERTURE);
     // A driver that runs for minutes with no output is not diagnosable, and `CLAUDE.md` §9 says a
-    // run that pins one host core while the card idles is a defect to DIAGNOSE. Every phase below
+    // run that pins one cpu core while the card idles is a defect to DIAGNOSE. Every phase below
     // stamps its own wall clock so the long pole is named rather than guessed at. These are
     // measurements in one frame and select nothing.
     let phase_clock = Instant::now();

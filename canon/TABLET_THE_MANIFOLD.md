@@ -476,7 +476,7 @@ occurrences separate**, which the shared-prefix array already reports.
 
 ### The horizon is read off the material — and a cone propagates, it is not searched
 
-`saturation_horizon` (`crates/holonic-engine/src/token_invariance.rs:2135`) holds the partition and
+`saturation_horizon` (`crates/holonic-engine/src/token_invariance.rs:2276`) holds the partition and
 refines it one shell at a time, touching only occurrences whose class is **not yet a singleton**
 (`:2154`, `classes.iter().filter(|c| c.len() > 1)`). A singleton can never split again, so that
 population shrinks monotonically and the accumulated work (`:2161`) is
@@ -560,15 +560,15 @@ separate — reported a least final radius of `1`. The floor was invisible to
 `tools/authored_levels.py` because it is not a `const`, and its unit test was guarded
 `if horizon > 1`, excluding exactly the case the floor decided. The card carried the identical floor
 in `cuda_refine.rs`; both now return `0`, and `the_card_refines_the_front` re-run on an RTX 4080
-SUPER agrees with the host on every surface it reads — **18,911 of 18,911** at the first re-run and
+SUPER agrees with the CPU on every surface it reads — **18,911 of 18,911** at the first re-run and
 **18,917 of 18,917** at a later one the same day, with **68,734 crossings on the card against 68,734
-shells on the host: one law, one cost.** The two figures differ because *the corpus grew under the
+shells on the CPU: one law, one cost.** The two figures differ because *the corpus grew under the
 measurement* — another session is writing files into it — which is the reason every row above carries
 its clock rather than a bare number.
 
 **And the two carriers are now handed the same ceiling.** 163,023,246 shells surface-local against
 546,228,375 the corpus ceiling imposed, with a declared control that neither carrier is handed a
-foreign one. A cost law that held on the host and not on the card would have been a second frame
+foreign one. A cost law that held on the CPU and not on the card would have been a second frame
 smuggled in as an optimisation.
 
 **WITHDRAWN 2026-08-11: the sentence that stood here was produced by a broken gauge.** It read
@@ -629,7 +629,7 @@ their own material required rather than skipped by a number.
 
 29,533 surfaces, each reading independent of every other — shared immutable census and atlas,
 disjoint occurrences. That is a front, and `sweep_over` covers it across the charts a caller
-declares, by **extent** rather than by count. Driving it serially pinned one host core while
+declares, by **extent** rather than by count. Driving it serially pinned one CPU core while
 twenty-three stood idle, which `CLAUDE.md` §9 names a defect to diagnose rather than narrate.
 `the_covered_sweep_equals_the_serial_sweep` requires the readings to be identical: a lane is a
 realization coordinate and may not move a reading.
@@ -663,17 +663,17 @@ device and the kernel:
 |---|---|
 | surfaces refined on the card | **18,889** |
 | crossings | **68,647** |
-| partitions agreeing with the host | **18,889 of 18,889** |
+| partitions agreeing with the CPU | **18,889 of 18,889** |
 | derived horizons agreeing | **18,889 of 18,889** |
 | idle lanes, named rather than hidden | 18,760,509 |
 | deepest cone | `"a"` at horizon **88** over 19,072 orbits |
 
-**A partition is not a numbering.** The card claims identities in probe order and the host in
+**A partition is not a numbering.** The card claims identities in probe order and the CPU in
 lexicographic window order, so the comparison is of the induced **equivalence** — requiring the
 numbering to match would be requiring a realization coordinate to be causal.
 
 **And the first run disagreed, which is why it was run.** The card returned 1,794 classes for `"of"`
-at shell one against the host's 1,787 — finer, never coarser. The cause was a race of my own making:
+at shell one against the CPU's 1,787 — finer, never coarser. The cause was a race of my own making:
 the claim and the key are two stores, and a lane that found its own class in a slot whose key had not
 yet landed walked on and claimed a **second** slot for the same pair. It splits a class in two and
 looks like nothing. The trace shell by shell is what found it; the aggregate said only *"116 horizons
@@ -704,28 +704,39 @@ the same split: `shell_keys` is the material, `claim_identities` is the law.
 
 **Who conducts through it, stated as reach rather than as intent — measured 2026-08-10.** The
 sentence that stood here, *"every organ with a front supplies a key law and shares everything else"*,
-is the design and not the position. `cuda_refine` has three consumers:
-`crates/holonic-engine/examples/the_card_refines_the_front.rs:40` (the separation front's **card**
-path), `soma/life/src/morphological_language/current.rs:921`
-(`quotient_generation_states`, a second organ's material through the same law), and one test at
-`crates/holonic-engine/src/token_invariance.rs:3998`. **`saturation_horizon`'s own host refinement
-does not call it** — it groups with a `BTreeMap` at `token_invariance.rs:2170-2181`, and the
-agreement with the shared law is established by that test rather than by the call. So the factoring
-carries two materials today, `causal_language` is not among them, and the host-side migration of the
-organ that motivated the factoring is owed.
+is the design and not the position.
+
+**RE-MEASURED 2026-08-15, and the 2026-08-10 census had decayed in both directions.** It read
+*"`cuda_refine` has three consumers"* and named one that no longer exists: `current.rs:921`
+`quotient_generation_states` occurs nowhere in the tree — `grep -rn "quotient_generation_states"
+--include='*.rs' soma crates` returns zero. The module meanwhile gained library consumers the census
+could not have seen. Command:
+`grep -rn "cuda_refine\|CudaRefineExecutor" --include='*.rs' soma crates`.
+
+```text
+   LIBRARY   holonic-engine: embedding_fiber, receiver_exact_compression, token_invariance
+             life: causal_section
+   DRIVERS   the_card_refines_the_front:40 (the separation front's card path),
+             the_foreign_map_founds_its_axes, the_code_material_returns_its_world_line,
+             the_conditioned_section_returns_after_detachment, the_operation_survives_the_codec
+```
+
+So the factoring carries more materials than the census recorded, and the reading it supported —
+*"the CPU-side migration of the organ that motivated the factoring is owed"* — is stated against a
+population that has moved and must be re-taken before it is cited again.
 
 **Proved on both charts and against the organ:**
 
 | | |
 |---|---|
-| host and card return the same partition | 1 · 2 · 31 · 32 · 33 · 1,024 · 40,000 cells, on the real card |
+| CPU and card return the same partition | 1 · 2 · 31 · 32 · 33 · 1,024 · 40,000 cells, on the real card |
 | the organ's key through the shared law = the organ's own refinement | every separable surface of the declared fixture |
 | the separation front on the card, unchanged by the factoring | 18,891 surfaces · 68,653 crossings · partitions and horizons 18,891 / 18,891 |
 
 **Equality is of the induced equivalence, never of the numbering.** A carrier claims identities in
 whatever order its lanes reach them, and requiring two carriers to agree on numbering would be
 requiring a realization coordinate to be causal — the record's own words: a lane, a warp, a block and
-a host thread are realization coordinates and none is a holon.
+a CPU thread are realization coordinates and none is a holon.
 
 ### Chronology is not seriality — arcs, junctions, and why the card's model is the same law
 
@@ -762,7 +773,7 @@ cosines, the hinge deficit, and Brandon's own *"in friction triangles are the qu
 ```
 
 A covering per organ is the cabinet failure one level down, exactly as a device path per organ is.
-`hardware_cover::expand_front` (`crates/holonic-engine/src/hardware_cover.rs:887`) is the law: the
+`hardware_cover::expand_front` (`crates/holonic-engine/src/hardware_cover.rs:1019`) is the law: the
 material supplies `cell -> successors`, the law covers it by **extent**, and successors are
 reassembled in the **front's own order** so a lane's completion order never becomes chronology.
 Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front (`:778-803`), with a failing cell
@@ -775,8 +786,8 @@ surfacing from any lane (`:807`).
 | organ | what it covers with, today |
 |---|---|
 | `causal_language` leader | **`expand_front`** — `soma/life/src/causal_language.rs:482`, with the tip's extent supplied as `emitted.len() + 1`. Migrated. |
-| `token_invariance::sweep_covered` | its **own** by-extent placement, `token_invariance.rs:1796-1811` — the same law, written twice. Not shared. |
-| `morphological_language::generate_currents` | `std::thread::available_parallelism()` directly (`soma/life/src/morphological_language/ecology.rs:791`) and sections the front `sections[at % lanes]` (`:798`) — **by count**, which is the law `sweep_covered`'s own comment names as wrong at `token_invariance.rs:1796`: *"Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one with two are not one unit each."* Not shared, and covering by a different law. |
+| `token_invariance::sweep_covered` | its **own** by-extent placement, `token_invariance.rs:1776-1811` — the same law, written twice. Not shared. |
+| `morphological_language::generate_currents` | `std::thread::available_parallelism()` directly (`soma/life/src/morphological_language/ecology.rs:1453`) and sections the front `sections[at % lanes]` (`:798`) — **by count**, which is the law `sweep_covered`'s own comment names as wrong at `token_invariance.rs:1776`: *"Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one with two are not one unit each."* Not shared, and covering by a different law. |
 
 So what is established is that the law exists, is proved lane-invariant on a branching front, and
 carries one organ. Two migrations are **owed**, and the second is not a rename: it changes
@@ -788,10 +799,10 @@ there too.
 ### What mounting a carrier used to cost, measured
 
 `condition_route_receivers_with_executor` walked receivers in a plain `for`, threading one carrier
-through all of them, while its host twin `condition_route_partition` says outright: *"Parallelism
+through all of them, while its CPU twin `condition_route_partition` says outright: *"Parallelism
 lives across independent receiver ecologies; one receiver's returned chronology remains serial."*
 **So mounting a card cost the parallelism** — the device sat resident holding 2 GB at 0% while one
-host core walked the population, which is precisely what was observed.
+CPU core walked the population, which is precisely what was observed.
 
 Repaired: each lane of the receiver cover mounts its own carrier, and the caller's carrier keeps a
 section so a mounted card is never idled. Measured on the bounded corpus:

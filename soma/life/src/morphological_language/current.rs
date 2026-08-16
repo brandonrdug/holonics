@@ -712,13 +712,13 @@ pub(super) fn receive_question(
     action: ActionCurrent,
     worker_threads: usize,
 ) -> Result<ResonanceEcology, MorphologicalLanguageError> {
-    let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-    receive_question_with_executor(prompt, action, &mut host)
+    let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+    receive_question_with_executor(prompt, action, &mut cpu)
 }
 
 /// Receive the outer question through one caller-retained physical executor. The executor crosses
 /// the question's Swing event; selecting a card at the outer language boundary cannot silently
-/// construct a private host executor here.
+/// construct a private cpu executor here.
 pub(super) fn receive_question_with_executor(
     prompt: &[String],
     action: ActionCurrent,
@@ -792,13 +792,13 @@ pub(super) fn materialize_returned_path_live<'a>(
     action: ActionCurrent,
     worker_threads: usize,
 ) -> Result<ResonanceEcologyRestImage, MorphologicalLanguageError> {
-    let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-    materialize_returned_path_live_with_executor(ecology, prompt, generated, action, &mut host)
+    let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+    materialize_returned_path_live_with_executor(ecology, prompt, generated, action, &mut cpu)
 }
 
 /// Re-enter every generated event as self-emanated cause through one caller-retained physical
 /// executor. Each returned event crosses the supplied executor; the emanation path cannot select a
-/// private host pool behind a caller which already mounted one.
+/// private cpu pool behind a caller which already mounted one.
 pub(super) fn materialize_returned_path_live_with_executor<'a>(
     mut ecology: ResonanceEcology,
     prompt: &[String],

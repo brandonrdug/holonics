@@ -359,7 +359,7 @@ fn run() -> Result<(), String> {
     let mut workers = BTreeMap::new();
     workers.insert("independent_series_workers", 4);
     workers.insert(
-        "host_parallelism_available",
+        "cpu_parallelism_available",
         thread::available_parallelism()
             .map(|count| u64::try_from(count.get()).unwrap_or(u64::MAX))
             .unwrap_or(1),

@@ -72,8 +72,8 @@ impl ResonanceEcology {
         occurrence: &ResonanceOccurrence,
         action: ActionCurrent,
     ) -> Result<ResonanceRadiation, ResonanceEcologyError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.receive_with(occurrence, action, &mut host)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.receive_with(occurrence, action, &mut cpu)
     }
 
     pub fn receive_with(
@@ -104,8 +104,8 @@ impl ResonanceEcology {
         occurrence: &ResonanceOccurrence,
         action: ActionCurrent,
     ) -> Result<ResonanceEmanation, ResonanceEcologyError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.receive_and_emanate_with(occurrence, action, &mut host)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.receive_and_emanate_with(occurrence, action, &mut cpu)
     }
 
     pub fn receive_and_emanate_with(
@@ -168,8 +168,8 @@ impl ResonanceEcology {
         occurrences: &[ResonanceOccurrence],
         action: ActionCurrent,
     ) -> Result<ResonanceConfigurationRadiation, ResonanceEcologyError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.receive_configuration_with(occurrences, action, &mut host)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.receive_configuration_with(occurrences, action, &mut cpu)
     }
 
     /// Execute one co-present configuration through a caller-retained physical executor.

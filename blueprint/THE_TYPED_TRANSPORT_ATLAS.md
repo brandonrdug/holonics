@@ -75,7 +75,7 @@ at formation time by information the reader had and discarded.**
 
 ### 1.2 Both loss sites are exact, and only one of them is small (verified)
 
-- **`v`:** `result_constructors` (`lean_mathematics/syntax.rs:307-331`) already isolates the
+- **`v`:** `result_constructors` (`lean_mathematics/syntax.rs:287-331`) already isolates the
   conclusion via `first_top_level_colon` and walks it at bracket depth zero — and matches exactly one
   character, `'∧'`. `LeanResultConstructor` has one variant. Every `=`, `↔`, `≤`, `<`, `→`, `¬` falls
   into `_ => {}`.
@@ -183,7 +183,7 @@ the emission's reader **refuses 622 of 7,516 documents outright**, which bounds 
 built on it can see.
 [The record](../research/records/2026-08-14_THE_CONCLUSION_CARRIES_ITS_RELATION_AND_THE_KERNEL_AGREES_SEVEN_OF_SEVEN.md).
 
-**Build.** Widen `LeanResultConstructor` and the walk at `syntax.rs:307-331` to return the relation
+**Build.** Widen `LeanResultConstructor` and the walk at `syntax.rs:491-331` to return the relation
 species the material actually exposes at depth zero. The species are read off the corpus, not
 authored: a conclusion the walker cannot classify returns **`Unclassified`** and is counted, never
 silently defaulted.

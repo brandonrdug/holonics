@@ -231,7 +231,7 @@ impl MorphologicalGeneratedCurrent {
     /// Carry the selected current through the same live question body on one caller-retained
     /// physical executor. The executor crosses both the question event and every self-emanated
     /// return; selecting a card at the outer language boundary cannot silently construct a private
-    /// host executor here.
+    /// cpu executor here.
     pub fn into_materialized_return_with_executor(
         self,
         prompt: &str,
@@ -406,7 +406,7 @@ impl MorphologicalGeneratedText {
     /// This is the sparse reflective counterpart of conditioning the complete pairwise passage
     /// product. Every emitted event remains on a witnessed prefix or suffix, the shared occurrence
     /// carries both source/passages lineages, and the composed chronology is returned through the
-    /// same production Swing. No novel vocabulary or host-authored bridge token is introduced.
+    /// same production Swing. No novel vocabulary or cpu-authored bridge token is introduced.
     pub fn compose_returned_currents(
         prompt: &str,
         left: &Self,

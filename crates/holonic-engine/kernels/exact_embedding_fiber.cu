@@ -22,14 +22,14 @@
 //
 // # Exactness
 //
-// `E` and `u` arrive as integers aligned to one declared power of two by the host's float mouth, so
+// `E` and `u` arrive as integers aligned to one declared power of two by the cpu's float mouth, so
 // every product is exact and every sum is exact. Accumulation is `__int128`: a `dim`-term sum of
 // products of values bounded by `2^b` needs `2b + ceil(log2(dim))` bits, which for the material this
 // was built for -- BF16 entries aligned to a common exponent, `dim = 2560` -- is far inside 128.
-// **The host checks that bound before dispatch and refuses rather than truncating**; nothing here
+// **The cpu checks that bound before dispatch and refuses rather than truncating**; nothing here
 // saturates, rounds, or clamps.
 //
-// A 128-bit value crosses back as two 64-bit halves, low then high, because the host carrier is
+// A 128-bit value crosses back as two 64-bit halves, low then high, because the cpu carrier is
 // `i128` and the driver interface is 64-bit words. The split is a chart, not a loss.
 
 #include <stdint.h>

@@ -26,7 +26,7 @@ use life::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::live_current::{LiveCurrentExecutor, ParallelHostLiveCurrentExecutor};
+use soma_membrane::live_current::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 /// This driver's name at the plate mouth:
 /// `output/eros_morphological_language_generation/<name>-<sha256>.form`.
@@ -267,17 +267,17 @@ fn run() -> Result<(), String> {
     );
     // **The carrier is MOUNTED and threaded, not built privately inside each call.**
     //
-    // This driver called `condition` and `generate`, both of which construct a private host pool.
+    // This driver called `condition` and `generate`, both of which construct a private cpu pool.
     // The card was therefore unreachable from production — not declined, unreachable — which is
     // exactly the finding `research/records/2026-08-10_THE_FRONT_IS_THE_PARALLEL_UNIT…` recorded
-    // for the agentic seam and which went unrepaired here. `SOMA_HOST` forces the host carrier so
+    // for the agentic seam and which went unrepaired here. `SOMA_CPU` forces the cpu carrier so
     // the two can be compared on the same material; without it the card carries the deed.
     let mut card;
-    let mut host;
-    let carrier: &mut dyn LiveCurrentExecutor = if std::env::var_os("SOMA_HOST").is_some() {
-        host = ParallelHostLiveCurrentExecutor::new(workers.max(1));
-        eprintln!("eros morphological language generation: carrier = host, {workers} lanes");
-        &mut host
+    let mut cpu;
+    let carrier: &mut dyn LiveCurrentExecutor = if std::env::var_os("SOMA_CPU").is_some() {
+        cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+        eprintln!("eros morphological language generation: carrier = cpu, {workers} lanes");
+        &mut cpu
     } else {
         match CudaLiveCurrentExecutor::new(0) {
             Ok(mounted) => {
@@ -289,14 +289,14 @@ fn run() -> Result<(), String> {
                 &mut card
             }
             Err(error) => {
-                // Named, never silent. A run that fell back without saying so would report a host
+                // Named, never silent. A run that fell back without saying so would report a cpu
                 // figure as a card figure.
                 eprintln!(
                     "eros morphological language generation: the card refused to mount ({error}); \
-                     carrying on the host with {workers} lanes"
+                     carrying on the cpu with {workers} lanes"
                 );
-                host = ParallelHostLiveCurrentExecutor::new(workers.max(1));
-                &mut host
+                cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+                &mut cpu
             }
         }
     };

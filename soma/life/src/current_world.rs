@@ -14,7 +14,7 @@ use body::{
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent, CurrentGeometry,
-    CurrentLineage, DirectedCurrentRelation, HostLiveCurrentExecutor, InterfaceCapability,
+    CurrentLineage, DirectedCurrentRelation, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, ReceiverCausalPassage,
     RegionalRelationArc, RegionalRelationCell, RegionalSupportSection,
 };
@@ -178,8 +178,8 @@ impl NativeRelationOrgan {
         action: ActionCurrent,
         ending: bool,
     ) -> Result<ContemporaryRadiation, LiveCurrentError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.present_with(machine, &mut host, relation, action, ending)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.present_with(machine, &mut cpu, relation, action, ending)
     }
 
     /// Present through the machine's actual resident physical executor. The organ still owns the
@@ -211,8 +211,8 @@ impl NativeRelationOrgan {
         action: ActionCurrent,
         ending: bool,
     ) -> Result<ContemporaryRadiation, LiveCurrentError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.present_complex_with(machine, &mut host, complex, action, ending)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.present_complex_with(machine, &mut cpu, complex, action, ending)
     }
 
     pub fn present_complex_with(
@@ -655,8 +655,8 @@ pub fn present_native_event(
     currents: &mut [NativeEventCurrent<'_>],
     relations: &[NativeEventRelation],
 ) -> Result<ContemporaryRadiation, LiveCurrentError> {
-    let mut host = HostLiveCurrentExecutor;
-    present_native_event_with(machine, &mut host, currents, relations)
+    let mut cpu = CpuLiveCurrentExecutor;
+    present_native_event_with(machine, &mut cpu, currents, relations)
 }
 
 /// The same plural native event through one caller-retained physical executor. Opening a new
@@ -673,7 +673,7 @@ pub fn present_native_event_with(
 
 /// Present one complete native event together with explicit higher regional cells. Flat relations
 /// remain available for genuinely atomic hand; a regional cell instead lends exact constituent
-/// ports and one receiving lineage. Host and CUDA executors form the same pre-state contacts; the
+/// ports and one receiving lineage. Cpu and CUDA executors form the same pre-state contacts; the
 /// direct machine closes every co-present regional component before its one atomic successor
 /// becomes visible.
 pub fn present_native_event_with_regional(
@@ -862,8 +862,8 @@ impl StreamedOctetOrgan {
         final_chunk: bool,
         world: impl FnMut(ContemporaryRadiation),
     ) -> Result<StreamChunkReceipt, LiveCurrentError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.present_chunk_with(machine, &mut host, chunk, action, final_chunk, world)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.present_chunk_with(machine, &mut cpu, chunk, action, final_chunk, world)
     }
 
     /// Stream through one retained physical executor. Storage chunks remain world-side carriage;
@@ -1836,10 +1836,10 @@ mod tests {
             NativeEventCurrent::continuing_complex(&mut context, context_chart.complex(), action()),
             NativeEventCurrent::continuing(&mut arrival, &arrival_atom, action()),
         ];
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         let radiation = present_native_event_with_regional(
             &mut machine,
-            &mut host,
+            &mut cpu,
             &mut currents,
             &[],
             &regional,

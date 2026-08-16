@@ -3,7 +3,7 @@
 //! The card returns the prior-equal distance at every situated octet plus a fixed profile summary.
 //! Exact attachment uses the complete length-prefixed returned field; the hashes summarize and
 //! never identify it. No tokenizer, language label, parser, or source surface crosses into the
-//! field. The host stages bytes and reads the return; it has no implementation of the semantic deed.
+//! field. The cpu stages bytes and reads the return; it has no implementation of the semantic deed.
 
 use core::ffi::c_void;
 
@@ -68,7 +68,7 @@ pub struct MaterialShadowCudaReceipt {
     pub launch_ordinal: u64,
     pub grid: [u32; 3],
     pub block: [u32; 3],
-    pub host_semantic_replay: bool,
+    pub cpu_semantic_replay: bool,
 }
 
 pub struct CudaMaterialShadowExecutor {
@@ -253,7 +253,7 @@ impl CudaMaterialShadowExecutor {
                 launch_ordinal: self.launches,
                 grid: [launch.grid.x, launch.grid.y, launch.grid.z],
                 block: [launch.block.x, launch.block.y, launch.block.z],
-                host_semantic_replay: false,
+                cpu_semantic_replay: false,
             },
         ))
     }

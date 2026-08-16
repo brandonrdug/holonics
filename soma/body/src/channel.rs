@@ -590,7 +590,7 @@ macro_rules! read_channel_once {
 }
 
 impl LineageChannel {
-    /// One packed carrier word of K. The host seam and the card's atomic store consume this same
+    /// One packed carrier word of K. The cpu seam and the card's atomic store consume this same
     /// scalar mouth; CHANNEL_WORDS is therefore a layout, never a prompt to respell one elsewhere.
     #[inline]
     pub fn packed_word(&self, word: usize) -> u32 {

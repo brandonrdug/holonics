@@ -171,8 +171,8 @@ or instruction. `OpTypeFloat` count in the SPIR-V binary is zero.
 
 | surface | what runs there | why, as the code states it |
 |---|---|---|
-| **CUDA, resident** | the receiver quotient (`claim_identities`, open-addressed `atomicCAS` into a table that provably cannot fill); morphological suffix/prefix conditioning; conduct grouping; material shadow; recurrent law found/evaluate/fold; live lineage events; regional contacts; text restriction | *"CPU/RAM and GPU/VRAM are local charts of the same caused body."* Conditioning has **no host fallback** by declaration. |
-| **CUDA, exact integer** | conic/segment support at 384 bits (`ExactInteger<12>`); relation ordering over `i64` points | host preflights magnitude in `BigInt` and diverts anything past 384 bits to the host law rather than rounding |
+| **CUDA, resident** | the receiver quotient (`claim_identities`, open-addressed `atomicCAS` into a table that provably cannot fill); morphological suffix/prefix conditioning; conduct grouping; material shadow; recurrent law found/evaluate/fold; live lineage events; regional contacts; text restriction | *"CPU/RAM and GPU/VRAM are local charts of the same caused body."* Conditioning has **no CPU fallback** by declaration. |
+| **CUDA, exact integer** | conic/segment support at 384 bits (`ExactInteger<12>`); relation ordering over `i64` points | CPU preflights magnitude in `BigInt` and diverts anything past 384 bits to the CPU law rather than rounding |
 | **SPIR-V / Vulkan** | the felt-series surface, 10 entries | same `body` law by `#[path]` include — **one mouth, three targets**. Convicted for production: headless Xid faults. |
 | **CPU** | all exact rational linear algebra, polynomial work, Sturm isolation, Smith normal form, corpus census, rest codecs | **no device path exists for any of these**, and none is stated as needed |
 | **CPU, multicore** | `crates/holonic-engine/src/executor.rs` — scoped threads, contiguous chunking, then a re-sort to input order | *"worker scheduling never becomes chronology"* |
@@ -245,7 +245,7 @@ than asserting disjointness.
    so a revised grain feeds the next pass.
 
    **So both hands of the axis exist and are already joined.** The gap is one hop further out than
-   stated: the composition's only caller is a driver, so the re-cut happens when a host sequence runs
+   stated: the composition's only caller is a driver, so the re-cut happens when a CPU sequence runs
    a pass, never when a current arrives. Brandon's ruling on the axis, 2026-08-13, is what this item
    must be read against: *"I think we are meant to wire both ways so that the degrees of freedom are
    available and so that diffusion can simply occur freely. Reopen something when a construction
@@ -255,13 +255,13 @@ than asserting disjointness.
 
    What remains true: condensation with a certified remainder has exactly one wired owner.
 3. **Twelve dead device entries.** Four registered-fold PTX entries with no launcher; `shell_keys`
-   never resolved; `refine_claimed` resolved and stored and never called, its work done host-side in
+   never resolved; `refine_claimed` resolved and stored and never called, its work done CPU-side in
    a `BTreeMap`; and six exact-integer width variants at 128/192/256 bits compiled, JIT'd, and held
    in fields explicitly prefixed with an underscore.
-4. **No host/device parity comparison runs in the gates.** There are 22 ignored tests and they
+4. **No CPU/device parity comparison runs in the gates.** There are 22 ignored tests and they
    include every one — the refine quotient, the causal section reference, the relation kernels. The
    gate suite runs without `--include-ignored`, on a machine that has the card. One parity gate does
-   run in production, as a mode defaulting to on: the conduct grouping recomputes on the host every
+   run in production, as a mode defaulting to on: the conduct grouping recomputes on the CPU every
    launch.
 5. **Seven fully unwired modules** and **905** zero-reference distinctive public items — re-measured
    2026-08-14. The earlier figures were taken by a module-path grep, which cannot measure this at all:
@@ -294,7 +294,7 @@ and, ruling that the mouth is not a peripheral port:
 > complete cycles and won't really be something to analyze without the engine being complete."*
 
 **Do not call this "the one mouth."** That phrase is taken — it is `ONE LAW, ONE MOUTH`, the
-discipline that host and device compile the same law source — and Brandon disclaimed a derived form
+discipline that CPU and device compile the same law source — and Brandon disclaimed a derived form
 of it on 2026-07-04: *"I don't know anything about the 'one-mouth debt', so it's definitely a form of
 drift that I'd need you to audit."* The laboratory's name for the object described here is **the
 active mouth**, from `a07ff376:…/RESEARCH/2026-07-18_THE_RELATION_IS_THE_ACTIVE_MOUTH…`,
@@ -442,7 +442,7 @@ gates"*, while `aim` gates. **Mass does not decide admission.**
 
 ### 5.7 Transmit or reflect is computable exactly, today
 
-`crates/holonic-engine/src/analytic_field.rs:1142` `exact_scalar_interface_coefficients` returns,
+`crates/holonic-engine/src/analytic_field.rs:1316` `exact_scalar_interface_coefficients` returns,
 over `Rat`, refusing non-positive admittance:
 
 ```text
@@ -512,6 +512,12 @@ slogan-form of the same equation, `HUNCH`/`OPEN` at its source. Grade nothing ab
 | **compiler-confirmed dead** | `cuda_refine.rs` `claimed` field never read; `live_current_cuda` `enact_one` never used; three unused imports; one unnecessary `mut` |
 | **quarantined by design** | the legacy surface constructor returns `None` with an `eprintln`; its real setup survives as an uncalled `historical_new` |
 | **name/behaviour drift** | `image.rs` does no imaging; `interaction.rs` has no algorithm; `hardware_cover.rs` makes no hardware query; `discrete_curvature.rs` is an exact involution rather than a flow; `contact_cycle.rs` says of itself that another module is the production path |
+
+**Re-measured 2026-08-15, two rows repaired and one still standing.**
+`grep -c "rug\|ab_glyph\|aho-corasick\|soma-surface" soma/life/Cargo.toml` returns **0** — the
+unused-dependency row is closed — and `contact_cycle.rs` no longer exists. What still holds is the
+row above it: `git grep -n "TODO\|FIXME\|todo!()\|unimplemented!()" -- 'crates/**/*.rs'
+'soma/**/*.rs' | wc -l` returns **0**.
 
 ## 7. What this document forbids
 

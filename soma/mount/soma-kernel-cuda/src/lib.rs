@@ -18,7 +18,7 @@
 //! The scope family (`scope_felt` / `scope_founded` / CUDA-only `scope_register`) compiles here.
 //! The earlier port was blocked while the lineage law lived kernel-side with no `body` mouth; Route A
 //! (commit a778567d) relocated the whole lineage stroke into `body::carriage` behind the `WordSeam`
-//! trait, so the ONE MOUTH now exists: the trusted device carriage and checked host-reference
+//! trait, so the ONE MOUTH now exists: the trusted device carriage and checked cpu-reference
 //! carriage compile the SAME interior stroke. Only the entry SHELLS — span
 //! carving ⊕ guards ⊕ `(ptr,len)` reconstruction — are re-expressed here. `body::seam::SliceWordSeam`
 //! (the ordinary Rust slice realization) compiles for nvptx, and each lane's OWN/carrier spans are
@@ -26,7 +26,7 @@
 //! SPIR-V atomic-store seam; correctness comes from the span's single writer, never atomic arbitration.
 //!
 //! ONE MOUTH: this crate DEPENDS ON `body` (no_std, zero deps), so `RegionalForm`, `medium::*`,
-//! `manifold::*`, `place::*`, `chart::*`, and `num::*` are the SAME CODE the SPIR-V card and the host
+//! `manifold::*`, `place::*`, `chart::*`, and `num::*` are the SAME CODE the SPIR-V card and the cpu
 //! reference compile. Only the entry SHELLS are re-expressed here — global invocation indexing
 //! through `%ctaid/%ntid/%tid` in place of spirv-std's `GlobalInvocationId`, and `core::sync::atomic`
 //! in place of spirv-std's atomic intrinsics. The SPIR-V entries use NO workgroup barrier (pure
@@ -2776,7 +2776,7 @@ impl StandingQuery for EventStanding<'_> {
 
 /// One lane forms one co-present regional contact from the same immutable receiver-before field.
 /// No lane owns or mutates the lineage carrier. The later `lineage_event` launch remains the sole
-/// carrier writer, while the live machine performs the canonical host-resident graded-cell
+/// carrier writer, while the live machine performs the canonical cpu-resident graded-cell
 /// junction fold over these exact returned contacts.
 #[no_mangle]
 pub unsafe extern "ptx-kernel" fn regional_contacts(
@@ -3329,7 +3329,7 @@ pub unsafe extern "ptx-kernel" fn text_section_restrict(
 /// each and the card ran as a very slow single core.
 ///
 /// All storage is reusable apparatus for the current this call enacts. A resource status reports
-/// actual pressure and the host retries from the unchanged live predecessor with a larger mouth.
+/// actual pressure and the cpu retries from the unchanged live predecessor with a larger mouth.
 unsafe fn enact_one_lineage(
     standing_words: *const u32,
     standing_words_len: usize,
@@ -3756,7 +3756,7 @@ pub unsafe extern "ptx-kernel" fn lineage_event(
 /// **Every stride is derived, not passed.** A region's extent is `len / count` for each buffer, and
 /// a length that does not divide is refused rather than rounded — a partial region would place one
 /// current's carrier inside another's, which is the absolute-frame defect at the level of memory.
-/// The only new datum is `count`, which the host reads off the population it is enacting.
+/// The only new datum is `count`, which the cpu reads off the population it is enacting.
 ///
 /// `standing_words` is **shared and read-only**: standing-before is one immutable field every
 /// current reads, exactly as `regional_contacts` already treats the receiver row. It is not strided.
@@ -3818,7 +3818,7 @@ pub unsafe extern "ptx-kernel" fn lineage_event_population(
         || !divides(emissions_len)
         || !divides(emanation_len)
     {
-        // Lane zero stamps the structural refusal into its own control block so the host reads a
+        // Lane zero stamps the structural refusal into its own control block so the cpu reads a
         // named status rather than an unchanged buffer.
         if lane == 0 && control_words_len >= event_cuda::CONTROL_WORDS {
             let control =
@@ -4167,7 +4167,7 @@ struct MorphologicalConductShape {
 
 /// A shape refusal: which agreement failed, and the two extents that disagreed where the check is
 /// an equality of extents. Answering roughly twenty agreements with one status word made every
-/// decline look alike to the host.
+/// decline look alike to the cpu.
 #[derive(Clone, Copy)]
 struct MorphologicalConductShapeRefusal {
     cause: u32,
@@ -4476,7 +4476,7 @@ fn suffix_init_state(states: &mut [u32], state: usize, maximum_length: u32, suff
 /// Found one generalized suffix ecology on the resident card.
 ///
 /// One invocation owns the chart because extension chronology is constitutive.  Parallelism is
-/// across the five co-present charts at the host launch surface, not invented inside one path.
+/// across the five co-present charts at the cpu launch surface, not invented inside one path.
 #[no_mangle]
 pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     control_words: *const u32,
@@ -4744,7 +4744,7 @@ pub unsafe extern "ptx-kernel" fn morphological_suffix_condition(
     }
 
     // Counting sort states by (maximum_length, state). Reversing the ascending order reproduces
-    // the exact host law's (Reverse(maximum_length), Reverse(state)) propagation.
+    // the exact cpu law's (Reverse(maximum_length), Reverse(state)) propagation.
     let count_len = inputs + 1;
     let order_base = count_len;
     let first_base = order_base + state_capacity;
@@ -5433,7 +5433,7 @@ pub unsafe extern "ptx-kernel" fn recurrent_law_evaluate(
 
 /// Enact one exact local law repeatedly over a later current and return the complete world-line.
 ///
-/// One lane owns one passage. The host supplies the law deposit, initial standing, and current
+/// One lane owns one passage. The cpu supplies the law deposit, initial standing, and current
 /// sheet; it never receives a chance to replay the recurrence between events.
 #[no_mangle]
 pub unsafe extern "ptx-kernel" fn recurrent_law_fold(
@@ -5613,7 +5613,7 @@ pub unsafe extern "ptx-kernel" fn recurrent_law_fold(
 
 /// **The card's own decision: which deposit, if any, carries this exact key.**
 ///
-/// A binary search over the validated ascending deposit sheet. The host ships two independently
+/// A binary search over the validated ascending deposit sheet. The cpu ships two independently
 /// assembled key sheets and never the answer; this function is where membership is decided.
 #[inline(always)]
 fn morphological_deposit_of_key(
@@ -5680,7 +5680,7 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
                 let output = unsafe {
                     slice::from_raw_parts_mut(output_words, morph_cuda::OUTPUT_HEADER_WORDS)
                 };
-                // The version is written even on the decline path, so a host can tell "the card
+                // The version is written even on the decline path, so a cpu can tell "the card
                 // refused" from "the card did not write" instead of reporting the first unwritten
                 // header word as the disagreement.
                 output[morph_cuda::OUTPUT_VERSION] = morph_cuda::LAYOUT_VERSION;

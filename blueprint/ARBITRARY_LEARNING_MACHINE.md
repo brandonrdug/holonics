@@ -127,7 +127,7 @@ media show that it can:
 - preserve change after source detachment and remount;
 - generate a held-out deed with complete causal-information receipt;
 - use that returned deed as an indispensable fiber of a further deed;
-- execute wide local work on an admitted parallel apparatus without host replay; and
+- execute wide local work on an admitted parallel apparatus without CPU replay; and
 - explain every mechanism by occurrence, local law, changed support, return, and receiver.
 
 The number of demonstrations is not an acceptance gate for universality. Each ecology is graded

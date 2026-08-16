@@ -1,4 +1,4 @@
-//! One complete live-carrier authority for the generalized host membrane.
+//! One complete live-carrier authority for the generalized cpu membrane.
 //!
 //! The snapshot keeps the canonical header and exact generalized carrier together. Its native
 //! schema is the only persistence mouth.

@@ -87,5 +87,5 @@ or “graphics on GPU.”
 ## I. Stop conditions
 
 Stop and rederive if the implementation requires a new global registry/scheduler, a complete-body
-clone, a global scan/materialized cover, a count gate, source replay, hot host replay, semantic
+clone, a global scan/materialized cover, a count gate, source replay, hot CPU replay, semantic
 device selector, compatibility path, filesystem identity, or a large application-local subsystem.

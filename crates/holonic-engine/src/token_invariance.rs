@@ -123,7 +123,7 @@
 //! `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`,
 //! ratified, is the law this follows: *"An exact antichain can have genuine large width. That width
 //! is an unresolved alternative fiber, not permission to exhaust memory or truncate silently. Shared
-//! structure is factorized; if the remaining exact terminal width exceeds declared host/card
+//! structure is factorized; if the remaining exact terminal width exceeds declared cpu/card
 //! capacity, the event returns a resource obstruction while preserving standing."* The standing
 //! preserved here is the complex itself: an obstructed exhibition costs the caller nothing it had.
 //!
@@ -206,7 +206,7 @@ use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
 use crate::hardware_cover::{
-    Chart, ChartId, CoverDecomposition, FrontCell, HardwareCover, HostDeclaration, expand_front,
+    Chart, ChartId, CoverDecomposition, FrontCell, HardwareCover, CpuDeclaration, expand_front,
 };
 use crate::receiver_exact_compression::{
     AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
@@ -1733,7 +1733,7 @@ pub fn sweep(
     atlas: &ConductAtlas,
     horizon: usize,
 ) -> BTreeMap<SurfaceId, SeparationReading> {
-    sweep_over(census, atlas, horizon, &HardwareCover::host_only())
+    sweep_over(census, atlas, horizon, &HardwareCover::cpu_only())
 }
 
 /// **The sweep, covered across the charts a caller declares.**
@@ -1741,7 +1741,7 @@ pub fn sweep(
 /// Every surface's reading is independent of every other — they share the census and the atlas
 /// immutably and touch disjoint occurrence sets — so the population of surfaces IS a front, and
 /// `hardware_cover` decomposes it. Until 2026-08-10 this was a serial `map`, which is why driving
-/// it pinned one host core while every other lane and the card stood idle: `CLAUDE.md` §9 names
+/// it pinned one cpu core while every other lane and the card stood idle: `CLAUDE.md` §9 names
 /// that state a defect to diagnose, not a mystery to narrate.
 ///
 /// **The cover places, and the placement is proved.** Each surface is a cell of the front whose
@@ -1752,7 +1752,7 @@ pub fn sweep(
 /// **The device chart is placed and not yet enacted, and that is stated rather than hidden.**
 /// `token_invariance` reaches no executor and no kernel — a window partition is a sort plus a
 /// longest-common-prefix scan, which is GPU-shaped, and building that kernel is its own
-/// construction. Cells placed on a device chart are read on the host today, and
+/// construction. Cells placed on a device chart are read on the cpu today, and
 /// [`SweepCover::device_cells`] reports how many, so the gap is a number rather than an impression.
 pub fn sweep_over(
     census: &CorpusCensus,
@@ -1766,10 +1766,10 @@ pub fn sweep_over(
 /// A covered sweep, with what the cover did to it.
 pub struct SweepCover {
     pub readings: BTreeMap<SurfaceId, SeparationReading>,
-    /// Cells the cover placed on a device chart. Read on the host today; the count is the debt.
+    /// Cells the cover placed on a device chart. Read on the cpu today; the count is the debt.
     pub device_cells: usize,
-    /// Lanes the host section was spread over.
-    pub host_lanes: usize,
+    /// Lanes the cpu section was spread over.
+    pub cpu_lanes: usize,
 }
 
 /// The covered sweep, returning the placement beside the readings.
@@ -1796,10 +1796,10 @@ pub fn sweep_covered(
         .map(|section| section.cells.len())
         .sum();
     // **The caller's declared width, unclamped.** This read `.max(1)`, which silently rewrote a
-    // declaration of zero host lanes into one. The only value it changed was `0`, and `0` and `1`
+    // declaration of zero cpu lanes into one. The only value it changed was `0`, and `0` and `1`
     // take the same branch below, so it was an authored floor with no orbit sitting on top of a
     // caller-declared level — the worse of the two, because it overrode a declaration.
-    let lanes = cover.host().lanes as usize;
+    let lanes = cover.cpu().lanes as usize;
 
     // Independence is checked before any work is issued. A barrier is not worked around: the sweep
     // falls back to one lane, which is always licensed. A width of zero -- no declared lanes, or no
@@ -1822,7 +1822,7 @@ pub fn sweep_covered(
     let expansion_cover = if licensed {
         cover.clone()
     } else {
-        HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 1 })])
+        HardwareCover::of_charts(vec![Chart::Cpu(CpuDeclaration { lanes: 1 })])
     };
     let surfaces_by_index = &surfaces;
     let readings = expand_front(
@@ -1846,7 +1846,7 @@ pub fn sweep_covered(
     SweepCover {
         readings,
         device_cells,
-        host_lanes: effective_lanes,
+        cpu_lanes: effective_lanes,
     }
 }
 
@@ -2163,7 +2163,7 @@ pub struct SaturationHorizon {
     /// be drained and re-pushed every shell, so the real per-shell work was `Θ(classes)` while this
     /// field reported `Θ(active)`. Retiring a singleton into a count the moment it appears made the
     /// two the same quantity. The number is exact and machine-independent; it reproduces bit for bit
-    /// on any host.
+    /// on any cpu.
     pub active_total: usize,
 }
 
@@ -4248,13 +4248,13 @@ mod tests {
 
     /// **This organ's key, driven through the SHARED law, equals this organ's own refinement.**
     ///
-    /// The point of the factoring: `saturation_horizon` and `quotient_on_host` are not two
+    /// The point of the factoring: `saturation_horizon` and `quotient_on_cpu` are not two
     /// implementations to be kept in step — the second is the law and the first supplies a key to
     /// it. This proves they agree on real material, which is what makes replacing the fused path
     /// with the shared one safe for every other organ that adopts it.
     #[test]
     fn the_shell_key_through_the_shared_quotient_equals_this_organs_own_refinement() {
-        use crate::cuda_refine::{ReadingIdentities, quotient_on_host};
+        use crate::cuda_refine::{ReadingIdentities, quotient_on_cpu};
         let root = declared_corpus("shared-quotient");
         let census = CorpusCensus::read(&root).unwrap();
         let atlas = atlas(&census);
@@ -4275,7 +4275,7 @@ mod tests {
                     break;
                 }
                 let keys = shell_keys_of(&census, &identities.per_surface, surface, depth);
-                let step = quotient_on_host(&classes, &keys);
+                let step = quotient_on_cpu(&classes, &keys);
                 classes = step.cell_class;
                 carried = step.classes;
             }
@@ -4320,17 +4320,17 @@ mod tests {
                 &census,
                 &atlas,
                 1,
-                &HardwareCover::of_charts(vec![crate::hardware_cover::Chart::Host(
-                    crate::hardware_cover::HostDeclaration { lanes },
+                &HardwareCover::of_charts(vec![crate::hardware_cover::Chart::Cpu(
+                    crate::hardware_cover::CpuDeclaration { lanes },
                 )]),
             )
         };
         let serial = at_lanes(1);
         let wide = at_lanes(8);
 
-        assert_eq!(serial.host_lanes, 1);
+        assert_eq!(serial.cpu_lanes, 1);
         assert!(
-            wide.host_lanes > 1,
+            wide.cpu_lanes > 1,
             "eight declared lanes over {} surfaces must spread",
             census.word_surfaces().len()
         );
@@ -4848,7 +4848,7 @@ mod tests {
 //
 // **This organ has no device path of its own, and that is the point.** `saturation_horizon`'s
 // refinement is a quotient by an exact key, which is one law with two charts —
-// `cuda_refine::{quotient_on_host, CudaRefineExecutor::quotient_on_device}`. What belongs to this
+// `cuda_refine::{quotient_on_cpu, CudaRefineExecutor::quotient_on_device}`. What belongs to this
 // organ is the KEY: what an occurrence carries at causal shell `k`. Everything after that is shared
 // with every other organ that has a front.
 //

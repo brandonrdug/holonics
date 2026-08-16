@@ -4,17 +4,17 @@
 //! all ecological names and assigns dense candidate and deposit ordinals; the card receives two
 //! independently assembled key sheets — every deposit's own exact transport key, and every key one
 //! candidate could ride — and **decides membership itself** by searching the deposit sheet.  There
-//! is deliberately no host fallback.
+//! is deliberately no cpu fallback.
 //!
-//! **What changed at `LAYOUT_VERSION = 2`, and why.**  The first version shipped a host-built
+//! **What changed at `LAYOUT_VERSION = 2`, and why.**  The first version shipped a cpu-built
 //! `relation` sheet of `[candidate, deposit, face]` triples.  Building that sheet *is* the join:
-//! the host had already asked, per candidate edge, which deposit ordinal it was, and the card
-//! returned the identity on the answer while the host re-verified it.  One carrier, so no parity
+//! the cpu had already asked, per candidate edge, which deposit ordinal it was, and the card
+//! returned the identity on the answer while the cpu re-verified it.  One carrier, so no parity
 //! was possible and the round trip was an echo.  The audit
-//! (`research/records/2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`
+//! (`research/records/2026-08-11_THE_SEAL_CARRIED_THE_CPU_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`
 //! §2 finding 4) named it, and it is withdrawn rather than deprecated.
 //!
-//! **The parity that is now possible.**  `host_attachment` recomputes the induced equivalence —
+//! **The parity that is now possible.**  `cpu_attachment` recomputes the induced equivalence —
 //! which *keys* each candidate attaches, never which ordinals — from the same two sheets by an
 //! independent implementation, and `MorphologicalConductAttachment::agrees_with` compares the two.
 //! Equality is of the induced equivalence and not of the numbering.
@@ -36,7 +36,7 @@ pub enum MorphologicalConductCudaError {
     /// A key row or deposit row is not of the front's declared key width.
     KeyWidth,
     /// A sheet the card searches is not strictly ascending, so the search would be unsound. The
-    /// host refuses it before the card does, and the card refuses it again.
+    /// cpu refuses it before the card does, and the card refuses it again.
     NoncanonicalSheet,
     DeviceRefused {
         key_row: Option<u32>,
@@ -57,7 +57,7 @@ pub enum MorphologicalConductCudaError {
     InvalidDeviceReturn {
         at: &'static str,
     },
-    /// The card's induced equivalence and the host's independently recomputed one disagree.
+    /// The card's induced equivalence and the cpu's independently recomputed one disagree.
     ParityBroken {
         candidate: u32,
     },
@@ -164,7 +164,7 @@ impl std::fmt::Display for MorphologicalConductCudaError {
             }
             Self::ParityBroken { candidate } => write!(
                 formatter,
-                "the card and the host disagree on the deposits candidate {candidate} attaches"
+                "the card and the cpu disagree on the deposits candidate {candidate} attaches"
             ),
             Self::PoisonedRealization => {
                 write!(
@@ -350,25 +350,25 @@ impl MorphologicalConductCudaFront {
             .count()
     }
 
-    /// **The independent host implementation of the same question, for parity only.**
+    /// **The independent cpu implementation of the same question, for parity only.**
     ///
     /// A linear merge rather than the card's binary search, returning the attached deposit **keys**
     /// per candidate. The comparison this feeds is of the induced equivalence — which keys each
     /// candidate rides — and never of the dense ordinals either side happens to use.
-    pub fn host_attachment(&self) -> LocalSequence<LocalSequence<&[u32]>> {
-        let mut host = LocalSequence::with_capacity(self.candidates.len());
+    pub fn cpu_attachment(&self) -> LocalSequence<LocalSequence<&[u32]>> {
+        let mut cpu = LocalSequence::with_capacity(self.candidates.len());
         for _ in 0..self.candidates.len() {
-            host.push(LocalSequence::new());
+            cpu.push(LocalSequence::new());
         }
         for row in &self.key_rows {
             for deposit in &self.deposits {
                 if deposit.active && wire::key_equals(deposit.key(), row.key()) {
-                    host[row.candidate as usize].push(deposit.key());
+                    cpu[row.candidate as usize].push(deposit.key());
                     break;
                 }
             }
         }
-        host
+        cpu
     }
 }
 
@@ -390,14 +390,14 @@ pub struct MorphologicalConductAttachment {
 }
 
 impl MorphologicalConductAttachment {
-    /// Compare the card's return with the host's independent recomputation, **of the induced
+    /// Compare the card's return with the cpu's independent recomputation, **of the induced
     /// equivalence**: the attached deposit keys per candidate, in canonical order.
     pub fn agrees_with(
         &self,
         front: &MorphologicalConductCudaFront,
     ) -> Result<(), MorphologicalConductCudaError> {
-        let host = front.host_attachment();
-        if host.len() != self.candidates.len() {
+        let cpu = front.cpu_attachment();
+        if cpu.len() != self.candidates.len() {
             return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
                 at: "the parity check received a different candidate population",
             });
@@ -416,10 +416,10 @@ impl MorphologicalConductAttachment {
                         })
                 })
                 .collect::<Result<LocalSequence<_>, _>>()?;
-            if device.len() != host[at].len()
+            if device.len() != cpu[at].len()
                 || device
                     .iter()
-                    .zip(host[at].iter())
+                    .zip(cpu[at].iter())
                     .any(|(left, right)| !wire::key_equals(left, right))
             {
                 return Err(MorphologicalConductCudaError::ParityBroken {
@@ -452,10 +452,10 @@ pub struct MorphologicalConductCudaReceipt {
     /// The exact bound on key comparisons the card's searches can perform: one binary search per
     /// key row over the deposit sheet. This is work, not time, and it reproduces on any machine.
     pub deposit_search_comparison_bound: usize,
-    /// What a linear host join would have cost on the same front, for the same reason.
-    pub host_linear_comparison_cost: usize,
-    pub host_to_device_words: usize,
-    pub device_to_host_words: usize,
+    /// What a linear cpu join would have cost on the same front, for the same reason.
+    pub cpu_linear_comparison_cost: usize,
+    pub cpu_to_device_words: usize,
+    pub device_to_cpu_words: usize,
     pub kernel_launches: u32,
     pub device_zero_operations: u32,
     /// Default-stream barriers taken so a null-stream memset cannot race the launch stream.
@@ -466,7 +466,7 @@ pub struct MorphologicalConductCudaReceipt {
     pub retained_streams: u32,
     pub stream_nonblocking: bool,
     pub stream_synchronizations: u32,
-    pub host_parity_checked: bool,
+    pub cpu_parity_checked: bool,
     pub prepare_and_ingress_nanoseconds: u128,
     pub kernel_and_stream_nanoseconds: u128,
     pub return_egress_nanoseconds: u128,
@@ -479,14 +479,14 @@ pub struct MorphologicalConductCudaOutput {
     pub apparatus: MorphologicalConductCudaReceipt,
 }
 
-/// Whether the host's independent recomputation runs beside every launch.
+/// Whether the cpu's independent recomputation runs beside every launch.
 ///
 /// The parity test is the whole reason the device carrier is worth having, so it is on by default.
 /// A caller producing at scale may declare it off; it is a caller's declaration with a stated
 /// reason, never a silent optimisation, and the receipt carries which was in force.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MorphologicalConductParity {
-    HostRecomputesEveryLaunch,
+    CpuRecomputesEveryLaunch,
     DeclaredOff,
 }
 
@@ -511,7 +511,7 @@ impl CudaMorphologicalConductExecutor {
     pub fn new(device_ordinal: i32) -> Result<Self, MorphologicalConductCudaError> {
         Self::with_parity(
             device_ordinal,
-            MorphologicalConductParity::HostRecomputesEveryLaunch,
+            MorphologicalConductParity::CpuRecomputesEveryLaunch,
         )
     }
 
@@ -689,8 +689,8 @@ impl CudaMorphologicalConductExecutor {
         //
         // `DeviceBuffer::zero` is `cuMemsetD32` on the context's DEFAULT stream, and this executor
         // launches on a stream created `CU_STREAM_NON_BLOCKING` — which by construction does not
-        // synchronize with the default stream. The host-to-device copies above are `cuMemcpyHtoD`
-        // on pageable memory and block the host until they land, so they need no barrier; the
+        // synchronize with the default stream. The cpu-to-device copies above are `cuMemcpyHtoD`
+        // on pageable memory and block the cpu until they land, so they need no barrier; the
         // memset does not, and without this the zeroing RACES the kernel.
         //
         // **Measured, and it is why this comment is here.** At two candidates and four deposits the
@@ -756,9 +756,9 @@ impl CudaMorphologicalConductExecutor {
         )?;
         let return_egress_nanoseconds = egress_started.elapsed().as_nanos();
 
-        let host_parity_checked =
-            self.parity == MorphologicalConductParity::HostRecomputesEveryLaunch;
-        if host_parity_checked {
+        let cpu_parity_checked =
+            self.parity == MorphologicalConductParity::CpuRecomputesEveryLaunch;
+        if cpu_parity_checked {
             semantic.agrees_with(front)?;
         }
 
@@ -795,17 +795,17 @@ impl CudaMorphologicalConductExecutor {
                 .checked_add(front.key_rows.len())
                 .ok_or(MorphologicalConductCudaError::Extent)?,
             deposit_search_comparison_bound: search_bound,
-            host_linear_comparison_cost: front
+            cpu_linear_comparison_cost: front
                 .key_rows
                 .len()
                 .checked_mul(front.deposits.len())
                 .ok_or(MorphologicalConductCudaError::Extent)?,
-            host_to_device_words: wire::CONTROL_WORDS
+            cpu_to_device_words: wire::CONTROL_WORDS
                 .checked_add(candidate_extent)
                 .and_then(|words| words.checked_add(deposit_extent))
                 .and_then(|words| words.checked_add(key_row_extent))
                 .ok_or(MorphologicalConductCudaError::Extent)?,
-            device_to_host_words: output_extent,
+            device_to_cpu_words: output_extent,
             kernel_launches: 1,
             device_zero_operations: 1,
             default_stream_barriers: 1,
@@ -815,7 +815,7 @@ impl CudaMorphologicalConductExecutor {
             retained_streams: 1,
             stream_nonblocking: self.stream.is_nonblocking(),
             stream_synchronizations: 1,
-            host_parity_checked,
+            cpu_parity_checked,
             prepare_and_ingress_nanoseconds,
             kernel_and_stream_nanoseconds,
             return_egress_nanoseconds,
@@ -890,7 +890,7 @@ fn decode_card_output(
     match output[wire::OUTPUT_STATUS] {
         wire::STATUS_INVALID => {
             // A shape refusal names its own cause; a later refusal names the key row. They are
-            // different returns and the host must not collapse them.
+            // different returns and the cpu must not collapse them.
             let cause = output[wire::OUTPUT_REFUSAL_CAUSE];
             if cause != wire::REFUSAL_NONE {
                 return Err(MorphologicalConductCudaError::DeviceRefusedShape {
@@ -1146,16 +1146,16 @@ mod tests {
     }
 
     #[test]
-    fn the_host_recomputation_attaches_by_key_and_skips_inactive_and_absent_keys() {
+    fn the_cpu_recomputation_attaches_by_key_and_skips_inactive_and_absent_keys() {
         let front = front();
-        let host = front.host_attachment();
+        let cpu = front.cpu_attachment();
         // Candidate 0's second key names a deposit that exists but is inactive; candidate 1's third
         // key names no deposit at all. Neither attaches, and neither is an error.
-        assert_eq!(host[0].len(), 1);
-        assert_eq!(host[0][0], &[1, 0, 0]);
-        assert_eq!(host[1].len(), 2);
-        assert_eq!(host[1][0], &[2, 0, 0]);
-        assert_eq!(host[1][1], &[2, 0, 1]);
+        assert_eq!(cpu[0].len(), 1);
+        assert_eq!(cpu[0][0], &[1, 0, 0]);
+        assert_eq!(cpu[1].len(), 2);
+        assert_eq!(cpu[1][0], &[2, 0, 0]);
+        assert_eq!(cpu[1][1], &[2, 0, 1]);
     }
 
     #[test]
@@ -1205,7 +1205,7 @@ mod tests {
         assert_eq!(attachment.active_deposits, 3);
         assert_eq!(attachment.candidates[0].active_deposits.as_ref(), &[0]);
         assert_eq!(attachment.candidates[1].active_deposits.as_ref(), &[2, 3]);
-        // And it agrees with the host's independent recomputation, of the keys and not the
+        // And it agrees with the cpu's independent recomputation, of the keys and not the
         // ordinals.
         attachment.agrees_with(&front).expect("parity holds");
 
@@ -1258,17 +1258,17 @@ mod tests {
         assert_eq!(returned.semantic.candidates[1].key_rows, 3);
         assert_eq!(returned.apparatus.kernel_launches, 1);
         assert_eq!(returned.apparatus.launch_ordinal, 1);
-        assert!(returned.apparatus.host_parity_checked);
+        assert!(returned.apparatus.cpu_parity_checked);
         // The carrier's own cost law: a binary search per key row against a linear join.
         assert!(
             returned.apparatus.deposit_search_comparison_bound
-                < returned.apparatus.host_linear_comparison_cost
+                < returned.apparatus.cpu_linear_comparison_cost
                 || front.deposits().len() <= 4
         );
         returned
             .semantic
             .agrees_with(&front)
-            .expect("card and host agree on the induced equivalence");
+            .expect("card and cpu agree on the induced equivalence");
 
         let second = cuda.enact(&front).expect("card reuses executor");
         assert_eq!(second.apparatus.launch_ordinal, 2);
@@ -1347,11 +1347,11 @@ mod tests {
             .enact(&front)
             .expect("the card carries a front at material scale");
         assert_eq!(returned.semantic.candidates.len(), CANDIDATES);
-        assert!(returned.apparatus.host_parity_checked);
+        assert!(returned.apparatus.cpu_parity_checked);
         returned
             .semantic
             .agrees_with(&front)
-            .expect("card and host agree on the induced equivalence at scale");
+            .expect("card and cpu agree on the induced equivalence at scale");
         // And the population it attached is neither empty nor everything, so the return separates.
         let attached: usize = returned
             .semantic
@@ -1373,7 +1373,7 @@ mod tests {
             eprintln!("no CUDA device: the named-refusal control did not run");
             return;
         };
-        // Declared key width 4, sheets carrying 3-word keys. The host front type is bypassed
+        // Declared key width 4, sheets carrying 3-word keys. The cpu front type is bypassed
         // deliberately: its own `KeyWidth` guard would refuse this before the card saw it, and the
         // point is what the CARD says.
         let forged = MorphologicalConductCudaFront {
@@ -1411,8 +1411,8 @@ mod tests {
             eprintln!("no CUDA device: the morphological-conduct refusal test did not run");
             return;
         };
-        // The host refuses a duplicated key row, so a forged front is built directly to prove the
-        // card refuses it too rather than trusting the host's guard.
+        // The cpu refuses a duplicated key row, so a forged front is built directly to prove the
+        // card refuses it too rather than trusting the cpu's guard.
         let forged = MorphologicalConductCudaFront {
             key_words: 3,
             max_candidate_keys: 2,

@@ -234,7 +234,7 @@ pub const FORM_WORDS: usize = COMPACT_FORM_WORDS;
 
 impl RegionalForm {
     /// Re-form the four exact components after the configuration fold's one final re-base. The
-    /// constructor is the card/host shared mouth; it performs no additional fold or normalization.
+    /// constructor is the card/cpu shared mouth; it performs no additional fold or normalization.
     #[inline]
     pub fn from_components(same: Cog, other: Cog, this_way: Rung, that_way: Rung) -> RegionalForm {
         let occupied = same.mag != 0 || other.mag != 0 || this_way.mag != 0 || that_way.mag != 0;

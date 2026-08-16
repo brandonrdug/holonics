@@ -27,7 +27,7 @@ pub unsafe extern "ptx-kernel" fn fill_identity(out: *mut u32) {
 }
 
 /// The odd constant folded once per thread by `atomic_fold`. Fixed and odd by construction
-/// so the exact host check `add_cell == count * FOLD_CONSTANT` cannot alias an even overlap.
+/// so the exact cpu check `add_cell == count * FOLD_CONSTANT` cannot alias an even overlap.
 pub const FOLD_CONSTANT: u64 = 2_305_843_009_213_693_951; // 2^61 - 1 (a Mersenne prime, odd)
 
 /// Each thread folds `FOLD_CONSTANT` into `add_cell` (atomic add) and its own index into

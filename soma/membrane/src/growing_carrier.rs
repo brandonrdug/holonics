@@ -1,4 +1,4 @@
-//! Fallible host carrier which re-bases only when an actual completion reaches a new depth.
+//! Fallible cpu carrier which re-bases only when an actual completion reaches a new depth.
 //!
 //! The words remain the body's native enclosure rows.  `Vec` capacity and allocation are substrate
 //! concerns behind the membrane; a failed growth request refuses the disposable passage and never

@@ -287,7 +287,7 @@ pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
 /// `(current class, exact key)` law.
 ///
 /// Receiver observations and successor addresses are the material keys. They cross without a
-/// host-built block assignment. Each receiver and each input refines the standing partition in
+/// cpu-built block assignment. Each receiver and each input refines the standing partition in
 /// turn; a complete input sweep which opens no class is the exact finite fixed point. Sequential
 /// intersections may reach that point in a different number of physical launches than synchronous
 /// Moore rounds, so the semantic `rounds` return is reconstructed from the exhibited shortest

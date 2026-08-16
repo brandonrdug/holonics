@@ -38,10 +38,10 @@ blueprint/THE_ROADMAP.md :: exact/enclosure.hpp :: same table
 # --- Owners removed by an excision, recoverable only from git history ---
 # CLAUDE.md §13 names each with the commit that deleted it, so a reader can check with
 # `git show <commit> -- <path>`. These are the "removed, not deprecated" rule working.
-CLAUDE.md :: cultivated_route.hpp :: same, basename form
-CLAUDE.md :: conditioning_law.hpp :: deleted at 2b562c8; §13 names that commit in the same table row
-CLAUDE.md :: conditioning_schema.hpp :: deleted at 2b562c8; same
-CLAUDE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; same
+canon/THE_CONTRACT_PROVENANCE.md :: cultivated_route.hpp :: same, basename form
+canon/THE_CONTRACT_PROVENANCE.md :: conditioning_law.hpp :: deleted at 2b562c8; §13 names that commit in the same table row
+canon/THE_CONTRACT_PROVENANCE.md :: conditioning_schema.hpp :: deleted at 2b562c8; same
+canon/THE_CONTRACT_PROVENANCE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; same
 
 # --- Runtime artifact names, not repository paths ---
 # A driver writes or reads these at run time; they are outputs under a gitignored directory.
@@ -60,6 +60,7 @@ canon/THE_RECOVERED_LAW.md :: RESULTS.md :: the observation-result genre filenam
 
 # --- Directory names in sentences that report their absence or their move ---
 CLAUDE.md :: runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem; the sentence names it to say it is gone
+canon/THE_CONTRACT_PROVENANCE.md :: runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem; the sentence names it to say it is gone
 canon/THE_DOCUMENT_LAW.md :: ../evidence/observations/ :: the historical "from" side of a defect row: where two canon links USED to point before 06518c3 moved the target
 canon/THE_DOCUMENT_LAW.md :: observations/ :: §1.8's defect row states the live observation genre directory is absent; that absence is the row
 canon/THE_QUOTE_NETWORK.md :: evidence/observations/ :: quoted inside a measurement of README's dead links; the deadness is the finding
@@ -88,7 +89,7 @@ blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quote
 # the sentence that regrades their receipt, and says where they survive (`93834398`). Naming a
 # deleted owner is the point of the regrade — it is how a reader checks the claim against history.
 CLAUDE.md :: continual_reasoning.rs :: deleted BY the pinned laboratory commit a07ff376; survives at its parent 93834398, which §5 states
-CLAUDE.md :: runs/dialogue-distractor-scaling/REPORT.json :: never tracked at any laboratory commit; §5 names it to record that the 8,748/2,701/11,795 receipt is unrecoverable, the same loss class as the tiger figures
+canon/THE_CONTRACT_PROVENANCE.md :: runs/dialogue-distractor-scaling/REPORT.json :: never tracked at any laboratory commit; §5 names it to record that the 8,748/2,701/11,795 receipt is unrecoverable, the same loss class as the tiger figures
 CLAUDE.md :: src/soma/life/src/symbolic_reasoning.rs :: same — the owner whose receipt §5 regrades, deleted BY a07ff376 and readable at 93834398
 
 # --- Directories outside this repository, named to describe what fills a transcript directory ---
@@ -119,3 +120,4 @@ canon/THE_TIMELINE.md :: conditioning_law.hpp :: deleted at 2b562c8; §2 names t
 canon/THE_TIMELINE.md :: conditioning_schema.hpp :: deleted at 2b562c8; §2 names that commit
 canon/THE_TIMELINE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; §2 names that commit
 blueprint/THE_ROADMAP.md :: runs/eros-two-theorem-deed/ :: the laboratory's empty run directory for the two-theorem deed, named because its EMPTINESS is the evidence that neither body had run it. It does not resolve here because `runs/` is the laboratory's and is gitignored there.
+blueprint/THE_MACHINE.md :: crates/holonic-engine/src/lean_mathematics.rs :: named 2026-08-15 as the file a stale row asks about; the file no longer exists, which IS the measurement -- the row cannot be re-run because its subject is gone

@@ -33,8 +33,8 @@
 //! path the caller supplies.  The family conditioned from it is the **same seventeen declared
 //! documents** the 14,018 measurement ran on, so the two counts are comparable; the exterior source
 //! of an occurrence is its declared repository-relative path and never its container, because a
-//! container coordinate on this machine is an absolute host path
-//! (`research/records/2026-08-11_THE_SEAL_CARRIED_THE_HOST_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`
+//! container coordinate on this machine is an absolute cpu path
+//! (`research/records/2026-08-11_THE_SEAL_CARRIED_THE_CPU_AND_THE_ORGANS_AWAIT_THEIR_CURRENT.md`
 //! §2 conviction 1) and an absolute frame may not enter a lineage.
 
 use std::{
@@ -160,10 +160,10 @@ struct Report {
 
     device: String,
     device_launches: u64,
-    device_host_parity_checked: bool,
+    device_cpu_parity_checked: bool,
     device_key_words: usize,
     device_deposit_search_comparison_bound: usize,
-    host_linear_comparison_cost: usize,
+    cpu_linear_comparison_cost: usize,
 
     ablated_target: Option<String>,
     ablated_target_sources: Vec<String>,
@@ -413,7 +413,7 @@ fn run() -> Result<(), String> {
     let spec = MorphologicalGenerationSpec {
         maximum_observed_tokens: arguments.tokens,
     };
-    let cover = HardwareCover::host_only();
+    let cover = HardwareCover::cpu_only();
     eprintln!("arm (a): the complete continuation fiber");
     let complete_started = Instant::now();
     let complete = ecology
@@ -444,10 +444,10 @@ fn run() -> Result<(), String> {
     let semantic = conducted.semantic.clone();
     let device_launches = executor.launches();
     let device = executor.device_name().to_owned();
-    let device_host_parity_checked = conducted
+    let device_cpu_parity_checked = conducted
         .apparatus
         .iter()
-        .all(|receipt| receipt.host_parity_checked);
+        .all(|receipt| receipt.cpu_parity_checked);
     let device_key_words = conducted
         .apparatus
         .first()
@@ -457,10 +457,10 @@ fn run() -> Result<(), String> {
         .iter()
         .map(|receipt| receipt.deposit_search_comparison_bound)
         .sum();
-    let host_linear_comparison_cost = conducted
+    let cpu_linear_comparison_cost = conducted
         .apparatus
         .iter()
-        .map(|receipt| receipt.host_linear_comparison_cost)
+        .map(|receipt| receipt.cpu_linear_comparison_cost)
         .sum();
     eprintln!(
         "arm (b): {conducted_population} branches in {conducted_wall_millis} ms over \
@@ -706,10 +706,10 @@ fn run() -> Result<(), String> {
         obstructed_withheld_candidates,
         device,
         device_launches,
-        device_host_parity_checked,
+        device_cpu_parity_checked,
         device_key_words,
         device_deposit_search_comparison_bound,
-        host_linear_comparison_cost,
+        cpu_linear_comparison_cost,
         ablated_target,
         ablated_target_sources,
         ablated_population,

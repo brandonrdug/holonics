@@ -815,7 +815,7 @@ fn main() {
         "  - This is not Navier-Stokes, not existence, not smoothness, not viscosity, and not"
     );
     println!("    a fluid solver. It is one exact finite conservative advection chart with a");
-    println!("    covector carried on it. The host module's bound stands unsoftened.");
+    println!("    covector carried on it. The cpu module's bound stands unsoftened.");
     println!("  - `Gamma` conservation is an ALGEBRAIC IDENTITY here, not a measurement. It is");
     println!("    stated and not counted. Nothing below it establishes Kelvin's theorem in any");
     println!("    setting where the flow is not a declared linear successor.");

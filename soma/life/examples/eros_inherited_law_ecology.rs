@@ -14,7 +14,7 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryRadiation, CurrentBoundaryPort, HostLiveCurrentExecutor, InterfaceCapability,
+    ContemporaryRadiation, CurrentBoundaryPort, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage,
     SparseStandingSurface,
 };
@@ -664,8 +664,8 @@ impl LawWorld {
                 NativeEventCurrent::continuing(&mut self.edge_2, &edge_2, action()),
                 NativeEventCurrent::continuing(&mut self.residual, &residual, action()),
             ];
-            let mut host = HostLiveCurrentExecutor;
-            present_native_event_with(&mut self.machine, &mut host, &mut currents, &[])
+            let mut cpu = CpuLiveCurrentExecutor;
+            present_native_event_with(&mut self.machine, &mut cpu, &mut currents, &[])
                 .map_err(debug)?;
         }
         Ok(())
@@ -726,10 +726,10 @@ impl LawWorld {
             NativeEventCurrent::continuing_complex(&mut self.edge_1, charts[1].complex(), action()),
             NativeEventCurrent::continuing_complex(&mut self.edge_2, charts[2].complex(), action()),
         ];
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         let radiation = present_native_event_with_regional(
             &mut self.machine,
-            &mut host,
+            &mut cpu,
             &mut currents,
             &[],
             &regions,
@@ -774,10 +774,10 @@ impl LawWorld {
                 action(),
             ),
         ];
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         let radiation = present_native_event_with_regional(
             &mut self.machine,
-            &mut host,
+            &mut cpu,
             &mut currents,
             &[],
             &regions,
@@ -1439,9 +1439,9 @@ fn decode_checkpoint(bytes: &[u8]) -> Result<EcologyCheckpoint, String> {
         return Err("the ecology checkpoint has an unknown header".to_owned());
     }
     let machine_len = usize::try_from(reader.u64()?)
-        .map_err(|_| "the machine extent does not fit this host".to_owned())?;
+        .map_err(|_| "the machine extent does not fit this cpu".to_owned())?;
     let law_len = usize::try_from(reader.u64()?)
-        .map_err(|_| "the law extent does not fit this host".to_owned())?;
+        .map_err(|_| "the law extent does not fit this cpu".to_owned())?;
     let machine_bytes = reader.take(machine_len)?;
     let machine_image = LiveCurrentRestImage::from_native_bytes(machine_bytes).map_err(debug)?;
     let machine = LiveCurrentMachine::from_rest_image(machine_image.clone()).map_err(debug)?;

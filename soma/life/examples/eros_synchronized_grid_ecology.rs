@@ -180,7 +180,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     println!(
-        "decoding {} complete synchronized GRID occurrences across bounded host workers",
+        "decoding {} complete synchronized GRID occurrences across bounded cpu workers",
         stems.len()
     );
     let decode_started = Instant::now();

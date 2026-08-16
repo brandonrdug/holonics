@@ -480,7 +480,7 @@ fn run() -> Result<(), String> {
     let source_sha256 = sha256(&source_bytes);
     let source: Source = serde_json::from_slice(&source_bytes)
         .map_err(|error| format!("{} parses: {error}", source_path.display()))?;
-    let report = run_host(source, source_sha256)?;
+    let report = run_cpu(source, source_sha256)?;
     let mut report_bytes = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("contextual-retriangulation report encodes: {error}"))?;
     report_bytes.push(b'\n');
@@ -504,7 +504,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host(source: Source, source_sha256: String) -> Result<Report, String> {
+fn run_cpu(source: Source, source_sha256: String) -> Result<Report, String> {
     let run_started = Instant::now();
     validate_source(&source)?;
     let budget = RunBudget::new();

@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    LiveBoundaryTransition, LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor,
+    LiveBoundaryTransition, LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
 
@@ -256,7 +256,7 @@ fn run() -> Result<(), String> {
     let threads = std::thread::available_parallelism()
         .map(|extent| extent.get())
         .unwrap_or(1);
-    let mut executor = ParallelHostLiveCurrentExecutor::new(threads);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(threads);
     let mut ecology = ResonanceEcology::new(LiveCurrentMachine::new(
         SparseStandingSurface::empty_rank(8).map_err(debug)?,
     ));
@@ -296,7 +296,7 @@ fn run() -> Result<(), String> {
     eprintln!("form deposited: {}", deposited.path.display());
     let remount_exact = remounted_bytes == rest_bytes;
 
-    let mut reverse_executor = ParallelHostLiveCurrentExecutor::new(threads);
+    let mut reverse_executor = ParallelCpuLiveCurrentExecutor::new(threads);
     let mut reverse = ResonanceEcology::new(LiveCurrentMachine::new(
         SparseStandingSurface::empty_rank(8).map_err(debug)?,
     ));

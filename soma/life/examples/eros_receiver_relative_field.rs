@@ -11,7 +11,7 @@ use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent, CurrentGeometry,
     CurrentLineage, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
-    LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelHostLiveCurrentExecutor,
+    LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelCpuLiveCurrentExecutor,
     RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
 
@@ -87,7 +87,7 @@ struct Acceptance {
     ineligible_third_remained_a_separate_component: bool,
     omitting_the_third_restored_the_dyad_exactly: bool,
     regional_storage_order_was_gauge: bool,
-    one_and_eight_host_cores_were_exact: bool,
+    one_and_eight_cpu_cores_were_exact: bool,
     ordinary_current_radiation_was_exact_across_every_branch: bool,
 }
 
@@ -149,7 +149,7 @@ fn run() -> Result<(), String> {
         return Err("usage: eros_receiver_relative_field <new-report.json>".to_owned());
     }
 
-    let report = run_host()?;
+    let report = run_cpu()?;
     let mut encoded = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("the exact report encodes: {error}"))?;
     encoded.push(b'\n');
@@ -171,7 +171,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host() -> Result<Report, String> {
+fn run_cpu() -> Result<Report, String> {
     let (base, lineages) = primed_machine()?;
     let predecessor_image = base.rest_image().map_err(debug)?;
     let predecessor = machine_read(&base)?;
@@ -209,7 +209,7 @@ fn run_host() -> Result<Report, String> {
                 == dyad.machine.rest_image().map_err(debug)?,
         regional_storage_order_was_gauge: permuted.machine.rest_image().map_err(debug)?
             == eligible_one.machine.rest_image().map_err(debug)?,
-        one_and_eight_host_cores_were_exact: eligible_many.radiation == eligible_one.radiation
+        one_and_eight_cpu_cores_were_exact: eligible_many.radiation == eligible_one.radiation
             && eligible_many.machine.rest_image().map_err(debug)?
                 == eligible_one.machine.rest_image().map_err(debug)?,
         ordinary_current_radiation_was_exact_across_every_branch: [
@@ -230,7 +230,7 @@ fn run_host() -> Result<Report, String> {
         && acceptance.ineligible_third_remained_a_separate_component
         && acceptance.omitting_the_third_restored_the_dyad_exactly
         && acceptance.regional_storage_order_was_gauge
-        && acceptance.one_and_eight_host_cores_were_exact
+        && acceptance.one_and_eight_cpu_cores_were_exact
         && acceptance.ordinary_current_radiation_was_exact_across_every_branch;
     if !accepted {
         return Err("the fixed population-relative contrasts did not all close".to_owned());
@@ -292,7 +292,7 @@ fn enact(
         RegionalRelationCell::new(lineages[2], &second),
         RegionalRelationCell::new(lineages[3], &third),
     ];
-    let mut executor = ParallelHostLiveCurrentExecutor::new(threads);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(threads);
     let radiation = match kind {
         BranchKind::Dyad => machine.receive_with(
             ContemporaryEvent::with_regional(&currents, &[], &cells[..2]),

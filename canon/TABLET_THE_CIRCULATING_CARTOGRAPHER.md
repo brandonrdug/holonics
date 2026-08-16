@@ -68,7 +68,7 @@ mount -> differentiate -> conduct/diffuse -> interact/glue
 ```
 
 `open`: the bounded owners have not yet returned this whole cycle as one continuing resident
-ecology without host semantic phase choreography.
+ecology without CPU semantic phase choreography.
 
 ## 4. Compression retains the reconstruction fiber
 
@@ -105,7 +105,7 @@ fronts, stable and changing modes, collapsed and reopened fibers, reconvergences
 higher-cell fillings, boundary radiation, morphology-changing returns, and retained obstructions.
 
 Apparatus placement remains a chart over this circulation. The strongest lawful resident surface
-owns the hot deed; the host may mount, rest, and inspect exact testimony but may not replay the
+owns the hot deed; the CPU may mount, rest, and inspect exact testimony but may not replay the
 semantic algorithm or select the cycle's phases.
 
 ## 7. The code-material correction
@@ -124,7 +124,7 @@ compose the existing owners; this tablet does not schedule that deed.
 
 This posture fails if a required consequence cannot cross the existing typed ports and the
 attempted composition returns a concrete missing owner. It also fails if the alleged circulation
-is actually a host-authored phase sequence, a private echo mistaken for exterior return, an
+is actually a CPU-authored phase sequence, a private echo mistaken for exterior return, an
 untyped diffusion, or a quotient which discards its reconstruction fiber.
 
 Complete derivation, standing-owner audit, and boundary:

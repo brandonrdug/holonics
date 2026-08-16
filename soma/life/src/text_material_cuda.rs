@@ -82,8 +82,8 @@ pub struct TextMaterialResidentReservation {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub struct TextMaterialCudaSyncReceipt {
     pub initial_mount: bool,
-    pub host_to_device_words: usize,
-    pub device_to_host_words: usize,
+    pub cpu_to_device_words: usize,
+    pub device_to_cpu_words: usize,
     pub bounded_delta_equal: bool,
     pub virtual_address_reservations: usize,
     pub newly_mapped_words: usize,
@@ -219,7 +219,7 @@ impl CudaTextMaterialResidentExecutor {
         let output = DeviceBuffer::<u32>::alloc_zeroed(1)?;
         let stream = Stream::create()?;
         context.synchronize()?;
-        let device_to_host_words = verify_resident_image(
+        let device_to_cpu_words = verify_resident_image(
             &section_rows,
             &section_features,
             &section_tokens,
@@ -227,7 +227,7 @@ impl CudaTextMaterialResidentExecutor {
             &feature_nodes,
             &image,
         )?;
-        let host_to_device_words = image
+        let cpu_to_device_words = image
             .section_rows
             .len()
             .checked_add(image.section_features.len())
@@ -269,8 +269,8 @@ impl CudaTextMaterialResidentExecutor {
         };
         let pending_sync = Some(TextMaterialCudaSyncReceipt {
             initial_mount: true,
-            host_to_device_words,
-            device_to_host_words,
+            cpu_to_device_words,
+            device_to_cpu_words,
             bounded_delta_equal: true,
             virtual_address_reservations: 5,
             newly_mapped_words,
@@ -441,7 +441,7 @@ impl CudaTextMaterialResidentExecutor {
         }
         self.context.synchronize()?;
 
-        let device_to_host_words = self.verify_resident_delta(&delta)?;
+        let device_to_cpu_words = self.verify_resident_delta(&delta)?;
 
         self.head_shadow
             .resize_with(delta.to.features, || wire::OPEN_LINK);
@@ -459,7 +459,7 @@ impl CudaTextMaterialResidentExecutor {
             .syncs
             .checked_add(1)
             .ok_or(TextMaterialCudaError::Extent)?;
-        let host_to_device_words = delta
+        let cpu_to_device_words = delta
             .section_rows
             .len()
             .checked_add(delta.section_features.len())
@@ -470,8 +470,8 @@ impl CudaTextMaterialResidentExecutor {
             .ok_or(TextMaterialCudaError::Extent)?;
         self.pending_sync = Some(TextMaterialCudaSyncReceipt {
             initial_mount: false,
-            host_to_device_words,
-            device_to_host_words,
+            cpu_to_device_words,
+            device_to_cpu_words,
             bounded_delta_equal: true,
             virtual_address_reservations: 0,
             newly_mapped_words,

@@ -30,7 +30,7 @@ What a **frame** carries is `LocalChart { origin, basis: [RatVec3; 3], labels }`
 (`model.rs:45`) — an origin and an ordered basis, exact over `BigRational`, with `gram()` and
 `orientation()` derived rather than stored. What a **reader** carries is
 `Receiver { frame, orientation, projection, gauge, route_overrides }`
-(`crates/relational-geometry/src/projection.rs:380`). Nothing in a `Construction` is written in a
+(`crates/relational-geometry/src/projection.rs:502`). Nothing in a `Construction` is written in a
 coordinate system; a coordinate exists only once a receiver has been applied. Two charts become
 comparable exactly when a `FrameRelation` (`model.rs:143`) declares an exact `AffineMap3` between
 them, and a comparison is refused when the relation graph admits more than one route and the caller
@@ -75,13 +75,21 @@ at once.
 | complex | `ExactComplexAxisPair` (`dimensional_receiver.rs:84`), `ExactTurn` (`decorated_path.rs:102`) | §10.5 |
 | projective / homogeneous | `ProjectivePoint2`, `HomogeneousConic`, `primitive_projective` (`projection.rs:33`) | every homogeneous carrier is reduced to a primitive integer tuple at construction |
 | barycentric | `SurfaceCrossing::barycentric: [Rat; 3]` (`holonic-engine/src/receiver.rs:658`) | §10.6 |
-| tangent | `AnalyticGeometry::tangent` (`analytic_field.rs:239`) and `tangent_dimension_at_homogeneous_origin` (`algebraic.rs:1032`) | two owners and two different objects — a curve's tangent vector and a cone's Zariski tangent dimension; there is no tangent **bundle** anywhere |
+| tangent | `ExactAnalyticOrbitGeometry::tangent` (`analytic_field.rs:239`) and `tangent_dimension_at_homogeneous_origin` (`algebraic.rs:1032`) | two owners and two different objects — a curve's tangent vector and a cone's Zariski tangent dimension; there is no tangent **bundle** anywhere |
 | phase | `arithmetic_phase.rs`, `receiver_phase_atlas.rs`, and the physical phase triple in `examples/desktop_receiver.rs:49` | three unrelated senses of "phase", none of them a symplectic phase space |
 | configuration | `basin.rs:28` `ConfigurationCellId` | a bounded exact **complex**, and the module refuses the continuous case by name |
 | **cylindrical, spherical** | **no owner.** `git grep -i cylindrical` over `crates/` and `soma/` returns zero; every `spherical` hit is `AtmosphericAltitude*` or a test string | neither is needed by anything built, and inventing one would be cabinet-filling (§9) |
 | **trilinear** | **no owner, and zero occurrences in the entire repository** | the natural next chart after barycentric, and genuinely absent |
 | **UV / texture** | **no owner.** `uv_` returns zero; `texture` occurs only in the test helper `textured_section` | nothing here parameterizes a surface for sampling, because nothing samples |
 | **latent / embedding** | **no owner, and the absence is a declaration.** `latent` names a reconstructed *divisor generator* (`divisor_reconstruction.rs:40`), not a learned vector; the ML sense is refused in source at `soma/life/src/agentic_language.rs:201` and `:436` | the honest replacement is the Nerode quotient of `receiver_exact_compression.rs`, which is a partition with an exhibitable separating word rather than a space with a distance |
+
+**Re-measured 2026-08-15, and one row's enumeration is stale.** `grep -rni "cylindrical" --include='*.rs'
+crates soma` returns 0 and `grep -rni "trilinear" --exclude-dir=target --exclude-dir=.git .` returns
+only this tablet's own line, so **the coordinate systems still have no owner**. But
+`grep -rni "spherical" --include='*.rs' crates soma` no longer returns only `AtmosphericAltitude*`:
+`CurvatureSign::Spherical` occurs at `hypergeometric_closure.rs:187`, `:232`, `:572`, `:824` and
+`examples/the_solution_closes_when_the_marks_take_turns.rs:143`. **That is a curvature sign and not
+a coordinate chart**, so the row's verdict survives and its evidence sentence does not.
 
 ### 10.4 The polar chart, and where the half-turn went
 
@@ -96,7 +104,7 @@ The affine half-angle chart misses exactly one point of the circle, `t = ∞`. T
 half-turn. And the carrier **restores exactly it**: `ProjectiveRatio::infinity()` is `1/0`, so
 `ExactSpin::axis(X, 1/0)` is the quaternion `[0,1,0,0]`, and `ExactSpin::matrix` returns
 `diag(1, −1, −1)` — rotation by `π` about `x`. `proved-derived`, two lines, checkable against
-`ExactSpin::matrix` at `projection.rs:237`. **So the one point the rational chart cannot see in its
+`ExactSpin::matrix` at `projection.rs:270`. **So the one point the rational chart cannot see in its
 affine form is `−1 = e^{iπ}`, and the projective completion is exactly the repair.** That is §2b's
 sentence arriving as a
 property of a chart rather than as a reading: the half-turn is not a value the chart forgot, it is

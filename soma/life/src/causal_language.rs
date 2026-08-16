@@ -16,7 +16,7 @@ use body::num::Cog;
 use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    LiveCurrentExecutor, LiveCurrentMachine, ParallelHostLiveCurrentExecutor,
+    LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
 
@@ -436,14 +436,14 @@ impl CausalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<CausalLanguageGeneration, CausalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        self.generate_with_executor(prompt, spec, action, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        self.generate_with_executor(prompt, spec, action, &mut cpu)
     }
 
     /// Generate through one caller-retained physical executor. Recruitment and suffix emanation
-    /// remain exact host work, but the question event and every self-emanated return of every
+    /// remain exact cpu work, but the question event and every self-emanated return of every
     /// terminal path cross the supplied executor; selecting a card at the outer language boundary
-    /// cannot silently construct a private host executor here.
+    /// cannot silently construct a private cpu executor here.
     pub fn generate_with_executor(
         &self,
         prompt: &str,
@@ -457,7 +457,7 @@ impl CausalLanguageEcology {
         }
 
         // The cover, declared once for this leader.
-        let cover = holonic_engine::hardware_cover::HardwareCover::host_only();
+        let cover = holonic_engine::hardware_cover::HardwareCover::cpu_only();
         let initial = self.recruit(&prompt_tokens);
         let initial_hexis = self.recruitment_read(&initial.sources)?;
         let mut states = vec![GenerationState {
@@ -707,9 +707,9 @@ impl CausalLanguageEcology {
             .collect())
     }
 
-    /// The retained host mouth for the question event. It has no library caller: this organ's one
+    /// The retained cpu mouth for the question event. It has no library caller: this organ's one
     /// generation path now threads a caller-retained executor all the way down, so keeping a
-    /// private host construction on that path would be the very defect the twin below removes.
+    /// private cpu construction on that path would be the very defect the twin below removes.
     /// The signature is preserved rather than cut because it is the worker-count mouth a caller
     /// which has mounted nothing still expects.
     #[allow(dead_code)]
@@ -719,13 +719,13 @@ impl CausalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<ResonanceEcology, CausalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        self.receive_question_with_executor(prompt, action, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        self.receive_question_with_executor(prompt, action, &mut cpu)
     }
 
     /// Receive the outer question through one caller-retained physical executor. The executor
     /// crosses the question's Swing event; selecting a card at the outer language boundary cannot
-    /// silently construct a private host executor here.
+    /// silently construct a private cpu executor here.
     fn receive_question_with_executor(
         &self,
         prompt: &[String],
@@ -826,7 +826,7 @@ pub(crate) fn condition_route_receivers(
 /// Condition the same complete route population through one caller-owned physical executor.
 /// Chronology within each receiver remains ordered; the executor is free to realize each returned
 /// event on a resident card. This is the production mouth used when a higher body explicitly
-/// mounts CUDA rather than silently rebuilding the route ecology on host workers.
+/// mounts CUDA rather than silently rebuilding the route ecology on cpu workers.
 pub(crate) fn condition_route_receivers_with_executor(
     groups: BTreeMap<ReceiverFiberIdentity, Vec<RouteTrainingSection>>,
     action: ActionCurrent,
@@ -906,7 +906,7 @@ fn condition_route_partition(
     for (feature, sections) in partition {
         // Parallelism lives across independent receiver ecologies; one receiver's returned
         // chronology remains serial and therefore uses one physical worker.
-        let mut executor = ParallelHostLiveCurrentExecutor::new(1);
+        let mut executor = ParallelCpuLiveCurrentExecutor::new(1);
         conditioned.push(condition_route_receiver(
             feature,
             sections,
@@ -1134,23 +1134,23 @@ mod tests {
     }
 
     /// One caller-retained executor which counts the events it was actually asked to realize. It
-    /// changes no result: it forwards every request to the same host carrier the private path
+    /// changes no result: it forwards every request to the same cpu carrier the private path
     /// would have built.
-    struct CountingHostExecutor {
-        host: ParallelHostLiveCurrentExecutor,
+    struct CountingCpuExecutor {
+        cpu: ParallelCpuLiveCurrentExecutor,
         enactments: usize,
     }
 
-    impl CountingHostExecutor {
+    impl CountingCpuExecutor {
         const fn new(worker_threads: usize) -> Self {
             Self {
-                host: ParallelHostLiveCurrentExecutor::new(worker_threads),
+                cpu: ParallelCpuLiveCurrentExecutor::new(worker_threads),
                 enactments: 0,
             }
         }
     }
 
-    impl LiveCurrentExecutor for CountingHostExecutor {
+    impl LiveCurrentExecutor for CountingCpuExecutor {
         fn enact(
             &mut self,
             physical_revision: u64,
@@ -1160,15 +1160,15 @@ mod tests {
             regional: &[RegionalExecutionRequest<'_>],
         ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
             self.enactments += 1;
-            self.host
+            self.cpu
                 .enact(physical_revision, standing, currents, relations, regional)
         }
     }
 
     /// One supplied executor crosses every Swing event on both generation paths, and the return is
-    /// the one the private-host path already produced.
+    /// the one the private-cpu path already produced.
     ///
-    /// Equality alone would not separate a real twin from one which quietly rebuilt its own host
+    /// Equality alone would not separate a real twin from one which quietly rebuilt its own cpu
     /// pool and ignored the argument. The count is the frame that makes it falsifiable: the
     /// supplied executor is the only executor either generation path may reach, so a nonzero count
     /// is proof that the question event and every self-emanated return crossed it.
@@ -1196,19 +1196,19 @@ mod tests {
             maximum_generated_tokens: 16,
             stop_at_sentence_boundary: true,
         };
-        let private_host = causal
+        let private_cpu = causal
             .generate(causal_prompt, causal_spec, action(), 2)
             .unwrap();
-        assert!(private_host
+        assert!(private_cpu
             .outputs
             .iter()
             .any(|output| !output.text.is_empty()));
-        let mut causal_executor = CountingHostExecutor::new(2);
+        let mut causal_executor = CountingCpuExecutor::new(2);
         let supplied = causal
             .generate_with_executor(causal_prompt, causal_spec, action(), &mut causal_executor)
             .unwrap();
-        assert_eq!(private_host, supplied);
-        assert!(causal_executor.enactments >= private_host.outputs.len());
+        assert_eq!(private_cpu, supplied);
+        assert!(causal_executor.enactments >= private_cpu.outputs.len());
 
         let morphological = MorphologicalLanguageEcology::condition(
             &[
@@ -1239,14 +1239,14 @@ mod tests {
         let morphological_spec = MorphologicalGenerationSpec {
             maximum_observed_tokens: 32,
         };
-        let private_host = morphological
+        let private_cpu = morphological
             .generate(morphological_prompt, morphological_spec, action(), 2)
             .unwrap();
-        assert!(private_host
+        assert!(private_cpu
             .outputs
             .iter()
             .any(|output| !output.text.is_empty()));
-        let mut morphological_executor = CountingHostExecutor::new(2);
+        let mut morphological_executor = CountingCpuExecutor::new(2);
         let supplied = morphological
             .generate_with_executor(
                 morphological_prompt,
@@ -1255,8 +1255,8 @@ mod tests {
                 &mut morphological_executor,
             )
             .unwrap();
-        assert_eq!(private_host, supplied);
-        assert!(morphological_executor.enactments >= private_host.outputs.len());
+        assert_eq!(private_cpu, supplied);
+        assert!(morphological_executor.enactments >= private_cpu.outputs.len());
     }
 
     #[test]
@@ -1309,7 +1309,7 @@ mod tests {
     }
 
     #[test]
-    fn plural_successors_return_without_host_ranking_or_pruning() {
+    fn plural_successors_return_without_cpu_ranking_or_pruning() {
         let ecology = CausalLanguageEcology::condition(
             &[
                 CausalLanguagePassage::new("alpha", 1, "Root emits alpha."),
@@ -1386,7 +1386,7 @@ mod tests {
 
     #[test]
     #[ignore = "requires the RTX CUDA device and committed lineage_event PTX entry"]
-    fn one_cell_complex_route_conditioning_is_host_card_exact() {
+    fn one_cell_complex_route_conditioning_is_cpu_card_exact() {
         let feature = route_feature_fiber("conditioning");
         let sources = [
             fiber_from_bytes(0x5254_534f_5552_4345, b"first"),
@@ -1405,10 +1405,10 @@ mod tests {
                 },
             ],
         )]);
-        let host = condition_route_receivers(groups.clone(), action(), 2).unwrap();
+        let cpu = condition_route_receivers(groups.clone(), action(), 2).unwrap();
         let mut cuda = crate::live_current_cuda::CudaLiveCurrentExecutor::new(0).unwrap();
         let card = condition_route_receivers_with_executor(groups, action(), &mut cuda).unwrap();
-        assert_eq!(host, card);
+        assert_eq!(cpu, card);
         assert!(cuda.launches() >= 2);
         assert!(cuda.contact_launches() >= 2);
     }

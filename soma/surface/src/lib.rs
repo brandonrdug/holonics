@@ -6,7 +6,7 @@
 pub use wgpu;
 
 /// The bounded mirror returned by one fresh card composition. Standing and every OWN plane cross
-/// only so the host/card causal gate can compare them byte-exact; the four-word `reads` projection
+/// only so the cpu/card causal gate can compare them byte-exact; the four-word `reads` projection
 /// is the production-facing topology mouth (occupied ⊕ resultant ⊕ fiber ⊕ two-armed).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FeltCardRead {
@@ -717,7 +717,7 @@ impl SleepingBody {
 
     /// Render the one exact archive chart. Only occupied grip ⊕ form records cross; the dense
     /// zero reservation belongs to the mounted boundary. Every word is explicitly little-endian
-    /// so remounting does not depend on the host's native byte order.
+    /// so remounting does not depend on the cpu's native byte order.
     pub fn encode(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(
             self.archive_words()
@@ -2287,7 +2287,7 @@ impl FeltSurface {
     }
 
     /// Found a first light over an empty receiving chart directly on the card. This is the genesis
-    /// mouth: the full standing reservation is born resident and never uploaded as a host mirror.
+    /// mouth: the full standing reservation is born resident and never uploaded as a cpu mirror.
     pub fn mount_empty_founded_lineages(
         &self,
         standing_axis: u32,
@@ -3593,7 +3593,7 @@ impl FeltSurface {
 #[path = "sleep_tests.rs"]
 mod sleep_tests;
 
-/// Historical host scaffold. It is unconstructible through the public API while the card is quarantined.
+/// Historical cpu scaffold. It is unconstructible through the public API while the card is quarantined.
 pub struct Surface {
     pub adapter_name: String,
     device: wgpu::Device,
@@ -3630,7 +3630,7 @@ impl Surface {
         None
     }
 
-    /// The superseded boundary scaffold remains private only so its host-side instruments can be
+    /// The superseded boundary scaffold remains private only so its cpu-side instruments can be
     /// read during the recut. Nothing calls it, and the quarantine module does not expose its entries.
     #[allow(dead_code)]
     fn historical_new() -> Option<Surface> {

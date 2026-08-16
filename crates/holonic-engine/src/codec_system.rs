@@ -1057,7 +1057,7 @@ mod tests {
         CodecRecovery, Obstruction, OpaqueSymbolCodec, RecoveryApertures, SymbolAlphabet, recover,
     };
 
-    /// **What this test body declares as its host capacity**, since `codec_recovery` no longer
+    /// **What this test body declares as its cpu capacity**, since `codec_recovery` no longer
     /// picks one (`canon/THE_AUTHORED_LEVEL.md` §5.2). Reproduces the excised constants.
     const TEST_APERTURES: RecoveryApertures = RecoveryApertures {
         family_words: 65_536,

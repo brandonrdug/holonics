@@ -280,7 +280,7 @@ fn build(corpus_form: &Path, source_roots: Vec<PathBuf>) -> Result<(), String> {
     }
     let device = resident.device_name().to_owned();
     let corpus_launches = resident.launches();
-    let atlas = resident.unmount_into_host();
+    let atlas = resident.unmount_into_cpu();
 
     let returned_occurrences = gpu_semantic
         .sections

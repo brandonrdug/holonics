@@ -17,7 +17,7 @@ use spirv_std::glam::UVec3;
 use spirv_std::memory::{Scope, Semantics};
 use spirv_std::spirv;
 
-// ONE MOUTH — the same types and scalar fold primitives the host compiles.
+// ONE MOUTH — the same types and scalar fold primitives the cpu compiles.
 #[path = "../../body/src/arrow.rs"]
 mod arrow;
 #[path = "../../body/src/boundary.rs"]

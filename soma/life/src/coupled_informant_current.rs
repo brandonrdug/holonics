@@ -729,7 +729,7 @@ mod tests {
     use relational_geometry::{Rat, ReceiverId};
     use soma_membrane::{
         CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent,
-        HostLiveCurrentExecutor, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
+        CpuLiveCurrentExecutor, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
         LiveCurrentRestImage, RegionalExecutionRequest, SparseStandingSurface,
     };
 
@@ -1017,10 +1017,10 @@ mod tests {
             .lineage(CoupledInformantCurrentChannel::Returned)
             .is_none());
 
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         let direct_generation = direct.receive(&generate).unwrap();
         let (generation, generation_current) = organ
-            .receive_into(&generate, &mut machine, &mut host)
+            .receive_into(&generate, &mut machine, &mut cpu)
             .unwrap();
         assert_eq!(generation, direct_generation);
         assert_eq!(generation_current.currents().len(), 5);
@@ -1034,7 +1034,7 @@ mod tests {
         };
         let direct_grade = direct.receive(&grade).unwrap();
         let (grade_receipt, grade_current) =
-            organ.receive_into(&grade, &mut machine, &mut host).unwrap();
+            organ.receive_into(&grade, &mut machine, &mut cpu).unwrap();
         assert_eq!(grade_receipt, direct_grade);
         assert_eq!(grade_current.currents().len(), 3);
         assert_eq!(grade_current.relations().len(), 2);
@@ -1046,7 +1046,7 @@ mod tests {
         };
         let direct_admit = direct.receive(&admit).unwrap();
         let (admit_receipt, admit_current) =
-            organ.receive_into(&admit, &mut machine, &mut host).unwrap();
+            organ.receive_into(&admit, &mut machine, &mut cpu).unwrap();
         assert_eq!(admit_receipt, direct_admit);
         assert_eq!(admit_current.currents().len(), 2);
         assert_eq!(admit_current.relations().len(), 1);
@@ -1092,10 +1092,10 @@ mod tests {
         };
         let direct_recur = direct.receive(&recur).unwrap();
         let (original_recur, original_current) =
-            organ.receive_into(&recur, &mut machine, &mut host).unwrap();
-        let mut remounted_host = HostLiveCurrentExecutor;
+            organ.receive_into(&recur, &mut machine, &mut cpu).unwrap();
+        let mut remounted_cpu = CpuLiveCurrentExecutor;
         let (remounted_recur, remounted_current) = remounted
-            .receive_into(&recur, &mut remounted_machine, &mut remounted_host)
+            .receive_into(&recur, &mut remounted_machine, &mut remounted_cpu)
             .unwrap();
         assert_eq!(original_recur, direct_recur);
         assert_eq!(remounted_recur, direct_recur);
@@ -1184,7 +1184,7 @@ mod tests {
             let mut machine =
                 LiveCurrentMachine::new(SparseStandingSurface::empty_rank(8).unwrap());
             organ.found(&mut machine).unwrap();
-            let mut host = HostLiveCurrentExecutor;
+            let mut cpu = CpuLiveCurrentExecutor;
             let (receipt, current) = organ
                 .receive_into(
                     &CoupledInformantEvent::Generate {
@@ -1194,7 +1194,7 @@ mod tests {
                         resolution: resolution_over(bands),
                     },
                     &mut machine,
-                    &mut host,
+                    &mut cpu,
                 )
                 .unwrap();
 

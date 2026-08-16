@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, ParallelHostLiveCurrentExecutor,
+    LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
 
@@ -311,7 +311,7 @@ fn run() -> Result<(), String> {
     let threads = std::thread::available_parallelism()
         .map(|extent| extent.get())
         .unwrap_or(1);
-    let mut executor = ParallelHostLiveCurrentExecutor::new(threads);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(threads);
     let mut ecology = ResonanceEcology::new(LiveCurrentMachine::new(
         SparseStandingSurface::empty_rank(8).map_err(debug)?,
     ));
@@ -338,7 +338,7 @@ fn run() -> Result<(), String> {
     let remount_exact = remounted_bytes == rest_bytes;
 
     let reversed = occurrences.iter().rev().cloned().collect::<Vec<_>>();
-    let mut reverse_executor = ParallelHostLiveCurrentExecutor::new(threads);
+    let mut reverse_executor = ParallelCpuLiveCurrentExecutor::new(threads);
     let mut reverse = ResonanceEcology::new(LiveCurrentMachine::new(
         SparseStandingSurface::empty_rank(8).map_err(debug)?,
     ));
@@ -390,7 +390,7 @@ fn run() -> Result<(), String> {
             ResonanceEcologyRestImage::from_native_bytes(&rest_bytes).map_err(debug)?,
         )
         .map_err(debug)?;
-        let mut question_executor = ParallelHostLiveCurrentExecutor::new(threads);
+        let mut question_executor = ParallelCpuLiveCurrentExecutor::new(threads);
         let question_radiation = question_ecology
             .receive_with(&question, action()?, &mut question_executor)
             .map_err(debug)?;
@@ -433,7 +433,7 @@ fn run() -> Result<(), String> {
                 ResonanceEcologyRestImage::from_native_bytes(&rest_bytes).map_err(debug)?,
             )
             .map_err(debug)?;
-            let mut branch_executor = ParallelHostLiveCurrentExecutor::new(threads);
+            let mut branch_executor = ParallelCpuLiveCurrentExecutor::new(threads);
             let returned = branch_ecology
                 .receive_with(&occurrence, action()?, &mut branch_executor)
                 .map_err(debug)?;
@@ -677,7 +677,7 @@ fn suffix_support_read(
     pieces: &BTreeMap<u32, String>,
 ) -> Result<SuffixSupportRead, String> {
     let matched_length = usize::try_from(support.matched_length())
-        .map_err(|_| "a suffix context length exceeds the host".to_owned())?;
+        .map_err(|_| "a suffix context length exceeds the cpu".to_owned())?;
     let start = prefix
         .len()
         .checked_sub(matched_length)

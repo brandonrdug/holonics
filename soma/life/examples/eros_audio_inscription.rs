@@ -19,7 +19,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
     CurrentBoundaryPort, CurrentExecutionRequest, DirectedExecutionRequest,
-    ExecutedContemporaryEvent, HostLiveCurrentExecutor, InterfaceCapability,
+    ExecutedContemporaryEvent, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalArcRadiation,
     RegionalExecutionRequest, SparseStandingSurface,
@@ -295,7 +295,7 @@ impl AudioWorld {
             ));
         }
         let regional = [NativeRegionalRelation::new(ACOUSTIC_RECEIVER, &arcs)];
-        let mut witness = WitnessHost::default();
+        let mut witness = WitnessCpu::default();
         let started = Instant::now();
         let radiation = present_native_event_with_regional(
             &mut self.machine,
@@ -344,12 +344,12 @@ impl AudioWorld {
 }
 
 #[derive(Default)]
-struct WitnessHost {
-    host: HostLiveCurrentExecutor,
+struct WitnessCpu {
+    cpu: CpuLiveCurrentExecutor,
     touched: Vec<Vec<usize>>,
 }
 
-impl WitnessHost {
+impl WitnessCpu {
     fn one_touched(&self) -> Result<Vec<usize>, String> {
         match self.touched.as_slice() {
             [one] => Ok(one.clone()),
@@ -361,7 +361,7 @@ impl WitnessHost {
     }
 }
 
-impl LiveCurrentExecutor for WitnessHost {
+impl LiveCurrentExecutor for WitnessCpu {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -371,7 +371,7 @@ impl LiveCurrentExecutor for WitnessHost {
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
         let executed =
-            self.host
+            self.cpu
                 .enact(physical_revision, standing, currents, relations, regional)?;
         self.touched.clear();
         self.touched
@@ -388,7 +388,7 @@ impl LiveCurrentExecutor for WitnessHost {
         physical_revision: u64,
         successor: &SparseStandingSurface,
     ) -> Result<(), LiveCurrentError> {
-        self.host
+        self.cpu
             .settle_physical_successor(physical_revision, successor)
     }
 }
@@ -594,10 +594,10 @@ fn preflight(source: &Path) -> Result<PreflightReport, String> {
         ));
     }
     let regional = [NativeRegionalRelation::new(ACOUSTIC_RECEIVER, &arcs)];
-    let mut host = HostLiveCurrentExecutor;
+    let mut cpu = CpuLiveCurrentExecutor;
     let started = Instant::now();
     let radiation =
-        present_native_event_with_regional(&mut machine, &mut host, &mut currents, &[], &regional)
+        present_native_event_with_regional(&mut machine, &mut cpu, &mut currents, &[], &regional)
             .map_err(debug)?;
     let elapsed_microseconds = started.elapsed().as_micros();
     let constituent = radiation

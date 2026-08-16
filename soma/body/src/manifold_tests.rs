@@ -2703,7 +2703,7 @@ while the shy dog saw the old rat run past the cat and the mat once more today";
 
 /// ★ THE WHOLE CARRIED FRAME HAS ONE MOUTH — the membrane and card derive row extent and every
 /// organ offset from this module. The reservation mounts exactly one deferred sibling per open
-/// depth; a host beat drains those slots before the frame crosses a stroke.
+/// depth; a cpu beat drains those slots before the frame crosses a stroke.
 #[test]
 fn the_carried_frame_layout_is_the_reservations_own() {
     const AXIS: i64 = 1 << 8;
@@ -3031,7 +3031,7 @@ fn the_frames_horizon_passes_unread_and_recurrence_rides() {
     }
 }
 
-/// ★ THE POOL RECUT GATE 1 — THE SAME LIGHT LANDS THE SAME OWN REGION (determinism at host grain;
+/// ★ THE POOL RECUT GATE 1 — THE SAME LIGHT LANDS THE SAME OWN REGION (determinism at cpu grain;
 /// the repeated-construction gate). One body, the same light twice into fresh own regions → the own
 /// regions are BYTE-EQUAL (the felt series is a total function of the light — place-not-store).
 #[test]

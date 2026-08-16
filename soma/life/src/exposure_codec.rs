@@ -85,7 +85,7 @@
 //!
 //! No grammar, no keyword list, no bracket table, no character classes, no encoding. It does not know
 //! what Lean is, what UTF-8 is, or that its octets group at all. It is told a radius and a call
-//! budget — both statements about the host, both declared by the caller, neither derivable from the
+//! budget — both statements about the cpu, both declared by the caller, neither derivable from the
 //! material — and nothing else.
 
 use std::cell::Cell;
@@ -104,7 +104,7 @@ const CODEC_SCHEMA: &str = "holonic-engine.recovered-symbol-codec.v1";
 /// The resource apertures one exposure recovery runs under, **declared by the caller**.
 ///
 /// There is deliberately no `Default`. Neither number is derivable from the material — the radius is
-/// how far this host can afford to look and the word budget is how many words it can afford to ask —
+/// how far this cpu can afford to look and the word budget is how many words it can afford to ask —
 /// so neither is the organ's to pick. Past either, the recovery refuses by name and reports the width
 /// the material required. `canon/THE_AUTHORED_LEVEL.md` §5.2 is the precedent: the same two levels
 /// moved out of `codec_recovery` for the same reason.

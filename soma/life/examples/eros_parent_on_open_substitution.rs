@@ -17,7 +17,7 @@ use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveMemory,
-    ParallelHostLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
+    ParallelCpuLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
     SparseStandingSurface,
 };
 
@@ -38,7 +38,7 @@ const RECRUIT_LOCAL: u64 = 0;
 const MAX_ARCS_PER_EVENT: usize = 2048;
 const EVENT_LIMIT: Duration = Duration::from_secs(30);
 const RUN_LIMIT: Duration = Duration::from_secs(120);
-const HOST_THREADS: usize = 8;
+const CPU_THREADS: usize = 8;
 const PRIMING_VALUES: [i64; 4] = [13, 29, -63_245, 71];
 
 const ECOLOGY_SCHEMA: u64 = 1;
@@ -455,7 +455,7 @@ fn run() -> Result<(), String> {
     validate_source(&source)?;
 
     let started = Instant::now();
-    let report = run_host(&source, &source_sha256)?;
+    let report = run_cpu(&source, &source_sha256)?;
     let mut report = report;
     report["run_wall_micros"] = json!(duration_micros(started.elapsed()));
     report["source"]["path"] = json!(source_path);
@@ -472,9 +472,9 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host(source: &Source, source_sha256: &str) -> Result<Value, String> {
+fn run_cpu(source: &Source, source_sha256: &str) -> Result<Value, String> {
     let budget = RunBudget::new();
-    let mut executor = ParallelHostLiveCurrentExecutor::new(HOST_THREADS);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(CPU_THREADS);
     let mut ecology = source_ecology(source)?;
     let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).map_err(debug)?);
     let mut events = Vec::new();
@@ -931,8 +931,8 @@ fn run_host(source: &Source, source_sha256: &str) -> Result<Value, String> {
             "local_products_per_receiver": source.cut.local_products_per_receiver,
         },
         "physical_execution": {
-            "executor": "ParallelHostLiveCurrentExecutor",
-            "host_threads": HOST_THREADS,
+            "executor": "ParallelCpuLiveCurrentExecutor",
+            "cpu_threads": CPU_THREADS,
             "model_reruns": source.expected.model_reruns,
             "feature_searches": source.expected.feature_searches,
             "thresholds": source.expected.thresholds,
@@ -1715,7 +1715,7 @@ fn push_interface(
 fn profiled_event(
     budget: &RunBudget,
     machine: &mut LiveCurrentMachine,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
     event_name: &str,
     semantic_words: usize,
     pair: [CurrentLineage; 2],
@@ -1765,7 +1765,7 @@ fn profiled_event(
 
 fn primed_pair(
     machine: &mut LiveCurrentMachine,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
 ) -> Result<[CurrentLineage; 2], String> {
     let first = relation(PRIMING_VALUES[0])?;
     let pair = [

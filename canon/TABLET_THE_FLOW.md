@@ -238,6 +238,10 @@ quotient = the integer the loop deposited.* The laboratory named the lawful retu
 this section names as owed; the owner is `crates/holonic-engine/src/running_integral.rs` and the
 measurement is at the end of this section.
 
+**Re-confirmed 2026-08-15.** `grep -n "winding" crates/holonic-engine/src/running_integral.rs` returns the
+winding-with-standing-value pair at `:533-543`, with
+`winding_twice_doubles_the_holonomy_and_reversing_negates_it` at `:1761`. The withdrawal stands.
+
 ### Why this is today's finding under another name
 
 On 2026-08-08 the grown circuit returned `H₁ = Z⁹ ⊕ Z/2` at width 2 and `Z¹⁵ ⊕ (Z/2)⁴` at width 3.
@@ -254,7 +258,7 @@ owner.** The quotation is left as it was written so that what was claimed remain
 
 - **The line numbers drifted.** Commit `ead11dc` ("The bare signs become passages, and one proposed
   repair is refused", 2026-08-08) shifted `running_integral.rs`, and the two `pub residual: BigInt`
-  arms now sit at `crates/holonic-engine/src/running_integral.rs:643` — `Disagreement`,
+  arms now sit at `crates/holonic-engine/src/running_integral.rs:675` — `Disagreement`,
   `total(left) − total(right)` — and `:793` — the chord obstruction, `declared − implied`. Lines 594
   and 744 carry unrelated code today.
 - **The owner is `running_integral`, not `derivation_integral`.**

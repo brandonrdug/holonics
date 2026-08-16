@@ -1,7 +1,8 @@
 # The Eros instantiation — what a model IS, what conditioning IS, what production IS
 
 **Date:** 2026-08-15
-**Status:** the active construction plan for instantiation. It sits beside
+**Status:** a construction plan under `blueprint/THE_ROADMAP.md`, the single active roadmap.
+This one covers instantiation. It sits beside
 [`THE_TRAVERSIBLE_CHAIN.md`](THE_TRAVERSIBLE_CHAIN.md) — that plan states what a link is made of;
 this states what a **body** is, how it is stored, and how it runs.
 **Occasion:** Brandon, 2026-08-15 — *"I want to now unify our machinery for Eros such that we can

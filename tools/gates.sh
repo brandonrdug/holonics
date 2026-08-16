@@ -49,8 +49,8 @@ CARGO_PATH=/opt/cuda/bin:$PATH   # holonic-engine's build script shells out to n
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-GATES=(tests authored-levels named-paths claim-index output-manifest closure-manifest
-       boundary-artifacts typst architecture-lint)
+GATES=(tests authored-levels named-paths line-citations claim-index output-manifest
+       closure-manifest boundary-artifacts typst architecture-lint document-law)
 
 # EIGHT, and the sixth was not requested. `tools/boundary_artifacts.py` is the third verifier this
 # repository owns that nothing invoked, and its own header states the exposure: *"Nothing in `cargo
@@ -61,6 +61,32 @@ GATES=(tests authored-levels named-paths claim-index output-manifest closure-man
 # *"THIS IS NOT A GATE AND NOT AN ORGAN. The kernel is an external receiver whose verdict is a
 # RETURN... `CLAUDE.md` §13 rule 2: a foreign process deciding what the body may construct is
 # `G_authored`."* Wiring it in would make an external kernel a governor. Run it on its own.
+
+# ---------------------------------------------------------------------------------------------
+# 10 · the laws THE_DOCUMENT_LAW states about governing documents
+# ---------------------------------------------------------------------------------------------
+#
+# Two laws the corpus already states and nothing enforced.
+#
+# An ABSENCE CLAIM must carry the command that measured it and the date it was measured.
+# `canon/THE_OWNER_ATLAS.md` states the discipline — *"A measured absence decays and carries its
+# command… Re-run it; do not cite it"* — and an audit on 2026-08-15 found roughly one in three
+# absence claims the assistant had made about this repository was false, with the durable population
+# being exactly the ones that looked measured.
+#
+# And `blueprint/` may hold exactly ONE document declaring itself active. `THE_ROADMAP.md` opens
+# *"This is the single active roadmap"*; on 2026-08-15 five of thirteen blueprints declared
+# themselves the active plan.
+
+gate_document-law() {
+    local out="$WORK/doclaw.out"
+    python3 "$ROOT/tools/document_law.py" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
 
 FAILED=()
 PASSED=()
@@ -150,6 +176,26 @@ gate_named-paths() {
     local status=$?
     SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
     SUMMARY="${SUMMARY:-no failure line}; $(grep -E '^path tokens' "$out" | tail -1)"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 3b · the LINE on the end of every path a governing document names
+# ---------------------------------------------------------------------------------------------
+#
+# `named-paths` above verifies the path. Nothing verified the number after the colon, and the
+# operating contract says in its own text that a line number is the most perishable thing a document
+# can carry. An audit on 2026-08-15 found 265 such citations with no verifier of any kind, and
+# `analytic_field.rs:1142` stale in three governing documents while a record deposited the same day
+# already carried the right line. The correction had been made and never propagated.
+
+gate_line-citations() {
+    local out="$WORK/lines.out"
+    python3 "$ROOT/tools/resolve_line_citations.py" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
+    SUMMARY="${SUMMARY:-no summary line}"
     [ "$status" -eq 0 ] || cat "$out"
     return "$status"
 }

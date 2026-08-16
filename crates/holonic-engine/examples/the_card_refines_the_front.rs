@@ -1,4 +1,4 @@
-//! The front is refined on the card, and the card's partition is required to equal the host's.
+//! The front is refined on the card, and the card's partition is required to equal the cpu's.
 //!
 //! **Occasion.** Brandon, 2026-08-10: *"the card's integration is so fucking important and you can't
 //! just keep punting it… every time we have to go from it not being integrated to integrating it,
@@ -15,20 +15,20 @@
 //! `−k` and at `+k`. Every occurrence's shell reading is independent of every other's and the
 //! grouping is a quotient by an exact key — one lane per occurrence, no reduction, no ordering.
 //!
-//! Equality of readings is made equality of **dense identities** once, on the host, over the whole
+//! Equality of readings is made equality of **dense identities** once, on the cpu, over the whole
 //! corpus; identity zero is reserved for a terminus before any reading is assigned one, because a
 //! terminus is family-invariant and must be a value no reading can take. A shell key is then one
 //! `u64`, and the new class is the identity of `(current class, key)`, claimed by `atomicCAS`.
 //!
 //! # What is proved here, not asserted
 //!
-//! 1. **The card's partition equals the host's, surface for surface**, as a partition — not as a
+//! 1. **The card's partition equals the cpu's, surface for surface**, as a partition — not as a
 //!    numbering, since class identities are claim order on one side and lexicographic on the other.
 //!    Two partitions are equal when they induce the same equivalence on sites, which is what is
 //!    checked.
 //! 2. **The derived horizon agrees**, so `saturation_horizon` is carrier-independent.
 //! 3. **The card is actually reached**: launches are counted, and a run that crossed nothing is a
-//!    failure rather than a silent host fallback.
+//!    failure rather than a silent cpu fallback.
 //! 4. **Idle lanes are reported.** The launch geometry is read off the device and the kernel; the
 //!    tail of the last block is named rather than hidden.
 
@@ -104,7 +104,7 @@ fn main() {
 
     // The corpus's ceiling: no window reaches past the longest whole. Reported, but NOT what any
     // one surface is refined against -- each surface's own ceiling is read off its own occurrences
-    // by `surface_horizon_bound`, exactly as the host law does.
+    // by `surface_horizon_bound`, exactly as the cpu law does.
     let ceiling = material_horizon_bound(&census);
     println!("  the corpus ceiling is {ceiling} shells; each surface is refined against its own\n");
 
@@ -125,10 +125,10 @@ fn main() {
     let mut horizon_disagreed: Vec<String> = Vec::new();
     let mut idle_lanes_total = 0u64;
     let mut deepest = (0usize, String::new(), 0usize);
-    // The host's shell count over exactly the surfaces the card refined, and the summed ceiling
+    // The cpu's shell count over exactly the surfaces the card refined, and the summed ceiling
     // each carrier was given. A cost law is a law: if the two carriers walk one law they walk the
     // same number of shells, and neither may be handed a ceiling that is not its surface's own.
-    let mut host_shells_total = 0usize;
+    let mut cpu_shells_total = 0usize;
     let mut own_ceiling_total = 0usize;
     let mut corpus_ceiling_total = 0usize;
 
@@ -155,36 +155,36 @@ fn main() {
         let occupied = sites.len() as u64;
         idle_lanes_total += (occupied.div_ceil(block) * block) - occupied;
 
-        let on_host = saturation_horizon(&census, &atlas, *surface);
-        host_shells_total += on_host.shells;
+        let on_cpu = saturation_horizon(&census, &atlas, *surface);
+        cpu_shells_total += on_cpu.shells;
         own_ceiling_total += own_ceiling;
         corpus_ceiling_total += ceiling;
 
-        // A partition is not a numbering. The card claims identities in probe order and the host in
+        // A partition is not a numbering. The card claims identities in probe order and the cpu in
         // lexicographic window order, so the comparison is of the induced EQUIVALENCE: two sites
         // share a class on one side exactly when they share one on the other.
-        let host_complex = SeparationComplex::read(&census, &atlas, *surface, on_host.horizon);
-        let mut host_class: BTreeMap<(u32, u32), usize> = BTreeMap::new();
-        for (at, class) in host_complex.classes.iter().enumerate() {
+        let cpu_complex = SeparationComplex::read(&census, &atlas, *surface, on_cpu.horizon);
+        let mut cpu_class: BTreeMap<(u32, u32), usize> = BTreeMap::new();
+        for (at, class) in cpu_complex.classes.iter().enumerate() {
             for site in &class.sites {
-                host_class.insert(*site, at);
+                cpu_class.insert(*site, at);
             }
         }
-        let mut card_to_host: BTreeMap<u32, usize> = BTreeMap::new();
-        let mut host_to_card: BTreeMap<usize, u32> = BTreeMap::new();
-        let mut same = on_card.classes == host_complex.classes.len();
+        let mut card_to_cpu: BTreeMap<u32, usize> = BTreeMap::new();
+        let mut cpu_to_card: BTreeMap<usize, u32> = BTreeMap::new();
+        let mut same = on_card.classes == cpu_complex.classes.len();
         if same {
             for (at, site) in sites.iter().enumerate() {
                 let theirs = on_card.site_class[at];
-                let ours = match host_class.get(site) {
+                let ours = match cpu_class.get(site) {
                     Some(ours) => *ours,
                     None => {
                         same = false;
                         break;
                     }
                 };
-                if *card_to_host.entry(theirs).or_insert(ours) != ours
-                    || *host_to_card.entry(ours).or_insert(theirs) != theirs
+                if *card_to_cpu.entry(theirs).or_insert(ours) != ours
+                    || *cpu_to_card.entry(ours).or_insert(theirs) != theirs
                 {
                     same = false;
                     break;
@@ -196,22 +196,22 @@ fn main() {
         } else {
             if disagreed.len() < 6 {
                 disagreed.push(format!(
-                    "{:?}: card {} classes, host {} classes",
+                    "{:?}: card {} classes, cpu {} classes",
                     census.surface(*surface),
                     on_card.classes,
-                    host_complex.classes.len()
+                    cpu_complex.classes.len()
                 ));
             }
         }
 
-        if on_card.horizon == on_host.horizon {
+        if on_card.horizon == on_cpu.horizon {
             horizons_agreed += 1;
         } else if horizon_disagreed.len() < 6 {
             horizon_disagreed.push(format!(
-                "{:?}: card h{}, host h{}",
+                "{:?}: card h{}, cpu h{}",
                 census.surface(*surface),
                 on_card.horizon,
-                on_host.horizon
+                on_cpu.horizon
             ));
         }
         if on_card.horizon > deepest.0 {
@@ -230,8 +230,8 @@ fn main() {
         elapsed.as_secs_f64(),
         card.launches()
     );
-    println!("  partitions agreeing with the host: {agreed}");
-    println!("  derived horizons agreeing with the host: {horizons_agreed}");
+    println!("  partitions agreeing with the cpu: {agreed}");
+    println!("  derived horizons agreeing with the cpu: {horizons_agreed}");
     println!(
         "  idle lanes over every crossing: {idle_lanes_total} -- the tail of each last block, named"
     );
@@ -240,7 +240,7 @@ fn main() {
         deepest.1, deepest.0, deepest.2
     );
     println!(
-        "  crossings on the card {} against {host_shells_total} shells on the host -- one law, one \
+        "  crossings on the card {} against {cpu_shells_total} shells on the cpu -- one law, one \
          cost",
         card.launches()
     );
@@ -264,11 +264,11 @@ fn main() {
     println!();
     let controls = [
         (
-            "the card's partition equals the host's on every surface",
+            "the card's partition equals the cpu's on every surface",
             disagreed.is_empty() && agreed > 0,
-            "would fail if: the device law and the host law were not one law. The comparison is of \
+            "would fail if: the device law and the cpu law were not one law. The comparison is of \
              the induced equivalence, not of class numbering -- the card claims in probe order and \
-             the host in lexicographic order, and requiring those to match would be requiring a \
+             the cpu in lexicographic order, and requiring those to match would be requiring a \
              realization coordinate to be causal.",
         ),
         (
@@ -280,7 +280,7 @@ fn main() {
         (
             "the card was actually reached",
             card.launches() > 0,
-            "would fail if: this run had silently fallen back to the host, which is the failure the \
+            "would fail if: this run had silently fallen back to the cpu, which is the failure the \
              whole driver exists to make impossible to report as success.",
         ),
         (
@@ -291,7 +291,7 @@ fn main() {
         ),
         (
             "the cost is carrier-independent too, not only the return",
-            card.launches() as usize == host_shells_total,
+            card.launches() as usize == cpu_shells_total,
             "would fail if: one carrier walked more shells than the other for the same answer -- a \
              cost law reproduced in its return and not in its work, which CLAUDE.md §8 calls not \
              porting it at all.",
@@ -326,20 +326,20 @@ fn trace(census: &CorpusCensus, atlas: &ConductAtlas, name: &str) {
     let ceiling = surface_horizon_bound(census, surface);
     let sites = census.sites(surface);
     println!("  tracing {name}: {} occurrences", sites.len());
-    println!("    {:>6}  {:>10}  {:>10}", "shell", "host", "card");
+    println!("    {:>6}  {:>10}  {:>10}", "shell", "cpu", "card");
     let identities = ReadingIdentities::of(census, atlas);
     let corpus = DeviceCorpus::of(census).expect("the corpus fits");
     let mut card = CudaRefineExecutor::new().expect("the card mounts");
     for depth in 1..=ceiling.min(60) {
-        let host = SeparationComplex::read(census, atlas, surface, depth).distinct_windows();
+        let cpu = SeparationComplex::read(census, atlas, surface, depth).distinct_windows();
         let on_card = card
             .saturate(&corpus, &identities, sites, depth)
             .expect("the card refines")
             .classes;
-        if host != on_card || depth <= 3 {
+        if cpu != on_card || depth <= 3 {
             println!(
-                "    {depth:>6}  {host:>10}  {on_card:>10}{}",
-                if host == on_card { "" } else { "   <-- differ" }
+                "    {depth:>6}  {cpu:>10}  {on_card:>10}{}",
+                if cpu == on_card { "" } else { "   <-- differ" }
             );
         }
     }

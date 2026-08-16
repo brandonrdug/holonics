@@ -4,7 +4,7 @@
 //! dense integer addresses plus the exact local before/after relation rows.  The card validates the
 //! exclusive movement, groups all causes by target, and independently disposes every occurrence.
 //! Only those already-grouped rows return; the sparse relation population and its grouping never
-//! cross back to the host.
+//! cross back to the cpu.
 
 use core::ffi::c_void;
 use std::time::Instant;
@@ -177,8 +177,8 @@ pub struct ReturnedContactCudaReceipt {
     pub header_relation_validations: usize,
     pub target_relation_tests: usize,
     pub occurrence_relation_tests: usize,
-    pub host_to_device_words: usize,
-    pub device_to_host_words: usize,
+    pub cpu_to_device_words: usize,
+    pub device_to_cpu_words: usize,
     pub returned_intermediate_relation_words: usize,
     pub kernel_launches: u32,
     pub device_zero_operations: u32,
@@ -327,8 +327,8 @@ impl CudaReturnedContactExecutor {
         //
         // `DeviceBuffer::zero` is `cuMemsetD32_v2` on the context's default stream, while
         // `Stream::create` opens a `CU_STREAM_NON_BLOCKING` stream, which by construction does not
-        // synchronise with the default one. The host-to-device copies above are `cuMemcpyHtoD` on
-        // pageable memory and block the host, so they need no barrier — the memset does not. At a
+        // synchronise with the default one. The cpu-to-device copies above are `cuMemcpyHtoD` on
+        // pageable memory and block the cpu, so they need no barrier — the memset does not. At a
         // small return the zero lands before the kernel; at a large one it is still running while
         // lane zero writes the header, and it erases the straight-line words written before the
         // kernel's own loops. That race was found in `morphological_language::conduct_cuda` by a
@@ -408,10 +408,10 @@ impl CudaReturnedContactExecutor {
             header_relation_validations: front.relations.len(),
             target_relation_tests,
             occurrence_relation_tests,
-            host_to_device_words: wire::CONTROL_WORDS
+            cpu_to_device_words: wire::CONTROL_WORDS
                 .checked_add(relation_extent)
                 .ok_or(ReturnedContactCudaError::Extent)?,
-            device_to_host_words: output_extent,
+            device_to_cpu_words: output_extent,
             returned_intermediate_relation_words: 0,
             kernel_launches: 1,
             device_zero_operations: 1,
@@ -736,7 +736,7 @@ mod tests {
         assert_eq!(returned.apparatus.kernel_launches, 1);
         assert_eq!(returned.apparatus.returned_intermediate_relation_words, 0);
         assert_eq!(
-            returned.apparatus.device_to_host_words,
+            returned.apparatus.device_to_cpu_words,
             wire::output_words(3, 5).unwrap()
         );
     }

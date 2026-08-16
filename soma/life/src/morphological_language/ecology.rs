@@ -315,7 +315,7 @@ impl MorphologicalLanguageEcology {
     }
 
     /// Condition the complete morphology through one explicitly mounted physical executor.
-    /// Structural suffix and chart formation remains exact host assembly; every Swing event which
+    /// Structural suffix and chart formation remains exact cpu assembly; every Swing event which
     /// changes route standing crosses the supplied executor instead of an internally selected CPU
     /// worker.
     pub fn condition_with_executor(
@@ -329,7 +329,7 @@ impl MorphologicalLanguageEcology {
 
     /// Found the complete recurrent-section morphology on the mandatory resident card.
     /// Exterior token charting stays at the process boundary; route events, five generalized
-    /// suffix ecologies, and question-prefix incidence have no host fallback.
+    /// suffix ecologies, and question-prefix incidence have no cpu fallback.
     pub fn condition_with_cuda(
         passages: &[MorphologicalLanguagePassage],
         action: ActionCurrent,
@@ -875,7 +875,7 @@ impl MorphologicalLanguageEcology {
     }
 
     /// Offline admission comparison between two conditioning realizations. This is intentionally
-    /// unavailable to production conduct: the card return is not accepted by replaying the host
+    /// unavailable to production conduct: the card return is not accepted by replaying the cpu
     /// after every deed. Tests may compare every retained relation and each native suffix image.
     #[cfg(test)]
     pub(in crate::morphological_language) fn exact_conditioning_agreement(
@@ -1248,14 +1248,14 @@ impl MorphologicalLanguageEcology {
         action: ActionCurrent,
         worker_threads: usize,
     ) -> Result<MorphologicalLanguageGeneration, MorphologicalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        self.generate_with_executor(prompt, spec, action, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        self.generate_with_executor(prompt, spec, action, &mut cpu)
     }
 
     /// Generate through one caller-retained physical executor. Terminal current selection remains
-    /// exact host suffix work, but every returned path is materialized on the supplied executor, so
+    /// exact cpu suffix work, but every returned path is materialized on the supplied executor, so
     /// one mounted card crosses every Swing event on this generation path. Selecting a card at the
-    /// outer language boundary cannot silently construct a private host executor here.
+    /// outer language boundary cannot silently construct a private cpu executor here.
     pub fn generate_with_executor(
         &self,
         prompt: &str,
@@ -1283,11 +1283,11 @@ impl MorphologicalLanguageEcology {
         self.generate_currents_over(
             prompt,
             spec,
-            &holonic_engine::hardware_cover::HardwareCover::host_only(),
+            &holonic_engine::hardware_cover::HardwareCover::cpu_only(),
         )
     }
 
-    /// Generate over a **declared** cover rather than one this function asked the host for.
+    /// Generate over a **declared** cover rather than one this function asked the cpu for.
     ///
     /// `hardware_cover::HardwareCover::of_charts` exists for exactly this reason, and says so:
     /// *"the determinism controls need to vary the cover without a card present, and a construction
@@ -1688,7 +1688,7 @@ impl MorphologicalLanguageEcology {
     ///
     /// The complete predecessor returns at least one successor per path. A conducting owner may
     /// instead retain every unattached event as an open disposition while emitting no successor;
-    /// that happens only after the resident attachment deed, never as a host-side post-filter.
+    /// that happens only after the resident attachment deed, never as a cpu-side post-filter.
     /// **The transport law's service dilation for one cell, read off the material.**
     ///
     /// `holonic_engine::receiver_current` states it:
@@ -1897,7 +1897,7 @@ impl MorphologicalLanguageEcology {
             };
             for event in candidates {
                 // The candidate's face is the generation site it was opened at — a receiver
-                // coordinate the card returns and the host checks, never a tag invented to make a
+                // coordinate the card returns and the cpu checks, never a tag invented to make a
                 // guard fire.
                 device_candidates.push(
                     MorphologicalConductCandidate::new(cell.site)
@@ -2608,7 +2608,7 @@ impl MorphologicalLanguageEcology {
         //
         // A phase candidate is removed only when another carries every one of its exact witnesses
         // and at least one strictly stronger, which is the ratified rule: *"No scalar score,
-        // probability, softmax, embedding distance, random sample, or host-written answer selects
+        // probability, softmax, embedding distance, random sample, or cpu-written answer selects
         // the result."* Domination is not ranking — it is a partial order, so incomparable
         // candidates all survive and plurality is still the return.
         //

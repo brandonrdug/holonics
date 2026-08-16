@@ -56,16 +56,16 @@ impl CudaLiveCurrentExecutor {
 
         let mut contacts = BTreeMap::new();
         if !pairs.is_empty() {
-            let receiver_host = cuda::ReceiverRow::new(receiver).words();
-            let receiver_device = upload(&receiver_host)?;
-            let mut directed_host = Vec::new();
-            directed_host
+            let receiver_cpu = cuda::ReceiverRow::new(receiver).words();
+            let receiver_device = upload(&receiver_cpu)?;
+            let mut directed_cpu = Vec::new();
+            directed_cpu
                 .try_reserve_exact(pairs.len() * cuda::DIRECTED_EVENT_WORDS)
                 .map_err(|_| LiveCurrentError::ResourceReservation)?;
             for words in pairs.keys() {
-                directed_host.extend_from_slice(words);
+                directed_cpu.extend_from_slice(words);
             }
-            let directed_device = upload(&directed_host)?;
+            let directed_device = upload(&directed_cpu)?;
             let contact_extent = checked_mul(pairs.len(), cuda::DIRECTED_CONTACT_WORDS)?;
             let contact_device =
                 DeviceBuffer::<u32>::alloc_zeroed(contact_extent).map_err(substrate)?;
@@ -237,7 +237,7 @@ impl CudaLiveCurrentExecutor {
         let mut emission_capacity =
             resident.map_or(32, |resident| resident.emission_capacity.max(32));
         let source_grain = request.event().geometry().source_grain()?;
-        let (relation_count, relation_extent, relation_host) = match request.event().geometry() {
+        let (relation_count, relation_extent, relation_cpu) = match request.event().geometry() {
             CurrentGeometry::Cell(relation) => (1usize, COG_WORDS, relation.words().to_vec()),
             CurrentGeometry::Complex(_) => (0usize, 0usize, vec![0u32]),
         };
@@ -321,27 +321,27 @@ impl CudaLiveCurrentExecutor {
                     .copy_from_slice(header.words());
             }
 
-            let owns_host = vec![SparseOwnCell::EMPTY; own_capacity];
-            let mut carrier_host = vec![0u32; carrier_extent];
-            let mut overflow_host = vec![0u32; overflow_extent];
-            let mut overflow_count_host = vec![0u32; max_depth];
-            let emissions_host = vec![0u32; emission_extent];
-            let emanation_host = vec![0u32; cuda::EMANATION_WORDS];
-            let mut directed_event_host = vec![0u32; directed_event_extent.max(1)];
-            let directed_contact_host = vec![0u32; directed_contact_extent.max(1)];
+            let owns_cpu = vec![SparseOwnCell::EMPTY; own_capacity];
+            let mut carrier_cpu = vec![0u32; carrier_extent];
+            let mut overflow_cpu = vec![0u32; overflow_extent];
+            let mut overflow_count_cpu = vec![0u32; max_depth];
+            let emissions_cpu = vec![0u32; emission_extent];
+            let emanation_cpu = vec![0u32; cuda::EMANATION_WORDS];
+            let mut directed_event_cpu = vec![0u32; directed_event_extent.max(1)];
+            let directed_contact_cpu = vec![0u32; directed_contact_extent.max(1)];
             for (ordinal, (_, relation)) in directed.iter().copied().enumerate() {
                 if relation.relation().to() != request.lineage() {
                     return Err(LiveCurrentError::ExecutionMismatch(request.lineage()));
                 }
                 let row = cuda::DirectedEventRow::new(relation.from(), relation.to());
                 let at = ordinal * cuda::DIRECTED_EVENT_WORDS;
-                directed_event_host[at..at + cuda::DIRECTED_EVENT_WORDS]
+                directed_event_cpu[at..at + cuda::DIRECTED_EVENT_WORDS]
                     .copy_from_slice(&row.words());
             }
 
             let control_device = upload(&control)?;
-            let relations_device = upload(&relation_host)?;
-            let owns_device = upload(&owns_host)?;
+            let relations_device = upload(&relation_cpu)?;
+            let owns_device = upload(&owns_cpu)?;
             let (carriers_device, overflow_device, overflow_counts_device) =
                 if let Some(resident) = resident {
                     if resident.depth != prior_depth
@@ -396,13 +396,13 @@ impl CudaLiveCurrentExecutor {
                         request,
                         max_depth,
                         overflow_capacity,
-                        &mut carrier_host,
-                        &mut overflow_host,
-                        &mut overflow_count_host,
+                        &mut carrier_cpu,
+                        &mut overflow_cpu,
+                        &mut overflow_count_cpu,
                     )?;
-                    let carriers_device = upload(&carrier_host)?;
-                    let overflow_device = upload(&overflow_host)?;
-                    let overflow_counts_device = upload(&overflow_count_host)?;
+                    let carriers_device = upload(&carrier_cpu)?;
+                    let overflow_device = upload(&overflow_cpu)?;
+                    let overflow_counts_device = upload(&overflow_count_cpu)?;
                     self.carrier_full_mounts = self
                         .carrier_full_mounts
                         .checked_add(1)
@@ -411,13 +411,13 @@ impl CudaLiveCurrentExecutor {
                         .checked_add(overflow_extent)
                         .and_then(|value| value.checked_add(max_depth))
                         .ok_or(LiveCurrentError::ResourceReservation)?;
-                    add_words(&mut self.carrier_host_words, mounted_words)?;
+                    add_words(&mut self.carrier_cpu_words, mounted_words)?;
                     (carriers_device, overflow_device, overflow_counts_device)
                 };
-            let directed_events_device = upload(&directed_event_host)?;
-            let directed_contacts_device = upload(&directed_contact_host)?;
-            let emissions_device = upload(&emissions_host)?;
-            let emanation_device = upload(&emanation_host)?;
+            let directed_events_device = upload(&directed_event_cpu)?;
+            let directed_contacts_device = upload(&directed_contact_cpu)?;
+            let emissions_device = upload(&emissions_cpu)?;
+            let emanation_device = upload(&emanation_cpu)?;
             self.module
                 .lineage_event()
                 .map_err(substrate)?
@@ -542,20 +542,20 @@ impl CudaLiveCurrentExecutor {
             }
 
             carriers_device
-                .copy_to_slice(&mut carrier_host)
+                .copy_to_slice(&mut carrier_cpu)
                 .map_err(substrate)?;
             overflow_device
-                .copy_to_slice(&mut overflow_host)
+                .copy_to_slice(&mut overflow_cpu)
                 .map_err(substrate)?;
             overflow_counts_device
-                .copy_to_slice(&mut overflow_count_host)
+                .copy_to_slice(&mut overflow_count_cpu)
                 .map_err(substrate)?;
             let mut overflow = Vec::new();
             overflow
                 .try_reserve_exact(depth)
                 .map_err(|_| LiveCurrentError::ResourceReservation)?;
             for row in 0..depth {
-                let count = overflow_count_host[row] as usize;
+                let count = overflow_count_cpu[row] as usize;
                 if count > overflow_capacity {
                     return Err(LiveCurrentError::ExecutionMismatch(request.lineage()));
                 }
@@ -565,10 +565,10 @@ impl CudaLiveCurrentExecutor {
                     .map_err(|_| LiveCurrentError::ResourceReservation)?;
                 for ordinal in 0..count {
                     let at = (row * overflow_capacity + ordinal) * NODE_WORDS;
-                    if !body::manifold::packed_node_is_canonical(&overflow_host, at) {
+                    if !body::manifold::packed_node_is_canonical(&overflow_cpu, at) {
                         return Err(LiveCurrentError::ExecutionMismatch(request.lineage()));
                     }
-                    nodes.push(body::manifold::unpack_node(&overflow_host, at));
+                    nodes.push(body::manifold::unpack_node(&overflow_cpu, at));
                 }
                 overflow.push(nodes);
             }
@@ -576,7 +576,7 @@ impl CudaLiveCurrentExecutor {
                 .ok_or(LiveCurrentError::ExecutionMismatch(request.lineage()))?;
             let next = LiveCarrierSnapshot::from_substrate_parts(
                 header,
-                carrier_host[..depth * ENCLOSURE_WORDS].to_vec(),
+                carrier_cpu[..depth * ENCLOSURE_WORDS].to_vec(),
                 overflow,
             )
             .map_err(LiveCurrentError::Carrier)?;
@@ -645,7 +645,7 @@ impl CudaLiveCurrentExecutor {
                 )
                 .ok_or(LiveCurrentError::ResourceReservation)?;
             let witness = carrier_witness(Some(header), next.carrier())?;
-            let overflow_counts = overflow_count_host[..depth]
+            let overflow_counts = overflow_count_cpu[..depth]
                 .iter()
                 .map(|count| *count as usize)
                 .collect();
@@ -902,7 +902,7 @@ impl LiveCurrentExecutor for CudaLiveCurrentExecutor {
 // The co-present population: one crossing, one lane per current
 // -------------------------------------------------------------------------------------------------
 
-/// One current's host-side region, staged at the population's uniform capacities.
+/// One current's cpu-side region, staged at the population's uniform capacities.
 struct StagedCurrent {
     control: Vec<u32>,
     relation: Vec<u32>,
@@ -1047,7 +1047,7 @@ impl CudaLiveCurrentExecutor {
                 let counts_at = checked_mul(lane, caps.max_depth)?;
                 if stage.resident {
                     // The lane's prior carrier already lives on the card. Copy it into this lane's
-                    // own region device-to-device rather than round-tripping it through the host.
+                    // own region device-to-device rather than round-tripping it through the cpu.
                     let resident = resident.expect("a resident stage names a resident");
                     let active = checked_mul(stage.prior_depth, ENCLOSURE_WORDS)?;
                     carriers_device
@@ -1104,7 +1104,7 @@ impl CudaLiveCurrentExecutor {
                         .checked_add(1)
                         .ok_or(LiveCurrentError::ResourceReservation)?;
                     add_words(
-                        &mut self.carrier_host_words,
+                        &mut self.carrier_cpu_words,
                         carrier_extent + overflow_extent + caps.max_depth,
                     )?;
                 }
@@ -1262,7 +1262,7 @@ impl CudaLiveCurrentExecutor {
             .ok_or(LiveCurrentError::PhysicalSettlement)
     }
 
-    /// Stage one current's host region at the population's uniform capacities.
+    /// Stage one current's cpu region at the population's uniform capacities.
     ///
     /// This is `enact_one`'s packing, taking its capacities as arguments instead of owning them, so
     /// the single-current path and the population path pack byte-identically at equal capacities.
@@ -1280,14 +1280,14 @@ impl CudaLiveCurrentExecutor {
         let prior = request.mount().carrier();
         let prior_depth = prior.depth();
         let source_grain = request.event().geometry().source_grain()?;
-        let (relation_count, relation_host) = match request.event().geometry() {
+        let (relation_count, relation_cpu) = match request.event().geometry() {
             CurrentGeometry::Cell(relation) => (1usize, relation.words().to_vec()),
             CurrentGeometry::Complex(_) => (0usize, Vec::new()),
         };
         // Every lane's relation region is one whole cog wide; the lane's DECLARED extent is
         // `PARAM_RELATIONS * COG_WORDS`, which the kernel reads from this control block.
         let mut relation = vec![0u32; COG_WORDS];
-        relation[..relation_host.len()].copy_from_slice(&relation_host);
+        relation[..relation_cpu.len()].copy_from_slice(&relation_cpu);
 
         let mut control = vec![0u32; cuda::CONTROL_WORDS];
         let params = cuda::CONTROL_PARAMS;

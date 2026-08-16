@@ -208,7 +208,7 @@ impl ExactReceiverCurrentRadiation {
 
     /// Materialize the distinct minimal-arrival witnesses retained by the
     /// predecessor DAG.  The exact population in [`Self::arrivals`] remains
-    /// authoritative when this inspection would exceed host address space.
+    /// authoritative when this inspection would exceed cpu address space.
     pub fn witness_paths_to(
         &self,
         target: ReceiverCurrentSiteId,
@@ -311,7 +311,7 @@ pub enum ExactReceiverCurrentError {
     EmptyRadiationBoundary,
     #[error("receiver-current target {0:?} did not return at this horizon")]
     UnreturnedTarget(ReceiverCurrentSiteId),
-    #[error("receiver-current carrier extent exceeds the exact host address")]
+    #[error("receiver-current carrier extent exceeds the exact cpu address")]
     CarrierExtent,
     #[error("receiver-current radiation is internally inconsistent")]
     MalformedRadiation,

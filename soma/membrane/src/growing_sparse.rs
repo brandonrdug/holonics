@@ -1,7 +1,7 @@
-//! Fallible growable host storage for one disposable current-local sparse body.
+//! Fallible growable cpu storage for one disposable current-local sparse body.
 //!
 //! Growth follows actual accepted topology rather than an exponential worst-case reservation.  A
-//! failed host allocation returns `false` through the body storage seam; the enclosing prepared
+//! failed cpu allocation returns `false` through the body storage seam; the enclosing prepared
 //! transaction discards this uncommitted current and preserves the prior receiver whole.
 
 use body::manifold::{SparseOwnCell, SparseOwnStorage};

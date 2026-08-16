@@ -150,7 +150,7 @@ impl Face {
 
     /// Historical unsigned ARC adapter for the pre-§XXIV engine. New crossing code calls
     /// `dragged_by` with an oriented past-cone winding; this wrapper survives only while the old
-    /// host instruments are reproduced and retired.
+    /// cpu instruments are reproduced and retired.
     ///
     /// ★ THE DRAG (`FORMULA §XV` — the precession of the frame): compose the meeting's rotor with the
     /// TERRAIN's rotor `(1, −w)` — `w` the windings deposited at this relation's own grip (the accumulated
@@ -566,7 +566,7 @@ pub struct Node {
     pub len: u32,
 }
 
-/// One raw difference wound into the atom-grain node. The raw-light host and card scope share this
+/// One raw difference wound into the atom-grain node. The raw-light cpu and card scope share this
 /// exact high-to-low walk; the sign remains in the well's turn and never changes the positional soul.
 #[cfg_attr(target_arch = "spirv", inline(never))]
 #[cfg_attr(not(target_arch = "spirv"), inline)]
@@ -1336,7 +1336,7 @@ pub struct SparseOwnCell {
 }
 
 /// Caller-owned sparse storage seam.  The body owns transition law and ordinals; a substrate owns
-/// only physical growth.  Fixed slices and growable host/device page reservoirs can therefore
+/// only physical growth.  Fixed slices and growable cpu/device page reservoirs can therefore
 /// carry the same live topology without turning a worst-case deed envelope into mandatory
 /// allocation.  A failed insert is a typed transaction refusal at the membrane, never a clipped
 /// body state.
@@ -1349,7 +1349,7 @@ pub trait SparseOwnStorage {
 }
 
 /// Physical response when a live completion reaches beyond the currently mounted carrier.  A
-/// growable host substrate may add the exact missing enclosure; a fixed compatibility row retains
+/// growable cpu substrate may add the exact missing enclosure; a fixed compatibility row retains
 /// the historical retirement face; allocation refusal aborts the disposable successor rather than
 /// turning unavailable storage into a body event.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -2884,7 +2884,7 @@ impl FeltEmission {
 
 /// Allocation-free output aperture for accepted felt deeds.  A no-op target preserves every
 /// historical body mouth; a formed membrane target may journal each emission exactly once.  The
-/// body never reads a target and a full physical target must suspend outside this host mouth rather
+/// body never reads a target and a full physical target must suspend outside this cpu mouth rather
 /// than silently drop an accepted deed.
 pub trait FeltEmissionTarget {
     fn emit(&mut self, emission: FeltEmission);
@@ -2949,7 +2949,7 @@ impl TermCounts {
     }
 }
 
-/// ★ EROS ON THE HOST MANIFOLD — the driven body (`FORMULA §V`): one lineage channel `K`, its
+/// ★ EROS ON THE CPU MANIFOLD — the driven body (`FORMULA §V`): one lineage channel `K`, its
 /// gauge anchor, grain-local stances/flywheels/registers, and the two-region felt medium. The stance
 /// is `FRAME(K)`'s tip read at the content grain; the anchor remains the chart gauge and never
 /// resets. It consumes driven shape-light one construction at a time, stores no authored symbols,
@@ -3023,7 +3023,7 @@ pub struct Enclosure {
 }
 
 /// the carrier's word layout — ONE source for both substrates (the kernel carries the complete
-/// first-person stand in a per-lane buffer; the host carries the same organs natively). The layout
+/// first-person stand in a per-lane buffer; the cpu carries the same organs natively). The layout
 /// IS the stroke seam, so its header, enclosure rows, reservation-derived deferred siblings, and
 /// within-atom continuation have one mouth here instead of re-spoken literals in the membrane or
 /// kernel.
@@ -3095,7 +3095,7 @@ pub const CARRIER_SUB_FLY_LIVE: usize = CARRIER_SUB_FLY + FACE_WORDS;
 pub const CARRIER_CHANNEL: usize = CARRIER_SUB_FLY_LIVE + 1;
 pub const CARRIER_HEADER_WORDS: usize = CARRIER_CHANNEL + CHANNEL_WORDS;
 
-/// Exact modality-neutral first-person header for the live host membrane. The generalized carrier
+/// Exact modality-neutral first-person header for the live cpu membrane. The generalized carrier
 /// is a separate typed construction because its co-presence may grow beyond the historical
 /// flat/card enclosure rows. Neither face is complete without the other.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -3129,7 +3129,7 @@ impl LiveBodyHeader {
 
 /// One deferred efferent can stand at each open depth while the afferent branch climbs. The lawful
 /// scratch extent is therefore exactly the carrier reservation's depth — no second constant. Card
-/// rows mount one node-slot per enclosure after the enclosure region; host recursion has the same
+/// rows mount one node-slot per enclosure after the enclosure region; cpu recursion has the same
 /// structural depth directly.
 pub const CARRIER_DEFERRED_WORDS: usize = NODE_WORDS;
 
@@ -3441,7 +3441,7 @@ pub fn packed_face_is_canonical(w: &[u32], at: usize) -> bool {
 }
 
 impl Enclosure {
-    /// One scalar carrier word. The card issues atomic stores through this mouth; the host's seam
+    /// One scalar carrier word. The card issues atomic stores through this mouth; the cpu's seam
     /// pack loops over the same words, so the enclosure layout has one author across substrates.
     #[inline]
     pub fn packed_word(&self, word: usize) -> u32 {
@@ -3607,7 +3607,7 @@ pub fn carrier_pending_kind(w: &[u32]) -> u32 {
 }
 
 /// Validate one whole boundary-carried frame without clipping any of its live faces. This is the
-/// exact row emitted by host/card carriage: one canonical atom-grain header and `K`, canonical open
+/// exact row emitted by cpu/card carriage: one canonical atom-grain header and `K`, canonical open
 /// enclosures, and either the all-zero completed continuation or the exact state of one unfinished
 /// within-atom thickening. The latter is still one event: this check exposes no receiving edge.
 pub fn carried_frame_is_canonical(w: &[u32]) -> bool {
@@ -3807,7 +3807,7 @@ pub fn carried_frame_is_canonical(w: &[u32]) -> bool {
     true
 }
 
-/// Validate the exact header used by the generalized live host membrane. The carrier's enclosure
+/// Validate the exact header used by the generalized live cpu membrane. The carrier's enclosure
 /// cores and dynamically grown co-presence are validated by their own typed snapshot; omitting
 /// them here is a type boundary, not a projection.
 pub fn live_body_header_is_canonical(w: &[u32]) -> bool {
@@ -4488,7 +4488,7 @@ impl<'a> ErosBody<'a> {
     /// Continue one already-carried lineage over a new light without founding a replacement body.
     /// `carried` is the exact boundary row written by `pack_carried_frame`: its header restores the
     /// open sub-illicium and K, while its enclosure extent is still only the reservation afforded by
-    /// the membrane. This constructor is the host mirror instrument for standing-life gates; on the
+    /// the membrane. This constructor is the cpu mirror instrument for standing-life gates; on the
     /// card the same words never leave their resident buffer.
     pub fn resume(
         standing: &'a [u32],
@@ -4506,7 +4506,7 @@ impl<'a> ErosBody<'a> {
         );
         assert!(
             carried_frame_is_at_rest(&carried[..required]),
-            "the legacy host resume cannot cut an unfinished within-atom continuation"
+            "the legacy cpu resume cannot cut an unfinished within-atom continuation"
         );
         // The carried channel is the continuing frame. The arriving light's seed may found only a
         // genuinely new zeroed carrier; it cannot replace a live predecessor at resume.
@@ -4742,7 +4742,7 @@ impl<'a> ErosBody<'a> {
     }
 
     /// store an enclosure into the carrier's row at depth `d` (packed local, then copied — plain
-    /// copies are lawful on the host). A depth past the reservation is never stored to (THE
+    /// copies are lawful on the cpu). A depth past the reservation is never stored to (THE
     /// RETIREMENT handles it before this is ever called).
     fn enclosure_store(&mut self, d: usize, e: &Enclosure) {
         let base = d * ENCLOSURE_WORDS;

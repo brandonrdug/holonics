@@ -41,16 +41,16 @@ impl CudaLiveCurrentExecutor {
         self.carrier_full_mounts
     }
 
-    pub const fn standing_host_words(&self) -> u64 {
-        self.standing_host_words
+    pub const fn standing_cpu_words(&self) -> u64 {
+        self.standing_cpu_words
     }
 
     pub const fn standing_device_words(&self) -> u64 {
         self.standing_device_words
     }
 
-    pub const fn carrier_host_words(&self) -> u64 {
-        self.carrier_host_words
+    pub const fn carrier_cpu_words(&self) -> u64 {
+        self.carrier_cpu_words
     }
 
     pub const fn carrier_device_words(&self) -> u64 {

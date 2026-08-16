@@ -67,8 +67,8 @@ impl SynchronizedOccurrenceChart {
         occurrence: &ExactSynchronizedOccurrence,
         action: ActionCurrent,
     ) -> Result<SynchronizedOccurrenceRadiation, SynchronizedOccurrenceError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.observe_with(machine, &mut host, occurrence, action)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.observe_with(machine, &mut cpu, occurrence, action)
     }
 
     pub fn observe_with(

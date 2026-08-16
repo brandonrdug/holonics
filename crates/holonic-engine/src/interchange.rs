@@ -28,7 +28,7 @@
 //! only when their complete exact consequences commute, *"including lineage, radiation, obstruction,
 //! and changed morphology"*, and *"a common label, collection, or lack of a visible edge does not
 //! prove independence."* A certificate that compared only final states would be the defect
-//! `2026-08-02_THE_HOST_FOREMAN...` convicts — *"Endpoint equality became stateful equivalence."*
+//! `2026-08-02_THE_CPU_FOREMAN...` convicts — *"Endpoint equality became stateful equivalence."*
 //!
 //! [`InterchangeCertificate::endpoint_only_verdict`] therefore computes what such a comparator
 //! *would* have said and keeps it beside the real verdict, so the disagreement is legible rather
@@ -317,7 +317,7 @@ impl InterchangeCertificate {
     /// **What a certificate comparing only final states would have returned.**
     ///
     /// Kept beside the real verdict so the convicted defect is legible rather than argued:
-    /// `2026-08-02_THE_HOST_FOREMAN...`, *"Endpoint equality became stateful equivalence."*
+    /// `2026-08-02_THE_CPU_FOREMAN...`, *"Endpoint equality became stateful equivalence."*
     pub fn endpoint_only_verdict(&self) -> bool {
         self.all_rebased && self.conduct_agrees && self.endpoints_agree
     }
@@ -1033,7 +1033,7 @@ pub mod declared_material {
     /// **one partition** and get there by founding different axes: one takes the blindness junction
     /// `(0,1)` and then a congestion axis, the other takes `(0,2)` and then `(0,1)`. A certificate
     /// that stopped at the endpoint would admit an interchange the lineage refuses, which is the
-    /// defect `2026-08-02_THE_HOST_FOREMAN...` convicts, reproduced on eight items so it does not
+    /// defect `2026-08-02_THE_CPU_FOREMAN...` convicts, reproduced on eight items so it does not
     /// depend on the filesystem.
     ///
     /// This is the same shape `soma/formal` returns — there the divergence is
@@ -1471,7 +1471,7 @@ mod tests {
 ///
 /// **So an order is not free, and this says what it costs.** `CLAUDE.md` §0's fourth lesson and the
 /// ratified *"apparatus completion order never enters semantic lineage"* were correctness statements;
-/// this is the same statement with a price on it. A front that carries host arrival order into a
+/// this is the same statement with a price on it. A front that carries cpu arrival order into a
 /// returned population and whose receiver family cannot read that order has **paid `⌈log₂(n!)⌉` bits
 /// for nothing** — and that is a measured overpayment, not a suspicion.
 ///

@@ -49,16 +49,16 @@ the result here.
 
 | subject | owner | note |
 |---|---|---|
-| **the mouth itself** | `soma/life/src/incidence_production.rs:1843` `admit_later` | derives the arrival's rank in `⪯` from the material's own `caused_by`; returns `ArrivalResponse` |
-| the arrival reading | `incidence_production.rs:2510` `ArrivalResponse` | `reached` · `reopened` · `saturated` · `untouched` · `founded` · `dissolved` · `verdicts` |
+| **the mouth itself** | `soma/life/src/incidence_production.rs:2113` `admit_later` | derives the arrival's rank in `⪯` from the material's own `caused_by`; returns `ArrivalResponse` |
+| the arrival reading | `incidence_production.rs:2351` `ArrivalResponse` | `reached` · `reopened` · `saturated` · `untouched` · `founded` · `dissolved` · `verdicts` |
 | the exact inverse (ablation) | `incidence_production.rs:2140` `withdraw` | non-bit-exact restoration exposes anything retained |
-| the site's capacity to accept | `incidence_production.rs:269` `ExposedPolarity::{Donor,Acceptor,Both}` | `Acceptor` = *"an external contact arrives at this site"* |
+| the site's capacity to accept | `incidence_production.rs:108` `ExposedPolarity::{Donor,Acceptor,Both}` | `Acceptor` = *"an external contact arrives at this site"* |
 | the ports | `soma/body/src/incidence.rs:199` `EventPortKind::{Ingress,Exposed}` | `EventPort::ingress(cell, hand, slot)` — address ⊕ hand ⊕ slot |
 | the reported gap | `incidence_production.rs:104-110` | the law names three ports, the body owns two; return is a polarity on an exposed site |
 | the transport law | `incidence_production.rs:23-56` | amplitude, hand, three declared `PhaseChart`s, superposition before quotient |
-| hand vs magnitude, independent | `incidence_production.rs:2617` `contact_winding`, `:2630` `sheet_of` | *"how far"* and *"which sense"* are two materially independent readings |
+| hand vs magnitude, independent | `incidence_production.rs:2641` `contact_winding`, `:2630` `sheet_of` | *"how far"* and *"which sense"* are two materially independent readings |
 | **where it narrows** | `incidence_production.rs:520`, `:524`, `:540`, `:1901` | `split_whitespace()`; `key = (rank, patch.to_owned())`; `octet_winding(patch.as_bytes())`; `grain: 0` |
-| the occurrence type | `incidence_production.rs:173` `DeclaredOccurrence` | `text: String` — the aperture, stated in the type |
+| the occurrence type | `incidence_production.rs:192` `DeclaredOccurrence` | `text: String` — the aperture, stated in the type |
 | material membrane (text) | `soma/life/src/text_material.rs` | container, byte range, role, chronology, parentage retained as lineage |
 | dialogue membrane | `soma/life/src/dialogue_lineage.rs` | admits only visible `user`/`assistant` message occurrences |
 | foreign-statistic intake | `crates/holonic-engine/src/derivation_codec_intake.rs:12-53` | the *"It's like Fourier Analysis"* organ; four slots declared; returns separating words |
@@ -71,7 +71,7 @@ the result here.
 | the six-role transition | `soma/membrane/src/live_holon.rs:477-566` | `begin` · `meeting` · `deed` · `consequence` · `returned` · `retain_residual` |
 | the grain re-cut | `soma/life/src/decomposing_codec.rs` | re-cuts at the collapsed pair's own separating word |
 | the join to elaboration | `soma/life/src/reintegrating_elaboration.rs` | built; **its only caller is a driver** |
-| the live plan and its two convictions | `blueprint/THE_ROADMAP.md` plan 1 | 46,745 identities embed the host path; 11,266 of 11,282 Codex witnesses lost chronology |
+| the live plan and its two convictions | `blueprint/THE_ROADMAP.md` plan 1 | 46,745 identities embed the CPU path; 11,266 of 11,282 Codex witnesses lost chronology |
 
 **Laws that govern a crossing** — all in the vendored laboratory copy, reference-graded, never
 doctrine by location:
@@ -127,7 +127,7 @@ The last construction promoted into an *"aperture law"* was withdrawn: `canon/TA
 | **the typing of all three** | `research/records/2026-07-19_THE_QUANTUM_PROPERTY_IS_THE_HOLONS_TRANSPORT_CLASS_THE_PIVOT_RETURNS_ONE_FACE.md` | Brandon-ratified |
 | — its engine consequence, the five-item occurrence record | same, §IX | the field list any crossing must carry |
 | registry form | `H.0461`, `papers/source/holonics/mathematical-physics.typ:313` | `definition` — *"A specific symmetry group and representation law are required."* |
-| the double cover, computed | `crates/holonic-engine/src/structure_group.rs:595` `CentralDoubleCover`, `:643` `lift` | returns `Closed` / `ReturnsCentre` / `DidNotCloseBelow`; **no representation is chosen** (`:62-64`) |
+| the double cover, computed | `crates/holonic-engine/src/structure_group.rs:628` `CentralDoubleCover`, `:643` `lift` | returns `Closed` / `ReturnsCentre` / `DidNotCloseBelow`; **no representation is chosen** (`:62-64`) |
 | the four faces of `1/2` | `CLAUDE.md` §3 (three) and §0b item 4 (the fourth, which explains them) | plus a fifth from the curvature side |
 | inertia, the exact split | `crates/holonic-engine/src/inertia.rs` | Sylvester triple over `Rat`, `L D Lᵀ` with a hyperbolic-plane branch |
 | inertia, the passages named | `crates/holonic-engine/src/winding_inertia.rs` (2,883 lines) | the split factors through the character group; `k` is a winding |
@@ -157,7 +157,7 @@ The last construction promoted into an *"aperture law"* was withdrawn: `canon/TA
 | the cone and the horizon | `canon/TABLET_THE_MANIFOLD.md` §22 | the metric sets the cone and the metric is a receiver face of standing |
 | hinge deficit | `crates/holonic-engine/src/contact_gluing.rs:1522`, `:1599` | curvature lives on the hinge, never on a cell's corners |
 | discrete curvature flow | `crates/holonic-engine/src/discrete_curvature.rs` | Chow–Luo combinatorial Ricci |
-| holonomy, refusing a non-closing walk | `crates/holonic-engine/src/running_integral.rs:636` | with `ChordObstruction` as the residual |
+| holonomy, refusing a non-closing walk | `crates/holonic-engine/src/running_integral.rs:903` | with `ChordObstruction` as the residual |
 | **the loop that is stated and not closed** | `blueprint/THE_ROADMAP.md` § on the geometry response | *"`geometry_responses` is supplied, never updated… The curvature is measured and discarded."* |
 
 ---

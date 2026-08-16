@@ -208,6 +208,12 @@ doctrinal:
 | `ScalingFunctions -> "Log"` | transcendental | `IntegerDecades`: the exact integer `k` with `10^k ≤ |v| < 10^(k+1)`, by integer comparison |
 | `MeshFunctions` by interpolation | a contour fitted through samples is not a witnessed statement | a **certified sign change** of `reading − level`, bracketed between stations |
 
+**Re-measured 2026-08-15 and one row is FALSE.** `grep -rn "atan2" --include='*.rs' crates soma` returns
+four hits: two doc comments and **two live calls on `f64`** at
+`soma/life/examples/eros_relampago_atmospheric_current.rs:1720`. Those are a boundary codec on
+foreign atmospheric data rather than library code, so `model_surface.rs`'s narrower phrasing —
+*"nowhere in this body"* — is correct and this row's *"either repository"* is not.
+
 **This is a strengthening, not a compromise.** A phase colour wheel shows a reader where a zero
 probably is. A winding number over a closed boundary *proves how many zeros are inside it* — and
 Wolfram's own documentation concedes its samplers may miss features. The image polygon that

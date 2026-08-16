@@ -133,7 +133,7 @@ impl CpuExecutor {
     /// Realize two independent, heterogeneous apparatus currents over the same predecessor.
     /// Their return address is fixed as `(left, right)`; worker completion order is not exposed.
     /// This is the physical owner for port-level overlap and prevents application conductors from
-    /// manufacturing their own host-thread choreography.
+    /// manufacturing their own cpu-thread choreography.
     pub fn execute_independent_pair<L, R>(
         &self,
         left: impl FnOnce() -> L + Send,

@@ -15,7 +15,7 @@ use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentExecutionRequest, CurrentGeometry,
     DirectedExecutionRequest, ExecutedContemporaryEvent, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
-    LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelHostLiveCurrentExecutor,
+    LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, ParallelCpuLiveCurrentExecutor,
     RegionalExecutionRequest, RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
 
@@ -26,7 +26,7 @@ const TEACHING_OCCURRENCE: u32 = 1;
 const HELD_OCCURRENCE: u32 = 2;
 const FRAME_START: usize = 0;
 const FRAME_EXTENT: usize = 6;
-const HOST_THREADS: usize = 2;
+const CPU_THREADS: usize = 2;
 
 const PACKET_STATE: u32 = 1;
 const PACKET_RULE: u32 = 2;
@@ -930,14 +930,14 @@ impl ArcSpec {
 }
 
 struct WitnessExecutor {
-    host: ParallelHostLiveCurrentExecutor,
+    cpu: ParallelCpuLiveCurrentExecutor,
     touched: Vec<Vec<usize>>,
 }
 
 impl WitnessExecutor {
     fn new() -> Self {
         Self {
-            host: ParallelHostLiveCurrentExecutor::new(HOST_THREADS),
+            cpu: ParallelCpuLiveCurrentExecutor::new(CPU_THREADS),
             touched: Vec::new(),
         }
     }
@@ -953,7 +953,7 @@ impl LiveCurrentExecutor for WitnessExecutor {
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
         let executed =
-            self.host
+            self.cpu
                 .enact(physical_revision, standing, currents, relations, regional)?;
         self.touched = executed
             .regional()
@@ -968,7 +968,7 @@ impl LiveCurrentExecutor for WitnessExecutor {
         physical_revision: u64,
         successor: &SparseStandingSurface,
     ) -> Result<(), LiveCurrentError> {
-        self.host
+        self.cpu
             .settle_physical_successor(physical_revision, successor)
     }
 }
@@ -1420,7 +1420,7 @@ struct SourceRead {
     selected_frame_start: usize,
     selected_frame_extent: usize,
     inherited_field_words_per_window: usize,
-    host_threads: usize,
+    cpu_threads: usize,
 }
 
 fn main() {
@@ -1597,7 +1597,7 @@ fn run() -> Result<(), String> {
             selected_frame_start: FRAME_START,
             selected_frame_extent: FRAME_EXTENT,
             inherited_field_words_per_window: FRAME_EXTENT * teaching.field.alphabet,
-            host_threads: HOST_THREADS,
+            cpu_threads: CPU_THREADS,
         },
         inherited_rule: recovered.read(),
         teaching_surface: teaching_read,

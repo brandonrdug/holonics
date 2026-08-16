@@ -1,6 +1,6 @@
 //! Substrate-neutral conduct of one native active current.
 //!
-//! This is the common event-time mouth for host and card execution.  It consumes canonical
+//! This is the common event-time mouth for cpu and card execution.  It consumes canonical
 //! relation atoms and one action per complete event, retains one unresolved dark interval, and
 //! reports every accepted body deed through a caller-owned output target.  Allocation, launch
 //! shape, journal storage, directed-incidence indexing, and world interpretation remain outside.
@@ -35,7 +35,7 @@ pub struct CurrentConduct {
 pub enum ConductError<E> {
     Structural(ValidationError),
     CurrentAbsent(u64),
-    HostExtent,
+    CpuExtent,
     ResourceExtent,
     BodyResource,
     RelationSpan,
@@ -44,7 +44,7 @@ pub enum ConductError<E> {
 }
 
 /// Physical output boundary for a conducted current.  Methods are chronological.  A target may
-/// retain event spans, CUDA rows, or host journals, but none of its return values can alter body
+/// retain event spans, CUDA rows, or cpu journals, but none of its return values can alter body
 /// law: any refusal aborts the disposable current whole.
 pub trait ConductTarget {
     type Error;
@@ -110,19 +110,19 @@ pub fn conduct_current<T: ConductTarget>(
     target: &mut T,
 ) -> Result<CurrentConduct, ConductError<T::Error>> {
     active.validate().map_err(ConductError::Structural)?;
-    let current_index = usize::try_from(current_ordinal).map_err(|_| ConductError::HostExtent)?;
+    let current_index = usize::try_from(current_ordinal).map_err(|_| ConductError::CpuExtent)?;
     let current = active
         .currents
         .get(current_index)
         .copied()
         .ok_or(ConductError::CurrentAbsent(current_ordinal))?;
     let first_event =
-        usize::try_from(current.event_offset()).map_err(|_| ConductError::HostExtent)?;
+        usize::try_from(current.event_offset()).map_err(|_| ConductError::CpuExtent)?;
     let after_event_u64 = current
         .event_offset()
         .checked_add(current.events())
         .ok_or(ConductError::ResourceExtent)?;
-    let after_event = usize::try_from(after_event_u64).map_err(|_| ConductError::HostExtent)?;
+    let after_event = usize::try_from(after_event_u64).map_err(|_| ConductError::CpuExtent)?;
 
     target
         .begin_current(current_ordinal, current.event_offset())
@@ -155,16 +155,16 @@ pub fn conduct_current<T: ConductTarget>(
 
         let local_event = event_index as u64 - current.event_offset();
         let first_atom =
-            usize::try_from(event.atom_offset()).map_err(|_| ConductError::HostExtent)?;
+            usize::try_from(event.atom_offset()).map_err(|_| ConductError::CpuExtent)?;
         let after_atom_u64 = event
             .atom_offset()
             .checked_add(event.atoms())
             .ok_or(ConductError::ResourceExtent)?;
-        let after_atom = usize::try_from(after_atom_u64).map_err(|_| ConductError::HostExtent)?;
+        let after_atom = usize::try_from(after_atom_u64).map_err(|_| ConductError::CpuExtent)?;
         let event_atoms = active
             .atoms
             .get(first_atom..after_atom)
-            .ok_or(ConductError::HostExtent)?;
+            .ok_or(ConductError::CpuExtent)?;
         let resolving_atoms = event_atoms
             .iter()
             .filter(|atom| atom.cog().mag != 0)

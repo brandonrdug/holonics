@@ -3,7 +3,7 @@
 //!   init -> pick the RTX 4080 SUPER -> load the Rust-emitted PTX -> alloc -> memcpy ->
 //!   launch (fill_identity, then atomic_fold) -> synchronize -> readback -> exact assert.
 //!
-//! Nothing is scored. Each gate prints EXACT or FAILED. No floats in the kernel; host timing
+//! Nothing is scored. Each gate prints EXACT or FAILED. No floats in the kernel; cpu timing
 //! prints are integer microseconds. On any driver fault the exact CUresult name is printed and
 //! the smoke stops — no retry loop.
 
@@ -88,11 +88,11 @@ fn run() -> mount::Result<()> {
         _ctx.synchronize()?;
     }
     let fill_us = t_fill.elapsed().as_micros();
-    let mut host = vec![0u32; IDENTITY_N];
-    out.copy_to_slice(&mut host)?;
+    let mut cpu = vec![0u32; IDENTITY_N];
+    out.copy_to_slice(&mut cpu)?;
 
     let mut first_bad: Option<(usize, u32)> = None;
-    for (i, &v) in host.iter().enumerate() {
+    for (i, &v) in cpu.iter().enumerate() {
         if v != i as u32 {
             first_bad = Some((i, v));
             break;
@@ -114,7 +114,7 @@ fn run() -> mount::Result<()> {
 
     // --- gate 2: atomic_fold -----------------------------------------------------------------
     // Each thread adds FOLD_CONSTANT once and maxes its index once. The exact device add is the
-    // 64-bit-wrapped product (atomics wrap mod 2^64, deterministically), so the host check uses
+    // 64-bit-wrapped product (atomics wrap mod 2^64, deterministically), so the cpu check uses
     // the same wrapping product — exactness, not approximation.
     let add_buf: DeviceBuffer<u64> = DeviceBuffer::alloc_zeroed(1)?;
     let max_buf: DeviceBuffer<u64> = DeviceBuffer::alloc_zeroed(1)?;

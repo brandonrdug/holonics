@@ -768,7 +768,7 @@ impl AgenticLanguageEcology {
     /// fixed by the trait — so this is the outer mouth a caller holding a mounted card conducts
     /// through. It is the same membrane: the occurrence is retained exactly when it was admitted,
     /// and the returned consequence is identical. The only difference is that the answer's
-    /// generation crosses the supplied executor instead of a privately constructed host pool.
+    /// generation crosses the supplied executor instead of a privately constructed cpu pool.
     pub fn receive_occurrence_with_executor<'a>(
         &mut self,
         occurrence: AgenticLanguageOccurrence<'a>,
@@ -795,8 +795,8 @@ impl AgenticLanguageEcology {
         &mut self,
         question: &AgenticLanguageQuestion,
     ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(self.worker_threads.max(1));
-        self.receive_question_with_executor(question, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(self.worker_threads.max(1));
+        self.receive_question_with_executor(question, &mut cpu)
     }
 
     /// Receive one outer question through a caller-retained physical executor.
@@ -1011,8 +1011,8 @@ impl AgenticLanguageEcology {
         &mut self,
         returned: &AgenticLanguageWorldReturn,
     ) -> Result<AgenticLanguageConsequence, AgenticLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(self.worker_threads.max(1));
-        self.receive_world_return_with_executor(returned, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(self.worker_threads.max(1));
+        self.receive_world_return_with_executor(returned, &mut cpu)
     }
 
     /// Receive the deed's returned world sections through a caller-retained physical executor.

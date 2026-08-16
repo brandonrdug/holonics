@@ -115,7 +115,7 @@ writing `Θ`**. What is owed is a notation normalization, not a port — and one
 that a **third** `C/d` shares the glyph: the nest depth, and the strike's mirror-versus-founding
 discriminant. Those must be kept typed apart from the turn.
 
-`crates/holonic-engine/src/cuda_aperture.rs:1024` carries `CarrierDilation { arc, chord }`, which I
+`crates/holonic-engine/src/cuda_aperture.rs:1244` carries `CarrierDilation { arc, chord }`, which I
 wrote today. It holds the pair and never divides, which is right, but it measures against the chord
 rather than from the pole:
 
@@ -154,7 +154,7 @@ anything but unit.
 ### 4.4 · ~~The factored receptive star was never ported~~ — STRUCK 2026-08-09, it was ported
 
 `I(R) = ⋃_{K} ⋂_{f∈K} I(f)` is **live in this tree** at
-`soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence`, with the cover founded
+`soma/life/src/relational_language/ecology.rs:1501` `clause_region_incidence`, with the cover founded
 on the receiver's own clause and entity morphology exactly as required, and it is **called** at
 `:890`. Its doc reads *"it is not a corpus scan or a lexical similarity ranking."*
 
@@ -191,6 +191,12 @@ absent from the evidence*:
 reintroducing a wall-clock comparison covers `CarrierAdmission::under` and not `admit` itself.
 §4.5 of `research/records/2026-08-08_THE_CARRIER_IS_ADMITTED_BY_ITS_WORK…` — the two-aperture orbit
 check — is unbuilt, and it is the same driver that would close both.
+
+**Re-measured 2026-08-15 and it HOLDS.** `grep -rn "APERTURE_WIDTH\\|\\.admit(" --include='*.rs' crates soma`
+returns `admit` at two drivers only (`the_carrier_is_admitted_by_its_work.rs`, `desktop_receiver.rs`);
+all sixteen tests in `cuda_aperture.rs` exercise `CarrierAdmission::under` and never `admit`. One
+aperture constant exists and no driver sweeps a second, **so there is no orbit and the gauge is
+undeclared rather than trivial.**
 
 ### 4.8 · Unretested survivors and undriven drivers from the assembly
 
@@ -233,6 +239,18 @@ of `tools/gates.sh`.
 | reflection composed into formal mathematics | `holonic_language\|Reflect` in `lean_mathematics.rs` returns **zero** |
 | a variable traversal schedule | `pop_front` returns 5 hits, **all hardcoded breadth-first** |
 | reusable exact rank | one definition, `algebraic.rs:1081`, **private**, ℚ-rank only |
+
+**Re-measured 2026-08-15. Four rows hold, three are FALSE, one is unmeasurable as written.** Command:
+`for p in '\\btoric\\b' 'ChiPair|chi_pair' 'hermite_normal_form' 'cycle_class' 'pop_front' 'WalkOrder'; do printf "%-24s %s\\n" "$p" "$(grep -rnE "$p" --include='*.rs' crates soma | wc -l)"; done`
+
+- HOLD: `toric` **0** (the "29 hits inside historical" count is itself stale — the word now returns
+  zero as a word), `ChiPair|chi_pair` 0, `hermite_normal_form` 0, `cycle_class` 0.
+- FALSE: a variable traversal schedule exists — `WalkOrder` 48 hits, swept in
+  `examples/grown_circuit_invariants.rs`; a public reusable exact rank exists at
+  `rebase_invariants.rs:261` over `SmithNormalForm`; and Hodge–Riemann has an owner in
+  `matroid_chow.rs` beyond the sheaf Laplacian.
+- UNMEASURABLE: `crates/holonic-engine/src/lean_mathematics.rs` no longer exists, so the `Reflect`
+  row asks about a file that is gone.
 
 ---
 

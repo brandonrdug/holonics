@@ -319,7 +319,7 @@ untested — nothing asserts `T.followed_by(T.inverse()).is_projective_identity(
 **The gauge standard to copy:** `rebase_invariants.rs:1361` collects three pivot walks into a set and
 **asserts `walks.len() == 3`** — *"or their agreement is one computation compared with itself
 twice."* (`:1220` is the test's name, not the assertion.) The counter-example this paragraph used to
-name — *"`receiver_atlas.rs:693` asserts `receiver_values.len() == 2`, one assertion from being a
+name — *"`receiver_atlas.rs:748` asserts `receiver_values.len() == 2`, one assertion from being a
 real gauge test"* — is **stale, and it cited the file to the wrong crate**: no `receiver_atlas`
 module exists under `holonic-engine` at all, and the real owner at
 `crates/relational-geometry/src/receiver_atlas.rs:746-762` records that it

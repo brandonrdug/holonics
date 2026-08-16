@@ -1,5 +1,5 @@
 //! mount-chart-gate — the §XXXII-b rung of the CUDA/PTX mount recut. It gates the CUDA port of the
-//! CHART family (`chart_mark` · `chart_count` · `chart_recast`) BYTE-EXACT against host references,
+//! CHART family (`chart_mark` · `chart_count` · `chart_recast`) BYTE-EXACT against cpu references,
 //! on the headless RTX 4080 SUPER.
 //!
 //!   chart_mark   — every live founded OWN cell casts its grip into the candidate receiving gauge
@@ -14,7 +14,7 @@
 //! Each is swept across five representative sizes — 0, 1, 64 (one workgroup), 100 (a non-multiple of
 //! 64), and a multi-block extent — so every dispatch-boundary and guard path is exercised; chart_count
 //! adds one seeded case that forces a hand carry so the carried branch is covered. Byte-exactness is
-//! the gate; nothing is scored. The host references read the SAME staged buffers the card binds, so
+//! the gate; nothing is scored. The cpu references read the SAME staged buffers the card binds, so
 //! only the port can diverge. On any driver fault the exact CUresult name prints and the gate stops.
 
 use std::ffi::c_void;
@@ -102,7 +102,7 @@ fn mark_case(ctx: &Context, mark: &Function, mark_axis: usize, own_cells: usize)
             own_form(i),
         );
     }
-    // host reference: read the SAME reservation, ground each live cell, mark its grip.
+    // cpu reference: read the SAME reservation, ground each live cell, mark its grip.
     let mut expected = vec![0u32; marks_len];
     for i in 0..own_cells {
         let at = i * OWN_CELL_WORDS;
@@ -161,7 +161,7 @@ fn mark_case(ctx: &Context, mark: &Function, mark_axis: usize, own_cells: usize)
             .position(|(c, h)| c != h)
             .unwrap();
         eprintln!(
-            "    marks DIVERGE at grip {}: card {} host {}",
+            "    marks DIVERGE at grip {}: card {} cpu {}",
             bad, card[bad], expected[bad]
         );
     }
@@ -189,7 +189,7 @@ fn count_case(
         *m = (g % 2 == 0) as u32;
     }
 
-    // host reference: replay the register over the new grips in [0, grip_count), skipping residence.
+    // cpu reference: replay the register over the new grips in [0, grip_count), skipping residence.
     let mut occ = seed;
     let mut carried = 0u64;
     for grip in 0..grip_count.min(marks_len) {
@@ -248,7 +248,7 @@ fn count_case(
     reg_b.copy_to_slice(&mut card)?;
     let ok = card == expected;
     println!(
-        "  chart_count grips {:>5} seed {:>4}: {}  (register card {:?} host {:?} · {} us)",
+        "  chart_count grips {:>5} seed {:>4}: {}  (register card {:?} cpu {:?} · {} us)",
         grip_count,
         seed,
         if ok { "EXACT" } else { "FAILED" },
@@ -273,7 +273,7 @@ fn recast_case(
     for cell in 0..old_cells {
         standing_form(cell).pack(&mut old_standing, cell * FORM_WORDS);
     }
-    // host reference: each occupied old grip in [0, grip_count) zero-extends its unchanged form.
+    // cpu reference: each occupied old grip in [0, grip_count) zero-extends its unchanged form.
     let mut expected = vec![0u32; new_cells * FORM_WORDS];
     for old_grip in 0..grip_count.min(old_cells) {
         let form = RegionalForm::unpack(&old_standing, old_grip * FORM_WORDS);

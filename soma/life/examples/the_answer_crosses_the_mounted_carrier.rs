@@ -3,12 +3,12 @@
 //! `AgenticLanguageEcology::condition_with_executor` has existed since the seam was first extended:
 //! a caller mounting a card could condition the language body through it. **The answer path could
 //! not.** Every materialization of a selected answer current ran `into_materialized_return`, which
-//! builds a private `ParallelHostLiveCurrentExecutor` out of a worker count, so a caller holding a
+//! builds a private `ParallelCpuLiveCurrentExecutor` out of a worker count, so a caller holding a
 //! mounted carrier had no expressible way to hand it to generation. The carrier was not declined;
 //! past conditioning it was unreachable.
 //!
 //! This driver measures the seam after the join. It is built so that a *fake* twin — one which
-//! takes the executor argument and quietly builds its own host pool anyway — fails it.
+//! takes the executor argument and quietly builds its own cpu pool anyway — fails it.
 //!
 //! Both agentic answer paths are exercised, because they are different edges of the loop:
 //!
@@ -19,7 +19,7 @@
 //!
 //! Three frames, in order of how hard they are to fake:
 //!
-//! 1. **The counting frame.** One `CountingHostExecutor` forwards every request to exactly the host
+//! 1. **The counting frame.** One `CountingCpuExecutor` forwards every request to exactly the cpu
 //!    carrier the private path would have built, and counts. Equality of the whole returned
 //!    `AgenticLanguageAnswer` proves the twin computes the same thing; the count proves the
 //!    supplied executor is the one that computed it. A fake twin returns the same answer with a
@@ -35,7 +35,7 @@
 //!    the loop* the carrier is crossed rather than only that it was.
 //!
 //! What this driver does NOT claim: any speedup, any card, or that the generation front is enacted
-//! wide. The executor here is a host pool wearing a counter, and the returned answer is required to
+//! wide. The executor here is a cpu pool wearing a counter, and the returned answer is required to
 //! be bit-identical to the private path's. This is a precondition being made expressible, not a
 //! performance change.
 
@@ -51,29 +51,29 @@ use life::morphological_language::MorphologicalLanguagePassage;
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
     CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent, LiveCurrentError,
-    LiveCurrentExecutor, ParallelHostLiveCurrentExecutor, RegionalExecutionRequest,
+    LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor, RegionalExecutionRequest,
     SparseStandingSurface,
 };
 
 /// One caller-retained executor which counts the events it was asked to realize and changes no
-/// result: every request is forwarded to the same host carrier the private path would have built.
-struct CountingHostExecutor {
-    host: ParallelHostLiveCurrentExecutor,
+/// result: every request is forwarded to the same cpu carrier the private path would have built.
+struct CountingCpuExecutor {
+    cpu: ParallelCpuLiveCurrentExecutor,
     enactments: usize,
     currents: usize,
 }
 
-impl CountingHostExecutor {
+impl CountingCpuExecutor {
     const fn new(worker_threads: usize) -> Self {
         Self {
-            host: ParallelHostLiveCurrentExecutor::new(worker_threads),
+            cpu: ParallelCpuLiveCurrentExecutor::new(worker_threads),
             enactments: 0,
             currents: 0,
         }
     }
 }
 
-impl LiveCurrentExecutor for CountingHostExecutor {
+impl LiveCurrentExecutor for CountingCpuExecutor {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -84,7 +84,7 @@ impl LiveCurrentExecutor for CountingHostExecutor {
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
         self.enactments += 1;
         self.currents += currents.len();
-        self.host
+        self.cpu
             .enact(physical_revision, standing, currents, relations, regional)
     }
 }
@@ -217,13 +217,13 @@ fn main() {
     println!();
 
     // -------------------------------------------------------------------------------------------
-    // FRAME 0 - the private host pool. What every caller had before the join.
+    // FRAME 0 - the private cpu pool. What every caller had before the join.
     // -------------------------------------------------------------------------------------------
     let mut private_body = agent();
     let (private_world_answer, private_grounded_answer) =
         cycle_through_private_pool(&mut private_body);
 
-    println!("FRAME 0 - private host pool (the pre-join path)");
+    println!("FRAME 0 - private cpu pool (the pre-join path)");
     println!("  world-return answer   {:?}", private_world_answer.text);
     println!("  grounded answer       {:?}", private_grounded_answer.text);
     println!(
@@ -236,7 +236,7 @@ fn main() {
     // FRAME 1 - one supplied executor, counted, read between occurrences.
     // -------------------------------------------------------------------------------------------
     let mut counted_body = agent();
-    let mut counting = CountingHostExecutor::new(WORKER_THREADS);
+    let mut counting = CountingCpuExecutor::new(WORKER_THREADS);
     let after_conditioning = counting.enactments;
 
     let question = AgenticLanguageQuestion::new("reflection-question", 90, DEED_QUESTION);
@@ -336,7 +336,7 @@ fn main() {
     // The grounded path needs a body which already received the world return, so that body is
     // driven to that point on a working carrier and only the final question is refused.
     let mut refused_grounded_body = agent();
-    let mut working = CountingHostExecutor::new(WORKER_THREADS);
+    let mut working = CountingCpuExecutor::new(WORKER_THREADS);
     let question = AgenticLanguageQuestion::new("reflection-question", 90, DEED_QUESTION);
     let grounded_deed = match refused_grounded_body
         .receive_occurrence_with_executor(
@@ -380,14 +380,14 @@ fn main() {
     let same_world = private_world_answer == counted_world_answer;
     report(
         same_world,
-        "the supplied-executor world-return answer equals the private-host answer",
+        "the supplied-executor world-return answer equals the private-cpu answer",
         "the twin computed a different answer -- threading the carrier changed semantics, not only\n       the carrier. This compares the WHOLE AgenticLanguageAnswer: question, generated body,\n       tokens, retained alternatives, reflection receipt, codec versions and relational thoughts.",
     );
 
     let same_grounded = private_grounded_answer == counted_grounded_answer;
     report(
         same_grounded,
-        "the supplied-executor grounded answer equals the private-host answer",
+        "the supplied-executor grounded answer equals the private-cpu answer",
         "the locally-grounded answer path diverged under a supplied carrier.",
     );
 
@@ -395,7 +395,7 @@ fn main() {
     report(
         world_crossing > 0,
         &format!("the world-return answer crossed the supplied carrier ({world_crossing} enactments)"),
-        "receive_world_return_with_executor built a private host pool and ignored its argument.\n       A FAKE TWIN RETURNS THE SAME ANSWER WITH THIS COUNT AT ZERO -- which is exactly why the\n       equality controls above are not sufficient on their own.",
+        "receive_world_return_with_executor built a private cpu pool and ignored its argument.\n       A FAKE TWIN RETURNS THE SAME ANSWER WITH THIS COUNT AT ZERO -- which is exactly why the\n       equality controls above are not sufficient on their own.",
     );
 
     let grounded_crossing = after_grounded - after_world_return;

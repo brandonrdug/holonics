@@ -2664,13 +2664,13 @@ fn write_summary(
         )?;
         writeln!(
             writer,
-            "{phase}_cuda_host_to_device_octets\t{}",
-            work.cuda_host_to_device_octets
+            "{phase}_cuda_cpu_to_device_octets\t{}",
+            work.cuda_cpu_to_device_octets
         )?;
         writeln!(
             writer,
-            "{phase}_cuda_device_to_host_octets\t{}",
-            work.cuda_device_to_host_octets
+            "{phase}_cuda_device_to_cpu_octets\t{}",
+            work.cuda_device_to_cpu_octets
         )?;
         writeln!(
             writer,
@@ -2684,8 +2684,8 @@ fn write_summary(
         )?;
         writeln!(
             writer,
-            "{phase}_host_relation_fallbacks\t{}",
-            work.host_relation_fallbacks
+            "{phase}_cpu_relation_fallbacks\t{}",
+            work.cpu_relation_fallbacks
         )?;
     }
     Ok(())

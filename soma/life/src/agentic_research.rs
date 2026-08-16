@@ -4,7 +4,7 @@
 //! [`AgenticLanguageEcology`] remains the body which receives a question, emits a deed, forms an
 //! answer, retains feedback, and changes later conduct.  [`LaboratoryResearchEcology`] is a typed
 //! exterior-research bridge: open relational boundaries cause further receiver regions directly
-//! and return their complete plural fiber.  No host-authored English self-question schedules
+//! and return their complete plural fiber.  No cpu-authored English self-question schedules
 //! thought.
 
 use std::collections::BTreeSet;

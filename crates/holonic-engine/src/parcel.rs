@@ -70,7 +70,7 @@
 //!
 //! `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`,
 //! ratified: *"Shared structure is factorized; if the remaining exact terminal width exceeds declared
-//! host/card capacity, the event returns a resource obstruction while preserving standing."*
+//! cpu/card capacity, the event returns a resource obstruction while preserving standing."*
 //!
 //! A parcel at a site with several admissible passages **forks and retains both** — plurality is the
 //! return and a continuation fiber is not a number (`CLAUDE.md` §13 rule 2). Nothing is sampled,

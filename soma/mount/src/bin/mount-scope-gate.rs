@@ -1,19 +1,19 @@
 //! mount-scope-gate — CUDA LADDER RUNG 3. It gates the CUDA/PTX port of the §XXVIII-b SCOPE entry
-//! family (`scope_felt` · `scope_founded`) BYTE-EXACT against the host reference, on the headless
+//! family (`scope_felt` · `scope_founded`) BYTE-EXACT against the cpu reference, on the headless
 //! RTX 4080 SUPER.
 //!
 //!   stage a bounded co-present cohort of raw-light lineages (each a short distinct light ⊕ two-byte
 //!   founding frame) over an immutable pre-light standing plane, exactly the buffer contract the
-//!   SPIR-V/PTX scope entries bind -> compute the HOST REFERENCE by carving each lane's disjoint OWN
+//!   SPIR-V/PTX scope entries bind -> compute the CPU REFERENCE by carving each lane's disjoint OWN
 //!   ⊕ carrier/K spans and running `body::carriage::carry_dense_stroke` / `carry_founded_stroke`
-//!   with `SliceWordSeam` (the SAME law the card runs, only the host lowering) -> upload -> dispatch
+//!   with `SliceWordSeam` (the SAME law the card runs, only the cpu lowering) -> upload -> dispatch
 //!   one thread per lane (block 64 × 1, with the 100-lane case deliberately crossing a second grid
 //!   row through the runtime X-thread stride) -> read back ->
 //!   assert the card's OWN reservation, carrier/K rows, per-lane term counts, and every word of the
 //!   formed radiation aperture are BYTE-EXACT.
 //!
 //! Both substrates call the identical `body::carriage` code; the gate therefore proves the nvptx
-//! lowering ⊕ the shell's span carving reproduce the host lowering word-for-word. Nothing is scored.
+//! lowering ⊕ the shell's span carving reproduce the cpu lowering word-for-word. Nothing is scored.
 //! Five lane counts are swept — 1 · 2 · 3 · 64 (one whole block) · 100 (a non-multiple of 64) — so the
 //! block-boundary and guard paths are exercised. The founded reservation opens the exact manifested
 //! `RADIATION_WORDS` aperture over a fresh zeroed buffer, matching the observed wgpu mouth. On any
@@ -21,10 +21,10 @@
 //! One further single-lineage gate carries the fixed long passage from body::carriage with one
 //! interior move per launch. The same complete grid is presented unconditionally until the carried
 //! cursor reaches the light's true end; OWN, carrier/K, radiation, and accumulated counts must then
-//! equal the uninterrupted host sibling while all eight continuation phases have crossed.
+//! equal the uninterrupted cpu sibling while all eight continuation phases have crossed.
 //!
 //! This binary takes NO arguments. The card run is conducted by the main line only; the reference
-//! path itself is gated host-side (no GPU) by the `#[cfg(test)]` self-checks below.
+//! path itself is gated cpu-side (no GPU) by the `#[cfg(test)]` self-checks below.
 
 use std::ffi::c_void;
 use std::time::Instant;
@@ -56,7 +56,7 @@ const STANDING_CELLS: usize = STANDING_AXIS * STANDING_AXIS; // the founded rece
 const DEPTH: usize = 8; // the declared carrier reservation; RESERVATION_LIMITED_LANES states its excess
 /// Lane counts swept: single · pair · triple · one whole block · a non-multiple of 64.
 const LANE_COUNTS: [usize; 5] = [1, 2, 3, 64, 100];
-/// Exact `(FOLD, STEP, CUT)` counts emitted by the shared host/body producer for each swept cohort.
+/// Exact `(FOLD, STEP, CUT)` counts emitted by the shared cpu/body producer for each swept cohort.
 /// This pins the radiation fixture itself before CUDA parity: an empty or weakened aperture fails.
 ///
 /// **Regenerated 2026-08-07 against the carriage law, not against a prior receipt.** The 64- and
@@ -76,7 +76,7 @@ const LANE_COUNTS: [usize; 5] = [1, 2, 3, 64, 100];
 ///   `(255, 159, 35)`. Measured consequence: lane 32 now completes INSIDE the declared depth-8
 ///   reservation, where under the prior law it demanded depth 9.
 ///
-/// The implementation was graded, not the receipt. Host x86-64 and device nvptx64 `sm_89` return
+/// The implementation was graded, not the receipt. Cpu x86-64 and device nvptx64 `sm_89` return
 /// **byte-identical** radiation for every swept cohort — `radiation EXACT · canonical EXACT` — and
 /// the stale constant was the only disagreeing party.
 const EXPECTED_RADIATION_SPECIES: [(usize, usize, usize); 5] = [
@@ -98,7 +98,7 @@ const EXPECTED_RADIATION_SPECIES: [(usize, usize, usize); 5] = [
 /// any reservation this gate can declare, so the gate keeps its declared aperture and states the
 /// excess rather than chasing it.
 ///
-/// Only the host-side self-checks read it, so it is `cfg(test)`. Left at module scope it made the
+/// Only the cpu-side self-checks read it, so it is `cfg(test)`. Left at module scope it made the
 /// binary build emit `constant is never used` — a warning the receipt that introduced it did not
 /// report.
 #[cfg(test)]
@@ -135,7 +135,7 @@ fn face(ok: bool) -> &'static str {
 }
 
 /// Deterministic staging of one lineage's raw light (≥ 2 bytes so every worldline carries at least
-/// one adjacent difference). Pure host construction — the card reads the identical packed bytes.
+/// one adjacent difference). Pure cpu construction — the card reads the identical packed bytes.
 fn lane_light(lane: usize) -> Vec<u8> {
     let len = 6 + (lane % 11); // 6..=16 bytes
     (0..len)
@@ -324,7 +324,7 @@ fn pack_dense_light(lanes: usize) -> (Vec<u32>, Vec<u32>) {
     (packed, rows)
 }
 
-/// The HOST REFERENCE for the dense scope: carve each lane's disjoint OWN plane ⊕ carrier/K row
+/// The CPU REFERENCE for the dense scope: carve each lane's disjoint OWN plane ⊕ carrier/K row
 /// (the same spans `dense_ranges` carves on the card) and run the shared `carry_dense_stroke`.
 fn dense_reference(
     lanes: usize,
@@ -373,14 +373,14 @@ fn dense_reference(
     (owns, carriers, counts)
 }
 
-/// One swept dense size: stage, host-reference, dispatch scope_felt, read back, assert BYTE-EXACT.
+/// One swept dense size: stage, cpu-reference, dispatch scope_felt, read back, assert BYTE-EXACT.
 fn dense_case(ctx: &Context, felt: &Function, lanes: usize) -> Result<bool> {
     let row_words = carrier_row_words(DEPTH);
     let own_words = DENSE_CELLS * FORM_WORDS;
     let standing_words = DENSE_CELLS * FORM_WORDS;
     let standing = vec![0u32; standing_words]; // immutable pre-light (all UNBORN), like the M4b gate
     let (packed, rows) = pack_dense_light(lanes);
-    let (host_owns, host_carriers, host_counts) = dense_reference(lanes, &standing, &packed, &rows);
+    let (cpu_owns, cpu_carriers, cpu_counts) = dense_reference(lanes, &standing, &packed, &rows);
 
     let owns_len = lanes * own_words;
     let carriers_len = lanes * row_words;
@@ -448,10 +448,10 @@ fn dense_case(ctx: &Context, felt: &Function, lanes: usize) -> Result<bool> {
     let mut card_counts = vec![0u64; counts_len];
     counts_b.copy_to_slice(&mut card_counts)?;
 
-    let owns_ok = card_owns == host_owns;
-    let carriers_ok = card_carriers == host_carriers;
-    let counts_ok = card_counts == host_counts;
-    let terms: [u64; 4] = host_counts.chunks_exact(4).fold([0u64; 4], |mut acc, c| {
+    let owns_ok = card_owns == cpu_owns;
+    let carriers_ok = card_carriers == cpu_carriers;
+    let counts_ok = card_counts == cpu_counts;
+    let terms: [u64; 4] = cpu_counts.chunks_exact(4).fold([0u64; 4], |mut acc, c| {
         for j in 0..4 {
             acc[j] += c[j];
         }
@@ -466,9 +466,9 @@ fn dense_case(ctx: &Context, felt: &Function, lanes: usize) -> Result<bool> {
         report_divergence(
             "dense",
             &card_owns,
-            &host_owns,
+            &cpu_owns,
             &card_carriers,
-            &host_carriers,
+            &cpu_carriers,
         );
     }
     Ok(owns_ok && carriers_ok && counts_ok)
@@ -509,7 +509,7 @@ fn pack_founded_light(lanes: usize) -> (Vec<u32>, Vec<u32>, usize) {
     (packed, rows, own_cell_offset)
 }
 
-/// The HOST REFERENCE for the founded scope: carve each lane's reservation-sized OWN chart ⊕
+/// The CPU REFERENCE for the founded scope: carve each lane's reservation-sized OWN chart ⊕
 /// carrier/K row (the spans `founded_header`/`founded_ranges` carve) and run `carry_founded_stroke`.
 fn founded_reference(
     lanes: usize,
@@ -569,20 +569,20 @@ fn founded_reference(
     (owns, carriers, counts, radiation)
 }
 
-/// One swept founded size: stage, host-reference, dispatch scope_founded, read back, assert BYTE-EXACT.
+/// One swept founded size: stage, cpu-reference, dispatch scope_founded, read back, assert BYTE-EXACT.
 fn founded_case(ctx: &Context, founded: &Function, lanes: usize) -> Result<bool> {
     let row_words = carrier_row_words(DEPTH);
     let standing_words = STANDING_CELLS * FORM_WORDS;
     let standing = vec![0u32; standing_words];
     let (packed, rows, total_own_cells) = pack_founded_light(lanes);
-    let (host_owns, host_carriers, host_counts, host_radiation) =
+    let (cpu_owns, cpu_carriers, cpu_counts, cpu_radiation) =
         founded_reference(lanes, &standing, &packed, &rows, total_own_cells);
-    let host_radiation_valid = validate_radiation(&host_radiation, &rows);
+    let cpu_radiation_valid = validate_radiation(&cpu_radiation, &rows);
 
     let owns_len = total_own_cells * OWN_CELL_WORDS;
     let carriers_len = lanes * row_words;
     let counts_len = lanes * 4;
-    let radiation_len = host_radiation.len();
+    let radiation_len = cpu_radiation.len();
 
     let standing_b: DeviceBuffer<u32> = DeviceBuffer::alloc(standing_words)?;
     standing_b.copy_from_slice(&standing)?;
@@ -653,20 +653,20 @@ fn founded_case(ctx: &Context, founded: &Function, lanes: usize) -> Result<bool>
     let mut card_radiation = vec![0u32; radiation_len];
     radiation_b.copy_to_slice(&mut card_radiation)?;
 
-    let owns_ok = card_owns == host_owns;
-    let carriers_ok = card_carriers == host_carriers;
-    let counts_ok = card_counts == host_counts;
-    let radiation_ok = card_radiation == host_radiation;
+    let owns_ok = card_owns == cpu_owns;
+    let carriers_ok = card_carriers == cpu_carriers;
+    let counts_ok = card_counts == cpu_counts;
+    let radiation_ok = card_radiation == cpu_radiation;
     let card_radiation_valid = validate_radiation(&card_radiation, &rows);
-    let radiation_valid = host_radiation_valid.is_ok() && card_radiation_valid.is_ok();
-    let terms: [u64; 4] = host_counts.chunks_exact(4).fold([0u64; 4], |mut acc, c| {
+    let radiation_valid = cpu_radiation_valid.is_ok() && card_radiation_valid.is_ok();
+    let terms: [u64; 4] = cpu_counts.chunks_exact(4).fold([0u64; 4], |mut acc, c| {
         for j in 0..4 {
             acc[j] += c[j];
         }
         acc
     });
     let radiation_rows = radiation_len / RADIATION_WORDS;
-    let species = radiation_species(&host_radiation);
+    let species = radiation_species(&cpu_radiation);
     let (radiated_folds, radiated_steps, radiated_cuts) = species;
     let radiation_nonvacuous = expected_radiation_species(lanes) == Some(species);
     println!(
@@ -675,8 +675,8 @@ fn founded_case(ctx: &Context, founded: &Function, lanes: usize) -> Result<bool>
         grid.x, grid.y, total_own_cells, owns_len, carriers_len, radiation_rows, radiated_folds, radiated_steps, radiated_cuts,
         terms[0], terms[1], terms[2], terms[3], carry_us,
     );
-    if let Err(error) = &host_radiation_valid {
-        eprintln!("  founded: HOST radiation is noncanonical: {error}");
+    if let Err(error) = &cpu_radiation_valid {
+        eprintln!("  founded: CPU radiation is noncanonical: {error}");
     }
     if let Err(error) = &card_radiation_valid {
         eprintln!("  founded: card radiation is noncanonical: {error}");
@@ -685,13 +685,13 @@ fn founded_case(ctx: &Context, founded: &Function, lanes: usize) -> Result<bool>
         report_divergence(
             "founded",
             &card_owns,
-            &host_owns,
+            &cpu_owns,
             &card_carriers,
-            &host_carriers,
+            &cpu_carriers,
         );
     }
     if !radiation_ok {
-        report_radiation_divergence(&card_radiation, &host_radiation);
+        report_radiation_divergence(&card_radiation, &cpu_radiation);
     }
     Ok(owns_ok
         && carriers_ok
@@ -800,10 +800,10 @@ fn continuation_stroke(founded: bool, interior_installment: usize) -> LineageStr
     stroke.with_interior_installment(interior_installment)
 }
 
-/// Run the fixed single lineage through the host lowering. Installment zero is the uninterrupted
+/// Run the fixed single lineage through the cpu lowering. Installment zero is the uninterrupted
 /// sibling; installment one returns after every exact interior move and is presented again until
 /// the carried cursor reaches the light's true end.
-fn continuation_host(founded: bool, interior_installment: usize) -> ContinuationTrace {
+fn continuation_cpu(founded: bool, interior_installment: usize) -> ContinuationTrace {
     let standing = vec![0u32; STANDING_CELLS * FORM_WORDS];
     let packed = pack_continuation_light();
     let own_words = if founded {
@@ -852,7 +852,7 @@ fn continuation_host(founded: bool, interior_installment: usize) -> Continuation
                 continuation_stroke(false, interior_installment),
             )
         }
-        .expect("the fixed continuation lineage has one formed host layout");
+        .expect("the fixed continuation lineage has one formed cpu layout");
 
         if manifold::continuation_is_efferent(prior_phase) && result.terms.total() != 0 {
             resumed_deposit = true;
@@ -864,12 +864,12 @@ fn continuation_host(founded: bool, interior_installment: usize) -> Continuation
         observe_continuation(&carriers, &mut phase_mask, &mut deepest);
         if let Some(required_depth) = required_carrier_rebase_depth(&carriers) {
             let required_depth = usize::try_from(required_depth)
-                .expect("the host gate can address its required carrier depth");
+                .expect("the cpu gate can address its required carrier depth");
             let mut fresh = vec![0u32; carrier_row_words(required_depth)];
             assert_eq!(
                 rebase_carrier_row(&carriers, &mut fresh),
                 Some((carrier_depth, required_depth)),
-                "the host gate mounts exactly the enclosure reached by the live continuation"
+                "the cpu gate mounts exactly the enclosure reached by the live continuation"
             );
             carriers = fresh;
             continue;
@@ -976,7 +976,7 @@ fn continuation_cuda_dense(ctx: &Context, felt: &Function) -> Result<Continuatio
         if let Some(required_depth) = required_carrier_rebase_depth(&carriers) {
             let old_depth = manifold::carrier_row_depth(carriers.len());
             let required_depth = usize::try_from(required_depth)
-                .expect("the CUDA gate host can address its required carrier depth");
+                .expect("the CUDA gate cpu can address its required carrier depth");
             let mut fresh = vec![0u32; carrier_row_words(required_depth)];
             assert_eq!(
                 rebase_carrier_row(&carriers, &mut fresh),
@@ -1104,7 +1104,7 @@ fn continuation_cuda_founded(ctx: &Context, founded: &Function) -> Result<Contin
         if let Some(required_depth) = required_carrier_rebase_depth(&carriers) {
             let old_depth = manifold::carrier_row_depth(carriers.len());
             let required_depth = usize::try_from(required_depth)
-                .expect("the CUDA gate host can address its required carrier depth");
+                .expect("the CUDA gate cpu can address its required carrier depth");
             let mut fresh = vec![0u32; carrier_row_words(required_depth)];
             assert_eq!(
                 rebase_carrier_row(&carriers, &mut fresh),
@@ -1144,22 +1144,22 @@ fn continuation_cuda_founded(ctx: &Context, founded: &Function) -> Result<Contin
 
 fn continuation_case(ctx: &Context, function: &Function, founded: bool) -> Result<bool> {
     let tag = if founded { "founded" } else { "dense" };
-    let whole = continuation_host(founded, 0);
-    let stepped = continuation_host(founded, CONTINUATION_INSTALLMENT);
+    let whole = continuation_cpu(founded, 0);
+    let stepped = continuation_cpu(founded, CONTINUATION_INSTALLMENT);
     let card = if founded {
         continuation_cuda_founded(ctx, function)?
     } else {
         continuation_cuda_dense(ctx, function)?
     };
 
-    let host_owns = stepped.owns == whole.owns;
-    let host_carriers = stepped.carriers == whole.carriers;
-    let host_radiation = stepped.radiation == whole.radiation;
-    let host_counts = stepped.counts == whole.counts;
-    let host_phases = stepped.phase_mask == 0xff;
+    let cpu_owns = stepped.owns == whole.owns;
+    let cpu_carriers = stepped.carriers == whole.carriers;
+    let cpu_radiation = stepped.radiation == whole.radiation;
+    let cpu_counts = stepped.counts == whole.counts;
+    let cpu_phases = stepped.phase_mask == 0xff;
     let expected_depth = whole.deepest;
-    let host_deepest = stepped.deepest == expected_depth;
-    let host_resumed = stepped.resumed_deposit;
+    let cpu_deepest = stepped.deepest == expected_depth;
+    let cpu_resumed = stepped.resumed_deposit;
     let card_owns = card.owns == whole.owns;
     let card_carriers = card.carriers == whole.carriers;
     let card_radiation = card.radiation == whole.radiation;
@@ -1168,16 +1168,16 @@ fn continuation_case(ctx: &Context, function: &Function, founded: bool) -> Resul
     let card_deepest = card.deepest == expected_depth;
     let card_resumed = card.resumed_deposit;
     let rows = continuation_founded_row();
-    let host_canonical = !founded
+    let cpu_canonical = !founded
         || (validate_radiation(&whole.radiation, &rows).is_ok()
             && validate_radiation(&stepped.radiation, &rows).is_ok());
     let card_canonical = !founded || validate_radiation(&card.radiation, &rows).is_ok();
 
     println!(
-        "  {tag} host one-move: OWN {} · carrier/K {} · radiation {} · counts {} {:?} · canonical {} · phase {:#04x} {} · deepest {}/{} {} · resumed efferent deposit {}",
-        face(host_owns), face(host_carriers), face(host_radiation), face(host_counts), stepped.counts,
-        face(host_canonical), stepped.phase_mask, face(host_phases), stepped.deepest,
-        expected_depth, face(host_deepest), face(host_resumed),
+        "  {tag} cpu one-move: OWN {} · carrier/K {} · radiation {} · counts {} {:?} · canonical {} · phase {:#04x} {} · deepest {}/{} {} · resumed efferent deposit {}",
+        face(cpu_owns), face(cpu_carriers), face(cpu_radiation), face(cpu_counts), stepped.counts,
+        face(cpu_canonical), stepped.phase_mask, face(cpu_phases), stepped.deepest,
+        expected_depth, face(cpu_deepest), face(cpu_resumed),
     );
     println!(
         "  {tag} CUDA one-move: OWN {} · carrier/K {} · radiation {} · counts {} {:?} · canonical {} · phase {:#04x} {} · deepest {}/{} {} · resumed efferent deposit {}",
@@ -1185,9 +1185,9 @@ fn continuation_case(ctx: &Context, function: &Function, founded: bool) -> Resul
         face(card_canonical), card.phase_mask, face(card_phases), card.deepest,
         expected_depth, face(card_deepest), face(card_resumed),
     );
-    if !(host_owns && host_carriers) {
+    if !(cpu_owns && cpu_carriers) {
         report_divergence(
-            &format!("{tag} host continuation"),
+            &format!("{tag} cpu continuation"),
             &stepped.owns,
             &whole.owns,
             &stepped.carriers,
@@ -1203,21 +1203,21 @@ fn continuation_case(ctx: &Context, function: &Function, founded: bool) -> Resul
             &whole.carriers,
         );
     }
-    if !host_radiation {
+    if !cpu_radiation {
         report_radiation_divergence(&stepped.radiation, &whole.radiation);
     }
     if !card_radiation {
         report_radiation_divergence(&card.radiation, &whole.radiation);
     }
 
-    Ok(host_owns
-        && host_carriers
-        && host_radiation
-        && host_counts
-        && host_canonical
-        && host_phases
-        && host_deepest
-        && host_resumed
+    Ok(cpu_owns
+        && cpu_carriers
+        && cpu_radiation
+        && cpu_counts
+        && cpu_canonical
+        && cpu_phases
+        && cpu_deepest
+        && cpu_resumed
         && card_owns
         && card_carriers
         && card_radiation
@@ -1228,14 +1228,14 @@ fn continuation_case(ctx: &Context, function: &Function, founded: bool) -> Resul
         && card_resumed)
 }
 
-fn report_radiation_divergence(card: &[u32], host: &[u32]) {
-    if let Some(word) = card.iter().zip(host).position(|(card, host)| card != host) {
+fn report_radiation_divergence(card: &[u32], cpu: &[u32]) {
+    if let Some(word) = card.iter().zip(cpu).position(|(card, cpu)| card != cpu) {
         eprintln!(
-            "  founded: radiation diverges at row {} word {}: card {} host {}",
+            "  founded: radiation diverges at row {} word {}: card {} cpu {}",
             word / RADIATION_WORDS,
             word % RADIATION_WORDS,
             card[word],
-            host[word],
+            cpu[word],
         );
     }
 }
@@ -1244,24 +1244,24 @@ fn report_radiation_divergence(card: &[u32], host: &[u32]) {
 fn report_divergence(
     tag: &str,
     card_owns: &[u32],
-    host_owns: &[u32],
+    cpu_owns: &[u32],
     card_carriers: &[u32],
-    host_carriers: &[u32],
+    cpu_carriers: &[u32],
 ) {
-    if let Some(i) = card_owns.iter().zip(host_owns).position(|(c, h)| c != h) {
+    if let Some(i) = card_owns.iter().zip(cpu_owns).position(|(c, h)| c != h) {
         eprintln!(
-            "  {tag}: OWN diverges at word {i}: card {} host {}",
-            card_owns[i], host_owns[i]
+            "  {tag}: OWN diverges at word {i}: card {} cpu {}",
+            card_owns[i], cpu_owns[i]
         );
     }
     if let Some(i) = card_carriers
         .iter()
-        .zip(host_carriers)
+        .zip(cpu_carriers)
         .position(|(c, h)| c != h)
     {
         eprintln!(
-            "  {tag}: carrier diverges at word {i}: card {} host {}",
-            card_carriers[i], host_carriers[i]
+            "  {tag}: carrier diverges at word {i}: card {} cpu {}",
+            card_carriers[i], cpu_carriers[i]
         );
     }
 }
@@ -1340,7 +1340,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    //! Host-side gates of the reference path (no GPU). They exercise the exact
+    //! Cpu-side gates of the reference path (no GPU). They exercise the exact
     //! `carry_dense_stroke`/`carry_founded_stroke` calls the card is compared against, proving the
     //! reference is deterministic (the property byte-exactness relies on) and non-vacuous (the
     //! carrier/K row is always packed on a completed stroke), before the card is ever touched.
@@ -1369,8 +1369,8 @@ mod tests {
     fn one_move_continuation_is_the_uninterrupted_construction_for_both_species() {
         for founded in [false, true] {
             let tag = if founded { "founded" } else { "dense" };
-            let whole = continuation_host(founded, 0);
-            let stepped = continuation_host(founded, CONTINUATION_INSTALLMENT);
+            let whole = continuation_cpu(founded, 0);
+            let stepped = continuation_cpu(founded, CONTINUATION_INSTALLMENT);
             assert_eq!(
                 stepped.owns, whole.owns,
                 "{tag} one-move continuation preserves final OWN"
@@ -1431,7 +1431,7 @@ mod tests {
             let b = dense_reference(lanes, &standing, &packed, &rows);
             assert_eq!(
                 a, b,
-                "the dense host reference is deterministic ({lanes} lanes)"
+                "the dense cpu reference is deterministic ({lanes} lanes)"
             );
             assert!(
                 a.1.iter().any(|&w| w != 0),
@@ -1451,7 +1451,7 @@ mod tests {
             let b = founded_reference(lanes, &standing, &packed, &rows, total_own_cells);
             assert_eq!(
                 a, b,
-                "the founded host reference is deterministic ({lanes} lanes)"
+                "the founded cpu reference is deterministic ({lanes} lanes)"
             );
             assert!(
                 a.1.iter().any(|&w| w != 0),
@@ -1465,7 +1465,7 @@ mod tests {
             assert_eq!(
                 validate_radiation(&a.3, &rows),
                 Ok(()),
-                "every host radiation row is typed and every lane begins with zero padding ({lanes} lanes)"
+                "every cpu radiation row is typed and every lane begins with zero padding ({lanes} lanes)"
             );
             assert_eq!(
                 a.3.len(),

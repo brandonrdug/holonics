@@ -83,8 +83,8 @@ Instrumented at `LivePin::rebase_exposed`, one run of
 `soma/life/examples/eros_agentic_research_conversation.rs`:
 
 ```text
-|αβ̄| = 0          161,642 of 162,990 comparisons        (99.2%)
-|a−b| ≠ 0         97.8% of those
+|αβ̄| = 0          161,642 : 162,990 comparisons
+|a−b| ≠ 0         158,096 : 161,642 of those
 wound              0
 hand residual      0
 rode               1,348
@@ -131,7 +131,7 @@ body'… An unconstructible relating is NOT READ: no test, no cut, no ride — n
 strand this pole cannot see."*
 
 The measurement is therefore **not** that an invariant broke. It is that the machine is asking
-99.2% of its questions **from a pole standing on one of the two things it is asking about**, so the
+161,642 of 162,990 of its questions **from a pole standing on one of the two things it is asking about**, so the
 answer is lawfully behind its own horizon and lawfully discarded. Nothing is wrong with the
 arithmetic; the pole is wrong.
 
@@ -187,7 +187,7 @@ horizon."*
 
 Two wheels of radii `r₁, r₂` give `r₁/r₂` and its inverse. Set `r₁ = 0` and there is no bad gear
 ratio — **there is one wheel**: nothing meshes, nothing turns, no torque crosses. That is the
-machine's state at 99.2% of its contacts, and it is the same sentence as Brandon's ruling on the whip
+machine's state at 161,642 of 162,990 of its contacts, and it is the same sentence as Brandon's ruling on the whip
 — *"It doesn't amplify it. Gear ratios."*
 
 Plato's construction is the same move from the other side: between two extremes one **inserts a
@@ -707,18 +707,18 @@ so the pole is `LivingFrame::tip()`, and `channel.rs:197-206` returns **the anch
 `sweep == place::origin()`. One full run of `eros_agentic_research_conversation`:
 
 ```text
-   pole_on_from      14,292      68.0%
-   pole_on_to         4,106      19.5%
-   pole_distinct      2,672      12.7%   <- the only contacts that can carry geometry at all
-   sweep_idle        21,070     100.0%   <- EVERY contact, without exception
-   relata_coincide   14,280      67.8%   <- from == to; not even a two-body contact
+   pole_on_from      14,292 : 21,070
+   pole_on_to         4,106 : 21,070
+   pole_distinct      2,672 : 21,070   <- the only contacts that can carry geometry at all
+   sweep_idle        21,070 : 21,070   <- EVERY contact, without exception
+   relata_coincide   14,280 : 21,070   <- from == to; not even a two-body contact
 ```
 
 **Three separate facts, and the third is the one that orders the others.**
 
-1. **The pole stands on a relatum in 87% of contacts**, which is what §2 deduced from the arithmetic
+1. **The pole stands on a relatum in 18,398 of 21,070 contacts**, which is what §2 deduced from the arithmetic
    alone. The deduction is now measured directly rather than inferred through the zero-product step.
-2. **In 68% the two relata are the same place**, so the three-body relating is being asked of one
+2. **In 14,280 of 21,070 the two relata are the same place**, so the three-body relating is being asked of one
    point presented three times. `zero_reach` at the comparison site is the same fact downstream.
 3. **The lineage channel never sweeps — 21,070 of 21,070.** The frame is frozen at genesis for the
    entire run, so the pole is the body's starting place from first contact to last.
@@ -767,7 +767,7 @@ frozen pole.** A later sweep of this repository should read that as the general 
 ### The falsifier, and it is one number
 
 Fold the lineage channel on the directed-event path, or seed a non-degenerate sweep, and
-`pole_distinct` must rise from 12.7% **while `found` leaves zero**. If `pole_distinct` rises and
+`pole_distinct` must rise from `2,672 : 21,070` **while `found` leaves zero**. If `pole_distinct` rises and
 `found` stays at zero, the two-axis reading is wrong and the obstruction is elsewhere. If
 `sweep_idle` falls and nothing else moves, the fold was cosmetic.
 
@@ -788,3 +788,12 @@ reference, and the measured `9:8` face in `prime-ratio-closure-0{1,2}`.
 absence claimed from a search over *names* when the owner is named something else. `CLAUDE.md`
 already says it — *grep the operation, then read the module* — and the same session that quoted that
 rule committed the error. **A path search can never establish a content absence.**
+
+---
+
+**PERCENTAGES CONVERTED 2026-08-15.** This record carried twelve percentages, written and then
+edited again after the ruling that *percentages are the same as floats* — a magnitude produced by
+dividing, which cannot cross a frame boundary. Every one is now the undivided pair it was taken
+from, and no figure changed: `pole_on_from 14,292 : 21,070` is the same measurement `68.0%` was.
+The correction had been applied to the conversation and not to the artifact, which is why it
+survived into the commit.

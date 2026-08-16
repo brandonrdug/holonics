@@ -4,17 +4,17 @@
 //! `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`,
 //! and it names the failure this module exists to prevent:**
 //!
-//! > *"A short exact card kernel placed at the end of that host-owned passage does not make the card
+//! > *"A short exact card kernel placed at the end of that cpu-owned passage does not make the card
 //! > the owner of the current. … The GPU did not fall back. The operative machine never crossed its
 //! > boundary."*
 //!
 //! and it fixes the ontology:
 //!
-//! > *"CPU/RAM and GPU/VRAM are local charts of the same caused body. A host-device copy is a codec
+//! > *"CPU/RAM and GPU/VRAM are local charts of the same caused body. A cpu-device copy is a codec
 //! > and transport morphism between separately addressed memory sections. It is not serialization of
 //! > a second semantic world."*
 //!
-//! > *"A GPU lane, warp, block, buffer address, page, stream, and host thread are **realization
+//! > *"A GPU lane, warp, block, buffer address, page, stream, and cpu thread are **realization
 //! > coordinates**; none is automatically a holon, receiver, or source identity."*
 //!
 //! So this module builds neither a "GPU backend" nor a "CPU fallback". It builds a **cover**: a
@@ -31,7 +31,7 @@
 //! Every quantity below comes from one of exactly two places:
 //!
 //! - **the surface declaring itself** — the device through `soma/mount`'s `Device::attribute` and
-//!   `Device::launch_census`, the host through `std::thread::available_parallelism`. A device's warp
+//!   `Device::launch_census`, the cpu through `std::thread::available_parallelism`. A device's warp
 //!   size is not a number this project chooses; it is the device's answer about the device.
 //! - **the material** — how many members a cell has, how many cells there are.
 //!
@@ -82,18 +82,18 @@ use num_bigint::BigUint;
 /// Which chart of the physical ecology a section is realized on.
 ///
 /// A chart is **not** a receiver and **not** a holon. The record is explicit: lanes, warps, blocks
-/// and host threads are *realization coordinates*. This type names where work was placed, and
+/// and cpu threads are *realization coordinates*. This type names where work was placed, and
 /// carries no semantic authority whatever.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ChartId {
-    Host,
+    Cpu,
     Device(i32),
 }
 
 impl std::fmt::Display for ChartId {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ChartId::Host => write!(formatter, "host"),
+            ChartId::Cpu => write!(formatter, "cpu"),
             ChartId::Device(ordinal) => write!(formatter, "device{ordinal}"),
         }
     }
@@ -139,15 +139,15 @@ impl DeviceDeclaration {
     }
 }
 
-/// The host's own answer about itself.
+/// The cpu's own answer about itself.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct HostDeclaration {
-    /// `std::thread::available_parallelism`, which is the host stating its own width.
+pub struct CpuDeclaration {
+    /// `std::thread::available_parallelism`, which is the cpu stating its own width.
     pub lanes: u32,
 }
 
-impl HostDeclaration {
-    /// The host declares itself. Never authored; never an environment override, because an override
+impl CpuDeclaration {
+    /// The cpu declares itself. Never authored; never an environment override, because an override
     /// is a knob and a knob is what this module exists to remove.
     pub fn declare() -> Self {
         Self {
@@ -165,34 +165,34 @@ impl HostDeclaration {
 /// One chart of the cover, with what it said about itself.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Chart {
-    Host(HostDeclaration),
+    Cpu(CpuDeclaration),
     Device(DeviceDeclaration),
 }
 
 impl Chart {
     pub fn id(&self) -> ChartId {
         match self {
-            Chart::Host(_) => ChartId::Host,
+            Chart::Cpu(_) => ChartId::Cpu,
             Chart::Device(device) => ChartId::Device(device.ordinal),
         }
     }
 
     /// **The chart's grain: the smallest cell that does not leave lanes idle.**
     ///
-    /// The host issues per lane, so its grain is one. The device issues per **warp** — every
+    /// The cpu issues per lane, so its grain is one. The device issues per **warp** — every
     /// lane of a warp executes together, so a cell smaller than a warp leaves `warp_size − n` lanes
     /// doing nothing. This is the one structural difference between the two charts, and it is read
     /// off the device rather than chosen.
     pub fn grain(&self) -> u64 {
         match self {
-            Chart::Host(_) => 1,
+            Chart::Cpu(_) => 1,
             Chart::Device(device) => u64::from(device.warp_size.max(1)),
         }
     }
 
     pub fn resident_lanes(&self) -> u64 {
         match self {
-            Chart::Host(host) => host.resident_lanes(),
+            Chart::Cpu(cpu) => cpu.resident_lanes(),
             Chart::Device(device) => device.resident_lanes(),
         }
     }
@@ -239,7 +239,7 @@ pub struct HardwareCover {
 }
 
 impl HardwareCover {
-    /// Form the cover from the host's own declaration plus whatever the **caller** obtained from
+    /// Form the cover from the cpu's own declaration plus whatever the **caller** obtained from
     /// the device.
     ///
     /// **The engine does not query the card, and that is a structural fact rather than a gap.**
@@ -255,7 +255,7 @@ impl HardwareCover {
     /// So the engine owns the **law** — which chart, licensed by what proof — and the physical
     /// surface is declared by a caller that can reach it.
     pub fn over(device: Option<DeviceDeclaration>) -> Self {
-        let mut charts = vec![Chart::Host(HostDeclaration::declare())];
+        let mut charts = vec![Chart::Cpu(CpuDeclaration::declare())];
         let mut refusals = Vec::new();
         match device {
             Some(device) => charts.push(Chart::Device(device)),
@@ -264,11 +264,11 @@ impl HardwareCover {
         Self { charts, refusals }
     }
 
-    /// A cover of exactly the host. Used where a caller declares that no device participates, and by
+    /// A cover of exactly the cpu. Used where a caller declares that no device participates, and by
     /// the determinism controls, which require the cover to be varied.
-    pub fn host_only() -> Self {
+    pub fn cpu_only() -> Self {
         Self {
-            charts: vec![Chart::Host(HostDeclaration::declare())],
+            charts: vec![Chart::Cpu(CpuDeclaration::declare())],
             refusals: Vec::new(),
         }
     }
@@ -299,18 +299,18 @@ impl HardwareCover {
     pub fn device(&self) -> Option<&DeviceDeclaration> {
         self.charts.iter().find_map(|chart| match chart {
             Chart::Device(device) => Some(device),
-            Chart::Host(_) => None,
+            Chart::Cpu(_) => None,
         })
     }
 
-    pub fn host(&self) -> &HostDeclaration {
+    pub fn cpu(&self) -> &CpuDeclaration {
         self.charts
             .iter()
             .find_map(|chart| match chart {
-                Chart::Host(host) => Some(host),
+                Chart::Cpu(cpu) => Some(cpu),
                 Chart::Device(_) => None,
             })
-            .expect("the host chart always declares")
+            .expect("the cpu chart always declares")
     }
 
     /// Every lane the whole cover can hold resident at once, summed across charts.
@@ -333,7 +333,7 @@ pub struct ModeIdentity {
     pub abi: &'static str,
     /// `P` — the kernel identity: which PTX, by name.
     pub kernel: &'static str,
-    /// `D` — the device capability, **as the device stated it**. `None` for a host-only mode.
+    /// `D` — the device capability, **as the device stated it**. `None` for a cpu-only mode.
     pub device: Option<String>,
     /// `A` — the arithmetic tier. This body is exact; a float tier would be a different mode.
     pub arithmetic: &'static str,
@@ -441,8 +441,8 @@ pub struct SectionWork {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Barrier {
     /// A cell is claimed more than once. `charts` carries one entry per CLAIM, with multiplicity,
-    /// so two sections reads `[Host(0), Device(0)]` and one section holding an index twice reads
-    /// `[Host(0), Host(0)]`. Counting sections rather than claims made the second invisible.
+    /// so two sections reads `[Cpu(0), Device(0)]` and one section holding an index twice reads
+    /// `[Cpu(0), Cpu(0)]`. Counting sections rather than claims made the second invisible.
     SharedCell { cell: usize, charts: Vec<ChartId> },
     /// A cell of the front reached no chart. Silent loss is the failure this catches.
     UnplacedCell { cell: usize },
@@ -514,10 +514,10 @@ impl CoverDecomposition {
     /// The law, and it contains no number:
     ///
     /// > A cell is placed on the **coarsest** chart whose grain its own extent fills. A cell
-    /// > that fills no chart's grain but the host's goes to the host.
+    /// > that fills no chart's grain but the cpu's goes to the cpu.
     ///
     /// On a two-chart cover that reads: a cell with at least `warp_size` members fills a warp and
-    /// goes to the device; a smaller cell would leave device lanes idle and goes to the host, whose
+    /// goes to the device; a smaller cell would leave device lanes idle and goes to the cpu, whose
     /// grain is one and which therefore wastes nothing on any cell.
     ///
     /// `warp_size` is the **device's answer about itself**. The comparison is the *material* against
@@ -628,8 +628,8 @@ impl CoverDecomposition {
                     }
                 }
                 _ => {
-                    // One entry per CLAIM, so two sections read `[Host, Device]` and one section
-                    // holding an index twice reads `[Host, Host]`.
+                    // One entry per CLAIM, so two sections read `[Cpu, Device]` and one section
+                    // holding an index twice reads `[Cpu, Cpu]`.
                     let mut charts = Vec::new();
                     for section in &self.sections {
                         for held in &section.cells {
@@ -739,15 +739,15 @@ mod tests {
             .collect()
     }
 
-    /// The host always declares, and it declares something the machine actually has.
+    /// The cpu always declares, and it declares something the machine actually has.
     #[test]
-    fn the_host_declares_itself() {
-        let host = HostDeclaration::declare();
-        assert!(host.lanes >= 1, "the host must state at least one lane");
-        let cover = HardwareCover::host_only();
+    fn the_cpu_declares_itself() {
+        let cpu = CpuDeclaration::declare();
+        assert!(cpu.lanes >= 1, "the cpu must state at least one lane");
+        let cover = HardwareCover::cpu_only();
         assert_eq!(cover.charts().len(), 1);
-        assert_eq!(cover.host().lanes, host.lanes);
-        assert_eq!(cover.charts()[0].grain(), 1, "a host lane is one");
+        assert_eq!(cover.cpu().lanes, cpu.lanes);
+        assert_eq!(cover.charts()[0].grain(), 1, "a cpu lane is one");
     }
 
     /// **The decomposition is by the material against the chart's own grain, and it moves.**
@@ -758,7 +758,7 @@ mod tests {
     fn the_material_decides_which_chart_and_both_receive_work() {
         let cover = HardwareCover {
             charts: vec![
-                Chart::Host(HostDeclaration { lanes: 8 }),
+                Chart::Cpu(CpuDeclaration { lanes: 8 }),
                 Chart::Device(stated_device(32, 1024, 80)),
             ],
             refusals: Vec::new(),
@@ -782,11 +782,11 @@ mod tests {
             .iter()
             .find(|section| matches!(section.chart, ChartId::Device(_)))
             .expect("a device section");
-        let host = decomposition
+        let cpu = decomposition
             .sections
             .iter()
-            .find(|section| section.chart == ChartId::Host)
-            .expect("a host section");
+            .find(|section| section.chart == ChartId::Cpu)
+            .expect("a cpu section");
 
         assert_eq!(
             device.cells.iter().map(|g| g.extent).collect::<Vec<_>>(),
@@ -794,7 +794,7 @@ mod tests {
             "exactly the cells that fill a warp"
         );
         assert_eq!(
-            host.cells.iter().map(|g| g.extent).collect::<Vec<_>>(),
+            cpu.cells.iter().map(|g| g.extent).collect::<Vec<_>>(),
             vec![1, 2, 31],
             "exactly the cells that would idle device lanes"
         );
@@ -807,14 +807,14 @@ mod tests {
         let population = front(&[8, 40]);
         let narrow = HardwareCover {
             charts: vec![
-                Chart::Host(HostDeclaration { lanes: 8 }),
+                Chart::Cpu(CpuDeclaration { lanes: 8 }),
                 Chart::Device(stated_device(4, 256, 20)),
             ],
             refusals: Vec::new(),
         };
         let wide = HardwareCover {
             charts: vec![
-                Chart::Host(HostDeclaration { lanes: 8 }),
+                Chart::Cpu(CpuDeclaration { lanes: 8 }),
                 Chart::Device(stated_device(64, 1024, 20)),
             ],
             refusals: Vec::new(),
@@ -856,7 +856,7 @@ mod tests {
     #[test]
     fn a_decomposition_that_loses_or_duplicates_a_cell_is_refused_by_name() {
         let population = front(&[64, 64]);
-        let cover = HardwareCover::host_only();
+        let cover = HardwareCover::cpu_only();
         let mut dropped = CoverDecomposition::of(&cover, &population, "test");
         dropped.sections[0].cells.pop();
         match dropped.independence(&population) {
@@ -890,7 +890,7 @@ mod tests {
     #[test]
     fn the_certificate_refuses_a_placement_that_is_not_a_partition_of_its_own_front() {
         let population = front(&[64, 64]);
-        let cover = HardwareCover::host_only();
+        let cover = HardwareCover::cpu_only();
 
         // (1) The same address, a different extent. Index presence is unchanged.
         let mut restated = CoverDecomposition::of(&cover, &population, "test");
@@ -1018,7 +1018,7 @@ mod tests {
         };
         let serial = expand_front(
             front.clone(),
-            &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 1 })]),
+            &HardwareCover::of_charts(vec![Chart::Cpu(CpuDeclaration { lanes: 1 })]),
             |cell| cell % 7 + 1,
             expand,
         )
@@ -1026,7 +1026,7 @@ mod tests {
         for lanes in [2u32, 3, 8, 64] {
             let covered = expand_front(
                 front.clone(),
-                &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes })]),
+                &HardwareCover::of_charts(vec![Chart::Cpu(CpuDeclaration { lanes })]),
                 |cell| cell % 7 + 1,
                 expand,
             )
@@ -1048,7 +1048,7 @@ mod tests {
         let front: Vec<u64> = (0..64).collect();
         let outcome = expand_front(
             front,
-            &HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes: 8 })]),
+            &HardwareCover::of_charts(vec![Chart::Cpu(CpuDeclaration { lanes: 8 })]),
             |_| 1,
             |cell| {
                 if cell == 47 {
@@ -1062,24 +1062,24 @@ mod tests {
     }
 
     /// The mode identity carries the device capability, which the record makes a constituent of
-    /// admission. A host-only mode must be distinguishable from a covered one.
+    /// admission. A cpu-only mode must be distinguishable from a covered one.
     #[test]
-    fn the_mode_identity_distinguishes_a_covered_body_from_a_host_only_one() {
+    fn the_mode_identity_distinguishes_a_covered_body_from_a_cpu_only_one() {
         let covered = HardwareCover {
             charts: vec![
-                Chart::Host(HostDeclaration { lanes: 8 }),
+                Chart::Cpu(CpuDeclaration { lanes: 8 }),
                 Chart::Device(stated_device(32, 1024, 80)),
             ],
             refusals: Vec::new(),
         };
-        let alone = HardwareCover::host_only();
+        let alone = HardwareCover::cpu_only();
         let with = ModeIdentity::of(&covered, "law", "abi", "kernel");
         let without = ModeIdentity::of(&alone, "law", "abi", "kernel");
         assert!(with.device.is_some());
         assert!(without.device.is_none());
         assert_ne!(with, without, "changing D must reopen admission");
-        assert_eq!(with.apparatus, "host+device0");
-        assert_eq!(without.apparatus, "host");
+        assert_eq!(with.apparatus, "cpu+device0");
+        assert_eq!(without.apparatus, "cpu");
     }
 }
 
@@ -1163,7 +1163,7 @@ where
     Successor: Send,
     Failure: Send,
 {
-    let lanes = cover.host().lanes.max(1).min(front.len().max(1) as u32) as usize;
+    let lanes = cover.cpu().lanes.max(1).min(front.len().max(1) as u32) as usize;
     if lanes <= 1 || front.len() <= 1 {
         let mut out = Vec::new();
         for cell in front {

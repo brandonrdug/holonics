@@ -281,12 +281,12 @@ describing the simulation in English is a later codec projection.
 `established-bounded [implemented-exact]`: the live body now has the finite constitutive seam.
 `DeclaredContactFace` survives on every admitted bond as exterior lineage, while
 `CausalSectionEcology` classifies roots only through exact receiver observations and complete
-successor histories. Its production read requires the resident generic CUDA quotient; the host
+successor histories. Its production read requires the resident generic CUDA quotient; the CPU
 reader exists only under test as an admission reference. On seven declared presentations, 34 exact
 device launches return three sum codecs in one stable fiber, two product codecs in another,
 one-step separators for same-value/different-law and reversed-port controls, receiver-ablation
 coarsening, renaming invariance, exact work, and the open exterior. Compute-sanitizer returns zero
-errors and the complete semantic reading equals the independent host admission reading. The
+errors and the complete semantic reading equals the independent CPU admission reading. The
 complete receipt and boundary are in the construction-evidence record above.
 
 `established-bounded [implemented-exact]`: the fourth return now carries the finite constitutive seam
@@ -312,7 +312,7 @@ departure, discover an unrestricted law family, or return the complete mount-to-
 as one continuing resident ecology. Existing bounded organs separately own incidence, diffusion,
 higher cells, receiver condensation, returned reading, and morphology; their missing relation is
 the joined circulation in which radiation returns, deposits an attributable change, and later
-current rides that changed morphology without host semantic phase choreography. Closing the
+current rides that changed morphology without CPU semantic phase choreography. Closing the
 bounded return creates no Transformer, Reasoner, Planner, Conversation, Expert, Language,
 Schedule, Stack, or ControlFlow subsystem.
 
@@ -320,7 +320,7 @@ Schedule, Stack, or ControlFlow subsystem.
 
 `project-postulate`: composition precedes new organs. Before naming a new subsystem, route the
 required consequence through the existing typed owners and exhibit the exact missing port,
-constitutive relation, or return if that composition refuses. A host-authored invocation sequence
+constitutive relation, or return if that composition refuses. A CPU-authored invocation sequence
 does not close the reasoning cycle.
 
 Any later construction must use mixed material without material-kind routing;

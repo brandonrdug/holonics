@@ -38,7 +38,7 @@
 //! ```
 //!
 //! **Under unified virtual addressing a `CUdeviceptr` is a process virtual address**, so
-//! `cuMemAddressReserve` is charged against the *host* `RLIMIT_AS`. The level and the process
+//! `cuMemAddressReserve` is charged against the *cpu* `RLIMIT_AS`. The level and the process
 //! limit are one constraint, not two: `RESIDENT_LOGICAL_WORD_RESERVATION` makes the resident text
 //! mount demand ≈86 GB of process VA, and therefore makes the organ unmountable under any
 //! `ulimit -v` below roughly 90 GB — a bound no caller can discover from the API, and one nothing
@@ -164,7 +164,7 @@ fn main() {
         "  But it does NOT bound the card. Run this with and without `ulimit -v` and read STATION 4:"
     );
     println!(
-        "  the reservation is charged to the HOST process address space through unified addressing,"
+        "  the reservation is charged to the CPU process address space through unified addressing,"
     );
     println!(
         "  so the level's real orbit is the process limit a caller may set, not the device it fits."

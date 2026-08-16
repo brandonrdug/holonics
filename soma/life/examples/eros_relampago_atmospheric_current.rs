@@ -50,7 +50,7 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_membrane::{
-    ContemporaryRadiation, HostLiveCurrentExecutor, LiveCurrentExecutor, LiveCurrentMachine,
+    ContemporaryRadiation, CpuLiveCurrentExecutor, LiveCurrentExecutor, LiveCurrentMachine,
     LiveCurrentRestImage, SparseStandingSurface,
 };
 
@@ -500,10 +500,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         SparseStandingSurface::empty_rank(8).map_err(|error| format!("{error:?}"))?,
     );
     let (mut coupled_executor, coupled_device): (Box<dyn LiveCurrentExecutor>, String) =
-        if std::env::var_os("SOMA_RELAMPAGO_HOST").is_some() {
+        if std::env::var_os("SOMA_RELAMPAGO_CPU").is_some() {
             (
-                Box::new(HostLiveCurrentExecutor),
-                "host exact reference".to_owned(),
+                Box::new(CpuLiveCurrentExecutor),
+                "cpu exact reference".to_owned(),
             )
         } else {
             let cuda = CudaLiveCurrentExecutor::new(0).map_err(|error| format!("{error:?}"))?;

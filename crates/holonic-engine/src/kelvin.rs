@@ -42,7 +42,7 @@
 //!
 //! ## What this does not claim
 //!
-//! Not Navier–Stokes, not existence or smoothness, not viscosity, not a fluid solver. The host
+//! Not Navier–Stokes, not existence or smoothness, not viscosity, not a fluid solver. The cpu
 //! module's own bound stands unsoftened: *"an exact finite conservative advection law, not a
 //! relabelling of diffusion or a claim to complete Navier–Stokes."* A complete exact-rational fluid
 //! body existed in the laboratory and Brandon ruled on 2026-08-08 that such partials be **lifted and

@@ -447,7 +447,7 @@ reappearing under different names.
   exactly what the other consumes, both ways, and **neither file references the other**. `temper` has
   in-degree 0 from everything.
 - **`supported_realizers::positive_form` → `inertia::from_integer_matrix`.** The positive form `MᵀM`
-  and the inertia split are joined by an `assert_eq!` at `supported_realizers.rs:276` — inside the
+  and the inertia split are joined by an `assert_eq!` at `supported_realizers.rs:295` — inside the
   `#[cfg(test)]` module opened at `:273` — and by nothing on any conduct path. `CLAUDE.md` §2's
   realization-causes-placement chain runs through exactly this pair.
 - **`matroid_chow::generator_pairing` (the Hodge–Riemann pairing) → `winding_inertia::from_symmetric_form`:

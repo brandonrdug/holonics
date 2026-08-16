@@ -1,7 +1,7 @@
 //! Device-local rebasing of complete REGISTER carrier rows.
 //!
-//! The host reads only the three-word substrate status and constructs the next physical lane
-//! layout.  The live carrier body never returns to host memory: one CUDA worker moves each exact
+//! The cpu reads only the three-word substrate status and constructs the next physical lane
+//! layout.  The live carrier body never returns to cpu memory: one CUDA worker moves each exact
 //! row into a fresh allocation and the old allocation remains immutable until completion.
 
 use crate::cuda::LaunchCensus;
@@ -83,7 +83,7 @@ fn planned_lanes(
             let required = usize::try_from(required).map_err(|_| {
                 boundary(
                     "carrier rebase request",
-                    "required carrier depth exceeds the host extent wire",
+                    "required carrier depth exceeds the cpu extent wire",
                 )
             })?;
             let old_depth = manifold::carrier_row_depth(old_words);
@@ -135,7 +135,7 @@ pub fn launch_register_carrier_rebase(
     if rebase.old_lanes.len() != rebase.old_lane_words.len() {
         return Err(boundary(
             "carrier rebase layout",
-            "host and device old-lane extents differ",
+            "cpu and device old-lane extents differ",
         ));
     }
     let (lane_words, fresh_words) = planned_lanes(

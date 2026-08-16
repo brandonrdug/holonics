@@ -232,4 +232,11 @@ the ruling above is rendered by `examples/grown_circuit_schedules.rs` as text an
 through `certified_face` and `presentation_gauge`. **The rendering organ has never been pointed at
 the object it was commissioned for.**
 
+**Re-measured 2026-08-15, and it HOLDS.**
+`grep -n "<svg" crates/holonic-engine/examples/generative_transport_prediction.rs crates/holonic-engine/examples/inverse_transport_reconstruction.rs`
+returns `:215` and `:291` — both still hand-write the element — and
+`grep -c "certified_face\|presentation_gauge" crates/holonic-engine/examples/grown_circuit_schedules.rs`
+returns 0. The rendering organ's only consumers remain `src/model_surface.rs` and
+`examples/certified_presentation_workbench.rs`.
+
 ---

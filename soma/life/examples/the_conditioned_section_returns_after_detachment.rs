@@ -176,7 +176,7 @@ struct ApparatusReceipt {
     quotient_device: String,
     quotient_launches: u64,
     quotient_threads_per_block: u32,
-    host_semantic_replay: bool,
+    cpu_semantic_replay: bool,
 }
 
 #[derive(Serialize)]
@@ -385,7 +385,7 @@ fn run() -> Result<(), String> {
         quotient_device: quotient_card.device_name().to_owned(),
         quotient_launches,
         quotient_threads_per_block: quotient_card.block_threads(),
-        host_semantic_replay: false,
+        cpu_semantic_replay: false,
     };
     let founding_coordinates = vec![[2, 2], [3, 2], [2, 3], [3, 3]];
     let later_coordinates = vec![[0, 0], [1, 0], [0, 1], [1, 1]];

@@ -47,7 +47,7 @@
 //! controls, in **0.21 s**.
 //!
 //! The cost wall is real and is now measured rather than hit, on caller-declared slices of that
-//! same cache (argv[2], debug profile, one host core):
+//! same cache (argv[2], debug profile, one cpu core):
 //!
 //! ```text
 //!   files   items   collapsed pairs   junctions   compress    certify_founding_orders   peak RSS
@@ -300,7 +300,7 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
     if certificate.lineage_changed_the_verdict() {
         println!("\n    >>> LINEAGE COMPARISON CHANGED THE VERDICT. A certificate comparing only");
         println!("    >>> final states would have returned the other answer. That is the defect");
-        println!("    >>> `2026-08-02_THE_HOST_FOREMAN...` convicts: endpoint equality became");
+        println!("    >>> `2026-08-02_THE_CPU_FOREMAN...` convicts: endpoint equality became");
         println!("    >>> stateful equivalence.");
     }
 

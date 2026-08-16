@@ -226,17 +226,17 @@ impl CudaLiveCurrentExecutor {
         &mut self,
         standing: &SparseStandingSurface,
     ) -> Result<ResidentStanding, LiveCurrentError> {
-        let (axis, host) = standing_words(standing)?;
-        let device = upload(&host)?;
+        let (axis, cpu) = standing_words(standing)?;
+        let device = upload(&cpu)?;
         self.standing_full_mounts = self
             .standing_full_mounts
             .checked_add(1)
             .ok_or(LiveCurrentError::ResourceReservation)?;
-        add_words(&mut self.standing_host_words, host.len())?;
+        add_words(&mut self.standing_cpu_words, cpu.len())?;
         Ok(ResidentStanding {
             axis,
             logical: standing.clone(),
-            words: host.len(),
+            words: cpu.len(),
             device,
         })
     }
@@ -251,7 +251,7 @@ impl CudaLiveCurrentExecutor {
                 soma_membrane::SparseStandingError::StandingChanged,
             ));
         }
-        let (axis, host) = standing_words(successor)?;
+        let (axis, cpu) = standing_words(successor)?;
         if axis != before.axis || successor.rank() != before.logical.rank() {
             return self.mount_standing(successor);
         }
@@ -272,11 +272,11 @@ impl CudaLiveCurrentExecutor {
             return Err(LiveCurrentError::ResourceReservation);
         }
 
-        let device = DeviceBuffer::alloc_zeroed(host.len()).map_err(substrate)?;
+        let device = DeviceBuffer::alloc_zeroed(cpu.len()).map_err(substrate)?;
         device
-            .copy_range_from_slice(0, &host[..cuda::STANDING_HEADER_WORDS])
+            .copy_range_from_slice(0, &cpu[..cuda::STANDING_HEADER_WORDS])
             .map_err(substrate)?;
-        let mut host_words = cuda::STANDING_HEADER_WORDS;
+        let mut cpu_words = cuda::STANDING_HEADER_WORDS;
         let mut device_words = 0usize;
         let mut before_at = 0usize;
         for (after_at, after) in after_cells.iter().copied().enumerate() {
@@ -304,20 +304,20 @@ impl CudaLiveCurrentExecutor {
                 device
                     .copy_range_from_slice(
                         destination,
-                        &host[destination..destination + cuda::STANDING_ROW_WORDS],
+                        &cpu[destination..destination + cuda::STANDING_ROW_WORDS],
                     )
                     .map_err(substrate)?;
-                host_words = host_words
+                cpu_words = cpu_words
                     .checked_add(cuda::STANDING_ROW_WORDS)
                     .ok_or(LiveCurrentError::ResourceReservation)?;
             }
         }
-        add_words(&mut self.standing_host_words, host_words)?;
+        add_words(&mut self.standing_cpu_words, cpu_words)?;
         add_words(&mut self.standing_device_words, device_words)?;
         Ok(ResidentStanding {
             axis,
             logical: successor.clone(),
-            words: host.len(),
+            words: cpu.len(),
             device,
         })
     }

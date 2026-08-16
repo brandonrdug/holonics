@@ -104,7 +104,7 @@ realize the same obligation.
 
 A returned output may re-enter only through an explicit feedback port, rest closure, or recurrent
 front receipt. A genuine recurrent frontier is a surviving caused boundary; a display loop, clock
-tick, polling pass, or host phase does not create another event.
+tick, polling pass, or CPU phase does not create another event.
 
 ## 7. Receiver equivalence and compression
 

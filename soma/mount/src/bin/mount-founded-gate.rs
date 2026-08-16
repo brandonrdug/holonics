@@ -1,21 +1,21 @@
 //! mount-founded-gate — the M5 rung of the CUDA/PTX mount recut. It gates the CUDA port of the
 //! FOUNDED-CELL fold (`link_founded_grain` · `link_founded_sum`, resolved by the shared
-//! `link_finish`) BYTE-EXACT against the host reference fold, on the headless RTX 4080 SUPER.
+//! `link_finish`) BYTE-EXACT against the cpu reference fold, on the headless RTX 4080 SUPER.
 //!
 //!   stage a reservation-sized OWN buffer (a concatenation of live founded cells, each carrying its
 //!   founding POSITION beside its accumulated form, built through `body`'s law) ⊕ a dense pre-light
-//!   standing plane -> compute the host reference with `body::medium::integrate` per receiving grip
+//!   standing plane -> compute the cpu reference with `body::medium::integrate` per receiving grip
 //!   (the SAME fold the SPIR-V card reproduces; each founded cell re-grounds to its standing grip via
 //!   `place::ground`) -> upload -> dispatch the two founded passes and the shared finish in the same
 //!   two-pass geometry the wgpu card uses (block 64, 2-D grid, the dispatch boundary is the pass
 //!   boundary) -> read back -> assert the card's final standing, topology reads, touched map, and the
-//!   untouched OWN reservation are BYTE-EXACT with the host's.
+//!   untouched OWN reservation are BYTE-EXACT with the cpu's.
 //!
 //! Five representative sizes are swept — 0, 1, 64 (one workgroup), 100 (a non-multiple of 64), and a
 //! multi-block reservation — so every dispatch-boundary and guard path is exercised. Byte-exactness
 //! is the gate; the printed figures are whatever the honestly-staged data produces. The staging
 //! replicates the GATE DATA (the founded cells that cross into the fold), never the fold itself — the
-//! fold is `body`'s, run once host-side as the reference and once on the card. Nothing is scored. On
+//! fold is `body`'s, run once cpu-side as the reference and once on the card. Nothing is scored. On
 //! any driver fault the exact CUresult name prints and the gate stops — no retry.
 
 use std::ffi::c_void;
@@ -99,7 +99,7 @@ fn pack_founded_cell(owns: &mut [u32], at: usize, live: bool, position: Place, f
     form.pack(owns, at + OWN_CELL_FORM);
 }
 
-/// One swept size: stage, host-reference, dispatch the three passes, read back, assert BYTE-EXACT.
+/// One swept size: stage, cpu-reference, dispatch the three passes, read back, assert BYTE-EXACT.
 #[allow(clippy::too_many_arguments)]
 fn founded_case(
     ctx: &Context,
@@ -126,8 +126,8 @@ fn founded_case(
         );
     }
 
-    // --- the HOST REFERENCE: read the SAME staged reservation, ground each live cell, fold once ---
-    let mut host_standing = pre_light.clone();
+    // --- the CPU REFERENCE: read the SAME staged reservation, ground each live cell, fold once ---
+    let mut cpu_standing = pre_light.clone();
     let mut expected_touched = vec![0u32; STANDING_CELLS];
     let mut at_cell: Vec<Vec<RegionalForm>> = vec![Vec::new(); STANDING_CELLS];
     for i in 0..own_cells {
@@ -150,11 +150,11 @@ fn founded_case(
         let mut forms: Vec<RegionalForm> = Vec::with_capacity(1 + at_cell[cell].len());
         forms.push(RegionalForm::unpack(&pre_light, cell * FORM_WORDS));
         forms.extend_from_slice(&at_cell[cell]);
-        integrate(&forms).pack(&mut host_standing, cell * FORM_WORDS);
+        integrate(&forms).pack(&mut cpu_standing, cell * FORM_WORDS);
     }
     let mut expected_reads = [0u64; 4];
     for cell in 0..STANDING_CELLS {
-        let form = RegionalForm::unpack(&host_standing, cell * FORM_WORDS);
+        let form = RegionalForm::unpack(&cpu_standing, cell * FORM_WORDS);
         if form != RegionalForm::UNBORN {
             let (same, other) = form.resultant();
             let (this_way, that_way) = form.fiber();
@@ -311,7 +311,7 @@ fn founded_case(
     let mut card_owns = vec![0u32; owns_len.max(1)];
     owns_b.copy_to_slice(&mut card_owns)?;
 
-    let standing_ok = card_standing == host_standing;
+    let standing_ok = card_standing == cpu_standing;
     let touched_ok = card_touched == expected_touched;
     let reads_ok = card_reads == expected_reads;
     let owns_ok = card_owns[..owns_len] == owns[..];
@@ -330,17 +330,17 @@ fn founded_case(
         if !standing_ok {
             let bad = card_standing
                 .iter()
-                .zip(host_standing.iter())
+                .zip(cpu_standing.iter())
                 .position(|(c, h)| c != h)
                 .unwrap();
             let cell = bad / FORM_WORDS;
             eprintln!(
-                "  own_cells {}: standing DIVERGES at cell {} (word {}): card {:?} host {:?}",
+                "  own_cells {}: standing DIVERGES at cell {} (word {}): card {:?} cpu {:?}",
                 own_cells,
                 cell,
                 bad % FORM_WORDS,
                 RegionalForm::unpack(&card_standing, cell * FORM_WORDS),
-                RegionalForm::unpack(&host_standing, cell * FORM_WORDS),
+                RegionalForm::unpack(&cpu_standing, cell * FORM_WORDS),
             );
         }
         eprintln!(

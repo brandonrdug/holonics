@@ -106,6 +106,10 @@ axis, `cuda_aperture::CarrierWork` the work axis, `ExactOrdering::Open` the corr
 two do not order, and `DeclaredCarrierMetric::cost_of` already the right shape for a declared
 exchange — with `cuda_aperture.rs:1113-1114` stating the obstruction verbatim.
 
+**Re-measured 2026-08-15, and it HOLDS.**
+`comm -12 <(grep -rl "cross_entropy" --include='*.rs' crates soma | sort) <(grep -rl "CarrierWork" --include='*.rs' crates soma | sort)`
+returns empty. The bit axis lives in six files, the work axis in two, and no file holds both.
+
 ## 6. Where the identity holds and where it stops
 
 **Holds, as an identity rather than an analogy.** By Kraft and Shannon source coding, code-length

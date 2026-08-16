@@ -92,8 +92,8 @@ impl ExactRelationalLanguageEcology {
         passages: &[MorphologicalLanguagePassage],
         worker_threads: usize,
     ) -> Result<Self, RelationalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        Self::condition_with_executor(passages, worker_threads, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        Self::condition_with_executor(passages, worker_threads, &mut cpu)
     }
 
     /// Condition one organ under a declared clause-pair delay law.
@@ -110,10 +110,10 @@ impl ExactRelationalLanguageEcology {
         if passages.is_empty() {
             return Err(RelationalLanguageError::EmptyEcology);
         }
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
         let mut ecology = Self::empty(worker_threads)?;
         ecology.characteristic_delay_law = law;
-        ecology.receive_with_executor(passages, worker_threads, &mut host)?;
+        ecology.receive_with_executor(passages, worker_threads, &mut cpu)?;
         Ok(ecology)
     }
 
@@ -126,15 +126,15 @@ impl ExactRelationalLanguageEcology {
         if passages.is_empty() {
             return Err(RelationalLanguageError::EmptyEcology);
         }
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
         let mut ecology = Self::empty(worker_threads)?;
-        ecology.receive_copresent_with_executor(passages, worker_threads, &mut host)?;
+        ecology.receive_copresent_with_executor(passages, worker_threads, &mut cpu)?;
         Ok(ecology)
     }
 
     /// Condition through one caller-retained physical executor. The executor crosses every Swing
     /// event in this organ; selecting a card at the outer language boundary cannot silently
-    /// construct a private host executor here.
+    /// construct a private cpu executor here.
     pub fn condition_with_executor(
         passages: &[MorphologicalLanguagePassage],
         worker_threads: usize,
@@ -196,8 +196,8 @@ impl ExactRelationalLanguageEcology {
         passages: &[MorphologicalLanguagePassage],
         worker_threads: usize,
     ) -> Result<usize, RelationalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        self.receive_with_executor(passages, worker_threads, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        self.receive_with_executor(passages, worker_threads, &mut cpu)
     }
 
     pub fn receive_copresent_with_workers(
@@ -205,8 +205,8 @@ impl ExactRelationalLanguageEcology {
         passages: &[MorphologicalLanguagePassage],
         worker_threads: usize,
     ) -> Result<usize, RelationalLanguageError> {
-        let mut host = ParallelHostLiveCurrentExecutor::new(worker_threads.max(1));
-        self.receive_copresent_with_executor(passages, worker_threads, &mut host)
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(worker_threads.max(1));
+        self.receive_copresent_with_executor(passages, worker_threads, &mut cpu)
     }
 
     /// Receive passages in their supplied causal order and cross every junction through the

@@ -119,7 +119,7 @@ impl ExactMatrix {
                     .ok()
                     .and_then(|columns| rows.checked_mul(columns))
             })
-            .ok_or_else(|| "matrix extent does not fit the host".to_owned())?;
+            .ok_or_else(|| "matrix extent does not fit the cpu".to_owned())?;
         if values.len() != expected {
             return Err(format!(
                 "matrix {rows}x{columns} needs {expected} values, got {}",
@@ -231,7 +231,7 @@ impl ExactMatrix {
                     .ok()
                     .and_then(|columns| rows.checked_mul(columns))
             })
-            .ok_or_else(|| "the carried matrix extent does not fit the host".to_owned())?;
+            .ok_or_else(|| "the carried matrix extent does not fit the cpu".to_owned())?;
         let mut values = Vec::with_capacity(count);
         for _ in 0..count {
             let exponent = read_i32(bytes, &mut cursor)?;
@@ -579,7 +579,7 @@ fn run() -> Result<(), String> {
     if arguments.next().is_some() {
         return Err(usage());
     }
-    let report = run_host(&result_root, &experiment_root)?;
+    let report = run_cpu(&result_root, &experiment_root)?;
     let mut encoded = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("the report encodes exactly: {error}"))?;
     encoded.push(b'\n');
@@ -606,7 +606,7 @@ fn usage() -> String {
         .to_owned()
 }
 
-fn run_host(result_root: &Path, experiment_root: &Path) -> Result<Report, String> {
+fn run_cpu(result_root: &Path, experiment_root: &Path) -> Result<Report, String> {
     let (source_read, laws) = source_laws(result_root, experiment_root)?;
     let source_outputs: Vec<(ExactMatrix, ExactMatrix)> = laws
         .iter()
@@ -1568,7 +1568,7 @@ fn read_bfloat16_words(
     })?;
     let header_length = u64::from_le_bytes(length);
     let header_extent = usize::try_from(header_length)
-        .map_err(|_| "the Safetensor header exceeds this host".to_owned())?;
+        .map_err(|_| "the Safetensor header exceeds this cpu".to_owned())?;
     let mut header = vec![0u8; header_extent];
     file.read_exact(&mut header)
         .map_err(|error| format!("{} reads its Safetensor header: {error}", path.display()))?;

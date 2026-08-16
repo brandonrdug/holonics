@@ -156,9 +156,9 @@ fn read_header(path: &str) -> Result<(File, Header), String> {
     let mut len = [0u8; 8];
     f.read_exact(&mut len).map_err(|e| e.to_string())?;
     let n = u64::from_le_bytes(len);
-    // `n as usize` truncated silently on a 32-bit host. Refuse instead.
+    // `n as usize` truncated silently on a 32-bit cpu. Refuse instead.
     let declared = usize::try_from(n)
-        .map_err(|_| format!("{path}: declared header length {n} exceeds this host's extent"))?;
+        .map_err(|_| format!("{path}: declared header length {n} exceeds this cpu's extent"))?;
     let mut raw = vec![0u8; declared];
     f.read_exact(&mut raw).map_err(|e| e.to_string())?;
     let text = String::from_utf8(raw).map_err(|e| e.to_string())?;
@@ -264,7 +264,7 @@ fn block(f: &mut File, h: &Header, name: &str) -> Result<(Vec<u16>, Vec<usize>),
     f.seek(SeekFrom::Start(h.base + entry.start))
         .map_err(|e| e.to_string())?;
     let mut raw =
-        vec![0u8; usize::try_from(span).map_err(|_| format!("{name}: span exceeds host"))?];
+        vec![0u8; usize::try_from(span).map_err(|_| format!("{name}: span exceeds cpu"))?];
     f.read_exact(&mut raw).map_err(|e| e.to_string())?;
     Ok((
         raw.chunks_exact(2)
@@ -500,8 +500,8 @@ fn sweep_on_the_card(
         located,
     };
 
-    // **The card.** Refused by name if no device is present, rather than falling back to the host
-    // and reporting a host figure as though the deed had been mounted.
+    // **The card.** Refused by name if no device is present, rather than falling back to the cpu
+    // and reporting a cpu figure as though the deed had been mounted.
     let mut executor = CudaRefineExecutor::new()
         .map_err(|error| format!("the resident card refused the deed: {error:?}"))?;
     println!("  device: {}", executor.device_name());

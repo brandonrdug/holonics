@@ -102,5 +102,5 @@ Do not rebuild:
 - retrieval presented as native memory;
 - generated text assembled from source quotations and called learning;
 - source-retaining rest;
-- host-authored phases that decide which organ “thinks” next; or
+- CPU-authored phases that decide which organ “thinks” next; or
 - device selection based on terms such as language, proof, or graphics.

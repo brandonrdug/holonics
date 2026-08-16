@@ -554,7 +554,7 @@ impl Faithfulness {
     }
 }
 
-/// Tarjan's algorithm, iterative so a 30,000-constituent atlas cannot overflow the host stack.
+/// Tarjan's algorithm, iterative so a 30,000-constituent atlas cannot overflow the cpu stack.
 ///
 /// Returns `(core index per node, core population)`. Cores are numbered in emission order, which
 /// is reverse topological: core `k` reaches only cores `< k`.

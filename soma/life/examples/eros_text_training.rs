@@ -16,7 +16,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryRadiation, CurrentBoundaryPort, CurrentExecutionRequest, DirectedExecutionRequest,
-    ExecutedContemporaryEvent, HostLiveCurrentExecutor, InterfaceCapability,
+    ExecutedContemporaryEvent, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalExecutionRequest,
     SparseStandingSurface,
@@ -351,9 +351,9 @@ impl TextWorld {
 
     fn present_line(&mut self, line: &[u8]) -> Result<u64, String> {
         let mut events = 0u64;
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         for (at, window) in line.windows(3).enumerate() {
-            self.present_window_with([window[0], window[1], window[2]], &mut host)
+            self.present_window_with([window[0], window[1], window[2]], &mut cpu)
                 .map_err(|error| {
                     format!(
                         "prefix window {at} [{} {} {}]: {error}",
@@ -369,12 +369,12 @@ impl TextWorld {
 }
 
 #[derive(Default)]
-struct WitnessHost {
-    host: HostLiveCurrentExecutor,
+struct WitnessCpu {
+    cpu: CpuLiveCurrentExecutor,
     touched: Vec<Vec<usize>>,
 }
 
-impl WitnessHost {
+impl WitnessCpu {
     fn one_touched(&self) -> Result<Vec<usize>, String> {
         match self.touched.as_slice() {
             [one] => Ok(one.clone()),
@@ -386,7 +386,7 @@ impl WitnessHost {
     }
 }
 
-impl LiveCurrentExecutor for WitnessHost {
+impl LiveCurrentExecutor for WitnessCpu {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -396,7 +396,7 @@ impl LiveCurrentExecutor for WitnessHost {
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
         let executed =
-            self.host
+            self.cpu
                 .enact(physical_revision, standing, currents, relations, regional)?;
         self.touched.clear();
         self.touched
@@ -413,7 +413,7 @@ impl LiveCurrentExecutor for WitnessHost {
         physical_revision: u64,
         successor: &SparseStandingSurface,
     ) -> Result<(), LiveCurrentError> {
-        self.host
+        self.cpu
             .settle_physical_successor(physical_revision, successor)
     }
 }
@@ -523,7 +523,7 @@ fn train_pass(world: &mut TextWorld, pass: u32, reverse: bool) -> Result<Trainin
             line.as_bytes().to_vec()
         };
         for (at, window) in material.windows(3).enumerate() {
-            let mut witness = WitnessHost::default();
+            let mut witness = WitnessCpu::default();
             let radiation = world
                 .present_window_with([window[0], window[1], window[2]], &mut witness)
                 .map_err(|error| {
@@ -624,7 +624,7 @@ fn probe_read(
     for candidate in candidates.iter().copied() {
         let mut world = TextWorld::from_checkpoint(&contextual_checkpoint)?;
         let before = world.machine.memory().standing_constituents;
-        let mut witness = WitnessHost::default();
+        let mut witness = WitnessCpu::default();
         let radiation = world
             .present_window_with([context[0], context[1], candidate], &mut witness)
             .map_err(|error| {

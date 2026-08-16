@@ -18,7 +18,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
     ContemporaryRadiation, CurrentBoundaryPort, CurrentExecutionRequest, DirectedExecutionRequest,
-    ExecutedContemporaryEvent, HostLiveCurrentExecutor, InterfaceCapability,
+    ExecutedContemporaryEvent, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalExecutionRequest,
     SparseStandingSurface,
@@ -349,12 +349,12 @@ impl EuclideanWorld {
 }
 
 #[derive(Default)]
-struct WitnessHost {
-    host: HostLiveCurrentExecutor,
+struct WitnessCpu {
+    cpu: CpuLiveCurrentExecutor,
     touched: Vec<Vec<usize>>,
 }
 
-impl LiveCurrentExecutor for WitnessHost {
+impl LiveCurrentExecutor for WitnessCpu {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -364,7 +364,7 @@ impl LiveCurrentExecutor for WitnessHost {
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
         let executed =
-            self.host
+            self.cpu
                 .enact(physical_revision, standing, currents, relations, regional)?;
         self.touched = executed
             .regional()
@@ -379,7 +379,7 @@ impl LiveCurrentExecutor for WitnessHost {
         physical_revision: u64,
         successor: &SparseStandingSurface,
     ) -> Result<(), LiveCurrentError> {
-        self.host
+        self.cpu
             .settle_physical_successor(physical_revision, successor)
     }
 }
@@ -604,12 +604,12 @@ fn run() -> Result<(), String> {
             IncidenceHand::Against,
             true,
         )?;
-        let mut control_host = HostLiveCurrentExecutor;
+        let mut control_cpu = CpuLiveCurrentExecutor;
         let control = no_region.present_with(
             &training_charts[at],
             IncidenceHand::Against,
             false,
-            &mut control_host,
+            &mut control_cpu,
         )?;
         ordinary_exact &= radiation.currents() == control.currents();
         forward_passages.push(passage);
@@ -765,7 +765,7 @@ fn present_read(
     let before_memory = memory_read(world.machine.memory());
     let before_rest = world.machine.rest_image().map_err(debug)?;
     let before_hashes = standing_hashes(world.machine.standing())?;
-    let mut witness = WitnessHost::default();
+    let mut witness = WitnessCpu::default();
     let radiation = world.present_with(chart, hand, regional, &mut witness)?;
     let touched = witness.touched.first().cloned().unwrap_or_default();
     let touched_hashes = touched

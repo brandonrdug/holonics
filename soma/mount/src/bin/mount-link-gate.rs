@@ -1,17 +1,17 @@
 //! mount-link-gate — the SECOND rung of the CUDA/PTX mount recut. It gates the CUDA port of the
 //! CONFIGURATION FOLD entry family (`link_grain` · `link_sum` · `link_finish`) BYTE-EXACT against
-//! the host reference fold, on the headless RTX 4080 SUPER.
+//! the cpu reference fold, on the headless RTX 4080 SUPER.
 //!
 //!   stage a bounded co-present configuration (pre-light standing ⊕ N disjoint OWN planes, built
-//!   through `body`'s law) -> compute the host reference with `body::medium::integrate` (the SAME
+//!   through `body`'s law) -> compute the cpu reference with `body::medium::integrate` (the SAME
 //!   fold the SPIR-V card reproduces) -> upload -> dispatch the three CUDA entries in the same
 //!   two-pass geometry the wgpu card uses (block 64, 2-D grid, the dispatch boundary is the pass
 //!   boundary) -> read back -> assert the card's final standing, topology reads, and touched map are
-//!   BYTE-EXACT with the host's.
+//!   BYTE-EXACT with the cpu's.
 //!
 //! Byte-exactness is the gate; the printed figures are whatever the honestly-staged data produces.
 //! The staging replicates the GATE DATA (the forms that cross into the fold), never the fold itself
-//! — the fold is `body`'s, run once host-side as the reference and once on the card. Nothing is
+//! — the fold is `body`'s, run once cpu-side as the reference and once on the card. Nothing is
 //! scored. On any driver fault the exact CUresult name prints and the gate stops — no retry.
 
 use std::ffi::c_void;
@@ -27,7 +27,7 @@ const PTX: &[u8] = include_bytes!("../../soma-kernel-cuda/soma_kernel_cuda.ptx")
 
 /// The staged configuration. 65,536 places · 3 co-present OWN planes — the same shape/scale as the
 /// card's SEAM_CELLS three-lineage gate (the figures differ because the forms are staged here, not
-/// carried from a real light; byte-exactness against the host reference is the gate).
+/// carried from a real light; byte-exactness against the cpu reference is the gate).
 const CELLS: usize = 1 << 16; // 65,536
 const LANES: usize = 3;
 const BLOCK: u32 = 64; // mirrors the SPIR-V `threads(64)`
@@ -96,10 +96,10 @@ fn run() -> Result<()> {
         }
     }
 
-    // --- the HOST REFERENCE: one fold per touched place, `body::medium::integrate` --------------
+    // --- the CPU REFERENCE: one fold per touched place, `body::medium::integrate` --------------
     // Identical to life's `integrate_light`: forms = [pre-light standing, own0, own1, ...]; a place
     // is touched iff any OWN plane is occupied; touched places fold once, untouched stay as staged.
-    let mut host_standing = pre_light.clone();
+    let mut cpu_standing = pre_light.clone();
     let mut expected_touched = vec![0u32; CELLS];
     let mut forms: Vec<RegionalForm> = Vec::with_capacity(LANES + 1);
     for cell in 0..CELLS {
@@ -114,13 +114,13 @@ fn run() -> Result<()> {
         }
         if touched {
             expected_touched[cell] = 1;
-            integrate(&forms).pack(&mut host_standing, at);
+            integrate(&forms).pack(&mut cpu_standing, at);
         }
     }
     // The topology projection over the FINAL standing (occupied · resultant · fiber · two-armed).
     let mut expected_reads = [0u64; 4];
     for cell in 0..CELLS {
-        let form = RegionalForm::unpack(&host_standing, cell * FORM_WORDS);
+        let form = RegionalForm::unpack(&cpu_standing, cell * FORM_WORDS);
         if form != RegionalForm::UNBORN {
             let (same, other) = form.resultant();
             let (this_way, that_way) = form.fiber();
@@ -320,13 +320,13 @@ fn run() -> Result<()> {
     let mut card_reads = [0u64; 4];
     reads_b.copy_to_slice(&mut card_reads)?;
 
-    let standing_ok = card_standing == host_standing;
+    let standing_ok = card_standing == cpu_standing;
     let owns_ok = card_owns == owns;
     let touched_ok = card_touched == expected_touched;
     let reads_ok = card_reads == expected_reads;
 
     println!(
-        "link:   {} occupied/resultant · {} fiber · {} two-armed   (host {} · {} · {})",
+        "link:   {} occupied/resultant · {} fiber · {} two-armed   (cpu {} · {} · {})",
         card_reads[0],
         card_reads[2],
         card_reads[3],
@@ -335,13 +335,13 @@ fn run() -> Result<()> {
         expected_reads[3]
     );
     println!(
-        "        reads card {:?}  host {:?}",
+        "        reads card {:?}  cpu {:?}",
         card_reads, expected_reads
     );
 
     if standing_ok && owns_ok && touched_ok && reads_ok {
         println!(
-            "GATE configuration-fold: EXACT  (card standing == host standing, {} u32 words; \
+            "GATE configuration-fold: EXACT  (card standing == cpu standing, {} u32 words; \
 OWN planes intact; touched map exact; topology read exact; {} us)",
             words, fold_us
         );
@@ -352,17 +352,17 @@ OWN planes intact; touched map exact; topology read exact; {} us)",
         if !standing_ok {
             let bad = card_standing
                 .iter()
-                .zip(host_standing.iter())
+                .zip(cpu_standing.iter())
                 .position(|(c, h)| c != h)
                 .unwrap();
             let cell = bad / FORM_WORDS;
             let at = cell * FORM_WORDS;
             eprintln!(
-                "  standing DIVERGES at cell {} (word {}): card {:?} host {:?}",
+                "  standing DIVERGES at cell {} (word {}): card {:?} cpu {:?}",
                 cell,
                 bad % FORM_WORDS,
                 RegionalForm::unpack(&card_standing, at),
-                RegionalForm::unpack(&host_standing, at),
+                RegionalForm::unpack(&cpu_standing, at),
             );
         }
         println!(

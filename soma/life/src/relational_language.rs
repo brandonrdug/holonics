@@ -23,9 +23,9 @@ use holonic_structure::{GrowingKeyAtlas, LocalQueue, LocalRelations, LocalSequen
 use num_bigint::BigUint;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 #[cfg(test)]
-use soma_membrane::HostLiveCurrentExecutor;
+use soma_membrane::CpuLiveCurrentExecutor;
 use soma_membrane::{
-    LiveCurrentExecutor, LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor,
+    LiveCurrentExecutor, LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor,
     SparseStandingSurface,
 };
 

@@ -1,9 +1,9 @@
 //! Exact resident text-section restriction at the CUDA membrane.
 //!
-//! The host text owner supplies one bounded aperture plus interned feature and transport
+//! The cpu text owner supplies one bounded aperture plus interned feature and transport
 //! coordinates. The resident card follows its append-only incidence links, returns only the
 //! caused section handles which fit that aperture, and restricts those handles exactly. No
-//! question/proof role, semantic rank, dominance population, or host-selected section list exists
+//! question/proof role, semantic rank, dominance population, or cpu-selected section list exists
 //! in this ABI.
 
 pub const SELECT_ENTRY_SYMBOL: &str = "text_incidence_select";

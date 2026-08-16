@@ -73,6 +73,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **Tablet of the Universality Machine** — Existence begins in interaction; causal multiplicity precedes symbolic arithmetic; language is a codec of dynamics rather than the source of intelligence; and the map deposited by prior… |
 | `canon/THE_AUTHORED_LEVEL.md` | **The authored level** — It states the law, enumerates the population in this tree, and gives the excision per instance. |
 | `canon/THE_CONTAMINANT_PROTOCOL.md` | **The contaminant protocol** — It names a family of contaminant species, gives each the condition that identifies it and a verified instance in this tree, and states the procedure a reader follows by hand before… |
+| `canon/THE_CONTRACT_PROVENANCE.md` | **The contract's provenance — what CLAUDE.md corrected, and what it used to say** — **This file is never the authority.** Where a block here and `CLAUDE.md` disagree, the contract governs and this file is the thing to fix. |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
 | `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
@@ -102,11 +103,11 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
-| `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — It sits beside `THE_TRAVERSIBLE_CHAIN.md` — that plan states what a link is made of; this states what a **body** is, how it is stored, and how it runs. |
+| `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — This one covers instantiation. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
-| `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — It supersedes `THE_TYPED_TRANSPORT_ATLAS.md` as the *object*; that document remains in force as the plan for one **instrument**, and §3 says exactly what it is and is not. |
+| `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — This one covers the atlas itself. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
-| `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — It sits **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
+| `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — This one covers the carriers, and sits more immediately **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
 | `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
 
 ---
@@ -236,9 +237,11 @@ outside `tools/` that names the verifier — not declared.
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 1 more |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 1 more |
+| `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 4 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
+| `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
 | `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 12 more |
 
 `cargo test --workspace` is the gate that is actually run alongside these.

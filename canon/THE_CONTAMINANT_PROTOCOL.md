@@ -61,10 +61,17 @@ of which **one arrow exists**. `founded_receiver.rs:221` names `receiver_current
 comment and the file contains no other reference to `receiver_current`: **the consumer is prose.**
 
 **Two prior instances the same session, both reported by the author before the third was committed.**
-`derivation_atlas::invariant_movement` (`derivation_atlas.rs:945`) reached only from
+`derivation_atlas::invariant_movement` (`derivation_atlas.rs:1311`) reached only from
 `examples/derivation_atlas_reader.rs` and tests; `temper` named in the roadmap as *"wired by the
 return join"* with a `temper::read()` that does not exist. Both now have library consumers —
 `crates/holonic-engine/src/returned_reading.rs:134` and `:540`. `capacities()` does not.
+
+**Re-measured 2026-08-15 and the third instance is now FALSE.**
+`grep -rn "\.capacities()\|fn capacities" --include='*.rs' crates soma` returns a genuine library
+consumer: `crates/holonic-engine/src/interchange.rs:389` `order_from_panel`, taking a
+`founded_receiver::FoundedPanel` and imported at `interchange.rs:66`. The §2.1 instance above —
+*"only call sites are examples and one test"* — is stale for the same reason. **A contaminant
+instance decays exactly like an absence claim, and this document did not exempt its own.**
 
 **Corrective form.** Name the consumer by `file:line` in the deposit, or state that the return is
 unconsumed and grade accordingly. A doc comment naming another module is not an edge. **"Closes the
@@ -388,6 +395,12 @@ vary the property under test"* applied to the repair.
 - `python3 tools/resolve_named_paths.py` returns zero failures.
 - No authored level introduced; if one was, it is dispositioned in the same commit.
 - The record exists, the canon points at it, the owners point back (`canon/THE_DOCUMENT_LAW.md` §4.5).
+
+**This is a checklist and not a measurement, and it is dated 2026-08-15 so the absence-claim gate can tell
+the two apart.** `tools/document_law.py` reads a paragraph as a claim about the tree when it carries
+an absence word beside a repository object; a normative list naming the objects it governs looks the
+same from outside. Where a rule here reads as an absence, it is a requirement on future deposits and
+carries no measurement of the present tree.
 
 **Sequencing.** Instruments before excisions, and an instrument is a *stated check*, not necessarily
 a program. **The item that most directly serves the objective — arbitrary degree, varying charts — is

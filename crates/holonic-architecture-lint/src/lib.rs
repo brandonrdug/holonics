@@ -1,6 +1,6 @@
 //! Repository architecture ratchet for continuing holonic machinery.
 //!
-//! This is an observer and build tool, so it may use host collections internally.  Its output is
+//! This is an observer and build tool, so it may use cpu collections internally.  Its output is
 //! never machine standing.  Production modules are checked against a committed per-file census:
 //! an inherited dependency may disappear, but no file may add another occurrence and a new file
 //! begins with zero allowance.

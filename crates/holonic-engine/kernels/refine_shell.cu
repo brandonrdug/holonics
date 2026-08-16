@@ -24,7 +24,7 @@
 // # Exactness, and why the key is one 64-bit word
 //
 // A receiver's reading of a surface is `[kind, weight, density, conduct token]`. Two occurrences
-// agree at an offset exactly when those four words agree, so the host assigns each DISTINCT reading
+// agree at an offset exactly when those four words agree, so the cpu assigns each DISTINCT reading
 // a dense identity once, over the whole corpus, and hands the device a `reading_id` per surface.
 // Equality of readings is then equality of identities, exactly, and a shell key is
 //
@@ -33,7 +33,7 @@
 // with `ABSENT` standing for an offset that has run off the end of its whole. `ABSENT` is a
 // distinguished identity and not a magic number: a terminus is family-invariant — deleting a
 // receiver never merges "the whole ended" with a reading — so it must be a value no reading can
-// take, and the host reserves identity zero for it before assigning any other.
+// take, and the cpu reserves identity zero for it before assigning any other.
 //
 // # The quotient is a hash join, not a sort
 //
@@ -44,17 +44,17 @@
 //
 // **The table cannot fill.** The number of distinct pairs is at most the number of occupied
 // occurrences, so a capacity above that always leaves an empty slot and every probe terminates.
-// The host sizes it as the next power of two strictly above the occurrence count — derived from
+// The cpu sizes it as the next power of two strictly above the occurrence count — derived from
 // the material, with no load factor and no number chosen.
 
 #include <stdint.h>
 
-// The identity reserved for an offset past the end of a whole. The host assigns every real reading
+// The identity reserved for an offset past the end of a whole. The cpu assigns every real reading
 // an identity at or above one, so this can collide with nothing.
 #define REFINE_ABSENT 0u
 
 // An empty table slot. A claimed slot holds `(class, key)` and can never be this, because a class
-// identity is at or above one on the host side.
+// identity is at or above one on the cpu side.
 #define REFINE_EMPTY 0xffffffffffffffffULL
 
 __device__ __forceinline__ uint64_t refine_mix(uint64_t value) {
@@ -196,7 +196,7 @@ extern "C" __global__ void refine_shell(
             // second.** Falling through here was a real defect: a lane that found its own class in
             // a slot whose key had not yet landed walked on and claimed a SECOND slot for the same
             // pair, splitting one class in two. Measured on `"of"` at shell one: 1,794 classes on
-            // the card against 1,787 on the host, the card finer by exactly the races it lost.
+            // the card against 1,787 on the cpu, the card finer by exactly the races it lost.
             //
             // The wait is bounded by one store from a lane that has already won its exchange, and
             // `key` can never be the empty marker: it is two 32-bit reading identities and the
@@ -238,7 +238,7 @@ extern "C" __global__ void refine_shell(
     }
 }
 
-/// One lane per slot. Marks which table slots were claimed, so the host can compact the sparse slot
+/// One lane per slot. Marks which table slots were claimed, so the cpu can compact the sparse slot
 /// indices into a dense class numbering without scanning the sites.
 extern "C" __global__ void refine_claimed(
     const uint64_t *table_pair,

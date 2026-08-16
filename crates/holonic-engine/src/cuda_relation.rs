@@ -21,7 +21,7 @@ const CUDA_SUCCESS: i32 = 0;
 /// why the previous `ABI` disposition on these constants was false.** The one value that remains is
 /// [`GRADE_ITEMS_PER_THREAD`], and it is not a launch level: it is a **wire constant shared with the
 /// kernel**, which blocks its grade pass by the same factor at
-/// `kernels/exact_relation_support.cu:370` and `:445`. Host and device must agree or the grade
+/// `kernels/exact_relation_support.cu:370` and `:445`. Cpu and device must agree or the grade
 /// mapping is wrong, and nothing in the build links the two — that is worth carrying as a defect
 /// rather than dissolving into a derivation it is not.
 const GRADE_ITEMS_PER_THREAD: u64 = 8;
@@ -184,8 +184,8 @@ pub struct CudaRelationReceipt {
     pub relation_dimension: u64,
     pub classified_pairs: u64,
     pub returned_relations: u64,
-    pub host_to_device_octets: u64,
-    pub device_to_host_octets: u64,
+    pub cpu_to_device_octets: u64,
+    pub device_to_cpu_octets: u64,
     pub launches: u64,
     pub front_uploads: u64,
     pub allocation_resizes: u64,
@@ -229,7 +229,7 @@ impl ReusableDeviceAllocation {
         if bytes != 0 {
             // SAFETY: the device allocation has at least this caller-checked
             // extent and the source slice remains live for the synchronous
-            // host-to-device transfer.
+            // cpu-to-device transfer.
             unsafe {
                 driver(
                     cuMemcpyHtoD_v2(self.pointer, values.as_ptr().cast(), bytes),
@@ -303,7 +303,7 @@ pub struct CudaExactRelationExecutor {
     resident_front: Option<PackedRelationFront>,
 }
 
-// The driver context may be made current on another host thread.  The
+// The driver context may be made current on another cpu thread.  The
 // production owner serializes all access to an executor, and every operation
 // explicitly calls `cuCtxSetCurrent` before touching retained handles.
 unsafe impl Send for CudaExactRelationExecutor {}
@@ -568,7 +568,7 @@ impl CudaExactRelationExecutor {
         }
         let pair_count =
             u64::try_from(pairs.len()).map_err(|_| CudaRelationError::ExtentOverflow)?;
-        let (mut host_to_device_octets, mut allocation_resizes, front_uploads) =
+        let (mut cpu_to_device_octets, mut allocation_resizes, front_uploads) =
             self.prepare_points_and_front(points, front)?;
         let pair_resize = self.pairs.ensure(std::mem::size_of_val(pairs))?;
         let counter_resize = self.counter.ensure(std::mem::size_of::<u64>())?;
@@ -576,11 +576,11 @@ impl CudaExactRelationExecutor {
             .checked_add(pair_resize)
             .and_then(|value| value.checked_add(counter_resize))
             .ok_or(CudaRelationError::ExtentOverflow)?;
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(self.pairs.copy_from(pairs)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         let zero = [0_u64];
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(self.counter.copy_from(&zero)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
 
@@ -634,7 +634,7 @@ impl CudaExactRelationExecutor {
         }
 
         let mut positive_extent = [0_u64];
-        let mut device_to_host_octets = self.counter.copy_to(&mut positive_extent)?;
+        let mut device_to_cpu_octets = self.counter.copy_to(&mut positive_extent)?;
         if positive_extent[0] > pair_count {
             return Err(CudaRelationError::MalformedSparseOutput);
         }
@@ -651,7 +651,7 @@ impl CudaExactRelationExecutor {
                 .checked_add(pair_resize)
                 .and_then(|value| value.checked_add(state_resize))
                 .ok_or(CudaRelationError::ExtentOverflow)?;
-            host_to_device_octets = host_to_device_octets
+            cpu_to_device_octets = cpu_to_device_octets
                 .checked_add(self.counter.copy_from(&zero)?)
                 .ok_or(CudaRelationError::ExtentOverflow)?;
 
@@ -709,7 +709,7 @@ impl CudaExactRelationExecutor {
         }
 
         let mut emitted_extent = [0_u64];
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(self.counter.copy_to(&mut emitted_extent)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         if emitted_extent != positive_extent {
@@ -719,7 +719,7 @@ impl CudaExactRelationExecutor {
         let mut output_states = vec![0_u8; output_extent];
         let pair_octets = self.sparse_pairs.copy_to(&mut output_pairs)?;
         let state_octets = self.sparse_states.copy_to(&mut output_states)?;
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(pair_octets)
             .and_then(|value| value.checked_add(state_octets))
             .ok_or(CudaRelationError::ExtentOverflow)?;
@@ -739,8 +739,8 @@ impl CudaExactRelationExecutor {
                 relation_dimension: u64::from(front.dimension),
                 classified_pairs: pair_count,
                 returned_relations: positive_extent[0],
-                host_to_device_octets,
-                device_to_host_octets,
+                cpu_to_device_octets,
+                device_to_cpu_octets,
                 launches,
                 front_uploads,
                 allocation_resizes,
@@ -801,7 +801,7 @@ impl CudaExactRelationExecutor {
         let window_count =
             u32::try_from(windows.len()).map_err(|_| CudaRelationError::ExtentOverflow)?;
 
-        let (mut host_to_device_octets, mut allocation_resizes, front_uploads) =
+        let (mut cpu_to_device_octets, mut allocation_resizes, front_uploads) =
             self.prepare_points_and_front(points, front)?;
         let order_resize = self.order.ensure(std::mem::size_of_val(order))?;
         let window_resize = self.windows.ensure(std::mem::size_of_val(windows))?;
@@ -813,12 +813,12 @@ impl CudaExactRelationExecutor {
             .ok_or(CudaRelationError::ExtentOverflow)?;
         let order_octets = self.order.copy_from(order)?;
         let window_octets = self.windows.copy_from(windows)?;
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(order_octets)
             .and_then(|value| value.checked_add(window_octets))
             .ok_or(CudaRelationError::ExtentOverflow)?;
         let zero = [0_u64];
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(self.counter.copy_from(&zero)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
 
@@ -875,7 +875,7 @@ impl CudaExactRelationExecutor {
         }
 
         let mut positive_extent = [0_u64];
-        let mut device_to_host_octets = self.counter.copy_to(&mut positive_extent)?;
+        let mut device_to_cpu_octets = self.counter.copy_to(&mut positive_extent)?;
         if positive_extent[0] > pair_count {
             return Err(CudaRelationError::MalformedSparseOutput);
         }
@@ -892,7 +892,7 @@ impl CudaExactRelationExecutor {
                 .checked_add(pair_resize)
                 .and_then(|value| value.checked_add(state_resize))
                 .ok_or(CudaRelationError::ExtentOverflow)?;
-            host_to_device_octets = host_to_device_octets
+            cpu_to_device_octets = cpu_to_device_octets
                 .checked_add(self.counter.copy_from(&zero)?)
                 .ok_or(CudaRelationError::ExtentOverflow)?;
 
@@ -953,7 +953,7 @@ impl CudaExactRelationExecutor {
         }
 
         let mut emitted_extent = [0_u64];
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(self.counter.copy_to(&mut emitted_extent)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         if emitted_extent != positive_extent {
@@ -963,7 +963,7 @@ impl CudaExactRelationExecutor {
         let mut output_states = vec![0_u8; output_extent];
         let pair_octets = self.sparse_pairs.copy_to(&mut output_pairs)?;
         let state_octets = self.sparse_states.copy_to(&mut output_states)?;
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(pair_octets)
             .and_then(|value| value.checked_add(state_octets))
             .ok_or(CudaRelationError::ExtentOverflow)?;
@@ -983,8 +983,8 @@ impl CudaExactRelationExecutor {
                 relation_dimension: u64::from(front.dimension),
                 classified_pairs: pair_count,
                 returned_relations: positive_extent[0],
-                host_to_device_octets,
-                device_to_host_octets,
+                cpu_to_device_octets,
+                device_to_cpu_octets,
                 launches,
                 front_uploads,
                 allocation_resizes,
@@ -1006,7 +1006,7 @@ impl CudaExactRelationExecutor {
             return Err(CudaRelationError::MalformedMembership);
         }
         let pair_count = choose_two(u64::from(point_count))?;
-        let (mut host_to_device_octets, mut allocation_resizes, front_uploads) =
+        let (mut cpu_to_device_octets, mut allocation_resizes, front_uploads) =
             self.prepare_points_and_front(points, front)?;
         let membership_resize = self.membership.ensure(std::mem::size_of_val(membership))?;
         let counter_resize = self.counter.ensure(std::mem::size_of::<u64>())?;
@@ -1016,14 +1016,14 @@ impl CudaExactRelationExecutor {
             .and_then(|value| value.checked_add(counter_resize))
             .and_then(|value| value.checked_add(grade_resize))
             .ok_or(CudaRelationError::ExtentOverflow)?;
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(self.membership.copy_from(membership)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         let zero_count = [0_u64];
         let zero_grade = [0_u64; 8];
         let counter_octets = self.counter.copy_from(&zero_count)?;
         let grade_octets = self.grade_counts.copy_from(&zero_grade)?;
-        host_to_device_octets = host_to_device_octets
+        cpu_to_device_octets = cpu_to_device_octets
             .checked_add(counter_octets)
             .and_then(|value| value.checked_add(grade_octets))
             .ok_or(CudaRelationError::ExtentOverflow)?;
@@ -1089,8 +1089,8 @@ impl CudaExactRelationExecutor {
 
         let mut counts = [0_u64; 8];
         let mut obstruction_extent = [0_u64];
-        let mut device_to_host_octets = self.grade_counts.copy_to(&mut counts)?;
-        device_to_host_octets = device_to_host_octets
+        let mut device_to_cpu_octets = self.grade_counts.copy_to(&mut counts)?;
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(self.counter.copy_to(&mut obstruction_extent)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         if obstruction_extent[0] > pair_count {
@@ -1109,7 +1109,7 @@ impl CudaExactRelationExecutor {
                 .checked_add(pair_resize)
                 .and_then(|value| value.checked_add(state_resize))
                 .ok_or(CudaRelationError::ExtentOverflow)?;
-            host_to_device_octets = host_to_device_octets
+            cpu_to_device_octets = cpu_to_device_octets
                 .checked_add(self.counter.copy_from(&zero_count)?)
                 .ok_or(CudaRelationError::ExtentOverflow)?;
             let mut point_pointer = self.points.pointer;
@@ -1162,7 +1162,7 @@ impl CudaExactRelationExecutor {
         }
 
         let mut emitted_extent = [0_u64];
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(self.counter.copy_to(&mut emitted_extent)?)
             .ok_or(CudaRelationError::ExtentOverflow)?;
         if emitted_extent != obstruction_extent {
@@ -1172,7 +1172,7 @@ impl CudaExactRelationExecutor {
         let mut output_kinds = vec![0_u8; output_extent];
         let pair_octets = self.sparse_pairs.copy_to(&mut output_pairs)?;
         let kind_octets = self.sparse_states.copy_to(&mut output_kinds)?;
-        device_to_host_octets = device_to_host_octets
+        device_to_cpu_octets = device_to_cpu_octets
             .checked_add(pair_octets)
             .and_then(|value| value.checked_add(kind_octets))
             .ok_or(CudaRelationError::ExtentOverflow)?;
@@ -1195,8 +1195,8 @@ impl CudaExactRelationExecutor {
                 relation_dimension: u64::from(front.dimension),
                 classified_pairs: pair_count,
                 returned_relations: obstruction_extent[0],
-                host_to_device_octets,
-                device_to_host_octets,
+                cpu_to_device_octets,
+                device_to_cpu_octets,
                 launches,
                 front_uploads,
                 allocation_resizes,
@@ -1229,7 +1229,7 @@ impl CudaExactRelationExecutor {
     ) -> Result<(u64, u64, u64), CudaRelationError> {
         self.make_current()?;
         let mut allocation_resizes = self.points.ensure(std::mem::size_of_val(points))?;
-        let mut host_to_device_octets = self.points.copy_from(points)?;
+        let mut cpu_to_device_octets = self.points.copy_from(points)?;
         let mut front_uploads = 0_u64;
         if self.resident_front.as_ref() != Some(front) {
             let positive_resize = self
@@ -1244,14 +1244,14 @@ impl CudaExactRelationExecutor {
                 .ok_or(CudaRelationError::ExtentOverflow)?;
             let positive_octets = self.positive_front.copy_from(&front.positive_maxima)?;
             let negative_octets = self.negative_front.copy_from(&front.negative_minima)?;
-            host_to_device_octets = host_to_device_octets
+            cpu_to_device_octets = cpu_to_device_octets
                 .checked_add(positive_octets)
                 .and_then(|value| value.checked_add(negative_octets))
                 .ok_or(CudaRelationError::ExtentOverflow)?;
             self.resident_front = Some(front.clone());
             front_uploads = 1;
         }
-        Ok((host_to_device_octets, allocation_resizes, front_uploads))
+        Ok((cpu_to_device_octets, allocation_resizes, front_uploads))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1266,7 +1266,7 @@ impl CudaExactRelationExecutor {
         output_extent: usize,
         pair_count_u64: u64,
     ) -> Result<(Vec<u8>, CudaRelationReceipt), CudaRelationError> {
-        let (mut host_to_device_octets, mut allocation_resizes, front_uploads) =
+        let (mut cpu_to_device_octets, mut allocation_resizes, front_uploads) =
             self.prepare_points_and_front(points, front)?;
         allocation_resizes = allocation_resizes
             .checked_add(self.output.ensure(output_extent)?)
@@ -1322,7 +1322,7 @@ impl CudaExactRelationExecutor {
                     allocation_resizes = allocation_resizes
                         .checked_add(self.pairs.ensure(std::mem::size_of_val(pairs))?)
                         .ok_or(CudaRelationError::ExtentOverflow)?;
-                    host_to_device_octets = host_to_device_octets
+                    cpu_to_device_octets = cpu_to_device_octets
                         .checked_add(self.pairs.copy_from(pairs)?)
                         .ok_or(CudaRelationError::ExtentOverflow)?;
                     let mut pair_pointer = self.pairs.pointer;
@@ -1372,7 +1372,7 @@ impl CudaExactRelationExecutor {
             }
         }
         let mut states = vec![0_u8; output_extent];
-        let device_to_host_octets = self.output.copy_to(&mut states)?;
+        let device_to_cpu_octets = self.output.copy_to(&mut states)?;
         Ok((
             states,
             CudaRelationReceipt {
@@ -1383,8 +1383,8 @@ impl CudaExactRelationExecutor {
                 relation_dimension: u64::from(front.dimension),
                 classified_pairs: pair_count_u64,
                 returned_relations: pair_count_u64,
-                host_to_device_octets,
-                device_to_host_octets,
+                cpu_to_device_octets,
+                device_to_cpu_octets,
                 launches,
                 front_uploads,
                 allocation_resizes,
@@ -1468,7 +1468,7 @@ mod tests {
 
     #[test]
     #[ignore = "requires a CUDA device"]
-    fn card_classifies_every_exact_pair_at_the_host_address() {
+    fn card_classifies_every_exact_pair_at_the_cpu_address() {
         let mut executor = CudaExactRelationExecutor::new().unwrap();
         let points = [0_i64, 0, 1, 1, 3, 0, 10, 10];
         let front = PackedRelationFront {

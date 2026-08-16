@@ -863,9 +863,9 @@ fn refused_swing_remains_one_retryable_causal_front() {
         Err(RelationalLanguageError::OpenPassage)
     );
 
-    let mut host = HostLiveCurrentExecutor;
+    let mut cpu = CpuLiveCurrentExecutor;
     assert_eq!(
-        retried.receive_with_executor(&later, 8, &mut host).unwrap(),
+        retried.receive_with_executor(&later, 8, &mut cpu).unwrap(),
         1
     );
     let returned = retried.execution_receipt();

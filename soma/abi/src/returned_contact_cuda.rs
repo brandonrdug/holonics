@@ -66,7 +66,7 @@ pub const TARGET_FOUNDED: usize = 4;
 pub const TARGET_WITHDRAWN_MASK_AT: usize = 5;
 
 // One row per occurrence, in occurrence-ordinal order.  This is the card's independent disposition
-// of the occurrence over all targets; the host does not transpose the target masks to reconstruct it.
+// of the occurrence over all targets; the cpu does not transpose the target masks to reconstruct it.
 pub const OCCURRENCE_STATUS: usize = 0;
 pub const OCCURRENCE_EPOCH: usize = 1;
 pub const OCCURRENCE_ORDINAL: usize = 2;

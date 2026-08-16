@@ -1,6 +1,6 @@
 //! Sparse REGISTER-equivalent replay of accepted Soma deeds.
 //!
-//! The dense [`body::manifold::FeltEmissionSurface`] remains the parity oracle.  This host surface
+//! The dense [`body::manifold::FeltEmissionSurface`] remains the parity oracle.  This cpu surface
 //! carries only occupied grips and therefore breathes in proportion to live construction, never
 //! `axis²`.
 //!

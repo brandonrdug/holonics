@@ -178,7 +178,7 @@ fn key_of(p: Place) -> PlaceKey {
 /// contacts read?
 ///
 /// The contacts read `enclosure(source_grain − 1)` and run at `:3546-3590`; the founder writes
-/// through `perceive_grain` and runs at `:3607-3637`, both inside `enact_host_current`. The
+/// through `perceive_grain` and runs at `:3607-3637`, both inside `enact_cpu_current`. The
 /// Cell-branch founder calls `perceive_grain(0, …)` (`manifold.rs:5125`) — **depth 0** — while
 /// `thicken_branch` calls `perceive_grain(k, …)` at a growing depth (`:5183`). So the two agree
 /// exactly when `source_grain == 1` and not otherwise, and reasoning is not enough to say which.
@@ -412,7 +412,7 @@ impl From<RelationAtom> for CurrentGeometry<'_> {
     }
 }
 
-/// A one-element host array is only a storage wrapper around one cell. No implementation exists
+/// A one-element cpu array is only a storage wrapper around one cell. No implementation exists
 /// for a plural slice, so this convenience cannot restore the rejected ordered-population mouth.
 impl<'a> From<&'a [RelationAtom; 1]> for CurrentGeometry<'a> {
     fn from(relation: &'a [RelationAtom; 1]) -> Self {
@@ -2434,7 +2434,7 @@ fn constituent_support_transitions(
                     constituent
                         .boundary_transition(
                             usize::try_from(boundary)
-                                .expect("u32 boundary is addressable on this host"),
+                                .expect("u32 boundary is addressable on this cpu"),
                         )
                         .expect("a validated factor references one complete boundary")
                 })
@@ -2513,7 +2513,7 @@ impl ExecutedContemporaryEvent {
 }
 
 /// Physical realization of the event-local body transition.  Implementations may own a resident
-/// host pool, CUDA context/module/buffers, or another substrate, but receive no source material,
+/// cpu pool, CUDA context/module/buffers, or another substrate, but receive no source material,
 /// cut, journal, receipt, or standing-after authority.
 pub trait LiveCurrentExecutor {
     fn enact(
@@ -2539,7 +2539,7 @@ pub trait LiveCurrentExecutor {
 }
 
 #[derive(Default)]
-pub struct HostLiveCurrentExecutor;
+pub struct CpuLiveCurrentExecutor;
 
 enum LineageBody {
     /// The first actual event has located K's anchor but has not crossed yet.
@@ -3551,18 +3551,18 @@ impl FeltEmissionTarget for EventOutput {
     }
 }
 
-struct HostCurrentEnactment {
+struct CpuCurrentEnactment {
     current: ExecutedLiveCurrent,
     directed: Vec<(usize, ExecutedDirectedRelation)>,
     regional: Vec<(usize, ExecutedRegionalRelation)>,
 }
 
-fn enact_host_current(
+fn enact_cpu_current(
     standing: &SparseStandingSurface,
     request: CurrentExecutionRequest<'_>,
     relations: &[DirectedExecutionRequest],
     regional: &[RegionalExecutionRequest<'_>],
-) -> Result<HostCurrentEnactment, LiveCurrentError> {
+) -> Result<CpuCurrentEnactment, LiveCurrentError> {
     let mount = request.mount;
     let header = mount.header();
     let mut carrier = mount.carrier().branch_shared();
@@ -3763,7 +3763,7 @@ fn enact_host_current(
     for cell in own.cells() {
         contributions.push((cell.founder(), cell.form()));
     }
-    Ok(HostCurrentEnactment {
+    Ok(CpuCurrentEnactment {
         current: ExecutedLiveCurrent::new(
             request.lineage(),
             LiveCarrierSnapshot::new(next_header, carrier)?,
@@ -3778,22 +3778,22 @@ fn enact_host_current(
     })
 }
 
-/// **The host declares its own width. There is no knob.**
+/// **The cpu declares its own width. There is no knob.**
 ///
 /// This read `SOMA_LIVE_THREADS` from the process environment until 2026-08-10. That variable was
 /// read in exactly one place, set nowhere in the repository, and documented nowhere — so the
 /// executor whose contract is *"the complete event result is required to equal
-/// `HostLiveCurrentExecutor`"* had a width that depended on the environment of whoever ran it, and
+/// `CpuLiveCurrentExecutor`"* had a width that depended on the environment of whoever ran it, and
 /// no test pinned it. An environment override is a knob, and a caller that genuinely wants a
-/// particular width already has `ParallelHostLiveCurrentExecutor::new`, which states it in the
+/// particular width already has `ParallelCpuLiveCurrentExecutor::new`, which states it in the
 /// type rather than in the ambient environment.
-fn available_host_event_threads() -> usize {
+fn available_cpu_event_threads() -> usize {
     std::thread::available_parallelism()
         .map(|threads| threads.get())
         .unwrap_or(1)
 }
 
-fn enact_host_population(
+fn enact_cpu_population(
     standing: &SparseStandingSurface,
     currents: &[CurrentExecutionRequest<'_>],
     relations: &[DirectedExecutionRequest],
@@ -3809,7 +3809,7 @@ fn enact_host_population(
     slots.resize_with(currents.len(), || None);
     if threads == 1 {
         for (at, slot) in slots.iter_mut().enumerate() {
-            *slot = Some(enact_host_current(
+            *slot = Some(enact_cpu_current(
                 standing,
                 currents[at],
                 relations,
@@ -3868,7 +3868,7 @@ fn enact_host_population(
                                     .map(|at| {
                                         (
                                             at,
-                                            enact_host_current(
+                                            enact_cpu_current(
                                                 standing,
                                                 currents[at],
                                                 relations,
@@ -3951,14 +3951,14 @@ fn enact_host_population(
     ))
 }
 
-/// Exact host realization with an explicit physical worker bound. The bound affects only work
-/// placement; the complete event result is required to equal [`HostLiveCurrentExecutor`].
-pub struct ParallelHostLiveCurrentExecutor {
+/// Exact cpu realization with an explicit physical worker bound. The bound affects only work
+/// placement; the complete event result is required to equal [`CpuLiveCurrentExecutor`].
+pub struct ParallelCpuLiveCurrentExecutor {
     threads: usize,
     worker_stack_bytes: Option<usize>,
 }
 
-impl ParallelHostLiveCurrentExecutor {
+impl ParallelCpuLiveCurrentExecutor {
     pub const fn new(threads: usize) -> Self {
         Self {
             threads,
@@ -3966,7 +3966,7 @@ impl ParallelHostLiveCurrentExecutor {
         }
     }
 
-    /// Select an explicit physical stack aperture for each scoped host worker. This changes only
+    /// Select an explicit physical stack aperture for each scoped cpu worker. This changes only
     /// worker storage; it cannot change the event population, conduct, or successor.
     pub const fn with_worker_stack(threads: usize, worker_stack_bytes: usize) -> Self {
         Self {
@@ -3976,7 +3976,7 @@ impl ParallelHostLiveCurrentExecutor {
     }
 }
 
-impl LiveCurrentExecutor for HostLiveCurrentExecutor {
+impl LiveCurrentExecutor for CpuLiveCurrentExecutor {
     fn enact(
         &mut self,
         _physical_revision: u64,
@@ -3985,18 +3985,18 @@ impl LiveCurrentExecutor for HostLiveCurrentExecutor {
         relations: &[DirectedExecutionRequest],
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
-        enact_host_population(
+        enact_cpu_population(
             standing,
             currents,
             relations,
             regional,
-            available_host_event_threads(),
+            available_cpu_event_threads(),
             None,
         )
     }
 }
 
-impl LiveCurrentExecutor for ParallelHostLiveCurrentExecutor {
+impl LiveCurrentExecutor for ParallelCpuLiveCurrentExecutor {
     fn enact(
         &mut self,
         _physical_revision: u64,
@@ -4005,7 +4005,7 @@ impl LiveCurrentExecutor for ParallelHostLiveCurrentExecutor {
         relations: &[DirectedExecutionRequest],
         regional: &[RegionalExecutionRequest<'_>],
     ) -> Result<ExecutedContemporaryEvent, LiveCurrentError> {
-        enact_host_population(
+        enact_cpu_population(
             standing,
             currents,
             relations,
@@ -4275,8 +4275,8 @@ impl LiveCurrentMachine {
         &mut self,
         event: ContemporaryEvent<'_>,
     ) -> Result<ContemporaryRadiation, LiveCurrentError> {
-        let mut host = HostLiveCurrentExecutor;
-        self.receive_with(event, &mut host)
+        let mut cpu = CpuLiveCurrentExecutor;
+        self.receive_with(event, &mut cpu)
     }
 
     /// The same machine transition through an explicitly resident physical executor.
@@ -5613,7 +5613,7 @@ mod tests {
     }
 
     #[test]
-    fn joint_regional_closure_is_exact_across_one_and_many_host_cores() {
+    fn joint_regional_closure_is_exact_across_one_and_many_cpu_cores() {
         let (base, lineages) = primed_equal_lineages(3);
         let rest = base.rest_image().unwrap();
         let mut one = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
@@ -5651,13 +5651,13 @@ mod tests {
         let one_radiation = one
             .receive_with(
                 ContemporaryEvent::with_regional(&currents, &[], &regional),
-                &mut ParallelHostLiveCurrentExecutor::new(1),
+                &mut ParallelCpuLiveCurrentExecutor::new(1),
             )
             .unwrap();
         let many_radiation = many
             .receive_with(
                 ContemporaryEvent::with_regional(&currents, &[], &regional),
-                &mut ParallelHostLiveCurrentExecutor::with_worker_stack(8, 4 * 1024 * 1024),
+                &mut ParallelCpuLiveCurrentExecutor::with_worker_stack(8, 4 * 1024 * 1024),
             )
             .unwrap();
 
@@ -5677,20 +5677,20 @@ mod tests {
         );
     }
 
-    /// **The requirement `ParallelHostLiveCurrentExecutor` states about itself, actually checked.**
+    /// **The requirement `ParallelCpuLiveCurrentExecutor` states about itself, actually checked.**
     ///
     /// Its own doc says *"the bound affects only work placement; the complete event result is
-    /// required to equal `HostLiveCurrentExecutor`."* Measured 2026-08-10: **no test compared the
+    /// required to equal `CpuLiveCurrentExecutor`."* Measured 2026-08-10: **no test compared the
     /// two.** The parity test above compares `Parallel(1)` against `Parallel(8)`, so the executor
     /// the requirement names was the one nothing verified — and its width comes from
-    /// `available_host_event_threads`, which reads `SOMA_LIVE_THREADS` from the process
+    /// `available_cpu_event_threads`, which reads `SOMA_LIVE_THREADS` from the process
     /// environment, so it was untested at any specific value.
     ///
     /// This closes that. It also varies the cover: the currents are given deliberately unequal
     /// extents, so the by-extent cover assigns them differently from a by-count one, and a lane
     /// carrying a different section must still return the identical event.
     #[test]
-    fn the_parallel_host_executor_equals_the_host_executor_it_declares_itself_against() {
+    fn the_parallel_cpu_executor_equals_the_cpu_executor_it_declares_itself_against() {
         let (base, lineages) = primed_equal_lineages(4);
         let rest = base.rest_image().unwrap();
         let mut default_width = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
@@ -5705,22 +5705,22 @@ mod tests {
         let event = || ContemporaryEvent::new(&currents, &[]);
 
         let by_default = default_width
-            .receive_with(event(), &mut HostLiveCurrentExecutor)
+            .receive_with(event(), &mut CpuLiveCurrentExecutor)
             .unwrap();
         let by_one = single
-            .receive_with(event(), &mut ParallelHostLiveCurrentExecutor::new(1))
+            .receive_with(event(), &mut ParallelCpuLiveCurrentExecutor::new(1))
             .unwrap();
         let by_many = wide
-            .receive_with(event(), &mut ParallelHostLiveCurrentExecutor::new(7))
+            .receive_with(event(), &mut ParallelCpuLiveCurrentExecutor::new(7))
             .unwrap();
 
         assert_eq!(
             by_default, by_one,
-            "the declared equality: HostLiveCurrentExecutor against one lane"
+            "the declared equality: CpuLiveCurrentExecutor against one lane"
         );
         assert_eq!(
             by_default, by_many,
-            "the declared equality: HostLiveCurrentExecutor against seven lanes"
+            "the declared equality: CpuLiveCurrentExecutor against seven lanes"
         );
         assert_same_machine(&default_width, &single);
         assert_same_machine(&default_width, &wide);

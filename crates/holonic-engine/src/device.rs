@@ -1,4 +1,4 @@
-//! Exact host/device execution boundary.
+//! Exact cpu/device execution boundary.
 //!
 //! A GPU API may realize this ABI, but it is not mathematical authority.
 //! Admission requires byte-for-byte equality of the exact returned carrier
@@ -14,7 +14,7 @@ use crate::{HomogeneousConic, ProjectiveTurn};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum DeviceBackend {
-    HostCpu,
+    CpuCpu,
     VulkanCompute,
     CudaCompute,
     OtherExact,
@@ -53,11 +53,11 @@ pub trait ExactDeviceExecutor {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct HostExactDevice;
+pub struct CpuExactDevice;
 
-impl ExactDeviceExecutor for HostExactDevice {
+impl ExactDeviceExecutor for CpuExactDevice {
     fn backend(&self) -> DeviceBackend {
-        DeviceBackend::HostCpu
+        DeviceBackend::CpuCpu
     }
 
     fn execute(
@@ -100,7 +100,7 @@ pub fn admit_device(
     candidate: &impl ExactDeviceExecutor,
     tasks: &[ExactDeviceTask],
 ) -> Result<DeviceParityReceipt, ExactDeviceError> {
-    let authority = HostExactDevice.execute(tasks)?;
+    let authority = CpuExactDevice.execute(tasks)?;
     let returned = candidate.execute(tasks)?;
     if returned.len() != authority.len() {
         return Err(ExactDeviceError::Cardinality {
@@ -123,7 +123,7 @@ pub fn admit_device(
 pub enum ExactDeviceError {
     #[error("device returned {actual} members for {expected} exact tasks")]
     Cardinality { expected: usize, actual: usize },
-    #[error("{0:?} failed exact host/device parity and cannot execute the live law")]
+    #[error("{0:?} failed exact cpu/device parity and cannot execute the live law")]
     ParityRefused(DeviceBackend),
     #[error("the physical device executor refused: {0}")]
     PhysicalRefusal(String),
@@ -136,7 +136,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn host_exact_abi_closes_its_own_admission_corpus() {
+    fn cpu_exact_abi_closes_its_own_admission_corpus() {
         let tasks = vec![
             ExactDeviceTask::ProjectiveTurn {
                 turn: ProjectiveTurn::identity(),
@@ -161,6 +161,6 @@ mod tests {
                 declared_source: integer(1),
             },
         ];
-        assert!(admit_device(&HostExactDevice, &tasks).unwrap().exact);
+        assert!(admit_device(&CpuExactDevice, &tasks).unwrap().exact);
     }
 }

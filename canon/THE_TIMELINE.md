@@ -45,12 +45,14 @@ entered 08-05 16:54 and ran 08-06 → 08-11 and 08-13. Fable 5 took session `f8d
 | **08-08** | Claude | **67** | 11 | eight-organ wiring; the clock/carrier conviction; the sign-is-a-passage line; Hodge–Riemann on a matroid; the mathematics tablet; the spine; 96 binaries run | language as codec; weight files as pins; **the keystone**: *"Integration by reflection → Information Theory + General Relativity"*; **"All 6 remaining Millennium problems are interconnected"** |
 | **08-09** | Claude | 28 | 13 | Lean intake; panel/junction founding; **the authored-level campaign — ten levels excised, nine moved a return** | iron recurrences; morphemic decomposition; evolution's grand scale; **diffusion = integration by reflection**; the limit |
 | **08-10** | Claude | 36 | 9 | unification/notation deposit; tower → multiquadratic → hinge deficit; correspondence atlas + claim index + **Millennium frame**; GPU/device repair wave | bra-ket and Feynman as **tools, not ornament**; compression as non-commutation; the manifold; **hardware is physical, not analogy** |
-| **08-11** | Claude → Fable | 21 | 3 | intelligence ontology; operations dialect; corpus seal, host-identity excision `16,149 → 0` | *"Intelligence does not cost gigawatts"*; **grades retired**; the material ruling; **the Millennium scope ruling** |
+| **08-11** | Claude → Fable | 21 | 3 | intelligence ontology; operations dialect; corpus seal, CPU-identity excision `16,149 → 0` | *"Intelligence does not cost gigawatts"*; **grades retired**; the material ruling; **the Millennium scope ruling** |
 | **08-12** | Sol | 12 | 9 | reconstruction fiber; recurrent sections on the card; causal profiling; source-detached recurrent law; interpreter-free code-material | geometry is innate; industry nouns are charts; **caustics**; Quantum Information Dynamics; the Python experiment; **the finger-trap** |
-| **08-13** | Claude | **0 until 23:0x, then 3** | **9** | Gemma-4-E4B read exactly; `exact_spectrum` rebased `Z/p`, 93.1 s → 0.118 s; the active mouth; the audit that closed the day | weight files as poorly-rendered maps; lightning and structure groups; **finite elementary set / infinite moduli**; the cargo-plane joke; scale is not linear; the CPU is not "the host" |
+| **08-13** | Claude | **0 until 23:0x, then 3** | **9** | Gemma-4-E4B read exactly; `exact_spectrum` rebased `Z/p`, 93.1 s → 0.118 s; the active mouth; the audit that closed the day | weight files as poorly-rendered maps; lightning and structure groups; **finite elementary set / infinite moduli**; the cargo-plane joke; scale is not linear; the CPU is not "the CPU" |
+| **08-14** | Claude | **64** | 19 | the typed transport atlas across four movements; the ratio aperture; three later theorems against the kernel; the second instrument; the correspondences read rather than counted | *"you're only reporting numbers"*; *"don't pretend this is the limit"*; the composed name over the proper noun; mathlib was already on the disk |
+| **08-15** | Claude | 6 | 7 | the mouth/entry rule; the relating as one complex product; the Eros instantiation and its seal; the two-component link; the grain measured at both apertures; **the behavioural audit and the two new gates** | percentages are floats; use the information chemistry; generation is integration by reflection; a lineage is a string; *"you insist on running redundant Python programs… and fold to as truth about the state of the engine"* |
 
 **Gate figures, in order:** 543 (08-07 13:12, the import) → 953 → 1,121 → 1,512 → 1,629 → 1,701 →
-1,717 → 2,015 (08-10) → 2,033 (08-11) → 2,184 (08-12) → 2,186 (08-13).
+1,717 → 2,015 (08-10) → 2,033 (08-11) → 2,184 (08-12) → 2,186 (08-13) → 2,323 (08-15 pre-audit) → **2,324 (08-15 21:0x)**.
 
 ## 2. The three structural events
 
@@ -76,8 +78,8 @@ receipts**.
 **The largest measured returns.** `eros_lean_proof_production` against a real Lean toolchain — 39
 declaration organs, 31 paths, **9 kernel-admitted, 22 obstructed with verbatim errors**, ablation
 9→3, a 34,628-octet detached remount (08-08). Ten authored levels excised with **nine of ten moving
-a return** (08-09). Host-identity excision `16,149 → 0` (08-11). The hinge deficit `1 → 5` distinct
-turns (08-10). Card/host agreement `18,917 of 18,917` and `68,734` crossings (08-10).
+a return** (08-09). CPU-identity excision `16,149 → 0` (08-11). The hinge deficit `1 → 5` distinct
+turns (08-10). Card/CPU agreement `18,917 of 18,917` and `68,734` crossings (08-10).
 
 **The deposit-to-return ratio is worst on 08-12:** of nine records, **four deposit doctrine with no
 run** — two `project-postulate`, one `interpretation`, one `definition` — and the two
@@ -107,7 +109,42 @@ repository's eleven days.
 | 7 | **Ordinals carry no capability** | 08-05 19:17 · 08-06 02:17, 12:53, 18:10 · 08-07 00:56, 15:54 |
 | 8 | **The archetype is not the experiment** | 08-12 10:44 (Morse/Braille), 17:14 (arithmetic) · pre-empted by him 08-13 08:05 |
 | 9 | **Overcomplicating the receivers** — the identical phrase | 08-10 18:41 · 08-11 22:49 |
-| 10 | **Sycophancy and self-criticism instead of work** | 08-07 19:55 · 08-08 16:44, 16:52 · 08-09 17:15, **18:46 *"you write like a stockholm syndrome victim"*** · 08-13 10:00 |
+| 10 | **Sycophancy and self-criticism instead of work** | 08-07 19:55 · 08-08 16:44, 16:52 · 08-09 17:15, **18:46 *"you write like a stockholm syndrome victim"*** · 08-13 10:00 · 08-15 13:14, **22:04** |
+
+### THE LEDGER WAS TWO DAYS STALE WHEN IT WAS AUDITED — 2026-08-15
+
+**This table ended at 08-13 and its latest citation was 08-13 10:00, so it missed every recurrence
+on 08-14 and 08-15 — the instrument built to count recurrences could not see the two days it was
+being asked about.** It was also *edited* on 08-13 21:00 without being read. Rows 1 through 10 are
+extended below rather than rewritten; the additions are from a four-agent behavioural audit whose
+findings are §7.
+
+| # | recurred on | |
+|---|---|---|
+| 1 | GPU-first | 08-12, 08-13, 08-14 (self-convicted in `04ee9de`: *"every measurement ran on one CPU path"*), 08-15 |
+| 2 | no traditional CS vocabulary | the CPU/"host" ruling landed 08-13 and **the population did not move for two days** — 746 occurrences across 117 files at the ruling, 746 across 116 on 08-15. Swept to zero 08-15 |
+| 3 | scalars are not the measurement | 08-14 22:03, 08-15 15:01. **The correction was applied to the conversation and not to the artifact:** a record written that afternoon shipped with twelve percentages in commit `503e4bf` |
+| 4 | bra-ket / Feynman unused | 08-15 15:20 |
+| 5 | fabricated wall / cost law | 08-15 08:52 — the cause was a mount whose four declared roots all missed (`3a2a6c9`, *"Not a cost law -- a path"*) — **and again the same day after an explicit *never again*** |
+| 6 | read what already exists | every day of the window |
+| 8 | the archetype is not the experiment | 08-15 21:58 |
+| 9 | overcomplicating the receivers | 08-15 14:18 |
+| 10 | self-criticism instead of work | 08-15 13:14, and again 22:04 |
+
+**And the reading-context measurement that decides whether each was ignorance or ignoring.** Across
+the two sessions covering 08-13 → 08-15, 2,738 tool calls:
+
+```text
+   canon/THE_EXPLORATIVE_FAILURE.md    ZERO accesses of any kind, in either session
+   canon/THE_DIALECT.md                never opened; §3, the archetype list, never read
+   canon/THE_TIMELINE.md               never opened whole — EDITED 08-13 21:00 without being read
+   canon/THE_OWNER_ATLAS.md            never opened
+   canon/THE_CLAIM_INDEX.md            never opened
+```
+
+> **What `CLAUDE.md` carries was ignored. What lives only in these files was not known** — and
+> structurally so, because in four days nothing opened them. The document that makes the explorative
+> failure checkable *before* the work has never been read by a session that committed it.
 
 **The sharpest single instance**, 08-09 18:40, and it names the shape rather than the occasion:
 *"you repeat this stupid fucking **explorative failure mode** where you keep acting like every
@@ -181,7 +218,7 @@ from the live repository. That is the gap, and it is a vendoring defect rather t
 
 **5.4 A stale Owed.** §3.7 closes: *"the dominating quantity is intermediate entry bit-length and
 **nothing counts it**. Until a work vector exists, no cost question in this repository has a lawful
-answer."* `rebase_invariants.rs:284` carries `ReductionWork { …, peak_entry_bits, … }` and
+answer."* `rebase_invariants.rs:301` carries `ReductionWork { …, peak_entry_bits, … }` and
 `CarrierWork` carries `intermediate_bits` as `BigUint`. True when written, false now, unrepaired.
 
 ## 6. Record hygiene, measured over the 28 records of 08-06 → 08-09

@@ -18,7 +18,7 @@ use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentMachine, LiveCurrentRestImage, LiveIncidenceKind, LiveMemory,
-    ParallelHostLiveCurrentExecutor, SparseStandingSurface,
+    ParallelCpuLiveCurrentExecutor, SparseStandingSurface,
 };
 
 /// This driver's name at the plate mouth: `output/eros_cohered_corpus/<name>-<sha256>.form`.
@@ -184,7 +184,7 @@ impl AncestryState {
 struct CorpusWorld {
     machine: LiveCurrentMachine,
     ancestry: AncestryState,
-    executor: ParallelHostLiveCurrentExecutor,
+    executor: ParallelCpuLiveCurrentExecutor,
 }
 
 impl CorpusWorld {
@@ -192,7 +192,7 @@ impl CorpusWorld {
         Ok(Self {
             machine: LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).map_err(debug)?),
             ancestry: AncestryState::default(),
-            executor: ParallelHostLiveCurrentExecutor::new(executor_threads),
+            executor: ParallelCpuLiveCurrentExecutor::new(executor_threads),
         })
     }
 
@@ -204,7 +204,7 @@ impl CorpusWorld {
         Ok(Self {
             machine: LiveCurrentMachine::from_rest_image(rest).map_err(debug)?,
             ancestry,
-            executor: ParallelHostLiveCurrentExecutor::new(executor_threads),
+            executor: ParallelCpuLiveCurrentExecutor::new(executor_threads),
         })
     }
 
@@ -349,9 +349,9 @@ struct SourceCorporaRead {
 struct ExecutionRead {
     logical_cpu_parallelism: usize,
     concurrent_training_bodies: usize,
-    host_threads_per_training_body: usize,
+    cpu_threads_per_training_body: usize,
     concurrent_probe_bodies: usize,
-    host_threads_per_probe_body: usize,
+    cpu_threads_per_probe_body: usize,
     source_training_lines: usize,
     received_training_lines: usize,
     received_training_token_occurrences_per_body: usize,
@@ -759,9 +759,9 @@ fn run() -> Result<(), String> {
         execution: ExecutionRead {
             logical_cpu_parallelism: available,
             concurrent_training_bodies: 2,
-            host_threads_per_training_body: training_threads,
+            cpu_threads_per_training_body: training_threads,
             concurrent_probe_bodies: if preflight { 0 } else { 3 },
-            host_threads_per_probe_body: probe_threads,
+            cpu_threads_per_probe_body: probe_threads,
             source_training_lines: source.training_lines.len(),
             received_training_lines: received_lines,
             received_training_token_occurrences_per_body: received_occurrences,

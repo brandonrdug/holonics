@@ -39,7 +39,7 @@ use holonic_engine::receiver_exact_compression::{InputId, ItemId, ObservedSystem
 
 /// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
 /// (`canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements
-/// about the host, so the caller states them. Past either the recovery refuses by name rather than
+/// about the cpu, so the caller states them. Past either the recovery refuses by name rather than
 /// sampling, and that refusal shape is what the move preserved.
 const APERTURES: RecoveryApertures = RecoveryApertures {
     family_words: 65_536,

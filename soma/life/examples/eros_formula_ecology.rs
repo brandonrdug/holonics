@@ -14,7 +14,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentExecutionRequest, CurrentGeometry,
-    CurrentLineage, DirectedExecutionRequest, ExecutedContemporaryEvent, HostLiveCurrentExecutor,
+    CurrentLineage, DirectedExecutionRequest, ExecutedContemporaryEvent, CpuLiveCurrentExecutor,
     InterfaceCapability, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine, LiveMemory, RegionalExecutionRequest, RegionalRelationArc,
     RegionalRelationCell, SparseStandingSurface,
@@ -838,7 +838,7 @@ fn run() -> Result<(), String> {
         if arguments.next().is_some() {
             return Err(usage());
         }
-        let report = run_poisson_tail_host()?;
+        let report = run_poisson_tail_cpu()?;
         return write_report(&output, &report, report.status);
     }
     if first == "--theta-mellin" {
@@ -846,7 +846,7 @@ fn run() -> Result<(), String> {
         if arguments.next().is_some() {
             return Err(usage());
         }
-        let report = run_theta_mellin_host()?;
+        let report = run_theta_mellin_cpu()?;
         return write_report(&output, &report, report.status);
     }
     if first == "--efficiency" {
@@ -854,7 +854,7 @@ fn run() -> Result<(), String> {
         if arguments.next().is_some() {
             return Err(usage());
         }
-        let report = run_efficiency_host()?;
+        let report = run_efficiency_cpu()?;
         return write_report(&output, &report, report.status);
     }
     if first == "--growth" {
@@ -862,14 +862,14 @@ fn run() -> Result<(), String> {
         if arguments.next().is_some() {
             return Err(usage());
         }
-        let report = run_growth_host()?;
+        let report = run_growth_cpu()?;
         return write_report(&output, &report, report.status);
     }
     let output = PathBuf::from(first);
     if arguments.next().is_some() {
         return Err(usage());
     }
-    let report = run_host()?;
+    let report = run_cpu()?;
     write_report(&output, &report, report.status)
 }
 
@@ -901,7 +901,7 @@ fn usage() -> String {
         .to_owned()
 }
 
-fn run_host() -> Result<Report, String> {
+fn run_cpu() -> Result<Report, String> {
     let source_laws = vec![
         ("formal-exp".to_owned(), LawKind::FormalExp),
         ("euler-log".to_owned(), LawKind::EulerLog),
@@ -1220,7 +1220,7 @@ fn run_host() -> Result<Report, String> {
     })
 }
 
-fn run_growth_host() -> Result<GrowthReport, String> {
+fn run_growth_cpu() -> Result<GrowthReport, String> {
     let source_laws = vec![
         ("formal-exp".to_owned(), LawKind::FormalExp),
         ("euler-log".to_owned(), LawKind::EulerLog),
@@ -3818,13 +3818,13 @@ struct PoissonReport {
 }
 
 #[derive(Default)]
-struct TimedHostExecutor {
-    inner: HostLiveCurrentExecutor,
+struct TimedCpuExecutor {
+    inner: CpuLiveCurrentExecutor,
     enact: Duration,
     settle: Duration,
 }
 
-impl LiveCurrentExecutor for TimedHostExecutor {
+impl LiveCurrentExecutor for TimedCpuExecutor {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -3979,7 +3979,7 @@ fn profiled_receive(
     let preflight = event_preflight(event)?;
     let before = usage_snapshot();
     let started = Instant::now();
-    let mut executor = TimedHostExecutor::default();
+    let mut executor = TimedCpuExecutor::default();
     let radiation = machine.receive_with(event, &mut executor).map_err(debug)?;
     let wall = started.elapsed();
     let after = usage_snapshot();
@@ -4160,7 +4160,7 @@ fn decode_bigint(
 ) -> Result<BigInt, String> {
     let sign = read_sign(atlas.word(root, sign_tag, &[term])?)?;
     let count = usize::try_from(atlas.word(root, count_tag, &[term])?)
-        .map_err(|_| "compact integer limb count exceeds the host".to_owned())?;
+        .map_err(|_| "compact integer limb count exceeds the cpu".to_owned())?;
     let mut limbs = Vec::with_capacity(count);
     for at in 0..count {
         limbs.push(
@@ -4185,9 +4185,9 @@ fn decode_compact_polynomial(
     let degree = u8::try_from(atlas.word(root, WORD_DEGREE, &[])?)
         .map_err(|_| "compact polynomial degree exceeds u8".to_owned())?;
     let axis_count = usize::try_from(atlas.word(root, WORD_AXIS_COUNT, &[])?)
-        .map_err(|_| "compact polynomial axis count exceeds the host".to_owned())?;
+        .map_err(|_| "compact polynomial axis count exceeds the cpu".to_owned())?;
     let term_count = usize::try_from(atlas.word(root, WORD_TERM_COUNT, &[])?)
-        .map_err(|_| "compact polynomial term count exceeds the host".to_owned())?;
+        .map_err(|_| "compact polynomial term count exceeds the cpu".to_owned())?;
     let mut axes = Vec::with_capacity(axis_count);
     for axis_at in 0..axis_count {
         let axis_at = axis_at as u64;
@@ -4198,7 +4198,7 @@ fn decode_compact_polynomial(
             )),
             2 => {
                 let length = usize::try_from(atlas.word(root, WORD_AXIS_SYMBOL_LEN, &[axis_at])?)
-                    .map_err(|_| "compact symbol length exceeds the host".to_owned())?;
+                    .map_err(|_| "compact symbol length exceeds the cpu".to_owned())?;
                 let mut bytes = Vec::with_capacity(length);
                 for byte_at in 0..length {
                     bytes.push(
@@ -4258,7 +4258,7 @@ impl ThetaMellinFace {
             .ok()
             .and_then(|value| value.checked_add(1))
             .and_then(|value| value.checked_mul(2))
-            .ok_or_else(|| "theta aperture exceeds the host".to_owned())?;
+            .ok_or_else(|| "theta aperture exceeds the cpu".to_owned())?;
         let mut arms = Vec::with_capacity(capacity);
         for shell in 0..=aperture {
             append_theta_shell(&mut arms, shell)?;
@@ -4322,7 +4322,7 @@ impl ThetaMellinFace {
             .ok()
             .and_then(|value| value.checked_add(1))
             .and_then(|value| value.checked_mul(2))
-            .ok_or_else(|| "theta aperture exceeds the host".to_owned())?;
+            .ok_or_else(|| "theta aperture exceeds the cpu".to_owned())?;
         let mut arms = Vec::with_capacity(capacity);
         for shell in 0..=aperture {
             append_theta_shell(&mut arms, shell)?;
@@ -4418,7 +4418,7 @@ fn append_theta_shell(arms: &mut Vec<ThetaArm>, shell: u32) -> Result<(), String
     let direct_at = arms.len();
     let reciprocal_at = direct_at
         .checked_add(1)
-        .ok_or_else(|| "theta arm index exceeds the host".to_owned())?;
+        .ok_or_else(|| "theta arm index exceeds the cpu".to_owned())?;
     arms.push(ThetaArm {
         shell,
         hand: ThetaHand::Direct,
@@ -4612,7 +4612,7 @@ fn decode_compact_theta_face(
     let aperture = u32::try_from(atlas.word(root, WORD_THETA_APERTURE, &[])?)
         .map_err(|_| "theta aperture exceeds u32".to_owned())?;
     let arm_count = usize::try_from(atlas.word(root, WORD_THETA_ARM_COUNT, &[])?)
-        .map_err(|_| "theta arm count exceeds the host".to_owned())?;
+        .map_err(|_| "theta arm count exceeds the cpu".to_owned())?;
     let fixed_axis = BigRational::new(
         BigInt::from(atlas.word(root, WORD_THETA_FIXED_NUMERATOR, &[])?),
         BigInt::from(atlas.word(root, WORD_THETA_FIXED_DENOMINATOR, &[])?),
@@ -4642,7 +4642,7 @@ fn decode_compact_theta_face(
                 WORD_THETA_INVOLUTION_TARGET,
                 &[route],
             )?)
-            .map_err(|_| "theta involution target exceeds the host".to_owned())?,
+            .map_err(|_| "theta involution target exceeds the cpu".to_owned())?,
             metric_weight: atlas.word(root, WORD_THETA_METRIC_WEIGHT, &[route])?,
             symmetric_coefficient: decode_rational_words(
                 &atlas,
@@ -5434,7 +5434,7 @@ fn run_scale_probe(budget: &RunBudget, semantic_atoms: usize) -> Result<ScalePro
     })
 }
 
-fn run_efficiency_host() -> Result<EfficiencyReport, String> {
+fn run_efficiency_cpu() -> Result<EfficiencyReport, String> {
     let budget = RunBudget::new();
     let microscopic_equivalence = run_micro_equivalence(&budget)?;
     let compact_formula_transition = run_compact_formula_transition(&budget)?;
@@ -5478,7 +5478,7 @@ fn run_efficiency_host() -> Result<EfficiencyReport, String> {
     Ok(EfficiencyReport {
         schema: "eros.formula-efficiency.v1",
         status: if accepted { "accepted" } else { "rejected" },
-        question: "Can exact formula growth retain its causal lifecycle while typed algebraic words replace JSON bits and the host indexes validation, pin identity, and exposed-interface seams?",
+        question: "Can exact formula growth retain its causal lifecycle while typed algebraic words replace JSON bits and the cpu indexes validation, pin identity, and exposed-interface seams?",
         theory_to_structure: "Each algebraic field or exact integer limb is one source-declared interface word. Interface local carries the exact word; its namespace carries artifact-root plus typed route. Fixed hand is orientation, never payload. The predecessor, law, objective, successor, and departure still cross as actual current and Standing relations.",
         stopping_condition: "Stop after one exact degree-two to degree-three successor, one microscopic literal/compact equivalence, four bounded index probes through 512 atoms, exact rest, and the two-minute hard limit. Do not enter theta/Mellin.",
         logical_cores: std::thread::available_parallelism()
@@ -5502,7 +5502,7 @@ fn run_efficiency_host() -> Result<EfficiencyReport, String> {
     })
 }
 
-fn run_theta_mellin_host() -> Result<ThetaMellinReport, String> {
+fn run_theta_mellin_cpu() -> Result<ThetaMellinReport, String> {
     const PREDECESSOR_APERTURE: u32 = 4;
 
     let budget = RunBudget::new();
@@ -5852,7 +5852,7 @@ fn run_theta_mellin_host() -> Result<ThetaMellinReport, String> {
     })
 }
 
-fn run_poisson_tail_host() -> Result<PoissonReport, String> {
+fn run_poisson_tail_cpu() -> Result<PoissonReport, String> {
     const PREDECESSOR_APERTURE: u32 = 4;
 
     let budget = RunBudget::new();
@@ -6173,7 +6173,7 @@ fn run_poisson_tail_host() -> Result<PoissonReport, String> {
         status: if accepted { "accepted" } else { "rejected" },
         question: "Can Soma carry the general finite-aperture/generative-remainder relation as one causal replacement when instantiated by two Gaussian charts joined by Poisson summation?",
         theory_to_structure: "The source supplies the exact Poisson transform identity. Each complete chart is factored into a finite theta aperture and one formal Gaussian tail generator. Growing the aperture transfers the same shell from each generator into its chart; the machine carries the predecessor, law, objective, replacement, constituent departure, and exact rest without materializing an infinite population.",
-        stopping_condition: "Stop after one aperture-four to aperture-five host transition preserves both complete chart bodies, preserves their inherited transform identity, advances both tail generators to shell six, recovers aperture four by restriction, and remounts exactly. Do not search zeta zeros, claim RH, enlarge the aperture, render, tune, or enter CUDA.",
+        stopping_condition: "Stop after one aperture-four to aperture-five cpu transition preserves both complete chart bodies, preserves their inherited transform identity, advances both tail generators to shell six, recovers aperture four by restriction, and remounts exactly. Do not search zeta zeros, claim RH, enlarge the aperture, render, tune, or enter CUDA.",
         inherited_fact: "Poisson summation for the Gaussian is source law, not a result rediscovered or proved by this run.",
         logical_cores: std::thread::available_parallelism()
             .map(|cores| cores.get())

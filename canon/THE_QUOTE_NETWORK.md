@@ -934,6 +934,11 @@ which grade moved, by how much in free rank, and which torsion appeared or vanis
 exhibitable population rather than a scalar distance. `crates/holonic-engine/src/derivation_skein.rs`
 drives it and returns 18 of 58 classes at `2·c` with factors `[2,2,2]`.
 
+**Command, re-run 2026-08-15:** `grep -n "QUOTE_NETWORK\\|struct ContextVerdict\\|struct GradeRemainder"
+crates/holonic-engine/src/skein.rs` returns the citation at `:13`, `GradeRemainder` at `:82` and
+`ContextVerdict` at `:100`, with library consumers at `derivation_skein.rs:95` and
+`substitution_realizers.rs:102`. The retraction stands.
+
 **What remains open is scale, not construction**, which is §11's own current position: the organ has
 never been run where the population is far enough that condensation is *required* rather than
 incidental. The theorem's boundary clause is carried in the source and is not softened — no complete
@@ -1468,6 +1473,11 @@ and `soma/mount/src/bin/mount-register-remount-gate.rs` (775 lines) carry rest a
 weight files have always been* — makes rest/remount and memoization one operation. **No document
 states that identification, and no owner is named as the cache.** It is the design he offered
 instead of a test-tier scheme, and the test-tier scheme is what was built.
+
+**Re-measured 2026-08-15 and it HOLDS.**
+`grep -rni "founded tensors are the cache\|named as the cache" --include='*.md' canon blueprint research CLAUDE.md CONSTRUCTION_STATE.md`
+returns only this file's own two lines, and `grep -rni "memoi" --include='*.rs' crates soma` returns
+one token in one example, which is not a cache owner. No owner is named as the cache.
 
 ---
 
@@ -2245,3 +2255,20 @@ immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
 | `mount-scope-gate` failure at lane cohort four | §20 | standing defect, fifth fixture unreached |
 | Governing documents describe an archived body | §26 | `README.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `notebook/check.sh` |
 | A standard name for "no system anticipates the unfounded axis" | §14 | he asked; never answered |
+
+
+**Re-measured 2026-08-15 and FOUR ROWS OF THIS INDEX ARE FALSE.** Commands:
+`grep -n "project-postulate" canon/TABLET_THE_UNIVERSALITY_MACHINE.md`,
+`grep -c "rug\|ab_glyph\|aho-corasick" soma/life/Cargo.toml`,
+`grep -n "architecture-lint" tools/gates.sh`.
+
+- the Universality Machine definition is carried at `canon/TABLET_THE_UNIVERSALITY_MACHINE.md:100`,
+  ratified 2026-08-12 — *"Carrier today: none"* is stale;
+- the skein row contradicts this same file at `:929` and `crates/holonic-engine/src/skein.rs:100`;
+- `soma/life/Cargo.toml` declares none of the three dependencies;
+- `architecture-lint` is a live gate with a committed baseline (`tools/gates.sh`,
+  `meta/HOLONIC_DSA_BASELINE.tsv`), repaired 2026-08-10 — it is not broken.
+
+**An index of open items decays faster than anything else in the corpus**, because every row is an
+absence claim and nothing re-runs them. This one is retained with its date so the next reader
+re-measures rather than inherits.

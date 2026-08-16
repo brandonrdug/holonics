@@ -2,7 +2,7 @@
 //!
 //! [`MorphologicalLanguageEcology`] owns the simultaneous-scale language body used inside every
 //! organ below. This module does not replace that body with a serialized conversation, a scalar
-//! embedding, or a host-selected answer. It composes several immutable conditioned organs:
+//! embedding, or a cpu-selected answer. It composes several immutable conditioned organs:
 //!
 //! - one shared inherited language body;
 //! - inherited action/observation/answer trajectory organs;
@@ -24,7 +24,7 @@ use holonic_language::{
 };
 use holonic_structure::{CausalMembrane, LocalSet};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{LiveCurrentExecutor, ParallelHostLiveCurrentExecutor};
+use soma_membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 use crate::{
     causal_language::{lexical_tokens, render_tokens},
@@ -198,7 +198,7 @@ pub struct AgenticActionRoute {
 /// contemporary language body exposes the inclusion-maximal ordered regions which actually
 /// reached an inherited action trajectory, plus the still-unmatched content surfaces which
 /// distinguish this occurrence from that inheritance. This remains exact caused testimony: it is
-/// neither an embedding nor a host-authored search query.
+/// neither an embedding nor a cpu-authored search query.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AgenticDeedArgument {
     pub ordered_surface: Vec<String>,

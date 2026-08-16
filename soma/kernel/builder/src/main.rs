@@ -1,6 +1,6 @@
 //! THE LOWERING — compile the soma kernel to SPIR-V (rust-gpu; ONE language, the body's own law shared by
 //! `#[path]`). Run from `kernel/builder/` on the pinned nightly (`rust-toolchain.toml`); the emitted module
-//! lands at `kernel/soma.spv` — the boundary crossing the host `include_bytes!`s.
+//! lands at `kernel/soma.spv` — the boundary crossing the cpu `include_bytes!`s.
 use spirv_builder::{Capability, SpirvBuilder};
 
 fn main() {

@@ -41,14 +41,14 @@ pub use register_recast::{
 pub const SOMA_PTX: &[u8] = include_bytes!("../soma-kernel-cuda/soma_kernel_cuda.ptx");
 
 /// The odd fold constant the `atomic_fold` kernel adds once per thread (mirrors the kernel's
-/// `FOLD_CONSTANT`; kept here so the host's exact check needs no re-derivation). 2^61 - 1.
+/// `FOLD_CONSTANT`; kept here so the cpu's exact check needs no re-derivation). 2^61 - 1.
 pub const FOLD_CONSTANT: u64 = 2_305_843_009_213_693_951;
 
 #[cfg(test)]
 mod tests {
     use super::SOMA_PTX;
 
-    /// The committed PTX boundary artifact, checked host-side (no GPU) so the workspace test
+    /// The committed PTX boundary artifact, checked cpu-side (no GPU) so the workspace test
     /// gates that the artifact is present, sm_89, and carries both entry points.
     const SMOKE_PTX: &[u8] = include_bytes!("../mount-smoke-kernel/mount_smoke_kernel.ptx");
     /// The CUDA smoke boundary. This check is deliberately static: it validates
@@ -118,7 +118,7 @@ mod tests {
     /// `soma-kernel-cuda/build-ptx.sh`, and emitted into the PTX. They have **no `soma_abi` entry
     /// symbol, no `Module::function` resolution, and no launcher** anywhere in `soma/` or
     /// `crates/` — `soma_abi::register::Entry` names five register entries and none of these is
-    /// among them. The `link` family has three host gates (`mount-link-gate` for
+    /// among them. The `link` family has three cpu gates (`mount-link-gate` for
     /// `link_{grain,sum,finish}`, `mount-founded-gate` for the founded pair); the *registered*
     /// third arm was compiled but its gate was never built, and `mount-chart-gate` resolves
     /// `chart_{mark,count,recast}` without `chart_register_mark`. The same four are orphaned

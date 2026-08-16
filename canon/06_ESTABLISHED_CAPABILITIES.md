@@ -11,7 +11,7 @@ schedule reconstruction.
 |---|---|
 | Event substrate and exact receiver engine | [`holonic-exact-receiver-engine-01`](archive/cpp-engine/evidence/observations/holonic-exact-receiver-engine-01/RESULTS.md); pinned implementation at `reference/engine-a07ff376/crates/holonic-engine/` |
 | Exact conic/receiver geometry | [`THE_CONIC_IS_ITS_QUADRATIC`](../research/records/2026-07-26_THE_CONIC_IS_ITS_QUADRATIC_THE_HINGE_EVENT_EMITS_ITS_LOCAL_WORLD.md) |
-| Exact host/card restriction | [`THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT`](../research/records/2026-07-26_THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT_THE_PHASE_COLORS_THE_FACE.md); [`cuda-continuation-01`](archive/cpp-engine/evidence/observations/cuda-continuation-01/README.md) |
+| Exact CPU/card restriction | [`THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT`](../research/records/2026-07-26_THE_CARD_RESTRICTS_THE_CAUSED_SUPPORT_THE_PHASE_COLORS_THE_FACE.md); [`cuda-continuation-01`](archive/cpp-engine/evidence/observations/cuda-continuation-01/README.md) |
 | Causal local fronts | [`THE_CURRENT_CROSSES_THE_LOCAL_FRONT`](../research/records/2026-07-27_THE_CURRENT_CROSSES_THE_LOCAL_FRONT_THE_FRAME_CANNOT_SCHEDULE_THE_EVENT.md) |
 | Dimension-independent causal algebra | [`THE_OPPOSED_ENDS_CAST_THE_CAUSAL_BODY`](../research/records/2026-07-27_THE_OPPOSED_ENDS_CAST_THE_CAUSAL_BODY_THE_SCALAR_IS_A_RECEIVER_RECEIPT.md) |
 | Prime fibers, sheaves, horns, recurrence | [`THE_PRIME_RECEIVES_THE_POLYNOMIAL`](../research/records/2026-07-27_THE_PRIME_RECEIVES_THE_POLYNOMIAL_THE_RESIDUE_TRANSPORT_EMERGES_FROM_THE_FIBERS.md); [`THE_INHERITED_POLYNOMIAL_ENTERS_THE_PRIME`](../research/records/2026-07-27_THE_INHERITED_POLYNOMIAL_ENTERS_THE_PRIME_THE_OPEN_HORN_BECOMES_A_CAUSED_CELL.md); [`THE_HORN_EMITS_THE_COEFFICIENT_FAMILY`](../research/records/2026-07-27_THE_HORN_EMITS_THE_COEFFICIENT_FAMILY_THE_RECEIVER_MEASURES_ITS_REFINEMENT.md); [`THE_INDUCED_FACE_RECURS`](../research/records/2026-07-27_THE_INDUCED_FACE_RECURS_THE_HOMOLOGOUS_PATHS_RETURN_ONE_FAMILY.md) |
@@ -36,7 +36,7 @@ schedule reconstruction.
 - **Receiver-relative geometry — `implemented-exact`.** Exact projective conics, simplicial hinges,
   local physical successors, connection holonomy, conic families, boundary subdivision, and
   continuous receiver supports were constructed without floating source standing.
-- **Host/card exact realization — `implemented-exact` + `measured`.** Exact finite projective segment
+- **CPU/card exact realization — `implemented-exact` + `measured`.** Exact finite projective segment
   and homogeneous-conic restriction crossed a native CUDA boundary with signed-magnitude carriers
   and 128/192/256/384-bit tiers. Complete address/multiplicity equality was graded. On the recorded
   RTX 4080 SUPER, bounded receiver passages measured roughly 9–15.5 ms in their declared apertures.

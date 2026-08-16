@@ -76,7 +76,7 @@ pub struct RecurrentLawCudaReceipt {
     pub launch_ordinal: u64,
     pub grid: [u32; 3],
     pub block: [u32; 3],
-    pub host_semantic_replay: bool,
+    pub cpu_semantic_replay: bool,
 }
 
 pub struct CudaRecurrentLawExecutor {
@@ -235,7 +235,7 @@ impl CudaRecurrentLawExecutor {
     }
 
     /// Enact complete recurrent passages on the card. Every intermediate standing returns; the
-    /// host has no per-event callback and cannot replay or repair the fold.
+    /// cpu has no per-event callback and cannot replay or repair the fold.
     pub fn fold(
         &mut self,
         queries: &[RecurrentFoldQuery],
@@ -406,7 +406,7 @@ impl CudaRecurrentLawExecutor {
                 launch_ordinal: self.launches,
                 grid: [launch.grid.x, launch.grid.y, launch.grid.z],
                 block: [launch.block.x, launch.block.y, launch.block.z],
-                host_semantic_replay: false,
+                cpu_semantic_replay: false,
             },
         ))
     }
@@ -476,7 +476,7 @@ impl CudaRecurrentLawExecutor {
                 launch_ordinal: self.launches,
                 grid: [launch.grid.x, launch.grid.y, launch.grid.z],
                 block: [launch.block.x, launch.block.y, launch.block.z],
-                host_semantic_replay: false,
+                cpu_semantic_replay: false,
             },
         ))
     }

@@ -832,7 +832,7 @@ mod tests {
 
     #[test]
     fn the_integer_law_and_the_exact_law_agree_on_every_swept_pair() {
-        // THE PARITY GATE, run rather than ignored. The device face and the host face are the same
+        // THE PARITY GATE, run rather than ignored. The device face and the cpu face are the same
         // statement, so they are checked against each other across a swept material rather than
         // asserted to agree in prose. Since 2026-08-15 it also compares the TRANSFER MATRIX entry
         // by entry, so the two charts agree on the transport and not only on its faces.

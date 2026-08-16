@@ -61,7 +61,7 @@ carrier. The factorization is stated here and deliberately not read further — 
 distinction is about a *phase* factor booked as magnitude, and nothing in this derivation exhibits
 one.
 
-The wave is one operator away. `cycle_laplacian` (`winding_inertia.rs:578`) is `L = 2I − A`, whose
+The wave is one operator away. `cycle_laplacian` (`winding_inertia.rs:700`) is `L = 2I − A`, whose
 eigenvalues `2 − 2cos(2πk/n) = 4sin²(πk/n)` are the discrete dispersion relation, and the driver
 measures its split at `n = 8` as `(7, 1, 0)` with the single null at `k = 0` — the constant mode,
 zero frequency, and nothing else. **Discrete linearity, curvature and the wave are three readings of
@@ -369,7 +369,7 @@ shapes, so it could disagree — `CLAUDE.md` §8's gauge-orbit rule satisfied by
 
 ### 12.2 The reading is receiver-relative and the frame measurably moves
 
-`cyclic_receiver_of_growth` (`winding_inertia.rs:636`) reads a grown circuit on the receiver
+`cyclic_receiver_of_growth` (`winding_inertia.rs:758`) reads a grown circuit on the receiver
 `net ↦ net mod n`, retaining conduction counted by displacement class. Net identifiers are allocated
 at expansion time, so this chart is schedule-relative, and the module **measures the difference
 rather than asserting it away**: the same Brent–Kung adder at extent 7 returns split `(3,0,4)` under
@@ -516,6 +516,13 @@ The absences, each with the search that shows it:
   the one adapter that would make the skein relation act on the object skein relations are for.
 - **No string.** `string theory`, `worldsheet` and `brane` return zero across `crates/` and `soma/`.
   `soma/surface` is a wgpu card boundary, not a surface in the mathematical sense.
+
+**Re-measured 2026-08-15.** `git grep -inw "writhe\|reidemeister" -- crates soma`,
+`git grep -in "jones\|alexander\|string theory\|worldsheet" -- crates soma` and
+`git grep -inw "brane\|branes" -- crates soma` all return **0**, and nothing converts a crossing
+into a `Substitution`. **One clause is stale:** `git grep -ic "unknot" -- crates soma` now returns
+five files rather than two — `examples/skein_far_condensation.rs:92` and three
+`soma/life/driver-sources/*/SOURCE.json` corpora.
 
 **One item moved while this section was being written and the correction belongs in it.**
 `crates/holonic-engine/examples/skein_far_condensation.rs` was a temporary sizing probe when this

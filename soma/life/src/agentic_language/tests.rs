@@ -988,13 +988,13 @@ fn remount_refuses_a_body_its_declared_causes_do_not_reproduce() {
 }
 
 /// One caller-retained executor which counts what it was asked to realize and forwards every
-/// request to exactly the host carrier the private path would have built.
-struct CountingHostExecutor {
-    host: ParallelHostLiveCurrentExecutor,
+/// request to exactly the cpu carrier the private path would have built.
+struct CountingCpuExecutor {
+    cpu: ParallelCpuLiveCurrentExecutor,
     enactments: usize,
 }
 
-impl LiveCurrentExecutor for CountingHostExecutor {
+impl LiveCurrentExecutor for CountingCpuExecutor {
     fn enact(
         &mut self,
         physical_revision: u64,
@@ -1004,7 +1004,7 @@ impl LiveCurrentExecutor for CountingHostExecutor {
         regional: &[soma_membrane::RegionalExecutionRequest<'_>],
     ) -> Result<soma_membrane::ExecutedContemporaryEvent, soma_membrane::LiveCurrentError> {
         self.enactments += 1;
-        self.host
+        self.cpu
             .enact(physical_revision, standing, currents, relations, regional)
     }
 }
@@ -1031,7 +1031,7 @@ impl LiveCurrentExecutor for RefusingExecutor {
 /// A caller-mounted carrier reaches the agentic answer, not only agentic conditioning.
 ///
 /// Equality of the returned answer alone would not separate a real twin from one which took the
-/// argument and quietly rebuilt its own host pool. Two frames make it falsifiable: the supplied
+/// argument and quietly rebuilt its own cpu pool. Two frames make it falsifiable: the supplied
 /// executor is the only executor either answer path may reach, so a nonzero count proves it
 /// carried the answer; and a *refusing* carrier must make the answer fail, which no fake twin can
 /// reproduce because it never consults the argument at all.
@@ -1053,7 +1053,7 @@ fn a_mounted_carrier_reaches_both_agentic_answer_paths() {
         )
     }
 
-    // The private-host path, which is what every caller had before the answer seam was joined.
+    // The private-cpu path, which is what every caller had before the answer seam was joined.
     let mut private_body = body();
     let question = AgenticLanguageQuestion::new("reflection-question", 90, DEED_QUESTION);
     let AgenticLanguageConsequence::Deed(deed) = private_body
@@ -1080,8 +1080,8 @@ fn a_mounted_carrier_reaches_both_agentic_answer_paths() {
 
     // The same cycle through one supplied carrier, counted between occurrences.
     let mut counted_body = body();
-    let mut counting = CountingHostExecutor {
-        host: ParallelHostLiveCurrentExecutor::new(2),
+    let mut counting = CountingCpuExecutor {
+        cpu: ParallelCpuLiveCurrentExecutor::new(2),
         enactments: 0,
     };
     let AgenticLanguageConsequence::Deed(deed) = counted_body
@@ -1151,8 +1151,8 @@ fn a_mounted_carrier_reaches_both_agentic_answer_paths() {
     );
 
     let mut refused_grounded_body = body();
-    let mut working = CountingHostExecutor {
-        host: ParallelHostLiveCurrentExecutor::new(2),
+    let mut working = CountingCpuExecutor {
+        cpu: ParallelCpuLiveCurrentExecutor::new(2),
         enactments: 0,
     };
     let AgenticLanguageConsequence::Deed(deed) = refused_grounded_body

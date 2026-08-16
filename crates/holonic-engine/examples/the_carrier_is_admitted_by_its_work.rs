@@ -1,8 +1,8 @@
 //! Admit one of two exact carriers on the **work** they do, never on the clock that watched them.
 //!
 //! `crates/holonic-engine/src/cuda_aperture.rs` conducts every receiver aperture through one of two
-//! carriers that a parity gate has already proved indistinguishable: the exact host law, and the
-//! hybrid CUDA/host law. Until 2026-08-08 the choice between them was
+//! carriers that a parity gate has already proved indistinguishable: the exact cpu law, and the
+//! hybrid CUDA/cpu law. Until 2026-08-08 the choice between them was
 //!
 //! ```text
 //! if authority_nanoseconds < candidate_nanoseconds
@@ -15,7 +15,7 @@
 //! The defect is not noise. The parity gate three lines above has already proved the two carriers
 //! return the same exact support for the declared receivers, so the question has **no answer inside
 //! that receiver family**, and the code resolved it by consulting a coordinate that is not in the
-//! family and is not receiver-visible: host contention, which includes whether the card is
+//! family and is not receiver-visible: cpu contention, which includes whether the card is
 //! simultaneously scanning out a desktop. That is `CLAUDE.md` §0's fourth lesson — a receiver-visible
 //! coordinate promoted into an invariant, returning consistently because there has only ever been
 //! one frame.
@@ -62,18 +62,18 @@ const APERTURE_HEIGHT: u32 = 24;
 /// create — see BOUNDS.
 const LIVE_REPETITIONS: usize = 3;
 
-fn work(host: u32, device: u32, transfer: u32, bits: u32) -> CarrierWork {
+fn work(cpu: u32, device: u32, transfer: u32, bits: u32) -> CarrierWork {
     CarrierWork {
-        host_evaluations: BigUint::from(host),
+        cpu_evaluations: BigUint::from(cpu),
         device_evaluations: BigUint::from(device),
         transfer_bytes: BigUint::from(transfer),
         intermediate_bits: BigUint::from(bits),
     }
 }
 
-fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
+fn metric(cpu: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
     DeclaredCarrierMetric::without_width(
-        BigUint::from(host),
+        BigUint::from(cpu),
         BigUint::from(device),
         BigUint::from(transfer),
     )
@@ -81,8 +81,8 @@ fn metric(host: u32, device: u32, transfer: u32) -> DeclaredCarrierMetric {
 
 fn render_work(carrier: &CarrierWork) -> String {
     format!(
-        "host {:>7}  device {:>7}  transfer {:>7}  bits {:>4}",
-        carrier.host_evaluations,
+        "cpu {:>7}  device {:>7}  transfer {:>7}  bits {:>4}",
+        carrier.cpu_evaluations,
         carrier.device_evaluations,
         carrier.transfer_bytes,
         carrier.intermediate_bits
@@ -103,7 +103,7 @@ fn render_admission(admission: &CarrierAdmission) -> String {
         CarrierAdmission::Open => "Open — both carriers retained".to_owned(),
         decided => {
             let carrier = match decided.conducts_through() {
-                ApertureExecutionBackend::ExactHost => "ExactHost",
+                ApertureExecutionBackend::ExactCpu => "ExactCpu",
                 ApertureExecutionBackend::HybridCuda => "HybridCuda",
             };
             match decided.dilation() {
@@ -164,7 +164,7 @@ fn conic(receiver: u64, cell: u64, coefficients: [Rat; 6]) -> PresentedPrimitive
 }
 
 /// Two receivers, three conics. Every one is exactly representable on the device carrier, so the
-/// hybrid candidate genuinely splits work across the seam rather than falling back to the host and
+/// hybrid candidate genuinely splits work across the seam rather than falling back to the cpu and
 /// making the two carriers a mirror by accident.
 fn live_presentation() -> ContinuousPresentation {
     ContinuousPresentation {
@@ -240,7 +240,7 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
     rule("THE DECLARED APERTURES");
     // ---------------------------------------------------------------------------------------------
-    println!("  work vector      host_evaluations, device_evaluations, transfer_bytes,");
+    println!("  work vector      cpu_evaluations, device_evaluations, transfer_bytes,");
     println!(
         "                   intermediate_bits — every coordinate a BigUint read off the receipt"
     );
@@ -264,7 +264,7 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
     println!(
         "  Four declared carrier pairs. The order is componentwise, so it is PARTIAL on purpose: a\n  \
-         host evaluation and a device evaluation are different units and nothing in the material\n  \
+         cpu evaluation and a device evaluation are different units and nothing in the material\n  \
          says how many of one buys one of the other.\n"
     );
 
@@ -300,7 +300,7 @@ fn main() {
         },
         Pair {
             name: "incomparable",
-            why: "fewer host evaluations bought with device work and transferred octets",
+            why: "fewer cpu evaluations bought with device work and transferred octets",
             authority: work(2_304, 0, 0, 128),
             candidate: work(256, 2_048, 4_096, 128),
             predicted: ExactOrdering::Open,
@@ -372,16 +372,16 @@ fn main() {
     println!("    authority   {}", render_work(&authority));
     println!("    candidate   {}\n", render_work(&candidate));
     let declarations = [
-        ("host 1 : device 1 : transfer 1     ", metric(1, 1, 1)),
-        ("host 1 : device 1 : transfer 0     ", metric(1, 1, 0)),
-        ("host 1 : device 4 : transfer 1     ", metric(1, 4, 1)),
+        ("cpu 1 : device 1 : transfer 1     ", metric(1, 1, 1)),
+        ("cpu 1 : device 1 : transfer 0     ", metric(1, 1, 0)),
+        ("cpu 1 : device 4 : transfer 1     ", metric(1, 4, 1)),
     ];
     let mut orbit: BTreeSet<&'static str> = BTreeSet::new();
     for (name, declared) in &declarations {
         let admission = CarrierAdmission::under(declared, &authority, &candidate);
         orbit.insert(match admission.conducts_through() {
             _ if admission.is_open() => "Open",
-            ApertureExecutionBackend::ExactHost => "ExactHost",
+            ApertureExecutionBackend::ExactCpu => "ExactCpu",
             ApertureExecutionBackend::HybridCuda => "HybridCuda",
         });
         println!("    {name}  {}", render_admission(&admission));
@@ -420,7 +420,7 @@ fn main() {
     ] {
         let again = CarrierAdmission::under(&declared, &authority, &candidate);
         let convicted_would_pick = if authority_ns < candidate_ns {
-            ApertureExecutionBackend::ExactHost
+            ApertureExecutionBackend::ExactCpu
         } else {
             ApertureExecutionBackend::HybridCuda
         };
@@ -430,7 +430,7 @@ fn main() {
             "    candidate {candidate_ns:>9} ns  authority {authority_ns:>9} ns   \
              admitted {:<11} the clock would have picked {:?}",
             match again.conducts_through() {
-                ApertureExecutionBackend::ExactHost => "ExactHost",
+                ApertureExecutionBackend::ExactCpu => "ExactCpu",
                 ApertureExecutionBackend::HybridCuda => "HybridCuda",
             },
             convicted_would_pick
@@ -456,7 +456,7 @@ fn main() {
 
     match CudaApertureExecutor::new() {
         Err(CudaApertureError::NoDevice) => {
-            println!("  NOT EXERCISED — no CUDA device is present on this host.");
+            println!("  NOT EXERCISED — no CUDA device is present on this cpu.");
             println!(
                 "  Sections 1-3 are exact and device-free; this section is the only one that needs\n  \
                  a card, and its absence is reported rather than papered over."
@@ -500,7 +500,7 @@ fn main() {
     println!(
         "  - The metric-free product order is PARTIAL, and on this executor's own material it\n    \
          returns Open whenever the card did any work at all. That is the finding, not a gap: the\n    \
-         two carriers trade host evaluations against device evaluations plus transferred octets,\n    \
+         two carriers trade cpu evaluations against device evaluations plus transferred octets,\n    \
          and no ordering of those is available without a receiver's declaration. The work vector\n    \
          alone is NOT sufficient to admit a carrier here."
     );
@@ -510,9 +510,9 @@ fn main() {
          price width would need a fourth cost, and none is claimed."
     );
     println!(
-        "  - `CarrierWork::of_host_authority` is a PREDICTION taken from the candidate's receipt\n    \
-         without running the host, and on this material its MAGNITUDE is refuted — see section 4.\n    \
-         Its doc claims *the host law evaluates every support the split shared out*; the host law\n    \
+        "  - `CarrierWork::of_cpu_authority` is a PREDICTION taken from the candidate's receipt\n    \
+         without running the cpu, and on this material its MAGNITUDE is refuted — see section 4.\n    \
+         Its doc claims *the cpu law evaluates every support the split shared out*; the cpu law\n    \
          in fact evaluates strictly fewer, because it does not evaluate an aperture member a tile\n    \
          has already excluded. The predicted ORDERING survives, which is the claim the owner's own\n    \
          doc makes falsifiable, and the refuted magnitude is information the clock comparison could\n    \
@@ -525,7 +525,7 @@ fn main() {
          does not put the card under a display load itself."
     );
     println!(
-        "  - Under `Open` the default conduct is the host authority, because it is the reference\n    \
+        "  - Under `Open` the default conduct is the cpu authority, because it is the reference\n    \
          every parity gate is taken against. That is a retained-plurality default and not a hidden\n    \
          preference: `admission()` reports it and `trace_through` conducts the other way."
     );
@@ -570,8 +570,8 @@ fn live_section(
     // carrier it admitted. Reading the admitted receipt's device figures beside the *candidate's*
     // work vector would print two carriers' coordinates as though they were one frame — the
     // absolute-frame defect at the level of a printout.
-    let host_run = executor_handle.trace_through(
-        ApertureExecutionBackend::ExactHost,
+    let cpu_run = executor_handle.trace_through(
+        ApertureExecutionBackend::ExactCpu,
         presentation,
         specification,
         receivers,
@@ -588,7 +588,7 @@ fn live_section(
     println!("  device            {}", receipt.device);
     println!(
         "  parity            {} (the gate that proves the two carriers indistinguishable)",
-        receipt.host_parity
+        receipt.cpu_parity
     );
     println!("  receivers         {}", receipt.receivers);
     println!("  aperture_members  {}", receipt.aperture_members);
@@ -598,7 +598,7 @@ fn live_section(
         println!("  THE HYBRID CANDIDATE'S OWN APERTURE FIGURES");
         println!("    arithmetic        {}", hybrid_receipt.device_arithmetic);
         println!("    device_primitives {}", hybrid_receipt.device_primitives);
-        println!("    host_primitives   {}", hybrid_receipt.host_primitives);
+        println!("    cpu_primitives   {}", hybrid_receipt.cpu_primitives);
         println!("    device_threads    {}", hybrid_receipt.device_threads);
         println!(
             "    device_output     {} octets",
@@ -640,7 +640,7 @@ fn live_section(
     println!(
         "    the convicted comparison would have picked {:?} from exactly these two numbers.",
         if receipt.admission_authority_nanoseconds < receipt.admission_candidate_nanoseconds {
-            ApertureExecutionBackend::ExactHost
+            ApertureExecutionBackend::ExactCpu
         } else {
             ApertureExecutionBackend::HybridCuda
         }
@@ -672,13 +672,13 @@ fn live_section(
     // -- Open retains both, exhibited by conducting through each ---------------------------------
     println!();
     println!("  BOTH CARRIERS ARE STILL CONDUCTIBLE");
-    let both_conduct = match (&host_run, &hybrid_run) {
-        (Ok((host_traces, host_receipt)), Ok((hybrid_traces, hybrid_receipt))) => {
+    let both_conduct = match (&cpu_run, &hybrid_run) {
+        (Ok((cpu_traces, cpu_receipt)), Ok((hybrid_traces, hybrid_receipt))) => {
             println!(
-                "    ExactHost   returned {} receivers, {} exact support evaluations, {} ns",
-                host_traces.len(),
-                host_receipt.exact_support_evaluations,
-                host_receipt.wall_nanoseconds
+                "    ExactCpu   returned {} receivers, {} exact support evaluations, {} ns",
+                cpu_traces.len(),
+                cpu_receipt.exact_support_evaluations,
+                cpu_receipt.wall_nanoseconds
             );
             println!(
                 "    HybridCuda  returned {} receivers, {} exact support evaluations, {} ns",
@@ -686,11 +686,11 @@ fn live_section(
                 hybrid_receipt.exact_support_evaluations,
                 hybrid_receipt.wall_nanoseconds
             );
-            let same = host_traces.len() == hybrid_traces.len()
-                && host_traces.iter().all(|(receiver, host)| {
+            let same = cpu_traces.len() == hybrid_traces.len()
+                && cpu_traces.iter().all(|(receiver, cpu)| {
                     hybrid_traces
                         .get(receiver)
-                        .is_some_and(|hybrid| host.has_same_exact_support(hybrid))
+                        .is_some_and(|hybrid| cpu.has_same_exact_support(hybrid))
                 });
             println!(
                 "    identical exact support across both carriers: {same} — which is precisely why\n    \
@@ -698,8 +698,8 @@ fn live_section(
             );
             same
         }
-        (host, hybrid) => {
-            println!("    ExactHost   {:?}", host.as_ref().err());
+        (cpu, hybrid) => {
+            println!("    ExactCpu   {:?}", cpu.as_ref().err());
             println!("    HybridCuda  {:?}", hybrid.as_ref().err());
             false
         }
@@ -707,7 +707,7 @@ fn live_section(
     holds.push((
         "both carriers stay conductible after admission and return identical exact support",
         both_conduct,
-        "trace_through(ExactHost) and trace_through(HybridCuda) both returned; support agrees"
+        "trace_through(ExactCpu) and trace_through(HybridCuda) both returned; support agrees"
             .to_owned(),
     ));
 
@@ -754,20 +754,20 @@ fn live_section(
         ),
     ));
 
-    // -- the prediction, graded against the host run rather than against itself -------------------
+    // -- the prediction, graded against the cpu run rather than against itself -------------------
     //
-    // `receipt.authority_work` is the prediction `of_host_authority` made from the CANDIDATE's
+    // `receipt.authority_work` is the prediction `of_cpu_authority` made from the CANDIDATE's
     // receipt, carried across `admit`'s receipt swap. Grading it against the admitted receipt it was
-    // swapped into would be a tautology: `of_host_authority(host_receipt).host_evaluations` is
-    // `host_receipt.exact_support_evaluations` by definition, and a receipt that could not have come
+    // swapped into would be a tautology: `of_cpu_authority(cpu_receipt).cpu_evaluations` is
+    // `cpu_receipt.exact_support_evaluations` by definition, and a receipt that could not have come
     // out otherwise carries no evidence (§8).
     println!();
-    println!("  THE PREDICTION, GRADED AGAINST THE HOST RUN");
+    println!("  THE PREDICTION, GRADED AGAINST THE CPU RUN");
     let predicted = receipt.authority_work.clone();
-    let ordering_confirmed = match &host_run {
-        Ok((_, host_receipt)) => {
+    let ordering_confirmed = match &cpu_run {
+        Ok((_, cpu_receipt)) => {
             let measured = CarrierWork {
-                host_evaluations: host_receipt.exact_support_evaluations.clone(),
+                cpu_evaluations: cpu_receipt.exact_support_evaluations.clone(),
                 device_evaluations: BigUint::from(0_u32),
                 transfer_bytes: BigUint::from(0_u32),
                 intermediate_bits: predicted.intermediate_bits.clone(),
@@ -790,18 +790,18 @@ fn live_section(
                 "    admission on the measurement  {}",
                 render_admission(&on_measurement)
             );
-            if predicted.host_evaluations == measured.host_evaluations {
+            if predicted.cpu_evaluations == measured.cpu_evaluations {
                 println!("    the magnitude is confirmed as well.");
             } else {
                 println!(
-                    "\n    THE MAGNITUDE IS REFUTED. `of_host_authority`'s doc claims *the host law\n    \
-                     evaluates every support the split shared out*, predicting {}. The host law\n    \
+                    "\n    THE MAGNITUDE IS REFUTED. `of_cpu_authority`'s doc claims *the cpu law\n    \
+                     evaluates every support the split shared out*, predicting {}. The cpu law\n    \
                      actually evaluated {}. It does not evaluate an aperture member that a tile has\n    \
                      already excluded, so the two carriers do not merely divide one fixed population\n    \
                      of evaluations — the device does strictly more of them to return the same exact\n    \
                      support. The predicted ORDERING survives and the predicted SIZE does not; the\n    \
                      clock comparison could not have returned either.",
-                    predicted.host_evaluations, measured.host_evaluations
+                    predicted.cpu_evaluations, measured.cpu_evaluations
                 );
             }
             println!(
@@ -812,14 +812,14 @@ fn live_section(
             on_prediction.conducts_through() == on_measurement.conducts_through()
         }
         Err(error) => {
-            println!("    the host run refused: {error}");
+            println!("    the cpu run refused: {error}");
             false
         }
     };
     holds.push((
-        "the predicted host work and the measured host work admit the SAME carrier",
+        "the predicted cpu work and the measured cpu work admit the SAME carrier",
         ordering_confirmed,
-        "the falsifiable claim `of_host_authority` makes is about the ordering, and it survives"
+        "the falsifiable claim `of_cpu_authority` makes is about the ordering, and it survives"
             .to_owned(),
     ));
 }

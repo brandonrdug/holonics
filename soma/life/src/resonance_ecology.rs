@@ -18,7 +18,7 @@ use soma_abi::active::{ActionCurrent, RelationAtom};
 #[cfg(test)]
 use soma_membrane::LiveBoundaryTransition;
 use soma_membrane::{
-    ContemporaryRadiation, CurrentBoundaryPort, HostLiveCurrentExecutor, InterfaceCapabilityOrigin,
+    ContemporaryRadiation, CurrentBoundaryPort, CpuLiveCurrentExecutor, InterfaceCapabilityOrigin,
     LiveConstituent, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
     LiveCurrentRestImage, ReceiverCausalPassage, ReceiverFiberIdentity, RegionalRelationRadiation,
 };

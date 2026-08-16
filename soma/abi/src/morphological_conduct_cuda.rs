@@ -1,15 +1,15 @@
 //! Exact morphological-conduct attachment at the CUDA execution membrane.
 //!
-//! **The card decides membership; the host never computes the incidence.**  The semantic owner
+//! **The card decides membership; the cpu never computes the incidence.**  The semantic owner
 //! ships two independently assembled key sheets — one row per deposit carrying that deposit's own
 //! exact transport key, and one row per (candidate, candidate-key) pair carrying the key the
 //! candidate could ride — and the card matches them.  One lane per candidate binary-searches the
 //! canonically ordered deposit sheet for each of its keys and writes only the deposit ordinals it
 //! found.  Nothing that resembles the answer crosses the membrane in the ingress direction.
 //!
-//! The first version of this layout carried a host-built `relation` sheet of
+//! The first version of this layout carried a cpu-built `relation` sheet of
 //! `[candidate, deposit, face]` triples, which is the join already performed: the card returned
-//! the identity on it and the host re-verified.  That is an echo and not a carrier, and it is
+//! the identity on it and the cpu re-verified.  That is an echo and not a carrier, and it is
 //! withdrawn at `LAYOUT_VERSION = 2`.
 //!
 //! **Canonical order is a property of the atlas, not a precomputed answer.**  The deposit sheet is
@@ -76,8 +76,8 @@ pub const OUTPUT_INVALID_KEY_ROW: usize = 11;
 /// **Why the card declined, by name.**
 ///
 /// The shape agreement the card performs before it starts is roughly twenty separate checks, and
-/// it used to answer all of them with one status word. A host reading that could say only "the card
-/// refused" — and worse, on the decline path the card never reaches the header fields, so a host
+/// it used to answer all of them with one status word. A cpu reading that could say only "the card
+/// refused" — and worse, on the decline path the card never reaches the header fields, so a cpu
 /// walking them reported the first unwritten word as the disagreement. These three words carry the
 /// cause ordinal and, where the check is an equality of extents, the two extents that disagreed.
 pub const OUTPUT_REFUSAL_CAUSE: usize = 12;
@@ -111,7 +111,7 @@ pub const REFUSAL_DEPOSIT_SHEET_UNSORTED: u32 = 21;
 pub const REFUSAL_CANDIDATE_FACE_OPEN: u32 = 22;
 pub const REFUSAL_ACTIVE_DEPOSIT_OVERFLOW: u32 = 23;
 
-/// The name of a refusal ordinal. One table, on the host side of the same wire the card writes.
+/// The name of a refusal ordinal. One table, on the cpu side of the same wire the card writes.
 pub const fn refusal_cause_name(cause: u32) -> &'static str {
     match cause {
         REFUSAL_NONE => "no shape refusal was recorded",
@@ -152,7 +152,7 @@ pub const fn refusal_cause_name(cause: u32) -> &'static str {
         REFUSAL_DEPOSIT_SHEET_UNSORTED => "the deposit sheet is not strictly ascending by key",
         REFUSAL_CANDIDATE_FACE_OPEN => "a candidate carries the reserved open face",
         REFUSAL_ACTIVE_DEPOSIT_OVERFLOW => "the active deposit count overflowed",
-        _ => "the card recorded a refusal ordinal this host does not name",
+        _ => "the card recorded a refusal ordinal this cpu does not name",
     }
 }
 
@@ -160,7 +160,7 @@ pub const CANDIDATE_STATUS: usize = 0;
 pub const CANDIDATE_EPOCH: usize = 1;
 pub const CANDIDATE_ORDINAL: usize = 2;
 pub const CANDIDATE_OUTPUT_FACE: usize = 3;
-/// How many key rows the card itself saw for this candidate. The host knows what it shipped; this
+/// How many key rows the card itself saw for this candidate. The cpu knows what it shipped; this
 /// is the card saying what it read, and the two are compared.
 pub const CANDIDATE_KEY_ROWS: usize = 4;
 pub const CANDIDATE_ACTIVE_DEPOSITS: usize = 5;
@@ -340,7 +340,7 @@ mod tests {
 
     #[test]
     fn every_refusal_ordinal_is_named_and_the_unknown_one_says_so() {
-        // A cause the host cannot name is worse than no cause, so the table is required to cover
+        // A cause the cpu cannot name is worse than no cause, so the table is required to cover
         // every ordinal the card can write and to say plainly when it does not.
         for cause in REFUSAL_NONE..=REFUSAL_ACTIVE_DEPOSIT_OVERFLOW {
             let name = refusal_cause_name(cause);
@@ -353,7 +353,7 @@ mod tests {
         }
         assert_eq!(
             refusal_cause_name(u32::MAX),
-            "the card recorded a refusal ordinal this host does not name"
+            "the card recorded a refusal ordinal this cpu does not name"
         );
     }
 

@@ -578,7 +578,7 @@ fn run() -> Result<(), String> {
     let source_sha256 = sha256(&source_bytes);
     let source: Source = serde_json::from_slice(&source_bytes)
         .map_err(|error| format!("{} parses exactly: {error}", source_path.display()))?;
-    let report = run_host(source, source_sha256)?;
+    let report = run_cpu(source, source_sha256)?;
     let mut encoded = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("the report encodes exactly: {error}"))?;
     encoded.push(b'\n');
@@ -606,7 +606,7 @@ fn usage() -> String {
     "usage: eros_pretrained_ecology_cultivation <source.json> <new-report.json>".to_owned()
 }
 
-fn run_host(source: Source, source_sha256: String) -> Result<Report, String> {
+fn run_cpu(source: Source, source_sha256: String) -> Result<Report, String> {
     validate_source(&source)?;
     let axes = source.selection.receiver_axes.clone();
     let all_factorized = source

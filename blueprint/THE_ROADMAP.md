@@ -60,7 +60,7 @@ verified, with exact rational holonomy per boundary. Reading all of mathlib cost
 **And its own falsifier already fails, in its own output.** A declared bijection renaming every
 constituent leaves the incidence exactly unmoved — *"the structure HELD, `∂`, `o` and `⪯` came from
 the material"* — and **moves the transport at 11 of 13 closed boundaries**, because
-`incidence_production.rs:2859` `contact_winding` is `popcount(tail ⊕ head)` and `:2873` `sheet_of` is
+`incidence_production.rs:2893` `contact_winding` is `popcount(tail ⊕ head)` and `:2873` `sheet_of` is
 a byte-popcount parity.
 
 > **The incidence is the material's. The transport is not. `2+2` and `2*2` are separated by the
@@ -1483,6 +1483,13 @@ proves harder than it looks, the mathematics still gains a verdict it does not h
    **opposite pole**: many windows that nonetheless collapse under conduct. `receiver_exact_compression`
    already computes that partition and no driver returns it.
 
+**Re-measured 2026-08-15 and it is FALSE.**
+`cargo run -q -p holonic-engine --example the_token_holds_an_axis_while_its_windows_vary` returns the
+partition directly — 4 blocks over 32,183 measured surfaces, iron 12,330 (11,620 vacuous + 710
+witnessed), the conduct-invariant population disjoint from iron, 4,037 conduct-invariant surfaces
+each carrying a separator outside its collapsing family, and 416,288 agreement checks against
+`receiver_exact_compression`. Eight declared holds, all held.
+
 ### Phase 3 — the run
 
 5. Mount papers, records and Lean sources as **one** conditioning. `conditioned_derivation` already
@@ -1690,7 +1697,7 @@ reaches nothing new.
 |---|---|
 | `conditioned_derivation.rs:992` | `if route.statement != query.statement { continue; }` |
 | `compose_passage` | writes the queried statement **verbatim**; its one degree of freedom is `brought`, a **recruitment**, not a statement |
-| `conditioned_derivation.rs:1318` | typed refusal `EmittedPassageMissedItsStatement` |
+| `conditioned_derivation.rs:1700` | typed refusal `EmittedPassageMissedItsStatement` |
 
 **The reading half already exists and is measured returning nothing.**
 `route_movement().founded_statements()` returns the empty population on every query in the complete
@@ -1709,6 +1716,12 @@ construction.** It needs two things this body does not have:
 2. **A population-valued admission rule** with retained obstructions, **never a filter.** The
    conditioning half is reusable as it stands: the morphemic bridge supplies the licence mechanism
    and `FoundedMorphology::cover` already decomposes a word the morphology has never seen.
+
+**Re-measured 2026-08-15 and it is FALSE.** `cargo test -p holonic-engine --lib statement_composition`
+passes 27. `crates/holonic-engine/src/statement_grammar.rs` is 1,389 lines and recovers a grammar
+from the deposit's own statement population, returning its aperture and residue;
+`statement_composition.rs` is the population-valued admission rule, and its driver returns seven
+named obstruction species rather than a filter.
 
 **Falsifier.** A returned passage reaching a statement absent from `standing_statements()`, whose
 statement 0-cell appears in the circuit, whose composition names the founded structure that licensed
@@ -1759,6 +1772,10 @@ both; the reverse is a Cargo cycle and always will be.
 the conditioned body emits at least one whose bridge stem is founded by a **nameable corpus
 document**. Plus a corpus ablation returning the passage **population** that appeared or departed —
 not a count delta.
+
+**Re-measured 2026-08-15 and it is FALSE.** `grep -rln "text_material" soma/life/examples | wc -l` returns
+**14** driver files reaching it, among them `eros_mathematics_conditioning.rs`,
+`the_code_material_returns_its_world_line.rs` and `the_material_mouth_seals_the_declared_body.rs`.
 
 **The reading returns.** The measured defect: `invariant_movement` and `route_movement` are called
 from one place, inside a `main`, and printed. `temper` and `derivation_integral` produce exactly what
@@ -1902,13 +1919,13 @@ Per the ground rules, absences are reported as first-class results. Each of thes
 |---|---|---|
 | Integer homology exists | `grep -rniE "smith_normal\|hermite_normal\|invariant_factor\|betti\|torsion" crates soma --include="*.rs"` | **1 hit, a doc comment** at `crates/holonic-engine/src/basin.rs:363` |
 | A Rust `ChiPair` exists | `grep -rn "ChiPair\|chi_pair" crates soma --include="*.rs"` | **zero** |
-| ~~The recruitment remedies are implemented~~ | ~~`grep -rniE "mincover\|min_cover\|provisional" soma/life/src`~~ | **STRUCK 2026-08-09 — the row was false and the same command now returns 4.** Both remedies are live and consumed: `soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence` (the intersection form, called at `:890`) and `soma/life/src/holonic_training.rs:272` `propose_views` and `:355` `commit_views` (consumed at `agentic_language/answer_continuation.rs:919` and `reflective_codec.rs:57`), plus `soma/membrane/src/live_holon.rs:200` `ProvisionalSettlement`. The pattern could not match the owners' names — the identical artifact `CLAUDE.md` §5 convicts for `fn without_stem`. **An absence claim is a measurement and the search pattern is part of the claim.** |
+| ~~The recruitment remedies are implemented~~ | ~~`grep -rniE "mincover\|min_cover\|provisional" soma/life/src`~~ | **STRUCK 2026-08-09 — the row was false and the same command now returns 4.** Both remedies are live and consumed: `soma/life/src/relational_language/ecology.rs:1501` `clause_region_incidence` (the intersection form, called at `:890`) and `soma/life/src/holonic_training.rs:272` `propose_views` and `:355` `commit_views` (consumed at `agentic_language/answer_continuation.rs:919` and `reflective_codec.rs:57`), plus `soma/membrane/src/live_holon.rs:200` `ProvisionalSettlement`. The pattern could not match the owners' names — the identical artifact `CLAUDE.md` §5 convicts for `fn without_stem`. **An absence claim is a measurement and the search pattern is part of the claim.** |
 | The deposit registry crossed to Rust | `grep -rln "closure_sha256" .` | **only** `archive/cpp-engine/cmake/HolonicDeposit.cmake` and `archive/cpp-engine/standing/MANIFEST.txt` |
 | `lean_mathematics.rs` composes reflection | `grep -c "holonic_language\|Reflect" soma/life/src/lean_mathematics.rs` | **zero** |
 | A Lean project is in the tree | `git ls-files soma/formal` | **7 files, all generated `.lake/agentic-research-kernel/formal_carry-0000{0..6}.lean`**; no `lakefile.toml`, no `lean-toolchain`, no manifest |
 | The atlas TSVs are read | `grep -rn "File::open" crates soma --include="*.rs" \| grep -i tsv` | **1 hit**, `mms_reconnection_traversal.rs:1443`, reading `source-sha256.tsv` — a provenance manifest, **not** the atlas |
 | A traversal schedule can be varied | `grep -n "pop_front" simplicial.rs local_star.rs graph_receiver.rs` | **5 hits, all hardcoded BFS**: `simplicial.rs:540`, `simplicial.rs:1203`, `graph_receiver.rs:1858`, `local_star.rs:370`, `local_star.rs:492` |
-| `exact_rational_rank` is reusable | `grep -rn "fn exact_rational_rank" crates` | **1 definition**, `algebraic.rs:1081`, **private**, ℚ-rank only |
+| `exact_rational_rank` is reusable | `grep -rn "fn exact_rational_rank" crates` | **1 definition**, `algebraic.rs:1046`, **private**, ℚ-rank only |
 
 Two losses are permanent and are recorded so they are not searched for again:
 
@@ -1957,13 +1974,13 @@ already the right shape for the schedule work below: `face_residuals` (schedule-
 `∂` on the 1-cochain) and `chord_residuals: Vec<LocalChordResidual>` (:244), which is
 `carried_vector − realized_vector` per non-tree edge and is **schedule-dependent by construction**.
 
-**Regge curvature is implemented.** `coordination_defect` (local_star.rs:1143) returns
+**Regge curvature is implemented.** `coordination_defect` (local_star.rs:1213) returns
 `LocalCoordinationDefect::InteriorCycle { coordination, charge: 6 − |link| }` — the disclination
 charge. `LocalTopologyChange::exact_charge_residual: Option<i64>` (:1177) is present only when every
 changed link is an interior cycle.
 
 **The spanning-tree / chord decomposition is implemented in the projective-transport case.**
-`HingeWorldLaw::propagate` (simplicial.rs:1174) does BFS from the pivot hinge, builds `tree_words`,
+`HingeWorldLaw::propagate` (simplicial.rs:1034) does BFS from the pivot hinge, builds `tree_words`,
 and emits a `HingeCycleReturn` (:912) per chord carrying `tree_to_source`, `chord`, `tree_to_target`,
 `transition_word`, `class`, and `target_residual`. `HingeCycleClass` (:898) is
 `ProjectiveGauge` / `FixedPointHolonomy` / `DisplacedHolonomy`, decided **without materializing the
@@ -2114,6 +2131,13 @@ construction"* (it is driven in four places), and §11's reach figure for the re
 >
 > **Open:** competitive selection among readings. The panel now grows, which is the precondition;
 > nothing yet keeps two incompatible decompositions alive and lets the material choose.
+
+**Re-measured 2026-08-15 and the quoted defect is FALSE of the tree at HEAD.**
+`grep -rn "\\.receivers()" --include='*.rs' crates soma` returns 26 call sites across 11 files;
+`founded_receiver.rs` alone calls it at `:379`, `:436`, `:670`, `:797`, `:829` and re-refines to
+exhaustion, driven by `the_junction_returns_a_group_element.rs` and
+`the_axis_reads_what_the_neighbour_does.rs`. **The sentence is retained as the defect this block then
+repairs, and may not be quoted alone as a position.**
 
 ### RETURNED 2026-08-09 — position, and the proof body as a leader
 
@@ -2339,7 +2363,7 @@ missing object is an **edge**.
   the closest thing in the workspace to a return path built on both sides with no caller between
   them.
 - ~~**`supported_realizers::positive_form` → `inertia::from_integer_matrix`.** Joined by an
-  `assert_eq!` at `supported_realizers.rs:276`, inside the `#[cfg(test)]` module opened at `:273`,
+  `assert_eq!` at `supported_realizers.rs:295`, inside the `#[cfg(test)]` module opened at `:273`,
   and by nothing on any conduct path.~~ **CLOSED, and this row was wrong in every particular —
   struck 2026-08-13 by opening the file.** The `#[cfg(test)]` module opens at `:338`, not `:273`;
   `:276` is inside a `landings` loop; and the module's own doc at `:293-297` records that the pair
@@ -2479,6 +2503,11 @@ against shuffle, body against newborn — against which the residual is formed.
 **The nearest standing organ is `gluing.rs`**, whose Mayer–Vietoris `δ` is genuinely two-body — what
 the union carries that neither piece does — and is keyed to the cover, i.e. to *which receivers*.
 It has in-degree 1 and no driver.
+
+**Re-measured 2026-08-15 and it is FALSE.**
+`grep -rn "crate::gluing\\|holonic_engine::gluing" --include='*.rs' crates soma` returns two library
+importers — `communication.rs:43` and `contact_gluing.rs:63` — plus one driver,
+`examples/the_measure_is_situated.rs:33`. In-degree 2, driver count 1.
 
 **What replaces it.** A declared null body on the same material, and the residual read as the
 difference of two comparisons rather than one.
@@ -2696,10 +2725,15 @@ paths, 9 admitted against 22 obstructed (6 mathematical, 16 environment), and 8 
 recruited an organ. Twelve declared controls, all holding. The `.lean` files themselves are
 returned to `output/lean-proof-production/` and inspected, not summarized into counts.
 
+**Re-measured 2026-08-15: the zero is the pre-return position and may not be carried forward.**
+`grep -rn "LeanMathematicsEcology" --include='*.rs' crates soma | grep -E '/(examples|tests|bin)/' | wc -l`
+returns **26**. Of the ten owners the table above grades, eight are now driven and two remain at
+zero — `ExactRelationalLanguageEcology` and `CudaResidentTextMaterialAtlas`.
+
 The controls are load-bearing on the owner's actual behavior, and this was established the strong
 way. A compile-break falsifier only proves the driver names a symbol, so the verifier made a
 single-point **semantic** mutation instead — `push_candidate` in
-`soma/life/src/lean_mathematics/syntax.rs:402` forced to store an empty `declaration_lineage`. The
+`soma/life/src/lean_mathematics/syntax.rs:647` forced to store an empty `declaration_lineage`. The
 driver returned `[FAILS] the kernel admitted at least one path that recruited a conditioned
 declaration organ`, holds fell 12 → 11, exit 1. Reverted bit-identical.
 
@@ -3209,7 +3243,7 @@ next movement, and it is now the load-bearing one.
 #### The schedule becomes an object and its difference is deposited as a Chi
 
 **The gap.** Every traversal in the engine is a **hardcoded breadth-first search**:
-`simplicial.rs:540`, `simplicial.rs:1203` (`HingeWorldLaw::propagate`), `local_star.rs:370`
+`simplicial.rs:540`, `simplicial.rs:1203` (`HingeWorldLaw::propagate`), `local_star.rs:24`
 (`realize_vectors`), `local_star.rs:492`, `graph_receiver.rs:1858`. There is no seam at which a
 different schedule could be supplied.
 
@@ -3219,6 +3253,13 @@ This matters more than it appears. `local_star.rs` already separates its residua
 traversal order and some do not. **That assertion has never been tested, because there is only one
 schedule.** By `CLAUDE.md` §8, a law that returns zero proves nothing about itself; a law that
 cannot be exercised at all proves less.
+
+**Re-measured 2026-08-15 and it HOLDS, with the surrounding sentence FALSE.**
+`grep -rn "schedule" --include='*.rs' crates/holonic-engine/src/local_star.rs crates/holonic-engine/src/simplicial.rs crates/holonic-engine/src/graph_receiver.rs`
+returns zero and `chord_residuals`/`face_residuals` occur only inside `local_star.rs` — no external
+consumer, no driver, so the schedule-dependence assertion is still untested. **But "every traversal
+in the engine is a hardcoded breadth-first search with no seam" is now false of the engine:**
+`grown_cell::Schedule` carries three and `examples/grown_circuit_invariants.rs` sweeps them.
 
 And there is no Rust `ChiPair` — verified zero. `structure/chi_pair.hpp`, the `{composed, direct}`
 pair that **is** the boundary of a 2-cell, was C++ and is archived. `ReceiverGraphDelta::between`
@@ -3398,7 +3439,7 @@ atlas is the next material, on this same organ — plus the transition maps and 
 
 #### The layout answers its own curvature
 
-**The gap.** `local_star.rs:2082` — `displacement = geometry_responses[hinge] · (Δcoordinate/2)`,
+**The gap.** `local_star.rs:2152` — `displacement = geometry_responses[hinge] · (Δcoordinate/2)`,
 applied `−` to `edge.lower` and `+` to `edge.upper`. Exact rational, momentum-symmetric, and
 `geometry_responses` is **supplied, never updated by what the layout returned.** The metric does not
 respond to the curvature it produced.
@@ -3427,7 +3468,7 @@ the loop**. Remains: the update law and its characterization.
 
 #### The carrier is admitted by its work and the clock is demoted to a measurement
 
-**The gap.** `crates/holonic-engine/src/cuda_aperture.rs:818`. `CudaApertureExecutor::admit` fuses
+**The gap.** `crates/holonic-engine/src/cuda_aperture.rs:1043`. `CudaApertureExecutor::admit` fuses
 three roles that are not one role: it checks parity exactly (`:809-816`, correct), it takes one
 wall-clock sample per carrier (`:808`, `:817`), and then it **selects the carrier from the second**
 — `if authority_nanoseconds < candidate_nanoseconds`. `preferred` is stored on the returned
@@ -3471,7 +3512,7 @@ carrier decision.
 **Laboratory vs remains.** Nothing here is a port. The exact work vector is computed today and
 discarded; the four-state ordering exists today and is not used here; the second aperture exists
 today and is not compared. Remains: the split of the three roles, the declared cost law, the `Open`
-arm, the frame field, and moving `examples/desktop_receiver.rs:2745` — an `assert_eq!` on the outcome
+arm, the frame field, and moving `examples/desktop_receiver.rs:2762` — an `assert_eq!` on the outcome
 of the race that **does not currently run**, since Cargo's default `test = false` for examples keeps
 it out of the workspace gate — into a gate, rewritten against the work law.
 
@@ -3523,7 +3564,7 @@ pattern cannot match:
 
 | remedy | owner | consumed at |
 |---|---|---|
-| factor the receptive star, `I(R) = ⋃_K ⋂_{f∈K} I(f)` | `soma/life/src/relational_language/ecology.rs:1365` `clause_region_incidence` | `:890` |
+| factor the receptive star, `I(R) = ⋃_K ⋂_{f∈K} I(f)` | `soma/life/src/relational_language/ecology.rs:1501` `clause_region_incidence` | `:890` |
 | provisional contact ≠ continuing cultivation | `soma/life/src/holonic_training.rs:272` `propose_views` / `:355` `commit_views` | `agentic_language/answer_continuation.rs:919`, `reflective_codec.rs:57` |
 | the two-phase primitive | `soma/membrane/src/live_holon.rs:200` `ProvisionalSettlement` | — |
 
@@ -3753,6 +3794,12 @@ So `CLAUDE.md` §11's certified-remainder condensation **has an owner**. What is
 `derivation_skein` drives it on 58 classes, and the organ has never run where the population is far
 enough that condensation is *required* rather than incidental — which is §11's own current position.
 
+**Re-measured 2026-08-15 and the scale clause is FALSE.**
+`cargo run --release -p holonic-engine --example skein_far_condensation` runs to completion on a far
+population: 1,021 cells and 2,420,959 entry-writes condensed to a one-cell realizer, forced-interval
+remainder 62 intervals over 127 nodes, and a sweep over eight readings with cyclomatic 0 → 2,304
+returning EMPTY exactly on the forests. **The organ has been run where condensation is required.**
+
 **What replaces it.** A driver on a genuinely far population, with the spanning-tree interval labelling
 §11 names as the route: on a tree the condensation is free and the remainder empty; every non-tree
 edge forces additional intervals and **that forced population is the certified remainder**, zero
@@ -3831,3 +3878,8 @@ of a weight file. Not semantic recovery of a foreign model.
 - **Halt and say so.** If a run is not doing what was claimed, stop it and report the actual state
   before proposing a repair.
 - Pushing to `origin` remains Brandon's call.
+
+
+**Dated 2026-08-15.** This bullet is a grading rule and asserts nothing absent about the tree; it is dated
+so `tools/document_law.py` can separate a requirement on future deposits from a measurement of the
+present one.

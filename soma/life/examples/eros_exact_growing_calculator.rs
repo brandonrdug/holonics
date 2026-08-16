@@ -14,7 +14,7 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryRadiation, CurrentBoundaryPort, HostLiveCurrentExecutor, InterfaceCapability,
+    ContemporaryRadiation, CurrentBoundaryPort, CpuLiveCurrentExecutor, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage,
     SparseStandingSurface,
 };
@@ -327,10 +327,10 @@ impl CalculatorWorld {
             ),
             NativeEventCurrent::continuing(&mut self.arrival, &arrival_atoms, action()),
         ];
-        let mut host = HostLiveCurrentExecutor;
+        let mut cpu = CpuLiveCurrentExecutor;
         present_native_event_with_regional(
             &mut self.machine,
-            &mut host,
+            &mut cpu,
             &mut currents,
             &relations,
             if regional { &regions } else { &[] },
@@ -367,8 +367,8 @@ impl CalculatorWorld {
                 action(),
             ),
         ];
-        let mut host = HostLiveCurrentExecutor;
-        present_native_event_with(&mut self.machine, &mut host, &mut currents, &[]).map_err(debug)
+        let mut cpu = CpuLiveCurrentExecutor;
+        present_native_event_with(&mut self.machine, &mut cpu, &mut currents, &[]).map_err(debug)
     }
 }
 

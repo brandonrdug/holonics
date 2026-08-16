@@ -151,7 +151,7 @@ struct ApparatusReceipt {
     law_launches: u64,
     quotient_device: String,
     quotient_launches: u64,
-    host_semantic_replay: bool,
+    cpu_semantic_replay: bool,
 }
 
 #[derive(Serialize)]
@@ -348,7 +348,7 @@ fn run() -> Result<(), String> {
             law_launches: law_card.launches(),
             quotient_device: quotient_card.device_name().to_owned(),
             quotient_launches: quotient_card.launches(),
-            host_semantic_replay: false,
+            cpu_semantic_replay: false,
         },
         returned_world_lines: returned_receipt,
     };

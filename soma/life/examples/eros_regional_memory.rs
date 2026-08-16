@@ -128,7 +128,7 @@ fn run() -> Result<(), String> {
     if arguments.next().is_some() {
         return Err("usage: eros_regional_memory <new-report.json>".to_owned());
     }
-    let report = run_host()?;
+    let report = run_cpu()?;
     let mut bytes = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("report does not encode: {error}"))?;
     bytes.push(b'\n');
@@ -150,7 +150,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host() -> Result<Report, String> {
+fn run_cpu() -> Result<Report, String> {
     let (base, lineages) = primed_machine()?;
     let rest = base.rest_image().map_err(debug)?;
     let mut taught = LiveCurrentMachine::from_rest_image(rest.clone()).map_err(debug)?;

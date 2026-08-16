@@ -54,7 +54,7 @@ impl Snapshot {
 }
 
 #[derive(Clone)]
-struct HostState {
+struct CpuState {
     owns: Vec<u32>,
     carrier: Vec<u32>,
     counts: [u64; 4],
@@ -63,7 +63,7 @@ struct HostState {
 }
 
 #[derive(Clone)]
-struct HostProof {
+struct CpuProof {
     sub: Snapshot,
     path: Snapshot,
     path_resumed: Snapshot,
@@ -173,9 +173,9 @@ fn status_words(status: RegisterStrokeStatus) -> [u32; STATUS_WORDS] {
     }
 }
 
-impl HostState {
-    fn born(capacity: usize) -> HostState {
-        HostState {
+impl CpuState {
+    fn born(capacity: usize) -> CpuState {
+        CpuState {
             owns: vec![0u32; own_words(capacity)],
             carrier: vec![0u32; manifold::carrier_row_words(DEPTH)],
             counts: [0; 4],
@@ -201,7 +201,7 @@ impl HostState {
             WordSpan::new(0, LIGHT.len() * manifold::RADIATION_WORDS),
             stroke(capacity, installment),
         )
-        .expect("the bounded host REGISTER mouth is formed");
+        .expect("the bounded cpu REGISTER mouth is formed");
         add_counts(&mut self.counts, result.terms);
         result
     }
@@ -209,7 +209,7 @@ impl HostState {
     fn recast(&mut self, new_axis: u32) {
         let mut fresh = vec![0u32; own_words(new_axis as usize * new_axis as usize)];
         recast_registered_own_row(&self.owns, &mut fresh)
-            .expect("the caused host REGISTER digit recasts exactly");
+            .expect("the caused cpu REGISTER digit recasts exactly");
         self.owns = fresh;
     }
 
@@ -226,8 +226,8 @@ impl HostState {
     }
 }
 
-fn host_proof() -> HostProof {
-    let mut exact = HostState::born(1);
+fn cpu_proof() -> CpuProof {
+    let mut exact = CpuState::born(1);
     let first = exact.step(0);
     assert_eq!(
         first.status,
@@ -282,7 +282,7 @@ fn host_proof() -> HostProof {
     }
     let final_state = exact.snapshot(RegisterStrokeStatus::Complete);
 
-    let mut sibling = HostState::born(16);
+    let mut sibling = CpuState::born(16);
     while !settled(&sibling.carrier) {
         let result = sibling.step(1);
         assert!(matches!(
@@ -297,7 +297,7 @@ fn host_proof() -> HostProof {
         final_state.capacity()
     ));
 
-    HostProof {
+    CpuProof {
         sub,
         path,
         path_resumed,
@@ -439,11 +439,11 @@ fn download_snapshot(
     Ok(snapshot)
 }
 
-fn compare_snapshot(label: &'static str, card: &Snapshot, host: &Snapshot) -> Result<()> {
+fn compare_snapshot(label: &'static str, card: &Snapshot, cpu: &Snapshot) -> Result<()> {
     require(
-        card == host,
+        card == cpu,
         "compare_snapshot",
-        format!("{label} card construction differs from the host construction"),
+        format!("{label} card construction differs from the cpu construction"),
     )
 }
 
@@ -463,22 +463,22 @@ fn flatten_lanes(rows: &[[u32; register_abi::LANE_WORDS]]) -> Vec<u32> {
     rows.iter().flat_map(|row| row.iter().copied()).collect()
 }
 
-fn card_mixed_recast(device: &Device, census: LaunchCensus, host: &HostProof) -> Result<()> {
-    let requested_old = &host.sub.owns;
+fn card_mixed_recast(device: &Device, census: LaunchCensus, cpu: &CpuProof) -> Result<()> {
+    let requested_old = &cpu.sub.owns;
     let mut requested_new = vec![0u32; own_words(4)];
     require(
         recast_registered_own_row(requested_old, &mut requested_new) == Some((1, 2)),
-        "card_mixed_recast:host_request",
-        "host failed to form the requested mixed-lane row",
+        "card_mixed_recast:cpu_request",
+        "cpu failed to form the requested mixed-lane row",
     )?;
 
-    let sibling_active = &host.final_state.owns;
+    let sibling_active = &cpu.final_state.owns;
     let sibling_capacity = 64usize;
     let mut sibling_generous = vec![0u32; own_words(sibling_capacity)];
     sibling_generous[..sibling_active.len()].copy_from_slice(sibling_active);
     require(
         registered_own_row_is_canonical(&sibling_generous, sibling_capacity),
-        "card_mixed_recast:host_sibling",
+        "card_mixed_recast:cpu_sibling",
         "the generous completed sibling is not canonical",
     )?;
 
@@ -536,15 +536,15 @@ fn card_mixed_recast(device: &Device, census: LaunchCensus, host: &HostProof) ->
     require(
         copied == expected,
         "card_mixed_recast:words",
-        "mixed recast fresh OWN differs from host at one or more words",
+        "mixed recast fresh OWN differs from cpu at one or more words",
     )
 }
 
-fn card_proof(host: &HostProof) -> Result<Snapshot> {
+fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
     mount::cuda::init()?;
     let device = Device::get(0)?;
     let census = device.launch_census()?;
-    card_mixed_recast(&device, census, host)?;
+    card_mixed_recast(&device, census, cpu)?;
 
     let path_snapshot = {
         let context = Context::create(&device)?;
@@ -575,7 +575,7 @@ fn card_proof(host: &HostProof) -> Result<Snapshot> {
             let sub = download_snapshot(
                 &owns, &carrier, &counts, &radiation, &packed, &lane, &status,
             )?;
-            compare_snapshot("SUB suspension", &sub, &host.sub)?;
+            compare_snapshot("SUB suspension", &sub, &cpu.sub)?;
 
             let new_lane = upload(&lane_row(4))?;
             let recast_output = checked_recast(
@@ -614,7 +614,7 @@ fn card_proof(host: &HostProof) -> Result<Snapshot> {
             let path = download_snapshot(
                 &owns, &carrier, &counts, &radiation, &packed, &lane, &status,
             )?;
-            compare_snapshot("PATH suspension", &path, &host.path)?;
+            compare_snapshot("PATH suspension", &path, &cpu.path)?;
             require(
                 cursor(&path.carrier) == 6
                     && phase(&path.carrier) == manifold::CONTINUATION_PATH_EFFERENT
@@ -685,7 +685,7 @@ fn card_proof(host: &HostProof) -> Result<Snapshot> {
         let resumed = download_snapshot(
             &owns, &carrier, &counts, &radiation, &packed, &lane, &status,
         )?;
-        compare_snapshot("pending-first PATH resume", &resumed, &host.path_resumed)?;
+        compare_snapshot("pending-first PATH resume", &resumed, &cpu.path_resumed)?;
         require(
             [
                 resumed.counts[0] - before_resume[0],
@@ -716,8 +716,8 @@ fn card_proof(host: &HostProof) -> Result<Snapshot> {
                 &owns, &carrier, &counts, &radiation, &packed, &lane, &status,
             )?;
         }
-        compare_snapshot("final exact conductor", &current, &host.final_state)?;
-        compare_snapshot("already-afforded sibling", &current, &host.sibling)?;
+        compare_snapshot("final exact conductor", &current, &cpu.final_state)?;
+        compare_snapshot("already-afforded sibling", &current, &cpu.sibling)?;
         current
     };
     context.destroy()?;
@@ -725,16 +725,16 @@ fn card_proof(host: &HostProof) -> Result<Snapshot> {
 }
 
 fn run() -> Result<()> {
-    let host = host_proof();
+    let cpu = cpu_proof();
     println!(
-        "host: SUB 1→2 cursor {} · PATH 2→4 cursor {} phase {} · final axis {} counts {:?}",
-        cursor(&host.sub.carrier),
-        cursor(&host.path.carrier),
-        phase(&host.path.carrier),
-        host.final_state.owns[manifold::OWN_REGISTER_AXIS],
-        host.final_state.counts,
+        "cpu: SUB 1→2 cursor {} · PATH 2→4 cursor {} phase {} · final axis {} counts {:?}",
+        cursor(&cpu.sub.carrier),
+        cursor(&cpu.path.carrier),
+        phase(&cpu.path.carrier),
+        cpu.final_state.owns[manifold::OWN_REGISTER_AXIS],
+        cpu.final_state.counts,
     );
-    let card = card_proof(&host)?;
+    let card = card_proof(&cpu)?;
     println!(
         "fresh-context REGISTER remount: EXACT · cursor {} · axis {} · counts {:?}",
         cursor(&card.carrier),
@@ -757,7 +757,7 @@ mod tests {
 
     #[test]
     fn bdadada_pins_sub_then_path_and_resumes_pending_first() {
-        let proof = host_proof();
+        let proof = cpu_proof();
         assert_eq!(proof.sub.status, [1, 1, 2]);
         assert_eq!(proof.path.status, [1, 2, 4]);
         assert_eq!(cursor(&proof.path.carrier), 6);

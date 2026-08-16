@@ -287,7 +287,7 @@ fn run() -> Result<(), String> {
         );
     }
 
-    let report = run_host(&artifacts)?;
+    let report = run_cpu(&artifacts)?;
     let mut encoded = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("the report encodes exactly: {error}"))?;
     encoded.push(b'\n');
@@ -309,7 +309,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host(artifacts: &Path) -> Result<Report, String> {
+fn run_cpu(artifacts: &Path) -> Result<Report, String> {
     let manifest_path = artifacts.join("manifest.json");
     let token_path = artifacts.join("token_spans.jsonl");
     let leaders_path = artifacts.join("receiver_leaders.json");

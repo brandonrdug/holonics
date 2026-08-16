@@ -36,7 +36,7 @@ and *pins*. Two of the three were doing excusing work.
   The constant makes a **restriction** read as a **definition**.
 - `QUADRIC_COEFFICIENT_COUNT = 10` is worse the same way. A quadric in `n` variables has `C(n+2,2)`
   coefficients, so **10 pins the ambient dimension at 3** while the name reads as a count.
-  `ExactAffineVersionFiber::new` already takes the count as a parameter (`field_atlas.rs:972`) — the
+  `ExactAffineVersionFiber::new` already takes the count as a parameter (`field_atlas.rs:1221`) — the
   machinery is dimension-agnostic and only the caller pins it. And `field_atlas.rs:1` opens *"The
   atlas has no authored population ceiling"* immediately above the two `const`s that author one.
 - **"Declared aperture that returns its outside" was the roundabout logic.** Refusing past a number
@@ -162,7 +162,7 @@ is `distinct_windows == 1` over the whole occurrence population. A capacity surv
 naming the required width**, never a prefix. That is the distinction that makes an obstruction lawful
 where a truncation is not, and it is the shape `2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER...`
 requires: *"Shared structure is factorized; if the remaining exact terminal width exceeds declared
-host/card capacity, the event returns a resource obstruction while preserving standing."*
+CPU/card capacity, the event returns a resource obstruction while preserving standing."*
 
 ### 5.1 Derive from the material — the remainder
 

@@ -1,4 +1,4 @@
-use holonic_engine::hardware_cover::{Chart, HardwareCover, HostDeclaration};
+use holonic_engine::hardware_cover::{Chart, HardwareCover, CpuDeclaration};
 
 use super::current::{materialize_returned_path_live, receive_question};
 use super::*;
@@ -9,7 +9,7 @@ fn action() -> ActionCurrent {
 
 #[test]
 #[ignore = "requires a CUDA device and the committed morphological conditioning entries"]
-fn cuda_conditioner_returns_the_exact_host_ecology_without_a_production_replay() {
+fn cuda_conditioner_returns_the_exact_cpu_ecology_without_a_production_replay() {
     let passages = vec![
         MorphologicalLanguagePassage::new(
             "math-a",
@@ -36,12 +36,12 @@ fn cuda_conditioner_returns_the_exact_host_ecology_without_a_production_replay()
             "A vector points across the field, and the field changes.",
         ),
     ];
-    let host = MorphologicalLanguageEcology::condition(&passages, action(), 5).unwrap();
+    let cpu = MorphologicalLanguageEcology::condition(&passages, action(), 5).unwrap();
     let mut conditioner = CudaMorphologicalConditioner::new(0).unwrap();
     let (card, semantic, apparatus) =
         MorphologicalLanguageEcology::condition_with_cuda(&passages, action(), &mut conditioner)
             .unwrap();
-    assert!(host.exact_conditioning_agreement(&card).unwrap());
+    assert!(cpu.exact_conditioning_agreement(&card).unwrap());
     assert!(semantic.suffix_extensions > 0);
     assert!(semantic.suffix_crosses > 0);
     assert!(semantic.prefix_crossings > 0);
@@ -482,7 +482,7 @@ fn rust_try_glyph_does_not_pose_a_question_to_the_language_ecology() {
 ///
 /// The generation front is expanded through `hardware_cover::expand_front`, which covers by extent
 /// and reassembles successors in the front's own order. This drives the same corpus over covers
-/// declaring one, two, three, eight and sixty-four host lanes and requires the returned branches —
+/// declaring one, two, three, eight and sixty-four cpu lanes and requires the returned branches —
 /// text, tokens, phases and rest, in order — plus every counter of the reflection receipt to be
 /// identical. `HardwareCover::of_charts` exists for this: a construction that can only be varied on
 /// real hardware cannot be graded on a machine that has none.
@@ -558,7 +558,7 @@ fn a_declared_lane_count_cannot_move_the_generated_reading() {
     };
     let prompt = "How does training change morphology while uncertainty remains?";
     let over = |lanes: u32| {
-        let cover = HardwareCover::of_charts(vec![Chart::Host(HostDeclaration { lanes })]);
+        let cover = HardwareCover::of_charts(vec![Chart::Cpu(CpuDeclaration { lanes })]);
         ecology
             .generate_currents_over(prompt, spec, &cover)
             .unwrap()
@@ -627,7 +627,7 @@ fn one_mounted_return_path_equals_explicit_live_transfer() {
         let germs = token_germs(&[predecessor, (*token).to_owned()]).unwrap();
         let occurrence =
             ResonanceOccurrence::self_emanated(u64::try_from(at + 1).unwrap(), germs).unwrap();
-        let mut executor = ParallelHostLiveCurrentExecutor::new(2);
+        let mut executor = ParallelCpuLiveCurrentExecutor::new(2);
         tokenwise
             .receive_with(&occurrence, action(), &mut executor)
             .unwrap();
@@ -833,7 +833,7 @@ fn the_transport_law_dilates_a_congested_passage_and_deletes_no_branch() {
         maximum_observed_tokens: 7,
     };
     let prompt = "How does training change morphology while uncertainty remains?";
-    let cover = HardwareCover::host_only();
+    let cover = HardwareCover::cpu_only();
     let returned = ecology
         .generate_currents_over(prompt, spec, &cover)
         .unwrap();

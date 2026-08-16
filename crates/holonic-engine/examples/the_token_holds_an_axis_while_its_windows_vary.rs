@@ -167,10 +167,10 @@ fn main() {
     };
 
     // **The cover, declared once.** Every surface's reading is independent, so the population of
-    // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
+    // surfaces is a front and the cpu's own lanes carry it. Driving this serially pinned one core
     // while fifteen stood idle.
-    let cover = HardwareCover::host_only();
-    println!("  the cover declares {} host lanes\n", cover.host().lanes);
+    let cover = HardwareCover::cpu_only();
+    println!("  the cover declares {} cpu lanes\n", cover.cpu().lanes);
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();

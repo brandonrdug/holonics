@@ -22,7 +22,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
-    LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor, RegionalArcRadiation,
+    LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor, RegionalArcRadiation,
     RegionalSupportSection, SparseStandingSurface,
 };
 
@@ -34,7 +34,7 @@ const MACHINE_REST_FORM: &str = "machine-rest";
 const SOURCE_SCHEMA: &str = "eros.audio-contextual-ecology.source.v1";
 const REPORT_SCHEMA: &str = "eros.audio-contextual-ecology.report.v1";
 const OBSERVATION_ID: &str = "eros-audio-contextual-ecology-01";
-const HOST_THREADS: usize = 8;
+const CPU_THREADS: usize = 8;
 const EVENT_LIMIT: Duration = Duration::from_secs(30);
 const RUN_LIMIT: Duration = Duration::from_secs(180);
 
@@ -632,8 +632,8 @@ fn run(source: &Source, source_bytes: usize) -> Result<Value, String> {
         },
         "physical_preflight": {
             "inherited_instrument": source.instrument,
-            "host_executor": "ParallelHostLiveCurrentExecutor",
-            "host_threads": HOST_THREADS,
+            "cpu_executor": "ParallelCpuLiveCurrentExecutor",
+            "cpu_threads": CPU_THREADS,
             "available_parallelism": std::thread::available_parallelism().map_or(1, usize::from),
             "run_limit_seconds": RUN_LIMIT.as_secs(),
             "event_limit_seconds": EVENT_LIMIT.as_secs(),
@@ -1321,7 +1321,7 @@ fn execute(
         &sections,
     )];
     let before = memory_read(machine.memory());
-    let mut executor = ParallelHostLiveCurrentExecutor::new(HOST_THREADS);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(CPU_THREADS);
     let started = Instant::now();
     let radiation =
         present_native_event_with_regional(machine, &mut executor, &mut currents, &[], &regional)

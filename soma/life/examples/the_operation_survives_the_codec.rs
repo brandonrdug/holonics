@@ -95,7 +95,7 @@ struct ApparatusReceipt {
     quotient_launches: u64,
     block_threads: u32,
     warp_size: u32,
-    host_semantic_replay: bool,
+    cpu_semantic_replay: bool,
 }
 
 #[derive(Serialize)]
@@ -255,7 +255,7 @@ fn main() -> Result<(), String> {
             quotient_launches: card.launches().saturating_sub(launches_before),
             block_threads: card.block_threads(),
             warp_size: card.warp_size(),
-            host_semantic_replay: false,
+            cpu_semantic_replay: false,
         },
         same_operation_cross_codec_fiber: cross_codec,
         same_value_different_law_separated: same_value_separator.interventions.clone(),

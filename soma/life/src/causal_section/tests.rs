@@ -101,7 +101,7 @@ fn ecology(prefix: &str) -> CausalSectionEcology {
 #[test]
 fn consequence_history_founds_the_class_and_not_the_codec_or_contact_face() {
     let ecology = ecology("");
-    let reading = ecology.read_on_host_for_admission().unwrap();
+    let reading = ecology.read_on_cpu_for_admission().unwrap();
     assert_eq!(
         reading.root_one_shot_blocks,
         vec![BTreeSet::from([
@@ -146,8 +146,8 @@ fn consequence_history_founds_the_class_and_not_the_codec_or_contact_face() {
 #[test]
 fn removing_the_value_receiver_only_coarsens_the_root_quotient() {
     let ecology = ecology("");
-    let full = ecology.read_on_host_for_admission().unwrap();
-    let ablated = ecology.read_without_on_host_for_admission("value").unwrap();
+    let full = ecology.read_on_cpu_for_admission().unwrap();
+    let ablated = ecology.read_without_on_cpu_for_admission("value").unwrap();
     assert_eq!(full.root_conduct_blocks.len(), 2);
     assert_eq!(ablated.root_conduct_blocks.len(), 1);
     assert_eq!(ablated.root_conduct_blocks[0].len(), 3);
@@ -155,8 +155,8 @@ fn removing_the_value_receiver_only_coarsens_the_root_quotient() {
 
 #[test]
 fn renaming_every_presentation_moves_no_population_shape() {
-    let standing = ecology("").read_on_host_for_admission().unwrap();
-    let renamed = ecology("renamed-").read_on_host_for_admission().unwrap();
+    let standing = ecology("").read_on_cpu_for_admission().unwrap();
+    let renamed = ecology("renamed-").read_on_cpu_for_admission().unwrap();
     let shape = |reading: &CausalSectionReading| {
         reading
             .root_conduct_blocks
@@ -172,13 +172,13 @@ fn renaming_every_presentation_moves_no_population_shape() {
     );
 }
 
-/// The host construction is an admission reader; the production read belongs to the card. This
+/// The cpu construction is an admission reader; the production read belongs to the card. This
 /// gate compares the complete semantic return, never dense device class ordinals or launch order.
 #[test]
 #[ignore = "requires the RTX CUDA device"]
-fn the_resident_quotient_returns_the_host_admission_reading_exactly() {
+fn the_resident_quotient_returns_the_cpu_admission_reading_exactly() {
     let ecology = ecology("");
-    let admitted = ecology.read_on_host_for_admission().unwrap();
+    let admitted = ecology.read_on_cpu_for_admission().unwrap();
     let mut card = CudaRefineExecutor::new().expect("the card mounts");
     let resident = ecology
         .read(&mut card)

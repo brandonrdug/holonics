@@ -1,7 +1,8 @@
 # The method atlas
 
 **Date:** 2026-08-15
-**Status:** the active construction plan for the atlas itself. It supersedes
+**Status:** a construction plan under `blueprint/THE_ROADMAP.md`, the single active roadmap.
+This one covers the atlas itself. It supersedes
 `THE_TYPED_TRANSPORT_ATLAS.md` as the *object*; that document remains in force as the plan for one
 **instrument**, and §3 says exactly what it is and is not.
 
@@ -146,6 +147,13 @@ spherical and finite; `= 1` is Euclidean and **exactly** the crystallographic or
 `winding_inertia::lattice_admits_order` already derives from `niven_value`; `< 1` is hyperbolic.
 `(2,3,5)` is finite but not crystallographic. One `Rat` comparison joins Schwarz's list to terrain
 this tree already computes, and it is not built.
+
+**Re-measured 2026-08-15 and it is PARTIAL — the comparison is built and the JOINT is not.**
+`cargo test -p holonic-engine --lib hypergeometric_closure` passes 12, and `curvature_sign` is
+exactly that one `Rat` comparison — `at_zero.abs() + at_one.abs() + at_infinity.abs()` against
+`Rat::one()`, returning `Spherical`/`Flat`/`Saddle`. **What is genuinely absent is the composition:**
+no site calls both `curvature_sign` and `winding_inertia::lattice_admits_order`. The joint is stated
+in a doc comment rather than computed, which is the shape this file exists to catch.
 
 ---
 

@@ -71,7 +71,7 @@ const RADIUS: usize = 3;
 
 /// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
 /// (`canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements
-/// about the host, so the caller states them. 65,536 family words holds this alphabet at radius
+/// about the cpu, so the caller states them. 65,536 family words holds this alphabet at radius
 /// three with 40,277 to spare, and the free-entry aperture bounds a `2^k` enumeration at
 /// 4,096 tables. Past either the recovery refuses by name rather than sampling.
 const APERTURES: RecoveryApertures = RecoveryApertures {

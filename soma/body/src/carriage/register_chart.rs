@@ -224,7 +224,7 @@ fn narrow_cascade<S: WordSeam>(
     }
 }
 
-/// Deposit one term through the exact host-register law using the current's reserved card words.
+/// Deposit one term through the exact cpu-register law using the current's reserved card words.
 /// The active axis is event-derived; `capacity_cells` is only the present mounting aperture. A
 /// required larger axis freezes the enclosing caller in its carrier and returns without mutating
 /// the row or face; the boundary supplies the exact recast row before relaunch.
@@ -272,7 +272,7 @@ pub(super) fn deposit<S: WordSeam>(
             ) {
                 return DepositResult::Invalid;
             }
-            // The pending infall is re-judged at the climbed hand. As in the host Medium, the
+            // The pending infall is re-judged at the climbed hand. As in the cpu Medium, the
             // tentative old-hand increment does not become the new hand's occupancy.
             let digit = current.digit();
             face.take_register(digit);
@@ -309,7 +309,7 @@ pub(super) fn deposit<S: WordSeam>(
     DepositResult::Accepted
 }
 
-/// Validate one safe host/reference register row before mutation. The reserved tail is required to
+/// Validate one safe cpu/reference register row before mutation. The reserved tail is required to
 /// stay all-zero, so capacity cannot masquerade as occupied gauge. Occupancy is exactly the live
 /// grip count at the accepted hand.
 fn row_is_canonical_with_pending_digit(

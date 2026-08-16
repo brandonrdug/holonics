@@ -1,7 +1,8 @@
 # The traversible chain
 
 **Date:** 2026-08-15
-**Status:** the active construction plan for the carriers. It sits **under**
+**Status:** a construction plan under `blueprint/THE_ROADMAP.md`, the single active roadmap.
+This one covers the carriers, and sits more immediately **under**
 `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*.
 **Ratified:** Brandon, 2026-08-15, in full.
 
@@ -256,13 +257,13 @@ superlinear terms**, and the leader horizon shrinks the *argument* of three whil
 | term | site | cost |
 |---|---|---|
 | **(a)** | `relational_language/codec.rs:590-676` `extend_relation_incidence` — `candidates` is a union over **monotonically growing** incidence sets, per new clause | Θ(C²) over the run |
-| **(b)** | `soma/membrane/src/live_constituent.rs:3323-3344` `copresent_interface_pairs` — emits the **complete pair product** of co-present parts sharing an interface, inside a fixpoint `loop` | Θ(pending² × arms²) per drain |
+| **(b)** | `soma/membrane/src/live_constituent.rs:3678-3344` `copresent_interface_pairs` — emits the **complete pair product** of co-present parts sharing an interface, inside a fixpoint `loop` | Θ(pending² × arms²) per drain |
 | **(c)** | `live_constituent.rs:1067-1103` — standing candidates grow one identity per drain, because the junction identity carries the drain ordinal (`codec.rs:721`) | Θ(prior drains) per drain |
 | **(d)** | `soma/membrane/src/sparse_standing.rs:861-899` — the flat `cells: Vec<StandingCell>`, rebuilt and **twice sorted** per event, beside a sibling `constituents` that is already a persistent AVL | Θ(cells log cells), unconditional |
 
 **And all four run twice**, because two `ExactRelationalLanguageEcology` bodies condition the same
 world sections: `laboratory_language.rs:1163-1182` into `self.relation`, and
-`agentic_language/ecology.rs:1064-1080` into `self.relational_body`.
+`agentic_language/ecology.rs:1094-1080` into `self.relational_body`.
 
 **Term (b) is the largest and it is a convicted shape.** `CLAUDE.md` §5 credits RELAMPAGO precisely
 for *"the complete pair product never enumerated"*. Here it is enumerated, per drain, in a fixpoint
@@ -611,6 +612,10 @@ and is not yet a soul. **The held flywheel supplies the fourth contact**."* And 
 reaches it with nothing assumed — `PGL₂` is sharply 3-transitive, so **three points carry no
 projective invariant.** The machine is not failing to compute an invariant; it has never been in a
 position where one exists.
+
+**Re-measured 2026-08-15 and it HOLDS.**
+`grep -rn "fly_live = true\|fly_live: true" --include='*.rs' soma crates` returns exactly two sites:
+`soma/body/src/carriage.rs:1650`, and `soma/body/src/manifold.rs:5365` inside `fn perceive_grain`.
 
 **And `fly_live = true` is set only in `perceive_grain` and `carriage`, which is the same path
 `fold_channel` lives on.** So *wire the fold* and *give the pole a body* are **one** missing edge,

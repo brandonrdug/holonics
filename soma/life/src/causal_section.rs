@@ -338,7 +338,7 @@ impl CausalSectionEcology {
     }
 
     /// Read the complete section population through the resident exact quotient. There is no
-    /// production host default: a caller must supply the already-mounted card owner.
+    /// production cpu default: a caller must supply the already-mounted card owner.
     pub fn read(
         &self,
         executor: &mut CudaRefineExecutor,
@@ -383,15 +383,15 @@ impl CausalSectionEcology {
         self.read_from_compression(system, compression)
     }
 
-    /// Host construction retained only as the admission reference used by unit tests. Production
+    /// Cpu construction retained only as the admission reference used by unit tests. Production
     /// source cannot call it, so omitting the card is not a runtime choice.
     #[cfg(test)]
-    fn read_on_host_for_admission(&self) -> Result<CausalSectionReading, CausalSectionError> {
-        self.read_with_host(self.receiver_index.values().copied().collect())
+    fn read_on_cpu_for_admission(&self) -> Result<CausalSectionReading, CausalSectionError> {
+        self.read_with_cpu(self.receiver_index.values().copied().collect())
     }
 
     #[cfg(test)]
-    fn read_without_on_host_for_admission(
+    fn read_without_on_cpu_for_admission(
         &self,
         receiver: &str,
     ) -> Result<CausalSectionReading, CausalSectionError> {
@@ -409,11 +409,11 @@ impl CausalSectionEcology {
         if active.is_empty() {
             return Err(CausalSectionError::EmptyReceiverFamily);
         }
-        self.read_with_host(active)
+        self.read_with_cpu(active)
     }
 
     #[cfg(test)]
-    fn read_with_host(
+    fn read_with_cpu(
         &self,
         active_receivers: Vec<ReceiverId>,
     ) -> Result<CausalSectionReading, CausalSectionError> {

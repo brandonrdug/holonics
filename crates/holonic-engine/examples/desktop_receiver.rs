@@ -908,7 +908,7 @@ impl ResearchTrace {
         let mut writer = BufWriter::new(File::create(&path)?);
         writeln!(
             writer,
-            "event\tkind\tactive_hinges\topen_frontier\taction_balances\tcurrent_routes\tface_fields\treceiver_worldlines\trewrite_candidates\tphysics_tasks\tphysics_workers\tchanged_hinges\tchanged_faces\tchanged_conics\taperture_width\taperture_height\ttrajectory_bits\treceiver_translation_bits\treceiver_spin_bits\treceiver_phase_bits\tpresentation_factor_bits\tpresented_support_bits\tdevice_arithmetic\tintermediate_bits\ttraced_addresses\tsupport_queries\twall_nanoseconds\tselected_primitives\tdevice_primitives\thost_primitives\tdevice_output_bytes\tselection_pack_ns\tdevice_prepare_ns\tdevice_execute_ns\tdevice_download_ns\tdevice_decode_ns\thost_trace_ns\thost_merge_ns\ttube_founded\ttube_refounded\ttube_deformed\ttube_transported\ttube_aperture_changed\ttube_retained\ttube_departed\ttube_shared_traces\ttube_reused_addresses\ttube_avoided_queries\ttube_changed_addresses\tpresentation_materialized_receivers\tpresentation_materialized_primitives\tcomplete_hinge_state\tcomplete_receiver_state\treceiver_event_nerve\treceiver_population\tcausal_layers\tpropagation_boundary\ttube_rebased"
+            "event\tkind\tactive_hinges\topen_frontier\taction_balances\tcurrent_routes\tface_fields\treceiver_worldlines\trewrite_candidates\tphysics_tasks\tphysics_workers\tchanged_hinges\tchanged_faces\tchanged_conics\taperture_width\taperture_height\ttrajectory_bits\treceiver_translation_bits\treceiver_spin_bits\treceiver_phase_bits\tpresentation_factor_bits\tpresented_support_bits\tdevice_arithmetic\tintermediate_bits\ttraced_addresses\tsupport_queries\twall_nanoseconds\tselected_primitives\tdevice_primitives\tcpu_primitives\tdevice_output_bytes\tselection_pack_ns\tdevice_prepare_ns\tdevice_execute_ns\tdevice_download_ns\tdevice_decode_ns\tcpu_trace_ns\tcpu_merge_ns\ttube_founded\ttube_refounded\ttube_deformed\ttube_transported\ttube_aperture_changed\ttube_retained\ttube_departed\ttube_shared_traces\ttube_reused_addresses\ttube_avoided_queries\ttube_changed_addresses\tpresentation_materialized_receivers\tpresentation_materialized_primitives\tcomplete_hinge_state\tcomplete_receiver_state\treceiver_event_nerve\treceiver_population\tcausal_layers\tpropagation_boundary\ttube_rebased"
         )?;
         Ok(Self {
             path,
@@ -1189,15 +1189,15 @@ impl ResearchTrace {
             render.wall_nanoseconds.to_string(),
             render.selected_primitives.to_string(),
             render.device_primitives.to_string(),
-            render.host_primitives.to_string(),
+            render.cpu_primitives.to_string(),
             render.device_output_bytes.to_string(),
             render.selection_pack_nanoseconds.to_string(),
             render.device_prepare_nanoseconds.to_string(),
             render.device_execute_nanoseconds.to_string(),
             render.device_download_nanoseconds.to_string(),
             render.device_decode_nanoseconds.to_string(),
-            render.host_trace_nanoseconds.to_string(),
-            render.host_merge_nanoseconds.to_string(),
+            render.cpu_trace_nanoseconds.to_string(),
+            render.cpu_merge_nanoseconds.to_string(),
             tubes.founded.to_string(),
             tubes.refounded.to_string(),
             tubes.deformed.to_string(),
@@ -1523,16 +1523,16 @@ struct ApertureRenderReceipt {
     wall_nanoseconds: u128,
     selected_primitives: BigUint,
     device_primitives: BigUint,
-    host_primitives: BigUint,
+    cpu_primitives: BigUint,
     device_output_bytes: BigUint,
     selection_pack_nanoseconds: u128,
     device_prepare_nanoseconds: u128,
     device_execute_nanoseconds: u128,
     device_download_nanoseconds: u128,
     device_decode_nanoseconds: u128,
-    host_trace_nanoseconds: u128,
-    host_merge_nanoseconds: u128,
-    host_parity: bool,
+    cpu_trace_nanoseconds: u128,
+    cpu_merge_nanoseconds: u128,
+    cpu_parity: bool,
     intermediate_bits: BigUint,
     device_arithmetic: String,
 }
@@ -1546,16 +1546,16 @@ fn retained_aperture_receipt(tubes: &TerminalTubeReceipt) -> ApertureRenderRecei
         wall_nanoseconds: 0,
         selected_primitives: BigUint::from(0_u8),
         device_primitives: BigUint::from(0_u8),
-        host_primitives: BigUint::from(0_u8),
+        cpu_primitives: BigUint::from(0_u8),
         device_output_bytes: BigUint::from(0_u8),
         selection_pack_nanoseconds: 0,
         device_prepare_nanoseconds: 0,
         device_execute_nanoseconds: 0,
         device_download_nanoseconds: 0,
         device_decode_nanoseconds: 0,
-        host_trace_nanoseconds: 0,
-        host_merge_nanoseconds: 0,
-        host_parity: true,
+        cpu_trace_nanoseconds: 0,
+        cpu_merge_nanoseconds: 0,
+        cpu_parity: true,
         intermediate_bits: BigUint::from(0_u8),
         device_arithmetic: format!(
             "exact carried support; reused-receivers={} avoided-queries={}",
@@ -1597,25 +1597,25 @@ fn render_receiver_traces(
     Ok((
         traces,
         ApertureRenderReceipt {
-            backend: "exact host".to_owned(),
+            backend: "exact cpu".to_owned(),
             traced_addresses,
             exact_support_queries,
             trace_workers_used: trace_execution.workers_used,
             wall_nanoseconds,
             selected_primitives: BigUint::from(presentation.primitives.len()),
             device_primitives: BigUint::from(0_u8),
-            host_primitives: BigUint::from(presentation.primitives.len()),
+            cpu_primitives: BigUint::from(presentation.primitives.len()),
             device_output_bytes: BigUint::from(0_u8),
             selection_pack_nanoseconds: 0,
             device_prepare_nanoseconds: 0,
             device_execute_nanoseconds: 0,
             device_download_nanoseconds: 0,
             device_decode_nanoseconds: 0,
-            host_trace_nanoseconds: wall_nanoseconds,
-            host_merge_nanoseconds: 0,
-            host_parity: true,
+            cpu_trace_nanoseconds: wall_nanoseconds,
+            cpu_merge_nanoseconds: 0,
+            cpu_parity: true,
             intermediate_bits: BigUint::from(0_u8),
-            device_arithmetic: "exact host integer-projective".to_owned(),
+            device_arithmetic: "exact cpu integer-projective".to_owned(),
         },
     ))
 }
@@ -1657,20 +1657,20 @@ fn receipt_from_cuda_traces(
         },
         traced_addresses,
         exact_support_queries,
-        trace_workers_used: receipt.host_workers,
+        trace_workers_used: receipt.cpu_workers,
         wall_nanoseconds: receipt.wall_nanoseconds,
         selected_primitives: receipt.selected_primitives,
         device_primitives: receipt.device_primitives,
-        host_primitives: receipt.host_primitives,
+        cpu_primitives: receipt.cpu_primitives,
         device_output_bytes: receipt.device_output_bytes,
         selection_pack_nanoseconds: receipt.selection_pack_nanoseconds,
         device_prepare_nanoseconds: receipt.device_prepare_nanoseconds,
         device_execute_nanoseconds: receipt.device_execute_nanoseconds,
         device_download_nanoseconds: receipt.device_download_nanoseconds,
         device_decode_nanoseconds: receipt.device_decode_nanoseconds,
-        host_trace_nanoseconds: receipt.host_trace_nanoseconds,
-        host_merge_nanoseconds: receipt.host_merge_nanoseconds,
-        host_parity: receipt.host_parity,
+        cpu_trace_nanoseconds: receipt.cpu_trace_nanoseconds,
+        cpu_merge_nanoseconds: receipt.cpu_merge_nanoseconds,
+        cpu_parity: receipt.cpu_parity,
         intermediate_bits: receipt.intermediate_bits,
         device_arithmetic: receipt.device_arithmetic,
     }
@@ -1771,7 +1771,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
     platform.present(&display)?;
     println!(
-        "live window={}x{} aperture={}x{} backend={} arithmetic={} intermediate-bits={} host-parity={} wall-ns={} CPU-workers={} assembly-workers={} physics-workers={} source-projected={} source-reused={} source-rebased={} primitives={} local-relations={} presentation-relations={} traced-addresses={} support-queries={} tube-founded={} tube-rebased={} tube-retained={} tube-delta-addresses={} linear-workers={} causal-layers={} active-stars={} pending-frontier={} propagation-boundary={:?} hinges-changed={} faces-changed={} conics-changed={} trace={} — each supplied event closes its locally parallel causal front to exact rest, return, or open cyclic support; receiver bodies move in the field; drag transports; arrows precess; W/S or wheel supply depth current; Esc closes",
+        "live window={}x{} aperture={}x{} backend={} arithmetic={} intermediate-bits={} cpu-parity={} wall-ns={} CPU-workers={} assembly-workers={} physics-workers={} source-projected={} source-reused={} source-rebased={} primitives={} local-relations={} presentation-relations={} traced-addresses={} support-queries={} tube-founded={} tube-rebased={} tube-retained={} tube-delta-addresses={} linear-workers={} causal-layers={} active-stars={} pending-frontier={} propagation-boundary={:?} hinges-changed={} faces-changed={} conics-changed={} trace={} — each supplied event closes its locally parallel causal front to exact rest, return, or open cyclic support; receiver bodies move in the field; drag transports; arrows precess; W/S or wheel supply depth current; Esc closes",
         display.width,
         display.height,
         specification.width,
@@ -1779,7 +1779,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         initial_render.backend,
         initial_render.device_arithmetic,
         initial_render.intermediate_bits,
-        initial_render.host_parity,
+        initial_render.cpu_parity,
         initial_render.wall_nanoseconds,
         workers,
         assembly_receipt.workers_used,
@@ -2761,15 +2761,15 @@ mod tests {
         let admission_nanoseconds = admission_started.elapsed().as_nanos();
         assert_eq!(
             cuda.preferred_backend(),
-            ApertureExecutionBackend::ExactHost
+            ApertureExecutionBackend::ExactCpu
         );
-        assert!(initial_receipt.host_parity);
+        assert!(initial_receipt.cpu_parity);
         assert!(initial_receipt.intermediate_bits > BigUint::from(384_u16));
-        assert!(initial_receipt.host_primitives > BigUint::from(0_u8));
+        assert!(initial_receipt.cpu_primitives > BigUint::from(0_u8));
         assert!(
             initial_receipt
                 .device_arithmetic
-                .contains("exact host integer-projective")
+                .contains("exact cpu integer-projective")
         );
         let packed_specification = terminal(32, 24);
         let packed_receivers = BTreeSet::from([ReceiverId(1)]);
@@ -2910,7 +2910,7 @@ mod tests {
             .trace(&successor, &resized_specification, &receivers, &executor)
             .unwrap();
         let selected_nanoseconds = selected_started.elapsed().as_nanos();
-        let host_trace = holonic_engine::trace_receivers_aperture_with_rational_conic_authority(
+        let cpu_trace = holonic_engine::trace_receivers_aperture_with_rational_conic_authority(
             &successor,
             &resized_specification,
             &receivers,
@@ -2919,11 +2919,11 @@ mod tests {
         .unwrap()
         .0;
         eprintln!(
-            "successor-carriers device={} host={} conics={} linear={} bits={} arithmetic={}",
+            "successor-carriers device={} cpu={} conics={} linear={} bits={} arithmetic={}",
             card_receipt.device_primitives,
-            card_receipt.host_primitives,
-            card_receipt.host_conics,
-            card_receipt.host_linear_primitives,
+            card_receipt.cpu_primitives,
+            card_receipt.cpu_conics,
+            card_receipt.cpu_linear_primitives,
             card_receipt.intermediate_bits,
             card_receipt.device_arithmetic,
         );
@@ -2931,29 +2931,29 @@ mod tests {
         assert_ne!(initial_trace, card_trace);
         assert!(card_receipt.intermediate_bits > BigUint::from(127_u8));
         assert_eq!(
-            &card_receipt.device_primitives + &card_receipt.host_primitives,
+            &card_receipt.device_primitives + &card_receipt.cpu_primitives,
             card_receipt.selected_primitives
         );
         if card_receipt.device_primitives.is_zero() {
             assert!(
                 card_receipt
                     .device_arithmetic
-                    .contains("exact host integer-projective")
+                    .contains("exact cpu integer-projective")
             );
         } else {
             assert!(card_receipt.device_arithmetic.contains("CUDA"));
         }
         for receiver in &receivers {
             let card = &card_trace[receiver];
-            let host = &host_trace[receiver];
+            let cpu = &cpu_trace[receiver];
             let selected = &selected_trace[receiver];
             assert_eq!(card.addresses, selected.addresses);
             assert_eq!(card.support_multiplicity, selected.support_multiplicity);
             assert_eq!(card.primitive_traces, selected.primitive_traces);
-            assert_eq!(card.addresses, host.addresses);
-            assert_eq!(card.support_multiplicity, host.support_multiplicity);
-            assert_eq!(card.primitive_traces, host.primitive_traces);
-            assert!(card.has_same_exact_support(host));
+            assert_eq!(card.addresses, cpu.addresses);
+            assert_eq!(card.support_multiplicity, cpu.support_multiplicity);
+            assert_eq!(card.primitive_traces, cpu.primitive_traces);
+            assert!(card.has_same_exact_support(cpu));
         }
         let layering_started = Instant::now();
         let mut display_atlas = TerminalTubeAtlas::new();
@@ -2992,48 +2992,48 @@ mod tests {
             admission_nanoseconds,
         );
         eprintln!(
-            "profile\tframe\taperture\tselected\tdevice-primitives\thost-primitives\thost-conics\thost-linear\tdevice-output-bytes\tpack-ns\tdevice-prepare-ns\tdevice-execute-ns\tdevice-download-ns\tdevice-decode-ns\thost-trace-ns\thost-merge-ns\ttotal-ns\tdevice-threads\tdevice-queries\thost-queries\n\
+            "profile\tframe\taperture\tselected\tdevice-primitives\tcpu-primitives\tcpu-conics\tcpu-linear\tdevice-output-bytes\tpack-ns\tdevice-prepare-ns\tdevice-execute-ns\tdevice-download-ns\tdevice-decode-ns\tcpu-trace-ns\tcpu-merge-ns\ttotal-ns\tdevice-threads\tdevice-queries\tcpu-queries\n\
              profile\tinitial\t640x400\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n\
              profile\tsuccessor\t640x720\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n\
-             selected\tbackend={}\ttotal-ns={}\thost-queries={}\n\
+             selected\tbackend={}\ttotal-ns={}\tcpu-queries={}\n\
              device={} arithmetic={} intermediate-bits={}",
             initial_receipt.selected_primitives,
             initial_receipt.device_primitives,
-            initial_receipt.host_primitives,
-            initial_receipt.host_conics,
-            initial_receipt.host_linear_primitives,
+            initial_receipt.cpu_primitives,
+            initial_receipt.cpu_conics,
+            initial_receipt.cpu_linear_primitives,
             initial_receipt.device_output_bytes,
             initial_receipt.selection_pack_nanoseconds,
             initial_receipt.device_prepare_nanoseconds,
             initial_receipt.device_execute_nanoseconds,
             initial_receipt.device_download_nanoseconds,
             initial_receipt.device_decode_nanoseconds,
-            initial_receipt.host_trace_nanoseconds,
-            initial_receipt.host_merge_nanoseconds,
+            initial_receipt.cpu_trace_nanoseconds,
+            initial_receipt.cpu_merge_nanoseconds,
             initial_receipt.wall_nanoseconds,
             initial_receipt.device_threads,
             initial_receipt.device_exact_support_evaluations,
-            initial_receipt.host_exact_support_evaluations,
+            initial_receipt.cpu_exact_support_evaluations,
             card_receipt.selected_primitives,
             card_receipt.device_primitives,
-            card_receipt.host_primitives,
-            card_receipt.host_conics,
-            card_receipt.host_linear_primitives,
+            card_receipt.cpu_primitives,
+            card_receipt.cpu_conics,
+            card_receipt.cpu_linear_primitives,
             card_receipt.device_output_bytes,
             card_receipt.selection_pack_nanoseconds,
             card_receipt.device_prepare_nanoseconds,
             card_receipt.device_execute_nanoseconds,
             card_receipt.device_download_nanoseconds,
             card_receipt.device_decode_nanoseconds,
-            card_receipt.host_trace_nanoseconds,
-            card_receipt.host_merge_nanoseconds,
+            card_receipt.cpu_trace_nanoseconds,
+            card_receipt.cpu_merge_nanoseconds,
             card_receipt.wall_nanoseconds,
             card_receipt.device_threads,
             card_receipt.device_exact_support_evaluations,
-            card_receipt.host_exact_support_evaluations,
+            card_receipt.cpu_exact_support_evaluations,
             selected_receipt.execution_backend,
             selected_nanoseconds,
-            selected_receipt.host_exact_support_evaluations,
+            selected_receipt.cpu_exact_support_evaluations,
             initial_receipt.device,
             card_receipt.device_arithmetic,
             card_receipt.intermediate_bits,
@@ -3047,7 +3047,7 @@ mod tests {
                 .trace_hybrid(&successor, &specification, &receivers, &executor)
                 .unwrap();
             eprintln!(
-                "scale\t{name}\t{}x{}\tpack-ns={}\tdevice-total-ns={}\thost-trace-ns={}\ttotal-ns={}\tdevice-queries={}\thost-queries={}\tdevice-output-bytes={}",
+                "scale\t{name}\t{}x{}\tpack-ns={}\tdevice-total-ns={}\tcpu-trace-ns={}\ttotal-ns={}\tdevice-queries={}\tcpu-queries={}\tdevice-output-bytes={}",
                 specification.width,
                 specification.height,
                 receipt.selection_pack_nanoseconds,
@@ -3055,10 +3055,10 @@ mod tests {
                     + receipt.device_execute_nanoseconds
                     + receipt.device_download_nanoseconds
                     + receipt.device_decode_nanoseconds,
-                receipt.host_trace_nanoseconds,
+                receipt.cpu_trace_nanoseconds,
                 receipt.wall_nanoseconds,
                 receipt.device_exact_support_evaluations,
-                receipt.host_exact_support_evaluations,
+                receipt.cpu_exact_support_evaluations,
                 receipt.device_output_bytes,
             );
         }
@@ -3066,7 +3066,7 @@ mod tests {
 
     #[test]
     #[ignore = "exact cost profile, not a correctness gate"]
-    fn exact_host_species_cost_profile() {
+    fn exact_cpu_species_cost_profile() {
         let receivers = BTreeSet::from([ReceiverId(1), ReceiverId(2)]);
         let specification = terminal(640, 720);
         let executor = CpuExecutor::multicore(NonZeroUsize::new(12).unwrap());

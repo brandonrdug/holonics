@@ -552,7 +552,7 @@ fn run() -> Result<(), String> {
         .map_err(|error| format!("{} reads completely: {error}", source_path.display()))?;
     let source: Source = serde_json::from_slice(&source_bytes)
         .map_err(|error| format!("{} parses exactly: {error}", source_path.display()))?;
-    let report = run_host(source, sha256(&source_bytes))?;
+    let report = run_cpu(source, sha256(&source_bytes))?;
     let mut encoded = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("the report encodes exactly: {error}"))?;
     encoded.push(b'\n');
@@ -580,7 +580,7 @@ fn usage() -> String {
     "usage: eros_transformer_contextual_hexis <source.json> <new-report.json>".to_owned()
 }
 
-fn run_host(source: Source, source_sha256: String) -> Result<Report, String> {
+fn run_cpu(source: Source, source_sha256: String) -> Result<Report, String> {
     if source.schema != SOURCE_SCHEMA {
         return Err(format!("source schema changed: {}", source.schema));
     }

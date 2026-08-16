@@ -261,7 +261,7 @@ fn safetensors_extent(
         .map_err(|error| format!("{} reads its header extent: {error}", path.display()))?;
     let header_length = u64::from_le_bytes(length);
     let extent = usize::try_from(header_length)
-        .map_err(|_| "the safetensors header exceeds this host".to_owned())?;
+        .map_err(|_| "the safetensors header exceeds this cpu".to_owned())?;
     let mut header = vec![0u8; extent];
     file.read_exact(&mut header)
         .map_err(|error| format!("{} reads its header: {error}", path.display()))?;
@@ -862,7 +862,7 @@ fn control_the_organ_on_real_material(material: &[RealMaterial]) -> bool {
     println!("   the file IS m*2^e and nothing rounded it at this boundary.\n");
 
     if material.is_empty() {
-        println!("    no declared external artifact resolved on this host.");
+        println!("    no declared external artifact resolved on this cpu.");
         println!("    control 3: FAILED -- a control that could not run has not passed.\n");
         return false;
     }

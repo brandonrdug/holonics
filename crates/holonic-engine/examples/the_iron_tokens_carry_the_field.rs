@@ -140,10 +140,10 @@ fn main() {
     // The fourth declared axis reads what the corpus does with a surface rather than how it is
     // spelled, and it has to be founded before any window can be read.
     // **The cover, declared once.** Every surface's reading is independent, so the population of
-    // surfaces is a front and the host's own lanes carry it. Driving this serially pinned one core
+    // surfaces is a front and the cpu's own lanes carry it. Driving this serially pinned one core
     // while fifteen stood idle.
-    let cover = HardwareCover::host_only();
-    println!("  the cover declares {} host lanes\n", cover.host().lanes);
+    let cover = HardwareCover::cpu_only();
+    println!("  the cover declares {} cpu lanes\n", cover.cpu().lanes);
     let atlas = ConductAtlas::found(&census, FOUNDING_HORIZON);
 
     let mut holds: Vec<(String, bool, String)> = Vec::new();
@@ -459,7 +459,7 @@ fn main() {
     let mut compared_pairs = BigUint::from(0u32);
     let mut check_failures: Vec<String> = Vec::new();
     let mut obstructed: Vec<(usize, SurfaceId, BigUint)> = Vec::new();
-    // **Covered across the host's lanes, and compared in a DEGREE-ONE chart.**
+    // **Covered across the cpu's lanes, and compared in a DEGREE-ONE chart.**
     //
     // Each surface's cross-check is independent of every other — shared immutable census and atlas,
     // disjoint occurrences — so this fold is the same front the sweep is, and it is covered the
@@ -469,7 +469,7 @@ fn main() {
     // material's own **star extent**, `d − 1` — the degree-one chart — so a surface whose pair
     // chart is wider is named with the width its material required rather than exploded or skipped
     // by a number someone chose.
-    let lanes = cover.host().lanes.max(1) as usize;
+    let lanes = cover.cpu().lanes.max(1) as usize;
     let work: Vec<(usize, SurfaceId)> = HORIZONS
         .iter()
         .flat_map(|horizon| {

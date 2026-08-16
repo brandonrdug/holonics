@@ -78,7 +78,7 @@ pub trait RegisterContactSurface<S: WordSeam> {
     ) -> bool;
 }
 
-/// The ordinary host/SPIR-V realization: form each contact at the carried deed that consumes it.
+/// The ordinary cpu/SPIR-V realization: form each contact at the carried deed that consumes it.
 /// It is the exact inline chronological foil for cooperative substrate surfaces.
 pub struct InlineRegisterContactSurface;
 
@@ -1299,7 +1299,7 @@ impl<S: WordSeam, const FOUNDED: bool, const REGISTERED: bool> FeltLineage<S, FO
         met.rotor_formed() && fly.rotor_formed() && met.chi_against_formed(fly).wound()
     }
 
-    /// Fold the whole meeting deed after the same horizon/flywheel reads as the host mouth. This
+    /// Fold the whole meeting deed after the same horizon/flywheel reads as the cpu mouth. This
     /// scalar-guarded form avoids transporting an optional aggregate through a shader ABI.
     #[inline(never)]
     fn fold_meeting(&mut self, met: &Face, fly: &Face, fly_live: bool, wound: bool) {
@@ -1858,7 +1858,7 @@ impl<S: WordSeam, const FOUNDED: bool, const REGISTERED: bool> FeltLineage<S, FO
             // `saturating_add(1)` explicit — the rust-gpu kernel has no saturating intrinsic
             // (`place.rs:52` is the same excision, same reason). `usize::MAX` is the only
             // spelling that stays correct across the seam: `usize` is 32-bit on
-            // `spirv-unknown-vulkan1.2` and 64-bit on the host, and a literal would pin one.
+            // `spirv-unknown-vulkan1.2` and 64-bit on the cpu, and a literal would pin one.
             .then(|| {
                 if self.continuation_depth == usize::MAX {
                     usize::MAX
@@ -2430,7 +2430,7 @@ fn prove_layout<const FOUNDED: bool, const REGISTERED: bool>(
     })
 }
 
-/// Check the complete mutable and immutable body rows accepted by the safe host/reference mouth.
+/// Check the complete mutable and immutable body rows accepted by the safe cpu/reference mouth.
 /// Device kernels enter the separately named trusted mouth after their mounting shell has supplied
 /// producer-owned canonical buffers. This scan is therefore a boundary check, never an interior
 /// carriage operation or a per-atom mechanism.
@@ -3252,7 +3252,7 @@ fn carry_register_with_layout<S: WordSeam>(
     )
 }
 
-/// Carry one dense host/reference stroke after rejecting every malformed persisted input row. No
+/// Carry one dense cpu/reference stroke after rejecting every malformed persisted input row. No
 /// radiation slice exists in this API or its monomorphized body.
 #[allow(clippy::too_many_arguments)]
 pub fn carry_dense_stroke<S: WordSeam>(
@@ -3285,7 +3285,7 @@ pub fn carry_dense_stroke<S: WordSeam>(
     carry_dense_with_layout::<S>(standing, owns, carriers, bytes, layout, stroke)
 }
 
-/// Carry one founded host/reference stroke after rejecting every malformed persisted input row. A
+/// Carry one founded cpu/reference stroke after rejecting every malformed persisted input row. A
 /// formed radiation stride instantiates the real aperture; every other stride preserves the
 /// historical no-radiation face without fabricating a backing slice.
 #[allow(clippy::too_many_arguments)]
@@ -3325,7 +3325,7 @@ pub fn carry_founded_stroke<S: WordSeam>(
     carry_founded_with_layout::<S>(standing, owns, carriers, bytes, radiation, layout, stroke)
 }
 
-/// Carry one REGISTER host/reference stroke. The mutable OWN span is
+/// Carry one REGISTER cpu/reference stroke. The mutable OWN span is
 /// `header ⊕ capacity_cells·whole_cell`; the header's active axis, never the capacity, grounds the
 /// current. `NeedsOwnRecast` leaves the causing caller frozen in the carrier; the boundary supplies
 /// the exact recast row and relaunches the same stroke before any later caller may run.
@@ -3366,7 +3366,7 @@ pub fn carry_register_stroke<S: WordSeam>(
     carry_register_with_layout::<S>(standing, owns, carriers, bytes, radiation, layout, stroke)
 }
 
-/// Carry one REGISTER host/reference stroke while exposing the next completed enclosure in this
+/// Carry one REGISTER cpu/reference stroke while exposing the next completed enclosure in this
 /// invocation. The completion row must enter zero and is never read by the body after it is
 /// written. Filling it yields only at the already-ratified descending stroke seam.
 #[allow(clippy::too_many_arguments)]
@@ -3626,9 +3626,9 @@ pub fn carry_register_stroke_trusted_with_completion_surface<
 mod tests {
     use super::*;
 
-    struct HostWordSeam;
+    struct CpuWordSeam;
 
-    unsafe impl WordSeam for HostWordSeam {
+    unsafe impl WordSeam for CpuWordSeam {
         unsafe fn read_u32_unchecked(words: &[u32], at: usize) -> u32 {
             *words.get_unchecked(at)
         }
@@ -3754,7 +3754,7 @@ mod tests {
             let carrier_words = WordSpan::new(0, carriers.len());
             let result = if founded {
                 let radiation_words = WordSpan::new(0, radiation.len());
-                carry_founded_stroke::<HostWordSeam>(
+                carry_founded_stroke::<CpuWordSeam>(
                     &standing,
                     &mut owns,
                     own_words,
@@ -3766,7 +3766,7 @@ mod tests {
                     make_stroke(stroke_atoms),
                 )
             } else {
-                carry_dense_stroke::<HostWordSeam>(
+                carry_dense_stroke::<CpuWordSeam>(
                     &standing,
                     &mut owns,
                     own_words,
@@ -3790,7 +3790,7 @@ mod tests {
             deepest = deepest.max(continuation_depth as usize);
             if let Some(required_depth) = required_carrier_rebase_depth(&carriers) {
                 let required_depth = usize::try_from(required_depth)
-                    .expect("the host test boundary can address its required carrier depth");
+                    .expect("the cpu test boundary can address its required carrier depth");
                 let mut fresh = std::vec![0u32; manifold::carrier_row_words(required_depth)];
                 assert_eq!(
                     rebase_carrier_row(&carriers, &mut fresh),
@@ -3852,7 +3852,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
             let own_len = owns.len();
             let carrier_len = carriers.len();
             let radiation_len = radiation.len();
-            let result = carry_founded_stroke::<HostWordSeam>(
+            let result = carry_founded_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, own_len),
@@ -3910,7 +3910,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         let carrier_len = carriers.len();
         let radiation_len = radiation.len();
         assert_eq!(
-            carry_founded_stroke::<HostWordSeam>(
+            carry_founded_stroke::<CpuWordSeam>(
                 standing,
                 owns,
                 WordSpan::new(0, own_len),
@@ -3936,7 +3936,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
     }
 
     #[test]
-    fn the_reserved_register_carriage_is_the_host_register_at_its_accepted_gauge() {
+    fn the_reserved_register_carriage_is_the_cpu_register_at_its_accepted_gauge() {
         struct VecChart {
             words: std::vec::Vec<u32>,
         }
@@ -3966,30 +3966,30 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
 now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         let standing = std::vec![0u32; AXIS * AXIS * FORM_WORDS];
 
-        let mut host_chart = VecChart {
+        let mut cpu_chart = VecChart {
             words: std::vec![0u32; manifold::OWN_CELL_WORDS],
         };
-        let mut host_enclosures = std::vec![0u32; DEPTH * manifold::ENCLOSURE_WORDS];
-        let mut host = manifold::ErosBody::over_register(
+        let mut cpu_enclosures = std::vec![0u32; DEPTH * manifold::ENCLOSURE_WORDS];
+        let mut cpu = manifold::ErosBody::over_register(
             &standing,
-            &mut host_chart,
+            &mut cpu_chart,
             AXIS as i64,
             &raw[..2],
             20,
-            &mut host_enclosures,
+            &mut cpu_enclosures,
         );
         let mut atom = 1usize;
         while atom < raw.len() {
-            host.live_atom(raw[atom - 1], raw[atom], 137);
+            cpu.live_atom(raw[atom - 1], raw[atom], 137);
             atom += 1;
         }
-        host.flush_dark();
-        let host_axis = host.own_axis() as usize;
-        let host_breath = host.breath();
-        let host_terms = host.deposited_terms();
-        let mut host_carrier = std::vec![0u32; manifold::carrier_row_words(DEPTH)];
-        assert!(host.pack_carried_frame(raw.len() as u64, &mut host_carrier));
-        drop(host);
+        cpu.flush_dark();
+        let cpu_axis = cpu.own_axis() as usize;
+        let cpu_breath = cpu.breath();
+        let cpu_terms = cpu.deposited_terms();
+        let mut cpu_carrier = std::vec![0u32; manifold::carrier_row_words(DEPTH)];
+        assert!(cpu.pack_carried_frame(raw.len() as u64, &mut cpu_carrier));
+        drop(cpu);
 
         let packed = packed(raw);
         let own_words = manifold::OWN_REGISTER_WORDS + CAPACITY_CELLS * manifold::OWN_CELL_WORDS;
@@ -4009,7 +4009,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
             137,
             0,
         );
-        let result = carry_register_stroke::<HostWordSeam>(
+        let result = carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut registered,
             WordSpan::new(0, own_words),
@@ -4020,16 +4020,16 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
             WordSpan::empty(),
             stroke,
         )
-        .expect("the registered host-reference carriage is formed");
+        .expect("the registered cpu-reference carriage is formed");
         assert_eq!(
             result.status,
             RegisterStrokeStatus::Complete,
             "the declared gate aperture is not the active gauge"
         );
         assert_eq!(result.cursor, raw.len() as u64);
-        assert_eq!(result.terms, host_terms);
+        assert_eq!(result.terms, cpu_terms);
         assert_eq!(
-            carrier, host_carrier,
+            carrier, cpu_carrier,
             "the register posture changes no carrier/K deed"
         );
 
@@ -4040,14 +4040,14 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
             | ((registered[manifold::OWN_REGISTER_RELEASES_HI] as u64) << 32);
         let narrows = registered[manifold::OWN_REGISTER_NARROWS_LO] as u64
             | ((registered[manifold::OWN_REGISTER_NARROWS_HI] as u64) << 32);
-        assert_eq!(axis, host_axis);
-        assert_eq!((releases, narrows), host_breath);
+        assert_eq!(axis, cpu_axis);
+        assert_eq!((releases, narrows), cpu_breath);
         let cell_base = manifold::OWN_REGISTER_WORDS;
         let active_words = axis * axis * manifold::OWN_CELL_WORDS;
         assert_eq!(
             &registered[cell_base..cell_base + active_words],
-            host_chart.words.as_slice(),
-            "the in-place register is the fresh host chart byte-whole at its accepted hand"
+            cpu_chart.words.as_slice(),
+            "the in-place register is the fresh cpu chart byte-whole at its accepted hand"
         );
         assert!(
             registered[cell_base + active_words..]
@@ -4095,7 +4095,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
 
         let mut deep_own = std::vec![0u32; own_words];
         let mut deep_carrier = std::vec![0u32; manifold::carrier_row_words(DEEP)];
-        let deep = carry_register_stroke::<HostWordSeam>(
+        let deep = carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut deep_own,
             WordSpan::new(0, own_words),
@@ -4115,7 +4115,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         let mut rebases = 0usize;
         loop {
             let carrier_words = carrier.len();
-            let result = carry_register_stroke::<HostWordSeam>(
+            let result = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut own,
                 WordSpan::new(0, own_words),
@@ -4233,7 +4233,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         let mut sibling_own = std::vec![0u32; sibling_words];
         let mut sibling_carrier = std::vec![0u32; carrier_words];
         let mut sibling_radiation = std::vec![0u32; radiation_words];
-        let sibling = carry_register_stroke::<HostWordSeam>(
+        let sibling = carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut sibling_own,
             WordSpan::new(0, sibling_words),
@@ -4261,7 +4261,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         loop {
             invocation += 1;
             let own_words = exact_own.len();
-            let attempted = carry_register_stroke::<HostWordSeam>(
+            let attempted = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut exact_own,
                 WordSpan::new(0, own_words),
@@ -4391,7 +4391,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
 
         loop {
             let own_words = owns.len();
-            let result = carry_register_stroke::<HostWordSeam>(
+            let result = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, own_words),
@@ -4477,7 +4477,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
 
         loop {
             let own_words = owns.len();
-            let result = carry_register_stroke::<HostWordSeam>(
+            let result = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, own_words),
@@ -4565,7 +4565,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         let mut gauge_terms = TermCounts::ZERO;
         loop {
             let own_words = gauge_owns.len();
-            let result = carry_register_stroke::<HostWordSeam>(
+            let result = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut gauge_owns,
                 WordSpan::new(0, own_words),
@@ -4606,7 +4606,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         loop {
             completion.fill(0);
             let own_words = owns.len();
-            let result = carry_register_stroke_with_completion::<HostWordSeam>(
+            let result = carry_register_stroke_with_completion::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, own_words),
@@ -4698,7 +4698,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         loop {
             wide_completion.fill(0);
             let own_words = wide_owns.len();
-            let result = carry_register_stroke_with_completion::<HostWordSeam>(
+            let result = carry_register_stroke_with_completion::<CpuWordSeam>(
                 &standing,
                 &mut wide_owns,
                 WordSpan::new(0, own_words),
@@ -4777,7 +4777,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         let mut sibling_own = std::vec![0u32; sibling_words];
         let mut sibling_carrier = std::vec![0u32; carrier_words];
         let mut sibling_radiation = std::vec![0u32; radiation_words];
-        let sibling = carry_register_stroke::<HostWordSeam>(
+        let sibling = carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut sibling_own,
             WordSpan::new(0, sibling_words),
@@ -4802,7 +4802,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
         let mut mask = 0u32;
         loop {
             let own_words = owns.len();
-            let result = carry_register_stroke::<HostWordSeam>(
+            let result = carry_register_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, own_words),
@@ -4894,7 +4894,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
             137,
             manifold::RADIATION_WORDS,
         );
-        let suspended = carry_register_stroke::<HostWordSeam>(
+        let suspended = carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut owns,
             WordSpan::new(0, own_words),
@@ -4923,7 +4923,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
             manifold::pending_control(manifold::PENDING_SUB, 0);
         assert!(manifold::carried_frame_is_canonical(&carrier));
         let before = (owns.clone(), carrier.clone(), radiation.clone());
-        assert!(carry_register_stroke::<HostWordSeam>(
+        assert!(carry_register_stroke::<CpuWordSeam>(
             &standing,
             &mut owns,
             WordSpan::new(0, own_words),
@@ -5236,7 +5236,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         let owns_before = owns.clone();
         let carriers_before = carriers.clone();
         assert_eq!(
-            carry_dense_stroke::<HostWordSeam>(
+            carry_dense_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, AXIS * AXIS * FORM_WORDS),
@@ -5255,7 +5255,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         carriers[manifold::CARRIER_CHANNEL + 4 * manifold::COG_WORDS] = 1;
         let carriers_before = carriers.clone();
         assert_eq!(
-            carry_dense_stroke::<HostWordSeam>(
+            carry_dense_stroke::<CpuWordSeam>(
                 &standing,
                 &mut owns,
                 WordSpan::new(0, AXIS * AXIS * FORM_WORDS),
@@ -5294,7 +5294,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
         carriers[CARRIER_BASE..CARRIER_BASE + carrier_len].fill(0);
         radiation[RADIATION_BASE..RADIATION_BASE + radiation_len].fill(0);
 
-        let result = carry_founded_stroke::<HostWordSeam>(
+        let result = carry_founded_stroke::<CpuWordSeam>(
             &standing,
             &mut owns,
             WordSpan::new(OWN_BASE, own_len),

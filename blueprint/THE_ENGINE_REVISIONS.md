@@ -218,6 +218,16 @@ Across four audits the most common finding was **a control that cannot fail**:
 | arm C | passes on any overlap short of total, over a buffer where chance predicts ≈342 and it returned 415 |
 | the coherence instrument | `|sweep|²` is dead code the compiler names, declared in six places |
 
+**Re-measured 2026-08-15. Two rows of this table are now FALSE and are struck rather than deleted, because
+the table's subject is the defect shape and a repaired instance is still its provenance.**
+
+- `organ_difference` — repaired. `cargo run -q -p life --example the_rest_advances_or_the_model_is_frozen`
+  now returns an organ arm over 103 deposited Lean artifacts, sealing a real `ConditionedRest` at
+  44,468 against 90,846 octets: the conditioned arm moves `["derivation"]` and the reseal moves `[]`.
+- the coherence instrument — removed, with its docs, on the same day.
+
+The other four rows stand as written.
+
 **The corpus already forbids this** — *a gauge whose group acts trivially on the declared material is
 not a gauge* — and it is **not enforced anywhere.**
 
@@ -238,7 +248,7 @@ The finger-trap correction, with specific targets found this session:
 | already owned | where | what it joins |
 |---|---|---|
 | `ExactReading::HarmonicReal` = `re² − im²`, exact over `Rat` | `model_surface.rs:61` | **the arrow's `(1,1)` form already has an owner.** `founds()` is `HarmonicReal ≤ 0`, and `causal_class = sense ∘ (·)²` exactly |
-| `ExactRatMatrix` with a verified inverse | `exact_linear.rs:212` | **bypassed by the four modules its own doc names** — `diffusion`, `sheaf_diffusion`, `inverse_transport`, `generative_transport` — and the bypass **dropped the inverse-certificate check** |
+| `ExactRatMatrix` with a verified inverse | `exact_linear.rs:362` | **bypassed by the four modules its own doc names** — `diffusion`, `sheaf_diffusion`, `inverse_transport`, `generative_transport` — and the bypass **dropped the inverse-certificate check** |
 | `simplicial.rs:689 is_affine` | | `Aff(1,ℂ) = Stab_{PGL₂}(∞)`, so the affine invariant *is* the cross-ratio with `∞` declared |
 | `TABLET_THE_TURN.md` §5 | | already names `reach/aim/cross` as the friction triangle and the law of cosines — three steps of this line re-derive it |
 

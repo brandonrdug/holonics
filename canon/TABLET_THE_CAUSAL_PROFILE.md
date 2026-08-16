@@ -40,7 +40,7 @@ core, or wall-clock interval is a chart of that closure.
 
 `proved-standard`: caused local order and message transport induce a partial order. A clock may
 extend or measure that order without becoming causality. CPU, GPU, memory, interconnect, power,
-thermal, host, and I/O observations therefore require explicit chart transports and calibration.
+thermal, CPU, and I/O observations therefore require explicit chart transports and calibration.
 
 ## 2. Logic is a quotient of physical current
 
@@ -111,6 +111,11 @@ passing information."*
    projection collapses or splits a **continuation fiber**, and it must be derived from caused
    transport. Symbol recurrence is a lexical statistic of an inscription; it carries no manipulation
    pattern and therefore cannot found an operation class.
+
+**Re-measured 2026-08-15.** `sed -n '144p' soma/life/src/material_shadow_cuda.rs` returns
+`material.extend(bytes.iter().map(|byte| u32::from(*byte)));`, and
+`grep -n "material_shadow_cuda" meta/AUTHORED_LEVELS.tsv` returns six rows, all `ABI` wire-format
+positions in `soma/abi/src/material_shadow_cuda.rs` — none for this byte grain. **The claim HOLDS.**
 
 **The measurement that was reported as support is in fact the falsifier.** The seven presentations
 of one fold returned shadow cycle ranks spanning `50, 68, 74, 79, 113, 141`. If the field tracked

@@ -2,7 +2,7 @@
 
 //! Substrate-neutral word records at Soma's execution membrane.
 //!
-//! This crate owns layouts which must be exact across host staging, CUDA entry shells,
+//! This crate owns layouts which must be exact across cpu staging, CUDA entry shells,
 //! other card substrates, and exact gates. It owns no carriage law, allocation, launch sizing,
 //! sharding, world policy, persistence, or observer interpretation.
 
@@ -15,7 +15,7 @@ pub mod contact;
 /// Fixed word transport for the consequence of one live event.
 // `cuda_execution` was removed 2026-08-10. It defined `EventContactRow` / `EVENT_CONTACT_WORDS`
 // with a full pack/validate/unpack round trip, 272 lines, and **nothing on either side of the
-// membrane referenced it** — not the PTX kernel crate, not the host executor, not a driver.
+// membrane referenced it** — not the PTX kernel crate, not the cpu executor, not a driver.
 // `CLAUDE.md` §13 rule 3: superseded production machinery fails closed. It is removed rather than
 // deprecated, and git history is the recovery surface.
 /// One substrate-neutral active event row.

@@ -795,9 +795,9 @@ pub struct ObservationEcologyWork {
     pub cuda_classified_relations: u64,
     /// Sparse relation consequences returned across the device boundary.
     pub cuda_returned_relations: u64,
-    /// Card classifications compared address-for-address with the host law.
+    /// Card classifications compared address-for-address with the cpu law.
     pub cuda_parity_relations: u64,
-    /// Structurally distinct relation modes admitted by an exact host witness.
+    /// Structurally distinct relation modes admitted by an exact cpu witness.
     pub cuda_mode_admissions: u64,
     /// Relation occurrences realized by an already admitted card mode.
     pub cuda_mode_reuses: u64,
@@ -806,12 +806,12 @@ pub struct ObservationEcologyWork {
     pub cuda_launches: u64,
     pub cuda_device: Option<String>,
     pub cuda_kernel_sha256: Option<String>,
-    pub cuda_host_to_device_octets: u64,
-    pub cuda_device_to_host_octets: u64,
+    pub cuda_cpu_to_device_octets: u64,
+    pub cuda_device_to_cpu_octets: u64,
     pub cuda_front_uploads: u64,
     pub cuda_allocation_resizes: u64,
     /// General chart strata whose relation cannot enter the packed card law.
-    pub host_relation_fallbacks: u64,
+    pub cpu_relation_fallbacks: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -883,7 +883,7 @@ impl CudaRelationRuntime {
         order: &[u32],
         windows: &[PackedRelationWindow],
         pair_count: u64,
-        host_witness: impl FnOnce() -> Result<CudaSparseRelations, ObservationEcologyError>,
+        cpu_witness: impl FnOnce() -> Result<CudaSparseRelations, ObservationEcologyError>,
     ) -> Result<(CudaSparseRelations, CudaRelationReceipt, CudaModeUse), ObservationEcologyError>
     {
         let realization = CudaModeRealization {
@@ -906,7 +906,7 @@ impl CudaRelationRuntime {
             receipt,
             already_admitted,
             pair_count,
-            host_witness,
+            cpu_witness,
         )
     }
 
@@ -916,7 +916,7 @@ impl CudaRelationRuntime {
         points: &[i64],
         point_count: u32,
         membership: &[u64],
-        host_witness: impl FnOnce() -> Result<CudaSparseGrade, ObservationEcologyError>,
+        cpu_witness: impl FnOnce() -> Result<CudaSparseGrade, ObservationEcologyError>,
     ) -> Result<(CudaSparseGrade, CudaRelationReceipt, CudaModeUse), ObservationEcologyError> {
         let realization = CudaModeRealization {
             mode: mode.clone(),
@@ -933,7 +933,7 @@ impl CudaRelationRuntime {
             receipt,
             already_admitted,
             compared_relations,
-            host_witness,
+            cpu_witness,
         )
     }
 
@@ -953,7 +953,7 @@ impl CudaRelationRuntime {
         receipt: CudaRelationReceipt,
         already_admitted: bool,
         compared_relations_if_admitted: u64,
-        host_witness: impl FnOnce() -> Result<T, ObservationEcologyError>,
+        cpu_witness: impl FnOnce() -> Result<T, ObservationEcologyError>,
     ) -> Result<(T, CudaRelationReceipt, CudaModeUse), ObservationEcologyError> {
         let compared_relations;
         if already_admitted {
@@ -967,8 +967,8 @@ impl CudaRelationRuntime {
             let _prior_witness_extent = witness.compared_relations;
             compared_relations = 0;
         } else {
-            let host_result = host_witness()?;
-            if host_result != result {
+            let cpu_result = cpu_witness()?;
+            if cpu_result != result {
                 return Err(ObservationEcologyError::CudaRelationParity);
             }
             compared_relations = compared_relations_if_admitted;
@@ -1004,8 +1004,8 @@ impl CudaRelationRuntime {
 /// event-local antichain may execute concurrently. CUDA is never selected by
 /// device presence: callers must construct the explicit CUDA policy.  Its
 /// driver context and buffers persist with this law.  A structurally exact
-/// mode is compared completely with the host once, then later occurrences of
-/// that same mode are realized by the card without a shadow host classifier.
+/// mode is compared completely with the cpu once, then later occurrences of
+/// that same mode are realized by the card without a shadow cpu classifier.
 #[derive(Clone)]
 pub struct ObservationEcologyLaw {
     cpu: CpuExecutor,
@@ -1171,13 +1171,13 @@ fn accumulate_cuda_receipt(
         .cuda_allocation_resizes
         .checked_add(receipt.allocation_resizes)
         .ok_or(ObservationEcologyError::CarrierOverflow)?;
-    work.cuda_host_to_device_octets = work
-        .cuda_host_to_device_octets
-        .checked_add(receipt.host_to_device_octets)
+    work.cuda_cpu_to_device_octets = work
+        .cuda_cpu_to_device_octets
+        .checked_add(receipt.cpu_to_device_octets)
         .ok_or(ObservationEcologyError::CarrierOverflow)?;
-    work.cuda_device_to_host_octets = work
-        .cuda_device_to_host_octets
-        .checked_add(receipt.device_to_host_octets)
+    work.cuda_device_to_cpu_octets = work
+        .cuda_device_to_cpu_octets
+        .checked_add(receipt.device_to_cpu_octets)
         .ok_or(ObservationEcologyError::CarrierOverflow)?;
     match &work.cuda_device {
         Some(device) if device != &receipt.device => {
@@ -2530,8 +2530,8 @@ fn emit_prediction(
     let decoded = decoded_batch(standing, batch, &law.cpu, work)?;
     let strata = strata(batch, family, &decoded)?;
     if law.exact_cuda_relations {
-        work.host_relation_fallbacks = work
-            .host_relation_fallbacks
+        work.cpu_relation_fallbacks = work
+            .cpu_relation_fallbacks
             .checked_add(
                 u64::try_from(strata.len())
                     .map_err(|_| ObservationEcologyError::CarrierOverflow)?,
@@ -2730,7 +2730,7 @@ fn emit_packed_prediction(
                         &traversal.order,
                         &traversal.windows,
                         traversal.pair_count,
-                        || packed_host_window_relations(stratum, &traversal),
+                        || packed_cpu_window_relations(stratum, &traversal),
                     )
                 })?;
                 accumulate_cuda_receipt(work, &receipt)?;
@@ -2861,7 +2861,7 @@ fn grade_return(
                                 &stratum.points,
                                 point_count,
                                 &packed_membership,
-                                || packed_host_sparse_grade(stratum, &membership),
+                                || packed_cpu_sparse_grade(stratum, &membership),
                             )
                         })?;
                         accumulate_cuda_receipt(work, &receipt)?;
@@ -2881,8 +2881,8 @@ fn grade_return(
             Err(ObservationEcologyError::CudaRelationChartNotPackable) => {
                 let decoded = decoded_batch(standing, batch, &law.cpu, work)?;
                 let strata = strata(batch, family, &decoded)?;
-                work.host_relation_fallbacks = work
-                    .host_relation_fallbacks
+                work.cpu_relation_fallbacks = work
+                    .cpu_relation_fallbacks
                     .checked_add(
                         u64::try_from(strata.len())
                             .map_err(|_| ObservationEcologyError::CarrierOverflow)?,
@@ -3010,7 +3010,7 @@ fn grade_stratum(
 }
 
 #[cfg(target_os = "linux")]
-fn packed_host_window_relations(
+fn packed_cpu_window_relations(
     packed: &PackedObservationStratum,
     traversal: &PackedPredictionTraversal,
 ) -> Result<CudaSparseRelations, ObservationEcologyError> {
@@ -3066,7 +3066,7 @@ fn packed_host_window_relations(
 }
 
 #[cfg(target_os = "linux")]
-fn packed_host_sparse_grade(
+fn packed_cpu_sparse_grade(
     packed: &PackedObservationStratum,
     membership: &BTreeMap<ReceiverTestimonyId, ReturnedCellId>,
 ) -> Result<CudaSparseGrade, ObservationEcologyError> {
@@ -3551,15 +3551,15 @@ fn physical_resources(
         ),
     };
     let mut receipt = PhysicalResourceReceipt::new(executor);
-    if work.cuda_host_to_device_octets != 0
-        || work.cuda_device_to_host_octets != 0
+    if work.cuda_cpu_to_device_octets != 0
+        || work.cuda_device_to_cpu_octets != 0
         || work.cuda_launches != 0
     {
         receipt.traffic.insert(
-            MemoryTier::HostDeviceLink,
+            MemoryTier::CpuDeviceLink,
             Traffic {
-                read_octets: BigUint::from(work.cuda_device_to_host_octets),
-                written_octets: BigUint::from(work.cuda_host_to_device_octets),
+                read_octets: BigUint::from(work.cuda_device_to_cpu_octets),
+                written_octets: BigUint::from(work.cuda_cpu_to_device_octets),
                 messages: BigUint::from(work.cuda_launches),
             },
         );
@@ -3696,7 +3696,7 @@ pub enum ObservationEcologyError {
     CudaRelationRuntimePoisoned,
     #[error("the exact CUDA mode-admission ledger violated its append-only invariant")]
     CudaModeRegistryInvariant,
-    #[error("the exact CUDA relation state differs from the host state at the same pair address")]
+    #[error("the exact CUDA relation state differs from the cpu state at the same pair address")]
     CudaRelationParity,
     #[error("an exact relation could not be represented by the admitted packed comparison carrier")]
     MalformedPackedRelation,

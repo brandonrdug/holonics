@@ -7,7 +7,7 @@
 //! reasoning, generated control wrappers, and attachments do not become language merely because
 //! they share a JSON record with it.
 //!
-//! **Every coordinate this membrane retains is read out of the container, never off the host.**
+//! **Every coordinate this membrane retains is read out of the container, never off the cpu.**
 //! A container is addressed by its own name in whatever store holds it, an occurrence identity is
 //! founded from that address plus the record ordinal and byte range, and a conversation is the
 //! container's declared session — never a message identity.  The two defects that law exists to
@@ -68,7 +68,7 @@ const TEXT_ASSISTANT_FINAL_RECEIVER: u64 = 40_000_002;
 const TEXT_DOCUMENT_RECEIVER: u64 = 40_000_003;
 const TEXT_EMANATED_RECEIVER: u64 = 40_000_004;
 /// `v5` because the occurrence identity law changed on 2026-08-11 and a `v4` rest is not the same
-/// body under a new name: every founded identity in a `v4` rest carries the absolute host path it
+/// body under a new name: every founded identity in a `v4` rest carries the absolute cpu path it
 /// was read at, so it is a lineage in an absolute frame. Refusing it at the schema is the point.
 const REST_SCHEMA: &str = "life.exact-text-material-atlas.v5";
 const CORPUS_SCHEMA: &str = "life.exact-text-material-corpus.v3";
@@ -129,7 +129,7 @@ pub enum TextMaterialError {
     WorkerPanicked,
     /// Two distinct containers of one source kind presented one container address.
     ///
-    /// The membrane will not disambiguate them by reaching back to the host path, because that is
+    /// The membrane will not disambiguate them by reaching back to the cpu path, because that is
     /// the absolute frame this identity law exists to remove. The ambiguity is returned instead.
     ContainerAddressCollision(String),
 }
@@ -139,7 +139,7 @@ pub enum TextMaterialError {
 pub struct TextMaterialWitness {
     pub source_kind: TextMaterialSourceKind,
     pub identity_species: TextMaterialIdentitySpecies,
-    /// The container's own address — its name in whatever store holds it — and never the host
+    /// The container's own address — its name in whatever store holds it — and never the cpu
     /// path it was mounted from. A witness is retained testimony; folding the filesystem into it
     /// makes the whole sealed body a function of one machine.
     pub container: String,
@@ -365,7 +365,7 @@ impl ExactTextMaterialCorpus {
         });
         // A container address must separate the containers it addresses. Two of one kind under one
         // address is an ambiguity, and the membrane returns it rather than reaching back to the
-        // host path that used to separate them.
+        // cpu path that used to separate them.
         for pair in containers.windows(2) {
             if (pair[0].source_kind, pair[0].source.as_str())
                 == (pair[1].source_kind, pair[1].source.as_str())
@@ -584,7 +584,7 @@ impl ExactTextMaterialAtlas {
     }
 
     /// Mount a native rest from a bounded input membrane. Unlike `fs::read` followed by
-    /// `from_native_bytes`, this does not retain a second complete file-sized host allocation
+    /// `from_native_bytes`, this does not retain a second complete file-sized cpu allocation
     /// beside the formed ecology.
     pub fn from_native_reader(reader: impl Read) -> Result<Self, TextMaterialError> {
         let atlas: Self = serde_json::from_reader(reader)
@@ -1748,7 +1748,7 @@ mod tests {
         assert_eq!(atlas.encode_native_bytes().unwrap(), incremental_rest);
         let refusal = atlas
             .mount_cuda(i32::MAX)
-            .expect_err("an unavailable device ordinal must refuse without consuming the host");
+            .expect_err("an unavailable device ordinal must refuse without consuming the cpu");
         assert_eq!(
             refusal.atlas().encode_native_bytes().unwrap(),
             incremental_rest
@@ -1900,7 +1900,7 @@ mod tests {
     );
 
     #[test]
-    fn one_container_read_at_two_host_paths_founds_one_identical_body() {
+    fn one_container_read_at_two_cpu_paths_founds_one_identical_body() {
         // The relocation control. A corpus address which moves when the container moves is a
         // lineage in an absolute frame — `CLAUDE.md` §0 lesson 2 — and no hash comparison can see
         // it, because both frames hash consistently inside themselves.
@@ -1959,12 +1959,12 @@ mod tests {
         );
         assert_eq!(left_containers, right_containers);
 
-        // And neither host frame survives anywhere inside the body it was read into.
+        // And neither cpu frame survives anywhere inside the body it was read into.
         let sealed = String::from_utf8(left_rest).unwrap();
         for root in [&left_root, &right_root] {
             assert!(
                 !sealed.contains(root.to_str().unwrap()),
-                "a host coordinate reached the sealed body"
+                "a cpu coordinate reached the sealed body"
             );
         }
 

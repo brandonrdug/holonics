@@ -2,8 +2,8 @@
 //!
 //! Exterior tokenization and dense chart naming remain at the process membrane. The device forms
 //! the five generalized suffix ecologies and the boundary-anchored question-prefix incidence.
-//! The host decodes those returned relations into their existing owners; it does not replay the
-//! conditioning algorithm. There is no host fallback.
+//! The cpu decodes those returned relations into their existing owners; it does not replay the
+//! conditioning algorithm. There is no cpu fallback.
 
 use core::ffi::c_void;
 use std::collections::{BTreeMap, BTreeSet};

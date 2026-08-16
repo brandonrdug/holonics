@@ -48,7 +48,7 @@ pub struct HornFillerBranchId {
 // `with_horn_local_section_limit` on the caller's behalf. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.5
 // convicted the name itself: **a default is a level the organ picked because the caller was never
 // asked.** The horn local-section limit bounds how many affine integer-polynomial torsors one
-// horn-resolution event may retain, which is a statement about the host, so
+// horn-resolution event may retain, which is a statement about the cpu, so
 // `with_horn_local_section_limit` is now the only constructor and every caller states it. The
 // refusal shape is unchanged: a zero limit is `PrimeEcologyError::ZeroHornLocalSectionLimit` and an
 // exceeded one is refused rather than sampled.

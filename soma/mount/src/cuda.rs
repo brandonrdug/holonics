@@ -245,7 +245,7 @@ impl Drop for Stream {
 }
 
 // CUDA's driver header names 0x04 `CU_CTX_SCHED_BLOCKING_SYNC`. Context scheduling belongs to
-// the host apparatus: while a long kernel carries a real worldline, sleeping this boundary thread
+// the cpu apparatus: while a long kernel carries a real worldline, sleeping this boundary thread
 // preserves a CPU core without changing device work or the construction crossing it.
 const CU_CTX_SCHED_BLOCKING_SYNC: u32 = 0x04;
 /// CUDA Driver ABI value for `CU_LIMIT_STACK_SIZE`: per-thread device stack bytes.
@@ -270,7 +270,7 @@ impl Context {
         Ok(Context { ctx })
     }
 
-    /// Make this retained context current on the calling host thread.
+    /// Make this retained context current on the calling cpu thread.
     ///
     /// CUDA's Driver API keeps current-context selection in thread-local apparatus. Independent
     /// exact executors may lawfully retain different contexts on one device, so an owner must
@@ -1118,7 +1118,7 @@ impl<T: Copy> DeviceBuffer<T> {
         })
     }
 
-    /// Allocate and zero-fill directly on the device. No host-sized staging allocation is made.
+    /// Allocate and zero-fill directly on the device. No cpu-sized staging allocation is made.
     pub fn alloc_zeroed(len: usize) -> Result<DeviceBuffer<T>>
     where
         T: DeviceZeroable,
@@ -1142,7 +1142,7 @@ impl<T: Copy> DeviceBuffer<T> {
     }
 
     pub fn copy_from_slice(&self, src: &[T]) -> Result<()> {
-        assert_eq!(src.len(), self.len, "host->device length mismatch");
+        assert_eq!(src.len(), self.len, "cpu->device length mismatch");
         let bytes = self.len * core::mem::size_of::<T>();
         unsafe {
             check(
@@ -1207,7 +1207,7 @@ impl<T: Copy> DeviceBuffer<T> {
     }
 
     pub fn copy_to_slice(&self, dst: &mut [T]) -> Result<()> {
-        assert_eq!(dst.len(), self.len, "device->host length mismatch");
+        assert_eq!(dst.len(), self.len, "device->cpu length mismatch");
         let bytes = self.len * core::mem::size_of::<T>();
         unsafe {
             check(
@@ -1269,7 +1269,7 @@ impl<T: Copy> DeviceBuffer<T> {
     }
 
     /// Copy one exact typed subspan between allocations in the current context. This is the
-    /// resident-lineage remount path: accepted device state need not detour through host storage.
+    /// resident-lineage remount path: accepted device state need not detour through cpu storage.
     pub fn copy_range_from_buffer(
         &self,
         destination_offset: usize,

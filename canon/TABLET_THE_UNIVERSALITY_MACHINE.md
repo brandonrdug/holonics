@@ -125,7 +125,7 @@ s_i = i - max {j < i | b_j = b_i}         otherwise.
 It is invariant under a bijection of byte surfaces and returns its complete recurrence arcs. A
 caused rectangular transition face founds an exact local bi-affine law on the card. Native rest
 retains only anonymous shadow keys and exact coefficients. After source departure, the card
-reattaches later raw source, folds the complete later current without host semantic replay, and
+reattaches later raw source, folds the complete later current without CPU semantic replay, and
 returns every intermediate standing to the exact behavioral quotient.
 
 Seven materially different sum presentations returned one complete world-line fiber; two product
@@ -170,7 +170,7 @@ the rectangular founding transition faces and the order in which the existing or
 It therefore does not return autonomous circulation through one continuing ecology. The missing
 relation is emission through typed ports, genuine exterior return, attributable change in reusable
 morphology, and later current through that changed body—with closure, plurality, or obstruction
-returned without host semantic phase choreography. “Schedule morphology” as a proposed semantic
+returned without CPU semantic phase choreography. “Schedule morphology” as a proposed semantic
 subsystem is withdrawn.
 
 Complete bounded construction and the subsequent architectural correction:

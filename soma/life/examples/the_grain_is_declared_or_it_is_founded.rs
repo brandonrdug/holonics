@@ -165,7 +165,7 @@ fn at_word_grain(material: &[u8]) -> Reading {
     reading
 }
 
-/// Drive the same octets at the ATOM grain, exactly as `enact_host_current`'s `Cell` branch does:
+/// Drive the same octets at the ATOM grain, exactly as `enact_cpu_current`'s `Cell` branch does:
 /// one `atom_node` per signed adjacent difference, through the compatibility mouth.
 fn at_atom_grain(material: &[u8]) -> Reading {
     let standing = vec![0u32; cells()];

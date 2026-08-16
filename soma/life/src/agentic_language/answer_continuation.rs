@@ -533,7 +533,7 @@ impl AgenticLanguageEcology {
     /// This is the agentic body's own generation mouth. The selected current's question event and
     /// every self-emanated return cross the supplied executor, so a caller which mounted a card at
     /// [`AgenticLanguageEcology::condition_with_executor`] keeps that carrier across the answer
-    /// rather than silently rebuilding a private host pool between conditioning and emanation.
+    /// rather than silently rebuilding a private cpu pool between conditioning and emanation.
     pub(super) fn prepare_answer_with_executor(
         &self,
         question: AgenticLanguageQuestion,

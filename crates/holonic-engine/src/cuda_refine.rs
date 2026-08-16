@@ -4,12 +4,12 @@
 //! important and you can't just keep punting it… every time we have to go from it not being
 //! integrated to integrating it, you risk contamination. It's GPU first."* This module exists so
 //! that the front `token_invariance` walks is enacted on the device from the beginning, with the
-//! host law standing beside it as the exact reference rather than as the implementation.
+//! cpu law standing beside it as the exact reference rather than as the implementation.
 //!
 //! # What crosses, and why it is small
 //!
 //! A receiver's reading of a surface is `[kind, weight, density, conduct token]`. Two occurrences
-//! agree at an offset exactly when those four words agree, so the host assigns each **distinct
+//! agree at an offset exactly when those four words agree, so the cpu assigns each **distinct
 //! reading** a dense identity once over the whole corpus — [`ReadingIdentities`] — and the device
 //! compares identities. Equality of identities is equality of readings, exactly.
 //!
@@ -25,7 +25,7 @@
 //! An occurrence's new class is the identity of `(current class, shell key)`, claimed by
 //! `atomicCAS` in an open-addressed table. The atomic is on the **claim**, never on the reading.
 //! Distinct pairs are at most occupied occurrences, so a capacity strictly above the occurrence
-//! count always leaves an empty slot and every probe terminates. The host sizes it as the next power
+//! count always leaves an empty slot and every probe terminates. The cpu sizes it as the next power
 //! of two above the site count — **derived from the material, no load factor, no number chosen.**
 //!
 //! # Launch geometry
@@ -275,7 +275,7 @@ pub struct CudaRefineExecutor {
     module: CuModule,
     refine: CuFunction,
     /// `refine_claimed` is RESOLVED AND NEVER LAUNCHED: `saturate` densifies the claimed slots on
-    /// the host after reading them back, which supersedes the kernel's device-side compaction. The
+    /// the cpu after reading them back, which supersedes the kernel's device-side compaction. The
     /// resolution stays because it is what proves the symbol is present in the committed module and
     /// because `refine_claimed`'s `MAX_THREADS_PER_BLOCK` is one of the three bounds on `block_x`;
     /// the handle stays in this field so a later launch needs no second resolution. Recorded rather
@@ -441,7 +441,7 @@ impl CudaRefineExecutor {
         if count == 0 {
             return Ok(DeviceSaturation {
                 // No occurrence, so no shell ever split: the least final radius is 0. This was `1`,
-                // the same authored floor the host law carried at `last_split.max(1)`.
+                // the same authored floor the cpu law carried at `last_split.max(1)`.
                 horizon: 0,
                 classes: 0,
                 shells: 0,
@@ -468,8 +468,8 @@ impl CudaRefineExecutor {
         let table_key = Buffer::alloc(capacity * std::mem::size_of::<u64>())?;
         // Every site opens in one class. Class identities begin at one so they can never equal the
         // empty marker, which is all ones.
-        let mut host_class = vec![1u32; count];
-        let device_class = Buffer::of(&host_class)?;
+        let mut cpu_class = vec![1u32; count];
+        let device_class = Buffer::of(&cpu_class)?;
         let device_next = Buffer::alloc(count * std::mem::size_of::<u32>())?;
 
         let mut previous_classes = 1usize;
@@ -535,7 +535,7 @@ impl CudaRefineExecutor {
                 dense.entry(*slot).or_insert(assigned);
             }
             for (at, slot) in next.iter().enumerate() {
-                host_class[at] = dense[slot];
+                cpu_class[at] = dense[slot];
             }
             let classes = dense.len();
             if depth == 1 {
@@ -549,7 +549,7 @@ impl CudaRefineExecutor {
                 unsafe {
                     cuMemcpyHtoD_v2(
                         device_class.pointer,
-                        host_class.as_ptr().cast(),
+                        cpu_class.as_ptr().cast(),
                         count * std::mem::size_of::<u32>(),
                     )
                 },
@@ -557,20 +557,20 @@ impl CudaRefineExecutor {
             )?;
             if classes == count {
                 // Every class is a singleton; no deeper shell can split anything. This is the
-                // theorem the host law stops on, and it holds here for the same reason.
+                // theorem the cpu law stops on, and it holds here for the same reason.
                 break;
             }
         }
 
         Ok(DeviceSaturation {
-            // `0` when no shell ever split, which is the reading and not a floor. The host law's
+            // `0` when no shell ever split, which is the reading and not a floor. The cpu law's
             // `SaturationHorizon::horizon` carries the same convention and the two are compared
             // directly by `the_card_refines_the_front`.
             horizon: last_split,
             classes: previous_classes,
             shells,
             classes_at_one,
-            site_class: host_class,
+            site_class: cpu_class,
         })
     }
 }
@@ -627,7 +627,7 @@ pub fn front_of(census: &CorpusCensus) -> Vec<(SurfaceId, Vec<(u32, u32)>)> {
 /// Which chart of the cover enacted a quotient. A realization coordinate, never a holon.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum QuotientCarrier {
-    Host,
+    Cpu,
     Device,
 }
 
@@ -662,8 +662,8 @@ impl Quotient {
     }
 }
 
-/// **The exact quotient on the host.** The reference every carrier is required to equal.
-pub fn quotient_on_host(classes: &[u32], keys: &[u64]) -> Quotient {
+/// **The exact quotient on the cpu.** The reference every carrier is required to equal.
+pub fn quotient_on_cpu(classes: &[u32], keys: &[u64]) -> Quotient {
     let mut dense: BTreeMap<(u32, u64), u32> = BTreeMap::new();
     let mut cell_class = Vec::with_capacity(classes.len());
     for (class, key) in classes.iter().zip(keys) {
@@ -673,7 +673,7 @@ pub fn quotient_on_host(classes: &[u32], keys: &[u64]) -> Quotient {
     Quotient {
         classes: dense.len(),
         cell_class,
-        carrier: QuotientCarrier::Host,
+        carrier: QuotientCarrier::Cpu,
     }
 }
 
@@ -767,7 +767,7 @@ impl CudaRefineExecutor {
 mod tests {
     use super::*;
 
-    /// **The law is one law.** The host and the card must return the same partition for the same
+    /// **The law is one law.** The cpu and the card must return the same partition for the same
     /// `(classes, keys)`, on material built to make the table collide and to make many cells share
     /// a pair — which is where a claim race shows up and where a wrong probe walks off.
     ///
@@ -783,31 +783,31 @@ mod tests {
             let keys: Vec<u64> = (0..cells)
                 .map(|at| ((at % 11) as u64) << 32 | (at % 5) as u64)
                 .collect();
-            let host = quotient_on_host(&classes, &keys);
+            let cpu = quotient_on_cpu(&classes, &keys);
             let device = card
                 .quotient_on_device(&classes, &keys)
                 .expect("the card quotients");
             assert_eq!(
-                host.classes, device.classes,
-                "class count at {cells} cells: host {} device {}",
-                host.classes, device.classes
+                cpu.classes, device.classes,
+                "class count at {cells} cells: cpu {} device {}",
+                cpu.classes, device.classes
             );
             assert!(
-                host.same_partition_as(&device),
+                cpu.same_partition_as(&device),
                 "the two charts must induce the same equivalence at {cells} cells"
             );
-            assert_eq!(host.carrier, QuotientCarrier::Host);
+            assert_eq!(cpu.carrier, QuotientCarrier::Cpu);
             assert_eq!(device.carrier, QuotientCarrier::Device);
         }
     }
 
-    /// The host law is exact on its own terms, without a card. A partition is an equivalence, so
+    /// The cpu law is exact on its own terms, without a card. A partition is an equivalence, so
     /// this checks the property rather than the numbering.
     #[test]
-    fn the_host_quotient_separates_exactly_on_the_pair() {
+    fn the_cpu_quotient_separates_exactly_on_the_pair() {
         let classes = [1u32, 1, 1, 2, 2];
         let keys = [10u64, 10, 11, 10, 11];
-        let quotient = quotient_on_host(&classes, &keys);
+        let quotient = quotient_on_cpu(&classes, &keys);
         assert_eq!(quotient.classes, 4, "(1,10) (1,11) (2,10) (2,11)");
         assert_eq!(quotient.cell_class[0], quotient.cell_class[1]);
         assert_ne!(quotient.cell_class[0], quotient.cell_class[2]);

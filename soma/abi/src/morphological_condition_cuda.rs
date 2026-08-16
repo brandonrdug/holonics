@@ -2,7 +2,7 @@
 //!
 //! The exterior chart supplies dense material symbols and caused source labels.  The card returns
 //! the generalized suffix-automaton incidence (including source-tree spans) and the
-//! boundary-anchored question-prefix incidence.  No host-built state, transition, suffix link,
+//! boundary-anchored question-prefix incidence.  No cpu-built state, transition, suffix link,
 //! prefix node, or active-prefix answer crosses into the card.
 
 pub const SUFFIX_ENTRY_SYMBOL: &str = "morphological_suffix_condition";
@@ -42,7 +42,7 @@ pub const SUFFIX_STATE_SPAN_LEN: usize = 7;
 pub const SUFFIX_STATE_WORDS: usize = 8;
 
 // Mutable transition incidence.  `next` is only the resident adjacency chart; state/symbol/target
-// are the semantic edge returned to the host.
+// are the semantic edge returned to the cpu.
 pub const SUFFIX_TRANSITION_STATE: usize = 0;
 pub const SUFFIX_TRANSITION_SYMBOL: usize = 1;
 pub const SUFFIX_TRANSITION_TARGET: usize = 2;

@@ -331,7 +331,7 @@ pub enum IntakeRefusal {
 ///
 /// `alphabet` and `radius` declare the query family, which is exhausted rather than sampled, so
 /// every relation returned is a statement about the whole family. `apertures` is what the **caller's
-/// host** can hold; it is passed through to [`recover`] and is not this organ's to pick. `material`
+/// cpu** can hold; it is passed through to [`recover`] and is not this organ's to pick. `material`
 /// is named wholes of real text; it is presented through [`present`] and segmented by the recovered
 /// structure, and the tokens enter [`FoundedMorphology::from_founded_words`] — the one seam.
 ///
@@ -726,7 +726,7 @@ mod tests {
         ConditionedBody, DerivationQuery, StemStanding, derive, expose,
     };
 
-    /// **What this test body declares as its host capacity.** The apertures moved out of
+    /// **What this test body declares as its cpu capacity.** The apertures moved out of
     /// `codec_recovery` on 2026-08-09 (`canon/THE_AUTHORED_LEVEL.md` §5.2); a fixture is a caller
     /// and declares its own. The values reproduce the excised constants so these fixtures' returns
     /// are unchanged by the move.

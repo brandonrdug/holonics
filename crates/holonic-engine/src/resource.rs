@@ -19,7 +19,7 @@ pub enum MemoryTier {
     Cache(u8),
     MainMemory,
     DeviceMemory,
-    HostDeviceLink,
+    CpuDeviceLink,
     DurableStorage,
     Network,
     Declared(String),

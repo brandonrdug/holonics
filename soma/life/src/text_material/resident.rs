@@ -28,9 +28,9 @@ pub enum TextMaterialRestrictionError {
     CarrierExtent,
 }
 
-/// Recoverable refusal of the initial host-to-card ownership crossing.
+/// Recoverable refusal of the initial cpu-to-card ownership crossing.
 ///
-/// The exact host predecessor remains inside this value, so unavailable hardware or an ABI
+/// The exact cpu predecessor remains inside this value, so unavailable hardware or an ABI
 /// refusal cannot destroy the only conditioned text body merely because mounting consumes
 /// ownership on success.
 #[derive(Debug)]
@@ -71,8 +71,8 @@ pub struct TextMaterialCudaRestrictionReceipt {
     pub returned_handle_population: usize,
     pub leader_feature_population: usize,
     pub query_transport_population: usize,
-    pub host_query_preparation_nanoseconds: u128,
-    pub host_return_formation_nanoseconds: u128,
+    pub cpu_query_preparation_nanoseconds: u128,
+    pub cpu_return_formation_nanoseconds: u128,
     pub total_elapsed_nanoseconds: u128,
     pub bounded_delta_equal: bool,
     pub resident_sync: Option<TextMaterialCudaSyncReceipt>,
@@ -95,11 +95,11 @@ pub struct TextMaterialCudaContactAttempt {
 }
 
 /// One ownership-coupled text ecology and its admitted resident CUDA realization.  Mounting
-/// consumes the host atlas so an exterior caller cannot silently bind the same card executor to
-/// another semantic world.  The host remains exact causal authority; the card is its retained
+/// consumes the cpu atlas so an exterior caller cannot silently bind the same card executor to
+/// another semantic world.  The cpu remains exact causal authority; the card is its retained
 /// physical chart and may only advance through append deltas derived from this body.
 pub struct CudaResidentTextMaterialAtlas {
-    host: ExactTextMaterialAtlas,
+    cpu: ExactTextMaterialAtlas,
     card: Option<CudaTextMaterialResidentExecutor>,
     device_ordinal: i32,
     resident_equality_certified: bool,
@@ -107,7 +107,7 @@ pub struct CudaResidentTextMaterialAtlas {
 
 #[derive(Debug)]
 pub struct CudaResidentTextMaterialNativeRest {
-    host_bytes: Box<[u8]>,
+    cpu_bytes: Box<[u8]>,
     device_ordinal: i32,
 }
 
@@ -124,12 +124,12 @@ impl CudaResidentTextMaterialRestRefusal {
 }
 
 impl CudaResidentTextMaterialNativeRest {
-    /// Found a fresh host owner from native contemporary standing, then transfer it across a new
+    /// Found a fresh cpu owner from native contemporary standing, then transfer it across a new
     /// device mount. No corpus or developmental source is consulted.
     pub fn remount(
         self,
     ) -> Result<CudaResidentTextMaterialAtlas, CudaResidentTextMaterialRestRefusal> {
-        let atlas = match ExactTextMaterialAtlas::from_native_bytes(&self.host_bytes) {
+        let atlas = match ExactTextMaterialAtlas::from_native_bytes(&self.cpu_bytes) {
             Ok(atlas) => atlas,
             Err(error) => {
                 return Err(CudaResidentTextMaterialRestRefusal {
@@ -152,7 +152,7 @@ impl std::fmt::Debug for CudaResidentTextMaterialAtlas {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter
             .debug_struct("CudaResidentTextMaterialAtlas")
-            .field("receipt", self.host.receipt())
+            .field("receipt", self.cpu.receipt())
             .field("card", &self.card)
             .field(
                 "resident_equality_certified",
@@ -182,7 +182,7 @@ impl ExactTextMaterialAtlas {
             }
         };
         Ok(CudaResidentTextMaterialAtlas {
-            host: self,
+            cpu: self,
             card: Some(card),
             device_ordinal,
             resident_equality_certified: true,
@@ -192,11 +192,11 @@ impl ExactTextMaterialAtlas {
 
 impl CudaResidentTextMaterialAtlas {
     pub const fn corpus(&self) -> &ExactTextMaterialCorpus {
-        self.host.corpus()
+        self.cpu.corpus()
     }
 
     pub const fn receipt(&self) -> &TextMaterialAtlasReceipt {
-        self.host.receipt()
+        self.cpu.receipt()
     }
 
     pub fn device_name(&self) -> &str {
@@ -213,47 +213,47 @@ impl CudaResidentTextMaterialAtlas {
         }
     }
 
-    /// End the exterior CUDA placement and return the one continuing host ecology.
+    /// End the exterior CUDA placement and return the one continuing cpu ecology.
     ///
     /// This is an ownership transfer, not a clone and not a fallback execution path: the resident
-    /// allocation is destroyed and the exact host authority that founded it continues.  A caller
+    /// allocation is destroyed and the exact cpu authority that founded it continues.  A caller
     /// that needs a later device deed must mount that same returned owner again.
-    pub fn unmount_into_host(self) -> ExactTextMaterialAtlas {
+    pub fn unmount_into_cpu(self) -> ExactTextMaterialAtlas {
         let Self {
-            host,
+            cpu,
             card,
             device_ordinal: _,
             resident_equality_certified: _,
         } = self;
         drop(card);
-        host
+        cpu
     }
 
-    /// Suspend by ownership transfer. Device storage is destroyed; only the exact native host
+    /// Suspend by ownership transfer. Device storage is destroyed; only the exact native cpu
     /// body and apparatus address survive for a later fresh remount.
     pub fn into_native_rest(
         self,
     ) -> Result<CudaResidentTextMaterialNativeRest, TextMaterialRestrictionError> {
-        let host_bytes = self.host.encode_native_bytes()?.into_boxed_slice();
+        let cpu_bytes = self.cpu.encode_native_bytes()?.into_boxed_slice();
         let Self {
-            host: _,
+            cpu: _,
             card,
             device_ordinal,
             resident_equality_certified: _,
         } = self;
         drop(card);
         Ok(CudaResidentTextMaterialNativeRest {
-            host_bytes,
+            cpu_bytes,
             device_ordinal,
         })
     }
 
-    /// Grade the continuing host authority through its native rest membrane without detaching
+    /// Grade the continuing cpu authority through its native rest membrane without detaching
     /// or replacing the resident card realization. This is an observation of the current body;
     /// the remounted image never becomes the authority merely because it compares equal.
-    pub fn grade_host_rest(&self) -> Result<bool, TextMaterialRestrictionError> {
-        let bytes = self.host.encode_native_bytes()?;
-        Ok(ExactTextMaterialAtlas::from_native_bytes(&bytes)? == self.host)
+    pub fn grade_cpu_rest(&self) -> Result<bool, TextMaterialRestrictionError> {
+        let bytes = self.cpu.encode_native_bytes()?;
+        Ok(ExactTextMaterialAtlas::from_native_bytes(&bytes)? == self.cpu)
     }
 
     /// Restrict the continuing ecology through its resident card chart.  A poisoned realization
@@ -269,12 +269,12 @@ impl CudaResidentTextMaterialAtlas {
         self.synchronize_card()?;
         let atlas_shape = self.atlas_shape()?;
         let query_started = std::time::Instant::now();
-        let (leader_features, query_transports) = self.host.restriction_coordinates(leader);
+        let (leader_features, query_transports) = self.cpu.restriction_coordinates(leader);
         let feature_mask_words = text_cuda::mask_words(leader_features.len());
         let transport_mask_words = text_cuda::mask_words(query_transports.len());
         // An APPARATUS extent: how many rows the return buffer holds. Not an admission — the
-        // junction decides that, host-side, after the card returns what it found.
-        let aperture = self.host.sections.len().max(1);
+        // junction decides that, cpu-side, after the card returns what it found.
+        let aperture = self.cpu.sections.len().max(1);
         if leader_features.is_empty() || aperture == 0 {
             let resident_sync = self
                 .card
@@ -294,8 +294,8 @@ impl CudaResidentTextMaterialAtlas {
                     returned_handle_population: 0,
                     leader_feature_population: leader_features.len(),
                     query_transport_population: query_transports.len(),
-                    host_query_preparation_nanoseconds: query_started.elapsed().as_nanos(),
-                    host_return_formation_nanoseconds: 0,
+                    cpu_query_preparation_nanoseconds: query_started.elapsed().as_nanos(),
+                    cpu_return_formation_nanoseconds: 0,
                     total_elapsed_nanoseconds: total_started.elapsed().as_nanos(),
                     bounded_delta_equal: self.resident_equality_certified,
                     resident_sync,
@@ -333,7 +333,7 @@ impl CudaResidentTextMaterialAtlas {
         query[text_cuda::QUERY_TRANSPORTS_AT] = extent_u32(query_transports_at)?;
         query[text_cuda::FEATURE_CURSORS_AT] = extent_u32(feature_cursors_at)?;
         query[text_cuda::TOTAL_WORDS] = extent_u32(query.len())?;
-        let host_query_preparation_nanoseconds = query_started.elapsed().as_nanos();
+        let cpu_query_preparation_nanoseconds = query_started.elapsed().as_nanos();
         let TextMaterialCudaRestrictionOutput {
             restriction_words,
             returned_handles,
@@ -345,14 +345,14 @@ impl CudaResidentTextMaterialAtlas {
             .restrict(&mut query)?;
 
         let return_started = std::time::Instant::now();
-        let returned = self.host.finish_restriction(
+        let returned = self.cpu.finish_restriction(
             leader,
             &leader_features,
             feature_mask_words,
             transport_mask_words,
             &restriction_words,
         );
-        let host_return_formation_nanoseconds = return_started.elapsed().as_nanos();
+        let cpu_return_formation_nanoseconds = return_started.elapsed().as_nanos();
         let resident_sync = self
             .card
             .as_mut()
@@ -365,8 +365,8 @@ impl CudaResidentTextMaterialAtlas {
                 returned_handle_population: returned_handles,
                 leader_feature_population: leader_features.len(),
                 query_transport_population: query_transports.len(),
-                host_query_preparation_nanoseconds,
-                host_return_formation_nanoseconds,
+                cpu_query_preparation_nanoseconds,
+                cpu_return_formation_nanoseconds,
                 total_elapsed_nanoseconds: total_started.elapsed().as_nanos(),
                 bounded_delta_equal: self.resident_equality_certified,
                 resident_sync,
@@ -431,7 +431,7 @@ impl CudaResidentTextMaterialAtlas {
     }
 
     /// Return one generated deed to the same ecology, then carry only its appended morphology to
-    /// the resident chart.  If physical synchronization fails the host deed remains caused and
+    /// the resident chart.  If physical synchronization fails the cpu deed remains caused and
     /// the card is barred until a clean remount from that authority succeeds.
     pub fn receive_emanated_caused(
         &mut self,
@@ -440,7 +440,7 @@ impl CudaResidentTextMaterialAtlas {
         caused_by: TextMaterialSet<String>,
     ) -> Result<(), TextMaterialRestrictionError> {
         let before = self.atlas_shape()?;
-        self.host
+        self.cpu
             .receive_emanated_caused(identity, text, caused_by)?;
         let after = self.atlas_shape()?;
         if before != after {
@@ -451,10 +451,10 @@ impl CudaResidentTextMaterialAtlas {
 
     fn atlas_shape(&self) -> Result<[u64; 4], TextMaterialRestrictionError> {
         Ok([
-            extent_u64(self.host.corpus.occurrences.len())?,
-            extent_u64(self.host.sections.len())?,
-            extent_u64(self.host.feature_catalogue.len())?,
-            extent_u64(self.host.token_catalogue.len())?,
+            extent_u64(self.cpu.corpus.occurrences.len())?,
+            extent_u64(self.cpu.sections.len())?,
+            extent_u64(self.cpu.feature_catalogue.len())?,
+            extent_u64(self.cpu.token_catalogue.len())?,
         ])
     }
 
@@ -466,7 +466,7 @@ impl CudaResidentTextMaterialAtlas {
         if needs_remount {
             let stale = self.card.take();
             drop(stale);
-            let image = self.host.resident_image()?;
+            let image = self.cpu.resident_image()?;
             self.card = Some(CudaTextMaterialResidentExecutor::mount(
                 self.device_ordinal,
                 image,
@@ -481,10 +481,10 @@ impl CudaResidentTextMaterialAtlas {
                 .as_ref()
                 .ok_or(TextMaterialRestrictionError::CarrierExtent)?;
             let shape = card.active_shape();
-            shape.occurrences == self.host.corpus.occurrences.len()
-                && shape.sections == self.host.sections.len()
-                && shape.features == self.host.feature_catalogue.len()
-                && shape.tokens == self.host.token_catalogue.len()
+            shape.occurrences == self.cpu.corpus.occurrences.len()
+                && shape.sections == self.cpu.sections.len()
+                && shape.features == self.cpu.feature_catalogue.len()
+                && shape.tokens == self.cpu.token_catalogue.len()
         };
         if synchronized {
             return Ok(());
@@ -497,7 +497,7 @@ impl CudaResidentTextMaterialAtlas {
             return Err(TextMaterialRestrictionError::CarrierExtent);
         }
         let delta = self
-            .host
+            .cpu
             .resident_delta(card.active_shape(), card.head_shadow())?;
         card.synchronize(delta)?;
         self.resident_equality_certified = true;

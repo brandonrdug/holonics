@@ -118,7 +118,7 @@ fn run() -> Result<(), String> {
     let spec = MorphologicalGenerationSpec {
         maximum_observed_tokens: 2,
     };
-    let cover = HardwareCover::host_only();
+    let cover = HardwareCover::cpu_only();
 
     println!("PROMPT");
     println!("  {prompt}");

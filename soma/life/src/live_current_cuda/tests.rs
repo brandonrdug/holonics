@@ -12,8 +12,8 @@ use body::num::Cog;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent,
-    DirectedCurrentRelation, HostLiveCurrentExecutor, InterfaceCapability, LiveCurrentMachine,
-    ParallelHostLiveCurrentExecutor,
+    DirectedCurrentRelation, CpuLiveCurrentExecutor, InterfaceCapability, LiveCurrentMachine,
+    ParallelCpuLiveCurrentExecutor,
 };
 
 fn relation(value: i64) -> RelationAtom {
@@ -25,29 +25,29 @@ fn action() -> ActionCurrent {
 }
 
 fn assert_live_equal(
-    host: &LiveCurrentMachine,
+    cpu: &LiveCurrentMachine,
     card: &LiveCurrentMachine,
     lineages: &[(soma_membrane::CurrentLineage, soma_membrane::CurrentLineage)],
 ) {
-    assert_eq!(host.standing(), card.standing());
-    assert_eq!(host.memory(), card.memory());
-    for (host_lineage, card_lineage) in lineages {
+    assert_eq!(cpu.standing(), card.standing());
+    assert_eq!(cpu.memory(), card.memory());
+    for (cpu_lineage, card_lineage) in lineages {
         assert_eq!(
-            host.lineage_cursor(*host_lineage),
+            cpu.lineage_cursor(*cpu_lineage),
             card.lineage_cursor(*card_lineage)
         );
         assert_eq!(
-            host.lineage_channel(*host_lineage),
+            cpu.lineage_channel(*cpu_lineage),
             card.lineage_channel(*card_lineage)
         );
         assert_eq!(
-            host.lineage_carrier(*host_lineage)
+            cpu.lineage_carrier(*cpu_lineage)
                 .map(|body| body.header()),
             card.lineage_carrier(*card_lineage)
                 .map(|body| body.header())
         );
         assert_eq!(
-            host.lineage_carrier(*host_lineage)
+            cpu.lineage_carrier(*cpu_lineage)
                 .map(|body| body.carrier()),
             card.lineage_carrier(*card_lineage)
                 .map(|body| body.carrier())
@@ -378,24 +378,24 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
     let left_lineage = left_image.lineage().unwrap();
     let right_lineage = right_image.lineage().unwrap();
 
-    let mut host = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card = LiveCurrentMachine::from_rest_image(rest).unwrap();
-    let mut host_left = NativeRelationOrgan::recover(left_image, &host).unwrap();
-    let mut host_right = NativeRelationOrgan::recover(right_image, &host).unwrap();
+    let mut cpu_left = NativeRelationOrgan::recover(left_image, &cpu).unwrap();
+    let mut cpu_right = NativeRelationOrgan::recover(right_image, &cpu).unwrap();
     let mut card_left = NativeRelationOrgan::recover(left_image, &card).unwrap();
     let mut card_right = NativeRelationOrgan::recover(right_image, &card).unwrap();
-    let mut host_executor = HostLiveCurrentExecutor;
+    let mut cpu_executor = CpuLiveCurrentExecutor;
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
 
     let left_face = [relation(-89)];
     let right_face = [relation(97)];
     let relation_rows = [NativeEventRelation::new(0, 1)];
-    let host_contact = {
+    let cpu_contact = {
         let mut currents = [
-            NativeEventCurrent::continuing(&mut host_left, &left_face, action()),
-            NativeEventCurrent::continuing(&mut host_right, &right_face, action()),
+            NativeEventCurrent::continuing(&mut cpu_left, &left_face, action()),
+            NativeEventCurrent::continuing(&mut cpu_right, &right_face, action()),
         ];
-        present_native_event_with(&mut host, &mut host_executor, &mut currents, &relation_rows)
+        present_native_event_with(&mut cpu, &mut cpu_executor, &mut currents, &relation_rows)
             .unwrap()
     };
     let card_contact = {
@@ -405,9 +405,9 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
         ];
         present_native_event_with(&mut card, &mut cuda, &mut currents, &relation_rows).unwrap()
     };
-    assert_eq!(host_contact, card_contact);
+    assert_eq!(cpu_contact, card_contact);
     assert_live_equal(
-        &host,
+        &cpu,
         &card,
         &[(left_lineage, left_lineage), (right_lineage, right_lineage)],
     );
@@ -428,23 +428,23 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
     let standing_mounts_after_contact = cuda.standing_full_mounts();
     let carrier_mounts_after_contact = cuda.carrier_full_mounts();
     let return_face = [relation(returned_change)];
-    let host_return = host_right
-        .present_with(&mut host, &mut host_executor, &return_face, action(), false)
+    let cpu_return = cpu_right
+        .present_with(&mut cpu, &mut cpu_executor, &return_face, action(), false)
         .unwrap();
     let card_return = card_right
         .present_with(&mut card, &mut cuda, &return_face, action(), false)
         .unwrap();
-    assert_eq!(host_return, card_return);
+    assert_eq!(cpu_return, card_return);
 
     for (left_value, right_value) in [(101, -103), (107, -109), (127, -131)] {
         let left_wake = [relation(left_value)];
         let right_wake = [relation(right_value)];
-        let host_wake = {
+        let cpu_wake = {
             let mut currents = [
-                NativeEventCurrent::continuing(&mut host_left, &left_wake, action()),
-                NativeEventCurrent::continuing(&mut host_right, &right_wake, action()),
+                NativeEventCurrent::continuing(&mut cpu_left, &left_wake, action()),
+                NativeEventCurrent::continuing(&mut cpu_right, &right_wake, action()),
             ];
-            present_native_event_with(&mut host, &mut host_executor, &mut currents, &[]).unwrap()
+            present_native_event_with(&mut cpu, &mut cpu_executor, &mut currents, &[]).unwrap()
         };
         let card_wake = {
             let mut currents = [
@@ -453,7 +453,7 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
             ];
             present_native_event_with(&mut card, &mut cuda, &mut currents, &[]).unwrap()
         };
-        assert_eq!(host_wake, card_wake);
+        assert_eq!(cpu_wake, card_wake);
     }
     assert_eq!(cuda.standing_full_mounts(), standing_mounts_after_contact);
     assert_eq!(cuda.carrier_full_mounts(), carrier_mounts_after_contact);
@@ -461,17 +461,17 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
     assert!(cuda.carrier_device_words() > 0);
 
     let departing = [relation(137)];
-    let host_departure = host_left
-        .present_with(&mut host, &mut host_executor, &departing, action(), true)
+    let cpu_departure = cpu_left
+        .present_with(&mut cpu, &mut cpu_executor, &departing, action(), true)
         .unwrap();
     let card_departure = card_left
         .present_with(&mut card, &mut cuda, &departing, action(), true)
         .unwrap();
-    assert_eq!(host_departure, card_departure);
-    assert!(host_left.lineage().is_none());
+    assert_eq!(cpu_departure, card_departure);
+    assert!(cpu_left.lineage().is_none());
     assert!(card_left.lineage().is_none());
     assert_eq!(cuda.resident_lineages(), 1);
-    assert_live_equal(&host, &card, &[(right_lineage, right_lineage)]);
+    assert_live_equal(&cpu, &card, &[(right_lineage, right_lineage)]);
 
     let launches_at_rest = cuda.launches();
     let card_rest_bytes = card.rest_image().unwrap().encode_native_bytes().unwrap();
@@ -481,9 +481,9 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
         cuda.resource_retries(),
         cuda.standing_full_mounts(),
         cuda.carrier_full_mounts(),
-        cuda.standing_host_words(),
+        cuda.standing_cpu_words(),
         cuda.standing_device_words(),
-        cuda.carrier_host_words(),
+        cuda.carrier_cpu_words(),
         cuda.carrier_device_words(),
     );
     drop(cuda);
@@ -498,8 +498,8 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
     assert_eq!(reopened_cuda.launches(), 0);
 
     let first_wake = [relation(149)];
-    let host_wake = host_right
-        .present_with(&mut host, &mut host_executor, &first_wake, action(), false)
+    let cpu_wake = cpu_right
+        .present_with(&mut cpu, &mut cpu_executor, &first_wake, action(), false)
         .unwrap();
     let card_wake = reopened_right
         .present_with(
@@ -510,13 +510,13 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
             false,
         )
         .unwrap();
-    assert_eq!(host_wake, card_wake);
+    assert_eq!(cpu_wake, card_wake);
     let remount_standing_mounts = reopened_cuda.standing_full_mounts();
     let remount_carrier_mounts = reopened_cuda.carrier_full_mounts();
 
     let later_wake = [relation(151)];
-    let host_later = host_right
-        .present_with(&mut host, &mut host_executor, &later_wake, action(), false)
+    let cpu_later = cpu_right
+        .present_with(&mut cpu, &mut cpu_executor, &later_wake, action(), false)
         .unwrap();
     let card_later = reopened_right
         .present_with(
@@ -527,14 +527,14 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
             false,
         )
         .unwrap();
-    assert_eq!(host_later, card_later);
+    assert_eq!(cpu_later, card_later);
     assert_eq!(
         reopened_cuda.standing_full_mounts(),
         remount_standing_mounts
     );
     assert_eq!(reopened_cuda.carrier_full_mounts(), remount_carrier_mounts);
     assert!(reopened_cuda.carrier_device_words() > 0);
-    assert_live_equal(&host, &reopened, &[(right_lineage, right_lineage)]);
+    assert_live_equal(&cpu, &reopened, &[(right_lineage, right_lineage)]);
 
     println!(
             "device={:?} world_register={} pre_remount_launches={} pre_remount_retries={} pre_remount_standing_full={} pre_remount_carrier_full={} pre_remount_standing_h2d_words={} pre_remount_standing_d2d_words={} pre_remount_carrier_h2d_words={} pre_remount_carrier_d2d_words={} remount_launches={} remount_retries={} remount_standing_full={} remount_carrier_full={} remount_carrier_d2d_words={} resident_lineages={}",
@@ -571,27 +571,27 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
     let zero_lineage = zero_image.lineage().unwrap();
     let numeral_lineage = numeral_image.lineage().unwrap();
 
-    let mut host = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card = LiveCurrentMachine::from_rest_image(rest).unwrap();
-    let mut host_zero = NativeRelationOrgan::recover(zero_image, &host).unwrap();
-    let mut host_numeral = NativeRelationOrgan::recover(numeral_image, &host).unwrap();
+    let mut cpu_zero = NativeRelationOrgan::recover(zero_image, &cpu).unwrap();
+    let mut cpu_numeral = NativeRelationOrgan::recover(numeral_image, &cpu).unwrap();
     let mut card_zero = NativeRelationOrgan::recover(zero_image, &card).unwrap();
     let mut card_numeral = NativeRelationOrgan::recover(numeral_image, &card).unwrap();
-    let mut host_executor = HostLiveCurrentExecutor;
+    let mut cpu_executor = CpuLiveCurrentExecutor;
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
-    let mut host_world = ResidueChartWorld::new(SMALL_EXTENT);
+    let mut cpu_world = ResidueChartWorld::new(SMALL_EXTENT);
     let mut card_world = ResidueChartWorld::new(LARGE_EXTENT);
     assert_eq!(core::mem::size_of::<ResidueChartWorld>(), 24);
 
     let zero_contact = [relation(-89)];
     let numeral_contact = [relation(97)];
     let hand = [NativeEventRelation::new(0, 1)];
-    let host_contact = {
+    let cpu_contact = {
         let mut currents = [
-            NativeEventCurrent::continuing(&mut host_zero, &zero_contact, action()),
-            NativeEventCurrent::continuing(&mut host_numeral, &numeral_contact, action()),
+            NativeEventCurrent::continuing(&mut cpu_zero, &zero_contact, action()),
+            NativeEventCurrent::continuing(&mut cpu_numeral, &numeral_contact, action()),
         ];
-        present_native_event_with(&mut host, &mut host_executor, &mut currents, &hand).unwrap()
+        present_native_event_with(&mut cpu, &mut cpu_executor, &mut currents, &hand).unwrap()
     };
     let card_contact = {
         let mut currents = [
@@ -600,7 +600,7 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
         ];
         present_native_event_with(&mut card, &mut cuda, &mut currents, &hand).unwrap()
     };
-    assert_eq!(host_contact, card_contact);
+    assert_eq!(cpu_contact, card_contact);
     let emission = card_contact.relations()[0]
         .contact()
         .emission
@@ -610,33 +610,33 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
         .find(|arm| arm.mag != 0)
         .expect("the scale world's formed deed carries one nonzero arm")
         .face();
-    host_world.receive_change(returned_change);
+    cpu_world.receive_change(returned_change);
     card_world.receive_change(returned_change);
-    assert_eq!(host_world.register, card_world.register);
+    assert_eq!(cpu_world.register, card_world.register);
 
     let return_face = [relation(returned_change)];
-    let host_return = host_numeral
-        .present_with(&mut host, &mut host_executor, &return_face, action(), false)
+    let cpu_return = cpu_numeral
+        .present_with(&mut cpu, &mut cpu_executor, &return_face, action(), false)
         .unwrap();
     let card_return = card_numeral
         .present_with(&mut card, &mut cuda, &return_face, action(), false)
         .unwrap();
-    assert_eq!(host_return, card_return);
+    assert_eq!(cpu_return, card_return);
     let standing_mounts_at_stream = cuda.standing_full_mounts();
     let carrier_mounts_at_stream = cuda.carrier_full_mounts();
     let mut checkpoints = Vec::new();
     let mut stream_rank_transitions = 0u64;
 
     for step in 1..=STREAM_EVENTS {
-        let host_event = host_world.next();
+        let cpu_event = cpu_world.next();
         let card_event = card_world.next();
-        assert_eq!(host_event, card_event);
-        let host_radiation = present_residue_chart_event(
-            &mut host,
-            &mut host_executor,
-            &mut host_zero,
-            &mut host_numeral,
-            &host_event,
+        assert_eq!(cpu_event, card_event);
+        let cpu_radiation = present_residue_chart_event(
+            &mut cpu,
+            &mut cpu_executor,
+            &mut cpu_zero,
+            &mut cpu_numeral,
+            &cpu_event,
         );
         let card_radiation = present_residue_chart_event(
             &mut card,
@@ -645,7 +645,7 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
             &mut card_numeral,
             &card_event,
         );
-        assert_eq!(host_radiation, card_radiation);
+        assert_eq!(cpu_radiation, card_radiation);
         if card_radiation.before_rank() != card_radiation.after_rank() {
             stream_rank_transitions += 1;
         }
@@ -663,7 +663,7 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
                 cuda.resource_retries(),
             ));
             assert_live_equal(
-                &host,
+                &cpu,
                 &card,
                 &[
                     (zero_lineage, zero_lineage),
@@ -672,9 +672,9 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
             );
         }
     }
-    assert_eq!(host_world.cursor, STREAM_EVENTS);
+    assert_eq!(cpu_world.cursor, STREAM_EVENTS);
     assert_eq!(card_world.cursor, STREAM_EVENTS);
-    assert_eq!(host_world.extent, SMALL_EXTENT);
+    assert_eq!(cpu_world.extent, SMALL_EXTENT);
     assert_eq!(card_world.extent, LARGE_EXTENT);
     assert_eq!(
         cuda.standing_full_mounts(),
@@ -682,13 +682,13 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
     );
     assert_eq!(cuda.carrier_full_mounts(), carrier_mounts_at_stream);
     assert!(cuda.standing_device_words() > 0);
-    assert!(cuda.carrier_device_words() > cuda.carrier_host_words());
+    assert!(cuda.carrier_device_words() > cuda.carrier_cpu_words());
 
     let departure_face = [ResidueChartWorld::atom(137)];
-    let host_departure = host_zero
+    let cpu_departure = cpu_zero
         .present_with(
-            &mut host,
-            &mut host_executor,
+            &mut cpu,
+            &mut cpu_executor,
             &departure_face,
             action(),
             true,
@@ -697,9 +697,9 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
     let card_departure = card_zero
         .present_with(&mut card, &mut cuda, &departure_face, action(), true)
         .unwrap();
-    assert_eq!(host_departure, card_departure);
+    assert_eq!(cpu_departure, card_departure);
     assert_eq!(cuda.resident_lineages(), 1);
-    assert_live_equal(&host, &card, &[(numeral_lineage, numeral_lineage)]);
+    assert_live_equal(&cpu, &card, &[(numeral_lineage, numeral_lineage)]);
 
     let launches_at_rest = cuda.launches();
     let machine_bytes = card.rest_image().unwrap().encode_native_bytes().unwrap();
@@ -712,9 +712,9 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
         cuda.resource_retries(),
         cuda.standing_full_mounts(),
         cuda.carrier_full_mounts(),
-        cuda.standing_host_words(),
+        cuda.standing_cpu_words(),
         cuda.standing_device_words(),
-        cuda.carrier_host_words(),
+        cuda.carrier_cpu_words(),
         cuda.carrier_device_words(),
         cuda.resident_standing_words(),
         cuda.resident_carrier_words(),
@@ -735,16 +735,16 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
     assert_eq!(reopened_cuda.launches(), 0);
 
     for _ in 0..2 {
-        let host_event = host_world.next();
+        let cpu_event = cpu_world.next();
         let card_event = reopened_world.next();
-        assert_eq!(host_event, card_event);
-        let host_numeral_path = NativePathChart::new(&host_event.numeral_chart).unwrap();
+        assert_eq!(cpu_event, card_event);
+        let cpu_numeral_path = NativePathChart::new(&cpu_event.numeral_chart).unwrap();
         let card_numeral_path = NativePathChart::new(&card_event.numeral_chart).unwrap();
-        let host_wake = host_numeral
+        let cpu_wake = cpu_numeral
             .present_complex_with(
-                &mut host,
-                &mut host_executor,
-                host_numeral_path.complex(),
+                &mut cpu,
+                &mut cpu_executor,
+                cpu_numeral_path.complex(),
                 action(),
                 false,
             )
@@ -758,14 +758,14 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
                 false,
             )
             .unwrap();
-        assert_eq!(host_wake, card_wake);
+        assert_eq!(cpu_wake, card_wake);
     }
-    assert_eq!(host_world.cursor, SMALL_EXTENT);
+    assert_eq!(cpu_world.cursor, SMALL_EXTENT);
     assert_eq!(reopened_world.cursor, SMALL_EXTENT);
-    assert_eq!(host_world.register, reopened_world.register);
+    assert_eq!(cpu_world.register, reopened_world.register);
     assert_ne!(reopened_before_wake, reopened.rest_image().unwrap());
     assert!(reopened_cuda.carrier_device_words() > 0);
-    assert_live_equal(&host, &reopened, &[(numeral_lineage, numeral_lineage)]);
+    assert_live_equal(&cpu, &reopened, &[(numeral_lineage, numeral_lineage)]);
 
     println!(
             "device={:?} source_extent={} visited={} source_rest_bytes={} machine_rest_bytes={} checkpoints={:?} stream_rank_transitions={} pre_remount_launches={} pre_remount_retries={} standing_full={} carrier_full={} standing_h2d_words={} standing_d2d_words={} carrier_h2d_words={} carrier_d2d_words={} resident_standing_words={} resident_carrier_words={} wait_launches=0 remount_launches={} remount_retries={} remount_carrier_d2d_words={} final_lineages={}",
@@ -856,8 +856,8 @@ fn graded_triangle_junction_is_exact_across_one_core_many_cores_cuda_and_rest() 
         NativeRegionalRelation::new(2, &arcs),
         NativeRegionalRelation::new(2, &arcs),
     ];
-    let mut one_executor = ParallelHostLiveCurrentExecutor::new(1);
-    let mut many_executor = ParallelHostLiveCurrentExecutor::new(8);
+    let mut one_executor = ParallelCpuLiveCurrentExecutor::new(1);
+    let mut many_executor = ParallelCpuLiveCurrentExecutor::new(8);
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
 
     let one_radiation = {
@@ -1063,12 +1063,12 @@ fn graded_triangle_junction_is_exact_across_one_core_many_cores_cuda_and_rest() 
 
 #[test]
 #[ignore = "requires the RTX CUDA device and committed lineage_event PTX entry"]
-fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
+fn one_cuda_mouth_matches_cpu_through_found_departure_and_later_ride() {
     let standing = SparseStandingSurface::empty_rank(6).unwrap();
-    let mut host = LiveCurrentMachine::new(standing.clone());
+    let mut cpu = LiveCurrentMachine::new(standing.clone());
     let mut card = LiveCurrentMachine::new(standing);
     let first = [relation(13)];
-    let host_main = host.attach(&first).unwrap();
+    let cpu_main = cpu.attach(&first).unwrap();
     let card_main = card.attach(&first).unwrap();
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
     // A second exact owner may lawfully mount the same card and become current between
@@ -1079,9 +1079,9 @@ fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
 
     for value in [13, 29, 17, 31, -63_245, 47, 71, -89] {
         let event = [relation(value)];
-        let host_return = host
+        let cpu_return = cpu
             .receive(ContemporaryEvent::unrelated(&[CurrentEvent::continuing(
-                host_main,
+                cpu_main,
                 &event,
                 action(),
             )]))
@@ -1096,17 +1096,17 @@ fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
                 &mut cuda,
             )
             .unwrap();
-        assert_eq!(host_return, card_return);
-        assert_live_equal(&host, &card, &[(host_main, card_main)]);
+        assert_eq!(cpu_return, card_return);
+        assert_live_equal(&cpu, &card, &[(cpu_main, card_main)]);
         foreign_context.make_current().unwrap();
     }
 
     let constituent_first = [relation(101)];
-    let host_constituent = host.attach(&constituent_first).unwrap();
+    let cpu_constituent = cpu.attach(&constituent_first).unwrap();
     let card_constituent = card.attach(&constituent_first).unwrap();
-    let host_return = host
+    let cpu_return = cpu
         .receive(ContemporaryEvent::unrelated(&[CurrentEvent::continuing(
-            host_constituent,
+            cpu_constituent,
             &constituent_first,
             action(),
         )]))
@@ -1121,12 +1121,12 @@ fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
             &mut cuda,
         )
         .unwrap();
-    assert_eq!(host_return, card_return);
+    assert_eq!(cpu_return, card_return);
 
     let constituent_end = [relation(103)];
-    let host_return = host
+    let cpu_return = cpu
         .receive(ContemporaryEvent::unrelated(&[CurrentEvent::ending(
-            host_constituent,
+            cpu_constituent,
             &constituent_end,
             action(),
         )]))
@@ -1141,14 +1141,14 @@ fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
             &mut cuda,
         )
         .unwrap();
-    assert_eq!(host_return, card_return);
-    assert!(!host.contains(host_constituent));
+    assert_eq!(cpu_return, card_return);
+    assert!(!cpu.contains(cpu_constituent));
     assert!(!card.contains(card_constituent));
 
     let later = [relation(-253)];
-    let host_return = host
+    let cpu_return = cpu
         .receive(ContemporaryEvent::unrelated(&[CurrentEvent::continuing(
-            host_main,
+            cpu_main,
             &later,
             action(),
         )]))
@@ -1159,15 +1159,15 @@ fn one_cuda_mouth_matches_host_through_found_departure_and_later_ride() {
             &mut cuda,
         )
         .unwrap();
-    assert_eq!(host_return, card_return);
-    assert_live_equal(&host, &card, &[(host_main, card_main)]);
+    assert_eq!(cpu_return, card_return);
+    assert_live_equal(&cpu, &card, &[(cpu_main, card_main)]);
     assert!(cuda.device_name().contains("NVIDIA"));
     assert_eq!(cuda.launches(), 11 + cuda.resource_retries());
 }
 
 #[test]
 #[ignore = "requires the RTX CUDA device and committed lineage_event PTX entry"]
-fn directed_current_hand_is_formed_on_card_and_matches_host() {
+fn directed_current_hand_is_formed_on_card_and_matches_cpu() {
     fn primed_pair() -> (
         LiveCurrentMachine,
         soma_membrane::CurrentLineage,
@@ -1209,9 +1209,9 @@ fn directed_current_hand_is_formed_on_card_and_matches_host() {
     let before_rank = baseline.standing().rank();
     let before_cells = baseline.standing().cells().len();
     let rest = baseline.rest_image().unwrap();
-    let mut host_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
-    let mut host_reverse = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu_reverse = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card_reverse = LiveCurrentMachine::from_rest_image(rest).unwrap();
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
 
@@ -1228,7 +1228,7 @@ fn directed_current_hand_is_formed_on_card_and_matches_host() {
     let forward_relation = [DirectedCurrentRelation::new(left, right)];
     let reverse_relation = [DirectedCurrentRelation::new(right, left)];
 
-    let host_forward_return = host_forward
+    let cpu_forward_return = cpu_forward
         .receive(ContemporaryEvent::new(&forward_currents, &forward_relation))
         .unwrap();
     let card_forward_return = card_forward
@@ -1237,14 +1237,14 @@ fn directed_current_hand_is_formed_on_card_and_matches_host() {
             &mut cuda,
         )
         .unwrap();
-    assert_eq!(host_forward_return, card_forward_return);
+    assert_eq!(cpu_forward_return, card_forward_return);
     assert_live_equal(
-        &host_forward,
+        &cpu_forward,
         &card_forward,
         &[(left, left), (right, right)],
     );
 
-    let host_reverse_return = host_reverse
+    let cpu_reverse_return = cpu_reverse
         .receive(ContemporaryEvent::new(&reverse_currents, &reverse_relation))
         .unwrap();
     let card_reverse_return = card_reverse
@@ -1253,22 +1253,22 @@ fn directed_current_hand_is_formed_on_card_and_matches_host() {
             &mut cuda,
         )
         .unwrap();
-    assert_eq!(host_reverse_return, card_reverse_return);
+    assert_eq!(cpu_reverse_return, card_reverse_return);
     assert_live_equal(
-        &host_reverse,
+        &cpu_reverse,
         &card_reverse,
         &[(left, left), (right, right)],
     );
 
     assert_eq!(
-        host_forward_return.currents(),
-        host_reverse_return.currents()
+        cpu_forward_return.currents(),
+        cpu_reverse_return.currents()
     );
     assert_ne!(
-        host_forward_return.relations()[0].contact(),
-        host_reverse_return.relations()[0].contact()
+        cpu_forward_return.relations()[0].contact(),
+        cpu_reverse_return.relations()[0].contact()
     );
-    assert_ne!(host_forward.standing(), host_reverse.standing());
+    assert_ne!(cpu_forward.standing(), cpu_reverse.standing());
     assert_eq!(cuda.directed_contacts(), 2);
     assert_eq!(cuda.launches(), 4 + cuda.resource_retries());
     println!(
@@ -1280,10 +1280,10 @@ fn directed_current_hand_is_formed_on_card_and_matches_host() {
             cuda.directed_contacts(),
             before_rank,
             before_cells,
-            host_forward.standing().rank(),
-            host_forward.standing().cells().len(),
-            host_reverse.standing().rank(),
-            host_reverse.standing().cells().len(),
+            cpu_forward.standing().rank(),
+            cpu_forward.standing().cells().len(),
+            cpu_reverse.standing().rank(),
+            cpu_reverse.standing().cells().len(),
         );
 }
 
@@ -1514,40 +1514,40 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     let left_image = left.checkpoint();
     let right_image = right.checkpoint();
 
-    let mut host_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card_forward = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
-    let mut host_reverse = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu_reverse = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card_reverse = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
-    let mut host_independent = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
+    let mut cpu_independent = LiveCurrentMachine::from_rest_image(rest.clone()).unwrap();
     let mut card_independent = LiveCurrentMachine::from_rest_image(rest).unwrap();
 
-    let mut host_forward_left = NativeRelationOrgan::recover(left_image, &host_forward).unwrap();
-    let mut host_forward_right = NativeRelationOrgan::recover(right_image, &host_forward).unwrap();
+    let mut cpu_forward_left = NativeRelationOrgan::recover(left_image, &cpu_forward).unwrap();
+    let mut cpu_forward_right = NativeRelationOrgan::recover(right_image, &cpu_forward).unwrap();
     let mut card_forward_left = NativeRelationOrgan::recover(left_image, &card_forward).unwrap();
     let mut card_forward_right = NativeRelationOrgan::recover(right_image, &card_forward).unwrap();
-    let mut host_reverse_left = NativeRelationOrgan::recover(left_image, &host_reverse).unwrap();
-    let mut host_reverse_right = NativeRelationOrgan::recover(right_image, &host_reverse).unwrap();
+    let mut cpu_reverse_left = NativeRelationOrgan::recover(left_image, &cpu_reverse).unwrap();
+    let mut cpu_reverse_right = NativeRelationOrgan::recover(right_image, &cpu_reverse).unwrap();
     let mut card_reverse_left = NativeRelationOrgan::recover(left_image, &card_reverse).unwrap();
     let mut card_reverse_right = NativeRelationOrgan::recover(right_image, &card_reverse).unwrap();
-    let mut host_independent_left =
-        NativeRelationOrgan::recover(left_image, &host_independent).unwrap();
-    let mut host_independent_right =
-        NativeRelationOrgan::recover(right_image, &host_independent).unwrap();
+    let mut cpu_independent_left =
+        NativeRelationOrgan::recover(left_image, &cpu_independent).unwrap();
+    let mut cpu_independent_right =
+        NativeRelationOrgan::recover(right_image, &cpu_independent).unwrap();
     let mut card_independent_left =
         NativeRelationOrgan::recover(left_image, &card_independent).unwrap();
     let mut card_independent_right =
         NativeRelationOrgan::recover(right_image, &card_independent).unwrap();
 
     let mut cuda = CudaLiveCurrentExecutor::new(0).unwrap();
-    let mut host_executor = HostLiveCurrentExecutor;
-    let mut host_forward_world = ProgramWorld::new(ProgramLaw::LeftWritesRight);
+    let mut cpu_executor = CpuLiveCurrentExecutor;
+    let mut cpu_forward_world = ProgramWorld::new(ProgramLaw::LeftWritesRight);
     let mut card_forward_world = ProgramWorld::new(ProgramLaw::LeftWritesRight);
-    let host_forward_return = enact_program_world(
-        &mut host_forward,
-        &mut host_executor,
-        &mut host_forward_left,
-        &mut host_forward_right,
-        &mut host_forward_world,
+    let cpu_forward_return = enact_program_world(
+        &mut cpu_forward,
+        &mut cpu_executor,
+        &mut cpu_forward_left,
+        &mut cpu_forward_right,
+        &mut cpu_forward_world,
     );
     let card_forward_return = enact_program_world(
         &mut card_forward,
@@ -1557,14 +1557,14 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         &mut card_forward_world,
     );
 
-    let mut host_reverse_world = ProgramWorld::new(ProgramLaw::RightWritesLeft);
+    let mut cpu_reverse_world = ProgramWorld::new(ProgramLaw::RightWritesLeft);
     let mut card_reverse_world = ProgramWorld::new(ProgramLaw::RightWritesLeft);
-    let host_reverse_return = enact_program_world(
-        &mut host_reverse,
-        &mut host_executor,
-        &mut host_reverse_left,
-        &mut host_reverse_right,
-        &mut host_reverse_world,
+    let cpu_reverse_return = enact_program_world(
+        &mut cpu_reverse,
+        &mut cpu_executor,
+        &mut cpu_reverse_left,
+        &mut cpu_reverse_right,
+        &mut cpu_reverse_world,
     );
     let card_reverse_return = enact_program_world(
         &mut card_reverse,
@@ -1574,14 +1574,14 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         &mut card_reverse_world,
     );
 
-    let mut host_independent_world = ProgramWorld::new(ProgramLaw::Independent);
+    let mut cpu_independent_world = ProgramWorld::new(ProgramLaw::Independent);
     let mut card_independent_world = ProgramWorld::new(ProgramLaw::Independent);
-    let host_independent_return = enact_program_world(
-        &mut host_independent,
-        &mut host_executor,
-        &mut host_independent_left,
-        &mut host_independent_right,
-        &mut host_independent_world,
+    let cpu_independent_return = enact_program_world(
+        &mut cpu_independent,
+        &mut cpu_executor,
+        &mut cpu_independent_left,
+        &mut cpu_independent_right,
+        &mut cpu_independent_world,
     );
     let card_independent_return = enact_program_world(
         &mut card_independent,
@@ -1591,11 +1591,11 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         &mut card_independent_world,
     );
 
-    assert_eq!(host_forward_return, card_forward_return);
-    assert_eq!(host_reverse_return, card_reverse_return);
-    assert_eq!(host_independent_return, card_independent_return);
+    assert_eq!(cpu_forward_return, card_forward_return);
+    assert_eq!(cpu_reverse_return, card_reverse_return);
+    assert_eq!(cpu_independent_return, card_independent_return);
     assert_live_equal(
-        &host_forward,
+        &cpu_forward,
         &card_forward,
         &[
             (left_image.lineage().unwrap(), left_image.lineage().unwrap()),
@@ -1606,7 +1606,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         ],
     );
     assert_live_equal(
-        &host_reverse,
+        &cpu_reverse,
         &card_reverse,
         &[
             (left_image.lineage().unwrap(), left_image.lineage().unwrap()),
@@ -1617,7 +1617,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         ],
     );
     assert_live_equal(
-        &host_independent,
+        &cpu_independent,
         &card_independent,
         &[
             (left_image.lineage().unwrap(), left_image.lineage().unwrap()),
@@ -1629,35 +1629,35 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     );
 
     assert_eq!(
-        host_forward_return.currents(),
-        host_reverse_return.currents()
+        cpu_forward_return.currents(),
+        cpu_reverse_return.currents()
     );
     assert_eq!(
-        host_forward_return.currents(),
-        host_independent_return.currents()
+        cpu_forward_return.currents(),
+        cpu_independent_return.currents()
     );
-    assert_eq!(host_forward_return.relations().len(), 1);
-    assert_eq!(host_reverse_return.relations().len(), 1);
-    assert!(host_independent_return.relations().is_empty());
-    assert!(host_forward_return.relations()[0]
+    assert_eq!(cpu_forward_return.relations().len(), 1);
+    assert_eq!(cpu_reverse_return.relations().len(), 1);
+    assert!(cpu_independent_return.relations().is_empty());
+    assert!(cpu_forward_return.relations()[0]
         .contact()
         .emission
         .is_some());
-    assert!(host_reverse_return.relations()[0]
+    assert!(cpu_reverse_return.relations()[0]
         .contact()
         .emission
         .is_none());
-    assert_ne!(host_forward.standing(), host_reverse.standing());
-    assert_ne!(host_forward.standing(), host_independent.standing());
-    assert_eq!(host_forward_world.received_contacts, 1);
+    assert_ne!(cpu_forward.standing(), cpu_reverse.standing());
+    assert_ne!(cpu_forward.standing(), cpu_independent.standing());
+    assert_eq!(cpu_forward_world.received_contacts, 1);
     assert_eq!(card_forward_world.received_contacts, 1);
-    assert_eq!(host_reverse_world.received_contacts, 1);
+    assert_eq!(cpu_reverse_world.received_contacts, 1);
     assert_eq!(card_reverse_world.received_contacts, 1);
-    assert_eq!(host_independent_world.received_contacts, 0);
+    assert_eq!(cpu_independent_world.received_contacts, 0);
     assert_eq!(card_independent_world.received_contacts, 0);
-    assert_eq!(host_forward_world.pending, card_forward_world.pending);
+    assert_eq!(cpu_forward_world.pending, card_forward_world.pending);
     assert!(card_forward_world.pending.is_some());
-    assert!(host_forward_world.checkpoint().is_none());
+    assert!(cpu_forward_world.checkpoint().is_none());
     assert!(card_forward_world.checkpoint().is_none());
     assert!(card_reverse_world.pending.is_none());
     assert!(card_independent_world.pending.is_none());
@@ -1683,16 +1683,16 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     let forward_contact_cells = card_forward.standing().cells().len();
     let reverse_contact_cells = card_reverse.standing().cells().len();
     let independent_contact_cells = card_independent.standing().cells().len();
-    let host_before_world_return = host_forward.rest_image().unwrap();
+    let cpu_before_world_return = cpu_forward.rest_image().unwrap();
     let card_before_world_return = card_forward.rest_image().unwrap();
-    assert_eq!(host_before_world_return, card_before_world_return);
+    assert_eq!(cpu_before_world_return, card_before_world_return);
 
-    let host_world_return = return_program_consequence(
-        &mut host_forward,
-        &mut host_executor,
-        &mut host_forward_left,
-        &mut host_forward_right,
-        &mut host_forward_world,
+    let cpu_world_return = return_program_consequence(
+        &mut cpu_forward,
+        &mut cpu_executor,
+        &mut cpu_forward_left,
+        &mut cpu_forward_right,
+        &mut cpu_forward_world,
     );
     let card_world_return = return_program_consequence(
         &mut card_forward,
@@ -1701,14 +1701,14 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         &mut card_forward_right,
         &mut card_forward_world,
     );
-    assert_eq!(host_world_return, card_world_return);
+    assert_eq!(cpu_world_return, card_world_return);
     assert_eq!(card_world_return.currents().len(), 1);
     assert!(card_world_return.relations().is_empty());
-    assert!(host_forward_world.pending.is_none());
+    assert!(cpu_forward_world.pending.is_none());
     assert!(card_forward_world.pending.is_none());
     assert_ne!(card_forward.rest_image().unwrap(), card_before_world_return);
     assert_live_equal(
-        &host_forward,
+        &cpu_forward,
         &card_forward,
         &[
             (left_image.lineage().unwrap(), left_image.lineage().unwrap()),
@@ -1719,7 +1719,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         ],
     );
     assert_eq!(
-        host_forward_world.checkpoint(),
+        cpu_forward_world.checkpoint(),
         card_forward_world.checkpoint()
     );
 
@@ -1746,19 +1746,19 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     let mut card_woken_right = NativeRelationOrgan::recover(card_right_rest, &card_woken).unwrap();
     let mut card_woken_world = ProgramWorld::recover(card_world_rest);
 
-    let host_probe = host_forward_world.observe_by([-253, 257]);
+    let cpu_probe = cpu_forward_world.observe_by([-253, 257]);
     let card_probe = card_woken_world.observe_by([-253, 257]);
-    assert_eq!(host_probe.left, card_probe.left);
-    assert_eq!(host_probe.right, card_probe.right);
-    let host_probe_return = {
+    assert_eq!(cpu_probe.left, card_probe.left);
+    assert_eq!(cpu_probe.right, card_probe.right);
+    let cpu_probe_return = {
         let mut currents = [
-            NativeEventCurrent::continuing(&mut host_forward_left, &host_probe.left, action()),
-            NativeEventCurrent::continuing(&mut host_forward_right, &host_probe.right, action()),
+            NativeEventCurrent::continuing(&mut cpu_forward_left, &cpu_probe.left, action()),
+            NativeEventCurrent::continuing(&mut cpu_forward_right, &cpu_probe.right, action()),
         ];
-        present_native_event_with(&mut host_forward, &mut host_executor, &mut currents, &[])
+        present_native_event_with(&mut cpu_forward, &mut cpu_executor, &mut currents, &[])
             .unwrap()
     };
-    host_forward_world.receive(&[], &host_probe_return);
+    cpu_forward_world.receive(&[], &cpu_probe_return);
     let card_probe_return = {
         let mut currents = [
             NativeEventCurrent::continuing(&mut card_woken_left, &card_probe.left, action()),
@@ -1768,9 +1768,9 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
     };
     card_woken_world.receive(&[], &card_probe_return);
 
-    assert_eq!(host_probe_return, card_probe_return);
+    assert_eq!(cpu_probe_return, card_probe_return);
     assert_live_equal(
-        &host_forward,
+        &cpu_forward,
         &card_woken,
         &[
             (left_image.lineage().unwrap(), left_image.lineage().unwrap()),
@@ -1781,7 +1781,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         ],
     );
     assert_eq!(
-        host_forward_world.checkpoint(),
+        cpu_forward_world.checkpoint(),
         card_woken_world.checkpoint()
     );
     assert_eq!(cuda.directed_contacts(), 2);

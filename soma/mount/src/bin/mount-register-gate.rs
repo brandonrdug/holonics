@@ -1,7 +1,7 @@
 //! mount-register-gate — the first bounded CUDA gate for the §XXXII-c REGISTER.
 //!
 //! The fixed raw-light lineage is carried through the shared `body::carriage` register mouth on
-//! the host and through the CUDA `scope_register` shell over the same empty axis-64 standing.
+//! the cpu and through the CUDA `scope_register` shell over the same empty axis-64 standing.
 //! OWN begins as the all-zero rank-zero seed inside a declared 64²-cell storage aperture; that
 //! aperture is an instrument reservation, never the current's starting or final gauge. The gate
 //! compares the complete register header ⊕ reservoir, whole carrier/K row, cumulative term counts,
@@ -290,9 +290,9 @@ fn append_completion(aperture: &[u32], stream: &mut Vec<u32>) {
     }
 }
 
-/// The shared host/reference lowering. Installment zero finishes in one call; installment one
+/// The shared cpu/reference lowering. Installment zero finishes in one call; installment one
 /// presents the same current again after each carried interior move until the true raw-light end.
-fn host_reference(interior_installment: usize, completion_rows: usize) -> RegisterTrace {
+fn cpu_reference(interior_installment: usize, completion_rows: usize) -> RegisterTrace {
     let standing = vec![0u32; STANDING_CELLS * FORM_WORDS];
     let packed = packed_light();
     let mut owns = vec![0u32; own_words()];
@@ -323,7 +323,7 @@ fn host_reference(interior_installment: usize, completion_rows: usize) -> Regist
             WordSpan::new(0, completion_stride),
             stroke(interior_installment, completion_stride),
         )
-        .expect("the bounded registered host layout is formed");
+        .expect("the bounded registered cpu layout is formed");
         append_completion(&completion, &mut completion_stream);
         launches += 1;
         counts[0] += result.terms.ride;
@@ -341,10 +341,10 @@ fn host_reference(interior_installment: usize, completion_rows: usize) -> Regist
             }
             RegisterStrokeStatus::NeedsCarrierRebase { required_depth } => {
                 let required = usize::try_from(required_depth)
-                    .expect("the requested carrier depth is host-representable");
+                    .expect("the requested carrier depth is cpu-representable");
                 let mut fresh = vec![0u32; carrier_row_words(required)];
                 body::carriage::rebase_carrier_row(&carriers, &mut fresh)
-                    .expect("the host remount retains the exact live carrier");
+                    .expect("the cpu remount retains the exact live carrier");
                 carriers = fresh;
                 continue;
             }
@@ -437,7 +437,7 @@ fn cuda_reference(
     let mut resumed_deposit = false;
     let mut launches = 0usize;
     let mut completion_stream = Vec::new();
-    let mut completion_words_host = vec![0u32; completion_words];
+    let mut completion_words_cpu = vec![0u32; completion_words];
 
     loop {
         let prior_phase = continuation_face(&carriers).0;
@@ -479,8 +479,8 @@ fn cuda_reference(
         carriers_b.copy_to_slice(&mut carriers)?;
         counts_b.copy_to_slice(&mut counts)?;
         statuses_b.copy_to_slice(&mut status_words)?;
-        completion_b.copy_to_slice(&mut completion_words_host)?;
-        append_completion(&completion_words_host, &mut completion_stream);
+        completion_b.copy_to_slice(&mut completion_words_cpu)?;
+        append_completion(&completion_words_cpu, &mut completion_stream);
         let emitted = counts
             .iter()
             .zip(prior_counts)
@@ -545,11 +545,11 @@ fn cuda_reference(
     })
 }
 
-fn report_words(label: &str, card: &[u32], host: &[u32]) {
-    if let Some(word) = card.iter().zip(host).position(|(card, host)| card != host) {
+fn report_words(label: &str, card: &[u32], cpu: &[u32]) {
+    if let Some(word) = card.iter().zip(cpu).position(|(card, cpu)| card != cpu) {
         eprintln!(
-            "  {label} diverges at word {word}: card {} host {}",
-            card[word], host[word]
+            "  {label} diverges at word {word}: card {} cpu {}",
+            card[word], cpu[word]
         );
     }
 }
@@ -557,21 +557,21 @@ fn report_words(label: &str, card: &[u32], host: &[u32]) {
 fn compare(
     tag: &str,
     card: &RegisterTrace,
-    host: &RegisterTrace,
+    cpu: &RegisterTrace,
     stepped: bool,
     cooperative: bool,
 ) -> bool {
-    let owns = card.owns == host.owns;
-    let carriers = card.carriers == host.carriers;
-    let counts = card.counts == host.counts;
-    let radiation = card.radiation == host.radiation;
-    let completion = card.completion == host.completion && !card.completion.is_empty();
+    let owns = card.owns == cpu.owns;
+    let carriers = card.carriers == cpu.carriers;
+    let counts = card.counts == cpu.counts;
+    let radiation = card.radiation == cpu.radiation;
+    let completion = card.completion == cpu.completion && !card.completion.is_empty();
     let status = card.status == REGISTER_STATUS_COMPLETE
-        && host.status == REGISTER_STATUS_COMPLETE
+        && cpu.status == REGISTER_STATUS_COMPLETE
         && card.old_axis == 0
         && card.new_axis == 0
-        && card.old_axis == host.old_axis
-        && card.new_axis == host.new_axis;
+        && card.old_axis == cpu.old_axis
+        && card.new_axis == cpu.new_axis;
     let canonical = registered_own_row_is_canonical(&card.owns, CAPACITY_CELLS)
         && active_row_is_nonvacuous(&card.owns)
         && validate_radiation(&card.radiation).is_ok()
@@ -616,16 +616,16 @@ fn compare(
         card.launches,
     );
     if !owns {
-        report_words("registered OWN", &card.owns, &host.owns);
+        report_words("registered OWN", &card.owns, &cpu.owns);
     }
     if !carriers {
-        report_words("carrier/K", &card.carriers, &host.carriers);
+        report_words("carrier/K", &card.carriers, &cpu.carriers);
     }
     if !radiation {
-        report_words("radiation", &card.radiation, &host.radiation);
+        report_words("radiation", &card.radiation, &cpu.radiation);
     }
     if !completion {
-        report_words("completion", &card.completion, &host.completion);
+        report_words("completion", &card.completion, &cpu.completion);
     }
     owns && carriers
         && counts
@@ -640,28 +640,28 @@ fn compare(
 
 fn run() -> Result<()> {
     let started = Instant::now();
-    let host = host_reference(WHOLE, PLURAL_COMPLETION_ROWS);
-    let host_one_row = host_reference(WHOLE, 1);
+    let cpu = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS);
+    let cpu_one_row = cpu_reference(WHOLE, 1);
     assert_eq!(
-        host.status, REGISTER_STATUS_COMPLETE,
+        cpu.status, REGISTER_STATUS_COMPLETE,
         "the declared gate aperture reaches the fixture's true end"
     );
-    assert_eq!(host.old_axis, 0);
-    assert_eq!(host.new_axis, 0);
-    assert_eq!(cursor(&host.carriers), LIGHT.len() as u64);
-    assert!(registered_own_row_is_canonical(&host.owns, CAPACITY_CELLS));
-    assert!(active_row_is_nonvacuous(&host.owns));
+    assert_eq!(cpu.old_axis, 0);
+    assert_eq!(cpu.new_axis, 0);
+    assert_eq!(cursor(&cpu.carriers), LIGHT.len() as u64);
+    assert!(registered_own_row_is_canonical(&cpu.owns, CAPACITY_CELLS));
+    assert!(active_row_is_nonvacuous(&cpu.owns));
     assert_eq!(
-        active_axis(&host.owns),
+        active_axis(&cpu.owns),
         STANDING_AXIS,
         "the fixture forces the register through every declared dyadic digit"
     );
     assert_eq!(
-        active_live_cells(&host.owns),
-        Some(active_occupancy(&host.owns))
+        active_live_cells(&cpu.owns),
+        Some(active_occupancy(&cpu.owns))
     );
-    assert_eq!(validate_radiation(&host.radiation), Ok(()));
-    assert!(radiation_is_nonvacuous(&host.radiation));
+    assert_eq!(validate_radiation(&cpu.radiation), Ok(()));
+    assert!(radiation_is_nonvacuous(&cpu.radiation));
 
     mount::cuda::init()?;
     let count = mount::Device::count()?;
@@ -744,17 +744,17 @@ fn run() -> Result<()> {
         "timing: inline {:?} · cooperative {:?} · one-move {:?} · one-row {:?} · repeat {:?}",
         inline_time, surface_time, stepped_time, one_row_time, repeat_time,
     );
-    let inline_ok = compare("CUDA inline foil", &inline, &host, false, false);
-    let surface_ok = compare("CUDA cooperative", &surface, &host, false, true);
-    let stepped_ok = compare("CUDA cooperative one-move", &stepped, &host, true, true);
+    let inline_ok = compare("CUDA inline foil", &inline, &cpu, false, false);
+    let surface_ok = compare("CUDA cooperative", &surface, &cpu, false, true);
+    let stepped_ok = compare("CUDA cooperative one-move", &stepped, &cpu, true, true);
     let one_row_ok = compare(
         "CUDA cooperative one-row completion",
         &one_row,
-        &host_one_row,
+        &cpu_one_row,
         false,
         true,
     );
-    let repeat_ok = compare("CUDA cooperative repeat", &repeat, &host, false, true);
+    let repeat_ok = compare("CUDA cooperative repeat", &repeat, &cpu, false, true);
 
     println!("total: {} us", started.elapsed().as_micros());
     if inline_ok && surface_ok && stepped_ok && one_row_ok && repeat_ok {
@@ -782,9 +782,9 @@ mod tests {
     }
 
     #[test]
-    fn registered_host_reference_is_canonical_nonvacuous_and_deterministic() {
-        let first = host_reference(WHOLE, PLURAL_COMPLETION_ROWS);
-        let second = host_reference(WHOLE, PLURAL_COMPLETION_ROWS);
+    fn registered_cpu_reference_is_canonical_nonvacuous_and_deterministic() {
+        let first = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS);
+        let second = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS);
         assert_eq!(first, second);
         assert_eq!(first.status, REGISTER_STATUS_COMPLETE);
         assert_eq!(first.old_axis, 0);
@@ -804,9 +804,9 @@ mod tests {
     }
 
     #[test]
-    fn registered_host_one_move_is_the_uninterrupted_construction() {
-        let whole = host_reference(WHOLE, PLURAL_COMPLETION_ROWS);
-        let stepped = host_reference(ONE_MOVE, PLURAL_COMPLETION_ROWS);
+    fn registered_cpu_one_move_is_the_uninterrupted_construction() {
+        let whole = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS);
+        let stepped = cpu_reference(ONE_MOVE, PLURAL_COMPLETION_ROWS);
         assert_eq!(stepped.owns, whole.owns);
         assert_eq!(stepped.carriers, whole.carriers);
         assert_eq!(stepped.counts, whole.counts);
@@ -832,7 +832,7 @@ mod tests {
 
     #[test]
     fn register_recast_abi_names_the_exact_out_of_place_mapping() {
-        let source = host_reference(WHOLE, PLURAL_COMPLETION_ROWS).owns;
+        let source = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS).owns;
         let old_axis = active_axis(&source) as u32;
         let new_axis = old_axis * 2;
         let old_capacity = old_axis as usize * old_axis as usize;
@@ -879,7 +879,7 @@ mod tests {
 
     #[test]
     fn register_recast_abi_carries_complete_siblings_at_their_own_axis() {
-        let source = host_reference(WHOLE, PLURAL_COMPLETION_ROWS).owns;
+        let source = cpu_reference(WHOLE, PLURAL_COMPLETION_ROWS).owns;
         let axis = active_axis(&source) as u32;
         let capacity = axis as usize * axis as usize;
         let widened_axis = axis * 2;

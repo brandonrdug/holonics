@@ -14,7 +14,7 @@ use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage, LiveMemory,
-    ParallelHostLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
+    ParallelCpuLiveCurrentExecutor, RegionalRelationArc, RegionalRelationCell,
     SparseStandingSurface,
 };
 
@@ -342,7 +342,7 @@ fn run() -> Result<(), String> {
     let source_sha256 = sha256(&source_bytes);
     let source: Source = serde_json::from_slice(&source_bytes)
         .map_err(|error| format!("{} parses: {error}", source_path.display()))?;
-    let report = run_host(source, source_sha256)?;
+    let report = run_cpu(source, source_sha256)?;
     let mut report_bytes = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("residual-chart report encodes: {error}"))?;
     report_bytes.push(b'\n');
@@ -365,7 +365,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
+fn run_cpu(source: Source, source_sha256: String) -> Result<Value, String> {
     let run_started = Instant::now();
     validate_source(&source)?;
     let samples = source_samples(&source)?;
@@ -375,7 +375,7 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
     }
 
     let budget = RunBudget::new();
-    let host_threads = std::thread::available_parallelism()
+    let cpu_threads = std::thread::available_parallelism()
         .map(usize::from)
         .unwrap_or(1)
         .clamp(1, 8);
@@ -386,7 +386,7 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
         .collect::<Vec<_>>();
     let control = no_diagram_control(
         &budget,
-        host_threads,
+        cpu_threads,
         &samples[0],
         &source.training_law.feature_order,
     )?;
@@ -410,7 +410,7 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
     for sample in &samples {
         let outcome = train_one(
             &budget,
-            host_threads,
+            cpu_threads,
             &mut machine,
             chart.as_ref(),
             &mut standing_samples,
@@ -455,7 +455,7 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
 
     let checkpoint_reads = run_checkpoint_probes(
         &budget,
-        host_threads,
+        cpu_threads,
         &source,
         &samples,
         &taxa,
@@ -546,8 +546,8 @@ fn run_host(source: Source, source_sha256: String) -> Result<Value, String> {
         },
         "training_contract": source.training_law,
         "physical_execution": {
-            "executor": "ParallelHostLiveCurrentExecutor",
-            "host_threads": host_threads,
+            "executor": "ParallelCpuLiveCurrentExecutor",
+            "cpu_threads": cpu_threads,
             "semantic_training_events": samples.len(),
             "machine_transitions_per_training_event": 4,
             "model_reruns": 0,
@@ -600,7 +600,7 @@ struct TrainingOutcome {
 #[allow(clippy::too_many_arguments)]
 fn train_one(
     budget: &RunBudget,
-    host_threads: usize,
+    cpu_threads: usize,
     machine: &mut LiveCurrentMachine,
     prior_chart: Option<&ChartState>,
     standing_samples: &mut Vec<Sample>,
@@ -638,7 +638,7 @@ fn train_one(
     )?;
     let (meeting_radiation, meeting_event) = profiled_event(
         budget,
-        host_threads,
+        cpu_threads,
         machine,
         &format!("current-{}", sample.ordinal),
         current_words.len(),
@@ -710,7 +710,7 @@ fn train_one(
     )?;
     let (prediction_radiation, prediction_event) = profiled_event(
         budget,
-        host_threads,
+        cpu_threads,
         machine,
         &format!("prediction-{}", sample.ordinal),
         prediction_words.len() + taxa.len(),
@@ -760,7 +760,7 @@ fn train_one(
     )?;
     let (actual_radiation, actual_event) = profiled_event(
         budget,
-        host_threads,
+        cpu_threads,
         machine,
         &format!("actual-{}", sample.ordinal),
         actual_words.len() + taxa.len(),
@@ -830,7 +830,7 @@ fn train_one(
         .collect::<Result<Vec<_>, _>>()?;
     let (replacement_radiation, replacement_event) = profiled_event(
         budget,
-        host_threads,
+        cpu_threads,
         machine,
         &format!("chart-{}", sample.ordinal),
         next_words.len(),
@@ -880,7 +880,7 @@ fn train_one(
     let expected_factor_paths = next_words
         .len()
         .checked_add(1)
-        .ok_or_else(|| "the outgoing chart boundary exceeds host extent".to_owned())?;
+        .ok_or_else(|| "the outgoing chart boundary exceeds cpu extent".to_owned())?;
     let outgoing_factor_exact = factor_memory.standing_constituents == 1
         && factor_memory.constituent_cells == 3
         && factor_memory.constituent_incidences == expected_factor_paths
@@ -940,7 +940,7 @@ fn train_one(
 
 fn no_diagram_control(
     budget: &RunBudget,
-    host_threads: usize,
+    cpu_threads: usize,
     sample: &Sample,
     feature_order: &[String],
 ) -> Result<Value, String> {
@@ -952,7 +952,7 @@ fn no_diagram_control(
     push_interface(&mut arcs, handle.recruit, IncidenceHand::Against)?;
     let (radiation, event) = profiled_event(
         budget,
-        host_threads,
+        cpu_threads,
         &mut machine,
         "no-diagram-control",
         words.len(),
@@ -975,7 +975,7 @@ fn no_diagram_control(
 
 fn run_checkpoint_probes(
     budget: &RunBudget,
-    host_threads: usize,
+    cpu_threads: usize,
     source: &Source,
     samples: &[Sample],
     taxa: &[String],
@@ -1020,7 +1020,7 @@ fn run_checkpoint_probes(
             push_interface(&mut arcs, probe_recruit, IncidenceHand::Against)?;
             let (radiation, event) = profiled_event(
                 budget,
-                host_threads,
+                cpu_threads,
                 &mut machine,
                 &format!("probe-{}-{}", expected.after_events, sample.ordinal),
                 words.len(),
@@ -1910,7 +1910,7 @@ fn standing_has_capability(machine: &LiveCurrentMachine, capability: InterfaceCa
 
 fn profiled_event(
     budget: &RunBudget,
-    host_threads: usize,
+    cpu_threads: usize,
     machine: &mut LiveCurrentMachine,
     event_name: &str,
     semantic_words: usize,
@@ -1948,7 +1948,7 @@ fn profiled_event(
         Some(slots) => RegionalRelationCell::with_outgoing_factor(pair[1], &remapped, slots),
         None => RegionalRelationCell::new(pair[1], &remapped),
     }];
-    let mut executor = ParallelHostLiveCurrentExecutor::new(host_threads);
+    let mut executor = ParallelCpuLiveCurrentExecutor::new(cpu_threads);
     let started = Instant::now();
     let radiation = machine
         .receive_with(

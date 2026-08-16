@@ -213,6 +213,16 @@ to **1,692 lines** by 10:31.
 - All **four** verified instances of §2.2's unfailable control are in the new organ's driver,
   `crates/holonic-engine/examples/the_development_declares_its_own_chain.rs`.
 
+**Re-measured 2026-08-15 and this bullet is FALSE.** All three are now typed refusals in the conducted
+owner: `grep -n "DerivationApertureRefusal::" crates/holonic-engine/src/derivation_atlas.rs` returns
+`CommentText` at `:398`, `PluralNamingDeclarations` at `:408` and `NoTheoremDeclared` at `:422`,
+returned by `read_derivation_within_aperture` at `:487`; `read_derivation` at `:505` is that
+function with the clause dropped, and its own doc reads *"`None` is now a refusal and never a
+partial reading."* The consumer citations in this bullet have also drifted.
+
+**The instance is retained rather than deleted**, because this file's subject is the failure shape
+and a repaired instance is still its provenance — but it may no longer be read as a live defect.
+
 **The library still conducts through the defect; the replacement terminates in an organ nothing
 reaches.** That sentence is the cost, and it is one grep.
 
@@ -278,7 +288,7 @@ a Python REPL sidecar (`experiments/byte-lm/sidecar/lean_repl.py`, severed to le
 2026-06-12), `src/shrine/holon-math/Holon.lean` (`beea8077`, 06-13),
 `src/labyrinth/mathematics/lean/Foundations.lean` (`4643ec75`, 06-14), a 73-file 17,143-line toolkit
 (`2b5c2213`, 06-23), `src/soma/formal/elementary-holonics/` (`7fba08d2`, 07-26), and the 3,521-line
-`src/soma/life/src/lean_mathematics.rs` (`ba8716b5`, 08-02). Seven weeks, six bodies.
+`soma/life/src/lean_mathematics.rs` (`ba8716b5`, 08-02). Seven weeks, six bodies.
 
 **And the laboratory convicted itself of this at least four times without the pattern stopping** —
 in source comments on 2026-06-23, in a record on 2026-07-13, in the 2026-07-21 record and the

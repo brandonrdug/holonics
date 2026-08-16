@@ -117,7 +117,7 @@
 //!
 //! Until 2026-08-09 the two numbers were `const FAMILY_APERTURE: u64 = 65_536` and
 //! `const FREE_ENTRY_APERTURE: u64 = 12`, authored here. `canon/THE_AUTHORED_LEVEL.md` convicted
-//! both: neither is derivable from the material — they are statements about the **host** the
+//! both: neither is derivable from the material — they are statements about the **cpu** the
 //! recovery runs on — so neither was this organ's to pick. They now arrive in
 //! [`RecoveryApertures`], which deliberately implements no `Default`: *a default is a level the
 //! organ picked because the caller was never asked.*
@@ -142,7 +142,7 @@ use thiserror::Error;
 /// Both bound work rather than meaning: the family aperture is a call budget and a memory bound on
 /// `sum(|alphabet|^L for L in 1..=radius)` returned words, and the free-entry aperture bounds a
 /// `2^k` enumeration of the boundary entries the family leaves open. Neither is read off the
-/// material; both are read off the host. **No `Default` is provided, on purpose.**
+/// material; both are read off the cpu. **No `Default` is provided, on purpose.**
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct RecoveryApertures {
     /// The largest declared query family this recovery may exhaust. Every word is returned once, so
@@ -789,7 +789,7 @@ pub enum RecoveryError {
 /// Recover an opaque symbol codec from testimony over the declared query family.
 ///
 /// `alphabet` is deduplicated and ordered; `radius` is the longest word the instrument may ask
-/// about; `apertures` is what this caller's host can hold. Nothing else is declared, and in
+/// about; `apertures` is what this caller's cpu can hold. Nothing else is declared, and in
 /// particular no character classes are supplied.
 pub fn recover(
     target: &OpaqueSymbolCodec,
@@ -1420,7 +1420,7 @@ mod tests {
         spellings.iter().map(|piece| word(piece)).collect()
     }
 
-    /// **What this test body declares as its host capacity.** A fixture is a caller and declares
+    /// **What this test body declares as its cpu capacity.** A fixture is a caller and declares
     /// its own apertures; the values that used to live in the organ as `FAMILY_APERTURE = 65_536`
     /// and `FREE_ENTRY_APERTURE = 12` are reproduced here so the fixtures' returns are unchanged by
     /// the move and the orbit is measured against the level rather than against a new number.

@@ -81,8 +81,8 @@ body—partition, factorization, locality, residency, placement, schedule, or re
 remain an explicit obstruction. Raising a work limit or retrying an unchanged morphology is not
 backreaction.
 
-Full host/device parity is a realization-admission event. Once admitted, the device hot path owes
-local/delta equality receipts and must not replay the full host procedure after every device deed.
+Full CPU/device parity is a realization-admission event. Once admitted, the device hot path owes
+local/delta equality receipts and must not replay the full CPU procedure after every device deed.
 
 Power, temperature, clocks, utilization, memory, latency, and energy are calibrated receiver
 testimony with a named sampling aperture. Device specifications are bounds, not measurements.

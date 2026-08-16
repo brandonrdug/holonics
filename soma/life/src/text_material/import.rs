@@ -517,7 +517,7 @@ fn history_visible(
 
 /// The container's own address, which is its name in whatever store holds it.
 ///
-/// **This is never the host path.**  Until 2026-08-11 every founded identity and every witness
+/// **This is never the cpu path.**  Until 2026-08-11 every founded identity and every witness
 /// carried `path.display()`, so 46,745 occurrence identities in the sealed corpus began
 /// `founded:container=/home/b`, and the corpus content address was therefore a function of this
 /// machine's home directory.  That is `CLAUDE.md` §0 lesson 2 — *no absolute frame in a lineage* —
@@ -526,7 +526,7 @@ fn history_visible(
 ///
 /// A corpus merges many containers, so the name discriminates them; a store that presents two
 /// distinct containers of one kind under one name is refused at `ExactTextMaterialCorpus::import`
-/// rather than resolved by reaching back to the host path.
+/// rather than resolved by reaching back to the cpu path.
 fn container_address(path: &Path) -> Result<String, TextMaterialError> {
     path.file_name()
         .map(|name| name.to_string_lossy().into_owned())

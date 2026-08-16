@@ -27,14 +27,14 @@
 //! `reconstruction_fiber` already builds the object and says the same in its own opening: *"Nothing
 //! chooses a surface."* This module supplies that organ's exact scores at map scale and stops there.
 //!
-//! # The two charts, and neither is a host
+//! # The two charts, and neither is a cpu
 //!
 //! Brandon, 2026-08-13, correcting the vocabulary this module was about to be written in: *"stop
-//! calling the CPU the 'host', it's just a misnomer. It's a bottleneck in a literal sense if
+//! calling the CPU the 'cpu', it's just a misnomer. It's a bottleneck in a literal sense if
 //! anything, it's a light-cone, a pathway. Same for the GPU, they're just paths that work
 //! differently."*
 //!
-//! `host` is CUDA's word and it carries a master/servant frame neither path has — which is the same
+//! `cpu` is CUDA's word and it carries a master/servant frame neither path has — which is the same
 //! defect as reading a `head` off a map that declares two KV heads: an exterior convention imported
 //! whole and then reasoned from. `hardware_cover` already has the right word, **chart**, and
 //! `CLAUDE.md` already rules that *"CPU, GPU, storage, network, checker, and sensor are apparatus

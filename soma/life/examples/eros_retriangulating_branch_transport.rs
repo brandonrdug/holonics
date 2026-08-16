@@ -550,7 +550,7 @@ fn run() -> Result<(), String> {
     let source_sha256 = sha256(&source_bytes);
     let source: Source = serde_json::from_slice(&source_bytes)
         .map_err(|error| format!("{} parses: {error}", source_path.display()))?;
-    let report = run_host(source, source_sha256)?;
+    let report = run_cpu(source, source_sha256)?;
     let mut report_bytes = serde_json::to_vec_pretty(&report)
         .map_err(|error| format!("retriangulating-branch report encodes: {error}"))?;
     report_bytes.push(b'\n');
@@ -574,7 +574,7 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-fn run_host(source: Source, source_sha256: String) -> Result<Report, String> {
+fn run_cpu(source: Source, source_sha256: String) -> Result<Report, String> {
     let started = Instant::now();
     validate_source(&source)?;
     let budget = RunBudget::new();
@@ -769,7 +769,7 @@ fn validate_source(source: &Source) -> Result<(), String> {
     {
         return Err("the fixed finite program or case extent changed".to_owned());
     }
-    if source.physical_preflight.executor != "bounded host"
+    if source.physical_preflight.executor != "bounded cpu"
         || source.physical_preflight.event_limit_seconds != EVENT_LIMIT.as_secs()
         || source.physical_preflight.run_limit_seconds != RUN_LIMIT.as_secs()
         || source.physical_preflight.maximum_regional_arcs_per_event != MAX_ARCS_PER_EVENT

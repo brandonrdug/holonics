@@ -1,5 +1,5 @@
 //! law — THE ONE MOUTH (W2 · THE CELL LAW → THE ARC, 2026-07-09; `FORMULA §II`, `THE_PARAMETERS`). The single
-//! shared law of the positional pool: the file the kernel `#[path]`-includes beside `geom`/`num`/`place`, so host
+//! shared law of the positional pool: the file the kernel `#[path]`-includes beside `geom`/`num`/`place`, so cpu
 //! and GPU speak ONE law — drift-checked, never asserted. Everything here is kernel-fit: flat `u32` words, guarded
 //! indexing, no allocation, no panic on the hot path.
 //!
@@ -217,7 +217,7 @@ pub fn word_of(pool: &[u32], cell: u32) -> u32 {
     }
 }
 
-/// FEED the well at a cell — the host realization of `accrue` (the worldline's own serialization). Returns the
+/// FEED the well at a cell — the cpu realization of `accrue` (the worldline's own serialization). Returns the
 /// fold's radiated quanta (the forced digit's quotient — 0 while the flow stands sub-hand). Out-of-reservation
 /// crossings are inert (the caller's accounting sees no transition; the boundary decides reservations).
 #[inline]
@@ -232,7 +232,7 @@ pub fn feed(pool: &mut [u32], cell: u32, quanta: u32, quantum: u32) -> u64 {
     }
 }
 
-/// ★ WIND (the DIGIT) — the host realization of `audit`: the quotient fires as windings (radiated up, handed
+/// ★ WIND (the DIGIT) — the cpu realization of `audit`: the quotient fires as windings (radiated up, handed
 /// on), the remainder stands, THE SWEEP CLIMBS AND STANDS. Returns `(windings, radiated)`. The arithmetic split
 /// `before = radiated + standing` is exact on the flow; this is bookkeeping, not conservation.
 #[inline(always)] // the storage pointer must never cross a function boundary in SPIR-V (the NV plain-store SEGV).

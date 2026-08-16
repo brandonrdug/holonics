@@ -705,7 +705,7 @@ pub struct ReceiverApertureTrace {
 impl ReceiverApertureTrace {
     /// Exact boundary equality independent of executor work testimony.
     ///
-    /// `exact_support_queries` may differ between recursive host refinement
+    /// `exact_support_queries` may differ between recursive cpu refinement
     /// and tiled device classification. It is a cost receipt, not part of the
     /// finite support standing.
     pub fn has_same_exact_support(&self, other: &Self) -> bool {
@@ -1174,7 +1174,7 @@ pub fn trace_receivers_aperture_with_rational_conic_authority(
     )
 }
 
-/// Restrict only linear simplex/thread supports. This is the exact host
+/// Restrict only linear simplex/thread supports. This is the exact cpu
 /// companion to a device which realizes conic support directly.
 pub fn trace_receivers_linear_aperture_with_cpu(
     presentation: &ContinuousPresentation,
@@ -2242,12 +2242,12 @@ mod tests {
             )
             .unwrap()
         };
-        let host = trace(address, 17_u8);
+        let cpu = trace(address, 17_u8);
         let device = trace(address, 41_u8);
-        assert_ne!(host, device);
-        assert!(host.has_same_exact_support(&device));
+        assert_ne!(cpu, device);
+        assert!(cpu.has_same_exact_support(&device));
         assert!(
-            !host.has_same_exact_support(&trace(PresentationAddress { column: 3, row: 3 }, 17_u8,))
+            !cpu.has_same_exact_support(&trace(PresentationAddress { column: 3, row: 3 }, 17_u8,))
         );
     }
 

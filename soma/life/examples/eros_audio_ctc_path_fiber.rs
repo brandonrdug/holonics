@@ -24,7 +24,7 @@ use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
-    LiveCurrentMachine, LiveMemory, ParallelHostLiveCurrentExecutor, RegionalArcRadiation,
+    LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor, RegionalArcRadiation,
     RegionalSupportSection, SparseStandingSurface,
 };
 
@@ -36,8 +36,8 @@ const MACHINE_REST_FORM: &str = "machine-rest";
 const SOURCE_SCHEMA: &str = "eros.audio-ctc-path-fiber.source.v1";
 const REPORT_SCHEMA: &str = "eros.audio-ctc-path-fiber.report.v1";
 const OBSERVATION_ID: &str = "eros-audio-ctc-path-fiber-01";
-const HOST_THREADS: usize = 8;
-const HOST_WORKER_STACK_BYTES: usize = 32 * 1024 * 1024;
+const CPU_THREADS: usize = 8;
+const CPU_WORKER_STACK_BYTES: usize = 32 * 1024 * 1024;
 const EVENT_LIMIT: Duration = Duration::from_secs(30);
 const RUN_LIMIT: Duration = Duration::from_secs(180);
 const PCM_BLOCK: usize = 320;
@@ -458,7 +458,7 @@ fn run(source: &Source, source_bytes: usize, source_sha256: String) -> Result<Va
     let budget = RunBudget::new();
     let validated = validate_source(source, source_bytes)?;
     let mut executor =
-        ParallelHostLiveCurrentExecutor::with_worker_stack(HOST_THREADS, HOST_WORKER_STACK_BYTES);
+        ParallelCpuLiveCurrentExecutor::with_worker_stack(CPU_THREADS, CPU_WORKER_STACK_BYTES);
     let mut machine =
         LiveCurrentMachine::new(SparseStandingSurface::empty_rank(10).map_err(debug)?);
 
@@ -797,9 +797,9 @@ fn run(source: &Source, source_bytes: usize, source_sha256: String) -> Result<Va
         },
         "physical_preflight": {
             "inherited_instrument": source.instrument,
-            "host_executor": "ParallelHostLiveCurrentExecutor",
-            "host_threads": HOST_THREADS,
-            "host_worker_stack_bytes": HOST_WORKER_STACK_BYTES,
+            "cpu_executor": "ParallelCpuLiveCurrentExecutor",
+            "cpu_threads": CPU_THREADS,
+            "cpu_worker_stack_bytes": CPU_WORKER_STACK_BYTES,
             "available_parallelism": std::thread::available_parallelism().map_or(1, usize::from),
             "run_limit_seconds": RUN_LIMIT.as_secs(),
             "event_limit_seconds": EVENT_LIMIT.as_secs(),
@@ -861,7 +861,7 @@ impl ProbeContext<'_> {
 
 fn probe(
     budget: &RunBudget,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
     cultivated: &LiveCurrentMachine,
     occurrence: &ValidatedOccurrence<'_>,
     context: ProbeContext<'_>,
@@ -885,7 +885,7 @@ fn probe(
 
 fn probe_expression(
     budget: &RunBudget,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
     cultivated: &LiveCurrentMachine,
     occurrence: &ValidatedOccurrence<'_>,
     source: &ValidatedSource<'_>,
@@ -948,7 +948,7 @@ fn probe_expression(
 
 fn probe_on(
     budget: &RunBudget,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
     machine: &mut LiveCurrentMachine,
     occurrence: &ValidatedOccurrence<'_>,
     context: ProbeContext<'_>,
@@ -1692,7 +1692,7 @@ fn expression_symbol_local(phase: u32, position: usize, token: u32) -> Result<u6
 
 fn execute(
     budget: &RunBudget,
-    executor: &mut ParallelHostLiveCurrentExecutor,
+    executor: &mut ParallelCpuLiveCurrentExecutor,
     machine: &mut LiveCurrentMachine,
     id: &str,
     role: &str,
