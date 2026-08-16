@@ -115,7 +115,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (107 deposits of 399)
+## 4 · The 2026-08 record line (108 deposits of 400)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -230,6 +230,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-16_THE_MATERIAL_IS_VISIBLE_WHERE_THE_LAW_CONTRIBUTES_NOTHING_AND_A_RUN_CONTINUED_ACROSS_A_PROCESS.md` | The material is visible where the law contributes nothing, and a run continued across a process |
 | `2026-08-16_THE_RENDER_IS_A_FIELD_THE_SURFACES_ARE_PATHS_AND_THE_DEFICIT_IS_ONE_READING_AT_TWO_GRAINS.md` | The render is a field, the surfaces are paths, and the deficit is one reading at two grains |
 | `2026-08-16_THE_SWING_CONSULTS_COMPOSITION_DEPTH_AND_THE_CAUSAL_STATE_IS_FINER_THAN_THE_ORBIT.md` | The swing consults composition depth, and the causal state is finer than the orbit |
+| `2026-08-16_WEIL_POSITIVITY_IS_A_TRACE_ON_A_RETAINED_REMAINDER_AND_A_PROOF_TRANSPORT_IS_A_ONE_BIT_COMPRESSION.md` | Weil positivity is a trace on a retained remainder, and a proof transport is a one-bit compression |
 
 ---
 
@@ -243,10 +244,10 @@ outside `tools/` that names the verifier — not declared.
 | `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 11 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 1 more |
-| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 1 more |
+| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 2 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
-| `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md` |
-| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 4 more |
+| `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
+| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 5 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
