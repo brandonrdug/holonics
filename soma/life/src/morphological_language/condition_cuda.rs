@@ -27,6 +27,20 @@ pub enum MorphologicalConditionCudaError {
     Driver(mount::CudaError),
     Suffix(ExactSuffixEcologyError),
     EmptyChart,
+    /// The named chart carried no path at all.
+    ChartCarriesNoPath { chart: &'static str },
+    /// The named chart's path population and its label population disagree.
+    ChartLabelsDisagree {
+        chart: &'static str,
+        paths: usize,
+        labels: usize,
+    },
+    /// The named chart carried a path with no germ in it, at this ordinal.
+    ChartPathIsEmpty {
+        chart: &'static str,
+        at: usize,
+        paths: usize,
+    },
     Extent,
     DeviceRefused(&'static str),
     InvalidDeviceReturn(&'static str),
@@ -58,6 +72,21 @@ impl std::fmt::Display for MorphologicalConditionCudaError {
             Self::Driver(error) => write!(formatter, "{error}"),
             Self::Suffix(error) => write!(formatter, "suffix ecology refused: {error:?}"),
             Self::EmptyChart => write!(formatter, "a resident conditioning chart is empty"),
+            Self::ChartCarriesNoPath { chart } => {
+                write!(formatter, "the {chart} chart carries no path")
+            }
+            Self::ChartLabelsDisagree {
+                chart,
+                paths,
+                labels,
+            } => write!(
+                formatter,
+                "the {chart} chart carries {paths} paths against {labels} labels"
+            ),
+            Self::ChartPathIsEmpty { chart, at, paths } => write!(
+                formatter,
+                "the {chart} chart carries an empty path at {at} of {paths}"
+            ),
             Self::Extent => write!(
                 formatter,
                 "a resident conditioning extent exceeded its wire"
@@ -388,8 +417,25 @@ fn stage_suffix(
     paths: &[Vec<ResonanceGerm>],
     labels: &[ReceiverFiberIdentity],
 ) -> Result<StagedSuffix, MorphologicalConditionCudaError> {
-    if paths.is_empty() || paths.len() != labels.len() || paths.iter().any(Vec::is_empty) {
-        return Err(MorphologicalConditionCudaError::EmptyChart);
+    // **A refusal that cannot be located is half a refusal.** `name` was taken and dropped, so
+    // every one of the five charts returned the same bare `EmptyChart` and the caller could not
+    // say which chart, or which of the three distinct conditions, produced it.
+    if paths.is_empty() {
+        return Err(MorphologicalConditionCudaError::ChartCarriesNoPath { chart: name });
+    }
+    if paths.len() != labels.len() {
+        return Err(MorphologicalConditionCudaError::ChartLabelsDisagree {
+            chart: name,
+            paths: paths.len(),
+            labels: labels.len(),
+        });
+    }
+    if let Some(at) = paths.iter().position(Vec::is_empty) {
+        return Err(MorphologicalConditionCudaError::ChartPathIsEmpty {
+            chart: name,
+            at,
+            paths: paths.len(),
+        });
     }
     let source_catalogue = labels
         .iter()

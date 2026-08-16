@@ -181,6 +181,7 @@ pub mod divisor_reconstruction;
 pub mod evolution;
 pub mod exact_linear;
 pub mod exact_value;
+pub mod landauer;
 pub mod executor;
 pub mod field_atlas;
 pub mod generative_transport;

@@ -35,6 +35,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
+use life::founded_mouth::FoundedMouth;
 use holonic_engine::codec_recovery::{
     conform, Boundary, Conformance, OpaqueSymbolCodec, RecoveredCodec, Symbol,
 };
@@ -507,6 +508,76 @@ fn run() -> Result<(), String> {
 
     println!("\n=== [9] THE ANSWER KEY, IN BOTH DIRECTIONS ===");
     answer_key_comparison(&codec, &held_out);
+
+    println!("\n=== [10] THE MOUTH, AGAINST THE AUTHORED TOKENIZER ===");
+    println!("  Every language ecology in this tree conditions on `lexical_tokens`, which is authored");
+    println!("  end to end — a word rule, a six-glyph punctuation set, a two-species partition, none");
+    println!("  of it read off any material. `FoundedMouth` reads the same octets through the codec");
+    println!("  recovered above and carries BOTH readings, because an excision is graded by its orbit");
+    println!("  and a replacement with no exhibited difference is bookkeeping.");
+    // The HELD-OUT stream first, because its refusal is a return and not a failure: a codec
+    // declines material carrying an octet the founding never showed, rather than guessing. That
+    // refusal is printed by name and then the reading is taken on material the founding DID cover,
+    // so the artifact appears beside the refusal instead of in place of it.
+    let apertures = ExposureApertures::declared(settings.radius, settings.family_words);
+    match FoundedMouth::found(
+        founding.clone(),
+        held_out.first().map_or(&[][..], Vec::as_slice),
+        apertures,
+    ) {
+        Ok(_) => println!("\n  the held-out stream segmented without refusal"),
+        Err(refusal) => println!(
+            "\n  on HELD-OUT material the mouth refused, lawfully: {refusal:?}\n      \
+             a codec has no rule for an octet its founding never carried, and declines"
+        ),
+    }
+    match FoundedMouth::found(
+        founding.clone(),
+        founding.first().map_or(&[][..], Vec::as_slice),
+        apertures,
+    ) {
+        Ok(mouth) => {
+            let disagreements = mouth.disagreements();
+            println!(
+                "\n  founded parts {}   authored parts {}   positions that disagree {}",
+                mouth.founded.len(),
+                mouth.authored.len(),
+                disagreements.len()
+            );
+            println!("  gauge freedoms the material never realised: {:?}", mouth.gauge_freedom);
+            println!("\n  the first parts each reading returns, side by side:");
+            for at in 0..mouth.founded.len().min(12) {
+                println!(
+                    "      [{at:>3}] founded {:<24} authored {}",
+                    format!("{:?}", mouth.founded[at]),
+                    mouth
+                        .authored
+                        .get(at)
+                        .map_or_else(|| "—".to_owned(), |part| format!("{part:?}"))
+                );
+            }
+            println!("\n  and the disagreements as PARTS, never as a rate:");
+            for disagreement in disagreements.iter().take(6) {
+                println!(
+                    "      at {:>4}  founded {:<22} authored {}",
+                    disagreement.at,
+                    format!("{:?}", disagreement.founded),
+                    disagreement
+                        .authored
+                        .as_ref()
+                        .map_or_else(|| "—".to_owned(), |part| format!("{part:?}"))
+                );
+            }
+            if disagreements.len() > 6 {
+                println!("      … {} further disagreements", disagreements.len() - 6);
+            }
+        }
+        Err(refusal) => {
+            // A refusal here is a return: it says the material founded no mouth, and which
+            // obstruction it hit. It is printed rather than swallowed.
+            println!("  the mouth REFUSED: {refusal:?}");
+        }
+    }
 
     Ok(())
 }

@@ -49,8 +49,21 @@ CARGO_PATH=/opt/cuda/bin:$PATH   # holonic-engine's build script shells out to n
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-GATES=(tests authored-levels named-paths line-citations claim-index output-manifest
-       closure-manifest boundary-artifacts typst architecture-lint document-law)
+GATES=(tests authored-levels named-paths line-citations claim-index driver-catalog
+       output-manifest closure-manifest boundary-artifacts typst architecture-lint document-law)
+
+# TWELVE, and the twelfth was added 2026-08-16 because the population it covers had no catalog of
+# any kind. Measured that morning: **203 example drivers, 163,332 lines — 42% the size of every
+# library crate combined — accrued over ten days**, of which 0 appeared in `THE_CLAIM_INDEX.md`, 39
+# were named in no governing document or research record, and 40 carried no module doc at all.
+# Brandon: *"I thought that at the least we'd have some records of references to these drivers, yet
+# you are showing me that we simply do not have a catalog for them."*
+#
+# A driver nobody can find is a capability nobody can cite, so the mechanism gets rebuilt beside its
+# own prior implementation — the explorative failure with the driver population as its habitat. This
+# gate does not judge a driver; it asserts only that every driver in the tree is in the ledger and
+# every ledger row is in the tree, which is the condition under which the atlas that DOES judge them
+# can stay true.
 
 # EIGHT, and the sixth was not requested. `tools/boundary_artifacts.py` is the third verifier this
 # repository owns that nothing invoked, and its own header states the exposure: *"Nothing in `cargo
@@ -215,6 +228,20 @@ gate_claim-index() {
     python3 "$ROOT/tools/claim_index.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 5 · every example driver is in the catalog, and every catalogued driver is in the tree
+# ---------------------------------------------------------------------------------------------
+
+gate_driver-catalog() {
+    local out="$WORK/drivers.out"
+    python3 "$ROOT/tools/driver_catalog.py" --check >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(head -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
     [ "$status" -eq 0 ] || cat "$out"
     return "$status"
@@ -467,6 +494,14 @@ run_controls() {
     control_probe claim-index "a document retitled without regenerating the index" \
         "sed -i '1s/.*/# The document law, retitled by a gate control/' '$ROOT/canon/THE_DOCUMENT_LAW.md'" \
         "sed -i '1s/.*/# The document law/' '$ROOT/canon/THE_DOCUMENT_LAW.md'" || broken=$((broken + 1))
+
+    # driver-catalog: a new driver added without cataloguing it. This is the exact event that
+    # produced 203 uncatalogued drivers, so the control is the event itself.
+    local driver_probe="$ROOT/crates/holonic-engine/examples/zz_gate_control_driver.rs"
+    CONTROL_ARTIFACTS+=("$driver_probe")
+    control_probe driver-catalog "a driver added without cataloguing it" \
+        "printf '//! A control driver, added and not catalogued.\nfn main() {}\n' >'$driver_probe'" \
+        "rm -f '$driver_probe'" || broken=$((broken + 1))
 
     # output-manifest and closure-manifest: a return directory with no manifest row and no
     # producing driver. It is UNRECORDED to the first and a new ORPHAN row to the second.

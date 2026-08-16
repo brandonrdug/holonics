@@ -127,7 +127,7 @@ The last construction promoted into an *"aperture law"* was withdrawn: `canon/TA
 | **the typing of all three** | `research/records/2026-07-19_THE_QUANTUM_PROPERTY_IS_THE_HOLONS_TRANSPORT_CLASS_THE_PIVOT_RETURNS_ONE_FACE.md` | Brandon-ratified |
 | — its engine consequence, the five-item occurrence record | same, §IX | the field list any crossing must carry |
 | registry form | `H.0461`, `papers/source/holonics/mathematical-physics.typ:313` | `definition` — *"A specific symmetry group and representation law are required."* |
-| the double cover, computed | `crates/holonic-engine/src/structure_group.rs:628` `CentralDoubleCover`, `:643` `lift` | returns `Closed` / `ReturnsCentre` / `DidNotCloseBelow`; **no representation is chosen** (`:62-64`) |
+| the double cover, computed | `crates/holonic-engine/src/structure_group.rs:654` `CentralDoubleCover`, `:643` `lift` | returns `Closed` / `ReturnsCentre` / `DidNotCloseBelow`; **no representation is chosen** (`:62-64`) |
 | the four faces of `1/2` | `CLAUDE.md` §3 (three) and §0b item 4 (the fourth, which explains them) | plus a fifth from the curvature side |
 | inertia, the exact split | `crates/holonic-engine/src/inertia.rs` | Sylvester triple over `Rat`, `L D Lᵀ` with a hyperbolic-plane branch |
 | inertia, the passages named | `crates/holonic-engine/src/winding_inertia.rs` (2,883 lines) | the split factors through the character group; `k` is a winding |

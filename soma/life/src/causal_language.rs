@@ -655,7 +655,22 @@ impl CausalLanguageEcology {
             if emanation.branches().is_empty() {
                 continue;
             }
-            let horizon = emanation.longest_matched_length();
+            // **The reached context and the PRODUCTIVE context are two different receivers, and
+            // reading the first where the law needs the second silenced whole sources.**
+            //
+            // `longest_matched_length` is the deepest context the path *reached*. That context may
+            // be terminal — present in the passage, with no outgoing material. Every support then
+            // sits at a shorter recurrent restriction, the filter below matches nothing, and this
+            // source contributes no branch **while still having raised `greatest_horizon`**. The
+            // `retain` afterwards deletes every token every other source did produce, and the whole
+            // junction falls through to the global suffix with an EMPTY source set — which is why
+            // the receipts read `sources=1` on 89 of 112 emissions.
+            //
+            // `greatest_productive_matched_length` is the accessor written for exactly this case,
+            // with the case stated in its own doc line, and it had no caller anywhere in the tree.
+            let Some(horizon) = emanation.greatest_productive_matched_length() else {
+                continue;
+            };
             greatest_horizon = greatest_horizon.max(horizon);
             for branch in emanation.branches() {
                 if !branch
@@ -682,7 +697,11 @@ impl CausalLanguageEcology {
         by_token.retain(|_, (horizon, _)| *horizon == greatest_horizon);
         if by_token.is_empty() {
             let emanation = self.global_suffix.emanate(&path)?;
-            greatest_horizon = emanation.longest_matched_length();
+            // Same reading as above: the bar is the deepest context with outgoing material, not the
+            // deepest context reached. A terminal deepest context here refused the whole fallback.
+            greatest_horizon = emanation
+                .greatest_productive_matched_length()
+                .unwrap_or_default();
             for branch in emanation.branches() {
                 if !branch
                     .supports()

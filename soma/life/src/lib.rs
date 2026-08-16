@@ -31,6 +31,7 @@ pub mod exact_world;
 // `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
 pub mod eros_rest;
 pub mod exposure_codec;
+pub mod founded_mouth;
 pub mod form_mouth;
 pub mod holonic_training;
 // Production on the oriented incidence complex rather than on a tape chart. It consumes

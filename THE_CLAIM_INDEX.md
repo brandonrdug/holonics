@@ -77,6 +77,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
 | `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
+| `canon/THE_DRIVER_ATLAS.md` | **The driver atlas — what each experiment showed, and which driver already owns it** — This is the reading half of the driver population. |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
 | `canon/THE_INFORMATION_ENGINE.md` | **The Information Engine — the cycle, its two strokes, every organ's station, and the surface each runs on** — **Evidence:** `measured` — three independent censuses over the clean tree (498 `.rs` files, 336,005 lines; agent worktrees excluded), a device census over 64 device entries and three… |
@@ -86,6 +87,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_OWNER_ATLAS.md` | **The owner atlas: which owner implements or states this, and where** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps Brandon's language. |
 | `canon/THE_QUOTE_NETWORK.md` | **The quote network** — Brandon asked for this artifact by name, twice, in the same message: |
 | `canon/THE_RECOVERED_LAW.md` | **The recovered law** — **Why this file exists.** The laboratory's answer to drift was `FORMULA.md`: one canon, read on demand, with a versioned reading rule at the top and per-claim grades — cited 212 times,… |
+| `canon/THE_SURFACES_ARE_PATHS.md` | **The surfaces are paths, and the front is what distributes across them** — Measured 2026-08-16 by `grep -rn -i "flow of electrons\\|lower pressure relative\\|instruction set would ideally flow\\|processing cycle surfaces"` over every document in the tree and both… |
 | `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); **368 records in `research/records/`, all tracked** — of which 63 are dated 08-03 or later… |
 | `canon/THE_TRAFFIC_SYSTEM.md` | **The traffic system** — It carries one of Brandon's longest-running analogies, which had **no canon presence at all** until 2026-08-09 — `grep -i 'traffic\\|automobile' canon/` returned zero — while the law it… |
 
@@ -103,6 +105,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
+| `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — This one covers instantiation. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — This one covers the atlas itself. |
@@ -112,7 +115,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (104 deposits of 396)
+## 4 · The 2026-08 record line (107 deposits of 399)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -223,6 +226,9 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-15_THE_FOURTH_REPAIR_WAS_BUILT_AND_REVERTED_AND_THE_SUB_COMPOSITION_IS_WHERE_IT_STOPS.md` | The fourth repair was built and reverted, and the sub-composition is where it stops |
 | `2026-08-15_THE_MATERIAL_ARMS_THE_FOUNDING_AND_THE_FOURTH_BODY_IS_NEVER_LIVE.md` | The material arms the founding, and the fourth body is never live |
 | `2026-08-15_THE_RELATING_IS_ONE_COMPLEX_PRODUCT_AND_THE_POLE_HAS_COLLAPSED_ONTO_A_RELATUM.md` | The relating is one complex product, and the pole has collapsed onto a relatum |
+| `2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md` | An address is a collapsed face that reopens, and the unification is one resume |
+| `2026-08-16_THE_MATERIAL_IS_VISIBLE_WHERE_THE_LAW_CONTRIBUTES_NOTHING_AND_A_RUN_CONTINUED_ACROSS_A_PROCESS.md` | The material is visible where the law contributes nothing, and a run continued across a process |
+| `2026-08-16_THE_RENDER_IS_A_FIELD_THE_SURFACES_ARE_PATHS_AND_THE_DEFICIT_IS_ONE_READING_AT_TWO_GRAINS.md` | The render is a field, the surfaces are paths, and the deficit is one reading at two grains |
 | `2026-08-16_THE_SWING_CONSULTS_COMPOSITION_DEPTH_AND_THE_CAUSAL_STATE_IS_FINER_THAN_THE_ORBIT.md` | The swing consults composition depth, and the causal state is finer than the orbit |
 
 ---
@@ -239,6 +245,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 1 more |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 1 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
+| `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md` |
 | `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 4 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |

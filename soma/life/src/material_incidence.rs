@@ -558,7 +558,13 @@ impl Faithfulness {
 ///
 /// Returns `(core index per node, core population)`. Cores are numbered in emission order, which
 /// is reverse topological: core `k` reaches only cores `< k`.
-fn strongly_connected_cores(outgoing: &[Vec<usize>]) -> (Vec<u32>, u32) {
+/// Tarjan's cores, iterative so a large atlas cannot overflow the stack.
+///
+/// **Public because a core IS the reversible subpopulation of a directed action**: inside a core
+/// every family reaches every other and the action restricted there is invertible; the one-way edges
+/// BETWEEN cores are exactly where an irreversible step put the arrow. A caller holding an induced
+/// action on families needs this reading and should not re-implement it.
+pub fn strongly_connected_cores(outgoing: &[Vec<usize>]) -> (Vec<u32>, u32) {
     let population = outgoing.len();
     let mut index = vec![u32::MAX; population];
     let mut low = vec![0u32; population];

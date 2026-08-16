@@ -98,7 +98,7 @@ and 2026-06-20:
 | co-present demand dilates passage delay | `receiver_current.rs:549-563`, exact over `BigUint` |
 | what does not get through is **deferred, not deleted** | `deferred_arrivals`, same file — this is the *dark information* form: a passage that exists, is admissible, and is not currently carrying |
 | congestion founds another pathway | `founded_receiver.rs` — `FoundingPressure::Congestion` |
-| the current takes the cheapest route, and the routes are cheap *by prior conduct* | **owned for founded axes** — `capacity := \|residue\| + 1` makes a route cheap exactly because it carried what nothing else carried. Still owed for **declared** passages: `characteristic_delay` is pinned at `1` by its only caller. |
+| the current takes the cheapest route, and the routes are cheap *by prior conduct* | **owned for founded axes** — `capacity := \|residue\| + 1` makes a route cheap exactly because it carried what nothing else carried. **And owned for declared passages as of 2026-08-15**: `CharacteristicDelayLaw::SourceContinuity` derives the delay from the minimal separation, in lines of the deposited source, between the line founding the head declaration and the nearest line naming the tail — driven by `the_terrain_dilates_the_passage`. The row read *"pinned at `1` by its only caller"* until 2026-08-16 and was stale by a day. |
 | an axis with empty residue is redundant, and its capacity says so | `founded_receiver.rs` — `residue`, `FoundedPanel::redundant`, `FoundedPanel::capacities`. `Res(r) = (⋂_{s≠r} ≡_s) ∖ ≡_r`; `capacity := \|Res(r)\| + 1`, so a redundant axis takes the **minimum** capacity and dilates maximally rather than being deleted. |
 
 ## 3b. How far things interact — the mechanism, ratified 2026-08-15
@@ -193,7 +193,7 @@ reading.
 > witness the propagation of the slow-down through the cars driving toward the bottleneck; this is
 > like the Doppler effect because we are talking about literally propagating signals."*
 
-Two readings, neither taken today.
+Two readings. **Both are built as of 2026-08-15 and read by nothing** — `crates/holonic-engine/src/approach_front.rs` carries `FrontClosing::between` for the first difference and `ApproachReading::across` for the second, with the narrowing-neck reading stated. This paragraph read *"neither taken today"* until 2026-08-16. A built organ nothing reads is the same shape as a deferred arrival, one level out.
 
 **Below a density there is no wave**, so far structure is not merely hard to perceive — it is not in
 the world. That is the frozen laboratory's measured species law arriving independently: *at one lane

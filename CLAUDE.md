@@ -20,21 +20,24 @@ stated below. They were first written for the archived C++ body in
 `archive/blueprints/CPP_GPU_FOUNDATION.md`, which now carries an archive banner; the requirements survive
 the body that occasioned them and this file carries them. They are meant to be enforced by
 executable audits rather than by cross-reference. **They now run as one sequence: `bash
-tools/gates.sh`** — **eleven** gates, one summary line each, non-zero if any is red:
-`tests · authored-levels · named-paths · line-citations · claim-index · output-manifest ·
-closure-manifest · boundary-artifacts · typst · architecture-lint · document-law`.
+tools/gates.sh`** — **twelve** gates, one summary line each, non-zero if any is red:
+`tests · authored-levels · named-paths · line-citations · claim-index · driver-catalog ·
+output-manifest · closure-manifest · boundary-artifacts · typst · architecture-lint · document-law`.
 `bash tools/gates.sh --list` prints them and is the authority; **do not restate the count in prose
 without running it** — one version of this paragraph said seven and omitted `boundary-artifacts`,
 another said nine over a list of nine while two more were being added the same hour.
 
-**The two newest were added 2026-08-15 by a behavioural audit and each closes a class the corpus
-could name but not catch.** `line-citations` verifies the number after the colon that `named-paths`
-never checked — 265 such citations existed with no verifier, and 46 were drifted.
-`document-law` requires every absence claim in a governing document to carry the command that
-measured it and its date, and requires every subordinate plan to name the roadmap it sits under.
+**The three newest each close a class the corpus could name but not catch.** `line-citations`
+(2026-08-15) verifies the number after the colon that `named-paths` never checked — 265 such
+citations existed with no verifier, and 46 were drifted. `document-law` (2026-08-15) requires every
+absence claim in a governing document to carry the command that measured it and its date, and
+requires every subordinate plan to name the roadmap it sits under. **`driver-catalog` (2026-08-16)
+asserts that every example driver is in `meta/DRIVER_CATALOG.tsv` and every catalogued driver is in
+the tree** — added the hour a census found 203 drivers and no catalog of any kind. Its control is
+the event that produced them: a driver added without cataloguing it.
 `bash tools/gates.sh --control` makes each one fail on purpose and restores.
 
-**Two of the nine cannot be green on a dirty tree, by construction, and that is not a defect.**
+**Two of the twelve cannot be green on a dirty tree, by construction, and that is not a defect.**
 `output-manifest` reddens when a driver has *run* since the ledger was written; `closure-manifest`
 reddens when any `src/**.rs` in a driver-owning crate has been *edited*, because a closure covers
 the whole crate — one dirty crate reddens every driver it owns. `git status` is the companion
@@ -81,6 +84,7 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | **`THE_CLAIM_INDEX.md`** | **the table of contents across every genre**, generated from the tree so it cannot drift. Enter here when you do not know which file owns a subject. |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **168 correspondence cards** keyed by holonic face: what other fields call the same thing, and where each `NON-EQUIVALENCE` is recorded. **Read this before claiming anything is absent** — the corpus could not be entered by concept until it existed. |
 | **`canon/THE_OWNER_ATLAS.md`** | **which owner implements or states a thing, and at what line.** `index`, asserts nothing. The correspondence atlas enters by *concept*; the claim index is generated from titles and cannot carry a line; nothing answered *"who owns this, where"* until 2026-08-13. **A subject not in it is absent from the atlas, not from the tree**, and every measured absence carries its command and its date. |
+| **`canon/THE_DRIVER_ATLAS.md`** | **which EXPERIMENT already showed a mechanism, and which driver owns it.** Deposited 2026-08-16 after `python3 tools/driver_catalog.py` measured **203 example drivers, 163,332 lines — 42% the size of every library crate combined, accrued over ten days — with 0 in the claim index, 39 named in no document, and no catalog of any kind.** Brandon: *"you've been working with your hands essentially tied behind your back because you've been painfully unaware of what the experimental drivers actually showcased."* Its §3 is a **mechanism → driver** index; **a construction proposed for a row in it is a rebuild.** Its generated half is `meta/DRIVER_CATALOG.tsv`, held true by the `driver-catalog` gate. And it carries the distinction the ledger cannot: **a carrying exterior is not an adjudicating one** — a card returns what the body asked for, and only `desktop_receiver` makes one an adjudicator, by checking it against an independent CPU computation. |
 | `canon/THE_INFORMATION_ENGINE.md` | **the cycle, its two strokes, every station's owner with its measured wiring, and the surface each runs on.** Carries the one measurement that orders the engine work — *the body is a descent with no return edge*, 21 modules and 20 hops, with every closing of emit → world → return living in one of 167 drivers — and §5, **the mouth**. |
 | `canon/THE_MILLENNIUM_FRAME.md` | all six problems, each as the receiver question it is here and the organ it lands on. `interpretation` throughout; **no deed may be graded by a row in it.** |
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
@@ -1227,7 +1231,7 @@ never been handed an antisymmetric form.**
 **And curvature is attained, not fundamental** — *"it is attained from depth and interpolation… many
 arcs angling away from each other, but it is still discretely founded."* That is the Regge reading
 §0c already carries. **Do not write, under any framing, that this body lacks curvature or a
-nonlinearity**; `structure_group.rs:544` `curvature_commutator` is the `a ∧ a` term with a test that
+nonlinearity**; `structure_group.rs:570` `curvature_commutator` is the `a ∧ a` term with a test that
 it is non-identity, and four other owners compute curvature. A claim of that shape was made on
 2026-08-14 by grepping for *names* — the convicted `fn without_stem` defect, on six subjects at
 once — and **"undocumented under that name" is not "unconstituted."**

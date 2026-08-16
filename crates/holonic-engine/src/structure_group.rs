@@ -92,13 +92,24 @@ pub enum GroupElement {
 impl GroupElement {
     /// The identity of the carrier this element lives in. Carrier-relative because the extent of a
     /// permutation is material, not a level.
-    pub fn identity_like(&self) -> Self {
-        match self {
-            Self::Permutation(p) => {
-                Self::Permutation((0..p.len()).map(|index| index as u8).collect())
-            }
+    ///
+    /// **Returns `None` past the carrier's reach rather than wrapping.** `Vec<u8>` addresses 256
+    /// points and holds any number of entries, so a permutation of degree 1,200 is *constructible*
+    /// — and the first form of this wrote `index as u8`, which silently reduced mod 256 and returned
+    /// a vector that is not a permutation at all. Every later comparison was then against garbage.
+    /// The tree's two sibling permutation sites already refuse cleanly at this boundary —
+    /// `arithmetic_monodromy` through `u8::try_from` into `CarrierOverflow`, and
+    /// `founded_receiver` through `.ok()?` — and this one corrupted instead.
+    pub fn identity_like(&self) -> Option<Self> {
+        Some(match self {
+            Self::Permutation(p) => Self::Permutation(
+                (0..p.len())
+                    .map(u8::try_from)
+                    .collect::<Result<Vec<u8>, _>>()
+                    .ok()?,
+            ),
             Self::Quaternion(_) => Self::Quaternion([1, 0, 0, 0]),
-        }
+        })
     }
 
     /// `self` then `next` — the ordered product, written so a walk composes left to right.
@@ -145,7 +156,9 @@ impl GroupElement {
             Self::Permutation(p) => {
                 let mut image = vec![0u8; p.len()];
                 for (index, target) in p.iter().enumerate() {
-                    *image.get_mut(usize::from(*target))? = index as u8;
+                    // Same boundary as `identity_like`: refuse past the carrier's reach rather
+                    // than reduce mod 256 and return a vector that is not a permutation.
+                    *image.get_mut(usize::from(*target))? = u8::try_from(index).ok()?;
                 }
                 Some(Self::Permutation(image))
             }
@@ -159,9 +172,10 @@ impl GroupElement {
         }
     }
 
-    /// Whether this element is the identity of its own carrier.
+    /// Whether this element is the identity of its own carrier. An element past the carrier's
+    /// reach has no identity to be, so it is not one.
     pub fn is_identity(&self) -> bool {
-        *self == self.identity_like()
+        self.identity_like().is_some_and(|identity| *self == identity)
     }
 }
 
@@ -176,6 +190,10 @@ pub enum StructureGroupRefusal {
     NoGeneratorDeclared,
     /// Two declared generators do not share a carrier or an extent.
     CarriersDisagree,
+    /// A declared generator's degree exceeds what the permutation carrier can address, so its
+    /// identity is not representable. Refused rather than reduced: a wrapped index is not a
+    /// permutation, and every later comparison would be against a vector that is not one.
+    CarrierOverflowed,
     /// A product left the carrier — an integer quaternion coefficient overflowed `i8`, which means
     /// the declared generators are not units and the set is not finite in this carrier.
     ProductLeftTheCarrier,
@@ -196,6 +214,10 @@ impl std::fmt::Display for StructureGroupRefusal {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NoGeneratorDeclared => write!(formatter, "no generator was declared"),
+            Self::CarrierOverflowed => write!(
+                formatter,
+                "a declared generator's degree exceeds what the permutation carrier addresses"
+            ),
             Self::CarriersDisagree => {
                 write!(
                     formatter,
@@ -265,9 +287,13 @@ impl StructureGroup {
         let seed = generators
             .first()
             .ok_or(StructureGroupRefusal::NoGeneratorDeclared)?;
-        let identity = seed.identity_like();
+        // A generator past the carrier's reach is refused HERE, before any product is formed,
+        // rather than silently reduced into a vector that is not a permutation.
+        let identity = seed
+            .identity_like()
+            .ok_or(StructureGroupRefusal::CarrierOverflowed)?;
         for generator in &generators {
-            if generator.identity_like() != identity {
+            if generator.identity_like().as_ref() != Some(&identity) {
                 return Err(StructureGroupRefusal::CarriersDisagree);
             }
         }

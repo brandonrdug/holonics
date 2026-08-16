@@ -65,7 +65,7 @@ exists for and says so in its own header: every other curvature owner in this bo
 computes `F = da` with no term for `a ∧ a`.
 
 **CORRECTED 2026-08-11 by reading the owner: the `a ∧ a` term EXISTS.**
-`structure_group.rs:544` carries `curvature_commutator` (cited as `:511` until 2026-08-14; the file
+`structure_group.rs:570` carries `curvature_commutator` (cited as `:511` until 2026-08-14; the file
 grew above it, and a line number is the most perishable thing a document can carry) — *"The curvature `a ∧ a`, as a return
 rather than a flag"* — with `commutator_subgroup` and `separating_pairs` beside it. The sentence
 that stood here, *"has no term for `a ∧ a`"*, was true of every *other* curvature owner and false

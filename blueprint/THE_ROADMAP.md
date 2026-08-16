@@ -29,10 +29,29 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE EROS CYCLE AS AN INFORMATION ENGINE — ratified 2026-08-16
+
+**This is the present deed, and it supersedes the centrifuge below as the ordering of the work
+without withdrawing any of it.** The plan is [`blueprint/THE_EROS_INFORMATION_ENGINE.md`](THE_EROS_INFORMATION_ENGINE.md),
+ratified by Brandon the same day, and it sits under this roadmap. Its derivations are
+`research/records/2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md`
+and
+`research/records/2026-08-16_THE_RENDER_IS_A_FIELD_THE_SURFACES_ARE_PATHS_AND_THE_DEFICIT_IS_ONE_READING_AT_TWO_GRAINS.md`.
+
+**Its first deed needs no new organ.** `discrete_curvature::step` is a synchronous update law over a
+hinge incidence — Brandon's 2026-07-20 triangular hinge automaton, built — and **every one of its
+drivers applies a single step and never an orbit**. Running it as an orbit is the machine's own
+cooling stroke, which is the reading the engine document records itself as lacking.
+
+**And it carries the cost axis.** Brandon's Landauer hypothesis is folded in at his direction:
+`Φ = P/(kT ln 2)` bounds **erasure and never transport**, so it prices the collapsing generators and
+not the permuting ones; its numerator is the collapsed population this tree already exhibits exactly;
+and the two are carried as an undivided pair.
+
 ## MATHEMATICS INTO THE INFORMATION CENTRIFUGE — ratified 2026-08-14
 
-**This is the present deed.** The Eros cycle below is complete and is its carrier. Findings and every
-re-run census:
+**The carrier of the deed above, and not withdrawn.** The Eros cycle below is complete and is its
+carrier. Findings and every re-run census:
 `research/records/2026-08-14_THE_CENTRIFUGE_IS_BUILT_AND_IT_SEPARATES_BY_SPELLING.md`.
 
 **The naming is load-bearing and is Brandon's.** The material is **mathematics**; Lean is a **codec**,

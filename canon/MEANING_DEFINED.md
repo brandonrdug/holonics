@@ -72,7 +72,7 @@ specificity is the shape of the channel. The traffic form is `canon/THE_TRAFFIC_
 
 | clause | owner | state |
 |---|---|---|
-| context is the medium's state at the site, not an annotation | `receiver_current.rs:549-563` — co-present demand dilates passage delay | **built**, but `characteristic_delay` is pinned at `1` by its only caller, so no channel is cheaper than another. **Channel specificity is owed.** |
+| context is the medium's state at the site, not an annotation | `receiver_current.rs:549-563` — co-present demand dilates passage delay | **built**, and channel specificity is **no longer owed**: `CharacteristicDelayLaw::SourceContinuity` derives the delay from the material rather than pinning it, driven with declared controls. This cell read *"pinned at `1`… Channel specificity is owed"* until 2026-08-16. |
 | identity is decided by recurring transport, not by the surface | `receiver_exact_compression.rs` — the Nerode partition refines until conduct separates, and the loss is exhibited as **the shortest separating word** | **built and driven** |
 | a distinction the panel cannot carry founds a new axis | `founded_receiver.rs` — `FoundingPressure::Blindness` | **built and driven** |
 | congestion founds another pathway | `founded_receiver.rs` — `FoundingPressure::Congestion` | **built and driven** |

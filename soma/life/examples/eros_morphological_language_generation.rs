@@ -19,8 +19,9 @@ use life::{
     form_mouth::deposit_form_or_message,
     live_current_cuda::CudaLiveCurrentExecutor,
     morphological_language::{
-        MorphologicalGeneratedText, MorphologicalGenerationSpec, MorphologicalLanguageEcology,
-        MorphologicalLanguageGeneration, MorphologicalLanguagePassage, MorphologicalResponseRest,
+        CudaMorphologicalConditioner, MorphologicalGeneratedText, MorphologicalGenerationSpec,
+        MorphologicalLanguageEcology, MorphologicalLanguageGeneration,
+        MorphologicalLanguagePassage, MorphologicalResponseRest,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -272,43 +273,98 @@ fn run() -> Result<(), String> {
     // exactly the finding `research/records/2026-08-10_THE_FRONT_IS_THE_PARALLEL_UNIT…` recorded
     // for the agentic seam and which went unrepaired here. `SOMA_CPU` forces the cpu carrier so
     // the two can be compared on the same material; without it the card carries the deed.
-    let mut card;
-    let mut cpu;
-    let carrier: &mut dyn LiveCurrentExecutor = if std::env::var_os("SOMA_CPU").is_some() {
-        cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+    // **CONDITIONING AND GENERATION WANT TWO DIFFERENT MOUNTS OF THE SAME CARD, and mounting the
+    // wrong one here is what made every run of this driver hang with the card idle.**
+    //
+    // `condition_with_executor` threads a `LiveCurrentExecutor`, so the card is reached ONE SWING
+    // EVENT AT A TIME. The route arm it selects is the per-row replay whose own comment inside
+    // `condition_inner` records the cost — *"the prior card arm replayed every row through a
+    // `ResonanceEcology`, returned the same target set, then discarded the complete rest image. On
+    // the 2,672-passage sealed front that echo ran for fifteen minutes without reaching the
+    // constitutive charts."* Handing that arm a card does not repair it; a per-event crossing of a
+    // card is a bottleneck, not a carrier, and the observable signature is exactly one core pinned
+    // with the device at idle.
+    //
+    // `condition_with_cuda` is the arm built for this deed and it takes a **resident**
+    // `CudaMorphologicalConditioner`: the route transpose is formed once from its caused rows, and
+    // the five generalized suffix ecologies and the question-prefix incidence are founded on the
+    // card with **no cpu fallback**. It has stood in this tree with one caller, and that caller is
+    // not a generation driver.
+    //
+    // So conditioning takes the resident conditioner and is released before generation mounts the
+    // live executor it needs. `SOMA_CPU` still forces the whole run onto the cpu so the two remain
+    // comparable on one material.
+    let force_cpu = std::env::var_os("SOMA_CPU").is_some();
+    let conditioning_started = Instant::now();
+    let ecology = if force_cpu {
         eprintln!("eros morphological language generation: carrier = cpu, {workers} lanes");
-        &mut cpu
+        let mut cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+        MorphologicalLanguageEcology::condition_with_executor(
+            &passages, action, workers, &mut cpu,
+        )
+        .map_err(debug)?
     } else {
-        match CudaLiveCurrentExecutor::new(0) {
-            Ok(mounted) => {
+        match CudaMorphologicalConditioner::new(0) {
+            Ok(mut conditioner) => {
                 eprintln!(
-                    "eros morphological language generation: carrier = {}",
-                    mounted.device_name()
+                    "eros morphological language generation: carrier = {} (resident conditioner)",
+                    conditioner.device_name()
                 );
-                card = mounted;
-                &mut card
+                let (ecology, _semantic, apparatus) =
+                    MorphologicalLanguageEcology::condition_with_cuda(
+                        &passages,
+                        action,
+                        &mut conditioner,
+                    )
+                    .map_err(debug)?;
+                eprintln!(
+                    "eros morphological language generation: conditioner apparatus {apparatus:?}"
+                );
+                ecology
             }
             Err(error) => {
                 // Named, never silent. A run that fell back without saying so would report a cpu
                 // figure as a card figure.
                 eprintln!(
-                    "eros morphological language generation: the card refused to mount ({error}); \
-                     carrying on the cpu with {workers} lanes"
+                    "eros morphological language generation: the resident conditioner refused to \
+                     mount ({error}); carrying on the cpu with {workers} lanes"
+                );
+                let mut cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+                MorphologicalLanguageEcology::condition_with_executor(
+                    &passages, action, workers, &mut cpu,
+                )
+                .map_err(debug)?
+            }
+        }
+    };
+    let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
+    eprintln!(
+        "eros morphological language generation: conditioned in {conditioning_wall_millis} ms"
+    );
+
+    // Generation wants the live executor, which is the mount whose grain matches its deed: a front
+    // of co-present branch tips, each crossing as its own event.
+    let mut card;
+    let mut cpu;
+    let carrier: &mut dyn LiveCurrentExecutor = if force_cpu {
+        cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
+        &mut cpu
+    } else {
+        match CudaLiveCurrentExecutor::new(0) {
+            Ok(mounted) => {
+                card = mounted;
+                &mut card
+            }
+            Err(error) => {
+                eprintln!(
+                    "eros morphological language generation: the card refused to mount for \
+                     generation ({error}); carrying on the cpu with {workers} lanes"
                 );
                 cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
                 &mut cpu
             }
         }
     };
-
-    let conditioning_started = Instant::now();
-    let ecology =
-        MorphologicalLanguageEcology::condition_with_executor(&passages, action, workers, carrier)
-            .map_err(debug)?;
-    let conditioning_wall_millis = conditioning_started.elapsed().as_millis();
-    eprintln!(
-        "eros morphological language generation: conditioned in {conditioning_wall_millis} ms"
-    );
     let generation_started = Instant::now();
     let mut prompt_reads = Vec::new();
     for prompt in source.prompts {
