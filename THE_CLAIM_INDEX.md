@@ -112,7 +112,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (103 deposits of 395)
+## 4 · The 2026-08 record line (104 deposits of 396)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -223,6 +223,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-15_THE_FOURTH_REPAIR_WAS_BUILT_AND_REVERTED_AND_THE_SUB_COMPOSITION_IS_WHERE_IT_STOPS.md` | The fourth repair was built and reverted, and the sub-composition is where it stops |
 | `2026-08-15_THE_MATERIAL_ARMS_THE_FOUNDING_AND_THE_FOURTH_BODY_IS_NEVER_LIVE.md` | The material arms the founding, and the fourth body is never live |
 | `2026-08-15_THE_RELATING_IS_ONE_COMPLEX_PRODUCT_AND_THE_POLE_HAS_COLLAPSED_ONTO_A_RELATUM.md` | The relating is one complex product, and the pole has collapsed onto a relatum |
+| `2026-08-16_THE_SWING_CONSULTS_COMPOSITION_DEPTH_AND_THE_CAUSAL_STATE_IS_FINER_THAN_THE_ORBIT.md` | The swing consults composition depth, and the causal state is finer than the orbit |
 
 ---
 
