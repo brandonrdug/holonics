@@ -1,5 +1,27 @@
 # The swing consults composition depth, and the causal state is finer than the orbit
 
+> **THE TITLE'S CLAIM IS WITHDRAWN, 2026-08-16, BY LOOKING AT THE TEXT.** Brandon: *"You're only
+> displaying scalars… I personally need to see text output."* Driver:
+> `soma/life/examples/the_thoughts_are_returned_as_text.rs`, which prints the segmentation this
+> record only ever counted.
+>
+> **Not one face founds, at any entry.** 59,734 faces crossed at the atom mouth, `faces_founded`
+> **zero** across every run. `perceive_grain`'s own doc says a thought completes *where it FOUNDS —
+> the aim orthogonal to the standing thought*; foundings are zero and thoughts complete anyway, so
+> **`thought_completed` is not the founding cut** and the reading below attached to it is unsupported.
+>
+> **And the cuts fall mid-word.** `…one complex produc` / `t, and the pole` at the atom mouth;
+> `…research rec` / `ord` at span 21, where every thought is a multiple of twenty-one octets. The cut
+> tracks the arrival chunking, not the material. At the atom mouth 179 of 326 cuts land at register
+> capacity — 15 faces of 15, `REGISTER = 2·K_WORD + 1` — and at span 21 none do, so it is not one
+> mechanism either.
+>
+> **What survives:** the count is real — completions per arrival do rise monotonically with
+> composition depth — and §2's finding that the causal state is finer than the orbit is untouched,
+> because it was measured on the partition rather than on the cut. What is struck is §3's
+> identification of that curve with the swing's orthogonal cut. **A monotone curve over a real
+> measurement, whose subject was never inspected.**
+
 **Date:** 2026-08-16
 **Truth status:** `established-bounded` for the three measurements; `interpretation` for the reading.
 **Evidence:** `implemented-exact`, `measured`. Driver:
