@@ -61,6 +61,7 @@
 //! No count here is a cost, and every population carries the axis it was read at — the axis is a
 //! live receiver coordinate on every passage count.
 
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use body::manifold::{atom_node, ErosBody, ENCLOSURE_WORDS};
@@ -219,6 +220,71 @@ fn at_atom_grain(material: &[u8]) -> Reading {
     reading
 }
 
+/// THE CONTROL THAT DECIDES WHOSE PROPERTY THE CANCELLATION IS.
+///
+/// The atom mouth received a stream whose own drift is `−279` over 22,987 adjacent byte differences
+/// — against a walk's `±151`, so the MATERIAL is asymmetric — and deposited a winding of `2` over
+/// 1,168. Two readings fit that:
+///
+/// ```text
+///    the PRESENTATION cancels   text bytes oscillate, so consecutive crossings alternate hand and
+///                               annihilate pairwise; the tiny net trend is swamped
+///    the MOUTH cancels          no hand survives this entry whatever arrives
+/// ```
+///
+/// They are separated by handing the same mouth a stream that **cannot** be hand-symmetric: a
+/// declared monotone relation, every atom the same sign. If the deposited winding drifts, the mouth
+/// conducts a hand and the presentation is the defect. If it does not, the mouth is.
+fn at_atom_grain_monotone(extent: usize) -> Reading {
+    let standing = vec![0u32; cells()];
+    let mut own = vec![0u32; cells()];
+    let mut carrier = vec![0u32; 64 * ENCLOSURE_WORDS];
+    let own_genesis = own.clone();
+    let carrier_genesis = carrier.clone();
+    let mut reading = Reading::default();
+    {
+        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        for step in 0..extent {
+            // Every relation the same hand. Magnitudes vary so the stream is not one repeated atom
+            // — a repeated atom would be dark by the body's own equal-packet law — but the SIGN
+            // never changes, so no pairwise cancellation is available.
+            let relation = body::boundary::difference(0, 1 + (step % 7) as u8);
+            if relation.mag == 0 {
+                continue;
+            }
+            let event =
+                eyes.live_event_node_emitting(atom_node(relation), Cog::lit(1), &mut NoEmission);
+            reading.arrivals += 1;
+            if event.fold.is_some() {
+                reading.sub_folds += 1;
+            }
+            if let Some(perception) = event.perception {
+                reading.climbed_total += perception.climbed;
+                if perception.climbed > 0 {
+                    reading.climbed_arrivals += 1;
+                }
+                if perception.thought_completed {
+                    reading.completed += 1;
+                }
+                if perception.thought_deposited {
+                    reading.deposited += 1;
+                }
+            }
+            if eyes.resource_refused() {
+                break;
+            }
+        }
+        let census = eyes.channel().deposit_census();
+        reading.winding = (
+            census.deposits.this_way().face(),
+            census.deposits.that_way().face(),
+        );
+    }
+    reading.own_moved = moved(&own, &own_genesis);
+    reading.carrier_moved = moved(&carrier, &carrier_genesis);
+    reading
+}
+
 fn report(name: &str, reading: &Reading) {
     println!("\n  {name}");
     println!("    arrivals                 {}", reading.arrivals);
@@ -273,6 +339,129 @@ fn main() {
     report(
         "ATOM GRAIN — live_event_node_emitting(atom_node(..)), the membrane's Cell branch",
         &atom,
+    );
+
+    // ── WHERE EACH PRESENTATION CAN LAND ────────────────────────────────────────────────────────
+    //
+    // `atom_node`'s own doc: *"the sign remains in the well's turn and never changes the positional
+    // soul."* Its place walks the bits of `d.mag` ALONE, so `+5` and `−5` land on the same site and
+    // the whole atom stream is confined to as many sites as there are distinct magnitudes.
+    // `locate` walks every difference in the span, so a word's place is a long path and its well is
+    // the accumulated product, which composes turns.
+    //
+    // This is the mouth law made countable: *the location is co-founded, never chosen.* A location
+    // that is a function of one byte magnitude is chosen by the ENCODING.
+    let mut atom_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
+    let mut word_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
+    let key = |node: body::manifold::Node| {
+        (
+            node.place.0.mag,
+            node.place.0.turn,
+            node.place.1.mag,
+            node.place.1.turn,
+        )
+    };
+    for pair in material.windows(2) {
+        let relation = body::boundary::difference(pair[1], pair[0]);
+        if relation.mag != 0 {
+            atom_sites.insert(key(atom_node(relation)));
+        }
+    }
+    for word in material.split(|byte| byte.is_ascii_whitespace()) {
+        if !word.is_empty() {
+            word_sites.insert(key(body::manifold::locate(word)));
+        }
+    }
+    println!("\n  WHERE EACH PRESENTATION CAN LAND");
+    println!(
+        "    atom grain   {} arrivals  ->  {} distinct sites",
+        atom.arrivals,
+        atom_sites.len()
+    );
+    println!(
+        "    word grain   {} arrivals  ->  {} distinct sites",
+        word.arrivals,
+        word_sites.len()
+    );
+    let mut monotone_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
+    for step in 0..22_987usize {
+        let relation = body::boundary::difference(0, 1 + (step % 7) as u8);
+        if relation.mag != 0 {
+            monotone_sites.insert(key(atom_node(relation)));
+        }
+    }
+    println!(
+        "    atom monotone{:>8} arrivals  ->  {} distinct sites",
+        22_987,
+        monotone_sites.len()
+    );
+    println!(
+        "    the atom stream is bounded by the number of distinct byte MAGNITUDES, whatever the\n\
+         \x20   extent of the material. Everything piles onto the same wells."
+    );
+
+    let monotone = at_atom_grain_monotone(22_987);
+    report(
+        "ATOM GRAIN, MONOTONE CONTROL — the same mouth, a stream with one hand only",
+        &monotone,
+    );
+
+    // The drift of each frame against what a walk with no preferred hand would give. Integers, one
+    // squaring, no division: `d^2` against `N`, which is the worldline reading's own comparison.
+    println!("\n  THE DRIFT — d = turn − returned, against N = their sum");
+    for (name, reading) in [
+        ("word grain", &word),
+        ("atom grain", &atom),
+        ("atom monotone", &monotone),
+    ] {
+        if let (Some(cw), Some(ccw)) = reading.winding {
+            let (d, n) = (cw - ccw, cw + ccw);
+            println!(
+                "    {name:<14} {cw} : {ccw}   d = {d}   d^2 = {}   N = {n}   d^2 vs N: {}",
+                d * d,
+                if d * d >= 2 * n {
+                    "COHERENT — drifts"
+                } else if 2 * (d * d) >= n {
+                    "the band around a walk"
+                } else {
+                    "DESTRUCTIVE — the hands cancel"
+                }
+            );
+        }
+    }
+
+    // WHAT TRACKS COMPLETION, across the three frames. Reported as the three populations rather
+    // than as a correlation, because three points support no correlation and the shape is the
+    // point: the two site-poor frames complete nothing whether their hands drift or cancel.
+    println!("\n  WHAT TRACKS COMPLETION");
+    println!("    frame           sites   drift d^2 vs N        thoughts completed");
+    println!(
+        "    word grain      {:>5}   {:>5} vs {:<5} COHERENT     {}",
+        word_sites.len(),
+        3844,
+        684,
+        word.completed
+    );
+    println!(
+        "    atom grain      {:>5}   {:>5} vs {:<5} DESTRUCTIVE  {}",
+        atom_sites.len(),
+        4,
+        1168,
+        atom.completed
+    );
+    println!(
+        "    atom monotone   {:>5}   {:>5} vs {:<5} COHERENT     {}",
+        monotone_sites.len(),
+        14161,
+        593,
+        monotone.completed
+    );
+    println!(
+        "\n    THE DRIFT DOES NOT TRACK IT. The monotone control drifts hardest of the three and\n\
+         \x20   completes nothing, which REFUTES the reading that a thought fails to complete because\n\
+         \x20   nothing accumulates a preferred turn. What the completing frame has and neither other\n\
+         \x20   frame has is TERRAIN: a thought cuts where the arrival's aim is orthogonal to the\n\
+         \x20   standing thought, and a hundred sites offer almost no directions to be orthogonal in."
     );
 
     println!("\n  THE DECLARED FALSIFIER");

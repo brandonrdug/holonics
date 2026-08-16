@@ -114,15 +114,58 @@ The atom path is **not inert** — it moved 30,412 own words, comparable to the 
 But its deposited hands are **585 : 583**, a drift of `2` over `1,168` deposits, against the word
 grain's **373 : 311**, a drift of `62` over `684`.
 
-A balanced pair is the **destructive** regime of the worldline reading: `d² ≪ N`. The atom stream
-deposits and its hands cancel, so nothing accumulates a preferred turn and no thought is ever
-founded to complete.
+A balanced pair is the **destructive** regime of the worldline reading: `d² ≪ N`.
 
-> **That is a statement about the SWING at the word grain, not about which mouth is driven.**
+### THE CAUSAL CLAIM MADE HERE WAS WRONG, AND ITS OWN CONTROL REFUTED IT
 
-**Falsifier for the next attempt, stated so it can fire:** a repair aimed at the sub-composition must
-move the atom path's drift away from balance — `d²` up against `N` — **and** raise
-`thoughts completed` off zero. One without the other is a count moved and not an edge.
+This section read: *"nothing accumulates a preferred turn and no thought is ever founded to
+complete."* **Brandon questioned the reading** — *"the machine is being exposed to the information
+within the laboratory, but not necessarily being curved toward particular behavior?"* — and the
+control built to answer him refuted the causal half.
+
+**Three frames, one mouth**, added to the same driver:
+
+```text
+   frame            sites   drift d² against N            thoughts completed
+   word grain       1,307    3,844 vs   684  COHERENT           357
+   atom grain         100        4 vs 1,168  DESTRUCTIVE          0
+   atom monotone        7   14,161 vs   593  COHERENT             0
+```
+
+1. **The mouth conducts a hand.** Handed a monotone stream — every relation the same sign, so no
+   pairwise cancellation is available — it deposits `237 : 356`, `d²/N ≈ 24`. The mouth is not the
+   canceller.
+2. **The material carries a hand and the PRESENTATION destroys it.** The adjacent byte differences
+   of the same octets drift `−279` against a walk's `±151`. The atom mouth received that and
+   deposited `2`. Text oscillates, consecutive crossings alternate hand, and they annihilate
+   pairwise.
+3. **And drift does not track completion.** The monotone frame drifts *hardest of the three* and
+   completes **zero**. So the sentence this section carried is refuted: a thought does not fail to
+   complete for want of an accumulated turn.
+
+### What does track it is TERRAIN, and the source says why
+
+`atom_node`'s own doc: *"the sign remains in the well's turn and **never changes the positional
+soul**."* Its place walks the bits of `d.mag` **alone**, so `+5` and `−5` land on the *same site* and
+the whole atom stream is confined to as many sites as there are distinct byte magnitudes —
+**100, for 22,987 arrivals, about 230 arrivals per well.** `locate` walks every difference in a span
+and its well is the accumulated product `w = ∏ dᵢ`, which composes turns: **1,307 sites for 3,704
+arrivals, about 2.8 per well.**
+
+A thought cuts where the arrival's aim is **orthogonal to the standing thought**
+(`manifold.rs:5102`). A hundred sites offer almost no directions to be orthogonal in.
+
+> **This is the mouth law made countable.** *The location is co-founded, never chosen* — and a
+> location that is a function of one byte magnitude is chosen by the **encoding**. Brandon's own
+> statement of the same thing: *"if you're mindlessly throwing data at it it'll just end up floating
+> and doing nothing."* 22,987 events onto 100 wells is that, measured.
+
+**Falsifier, re-aimed by the control and stated so it can fire:** a presentation with a **large site
+population** must raise `thoughts completed` off zero **whether or not its hands drift**; and a
+presentation with a large drift and a small site population must not. The second half already holds
+— the monotone control is it. The first half is the next experiment, and the honest bound is that
+three frames support no correlation: the shape is that both site-poor frames complete nothing while
+their hands do opposite things.
 
 ---
 
