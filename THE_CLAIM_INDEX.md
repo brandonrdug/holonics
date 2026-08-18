@@ -125,7 +125,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (133 deposits of 425)
+## 4 · The 2026-08 record line (134 deposits of 426)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -256,6 +256,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md` | The work is counted, the prediction is refuted where it is wrong, and the hand was inverted |
 | `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
 | `2026-08-18_A_LICENSED_WALK_EMITS_SUBSTRINGS_AND_THE_ARC_IS_THE_COMPOSITION_OPERATOR.md` | A licensed walk emits substrings, and the arc is the composition operator |
+| `2026-08-18_FREQUENCY_DISAGREES_WITH_EVERY_OTHER_FACE_AT_EVERY_JUNCTION.md` | Frequency disagrees with every other face, at every junction |
 | `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
 | `2026-08-18_THE_ATLAS_IS_A_NAVMESH_AND_THE_TRANSITION_TO_A_TENSOR_SPLITS_INTO_A_FREE_TREE_AND_A_CYCLE_RANK.md` | The atlas is a navmesh, and the transition to a tensor splits into a free tree and a cycle rank |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
