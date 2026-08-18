@@ -157,19 +157,27 @@ that showed it. A construction proposed for any row here is a rebuild.
 | harmonic measure by two independent routes — Eulerian Schur complement against a Lagrangian parcel cohort — glued by the boundary-integral identity at every horizon | `the_parcel_rides_and_the_field_watches.rs` |
 | circulation `Γ = ⟨c,v⟩` with `dᵀc = 0` re-checked every step, and the three-junction aperture where the module's own closure argument stops | `the_loop_carries_its_circulation.rs` |
 | plaquette holonomy as a **group element**, Wilson action, exact transfer spectrum; gauge-equivalent pair identical after being checked to differ | `the_plaquette_carries_a_group_element.rs` |
+| **repetition against breadth on real holonomies**: one walk repeated reaches at most its own cyclic subgroup (order 4 on every one of nine walks) while the family generates the whole group (order 8), **with the abelian control coinciding at 4 against 4** so the gap is the non-commutativity and not the method | `the_plaquette_carries_a_group_element.rs` |
 | exact wave/advection transport with every interface, cycle and energy residual exactly zero | `analytic_field_transport.rs` |
 | Buckingham pi with the **left kernel** — what "set `c = 1`" actually is — and `t = tan(θ/2)` exact | `the_shorthand_is_one_angle.rs` |
 | cross-ratio unmoved under five `PGL(2,ℚ)` turns **whose orbit is exhibited first** | `the_swing_is_the_invariant.rs` |
+| **two determination laws composed in one chain** — a closed loop re-reading the material per grain against a ballistic commitment licensed by a run of exact agreement; the windings agree exactly and the **committed remainder** does not, so the cocycle defect returns the determination-law mismatch in one coordinate the running sum cannot see | `the_committed_step_is_a_link_and_the_winding_cannot_see_it.rs` |
+| **the standing wave, the band structure, and the resonance** — `\|Γ\|²` as the invariant with the ratio refused where its root leaves `ℚ`; pass/edge/stop by one exact rational comparison on `Tr M/2`; the bilayer band edge at `cos α = \|Γ\|`, rational exactly when the admittance ratio is a rational square; the cavity transparent exactly at `p² = 1`, with a matched cavity flat at every phase as the control | `the_resonator_is_asked_what_it_resonates_at.rs` |
+| **the propagation phase in a junction chain**, so a closed chain's holonomy is no longer the identity by construction — non-commuting **iff** the phase is not a whole turn **and** the junction is not matched, both controls run | `the_resonator_is_asked_what_it_resonates_at.rs` |
 
 ### The form, the split, the windings
 
 | mechanism | already owned by |
 |---|---|
+| **the `d`-dimensional geometric product over `Rat`** — the division law `a = (a b⁻¹) b` asserted in the algebra; the exterior sign shown not to be a coboundary by the product failing to commute; `multiquadratic`'s structure constant recovered as the magnitude face, with 24 of 64 basis-blade products differing in sign alone | `the_arrow_is_the_division_and_the_score_is_its_aim.rs` |
+| **the exact cost of an exact deed, counted rather than timed** — rational operations by species, entries written, cumulative and peak numerator/denominator bit-length, resident extent and dependency span; a **prediction** admits or defers before the deed runs, six of eight coordinates return exact and two are refuted, and the `k⁴b` law arrives from counted coordinates rather than from a regression on elapsed seconds | `the_head_reads_the_aim_and_the_census_is_four_classes.rs` |
+| **the four-class causal census on a real head's own directions**, with the class census shown to be a tautology at `d = 256` and the hand split by a declared coordinate-shift null into pairing and entry population; the exact width at which the card's `i128` carrier stops, measured | `the_head_reads_the_aim_and_the_census_is_four_classes.rs` |
 | a positive form whose positivity **can fail**, with an out-of-the-ample-cone class required to break it and doing so | `matroid_hodge_riemann.rs` |
 | passages **named by winding** rather than signs counted, cross-certified three ways | `signs_are_windings.rs` |
 | `ker(MᵀM)` in class space against `ker(MMᵀ)` in realizer space, **never conflated**; hand flipped with the split unmoved | `the_realizer_places_itself.rs` |
 | the integral obstruction as a returned object — a class reached only as `2·c`, rank 1, invariant factors `[2]` | `derivation_moves.rs`, `substitution_realizer_placement.rs` |
 | `n₊(PᵀAP) ≤ n₊(A)` with the collapsed direction exhibited; the rank–trace identity exact | `the_pullback_bounds_the_inertia.rs` |
+| **Haynsworth additivity `In(H) = In(A) + In(H/A)`** on a declared block split — `H.0127`'s second sentence, which is the Riemann support-successor obligation's own law — with the positive-definite arm labelled as the one that CANNOT fail and two arms that genuinely add a negative direction | `the_pullback_bounds_the_inertia.rs` |
 | the coefficient group is the **caller's**: one cochain under `ℤ`, `ℤ/3`, `ℤ/2` returning three chord populations with the `ℤ/2` witness exhibited | `the_integer_holonomy_cannot_see_the_torsion_class.rs` |
 | the accumulated value **together with its path**; coboundary / closed / standing kept apart; basepoint gauge orbit measured | `the_integral_is_the_pair.rs` |
 | founding-order non-commutation valued as a **cycle type**, with a falsifier pair agreeing on parity and disagreeing on cycle type | `the_junction_returns_a_group_element.rs` |
@@ -189,8 +197,10 @@ that showed it. A construction proposed for any row here is a rebuild.
 
 | mechanism | already owned by |
 |---|---|
+| **the layered lattice a transformer's admitted transports define, put through the compression organ on both carriers** — the product order as successor, receivers that are codec faces of the material, offsets derived from its own recurrence gaps; the terminus-separated and receiver-separated populations split so the declared depth cannot masquerade as a memory order; the irreducible collapse measured to sit **entirely at the terminal layer** | `the_layered_lattice_is_compressed_by_its_own_receivers.rs` |
 | deleting a founded stem and re-asking, **with both controls** — a non-reaching stem whose removal must leave the reading indistinguishable, and the first reaching one in canonical order that must move it | `conditioned_derivation_body.rs` |
 | the collapsed population with the **shortest separating word** per pair, plus three declared-wrong readings each returning a non-empty disagreement | `codec_separation_cross_check.rs` |
+| the same organ on a **materially unrelated source** — the registry's own dependency graph over its grade vocabulary, generated by `tools/registry_incidence.py` so no partition can be authored; 274 entries, 12 one-shot blocks against 261 conduct blocks, 13,015 collapsed pairs, memory order 4 | `the_registry_is_material_for_the_compression.rs` |
 | a segmenter recovered from an opaque conditioner by an **exhausted** query family, with the gauge shown acting before agreement is admitted as evidence | `foreign_codec_intake.rs` |
 | a codec recovered from **octets alone** — UTF-8 lead/continuation structure, held out against an independent decoder | `soma/life/examples/the_codec_is_recovered_from_exposure.rs` |
 | receivers **founded** at the junctions a panel is blind to, to exhaustion, with the Nerode congruence bit-identical before and after and a fully-witnessing null that founds nothing | `the_receiver_is_founded_at_the_junction.rs` |
@@ -203,10 +213,12 @@ that showed it. A construction proposed for any row here is a rebuild.
 | mechanism | already owned by |
 |---|---|
 | the whole conditioning arc in one run: **unreachable → kernel deed → reachable, its proof naming the first → ablate → unreachable again** | `soma/life/examples/the_second_theorem_is_reachable_only_after_the_return.rs` |
+| **proof motions admitted by quotient closure over kernel testimony**, the same law as the conditioning fibers on a second material: 15 motions, 3 admitted, 4 conflicted, 8 refuted — with `close/assumption` confirmed 7 and refuted 4 and **still conflicted**, because the count does not outvote a refutation | `soma/life/examples/eros_lean_proof_production.rs` |
 | a body sealed to octets, every source made unreachable, resuming and answering **a statement never asked before the seal** | `soma/life/examples/eros_mathematics_instance_rest.rs` |
 | a world return carried **across** the seal — two detached turns, the second holding only the sealed rest | `soma/life/examples/the_conditioning_return_crosses_the_seal.rs` |
 | the emitted population shown **strictly smaller** than the complete continuation fiber, with `ablate_target` removing exactly what one deposit licensed and `ablate_all` restoring the enumeration bit-exactly | `soma/life/examples/the_deposit_licenses_the_re_emission.rs` |
 | the emitted text returned **verbatim**, both arms, with the withheld population and the obstructions carrying addresses, asserting nothing | `soma/life/examples/the_production_is_read.rs` |
+| **the emission's deciding filter turned into a coordinate the ratio carries** — the junction as an exact `RatioFamily` and `SectionModulus` with the horizon per member, the recruitment contact as a whole `clifford::Arrow` with `Aim::Ortho` founding rather than reading as nothing, the presentation's division through `receiver_exact_compression`, and the window test read on every emitted surface; over eight prompts the gate returns **8 of 8 contiguous spans** against the ratio reading's **2,055 of 12,130**, and a two-token emission is shown to be a span **by construction** | `soma/life/examples/the_horizon_is_a_coordinate_and_the_emission_keeps_its_cross.rs` |
 | a plural successor family from a prefix **with no target**, every branch re-entered as self-emanated material and its own next family inspected | `soma/life/examples/eros_resonant_generation.rs` |
 | question → deed → world return → answer → **returned correction** → second question, with the difference between the two answers printed | `soma/life/examples/eros_agentic_research_conversation.rs` |
 | an arrival depositing into oriented incidence and a later arrival riding it, with the dependence proved by **`withdraw` shown bit-exactly inverse** | `soma/life/examples/the_later_current_rides_the_deposit.rs` |
@@ -227,6 +239,7 @@ that showed it. A construction proposed for any row here is a rebuild.
 
 | mechanism | already owned by |
 |---|---|
+| **the mouth joined to the conduction**: an arrival's own deposit distribution founds an admittance profile, the current crosses reflecting junctions and returns, and a later arrival's conduction differs according to whether the first deposited — with the withdrawal control and **the grain shown to matter**, since the constituent grain is blind to a change the boundary grain sees | `the_deposit_conducts_and_the_later_current_rides_a_reflection.rs` |
 | the float mouth: a float **is** a dyadic and a deleted tail, bit-exact over subnormals and both zeros, point-vs-enclosure giving different verdicts | `a_float_is_a_dyadic_and_a_deleted_tail.rs` |
 | a foreign pretrained map entering as bits and **founding its axes by name** — irreducible factors of an exact rational operator, the unresolved factor carried as the founding, no root approximated | `the_foreign_map_founds_its_axes.rs` |
 | a tied readout returning the **exact face population with no maximum, no ranking, no winner**, on the card, with the candidate band read off the material as an octave | `the_readout_returns_a_fiber_not_a_winner.rs` |

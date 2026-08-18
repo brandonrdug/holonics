@@ -29,8 +29,13 @@ pub const TRAINING_TAG: SchemaTag = match SchemaTag::new(*b"HTEC") {
     None => panic!("HTEC is four octets of [A-Z0-9]"),
 };
 
-/// The codec's own layout version, the `\x01` in its `b"HTEC\0\0\0\x01"` prefix.
-pub const TRAINING_SCHEMA_VERSION: u32 = 1;
+/// The codec's own layout version, the `\x02` in its `b"HTEC\0\0\0\x02"` prefix.
+///
+/// Raised from `1` on 2026-08-16 when the training ecology began carrying its two-sided standing —
+/// per fiber, the confirmations and refutations that decide admission by quotient closure. A rest
+/// sealed at version `1` carries no refutation evidence, and reading it as "never refuted" would
+/// admit every fiber it holds, so the codec refuses it by name rather than defaulting.
+pub const TRAINING_SCHEMA_VERSION: u32 = 2;
 
 pub struct TrainingSchema;
 

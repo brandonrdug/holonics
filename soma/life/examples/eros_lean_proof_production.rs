@@ -212,6 +212,76 @@ fn lineage(candidate: &LeanProofCandidate) -> Vec<String> {
 }
 
 /// The theorem the ecology was never shown, posed in the environment Lean core alone can check.
+
+/// **Three real projective-geometry goals, posed against the corpus's own Swing file.**
+///
+/// `ElementaryHolonics/Geometry/CrossRatio.lean` carries the ordered Swing carrier `swingPair`, its
+/// projective comparison `ProjectivelyEq` (cross multiplication, no division), the scalar
+/// `crossRatio`, and four theorems relating them. These goals are about **that geometry** — the
+/// invariance of the Swing under affine coordinate change — and not about the machine's own proof
+/// plumbing. The motions a candidate composes are therefore real geometry lemmas, and a conflicted
+/// verdict says a lemma carries in one projective situation and not another.
+fn swing_problems() -> Vec<LeanProofProblem> {
+    let prefix = "import ElementaryHolonics.Geometry.CrossRatio\n\
+                  namespace Soma.Holonics\n\
+                  variable {K : Type*} [Field K]"
+        .to_owned();
+    let suffix = "end Soma.Holonics".to_owned();
+    let scope = BTreeSet::from(["CrossRatio.lean".to_owned()]);
+    vec![
+        // Scaling a ratio presentation leaves it projectively equal — the pure quotient fact.
+        LeanProofProblem {
+            identity: "swing-scale-projective".to_owned(),
+            source_scope: scope.clone(),
+            prefix: prefix.clone(),
+            theorem_header: "theorem probe_scale (u : K) (p : RatioPresentation K) : \
+                             (p.scale u).ProjectivelyEq p"
+                .to_owned(),
+            suffix: suffix.clone(),
+        },
+        // The Swing pair is carried by an affine change of coordinates onto a common square.
+        LeanProofProblem {
+            identity: "swing-affine-pair".to_owned(),
+            source_scope: scope.clone(),
+            prefix: prefix.clone(),
+            theorem_header: "theorem probe_pair (a b c d u v : K) : \
+                             swingPair (u * a + v) (u * b + v) (u * c + v) (u * d + v) = \
+                             (swingPair a b c d).scale (u * u)"
+                .to_owned(),
+            suffix: suffix.clone(),
+        },
+        // THE SHARPEST GOAL, and it is the corpus's own distinction. The PAIR identity above
+        // needs no hypothesis at all; the scalar cross-ratio is a QUOTIENT of that pair and needs
+        // three nonvanishing conditions — `u ≠ 0`, `c - b ≠ 0`, `d - a ≠ 0` — because a division
+        // was taken. If the classification is reading the geometry rather than the harness, the
+        // motions that route through `crossRatio` must behave differently from those that stay on
+        // `swingPair`.
+        LeanProofProblem {
+            identity: "swing-cross-ratio-quotient".to_owned(),
+            source_scope: BTreeSet::from(["CrossRatio.lean".to_owned()]),
+            prefix: prefix.clone(),
+            theorem_header: "theorem probe_quotient (a b c d u v : K) (hu : u ≠ 0) \
+                             (hcb : c - b ≠ 0) (hda : d - a ≠ 0) : \
+                             crossRatio (u * a + v) (u * b + v) (u * c + v) (u * d + v) = \
+                             crossRatio a b c d"
+                .to_owned(),
+            suffix: suffix.clone(),
+        },
+        // And the projective statement that follows from the two above composed.
+        LeanProofProblem {
+            identity: "swing-affine-projective".to_owned(),
+            source_scope: scope,
+            prefix,
+            theorem_header: "theorem probe_projective (a b c d u v : K) : \
+                             RatioPresentation.ProjectivelyEq \
+                             (swingPair (u * a + v) (u * b + v) (u * c + v) (u * d + v)) \
+                             (swingPair a b c d)"
+                .to_owned(),
+            suffix,
+        },
+    ]
+}
+
 fn core_problem() -> LeanProofProblem {
     LeanProofProblem {
         identity: "carrier-transport".to_owned(),
@@ -586,6 +656,148 @@ fn main() {
         })
         .count();
     let mathematical_obstructions = returns.obstruction_extent() - environment_obstructions;
+    // ---------------------------------------------------------------------------------------
+    // The admission law of `holonic_training`, applied to mathematics over the same material the
+    // kernel already returned. The conditioning path had to recover its negative side from its own
+    // prior predictions because it only watches; here the kernel ANSWERS, so `Obstructed` is a
+    // refusal of the motions that submission carried, with a verbatim diagnostic behind it.
+    {
+        use life::lean_mathematics::kernel_returns::motion_admissions;
+        use life::holonic_training::FiberAdmission;
+        let sorted = motion_admissions(&returns);
+        let extent: usize = sorted.values().map(Vec::len).sum();
+        println!("\n    --- the motions, admitted by quotient closure rather than by a count");
+        println!("      distinct motions submitted   {extent}");
+        for verdict in [
+            FiberAdmission::Admitted,
+            FiberAdmission::Conflicted,
+            FiberAdmission::Refuted,
+            FiberAdmission::Open,
+        ] {
+            let members = sorted.get(&verdict).map_or(0, Vec::len);
+            let gloss = match verdict {
+                FiberAdmission::Admitted => "carried every time it was submitted",
+                FiberAdmission::Conflicted => "carried sometimes — its chart is doing work its name does not",
+                FiberAdmission::Refuted => "never carried",
+                FiberAdmission::Open => "never submitted",
+            };
+            println!("      {:<12} {members:>4}   {gloss}", format!("{verdict:?}"));
+        }
+        for verdict in [FiberAdmission::Admitted, FiberAdmission::Conflicted] {
+            let Some(members) = sorted.get(&verdict) else {
+                continue;
+            };
+            println!("\n      {verdict:?}:");
+            for (key, standing) in members.iter().take(10) {
+                println!(
+                    "        {key:<52} confirmed {:>3}  refuted {:>3}",
+                    standing.confirmations, standing.refutations
+                );
+            }
+            if members.len() > 10 {
+                println!("        ... {} further, all retained", members.len() - 10);
+            }
+        }
+        println!(
+            "\n      A CONFLICTED motion is a junction, not a bad tactic: it closes some goals and\n\
+             \x20     not others, so a recognition condition is owed before it can be an atlas edge.\n\
+             \x20     That is `H.0362`'s requirement on a formulation node, arriving as a measurement."
+        );
+    }
+
+    // ---------------------------------------------------------------- real geometry
+    // The classification above ran over this repository's proof PLUMBING — `formal_carry` and
+    // `exact_chart_carry` are declarations authored to exercise the kernel loop, so a verdict on
+    // them says nothing mathematical. These three goals are about the projective Swing: whether
+    // the cross-ratio's carrier survives an affine change of coordinates. The motions are real
+    // geometry lemmas and the verdicts are about geometry.
+    {
+        use life::holonic_training::FiberAdmission;
+        use life::lean_mathematics::kernel_returns::motion_admissions;
+        let geometry_project = root.join("soma/formal/elementary-holonics");
+        println!("\n=== real geometry: the projective Swing, three goals against the kernel");
+        println!("    kernel project   {}", geometry_project.display());
+        let world = LeanKernelWorld::new(
+            &geometry_project,
+            root.join("output/lean-proof-production-swing"),
+            4,
+        );
+        match world {
+            Err(refusal) => println!("    the geometry kernel world refused: {refusal:?}"),
+            Ok(world) => {
+                let mut families = Vec::new();
+                for problem in swing_problems() {
+                    let identity = problem.identity.clone();
+                    let Ok(kernel_problem) = ecology.materialize_kernel_problem(&problem) else {
+                        println!("    {identity:<26} the problem did not materialize");
+                        continue;
+                    };
+                    match ecology.generate_proof_candidates(&kernel_problem) {
+                        Err(refusal) => {
+                            println!("    {identity:<26} no candidates: {refusal:?}");
+                        }
+                        Ok((reached, candidates)) => match world.grade_all(&kernel_problem, &candidates)
+                        {
+                            Err(refusal) => {
+                                println!("    {identity:<26} grading refused: {refusal:?}");
+                            }
+                            Ok(returns) => {
+                                println!(
+                                    "    {identity:<26} reached {:>3} declarations, {:>3} paths, \
+                                     {:>2} admitted, {:>3} obstructed",
+                                    reached.len(),
+                                    candidates.len(),
+                                    returns.kernel_admitted_extent(),
+                                    returns.obstruction_extent()
+                                );
+                                families.push(returns);
+                            }
+                        },
+                    }
+                }
+                if families.is_empty() {
+                    println!("    no geometry family graded, so no motion carries a verdict here");
+                } else {
+                    let mut standing: std::collections::BTreeMap<String, (u64, u64)> =
+                        std::collections::BTreeMap::new();
+                    for family in &families {
+                        for (key, side) in motion_admissions(family) {
+                            for (name, seen) in side {
+                                let entry = standing.entry(name).or_default();
+                                entry.0 += seen.confirmations;
+                                entry.1 += seen.refutations;
+                                let _ = key;
+                            }
+                        }
+                    }
+                    println!("\n    the geometry motions, admitted by quotient closure");
+                    let verdict = |confirmed: u64, refuted: u64| match (confirmed, refuted) {
+                        (0, 0) => FiberAdmission::Open,
+                        (_, 0) => FiberAdmission::Admitted,
+                        (0, _) => FiberAdmission::Refuted,
+                        _ => FiberAdmission::Conflicted,
+                    };
+                    for wanted in [
+                        FiberAdmission::Admitted,
+                        FiberAdmission::Conflicted,
+                        FiberAdmission::Refuted,
+                    ] {
+                        let members: Vec<_> = standing
+                            .iter()
+                            .filter(|(_, (confirmed, refuted))| verdict(*confirmed, *refuted) == wanted)
+                            .collect();
+                        println!("      {:<12} {:>3}", format!("{wanted:?}"), members.len());
+                        for (name, (confirmed, refuted)) in members.iter().take(8) {
+                            println!(
+                                "        {name:<48} confirmed {confirmed:>3}  refuted {refuted:>3}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     println!("\n    --- reading the obstruction population");
     println!(
         "      mathematical      {mathematical_obstructions}  the kernel read the term and refused it"

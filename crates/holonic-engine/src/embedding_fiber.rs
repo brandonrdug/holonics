@@ -27,14 +27,24 @@
 //! `reconstruction_fiber` already builds the object and says the same in its own opening: *"Nothing
 //! chooses a surface."* This module supplies that organ's exact scores at map scale and stops there.
 //!
-//! # The two charts, and neither is a cpu
+//! # The two charts, and neither is a host
+//!
+//! **QUOTATION REPAIRED 2026-08-18.** This block read *"stop calling the CPU the **'cpu'**"* and then
+//! *"**`cpu`** is CUDA's word"*. Both were wrong: the ruling is `host`, and `host` is CUDA's word —
+//! `cpu` is not. A mechanical `host → cpu` sweep passed **through the quotation marks**, leaving
+//! Brandon quoted as telling himself not to call the CPU "the cpu". `CLAUDE.md` and
+//! `canon/THE_SURFACES_ARE_PATHS.md` both carry the correct form.
+//!
+//! **A corrupted quotation is the contamination `CLAUDE.md` §9 calls hardest to detect**, because no
+//! later reader re-checks a provenance line — that is what the line is for. A sweep that rewrites
+//! prose must not enter a quotation, and this one did.
 //!
 //! Brandon, 2026-08-13, correcting the vocabulary this module was about to be written in: *"stop
-//! calling the CPU the 'cpu', it's just a misnomer. It's a bottleneck in a literal sense if
+//! calling the CPU the 'host', it's just a misnomer. It's a bottleneck in a literal sense if
 //! anything, it's a light-cone, a pathway. Same for the GPU, they're just paths that work
 //! differently."*
 //!
-//! `cpu` is CUDA's word and it carries a master/servant frame neither path has — which is the same
+//! `host` is CUDA's word and it carries a master/servant frame neither path has — which is the same
 //! defect as reading a `head` off a map that declares two KV heads: an exterior convention imported
 //! whole and then reasoned from. `hardware_cover` already has the right word, **chart**, and
 //! `CLAUDE.md` already rules that *"CPU, GPU, storage, network, checker, and sensor are apparatus
@@ -1078,6 +1088,181 @@ pub fn score_serially(
         scores.push(accumulated);
     }
     Ok(scores)
+}
+
+// -------------------------------------------------------------------------------------------------
+// The safetensors intake — lifted 2026-08-17
+// -------------------------------------------------------------------------------------------------
+
+/// **Reading a deposited map's own container format**, beside the float mouth it feeds.
+///
+/// Lifted here 2026-08-17 because **four separate drivers each carried their own copy** —
+/// `the_foreign_map_founds_its_axes`, `the_readout_founds_its_own_receivers`,
+/// `the_readout_returns_a_fiber_not_a_winner`, and `the_map_deposits_and_a_later_current_rides_it` —
+/// which is the duplication `canon/THE_DRIVER_ATLAS.md` was deposited to stop. A container parse is
+/// a codec intake and belongs with `align_bfloat16`, which is the only door its octets may enter by.
+///
+/// **`dtype` is retained and checked.** One of those four copies read `shape` and `data_offsets` and
+/// never consulted `dtype`, assuming a two-octet element unconditionally — so handed an `F32` file it
+/// would have returned a plausible population of garbage rather than refusing.
+pub mod safetensors {
+    use std::collections::BTreeMap;
+    use std::fs::File;
+    use std::io::{Read, Seek, SeekFrom};
+
+    /// The only element width this intake admits, named so the refusal can say what it wanted.
+    pub const ADMITTED_DTYPE: &str = "BF16";
+    const ADMITTED_OCTETS: u64 = 2;
+
+    /// One tensor's declared header row.
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    pub struct Entry {
+        pub dtype: String,
+        pub shape: Vec<usize>,
+        pub start: u64,
+        pub end: u64,
+    }
+
+    /// A container's declared tensors and where its payload begins.
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    pub struct Header {
+        pub map: BTreeMap<String, Entry>,
+        pub base: u64,
+    }
+
+    impl Header {
+        pub fn entry(&self, name: &str) -> Result<&Entry, String> {
+            self.map
+                .get(name)
+                .ok_or_else(|| format!("the container declares no tensor named {name:?}"))
+        }
+    }
+
+    /// Open a container and read its declared header.
+    pub fn read_header(path: &str) -> Result<(File, Header), String> {
+        let mut file = File::open(path).map_err(|error| format!("open {path}: {error}"))?;
+        let mut length = [0u8; 8];
+        file.read_exact(&mut length).map_err(|e| e.to_string())?;
+        let declared = u64::from_le_bytes(length);
+        let extent = usize::try_from(declared).map_err(|_| {
+            format!("{path}: declared header length {declared} exceeds this machine's extent")
+        })?;
+        let mut raw = vec![0u8; extent];
+        file.read_exact(&mut raw).map_err(|e| e.to_string())?;
+        let text = String::from_utf8(raw).map_err(|e| e.to_string())?;
+        let mut map = BTreeMap::new();
+        let mut at = 0usize;
+        while let Some(quote) = text[at..].find('"') {
+            let start = at + quote + 1;
+            let Some(end) = text[start..].find('"') else {
+                break;
+            };
+            let name = text[start..start + end].to_owned();
+            let rest = start + end + 1;
+            if !text[rest..].starts_with(':') || !name.contains('.') {
+                at = rest;
+                continue;
+            }
+            let segment_end = text[rest..].find('}').map_or(text.len(), |z| rest + z);
+            let segment = &text[rest..segment_end];
+            let pull = |key: &str, width: usize| -> Vec<u64> {
+                segment
+                    .find(key)
+                    .map(|position| {
+                        let from = rest + position + width;
+                        let to = text[from..].find(']').map_or(from, |z| from + z);
+                        text[from..to]
+                            .split(',')
+                            .filter_map(|value| value.trim().parse::<u64>().ok())
+                            .collect()
+                    })
+                    .unwrap_or_default()
+            };
+            let shape: Vec<usize> = pull("\"shape\":[", 9)
+                .into_iter()
+                .filter_map(|value| usize::try_from(value).ok())
+                .collect();
+            let offsets = pull("\"data_offsets\":[", 16);
+            let dtype = segment
+                .find("\"dtype\":\"")
+                .map(|position| {
+                    let from = rest + position + 9;
+                    let to = text[from..].find('"').map_or(from, |z| from + z);
+                    text[from..to].to_owned()
+                })
+                .unwrap_or_default();
+            if !shape.is_empty() && offsets.len() == 2 {
+                map.insert(
+                    name,
+                    Entry {
+                        dtype,
+                        shape,
+                        start: offsets[0],
+                        end: offsets[1],
+                    },
+                );
+            }
+            at = segment_end.max(rest);
+        }
+        Ok((
+            file,
+            Header {
+                map,
+                base: 8 + declared,
+            },
+        ))
+    }
+
+    /// Read a contiguous span of rows of a two-dimensional `BF16` tensor as raw words.
+    ///
+    /// The `dtype` is checked and the span is bounds-checked against the declared payload, so a
+    /// mis-shaped read refuses rather than returning octets from a neighbouring tensor.
+    pub fn read_rows(
+        file: &mut File,
+        header: &Header,
+        name: &str,
+        from_row: usize,
+        rows: usize,
+    ) -> Result<(Vec<u16>, usize), String> {
+        let entry = header.entry(name)?;
+        if entry.dtype != ADMITTED_DTYPE {
+            return Err(format!(
+                "{name}: this intake admits {ADMITTED_DTYPE} and the container declares {}",
+                entry.dtype
+            ));
+        }
+        if entry.shape.len() != 2 {
+            return Err(format!(
+                "{name}: this reader admits a two-dimensional tensor and the container declares {:?}",
+                entry.shape
+            ));
+        }
+        let width = entry.shape[1];
+        let end_row = from_row
+            .checked_add(rows)
+            .ok_or_else(|| format!("{name}: the requested span overflows"))?;
+        if end_row > entry.shape[0] {
+            return Err(format!(
+                "{name}: rows {from_row}..{end_row} reach past the declared {} rows",
+                entry.shape[0]
+            ));
+        }
+        let offset = entry.start + (from_row * width) as u64 * ADMITTED_OCTETS;
+        let octets = (rows * width) as u64 * ADMITTED_OCTETS;
+        if offset + octets > entry.end {
+            return Err(format!("{name}: the span reaches past the declared payload"));
+        }
+        file.seek(SeekFrom::Start(header.base + offset))
+            .map_err(|error| format!("{name}: seek: {error}"))?;
+        let mut raw = vec![0u8; usize::try_from(octets).map_err(|_| "span exceeds extent")?];
+        file.read_exact(&mut raw)
+            .map_err(|error| format!("{name}: read: {error}"))?;
+        let words = raw
+            .chunks_exact(2)
+            .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+            .collect();
+        Ok((words, width))
+    }
 }
 
 #[cfg(test)]

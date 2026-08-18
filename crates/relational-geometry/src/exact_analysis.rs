@@ -339,6 +339,10 @@ pub enum ExactAnalysisError {
     UnresolvedBoundary(u32),
     #[error("no exact ray avoided every polygon vertex")]
     NoAdmissibleWindingRay,
+    #[error("Borwein's chain needs a depth of at least one")]
+    BorweinDepthTooSmall,
+    #[error("Borwein weight {0} did not clear its denominator and is not an integer")]
+    BorweinWeightNotIntegral(u32),
 }
 
 fn factorial(value: u32) -> BigInt {
@@ -952,6 +956,327 @@ pub fn eta_second_derivative_bound(
     Ok(dyadic_ceil(&(finite + tail), config.dyadic_bits))
 }
 
+/// One term of the head chain, with the two faces it is built from **retained**.
+///
+/// `n^(-s) = exp(-sigma·log n) · cis(-tau·log n)`: an amplitude and a turn.
+/// [`negative_complex_power`] forms both and returns only their product, so the
+/// magnitude and the winding arrive already multiplied and a reader cannot ask
+/// which one moved. This carries both, together with the term's **address** in
+/// the free abelian group on the primes — `n = prod p^a`, which is the collapsed
+/// face that unique factorization reopens.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EtaChainTerm {
+    pub base: u32,
+    /// `n = prod p^a`, the reopened address.
+    pub address: Vec<PrimeValuation>,
+    pub log_base: RatInterval,
+    /// `exp(-sigma·log n)` — the magnitude face.
+    pub amplitude: RatInterval,
+    /// `-tau·log n` — the turn, in the additive chart, before `cis` carries it up.
+    pub turn: RatInterval,
+    pub value: ComplexInterval,
+}
+
+/// One Euler--Maclaurin correction, read as a crossing rather than as an error term.
+///
+/// The correction of index `2k` is
+/// `B_(2k)/(2k)! · (s)_(2k-1) · N^(-s) / N^(2k-1)`, and its three parts are three
+/// different objects: an **exact rational** weight, a **shift-orbit product**
+/// `(s)_(2k-1) = s(s+1)...(s+2k-2)` which is the rising factorial, and a decay.
+///
+/// The odd-index Bernoulli numbers vanish, so only **odd crossing orders** occur;
+/// that is a parity selection rule and it decides which terms exist before any
+/// magnitude is computed. The sign of `B_(2k)` alternates, so the hand alternates
+/// with the crossing.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EulerMaclaurinCrossing {
+    /// `2k - 1`, the order of the derivative crossing.
+    pub crossing_order: u32,
+    pub bernoulli_index: u32,
+    pub bernoulli: Rat,
+    /// `B_(2k)/(2k)!`, exact.
+    pub coefficient: Rat,
+    /// The sign of `B_(2k)`: which way this crossing turns.
+    pub hand: i32,
+    /// `(s)_(2k-1)`, the rising factorial — the shift orbit of `s`, multiplied out.
+    pub pochhammer: ComplexInterval,
+    pub value: ComplexInterval,
+}
+
+/// The Euler--Maclaurin evaluation returned as the chain it is, not as its sum.
+///
+/// `zeta(s) = sum_(n<N) n^(-s) + N^(1-s)/(s-1) + N^(-s)/2 + sum_k crossing_k + R`
+///
+/// The identity behind it is an operator statement: `sigma = e^(partial)`, so
+/// `1/(e^partial - 1) = 1/partial · sum_n B_n partial^n / n!`. **Summation is
+/// integration composed with a series in the derivative whose coefficients are
+/// the Bernoulli rationals** — a chart transition between the difference chart
+/// and the differential one, with `B_n` as its connection coefficients.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EtaChainDecomposition {
+    pub receiver: ComplexReceiverBox,
+    pub head: Vec<EtaChainTerm>,
+    /// `N^(1-s)/(s-1)` — the integral term the chart transition pays for.
+    pub integral_term: ComplexInterval,
+    /// `N^(-s)/2` — the boundary half-term.
+    pub boundary_half: ComplexInterval,
+    pub crossings: Vec<EulerMaclaurinCrossing>,
+    pub remainder_radius: Rat,
+    pub zeta: ComplexInterval,
+    /// `1 - 2^(1-s)`, the alternating rebase carrying zeta to eta.
+    pub alternating_factor: ComplexInterval,
+    pub eta: ComplexInterval,
+}
+
+fn prime_address(mut base: u32) -> Vec<PrimeValuation> {
+    let mut address = Vec::new();
+    let mut prime = 2;
+    while prime * prime <= base {
+        let mut exponent = 0;
+        while base % prime == 0 {
+            base /= prime;
+            exponent += 1;
+        }
+        if exponent > 0 {
+            address.push(PrimeValuation { prime, exponent });
+        }
+        prime += 1;
+    }
+    if base > 1 {
+        address.push(PrimeValuation {
+            prime: base,
+            exponent: 1,
+        });
+    }
+    address
+}
+
+fn negative_complex_power_parts(
+    base: u32,
+    receiver: &ComplexReceiverBox,
+    config: &ExactSeriesConfig,
+) -> Result<EtaChainTerm, ExactAnalysisError> {
+    let logarithm = log_rational_interval(
+        &Rat::from_integer(BigInt::from(base)),
+        config.log_terms,
+        config.dyadic_bits,
+    )?;
+    let amplitude_exponent = receiver.sigma.multiply(&logarithm).neg();
+    let amplitude = exp_interval(
+        &amplitude_exponent,
+        config.exponential_terms,
+        config.dyadic_bits,
+    );
+    let turn = receiver.tau.multiply(&logarithm).neg();
+    let value = cis_interval(&turn, config.trigonometric_terms, config.dyadic_bits)
+        .multiply(&ComplexInterval::new(
+            amplitude.clone(),
+            RatInterval::point(Rat::zero()),
+        ))
+        .round_out(config.dyadic_bits);
+    Ok(EtaChainTerm {
+        base,
+        address: prime_address(base),
+        log_base: logarithm,
+        amplitude,
+        turn,
+        value,
+    })
+}
+
+/// Return the Euler--Maclaurin chain for `eta` at one receiver, term by term.
+///
+/// Every quantity is exact: the head terms are amplitudes and turns over `Rat`,
+/// the Bernoulli numbers are exact rationals, the rising factorial is an exact
+/// interval product, and the remainder is a certified radius. Nothing here is a
+/// float and nothing is rounded to a decimal face.
+pub fn eta_chain_decomposition(
+    receiver: &ComplexReceiverBox,
+    config: &ExactSeriesConfig,
+) -> Result<EtaChainDecomposition, ExactAnalysisError> {
+    if !receiver.sigma.lower.is_positive() {
+        return Err(ExactAnalysisError::NonPositiveSigma);
+    }
+    if receiver.sigma.lower <= Rat::one()
+        && receiver.sigma.upper >= Rat::one()
+        && receiver.tau.contains_zero()
+    {
+        return Err(ExactAnalysisError::ZetaPoleInReceiver);
+    }
+    let bits = config.dyadic_bits;
+    let start = config.euler_maclaurin_start;
+    let order = config.euler_maclaurin_order;
+
+    let mut head = Vec::new();
+    let mut value = ComplexInterval::zero();
+    for base in 1..start {
+        let term = negative_complex_power_parts(base, receiver, config)?;
+        value = value.add(&term.value).round_out(bits);
+        head.push(term);
+    }
+
+    let start_power = negative_complex_power(start, receiver, config)?;
+    let s_minus_one =
+        ComplexInterval::new(receiver.sigma.translate(&-Rat::one()), receiver.tau.clone());
+    let integral_term = start_power
+        .scale(&integer(i64::from(start)))
+        .divide(&s_minus_one)?
+        .round_out(bits);
+    let boundary_half = start_power
+        .scale(&ratio(BigInt::one(), BigInt::from(2)))
+        .round_out(bits);
+    value = value
+        .add(&integral_term)
+        .add(&boundary_half)
+        .round_out(bits);
+
+    let mut crossings = Vec::new();
+    for correction in 1..=order {
+        let even = 2 * correction;
+        let bernoulli = bernoulli_number(even);
+        let coefficient = bernoulli.clone() / Rat::from_integer(factorial(even));
+        let start_scale = ratio(BigInt::one(), BigInt::from(start).pow(even - 1));
+        let pochhammer = rising_complex(receiver, even - 1);
+        let term = pochhammer
+            .multiply(&start_power)
+            .scale(&(coefficient.clone() * start_scale))
+            .round_out(bits);
+        value = value.add(&term).round_out(bits);
+        let hand = if bernoulli.numer().is_negative() {
+            -1
+        } else if bernoulli.numer().is_zero() {
+            0
+        } else {
+            1
+        };
+        crossings.push(EulerMaclaurinCrossing {
+            crossing_order: even - 1,
+            bernoulli_index: even,
+            bernoulli,
+            coefficient,
+            hand,
+            pochhammer,
+            value: term,
+        });
+    }
+
+    let (zeta, remainder_radius) = zeta_euler_maclaurin(receiver, config)?;
+    let two_power = negative_complex_power(2, receiver, config)?.scale(&integer(2));
+    let alternating_factor =
+        ComplexInterval::point(RatComplex::new(Rat::one(), Rat::zero())).subtract(&two_power);
+    let eta = alternating_factor.multiply(&zeta).round_out(bits);
+    Ok(EtaChainDecomposition {
+        receiver: receiver.clone(),
+        head,
+        integral_term,
+        boundary_half,
+        crossings,
+        remainder_radius,
+        zeta,
+        alternating_factor,
+        eta,
+    })
+}
+
+/// One term of Borwein's finite alternating chain.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BorweinTerm {
+    pub index: u32,
+    /// `d_k - d_n`, an exact integer. Borwein's weights are integers, not samples.
+    pub weight: BigInt,
+    /// `(-1)^k` — the alternating hand.
+    pub hand: i32,
+    /// `(k+1)^(-s)`.
+    pub power: ComplexInterval,
+    pub value: ComplexInterval,
+}
+
+/// Borwein's chain for `eta`, exact in its weights and **uncertified** in its tail.
+///
+/// `eta(s) = (-1/d_n) sum_(k<n) (-1)^k (d_k - d_n) (k+1)^(-s) + gamma_n(s)`
+/// with `d_k = n sum_(i<=k) (n+i-1)! 4^i / ((n-i)! (2i)!)`, every `d_k` an integer.
+///
+/// **This type is deliberately not an [`EtaEvaluation`].** Borwein's remainder
+/// obeys `|gamma_n(s)| <= 3/(3+sqrt 8)^n · 1/|Gamma(s)|`, and this body owns no
+/// Gamma function — measured 2026-08-16, `grep -rniF "gamma"` over `crates` and
+/// `soma` returns only variable names. So the tail cannot be certified here and
+/// the value must never be presented as an enclosure. What it is good for is a
+/// **second frame**: an independent chain whose value may be checked against the
+/// certified Euler--Maclaurin enclosure, and an invariant is only visible across
+/// two frames.
+///
+/// The decay base is `3 + sqrt 8 = 3 + 2 sqrt 2 = (1 + sqrt 2)^2`, the square of
+/// the fundamental unit of the ring adjoining `sqrt 2`. The condensation's rate
+/// is a fundamental unit, not a tuned constant.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EtaBorweinChain {
+    pub receiver: ComplexReceiverBox,
+    pub depth: u32,
+    pub weights: Vec<BigInt>,
+    pub d_final: BigInt,
+    pub terms: Vec<BorweinTerm>,
+    pub value: ComplexInterval,
+}
+
+fn borwein_weights(depth: u32) -> Result<Vec<BigInt>, ExactAnalysisError> {
+    if depth == 0 {
+        return Err(ExactAnalysisError::BorweinDepthTooSmall);
+    }
+    let outer = Rat::from_integer(BigInt::from(depth));
+    let mut running = Rat::zero();
+    let mut weights = Vec::with_capacity(depth as usize + 1);
+    for index in 0..=depth {
+        let numerator = factorial(depth + index - 1) * BigInt::from(4u32).pow(index);
+        let denominator = factorial(depth - index) * factorial(2 * index);
+        running += Rat::new(numerator, denominator);
+        let value = &outer * &running;
+        if !value.denom().is_one() {
+            return Err(ExactAnalysisError::BorweinWeightNotIntegral(index));
+        }
+        weights.push(value.numer().clone());
+    }
+    Ok(weights)
+}
+
+/// Build Borwein's chain at one receiver. See [`EtaBorweinChain`] for the bound
+/// this cannot certify and why the type is separate.
+pub fn eta_borwein_chain(
+    receiver: &ComplexReceiverBox,
+    depth: u32,
+    config: &ExactSeriesConfig,
+) -> Result<EtaBorweinChain, ExactAnalysisError> {
+    let weights = borwein_weights(depth)?;
+    let d_final = weights[depth as usize].clone();
+    let mut accumulated = ComplexInterval::zero();
+    let mut terms = Vec::new();
+    for index in 0..depth {
+        let weight = &weights[index as usize] - &d_final;
+        let hand = if index % 2 == 0 { 1 } else { -1 };
+        let power = negative_complex_power(index + 1, receiver, config)?;
+        let scaled = Rat::from_integer(&weight * BigInt::from(hand));
+        let term = power.scale(&scaled).round_out(config.dyadic_bits);
+        accumulated = accumulated.add(&term).round_out(config.dyadic_bits);
+        terms.push(BorweinTerm {
+            index,
+            weight,
+            hand,
+            power,
+            value: term,
+        });
+    }
+    let value = accumulated
+        .scale(&(-Rat::one() / Rat::from_integer(d_final.clone())))
+        .round_out(config.dyadic_bits);
+    Ok(EtaBorweinChain {
+        receiver: receiver.clone(),
+        depth,
+        weights,
+        d_final,
+        terms,
+        value,
+    })
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PrimeValuation {
     pub prime: u32,
@@ -1512,6 +1837,107 @@ mod tests {
         );
         assert_eq!(ahead.with_the_turn.len(), behind.against_the_turn.len());
         assert_eq!(ahead.against_the_turn.len(), behind.with_the_turn.len());
+    }
+
+
+    fn probe_config() -> ExactSeriesConfig {
+        ExactSeriesConfig {
+            dyadic_bits: 96,
+            euler_maclaurin_start: 12,
+            euler_maclaurin_order: 10,
+            log_terms: 28,
+            exponential_terms: 18,
+            trigonometric_terms: 16,
+        }
+    }
+
+    fn probe_point() -> ComplexReceiverBox {
+        ComplexReceiverBox::point(rat(1, 2), rat(14, 1))
+    }
+
+    /// The chain must reproduce the value the plain evaluator returns. If the
+    /// decomposition drifted from `zeta_euler_maclaurin` this fires.
+    #[test]
+    fn the_chain_returns_the_same_eta_as_the_plain_evaluation() {
+        let config = probe_config();
+        let point = probe_point();
+        let chain = eta_chain_decomposition(&point, &config).expect("the chain");
+        let plain = eta_evaluate(&point, &config).expect("the plain evaluation");
+        assert_eq!(chain.eta, plain.value);
+        assert_eq!(chain.head.len() as u32, config.euler_maclaurin_start - 1);
+        assert_eq!(chain.crossings.len() as u32, config.euler_maclaurin_order);
+    }
+
+    /// The odd-index Bernoulli numbers vanish, so every crossing this chain carries
+    /// has ODD order. That is a parity selection rule: it decides which terms exist
+    /// before any magnitude is computed.
+    #[test]
+    fn every_euler_maclaurin_crossing_has_odd_order_and_an_alternating_hand() {
+        let chain = eta_chain_decomposition(&probe_point(), &probe_config()).expect("the chain");
+        let mut expected_hand = 1;
+        for crossing in &chain.crossings {
+            assert_eq!(
+                crossing.crossing_order % 2,
+                1,
+                "crossing order {} is even",
+                crossing.crossing_order
+            );
+            assert!(!crossing.bernoulli.numer().is_zero());
+            assert_eq!(
+                crossing.hand, expected_hand,
+                "the hand did not alternate at order {}",
+                crossing.crossing_order
+            );
+            expected_hand = -expected_hand;
+        }
+    }
+
+    /// Every head term carries its address in the free abelian group on the primes,
+    /// and the address must multiply back to the term's own base.
+    #[test]
+    fn every_head_term_address_reopens_to_its_base() {
+        let chain = eta_chain_decomposition(&probe_point(), &probe_config()).expect("the chain");
+        for term in &chain.head {
+            let rebuilt = term
+                .address
+                .iter()
+                .fold(1u32, |product, valuation| {
+                    product * valuation.prime.pow(valuation.exponent)
+                });
+            assert_eq!(rebuilt, term.base, "address did not reopen to its base");
+        }
+    }
+
+    /// Borwein's weights are integers — `borwein_weights` refuses otherwise — and
+    /// the first is always one.
+    #[test]
+    fn borwein_weights_are_integers_and_open_at_one() {
+        for depth in 1u32..=14 {
+            let weights = borwein_weights(depth).expect("integral weights");
+            assert_eq!(weights.len(), depth as usize + 1);
+            assert_eq!(weights[0], BigInt::one(), "d_0 must be 1 at depth {depth}");
+        }
+        assert!(borwein_weights(0).is_err(), "depth zero must refuse");
+    }
+
+    /// The two frames. Borwein carries no certificate here — his bound needs Gamma,
+    /// which this body does not own — so the check is that his chain lands inside the
+    /// Euler--Maclaurin enclosure once it is deep enough, AND that it does NOT when it
+    /// is shallow. Without the second arm the first could not fail.
+    #[test]
+    fn the_two_frames_meet_only_once_borwein_is_deep_enough() {
+        let config = probe_config();
+        let point = probe_point();
+        let certified = eta_evaluate(&point, &config).expect("the certified frame").value;
+        let overlaps = |left: &RatInterval, right: &RatInterval| {
+            left.lower <= right.upper && right.lower <= left.upper
+        };
+        let agrees = |depth: u32| {
+            let borwein = eta_borwein_chain(&point, depth, &config).expect("the Borwein chain");
+            overlaps(&borwein.value.re, &certified.re) && overlaps(&borwein.value.im, &certified.im)
+        };
+        assert!(!agrees(6), "a shallow Borwein chain must NOT reach the enclosure");
+        assert!(agrees(32), "a deep Borwein chain must reach the enclosure");
     }
 
     #[test]

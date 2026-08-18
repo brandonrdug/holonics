@@ -253,10 +253,13 @@ Writing $chevron.l psi,phi chevron.r$ computes the same number and presents the
 two arguments as one species.  They are not: one is what is presented and the
 other is what presents it.  Riesz makes the conflation harmless for the *value*
 and lossy for the *reading*, and the reading is what the framework is about.
-The payoff is immediate: a receiver family is complete exactly when it resolves
-the identity, so non-reconstruction is no longer a caveat carried in prose --
-it is the inequality $sum_i ketbra(a_i, a_i) != I$, and the defect $I-P$ is a
-computable object.
+The payoff is immediate: a receiver family orthonormal in a declared metric is
+complete exactly when it resolves the identity, so non-reconstruction is no
+longer a caveat carried in prose -- it is the inequality
+$sum_i ketbra(a_i, a_i) != I$, and the defect $I-P$ is a computable object.
+The metric is not decoration: for a family that merely spans, the sum is the
+frame operator rather than a projection, and reconstruction runs through the
+dual frame.
 
 == Crossing depth, and why the correction terms alternate
 

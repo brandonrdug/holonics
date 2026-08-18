@@ -190,7 +190,9 @@ use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use holonic_structure::{Chain, ChainEnd, Composes, Hand, Relating};
 use relational_geometry::Rat;
+use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum LeaderError {
@@ -733,6 +735,206 @@ impl LeaderLaw {
         }
         Ok(())
     }
+}
+
+// ---------------------------------------------------------------------------------------------
+// the two determination laws, as chain links — 2026-08-17
+
+/// **What a step carried, and what it committed past without re-reading.**
+///
+/// Additive, because a quadrature's transport is a running sum. The second coordinate is the whole
+/// content of the type: a `Found` re-reads the material at every grain and commits past nothing, so
+/// its `uninspected` is zero; a `Ride` commits across its whole span on the strength of a run of
+/// agreement, so its `uninspected` is that span less the one grain it did read.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CommittedTransport {
+    /// The winding this step deposited into the running sum.
+    pub winding: Rat,
+    /// Material the step committed past without re-reading. Zero for a `Found`.
+    pub uninspected: Rat,
+}
+
+impl Composes for CommittedTransport {
+    type Defect = Self;
+    /// **What the chain committed past**, undivided. A pure-`Found` chain's remainder is identically
+    /// zero and *that receipt is a definition* — the evidence is a mixed chain whose remainder is
+    /// not, and whose refoundings are named.
+    type Remainder = Rat;
+
+    fn identity() -> Self {
+        Self {
+            winding: Rat::zero(),
+            uninspected: Rat::zero(),
+        }
+    }
+
+    fn compose(&self, next: &Self) -> Self {
+        Self {
+            winding: &self.winding + &next.winding,
+            uninspected: &self.uninspected + &next.uninspected,
+        }
+    }
+
+    fn defect(direct: &Self, composed: &Self) -> Self {
+        Self {
+            winding: &direct.winding - &composed.winding,
+            uninspected: &direct.uninspected - &composed.uninspected,
+        }
+    }
+
+    fn closed(defect: &Self) -> bool {
+        defect.winding.is_zero() && defect.uninspected.is_zero()
+    }
+
+    fn remainder(&self) -> Rat {
+        self.uninspected.clone()
+    }
+
+    fn is_empty(remainder: &Rat) -> bool {
+        remainder.is_zero()
+    }
+}
+
+/// **One step of a growth, as a chain link — the two determination laws made composable.**
+///
+/// `integrate_by_leaders` has composed [`ExtensionKind::Found`] and [`ExtensionKind::Ride`] since it
+/// was written, and they are genuinely two determination laws: a `Found` re-reads the material at its
+/// tip and its span is one grain, while a `Ride` is licensed **only** by a run of exact agreement and
+/// then extrapolates one jet across the whole reach **with no landing check** under
+/// [`RideDiscipline::GermBounded`] — ballistic, its error legible at the next tip, where the residual
+/// revokes the licence and refounds the axis.
+///
+/// **They lived inside one integrator and nothing could compose them.** Measured 2026-08-17 by
+/// `grep -rn "impl Relating for" --include='*.rs' crates soma` → **3**, and neither was among them,
+/// so `Chain::compose`, `defect_against`, `holonomy` and `remainder` could not see the growth at all.
+/// This is that lift, and the question it makes askable is the one no existing chain can ask:
+/// **what separates going through from going straight, when some of the steps were committed
+/// ballistically?**
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CommittedStep {
+    pub index: usize,
+    pub kind: ExtensionKind,
+    pub span: Rat,
+    /// The residual the material returned against this step's own prediction. Zero when it agreed —
+    /// and a run of zeros is exactly what licenses the next ride.
+    pub residual: Rat,
+    transport: CommittedTransport,
+}
+
+impl CommittedStep {
+    /// Read one extension as a link, with the residual the growth returned at it.
+    ///
+    /// `residual` is the growth's own `RefoundingObstruction::winding_residual` where one was
+    /// returned at this index, and zero where the material agreed.
+    pub fn of_extension(extension: &Extension, residual: Rat, grain: &Rat) -> Self {
+        let uninspected = match &extension.kind {
+            ExtensionKind::Found => Rat::zero(),
+            // The ride read the jet at its tip and committed across the rest.
+            ExtensionKind::Ride { .. } => {
+                let past = &extension.span - grain;
+                if past.is_positive() { past } else { Rat::zero() }
+            }
+        };
+        Self {
+            index: extension.index,
+            kind: extension.kind.clone(),
+            span: extension.span.clone(),
+            residual: residual.clone(),
+            transport: CommittedTransport {
+                winding: extension.winding.clone(),
+                uninspected,
+            },
+        }
+    }
+
+    /// Whether this step committed past material it did not read.
+    pub fn is_committed(&self) -> bool {
+        !self.transport.uninspected.is_zero()
+    }
+}
+
+impl Relating for CommittedStep {
+    /// The reach WEIGHS: how far this step carried. It bends what follows and decides nothing.
+    type Weight = Rat;
+    type Transport = CommittedTransport;
+
+    fn reach(&self) -> &Rat {
+        &self.span
+    }
+
+    /// **The hand is the sign of the STORED face**, which is the convention every implementor in this
+    /// tree reads and which was audited across all of them on 2026-08-17.
+    ///
+    /// For a step the stored face is the **residual** — what the material returned against the
+    /// prediction and therefore did *not* transport — exactly as `M₂₁` is at a junction and `aim` is
+    /// at an arrow. So `Ortho` is the step whose residual vanished: nothing stored, everything
+    /// carried. **And that is not a coincidence of convention — a run of `Ortho` steps is precisely
+    /// what licenses the next ride.**
+    fn hand(&self) -> Hand {
+        if self.residual.is_zero() {
+            Hand::Ortho
+        } else if self.residual.is_positive() {
+            Hand::Cohere
+        } else {
+            Hand::Anti
+        }
+    }
+
+    fn transport(&self) -> &CommittedTransport {
+        &self.transport
+    }
+}
+
+/// A growth read as a chain of its own steps.
+pub type GrowthChain<N> = Chain<N, CommittedStep, GrowthStanding>;
+
+/// Why a growth chain stands where it does.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum GrowthStanding {
+    /// The growth is continuing and the axis stands.
+    Carrying(Rat),
+    /// The material ran out. The chain ends because the region does, not because a count did.
+    RegionExhausted,
+    /// The founded axis failed to predict the next tip and was refounded here.
+    Refounded(Rat),
+}
+
+/// **Read a whole growth as a chain**, so its composition, its cocycle defect and its remainder are
+/// the chain machinery's rather than this module's.
+pub fn chain_of(quadrature: &LeaderQuadrature) -> GrowthChain<usize> {
+    let residual_at: BTreeMap<usize, Rat> = quadrature
+        .obstructions
+        .iter()
+        .map(|obstruction| {
+            (
+                obstruction.extension_index,
+                obstruction.winding_residual.clone(),
+            )
+        })
+        .collect();
+    let mut chain = Chain::founded(
+        0usize,
+        ChainEnd::Continues(GrowthStanding::RegionExhausted),
+        GrowthStanding::Carrying(Rat::zero()),
+    );
+    for extension in &quadrature.extensions {
+        let residual = residual_at
+            .get(&extension.index)
+            .cloned()
+            .unwrap_or_else(Rat::zero);
+        let standing = if residual.is_zero() {
+            GrowthStanding::Carrying(extension.running_sum.clone())
+        } else {
+            GrowthStanding::Refounded(residual.clone())
+        };
+        chain.carry(
+            CommittedStep::of_extension(extension, residual, &quadrature.grain),
+            extension.index + 1,
+            standing,
+        );
+    }
+    chain.terminate(GrowthStanding::RegionExhausted);
+    chain
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1803,6 +2005,142 @@ mod tests {
     }
 
     // --- provably nonzero controls ------------------------------------------------------------
+
+    // -----------------------------------------------------------------------------------------
+    // THE TWO DETERMINATION LAWS AS CHAIN LINKS — 2026-08-17
+    // -----------------------------------------------------------------------------------------
+
+    /// ★ WHAT SEPARATES GOING THROUGH FROM GOING STRAIGHT, WHEN SOME STEPS WERE COMMITTED
+    /// BALLISTICALLY — the question no existing chain in this tree could ask.
+    ///
+    /// Two growths over **one material**: one that never rides, so every step re-reads the material
+    /// at its own grain, and one that rides, so some steps commit across a whole reach on the
+    /// strength of a run of exact agreement. The winding must agree — that is this module's own
+    /// theorem and it is why riding is lawful — and the **committed remainder** must not, because
+    /// that is the whole difference between the two determination laws.
+    #[test]
+    fn the_winding_agrees_and_the_committed_remainder_does_not() {
+        let (boundary, expected) = unaligned_piecewise();
+        let grain = rat(1, 4);
+        let walked = run(&boundary, grain.clone(), RideDiscipline::GrainOnly);
+        let ridden = run(&boundary, grain.clone(), RideDiscipline::GermBounded);
+
+        // The material is the same and both growths return it exactly.
+        assert_eq!(walked.area, expected);
+        assert_eq!(ridden.area, expected);
+        // THE ANTI-VACUITY ARM: the ridden growth must actually ride, or there are not two laws here.
+        assert!(ridden.ride_count() > 0, "nothing was ridden; there is one law, not two");
+        assert_eq!(walked.ride_count(), 0, "the control must never ride");
+
+        let walked_chain = chain_of(&walked);
+        let ridden_chain = chain_of(&ridden);
+        let straight = walked_chain.compose();
+        let through = ridden_chain.compose();
+
+        // ONE: the winding is the same. Going through and going straight deposit the same total.
+        assert_eq!(straight.winding, through.winding);
+        assert_eq!(straight.winding, expected);
+
+        // TWO: the committed remainders are not. THIS IS THE DETERMINATION-LAW MISMATCH, and it is
+        // invisible to the winding — a chain that carried only the running sum would report these
+        // two growths as identical.
+        assert!(
+            straight.uninspected.is_zero(),
+            "a chain that re-reads at every grain commits past nothing -- A DEFINITION, not evidence"
+        );
+        assert!(
+            through.uninspected.is_positive(),
+            "the ridden growth must have committed past material it did not read"
+        );
+
+        // THREE: the cocycle defect against the straight transport says exactly that, and says it in
+        // one coordinate rather than in prose.
+        let defect = ridden_chain.defect_against(&straight);
+        assert!(defect.winding.is_zero(), "the windings do not separate them");
+        assert!(!defect.uninspected.is_zero(), "the commitment does");
+        assert!(
+            !<CommittedTransport as Composes>::closed(&defect),
+            "the two determination laws do not compose to the same transport"
+        );
+
+        // FOUR: the chain's own remainder is the committed material, and `is_rebase` reads it.
+        assert!(walked_chain.is_rebase(), "walking every grain is a rebase with no remainder");
+        assert!(!ridden_chain.is_rebase(), "riding is not");
+    }
+
+    /// ★ THE HAND READS THE STORED FACE HERE TOO, AND A COMMITTED STEP STORED NOTHING — with the
+    /// relationship to the *preceding* step measured rather than assumed, because the first version
+    /// of this test assumed it and was wrong.
+    ///
+    /// The hand is the sign of the **stored face** at every implementor in this tree — `aim` at an
+    /// arrow, `M₂₁` at a junction, and the residual here, which is what the material returned against
+    /// the step's own prediction and therefore did *not* transport. `Ortho` is the step that stored
+    /// nothing.
+    ///
+    /// **What was assumed and is false:** that the step immediately before a ride also reads `Ortho`.
+    /// It does not — measured on `unaligned_piecewise` at grain `1/4`, a step preceding a committed
+    /// one reads `Anti`. A `RefoundingObstruction` is attributed to the extension whose *founded
+    /// axis* failed, and that index is not the index of the tip at which the failure was discovered,
+    /// so the residual sits one step from where a naive reading expects it. **That offset is a fact
+    /// about the growth's own bookkeeping and it is reported rather than asserted away.**
+    #[test]
+    fn a_committed_step_stored_nothing_and_the_preceding_hand_is_measured() {
+        let (boundary, _) = unaligned_piecewise();
+        let ridden = run(&boundary, rat(1, 4), RideDiscipline::GermBounded);
+        let chain = chain_of(&ridden);
+        let links = chain.links();
+        assert!(links.iter().any(|step| step.is_committed()), "no ride to check");
+        assert!(
+            !ridden.obstructions.is_empty(),
+            "the material must refound somewhere or the hand cannot vary"
+        );
+
+        // ONE, and it holds: every committed step's OWN residual vanished.
+        let committed: Vec<&CommittedStep> =
+            links.iter().filter(|step| step.is_committed()).collect();
+        assert!(!committed.is_empty());
+        for step in &committed {
+            assert_eq!(
+                step.hand(),
+                Hand::Ortho,
+                "a committed step stored nothing at index {}",
+                step.index
+            );
+        }
+
+        // TWO, MEASURED: the preceding hands are a population, not a constant. Both readings occur,
+        // which is what makes the hand a reading of the material rather than of the ride.
+        let preceding: Vec<Hand> = links
+            .iter()
+            .enumerate()
+            .filter(|(at, step)| step.is_committed() && *at > 0)
+            .map(|(at, _)| links[at - 1].hand())
+            .collect();
+        assert!(!preceding.is_empty());
+        assert!(
+            preceding.iter().any(|hand| *hand != Hand::Ortho),
+            "if every preceding hand were Ortho the reading would be forced by the licence"
+        );
+
+        // THREE, THE ANTI-VACUITY ARM: a refounding step stored something, so its hand is NOT Ortho.
+        // Without this the hand would be a constant wearing an enum.
+        let refounded: Vec<Hand> = links
+            .iter()
+            .filter(|step| !step.residual.is_zero())
+            .map(Relating::hand)
+            .collect();
+        assert!(!refounded.is_empty(), "no step stored anything");
+        assert!(
+            refounded.iter().all(|hand| *hand != Hand::Ortho),
+            "a refounding step stored a residual and must not read Ortho"
+        );
+        // and both in-plane hands are reachable, so the sign is carrying information
+        assert!(
+            refounded.iter().any(|hand| *hand == Hand::Anti)
+                || refounded.iter().any(|hand| *hand == Hand::Cohere),
+            "the residual's sign must be readable"
+        );
+    }
 
     #[test]
     fn nonzero_controls() {

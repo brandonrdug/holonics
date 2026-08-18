@@ -49,7 +49,7 @@ use holonic_engine::lean_development::{
 };
 use life::exposure_codec::{
     carried, octets_of, recover, ExposedMaterial, ExposureApertures, ExposureObstruction,
-    ExposureRecovery, UnitRole,
+    ExposureRecovery, LadderStop, Unit, UnitRole, ladder,
 };
 use life::text_material::ExactTextMaterialAtlas;
 
@@ -137,33 +137,81 @@ fn run() -> Result<(), String> {
         "  family. This recomputes it in one pass by adjacency signature — every octet keyed by"
     );
     println!(
-        "  exactly which octets follow it and which precede it — and the two must land on the"
+        "  exactly which octets follow it and which precede it — and the refinement must REFINE it."
     );
     println!(
-        "  same partition. The signature route cannot be coarser than the refinement, because a"
+        "  CORRECTED 2026-08-17: the two were required to be EQUAL, on the argument that a one-hole"
     );
-    println!("  one-hole context of length two *is* the signature, so agreement pins both.");
+    println!(
+        "  context of length two *is* the signature. That argument bounds the signature route from"
+    );
+    println!(
+        "  one side only. Refinement draws contexts from the whole declared family, so at radius 3"
+    );
+    println!(
+        "  and above it may separate a pair that no length-two context separates, and then it is"
+    );
+    println!(
+        "  STRICTLY FINER and correct. Equality holds exactly when radius two already sufficed."
+    );
+    println!(
+        "  The law is containment; the pairs only a longer context separated are the return."
+    );
     let signature = signature_quotient(&material, &recovery.alphabet);
-    let refined: BTreeSet<BTreeSet<u8>> = recovery.direct_quotient.iter().cloned().collect();
-    let signed: BTreeSet<BTreeSet<u8>> = signature.iter().cloned().collect();
+    let refined: BTreeSet<BTreeSet<Unit>> = recovery.direct_quotient.iter().cloned().collect();
+    let signed: BTreeSet<BTreeSet<Unit>> = signature.iter().cloned().collect();
+    let refines = refined
+        .iter()
+        .all(|block| signed.iter().any(|coarser| block.is_subset(coarser)));
     println!(
-        "    refinement route {} blocks   signature route {} blocks   the two routes {}",
+        "    refinement route {} blocks   signature route {} blocks   {}",
         refined.len(),
         signed.len(),
         if refined == signed {
-            "AGREE on the partition, block for block"
+            "the two AGREE block for block: radius two already sufficed"
+        } else if refines {
+            "the refinement is STRICTLY FINER, and it refines the signature"
         } else {
-            "DISAGREE — the difference is exhibited below"
+            "THE REFINEMENT DOES NOT REFINE THE SIGNATURE — the law is broken"
         }
     );
+    if !refines {
+        for block in refined.iter().take(6) {
+            if !signed.iter().any(|coarser| block.is_subset(coarser)) {
+                println!(
+                    "      this block is in no signature block: {}",
+                    render_octets(&block.iter().copied().collect::<Vec<_>>())
+                );
+            }
+        }
+        return Err("the refinement route does not refine the signature route".to_owned());
+    }
     if refined != signed {
-        for block in refined.symmetric_difference(&signed).take(6) {
+        // What a length-two context could not separate and a longer one did. This is the content of
+        // the disagreement, and it is a statement about the material's own depth.
+        let mut exhibited = 0usize;
+        for coarser in &signed {
+            let split: Vec<&BTreeSet<Unit>> = refined
+                .iter()
+                .filter(|block| block.is_subset(coarser) && block.len() < coarser.len())
+                .collect();
+            if split.len() < 2 {
+                continue;
+            }
+            if exhibited >= 6 {
+                break;
+            }
+            exhibited += 1;
+            let parts: Vec<String> = split
+                .iter()
+                .map(|block| render_octets(&block.iter().copied().collect::<Vec<_>>()))
+                .collect();
             println!(
-                "      only one route holds {}",
-                render_octets(&block.iter().copied().collect::<Vec<_>>())
+                "      {} shares an adjacency signature and a longer context still parts it: {}",
+                render_octets(&coarser.iter().copied().collect::<Vec<_>>()),
+                parts.join("  |  ")
             );
         }
-        return Err("the two quotient routes disagreed".to_owned());
     }
     println!(
         "  The independent route on the CODEC itself is Moore refinement over the joint carrier,"
@@ -377,13 +425,13 @@ fn run() -> Result<(), String> {
         let flipped_conformance = conform(&flipped, &key, &borrowed);
         match word {
             Some(word) => {
-                let octets = octets_of(&word).unwrap_or_default();
+                let asked: Vec<Unit> = word.iter().map(|symbol| symbol.0).collect();
                 println!(
                     "  {:>9} -> {:<9} free.  the word that would decide it: {}   does the material carry it? {}",
                     left.name(),
                     right.name(),
                     render(&word),
-                    material.occurs(&octets)
+                    material.occurs(&asked)
                 );
             }
             None => println!(
@@ -422,7 +470,7 @@ fn run() -> Result<(), String> {
     println!("  reading is a function of what was received and the ladder is what says so.");
     let total: u64 = founding.iter().map(|e| e.len() as u64).sum();
     let mut budget = 1u64 << 12;
-    let mut rungs: Vec<(u64, BTreeSet<u8>)> = Vec::new();
+    let mut rungs: Vec<(u64, BTreeSet<Unit>)> = Vec::new();
     let mut seen_extents: BTreeSet<u64> = BTreeSet::new();
     let mut refused_below: Option<u64> = None;
     while budget < total.saturating_mul(2) {
@@ -442,9 +490,9 @@ fn run() -> Result<(), String> {
                 } else {
                     format!(
                         "standing {:>3}  demanding {:>3}  internal {:>3}",
-                        step.octets_with(UnitRole::Standing).len(),
-                        step.octets_with(UnitRole::Demanding).len(),
-                        step.octets_with(UnitRole::Internal).len()
+                        step.units_with(UnitRole::Standing).len(),
+                        step.units_with(UnitRole::Demanding).len(),
+                        step.units_with(UnitRole::Internal).len()
                     )
                 };
                 let conformance = step
@@ -466,10 +514,10 @@ fn run() -> Result<(), String> {
                         .unwrap_or_else(|| "-".to_owned())
                 );
                 let recovered_here = step.codec.is_some();
-                let internal: BTreeSet<u8> = step.opening_frame.internal.iter().copied().collect();
+                let internal: BTreeSet<Unit> = step.opening_frame.internal.iter().copied().collect();
                 let moved = rungs
                     .last()
-                    .map(|(_, previous): &(u64, BTreeSet<u8>)| {
+                    .map(|(_, previous): &(u64, BTreeSet<Unit>)| {
                         previous.symmetric_difference(&internal).count()
                     })
                     .unwrap_or(internal.len());
@@ -508,6 +556,17 @@ fn run() -> Result<(), String> {
 
     println!("\n=== [9] THE ANSWER KEY, IN BOTH DIRECTIONS ===");
     answer_key_comparison(&codec, &held_out);
+
+    println!("\n=== [9b] THE LADDER — THE SAME LAW, ONE SCALE UP ===");
+    println!("  Sections 2 through 9 are ONE rung. The recovery reads a candidate alphabet and returns");
+    println!("  the units the material founds out of it; declaring those units as the next alphabet and");
+    println!("  asking again is the same law at the next scale. Nothing below knows what a character, a");
+    println!("  word or a statement is, and no rung is told what the rung under it recovered.");
+    println!();
+    println!("  This is what supersedes an authored grammar. A separator founded once and used at every");
+    println!("  depth is one material's self-similarity promoted to a law; here each rung founds its own,");
+    println!("  and where a rung founds nothing it says so by name rather than returning an empty split.");
+    ladder_report(founding.clone(), settings.radius, settings.family_words, 4);
 
     println!("\n=== [10] THE MOUTH, AGAINST THE AUTHORED TOKENIZER ===");
     println!("  Every language ecology in this tree conditions on `lexical_tokens`, which is authored");
@@ -733,7 +792,7 @@ fn report(recovery: &ExposureRecovery, extent: u64) {
     if !recovery.roles.is_empty() {
         println!("\n  THE RECOVERED CODEC");
         for role in [UnitRole::Standing, UnitRole::Demanding, UnitRole::Internal] {
-            let members = recovery.octets_with(role);
+            let members = recovery.units_with(role);
             if members.is_empty() {
                 continue;
             }
@@ -793,22 +852,119 @@ fn report(recovery: &ExposureRecovery, extent: u64) {
     );
 }
 
+
+/// Climb the recovery and report every rung, plus the named stop.
+///
+/// The stop is the reading: `NoCoarsening` says the material has no coarser unit at this radius,
+/// `Refused` says how much wider the material is than the declared aperture, `Obstructed` says the
+/// rung established no rule. None of them is an error and none is smoothed into a zero.
+fn ladder_report(exposures: Vec<Vec<u8>>, radius: usize, family_words: u64, scales: usize) {
+    let climbed = match ladder(
+        exposures,
+        ExposureApertures::declared(radius, family_words),
+        scales,
+    ) {
+        Ok(climbed) => climbed,
+        Err(refusal) => {
+            println!("  the ground rung refused: {refusal}");
+            return;
+        }
+    };
+    println!(
+        "  {:>4}  {:>10}  {:>9}  {:>8}  {:>8}  {:>9}  {:>7}",
+        "rung", "candidates", "alphabet", "refusals", "blocks", "units", "parts"
+    );
+    for rung in &climbed.rungs {
+        println!(
+            "  {:>4}  {:>10}  {:>9}  {:>8}  {:>8}  {:>9}  {:>7}",
+            rung.scale,
+            rung.candidates,
+            rung.recovery.alphabet.len(),
+            rung.recovery.refusals.len(),
+            rung.recovery.direct_quotient.len(),
+            rung.founded_units.len(),
+            rung.parts
+        );
+    }
+    for rung in &climbed.rungs {
+        if rung.founded_units.is_empty() {
+            continue;
+        }
+        let widest = rung
+            .founded_units
+            .iter()
+            .map(|unit| unit.len())
+            .max()
+            .unwrap_or(0);
+        let compound: Vec<&Vec<u8>> = rung
+            .founded_units
+            .iter()
+            .filter(|unit| unit.len() > 1)
+            .collect();
+        println!();
+        println!(
+            "  rung {} founded {} units, {} of them compound, widest {} octets",
+            rung.scale,
+            rung.founded_units.len(),
+            compound.len(),
+            widest
+        );
+        // widest first: a rung's finding is the coarsest thing it joined, and taking the first
+        // twenty-four in unit order would show only what the rung below already had.
+        let mut widest_first: Vec<&Vec<u8>> = compound.clone();
+        widest_first.sort_by(|left, right| right.len().cmp(&left.len()).then(left.cmp(right)));
+        let sample: Vec<String> = widest_first
+            .iter()
+            .take(24)
+            .map(|unit| format!("{:?}", String::from_utf8_lossy(unit)))
+            .collect();
+        if sample.is_empty() {
+            println!("    no compound unit: this rung cut at every adjacency it was handed");
+        } else {
+            println!("    {}", sample.join(" "));
+        }
+    }
+    println!();
+    match &climbed.stopped {
+        LadderStop::NoCoarsening { scale } => println!(
+            "  STOPPED at rung {scale}: the codec cut at every adjacency, so the scale above IS the\n  \
+             scale below. The material has no coarser unit at this radius, and that is a reading."
+        ),
+        LadderStop::Obstructed { scale, obstructions } => println!(
+            "  STOPPED at rung {scale}: no codec, {} obstruction(s) — {:?}",
+            obstructions.len(),
+            obstructions
+        ),
+        LadderStop::Refused {
+            scale,
+            candidates,
+            refusal,
+        } => println!(
+            "  STOPPED at rung {scale}: {candidates} candidates, and the family they declare is past\n  \
+             the aperture — {refusal}"
+        ),
+        LadderStop::CeilingReached { scales } => println!(
+            "  the declared {scales} scales were climbed with no obstruction; the ladder could go on"
+        ),
+    }
+}
+
 /// The direct quotient recomputed in one pass, by keying each octet on its exact adjacency
 /// signature. A second algorithm over the same testimony, holding no state the refinement holds.
-fn signature_quotient(material: &ExposedMaterial, alphabet: &[u8]) -> Vec<BTreeSet<u8>> {
-    let mut keyed: BTreeMap<(Vec<u8>, Vec<u8>), BTreeSet<u8>> = BTreeMap::new();
-    for octet in alphabet {
-        let follows: Vec<u8> = alphabet
+fn signature_quotient(material: &ExposedMaterial, alphabet: &[Unit]) -> Vec<BTreeSet<Unit>> {
+    let mut keyed: BTreeMap<(Vec<Unit>, Vec<Unit>), BTreeSet<Unit>> = BTreeMap::new();
+    for unit in alphabet {
+        let follows: Vec<Unit> = alphabet
             .iter()
             .copied()
-            .filter(|next| material.occurs(&[*octet, *next]))
+            .filter(|next| material.occurs(&[*unit, *next]))
             .collect();
-        let precedes: Vec<u8> = alphabet
+        let precedes: Vec<Unit> = alphabet
             .iter()
             .copied()
-            .filter(|before| material.occurs(&[*before, *octet]))
+            .filter(|before| material.occurs(&[*before, *unit]))
             .collect();
-        keyed.entry((follows, precedes)).or_default().insert(*octet);
+        keyed.entry((follows, precedes)).or_default().insert(*unit);
     }
     keyed.into_values().collect()
 }
@@ -837,7 +993,7 @@ fn exhibit_conformance(name: &str, conformance: &Conformance) {
     for refusal in conformance.refusals.iter().take(3) {
         println!(
             "    refused an exposure carrying {} — an octet the founding exposure never showed",
-            render_octet(refusal.symbol.0 as u8)
+            render_octet(refusal.symbol.0)
         );
     }
 }
@@ -1277,7 +1433,13 @@ fn truncate_to(exposures: Vec<Vec<u8>>, budget: u64) -> Vec<Vec<u8>> {
 // Rendering
 // -------------------------------------------------------------------------------------------------
 
-fn render_octet(octet: u8) -> String {
+/// This driver reads at the OCTET scale, so a unit is an octet and rendering one is a narrowing
+/// rather than an interpretation. A unit wider than an octet would mean this driver is the wrong
+/// reader for the rung it was handed, and it says so rather than truncating.
+fn render_octet(unit: Unit) -> String {
+    let Ok(octet) = u8::try_from(unit) else {
+        return format!("unit:{unit}");
+    };
     if (0x20..0x7f).contains(&octet) {
         format!("'{}'", octet as char)
     } else {
@@ -1285,10 +1447,10 @@ fn render_octet(octet: u8) -> String {
     }
 }
 
-fn render_octets(octets: &[u8]) -> String {
-    octets
+fn render_octets(units: &[Unit]) -> String {
+    units
         .iter()
-        .map(|octet| render_octet(*octet))
+        .map(|unit| render_octet(*unit))
         .collect::<Vec<_>>()
         .join(" ")
 }
@@ -1305,22 +1467,19 @@ fn latin1(octets: &[u8]) -> String {
 }
 
 fn render(carried_word: &[Symbol]) -> String {
-    render_octets(&octets_of(carried_word).unwrap_or_default())
+    let units: Vec<Unit> = carried_word.iter().map(|symbol| symbol.0).collect();
+    render_octets(&units)
 }
 
 fn render_tokens(tokens: &[Vec<Symbol>]) -> String {
     tokens
         .iter()
         .map(|token| {
-            let octets = octets_of(token).unwrap_or_default();
-            if octets.len() > 8 {
-                format!(
-                    "[{} … {} octets]",
-                    render_octets(&octets[..8]),
-                    octets.len()
-                )
+            let units: Vec<Unit> = token.iter().map(|symbol| symbol.0).collect();
+            if units.len() > 8 {
+                format!("[{} … {} units]", render_octets(&units[..8]), units.len())
             } else {
-                format!("[{}]", render_octets(&octets))
+                format!("[{}]", render_octets(&units))
             }
         })
         .collect::<Vec<_>>()

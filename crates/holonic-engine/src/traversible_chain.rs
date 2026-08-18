@@ -82,8 +82,44 @@
 //! by `ρ` — so a closed chain returns `ρ = 1` and its holonomy is the identity *by construction*.
 //! That receipt could not have come out otherwise and carries no evidence. Holonomy needs a link
 //! that does not commute with `M(ρ)` — a propagation phase, or a lumped series/shunt element in the
-//! `(voltage, current)` chart — and **this module owns none of them.** The abelian-ness is measured
-//! rather than assumed in `the_interface_family_is_abelian_which_is_why_its_holonomy_is_forced`.
+//! `(voltage, current)` chart. The abelian-ness is measured rather than assumed in
+//! `the_interface_family_is_abelian_which_is_why_its_holonomy_is_forced`.
+//!
+//! # ★ THE PHASE IS WIRED — 2026-08-17, and the paragraph above is now bounded rather than absolute
+//!
+//! The sentence *"this module owns none of them"* held for two days and is **withdrawn**.
+//! [`PhasedTransfer`] carries the missing link, and the two parts it is built from both already
+//! stood: `analytic_field::ExactStratifiedLayer` declares an exact propagation phase on the unit
+//! conic, and `dimensional_wave` applies one per port with the reverse carrying its inverse.
+//!
+//! **Why a real `2×2` could not hold it, and what does.** In the wave-amplitude chart a propagation
+//! of electrical length `φ` is `diag(e^{−iφ}, e^{+iφ})` — the forward half advances and the returned
+//! half retards, which is the whole content of a round trip. That is not a real matrix. Over `Rat`
+//! the honest carrier is a `2×2` over the **exact complex** `dimensional_wave::ExactComplexWaveCurrent`,
+//! with the interface embedded by its real entries:
+//!
+//! ```text
+//!   M(ρ) ↪ [[ (1+ρ)/2 , (1−ρ)/2 ], [ (1−ρ)/2 , (1+ρ)/2 ]]          real
+//!   P(p) =  [[ p̄ , 0 ], [ 0 , p ]]        p = cos + i sin,  |p| = 1
+//! ```
+//!
+//! **And the non-commutation is exactly conditional, which is why it is evidence.**
+//!
+//! ```text
+//!   M P − P M  =  (1−ρ)/2 · [[ 0 , p − p̄ ], [ p̄ − p , 0 ]]
+//! ```
+//!
+//! so `M` and `P` commute **iff `sin φ = 0` or `ρ = 1`** — iff the phase is a whole turn, or the
+//! junction is matched. A phase across a matched junction is invisible and a whole turn across a
+//! mismatch is invisible; only a real phase across a real mismatch turns. That is a condition on the
+//! material rather than a property of the carrier, and both controls are exhibited in
+//! `the_phase_and_the_mismatch_are_BOTH_required_for_the_family_to_turn`.
+//!
+//! **The conservation law survives it, and that is the check that the wire is physical.** `P` is
+//! unitary, so `P† J P = |p|² J = J` — the phase is an isometry of the admittance metric with scale
+//! **one**, carrying no admittance change, while an interface scales by `ρ`. A composite's scale is
+//! the product of its links', and [`PhasedTransfer::conserved_form`] returns `Obstructed` on
+//! anything outside the group. A wire that broke this would be transporting energy it invented.
 //!
 //! # An admittance is what a site accepts, and it is derived from the material
 //!
@@ -129,6 +165,7 @@ use thiserror::Error;
 use crate::analytic_field::{
     AnalyticFieldError, ExactScalarInterfaceCoefficients, exact_scalar_interface_coefficients,
 };
+use crate::dimensional_wave::{ExactComplexWaveCurrent, ExactWavePhaseTransport};
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum TraversibleChainError {
@@ -646,8 +683,520 @@ pub enum Standing {
     Reflected(Rat),
 }
 
+// -------------------------------------------------------------------------------------------------
+// The phase element, and the transport that can hold it
+// -------------------------------------------------------------------------------------------------
+
+/// **A transport in the (forward, returned) COMPLEX amplitude chart.**
+///
+/// [`TransferMatrix`] is real, and a real `2×2` cannot hold a propagation phase: the forward half
+/// advances by `e^{−iφ}` while the returned half retards by `e^{+iφ}`, and their difference is what
+/// a round trip is. This carrier is the same matrix over the exact complex, which is the smallest
+/// thing that holds both an interface and a phase.
+///
+/// **Nothing here supersedes [`TransferMatrix`].** An unphased chain composes real matrices and
+/// should keep doing so; the module's own abelian receipt is about that family and stays true of it.
+/// This type is what a chain composes **when a phase is declared between its interfaces**.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PhasedTransfer {
+    through: ExactComplexWaveCurrent,
+    into_forward: ExactComplexWaveCurrent,
+    returned: ExactComplexWaveCurrent,
+    into_returned: ExactComplexWaveCurrent,
+}
+
+impl PhasedTransfer {
+    /// Embed a real interface transport. The entries are unchanged; only the carrier widens.
+    pub fn of_interface(matrix: &TransferMatrix) -> Self {
+        let real = |value: &Rat| ExactComplexWaveCurrent::new(value.clone(), Rat::zero());
+        Self {
+            through: real(&matrix.through),
+            into_forward: real(&matrix.into_forward),
+            returned: real(&matrix.returned),
+            into_returned: real(&matrix.into_returned),
+        }
+    }
+
+    /// **The propagation phase**, `diag(p̄, p)` for a declared `p = cos + i·sin` on the exact unit
+    /// conic. The forward half advances and the returned half retards, which is why the reverse
+    /// carries the inverse — the same convention `dimensional_wave` applies per port.
+    pub fn of_propagation(phase: &ExactWavePhaseTransport) -> Self {
+        let forward =
+            ExactComplexWaveCurrent::new(phase.cosine.clone(), -phase.sine.clone());
+        let returned = ExactComplexWaveCurrent::new(phase.cosine.clone(), phase.sine.clone());
+        Self {
+            through: forward,
+            into_forward: ExactComplexWaveCurrent::zero(),
+            returned: ExactComplexWaveCurrent::zero(),
+            into_returned: returned,
+        }
+    }
+
+    pub const fn through(&self) -> &ExactComplexWaveCurrent {
+        &self.through
+    }
+
+    /// `M₂₁` — **the returned component**, and the chain's remainder, exactly as in the real chart.
+    pub const fn returned(&self) -> &ExactComplexWaveCurrent {
+        &self.returned
+    }
+
+    pub const fn into_forward(&self) -> &ExactComplexWaveCurrent {
+        &self.into_forward
+    }
+
+    pub const fn into_returned(&self) -> &ExactComplexWaveCurrent {
+        &self.into_returned
+    }
+
+    /// `det M = M₁₁M₂₂ − M₁₂M₂₁`.
+    pub fn determinant(&self) -> ExactComplexWaveCurrent {
+        self.through
+            .multiply(&self.into_returned)
+            .subtract(&self.into_forward.multiply(&self.returned))
+    }
+
+    /// `Γ = M₂₁/M₁₁`, or `None` on a vanishing forward diagonal.
+    pub fn reflection(&self) -> Option<ExactComplexWaveCurrent> {
+        Some(self.returned.multiply(&self.through.reciprocal()?))
+    }
+
+    /// `τ = 1/M₁₁`, or `None` on a vanishing forward diagonal.
+    pub fn transmission(&self) -> Option<ExactComplexWaveCurrent> {
+        self.through.reciprocal()
+    }
+
+    pub fn inverse(&self) -> Option<Self> {
+        let reciprocal = self.determinant().reciprocal()?;
+        Some(Self {
+            through: self.into_returned.multiply(&reciprocal),
+            into_forward: self.into_forward.negated().multiply(&reciprocal),
+            returned: self.returned.negated().multiply(&reciprocal),
+            into_returned: self.through.multiply(&reciprocal),
+        })
+    }
+
+    /// **`M† J M` against `ρ J`, with `J = diag(1, −1)`** — the admittance metric in the complex
+    /// chart, where the transpose becomes the conjugate transpose.
+    ///
+    /// An interface returns `Scaled(ρ)`; a propagation returns `Scaled(1)`, because `|p| = 1` and a
+    /// phase carries no admittance change. Anything outside the group is `Obstructed` with the three
+    /// entries that decided it exhibited.
+    pub fn conserved_form(&self) -> PhasedConservedForm {
+        // (M† J M)_11 = |M11|^2 - |M21|^2 ; _22 = |M12|^2 - |M22|^2 ; _12 = conj(M11)M12 - conj(M21)M22
+        let forward = self.through.norm_square() - self.returned.norm_square();
+        let returned = self.into_forward.norm_square() - self.into_returned.norm_square();
+        let cross = self
+            .through
+            .conjugate()
+            .multiply(&self.into_forward)
+            .subtract(&self.returned.conjugate().multiply(&self.into_returned));
+        if cross.is_zero() && forward == -returned.clone() {
+            PhasedConservedForm::Scaled(forward)
+        } else {
+            PhasedConservedForm::Obstructed {
+                cross,
+                forward,
+                returned,
+            }
+        }
+    }
+}
+
+/// What `M† J M` returned in the complex chart. Plural and exhibited rather than a verdict.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PhasedConservedForm {
+    /// `M† J M = ρ J`. An interface carries `ρ`; a phase carries exactly one.
+    Scaled(Rat),
+    Obstructed {
+        cross: ExactComplexWaveCurrent,
+        forward: Rat,
+        returned: Rat,
+    },
+}
+
+impl PhasedConservedForm {
+    pub const fn scale(&self) -> Option<&Rat> {
+        match self {
+            Self::Scaled(scale) => Some(scale),
+            Self::Obstructed { .. } => None,
+        }
+    }
+}
+
+impl Composes for PhasedTransfer {
+    type Defect = Self;
+    /// **The half that came back**, `M₂₁`, undivided — the same choice the real chart makes.
+    type Remainder = ExactComplexWaveCurrent;
+
+    fn identity() -> Self {
+        Self {
+            through: ExactComplexWaveCurrent::one(),
+            into_forward: ExactComplexWaveCurrent::zero(),
+            returned: ExactComplexWaveCurrent::zero(),
+            into_returned: ExactComplexWaveCurrent::one(),
+        }
+    }
+
+    fn compose(&self, next: &Self) -> Self {
+        Self {
+            through: self
+                .through
+                .multiply(&next.through)
+                .add(&self.into_forward.multiply(&next.returned)),
+            into_forward: self
+                .through
+                .multiply(&next.into_forward)
+                .add(&self.into_forward.multiply(&next.into_returned)),
+            returned: self
+                .returned
+                .multiply(&next.through)
+                .add(&self.into_returned.multiply(&next.returned)),
+            into_returned: self
+                .returned
+                .multiply(&next.into_forward)
+                .add(&self.into_returned.multiply(&next.into_returned)),
+        }
+    }
+
+    fn defect(direct: &Self, composed: &Self) -> Self {
+        match composed.inverse() {
+            Some(inverse) => direct.compose(&inverse),
+            None => direct.clone(),
+        }
+    }
+
+    fn closed(defect: &Self) -> bool {
+        *defect == Self::identity()
+    }
+
+    fn remainder(&self) -> ExactComplexWaveCurrent {
+        self.returned.clone()
+    }
+
+    fn is_empty(remainder: &ExactComplexWaveCurrent) -> bool {
+        remainder.is_zero()
+    }
+}
+
+/// **One link of a phased chain: a junction, or the propagation between two of them.**
+///
+/// Two species and not one, because they are different caused events: an interface changes what the
+/// medium accepts, and a propagation changes only the phase the current arrives carrying. Collapsing
+/// them into one "step" would delete exactly the distinction the holonomy lives in.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PhasedLink {
+    /// A junction between two admittances.
+    Interface {
+        crossing: Crossing,
+        transport: PhasedTransfer,
+    },
+    /// A declared propagation phase through a uniform section. It carries the admittance the current
+    /// arrived with, because propagation changes no admittance.
+    Propagation {
+        phase: ExactWavePhaseTransport,
+        carrying: Rat,
+        transport: PhasedTransfer,
+    },
+}
+
+impl PhasedLink {
+    pub fn interface(crossing: Crossing) -> Self {
+        let transport = PhasedTransfer::of_interface(crossing.transport());
+        Self::Interface {
+            crossing,
+            transport,
+        }
+    }
+
+    /// A declared propagation through a section the current crosses carrying `carrying`.
+    pub fn propagation(phase: ExactWavePhaseTransport, carrying: &Admittance) -> Self {
+        let transport = PhasedTransfer::of_propagation(&phase);
+        Self::Propagation {
+            phase,
+            carrying: carrying.0.clone(),
+            transport,
+        }
+    }
+
+    /// Whether this link turns at all: a propagation whose sine is zero is a whole turn and is
+    /// invisible to composition, which is one half of the non-commutation condition.
+    pub fn turns(&self) -> bool {
+        match self {
+            Self::Interface { .. } => false,
+            Self::Propagation { phase, .. } => !phase.sine.is_zero(),
+        }
+    }
+}
+
+impl Relating for PhasedLink {
+    type Weight = Rat;
+    type Transport = PhasedTransfer;
+
+    fn reach(&self) -> &Rat {
+        match self {
+            Self::Interface { crossing, .. } => crossing.reach(),
+            Self::Propagation { carrying, .. } => carrying,
+        }
+    }
+
+    /// **The hand is the sign of the STORED face, and it is read that way at every link.**
+    ///
+    /// `holonic_structure::Hand::Ortho` is defined as *"cohere-null with the cross **maximal** — the
+    /// pure orthogonal turn, the founding hand"*, so `Ortho` names the case where nothing stands and
+    /// everything transports. `soma/body/src/arrow.rs` reads the sign of `aim`, which its own typing
+    /// calls *what STANDS*; [`Crossing::meet`] reads the sign of `M₂₁`, the half that came **back**
+    /// and therefore did not transport. Both are the stored face and both agree.
+    ///
+    /// **CORRECTED 2026-08-17, hours after it was written.** This read the sign of `phase.sine` and
+    /// returned `Ortho` at `sine = 0` — which is a **whole turn**, the identity, the *least* turn
+    /// there is — while the variant it assigned means *the most turn there is*. Inverted, and the
+    /// doc comment said so out loud without noticing: *"`Ortho` at a whole turn, where nothing
+    /// turns."*
+    ///
+    /// A rotation's stored face is its **cosine** — how much of the arriving current stays where it
+    /// was — and its transported face is the sine. So `cos = 0`, the quarter turn, is where nothing
+    /// stands and the turn is maximal, and that is `Ortho`.
+    fn hand(&self) -> Hand {
+        match self {
+            Self::Interface { crossing, .. } => crossing.hand(),
+            Self::Propagation { phase, .. } => {
+                if phase.cosine.is_zero() {
+                    Hand::Ortho
+                } else if phase.cosine.is_positive() {
+                    Hand::Cohere
+                } else {
+                    Hand::Anti
+                }
+            }
+        }
+    }
+
+    fn transport(&self) -> &PhasedTransfer {
+        match self {
+            Self::Interface { transport, .. } | Self::Propagation { transport, .. } => transport,
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The resonator: what a mismatched termination does to a wave that keeps coming back
+// -------------------------------------------------------------------------------------------------
+
+/// **The standing wave a mismatched termination holds.**
+///
+/// A junction that does not match returns part of what arrives; the returned half interferes with
+/// the arriving half and the sum has fixed maxima and minima in space. That is a **standing wave**,
+/// and until 2026-08-17 nothing in this tree computed one — measured with its scope,
+/// `grep -rniE "standing[ _-]?wave" crates soma --include='*.rs'` returned two hits, both negations,
+/// and `grep -rn "impedance" crates soma --include='*.rs' | grep -v examples` returned zero in any
+/// library `src`. The quantity this tree owns is admittance, and the module that owns the most of it
+/// is this one.
+///
+/// # The invariant is `|Γ|²` and the ratio is a face of it
+///
+/// The classical figure is `SWR = (1+|Γ|)/(1−|Γ|)`, and `|Γ|` is a **square root**. `|Γ|²` is exact
+/// over `Rat`; `|Γ|` generally is not. So the invariant carried here is the reflected share `|Γ|²`,
+/// and the two extremes are returned as the **roots of a declared rational quadratic**:
+///
+/// ```text
+///   extremes:  (1+|Γ|)² and (1−|Γ|)²
+///   their sum      = 2(1 + |Γ|²)          exact
+///   their product  = (1 − |Γ|²)²          exact
+///   their ratio    = SWR²                 irrational unless |Γ|² is a rational square
+/// ```
+///
+/// Both symmetric functions are exactly rational, so the pair is exactly determined without either
+/// member being taken. [`StandingWaveReading::standing_wave_ratio`] returns the scalar **only** when
+/// `|Γ|²` is a rational square, and `None` is a refusal to take a root rather than a missing figure.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StandingWaveReading {
+    /// `|Γ|²` — the share of incident power the termination returns. Exact, and the invariant.
+    pub reflected_share: Rat,
+    /// `(1+|Γ|)² + (1−|Γ|)² = 2(1 + |Γ|²)`.
+    pub extreme_sum: Rat,
+    /// `(1+|Γ|)²(1−|Γ|)² = (1 − |Γ|²)²`.
+    pub extreme_product: Rat,
+    /// `(1+|Γ|)/(1−|Γ|)`, exactly, when `|Γ|²` is a rational square. `None` is a refusal.
+    pub standing_wave_ratio: Option<Rat>,
+    /// True exactly at a matched termination, where nothing returns and there is no standing wave.
+    /// **The control**: a reading that returns a standing wave here is measuring the instrument.
+    pub matched: bool,
+}
+
+impl StandingWaveReading {
+    /// Read the standing wave a declared reflection holds. `reflection` is `Γ` in the complex chart.
+    pub fn of_reflection(reflection: &ExactComplexWaveCurrent, kernel_bound: u64) -> Self {
+        let share = reflection.norm_square();
+        let two = Rat::from_integer(2.into());
+        let one_minus = Rat::one() - &share;
+        let ratio = if share.is_zero() {
+            Some(Rat::one())
+        } else {
+            // |Γ| exists in ℚ exactly when |Γ|² is a rational square. `multiquadratic::square_root`
+            // decides that by reducing to a squarefree kernel and refusing past a declared bound;
+            // `as_rational` is `Some` precisely on the square case. Nothing is approximated.
+            crate::multiquadratic::Multiquadratic::square_root(&share, kernel_bound)
+                .ok()
+                .and_then(|root| root.as_rational())
+                .and_then(|magnitude| {
+                    let denominator = Rat::one() - &magnitude;
+                    if denominator.is_zero() {
+                        // Total reflection: the ratio is unbounded, which is a fact and not a value.
+                        None
+                    } else {
+                        Some((Rat::one() + &magnitude) / denominator)
+                    }
+                })
+        };
+        Self {
+            reflected_share: share.clone(),
+            extreme_sum: two * (Rat::one() + &share),
+            extreme_product: &one_minus * &one_minus,
+            standing_wave_ratio: ratio,
+            matched: share.is_zero(),
+        }
+    }
+}
+
+/// **Which band a periodic structure's cell puts a mode in**, decided by one exact comparison.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum BandClass {
+    /// `|Tr M / 2| < 1`. The cell's eigenvalues are on the unit circle: the mode propagates.
+    Pass,
+    /// `|Tr M / 2| = 1`. The band edge — the eigenvalues collide and the cell is not diagonalisable.
+    Edge,
+    /// `|Tr M / 2| > 1`. The eigenvalues are real and reciprocal: one grows, the mode is evanescent.
+    Stop,
+}
+
+/// **The Bloch reading of one period of a periodic structure.**
+///
+/// A cell that begins and ends at the same admittance has `ρ = 1`, so its composed transport lies in
+/// the group preserving the admittance metric with scale one — `SU(1,1)` — whose trace is
+/// **real**, `Tr = 2·Re(M₁₁)`. Its eigenvalues satisfy `λ + 1/λ = Tr`, so
+///
+/// ```text
+///   |Tr/2| < 1   λ = e^{iK}, unimodular   the mode PROPAGATES   (pass band)
+///   |Tr/2| = 1   λ = ±1, degenerate       the BAND EDGE
+///   |Tr/2| > 1   λ real, one > 1          the mode DECAYS       (stop band)
+/// ```
+///
+/// **One exact rational comparison decides it.** No root is extracted, no angle is taken and no
+/// eigenvector is formed — the same shape as `hypergeometric_closure` deciding whether a return
+/// group is finite by sorting integers.
+///
+/// **`trace_imaginary` is measured, not assumed.** It must vanish for the reading to mean anything,
+/// and a cell that is not reciprocal-and-lossless returns a non-zero one — which is the condition
+/// that makes this a measurement on the cell rather than a restatement of `SU(1,1)`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BlochReading {
+    /// `Tr M / 2 = Re(M₁₁ + M₂₂)/2`.
+    pub half_trace: Rat,
+    /// `Im(M₁₁ + M₂₂)/2` — zero exactly when the cell is in the group, and returned rather than
+    /// asserted.
+    pub trace_imaginary: Rat,
+    pub class: BandClass,
+    /// The metric scale the cell carries, `ρ`. A genuine period has `ρ = 1`; anything else means the
+    /// cell is not periodic and the band reading does not apply. `None` when the cell is outside the
+    /// group entirely.
+    pub metric_scale: Option<Rat>,
+}
+
+impl BlochReading {
+    /// Read one period's composed transport.
+    pub fn of_cell(cell: &PhasedTransfer) -> Self {
+        let two = Rat::from_integer(2.into());
+        let trace = cell.through.add(&cell.into_returned);
+        let half_trace = &trace.real / &two;
+        let trace_imaginary = &trace.imaginary / &two;
+        let magnitude = if half_trace.is_negative() {
+            -half_trace.clone()
+        } else {
+            half_trace.clone()
+        };
+        let class = match magnitude.cmp(&Rat::one()) {
+            core::cmp::Ordering::Less => BandClass::Pass,
+            core::cmp::Ordering::Equal => BandClass::Edge,
+            core::cmp::Ordering::Greater => BandClass::Stop,
+        };
+        Self {
+            half_trace,
+            trace_imaginary,
+            class,
+            metric_scale: cell.conserved_form().scale().cloned(),
+        }
+    }
+
+    /// Whether the reading is admissible: the cell is in the group, its trace is real, and it
+    /// returns to the admittance it started from.
+    pub fn is_a_period(&self) -> bool {
+        self.trace_imaginary.is_zero() && self.metric_scale.as_ref() == Some(&Rat::one())
+    }
+}
+
+/// **A two-junction cavity with a declared phase between its mirrors.**
+///
+/// This is the smallest structure that resonates, and its composite reflection is the classical
+/// multiple-reflection sum in closed form:
+///
+/// ```text
+///   Γ_total  =  (Γ₁ + Γ₂ e^{2iφ}) / (1 + Γ₁ Γ₂ e^{2iφ})
+/// ```
+///
+/// It is computed here as a **composition of standing transports** — junction, propagation, junction
+/// — and the closed form above is asserted against it rather than implemented, which is the same
+/// discipline `the_reflection_composes_by_the_addition_law_and_the_transmission_by_its_denominator`
+/// applies in the real chart.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CavityReading {
+    /// The round-trip phase `p² = e^{2iφ}`, exact on the unit conic.
+    pub round_trip: ExactWavePhaseTransport,
+    pub composite: PhasedTransfer,
+    pub standing_wave: StandingWaveReading,
+    /// True exactly when the round trip is a whole turn and the two mirrors' returns cancel — the
+    /// **transmission resonance**, at which a mismatched cavity is perfectly transparent.
+    pub resonant: bool,
+}
+
+/// Compose a cavity: `Y_outer → Y_inner`, a declared phase, `Y_inner → Y_outer`.
+pub fn cavity(
+    outer: &Admittance,
+    inner: &Admittance,
+    phase: &ExactWavePhaseTransport,
+    kernel_bound: u64,
+) -> Result<CavityReading, TraversibleChainError> {
+    let first = PhasedTransfer::of_interface(Crossing::meet(outer, inner)?.transport());
+    let through = PhasedTransfer::of_propagation(phase);
+    let second = PhasedTransfer::of_interface(Crossing::meet(inner, outer)?.transport());
+    let composite = first.compose(&through).compose(&second);
+    let reflection = composite
+        .reflection()
+        .expect("M11 does not vanish for positive admittances");
+    let standing_wave = StandingWaveReading::of_reflection(&reflection, kernel_bound);
+    Ok(CavityReading {
+        round_trip: phase.compose(phase),
+        composite,
+        resonant: standing_wave.reflected_share.is_zero(),
+        standing_wave,
+    })
+}
+
 /// A chain of crossings over the exact carrier.
 pub type InteractionChain<N> = Chain<N, Crossing, Standing>;
+
+/// **A chain of crossings with declared propagation between them.** The carrier that can hold a
+/// non-trivial holonomy.
+pub type PhasedChain<N> = Chain<N, PhasedLink, Standing>;
+
+/// Found a phased traversal at a source carrying a declared admittance.
+pub fn found_phased<N>(source: N, carrying: &Admittance, prior: Standing) -> PhasedChain<N> {
+    Chain::founded(
+        source,
+        ChainEnd::Continues(prior),
+        Standing::Carrying(carrying.0.clone()),
+    )
+}
 
 /// Found a traversal at a source carrying a declared admittance.
 pub fn found<N>(source: N, carrying: &Admittance, prior: Standing) -> InteractionChain<N> {
@@ -658,10 +1207,122 @@ pub fn found<N>(source: N, carrying: &Admittance, prior: Standing) -> Interactio
     )
 }
 
+// -------------------------------------------------------------------------------------------------
+// The band: a chain of junctions IS a band, and its twist is the reflection signs
+// -------------------------------------------------------------------------------------------------
+
+/// **What one junction does to the hand, under a declared traversal.**
+///
+/// `Γ = (Y_i − Y_t)/(Y_i + Y_t)`. When the arriving section admits *less* than the one it meets,
+/// `Γ` is negative: the returned half comes back **inverted**, a half-turn, `−1 = e^(i pi)`. That
+/// is the same half-turn a Möbius band's fiber makes over one circuit of its base, where the
+/// parametrization's `cos(t/2)` turns the cross-section by `pi` while `t` turns by `2 pi`.
+///
+/// **The sign is a property of the (junction, direction) pair and never of the junction alone.**
+/// Traversing the same interface the other way swaps `Y_i` and `Y_t` and negates `Γ`. That is not a
+/// defect in the reading; it is the physical asymmetry that puts the half-wave loss at one face of
+/// a thin film and not the other, and it is time parity living on the transport rather than on the
+/// state. A band is therefore built by a **declared traversal**, and reversing the declaration is a
+/// gauge whose orbit must be exhibited rather than assumed trivial.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum JunctionTwist {
+    /// `Γ < 0` — the returned half comes back inverted. One half-turn.
+    Inverting,
+    /// `Γ > 0` — the returned half keeps the hand it left with. No turn.
+    Preserving,
+    /// `Γ = 0` — the matched junction. Nothing returns, so nothing turns.
+    Matched,
+}
+
+/// **The boundary of a band, which is a knot exactly when the twist count is odd.**
+///
+/// A band with `m` half-twists has as its boundary the `(2, m)` torus link. For even `m` that is
+/// two circles; for odd `m` it is a single circle — a knot — with crossing number `m`. Every
+/// nontrivial torus knot is **prime**, so odd `m >= 3` names a prime knot: `m = 3` is the trefoil,
+/// `m = 5` the cinquefoil.
+///
+/// This is classical knot theory, carried here as a *reading* of the twist count and not computed:
+/// nothing in this tree builds the knot or verifies its type.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BoundaryKnot {
+    /// Even twist count — the band is orientable and its boundary is two circles.
+    TwoComponentLink { half_twists: usize },
+    /// One half-twist — nonorientable, and the boundary is the unknot.
+    Unknot,
+    /// Odd `m >= 3` — the `(2, m)` torus knot, crossing number `m`, and prime.
+    PrimeTorusKnot { crossing_number: usize },
+}
+
+/// **A chain of junctions read as a band, with the winding kept and the parity derived from it.**
+///
+/// `CLAUDE.md` requires that a count of signs never stand in for the passages that produced it, so
+/// this keeps the per-junction twist list and the half-twist total, and offers orientability as a
+/// *derived* face rather than as the stored quantity.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BandReading {
+    /// One entry per crossing, in traversal order.
+    pub twists: Vec<JunctionTwist>,
+    /// How many junctions inverted — the winding, not its parity.
+    pub half_twists: usize,
+    pub preserving: usize,
+    pub matched: usize,
+}
+
+impl BandReading {
+    /// Read a declared traversal of a junction chain as a band.
+    pub fn of_chain<N>(chain: &InteractionChain<N>) -> Self {
+        let mut twists = Vec::with_capacity(chain.links().len());
+        let (mut half_twists, mut preserving, mut matched) = (0, 0, 0);
+        for crossing in chain.links() {
+            let reflection = crossing.reflection();
+            let twist = if reflection.is_negative() {
+                half_twists += 1;
+                JunctionTwist::Inverting
+            } else if reflection.is_zero() {
+                matched += 1;
+                JunctionTwist::Matched
+            } else {
+                preserving += 1;
+                JunctionTwist::Preserving
+            };
+            twists.push(twist);
+        }
+        Self {
+            twists,
+            half_twists,
+            preserving,
+            matched,
+        }
+    }
+
+    /// **The orientability class, derived from the winding rather than stored beside it.**
+    /// Odd twist count means a circuit returns the hand reversed — which is exactly MathWorld's
+    /// definition of a nonorientable surface, *"a closed path such that the directrix is reversed
+    /// when moved around this path"*, and exactly a nontrivial holonomy in `O(1) = {±1}`.
+    pub const fn reversing(&self) -> bool {
+        self.half_twists % 2 == 1
+    }
+
+    pub const fn orientable(&self) -> bool {
+        !self.reversing()
+    }
+
+    /// The `(2, m)` boundary this twist count carries. See [`BoundaryKnot`].
+    pub const fn boundary(&self) -> BoundaryKnot {
+        match self.half_twists {
+            0 => BoundaryKnot::TwoComponentLink { half_twists: 0 },
+            1 => BoundaryKnot::Unknot,
+            m if m % 2 == 0 => BoundaryKnot::TwoComponentLink { half_twists: m },
+            m => BoundaryKnot::PrimeTorusKnot { crossing_number: m },
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use holonic_structure::{DeclaredGauge, Disposition};
+    use std::collections::BTreeSet;
     use num_bigint::BigInt;
 
     fn admittance(numerator: i64, denominator: i64) -> Admittance {
@@ -690,6 +1351,86 @@ mod tests {
             );
         }
         chain
+    }
+
+    /// **The band's twist comes from the material's own direction, not from a declaration.**
+    /// An ascending admittance profile meets a more admitting section at every step, so every `Γ`
+    /// is negative and every junction inverts. The half-twist count is then the junction count,
+    /// and the orientability is its parity.
+    #[test]
+    fn an_ascending_chain_inverts_at_every_junction_and_its_parity_is_the_length() {
+        for profile in [
+            vec![1i64, 2, 3],
+            vec![1, 2, 3, 4],
+            vec![1, 3, 9, 27, 81],
+            vec![2, 5],
+        ] {
+            let chain = chain_over(&profile);
+            let band = BandReading::of_chain(&chain);
+            let junctions = profile.len() - 1;
+            assert_eq!(band.half_twists, junctions, "profile {profile:?}");
+            assert_eq!(band.preserving, 0);
+            assert_eq!(band.matched, 0);
+            assert_eq!(band.reversing(), junctions % 2 == 1, "profile {profile:?}");
+        }
+    }
+
+    /// The other direction is not the same band, and that is the content rather than a defect:
+    /// reversing a traversal negates every `Γ`, so a descending profile turns nowhere and is
+    /// orientable at every length. **Reversal is a declared gauge and this exhibits its orbit** —
+    /// the reading MOVES, so the direction is load-bearing.
+    #[test]
+    fn reversing_the_traversal_moves_the_band_and_that_orbit_is_exhibited() {
+        let ascending = vec![1i64, 2, 3, 4];
+        let mut descending = ascending.clone();
+        descending.reverse();
+
+        let up = BandReading::of_chain(&chain_over(&ascending));
+        let down = BandReading::of_chain(&chain_over(&descending));
+
+        assert_eq!(up.half_twists, 3);
+        assert_eq!(down.half_twists, 0);
+        assert!(up.reversing(), "an odd ascending chain is nonorientable");
+        assert!(down.orientable(), "the reversed chain turns nowhere");
+        assert_ne!(
+            up.twists, down.twists,
+            "if reversal moved nothing the direction would be gauge, and it is not"
+        );
+    }
+
+    /// A matched junction reflects nothing, so it turns nothing. It must not be counted as a
+    /// preserving junction either — three dispositions, not two.
+    #[test]
+    fn a_matched_junction_turns_nothing_and_is_neither_inverting_nor_preserving() {
+        let chain = chain_over(&[3i64, 3, 3]);
+        let band = BandReading::of_chain(&chain);
+        assert_eq!(band.matched, 2);
+        assert_eq!(band.half_twists, 0);
+        assert_eq!(band.preserving, 0);
+        assert!(band.orientable());
+        assert!(band.twists.iter().all(|t| *t == JunctionTwist::Matched));
+    }
+
+    /// The boundary of a band with `m` half-twists is the `(2, m)` torus link: two circles for
+    /// even `m`, the unknot at `m = 1`, and a prime torus knot of crossing number `m` for odd
+    /// `m >= 3`. The trefoil is the three-junction ascending chain.
+    #[test]
+    fn the_boundary_of_an_odd_band_is_a_prime_knot_whose_crossing_number_is_the_twist() {
+        let trefoil = BandReading::of_chain(&chain_over(&[1i64, 2, 3, 4]));
+        assert_eq!(
+            trefoil.boundary(),
+            BoundaryKnot::PrimeTorusKnot { crossing_number: 3 }
+        );
+
+        let unknot = BandReading::of_chain(&chain_over(&[1i64, 2]));
+        assert_eq!(unknot.boundary(), BoundaryKnot::Unknot);
+
+        let link = BandReading::of_chain(&chain_over(&[1i64, 2, 3]));
+        assert_eq!(
+            link.boundary(),
+            BoundaryKnot::TwoComponentLink { half_twists: 2 }
+        );
+        assert!(link.orientable(), "an even band is orientable");
     }
 
     #[test]
@@ -1440,5 +2181,488 @@ mod tests {
         let mut closed = found("source", &carried, Standing::NoTravelingSection);
         closed.terminate(Standing::NoTravelingSection);
         assert_eq!(closed.disposition(), Disposition::Saturated);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // THE PHASE WIRE — 2026-08-17
+    // ---------------------------------------------------------------------------------------------
+
+    /// A declared phase on the exact unit conic. `(3/5, 4/5)` is the smallest rational point that is
+    /// not a whole or quarter turn, so it is the honest witness rather than a degenerate one.
+    fn phase(cosine: (i64, i64), sine: (i64, i64)) -> ExactWavePhaseTransport {
+        ExactWavePhaseTransport::new(
+            Rat::new(cosine.0.into(), cosine.1.into()),
+            Rat::new(sine.0.into(), sine.1.into()),
+        )
+        .expect("on the exact unit conic")
+    }
+
+    /// ★ THE FALSIFIER THE PLAN NAMES. The abelian receipt above must still hold on an **unphased**
+    /// chain — it is a true statement about the interface family — and must **fail** once a real
+    /// phase crosses a real mismatch. Both arms are here, in one test, so neither can drift from the
+    /// other.
+    #[test]
+    fn the_phased_family_does_not_commute_and_the_holonomy_is_no_longer_forced() {
+        let turn = phase((3, 5), (4, 5));
+        let interface = Crossing::meet(&whole(1), &whole(3)).expect("meets");
+        let matrix = PhasedTransfer::of_interface(interface.transport());
+        let propagation = PhasedTransfer::of_propagation(&turn);
+
+        // THE CONTROL, and it is the module's own receipt: two interfaces still commute.
+        let other = PhasedTransfer::of_interface(
+            Crossing::meet(&whole(3), &whole(7)).expect("meets").transport(),
+        );
+        assert_eq!(
+            matrix.compose(&other),
+            other.compose(&matrix),
+            "the interface family is abelian, phased carrier or not"
+        );
+
+        // THE ARM: an interface and a phase do not.
+        assert_ne!(
+            matrix.compose(&propagation),
+            propagation.compose(&matrix),
+            "a phase across a mismatch must not commute, or the wire did nothing"
+        );
+
+        // A CLOSED CHAIN, and its holonomy. Y: 1 -> 3 -> 7 -> 1, with one declared propagation
+        // inserted after the first junction. The admittance ratio still closes -- det is
+        // multiplicative and the phase has det 1 -- so nothing about the material changed; what
+        // changed is that the transport no longer forgets the order.
+        let source = whole(1);
+        let mut loop_chain = found_phased(1i64, &source, Standing::NoTravelingSection);
+        loop_chain.carry(
+            PhasedLink::interface(Crossing::meet(&whole(1), &whole(3)).expect("meets")),
+            3,
+            Standing::Carrying(Rat::from_integer(3.into())),
+        );
+        loop_chain.carry(
+            PhasedLink::propagation(turn.clone(), &whole(3)),
+            3,
+            Standing::Carrying(Rat::from_integer(3.into())),
+        );
+        loop_chain.carry(
+            PhasedLink::interface(Crossing::meet(&whole(3), &whole(7)).expect("meets")),
+            7,
+            Standing::Carrying(Rat::from_integer(7.into())),
+        );
+        loop_chain.carry(
+            PhasedLink::interface(Crossing::meet(&whole(7), &whole(1)).expect("meets")),
+            1,
+            Standing::LoopClosed,
+        );
+        let holonomy = loop_chain.holonomy().expect("the chain closes");
+        assert_ne!(
+            holonomy,
+            PhasedTransfer::identity(),
+            "THE FALSIFIER: a closed phased chain must NOT return the identity"
+        );
+        // And the determinant still closes at one, so the holonomy is not an admittance leak.
+        assert_eq!(
+            loop_chain.compose().determinant(),
+            ExactComplexWaveCurrent::one(),
+            "det is multiplicative and the phase has det 1: the ratio still closes"
+        );
+
+        // THE SECOND CONTROL: the same chain with the IDENTITY phase returns the identity, which is
+        // the module's original receipt recovered exactly.
+        let mut unturned = found_phased(1i64, &source, Standing::NoTravelingSection);
+        for (incident, transmitted, node) in [(1i64, 3i64, 3i64), (3, 7, 7), (7, 1, 1)] {
+            unturned.carry(
+                PhasedLink::interface(
+                    Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets"),
+                ),
+                node,
+                Standing::Carrying(Rat::from_integer(transmitted.into())),
+            );
+        }
+        unturned.carry(
+            PhasedLink::propagation(ExactWavePhaseTransport::identity(), &whole(1)),
+            1,
+            Standing::LoopClosed,
+        );
+        assert_eq!(
+            unturned.holonomy().expect("the chain closes"),
+            PhasedTransfer::identity(),
+            "a whole turn is invisible, so the unphased receipt is recovered exactly"
+        );
+    }
+
+    /// ★ THE NON-COMMUTATION IS CONDITIONAL, AND BOTH CONDITIONS ARE REQUIRED. A phase across a
+    /// matched junction is invisible; a whole turn across a mismatch is invisible. Only a real
+    /// phase across a real mismatch turns — which is a statement about the material and not about
+    /// the carrier, and is what makes the holonomy evidence.
+    #[test]
+    fn the_phase_and_the_mismatch_are_both_required_for_the_family_to_turn() {
+        let turning = phase((3, 5), (4, 5));
+        let whole_turn = ExactWavePhaseTransport::identity();
+        let matched = PhasedTransfer::of_interface(
+            Crossing::meet(&whole(5), &whole(5)).expect("meets").transport(),
+        );
+        let mismatched = PhasedTransfer::of_interface(
+            Crossing::meet(&whole(2), &whole(9)).expect("meets").transport(),
+        );
+
+        // matched junction + real phase -> commutes (the interface is the identity matrix)
+        let turn = PhasedTransfer::of_propagation(&turning);
+        assert_eq!(matched.compose(&turn), turn.compose(&matched));
+        // mismatch + whole turn -> commutes (the phase is the identity matrix)
+        let no_turn = PhasedTransfer::of_propagation(&whole_turn);
+        assert_eq!(mismatched.compose(&no_turn), no_turn.compose(&mismatched));
+        // mismatch + real phase -> does NOT commute, and the defect is exactly (1-rho)/2 . (p - pbar)
+        let forward = mismatched.compose(&turn);
+        let backward = turn.compose(&mismatched);
+        assert_ne!(forward, backward);
+        let expected_off_diagonal = ExactComplexWaveCurrent::new(Rat::zero(), Rat::one())
+            .scaled(&(Rat::new(2.into(), 1.into()) * &turning.sine))
+            .scaled(&(Rat::one() - Rat::new(9.into(), 2.into())))
+            .scaled(&Rat::new(1.into(), 2.into()));
+        assert_eq!(
+            forward.into_forward().subtract(backward.into_forward()),
+            expected_off_diagonal,
+            "the commutator's stated form, checked against the product"
+        );
+    }
+
+    /// ★ THE CONSERVATION LAW SURVIVES THE WIRE. A phase is an isometry of the admittance metric
+    /// with scale exactly one — it carries no admittance change — while an interface scales by `ρ`,
+    /// and a composite carries the product. A wire that broke this would be inventing energy.
+    ///
+    /// The foil is required: a transport outside the group must be `Obstructed`, or the law is a
+    /// tautology of `2×2` matrices rather than a condition on this family.
+    #[test]
+    fn the_phase_is_an_isometry_of_the_admittance_metric_and_the_interface_scales_it() {
+        let turn = PhasedTransfer::of_propagation(&phase((3, 5), (4, 5)));
+        assert_eq!(
+            turn.conserved_form().scale(),
+            Some(&Rat::one()),
+            "a phase carries no admittance change"
+        );
+        for (incident, transmitted) in [(1i64, 3i64), (3, 7), (7, 1), (5, 5)] {
+            let matrix = PhasedTransfer::of_interface(
+                Crossing::meet(&whole(incident), &whole(transmitted))
+                    .expect("meets")
+                    .transport(),
+            );
+            assert_eq!(
+                matrix.conserved_form().scale(),
+                Some(&Rat::new(transmitted.into(), incident.into())),
+                "an interface scales the metric by rho"
+            );
+            // and the composite carries the product, phase included
+            let composite = matrix.compose(&turn);
+            assert_eq!(
+                composite.conserved_form().scale(),
+                Some(&Rat::new(transmitted.into(), incident.into()))
+            );
+        }
+        // THE FOIL: a shunt element in the (V, I) chart is outside the group and is refused by name.
+        let outside = PhasedTransfer {
+            through: ExactComplexWaveCurrent::one(),
+            into_forward: ExactComplexWaveCurrent::zero(),
+            returned: ExactComplexWaveCurrent::one(),
+            into_returned: ExactComplexWaveCurrent::one(),
+        };
+        assert!(matches!(
+            outside.conserved_form(),
+            PhasedConservedForm::Obstructed { .. }
+        ));
+    }
+
+    /// ★ THE RESONATOR, ASKED. A mismatched termination holds a standing wave; a matched one does
+    /// not, and **the second half is the control** — a reading that returns a standing wave on a
+    /// matched termination is measuring the instrument.
+    #[test]
+    fn a_mismatch_holds_a_standing_wave_and_a_match_holds_none() {
+        // THE CONTROL FIRST. Y: 5 -> 5 matches, Γ = 0, and nothing stands.
+        let matched = Crossing::meet(&whole(5), &whole(5)).expect("meets");
+        let flat = StandingWaveReading::of_reflection(
+            &ExactComplexWaveCurrent::new(matched.reflection(), Rat::zero()),
+            1 << 20,
+        );
+        assert!(flat.matched);
+        assert_eq!(flat.reflected_share, Rat::zero());
+        assert_eq!(flat.standing_wave_ratio, Some(Rat::one()));
+        assert_eq!(flat.extreme_sum, Rat::from_integer(2.into()));
+        assert_eq!(flat.extreme_product, Rat::one());
+
+        // THE ARM. Y: 1 -> 3 gives Γ = (1-3)/(1+3) = -1/2, so |Γ|² = 1/4 and |Γ| = 1/2 is rational:
+        // the ratio is exactly 3, and nothing was rounded to say so.
+        let crossing = Crossing::meet(&whole(1), &whole(3)).expect("meets");
+        assert_eq!(crossing.reflection(), Rat::new((-1).into(), 2.into()));
+        let standing = StandingWaveReading::of_reflection(
+            &ExactComplexWaveCurrent::new(crossing.reflection(), Rat::zero()),
+            1 << 20,
+        );
+        assert!(!standing.matched);
+        assert_eq!(standing.reflected_share, Rat::new(1.into(), 4.into()));
+        assert_eq!(standing.standing_wave_ratio, Some(Rat::from_integer(3.into())));
+        // the extremes are the roots of x² − (5/2)x + (9/16), i.e. 9/4 and 1/4, ratio 9 = SWR².
+        assert_eq!(standing.extreme_sum, Rat::new(5.into(), 2.into()));
+        assert_eq!(standing.extreme_product, Rat::new(9.into(), 16.into()));
+
+        // AND THE REFUSAL. Y: 1 -> 2 gives Γ = -1/3, |Γ|² = 1/9, |Γ| = 1/3 — rational again. Y: 1 -> 5
+        // gives Γ = -2/3, |Γ|² = 4/9 — still a square. A NON-square needs an irrational root:
+        // Γ = (1-ρ)/(1+ρ) with ρ = 4 gives -3/5, |Γ|² = 9/25, square. Take the complex case instead,
+        // where the share is 1/2 and no rational root exists.
+        let irrational = StandingWaveReading::of_reflection(
+            &ExactComplexWaveCurrent::new(
+                Rat::new(1.into(), 2.into()),
+                Rat::new(1.into(), 2.into()),
+            ),
+            1 << 20,
+        );
+        assert_eq!(irrational.reflected_share, Rat::new(1.into(), 2.into()));
+        assert_eq!(
+            irrational.standing_wave_ratio, None,
+            "the ratio needs a root the rationals do not hold; refusing is the return"
+        );
+        // and the invariant is still exact and still says everything the ratio would have.
+        assert_eq!(irrational.extreme_sum, Rat::new(3.into(), 1.into()));
+        assert_eq!(irrational.extreme_product, Rat::new(1.into(), 4.into()));
+    }
+
+    /// ★ THE BAND STRUCTURE, DECIDED BY ONE EXACT RATIONAL COMPARISON. All three classes must be
+    /// reachable on real material or the classification is vacuous, and the imaginary part of the
+    /// trace is **measured** rather than assumed away.
+    #[test]
+    fn the_cell_trace_decides_the_band_and_all_three_classes_are_reachable() {
+        // A PERIOD IS A BILAYER, and the first attempt at this test found out why by failing.
+        // Composing only `M(rho) . P . M(1/rho)` -- propagation inside the slab and none outside --
+        // gives half-trace `cos(phi)` for EVERY rho, so no such stack ever has a stop band. That is
+        // physically right and it convicts the cell rather than the reading: consecutive cells'
+        // junctions cancel, `M(1/rho)M(rho) = M(1) = I`, and the structure collapses to a uniform
+        // medium. A real period propagates through BOTH media:
+        //
+        //     P(alpha) . M(rho) . P(beta) . M(1/rho)
+        let cell = |transmitted: i64,
+                    first_turn: &ExactWavePhaseTransport,
+                    second_turn: &ExactWavePhaseTransport|
+         -> PhasedTransfer {
+            PhasedTransfer::of_propagation(first_turn)
+                .compose(&PhasedTransfer::of_interface(
+                    Crossing::meet(&whole(1), &whole(transmitted))
+                        .expect("meets")
+                        .transport(),
+                ))
+                .compose(&PhasedTransfer::of_propagation(second_turn))
+                .compose(&PhasedTransfer::of_interface(
+                    Crossing::meet(&whole(transmitted), &whole(1))
+                        .expect("meets")
+                        .transport(),
+                ))
+        };
+        let quarter = phase((0, 1), (1, 1));
+        let three_four_five = phase((3, 5), (4, 5));
+        let whole_turn = ExactWavePhaseTransport::identity();
+
+        let mut seen: BTreeSet<BandClass> = BTreeSet::new();
+        for (transmitted, first_turn, second_turn, expected) in [
+            // Quarter turn in both media through a mismatch: the classic stop band.
+            (3i64, &quarter, &quarter, BandClass::Stop),
+            (9, &quarter, &quarter, BandClass::Stop),
+            // The same phases with NO mismatch: the band edge, which is the half-wave point of a
+            // uniform medium. rho = 1 is the control -- with nothing to reflect there is no gap.
+            (1, &quarter, &quarter, BandClass::Edge),
+            // A phase in one medium only, through the mismatch: still propagating.
+            (3, &quarter, &whole_turn, BandClass::Pass),
+            (3, &three_four_five, &three_four_five, BandClass::Pass),
+        ] {
+            let composed = cell(transmitted, first_turn, second_turn);
+            let reading = BlochReading::of_cell(&composed);
+            assert!(
+                reading.is_a_period(),
+                "the cell must return to its own admittance with a real trace"
+            );
+            assert_eq!(reading.trace_imaginary, Rat::zero());
+            assert_eq!(reading.metric_scale, Some(Rat::one()));
+            assert_eq!(
+                reading.class, expected,
+                "rho={transmitted} half-trace={}",
+                reading.half_trace
+            );
+            seen.insert(reading.class);
+
+            // THE SECOND FRAME. The classical bilayer dispersion,
+            //   half-trace = cos(a)cos(b) - ((1+rho^2)/(2 rho)) sin(a) sin(b),
+            // asserted AGAINST the composition rather than implemented in place of it. The
+            // coefficient exceeds one for every rho != 1 by AM-GM, which is exactly why a mismatch
+            // opens a gap and a matched stack cannot.
+            let rho = Rat::from_integer(transmitted.into());
+            let coupling = (Rat::one() + &rho * &rho) / (Rat::from_integer(2.into()) * &rho);
+            let classical = &first_turn.cosine * &second_turn.cosine
+                - &coupling * &first_turn.sine * &second_turn.sine;
+            assert_eq!(
+                reading.half_trace, classical,
+                "the bilayer dispersion, against the composed transport"
+            );
+            assert!(coupling >= Rat::one(), "AM-GM: the coupling never drops below one");
+        }
+        assert_eq!(seen.len(), 3, "all three band classes must be reachable");
+
+        // THE FOIL: a cell that does not return to its own admittance is not a period, and the
+        // reading says so rather than classifying it anyway.
+        let not_a_period = PhasedTransfer::of_interface(
+            Crossing::meet(&whole(1), &whole(3)).expect("meets").transport(),
+        );
+        let reading = BlochReading::of_cell(&not_a_period);
+        assert!(!reading.is_a_period());
+        assert_eq!(reading.metric_scale, Some(Rat::from_integer(3.into())));
+    }
+
+    /// ★ THE CAVITY RESONATES, AND THE RESONANCE IS AN EXACT RATIONAL CONDITION. The composite is a
+    /// composition of standing transports; the classical closed form is asserted **against** it.
+    #[test]
+    fn the_cavity_is_transparent_exactly_at_the_whole_round_trip() {
+        let bound = 1u64 << 20;
+        let outer = whole(1);
+        let inner = whole(3);
+        // A whole round trip: p² = 1. The two mirrors' returns cancel and the cavity is transparent
+        // even though each of its junctions reflects a quarter of the incident power.
+        let resonant = cavity(&outer, &inner, &ExactWavePhaseTransport::identity(), bound)
+            .expect("both junctions meet");
+        assert!(resonant.resonant);
+        assert_eq!(resonant.standing_wave.reflected_share, Rat::zero());
+        assert_eq!(
+            resonant.round_trip,
+            ExactWavePhaseTransport::identity(),
+            "p² = 1 is the resonance condition, exactly"
+        );
+        // and each mirror alone is emphatically not transparent.
+        assert_eq!(
+            Crossing::meet(&outer, &inner).expect("meets").reflection(),
+            Rat::new((-1).into(), 2.into())
+        );
+
+        // A quarter turn: p² = −1, the anti-resonance, where the returns add instead.
+        let quarter = phase((0, 1), (1, 1));
+        let anti = cavity(&outer, &inner, &quarter, bound).expect("both junctions meet");
+        assert!(!anti.resonant);
+        assert_eq!(
+            anti.round_trip,
+            ExactWavePhaseTransport::new(Rat::from_integer((-1).into()), Rat::zero())
+                .expect("on the conic"),
+        );
+        // Γ_total = 2Γ/(1+Γ²) at p² = −1 with Γ = −1/2: −1/(5/4) = −4/5, so the share is 16/25.
+        assert_eq!(
+            anti.standing_wave.reflected_share,
+            Rat::new(16.into(), 25.into())
+        );
+        assert_eq!(
+            anti.standing_wave.standing_wave_ratio,
+            Some(Rat::from_integer(9.into())),
+            "|Γ| = 4/5 is rational here, so the ratio is exactly 9"
+        );
+
+        // THE CLOSED FORM, ASSERTED AGAINST THE COMPOSITION rather than implemented. For a symmetric
+        // slab Γ₂ = −Γ₁, so Γ_total = Γ₁(1 − e^{2iφ})/(1 − Γ₁² e^{2iφ}).
+        for turn in [
+            ExactWavePhaseTransport::identity(),
+            quarter.clone(),
+            phase((3, 5), (4, 5)),
+            phase((5, 13), (12, 13)),
+        ] {
+            let reading = cavity(&outer, &inner, &turn, bound).expect("both junctions meet");
+            let gamma = Rat::new((-1).into(), 2.into());
+            let round = ExactComplexWaveCurrent::new(
+                reading.round_trip.cosine.clone(),
+                reading.round_trip.sine.clone(),
+            );
+            let one = ExactComplexWaveCurrent::one();
+            let numerator = one.subtract(&round).scaled(&gamma);
+            let denominator = one.subtract(&round.scaled(&(&gamma * &gamma)));
+            let closed_form = numerator.multiply(
+                &denominator
+                    .reciprocal()
+                    .expect("the denominator does not vanish"),
+            );
+            assert_eq!(
+                reading.composite.reflection().expect("M11 stands"),
+                closed_form,
+                "the multiple-reflection sum in closed form, against the composition"
+            );
+        }
+
+        // THE CONTROL: a MATCHED cavity is transparent at EVERY phase, so a phase sweep that shows
+        // variation on it would be measuring the instrument.
+        for turn in [
+            ExactWavePhaseTransport::identity(),
+            quarter,
+            phase((3, 5), (4, 5)),
+        ] {
+            let flat = cavity(&outer, &outer, &turn, bound).expect("both junctions meet");
+            assert!(flat.resonant, "a matched cavity resonates at every phase");
+            assert_eq!(flat.standing_wave.reflected_share, Rat::zero());
+        }
+    }
+
+    /// ★ THE HAND IS THE SIGN OF THE STORED FACE AT EVERY IMPLEMENTOR, and this test is the audit
+    /// that found it was not.
+    ///
+    /// `Hand::Ortho` is *"cohere-null with the cross **maximal**"*. A propagation's hand was read off
+    /// its **sine** and returned `Ortho` at `sine = 0` — a whole turn, the identity, the least turn
+    /// there is. The repair reads the **cosine**, the stored face, so `Ortho` lands on the quarter
+    /// turn where nothing stands. Both arms are required: the identity must NOT be `Ortho`, and the
+    /// quarter turn must be.
+    #[test]
+    fn a_propagations_hand_is_its_stored_face_and_the_identity_is_not_the_founding_turn() {
+        let carrying = whole(3);
+        // THE WHOLE TURN. Nothing turns; the stored face is everything.
+        let identity = PhasedLink::propagation(ExactWavePhaseTransport::identity(), &carrying);
+        assert_eq!(
+            identity.hand(),
+            Hand::Cohere,
+            "a whole turn stores everything, so its hand coheres and is emphatically not Ortho"
+        );
+        assert!(!identity.turns());
+
+        // THE QUARTER TURN. The stored face is null and the turn is maximal.
+        let quarter = PhasedLink::propagation(phase((0, 1), (1, 1)), &carrying);
+        assert_eq!(quarter.hand(), Hand::Ortho, "cos = 0 is the founding turn");
+        assert!(quarter.turns());
+
+        // THE HALF TURN. Everything stored comes back inverted.
+        let half = PhasedLink::propagation(
+            ExactWavePhaseTransport::new(Rat::from_integer((-1).into()), Rat::zero())
+                .expect("on the conic"),
+            &carrying,
+        );
+        assert_eq!(half.hand(), Hand::Anti);
+
+        // AND A SHALLOW TURN IS STILL COHERE: the hand is not a proxy for "does it turn at all".
+        let shallow = PhasedLink::propagation(phase((3, 5), (4, 5)), &carrying);
+        assert_eq!(shallow.hand(), Hand::Cohere);
+        assert!(shallow.turns(), "it turns, and it still coheres");
+
+        // THE CROSS-IMPLEMENTOR ARM: an interface reads the same face. A MATCHED junction returns
+        // nothing, so its stored face is null and its hand is Ortho — agreeing with the arrow's
+        // reading of a null cohere, and with this module's own note that a match is "the founding
+        // orthogonal case rather than a null".
+        let matched = PhasedLink::interface(Crossing::meet(&whole(5), &whole(5)).expect("meets"));
+        assert_eq!(matched.hand(), Hand::Ortho);
+        let mismatched = PhasedLink::interface(Crossing::meet(&whole(1), &whole(3)).expect("meets"));
+        assert_ne!(mismatched.hand(), Hand::Ortho, "a mismatch stores something");
+    }
+
+    /// The real chart embeds without moving a single entry, so the phased carrier is a widening and
+    /// never a replacement — the module's standing figures are all still readable in it.
+    #[test]
+    fn the_real_chart_embeds_into_the_phased_one_unchanged() {
+        for (incident, transmitted) in [(1i64, 3i64), (2, 9), (60, 1), (5, 5)] {
+            let crossing = Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets");
+            let embedded = PhasedTransfer::of_interface(crossing.transport());
+            assert_eq!(
+                embedded.reflection().expect("M11 does not vanish"),
+                ExactComplexWaveCurrent::new(crossing.reflection(), Rat::zero())
+            );
+            assert_eq!(
+                embedded.transmission().expect("M11 does not vanish"),
+                ExactComplexWaveCurrent::new(crossing.transmission(), Rat::zero())
+            );
+            assert_eq!(
+                embedded.determinant(),
+                ExactComplexWaveCurrent::new(crossing.transport().determinant(), Rat::zero())
+            );
+        }
     }
 }

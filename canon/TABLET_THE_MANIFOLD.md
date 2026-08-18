@@ -785,7 +785,7 @@ surfacing from any lane (`:807`).
 
 | organ | what it covers with, today |
 |---|---|
-| `causal_language` leader | **`expand_front`** — `soma/life/src/causal_language.rs:482`, with the tip's extent supplied as `emitted.len() + 1`. Migrated. |
+| `causal_language` leader | **`expand_front`** — `soma/life/src/causal_language.rs:645`, with the tip's extent supplied as `emitted.len() + 1`. Migrated. (Cited at `:482`, then `:820`; the line has moved twice in one day. Cite the construct — `grep -n "expand_front("` — and let the line be a hint.) |
 | `token_invariance::sweep_covered` | its **own** by-extent placement, `token_invariance.rs:1776-1811` — the same law, written twice. Not shared. |
 | `morphological_language::generate_currents` | `std::thread::available_parallelism()` directly (`soma/life/src/morphological_language/ecology.rs:1453`) and sections the front `sections[at % lanes]` (`:798`) — **by count**, which is the law `sweep_covered`'s own comment names as wrong at `token_invariance.rs:1776`: *"Cover the surfaces by EXTENT, not by count: a surface with a million occurrences and one with two are not one unit each."* Not shared, and covering by a different law. |
 

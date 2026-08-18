@@ -22,6 +22,27 @@
 //! primitive that makes such a count computable, so that a positivity claim in this body can be a
 //! claim about material rather than about the shape of the expression that produced it.
 //!
+//! ## This module is the fifth name of one organ, and it is the one that computes its law
+//!
+//! `canon/THE_INFORMATION_ENGINE.md` records the Schur complement as **one organ under four
+//! names, none of which cites the others**: `diffusion.rs`'s certified boundary transfer, `H.0219`'s
+//! parallelization barrier, the effective tension `S = D − C*A⁻¹C` of
+//! `papers/source/mathematics/theorems/conditioned-effective-tension.typ`, and **`H.0127` *Schur
+//! complement and inertia***, `proved-standard`, which states the law the other three use.
+//!
+//! **This module is the fifth**, and it is the one that actually computes `H.0127`: the elimination
+//! below *is* the Schur complement, recursed, exactly over `Rat`. Added 2026-08-16 after a campaign
+//! measured that it cited none of the four.
+//!
+//! That matters beyond bookkeeping. `H.0127`'s second sentence — *"the block matrix has the inertia
+//! of `A` plus the inertia of its Schur complement"* — is Haynsworth's additivity, and it is the law
+//! the Riemann support-successor obligation is stated in:
+//! `papers/source/mathematics/theorems/weil-support-induction-reduction.typ` reduces the hypothesis
+//! to `(RANGE)` and `(OPERATOR SHORT)`, which are Albert's block-positivity pair, whose finite form
+//! is `H/A >= 0`. `examples/the_pullback_bounds_the_inertia.rs` returns
+//! `In(H) = In(A) + In(H/A)` on three fixtures, with the positive-definite arm labelled as the one
+//! that cannot fail.
+//!
 //! ## The law, and what makes it a testable claim rather than an assumption
 //!
 //! Sylvester's law of inertia: for a symmetric bilinear form over an ordered field, the triple
@@ -72,6 +93,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::exact_work::ExactWork;
 use crate::rebase_invariants::IntegerMatrix;
 
 // -------------------------------------------------------------------------------------------
@@ -365,6 +387,38 @@ pub fn inertia_with_schedule(
     form: &SymmetricForm,
     order: PivotOrder,
 ) -> (Inertia, InertiaSchedule) {
+    let (tally, schedule, _) = inertia_with_work(form, order);
+    (tally, schedule)
+}
+
+/// **The same elimination, returning what it cost.**
+///
+/// Added 2026-08-17. `canon/TABLET_THE_CHART.md` §3.7 records that *"the dominating quantity is
+/// intermediate entry bit-length and nothing counts it. Until a work vector exists, no cost question
+/// in this repository has a lawful answer."* This is that count, taken at the only place it can be
+/// taken exactly: inside the elimination, on every entry it writes.
+///
+/// **Why the schedule was not enough, in its own words.** `InertiaSchedule` returns the pivot steps,
+/// and the same tablet says the pivot count is *provably not* the dominating quantity — a form can
+/// take `k` pivots whose entries stay narrow, or `k` pivots whose entries are `k × k` minors. The
+/// steps say how many; only [`ExactWork::peak_bits`] says how wide.
+///
+/// The counting is exact and adds no arithmetic: every operation was already performed, and this
+/// records that it was.
+pub fn inertia_with_work(
+    form: &SymmetricForm,
+    order: PivotOrder,
+) -> (Inertia, InertiaSchedule, ExactWork) {
+    let mut work = ExactWork::nothing();
+    let extent = form.extent();
+    work.resident(u64::try_from(extent.saturating_mul(extent)).unwrap_or(u64::MAX));
+    // The form as handed in is the widest thing that stands before a single step is taken, so its
+    // own entries enter the peak. A deed whose INPUT is wide has already paid for that width.
+    for row in 0..extent {
+        for column in 0..extent {
+            work.wrote(form.at(row, column));
+        }
+    }
     let mut working = form.rows();
     let mut alive: Vec<usize> = (0..form.extent()).collect();
     let mut tally = Inertia::default();
@@ -380,7 +434,9 @@ pub fn inertia_with_schedule(
                 tally.positive += 1;
             }
             steps.push(PivotStep::Diagonal { index, negative });
-            eliminate_diagonal(&mut working, &alive, index, &pivot);
+            // Each pivot depends on the last: the span of a serial elimination is its pivot count.
+            work.stepped();
+            eliminate_diagonal(&mut working, &alive, index, &pivot, &mut work);
             alive.retain(|surviving| *surviving != index);
             continue;
         }
@@ -390,7 +446,8 @@ pub fn inertia_with_schedule(
             tally.positive += 1;
             tally.negative += 1;
             steps.push(PivotStep::ZeroDiagonalPair { low, high });
-            eliminate_pair(&mut working, &alive, low, high, &pivot);
+            work.stepped();
+            eliminate_pair(&mut working, &alive, low, high, &pivot, &mut work);
             alive.retain(|surviving| *surviving != low && *surviving != high);
             continue;
         }
@@ -401,14 +458,20 @@ pub fn inertia_with_schedule(
         alive.clear();
     }
 
-    (tally, InertiaSchedule { order, steps })
+    (tally, InertiaSchedule { order, steps }, work)
 }
 
 /// `a'_jk = a_jk - a_ji · a_ik / a_ii` over the survivors.
 ///
 /// The pivot row and column are read from a snapshot and are outside the region written, so the
 /// update cannot see its own partial results. That is what makes the order a free parameter.
-fn eliminate_diagonal(working: &mut [Vec<Rat>], alive: &[usize], index: usize, pivot: &Rat) {
+fn eliminate_diagonal(
+    working: &mut [Vec<Rat>],
+    alive: &[usize],
+    index: usize,
+    pivot: &Rat,
+    work: &mut ExactWork,
+) {
     let survivors: Vec<(usize, Rat)> = alive
         .iter()
         .filter(|surviving| **surviving != index)
@@ -419,6 +482,11 @@ fn eliminate_diagonal(working: &mut [Vec<Rat>], alive: &[usize], index: usize, p
             // `a_ik == a_ki`, so one snapshot serves both factors.
             let delta = (to_pivot_row * to_pivot_column) / pivot;
             working[*row][*column] -= delta;
+            // One multiply, one divide (which normalises), one subtract, one entry written.
+            work.multiplied(1);
+            work.divided(1);
+            work.added(1);
+            work.wrote(&working[*row][*column]);
         }
     }
 }
@@ -427,7 +495,14 @@ fn eliminate_diagonal(working: &mut [Vec<Rat>], alive: &[usize], index: usize, p
 ///
 /// This is the Schur complement of a `2x2` block whose inverse is `[[0, 1/a], [1/a, 0]]`, which is
 /// where the crossed product comes from.
-fn eliminate_pair(working: &mut [Vec<Rat>], alive: &[usize], low: usize, high: usize, pivot: &Rat) {
+fn eliminate_pair(
+    working: &mut [Vec<Rat>],
+    alive: &[usize],
+    low: usize,
+    high: usize,
+    pivot: &Rat,
+    work: &mut ExactWork,
+) {
     let survivors: Vec<usize> = alive
         .iter()
         .copied()
@@ -445,6 +520,11 @@ fn eliminate_pair(working: &mut [Vec<Rat>], alive: &[usize], low: usize, high: u
         for (right, column) in survivors.iter().enumerate() {
             let crossed = &to_low[left] * &to_high[right] + &to_high[left] * &to_low[right];
             working[*row][*column] -= crossed / pivot;
+            // Two multiplies, one add for the cross, one divide, one subtract, one entry written.
+            work.multiplied(2);
+            work.added(2);
+            work.divided(1);
+            work.wrote(&working[*row][*column]);
         }
     }
 }
@@ -647,16 +727,27 @@ pub fn pullback_inertia_bound(
     form: &SymmetricForm,
     basis: &ExactRatMatrix,
 ) -> Result<PullbackInertia, InertiaError> {
+    Ok(pullback_inertia_bound_with_work(form, basis)?.0)
+}
+
+/// **The same pull-back, with its work separated by phase.**
+///
+/// Added 2026-08-17 because an adjudication observed that timing this function *"is not isolated
+/// Gaussian elimination"* — it performs two matrix products, a kernel row reduction and two
+/// eliminations, and a clock cannot say which one carried the cost. The return is one vector per
+/// phase, so the question is answered by counting instead of attributed by guess.
+pub fn pullback_inertia_bound_with_work(
+    form: &SymmetricForm,
+    basis: &ExactRatMatrix,
+) -> Result<(PullbackInertia, Vec<(&'static str, ExactWork)>), InertiaError> {
     if basis.rows() != form.extent() {
         return Err(InertiaError::PullbackRowsMismatch {
             extent: form.extent(),
             rows: basis.rows(),
         });
     }
-    let transported = basis
-        .transpose()?
-        .multiply(&form.as_matrix()?)?
-        .multiply(basis)?;
+    let (half, first_product) = basis.transpose()?.multiply_with_work(&form.as_matrix()?)?;
+    let (transported, second_product) = half.multiply_with_work(basis)?;
     // Routed back through the validating constructor for the same reason `congruence` is: `PᵀAP` is
     // symmetric as mathematics, so an asymmetric arrival is a wrong multiplication and must say so.
     let pulled = SymmetricForm::from_rows(
@@ -665,13 +756,24 @@ pub fn pullback_inertia_bound(
             .collect::<Result<Vec<Vec<Rat>>, ExactLinearError>>()?,
     )?;
     let kernel = kernel_basis(basis)?;
-    Ok(PullbackInertia {
-        source: inertia(form),
-        pulled_back: inertia(&pulled),
-        form: pulled,
-        basis_rank: basis.columns() - kernel.len(),
-        kernel,
-    })
+    let (source_tally, _, source_work) = inertia_with_work(form, PivotOrder::FirstNonzero);
+    let (pulled_tally, _, pulled_work) = inertia_with_work(&pulled, PivotOrder::FirstNonzero);
+    let phases = vec![
+        ("product-transpose-times-form", first_product),
+        ("product-times-basis", second_product),
+        ("elimination-source", source_work),
+        ("elimination-pulled-back", pulled_work),
+    ];
+    Ok((
+        PullbackInertia {
+            source: source_tally,
+            pulled_back: pulled_tally,
+            form: pulled,
+            basis_rank: basis.columns() - kernel.len(),
+            kernel,
+        },
+        phases,
+    ))
 }
 
 /// A basis of `{x : M x = 0}`, exactly, by reduced row echelon form over `Rat`.
@@ -822,6 +924,136 @@ pub enum InertiaError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::exact_value::ExactOrdering;
+    use num_bigint::BigUint;
+
+    // -----------------------------------------------------------------------------------------
+    // THE WORK VECTOR — 2026-08-17
+    // -----------------------------------------------------------------------------------------
+
+    /// ★ THE PIVOT COUNT IS PROVABLY NOT THE DOMINATING QUANTITY, and this is the proof the tablet
+    /// asserts without one.
+    ///
+    /// `canon/TABLET_THE_CHART.md` §3.7: *"`PivotSchedule` returns the pivot count and it is
+    /// provably **not** the dominating quantity; the dominating quantity is intermediate entry
+    /// bit-length and nothing counts it."* Two forms of the same extent, taking the **same number of
+    /// pivots**, whose peak intermediate widths differ by orders. If the widths agreed, the vector
+    /// would be measuring what the schedule already said and would carry nothing.
+    #[test]
+    fn two_forms_take_the_same_pivots_and_do_not_take_the_same_width() {
+        let extent = 8usize;
+        // A: the identity. Every pivot is 1, every Schur update subtracts zero, nothing widens.
+        let identity = SymmetricForm::from_diagonal(vec![Rat::one(); extent]);
+        // B: the Hilbert form `1/(i+j+1)` — symmetric, invertible, and famous for exactly the
+        // property under test: its exact elimination's intermediates blow up.
+        let hilbert = SymmetricForm::from_rows(
+            (0..extent)
+                .map(|row| {
+                    (0..extent)
+                        .map(|column| Rat::new(1.into(), (row + column + 1).into()))
+                        .collect()
+                })
+                .collect(),
+        )
+        .expect("symmetric by construction");
+
+        let (flat_tally, flat_schedule, flat_work) =
+            inertia_with_work(&identity, PivotOrder::FirstNonzero);
+        let (deep_tally, deep_schedule, deep_work) =
+            inertia_with_work(&hilbert, PivotOrder::FirstNonzero);
+
+        // Both are positive definite of the same extent, and both take the same pivots.
+        assert!(flat_tally.is_positive_definite());
+        assert!(deep_tally.is_positive_definite());
+        assert_eq!(flat_schedule.steps.len(), deep_schedule.steps.len());
+        assert_eq!(flat_work.dependency_span, deep_work.dependency_span);
+
+        // THE ARM: the widths do not agree, and the wider one is wider by a real margin.
+        assert!(
+            deep_work.peak_bits > flat_work.peak_bits,
+            "the schedule cannot see this: {} pivots either way, peak {} against {}",
+            flat_schedule.steps.len(),
+            deep_work.peak_bits,
+            flat_work.peak_bits
+        );
+        // And the product order says so rather than a scalar: the identity's work is DOMINATED.
+        assert_eq!(flat_work.order_against(&deep_work), ExactOrdering::Less);
+    }
+
+    /// ★ THE WIDTH GROWS WITH THE DEPTH, which is the shape `O(k³)` operations on `k × k` minors
+    /// predicts and which a wall-clock fit could only infer. Measured on the form whose growth is
+    /// classical, so the reading has a second frame outside this repository.
+    #[test]
+    fn the_peak_width_grows_with_the_extent_on_a_form_whose_growth_is_classical() {
+        let hilbert = |extent: usize| {
+            SymmetricForm::from_rows(
+                (0..extent)
+                    .map(|row| {
+                        (0..extent)
+                            .map(|column| Rat::new(1.into(), (row + column + 1).into()))
+                            .collect()
+                    })
+                    .collect(),
+            )
+            .expect("symmetric by construction")
+        };
+        let mut widths = Vec::new();
+        for extent in [2usize, 4, 6, 8] {
+            let (_, _, work) = inertia_with_work(&hilbert(extent), PivotOrder::FirstNonzero);
+            widths.push((extent, work.peak_bits.clone(), work.multiplications.clone()));
+        }
+        for pair in widths.windows(2) {
+            assert!(
+                pair[1].1 > pair[0].1,
+                "peak width must grow: extent {} gave {}, extent {} gave {}",
+                pair[0].0,
+                pair[0].1,
+                pair[1].0,
+                pair[1].1
+            );
+            assert!(pair[1].2 > pair[0].2, "and so must the operation count");
+        }
+    }
+
+    /// ★ THE PHASES SEPARATE, which is the thing a clock provably cannot do. An adjudication
+    /// observed that timing `pullback_inertia_bound` does not isolate the elimination because two
+    /// matrix products and two eliminations share the interval. Counted, they are four vectors.
+    #[test]
+    fn the_pullback_returns_one_work_vector_per_phase_and_they_are_not_equal() {
+        let form = SymmetricForm::from_diagonal(vec![Rat::one(); 4]);
+        let basis = ExactRatMatrix::new(
+            (0..4)
+                .map(|row| {
+                    (0..3)
+                        .map(|column| Rat::new(((row + column) as i64 + 1).into(), 3.into()))
+                        .collect()
+                })
+                .collect(),
+        )
+        .expect("rectangular");
+        let (bound, phases) =
+            pullback_inertia_bound_with_work(&form, &basis).expect("shapes agree");
+        assert_eq!(phases.len(), 4);
+        let named: Vec<&str> = phases.iter().map(|(name, _)| *name).collect();
+        assert_eq!(
+            named,
+            vec![
+                "product-transpose-times-form",
+                "product-times-basis",
+                "elimination-source",
+                "elimination-pulled-back"
+            ]
+        );
+        // A PRODUCT'S DEPENDENCY SPAN IS ONE; AN ELIMINATION'S IS ITS PIVOT COUNT. That single
+        // coordinate separates a deed a card could carry from one it could not, and no scalar
+        // carries it.
+        assert_eq!(phases[0].1.dependency_span, BigUint::from(1u32));
+        assert_eq!(phases[1].1.dependency_span, BigUint::from(1u32));
+        assert!(phases[2].1.dependency_span > BigUint::from(1u32));
+        // and the phases are genuinely different vectors, not one repeated
+        assert_ne!(phases[0].1, phases[2].1);
+        assert_eq!(bound.pulled_back.extent(), 3);
+    }
     use crate::rebase_invariants::{PivotRule, smith_normal_form};
 
     fn integers(rows: &[Vec<i64>]) -> SymmetricForm {

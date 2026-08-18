@@ -47,10 +47,19 @@
 //!
 //! ## The exactness route
 //!
-//! `f64` and `f32` appear in this file and in `exact_value::ieee754` and nowhere else. In
-//! `ieee754` they appear in four functions, each one call to `to_bits` or `from_bits`. This file is
-//! a boundary driver: it reads bytes off a disk, reinterprets them, and hands `BigUint × 2^e`
-//! inward. **No arithmetic is performed on a machine float anywhere.**
+//! In `exact_value::ieee754`, `f32` and `f64` appear in four functions, each one call to `to_bits`
+//! or `from_bits` — no float **value** is constructed or operated on anywhere in a library crate.
+//! This file is a boundary driver: it reads bytes off a disk, reinterprets them, and hands
+//! `BigUint × 2^e` inward.
+//!
+//! **Corrected 2026-08-16, and the withdrawn sentence is worth carrying.** This header read *"`f64`
+//! and `f32` appear in this file and in `exact_value::ieee754` and nowhere else"* and **"No
+//! arithmetic is performed on a machine float anywhere."** Both were false, and the second was
+//! false of this very file: `minkowski_height_bound` below computes
+//! `((bits as f64) / rank).exp2() * rank.sqrt()` — three float operations. That figure is
+//! display-only and gates nothing, which the function says itself, but a header that denies what
+//! its own file does is worse than no header, because a later reader checks the claim and not the
+//! code. The float arithmetic in this driver is **exterior reporting**; the transport is exact.
 
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};

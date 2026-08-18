@@ -68,8 +68,15 @@ pub struct ReceiverId(pub u64);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct InputId(pub u64);
 
-/// What a receiver returns from an item, exactly. An opaque exact token — never a magnitude, so
-/// nothing here can be ordered, averaged, or thresholded.
+/// What a receiver returns from an item, exactly. An opaque exact token — never a magnitude.
+///
+/// **CORRECTED 2026-08-18.** This read *"so nothing here can be ordered, averaged, or thresholded"*
+/// while the next line derives `Ord` and the field is `pub u64`, which the device path reads as a
+/// raw key. The derive is **required**: `Partition::from_keys` groups by an observation signature
+/// and needs a total order to do it, and `compress_on_device` needs a key. What is true, and is what
+/// the sentence meant, is that **no law in this module reads an ordering between two observations as
+/// a magnitude** — the order is a canonical arrangement, never a comparison of what two receivers
+/// returned. A caller that subtracts, averages or thresholds these values has left the calculus.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Observation(pub u64);
 

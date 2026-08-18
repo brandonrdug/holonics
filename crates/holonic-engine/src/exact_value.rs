@@ -1088,9 +1088,16 @@ mod tests {
 
     /// Every pattern this codec accepts must come back out of it identical.
     ///
-    /// Stated at the level of **bits** rather than of `f64`, deliberately: `f32` and `f64` occur in
-    /// exactly four functions of `ieee754` and nowhere else in any library file of this workspace,
-    /// and that includes this test module. The live-float round trip is exercised by
+    /// Stated at the level of **bits** rather than of `f64`, deliberately: no float **value** is
+    /// constructed or operated on outside the four functions of `ieee754`, in any library file of
+    /// this workspace, and that includes this test module. (The earlier wording said the *tokens*
+    /// `f32`/`f64` occur nowhere else, which is false — they occur in a doc line of `reopening.rs`,
+    /// in a `#[test]` comment of `embedding_fiber.rs` recording a removal, and as the string
+    /// literals `".f16"`/`".f32"`/`".f64"` inside `soma/mount`'s *negative* assertion that the
+    /// generated PTX contains none. None of those is a float value; the claim about values holds
+    /// and the claim about tokens did not. Measured 2026-08-16,
+    /// `grep -rn --include='*.rs' -w 'f64\|f32' crates soma`.) The live-float round trip is
+    /// exercised by
     /// `examples/a_float_is_a_dyadic_and_a_deleted_tail.rs`, which is a boundary driver and may
     /// hold one.
     #[test]

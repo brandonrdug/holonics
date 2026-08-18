@@ -67,6 +67,15 @@ impl ExactComplexWaveCurrent {
         Self::default()
     }
 
+    /// The multiplicative unit. Added 2026-08-17 with the arithmetic below, so a transport matrix
+    /// over this carrier can be built outside this module.
+    pub fn one() -> Self {
+        Self {
+            real: Rat::one(),
+            imaginary: Rat::zero(),
+        }
+    }
+
     pub fn is_zero(&self) -> bool {
         self.real.is_zero() && self.imaginary.is_zero()
     }
@@ -80,21 +89,61 @@ impl ExactComplexWaveCurrent {
         self.imaginary += &other.imaginary;
     }
 
-    fn scaled(&self, coefficient: &Rat) -> Self {
+    /// Exact sum.
+    pub fn add(&self, other: &Self) -> Self {
+        Self {
+            real: &self.real + &other.real,
+            imaginary: &self.imaginary + &other.imaginary,
+        }
+    }
+
+    /// Exact complex product.
+    pub fn multiply(&self, other: &Self) -> Self {
+        Self {
+            real: &self.real * &other.real - &self.imaginary * &other.imaginary,
+            imaginary: &self.real * &other.imaginary + &self.imaginary * &other.real,
+        }
+    }
+
+    /// The conjugate — the reflection that reverses the turn while keeping the reach.
+    pub fn conjugate(&self) -> Self {
+        Self {
+            real: self.real.clone(),
+            imaginary: -self.imaginary.clone(),
+        }
+    }
+
+    pub fn negated(&self) -> Self {
+        Self {
+            real: -self.real.clone(),
+            imaginary: -self.imaginary.clone(),
+        }
+    }
+
+    /// The reciprocal, or `None` at the origin, where it is not posed.
+    pub fn reciprocal(&self) -> Option<Self> {
+        let span = self.norm_square();
+        if span.is_zero() {
+            return None;
+        }
+        Some(self.conjugate().scaled(&(Rat::one() / span)))
+    }
+
+    pub fn scaled(&self, coefficient: &Rat) -> Self {
         Self {
             real: coefficient * &self.real,
             imaginary: coefficient * &self.imaginary,
         }
     }
 
-    fn subtract(&self, other: &Self) -> Self {
+    pub fn subtract(&self, other: &Self) -> Self {
         Self {
             real: &self.real - &other.real,
             imaginary: &self.imaginary - &other.imaginary,
         }
     }
 
-    fn rotate(&self, cosine: &Rat, sine: &Rat) -> Self {
+    pub fn rotate(&self, cosine: &Rat, sine: &Rat) -> Self {
         Self {
             real: cosine * &self.real - sine * &self.imaginary,
             imaginary: sine * &self.real + cosine * &self.imaginary,

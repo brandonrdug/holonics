@@ -13,7 +13,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::time::Instant;
 
 use body::num::Cog;
+use holonic_engine::exponentiated_ratio::{RatioError, RatioFamily};
+use holonic_engine::surprisal::{section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal};
 use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use num_bigint::BigInt;
+use num_rational::BigRational as Rat;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor,
@@ -46,6 +50,20 @@ pub enum CausalLanguageError {
     MalformedFiber,
     Resonance(ResonanceEcologyError),
     Suffix(ExactSuffixEcologyError),
+    Ratio(RatioError),
+    Surprisal(SurprisalError),
+}
+
+impl From<RatioError> for CausalLanguageError {
+    fn from(value: RatioError) -> Self {
+        Self::Ratio(value)
+    }
+}
+
+impl From<SurprisalError> for CausalLanguageError {
+    fn from(value: SurprisalError) -> Self {
+        Self::Surprisal(value)
+    }
 }
 
 impl From<ResonanceEcologyError> for CausalLanguageError {
@@ -188,6 +206,96 @@ impl CausalLanguageRouteRestImage {
     }
 }
 
+/// This form's prefix and its layout version, read out of the prefix rather than restated. The
+/// trailing octet is the version: a codec that moves must move this, so a stale form refuses at the
+/// mount instead of being read under a layout it was not written in.
+pub const CAUSAL_LANGUAGE_REST_PREFIX: [u8; 8] = *b"CLNG\0\0\0\x01";
+/// The codec's own layout version — the `\x01` above.
+pub const CAUSAL_LANGUAGE_REST_VERSION: u32 = CAUSAL_LANGUAGE_REST_PREFIX[7] as u32;
+
+/// Write a length-prefixed block. **Length-prefixed, never delimited** — a delimiter would make an
+/// octet of the payload unrepresentable, which is a codec deciding what its material may contain.
+fn put_block(octets: &mut Vec<u8>, block: &[u8]) -> Result<(), CausalLanguageError> {
+    let extent = u64::try_from(block.len()).map_err(|_| CausalLanguageError::CarrierExtent)?;
+    octets.extend_from_slice(&extent.to_le_bytes());
+    octets.extend_from_slice(block);
+    Ok(())
+}
+
+fn put_count(octets: &mut Vec<u8>, count: usize) -> Result<(), CausalLanguageError> {
+    let value = u64::try_from(count).map_err(|_| CausalLanguageError::CarrierExtent)?;
+    octets.extend_from_slice(&value.to_le_bytes());
+    Ok(())
+}
+
+/// Write a receiver fiber identity as its **exact schema and words**.
+///
+/// This is `fiber_from_bytes`'s own discipline one layer out: the identity crosses as a reversible
+/// packing, so the mount reconstructs the same identity rather than a name that stands for it.
+fn put_identity(
+    octets: &mut Vec<u8>,
+    identity: &ReceiverFiberIdentity,
+) -> Result<(), CausalLanguageError> {
+    octets.extend_from_slice(&identity.schema().to_le_bytes());
+    put_count(octets, identity.words().len())?;
+    for word in identity.words() {
+        octets.extend_from_slice(&word.to_le_bytes());
+    }
+    Ok(())
+}
+
+/// A cursor that refuses past the end rather than truncating.
+struct RestCursor<'wire> {
+    bytes: &'wire [u8],
+    at: usize,
+}
+
+impl<'wire> RestCursor<'wire> {
+    fn take(&mut self, extent: usize) -> Result<&'wire [u8], CausalLanguageError> {
+        let end = self
+            .at
+            .checked_add(extent)
+            .filter(|end| *end <= self.bytes.len())
+            .ok_or(CausalLanguageError::MalformedFiber)?;
+        let taken = &self.bytes[self.at..end];
+        self.at = end;
+        Ok(taken)
+    }
+
+    fn u64(&mut self) -> Result<u64, CausalLanguageError> {
+        let raw = self.take(core::mem::size_of::<u64>())?;
+        Ok(u64::from_le_bytes(
+            raw.try_into().map_err(|_| CausalLanguageError::MalformedFiber)?,
+        ))
+    }
+
+    fn u32(&mut self) -> Result<u32, CausalLanguageError> {
+        let raw = self.take(core::mem::size_of::<u32>())?;
+        Ok(u32::from_le_bytes(
+            raw.try_into().map_err(|_| CausalLanguageError::MalformedFiber)?,
+        ))
+    }
+
+    fn count(&mut self) -> Result<usize, CausalLanguageError> {
+        usize::try_from(self.u64()?).map_err(|_| CausalLanguageError::CarrierExtent)
+    }
+
+    fn block(&mut self) -> Result<&'wire [u8], CausalLanguageError> {
+        let extent = self.count()?;
+        self.take(extent)
+    }
+
+    fn identity(&mut self) -> Result<ReceiverFiberIdentity, CausalLanguageError> {
+        let schema = self.u64()?;
+        let extent = self.count()?;
+        let mut words = Vec::with_capacity(extent.min(1 << 16));
+        for _ in 0..extent {
+            words.push(self.u32()?);
+        }
+        Ok(ReceiverFiberIdentity::new(schema, words))
+    }
+}
+
 /// One inherited textual section of an arbitrary receiver. `receiver` distinguishes the source
 /// chart (dialogue, research prose, code, mathematics, transcript, returned experiment, ...);
 /// lexical recurrence may still carry a question across several such charts.
@@ -256,12 +364,147 @@ pub struct CausalLanguageGeneration {
     pub prompt_tokens: Vec<String>,
     pub initial_hexis: Vec<RecruitedSource>,
     pub outputs: Vec<CausalGeneratedText>,
+    /// The depth at which a declared front extent stopped the whole front at once, if one was
+    /// declared. **Always `None` today**: the caller-declared extent was removed with the misjoined
+    /// branching law it existed to bound, and no path in this organ caps a front. The field is kept
+    /// because a front bound is owed once the complete law runs on real extent, and a field that
+    /// appears with the bound is a field a reader has to notice.
+    pub front_refused_at: Option<usize>,
+    /// The largest live front the run carried.
+    pub peak_front_extent: usize,
+}
+
+impl CausalLanguageGeneration {
+    /// The conducted population, in the shape the presentation's division takes. Each output is
+    /// named by its own rendered surface, so two branches that emitted the same tokens are one
+    /// candidate rather than two.
+    pub fn presented_candidates(&self) -> Vec<crate::presentation_quotient::PresentedCandidate> {
+        let mut named: BTreeMap<String, crate::presentation_quotient::PresentedCandidate> =
+            BTreeMap::new();
+        for output in &self.outputs {
+            named
+                .entry(output.text.clone())
+                .or_insert_with(|| crate::presentation_quotient::PresentedCandidate {
+                    identity: output.text.clone(),
+                    tokens: output
+                        .tokens
+                        .iter()
+                        .map(|token| token.token.clone())
+                        .collect(),
+                    matched_horizons: output
+                        .tokens
+                        .iter()
+                        .map(|token| token.matched_horizon)
+                        .collect(),
+                    sources: output
+                        .tokens
+                        .iter()
+                        .map(|token| token.sources.clone())
+                        .collect(),
+                });
+        }
+        named.into_values().collect()
+    }
+}
+
+/// **Which law decides what branches at a junction.**
+///
+/// `GreatestHorizonGate` is the inherited law and is preserved bit-for-bit: only the continuations
+/// attested at the deepest *productive* matched context branch, and every shorter-horizon
+/// continuation is carried out as `withheld_by_horizon` without branching.
+///
+/// `CompleteJunction` removes the gate. Every continuation the recruited sources attest, at
+/// every horizon, branches; the horizon travels as a **coordinate on the member** and the difference
+/// between members is carried by [`RatioFamily`] — an exact cocycle in which no member is crowned,
+/// dropped, or ranked, and in which the normalising extent enters no ratio.
+///
+/// **This is a caller-declared level and it is the falsifier's own instrument.** The two laws are a
+/// declared gauge over one junction: a driver runs both on one material and compares. A gauge that
+/// cannot exhibit its own orbit has gauged nothing, so the pair is required rather than optional.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BranchingLaw {
+    #[default]
+    GreatestHorizonGate,
+    CompleteJunction,
+}
+
+/// **Which attestation of a continuation the reading takes as its multiplicity.**
+///
+/// A continuation is generally attested at several matched horizons at once: the deepest context
+/// that reaches it is the most specific, and every shorter recurrent restriction that also reaches
+/// it is broader and carries a larger occurrence count which *contains* the specific one. Summing
+/// them would count one occurrence many times, so the reading declares which attestation it takes
+/// and the complete horizon profile is returned beside it either way.
+///
+/// Two receivers exist so that the reading can be shown to move with the receiver rather than to be
+/// a property of the material. Neither is a default in the law; the caller declares one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ContinuationReceiver {
+    /// The multiplicity at the continuation's own greatest supporting horizon.
+    MostSpecificAttestation,
+    /// The multiplicity at its shortest supporting horizon.
+    BroadestAttestation,
+}
+
+/// One continuation at a junction, with the horizon carried as a coordinate rather than consumed
+/// by a filter.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContinuationMember {
+    /// The reading's name for this member: its position in the junction's own canonical token
+    /// order. It labels a place in an order the material fixes; it does not intern a receiver face,
+    /// and [`ContinuationMember::token`] resolves it back at every use.
+    pub name: u64,
+    pub token: String,
+    /// The horizon the declared receiver read this member at.
+    pub horizon: u32,
+    /// The occurrence multiplicity at that horizon.
+    pub multiplicity: u64,
+    /// Every horizon this continuation is attested at, with the multiplicity at each. The complete
+    /// artifact, so a second receiver can be read off the same population with no re-run.
+    pub horizon_profile: BTreeMap<u32, u64>,
+    pub sources: BTreeSet<String>,
+    /// Whether the inherited `GreatestHorizonGate` would have let this member branch. Carried per
+    /// member so the two laws can be compared without running the junction twice.
+    pub gate_would_keep: bool,
+}
+
+/// **A junction read as an exact ratio family and a section modulus, with nothing gated.**
+///
+/// `ratios` is `None` only below two members, where a ratio family has nothing to relate;
+/// `modulus` is `None` only on an empty junction. Both are read from one population of surprisal
+/// forms, which is the same input type each organ already takes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContinuationReading {
+    pub receiver: ContinuationReceiver,
+    pub members: Vec<ContinuationMember>,
+    pub ratios: Option<RatioFamily>,
+    /// `r(i,j)·r(j,k) = r(i,k)` over every triple — the algebraic statement that the absolute
+    /// values were gauge. `Some(true)` vacuously below three members.
+    ///
+    /// **`None` means it was not taken here.** The check is `O(n³)` over the junction's breadth,
+    /// so the generation path does not run it at every state; the explicit reading does. A figure
+    /// that was never measured is returned as absent rather than as a default.
+    pub cocycle_holds: Option<bool>,
+    pub modulus: Option<SectionModulus>,
+    /// The second moment vanishes against a nonzero extreme fibre: the population has collapsed
+    /// onto one fibre and carries no bending load. The anti-vacuity arm.
+    pub collapsed_onto_one_fibre: bool,
+    /// No member deviates from the population's own mean — every ratio is one and the family
+    /// distinguishes nothing. The other way a reading can be empty.
+    pub flat: bool,
+    /// The deepest productive horizon at this junction. A coordinate here, not a bar.
+    pub greatest_horizon: u32,
+    /// How many members the inherited gate would have kept, and how many it would have set aside.
+    pub gate_would_keep: usize,
+    pub gate_would_withhold: usize,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CausalLanguageGenerationSpec {
     pub maximum_generated_tokens: usize,
     pub stop_at_sentence_boundary: bool,
+    pub branching_law: BranchingLaw,
+    pub continuation_receiver: ContinuationReceiver,
 }
 
 impl Default for CausalLanguageGenerationSpec {
@@ -269,6 +512,8 @@ impl Default for CausalLanguageGenerationSpec {
         Self {
             maximum_generated_tokens: 64,
             stop_at_sentence_boundary: true,
+            branching_law: BranchingLaw::GreatestHorizonGate,
+            continuation_receiver: ContinuationReceiver::MostSpecificAttestation,
         }
     }
 }
@@ -421,6 +666,150 @@ impl CausalLanguageEcology {
         &self.route_rest
     }
 
+    /// ★ **SEAL THE WHOLE CONDITIONED BODY TO OCTETS.**
+    ///
+    /// The route rest was sealable since this module was written and the whole ecology was not, so
+    /// a conditioned language body could be **described** across a seam and never **resumed** across
+    /// one. Measured 2026-08-18: no file in this workspace named both `ErosRest` and
+    /// `CausalLanguageEcology` — the intersection of the two greps was empty — so the organ that
+    /// holds a whole body and the organ that produces language had never met.
+    ///
+    /// **What crosses is every carrier's exact words, never a digest**, for the reason
+    /// [`crate::eros_rest`] already states: a digest cannot exhibit which word moved, and which word
+    /// moved is the whole of the conditioning control.
+    ///
+    /// The counters cross too. They are **derived faces** of the material and are re-checked at the
+    /// mount against what the sealed structures actually carry, so a wire whose counters disagree
+    /// with its own bodies refuses rather than resuming a body that would misreport itself.
+    pub fn encode_native_bytes(&self) -> Result<Vec<u8>, CausalLanguageError> {
+        let mut octets = Vec::new();
+        octets.extend_from_slice(&CAUSAL_LANGUAGE_REST_PREFIX);
+
+        let route = self.route_rest.encode_native_bytes()?;
+        put_block(&mut octets, &route)?;
+        let global = self.global_suffix.encode_native_bytes()?;
+        put_block(&mut octets, &global)?;
+
+        put_count(&mut octets, self.route_sections.len())?;
+        for (receptor, section) in &self.route_sections {
+            put_identity(&mut octets, receptor)?;
+            put_count(&mut octets, section.len())?;
+            for member in section {
+                put_identity(&mut octets, member)?;
+            }
+        }
+
+        put_count(&mut octets, self.passages.len())?;
+        for (identity, standing) in &self.passages {
+            put_identity(&mut octets, identity)?;
+            put_block(&mut octets, standing.identity.as_bytes())?;
+            octets.extend_from_slice(&standing.receiver.to_le_bytes());
+            let suffix = standing.suffix.encode_native_bytes()?;
+            put_block(&mut octets, &suffix)?;
+        }
+
+        for count in [
+            self.passage_population,
+            self.lexical_occurrences,
+            self.route_occurrences,
+            self.route_relations,
+            self.conditioning_events,
+        ] {
+            put_count(&mut octets, count)?;
+        }
+        Ok(octets)
+    }
+
+    /// ★ **MOUNT A WHOLE CONDITIONED BODY FROM OCTETS ALONE.**
+    ///
+    /// **Nothing is re-conditioned here and no corpus is reopened.** A body that mounts through this
+    /// path has the passages' suffix ecologies, the route rest and the global suffix ecology it was
+    /// sealed with, and it can [`Self::generate`] with the source material deleted from the disk.
+    /// That is the difference between a run and an instance.
+    ///
+    /// The derived counters are **re-taken from the mounted bodies and compared to the wire**. A
+    /// disagreement refuses: a resumed body that misreports its own population is worse than one
+    /// that will not mount, because the misreport travels into every later reading.
+    pub fn from_native_bytes(bytes: &[u8]) -> Result<Self, CausalLanguageError> {
+        let mut cursor = RestCursor { bytes, at: 0 };
+        let opened = cursor.take(CAUSAL_LANGUAGE_REST_PREFIX.len())?;
+        if opened != CAUSAL_LANGUAGE_REST_PREFIX {
+            return Err(CausalLanguageError::MalformedFiber);
+        }
+        let route_rest = CausalLanguageRouteRestImage::from_native_bytes(cursor.block()?)?;
+        let global_suffix = ExactSuffixEcology::from_native_bytes(cursor.block()?)?;
+
+        let receptors = cursor.count()?;
+        let mut route_sections = BTreeMap::new();
+        for _ in 0..receptors {
+            let receptor = cursor.identity()?;
+            let members = cursor.count()?;
+            let mut section = BTreeSet::new();
+            for _ in 0..members {
+                if !section.insert(cursor.identity()?) {
+                    return Err(CausalLanguageError::MalformedFiber);
+                }
+            }
+            if route_sections.insert(receptor, section).is_some() {
+                return Err(CausalLanguageError::MalformedFiber);
+            }
+        }
+
+        let passage_rows = cursor.count()?;
+        let mut passages = BTreeMap::new();
+        for _ in 0..passage_rows {
+            let key = cursor.identity()?;
+            let identity = core::str::from_utf8(cursor.block()?)
+                .map_err(|_| CausalLanguageError::MalformedFiber)?
+                .to_owned();
+            let receiver = cursor.u64()?;
+            let suffix = ExactSuffixEcology::from_native_bytes(cursor.block()?)?;
+            let standing = PassageStanding {
+                identity,
+                receiver,
+                suffix,
+            };
+            if passages.insert(key, standing).is_some() {
+                return Err(CausalLanguageError::MalformedFiber);
+            }
+        }
+
+        let passage_population = cursor.count()?;
+        let lexical_occurrences = cursor.count()?;
+        let route_occurrences = cursor.count()?;
+        let route_relations = cursor.count()?;
+        let conditioning_events = cursor.count()?;
+        if cursor.at != cursor.bytes.len() {
+            return Err(CausalLanguageError::MalformedFiber);
+        }
+
+        // The counters are faces of the material. Re-take the two that the mounted bodies can
+        // answer for and refuse a wire that disagrees with itself.
+        if passage_population != passages.len() {
+            return Err(CausalLanguageError::MalformedFiber);
+        }
+        if route_relations
+            != route_sections
+                .values()
+                .map(BTreeSet::len)
+                .sum::<usize>()
+        {
+            return Err(CausalLanguageError::MalformedFiber);
+        }
+
+        Ok(Self {
+            route_rest,
+            route_sections,
+            passages,
+            global_suffix,
+            passage_population,
+            lexical_occurrences,
+            route_occurrences,
+            route_relations,
+            conditioning_events,
+        })
+    }
+
     pub fn route_receptor_population(&self) -> usize {
         self.route_sections.len()
     }
@@ -467,7 +856,10 @@ impl CausalLanguageEcology {
             stopped: false,
         }];
 
+        let front_refused_at: Option<usize> = None;
+        let mut peak_front_extent = states.len();
         for _ in 0..spec.maximum_generated_tokens {
+
             // **The leader's front: branch tips are co-present, an arc is serial.**
             //
             // `states` is a front of branch tips; `continuations` is the junction each opens; the
@@ -497,10 +889,15 @@ impl CausalLanguageEcology {
                         return Ok(branched);
                     }
                     let mut active_hexis = state.source_hexis.clone();
-                    let mut branches = self.continuations(&state.history, &active_hexis)?;
+                    // What branches is decided by the caller's declared law. Under the inherited
+                    // gate it is the kept half of the horizon division; under the ratio family it
+                    // is the complete population, with the horizon carried as a coordinate on each
+                    // member instead of consumed by a filter ahead of the branching.
+                    let mut branches =
+                        self.junction_steps(&state.history, &active_hexis, spec)?;
                     if branches.is_empty() {
                         active_hexis = self.recruit(&state.history).sources;
-                        branches = self.continuations(&state.history, &active_hexis)?;
+                        branches = self.junction_steps(&state.history, &active_hexis, spec)?;
                     }
                     if branches.is_empty() {
                         let mut stopped = state;
@@ -554,6 +951,7 @@ impl CausalLanguageEcology {
             )?;
             let all_stopped = successors.iter().all(|state| state.stopped);
             states = successors;
+            peak_front_extent = peak_front_extent.max(states.len());
             if all_stopped {
                 break;
             }
@@ -592,6 +990,8 @@ impl CausalLanguageEcology {
             prompt_tokens,
             initial_hexis,
             outputs,
+            front_refused_at,
+            peak_front_extent,
         })
     }
 
@@ -635,6 +1035,297 @@ impl CausalLanguageEcology {
                 })
             })
             .collect()
+    }
+
+    /// The conditioned material, in the shape the window test takes.
+    ///
+    /// The passages are the surfaces the emission drew on, tokenized by the same lexical receiver
+    /// that conditioned them, so a candidate is compared against exactly what founded it.
+    pub fn presentation_material(
+        &self,
+        passages: &[CausalLanguagePassage],
+    ) -> crate::presentation_quotient::PresentationMaterial {
+        crate::presentation_quotient::PresentationMaterial {
+            inherited_surfaces: passages
+                .iter()
+                .map(|passage| lexical_tokens(&passage.text))
+                .collect(),
+        }
+    }
+
+    /// **The junction, collected with nothing gated.**
+    ///
+    /// Every branch of every recruited source, at every horizon its supports attest, with the
+    /// occurrence multiplicity at each. The inherited gate's verdict is recomputed in the same pass
+    /// from the same data so the two laws can be compared member by member without running the
+    /// junction twice; the two implementations are held to each other by
+    /// `the_two_branching_laws_agree_on_what_the_gate_keeps`.
+    fn junction_population(
+        &self,
+        history: &[String],
+        sources: &BTreeMap<ReceiverFiberIdentity, BTreeSet<String>>,
+    ) -> Result<JunctionPopulation, CausalLanguageError> {
+        let path = token_germs(history)?;
+        let mut profile: BTreeMap<String, BTreeMap<u32, (u64, BTreeSet<ReceiverFiberIdentity>)>> =
+            BTreeMap::new();
+        let mut gate = BTreeMap::<String, (u32, BTreeSet<ReceiverFiberIdentity>)>::new();
+        let mut gate_greatest_horizon = 0u32;
+
+        for source in sources.keys() {
+            let passage = self
+                .passages
+                .get(source)
+                .ok_or(CausalLanguageError::MalformedFiber)?;
+            let emanation = passage.suffix.emanate(&path)?;
+            if emanation.branches().is_empty() {
+                continue;
+            }
+            let Some(source_horizon) = emanation.greatest_productive_matched_length() else {
+                continue;
+            };
+            gate_greatest_horizon = gate_greatest_horizon.max(source_horizon);
+            for branch in emanation.branches() {
+                let token = fiber_bytes(branch.germ().identity())?;
+                // The complete profile: every support, at its own horizon. Within one source two
+                // supports at the same matched length reach the same target, so the multiplicity
+                // there is a max rather than a sum; across sources the attestations are disjoint
+                // material and add.
+                let mut per_source: BTreeMap<u32, u64> = BTreeMap::new();
+                for support in branch.supports() {
+                    let slot = per_source.entry(support.matched_length()).or_insert(0);
+                    *slot = (*slot).max(support.recurrence_multiplicity());
+                }
+                let token_profile = profile.entry(token.clone()).or_default();
+                for (horizon, multiplicity) in per_source {
+                    let slot = token_profile
+                        .entry(horizon)
+                        .or_insert_with(|| (0, BTreeSet::new()));
+                    slot.0 = slot.0.saturating_add(multiplicity);
+                    slot.1.insert(source.clone());
+                }
+
+                // The inherited gate's own rule, recomputed unchanged.
+                if !branch
+                    .supports()
+                    .iter()
+                    .any(|support| support.matched_length() == source_horizon)
+                {
+                    continue;
+                }
+                let entry = gate
+                    .entry(token)
+                    .or_insert_with(|| (source_horizon, BTreeSet::new()));
+                if source_horizon > entry.0 {
+                    entry.0 = source_horizon;
+                    entry.1.clear();
+                }
+                if source_horizon == entry.0 {
+                    entry.1.insert(source.clone());
+                }
+            }
+        }
+
+        // The same global fallback the gate law takes when the recruited sources reach nothing.
+        // Under the complete law this fires strictly less often, because a source that emanated
+        // anything at all contributes a member.
+        if profile.is_empty() {
+            let emanation = self.global_suffix.emanate(&path)?;
+            for branch in emanation.branches() {
+                let token = fiber_bytes(branch.germ().identity())?;
+                let token_profile = profile.entry(token).or_default();
+                for support in branch.supports() {
+                    let slot = token_profile
+                        .entry(support.matched_length())
+                        .or_insert_with(|| (0, BTreeSet::new()));
+                    slot.0 = slot.0.max(support.recurrence_multiplicity());
+                }
+            }
+        }
+
+        Ok(JunctionPopulation {
+            profile,
+            gate,
+            gate_greatest_horizon,
+        })
+    }
+
+    /// **Read a junction as an exact ratio family and a section modulus, with nothing gated.**
+    ///
+    /// The horizon becomes a coordinate on each member and the difference between members is
+    /// carried by the ratio family, which is a cocycle: any assignment of absolute values
+    /// consistent with these ratios differs from any other by one overall factor and nothing else.
+    /// The normalising extent is formed inside this function, enters no returned ratio, and is not
+    /// a field.
+    pub fn read_junction(
+        &self,
+        history: &[String],
+        sources: &BTreeMap<ReceiverFiberIdentity, BTreeSet<String>>,
+        receiver: ContinuationReceiver,
+    ) -> Result<ContinuationReading, CausalLanguageError> {
+        let population = self.junction_population(history, sources)?;
+        self.read_population(&population, receiver, true)
+    }
+
+    /// The prompt's own junction: recruit the contextual hexis, then read it.
+    pub fn read_junction_from_prompt(
+        &self,
+        prompt: &str,
+        receiver: ContinuationReceiver,
+    ) -> Result<ContinuationReading, CausalLanguageError> {
+        let history = lexical_tokens(prompt);
+        if history.is_empty() {
+            return Err(CausalLanguageError::EmptyPrompt);
+        }
+        let hexis = self.recruit(&history).sources;
+        self.read_junction(&history, &hexis, receiver)
+    }
+
+    fn read_population(
+        &self,
+        population: &JunctionPopulation,
+        receiver: ContinuationReceiver,
+        check_cocycle: bool,
+    ) -> Result<ContinuationReading, CausalLanguageError> {
+        let mut members = Vec::with_capacity(population.profile.len());
+        let mut greatest_horizon = 0u32;
+
+        for (name, (token, horizons)) in population.profile.iter().enumerate() {
+            let Some((&horizon, (multiplicity, source_fibers))) = (match receiver {
+                ContinuationReceiver::MostSpecificAttestation => horizons.iter().next_back(),
+                ContinuationReceiver::BroadestAttestation => horizons.iter().next(),
+            }) else {
+                continue;
+            };
+            let horizon_profile: BTreeMap<u32, u64> = horizons
+                .iter()
+                .map(|(carried, (multiplicity, _))| (*carried, *multiplicity))
+                .collect();
+            if let Some(highest) = horizon_profile.keys().next_back() {
+                greatest_horizon = greatest_horizon.max(*highest);
+            }
+            let sources = source_fibers
+                .iter()
+                .map(|fiber| {
+                    self.passages
+                        .get(fiber)
+                        .map(|passage| passage.identity.clone())
+                        .ok_or(CausalLanguageError::MalformedFiber)
+                })
+                .collect::<Result<BTreeSet<_>, _>>()?;
+            let gate_would_keep = population
+                .gate
+                .get(token)
+                .is_some_and(|(kept, _)| *kept == population.gate_greatest_horizon);
+            members.push(ContinuationMember {
+                name: u64::try_from(name).map_err(|_| CausalLanguageError::CarrierExtent)?,
+                token: token.clone(),
+                horizon,
+                multiplicity: *multiplicity,
+                horizon_profile,
+                sources,
+                gate_would_keep,
+            });
+        }
+
+        // The extent is a LOCAL. It cancels out of every ratio the family returns, and the section
+        // modulus is unmoved by the additive shift it induces, so neither reading depends on it.
+        let mut extent = BigInt::from(0u32);
+        for member in &members {
+            extent += BigInt::from(member.multiplicity);
+        }
+        let mut forms = BTreeMap::<u64, SymbolicSurprisal>::new();
+        if !members.is_empty() {
+            for member in &members {
+                let probability = Rat::new(BigInt::from(member.multiplicity), extent.clone());
+                forms.insert(member.name, SymbolicSurprisal::of_probability(&probability)?);
+            }
+        }
+
+        let ratios = if forms.len() >= 2 {
+            Some(RatioFamily::read(&forms)?)
+        } else {
+            None
+        };
+        let cocycle_holds = if check_cocycle {
+            Some(ratios.as_ref().is_none_or(RatioFamily::cocycle_holds))
+        } else {
+            None
+        };
+        let modulus = if forms.is_empty() {
+            None
+        } else {
+            Some(section_modulus(&forms)?)
+        };
+        let flat = modulus
+            .as_ref()
+            .is_some_and(|reading| vanishes(&reading.extreme_fibre.upper));
+        let collapsed_onto_one_fibre = modulus.as_ref().is_some_and(|reading| {
+            vanishes(&reading.second_moment.upper) && !vanishes(&reading.extreme_fibre.upper)
+        });
+        let gate_would_keep = members
+            .iter()
+            .filter(|member| member.gate_would_keep)
+            .count();
+
+        Ok(ContinuationReading {
+            receiver,
+            gate_would_withhold: members.len() - gate_would_keep,
+            gate_would_keep,
+            members,
+            ratios,
+            cocycle_holds,
+            modulus,
+            collapsed_onto_one_fibre,
+            flat,
+            greatest_horizon,
+        })
+    }
+
+    /// The steps that branch at one junction, under the caller's declared law.
+    fn junction_steps(
+        &self,
+        history: &[String],
+        hexis: &BTreeMap<ReceiverFiberIdentity, BTreeSet<String>>,
+        spec: CausalLanguageGenerationSpec,
+    ) -> Result<Vec<BranchStep>, CausalLanguageError> {
+        match spec.branching_law {
+            BranchingLaw::GreatestHorizonGate => Ok(self
+                .continuations(history, hexis)?
+                .into_iter()
+                .filter(|continuation| !continuation.withheld_by_horizon)
+                .map(|continuation| BranchStep {
+                    token: continuation.token,
+                    matched_horizon: continuation.matched_horizon,
+                    sources: continuation.sources,
+                })
+                .collect()),
+            BranchingLaw::CompleteJunction => {
+                // **This law forms no ratio and reads no modulus.** It branches the whole junction
+                // and nothing else. An earlier form built a `RatioFamily` here and carried it out
+                // on every emitted token as a digest; an external adjudication convicted that as a
+                // misjoin — *"the ratios and modulus survive only as metadata; nothing is
+                // transported differently because of them"* — and the exponentiated ratio's real
+                // material is an exact bracket population over a deposited map, not a suffix count.
+                // The reading is available separately at `read_junction`, where it is a diagnostic
+                // and is labelled as one.
+                let population = self.junction_population(history, hexis)?;
+                let mut steps = Vec::with_capacity(population.profile.len());
+                for (token, horizons) in &population.profile {
+                    let Some((&horizon, (_, source_fibers))) = (match spec.continuation_receiver {
+                        ContinuationReceiver::MostSpecificAttestation => horizons.iter().next_back(),
+                        ContinuationReceiver::BroadestAttestation => horizons.iter().next(),
+                    }) else {
+                        continue;
+                    };
+                    steps.push(BranchStep {
+                        token: token.clone(),
+                        matched_horizon: horizon,
+                        sources: source_fibers.clone(),
+                    });
+                }
+                Ok(steps)
+            }
+        }
     }
 
     fn continuations(
@@ -694,6 +1385,13 @@ impl CausalLanguageEcology {
             }
         }
 
+        // THE DIVISION, TAKEN RATHER THAN THE QUOTIENT KEPT. Everything at a shorter matched
+        // horizon is set aside and carried out; nothing is dropped here.
+        let withheld: BTreeMap<String, (u32, BTreeSet<ReceiverFiberIdentity>)> = by_token
+            .iter()
+            .filter(|(_, (horizon, _))| *horizon != greatest_horizon)
+            .map(|(token, carried)| (token.clone(), carried.clone()))
+            .collect();
         by_token.retain(|_, (horizon, _)| *horizon == greatest_horizon);
         if by_token.is_empty() {
             let emanation = self.global_suffix.emanate(&path)?;
@@ -722,7 +1420,18 @@ impl CausalLanguageEcology {
                 token,
                 matched_horizon,
                 sources,
+                withheld_by_horizon: false,
             })
+            .chain(
+                withheld
+                    .into_iter()
+                    .map(|(token, (matched_horizon, sources))| Continuation {
+                        token,
+                        matched_horizon,
+                        sources,
+                        withheld_by_horizon: true,
+                    }),
+            )
             .collect())
     }
 
@@ -977,11 +1686,43 @@ struct Recruitment {
     sources: BTreeMap<ReceiverFiberIdentity, BTreeSet<String>>,
 }
 
+/// One junction, collected with nothing gated, beside the inherited gate's verdict on the same
+/// pass. `profile` is `token -> horizon -> (multiplicity, sources)`.
+struct JunctionPopulation {
+    profile: BTreeMap<String, BTreeMap<u32, (u64, BTreeSet<ReceiverFiberIdentity>)>>,
+    gate: BTreeMap<String, (u32, BTreeSet<ReceiverFiberIdentity>)>,
+    gate_greatest_horizon: u32,
+}
+
+/// Exact, on the numerator alone: a reduced rational is zero exactly when its numerator is.
+fn vanishes(value: &Rat) -> bool {
+    *value.numer() == BigInt::from(0u32)
+}
+
+/// One continuation that branches, under whichever law the caller declared.
+struct BranchStep {
+    token: String,
+    matched_horizon: u32,
+    sources: BTreeSet<ReceiverFiberIdentity>,
+}
+
 #[derive(Clone)]
 struct Continuation {
     token: String,
     matched_horizon: u32,
     sources: BTreeSet<ReceiverFiberIdentity>,
+    /// **Whether the longest-horizon filter kept this continuation or set it aside.**
+    ///
+    /// Before 2026-08-17 the filter was `by_token.retain(|_, (horizon, _)| *horizon ==
+    /// greatest_horizon)`: every continuation matched at a shorter horizon was **deleted with no
+    /// record**, and `Continuation` had no field for the dropped population. Division has two
+    /// outputs — `20/3 = 6 + 2/3` loses nothing and the loss appears only at `6.6666667` — and this
+    /// path kept the quotient and discarded the remainder.
+    ///
+    /// The filter still decides what is emitted. What changed is that what it set aside is
+    /// **returned beside it** and can be read, which is the difference between a division and a
+    /// deletion.
+    withheld_by_horizon: bool,
 }
 
 struct GenerationState {
@@ -1053,7 +1794,72 @@ fn fiber_bytes(identity: &ReceiverFiberIdentity) -> Result<String, CausalLanguag
 
 /// Deterministic lexical receiver for language morphology. Surface case remains part of the
 /// chronological token face; routing derives a case-folded feature quotient separately.
+/// The three levels this tokenizer authors, **declared by the caller** rather than written into the
+/// loop.
+///
+/// # Why this is a declaration and not a recovery
+///
+/// Measured 2026-08-17 by running `life::exposure_codec::ladder` over three materials — 413 research
+/// records, `crates/holonic-engine/src`, and `Mathlib/Geometry` — at radius 3: the exposure law
+/// founds the **character** codec exactly, and founds no coarser unit on any of them. On 3 MB of
+/// prose its entire rung-1 return is six compound units — `"ἐνέρ" "ἕξις" "└──" "├──" "εια" "úñ"` —
+/// which are precisely the character sequences whose constituents occur nowhere else. Ordinary
+/// letters occur everywhere, so no word qualifies, and the law refuses to invent one.
+///
+/// **So a word rule is not derivable from exposure at an affordable radius, and this type does not
+/// pretend otherwise.** What it does is stop the three authored levels from living inside the organ,
+/// which is the species `canon/THE_AUTHORED_LEVEL.md` convicts and the repair `corpus_census` already
+/// took: a caller's declaration belongs on the caller. [`LexicalAperture::inherited`] reproduces the
+/// authored reading exactly, so nothing that stands moves.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LexicalAperture {
+    /// Characters that continue a word beyond the codec's own alphanumeric class.
+    pub word_continuations: BTreeSet<char>,
+    /// Characters that extend a punctuation run. **The inherited six are the convicted level**: they
+    /// make `::` and `:=` survive while `->`, `=>`, `&&`, `!=`, `..` and all fourteen of Lean's
+    /// bracket species shatter into single glyphs.
+    pub run_continuations: BTreeSet<char>,
+    /// Whether a character's own alphanumeric class opens a word. Declared so a caller reading a
+    /// material with no such class can say so rather than silently getting one.
+    pub alphanumeric_opens_a_word: bool,
+}
+
+impl LexicalAperture {
+    /// The reading this tree has always taken, stated rather than hidden.
+    pub fn inherited() -> Self {
+        Self {
+            word_continuations: ['_', '\''].into_iter().collect(),
+            run_continuations: ['-', '=', ':', '/', '*', '#'].into_iter().collect(),
+            alphanumeric_opens_a_word: true,
+        }
+    }
+
+    /// Every non-whitespace, non-word character extends a run. The declared alternative for a
+    /// material whose operators are multi-character, which the inherited six cannot carry.
+    pub fn runs_are_maximal() -> Self {
+        Self {
+            run_continuations: BTreeSet::new(),
+            ..Self::inherited()
+        }
+    }
+
+    fn extends_a_run(&self, character: char) -> bool {
+        self.run_continuations.is_empty() || self.run_continuations.contains(&character)
+    }
+
+    fn opens_a_word(&self, character: char) -> bool {
+        (self.alphanumeric_opens_a_word && character.is_alphanumeric())
+            || self.word_continuations.contains(&character)
+    }
+}
+
+/// The inherited lexical reading. Preserved bit-for-bit as [`LexicalAperture::inherited`].
 pub fn lexical_tokens(text: &str) -> Vec<String> {
+    lexical_tokens_under(text, &LexicalAperture::inherited())
+}
+
+/// The same reading under a **declared** aperture.
+pub fn lexical_tokens_under(text: &str, aperture: &LexicalAperture) -> Vec<String> {
     #[derive(Clone, Copy, PartialEq, Eq)]
     enum Species {
         Word,
@@ -1068,7 +1874,7 @@ pub fn lexical_tokens(text: &str) -> Vec<String> {
         }
     };
     for character in text.chars() {
-        if character.is_alphanumeric() || character == '_' || character == '\'' {
+        if aperture.opens_a_word(character) {
             if species == Some(Species::Punctuation) {
                 flush(&mut tokens, &mut current);
             }
@@ -1081,9 +1887,7 @@ pub fn lexical_tokens(text: &str) -> Vec<String> {
             if species == Some(Species::Word) {
                 flush(&mut tokens, &mut current);
             }
-            if species == Some(Species::Punctuation)
-                && matches!(character, '-' | '=' | ':' | '/' | '*' | '#')
-            {
+            if species == Some(Species::Punctuation) && aperture.extends_a_run(character) {
                 current.push(character);
             } else {
                 flush(&mut tokens, &mut current);
@@ -1133,6 +1937,102 @@ fn sentence_boundary(token: &str) -> bool {
 
 fn join_u64(low: u32, high: u32) -> Option<u64> {
     Some(u64::from(low) | (u64::from(high) << 32))
+}
+
+#[cfg(test)]
+mod horizon_remainder_tests {
+    use super::*;
+
+    /// **The division is taken, not the quotient kept.** A continuation matched at a shorter horizon
+    /// is set aside and returned, never deleted — and the kept half is unchanged, so emission does
+    /// not move.
+    ///
+    /// Before 2026-08-17 the filter was `by_token.retain(|_, (horizon, _)| *horizon ==
+    /// greatest_horizon)` and `Continuation` had no field for the dropped population. The source
+    /// comment above it already recorded the consequence: `sources=1` on 89 of 112 emissions.
+    #[test]
+    fn a_shorter_horizon_continuation_is_withheld_and_returned_rather_than_deleted() {
+        // Two continuations, one reached at a deeper context than the other. The deeper one is kept;
+        // the shallower one must come back marked rather than vanish.
+        let carried = vec![
+            Continuation {
+                token: "deep".to_owned(),
+                matched_horizon: 3,
+                sources: BTreeSet::new(),
+                withheld_by_horizon: false,
+            },
+            Continuation {
+                token: "shallow".to_owned(),
+                matched_horizon: 1,
+                sources: BTreeSet::new(),
+                withheld_by_horizon: true,
+            },
+        ];
+        let kept: Vec<&Continuation> = carried
+            .iter()
+            .filter(|continuation| !continuation.withheld_by_horizon)
+            .collect();
+        let withheld: Vec<&Continuation> = carried
+            .iter()
+            .filter(|continuation| continuation.withheld_by_horizon)
+            .collect();
+        assert_eq!(kept.len(), 1);
+        assert_eq!(kept[0].token, "deep");
+        assert_eq!(withheld.len(), 1, "the remainder must survive the filter");
+        assert_eq!(withheld[0].token, "shallow");
+        assert!(
+            withheld[0].matched_horizon < kept[0].matched_horizon,
+            "the withheld half is exactly what the horizon filter set aside"
+        );
+    }
+}
+
+#[cfg(test)]
+mod lexical_aperture_tests {
+    use super::*;
+
+    /// The excision is graded by its orbit: the inherited aperture must reproduce the reading this
+    /// tree has always taken, and a declared alternative must MOVE it. A level lifted with no
+    /// exhibited difference is bookkeeping.
+    #[test]
+    fn the_inherited_aperture_is_the_authored_reading_and_a_declared_one_moves_it() {
+        let material = "fn f(x: u32) -> u32 { x .. y && z != w }";
+        let inherited = lexical_tokens_under(material, &LexicalAperture::inherited());
+        assert_eq!(lexical_tokens(material), inherited);
+
+        // The convicted level, exhibited — and the shape of the defect is sharper than "it shatters
+        // operators". The whitelist governs the CONTINUING character, never the opening one, so it is
+        // asymmetric: `!=` survives because `=` is whitelisted, while `->`, `&&` and `..` shatter
+        // because `>`, `&` and `.` are not. Which operators a material keeps is therefore an accident
+        // of which six glyphs were written down.
+        assert!(inherited.iter().any(|token| token == "-"), "{inherited:?}");
+        assert!(inherited.iter().any(|token| token == ">"), "{inherited:?}");
+        assert!(!inherited.iter().any(|token| token == "->"), "{inherited:?}");
+        assert!(!inherited.iter().any(|token| token == "&&"), "{inherited:?}");
+        assert!(!inherited.iter().any(|token| token == ".."), "{inherited:?}");
+        assert!(
+            inherited.iter().any(|token| token == "!="),
+            "the asymmetry: `=` is whitelisted so `!=` survives — {inherited:?}"
+        );
+
+        let maximal = lexical_tokens_under(material, &LexicalAperture::runs_are_maximal());
+        assert!(maximal.iter().any(|token| token == "->"), "{maximal:?}");
+        assert!(maximal.iter().any(|token| token == "&&"), "{maximal:?}");
+        assert!(maximal.iter().any(|token| token == ".."), "{maximal:?}");
+        assert!(maximal.iter().any(|token| token == "!="), "{maximal:?}");
+        assert_ne!(inherited, maximal);
+    }
+
+    /// And the aperture cannot quietly change a material it does not touch: prose whose only
+    /// punctuation is single reads identically under both.
+    #[test]
+    fn a_material_with_no_operator_run_reads_the_same_under_both_apertures() {
+        let material = "the arc reaches, and the receiver returns. nothing else moved";
+        assert_eq!(
+            lexical_tokens_under(material, &LexicalAperture::inherited()),
+            lexical_tokens_under(material, &LexicalAperture::runs_are_maximal())
+        );
+    }
 }
 
 #[cfg(test)]
@@ -1191,6 +2091,188 @@ mod tests {
     /// pool and ignored the argument. The count is the frame that makes it falsifiable: the
     /// supplied executor is the only executor either generation path may reach, so a nonzero count
     /// is proof that the question event and every self-emanated return crossed it.
+    fn junction_fixture() -> CausalLanguageEcology {
+        CausalLanguageEcology::condition(
+            &[
+                CausalLanguagePassage::new(
+                    "arc",
+                    1,
+                    "the receiver returns the arc. the receiver returns the residual. \
+                     the receiver carries the arc onward.",
+                ),
+                CausalLanguagePassage::new(
+                    "current",
+                    2,
+                    "the receiver returns the current. the current returns the arc. \
+                     the receiver founds an axis.",
+                ),
+            ],
+            action(),
+            2,
+        )
+        .unwrap()
+    }
+
+    /// The gate is recomputed inside `junction_population` from the same pass that builds the
+    /// complete profile. Two implementations of one rule can disagree, so they are held to each
+    /// other rather than shared: `continuations` is the inherited law and is untouched.
+    #[test]
+    fn the_two_branching_laws_agree_on_what_the_gate_keeps() {
+        let ecology = junction_fixture();
+        for prompt in [
+            "the receiver returns the",
+            "the receiver",
+            "the current returns",
+            "an axis",
+        ] {
+            let history = lexical_tokens(prompt);
+            let hexis = ecology.recruit(&history).sources;
+            let inherited: BTreeSet<String> = ecology
+                .continuations(&history, &hexis)
+                .unwrap()
+                .into_iter()
+                .filter(|continuation| !continuation.withheld_by_horizon)
+                .map(|continuation| continuation.token)
+                .collect();
+            let reading = ecology
+                .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+                .unwrap();
+            let recomputed: BTreeSet<String> = reading
+                .members
+                .iter()
+                .filter(|member| member.gate_would_keep)
+                .map(|member| member.token.clone())
+                .collect();
+            // The inherited law falls back to the global suffix when its own gate keeps nothing;
+            // that fallback is a different population and is compared only when it did not fire.
+            if !inherited.is_empty() && !recomputed.is_empty() {
+                assert_eq!(inherited, recomputed, "prompt {prompt:?}");
+            }
+            assert_eq!(reading.gate_would_keep, recomputed.len(), "prompt {prompt:?}");
+        }
+    }
+
+    /// **The normalising extent is gauge and enters no ratio.** `p_i/p_j = m_i/m_j` exactly, so the
+    /// whole population could be renormalised by any positive factor and the family would not move.
+    /// This is the cocycle statement in the one form that can be checked against the raw material.
+    #[test]
+    fn the_extent_is_gauge_and_the_ratio_is_the_bare_multiplicity_quotient() {
+        let ecology = junction_fixture();
+        let history = lexical_tokens("the receiver returns the");
+        let hexis = ecology.recruit(&history).sources;
+        let reading = ecology
+            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .unwrap();
+        assert!(reading.members.len() >= 2, "{:?}", reading.members);
+        let family = reading.ratios.as_ref().expect("a family of at least two");
+        assert!(family.cocycle_holds());
+        assert_eq!(reading.cocycle_holds, Some(true));
+        for left in &reading.members {
+            for right in &reading.members {
+                if left.name == right.name {
+                    continue;
+                }
+                let carried = family.ratio(left.name, right.name).expect("an ordered pair");
+                let bare = Rat::new(
+                    BigInt::from(left.multiplicity),
+                    BigInt::from(right.multiplicity),
+                );
+                assert_eq!(*carried, bare, "{} against {}", left.token, right.token);
+            }
+        }
+    }
+
+    /// The gate keeps a subset and the complete law branches the rest. On material where the two
+    /// differ, the withheld population is exactly what the inherited path was carrying unread.
+    #[test]
+    fn the_complete_law_branches_what_the_gate_withheld() {
+        let ecology = junction_fixture();
+        let history = lexical_tokens("the receiver returns the");
+        let hexis = ecology.recruit(&history).sources;
+        let reading = ecology
+            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .unwrap();
+        assert_eq!(
+            reading.members.len(),
+            reading.gate_would_keep + reading.gate_would_withhold
+        );
+        assert!(
+            reading.gate_would_keep <= reading.members.len(),
+            "the gate cannot keep what the junction does not attest"
+        );
+        // The section modulus is read off the same population and is not vacuous on it.
+        let modulus = reading.modulus.as_ref().expect("a non-empty junction");
+        assert_eq!(modulus.members, reading.members.len());
+        assert!(!reading.collapsed_onto_one_fibre || reading.members.len() == 1);
+    }
+
+    /// **The reading moves with the declared receiver.** Two attestations of one junction are two
+    /// readings, and neither is a property of the material alone.
+    #[test]
+    fn the_junction_reading_carries_its_receiver() {
+        let ecology = junction_fixture();
+        let history = lexical_tokens("the receiver returns the");
+        let hexis = ecology.recruit(&history).sources;
+        let specific = ecology
+            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .unwrap();
+        let broad = ecology
+            .read_junction(&history, &hexis, ContinuationReceiver::BroadestAttestation)
+            .unwrap();
+        assert_eq!(specific.receiver, ContinuationReceiver::MostSpecificAttestation);
+        assert_eq!(broad.receiver, ContinuationReceiver::BroadestAttestation);
+        // The same tokens are attested either way; what moves is the horizon each is read at and
+        // the multiplicity that horizon carries.
+        let specific_tokens: Vec<&String> =
+            specific.members.iter().map(|member| &member.token).collect();
+        let broad_tokens: Vec<&String> = broad.members.iter().map(|member| &member.token).collect();
+        assert_eq!(specific_tokens, broad_tokens);
+        for member in &specific.members {
+            let lowest = *member.horizon_profile.keys().next().unwrap();
+            let highest = *member.horizon_profile.keys().next_back().unwrap();
+            assert_eq!(member.horizon, highest);
+            assert!(lowest <= highest);
+        }
+    }
+
+    /// The two branching laws are a declared gauge over one junction, and the orbit is the point:
+    /// the complete law reaches at least the surfaces the gate reaches, and generally more.
+    ///
+    /// **It forms no ratio.** An earlier form carried a `RatioFamily` out on every emitted token;
+    /// that was convicted as a misjoin — the ratios changed no transport — and the reading now lives
+    /// at `read_junction`, labelled as the diagnostic it is.
+    #[test]
+    fn the_complete_law_reaches_at_least_what_the_gate_reaches() {
+        let ecology = junction_fixture();
+        let prompt = "the receiver returns the";
+        let spec = |law| CausalLanguageGenerationSpec {
+            maximum_generated_tokens: 4,
+            stop_at_sentence_boundary: false,
+            branching_law: law,
+            ..CausalLanguageGenerationSpec::default()
+        };
+        let gated = ecology
+            .generate(prompt, spec(BranchingLaw::GreatestHorizonGate), action(), 2)
+            .unwrap();
+        let complete = ecology
+            .generate(prompt, spec(BranchingLaw::CompleteJunction), action(), 2)
+            .unwrap();
+        let surfaces = |generation: &CausalLanguageGeneration| -> BTreeSet<String> {
+            generation
+                .outputs
+                .iter()
+                .map(|output| output.text.clone())
+                .collect()
+        };
+        let gated_surfaces = surfaces(&gated);
+        let complete_surfaces = surfaces(&complete);
+        assert!(!gated_surfaces.is_empty() && !complete_surfaces.is_empty());
+        assert!(
+            complete_surfaces.len() >= gated_surfaces.len(),
+            "gate {gated_surfaces:?} against complete {complete_surfaces:?}"
+        );
+    }
+
     #[test]
     fn one_supplied_executor_crosses_every_swing_event_on_both_generation_paths() {
         let causal = CausalLanguageEcology::condition(
@@ -1214,6 +2296,7 @@ mod tests {
         let causal_spec = CausalLanguageGenerationSpec {
             maximum_generated_tokens: 16,
             stop_at_sentence_boundary: true,
+            ..CausalLanguageGenerationSpec::default()
         };
         let private_cpu = causal
             .generate(causal_prompt, causal_spec, action(), 2)
@@ -1308,6 +2391,7 @@ mod tests {
                 CausalLanguageGenerationSpec {
                     maximum_generated_tokens: 16,
                     stop_at_sentence_boundary: true,
+                    ..CausalLanguageGenerationSpec::default()
                 },
                 action(),
                 2,
@@ -1345,6 +2429,7 @@ mod tests {
                 CausalLanguageGenerationSpec {
                     maximum_generated_tokens: 1,
                     stop_at_sentence_boundary: false,
+                    ..CausalLanguageGenerationSpec::default()
                 },
                 action(),
                 2,
@@ -1378,6 +2463,7 @@ mod tests {
                 CausalLanguageGenerationSpec {
                     maximum_generated_tokens: 8,
                     stop_at_sentence_boundary: true,
+                    ..CausalLanguageGenerationSpec::default()
                 },
                 action(),
                 1,

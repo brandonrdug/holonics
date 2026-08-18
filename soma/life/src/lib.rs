@@ -50,6 +50,7 @@ pub mod live_current_cuda;
 pub mod material_incidence;
 pub mod material_shadow_cuda;
 pub mod morphological_language;
+pub mod presentation_quotient;
 pub mod relational_language;
 // The receiver-relative preimage population of a presented token occurrence. It lives here because
 // it composes `holonic-engine`'s corpus/conduct, exact compression, and diffusion owners at one

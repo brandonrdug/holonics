@@ -115,7 +115,19 @@ read the row describing it in the table above and treated the description as the
 
 Three entry points exist for exactly this and cost nothing:
 
-- **`THE_CLAIM_INDEX.md`** when you do not know which file owns a subject;
+- **`THE_CLAIM_INDEX.md`** when you do not know which file owns a subject — **but know its aperture
+  before you trust a miss.** `tools/claim_index.py` globs `2026-08-*.md` over `research/records/`, so
+  it indexes 108 of 400 records; the 292 July records are outside it. Measured 2026-08-16:
+  `ls research/records/*.md | wc -l` → 400, `ls research/records/2026-07-*.md | wc -l` → 292. **The
+  entire RH / Sonin / prolate / Weil corpus is in the part it cannot reach**, and on 2026-08-16 a
+  session posed four identifications as open questions that had been deposited in July. When the
+  index misses, go to `canon/THE_CORRESPONDENCE_ATLAS.md`, which enters by *concept* and reaches the
+  whole tree.
+- **`papers/source/mathematics/catalogue.typ`** when the subject is mathematics. It is a **second
+  registry**, keyed by strings like `"theorem:weil-support-induction-reduction"`, with fields
+  `key · kind · title · status · depends · claim · proof · boundary` — **no `id:` and no `grade:`**,
+  measured 2026-08-16 by `grep -rn "id:" papers/source/mathematics/` → 0. Searching it for an
+  `H.NNNN` id or a grade returns nothing and that is not an absence of content.
 - **`canon/THE_OWNER_ATLAS.md`** when you need who implements it and at what line — and note its own
   occasion, that this question *"cost four full network sweeps in one evening"* on 2026-08-13;
 - **`canon/THE_TIMELINE.md`** when the subject is a *behaviour*, because it carries the corrections
@@ -255,9 +267,22 @@ measurement. Nothing needs porting there; what the carrier needs is a driver.
 
 And four lessons, each earned by a defect found in it:
 
-- **Bind every deposit to its content hash AND its closure hash, with a verifier.** The laboratory
+- **Track every deposit, and let its hash report loss rather than name the thing.** The laboratory
   lost its tiger figures and the file holding `semantics_invariant_under_exact_chart` to an
-  untracked `runs/`. Neither is recoverable at any commit in either repository. The registry that
+  untracked `runs/`. **This lesson read *"bind every deposit to its content hash AND its closure
+  hash"* until 2026-08-18, and Brandon convicted the addressing half directly on 2026-08-16** —
+  *"a properly implemented machine doesn't need you to ensure uniqueness with a checksum… you're
+  introducing an overcomplication with the hashing… parse my alarm carefully."* He is right, and the
+  reason is the corpus's own: **a hash is a compression with no decoder and no exhibited remainder**,
+  so making one an identity imports at the addressing layer exactly the deletion every other collapse
+  here must repay. **A deposit's identity is its path plus its lineage** — a path is a route, each
+  step a difference from the last, and the archive defect was never that a path is an address but
+  that ten C++ card adapters folded the path *into the rest integrity*. The axis is **reopenable
+  versus one-way**, not absolute versus relative. Ratified and derived in
+  [`research/records/2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md`](research/records/2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md);
+  the tree already enforces it — `soma/membrane/src/live_constituent.rs` *"a plural receiver face must
+  not be hashed, sequentially interned, or rebased into one scalar"*. Hashes stay where they are
+  lawful: **detecting loss in an ignored directory, and declaring an apparatus frame.** Neither is recoverable at any commit in either repository. The registry that
   would have prevented it is archived (`closure_sha256` resolves only under `archive/cpp-engine/`)
   and has no Rust owner.
 - **No absolute frame in a lineage.** Ten C++ card adapters folded the filesystem path into the rest
@@ -335,7 +360,18 @@ Deposited 2026-08-10 in `papers/source/`, all rendering, ids in the reserved run
 Dirac macros live once, at `papers/source/lib/dirac.typ`, built from the corpus's `chevron` idiom so
 no LaTeX-shaped syntax enters. **Use this notation.** A bra is a receiver, a ket is a construction,
 a bracket is a face, and `sum_i |a_i><a_i| = I` is exactly the completeness of a declared receiver
-family — so `≠ I` is receiver non-reconstruction written in the symbol, with the defect computable.
+family **that is orthonormal in a declared metric `G`** — so `≠ I` is receiver non-reconstruction
+written in the symbol, with the defect computable.
+
+**The metric is load-bearing and was implicit here until 2026-08-17.** For a family that merely
+spans, `S = Σᵢ|aᵢ⟩⟨aᵢ|` is the **frame operator** — positive and invertible, neither a projection
+nor `I` — so a family may reconstruct every construction while `S ≠ I`, and reconstruction runs
+through the **dual frame** `S⁻¹|aᵢ⟩`. Writing the resolution without its metric asserts an
+orthonormality no receiver declared, which is the undeclared-Euclidean defect refused everywhere
+else in this file. The repair is a month older than the correction and is in this tree:
+`2026-07-20_THE_EULER_DIFFERENCE_REBASES_THE_METRIC_THE_RETURN_MUST_BE_COVARIANT.md`'s
+`P^[p] = [(PGP)|_range P]⁻¹ PG` **is** the dual-frame formula. Eight sites carried the unqualified
+form; all eight now carry the metric.
 
 ### The seven results of 2026-08-10, in one place
 
@@ -1000,8 +1036,13 @@ crystallographic orders `winding_inertia::lattice_admits_order` already derives 
 Schwarz's list to standing terrain.
 
 **Standing bar.** A table of integrals is **not** an instance of localized P=NP: verification means
-zero-testing, which is the undecidable half; a finite table is the advice model `NP ⊆ P/poly`, which
-Karp–Lipton would collapse `PH` for; and a table is incomplete by construction. **The sound instances
+zero-testing, which is the undecidable half; a finite table is incomplete by construction; and the
+advice reading is **stated correctly as of 2026-08-17** — a *single* finite table says nothing about
+`P/poly` at all. What would establish `NP ⊆ P/poly` is a **polynomial-size circuit for every input
+length, correct on every instance of that length**, and a full truth table is normally exponential.
+Karp–Lipton then collapses `PH` to `Σ₂ᴾ`. The earlier form of this sentence read *"a finite table is
+the advice model `NP ⊆ P/poly`"*, which conflated one table with a length-indexed family and was
+refuted by external adjudication; the bar's conclusion survives and its derivation is repaired. **The sound instances
 are Liouville/Risch and Kovacic** — an a priori bound making the candidate population finite and
 exhaustible — **and certificate-producing algorithms**, which are honestly witness-shaped.
 

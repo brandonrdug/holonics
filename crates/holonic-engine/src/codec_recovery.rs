@@ -1420,7 +1420,7 @@ mod tests {
         spellings.iter().map(|piece| word(piece)).collect()
     }
 
-    /// **What this test body declares as its cpu capacity.** A fixture is a caller and declares
+    /// **What this test body declares as its own capacity.** A fixture is a caller and declares
     /// its own apertures; the values that used to live in the organ as `FAMILY_APERTURE = 65_536`
     /// and `FREE_ENTRY_APERTURE = 12` are reproduced here so the fixtures' returns are unchanged by
     /// the move and the orbit is measured against the level rather than against a new number.

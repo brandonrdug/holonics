@@ -136,7 +136,7 @@ constitutive response, boundary, chronology, and receiver** are all declared.
 | — | **conduct** | `soma/abi/src/conduct.rs` `conduct_current` | **WIRED** |
 | — | conduct, receiver-local | `crates/holonic-engine/src/receiver_current.rs` `radiate` | **WIRED**, 2 |
 | — | **diffuse** | `crates/holonic-engine/src/diffusion.rs` `enact` (Schur) | **WIRED**, 3 |
-| — | *— and that Schur complement is **one organ under FOUR names***: `diffusion.rs`'s certified boundary transfer; `H.0219`'s parallelization **barrier**; the **effective tension** `S = D − C*A⁻¹C` of `theorems/conditioned-effective-tension.typ`, whose `(STABILITY)` clause is `q ≥ 0 ⟺ S ≥ 0`; and **`H.0127` *Schur complement and inertia***, `proved-standard`, which states the law the other three use — *"the block matrix has the inertia of `A` plus the inertia of its Schur complement."* None of the four cites the others. | | |
+| — | *— and that Schur complement is **one organ under FIVE names***: `diffusion.rs`'s certified boundary transfer; `H.0219`'s parallelization **barrier**; the **effective tension** `S = D − C*A⁻¹C` of `theorems/conditioned-effective-tension.typ`, whose `(STABILITY)` clause is `q ≥ 0 ⟺ S ≥ 0`; and **`H.0127` *Schur complement and inertia***, `proved-standard`, which states the law the other three use — *"the block matrix has the inertia of `A` plus the inertia of its Schur complement."* None of the four cites the others. | | |
 | — | diffuse, higher grade | `crates/holonic-engine/src/sheaf_diffusion.rs` | **WIRED**, 2 |
 | — | **glue / fill** | `crates/holonic-engine/src/gluing.rs` `read_cover` | **WIRED**, 2 |
 | — | glue at contact | `contact_gluing.rs`, `derivation_two_cells.rs` | **DRIVER-ONLY** |

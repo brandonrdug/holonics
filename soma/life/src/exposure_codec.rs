@@ -136,62 +136,133 @@ impl ExposureApertures {
 /// iterator over the exposures, and the [`std::fmt::Debug`] shows only how many contacts have been
 /// made. The recovery below holds one of these and can do exactly what this surface permits.
 pub struct ExposedMaterial {
-    exposures: Vec<Vec<u8>>,
+    exposures: Vec<Vec<Unit>>,
+    /// The candidate alphabet, **declared by the caller**, as each unit's octet spelling. A [`Unit`]
+    /// is an index into this table and carries no meaning of its own.
+    ///
+    /// At octet scale the caller declares all 256 single-octet spellings, so `Unit(0x61)` is `'a'`
+    /// and every value in this module is the octet it always was. At any higher scale the caller
+    /// declares the unit population the scale below returned.
+    spellings: Vec<Vec<u8>>,
+    /// The packing base: one more than the candidate extent, so a digit of `0` marks *no unit here*
+    /// and words of different length cannot collide.
+    base: u64,
     /// Every factor up to the exposed radius, packed, carrying `1` for *occurred once* and `2` for
-    /// *recurred*. Built once from the octets; it is the material's own testimony, indexed.
+    /// *recurred*. Built once from the material; it is the material's own testimony, indexed.
     factors: HashMap<u64, u8>,
-    openings: BTreeSet<u8>,
-    closings: BTreeSet<u8>,
+    openings: BTreeSet<Unit>,
+    closings: BTreeSet<Unit>,
     radius: usize,
     contacts: Cell<u64>,
     deep_scans: Cell<u64>,
 }
 
-/// The width of the packing carrier, read off `u64` rather than authored: one octet of length and
-/// seven of word.
-const fn packing_radius() -> usize {
-    (u64::BITS as usize / 8) - 1
-}
+/// A unit of the declared candidate alphabet: an **index**, never a value.
+///
+/// The recovery reads units and never their spellings, so nothing downstream of the index can be a
+/// statement about octets, characters, or any other codec. The spelling exists so a return can be
+/// exhibited.
+pub type Unit = u32;
 
-fn pack(word: &[u8]) -> u64 {
-    let mut key = (word.len() as u64) << 56;
-    for (position, octet) in word.iter().enumerate() {
-        key |= (*octet as u64) << (48 - 8 * position);
+/// The widest word the packing carrier admits at this base, computed rather than authored.
+///
+/// A word packs as base-`base` digits in a `u64`, so the radius is the largest `r` with
+/// `base^r <= u64::MAX`. At octet scale `base` is 257 and this returns **7**, which is what the
+/// hand-written `u64::BITS / 8 - 1` returned before the carrier was generalized.
+fn packing_radius(base: u64) -> usize {
+    let mut radius = 0usize;
+    let mut power: u64 = 1;
+    while let Some(next) = power.checked_mul(base) {
+        power = next;
+        radius += 1;
     }
-    key
+    radius
 }
 
 impl ExposedMaterial {
+    fn pack(&self, word: &[Unit]) -> u64 {
+        let mut key = 0u64;
+        for unit in word {
+            key = key * self.base + u64::from(*unit) + 1;
+        }
+        key
+    }
+
     /// Expose a population of octet streams and index every factor up to `radius`.
+    ///
+    /// The octet-scale entry point: the caller declares all 256 single-octet spellings, so a unit is
+    /// an octet and every reading below is the reading this organ has always taken.
+    pub fn expose(exposures: Vec<Vec<u8>>, radius: usize) -> Result<Self, ExposureRefusal> {
+        let spellings: Vec<Vec<u8>> = (0u16..256).map(|value| vec![value as u8]).collect();
+        let units: Vec<Vec<Unit>> = exposures
+            .into_iter()
+            .map(|exposure| exposure.into_iter().map(Unit::from).collect())
+            .collect();
+        Self::expose_units(units, spellings, radius)
+    }
+
+    /// Expose a population of **unit** streams over a declared candidate alphabet.
     ///
     /// Exposures are separate streams: **no word crosses an exposure boundary**, because two files
     /// are not one file, and a codec recovered across the seam would have been recovered from an
     /// artifact of the concatenation order.
-    pub fn expose(exposures: Vec<Vec<u8>>, radius: usize) -> Result<Self, ExposureRefusal> {
+    ///
+    /// This is the same law at every scale. What changes between rungs is only what a unit is, and
+    /// that is the caller's declaration rather than the organ's.
+    pub fn expose_units(
+        exposures: Vec<Vec<Unit>>,
+        spellings: Vec<Vec<u8>>,
+        radius: usize,
+    ) -> Result<Self, ExposureRefusal> {
         if radius < 2 {
             return Err(ExposureRefusal::RadiusBelowAdjacency { radius });
         }
-        if radius > packing_radius() {
+        if spellings.is_empty() {
+            return Err(ExposureRefusal::NoExposure);
+        }
+        let base = spellings.len() as u64 + 1;
+        let carrier_radius = packing_radius(base);
+        if radius > carrier_radius {
             return Err(ExposureRefusal::RadiusExceedsCarrier {
                 radius,
-                carrier_radius: packing_radius(),
+                carrier_radius,
             });
         }
-        let exposures: Vec<Vec<u8>> = exposures.into_iter().filter(|e| !e.is_empty()).collect();
+        let exposures: Vec<Vec<Unit>> = exposures.into_iter().filter(|e| !e.is_empty()).collect();
         if exposures.is_empty() {
             return Err(ExposureRefusal::NoExposure);
         }
+        let extent = spellings.len() as Unit;
+        for exposure in &exposures {
+            if let Some(outside) = exposure.iter().find(|unit| **unit >= extent) {
+                return Err(ExposureRefusal::UnitOutsideAlphabet {
+                    unit: *outside,
+                    extent: spellings.len(),
+                });
+            }
+        }
+        let mut material = Self {
+            exposures,
+            spellings,
+            base,
+            factors: HashMap::new(),
+            openings: BTreeSet::new(),
+            closings: BTreeSet::new(),
+            radius,
+            contacts: Cell::new(0),
+            deep_scans: Cell::new(0),
+        };
         let mut factors: HashMap<u64, u8> = HashMap::new();
         let mut openings = BTreeSet::new();
         let mut closings = BTreeSet::new();
-        for exposure in &exposures {
+        for exposure in &material.exposures {
             openings.insert(exposure[0]);
             closings.insert(exposure[exposure.len() - 1]);
             for start in 0..exposure.len() {
                 let reach = radius.min(exposure.len() - start);
                 for length in 1..=reach {
                     let slot = factors
-                        .entry(pack(&exposure[start..start + length]))
+                        .entry(material.pack(&exposure[start..start + length]))
                         .or_insert(0);
                     if *slot < 2 {
                         *slot += 1;
@@ -199,15 +270,28 @@ impl ExposedMaterial {
                 }
             }
         }
-        Ok(Self {
-            exposures,
-            factors,
-            openings,
-            closings,
-            radius,
-            contacts: Cell::new(0),
-            deep_scans: Cell::new(0),
-        })
+        material.factors = factors;
+        material.openings = openings;
+        material.closings = closings;
+        Ok(material)
+    }
+
+    /// How many units the caller declared as candidates. The recovery probes every one of them.
+    pub fn candidate_extent(&self) -> usize {
+        self.spellings.len()
+    }
+
+    /// One unit's octet spelling. Carried so a return can be exhibited; never read by the recovery.
+    pub fn spelling(&self, unit: Unit) -> &[u8] {
+        self.spellings
+            .get(unit as usize)
+            .map(|spelling| spelling.as_slice())
+            .unwrap_or(&[])
+    }
+
+    /// The declared candidate spellings, in unit order.
+    pub fn spellings(&self) -> &[Vec<u8>] {
+        &self.spellings
     }
 
     fn contact(&self) {
@@ -216,13 +300,13 @@ impl ExposedMaterial {
 
     /// The number of times this word was seen, saturating at two. The one primitive; everything else
     /// on this surface reads it.
-    fn sightings(&self, word: &[u8]) -> u8 {
+    fn sightings(&self, word: &[Unit]) -> u8 {
         self.contact();
         if word.is_empty() {
             return 0;
         }
         if word.len() <= self.radius {
-            return self.factors.get(&pack(word)).copied().unwrap_or(0);
+            return self.factors.get(&self.pack(word)).copied().unwrap_or(0);
         }
         // A word past the exposed radius is still a lawful question; it costs a scan, and the scan is
         // counted separately so a recovery that wanders past its declared family cannot hide it.
@@ -245,27 +329,27 @@ impl ExposedMaterial {
     }
 
     /// Does this word occur in the material at all.
-    pub fn occurs(&self, word: &[u8]) -> bool {
+    pub fn occurs(&self, word: &[Unit]) -> bool {
         self.sightings(word) >= 1
     }
 
     /// Does this word occur **more than once**. Recurrence, in the only sense the word has: it
     /// happened again. This is not a threshold and no other multiplicity is available from this
     /// surface — the counter saturates at two, so nothing downstream can rank by it.
-    pub fn recurs(&self, word: &[u8]) -> bool {
+    pub fn recurs(&self, word: &[Unit]) -> bool {
         self.sightings(word) >= 2
     }
 
-    /// Does some exposure begin with this octet.
-    pub fn opens(&self, octet: u8) -> bool {
+    /// Does some exposure begin with this unit.
+    pub fn opens(&self, unit: Unit) -> bool {
         self.contact();
-        self.openings.contains(&octet)
+        self.openings.contains(&unit)
     }
 
-    /// Does some exposure end with this octet.
-    pub fn closes(&self, octet: u8) -> bool {
+    /// Does some exposure end with this unit.
+    pub fn closes(&self, unit: Unit) -> bool {
         self.contact();
-        self.closings.contains(&octet)
+        self.closings.contains(&unit)
     }
 
     /// How many contacts have been made. A cost, reported rather than optimised away.
@@ -332,24 +416,24 @@ impl UnitRole {
 /// refusal can be read without consulting the material again.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct MinimalRefusal {
-    pub word: Vec<u8>,
+    pub word: Vec<Unit>,
     /// The recurring prefix that licensed the left of it.
-    pub licensing_prefix: Vec<u8>,
+    pub licensing_prefix: Vec<Unit>,
     /// The recurring suffix that licensed the right of it.
-    pub licensing_suffix: Vec<u8>,
+    pub licensing_suffix: Vec<Unit>,
 }
 
 /// Why two octets are in different blocks of the direct quotient: the shortest admissible context
 /// that separated them, and which side occurred there.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct OctetSeparation {
-    pub left: u8,
-    pub right: u8,
-    pub prefix: Vec<u8>,
-    pub suffix: Vec<u8>,
-    /// Whether the left octet's word occurred in that context.
+    pub left: Unit,
+    pub right: Unit,
+    pub prefix: Vec<Unit>,
+    pub suffix: Vec<Unit>,
+    /// Whether the left unit's word occurred in that context.
     pub left_occurs: bool,
-    /// Whether the right octet's word occurred in that context.
+    /// Whether the right unit's word occurred in that context.
     pub right_occurs: bool,
 }
 
@@ -378,9 +462,9 @@ pub struct LengthCensus {
 pub struct FrameReading {
     /// What seeded the downward fixed point.
     pub frame: String,
-    pub internal: BTreeSet<u8>,
-    pub demanding: BTreeSet<u8>,
-    pub standing: BTreeSet<u8>,
+    pub internal: BTreeSet<Unit>,
+    pub demanding: BTreeSet<Unit>,
+    pub standing: BTreeSet<Unit>,
     /// How many removal rounds the fixed point took. A cost, exact.
     pub rounds: u64,
 }
@@ -399,7 +483,7 @@ pub enum ExposureObstruction {
         opening: FrameReading,
         closing: FrameReading,
     },
-    /// Every octet came back unit-internal, so nothing stands and the reading founds no unit at all.
+    /// Every unit came back unit-internal, so nothing stands and the reading founds no unit at all.
     NothingStands { internal: u64, demanding: u64 },
 }
 
@@ -421,19 +505,22 @@ pub struct ExposureWork {
 pub struct ExposureRecovery {
     pub schema: String,
     pub radius: usize,
-    pub alphabet: Vec<u8>,
+    pub alphabet: Vec<Unit>,
+    /// Each candidate unit's octet spelling, in unit order, so a return can be exhibited without
+    /// consulting the material again. Carried, never read by the recovery.
+    pub spellings: Vec<Vec<u8>>,
     pub census: Vec<LengthCensus>,
     /// Every minimal refusal, at every length. The codec's rule set.
     pub refusals: Vec<MinimalRefusal>,
     /// The finest quotient the family admits: two octets share a block only when no admitted context
     /// separates them.
-    pub direct_quotient: Vec<BTreeSet<u8>>,
+    pub direct_quotient: Vec<BTreeSet<Unit>>,
     /// Every pair the direct quotient separated, with the shortest context that did it.
     pub direct_separations: Vec<OctetSeparation>,
     pub opening_frame: FrameReading,
     pub closing_frame: FrameReading,
     /// The role of every octet, present only when the frames agreed.
-    pub roles: BTreeMap<u8, UnitRole>,
+    pub roles: BTreeMap<Unit, UnitRole>,
     /// The codec, present exactly when `obstructions` is empty.
     pub codec: Option<RecoveredCodec>,
     /// The class adjacencies the material never realized. Their boundary entries are free: flipping
@@ -448,13 +535,32 @@ impl ExposureRecovery {
         self.codec.is_some()
     }
 
-    /// The octets carrying one role, in canonical order.
-    pub fn octets_with(&self, role: UnitRole) -> Vec<u8> {
+    /// The units carrying one role, in canonical order.
+    pub fn units_with(&self, role: UnitRole) -> Vec<Unit> {
         self.roles
             .iter()
             .filter(|(_, carried)| **carried == role)
-            .map(|(octet, _)| *octet)
+            .map(|(unit, _)| *unit)
             .collect()
+    }
+
+    /// The same reading at octet scale, where a unit **is** an octet.
+    ///
+    /// Returns `None` at any higher scale rather than truncating a unit into its first octet, which
+    /// would be a magnitude crossing a frame boundary.
+    pub fn octets_with(&self, role: UnitRole) -> Option<Vec<u8>> {
+        self.units_with(role)
+            .into_iter()
+            .map(|unit| u8::try_from(unit).ok())
+            .collect()
+    }
+
+    /// One unit's declared octet spelling.
+    pub fn spelling(&self, unit: Unit) -> &[u8] {
+        self.spellings
+            .get(unit as usize)
+            .map(|spelling| spelling.as_slice())
+            .unwrap_or(&[])
     }
 }
 
@@ -478,6 +584,13 @@ pub enum ExposureRefusal {
     RadiusDisagreesWithExposure {
         exposed: usize,
         declared: usize,
+    },
+    /// An exposure carries a unit the declared candidate alphabet does not contain. The caller
+    /// declared the alphabet, so this is a statement about the declaration and not about the
+    /// material, and it names the unit rather than dropping it.
+    UnitOutsideAlphabet {
+        unit: Unit,
+        extent: usize,
     },
 }
 
@@ -503,6 +616,10 @@ impl std::fmt::Display for ExposureRefusal {
             Self::RadiusDisagreesWithExposure { exposed, declared } => write!(
                 formatter,
                 "the material was exposed at radius {exposed} and the recovery declares {declared}"
+            ),
+            Self::UnitOutsideAlphabet { unit, extent } => write!(
+                formatter,
+                "an exposure carries unit {unit} and the declared alphabet has {extent} candidates"
             ),
         }
     }
@@ -532,17 +649,21 @@ pub fn recover(
     }
     let radius = apertures.radius;
 
-    // 1. The alphabet, by exhausting every octet value. Even the alphabet is testimony.
-    let mut alphabet: Vec<u8> = Vec::new();
-    for value in 0u16..=255 {
-        let octet = value as u8;
-        if material.occurs(&[octet]) {
-            alphabet.push(octet);
+    // 1. The alphabet, by exhausting every DECLARED candidate. Even the alphabet is testimony: the
+    //    caller says what could be a unit, the material says which ones are. At octet scale the
+    //    candidate set is all 256 single-octet spellings, so this is the same exhaustion it has
+    //    always been -- the count is now read off the declaration rather than written into the loop.
+    let candidates = material.candidate_extent();
+    let mut alphabet: Vec<Unit> = Vec::new();
+    for candidate in 0..candidates {
+        let unit = candidate as Unit;
+        if material.occurs(&[unit]) {
+            alphabet.push(unit);
         }
     }
     let symbols = alphabet.len() as u64;
     let mut work = ExposureWork {
-        alphabet_probes: 256,
+        alphabet_probes: candidates as u64,
         ..ExposureWork::default()
     };
     if alphabet.is_empty() {
@@ -586,9 +707,9 @@ pub fn recover(
     let mut census: Vec<LengthCensus> = Vec::with_capacity(radius);
     let mut refusals: Vec<MinimalRefusal> = Vec::new();
     // The adjacency, kept because every later step reads it and the family already paid for it.
-    let mut follows: BTreeMap<u8, BTreeSet<u8>> = BTreeMap::new();
-    let mut precedes: BTreeMap<u8, BTreeSet<u8>> = BTreeMap::new();
-    let mut word = vec![0u8; radius];
+    let mut follows: BTreeMap<Unit, BTreeSet<Unit>> = BTreeMap::new();
+    let mut precedes: BTreeMap<Unit, BTreeSet<Unit>> = BTreeMap::new();
+    let mut word = vec![0 as Unit; radius];
     for length in 1..=radius {
         let admitted = per_length[length - 1];
         let mut realized = 0u64;
@@ -641,15 +762,15 @@ pub fn recover(
     work.contexts_examined = contexts;
 
     // 4. The unit reading, taken in two frames.
-    let openings: BTreeSet<u8> = alphabet
+    let openings: BTreeSet<Unit> = alphabet
         .iter()
         .copied()
-        .filter(|octet| material.opens(*octet))
+        .filter(|unit| material.opens(*unit))
         .collect();
-    let closings: BTreeSet<u8> = alphabet
+    let closings: BTreeSet<Unit> = alphabet
         .iter()
         .copied()
-        .filter(|octet| material.closes(*octet))
+        .filter(|unit| material.closes(*unit))
         .collect();
     let opening_frame = unit_reading(
         &alphabet,
@@ -689,17 +810,17 @@ pub fn recover(
         });
     }
 
-    let mut roles: BTreeMap<u8, UnitRole> = BTreeMap::new();
+    let mut roles: BTreeMap<Unit, UnitRole> = BTreeMap::new();
     if frames_agree {
-        for octet in &alphabet {
-            let role = if opening_frame.internal.contains(octet) {
+        for unit in &alphabet {
+            let role = if opening_frame.internal.contains(unit) {
                 UnitRole::Internal
-            } else if opening_frame.demanding.contains(octet) {
+            } else if opening_frame.demanding.contains(unit) {
                 UnitRole::Demanding
             } else {
                 UnitRole::Standing
             };
-            roles.insert(*octet, role);
+            roles.insert(*unit, role);
         }
     }
 
@@ -717,6 +838,7 @@ pub fn recover(
         schema: RECOVERY_SCHEMA.to_owned(),
         radius,
         alphabet,
+        spellings: material.spellings().to_vec(),
         census,
         refusals,
         direct_quotient,
@@ -739,14 +861,14 @@ pub fn recover(
 /// does it and the choice among equally short ones is the enumeration's and not a preference.
 fn direct_quotient(
     material: &ExposedMaterial,
-    alphabet: &[u8],
+    alphabet: &[Unit],
     radius: usize,
-) -> (Vec<BTreeSet<u8>>, Vec<OctetSeparation>, u64) {
+) -> (Vec<BTreeSet<Unit>>, Vec<OctetSeparation>, u64) {
     let symbols = alphabet.len();
     let mut block = vec![0usize; symbols];
     let mut separations: Vec<OctetSeparation> = Vec::new();
     let mut contexts = 0u64;
-    let mut filled = vec![0u8; radius];
+    let mut filled = vec![0 as Unit; radius];
     'contexts: for length in 1..=radius {
         let fills = (symbols as u64).pow((length - 1) as u32);
         for hole in 0..length {
@@ -796,11 +918,11 @@ fn direct_quotient(
             }
         }
     }
-    let mut blocks: BTreeMap<usize, BTreeSet<u8>> = BTreeMap::new();
+    let mut blocks: BTreeMap<usize, BTreeSet<Unit>> = BTreeMap::new();
     for (symbol, index) in block.iter().enumerate() {
         blocks.entry(*index).or_default().insert(alphabet[symbol]);
     }
-    let quotient: Vec<BTreeSet<u8>> = blocks.into_values().collect();
+    let quotient: Vec<BTreeSet<Unit>> = blocks.into_values().collect();
     separations.sort();
     separations.dedup();
     (quotient, separations, contexts)
@@ -812,45 +934,45 @@ fn direct_quotient(
 /// is reached from outside `D(C) union C`. The operator is monotone downward, so it terminates, and
 /// the set it lands on is the greatest unit-internal set below the seed complement.
 fn unit_reading(
-    alphabet: &[u8],
-    follows: &BTreeMap<u8, BTreeSet<u8>>,
-    precedes: &BTreeMap<u8, BTreeSet<u8>>,
-    seed: &BTreeSet<u8>,
+    alphabet: &[Unit],
+    follows: &BTreeMap<Unit, BTreeSet<Unit>>,
+    precedes: &BTreeMap<Unit, BTreeSet<Unit>>,
+    seed: &BTreeSet<Unit>,
     frame: &str,
 ) -> FrameReading {
     let empty = BTreeSet::new();
-    let mut internal: BTreeSet<u8> = alphabet
+    let mut internal: BTreeSet<Unit> = alphabet
         .iter()
         .copied()
-        .filter(|octet| !seed.contains(octet))
+        .filter(|unit| !seed.contains(unit))
         .collect();
     let mut rounds = 0u64;
     loop {
-        let demanding: BTreeSet<u8> = alphabet
+        let demanding: BTreeSet<Unit> = alphabet
             .iter()
             .copied()
-            .filter(|octet| !internal.contains(octet))
-            .filter(|octet| {
-                let onward = follows.get(octet).unwrap_or(&empty);
+            .filter(|unit| !internal.contains(unit))
+            .filter(|unit| {
+                let onward = follows.get(unit).unwrap_or(&empty);
                 !onward.is_empty() && onward.iter().all(|next| internal.contains(next))
             })
             .collect();
-        let reached: BTreeSet<u8> = internal
+        let reached: BTreeSet<Unit> = internal
             .iter()
             .copied()
-            .filter(|octet| {
+            .filter(|unit| {
                 precedes
-                    .get(octet)
+                    .get(unit)
                     .unwrap_or(&empty)
                     .iter()
                     .any(|before| !internal.contains(before) && !demanding.contains(before))
             })
             .collect();
         if reached.is_empty() {
-            let standing: BTreeSet<u8> = alphabet
+            let standing: BTreeSet<Unit> = alphabet
                 .iter()
                 .copied()
-                .filter(|octet| !internal.contains(octet) && !demanding.contains(octet))
+                .filter(|unit| !internal.contains(unit) && !demanding.contains(unit))
                 .collect();
             return FrameReading {
                 frame: frame.to_owned(),
@@ -860,8 +982,8 @@ fn unit_reading(
                 rounds,
             };
         }
-        for octet in reached {
-            internal.remove(&octet);
+        for unit in reached {
+            internal.remove(&unit);
         }
         rounds += 1;
     }
@@ -874,9 +996,9 @@ fn unit_reading(
 /// **right** class alone. Every octet emits: nothing in this material is a symbol that contributes no
 /// character, and a `Drop` verdict is not forced by any word, so none is invented.
 fn assemble(
-    alphabet: &[u8],
-    roles: &BTreeMap<u8, UnitRole>,
-    follows: &BTreeMap<u8, BTreeSet<u8>>,
+    alphabet: &[Unit],
+    roles: &BTreeMap<Unit, UnitRole>,
+    follows: &BTreeMap<Unit, BTreeSet<Unit>>,
 ) -> (RecoveredCodec, Vec<(UnitRole, UnitRole)>) {
     let order = [UnitRole::Standing, UnitRole::Demanding, UnitRole::Internal];
     let present: Vec<UnitRole> = order
@@ -888,8 +1010,8 @@ fn assemble(
         .map(|role| {
             alphabet
                 .iter()
-                .filter(|octet| roles.get(octet) == Some(role))
-                .map(|octet| Symbol(u32::from(*octet)))
+                .filter(|unit| roles.get(unit) == Some(role))
+                .map(|unit| Symbol(*unit))
                 .collect()
         })
         .collect();
@@ -915,10 +1037,10 @@ fn assemble(
         for right in &present {
             let realized = alphabet
                 .iter()
-                .filter(|octet| roles.get(octet) == Some(left))
-                .any(|octet| {
+                .filter(|unit| roles.get(unit) == Some(left))
+                .any(|unit| {
                     follows
-                        .get(octet)
+                        .get(unit)
                         .unwrap_or(&empty)
                         .iter()
                         .any(|next| roles.get(next) == Some(right))
@@ -974,9 +1096,228 @@ pub fn octet_alphabet() -> SymbolAlphabet {
     .expect("the octet alphabet carries no repeat")
 }
 
+
+// -------------------------------------------------------------------------------------------------
+// The ladder — the same recovery, one scale up
+// -------------------------------------------------------------------------------------------------
+
+/// One rung of the scale ladder: what a recovery over one candidate alphabet returned, and the unit
+/// population its codec then founded for the rung above.
+#[derive(Clone, Debug)]
+pub struct Rung {
+    /// How many times the recovery has been climbed. Rung `0` is the octet scale.
+    pub scale: usize,
+    /// How many candidate units this rung probed.
+    pub candidates: usize,
+    /// The recovery itself, whole.
+    pub recovery: ExposureRecovery,
+    /// The unit population this rung's codec founded: each unit's octet spelling, in unit order.
+    /// Empty when the rung recovered no codec.
+    pub founded_units: Vec<Vec<u8>>,
+    /// How many parts the segmentation produced across every exposure, so a rung that cut everywhere
+    /// is visible as a rung that founded nothing.
+    pub parts: u64,
+}
+
+/// Why the ladder stopped. Every arm is a **return**, and which arm is the reading.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum LadderStop {
+    /// A rung returned obstructions instead of a codec, so there is nothing to climb with.
+    Obstructed {
+        scale: usize,
+        obstructions: Vec<ExposureObstruction>,
+    },
+    /// The rung's codec cut at every adjacency, so the population above it is the population below
+    /// it and climbing founds nothing. **This is the honest stop**, not an error: a codec that joins
+    /// nothing has said the material has no coarser unit at this radius.
+    NoCoarsening { scale: usize },
+    /// The next rung's exhausted family is past a declared aperture, or its word is past the packing
+    /// carrier. The refusal is carried verbatim with the candidate extent that caused it, because
+    /// *how much wider the material is than the aperture* is the finding.
+    Refused {
+        scale: usize,
+        candidates: usize,
+        refusal: ExposureRefusal,
+    },
+    /// The caller's declared number of scales was reached with no obstruction. The ladder could have
+    /// climbed further.
+    CeilingReached { scales: usize },
+}
+
+/// What climbing the recovery returned.
+#[derive(Clone, Debug)]
+pub struct ScaleLadder {
+    pub rungs: Vec<Rung>,
+    pub stopped: LadderStop,
+}
+
+/// Run the recovery, then run it again on the units it founded, for as many scales as the caller
+/// declares.
+///
+/// **This is one law at every scale and the only thing that changes between rungs is what a unit
+/// is.** Rung `0` probes the 256 octet candidates; rung `n+1` probes the unit population rung `n`'s
+/// codec founded. Nothing here knows what a character, a word or a statement is, and no rung is told
+/// what the rung below recovered — it is handed a candidate alphabet and asked the same questions.
+///
+/// The ladder is why an authored grammar is unnecessary rather than merely refused: a separator
+/// founded once and used at every depth is a material's self-similarity promoted to a law, and a
+/// material that is not self-similar returns nothing to it. Here each rung founds its own.
+///
+/// Exposure boundaries are preserved at every rung: a unit of rung `n+1` is built only from units
+/// that were adjacent **within one exposure**, so no word crosses a seam at any scale.
+pub fn ladder(
+    exposures: Vec<Vec<u8>>,
+    apertures: ExposureApertures,
+    scales: usize,
+) -> Result<ScaleLadder, ExposureRefusal> {
+    let mut spellings: Vec<Vec<u8>> = (0u16..256).map(|value| vec![value as u8]).collect();
+    let mut streams: Vec<Vec<Unit>> = exposures
+        .into_iter()
+        .map(|exposure| exposure.into_iter().map(Unit::from).collect())
+        .collect();
+    let mut rungs: Vec<Rung> = Vec::new();
+
+    for scale in 0..scales {
+        let candidates = spellings.len();
+        let material = match ExposedMaterial::expose_units(
+            streams.clone(),
+            spellings.clone(),
+            apertures.radius,
+        ) {
+            Ok(material) => material,
+            Err(refusal) => {
+                // The first rung's refusal is the caller's, not the ladder's, and is returned as one.
+                if scale == 0 {
+                    return Err(refusal);
+                }
+                return Ok(ScaleLadder {
+                    rungs,
+                    stopped: LadderStop::Refused {
+                        scale,
+                        candidates,
+                        refusal,
+                    },
+                });
+            }
+        };
+        let recovery = match recover(&material, apertures) {
+            Ok(recovery) => recovery,
+            Err(refusal) => {
+                if scale == 0 {
+                    return Err(refusal);
+                }
+                return Ok(ScaleLadder {
+                    rungs,
+                    stopped: LadderStop::Refused {
+                        scale,
+                        candidates,
+                        refusal,
+                    },
+                });
+            }
+        };
+
+        let Some(codec) = recovery.codec.clone() else {
+            let obstructions = recovery.obstructions.clone();
+            rungs.push(Rung {
+                scale,
+                candidates,
+                recovery,
+                founded_units: Vec::new(),
+                parts: 0,
+            });
+            return Ok(ScaleLadder {
+                rungs,
+                stopped: LadderStop::Obstructed {
+                    scale,
+                    obstructions,
+                },
+            });
+        };
+
+        // Segment every exposure with the rung's own codec. A part is a unit of the scale above, and
+        // its spelling is the concatenation of its constituents' — so a rung's units render as the
+        // material wrote them, at any depth.
+        let mut next_spellings: Vec<Vec<u8>> = Vec::new();
+        let mut index_of: BTreeMap<Vec<u8>, Unit> = BTreeMap::new();
+        let mut next_streams: Vec<Vec<Unit>> = Vec::with_capacity(streams.len());
+        let mut parts = 0u64;
+        for stream in &streams {
+            let word: Vec<Symbol> = stream.iter().map(|unit| Symbol(*unit)).collect();
+            let segmented = match codec.segment(&word) {
+                Ok(segmented) => segmented,
+                Err(_) => {
+                    return Ok(ScaleLadder {
+                        rungs,
+                        stopped: LadderStop::Obstructed {
+                            scale,
+                            obstructions: recovery.obstructions.clone(),
+                        },
+                    })
+                }
+            };
+            let mut next: Vec<Unit> = Vec::with_capacity(segmented.len());
+            for part in &segmented {
+                parts += 1;
+                let mut spelling: Vec<u8> = Vec::new();
+                for symbol in part {
+                    spelling.extend_from_slice(
+                        spellings
+                            .get(symbol.0 as usize)
+                            .map(|s| s.as_slice())
+                            .unwrap_or(&[]),
+                    );
+                }
+                let next_unit = match index_of.get(&spelling) {
+                    Some(unit) => *unit,
+                    None => {
+                        let unit = next_spellings.len() as Unit;
+                        next_spellings.push(spelling.clone());
+                        index_of.insert(spelling, unit);
+                        unit
+                    }
+                };
+                next.push(next_unit);
+            }
+            next_streams.push(next);
+        }
+
+        // A rung that founds exactly as many parts as it was handed units has joined nothing.
+        let handed: u64 = streams.iter().map(|stream| stream.len() as u64).sum();
+        let coarsened = parts < handed;
+        rungs.push(Rung {
+            scale,
+            candidates,
+            recovery,
+            founded_units: next_spellings.clone(),
+            parts,
+        });
+        if !coarsened {
+            return Ok(ScaleLadder {
+                rungs,
+                stopped: LadderStop::NoCoarsening { scale },
+            });
+        }
+        spellings = next_spellings;
+        streams = next_streams;
+    }
+
+    Ok(ScaleLadder {
+        rungs,
+        stopped: LadderStop::CeilingReached { scales },
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Octet literals as units. At octet scale a unit **is** an octet, so this is a widening and
+    /// never a reinterpretation.
+    fn units(octets: &[u8]) -> Vec<Unit> {
+        octets.iter().copied().map(Unit::from).collect()
+    }
+
 
     /// A returned segmentation, read back as the octet strings it stands for. The carrier holds
     /// ordinals; a fixture asserts about the material, so this is where the two meet.
@@ -1042,13 +1383,78 @@ mod tests {
         ExposedMaterial::expose(exposures, 3).expect("exposes")
     }
 
+    /// The ladder climbs: rung 0 founds units out of octets, rung 1 founds units out of THOSE.
+    ///
+    /// The material is a two-level code. `Hp` and `Hq` are two-octet units at the octet scale, and
+    /// nothing below tells either rung what a unit is; each founds its own.
+    #[test]
+    fn the_ladder_founds_a_unit_of_units_and_says_where_it_stopped() {
+        let exposures: Vec<Vec<u8>> = vec![
+            b"aHpbHqaHpHqbbaHqaHpa".to_vec(),
+            b"bHqaHpbbHpaHqHpaHqbb".to_vec(),
+            b"aHpaHqbHpbHqaaHpbHqa".to_vec(),
+            b"bbHqaaHpbHqHpbaHqaHpb".to_vec(),
+        ];
+        let climbed = ladder(exposures, ExposureApertures::declared(3, 1 << 22), 3)
+            .expect("the octet rung recovers");
+        assert!(!climbed.rungs.is_empty());
+
+        // rung 0 recovered the octet code: H demands, p and q are internal, a and b stand.
+        let ground = &climbed.rungs[0].recovery;
+        assert_eq!(ground.roles[&Unit::from(b'H')], UnitRole::Demanding);
+        assert_eq!(ground.roles[&Unit::from(b'p')], UnitRole::Internal);
+        assert_eq!(ground.roles[&Unit::from(b'q')], UnitRole::Internal);
+        assert_eq!(ground.roles[&Unit::from(b'a')], UnitRole::Standing);
+
+        // and it founded units of more than one octet, which is what makes a second rung possible.
+        let founded = &climbed.rungs[0].founded_units;
+        assert!(
+            founded.iter().any(|unit| unit.len() > 1),
+            "rung 0 founded only single-octet units: {founded:?}"
+        );
+        assert!(founded.contains(&b"Hp".to_vec()), "{founded:?}");
+        assert!(founded.contains(&b"Hq".to_vec()), "{founded:?}");
+
+        // the rung above probed the population rung 0 founded, not 256 octets. The scale changed and
+        // the law did not.
+        if climbed.rungs.len() > 1 {
+            assert_eq!(climbed.rungs[1].candidates, founded.len());
+            assert!(climbed.rungs[1].candidates < 256);
+        }
+    }
+
+    /// A material whose codec joins nothing stops the ladder by name rather than by looping.
+    #[test]
+    fn a_codec_that_cuts_everywhere_stops_the_ladder_with_no_coarsening() {
+        let exposures: Vec<Vec<u8>> = vec![b"abcabcab".to_vec(), b"bcabcabc".to_vec()];
+        let climbed = ladder(exposures, ExposureApertures::declared(2, 1 << 20), 4)
+            .expect("the octet rung recovers");
+        match &climbed.stopped {
+            LadderStop::NoCoarsening { scale } => assert_eq!(*scale, 0),
+            LadderStop::Obstructed { .. } => {}
+            other => panic!("expected a coarsening stop or an obstruction, got {other:?}"),
+        }
+    }
+
+    /// A unit outside the declared candidate alphabet is refused by name, never dropped.
+    #[test]
+    fn a_unit_the_declaration_does_not_carry_is_refused_by_name() {
+        let refusal =
+            ExposedMaterial::expose_units(vec![vec![0, 1, 7]], vec![vec![b'a'], vec![b'b']], 2)
+                .expect_err("the alphabet has two candidates and the stream carries a third");
+        assert_eq!(
+            refusal,
+            ExposureRefusal::UnitOutsideAlphabet { unit: 7, extent: 2 }
+        );
+    }
+
     #[test]
     fn the_alphabet_is_recovered_by_exhausting_every_octet_value() {
         let material = ExposedMaterial::expose(vec![b"abcabc".to_vec(), b"bcabca".to_vec()], 3)
             .expect("exposes");
         let recovery =
             recover(&material, ExposureApertures::declared(3, 100_000)).expect("recovers");
-        assert_eq!(recovery.alphabet, vec![b'a', b'b', b'c']);
+        assert_eq!(recovery.alphabet, units(b"abc"));
         assert_eq!(recovery.work.alphabet_probes, 256);
     }
 
@@ -1077,8 +1483,8 @@ mod tests {
     fn recurrence_is_what_licenses_a_refusal_and_a_single_sighting_licenses_nothing() {
         let material =
             ExposedMaterial::expose(vec![b"xyzq".to_vec(), b"xy".to_vec()], 3).expect("exposes");
-        assert!(material.recurs(b"xy"));
-        assert!(!material.recurs(b"zq"));
+        assert!(material.recurs(&units(b"xy")));
+        assert!(!material.recurs(&units(b"zq")));
         let recovery =
             recover(&material, ExposureApertures::declared(3, 100_000)).expect("recovers");
         for refusal in &recovery.refusals {
@@ -1089,8 +1495,8 @@ mod tests {
         assert!(!recovery
             .refusals
             .iter()
-            .any(|refusal| refusal.licensing_prefix == b"zq".to_vec()
-                || refusal.licensing_suffix == b"zq".to_vec()));
+            .any(|refusal| refusal.licensing_prefix == units(b"zq")
+                || refusal.licensing_suffix == units(b"zq")));
     }
 
     #[test]
@@ -1103,11 +1509,11 @@ mod tests {
             "{:?}",
             recovery.obstructions
         );
-        assert_eq!(recovery.roles[&b'H'], UnitRole::Demanding);
-        assert_eq!(recovery.roles[&b'p'], UnitRole::Internal);
-        assert_eq!(recovery.roles[&b'q'], UnitRole::Internal);
-        assert_eq!(recovery.roles[&b'a'], UnitRole::Standing);
-        assert_eq!(recovery.roles[&b'b'], UnitRole::Standing);
+        assert_eq!(recovery.roles[&Unit::from(b'H')], UnitRole::Demanding);
+        assert_eq!(recovery.roles[&Unit::from(b'p')], UnitRole::Internal);
+        assert_eq!(recovery.roles[&Unit::from(b'q')], UnitRole::Internal);
+        assert_eq!(recovery.roles[&Unit::from(b'a')], UnitRole::Standing);
+        assert_eq!(recovery.roles[&Unit::from(b'b')], UnitRole::Standing);
         let codec = recovery.codec.as_ref().expect("a codec");
         assert_eq!(
             as_text(&codec.segment(&carried(b"aHpbHq")).expect("segments")),
@@ -1217,11 +1623,11 @@ mod tests {
         }
         // and the quotient is finer than the role reading: `p` and `q` play one role and are still
         // separated, which is the bound the direct grain reports on itself.
-        assert_eq!(recovery.roles[&b'p'], recovery.roles[&b'q']);
+        assert_eq!(recovery.roles[&Unit::from(b'p')], recovery.roles[&Unit::from(b'q')]);
         assert!(recovery
             .direct_quotient
             .iter()
-            .all(|block| !(block.contains(&b'p') && block.contains(&b'q'))));
+            .all(|block| !(block.contains(&Unit::from(b'p')) && block.contains(&Unit::from(b'q')))));
     }
 
     #[test]
@@ -1259,9 +1665,9 @@ mod tests {
         let material = ExposedMaterial::expose(vec![b"abcdef".to_vec(), b"abcdef".to_vec()], 3)
             .expect("exposes");
         assert_eq!(material.deep_scans(), 0);
-        assert!(material.occurs(b"abcde"));
+        assert!(material.occurs(&units(b"abcde")));
         assert_eq!(material.deep_scans(), 1);
-        assert!(!material.occurs(b"fedcba"));
+        assert!(!material.occurs(&units(b"fedcba")));
         assert_eq!(material.deep_scans(), 2);
         // and a recovery never spends one: its family is bounded by the exposed radius.
         let recovery =
@@ -1280,7 +1686,7 @@ mod tests {
         let joined = ExposedMaterial::expose(vec![b"abcdef".to_vec()], 3).expect("exposes");
         let split =
             ExposedMaterial::expose(vec![b"abc".to_vec(), b"def".to_vec()], 3).expect("exposes");
-        assert!(joined.occurs(b"cd"));
-        assert!(!split.occurs(b"cd"));
+        assert!(joined.occurs(&units(b"cd")));
+        assert!(!split.occurs(&units(b"cd")));
     }
 }

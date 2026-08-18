@@ -141,8 +141,19 @@ often what prevents it. `receiver_current` already computes predicted contention
 `co_present_branch_population` is what is *about to* be co-present at a site.
 
 **So `deferred_arrivals` is not an overflow bucket.** It is the population of predicted-but-unrealised
-arrivals — the virtual crossings units actually respond to. It is retained and never *read*, which is
-the same shape as `H.0466`'s unconnected leaders.
+arrivals — the virtual crossings units actually respond to.
+
+**CORRECTED 2026-08-17: it is read, and this sentence said it was not.** The claim was *"it is
+retained and never read, which is the same shape as `H.0466`'s unconnected leaders."* Measured
+2026-08-17 by `grep -rn "deferred_arrivals" --include='*.rs' crates soma`:
+`crates/holonic-engine/src/approach_front.rs` reads it — `front`, `closing` (the first difference) and
+`approach` (the second, *"the Doppler"*) are all taken over it — and
+`crates/holonic-engine/src/derivation_capacitance.rs` reads it at three sites. What is true, and is
+the sharper statement the stale one was reaching for, is that **it is read and never routed on**:
+`approach_front`'s own header says *"it reports; it never routes. If it ever reaches a `min`, `sort`
+or `argmax` that discards a member it has become a governor."* Whether a predicted crossing may
+determine a transport without becoming a governor is an open question and is Brandon's, not the
+assistant's.
 
 ### Vision is physical, and it is the arrival set
 

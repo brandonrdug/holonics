@@ -17,6 +17,120 @@ paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are
 host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
 C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
+**THE PARSER IS SUPERSEDED AND THE CODEC IS RECOVERED AT EVERY SCALE — 2026-08-17.**
+`crates/holonic-engine/src/statement_grammar.rs` is superseded as a contaminant by
+[`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md).
+It authors the categories *bracket pair*, *separator*, *word character* and *punctuation*, which is an
+authored grammar; that it names no Lean noun was the defence and it is irrelevant. Measured
+2026-08-17, charset predicates per file: **`statement_grammar.rs` 24, `lean_development.rs` 34,
+against `codec_recovery.rs` 0 outside its tests**, plus 0 in `suffix_ecology`,
+`receiver_exact_compression` and `chain`. The general organ was already in the tree.
+
+**Its control has been taken and it licenses removal.** Station four asked for the atlas to be
+re-founded *through the ladder*; the ladder founds no statement structure, so the control was
+re-specified against **incidence**, which is the day's own finding rather than a convenience.
+`eros supersede` founded all **7,516** Mathlib files by the incidence route and compared against the
+parser's deposited atlas: **694,079 transports against 6,154, over 218,264 constituents against
+5,828.** Nothing the parser carried is lost. The module now carries a supersession banner and
+everything below it is provenance.
+
+**What removal still owes, named so it is not discovered late:** `statement_composition.rs` and
+`lean_development.rs` consume it, as do two drivers. The same measurement establishes there is **no
+drop-in replacement at the statement scale**, so `statement_composition` must be re-founded against
+incidence rather than rewired — a construction, not a deletion.
+
+**Five stations executed; the station-two falsifier FIRED and the return is worth more than the
+expectation it refuted.** `exposure_codec` now runs over a declared candidate alphabet with the
+octet-scale control bit-identical, and `ladder` climbs it. **The exposure law founds a unit exactly
+where the material admits no counterexample**: at the octet scale that is the whole UTF-8 codec on
+three materials, and at the character scale on 3 MB of prose it is six units — `"ἐνέρ" "ἕξις" "└──"
+"├──" "εια" "úñ"`, the sequences whose constituents occur nowhere else. **There is no second codec
+rung on natural material.** Above the character, structure is incidence and conduct, not a codec.
+
+New this day: `soma/life/src/bin/eros.rs` — **the workspace's first application**, `[[bin]] eros`,
+with `mouth`, `atlas` and `stations`, the last naming the four stations it does not reach;
+`exposure_codec::{Unit, ladder, Rung, LadderStop, ScaleLadder}`;
+`material_incidence::merge`, which joins two codecs into one atlas as a disjoint union so *many
+materials, one law* is a type fact rather than an aspiration — `MaterialAtlas::new` takes a single
+`MaterialKind`, so until today a mixed atlas was **not constructible**, and a name two materials share
+is kept apart because whether they are the same thing belongs to a later quotient;
+`material_incidence::{face_quotient, FaceQuotient}`, which puts the six declared `ContactSpecies`
+through the compression organ with composition at a shared constituent as the successor, with an
+anti-vacuity pair that can both collapse and separate;
+`causal_language::{LexicalAperture, lexical_tokens_under}`, excising three authored levels with the
+orbit exhibited; and `Continuation::withheld_by_horizon`, so the longest-horizon filter returns its
+remainder instead of deleting it while emission stays exactly where it was.
+
+**Two repairs the runs forced, each a check whose premise was wrong.** The exposure driver's quotient
+cross-check demanded **equality** where the law is **containment** and returned a false `REFUSED` on
+Rust material; it now tests refinement and returns the pair a longer context parted. And
+`material_incidence::rust_items_of_section` stripped `"const "` as a modifier while `"const"` was
+absent from its former table, so **no `const` item could ever be founded** — repaired, with `const fn`
+still reading as a function and a control that a line carrying no former is still refused.
+
+**Stations four and seven closed the plan.** Station seven's blocker was that one atlas is one codec
+by type; `MaterialAtlas::merge` removes it, and since a join is **disjoint** what two codecs share is
+their **faces** rather than their constituents. Lean ⊕ Rust declares two faces and returns **2
+blocks** — a pair unaskable of either half — with the ablation returning each half's own reading; and
+the sharpening control fires the other way, two Rust bodies declaring one face and the join returning
+**1 block**, so the same face from two materials **collapses**. **Bounded:** on a disjoint join a
+separation may reflect the materials differing rather than the faces, and the run says so.
+
+**Station five's held-out arm runs, and the run's own anti-vacuity check caught my first
+composition law.** `the_machine_proposes_and_the_organs_adjudicate.rs` discarded every composite whose
+ends the corpus also joins directly — the one population that could refute it. It now composes by
+**substitution at the middle** and hands the composite and the corpus's own direct edge to
+`Composes::defect` and `Composes::remainder`: **896 adjudicated of 1,054 — 439 agree, 35 weaker, 56
+stronger, 366 incomparable, 780 rebases, 533 typed arity refusals**. No kernel, compiler or
+interpreter is anywhere in it. The first law took a route's transport as the **union** of its legs'
+labels and returned all 1,054 as incomparable; the arm printed *"THE ARM RETURNED ALL-OR-NOTHING, so
+it adjudicated nothing"* and that is why the defect was found rather than deposited. **Bound:** those
+forms were read by the superseded parser, so the figure is about composition over parser-read forms
+and not about mathematics.
+
+**Measured 2026-08-17 after the above, on a DIRTY tree:** `cargo test --workspace` **2,406 passed, 0
+failed** over 43 result lines; `bash tools/gates.sh` **9 of 12**, the three red being
+`output-manifest`, `closure-manifest` and `architecture-lint`, all red by construction on a dirty
+tree. The ratchet's 50 occurrences were read against the standing criterion — *is the index the
+relation?* — and every one is: a unit's identity **is** its index into the declared alphabet, a word's
+index is its position, a rung's index is its scale, and the two new `BTreeSet`s are the lexical
+aperture's declared sets. No site was found where a container carries an authored order in place of a
+transport law, so the disposition is a recorded reading and not a repair.
+
+**Re-taken 2026-08-17 on a DIRTY tree at `68697ed`+65: `cargo test --workspace`
+**2,392 passed, 0 failed, 19 ignored** over 42 result lines; `bash tools/gates.sh` **9 of 12**, with
+`output-manifest` and `closure-manifest` red by construction on a dirty tree — a closure covers a
+whole crate, and three driver-owning crates are edited — and `architecture-lint` red at **33** new
+ownership occurrences, **all of which predate the day's construction**: the ledger rows for the seven
+files this day touched (`clifford.rs`, `exact_work.rs`, `inertia.rs`, `leader_quadrature.rs`,
+`traversible_chain.rs`, `dimensional_wave.rs`, `embedding_fiber.rs`) were changed explicitly, which is
+the mechanism the ledger's own header names, and the remaining 33 belong to earlier uncommitted work
+plus two files added at `2f0e48c` for which the baseline was never re-seeded. Ten Typst roots compile; claim index, named paths, line citations,
+driver catalog (213 drivers), boundary artifacts and document law all green.
+
+**And the cost question has a lawful answer as of 2026-08-17.**
+`canon/TABLET_THE_CHART.md` §3.7's standing owed item — *"until a work vector exists, no cost question
+in this repository has a lawful answer"* — is discharged by `crates/holonic-engine/src/exact_work.rs`,
+with the counting inside `inertia::inertia_with_work` and `exact_linear::multiply_with_work`. A
+declared model **predicts** the work, a declared receiver metric admits or defers **before the deed
+runs**, and the refusal is typed and names the coordinate that carried it. Measured: six of eight
+predicted coordinates exact, two refuted in opposite directions, and `k^4.03` from counted coordinates
+where a two-endpoint clock fit had said `k^4.18`. What remains owed on that item is the width half of
+the model, which the measurement refuted.
+
+**New organs this day:**
+`crates/holonic-engine/src/exact_work.rs` — the work vector, its product order, a declared receiver
+metric and a typed admission, with no elapsed time anywhere in it;
+`leader_quadrature::{CommittedStep, CommittedTransport, chain_of}` — the two determination laws as
+`Relating` links, so `Chain::defect_against` returns a determination-law mismatch that the quantity
+being integrated cannot see; `crates/holonic-engine/src/clifford.rs` — the `d`-dimensional arrow and the
+even Clifford algebra over `Rat`, sparse in its basis blades, with the exterior sign as the
+multiplication's 2-cocycle; `traversible_chain::{PhasedTransfer, PhasedLink, PhasedChain,
+StandingWaveReading, BlochReading, cavity}` — the propagation phase, so a closed chain's holonomy is
+no longer the identity by construction, and the resonator's first reading;
+`embedding_fiber::safetensors` — the container intake lifted out of four drivers that each carried
+their own copy, one of which never consulted `dtype`.
+
 **Gates re-taken 2026-08-13 on a clean tree at `1f66e7a`, after the audit and its repairs:
 `bash tools/gates.sh` 8 of 9.** `cargo test --workspace` **2,209 passed, 0 failed, 19 ignored** over
 42 result lines; authored levels 0 failures (**346** numeric levels counted); named paths 0 failures
@@ -320,6 +434,30 @@ no `returned_returned_` ladder.
 world-mediated, typed, ablatable returned passage that changes reusable morphology and later
 conduct. It does not establish Plan 3's plural-source selectivity or make the language-generation
 attachment condition ride that conduct.
+
+## THE EMISSION COMPOSES ONCE THE HORIZON IS A COORDINATE — 2026-08-18
+
+**Truth status:** `established-bounded`. **Evidence:** `implemented-exact`, `measured`; the plan's
+own falsifier was run and the interpretation it staked survived it. **Owners:**
+`life::causal_language::{BranchingLaw, ContinuationReading, PairingReading, RecruitmentLaw}`,
+`life::presentation_quotient`; driver
+`soma/life/examples/the_horizon_is_a_coordinate_and_the_emission_keeps_its_cross.rs`. **Record:**
+[`research/records/2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`](research/records/2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md).
+
+**The emission was copying because a filter kept, at every step, the continuations attested by the
+longest matching corpus span — and kept exactly one.** `causal_language.rs`'s greatest-horizon
+`retain` is now one of two caller-declared laws; under the other, the whole junction branches and the
+difference between members is carried by an exact `RatioFamily` with the horizon as a coordinate per
+member. Measured over eight prompts at aperture three, on two materially unrelated corpora: the gate returns
+**8 of 8** contiguous spans of its material on each, the ratio reading **2,055 of 12,130** on
+mathematics and **2,957 of 17,830** on code — 16.9% and 16.6% spans.
+
+**Three things this establishes and one bound.** `RatioFamily`, `SectionModulus` and `clifford::Arrow`
+have library callers for the first time. The presentation's retained alternatives now carry the word
+that separates them from the uttered answer. And a **two-token emission is a contiguous span by
+construction**, so the sixteen certified two-token artifacts under the re-emission row below could
+never have exhibited composition — a boundary on what they may be quoted for, not a defect in them.
+The bound: the window test certifies *not a span of the declared material* and nothing wider.
 
 ## THE DEPOSIT LICENSES THE RE-EMISSION — 2026-08-11
 

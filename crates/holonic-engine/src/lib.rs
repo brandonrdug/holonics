@@ -75,6 +75,9 @@ pub mod codec_recovery;
 // Declared, never glob-exported: `ItemId`, `Observation`, `ReceiverId` and `Disagreement` collide
 // across the engine's receiver modules and must be named at every call site.
 pub mod causal_traversal;
+/// The `d`-dimensional arrow and the even Clifford algebra that carries its hand — the lift of
+/// `soma/body/src/arrow.rs` out of two dimensions, over exact rationals.
+pub mod clifford;
 pub mod codec_system;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
@@ -180,7 +183,15 @@ pub mod display;
 pub mod divisor_reconstruction;
 pub mod evolution;
 pub mod exact_linear;
+// The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
+// `<a|b>²/(<a|a><b|b>)`, whose dyadic frames cancel identically, so the face crosses where the
+// bracket cannot. Carried as a pair, ordered by cross-multiplication, with the hand the square
+// deleted returned beside it and the turn face closing against it by Lagrange.
+pub mod exact_contact;
 pub mod exact_value;
+/// What an exact deed cost, counted rather than timed — the work vector `TABLET_THE_CHART` §3.7
+/// records as owed, with a typed admission and no clock anywhere in it.
+pub mod exact_work;
 pub mod landauer;
 pub mod executor;
 pub mod field_atlas;

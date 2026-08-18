@@ -537,3 +537,103 @@ fn lean_rest_rejects_prior_missing_unknown_and_corrupted_nested_faces() {
         Err(LeanMathematicsError::InvalidRest)
     );
 }
+
+/// **The admission law over mathematics, and all four verdicts on one family.**
+///
+/// The kernel supplies both sides natively: an admitted submission confirms every motion it
+/// carried, an obstructed one refutes them. A motion in both is CONFLICTED — it closes some goals
+/// and not others, so its own name does not determine whether it carries.
+#[test]
+fn a_motion_in_both_an_admitted_and_an_obstructed_proof_is_conflicted() {
+    use crate::holonic_training::FiberAdmission;
+    use crate::lean_mathematics::kernel_returns::{motion_admissions, motion_key, motion_standing};
+    use std::sync::Arc;
+
+    let always = LeanProofMotion::Close {
+        tactic: Arc::from("rfl"),
+    };
+    let never = LeanProofMotion::Rewrite {
+        declaration: Arc::from("absent_lemma"),
+    };
+    let both = LeanProofMotion::Direct {
+        declaration: Arc::from("shared_lemma"),
+    };
+
+    let member = |ordinal: u64, motions: Vec<LeanProofMotion>, admitted: bool| LeanKernelReturn {
+        candidate: LeanProofCandidate {
+            ordinal,
+            proof: format!("proof {ordinal}"),
+            motions,
+            declaration_lineage: LocalSet::default(),
+        },
+        outcome: if admitted {
+            LeanKernelOutcome::KernelAdmitted
+        } else {
+            LeanKernelOutcome::Obstructed
+        },
+        source_sha256: sha256(format!("{ordinal}").as_bytes()),
+        diagnostic_sha256: sha256(b""),
+        diagnostic: String::new(),
+        observed_millis: 0,
+    };
+
+    let family = LeanKernelReturnFamily::from_members(LocalSequence::from_iter([
+        member(0, vec![always.clone(), both.clone()], true),
+        member(1, vec![always.clone()], true),
+        member(2, vec![never.clone(), both.clone()], false),
+    ]))
+    .unwrap();
+
+    let standing = motion_standing(&family);
+    assert_eq!(standing[&motion_key(&always)].confirmations, 2);
+    assert_eq!(standing[&motion_key(&always)].refutations, 0);
+    assert_eq!(standing[&motion_key(&both)].confirmations, 1);
+    assert_eq!(standing[&motion_key(&both)].refutations, 1);
+    assert_eq!(standing[&motion_key(&never)].confirmations, 0);
+    assert_eq!(standing[&motion_key(&never)].refutations, 1);
+
+    let sorted = motion_admissions(&family);
+    let named = |verdict: FiberAdmission| -> Vec<String> {
+        sorted
+            .get(&verdict)
+            .map(|members| members.iter().map(|(key, _)| key.clone()).collect())
+            .unwrap_or_default()
+    };
+    assert_eq!(named(FiberAdmission::Admitted), vec![motion_key(&always)]);
+    assert_eq!(named(FiberAdmission::Conflicted), vec![motion_key(&both)]);
+    assert_eq!(named(FiberAdmission::Refuted), vec![motion_key(&never)]);
+    assert!(
+        named(FiberAdmission::Open).is_empty(),
+        "every motion here was submitted"
+    );
+}
+
+/// A motion repeated inside ONE proof is one piece of evidence about that proof, not several.
+/// Without this the counts would rank by how often a tactic appears in a single term.
+#[test]
+fn a_motion_repeated_inside_one_proof_counts_once() {
+    use crate::lean_mathematics::kernel_returns::{motion_key, motion_standing};
+    use std::sync::Arc;
+
+    let motion = LeanProofMotion::Close {
+        tactic: Arc::from("simp"),
+    };
+    let family = LeanKernelReturnFamily::from_members(LocalSequence::from_iter([
+        LeanKernelReturn {
+            candidate: LeanProofCandidate {
+                ordinal: 0,
+                proof: "proof".to_owned(),
+                motions: vec![motion.clone(), motion.clone(), motion.clone()],
+                declaration_lineage: LocalSet::default(),
+            },
+            outcome: LeanKernelOutcome::KernelAdmitted,
+            source_sha256: sha256(b"0"),
+            diagnostic_sha256: sha256(b""),
+            diagnostic: String::new(),
+            observed_millis: 0,
+        },
+    ]))
+    .unwrap();
+    let standing = motion_standing(&family);
+    assert_eq!(standing[&motion_key(&motion)].confirmations, 1);
+}

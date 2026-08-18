@@ -155,6 +155,13 @@ pub fn probability_ratio(
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RatioFamily {
     schema: String,
+    /// The integer reciprocal temperature this family was rebased by, `1` for a family read
+    /// directly off a surprisal population.
+    ///
+    /// **Added 2026-08-18.** Without it a rebased family was bit-indistinguishable from a warm one,
+    /// so a reading could not say which frame it was taken in — the absolute-frame defect, one
+    /// level in.
+    rebased_by: u32,
     members: Vec<u64>,
     /// `(i, j) -> p_i / p_j`, for every ordered pair of distinct members.
     ratios: BTreeMap<(u64, u64), Rat>,
@@ -184,9 +191,15 @@ impl RatioFamily {
         }
         Ok(Self {
             schema: SCHEMA.to_owned(),
+            rebased_by: 1,
             members,
             ratios,
         })
+    }
+
+    /// The integer reciprocal temperature this family stands in. `1` is the frame it was read in.
+    pub const fn rebased_by_reciprocal(&self) -> u32 {
+        self.rebased_by
     }
 
     pub fn members(&self) -> &[u64] {
@@ -283,18 +296,30 @@ impl RatioFamily {
         Ok(true)
     }
 
-    /// Every ratio raised to `1/temperature` — the **root**, taken only where it
-    /// stays in ℚ.
+    /// Every ratio raised to the **integer power** `reciprocal_temperature`.
     ///
     /// Temperature is not a new quantity: `softmax(x/T)` sends `r` to `r^{1/T}`,
-    /// so it is a rebase of the winding the ratio already carries. This returns
-    /// the rebased family for an integer reciprocal temperature, and refuses
-    /// where the root leaves ℚ rather than returning an approximation.
+    /// so it is a rebase of the winding the ratio already carries, and this is
+    /// that rebase for `T = 1/n` with `n` a positive integer.
+    ///
+    /// **CORRECTED 2026-08-18, twice.** The doc said this takes *"the **root**,
+    /// taken only where it stays in ℚ"* and *"refuses where the root leaves ℚ"*.
+    /// It takes an integer power; no root is taken, none can leave ℚ, and
+    /// [`RatioError`] correctly carries no variant for it — the promised refusal
+    /// was both unreachable and unimplemented. The **root** case, `T > 1`, is not
+    /// implemented here at all and would need the algebraic carrier.
+    ///
+    /// And the doc said *"no path here reaches `T → 0`, which is argmax — the
+    /// limit this module exists not to take."* That was backwards: the parameter
+    /// **is** `1/T`, so `T → 0` is `reciprocal_temperature → ∞` and the parameter
+    /// drives straight at it. What holds the ban is not this argument — it is
+    /// that every ratio is returned and none is crowned, at any `n`. The limit is
+    /// never *taken* because nothing here selects; the parameter can approach it
+    /// and the return stays a complete family.
     ///
     /// **`reciprocal = 0` is refused.** That is `T → ∞`, where every ratio
     /// becomes one and no member is distinguishable from any other; it is a
-    /// degenerate frame rather than a hot one. And no path here reaches `T → 0`,
-    /// which is argmax — the limit this module exists not to take.
+    /// degenerate frame rather than a hot one.
     pub fn rebased_by(&self, reciprocal_temperature: u32) -> Result<Self, RatioError> {
         if reciprocal_temperature == 0 {
             return Err(RatioError::DegenerateTemperature);
@@ -308,6 +333,9 @@ impl RatioFamily {
         }
         Ok(Self {
             schema: self.schema.clone(),
+            // The rebases compose: `(r^m)^n = r^{mn}`, so the frame this family stands in is the
+            // product, not the last exponent applied.
+            rebased_by: self.rebased_by.saturating_mul(reciprocal_temperature),
             members: self.members.clone(),
             ratios,
         })
@@ -541,5 +569,58 @@ mod tests {
             RatioFamily::read(&population),
             Err(RatioError::FamilyTooSmall { members: 1 })
         );
+    }
+}
+
+#[cfg(test)]
+mod frame_tests {
+    use super::*;
+    use crate::surprisal::SymbolicSurprisal;
+
+    fn population() -> BTreeMap<u64, SymbolicSurprisal> {
+        let mut carried = BTreeMap::new();
+        for (name, numerator) in [(0u64, 1i64), (1, 2), (2, 4)] {
+            let probability = Rat::new(BigInt::from(numerator), BigInt::from(8i64));
+            carried.insert(
+                name,
+                SymbolicSurprisal::of_probability(&probability).expect("a probability"),
+            );
+        }
+        carried
+    }
+
+    /// **A rebased family must not be bit-indistinguishable from a warm one.** Before 2026-08-18 the
+    /// reciprocal was applied and then forgotten, so a reading could not say which frame it stood
+    /// in — the absolute-frame defect one level in.
+    #[test]
+    fn the_family_carries_the_frame_it_was_rebased_into() {
+        let read = RatioFamily::read(&population()).expect("a family");
+        assert_eq!(read.rebased_by_reciprocal(), 1);
+        let cooled = read.rebased_by(3).expect("a positive reciprocal");
+        assert_eq!(cooled.rebased_by_reciprocal(), 3);
+        // The rebases compose, so the frame is the product rather than the last exponent.
+        let twice = cooled.rebased_by(2).expect("a positive reciprocal");
+        assert_eq!(twice.rebased_by_reciprocal(), 6);
+        assert_ne!(read, cooled, "two frames must not be equal as values");
+    }
+
+    /// The ban is held by the return, not by the parameter: at any reciprocal the family is complete
+    /// and no member is crowned. `T -> 0` is `reciprocal -> infinity`, which the parameter can
+    /// approach; what it can never do is make the family select.
+    #[test]
+    fn every_member_survives_every_frame() {
+        let read = RatioFamily::read(&population()).expect("a family");
+        for reciprocal in [1u32, 2, 7, 64, u32::MAX] {
+            let rebased = read.rebased_by(reciprocal).expect("a positive reciprocal");
+            assert_eq!(rebased.members(), read.members());
+            for left in read.members() {
+                for right in read.members() {
+                    if left != right {
+                        assert!(rebased.ratio(*left, *right).is_some());
+                    }
+                }
+            }
+        }
+        assert_eq!(read.rebased_by(0), Err(RatioError::DegenerateTemperature));
     }
 }

@@ -296,7 +296,7 @@ The sentence is withdrawn and replaced by the reach, taken by reading the owners
 
 | carrier | the two arms | driven by |
 |---|---|---|
-| `RayCrossings` — the η boundary | crossing addresses (`total`) ; `winding()` | `polygon_winding`, `crates/relational-geometry/src/exact_analysis.rs:1201`, with its declared control at `:1440` |
+| `RayCrossings` — the η boundary | crossing addresses (`total`) ; `winding()` | `polygon_winding`, `crates/relational-geometry/src/exact_analysis.rs:1526`, with its declared control at `:1440` |
 | `HingeHolonomy::Exact` — `crates/holonic-engine/src/contact_gluing.rs:1470` | `cosine`/`sine` as an exact point on the unit circle (the position) ; `half_turns: u32` (the winding) | `crates/holonic-engine/examples/the_hinge_carries_the_curvature.rs`, six declared gates, of which two are the §8 gauge orbit in both directions — a similarity must move nothing (`:436`), a non-similar metric must move the population (`:464`) |
 | `ReceiverPhaseAtlasStanding::germ_populations` — `crates/holonic-engine/src/receiver_phase_atlas.rs:348` | germ **addresses** by signature ; the count demoted to a reading | its own doc at `:347` cites `RayCrossings`' shape as the form it was rebuilt into |
 

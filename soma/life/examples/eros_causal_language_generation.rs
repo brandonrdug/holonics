@@ -255,6 +255,7 @@ fn run() -> Result<(), String> {
                 CausalLanguageGenerationSpec {
                     maximum_generated_tokens: prompt.maximum_generated_tokens,
                     stop_at_sentence_boundary: true,
+                    ..CausalLanguageGenerationSpec::default()
                 },
                 action,
                 workers,
@@ -280,6 +281,7 @@ fn run() -> Result<(), String> {
             CausalLanguageGenerationSpec {
                 maximum_generated_tokens: CONTROL_APERTURE,
                 stop_at_sentence_boundary: true,
+                ..CausalLanguageGenerationSpec::default()
             },
             action,
             workers,

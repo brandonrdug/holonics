@@ -796,4 +796,151 @@ fn main() {
         );
         std::process::exit(1);
     }
+
+    classify_mechanisms(&declared_pencils());
+}
+
+/// **Material that DOES meet a pole, which the declared quadruples deliberately avoid.**
+///
+/// `declared_quadruples` is chosen so that no mark is a pole of any declared turn — that is what
+/// lets the orbit demand every mark move. It also means no turn can ever fail, so a classification
+/// over that material alone would return one block and carry nothing. These quadruples each contain
+/// the pole of one projective turn: `t = 0` is the pole of the swap `(0,1,1,0)`, and `t = -3` is the
+/// pole of `(2,1,1,3)`.
+fn quadruples_meeting_a_pole() -> Vec<(&'static str, Vec<Rat>)> {
+    vec![
+        ("contains t=0  (the swap's pole)", vec![
+            integer(0),
+            integer(1),
+            integer(2),
+            integer(4),
+        ]),
+        ("contains t=-3 (the pole of 2,1;1,3)", vec![
+            integer(-3),
+            integer(1),
+            integer(2),
+            integer(4),
+        ]),
+    ]
+}
+
+/// **The admission law over transport mechanisms, computed by this body and nothing else.**
+///
+/// A mechanism is CONFIRMED on a material when the cross-ratio it carries is exactly unmoved, and
+/// REFUTED when the carry refuses or the value moves. Both sides are exact rational arithmetic in
+/// this process — **no external checker is consulted, and none is needed.** A proof assistant is a
+/// medium for communicating and re-running a proof; it is not where the mathematics is decided.
+///
+/// The verdict is the same four-state law the conditioning fibers use:
+///
+/// ```text
+///     Admitted     preserved the invariant on every material it met
+///     Conflicted   preserved on some and not others — its applicability has a CONDITION,
+///                  and here that condition is nameable: no mark at the turn's pole
+///     Refuted      never preserved it
+/// ```
+fn classify_mechanisms(pencils: &[(&'static str, ProjectivePencil)]) {
+    let turns = declared_turns();
+    let mut materials: Vec<(String, Vec<Rat>)> = declared_quadruples()
+        .into_iter()
+        .enumerate()
+        .map(|(at, parameters)| (format!("pole-free {at}"), parameters))
+        .collect();
+    materials.extend(
+        quadruples_meeting_a_pole()
+            .into_iter()
+            .map(|(name, parameters)| (name.to_owned(), parameters)),
+    );
+
+    // Each mechanism is a map on the pencil parameter. The projective turns are the declared
+    // family; the two reparameterisations are the controls that must fail, because squaring and
+    // cubing are not projective and leave the pencil.
+    let mut mechanisms: Vec<(String, Box<dyn Fn(&Rat) -> Option<Rat>>)> = Vec::new();
+    for (name, turn) in turns {
+        let carried = turn.clone();
+        mechanisms.push((
+            format!("turn {name}"),
+            Box::new(move |value: &Rat| carried.apply(value)),
+        ));
+    }
+    mechanisms.push((
+        "reparameterise t -> t^2".to_owned(),
+        Box::new(|value: &Rat| Some(value * value)),
+    ));
+    mechanisms.push((
+        "reparameterise t -> t^3".to_owned(),
+        Box::new(|value: &Rat| Some(value * value * value)),
+    ));
+
+    println!("\n\nTHE MECHANISMS, ADMITTED BY WHAT THEY PRESERVE");
+    println!("----------------------------------------------");
+    println!(
+        "  Both sides of the evidence are computed here, exactly over Rat. No external checker is\n\
+         \x20 consulted: a mechanism either leaves the cross-ratio exactly where it was or it does not."
+    );
+    println!(
+        "\n  {:<34} {:>9} {:>9}   verdict",
+        "mechanism", "preserved", "moved"
+    );
+
+    let mut conflicted_conditions: Vec<String> = Vec::new();
+    for (name, mechanism) in &mechanisms {
+        let mut preserved = 0u64;
+        let mut moved = 0u64;
+        let mut failing: Vec<String> = Vec::new();
+        for (pencil_name, pencil) in pencils {
+            for (material_name, parameters) in &materials {
+                let before = match cross_ratio(&pencil.place_all(parameters)) {
+                    Ok(value) => value,
+                    Err(_) => continue,
+                };
+                let carried: Option<Vec<Rat>> =
+                    parameters.iter().map(|value| mechanism(value)).collect();
+                let holds = match carried {
+                    // The carry refused — a mark left the pencil. That is a refutation and it is
+                    // reported rather than skipped, because refusing IS the mechanism's behaviour
+                    // on this material.
+                    None => false,
+                    Some(images) => match cross_ratio(&pencil.place_all(&images)) {
+                        Ok(after) => after == before,
+                        Err(_) => false,
+                    },
+                };
+                if holds {
+                    preserved += 1;
+                } else {
+                    moved += 1;
+                    failing.push(format!("{material_name} on {}", &pencil_name[..7.min(pencil_name.len())]));
+                }
+            }
+        }
+        let verdict = match (preserved, moved) {
+            (0, 0) => "OPEN",
+            (_, 0) => "ADMITTED",
+            (0, _) => "REFUTED",
+            _ => "CONFLICTED",
+        };
+        println!("  {name:<34} {preserved:>9} {moved:>9}   {verdict}");
+        if verdict == "CONFLICTED" {
+            conflicted_conditions.push(format!("    {name} fails on: {}", failing.join(", ")));
+        }
+    }
+
+    if conflicted_conditions.is_empty() {
+        println!(
+            "\n  NOTHING CONFLICTED. Every mechanism either preserved the invariant everywhere or\n\
+             \x20 nowhere, so this material carries no recognition condition to find."
+        );
+    } else {
+        println!("\n  The conflicted mechanisms, and where they fail:");
+        for line in &conflicted_conditions {
+            println!("{line}");
+        }
+        println!(
+            "\n  A CONFLICTED mechanism is not a broken one. It preserves the cross-ratio wherever\n\
+             \x20 it is defined, and refuses where a mark sits at its pole — so its applicability\n\
+             \x20 carries a condition its name does not: NO MARK AT THE POLE. That condition is what\n\
+             \x20 an atlas edge owes, and the classification found it without being told."
+        );
+    }
 }

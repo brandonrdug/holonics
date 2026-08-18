@@ -103,19 +103,28 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/ARBITRARY_LEARNING_MACHINE.md` | **Extensible holonic learning machine** — Construct one continuing holonic ecology that can mount inherited organs, receive caused material through arbitrary codecs, let returned passages change reusable morphology, conduct later… |
 | `blueprint/CONTAMINATION_BANS.md` | **Contamination bans** — These are hard reconstruction invariants derived from repeated laboratory failures. |
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
+| `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md` | **The admission is a quotient and the breadth is a group** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
+| `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` | **The arrow is the division and attention keeps only its aim** — **Evidence:** `measured` where stated; the arrow's own source is `soma/body/src/arrow.rs:17-26` and `:114-125`, read today. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
+| `blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md` | **The Clifford lift, the phase wire, and the four untaken readings** — Every citation below was verified at the line given on the day of writing. |
+| `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md` | **The codec is recovered at every scale, and the faces are a return** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — This one covers instantiation. |
+| `blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md` | **The horizon is a coordinate, not a gate, and the emission keeps its cross** — **Evidence:** `measured`. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
+| `blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md` | **The machine produces mathematics it was not given** — **Evidence:** the standing measurements this plan builds on are cited inline with their commands and dates; nothing below is assumed. |
+| `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md` | **The map is material, the head is a contact, and the instance resumes** — **Evidence:** `measured`. |
 | `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — This one covers the atlas itself. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
+| `blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md` | **The statement is a crossing word and the separator is oriented** — **Evidence:** `measured` — every figure was taken on this machine today, and the two that are outside-instrument analyses say so by name. |
 | `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — This one covers the carriers, and sits more immediately **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
 | `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
+| `blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md` | **The work vector, the hand's polarity, and the committed step** — Every absence below carries the command that measured it and its date. |
 
 ---
 
-## 4 · The 2026-08 record line (108 deposits of 400)
+## 4 · The 2026-08 record line (125 deposits of 417)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -227,10 +236,27 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-15_THE_MATERIAL_ARMS_THE_FOUNDING_AND_THE_FOURTH_BODY_IS_NEVER_LIVE.md` | The material arms the founding, and the fourth body is never live |
 | `2026-08-15_THE_RELATING_IS_ONE_COMPLEX_PRODUCT_AND_THE_POLE_HAS_COLLAPSED_ONTO_A_RELATUM.md` | The relating is one complex product, and the pole has collapsed onto a relatum |
 | `2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md` | An address is a collapsed face that reopens, and the unification is one resume |
+| `2026-08-16_EVERY_ROUTE_TO_ZETA_PAYS_GAMMA_AND_ONLY_ONE_PAYS_IT_IN_A_FINITE_SHIFT_ORBIT.md` | Every route to zeta pays Gamma, and only one pays it in a finite shift orbit |
+| `2026-08-16_THE_CORNER_BREAKS_THE_GROUP_LAW_AND_ITS_REMAINDER_IS_A_HOLONOMY.md` | The corner breaks the group law and its remainder is a holonomy |
+| `2026-08-16_THE_COUNT_GATED_SPEECH_NOT_ADMISSION_AND_THE_EXCISION_IS_REFUTED.md` | The count gated speech, not admission, and the excision is refuted |
+| `2026-08-16_THE_JUNCTION_IS_A_HALF_TWIST_AND_A_MODULUS_IS_WHAT_A_DECLARED_QUOTIENT_RETAINS.md` | The junction is a half-twist, and a modulus is what a declared quotient retains |
+| `2026-08-16_THE_KERNEL_ANSWERS_SO_THE_ADMISSION_LAW_APPLIES_TO_MATHEMATICS_UNCHANGED.md` | The kernel answers, so the admission law applies to mathematics unchanged |
 | `2026-08-16_THE_MATERIAL_IS_VISIBLE_WHERE_THE_LAW_CONTRIBUTES_NOTHING_AND_A_RUN_CONTINUED_ACROSS_A_PROCESS.md` | The material is visible where the law contributes nothing, and a run continued across a process |
 | `2026-08-16_THE_RENDER_IS_A_FIELD_THE_SURFACES_ARE_PATHS_AND_THE_DEFICIT_IS_ONE_READING_AT_TWO_GRAINS.md` | The render is a field, the surfaces are paths, and the deficit is one reading at two grains |
 | `2026-08-16_THE_SWING_CONSULTS_COMPOSITION_DEPTH_AND_THE_CAUSAL_STATE_IS_FINER_THAN_THE_ORBIT.md` | The swing consults composition depth, and the causal state is finer than the orbit |
+| `2026-08-16_THE_WITNESS_HAS_NO_ADDRESS_AND_REPETITION_EXPLORES_ONLY_A_CYCLIC_SUBGROUP.md` | The witness has no address, and repetition explores only a cyclic subgroup |
 | `2026-08-16_WEIL_POSITIVITY_IS_A_TRACE_ON_A_RETAINED_REMAINDER_AND_A_PROOF_TRANSPORT_IS_A_ONE_BIT_COMPRESSION.md` | Weil positivity is a trace on a retained remainder, and a proof transport is a one-bit compression |
+| `2026-08-17_ONE_ORGAN_THREE_CODECS_AND_THE_RELATION_LIVES_AT_A_DIFFERENT_LAYER_IN_EACH.md` | One organ, three codecs, and the relation lives at a different layer in each |
+| `2026-08-17_THE_IDENTITY_IS_A_PERMUTATION_AND_ONE_TRUNCATED_HEADER_COST_THREE_THOUSAND_READINGS.md` | The identity is a permutation, and one truncated header cost three thousand readings |
+| `2026-08-17_THE_LADDER_CLIMBS_AND_THE_CODEC_ENDS_AT_THE_CHARACTER.md` | The ladder climbs, and the codec ends at the character |
+| `2026-08-17_THE_MACHINE_PROPOSED_MATHEMATICS_AND_EXACT_ORGANS_ADMITTED_SEVENTEEN.md` | The machine proposed mathematics and exact organs admitted seventeen |
+| `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | The phase is wired, the band edge is the reflection coefficient, and the exact carrier has a cost law |
+| `2026-08-17_THE_QUOTIENT_HAS_TWO_PARTS_AND_THE_EMISSION_HEAD_KEEPS_ONE.md` | The quotient has two parts and the emission head keeps one |
+| `2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md` | The work is counted, the prediction is refuted where it is wrong, and the hand was inverted |
+| `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
+| `2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md` | The blade dropped the metric, and the two-frame check was live only where it could not fire |
+| `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
+| `2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md` | The model and the production met, and the answer is a block, not a pick |
 
 ---
 
@@ -250,6 +276,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 5 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
+| `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `canon/THE_DRIVER_ATLAS.md` |
 | `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
 | `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 12 more |
 

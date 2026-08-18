@@ -138,7 +138,7 @@ under `research/records/`.
 | the return is a finite electrodynamic/thermal wave | `2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md` | 146 |
 | universality by first return | `2026-07-17_THE_ARC_IS_THE_CONSTRUCTION_THE_SPECTRUM_IS_ITS_RECEIVER_FACE.md` | 387 |
 
-### the current and the circuit  (14)
+### the current and the circuit  (20)
 
 | the external field's own label | record | line |
 |---|---|---|
@@ -156,6 +156,12 @@ under `research/records/`.
 | leader branching can be born beside standing channel | `2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md` | 82 |
 | lightning work is not identical to heat | `2026-07-17_HEAT_IS_THE_INEXACT_BOUNDARY_CURRENT_TEMPERATURE_IS_THE_INTEGRATING_FRAME.md` | 230 |
 | successive bidirectional leaders reuse a triggered channel | `2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md` | 104 |
+| Fresnel at normal incidence, the transmission-line reflection coefficient, and the Smith chart — **one law**, `Γ = (Y_i−Y_t)/(Y_i+Y_t)`, exact over `Rat` | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 78 |
+| impedance matching, and the matched junction where nothing returns | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 100 |
+| the standing wave a mismatched termination holds, and its ratio as a **face** of `\|Γ\|²` | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 105 |
+| the Bloch pass/stop/edge classification by `\|Tr M/2\|`, and the bilayer dispersion | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 117 |
+| the Fabry–Pérot cavity, transparent exactly at the whole round trip | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 130 |
+| the adiabatic taper as composed rebases with zero remainder — *"It doesn't amplify it. Gear ratios."* | `2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md` | 74 |
 
 ### the boundary and the integral  (16)
 
@@ -318,6 +324,30 @@ The first six are opened by
 which supplies the sources and their caveats but deliberately builds nothing.
 
 ---
+
+## 4b · One NON-EQUIVALENCE the junction rows must carry — added 2026-08-17
+
+**A matched junction is NOT an aligned pair of directions, and identifying them is refused.** An
+external adjudication killed exactly that identification on 2026-08-17:
+
+> Impedance matching requires **conjugate effort/flow variables, incident and reflected travelling
+> modes at a port, an admittance on each side, the Möbius law `Γ = (Y_i−Y_t)/(Y_i+Y_t)`, and
+> phase-dependent interference.** A transfer ratio, a control error, or a dot product supplies none
+> of them. Manufacturing `(1−G)/(1+G)` from a dimensionless gain is a coordinate trick, not physical
+> reflection.
+
+So `⟨q,k⟩ = 0` is **not** `Γ = 0`. The two share the variant name `Hand::Ortho` because both read the
+sign of the **stored face** — `aim` is *what stands*, `M₂₁` is *what came back and therefore did not
+transport* — and the shared reading is the stored face's sign, **not** an equality of quantities.
+`T + Γ² = 1` and `cos²θ + sin²θ = 1` are each **identities of their own convention**, and joining two
+tautologies is not a correspondence. Every card above is about a **port with two travelling modes**;
+none of them licenses a reading of a bilinear pairing between directions.
+
+**Why this row exists at all.** Measured 2026-08-17, before the rows above were written:
+`grep -c -iE "impedance|admittance|matched junction|standing wave" canon/THE_CORRESPONDENCE_ATLAS.md`
+→ **0**, over the whole file. The concept-entry index could not reach the corpus's own junction
+machinery, and in one day both an external sweep and the assistant built a false identification on it
+— which is the failure this file exists to prevent, arriving because the file could not be entered.
 
 ## 5 · Bounds
 

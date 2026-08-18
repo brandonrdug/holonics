@@ -297,7 +297,7 @@ fn run_cell(mut source: Source, source_sha256: String) -> Result<Value, String> 
         "no_standing_controls": no_standing,
         "training_trajectory": trajectory,
         "rest": {
-            "schema": "HTEC/1",
+            "schema": "HTEC/2",
             "sha256": rest_sha256,
             "octets": rest.len(),
             "exact": rest_exact,

@@ -1,5 +1,10 @@
+use std::collections::{BTreeMap, BTreeSet};
+
 use holonic_structure::{LocalRelations, LocalSequence};
 use serde::Serialize;
+
+use crate::holonic_training::{FiberAdmission, FiberStanding};
+use super::LeanProofMotion;
 
 use super::{LeanMathematicsError, LeanProofCandidate};
 
@@ -143,4 +148,88 @@ impl LeanKernelReturnFamily {
         }
         Ok(Self { members })
     }
+}
+
+/// **The two-sided standing of one proof motion across a kernel return family.**
+///
+/// The conditioning path had to derive its negative side from its own prior predictions, because it
+/// only ever watched. **Here the negative side arrives for free, because the kernel answers
+/// queries**: `LeanKernelOutcome::Obstructed` is a refusal with a verbatim diagnostic, and it is a
+/// refusal *of the motions the submission carried*.
+///
+/// So the admission law of `crate::holonic_training` applies unchanged to mathematics, over a
+/// different material:
+///
+/// ```text
+///     Admitted     the motion appears in kernel-admitted proofs and in no obstructed one
+///     Refuted      it appears only in obstructed ones
+///     Conflicted   both — its own name does not determine whether it carries
+///     Open         it has not been submitted
+/// ```
+///
+/// **`Conflicted` is the class that matters for a method atlas.** A motion that closes some goals
+/// and fails others is a transport mechanism whose *chart* is doing work its name does not carry —
+/// which is exactly the recognition condition `H.0362`'s formulation nodes require of an atlas
+/// edge. It is a junction, not a bad tactic.
+///
+/// Nothing here ranks: the counts are reported and the verdict turns only on whether each side is
+/// zero.
+pub fn motion_standing(family: &LeanKernelReturnFamily) -> BTreeMap<String, FiberStanding> {
+    let mut standing: BTreeMap<String, FiberStanding> = BTreeMap::new();
+    for returned in family.members() {
+        let admitted = returned.kernel_admitted();
+        // One submission counts once per distinct motion it carries: a motion repeated inside one
+        // proof is one piece of evidence about that proof, not several.
+        let mut seen = BTreeSet::new();
+        for motion in &returned.candidate().motions {
+            if !seen.insert(motion_key(motion)) {
+                continue;
+            }
+            let entry = standing.entry(motion_key(motion)).or_default();
+            let side = if admitted {
+                &mut entry.confirmations
+            } else {
+                &mut entry.refutations
+            };
+            *side = side.saturating_add(1);
+        }
+    }
+    standing
+}
+
+/// The motion's own species and subject, as its address. `Close` is keyed by its tactic and every
+/// other species by the declaration it transports through, because that is what a later proof would
+/// have to reach for.
+pub fn motion_key(motion: &LeanProofMotion) -> String {
+    match motion {
+        LeanProofMotion::Close { tactic } => format!("close/{tactic}"),
+        LeanProofMotion::Direct { declaration } => format!("direct/{declaration}"),
+        LeanProofMotion::Rewrite { declaration } => format!("rewrite/{declaration}"),
+        LeanProofMotion::IntroduceFact { declaration } => format!("fact/{declaration}"),
+        LeanProofMotion::RecurApply { declaration, depth } => {
+            format!("recur{depth}/{declaration}")
+        }
+        LeanProofMotion::Contrapose {
+            hypothesis,
+            declaration,
+        } => format!("contrapose[{hypothesis}]/{declaration}"),
+        LeanProofMotion::Project {
+            declaration,
+            projection,
+        } => format!("project{projection}/{declaration}"),
+    }
+}
+
+/// The motions this family admits, refutes, holds conflicted, and has never submitted.
+pub fn motion_admissions(
+    family: &LeanKernelReturnFamily,
+) -> BTreeMap<FiberAdmission, Vec<(String, FiberStanding)>> {
+    let mut sorted: BTreeMap<FiberAdmission, Vec<(String, FiberStanding)>> = BTreeMap::new();
+    for (key, standing) in motion_standing(family) {
+        sorted
+            .entry(standing.admission())
+            .or_default()
+            .push((key, standing));
+    }
+    sorted
 }

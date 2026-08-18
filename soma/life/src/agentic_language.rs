@@ -26,6 +26,7 @@ use holonic_structure::{CausalMembrane, LocalSet};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
+use crate::presentation_quotient::{divide, PresentationDivision, PresentationMaterial, PresentedCandidate};
 use crate::{
     causal_language::{lexical_tokens, render_tokens},
     holonic_training::{
@@ -331,6 +332,11 @@ pub struct AgenticLanguageAnswer {
     /// Incomparable terminal currents which crossed the same membrane but were not selected by
     /// this receiver. Their surfaces and causal bodies remain exact future testimony.
     pub retained_alternatives: Vec<AgenticRetainedAnswerAlternative>,
+    /// **The division of that remainder, taken.** Each retained alternative is related to the
+    /// uttered answer by the shortest word a declared receiver family separates them with, or is
+    /// returned as indistinguishable under that family. Before this the remainder was kept and the
+    /// division was never taken, which is a second undivided pile rather than a quotient.
+    pub presentation_division: PresentationDivision,
     pub reflection: MorphologicalReflectionReceipt,
     pub novel_contiguous_surface: bool,
     pub locally_conditioned_episodes: BTreeSet<String>,

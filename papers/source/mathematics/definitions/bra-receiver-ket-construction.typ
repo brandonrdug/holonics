@@ -40,7 +40,8 @@
     order is visible in the symbol.
 
     *A declared receiver family is complete exactly when it resolves the
-    identity.* For a family ${bra(a_i)}$ with kets $ket(a_i)$,
+    identity, and the statement carries a metric.* For a family ${bra(a_i)}$
+    with kets $ket(a_i)$ that is *orthonormal in a declared inner product $G$*,
     $
       sum_i ketbra(a_i, a_i) = I
       quad &lt;==&gt; quad
@@ -51,6 +52,32 @@
     exactly what the family cannot see. Receiver non-reconstruction is therefore
     not an obstacle to this notation; it is the statement
     $sum_i ketbra(a_i, a_i) != I$, written in it.
+
+    *The orthonormality hypothesis is load-bearing and was implicit until
+    2026-08-17.* For a family that is merely complete -- spanning, with no
+    orthogonality assumed -- the sum is the *frame operator*
+    $S = sum_i ketbra(a_i, a_i)$, which is positive and invertible but is *not a
+    projection and not the identity*. Reconstruction there runs through the *dual
+    frame* $ket(tilde(a)_i) = S^(-1) ket(a_i)$,
+    $
+      ket(psi) = sum_i braket(a_i, psi) ket(tilde(a)_i)
+      quad "(FRAME RECONSTRUCTION)"
+    $
+    so a family may reconstruct every construction while $sum_i ketbra(a_i, a_i)
+    != I$. Writing the resolution without its metric therefore *asserts an
+    orthonormality the receiver never declared*, which is the same defect as an
+    undeclared Euclidean form anywhere else in this corpus.
+
+    The repair is deposited and is a month older than the correction. With $P$ the
+    projection onto the family's span and $G$ the declared metric, G-orthogonality
+    $P G (x - P^([p]) x) = 0$ gives
+    $
+      P^([p]) = [(P G P)|_("range" P)]^(-1) P G, quad G = J^* J
+      quad "(RECEIVER-RELATIVE RECONSTRUCTION)"
+    $
+    which is the dual-frame formula written in this corpus's own notation, and it
+    closes: *"The relation between those words, the available currents, and
+    orthogonality is receiver-relative."*
 
     A positive operator-valued measure ${E_i}$ with $sum_i E_i=I$ is a complete
     declared receiver family whose faces are the quotients

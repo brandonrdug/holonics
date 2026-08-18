@@ -351,7 +351,22 @@ fn main() {
         .filter_map(|outcome| outcome.receipt.as_ref().ok())
         .map(|receipt| receipt.winding)
         .sum();
-    println!("# certified zero count over the scanned window: {certified_total}");
+    // A refused band contributes nothing to this sum while its zeros remain in the window, so the
+    // total is a LOWER BOUND whenever any band refused, and calling it a count would be an aperture
+    // reporting what it admitted and dropping what it excluded. The refusals are named here for the
+    // same reason `ArrivalResponse` reports its exclusions rather than discarding them.
+    let refused = outcomes
+        .iter()
+        .filter(|outcome| outcome.receipt.is_err())
+        .count();
+    if refused == 0 {
+        println!("# certified zero count over the scanned window: {certified_total}");
+    } else {
+        println!(
+            "# certified zero count over the scanned window: AT LEAST {certified_total} \
+             ({refused} band(s) refused and their zeros are still in the window)"
+        );
+    }
     println!("# charged bands: {}", charged.len());
     println!("# {walk_note}");
     println!("# atlas -> {}", atlas_path.display());

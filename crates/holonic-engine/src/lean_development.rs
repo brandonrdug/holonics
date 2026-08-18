@@ -1574,10 +1574,138 @@ fn recruit_line(line: &str, into: &mut BTreeMap<String, u32>) {
 /// reason. Returns the offset of the terminator, so the caller can also learn that the header is
 /// **closed** — an open header that is never closed is returned empty, which is how a `structure`
 /// with no `:=` anywhere lost its statement entirely.
+#[cfg(test)]
+mod header_terminator_tests {
+    use super::*;
+
+    /// **The repair's orbit, on the statement that found it.** Mathlib writes named arguments as
+    /// `(R := R)`, and `:=` there is not the header's terminator.
+    #[test]
+    fn a_named_argument_does_not_terminate_the_header() {
+        let text = "\
+theorem mem_maxTensorProduct {z : G} :
+    z ∈ maxTensorProduct (R := R) C₁ C₂ ↔ P z := by
+  simp
+";
+        let read = read_development(text, DeclarationGrain::EveryTopLevelDeclaration);
+        assert_eq!(read.declarations.len(), 1);
+        let statement = &read.declarations[0].statement;
+        assert!(
+            statement.contains("(R := R)"),
+            "the named argument is part of the statement: {statement:?}"
+        );
+        assert!(statement.ends_with("↔ P z"), "cut at the real terminator: {statement:?}");
+        // and the header now closes every bracket it opens, which is what the grammar recovery
+        // needs of every member of a population
+        let opened = statement.chars().filter(|symbol| *symbol == '(').count();
+        let closed = statement.chars().filter(|symbol| *symbol == ')').count();
+        assert_eq!(opened, closed);
+    }
+
+    /// The control: a terminator at depth zero still terminates, and `where` still does.
+    #[test]
+    fn a_terminator_at_depth_zero_still_cuts() {
+        let text = "\
+theorem plain (a : Nat) : a = a := rfl
+";
+        let read = read_development(text, DeclarationGrain::EveryTopLevelDeclaration);
+        assert_eq!(read.declarations[0].statement, "(a : Nat) : a = a");
+    }
+}
+
+/// The brackets a header nests in, as this reader's declared aperture.
+///
+/// It is an aperture and not a semantics: the reader does not know what any of these group, only
+/// that a terminator standing **inside** one of them belongs to that group and not to the header.
+pub const HEADER_BRACKETS: [(char, char); 8] = [
+    ('(', ')'),
+    ('[', ']'),
+    ('{', '}'),
+    ('⟨', '⟩'),
+    ('⦃', '⦄'),
+    ('⟮', '⟯'),
+    ('⁅', '⁆'),
+    ('⟪', '⟫'),
+];
+
+/// Whether a returned header closes every bracket it opens, over [`HEADER_BRACKETS`].
+///
+/// **This is the reader auditing its own return, and a caller is expected to ask.** A header that
+/// does not nest is one the reader cut in a place the source did not intend, or one written in a
+/// notation outside this aperture; either way it is not a whole statement, and a population-wide
+/// founding — which is what [`crate::statement_grammar::recover`] performs — is destroyed by a
+/// single member of that kind. Measured 2026-08-16 over `Mathlib/Geometry`: 3,691 of 3,695 theorem
+/// headers nest, and the four that do not were enough to cost the parenthesis and brace species for
+/// all of them.
+///
+/// The four are not hidden by this function. It returns a verdict per header so a caller can exhibit
+/// them, which is what retaining a refusal means.
+pub fn header_nests(text: &str) -> bool {
+    let mut expected: Vec<char> = Vec::new();
+    for symbol in text.chars() {
+        if let Some((_, close)) = HEADER_BRACKETS.iter().find(|(open, _)| *open == symbol) {
+            expected.push(*close);
+        } else if HEADER_BRACKETS.iter().any(|(_, close)| *close == symbol) {
+            match expected.last() {
+                Some(wanted) if *wanted == symbol => {
+                    expected.pop();
+                }
+                _ => return false,
+            }
+        }
+    }
+    expected.is_empty()
+}
+
+/// The nesting depth **before** each byte, over [`HEADER_BRACKETS`]. Never refuses: a header whose
+/// brackets do not balance still needs a terminator, and a depth that has gone wrong is better than
+/// no cut at all.
+fn header_depths(text: &str) -> Vec<usize> {
+    let mut depth = 0i64;
+    let mut profile = Vec::with_capacity(text.len());
+    for symbol in text.chars() {
+        let before = usize::try_from(depth.max(0)).unwrap_or(0);
+        for _ in 0..symbol.len_utf8() {
+            profile.push(before);
+        }
+        if HEADER_BRACKETS.iter().any(|(open, _)| *open == symbol) {
+            depth += 1;
+        } else if HEADER_BRACKETS.iter().any(|(_, close)| *close == symbol) {
+            depth -= 1;
+        }
+    }
+    profile
+}
+
+/// Where a declaration's header stops.
+///
+/// **The terminator is the first one standing at depth zero**, repaired 2026-08-16 by pointing the
+/// reader at `Mathlib/Geometry`. Taking the first `:=` anywhere cuts the header of
+/// `z ∈ maxTensorProduct (R := R) C₁ C₂ ↔ …` at the **named argument**, returning
+/// `z ∈ maxTensorProduct (R` — an opener that never closes. Measured before the repair: 45 of 3,383
+/// theorem headers in that subtree carried an unclosed bracket, and a statement grammar recovered
+/// over a population containing one such member founds no parenthesis species at all, because its
+/// founding rule is a property of the **whole** population. One truncated header cost the reading
+/// of three thousand whole ones.
+///
+/// `where` is treated the same way, and for the same reason.
 fn header_terminator(text: &str) -> Option<usize> {
-    let assignment = text.find(":=");
-    let mut clause: Option<usize> = None;
+    let depth = header_depths(text);
+    let at_depth_zero = |at: usize| depth.get(at).is_some_and(|carried| *carried == 0);
+
+    let mut assignment: Option<usize> = None;
+    let mut cursor = 0usize;
+    while let Some(at) = text[cursor..].find(":=") {
+        let at = cursor + at;
+        if at_depth_zero(at) {
+            assignment = Some(at);
+            break;
+        }
+        cursor = at + ":=".len();
+    }
+
     let bytes = text.as_bytes();
+    let mut clause: Option<usize> = None;
     let mut cursor = 0usize;
     while let Some(at) = text[cursor..].find("where") {
         let at = cursor + at;
@@ -1586,12 +1714,13 @@ fn header_terminator(text: &str) -> Option<usize> {
         let after = at + "where".len();
         let after_ok = after >= bytes.len()
             || !is_identifier_body(text[after..].chars().next().unwrap_or(' '));
-        if before_ok && after_ok {
+        if before_ok && after_ok && at_depth_zero(at) {
             clause = Some(at);
             break;
         }
         cursor = after;
     }
+
     match (assignment, clause) {
         (Some(a), Some(w)) => Some(a.min(w)),
         (Some(a), None) => Some(a),

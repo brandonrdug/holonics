@@ -120,7 +120,7 @@ fn deposit_resume_redeposit_through_the_binary_is_byte_identical() {
     );
     let report = stdout(&deposited);
     assert!(report.contains("DEPOSITED"), "{report}");
-    assert!(report.contains("schema        HTEC/1"), "{report}");
+    assert!(report.contains("schema        HTEC/2"), "{report}");
     assert!(report.contains("A FORM was deposited"), "{report}");
     assert!(
         report.contains("were NOT deposited -- they died as they flowed"),
@@ -221,7 +221,7 @@ fn the_binary_reports_an_unheld_schema_on_inspect_and_refuses_it_on_resume() {
     assert!(inspected.status.success(), "{}", stderr(&inspected));
     let report = stdout(&inspected);
     assert!(report.contains("NOT HELD by this reader"), "{report}");
-    assert!(report.contains("HTEC/1, ERST/2"), "{report}");
+    assert!(report.contains("HTEC/2, ERST/2"), "{report}");
     assert!(report.contains("NO BODY WAS LIT"), "{report}");
 
     let refused = holon_plate(&["resume", "--plate", &text(&plate)]);
@@ -488,7 +488,7 @@ fn the_help_states_what_the_plate_does_not_claim() {
     let helped = holon_plate(&["--help"]);
     assert!(helped.status.success());
     let report = stdout(&helped);
-    assert!(report.contains("HTEC/1"), "{report}");
+    assert!(report.contains("HTEC/2"), "{report}");
     assert!(report.contains("ERST/2"), "{report}");
     assert!(report.contains("RBIN/1"), "{report}");
     assert!(report.contains("REFUSED, never guessed at"), "{report}");

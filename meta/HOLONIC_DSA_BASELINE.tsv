@@ -19,6 +19,7 @@ crates/holonic-engine/src/causal_reflection.rs	.clone()=48	.collect()=13	.into_i
 crates/holonic-engine/src/causal_state_grammar.rs	.clone()=69	.collect()=29	.flat_map()=3	.into_iter()=9	BTreeMap=22	BTreeSet=47	Vec=43	VecDeque=2
 crates/holonic-engine/src/causal_traversal.rs	.clone()=31	.flat_map()=1	BTreeMap=18	BTreeSet=17	Vec=60
 crates/holonic-engine/src/certified_face.rs	.clone()=21	.collect()=6	.into_iter()=2	BTreeMap=3	Vec=17
+crates/holonic-engine/src/clifford.rs	.clone()=25	.collect()=9	BTreeMap=7	Vec=18
 crates/holonic-engine/src/codec_recovery.rs	.clone()=28	.collect()=35	.flat_map()=3	.into_iter()=6	BTreeMap=3	BTreeSet=27	Vec=148	VecDeque=2
 crates/holonic-engine/src/codec_system.rs	.clone()=31	.collect()=29	.into_iter()=4	BTreeMap=5	BTreeSet=15	Vec=87	VecDeque=5
 crates/holonic-engine/src/collocation.rs	.clone()=35	.collect()=28	.flat_map()=2	.into_iter()=5	BTreeMap=32	BTreeSet=64	Vec=31
@@ -44,15 +45,16 @@ crates/holonic-engine/src/device.rs	.collect()=1	Vec=3
 crates/holonic-engine/src/diffusion.rs	.clone()=23	.collect()=23	.into_iter()=2	BTreeMap=28	BTreeSet=5	Vec=65
 crates/holonic-engine/src/dilation.rs	.clone()=2	.collect()=6	.into_iter()=7	BTreeMap=9	BTreeSet=17	Vec=13	VecDeque=4
 crates/holonic-engine/src/dimensional_receiver.rs	.clone()=48	.collect()=17	.flat_map()=8	.into_iter()=5	BTreeMap=37	BTreeSet=37	Vec=27
-crates/holonic-engine/src/dimensional_wave.rs	.clone()=30	.collect()=8	.into_iter()=1	BTreeMap=21	BTreeSet=14	Vec=40
+crates/holonic-engine/src/dimensional_wave.rs	.clone()=34	.collect()=8	.into_iter()=1	BTreeMap=21	BTreeSet=14	Vec=40
 crates/holonic-engine/src/discrete_curvature.rs	.clone()=16	.collect()=24	.flat_map()=2	.into_iter()=11	BTreeMap=40	BTreeSet=17	Vec=15	VecDeque=2
 crates/holonic-engine/src/display.rs	.collect()=1	Vec=6
 crates/holonic-engine/src/divisor_reconstruction.rs	.clone()=39	.collect()=39	.into_iter()=4	BTreeMap=26	BTreeSet=44	Vec=82
 crates/holonic-engine/src/elementary_chart.rs	.clone()=1	.collect()=1	BTreeMap=2	Vec=1
-crates/holonic-engine/src/embedding_fiber.rs	.clone()=5	.collect()=11	BTreeMap=4	Vec=23
+crates/holonic-engine/src/embedding_fiber.rs	.clone()=5	.collect()=14	.into_iter()=1	BTreeMap=7	Vec=27
 crates/holonic-engine/src/evolution.rs	.clone()=2	BTreeMap=7	Vec=8
 crates/holonic-engine/src/exact_linear.rs	.clone()=6	.collect()=8	.into_iter()=3	Vec=16
 crates/holonic-engine/src/exact_value.rs	.clone()=28	.collect()=3	Vec=12
+crates/holonic-engine/src/exact_work.rs	.clone()=16	.collect()=2	.into_iter()=1	Vec=3
 crates/holonic-engine/src/executor.rs	.clone()=3	.collect()=6	.into_iter()=1	HashSet=2	Vec=8
 crates/holonic-engine/src/exponentiated_ratio.rs	.clone()=9	.collect()=2	BTreeMap=23	Vec=2
 crates/holonic-engine/src/field_atlas.rs	.clone()=60	.collect()=22	.flat_map()=1	.into_iter()=10	BTreeMap=50	BTreeSet=56	Vec=48	VecDeque=2
@@ -68,13 +70,13 @@ crates/holonic-engine/src/holonic_complex.rs	.clone()=8	.collect()=18	.flat_map(
 crates/holonic-engine/src/hypergeometric_closure.rs	.clone()=8	.collect()=4	BTreeMap=3	BTreeSet=1	Vec=6
 crates/holonic-engine/src/image.rs	Vec=2
 crates/holonic-engine/src/implicit.rs	.clone()=32	.collect()=8	.into_iter()=1	BTreeMap=3	BTreeSet=11	Vec=31
-crates/holonic-engine/src/inertia.rs	.clone()=15	.collect()=22	.into_iter()=2	Vec=42
+crates/holonic-engine/src/inertia.rs	.clone()=17	.collect()=29	.into_iter()=2	Vec=45
 crates/holonic-engine/src/interaction.rs	Vec=2
 crates/holonic-engine/src/interchange.rs	.clone()=13	.collect()=23	.flat_map()=2	.into_iter()=5	BTreeMap=3	BTreeSet=7	Vec=55
 crates/holonic-engine/src/inverse_transport.rs	.clone()=30	.collect()=13	.flat_map()=1	.into_iter()=2	BTreeMap=7	BTreeSet=6	Vec=64	VecDeque=2
 crates/holonic-engine/src/kelvin.rs	.clone()=11	.collect()=11	.into_iter()=9	BTreeMap=11	BTreeSet=3	Vec=2
 crates/holonic-engine/src/lattice_gauge.rs	.clone()=21	.collect()=17	.flat_map()=1	.into_iter()=3	BTreeMap=19	BTreeSet=5	Vec=31
-crates/holonic-engine/src/leader_quadrature.rs	.clone()=33	.collect()=9	.into_iter()=1	BTreeSet=3	Vec=46
+crates/holonic-engine/src/leader_quadrature.rs	.clone()=43	.collect()=13	.into_iter()=1	BTreeMap=2	BTreeSet=3	Vec=49
 crates/holonic-engine/src/lean_development.rs	.clone()=17	.collect()=21	.flat_map()=1	.into_iter()=3	BTreeMap=59	BTreeSet=19	Vec=70
 crates/holonic-engine/src/live_presentation.rs	.clone()=2	.collect()=3	.into_iter()=2	BTreeMap=3	BTreeSet=7	Vec=7
 crates/holonic-engine/src/local_star.rs	.clone()=86	.collect()=48	.flat_map()=6	.into_iter()=17	BTreeMap=72	BTreeSet=26	Vec=138	VecDeque=3
@@ -125,7 +127,7 @@ crates/holonic-engine/src/supported_realizers.rs	.clone()=3	.collect()=8	.flat_m
 crates/holonic-engine/src/surprisal.rs	.clone()=25	.collect()=4	BTreeMap=17	Vec=7
 crates/holonic-engine/src/temper.rs	.clone()=7	.collect()=9	.into_iter()=4	BTreeSet=8	Vec=10
 crates/holonic-engine/src/token_invariance.rs	.clone()=29	.collect()=59	.flat_map()=1	.into_iter()=18	BTreeMap=46	BTreeSet=27	Vec=96
-crates/holonic-engine/src/traversible_chain.rs	.clone()=14
+crates/holonic-engine/src/traversible_chain.rs	.clone()=32	BTreeSet=3	Vec=2
 crates/holonic-engine/src/tube.rs	.clone()=59	.collect()=18	.flat_map()=3	.into_iter()=4	BTreeMap=36	BTreeSet=40	Vec=21
 crates/holonic-engine/src/wave_propagation.rs	.clone()=24	.collect()=12	.flat_map()=1	.into_iter()=2	BTreeMap=11	BTreeSet=12	Vec=43
 crates/holonic-engine/src/winding_inertia.rs	.clone()=28	.collect()=22	Vec=57

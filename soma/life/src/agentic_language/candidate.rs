@@ -248,6 +248,11 @@ pub(super) struct SelectedAnswerCandidate {
     pub(super) codec_versions: BTreeSet<String>,
     pub(super) cultivated_codec_paths: Vec<AgenticLanguageCodecPathReceipt>,
     pub(super) retained_alternatives: Vec<AgenticRetainedAnswerAlternative>,
+    /// **The presentation quotient's division, taken.** The retained alternatives were kept here
+    /// from the beginning and carried no distinguishing word; this relates each of them to the
+    /// uttered answer by the shortest word a declared receiver family separates them with, or says
+    /// that none does.
+    pub(super) presentation_division: PresentationDivision,
 }
 
 pub(super) fn select_generated_answer(
@@ -543,6 +548,32 @@ pub(super) fn select_answer_candidate(
             .count(),
         retained_alternative_population: retained_alternatives.len(),
     };
+
+    // THE DIVISION, TAKEN. The remainder was retained above and had no relation to the answer; it
+    // now comes back either as indistinguishable under the declared family or as separated, with
+    // the word that separates it.
+    let material = PresentationMaterial {
+        inherited_surfaces: candidates
+            .iter()
+            .flat_map(|candidate| candidate.inherited_surfaces.iter().cloned())
+            .collect(),
+    };
+    let answer_identity = selected_tokens.join(" ");
+    let mut presented = vec![PresentedCandidate::new(
+        answer_identity.clone(),
+        selected_tokens.clone(),
+    )];
+    for alternative in &retained_alternatives {
+        let tokens = alternative_surface(alternative);
+        let identity = tokens.join(" ");
+        if identity == answer_identity {
+            continue;
+        }
+        presented.push(PresentedCandidate::new(identity, tokens));
+    }
+    let presentation_division = divide(&presented, &answer_identity, &material)
+        .map_err(|_| AgenticLanguageError::NoGroundedLanguageReturn)?;
+
     let AnswerCandidate {
         generated,
         episode_identities,
@@ -574,6 +605,7 @@ pub(super) fn select_answer_candidate(
         codec_versions,
         cultivated_codec_paths,
         retained_alternatives,
+        presentation_division,
     })
 }
 

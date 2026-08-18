@@ -8,6 +8,10 @@ publish = false
 name = "life"
 path = "src/lib.rs"
 
+[[bin]]
+name = "eros"
+path = "src/bin/eros.rs"
+
 [dependencies]
 body = { path = "../body" }
 holonic-structure = { path = "../../crates/holonic-structure" }

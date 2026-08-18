@@ -118,6 +118,97 @@ fn report(label: &str, pullback: &PullbackInertia) {
     );
 }
 
+
+/// **`In(H) = In(A) + In(H/A)` — Haynsworth's inertia additivity, on a declared block split.**
+///
+/// This is the second sentence of `H.0127` *Schur complement and inertia*, `proved-standard`, and
+/// it is the law the Riemann support-successor obligation is stated in: that reduction's remaining
+/// conditions are Albert's block-positivity pair, `Ran(C) ⊆ Ran(A^{1/2})` and `D − Y*Y ≥ 0`, whose
+/// finite form is exactly `H/A ≥ 0`. `canon/THE_INFORMATION_ENGINE.md` already records the Schur
+/// complement as one organ under four names, none citing the others; `inertia.rs` is the fifth and
+/// it is the one that computes this law, by repeated Schur complement over `Rat`.
+///
+/// **Read the second row before the first.** On a positive-definite `H` the split cannot produce a
+/// negative direction — that arm is a tautology and is labelled one. The arm that carries evidence
+/// is the indefinite one, where `In(H/A)` genuinely has a negative part.
+fn haynsworth(name: &str, rows: &[Vec<i64>], split: usize) {
+    let form = SymmetricForm::from_integers(rows).expect("a symmetric form");
+    let whole = inertia(&form);
+
+    let block = |top: std::ops::Range<usize>, left: std::ops::Range<usize>| {
+        ExactRatMatrix::new(
+            top.map(|row| {
+                left.clone()
+                    .map(|column| Rat::from_integer(BigInt::from(rows[row][column])))
+                    .collect()
+            })
+            .collect(),
+        )
+        .expect("a rectangular block")
+    };
+    let extent = rows.len();
+    let upper = block(0..split, 0..split);
+    let cross = block(0..split, split..extent);
+    let lower = block(split..extent, split..extent);
+
+    let leading = SymmetricForm::from_rows(
+        (0..split)
+            .map(|row| {
+                (0..split)
+                    .map(|column| Rat::from_integer(BigInt::from(rows[row][column])))
+                    .collect()
+            })
+            .collect(),
+    )
+    .expect("the leading block is symmetric");
+
+    let Ok(inverse) = upper.inverse() else {
+        println!("  {name}: the leading block is singular, so no Schur complement exists");
+        return;
+    };
+    let correction = cross
+        .transpose()
+        .expect("a transpose")
+        .multiply(&inverse)
+        .and_then(|left| left.multiply(&cross))
+        .expect("the correction composes");
+    let complement = lower.subtract(&correction).expect("the shapes meet");
+    let schur = SymmetricForm::from_rows(complement.to_rows())
+        .expect("the Schur complement is symmetric");
+
+    let leading_inertia = inertia(&leading);
+    let schur_inertia = inertia(&schur);
+    let sum = (
+        leading_inertia.positive + schur_inertia.positive,
+        leading_inertia.zero + schur_inertia.zero,
+        leading_inertia.negative + schur_inertia.negative,
+    );
+    println!("  {name}");
+    println!(
+        "    In(H) {:?}   In(A) {:?}   In(H/A) {:?}",
+        (whole.positive, whole.zero, whole.negative),
+        (
+            leading_inertia.positive,
+            leading_inertia.zero,
+            leading_inertia.negative
+        ),
+        (
+            schur_inertia.positive,
+            schur_inertia.zero,
+            schur_inertia.negative
+        )
+    );
+    assert_eq!(
+        (whole.positive, whole.zero, whole.negative),
+        sum,
+        "{name}: inertia additivity failed"
+    );
+    println!(
+        "    additivity holds; the elimination added {} negative direction(s)",
+        schur_inertia.negative
+    );
+}
+
 fn main() {
     println!("== the pull-back bound, exact over Rat ==");
 
@@ -282,4 +373,27 @@ fn main() {
     println!("-- the refusal the shape owes --");
     let mismatched = pullback_inertia_bound(&SymmetricForm::zeros(3), &matrix(&[vec![1], vec![0]]));
     println!("  a pull-back whose rows miss the extent: {mismatched:?}");
+
+    // ---------------------------------------------------------------------------------------
+    println!();
+    println!("-- Haynsworth: In(H) = In(A) + In(H/A), and what RH asks of the second term --");
+    haynsworth(
+        "positive definite (the arm that CANNOT fail, and is labelled one)",
+        &[vec![2, 1, 0], vec![1, 2, 1], vec![0, 1, 2]],
+        1,
+    );
+    haynsworth(
+        "indefinite, D sourced against A (the arm that CAN fail)",
+        &[vec![1, 0, 2], vec![0, 1, 0], vec![2, 0, 1]],
+        2,
+    );
+    haynsworth(
+        "the hyperbolic plane adjoined (a negative direction that no recharting removes)",
+        &[vec![1, 0, 0], vec![0, 0, 1], vec![0, 1, 0]],
+        1,
+    );
+    println!();
+    println!("  The Riemann support successor asks that the third column never leaves zero,");
+    println!("  at every support step. `weil-signature-transport` proves a genuine negative");
+    println!("  direction cannot be removed by recharting, so no rebase can close it.");
 }

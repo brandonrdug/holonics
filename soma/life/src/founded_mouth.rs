@@ -38,7 +38,7 @@
 
 use crate::exposure_codec::{
     carried, octets_of, recover, ExposedMaterial, ExposureApertures, ExposureObstruction,
-    ExposureRefusal, UnitRole,
+    ExposureRefusal, Unit, UnitRole,
 };
 
 /// Why a mouth could not be founded. Distinct from an obstruction, which is a return.
@@ -76,10 +76,11 @@ pub struct MouthDisagreement {
 /// The segmentation a material's own octets decided, with the authored reading retained beside it.
 #[derive(Clone, Debug)]
 pub struct FoundedMouth {
-    /// The alphabet the material actually carries, recovered by exhausting all 256 probes.
-    pub alphabet: Vec<u8>,
-    /// Every octet's role, present only because the two seeding frames agreed.
-    pub roles: Vec<(u8, UnitRole)>,
+    /// The alphabet the material actually carries, recovered by exhausting every declared
+    /// candidate. At the octet scale this mouth founds on, a unit is an octet.
+    pub alphabet: Vec<Unit>,
+    /// Every unit's role, present only because the two seeding frames agreed.
+    pub roles: Vec<(Unit, UnitRole)>,
     /// The class adjacencies the material never realised. Flipping one changes no segmentation of
     /// this material, so they are freedoms and are reported rather than filled.
     pub gauge_freedom: Vec<(UnitRole, UnitRole)>,
@@ -151,12 +152,21 @@ impl FoundedMouth {
         found
     }
 
-    /// The octets carrying one recovered role, in canonical order.
-    pub fn octets_with(&self, role: UnitRole) -> Vec<u8> {
+    /// The units carrying one recovered role, in canonical order.
+    pub fn units_with(&self, role: UnitRole) -> Vec<Unit> {
         self.roles
             .iter()
             .filter(|(_, carried)| *carried == role)
-            .map(|(octet, _)| *octet)
+            .map(|(unit, _)| *unit)
+            .collect()
+    }
+
+    /// The same reading at octet scale, where a unit **is** an octet. `None` if any unit is wider,
+    /// which this mouth's own founding cannot produce but a caller's alphabet could.
+    pub fn octets_with(&self, role: UnitRole) -> Option<Vec<u8>> {
+        self.units_with(role)
+            .into_iter()
+            .map(|unit| u8::try_from(unit).ok())
             .collect()
     }
 }

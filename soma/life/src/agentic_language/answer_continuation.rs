@@ -723,6 +723,7 @@ impl AgenticLanguageEcology {
             evidence_sources: selected.evidence_sources,
             selection: selected.selection,
             retained_alternatives: selected.retained_alternatives,
+            presentation_division: selected.presentation_division,
             reflection: selected.reflection,
             novel_contiguous_surface: selected.novel_contiguous_surface,
             locally_conditioned_episodes,

@@ -164,6 +164,9 @@ pub struct TrainingEcology {
     /// it never truncates or ranks them.
     pub maximum_templates_per_occurrence: usize,
     pub fibers: GrowingKeyAtlas<TransductionFiber, u64>,
+    /// The two-sided standing per fiber. Additive beside `fibers`: nothing that reads the
+    /// recurrence moves, and the admission verdict is a second reading over the same population.
+    pub standing: GrowingKeyAtlas<TransductionFiber, FiberStanding>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -186,6 +189,9 @@ pub struct TrainingCultivationProposal {
     active_templates_after: usize,
     updates: Box<[TrainingFiberUpdate]>,
     observations: Box<[ObservedTransduction]>,
+    /// Per fiber, whether this occurrence CONFIRMED it (`true`) or REFUTED it (`false`), read off
+    /// the prior prediction's own supports before the occurrence commits.
+    evidence: Box<[(TransductionFiber, bool)]>,
 }
 
 impl TrainingCultivationProposal {
@@ -228,6 +234,7 @@ impl TrainingEcology {
             minimum_recurrence,
             maximum_templates_per_occurrence,
             fibers: GrowingKeyAtlas::new(),
+            standing: GrowingKeyAtlas::new(),
         })
     }
 
@@ -330,6 +337,22 @@ impl TrainingEcology {
                 next_recurrence,
             });
         }
+        let mut evidence: BTreeMap<TransductionFiber, bool> = BTreeMap::new();
+        for view in views {
+            let unfloored = self.predict_unfloored(&view.faces, &view.parameters)?;
+            let (confirmed, refuted) = unfloored.two_sided_evidence(consequence);
+            for fiber in refuted {
+                evidence.entry(fiber).or_insert(false);
+            }
+            // A confirmation anywhere in this occurrence outranks a refutation elsewhere in it:
+            // the fiber did speak correctly, and the plural remainder is what `OpenIncluded`
+            // already reports.
+            for fiber in confirmed {
+                evidence.insert(fiber, true);
+            }
+        }
+        let evidence: Vec<(TransductionFiber, bool)> = evidence.into_iter().collect();
+
         let active_templates_before = self.active_template_count();
         let newly_active = updates
             .iter()
@@ -348,6 +371,7 @@ impl TrainingEcology {
             active_templates_after,
             updates: updates.into_boxed_slice(),
             observations: derived.into_boxed_slice(),
+            evidence: evidence.into_boxed_slice(),
         })
     }
 
@@ -386,12 +410,29 @@ impl TrainingEcology {
             next_generation,
             updates,
             observations,
+            evidence,
             ..
         } = proposal;
         for update in updates {
             self.fibers
                 .try_insert(update.fiber, update.next_recurrence)
                 .expect("the preflighted training fiber batch remains admissible");
+        }
+        for (fiber, confirmed) in evidence {
+            if !self.standing.contains(&fiber) {
+                if self.standing.try_reserve_new_keys(1).is_err() {
+                    continue;
+                }
+                let _ = self.standing.try_insert(fiber.clone(), FiberStanding::default());
+            }
+            if let Some(entry) = self.standing.get_mut(&fiber) {
+                let side = if confirmed {
+                    &mut entry.confirmations
+                } else {
+                    &mut entry.refutations
+                };
+                *side = side.saturating_add(1);
+            }
         }
         self.generation = next_generation;
         debug_assert!(self.validate().is_ok());
@@ -428,6 +469,45 @@ impl TrainingEcology {
             .collect()
     }
 
+    /// The four-state admission verdict for one fiber. `Open` when nothing has spoken for or
+    /// against it.
+    pub fn fiber_admission(&self, fiber: &TransductionFiber) -> FiberAdmission {
+        self.standing
+            .get(fiber)
+            .copied()
+            .unwrap_or_default()
+            .admission()
+    }
+
+    /// **Templates admitted by quotient closure rather than by a recurrence floor.**
+    ///
+    /// A fiber is admitted when it has been confirmed and never refuted — the feasible set has one
+    /// member. No count is compared against a bound, so **one occurrence can admit a fiber that a
+    /// recurrence floor would still be withholding**, and no number of confirmations can admit one
+    /// that has ever been refuted. `Conflicted` fibers are returned by
+    /// [`Self::conflicted_templates`] rather than folded in or discarded.
+    pub fn admitted_templates(&self) -> Vec<ActiveTransduction> {
+        self.templates_where(FiberAdmission::Admitted)
+    }
+
+    /// The fibers whose own receiver axes do not separate the cases they are responsible for.
+    /// These are junctions, not failures.
+    pub fn conflicted_templates(&self) -> Vec<ActiveTransduction> {
+        self.templates_where(FiberAdmission::Conflicted)
+    }
+
+    fn templates_where(&self, verdict: FiberAdmission) -> Vec<ActiveTransduction> {
+        self.fibers
+            .iter()
+            .filter(|(fiber, _)| self.fiber_admission(fiber) == verdict)
+            .map(|(fiber, recurrence)| ActiveTransduction {
+                template: fiber.template.clone(),
+                parameters: fiber.parameters.clone(),
+                recurrence: *recurrence,
+            })
+            .collect()
+    }
+
     pub fn active_template_count(&self) -> usize {
         self.fibers
             .values()
@@ -443,7 +523,7 @@ impl TrainingEcology {
     pub fn encode_native_bytes(&self) -> Result<Vec<u8>, String> {
         self.validate()?;
         let mut bytes = Vec::new();
-        bytes.extend_from_slice(b"HTEC\0\0\0\x01");
+        bytes.extend_from_slice(b"HTEC\0\0\0\x02");
         put_u64(&mut bytes, self.generation);
         put_u64(&mut bytes, self.minimum_recurrence);
         put_u64(
@@ -487,13 +567,19 @@ impl TrainingEcology {
                 }
             }
             put_u64(&mut bytes, *recurrence);
+            let standing = self.standing.get(fiber).copied().unwrap_or_default();
+            put_u64(&mut bytes, standing.confirmations);
+            put_u64(&mut bytes, standing.refutations);
         }
         Ok(bytes)
     }
 
     pub fn decode_native_bytes(bytes: &[u8]) -> Result<Self, String> {
         let mut cursor = ByteCursor::new(bytes);
-        if cursor.take(8)? != b"HTEC\0\0\0\x01" {
+        if cursor.take(8)? != b"HTEC\0\0\0\x02" {
+            // Refused by name rather than defaulted: a rest sealed before the two-sided standing
+            // existed carries no refutation evidence, and silently reading it as "never refuted"
+            // would admit every fiber it holds.
             return Err("training ecology rest schema changed".to_owned());
         }
         let generation = cursor.u64()?;
@@ -506,6 +592,10 @@ impl TrainingEcology {
         fibers
             .try_reserve_new_keys(fiber_count)
             .map_err(|_| "training ecology rest cannot reserve its fiber atlas".to_owned())?;
+        let mut standing = GrowingKeyAtlas::new();
+        standing
+            .try_reserve_new_keys(fiber_count)
+            .map_err(|_| "training ecology rest cannot reserve its standing atlas".to_owned())?;
         for _ in 0..fiber_count {
             let parameter_count = usize::try_from(cursor.u64()?)
                 .map_err(|_| "parameter count exceeds usize".to_owned())?;
@@ -539,10 +629,25 @@ impl TrainingEcology {
                 });
             }
             let recurrence = cursor.u64()?;
+            let confirmations = cursor.u64()?;
+            let refutations = cursor.u64()?;
             let fiber = TransductionFiber {
                 template: TransductionTemplate { steps },
                 parameters,
             };
+            if confirmations != 0 || refutations != 0 {
+                standing
+                    .try_insert(
+                        fiber.clone(),
+                        FiberStanding {
+                            confirmations,
+                            refutations,
+                        },
+                    )
+                    .map_err(|_| {
+                        "training ecology rest cannot found its standing atlas".to_owned()
+                    })?;
+            }
             if fibers
                 .try_insert(fiber, recurrence)
                 .map_err(|_| "training ecology rest cannot found its fiber atlas".to_owned())?
@@ -559,6 +664,7 @@ impl TrainingEcology {
             minimum_recurrence,
             maximum_templates_per_occurrence,
             fibers,
+            standing,
         };
         ecology.validate()?;
         Ok(ecology)
@@ -566,20 +672,76 @@ impl TrainingEcology {
 
     /// Rebind every active route afforded by the contemporary face population.
     ///
-    /// Receiver parameters do not assign a scalar score.  Every route at the maximal exact
-    /// parameter-incidence rank remains present, including path-distinct routes with equal
-    /// consequences.
+    /// **CORRECTED 2026-08-18.** This read *"Receiver parameters do not assign a scalar score"*, and
+    /// eleven lines below it a maximum over `equal_axes.len()` discards every route that does not
+    /// reach it. That **is** a scalar deciding which routes survive, and denying it in the doc while
+    /// computing it in the body is the shape `CLAUDE.md` §8 rules on: grade the implementation, not
+    /// the receipt.
+    ///
+    /// What is true: no receiver parameter assigns a *magnitude* to a route, and no route is ranked
+    /// against another by anything but the **exact count of parameter axes it agrees on**, which is
+    /// an incidence and not a score. Every route at the maximal rank remains present, including
+    /// path-distinct routes with equal consequences.
+    ///
+    /// And the sub-maximal population is now **returned rather than deleted**
+    /// ([`TrainingPrediction::withheld_below_rank`]). Division has two parts; this path kept the
+    /// quotient and dropped the remainder, which also meant a sub-maximal fiber never entered the
+    /// two-sided evidence and so **could never be refuted** — the exact thing the two-sided standing
+    /// was added to make possible.
     pub fn predict(
         &self,
         faces: &[SourceFace],
         parameters: &BTreeMap<String, String>,
+    ) -> Result<TrainingPrediction, String> {
+        self.predict_above_floor(faces, parameters, self.minimum_recurrence)
+    }
+
+    /// **The same prediction with every route allowed to speak, however few times it has been
+    /// seen.** This exists because `minimum_recurrence` turned out not to be the admission rule at
+    /// all — it is the *speech* rule, filtered here in `predict`. A route below the floor cannot
+    /// predict, so it can never be wrong, so it can never be refuted: **the count sits upstream of
+    /// the evidence that would otherwise decide.** Gathering two-sided standing therefore requires
+    /// asking what the body would have said with the floor lifted, which is what this returns.
+    ///
+    /// It is not the reported prediction and must not be used as one; `predict` is unchanged.
+    ///
+    /// # The excision was attempted and is REFUTED, measured 2026-08-16
+    ///
+    /// Replacing the floor in `predict` with the admission verdict — letting `Open` and `Admitted`
+    /// routes speak and silencing `Refuted` and `Conflicted` ones — **reddened 4 of 328 tests in
+    /// this crate**, and reading them showed a real regression rather than tests encoding the
+    /// floor. With the floor lifted, routes seen exactly once speak, and those are overwhelmingly
+    /// occurrence-specific literals: one prediction returned
+    /// `{"Hello, Lin!", "Lin", "Mira"}` where the floored reading returns
+    /// `{"Hello, Mira!", "Mira"}` — a stale literal from an earlier occurrence emitted as a
+    /// candidate.
+    ///
+    /// **So the floor is doing load-bearing work that the admission verdict does not replace.**
+    /// `Open` means *never tested*, which is not the same as *admissible to speak*: a route with no
+    /// standing at all floods the candidate set. What the two-sided standing adds is the thing a
+    /// count structurally cannot do — **withdrawal**. A count only ever rises; a refutation
+    /// removes a route the floor still holds. The ledger's excision of this level stands as owed
+    /// and is not discharged here.
+    pub fn predict_unfloored(
+        &self,
+        faces: &[SourceFace],
+        parameters: &BTreeMap<String, String>,
+    ) -> Result<TrainingPrediction, String> {
+        self.predict_above_floor(faces, parameters, 0)
+    }
+
+    fn predict_above_floor(
+        &self,
+        faces: &[SourceFace],
+        parameters: &BTreeMap<String, String>,
+        floor: u64,
     ) -> Result<TrainingPrediction, String> {
         let bindings = face_bindings(faces)?;
         let mut afforded = Vec::new();
         for (fiber, recurrence) in self
             .fibers
             .iter()
-            .filter(|(_, recurrence)| **recurrence >= self.minimum_recurrence)
+            .filter(|(_, recurrence)| **recurrence >= floor)
         {
             let Ok(path) = instantiate(&fiber.template, &bindings) else {
                 continue;
@@ -601,6 +763,15 @@ impl TrainingEcology {
         };
 
         let mut candidates = BTreeMap::<TransductionPath, CandidateTransduction>::new();
+        // THE DIVISION, TAKEN. The maximal rank is the quotient; what it set aside is carried out
+        // rather than dropped.
+        let mut withheld_below_rank: Vec<(usize, TransductionPath)> = afforded
+            .iter()
+            .filter(|(_, _, equal_axes, _)| equal_axes.len() != agreement_rank)
+            .map(|(_, _, equal_axes, path)| (equal_axes.len(), path.clone()))
+            .collect();
+        withheld_below_rank.sort();
+        withheld_below_rank.dedup();
         for (fiber, recurrence, equal_axes, path) in afforded
             .into_iter()
             .filter(|(_, _, equal_axes, _)| equal_axes.len() == agreement_rank)
@@ -622,6 +793,7 @@ impl TrainingEcology {
         Ok(TrainingPrediction {
             agreement_rank: Some(agreement_rank),
             candidates: candidates.into_values().collect(),
+            withheld_below_rank,
         })
     }
 
@@ -687,6 +859,9 @@ impl TrainingEcology {
             Ok(TrainingPrediction {
                 agreement_rank: Some(receiver.len()),
                 candidates: candidates.into_values().collect(),
+                // This path recruits by an exact receiver face rather than by a rank maximum, so it
+                // sets nothing aside and the remainder is empty by construction.
+                withheld_below_rank: Vec::new(),
             })
         }
     }
@@ -710,6 +885,58 @@ pub enum ConsequenceRelation {
     OpenIncluded,
     /// Active routes spoke, but none returned the observed consequence.
     OpenResidual,
+}
+
+/// **What one fiber has been observed to do, from BOTH sides.**
+///
+/// The conditioning path already computes the negative side and discards it.
+/// [`ConsequenceRelation::OpenResidual`] means *active routes spoke and none returned the observed
+/// consequence* — a refusal taken while the parts were licensed — and
+/// [`TrainingPrediction::two_sided_evidence`] recovers which fibers it was a refusal *of*.
+///
+/// `confirmations` and `refutations` are reported and are **never compared against a bound**. The
+/// verdict in [`FiberStanding::admission`] turns only on whether each is zero, which is a
+/// structural condition and not a magnitude — so one confirmation with no refutation admits, and
+/// one refutation conflicts with any number of confirmations. That is the whole difference from a
+/// recurrence floor, which can only ever raise one side.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub struct FiberStanding {
+    /// Occurrences at which this fiber supported a candidate that returned the observed
+    /// consequence.
+    pub confirmations: u64,
+    /// Occurrences at which this fiber spoke and **no** candidate it supported returned the
+    /// observed consequence.
+    pub refutations: u64,
+}
+
+/// The four-state verdict on a fiber, decided by zero-ness on both sides.
+///
+/// This is the same shape as `observation_ecology::ReceiverRelationState` and as
+/// `divisor_reconstruction::DivisorContactVersionFiber::is_unique`, at the conditioning altitude.
+/// `Conflicted` is retained and never tie-broken: it says the fiber's behaviour depends on
+/// something its own receiver axes do not carry, which is a junction where a receiver should be
+/// founded rather than a fiber to discard.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum FiberAdmission {
+    /// It has not yet spoken at a receiver where the consequence was observed.
+    Open,
+    /// Confirmed somewhere and refuted nowhere — the feasible set has one member.
+    Admitted,
+    /// Refuted somewhere and confirmed nowhere.
+    Refuted,
+    /// Both, so its aperture does not separate the cases it is responsible for.
+    Conflicted,
+}
+
+impl FiberStanding {
+    pub const fn admission(&self) -> FiberAdmission {
+        match (self.confirmations, self.refutations) {
+            (0, 0) => FiberAdmission::Open,
+            (_, 0) => FiberAdmission::Admitted,
+            (0, _) => FiberAdmission::Refuted,
+            _ => FiberAdmission::Conflicted,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -741,6 +968,11 @@ pub struct CandidateTransduction {
 pub struct TrainingPrediction {
     pub agreement_rank: Option<usize>,
     pub candidates: Vec<CandidateTransduction>,
+    /// **The remainder of the rank division: every route the maximum set aside, with the rank it
+    /// reached.** Added 2026-08-18. It is not a second candidate population and nothing here may
+    /// promote it into one; it exists so a sub-maximal route is visible to a later reading and can
+    /// be refuted rather than being silently absent from the evidence.
+    pub withheld_below_rank: Vec<(usize, TransductionPath)>,
 }
 
 impl TrainingPrediction {
@@ -769,6 +1001,35 @@ impl TrainingPrediction {
                 .ok_or_else(|| "consequence path population overflowed".to_owned())?;
         }
         Ok(population)
+    }
+
+    /// **The two-sided evidence this prediction carries about its own supporting fibers.**
+    ///
+    /// A fiber that supported at least one candidate returning `actual` is **confirmed** here. A
+    /// fiber that spoke and supported *only* candidates that did not return `actual` is
+    /// **refuted** here. A fiber on both sides is confirmed, not refuted — it did speak correctly
+    /// once, and the plural remainder is what `OpenIncluded` already reports.
+    ///
+    /// Nothing is authored: both sets are read off `candidates[*].support`, which the ecology
+    /// already builds in order to name which occurrences founded a route.
+    pub fn two_sided_evidence(&self, actual: &[u8]) -> (BTreeSet<TransductionFiber>, BTreeSet<TransductionFiber>) {
+        let mut spoke = BTreeSet::new();
+        let mut confirmed = BTreeSet::new();
+        for candidate in &self.candidates {
+            let matched = candidate.path.consequence == actual;
+            for support in &candidate.support {
+                let fiber = TransductionFiber {
+                    template: support.template.clone(),
+                    parameters: support.parameters.clone(),
+                };
+                if matched {
+                    confirmed.insert(fiber.clone());
+                }
+                spoke.insert(fiber);
+            }
+        }
+        let refuted = spoke.difference(&confirmed).cloned().collect();
+        (confirmed, refuted)
     }
 
     pub fn relation_to(&self, actual: &[u8]) -> ConsequenceRelation {
@@ -1082,6 +1343,145 @@ mod tests {
             .collect()
     }
 
+
+    /// **The negative side is real evidence and it was already being computed.** A fiber whose
+    /// routes spoke and returned something other than what the world returned is REFUTED, and the
+    /// refutation is read off the prior prediction's own supports rather than authored.
+    #[test]
+    fn a_route_that_spoke_and_was_wrong_is_refuted_and_never_admitted() {
+        let mut ecology = TrainingEcology::new(2, 4_096).unwrap();
+        let receiver = parameters(&[("task", "greet")]);
+        // Two occurrences agreeing, so the route becomes active under the recurrence floor.
+        for _ in 0..2 {
+            ecology
+                .cultivate(&[face("name", "Ada")], &receiver, b"Hello, Ada!")
+                .unwrap();
+        }
+        assert!(!ecology.active_templates().is_empty(), "the floor admitted");
+        // Now the same receiver returns something the active routes do not produce.
+        ecology
+            .cultivate(&[face("name", "Ada")], &receiver, b"Goodbye, Ada!")
+            .unwrap();
+
+        let refuted = ecology
+            .fibers
+            .iter()
+            .filter(|(fiber, _)| {
+                matches!(
+                    ecology.fiber_admission(fiber),
+                    FiberAdmission::Refuted | FiberAdmission::Conflicted
+                )
+            })
+            .count();
+        assert!(
+            refuted > 0,
+            "a route that spoke and was wrong must carry a refutation"
+        );
+    }
+
+    /// **One refutation conflicts with any number of confirmations, and no count overrides it.**
+    /// This is the property a recurrence floor cannot have: the floor can only ever raise one side.
+    #[test]
+    fn a_refutation_is_not_outvoted_by_confirmations() {
+        let admitted = FiberStanding {
+            confirmations: 1,
+            refutations: 0,
+        };
+        let conflicted = FiberStanding {
+            confirmations: 10_000,
+            refutations: 1,
+        };
+        let refuted = FiberStanding {
+            confirmations: 0,
+            refutations: 1,
+        };
+        assert_eq!(admitted.admission(), FiberAdmission::Admitted);
+        assert_eq!(conflicted.admission(), FiberAdmission::Conflicted);
+        assert_eq!(refuted.admission(), FiberAdmission::Refuted);
+        assert_eq!(FiberStanding::default().admission(), FiberAdmission::Open);
+    }
+
+    /// **The orbit, and it is the falsifier the plan demands.** If quotient-closure admission and
+    /// the recurrence floor selected the same population on every material, the change would be
+    /// cosmetic. This exhibits material where they DISAGREE, in the direction that matters: a
+    /// route the floor has already admitted is WITHDRAWN by a refutation, and no number of prior
+    /// confirmations outvotes it.
+    #[test]
+    fn quotient_closure_and_the_recurrence_floor_disagree_and_the_orbit_is_exhibited() {
+        let mut ecology = TrainingEcology::new(2, 4_096).unwrap();
+        let receiver = parameters(&[("task", "greet")]);
+        for name in ["Ada", "Lin", "Wen"] {
+            ecology
+                .cultivate(
+                    &[face("name", name)],
+                    &receiver,
+                    format!("Hello, {name}!").as_bytes(),
+                )
+                .unwrap();
+        }
+        let floor_before = ecology.active_templates().len();
+        let quotient_before = ecology.admitted_templates().len();
+        assert!(quotient_before > 0, "a confirmed route must be admitted");
+
+        // The same receiver now returns something the admitted route does not produce.
+        ecology
+            .cultivate(&[face("name", "Ada")], &receiver, b"Goodbye, Ada!")
+            .unwrap();
+
+        let floor_after = ecology.active_templates().len();
+        let quotient_after = ecology.admitted_templates().len();
+        let conflicted = ecology.conflicted_templates().len();
+
+        assert_eq!(
+            floor_before, floor_after,
+            "the recurrence floor cannot withdraw anything: a count only ever rises"
+        );
+        assert!(
+            quotient_after < quotient_before,
+            "the refutation must withdraw a route the floor still holds \
+             (before {quotient_before}, after {quotient_after})"
+        );
+        assert!(
+            conflicted > 0,
+            "the withdrawn route is retained as a junction, not discarded"
+        );
+        assert_ne!(
+            floor_after, quotient_after,
+            "if the two populations always agreed the change would be cosmetic"
+        );
+    }
+
+    /// The standing crosses the wire, and a rest sealed before it existed is refused BY NAME
+    /// rather than read as "never refuted" — which would admit every fiber it holds.
+    #[test]
+    fn the_standing_crosses_the_wire_and_the_earlier_schema_is_refused() {
+        let mut ecology = TrainingEcology::new(2, 4_096).unwrap();
+        let receiver = parameters(&[("task", "greet")]);
+        for name in ["Ada", "Lin"] {
+            ecology
+                .cultivate(
+                    &[face("name", name)],
+                    &receiver,
+                    format!("Hello, {name}!").as_bytes(),
+                )
+                .unwrap();
+        }
+        let sealed = ecology.encode_native_bytes().unwrap();
+        let remounted = TrainingEcology::decode_native_bytes(&sealed).unwrap();
+        assert_eq!(remounted.standing, ecology.standing);
+        assert_eq!(
+            remounted.admitted_templates().len(),
+            ecology.admitted_templates().len()
+        );
+
+        let mut earlier = sealed.clone();
+        earlier[7] = 1;
+        assert!(
+            TrainingEcology::decode_native_bytes(&earlier).is_err(),
+            "a rest sealed without the two-sided standing must refuse, not default"
+        );
+    }
+
     #[test]
     fn ordinary_consequences_cultivate_text_and_code_paths_without_teacher_dags() {
         let mut ecology = TrainingEcology::new(2, 4_096).unwrap();
@@ -1220,6 +1620,55 @@ mod tests {
             code.consequences(),
             BTreeSet::from([b"emit(\"Hello, Mira!\")".to_vec()])
         );
+    }
+
+    /// **The rank division's remainder, exhibited.** A route agreeing on one parameter axis and a
+    /// route agreeing on two are both afforded; the maximum keeps the second and, before
+    /// 2026-08-18, deleted the first with no record. A sub-maximal route that leaves no trace can
+    /// never be refuted, which is the one thing the two-sided standing exists to make possible.
+    ///
+    /// This test fails if the remainder is empty when the ranks differ — which is exactly what it
+    /// asserted implicitly before the repair, by asserting nothing.
+    #[test]
+    fn the_rank_maximum_returns_what_it_set_aside() {
+        let mut ecology = TrainingEcology::new(2, 4_096).unwrap();
+        let faces = [face("subject", "arc")];
+        // Two routes, one founded under a single axis and one under two, each cultivated to the
+        // recurrence floor so both are afforded. The second agrees on more axes.
+        for _ in 0..2 {
+            ecology
+                .cultivate(&faces, &parameters(&[("stage", "one")]), b"narrow")
+                .unwrap();
+            ecology
+                .cultivate(
+                    &faces,
+                    &parameters(&[("stage", "one"), ("mode", "two")]),
+                    b"wide",
+                )
+                .unwrap();
+        }
+        let prediction = ecology
+            .predict(&faces, &parameters(&[("stage", "one"), ("mode", "two")]))
+            .unwrap();
+        assert_eq!(prediction.agreement_rank, Some(2));
+        assert!(
+            !prediction.withheld_below_rank.is_empty(),
+            "the maximum set a route aside and must return it: {prediction:?}"
+        );
+        for (rank, _) in &prediction.withheld_below_rank {
+            assert!(
+                *rank < 2,
+                "only sub-maximal routes belong in the remainder, saw rank {rank}"
+            );
+        }
+        // And the remainder is not a second candidate population.
+        assert!(prediction
+            .candidates
+            .iter()
+            .all(|candidate| !prediction
+                .withheld_below_rank
+                .iter()
+                .any(|(_, path)| *path == candidate.path)));
     }
 
     #[test]

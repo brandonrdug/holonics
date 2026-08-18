@@ -57,6 +57,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use holonic_engine::receiver_exact_compression::{
+    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+};
 use num_bigint::BigInt;
 use num_rational::BigRational;
 
@@ -239,6 +242,66 @@ impl MaterialAtlas {
 
     pub const fn kind(&self) -> MaterialKind {
         self.kind
+    }
+
+    /// Join two atlases into one, so a body can carry more than one material at once.
+    ///
+    /// # Why this exists
+    ///
+    /// `MaterialAtlas::new` takes a **single** [`MaterialKind`], so until 2026-08-17 one atlas was
+    /// one codec *by type* and a mixed-material atlas was not constructible at all. For *many
+    /// materials, one law* that is the blocking signature, and it is a type fact rather than a
+    /// missing organ.
+    ///
+    /// The join is a **disjoint union**: every constituent of `other` is renamed under a declared
+    /// prefix, so two materials that happen to use the same name are not silently identified. That
+    /// identification is a real question and it belongs to a later quotient — `face_quotient` and
+    /// `receiver_exact_compression` decide what conducts alike — never to the intake, which would be
+    /// authoring the answer.
+    ///
+    /// `kind` keeps this atlas's own, because [`MaterialKind`] documents itself as provenance that
+    /// decides nothing; the contacts carry their faces and those are what a reading consults.
+    pub fn merge(
+        &self,
+        other: &Self,
+        other_prefix: &str,
+    ) -> Result<Self, MaterialIncidenceError> {
+        if other_prefix.split_whitespace().count() != 1 {
+            return Err(MaterialIncidenceError::ConstituentCarriesWhitespace(
+                other_prefix.to_owned(),
+            ));
+        }
+        let offset = self.constituents.len();
+        let mut constituents = self.constituents.clone();
+        constituents.extend(
+            other
+                .constituents
+                .iter()
+                .map(|name| format!("{other_prefix}{name}")),
+        );
+        let mut storage_ordinal = self.storage_ordinal.clone();
+        let carried = self.storage_ordinal.iter().copied().max().unwrap_or(0);
+        storage_ordinal.extend(
+            other
+                .storage_ordinal
+                .iter()
+                .map(|ordinal| ordinal.saturating_add(carried).saturating_add(1)),
+        );
+        let mut contacts = self.contacts.clone();
+        contacts.extend(other.contacts.iter().map(|contact| StructuralContact {
+            from: contact.from + offset,
+            to: contact.to + offset,
+            owner: contact.owner + offset,
+            species: contact.species,
+        }));
+        Self::new(
+            self.kind,
+            constituents,
+            storage_ordinal,
+            contacts,
+            self.open_joins.saturating_add(other.open_joins),
+            self.containers.saturating_add(other.containers),
+        )
     }
     pub fn constituents(&self) -> &[String] {
         &self.constituents
@@ -1026,10 +1089,22 @@ pub fn rust_items_of_section(module: &str, storage_ordinal: u64, text: &str) -> 
         let trimmed = line.trim_start();
         let mut cursor = trimmed;
         // Strip the visibility and the modifiers the material writes before the former.
+        // `const` is a modifier in `const fn` and a FORMER standing on its own, and stripping it
+        // unconditionally made the second unreachable: `const NAME: T = v;` lost its former and was
+        // skipped, so no const item could ever be founded while `RustItem::former`'s own doc listed
+        // one. Repaired 2026-08-17 by remembering the strip and restoring it when nothing else
+        // claimed the former.
+        let mut stripped_const = false;
         loop {
             let stripped = ["pub ", "async ", "const ", "unsafe ", "extern ", "default "]
                 .iter()
-                .find_map(|prefix| cursor.strip_prefix(prefix));
+                .find_map(|prefix| {
+                    cursor.strip_prefix(*prefix).inspect(|_| {
+                        if *prefix == "const " {
+                            stripped_const = true;
+                        }
+                    })
+                });
             match stripped {
                 Some(rest) => cursor = rest.trim_start(),
                 None => {
@@ -1053,11 +1128,20 @@ pub fn rust_items_of_section(module: &str, storage_ordinal: u64, text: &str) -> 
         let Some((former, rest)) = cursor.split_once(char::is_whitespace) else {
             continue;
         };
+        let mut former = former;
+        let mut rest = rest;
         if !matches!(
             former,
             "fn" | "struct" | "enum" | "trait" | "type" | "union" | "static" | "macro_rules!"
         ) {
-            continue;
+            // Nothing else claimed it, so a stripped `const` was the former after all and the token
+            // standing here is the name.
+            if stripped_const {
+                rest = cursor;
+                former = "const";
+            } else {
+                continue;
+            }
         }
         let name = rest
             .trim_start()
@@ -1755,6 +1839,490 @@ fn sanitized(name: &str) -> String {
         "·".to_owned()
     } else {
         joined
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// The face quotient — the faces a material's own conduct distinguishes
+// -------------------------------------------------------------------------------------------------
+
+/// Faces as states, composition at a shared constituent as the successor.
+///
+/// # Why this exists
+///
+/// [`ContactSpecies`] is a **taxonomy**: six variants written here, of which `Recruits` (Lean) and
+/// `Calls` (Rust) are structurally the same construction — compare the two construction sites, both
+/// `StructuralContact { from, to, owner: from, species }` built from *named another* — separated
+/// only by which language the material came from. `DeclaredContactFace`'s own doc in
+/// `soma/life/src/incidence_production.rs` has said since it was written that this is not its job:
+///
+/// > *"This is deliberately not a reaction class. A source atlas may call a face `operand`, `calls`,
+/// > or `adjacency`; a later behavioral quotient decides whether two such faces conduct alike."*
+///
+/// **The quotient exists, is exact, and had never been asked.** Measured 2026-08-17 by
+/// `grep -n "receiver_exact_compression\|ReceiverExactCompression\|compress(" soma/life/src/material_incidence.rs`,
+/// which returned nothing before this module.
+///
+/// # The system, and why the successor is a composition
+///
+/// A face is not a value to be classified; it is something a contact **does**. Two faces are the
+/// same face when no chain of compositions distinguishes them, so the state is the face and the
+/// input is the face it is followed by: `successor(f, g)` continues exactly when some constituent
+/// carries an inbound `f` and an outbound `g`. The separating artifact is therefore a **chain of
+/// faces**, which is the material's own object rather than a label.
+///
+/// Without a successor the conduct partition would equal the one-shot partition, which
+/// `receiver_exact_compression` calls vacuous as a check by name.
+struct FaceConduct {
+    faces: Vec<String>,
+    /// Five structural readings per face, each an exact opaque token and never a magnitude.
+    ///
+    /// Four are **ὑπό** — the vertical reading: does the face ever run from a constituent to itself,
+    /// ever upward in dependency height, ever downward, ever level. The fifth is **ἐν** — does the
+    /// face ever lie **inside a closed boundary**, read off `IncidenceComplex::compounds`, where a
+    /// compound *is* a closed boundary.
+    ///
+    /// **The fifth was missing until 2026-08-17 and its absence was a real hole**: a quotient with
+    /// only the vertical reading can see a face that climbs and one that descends and cannot see a
+    /// face that **encloses**. Containment and height are different relations — being under a dome
+    /// and being in the building coincide only because the roof bounds both — and a reading that
+    /// carries one and calls it the other has collapsed them. Nothing was constructed for this: the
+    /// complex has computed its compounds since it was written.
+    observations: Vec<[u64; 5]>,
+    /// `follows[f]` holds every face that can follow `f` at a shared constituent.
+    follows: Vec<BTreeSet<usize>>,
+}
+
+impl ObservedSystem for FaceConduct {
+    fn items(&self) -> Vec<ItemId> {
+        (0..self.faces.len() as u64).map(ItemId).collect()
+    }
+
+    fn receivers(&self) -> Vec<ReceiverId> {
+        (0..5u64).map(ReceiverId).collect()
+    }
+
+    fn inputs(&self) -> Vec<InputId> {
+        (0..self.faces.len() as u64).map(InputId).collect()
+    }
+
+    fn observation(&self, item: ItemId, receiver: ReceiverId) -> Observation {
+        Observation(
+            self.observations
+                .get(item.0 as usize)
+                .and_then(|row| row.get(receiver.0 as usize).copied())
+                .unwrap_or(0),
+        )
+    }
+
+    fn successor(&self, item: ItemId, input: InputId) -> Option<ItemId> {
+        let onward = self.follows.get(item.0 as usize)?;
+        onward
+            .contains(&(input.0 as usize))
+            .then_some(ItemId(input.0))
+    }
+}
+
+/// What the material says about its own faces.
+#[derive(Clone, Debug)]
+pub struct FaceQuotient {
+    /// The faces the atlas declared, in canonical order. `ItemId(i)` is `declared[i]`.
+    pub declared: Vec<String>,
+    /// Faces the material's conduct cannot tell apart. A block of more than one is a declaration
+    /// the material does not support.
+    pub blocks: Vec<BTreeSet<String>>,
+    /// Pairs the one-shot reading held together and conduct separated, each with the shortest chain
+    /// of faces that separated them.
+    pub separated: Vec<(String, String, Vec<String>)>,
+    /// How many refinement rounds the conduct partition took — the longest shortest-distinguishing
+    /// chain over the face population.
+    pub rounds: usize,
+    /// Whether the containment receiver was consulted, i.e. whether the complex founded. `false`
+    /// means the reading is **vertical only** and says so rather than presenting four receivers as
+    /// five.
+    pub closure_read: bool,
+    /// The faces measured to lie inside at least one closed boundary.
+    pub enclosed_faces: BTreeSet<String>,
+}
+
+impl FaceQuotient {
+    /// Faces the material declared but whose conduct is indistinguishable from another's.
+    pub fn undersupported(&self) -> Vec<&BTreeSet<String>> {
+        self.blocks.iter().filter(|block| block.len() > 1).collect()
+    }
+}
+
+/// Take the face quotient of one atlas.
+///
+/// **This asks the material which of its declared faces it can actually tell apart.** A block of more
+/// than one face is a distinction this repository wrote down and the material does not carry.
+pub fn face_quotient(atlas: &MaterialAtlas) -> FaceQuotient {
+    let (heights, _, _) = atlas.heights();
+    let mut declared: Vec<String> = atlas
+        .contacts()
+        .iter()
+        .map(|contact| contact.species.name().to_owned())
+        .collect::<BTreeSet<String>>()
+        .into_iter()
+        .collect();
+    declared.sort();
+    let index: BTreeMap<&str, usize> = declared
+        .iter()
+        .enumerate()
+        .map(|(at, face)| (face.as_str(), at))
+        .collect();
+
+    let mut observations = vec![[0u64; 5]; declared.len()];
+    // inbound[c] / outbound[c] — which faces land at and leave each constituent.
+    let mut inbound: BTreeMap<usize, BTreeSet<usize>> = BTreeMap::new();
+    let mut outbound: BTreeMap<usize, BTreeSet<usize>> = BTreeMap::new();
+    for contact in atlas.contacts() {
+        let Some(face) = index.get(contact.species.name()).copied() else {
+            continue;
+        };
+        let from = heights.get(contact.from).copied().unwrap_or(0);
+        let to = heights.get(contact.to).copied().unwrap_or(0);
+        if contact.from == contact.to {
+            observations[face][0] = 1;
+        }
+        match to.cmp(&from) {
+            std::cmp::Ordering::Greater => observations[face][1] = 1,
+            std::cmp::Ordering::Less => observations[face][2] = 1,
+            std::cmp::Ordering::Equal => observations[face][3] = 1,
+        }
+        inbound.entry(contact.to).or_default().insert(face);
+        outbound.entry(contact.from).or_default().insert(face);
+    }
+
+    let mut follows = vec![BTreeSet::<usize>::new(); declared.len()];
+    for (constituent, landed) in &inbound {
+        let Some(leaving) = outbound.get(constituent) else {
+            continue;
+        };
+        for face in landed {
+            for next in leaving {
+                follows[*face].insert(*next);
+            }
+        }
+    }
+
+    // ἐν — the containment reading, off the standing organ. A `Compound` is a closed boundary and
+    // carries the bonds that close it; each bond carries its own declared faces, so the face is read
+    // from the bond rather than by trusting an index to line up with the contact population.
+    let mut enclosed_faces: BTreeSet<String> = BTreeSet::new();
+    let closure_read = match atlas.found(RankRepresentative::Least) {
+        Ok(complex) => {
+            let bonds = complex.bonds();
+            for compound in complex.compounds() {
+                for bond_at in &compound.bonds {
+                    let Some(bond) = bonds.get(*bond_at) else {
+                        continue;
+                    };
+                    for face in &bond.contact_faces {
+                        if let Some(at) = index.get(face.name()) {
+                            observations[*at][4] = 1;
+                            enclosed_faces.insert(declared[*at].clone());
+                        }
+                    }
+                }
+            }
+            true
+        }
+        // A complex that will not found is a statement about the atlas, not a gap to paper over: the
+        // reading returns vertical-only and declares it.
+        Err(_) => false,
+    };
+
+    let system = FaceConduct {
+        faces: declared.clone(),
+        observations,
+        follows,
+    };
+    let compressed = compress(&system);
+    let name = |item: &ItemId| {
+        declared
+            .get(item.0 as usize)
+            .cloned()
+            .unwrap_or_else(|| format!("face:{}", item.0))
+    };
+    let blocks: Vec<BTreeSet<String>> = compressed
+        .conduct
+        .blocks
+        .iter()
+        .map(|block| block.iter().map(name).collect())
+        .collect();
+    let separated: Vec<(String, String, Vec<String>)> = compressed
+        .collapsed
+        .iter()
+        .map(|pair| {
+            (
+                name(&pair.left),
+                name(&pair.right),
+                pair.distinguishing_word
+                    .iter()
+                    .map(|input| {
+                        declared
+                            .get(input.0 as usize)
+                            .cloned()
+                            .unwrap_or_else(|| format!("face:{}", input.0))
+                    })
+                    .collect(),
+            )
+        })
+        .collect();
+    FaceQuotient {
+        declared,
+        blocks,
+        separated,
+        rounds: compressed.rounds,
+        closure_read,
+        enclosed_faces,
+    }
+}
+
+#[cfg(test)]
+mod merged_atlas_tests {
+    use super::*;
+
+    fn atlas_of(
+        kind: MaterialKind,
+        constituents: &[&str],
+        contacts: &[(usize, usize, usize, ContactSpecies)],
+    ) -> MaterialAtlas {
+        MaterialAtlas::new(
+            kind,
+            constituents.iter().map(|name| (*name).to_owned()).collect(),
+            (0..constituents.len() as u64).collect(),
+            contacts
+                .iter()
+                .map(|(from, to, owner, species)| StructuralContact {
+                    from: *from,
+                    to: *to,
+                    owner: *owner,
+                    species: *species,
+                })
+                .collect(),
+            0,
+            1,
+        )
+        .expect("a declared atlas")
+    }
+
+    /// **Many materials, one atlas.** Two codecs join without either being read by the other's
+    /// reader, and the face population of the join is the union of theirs — which is what makes a
+    /// face quotient over more than one codec possible at all.
+    #[test]
+    fn two_materials_join_into_one_atlas_and_the_faces_are_the_union() {
+        let lean = atlas_of(
+            MaterialKind::Lean,
+            &["thm", "lemma"],
+            &[(0, 1, 0, ContactSpecies::Recruits)],
+        );
+        let rust = atlas_of(
+            MaterialKind::Rust,
+            &["fn_a", "fn_b"],
+            &[(0, 1, 0, ContactSpecies::Calls)],
+        );
+        let joined = lean.merge(&rust, "rust:").expect("the atlases join");
+        assert_eq!(joined.constituents().len(), 4);
+        assert_eq!(joined.contacts().len(), 2);
+        assert!(joined.constituents().contains(&"rust:fn_a".to_owned()));
+
+        let quotient = face_quotient(&joined);
+        assert_eq!(quotient.declared, vec!["calls", "recruits"]);
+    }
+
+    /// **A name shared by two materials is NOT identified at the intake.** The prefix keeps them
+    /// apart, because whether two constituents are the same thing is a question for a later
+    /// quotient and answering it here would be the intake authoring its own conclusion.
+    #[test]
+    fn a_name_two_materials_share_is_kept_apart_by_the_join() {
+        let left = atlas_of(
+            MaterialKind::Lean,
+            &["add", "zero"],
+            &[(0, 1, 0, ContactSpecies::Recruits)],
+        );
+        let right = atlas_of(
+            MaterialKind::Rust,
+            &["add", "zero"],
+            &[(0, 1, 0, ContactSpecies::Calls)],
+        );
+        let joined = left.merge(&right, "rust:").expect("the atlases join");
+        assert_eq!(joined.constituents().len(), 4, "{:?}", joined.constituents());
+        // and every contact still lands inside its own material
+        for contact in joined.contacts() {
+            let from_is_right = joined.constituents()[contact.from].starts_with("rust:");
+            let to_is_right = joined.constituents()[contact.to].starts_with("rust:");
+            assert_eq!(from_is_right, to_is_right, "a contact crossed the join");
+        }
+    }
+}
+
+#[cfg(test)]
+mod face_quotient_tests {
+    use super::*;
+
+    fn atlas_of(
+        constituents: &[&str],
+        contacts: &[(usize, usize, usize, ContactSpecies)],
+    ) -> MaterialAtlas {
+        MaterialAtlas::new(
+            MaterialKind::Arithmetic,
+            constituents.iter().map(|name| (*name).to_owned()).collect(),
+            (0..constituents.len() as u64).collect(),
+            contacts
+                .iter()
+                .map(|(from, to, owner, species)| StructuralContact {
+                    from: *from,
+                    to: *to,
+                    owner: *owner,
+                    species: *species,
+                })
+                .collect(),
+            0,
+            1,
+        )
+        .expect("a declared atlas")
+    }
+
+    /// **The quotient can collapse.** Two faces laid over the SAME contacts conduct identically, so
+    /// the material cannot tell them apart and says so. That is a declaration this repository wrote
+    /// down and the material does not carry.
+    #[test]
+    fn two_faces_over_the_same_contacts_collapse_into_one_block() {
+        // every `recruits` edge is also a `calls` edge, so nothing distinguishes the two names.
+        let quotient = face_quotient(&atlas_of(
+            &["a", "b", "c"],
+            &[
+                (0, 1, 0, ContactSpecies::Recruits),
+                (0, 1, 0, ContactSpecies::Calls),
+                (1, 2, 1, ContactSpecies::Recruits),
+                (1, 2, 1, ContactSpecies::Calls),
+            ],
+        ));
+        assert_eq!(quotient.declared, vec!["calls", "recruits"]);
+        assert_eq!(
+            quotient.blocks.len(),
+            1,
+            "the material separates two faces it cannot tell apart: {:?}",
+            quotient.blocks
+        );
+        assert_eq!(quotient.undersupported().len(), 1);
+    }
+
+    /// **And it can separate**, or the collapse above would be a law that cannot fail. Here the two
+    /// faces run in opposite directions through the dependency height, which the declared receivers
+    /// read, so the material carries the distinction and the quotient keeps it.
+    #[test]
+    fn two_faces_with_different_conduct_stay_apart() {
+        let quotient = face_quotient(&atlas_of(
+            &["a", "b", "c"],
+            &[
+                // `recruits` climbs, `operand` returns to a leaf: different height conduct.
+                (0, 1, 0, ContactSpecies::Recruits),
+                (1, 2, 1, ContactSpecies::Recruits),
+                (2, 2, 2, ContactSpecies::Operand),
+            ],
+        ));
+        assert_eq!(quotient.declared, vec!["operand", "recruits"]);
+        assert_eq!(
+            quotient.blocks.len(),
+            2,
+            "the material distinguishes these and the quotient merged them: {:?}",
+            quotient.blocks
+        );
+        assert!(quotient.undersupported().is_empty());
+    }
+
+    /// **The containment receiver fires, and can also not fire.** ἐν is read off closed boundaries,
+    /// which are cycles, so a material carrying one must return an enclosed face and a material
+    /// carrying none must return an empty set. A receiver that fired either always or never would be
+    /// a coordinate that decides nothing.
+    #[test]
+    fn the_containment_receiver_reads_a_closed_boundary_and_is_silent_without_one() {
+        // a cycle: a -> b -> a. Two bonds, one closed boundary.
+        let enclosed = face_quotient(&atlas_of(
+            &["a", "b"],
+            &[
+                (0, 1, 0, ContactSpecies::Recruits),
+                (1, 0, 1, ContactSpecies::Recruits),
+            ],
+        ));
+        assert!(enclosed.closure_read, "the complex refused to found");
+        assert!(
+            !enclosed.enclosed_faces.is_empty(),
+            "a material with a closed boundary returned no enclosed face"
+        );
+
+        // no cycle: a -> b -> c. Nothing closes.
+        let open = face_quotient(&atlas_of(
+            &["a", "b", "c"],
+            &[
+                (0, 1, 0, ContactSpecies::Recruits),
+                (1, 2, 1, ContactSpecies::Recruits),
+            ],
+        ));
+        assert!(open.closure_read);
+        assert!(
+            open.enclosed_faces.is_empty(),
+            "a material with no closed boundary reported one: {:?}",
+            open.enclosed_faces
+        );
+    }
+
+    /// A material declaring one face returns one block, and that is a statement about the material
+    /// rather than about the quotient. `rust_atlas` emits exactly one species today, so its
+    /// connection is abelian at winding one and no face reading can be evidence there.
+    #[test]
+    fn one_declared_face_returns_one_block_and_carries_no_evidence() {
+        let quotient = face_quotient(&atlas_of(
+            &["a", "b"],
+            &[(0, 1, 0, ContactSpecies::Calls)],
+        ));
+        assert_eq!(quotient.declared, vec!["calls"]);
+        assert_eq!(quotient.blocks.len(), 1);
+        // and the single block is NOT undersupported: one face cannot be indistinguishable from
+        // another when there is no other.
+        assert!(quotient.undersupported().is_empty());
+    }
+}
+
+#[cfg(test)]
+mod const_former_tests {
+    use super::*;
+
+    /// A `const` item is founded, and `const fn` still reads as a function.
+    ///
+    /// Before 2026-08-17 `"const "` was stripped as a modifier and `"const"` was absent from the
+    /// former table, so the first of these founded nothing at all while `RustItem::former`'s doc
+    /// listed `const` as a former it returns.
+    #[test]
+    fn a_const_item_is_founded_and_a_const_fn_is_still_a_function() {
+        let items = rust_items_of_section(
+            "probe",
+            0,
+            "pub const WIDTH: usize = 12;\nconst fn narrow(x: u32) -> u32 { x }\npub fn wide() {}\n",
+        );
+        let formers: Vec<(&str, &str)> = items
+            .iter()
+            .map(|item| (item.former.as_str(), item.name.as_str()))
+            .collect();
+        assert!(
+            formers.contains(&("const", "WIDTH")),
+            "the const item was not founded: {formers:?}"
+        );
+        assert!(
+            formers.contains(&("fn", "narrow")),
+            "const fn must still read as a function: {formers:?}"
+        );
+        assert!(formers.contains(&("fn", "wide")), "{formers:?}");
+    }
+
+    /// The control: a line that is neither is still refused, so the repair widened nothing else.
+    #[test]
+    fn a_line_carrying_no_former_is_still_refused() {
+        let items = rust_items_of_section("probe", 0, "    let x = 1;\n    x + 1\n");
+        assert!(items.is_empty(), "{items:?}");
     }
 }
 

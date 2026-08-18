@@ -62,9 +62,25 @@ X              a transport
 |a⟩⟨a|         a DEPOSIT                         (a construction reversed into a receiver — the
                                                   emanation becomes the pole the next arrival is
                                                   related from, canon/THE_HOLOBROCHOS_SPINE.md §4)
-Σᵢ|aᵢ⟩⟨aᵢ| = I  the terrain receives everything   (≠ I has a computable defect)
+Σᵢ|aᵢ⟩⟨aᵢ| = I  the terrain receives everything   (G-ORTHONORMAL family only; ≠ I has a
+                                                  computable defect. Without orthonormality the
+                                                  sum is a FRAME OPERATOR, not a projection, and
+                                                  reconstruction runs through the dual frame.)
 tr X           the basepoint-free face of the closed loop   (§5)
 ```
+
+**The resolution row carries a metric, corrected 2026-08-17.** `Σᵢ|aᵢ⟩⟨aᵢ| = I` holds for a family
+**orthonormal in a declared inner product `G`**, and the hypothesis was implicit in every statement
+of it in this corpus until an external adjudication refuted the projector reading. For a family that
+merely spans, `S = Σᵢ|aᵢ⟩⟨aᵢ|` is the **frame operator** — positive and invertible, and neither a
+projection nor `I` — so a family can reconstruct every construction while `S ≠ I`, and
+reconstruction runs through the **dual frame** `|ãᵢ⟩ = S⁻¹|aᵢ⟩`. Writing the row without its metric
+asserts an orthonormality no receiver declared, which is the undeclared-Euclidean defect this corpus
+refuses everywhere else. **The repair is a month older than the correction**:
+`research/records/2026-07-20_THE_EULER_DIFFERENCE_REBASES_THE_METRIC_THE_RETURN_MUST_BE_COVARIANT.md`
+(`FORMULA §CXXV`) derives `P^[p] = [(PGP)|_range P]⁻¹ PG` from `G`-orthogonality, which **is** the
+dual-frame formula, and closes: *"The relation between those words, the available currents, and
+orthogonality is receiver-relative."*
 
 The outer-product row is the load-bearing one: **the deposit operation of the conditioning law is
 already a primitive of the notation.** A projection `|a⟩⟨a|` applied as a quotient is the receiver

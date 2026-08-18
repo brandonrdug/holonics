@@ -136,7 +136,18 @@ impl SymbolicSurprisal {
     }
 
     fn add_term(&mut self, prime: u64, coefficient: Rat) -> Result<(), SurprisalError> {
-        if prime < 2 {
+        // **REPAIRED 2026-08-18: this was `if prime < 2`, which is not a primality check.**
+        //
+        // The whole exactness argument of this module rests on the ℚ-linear independence of
+        // `{log₂ p : p prime}` — that is what makes `is_zero` true *exactly* when the form is zero
+        // as a real number. A composite admitted here breaks it on inputs the public constructor
+        // accepts: `term(2, 2).minus(&term(4, 1))` is zero as a real number, and before this repair
+        // `is_zero()` returned `false` and `compare` returned `Open`, never `Equal`.
+        //
+        // Trial division to `√prime` is exact, terminates, and costs nothing at the extents this
+        // carrier admits — a `u64` prime index, where the loop is at most 2^32 steps and in practice
+        // a handful.
+        if !is_prime(prime) {
             return Err(SurprisalError::NotAPrime(prime));
         }
         if coefficient.is_zero() {
@@ -669,6 +680,26 @@ pub fn entropy(population: &BTreeMap<u64, BigUint>) -> Result<Support, Surprisal
     cross_entropy(population, population)
 }
 
+/// **Exact primality by trial division.** No probabilistic test, no table, no bound below which a
+/// number is assumed prime: the argument this module's exactness rests on is about primes, so the
+/// carrier admits a prime or refuses.
+fn is_prime(value: u64) -> bool {
+    if value < 2 {
+        return false;
+    }
+    if value % 2 == 0 {
+        return value == 2;
+    }
+    let mut divisor = 3u64;
+    while divisor.saturating_mul(divisor) <= value {
+        if value % divisor == 0 {
+            return false;
+        }
+        divisor += 2;
+    }
+    true
+}
+
 fn factor_biguint(value: &BigUint) -> Result<Vec<(u64, u32)>, SurprisalError> {
     if value.is_zero() {
         return Err(SurprisalError::NonPositiveProbability);
@@ -709,10 +740,200 @@ pub enum SurprisalError {
     EnclosureUnavailable,
     #[error("a residual prime factor exceeded the machine-word carrier")]
     CarrierOverflow,
+    #[error("a section modulus needs a population; an empty one has no axis to be a moment about")]
+    EmptyPopulation,
+}
+
+
+/// **The section modulus of a surprisal population: the second moment about its own mean, against
+/// the extreme deviation, carried as an UNDIVIDED PAIR.**
+///
+/// Section modulus is `S = I/c` — a second moment about a gauge-fixed axis, over the distance to
+/// the extreme fibre — and it says that strength lives in the *distribution* about the axis rather
+/// than in the total. Two facts make it the right reading here rather than an analogy.
+///
+/// **The gauge is the same one.** A section's neutral axis is chosen so the first moment vanishes;
+/// this reading takes the population's own mean, so the first moment vanishes by construction. The
+/// exponentiated ratio family is invariant under an additive shift of every member, which is
+/// exactly that gauge, and `the_section_modulus_is_unmoved_by_the_additive_gauge` holds it to it.
+///
+/// **The two ingredients are the two limits.** The second moment is the reading at unit
+/// temperature; the extreme fibre is what the zero-temperature limit selects, which is the
+/// governor `CLAUDE.md` bans. So the pair prices the banned collapse **without taking it**: a body
+/// whose second moment vanishes against a nonzero extreme fibre has collapsed onto a single fibre
+/// and carries no bending load.
+///
+/// The quotient is never formed. Both members are exact rational enclosures, and the horizon law
+/// says a ratio crosses as a pair.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SectionModulus {
+    /// `I` — the mean squared deviation from the population's own mean.
+    pub second_moment: ExactInterval,
+    /// `c` — an enclosure of the largest deviation from that mean.
+    pub extreme_fibre: ExactInterval,
+    pub members: usize,
+}
+
+fn squared_bounds(interval: &ExactInterval) -> (Rat, Rat) {
+    let lower = interval.lower.clone();
+    let upper = interval.upper.clone();
+    let low_square = &lower * &lower;
+    let high_square = &upper * &upper;
+    let straddles = lower <= Rat::zero() && upper >= Rat::zero();
+    let least = if straddles {
+        Rat::zero()
+    } else if low_square <= high_square {
+        low_square.clone()
+    } else {
+        high_square.clone()
+    };
+    let greatest = if low_square >= high_square {
+        low_square
+    } else {
+        high_square
+    };
+    (least, greatest)
+}
+
+/// Read the section modulus of a population of surprisal forms.
+///
+/// Everything is exact: the mean is a surprisal form, each deviation is a surprisal form, and the
+/// numbers come from `SymbolicSurprisal::enclosure`, which returns an exact rational interval.
+pub fn section_modulus(
+    population: &BTreeMap<u64, SymbolicSurprisal>,
+) -> Result<SectionModulus, SurprisalError> {
+    let members = population.len();
+    if members == 0 {
+        return Err(SurprisalError::EmptyPopulation);
+    }
+    let extent = Rat::from_integer(BigInt::from(
+        u64::try_from(members).map_err(|_| SurprisalError::EmptyPopulation)?,
+    ));
+    let mut mean = SymbolicSurprisal::zero();
+    for form in population.values() {
+        mean = mean.plus(form);
+    }
+    let mean = mean.scaled(&(Rat::one() / &extent));
+
+    let mut moment_low = Rat::zero();
+    let mut moment_high = Rat::zero();
+    let mut fibre_low = Rat::zero();
+    let mut fibre_high = Rat::zero();
+    for form in population.values() {
+        let deviation = form.minus(&mean).enclosure()?;
+        let (least, greatest) = squared_bounds(&deviation);
+        moment_low += least;
+        moment_high += greatest;
+        let magnitude_low = if deviation.lower <= Rat::zero() && deviation.upper >= Rat::zero() {
+            Rat::zero()
+        } else if deviation.lower > Rat::zero() {
+            deviation.lower.clone()
+        } else {
+            -deviation.upper.clone()
+        };
+        let magnitude_high = {
+            let low = if deviation.lower < Rat::zero() {
+                -deviation.lower.clone()
+            } else {
+                deviation.lower.clone()
+            };
+            let high = if deviation.upper < Rat::zero() {
+                -deviation.upper.clone()
+            } else {
+                deviation.upper.clone()
+            };
+            if low >= high { low } else { high }
+        };
+        if magnitude_low > fibre_low {
+            fibre_low = magnitude_low;
+        }
+        if magnitude_high > fibre_high {
+            fibre_high = magnitude_high;
+        }
+    }
+    Ok(SectionModulus {
+        second_moment: ExactInterval::new(moment_low / &extent, moment_high / &extent)
+            .map_err(|_| SurprisalError::EmptyPopulation)?,
+        extreme_fibre: ExactInterval::new(fibre_low, fibre_high)
+            .map_err(|_| SurprisalError::EmptyPopulation)?,
+        members,
+    })
 }
 
 #[cfg(test)]
 mod tests {
+
+    fn modulus_population(terms: &[(u64, &[(u64, i64)])]) -> BTreeMap<u64, SymbolicSurprisal> {
+        terms
+            .iter()
+            .map(|(name, factors)| {
+                let mut form = SymbolicSurprisal::zero();
+                for (prime, coefficient) in factors.iter() {
+                    form = form.plus(
+                        &SymbolicSurprisal::term(
+                            *prime,
+                            Rat::from_integer(BigInt::from(*coefficient)),
+                        )
+                        .expect("a prime term"),
+                    );
+                }
+                (*name, form)
+            })
+            .collect()
+    }
+
+    /// **The gauge, and it is softmax's own.** Adding one constant form to every member shifts the
+    /// mean by exactly that form, so every deviation is unmoved and BOTH readings must be
+    /// bit-identical. If this ever moved, the reading would be measuring absolute position, which
+    /// is the gauge direction and carries nothing.
+    #[test]
+    fn the_section_modulus_is_unmoved_by_the_additive_gauge() {
+        let base = modulus_population(&[(1, &[(2, 1)]), (2, &[(3, 1)]), (3, &[(2, 3)])]);
+        let shift = SymbolicSurprisal::term(5, Rat::from_integer(BigInt::from(7)))
+            .expect("a prime term");
+        let shifted: BTreeMap<u64, SymbolicSurprisal> = base
+            .iter()
+            .map(|(name, form)| (*name, form.plus(&shift)))
+            .collect();
+
+        let before = section_modulus(&base).expect("a section modulus");
+        let after = section_modulus(&shifted).expect("a section modulus");
+        assert_eq!(before, after, "the additive gauge must move nothing");
+    }
+
+    /// **And it must move under a change that provably alters the spread**, or it is measuring
+    /// nothing. Widening the population strictly increases both the second moment and the extreme
+    /// fibre. Without this arm the gauge test above would pass on a reading that always returned
+    /// zero.
+    #[test]
+    fn the_section_modulus_moves_when_the_spread_moves() {
+        let narrow = modulus_population(&[(1, &[(2, 1)]), (2, &[(2, 2)]), (3, &[(2, 3)])]);
+        let wide = modulus_population(&[(1, &[(2, 1)]), (2, &[(2, 2)]), (3, &[(2, 30)])]);
+
+        let narrow = section_modulus(&narrow).expect("a section modulus");
+        let wide = section_modulus(&wide).expect("a section modulus");
+        assert!(
+            wide.second_moment.lower > narrow.second_moment.upper,
+            "a wider population must carry a strictly larger second moment"
+        );
+        assert!(
+            wide.extreme_fibre.lower > narrow.extreme_fibre.upper,
+            "a wider population must carry a strictly larger extreme fibre"
+        );
+    }
+
+    /// **The collapse the ban forbids, priced without taking it.** A population whose members are
+    /// all equal has zero deviation, so the second moment vanishes against a zero extreme fibre —
+    /// it has collapsed onto a single fibre and carries no bending load. The quotient is never
+    /// formed, so nothing divides by that zero.
+    #[test]
+    fn a_collapsed_population_carries_no_bending_load() {
+        let flat = modulus_population(&[(1, &[(2, 4)]), (2, &[(2, 4)]), (3, &[(2, 4)])]);
+        let reading = section_modulus(&flat).expect("a section modulus");
+        assert!(reading.second_moment.upper.is_zero());
+        assert!(reading.extreme_fibre.upper.is_zero());
+        assert_eq!(reading.members, 3);
+    }
     use super::*;
 
     fn rat(numerator: i64, denominator: i64) -> Rat {
@@ -967,5 +1188,48 @@ mod tests {
             SymbolicSurprisal::of_probability(&Rat::zero()),
             Err(SurprisalError::NonPositiveProbability)
         );
+    }
+}
+
+#[cfg(test)]
+mod primality_repair_tests {
+    use super::*;
+
+    /// **The defect this repair closes, asserted.** Before 2026-08-18 `add_term` tested `prime < 2`,
+    /// so `term(4, …)` was admitted and the ℚ-linear-independence argument failed on an input the
+    /// public constructor accepts: `2·log₂2 − 1·log₂4` is zero as a real number, and `is_zero()`
+    /// returned `false`.
+    #[test]
+    fn a_composite_is_refused_by_name_so_the_zero_test_stays_exact() {
+        assert_eq!(
+            SymbolicSurprisal::term(4, Rat::one()),
+            Err(SurprisalError::NotAPrime(4))
+        );
+        assert_eq!(
+            SymbolicSurprisal::term(9, Rat::one()),
+            Err(SurprisalError::NotAPrime(9))
+        );
+        assert_eq!(
+            SymbolicSurprisal::term(1, Rat::one()),
+            Err(SurprisalError::NotAPrime(1))
+        );
+        // And the primes it must still admit, including the two edges the loop can get wrong.
+        for prime in [2u64, 3, 5, 7, 11, 13, 9_223_372_036_854_775_783] {
+            assert!(
+                SymbolicSurprisal::term(prime, Rat::one()).is_ok(),
+                "{prime} is prime and must be admitted"
+            );
+        }
+    }
+
+    /// The exactness the refusal protects: two forms that are equal as real numbers are `is_zero`
+    /// after subtraction, and no admitted pair can be equal-but-not-detected.
+    #[test]
+    fn the_zero_test_is_exact_on_every_admitted_form() {
+        let two = SymbolicSurprisal::term(2, Rat::from_integer(2.into())).unwrap();
+        let also_two = SymbolicSurprisal::term(2, Rat::from_integer(2.into())).unwrap();
+        assert!(two.minus(&also_two).is_zero());
+        let three = SymbolicSurprisal::term(3, Rat::one()).unwrap();
+        assert!(!two.minus(&three).is_zero());
     }
 }

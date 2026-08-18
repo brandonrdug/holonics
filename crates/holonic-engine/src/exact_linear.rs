@@ -204,20 +204,45 @@ impl ExactRatMatrix {
     }
 
     pub fn multiply(&self, other: &Self) -> Result<Self, ExactLinearError> {
+        Ok(self.multiply_with_work(other)?.0)
+    }
+
+    /// **The same product, returning what it cost.**
+    ///
+    /// Added 2026-08-17 because an adjudication observed that a timing of `A† W A` followed by an
+    /// elimination *"is not isolated Gaussian elimination"* — the product and the reduction share the
+    /// interval, and a clock cannot separate them. Counted, they separate exactly.
+    ///
+    /// A product's **dependency span is one**: every output entry is independent of every other, so
+    /// the whole deed is one step however many operations it performs. An elimination's span is its
+    /// pivot count. That single coordinate is the difference between a deed a card could carry and a
+    /// deed it could not, and no scalar cost carries it.
+    pub fn multiply_with_work(
+        &self,
+        other: &Self,
+    ) -> Result<(Self, crate::exact_work::ExactWork), ExactLinearError> {
         if self.columns != other.rows {
             return Err(ExactLinearError::ShapeMismatch);
         }
+        let mut work = crate::exact_work::ExactWork::nothing();
+        work.resident(
+            u64::try_from(self.rows.saturating_mul(other.columns)).unwrap_or(u64::MAX),
+        );
+        work.stepped();
         let mut result = Self::zero(self.rows, other.columns)?;
         for row in 0..self.rows {
             for column in 0..other.columns {
                 let mut value = Rat::zero();
                 for inner in 0..self.columns {
                     value += self.get(row, inner)? * other.get(inner, column)?;
+                    work.multiplied(1);
+                    work.added(1);
                 }
+                work.wrote(&value);
                 result.set(row, column, value)?;
             }
         }
-        Ok(result)
+        Ok((result, work))
     }
 
     pub fn apply(&self, vector: &[Rat]) -> Result<Vec<Rat>, ExactLinearError> {

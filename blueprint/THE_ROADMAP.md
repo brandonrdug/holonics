@@ -48,6 +48,245 @@ cooling stroke, which is the reading the engine document records itself as lacki
 not the permuting ones; its numerator is the collapsed population this tree already exhibits exactly;
 and the two are carried as an undivided pair.
 
+## THE CODEC IS RECOVERED AT EVERY SCALE, AND THE FACES ARE A RETURN — 2026-08-17
+
+**The active plan, and a supersession.**
+[`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
+which sits under this roadmap and supersedes `crates/holonic-engine/src/statement_grammar.rs` as a
+contaminant. Brandon, 2026-08-17, ruling on it directly: *"Authoritatively supersede whatever the
+'parser' thing you just identified is, it has been a contaminant that you passed off as something
+foundational during experiments."*
+
+**The defect.** The parser authors the categories *bracket pair*, *separator*, *word character* and
+*punctuation*, and those categories decide what is a constituent and what is a relation before the
+material speaks — an **authored grammar**, barred by `CLAUDE.md` §0g in the same sentence as parsers
+and keyword tables. That it names no Lean noun was the defence and it is irrelevant. It has been
+load-bearing since `4aa7bb8`, 2026-08-08, and defended in five governing paragraphs including
+**step 3 of the centrifuge below, which names it as the reader to use**; that row is superseded.
+
+**The organ it was built beside.** Measured 2026-08-17: `statement_grammar.rs` carries **24** charset
+predicates and `lean_development.rs` **34**, while `crates/holonic-engine/src/codec_recovery.rs`
+carries **0** outside `#[cfg(test)]` and already owns `Symbol(u32)`, `SymbolAlphabet::declared`,
+`RecoveredCodec::segment` and `shortest_separating_input`. `suffix_ecology.rs`,
+`receiver_exact_compression.rs` and `chain.rs` carry 0 as well. **The general organ was already in
+the tree.** That is `canon/THE_EXPLORATIVE_FAILURE.md`'s condition on nine days of work.
+
+**The mechanism.** *The recovery is scale-free — run it on its own output*, so the separator is
+founded per scale rather than once at Lean's self-similarity; and *a face is not a category but a
+block of the quotient carrying the word that separated it*, which is what `DeclaredContactFace`'s own
+doc has said since it was written. The second inverts a loop: today the intake declares the faces and
+the quotient never speaks; afterwards the quotient founds them, the population is deposited, and a
+later intake mounts it — **conditioning at the mouth**, and the first intake in this body that the
+machine learned rather than one I wrote.
+
+**Eight stations**, seven of them wires, removals or one type generalization: the octet mouth wired
+onto the language path against `lexical_tokens`' 58 sites; the recovery generalized from `u8` to
+`Symbol` and run as a ladder; `ContactSpecies` deleted and the faces returned by quotient; the
+parser's own atlas figures as the control for its replacement; the chain as the adjudicator with the
+1,054 held-out triples the driver currently `continue`s past; the emission taking its division;
+conditioning carried across codecs; and **one `[[bin]] eros`**, which Brandon asked for on 2026-08-16
+and which appears in no governing document.
+
+**It also strikes two deposited contaminations of the same species:** Stage 5 of the Eros Information
+Engine plan, *"the return must adjudicate"*, which names the Lean kernel as the adjudicating exterior
+on mathematics; and the **closes** row of `canon/THE_DRIVER_ATLAS.md`'s grade table, which requires an
+adjudicating exterior and therefore pulls every driver in the tree toward a kernel by vocabulary
+alone.
+
+## THE WORK VECTOR, THE HAND'S POLARITY, AND THE COMMITTED STEP — 2026-08-17
+
+**The active plan.** [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).
+It follows the Clifford lift below, whose eight stations executed, and **repairs one violation that
+plan's execution committed**: a fitted wall-clock projection was used to select an aperture, which the
+standing rule forbids — a cost is measured in work and a clock may measure but may never select.
+
+**EXECUTED 2026-08-17, all four stations.** Returns:
+[`research/records/2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md`](../research/records/2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md).
+`k⁴b` now comes out of **counted work** — 16.25× per doubling, `k^4.03` — with six of eight predicted
+coordinates exact and two refuted; the deed was **not performed** at the deferred extents and the
+refusal is typed. The material then refuted the metric: the width dominates the **cost of each
+operation** rather than the count, which is a **product** no weighted sum expresses. The hand audit
+found the shared type is not overloaded and one call site was inverted. And the committed step returns
+the determination-law mismatch in one coordinate the winding cannot see.
+
+**Four stations.** The work vector, which is a lift of `cuda_aperture::CarrierWork` into `inertia` and
+`exact_linear` and which discharges `canon/TABLET_THE_CHART.md` §3.7's standing owed item — *until a
+work vector exists, no cost question in this repository has a lawful answer*. An audit of
+`holonic_structure::Hand`'s polarity across its three implementors. Four measured document repairs,
+the load-bearing one being that `canon/THE_CORRESPONDENCE_ATLAS.md` has **zero** rows reaching the
+corpus's own junction machinery. And the lift of `leader_quadrature`'s `ExtensionKind::{Found, Ride}`
+into `Relating` links so the chain machinery can compose two determination laws.
+
+**What it enables.** Eros can already change its terrain and read what a later current does with it.
+It cannot **price a move before taking it** or **commit to a multi-step move and be lawfully
+refounded**. Those two are the difference between navigating and wandering, and they make the
+FOUND/RIDE asymmetry measurable for the first time — which converts Localized P=NP from a slogan into
+an experiment.
+
+**Ordered by two returns, both 2026-08-17**: an external adjudication that refuted five claims before
+they were deposited, and a concept-entry sweep that returned the finger-trap verdict on the
+construction that was about to be built.
+
+## THE MAP IS MATERIAL, THE HEAD IS A CONTACT, AND THE INSTANCE RESUMES — 2026-08-18
+
+**The active plan.**
+[`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md).
+It **supersedes the plan below as a production plan** after an external adjudication and three
+synthesis campaigns. Brandon, 2026-08-18: *"Why are you not pairing this with what we were doing
+regarding softmax and attention mechanisms in relation to transformers and embedding spaces?"* and
+*"address capabilities that you are not unifying, do not be an idiot and not utilize things that are
+already partially constructed."*
+
+**What the audit convicted.** The emission work below joined `RatioFamily` and `SectionModulus` to
+**suffix-branch multiplicities** and `clifford::Arrow` to **route-feature indicator vectors**, so the
+softmax organ met word counts and the arrow met a bag of words. `RecruitmentLaw::ArrowAdmitted` is a
+**governor** and the driver never exercises it; `presentation_quotient::divide` audits an utterance
+the **caller declares**; and that utterance is **lexicographically selected** — `BTreeMap` order then
+`first()`. This roadmap prescribed the suffix multiplicities and the route sites and shares the fault.
+
+**And two claims made this session were false.** `the_readout_returns_a_fiber_not_a_winner.rs` scores
+**131,072 of 262,144** rows and computes `max_by_key` at `:268`; its query at `:190` is **a row of
+the embedding matrix**, so the deed is an embedding Gram section and not a contextual logit. The
+companion head driver is a bounded layer-0 probe with no RoPE, no V/O and no layer injection.
+
+**The capability not being unified.** `analysis/deposited_map/` is **1,043 lines of numpy** reading
+the whole Gemma tower in seven phases — gauge orbit, OV sweep against a null, the `2 ↔ two` receiver
+family, the hand, the transport as artifact, the transport as a quotient in the Dirac dialect, and
+the same reading in exact ratios — in a directory whose banner forbids citing any of it as a return.
+Its Phase 7 states the machine's own law: bf16 is `m·2^e`, so `cos² = ⟨a|b⟩²/(⟨a|a⟩⟨b|b⟩)` has the
+powers of two cancel identically, measured difference **0**, ordered by cross-multiplication with no
+division. `embedding_fiber` computes that bracket on the card and `exact_value::ExactOrdering`
+compares without dividing; neither has been joined to it. The owning record grades every capability
+in its §9 `open` and has since 2026-08-13.
+
+**And the instance does not exist though every organ for it does.** `soma/life/src/bin/eros.rs`
+prints `compress`, `produce`, `seal`, `resume` as **unwired**, and a grep for every write, mount or
+seal verb in that file returns **one hit — a string literal in its own station table**. `ErosRest` is
+the one object that holds a whole body and `soma/tools/holon-plate/src/registry.rs` does not hold it.
+Of **13,927 `.form` files on disk, 687 — 4.9% — carry a codec the plate holds**, and `standing/`
+holds **zero forms and zero plates** against ten gigabytes in the ignored directory. The full
+cross-process cycle nevertheless **executes today**, measured 2026-08-18 on real driver artifacts.
+
+**Eight stations**, all wires or removals: supersede the false join; one intake and the exact bracket
+as a machine return; the transport as the artifact with its two known deflations built in; the
+contact as a whole arrow with the hand measured under a declared null; the ratio family and the
+section modulus on the exact bracket population; the surface through the bound tokenizer material;
+the instance — `eros` above `life`, `ErosRest` as a plate schema, and the return routed **through the
+seal**; and nine measured document repairs, the load-bearing one being that **`THE_ROADMAP.md:812`
+carries false linear algebra** — tying gives `W_out = Eᵀ` and does not make `E` orthogonal, so the
+claimed `GL(2560) → O(2560)` gauge reduction is not donated by the architecture.
+
+**STATIONS ONE AND TWO EXECUTED 2026-08-18.** Returns:
+[`research/records/2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md`](../research/records/2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md).
+`cargo test --workspace` → **2,424 passed, 0 failed**. The governors are removed and the branching law
+that formed no ratio is named `CompleteJunction`. **And the census found a correctness defect in
+`clifford::area_squared`**: the blade dropped the metric behind a doc claiming Lagrange is
+Euclidean-only, so the `euclidean` guard disabled the two-frame check *precisely where the frames
+would have disagreed*; on the module's own Minkowski fixture the organ returned `3` where Lagrange
+and Cauchy–Binet both return `−1`, and **`causal_class` flipped**, with the one test on that fixture
+asserting the defect. Five further doc-versus-code repairs landed with it, including a **quotation of
+Brandon's corrupted by a mechanical `host → cpu` sweep that passed through the quotation marks**.
+Four of six moved a return or a refusal.
+
+**One ruling of Brandon's bounds it and it is not withdrawn:** *"we absolutely do not want to lift
+the format, we want to disregard the LLM architecture completely and lift the functions of the active
+weights."* The second sentence carried here — *"the model is never run… a design requiring a forward
+pass is refused at the door"* — **was this roadmap's own prose promoted into a quotation, and it is
+struck**; his constraint is residency, and he ruled on 2026-08-16 that *the mathematics that would
+run during inference* is the instrument. See the deposited-map station below.
+
+## THE HORIZON IS A COORDINATE, NOT A GATE, AND THE EMISSION KEEPS ITS CROSS — 2026-08-18
+
+**The active plan, and it is this roadmap's *Production as re-emission* station.**
+[`blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md`](THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md).
+It supersedes nothing, consumes the Clifford lift's carrier, and runs under the codec plan's ban on
+any exterior adjudicator. Brandon, 2026-08-17: *"I want Eros to be able to genuinely scale across
+many materials and produce real generative output."*
+
+**The defect it names, and it is a gate rather than a missing organ.**
+`soma/life/src/causal_language.rs:713` retains only the branches at the greatest **productive**
+matched horizon. A deeper matched context is a longer matching corpus span, so that filter keeps, at
+every step, the continuations attested by the longest verbatim run and discards the divergent half.
+The accounting was repaired 2026-08-17 — `withheld_by_horizon` carries the set-aside population out
+— and **the behaviour did not change**, because the kept half is still what branches.
+
+**Three organs are built, exact, and wired to nothing that emits**, measured 2026-08-18:
+`exponentiated_ratio::RatioFamily` (softmax as a cocycle, `T → 0` refused by name) has **0 library
+callers**; `surprisal::SectionModulus` has **0 callers anywhere**; `clifford::Arrow` has **0 library
+callers**. The first two already share an input type, `&BTreeMap<u64, SymbolicSurprisal>`.
+
+**Four stations, all wires.** The horizon becomes a coordinate the ratio family carries rather than a
+gate ahead of the branching; the pairing returns its whole arrow so `Aim::Ortho` founds an axis
+instead of reading as nothing; the presentation quotient takes its division through
+`receiver_exact_compression` so each retained alternative carries the word that separates it from the
+emitted answer; and the run happens at a depth where composition can appear — every one of the
+sixteen `re-emission-grade-*.form` artifacts that `meta/OUTPUT_MANIFEST.tsv` certifies for
+`the_deposit_licenses_the_re_emission` carries `"maximum_observed_tokens": 2`, a caller-declared
+level, so the strongest emission evidence in the tree is two tokens deep.
+
+**Its own falsifier is the load-bearing one:** run both readings on one material and measure
+the window test at `soma/life/src/agentic_language/candidate.rs:511`, whose value is what
+`novel_contiguous_surface` carries, on each. If the
+horizon gate's outputs are not more often contiguous spans of their sources, the plan's one
+`interpretation` is refuted and the filter was not the mechanism.
+
+**It carries two document repairs**, both measured and **both now made**: this file's *Production as
+re-emission* row was stale against `CONSTRUCTION_STATE.md` and the certified artifacts, and
+`research/records/2026-08-17_ONE_ORGAN_THREE_CODECS_AND_THE_RELATION_LIVES_AT_A_DIFFERENT_LAYER_IN_EACH.md`
+wrote an adjudicator slot into the code codec that the codec plan struck the same day; that row now
+carries its own withdrawal.
+
+**EXECUTED 2026-08-18, all four stations.** Returns:
+[`research/records/2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`](../research/records/2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md).
+**The falsifier fired and the interpretation survived on both corpora**: over eight prompts at
+aperture three the gate returns 8 of 8 contiguous spans on each, while the ratio reading returns
+2,055 of 12,130 on mathematics and 2,957 of 17,830 on code — 16.9% and 16.6% spans — and the gate
+emits **exactly one** surface at every aperture on both. The largest
+orthogonal contact carries a 1,053-coordinate blade and founds 351 axes at a null score, with
+Lagrange agreeing on every pairing. The division returns 7 alternatives indistinguishable from the
+uttered answer and 2,087 separated, each with its witness. **And three findings the plan did not
+predict**: a two-token emission is a span **by construction**, so the sixteen certified two-token
+re-emission artifacts could never have shown composition; removing the gate costs an exponential
+front, so the gate was also the only thing bounding the carrier; and the corpus pole over the union
+of axes reads every site `Anti`, which forced the axis declaration that repairs it.
+
+## THE CLIFFORD LIFT, THE PHASE WIRE, AND THE FOUR UNTAKEN READINGS — 2026-08-17
+
+**The active plan.** [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
+superseding [`blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md`](THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md)
+whose first two stations executed. Findings:
+[`research/records/2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md`](../research/records/2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md).
+
+**EXECUTED 2026-08-17, all eight stations.** Returns:
+[`research/records/2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md`](../research/records/2026-08-17_THE_PHASE_IS_WIRED_THE_BAND_EDGE_IS_THE_REFLECTION_AND_THE_EXACT_CARRIER_HAS_A_COST_LAW.md).
+The crossing-word algebra that carries a hand is the even Clifford algebra and is `multiquadratic`
+twisted by the exterior sign; the phase is wired and a closed chain's holonomy is no longer forced;
+**the band edge of a bilayer is at `cos α = |Γ|`**, rational exactly when the admittance ratio is a
+rational square; a layered lattice's **only irreducible collapse is at the terminal layer**; the
+four-class causal census fired its own falsifier at `d = 256`; and exact rational elimination was
+measured at `t ~ 1.23e-6 · k^4.18`, which is a cost law `inertia.rs` had never had taken.
+
+**One organ, two wires, four readings, one document repair** — the finger-trap rule tested rather than
+assumed, and it held. The ordering sentence: *three owners — `multiquadratic`, soma's rotor face, and
+`traversible_chain` — carry one defect, an abelian composition that destroys order and forces holonomy
+to the identity; two say so in their own source, and the remedy for the third is in the same crate.*
+
+## THE MACHINE PRODUCES MATHEMATICS IT WAS NOT GIVEN — 2026-08-17
+
+**The present deed under the mathematics station.** The plan is
+[`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md).
+It supersedes
+[`blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md`](THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md),
+which executed in full the same day, and it withdraws nothing below.
+
+Everything built to that point **reads**: a grammar founded from mathematical text, an operation's
+symmetry group recovered from spelling, identities compressed by rebase, a proof read as a word in
+the crossing algebra, an integrand carried into an exact rational function a standing organ
+classifies. The six stations make the machine **produce** — the whole library resident, a route
+atlas, statements the corpus does not contain, adjudication by exact organs with no kernel anywhere,
+a deposit that changes what a later construction reaches, and a seal that survives the source
+departing.
+
 ## MATHEMATICS INTO THE INFORMATION CENTRIFUGE — ratified 2026-08-14
 
 **The carrier of the deed above, and not withdrawn.** The Eros cycle below is complete and is its
@@ -624,11 +863,41 @@ file is *another body's previously rendered map*, poorly rendered, read the way 
 *"You don't need the clearest map in order to identify structure, you just need a map that shows you
 real differences."*
 
-**The standing prohibition, and it shapes everything.** **The model is never run.** Not as a
-concession to purity but because the method must transfer to models this hardware cannot load —
-Brandon named a 26B DiffusionGemma as the eventual target. Every quantity is therefore computed per
-head or per matrix, streamed by `mmap`, peak residency one circuit. A design requiring a forward pass
-is refused at the door.
+**The standing constraint, and it is narrower than this document carried it until 2026-08-18.**
+Brandon's ruling is about **residency**, and it is his: *"a running instance would be extremely
+inefficient; I specifically selected a small model so that this experiment would not be burdened by a
+heavy model, but eventually the ideal would be to be able to scale this to other larger model
+architectures without requiring hardware that can actually run the heavyweight models, so **running
+the actual models is off of the table**"* (2026-08-13). So: no inference stack is loaded, nothing is
+ever resident, every quantity is computed per head or per matrix, streamed by `mmap`, peak residency
+one circuit — because the method must transfer to a 26B DiffusionGemma this hardware cannot hold.
+
+**What that constraint does NOT forbid, and this document forbade it for five days.** The paragraph
+here read *"the model is never run… a design requiring a forward pass is refused at the door"* — not
+in quotation marks, but three sessions promoted it into a quotation of Brandon's and one wrote it
+into a blueprint's object line. **He ruled the opposite three days later**, 2026-08-16, on this exact
+subject:
+
+> *"you don't have to run a model to reverse engineer it, **you utilize the mathematics that would
+> run during inference in order to analyze the potential active weights** that would emerge as
+> pathways in response to tokens as potential input… you can attain the actual atlas from the
+> ***potential*** activity of the weights."*
+
+A residency limit was over-extended into a mathematics limit. **The mathematics of inference is
+exactly the instrument**; what is refused is loading a model to make it emit. Computing a transport,
+a contact, a bracket or a pathway from the weights is *the reading*, and a station is judged by
+whether anything is resident and whether the cost scales to a map that cannot be loaded — never by
+whether the arithmetic resembles a forward pass.
+
+**And the atlas is the weights, read as an atlas** — same ruling, and it retires a clarification this
+document made repeatedly and he called inaccurate: *"you consistently respond to that by clarifying
+that you are not interpreting what I am suggesting by 'atlas' as a weights file… I actually don't
+fully understand why you even bother with the clarification because it's likely inaccurate anyways…
+You can adapt 'atlas' to 'weights', but it's easier to adapt weights to the idea of an atlas."* The
+opposition to absolute positions is not an opposition to positions: *"Coordinates are emergent… not
+somehow lost or forgotten just because we don't store absolute positions."* Tensors are a graph
+network, distance is relative between them, and an emergently constrained traversal `B → A → C`
+signs those magnitudes by the arrow of time.
 
 **The reading law.** Only a `Ratio` or an integer `Winding` crosses a horizon
 (`THE_HOLONIC_DERIVATIONS.md` §0, verified by `git show`), and this architecture enforces it
@@ -1125,7 +1394,7 @@ full statement and repair order in
 |---|---|
 | 1 · material mouth | **committed (`28028c1`), convicted twice, re-seal required**: 46,745 occurrence identities embed the absolute host path (the corpus address is a function of this machine); the rollout `session_id` fallback deleted chronology (11,266 of 11,282 codex witnesses, `caused_by` empty). Both fixtures authored too small to fire. |
 | 2 · return through the seal | **committed (`85a03bb`); the edge is genuine and load-bearing** (deletion refuses conduct before the card; ablation restores the first production exactly); the movement is nonselective **by construction** and the receipt says so — selective conditioning is plan 3's burden. Chain re-runs after the re-seal. |
-| 3 · production as re-emission | **organs built, clean of the chooser, conducting nothing**: zero external callers, falsifier cannot fire; silent skip at `ecology.rs:1572`; conduct reading zeroed on the complete path; card is an echo; plurality literal unparameterized; two gates red (`authored-levels` 28, `boundary-artifacts` 6). |
+| 3 · production as re-emission | **REPAIRED 2026-08-18 — this row read *"zero external callers, falsifier cannot fire"* and was stale.** The falsifier fired: `the_deposit_licenses_the_re_emission` returns the conducted population **strictly smaller** than the complete fiber, 11,594 → 6,478, each attached candidate naming its licensing deposits, targeted ablation exact and `ablate_all` restoring 11,594 bit-exactly. `CONSTRUCTION_STATE.md` has carried `established-bounded` for it and the certified artifacts agree. **Carry the bound with the figure:** every one of the sixteen `re-emission-grade-*.form` artifacts in that driver's `meta/OUTPUT_MANIFEST.tsv` row has `"maximum_observed_tokens": 2`, and `soma/life/src/morphological_language/ecology.rs:1738` halts on that field, so the strongest emission evidence in the tree is **two tokens deep**. What remains open from the original row: the silent skip at `ecology.rs:1572`, the conduct reading zeroed on the complete path, and the two red gates. |
 | 4 · one expansion law | untouched by the run; `generate_currents` already rode `expand_front` before it — the `token_invariance` migration, the interchange certificate, and the two stale comments remain. |
 | 5 · cut classifier | untouched. |
 | 6 · mathematics depth line | untouched. | The

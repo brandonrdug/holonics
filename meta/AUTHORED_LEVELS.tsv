@@ -10,7 +10,6 @@
 #
 # Regenerate: python3 tools/authored_levels.py --write
 # Verify:     python3 tools/authored_levels.py --check
-disposition	owner	name	value	why
 MATERIAL	crates/holonic-engine/src/arithmetic_monodromy.rs	LEAST_DEGREE_WITH_A_DISCRIMINANT	2	THEOREM: disc(f) = (-1)^(n(n-1)/2) Res(f,f')/a_n requires deg f' >= 1, hence n >= 2. Stated independently by rational_polynomial::integer_discriminant, which refuses degree < 2.
 ABI	crates/holonic-engine/src/conditioned_derivation.rs	AT_END_RECEIVER	0	an index or identity element, not a level
 APERTURE	crates/holonic-engine/src/conditioned_derivation.rs	COMMITTING_RECURRENCE	2	Two occurrences before a route commits. Declared, and the withheld routes are RETURNED as lineage rather than discarded. To derive: the recurrence a receiver requires is that receiver\u2019s declaration, and belongs with it.
@@ -42,6 +41,7 @@ APERTURE	crates/holonic-engine/src/matroid_chow.rs	RANK_APERTURE	4	As GROUND_APE
 MATERIAL	crates/holonic-engine/src/quintic_chart.rs	SOLVABLE_SYMMETRIC_DEGREE	4	THEOREM: Abel-Ruffini. S_n is solvable exactly for n <= 4; A_5 is simple and non-abelian. The one number in this organ that does not move with the degree, and lifting the degree pin is what made it visible.
 APERTURE	crates/holonic-engine/src/surprisal.rs	LOG_SERIES_TERMS	64	A truncation of an exact series with a RETAINED remainder certificate. `exact_value.rs::SeriesTailCertificate` is the carrier and the remainder is an exact rational interval, so the outside IS returned. To derive: the terms needed follow from the requested enclosure width, which the caller should declare.
 MATERIAL	crates/holonic-structure/src/keyed_atlas.rs	MAXIMUM_AVL_DEPTH	128	An AVL tree over a `usize`-indexed population has depth < 1.4405\u00b7log2(n+2); 128 exceeds any population addressable on a 64-bit carrier. Theorem, not a budget.
+disposition	owner	name	value	why
 ABI	soma/abi/src/contact.rs	COMMAND	0	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
 ABI	soma/abi/src/contact.rs	COMMAND_FORM	1	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
 ABI	soma/abi/src/contact.rs	COMMAND_STOP	2	wire-format discriminant or event tag at the declared foreign boundary; `soma/abi` IS the ABI
@@ -349,7 +349,7 @@ ABI	soma/body/src/register.rs	MODE_FOUND	4	mode or lineage discriminant; a tag, 
 ABI	soma/body/src/register.rs	MODE_RANK	2	mode or lineage discriminant; a tag, not a level
 APERTURE	soma/life/src/agentic_language.rs	CODEC_MINIMUM_RECURRENCE	2	Two DISTINCT occurrences before a route commits; withheld routes are RETAINED as lineage rather than discarded, so the outside is returned. Driven with its orbit at agentic_language/tests.rs (the first correction changes no conduct, the second does). To derive: the recurrence a receiver requires is that receiver's declaration and belongs on the receiver, not on this caller -- TrainingEcology::new already accepts it as an argument.
 APERTURE	soma/life/src/agentic_language.rs	CODEC_TEMPLATE_APERTURE	4096	The template population one codec continuation is willing to hold. Declared by this caller and passed to TrainingEcology::new, which accepts any positive value. To derive: it follows from the caller's memory declaration, which should be supplied rather than assumed -- the same excision GROUND_APERTURE and the Chow-ring bound carry.
-APERTURE	soma/life/src/relational_language/codec.rs	SEAM_CLOSURE_HORIZON	8	The chronology a standing factor must cross the co-present seam closure within. Declared, and it RETURNS ITS OUTSIDE: every deferred factor is retained by name with its arriving width, its offered arms, and its exact service rounds. Its orbit is exhibited — horizons 4/8/32 defer 45/41/32 factors and leave the returned answer structurally identical, so it moves what is retained and never what is returned. To derive: the material's own service-round distribution across a drain, which nothing yet reads.
+APERTURE	soma/life/src/bin/eros.rs	CHAIN_EXHIBIT	16	a PRESENTATION aperture on the terminal, not on the deed: the whole walked population is carried and counted, and the line above the exhibit says how many were not printed. What would derive it from the material: nothing does — it is a property of a terminal, and the honest excision is to return the population and let the caller decide what to render, which is the shape `the_production_is_read` already uses.
 ABI	soma/life/src/current_world.rs	ORGAN_PRESENT_WORD	2	compact-form layout offset; a wire position, not a level
 ABI	soma/life/src/decomposing_codec.rs	CLOSES_RECEIVER	256	compact-form layout offset; a wire position, not a level
 ABI	soma/life/src/dialogue_lineage.rs	ASSISTANT_COMMENTARY_RECEIVER	20000001	receiver identity token -- an address in a declared numbering, not a level
@@ -359,6 +359,7 @@ ABI	soma/life/src/dialogue_lineage.rs	USER_RECEIVER	20000000	receiver identity t
 ABI	soma/life/src/laboratory_language/repository.rs	CODE_RECEIVER_BASE	1000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/laboratory_language/repository.rs	THEORY_RECEIVER_BASE	10000	receiver identity token -- an address in a declared numbering, not a level
 MATERIAL	soma/life/src/relational_language.rs	RELATIONAL_SWING_OCCURRENCE_SPAN	2	THEOREM-shaped: one Resonance occurrence occupies an antecedent order and its next consequent order, so its span is the arity of the relation and is 2 by definition of the pair. It does not vary with material, capacity, or receiver.
+APERTURE	soma/life/src/relational_language/codec.rs	SEAM_CLOSURE_HORIZON	8	The chronology a standing factor must cross the co-present seam closure within. Declared, and it RETURNS ITS OUTSIDE: every deferred factor is retained by name with its arriving width, its offered arms, and its exact service rounds. Its orbit is exhibited — horizons 4/8/32 defer 45/41/32 factors and leave the returned answer structurally identical, so it moves what is retained and never what is returned. To derive: the material's own service-round distribution across a drain, which nothing yet reads.
 ABI	soma/life/src/research_intelligence.rs	CODE_RECEIVER_BASE	31000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/research_intelligence.rs	MATHEMATICS_RECEIVER	30000000	receiver identity token -- an address in a declared numbering, not a level
 ABI	soma/life/src/resonance_ecology.rs	CAPACITY_ATOM	1	receiver identity token -- an address in a declared numbering, not a level

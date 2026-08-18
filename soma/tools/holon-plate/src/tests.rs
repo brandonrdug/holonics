@@ -603,7 +603,7 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
     assert_eq!(
         held,
         &[
-            "HTEC/1".to_owned(),
+            "HTEC/2".to_owned(),
             "ERST/2".to_owned(),
             "RBIN/1".to_owned(),
             "CDER/1".to_owned()
@@ -611,7 +611,7 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
     );
     let rendered = refusal.to_string();
     assert!(rendered.contains("ZZZZ/1"), "{rendered}");
-    assert!(rendered.contains("HTEC/1"), "{rendered}");
+    assert!(rendered.contains("HTEC/2"), "{rendered}");
     assert!(rendered.contains("not resumed by guessing"), "{rendered}");
 }
 
@@ -636,9 +636,9 @@ fn the_held_versions_are_taken_from_the_codecs_they_hold() {
         CURRENT_SCHEMA_VERSION,
         soma_membrane::LIVE_CURRENT_REST_LAYOUT_VERSION
     );
-    // HTEC's codec writes b"HTEC\0\0\0\x01"; the schema version is that trailing octet.
+    // HTEC's codec writes b"HTEC\0\0\0\x02"; the schema version is that trailing octet.
     let form = training_form();
-    assert_eq!(&form[0..8], b"HTEC\0\0\0\x01".as_slice());
+    assert_eq!(&form[0..8], b"HTEC\0\0\0\x02".as_slice());
     assert_eq!(TRAINING_SCHEMA_VERSION, u32::from(form[7]));
 
     // RBIN's codec writes its magic and then its own layout version as a little-endian u32.

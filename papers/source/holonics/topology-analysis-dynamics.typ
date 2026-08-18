@@ -884,12 +884,15 @@
       emits with $ket(phi)$, in that order.
     ],
     transformations: [
-      A declared receiver family is complete exactly when it resolves the
-      identity, $sum_i ketbra(a_i, a_i)=I$; when the sum is a proper projection
-      $P$, the defect $I-P$ is what the family cannot see, so H.0012's
-      non-reconstruction is the statement $sum_i ketbra(a_i, a_i) != I$ written in
-      this notation. A POVM is a complete family whose faces are quotients
-      $p(i)=braket(psi, E_i, psi)$.
+      A declared receiver family *orthonormal in a declared metric $G$* is
+      complete exactly when it resolves the identity, $sum_i ketbra(a_i, a_i)=I$;
+      when the sum is a proper projection $P$, the defect $I-P$ is what the family
+      cannot see, so H.0012's non-reconstruction is the statement
+      $sum_i ketbra(a_i, a_i) != I$ written in this notation. *The orthonormality
+      is load-bearing*: without it the sum is the frame operator, positive and
+      invertible but neither a projection nor $I$, and reconstruction runs through
+      the dual frame $S^(-1) ket(a_i)$. A POVM is a complete family whose faces are
+      quotients $p(i)=braket(psi, E_i, psi)$.
     ],
     boundary: [
       The symmetric form $chevron.l psi,phi chevron.r$ computes the same number
