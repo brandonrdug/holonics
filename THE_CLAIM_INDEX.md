@@ -125,7 +125,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (129 deposits of 421)
+## 4 · The 2026-08 record line (132 deposits of 424)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -255,6 +255,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-17_THE_QUOTIENT_HAS_TWO_PARTS_AND_THE_EMISSION_HEAD_KEEPS_ONE.md` | The quotient has two parts and the emission head keeps one |
 | `2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md` | The work is counted, the prediction is refuted where it is wrong, and the hand was inverted |
 | `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
+| `2026-08-18_A_LICENSED_WALK_EMITS_SUBSTRINGS_AND_THE_ARC_IS_THE_COMPOSITION_OPERATOR.md` | A licensed walk emits substrings, and the arc is the composition operator |
 | `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
 | `2026-08-18_THE_ATLAS_IS_A_NAVMESH_AND_THE_TRANSITION_TO_A_TENSOR_SPLITS_INTO_A_FREE_TREE_AND_A_CYCLE_RANK.md` | The atlas is a navmesh, and the transition to a tensor splits into a free tree and a cycle rank |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
@@ -262,6 +263,8 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
 | `2026-08-18_THE_HANKEL_RANK_DOES_NOT_SATURATE_SO_THE_COMPRESSION_IS_SPARSITY_AND_IT_IS_EXACT.md` | The Hankel rank does not saturate, so the compression is sparsity — and it is exact |
 | `2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md` | The model and the production met, and the answer is a block, not a pick |
+| `2026-08-18_THE_MONOID_IS_APERIODIC_BY_CONSTRUCTION_SO_THE_CRYSTAL_NEEDS_THE_TURN.md` | The monoid is aperiodic by construction, so the crystal needs the turn |
+| `2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md` | The ratio crossed, the container produces, and all 168 Gemma circuits are full rank |
 
 ---
 
