@@ -31,16 +31,21 @@ const PRIMES: [i128; 2] = [2_147_483_647, 2_147_483_629];
 
 /// The circuits read, each as `(name, rows, columns, head width)`. A head width of zero means the
 /// whole block is one circuit.
-fn circuits() -> Vec<(&'static str, usize)> {
-    vec![
-        ("model.language_model.layers.0.self_attn.q_proj.weight", 256),
-        ("model.language_model.layers.0.self_attn.k_proj.weight", 256),
-        ("model.language_model.layers.0.self_attn.v_proj.weight", 256),
-        ("model.language_model.layers.0.per_layer_input_gate.weight", 0),
-        ("model.language_model.layers.20.self_attn.q_proj.weight", 256),
-        ("model.language_model.layers.20.per_layer_input_gate.weight", 0),
-        ("model.language_model.layers.41.self_attn.q_proj.weight", 256),
-    ]
+fn circuits() -> Vec<(String, usize)> {
+    let mut held = Vec::new();
+    for layer in 0..42 {
+        for circuit in ["q_proj", "k_proj", "v_proj"] {
+            held.push((
+                format!("model.language_model.layers.{layer}.self_attn.{circuit}.weight"),
+                256,
+            ));
+        }
+        held.push((
+            format!("model.language_model.layers.{layer}.per_layer_input_gate.weight"),
+            256,
+        ));
+    }
+    held
 }
 
 fn main() {
@@ -108,8 +113,9 @@ fn run() -> Result<(), String> {
         "circuit", "shape", "rank", "deficit", "frames"
     );
 
-    let mut totals: BTreeMap<&str, (usize, usize)> = BTreeMap::new();
+    let mut totals: BTreeMap<String, (usize, usize)> = BTreeMap::new();
     for (name, head) in circuits() {
+        let name = name.as_str();
         let entry = header.entry(name)?;
         let rows_declared = entry.shape[0];
         let width = entry.shape[1];
@@ -151,21 +157,29 @@ fn run() -> Result<(), String> {
             bound - rank,
             if agree { "agree" } else { "DISAGREE" }
         );
-        totals.insert(name, (rank, bound));
+        totals.insert(name.to_owned(), (rank, bound));
     }
 
     println!();
     println!("THE READING");
-    let full: Vec<&str> = totals
+    let full: Vec<&String> = totals
         .iter()
         .filter(|(_, (rank, bound))| rank == bound)
-        .map(|(name, _)| *name)
+        .map(|(name, _)| name)
+        .collect();
+    let deficient: Vec<(&String, usize)> = totals
+        .iter()
+        .filter(|(_, (rank, bound))| rank != bound)
+        .map(|(name, (rank, bound))| (name, bound - rank))
         .collect();
     println!(
         "  {} of {} circuits are FULL RANK for their own shape.",
         full.len(),
         totals.len()
     );
+    for (name, deficit) in &deficient {
+        println!("  DEFICIT {deficit:>4}  {}", name.trim_start_matches("model.language_model."));
+    }
     println!("  A full-rank circuit carries every dimension it declares: there is no free");
     println!("  low-rank factorisation of it, and shrinking its shape WOULD lose something exact.");
     println!("  A rank-deficient one carries less than it declares, and the deficit is dimension");
