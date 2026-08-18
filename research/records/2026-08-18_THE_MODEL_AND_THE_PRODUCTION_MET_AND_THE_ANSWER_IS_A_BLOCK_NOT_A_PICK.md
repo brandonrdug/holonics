@@ -152,10 +152,81 @@ The gap it exposes is real and stated as one: the sealed body carries every pass
 so the inherited surfaces **are** in the octets and no reader returns them. Until one does, the far
 side reads with three faces where the near side read with four.
 
-## 8. What this does not establish
+## 8. The return edge, closed the same day
 
-- **The resumed body was not changed and did not re-seal.** This is resume-and-produce, not yet
-  condition-again-and-deposit. The return edge through the seal remains open.
+Section 8 of the first form of this record read *"the resumed body was not changed and did not
+re-seal… the return edge through the seal remains open."* It is closed and the paragraph is
+withdrawn.
+
+**What was missing was an operation, not a faculty.** `CausalLanguageEcology` carried **no `&mut
+self` method at all** — measured — and `ExactSuffixEcology`'s only construction was `condition`,
+which builds from paths and returns an immutable body. So a resumed body could produce and could not
+be changed by anything.
+
+**A suffix automaton is natively online**; what made the body immutable is that conditioning
+**finalises destructively**. Both finalisations invert exactly:
+
+- the multiplicity fold satisfies `final(s) = direct(s) + Σ final(c)` over suffix-link children, so
+  `direct(s) = final(s) − Σ final(c)` read from a copy of the final values — order-free;
+- the frozen transition atlas thaws by iterating each state's span back into the builder's shape.
+
+**Two falsifiers were written first and both bit**, and they found one defect: `condition` carries
+`last` forward across paths — it builds **one** automaton over the concatenation `A #0 B #1 …` with a
+unique separator per path — while the first absorb restarted at the root. That lost one germ
+transition (11 against 12) and produced a body that would not re-seal. `last` is recoverable with no
+wire change: it is the **unique state of greatest `maximum_length`**, since every clone created
+during construction is strictly shorter.
+
+**Absorb is order-dependent and that is the correct reading.** `condition` sorts its paths, so its
+numbering is canonical; an absorb appends and takes a fresh boundary. The bodies are not required to
+be equal and the boundary indices genuinely differ. What must agree is the **material**, and it does:
+germ transitions equal, every probed emanation equal in matched length and branch population. A body
+that absorbed `A` then `B` having a lineage is chronology being real, not a defect to canonicalise.
+
+**The route side needed its sections retained.** A receptor's rest is founded from its own complete
+section population, and conditioning consumed those sections. Without them a new passage could be
+given its own suffix ecology, folded into the global one, and still **never be recruited**. They are
+now retained and sealed — the codec moved `1 → 2`, so a form written under the old version refuses at
+the mount rather than resuming a body that would silently be unable to take material.
+
+### And a later current rides it
+
+The resumed process generated, absorbed **its own production** as a passage, and re-sealed:
+
+```
+absorbed     4,303 octets of its own emission
+passages     4 -> 5
+occurrences  19,970 -> 20,969
+receptors    2,305 -> 2,305
+re-sealed    21,159,943 -> 22,800,406 octets
+a repeated passage identity REFUSED, as it must
+```
+
+Then **two further processes**, each given one rest path and nothing else — no corpus, no prompt list
+beyond the declared one, no knowledge of which body it held — were asked the same prompt under the
+same law:
+
+| | emissions | distinct surfaces | response blocks | collapsed pairs |
+|---|---|---|---|---|
+| **before the return** | 501 | 501 | **10** | 3,503 |
+| **after the return** | 506 | 506 | **14** | 2,396 |
+
+**Five surfaces exist that did not exist before, and the quotient divides into fourteen blocks where
+it divided into ten.** The collapsed population *fell*, which is the right direction and not a
+convenience: absorbed material gives the declared receiver family more to tell candidates apart with,
+so fewer pairs collapse.
+
+**One reading did not move and is reported rather than smoothed:** the distinct `(token, matched
+horizon)` population is **405 on both sides**. What the absorb moved is the emitted population and
+the partition, not the depth at which any token is attested. An absorb of material made entirely of
+the corpus's own tokens adds occurrences, not new nesting — so this is the expected shape, and a run
+that claimed the horizons had deepened would have been claiming more than happened.
+
+## 9. What this still does not establish
+
+- **The absorbed material is the body's own emission, which is made of corpus tokens.** Nothing
+  novel entered, so this measures that the loop closes and carries a change — not that the machine
+  learned anything it did not already hold.
 - **The declared aperture is 2 generated tokens**, because the front branches super-exponentially.
   That bound is a receiver parameter and never the law, and the front-termination question is open.
 - **The tokenizer is `lexical_tokens`**, which splits on whitespace, so `"( 1"` and `"** The"` are
@@ -166,7 +237,7 @@ side reads with three faces where the near side read with four.
   in this material; a different declared family is a different reading, and the family is carried on
   the returned division so a block count can never be quoted without it.
 
-## 9. Falsifiers
+## 10. Falsifiers
 
 - Sealing and mounting must return identical populations; a disagreement refuses at the mount, and
   the counters are re-taken from the mounted bodies rather than trusted from the wire.

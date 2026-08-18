@@ -90,6 +90,23 @@ impl CausalLanguageRouteRestImage {
         self.receivers.len()
     }
 
+    /// Replace the rested images of exactly the receptors a later absorb re-founded.
+    ///
+    /// A receptor's rest is founded from **its own** complete section population and from nothing
+    /// else, so re-founding one receptor and leaving every other standing is exact rather than an
+    /// approximation of re-founding the corpus.
+    pub(crate) fn merge(
+        &mut self,
+        refounded: CausalLanguageRouteRestImage,
+    ) -> Result<(), CausalLanguageError> {
+        for (feature, rest) in refounded.receivers.into_iter() {
+            self.receivers
+                .try_insert(feature, rest)
+                .map_err(|_| CausalLanguageError::CarrierExtent)?;
+        }
+        Ok(())
+    }
+
     pub fn encode_native_bytes(&self) -> Result<Vec<u8>, CausalLanguageError> {
         let count =
             u64::try_from(self.receivers.len()).map_err(|_| CausalLanguageError::CarrierExtent)?;
@@ -209,8 +226,13 @@ impl CausalLanguageRouteRestImage {
 /// This form's prefix and its layout version, read out of the prefix rather than restated. The
 /// trailing octet is the version: a codec that moves must move this, so a stale form refuses at the
 /// mount instead of being read under a layout it was not written in.
-pub const CAUSAL_LANGUAGE_REST_PREFIX: [u8; 8] = *b"CLNG\0\0\0\x01";
-/// The codec's own layout version — the `\x01` above.
+pub const CAUSAL_LANGUAGE_REST_PREFIX: [u8; 8] = *b"CLNG\0\0\0\x02";
+/// The codec's own layout version — the `\x02` above.
+///
+/// **Moved `1 -> 2` on 2026-08-18** when the retained route sections joined the seal, so that a
+/// resumed body can [`CausalLanguageEcology::absorb`] rather than only produce. A form written under
+/// version 1 carries no sections and refuses at the mount instead of resuming a body that would
+/// silently be unable to take material.
 pub const CAUSAL_LANGUAGE_REST_VERSION: u32 = CAUSAL_LANGUAGE_REST_PREFIX[7] as u32;
 
 /// Write a length-prefixed block. **Length-prefixed, never delimited** — a delimiter would make an
@@ -524,6 +546,16 @@ impl Default for CausalLanguageGenerationSpec {
 pub struct CausalLanguageEcology {
     route_rest: CausalLanguageRouteRestImage,
     route_sections: BTreeMap<ReceiverFiberIdentity, BTreeSet<ReceiverFiberIdentity>>,
+    /// **The route sections that founded the rest, retained rather than consumed.**
+    ///
+    /// Conditioning built these, handed them to `condition_route_receivers`, and dropped them. That
+    /// made recruitment un-extendable: a later passage could be given its own suffix ecology and
+    /// folded into the global one, and it could still never be **recruited**, because a receptor's
+    /// rested resonance is founded from its complete section population and the old sections were
+    /// gone. Retaining them is what makes [`Self::absorb`] able to re-found only the receptors the
+    /// new material touched, exactly, rather than re-founding the corpus or leaving the new passage
+    /// unreachable.
+    route_material: BTreeMap<ReceiverFiberIdentity, Vec<RouteTrainingSection>>,
     passages: BTreeMap<ReceiverFiberIdentity, PassageStanding>,
     global_suffix: ExactSuffixEcology,
     passage_population: usize,
@@ -619,6 +651,7 @@ impl CausalLanguageEcology {
                 route_relations
             );
         }
+        let route_material = route_groups.clone();
         let (route_rest, route_sections, conditioning_events) =
             condition_route_receivers(route_groups, action, worker_threads)?;
         if trace {
@@ -632,6 +665,7 @@ impl CausalLanguageEcology {
         Ok(Self {
             route_rest,
             route_sections,
+            route_material,
             passages: standing,
             global_suffix,
             passage_population: passages.len(),
@@ -666,6 +700,107 @@ impl CausalLanguageEcology {
         &self.route_rest
     }
 
+    /// ★ **ABSORB ONE FURTHER PASSAGE — the return edge.**
+    ///
+    /// Measured 2026-08-18 before this existed: this type carried **no `&mut self` method at all**,
+    /// and `condition` is an associated function that builds from scratch. So a resumed body could
+    /// produce and could not be changed — not by its own production, not by anything handed to it.
+    /// A machine that seals and resumes but cannot absorb is a recording, not an instance.
+    ///
+    /// **This is not a second conditioning law.** It is the same law applied to standing material:
+    ///
+    /// - the passage founds its own [`ExactSuffixEcology`] exactly as `condition` founds one;
+    /// - the global suffix **absorbs** the new path, which the automaton supports natively because
+    ///   it is an online structure — see `ExactSuffixEcology::absorb`;
+    /// - the new passage's route features are merged into the retained section population, and
+    ///   **only the receptors that population changed are re-founded**, because a receptor's rest
+    ///   is founded from its own sections and from nothing else.
+    ///
+    /// **A repeated passage identity refuses**, exactly as it refuses in `condition`. Absorbing the
+    /// same material twice is a different claim from absorbing it once, and this organ will not
+    /// silently make them the same body.
+    ///
+    /// **The cost is stated rather than hidden**: re-founding is proportional to the sections of the
+    /// touched receptors, not to the corpus — but a passage sharing route features with everything
+    /// touches everything, so the worst case is a full re-founding of the route side. The suffix
+    /// side is genuinely incremental.
+    pub fn absorb(
+        &mut self,
+        passage: &CausalLanguagePassage,
+        action: ActionCurrent,
+        worker_threads: usize,
+    ) -> Result<(), CausalLanguageError> {
+        let source = source_fiber(passage)?;
+        if self.passages.contains_key(&source) {
+            return Err(CausalLanguageError::DuplicatePassage(
+                passage.identity.clone(),
+            ));
+        }
+        let tokens = lexical_tokens(&passage.text);
+        if tokens.is_empty() {
+            return Err(CausalLanguageError::EmptyPassage(passage.identity.clone()));
+        }
+        let path = token_germs(&tokens)?;
+
+        // The passage's own standing, founded exactly as conditioning founds one.
+        let suffix = ExactSuffixEcology::condition(std::slice::from_ref(&path))?;
+
+        // The global suffix takes the new path without reopening any other material.
+        self.global_suffix.absorb(&path)?;
+
+        // The route side: merge the sections, re-found only the receptors they touched.
+        let features = route_features(&tokens);
+        let added_relations = features.len();
+        let source_order =
+            u64::try_from(self.passage_population).map_err(|_| CausalLanguageError::CarrierExtent)?;
+        let mut touched: BTreeMap<ReceiverFiberIdentity, Vec<RouteTrainingSection>> =
+            BTreeMap::new();
+        for feature in features {
+            let feature_identity = route_feature_fiber(&feature);
+            let sections = self.route_material.entry(feature_identity.clone()).or_default();
+            sections.push(RouteTrainingSection {
+                source_order,
+                source: source.clone(),
+            });
+            touched.insert(feature_identity, sections.clone());
+        }
+        if !touched.is_empty() {
+            let (refounded, sections, events) =
+                condition_route_receivers(touched, action, worker_threads)?;
+            self.route_rest.merge(refounded)?;
+            for (receptor, targets) in sections {
+                self.route_sections.insert(receptor, targets);
+            }
+            self.conditioning_events = self
+                .conditioning_events
+                .checked_add(events)
+                .ok_or(CausalLanguageError::CarrierExtent)?;
+        }
+
+        self.passages.insert(
+            source,
+            PassageStanding {
+                identity: passage.identity.clone(),
+                receiver: passage.receiver,
+                suffix,
+            },
+        );
+        self.passage_population = self
+            .passage_population
+            .checked_add(1)
+            .ok_or(CausalLanguageError::CarrierExtent)?;
+        self.lexical_occurrences = self
+            .lexical_occurrences
+            .checked_add(tokens.len())
+            .ok_or(CausalLanguageError::CarrierExtent)?;
+        self.route_relations = self
+            .route_relations
+            .checked_add(added_relations)
+            .ok_or(CausalLanguageError::CarrierExtent)?;
+        self.route_occurrences = self.route_relations;
+        Ok(())
+    }
+
     /// ★ **SEAL THE WHOLE CONDITIONED BODY TO OCTETS.**
     ///
     /// The route rest was sealable since this module was written and the whole ecology was not, so
@@ -696,6 +831,16 @@ impl CausalLanguageEcology {
             put_count(&mut octets, section.len())?;
             for member in section {
                 put_identity(&mut octets, member)?;
+            }
+        }
+
+        put_count(&mut octets, self.route_material.len())?;
+        for (feature, sections) in &self.route_material {
+            put_identity(&mut octets, feature)?;
+            put_count(&mut octets, sections.len())?;
+            for section in sections {
+                octets.extend_from_slice(&section.source_order.to_le_bytes());
+                put_identity(&mut octets, &section.source)?;
             }
         }
 
@@ -755,6 +900,26 @@ impl CausalLanguageEcology {
             }
         }
 
+        let material_rows = cursor.count()?;
+        let mut route_material: BTreeMap<ReceiverFiberIdentity, Vec<RouteTrainingSection>> =
+            BTreeMap::new();
+        for _ in 0..material_rows {
+            let feature = cursor.identity()?;
+            let sections = cursor.count()?;
+            let mut carried = Vec::with_capacity(sections.min(1 << 16));
+            for _ in 0..sections {
+                let source_order = cursor.u64()?;
+                let source = cursor.identity()?;
+                carried.push(RouteTrainingSection {
+                    source_order,
+                    source,
+                });
+            }
+            if route_material.insert(feature, carried).is_some() {
+                return Err(CausalLanguageError::MalformedFiber);
+            }
+        }
+
         let passage_rows = cursor.count()?;
         let mut passages = BTreeMap::new();
         for _ in 0..passage_rows {
@@ -800,6 +965,7 @@ impl CausalLanguageEcology {
         Ok(Self {
             route_rest,
             route_sections,
+            route_material,
             passages,
             global_suffix,
             passage_population,
@@ -1471,7 +1637,7 @@ impl CausalLanguageEcology {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct RouteTrainingSection {
     pub(crate) source_order: u64,
     pub(crate) source: ReceiverFiberIdentity,

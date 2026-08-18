@@ -269,14 +269,14 @@ outside `tools/` that names the verifier — not declared.
 |---|---|---|
 | `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 11 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
-| `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 1 more |
-| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 2 more |
+| `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, and 3 more |
+| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MACHINE.md`, and 5 more |
+| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `CONTEXT_HANDOFF.md`, and 7 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
-| `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `canon/THE_DRIVER_ATLAS.md` |
+| `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `canon/THE_DRIVER_ATLAS.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, and 1 more |
 | `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
 | `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 12 more |
 

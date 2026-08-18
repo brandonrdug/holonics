@@ -79,11 +79,15 @@ const MATERIAL: &[(&str, u64)] = &[
 /// built from words the material does not carry, which must emit nothing rather than fabricate.
 const PROMPTS: &[&str] = &["the receiver", "a compression is"];
 const CONTROL_PROMPT: &str = "zzqx wubblefrump gorptangle";
+/// The prompt the two riding processes are both asked. Declared once so the only difference between
+/// them is the body they mounted.
+const RIDE_PROMPT: &str = "the receiver";
 
 fn main() {
     let arguments: Vec<String> = std::env::args().collect();
     let outcome = match arguments.get(1).map(String::as_str) {
         Some("--resume") => resume(arguments.get(2).map(PathBuf::from)),
+        Some("--ride") => ride(arguments.get(2).map(PathBuf::from)),
         _ => seal_and_dispatch(),
     };
     if let Err(reason) = outcome {
@@ -394,6 +398,59 @@ fn seal_and_dispatch() -> Result<(), String> {
     Ok(())
 }
 
+/// Mount one rest and produce. **This process is given a path and nothing else** — no corpus, no
+/// prompt list beyond the declared one, no knowledge of which of the two bodies it holds.
+fn ride(path: Option<PathBuf>) -> Result<(), String> {
+    let path = path.ok_or("the riding process was given no rest path")?;
+    let octets = std::fs::read(&path).map_err(|error| format!("{}: {error}", path.display()))?;
+    let rest = ErosRest::from_native_bytes(&octets)
+        .map_err(|error| format!("the rest would not mount: {error:?}"))?;
+    let organ = rest
+        .organs()
+        .iter()
+        .find(|organ| organ.organ == LANGUAGE_ORGAN)
+        .ok_or_else(|| format!("the rest carries no organ named {LANGUAGE_ORGAN:?}"))?;
+    let ecology = CausalLanguageEcology::from_native_bytes(&organ.bytes)
+        .map_err(|error| format!("the language body would not mount: {error:?}"))?;
+    println!(
+        "    mounted   {} passages, {} occurrences, {} receptors",
+        ecology.passage_population(),
+        ecology.lexical_occurrence_population(),
+        ecology.route_receptor_population()
+    );
+    let generation = ecology
+        .generate(RIDE_PROMPT, spec(), current()?, 8)
+        .map_err(|error| format!("generation refused: {error:?}"))?;
+    let blind = PresentationMaterial::default();
+    let division = divide_junction(
+        &presented(&generation),
+        &blind,
+        &PresentationReceiver::COLLAPSING,
+    )
+    .map_err(|error| format!("the junction would not divide: {error:?}"))?;
+    let surfaces = surfaces(&generation);
+    // The horizon profile is what an absorbed occurrence moves even when no new surface appears:
+    // the same continuation attested at a deeper nested receiver is a different reading.
+    let mut horizons: BTreeSet<(String, u32)> = BTreeSet::new();
+    for text in &generation.outputs {
+        for token in &text.tokens {
+            horizons.insert((token.token.clone(), token.matched_horizon));
+        }
+    }
+    println!("    produced  {} emissions, {} distinct surfaces", generation.outputs.len(), surfaces.len());
+    println!("    divided   {} response blocks", division.conduct_blocks);
+    println!("    collapsed {} pairs", division.collapsed_population);
+    println!("    horizons  {} distinct (token, matched horizon) readings", horizons.len());
+    println!(
+        "    ATTEST    surfaces={} blocks={} collapsed={} horizons={}",
+        surfaces.len(),
+        division.conduct_blocks,
+        division.collapsed_population,
+        horizons.len()
+    );
+    Ok(())
+}
+
 fn resume(path: Option<PathBuf>) -> Result<(), String> {
     let path = path.ok_or("the resuming process was given no rest path")?;
     let octets = std::fs::read(&path).map_err(|error| format!("{}: {error}", path.display()))?;
@@ -404,7 +461,7 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
         .iter()
         .find(|organ| organ.organ == LANGUAGE_ORGAN)
         .ok_or_else(|| format!("the rest carries no organ named {LANGUAGE_ORGAN:?}"))?;
-    let ecology = CausalLanguageEcology::from_native_bytes(&organ.bytes)
+    let mut ecology = CausalLanguageEcology::from_native_bytes(&organ.bytes)
         .map_err(|error| format!("the language body would not mount: {error:?}"))?;
     println!("  mounted from octets alone — no corpus was opened by this process");
     println!(
@@ -438,6 +495,98 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
         .map_err(|error| format!("the junction would not divide: {error:?}"))?;
         println!("    (the span receiver is blind here: no corpus in this process)");
         respond(&division);
+    }
+
+    // ---- ★ THE RETURN EDGE: absorb the production, re-seal ----
+    println!("\n  THE RETURN — the body absorbs its OWN production and re-seals");
+    let ridden = ecology
+        .generate(PROMPTS[0], spec(), current()?, 8)
+        .map_err(|error| format!("generation refused: {error:?}"))?;
+    // The material returned is the body's own emission, rendered back as a passage. It is a
+    // GENUINE return only because it crosses the seal below -- a private echo is not a return.
+    let returned: String = ridden
+        .outputs
+        .iter()
+        .map(|text| text.text.as_str())
+        .collect::<Vec<_>>()
+        .join(" ");
+    if returned.trim().is_empty() {
+        return Err("the production was empty, so there is nothing to absorb".to_owned());
+    }
+    let before_passages = ecology.passage_population();
+    let before_occurrences = ecology.lexical_occurrence_population();
+    let before_receptors = ecology.route_receptor_population();
+    let own = CausalLanguagePassage::new("eros/own-production", 99, returned.clone());
+    ecology
+        .absorb(&own, current()?, 8)
+        .map_err(|error| format!("the body would not absorb its own production: {error:?}"))?;
+    println!(
+        "    absorbed {} octets of its own emission",
+        returned.len()
+    );
+    println!(
+        "    passages    {before_passages} -> {}",
+        ecology.passage_population()
+    );
+    println!(
+        "    occurrences {before_occurrences} -> {}",
+        ecology.lexical_occurrence_population()
+    );
+    println!(
+        "    receptors   {before_receptors} -> {}",
+        ecology.route_receptor_population()
+    );
+    if ecology.passage_population() == before_passages {
+        return Err("the absorb moved nothing: the body is frozen".to_owned());
+    }
+    // A repeated identity must refuse. Absorbing the same material twice is a different claim.
+    if ecology.absorb(&own, current()?, 8).is_ok() {
+        return Err("THE CONTROL FAILED: a repeated passage identity absorbed twice".to_owned());
+    }
+    println!("    a repeated passage identity REFUSED, as it must");
+
+    let changed = ecology
+        .encode_native_bytes()
+        .map_err(|error| format!("the changed body would not re-seal: {error:?}"))?;
+    let out = PathBuf::from("output/eros-language-rest");
+    let changed_path = out.join("conditioned-language-after-return.erosrest");
+    let changed_rest = ErosRest::seal(
+        LineageChannel::from_located_first_difference((Cog::lit(3), Cog::lit(1))),
+        Vec::new(),
+        vec![OrganRest {
+            organ: LANGUAGE_ORGAN.to_owned(),
+            bytes: changed,
+        }],
+    )
+    .map_err(|error| format!("the changed whole body would not seal: {error:?}"))?;
+    let octets = changed_rest
+        .encode_native_bytes()
+        .map_err(|error| format!("{error:?}"))?;
+    std::fs::write(&changed_path, &octets)
+        .map_err(|error| format!("{}: {error}", changed_path.display()))?;
+    println!(
+        "    re-sealed   {} octets -> {}",
+        octets.len(),
+        changed_path.display()
+    );
+    println!("    The changed body is on disk. A later process rides it, or nothing rode.");
+
+    println!("\n  ★ DOES A LATER CURRENT RIDE THE CHANGE?");
+    println!("  Two further processes, each given ONE rest path and nothing else: the body as it");
+    println!("  stood before the return, and the body after it. Same prompt, same law. If the two");
+    println!("  productions are identical, the absorb changed nothing later current rides, and that");
+    println!("  is the finding rather than a thing to hide.\n");
+    let self_path = std::env::current_exe().map_err(|error| format!("current_exe: {error}"))?;
+    for (label, rest) in [("BEFORE the return", &path), ("AFTER the return", &changed_path)] {
+        println!("  --- {label} ---");
+        let status = std::process::Command::new(&self_path)
+            .arg("--ride")
+            .arg(rest)
+            .status()
+            .map_err(|error| format!("could not launch the riding process: {error}"))?;
+        if !status.success() {
+            return Err(format!("the riding process refused for {label}"));
+        }
     }
 
     println!("\n  THE ABSENT-MORPHOLOGY CONTROL");

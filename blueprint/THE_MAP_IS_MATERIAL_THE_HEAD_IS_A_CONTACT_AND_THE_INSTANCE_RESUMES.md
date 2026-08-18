@@ -58,7 +58,7 @@ documentation repairs rather than presented as evidence.
 
 Return:
 [`research/records/2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md`](../research/records/2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md).
-`cargo test --workspace` → **2,432 passed, 0 failed, 19 ignored, 43 result lines.**
+`cargo test --workspace` → **2,434 passed, 0 failed, 19 ignored, 43 result lines.**
 
 **Chain steps 4 and 5 left numpy.** `crates/holonic-engine/src/exact_contact.rs` carries
 `cos² = ⟨a|b⟩²/(⟨a|a⟩⟨b|b⟩)` as an exact pair, never divided, ordered by cross-multiplication through
@@ -89,9 +89,34 @@ morphology control reported a fabrication when the body returned one member carr
 surface; and `wholly_inherited` reported a **blind receiver** as a property of the block across the
 seam, now `Option<bool>` with `None` where the material cannot answer.
 
-**Still open here:** the resumed body is not changed and does not re-seal, so the return edge through
-the seal is untaken; the front never closes, so the aperture is a declared 2 tokens; and
-`founded_mouth` is still bypassed — `grep -c founded_mouth soma/life/src/bin/eros.rs` → 0.
+**AND THE RETURN EDGE CLOSED THE SAME DAY.** `CausalLanguageEcology` carried **no `&mut self` method
+at all**, so a resumed body could produce and could not be changed. `ExactSuffixEcology::absorb`
+thaws the frozen atlas, inverts the multiplicity fold — `direct(s) = final(s) − Σ final(c)`, read
+from a copy so the inversion is order-free — extends, and re-folds. Two falsifiers written first both
+bit and found one defect: conditioning carries `last` forward across paths, building **one**
+automaton over the concatenation, while the first absorb restarted at the root; `last` is recoverable
+with no wire change as the unique state of greatest `maximum_length`. The route sections are now
+retained and sealed (codec `1 → 2`), because a receptor's rest is founded from its own complete
+section population and without them a new passage could never be **recruited**.
+
+The resumed process then absorbed **its own production** — 4,303 octets, passages `4 → 5`,
+occurrences `19,970 → 20,969`, re-sealed at 22,800,406 octets, a repeated identity refusing — and
+**two further processes, each given one rest path and nothing else**, were asked the same prompt:
+
+| | emissions | response blocks | collapsed pairs |
+|---|---|---|---|
+| before the return | 501 | **10** | 3,503 |
+| after the return | 506 | **14** | 2,396 |
+
+**Five surfaces exist that did not before and the quotient divides into fourteen blocks where it
+divided into ten.** The `(token, matched horizon)` population is **405 on both sides** — the absorb
+moved the emitted population and the partition, not the depth of attestation, which is the expected
+shape for material made of the corpus's own tokens and is reported rather than smoothed.
+
+**Still open here:** the front never closes, so the aperture is a declared 2 tokens; `founded_mouth`
+is still bypassed — `grep -c founded_mouth soma/life/src/bin/eros.rs` → 0; and the absorbed material
+is the body's own emission, so the loop is shown to close and carry a change, not to have learned
+anything the body did not already hold.
 
 ---
 

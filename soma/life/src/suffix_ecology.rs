@@ -692,6 +692,162 @@ impl ExactSuffixEcology {
         Ok((ecology, source_catalogue, source_incidence))
     }
 
+    /// ★ **ABSORB ONE FURTHER PATH INTO A STANDING ECOLOGY.**
+    ///
+    /// Measured 2026-08-18: `CausalLanguageEcology` carried **no `&mut self` method at all** and
+    /// this organ's only construction was [`Self::condition`], which builds from paths and returns
+    /// an immutable body. So a resumed body could produce and could not be changed — by its own
+    /// production or by anything handed to it. **That is the missing return edge**, and it is a
+    /// missing operation rather than a missing faculty.
+    ///
+    /// # Why this is possible at all
+    ///
+    /// A suffix automaton is natively an **online** structure: [`SuffixEcologyBuilder::extend`]
+    /// takes one symbol at a time and [`Self::condition`] already drives it that way. What made the
+    /// body immutable is that conditioning **finalises destructively** — the multiplicities are
+    /// folded up the suffix-link tree and the transitions are compacted into a frozen atlas.
+    ///
+    /// Both are exactly reversible and this method reverses them:
+    ///
+    /// - **The fold inverts.** After folding, `final(s) = direct(s) + Σ final(c)` over `s`'s
+    ///   suffix-link children, so `direct(s) = final(s) − Σ final(c)` — computed from a copy of the
+    ///   final values, which makes the inversion order-free rather than dependent on a traversal.
+    /// - **The atlas thaws.** Every state's span is iterated back into a `LocalRelations`, which is
+    ///   the shape the builder holds.
+    ///
+    /// The path is then extended in exactly the way [`Self::condition`] extends one, with a
+    /// **fresh boundary symbol** taken as one past the greatest boundary the body already carries,
+    /// and the fold is retaken.
+    ///
+    /// # This is order-dependent, and that is the correct reading
+    ///
+    /// [`Self::condition`] **sorts** its paths before building, so its state numbering is canonical
+    /// and independent of the order material arrived in. An absorb appends. So
+    /// `condition([A, B])` and `condition([A]).absorb(B)` are not required to be the same body, and
+    /// **the boundary indices genuinely differ**.
+    ///
+    /// What must agree is the **material**: boundary symbols are separators, every emanation walks
+    /// germ transitions only, and `material_transition_count` counts germ transitions only. The
+    /// test `absorbing_a_path_reaches_the_same_material_as_conditioning_on_both` asserts exactly
+    /// that and is this method's falsifier.
+    ///
+    /// A body that absorbed `A` then `B` is a body with a lineage; that it is distinguishable from
+    /// one handed both at once is the chronology being real, not a defect to canonicalise away.
+    pub fn absorb(&mut self, path: &[ResonanceGerm]) -> Result<(), ExactSuffixEcologyError> {
+        if path.is_empty() {
+            return Err(ExactSuffixEcologyError::EmptyPath);
+        }
+
+        // ---- thaw ----
+        let mut builder = SuffixEcologyBuilder {
+            states: Vec::with_capacity(self.states.len() + path.len() * 2 + 2),
+        };
+        let mut greatest_boundary: Option<u64> = None;
+        for state in &self.states {
+            let mut transitions = LocalRelations::new();
+            for (symbol, target) in self.transitions.iter(state.transitions)? {
+                if let SuffixSymbol::Boundary(at) = symbol {
+                    greatest_boundary = Some(greatest_boundary.map_or(*at, |held| held.max(*at)));
+                }
+                transitions.try_insert(symbol.clone(), *target)?;
+            }
+            builder.states.push(SuffixBuilderState {
+                maximum_length: state.maximum_length,
+                suffix: state.suffix,
+                material_end_multiplicity: state.material_end_multiplicity,
+                transitions,
+            });
+        }
+
+        // ---- un-fold the multiplicities ----
+        //
+        // Read from a COPY of the folded values so the subtraction does not consume a value another
+        // state still needs. Order-free by construction.
+        let folded: Vec<u64> = builder
+            .states
+            .iter()
+            .map(|state| state.material_end_multiplicity)
+            .collect();
+        for state in 1..builder.states.len() {
+            if let Some(parent) = builder.states[state].suffix {
+                builder.states[parent].material_end_multiplicity = builder.states[parent]
+                    .material_end_multiplicity
+                    .checked_sub(folded[state])
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+            }
+        }
+
+        // ---- extend from where the body actually stands ----
+        //
+        // **Conditioning does not restart at the root between paths.** It carries `last` forward
+        // across every path, so the body is one automaton over the concatenation
+        // `A #0 B #1 C #2 ...` with a unique separator per path. An absorb that restarted from the
+        // root would build a second, disconnected string — and it did: the first form of this
+        // method lost one germ transition (11 against 12) and produced a body that would not
+        // re-seal. Both falsifiers below caught it.
+        //
+        // The frozen form carries no `last` field, and it does not need one: the state reached by
+        // consuming the whole concatenation is the **unique** state of greatest `maximum_length`.
+        // Every clone created during construction is strictly shorter, so the maximum is attained
+        // once and recovering it needs no wire change.
+        let last_state = builder
+            .states
+            .iter()
+            .enumerate()
+            .max_by_key(|(at, state)| (state.maximum_length, *at))
+            .map(|(at, _)| at)
+            .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+        let boundary = greatest_boundary
+            .map_or(Ok(0), |held| {
+                held.checked_add(1).ok_or(ExactSuffixEcologyError::CarrierExtent)
+            })?;
+        let mut last = last_state;
+        for germ in path {
+            last = builder.extend(last, SuffixSymbol::Germ(GermKey::from_germ(germ)))?;
+            builder.states[last].material_end_multiplicity = builder.states[last]
+                .material_end_multiplicity
+                .checked_add(1)
+                .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
+        }
+        builder.extend(last, SuffixSymbol::Boundary(boundary))?;
+
+        // ---- retake the fold ----
+        let mut descending = (1..builder.states.len()).collect::<Vec<_>>();
+        descending.sort_by_key(|state| {
+            (
+                core::cmp::Reverse(builder.states[*state].maximum_length),
+                core::cmp::Reverse(*state),
+            )
+        });
+        for &state in &descending {
+            let suffix = builder.states[state]
+                .suffix
+                .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+            builder.states[suffix].material_end_multiplicity = builder.states[suffix]
+                .material_end_multiplicity
+                .checked_add(builder.states[state].material_end_multiplicity)
+                .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
+        }
+
+        let material_transitions = builder
+            .states
+            .iter()
+            .map(|state| {
+                state
+                    .transitions
+                    .iter()
+                    .filter(|(symbol, _)| matches!(symbol, SuffixSymbol::Germ(_)))
+                    .count()
+            })
+            .try_fold(0usize, |total, extent| {
+                total
+                    .checked_add(extent)
+                    .ok_or(ExactSuffixEcologyError::CarrierExtent)
+            })?;
+        *self = builder.freeze(material_transitions)?;
+        Ok(())
+    }
+
     pub fn state_count(&self) -> usize {
         self.states.len()
     }
@@ -1629,6 +1785,81 @@ mod tests {
 
     fn source(value: u32) -> ReceiverFiberIdentity {
         ReceiverFiberIdentity::new(0x5352_4345, [value])
+    }
+
+    #[test]
+    fn absorbing_a_path_reaches_the_same_material_as_conditioning_on_both() {
+        // **The falsifier for `absorb`.** Conditioning sorts its paths and numbers its states
+        // canonically; absorbing appends and takes a fresh boundary symbol. The two bodies are
+        // therefore NOT required to be equal, and the boundary indices genuinely differ. What must
+        // agree is the material: germ transitions, and every emanation over them.
+        let first = vec![germ(1), germ(2), germ(3)];
+        let second = vec![germ(4), germ(2), germ(5)];
+
+        let together =
+            ExactSuffixEcology::condition(&[first.clone(), second.clone()]).unwrap();
+        let mut absorbed = ExactSuffixEcology::condition(&[first.clone()]).unwrap();
+        let before_states = absorbed.state_count();
+        let before_transitions = absorbed.material_transition_count();
+        absorbed.absorb(&second).unwrap();
+
+        // The absorb changed the body. A body that absorbed and did not move would be frozen, and
+        // that is the defect the whole-body seal instrument exists to catch.
+        assert!(absorbed.state_count() > before_states);
+        assert!(absorbed.material_transition_count() > before_transitions);
+
+        assert_eq!(
+            absorbed.material_transition_count(),
+            together.material_transition_count(),
+            "the germ transitions must agree; only the separators may differ"
+        );
+
+        // Every emanation over material must agree, including one that reaches nothing.
+        for probe in [
+            vec![germ(1), germ(2)],
+            vec![germ(4), germ(2)],
+            vec![germ(9), germ(2)],
+            vec![germ(2), germ(5)],
+            vec![germ(2), germ(3)],
+            vec![germ(7)],
+        ] {
+            let one = together.emanate(&probe).unwrap();
+            let two = absorbed.emanate(&probe).unwrap();
+            assert_eq!(
+                one.longest_matched_length(),
+                two.longest_matched_length(),
+                "matched length disagreed on {probe:?}"
+            );
+            assert_eq!(
+                one.branches().len(),
+                two.branches().len(),
+                "branch population disagreed on {probe:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn absorbing_refuses_an_empty_path_and_the_absorbed_body_reseals() {
+        let mut ecology = ExactSuffixEcology::condition(&[vec![germ(1), germ(2)]]).unwrap();
+        assert_eq!(ecology.absorb(&[]), Err(ExactSuffixEcologyError::EmptyPath));
+        ecology.absorb(&[germ(3), germ(1)]).unwrap();
+        // A body that absorbed must still seal and mount: the return edge is only closed if the
+        // changed body can cross a seam again.
+        let wire = ecology.encode_native_bytes().unwrap();
+        assert_eq!(
+            ExactSuffixEcology::from_native_bytes(&wire).unwrap(),
+            ecology
+        );
+        // And it must absorb again -- a body that can be changed once and not twice has a
+        // conditioning event, not a continuing standing.
+        let states = ecology.state_count();
+        ecology.absorb(&[germ(2), germ(3), germ(4)]).unwrap();
+        assert!(ecology.state_count() > states);
+        let wire = ecology.encode_native_bytes().unwrap();
+        assert_eq!(
+            ExactSuffixEcology::from_native_bytes(&wire).unwrap(),
+            ecology
+        );
     }
 
     #[test]
