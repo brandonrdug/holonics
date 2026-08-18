@@ -10,7 +10,10 @@ until their artifacts return.
 **Source material:** `/home/b/models/gemma-4-E4B-it/`, with `model.safetensors` as the inherited
 weight occurrence and the sibling configuration, processor, tokenizer, chat-template, and
 generation files as exterior apparatus lineage.
-**Doctrine:** [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md) and the Phoenix master
+**Doctrine:** [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
+[`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
+[`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md),
+[`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md), and the Phoenix master
 blueprint named above.
 **Construction disposition:** this blueprint consumes the unfinished production stations of
 [`THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md)
@@ -125,10 +128,10 @@ n=struct.unpack('<Q',f.read(8))[0]; h=json.loads(f.read(n))"
      11,796,480    0.07%   n=2     modality projections
 ```
 
-`10752 = 42 x 256`, so the per-layer table is a rank-3 object flattened: one 256-wide chart per
-layer per token. **Two tensors are 43.64% of the model and both are vocabulary-indexed.** A
-vocabulary-indexed table is a map from token identity to a construction, which is exactly
-`receiver_exact_compression`'s object; no new owner is owed to collapse it.
+`10752 = 42 x 256`, so the per-layer table admits a rank-3 chart: one 256-wide population per layer
+per vocabulary row. **Two tensors are 43.64% of the model and both are vocabulary-indexed.** That
+indexing alone does not make them a `receiver_exact_compression::ObservedSystem`; they enter that
+owner only after typed successor/intervention receivers have been enacted.
 
 **And `tie_word_embeddings = True` with no `lm_head` tensor** — measured 2026-08-18 by the command
 above, `any('lm_head' in k for k in h)` returns `False`. The output surface is `embed_tokens` read
@@ -149,20 +152,18 @@ Four independent differences: head dimension, rope species, theta, and partial r
 populations are **42 distinct `v_proj` operators, 84 key/value heads, 336 query heads**, in the two
 dimensions above.
 
-**`partial_rotary_factor = 0.25` on a 512-wide head is 128 rotating dimensions and 384 that carry no
-chronology at all.** The global contact therefore splits exactly into a chronological part — a
+**`partial_rotary_factor = 0.25` on a 512-wide head is 128 dimensions rotated by this RoPE chart and
+384 not rotated by it.** The global contact therefore splits exactly into a RoPE-acted part — a
 discrete action by one group element per frequency band, whose exact carrier is the integer
-separation and the band index — and an achronological part which is a plain bilinear form. That
-chart split is handed over by the source and costs nothing to take.
+separation and the band index — and a complement which this positional chart leaves fixed. The
+complement still carries chronology through residual standing and other passages; “no RoPE action”
+is not “no chronology.”
 
-**THE KV-SHARING DECLARATION IS A FREE DAY-ONE INTERVENTION.** `text_config.num_kv_shared_layers`
-is `18` while all `42` layers carry their own `k_proj` and `v_proj` in the payload — measured
-2026-08-18 by the command above, `k_proj` and `v_proj` each return `42`. **The source declares a
-transport identity its tensor population does not express.** Whether those operators are inert
-under the declared runtime is one cheap decisive ablation and it belongs at admission, not at
-dissection. If they are inert that is roughly `94` MB of manifested material carrying no transport —
-a certified condensation the source hands over before any analysis — and if they are not, the
-declared runtime law is not what the config says.
+**THE KV-SHARING FIELD IS REALIZATION TESTIMONY, NOT A REDUNDANCY CERTIFICATE.**
+`text_config.num_kv_shared_layers` is `18` while all `42` layers carry `k_proj` and `v_proj`
+populations. The field describes a source realization/cache policy; it does not state that those
+weights are identical or inert. The exact source implementation must bind the policy to occurrences
+and ports before any ablation is meaningful. No byte condensation follows from this field alone.
 
 **NEITHER MoE NOR MULTI-TOKEN PREDICTION IS EXERCISABLE HERE.** Measured 2026-08-18 by
 `python3 -c "import json;print(json.load(open('/home/b/models/gemma-4-E4B-it/config.json'))['text_config'])"`:
@@ -181,13 +182,12 @@ GGUF the master contract lists, and no mixed-architecture claim may be read out 
   rank 4      2 tensors           76,032 octets    0.000%
 ```
 
-`630 / 2130` is `29.6%` of entries and `99.793%` of octets. **The mouth reads the mass and misses
-the law**: the `557` rank-1 tensors are every RMSNorm gain and every `layer_scalar`, and no layer's
-constitutive passage can be enacted without them; the `928` rank-0 scalars are the audio tower's
-`input_max` / `input_min` / `output_max` / `output_min` clip bounds, which are a stored aperture
-declaration rather than a weight. Rank-count and byte-count are both receiver faces and neither
-answers the question. **The source-coverage ledger therefore carries a third axis — load-bearing for
-the declared transport — and a population is not `unread` in the same sense along all three.**
+`630 / 2130` is `29.6%` of entries and `99.793%` of octets. **The old mouth read the mass and missed
+many small law-bearing candidates**: rank-1 tensors include normalization gains and site scalars;
+rank-0 scalars include the audio tower's clipped-linear bounds. Rank-count and byte-count are both
+receiver faces and neither answers which population is load-bearing. The source ledger therefore
+separates mouth admission, transport excitation, and load-bearing testimony; only an enacted typed
+operator diagram may found the third axis.
 
 ## 2. One owner and one application entry
 
@@ -232,7 +232,11 @@ port, law, or consequence.
 
 | responsibility | standing owner | use in this plan |
 |---|---|---|
-| safetensors and BF16 rank-2 rows | `crates/holonic-engine/src/embedding_fiber.rs::{safetensors,ResidentReadout}` | presently bounded streamed source mouth and exact contact input |
+| computational holon and operation species | `canon/TABLET_THE_OPERATIONS.md`, `research/records/2026-07-19_THE_CONSTITUENT_IS_THE_COMPOSITE_THE_PRODUCT_CANNOT_DISCARD_ITS_PINS.md` | construction / transport / face / quotient over live incidence, words and exterior |
+| operator diagram and ports | `EvolutionShape`, `CategoryPresentation`, `CausalDiagram`, `RealizationWitness` | typed source realization, chronology, branches and interactions |
+| exact linear chart | `exact_linear::ExactRatMatrix`, `causal_traversal::ExactCausalTraversalPassage` | application, serial product, exact work, balance forms and bounded inversion |
+| foreign source manifest and exact binary mouth | `foreign_map` | arbitrary-rank manifestation, independent admission/transport coverage, exact BF16/F32/F64 codewords |
+| BF16 rank-2 contraction surface | `crates/holonic-engine/src/embedding_fiber.rs::{safetensors,ResidentReadout}` | focused rows delegated through the foreign manifest; resident exact contact input |
 | exact IEEE codewords and output rounding | `exact_value::ieee754` | stored dyadic values and certified export residual |
 | contact geometry | `clifford::Arrow`, `exact_contact::ExactContact` | aim, blade, reach, hand, ratio face |
 | softmax/ratio geometry | `exponentiated_ratio::RatioFamily`, `surprisal::SectionModulus` | complete contact cocycle and spread |
@@ -242,6 +246,8 @@ port, law, or consequence.
 | diffusion and sheaf state | `diffusion`, `sheaf_diffusion`, `phase_current` | cross-site/rank transport and SSM projection |
 | composition relation | `crates/holonic-structure/src/relating.rs::Relating` | typed rebase/composition relation |
 | composed chain | `crates/holonic-structure/src/chain.rs::Chain` | composed incidence and returned remainder |
+| parallel/interchange | `interchange::InterchangeCertificate` | certify co-present branches without importing apparatus order |
+| chain morphism and higher coherence | `algebraic::CausalSectionMorphism`, `grown_cell`, `derivation_two_cells` | boundary commutation, filled squares and retained obstruction |
 | behavioral quotient | `receiver_exact_compression::{CollapsedPair,ReceiverExactCompression}`, `soma/life/src/reconstruction_fiber.rs` | taxa, receiver-minimality, shortest separators and retained reopening fibre |
 | exact dimension | `rebase_invariants::smith_normal_form`, `athena::TreeChart` | rank, invariant factors, lattice/state dimensions |
 | cultivation | `holonic_training` vocabulary plus owner-local deltas | proposal/commit/evidence; generalized beyond text templates |
@@ -250,10 +256,15 @@ port, law, or consequence.
 
 The following are not yet standing joins and may require owner-local generalization:
 
-- arbitrary-rank BF16/F32 safetensors intake; the current `read_rows` admits only rank-2 BF16;
+- complete source admission beyond the presently decoded rank-0/rank-1 checkpoint, with all sibling
+  artifact hashes and load-bearing status founded from the operator diagram;
 - a canonical reader/realization law for Athena's U16/U32 integer container;
 - symbolic/certified general exponential ratios matching Gemma's source softmax law;
 - complete streamed contextual Gemma transport;
+- a ported heterogeneous transport word binding foreign linear/nonlinear occurrences to the
+  standing operation complex, including exact chain-defect propagation;
+- public kernel/image/cokernel/preimage-fibre and receiver-metric adjoint receipts for general
+  ported linear transport; square inversion alone does not supply them;
 - lifted-model local morphology and its genuine adjoint return;
 - Phoenix whole-rest and executable-model schema; and
 - a runtime which enacts native Phoenix inference.
@@ -279,11 +290,14 @@ unread-refused
 predicted exact work and peak streamed residency
 ```
 
-The existing source mouth can enumerate every header entry but read only rank-2 BF16 rows. A
-manifested tensor is not thereby admitted, and an adjacent readable matrix lends no standing to an
-unread vector, scalar, or higher-rank tensor. The first text grade owes explicit coverage over the
-complete declared text tower. Any bounded subset is a **partial Gemma lift** and cannot support a
-whole-model or Phoenix-rebirth claim.
+`embedding_fiber::safetensors::read_rows` remains rank-2 BF16-bounded. The owner-local
+`foreign_map` generalization manifests every declared population, retains refusals by name, and can
+decode BF16 spans at arbitrary rank; the current source checkpoint actually decodes the rank-0 and
+rank-1 population only. Manifestation, source decoding, potential transport, and active stimulation
+are separate ledger axes. An adjacent decoded matrix lends no standing to an unposed vector or
+operator. The first text grade owes explicit coverage over the complete declared text tower. Any
+bounded subset is a **partial source admission/lift** as applicable and cannot support a whole-model
+or Phoenix-rebirth claim.
 
 The manifest preserves paths as apparatus addresses and never folds them into tensor, transport, or
 model identity. Tensor names locate material and do not taxonomize the native ecology.
@@ -327,85 +341,92 @@ lift and prevents Phoenix from erasing the still-open question of what Eros prod
 routes by material kind; only counts/topology return and no actual surface/future section is
 inspected.
 
-## The grain is declared and the residual is retained
+## The map becomes a ported operation complex before it becomes a pathway
 
-**This station is inserted 2026-08-18 because the exact resident carrier refuses inside the first
-layer, and every station after it depends on how that refusal is answered.**
-
-`crates/holonic-engine/src/embedding_fiber.rs` sets `CARRIER_OCTAVES = 128` and
-`ResidentReadout::needed_octaves(entry_octaves, dim) = 2*entry_octaves + ceil(log2 dim) + 1`.
-Measured 2026-08-18 by
-`grep -n "CARRIER_OCTAVES\|fn needed_octaves" -A 8 crates/holonic-engine/src/embedding_fiber.rs`
-and evaluating that expression at `dim = 2560`:
+The computational holon is already deposited and is not a universal `Holon<T>` numeric wrapper:
 
 ```text
-  matmul 1   entry_octaves    8   needed    29   FITS
-  matmul 2   entry_octaves   29   needed    71   FITS
-  matmul 3   entry_octaves   71   needed   155   REFUSES -- CarrierTooNarrow
+H = (A_H, C_*(H), partial_H, omega_H, {K_gamma}, Gamma_H)
 ```
 
-**One Gemma layer chains seven matmuls — q, k, v, o, gate, up, down. Forty-two layers chain 294.**
-So *"enacted exactly on a closed carrier"* is not the route through this tower, and this is
-arithmetic rather than an engineering difficulty. The obstruction is sharper still one level up:
-RMSNorm is `1 / sqrt(mean(x^2) + eps)`, an algebraic number of degree two over the rationals, and
-forty-two nested layers is degree `2^42`. Neither the activation nor the softmax is what closes
-this door; the normalization is.
+with locally founded blade support, oriented cellular incidence, event readings, ordered transport
+words, and exposed boundary/open residual. `TABLET_THE_OPERATIONS` types every local deed as a
+construction, transport, face, or quotient. The missing Phoenix join is therefore one executable
+ported realization of the foreign operator diagram into this standing object.
 
-**The answer is already in the tree and it is lawful in this plan's own terms.**
-`exact_value::ieee754::round_into` returns `(BinaryFloatDatum, Rat)` with
-`value = datum.value() + residual` holding **exactly**, and `embedding_fiber::align_bfloat16`
-re-admits a grained vector to the card. So the layer boundary becomes
+The first candidate diagram binds source implementation/configuration testimony through
+`EvolutionShape`, `CategoryPresentation`, `CausalDiagram`, and `RealizationWitness`; local linear
+maps use `ExactRatMatrix`/`ExactCausalTraversal`; boundary-commuting maps use
+`CausalSectionMorphism`; serial words retain `Relating`/`Chain` lineage; and co-present branches owe
+an `InterchangeCertificate`. Source testimony is an exterior realization codec and not native
+ontology. If exact source testimony is absent or contradictory, all compatible diagrams remain a
+`ReconstructionFiber`; human inspection of plausible text may not select one.
+
+The dependency geometry is not a 294-product line:
 
 ```text
-  exact resident matmul  ->  exact rational result
-      -> round_into(declared grain)  ->  (dyadic word, exact rational residual)
-      -> align_bfloat16              ->  resident again
+standing -> normalization -> {Q, K, V} co-present branches
+Q,K -> contact/ratio construction; ratio,V -> carried section -> O transport
+standing,O-return -> residual construction
+residual standing -> normalization -> {gate, up} co-present branches
+gate,up -> nonlinear/Hadamard construction -> down transport -> residual construction.
 ```
 
-which is **a declared quotient carrying its complete reconstruction fibre** — precisely what this
-plan already requires of every quotient — rather than a rounding. The carrier stays bounded by
-construction and nothing is discarded.
+This is a topology template whose exact ordering and extra Gemma passages must be bound from the
+source realization. Q/K/V and gate/up are not serial matrix chains. A contraction count is work,
+not dependency span. Matrix multiplication compiles only a typed serial word; a dense product is one
+receiver/apparatus chart and never replaces the word.
 
-**The retained residual per layer is the measurement, not an accounting cost.** A layer whose
-residual population grows under the declared grain is dissipative; one whose residual shrinks is
-contractive. That per-layer residual current is the crystalline-and-dissipative coupling as a
-measured quantity rather than an analogy, and it is unavailable to any float implementation of the
-same tower.
-
-**And it is the second condensation axis, orthogonal to morphology.** Declaring a coarser grain per
-layer and measuring where the declared future receiver family stops separating is receiver-minimal
-condensation performed **on the transport** rather than on the weight population, with the grain
-read off the receiver rather than authored. No grain, ladder, or floor may appear in source or
-driver code before a declared receiver has failed to separate at the next coarser step; the ladder
-is a return, and its refusal at a given step is the finding.
-
-### The exact aligned carrier is four times the source dtype, and one tensor already overflows the card
-
-`embedding_fiber::AlignedMaterial` holds `entries: Vec<i64>` — measured 2026-08-18 by
-`sed -n '223,240p' crates/holonic-engine/src/embedding_fiber.rs` — so an aligned BF16 tensor is
-**four times its stored size**, while a BF16 entry only ever occupies `8` octaves of that word. The
-apparatus is an RTX 4080 SUPER with `16,376` MiB, measured the same day by
-`nvidia-smi --query-gpu=name,memory.total --format=csv`, and the card also carries the display.
+For local cross-chart defect
 
 ```text
-  source BF16            aligned i64          resident?
-  embed_tokens                    1.34 GB        5.37 GB   yes, alone
-  embed_tokens_per_layer          5.64 GB       22.55 GB   NO -- exceeds the card by itself
-  one language layer (7 ops)      0.16 GB        0.63 GB   yes
+chi_gamma = Phi_Y T_gamma - S_gamma Phi_X,
 ```
 
-Two consequences, and neither is a permission to widen anything. **The streaming partition is
-planned against four times the tensor bytes, not against the file.** And the `i64` word is itself an
-apparatus aperture rather than a law: packing an aligned entry to its measured `entry_octaves` is an
-owner-local generalization of `align_bfloat16` and `exact_embedding_fiber.cu` which returns the
-factor to near one for BF16 material. That generalization is a typed gap, not a new owner, and it is
-the correct answer to residency pressure here — the incorrect answer is a larger allocation.
+serial composition obeys the exact propagation law
 
-**Falsifiers.** A grain is chosen to make a number look good rather than derived from a receiver
-that stopped separating; the residual is summed into a scalar instead of retained as a population;
-`round_into`'s exact identity is asserted rather than checked at each boundary; the ladder reports a
-byte reduction whose reconstruction fibre is not carried; the residual is discarded and the pass is
-still called exact.
+```text
+chi_(eta gamma) = chi_eta T_gamma + S_eta chi_gamma.
+```
+
+This discrete Leibniz rule attributes whole-path disagreement without flattening the diagram.
+Zero defect fills the corresponding higher cell; nonzero defect remains holonomy/obstruction.
+
+Inversion is never a blanket pathway operation. A rebase `T : X -> Y` requires a witness `B` with
+`BT = I_X` and `TB = I_Y`. A singular or rectangular map returns kernel, image, cokernel, and the
+complete affine reconstruction fibre. A pseudoinverse is a receiver-selected section requiring
+declared metrics. Cultivation uses the metric adjoint `G_X^-1 T^T G_Y`, not an inverse and not a
+bare transpose silently assuming Euclidean charts.
+
+Orientation, chronology and reversibility are recorded independently. Invertible chart transitions
+carry the sign of their top exterior power, and a loop product of `-1` is a global orientation
+obstruction—not a property of any one locally orientable chart. A rectangular perspective receiver
+instead returns `J^T G J`, the top nonzero exterior blade, `ker J`, and the rank-loss
+minor/discriminant locus. Equal pullback Grams with opposite blades must remain separated. The
+orientation double cover/local system retains a coherent receiver chart even when the quotient
+atlas is non-orientable.
+
+**Falsifiers.** Same-shaped but differently typed ports compose; noncommuting words `AB` and `BA`
+collapse; two distinct words with one product matrix lose their lineage before a receiver quotient;
+Q/K/V or gate/up are counted as serial depth; a singular map returns an inverse; a claimed rebase
+checks only one identity side; direct whole-path `chi` disagrees with the recurrence above; equal
+Gram faces erase opposite exterior hands; a Möbius loop returns orientable.
+
+### Carrier and hardware consequence
+
+`AlignedMaterial` currently expands stored BF16 words into `i64` entries on the card. That is an
+apparatus chart, not the semantic form and not evidence that every source tensor must be expanded at
+once. Candidate realizations include streamed active fronts, resident reuse partitions, packed
+aligned entries, or other exact charts; the complete work/range/transfer receipt decides among them.
+No solution is selected from file size alone.
+
+The card owns every wide semantic front it admits. CPU apparatus may mmap source bytes, establish
+ports, persist rest, and independently audit returns; it may not execute normalization, RoPE,
+contact/ratio transport, gating, or residual joins between CUDA leaf contractions. Weights remain
+resident for the reuse interval declared by the operation complex rather than being uploaded once
+per contraction. `exact_work::ExactWork` predicts semantic work before the deed; physical telemetry
+separately measures stored ingress, resident expansion, scratch, output egress, allocation, launch,
+and synchronization.
 
 ## 6. One honest Gemma pathway is enacted before the tower is generalized
 
@@ -434,7 +455,7 @@ Every nonlinear or transcendental source operation is one of:
 3. enclosed with a certified remainder; or
 4. returned as an obstruction.
 
-**The complete transcendental census of this source, measured 2026-08-18 by
+**The configuration-level transcendental census, measured 2026-08-18 by
 `python3 -c "import json;print(json.load(open('/home/b/models/gemma-4-E4B-it/config.json')))"`, and
 two of the four are free.**
 
@@ -442,8 +463,8 @@ two of the four are free.**
 |---|---|---|
 | `final_logit_softcapping` | `30.0` | `30 tanh(x/30)` is **strictly monotone**, so every order face of the potential section — including the nearest-boundary receiver — is exactly invariant under it. It is a total transformation for a magnitude receiver and the identity for an order receiver, and for the latter it need not be evaluated at all. |
 | attention softmax | — | the **contact ordering** needs no transcendental: `p_i/p_j = exp(x_i - x_j)` is monotone in the difference, so comparing two weights is comparing two rational differences by cross-multiplication, which is `exact_contact::RatioFace::compare`'s standing deed. Only the convex combination for value transport needs an enclosure. |
-| `rms_norm_eps` `1e-06` normalization | — | `1/sqrt(mean(x^2)+eps)` is degree two over the rationals and is **the actual obstruction**; see the grain station above. |
-| `hidden_activation` `gelu_pytorch_tanh` | — | transcendental, mid-residual, order-preserving nowhere it matters. It needs a certified enclosure; `exact_value::SeriesTailCertificate` carries three species. |
+| `rms_norm_eps` `1e-06` normalization | — | one application adjoins at most a quadratic radical over its actual input field; dependencies decide the resulting extension degree. It requires an exact algebraic or certified receiver-bounded passage, not a presumed `2^42` tower. |
+| `hidden_activation` `gelu_pytorch_tanh` | — | a nonlinear constitutive construction. `exact_value::SeriesTailCertificate` supplies remainder species, but no complete GELU/tanh realization is standing merely from that carrier. |
 | audio `attention_logit_cap` `50.0`, `use_clipped_linears` | `True` | the `928` stored rank-0 `input_max` / `input_min` / `output_max` / `output_min` bounds are the source's own declared aperture per linear map, not weights, and they are read as such. |
 
 No epsilon or source-runtime float silently decides identity, rank, route, or a native coefficient.
@@ -520,10 +541,10 @@ port and inspect the returned consequence before claiming even the bounded porta
   layers**, where the label carries no geometric content and a returned split or merge is real
   evidence. The `sliding` / `full` axis is then a **positive** control: a taxonomy that fails to
   separate two populations differing in four declared ways has not dissected anything.
-- **`num_kv_shared_layers = 18` supplies the panel's cheapest decisive intervention and it runs
-  first.** Ablate the `k_proj` and `v_proj` of a declared KV-shared layer. Under the config's own
-  declared runtime the consequence must not move; if it moves, the declared law is not the enacted
-  law and that is a finding about the source before any native work begins.
+- **`num_kv_shared_layers = 18` is first a realization-binding question.** Bind the source
+  implementation's cache/state reuse law to exact occurrences and ports, then intervene on that
+  reuse while holding the K/V weight transports fixed. Ablating K/V weights on the assumption that
+  cache sharing makes them inert is forbidden.
 
 **Anti-vacuity requirements**
 
@@ -859,9 +880,9 @@ deterministic for its declared exact law and receiver family, not universal sema
 | source departure | live access audit shows no foreign/developmental opens, mmaps, subprocesses, or retained lookup |
 | GPU residency | hiding the GPU returns typed refusal and never a CPU answer |
 | exceptional compression | complete measured cost vector has a strict reduction and no receiver regression |
-| declared grain | the ladder's step is refused by a receiver that stopped separating, not chosen; `round_into`'s exact identity holds at every layer boundary; the residual is a retained population |
+| declared grain | any quotient step is refused by a receiver that stopped separating, not chosen; its complete per-entry residual reconstructs every admitted predecessor |
 | embedding condensation | the `unexcited` population is stated beside the factor and its bytes are inside the cost vector |
-| KV-shared declaration | ablating a declared-shared layer's `k_proj`/`v_proj` moves the consequence exactly as the declared runtime law predicts |
+| KV-sharing realization | the source cache/state reuse passage is bound to typed occurrences; changing reuse is separated from changing K/V weights |
 | Phoenix attribution | targeted ablation removes lifted/cultivated conduct exactly |
 | multimodal portability | a real non-text projection crosses typed ports; placeholder tokens do not count |
 

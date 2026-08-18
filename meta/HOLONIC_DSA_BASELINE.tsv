@@ -50,8 +50,9 @@ crates/holonic-engine/src/discrete_curvature.rs	.clone()=16	.collect()=24	.flat_
 crates/holonic-engine/src/display.rs	.collect()=1	Vec=6
 crates/holonic-engine/src/divisor_reconstruction.rs	.clone()=39	.collect()=39	.into_iter()=4	BTreeMap=26	BTreeSet=44	Vec=82
 crates/holonic-engine/src/elementary_chart.rs	.clone()=1	.collect()=1	BTreeMap=2	Vec=1
-crates/holonic-engine/src/embedding_fiber.rs	.clone()=5	.collect()=14	.into_iter()=1	BTreeMap=7	Vec=27
+crates/holonic-engine/src/embedding_fiber.rs	.clone()=5	.collect()=15	.into_iter()=1	BTreeMap=7	Vec=28
 crates/holonic-engine/src/evolution.rs	.clone()=2	BTreeMap=7	Vec=8
+crates/holonic-engine/src/exact_json.rs	.into_iter()=1	Vec=7
 crates/holonic-engine/src/exact_linear.rs	.clone()=6	.collect()=8	.into_iter()=3	Vec=16
 crates/holonic-engine/src/exact_value.rs	.clone()=28	.collect()=3	Vec=12
 crates/holonic-engine/src/exact_work.rs	.clone()=16	.collect()=2	.into_iter()=1	Vec=3
@@ -59,6 +60,7 @@ crates/holonic-engine/src/executor.rs	.clone()=3	.collect()=6	.into_iter()=1	Has
 crates/holonic-engine/src/exponentiated_ratio.rs	.clone()=9	.collect()=2	BTreeMap=23	Vec=2
 crates/holonic-engine/src/field_atlas.rs	.clone()=60	.collect()=22	.flat_map()=1	.into_iter()=10	BTreeMap=50	BTreeSet=56	Vec=48	VecDeque=2
 crates/holonic-engine/src/founded_receiver.rs	.clone()=19	.collect()=30	.into_iter()=4	BTreeMap=6	BTreeSet=13	Vec=47
+crates/holonic-engine/src/foreign_map.rs	.clone()=8	.collect()=11	.into_iter()=1	BTreeMap=15	BTreeSet=2	Vec=18
 crates/holonic-engine/src/generative_transport.rs	.clone()=43	.collect()=17	.flat_map()=1	.into_iter()=5	BTreeSet=10	Vec=93
 crates/holonic-engine/src/gluing.rs	.clone()=4	.collect()=10	BTreeSet=26	Vec=10
 crates/holonic-engine/src/graded_complex_form.rs	.clone()=7	.collect()=3	BTreeSet=7	Vec=15

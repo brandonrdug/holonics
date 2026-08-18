@@ -225,9 +225,7 @@ impl ExactRatMatrix {
             return Err(ExactLinearError::ShapeMismatch);
         }
         let mut work = crate::exact_work::ExactWork::nothing();
-        work.resident(
-            u64::try_from(self.rows.saturating_mul(other.columns)).unwrap_or(u64::MAX),
-        );
+        work.resident(u64::try_from(self.rows.saturating_mul(other.columns)).unwrap_or(u64::MAX));
         work.stepped();
         let mut result = Self::zero(self.rows, other.columns)?;
         for row in 0..self.rows {
@@ -316,7 +314,8 @@ impl ExactRatMatrix {
             }
         }
         let inverse = Self::new(right)?;
-        if self.multiply(&inverse)? != Self::identity(extent)? {
+        let identity = Self::identity(extent)?;
+        if self.multiply(&inverse)? != identity || inverse.multiply(self)? != identity {
             return Err(ExactLinearError::InverseCertificateFailure);
         }
         Ok(inverse)
@@ -406,6 +405,10 @@ mod tests {
         );
         assert_eq!(
             matrix.multiply(&inverse).unwrap(),
+            ExactRatMatrix::identity(2).unwrap()
+        );
+        assert_eq!(
+            inverse.multiply(&matrix).unwrap(),
             ExactRatMatrix::identity(2).unwrap()
         );
     }

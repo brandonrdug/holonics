@@ -7,6 +7,9 @@ cited to its owner or governing record; every Phoenix capability remains `open` 
 artifact and falsifiers return.
 **Doctrine:** [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
 [`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
+[`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
+[`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md),
+[`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md),
 [`canon/TABLET_THE_COMPRESSION.md`](../canon/TABLET_THE_COMPRESSION.md), and
 [`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md).
 **Derivation:**
@@ -160,16 +163,14 @@ The source manifest distinguishes four value species:
 4. unknown or unread material.
 
 A source manifest may enumerate tensors or codeword regions which the standing mouth cannot yet
-decode. Enumeration is not admission. Every source population is entered in a coverage ledger as
-exactly one of:
+decode. Enumeration is not admission, and admission is not a lift. Every source population carries
+independent axes:
 
 ```text
-lifted exactly
-lifted boundedly
-potential-only
-stimulated actively
-unexcited
-unread/refused.
+mouth/admission: manifested-only | decoded-exact | decoded-bounded | unread/refused
+transport:       unposed | potential-only | stimulated-actively | unexcited
+load-bearing:    founded only by an enacted typed operator diagram
+condensation:    retained | receiver-condensed | open, only after successor grading.
 ```
 
 Whole-model language is lawful only when the complete body declared by the source manifest is
@@ -201,7 +202,7 @@ shape, dtype, packing and quantization laws
 typed exterior ports
 processor/tokenizer/decoder lineage
 exact, bounded, unknown, and excluded populations
-coverage class for every manifested population
+independent admission, transport, load-bearing, and condensation status for every population
 peak streamed residency and exact work
 ```
 
@@ -381,6 +382,27 @@ audit; it may not replay source semantics after device refusal.
 crosses; the device refuses and CPU reproduces the answer; the path omits a load-bearing
 normalization/chronology/return; one output substitutes for the trajectory.
 
+### The source realization is a ported operation complex
+
+Before active stimulation, bind the source's exterior realization testimony to the standing
+`EvolutionShape`, `CategoryPresentation`, `CausalDiagram`, `ExactRatMatrix`, `ExactCausalTraversal`,
+`CausalSectionMorphism`, `Relating`/`Chain`, and `InterchangeCertificate` owners. Every occurrence
+is typed as one operation species from `TABLET_THE_OPERATIONS`: construction, transport, face, or
+quotient. The source implementation/configuration is admissible as exterior realization testimony;
+it never becomes native ontology. If that testimony is absent or internally inconsistent, the
+candidate operation diagrams remain a `ReconstructionFiber` and no human-coherence judgment chooses
+one.
+
+The complete linear subdiagram is a ported transport word. Serial matrix multiplication compiles
+that word into one chart only where adjacent codomain/domain ports agree. Co-present branches share
+immutable predecessor standing and require an interchange receipt; their later interaction or
+reconvergence is a separate construction. The complete nonlinear body remains a path category of
+certified section maps/correspondences and is never forced into one matrix algebra.
+
+**Falsifiers:** same-shaped but differently typed ports compose; Q/K/V or gate/up branches are
+reported as one serial chain; a source label supplies the operation species; an unverified source
+configuration becomes native law; a dense product replaces the ordered word and its lineage.
+
 ### Transport functions are dissected by intervention
 
 Build source and native taxonomies separately. Use matched removal, replacement, permutation,
@@ -535,20 +557,20 @@ where the source collapses.
   independent audits. There is no semantic fallback.
 - Exact semantic receipts are separate from timing, memory, power, and thermal telemetry.
 - Every station predicts/counts exact work before expensive execution and returns typed refusal.
-- **An exact resident carrier has a finite width and a chained source tower will exhaust it.**
-  Measured 2026-08-18 on the first instance by
-  `grep -n "CARRIER_OCTAVES\|fn needed_octaves" -A 8 crates/holonic-engine/src/embedding_fiber.rs`:
-  the resident exact carrier is `128` octaves wide and each chained multiply-accumulate over width
-  `d` costs `2*entry + ceil(log2 d) + 1`, so two chained `2560`-wide products fit and the third
-  refuses. Every source deeper than two chained products therefore owes a **declared grain with a
-  retained exact residual** at each boundary — `value = grain + residual` holding exactly, which is
-  a quotient carrying its complete reconstruction fibre and not a rounding. The grain is read off a
-  receiver that stopped separating; it is never authored, and no grain, ladder, or floor may appear
-  in source or driver code before that receiver has failed to separate. **The retained residual per
-  boundary is a measurement of the transport, not an accounting cost**: a boundary whose residual
-  population grows is dissipative and one whose residual shrinks is contractive, and that reading is
-  unavailable to any float implementation of the same tower. It is also a condensation axis
-  orthogonal to morphology, and it is graded by the same receiver-minimality condition.
+- Every exact carrier has a declared range and work law at the operation occurrence where it is
+  used. `embedding_fiber::CARRIER_OCTAVES` bounds that owner's dot-product accumulator; it is not a
+  theorem about the dependency depth of an arbitrary operator diagram. A range refusal may found a
+  receiver-derived grain/quotient only with its complete per-entry reconstruction fibre. Aggregate
+  residual width is neither that fibre nor evidence of dissipation.
+- The physical realization follows the causal diagram: wide certified fronts belong on the card;
+  ordered paths remain ordered; global reductions/interactions are named barriers; and no CPU
+  foreman executes normalization, chronology, contact, gating, or residual law between device leaf
+  products. Weight partitions remain resident for their admitted reuse interval rather than being
+  uploaded once per local contraction.
+- Semantic work uses the standing `exact_work::ExactWork` and is admitted before the deed. Physical
+  telemetry separately reports actual ingress, egress, resident bytes, scratch, allocation, launch,
+  synchronization, and transfer lineage. A predicted byte count is never reported as measured bus
+  traffic.
 - Resource pressure changes partition, factorization, placement, residency, or receiver aperture.
   It never authorizes increasing a magic bound and replaying the same morphology.
 - A quantized deployment export may use exterior floating/scaled arithmetic. No float enters the
@@ -647,6 +669,8 @@ Every implementing agent carries these sentences verbatim:
 > A caller-selected rank or layer count is not founded capacity.
 > A dequantized low-bit tensor is not the original full-precision model.
 > A CPU replay is not a GPU-resident return.
+> CUDA leaf products around CPU-owned semantics are not a resident pathway.
+> A contraction count is work and not dependency depth.
 > A population the material never excited is not a population that condensed.
 > A grain chosen to improve a number is not a grain a receiver stopped separating at.
 > A discarded residual is not an exact pass.

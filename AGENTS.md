@@ -246,6 +246,20 @@ construction merely because its current implementation is being replaced.
   receiver-exact or remainder-carrying condensation, source-detached rest, later conduct, matched
   siblings, and targeted ablation. A renamed tensor container or equal output on one corpus does not
   grade it.
+- For every inherited-model pathway, read `canon/TABLET_THE_OPERATIONS.md`,
+  `canon/TABLET_THE_MANIFOLD.md`, and `canon/THE_SURFACES_ARE_PATHS.md`. The computational holon is
+  the live operation complex—incidence, ordered transport words, event readings, and open exterior—
+  not a universal numeric wrapper or tensor stack. Bind foreign realization testimony through the
+  existing evolution/category/causal/realization, exact-linear/traversal, chain, morphism, and
+  interchange owners. Q/K/V and gate/up are co-present branches, not serial matrix depth.
+- Matrix inversion is only the rebase case and owes both identity compositions. Singular or
+  rectangular maps return kernel, image, cokernel and affine reconstruction fibre. A pseudoinverse
+  requires declared receiver metrics; cultivation uses the metric adjoint, not inversion.
+- A CUDA leaf contraction does not make a model pathway resident. The card owns every admitted hot
+  semantic front, including normalization, chronology, contact/ratio, gating and residual joins;
+  CPU apparatus may not orchestrate those laws between device calls or re-upload invariant weights
+  per contraction. Predict semantic work before dispatch and report actual transfer/residency
+  telemetry separately.
 
 ## Causal profiling and physical computation
 

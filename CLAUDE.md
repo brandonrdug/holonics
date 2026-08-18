@@ -1379,6 +1379,22 @@ with their remainder, seal with the foreign source absent, remount, and require 
 conduct plus matched-sibling and targeted-ablation controls. A converted tensor file, one equal
 output, or a renamed architecture is not rebirth.
 
+**The foreign map is a ported operation complex, not a linear stack.** Read
+`canon/TABLET_THE_OPERATIONS.md` and the Phoenix owner table before implementing a pathway. Bind the
+source realization through `EvolutionShape`, typed boundary ports, `CausalDiagram`,
+`RealizationWitness`, `ExactRatMatrix`/`ExactCausalTraversal`, `CausalSectionMorphism`,
+`Relating`/`Chain`, and `InterchangeCertificate`. Q/K/V and gate/up are co-present branches, not
+serial matrix depth. A product matrix is one compiled receiver chart of an ordered transport word;
+it never replaces the word, its intermediate occurrences, joins, or residuals. If source
+realization testimony is absent, retain the complete candidate-diagram fibre—human inspection of a
+plausible output may not choose one.
+
+**Inverse, reconstruction, and adjoint are different operations.** A rebase owes both `BA = I_X`
+and `AB = I_Y`. A singular or rectangular map returns kernel, image, cokernel and affine preimage
+fibre; it does not acquire an inverse. A pseudoinverse requires declared receiver metrics.
+Cultivation returns a covector through `G_X^-1 A^T G_Y`; it is not inversion, and a bare transpose
+silently assumes orthonormal Euclidean charts.
+
 **No authored semantic capacities.** Layers and stacks are apparatus/chronology charts. Lattice
 incidence, recurring phase, cycles, reconvergence, and receiver consequence found the useful
 dimensions. Physical memory, formats, calibrated safety limits, receiver questions, and maximum
@@ -2024,6 +2040,14 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 - **The GPU owns the deed.** The CPU handles process boundaries, durable rest, narrow exterior
   codecs, and offline audits. A run that pins one core while the card idles is a defect to
   diagnose, not a mystery to narrate.
+
+  A CUDA leaf product does not make a pathway resident. Normalization, chronology, contact/ratio,
+  gating, residual joins, and quotient returns are semantic parts of the same hot deed. They may not
+  be executed by a CPU foreman between device contractions. Derive fronts and barriers from the
+  causal diagram, retain weight partitions for their admitted reuse interval, use
+  `exact_work::ExactWork` before dispatch, and report actual ingress/egress/residency/scratch
+  telemetry separately from predicted work. Re-uploading one invariant matrix per contraction is a
+  broken realization, not streaming.
 
   **Do not call the CPU "the host."** Brandon, direct ruling 2026-08-13: *"stop calling the CPU the
   'host', it's just a misnomer. It's a bottleneck in a literal sense if anything, it's a light-cone,

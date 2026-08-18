@@ -200,6 +200,8 @@ pub mod landauer;
 pub mod executor;
 pub mod field_atlas;
 pub mod generative_transport;
+mod exact_json;
+pub mod foreign_map;
 pub mod gluing;
 // The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
 // deposited and re-lit by a different part. Declared, never glob-exported: it names

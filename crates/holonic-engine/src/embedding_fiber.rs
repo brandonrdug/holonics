@@ -75,7 +75,6 @@ use num_bigint::BigInt;
 use thiserror::Error;
 
 use crate::cuda_aperture::DerivedLaunch;
-use crate::exact_value::ieee754::decode_bfloat16_bits;
 
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_embedding_fiber.ptx"));
 const CUDA_SUCCESS: i32 = 0;
@@ -230,6 +229,44 @@ pub struct AlignedMaterial {
     pub negatives: u64,
 }
 
+/// **The BF16 mouth without a heap allocation, and it is the same mouth.**
+///
+/// `exact_value::ieee754::decode_bfloat16_bits` returns a `BigUint` significand, which is the right
+/// carrier for a general float species and the wrong one for a hot path: aligning the text tower of
+/// a sixteen-gigaoctet map is `4.7` thousand million elements, and one allocation each is not a
+/// constant factor, it is the deed.
+///
+/// A `BF16` significand is at most eight octaves and fits an `i64` with fifty-five to spare, so the
+/// same integers are computable without a heap. **This is not a second decoder and it is not
+/// permitted to be one.** The test `the_fast_mouth_agrees_with_the_declared_mouth_on_every_pattern`
+/// sweeps all `65,536` patterns and requires bit-identical agreement — including the refusals — so
+/// what stands here is one mouth with two implementations and a proof that they are one.
+fn decode_bfloat16_word(word: u16) -> Result<(i64, i32), FiberError> {
+    let species = crate::exact_value::ieee754::BinaryFloatSpecies::Bfloat16;
+    let stored_bits = species.stored_significand_bits();
+    let hidden: u16 = 1 << stored_bits;
+    let exponent_mask = (1u16 << species.exponent_bits()) - 1;
+
+    let negative = word & 0x8000 != 0;
+    let exponent = ((word >> stored_bits) & exponent_mask) as i32;
+    let mantissa = word & (hidden - 1);
+    if exponent == i32::from(exponent_mask) {
+        return Err(FiberError::MouthRefused {
+            reason: format!("the pattern {word:#06x} is not a finite BF16 value"),
+        });
+    }
+    let (significand, ulp_exponent) = if exponent == 0 {
+        (mantissa, species.subnormal_ulp_exponent())
+    } else {
+        (
+            mantissa | hidden,
+            exponent - species.exponent_bias() - stored_bits as i32,
+        )
+    };
+    let magnitude = i64::from(significand);
+    Ok((if negative { -magnitude } else { magnitude }, ulp_exponent))
+}
+
 /// Align BF16 words onto one exponent, exactly.
 ///
 /// **The declared float mouth is the only way a float enters**, and it enters as a `BigUint`
@@ -238,22 +275,11 @@ pub fn align_bfloat16(words: &[u16]) -> Result<AlignedMaterial, FiberError> {
     let mut decoded = Vec::with_capacity(words.len());
     let mut lowest = i32::MAX;
     for word in words {
-        let datum = decode_bfloat16_bits(*word).map_err(|error| FiberError::MouthRefused {
-            reason: format!("{error:?}"),
-        })?;
-        let significand =
-            u64::try_from(&datum.significand).map_err(|_| FiberError::MouthRefused {
-                reason: "a BF16 significand exceeded the exact word carrier".to_owned(),
-            })?;
-        let signed = if datum.negative {
-            -(significand as i64)
-        } else {
-            significand as i64
-        };
-        if significand != 0 {
-            lowest = lowest.min(datum.ulp_exponent);
+        let (signed, exponent) = decode_bfloat16_word(*word)?;
+        if signed != 0 {
+            lowest = lowest.min(exponent);
         }
-        decoded.push((signed, datum.ulp_exponent));
+        decoded.push((signed, exponent));
     }
     if lowest == i32::MAX {
         lowest = 0;
@@ -372,6 +398,9 @@ pub struct ResidentReadout {
     scores_addressed: CuFunction,
     octaves: CuFunction,
     scores_batched: CuFunction,
+    lowest_exponent: CuFunction,
+    align: CuFunction,
+    row_mass: CuFunction,
     device_name: String,
     /// Block and grid, derived from what this device and these kernels admit. Never authored here.
     launch: DerivedLaunch,
@@ -437,12 +466,15 @@ impl ResidentReadout {
                 "cuDeviceGetAttribute(warp size)",
             )?;
 
-            let mut loaded = [std::ptr::null_mut(); 4];
+            let mut loaded = [std::ptr::null_mut(); 7];
             for (slot, symbol) in loaded.iter_mut().zip([
                 c"exact_readout_scores",
                 c"exact_readout_scores_addressed",
                 c"exact_score_octaves",
                 c"exact_readout_scores_batched",
+                c"bfloat16_lowest_exponent",
+                c"bfloat16_align",
+                c"exact_row_absolute_mass",
             ]) {
                 if let Err(error) = checked(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -461,6 +493,9 @@ impl ResidentReadout {
                 scores_addressed: loaded[1],
                 octaves: loaded[2],
                 scores_batched: loaded[3],
+                lowest_exponent: loaded[4],
+                align: loaded[5],
+                row_mass: loaded[6],
                 device_name,
                 launch: {
                     // Every kernel this module launches must fit the block, so the block is the
@@ -553,6 +588,207 @@ impl ResidentReadout {
                 entry_octaves: readout.entry_octaves,
                 exponent: readout.exponent,
                 octets: bytes,
+            })
+        }
+    }
+
+    /// ★ **MOUNT A STORED MAP BY ITS OWN CODEWORDS, WITH THE MOUTH ON THE RESIDENT CHART.**
+    ///
+    /// Measured 2026-08-18 on one `10240 x 2560` stored map, which is what occasioned this:
+    ///
+    /// ```text
+    ///   disk read                     26 ms
+    ///   align on the serial chart    271 ms      <- decode and shift, one element at a time
+    ///   upload 209 MB                 11 ms
+    ///   the deed itself                2.25 ms
+    /// ```
+    ///
+    /// The serial chart was spending **a hundred and twenty times the deed** preparing an operand,
+    /// and the operand it prepared was four times the size of the material it came from.
+    /// `CLAUDE.md` names three causes of an idle card and this is the second: *a bulk reduction
+    /// left on the wrong surface*. Decoding a codeword and shifting it onto one declared exponent
+    /// is per-element and order-free — it is resident work by the material's own shape, and
+    /// [`align_bfloat16`] remains the serial chart's independent implementation of the same law.
+    ///
+    /// Two further consequences. The bus carries the **stored** two-octet words rather than the
+    /// eight-octet aligned ones, so the transfer falls by four. And nothing allocates a heap image
+    /// of a map that is only passing through.
+    ///
+    /// The refusals are unchanged: a non-finite pattern and a shift that would cross the hand are
+    /// both flagged on the card and raised here by the same names the serial chart raises.
+    pub fn mount_bfloat16<'chart>(
+        &'chart self,
+        words: &[u16],
+        dim: usize,
+    ) -> Result<MountedReadout<'chart>, FiberError> {
+        if dim == 0 || words.len() % dim != 0 {
+            return Err(FiberError::RaggedReadout {
+                words: words.len(),
+                dim,
+            });
+        }
+        let rows = words.len() / dim;
+        let count = u32::try_from(words.len()).map_err(|_| FiberError::ExtentOverflow { rows })?;
+        let block = self.launch.block_x;
+        let grid = self
+            .launch
+            .grid_for(count)
+            .map_err(|_| FiberError::ExtentOverflow { rows })?;
+        unsafe {
+            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            let stored_octets = std::mem::size_of_val(words);
+            let aligned_octets = words.len() * std::mem::size_of::<i64>();
+            let mut stored: CuDevicePtr = 0;
+            checked(
+                cuMemAlloc_v2(&mut stored, stored_octets),
+                "cuMemAlloc(stored)",
+            )?;
+            let free_stored = |pointer: CuDevicePtr| {
+                let _ = cuMemFree_v2(pointer);
+            };
+            if let Err(error) = checked(
+                cuMemcpyHtoD_v2(stored, words.as_ptr().cast(), stored_octets),
+                "cuMemcpy(stored)",
+            ) {
+                free_stored(stored);
+                return Err(error);
+            }
+
+            // Four small slots: the lowest exponent, the widest octave, the hand population, and
+            // the refusal flags. Pre-set from here so the kernel's reductions have a frame.
+            let mut scratch: CuDevicePtr = 0;
+            if let Err(error) = checked(cuMemAlloc_v2(&mut scratch, 16), "cuMemAlloc(scratch)") {
+                free_stored(stored);
+                return Err(error);
+            }
+            let seed: [u32; 4] = [i32::MAX as u32, 0, 0, 0];
+            if let Err(error) = checked(
+                cuMemcpyHtoD_v2(scratch, seed.as_ptr().cast(), 16),
+                "cuMemcpy(scratch)",
+            ) {
+                free_stored(stored);
+                free_stored(scratch);
+                return Err(error);
+            }
+            let lowest_slot = scratch;
+            let octaves_slot = scratch + 4;
+            let negatives_slot = scratch + 8;
+            let refused_slot = scratch + 12;
+
+            let mut count_arg = count;
+            let mut parameters: [*mut c_void; 4] = [
+                (&raw mut stored).cast(),
+                (&raw mut count_arg).cast(),
+                (&raw const lowest_slot as *mut CuDevicePtr).cast(),
+                (&raw const refused_slot as *mut CuDevicePtr).cast(),
+            ];
+            if let Err(error) = checked(
+                cuLaunchKernel(
+                    self.lowest_exponent,
+                    grid,
+                    1,
+                    1,
+                    block,
+                    1,
+                    1,
+                    0,
+                    std::ptr::null_mut(),
+                    parameters.as_mut_ptr(),
+                    std::ptr::null_mut(),
+                ),
+                "cuLaunchKernel(bfloat16_lowest_exponent)",
+            )
+            .and_then(|()| checked(cuCtxSynchronize(), "cuCtxSynchronize"))
+            {
+                free_stored(stored);
+                free_stored(scratch);
+                return Err(error);
+            }
+
+            let mut read_back = [0u32; 4];
+            if let Err(error) = checked(
+                cuMemcpyDtoH_v2(read_back.as_mut_ptr().cast(), scratch, 16),
+                "cuMemcpy(scratch back)",
+            ) {
+                free_stored(stored);
+                free_stored(scratch);
+                return Err(error);
+            }
+            if read_back[3] & 1 != 0 {
+                free_stored(stored);
+                free_stored(scratch);
+                return Err(FiberError::MouthRefused {
+                    reason: "the stored map carries a pattern that is not a finite BF16 value"
+                        .to_owned(),
+                });
+            }
+            let mut lowest = read_back[0] as i32;
+            if lowest == i32::MAX {
+                // Every word is zero: the map has no scale of its own and the frame is the origin.
+                lowest = 0;
+            }
+
+            let mut resident: CuDevicePtr = 0;
+            if let Err(error) = checked(
+                cuMemAlloc_v2(&mut resident, aligned_octets),
+                "cuMemAlloc(aligned)",
+            ) {
+                free_stored(stored);
+                free_stored(scratch);
+                return Err(error);
+            }
+            let mut lowest_arg = lowest;
+            let mut parameters: [*mut c_void; 7] = [
+                (&raw mut stored).cast(),
+                (&raw mut count_arg).cast(),
+                (&raw mut lowest_arg).cast(),
+                (&raw mut resident).cast(),
+                (&raw const octaves_slot as *mut CuDevicePtr).cast(),
+                (&raw const negatives_slot as *mut CuDevicePtr).cast(),
+                (&raw const refused_slot as *mut CuDevicePtr).cast(),
+            ];
+            let outcome = checked(
+                cuLaunchKernel(
+                    self.align,
+                    grid,
+                    1,
+                    1,
+                    block,
+                    1,
+                    1,
+                    0,
+                    std::ptr::null_mut(),
+                    parameters.as_mut_ptr(),
+                    std::ptr::null_mut(),
+                ),
+                "cuLaunchKernel(bfloat16_align)",
+            )
+            .and_then(|()| checked(cuCtxSynchronize(), "cuCtxSynchronize"))
+            .and_then(|()| {
+                checked(
+                    cuMemcpyDtoH_v2(read_back.as_mut_ptr().cast(), scratch, 16),
+                    "cuMemcpy(scratch back)",
+                )
+            });
+            free_stored(stored);
+            free_stored(scratch);
+            if let Err(error) = outcome {
+                free_stored(resident);
+                return Err(error);
+            }
+            if read_back[3] & 2 != 0 {
+                free_stored(resident);
+                return Err(FiberError::AlignmentSpread { spread: u32::MAX });
+            }
+
+            Ok(MountedReadout {
+                chart: self,
+                resident,
+                rows,
+                dim,
+                entry_octaves: read_back[1],
+                exponent: lowest,
+                octets: aligned_octets,
             })
         }
     }
@@ -844,6 +1080,97 @@ impl MountedReadout<'_> {
     /// This is the shape the 4,096-question driver wanted. It is not a different deed: `dim` was
     /// already a stride in the kernel, so the batched form is the same arithmetic indexed by
     /// `blockIdx.y`.
+    /// **The absolute mass of every row, exactly, on the resident chart.**
+    ///
+    /// This is what carries an incoming certified width through a contraction, and it is the same
+    /// shape as the score deed: one thread per row, exact 128-bit accumulation, nothing rounded.
+    /// It was a serial pass over every element until 2026-08-18, which is a bulk reduction on the
+    /// wrong surface for the same reason the alignment was.
+    pub fn absolute_row_mass(&self) -> Result<Vec<i128>, FiberError> {
+        let rows = self.rows;
+        if rows == 0 {
+            return Ok(Vec::new());
+        }
+        let work = u32::try_from(rows).map_err(|_| FiberError::ExtentOverflow { rows })?;
+        let block = self.chart.launch.block_x;
+        let grid = self
+            .chart
+            .launch
+            .grid_for(work)
+            .map_err(|_| FiberError::ExtentOverflow { rows })?;
+        unsafe {
+            checked(cuCtxSetCurrent(self.chart.context), "cuCtxSetCurrent")?;
+            let octets = rows * std::mem::size_of::<u64>();
+            let mut low: CuDevicePtr = 0;
+            let mut high: CuDevicePtr = 0;
+            checked(cuMemAlloc_v2(&mut low, octets), "cuMemAlloc(mass low)")?;
+            if let Err(error) = checked(cuMemAlloc_v2(&mut high, octets), "cuMemAlloc(mass high)") {
+                let _ = cuMemFree_v2(low);
+                return Err(error);
+            }
+            let mut resident = self.resident;
+            let mut rows_arg = work;
+            let mut dim_arg =
+                u32::try_from(self.dim).map_err(|_| FiberError::ExtentOverflow { rows })?;
+            let mut parameters: [*mut c_void; 5] = [
+                (&raw mut resident).cast(),
+                (&raw mut rows_arg).cast(),
+                (&raw mut dim_arg).cast(),
+                (&raw mut low).cast(),
+                (&raw mut high).cast(),
+            ];
+            let mut low_host = vec![0u64; rows];
+            let mut high_host = vec![0i64; rows];
+            let outcome = checked(
+                cuLaunchKernel(
+                    self.chart.row_mass,
+                    grid,
+                    1,
+                    1,
+                    block,
+                    1,
+                    1,
+                    0,
+                    std::ptr::null_mut(),
+                    parameters.as_mut_ptr(),
+                    std::ptr::null_mut(),
+                ),
+                "cuLaunchKernel(exact_row_absolute_mass)",
+            )
+            .and_then(|()| checked(cuCtxSynchronize(), "cuCtxSynchronize"))
+            .and_then(|()| {
+                checked(
+                    cuMemcpyDtoH_v2(low_host.as_mut_ptr().cast(), low, octets),
+                    "cuMemcpy(mass low)",
+                )
+            })
+            .and_then(|()| {
+                checked(
+                    cuMemcpyDtoH_v2(high_host.as_mut_ptr().cast(), high, octets),
+                    "cuMemcpy(mass high)",
+                )
+            });
+            let _ = cuMemFree_v2(low);
+            let _ = cuMemFree_v2(high);
+            outcome?;
+            Ok(low_host
+                .iter()
+                .zip(&high_host)
+                .map(|(low, high)| ((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF))
+                .collect())
+        }
+    }
+
+    /// The power of two this map's aligned entries are multiples of.
+    pub fn exponent(&self) -> i32 {
+        self.exponent
+    }
+
+    /// The widest aligned entry's octave count, read off the material by the resident mouth.
+    pub fn entry_octaves(&self) -> u32 {
+        self.entry_octaves
+    }
+
     pub fn score_many(
         &self,
         queries: &[&AlignedMaterial],
@@ -1096,11 +1423,13 @@ pub fn score_serially(
 
 /// **Reading a deposited map's own container format**, beside the float mouth it feeds.
 ///
-/// Lifted here 2026-08-17 because **four separate drivers each carried their own copy** —
+/// The focused rank-2 BF16 reader remains here because **four separate drivers once carried their
+/// own copy** —
 /// `the_foreign_map_founds_its_axes`, `the_readout_founds_its_own_receivers`,
 /// `the_readout_returns_a_fiber_not_a_winner`, and `the_map_deposits_and_a_later_current_rides_it` —
 /// which is the duplication `canon/THE_DRIVER_ATLAS.md` was deposited to stop. A container parse is
-/// a codec intake and belongs with `align_bfloat16`, which is the only door its octets may enter by.
+/// a codec intake. Header manifestation now delegates to the architecture-neutral `foreign_map`
+/// mouth, so this module owns only the rank-2 BF16 question it asks of that manifest.
 ///
 /// **`dtype` is retained and checked.** One of those four copies read `shape` and `data_offsets` and
 /// never consulted `dtype`, assuming a two-octet element unconditionally — so handed an `F32` file it
@@ -1109,6 +1438,8 @@ pub mod safetensors {
     use std::collections::BTreeMap;
     use std::fs::File;
     use std::io::{Read, Seek, SeekFrom};
+
+    use crate::foreign_map::{ContainerSpecies, manifest_safetensors};
 
     /// The only element width this intake admits, named so the refusal can say what it wanted.
     pub const ADMITTED_DTYPE: &str = "BF16";
@@ -1140,77 +1471,26 @@ pub mod safetensors {
 
     /// Open a container and read its declared header.
     pub fn read_header(path: &str) -> Result<(File, Header), String> {
-        let mut file = File::open(path).map_err(|error| format!("open {path}: {error}"))?;
-        let mut length = [0u8; 8];
-        file.read_exact(&mut length).map_err(|e| e.to_string())?;
-        let declared = u64::from_le_bytes(length);
-        let extent = usize::try_from(declared).map_err(|_| {
-            format!("{path}: declared header length {declared} exceeds this machine's extent")
-        })?;
-        let mut raw = vec![0u8; extent];
-        file.read_exact(&mut raw).map_err(|e| e.to_string())?;
-        let text = String::from_utf8(raw).map_err(|e| e.to_string())?;
-        let mut map = BTreeMap::new();
-        let mut at = 0usize;
-        while let Some(quote) = text[at..].find('"') {
-            let start = at + quote + 1;
-            let Some(end) = text[start..].find('"') else {
-                break;
-            };
-            let name = text[start..start + end].to_owned();
-            let rest = start + end + 1;
-            if !text[rest..].starts_with(':') || !name.contains('.') {
-                at = rest;
-                continue;
-            }
-            let segment_end = text[rest..].find('}').map_or(text.len(), |z| rest + z);
-            let segment = &text[rest..segment_end];
-            let pull = |key: &str, width: usize| -> Vec<u64> {
-                segment
-                    .find(key)
-                    .map(|position| {
-                        let from = rest + position + width;
-                        let to = text[from..].find(']').map_or(from, |z| from + z);
-                        text[from..to]
-                            .split(',')
-                            .filter_map(|value| value.trim().parse::<u64>().ok())
-                            .collect()
-                    })
-                    .unwrap_or_default()
-            };
-            let shape: Vec<usize> = pull("\"shape\":[", 9)
-                .into_iter()
-                .filter_map(|value| usize::try_from(value).ok())
-                .collect();
-            let offsets = pull("\"data_offsets\":[", 16);
-            let dtype = segment
-                .find("\"dtype\":\"")
-                .map(|position| {
-                    let from = rest + position + 9;
-                    let to = text[from..].find('"').map_or(from, |z| from + z);
-                    text[from..to].to_owned()
-                })
-                .unwrap_or_default();
-            if !shape.is_empty() && offsets.len() == 2 {
-                map.insert(
+        let (file, container) = manifest_safetensors(path).map_err(|error| error.to_string())?;
+        let base = match container.species {
+            ContainerSpecies::Safetensors { base, .. } => base,
+        };
+        let map = container
+            .tensors
+            .into_iter()
+            .map(|(name, tensor)| {
+                (
                     name,
                     Entry {
-                        dtype,
-                        shape,
-                        start: offsets[0],
-                        end: offsets[1],
+                        dtype: tensor.dtype.declared().to_owned(),
+                        shape: tensor.shape,
+                        start: tensor.start,
+                        end: tensor.end,
                     },
-                );
-            }
-            at = segment_end.max(rest);
-        }
-        Ok((
-            file,
-            Header {
-                map,
-                base: 8 + declared,
-            },
-        ))
+                )
+            })
+            .collect::<BTreeMap<_, _>>();
+        Ok((file, Header { map, base }))
     }
 
     /// Read a contiguous span of rows of a two-dimensional `BF16` tensor as raw words.
@@ -1250,7 +1530,9 @@ pub mod safetensors {
         let offset = entry.start + (from_row * width) as u64 * ADMITTED_OCTETS;
         let octets = (rows * width) as u64 * ADMITTED_OCTETS;
         if offset + octets > entry.end {
-            return Err(format!("{name}: the span reaches past the declared payload"));
+            return Err(format!(
+                "{name}: the span reaches past the declared payload"
+            ));
         }
         file.seek(SeekFrom::Start(header.base + offset))
             .map_err(|error| format!("{name}: seek: {error}"))?;
@@ -1317,6 +1599,85 @@ mod tests {
         ));
     }
 
+    /// **One mouth, two implementations, and this is the proof.** All 65,536 patterns, including
+    /// the non-finite ones both must refuse, and including the negative zero neither may collapse.
+    #[test]
+    fn the_fast_mouth_agrees_with_the_declared_mouth_on_every_pattern() {
+        let mut finite = 0u32;
+        let mut refused = 0u32;
+        for pattern in 0u16..=u16::MAX {
+            let declared = crate::exact_value::ieee754::decode_bfloat16_bits(pattern);
+            let fast = super::decode_bfloat16_word(pattern);
+            match (declared, fast) {
+                (Ok(datum), Ok((signed, exponent))) => {
+                    finite += 1;
+                    let magnitude = u64::try_from(&datum.significand).expect("eight octaves");
+                    let expected = if datum.negative {
+                        -(magnitude as i64)
+                    } else {
+                        magnitude as i64
+                    };
+                    assert_eq!(signed, expected, "pattern {pattern:#06x} significand");
+                    assert_eq!(
+                        exponent, datum.ulp_exponent,
+                        "pattern {pattern:#06x} exponent"
+                    );
+                }
+                (Err(_), Err(_)) => refused += 1,
+                (declared, fast) => {
+                    panic!("pattern {pattern:#06x} disagrees: {declared:?} against {fast:?}")
+                }
+            }
+        }
+        // 2 signs x 255 finite exponent codes x 128 mantissas = 65,280 finite; the one non-finite
+        // exponent code carries 2 x 128 = 256 patterns and both mouths refuse every one of them.
+        assert_eq!(finite, 65_280);
+        assert_eq!(refused, 256);
+        assert_eq!(finite + refused, 65_536);
+    }
+
+    /// The CUDA mouth is a second implementation only where the actual device passage agrees with
+    /// the serial mouth. This fixture includes negative words and unequal exponents, so it crosses
+    /// the hand-restoration path which previously used an undefined signed left shift.
+    #[test]
+    fn the_resident_bfloat16_mouth_agrees_with_the_serial_mouth_on_a_nontrivial_frame() {
+        let Ok(resident) = ResidentReadout::new() else {
+            eprintln!("no resident chart answered; the BF16 mouth parity check did not run");
+            return;
+        };
+        // Three rows at width four: positive, negative, zero, and several exponent spreads.
+        let words = vec![
+            0x3f80, 0xc000, 0x3f00, 0x0000, // 1, -2, 1/2, 0
+            0x4080, 0xbf80, 0x4000, 0xc040, // 4, -1, 2, -3
+            0x3e80, 0x4100, 0xc100, 0x3fc0, // 1/4, 8, -8, 3/2
+        ];
+        let serial = align_bfloat16(&words).expect("serial mouth");
+        let mounted = resident.mount_bfloat16(&words, 4).expect("resident mouth");
+        assert_eq!(mounted.exponent(), serial.exponent);
+        assert_eq!(mounted.entry_octaves(), serial.entry_octaves);
+        assert_eq!(
+            mounted.resident_octets(),
+            words.len() * std::mem::size_of::<i64>()
+        );
+
+        let serial_mass: Vec<i128> = serial
+            .entries
+            .chunks_exact(4)
+            .map(|row| {
+                row.iter()
+                    .map(|value| i128::from(value.unsigned_abs()))
+                    .sum()
+            })
+            .collect();
+        assert_eq!(mounted.absolute_row_mass().expect("row mass"), serial_mass);
+
+        let query_words = [0x3f80, 0xbf80, 0x4000, 0x3f00];
+        let query = align_bfloat16(&query_words).expect("query mouth");
+        let carried = mounted.score(&query, None).expect("resident contraction");
+        let expected = score_serially(&serial, &query, 4, None).expect("serial contraction");
+        assert_eq!(carried.scores, expected);
+    }
+
     /// **The headroom is computed from the material and refused rather than truncated.**
     ///
     /// This is the falsifier for the exactness claim: a material that would overflow the exact
@@ -1345,7 +1706,8 @@ mod tests {
         // in any library `src/` in this workspace, evaluating a zero-remainder claim in the very
         // carrier the module exists to avoid.
         for (word, entry) in words.iter().zip(&aligned.entries) {
-            let datum = decode_bfloat16_bits(*word).expect("the mouth admits these");
+            let datum = crate::exact_value::ieee754::decode_bfloat16_bits(*word)
+                .expect("the mouth admits these");
             let magnitude =
                 u64::try_from(&datum.significand).expect("a BF16 significand is one word") as i64;
             let signed = if datum.negative {

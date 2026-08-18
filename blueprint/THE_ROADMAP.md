@@ -67,31 +67,32 @@ native dissection; matched siblings; exact work; and targeted ablation. Static a
 lift, diagnostics are not dissection, serialization is not compression, a tensor file is not a
 runtime, and one output is not inference readiness.
 
-**Ratified and promoted from draft 2026-08-18, after the source and every named owner were
-re-measured.** Every architectural figure the Gemma plan states holds exactly —
-`15,992,595,884` octets, `2,130` tensors all BF16, `42 / 2560 / 10240`, `35` sliding and `7` full at
-`{5,11,17,23,29,35,41}`, window `512`, context `131,072`, vocabulary `262,144` — and every owner in
-its composition table resolves. Four laws were added by that review and they bind the master
-contract, not only the first instance:
+**Re-audited and corrected 2026-08-18 after the first implementation attempt was paused.** The
+source census stands, including `15,992,595,884` octets, `2,130` BF16 tensors, the declared tower,
+and the two attention layouts. The claimed active pathway does not. It linearized a branching
+operator diagram into “294 chained matmuls,” rebuilt exact arithmetic beside standing owners, ran
+normalization/chronology/contact/gating/residual semantics on one CPU core around CUDA leaf
+contractions, carried no source-coverage ledger into that path, and reported a transfer count which
+was four times its own BF16 upload rule. The paused tree did not build.
 
-- **The exact resident carrier refuses inside the first layer.** `CARRIER_OCTAVES = 128` and
-  `2*entry + ceil(log2 d) + 1` admit two chained `2560`-wide products and refuse the third, while one
-  Gemma layer chains seven and the tower chains `294`; the normalization's degree-two root compounds
-  to `2^42` besides. So a **declared grain with a retained exact residual** at each boundary is
-  forced — `value = grain + residual` exactly, a quotient carrying its complete reconstruction fibre
-  — and the per-boundary residual becomes the transport's own dissipative-versus-contractive reading
-  and a second condensation axis orthogonal to morphology.
-- **A population the material never excited is `unexcited`, never `condensed`.** `43.64%` of the
-  source is two vocabulary-indexed tables over `262,144` rows and the declared corpus reaches a small
-  fraction of them; collapsing the remainder would report a large factor and would be the
-  authored-partition defect wearing a passing result.
-- **The exact aligned carrier is four times the source dtype**, so `embed_tokens_per_layer` alone
-  exceeds the card at `22.55` GB; the answer is packing the aligned word to its measured octaves, not
-  a larger allocation.
-- **The `sliding` / `full` label predicts four independent geometric facts**, so the requirement that
-  a source-layout label fail to predict the native taxon is posed inside the `35` sliding layers,
-  where it can fail. `num_kv_shared_layers = 18` against `42` independent `k_proj` / `v_proj`
-  populations supplies the panel's first and cheapest decisive ablation.
+The correction composes the mathematics already owned. `TABLET_THE_OPERATIONS` supplies the
+computational holon and the construction/transport/face/quotient species; `EvolutionShape`,
+`CategoryPresentation`, `CausalDiagram`, `ExactRatMatrix`, `ExactCausalTraversal`,
+`CausalSectionMorphism`, `Relating`/`Chain`, and `InterchangeCertificate` supply the ported operation
+complex. Q/K/V and gate/up are co-present branches, not serial depth. A product matrix is one
+compiled receiver chart of an ordered word. Inverse exists only for a proved rebase; singular and
+rectangular passages return kernel/cokernel/reconstruction fibres; cultivation returns through a
+declared metric adjoint. Hardware realization follows certified fronts and barriers with the card
+owning the hot semantic deed, retained weight partitions, pre-deed exact-work admission, and
+separate measured transfer telemetry.
+
+The source-mouth return is correspondingly bounded: all declared populations are manifested and a
+rank-0/rank-1 population occupying a small byte share is decoded exactly; neither fact is a
+transport lift. The resident BF16 mouth remains an owner-local bounded return after its signed-shift
+defect was repaired; the corrected negative/exponent-spread CUDA fixture agrees with the serial
+mouth on alignment frame, row masses, and contractions. This is bounded parity, not an exhaustive
+CUDA-codeword proof. No whole-source admission, contextual Gemma conduct, dissection, condensation,
+or Phoenix capability is promoted by those returns.
 
 **No executable capability is promoted by this design deposit.** `CONSTRUCTION_STATE.md` remains
 unchanged until the Gemma plan returns an actual source-detached executable native model and passes

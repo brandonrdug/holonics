@@ -168,3 +168,155 @@ extern "C" __global__ void exact_score_octaves(
     }
     octaves[slot] = octave;
 }
+
+// ---------------------------------------------------------------------------------------------
+// **THE MOUTH ITSELF, ON THE SURFACE WHOSE TRANSPORT LAW FITS IT.**
+//
+// Added 2026-08-18 after a measurement, and the measurement is the whole justification. Contracting
+// one 26-million-element stored map cost:
+//
+//     disk read            26 ms
+//     align on the serial chart   271 ms      <- decode and shift, one element at a time
+//     upload 209 MB               11 ms
+//     the deed                     2.25 ms
+//
+// The serial chart was spending **a hundred times the deed** preparing an operand, and the operand
+// it prepared was four times the size of the material it prepared it from. `CLAUDE.md`: *"a bulk
+// reduction left on the wrong surface"* is one of the three named causes of an idle card, and this
+// was it. Decoding a stored codeword into a signed significand and shifting it onto one declared
+// exponent is per-element, order-free, and has no serial dependence at all -- it is resident work
+// by the material's own shape.
+//
+// Two consequences beyond the arithmetic. The bus now carries the **stored** two-octet codewords
+// rather than the eight-octet aligned words, so the transfer falls by four. And the serial chart
+// stops allocating a heap image of every map it touches.
+//
+// The refusals are preserved exactly. A non-finite pattern and an alignment that would leave the
+// signed word are both flagged, and the serial chart raises the same named errors it always did --
+// this moves the deed, it does not soften the law.
+
+#define BFLOAT16_STORED_BITS 7
+#define BFLOAT16_BIAS 127
+#define BFLOAT16_HIDDEN (1u << BFLOAT16_STORED_BITS)
+#define BFLOAT16_SUBNORMAL_ULP (1 - BFLOAT16_BIAS - BFLOAT16_STORED_BITS)
+#define SIGNED_WORD_OCTAVES 63u
+
+// `refused` bits: 1 = a non-finite pattern, 2 = an alignment past the signed word.
+__device__ __forceinline__ int decode_bfloat16(uint16_t word, int64_t *significand, int *ulp) {
+    int exponent = (int)((word >> BFLOAT16_STORED_BITS) & 0xffu);
+    uint16_t mantissa = word & (uint16_t)(BFLOAT16_HIDDEN - 1u);
+    if (exponent == 0xff) {
+        return 0;
+    }
+    int64_t magnitude;
+    if (exponent == 0) {
+        magnitude = (int64_t)mantissa;
+        *ulp = BFLOAT16_SUBNORMAL_ULP;
+    } else {
+        magnitude = (int64_t)(mantissa | (uint16_t)BFLOAT16_HIDDEN);
+        *ulp = exponent - BFLOAT16_BIAS - BFLOAT16_STORED_BITS;
+    }
+    *significand = (word & 0x8000u) ? -magnitude : magnitude;
+    return 1;
+}
+
+// The lowest unit-in-the-last-place among the nonzero stored words. **A zero contributes no frame**
+// -- it has no scale of its own, and letting one drag the common exponent down would widen every
+// other entry for nothing.
+extern "C" __global__ void bfloat16_lowest_exponent(
+    const uint16_t *words,
+    uint32_t count,
+    int32_t *lowest,      // one slot, pre-set to a ceiling by the caller
+    uint32_t *refused     // one slot
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) {
+        return;
+    }
+    int64_t significand;
+    int ulp;
+    if (!decode_bfloat16(words[at], &significand, &ulp)) {
+        atomicOr(refused, 1u);
+        return;
+    }
+    if (significand != 0) {
+        atomicMin(lowest, (int32_t)ulp);
+    }
+}
+
+// Decode and shift onto the declared common exponent, and return the material's own octave count
+// and hand population as reductions rather than as a second pass.
+extern "C" __global__ void bfloat16_align(
+    const uint16_t *words,
+    uint32_t count,
+    int32_t lowest,
+    int64_t *entries,        // count
+    uint32_t *entry_octaves, // one slot, pre-set to 0
+    uint32_t *negatives,     // one slot, pre-set to 0
+    uint32_t *refused        // one slot
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) {
+        return;
+    }
+    int64_t significand;
+    int ulp;
+    if (!decode_bfloat16(words[at], &significand, &ulp)) {
+        atomicOr(refused, 1u);
+        entries[at] = 0;
+        return;
+    }
+    if (significand == 0) {
+        entries[at] = 0;
+        return;
+    }
+    uint32_t spread = (uint32_t)(ulp - lowest);
+    uint64_t magnitude = (uint64_t)(significand < 0 ? -significand : significand);
+    uint32_t octaves = 0;
+    uint64_t scan = magnitude;
+    while (scan != 0) {
+        scan >>= 1;
+        ++octaves;
+    }
+    // The demand is the entry's OWN octaves plus the spread. A shift that would cross the hand is
+    // refused rather than wrapped -- the same law the serial chart holds, and for the same reason:
+    // a wrapped shift flips a passage's hand and returns a plausible wrong number.
+    if (spread >= SIGNED_WORD_OCTAVES || octaves + spread > SIGNED_WORD_OCTAVES) {
+        atomicOr(refused, 2u);
+        entries[at] = 0;
+        return;
+    }
+    // Shift the unsigned magnitude and restore the hand afterward. Left-shifting a negative
+    // signed integer is undefined in C++/CUDA even when the mathematical result fits.
+    uint64_t shifted = magnitude << spread;
+    entries[at] = significand < 0 ? -(int64_t)shifted : (int64_t)shifted;
+    if (significand < 0) {
+        atomicAdd(negatives, 1u);
+    }
+    atomicMax(entry_octaves, octaves + spread);
+}
+
+// **The absolute mass of each row**, which is what carries an incoming certified width through a
+// contraction. Same shape as the score kernel and for the same reason: one thread per row, exact
+// 128-bit accumulation, nothing rounded.
+extern "C" __global__ void exact_row_absolute_mass(
+    const int64_t *readout,
+    uint32_t rows,
+    uint32_t dim,
+    uint64_t *mass_low,
+    int64_t *mass_high
+) {
+    uint32_t row = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row >= rows) {
+        return;
+    }
+    const int64_t *entries = readout + (size_t)row * (size_t)dim;
+    __int128 accumulated = 0;
+    for (uint32_t at = 0; at < dim; ++at) {
+        int64_t value = entries[at];
+        accumulated += (__int128)(value < 0 ? -value : value);
+    }
+    SplitScore split = split_of(accumulated);
+    mass_low[row] = split.low;
+    mass_high[row] = split.high;
+}

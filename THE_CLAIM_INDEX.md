@@ -128,7 +128,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (136 deposits of 428)
+## 4 · The 2026-08 record line (138 deposits of 430)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -266,9 +266,11 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
 | `2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md` | The blade dropped the metric, and the two-frame check was live only where it could not fire |
 | `2026-08-18_THE_CLIMB_USED_THE_WRONG_ENDPOINT_AND_THE_DEGRADATION_WAS_A_DEPOSITED_LAW.md` | The climb used the wrong endpoint, and the degradation was a deposited law |
+| `2026-08-18_THE_FOREIGN_MAP_CONDUCTS_AND_THE_CARRIER_WAS_REBUILT_BESIDE_ITS_OWNERS.md` | The foreign map conducts, and the carrier was rebuilt beside its owners |
 | `2026-08-18_THE_FUTURE_IS_A_PLURAL_CAUSAL_SECTION_SOFTMAX_IS_ITS_LOCAL_LAPLACIAN_AND_THE_ADJOINT_RETURNS_THROUGH_STATE.md` | The future is a plural causal section; softmax is its local Laplacian, and the adjoint returns through state |
 | `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
 | `2026-08-18_THE_HANKEL_RANK_DOES_NOT_SATURATE_SO_THE_COMPRESSION_IS_SPARSITY_AND_IT_IS_EXACT.md` | The Hankel rank does not saturate, so the compression is sparsity — and it is exact |
+| `2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md` | The holon is the operation complex, the foreign map is a ported word, and the card carries its fronts |
 | `2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md` | The model and the production met, and the answer is a block, not a pick |
 | `2026-08-18_THE_MONOID_IS_APERIODIC_BY_CONSTRUCTION_SO_THE_CRYSTAL_NEEDS_THE_TURN.md` | The monoid is aperiodic by construction, so the crystal needs the turn |
 | `2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md` | The ratio crossed, the container produces, and all 168 Gemma circuits are full rank |
@@ -282,7 +284,7 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 11 more |
+| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, and 12 more |
 | `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, and 3 more |
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
