@@ -62,6 +62,10 @@ pub mod arithmetic_monodromy;
 pub mod arithmetic_phase;
 pub mod atlas;
 pub mod atmospheric_inverse;
+// ATHENA -- the chart transition from a holonic atlas to a tensor container. The suffix-link tree
+// labels by depth-first interval, containment becomes the light-cone order of 1+1 Minkowski space,
+// and every emitted float carries the exact rational residual its rounding cost.
+pub mod athena;
 pub mod basin;
 pub mod bit_causal;
 pub mod category;

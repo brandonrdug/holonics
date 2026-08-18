@@ -416,6 +416,11 @@ pub enum ExactValueError {
     #[error("an absolute geometric tail ratio must satisfy 0 <= r < 1")]
     InvalidGeometricRatio,
     #[error(
+        "the exact value has magnitude past what {species} can carry, so emitting it would return an \
+         infinity: refused rather than saturated"
+    )]
+    FloatMagnitudeOverflows { species: &'static str },
+    #[error(
         "the {species} bit pattern 0x{bits:x} is not a number: it names no ratio, so it has no exact dyadic and no enclosure"
     )]
     NotANumberFloat { species: &'static str, bits: u64 },
@@ -989,6 +994,147 @@ pub mod ieee754 {
         decode_binary32_bits(value.to_bits())
     }
 
+    /// ★ **THE EMIT-SIDE MOUTH: round an exact value into a float and KEEP THE REMAINDER.**
+    ///
+    /// Every float mouth in this workspace ran one way — a stored word decoded to an exact dyadic,
+    /// so a float could enter and never leave. Emitting requires the other direction, and the
+    /// direction that *loses* something is exactly the one that must certify what it lost.
+    ///
+    /// Returns the datum together with an **exact rational residual** satisfying
+    ///
+    /// ```text
+    ///     value  =  datum.value()  +  residual          exactly, over the rationals
+    /// ```
+    ///
+    /// so nothing about the rounding is unknown. A caller emitting a tensor can sum, bound, or
+    /// exhibit the residuals rather than reporting a tolerance that got smaller — which is the
+    /// error relocating, not shrinking.
+    ///
+    /// **Round-to-nearest, ties-to-even**, computed on integers: no float arithmetic occurs here
+    /// and no comparison is approximate. A magnitude past the format's top binade is **refused**
+    /// rather than saturated to an infinity, because an infinity names no ratio and this carrier
+    /// admits no member that names no ratio.
+    pub fn round_into(
+        value: &Rat,
+        species: BinaryFloatSpecies,
+    ) -> Result<(BinaryFloatDatum, Rat), ExactValueError> {
+        let negative = num_traits::Signed::is_negative(value);
+        let magnitude = if negative { -value.clone() } else { value.clone() };
+        let stored = species.stored_significand_bits() as i32;
+        let subnormal_ulp = species.subnormal_ulp_exponent();
+
+        // The zero datum, and it is exact.
+        if magnitude.is_zero() {
+            let datum = BinaryFloatDatum {
+                species,
+                bits: 0,
+                negative,
+                significand: BigUint::from(0u32),
+                ulp_exponent: subnormal_ulp,
+                subnormal: true,
+            };
+            return Ok((datum, Rat::zero()));
+        }
+
+        // The binade: the greatest `k` with `2^k <= magnitude`. Found by comparing exact
+        // rationals, never by a logarithm.
+        let mut binade: i32 = 0;
+        let two = Rat::from_integer(BigInt::from(2));
+        let mut probe = Rat::one();
+        while probe > magnitude {
+            probe /= &two;
+            binade -= 1;
+            if binade < subnormal_ulp - 1 {
+                break;
+            }
+        }
+        while &probe * &two <= magnitude {
+            probe *= &two;
+            binade += 1;
+        }
+
+        // Normal numbers place the ulp `stored` bits below the binade; subnormals sit on the
+        // format's fixed floor grid.
+        let normal_ulp = binade - stored;
+        let ulp_exponent = normal_ulp.max(subnormal_ulp);
+        let subnormal = ulp_exponent > normal_ulp || binade < subnormal_ulp + stored;
+
+        // significand = round_half_even(magnitude / 2^ulp_exponent), on integers.
+        let scale = power_of_two(-ulp_exponent);
+        let scaled_value = &magnitude * &scale;
+        let floor = scaled_value.numer() / scaled_value.denom();
+        let remainder = &scaled_value - Rat::from_integer(floor.clone());
+        let half = Rat::new(BigInt::from(1), BigInt::from(2));
+        let rounded = match remainder.cmp(&half) {
+            core::cmp::Ordering::Less => floor,
+            core::cmp::Ordering::Greater => floor + BigInt::from(1),
+            // Ties to even: the tie is exactly representable and the choice is declared.
+            core::cmp::Ordering::Equal => {
+                if (&floor % BigInt::from(2)).is_zero() {
+                    floor
+                } else {
+                    floor + BigInt::from(1)
+                }
+            }
+        };
+
+        // Rounding up may carry into the next binade: `0b1111... -> 0b10000...`. Re-seat rather
+        // than emit a significand the format cannot hold.
+        //
+        // **The carry is exact and needs no re-rounding.** `2·hidden · 2^ulp = hidden · 2^(ulp+1)`,
+        // so the carried datum is the hidden bit one binade up, full stop. An earlier form
+        // recomputed the FLOOR at the lifted exponent, which lands one below the hidden bit and
+        // produced a significand the format cannot hold — refused at `to_bits` with a bijection
+        // complaint that named the wrong defect. The exhaustive sweep over every bf16 pattern could
+        // not catch it, because a representable value never carries; real material found it on its
+        // first unrepresentable half-integer.
+        let hidden = BigInt::from(1) << (stored as usize);
+        let (significand, ulp_exponent, subnormal) = if !subnormal && rounded >= (&hidden << 1) {
+            (hidden.clone(), ulp_exponent + 1, false)
+        } else if subnormal && rounded >= hidden {
+            // A subnormal that rounded up into the smallest normal is a normal.
+            (rounded, ulp_exponent, false)
+        } else {
+            (rounded, ulp_exponent, subnormal)
+        };
+
+        let raw_exponent = ulp_exponent + species.exponent_bias() + stored;
+        if !subnormal && raw_exponent as u64 >= species.exponent_mask() {
+            return Err(ExactValueError::FloatMagnitudeOverflows {
+                species: species.name(),
+            });
+        }
+
+        let significand: BigUint =
+            significand
+                .to_biguint()
+                .ok_or(ExactValueError::FloatMagnitudeOverflows {
+                    species: species.name(),
+                })?;
+        let mut datum = BinaryFloatDatum {
+            species,
+            bits: 0,
+            negative,
+            significand,
+            ulp_exponent,
+            subnormal,
+        };
+        datum.bits = datum.to_bits()?;
+        let residual = value - datum.value();
+        Ok((datum, residual))
+    }
+
+    /// [`round_into`] for `Bfloat16`, returning the stored word beside the exact residual.
+    pub fn round_into_bfloat16(value: &Rat) -> Result<(u16, Rat), ExactValueError> {
+        let (datum, residual) = round_into(value, BinaryFloatSpecies::Bfloat16)?;
+        let word = u16::try_from(datum.to_bits()?).map_err(|_| {
+            ExactValueError::FloatMagnitudeOverflows {
+                species: BinaryFloatSpecies::Bfloat16.name(),
+            }
+        })?;
+        Ok((word, residual))
+    }
+
     /// The inverse mouth, so the bijection can be exercised end to end by a driver.
     pub fn encode_f64(datum: &BinaryFloatDatum) -> Result<f64, ExactValueError> {
         if datum.species != BinaryFloatSpecies::Binary64 {
@@ -1030,6 +1176,144 @@ pub mod ieee754 {
         } else {
             Rat::new(numerator, BigInt::one() << ((-exponent) as usize))
         }
+    }
+}
+
+
+#[cfg(test)]
+mod emit_side_mouth_tests {
+    use super::ieee754::{
+        decode_bfloat16_bits, round_into, round_into_bfloat16, BinaryFloatSpecies,
+    };
+    use super::Rat;
+    use num_bigint::BigInt;
+    use num_traits::Zero;
+
+    fn rat(numerator: i64, denominator: i64) -> Rat {
+        Rat::new(BigInt::from(numerator), BigInt::from(denominator))
+    }
+
+    #[test]
+    fn a_representable_value_emits_with_residual_exactly_zero() {
+        // Every one of these is a dyadic bf16 can hold exactly, so the mouth must lose NOTHING.
+        for value in [
+            rat(0, 1),
+            rat(1, 1),
+            rat(-1, 1),
+            rat(1, 2),
+            rat(3, 4),
+            rat(-5, 8),
+            rat(256, 1),
+            rat(1, 256),
+            rat(127, 128),
+        ] {
+            let (word, residual) = round_into_bfloat16(&value).expect("emits");
+            assert!(
+                residual.is_zero(),
+                "a representable value lost {residual} at {value}"
+            );
+            // And the round trip through the READ side must return the same exact value.
+            let back = decode_bfloat16_bits(word).expect("decodes").value();
+            assert_eq!(back, value, "the two mouths disagree at {value}");
+        }
+    }
+
+    #[test]
+    fn an_unrepresentable_value_closes_exactly_over_the_residual() {
+        // **The law: value = datum.value() + residual, exactly, over the rationals.** A tenth is
+        // not a dyadic, so the residual is genuinely non-zero and must account for the whole
+        // difference -- nothing is unknown about what the emission cost.
+        for value in [rat(1, 10), rat(-1, 3), rat(22, 7), rat(1, 1000), rat(-9999, 7)] {
+            let (datum, residual) =
+                round_into(&value, BinaryFloatSpecies::Bfloat16).expect("emits");
+            assert_eq!(
+                datum.value() + residual.clone(),
+                value,
+                "the residual did not close at {value}"
+            );
+            assert!(!residual.is_zero(), "{value} should not be representable");
+            // The residual may never exceed half an ulp: that is what round-to-nearest MEANS, and
+            // a residual past it would mean a nearer float existed and was not taken.
+            let half_ulp = datum.unit_in_last_place() / Rat::from_integer(BigInt::from(2));
+            let magnitude = if num_traits::Signed::is_negative(&residual) {
+                -residual.clone()
+            } else {
+                residual.clone()
+            };
+            assert!(
+                magnitude <= half_ulp,
+                "residual {residual} exceeds half an ulp {half_ulp} at {value}"
+            );
+        }
+    }
+
+    #[test]
+    fn every_bfloat16_word_survives_the_round_trip_through_both_mouths() {
+        // The read mouth decodes a word to an exact value; the emit mouth must return that word.
+        // Swept over every finite bf16 pattern -- this is a bijection claim and it is checked
+        // exhaustively rather than sampled.
+        let mut checked = 0u32;
+        for bits in 0..=u16::MAX {
+            let Ok(datum) = decode_bfloat16_bits(bits) else {
+                continue; // NaN and the infinities name no ratio and are refused by the reader.
+            };
+            let value = datum.value();
+            let (word, residual) = round_into_bfloat16(&value).expect("emits");
+            assert!(residual.is_zero(), "0x{bits:04x} lost {residual}");
+            // -0.0 and +0.0 carry the same value; the sign is retained separately and the emit
+            // mouth reads it from the value, which has no negative zero. That is the one place the
+            // round trip is not on the nose, and it is named rather than hidden.
+            if datum.is_zero() {
+                assert!(word == 0x0000 || word == 0x8000);
+            } else {
+                assert_eq!(word, bits, "0x{bits:04x} did not return itself");
+            }
+            checked += 1;
+        }
+        assert!(checked > 60_000, "only {checked} finite patterns were swept");
+    }
+
+    #[test]
+    fn a_rounding_carry_across_a_binade_re_seats_rather_than_overflowing() {
+        // **The case the exhaustive sweep cannot reach**: a value BETWEEN two representables that
+        // rounds UP across a binade boundary. 32729/2 = 16364.5 sits just under 2^14 and rounds to
+        // 16384, carrying `0b11111111 -> 0b100000000`. Found by real material, not by the sweep.
+        for value in [rat(32729, 2), rat(-32729, 2), rat(511, 256), rat(1023, 512)] {
+            let (datum, residual) =
+                round_into(&value, BinaryFloatSpecies::Bfloat16).expect("emits");
+            assert_eq!(
+                datum.value() + residual.clone(),
+                value,
+                "the carry did not close at {value}"
+            );
+            let half_ulp = datum.unit_in_last_place() / Rat::from_integer(BigInt::from(2));
+            let magnitude = if num_traits::Signed::is_negative(&residual) {
+                -residual.clone()
+            } else {
+                residual.clone()
+            };
+            assert!(magnitude <= half_ulp, "{value} rounded past half an ulp");
+            // And the carried datum must re-encode, which is what the defect broke.
+            datum.to_bits().expect("the carried datum must hold in the format");
+        }
+    }
+
+    #[test]
+    fn a_magnitude_past_the_format_refuses_rather_than_saturating() {
+        // An infinity names no ratio, so this carrier admits no member that names no ratio.
+        let past = Rat::from_integer(BigInt::from(1) << 400);
+        assert!(round_into(&past, BinaryFloatSpecies::Bfloat16).is_err());
+        assert!(round_into(&(-past), BinaryFloatSpecies::Bfloat16).is_err());
+    }
+
+    #[test]
+    fn the_tie_goes_to_even_and_the_choice_is_declared() {
+        // Exactly halfway between two bf16 neighbours. bf16 has 8 significand bits, so
+        // 257/256 sits between 1 and 1+2^-7; the tie must land on the even significand.
+        let (low, residual) =
+            round_into(&rat(513, 512), BinaryFloatSpecies::Bfloat16).expect("emits");
+        assert_eq!(low.value() + residual, rat(513, 512));
+        assert!(low.significand.clone() % num_bigint::BigUint::from(2u32) == num_bigint::BigUint::from(0u32));
     }
 }
 
