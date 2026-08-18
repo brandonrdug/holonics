@@ -1,5 +1,12 @@
 # The map is material, the head is a contact, and the instance resumes
 
+> **CONSUMED BY THE PHOENIX CONSTRUCTION / SUBORDINATE INSTRUMENT / NOT AN INDEPENDENT
+> SCHEDULER — 2026-08-18.** Completed exact contacts, rest/return work, audits, and controls remain
+> standing. Its unfinished transport, contact, ratio/modulus, surface, instance, and document
+> consequences are composed and graded by
+> [`THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md).
+> Do not implement a remaining station from this file in isolation.
+
 **Date:** 2026-08-18
 **Truth status:** `established-bounded` for every code citation and every measured figure below, each
 verified at the line given today by direct read or by running the tool; `proved-standard` for the

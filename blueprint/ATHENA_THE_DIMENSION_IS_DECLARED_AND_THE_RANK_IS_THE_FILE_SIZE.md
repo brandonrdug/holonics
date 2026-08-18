@@ -1,5 +1,12 @@
 # Athena — the dimension is declared, the rank is the file size, and no float is respected
 
+> **CONSUMED BY THE PHOENIX CONSTRUCTION / SUBORDINATE DIMENSION AND EXPORT INSTRUMENT / NOT AN
+> INDEPENDENT SCHEDULER — 2026-08-18.** ATHENA-000's exact mouths, tree chart, integer containers,
+> and the dense-route refutation remain standing evidence. Native baseline, receiver-minimal
+> dimension, cultivation, executable output, and inference are now specified by
+> [`THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md).
+> Do not resume a station here as a standalone tensor experiment.
+
 **Date:** 2026-08-18
 **Truth status:** `established-bounded` for every measured figure; `proved-standard` for the
 realization theorem and the interval/light-cone equivalence; `interpretation` for the architecture,

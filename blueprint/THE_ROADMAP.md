@@ -29,6 +29,48 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE PHOENIX REBIRTH LIFTS INHERITED HEXIS AND RETURNS A NATIVE EXECUTABLE ECOLOGY — 2026-08-18
+
+**The active construction design.** The master contract is
+[`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`](THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md);
+the first executable instance is
+[`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md).
+They sit under the hexis doctrine in `canon/TABLET_THE_HEXIS.md` and the complete derivation in
+`research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
+
+**The object.** Admit another body's rested model material; recover its potential and actively
+stimulated transport functions; dissect those functions by intervention; re-express them as native
+holonic sections, lattices, state equations, generators and open fibres; condense only where a
+declared future receiver family factors; cultivate the native ecology on new caused material; seal
+with the foreign source absent; and return a frozen executable model plus source/native dissection
+atlases, held-out conduct, and targeted ablation.
+
+**The first source is the local Gemma-4-E4B BF16 map.** Its text path is the first executable grade.
+The source census establishes vision/audio materials and projection ports; one actual non-text
+projection is a prospective portability control which the first executable grade must enact. That
+control is not a second construction and does not establish complete multimodal inference. The
+native Eros/Athena arm remains beside the inherited arm so Phoenix cannot erase the still-open
+question of what Eros produces without foreign hexis.
+
+**This plan consumes, and does not discard, the standing instruments.** The exact contacts,
+whole-body rest, ratio/modulus owners, static deposited-map readings, Athena integer mouths and tree
+chart, source-detached seal, receiver compression, diffusion/sheaf, chain, phase, lattice and work
+owners are composed here. The unfinished production stations of
+`THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md` and the unrealized executable
+stations of `ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md` no longer schedule
+independent builds. Their completed findings remain evidence and controls.
+
+**The complete grade is indivisible:** exact source admission; potential lift; contextual active
+path; intervention taxonomy; native re-expression; cross-chart defect; receiver-minimal
+condensation with reconstruction fibres; cultivation; source-detached rest; real frozen inference;
+native dissection; matched siblings; exact work; and targeted ablation. Static analysis is not a
+lift, diagnostics are not dissection, serialization is not compression, a tensor file is not a
+runtime, and one output is not inference readiness.
+
+**No executable capability is promoted by this design deposit.** `CONSTRUCTION_STATE.md` remains
+unchanged until the Gemma plan returns an actual source-detached executable native model and passes
+its complete grade.
+
 ## THE EROS CYCLE AS AN INFORMATION ENGINE — ratified 2026-08-16
 
 **This is the present deed, and it supersedes the centrifuge below as the ordering of the work
@@ -129,9 +171,10 @@ construction that was about to be built.
 
 ## THE MAP IS MATERIAL, THE HEAD IS A CONTACT, AND THE INSTANCE RESUMES — 2026-08-18
 
-**The active plan.**
+**Consumed as an instrument plan by the Phoenix construction above; it no longer independently
+schedules production.**
 [`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md).
-It **supersedes the plan below as a production plan** after an external adjudication and three
+It superseded the plan below as a production plan after an external adjudication and three
 synthesis campaigns. Brandon, 2026-08-18: *"Why are you not pairing this with what we were doing
 regarding softmax and attention mechanisms in relation to transformers and embedding spaces?"* and
 *"address capabilities that you are not unifying, do not be an idiot and not utilize things that are

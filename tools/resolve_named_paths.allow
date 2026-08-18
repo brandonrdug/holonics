@@ -54,6 +54,7 @@ blueprint/THE_ROADMAP.md :: overlap_nerve.tsv :: same driver
 
 # --- A path a movement proposes to create ---
 blueprint/THE_ROADMAP.md :: crates/holonic-engine/src/homology.rs :: the integer-homology movement's target; absent by design until it is built
+blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md :: soma/tools/eros/ :: the Phoenix blueprint's named exterior application target; absent by design until its construction station
 
 # --- Genre filename in a section stating the genre is empty ---
 canon/THE_RECOVERED_LAW.md :: RESULTS.md :: the observation-result genre filename; the live genre is empty per THE_DOCUMENT_LAW.md §1.8
