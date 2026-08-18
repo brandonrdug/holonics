@@ -58,7 +58,7 @@ use crate::causal::EventId;
 use crate::category::BoundaryId;
 use crate::evolution::{EvolutionError, EvolutionLawId, EvolutionShape};
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
-use crate::exact_work::ExactWork;
+use crate::exact_work::{Admission, ExactWork, WorkBudget};
 use crate::interaction::{InteractionBond, InteractionPattern, InteractionTemporality, OccurrencePort};
 use crate::realization::{RealizationError, RealizationWitness};
 
@@ -197,6 +197,82 @@ impl PortedTransport {
             chart: chart.into(),
             matrix,
         }
+    }
+
+    /// **Pose a transport from a source population's own stored codewords, exactly.**
+    ///
+    /// The codewords enter through [`crate::exact_value::ieee754`], the workspace's declared float
+    /// mouth, so the posed entries **are** the stored values rather than approximations of them.
+    /// The chart lineage names where they came from, because a matrix without its chart is a
+    /// coordinate array and not a transport.
+    pub fn posed_from_bfloat16(
+        name: impl Into<String>,
+        source_port: BoundaryId,
+        target_port: BoundaryId,
+        chart: impl Into<String>,
+        words: &[u16],
+        rows: usize,
+        columns: usize,
+    ) -> Result<Self, PortedError> {
+        if words.len() != rows.saturating_mul(columns) {
+            return Err(PortedError::PosedExtentDisagrees {
+                declared: rows.saturating_mul(columns),
+                supplied: words.len(),
+            });
+        }
+        let mut entries = Vec::with_capacity(rows);
+        for row in 0..rows {
+            let mut carried = Vec::with_capacity(columns);
+            for column in 0..columns {
+                let word = words[row * columns + column];
+                let datum = crate::exact_value::ieee754::decode_bfloat16_bits(word)
+                    .map_err(|_| PortedError::CodewordRefused { word })?;
+                carried.push(datum.value());
+            }
+            entries.push(carried);
+        }
+        Ok(Self::new(
+            name,
+            source_port,
+            target_port,
+            chart,
+            ExactRatMatrix::new(entries)?,
+        ))
+    }
+
+    /// **What posing this transport densely would cost, before anything is posed.**
+    ///
+    /// Residency is the coordinate that decides here: an exact rational entry is not a machine
+    /// word, and a caller that discovers this after allocating has already paid.
+    pub fn predicted_posing_work(rows: usize, columns: usize, entry_bits: u64) -> ExactWork {
+        let mut work = ExactWork::nothing();
+        work.resident(u64::try_from(rows.saturating_mul(columns)).unwrap_or(u64::MAX));
+        work.stepped();
+        let _ = entry_bits;
+        work
+    }
+
+    /// What factorizing this transport would cost, before it is attempted.
+    pub fn predicted_factorization_work(&self, entry_bits: u64) -> ExactWork {
+        ExactWork::predicted_elimination(self.matrix.rows().max(self.matrix.columns()), entry_bits)
+    }
+
+    /// **The factorization, only if a declared work receiver admits it.**
+    ///
+    /// A refusal is a return: it carries the priced work, the ceiling, and the coordinate that
+    /// dominated the price, so a caller learns *what* made the deed expensive rather than that it
+    /// was. `CLAUDE.md`: resource pressure changes partition, factorization, placement, residency,
+    /// or aperture — it never authorizes raising a magic number.
+    pub fn factorization_under(
+        &self,
+        budget: &WorkBudget,
+        entry_bits: u64,
+    ) -> Result<Result<LinearFactorization, Admission>, PortedError> {
+        let admission = budget.admits(&self.predicted_factorization_work(entry_bits));
+        if !admission.is_admitted() {
+            return Ok(Err(admission));
+        }
+        Ok(Ok(self.factorization()?))
     }
 
     /// Carry one standing across. Refuses on extent, and the port check happens in the word.
@@ -712,6 +788,10 @@ pub enum PortedError {
     ChartExtentsDisagree { left: String, right: String },
     #[error("an empty word has no composition")]
     EmptyWord,
+    #[error("a transport declared {declared} entries and {supplied} codewords were supplied")]
+    PosedExtentDisagrees { declared: usize, supplied: usize },
+    #[error("the codeword {word:#06x} is not a finite stored value")]
+    CodewordRefused { word: u16 },
     #[error("the source and native words, or their charts, are of disagreeing length")]
     WordLengthsDisagree,
     #[error("an exact linear operation refused: {0}")]
