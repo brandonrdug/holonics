@@ -101,6 +101,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 |---|---|
 | `blueprint/ADAPTING_A_NEW_ECOLOGY.md` | **Adapting a new ecology** — Use this worksheet before introducing code or a new organ. |
 | `blueprint/ARBITRARY_LEARNING_MACHINE.md` | **Extensible holonic learning machine** — Construct one continuing holonic ecology that can mount inherited organs, receive caused material through arbitrary codecs, let returned passages change reusable morphology, conduct later… |
+| `blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md` | **Athena — the dimension is declared, the rank is the file size, and no float is respected** — **Plan:** sits under `blueprint/THE_ROADMAP.md`. |
 | `blueprint/CONTAMINATION_BANS.md` | **Contamination bans** — These are hard reconstruction invariants derived from repeated laboratory failures. |
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md` | **The admission is a quotient and the breadth is a group** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
@@ -124,7 +125,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (127 deposits of 419)
+## 4 · The 2026-08 record line (129 deposits of 421)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -255,9 +256,11 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md` | The work is counted, the prediction is refuted where it is wrong, and the hand was inverted |
 | `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
 | `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
+| `2026-08-18_THE_ATLAS_IS_A_NAVMESH_AND_THE_TRANSITION_TO_A_TENSOR_SPLITS_INTO_A_FREE_TREE_AND_A_CYCLE_RANK.md` | The atlas is a navmesh, and the transition to a tensor splits into a free tree and a cycle rank |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
 | `2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md` | The blade dropped the metric, and the two-frame check was live only where it could not fire |
 | `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
+| `2026-08-18_THE_HANKEL_RANK_DOES_NOT_SATURATE_SO_THE_COMPRESSION_IS_SPARSITY_AND_IT_IS_EXACT.md` | The Hankel rank does not saturate, so the compression is sparsity — and it is exact |
 | `2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md` | The model and the production met, and the answer is a block, not a pick |
 
 ---

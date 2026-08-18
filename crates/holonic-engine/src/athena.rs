@@ -269,6 +269,130 @@ pub fn emit_tensor(
     })
 }
 
+/// **An integer tensor: no rounding, no residual, no float anywhere.**
+///
+/// **`BF16` cannot hold an index.** Eight significand bits means every integer above 256 is
+/// unrepresentable, so a container whose content is *structure* — class identities, targets, offsets
+/// — must carry integer dtypes. The industry's containers are `BF16` throughout because their
+/// content is magnitudes; the moment the content is a graph, that choice is wrong rather than
+/// merely lossy.
+///
+/// Measured 2026-08-18 and it is why this exists: the Hankel rank of real material does **not**
+/// saturate — 1,638 of 2,048 at the widest aperture swept, against 25,030 classes — so there is no
+/// small linear representation and a dense chart is an *expansion*. The transport is natively a
+/// sparse partial function and it crosses as one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IntegerTensor {
+    pub name: String,
+    pub rows: usize,
+    pub width: usize,
+    pub dtype: IntegerDtype,
+    /// Little-endian octets, row-major.
+    pub octets: Vec<u8>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IntegerDtype {
+    U16,
+    U32,
+}
+
+impl IntegerDtype {
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::U16 => "U16",
+            Self::U32 => "U32",
+        }
+    }
+
+    pub const fn octets(self) -> usize {
+        match self {
+            Self::U16 => 2,
+            Self::U32 => 4,
+        }
+    }
+
+    /// The greatest value this carrier holds. A value past it **refuses**: a silently wrapped index
+    /// addresses the wrong class, which is worse than a rounding error because nothing about it is
+    /// small.
+    pub const fn ceiling(self) -> u64 {
+        match self {
+            Self::U16 => u16::MAX as u64,
+            Self::U32 => u32::MAX as u64,
+        }
+    }
+}
+
+/// Lay a population of integers into a tensor, refusing any value the carrier cannot hold.
+pub fn emit_integers(
+    name: impl Into<String>,
+    values: &[u64],
+    width: usize,
+    dtype: IntegerDtype,
+) -> Result<IntegerTensor, AthenaError> {
+    if width == 0 || values.is_empty() {
+        return Err(AthenaError::EmptyRows);
+    }
+    if values.len() % width != 0 {
+        return Err(AthenaError::RaggedRow {
+            width: values.len() % width,
+            declared: width,
+        });
+    }
+    let mut octets = Vec::with_capacity(values.len() * dtype.octets());
+    for value in values {
+        if *value > dtype.ceiling() {
+            return Err(AthenaError::MouthRefused {
+                value: value.to_string(),
+                species: dtype.name(),
+                reason: format!("past the carrier's ceiling of {}", dtype.ceiling()),
+            });
+        }
+        match dtype {
+            IntegerDtype::U16 => octets.extend_from_slice(&(*value as u16).to_le_bytes()),
+            IntegerDtype::U32 => octets.extend_from_slice(&(*value as u32).to_le_bytes()),
+        }
+    }
+    Ok(IntegerTensor {
+        name: name.into(),
+        rows: values.len() / width,
+        width,
+        dtype,
+        octets,
+    })
+}
+
+/// Serialise integer tensors as a `safetensors` container. Every entry crosses **exactly**.
+pub fn integer_container(tensors: &[IntegerTensor]) -> Vec<u8> {
+    let mut header = String::from("{");
+    let mut offset = 0usize;
+    for (at, tensor) in tensors.iter().enumerate() {
+        if at > 0 {
+            header.push(',');
+        }
+        let end = offset + tensor.octets.len();
+        header.push_str(&format!(
+            "\"{}\":{{\"dtype\":\"{}\",\"shape\":[{},{}],\"data_offsets\":[{offset},{end}]}}",
+            tensor.name,
+            tensor.dtype.name(),
+            tensor.rows,
+            tensor.width
+        ));
+        offset = end;
+    }
+    header.push('}');
+    while header.len() % 8 != 0 {
+        header.push(' ');
+    }
+    let mut octets = Vec::with_capacity(8 + header.len() + offset);
+    octets.extend_from_slice(&(header.len() as u64).to_le_bytes());
+    octets.extend_from_slice(header.as_bytes());
+    for tensor in tensors {
+        octets.extend_from_slice(&tensor.octets);
+    }
+    octets
+}
+
 /// Serialise emitted tensors as a `safetensors` container.
 ///
 /// **The header is written by hand and deliberately so.** It is the whole of what the format is —

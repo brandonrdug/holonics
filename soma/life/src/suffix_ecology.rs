@@ -877,6 +877,33 @@ impl ExactSuffixEcology {
             .and_then(|parent| u32::try_from(parent).ok())
     }
 
+    /// **The transport out of one class, as it actually is: a sparse partial function.**
+    ///
+    /// Every outgoing germ transition, with the class it reaches. This is the whole of `δ` at that
+    /// class and it is what an Athena container carries — measured 2026-08-18, the Hankel rank of
+    /// real material does **not** saturate (1,638 of 2,048 at the widest aperture swept, against
+    /// 25,030 classes), so there is no small linear representation and a dense matrix chart is an
+    /// *expansion* of this rather than a compression of it.
+    pub fn outgoing(&self, state: u32) -> Vec<(ResonanceGerm, u32)> {
+        let Ok(at) = usize::try_from(state) else {
+            return Vec::new();
+        };
+        let Some(held) = self.states.get(at) else {
+            return Vec::new();
+        };
+        let Ok(rows) = self.transitions.iter(held.transitions) else {
+            return Vec::new();
+        };
+        rows.filter_map(|(symbol, target)| match symbol {
+            SuffixSymbol::Germ(key) => {
+                let germ = key.germ().ok()?;
+                Some((germ, u32::try_from(*target).ok()?))
+            }
+            SuffixSymbol::Boundary(_) => None,
+        })
+        .collect()
+    }
+
     /// **THE JUNCTION'S BREADTH** — how many distinct germs continue out of this class.
     ///
     /// `0` is a terminus. `1` is a **forced passage**: the material admits exactly one continuation,
