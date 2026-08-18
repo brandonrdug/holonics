@@ -195,7 +195,7 @@ the ATHENA-000 record is wrong.
 
 ### Station four — a declared architecture, so the container is runnable
 
-`config.json` naming the layer law: **layer `k` is the atlas at suffix-link height `k`**, layer count
+A declared architecture manifest naming the layer law: **layer `k` is the atlas at suffix-link height `k`**, layer count
 = the tree's height (measured **8**), and the composition is the transfer-matrix product of the
 per-germ `A_a`.
 
