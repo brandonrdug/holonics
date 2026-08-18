@@ -94,6 +94,27 @@ mouth on alignment frame, row masses, and contractions. This is bounded parity, 
 CUDA-codeword proof. No whole-source admission, contextual Gemma conduct, dissection, condensation,
 or Phoenix capability is promoted by those returns.
 
+**Stations one and two returned 2026-08-18** and are recorded in
+[`research/records/2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md`](../research/records/2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md).
+The three returns a linear map owes are built inside `exact_linear` — kernel, image, open exterior,
+affine preimage fibre with a witnessing obstruction covector, a rebase receipt carrying **both**
+identity compositions, and a metric adjoint a bare transpose fails under declared receiver metrics.
+`ported_operation` binds a foreign diagram with **nominal** port identity, retains its transport
+words, and carries the lift defect's own chain rule. The Gemma diagram is bound whole — `172` typed
+ports, `635` operations, `508` co-present fronts, `210` reconvergences, every operation typed
+construction / transport / face / quotient — and the source's authoritative description decides
+three bindings by name while **four remain open candidate populations** because the executable
+implementation is absent. One real transport applies at full extent with the card owning the deed;
+posing it densely as exact rationals is **refused** by a declared work receiver naming
+`resident-entries` as the dominating coordinate.
+
+**The contextual operator complex, dissection, condensation, cultivation, native rest, runtime and
+inference do not exist**, measured 2026-08-18 by
+`cargo run --release -q -p holonic-engine --example the_source_diagram_is_bound_or_its_candidates_are_retained -- /home/b/models/gemma-4-E4B-it`,
+which returns `diagram closed false` with `4` open candidate populations and poses no transport, and
+by `ls crates/holonic-engine/examples/ soma/life/examples/`, which carries no driver enacting a
+contextual word on caused material.
+
 **No executable capability is promoted by this design deposit.** `CONSTRUCTION_STATE.md` remains
 unchanged until the Gemma plan returns an actual source-detached executable native model and passes
 its complete grade.
