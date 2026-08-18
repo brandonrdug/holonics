@@ -27,6 +27,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::causal_language::token_germs;
+use crate::suffix_ecology::ExactSuffixEcology;
 use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
@@ -53,6 +55,55 @@ impl PresentedCandidate {
             sources: Vec::new(),
         }
     }
+}
+
+/// **Where a division reads its faces from.**
+///
+/// **`Atlas` is the production ground and `Surfaces` is the negative control.** The distinction is
+/// the whole of Brandon's 2026-08-18 correction:
+///
+/// > *"I'm worried at this point that you're still attempting to preserve properties as strings
+/// > directly as opposed to allowing the compression mechanisms to encode (embed) the tokens along
+/// > chains."*
+///
+/// He was right and the code was worse than the phrasing. Every face but the horizon was computed
+/// from a **spelling** — `TerminalToken` was `digest(token.as_bytes())`, and `InheritedSpan` was an
+/// `O(corpus)` window scan over `Vec<String>` backed by a `BTreeSet<Vec<String>>` holding **every
+/// window of the material**. That set is the *uncompressed enumeration of exactly what the suffix
+/// automaton compresses*, rebuilt beside the organ whose entire purpose is to have already done it.
+///
+/// Reading a spelling is wrong in both directions at once: it **separates identical transport**
+/// (one class, two spellings — the codec equivalence this corpus is built on) and it **merges
+/// different transport** (one spelling, two contexts, two classes).
+///
+/// And the "blind receiver" this module reported across a process seam was never blind. The sealed
+/// body carries the automaton; the automaton answers the span question by construction. The far
+/// side was being asked the corpus.
+pub enum PresentationGround<'atlas> {
+    /// The compressed material itself. Every face is read from where a prefix **lands** in it.
+    Atlas(&'atlas ExactSuffixEcology),
+    /// The literal inherited surfaces. Retained as the control that exhibits what the compression
+    /// was doing, never as the production ground.
+    Surfaces(PresentationMaterial),
+}
+
+/// Where one prefix lands, read once and carried.
+///
+/// `state` is the transport class — the set of positions the prefix occurs at, as one identity.
+/// `coherent_depth` is `matched_length`: how far back the current is still coherent, so a **drop**
+/// in it is exactly where the leader had to arc down a suffix link because the channel did not
+/// conduct forward. That arc is integration by lightning and `ExactSuffixEcology::carry` already
+/// performs it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct PrefixReading {
+    state: u32,
+    coherent_depth: u32,
+    standing: u64,
+    class_extent: u64,
+    /// `Some(true)` when the whole prefix was accepted without a single arc — which is exactly
+    /// "this is a contiguous window of the inherited material", answered in `O(|prefix|)` by the
+    /// walk rather than by searching a corpus.
+    span: Option<bool>,
 }
 
 /// The material the emission drew on, for the one receiver that needs it.
@@ -156,23 +207,86 @@ pub struct SeparatedAlternative {
 /// The declared receiver family: four codec faces of the emission's own return.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PresentationReceiver {
-    /// The identity of the prefix's last emitted token.
+    /// **The transport class the prefix lands in** — the automaton state, which is the set of
+    /// positions the prefix occurs at, carried as one identity.
+    ///
+    /// This is the face that reads the compression. Two candidates in one class are
+    /// indistinguishable to the transport **however they are spelled**; one spelling reached from
+    /// two contexts lands in two classes. Under `Surfaces` ground it reads `0` for everything and
+    /// collapses nothing, which is the honest behaviour of a face whose ground cannot answer it.
+    ///
+    /// **The `u32` is the height climbed up the suffix-link tree, and it is the declared grain.**
+    /// Height `0` is the finest class and on real material it is an **identity face** — measured
+    /// 2026-08-18, 501 emissions landed in 501 distinct classes, because at that length the
+    /// material genuinely distinguishes every continuation. Each step up reads the same current
+    /// through a shorter context, so the block count as a function of height is the compression
+    /// curve of this population against this material — a scale ladder read off the tree rather
+    /// than a threshold anyone chose.
+    TransportClass(u32),
+    /// **How far back the current is still coherent** — the walk's `matched_length`.
+    ///
+    /// A drop here is where the leader **arced down a suffix link** because no forward transition
+    /// existed. The magnitude is how much context survived the arc.
+    CoherentDepth,
+    /// **How much material stands behind the class** — the state's folded occurrence count.
+    Standing,
+    /// The identity of the prefix's last emitted token, **as a spelling**.
+    ///
+    /// **This is the control face and it is an identity map on distinct candidates.** A family
+    /// carrying it has the identity as its quotient. Kept because the difference between a division
+    /// with it and one without is the measurement of what the compression was doing.
     TerminalToken,
     /// The matched horizon that token was exposed at.
     TerminalHorizon,
     /// The set of sources that attested it.
     TerminalSources,
     /// Whether the prefix is a contiguous window of some inherited surface.
+    ///
+    /// Under `Atlas` ground this is *the whole prefix was accepted with no arc*, answered by the
+    /// walk. Under `Surfaces` ground it is a window search over a materialised substring set.
     InheritedSpan,
 }
 
 impl PresentationReceiver {
-    pub const ALL: [Self; 4] = [
+    /// Every declared face, **including the spelling control**.
+    pub const ALL: [Self; 7] = [
+        Self::TransportClass(0),
+        Self::CoherentDepth,
+        Self::Standing,
         Self::TerminalToken,
         Self::TerminalHorizon,
         Self::TerminalSources,
         Self::InheritedSpan,
     ];
+
+    /// ★ **THE TRANSPORT FAMILY** — every face read from where the prefix lands in the atlas, and
+    /// no spelling anywhere.
+    ///
+    /// This is the production family. `TerminalSources` is admitted because a source identity is a
+    /// lineage label the emission carried, not a spelling of the material; `TerminalToken` is not.
+    pub const TRANSPORT: [Self; 5] = [
+        Self::TransportClass(0),
+        Self::CoherentDepth,
+        Self::Standing,
+        Self::TerminalHorizon,
+        Self::InheritedSpan,
+    ];
+
+    /// **The transport family at a declared grain.**
+    ///
+    /// Every face here is read from the atlas and the class is read `height` steps up the
+    /// suffix-link tree. A family is only ever as coarse as its **finest** member, so a family
+    /// carrying an identity face has the identity as its quotient however many coarse faces sit
+    /// beside it — which is how `TerminalToken` made the first division vacuous and how
+    /// `TransportClass(0)` made the second one vacuous the same way.
+    pub fn transport_at(height: u32) -> [Self; 4] {
+        [
+            Self::TransportClass(height),
+            Self::Standing,
+            Self::TerminalHorizon,
+            Self::InheritedSpan,
+        ]
+    }
 
     /// **The family with the identity face withheld.**
     ///
@@ -186,6 +300,10 @@ impl PresentationReceiver {
         Self::TerminalSources,
         Self::InheritedSpan,
     ];
+
+    /// The spelling face alone — the sharpest control, whose quotient is the identity by
+    /// construction and whose block count therefore restates its input.
+    pub const SPELLING_ONLY: [Self; 1] = [Self::TerminalToken];
 }
 
 /// **The division: one uttered answer, and a typed remainder.**
@@ -240,9 +358,14 @@ struct PrefixSystem {
     index: BTreeMap<Vec<String>, usize>,
     alphabet: Vec<String>,
     family: Vec<PresentationReceiver>,
+    /// Every class's ancestor chain, resolved once at build so a face can read any declared height
+    /// without holding a borrow of the atlas.
+    ancestors: BTreeMap<(u32, u32), u32>,
+    /// Where each prefix LANDS, read once from the ground. Replaces the per-prefix span flag: a
+    /// landing answers the span question and four more besides.
+    readings: BTreeMap<Vec<String>, PrefixReading>,
     horizon_at: BTreeMap<Vec<String>, u32>,
     sources_at: BTreeMap<Vec<String>, BTreeSet<String>>,
-    spans: BTreeMap<Vec<String>, bool>,
 }
 
 fn digest(bytes: &[u8]) -> u64 {
@@ -293,9 +416,21 @@ impl ObservedSystem for PrefixSystem {
 }
 
 impl PrefixSystem {
+    fn ancestor_of(&self, state: u32, height: u32) -> u32 {
+        self.ancestors.get(&(state, height)).copied().unwrap_or(state)
+    }
+
     fn face(&self, prefix: &[String], receiver: PresentationReceiver) -> u64 {
         let owned = prefix.to_vec();
+        let reading = self.readings.get(&owned).copied().unwrap_or_default();
         match receiver {
+            // ---- the faces that read the compression ----
+            PresentationReceiver::TransportClass(height) => {
+                u64::from(self.ancestor_of(reading.state, height))
+            }
+            PresentationReceiver::CoherentDepth => u64::from(reading.coherent_depth),
+            PresentationReceiver::Standing => reading.standing,
+            // ---- the spelling control ----
             PresentationReceiver::TerminalToken => match prefix.last() {
                 None => 0,
                 Some(token) => digest(token.as_bytes()),
@@ -315,9 +450,13 @@ impl PrefixSystem {
                         .as_bytes(),
                 ),
             },
-            PresentationReceiver::InheritedSpan => {
-                u64::from(self.spans.get(&owned).copied().unwrap_or(true))
-            }
+            // Under Atlas ground this is "accepted with no arc", from the walk. Under Surfaces
+            // ground it is a window search. `None` -- the ground cannot answer -- reads as one
+            // value and collapses nothing, rather than reading as `false` and asserting *composed*.
+            PresentationReceiver::InheritedSpan => match reading.span {
+                None => 0,
+                Some(span) => u64::from(span) + 1,
+            },
         }
     }
 }
@@ -326,9 +465,59 @@ impl PrefixSystem {
 ///
 /// Shared by [`divide`] and [`divide_junction`] so the two readings cannot drift: a junction
 /// divided one way and audited another would be two partitions of one population.
+/// Read where one prefix lands.
+///
+/// **Under `Atlas` this is one walk and it answers everything.** `receive_path` carries the germs
+/// forward while the channel conducts and **arcs down a suffix link** when it does not — which is
+/// the lightning, already implemented — so the returned `(state, matched_length)` is the prefix's
+/// position in the compressed material. `matched_length == prefix.len()` means no arc lost anything,
+/// which is exactly *this is a contiguous window of the inherited material*, in `O(|prefix|)` and
+/// with no corpus present.
+///
+/// **Under `Surfaces` the transport faces read zero and the span is a window search.** That is the
+/// control, and its faces collapsing nothing is the honest behaviour of a ground that cannot answer
+/// them rather than a defect to paper over.
+fn read_landing(
+    ground: &PresentationGround<'_>,
+    prefix: &[String],
+) -> Result<PrefixReading, PresentationError> {
+    match ground {
+        PresentationGround::Surfaces(material) => Ok(PrefixReading {
+            state: 0,
+            coherent_depth: 0,
+            standing: 0,
+            class_extent: 0,
+            span: material.can_answer().then(|| material.is_contiguous_span(prefix)),
+        }),
+        PresentationGround::Atlas(ecology) => {
+            if prefix.is_empty() {
+                return Ok(PrefixReading {
+                    span: Some(true),
+                    ..PrefixReading::default()
+                });
+            }
+            let germs = token_germs(prefix).map_err(|_| PresentationError::CarrierExtent)?;
+            let current = ecology
+                .receive_path(&germs)
+                .map_err(|_| PresentationError::CarrierExtent)?;
+            let state = current.state();
+            let coherent_depth = current.matched_length();
+            let extent = u32::try_from(prefix.len()).map_err(|_| PresentationError::CarrierExtent)?;
+            Ok(PrefixReading {
+                state,
+                coherent_depth,
+                standing: ecology.standing_at(state).unwrap_or(0),
+                class_extent: ecology.class_extent(state).unwrap_or(0) as u64,
+                // No arc lost anything, so the whole prefix occurs in the material.
+                span: Some(coherent_depth == extent),
+            })
+        }
+    }
+}
+
 fn prefix_system(
     candidates: &[PresentedCandidate],
-    material: &PresentationMaterial,
+    ground: &PresentationGround<'_>,
     family: &[PresentationReceiver],
 ) -> Result<PrefixSystem, PresentationError> {
     if family.is_empty() {
@@ -368,19 +557,35 @@ fn prefix_system(
         .map(|(position, prefix)| (prefix.clone(), position))
         .collect();
     let alphabet: Vec<String> = alphabet.into_iter().collect();
-    let spans: BTreeMap<Vec<String>, bool> = prefixes
-        .iter()
-        .map(|prefix| (prefix.clone(), material.is_contiguous_span(prefix)))
-        .collect();
+    let mut readings = BTreeMap::new();
+    for prefix in &prefixes {
+        readings.insert(prefix.clone(), read_landing(ground, prefix)?);
+    }
+
+    // Resolve every height the declared family actually asks for, once.
+    let mut ancestors = BTreeMap::new();
+    if let PresentationGround::Atlas(ecology) = ground {
+        for face in family {
+            if let PresentationReceiver::TransportClass(height) = face {
+                for reading in readings.values() {
+                    ancestors.insert(
+                        (reading.state, *height),
+                        ecology.suffix_ancestor(reading.state, *height),
+                    );
+                }
+            }
+        }
+    }
 
     Ok(PrefixSystem {
         prefixes,
         index,
         alphabet,
         family: family.to_vec(),
+        ancestors,
+        readings,
         horizon_at,
         sources_at,
-        spans,
     })
 }
 
@@ -405,7 +610,8 @@ pub fn divide(
         .iter()
         .find(|candidate| candidate.identity == answer)
         .ok_or_else(|| PresentationError::AnswerNotPresented(answer.to_owned()))?;
-    let system = prefix_system(candidates, material, &PresentationReceiver::ALL)?;
+    let ground = PresentationGround::Surfaces(material.clone());
+    let system = prefix_system(candidates, &ground, &PresentationReceiver::ALL)?;
     let compression = compress(&system);
 
     let item_of = |tokens: &[String]| -> Option<ItemId> {
@@ -607,13 +813,13 @@ impl JunctionDivision {
 /// difference between the two block counts is exactly what the identity face was carrying.
 pub fn divide_junction(
     candidates: &[PresentedCandidate],
-    material: &PresentationMaterial,
+    ground: &PresentationGround<'_>,
     family: &[PresentationReceiver],
 ) -> Result<JunctionDivision, PresentationError> {
     if candidates.is_empty() {
         return Err(PresentationError::EmptyPopulation);
     }
-    let system = prefix_system(candidates, material, family)?;
+    let system = prefix_system(candidates, ground, family)?;
     let compression = compress(&system);
 
     let word_of = |word: &[InputId]| -> Vec<String> {
@@ -634,7 +840,10 @@ pub fn divide_junction(
     let mut block_members: BTreeMap<usize, BTreeSet<String>> = BTreeMap::new();
     let mut block_surfaces: BTreeMap<usize, BTreeSet<String>> = BTreeMap::new();
     let mut block_inherited: BTreeMap<usize, bool> = BTreeMap::new();
-    let material_can_answer = material.can_answer();
+    let ground_can_answer = !matches!(
+        ground,
+        PresentationGround::Surfaces(material) if !material.can_answer()
+    );
     let mut block_of_candidate: BTreeMap<String, usize> = BTreeMap::new();
     for candidate in candidates {
         let Some(position) = system.index.get(&candidate.tokens) else {
@@ -650,7 +859,11 @@ pub fn divide_junction(
             .entry(block)
             .or_default()
             .insert(candidate.tokens.join(" "));
-        let inherited = material.is_contiguous_span(&candidate.tokens);
+        let inherited = system
+            .readings
+            .get(&candidate.tokens)
+            .and_then(|reading| reading.span)
+            .unwrap_or(false);
         let slot = block_inherited.entry(block).or_insert(true);
         *slot = *slot && inherited;
         block_of_candidate.insert(candidate.identity.clone(), block);
@@ -676,7 +889,7 @@ pub fn divide_junction(
         .map(|block| ResponseBlock {
             members: block_members[block].iter().cloned().collect(),
             surfaces: block_surfaces[block].iter().cloned().collect(),
-            wholly_inherited: material_can_answer.then(|| block_inherited[block]),
+            wholly_inherited: ground_can_answer.then(|| block_inherited[block]),
         })
         .collect();
 

@@ -51,8 +51,8 @@ use life::causal_language::{
 };
 use life::eros_rest::{ErosRest, OrganRest};
 use life::presentation_quotient::{
-    divide_junction, JunctionDivision, PresentationMaterial, PresentationReceiver,
-    PresentedCandidate,
+    divide_junction, JunctionDivision, PresentationGround, PresentationMaterial,
+    PresentationReceiver, PresentedCandidate,
 };
 use soma_abi::active::ActionCurrent;
 
@@ -288,26 +288,69 @@ fn seal_and_dispatch() -> Result<(), String> {
             .map_err(|error| format!("generation refused for {prompt:?}: {error:?}"))?;
         report(prompt, &generation);
         let candidates = presented(&generation);
-        // **Two frames.** The full family carries `TerminalToken`, which is the candidate's own
-        // identity, so its quotient is the identity map and its block count restates the input.
-        // The collapsing family withholds exactly that axis. The DIFFERENCE is what the identity
-        // face was carrying, and withholding a receiver axis is the ablation shape this corpus
-        // names as the one to imitate.
-        let full = divide_junction(&candidates, &material_faces, &PresentationReceiver::ALL)
+        // **Two GROUNDS, and that is the measurement.** The atlas ground reads every face from
+        // where a prefix LANDS in the compressed material -- its transport class, how far back the
+        // current is still coherent, how much material stands behind the class. The surfaces
+        // ground reads spellings and searches a materialised window set. The difference between
+        // the two divisions is what the compression was doing.
+        let atlas = PresentationGround::Atlas(ecology.global_suffix());
+        let surfaces_ground = PresentationGround::Surfaces(material_faces.clone());
+
+        let transport = divide_junction(&candidates, &atlas, &PresentationReceiver::TRANSPORT)
             .map_err(|error| format!("the junction would not divide: {error:?}"))?;
-        respond(&full);
-        let collapsing =
-            divide_junction(&candidates, &material_faces, &PresentationReceiver::COLLAPSING)
-                .map_err(|error| format!("the junction would not divide: {error:?}"))?;
-        respond(&collapsing);
+        respond(&transport);
+
+        let spelling = divide_junction(
+            &candidates,
+            &surfaces_ground,
+            &PresentationReceiver::SPELLING_ONLY,
+        )
+        .map_err(|error| format!("the junction would not divide: {error:?}"))?;
+        respond(&spelling);
+
+        println!("    ---- THE GROUND ----");
         println!(
-            "    ---- THE AXIS ABLATION ----\n    withholding TerminalToken moves the response \
-             population {} -> {}",
-            full.conduct_blocks, collapsing.conduct_blocks
+            "    reading the SPELLING alone      {} blocks from {} candidates",
+            spelling.conduct_blocks, spelling.candidate_population
         );
-        if full.conduct_blocks == collapsing.conduct_blocks {
-            println!("    THE AXIS CARRIED NOTHING: the identity face changed no block. Reported");
-            println!("    rather than presented as agreement.");
+        println!(
+            "    reading the ATLAS at grain 0    {} blocks from {} candidates",
+            transport.conduct_blocks, transport.candidate_population
+        );
+
+        // ---- ★ THE COMPRESSION CURVE ----
+        //
+        // A family is only as coarse as its FINEST member, so grain 0 -- the finest transport class
+        // -- makes the whole family the identity whatever coarse faces sit beside it. That is not a
+        // defect in the material: at this length the material genuinely puts every continuation in
+        // its own class. The coarsening is the suffix-link tree, and climbing it reads the same
+        // current through a shorter context.
+        //
+        // The block count as a function of height is this population's compression against this
+        // material. Nothing here is chosen: the ladder is the tree the material built.
+        println!("    ---- THE COMPRESSION CURVE (grain climbed up the suffix-link tree) ----");
+        println!("      grain   blocks   collapsed pairs   memory order");
+        let mut previous = None;
+        for height in 0..8u32 {
+            let family = PresentationReceiver::transport_at(height);
+            let division = divide_junction(&candidates, &atlas, &family)
+                .map_err(|error| format!("the junction would not divide: {error:?}"))?;
+            println!(
+                "      {height:<7} {:<8} {:<17} {:?}",
+                division.conduct_blocks, division.collapsed_population, division.memory_order
+            );
+            if previous == Some(division.conduct_blocks) && division.conduct_blocks == 1 {
+                println!("      (the population has collapsed to one block; climbing further");
+                println!("       cannot coarsen it and the sweep stops)");
+                break;
+            }
+            previous = Some(division.conduct_blocks);
+        }
+        if transport.conduct_blocks == transport.candidate_population {
+            println!("    Grain 0 is an IDENTITY face on this population: every candidate lands in");
+            println!("    its own transport class, so the material distinguishes all of them at");
+            println!("    this length. That is a reading about the material, not a vacuous check --");
+            println!("    and it is exactly why a grain must be declared.");
         }
         before.push((prompt.to_string(), surfaces(&generation)));
     }
@@ -421,11 +464,11 @@ fn ride(path: Option<PathBuf>) -> Result<(), String> {
     let generation = ecology
         .generate(RIDE_PROMPT, spec(), current()?, 8)
         .map_err(|error| format!("generation refused: {error:?}"))?;
-    let blind = PresentationMaterial::default();
+    let atlas = PresentationGround::Atlas(ecology.global_suffix());
     let division = divide_junction(
         &presented(&generation),
-        &blind,
-        &PresentationReceiver::COLLAPSING,
+        &atlas,
+        &PresentationReceiver::TRANSPORT,
     )
     .map_err(|error| format!("the junction would not divide: {error:?}"))?;
     let surfaces = surfaces(&generation);
@@ -472,28 +515,29 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
     );
 
     println!("\n  PRODUCTION, AFTER THE SEAM");
-    // **The span receiver is BLIND on this side, and that is the second frame.** This process has
-    // no corpus, so `PresentationMaterial` is empty and `InheritedSpan` returns the same face for
-    // every candidate. Withholding a receiver axis is the ablation shape this corpus names as the
-    // one to imitate: the division is retaken under a family one axis smaller, and the difference
-    // between the two block counts is what that axis was carrying.
+    // **THE FAR SIDE WAS NEVER BLIND.**
     //
-    // It is also a real gap, stated as one: the sealed body carries every passage's suffix ecology,
-    // so the inherited surfaces ARE in the octets and no reader returns them. Until one does, the
-    // far side reads with three faces where the near side read with four.
-    let blind = PresentationMaterial::default();
+    // An earlier form of this driver read the span face from `PresentationMaterial`, found it empty
+    // in a process with no corpus, and called the receiver blind. The sealed body carries the
+    // atlas; the atlas answers the span question by construction, because a prefix accepted with no
+    // arc IS a contiguous window of the inherited material. The corpus was never the ground -- it
+    // was a materialised enumeration of what the compression already held.
+    //
+    // So this side reads the SAME family from the SAME kind of ground as the near side, and the two
+    // divisions may be compared directly rather than across an axis that was withheld by accident.
     for prompt in PROMPTS {
         let generation = ecology
             .generate(prompt, spec(), current()?, 8)
             .map_err(|error| format!("generation refused for {prompt:?}: {error:?}"))?;
         report(prompt, &generation);
+        let atlas = PresentationGround::Atlas(ecology.global_suffix());
         let division = divide_junction(
             &presented(&generation),
-            &blind,
-            &PresentationReceiver::COLLAPSING,
+            &atlas,
+            &PresentationReceiver::TRANSPORT,
         )
         .map_err(|error| format!("the junction would not divide: {error:?}"))?;
-        println!("    (the span receiver is blind here: no corpus in this process)");
+        println!("    (read from the atlas the octets carry -- no corpus in this process)");
         respond(&division);
     }
 

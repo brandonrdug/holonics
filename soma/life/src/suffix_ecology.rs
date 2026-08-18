@@ -848,6 +848,59 @@ impl ExactSuffixEcology {
         Ok(())
     }
 
+    /// **How much material stands behind one transport class.**
+    ///
+    /// This is the state's folded occurrence count — every material occurrence in its suffix-link
+    /// subtree. It is the **zeta transform** of the direct counts over the suffix-link poset, and
+    /// `absorb` inverts it by **Möbius inversion**, which is why a finalised body can be extended
+    /// at all.
+    ///
+    /// A reading that wants *how much material this class carries* takes it here rather than
+    /// counting occurrences in a corpus it may not have. The atlas already holds the answer.
+    pub fn standing_at(&self, state: u32) -> Option<u64> {
+        self.states
+            .get(usize::try_from(state).ok()?)
+            .map(|state| state.material_end_multiplicity)
+    }
+
+    /// **Climb the suffix-link tree — the material's own scale ladder.**
+    ///
+    /// A state's suffix link goes to the class of its longest proper suffix, so climbing coarsens:
+    /// height `0` is the finest class the prefix lands in, and each step up reads the same current
+    /// through a **shorter context**. The root is absorbing, so a climb past the top stops there
+    /// rather than refusing.
+    ///
+    /// **This is the self-similarity, and it is where a receiver declares its grain.** The tree is
+    /// scale-free in the substring-length direction — a class's occurrence set is the disjoint union
+    /// of its children's plus its own direct occurrences, the same shape at every height — so
+    /// restriction plus rebase along a suffix link preserves the reading while scale and lineage
+    /// remain. A grain declared as a height is read off a structure the material built; it is not a
+    /// threshold anyone chose.
+    pub fn suffix_ancestor(&self, state: u32, height: u32) -> u32 {
+        let mut at = match usize::try_from(state) {
+            Ok(at) if at < self.states.len() => at,
+            _ => return 0,
+        };
+        for _ in 0..height {
+            match self.states[at].suffix {
+                Some(parent) => at = parent,
+                None => break,
+            }
+        }
+        u32::try_from(at).unwrap_or(0)
+    }
+
+    /// **The longest substring this transport class represents.**
+    ///
+    /// A state is an equivalence class of contexts sharing one occurrence set; the class covers an
+    /// interval of substring lengths, and this is its top. With
+    /// [`ExactSuffixCurrent::matched_length`] it says where inside the class a current stands.
+    pub fn class_extent(&self, state: u32) -> Option<usize> {
+        self.states
+            .get(usize::try_from(state).ok()?)
+            .map(|state| state.maximum_length)
+    }
+
     pub fn state_count(&self) -> usize {
         self.states.len()
     }
