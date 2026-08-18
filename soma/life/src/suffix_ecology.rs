@@ -144,6 +144,12 @@ pub struct ExactSuffixCurrent {
 }
 
 impl ExactSuffixCurrent {
+    /// A current standing at the root — nothing carried yet. Public so a probe can walk the atlas
+    /// one germ at a time and read what happens at each step.
+    pub const fn root_public() -> Self {
+        Self::root()
+    }
+
     const fn root() -> Self {
         Self {
             state: 0,
@@ -861,6 +867,50 @@ impl ExactSuffixEcology {
         self.states
             .get(usize::try_from(state).ok()?)
             .map(|state| state.material_end_multiplicity)
+    }
+
+    /// The class of this class's longest proper suffix — one step of the ladder.
+    pub fn suffix_link(&self, state: u32) -> Option<u32> {
+        self.states
+            .get(usize::try_from(state).ok()?)?
+            .suffix
+            .and_then(|parent| u32::try_from(parent).ok())
+    }
+
+    /// **THE JUNCTION'S BREADTH** — how many distinct germs continue out of this class.
+    ///
+    /// `0` is a terminus. `1` is a **forced passage**: the material admits exactly one continuation,
+    /// so nothing is decided there and no plurality exists to divide. Greater than one is a genuine
+    /// fork. The distribution of this over the whole atlas says where the material is determined and
+    /// where it branches, which is a structural fact about the material and not about any prompt.
+    pub fn junction_breadth(&self, state: u32) -> usize {
+        let Ok(at) = usize::try_from(state) else {
+            return 0;
+        };
+        let Some(held) = self.states.get(at) else {
+            return 0;
+        };
+        let Ok(rows) = self.transitions.iter(held.transitions) else {
+            return 0;
+        };
+        rows.filter(|(symbol, _)| matches!(symbol, SuffixSymbol::Germ(_)))
+            .count()
+    }
+
+    /// **THE CLASS'S OWN INTERVAL** — `[minimum, maximum]` substring length.
+    ///
+    /// A state is not one substring. It is every substring of consecutive lengths that share this
+    /// occurrence set, and `minimum = maximum(suffix link) + 1`. **The width of that interval is a
+    /// tolerance in this corpus's exact sense**: over that whole range of grains the reading does not
+    /// change, because no declared receiver can separate them — the collapsed-pair relation, read off
+    /// the tree rather than set by a number.
+    pub fn class_interval(&self, state: u32) -> Option<(usize, usize)> {
+        let maximum = self.class_extent(state)?;
+        let minimum = match self.suffix_link(state) {
+            None => 0,
+            Some(parent) => self.class_extent(parent)? + 1,
+        };
+        Some((minimum, maximum))
     }
 
     /// **Climb the suffix-link tree — the material's own scale ladder.**

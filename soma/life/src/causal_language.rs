@@ -1915,6 +1915,13 @@ pub(crate) fn germ(identity: ReceiverFiberIdentity) -> Result<ResonanceGerm, Cau
     Ok(ResonanceGerm::new(identity, phase))
 }
 
+/// The germ population of a token sequence, for a caller probing the atlas directly.
+pub fn token_germs_public(
+    tokens: &[String],
+) -> Result<Vec<ResonanceGerm>, CausalLanguageError> {
+    token_germs(tokens)
+}
+
 pub(crate) fn token_germs(tokens: &[String]) -> Result<Vec<ResonanceGerm>, CausalLanguageError> {
     tokens
         .iter()
@@ -1937,7 +1944,13 @@ fn route_features(tokens: &[String]) -> BTreeSet<String> {
         .collect()
 }
 
-fn fiber_bytes(identity: &ReceiverFiberIdentity) -> Result<String, CausalLanguageError> {
+/// **Reopen a receiver fiber identity to the octets that founded it.**
+///
+/// `fiber_from_bytes` is a **length-prefixed word packing, not a digest**, and this reverses it
+/// exactly. So a germ carries its own token back with no vocabulary file anywhere — which is the
+/// corpus's own address law, *an address is a collapsed face that reopens*, holding at the smallest
+/// grain the machine has.
+pub fn fiber_bytes(identity: &ReceiverFiberIdentity) -> Result<String, CausalLanguageError> {
     if !matches!(
         identity.schema(),
         TOKEN_SCHEMA | FEATURE_SCHEMA | SOURCE_SCHEMA

@@ -124,7 +124,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (126 deposits of 418)
+## 4 · The 2026-08 record line (127 deposits of 419)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -254,6 +254,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-17_THE_QUOTIENT_HAS_TWO_PARTS_AND_THE_EMISSION_HEAD_KEEPS_ONE.md` | The quotient has two parts and the emission head keeps one |
 | `2026-08-17_THE_WORK_IS_COUNTED_THE_PREDICTION_IS_REFUTED_AND_THE_HAND_WAS_INVERTED.md` | The work is counted, the prediction is refuted where it is wrong, and the hand was inverted |
 | `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
+| `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
 | `2026-08-18_THE_BLADE_DROPPED_THE_METRIC_AND_THE_TWO_FRAME_CHECK_WAS_LIVE_ONLY_WHERE_IT_COULD_NOT_FIRE.md` | The blade dropped the metric, and the two-frame check was live only where it could not fire |
 | `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
