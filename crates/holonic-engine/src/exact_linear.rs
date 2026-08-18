@@ -321,6 +321,274 @@ impl ExactRatMatrix {
         Ok(inverse)
     }
 
+    // ---------------------------------------------------------------------------------------
+    // THE THREE RETURNS A MAP OWES, AND THEY ARE NOT THE SAME RETURN
+    // ---------------------------------------------------------------------------------------
+    //
+    // `research/records/2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_...md` §6 states the law and
+    // records these as `open`:
+    //
+    //     X -> X / ker(T) -> image(T) -> Y
+    //          quotient       rebase       inclusion / open cokernel
+    //
+    // - an **inverse** exists only for a rebase, and only with BOTH identity compositions;
+    // - a singular or rectangular map returns **kernel, image, cokernel and an affine preimage
+    //   fibre**, and selects no representative;
+    // - a **metric adjoint** `G_X^-1 T^T G_Y` is a third object again, and a bare transpose is it
+    //   only under undeclared orthonormal Euclidean charts — the smuggling this line refuses.
+    //
+    // They are added here rather than beside this owner because that is where the factorization of
+    // an exact rational operator belongs. Nothing below decides a receiver's purpose; each returns
+    // the complete population and lets a declaration do the choosing.
+
+    /// The reduced row echelon form, its pivot columns, and what the reduction cost.
+    ///
+    /// One primitive under everything below. `inverse` predates it and keeps its own augmented
+    /// elimination, so the certificate it already carries is untouched.
+    pub fn reduced_row_echelon(
+        &self,
+    ) -> Result<(Self, Vec<usize>, crate::exact_work::ExactWork), ExactLinearError> {
+        let mut work = crate::exact_work::ExactWork::nothing();
+        work.resident(u64::try_from(self.rows.saturating_mul(self.columns)).unwrap_or(u64::MAX));
+        let mut rows = self.to_rows();
+        let mut pivots = Vec::new();
+        let mut pivot_row = 0usize;
+        for column in 0..self.columns {
+            if pivot_row >= self.rows {
+                break;
+            }
+            let Some(found) = (pivot_row..self.rows).find(|row| !rows[*row][column].is_zero())
+            else {
+                continue;
+            };
+            rows.swap(found, pivot_row);
+            work.stepped();
+            let divisor = rows[pivot_row][column].clone();
+            for entry in &mut rows[pivot_row] {
+                *entry /= &divisor;
+                work.divided(1);
+            }
+            let pivot = rows[pivot_row].clone();
+            for row in 0..self.rows {
+                if row == pivot_row || rows[row][column].is_zero() {
+                    continue;
+                }
+                let factor = rows[row][column].clone();
+                for (entry, above) in rows[row].iter_mut().zip(&pivot) {
+                    *entry -= &factor * above;
+                    work.multiplied(1);
+                    work.added(1);
+                }
+            }
+            pivots.push(column);
+            pivot_row += 1;
+        }
+        for row in &rows {
+            for entry in row {
+                work.wrote(entry);
+            }
+        }
+        Ok((Self::new(rows)?, pivots, work))
+    }
+
+    /// The rank, read off the reduction rather than declared.
+    pub fn rank(&self) -> Result<usize, ExactLinearError> {
+        Ok(self.reduced_row_echelon()?.1.len())
+    }
+
+    /// **A basis of `ker(T)`: the directions this map collapses.**
+    ///
+    /// One vector per free column, each carrying a single `1` in its own free coordinate, so the
+    /// population is exhibited rather than summarized by a count. An empty return is a genuine
+    /// zero: the map collapses nothing.
+    pub fn kernel_basis(&self) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
+        let (reduced, pivots, _) = self.reduced_row_echelon()?;
+        let free: Vec<usize> = (0..self.columns)
+            .filter(|column| !pivots.contains(column))
+            .collect();
+        let mut basis = Vec::with_capacity(free.len());
+        for column in &free {
+            let mut vector = vec![Rat::zero(); self.columns];
+            vector[*column] = Rat::one();
+            for (row, pivot) in pivots.iter().enumerate() {
+                vector[*pivot] = -reduced.get(row, *column)?.clone();
+            }
+            basis.push(vector);
+        }
+        Ok(basis)
+    }
+
+    /// **A basis of `image(T)`: the pivot columns of the map itself**, not of its reduction.
+    pub fn image_basis(&self) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
+        let (_, pivots, _) = self.reduced_row_echelon()?;
+        let mut basis = Vec::with_capacity(pivots.len());
+        for column in pivots {
+            basis.push(
+                (0..self.rows)
+                    .map(|row| self.get(row, column).cloned())
+                    .collect::<Result<Vec<_>, _>>()?,
+            );
+        }
+        Ok(basis)
+    }
+
+    /// **A basis of the cokernel's annihilator: the covectors that see nothing this map emits.**
+    ///
+    /// `coker(T) = Y / image(T)`, and what exhibits it exactly is `ker(T^T)` — every covector
+    /// vanishing on the image. A nonempty return is the **open exterior** of this transport: a
+    /// receiver direction the map cannot reach, named rather than counted.
+    pub fn cokernel_annihilator(&self) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
+        self.transpose()?.kernel_basis()
+    }
+
+    /// **The complete affine preimage of a declared target, and no representative is selected.**
+    ///
+    /// Returns `Some((particular, kernel_basis))` — the fibre `x_0 + ker(T)` — or `None` with the
+    /// inconsistency exhibited by [`Self::preimage_obstruction`]. A caller that wants one point
+    /// declares that reading itself.
+    pub fn preimage_fibre(
+        &self,
+        target: &[Rat],
+    ) -> Result<Option<(Vec<Rat>, Vec<Vec<Rat>>)>, ExactLinearError> {
+        if target.len() != self.rows {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let mut augmented = self.to_rows();
+        for (row, value) in augmented.iter_mut().zip(target) {
+            row.push(value.clone());
+        }
+        let augmented = Self::new(augmented)?;
+        let (reduced, pivots, _) = augmented.reduced_row_echelon()?;
+        if pivots.last() == Some(&self.columns) {
+            // A pivot in the augmented column: the target is outside the image.
+            return Ok(None);
+        }
+        let mut particular = vec![Rat::zero(); self.columns];
+        for (row, pivot) in pivots.iter().enumerate() {
+            particular[*pivot] = reduced.get(row, self.columns)?.clone();
+        }
+        Ok(Some((particular, self.kernel_basis()?)))
+    }
+
+    /// The covector witnessing that a target lies outside the image, or `None` when it does not.
+    ///
+    /// **An obstruction is a return.** `w` with `w^T T = 0` and `<w, y> != 0` proves the refusal
+    /// rather than asserting it.
+    pub fn preimage_obstruction(
+        &self,
+        target: &[Rat],
+    ) -> Result<Option<Vec<Rat>>, ExactLinearError> {
+        if target.len() != self.rows {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        for covector in self.cokernel_annihilator()? {
+            let pairing = covector
+                .iter()
+                .zip(target)
+                .fold(Rat::zero(), |sum, (left, right)| sum + left * right);
+            if !pairing.is_zero() {
+                return Some(Ok(covector)).transpose();
+            }
+        }
+        Ok(None)
+    }
+
+    /// **The complete factorization**, so a caller cannot read one face and forget the others.
+    pub fn factorization(&self) -> Result<LinearFactorization, ExactLinearError> {
+        let (_, pivots, work) = self.reduced_row_echelon()?;
+        Ok(LinearFactorization {
+            rows: self.rows,
+            columns: self.columns,
+            rank: pivots.len(),
+            kernel: self.kernel_basis()?,
+            image: self.image_basis()?,
+            cokernel_annihilator: self.cokernel_annihilator()?,
+            work,
+        })
+    }
+
+    /// **A rebase receipt, which requires BOTH identity compositions.**
+    ///
+    /// `TABLET_THE_OPERATIONS`: an inverse exists only for a rebase. A map that is not one refuses
+    /// here and returns its factorization instead of a pseudo-inverse nobody declared.
+    pub fn rebase_receipt(&self) -> Result<RebaseReceipt, ExactLinearError> {
+        if !self.is_square() {
+            return Ok(RebaseReceipt::Refused {
+                factorization: Box::new(self.factorization()?),
+                reason: "a rectangular map has no inverse; it has a factorization",
+            });
+        }
+        match self.inverse() {
+            Ok(inverse) => {
+                let identity = Self::identity(self.rows)?;
+                let forward = self.multiply(&inverse)?;
+                let backward = inverse.multiply(self)?;
+                if forward != identity || backward != identity {
+                    return Err(ExactLinearError::InverseCertificateFailure);
+                }
+                Ok(RebaseReceipt::Rebase {
+                    inverse: Box::new(inverse),
+                    forward_identity: true,
+                    backward_identity: true,
+                })
+            }
+            Err(ExactLinearError::SingularMatrix) => Ok(RebaseReceipt::Refused {
+                factorization: Box::new(self.factorization()?),
+                reason: "the map collapses a direction; it is a quotient, not a rebase",
+            }),
+            Err(other) => Err(other),
+        }
+    }
+
+    /// **The metric adjoint `G_X^-1 T^T G_Y`**, characterized by `<Tx, y>_Y = <x, T^dagger y>_X`.
+    ///
+    /// A bare transpose is this object only when both metrics are the identity, which is an
+    /// orthonormal Euclidean declaration nobody made. `CLAUDE.md` §13: *the metric is a receiver
+    /// face of standing*, so it is a parameter here and never a default.
+    pub fn metric_adjoint(
+        &self,
+        domain_metric: &Self,
+        codomain_metric: &Self,
+    ) -> Result<Self, ExactLinearError> {
+        if domain_metric.rows != self.columns || !domain_metric.is_square() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        if codomain_metric.rows != self.rows || !codomain_metric.is_square() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        domain_metric
+            .inverse()?
+            .multiply(&self.transpose()?)?
+            .multiply(codomain_metric)
+    }
+
+    /// The exact defect of a claimed adjoint against its own characterization, over a declared
+    /// pair. Zero is the claim; anything else is the obstruction, exhibited.
+    pub fn adjoint_defect(
+        &self,
+        claimed: &Self,
+        domain_metric: &Self,
+        codomain_metric: &Self,
+        x: &[Rat],
+        y: &[Rat],
+    ) -> Result<Rat, ExactLinearError> {
+        let left = {
+            let tx = self.apply(x)?;
+            let gy = codomain_metric.apply(y)?;
+            tx.iter()
+                .zip(&gy)
+                .fold(Rat::zero(), |sum, (a, b)| sum + a * b)
+        };
+        let right = {
+            let ty = claimed.apply(y)?;
+            let gx = domain_metric.apply(x)?;
+            gx.iter()
+                .zip(&ty)
+                .fold(Rat::zero(), |sum, (a, b)| sum + a * b)
+        };
+        Ok(left - right)
+    }
+
     fn zip(
         &self,
         other: &Self,
@@ -357,6 +625,55 @@ impl ExactRatMatrix {
     }
 }
 
+/// The complete factorization of an exact rational transport.
+///
+/// **All four faces at once**, so a caller cannot read the rank and forget that the map collapses
+/// something or that its exterior is open.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LinearFactorization {
+    pub rows: usize,
+    pub columns: usize,
+    pub rank: usize,
+    /// The collapsed directions, exhibited.
+    pub kernel: Vec<Vec<Rat>>,
+    /// The reached directions, as columns of the map itself.
+    pub image: Vec<Vec<Rat>>,
+    /// Covectors that see nothing this map emits: the **open exterior**.
+    pub cokernel_annihilator: Vec<Vec<Rat>>,
+    pub work: crate::exact_work::ExactWork,
+}
+
+impl LinearFactorization {
+    /// A rebase collapses nothing and leaves nothing unreached.
+    pub fn is_rebase(&self) -> bool {
+        self.kernel.is_empty() && self.cokernel_annihilator.is_empty() && self.rows == self.columns
+    }
+
+    pub fn collapsed_dimension(&self) -> usize {
+        self.kernel.len()
+    }
+
+    pub fn open_exterior_dimension(&self) -> usize {
+        self.cokernel_annihilator.len()
+    }
+}
+
+/// What a map returns when asked whether it is a rebase.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RebaseReceipt {
+    /// **Both identity compositions returned.** That is what makes it a rebase.
+    Rebase {
+        inverse: Box<ExactRatMatrix>,
+        forward_identity: bool,
+        backward_identity: bool,
+    },
+    /// Not a rebase, and the factorization is what it has instead.
+    Refused {
+        factorization: Box<LinearFactorization>,
+        reason: &'static str,
+    },
+}
+
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ExactLinearError {
     #[error("an exact matrix cannot have ragged rows")]
@@ -378,6 +695,167 @@ pub enum ExactLinearError {
 #[cfg(test)]
 mod tests {
     use num_bigint::BigInt;
+    use super::*;
+
+    fn rat(numerator: i64, denominator: i64) -> Rat {
+        Rat::new(BigInt::from(numerator), BigInt::from(denominator))
+    }
+
+    fn matrix(rows: &[&[i64]]) -> ExactRatMatrix {
+        ExactRatMatrix::new(
+            rows.iter()
+                .map(|row| row.iter().map(|value| rat(*value, 1)).collect())
+                .collect(),
+        )
+        .expect("well-formed")
+    }
+
+    /// **A singular map returns its factorization, never an inverse.** The collapsed direction is
+    /// exhibited as a vector rather than reported as a rank deficit.
+    #[test]
+    fn a_singular_map_returns_a_factorization_rather_than_an_inverse() {
+        // Columns two and three are dependent, so exactly one direction collapses.
+        let singular = matrix(&[&[1, 2, 3], &[2, 4, 6], &[1, 1, 1]]);
+        let receipt = singular.rebase_receipt().expect("receipt");
+        let RebaseReceipt::Refused { factorization, .. } = receipt else {
+            panic!("a singular map must refuse to be a rebase");
+        };
+        assert_eq!(factorization.rank, 2);
+        assert_eq!(factorization.collapsed_dimension(), 1);
+        assert_eq!(factorization.open_exterior_dimension(), 1);
+        assert!(!factorization.is_rebase());
+        // And the collapsed direction really is collapsed: T k = 0, exactly.
+        let kernel = &factorization.kernel[0];
+        let image = singular.apply(kernel).expect("applies");
+        assert!(image.iter().all(Zero::is_zero), "kernel vector {kernel:?}");
+        // The open exterior is a covector that sees nothing the map emits.
+        let covector = &factorization.cokernel_annihilator[0];
+        for column in factorization.image.iter() {
+            let pairing = covector
+                .iter()
+                .zip(column)
+                .fold(Rat::zero(), |sum, (a, b)| sum + a * b);
+            assert!(pairing.is_zero(), "the annihilator must annihilate the image");
+        }
+    }
+
+    /// **A rectangular map has no inverse and says so**, returning the affine preimage fibre for a
+    /// reachable target and a witnessing covector for an unreachable one. No representative is
+    /// selected in either case.
+    #[test]
+    fn a_rectangular_map_returns_an_affine_fibre_or_an_exhibited_obstruction() {
+        // Two equations, three unknowns: one free direction.
+        let wide = matrix(&[&[1, 1, 0], &[0, 1, 1]]);
+        assert!(matches!(
+            wide.rebase_receipt().expect("receipt"),
+            RebaseReceipt::Refused { .. }
+        ));
+        let target = vec![rat(2, 1), rat(3, 1)];
+        let (particular, kernel) = wide
+            .preimage_fibre(&target)
+            .expect("solved")
+            .expect("reachable");
+        assert_eq!(wide.apply(&particular).expect("applies"), target);
+        assert_eq!(kernel.len(), 1, "one free direction");
+        // Every point of the fibre maps to the same target, which is what makes it a fibre.
+        let moved: Vec<Rat> = particular
+            .iter()
+            .zip(&kernel[0])
+            .map(|(base, direction)| base + direction * rat(7, 2))
+            .collect();
+        assert_eq!(wide.apply(&moved).expect("applies"), target);
+        assert!(
+            wide.preimage_obstruction(&target).expect("checked").is_none(),
+            "a reachable target has no obstruction"
+        );
+
+        // A tall map whose exterior is genuinely open.
+        let tall = matrix(&[&[1, 0], &[0, 1], &[0, 0]]);
+        let unreachable = vec![rat(0, 1), rat(0, 1), rat(1, 1)];
+        assert!(tall.preimage_fibre(&unreachable).expect("solved").is_none());
+        let covector = tall
+            .preimage_obstruction(&unreachable)
+            .expect("checked")
+            .expect("the refusal is witnessed");
+        let pairing = covector
+            .iter()
+            .zip(&unreachable)
+            .fold(Rat::zero(), |sum, (a, b)| sum + a * b);
+        assert!(!pairing.is_zero(), "the witness must separate the target");
+    }
+
+    /// **A rebase returns both identity compositions**, and that is the whole content of the claim.
+    #[test]
+    fn a_rebase_returns_both_identity_compositions() {
+        let rebase = matrix(&[&[2, 1], &[1, 1]]);
+        let RebaseReceipt::Rebase {
+            inverse,
+            forward_identity,
+            backward_identity,
+        } = rebase.rebase_receipt().expect("receipt")
+        else {
+            panic!("an invertible map is a rebase");
+        };
+        assert!(forward_identity && backward_identity);
+        let identity = ExactRatMatrix::identity(2).expect("identity");
+        assert_eq!(rebase.multiply(&inverse).expect("product"), identity);
+        assert_eq!(inverse.multiply(&rebase).expect("product"), identity);
+        assert!(rebase.factorization().expect("factored").is_rebase());
+    }
+
+    /// **A bare transpose is the adjoint only under undeclared orthonormal charts.**
+    ///
+    /// Under a nonidentity receiver metric the transpose fails `<Tx,y>_Y = <x,T*y>_X` and the
+    /// metric adjoint passes it. This is the smuggling `CLAUDE.md` §13 refuses, made executable.
+    #[test]
+    fn a_bare_transpose_fails_the_adjoint_test_under_a_declared_metric() {
+        let transport = matrix(&[&[1, 2], &[0, 3]]);
+        let domain_metric = matrix(&[&[2, 0], &[0, 5]]);
+        let codomain_metric = matrix(&[&[3, 1], &[1, 4]]);
+        let x = vec![rat(1, 1), rat(-2, 1)];
+        let y = vec![rat(3, 1), rat(1, 2)];
+
+        let bare = transport.transpose().expect("transposed");
+        let bare_defect = transport
+            .adjoint_defect(&bare, &domain_metric, &codomain_metric, &x, &y)
+            .expect("paired");
+        assert!(
+            !bare_defect.is_zero(),
+            "a bare transpose must not satisfy a declared metric's adjoint law"
+        );
+
+        let adjoint = transport
+            .metric_adjoint(&domain_metric, &codomain_metric)
+            .expect("adjoint");
+        let defect = transport
+            .adjoint_defect(&adjoint, &domain_metric, &codomain_metric, &x, &y)
+            .expect("paired");
+        assert!(defect.is_zero(), "the metric adjoint must satisfy its own law, got {defect}");
+
+        // And under identity metrics the two coincide, which is exactly when the shortcut is lawful.
+        let identity = ExactRatMatrix::identity(2).expect("identity");
+        assert_eq!(
+            transport.metric_adjoint(&identity, &identity).expect("adjoint"),
+            bare
+        );
+    }
+
+    /// The reduction's rank agrees with the factorization it founds, and the work is counted rather
+    /// than timed.
+    #[test]
+    fn the_reduction_returns_its_rank_and_what_it_cost() {
+        let map = matrix(&[&[1, 2, 3], &[2, 4, 6], &[1, 1, 1]]);
+        let (_, pivots, work) = map.reduced_row_echelon().expect("reduced");
+        assert_eq!(pivots.len(), 2);
+        assert_eq!(map.rank().expect("rank"), 2);
+        let coordinates = work.coordinates();
+        assert!(
+            coordinates.iter().any(|(name, count)| *name == "dependency-span"
+                && *count == num_bigint::BigUint::from(2u32)),
+            "the dependency span is the pivot count: {coordinates:?}"
+        );
+    }
+
 
     use super::*;
 

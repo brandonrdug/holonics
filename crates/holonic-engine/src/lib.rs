@@ -200,7 +200,7 @@ pub mod landauer;
 pub mod executor;
 pub mod field_atlas;
 pub mod generative_transport;
-mod exact_json;
+pub mod exact_json;
 pub mod foreign_map;
 pub mod gluing;
 // The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
@@ -296,6 +296,7 @@ pub mod returned_conduct;
 // The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
 // with the obstruction named when the target chart cannot represent the answer.
 // `canon/TABLET_THE_CHART.md:280`.
+pub mod ported_operation;
 pub mod quintic_chart;
 // Exact univariate and bivariate polynomials over `Q`, with the complete rational-root census and
 // the fraction-free polynomial resultant that `quintic_chart` eliminates with.

@@ -253,6 +253,56 @@ fn skip_value(bytes: &[u8], at: &mut usize) -> Result<(), String> {
     }
 }
 
+
+/// A signed integer field, exactly. **There is no float path here and that is the point.**
+pub fn as_i64(span: &str) -> Option<i64> {
+    span.trim().parse::<i64>().ok()
+}
+
+pub fn as_bool(span: &str) -> Option<bool> {
+    match span.trim() {
+        "true" => Some(true),
+        "false" => Some(false),
+        _ => None,
+    }
+}
+
+/// The raw spans of a `[...]` array's elements, in order, without allocating a tree.
+pub fn array_elements(span: &str) -> Result<Vec<&str>, String> {
+    let bytes = span.as_bytes();
+    let mut at = 0usize;
+    skip_space(bytes, &mut at);
+    if bytes.get(at) != Some(&b'[') {
+        return Err("the span does not open with an array".to_owned());
+    }
+    at += 1;
+    let mut out = Vec::new();
+    loop {
+        skip_space(bytes, &mut at);
+        match bytes.get(at) {
+            None => return Err("the array ends without closing".to_owned()),
+            Some(b']') => return Ok(out),
+            Some(b',') => {
+                at += 1;
+                continue;
+            }
+            Some(_) => {}
+        }
+        let from = at;
+        skip_value(bytes, &mut at)?;
+        out.push(&span[from..at]);
+    }
+}
+
+/// Every string element of a `[...]` span, in order.
+pub fn as_string_array(span: &str) -> Option<Vec<String>> {
+    array_elements(span)
+        .ok()?
+        .into_iter()
+        .map(as_string)
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
