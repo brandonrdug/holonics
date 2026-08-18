@@ -64,6 +64,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` | **Tablet of the circulating cartographer** — The map is the changing terrain; intelligence is navigation through it; and the present construction frontier is circulation through the machine's existing organs rather than another… |
 | `canon/TABLET_THE_COMPRESSION.md` | **TABLET — THE COMPRESSION** — **Ratified:** 2026-08-14. **Derivation and every citation:** `research/records/2026-08-14_COMPRESSION_IS_A_CODEC_PIVOT_THE_INVARIANCE_IS_ADDITIVE_AND_NOTHING_PRICES_BOTH_AXES.md`. |
 | `canon/TABLET_THE_FLOW.md` | **The flow: fluid dynamics, phases, and parallel integration** — Why Navier-Stokes is not a distant problem, the zeta distribution as an exact self-similar phase, and ant integration as the exact part of the fundamental theorem. |
+| `canon/TABLET_THE_HEXIS.md` | **Tablet of hexis: cultivation, overlays, condensation, and the living receiver** — **Derivation:** `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`. |
 | `canon/TABLET_THE_MANIFOLD.md` | **The manifold: charts as types, the structure group as the legal casts, and what a loop returns** — A manifold is the invariant of a population of currents and not their container; a chart is a type and a transition map is an implicit cast; every geometry is a reduction of the structure… |
 | `canon/TABLET_THE_OPERATIONS.md` | **The operations: every classical operation is a construction, a transport, a face, or a quotient** — Every operation of linear algebra, differential equations, and analysis is one of four species — a construction, a transport, a face, or a quotient — and the notation is complete only when… |
 | `canon/TABLET_THE_REALIZER.md` | **The realizer: positivity, the holomorphic half, and rendering** — Hodge-Riemann where it is proved, the holomorphic organ that was already owned, and rendering as a receiver whose missed feature is an obstruction. |
@@ -125,7 +126,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (135 deposits of 427)
+## 4 · The 2026-08 record line (136 deposits of 428)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -257,6 +258,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md` | Three owners, one abelian defect, and the July corpus already held the repair |
 | `2026-08-18_A_LICENSED_WALK_EMITS_SUBSTRINGS_AND_THE_ARC_IS_THE_COMPOSITION_OPERATOR.md` | A licensed walk emits substrings, and the arc is the composition operator |
 | `2026-08-18_FREQUENCY_DISAGREES_WITH_EVERY_OTHER_FACE_AT_EVERY_JUNCTION.md` | Frequency disagrees with every other face, at every junction |
+| `2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md` | Hexis is rested conditional transport; tuning deforms it, and distillation condenses families |
 | `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
 | `2026-08-18_THE_ATLAS_IS_A_NAVMESH_AND_THE_TRANSITION_TO_A_TENSOR_SPLITS_INTO_A_FREE_TREE_AND_A_CYCLE_RANK.md` | The atlas is a navmesh, and the transition to a tensor splits into a free tree and a cycle rank |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |

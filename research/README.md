@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 427 research deposits current through 18 August 2026, including all 307
+`records/` contains 428 research deposits current through 18 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -120,6 +120,15 @@ governs the rebuild.
   MTP, and block diffusion receivers; material distinguished from noise; autograd as the adjoint
   return through retained causal lineage; and the comparative architecture named as a
   receiver-indexed multigraded causal sheaf/state-space ecology with plastic incidence.
+- **Hexis, tuning, factorized overlays, familywise condensation, and inherited-model rebirth:**
+  `records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`
+  — the industry cultivation stack separated into exposure, broad pretraining, specialized
+  post-training, overlays, and world return; architecture-independent checkpoint-relative
+  fine-tuning; LoRA as a factorized morphology overlay whose semantic rank must be founded;
+  distillation as a cross-chart transport square with a retained defect; the illicial potential
+  section and causal adjoint return; lattice/crystal/fractal/lightning morphology regimes; founded
+  capacity; and the boundary by which inherited transformer hexis may be lifted, cultivated,
+  condensed, rested, and ablated without claiming recovery of its original corpus.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

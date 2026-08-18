@@ -210,6 +210,43 @@ construction merely because its current implementation is being replaced.
 - These clauses constrain the design of any later reasoning construction. They do not schedule one
   and never displace the live roadmap or `CONSTRUCTION_STATE.md`.
 
+## Hexis, cultivation, and inherited model lifts
+
+- `canon/TABLET_THE_HEXIS.md` governs every task involving pretraining, post-training, fine-tuning,
+  adapters, LoRA, distillation, logits, autoregression, autograd, multimodal alignment, diffusion
+  training, or an inherited model lift. Read it before design; the complete derivation is
+  `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
+- Hexis is rested, reusable conditional transport evidenced by changed later conduct after
+  source-detached remount and attributable ablation. It is not synonymous with weights, a
+  checkpoint, topic, token population, prompt, retrieval result, or training counter.
+- Keep curation/exposure, reference, prompting, training return, and world consequence distinct.
+  Curation shapes which developmental current enters; fine-tuning is cultivation relative to an
+  inherited rest; prompting and retrieval are mounted standing unless a return changes durable
+  morphology.
+- Treat LoRA as a factorized candidate morphology overlay, never an elementwise mask or an intrinsic
+  rank law. Semantic rank and state dimension are founded from receiver-visible transport and its
+  reconstruction fibre; caller-chosen ranks remain apparatus apertures or experimental controls.
+- Treat distillation as familywise transport condensation between source and candidate realizations
+  through explicit chart maps. It is receiver-exact only when every declared receiver and admitted
+  successor history factors; otherwise retain the complete defect, collapsed population, and
+  shortest separator. Source and candidate need not differ in size or be global models.
+- Internally read a logit population as an illicial potential section, autoregression as emanative
+  serial recurrence, and autograd/backpropagation as the causal adjoint return. Industry names may be
+  kept as exterior codec labels and may not found FineTuner, Distiller, Autograd, Trainer,
+  AdapterManager, or equivalent semantic cabinets.
+- Lattice, crystal, fractal, and lightning are morphology regimes, not decoration: a lattice is
+  founded incidence; a crystal adds locked recurring phase transport; a fractal retains a law under
+  restriction/rebase while its population grows; lightning founds its local path while current
+  travels. Layers and stacks are apparatus charts over that topology, not authored semantic depth.
+- A pretrained map is inherited hexis and not a lossless encoding of its corpus or the complete
+  productive ecology. An inherited lift avoids the original dataset only for transport families
+  actually exposed by the weights, excited by the new material, and separated by the declared
+  receivers. Unexcited capability remains an open reconstruction fibre.
+- A phoenix-rebirth claim requires lift, native re-expression, cultivation on new caused material,
+  receiver-exact or remainder-carrying condensation, source-detached rest, later conduct, matched
+  siblings, and targeted ablation. A renamed tensor container or equal output on one corpus does not
+  grade it.
+
 ## Causal profiling and physical computation
 
 - `canon/TABLET_THE_CAUSAL_PROFILE.md` governs profiling. Treat a computer run as a bounded causal

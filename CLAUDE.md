@@ -90,6 +90,7 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
 | `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_HEXIS.md` | **cultivation, overlays, condensation, and inherited model lifts, ratified 2026-08-18**: hexis as rested conditional transport; fine-tuning as cultivation relative to inherited rest; LoRA as a factorized overlay; distillation as familywise transport condensation; the illicial potential section and causal adjoint return; founded lattice capacity; and the boundary on phoenix-rebirthing inherited models. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
 | `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material has returned one bounded algorithmic world-line family. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_COMPRESSION.md` | **what compression is, ratified 2026-08-14**: a codec pivot carrying a declared decoder, the three species by remainder, the linear ceiling and the four hypotheses it needs, and the cost as a second axis. **Its governing correction is that the invariance is ADDITIVE** — a difference against a declared machine, never a ratio — so a compression figure quoted without its decoder is the absolute-volume violation, and it names the 2024 result that is commonly quoted in violation of it. |
@@ -1317,6 +1318,75 @@ So the figure stands as what it is — an outside sympy analysis, quoted with it
 sentence that promised it a route to becoming a machine return is withdrawn. **A discharge condition
 naming an owner that answers a different question is worse than no condition**, because it reads as
 already considered, which is the durability mechanism this file convicts elsewhere by name.
+
+## 0n. Hexis, cultivation, and inherited-model rebirth — ratified 2026-08-18
+
+The governing doctrine is `canon/TABLET_THE_HEXIS.md`; the complete derivation, industry-source
+crosswalk, equations, owner map, and boundaries are
+`research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
+This section carries only the conduct rules.
+
+**Hexis is rested conditional transport.** A checkpoint, parameter field, adapter, lattice, state
+equation, codec path, or generated organ realizes hexis only where it survives rest/remount, changes
+later conduct, and targeted removal removes the attributable consequence. Do not use `hexis` as a
+synonym for weights, topic, prompt, corpus, token list, or a training counter.
+
+**Keep the cultivation events distinct.** Data curation and filtering shape the exposure aperture.
+Multimodal labels do not make sections interact without shared occurrence, chronology, geometry,
+calibration, or consequence. Fine-tuning is checkpoint-relative cultivation through changed
+parameters or attached trainable morphology. Prompting, retrieval, caches, and tools are mounted
+current or exterior ecology unless their return changes durable standing.
+
+**Industry vocabulary is a boundary chart, never a cabinet plan.** Internally:
+
+```text
+logit vector       -> illicial potential section
+autoregression     -> emanative serial recurrence
+autograd/backprop  -> causal adjoint return
+LoRA               -> factorized morphology overlay
+distillation       -> familywise transport condensation
+teacher/student    -> source/candidate realizations
+```
+
+Keep the familiar words when communicating with industry tools and papers. Do not found
+`FineTuner`, `Distiller`, `Autograd`, `Trainer`, `AdapterManager`, or matching semantic owners from
+them. Compose the standing section, ratio, residual, adjoint, compression, chain, diffusion, rest,
+and ablation owners first.
+
+**LoRA is not a mask and its rank is not law.** It inserts a factorized low-rank delta through an
+inherited transport. A caller-chosen rank is an apparatus aperture or experimental control. The
+machine's semantic rank, state dimension, lattice depth, and stopping relation come from
+receiver-visible defect, incidence, cycle population, exact work, and reconstruction testimony. If
+the required family is not low-rank, return that obstruction or use another morphology species; do
+not increase a constant until a benchmark passes.
+
+**Distillation compares transports, not model personalities.** Source and candidate need not differ
+in size, architecture, modality, or global identity. Require explicit cross-chart maps and compare
+complete successor histories. Call the condensation receiver-exact only when every declared future
+consequence factors through it. Otherwise carry the defect, collapsed population, and shortest
+separator. `teacher` and `student` are exterior metaphors and may not decide the ontology.
+
+**A pretrained map is inherited hexis, never its lost corpus.** The weights may amortize prior
+developmental work and expose potential transports; they do not losslessly encode the original data,
+training procedure, or every behavior the data could elicit. An inherited lift succeeds without the
+original corpus only for pathways the map exposes, the new material excites, and the receiver family
+can distinguish. Static weight analysis returns potential conduct; contextual conduct still owes a
+caused current or exact active-path composition.
+
+**Phoenix rebirth has a complete grade.** Lift the foreign transports, re-express them as native
+sections/lattices/state equations, cultivate them on new caused material, condense repeated families
+with their remainder, seal with the foreign source absent, remount, and require attributable later
+conduct plus matched-sibling and targeted-ablation controls. A converted tensor file, one equal
+output, or a renamed architecture is not rebirth.
+
+**No authored semantic capacities.** Layers and stacks are apparatus/chronology charts. Lattice
+incidence, recurring phase, cycles, reconvergence, and receiver consequence found the useful
+dimensions. Physical memory, formats, calibrated safety limits, receiver questions, and maximum
+authorized work remain exterior declarations. Resource pressure changes partition, factorization,
+placement, residency, or aperture, or returns an obstruction; it never authorizes raising a magic
+number and repeating the same morphology.
+
+This section schedules nothing. The roadmap and position record alone decide construction.
 
 ## 1. The floor is a carrier, not a retired interface
 
