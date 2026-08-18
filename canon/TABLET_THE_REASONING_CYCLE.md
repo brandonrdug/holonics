@@ -316,6 +316,93 @@ current rides that changed morphology without CPU semantic phase choreography. C
 bounded return creates no Transformer, Reasoner, Planner, Conversation, Expert, Language,
 Schedule, Stack, or ControlFlow subsystem.
 
+## 8b. The future is a plural causal section
+
+`interpretation`: a common comparison space for CNNs, GNNs, attention, state-space recurrence,
+discrete diffusion, autoregression, multi-token prediction, and Eros is a **holonic section space**:
+
+```text
+H = (graded incidence K,
+     local state spaces S,
+     typed transport T,
+     receiver family R,
+     reusable morphology Lambda,
+     addressed lineage ell,
+     open exterior O).
+```
+
+An architecture is a factorization and apparatus chart of caused section evolution in `H`, not a
+separate ontology. A tensor is one global chart; a convolution transports a fixed kernel over a
+declared incidence; a graph network transports over sparse irregular incidence; attention forms an
+input-conditioned dense contact graph; an SSM factors temporal continuation through retained latent
+standing; Eros additionally admits multigraded incidence, higher filling, exterior return, and
+plastic morphology.
+
+For a complete contact population with scores `s_i`, finite-temperature softmax first returns the
+ratio cocycle
+
+```text
+r(i,j) = exp(beta (s_i - s_j)),
+r(i,j) r(j,k) = r(i,k).
+```
+
+It factors through the additive-gauge quotient `R^n / span(1,...,1)` and drops no member by itself.
+The common additive frame is the departed coordinate; the complete pairwise-difference family is the
+retained remainder. Sampling, quantization, top-k, argmax, or another later collapse owes its own
+`ReconstructionFiber`.
+
+The exact differential bridge to diffusion is
+
+```text
+J_softmax = beta (diag(p) - p p^T),
+J_softmax 1 = 0,
+v^T J_softmax v = beta Var_p(v).
+```
+
+`J_softmax` is the complete-graph Laplacian with conductances `beta p_i p_j`. It is the local
+alternative-fibre geometry through which an adjoint residual returns. The standing
+`SectionModulus` is an adjacent receiver over second moment and extreme fibre; its implemented
+unweighted symbolic reading is not silently identified with the softmax-weighted covariance.
+
+The exact diffusion law already projects to a discrete state equation:
+
+```text
+(C + tau L) phi_(k+1) = C phi_k + u_k,
+phi_(k+1) = (C + tau L)^-1 C phi_k + (C + tau L)^-1 u_k,
+y_k = H phi_k.
+```
+
+Thus an exact diffusion certificate supplies `A_bar`, `B_bar`, chronology, and a declared
+observation map without founding an SSM subsystem. Sheaf diffusion generalizes the state to local
+stalks and typed restriction maps. A fixed LTI SSM is one condensation of this ecology; a selective
+or switching sheaf SSM is closer where current changes admission, observation, or chronology.
+
+`definition`: for a predecessor occurrence `E` and future receiver family `F`, the **plural future
+section** is the complete situated successor population with its internal incidence, chronology,
+compatible transports, open alternatives, obstructions, and lineage. A nearest-token prediction is
+one quotient of that section. Multi-token heads, speculative drafting, and block diffusion are
+different receiver/apparatus faces of plural futures and may not be conflated, but none requires one
+token to be the primitive future object.
+
+Material entering the cycle is caused substrate/current, not noise. A declared corruption source,
+an unresolved receiver fibre, and physical apparatus disturbance are three distinct objects which
+may each be called noise in an exterior chart. Causal diffusion transports standing and returned
+differences through founded incidence; it does not require random corruption or delete source
+lineage.
+
+`interpretation`: holonic autograd is the adjoint return through the local maps and addressed
+lineage of the forward passage. The adjoint reverses composition order rather than physical time.
+Softmax returns through its Laplacian, an SSM through `A_bar^T`, a sheaf through adjoint restriction
+maps, and an implicit diffusion solve through `M^T psi = dL/dphi`. A non-smooth seam returns plural
+generalized derivatives, obstruction, or refusal rather than a fabricated smooth gradient.
+
+The compact comparative description is **a receiver-indexed multigraded causal sheaf/state-space
+ecology with plastic incidence**. It is a chart for reasoning about Eros, never a replacement name
+or a claim that Eros is identical to an inherited neural-network architecture.
+
+Complete derivation, industry-source distinctions, owner map, and boundaries:
+`research/records/2026-08-18_THE_FUTURE_IS_A_PLURAL_CAUSAL_SECTION_SOFTMAX_IS_ITS_LOCAL_LAPLACIAN_AND_THE_ADJOINT_RETURNS_THROUGH_STATE.md`.
+
 ## 9. Construction discipline and falsifiers
 
 `project-postulate`: composition precedes new organs. Before naming a new subsystem, route the

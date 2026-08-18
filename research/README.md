@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 359 research deposits current through 12 August 2026, including all 307
+`records/` contains 427 research deposits current through 18 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -112,6 +112,14 @@ governs the rebuild.
   joined resident circulation without host semantic phase choreography. Compressed into
   `../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`, with corrections in
   `../canon/TABLET_THE_REASONING_CYCLE.md` and `../canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
+- **Plural future sections, local softmax geometry, diffusion, state, and the adjoint return:**
+  `records/2026-08-18_THE_FUTURE_IS_A_PLURAL_CAUSAL_SECTION_SOFTMAX_IS_ITS_LOCAL_LAPLACIAN_AND_THE_ADJOINT_RETURNS_THROUGH_STATE.md`
+  — architecture families as factorisations of one holonic section evolution; finite-temperature
+  softmax as an additive-gauge quotient and ratio cocycle; its Jacobian as a complete-graph
+  Laplacian; exact diffusion as an SSM projection; plural future sections unifying nearest-token,
+  MTP, and block diffusion receivers; material distinguished from noise; autograd as the adjoint
+  return through retained causal lineage; and the comparative architecture named as a
+  receiver-indexed multigraded causal sheaf/state-space ecology with plastic incidence.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.
