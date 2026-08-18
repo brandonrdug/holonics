@@ -99,6 +99,12 @@ cross-chart maps. It is receiver-exact only where every declared future conseque
   possible apparatus consequences; none is compression by itself.
 - Every approximate or bounded condensation carries the cross-chart defect, collapsed population,
   reconstruction fibre, and shortest separating histories.
+- **A population the declared material never excited is `unexcited`, never `condensed`.** The two
+  are separate classes of the coverage ledger and they are reported as two numbers whose sum is the
+  only quotable one; an unexcited population's bytes stay inside the reconstruction fibre and inside
+  the artifact-plus-decoder total. A collapse whose classes are separated only by which material the
+  operator chose is a statement about that choice and not about the map — the authored-partition
+  defect `CLAUDE.md` convicts, wearing a passing result.
 - Exceptional compression means receiver-minimal native morphology: every retained axis has a
   separating consequence and removing any retained relation moves the declared family. No numeric
   compression-factor threshold is authored in advance. The words *exceptional*, *hyper-efficient*,
@@ -529,6 +535,20 @@ where the source collapses.
   independent audits. There is no semantic fallback.
 - Exact semantic receipts are separate from timing, memory, power, and thermal telemetry.
 - Every station predicts/counts exact work before expensive execution and returns typed refusal.
+- **An exact resident carrier has a finite width and a chained source tower will exhaust it.**
+  Measured 2026-08-18 on the first instance by
+  `grep -n "CARRIER_OCTAVES\|fn needed_octaves" -A 8 crates/holonic-engine/src/embedding_fiber.rs`:
+  the resident exact carrier is `128` octaves wide and each chained multiply-accumulate over width
+  `d` costs `2*entry + ceil(log2 d) + 1`, so two chained `2560`-wide products fit and the third
+  refuses. Every source deeper than two chained products therefore owes a **declared grain with a
+  retained exact residual** at each boundary — `value = grain + residual` holding exactly, which is
+  a quotient carrying its complete reconstruction fibre and not a rounding. The grain is read off a
+  receiver that stopped separating; it is never authored, and no grain, ladder, or floor may appear
+  in source or driver code before that receiver has failed to separate. **The retained residual per
+  boundary is a measurement of the transport, not an accounting cost**: a boundary whose residual
+  population grows is dissipative and one whose residual shrinks is contractive, and that reading is
+  unavailable to any float implementation of the same tower. It is also a condensation axis
+  orthogonal to morphology, and it is graded by the same receiver-minimality condition.
 - Resource pressure changes partition, factorization, placement, residency, or receiver aperture.
   It never authorizes increasing a magic bound and replaying the same morphology.
 - A quantized deployment export may use exterior floating/scaled arithmetic. No float enters the
@@ -627,6 +647,9 @@ Every implementing agent carries these sentences verbatim:
 > A caller-selected rank or layer count is not founded capacity.
 > A dequantized low-bit tensor is not the original full-precision model.
 > A CPU replay is not a GPU-resident return.
+> A population the material never excited is not a population that condensed.
+> A grain chosen to improve a number is not a grain a receiver stopped separating at.
+> A discarded residual is not an exact pass.
 > A source-name correspondence is not a transport correspondence.
 > Agreement with the source is not Phoenix success.
 > A source-detached remount and targeted ablation are mandatory.
