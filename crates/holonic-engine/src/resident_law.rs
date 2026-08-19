@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 
 use crate::embedding_fiber::MountedReadout;
 use crate::ported_operation::OperationSpecies;
-use crate::resident_section::{BandElements, Dyadic, DyadicEnclosure, Lane, LawShape, Positions, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, SeriesAperture, StagedWords};
+use crate::resident_section::{BandElements, Dyadic, DyadicEnclosure, Lane, LaneTree, LawShape, PartialStanding, Positions, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, SeriesAperture, StagedWords, TileGeometry};
 
 // ---------------------------------------------------------------------------------------------
 // material
@@ -418,6 +418,165 @@ impl ResidentLaw for Contract {
     }
     fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
         surface.record_contract(lane, inputs[0], &material.populations[&self.population].readout, out)
+    }
+}
+
+
+/// **The same contraction, realized as a tiled cooperative geometry.** One law, one species, one
+/// map, one output — and a caller-declared `tile` that is an APPARATUS aperture and nothing else.
+///
+/// Its source entailment is `Contract`'s, unchanged and by construction: the same population's own
+/// attribute must name the operation in a resolved slice and the same declared shape must be
+/// identified in the container header. The tile adds one parameter row saying what entailed it —
+/// the caller's declaration of a launch geometry — so a receipt reading the law's name and
+/// parameters can see that the geometry is apparatus and that no source testimony was asked to
+/// carry it.
+///
+/// **Why no new admission law is needed.** The a-priori bound `Contract` is admitted under is
+/// subset-monotone: for every `A ⊆ [0, K)`,
+/// `|Σ_{i∈A} w_i x_i| ≤ (Σ_{i∈A} |w_i|) · max_i |x_i| ≤ (Σ_{i∈K} |w_i|) · max_i |x_i|`, which is
+/// the row-mass bound itself. So every node of every tree over every K-partition stands inside the
+/// octaves the occurrence was already admitted for, and the tiled law's `bound_octaves` is
+/// `Contract`'s verbatim. `admitted_node_octaves` is a declared per-node aperture the kernel
+/// REFUSES at rather than wrapping past — a behavioural difference from the scalar owner, which has
+/// no per-step check at all.
+///
+/// Species: transport.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContractTiled {
+    pub population: String,
+    pub tile: TileGeometry,
+    /// The per-node overflow aperture. `ResidentSurface::carrier_octaves()` is the carrier's own
+    /// ceiling; a caller declaring less is narrowing the aperture and will see the refusal.
+    pub admitted_node_octaves: u32,
+    /// Which fixed word the lanes fold under. `Descending` is the declared word.
+    pub tree: LaneTree,
+}
+
+impl ResidentLaw for ContractTiled {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        self.entail(validation)
+    }
+    fn name(&self) -> &'static str {
+        "contract-tiled(apparatus tile)"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Transport
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        if material.populations.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0) + i64::from(material.populations[&self.population].mass_value_octaves) + 1
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_contract_tiled(rows, width, octaves, &material.populations[&self.population].readout, self.tile)
+    }
+    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        vec![map_range(&material.populations[&self.population].readout)]
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_contract_tiled(lane, inputs[0], &material.populations[&self.population].readout, self.tile, self.admitted_node_octaves, self.tree, out)
+    }
+}
+
+impl ContractTiled {
+    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut entailment = Contract { population: self.population.clone() }.entail(validation)?;
+        entailment.law = "contract-tiled";
+        entailment.parameters.push((
+            "tile".to_owned(),
+            format!("{:?}", self.tile),
+            "the caller's declared launch geometry — an APPARATUS aperture; no source testimony carries it, and the returned words do not move with it".to_owned(),
+        ));
+        entailment.parameters.push((
+            "admitted_node_octaves".to_owned(),
+            self.admitted_node_octaves.to_string(),
+            "the caller's declared per-node overflow aperture, inside the carrier the same source shape admits".to_owned(),
+        ));
+        entailment.parameters.push((
+            "tree".to_owned(),
+            self.tree.written().to_owned(),
+            "the declared fixed reduction word — apparatus, and the reversed control returns the same words".to_owned(),
+        ));
+        Ok(entailment)
+    }
+}
+
+/// **The same contraction again, with `K` partitioned into `S` slices whose exact 128-bit partials a
+/// join folds under one fixed word.** Required where no K-complete member of the family reaches one
+/// wave. NO PARTIAL IS ROUNDED: the one outward rounding happens in the join and nowhere else.
+///
+/// The partial standing is retained on the surface before the passage opens ([`ResidentSurface::retain_partials`])
+/// because the kernel that writes it and the kernel that reads it are recorded into one graph before
+/// either runs. Both kernels are ONE occurrence — one law, one output section, one census — recorded
+/// in order on one lane.
+///
+/// Species: transport.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContractSplitK {
+    pub population: String,
+    pub tile: TileGeometry,
+    pub partials: PartialStanding,
+    pub admitted_node_octaves: u32,
+    pub tree: LaneTree,
+}
+
+impl ResidentLaw for ContractSplitK {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        self.entail(validation)
+    }
+    fn name(&self) -> &'static str {
+        "contract-split-k(apparatus tile)"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Transport
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        if material.populations.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0) + i64::from(material.populations[&self.population].mass_value_octaves) + 1
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_contract_tiled(rows, width, octaves, &material.populations[&self.population].readout, self.tile)
+    }
+    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        vec![map_range(&material.populations[&self.population].readout), self.partials.range()]
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_contract_split_k(lane, inputs[0], &material.populations[&self.population].readout, self.tile, &self.partials, self.admitted_node_octaves, self.tree, out)
+    }
+}
+
+impl ContractSplitK {
+    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut entailment = Contract { population: self.population.clone() }.entail(validation)?;
+        entailment.law = "contract-split-k";
+        entailment.parameters.push((
+            "tile".to_owned(),
+            format!("{:?}", self.tile),
+            "the caller's declared launch geometry, with the K partition factor — an APPARATUS aperture".to_owned(),
+        ));
+        entailment.parameters.push((
+            "partials".to_owned(),
+            format!("{} exact 128-bit partials per output coordinate", self.partials.splits),
+            "the apparatus standing the split writes and the join reads; no partial is at the grain and none is rounded".to_owned(),
+        ));
+        entailment.parameters.push((
+            "tree".to_owned(),
+            self.tree.written().to_owned(),
+            "the declared fixed reduction word over the K partition — apparatus".to_owned(),
+        ));
+        Ok(entailment)
     }
 }
 
@@ -1224,6 +1383,42 @@ mod tests {
         let (lo, hi) = pi_enclosure(40).expect("pi");
         assert!(lo < hi);
         assert!(lo > decimal_to_rat("3.14159265358979").unwrap() && hi < decimal_to_rat("3.1415926535898").unwrap());
+    }
+
+    #[test]
+    fn the_tiled_law_is_entailed_by_the_same_testimony_and_names_the_tile_as_apparatus() {
+        let population = "model.language_model.layers.0.self_attn.q_proj.weight".to_owned();
+        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
+        let tiled = ContractTiled { population: population.clone(), tile, admitted_node_octaves: 126, tree: LaneTree::Descending };
+        let scalar = Contract { population: population.clone() };
+        let related = validation(&["query_states = self.q_proj(hidden_states).view(hidden_shape)"], &[], &[(&population, &[2048, 2560])]);
+        // the SAME testimony entails both, and the tiled law adds only apparatus rows
+        let scalar_entailed = scalar.entailment(&related).expect("scalar entailed");
+        let tiled_entailed = tiled.entailment(&related).expect("tiled entailed");
+        assert_eq!(scalar_entailed.naming_slices, tiled_entailed.naming_slices);
+        assert_eq!(tiled_entailed.parameters[0], scalar_entailed.parameters[0]);
+        assert_eq!(tiled_entailed.parameters.len(), scalar_entailed.parameters.len() + 3);
+        assert!(tiled_entailed.parameters.iter().any(|(name, _, by)| name == "tile" && by.contains("APPARATUS")));
+        assert!(tiled_entailed.parameters.iter().any(|(name, _, _)| name == "tree"));
+        // and a slice that names a different population entails neither
+        let unrelated = validation(&["key_states = self.k_proj(hidden_states).view(hidden_shape)"], &[], &[(&population, &[2048, 2560])]);
+        assert!(matches!(scalar.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
+        assert!(matches!(tiled.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
+        // the split-K law carries the partition factor and the partial standing as apparatus too
+        let standing_free = ContractSplitK {
+            population: population.clone(),
+            tile: TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 8 },
+            partials: PartialStanding::declared(1, 2048, 8),
+            admitted_node_octaves: 126,
+            tree: LaneTree::Descending,
+        };
+        let split_entailed = standing_free.entailment(&related).expect("split entailed");
+        assert_eq!(split_entailed.law, "contract-split-k");
+        assert!(split_entailed.parameters.iter().any(|(name, value, _)| name == "partials" && value.contains('8')));
+        // the laws are the same species and the same arity as the scalar owner
+        assert_eq!(tiled.species(), scalar.species());
+        assert_eq!(tiled.arity(), scalar.arity());
+        assert_eq!(standing_free.species(), OperationSpecies::Transport);
     }
 
     #[test]

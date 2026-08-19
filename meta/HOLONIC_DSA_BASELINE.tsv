@@ -120,8 +120,8 @@ crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.fla
 crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57
 crates/holonic-engine/src/regime_reading.rs	.clone()=1	.collect()=5	Vec=7
 crates/holonic-engine/src/reopening.rs	.clone()=40	.collect()=15	.flat_map()=2	.into_iter()=1	Vec=55
-crates/holonic-engine/src/resident_law.rs	.clone()=14	.collect()=11	.into_iter()=4	BTreeMap=43	Vec=49
-crates/holonic-engine/src/resident_section.rs	.clone()=8	.collect()=14	.into_iter()=3	Vec=67
+crates/holonic-engine/src/resident_law.rs	.clone()=21	.collect()=11	.into_iter()=4	BTreeMap=47	Vec=51
+crates/holonic-engine/src/resident_section.rs	.clone()=8	.collect()=16	.into_iter()=3	Vec=75
 crates/holonic-engine/src/resource.rs	.clone()=6	BTreeMap=10
 crates/holonic-engine/src/returned_reading.rs	.clone()=30	.collect()=33	.flat_map()=2	.into_iter()=9	BTreeMap=5	BTreeSet=20	Vec=54
 crates/holonic-engine/src/running_integral.rs	.clone()=14	.collect()=12	.into_iter()=2	BTreeMap=12	BTreeSet=24	Vec=13	VecDeque=2

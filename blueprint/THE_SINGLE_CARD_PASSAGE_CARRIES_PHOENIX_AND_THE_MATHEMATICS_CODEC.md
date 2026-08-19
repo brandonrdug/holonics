@@ -3,7 +3,7 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap. **Deeds H0 and H1 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md)); H2 is the open deed; every later deed is open.
+**Status:** active construction contract when named by the roadmap. **Deeds H0, H1 and H2 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md)); H3 is the open deed; every later deed is open.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -584,6 +584,10 @@ lineage.
 Pass requires exact equality and no regression in receiver result. Performance is reported, not a
 semantic gate, but a tiled realization whose profile exhibits no additional ready warps or locality
 must return that obstruction before it replaces the scalar owner.
+
+**Returned 2026-08-19** — the record named in the status line. 104/104 bit-equal under three
+referees; the obstruction returned shape-conditionally with its mechanism measured (q_proj: eligible
+warps ×4, 5–20× faster; gate_proj: DRAM 95 %, L2 hit 83 % → 7 %, 0.91×); the scalar owner retained.
 
 ### Deed H3 — reductions, census and receiver-dependent fusion
 

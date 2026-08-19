@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (157 deposits of 449)
+## 4 · The 2026-08 record line (158 deposits of 450)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -286,6 +286,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md` | The site conducts, the candidates are separated by one order, and the source departs |
 | `2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md` | The site returned, but the card did not own the path, and Phoenix remains a partial lift |
 | `2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md` | The source diagram is bound, the transport is posed, and the work receiver refuses the dense one |
+| `2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md` | The contraction is tiled, the scalar owner referees, and the obstruction is shape-conditional and measured |
 | `2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md` | The filled polygon is a two-chain, the cosmological flow is a symmetry quotient, and the equation atlas retains its fibres |
 | `2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md` | The layer is one graph launched once, and the immediate gate returns its falsifiers with the ratchet open |
 | `2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md` | The partition is typed, the reduction is a junction, and the adversary refuted eight claims before the deed was recorded |
@@ -311,7 +312,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 18 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 19 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

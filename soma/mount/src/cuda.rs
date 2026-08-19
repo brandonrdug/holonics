@@ -798,6 +798,48 @@ impl Function<'_> {
         })
     }
 
+    /// Read the driver/JIT's actual per-thread register count for this entry after PTX has been
+    /// lowered for the mounted card. Attribute four is `CU_FUNC_ATTRIBUTE_NUM_REGS`.
+    ///
+    /// **A measurement, never a governor.** The count is what the loaded module actually carries,
+    /// so a caller deriving a residency candidate family from it is reading the apparatus rather
+    /// than estimating it; nothing here chooses a geometry.
+    pub fn num_regs(&self) -> Result<u32> {
+        let mut value = 0i32;
+        unsafe {
+            check(
+                cuFuncGetAttribute(&mut value, 4, self.func),
+                "cuFuncGetAttribute(NUM_REGS)",
+            )?
+        };
+        if value < 0 {
+            return Err(invalid_driver_value(
+                "Function::num_regs",
+                format!("driver reported a negative per-thread register count {value}"),
+            ));
+        }
+        Ok(value as u32)
+    }
+
+    /// The statically declared shared surface of this entry, in octets. Attribute one is
+    /// `CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES`; it excludes the dynamic extent a launch declares.
+    pub fn static_shared_bytes(&self) -> Result<u32> {
+        let mut value = 0i32;
+        unsafe {
+            check(
+                cuFuncGetAttribute(&mut value, 1, self.func),
+                "cuFuncGetAttribute(SHARED_SIZE_BYTES)",
+            )?
+        };
+        if value < 0 {
+            return Err(invalid_driver_value(
+                "Function::static_shared_bytes",
+                format!("driver reported a negative static shared extent {value}"),
+            ));
+        }
+        Ok(value as u32)
+    }
+
     /// Cover one flat work extent through X/Y using only driver-reported apertures. The u32
     /// `x_stride` is the kernel wire's declared boundary; a larger construction must be sharded by
     /// its conductor rather than clipped here.

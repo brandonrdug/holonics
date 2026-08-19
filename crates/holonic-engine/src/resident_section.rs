@@ -85,9 +85,19 @@ pub const WORD_OCTAVES: u32 = 63;
 /// The census slot: sixteen 32-bit words per occurrence. Layout in the kernel's own header.
 pub const SLOT_WORDS: usize = 16;
 
+/// **The register allocation granularity, in registers per warp.** An apparatus coordinate of the
+/// mounted architecture: a warp's registers are charged in units of 256 (eight per thread, rounded
+/// up), so a kernel using 40 registers per thread is charged 1,280 per warp and not 1,280 − ε. It
+/// is stated here because the driver does not expose it as an attribute, and a candidate family
+/// computed without it disagrees with the card's own residency reading.
+///
+/// Falsifier: `resident_blocks` computed with it must reproduce the measured
+/// `resident_blocks_per_sm` of every kernel the profiler has already read.
+const REGISTER_GRAIN_PER_WARP: u32 = 256;
+
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 16] = [
+pub const KERNELS: [&str; 25] = [
     "section_from_bfloat16",
     "section_carry",
     "section_withdraw_rows",
@@ -104,6 +114,18 @@ pub const KERNELS: [&str; 16] = [
     "section_collapse_control",
     "section_census",
     "section_arithmetic_control",
+    // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
+    // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
+    // so no instantiation drops `block_x` for the other kernels in the module.
+    "section_contract_tiled_r1_l32",
+    "section_contract_tiled_r2_l32",
+    "section_contract_tiled_r4_l32",
+    "section_contract_tiled_r1_l16",
+    "section_contract_tiled_r4_l16",
+    "section_contract_tiled_r1_l8",
+    "section_contract_partial_r1_l32",
+    "section_contract_partial_r4_l32",
+    "section_contract_join",
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
@@ -118,6 +140,9 @@ const ATTRIBUTE_ASYNC_ENGINE_COUNT: i32 = 40;
 const ATTRIBUTE_UNIFIED_ADDRESSING: i32 = 41;
 const ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR: i32 = 75;
 const ATTRIBUTE_COMPUTE_CAPABILITY_MINOR: i32 = 76;
+const ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR: i32 = 81;
+const ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR: i32 = 82;
+const ATTRIBUTE_MAX_BLOCKS_PER_MULTIPROCESSOR: i32 = 106;
 
 /// The refusal flags the kernels raise, mirrored from the kernel header.
 pub const REFUSED_CARRIER: u32 = 1;
@@ -348,7 +373,30 @@ pub struct ResidentSurface<'chart> {
     /// allocation a deed predicts is rounded up to it, so the predicted requirement is what the
     /// card will charge rather than what the words sum to.
     allocation_grain: u64,
+    /// The multiprocessor's own residency ceilings, as the device stated them: blocks, registers
+    /// and shared octets per multiprocessor. Read at mount; nothing here is remembered from a
+    /// specification sheet.
+    sm_limits: MultiprocessorLimits,
+    /// **Retained apparatus scratch for the split-K partial buffers.** A partial standing is not a
+    /// section: it carries the exact 128-bit accumulation of one K slice and never a coordinate at
+    /// the grain. It is retained for the surface's life because the kernel that writes it and the
+    /// kernel that reads it are recorded into one graph before either runs.
+    partials: RefCell<Vec<DeviceBuffer<i64>>>,
     census: RefCell<TransferCensus>,
+}
+
+/// The multiprocessor's declared residency ceilings — the inputs of the resource equation, each
+/// read from `cuDeviceGetAttribute` and none of them authored.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct MultiprocessorLimits {
+    pub max_blocks: u32,
+    pub max_threads: u32,
+    pub max_registers: u32,
+    pub max_shared_octets: u32,
+    pub warp: u32,
+    pub multiprocessors: u32,
+    /// The register allocation granularity, in registers per warp. Ada allocates in units of 256.
+    pub register_grain: u32,
 }
 
 /// A section resident on the card. **Opaque**: its coordinates are reachable only through the
@@ -702,6 +750,15 @@ impl<'chart> ResidentSurface<'chart> {
             block.max(launch.warp.max(1))
         };
         let cover = HardwareCover::over(Some(declaration.clone()));
+        let sm_limits = MultiprocessorLimits {
+            max_blocks: attribute(ATTRIBUTE_MAX_BLOCKS_PER_MULTIPROCESSOR)?,
+            max_threads: declaration.max_threads_per_multiprocessor,
+            max_registers: attribute(ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR)?,
+            max_shared_octets: attribute(ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR)?,
+            warp: declaration.warp_size.max(1),
+            multiprocessors: declaration.multiprocessors.max(1),
+            register_grain: REGISTER_GRAIN_PER_WARP,
+        };
         let allocation_grain = context.allocation_grain_bytes()? as u64;
         let memory_at_mount = context.memory_info()?;
         let ptx_sha256 = Sha256::digest(PTX).iter().map(|byte| format!("{byte:02x}")).collect();
@@ -718,6 +775,8 @@ impl<'chart> ResidentSurface<'chart> {
             reduction_block,
             memory_at_mount,
             allocation_grain,
+            sm_limits,
+            partials: RefCell::new(Vec::new()),
             census: RefCell::new(TransferCensus::default()),
         })
     }
@@ -1521,6 +1580,456 @@ impl<'chart> ResidentSurface<'chart> {
         self.census.borrow_mut().resident_shrank(shrink);
         Ok((results, flags))
     }
+
+    // -----------------------------------------------------------------------------------------
+    // the tiled contraction — one law, a second realization, and a caller-declared geometry
+    // -----------------------------------------------------------------------------------------
+
+    /// The multiprocessor's declared residency ceilings, as the device stated them at mount.
+    pub fn multiprocessor_limits(&self) -> MultiprocessorLimits {
+        self.sm_limits
+    }
+
+    /// **The registers per thread the loaded module actually carries for one entry**, read through
+    /// `cuFuncGetAttribute(CU_FUNC_ATTRIBUTE_NUM_REGS)` after the driver lowered the PTX for this
+    /// card. A measurement of the apparatus, never an estimate and never a governor.
+    pub fn measured_registers(&self, symbol: &str) -> Result<u32, ResidentRefusal> {
+        Ok(self.function(symbol)?.num_regs()?)
+    }
+
+    /// The statically declared shared octets of one entry — excluding the dynamic extent a launch
+    /// declares, which the caller's tile decides.
+    pub fn measured_static_shared(&self, symbol: &str) -> Result<u32, ResidentRefusal> {
+        Ok(self.function(symbol)?.static_shared_bytes()?)
+    }
+
+    /// The per-thread local surface of one entry, in octets, as the driver reports it after
+    /// lowering. Nonzero means the entry spilled or holds a stack frame; zero is lawful.
+    pub fn measured_local_octets(&self, symbol: &str) -> Result<u32, ResidentRefusal> {
+        Ok(u32::try_from(self.function(symbol)?.local_size_bytes()?).unwrap_or(u32::MAX))
+    }
+
+    /// The block extent one entry admits, as the driver reports it after lowering.
+    pub fn measured_block_ceiling(&self, symbol: &str) -> Result<u32, ResidentRefusal> {
+        Ok(self.function(symbol)?.max_threads_per_block()?)
+    }
+
+    /// The predicted shape of the tiled contraction. **The octave admission is the SAME as
+    /// [`ResidentSurface::shape_contract`]'s**, deliberately and by derivation: the a-priori bound
+    /// `input_octaves + entry_octaves + ceil_log2(inner) + 1` is subset-monotone, so no tree over
+    /// any K-partition can widen it and no new admission law is needed. What the tile adds is
+    /// apparatus: the block, the dynamic shared extent and the launch count.
+    pub fn shape_contract_tiled(&self, rows: usize, inner: usize, input_octaves: u32, map: &MountedReadout<'chart>, tile: TileGeometry) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "contract-tiled";
+        if inner != map.dim() {
+            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: inner, right: map.dim() });
+        }
+        let out_width = map.rows();
+        tile.admit(OPERATION, self.launch.block_x, self.launch.warp, self.max_shared_octets)?;
+        let needed = input_octaves + map.entry_octaves() + ceil_log2(inner) + 1;
+        Self::admit_octaves(OPERATION, needed)?;
+        let blocks = tile.blocks(rows, out_width);
+        if blocks > u64::from(self.launch.max_grid_x) {
+            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width: out_width });
+        }
+        let mut work = ExactWork::predicted_product(rows, inner, out_width, u64::from(input_octaves.max(map.entry_octaves())));
+        work.entries_written = BigUint::from(2 * (rows * out_width) as u64);
+        work.resident(2 * (rows * out_width) as u64);
+        let peak = u64::from(input_octaves) + u64::from(map.entry_octaves()) + u64::from(ceil_log2(inner)) + 1;
+        work.peak_bits = BigUint::from(peak);
+        work.cumulative_bits = BigUint::from(2 * (rows * out_width) as u64 * peak);
+        // The dependency span the geometry realizes: the serial K a lane walks, then the lane tree,
+        // then (split-K only) the join tree. The scalar owner's span is `inner`.
+        let lanes = u64::from(tile.lanes);
+        let splits = u64::from(tile.splits.max(1));
+        let serial = (inner as u64).div_ceil(lanes * splits);
+        work.dependency_span = BigUint::from(serial + u64::from(ceil_log2(tile.lanes as usize)) + u64::from(ceil_log2(tile.splits.max(1) as usize)));
+        let couplings = vec![CouplingPlan {
+            coupling: "the inner contraction over K, folded by a fixed lane tree inside one block",
+            kernel: tile.symbol(OPERATION)?,
+            extent: inner as u64,
+            block: tile.block(),
+            predicted: {
+                let mut reduction = ExactWork::nothing();
+                reduction.added((rows * out_width) as u64 * (inner as u64));
+                reduction.dependency_span = BigUint::from(serial + u64::from(ceil_log2(tile.lanes as usize)));
+                reduction
+            },
+        }];
+        // K-complete: the semantic kernel and its census. Split-K: the partial, the join, the census.
+        let launches = if tile.splits > 1 { 3 } else { 2 };
+        Ok(LawShape { operation: OPERATION, rows, width: out_width, needed, predicted: work, couplings, launches, shared_octets: tile.shared_octets(), block: tile.block() })
+    }
+
+    /// **Retain one split-K partial standing on the card.** `4` exact `i64` words per output
+    /// coordinate per partial: the low and high halves of the lower accumulator, then of the upper.
+    /// Nothing here is at the grain and nothing here is rounded.
+    pub fn retain_partials(&self, rows: usize, out_width: usize, splits: u32) -> Result<PartialStanding, ResidentRefusal> {
+        if splits == 0 || !splits.is_power_of_two() || splits > 16 {
+            return Err(ResidentRefusal::Declaration { operation: "contract-split-k", what: format!("a split factor of {splits} is not a power of two in 1..=16") });
+        }
+        let words = 4 * rows * out_width * splits as usize;
+        let buffer = self.alloc::<i64>(words)?;
+        let pointer = buffer.device_ptr();
+        let mut held = self.partials.borrow_mut();
+        held.push(buffer);
+        Ok(PartialStanding { index: held.len() - 1, pointer, rows, out_width, splits, words })
+    }
+
+    /// Read one retained partial standing back as its exact 128-bit accumulations, indexed
+    /// `((a * rows) + row) * out_width + column`. The CPU-side replay of the declared join tree
+    /// runs on exactly these words.
+    pub fn read_partials(&self, standing: &PartialStanding) -> Result<Vec<(i128, i128)>, ResidentRefusal> {
+        let held = self.partials.borrow();
+        let buffer = held.get(standing.index).ok_or_else(|| ResidentRefusal::Declaration { operation: "contract-split-k", what: "a partial standing this surface does not hold".to_owned() })?;
+        let mut words = vec![0i64; standing.words];
+        buffer.copy_to_slice(&mut words)?;
+        self.census.borrow_mut().egress_receipt_octets += (standing.words * 8) as u64;
+        Ok((0..standing.words / 4)
+            .map(|p| {
+                let compose = |low: i64, high: i64| -> i128 { (((high as u64 as u128) << 64) | (low as u64 as u128)) as i128 };
+                (compose(words[4 * p], words[4 * p + 1]), compose(words[4 * p + 2], words[4 * p + 3]))
+            })
+            .collect())
+    }
+
+    /// Record the K-complete tiled contraction: one block owns a disjoint output tile and the whole
+    /// inner extent. `tree` selects which fixed word the lanes fold under; `Descending` is the
+    /// declared word and `Ascending` is the reversed control.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_contract_tiled(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, map: &MountedReadout<'chart>, tile: TileGeometry, admitted_node_octaves: u32, tree: LaneTree, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        const OPERATION: &str = "contract-tiled";
+        if tile.splits != 1 {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a K-complete record with a split factor of {}", tile.splits) });
+        }
+        let mut params = Params::new();
+        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32)
+            .ptr(map.raw_resident()).i32(map.exponent()).u32(map.rows() as u32).i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .u32(tile.outs_per_block).u32(tile.k_tile).u32(admitted_node_octaves).u32(tree.word())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        let blocks = tile.blocks(input.rows, map.rows());
+        self.record_blocks(lane, tile.symbol(OPERATION)?, blocks as usize, tile.block(), tile.shared_octets(), &mut params, OPERATION)
+    }
+
+    /// Record the split-K pair onto one lane: the exact 128-bit partial, then the join that folds
+    /// the partials under the fixed balanced word and performs THE ONE OUTWARD ROUNDING. Both are
+    /// one occurrence — one law, one output section, one census — recorded in order on one stream.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_contract_split_k(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, map: &MountedReadout<'chart>, tile: TileGeometry, standing: &PartialStanding, admitted_node_octaves: u32, tree: LaneTree, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        const OPERATION: &str = "contract-split-k";
+        if tile.splits <= 1 {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: "a split-K record with no split".to_owned() });
+        }
+        if standing.rows != input.rows || standing.out_width != map.rows() || standing.splits != tile.splits {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("the partial standing is {}x{}x{} and the launch is {}x{}x{}", standing.splits, standing.rows, standing.out_width, tile.splits, input.rows, map.rows()) });
+        }
+        let mut partial_params = Params::new();
+        partial_params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32)
+            .ptr(map.raw_resident()).u32(map.rows() as u32).ptr(standing.pointer)
+            .u32(tile.splits).u32(tile.outs_per_block).u32(tile.k_tile).u32(admitted_node_octaves).u32(tree.word())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        let blocks = tile.blocks(input.rows, map.rows());
+        self.record_blocks(lane, tile.symbol(OPERATION)?, blocks as usize, tile.block(), tile.shared_octets(), &mut partial_params, OPERATION)?;
+        let mut join_params = Params::new();
+        join_params.ptr(standing.pointer).u32(tile.splits).u32(input.rows as u32).u32(map.rows() as u32)
+            .i32(map.exponent()).i32(out.grain.0 as i32).u32(admitted_node_octaves).u32(tree.word())
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_flat(lane, "section_contract_join", input.rows * map.rows(), &mut join_params, OPERATION)
+    }
+
+    /// **The finite candidate family for one contraction shape, from the device's own attributes
+    /// and the module's MEASURED registers.** Every member is admitted: it is a whole-warp block the
+    /// module carries an entry for, whose dynamic shared extent the device admits and whose grid the
+    /// device can cover. Nothing here is ordered and nothing here is called optimal — domination is
+    /// the caller's declared axis set, and [`non_dominated`] takes it.
+    pub fn contract_candidates(&self, rows: usize, inner: usize, out_width: usize) -> Result<Vec<LaunchCandidate>, ResidentRefusal> {
+        let mut family = Vec::new();
+        for tile in TileGeometry::enumerate() {
+            if tile.admit("contract-tiled", self.launch.block_x, self.launch.warp, self.max_shared_octets).is_err() {
+                continue;
+            }
+            let symbol = match tile.symbol(if tile.splits > 1 { "contract-split-k" } else { "contract-tiled" }) {
+                Ok(symbol) => symbol,
+                Err(_) => continue,
+            };
+            let blocks = tile.blocks(rows, out_width);
+            if blocks == 0 || blocks > u64::from(self.launch.max_grid_x) {
+                continue;
+            }
+            let registers = self.measured_registers(symbol)?;
+            let shared = tile.shared_octets() + self.measured_static_shared(symbol)?;
+            let block = tile.block();
+            let limits = self.sm_limits;
+            let warps = block.div_ceil(limits.warp.max(1)).max(1);
+            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1)) * limits.register_grain.max(1);
+            let by_blocks = limits.max_blocks;
+            let by_threads = limits.max_threads / block.max(1);
+            let by_registers = if per_warp == 0 { u32::MAX } else { limits.max_registers / (per_warp * warps).max(1) };
+            let by_shared = if shared == 0 { u32::MAX } else { limits.max_shared_octets / shared };
+            let resident = by_blocks.min(by_threads).min(by_registers).min(by_shared);
+            let bound_by = if resident == by_registers && by_registers <= by_shared && by_registers <= by_threads && by_registers <= by_blocks {
+                "registers"
+            } else if resident == by_shared && by_shared <= by_threads && by_shared <= by_blocks {
+                "shared"
+            } else if resident == by_threads && by_threads <= by_blocks {
+                "threads"
+            } else {
+                "blocks"
+            };
+            let cover = u64::from(resident) * u64::from(limits.multiprocessors);
+            family.push(LaunchCandidate {
+                tile,
+                symbol,
+                block,
+                shared_octets: shared,
+                registers,
+                local_octets: self.function(symbol)?.local_size_bytes()? as u32,
+                resident_blocks: resident,
+                occupancy: (resident * block, limits.max_threads.max(1)),
+                blocks,
+                residency_waves: (blocks, cover.max(1)),
+                lane_waves: (blocks * u64::from(block), u64::from(limits.max_threads) * u64::from(limits.multiprocessors)),
+                serial_k_per_lane: (inner as u64).div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1))),
+                dependency_span: (inner as u64).div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1))) + u64::from(ceil_log2(tile.lanes as usize)) + u64::from(ceil_log2(tile.splits.max(1) as usize)),
+                bound_by,
+            });
+        }
+        Ok(family)
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// the tiled contraction's apparatus geometry — a caller's declaration, never a semantic level
+// ---------------------------------------------------------------------------------------------
+
+/// **The launch geometry of one tiled contraction, declared by the caller.**
+///
+/// Every field here is an APPARATUS aperture and none of them is semantic: the returned words are
+/// bit-identical under every admitted member of the family, which is what the equality control
+/// asserts. The law's name in a receipt says so, and the geometry travels beside the law rather
+/// than inside it.
+///
+/// * `tile_rows` — the token rows one block holds in registers, `T_t`;
+/// * `lanes` — the lanes that cooperate over `K` for one output coordinate, `L`;
+/// * `outs_per_block` — the output coordinates one block owns, `O_t`; the block is `O_t · L`;
+/// * `k_tile` — the `x` staging depth in shared, `K_t`; `0` stages nothing and takes no barrier;
+/// * `splits` — the `K` partition factor `S`; `1` is K-complete, and `S > 1` is the split-K pair.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct TileGeometry {
+    pub tile_rows: u32,
+    pub lanes: u32,
+    pub outs_per_block: u32,
+    pub k_tile: u32,
+    pub splits: u32,
+}
+
+impl TileGeometry {
+    /// The block extent this geometry launches at: one lane group per output coordinate.
+    pub fn block(&self) -> u32 {
+        self.outs_per_block * self.lanes
+    }
+    /// The dynamic shared extent, in octets: the `[lo, hi]` pair of every staged `x` coordinate.
+    pub fn shared_octets(&self) -> u32 {
+        self.tile_rows * self.k_tile * 16
+    }
+    /// `ceil(out_width / O_t) · ceil(rows / T_t) · S`, linearized on x.
+    pub fn blocks(&self, rows: usize, out_width: usize) -> u64 {
+        let tiles_o = (out_width as u64).div_ceil(u64::from(self.outs_per_block).max(1));
+        let tiles_t = (rows as u64).div_ceil(u64::from(self.tile_rows).max(1));
+        tiles_o * tiles_t * u64::from(self.splits.max(1))
+    }
+    /// The unmangled entry this geometry resolves to, or the refusal naming the family it is not in.
+    pub fn symbol(&self, operation: &'static str) -> Result<&'static str, ResidentRefusal> {
+        let emitted = match (self.splits > 1, self.tile_rows, self.lanes) {
+            (false, 1, 32) => Some("section_contract_tiled_r1_l32"),
+            (false, 2, 32) => Some("section_contract_tiled_r2_l32"),
+            (false, 4, 32) => Some("section_contract_tiled_r4_l32"),
+            (false, 1, 16) => Some("section_contract_tiled_r1_l16"),
+            (false, 4, 16) => Some("section_contract_tiled_r4_l16"),
+            (false, 1, 8) => Some("section_contract_tiled_r1_l8"),
+            (true, 1, 32) => Some("section_contract_partial_r1_l32"),
+            (true, 4, 32) => Some("section_contract_partial_r4_l32"),
+            _ => None,
+        };
+        emitted.ok_or(ResidentRefusal::Declaration { operation, what: format!("no entry is emitted for {self:?}; the family is the one the module carries") })
+    }
+    /// Refuse a geometry the device or the module cannot carry, naming which aperture refused.
+    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32, shared_ceiling: u32) -> Result<(), ResidentRefusal> {
+        if self.lanes == 0 || !self.lanes.is_power_of_two() || self.lanes > warp.max(1) {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("{} lanes is not a power of two inside one warp of {warp}", self.lanes) });
+        }
+        if self.tile_rows == 0 || self.outs_per_block == 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: "a tile with no rows or no output coordinates".to_owned() });
+        }
+        if self.splits == 0 || !self.splits.is_power_of_two() || self.splits > 16 {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a split factor of {} is not a power of two in 1..=16", self.splits) });
+        }
+        let block = self.block();
+        if block == 0 || block % warp.max(1) != 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} is not a whole number of warps of {warp}") });
+        }
+        if block > block_ceiling {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+        }
+        if self.shared_octets() > shared_ceiling {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a staged tile of {} octets exceeds the device's {shared_ceiling} per block", self.shared_octets()) });
+        }
+        self.symbol(operation)?;
+        Ok(())
+    }
+    /// **The finite population of geometries this module can realize at all.** The cross product of
+    /// the emitted entries with the output-group and staging apertures; membership of the family a
+    /// given shape admits is decided by [`ResidentSurface::contract_candidates`], which reads the
+    /// device.
+    pub fn enumerate() -> Vec<TileGeometry> {
+        let mut family = Vec::new();
+        for (tile_rows, lanes, splits) in [(1, 32, 1), (2, 32, 1), (4, 32, 1), (1, 16, 1), (4, 16, 1), (1, 8, 1), (1, 32, 2), (1, 32, 4), (1, 32, 8), (1, 32, 16), (4, 32, 2), (4, 32, 4), (4, 32, 8), (4, 32, 16)] {
+            for outs_per_block in [1u32, 2, 4, 8, 16, 32, 64] {
+                for k_tile in [0u32, 128, 256, 512, 1024] {
+                    let tile = TileGeometry { tile_rows, lanes, outs_per_block, k_tile, splits };
+                    if tile.block() > 512 || tile.block() % 32 != 0 || tile.shared_octets() > 49_152 {
+                        continue;
+                    }
+                    family.push(tile);
+                }
+            }
+        }
+        family
+    }
+}
+
+/// **Which fixed word the lanes fold under.** `Descending` is the declared word — halving offsets
+/// `L/2 .. 1` — and `Ascending` is the reversed control, a different pairing of the same leaves.
+/// Integer addition is exact and associative, so the two must return bit-identical values; the
+/// per-node widths need not agree, and a value divergence is a defect of the realization.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LaneTree {
+    Descending,
+    Ascending,
+}
+
+impl LaneTree {
+    pub fn word(&self) -> u32 {
+        match self {
+            LaneTree::Descending => 0,
+            LaneTree::Ascending => 1,
+        }
+    }
+    pub fn written(&self) -> &'static str {
+        match self {
+            LaneTree::Descending => "descending halving offsets L/2 .. 1; join ascending in a",
+            LaneTree::Ascending => "ascending doubling offsets 1 .. L/2; join descending in a",
+        }
+    }
+}
+
+/// **A retained split-K partial standing.** Not a section: it carries the exact `__int128`
+/// accumulation of one `K` slice at grain `2^(map_e − F)` and never a coordinate at the grain.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PartialStanding {
+    index: usize,
+    pointer: u64,
+    pub rows: usize,
+    pub out_width: usize,
+    pub splits: u32,
+    pub words: usize,
+}
+
+impl PartialStanding {
+    /// **A partial standing declared without a card**, for a law whose entailment or shape is being
+    /// read before any surface is mounted. It addresses nothing: `record` refuses it, because the
+    /// surface it names holds no buffer at that index.
+    pub fn declared(rows: usize, out_width: usize, splits: u32) -> Self {
+        Self { index: usize::MAX, pointer: 0, rows, out_width, splits, words: 4 * rows * out_width * splits as usize }
+    }
+    /// The address range the partial occupies — a footprint coordinate, for a receipt.
+    pub fn range(&self) -> (u64, u64) {
+        (self.pointer, self.pointer + (self.words * 8) as u64)
+    }
+}
+
+/// **One admitted launch geometry, with what the device and the module say about it.** Every
+/// coordinate is measured or derived from a measurement; there is no combined coordinate, no score
+/// and no ordering. Occupancy and the two wave faces are exact integer ratios — a float would put a
+/// deleted tail into an apparatus reading.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LaunchCandidate {
+    pub tile: TileGeometry,
+    pub symbol: &'static str,
+    pub block: u32,
+    /// Dynamic plus static shared octets per block.
+    pub shared_octets: u32,
+    /// **Measured** through `cuFuncGetAttribute(NUM_REGS)` on the loaded module.
+    pub registers: u32,
+    /// **Measured** per-thread local surface; nonzero means the entry spilled or holds a stack.
+    pub local_octets: u32,
+    pub resident_blocks: u32,
+    /// `(resident lanes, the multiprocessor's ceiling)` — a ratio, never divided.
+    pub occupancy: (u32, u32),
+    pub blocks: u64,
+    /// `(blocks, resident_blocks · multiprocessors)` — the residency wave face.
+    pub residency_waves: (u64, u64),
+    /// `(threads, the card's resident lanes)` — the lane wave face the profile classifies on.
+    pub lane_waves: (u64, u64),
+    pub serial_k_per_lane: u64,
+    pub dependency_span: u64,
+    /// Which term of the resource equation bound the residency.
+    pub bound_by: &'static str,
+}
+
+/// One apparatus coordinate a receiver may declare, and the hand it reads it with.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CandidateAxis {
+    ResidentBlocksUp,
+    OccupancyUp,
+    MapReuseUp,
+    LanesUp,
+    SharedDown,
+    SerialKDown,
+    DependencySpanDown,
+    BlocksDown,
+    RegistersDown,
+}
+
+impl CandidateAxis {
+    /// The axis's coordinate as a ratio, oriented so that GREATER is better on the declared hand.
+    fn read(&self, candidate: &LaunchCandidate) -> (u128, u128) {
+        match self {
+            CandidateAxis::ResidentBlocksUp => (u128::from(candidate.resident_blocks), 1),
+            CandidateAxis::OccupancyUp => (u128::from(candidate.occupancy.0), u128::from(candidate.occupancy.1.max(1))),
+            CandidateAxis::MapReuseUp => (u128::from(candidate.tile.tile_rows), 1),
+            CandidateAxis::LanesUp => (u128::from(candidate.tile.lanes), 1),
+            CandidateAxis::SharedDown => (1, u128::from(candidate.shared_octets) + 1),
+            CandidateAxis::SerialKDown => (1, u128::from(candidate.serial_k_per_lane) + 1),
+            CandidateAxis::DependencySpanDown => (1, u128::from(candidate.dependency_span) + 1),
+            CandidateAxis::BlocksDown => (1, u128::from(candidate.blocks) + 1),
+            CandidateAxis::RegistersDown => (1, u128::from(candidate.registers) + 1),
+        }
+    }
+}
+
+/// **The non-dominated members of a candidate family under a DECLARED axis set.**
+///
+/// A candidate is dominated when another is at least as good on every declared axis and strictly
+/// better on one. No axis is summed with another — they are different species and a sum would be a
+/// scalar governor over incomparable coordinates — so the returned set is a function of what the
+/// receiver declared, exactly as a compression's remainder is. Changing the axis set changes the
+/// set, which is the falsifier: a return that did not move under a changed declaration was ranking.
+pub fn non_dominated(family: &[LaunchCandidate], axes: &[CandidateAxis]) -> Vec<usize> {
+    let ratio_ge = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 >= b.0 * a.1;
+    let ratio_gt = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 > b.0 * a.1;
+    (0..family.len())
+        .filter(|at| {
+            !family.iter().enumerate().any(|(other, rival)| {
+                other != *at
+                    && axes.iter().all(|axis| ratio_ge(axis.read(rival), axis.read(&family[*at])))
+                    && axes.iter().any(|axis| ratio_gt(axis.read(rival), axis.read(&family[*at])))
+            })
+        })
+        .collect()
 }
 
 /// One occurrence's lane in an open capture: its stream, its own census slot, and the lineage it
@@ -2114,6 +2623,243 @@ mod tests {
         for ((cl, ch), (fl, fh)) in runs[0].iter().zip(&runs[1]) {
             assert!(cl <= fl && fh <= ch, "finer grain must nest");
             assert!(fh - fl < ch - cl, "and be strictly narrower");
+        }
+    }
+
+
+    fn candidate(tile: TileGeometry, registers: u32, resident_blocks: u32, shared: u32) -> LaunchCandidate {
+        LaunchCandidate {
+            tile,
+            symbol: "section_contract_tiled_r1_l32",
+            block: tile.block(),
+            shared_octets: shared,
+            registers,
+            local_octets: 0,
+            resident_blocks,
+            occupancy: (resident_blocks * tile.block(), 1536),
+            blocks: 512,
+            residency_waves: (512, u64::from(resident_blocks) * 80),
+            lane_waves: (512 * u64::from(tile.block()), 122_880),
+            serial_k_per_lane: 2560 / u64::from(tile.lanes),
+            dependency_span: 2560 / u64::from(tile.lanes) + 5,
+            bound_by: "registers",
+        }
+    }
+
+    #[test]
+    fn a_contract_tiled_geometry_outside_the_emitted_family_refuses_by_name() {
+        // the module carries an entry for (T_t, L) = (1, 32) and none for (3, 32)
+        let admitted = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
+        assert_eq!(admitted.symbol("contract-tiled").expect("emitted"), "section_contract_tiled_r1_l32");
+        assert_eq!(admitted.block(), 128);
+        assert_eq!(admitted.shared_octets(), 1 * 256 * 16);
+        let unemitted = TileGeometry { tile_rows: 3, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
+        assert!(matches!(unemitted.symbol("contract-tiled"), Err(ResidentRefusal::Declaration { .. })));
+        // a partial block of lanes, a lane count past the warp, a split that is not a power of two,
+        // a block past the module's ceiling and a staged tile past the device — each refuses, and
+        // each names which aperture it left
+        assert!(TileGeometry { tile_rows: 1, lanes: 8, outs_per_block: 3, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(TileGeometry { tile_rows: 1, lanes: 64, outs_per_block: 1, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 3 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 32, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(TileGeometry { tile_rows: 4, lanes: 32, outs_per_block: 4, k_tile: 1024, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(admitted.admit("t", 512, 32, 49_152).is_ok());
+        // the blocks the geometry launches, including both tails
+        assert_eq!(admitted.blocks(5, 2048), 512 * 5);
+        assert_eq!(admitted.blocks(3, 2049), 513 * 3);
+        let split = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 8 };
+        assert_eq!(split.blocks(1, 512), 128 * 8);
+        assert_eq!(split.symbol("contract-split-k").expect("emitted"), "section_contract_partial_r1_l32");
+    }
+
+    #[test]
+    fn the_contract_tiled_candidate_family_is_finite_and_the_retained_set_moves_with_the_declared_axes() {
+        // every enumerated member is a whole-warp block the device could carry
+        let family = TileGeometry::enumerate();
+        assert!(!family.is_empty());
+        for tile in &family {
+            assert_eq!(tile.block() % 32, 0);
+            assert!(tile.block() <= 512);
+            assert!(tile.shared_octets() <= 49_152);
+        }
+        // domination is the receiver's declaration, and the retained set moves when it changes
+        let candidates = vec![
+            candidate(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 1 }, 40, 10, 0),
+            candidate(TileGeometry { tile_rows: 4, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 }, 64, 6, 16_384),
+            candidate(TileGeometry { tile_rows: 2, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 1 }, 47, 9, 0),
+        ];
+        let coarse = non_dominated(&candidates, &[CandidateAxis::ResidentBlocksUp, CandidateAxis::SharedDown]);
+        // the four-row tile is dominated on both coarse axes by the one-row tile
+        assert_eq!(coarse, vec![0]);
+        let with_reuse = non_dominated(&candidates, &[CandidateAxis::ResidentBlocksUp, CandidateAxis::SharedDown, CandidateAxis::MapReuseUp]);
+        assert_eq!(with_reuse, vec![0, 1, 2]);
+        // and a declaration that reads only one axis retains only its extremum
+        assert_eq!(non_dominated(&candidates, &[CandidateAxis::MapReuseUp]), vec![1]);
+    }
+
+    #[test]
+    fn the_contract_tiled_shape_admits_exactly_what_the_scalar_owner_admits_and_prices_the_tile_beside_it() {
+        let Some((readout, surface)) = surface() else { return };
+        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let scalar = surface.shape_contract(1, 2, 22, &map).expect("scalar shape");
+        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
+        let tiled = surface.shape_contract_tiled(1, 2, 22, &map, tile).expect("tiled shape");
+        // the same octave admission, by the subset-monotone argument, and the same output shape
+        assert_eq!(tiled.needed, scalar.needed);
+        assert_eq!((tiled.rows, tiled.width), (scalar.rows, scalar.width));
+        // and the apparatus beside it: the tile's block, its staged extent, its launches
+        assert_eq!(tiled.block, 128);
+        assert_eq!(tiled.shared_octets, 4_096);
+        assert_eq!(tiled.launches, 2);
+        assert_eq!(tiled.couplings.len(), 1);
+        // a split-K geometry records three launches, because the join is the third
+        let split = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 4 };
+        assert_eq!(surface.shape_contract_tiled(1, 2, 22, &map, split).expect("split shape").launches, 3);
+        // a geometry the module emits no entry for refuses at the shape, before any launch
+        let unemitted = TileGeometry { tile_rows: 8, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
+        assert!(surface.shape_contract_tiled(1, 2, 22, &map, unemitted).is_err());
+        // a width that disagrees with the map refuses by name
+        assert!(surface.shape_contract_tiled(1, 3, 22, &map, tile).is_err());
+    }
+
+    #[test]
+    fn the_contract_tiled_family_reads_its_registers_from_the_loaded_module() {
+        let Some((_, surface)) = surface() else { return };
+        // every emitted entry answers, and the scalar owner's own measured count stands beside them
+        for symbol in ["section_contract", "section_contract_tiled_r1_l32", "section_contract_tiled_r4_l32", "section_contract_partial_r1_l32", "section_contract_join"] {
+            let registers = surface.measured_registers(symbol).expect("registers");
+            assert!(registers > 0 && registers <= 255, "{symbol} reported {registers} registers");
+        }
+        // the module-wide block derivation did not move when the family was added
+        assert_eq!(surface.derived_launch().0, 512);
+        for symbol in KERNELS {
+            assert!(surface.measured_block_ceiling(symbol).expect("ceiling") >= 512, "{symbol} admits fewer than 512 threads");
+        }
+        let limits = surface.multiprocessor_limits();
+        assert!(limits.max_blocks > 0 && limits.max_registers > 0 && limits.max_shared_octets > 0);
+        let family = surface.contract_candidates(5, 2560, 2048).expect("family");
+        assert!(!family.is_empty());
+        for member in &family {
+            assert!(member.resident_blocks >= 1, "{member:?} is resident nowhere");
+            assert!(member.registers > 0);
+        }
+    }
+
+    #[test]
+    fn a_contract_tiled_return_is_bit_equal_to_the_scalar_owner_and_the_reversed_tree_agrees() {
+        let Some((readout, surface)) = surface() else { return };
+        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let grain = ResidentGrain(20);
+        let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+        let scalar_shape = surface.shape_contract(1, 2, enter.needed.min(22), &map).expect("shape");
+        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
+        let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
+        let x = surface.fresh_section(1, 2, grain).expect("x");
+        let scalar_out = surface.fresh_section(1, 2, grain).expect("scalar");
+        let descending = surface.fresh_section(1, 2, grain).expect("descending");
+        let ascending = surface.fresh_section(1, 2, grain).expect("ascending");
+        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        builder.close(0, &x, enter.needed).expect("close");
+        let lane = builder.open(1, &[0]).expect("open");
+        surface.record_contract(&lane, &x, &map, &scalar_out).expect("scalar");
+        builder.close(1, &scalar_out, scalar_shape.needed).expect("close");
+        let lane = builder.open(2, &[0]).expect("open");
+        surface.record_contract_tiled(&lane, &x, &map, tile, ResidentSurface::carrier_octaves(), LaneTree::Descending, &descending).expect("tiled");
+        builder.close(2, &descending, tiled_shape.needed).expect("close");
+        let lane = builder.open(3, &[0]).expect("open");
+        surface.record_contract_tiled(&lane, &x, &map, tile, ResidentSurface::carrier_octaves(), LaneTree::Ascending, &ascending).expect("tiled");
+        builder.close(3, &ascending, tiled_shape.needed).expect("close");
+        let passage = builder.finish().expect("finish");
+        let reading = passage.launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.obstruction);
+        let scalar_words = surface.read_out(&scalar_out).expect("read");
+        assert_eq!(surface.read_out(&descending).expect("read"), scalar_words);
+        assert_eq!(surface.read_out(&ascending).expect("read"), scalar_words);
+        // the census words of the three occurrences agree, not only the sections
+        for at in [2usize, 3] {
+            assert_eq!(reading.slots[at].max_octave, reading.slots[1].max_octave);
+            assert_eq!(reading.slots[at].max_width, reading.slots[1].max_width);
+            assert_eq!(reading.slots[at].width_sum, reading.slots[1].width_sum);
+            assert_eq!(reading.slots[at].nonzero_widths, reading.slots[1].nonzero_widths);
+            assert_eq!(reading.slots[at].refused, reading.slots[1].refused);
+        }
+    }
+
+    #[test]
+    fn a_contract_tiled_node_aperture_refuses_where_the_scalar_owner_wraps_silently() {
+        let Some((readout, surface)) = surface() else { return };
+        // a one-octave node aperture is narrower than any real accumulation: the tiled kernel
+        // refuses at the node and names REFUSED_CARRIER; the scalar owner has no per-step check
+        // at all and returns the same words it always did. That is the behavioural difference.
+        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let grain = ResidentGrain(20);
+        let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
+        let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
+        let x = surface.fresh_section(1, 2, grain).expect("x");
+        let out = surface.fresh_section(1, 2, grain).expect("out");
+        let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        builder.close(0, &x, enter.needed).expect("close");
+        let lane = builder.open(1, &[0]).expect("open");
+        surface.record_contract_tiled(&lane, &x, &map, tile, 1, LaneTree::Descending, &out).expect("tiled");
+        builder.close(1, &out, tiled_shape.needed).expect("close");
+        let passage = builder.finish().expect("finish");
+        let reading = passage.launch().expect("launch");
+        assert_eq!(reading.slots[1].refused & REFUSED_CARRIER, REFUSED_CARRIER);
+        assert!(reading.obstruction.origins().any(|refusal| refusal.index == 1));
+    }
+
+    #[test]
+    fn a_split_k_partial_is_exact_and_the_join_rounds_once() {
+        let Some((readout, surface)) = surface() else { return };
+        // four inner coordinates, split two ways: each partial carries an exact 128-bit sum at the
+        // product grain, and only the join places anything at the section's grain.
+        let map_words = [ONE, TWO, THREE, FOUR, HALF, ONE, TWO, HALF];
+        let map = readout.mount_bfloat16(&map_words, 4).expect("map");
+        let grain = ResidentGrain(20);
+        let staged = surface.stage_words(&[ONE, TWO, ONE, FOUR], 1, 4).expect("stage");
+        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain).expect("shape");
+        let scalar_shape = surface.shape_contract(1, 4, enter.needed.min(24), &map).expect("shape");
+        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 2 };
+        let split_shape = surface.shape_contract_tiled(1, 4, enter.needed.min(24), &map, tile).expect("shape");
+        let standing = surface.retain_partials(1, 2, 2).expect("partials");
+        let x = surface.fresh_section(1, 4, grain).expect("x");
+        let scalar_out = surface.fresh_section(1, 2, grain).expect("scalar");
+        let split_out = surface.fresh_section(1, 2, grain).expect("split");
+        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        builder.close(0, &x, enter.needed).expect("close");
+        let lane = builder.open(1, &[0]).expect("open");
+        surface.record_contract(&lane, &x, &map, &scalar_out).expect("scalar");
+        builder.close(1, &scalar_out, scalar_shape.needed).expect("close");
+        let lane = builder.open(2, &[0]).expect("open");
+        surface.record_contract_split_k(&lane, &x, &map, tile, &standing, ResidentSurface::carrier_octaves(), LaneTree::Descending, &split_out).expect("split");
+        builder.close(2, &split_out, split_shape.needed).expect("close");
+        let passage = builder.finish().expect("finish");
+        let reading = passage.launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.obstruction);
+        assert_eq!(surface.read_out(&split_out).expect("read"), surface.read_out(&scalar_out).expect("read"));
+        // the partials themselves: two per output coordinate, and their exact sum is the whole
+        let partials = surface.read_partials(&standing).expect("partials");
+        assert_eq!(partials.len(), 2 * 1 * 2);
+        for column in 0..2usize {
+            let (a_lo, a_hi) = partials[column];
+            let (b_lo, b_hi) = partials[2 + column];
+            let whole_lo = a_lo + b_lo;
+            let whole_hi = a_hi + b_hi;
+            // the join's one rounding takes the exact sum at 2^(map_e − F) down to 2^-F
+            let exponent = map.exponent();
+            let floor = |value: i128| -> i128 { if exponent >= 0 { value << exponent } else { value >> (-exponent) } };
+            let read = surface.read_out(&split_out).expect("read")[column];
+            assert_eq!(floor(whole_lo), i128::from(read.0), "the lower word is the floor of the exact sum");
+            assert!(i128::from(read.1) >= floor(whole_hi));
         }
     }
 

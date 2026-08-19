@@ -104,6 +104,24 @@ Pressure stays one covector per species with a named zero and an honest `BeyondA
 changed; no device mounted; **Deed H2 (the exact tiled contraction) is next**, its design study
 prepared. `CONSTRUCTION_STATE.md` does not move.
 
+**DEED H2 PASSED 2026-08-19 — the contraction is tiled, the scalar owner referees, and the
+obstruction is shape-conditional and measured.** Record:
+[`research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md`](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md).
+Nine new kernel entries (cooperative tiles with a fixed lane tree and its on-card reversed control,
+one outward rounding after the whole K reduction, a per-node overflow aperture that refuses where
+the scalar owner would wrap, and the split-K pair whose partials are never rounded); **104 of 104
+equality rows bit-equal — words and census — under three referees** on the real admitted source,
+including a coarser-grain row where the material genuinely distinguishes the interval sign rule;
+ten controls each failing under a named perturbation; the launch-geometry candidate family derived
+from the device and the measured registers with non-dominated candidates retained and no "optimal";
+the H1 receipts realized by the enacted geometry (cells = blocks; the junction's leaves = the split
+factor). **The §8 obstruction clause returned a measured, shape-conditional obstruction**: q_proj
+runs 5–20× faster with eligible warps ×4 and occupancy ×2.6, while gate_proj is 0.91× — the tile
+saturates DRAM at 95 % with the L2 hit collapsed 83 % → 7 % — so `section_contract` is not replaced
+and remains the owner and referee, the tiled laws standing beside it with their profile. Two named
+hand-offs to H3: `shape_enter`'s authored a-priori bound, and the strided-partial certification
+absence. `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

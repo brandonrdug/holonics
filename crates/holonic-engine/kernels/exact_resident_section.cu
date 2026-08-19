@@ -1021,3 +1021,338 @@ extern "C" __global__ void section_arithmetic_control(
         out[((size_t)i * 10 + j) * 2 + 1] = (int64_t)(uint64_t)((uwide)results[j] >> 64);
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// the tiled contraction: THE SAME ARITHMETIC, a cooperative geometry
+// ---------------------------------------------------------------------------------------------
+//
+// `section_contract` above is the independent exact reference and is NOT modified. What follows is
+// a second realization of the same law: one block owns a disjoint output tile, its lanes cooperate
+// over the inner axis, and the map row is walked along `i` so a warp instruction reads contiguous
+// octets. Everything semantic is carried over verbatim:
+//
+//   * the carrier — `int64_t` endpoints at grain `2^-F`, `__int128` accumulation;
+//   * the sign rule — `w >= 0 -> (lo*lo, hi*hi)`, `w < 0 -> (lo*hi, hi*lo)`; the map is a POINT, so
+//     both endpoints are attained and no widening enters;
+//   * NO PARTIAL IS EVER ROUNDED. Every intermediate over any subset `A` of `[0, inner)` is the
+//     exact integer `sum_{i in A} w_i x_i^(sel)` at grain `2^(map_e - F)`;
+//   * THE ONE OUTWARD ROUNDING sits after the whole K sum — at lane 0 in the K-complete kernel and
+//     in the join kernel in the split-K pair — and nowhere else. `shift_floor`/`shift_ceil`/
+//     `to_word` appear at exactly one site in each entry;
+//   * the census and the lineage — this occurrence's own slot, its declared predecessors only, no
+//     new slot word and no new refusal flag.
+//
+// Three things differ from the scalar owner and each is stated rather than smoothed:
+//
+//   1. the upstream inspection follows `section_rms_rebase`'s convention, because these kernels
+//      carry `__syncthreads()` and a divergent early return is a hazard: thread 0 reads the
+//      declared predecessors into a shared sentinel and the whole block leaves together. The tail
+//      is a per-write predicate and never an early return;
+//   2. a declared per-node aperture `admitted_node_octaves` REFUSES (`REFUSED_CARRIER`) at a node
+//      of the reduction tree that exceeds it. The scalar owner has no per-step check at all, so on
+//      material outside the a-priori admission the scalar owner wraps silently and this one
+//      refuses. That is a behavioural difference and the driver reports it with the fixture that
+//      exhibits it; it is never folded into the equality claim. The admission itself needs no new
+//      law: for every subset `A` of `[0, inner)`,
+//        |sum_{i in A} w_i x_i| <= (sum_{i in A} |w_i|) max_i |x_i| <= (sum_{i in K} |w_i|) max_i |x_i|,
+//      which is exactly the row-mass bound the occurrence was already admitted under, so every node
+//      of every tree over every K-partition is bounded by the a-priori octaves;
+//   3. `tree` selects WHICH fixed word the lanes fold under. `0` is the declared word — descending
+//      halving offsets `L/2 .. 1`. `1` is the reversed control — ascending doubling offsets
+//      `1 .. L/2`, a genuinely different pairing of the same leaves. Integer addition is exact and
+//      associative, so the two must return bit-identical values while their per-node widths need
+//      not agree; a divergence there is a defect of the realization and not of the arithmetic.
+//
+// No float and no division on the wide carrier: the only divisions are `u32` index arithmetic.
+
+// A `__int128` across a warp shuffle, as its four 32-bit words. The tree stays fixed because the
+// offsets are the loop's and not the schedule's.
+__device__ __forceinline__ wide shfl_down_wide(unsigned mask, wide v, unsigned delta, int width) {
+    uwide u = (uwide)v;
+    uint32_t w0 = (uint32_t)u, w1 = (uint32_t)(u >> 32), w2 = (uint32_t)(u >> 64), w3 = (uint32_t)(u >> 96);
+    w0 = __shfl_down_sync(mask, w0, delta, width);
+    w1 = __shfl_down_sync(mask, w1, delta, width);
+    w2 = __shfl_down_sync(mask, w2, delta, width);
+    w3 = __shfl_down_sync(mask, w3, delta, width);
+    return (wide)((uwide)w0 | ((uwide)w1 << 32) | ((uwide)w2 << 64) | ((uwide)w3 << 96));
+}
+
+// The per-node overflow aperture. A node past it refuses; nothing wraps and nothing is clamped.
+__device__ __forceinline__ void node_aperture(wide l, wide h, uint32_t admitted, uint32_t *slot) {
+    if (octaves_of(magnitude(l)) > admitted || octaves_of(magnitude(h)) > admitted) {
+        atomicOr(slot + SLOT_REFUSED, REFUSED_CARRIER);
+    }
+}
+
+// Steps (a), (b) and (c): stage, accumulate exactly, and fold the lanes under the declared word.
+// `TILE_ROWS` and `LANES` are template parameters so the accumulators live in registers and the
+// tree unrolls; `k_tile == 0` is the unstaged member of the family, which reads `x` straight from
+// global and takes no barrier at all.
+template <uint32_t TILE_ROWS, uint32_t LANES>
+__device__ __forceinline__ void contract_accumulate(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,
+    const int64_t *map, uint32_t out_width,
+    uint32_t k_begin, uint32_t k_end, uint32_t k_tile,
+    uint32_t t0, uint32_t o, uint32_t admitted_node_octaves, uint32_t tree,
+    wide (&acc_lo)[TILE_ROWS], wide (&acc_hi)[TILE_ROWS], uint32_t *slot
+) {
+    extern __shared__ unsigned char tiled_shared_raw[];
+    int64_t *sx_lo = (int64_t *)tiled_shared_raw;
+    int64_t *sx_hi = sx_lo + (size_t)TILE_ROWS * (size_t)(k_tile == 0u ? 1u : k_tile);
+    const uint32_t lane = threadIdx.x % LANES;
+
+    #pragma unroll
+    for (uint32_t r = 0; r < TILE_ROWS; ++r) { acc_lo[r] = 0; acc_hi[r] = 0; }
+
+    if (k_tile == 0u) {
+        // (b) unstaged: each lane walks its own stride-LANES slice of `[k_begin, k_end)` and reads
+        //     both operands straight from global. Consecutive lanes read consecutive `i`.
+        if (o < out_width) {
+            const int64_t *w = map + (size_t)o * (size_t)inner;
+            for (uint32_t c = k_begin + lane; c < k_end; c += LANES) {
+                const wide wv = (wide)w[c];
+                #pragma unroll
+                for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+                    if (t0 + r < rows) {
+                        const wide xl = (wide)lo[(size_t)(t0 + r) * (size_t)inner + c];
+                        const wide xh = (wide)hi[(size_t)(t0 + r) * (size_t)inner + c];
+                        if (wv >= 0) { acc_lo[r] += wv * xl; acc_hi[r] += wv * xh; }
+                        else         { acc_lo[r] += wv * xh; acc_hi[r] += wv * xl; }
+                    }
+                }
+            }
+        }
+    } else {
+        for (uint32_t base = k_begin; base < k_end; base += k_tile) {
+            const uint32_t take = (k_end - base) < k_tile ? (k_end - base) : k_tile;
+            // (a) the block's lanes cooperatively stage the `x` K-tile for its TILE_ROWS rows.
+            //     Consecutive lanes read consecutive `i`, so both `lo[]` and `hi[]` coalesce.
+            for (uint32_t u = threadIdx.x; u < TILE_ROWS * take; u += blockDim.x) {
+                const uint32_t r = u / take, c = u % take;
+                const int inside = (t0 + r) < rows;
+                sx_lo[(size_t)r * (size_t)k_tile + c] = inside ? lo[(size_t)(t0 + r) * (size_t)inner + base + c] : (int64_t)0;
+                sx_hi[(size_t)r * (size_t)k_tile + c] = inside ? hi[(size_t)(t0 + r) * (size_t)inner + base + c] : (int64_t)0;
+            }
+            __syncthreads();
+            // (b) the map row is contiguous along `i` and is read once per group, reused TILE_ROWS
+            //     times in registers, so the map is never staged.
+            if (o < out_width) {
+                const int64_t *w = map + (size_t)o * (size_t)inner + base;
+                for (uint32_t c = lane; c < take; c += LANES) {
+                    const wide wv = (wide)w[c];
+                    #pragma unroll
+                    for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+                        const wide xl = (wide)sx_lo[(size_t)r * (size_t)k_tile + c];
+                        const wide xh = (wide)sx_hi[(size_t)r * (size_t)k_tile + c];
+                        if (wv >= 0) { acc_lo[r] += wv * xl; acc_hi[r] += wv * xh; }
+                        else         { acc_lo[r] += wv * xh; acc_hi[r] += wv * xl; }
+                    }
+                }
+            }
+            __syncthreads();   // before the next tile overwrites the staged x
+        }
+    }
+
+    // (c) THE FIXED TREE over the LANES lanes of one output group, `log2(LANES)` levels.
+    if (tree == 0u) {
+        #pragma unroll
+        for (uint32_t half = LANES >> 1; half > 0u; half >>= 1) {
+            #pragma unroll
+            for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+                acc_lo[r] += shfl_down_wide(0xffffffffu, acc_lo[r], half, (int)LANES);
+                acc_hi[r] += shfl_down_wide(0xffffffffu, acc_hi[r], half, (int)LANES);
+            }
+            if (lane < half) {
+                #pragma unroll
+                for (uint32_t r = 0; r < TILE_ROWS; ++r) node_aperture(acc_lo[r], acc_hi[r], admitted_node_octaves, slot);
+            }
+        }
+    } else {
+        #pragma unroll
+        for (uint32_t half = 1u; half < LANES; half <<= 1) {
+            #pragma unroll
+            for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+                acc_lo[r] += shfl_down_wide(0xffffffffu, acc_lo[r], half, (int)LANES);
+                acc_hi[r] += shfl_down_wide(0xffffffffu, acc_hi[r], half, (int)LANES);
+            }
+            if ((lane % (2u * half)) == 0u) {
+                #pragma unroll
+                for (uint32_t r = 0; r < TILE_ROWS; ++r) node_aperture(acc_lo[r], acc_hi[r], admitted_node_octaves, slot);
+            }
+        }
+    }
+}
+
+// The K-complete realization: one block owns a disjoint output tile and the whole inner extent.
+template <uint32_t TILE_ROWS, uint32_t LANES>
+__device__ __forceinline__ void section_contract_tiled_body(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,
+    const int64_t *map, int32_t map_e, uint32_t out_width, int32_t grain,
+    int64_t *out_lo, int64_t *out_hi,
+    uint32_t outs_per_block, uint32_t k_tile, uint32_t admitted_node_octaves, uint32_t tree,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    __shared__ int32_t stop;
+    if (threadIdx.x == 0) stop = upstream_refused(census, lineage, lineage_count, slot) ? 1 : 0;
+    __syncthreads();
+    if (stop) return;
+
+    const uint32_t tiles_o = (out_width + outs_per_block - 1u) / outs_per_block;
+    const uint32_t o_tile = blockIdx.x % tiles_o;
+    const uint32_t t_tile = blockIdx.x / tiles_o;
+    const uint32_t o0 = o_tile * outs_per_block;
+    const uint32_t t0 = t_tile * TILE_ROWS;
+    const uint32_t group = threadIdx.x / LANES;
+    const uint32_t lane = threadIdx.x % LANES;
+    const uint32_t o = o0 + group;
+
+    wide acc_lo[TILE_ROWS], acc_hi[TILE_ROWS];
+    contract_accumulate<TILE_ROWS, LANES>(lo, hi, rows, inner, map, out_width, 0u, inner, k_tile,
+                                          t0, o, admitted_node_octaves, tree, acc_lo, acc_hi, slot);
+
+    // (d) THE ONE OUTWARD ROUNDING. The products sit at 2^(map_e - F) and the grain wants 2^-F, so
+    //     the shift is by map_e — once per endpoint per output coordinate, and nowhere else.
+    if (lane == 0u && o < out_width) {
+        #pragma unroll
+        for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+            if (t0 + r < rows) {
+                const size_t at = (size_t)(t0 + r) * (size_t)out_width + o;
+                out_lo[at] = to_word(shift_floor(acc_lo[r], map_e, slot), slot);
+                out_hi[at] = to_word(shift_ceil(acc_hi[r], map_e, slot), slot);
+            }
+        }
+    }
+    (void)grain;
+}
+
+// The split-K partial. Its store is EXACT and 128 bits wide: rounding a partial would put `splits`
+// roundings on a path the law admits one on. `a = blockIdx.x / (tiles_o * tiles_t)` is the K
+// partition index and `[k0, k1)` its half-open slice — contiguous, so the junction's partial
+// regions are coordinate regions and the reduction owner can certify them.
+template <uint32_t TILE_ROWS, uint32_t LANES>
+__device__ __forceinline__ void section_contract_partial_body(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,
+    const int64_t *map, uint32_t out_width, int64_t *partial,
+    uint32_t splits, uint32_t outs_per_block, uint32_t k_tile, uint32_t admitted_node_octaves, uint32_t tree,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    __shared__ int32_t stop;
+    if (threadIdx.x == 0) stop = upstream_refused(census, lineage, lineage_count, slot) ? 1 : 0;
+    __syncthreads();
+    if (stop) return;
+
+    const uint32_t tiles_o = (out_width + outs_per_block - 1u) / outs_per_block;
+    const uint32_t tiles_t = (rows + TILE_ROWS - 1u) / TILE_ROWS;
+    const uint32_t o_tile = blockIdx.x % tiles_o;
+    const uint32_t t_tile = (blockIdx.x / tiles_o) % tiles_t;
+    const uint32_t a = (blockIdx.x / tiles_o) / tiles_t;
+    const uint32_t span = (inner + splits - 1u) / splits;
+    const uint32_t k0 = a * span;
+    const uint32_t k1 = (k0 + span) < inner ? (k0 + span) : inner;
+    const uint32_t o0 = o_tile * outs_per_block;
+    const uint32_t t0 = t_tile * TILE_ROWS;
+    const uint32_t group = threadIdx.x / LANES;
+    const uint32_t lane = threadIdx.x % LANES;
+    const uint32_t o = o0 + group;
+
+    wide acc_lo[TILE_ROWS], acc_hi[TILE_ROWS];
+    contract_accumulate<TILE_ROWS, LANES>(lo, hi, rows, inner, map, out_width, k0, k1, k_tile,
+                                          t0, o, admitted_node_octaves, tree, acc_lo, acc_hi, slot);
+
+    if (lane == 0u && o < out_width) {
+        #pragma unroll
+        for (uint32_t r = 0; r < TILE_ROWS; ++r) {
+            if (t0 + r < rows) {
+                const size_t p = (((size_t)a * (size_t)rows) + (size_t)(t0 + r)) * (size_t)out_width + o;
+                partial[4 * p + 0] = (int64_t)(uint64_t)((uwide)acc_lo[r]);
+                partial[4 * p + 1] = (int64_t)(uint64_t)((uwide)acc_lo[r] >> 64);
+                partial[4 * p + 2] = (int64_t)(uint64_t)((uwide)acc_hi[r]);
+                partial[4 * p + 3] = (int64_t)(uint64_t)((uwide)acc_hi[r] >> 64);
+            }
+        }
+    }
+}
+
+// One thread per output coordinate. The tree over the `splits` partials is FIXED: a balanced binary
+// fold in ASCENDING partition index, realized as a rank stack, so the intermediate population is
+// `log2(splits) + 1` and never `splits`. `tree == 1` relabels the leaves `j -> splits-1-j`, which is
+// the reversed control the reduction owner's `ReductionWord::reversed` names. Then, and only then,
+// THE ONE OUTWARD ROUNDING.
+extern "C" __global__ void section_contract_join(
+    const int64_t *partial, uint32_t splits, uint32_t rows, uint32_t out_width,
+    int32_t map_e, int32_t grain, uint32_t admitted_node_octaves, uint32_t tree,
+    int64_t *out_lo, int64_t *out_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= rows * out_width) return;
+    if (upstream_refused(census, lineage, lineage_count, slot)) return;
+    const uint32_t t = at / out_width, o = at % out_width;
+
+    wide st_lo[6], st_hi[6];
+    uint32_t st_rank[6];
+    int top = 0;
+    for (uint32_t j = 0; j < splits; ++j) {
+        const uint32_t a = (tree == 0u) ? j : (splits - 1u - j);
+        const size_t p = (((size_t)a * (size_t)rows) + (size_t)t) * (size_t)out_width + o;
+        wide vl = (wide)((((uwide)(uint64_t)partial[4 * p + 1]) << 64) | (uwide)(uint64_t)partial[4 * p + 0]);
+        wide vh = (wide)((((uwide)(uint64_t)partial[4 * p + 3]) << 64) | (uwide)(uint64_t)partial[4 * p + 2]);
+        uint32_t rank = 0;
+        while (top > 0 && st_rank[top - 1] == rank) {
+            top -= 1;
+            vl = st_lo[top] + vl;
+            vh = st_hi[top] + vh;
+            rank += 1;
+            node_aperture(vl, vh, admitted_node_octaves, slot);
+        }
+        st_lo[top] = vl; st_hi[top] = vh; st_rank[top] = rank; top += 1;
+    }
+    // `splits` is a power of two by declaration, so the stack folds to exactly one node.
+    wide fold_lo = st_lo[0], fold_hi = st_hi[0];
+    for (int j = 1; j < top; ++j) {
+        fold_lo = fold_lo + st_lo[j];
+        fold_hi = fold_hi + st_hi[j];
+        node_aperture(fold_lo, fold_hi, admitted_node_octaves, slot);
+    }
+    out_lo[at] = to_word(shift_floor(fold_lo, map_e, slot), slot);
+    out_hi[at] = to_word(shift_ceil(fold_hi, map_e, slot), slot);
+    (void)grain;
+}
+
+// The emitted family: one unmangled `extern "C"` entry per retained candidate, because a template
+// cannot carry C linkage and `cuModuleGetFunction` resolves by an unmangled symbol. Every wrapper
+// is named in the module's KERNELS list, so the module-wide block derivation inspects every
+// instantiation rather than one; `__launch_bounds__(512)` keeps each instantiation's admitted block
+// at the module's present minimum, so no other kernel's geometry moves.
+#define EMIT_TILED(NAME, TILE_ROWS, LANES)                                                          \
+    extern "C" __global__ void __launch_bounds__(512) NAME(                                         \
+        const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,                        \
+        const int64_t *map, int32_t map_e, uint32_t out_width, int32_t grain,                       \
+        int64_t *out_lo, int64_t *out_hi,                                                           \
+        uint32_t outs_per_block, uint32_t k_tile, uint32_t admitted_node_octaves, uint32_t tree,    \
+        uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count) {  \
+        section_contract_tiled_body<TILE_ROWS, LANES>(                                              \
+            lo, hi, rows, inner, map, map_e, out_width, grain, out_lo, out_hi,                      \
+            outs_per_block, k_tile, admitted_node_octaves, tree, slot, census, lineage, lineage_count); \
+    }
+
+#define EMIT_PARTIAL(NAME, TILE_ROWS, LANES)                                                        \
+    extern "C" __global__ void __launch_bounds__(512) NAME(                                         \
+        const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,                        \
+        const int64_t *map, uint32_t out_width, int64_t *partial,                                   \
+        uint32_t splits, uint32_t outs_per_block, uint32_t k_tile, uint32_t admitted_node_octaves,  \
+        uint32_t tree,                                                                              \
+        uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count) {  \
+        section_contract_partial_body<TILE_ROWS, LANES>(                                            \
+            lo, hi, rows, inner, map, out_width, partial, splits, outs_per_block, k_tile,           \
+            admitted_node_octaves, tree, slot, census, lineage, lineage_count);                     \
+    }
+
+EMIT_TILED  (section_contract_tiled_r1_l32,   1u, 32u)
+EMIT_TILED  (section_contract_tiled_r2_l32,   2u, 32u)
+EMIT_TILED  (section_contract_tiled_r4_l32,   4u, 32u)
+EMIT_TILED  (section_contract_tiled_r1_l16,   1u, 16u)
+EMIT_TILED  (section_contract_tiled_r4_l16,   4u, 16u)
+EMIT_TILED  (section_contract_tiled_r1_l8,    1u,  8u)
+EMIT_PARTIAL(section_contract_partial_r1_l32, 1u, 32u)
+EMIT_PARTIAL(section_contract_partial_r4_l32, 4u, 32u)
