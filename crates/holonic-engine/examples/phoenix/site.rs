@@ -15,6 +15,7 @@
 
 use std::collections::BTreeMap;
 use std::fs::File;
+use std::io::Write;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
@@ -188,7 +189,7 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
     }
 }
 
-fn two_to(exponent: i64) -> Rat {
+pub fn two_to(exponent: i64) -> Rat {
     if exponent >= 0 {
         Rat::from_integer(BigInt::from(num_bigint::BigUint::from(1u8) << exponent as usize))
     } else {
@@ -531,3 +532,157 @@ fn grain_after(
     Ok(event)
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// THE NATIVE SIDE: a carrier that holds NO source handle, and the container writer it reads back.
+// ---------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------
+// THE NATIVE CARRIER. It holds no source path, so the code path to the source does not exist.
+// ---------------------------------------------------------------------------------------------
+
+pub struct NativeRestCarrier<'chart> {
+    pub chart: &'chart ResidentReadout,
+    pub container: holonic_engine::foreign_map::ForeignContainer,
+    pub file: std::fs::File,
+    pub bands: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
+    pub below_the_frame: usize,
+}
+
+/// Read off the carrier and the diagram, exactly as the source-fed conduct reads it.
+
+
+impl PortedCarrier for NativeRestCarrier<'_> {
+    fn contract(&mut self, population: &str, standing: &[Rat]) -> Result<Vec<Rat>, String> {
+        let tensor = self
+            .container
+            .tensor(population)
+            .map_err(|error| error.to_string())?
+            .clone();
+        let mut words = Vec::with_capacity(standing.len());
+        for value in standing {
+            let (word, residual) = round_into_bfloat16(value).map_err(|e| format!("{e:?}"))?;
+            if !residual.is_zero() {
+                return Err("a contraction was handed an ungrained standing".to_owned());
+            }
+            words.push(word);
+        }
+        let query =
+            holonic_engine::embedding_fiber::align_bfloat16(&words).map_err(|e| format!("{e:?}"))?;
+        let stored = self
+            .container
+            .read_bf16_whole(&mut self.file, population)
+            .map_err(|error| error.to_string())?;
+        let mounted = self
+            .chart
+            .mount_bfloat16(&stored, tensor.shape[1])
+            .map_err(|e| format!("{e:?}"))?;
+        let scored = mounted.score_many(&[&query]).map_err(|e| format!("{e:?}"))?;
+        let unit = two_to(scored[0].readout_exponent as i64 + scored[0].query_exponent as i64);
+        Ok((0..tensor.shape[0])
+            .map(|row| Rat::from_integer(scored[0].exact(row).unwrap_or_else(BigInt::zero)) * &unit)
+            .collect())
+    }
+
+    fn stored(&mut self, population: &str) -> Result<Vec<Rat>, String> {
+        Ok(self
+            .container
+            .read_bf16_whole(&mut self.file, population)
+            .map_err(|error| error.to_string())?
+            .iter()
+            .map(|word| decode_bfloat16_bits(*word).expect("finite").value())
+            .collect())
+    }
+
+    /// **The sealed rest carries only the rows the diagram named, not the whole table.**
+    ///
+    /// So a lookup's row index is relocated at the seal and read here against the sealed
+    /// population's own extent. The rest is smaller than the source by exactly the rows no caused
+    /// material excited — which are `unexcited`, not condensed, and no factor is quoted for them.
+    fn stored_row(&mut self, population: &str, row: usize) -> Result<Vec<Rat>, String> {
+        Ok(self
+            .container
+            .read_rows_bf16(&mut self.file, population, row, 1)
+            .map_err(|error| error.to_string())?
+            .0
+            .iter()
+            .map(|word| decode_bfloat16_bits(*word).expect("finite").value())
+            .collect())
+    }
+
+    fn rotations(
+        &mut self,
+        population: &str,
+    ) -> Result<Vec<(ExactInterval, ExactInterval)>, String> {
+        self.bands
+            .get(population)
+            .cloned()
+            .ok_or_else(|| format!("the rest carries no band population named {population}"))
+    }
+
+    fn grain(&mut self, standing: &[Rat]) -> Result<(Vec<Rat>, Vec<Rat>), String> {
+        let mut rounded = Vec::with_capacity(standing.len());
+        let mut residual = Vec::with_capacity(standing.len());
+        for value in standing {
+            let (word, remainder) = round_into_bfloat16(value).map_err(|e| format!("{e:?}"))?;
+            let datum = decode_bfloat16_bits(word).map_err(|e| format!("{e:?}"))?;
+            rounded.push((datum.value(), datum.ulp_exponent, datum.significand.bits() == 0));
+            residual.push(remainder);
+        }
+        let top = rounded
+            .iter()
+            .filter(|(_, _, zero)| !zero)
+            .map(|(_, exponent, _)| *exponent)
+            .max()
+            .unwrap_or(0);
+        let mut carried = Vec::with_capacity(standing.len());
+        for (at, (value, exponent, zero)) in rounded.into_iter().enumerate() {
+            if !zero && (top - exponent) > CARRIER_REACH {
+                residual[at] = standing[at].clone();
+                self.below_the_frame += 1;
+                carried.push(Rat::from_integer(BigInt::from(0)));
+            } else {
+                carried.push(value);
+            }
+        }
+        Ok((carried, residual))
+    }
+}
+
+/// Write a container in the species the source arrived in, so the standing mouth reads it back.
+pub fn write_container(
+    path: &str,
+    header: &[(String, (String, Vec<usize>, u64, u64))],
+    metadata: &BTreeMap<String, String>,
+    payload: &[u8],
+) {
+    let mut map = serde_json::Map::new();
+    map.insert(
+        "__metadata__".to_owned(),
+        serde_json::to_value(metadata).expect("metadata"),
+    );
+    for (name, (dtype, shape, start, end)) in header {
+        let mut entry = serde_json::Map::new();
+        entry.insert("dtype".to_owned(), serde_json::json!(dtype));
+        entry.insert("shape".to_owned(), serde_json::json!(shape));
+        entry.insert("data_offsets".to_owned(), serde_json::json!([start, end]));
+        map.insert(name.clone(), serde_json::Value::Object(entry));
+    }
+    let text = serde_json::to_string(&serde_json::Value::Object(map)).expect("header");
+    let mut file = std::fs::File::create(path).expect("create");
+    file.write_all(&(text.len() as u64).to_le_bytes()).expect("length");
+    file.write_all(text.as_bytes()).expect("header");
+    file.write_all(payload).expect("payload");
+}
+
+/// A digest declares which byte occurrence was read. It is a frame declaration, never an identity.
+pub fn digest_of(path: &str) -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(std::fs::read(path).expect("read"));
+    hasher
+        .finalize()
+        .iter()
+        .map(|octet| format!("{octet:02x}"))
+        .collect()
+}
