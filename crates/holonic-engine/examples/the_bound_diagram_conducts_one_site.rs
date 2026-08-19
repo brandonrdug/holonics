@@ -805,7 +805,7 @@ fn main() {
             }],
         );
         let passage_event = complex.occur(passage).expect("occurs");
-        program.bind(passage_event, PortedOperationKind::GatedPassage { terms });
+        program.bind(passage_event, PortedOperationKind::GatedPassage { terms, inner: None });
         join(&mut complex, tag("passage admits"), intermediate, second[0], passage_event, 0);
 
         let mixed = bind(

@@ -249,7 +249,6 @@ impl PortedTransport {
     pub fn predicted_posing_work(rows: usize, columns: usize, entry_bits: u64) -> ExactWork {
         let mut work = ExactWork::nothing();
         work.resident(u64::try_from(rows.saturating_mul(columns)).unwrap_or(u64::MAX));
-        work.stepped();
         let _ = entry_bits;
         work
     }
@@ -819,7 +818,22 @@ pub enum PortedOperationKind {
     Hadamard,
     /// A pointwise constitutive law through
     /// `exact_value::CertifiedSeries::hyperbolic_tangent_enclosure`. Species: transport.
-    GatedPassage { terms: usize },
+    GatedPassage {
+        terms: usize,
+        /// **The inner argument the source's `hidden_activation` declares.**
+        ///
+        /// `None` is `x` itself, which makes the passage `x·sigmoid(2x)` — the form this operation
+        /// carried before the source was consulted, retained so a diagram that used it is still
+        /// readable. `Some((scale, cubic))` is `scale·(x + cubic·x³)`, which with the surrounding
+        /// `½x(1 + tanh(·))` is `gelu_pytorch_tanh`.
+        ///
+        /// Both constants are **exact rationals read through the IEEE-754 mouth from the `binary64`
+        /// words the source's implementation computes with**, so this is
+        /// `SourceTestimony::Implementation` rather than an approximation of one. The source does
+        /// not compute `sqrt(2/pi)`; it computes with one particular stored word, and that word is
+        /// exactly representable here.
+        inner: Option<(Rat, Rat)>,
+    },
     /// A declared quotient onto the stored grain, through `exact_value::ieee754::round_into`.
     /// Species: quotient.
     GrainBoundary,
@@ -1268,6 +1282,13 @@ fn realize_handed(
     }
 
     for front in &fronts {
+        // **ONE STEP PER FRONT, not per operation.** `ExactWork::dependency_span` is documented as
+        // *the longest chain of steps that must happen in order*, and a front's members do not
+        // happen in order — that is what a front is. Stepping inside `enact` counted 174 for a
+        // layer whose span is 23, which is exactly the contraction-count-versus-dependency-span
+        // confusion the corpus names. `exact_linear` and `inertia` step once per genuine pivot and
+        // were already correct.
+        work.stepped();
         for occurrence in &front.occurrences {
             let operation = &program.operations[occurrence];
             let law = &complex.shape.laws[&complex.shape.occurrences[occurrence].law];
@@ -1340,11 +1361,9 @@ fn enact(
     let apparatus = |reason: String| PortedError::Apparatus { reason };
     Ok(match operation {
         PortedOperationKind::Lookup { population, row } => {
-            work.stepped();
             carrier.stored_row(population, *row).map_err(apparatus)?
         }
         PortedOperationKind::Contract { population } => {
-            work.stepped();
             carrier
                 .contract(population, &admitted[0])
                 .map_err(apparatus)?
@@ -1372,7 +1391,6 @@ fn enact(
             let mean = squares / width + floor;
             let root = AlgebraicRoot::reciprocal_square_root(&mean, ROOT_OCTAVES)
                 .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
-            work.stepped();
             let enclosure = root.enclosure();
             let two = Rat::from_integer(BigInt::from(2));
             let mut out = Vec::with_capacity(section.len());
@@ -1402,7 +1420,6 @@ fn enact(
                     right: admitted[1].len(),
                 });
             }
-            work.stepped();
             admitted[0]
                 .iter()
                 .zip(&admitted[1])
@@ -1419,7 +1436,6 @@ fn enact(
                     right: admitted[1].len(),
                 });
             }
-            work.stepped();
             admitted[0]
                 .iter()
                 .zip(&admitted[1])
@@ -1429,13 +1445,22 @@ fn enact(
                 })
                 .collect()
         }
-        PortedOperationKind::GatedPassage { terms } => {
+        PortedOperationKind::GatedPassage { terms, inner } => {
             let one = Rat::one();
             let two = Rat::from_integer(BigInt::from(2));
             let mut out = Vec::with_capacity(admitted[0].len());
             let mut widths = Vec::with_capacity(admitted[0].len());
             for value in &admitted[0] {
-                let turned = CertifiedSeries::hyperbolic_tangent_enclosure(value, *terms)
+                // The turn's argument. `x` itself, or the declared cubic the source names.
+                let argument = match inner {
+                    None => value.clone(),
+                    Some((scale, cubic)) => {
+                        work.multiplied(4);
+                        work.added(1);
+                        scale * (value + cubic * value * value * value)
+                    }
+                };
+                let turned = CertifiedSeries::hyperbolic_tangent_enclosure(&argument, *terms)
                     .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
                 let low = (&turned.lower + &one) * value / &two;
                 let high = (&turned.upper + &one) * value / &two;
@@ -1445,7 +1470,6 @@ fn enact(
                 work.multiplied(3);
                 work.added(2);
             }
-            work.stepped();
             retained.entry(*occurrence).or_default().extend(widths);
             out
         }
@@ -1465,7 +1489,6 @@ fn enact(
                     right: 2 * elements.len(),
                 });
             }
-            work.stepped();
             let two = Rat::from_integer(BigInt::from(2));
             let mut out = section.clone();
             let mut widths = vec![Rat::zero(); section.len()];
@@ -1530,7 +1553,6 @@ fn enact(
                     )?,
                 );
             }
-            work.stepped();
             let dimension = constructions.first().map(Vec::len).unwrap_or(0);
             let mut out = Vec::with_capacity(dimension);
             let mut widths = Vec::with_capacity(dimension);
@@ -1578,13 +1600,11 @@ fn enact(
             out
         }
         PortedOperationKind::Concatenate => {
-            work.stepped();
             admitted.iter().flat_map(|part| part.iter().cloned()).collect()
         }
         PortedOperationKind::Ablate { from, count } => {
             let section = &admitted[0];
             let upper = (from + count).min(section.len());
-            work.stepped();
             let mut out = section.clone();
             let mut withdrawn = Vec::with_capacity(upper.saturating_sub(*from));
             for at in *from..upper {
@@ -1604,7 +1624,6 @@ fn enact(
                     right: section.len(),
                 });
             }
-            work.stepped();
             // **What a projection drops is its retained fibre**, exhibited rather than discarded.
             let dropped: Vec<Rat> = section[..*from]
                 .iter()
@@ -1615,7 +1634,6 @@ fn enact(
             section[*from..from + count].to_vec()
         }
         PortedOperationKind::GrainBoundary => {
-            work.stepped();
             let (carried, residual) = carrier.grain(&admitted[0]).map_err(apparatus)?;
             retained.entry(*occurrence).or_default().extend(residual);
             carried
@@ -2350,9 +2368,15 @@ mod tests {
             vec![rat(12), rat(-4)],
             "the reconvergence admitted both paths, not one"
         );
+        // **Three, not four.** This diagram has four operations over three fronts, and the
+        // assertion three lines above says the middle two are CO-PRESENT. Asserting a span of four
+        // contradicted it: it counted two co-present operations as two serial steps. The assertion
+        // was carrying the defect, which is the shape `CLAUDE.md` records for the eleven tests that
+        // asserted `ComparativeMultiplicity`'s.
+        assert_eq!(receipt.fronts.len(), 3);
         assert!(receipt.work.coordinates().iter().any(|(name, count)| *name
             == "dependency-span"
-            && *count == num_bigint::BigUint::from(4u32)));
+            && *count == num_bigint::BigUint::from(3u32)));
     }
 
     /// **A grain boundary's residual is retained per occurrence and exhibited**, never propagated.

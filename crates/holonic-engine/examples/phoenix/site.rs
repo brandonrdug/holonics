@@ -20,7 +20,9 @@ use std::io::Write;
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
-use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
+use holonic_engine::exact_value::ieee754::{
+    decode_bfloat16_bits, decode_binary64_bits, round_into_bfloat16,
+};
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
 use holonic_engine::interaction::OccurrencePort;
@@ -212,6 +214,47 @@ pub fn two_to(exponent: i64) -> Rat {
 /// what makes an attribution possible at all.
 pub type DeclaredAblation = Option<(usize, usize)>;
 
+/// **How far into the layer the diagram reaches.**
+///
+/// A parameter rather than an edit, because the stations that returned already measured the contact
+/// half and a figure re-taken against a different diagram is a different figure.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum Reach {
+    /// Through the contact and its reconvergence. What stations three through eleven measured.
+    #[default]
+    ContactHalf,
+    /// The whole layer: the contact's return projected back, both re-entries, and the gated
+    /// passage. **Not the whole layer's SOURCE** — the per-layer branch is an open candidate and is
+    /// named as one by `WHOLE_LAYER_OPEN` rather than guessed at.
+    WholeLayer,
+}
+
+/// **What the whole-layer reach does NOT decide.** Four populations layer zero carries whose
+/// composition the source's configuration and model card do not fix, retained as the question they
+/// are rather than bound to a plausible reading. `CLAUDE.md`: human inspection of plausible language
+/// cannot select a composition.
+pub const WHOLE_LAYER_OPEN: [(&str, &str); 4] = [
+    (
+        "per_layer_input_gate.weight",
+        "the per-layer embedding is 256 wide and this contracts 2560 to 256 — which side gates \
+         which, and is the product taken before or after `post_per_layer_input_norm`?",
+    ),
+    (
+        "per_layer_projection.weight",
+        "it returns 256 to 2560, but whether its return re-enters the residual before or after the \
+         gated passage is not stated anywhere in the configuration or the model card",
+    ),
+    (
+        "post_per_layer_input_norm.weight",
+        "a 2560 rebase gain on a branch whose own composition is undecided",
+    ),
+    (
+        "layer_scalar",
+        "a single stored value with no declared role — a gain on the layer's return, on its \
+         re-entry, or on neither",
+    ),
+];
+
 /// **The founding: the diagram, its program, and the material they name.**
 ///
 /// Separated from the conduct so a native rest can seal exactly this and nothing else. What a
@@ -232,6 +275,16 @@ pub fn found(
     candidate: Candidate,
     terms: usize,
     ablation: DeclaredAblation,
+) -> Result<(FoundedSite, ForeignContainer, File), String> {
+    found_reaching(root, candidate, terms, ablation, Reach::ContactHalf)
+}
+
+pub fn found_reaching(
+    root: &str,
+    candidate: Candidate,
+    terms: usize,
+    ablation: DeclaredAblation,
+    reach: Reach,
 ) -> Result<(FoundedSite, ForeignContainer, File), String> {
     let (file, container) = manifest_safetensors(&format!("{root}/model.safetensors"))
         .map_err(|error| error.to_string())?;
@@ -279,8 +332,10 @@ pub fn found(
     let receiver_head = complex.port("one receiver chart");
     let presented_head = complex.port("one presented chart");
     let carried_head = complex.port("one carried chart");
+    let passage_wide = complex.port("the gated passage's chart");
 
     let mut program = PortedProgram::default();
+    let mut entering_standing: Vec<EventId> = Vec::new();
     let mut turned_presented: Vec<EventId> = Vec::new();
     let mut carried_heads: Vec<EventId> = Vec::new();
     let mut assembled: Vec<EventId> = Vec::new();
@@ -307,6 +362,9 @@ pub fn found(
             entering = event;
         }
 
+        // The residual stream is the value BEFORE the entering rebase, which is what both
+        // re-entries below return to.
+        entering_standing.push(entering);
         let rebase = law(&mut complex, tag("entering rebase"), OperationSpecies::Transport, vec![grained], vec![standing]);
         let rebase_event = complex.occur(rebase).map_err(|e| e.to_string())?;
         program.bind(
@@ -429,7 +487,101 @@ pub fn found(
         for (at, part) in parts.iter().enumerate() {
             join(&mut complex, tag(&format!("reconvergence {at}")), carried_head, *part, joined, at)?;
         }
-        assembled.push(joined);
+        if reach == Reach::ContactHalf {
+            assembled.push(joined);
+            continue;
+        }
+
+        // -------------------------------------------------------------------------------------
+        // THE GATED PASSAGE HALF. Every population below is named by the source; the four the
+        // source does NOT decide are in `WHOLE_LAYER_OPEN` and appear nowhere in this diagram.
+        // -------------------------------------------------------------------------------------
+        let returned_grain = grain_after(&mut complex, &mut program, tag("contact return grain"), carried_wide, carried_wide, joined)?;
+
+        let l = law(&mut complex, tag("contact returns"), OperationSpecies::Transport, vec![carried_wide], vec![grained]);
+        let projected_back = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(projected_back, PortedOperationKind::Contract { population: named("self_attn.o_proj.weight") });
+        join(&mut complex, tag("contact returns"), carried_wide, returned_grain, projected_back, 0)?;
+
+        let l = law(&mut complex, tag("contact return rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let returned_rebased = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(
+            returned_rebased,
+            PortedOperationKind::RebaseByGain {
+                population: named("post_attention_layernorm.weight"),
+                floor: floor.clone(),
+                gain_carries_unit: candidate.gain_carries_unit,
+            },
+        );
+        join(&mut complex, tag("contact return rebase"), grained, projected_back, returned_rebased, 0)?;
+
+        // **THE FIRST RE-ENTRY.** The retained standing and the returned current, joined.
+        let l = law(&mut complex, tag("contact re-entry"), OperationSpecies::Construction, vec![grained, grained], vec![grained]);
+        let first_re_entry = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(first_re_entry, PortedOperationKind::ReEntry);
+        join(&mut complex, tag("re-entry retains"), grained, entering_standing[position], first_re_entry, 0)?;
+        join(&mut complex, tag("re-entry returns"), grained, returned_rebased, first_re_entry, 1)?;
+
+        let l = law(&mut complex, tag("passage entering rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let passage_entering = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(
+            passage_entering,
+            PortedOperationKind::RebaseByGain {
+                population: named("pre_feedforward_layernorm.weight"),
+                floor: floor.clone(),
+                gain_carries_unit: candidate.gain_carries_unit,
+            },
+        );
+        join(&mut complex, tag("passage entering rebase"), grained, first_re_entry, passage_entering, 0)?;
+        let passage_grain = grain_after(&mut complex, &mut program, tag("passage entering grain"), grained, grained, passage_entering)?;
+
+        // **THE FRONT.** The gate and the carried branch are CO-PRESENT — neither reads the other,
+        // and `layers()` puts them in one front for exactly that reason.
+        let mut passage_branches = Vec::new();
+        for (what, suffix) in [("gate", "mlp.gate_proj.weight"), ("up", "mlp.up_proj.weight")] {
+            let l = law(&mut complex, tag(what), OperationSpecies::Transport, vec![grained], vec![passage_wide]);
+            let event = complex.occur(l).map_err(|e| e.to_string())?;
+            program.bind(event, PortedOperationKind::Contract { population: named(suffix) });
+            join(&mut complex, tag(what), grained, passage_grain, event, 0)?;
+            passage_branches.push(event);
+        }
+
+        let l = law(&mut complex, tag("the gate turns"), OperationSpecies::Transport, vec![passage_wide], vec![passage_wide]);
+        let gated = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(gated, PortedOperationKind::GatedPassage { terms, inner: Some(gelu_inner()) });
+        join(&mut complex, tag("the gate turns"), passage_wide, passage_branches[0], gated, 0)?;
+
+        let l = law(&mut complex, tag("the gate admits"), OperationSpecies::Construction, vec![passage_wide, passage_wide], vec![passage_wide]);
+        let admitted = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(admitted, PortedOperationKind::Hadamard);
+        join(&mut complex, tag("the gate admits gate"), passage_wide, gated, admitted, 0)?;
+        join(&mut complex, tag("the gate admits up"), passage_wide, passage_branches[1], admitted, 1)?;
+        let admitted_grain = grain_after(&mut complex, &mut program, tag("passage grain"), passage_wide, passage_wide, admitted)?;
+
+        let l = law(&mut complex, tag("the passage returns"), OperationSpecies::Transport, vec![passage_wide], vec![grained]);
+        let passage_returned = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(passage_returned, PortedOperationKind::Contract { population: named("mlp.down_proj.weight") });
+        join(&mut complex, tag("the passage returns"), passage_wide, admitted_grain, passage_returned, 0)?;
+
+        let l = law(&mut complex, tag("passage return rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let passage_rebased = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(
+            passage_rebased,
+            PortedOperationKind::RebaseByGain {
+                population: named("post_feedforward_layernorm.weight"),
+                floor: floor.clone(),
+                gain_carries_unit: candidate.gain_carries_unit,
+            },
+        );
+        join(&mut complex, tag("passage return rebase"), grained, passage_returned, passage_rebased, 0)?;
+
+        // **THE SECOND RE-ENTRY.** The layer's return.
+        let l = law(&mut complex, tag("passage re-entry"), OperationSpecies::Construction, vec![grained, grained], vec![grained]);
+        let second_re_entry = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(second_re_entry, PortedOperationKind::ReEntry);
+        join(&mut complex, tag("passage re-entry retains"), grained, first_re_entry, second_re_entry, 0)?;
+        join(&mut complex, tag("passage re-entry returns"), grained, passage_rebased, second_re_entry, 1)?;
+        assembled.push(second_re_entry);
     }
 
     program.validate(&complex).map_err(|e| e.to_string())?;
@@ -483,6 +635,22 @@ pub fn conduct(
         .iter()
         .map(|event| receipt.carried[&OccurrencePort::output(*event, 0)].clone())
         .collect())
+}
+
+/// **The inner argument the source's `hidden_activation` declares**, read exactly.
+///
+/// `config.json` names `gelu_pytorch_tanh`, whose implementation computes
+/// `½x(1 + tanh(s·(x + c·x³)))` with `s` and `c` as `binary64` words. The source does not compute
+/// `sqrt(2/pi)` at conduct time; it computes with one particular stored word. That word is read here
+/// through the standing IEEE-754 mouth — **from its bits, so no float arithmetic occurs anywhere** —
+/// which makes this `SourceTestimony::Implementation` rather than an approximation of one.
+pub fn gelu_inner() -> (Rat, Rat) {
+    let read = |bits: u64| {
+        decode_binary64_bits(bits)
+            .expect("a finite stored word")
+            .value()
+    };
+    (read(0x3FE9_8845_33D4_3651), read(0x3FA6_E4E2_6D48_01F7))
 }
 
 fn law(
