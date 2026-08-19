@@ -85,12 +85,12 @@ pub const SIBLINGS: [Candidate; 3] = [
 // ---------------------------------------------------------------------------------------------
 
 pub struct ResidentSourceCarrier<'chart> {
-    chart: &'chart ResidentReadout,
-    container: ForeignContainer,
-    file: File,
-    below_the_frame: usize,
+    pub chart: &'chart ResidentReadout,
+    pub container: ForeignContainer,
+    pub file: File,
+    pub below_the_frame: usize,
     /// The band group elements, founded once and supplied by name. **Material, not program text.**
-    rotations: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
+    pub rotations: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
 }
 
 /// Read off the carrier and the diagram: a signed word holds sixty-three magnitude octaves, a

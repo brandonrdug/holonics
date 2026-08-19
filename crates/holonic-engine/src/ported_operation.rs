@@ -1098,11 +1098,158 @@ impl PortedRealizationReceipt {
 ///
 /// The only loop here is over `CausalDiagram::layers`, and within a layer the occurrences are
 /// co-present — the front. Nothing in this function knows what a foreign map is.
+/// **A hand on a front — a gauge, not a schedule.**
+///
+/// `CausalDiagram::layers()` decides which occurrences are co-present; nothing here can change that.
+/// A hand only chooses how a front the diagram *already declared co-present* is traversed, so it
+/// states no order the diagram did not force. Co-presence is exactly the claim that this choice is
+/// invisible, and `CLAUDE.md` §8 requires a gauge to exhibit its own orbit rather than assert one —
+/// `PivotRule::ALL` was built to prevent a defect and became the defect because nobody measured its
+/// orbit on the declared material.
+///
+/// [`FrontHand::DraggedAcross`] is the control that makes the other three non-vacuous. It moves an
+/// occurrence **between** fronts, which is an order the diagram refused, and the realization must
+/// refuse it back.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FrontHand {
+    /// The hand `layers()` founded. The diagram's own.
+    AsFounded,
+    /// Every front traversed against its founding hand.
+    Reversed,
+    /// Every front rotated by one. A second, independent element of the same gauge.
+    Rotated,
+    /// **THE CONTROL.** One occurrence is dragged into the front of a producer it actually depends
+    /// on, so its input is unwritten when it runs.
+    ///
+    /// The first form of this dragged the front's *first* occurrence into its predecessor by
+    /// position, and it changed nothing — `layers()` is a topological layering, so an occurrence
+    /// whose inputs all come from strictly earlier fronts is still lawful one layer up. **A control
+    /// that does not produce the illegal state it is testing for is not a control.** This one is
+    /// built from the bond map, which is why it needs the complex.
+    DraggedOntoItsProducer,
+}
+
+impl FrontHand {
+    /// Apply the hand. Only [`FrontHand::DraggedAcross`] changes front *membership*; the others
+    /// permute within a front and leave the chronology exactly where the diagram put it.
+    pub fn applied(self, fronts: Vec<Front>) -> Vec<Front> {
+        match self {
+            Self::AsFounded => fronts,
+            Self::Reversed => fronts
+                .into_iter()
+                .map(|front| Front {
+                    depth: front.depth,
+                    occurrences: front.occurrences.into_iter().rev().collect(),
+                })
+                .collect(),
+            Self::Rotated => fronts
+                .into_iter()
+                .map(|front| {
+                    let mut occurrences = front.occurrences;
+                    if occurrences.len() > 1 {
+                        occurrences.rotate_left(1);
+                    }
+                    Front {
+                        depth: front.depth,
+                        occurrences,
+                    }
+                })
+                .collect(),
+            // Without the complex this hand cannot find a producer, so it is the identity and
+            // says so. `applied_to` is the form that can build it.
+            Self::DraggedOntoItsProducer => fronts,
+        }
+    }
+
+    /// [`FrontHand::applied`], with the complex available so [`FrontHand::DraggedOntoItsProducer`]
+    /// can read the bond map.
+    ///
+    /// Returns the handed fronts beside **what it actually disturbed** — the occurrence it moved and
+    /// the producer it was moved onto — so the control's own premise is exhibited rather than
+    /// assumed. `None` there means the hand found no such pair and the control did not fire.
+    pub fn applied_to(
+        self,
+        complex: &PortedOperationComplex,
+        fronts: Vec<Front>,
+    ) -> (Vec<Front>, Option<(EventId, EventId)>) {
+        let Self::DraggedOntoItsProducer = self else {
+            return (self.applied(fronts), None);
+        };
+        let mut producing: BTreeMap<EventId, EventId> = BTreeMap::new();
+        for interaction in complex.shape.interactions.values() {
+            for bond in &interaction.bonds {
+                producing.insert(bond.target.event, bond.source.event);
+            }
+        }
+        let mut depth_of: BTreeMap<EventId, usize> = BTreeMap::new();
+        for front in &fronts {
+            for occurrence in &front.occurrences {
+                depth_of.insert(*occurrence, front.depth);
+            }
+        }
+        // The first consumer whose producer sits in a strictly earlier front. Moving it into the
+        // producer's front puts it beside the thing it needs rather than after it.
+        let disturbed = fronts.iter().find_map(|front| {
+            front.occurrences.iter().find_map(|consumer| {
+                let producer = producing.get(consumer)?;
+                let producer_depth = *depth_of.get(producer)?;
+                (producer_depth < front.depth).then_some((*consumer, *producer, producer_depth))
+            })
+        });
+        let Some((consumer, producer, producer_depth)) = disturbed else {
+            return (fronts, None);
+        };
+        let handed = fronts
+            .into_iter()
+            .map(|front| {
+                let mut occurrences: Vec<EventId> = front
+                    .occurrences
+                    .into_iter()
+                    .filter(|occurrence| *occurrence != consumer)
+                    .collect();
+                if front.depth == producer_depth {
+                    // **FIRST, not last.** Appending it after the producer leaves a legal order —
+                    // measured, and the control returned no refusal until this line said `insert`.
+                    // The illegal state being tested for is a consumer running BEFORE its producer.
+                    occurrences.insert(0, consumer);
+                }
+                Front {
+                    depth: front.depth,
+                    occurrences,
+                }
+            })
+            .collect();
+        (handed, Some((consumer, producer)))
+    }
+}
+
+/// [`realize`] under a declared front hand. See [`FrontHand`] for why this is a gauge rather than a
+/// schedule.
+pub fn realize_under(
+    complex: &PortedOperationComplex,
+    program: &PortedProgram,
+    carrier: &mut dyn PortedCarrier,
+    entering: &BTreeMap<OccurrencePort, Vec<Rat>>,
+    hand: FrontHand,
+) -> Result<PortedRealizationReceipt, PortedError> {
+    realize_handed(complex, program, carrier, entering, hand)
+}
+
 pub fn realize(
     complex: &PortedOperationComplex,
     program: &PortedProgram,
     carrier: &mut dyn PortedCarrier,
     entering: &BTreeMap<OccurrencePort, Vec<Rat>>,
+) -> Result<PortedRealizationReceipt, PortedError> {
+    realize_handed(complex, program, carrier, entering, FrontHand::AsFounded)
+}
+
+fn realize_handed(
+    complex: &PortedOperationComplex,
+    program: &PortedProgram,
+    carrier: &mut dyn PortedCarrier,
+    entering: &BTreeMap<OccurrencePort, Vec<Rat>>,
+    hand: FrontHand,
 ) -> Result<PortedRealizationReceipt, PortedError> {
     program.validate(complex)?;
     complex.witness.validate(&complex.shape)?;
@@ -1110,7 +1257,7 @@ pub fn realize(
     let mut carried: BTreeMap<OccurrencePort, Vec<Rat>> = entering.clone();
     let mut retained: BTreeMap<EventId, Vec<Rat>> = BTreeMap::new();
     let mut work = ExactWork::nothing();
-    let fronts = complex.fronts()?;
+    let (fronts, _) = hand.applied_to(complex, complex.fronts()?);
 
     // Every bond, indexed by the port it carries **to**. This is the diagram's dataflow.
     let mut arriving: BTreeMap<OccurrencePort, OccurrencePort> = BTreeMap::new();
