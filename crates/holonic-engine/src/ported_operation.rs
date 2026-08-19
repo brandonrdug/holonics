@@ -360,23 +360,7 @@ impl PortedWord {
     /// **Enact the word in causal order**, retaining every intermediate standing.
     ///
     /// This is the construction. Nothing is flattened and no total product is formed.
-    pub fn operation_name(operation: &PortedOperationKind) -> &'static str {
-    match operation {
-        PortedOperationKind::Lookup { .. } => "lookup",
-        PortedOperationKind::Contract { .. } => "contract",
-        PortedOperationKind::RebaseByGain { .. } => "rebase",
-        PortedOperationKind::ReEntry => "re-entry",
-        PortedOperationKind::Hadamard => "hadamard",
-        PortedOperationKind::GatedPassage { .. } => "gated passage",
-        PortedOperationKind::GrainBoundary => "grain",
-        PortedOperationKind::Project { .. } => "project",
-        PortedOperationKind::Chronology { .. } => "chronology",
-        PortedOperationKind::ContactAndCarry { .. } => "contact",
-        PortedOperationKind::Concatenate => "concatenate",
-    }
-}
-
-fn enact(&self, standing: &[Rat]) -> Result<Vec<Vec<Rat>>, PortedError> {
+    pub fn enact(&self, standing: &[Rat]) -> Result<Vec<Vec<Rat>>, PortedError> {
         let mut carried = standing.to_vec();
         let mut lineage = Vec::with_capacity(self.steps.len() + 1);
         lineage.push(carried.clone());
@@ -839,6 +823,16 @@ pub enum PortedOperationKind {
     /// A declared quotient onto the stored grain, through `exact_value::ieee754::round_into`.
     /// Species: quotient.
     GrainBoundary,
+    /// **A targeted ablation: a declared span of coordinates is withdrawn and retained.**
+    ///
+    /// This is the intervention a dissection and a condensation are made of. It differs from
+    /// [`Self::Project`] in what it emits — a projection narrows the port, an ablation keeps the
+    /// port's width and empties a declared span — so a matched sibling differs from its base in
+    /// exactly this one relation and nothing downstream changes shape.
+    ///
+    /// What it withdrew is its **retained fibre**, exhibited at its own occurrence. Species:
+    /// quotient.
+    Ablate { from: usize, count: usize },
     /// **A projection onto a declared span of coordinates.** A head slice is a quotient by the
     /// tablet's own reading — it collapses the complementary coordinates — so it owes them, and
     /// what it dropped is exactly its retained fibre. Species: quotient.
@@ -893,7 +887,9 @@ impl PortedOperationKind {
             | Self::RebaseByGain { .. }
             | Self::GatedPassage { .. }
             | Self::Chronology { .. } => OperationSpecies::Transport,
-            Self::GrainBoundary | Self::Project { .. } => OperationSpecies::Quotient,
+            Self::GrainBoundary | Self::Project { .. } | Self::Ablate { .. } => {
+                OperationSpecies::Quotient
+            }
         }
     }
 
@@ -909,6 +905,7 @@ impl PortedOperationKind {
             | Self::GatedPassage { .. }
             | Self::Chronology { .. }
             | Self::Project { .. }
+            | Self::Ablate { .. }
             | Self::GrainBoundary => (1, 1),
             Self::ReEntry | Self::Hadamard => (2, 1),
             Self::ContactAndCarry { .. } | Self::Concatenate => return None,
@@ -1168,6 +1165,7 @@ fn operation_name(operation: &PortedOperationKind) -> &'static str {
         PortedOperationKind::GatedPassage { .. } => "gated passage",
         PortedOperationKind::GrainBoundary => "grain",
         PortedOperationKind::Project { .. } => "project",
+        PortedOperationKind::Ablate { .. } => "ablate",
         PortedOperationKind::Chronology { .. } => "chronology",
         PortedOperationKind::ContactAndCarry { .. } => "contact",
         PortedOperationKind::Concatenate => "concatenate",
@@ -1422,6 +1420,21 @@ fn enact(
         PortedOperationKind::Concatenate => {
             work.stepped();
             admitted.iter().flat_map(|part| part.iter().cloned()).collect()
+        }
+        PortedOperationKind::Ablate { from, count } => {
+            let section = &admitted[0];
+            let upper = (from + count).min(section.len());
+            work.stepped();
+            let mut out = section.clone();
+            let mut withdrawn = Vec::with_capacity(upper.saturating_sub(*from));
+            for at in *from..upper {
+                withdrawn.push(section[at].clone());
+                out[at] = Rat::zero();
+            }
+            // **What an ablation withdrew is its retained fibre.** Nothing is discarded, so the
+            // predecessor is reconstructible from the return and the fibre together.
+            retained.entry(*occurrence).or_default().extend(withdrawn);
+            out
         }
         PortedOperationKind::Project { from, count } => {
             let section = &admitted[0];
