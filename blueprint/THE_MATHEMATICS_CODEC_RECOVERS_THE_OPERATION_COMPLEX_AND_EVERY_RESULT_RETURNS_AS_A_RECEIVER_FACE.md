@@ -1,16 +1,16 @@
 # The mathematics codec recovers the operation complex, and every result returns as a receiver face
 
-**Date:** 2026-08-18  
+**Date:** 2026-08-18
 **Kind:** construction blueprint under [THE_ROADMAP.md](THE_ROADMAP.md), the sole scheduling
-authority.  
+authority.
 **Truth status:** construction contract. Existing capabilities are graded only at their cited
 bounded owners. Every joined PDF, mathematical-document, OCR, general rendering, search,
 cultivation, and frozen-model capability specified here is **open** until its complete return is
-executed and inspected.  
+executed and inspected.
 **Position:** this is the mathematics-native specialization of the Eros circulation and a future
 receiver family for Phoenix cultivation. It composes with
 [THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md](THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md);
-it does not replace or interrupt the active Gemma instance.  
+it does not replace or interrupt the active Gemma instance.
 **Construction-state boundary:** this design deposit promotes no executable capability and does not
 move [CONSTRUCTION_STATE.md](../CONSTRUCTION_STATE.md).
 
