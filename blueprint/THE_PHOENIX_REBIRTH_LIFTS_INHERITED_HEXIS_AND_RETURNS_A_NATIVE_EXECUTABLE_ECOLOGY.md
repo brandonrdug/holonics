@@ -14,6 +14,10 @@ artifact and falsifiers return.
 [`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md).
 **Derivation:**
 [`research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`](../research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md).
+**External geometry and normalization receivers:**
+[`research/records/2026-08-18_THE_ARCHITECTURE_IS_A_DOMAIN_ACTION_THE_GAUGE_CARRIES_THE_SECTION_AND_THE_COARSENING_OWES_ITS_FIBRE.md`](../research/records/2026-08-18_THE_ARCHITECTURE_IS_A_DOMAIN_ACTION_THE_GAUGE_CARRIES_THE_SECTION_AND_THE_COARSENING_OWES_ITS_FIBRE.md)
+and
+[`research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md`](../research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md).
 **Occasion:** Brandon, 2026-08-18: *"The ideal outcome that I want from the Phoenix rebirth is to
 see a model like Gemma lifted and exceptionally compressed into a holonic format … in addition to
 being tuned and dissected."*
@@ -378,6 +382,12 @@ and observation passages.
 The strongest lawful resident surface owns the hot deed. CPU apparatus may mount, persist, and
 audit; it may not replay source semantics after device refusal.
 
+Every normalization returns its population aperture, pivot, quadratic form, exact epsilon, gain and
+bias, inverse-or-quotient classification, kernel/image, ReconstructionFiber, and local
+derivative/adjoint. Epsilon-zero projective normalization and nonzero-epsilon bounded radial charts
+are different operations. Every softmax first returns the positive ratio/projective chart; it is
+called a probability or Markov transition only when a stochastic receiver is declared.
+
 **Falsifiers:** active and potential atlases are identical by construction; no caused current
 crosses; the device refuses and CPU reproduces the answer; the path omits a load-bearing
 normalization/chronology/return; one output substitutes for the trajectory.
@@ -463,6 +473,17 @@ declared future receiver family including, where meaningful:
 Condense only where the family factors. Receiver-minimality requires every retained native axis to
 have a shortest separating consequence. The source/native size and work vectors are reported only
 with their complete decoders/runtimes.
+
+When the source or native interaction is read as a Markov chain, state condensation requires exact
+dynamic factorization. For state-to-block incidence \(C\), transition \(P\), and quotient
+\(\bar P\), the receipt returns
+
+\[
+PC=C\bar P
+\]
+
+or its complete defect and separated within-block histories. One-step agreement, distance
+preservation, reconstruction MSE, and stationary mass are insufficient.
 
 **Falsifiers:** bytes shrink while behavior fibre is unknown; source agreement alone grades the
 station; the same probe material both founds and grades every relation; removing a retained axis

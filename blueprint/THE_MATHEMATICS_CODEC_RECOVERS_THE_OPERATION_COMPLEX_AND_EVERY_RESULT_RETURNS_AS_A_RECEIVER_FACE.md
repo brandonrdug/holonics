@@ -26,6 +26,18 @@ move [CONSTRUCTION_STATE.md](../CONSTRUCTION_STATE.md).
 [AlphaEvolve: A coding agent for scientific and algorithmic discovery](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/AlphaEvolve.pdf),
 2025. The paper supplies an exterior comparison and no construction authority.
 
+**External geometry, manifold, Markov, and normalization comparisons:**
+[Geometric Deep Learning](https://arxiv.org/abs/2104.13478),
+[A Geometric Perspective on Autoencoders](https://arxiv.org/abs/2309.08247),
+[Geometry-Aware Generative Autoencoders](https://arxiv.org/abs/2410.12779),
+[Manifold-Matching Autoencoders](https://arxiv.org/abs/2603.16568), and
+[Layer Normalization](https://arxiv.org/abs/1607.06450). Their exact synthesis and limits are
+deposited in
+[the geometric-action record](../research/records/2026-08-18_THE_ARCHITECTURE_IS_A_DOMAIN_ACTION_THE_GAUGE_CARRIES_THE_SECTION_AND_THE_COARSENING_OWES_ITS_FIBRE.md)
+and
+[the Markov/normalization record](../research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md).
+They supply exterior mathematical receivers and no construction authority.
+
 ---
 
 ## THE OUTCOME
@@ -174,6 +186,96 @@ dated catalog testimony, not a global optimum.
 
 The asynchronous Python controller, worker pools, islands, queues, mutation markers, and program
 database are implementation charts. They are not imported as Eros architecture.
+
+---
+
+## THE MANIFOLD, MARKOV, AND NORMALIZATION INTERMEDIARY
+
+Equal reconstruction does not identify a manifold or chart. If encoder/decoder pair \((g,f)\)
+reconstructs the declared samples, an invertible latent chart change \(h\) leaves reconstruction
+unchanged under
+
+\[
+(f,g)\mapsto(f\circ h^{-1},h\circ g).
+\]
+
+The complete chart orbit remains open until metric, topology, curvature, orientation, connection,
+intervention, and successor receivers separate it. Every claimed pullback metric additionally
+returns rank and singular locus; a semidefinite form is not called a Riemannian metric on the whole
+ambient space.
+
+### Markov interaction and dynamic compression
+
+A Gaussian metric affinity may be normalized into a Markov receiver:
+
+\[
+K_{ij}=\exp(-d(i,j)^2/\sigma),
+\qquad
+P_{ij}=\frac{K_{ij}}{\sum_kK_{ik}}.
+\]
+
+Then \(P^t\) is the receiver’s weighted population of \(t\)-step transport words. A state partition
+is an exact compression of that interaction only when its block incidence \(C\) intertwines:
+
+\[
+PC=C\bar P.
+\]
+
+The complete defect \(PC-C\bar P\), within-block histories, and shortest separating continuation
+belong in the ReconstructionFiber. Geometry, reconstruction error, and stationary mass do not
+substitute for this dynamic law.
+
+### Normalization sections
+
+Every normalization return carries:
+
+~~~text
+normalized occurrence population and typed ports
+pivot/common-mode subspace
+quadratic form or positive ratio family
+exact epsilon
+gain and bias transport
+inverse-or-quotient classification
+kernel, image, and ReconstructionFiber
+local derivative and metric adjoint
+finite-precision seal remainder
+receiver scope.
+~~~
+
+Softmax is the exponential/projective chart
+
+\[
+\mathbb R^n/\operatorname{span}\{\mathbf1\}
+\cong
+\operatorname{int}\Delta^{n-1}.
+\]
+
+It becomes probability only for a declared stochastic receiver. Sigmoid is the two-port instance.
+Its finite odds retain the potential difference.
+
+RMS is the quadratic density
+
+\[
+\operatorname{RMS}(x)=\sqrt{x^\top x/d}.
+\]
+
+Epsilon-zero RMSNorm selects an RMS-one representative and quotients positive radius. Nonzero
+epsilon instead maps radius injectively into an open ball before zero gains or quantization. A
+horizon claim must name which receiver deliberately ignores that recoverable radius.
+
+LayerNorm first projects through
+
+\[
+I-\mathbf1\mathbf1^\top/d
+\]
+
+and then applies the centered radial chart. It is a pivot into a mean-zero section, not an arbitrary
+rotation and not a time-parity certificate. Time parity still requires completed propagation and
+return.
+
+These sections live on simplices, spheres/open balls, Grassmannians, metric cones, group orbits, and
+Markov quotient spaces. They are nonlinear geometric compression charts and must not be reduced to
+one linear bottleneck story.
 
 ---
 

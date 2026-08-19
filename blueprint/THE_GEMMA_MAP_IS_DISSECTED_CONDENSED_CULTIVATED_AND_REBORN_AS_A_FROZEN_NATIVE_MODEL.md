@@ -27,6 +27,37 @@ exceptionally compressed into a holonic format … in addition to being tuned an
 
 ---
 
+## Audited construction position — 2026-08-18
+
+The adversarial return is
+[THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md](../research/records/2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md).
+It distinguishes exact instruments, bounded experiments, and this blueprint’s station grades.
+
+| obligation | audited position |
+|---|---|
+| source manifestation and exact binary mouths | bounded instruments stand; complete source admission remains open |
+| exact linear fibres, rebases, and metric adjoints | implemented-exact |
+| generic typed ported words and lift-defect law | implemented-exact at the substrate aperture |
+| contextual active Gemma path | open; current site/layer diagrams are proposed, incomplete, and CPU-owned outside contraction leaves |
+| source intervention taxonomy | open; candidate distinguishability was measured but two real source questions remain unsettled |
+| native morphology | open; no lattice, state, generator, or source-independent ecology was founded |
+| condensation | open; one axis-block sensitivity census returned, with no quotient runtime or decoder |
+| cultivation | open; BF16 mutation/remount/withdrawal returned, but the checked adjoint did not derive the delta and the split was not held out |
+| native rest | open; the current artifact is a fixed three-row source-tensor fixture |
+| runtime and frozen inference | open; one proposed layer reaches a tied potential face, but no application accepts new material or enacts the tower |
+| reborn-body dissection and Phoenix grade | open |
+
+The bounded returns remain evidence. None is deleted or demoted merely because its master station
+remains open. The next gate is one source-authenticated complete layer whose whole semantic path is
+GPU resident, whose approximation fibres propagate, whose two K/V families and PLE branch are
+complete, and whose work is admitted before execution.
+
+The normalization and Markov corrections are derived in
+[THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md](../research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md).
+In particular, source epsilon makes Gemma RMSNorm a bounded radial chart rather than an exact
+magnitude quotient, and a state condensation of attention/diffusion transport owes a lumpability or
+equivalent successor-factorization receipt.
+
 ## 0. The requested outcome
 
 The first Phoenix instance returns two inseparable deliverables:
@@ -463,9 +494,29 @@ two of the four are free.**
 |---|---|---|
 | `final_logit_softcapping` | `30.0` | `30 tanh(x/30)` is **strictly monotone**, so every order face of the potential section — including the nearest-boundary receiver — is exactly invariant under it. It is a total transformation for a magnitude receiver and the identity for an order receiver, and for the latter it need not be evaluated at all. |
 | attention softmax | — | the **contact ordering** needs no transcendental: `p_i/p_j = exp(x_i - x_j)` is monotone in the difference, so comparing two weights is comparing two rational differences by cross-multiplication, which is `exact_contact::RatioFace::compare`'s standing deed. Only the convex combination for value transport needs an enclosure. |
-| `rms_norm_eps` `1e-06` normalization | — | one application adjoins at most a quadratic radical over its actual input field; dependencies decide the resulting extension degree. It requires an exact algebraic or certified receiver-bounded passage, not a presumed `2^42` tower. |
+| `rms_norm_eps` `1e-06` normalization | — | one application adjoins at most a quadratic radical over its actual input field; dependencies decide the resulting extension degree. With nonzero epsilon and nonzero gains the radial magnitude is analytically recoverable, so this is a bounded radial chart rather than an exact scale quotient. The return owes the exact epsilon, radical or enclosure, inverse-or-quotient classification, local derivative/adjoint, and later storage fibre. |
 | `hidden_activation` `gelu_pytorch_tanh` | — | a nonlinear constitutive construction. `exact_value::SeriesTailCertificate` supplies remainder species, but no complete GELU/tanh realization is standing merely from that carrier. |
 | audio `attention_logit_cap` `50.0`, `use_clipped_linears` | `True` | the `928` stored rank-0 `input_max` / `input_min` / `output_max` / `output_min` bounds are the source's own declared aperture per linear map, not weights, and they are read as such. |
+
+The authoritative
+[Gemma 4 implementation](https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma4/modeling_gemma4.py)
+is admissible exterior realization testimony and resolves the layer-zero PLE order:
+
+~~~text
+residual = hidden standing
+→ per_layer_input_gate
+→ GELU
+→ Hadamard contact with the layer’s PLE section
+→ per_layer_projection
+→ post_per_layer_input_norm
+→ residual re-entry
+→ multiplication by layer_scalar.
+~~~
+
+It also specifies the token-identity and context-aware PLE branches. A missing local Python package
+does not leave these relations open. The exact source revision and content address must accompany
+the realization receipt; the public implementation remains exterior testimony and never native
+ontology.
 
 No epsilon or source-runtime float silently decides identity, rank, route, or a native coefficient.
 An exterior source-runtime replay may provide an independent comparison face and never governs the
@@ -645,6 +696,18 @@ source fact and not a condition silently simulated by repeated single-boundary e
 The body may preserve a receiver exactly, preserve it within certified enclosures, or return it
 open. All three are typed. Compression is not graded by mean output similarity, benchmark accuracy,
 parameter count, or file size.
+
+When a normalized contact family is read as a Markov interaction, condensation additionally owes
+the dynamic intertwining law. For state-to-block incidence \(C\), source transition \(P\), and
+candidate quotient transition \(\bar P\),
+
+\[
+PC=C\bar P
+\]
+
+must hold on the complete declared successor family. Its defect, within-block histories, and
+shortest separating continuation remain in the ReconstructionFiber. Pairwise distance, one-step
+output agreement, or a small RMS distortion does not establish this law.
 
 Receiver-minimality is the completion condition:
 

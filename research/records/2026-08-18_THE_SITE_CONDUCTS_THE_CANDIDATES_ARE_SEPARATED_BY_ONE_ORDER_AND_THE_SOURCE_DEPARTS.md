@@ -15,6 +15,25 @@ sharing `crates/holonic-engine/examples/phoenix/site.rs`.
 
 ---
 
+## Audit correction — 2026-08-18
+
+The measurements below remain bounded evidence. Their Phoenix promotion is withdrawn by
+[the adversarial audit](2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md):
+
+- the site realization is one selected candidate diagram and its non-contraction semantics execute
+  on CPU;
+- one of two K/V families is absent;
+- open source candidates are executed through BASE rather than settled;
+- local enclosure widths are retained but not propagated;
+- “axes condensed” is an axis-block sensitivity census with no quotient runtime or decoder;
+- the sealed artifact is a fixed three-token source-tensor fixture, not native morphology;
+- seal/mount/seal equality was written from the original in-memory buffers and is vacuous as an
+  atlas-to-weights round trip; and
+- the post-deed descriptor census cannot see source accesses opened and closed during the deed.
+
+Accordingly, the active-path, dissection, condensation, and native-rest master stations remain
+**open**. What stands is the narrower instrument and experiment population reported below.
+
 ## 0. What the four stations establish together
 
 A foreign map's first site was **bound as a diagram**, **conducted by that diagram's own chronology**,

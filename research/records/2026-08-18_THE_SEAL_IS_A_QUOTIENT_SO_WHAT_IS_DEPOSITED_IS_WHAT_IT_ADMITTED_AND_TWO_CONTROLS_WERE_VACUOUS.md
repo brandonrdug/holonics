@@ -13,6 +13,24 @@ the repair.
 
 ---
 
+## Audit correction — 2026-08-18
+
+The BF16 quotient, remount, admitted-delta, and withdrawal measurements below remain
+**established-bounded**. The cultivation grade is withdrawn by
+[the adversarial audit](2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md):
+
+- the metric adjoint is verified and then ignored; the committed delta is computed independently by
+  coordinatewise division;
+- the two declared metrics are driver-authored periodic diagonals and do not found the update;
+- development, target, and “held-out” rows are all compiled into CAUSED and sealed into every arm;
+- the material is not the blueprint’s lineage-separated holonics development/held-out split;
+- the subject-disjoint control is absent; and
+- movement is not graded against improvement toward a declared behavioral or mathematical
+  consequence.
+
+The exact return is a BF16 mutation/remount/withdrawal mechanism over one 64-coordinate gain
+population. The Phoenix cultivation station remains **open**.
+
 ## 0. The one-sentence finding
 
 **A stored floating species is a quotient, so the delta a cultivation deposits is never the delta

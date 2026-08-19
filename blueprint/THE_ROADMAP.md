@@ -108,7 +108,9 @@ implementation is absent. One real transport applies at full extent with the car
 posing it densely as exact rationals is **refused** by a declared work receiver naming
 `resident-entries` as the dominating coordinate.
 
-**Stations three, five, eight, nine and eleven returned 2026-08-18** and are recorded in
+**Bounded experiments corresponding to stations three, five, eight, nine and eleven returned
+2026-08-18; the master stations remain open after adversarial audit.** The pre-audit measurements
+are recorded in
 [`research/records/2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md`](../research/records/2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md)
 and
 [`research/records/2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md`](../research/records/2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md).
@@ -117,16 +119,18 @@ The bound diagram **conducts** — `120` operations over `21` co-present fronts,
 crossings, and `6,221` entries retained whole below the frame, which is what *derived*
 `CARRIER_REACH = 46` from three named refusals rather than declaring it. Of the four open candidate
 populations, a declared family of `32` hand and order faces **separates two and leaves one moot**,
-and its **minimal separating subfamily is `1` of `32`** — the order at coordinate `1024`. Axis
-condensation returns `40` load-bearing against `24` the family cannot separate, `1600` retained plus
-`960` fibre, **with no factor quoted**. The native rest seals `15,910,937` octets carrying the
+and its **minimal separating subfamily is `1` of `32`** — the order at coordinate `1024`. An
+axis-block sensitivity census returns `40` load-bearing blocks against `24` the family cannot
+separate, `1600` retained plus
+`960` fibre, **with no factor quoted**. The fixed-site source-tensor fixture seals `15,910,937` octets carrying the
 diagram, its program, its band elements and the `7` populations the program names; `seal → mount →
 seal` is byte-identical; a **fresh process holding no source handle** returns what the source-fed
 body returned, coordinate by exact coordinate, with a live `/proc/self/fd` audit of `39` descriptors
-taken **after** the deed and none resolving to the source. Cultivation deposits an exact delta
-derived through a declared non-Euclidean **metric adjoint** — defect exactly `0` where a bare
-transpose's is not — with **no step size anywhere**, and grades it against a matched sibling carrying
-the same delta population with only its coordinate incidence withdrawn.
+taken **after** the deed and none resolving to the source. The cultivation experiment verifies a
+declared non-Euclidean **metric adjoint** — defect exactly `0` where a bare transpose's is not —
+but computes the committed delta separately by coordinatewise division. The adjoint is testimony,
+not the return law which derived the delta. The bounded return is a BF16
+mutation/remount/withdrawal mechanism, not the cultivation station.
 
 **Two of that station's controls were vacuous on the first pass and the repair convicted the seal.**
 The subject-disjoint control was true by construction of the commit and now says so; the ablation
@@ -146,6 +150,29 @@ front is certified by an `InterchangeCertificate`** —
 runtime, inference loop or export exists** — `ls crates/holonic-engine/examples/ soma/life/examples/
 | grep -icE "export|gguf|onnx"` returns `0`, and no driver emits from a sealed native rest. **The
 reborn body has not been re-dissected.**
+
+**Adversarially regraded 2026-08-18 after commits 5f12734, e43db49 and 584b5d5.**
+[The audit](../research/records/2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md)
+finds that no master station has passed. The reusable exact-linear and generic ported-word
+instruments stand, as do a GPU projection leaf, BF16 seal remainder, mount reuse, and a tied-head
+potential face. The promoted path does not:
+
+- the host traverses and enacts normalization, chronology, GELU, contact/softmax, residual,
+  projection, and grain semantics; only contraction leaves reach CUDA;
+- local algebraic and transcendental widths are stored but not propagated through successors;
+- negative value transport breaks the current interval-division enclosure;
+- one of two K/V families and the authoritative PLE branch are absent;
+- open candidate questions are executed through one selected BASE realization;
+- no Phoenix path carries an InterchangeCertificate or complete pre-deed work admission;
+- the sealed object is a fixed three-token source-tensor fixture, not native morphology;
+- the checked metric adjoint does not derive the committed cultivation delta; and
+- the one-layer potential section is not Gemma inference or a native executable model.
+
+The user’s apparatus observation during the emission audit was no GPU activity, multicore CPU
+activity, and varying RAM; the run was terminated because it had already failed the mandatory
+resident-hot-deed gate. The corrected next gate is one complete source-authenticated layer with both
+K/V families, PLE, epsilon-aware normalization, propagated remainder, GPU-resident semantics,
+interchange, complete work admission, and runtime-supplied material.
 
 **No executable capability is promoted by these returns.** `CONSTRUCTION_STATE.md` remains unchanged
 until the Gemma plan returns an actual source-detached executable native model — one that emits —
@@ -1057,16 +1084,20 @@ network, distance is relative between them, and an emergently constrained traver
 signs those magnitudes by the arrow of time.
 
 **The reading law.** Only a `Ratio` or an integer `Winding` crosses a horizon
-(`THE_HOLONIC_DERIVATIONS.md` §0, verified by `git show`), and this architecture enforces it
-physically: RMSNorm at every layer entry discards magnitude, so **RMSNorm is the horizon**. Measured
-independently: every probe token's PLE slice sits at norm ≈1.0, deviation 0.022–0.058. Admitted
+(`THE_HOLONIC_DERIVATIONS.md` §0, verified by `git show`). Epsilon-zero RMSNorm supplies that
+projective reading by discarding positive radial magnitude. Gemma declares nonzero epsilon, so its
+exact RMSNorm is instead an injective bounded radial chart before zero gains or quantization;
+radius is recoverable from distance to the chart boundary. **RMSNorm is the horizon only for a
+declared directional receiver, not as an identity of the source operation.** Measured independently:
+every probe token's PLE slice sits at norm ≈1.0, deviation 0.022–0.058. Admitted
 observables are projectivised spectra, principal angles, symmetric/antisymmetric ratios, the
 cross-ratio, and integer windings, ranks and torsion. **Refused: norms, condition numbers, raw
 eigenvalue magnitudes, cosine similarity, any scalar dashboard.**
 
-**The gauge, reduced by the architecture itself.** There is no `lm_head`; the tie forces `MᵀM = I`,
-collapsing `GL(2560)` to `O(2560)` — a metric, hence a reduction of the structure group in
-`canon/TABLET_THE_MANIFOLD.md` §16's exact sense. RoPE supplies canonical coordinates in each head's
+**The tied boundary does not donate an orthogonal gauge.** There is no `lm_head`; tying supplies
+`W_out = Eᵀ`, not `EᵀE = I`, and therefore does not collapse `GL(2560)` to `O(2560)`. Any metric or
+structure-group reduction must be founded by an enacted receiver/action law. RoPE supplies relative
+coordinates in each head's
 rotary subspace. The instrument is `Phi_S(W) = E_S W E_Sᵀ`, invariant because `E → EMᵀ` and
 `W → MWMᵀ` cancel, expressed in the vocabulary basis the model supplies.
 
