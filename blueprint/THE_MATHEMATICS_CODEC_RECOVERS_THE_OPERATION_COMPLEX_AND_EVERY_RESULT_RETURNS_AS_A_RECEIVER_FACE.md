@@ -1,5 +1,11 @@
 # The mathematics codec recovers the operation complex, and every result returns as a receiver face
 
+> **SUPERSEDED AS A CONSTRUCTION SCHEDULER — 2026-08-19.** Its mathematical-section schema,
+> AlphaEvolve/GDL/manifold/normalization comparisons, document-mouth boundary, artifact family and
+> first vertical grade are retained as component-contract provenance where
+> [THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
+> composes them. This file schedules no work. [THE_ROADMAP.md](THE_ROADMAP.md) is the sole scheduler.
+
 **Date:** 2026-08-18
 **Kind:** construction blueprint under [THE_ROADMAP.md](THE_ROADMAP.md), the sole scheduling
 authority.
@@ -355,6 +361,33 @@ A term is never identified by its printed name. Bound-variable renaming is a reb
 typesetting, color, scale, and harmless page reflow are presentation gauges. Changing an exponent,
 operator hand, contraction, index variance, unit, branch, or hypothesis changes the operation
 complex or returns a refusal.
+
+---
+
+## THE EXTERIOR EQUATION ATLAS IS MATERIAL, NOT AN ONTOLOGY
+
+The first curated formulation store now exists at
+[`research/equation-atlas/README.md`](../research/equation-atlas/README.md), derived and bounded by
+[`2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md`](../research/records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md).
+It carries equation formulation occurrences and a graded directed relation graph in JSON Lines.
+Every occurrence names hypotheses, carrier, units, receiver, collapsed fibre, source and boundary;
+every graph edge names its grade and non-equivalence.
+
+This is exterior research testimony. It is not a parser, AST, equation ontology, solver, CAS,
+proof checker, runtime topology, recovered mathematical section, training event, or native
+morphology. Its identifiers name catalog occurrences rather than intrinsic mathematical identity.
+Equal display strings remain distinct until a standing comparison owner returns their relation.
+
+When the first vertical deed is scheduled, the atlas may be one admitted source beside PDF, vector,
+raster and proof-assistant faces. The live body must still recover source incidence, plural typed
+operation complexes, transports, receiver consequences, residuals, shortest separators and
+ReconstructionFibers. A JSON edge may pose a candidate correspondence; it may never instruct the
+engine or testify for its own semantic truth.
+
+The reusable Typst library under `papers/source/mathematics/` remains the owner of declared
+definitions, lemmas, theorems, corollaries and proofs. The equation atlas does not duplicate or
+supersede that library. A later raw-document intake must additionally retain exact source bytes,
+page/layout incidence and codec faces rather than treating this curation as the original document.
 
 ---
 

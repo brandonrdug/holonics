@@ -34,6 +34,19 @@ Every object record contains:
 The library separates dependency from publication sequence. Exact, conditional, classical,
 computational, and open objects remain typed apart.
 
+## Exterior equation material
+
+The curated machine-readable equation and relation store lives at
+[`research/equation-atlas/README.md`](../../../research/equation-atlas/README.md), outside this reusable object
+registry. That store contains exterior formulation occurrences, contexts, receiver scopes and
+graded research correspondences. It is material for a later codec intake, not a second theorem
+library and not the semantic owner of its formulas.
+
+Raw document bytes, page layouts, raster/vector renderings and repeated source occurrences must
+remain distinct at intake. They must not be silently normalized into this Typst catalogue or
+collapsed because their rendered equations agree. Only a returned formulation-span or other
+standing comparison owner may establish the relevant equality, rebase, quotient or obstruction.
+
 ## Elementary relational geometry
 
 The foundational definitions are:

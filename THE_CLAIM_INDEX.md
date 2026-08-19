@@ -122,6 +122,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — This one covers the atlas itself. |
 | `blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md` | **The Phoenix rebirth lifts inherited hexis and returns a native executable ecology** — **Truth status:** construction contract. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
+| `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md` | **The single-card passage carries Phoenix and the mathematics codec** — **Status:** active construction contract when named by the roadmap; **open** until Deed H0 returns. |
 | `blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md` | **The statement is a crossing word and the separator is oriented** — **Evidence:** `measured` — every figure was taken on this machine today, and the two that are outside-instrument analyses say so by name. |
 | `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — This one covers the carriers, and sits more immediately **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
 | `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
@@ -129,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (154 deposits of 446)
+## 4 · The 2026-08 record line (155 deposits of 447)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -291,6 +292,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-19_THE_SOURCE_IS_ADMITTED_WHOLE_AND_THE_POTENTIAL_ATLAS_COVERS_THE_TOWER.md` | The source is admitted whole, and the potential atlas covers the tower |
 | `2026-08-19_THE_SOURCE_IS_DISSECTED_BY_INTERVENTION_AND_THE_REUSE_IS_SEPARATED_FROM_THE_WEIGHTS.md` | The source is dissected by intervention, and the reuse is separated from the weights |
 | `2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md` | The tower conducts layer by layer, and the certified enclosure diverges at 2^35 per layer |
+| `2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md` | The warp scheduler does not schedule the holon, the reduction is a typed junction, and the card owes its pressure field |
 
 ---
 
@@ -307,7 +309,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 16 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 17 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `canon/THE_DRIVER_ATLAS.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, and 1 more |

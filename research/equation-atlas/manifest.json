@@ -1,0 +1,28 @@
+{
+  "schema": "holonics.exterior-equation-atlas.manifest.v1",
+  "observation_id": "holonics-prominent-equation-atlas-2026-08-19",
+  "truth_status": "definition",
+  "kind": "CURATED_EXTERIOR_RESEARCH_MATERIAL",
+  "governing_record": "research/records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md",
+  "question": "Which prominent equation formulations, hypotheses, receiver scopes, collapsed fibres, and graded research relations should be available as exterior material for later mathematics-codec recovery?",
+  "artifacts": [
+    {
+      "path": "schema.json",
+      "bytes": 2744,
+      "sha256": "6e7ef06eb2a4e053b06ebf9c93ef680a341e248cd0aab73a1b87e263e2f98dd0"
+    },
+    {
+      "path": "equations.jsonl",
+      "bytes": 36449,
+      "sha256": "df369bd90cc5c1e16f53ef7431d23abc24c3713202331d028cb4fc40109fa548",
+      "records": 45
+    },
+    {
+      "path": "relations.jsonl",
+      "bytes": 16324,
+      "sha256": "55f153f8b6a83053a39401426256a4eed09bc6ff20aafb6309fe6d1e464fc7b8",
+      "records": 36
+    }
+  ],
+  "boundary": "This manifest certifies stored bytes and counts only. It does not certify mathematical truth, recovered topology, training, or native conduct."
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "holonics.exterior-equation-atlas.v1",
+  "title": "Holonics exterior equation atlas",
+  "description": "Storage schema for curated equation formulation occurrences and their graded research relations.",
+  "$defs": {
+    "truth_status": {
+      "type": "string",
+      "enum": [
+        "definition",
+        "proved-standard",
+        "proved-derived",
+        "established-bounded",
+        "interpretation",
+        "conditional",
+        "open",
+        "counterexample",
+        "historical"
+      ]
+    },
+    "string_list": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "equation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_type",
+        "id",
+        "title",
+        "truth_status",
+        "latex",
+        "ascii",
+        "objects",
+        "hypotheses",
+        "carrier",
+        "units",
+        "receiver",
+        "collapsed_fibre",
+        "source",
+        "boundary",
+        "tags"
+      ],
+      "properties": {
+        "record_type": { "const": "equation" },
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "truth_status": { "$ref": "#/$defs/truth_status" },
+        "latex": { "type": "string" },
+        "ascii": { "type": "string" },
+        "objects": { "$ref": "#/$defs/string_list" },
+        "hypotheses": { "$ref": "#/$defs/string_list" },
+        "carrier": { "type": "string" },
+        "units": { "type": "string" },
+        "receiver": { "type": "string" },
+        "collapsed_fibre": { "type": "string" },
+        "source": { "type": "string" },
+        "boundary": { "type": "string" },
+        "tags": { "$ref": "#/$defs/string_list" }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_type",
+        "id",
+        "from",
+        "to",
+        "relation",
+        "truth_status",
+        "hypotheses",
+        "receiver",
+        "source",
+        "boundary"
+      ],
+      "properties": {
+        "record_type": { "const": "relation" },
+        "id": { "type": "string", "minLength": 1 },
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "relation": { "type": "string", "minLength": 1 },
+        "truth_status": { "$ref": "#/$defs/truth_status" },
+        "hypotheses": { "$ref": "#/$defs/string_list" },
+        "receiver": { "type": "string" },
+        "source": { "type": "string" },
+        "boundary": { "type": "string" }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/equation" },
+    { "$ref": "#/$defs/relation" }
+  ]
+}

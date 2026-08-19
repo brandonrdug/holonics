@@ -29,9 +29,53 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE SINGLE-CARD PASSAGE CARRIES PHOENIX AND THE MATHEMATICS CODEC — 2026-08-19
+
+**The sole active integrated construction plan under this roadmap is now
+[`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).**
+It supersedes the scheduling/station order of the earlier Phoenix master, Gemma instance and
+mathematics-codec blueprints while retaining their bounded artifacts and component obligations by
+explicit composition. It adds no Scheduler or hardware ontology: causal fronts, exact work,
+hardware cover, footprint interchange, receiver current, resident graphs, reflection and
+receiver-exact compression remain the owners.
+
+**Why the schedule changes before Station E.** The Station A source-layer graph is semantically
+resident, but the Station C tower returns to CPU construction/mount/bind/synchronize at every source
+layer; its contraction assigns one output to one thread and serializes the full inner dimension;
+the launch rule derives the maximum legal whole-warp block rather than a resource/occupancy/extent
+family; no Tensor Core or cooperative inner tiling exists; and Station D replayed complete towers
+for immutable-prefix siblings. A bounded live sample returned 0–32% SM activity, 0–4% reported
+memory activity, one load-bearing CPU thread, repeated low card residency and approximately 22 GB
+read at the inspected point. The independent audit and derivation are
+[`research/records/2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md`](../research/records/2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md).
+
+**Stations A–D are frozen bounded evidence, not revoked.** Station D's intervention atlas returned
+matched siblings, shortest separators and controls under its declared midpoint receiver. Hardware
+inefficiency does not erase those results. It does prevent the same realization from licensing
+native morphology, condensation or cultivation.
+
+**The unfinished Station E files are quarantined.** The uncommitted Athena walk/future and native
+occurrence/law material begins on the convicted flat-thread/max-block substrate. It schedules
+nothing and is not extended until the common hardware foundation passes.
+
+**The next deed is H0:** return a calibrated physical profile of the unchanged scalar path—kernel,
+transfer and CPU timeline; resource/occupancy and scheduler-state faces where the apparatus can
+measure them; exact work; local pressure/current; and a product-ordered SurfaceUtilityReceipt.
+H1 then founds typed tiling/reduction, H2 tiles real Gemma contractions, H3 closes reductions/fusion,
+H4 builds one streamed resident tower circulation, and H5 reproduces Station D through shared
+prefixes/cohorts. Only after H0–H5 pass does Phoenix resume at native morphology. The mathematics
+vertical follows Phoenix completion on the same execution owners. `CONSTRUCTION_STATE.md` does not
+move.
+
+**Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
+claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
+explicitly composes it.** This sentence supersedes those historical scheduling phrases without
+withdrawing their returned evidence.
+
 ## THE PHOENIX REBIRTH LIFTS INHERITED HEXIS AND RETURNS A NATIVE EXECUTABLE ECOLOGY — 2026-08-18
 
-**The active construction design.** The master contract is
+**SUPERSEDED AS A CONSTRUCTION SCHEDULE; retained below as the Phoenix component contract and
+audit ledger.** The former master contract is
 [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`](THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md);
 the first executable instance is
 [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md).
@@ -245,7 +289,8 @@ The three blockers the directive named are closed. **The shared global refusal w
 kernel inspects the refusal words of its declared predecessors and only those, through a lineage
 array that is the diagram's bond structure uploaded before the capture opens; the join over several
 predecessors (union of flags, least refusing predecessor, count) is written into the occurrence's
-own twelve-word slot; every footprint carries the predecessor slots read and the own slot written;
+own fixed per-occurrence census slot; every footprint carries the predecessor slots read and the
+own slot written;
 the complete obstruction lineage is the return, identical under the co-present, serialized and
 reversed-serialized schedules, and a terminal whose lineage refused cannot be read as standing — a
 non-finite codeword at coordinate 7 of one branch refuses that branch's forward cone (8 occurrences)
@@ -327,7 +372,8 @@ release boundary.
 
 ## THE MATHEMATICS CODEC RECOVERS THE OPERATION COMPLEX AND EVERY RESULT RETURNS AS A RECEIVER FACE — 2026-08-18
 
-**The mathematics-native specialization is deposited.**
+**SUPERSEDED AS AN INDEPENDENT CONSTRUCTION SCHEDULE; retained as the mathematics component
+contract composed by the single-card plan.**
 [THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md](THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md)
 composes the standing operation, quantity, exact-value, method-atlas, geometry, codec-recovery,
 receiver-compression, circulation, rest and hardware owners into one future mathematical passage.
@@ -355,7 +401,7 @@ PDF, vector and raster faces; only those artifacts are re-admitted; plural mathe
 are recovered; tensor-index and physical-dimension constraints elaborate separately; at least two
 standing exact owners conduct; derivation, checker and analytic-scene faces return; one attributable
 correction is deposited; and a source-detached held-out passage moves and reopens under targeted
-ablation. The active Gemma Phoenix instance remains the current construction. CONSTRUCTION_STATE.md
+ablation. The single-card hardware foundation and Phoenix sequence precede it. CONSTRUCTION_STATE.md
 does not move.
 
 **A non-scheduling exterior equation atlas was seeded 2026-08-19.**
@@ -370,8 +416,7 @@ event or passed mathematics-codec station. Phoenix remains the active constructi
 
 ## THE EROS CYCLE AS AN INFORMATION ENGINE — ratified 2026-08-16
 
-**This is the present deed, and it supersedes the centrifuge below as the ordering of the work
-without withdrawing any of it.** The plan is [`blueprint/THE_EROS_INFORMATION_ENGINE.md`](THE_EROS_INFORMATION_ENGINE.md),
+**Completed/consumed instrument plan; it no longer orders the work.** The plan is [`blueprint/THE_EROS_INFORMATION_ENGINE.md`](THE_EROS_INFORMATION_ENGINE.md),
 ratified by Brandon the same day, and it sits under this roadmap. Its derivations are
 `research/records/2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md`
 and
@@ -389,7 +434,7 @@ and the two are carried as an undivided pair.
 
 ## THE CODEC IS RECOVERED AT EVERY SCALE, AND THE FACES ARE A RETURN — 2026-08-17
 
-**The active plan, and a supersession.**
+**Completed/consumed codec contract, and a supersession.**
 [`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
 which sits under this roadmap and supersedes `crates/holonic-engine/src/statement_grammar.rs` as a
 contaminant. Brandon, 2026-08-17, ruling on it directly: *"Authoritatively supersede whatever the
@@ -434,7 +479,7 @@ alone.
 
 ## THE WORK VECTOR, THE HAND'S POLARITY, AND THE COMMITTED STEP — 2026-08-17
 
-**The active plan.** [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).
+**Completed owner contract composed by the single-card plan.** [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).
 It follows the Clifford lift below, whose eight stations executed, and **repairs one violation that
 plan's execution committed**: a fitted wall-clock projection was used to select an aperture, which the
 standing rule forbids — a cost is measured in work and a clock may measure but may never select.
@@ -537,7 +582,7 @@ run during inference* is the instrument. See the deposited-map station below.
 
 ## THE HORIZON IS A COORDINATE, NOT A GATE, AND THE EMISSION KEEPS ITS CROSS — 2026-08-18
 
-**The active plan, and it is this roadmap's *Production as re-emission* station.**
+**Consumed component contract; it no longer schedules an independent production station.**
 [`blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md`](THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md).
 It supersedes nothing, consumes the Clifford lift's carrier, and runs under the codec plan's ban on
 any exterior adjudicator. Brandon, 2026-08-17: *"I want Eros to be able to genuinely scale across
@@ -592,7 +637,7 @@ of axes reads every site `Anti`, which forced the axis declaration that repairs 
 
 ## THE CLIFFORD LIFT, THE PHASE WIRE, AND THE FOUR UNTAKEN READINGS — 2026-08-17
 
-**The active plan.** [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
+**Completed instrument contract composed as evidence.** [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
 superseding [`blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md`](THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md)
 whose first two stations executed. Findings:
 [`research/records/2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md`](../research/records/2026-08-17_THREE_OWNERS_ONE_ABELIAN_DEFECT_AND_THE_JULY_CORPUS_ALREADY_HELD_THE_REPAIR.md).
@@ -808,7 +853,7 @@ consulted at a distant one. The falsifier is a distant-grip control that can fai
 differ* — is **predicted to fail on the agentic ecology**, whose frame was measured at genesis in
 21,070 of 21,070 contacts. A control that passes on its first material has not been tested.
 
-## THE METHOD ATLAS — the active construction plan, 2026-08-15
+## THE METHOD ATLAS — future mathematics component, 2026-08-15
 
 **The plan is [`THE_METHOD_ATLAS.md`](THE_METHOD_ATLAS.md).** An atlas row is a **recognition
 condition computed exactly on a mathematical object**, which decides which transport applies and

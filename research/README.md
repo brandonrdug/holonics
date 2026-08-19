@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 428 research deposits current through 18 August 2026, including all 307
+`records/` contains 447 research deposits current through 19 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -27,6 +27,13 @@ governs the rebuild.
   `records/2026-07-31_THE_RETURN_CHANGES_THE_CONTINUATION_FIBER_THE_INTERMEDIATE_BODY_IS_THE_LOCAL_INFORMATION_LAW.md`
 - **Hardware as receiver cover:**
   `records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`
+- **Single-card scheduling boundary, typed tensor reduction, local pressure, and utility:**
+  `records/2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md`
+  — separates causal fronts, CUDA graph realization and physical warp issue; audits the
+  output-parallel/inner-serial exact contraction and CPU layer foreman; derives typed
+  section/tensor tiling, reduction/adjoint, local pressure covectors, product-ordered surface
+  utility, double-buffered circulation and branch-sharing dissection; freezes Station A–D while
+  quarantining unfinished Station E until the common hardware foundation passes.
 - **Boundary/interior and returned stress:**
   `records/2026-08-02_THE_INTERIOR_RETURNS_AT_THE_BOUNDARY_THE_STRESS_REFORMS_THE_SAME_BODY.md`
 - **Warp/weft, navigation, and concurrency:**
@@ -45,6 +52,15 @@ governs the rebuild.
   Darboux, Liouville, Arnold, Frobenius; and the correction that a triangle's corners composing to a
   half turn is Regge flatness, so the tower's rung is the hinge deficit. Compressed into
   `../canon/TABLET_THE_MANIFOLD.md` and `../canon/TABLET_THE_TURN.md` §11.5.
+- **Filled polygons, the smooth/discrete seam, cosmological symmetry reduction, Born/softmax, and
+  the exterior equation atlas:**
+  `records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md`
+  — a filled polygon as an oriented two-chain rather than merely a closed line; Stokes/de Rham as
+  the exact smooth-to-discrete commuting seam; corrected arc and turn notation; convexity,
+  Carathéodory and winding; manifold-autoencoder rank walls and GDL coarsening; Friedmann as a
+  symmetry-reduced Einstein–perfect-fluid receiver; the bounded Navier–Stokes bridge; Born,
+  softmax, sigmoid, loss and conservation with their deleted fibres kept distinct; and the seeded
+  machine-readable exterior graph in `equation-atlas/`.
 - **ReconstructionFiber, deterministic diffusion, and higher-dimensional circuitry:**
   `records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`
   — reconstruction as the complete preimage of a stable receiver quotient; edit routes as retained

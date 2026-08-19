@@ -1,5 +1,11 @@
 # The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model
 
+> **SUPERSEDED AS A CONSTRUCTION SCHEDULER — 2026-08-19.** Its Gemma source facts, Station A-D
+> bounded returns, intervention family, receiver obligations and final-instance falsifiers are
+> retained as component-contract provenance where
+> [THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
+> composes them. This file schedules no work. [THE_ROADMAP.md](THE_ROADMAP.md) is the sole scheduler.
+
 **Date:** 2026-08-18
 **Kind:** first executable construction under
 [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`](THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md)

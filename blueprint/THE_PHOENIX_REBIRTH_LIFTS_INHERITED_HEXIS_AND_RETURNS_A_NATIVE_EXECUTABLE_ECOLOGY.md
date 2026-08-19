@@ -1,5 +1,11 @@
 # The Phoenix rebirth lifts inherited hexis and returns a native executable ecology
 
+> **SUPERSEDED AS A CONSTRUCTION SCHEDULER — 2026-08-19.** Its artifact definitions, vocabulary
+> firewall, architecture-neutral Phoenix obligations and final indivisible grade are retained as
+> component-contract provenance where
+> [THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
+> composes them. This file schedules no work. [THE_ROADMAP.md](THE_ROADMAP.md) is the sole scheduler.
+
 **Date:** 2026-08-18
 **Kind:** master construction blueprint under [`blueprint/THE_ROADMAP.md`](THE_ROADMAP.md).
 **Truth status:** construction contract. Every standing capability and measurement used below is
