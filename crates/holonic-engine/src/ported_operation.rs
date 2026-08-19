@@ -852,7 +852,11 @@ pub enum PortedOperationKind {
         /// occurrence cost two hundred and fifty milliseconds an occurrence, twenty per position,
         /// for a value that does not change. `R(p a) = R(a)^p` — the element is the site's and the
         /// integer is the position's.
-        rotations: Vec<(ExactInterval, ExactInterval)>,
+        /// **Named, not carried.** The band elements are standing material of the site, so the
+        /// program NAMES them and the carrier supplies them. Carrying them inline made every
+        /// chronology occurrence repeat five hundred and twelve exact rationals, which is material
+        /// living in program text — and a native rest would have sealed it once per occurrence.
+        rotations: String,
         position: u64,
         /// **A declared candidate.** A rotation needs two coordinates and a chart of width `d`
         /// offers two pairings: the two halves, or adjacent entries. They are different group
@@ -948,6 +952,12 @@ pub trait PortedCarrier {
     fn stored_row(&mut self, population: &str, row: usize) -> Result<Vec<Rat>, String>;
     /// The declared quotient onto the stored grain: the carried value and its **exact** residual.
     fn grain(&mut self, standing: &[Rat]) -> Result<(Vec<Rat>, Vec<Rat>), String>;
+    /// A declared population of band group elements. **Material, not program text**: a chronology
+    /// names its ladder and the apparatus supplies it, so a native rest seals it once.
+    fn rotations(
+        &mut self,
+        population: &str,
+    ) -> Result<Vec<(ExactInterval, ExactInterval)>, String>;
 }
 
 /// An executable assignment from every occurrence in one ported complex to one exact operation.
@@ -1299,10 +1309,13 @@ fn enact(
         } => {
             let section = &admitted[0];
             let bands = section.len() / 2;
-            if bands == 0 || rotations.len() < bands {
+            let elements = carrier
+                .rotations(rotations)
+                .map_err(|reason| PortedError::Apparatus { reason })?;
+            if bands == 0 || elements.len() < bands {
                 return Err(PortedError::WidthDisagrees {
                     left: section.len(),
-                    right: 2 * rotations.len(),
+                    right: 2 * elements.len(),
                 });
             }
             work.stepped();
@@ -1311,7 +1324,7 @@ fn enact(
             let mut widths = vec![Rat::zero(); section.len()];
             for band in 0..bands {
                 // The band's group element is the site's; a position is its integer power.
-                let (cosine, sine) = compose_rotation(&rotations[band], *position)
+                let (cosine, sine) = compose_rotation(&elements[band], *position)
                     .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
                 let (first, second) = if *pairs_halves {
                     (band, band + bands)
@@ -1936,6 +1949,12 @@ mod tests {
         }
         fn stored_row(&mut self, population: &str, _row: usize) -> Result<Vec<Rat>, String> {
             self.stored(population)
+        }
+        fn rotations(
+            &mut self,
+            _population: &str,
+        ) -> Result<Vec<(ExactInterval, ExactInterval)>, String> {
+            Ok(Vec::new())
         }
         fn grain(&mut self, standing: &[Rat]) -> Result<(Vec<Rat>, Vec<Rat>), String> {
             let mut carried = Vec::with_capacity(standing.len());

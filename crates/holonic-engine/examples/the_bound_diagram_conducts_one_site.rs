@@ -90,6 +90,10 @@ struct ResidentSourceCarrier<'chart> {
     stored_octets: u64,
     grain_crossings: usize,
     below_the_frame: usize,
+    rotations: std::collections::BTreeMap<
+        String,
+        Vec<(holonic_engine::exact_value::ExactInterval, holonic_engine::exact_value::ExactInterval)>,
+    >,
 }
 
 /// The octaves the exact aligned carrier admits between a section's top entry and its smallest.
@@ -191,6 +195,16 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
     /// So the aperture is declared here and what falls below it is **retained whole** rather than
     /// carried as something it is not. That is the horizon law: what cannot cross the frame is
     /// kept, not approximated across it.
+    fn rotations(
+        &mut self,
+        population: &str,
+    ) -> Result<Vec<(holonic_engine::exact_value::ExactInterval, holonic_engine::exact_value::ExactInterval)>, String> {
+        self.rotations
+            .get(population)
+            .cloned()
+            .ok_or_else(|| format!("no band population named {population}"))
+    }
+
     fn grain(&mut self, standing: &[Rat]) -> Result<(Vec<Rat>, Vec<Rat>), String> {
         let mut rounded = Vec::with_capacity(standing.len());
         let mut residual = Vec::with_capacity(standing.len());
@@ -531,7 +545,7 @@ fn main() {
             program.bind(
                 turn_event,
                 PortedOperationKind::Chronology {
-                    rotations: rotations.clone(),
+                    rotations: "site.chronology.band-elements".to_owned(),
                     position: position as u64,
                     pairs_halves: candidate.pairs_halves,
                 },
@@ -605,7 +619,7 @@ fn main() {
             program.bind(
                 turned,
                 PortedOperationKind::Chronology {
-                    rotations: rotations.clone(),
+                    rotations: "site.chronology.band-elements".to_owned(),
                     position: position as u64,
                     pairs_halves: candidate.pairs_halves,
                 },
@@ -888,6 +902,10 @@ fn main() {
         stored_octets: 0,
         grain_crossings: 0,
         below_the_frame: 0,
+        rotations: std::collections::BTreeMap::from([(
+            "site.chronology.band-elements".to_owned(),
+            rotations,
+        )]),
     };
     println!();
     println!("  THE HANDOVER — one call to `realize`; no order is stated in this driver");

@@ -33,6 +33,9 @@ use relational_geometry::Rat;
 
 const SITE: usize = 0;
 const SYMBOLS: &str = "model.language_model.embed_tokens.weight";
+/// The name the chronology's band elements are sealed and looked up under.
+pub const BAND_POPULATION: &str = "site.chronology.band-elements";
+
 pub const CAUSED: [usize; 3] = [818, 18_740, 563];
 
 fn named(suffix: &str) -> String {
@@ -85,6 +88,8 @@ pub struct ResidentSourceCarrier<'chart> {
     container: ForeignContainer,
     file: File,
     below_the_frame: usize,
+    /// The band group elements, founded once and supplied by name. **Material, not program text.**
+    rotations: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
 }
 
 /// Read off the carrier and the diagram: a signed word holds sixty-three magnitude octaves, a
@@ -144,6 +149,16 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
             .collect())
     }
 
+    fn rotations(
+        &mut self,
+        population: &str,
+    ) -> Result<Vec<(ExactInterval, ExactInterval)>, String> {
+        self.rotations
+            .get(population)
+            .cloned()
+            .ok_or_else(|| format!("no band population named {population}"))
+    }
+
     fn grain(&mut self, standing: &[Rat]) -> Result<(Vec<Rat>, Vec<Rat>), String> {
         let mut rounded = Vec::with_capacity(standing.len());
         let mut residual = Vec::with_capacity(standing.len());
@@ -196,13 +211,27 @@ fn two_to(exponent: i64) -> Rat {
 /// what makes an attribution possible at all.
 pub type DeclaredAblation = Option<(usize, usize)>;
 
-pub fn conduct(
+/// **The founding: the diagram, its program, and the material they name.**
+///
+/// Separated from the conduct so a native rest can seal exactly this and nothing else. What a
+/// program NAMES is what a rest must carry; anything else in the source is outside the seal and is
+/// reported as outside it.
+pub struct FoundedSite {
+    pub complex: PortedOperationComplex,
+    pub program: PortedProgram,
+    pub band_elements: Vec<(ExactInterval, ExactInterval)>,
+    /// Every stored population the program names, and nothing else.
+    pub populations: Vec<String>,
+    /// The occurrences whose output is the site's return, in position order.
+    pub returns: Vec<EventId>,
+}
+
+pub fn found(
     root: &str,
-    chart: &ResidentReadout,
     candidate: Candidate,
     terms: usize,
     ablation: DeclaredAblation,
-) -> Result<Vec<Vec<Rat>>, String> {
+) -> Result<(FoundedSite, ForeignContainer, File), String> {
     let (file, container) = manifest_safetensors(&format!("{root}/model.safetensors"))
         .map_err(|error| error.to_string())?;
     let chart_width = container
@@ -326,7 +355,7 @@ pub fn conduct(
         program.bind(
             presented_turned,
             PortedOperationKind::Chronology {
-                rotations: rotations.clone(),
+                rotations: BAND_POPULATION.to_owned(),
                 position: position as u64,
                 pairs_halves: candidate.pairs_halves,
             },
@@ -365,7 +394,7 @@ pub fn conduct(
             program.bind(
                 turned,
                 PortedOperationKind::Chronology {
-                    rotations: rotations.clone(),
+                    rotations: BAND_POPULATION.to_owned(),
                     position: position as u64,
                     pairs_halves: candidate.pairs_halves,
                 },
@@ -403,15 +432,53 @@ pub fn conduct(
     }
 
     program.validate(&complex).map_err(|e| e.to_string())?;
+    let mut populations: Vec<String> = Vec::new();
+    for operation in program.operations.values() {
+        let named = match operation {
+            PortedOperationKind::Lookup { population, .. }
+            | PortedOperationKind::Contract { population }
+            | PortedOperationKind::RebaseByGain { population, .. } => Some(population.clone()),
+            _ => None,
+        };
+        if let Some(name) = named
+            && !populations.contains(&name)
+        {
+            populations.push(name);
+        }
+    }
+    populations.sort();
+    Ok((
+        FoundedSite {
+            complex,
+            program,
+            band_elements: rotations,
+            populations,
+            returns: assembled,
+        },
+        container,
+        file,
+    ))
+}
+
+pub fn conduct(
+    root: &str,
+    chart: &ResidentReadout,
+    candidate: Candidate,
+    terms: usize,
+    ablation: DeclaredAblation,
+) -> Result<Vec<Vec<Rat>>, String> {
+    let (site, container, file) = found(root, candidate, terms, ablation)?;
     let mut carrier = ResidentSourceCarrier {
         chart,
         container,
         file,
         below_the_frame: 0,
+        rotations: BTreeMap::from([(BAND_POPULATION.to_owned(), site.band_elements.clone())]),
     };
-    let receipt = realize(&complex, &program, &mut carrier, &BTreeMap::new())
+    let receipt = realize(&site.complex, &site.program, &mut carrier, &BTreeMap::new())
         .map_err(|error| error.to_string())?;
-    Ok(assembled
+    Ok(site
+        .returns
         .iter()
         .map(|event| receipt.carried[&OccurrencePort::output(*event, 0)].clone())
         .collect())
