@@ -190,11 +190,45 @@ impl ExactInterval {
         }
     }
 
-    /// An integer power, by repeated multiplication of the set.
+    /// An integer power of the set, by **binary exponentiation**, held at a declared grain.
+    ///
+    /// Repeated multiplication costs the exponent; binary exponentiation costs its octaves.
+    /// Measured 2026-08-18, a gated passage over ten thousand two hundred and forty entries spent
+    /// `17.4` seconds of an `18.4`-second site inside this call, because a `tanh` at `|x| < 32`
+    /// composes up to sixty-three steps and each entry paid all of them.
+    ///
+    /// `octaves` holds every intermediate outward on a dyadic grid, so a long power cannot grow its
+    /// denominators; the enclosure only ever widens and what it could not carry is inside it.
+    pub fn power_held(&self, exponent: u32, octaves: u32) -> Result<Self, ExactValueError> {
+        let mut result = Self::point(Rat::one());
+        let mut square = self.clone();
+        let mut remaining = exponent;
+        while remaining > 0 {
+            if remaining & 1 == 1 {
+                result = result.times(&square)?.round_out(octaves)?;
+            }
+            remaining >>= 1;
+            if remaining > 0 {
+                square = square.times(&square)?.round_out(octaves)?;
+            }
+        }
+        Ok(result)
+    }
+
+    /// An integer power of the set, exactly, with no grain. A caller composing a long chain wants
+    /// [`Self::power_held`]; this is for a short one where the exactness is the point.
     pub fn power(&self, exponent: u32) -> Result<Self, ExactValueError> {
         let mut result = Self::point(Rat::one());
-        for _ in 0..exponent {
-            result = result.times(self)?;
+        let mut square = self.clone();
+        let mut remaining = exponent;
+        while remaining > 0 {
+            if remaining & 1 == 1 {
+                result = result.times(&square)?;
+            }
+            remaining >>= 1;
+            if remaining > 0 {
+                square = square.times(&square)?;
+            }
         }
         Ok(result)
     }
@@ -580,11 +614,8 @@ impl CertifiedSeries {
         // **Held at a grain at every step.** An unheld interval power grows its denominators with
         // the exponent, and `e^63` composed sixty-three times is the same cost defect as an unheld
         // ladder. The grain is read off the carrier and the enclosure only ever widens.
-        let mut carried = ExactInterval::point(Rat::one());
-        for _ in 0..steps {
-            carried = carried.times(&unit)?.round_out(EXPONENTIAL_OCTAVES)?;
-        }
-        let carried = carried
+        let carried = unit
+            .power_held(steps, EXPONENTIAL_OCTAVES)?
             .times(&Self::exponential_series(&fraction, terms)?.enclosure())?
             .round_out(EXPONENTIAL_OCTAVES)?;
         if negative {

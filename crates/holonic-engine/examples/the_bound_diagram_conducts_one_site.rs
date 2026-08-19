@@ -49,6 +49,31 @@ const SITE: usize = 0;
 const SYMBOLS: &str = "model.language_model.embed_tokens.weight";
 /// Two caused symbols, delivered by the source's own codec: `The` and `receiver`.
 const CAUSED: [usize; 2] = [818, 18_740];
+/// **One member of the open candidate populations station one returned.**
+///
+/// A sibling differs from the base in exactly one relation, which is what makes a separation
+/// attributable. Nothing here selects; the receiver separation below decides which questions are
+/// real and which are moot.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Candidate {
+    name: &'static str,
+    gain_carries_unit: bool,
+    pairs_halves: bool,
+    scale_contact: bool,
+}
+
+impl Candidate {
+    const BASE: Self = Self {
+        name: "base",
+        gain_carries_unit: false,
+        pairs_halves: true,
+        scale_contact: true,
+    };
+    fn contact_scale_width(&self, chart_width: usize) -> usize {
+        if self.scale_contact { chart_width } else { 1 }
+    }
+}
+
 fn named(suffix: &str) -> String {
     format!("model.language_model.layers.{SITE}.{suffix}")
 }
@@ -214,6 +239,7 @@ fn main() {
     let root = std::env::args()
         .nth(1)
         .unwrap_or_else(|| "/home/b/models/gemma-4-E4B-it".to_owned());
+    let candidate = Candidate::BASE;
     let terms: usize = std::env::var("TERMS")
         .ok()
         .and_then(|value| value.parse().ok())
@@ -383,6 +409,7 @@ fn main() {
             PortedOperationKind::RebaseByGain {
                 population: named("input_layernorm.weight"),
                 floor: Rat::new(BigInt::from(1), BigInt::from(1_000_000)),
+                gain_carries_unit: candidate.gain_carries_unit,
             },
         );
         join(&mut complex, tag("rebase admits"), grained, entering_grain, rebase_event, 0);
@@ -483,6 +510,7 @@ fn main() {
                 PortedOperationKind::RebaseByGain {
                     population: carrier,
                     floor: Rat::new(BigInt::from(1), BigInt::from(1_000_000)),
+                    gain_carries_unit: candidate.gain_carries_unit,
                 },
             );
             join(&mut complex, tag(&what), presented_head, *source, event, 0);
@@ -505,6 +533,7 @@ fn main() {
                 PortedOperationKind::Chronology {
                     rotations: rotations.clone(),
                     position: position as u64,
+                    pairs_halves: candidate.pairs_halves,
                 },
             );
             join(&mut complex, tag(&format!("{what} turns")), presented_head, event, turn_event, 0);
@@ -556,6 +585,7 @@ fn main() {
                 PortedOperationKind::RebaseByGain {
                     population: carrier,
                     floor: Rat::new(BigInt::from(1), BigInt::from(1_000_000)),
+                    gain_carries_unit: candidate.gain_carries_unit,
                 },
             );
             join(&mut complex, tag(&format!("{what} rebase")), receiver_head, projected, rebased, 0);
@@ -577,6 +607,7 @@ fn main() {
                 PortedOperationKind::Chronology {
                     rotations: rotations.clone(),
                     position: position as u64,
+                    pairs_halves: candidate.pairs_halves,
                 },
             );
             join(&mut complex, tag(&format!("{what} turns")), receiver_head, rebased, turned, 0);
@@ -605,7 +636,7 @@ fn main() {
                 contact,
                 PortedOperationKind::ContactAndCarry {
                     terms,
-                    scale_width: chart_width,
+                    scale_width: candidate.contact_scale_width(chart_width),
                 },
             );
             join(&mut complex, tag(&format!("{what} contact receiver")), receiver_head, turned, contact, 0);
@@ -695,6 +726,7 @@ fn main() {
             PortedOperationKind::RebaseByGain {
                 population: named("post_attention_layernorm.weight"),
                 floor: Rat::new(BigInt::from(1), BigInt::from(1_000_000)),
+                gain_carries_unit: candidate.gain_carries_unit,
             },
         );
         join(&mut complex, tag("return rebase admits"), standing, returning_event, return_rebase, 0);

@@ -821,7 +821,14 @@ pub enum PortedOperationKind {
     Contract { population: String },
     /// `gain * x / sqrt(mean(x^2) + floor)`, the root isolated by
     /// `exact_value::AlgebraicRoot::reciprocal_square_root`. Species: transport.
-    RebaseByGain { population: String, floor: Rat },
+    RebaseByGain {
+        population: String,
+        floor: Rat,
+        /// **A declared candidate, not a default.** Some rested maps store the gain and some store
+        /// an offset whose law reads `1 + g`. The material does not decide it; a receiver
+        /// separation does, and this field is what makes a matched sibling possible.
+        gain_carries_unit: bool,
+    },
     /// Re-entry of a retained standing. Species: construction.
     ReEntry,
     /// Pointwise product of two standings. Species: construction.
@@ -853,6 +860,10 @@ pub enum PortedOperationKind {
         /// integer is the position's.
         rotations: Vec<(ExactInterval, ExactInterval)>,
         position: u64,
+        /// **A declared candidate.** A rotation needs two coordinates and a chart of width `d`
+        /// offers two pairings: the two halves, or adjacent entries. They are different group
+        /// actions on one chart and the container does not say which.
+        pairs_halves: bool,
     },
     /// **The reconvergence of a front: parts assembled into one standing, in bond order.**
     ///
@@ -1183,7 +1194,11 @@ fn enact(
                 .contract(population, &admitted[0])
                 .map_err(apparatus)?
         }
-        PortedOperationKind::RebaseByGain { population, floor } => {
+        PortedOperationKind::RebaseByGain {
+            population,
+            floor,
+            gain_carries_unit,
+        } => {
             let gain = carrier.stored(population).map_err(apparatus)?;
             let section = &admitted[0];
             if section.len() != gain.len() {
@@ -1207,8 +1222,13 @@ fn enact(
             let two = Rat::from_integer(BigInt::from(2));
             let mut out = Vec::with_capacity(section.len());
             let mut widths = Vec::with_capacity(section.len());
+            let unit = if *gain_carries_unit {
+                Rat::one()
+            } else {
+                Rat::zero()
+            };
             for (value, gain) in section.iter().zip(&gain) {
-                let scaled = value * gain;
+                let scaled = value * (gain + &unit);
                 let low = &enclosure.lower * &scaled;
                 let high = &enclosure.upper * &scaled;
                 let (below, above) = if low <= high { (low, high) } else { (high, low) };
@@ -1277,6 +1297,7 @@ fn enact(
         PortedOperationKind::Chronology {
             rotations,
             position,
+            pairs_halves,
         } => {
             let section = &admitted[0];
             let bands = section.len() / 2;
@@ -1294,16 +1315,21 @@ fn enact(
                 // The band's group element is the site's; a position is its integer power.
                 let (cosine, sine) = compose_rotation(&rotations[band], *position)
                     .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
-                let x = section[band].clone();
-                let y = section[band + bands].clone();
+                let (first, second) = if *pairs_halves {
+                    (band, band + bands)
+                } else {
+                    (2 * band, 2 * band + 1)
+                };
+                let x = section[first].clone();
+                let y = section[second].clone();
                 let real = interval_scaled(&cosine, &x);
                 let cross = interval_scaled(&sine, &y);
                 let left = interval_scaled(&sine, &x);
                 let right = interval_scaled(&cosine, &y);
-                out[band] = ((&real.0 - &cross.1) + (&real.1 - &cross.0)) / &two;
-                out[band + bands] = ((&left.0 + &right.0) + (&left.1 + &right.1)) / &two;
-                widths[band] = ((&real.1 - &cross.0) - (&real.0 - &cross.1)) / &two;
-                widths[band + bands] = ((&left.1 + &right.1) - (&left.0 + &right.0)) / &two;
+                out[first] = ((&real.0 - &cross.1) + (&real.1 - &cross.0)) / &two;
+                out[second] = ((&left.0 + &right.0) + (&left.1 + &right.1)) / &two;
+                widths[first] = ((&real.1 - &cross.0) - (&real.0 - &cross.1)) / &two;
+                widths[second] = ((&left.1 + &right.1) - (&left.0 + &right.0)) / &two;
                 work.multiplied(4);
                 work.added(2);
             }

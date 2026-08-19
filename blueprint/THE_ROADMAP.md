@@ -119,6 +119,39 @@ contextual word on caused material.
 unchanged until the Gemma plan returns an actual source-detached executable native model and passes
 its complete grade.
 
+## THE MATHEMATICS CODEC RECOVERS THE OPERATION COMPLEX AND EVERY RESULT RETURNS AS A RECEIVER FACE — 2026-08-18
+
+**The mathematics-native specialization is deposited.**
+[THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md](THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md)
+composes the standing operation, quantity, exact-value, method-atlas, geometry, codec-recovery,
+receiver-compression, circulation, rest and hardware owners into one future mathematical passage.
+It is also a prospective receiver family for Phoenix cultivation: a lifted OCR, vision, coding or
+mathematical organ may propose candidate faces, while exact native owners retain authority for their
+declared consequences.
+
+**The AlphaEvolve comparison is folded in with a correction.** The reported system is LLM-directed
+evolutionary program search under executable evaluators; Gemini is not updated by reinforcement
+learning in the discovery loop. Its useful mechanism is proposal → execution → plural receiver
+return → retained lineage, especially the search for generators and constructor algorithms rather
+than final objects. Scalar fitness, evaluation cascades, MAP-Elites bins, island populations and
+program databases remain exterior search charts. They do not define mathematical truth, native
+topology, hexis or training.
+
+**The missing edge is exact and no cabinet is authorized.** The live body has no PDF/OCR
+mathematical-document section joining page/raster incidence to typed operation complexes, and no
+sealed passage joining plural formulation, exact method navigation, proof and visual faces,
+exterior return, cultivation, detached remount and ablation. The blueprint specifies that passage
+without founding a CAS, Solver, Parser, OCR, Trainer, Evaluator or evolutionary-search semantic
+subsystem, and without reviving the superseded statement parser.
+
+**Its first vertical deed is specified but not scheduled by this deposit.** Exact source produces
+PDF, vector and raster faces; only those artifacts are re-admitted; plural mathematical sections
+are recovered; tensor-index and physical-dimension constraints elaborate separately; at least two
+standing exact owners conduct; derivation, checker and analytic-scene faces return; one attributable
+correction is deposited; and a source-detached held-out passage moves and reopens under targeted
+ablation. The active Gemma Phoenix instance remains the current construction. CONSTRUCTION_STATE.md
+does not move.
+
 ## THE EROS CYCLE AS AN INFORMATION ENGINE — ratified 2026-08-16
 
 **This is the present deed, and it supersedes the centrifuge below as the ordering of the work
