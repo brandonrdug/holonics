@@ -89,9 +89,11 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these **ten**, in order, and nothing else by default. (It said "nine" over a table of ten from
+Read these **twelve**, in order, and nothing else by default. (It said "nine" over a table of ten from
 2026-08-13, when the timeline was inserted without recounting — the same defect as the paragraph
-below that convicts itself for saying "seven" gates. **Count the rows; do not carry the word.**)
+below that convicts itself for saying "seven" gates; it said "ten" over twelve from 2026-08-19 until
+the single-card plan and its audit were added the same day. **Count the rows; do not carry the
+word.**)
 
 | file | what it is |
 |---|---|
@@ -103,7 +105,9 @@ below that convicts itself for saying "seven" gates. **Count the rows; do not ca
 | `canon/THE_EXPLORATIVE_FAILURE.md` | the condition that identifies the recurring escalation — *a construction whose object already has an owner, answered with a new organ beside it rather than a repair inside it* — its trigger, and its enumerated instances. It is checkable **before** the work, which is what the five prior statements of the pattern were not. |
 | `canon/THE_MEASURED_CAPABILITIES.md` | **not a trophy list — a list of things the machine has already been made to do, successfully, as partials.** It is evidence that the theories work when applied. Its use is to stop you asserting a wall, or treating a future implementation as harder than it is: the machine has been observed doing all of these trivially, in one codec or another. Read it before proposing construction. |
 | `canon/THE_TIMELINE.md` | **every day of this repository** — who ran it, what Brandon asked for, what returned, what was deposited, and the ten corrections he has had to issue more than once. It also serves the purpose above: it is the record of what has already been worked through, so it is not worked through again. |
-| `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. |
+| `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. Its 2026-08-19 section names the sole active plan, the next deed, and says that every later "active plan / present deed" phrase in the file is a dated ledger statement that schedules nothing. |
+| **`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`** | **the sole active integrated construction plan, 2026-08-19.** Three material arms (foreign Gemma rest, native Eros/Athena, raw mathematics) through one execution calculus; the vocabulary firewall; the five receipts (`FrontReceipt`, `TilingReceipt`, `ReductionReceipt`, `PressureReceipt`, `SurfaceUtilityReceipt`, `SurfaceTransitionReceipt`); the ordered deeds **H0–H5** (single-card foundation) → **P0–P5** (Phoenix resumes at native morphology) → **M0–M3** (mathematics codec); the deprecation law; the complete falsifier matrix. **No later deed begins while an earlier grade is open.** |
+| `research/records/2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md` | the audit and derivation that forced the pivot: three schedulers were being called one thing (causal fronts, CUDA graph realization, physical warp issue); the tower is still a CPU foreman at every source layer; the exact contraction is output-parallel and inner-serial; the launch rule proves legality not utility; graph permission is not measured overlap; the reduction is a typed junction carrying `T_a`, a fixed tree, widths and adjoints; pressure is a local covector population; utility is a product, not a percentage. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 
 **Additional required indexes and frames, begun 2026-08-10 because three false absences were
@@ -1434,6 +1438,91 @@ number and repeating the same morphology.
 
 This section schedules nothing. The roadmap and position record alone decide construction.
 
+## 0o. The single-card foundation, and how this session orchestrates it — ratified 2026-08-19
+
+**Brandon and Sol pivoted the roadmap on 2026-08-19 after Stations A–D.** The sole active plan is
+`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`; the audit is the
+warp-scheduler record in the reading table above. What governs conduct:
+
+- **Stations A–D are frozen bounded evidence** (`cc7e625`, `1004b6f`, `70174d1`, `73fa23b`), not
+  revoked and not to be re-run during owner iteration. Hardware inefficiency does not erase them; it
+  prevents the same realization from licensing native morphology, condensation or cultivation.
+- **Station E is quarantined, on a branch.** The native occurrence witness, the native laws, the
+  Athena walk/future kernels, the `OccurrenceWitness` trait and the `permutations → arrays` rename
+  live at `quarantine/station-e-predecessor` (`06347e1`), off `main`, **neither deleted nor
+  admitted**. Their source testimony may be rederived after Deed H5; their execution shape —
+  one-thread flat kernels, maximum-legal-block launch — is the convicted substrate and may not be
+  extended. The ratchet is red on that cone by construction; no ledger re-seed is authorized.
+- **The order is H0 → H1 → H2 → H3 → H4 → H5, then P0 → P5, then M0 → M3, and no later deed begins
+  while an earlier grade is open.** H0 is a measurement of the *unchanged* scalar path with no
+  semantic code change. `CONSTRUCTION_STATE.md` moves only at P5.
+- **The hardware vocabulary firewall.** Warp scheduler, thread scheduler, stream, block, grid,
+  Tensor Core, CPU, GPU, cache and PCIe are apparatus charts that never determine semantic
+  topology; "layer" is foreign lineage or one depth receiver; "tensor parallelism" here means
+  section regions enacted concurrently across one card's SM/warp/block hierarchy, never multi-GPU;
+  "pressure" is a local receiver-indexed reaction of current against capacity and boundary and no
+  global scalar pressure chooses a branch or placement. No Scheduler, Planner, Interpreter, Backend,
+  SurfaceManager, TensorEngine semantic cabinet.
+- **The falsifiers that govern every hardware sentence, restated so they are checkable:** graph
+  permission is not measured overlap; the maximum legal whole-warp block is a refusal bound, not an
+  optimum; a front is covered by extent, never by count; shared-output shards owe a
+  `ReductionReceipt` carrying the partial charts, the fixed tree, the intermediate width, the
+  directed rounding and the adjoints `T_a*`; atomics testify only for the commutative receiver they
+  implement, never for ordered history; a scalar utilization, speedup or energy quotient never
+  governs semantics; the CPU never chooses an operation between resident fronts; **tiling is not
+  compression**; NVIDIA-SMI never substitutes for scheduler/resource telemetry; missing metrics stay
+  *unknown*, never zero; dense full-rank weights receive no presumed low-rank truncation (all 168
+  inspected Gemma circuits were full rank); a crystal claim needs winding/group return.
+
+### The profiling apparatus, measured 2026-08-19 on this machine
+
+Sol's audit said Nsight was not installed; **it is, under the CUDA 12.9 tree rather than the 13.2
+one**: `/opt/cuda-12.9/bin/nsys` (Nsight Systems 2025.1.3) and `/opt/cuda-12.9/bin/ncu` (Nsight
+Compute 2025.2.1), with `/opt/cuda/extras/CUPTI` for the 13.2 toolchain. Measured by running them
+against a `holonic-engine` lib test on the 595.71 driver:
+
+- **`nsys` works unprivileged**: `nsys profile --trace=cuda,osrt --cuda-graph-trace=node
+  --cuda-event-trace=false` returned the graph's kernel nodes (`section_contract`, `section_census`,
+  …), every driver-API call with durations (`cuCtxCreate_v2` 87 ms, `cuModuleLoadData`, the graph
+  instantiate/launch, the stream/event calls), and the memcpy population; `nsys stats
+  --force-export=true --report cuda_gpu_kern_sum,cuda_api_sum,cuda_gpu_mem_size_sum --format csv`
+  reads them back. CPU sampling: process-tree OK, system-wide refused (`perf_event_paranoid = 2`).
+- **`ncu` connects but the counters are admin-only**: `ERR_NVGPUCTRPERM`, because
+  `/proc/driver/nvidia/params` carries `RmProfilingAdminOnly: 1`. Two routes, and the second is
+  Brandon's decision: run `ncu` through `SUDO_ASKPASS=/home/b/secure-askpass/askpass sudo -A` (he
+  approves each call), or set `options nvidia NVreg_RestrictProfilingToAdminUsers=0` in
+  `/etc/modprobe.d/` and reboot. **Until one of them is taken, every ncu-only face
+  (active/eligible/issued warps, stall classes, registers, achieved occupancy, L1/L2/DRAM
+  traffic) is *unknown* in H0's artifacts, stated as such, never inferred.**
+- Nsight is exterior apparatus under the plan: it measures the realization and testifies for
+  nothing semantic. Its report files are not boundary artifacts; the `.tsv`/`.form` faces the deed
+  derives from them are.
+
+### Orchestration, and the two workflow defects this session committed
+
+Brandon, 2026-08-19: act as an orchestrator; **at most two agents at a time, Opus, dividing the
+work only where it actually divides**; pose the phases and review each critically for rigor; the
+single-card foundation precedes any Phoenix resumption. An agent's return is evidence to be checked
+against the tree, never a conclusion to be relayed (the rule in §9 stands); no sub-agent authors
+provenance or quotes Brandon (§9 stands). Each dispatched agent receives the deed's pass predicate,
+the artifact names and columns it owes, the files it may touch, the forbidden actions (no workspace
+tests, no release all-target builds, no rerun of an unchanged expensive deed, no writes under a tree
+a release reading is covering), and the obligation to report what it could not measure as unknown.
+
+Two defects of this session, recorded so they are not repeated:
+
+1. **A file written into a covered tree during a release reading is an edit to the closure.** Two
+   Station E files were written into `crates/holonic-engine/src/` while Station D's complete gate
+   was running; the ratchet and the closure manifest reddened on work that was not the station's,
+   and the two scopes had to be reported separately. Do not write under `crates/`, `soma/`, or any
+   ledger-covered directory while `bash tools/gates.sh` runs; write to the scratchpad and move in
+   after the reading.
+2. **Another session's uncommitted files are not this session's to stage.** Sol's deposits sat in the
+   tree unstaged during Station D's commit; `git add -A` staged them and they had to be unstaged by
+   name before the commit. Stage by path, and read `git status` for authorship before every commit.
+
+This section schedules nothing beyond what the roadmap's 2026-08-19 section names.
+
 ## 1. The floor is a carrier, not a retired interface
 
 **The single most damaging defect in the inherited authority was an admission rule that made the
@@ -2069,7 +2158,11 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
 
 - **The GPU owns the deed.** The CPU handles process boundaries, durable rest, narrow exterior
   codecs, and offline audits. A run that pins one core while the card idles is a defect to
-  diagnose, not a mystery to narrate.
+  diagnose, not a mystery to narrate. **And owning the deed is not the same as using the card**
+  (§0o): the Station C tower owned every deed on the card and still measured 0–32% SM activity,
+  because it was 43 graphs with a CPU foreman between them, an output-parallel inner-serial
+  contraction, and a maximum-legal block. Residency is necessary; the typed tiling, reduction and
+  utility receipts are what make utility a claim.
 
   A CUDA leaf product does not make a pathway resident. Normalization, chronology, contact/ratio,
   gating, residual joins, and quotient returns are semantic parts of the same hot deed. They may not

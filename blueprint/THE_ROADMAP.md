@@ -67,6 +67,25 @@ prefixes/cohorts. Only after H0–H5 pass does Phoenix resume at native morpholo
 vertical follows Phoenix completion on the same execution owners. `CONSTRUCTION_STATE.md` does not
 move.
 
+**DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
+[`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).
+The unchanged committed Station C tower under Nsight Systems and Nsight Compute (counters reached
+under `sudo`; both tools live under `/opt/cuda-12.9/bin`): 43 graph launches verified exactly; the
+card busy **10.2 % of the kernel span** and 4.3 % of the wall; inter-graph CPU gaps of 228–281 ms
+against 10.8–11.9 ms graph walls (×23; 93.7 % of the span), attributed by API census and the driver's
+own clocks to the mount phase (source read, per-region hashing, bf16 decode, 2,112 serialized mount
+launches each followed by `cuCtxSynchronize`) and the release; graph permission (13 of 45 fronts
+with ≥2 members) against measured overlap (at most 4–5 concurrent kernels); **every `section_*`
+geometry below one wave** (0.010–0.417 waves per card; the contraction at 51,200 threads, 42
+registers, 28–40 % achieved occupancy, 0.48 eligible warps per cycle, 67 % no-eligible, 9 % DRAM,
+12 % SM); the inner dimension serial (45× across one fixed output extent); 9.29 GB host→device at
+71 % of nominal and **0 ns overlapping any kernel**; census kernels 8–11 % of each graph wall. One
+classification per load-bearing kernel class and per boundary under a rubric declared before the
+measurement; the semantic receipts (45 fronts, all interchangeable; service rounds 1 on every front;
+typed admission 5 bounded + 31 exhibited unbounded) stand beside the telemetry, product-ordered,
+never summed. No semantic code changed. **Deed H1 (typed partition and reduction receipts) is
+next.** `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

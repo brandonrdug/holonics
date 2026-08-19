@@ -3,7 +3,7 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap; **open** until Deed H0 returns.
+**Status:** active construction contract when named by the roadmap. **Deed H0 returned 2026-08-19** ([the record](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md)); H1 is the open deed; every later deed is open.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -543,6 +543,13 @@ Nsight or CUPTI is exterior apparatus. Missing metrics remain unknown, not zero.
 
 **Pass:** one attributable bottleneck classification per load-bearing kernel/boundary, with raw
 telemetry and calibration. No semantic code changes.
+
+**Returned 2026-08-19** — the record named in the status line; driver
+`crates/holonic-engine/examples/the_scalar_path_returns_its_pressure_and_utility.rs`, deriver
+`tools/profile_scalar_path.py`, artifacts under the directory above (the raw Nsight reports outside
+the repository). Card busy 10.2 % of the kernel span; inter-graph gaps ×23 the graph wall; every
+section kernel below one wave; transfers serialized with compute; the classification table is §3
+of the record.
 
 ### Deed H1 — typed partition and reduction receipts
 
