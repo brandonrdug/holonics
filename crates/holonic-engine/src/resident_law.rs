@@ -46,8 +46,10 @@ pub struct ResidentMaterial<'chart> {
     pub positions: Option<Positions<'chart>>,
     /// **Resident standings carried in from an earlier passage** — the previous layer's residual
     /// stream, a shared K/V standing — each with the a-priori octave bound it was admitted under
-    /// (and measured at). Owned here: the earlier passage released them.
-    pub standings: BTreeMap<String, (ResidentSection<'chart>, u32)>,
+    /// (and measured at). Released by the earlier passage; held through `Rc` because one standing
+    /// (a stored K/V) enters several later passages and is written by none of them — a shared
+    /// pointer to an immutable section is not a second owner of a continuing body.
+    pub standings: BTreeMap<String, (std::rc::Rc<ResidentSection<'chart>>, u32)>,
 }
 
 impl ResidentMaterial<'_> {
@@ -61,7 +63,12 @@ impl ResidentMaterial<'_> {
         self.populations.values().map(|p| p.readout.resident_octets() as u64).sum::<u64>()
             + self.bands.values().map(|(b, _)| b.resident_octets()).sum::<u64>()
             + self.positions.as_ref().map(Positions::resident_octets).unwrap_or(0)
-            + self.standings.values().map(|(s, _)| s.resident_octets()).sum::<u64>()
+    }
+
+    /// The resident octets of the standings carried in from earlier passages — resident already,
+    /// released by those passages, counted apart from the material deed that mounted the maps.
+    pub fn standings_octets(&self) -> u64 {
+        self.standings.values().map(|(s, _)| s.resident_octets()).sum::<u64>()
     }
 }
 
@@ -226,6 +233,62 @@ impl ResidentLaw for Standing {
     }
     fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
         surface.record_carry(lane, &material.standings[&self.name].0, out)
+    }
+}
+
+/// **The midpoint quotient** — the receiver's declared chart where the certified enclosure cannot
+/// be carried further: the occurrence's enclosure `[lo, hi]` is collapsed to its midpoint for its
+/// successors, while the enclosure itself stays resident in the predecessor's section as the
+/// complete per-entry residual, and the census of the predecessor carries the collapsed
+/// population's widest, summed and nonzero widths. This is a quotient forced by the carrier — the
+/// word stops separating once the composed enclosure's a-priori amplification (measured at
+/// `≈ 2^35` per Gemma layer) exceeds it — and it is named as such on every occurrence, never hidden
+/// inside a kernel. It is NOT `CollapseControl`, which is the same arithmetic offered as an unsound
+/// control at one site; this one is the declared chart of the whole passage and its entailment
+/// requires the declaration. Species: quotient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MidpointQuotient;
+
+impl ResidentLaw for MidpointQuotient {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        self.entail(validation)
+    }
+    fn name(&self) -> &'static str {
+        "midpoint-quotient"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
+        Ok(())
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_collapse_control(rows, width, octaves).map(|mut shape| {
+            shape.operation = "midpoint-quotient";
+            shape
+        })
+    }
+    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        Vec::new()
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_collapse_control(lane, inputs[0], out)
+    }
+}
+
+impl MidpointQuotient {
+    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if !validation.interventions.iter().any(|s| s.contains("quotient")) {
+            return Err(unentailed("midpoint-quotient", "declaration", "a declared quotient chart", validation));
+        }
+        Ok(LawEntailment { law: "midpoint-quotient", parameters: vec![("chart".to_owned(), "midpoint of the certified enclosure; the enclosure retained in the predecessor".to_owned(), format!("the receiver's declaration: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
     }
 }
 
@@ -834,8 +897,13 @@ pub fn entailment_of(law: &dyn ResidentLaw, validation: &BindingValidation) -> R
 
 impl Enter {
     pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let naming_slices = naming("enter", validation, &["embed"])?;
-        let by = self.scale_entailed_by(validation).ok_or_else(|| unentailed("enter", "scale", format!("{}·2^{}", self.scale.significand, self.scale.exponent), validation))?;
+        let naming_slices = naming("enter", validation, &["embed", "inputs_embeds"])?;
+        // an unscaled standing entering from an exterior module (`inputs_embeds=`) is entailed at scale one
+        let by = if self.scale == Dyadic::ONE && slices_of(validation).iter().any(|s| s.contains("inputs_embeds=")) {
+            "an unscaled standing entering from an exterior module (inputs_embeds=) — scale one".to_owned()
+        } else {
+            self.scale_entailed_by(validation).ok_or_else(|| unentailed("enter", "scale", format!("{}·2^{}", self.scale.significand, self.scale.exponent), validation))?
+        };
         Ok(LawEntailment { law: "enter", parameters: vec![("scale".to_owned(), format!("{}·2^{}", self.scale.significand, self.scale.exponent), by), ("population".to_owned(), self.population.clone(), "the entering rows the runtime supplied under this name".to_owned())], naming_slices })
     }
 }

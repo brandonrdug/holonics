@@ -82,8 +82,8 @@ const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_resident_sect
 const WIDE_OCTAVES: u32 = 127;
 /// The signed word a section coordinate is stored in, read off `i64`; one octave is the hand.
 pub const WORD_OCTAVES: u32 = 63;
-/// The census slot: twelve 32-bit words per occurrence. Layout in the kernel's own header.
-pub const SLOT_WORDS: usize = 12;
+/// The census slot: sixteen 32-bit words per occurrence. Layout in the kernel's own header.
+pub const SLOT_WORDS: usize = 16;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
@@ -589,6 +589,10 @@ pub struct SlotReading {
     /// How many predecessor slots the kernel inspected at entry — proof the inspection ran, and
     /// equal to the declared lineage's length.
     pub lineage_inspected: u32,
+    /// The sum of every enclosure's width in grains, and how many coordinates had width at all —
+    /// with `max_width`, the collapsed population a midpoint quotient after this occurrence deletes.
+    pub width_sum: u64,
+    pub nonzero_widths: u32,
 }
 
 impl SlotReading {
@@ -605,6 +609,8 @@ impl SlotReading {
             upstream_first: if words[9] == 0 { None } else { Some(words[9] as usize - 1) },
             upstream_count: words[10],
             lineage_inspected: words[11],
+            width_sum: u64::from(words[12]) | (u64::from(words[13]) << 32),
+            nonzero_widths: words[14],
         }
     }
 

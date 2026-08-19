@@ -256,7 +256,7 @@ fn main() {
     let tower_clock = Instant::now();
     for layer in 0..tower::LAYERS {
         let entry = if layer == 0 { Entry::Rows } else { Entry::Carried };
-        let founded = tower::found_layer(layer, entry, &scales, terms, unit_scalar, Sibling::Base, 1).unwrap_or_else(|error| {
+        let founded = tower::found_layer(layer, entry, tower::Chart::Interval, &scales, terms, unit_scalar, Sibling::Base, 1).unwrap_or_else(|error| {
             println!("REFUSED: layer {layer} did not found — {error}");
             std::process::exit(1);
         });
@@ -316,7 +316,7 @@ fn main() {
         }
     }
     // the final deed
-    let final_founded = tower::found_final(&scales).expect("final founds");
+    let final_founded = tower::found_final(tower::Chart::Interval, &scales).expect("final founds");
     let final_closure = final_founded.complex.closure().expect("closure");
     match final_founded.realization.validate(&final_founded.complex).map_err(|e| e.to_string()).and_then(|()| occurrence.validate(&final_founded.complex).map_err(|e| e.to_string())) {
         Ok(validations) => {
@@ -451,7 +451,7 @@ fn main() {
             if let Some(r) = drifted.get_mut(&tower::named(0, "input_layernorm.weight")) { r.dtype = "F32".to_owned(); }
             let mut occ = occurrence.clone();
             occ.container.regions = drifted;
-            let founded = tower::found_layer(0, Entry::Rows, &scales, terms, unit_scalar, Sibling::Base, 1).expect("founds");
+            let founded = tower::found_layer(0, Entry::Rows, tower::Chart::Interval, &scales, terms, unit_scalar, Sibling::Base, 1).expect("founds");
             matches!(occ.validate(&founded.complex), Err(SourceRefusal::DtypeDiffers { .. }))
         },
         "every declared extent agrees with elements × dtype width; a region drifted to F32 for a bound population refuses at DtypeDiffers before any transport");
@@ -467,7 +467,7 @@ fn main() {
     verdicts.record(6, "a valid but semantically unrelated source slice does not authenticate another binding",
         {
             // offer the q_proj slice (valid, resolves) as the presented projection's testimony
-            let mut founded = tower::found_layer(0, Entry::Rows, &scales, terms, unit_scalar, Sibling::Base, 1).expect("founds");
+            let mut founded = tower::found_layer(0, Entry::Rows, tower::Chart::Interval, &scales, terms, unit_scalar, Sibling::Base, 1).expect("founds");
             let law_id = founded.complex.shape.laws.iter().find(|(_, l)| l.name == "presented projection").map(|(id, _)| *id).expect("k");
             let op = founded.complex.operations.get_mut(&law_id).expect("op");
             op.testimony.retain(|t| !matches!(t, SourceTestimony::Implementation { .. }));

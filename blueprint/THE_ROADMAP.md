@@ -273,6 +273,28 @@ realization (54 stored populations named unbound by the source), the final norm,
 and the modality projections — 1,466 operations, 1,466 entailed. Eleven falsifiers pass. A potential
 atlas is not an active one; Station C enacts the tower. `CONSTRUCTION_STATE.md` does not move.
 
+**THE TOWER CONDUCTS LAYER BY LAYER, AND THE CERTIFIED ENCLOSURE DIVERGES AT 2^35 PER LAYER —
+Station C PASSED 2026-08-19.** Record:
+[`research/records/2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md`](../research/records/2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md).
+**The whole Gemma-4-E4B text tower conducts on the card** for five runtime-supplied inputs — 42
+layer deeds and the final deed, each one graph launched once with typed admission, footprint
+certificates and an empty obstruction lineage; the KV-sharing realization, both species and both
+RoPE species enacted; the residual stream and the stored K/V standings carried between layer
+graphs on the card; streamable by layer (the widest charge of one deed 5.4 GB against the 16 GB
+source); the potential section over 262,144, the plural future section and the native decoded
+surface — *"The capital of France is"* → **" France"**, the source runtime's own top, five of
+five. **The material returned one genuine obstruction**: the certified interval enclosure of the
+composed tower diverges at ≈ 2^35.6 per layer (measured at two grains), so the word refuses inside
+layer 1 by name — no grain and no word carries a certified enclosure through two layers. The tower
+is carried by a **declared quotient chart** (`MidpointQuotient`, quotient species, entailed by its
+declaration, the enclosure retained per entry, the collapsed population censused: 1,296 quotients,
+Σ 24,306,337 grains of 2^-48), and the receipt says the composition is not certified. The source's
+bf16 face drifts from the native chart in the residual stream (772/2,560 same codeword at layer 0,
+0/2,560 at layer 41) while the order face at the boundary agrees on every input. One real non-text
+projection crossed its typed ports (256 vision soft tokens, native chart on the source's codeword at
+393,190 of 655,360). Fourteen falsifiers pass; rest, condensation, cultivation and reborn dissection
+stay open by name. `CONSTRUCTION_STATE.md` does not move.
+
 **The workflow was separately re-audited the same day.** The complete gate was being used as an
 inner loop, release all-target builds repeatedly linked the evidence-driver population, and selected
 gate results were spliced into a complete-gate report. The binding validation cadence is deposited

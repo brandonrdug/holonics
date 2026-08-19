@@ -42,6 +42,10 @@
 //   [9]  upstream first       1 + the least refusing predecessor index in the declared lineage; 0 = none
 //   [10] upstream count       how many declared predecessors had refused
 //   [11] lineage inspected    how many predecessor slots this kernel read — proof the inspection ran
+//   [12..14] width sum        the sum of every enclosure's width, as one aligned 64-bit word (atomicAdd):
+//                             with [6..8] the collapsed population of a midpoint quotient after it
+//   [14] nonzero widths       how many coordinates had width > 0
+//   [15] reserved
 //
 // **There is no global word.** The first form of this file had every kernel read one shared
 // refusal word at entry and every census write it. That was unlawful as represented: unrelated
@@ -79,7 +83,7 @@ typedef unsigned __int128 uwide;
 #define REFUSED_BOUND     16u
 
 // The census slot layout, in 32-bit words.
-#define SLOT_WORDS           12
+#define SLOT_WORDS           16
 #define SLOT_REFUSED         0
 #define SLOT_REACH           1
 #define SLOT_WRITTEN         2
@@ -91,6 +95,8 @@ typedef unsigned __int128 uwide;
 #define SLOT_UPSTREAM_FIRST  9
 #define SLOT_UPSTREAM_COUNT  10
 #define SLOT_LINEAGE         11
+#define SLOT_WIDTH_SUM       12
+#define SLOT_NONZERO_WIDTHS  14
 
 // ---------------------------------------------------------------------------------------------
 // exact helpers over the wide carrier — magnitude first, sign restored under the directed law
@@ -929,7 +935,10 @@ extern "C" __global__ void section_census(
     atomicMax(slot + SLOT_OCTAVE, oct);
     if (b >= a) {
         uwide width = (uwide)(b - a);   // b − a of two int64 words: at most 2^64, exact in the wide carrier
-        atomicMax((unsigned long long *)(slot + SLOT_WIDTH), (unsigned long long)(width > (uwide)UINT64_MAX ? UINT64_MAX : (uint64_t)width));
+        unsigned long long w64 = (unsigned long long)(width > (uwide)UINT64_MAX ? UINT64_MAX : (uint64_t)width);
+        atomicMax((unsigned long long *)(slot + SLOT_WIDTH), w64);
+        atomicAdd((unsigned long long *)(slot + SLOT_WIDTH_SUM), w64);
+        if (w64 != 0ull) atomicAdd(slot + SLOT_NONZERO_WIDTHS, 1u);
     } else {
         atomicOr(slot + SLOT_INVERTED, 1u);
         atomicOr(slot + SLOT_REFUSED, REFUSED_INVERTED);

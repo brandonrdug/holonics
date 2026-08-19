@@ -35,10 +35,10 @@ It distinguishes exact instruments, bounded experiments, and this blueprint’s 
 
 | obligation | audited position |
 |---|---|
-| source manifestation and exact binary mouths | bounded instruments stand; complete source admission remains open |
+| source manifestation and exact binary mouths | **complete source manifest returned 2026-08-19** (Station B record): all 2,130 populations hashed in one streamed pass, every `BF16` codeword decoded exactly through the one float mouth, file identity bound, dtype checked, every law entailed by its validated testimony; the potential atlas over all 42 layers, 1,466 operations entailed |
 | exact linear fibres, rebases, and metric adjoints | implemented-exact |
 | generic typed ported words and lift-defect law | implemented-exact at the substrate aperture |
-| contextual active Gemma path | open as a master station; **the layer-zero deed with its per-layer input is bound as one CUDA graph, admitted whole before allocation, launched once and read once, with source bindings validated and the source-runtime defect carried** (2026-08-19 record); layers `1`–`41` and the head remain outside the aperture |
+| contextual active Gemma path | **active stimulation of the whole text tower returned 2026-08-19** (Station C record): 42 layer deeds and the final deed per input, each one graph, the KV-sharing realization and both species enacted, the potential section and the plural future section returned, the source's own top candidate five of five; carried by a declared `MidpointQuotient` chart because the certified interval enclosure of the composed tower diverges at ≈ 2^35.6 per layer (measured) — the composition is not certified and the receipt says so |
 | source intervention taxonomy | open; candidate distinguishability was measured but two real source questions remain unsettled |
 | native morphology | open; no lattice, state, generator, or source-independent ecology was founded |
 | condensation | open; one axis-block sensitivity census returned, with no quotient runtime or decoder |

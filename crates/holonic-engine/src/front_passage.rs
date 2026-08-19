@@ -93,7 +93,7 @@ use mount::GraphCensus;
 
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
-    MountedPopulation, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
+    MidpointQuotient, MountedPopulation, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
@@ -341,6 +341,8 @@ fn semantic_constraints(coordinate: &str) -> &'static [&'static str] {
 pub struct ApparatusPrediction {
     /// Mounted maps, bands and positions the deed reads — resident already, required by the deed.
     pub source_map_octets: u64,
+    /// Standings carried in from earlier passages — resident already, released by them.
+    pub carried_standing_octets: u64,
     /// Entering codewords staged on the card.
     pub staged_octets: u64,
     /// Every section written: two words per coordinate.
@@ -364,8 +366,12 @@ pub struct ApparatusPrediction {
     pub scratch_octets: u64,
     /// The widest flat launch extent (rows × width) any occurrence issues.
     pub grid_extent: u64,
-    /// The widest a-priori octave bound any occurrence is admitted under.
+    /// The widest a-priori octave bound any occurrence is admitted under (capped at the word).
     pub carrier_peak_octaves: u64,
+    /// The widest a-priori bound BEFORE the cap, and how many occurrences stood above the word and
+    /// were admitted at it — those the census alone decides on the card.
+    pub a_priori_peak_octaves_uncapped: u64,
+    pub occurrences_admitted_at_the_word: u64,
     /// Kernel launches captured into the graph: semantic and census.
     pub captured_launches: u64,
     /// Within-section reductions realized as named barriers.
@@ -727,12 +733,16 @@ impl<'chart> FrontPassage<'chart> {
         ordered
     }
 
-    /// The bound a law puts on the octaves of its output words, clamped to the word.
-    fn bound_octaves(&self, law: &dyn ResidentLaw, input_octaves: &[u32], material: &ResidentMaterial<'chart>) -> u32 {
+    /// The bound a law puts on the octaves of its output words, clamped to the word, with the
+    /// uncapped bound beside it.
+    fn bound_octaves(&self, law: &dyn ResidentLaw, input_octaves: &[u32], material: &ResidentMaterial<'chart>) -> (u32, u32) {
         let bound = law.bound_octaves(self.grain, input_octaves, material);
+        let uncapped = u32::try_from(bound.max(1)).unwrap_or(u32::MAX);
         // A written word occupies at most the signed word: a bound past it is a bound on nothing,
-        // and a value past it is refused on the card by name.
-        u32::try_from(bound.max(1)).unwrap_or(u32::MAX).min(WORD_OCTAVES)
+        // and a value past it is refused on the card by name. The occurrence is admitted AT the
+        // word, and the receipt exhibits that its a-priori bound stood above it, so the admission
+        // says which occurrences the census alone decides.
+        (uncapped.min(WORD_OCTAVES), uncapped)
     }
 
     // -----------------------------------------------------------------------------------------
@@ -868,7 +878,11 @@ impl<'chart> FrontPassage<'chart> {
                 }
                 let shapes: Vec<(usize, usize, u32)> = inputs.iter().map(|port| field.get(port).copied().unwrap_or((0, 0, 0))).collect();
                 let octaves: Vec<u32> = shapes.iter().map(|(_, _, o)| *o).collect();
-                let bound = self.bound_octaves(law, &octaves, material);
+                let (bound, uncapped) = self.bound_octaves(law, &octaves, material);
+                if uncapped > WORD_OCTAVES {
+                    apparatus.occurrences_admitted_at_the_word += 1;
+                }
+                apparatus.a_priori_peak_octaves_uncapped = apparatus.a_priori_peak_octaves_uncapped.max(u64::from(uncapped));
                 let shape = law.shape(self.surface, self.grain, &shapes, material).map_err(|refusal| FrontPassageObstruction::Resource(ResourceObstruction::Carrier(refusal)))?;
                 field.insert(OccurrencePort::output(*occurrence, 0), (shape.rows, shape.width, bound));
                 front_work = co_present(&front_work, &shape.predicted);
@@ -923,6 +937,7 @@ impl<'chart> FrontPassage<'chart> {
         allocation_octets.push(lineage_octets);
         let terminal_plan = plans.iter().find(|plan| plan.occurrence == terminal).ok_or(CompileRefusal::ForeignOccurrence { occurrence: terminal })?;
         apparatus.source_map_octets = material.resident_octets();
+        apparatus.carried_standing_octets = material.standings_octets();
         apparatus.staged_octets = staged_octets;
         apparatus.section_octets = section_octets;
         apparatus.census_octets = census_octets;
@@ -1015,7 +1030,9 @@ impl<'chart> FrontPassage<'chart> {
         // apparatus
         let a = &plan.apparatus_prediction;
         let mut apparatus = vec![
-            CoordinateAdmission::bounded("carrier-peak-octaves", BigUint::from(a.carrier_peak_octaves), BigUint::from(u64::from(WORD_OCTAVES)), "the signed word the section is stored in"),
+            CoordinateAdmission::bounded("carrier-peak-octaves", BigUint::from(a.carrier_peak_octaves), BigUint::from(u64::from(WORD_OCTAVES)), "the signed word the section is stored in (the a-priori bound is capped here; see the two coordinates below)"),
+            CoordinateAdmission::unbounded("a-priori-peak-octaves-uncapped", BigUint::from(a.a_priori_peak_octaves_uncapped), "the widest a-priori bound before the cap at the word; where it exceeds the word the occurrence is admitted at the word and its census refuses on the card", &["the word: 63 octaves, enforced by the census and by CarrierLeft on the card"]),
+            CoordinateAdmission::unbounded("occurrences-admitted-at-the-word", BigUint::from(a.occurrences_admitted_at_the_word), "occurrences whose a-priori bound stood above the word; the census alone decides them", &["the word"]),
             CoordinateAdmission::bounded("charged-resident-octets", BigUint::from(a.charged_octets), BigUint::from(free), "the device's free memory at admission"),
             CoordinateAdmission::bounded("scratch-octets", BigUint::from(a.scratch_octets), BigUint::from(u64::from(declaration.max_sectiond_bytes)), "the device's shared memory per block"),
             CoordinateAdmission::bounded("grid-extent", BigUint::from(a.grid_extent), BigUint::from(u64::from(max_grid)) * BigUint::from(u64::from(self.surface.derived_launch().0)), "the launch aperture: grid ceiling × block"),
@@ -1039,6 +1056,7 @@ impl<'chart> FrontPassage<'chart> {
             CoordinateAdmission::unbounded("egress-section-octets", BigUint::from(a.egress_section_octets), "the terminal face, read once by the receiver", &["the bus"]),
             CoordinateAdmission::unbounded("retained-remainder-grain", BigUint::from(a.remainder_grain), "the remainder is retained whole at this grain; no ceiling on its width is declared", &["the word: 63 octaves"]),
         ];
+        apparatus.push(CoordinateAdmission::unbounded("carried-standing-octets", BigUint::from(a.carried_standing_octets), "standings released by earlier passages, resident already; no ceiling is declared", &["the device's memory"]));
         // the source standing: cited from the material admission, or exhibited as already resident
         match material {
             Some(admitted) => apparatus.push(CoordinateAdmission::bounded("source-standing-octets", BigUint::from(a.source_map_octets), BigUint::from(admitted.resident_octets()), "the cited material admission's admitted resident standing")),
@@ -1917,7 +1935,7 @@ mod tests {
         next_realization.bind(c, Standing { name: "x".to_owned() });
         next_realization.bind(sc, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
         let mut next_material = ResidentMaterial::empty();
-        next_material.standings.insert("x".to_owned(), (section, bound));
+        next_material.standings.insert("x".to_owned(), (std::rc::Rc::new(section), bound));
         let second = passage.bind(&next, &next_realization, &next_material, &occ, &DeedReceiver::unbounded(), None, sc).expect("binds");
         let returned2 = second.launch(&surface.mode()).expect("deed");
         let doubled = second.read_terminal(&returned2).expect("read");

@@ -40,7 +40,9 @@
 use std::collections::BTreeMap;
 
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
-use holonic_engine::front_passage::{Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MaterialPlan, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, WithdrawColumns};
+use holonic_engine::category::BoundaryId;
+use holonic_engine::causal::EventId;
+use holonic_engine::front_passage::{Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MaterialPlan, MidpointQuotient, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, WithdrawColumns};
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex};
 use holonic_engine::resident_section::{Dyadic, DyadicEnclosure, SeriesAperture};
 use num_bigint::BigInt;
@@ -78,6 +80,8 @@ pub const SHARED_V_FULL: &str = "shared V, full (stored by layer 23)";
 /// Named returns a caller may read or release.
 pub const X0: &str = "x0";
 pub const LAYER_RETURN: &str = "layer";
+/// The layer scalar's own enclosure, before the terminal quotient under the midpoint chart.
+pub const LAYER_ENCLOSURE: &str = "layer enclosure";
 pub const K_STANDING: &str = "k standing";
 pub const V_STANDING: &str = "v standing";
 pub const CONTACT: &str = "contact";
@@ -362,6 +366,37 @@ pub fn algebraic_scales() -> Result<(DyadicEnclosure, DyadicEnclosure), String> 
     super::resident_layer::algebraic_scales()
 }
 
+/// **The carrier chart of a deed.** `Interval` propagates every certified enclosure into its
+/// successors — exact, and diverging: the composed enclosure's a-priori amplification is ≈ 2^35 per
+/// layer (measured at grains 2^-48 and 2^-24), so the word is exhausted inside layer 1. `Midpoint`
+/// is the receiver's declared quotient chart: after every occurrence whose enclosure can widen, a
+/// [`MidpointQuotient`] collapses the enclosure to its midpoint for the successors while the
+/// enclosure stays resident in the predecessor's section as the complete per-entry residual and its
+/// collapsed population (widest, summed and nonzero widths) is censused. Each occurrence's enclosure
+/// is then certified relative to its midpoint predecessors; the composition is not, and the receipt
+/// says so.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Chart {
+    Interval,
+    Midpoint,
+}
+
+pub const QUOTIENT_DECLARATION: &str = "declared quotient chart: the certified enclosure is collapsed to its midpoint for the successors; the enclosure is retained in the predecessor's section as the complete per-entry residual and its collapsed population is censused; forced by the carrier's word at the measured amplification of the composed enclosure (about 2^35 per layer), not chosen to improve a number";
+
+/// Seal an occurrence's output under the chart: under `Midpoint`, a quotient occurrence after it,
+/// whose output the successors read; under `Interval`, the occurrence itself.
+pub fn seal(chart: Chart, complex: &mut PortedOperationComplex, realization: &mut ResidentRealization, event: EventId, port: BoundaryId, label: &str) -> Result<EventId, String> {
+    match chart {
+        Chart::Interval => Ok(event),
+        Chart::Midpoint => {
+            let quotient = law(complex, &format!("{label} · midpoint quotient"), OperationSpecies::Quotient, vec![port], vec![port], None, vec![intervention(QUOTIENT_DECLARATION)])?;
+            realization.bind(quotient, MidpointQuotient);
+            bond(complex, &format!("{label} sealed"), port, event, quotient, 0)?;
+            Ok(quotient)
+        }
+    }
+}
+
 /// How a layer's deed enters its standing: layer zero from the embedding rows the runtime supplied;
 /// every later layer from the residual stream the previous layer released.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -383,7 +418,7 @@ pub enum Sibling {
 /// layer builds its own K/V — `K_STANDING` (after the chronology) and `V_STANDING` (after the
 /// rebase), which an `OwnAndStore` layer releases for the shared layers.
 #[allow(clippy::too_many_arguments)]
-pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAperture, layer_scalar: Dyadic, sibling: Sibling, tokens: usize) -> Result<Founded, String> {
+pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAperture, layer_scalar: Dyadic, sibling: Sibling, tokens: usize) -> Result<Founded, String> {
     let species = Species::of(layer);
     let role = KvRole::of(layer);
     let head = species.head_width();
@@ -438,16 +473,19 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(projected, Contract { population: PLE_MODEL_PROJECTION.to_owned() });
     bond(&mut complex, "x0 projects", standing, x0, projected, 0)?;
+    let projected = seal(chart, &mut complex, &mut realization, projected, ple, "projected")?;
     let scaled = law(&mut complex, "per-layer projection scale 2560^-1/2", OperationSpecies::Transport, vec![ple], vec![ple], None, vec![
         implementation("Gemma4TextModel.__init__ (self.per_layer_model_projection_scale = config.hidden_size**-0.5)"),
         configuration("hidden_size", "2560"),
     ])?;
     realization.bind(scaled, Scale { by: scales.0 });
     bond(&mut complex, "projection scales", ple, projected, scaled, 0)?;
+    let scaled = seal(chart, &mut complex, &mut realization, scaled, ple, "scaled")?;
     let normed = law(&mut complex, "per-layer projection norm", OperationSpecies::Transport, vec![ple], vec![ple], Some(PLE_PROJECTION_NORM.to_owned()),
         rebase_testimony("Gemma4TextModel.project_per_layer_inputs (per_layer_projection = self.per_layer_projection_norm(per_layer_projection))", PLE_PROJECTION_NORM, PLE_WIDTH))?;
     realization.bind(normed, RmsRebase { group: PLE_WIDTH, gain: Some(PLE_PROJECTION_NORM.to_owned()), eps });
     bond(&mut complex, "projection norms", ple, scaled, normed, 0)?;
+    let normed = seal(chart, &mut complex, &mut realization, normed, ple, "normed")?;
     let token = law(&mut complex, "per-layer token identity", OperationSpecies::Construction, vec![], vec![ple], Some(PLE_EMBED.to_owned()), vec![
         implementation("Gemma4TextModel.get_per_layer_inputs (return self.embed_tokens_per_layer(input_ids).reshape()"),
         implementation("Gemma4TextModel.__init__ (embed_scale=config.hidden_size_per_layer_input**0.5,)"),
@@ -461,11 +499,13 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     realization.bind(joined, ReEntry);
     bond(&mut complex, "join projection", ple, normed, joined, 0)?;
     bond(&mut complex, "join token", ple, token, joined, 1)?;
+    let joined = seal(chart, &mut complex, &mut realization, joined, ple, "joined")?;
     let halved = law(&mut complex, "per-layer input scale 2^-1/2", OperationSpecies::Transport, vec![ple], vec![ple], None, vec![
         implementation("Gemma4TextModel.__init__ (self.per_layer_input_scale = 2.0**-0.5)"),
     ])?;
     realization.bind(halved, Scale { by: scales.1 });
     bond(&mut complex, "join scales", ple, joined, halved, 0)?;
+    let halved = seal(chart, &mut complex, &mut realization, halved, ple, "halved")?;
 
     // --- the layer ---
     let decoder = "Gemma4TextDecoderLayer.forward";
@@ -473,6 +513,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.input_layernorm(hidden_states))", &n("input_layernorm.weight"), HIDDEN))?;
     realization.bind(rebased, RmsRebase { group: HIDDEN, gain: Some(n("input_layernorm.weight")), eps });
     bond(&mut complex, "standing rebases", standing, residual_in, rebased, 0)?;
+    let rebased = seal(chart, &mut complex, &mut realization, rebased, standing, "rebased")?;
 
     // the receiver projection, always the layer's own
     let q = law(&mut complex, "receiver projection", OperationSpecies::Transport, vec![standing], vec![receivers], Some(n("self_attn.q_proj.weight")), vec![
@@ -486,6 +527,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(q, Contract { population: n("self_attn.q_proj.weight") });
     bond(&mut complex, "receiver projection", standing, rebased, q, 0)?;
+    let q = seal(chart, &mut complex, &mut realization, q, receivers, "q")?;
     let qn = law(&mut complex, "receiver head rebase", OperationSpecies::Transport, vec![receivers], vec![receivers], Some(n("self_attn.q_norm.weight")), {
         let mut t = rebase_testimony("Gemma4TextAttention.forward (query_states = self.q_norm(query_states))", &n("self_attn.q_norm.weight"), head);
         t.push(implementation("Gemma4TextAttention.__init__ (self.q_norm = Gemma4RMSNorm(dim=self.head_dim, eps=config.rms_norm_eps))"));
@@ -493,6 +535,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     })?;
     realization.bind(qn, RmsRebase { group: head, gain: Some(n("self_attn.q_norm.weight")), eps });
     bond(&mut complex, "q rebases", receivers, q, qn, 0)?;
+    let qn = seal(chart, &mut complex, &mut realization, qn, receivers, "qn")?;
 
     let chronology_testimony = |site: &str| {
         let mut t = vec![
@@ -525,6 +568,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
         chronology_testimony("Gemma4TextAttention.forward (query_states = apply_rotary_pos_emb(query_states, cos, sin, unsqueeze_dim=2))"))?;
     realization.bind(qr, Chronology { bands: species.bands().to_owned(), heads: HEADS, head_width: head });
     bond(&mut complex, "q turns", receivers, qn, qr, 0)?;
+    let qr = seal(chart, &mut complex, &mut realization, qr, receivers, "qr")?;
 
     // the presented and carried standings: the layer's own, or the stored ones
     let (k_in, v_in) = match role {
@@ -539,6 +583,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
             ])?;
             realization.bind(k, Contract { population: n("self_attn.k_proj.weight") });
             bond(&mut complex, "presented projection", standing, rebased, k, 0)?;
+            let k = seal(chart, &mut complex, &mut realization, k, families, "k")?;
             let v = law(&mut complex, "carried projection", OperationSpecies::Transport, vec![standing], vec![families], Some(n("self_attn.v_proj.weight")), vec![
                 implementation("Gemma4TextAttention.forward (value_states = self.v_proj(hidden_states).view(hidden_shape) if self.v_proj is not None else key_states)"),
                 implementation("Gemma4TextAttention.__init__ (if not self.is_kv_shared_layer:)"),
@@ -549,6 +594,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
             ])?;
             realization.bind(v, Contract { population: n("self_attn.v_proj.weight") });
             bond(&mut complex, "carried projection", standing, rebased, v, 0)?;
+            let v = seal(chart, &mut complex, &mut realization, v, families, "v")?;
             let kn = law(&mut complex, "presented head rebase", OperationSpecies::Transport, vec![families], vec![families], Some(n("self_attn.k_norm.weight")), {
                 let mut t = rebase_testimony("Gemma4TextAttention.forward (key_states = self.k_norm(key_states))", &n("self_attn.k_norm.weight"), head);
                 t.push(implementation("Gemma4TextAttention.__init__ (self.k_norm = Gemma4RMSNorm(dim=self.head_dim, eps=config.rms_norm_eps))"));
@@ -556,6 +602,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
             })?;
             realization.bind(kn, RmsRebase { group: head, gain: Some(n("self_attn.k_norm.weight")), eps });
             bond(&mut complex, "k rebases", families, k, kn, 0)?;
+            let kn = seal(chart, &mut complex, &mut realization, kn, families, "kn")?;
             let vn = law(&mut complex, "carried head rebase, no gain", OperationSpecies::Transport, vec![families], vec![families], None, vec![
                 implementation("Gemma4TextAttention.forward (value_states = self.v_norm(value_states))"),
                 implementation("Gemma4TextAttention.__init__ (self.v_norm = Gemma4RMSNorm(self.head_dim, eps=config.rms_norm_eps, with_scale=False))"),
@@ -565,6 +612,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
             ])?;
             realization.bind(vn, RmsRebase { group: head, gain: None, eps });
             bond(&mut complex, "v rebases", families, v, vn, 0)?;
+            let vn = seal(chart, &mut complex, &mut realization, vn, families, "vn")?;
             let (k_source, v_source) = match sibling {
                 Sibling::Base => (kn, vn),
                 Sibling::WithdrawFamily(family) => {
@@ -583,6 +631,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
                 chronology_testimony("Gemma4TextAttention.forward (key_states = apply_rotary_pos_emb(key_states, cos, sin, unsqueeze_dim=2))"))?;
             realization.bind(kr, Chronology { bands: species.bands().to_owned(), heads: KV_HEADS, head_width: head });
             bond(&mut complex, "k turns", families, k_source, kr, 0)?;
+            let kr = seal(chart, &mut complex, &mut realization, kr, families, "kr")?;
             returns.insert(K_STANDING, kr);
             returns.insert(V_STANDING, v_source);
             (kr, v_source)
@@ -638,6 +687,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;
     bond(&mut complex, "contact presented", families, k_in, contact, 1)?;
     bond(&mut complex, "contact carried", families, v_in, contact, 2)?;
+    let contact = seal(chart, &mut complex, &mut realization, contact, receivers, "contact")?;
     returns.insert(CONTACT, contact);
 
     let o = law(&mut complex, "contact returns", OperationSpecies::Transport, vec![receivers], vec![standing], Some(n("self_attn.o_proj.weight")), vec![
@@ -646,20 +696,24 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(o, Contract { population: n("self_attn.o_proj.weight") });
     bond(&mut complex, "contact projects back", receivers, contact, o, 0)?;
+    let o = seal(chart, &mut complex, &mut realization, o, standing, "o")?;
     let on = law(&mut complex, "post-attention rebase", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("post_attention_layernorm.weight")),
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.post_attention_layernorm(hidden_states))", &n("post_attention_layernorm.weight"), HIDDEN))?;
     realization.bind(on, RmsRebase { group: HIDDEN, gain: Some(n("post_attention_layernorm.weight")), eps });
     bond(&mut complex, "return rebases", standing, o, on, 0)?;
+    let on = seal(chart, &mut complex, &mut realization, on, standing, "on")?;
     let r1 = law(&mut complex, "first re-entry", OperationSpecies::Construction, vec![standing, standing], vec![standing], None,
         vec![implementation(&format!("{decoder} (hidden_states = residual + hidden_states)"))])?;
     realization.bind(r1, ReEntry);
     bond(&mut complex, "re-entry retains the standing", standing, residual_in, r1, 0)?;
     bond(&mut complex, "re-entry returns", standing, on, r1, 1)?;
+    let r1 = seal(chart, &mut complex, &mut realization, r1, standing, "r1")?;
 
     let h2 = law(&mut complex, "pre-feedforward rebase", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("pre_feedforward_layernorm.weight")),
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.pre_feedforward_layernorm(hidden_states))", &n("pre_feedforward_layernorm.weight"), HIDDEN))?;
     realization.bind(h2, RmsRebase { group: HIDDEN, gain: Some(n("pre_feedforward_layernorm.weight")), eps });
     bond(&mut complex, "r1 rebases", standing, r1, h2, 0)?;
+    let h2 = seal(chart, &mut complex, &mut realization, h2, standing, "h2")?;
     let mut branches = Vec::new();
     for (what, suffix) in [("gate", "mlp.gate_proj.weight"), ("up", "mlp.up_proj.weight")] {
         let event = law(&mut complex, what, OperationSpecies::Transport, vec![standing], vec![passage], Some(n(suffix)), vec![
@@ -669,6 +723,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
         ])?;
         realization.bind(event, Contract { population: n(suffix) });
         bond(&mut complex, what, standing, h2, event, 0)?;
+        let event = seal(chart, &mut complex, &mut realization, event, passage, what)?;
         branches.push(event);
     }
     let gated = law(&mut complex, "gate turns", OperationSpecies::Transport, vec![passage], vec![passage], None, vec![
@@ -678,27 +733,32 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(gated, GeluTanh { c1, c2, terms });
     bond(&mut complex, "gate turns", passage, branches[0], gated, 0)?;
+    let gated = seal(chart, &mut complex, &mut realization, gated, passage, "gated")?;
     let admitted = law(&mut complex, "gate admits", OperationSpecies::Construction, vec![passage, passage], vec![passage], None, vec![
         implementation("Gemma4TextMLP.forward (down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x)))"),
     ])?;
     realization.bind(admitted, Hadamard);
     bond(&mut complex, "admits gate", passage, gated, admitted, 0)?;
     bond(&mut complex, "admits up", passage, branches[1], admitted, 1)?;
+    let admitted = seal(chart, &mut complex, &mut realization, admitted, passage, "admitted")?;
     let down = law(&mut complex, "passage returns", OperationSpecies::Transport, vec![passage], vec![standing], Some(n("mlp.down_proj.weight")), vec![
         implementation("Gemma4TextMLP.forward (down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x)))"),
         shape(&n("mlp.down_proj.weight"), &[HIDDEN, FFN]),
     ])?;
     realization.bind(down, Contract { population: n("mlp.down_proj.weight") });
     bond(&mut complex, "passage returns", passage, admitted, down, 0)?;
+    let down = seal(chart, &mut complex, &mut realization, down, standing, "down")?;
     let dn = law(&mut complex, "post-feedforward rebase", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("post_feedforward_layernorm.weight")),
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.post_feedforward_layernorm(hidden_states))", &n("post_feedforward_layernorm.weight"), HIDDEN))?;
     realization.bind(dn, RmsRebase { group: HIDDEN, gain: Some(n("post_feedforward_layernorm.weight")), eps });
     bond(&mut complex, "down rebases", standing, down, dn, 0)?;
+    let dn = seal(chart, &mut complex, &mut realization, dn, standing, "dn")?;
     let r2 = law(&mut complex, "second re-entry", OperationSpecies::Construction, vec![standing, standing], vec![standing], None,
         vec![implementation(&format!("{decoder} (hidden_states = residual + hidden_states)"))])?;
     realization.bind(r2, ReEntry);
     bond(&mut complex, "second re-entry retains", standing, r1, r2, 0)?;
     bond(&mut complex, "second re-entry returns", standing, dn, r2, 1)?;
+    let r2 = seal(chart, &mut complex, &mut realization, r2, standing, "r2")?;
 
     // the PLE branch, in the source's own order
     let pg = law(&mut complex, "per-layer input gate", OperationSpecies::Transport, vec![standing], vec![ple], Some(n("per_layer_input_gate.weight")), vec![
@@ -707,6 +767,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(pg, Contract { population: n("per_layer_input_gate.weight") });
     bond(&mut complex, "r2 gates", standing, r2, pg, 0)?;
+    let pg = seal(chart, &mut complex, &mut realization, pg, ple, "pg")?;
     let pga = law(&mut complex, "per-layer gate turns", OperationSpecies::Transport, vec![ple], vec![ple], None, vec![
         implementation(&format!("{decoder} (hidden_states = self.act_fn(hidden_states))")),
         implementation("Gemma4TextDecoderLayer.__init__ (self.act_fn = ACT2FN[config.hidden_activation])"),
@@ -714,32 +775,39 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
     ])?;
     realization.bind(pga, GeluTanh { c1, c2, terms });
     bond(&mut complex, "per-layer gate turns", ple, pg, pga, 0)?;
+    let pga = seal(chart, &mut complex, &mut realization, pga, ple, "pga")?;
     let pm = law(&mut complex, "per-layer gate admits the input", OperationSpecies::Construction, vec![ple, ple], vec![ple], None,
         vec![implementation(&format!("{decoder} (hidden_states = hidden_states * per_layer_input)"))])?;
     realization.bind(pm, Hadamard);
     bond(&mut complex, "admits gate", ple, pga, pm, 0)?;
     bond(&mut complex, "admits per-layer input", ple, halved, pm, 1)?;
+    let pm = seal(chart, &mut complex, &mut realization, pm, ple, "pm")?;
     let pp = law(&mut complex, "per-layer projection", OperationSpecies::Transport, vec![ple], vec![standing], Some(n("per_layer_projection.weight")), vec![
         implementation(&format!("{decoder} (hidden_states = self.per_layer_projection(hidden_states))")),
         shape(&n("per_layer_projection.weight"), &[HIDDEN, PLE_WIDTH]),
     ])?;
     realization.bind(pp, Contract { population: n("per_layer_projection.weight") });
     bond(&mut complex, "per-layer projects", ple, pm, pp, 0)?;
+    let pp = seal(chart, &mut complex, &mut realization, pp, standing, "pp")?;
     let ppn = law(&mut complex, "post per-layer input rebase", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("post_per_layer_input_norm.weight")),
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.post_per_layer_input_norm(hidden_states))", &n("post_per_layer_input_norm.weight"), HIDDEN))?;
     realization.bind(ppn, RmsRebase { group: HIDDEN, gain: Some(n("post_per_layer_input_norm.weight")), eps });
     bond(&mut complex, "per-layer rebases", standing, pp, ppn, 0)?;
+    let ppn = seal(chart, &mut complex, &mut realization, ppn, standing, "ppn")?;
     let r3 = law(&mut complex, "third re-entry", OperationSpecies::Construction, vec![standing, standing], vec![standing], None,
         vec![implementation(&format!("{decoder} (hidden_states = residual + hidden_states)"))])?;
     realization.bind(r3, ReEntry);
     bond(&mut complex, "third re-entry retains", standing, r2, r3, 0)?;
     bond(&mut complex, "third re-entry returns", standing, ppn, r3, 1)?;
+    let r3 = seal(chart, &mut complex, &mut realization, r3, standing, "r3")?;
     let out = law(&mut complex, "layer scalar", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("layer_scalar")), vec![
         implementation(&format!("{decoder} (hidden_states *= self.layer_scalar)")),
         shape(&n("layer_scalar"), &[1]),
     ])?;
     realization.bind(out, Scale { by: point_enclosure(layer_scalar) });
     bond(&mut complex, "layer scales", standing, r3, out, 0)?;
+    returns.insert(LAYER_ENCLOSURE, out);
+    let out = seal(chart, &mut complex, &mut realization, out, standing, "out")?;
     returns.insert(LAYER_RETURN, out);
 
     Ok(Founded { complex, realization, returns })
@@ -750,7 +818,7 @@ pub fn found_layer(layer: usize, entry: Entry, scales: &(DyadicEnclosure, Dyadic
 /// other direction — the illicial potential section over the whole vocabulary, one row per token.
 /// `final_logit_softcapping = 30` is a strictly monotone transformation of every coordinate, so the
 /// order faces of this section are its order faces; it is reported, not enacted.
-pub fn found_final(scales_unused: &(DyadicEnclosure, DyadicEnclosure)) -> Result<Founded, String> {
+pub fn found_final(chart: Chart, scales_unused: &(DyadicEnclosure, DyadicEnclosure)) -> Result<Founded, String> {
     let _ = scales_unused;
     let eps = Dyadic::of_binary64_bits(EPS_BITS).map_err(|e| e.to_string())?;
     let mut complex = PortedOperationComplex::new("Gemma-4-E4B final normalization and tied output boundary");
@@ -767,6 +835,7 @@ pub fn found_final(scales_unused: &(DyadicEnclosure, DyadicEnclosure)) -> Result
         rebase_testimony("Gemma4TextModel.forward (hidden_states = self.norm(hidden_states))", FINAL_NORM, HIDDEN))?;
     realization.bind(normed, RmsRebase { group: HIDDEN, gain: Some(FINAL_NORM.to_owned()), eps });
     bond(&mut complex, "final rebases", standing, carried, normed, 0)?;
+    let normed = seal(chart, &mut complex, &mut realization, normed, standing, "final normed")?;
     returns.insert(FINAL_NORMED, normed);
     let potential = law(&mut complex, "tied output boundary", OperationSpecies::Transport, vec![standing], vec![vocabulary], Some(EMBED.to_owned()), vec![
         implementation("Gemma4ForConditionalGeneration.forward (logits = self.lm_head(hidden_states[:, slice_indices, :]))"),
