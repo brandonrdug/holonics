@@ -108,16 +108,49 @@ implementation is absent. One real transport applies at full extent with the car
 posing it densely as exact rationals is **refused** by a declared work receiver naming
 `resident-entries` as the dominating coordinate.
 
-**The contextual operator complex, dissection, condensation, cultivation, native rest, runtime and
-inference do not exist**, measured 2026-08-18 by
-`cargo run --release -q -p holonic-engine --example the_source_diagram_is_bound_or_its_candidates_are_retained -- /home/b/models/gemma-4-E4B-it`,
-which returns `diagram closed false` with `4` open candidate populations and poses no transport, and
-by `ls crates/holonic-engine/examples/ soma/life/examples/`, which carries no driver enacting a
-contextual word on caused material.
+**Stations three, five, eight, nine and eleven returned 2026-08-18** and are recorded in
+[`research/records/2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md`](../research/records/2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md)
+and
+[`research/records/2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md`](../research/records/2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md).
+The bound diagram **conducts** — `120` operations over `21` co-present fronts, `26` construction /
+`60` transport / `34` face, `14` resident contractions carrying `367,001,600` octets, `39,936` grain
+crossings, and `6,221` entries retained whole below the frame, which is what *derived*
+`CARRIER_REACH = 46` from three named refusals rather than declaring it. Of the four open candidate
+populations, a declared family of `32` hand and order faces **separates two and leaves one moot**,
+and its **minimal separating subfamily is `1` of `32`** — the order at coordinate `1024`. Axis
+condensation returns `40` load-bearing against `24` the family cannot separate, `1600` retained plus
+`960` fibre, **with no factor quoted**. The native rest seals `15,910,937` octets carrying the
+diagram, its program, its band elements and the `7` populations the program names; `seal → mount →
+seal` is byte-identical; a **fresh process holding no source handle** returns what the source-fed
+body returned, coordinate by exact coordinate, with a live `/proc/self/fd` audit of `39` descriptors
+taken **after** the deed and none resolving to the source. Cultivation deposits an exact delta
+derived through a declared non-Euclidean **metric adjoint** — defect exactly `0` where a bare
+transpose's is not — with **no step size anywhere**, and grades it against a matched sibling carrying
+the same delta population with only its coordinate incidence withdrawn.
 
-**No executable capability is promoted by this design deposit.** `CONSTRUCTION_STATE.md` remains
-unchanged until the Gemma plan returns an actual source-detached executable native model and passes
-its complete grade.
+**Two of that station's controls were vacuous on the first pass and the repair convicted the seal.**
+The subject-disjoint control was true by construction of the commit and now says so; the ablation
+resealed the predecessor from the source, which is the same bytes by construction. Withdrawing from
+the cultivated rest instead returned `42` of `64` coordinates, because a stored floating species is a
+**quotient** and a quotient has no inverse. What is deposited is what the seal admitted —
+`decode(round(g+δ)) − g`, with the difference retained as a `64`-entry collapsed population — and
+withdrawing that returns `64` of `64` and the predecessor's conduct exactly.
+
+**What the tower still does not reach, measured 2026-08-18.** The aperture is **one site's contact
+half**: `grep -A 8 "stored populations NAMED"` on the seal station's return names `embed_tokens`,
+layer `0`'s `input_layernorm`, `q_norm`, `k_norm`, `q_proj`, `k_proj` and `v_proj` and nothing else,
+so `o_proj`, the whole gated passage, layers `1`–`41` and the emission head are outside it. **No
+front is certified by an `InterchangeCertificate`** —
+`grep -rl "InterchangeCertificate" crates/holonic-engine/examples/` returns exactly one driver,
+`the_front_is_ordered_until_a_certificate_unorders_it.rs`, which is not a Phoenix station. **No
+runtime, inference loop or export exists** — `ls crates/holonic-engine/examples/ soma/life/examples/
+| grep -icE "export|gguf|onnx"` returns `0`, and no driver emits from a sealed native rest. **The
+reborn body has not been re-dissected.**
+
+**No executable capability is promoted by these returns.** `CONSTRUCTION_STATE.md` remains unchanged
+until the Gemma plan returns an actual source-detached executable native model — one that emits —
+and passes its complete grade. What returned is a source-detached executable **site**, which is a
+station and not the model.
 
 ## THE MATHEMATICS CODEC RECOVERS THE OPERATION COMPLEX AND EVERY RESULT RETURNS AS A RECEIVER FACE — 2026-08-18
 
