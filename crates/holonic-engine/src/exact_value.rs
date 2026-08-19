@@ -118,6 +118,87 @@ impl ExactInterval {
         }
     }
 
+    /// **Widen outward onto a dyadic grid, so a chain of enclosures cannot grow its denominator
+    /// without bound.**
+    ///
+    /// The result strictly contains the original — the lower bound floors and the upper ceils — so
+    /// nothing is lost, and the denominators stay at `2^octaves` however long the chain runs.
+    /// Measured 2026-08-18: a geometric ladder of one hundred and twenty-eight enclosures founded
+    /// by exact multiplication carried denominators of five thousand six hundred bits, and a
+    /// twenty-four term series on each was the whole cost of a site.
+    pub fn round_out(&self, octaves: u32) -> Result<Self, ExactValueError> {
+        let scale = Rat::from_integer(BigInt::from(BigUint::one() << octaves as usize));
+        let unit = scale.recip();
+        let floor = |value: &Rat| -> Rat {
+            let scaled = value * &scale;
+            let truncated = scaled.to_integer();
+            let corrected = if scaled.is_negative() && Rat::from_integer(truncated.clone()) != scaled
+            {
+                truncated - BigInt::one()
+            } else {
+                truncated
+            };
+            Rat::from_integer(corrected) * &unit
+        };
+        let ceiling = |value: &Rat| -> Rat {
+            let scaled = value * &scale;
+            let truncated = scaled.to_integer();
+            let corrected = if scaled.is_positive() && Rat::from_integer(truncated.clone()) != scaled
+            {
+                truncated + BigInt::one()
+            } else {
+                truncated
+            };
+            Rat::from_integer(corrected) * &unit
+        };
+        Self::new(floor(&self.lower), ceiling(&self.upper))
+    }
+
+    /// The product of two enclosures. **An interval is a set, so the product is the set's.**
+    pub fn times(&self, other: &Self) -> Result<Self, ExactValueError> {
+        let corners = [
+            &self.lower * &other.lower,
+            &self.lower * &other.upper,
+            &self.upper * &other.lower,
+            &self.upper * &other.upper,
+        ];
+        let mut lower = corners[0].clone();
+        let mut upper = corners[0].clone();
+        for corner in &corners[1..] {
+            if *corner < lower {
+                lower = corner.clone();
+            }
+            if *corner > upper {
+                upper = corner.clone();
+            }
+        }
+        Self::new(lower, upper)
+    }
+
+    /// **Refuses across zero rather than widening to infinity**, which is the honest return: the
+    /// reciprocal of a set containing zero is not an interval.
+    pub fn reciprocal(&self) -> Result<Self, ExactValueError> {
+        if !self.lower.is_positive() && !self.upper.is_negative() {
+            return Err(ExactValueError::ReciprocalStraddlesZero);
+        }
+        let a = self.lower.recip();
+        let b = self.upper.recip();
+        if a <= b {
+            Self::new(a, b)
+        } else {
+            Self::new(b, a)
+        }
+    }
+
+    /// An integer power, by repeated multiplication of the set.
+    pub fn power(&self, exponent: u32) -> Result<Self, ExactValueError> {
+        let mut result = Self::point(Rat::one());
+        for _ in 0..exponent {
+            result = result.times(self)?;
+        }
+        Ok(result)
+    }
+
     pub fn disjoint_order(&self, other: &Self) -> ExactOrdering {
         if self.upper < other.lower {
             ExactOrdering::Less
@@ -288,6 +369,147 @@ impl SeriesTailCertificate {
 
 /// A convergent series face with an exact finite sum and an exact tail
 /// enclosure derived from one supported certificate species.
+/// **The roots a transport actually asks for, isolated by this owner's own certificate.**
+///
+/// A root-mean-square rebase asks for `1/sqrt(s)` and nothing else; a chart width asks for
+/// `1/sqrt(d)`. Both are algebraic of degree two, which is exactly what [`AlgebraicRoot`] is for,
+/// and the Sturm certificate it already carries is what makes the isolation a proof rather than an
+/// iteration count. These are added inside this owner because that is where a root of an exact
+/// rational belongs.
+impl AlgebraicRoot {
+    /// The positive `sqrt(radicand)`, isolated with a Sturm certificate.
+    ///
+    /// The bracket comes from an integer square root at `octaves` dyadic places, so it needs no
+    /// starting guess; the certificate is what verifies it.
+    pub fn square_root(radicand: &Rat, octaves: u32) -> Result<Self, ExactValueError> {
+        Self::degree_two_root(radicand, octaves, false)
+    }
+
+    /// The positive `1/sqrt(radicand)`, isolated with a Sturm certificate.
+    ///
+    /// **This is the return a normalization actually needs**, and taking it directly rather than
+    /// inverting a root keeps one certificate instead of two.
+    pub fn reciprocal_square_root(
+        radicand: &Rat,
+        octaves: u32,
+    ) -> Result<Self, ExactValueError> {
+        Self::degree_two_root(radicand, octaves, true)
+    }
+
+    fn degree_two_root(
+        radicand: &Rat,
+        octaves: u32,
+        reciprocal: bool,
+    ) -> Result<Self, ExactValueError> {
+        if !radicand.is_positive() {
+            return Err(ExactValueError::NonPositiveRadicand);
+        }
+        let numerator = radicand.numer().magnitude().clone();
+        let denominator = radicand.denom().magnitude().clone();
+        // `q x^2 - p` has root sqrt(p/q); `p y^2 - q` has root 1/sqrt(p/q).
+        let polynomial = if reciprocal {
+            IntegerPolynomial::new(vec![
+                -BigInt::from(denominator.clone()),
+                BigInt::zero(),
+                BigInt::from(numerator.clone()),
+            ])?
+        } else {
+            IntegerPolynomial::new(vec![
+                -BigInt::from(numerator.clone()),
+                BigInt::zero(),
+                BigInt::from(denominator.clone()),
+            ])?
+        };
+        // An integer square root at `octaves` dyadic places brackets the value by construction.
+        let scale = BigUint::one() << (2 * octaves as usize);
+        let (over, under) = if reciprocal {
+            (denominator * &scale, numerator)
+        } else {
+            (numerator * &scale, denominator)
+        };
+        let floor = (over / under).sqrt();
+        let unit = Rat::new(
+            BigInt::one(),
+            BigInt::from(BigUint::one() << octaves as usize),
+        );
+        let mut lower = Rat::from_integer(BigInt::from(floor.clone())) * &unit;
+        let mut upper = Rat::from_integer(BigInt::from(floor + 1u32)) * &unit;
+        // A strict interval whose endpoints are not themselves roots, widened outward by one place
+        // where the floor landed exactly on the root.
+        if polynomial.evaluate(&lower).is_zero() {
+            lower -= &unit;
+        }
+        if polynomial.evaluate(&upper).is_zero() {
+            upper += &unit;
+        }
+        if !lower.is_positive() {
+            lower = &unit / Rat::from_integer(BigInt::from(2));
+            if polynomial.evaluate(&lower).is_zero() {
+                lower /= Rat::from_integer(BigInt::from(2));
+            }
+        }
+        Self::isolate(polynomial, ExactInterval::new(lower, upper)?)
+    }
+
+    /// The positive `radicand^(1/degree)`, isolated with a Sturm certificate.
+    ///
+    /// **A chronology ladder's per-band angle is exactly this object**: `base^(-2i/d)` is algebraic
+    /// of degree `d/2`, and taking it as a root rather than through a logarithm keeps the whole
+    /// ladder inside exact arithmetic. The bracket comes from an integer `n`-th root; the
+    /// certificate is what verifies it.
+    pub fn nth_root(radicand: &Rat, degree: u32, octaves: u32) -> Result<Self, ExactValueError> {
+        if !radicand.is_positive() {
+            return Err(ExactValueError::NonPositiveRadicand);
+        }
+        if degree == 0 {
+            return Err(ExactValueError::ConstantPolynomial);
+        }
+        let numerator = radicand.numer().magnitude().clone();
+        let denominator = radicand.denom().magnitude().clone();
+        let mut coefficients = vec![BigInt::zero(); degree as usize + 1];
+        coefficients[0] = -BigInt::from(numerator.clone());
+        coefficients[degree as usize] = BigInt::from(denominator.clone());
+        let polynomial = IntegerPolynomial::new(coefficients)?;
+        let scale = BigUint::one() << (degree as usize * octaves as usize);
+        let floor = (numerator * &scale / denominator).nth_root(degree);
+        let unit = Rat::new(
+            BigInt::one(),
+            BigInt::from(BigUint::one() << octaves as usize),
+        );
+        let mut lower = Rat::from_integer(BigInt::from(floor.clone())) * &unit;
+        let mut upper = Rat::from_integer(BigInt::from(floor + 1u32)) * &unit;
+        if polynomial.evaluate(&lower).is_zero() {
+            lower -= &unit;
+        }
+        if polynomial.evaluate(&upper).is_zero() {
+            upper += &unit;
+        }
+        if !lower.is_positive() {
+            lower = &unit / Rat::from_integer(BigInt::from(2));
+        }
+        Self::isolate(polynomial, ExactInterval::new(lower, upper)?)
+    }
+
+    /// The isolating interval, which **is** the enclosure: the root is inside it and the
+    /// certificate says exactly one root is.
+    pub fn enclosure(&self) -> &ExactInterval {
+        &self.isolating_interval
+    }
+}
+
+/// Past this reach a decaying exponential is below `2^-REACH`, which no grain this workspace
+/// carries can separate from zero. Read off the carrier: `bfloat16` holds eight significand
+/// octaves and `binary64` fifty-two, so sixty-four leaves every declared receiver behind.
+const DECAY_REACH: u32 = 64;
+/// Past this reach a growing exponential leaves any carrier a declared receiver reads, and the
+/// owner **refuses** rather than forming it.
+const GROWTH_REACH: u32 = 64;
+/// Past this reach `tanh` is within `2^(-2 REACH)` of its limit.
+const TANGENT_REACH: u32 = 32;
+/// The dyadic places a composed exponential is held at, so its denominators cannot grow with the
+/// exponent. Sixty-four leaves every declared receiver in this workspace behind.
+const EXPONENTIAL_OCTAVES: u32 = 64;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CertifiedSeries {
     pub expression: ExactExpr,
@@ -317,6 +539,238 @@ impl CertifiedSeries {
             .remainder_interval()
             .expect("a CertifiedSeries retains its validated certificate")
             .translated(&self.partial_sum)
+    }
+
+    /// **`exp(x)` as a certified enclosure**, reduced through the exponential's own homomorphism.
+    ///
+    /// A Taylor series is only well-conditioned near zero: at `x = -15` with forty terms the first
+    /// omitted term is `15^40/40!`, which is larger than `exp(-15)` itself, so the certificate
+    /// closes on an interval hundreds of thousands of times wider than the value. That is not a
+    /// defect of the certificate — it is the honest bound for that many terms — and the repair is
+    /// the function's own law rather than more terms.
+    ///
+    /// `exp(a+b) = exp(a)exp(b)` splits `x` into a whole part and a fraction below one. The whole
+    /// part rides an integer power of `exp(1)`; the fraction takes the series, where it converges
+    /// fast and the geometric bound is tight. `CLAUDE.md` §0l: the additive chart carried to the
+    /// multiplicative one is what `exp` **is**, so using it here is the owner carrying its own
+    /// function.
+    pub fn exponential_enclosure(x: &Rat, terms: usize) -> Result<ExactInterval, ExactValueError> {
+        if terms == 0 {
+            return Err(ExactValueError::EmptySeries);
+        }
+        let negative = x.is_negative();
+        let magnitude = if negative { -x.clone() } else { x.clone() };
+        // **THE APERTURE, and it is a bound rather than a shortcut.** For `x <= -REACH` the value
+        // is below `2^-REACH` because `e > 2`, so `[0, 2^-REACH]` contains it exactly — and no
+        // declared receiver at any grain this workspace carries can separate a finer statement.
+        // Forming `e^REACH` to divide it back out is the same answer at hundreds of times the cost.
+        if negative && magnitude >= Rat::from_integer(BigInt::from(DECAY_REACH)) {
+            return ExactInterval::new(
+                Rat::zero(),
+                Rat::new(BigInt::one(), BigInt::from(BigUint::one() << DECAY_REACH as usize)),
+            );
+        }
+        let whole = magnitude.to_integer();
+        let fraction = &magnitude - Rat::from_integer(whole.clone());
+        let unit = Self::exponential_series(&Rat::one(), terms)?.enclosure();
+        let steps = u32::try_from(&whole).map_err(|_| ExactValueError::TailDoesNotClose)?;
+        if steps > GROWTH_REACH {
+            return Err(ExactValueError::TailDoesNotClose);
+        }
+        // **Held at a grain at every step.** An unheld interval power grows its denominators with
+        // the exponent, and `e^63` composed sixty-three times is the same cost defect as an unheld
+        // ladder. The grain is read off the carrier and the enclosure only ever widens.
+        let mut carried = ExactInterval::point(Rat::one());
+        for _ in 0..steps {
+            carried = carried.times(&unit)?.round_out(EXPONENTIAL_OCTAVES)?;
+        }
+        let carried = carried
+            .times(&Self::exponential_series(&fraction, terms)?.enclosure())?
+            .round_out(EXPONENTIAL_OCTAVES)?;
+        if negative {
+            carried.reciprocal()
+        } else {
+            Ok(carried)
+        }
+    }
+
+    /// **`exp(x)` as a certified series for `|x| <= 1`**, with the geometric tail this owner
+    /// already validates.
+    ///
+    /// After `n` terms every omitted term is at most the first times `(|x|/(n+1))^j`, which is
+    /// exactly [`SeriesTailCertificate::AbsoluteGeometric`]. The owner refuses the certificate
+    /// where the ratio bound does not close the tail, so a caller cannot silently take too few
+    /// terms for its argument. [`Self::exponential_enclosure`] is the reduction that keeps every
+    /// caller inside this domain.
+    pub fn exponential_series(x: &Rat, terms: usize) -> Result<Self, ExactValueError> {
+        if terms == 0 {
+            return Err(ExactValueError::EmptySeries);
+        }
+        let mut sum = Rat::zero();
+        let mut term = Rat::one();
+        for k in 0..terms {
+            sum += &term;
+            term = &term * x / Rat::from_integer(BigInt::from(k as u64 + 1));
+        }
+        let magnitude = |value: &Rat| -> Rat {
+            if value.is_negative() {
+                -value.clone()
+            } else {
+                value.clone()
+            }
+        };
+        let ratio_bound = magnitude(x) / Rat::from_integer(BigInt::from(terms as u64 + 1));
+        if ratio_bound >= Rat::one() {
+            return Err(ExactValueError::TailDoesNotClose);
+        }
+        Self::new(
+            ExactExpr::Rational(x.clone()),
+            sum,
+            BigUint::from(terms as u64),
+            SeriesTailCertificate::AbsoluteGeometric {
+                first_omitted_abs_bound: magnitude(&term),
+                ratio_abs_bound: ratio_bound,
+            },
+        )
+    }
+
+    /// **`cos(x)` and `sin(x)` for `|x| <= 1`**, alternating with monotonically decreasing terms.
+    ///
+    /// For `|x| <= 1` every ratio `x^2/((2k+1)(2k+2))` is at most one half, so the terms decrease
+    /// from the first and the omitted tail is bounded by its first omitted term — exactly
+    /// [`SeriesTailCertificate::AlternatingMonotone`]. A caller past that domain composes the
+    /// rotation group's own law, `R(a+b) = R(a)R(b)`, rather than asking for more terms.
+    pub fn circular_series(x: &Rat, terms: usize) -> Result<(Self, Self), ExactValueError> {
+        if terms == 0 {
+            return Err(ExactValueError::EmptySeries);
+        }
+        let magnitude = if x.is_negative() { -x.clone() } else { x.clone() };
+        if magnitude > Rat::one() {
+            return Err(ExactValueError::TailDoesNotClose);
+        }
+        let square = x * x;
+
+        let mut cosine_sum = Rat::zero();
+        let mut cosine_term = Rat::one();
+        for k in 0..terms {
+            if k % 2 == 0 {
+                cosine_sum += &cosine_term;
+            } else {
+                cosine_sum -= &cosine_term;
+            }
+            let a = Rat::from_integer(BigInt::from(2 * k as u64 + 1));
+            let b = Rat::from_integer(BigInt::from(2 * k as u64 + 2));
+            cosine_term = &cosine_term * &square / (a * b);
+        }
+        let cosine = Self::new(
+            ExactExpr::Rational(x.clone()),
+            cosine_sum,
+            BigUint::from(terms as u64),
+            SeriesTailCertificate::AlternatingMonotone {
+                first_omitted_term: cosine_term,
+            },
+        )?;
+
+        let mut sine_sum = Rat::zero();
+        let mut sine_term = x.clone();
+        for k in 0..terms {
+            if k % 2 == 0 {
+                sine_sum += &sine_term;
+            } else {
+                sine_sum -= &sine_term;
+            }
+            let a = Rat::from_integer(BigInt::from(2 * k as u64 + 2));
+            let b = Rat::from_integer(BigInt::from(2 * k as u64 + 3));
+            sine_term = &sine_term * &square / (a * b);
+        }
+        let sine = Self::new(
+            ExactExpr::Rational(x.clone()),
+            sine_sum,
+            BigUint::from(terms as u64),
+            SeriesTailCertificate::AlternatingMonotone {
+                first_omitted_term: sine_term,
+            },
+        )?;
+        Ok((cosine, sine))
+    }
+
+    /// **A rotation by an integer multiple of one angle, through the group's own law.**
+    ///
+    /// `R(p a) = R(a)^p` by repeated composition of the enclosed group element, so the
+    /// transcendental is evaluated **once per band** and a position is an integer power. The
+    /// chronology's exact carrier is therefore the integer `p`, and no series runs per position.
+    pub fn rotation_power(
+        angle: &Rat,
+        power: u64,
+        terms: usize,
+    ) -> Result<(ExactInterval, ExactInterval), ExactValueError> {
+        let (cosine, sine) = Self::circular_series(angle, terms)?;
+        let mut carried = (ExactInterval::point(Rat::one()), ExactInterval::point(Rat::zero()));
+        let step = (cosine.enclosure(), sine.enclosure());
+        for _ in 0..power {
+            let real = carried
+                .0
+                .times(&step.0)?
+                .translated(&Rat::zero());
+            let cross = carried.1.times(&step.1)?;
+            let cosine_out =
+                ExactInterval::new(&real.lower - &cross.upper, &real.upper - &cross.lower)?;
+            let left = carried.0.times(&step.1)?;
+            let right = carried.1.times(&step.0)?;
+            let sine_out =
+                ExactInterval::new(&left.lower + &right.lower, &left.upper + &right.upper)?;
+            carried = (cosine_out, sine_out);
+        }
+        Ok(carried)
+    }
+
+    /// **`tanh(x)`, taken through the DECAYING exponential so nothing large is ever formed.**
+    ///
+    /// `tanh(x) = sign(x) (1 - e^(-2|x|)) / (1 + e^(-2|x|))`. Written the other way the
+    /// intermediate is `e^(2|x|)`, which leaves every bounded carrier long before the value itself
+    /// stops moving. The identity is exact and the reformulation is the whole difference.
+    ///
+    /// Returns the enclosure rather than a series, because a quotient of two series is not one.
+    pub fn hyperbolic_tangent_enclosure(
+        x: &Rat,
+        terms: usize,
+    ) -> Result<ExactInterval, ExactValueError> {
+        let negative = x.is_negative();
+        let magnitude = if negative { -x.clone() } else { x.clone() };
+        let two = Rat::from_integer(BigInt::from(2));
+        // **THE APERTURE.** Past this reach `e^(-2|x|) <= 2^(-2 REACH)`, so `tanh` is within that
+        // of one and the enclosure below is exact. `TANGENT_REACH` is read off the carrier the
+        // grain uses, not chosen for a result.
+        if magnitude >= Rat::from_integer(BigInt::from(TANGENT_REACH)) {
+            let bound = Rat::new(
+                BigInt::one(),
+                BigInt::from(BigUint::one() << (2 * TANGENT_REACH) as usize),
+            );
+            let one = Rat::one();
+            let low = (&one - &bound) / (&one + &bound);
+            let interval = ExactInterval::new(low, one)?;
+            return Ok(if negative {
+                ExactInterval::new(-interval.upper.clone(), -interval.lower.clone())?
+            } else {
+                interval
+            });
+        }
+        let decaying = Self::exponential_enclosure(&(-(&magnitude * &two)), terms)?;
+        let one = Rat::one();
+        // Both endpoints of a decreasing-in-`u` map, so the bounds swap.
+        let low = (&one - &decaying.upper) / (&one + &decaying.upper);
+        let high = (&one - &decaying.lower) / (&one + &decaying.lower);
+        let (below, above) = if low <= high {
+            (low, high)
+        } else {
+            (high, low)
+        };
+        let interval = ExactInterval::new(below, above)?;
+        Ok(if negative {
+            ExactInterval::new(-interval.upper.clone(), -interval.lower.clone())?
+        } else {
+            interval
+        })
     }
 }
 
@@ -397,6 +851,14 @@ impl ExactValue {
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ExactValueError {
+    #[error("a root was asked of a non-positive radicand")]
+    NonPositiveRadicand,
+    #[error("a series was asked for zero terms")]
+    EmptySeries,
+    #[error("a reciprocal was asked of an enclosure straddling zero")]
+    ReciprocalStraddlesZero,
+    #[error("the geometric ratio bound does not close the tail at the declared term count")]
+    TailDoesNotClose,
     #[error("an exact interval cannot have its lower endpoint above its upper endpoint")]
     ReversedInterval,
     #[error("the zero polynomial does not identify an algebraic species")]
@@ -1319,6 +1781,147 @@ mod emit_side_mouth_tests {
 
 #[cfg(test)]
 mod tests {
+    /// **A root is isolated by a Sturm certificate, not by an iteration count.**
+    ///
+    /// The reciprocal root is what a normalization actually asks for, and taking it directly keeps
+    /// one certificate instead of two.
+    #[test]
+    fn the_roots_a_transport_asks_for_are_isolated_by_certificate() {
+        let two = Rat::from_integer(BigInt::from(2));
+        let root = AlgebraicRoot::square_root(&two, 40).expect("isolated");
+        assert_eq!(root.polynomial.degree(), 2);
+        let enclosure = root.enclosure();
+        // sqrt(2) = 1.41421356237...; the bracket is stated, not computed.
+        let below = Rat::new(BigInt::from(141421356), BigInt::from(100000000));
+        let above = Rat::new(BigInt::from(141421357), BigInt::from(100000000));
+        assert!(enclosure.lower >= below && enclosure.upper <= above);
+        assert_eq!(
+            root.polynomial
+                .distinct_root_count(enclosure)
+                .expect("counted"),
+            1,
+            "the certificate's whole content is that exactly one root is inside"
+        );
+
+        let inverse = AlgebraicRoot::reciprocal_square_root(&two, 40).expect("isolated");
+        // 1/sqrt(2) = 0.70710678118...
+        let below = Rat::new(BigInt::from(70710678), BigInt::from(100000000));
+        let above = Rat::new(BigInt::from(70710679), BigInt::from(100000000));
+        assert!(inverse.enclosure().lower >= below && inverse.enclosure().upper <= above);
+
+        // A perfect square returns an interval containing its exact root and refuses no less.
+        let four = Rat::from_integer(BigInt::from(4));
+        let exact = AlgebraicRoot::square_root(&four, 20).expect("isolated");
+        assert!(
+            exact.enclosure().lower <= Rat::from_integer(BigInt::from(2))
+                && exact.enclosure().upper >= Rat::from_integer(BigInt::from(2))
+        );
+        assert!(AlgebraicRoot::square_root(&-two, 20).is_err());
+    }
+
+    /// **The chronology is an integer, and the rotation stays on the circle.**
+    ///
+    /// The transcendental runs once per band; a position is an integer power of the enclosed group
+    /// element. Composing two positions equals rotating once by their sum, and the modulus is
+    /// preserved — which is what a group element has and a pair of independently bounded numbers
+    /// does not.
+    #[test]
+    fn the_chronology_rides_as_an_integer_power_of_one_group_element() {
+        let step = Rat::new(BigInt::from(1), BigInt::from(8));
+        for position in [1u64, 3, 7, 16] {
+            let (cosine, sine) =
+                CertifiedSeries::rotation_power(&step, position, 30).expect("rotated");
+            let modulus = cosine
+                .times(&cosine)
+                .expect("square")
+                .times(&ExactInterval::point(Rat::one()))
+                .expect("scaled");
+            let cross = sine.times(&sine).expect("square");
+            let total = ExactInterval::new(
+                &modulus.lower + &cross.lower,
+                &modulus.upper + &cross.upper,
+            )
+            .expect("summed");
+            assert!(
+                total.lower <= Rat::one() && total.upper >= Rat::one(),
+                "position {position} left the circle: {total:?}"
+            );
+        }
+        // A band angle is an n-th root, isolated by the same certificate a square root is.
+        let base = Rat::from_integer(BigInt::from(10_000));
+        let band = AlgebraicRoot::nth_root(&base, 128, 40).expect("isolated");
+        assert_eq!(band.polynomial.degree(), 128);
+        // 10000^(1/128) = 1.0746078...; the bracket is stated rather than computed, and the
+        // isolating interval must sit strictly inside it.
+        let below = Rat::new(BigInt::from(10746078), BigInt::from(10000000));
+        let above = Rat::new(BigInt::from(10746079), BigInt::from(10000000));
+        assert!(
+            band.enclosure().lower >= below && band.enclosure().upper <= above,
+            "{:?}",
+            band.enclosure()
+        );
+        assert_eq!(
+            band.polynomial
+                .distinct_root_count(band.enclosure())
+                .expect("counted"),
+            1
+        );
+    }
+
+    /// **The certified series carries the two transcendentals a transport needs**, and refuses
+    /// rather than taking too few terms for its argument.
+    #[test]
+    fn the_certified_series_carries_the_exponential_and_the_tangent() {
+        let three_eighths = Rat::new(BigInt::from(3), BigInt::from(8));
+        let series = CertifiedSeries::exponential_series(&three_eighths, 24).expect("certified");
+        let enclosure = series.enclosure();
+        // exp(3/8) = 1.4549914146...
+        let below = Rat::new(BigInt::from(14549914), BigInt::from(10000000));
+        let above = Rat::new(BigInt::from(14549915), BigInt::from(10000000));
+        assert!(enclosure.lower >= below && enclosure.upper <= above);
+        assert!(matches!(
+            series.tail_certificate,
+            SeriesTailCertificate::AbsoluteGeometric { .. }
+        ));
+        // Too few terms for the argument is refused, not silently taken.
+        assert_eq!(
+            CertifiedSeries::exponential_series(&Rat::from_integer(BigInt::from(40)), 4),
+            Err(ExactValueError::TailDoesNotClose)
+        );
+        // And the reduction keeps every caller inside the series' own domain: exp(-15) returns a
+        // usable enclosure where a direct forty-term series' honest bound is wider than the value.
+        let far = CertifiedSeries::exponential_enclosure(
+            &Rat::from_integer(BigInt::from(-15)),
+            32,
+        )
+        .expect("reduced");
+        assert!(far.lower.is_positive(), "an exponential is never negative");
+        assert!(far.upper < Rat::new(BigInt::from(1), BigInt::from(1_000_000)));
+
+        // tanh through the DECAYING exponential: monotone, bounded, and nothing large forms.
+        let mut previous: Option<ExactInterval> = None;
+        for numerator in [-30i64, -8, -1, 0, 1, 8, 30] {
+            let x = Rat::new(BigInt::from(numerator), BigInt::from(4));
+            let value = CertifiedSeries::hyperbolic_tangent_enclosure(&x, 40).expect("enclosed");
+            assert!(value.lower >= Rat::from_integer(BigInt::from(-1)));
+            assert!(value.upper <= Rat::one());
+            if let Some(before) = previous {
+                assert_eq!(
+                    before.disjoint_order(&value),
+                    ExactOrdering::Less,
+                    "tanh must separate at {numerator}/4"
+                );
+            }
+            previous = Some(value);
+        }
+        // tanh(1/2) = 0.46211715726...
+        let half = Rat::new(BigInt::from(1), BigInt::from(2));
+        let value = CertifiedSeries::hyperbolic_tangent_enclosure(&half, 40).expect("enclosed");
+        let below = Rat::new(BigInt::from(46211715), BigInt::from(100000000));
+        let above = Rat::new(BigInt::from(46211716), BigInt::from(100000000));
+        assert!(value.lower >= below && value.upper <= above, "{value:?}");
+    }
+
     use relational_geometry::{integer, rat};
 
     use super::*;
