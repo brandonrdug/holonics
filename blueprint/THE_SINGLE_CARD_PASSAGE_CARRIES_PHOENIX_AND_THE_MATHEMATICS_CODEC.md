@@ -3,7 +3,7 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap. **Deed H0 returned 2026-08-19** ([the record](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md)); H1 is the open deed; every later deed is open.
+**Status:** active construction contract when named by the roadmap. **Deeds H0 and H1 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md)); H2 is the open deed; every later deed is open.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -566,6 +566,11 @@ Pass controls:
 - reduction tree and reversed control agree;
 - adjoint return reaches every partial chart;
 - pressure remains a local product.
+
+**Returned 2026-08-19** — the record named in the status line; owners `section_partition.rs` and
+`reduction_junction.rs`; driver `the_partition_is_typed_and_the_reduction_is_a_junction.rs`;
+adversary `tests/h1_adversary.rs` (35 attacks, 8 refutations repaired, tests kept). The seven
+controls each fail under a named perturbation on real Gemma shapes.
 
 ### Deed H2 — real Gemma exact contraction is tiled
 

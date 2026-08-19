@@ -86,6 +86,24 @@ typed admission 5 bounded + 31 exhibited unbounded) stand beside the telemetry, 
 never summed. No semantic code changed. **Deed H1 (typed partition and reduction receipts) is
 next.** `CONSTRUCTION_STATE.md` does not move.
 
+**DEED H1 PASSED 2026-08-19 — the partition is typed and the reduction is a junction.** Record:
+[`research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md`](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md).
+Two owners founded by composition after the attempt returned the absent relations (`FrontCell` has no
+coordinate; a footprint certificate cannot fail on a hole; `metric_adjoint` owns one map; `ExactWork`
+never refuses; `receiver_current` has no species axis): the certified coordinate-region partition
+(completeness and disjointness computed by a row-band sweep; junction outputs contained and covered
+by their own partials) and the shared-output reduction junction (the fixed word and its reversed
+control, the width at every node against a declared aperture that refuses by naming the node, one
+directed outward rounding at the boundary with the residual retained, the adjoint into every partial
+chart as an exhibited operator residual under declared metrics). Seven controls fail under their
+perturbations on real Gemma shapes with real bf16 words; **an adversarial pass of 35 public-API
+attacks refuted eight claims of the first build** (foreign junction outputs, uncovered junctions,
+silent zero at a foreign leaf, an unchecked carrier grain, a vacuous authored adjoint probe, a
+literal roundings count, degenerate partitions) — each repaired with the attack kept red-then-green.
+Pressure stays one covector per species with a named zero and an honest `BeyondAperture`. No kernel
+changed; no device mounted; **Deed H2 (the exact tiled contraction) is next**, its design study
+prepared. `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

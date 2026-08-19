@@ -117,6 +117,7 @@ crates/holonic-engine/src/receiver_current.rs	.clone()=14	.collect()=1	Vec=12
 crates/holonic-engine/src/receiver_ecology.rs	.clone()=18	.collect()=16	.into_iter()=1	BTreeMap=10	BTreeSet=10	Vec=28
 crates/holonic-engine/src/receiver_exact_compression.rs	.clone()=3	.collect()=17	.into_iter()=2	BTreeMap=5	BTreeSet=9	Vec=32	VecDeque=2
 crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.flat_map()=2	.into_iter()=1	BTreeMap=14	BTreeSet=18	Vec=25
+crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57
 crates/holonic-engine/src/regime_reading.rs	.clone()=1	.collect()=5	Vec=7
 crates/holonic-engine/src/reopening.rs	.clone()=40	.collect()=15	.flat_map()=2	.into_iter()=1	Vec=55
 crates/holonic-engine/src/resident_law.rs	.clone()=14	.collect()=11	.into_iter()=4	BTreeMap=43	Vec=49
@@ -124,6 +125,7 @@ crates/holonic-engine/src/resident_section.rs	.clone()=8	.collect()=14	.into_ite
 crates/holonic-engine/src/resource.rs	.clone()=6	BTreeMap=10
 crates/holonic-engine/src/returned_reading.rs	.clone()=30	.collect()=33	.flat_map()=2	.into_iter()=9	BTreeMap=5	BTreeSet=20	Vec=54
 crates/holonic-engine/src/running_integral.rs	.clone()=14	.collect()=12	.into_iter()=2	BTreeMap=12	BTreeSet=24	Vec=13	VecDeque=2
+crates/holonic-engine/src/section_partition.rs	.clone()=33	.collect()=13	.flat_map()=1	.into_iter()=2	BTreeMap=8	BTreeSet=4	Vec=93
 crates/holonic-engine/src/sheaf_diffusion.rs	.clone()=21	.collect()=21	.into_iter()=3	BTreeMap=32	BTreeSet=11	Vec=38
 crates/holonic-engine/src/simplicial.rs	.clone()=56	.collect()=26	.flat_map()=5	.into_iter()=12	BTreeMap=28	BTreeSet=23	Vec=51	VecDeque=3
 crates/holonic-engine/src/situated_residual.rs	.clone()=20	.collect()=12	.into_iter()=2	BTreeMap=6	BTreeSet=4	Vec=17

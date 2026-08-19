@@ -328,6 +328,16 @@ pub mod source_occurrence;
 // The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
 // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
 pub mod front_passage;
+// The coordinate-region partition of one section, with its completeness and disjointness computed
+// rather than asserted, its cover and independence certificate composed, and its pressure one
+// covector per resource species. `FrontCell` carries an index and an extent and no coordinate;
+// `certify_footprints` proves disjointness and is blind to a hole, because absence never collides.
+pub mod section_partition;
+// The shared-output junction `y = sum_a T_a y_a`: the partial coordinate regions, the fixed word
+// and its reversed control, the intermediate width at every node against a declared overflow
+// aperture, one directed outward rounding at the declared boundary with its residual, and the
+// adjoint return `T_a^*` into every partial chart under declared metrics.
+pub mod reduction_junction;
 pub mod resident_law;
 pub mod reopening;
 pub mod resource;

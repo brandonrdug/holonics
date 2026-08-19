@@ -685,6 +685,21 @@ impl CompiledPlan<'_> {
     pub fn fronts(&self) -> &[Front] {
         &self.fronts
     }
+    /// **The exact work of one occurrence, borrowed from the shape it was priced under.**
+    ///
+    /// Read-only, and it changes nothing: `LawShape::predicted` was already computed by the law and
+    /// already summed into `deed_prediction` and into each front's `FrontReceipt::predicted`. What
+    /// was missing was any way to *read* it per occurrence — H0's exact-work artifact records the
+    /// absence in its own text, and had to report per-front and per-coupling instead. The plan owns
+    /// the shapes, so the accessor belongs here; the passage consumes the plan and never held them.
+    ///
+    /// It returns an iterator rather than a population, so reading the work materializes nothing:
+    /// the caller decides whether it wants a body, exactly as `receiver_current::sites` does.
+    pub fn occurrence_work(&self) -> impl Iterator<Item = (EventId, &ExactWork)> {
+        self.plans
+            .iter()
+            .map(|plan| (plan.occurrence, &plan.shape.predicted))
+    }
 }
 
 /// The passage over one surface at one grain, under one schedule.
