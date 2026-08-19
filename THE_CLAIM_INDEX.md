@@ -129,7 +129,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (139 deposits of 431)
+## 4 · The 2026-08 record line (141 deposits of 433)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -275,6 +275,8 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_MODEL_AND_THE_PRODUCTION_MET_AND_THE_ANSWER_IS_A_BLOCK_NOT_A_PICK.md` | The model and the production met, and the answer is a block, not a pick |
 | `2026-08-18_THE_MONOID_IS_APERIODIC_BY_CONSTRUCTION_SO_THE_CRYSTAL_NEEDS_THE_TURN.md` | The monoid is aperiodic by construction, so the crystal needs the turn |
 | `2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md` | The ratio crossed, the container produces, and all 168 Gemma circuits are full rank |
+| `2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md` | The seal is a quotient, so what is deposited is what it admitted — and two controls were vacuous |
+| `2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md` | The site conducts, the candidates are separated by one order, and the source departs |
 | `2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md` | The source diagram is bound, the transport is posed, and the work receiver refuses the dense one |
 
 ---

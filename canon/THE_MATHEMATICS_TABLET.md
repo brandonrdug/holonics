@@ -44,7 +44,7 @@ retains both and offers the collapse as a *reading*.
 
 | carrier | keeps | deletes | the deleted thing is | lawful form, and its owner |
 |---|---|---|---|---|
-| **float** | the magnitude | the tail | the residual of the expansion | `CertifiedSeries` + `SeriesTailCertificate`, `holonic-engine/src/exact_value.rs:238` |
+| **float** | the magnitude | the tail | the residual of the expansion | `CertifiedSeries` + `SeriesTailCertificate`, `holonic-engine/src/exact_value.rs:361` |
 | **sign** | the magnitude | the turn | the winding, `−1 = e^{iπ}` | `OrientedWinding` `soma/body/src/channel.rs:111`; `RayCrossings` `relational-geometry/src/exact_analysis.rs` |
 | **reduced coefficient** | the difference | the passages | which hands were actually taken | `ComparativeMultiplicity`, `holonic-engine/src/algebraic.rs`, repaired 2026-08-08 |
 

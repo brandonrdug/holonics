@@ -226,7 +226,7 @@ and the powers of two **cancel identically** — numerator `2^{2(e_a+e_b)}`, den
 `|·|²` is the quotient by the phase circle. Ratios compare by cross-multiplication, so the population
 sorts and medians with **no division at any point**.
 
-`crates/holonic-engine/src/embedding_fiber.rs:227` `align_bfloat16` already produces exactly that
+`crates/holonic-engine/src/embedding_fiber.rs:274` `align_bfloat16` already produces exactly that
 integer alignment, `:358` `ResidentReadout` computes exactly that bracket on the card, and
 `exact_value`'s `ExactOrdering` already compares without dividing. The law is implemented twice: once
 correctly in a directory declared not to be the machine, and once as unjoined organs in the machine.

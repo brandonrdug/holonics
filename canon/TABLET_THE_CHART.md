@@ -288,7 +288,7 @@ unobserved cycle type never excludes a group."* Driven by
 `examples/arithmetic_monodromy_ecology.rs`. So the machine already **computes the obstruction**; what
 it does not do is **transport to the chart the obstruction names**.
 
-Root isolation is likewise exact — `exact_value.rs:189` `AlgebraicRoot` refuses construction unless
+Root isolation is likewise exact — `exact_value.rs:312` `AlgebraicRoot` refuses construction unless
 its Sturm certificate proves exactly one root in the interval, and `implicit.rs:719` returns a full
 certified real-root population at a declared **quartic** aperture. *Root isolation and obstruction
 detection are built; root solving by chart transport is not.*

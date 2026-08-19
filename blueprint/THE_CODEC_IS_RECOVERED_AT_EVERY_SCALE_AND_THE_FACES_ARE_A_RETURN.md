@@ -346,7 +346,7 @@ counts the remainder where the compression organ **exhibits** it.
 
 - `agentic_language.rs:331` `retained_alternatives` gains the **distinguishing word** and the witness
   receiver, so the presentation quotient becomes a division rather than a second undivided pile.
-- `causal_language.rs:1161` `by_token.retain(|_, (horizon, _)| *horizon == greatest_horizon)` returns
+- `causal_language.rs:1503` `by_token.retain(|_, (horizon, _)| *horizon == greatest_horizon)` returns
   its remainder instead of deleting it — and as of 2026-08-18 it is one of two caller-declared
   branching laws rather than the only one. That is the longest-context filter, whose own source comment
   records the consequence: `sources=1` on 89 of 112 emissions.

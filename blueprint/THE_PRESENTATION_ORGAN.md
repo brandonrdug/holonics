@@ -95,7 +95,7 @@ Values which cannot yet be ordered from their exact certificates return `Open` r
 through to an epsilon comparison."*
 
 **The inversion, and it is the organ's whole content.** Mathematica *samples and hopes*. This body
-can *count and know*, because `IntegerPolynomial::distinct_root_count` (`exact_value.rs:164`)
+can *count and know*, because `IntegerPolynomial::distinct_root_count` (`exact_value.rs:287`)
 returns the exact number of distinct real roots in a rational interval from a Sturm sequence, with
 no float anywhere. So a cell does not get subdivided until it looks smooth; it gets **certified**:
 
