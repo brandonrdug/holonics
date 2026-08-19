@@ -87,8 +87,9 @@ pub const SLOT_WORDS: usize = 12;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 13] = [
+pub const KERNELS: [&str; 14] = [
     "section_from_bfloat16",
+    "section_carry",
     "section_contract",
     "section_rms_rebase",
     "section_chronology",
@@ -1159,6 +1160,20 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
     }
 
+    /// The carry of a resident standing into this passage: one read and one write per coordinate,
+    /// no arithmetic, the octave bound unchanged.
+    pub fn shape_carry(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "carry";
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves.max(1)));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
+    }
+
     // -----------------------------------------------------------------------------------------
     // the passage: capture, launch once, read once
     // -----------------------------------------------------------------------------------------
@@ -1364,6 +1379,17 @@ impl<'chart> ResidentSurface<'chart> {
         params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.count() as u32)
             .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_flat(lane, "section_collapse_control", input.count(), &mut params, "collapse-control")
+    }
+
+    /// Record the carry of a resident standing into `out`.
+    pub fn record_carry(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        if input.rows() != out.rows() || input.width() != out.width() {
+            return Err(ResidentRefusal::RowsDisagree { operation: "carry", left: input.rows() * input.width(), right: out.rows() * out.width() });
+        }
+        let mut params = Params::new();
+        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(out.count() as u32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_flat(lane, "section_carry", out.count(), &mut params, "carry")
     }
 
     /// The census of one written section into the occurrence's slot, and the a-priori bound it was

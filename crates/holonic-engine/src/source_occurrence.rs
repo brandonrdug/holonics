@@ -68,6 +68,9 @@ pub enum SourceRefusal {
     ConfigurationValueDiffers { operation: String, field: String, declared: String, measured: String },
     /// A declared shape disagrees with the authenticated container header.
     ShapeDiffers { operation: String, population: String, declared: Vec<usize>, measured: Vec<usize> },
+    /// The container header declares a dtype for the population other than the exact carrier the
+    /// deed decodes — checked, not recorded.
+    DtypeDiffers { operation: String, population: String, declared: String, measured: String },
     /// A binding names a stored population the container does not identify by region.
     PopulationNotIdentified { operation: String, population: String },
     /// An intervention offered as testimony for a source law, or a source law with none.
@@ -96,6 +99,10 @@ pub struct AuthenticatedText {
     /// An exterior version string the caller read from the source's own metadata, if any.
     pub version: Option<String>,
     text: String,
+    /// The text with every Python comment body and string-literal body replaced by spaces of the
+    /// same length (newlines kept), so symbol and slice resolution reads CODE and never a comment
+    /// or a docstring. Same length, same offsets, same line numbers as `text`.
+    scrubbed: String,
     /// Whether the text was read from `locator` (and can be re-read to detect drift) or declared
     /// by content by a caller that already held it.
     read_from_locator: bool,
@@ -118,6 +125,7 @@ impl AuthenticatedText {
             sha256: hex(&Sha256::digest(&bytes)),
             octets: bytes.len() as u64,
             version: version.map(str::to_owned),
+            scrubbed: scrub_python(&text),
             text,
             read_from_locator: true,
         })
@@ -126,6 +134,10 @@ impl AuthenticatedText {
     /// The text this occurrence authenticated, for a caller that resolves against it.
     pub fn text(&self) -> &str {
         &self.text
+    }
+    /// The scrubbed text resolution reads — see [`scrub_python`].
+    pub fn scrubbed(&self) -> &str {
+        &self.scrubbed
     }
 
     /// Re-read the locator and compare: the content must still hash to what was declared. A text
@@ -157,6 +169,7 @@ impl AuthenticatedText {
             sha256: hex(&Sha256::digest(text.as_bytes())),
             octets: text.len() as u64,
             version: version.map(str::to_owned),
+            scrubbed: scrub_python(text),
             text: text.to_owned(),
             read_from_locator: false,
         }
@@ -189,9 +202,23 @@ pub struct AuthenticatedContainer {
     /// makes and records; `None` says it was not taken, never that it was).
     pub content_sha256: Option<String>,
     pub regions: BTreeMap<String, RegionIdentity>,
+    /// The one file occurrence every read of this container must have been of: device, inode,
+    /// size, modification and change instants, taken when the container was authenticated.
+    /// `verify_still` re-reads it and refuses when it moved. `None` says it was not taken.
+    pub identity: Option<crate::foreign_map::FileIdentity>,
 }
 
 impl AuthenticatedContainer {
+    /// Re-read the file occurrence at the locator and refuse when it is not the one authenticated.
+    pub fn verify_still(&self) -> Result<(), SourceRefusal> {
+        let Some(declared) = &self.identity else { return Ok(()) };
+        let now = crate::foreign_map::FileIdentity::at(&self.locator).map_err(|error| SourceRefusal::Unreadable { locator: self.locator.clone(), reason: error.to_string() })?;
+        if now != *declared {
+            return Err(SourceRefusal::Drifted { locator: self.locator.clone(), declared: format!("{declared:?}"), measured: format!("{now:?}") });
+        }
+        Ok(())
+    }
+
     /// Hash the safetensors header (the eight-octet length and the JSON it declares).
     pub fn read_header(locator: &str) -> Result<(u64, u64, String), SourceRefusal> {
         let mut file = std::fs::File::open(locator).map_err(|error| SourceRefusal::Unreadable {
@@ -288,6 +315,71 @@ pub struct SourceOccurrence {
     pub configuration_scope: Vec<String>,
     pub container: AuthenticatedContainer,
     pub assets: Vec<AssetDeclaration>,
+}
+
+/// **Scrub Python for resolution**: every `#` comment body and every string-literal body — single-
+/// or triple-quoted, with `r`/`b`/`f`/`u` prefixes in any case — is replaced by spaces of the same
+/// length, newlines kept, so offsets and line numbers are unchanged and a symbol or slice can only
+/// resolve against code. A slice that occurs only inside a docstring or a comment therefore does
+/// not resolve, which is what "a valid but unrelated slice must not authenticate" requires of the
+/// resolver. Escapes inside strings are honoured; an unterminated string scrubs to the end of
+/// the text, which refuses rather than admits.
+pub fn scrub_python(text: &str) -> String {
+    let bytes = text.as_bytes();
+    let mut out: Vec<u8> = bytes.to_vec();
+    let mut i = 0usize;
+    let n = bytes.len();
+    let blank = |out: &mut Vec<u8>, from: usize, to: usize| {
+        for k in from..to.min(out.len()) {
+            if out[k] != b'\n' {
+                out[k] = b' ';
+            }
+        }
+    };
+    while i < n {
+        let c = bytes[i];
+        if c == b'#' {
+            let mut j = i;
+            while j < n && bytes[j] != b'\n' {
+                j += 1;
+            }
+            blank(&mut out, i + 1, j);
+            i = j;
+            continue;
+        }
+        if c == b'\'' || c == b'"' {
+            // a string literal; its prefix letters (r, b, f, u) precede the quote and are left as code
+            let triple = i + 2 < n && bytes[i + 1] == c && bytes[i + 2] == c;
+            let quote_len = if triple { 3 } else { 1 };
+            let mut j = i + quote_len;
+            let mut closed = false;
+            while j < n {
+                if bytes[j] == b'\\' {
+                    j += 2;
+                    continue;
+                }
+                if triple {
+                    if j + 2 < n && bytes[j] == c && bytes[j + 1] == c && bytes[j + 2] == c {
+                        closed = true;
+                        break;
+                    }
+                } else if bytes[j] == c {
+                    closed = true;
+                    break;
+                } else if bytes[j] == b'\n' {
+                    // a single-quoted string does not cross a line; treat as closed at the newline
+                    break;
+                }
+                j += 1;
+            }
+            blank(&mut out, i + quote_len, j.min(n));
+            i = if closed { j + quote_len } else { j };
+            continue;
+        }
+        i += 1;
+    }
+    // every byte we touched was ASCII, so the result is valid UTF-8
+    String::from_utf8(out).unwrap_or_else(|_| text.to_owned())
 }
 
 /// One segment resolves at a position, or nowhere. The forms a segment may take in the text.
@@ -388,7 +480,9 @@ impl SourceOccurrence {
                 });
             }
         }
-        let text = self.implementation.text();
+        // Resolution reads the SCRUBBED text: comments and string bodies are blank, so a segment
+        // or a slice that occurs only in a docstring or a comment does not resolve.
+        let text = self.implementation.scrubbed();
         let mut scope: &str = text;
         let mut scope_offset = 0usize;
         let mut line = 0usize;
@@ -413,7 +507,23 @@ impl SourceOccurrence {
             }
         }
         if let Some(slice) = slice {
-            if !scope.contains(slice) {
+            // The slice must occur in the scope as CODE: its own string bodies are blanked the way
+            // the text's are, the blanked slice must occur in the blanked scope, and at that very
+            // position the raw text must carry the slice verbatim — so a slice is matched by its
+            // code structure AND its literal contents, never inside a comment or a docstring.
+            let scrubbed_slice = scrub_python(slice);
+            let raw_scope = &self.implementation.text()[scope_offset..scope_offset + scope.len()];
+            let mut found = false;
+            let mut from = 0usize;
+            while let Some(hit) = scope[from..].find(&scrubbed_slice) {
+                let at = from + hit;
+                if raw_scope.get(at..at + slice.len()) == Some(slice) {
+                    found = true;
+                    break;
+                }
+                from = at + 1;
+            }
+            if !found {
                 return Err(SourceRefusal::SliceAbsent {
                     operation: operation.to_owned(),
                     symbol: symbol.to_owned(),
@@ -521,6 +631,9 @@ impl SourceOccurrence {
                                 measured: region.shape.clone(),
                             });
                         }
+                        if region.dtype != "Bf16" && region.dtype != "BF16" {
+                            return Err(SourceRefusal::DtypeDiffers { operation: name.clone(), population: population.clone(), declared: "BF16".to_owned(), measured: region.dtype.clone() });
+                        }
                         validation.shapes.push((population.clone(), shape.clone()));
                         exterior = true;
                     }
@@ -594,9 +707,33 @@ class Attention(nn.Module):
                 header_sha256: String::new(),
                 content_sha256: None,
                 regions,
+                identity: None,
             },
             assets: Vec::new(),
         }
+    }
+
+    #[test]
+    fn resolution_reads_code_and_not_a_comment_or_a_docstring() {
+        let scrubbed = scrub_python("x = 1  # self.fake = 2\ns = \"self.other(\"\nt = '''doc self.third( more\nlines'''\ny = self.real(\n");
+        assert!(scrubbed.contains("x = 1  #"));
+        assert!(!scrubbed.contains("self.fake"));
+        assert!(!scrubbed.contains("self.other"));
+        assert!(!scrubbed.contains("self.third"));
+        assert!(scrubbed.contains("self.real("));
+        assert_eq!(scrubbed.matches('\n').count(), 5, "newlines are kept so line numbers hold");
+        // a symbol whose only occurrence is in a comment does not resolve
+        let text = "class Site:\n    def enter(self):\n        # self.phantom = words\n        x = words * scale\n        doc = \"\"\"phantom = x\"\"\"\n";
+        let occurrence = SourceOccurrence {
+            implementation: AuthenticatedText::of_text("/site.py", text, None),
+            configuration: AuthenticatedText::of_text("/config.json", "{}", None),
+            configuration_scope: Vec::new(),
+            container: AuthenticatedContainer { locator: "/none".to_owned(), octets: 0, header_octets: 0, header_sha256: String::new(), content_sha256: None, regions: BTreeMap::new(), identity: None },
+            assets: Vec::new(),
+        };
+        assert!(matches!(occurrence.resolve_symbol("op", "Site.enter.phantom"), Err(SourceRefusal::SymbolUnresolved { .. })));
+        assert!(matches!(occurrence.resolve_symbol("op", "Site.enter (phantom = x)"), Err(SourceRefusal::SliceAbsent { .. })));
+        assert!(occurrence.resolve_symbol("op", "Site.enter (x = words * scale)").is_ok());
     }
 
     #[test]

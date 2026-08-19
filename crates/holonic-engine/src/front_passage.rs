@@ -88,12 +88,12 @@ use crate::resident_section::{
     SlotReading, StagedWords, TransferCensus, SLOT_WORDS, WORD_OCTAVES,
 };
 use crate::source_occurrence::{BindingValidation, SourceOccurrence, SourceRefusal};
-use crate::traversible_chain::{found, Admittance, Crossing, Standing};
+use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainStanding};
 use mount::GraphCensus;
 
 pub use crate::resident_law::{
-    Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, GeluTanh, Hadamard, MountedPopulation, ReEntry, ResidentLaw,
-    ResidentMaterial, RmsRebase, Scale, WithdrawColumns,
+    Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
+    MountedPopulation, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
@@ -176,6 +176,9 @@ pub enum CompileRefusal {
     Source(SourceRefusal),
     /// A law names material the caller did not mount or read.
     MaterialAbsent { occurrence: EventId, name: String },
+    /// The validated testimony of an occurrence does not entail the law bound to it — a valid but
+    /// unrelated slice, or a parameter no field, shape or slice accounts for.
+    Entailment { occurrence: EventId, operation: String, refusal: EntailmentRefusal },
 }
 
 impl From<SourceRefusal> for CompileRefusal {
@@ -661,6 +664,8 @@ pub struct CompiledPlan<'a> {
     pub apparatus_prediction: ApparatusPrediction,
     pub octave_field: BTreeMap<OccurrencePort, u32>,
     pub source_bindings: Vec<BindingValidation>,
+    /// Per occurrence: how its law's parameters are entailed by the validated testimony.
+    pub entailments: Vec<(EventId, LawEntailment)>,
     pub closure: DiagramClosure,
     terminal: EventId,
     grain: ResidentGrain,
@@ -810,9 +815,25 @@ impl<'chart> FrontPassage<'chart> {
             return Err(CompileRefusal::DiagramOpen(closure).into());
         }
         let source_bindings = source.validate(complex)?;
+        // Every occurrence's law must be ENTAILED by the validated testimony of its operation: a
+        // resolved slice names the operation and every parameter is accounted for by a field, a
+        // shape or a slice. Validation says the testimony is real; entailment says it is THIS law's.
+        let mut entailments: Vec<(EventId, LawEntailment)> = Vec::with_capacity(realization.bindings.len());
         for (occurrence, law) in &realization.bindings {
             if let Err(name) = law.material(material) {
                 return Err(CompileRefusal::MaterialAbsent { occurrence: *occurrence, name }.into());
+            }
+            let operation = complex
+                .shape
+                .occurrences
+                .get(occurrence)
+                .and_then(|o| complex.shape.laws.get(&o.law))
+                .map(|l| l.name.clone())
+                .ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
+            let validation = source_bindings.iter().find(|v| v.operation == operation).ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
+            match law.entailment(validation) {
+                Ok(entailment) => entailments.push((*occurrence, entailment)),
+                Err(refusal) => return Err(CompileRefusal::Entailment { occurrence: *occurrence, operation, refusal }.into()),
             }
         }
         if !complex.shape.occurrences.contains_key(&terminal) {
@@ -962,6 +983,7 @@ impl<'chart> FrontPassage<'chart> {
             apparatus_prediction: apparatus,
             octave_field,
             source_bindings,
+            entailments,
             closure,
             terminal,
             grain: self.grain,
@@ -1198,10 +1220,12 @@ impl<'chart> FrontPassage<'chart> {
             apparatus_prediction: plan.apparatus_prediction,
             octave_field: plan.octave_field,
             source_bindings: plan.source_bindings,
+            entailments: plan.entailments,
             admission,
             mode: surface.mode(),
             traffic,
             terminal: plan.terminal,
+            released: false,
         })
     }
 
@@ -1301,7 +1325,7 @@ fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecolo
     let mut composite = None;
     if let Some(first) = lane_demand.first() {
         if let Ok(admittance) = Admittance::from_shared(first.1.max(1), 1) {
-            let mut chain = found(first.0, &admittance, Standing::Carrying(admittance.value().clone()));
+            let mut chain = found(first.0, &admittance, ChainStanding::Carrying(admittance.value().clone()));
             let mut carrying = admittance;
             let mut whole = true;
             for window in lane_demand.windows(2) {
@@ -1318,7 +1342,7 @@ fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecolo
                     reflection: crossing.reflection(),
                     power_transmission: crossing.power_transmission(),
                 });
-                chain.carry(crossing, to, Standing::Carrying(transmitted.value().clone()));
+                chain.carry(crossing, to, ChainStanding::Carrying(transmitted.value().clone()));
                 carrying = transmitted;
             }
             if whole && chain.hops() > 0 {
@@ -1355,10 +1379,14 @@ pub struct CompiledPassage<'chart> {
     pub apparatus_prediction: ApparatusPrediction,
     pub octave_field: BTreeMap<OccurrencePort, u32>,
     pub source_bindings: Vec<BindingValidation>,
+    /// Per occurrence: the entailment of its law by the validated testimony.
+    pub entailments: Vec<(EventId, LawEntailment)>,
     pub admission: DeedAdmission,
     pub mode: ModeIdentity,
     pub traffic: TrafficReading,
     terminal: EventId,
+    /// A section has been released to a later passage; this passage may not launch again.
+    released: bool,
 }
 
 impl<'chart> CompiledPassage<'chart> {
@@ -1368,6 +1396,15 @@ impl<'chart> CompiledPassage<'chart> {
     }
     pub fn terminal(&self) -> EventId {
         self.terminal
+    }
+    /// **Release a section to a later passage**, with the a-priori bound it was admitted under:
+    /// the residual stream or a shared standing leaves this passage's ownership and enters the next
+    /// passage's material as a [`Standing`]. This passage may not be launched again afterwards;
+    /// the section it wrote has moved.
+    pub fn release_section(&mut self, occurrence: EventId) -> Option<(ResidentSection<'chart>, u32)> {
+        let bound = self.bounds.get(&occurrence).map(|(b, _, _)| *b)?;
+        self.released = true;
+        self.sections.remove(&occurrence).map(|section| (section, bound))
     }
     /// The passage index of an occurrence, as the lineage names it.
     pub fn index_of(&self, occurrence: EventId) -> Option<usize> {
@@ -1430,6 +1467,9 @@ impl<'chart> CompiledPassage<'chart> {
     /// deed is returned whole whether or not the card refused somewhere, and what did not stand
     /// cannot be read as standing.
     pub fn launch(&self, expected: &ModeIdentity) -> Result<PassageReturn, FrontPassageObstruction> {
+        if self.released {
+            return Err(surface_refusal(ResidentRefusal::Declaration { operation: "passage", what: "a section was released to a later passage; this passage may not launch again".to_owned() }));
+        }
         let actual = self.surface.mode();
         if *expected != actual {
             return Err(surface_refusal(ResidentRefusal::ModeMismatch { expected: Box::new(expected.clone()), actual: Box::new(actual) }));
@@ -1510,14 +1550,14 @@ mod tests {
         Some((readout, surface))
     }
 
-    const IMPLEMENTATION: &str = "class Site:\n    def enter(self):\n        x = words * scale\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n";
+    const IMPLEMENTATION: &str = "class Site:\n    def enter(self):\n        x = embed(words) * scale\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n";
 
     fn occurrence() -> SourceOccurrence {
         SourceOccurrence {
             implementation: AuthenticatedText::of_text("/site.py", IMPLEMENTATION, None),
-            configuration: AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 20}}"#, None),
+            configuration: AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 20, "width": 1}}"#, None),
             configuration_scope: vec!["text_config".to_owned()],
-            container: AuthenticatedContainer { locator: "/none".to_owned(), octets: 0, header_octets: 0, header_sha256: String::new(), content_sha256: None, regions: BTreeMap::new() },
+            container: AuthenticatedContainer { locator: "/none".to_owned(), octets: 0, header_octets: 0, header_sha256: String::new(), content_sha256: None, regions: BTreeMap::new(), identity: None },
             assets: Vec::new(),
         }
     }
@@ -1526,8 +1566,8 @@ mod tests {
     fn small_diagram() -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId) {
         let mut complex = PortedOperationComplex::new("small");
         let standing = complex.port("standing");
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }];
-        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = words * scale)")).expect("law");
+        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
+        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
         let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
         let hadamard = complex.bind_operation("hadamard", OperationSpecies::Construction, vec![standing, standing], vec![standing], None, testimony("Site.hadamard (z = x * x)")).expect("law");
         let e = complex.occur(enter).expect("occur");
@@ -1657,10 +1697,10 @@ mod tests {
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let mut fabricated = occurrence();
-        fabricated.implementation = AuthenticatedText::of_text("/site.py", "class Site:\n    def enter(self):\n        x = words * scale\n", None);
+        fabricated.implementation = AuthenticatedText::of_text("/site.py", "class Site:\n    def enter(self):\n        x = embed(words) * scale\n", None);
         assert!(matches!(passage.compile(&complex, &realization, &material, &fabricated, s), Err(FrontPassageObstruction::Compile(CompileRefusal::Source(SourceRefusal::SymbolUnresolved { .. })))));
         let mut drifted = occurrence();
-        drifted.configuration = AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 21}}"#, None);
+        drifted.configuration = AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 21, "width": 1}}"#, None);
         assert!(matches!(passage.compile(&complex, &realization, &material, &drifted, s), Err(FrontPassageObstruction::Compile(CompileRefusal::Source(SourceRefusal::ConfigurationValueDiffers { .. })))));
         complex.retain_undecided(crate::ported_operation::CandidateDiagrams {
             question: "which pairing?".to_owned(),
@@ -1693,8 +1733,8 @@ mod tests {
     fn two_branch_diagram() -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId, EventId, EventId) {
         let mut complex = PortedOperationComplex::new("two branches");
         let standing = complex.port("standing");
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }];
-        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = words * scale)")).expect("law");
+        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
+        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
         let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
         let join = complex.bind_operation("hadamard", OperationSpecies::Construction, vec![standing, standing], vec![standing], None, testimony("Site.hadamard (z = x * x)")).expect("law");
         let ea = complex.occur(enter).expect("occur");
@@ -1845,6 +1885,45 @@ mod tests {
                 assert!(reads.iter().all(|r| footprint.reads.contains(r)));
             }
         }
+    }
+
+    /// A standing released from one passage enters the next as a `Standing` construction: the carry
+    /// is bit-exact, no octet crosses the apparatus boundary, and the released passage may not
+    /// launch again.
+    #[test]
+    fn a_released_standing_enters_the_next_passage_bit_exactly_and_the_releasing_passage_cannot_relaunch() {
+        let Some((_, surface)) = surface() else { return };
+        let (complex, realization, _, s, _) = small_diagram();
+        let material = material();
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let mut first = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, s).expect("binds");
+        let returned = first.launch(&surface.mode()).expect("deed");
+        let face = first.read_terminal(&returned).expect("read");
+        let ingress_before = surface.census().ingress_octets;
+        let (section, bound) = first.release_section(s).expect("released");
+        assert!(matches!(first.launch(&surface.mode()), Err(FrontPassageObstruction::Resource(ResourceObstruction::Surface(ResidentRefusal::Declaration { .. })))));
+        // the next passage: standing → scale by 2, the carry entailed by the slice that names the standing
+        let mut occ = occurrence();
+        occ.implementation = AuthenticatedText::of_text("/site.py", "class Site:\n    def enter(self):\n        x = embed(words) * scale\n        hidden_states = x\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n", None);
+        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }];
+        let mut next = PortedOperationComplex::new("next");
+        let standing = next.port("standing");
+        let carry = next.bind_operation("carry", OperationSpecies::Construction, vec![], vec![standing], None, vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: "Site.enter (hidden_states = x)".to_owned() }]).expect("law");
+        let scale = next.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
+        let c = next.occur(carry).expect("occur");
+        let sc = next.occur(scale).expect("occur");
+        next.carries_precedence("carried scales", standing, OccurrencePort::output(c, 0), OccurrencePort::input(sc, 0)).expect("bond");
+        let mut next_realization = ResidentRealization::default();
+        next_realization.bind(c, Standing { name: "x".to_owned() });
+        next_realization.bind(sc, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        let mut next_material = ResidentMaterial::empty();
+        next_material.standings.insert("x".to_owned(), (section, bound));
+        let second = passage.bind(&next, &next_realization, &next_material, &occ, &DeedReceiver::unbounded(), None, sc).expect("binds");
+        let returned2 = second.launch(&surface.mode()).expect("deed");
+        let doubled = second.read_terminal(&returned2).expect("read");
+        assert_eq!(doubled.len(), face.len());
+        assert!(doubled.iter().zip(&face).all(|((l2, h2), (l, h))| *l2 == 2 * l && *h2 == 2 * h));
+        assert_eq!(surface.census().ingress_octets - ingress_before, 4, "only the one lineage word crossed; the standing did not");
     }
 
     #[test]

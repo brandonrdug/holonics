@@ -892,6 +892,21 @@ extern "C" __global__ void section_collapse_control(
     out_hi[at] = (int64_t)mid;
 }
 
+// **The carry**: a resident standing entering this passage from an earlier one — the residual
+// stream of the previous layer, or a shared K/V standing — copied into this passage's own section
+// so the graph owns what it reads. No octet crosses the apparatus boundary; the lineage is
+// inspected like every other kernel's.
+extern "C" __global__ void section_carry(
+    const int64_t *in_lo, const int64_t *in_hi, uint32_t count,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    out_lo[at] = in_lo[at];
+    out_hi[at] = in_hi[at];
+}
+
 // The census of one written section into the occurrence's own slot: the widest octave, the widest
 // enclosure, whether any coordinate inverted, and whether the a-priori octave bound the occurrence
 // was admitted under HELD. A refuted bound is written into THIS occurrence's refusal word, which

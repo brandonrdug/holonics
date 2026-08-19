@@ -98,19 +98,19 @@ pub fn named(suffix: &str) -> String {
     format!("model.language_model.layers.{LAYER}.{suffix}")
 }
 
-fn implementation(symbol: &str) -> SourceTestimony {
+pub fn implementation(symbol: &str) -> SourceTestimony {
     SourceTestimony::Implementation { locator: IMPLEMENTATION.to_owned(), symbol: symbol.to_owned() }
 }
 
-fn configuration(field: &str, value: &str) -> SourceTestimony {
+pub fn configuration(field: &str, value: &str) -> SourceTestimony {
     SourceTestimony::Configuration { field: field.to_owned(), value: value.to_owned() }
 }
 
-fn shape(population: &str, shape: &[usize]) -> SourceTestimony {
+pub fn shape(population: &str, shape: &[usize]) -> SourceTestimony {
     SourceTestimony::DeclaredShape { population: population.to_owned(), shape: shape.to_vec() }
 }
 
-fn intervention(statement: &str) -> SourceTestimony {
+pub fn intervention(statement: &str) -> SourceTestimony {
     SourceTestimony::Intervention { statement: statement.to_owned() }
 }
 
@@ -131,13 +131,13 @@ impl Source {
         Ok(Self { root: root.to_owned(), file, container })
     }
 
-    fn whole(&mut self, population: &str) -> Result<(Vec<u16>, Vec<usize>), String> {
+    pub fn whole(&mut self, population: &str) -> Result<(Vec<u16>, Vec<usize>), String> {
         let shape = self.container.tensor(population).map_err(|error| error.to_string())?.shape.clone();
         let words = self.container.read_bf16_whole(&mut self.file, population).map_err(|error| error.to_string())?;
         Ok((words, shape))
     }
 
-    fn rows(&mut self, population: &str, from: usize, count: usize) -> Result<(Vec<u16>, usize), String> {
+    pub fn rows(&mut self, population: &str, from: usize, count: usize) -> Result<(Vec<u16>, usize), String> {
         self.container.read_rows_bf16(&mut self.file, population, from, count).map_err(|error| error.to_string())
     }
 
@@ -155,7 +155,7 @@ impl Source {
     }
 }
 
-fn digest_words(words: &[u16]) -> String {
+pub fn digest_words(words: &[u16]) -> String {
     let mut hasher = Sha256::new();
     for word in words {
         hasher.update(word.to_le_bytes());
@@ -385,7 +385,7 @@ pub fn source_occurrence(root: &str, regions: BTreeMap<String, RegionIdentity>, 
         implementation,
         configuration,
         configuration_scope: vec!["text_config".to_owned()],
-        container: AuthenticatedContainer { locator, octets, header_octets, header_sha256, content_sha256, regions },
+        container: AuthenticatedContainer { identity: holonic_engine::foreign_map::FileIdentity::at(&locator).ok(), locator, octets, header_octets, header_sha256, content_sha256, regions },
         assets,
     })
 }
@@ -402,12 +402,12 @@ pub struct Founded {
     pub returns: BTreeMap<&'static str, EventId>,
 }
 
-fn law(complex: &mut PortedOperationComplex, name: &str, species: OperationSpecies, inputs: Vec<BoundaryId>, outputs: Vec<BoundaryId>, carrier: Option<String>, testimony: Vec<SourceTestimony>) -> Result<EventId, String> {
+pub fn law(complex: &mut PortedOperationComplex, name: &str, species: OperationSpecies, inputs: Vec<BoundaryId>, outputs: Vec<BoundaryId>, carrier: Option<String>, testimony: Vec<SourceTestimony>) -> Result<EventId, String> {
     let law = complex.bind_operation(name, species, inputs, outputs, carrier, testimony).map_err(|e| e.to_string())?;
     complex.occur(law).map_err(|e| e.to_string())
 }
 
-fn bond(complex: &mut PortedOperationComplex, name: &str, port: BoundaryId, from: EventId, to: EventId, input: usize) -> Result<(), String> {
+pub fn bond(complex: &mut PortedOperationComplex, name: &str, port: BoundaryId, from: EventId, to: EventId, input: usize) -> Result<(), String> {
     complex.carries_precedence(name, port, OccurrencePort::output(from, 0), OccurrencePort::input(to, input)).map_err(|e| e.to_string())
 }
 
@@ -422,7 +422,7 @@ pub enum Sibling {
 }
 
 /// The RMS rebase's testimony: the source law, its epsilon, and the gain's declared shape.
-fn rebase_testimony(site: &str, population: &str, group: usize) -> Vec<SourceTestimony> {
+pub fn rebase_testimony(site: &str, population: &str, group: usize) -> Vec<SourceTestimony> {
     vec![
         implementation(site),
         implementation("Gemma4RMSNorm._norm (mean_squared = hidden_states.pow(2).mean(-1, keepdim=True) + self.eps)"),
@@ -555,6 +555,7 @@ pub fn found_deed(scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAper
         implementation("Gemma4TextAttention.__init__ (self.v_norm = Gemma4RMSNorm(self.head_dim, eps=config.rms_norm_eps, with_scale=False))"),
         implementation("Gemma4RMSNorm._norm (return hidden_states * torch.pow(mean_squared, -0.5))"),
         configuration("rms_norm_eps", "1e-06"),
+        configuration("head_dim", "256"),
     ])?;
     realization.bind(vn, RmsRebase { group: HEAD_WIDTH, gain: None, eps });
     bond(&mut complex, "v rebases", families, projections[2], vn, 0)?;
@@ -585,6 +586,9 @@ pub fn found_deed(scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAper
             configuration("rope_parameters.sliding_attention.rope_type", "default"),
             configuration("rope_parameters.sliding_attention.rope_theta", "10000.0"),
             configuration("layer_types[0]", "sliding_attention"),
+            configuration("num_attention_heads", "8"),
+            configuration("num_key_value_heads", "2"),
+            configuration("head_dim", "256"),
         ]
     };
     let qr = law(&mut complex, "receiver chronology", OperationSpecies::Transport, vec![receivers], vec![receivers], None,
@@ -607,6 +611,7 @@ pub fn found_deed(scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAper
         configuration("sliding_window", "512"),
         configuration("num_attention_heads", "8"),
         configuration("num_key_value_heads", "2"),
+        configuration("head_dim", "256"),
     ])?;
     realization.bind(contact, Contact { heads: HEADS, kv_heads: KV_HEADS, head_width: HEAD_WIDTH, window: SLIDING_WINDOW, terms });
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;

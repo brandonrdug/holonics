@@ -261,6 +261,18 @@ is gone**: eleven owner-local laws in `crates/holonic-engine/src/resident_law.rs
 parity over 5,120), seven later stations open by name. `CONSTRUCTION_STATE.md` does not move;
 Station B (complete source admission and potential transport) is next.
 
+**THE SOURCE IS ADMITTED WHOLE AND THE POTENTIAL ATLAS COVERS THE TOWER — Station B PASSED
+2026-08-19.** Record:
+[`research/records/2026-08-19_THE_SOURCE_IS_ADMITTED_WHOLE_AND_THE_POTENTIAL_ATLAS_COVERS_THE_TOWER.md`](../research/records/2026-08-19_THE_SOURCE_IS_ADMITTED_WHOLE_AND_THE_POTENTIAL_ATLAS_COVERS_THE_TOWER.md).
+All 2,130 populations manifested, every region hashed in one streamed pass, **every `BF16`
+codeword — 7,996,157,418 — decoded exactly through the one float mouth**, 2,130 decoded-exact;
+file identity bound before and after; dtype checked; resolution blind to comments and strings;
+every law entailed by its validated testimony so an unrelated slice cannot authenticate; the
+potential atlas founded over all 42 layers with both species, both RoPE species, the KV-sharing
+realization (54 stored populations named unbound by the source), the final norm, the tied boundary
+and the modality projections — 1,466 operations, 1,466 entailed. Eleven falsifiers pass. A potential
+atlas is not an active one; Station C enacts the tower. `CONSTRUCTION_STATE.md` does not move.
+
 **The workflow was separately re-audited the same day.** The complete gate was being used as an
 inner loop, release all-target builds repeatedly linked the evidence-driver population, and selected
 gate results were spliced into a complete-gate report. The binding validation cadence is deposited

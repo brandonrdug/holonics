@@ -51,6 +51,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
+use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -377,6 +378,143 @@ impl CoverageLedger {
 
     pub fn declared(&self) -> usize {
         self.state.len()
+    }
+}
+
+/// The class of one `bfloat16` codeword, read through the one float mouth once per distinct word.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CodewordClass {
+    Zero,
+    Subnormal,
+    Normal { exponent: i32 },
+    NonFinite,
+}
+
+fn census_word(region: &mut RegionCensus, table: &[CodewordClass], word: u16) {
+    region.codewords += 1;
+    match table[usize::from(word)] {
+        CodewordClass::Zero => {
+            region.finite += 1;
+            region.zero += 1;
+        }
+        CodewordClass::Subnormal => {
+            region.finite += 1;
+            region.subnormal += 1;
+        }
+        CodewordClass::Normal { exponent } => {
+            region.finite += 1;
+            region.exponent_min = Some(region.exponent_min.map_or(exponent, |e: i32| e.min(exponent)));
+            region.exponent_max = Some(region.exponent_max.map_or(exponent, |e: i32| e.max(exponent)));
+        }
+        CodewordClass::NonFinite => region.non_finite += 1,
+    }
+}
+
+/// **One stable file occurrence**: device, inode, size and the modification and change instants,
+/// read before and after a pass. Equality across the pass is the proof that the digest, the census
+/// and any mount read one occurrence; it is not an identity and nothing is keyed by it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FileIdentity {
+    pub device: u64,
+    pub inode: u64,
+    pub octets: u64,
+    pub modified_secs: i64,
+    pub modified_nanos: i64,
+    pub changed_secs: i64,
+    pub changed_nanos: i64,
+}
+
+impl FileIdentity {
+    /// Read the identity of an open file.
+    pub fn of(file: &File, address: &str) -> Result<Self, ForeignMapError> {
+        use std::os::unix::fs::MetadataExt;
+        let metadata = file.metadata().map_err(|error| ForeignMapError::Open { address: address.to_owned(), reason: error.to_string() })?;
+        Ok(Self {
+            device: metadata.dev(),
+            inode: metadata.ino(),
+            octets: metadata.len(),
+            modified_secs: metadata.mtime(),
+            modified_nanos: metadata.mtime_nsec(),
+            changed_secs: metadata.ctime(),
+            changed_nanos: metadata.ctime_nsec(),
+        })
+    }
+    /// Read the identity at an address, opening it only to stat it.
+    pub fn at(address: &str) -> Result<Self, ForeignMapError> {
+        let file = File::open(address).map_err(|error| ForeignMapError::Open { address: address.to_owned(), reason: error.to_string() })?;
+        Self::of(&file, address)
+    }
+}
+
+/// The census of one declared region after the streamed pass.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RegionCensus {
+    pub name: String,
+    pub dtype: ForeignDtype,
+    pub shape: Vec<usize>,
+    pub start: u64,
+    pub end: u64,
+    /// The region's own content digest — a frame declaration for the region, never an identity.
+    pub sha256: String,
+    pub octets: u64,
+    pub codewords: u64,
+    pub finite: u64,
+    pub non_finite: u64,
+    pub zero: u64,
+    pub subnormal: u64,
+    /// The unbiased exponent of the leading one over the finite nonzero normal codewords.
+    pub exponent_min: Option<i32>,
+    pub exponent_max: Option<i32>,
+    /// Founded by the pass: `DecodedExact` when every codeword decoded finite through the mouth,
+    /// `UnreadRefused` when any did not, `ManifestedOnly` for a dtype this pass does not decode.
+    pub admission: AdmissionClass,
+}
+
+impl RegionCensus {
+    pub fn rank(&self) -> usize {
+        self.shape.len()
+    }
+}
+
+/// **The streamed census of one container**: the whole-file and header digests, every region's
+/// digest and decode census, the octets no region claimed, and the pass's own residency and work.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StreamedCensus {
+    pub address: String,
+    pub identity: FileIdentity,
+    pub header_sha256: String,
+    pub content_sha256: String,
+    pub regions: Vec<RegionCensus>,
+    pub uncovered_payload_octets: u64,
+    pub chunk_octets: usize,
+    /// The pass's peak residency on the serial chart: the chunk buffer, the length word, and one
+    /// carried octet per region.
+    pub peak_resident_octets: u64,
+    pub octets_hashed: u64,
+    pub codewords_decoded: u64,
+}
+
+impl StreamedCensus {
+    pub fn region(&self, name: &str) -> Option<&RegionCensus> {
+        self.regions.iter().find(|region| region.name == name)
+    }
+    /// Admission census: how many regions landed in each class.
+    pub fn admission_census(&self) -> BTreeMap<AdmissionClass, usize> {
+        let mut census = BTreeMap::new();
+        for region in &self.regions {
+            *census.entry(region.admission).or_insert(0) += 1;
+        }
+        census
+    }
+    /// Rank census over the regions: `(count, octets)` per rank.
+    pub fn rank_census(&self) -> BTreeMap<usize, (usize, u64)> {
+        let mut census = BTreeMap::new();
+        for region in &self.regions {
+            let entry = census.entry(region.rank()).or_insert((0usize, 0u64));
+            entry.0 += 1;
+            entry.1 += region.octets;
+        }
+        census
     }
 }
 
@@ -958,6 +1096,184 @@ impl ForeignContainer {
             .collect())
     }
 
+    /// ★ **THE STREAMED CENSUS: every region hashed and every `BF16` codeword decoded exactly, in one
+    /// pass over the payload, with the file occurrence bound before and after.**
+    ///
+    /// Station B of the Phoenix sequence owes a manifest over **all** declared populations whose
+    /// admission status is founded by a decode and not by association. Reading 16 GB twice is what
+    /// a separate digest and a separate decode would cost, so this is one pass: the payload is read
+    /// in `chunk_octets` pieces in file order; the whole-file hasher sees every octet (header first,
+    /// then payload, gaps included); each region's own hasher sees its octets; and each `BF16`
+    /// region's codewords go through the **one float mouth** — `decode_bfloat16_bits`, evaluated once
+    /// per distinct codeword into a 65,536-entry table because a `bfloat16` has exactly that many —
+    /// to a census of finite, non-finite, zero and subnormal codewords and the unbiased exponent
+    /// range. A region whose dtype is not `BF16` is hashed and left `ManifestedOnly` by name; a
+    /// `BF16` region carrying a non-finite codeword is `UnreadRefused` by name with the count.
+    ///
+    /// The peak residency is the chunk buffer plus one hasher per open region; the exact work is the
+    /// octets hashed (twice — once for the whole, once for the region) and the codewords decoded.
+    /// `FileIdentity` is read before the pass and after it; if it moved, the census is refused
+    /// rather than returned — the digest must read one stable occurrence.
+    pub fn streamed_census(&self, file: &mut File, chunk_octets: usize) -> Result<StreamedCensus, ForeignMapError> {
+        use sha2::{Digest, Sha256};
+        let identity_before = FileIdentity::of(file, &self.address)?;
+        let ContainerSpecies::Safetensors { header_octets, base } = &self.species;
+        let header_octets = *header_octets;
+        let base = *base;
+        // the codeword table: one mouth, evaluated once per distinct word
+        let table: Vec<CodewordClass> = (0..=u16::MAX)
+            .map(|word| match decode_bfloat16_bits(word) {
+                Ok(datum) => {
+                    if datum.significand == BigUint::from(0u32) {
+                        CodewordClass::Zero
+                    } else if datum.subnormal {
+                        CodewordClass::Subnormal
+                    } else {
+                        // the unbiased exponent of the leading one: value ∈ [2^e, 2^(e+1))
+                        CodewordClass::Normal { exponent: datum.ulp_exponent + 7 }
+                    }
+                }
+                Err(_) => CodewordClass::NonFinite,
+            })
+            .collect();
+        // regions in file order
+        let mut ordered: Vec<(&String, &ForeignTensor)> = self.tensors.iter().collect();
+        ordered.sort_by_key(|(_, tensor)| (tensor.start, tensor.end));
+        let mut regions: Vec<RegionCensus> = ordered
+            .iter()
+            .map(|(name, tensor)| RegionCensus {
+                name: (*name).clone(),
+                dtype: tensor.dtype.clone(),
+                shape: tensor.shape.clone(),
+                start: tensor.start,
+                end: tensor.end,
+                sha256: String::new(),
+                octets: 0,
+                codewords: 0,
+                finite: 0,
+                non_finite: 0,
+                zero: 0,
+                subnormal: 0,
+                exponent_min: None,
+                exponent_max: None,
+                admission: AdmissionClass::ManifestedOnly,
+            })
+            .collect();
+        let mut hashers: Vec<Option<Sha256>> = (0..regions.len()).map(|_| None).collect();
+        let mut carry: Vec<Option<u8>> = vec![None; regions.len()];
+        let mut whole = Sha256::new();
+        // the header, as it lies
+        file.seek(SeekFrom::Start(0)).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
+        let mut head = vec![0u8; usize::try_from(base).map_err(|_| ForeignMapError::HeaderTooLong { address: self.address.clone(), declared: header_octets })?];
+        file.read_exact(&mut head).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
+        whole.update(&head);
+        let mut header_hasher = Sha256::new();
+        header_hasher.update(&head[8..]);
+        let header_sha256: String = header_hasher.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+        // the payload, chunk by chunk
+        let chunk = chunk_octets.max(2) & !1usize;
+        let mut buffer = vec![0u8; chunk];
+        let mut offset: u64 = 0; // payload-relative
+        let mut next_region = 0usize; // first region not yet finished
+        let mut uncovered_octets: u64 = 0;
+        let mut octets_hashed: u64 = 0;
+        let mut codewords_decoded: u64 = 0;
+        let payload = self.payload_octets;
+        while offset < payload {
+            let want = usize::try_from((payload - offset).min(chunk as u64)).unwrap_or(chunk);
+            let read = file.read(&mut buffer[..want]).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
+            if read == 0 {
+                return Err(ForeignMapError::Read { name: self.address.clone(), reason: format!("the payload ended at {offset} of {payload}") });
+            }
+            let piece = &buffer[..read];
+            whole.update(piece);
+            octets_hashed += read as u64;
+            let chunk_from = offset;
+            let chunk_to = offset + read as u64;
+            // every region meeting this chunk
+            let mut covered_in_chunk: u64 = 0;
+            let mut at = next_region;
+            while at < regions.len() && regions[at].start < chunk_to {
+                let region = &mut regions[at];
+                if region.end <= chunk_from {
+                    at += 1;
+                    continue;
+                }
+                let from = region.start.max(chunk_from);
+                let to = region.end.min(chunk_to);
+                if from < to {
+                    let slice = &piece[(from - chunk_from) as usize..(to - chunk_from) as usize];
+                    let hasher = hashers[at].get_or_insert_with(Sha256::new);
+                    hasher.update(slice);
+                    octets_hashed += slice.len() as u64;
+                    region.octets += slice.len() as u64;
+                    covered_in_chunk += slice.len() as u64;
+                    if region.dtype == ForeignDtype::Bf16 {
+                        let mut words = slice;
+                        if let Some(first) = carry[at].take() {
+                            // a codeword split across chunks
+                            let word = u16::from_le_bytes([first, words[0]]);
+                            census_word(region, &table, word);
+                            codewords_decoded += 1;
+                            words = &words[1..];
+                        }
+                        let whole_words = words.len() & !1usize;
+                        for pair in words[..whole_words].chunks_exact(2) {
+                            census_word(region, &table, u16::from_le_bytes([pair[0], pair[1]]));
+                        }
+                        codewords_decoded += (whole_words / 2) as u64;
+                        if whole_words < words.len() {
+                            carry[at] = Some(words[whole_words]);
+                        }
+                    }
+                }
+                if region.end <= chunk_to {
+                    // finished: seal its hash and its admission
+                    if let Some(hasher) = hashers[at].take() {
+                        region.sha256 = hasher.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+                    }
+                    region.admission = if region.dtype != ForeignDtype::Bf16 {
+                        AdmissionClass::ManifestedOnly
+                    } else if region.non_finite > 0 {
+                        AdmissionClass::UnreadRefused
+                    } else {
+                        AdmissionClass::DecodedExact
+                    };
+                    if at == next_region {
+                        next_region += 1;
+                    }
+                }
+                at += 1;
+            }
+            // gaps: octets of this chunk no region claimed (regions do not overlap — validated at manifest)
+            uncovered_octets += (read as u64).saturating_sub(covered_in_chunk);
+            offset = chunk_to;
+        }
+        // regions never reached (past the payload) stay unsealed: refuse by name
+        for (at, region) in regions.iter_mut().enumerate() {
+            if hashers[at].is_some() || (region.end > region.start && region.sha256.is_empty()) {
+                region.admission = AdmissionClass::UnreadRefused;
+            }
+        }
+        let content_sha256: String = whole.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+        let identity_after = FileIdentity::of(file, &self.address)?;
+        if identity_before != identity_after {
+            return Err(ForeignMapError::Read { name: self.address.clone(), reason: format!("the file occurrence moved during the pass: {identity_before:?} → {identity_after:?}") });
+        }
+        Ok(StreamedCensus {
+            address: self.address.clone(),
+            identity: identity_before,
+            header_sha256,
+            content_sha256,
+            regions,
+            uncovered_payload_octets: uncovered_octets,
+            chunk_octets: chunk,
+            peak_resident_octets: chunk as u64 + 8 + (self.tensors.len() as u64) * 2,
+            octets_hashed,
+            codewords_decoded,
+        })
+    }
+
     /// Found a ledger over the whole manifested population, with every refusal already placed.
     ///
     /// Nothing is promoted here. Every readable entry starts manifested and **transport-unposed**;
@@ -1177,6 +1493,58 @@ mod tests {
         );
         assert!(ForeignDtype::F32.exactly_decodable());
         assert!(ForeignDtype::F64.exactly_decodable());
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// The streamed census: two `BF16` regions (one carrying an infinity at a nonzero coordinate),
+    /// one `F32` region, and a gap between regions; every digest is checked against a direct
+    /// computation, the decode census is checked word by word, and a tiny chunk forces a codeword
+    /// to straddle chunks.
+    #[test]
+    fn the_streamed_census_hashes_every_region_decodes_every_bf16_codeword_and_reports_the_gap() {
+        use sha2::{Digest, Sha256};
+        let path = scratch("streamed");
+        // region a: [1.0, 2.0, -1.5, 0.5, 0 (zero), subnormal 0x0001] at 0..12
+        let a_words: [u16; 6] = [0x3F80, 0x4000, 0xBFC0, 0x3F00, 0x0000, 0x0001];
+        // gap of 2 octets at 12..14
+        // region b: [1.0, +inf, 3.0] at 14..20 — +inf at coordinate 1
+        let b_words: [u16; 3] = [0x3F80, 0x7F80, 0x4040];
+        // region c: one f32 1.0 at 20..24
+        let mut payload: Vec<u8> = Vec::new();
+        for w in a_words { payload.extend_from_slice(&w.to_le_bytes()); }
+        payload.extend_from_slice(&[0xAA, 0xBB]);
+        for w in b_words { payload.extend_from_slice(&w.to_le_bytes()); }
+        payload.extend_from_slice(&1.0f32.to_le_bytes());
+        let header = r#"{"a":{"dtype":"BF16","shape":[2,3],"data_offsets":[0,12]},"b":{"dtype":"BF16","shape":[3],"data_offsets":[14,20]},"c":{"dtype":"F32","shape":[],"data_offsets":[20,24]}}"#;
+        write_container(&path, header, &payload);
+        let (mut file, container) = manifest_safetensors(path.to_str().expect("path")).expect("manifest");
+        for chunk in [2usize, 3, 5, 1 << 20] {
+            let census = container.streamed_census(&mut file, chunk).expect("census");
+            let hex = |bytes: &[u8]| -> String { Sha256::digest(bytes).iter().map(|o| format!("{o:02x}")).collect() };
+            assert_eq!(census.region("a").expect("a").sha256, hex(&payload[0..12]), "chunk {chunk}");
+            assert_eq!(census.region("b").expect("b").sha256, hex(&payload[14..20]));
+            assert_eq!(census.region("c").expect("c").sha256, hex(&payload[20..24]));
+            let mut whole: Vec<u8> = Vec::new();
+            whole.extend_from_slice(&(header.len() as u64).to_le_bytes());
+            whole.extend_from_slice(header.as_bytes());
+            whole.extend_from_slice(&payload);
+            assert_eq!(census.content_sha256, hex(&whole));
+            assert_eq!(census.header_sha256, hex(header.as_bytes()));
+            let a = census.region("a").expect("a");
+            assert_eq!((a.codewords, a.finite, a.non_finite, a.zero, a.subnormal), (6, 6, 0, 1, 1));
+            assert_eq!((a.exponent_min, a.exponent_max), (Some(-1), Some(1)));
+            assert_eq!(a.admission, AdmissionClass::DecodedExact);
+            let b = census.region("b").expect("b");
+            assert_eq!((b.codewords, b.finite, b.non_finite), (3, 2, 1));
+            assert_eq!(b.admission, AdmissionClass::UnreadRefused, "a non-finite codeword refuses the region by name");
+            let c = census.region("c").expect("c");
+            assert_eq!(c.admission, AdmissionClass::ManifestedOnly);
+            assert_eq!(c.codewords, 0);
+            assert_eq!(census.uncovered_payload_octets, 2);
+            assert_eq!(census.codewords_decoded, 9);
+            assert_eq!(census.octets_hashed, 24 + 22);
+            assert_eq!(census.identity.octets, whole.len() as u64);
+        }
         let _ = std::fs::remove_file(&path);
     }
 

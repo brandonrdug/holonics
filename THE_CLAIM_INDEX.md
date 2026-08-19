@@ -129,7 +129,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (150 deposits of 442)
+## 4 · The 2026-08 record line (151 deposits of 443)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -287,6 +287,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md` | The source diagram is bound, the transport is posed, and the work receiver refuses the dense one |
 | `2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md` | The layer is one graph launched once, and the immediate gate returns its falsifiers with the ratchet open |
 | `2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md` | The refusal travels along the lineage, the admission is typed, and the ratchet is dispositioned |
+| `2026-08-19_THE_SOURCE_IS_ADMITTED_WHOLE_AND_THE_POTENTIAL_ATLAS_COVERS_THE_TOWER.md` | The source is admitted whole, and the potential atlas covers the tower |
 
 ---
 
@@ -303,7 +304,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 9 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 14 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `canon/THE_DRIVER_ATLAS.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, and 1 more |
