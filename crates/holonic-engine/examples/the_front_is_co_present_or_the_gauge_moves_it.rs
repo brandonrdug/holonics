@@ -101,6 +101,8 @@ fn main() {
         file,
         below_the_frame: 0,
         rotations: BTreeMap::from([(BAND_POPULATION.to_owned(), site.band_elements.clone())]),
+        resident: BTreeMap::new(),
+        reused: 0,
     };
     let mut readings = Vec::new();
     for (hand, told) in HANDS {

@@ -19,7 +19,7 @@ use std::io::Write;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
-use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
+use holonic_engine::embedding_fiber::{align_bfloat16, MountedReadout, ResidentReadout};
 use holonic_engine::exact_value::ieee754::{
     decode_bfloat16_bits, decode_binary64_bits, round_into_bfloat16,
 };
@@ -93,6 +93,17 @@ pub struct ResidentSourceCarrier<'chart> {
     pub below_the_frame: usize,
     /// The band group elements, founded once and supplied by name. **Material, not program text.**
     pub rotations: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
+    /// **Residency.** A population mounted on the card stays there and is scored again.
+    ///
+    /// Without this the carrier re-read and re-mounted an INVARIANT operand at every occurrence —
+    /// three times per projection for three positions, and it would have been four gigabytes of
+    /// re-upload for a tied emission head. `CLAUDE.md` names that failure directly: *a device call
+    /// with no residency that spends its time re-uploading an invariant operand*. Keyed by
+    /// population, so nothing about the diagram decides what is resident; the material does.
+    pub resident: BTreeMap<String, MountedReadout<'chart>>,
+    /// How many mounts were served from residency rather than re-uploaded. A measurement, so the
+    /// claim above is checkable rather than asserted.
+    pub reused: usize,
 }
 
 /// Read off the carrier and the diagram: a signed word holds sixty-three magnitude octaves, a
@@ -116,15 +127,22 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
             words.push(word);
         }
         let query = align_bfloat16(&words).map_err(|e| format!("{e:?}"))?;
-        let stored = self
-            .container
-            .read_bf16_whole(&mut self.file, population)
-            .map_err(|error| error.to_string())?;
-        let mounted = self
-            .chart
-            .mount_bfloat16(&stored, tensor.shape[1])
+        if self.resident.contains_key(population) {
+            self.reused += 1;
+        } else {
+            let stored = self
+                .container
+                .read_bf16_whole(&mut self.file, population)
+                .map_err(|error| error.to_string())?;
+            let mounted = self
+                .chart
+                .mount_bfloat16(&stored, tensor.shape[1])
+                .map_err(|e| format!("{e:?}"))?;
+            self.resident.insert(population.to_owned(), mounted);
+        }
+        let scored = self.resident[population]
+            .score_many(&[&query])
             .map_err(|e| format!("{e:?}"))?;
-        let scored = mounted.score_many(&[&query]).map_err(|e| format!("{e:?}"))?;
         let unit = two_to(scored[0].readout_exponent as i64 + scored[0].query_exponent as i64);
         Ok((0..tensor.shape[0])
             .map(|row| Rat::from_integer(scored[0].exact(row).unwrap_or_else(BigInt::zero)) * &unit)
@@ -227,6 +245,17 @@ pub enum Reach {
     /// passage. **Not the whole layer's SOURCE** — the per-layer branch is an open candidate and is
     /// named as one by `WHOLE_LAYER_OPEN` rather than guessed at.
     WholeLayer,
+    /// The layer, then the body's final rebase and the **tied** emission head.
+    ///
+    /// `tie_word_embeddings` is `true` and there is no `lm_head` in the container, so the head IS
+    /// `embed_tokens.weight` read the other way — the same 262144 x 2560 population the mouth reads
+    /// rows of. The return is the illicial potential section, 262144 wide.
+    ///
+    /// The declared `final_logit_softcapping` is NOT an occurrence here, and that is a claim rather
+    /// than an omission: `c*tanh(x/c)` is strictly monotone, so it cannot move any receiver that
+    /// reads an ORDER, and an order is what crosses a frame where a magnitude does not. The station
+    /// applies it as the receiver face it is and checks that the block does not move.
+    ThroughEmission,
 }
 
 /// **What the whole-layer reach does NOT decide.** Four populations layer zero carries whose
@@ -333,6 +362,7 @@ pub fn found_reaching(
     let presented_head = complex.port("one presented chart");
     let carried_head = complex.port("one carried chart");
     let passage_wide = complex.port("the gated passage's chart");
+    let potential = complex.port("the illicial potential section");
 
     let mut program = PortedProgram::default();
     let mut entering_standing: Vec<EventId> = Vec::new();
@@ -581,7 +611,32 @@ pub fn found_reaching(
         program.bind(second_re_entry, PortedOperationKind::ReEntry);
         join(&mut complex, tag("passage re-entry retains"), grained, first_re_entry, second_re_entry, 0)?;
         join(&mut complex, tag("passage re-entry returns"), grained, passage_rebased, second_re_entry, 1)?;
-        assembled.push(second_re_entry);
+        if reach == Reach::WholeLayer {
+            assembled.push(second_re_entry);
+            continue;
+        }
+
+        // -------------------------------------------------------------------------------------
+        // THE EMISSION. The body's final rebase, then the TIED head.
+        // -------------------------------------------------------------------------------------
+        let l = law(&mut complex, tag("the body's rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let body_rebased = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(
+            body_rebased,
+            PortedOperationKind::RebaseByGain {
+                population: "model.language_model.norm.weight".to_owned(),
+                floor: floor.clone(),
+                gain_carries_unit: candidate.gain_carries_unit,
+            },
+        );
+        join(&mut complex, tag("the body's rebase"), grained, second_re_entry, body_rebased, 0)?;
+        let emission_grain = grain_after(&mut complex, &mut program, tag("emission grain"), grained, grained, body_rebased)?;
+
+        let l = law(&mut complex, tag("the emission"), OperationSpecies::Transport, vec![grained], vec![potential]);
+        let emitted = complex.occur(l).map_err(|e| e.to_string())?;
+        program.bind(emitted, PortedOperationKind::Contract { population: SYMBOLS.to_owned() });
+        join(&mut complex, tag("the emission"), grained, emission_grain, emitted, 0)?;
+        assembled.push(emitted);
     }
 
     program.validate(&complex).map_err(|e| e.to_string())?;
@@ -627,6 +682,8 @@ pub fn conduct(
         file,
         below_the_frame: 0,
         rotations: BTreeMap::from([(BAND_POPULATION.to_owned(), site.band_elements.clone())]),
+        resident: BTreeMap::new(),
+        reused: 0,
     };
     let receipt = realize(&site.complex, &site.program, &mut carrier, &BTreeMap::new())
         .map_err(|error| error.to_string())?;
@@ -715,6 +772,10 @@ pub struct NativeRestCarrier<'chart> {
     pub file: std::fs::File,
     pub bands: BTreeMap<String, Vec<(ExactInterval, ExactInterval)>>,
     pub below_the_frame: usize,
+    /// **Residency**, for the same reason the source-fed carrier has it: an invariant operand is
+    /// mounted once and scored again, never re-uploaded per occurrence.
+    pub resident: BTreeMap<String, MountedReadout<'chart>>,
+    pub reused: usize,
 }
 
 /// Read off the carrier and the diagram, exactly as the source-fed conduct reads it.
@@ -737,15 +798,22 @@ impl PortedCarrier for NativeRestCarrier<'_> {
         }
         let query =
             holonic_engine::embedding_fiber::align_bfloat16(&words).map_err(|e| format!("{e:?}"))?;
-        let stored = self
-            .container
-            .read_bf16_whole(&mut self.file, population)
-            .map_err(|error| error.to_string())?;
-        let mounted = self
-            .chart
-            .mount_bfloat16(&stored, tensor.shape[1])
+        if self.resident.contains_key(population) {
+            self.reused += 1;
+        } else {
+            let stored = self
+                .container
+                .read_bf16_whole(&mut self.file, population)
+                .map_err(|error| error.to_string())?;
+            let mounted = self
+                .chart
+                .mount_bfloat16(&stored, tensor.shape[1])
+                .map_err(|e| format!("{e:?}"))?;
+            self.resident.insert(population.to_owned(), mounted);
+        }
+        let scored = self.resident[population]
+            .score_many(&[&query])
             .map_err(|e| format!("{e:?}"))?;
-        let scored = mounted.score_many(&[&query]).map_err(|e| format!("{e:?}"))?;
         let unit = two_to(scored[0].readout_exponent as i64 + scored[0].query_exponent as i64);
         Ok((0..tensor.shape[0])
             .map(|row| Rat::from_integer(scored[0].exact(row).unwrap_or_else(BigInt::zero)) * &unit)

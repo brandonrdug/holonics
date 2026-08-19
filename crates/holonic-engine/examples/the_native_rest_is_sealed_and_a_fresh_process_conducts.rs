@@ -122,6 +122,8 @@ fn conduct_from_rest_alone(rest: &str) {
         file,
         bands: BTreeMap::from([(BAND_POPULATION.to_owned(), bands)]),
         below_the_frame: 0,
+        resident: BTreeMap::new(),
+        reused: 0,
     };
     let receipt = match realize(&complex, &program, &mut carrier, &BTreeMap::new()) {
         Ok(receipt) => receipt,
