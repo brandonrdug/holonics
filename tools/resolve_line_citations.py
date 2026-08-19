@@ -52,8 +52,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -129,6 +131,25 @@ def is_archived(document: Path) -> bool:
     return bool(BANNERED.search(document.read_text(errors="replace")[:800]))
 
 
+@lru_cache(maxsize=1)
+def live_files_by_name() -> dict[str, tuple[Path, ...]]:
+    """Index live files once, pruning apparatus/provenance roots before traversal.
+
+    The previous fallback called ``ROOT.rglob(name)`` once per distinct citation token. ``rglob``
+    entered the hundreds-of-gigabytes ``target/`` tree and discarded it only after the walk. A
+    citation gate is a repository-source reader; build artifacts, git objects and provenance are
+    outside its aperture and are pruned before descent.
+    """
+
+    excluded = {"archive", "reference", "target", ".git"}
+    indexed: dict[str, list[Path]] = {}
+    for directory, names, files in os.walk(ROOT):
+        names[:] = [name for name in names if name not in excluded]
+        for name in files:
+            indexed.setdefault(name, []).append(Path(directory) / name)
+    return {name: tuple(sorted(paths)) for name, paths in indexed.items()}
+
+
 def resolve(token: str) -> Path | None | str:
     """Repository-relative first, then by basename — which is what a reader does with it.
 
@@ -147,13 +168,18 @@ def resolve(token: str) -> Path | None | str:
         if under.is_file():
             return under
     name = Path(token).name
-    matches: list[Path] = []
-    for candidate in ROOT.rglob(name):
-        parts = candidate.relative_to(ROOT).parts
-        if parts and parts[0] in {"archive", "reference", "target", ".git"}:
-            continue
-        if candidate.is_file():
-            matches.append(candidate)
+    matches = list(live_files_by_name().get(name, ()))
+    if "/" in token:
+        suffix = Path(token).parts
+        suffix_matches = [
+            candidate
+            for candidate in matches
+            if candidate.relative_to(ROOT).parts[-len(suffix) :] == suffix
+        ]
+        if len(suffix_matches) == 1:
+            return suffix_matches[0]
+        if suffix_matches:
+            matches = suffix_matches
     if len(matches) > 1 and "/" not in token:
         return "AMBIGUOUS"
     return matches[0] if matches else None

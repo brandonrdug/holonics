@@ -10,6 +10,10 @@ desktop-x11 = ["dep:x11rb"]
 
 [dependencies]
 holonic-structure = { workspace = true }
+# The CUDA Driver API boundary. `mount -> body, soma-abi` only (measured with `cargo metadata`,
+# 2026-08-18), so this edge closes no cycle: the engine's resident owner reaches the card through
+# the one census `soma/mount` owns rather than declaring a second `#[link(name = "cuda")]` regime.
+mount = { path = "../../soma/mount" }
 num-bigint = { workspace = true }
 num-rational = { workspace = true }
 num-traits = { workspace = true }

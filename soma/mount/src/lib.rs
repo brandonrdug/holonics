@@ -16,7 +16,8 @@ pub mod register_launch;
 pub mod register_recast;
 
 pub use cuda::{
-    Context, CudaError, Device, DeviceBuffer, Dim3, Function, LinearLaunch, Module, Result, Stream,
+    BorrowedContext, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, Function,
+    Graph, GraphCensus, GraphExec, LinearLaunch, MemoryInfo, Module, Result, Stream,
     VirtualDeviceBuffer, VirtualDeviceGrowth,
 };
 pub use live_event_launch::{

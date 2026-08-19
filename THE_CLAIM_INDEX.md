@@ -129,7 +129,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (144 deposits of 436)
+## 4 · The 2026-08 record line (150 deposits of 442)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -270,6 +270,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_CLIMB_USED_THE_WRONG_ENDPOINT_AND_THE_DEGRADATION_WAS_A_DEPOSITED_LAW.md` | The climb used the wrong endpoint, and the degradation was a deposited law |
 | `2026-08-18_THE_FOREIGN_MAP_CONDUCTS_AND_THE_CARRIER_WAS_REBUILT_BESIDE_ITS_OWNERS.md` | The foreign map conducts, and the carrier was rebuilt beside its owners |
 | `2026-08-18_THE_FUTURE_IS_A_PLURAL_CAUSAL_SECTION_SOFTMAX_IS_ITS_LOCAL_LAPLACIAN_AND_THE_ADJOINT_RETURNS_THROUGH_STATE.md` | The future is a plural causal section; softmax is its local Laplacian, and the adjoint returns through state |
+| `2026-08-18_THE_GATE_IS_A_RELEASE_RECEIVER_NOT_AN_INNER_LOOP_AND_REPEATED_VALIDATION_BECAME_THE_BOTTLENECK.md` | The gate is a release receiver, not an inner loop, and repeated validation became the bottleneck |
 | `2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md` | The gate was the mechanism, and the emission composes once the horizon is a coordinate |
 | `2026-08-18_THE_HANKEL_RANK_DOES_NOT_SATURATE_SO_THE_COMPRESSION_IS_SPARSITY_AND_IT_IS_EXACT.md` | The Hankel rank does not saturate, so the compression is sparsity — and it is exact |
 | `2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md` | The holon is the operation complex, the foreign map is a ported word, and the card carries its fronts |
@@ -278,9 +279,14 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_THE_MONOID_IS_APERIODIC_BY_CONSTRUCTION_SO_THE_CRYSTAL_NEEDS_THE_TURN.md` | The monoid is aperiodic by construction, so the crystal needs the turn |
 | `2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md` | The ratio crossed, the container produces, and all 168 Gemma circuits are full rank |
 | `2026-08-18_THE_SEAL_IS_A_QUOTIENT_SO_WHAT_IS_DEPOSITED_IS_WHAT_IT_ADMITTED_AND_TWO_CONTROLS_WERE_VACUOUS.md` | The seal is a quotient, so what is deposited is what it admitted — and two controls were vacuous |
+| `2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md` | The section must stay on the card: the contract before the resident layer |
+| `2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md` | The section stayed, but the host still owned the passage, and no Phoenix station passed |
+| `2026-08-18_THE_SECTION_STAYED_ON_THE_CARD_ONE_LAYER_IS_RESIDENT_AND_PHOENIX_IS_STILL_A_STATION_AWAY.md` | The section stayed on the card: one layer is resident, and Phoenix is still a station away |
 | `2026-08-18_THE_SITE_CONDUCTS_THE_CANDIDATES_ARE_SEPARATED_BY_ONE_ORDER_AND_THE_SOURCE_DEPARTS.md` | The site conducts, the candidates are separated by one order, and the source departs |
 | `2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md` | The site returned, but the card did not own the path, and Phoenix remains a partial lift |
 | `2026-08-18_THE_SOURCE_DIAGRAM_IS_BOUND_THE_TRANSPORT_IS_POSED_AND_THE_WORK_RECEIVER_REFUSES_THE_DENSE_ONE.md` | The source diagram is bound, the transport is posed, and the work receiver refuses the dense one |
+| `2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md` | The layer is one graph launched once, and the immediate gate returns its falsifiers with the ratchet open |
+| `2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md` | The refusal travels along the lineage, the admission is typed, and the ratchet is dispositioned |
 
 ---
 
@@ -297,7 +303,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `CLAUDE.md`, `CONSTRUCTION_STATE.md`, `CONTEXT_HANDOFF.md`, and 7 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 9 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `canon/THE_DRIVER_ATLAS.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, and 1 more |

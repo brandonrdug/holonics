@@ -342,3 +342,36 @@ Every phase must:
 If a phase fails, repair or rederive its owner. Do not increase a magic bound, add fallback,
 preserve a compatibility route, build a nearby toy, or extend another subsystem while the required
 return is absent.
+
+## Validation cadence and cost discipline
+
+The complete gate is a **release receiver**, never an edit-loop command. Validation is proportional
+to the closure which changed:
+
+1. During owner-local iteration, run `cargo check` for the affected package/library, the changed
+   owner's focused tests, the exact driver or device deed being repaired, and only the named cheap
+   document/architecture gates whose inputs changed.
+2. After one owner closes, run the affected package's library/tests and its directly dependent
+   driver. Do not run `cargo test --workspace`, `cargo build --all-targets`, a release all-target
+   build, every example, or all twelve gates merely because one source file changed.
+3. Before a real deed, inspect its code/source/configuration closure. If that closure and its input
+   occurrence are unchanged, reuse and inspect the existing addressed receipt; do not rerun an
+   expensive deed or serial reference to reproduce a number already bound to the same closure.
+4. Regenerate claim, driver, output, closure, and authored-level ledgers once, after the coherent
+   implementation and returned artifact stand. Ledger regeneration is not progress on the deed.
+5. At the release boundary, run `bash tools/gates.sh` once on the coherent tree. It already runs the
+   complete workspace tests; do not run the full workspace suite immediately before it. If only a
+   cheap gate then fails and no code or executable artifact changes in the repair, rerun that named
+   gate and report the scopes separately. Never present selected-gate results as a complete-gate
+   result.
+
+Every expensive invocation records command, start/end or elapsed time, exit status, code closure,
+and purpose. A second invocation with the same closure requires a named falsifier the first run did
+not answer. Full tests on a dirty tree do not make `output-manifest` or `closure-manifest` green, and
+the architecture ratchet must be dispositioned rather than explained away as red-by-construction.
+
+No test or driver is deleted because the population is large. First classify it as an owner guard,
+real deed, persisted-artifact consumer, serial/reference control, or redundant replay. Remove only a
+measured duplicate or superseded path with no independent receiver consequence. Build-cache cleanup
+is a separate destructive apparatus action and requires Brandon's authorization; never hide workflow
+cost by silently cleaning the Cargo build-output tree.

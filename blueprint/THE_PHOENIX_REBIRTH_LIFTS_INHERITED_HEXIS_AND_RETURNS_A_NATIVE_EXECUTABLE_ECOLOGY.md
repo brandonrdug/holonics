@@ -346,6 +346,16 @@ during inference; a preflight declaration is not evidence.
 The stations are ordered by dependency. A later station cannot repair, reinterpret, or waive a
 missing earlier return.
 
+Every station has three distinct evidence levels:
+
+1. instrument implementation;
+2. bounded experimental return; and
+3. master-station grade.
+
+An exact owner test or bounded fixture does not promote a master station. Promotion requires every
+artifact, apparatus condition, source-boundary condition, receiver return, and falsifier named by
+that station. Missing evidence remains `open`; a later station cannot relabel or waive it.
+
 ### The source is admitted as material
 
 Produce the foreign source manifest. Stream rather than load where source size requires it. Decode
@@ -382,6 +392,11 @@ and observation passages.
 The strongest lawful resident surface owns the hot deed. CPU apparatus may mount, persist, and
 audit; it may not replay source semantics after device refusal.
 
+The host may mount, persist, admit, and inspect a deed. It may not select semantic operation
+variants, impose semantic chronology, globally synchronize and inspect after every kernel, or feed
+the next semantic operation from per-kernel host receipts. A device-resident vector under
+host-owned semantic circulation is not a resident pathway.
+
 Every normalization returns its population aperture, pivot, quadratic form, exact epsilon, gain and
 bias, inverse-or-quotient classification, kernel/image, ReconstructionFiber, and local
 derivative/adjoint. Epsilon-zero projective normalization and nonzero-epsilon bounded radial charts
@@ -402,6 +417,11 @@ quotient. The source implementation/configuration is admissible as exterior real
 it never becomes native ontology. If that testimony is absent or internally inconsistent, the
 candidate operation diagrams remain a `ReconstructionFiber` and no human-coherence judgment chooses
 one.
+
+Every bound source occurrence validates its symbol, configuration, declared shape, and claimed
+implementation entailment against the authenticated source occurrence. A file hash, locator, or
+driver-authored operation name alone is not source testimony. The source model occurrence itself is
+content-addressed separately from the implementation and codec occurrences.
 
 The complete linear subdiagram is a ported transport word. Serial matrix multiplication compiles
 that word into one chart only where adjacent codomain/domain ports agree. Co-present branches share
@@ -592,6 +612,10 @@ where the source collapses.
   telemetry separately reports actual ingress, egress, resident bytes, scratch, allocation, launch,
   synchronization, and transfer lineage. A predicted byte count is never reported as measured bus
   traffic.
+- The complete deed is priced once before its first launch. The admitted semantic and apparatus
+  receipts include every predecessor/front, device-to-device staging, scratch and retained
+  residency, allocation, synchronization, certificate/census work, and terminal egress. If any
+  coordinate is not yet priceable, the deed refuses before predecessor work begins.
 - Resource pressure changes partition, factorization, placement, residency, or receiver aperture.
   It never authorizes increasing a magic bound and replaying the same morphology.
 - A quantized deployment export may use exterior floating/scaled arithmetic. No float enters the

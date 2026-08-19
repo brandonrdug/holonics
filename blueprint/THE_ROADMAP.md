@@ -176,8 +176,98 @@ interchange, complete work admission, and runtime-supplied material.
 
 **No executable capability is promoted by these returns.** `CONSTRUCTION_STATE.md` remains unchanged
 until the Gemma plan returns an actual source-detached executable native model — one that emits —
-and passes its complete grade. What returned is a source-detached executable **site**, which is a
-station and not the model.
+and passes its complete grade. The earlier source-fed site and fixed remount fixtures are bounded
+experiments; neither is a source-detached native station or model.
+
+**THE RESIDENT SECTION RETURNED, BUT THE RESIDENT PASSAGE DID NOT — regraded 2026-08-18.** Contract:
+[`research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`](../research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md);
+claimed return:
+[`research/records/2026-08-18_THE_SECTION_STAYED_ON_THE_CARD_ONE_LAYER_IS_RESIDENT_AND_PHOENIX_IS_STILL_A_STATION_AWAY.md`](../research/records/2026-08-18_THE_SECTION_STAYED_ON_THE_CARD_ONE_LAYER_IS_RESIDENT_AND_PHOENIX_IS_STILL_A_STATION_AWAY.md).
+Audit:
+[`research/records/2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md`](../research/records/2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md).
+
+**Established-bounded:** `resident_section` supplies a real CUDA interval carrier; the selected
+layer-zero fixture mounts the named BF16 maps once, executes resident interval kernels for the local
+operations, reads one terminal section, copies no intermediate section vector to the host, includes
+both K/V families and PLE, and returns nested terminal enclosures under a finer declared aperture.
+Those mechanisms stand.
+
+**Counterexample to the promoted gate:** `ResidentBinding → FrontPassage::conduct →
+FrontEnactor::enact_in → enact_member` is a new host instruction/dispatch loop. Each local CUDA
+operation globally synchronizes and returns a receipt before the host selects the next operation;
+the measured fixture reports `180` launches, `180` synchronizations and `5,760` receipt-egress
+octets. The PLE predecessor's six fronts execute before the layer's twenty-three fronts are priced,
+so the composed twenty-nine-front deed was not admitted before its first launch. Staging copies,
+mounted-map residency, census/comparison work, scratch, synchronization and terminal egress are
+outside the admitted vector. The source file hash does not validate each claimed symbol,
+configuration or shape, and the BF16 source-runtime face lies inside only `9` of `5,120` resident
+enclosures; that discrepancy remains an uncarried cross-chart defect. The selected serial
+permutations do not certify physical co-presence, and the hardware cover is not bound to the mounted
+surface/PTX mode. The negative signed shift in the CUDA exactness cone and two vacuous driver
+falsifiers remain defects.
+
+Therefore **no Phoenix master station passed**. The immediate gate remains one complete
+source-authenticated layer with both K/V families, PLE, propagated remainder, GPU-owned semantic
+chronology, physical interchange, mode-bound cover, complete work admitted before any predecessor
+launch, validated source bindings, and non-vacuous controls. No tower expansion, runtime/export,
+condensation, cultivation or native-rest work begins before it. `CONSTRUCTION_STATE.md` remains
+unchanged.
+
+**THE PASSAGE IS ONE GRAPH LAUNCHED ONCE — returned 2026-08-19; the immediate gate stands OPEN on
+the ratchet alone.** Record:
+[`research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md`](../research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md);
+artifact: the driver's receipt `layer-0-resident-2-tokens-grain-48-terms-14.form` under its `output/` directory (ignored by git, named in the record).
+The host dispatch loop the audit above convicted is gone from production: the per-layer input
+predecessor and layer zero are **one diagram (35 occurrences, 23 fronts)**, every binding validated
+by symbol, verbatim slice, configuration field, declared shape and content region against an
+authenticated source occurrence (implementation, configuration, container header and
+whole-content digest, 22 regions, 5 assets declared unused); the whole deed priced — semantic
+`ExactWork` and an apparatus vector — and admitted **before any allocation**; every front's
+independence derived from footprints (`interchange::certify_footprints`), never replayed; the deed
+captured into **one CUDA graph — 71 nodes, 78 edges, equal to the diagram's bonds — launched once,
+synchronized once, read once**, refusals accumulating on the card in per-occurrence census slots;
+the apparatus bound as one occurrence through `soma/mount` with the cover built from the mounted
+device and the mode carrying the PTX digest; no signed value left-shifted in the kernel; the source
+runtime's bf16 and f32 faces returned as a per-port `chi` slot; the serial reference at `2^-96` in
+parity over all 5,120 terminal coordinates; **sixteen falsifiers with predicates that can fail
+passing, seven later stations open by name.** What does not pass: the architecture ratchet is red on
+this tree because the three owners are uncommitted (a zero allowance) — read as a design falsifier
+and no container found standing in for a transport law, **not re-seeded** — so under the directive's
+completion list the gate is OPEN on that item and **no Phoenix station is claimed**.
+`CONSTRUCTION_STATE.md` remains unchanged. What the tower still owes is unchanged: layers `1`–`41`,
+the emission head, native rest, runtime, condensation, cultivation and ablation begin only after the
+ratchet is dispositioned at a commit and the gate is read whole.
+
+**THE REFUSAL TRAVELS ALONG THE LINEAGE, THE ADMISSION IS TYPED, AND THE RATCHET IS DISPOSITIONED —
+Station A of the complete sequence PASSED 2026-08-19.** Record:
+[`research/records/2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md`](../research/records/2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md).
+The three blockers the directive named are closed. **The shared global refusal word is gone**: every
+kernel inspects the refusal words of its declared predecessors and only those, through a lineage
+array that is the diagram's bond structure uploaded before the capture opens; the join over several
+predecessors (union of flags, least refusing predecessor, count) is written into the occurrence's
+own twelve-word slot; every footprint carries the predecessor slots read and the own slot written;
+the complete obstruction lineage is the return, identical under the co-present, serialized and
+reversed-serialized schedules, and a terminal whose lineage refused cannot be read as standing — a
+non-finite codeword at coordinate 7 of one branch refuses that branch's forward cone (8 occurrences)
+and nothing else, with the five unrelated sibling sections bit-identical. **`semantic: None` is
+gone**: `DeedAdmission` is a typed product order over 9 semantic and 24 apparatus coordinates, each
+bounded (by the receiver or the mounted card) or exhibited as unbounded with its reason and
+constraint; source-map mounting is a preceding material admission predicted from the header
+(19 maps, 749,864,968 resident octets, 19 of 19 reconciled) that the deed cites; the allocation
+grain is measured (2,097,152 octets) and the charge law is exhibited. **The `ResidentBinding` cabinet
+is gone**: eleven owner-local laws in `crates/holonic-engine/src/resident_law.rs`. Every one of the
+121 ratchet occurrences was read and dispositioned, the ledger rows changed explicitly, and
+`architecture-lint` is clean. Twenty-four falsifiers pass on the card (the serial reference in
+parity over 5,120), seven later stations open by name. `CONSTRUCTION_STATE.md` does not move;
+Station B (complete source admission and potential transport) is next.
+
+**The workflow was separately re-audited the same day.** The complete gate was being used as an
+inner loop, release all-target builds repeatedly linked the evidence-driver population, and selected
+gate results were spliced into a complete-gate report. The binding validation cadence is deposited
+in
+[`research/records/2026-08-18_THE_GATE_IS_A_RELEASE_RECEIVER_NOT_AN_INNER_LOOP_AND_REPEATED_VALIDATION_BECAME_THE_BOTTLENECK.md`](../research/records/2026-08-18_THE_GATE_IS_A_RELEASE_RECEIVER_NOT_AN_INNER_LOOP_AND_REPEATED_VALIDATION_BECAME_THE_BOTTLENECK.md)
+and in the operating contracts. Focused owner checks carry iteration; one complete gate reads the
+release boundary.
 
 ## THE MATHEMATICS CODEC RECOVERS THE OPERATION COMPLEX AND EVERY RESULT RETURNS AS A RECEIVER FACE — 2026-08-18
 

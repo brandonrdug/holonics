@@ -38,12 +38,17 @@
 //! **This module does not query the card, and it must not.** `soma/mount/src/cuda.rs` already owns
 //! that: `Device::attribute`, `Device::launch_census`, `Function::max_threads_per_block`, and
 //! `Function::linear_launch`, which derives grid and block from driver-reported apertures and
-//! **refuses rather than clipping** when the work exceeds them. The engine cannot depend on
-//! `soma/mount` — `soma/life` depends on the engine, so the reverse edge is a Cargo cycle
-//! (`blueprint/THE_ASSEMBLY.md` F1). A first version of this file declared its own
-//! `cuDeviceGetAttribute` block; that is precisely the construction
+//! **refuses rather than clipping** when the work exceeds them. A first version of this file
+//! declared its own `cuDeviceGetAttribute` block; that is precisely the construction
 //! `canon/THE_EXPLORATIVE_FAILURE.md` convicts, and it was removed. The engine owns the **law**; a
 //! caller that can reach the surface supplies the declaration.
+//!
+//! **CORRECTED 2026-08-18: this paragraph read *"the engine cannot depend on `soma/mount` — a Cargo
+//! cycle"*, and that was wrong.** `cargo metadata` shows `mount -> body, soma-abi` and nothing
+//! reaching the engine, so `holonic-engine -> mount` closes no cycle; it was `life -> engine` that
+//! forbids the *other* direction. The engine now depends on `mount`, and `resident_section` builds
+//! its [`DeviceDeclaration`] from `mount::Device::attribute` — the device's own answers, through the
+//! one census this tree owns — and builds the cover from that declaration and nowhere else.
 //!
 //! What IS a contaminant, and it is in the engine's own device path: `cuda_aperture.rs:44` carries
 //! `const THREADS_PER_BLOCK: u32 = 128` and `cuda_relation.rs` carries `128` and `256`, all three
@@ -69,7 +74,7 @@
 //!
 //! `H.0219` says the same thing from the other side: flux locality **licenses a decomposition and
 //! never a schedule**. So [`CoverDecomposition::independence`] does not assert that sections commute —
-//! it **checks** that their supports are disjoint and returns a named [`Barrier`] when they are not.
+//! it **checks** that their supports are disjoint and returns a named [`CoverBarrier`] when they are not.
 
 use std::collections::BTreeSet;
 
@@ -339,6 +344,11 @@ pub struct ModeIdentity {
     pub arithmetic: &'static str,
     /// `χ` — the apparatus chart: which cover declared, by chart ids.
     pub apparatus: String,
+    /// The kernel's CONTENT identity — the SHA-256 of the PTX the mode loaded — beside its name.
+    /// `None` where the caller declared a name and no content; a resident surface that loaded a
+    /// module states it, so two modes with one kernel name and different laws are two modes.
+    /// Added 2026-08-18.
+    pub kernel_content: Option<String>,
 }
 
 impl ModeIdentity {
@@ -368,7 +378,14 @@ impl ModeIdentity {
                 .map(|chart| chart.id().to_string())
                 .collect::<Vec<_>>()
                 .join("+"),
+            kernel_content: None,
         }
+    }
+
+    /// The same mode with the kernel's content identity stated.
+    pub fn with_kernel_content(mut self, sha256: impl Into<String>) -> Self {
+        self.kernel_content = Some(sha256.into());
+        self
     }
 }
 
@@ -438,8 +455,16 @@ pub struct SectionWork {
 }
 
 /// Why a decomposition is not licensed. A barrier is named; it is never worked around.
+///
+/// **Renamed from `Barrier` 2026-08-18.** Every variant here is a defect of the apparatus partition
+/// itself — a cell shared, unplaced, misdeclared, foreign or repeated — and none is a semantic
+/// coupling. The Phoenix correction directive keeps four obstruction species apart because each is
+/// answered differently: this one by repairing the partition; a `GlobalCouplingBarrier` by realizing
+/// a resident reduction; an interchange refusal by keeping the order; a resource obstruction by
+/// changing partition, factorization, residency or aperture. One `Barrier` answering all four with
+/// sequential CPU execution would have deleted the information that decides the repair.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Barrier {
+pub enum CoverBarrier {
     /// A cell is claimed more than once. `charts` carries one entry per CLAIM, with multiplicity,
     /// so two sections reads `[Cpu(0), Device(0)]` and one section holding an index twice reads
     /// `[Cpu(0), Cpu(0)]`. Counting sections rather than claims made the second invisible.
@@ -463,10 +488,10 @@ pub enum Barrier {
     RepeatedFrontCell { cell: usize },
 }
 
-impl std::fmt::Display for Barrier {
+impl std::fmt::Display for CoverBarrier {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Barrier::SharedCell { cell, charts } => write!(
+            CoverBarrier::SharedCell { cell, charts } => write!(
                 formatter,
                 "cell {cell} is claimed by {} charts: {}",
                 charts.len(),
@@ -476,10 +501,10 @@ impl std::fmt::Display for Barrier {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            Barrier::UnplacedCell { cell } => {
+            CoverBarrier::UnplacedCell { cell } => {
                 write!(formatter, "cell {cell} reached no chart")
             }
-            Barrier::ExtentDisagrees {
+            CoverBarrier::ExtentDisagrees {
                 cell,
                 chart,
                 declared,
@@ -489,11 +514,11 @@ impl std::fmt::Display for Barrier {
                 "cell {cell} is declared with extent {declared} and placed on {chart} with extent \
                  {placed}"
             ),
-            Barrier::ForeignCell { cell, chart } => write!(
+            CoverBarrier::ForeignCell { cell, chart } => write!(
                 formatter,
                 "{chart} holds cell {cell}, which the front does not declare"
             ),
-            Barrier::RepeatedFrontCell { cell } => {
+            CoverBarrier::RepeatedFrontCell { cell } => {
                 write!(formatter, "the front declares cell {cell} more than once")
             }
         }
@@ -564,7 +589,7 @@ impl CoverDecomposition {
     /// Two sections may run concurrently exactly when their consequences commute, and for a refinement
     /// over disjoint cells that reduces to disjointness of the cells themselves. The placement must
     /// therefore be a partition of the front **as a population of `(index, extent)` cells**, and
-    /// every way it can fail to be one is returned as a named [`Barrier`].
+    /// every way it can fail to be one is returned as a named [`CoverBarrier`].
     ///
     /// **Repaired 2026-08-11. The check licensed constructions it had not examined.** It iterated
     /// the front and counted how many SECTIONS contained each index, which is blind to four
@@ -581,7 +606,7 @@ impl CoverDecomposition {
     /// certificate of the front it named. `CLAUDE.md` §8: a check whose material cannot vary the
     /// property under test is the same defect as a check that cannot fail — and this one wore a
     /// passing result on exactly the constructions it existed to refuse.
-    pub fn independence(&self, front: &[FrontCell]) -> Result<(), Vec<Barrier>> {
+    pub fn independence(&self, front: &[FrontCell]) -> Result<(), Vec<CoverBarrier>> {
         let mut barriers = Vec::new();
 
         // Nothing here materializes an index: every question is asked of the front and the
@@ -597,7 +622,7 @@ impl CoverDecomposition {
                 .iter()
                 .any(|earlier| earlier.index == cell.index)
             {
-                barriers.push(Barrier::RepeatedFrontCell { cell: cell.index });
+                barriers.push(CoverBarrier::RepeatedFrontCell { cell: cell.index });
             }
 
             // Claims are counted with MULTIPLICITY rather than by section, which is what makes an
@@ -616,10 +641,10 @@ impl CoverDecomposition {
             }
 
             match (claims, first_claim) {
-                (0, _) | (_, None) => barriers.push(Barrier::UnplacedCell { cell: cell.index }),
+                (0, _) | (_, None) => barriers.push(CoverBarrier::UnplacedCell { cell: cell.index }),
                 (1, Some((chart, placed))) => {
                     if placed != cell.extent {
-                        barriers.push(Barrier::ExtentDisagrees {
+                        barriers.push(CoverBarrier::ExtentDisagrees {
                             cell: cell.index,
                             chart,
                             declared: cell.extent,
@@ -638,7 +663,7 @@ impl CoverDecomposition {
                             }
                         }
                     }
-                    barriers.push(Barrier::SharedCell {
+                    barriers.push(CoverBarrier::SharedCell {
                         cell: cell.index,
                         charts,
                     });
@@ -650,7 +675,7 @@ impl CoverDecomposition {
         for section in &self.sections {
             for held in &section.cells {
                 if !front.iter().any(|cell| cell.index == held.index) {
-                    barriers.push(Barrier::ForeignCell {
+                    barriers.push(CoverBarrier::ForeignCell {
                         cell: held.index,
                         chart: section.chart,
                     });
@@ -860,7 +885,7 @@ mod tests {
         let mut dropped = CoverDecomposition::of(&cover, &population, "test");
         dropped.sections[0].cells.pop();
         match dropped.independence(&population) {
-            Err(barriers) => assert!(matches!(barriers[0], Barrier::UnplacedCell { cell: 1 })),
+            Err(barriers) => assert!(matches!(barriers[0], CoverBarrier::UnplacedCell { cell: 1 })),
             Ok(()) => panic!("a dropped cell must be refused"),
         }
 
@@ -874,7 +899,7 @@ mod tests {
             Err(barriers) => assert!(
                 barriers
                     .iter()
-                    .any(|barrier| matches!(barrier, Barrier::SharedCell { cell: 0, .. }))
+                    .any(|barrier| matches!(barrier, CoverBarrier::SharedCell { cell: 0, .. }))
             ),
             Ok(()) => panic!("a duplicated cell must be refused"),
         }
@@ -898,7 +923,7 @@ mod tests {
         match restated.independence(&population) {
             Err(barriers) => assert!(barriers.iter().any(|barrier| matches!(
                 barrier,
-                Barrier::ExtentDisagrees {
+                CoverBarrier::ExtentDisagrees {
                     cell: 0,
                     declared: 64,
                     placed: 65,
@@ -918,7 +943,7 @@ mod tests {
             Err(barriers) => assert!(
                 barriers
                     .iter()
-                    .any(|barrier| matches!(barrier, Barrier::ForeignCell { cell: 7, .. }))
+                    .any(|barrier| matches!(barrier, CoverBarrier::ForeignCell { cell: 7, .. }))
             ),
             Ok(()) => panic!("a foreign cell must be refused"),
         }
@@ -932,7 +957,7 @@ mod tests {
         match doubled.independence(&population) {
             Err(barriers) => assert!(barriers.iter().any(|barrier| matches!(
                 barrier,
-                Barrier::SharedCell { cell: 0, charts } if charts.len() == 2
+                CoverBarrier::SharedCell { cell: 0, charts } if charts.len() == 2
             ))),
             Ok(()) => panic!("an index held twice in one section must be refused"),
         }
@@ -953,7 +978,7 @@ mod tests {
             Err(barriers) => assert!(
                 barriers
                     .iter()
-                    .any(|barrier| matches!(barrier, Barrier::RepeatedFrontCell { cell: 0 }))
+                    .any(|barrier| matches!(barrier, CoverBarrier::RepeatedFrontCell { cell: 0 }))
             ),
             Ok(()) => panic!("a front repeating an address must be refused"),
         }

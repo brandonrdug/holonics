@@ -534,6 +534,13 @@ impl ResidentReadout {
         &self.device_name
     }
 
+    /// The driver context this chart mounted, for a sibling owner in this crate that loads its own
+    /// exact laws into the SAME context and reads populations this chart mounted. Crate-private:
+    /// a context is an apparatus coordinate and never crosses to a caller as a value.
+    pub(crate) fn raw_context(&self) -> *mut c_void {
+        self.context
+    }
+
     /// The carrier headroom this material needs, computed from the material and never assumed.
     ///
     /// An exact `dim`-term sum of products of `b`-octave entries needs `2b + ceil(log2 dim)`
@@ -829,6 +836,13 @@ pub struct MountedReadout<'chart> {
 }
 
 impl MountedReadout<'_> {
+    /// The resident aligned words, for a sibling owner in this crate contracting a resident section
+    /// through this map inside the same context. Crate-private for the same reason as
+    /// [`ResidentReadout::raw_context`].
+    pub(crate) fn raw_resident(&self) -> u64 {
+        self.resident
+    }
+
     /// Rows the mounted map carries.
     pub fn rows(&self) -> usize {
         self.rows

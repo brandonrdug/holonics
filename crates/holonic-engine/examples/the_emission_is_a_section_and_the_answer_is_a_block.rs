@@ -36,7 +36,7 @@ use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_value::ieee754::round_into_bfloat16;
 use holonic_engine::exact_value::CertifiedSeries;
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_operation::realize;
+use holonic_engine::ported_reference::realize;
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;

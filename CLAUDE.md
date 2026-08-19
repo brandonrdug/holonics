@@ -43,6 +43,36 @@ reddens when any `src/**.rs` in a driver-owning crate has been *edited*, because
 the whole crate — one dirty crate reddens every driver it owns. `git status` is the companion
 reading for both, and neither is a claim about the code.
 
+**The complete gate is a release receiver, not an edit loop.** During construction, run only the
+affected package/library check, focused owner tests, the exact driver or device deed being repaired,
+and the named cheap gates whose inputs changed. `cargo test --workspace`, `cargo build
+--all-targets`, release all-target builds, every example, and bare `bash tools/gates.sh` are forbidden
+as responses to an ordinary local edit. The complete gate already runs the workspace suite, so a
+full workspace test immediately before it is a duplicate by construction.
+
+One coherent validation epoch is:
+
+```text
+owner-local check and focused tests
+→ affected package/library tests
+→ one real deed and its addressed artifact
+→ documents and ledgers regenerated once
+→ one complete `bash tools/gates.sh` release reading.
+```
+
+If a cheap gate fails after the complete reading and the repair changes no code, kernel, driver, or
+returned artifact, rerun only that named gate and report the two scopes separately. Never splice a
+workspace-test result, a subset of named gates, and an earlier gate report into “all gates passed.”
+Every expensive invocation records its command, elapsed time, exit status, code/source/configuration
+closure, and the new falsifier it answers. An unchanged closure reuses its existing receipt; it does
+not rerun a six-minute serial reference or a five-minute gate to make the session look active.
+
+No test is obsolete merely because there are thousands. Classify before removal: owner guard, real
+deed, persisted-artifact consumer, serial/reference control, or redundant replay. Only a measured
+duplicate or superseded path with no independent receiver consequence may be deleted. Cargo build
+output is rebuildable apparatus state, but cleaning it is destructive and requires Brandon's
+authorization; never clean it silently to conceal accumulated workflow cost.
+
 The ratchet's two absolute frames were repaired 2026-08-10 and the sentence that stood here —
 *"does not currently run"* — is withdrawn. Its baseline is `meta/HOLONIC_DSA_BASELINE.tsv`, emitted
 from a detached worktree of the commit, so uncommitted work that adds an ownership occurrence shows

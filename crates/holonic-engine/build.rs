@@ -53,6 +53,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
     println!("cargo:rerun-if-changed=kernels/exact_embedding_fiber.cu");
+    println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {
         return;
     }
@@ -122,6 +123,25 @@ fn main() {
     assert!(
         fiber_status.success(),
         "nvcc refused kernels/exact_embedding_fiber.cu"
+    );
+
+    let section_output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR"))
+        .join("exact_resident_section.ptx");
+    let section_status = Command::new("nvcc")
+        .args([
+            "--ptx",
+            "-O3",
+            "--std=c++20",
+            &gpu_architecture,
+            "kernels/exact_resident_section.cu",
+            "-o",
+        ])
+        .arg(&section_output)
+        .status()
+        .expect("nvcc is required to compile the exact resident-section law");
+    assert!(
+        section_status.success(),
+        "nvcc refused kernels/exact_resident_section.cu"
     );
 
     let refine_output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR"))

@@ -9,7 +9,7 @@
 //!
 //! This driver **binds** and hands over. It declares ports, laws, occurrences and bonds; it binds
 //! each occurrence to an exact operation; it supplies a [`PortedCarrier`]. Then it calls
-//! `ported_operation::realize` **once**.
+//! `ported_reference::realize` **once**.
 //!
 //! Every ordering question is answered by `CausalDiagram::layers` inside that call, and every
 //! dataflow question by the diagram's own interaction bonds. This file contains no loop over
@@ -37,10 +37,8 @@ use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
 use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_operation::{
-    realize, OperationSpecies, PortedCarrier, PortedOperationComplex, PortedOperationKind,
-    PortedProgram, SourceTestimony,
-};
+use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
+use holonic_engine::ported_reference::{realize, PortedCarrier, PortedOperationKind, PortedProgram};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;

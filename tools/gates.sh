@@ -16,6 +16,12 @@
 #     bash tools/gates.sh named-paths typst  # only the named gates, in the order given
 #     bash tools/gates.sh --control          # make each gate FAIL on purpose, then restore
 #
+# This is a RELEASE receiver, not an edit-loop command. It already runs the complete workspace
+# suite. During construction invoke only named gates whose inputs changed and focused Cargo tests
+# outside this script; run the complete sequence once after code, deed, documents and ledgers agree.
+# Never run `cargo test --workspace` immediately before the complete sequence, and never report a
+# subset invocation as though the complete sequence passed.
+#
 # Exit is non-zero if any gate fails. Every gate prints exactly one summary line; the full output
 # of a failing gate is printed underneath it, and the full output of a passing one is discarded.
 #
@@ -156,12 +162,27 @@ sum_test_results() {
 
 gate_tests() {
     local out="$WORK/tests.out"
-    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" cargo test --workspace -j 2 >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(sum_test_results <"$out")"
+    local examples="$WORK/examples.out"
+    # Unit/integration/bin tests are the executable guard population. The example targets are
+    # an evidence-driver corpus and are marked `test=false`; linking every one into the test profile
+    # made a local library repair pay hundreds of binaries. Keep their release-boundary coverage by
+    # type-checking them once, without linking or executing them all. Real deeds are still built and
+    # executed explicitly by their owning phase.
+    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+        cargo test --workspace --lib --bins --tests -j 2 >"$out" 2>&1
+    local tests_status=$?
+    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+        cargo check --workspace --examples -j 2 >"$examples" 2>&1
+    local examples_status=$?
+    local status=0
+    [ "$tests_status" -eq 0 ] && [ "$examples_status" -eq 0 ] || status=1
+    SUMMARY="$(sum_test_results <"$out"); example targets type-checked"
     # What is shown on failure is decided by the material: the lines cargo itself marks, plus
     # every result line. A fixed line budget would elide the one failure in a 30,000-line log.
-    [ "$status" -eq 0 ] || grep -E '^(error|failures:|---- |test result:)|FAILED|panicked' "$out"
+    if [ "$status" -ne 0 ]; then
+        grep -E '^(error|failures:|---- |test result:)|FAILED|panicked' "$out"
+        grep -E '^(error|warning:)|could not compile' "$examples"
+    fi
     return "$status"
 }
 

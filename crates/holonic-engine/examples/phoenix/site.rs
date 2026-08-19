@@ -9,7 +9,7 @@
 //! It is not a library owner: it binds a source instance, and `CLAUDE.md`'s rule is that a source
 //! instance never becomes internal anatomy. It is also not a scheduler — it declares ports, laws,
 //! occurrences and bonds, binds each occurrence to an exact operation, and hands over to
-//! `ported_operation::realize`, which is where the chronology decides the order.
+//! `ported_reference::realize`, which is where the chronology decides the order.
 
 #![allow(dead_code)]
 
@@ -26,12 +26,10 @@ use holonic_engine::exact_value::ieee754::{
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_operation::{
-    realize, OperationSpecies, PortedCarrier, PortedOperationComplex, PortedOperationKind,
-    PortedProgram, SourceTestimony,
-};
+use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
+use holonic_engine::ported_reference::{realize, PortedCarrier, PortedOperationKind, PortedProgram};
 use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use num_traits::Zero;
 use relational_geometry::Rat;
 
 const SITE: usize = 0;

@@ -9,7 +9,6 @@ use std::ffi::CString;
 // Keep them private: callers cross through the checked, typed wrappers below.
 #[link(name = "cuda")]
 extern "C" {
-    fn cuMemGetInfo_v2(free: *mut usize, total: *mut usize) -> ffi::CUresult;
     fn cuMemsetD32_v2(dst_device: ffi::CUdeviceptr, value: u32, count: usize) -> ffi::CUresult;
     fn cuDeviceGetAttribute(
         value: *mut i32,
@@ -231,6 +230,239 @@ impl Stream {
     pub const fn is_nonblocking(&self) -> bool {
         true
     }
+
+    /// Order this stream's later work after an event: a dependency edge, not a cpu wait. Under
+    /// capture it becomes a graph edge and nothing blocks.
+    pub fn wait_event(&self, event: &Event) -> Result<()> {
+        unsafe { check(ffi::cuStreamWaitEvent(self.stream, event.event, 0), "cuStreamWaitEvent") }
+    }
+
+    /// Begin recording every launch, event, memset and copy issued to this stream — and to any
+    /// stream that waits on an event recorded in it — as one graph, instead of executing them.
+    /// `CU_STREAM_CAPTURE_MODE_THREAD_LOCAL` (1): the capturing thread may issue no potentially
+    /// synchronizing apparatus call (an allocation, a synchronous copy) until the capture ends —
+    /// so a capture cannot silently interleave one — while other threads of the process, each
+    /// with its own exact owner, are unaffected.
+    pub fn begin_capture(&self) -> Result<()> {
+        unsafe { check(ffi::cuStreamBeginCapture_v2(self.stream, 1), "cuStreamBeginCapture_v2") }
+    }
+
+    /// Close the capture and return the bound graph. Every forked stream must have been joined
+    /// back through an event this stream waited on; the driver refuses an unjoined capture.
+    pub fn end_capture(&self) -> Result<Graph> {
+        let mut graph: ffi::CUgraph = core::ptr::null_mut();
+        unsafe { check(ffi::cuStreamEndCapture(self.stream, &mut graph), "cuStreamEndCapture")? };
+        Ok(Graph { graph })
+    }
+
+    /// Set `count` 32-bit words at `pointer` to `value`, ordered on this stream (a memset node
+    /// under capture).
+    pub fn memset_u32_async(&self, pointer: ffi::CUdeviceptr, value: u32, count: usize) -> Result<()> {
+        unsafe { check(ffi::cuMemsetD32Async(pointer, value, count, self.stream), "cuMemsetD32Async") }
+    }
+
+    /// A device-to-device copy ordered on this stream (a memcpy node under capture). Nothing
+    /// crosses the apparatus boundary.
+    pub fn copy_device_to_device_async(
+        &self,
+        destination: ffi::CUdeviceptr,
+        source: ffi::CUdeviceptr,
+        bytes: usize,
+    ) -> Result<()> {
+        unsafe {
+            check(
+                ffi::cuMemcpyDtoDAsync_v2(destination, source, bytes, self.stream),
+                "cuMemcpyDtoDAsync_v2",
+            )
+        }
+    }
+}
+
+/// One recorded point on a stream, for ordering other streams after it. Created without timing,
+/// so it is a dependency and never a clock.
+pub struct Event {
+    event: ffi::CUevent,
+}
+
+impl Event {
+    /// `CU_EVENT_DISABLE_TIMING` (2): an event that orders and does not time.
+    pub fn create() -> Result<Self> {
+        let mut event: ffi::CUevent = core::ptr::null_mut();
+        unsafe { check(ffi::cuEventCreate(&mut event, 2), "cuEventCreate(DISABLE_TIMING)")? };
+        Ok(Self { event })
+    }
+
+    /// Record this event at the current tail of `stream`.
+    pub fn record(&self, stream: &Stream) -> Result<()> {
+        unsafe { check(ffi::cuEventRecord(self.event, stream.stream), "cuEventRecord") }
+    }
+}
+
+impl Drop for Event {
+    fn drop(&mut self) {
+        if !self.event.is_null() {
+            unsafe {
+                let _ = ffi::cuEventDestroy_v2(self.event);
+            }
+            self.event = core::ptr::null_mut();
+        }
+    }
+}
+
+/// The census of a bound graph, read back from the driver: what the apparatus actually holds,
+/// not what the caller intended to capture. `edges` is the dependency population; two nodes with
+/// no path between them are co-present on the apparatus by construction.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GraphCensus {
+    pub nodes: usize,
+    pub edges: usize,
+    pub kernel_nodes: usize,
+    pub memset_nodes: usize,
+    pub memcpy_nodes: usize,
+    pub other_nodes: usize,
+}
+
+/// A captured graph: the complete dependency structure of a deed, bound before it is launched.
+pub struct Graph {
+    graph: ffi::CUgraph,
+}
+
+impl Graph {
+    /// Read the node and edge populations back from the driver.
+    pub fn census(&self) -> Result<GraphCensus> {
+        let mut nodes = 0usize;
+        unsafe {
+            check(
+                ffi::cuGraphGetNodes(self.graph, core::ptr::null_mut(), &mut nodes),
+                "cuGraphGetNodes(count)",
+            )?
+        };
+        let mut handles: Vec<ffi::CUgraphNode> = vec![core::ptr::null_mut(); nodes];
+        if nodes > 0 {
+            unsafe {
+                check(
+                    ffi::cuGraphGetNodes(self.graph, handles.as_mut_ptr(), &mut nodes),
+                    "cuGraphGetNodes",
+                )?
+            };
+        }
+        let mut edges = 0usize;
+        unsafe {
+            check(
+                ffi::cuGraphGetEdges(self.graph, core::ptr::null_mut(), core::ptr::null_mut(), &mut edges),
+                "cuGraphGetEdges(count)",
+            )?
+        };
+        let (mut kernel_nodes, mut memset_nodes, mut memcpy_nodes, mut other_nodes) = (0, 0, 0, 0);
+        for handle in handles.iter().take(nodes) {
+            let mut kind: core::ffi::c_int = -1;
+            unsafe { check(ffi::cuGraphNodeGetType(*handle, &mut kind), "cuGraphNodeGetType")? };
+            // CUgraphNodeType: KERNEL 0, MEMCPY 1, MEMSET 2; everything else is counted apart.
+            match kind {
+                0 => kernel_nodes += 1,
+                1 => memcpy_nodes += 1,
+                2 => memset_nodes += 1,
+                _ => other_nodes += 1,
+            }
+        }
+        Ok(GraphCensus {
+            nodes,
+            edges,
+            kernel_nodes,
+            memset_nodes,
+            memcpy_nodes,
+            other_nodes,
+        })
+    }
+
+    /// Instantiate the graph for launch. Flags 0: no device-launch, no auto-free.
+    pub fn instantiate(&self) -> Result<GraphExec> {
+        let mut exec: ffi::CUgraphExec = core::ptr::null_mut();
+        unsafe {
+            check(
+                ffi::cuGraphInstantiateWithFlags(&mut exec, self.graph, 0),
+                "cuGraphInstantiateWithFlags",
+            )?
+        };
+        Ok(GraphExec { exec })
+    }
+}
+
+impl Drop for Graph {
+    fn drop(&mut self) {
+        if !self.graph.is_null() {
+            unsafe {
+                let _ = ffi::cuGraphDestroy(self.graph);
+            }
+            self.graph = core::ptr::null_mut();
+        }
+    }
+}
+
+/// An instantiated graph. One `launch` enacts the whole bound structure; the cpu takes no part
+/// between its nodes.
+pub struct GraphExec {
+    exec: ffi::CUgraphExec,
+}
+
+impl GraphExec {
+    pub fn launch(&self, stream: &Stream) -> Result<()> {
+        unsafe { check(ffi::cuGraphLaunch(self.exec, stream.stream), "cuGraphLaunch") }
+    }
+}
+
+impl Drop for GraphExec {
+    fn drop(&mut self) {
+        if !self.exec.is_null() {
+            unsafe {
+                let _ = ffi::cuGraphExecDestroy(self.exec);
+            }
+            self.exec = core::ptr::null_mut();
+        }
+    }
+}
+
+/// A context this crate did NOT create and must not destroy: another owner mounted it and this
+/// caller only makes it current. A borrowed context is how two exact owners share one device
+/// context without either creating a second census of the card.
+pub struct BorrowedContext {
+    ctx: ffi::CUcontext,
+}
+
+impl BorrowedContext {
+    /// Adopt a raw driver context handle. The caller asserts the owning body outlives every use.
+    pub fn adopt(raw: *mut c_void) -> Result<Self> {
+        if raw.is_null() {
+            return Err(invalid_driver_value("BorrowedContext::adopt", "a null context handle".into()));
+        }
+        Ok(Self { ctx: raw })
+    }
+
+    pub fn make_current(&self) -> Result<()> {
+        unsafe { check(ffi::cuCtxSetCurrent(self.ctx), "cuCtxSetCurrent") }
+    }
+
+    /// The raw handle, for equality against another owner's handle. Never dereferenced here.
+    pub fn raw(&self) -> *mut c_void {
+        self.ctx
+    }
+
+    /// Free and total device memory as the driver reports it for the current context.
+    pub fn memory_info(&self) -> Result<MemoryInfo> {
+        self.make_current()?;
+        let mut free_bytes = 0;
+        let mut total_bytes = 0;
+        unsafe { check(ffi::cuMemGetInfo_v2(&mut free_bytes, &mut total_bytes), "cuMemGetInfo_v2")? };
+        Ok(MemoryInfo { free_bytes, total_bytes })
+    }
+
+    /// The measured `cuMemAlloc` charge grain in this borrowed context — the same probe as
+    /// [`Context::allocation_grain_bytes`], so an adopting owner can price its allocations against
+    /// the grain the card actually charges.
+    pub fn allocation_grain_bytes(&self) -> Result<usize> {
+        self.make_current()?;
+        measure_allocation_grain(|| self.memory_info())
+    }
 }
 
 impl Drop for Stream {
@@ -360,7 +592,7 @@ impl Context {
         let mut total_bytes = 0;
         unsafe {
             check(
-                cuMemGetInfo_v2(&mut free_bytes, &mut total_bytes),
+                ffi::cuMemGetInfo_v2(&mut free_bytes, &mut total_bytes),
                 "cuMemGetInfo_v2",
             )?
         };
@@ -382,47 +614,55 @@ impl Context {
     /// substrate grain only to reserve simultaneous allocations before launch; it is not a body
     /// extent. A second probe proves the charge composes instead of assuming a page size.
     pub fn allocation_grain_bytes(&self) -> Result<usize> {
-        let before = self.memory_info()?.free_bytes;
-        let one = DeviceBuffer::<u32>::alloc(1)?;
-        let after_one = self.memory_info()?.free_bytes;
-        let grain = before.checked_sub(after_one).ok_or_else(|| {
-            invalid_driver_value(
-                "Context::allocation_grain_bytes",
-                "a live allocation increased reported free memory".into(),
-            )
-        })?;
-        drop(one);
-        let restored = self.memory_info()?.free_bytes;
-        if grain == 0 || grain % core::mem::size_of::<u32>() != 0 || restored != before {
-            return Err(invalid_driver_value(
-                "Context::allocation_grain_bytes",
-                format!(
-                    "one-word charge {grain} and restored free extent {restored} do not close at {before}"
-                ),
-            ));
-        }
-
-        let wider_words = grain / core::mem::size_of::<u32>() + 1;
-        let wider = DeviceBuffer::<u32>::alloc(wider_words)?;
-        let after_wider = self.memory_info()?.free_bytes;
-        let wider_charge = before.checked_sub(after_wider).ok_or_else(|| {
-            invalid_driver_value(
-                "Context::allocation_grain_bytes",
-                "the wider probe increased reported free memory".into(),
-            )
-        })?;
-        drop(wider);
-        let restored_again = self.memory_info()?.free_bytes;
-        if grain.checked_mul(2) != Some(wider_charge) || restored_again != before {
-            return Err(invalid_driver_value(
-                "Context::allocation_grain_bytes",
-                format!(
-                    "the measured charge does not compose: grain {grain}, wider charge {wider_charge}, restored {restored_again}/{before}"
-                ),
-            ));
-        }
-        Ok(grain)
+        measure_allocation_grain(|| self.memory_info())
     }
+}
+
+/// The allocation-grain probe shared by an owned and a borrowed context: one word's charge, then a
+/// probe one word wider than that charge must cost exactly twice, and the free extent must close
+/// after each. **Measured, never declared** — an apparatus coordinate a deed's admission rounds
+/// every allocation up to.
+fn measure_allocation_grain(memory_info: impl Fn() -> Result<MemoryInfo>) -> Result<usize> {
+    let before = memory_info()?.free_bytes;
+    let one = DeviceBuffer::<u32>::alloc(1)?;
+    let after_one = memory_info()?.free_bytes;
+    let grain = before.checked_sub(after_one).ok_or_else(|| {
+        invalid_driver_value(
+            "allocation_grain_bytes",
+            "a live allocation increased reported free memory".into(),
+        )
+    })?;
+    drop(one);
+    let restored = memory_info()?.free_bytes;
+    if grain == 0 || grain % core::mem::size_of::<u32>() != 0 || restored != before {
+        return Err(invalid_driver_value(
+            "allocation_grain_bytes",
+            format!(
+                "one-word charge {grain} and restored free extent {restored} do not close at {before}"
+            ),
+        ));
+    }
+
+    let wider_words = grain / core::mem::size_of::<u32>() + 1;
+    let wider = DeviceBuffer::<u32>::alloc(wider_words)?;
+    let after_wider = memory_info()?.free_bytes;
+    let wider_charge = before.checked_sub(after_wider).ok_or_else(|| {
+        invalid_driver_value(
+            "allocation_grain_bytes",
+            "the wider probe increased reported free memory".into(),
+        )
+    })?;
+    drop(wider);
+    let restored_again = memory_info()?.free_bytes;
+    if grain.checked_mul(2) != Some(wider_charge) || restored_again != before {
+        return Err(invalid_driver_value(
+            "allocation_grain_bytes",
+            format!(
+                "the measured charge does not compose: grain {grain}, wider charge {wider_charge}, restored {restored_again}/{before}"
+            ),
+        ));
+    }
+    Ok(grain)
 }
 
 impl Drop for Context {
@@ -665,7 +905,7 @@ impl Function<'_> {
     /// Launch this kernel. `params` are pointers to each argument value, in declared order,
     /// exactly as `cuLaunchKernel`'s `kernelParams` expects (e.g. `&mut buf.device_ptr() as *mut _`).
     pub fn launch(&self, grid: Dim3, block: Dim3, params: &mut [*mut c_void]) -> Result<()> {
-        self.launch_raw(grid, block, core::ptr::null_mut(), params)
+        self.launch_raw(grid, block, 0, core::ptr::null_mut(), params)
     }
 
     pub fn launch_on(
@@ -675,13 +915,27 @@ impl Function<'_> {
         block: Dim3,
         params: &mut [*mut c_void],
     ) -> Result<()> {
-        self.launch_raw(grid, block, stream.stream, params)
+        self.launch_raw(grid, block, 0, stream.stream, params)
+    }
+
+    /// Launch on a stream with `shared_bytes` of dynamic shared memory per block — a block
+    /// reduction's own working surface, sized by the caller from the extent it reduces.
+    pub fn launch_on_shared(
+        &self,
+        stream: &Stream,
+        grid: Dim3,
+        block: Dim3,
+        shared_bytes: u32,
+        params: &mut [*mut c_void],
+    ) -> Result<()> {
+        self.launch_raw(grid, block, shared_bytes, stream.stream, params)
     }
 
     fn launch_raw(
         &self,
         grid: Dim3,
         block: Dim3,
+        shared_bytes: u32,
         stream: ffi::CUstream,
         params: &mut [*mut c_void],
     ) -> Result<()> {
@@ -695,7 +949,7 @@ impl Function<'_> {
                     block.x,
                     block.y,
                     block.z,
-                    0,
+                    shared_bytes,
                     stream,
                     params.as_mut_ptr(),
                     core::ptr::null_mut(),

@@ -48,6 +48,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -83,11 +84,26 @@ def crate_of(source: Path) -> Path:
     return source.parent
 
 
+@lru_cache(maxsize=None)
+def file_digest(source: Path) -> str:
+    """Hash a source occurrence once per manifest reading."""
+
+    return hashlib.sha256(source.read_bytes()).hexdigest()
+
+
+@lru_cache(maxsize=None)
+def crate_members(crate: Path) -> tuple[Path, ...]:
+    """The shared closure population of a driver-owning crate, founded once per crate."""
+
+    members = [crate / "Cargo.toml"]
+    members += sorted((crate / "src").rglob("*.rs"))
+    return tuple(member for member in sorted(set(members)) if member.is_file())
+
+
 def closure_of(source: Path) -> tuple[str, int]:
     """Hash the driver, its crate's sources, and its crate manifest. Returns (hash, file count)."""
     crate = crate_of(source)
-    members = [source, crate / "Cargo.toml"]
-    members += sorted((crate / "src").rglob("*.rs"))
+    members = [source, *crate_members(crate)]
     digest = hashlib.sha256()
     counted = 0
     for member in sorted(set(members)):
@@ -95,7 +111,7 @@ def closure_of(source: Path) -> tuple[str, int]:
             continue
         digest.update(str(member.relative_to(ROOT)).encode())
         digest.update(b"\0")
-        digest.update(hashlib.sha256(member.read_bytes()).hexdigest().encode())
+        digest.update(file_digest(member).encode())
         digest.update(b"\n")
         counted += 1
     return digest.hexdigest(), counted

@@ -38,9 +38,8 @@ use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bflo
 use holonic_engine::exact_value::ExactInterval;
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_operation::{
-    realize, PortedCarrier, PortedOperationComplex, PortedProgram,
-};
+use holonic_engine::ported_operation::PortedOperationComplex;
+use holonic_engine::ported_reference::{realize, PortedProgram};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
@@ -220,7 +219,7 @@ fn seal_and_hand_over(arguments: &[String]) {
         let is_row = site.program.operations.values().any(|operation| {
             matches!(
                 operation,
-                holonic_engine::ported_operation::PortedOperationKind::Lookup { population: named, .. }
+                holonic_engine::ported_reference::PortedOperationKind::Lookup { population: named, .. }
                     if named == population
             )
         });
@@ -257,7 +256,7 @@ fn seal_and_hand_over(arguments: &[String]) {
     let mut sealed_program = site.program.clone();
     let mut relocated = 0usize;
     for operation in sealed_program.operations.values_mut() {
-        if let holonic_engine::ported_operation::PortedOperationKind::Lookup { row, .. } = operation
+        if let holonic_engine::ported_reference::PortedOperationKind::Lookup { row, .. } = operation
         {
             *row = CAUSED.iter().position(|caused| caused == row).unwrap_or(0);
             relocated += 1;
@@ -287,7 +286,7 @@ fn seal_and_hand_over(arguments: &[String]) {
     );
     metadata.insert(
         "realization".to_owned(),
-        "the runtime is `ported_operation::realize`; the ordering is the diagram's chronology; the \
+        "the runtime is `ported_reference::realize`; the ordering is the diagram's chronology; the \
          apparatus is one resident chart and this container. No source access is admitted."
             .to_owned(),
     );

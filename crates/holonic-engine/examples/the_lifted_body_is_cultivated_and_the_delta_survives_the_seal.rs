@@ -46,7 +46,7 @@ use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
-use holonic_engine::ported_operation::PortedOperationKind;
+use holonic_engine::ported_reference::PortedOperationKind;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
@@ -687,7 +687,7 @@ fn seal(
     );
     metadata.insert(
         "realization".to_owned(),
-        "the runtime is `ported_operation::realize`; the ordering is the diagram's chronology."
+        "the runtime is `ported_reference::realize`; the ordering is the diagram's chronology."
             .to_owned(),
     );
     write_container(path, &header, &metadata, &payload);

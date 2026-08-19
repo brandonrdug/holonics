@@ -14,6 +14,10 @@ pub type CUcontext = *mut c_void;
 pub type CUmodule = *mut c_void;
 pub type CUfunction = *mut c_void;
 pub type CUstream = *mut c_void;
+pub type CUevent = *mut c_void;
+pub type CUgraph = *mut c_void;
+pub type CUgraphExec = *mut c_void;
+pub type CUgraphNode = *mut c_void;
 pub type CUmemGenericAllocationHandle = u64;
 
 #[repr(C)]
@@ -148,4 +152,40 @@ extern "C" {
 
     pub fn cuGetErrorName(err: CUresult, pStr: *mut *const c_char) -> CUresult;
     pub fn cuGetErrorString(err: CUresult, pStr: *mut *const c_char) -> CUresult;
+
+    // Events, stream capture and graphs — added 2026-08-18 for the resident passage: a whole
+    // dependency structure is bound before launch and launched once, so no cpu decision sits
+    // between semantic nodes. Bound by their exported symbol names; `cuGraphInstantiate` is the
+    // header's `#define` for `cuGraphInstantiateWithFlags` and `cuStreamBeginCapture` for the
+    // `_v2` entry.
+    pub fn cuEventCreate(phEvent: *mut CUevent, flags: c_uint) -> CUresult;
+    pub fn cuEventRecord(hEvent: CUevent, hStream: CUstream) -> CUresult;
+    pub fn cuEventDestroy_v2(hEvent: CUevent) -> CUresult;
+    pub fn cuStreamWaitEvent(hStream: CUstream, hEvent: CUevent, flags: c_uint) -> CUresult;
+    pub fn cuStreamBeginCapture_v2(hStream: CUstream, mode: c_int) -> CUresult;
+    pub fn cuStreamEndCapture(hStream: CUstream, phGraph: *mut CUgraph) -> CUresult;
+    pub fn cuGraphInstantiateWithFlags(
+        phGraphExec: *mut CUgraphExec,
+        hGraph: CUgraph,
+        flags: u64,
+    ) -> CUresult;
+    pub fn cuGraphLaunch(hGraphExec: CUgraphExec, hStream: CUstream) -> CUresult;
+    pub fn cuGraphExecDestroy(hGraphExec: CUgraphExec) -> CUresult;
+    pub fn cuGraphDestroy(hGraph: CUgraph) -> CUresult;
+    pub fn cuGraphGetNodes(hGraph: CUgraph, nodes: *mut CUgraphNode, numNodes: *mut usize) -> CUresult;
+    pub fn cuGraphGetEdges(
+        hGraph: CUgraph,
+        from: *mut CUgraphNode,
+        to: *mut CUgraphNode,
+        numEdges: *mut usize,
+    ) -> CUresult;
+    pub fn cuGraphNodeGetType(hNode: CUgraphNode, kind: *mut c_int) -> CUresult;
+    pub fn cuMemsetD32Async(dstDevice: CUdeviceptr, ui: c_uint, n: usize, hStream: CUstream) -> CUresult;
+    pub fn cuMemcpyDtoDAsync_v2(
+        dst: CUdeviceptr,
+        src: CUdeviceptr,
+        bytes: usize,
+        hStream: CUstream,
+    ) -> CUresult;
+    pub fn cuMemGetInfo_v2(free: *mut usize, total: *mut usize) -> CUresult;
 }

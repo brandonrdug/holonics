@@ -34,7 +34,8 @@ mod site;
 use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::ported_operation::{realize_under, FrontHand, PortedError};
+use holonic_engine::ported_operation::PortedError;
+use holonic_engine::ported_reference::{realize_under, FrontHand};
 use site::{found, ResidentSourceCarrier, BAND_POPULATION, BASE};
 
 const HANDS: [(FrontHand, &str); 3] = [

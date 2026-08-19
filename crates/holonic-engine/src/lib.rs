@@ -297,6 +297,9 @@ pub mod returned_conduct;
 // with the obstruction named when the target chart cannot represent the answer.
 // `canon/TABLET_THE_CHART.md:280`.
 pub mod ported_operation;
+// The serial reference realization of a ported diagram, quarantined from the production cone
+// 2026-08-18: admission and parity testimony only. The resident owner is `resident_section`.
+pub mod ported_reference;
 pub mod quintic_chart;
 // Exact univariate and bivariate polynomials over `Q`, with the complete rational-root census and
 // the fraction-free polynomial resultant that `quintic_chart` eliminates with.
@@ -314,6 +317,18 @@ pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
 pub mod regime_reading;
+// The resident section: the continuing semantic standing owned by the card between the entering
+// codewords and the terminal face. Contract:
+// `research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`.
+pub mod resident_section;
+// The source occurrence a resident passage binds to, authenticated by content: implementation
+// symbols and slices resolved in the file, configuration fields as exact JSON spans, container
+// regions with their digests, interventions typed apart from source law. Same contract.
+pub mod source_occurrence;
+// The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
+// -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
+pub mod front_passage;
+pub mod resident_law;
 pub mod reopening;
 pub mod resource;
 pub mod sheaf_diffusion;

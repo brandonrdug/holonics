@@ -230,6 +230,24 @@ pub enum DistinguishingWord {
     /// (`founded_receiver.rs`: *"founding sharpens what is seen, never what conduct does"*). If this
     /// fires, the law is violated; the certificate reports it and refuses rather than grading it.
     ConductMoved { orders: (usize, usize) },
+    /// **An admitted legal order of a co-present front changed its complete return.** The
+    /// coordinate names which of endpoint, conduct, obstruction, lineage, resources, capacities or
+    /// remainder moved, and the port it moved at; `differing` is how many endpoint coordinates
+    /// disagreed where the coordinate is the endpoint. Added 2026-08-18 for
+    /// [`certify_front`], the front-order generalization of this certificate.
+    ReturnDiffers {
+        orders: (usize, usize),
+        coordinate: String,
+        port: String,
+        differing: u64,
+    },
+    /// **An admitted order could not be enacted at all** — a consumer ran before its producer, or
+    /// the apparatus refused. The order was declared legal and is not; the front stays ordered.
+    EnactmentRefused { order: usize, reason: String },
+    /// **Two members of a front share an address one of them writes.** Their complete
+    /// consequences cannot commute, so the front stays ordered — derived from the footprints
+    /// before any launch, never from a replay. Added 2026-08-18 for [`certify_footprints`].
+    FootprintShared { members: (usize, usize), address: u64 },
 }
 
 /// The verdict. Refusal is a first-class return.
@@ -261,6 +279,12 @@ pub enum Coherence {
         orders_lawful: usize,
         agreed: bool,
     },
+    /// **Independence derived, not replayed.** Every pair of members was checked for a shared
+    /// address that either writes, and none was found; the members share no allocator, mint or
+    /// resource during the deed, and each is a deterministic function of its inputs. On such a
+    /// front every order — and every physical interleaving — returns one complete consequence by
+    /// construction, which is what a factorial replay could only sample. Added 2026-08-18.
+    FootprintDisjoint { occurrences: usize, pairs_checked: usize },
 }
 
 impl Coherence {
@@ -1550,6 +1574,432 @@ impl InterchangeCertificate {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// THE FRONT CERTIFICATE — the same law over the enacted orders of a co-present front, 2026-08-18
+// ---------------------------------------------------------------------------------------------
+//
+// `CausalDiagram::layers` says which occurrences are co-present. Co-presence is a claim about the
+// diagram; **parallel physical enactment additionally requires that no admitted legal order of the
+// front changes its complete return** — endpoint, conduct, obstruction, lineage, logical resources,
+// capacities, remainder — which is this module's law pointed at enacted orders instead of founding
+// orders. The Phoenix audit of 2026-08-18 returned that the paused pathway enforced dataflow and
+// enacted nothing simultaneously, and that no front carried a certificate at all. This is the owner-
+// local generalization the correction directive asked for: the verdict is [`Interchange`], the
+// refusal is a [`DistinguishingWord`], and the coherence is [`Coherence::AllOrders`] over every
+// permutation the caller declared legal.
+//
+// The endpoint is compared WHERE IT LIVES. A resident section must not cross to the serial chart to
+// be compared, so the enactor answers [`EnactsInOrder::endpoints_disagree`] itself; this module only
+// asks. Everything else in the return is a face the enactor hands over as [`EnactedFace`].
+
+/// **The complete return of one enacted order, as the coordinates the certificate compares** —
+/// every coordinate the directive names except the endpoint, which the enactor compares in place.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EnactedFace {
+    /// Per written port, the operation that wrote it. The conduct.
+    pub conduct: BTreeMap<String, String>,
+    /// Every typed obstruction the order returned, by name.
+    pub obstruction: Vec<String>,
+    /// Per written port, the ports it read — order-free. The lineage.
+    pub lineage: BTreeMap<String, BTreeSet<String>>,
+    /// Logical resources: launches, resident entries, work coordinates.
+    pub resources: BTreeMap<String, BigUint>,
+    /// Capacities: grain, apertures, the octave census per port.
+    pub capacities: BTreeMap<String, BigUint>,
+    /// Per written port, the widest enclosure — the propagated remainder's census.
+    pub remainder: BTreeMap<String, BigUint>,
+}
+
+/// What a front's enactor must answer for the certificate to be taken.
+pub trait EnactsInOrder {
+    /// Enact the front in this order into staging, returning its face; refuse an order that cannot
+    /// be enacted (a consumer before its producer, an apparatus refusal).
+    fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String>;
+    /// Per written port, how many endpoint coordinates disagree between the stagings of two enacted
+    /// orders — compared where the endpoints live. Only nonzero entries need be returned.
+    fn endpoints_disagree(&mut self, a: usize, b: usize) -> Result<Vec<(String, u64)>, String>;
+}
+
+/// The certificate over a front's declared legal orders.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FrontCertificate {
+    pub schema: String,
+    pub members: usize,
+    /// Every order that was declared legal and enacted, in the order it was enacted.
+    pub orders: Vec<Vec<usize>>,
+    /// The face of each order, `None` where it refused.
+    pub faces: Vec<Option<EnactedFace>>,
+    pub refusals: Vec<(usize, String)>,
+    pub endpoints_agree: bool,
+    pub conduct_agrees: bool,
+    pub obstruction_agrees: bool,
+    pub lineage_agrees: bool,
+    pub resources_agree: bool,
+    pub capacities_agree: bool,
+    pub remainder_agrees: bool,
+    pub verdict: Interchange,
+    pub coherence: Coherence,
+}
+
+impl FrontCertificate {
+    pub fn is_interchangeable(&self) -> bool {
+        matches!(self.verdict, Interchange::Interchangeable)
+    }
+
+    /// What a certificate comparing only the endpoint would have said. Kept beside the verdict for
+    /// the same reason [`InterchangeCertificate::endpoint_only_verdict`] is: *"Endpoint equality
+    /// became stateful equivalence"* is the convicted defect.
+    pub fn endpoint_only_verdict(&self) -> bool {
+        self.refusals.is_empty() && self.endpoints_agree
+    }
+
+    pub fn lineage_changed_the_verdict(&self) -> bool {
+        self.endpoint_only_verdict() != self.is_interchangeable()
+    }
+
+    pub fn because(&self) -> Option<&DistinguishingWord> {
+        match &self.verdict {
+            Interchange::Interchangeable => None,
+            Interchange::Ordered { because } => Some(because),
+        }
+    }
+}
+
+/// Every permutation of `0..members`. The admitted legal orders of a front whose members read only
+/// committed standings — which is what a front is.
+pub fn all_orders(members: usize) -> Vec<Vec<usize>> {
+    permutations(&(0..members).collect::<Vec<_>>())
+}
+
+/// One member's footprint on the apparatus: the address ranges it reads and the ranges it writes,
+/// half-open `[from, to)`. Every range is a realization coordinate and carries no semantics.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MemberFootprint {
+    pub reads: Vec<(u64, u64)>,
+    pub writes: Vec<(u64, u64)>,
+}
+
+fn ranges_meet(a: (u64, u64), b: (u64, u64)) -> Option<u64> {
+    let from = a.0.max(b.0);
+    let to = a.1.min(b.1);
+    (from < to).then_some(from)
+}
+
+/// **Certify a front from its members' footprints, before any launch.** The law it applies is
+/// `canon/01_CAUSAL_CALCULUS.md:85`: two events belong to the independence relation when their
+/// complete exact consequences commute, for which disjoint read/write support suffices *"only when
+/// no hidden allocator, lineage mint, port, resource state, or other owner is shared."* The caller
+/// asserts the second half by construction — every member owns its own census slot, every
+/// allocation precedes the deed, every kernel is a deterministic function of its inputs — and this
+/// function checks the first: no member writes an address another member reads or writes.
+///
+/// A factorial replay was what stood here. It sampled orders and compared endpoints; this derives
+/// the property the replay could only sample, and it scales as the square of the breadth rather
+/// than its factorial.
+pub fn certify_footprints(members: &[MemberFootprint]) -> FrontCertificate {
+    let mut pairs = 0usize;
+    let mut because: Option<DistinguishingWord> = None;
+    'outer: for (i, a) in members.iter().enumerate() {
+        for (j, b) in members.iter().enumerate().skip(i + 1) {
+            pairs += 1;
+            for write in &a.writes {
+                for other in b.reads.iter().chain(b.writes.iter()) {
+                    if let Some(address) = ranges_meet(*write, *other) {
+                        because = Some(DistinguishingWord::FootprintShared { members: (i, j), address });
+                        break 'outer;
+                    }
+                }
+            }
+            for write in &b.writes {
+                for other in a.reads.iter() {
+                    if let Some(address) = ranges_meet(*write, *other) {
+                        because = Some(DistinguishingWord::FootprintShared { members: (i, j), address });
+                        break 'outer;
+                    }
+                }
+            }
+        }
+    }
+    let agreed = because.is_none();
+    FrontCertificate {
+        schema: "holonic-engine.front-certificate.footprint.v1".to_owned(),
+        members: members.len(),
+        orders: Vec::new(),
+        faces: Vec::new(),
+        refusals: Vec::new(),
+        endpoints_agree: agreed,
+        conduct_agrees: agreed,
+        obstruction_agrees: agreed,
+        lineage_agrees: agreed,
+        resources_agree: agreed,
+        capacities_agree: agreed,
+        remainder_agrees: agreed,
+        verdict: match because {
+            Some(because) => Interchange::Ordered { because },
+            None => Interchange::Interchangeable,
+        },
+        coherence: Coherence::FootprintDisjoint { occurrences: members.len(), pairs_checked: pairs },
+    }
+}
+
+/// **Certify a front over its declared legal orders.** Every order is enacted; the first coordinate
+/// on which two orders' complete returns disagree refuses the front by name.
+pub fn certify_front(orders: &[Vec<usize>], enactor: &mut dyn EnactsInOrder) -> FrontCertificate {
+    let members = orders.first().map(Vec::len).unwrap_or(0);
+    let mut faces: Vec<Option<EnactedFace>> = Vec::with_capacity(orders.len());
+    let mut refusals = Vec::new();
+    for (at, order) in orders.iter().enumerate() {
+        match enactor.enact_in(order) {
+            Ok(face) => faces.push(Some(face)),
+            Err(reason) => {
+                refusals.push((at, reason));
+                faces.push(None);
+            }
+        }
+    }
+    let lawful = faces.iter().filter(|face| face.is_some()).count();
+    let mut certificate = FrontCertificate {
+        schema: "holonic-engine.front-certificate.v1".to_owned(),
+        members,
+        orders: orders.to_vec(),
+        faces: faces.clone(),
+        refusals: refusals.clone(),
+        endpoints_agree: true,
+        conduct_agrees: true,
+        obstruction_agrees: true,
+        lineage_agrees: true,
+        resources_agree: true,
+        capacities_agree: true,
+        remainder_agrees: true,
+        verdict: Interchange::Interchangeable,
+        coherence: Coherence::AllOrders {
+            occurrences: members,
+            orders_compared: orders.len(),
+            orders_lawful: lawful,
+            agreed: false,
+        },
+    };
+    // 1. Every declared order must enact. A declared-legal order that refuses is the first refusal.
+    if let Some((order, reason)) = refusals.first() {
+        certificate.verdict = Interchange::Ordered {
+            because: DistinguishingWord::EnactmentRefused {
+                order: *order,
+                reason: reason.clone(),
+            },
+        };
+        return certificate;
+    }
+    // 2. Every coordinate of every later order against the first, endpoint first.
+    let mut because: Option<DistinguishingWord> = None;
+    for later in 1..orders.len() {
+        match enactor.endpoints_disagree(0, later) {
+            Ok(differing) => {
+                if let Some((port, count)) = differing.into_iter().find(|(_, count)| *count > 0) {
+                    certificate.endpoints_agree = false;
+                    because.get_or_insert(DistinguishingWord::ReturnDiffers {
+                        orders: (0, later),
+                        coordinate: "endpoint".to_owned(),
+                        port,
+                        differing: count,
+                    });
+                }
+            }
+            Err(reason) => {
+                certificate.endpoints_agree = false;
+                because.get_or_insert(DistinguishingWord::EnactmentRefused {
+                    order: later,
+                    reason,
+                });
+            }
+        }
+        let (Some(first), Some(other)) = (&faces[0], &faces[later]) else {
+            continue;
+        };
+        let mut note = |coordinate: &'static str, port: String, agrees: &mut bool| {
+            *agrees = false;
+            because.get_or_insert(DistinguishingWord::ReturnDiffers {
+                orders: (0, later),
+                coordinate: coordinate.to_owned(),
+                port,
+                differing: 0,
+            });
+        };
+        if first.conduct != other.conduct {
+            let port = first_disagreeing_key(&first.conduct, &other.conduct);
+            note("conduct", port, &mut certificate.conduct_agrees);
+        }
+        if first.obstruction != other.obstruction {
+            note("obstruction", String::new(), &mut certificate.obstruction_agrees);
+        }
+        if first.lineage != other.lineage {
+            let port = first_disagreeing_key(&first.lineage, &other.lineage);
+            note("lineage", port, &mut certificate.lineage_agrees);
+        }
+        if first.resources != other.resources {
+            let port = first_disagreeing_key(&first.resources, &other.resources);
+            note("resources", port, &mut certificate.resources_agree);
+        }
+        if first.capacities != other.capacities {
+            let port = first_disagreeing_key(&first.capacities, &other.capacities);
+            note("capacities", port, &mut certificate.capacities_agree);
+        }
+        if first.remainder != other.remainder {
+            let port = first_disagreeing_key(&first.remainder, &other.remainder);
+            note("remainder", port, &mut certificate.remainder_agrees);
+        }
+    }
+    match because {
+        Some(because) => certificate.verdict = Interchange::Ordered { because },
+        None => {
+            certificate.coherence = Coherence::AllOrders {
+                occurrences: members,
+                orders_compared: orders.len(),
+                orders_lawful: lawful,
+                agreed: true,
+            };
+        }
+    }
+    certificate
+}
+
+fn first_disagreeing_key<V: PartialEq>(left: &BTreeMap<String, V>, right: &BTreeMap<String, V>) -> String {
+    for (key, value) in left {
+        match right.get(key) {
+            Some(other) if other == value => {}
+            _ => return key.clone(),
+        }
+    }
+    right
+        .keys()
+        .find(|key| !left.contains_key(*key))
+        .cloned()
+        .unwrap_or_default()
+}
+
+#[cfg(test)]
+mod front_certificate_tests {
+    use super::*;
+
+    /// Two members writing two ports from shared immutable inputs: every order agrees.
+    struct Independent {
+        written: BTreeMap<usize, Vec<i64>>,
+    }
+
+    impl EnactsInOrder for Independent {
+        fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String> {
+            let mut face = EnactedFace::default();
+            let mut ports = Vec::new();
+            for member in order {
+                ports.push(vec![*member as i64 * 10, *member as i64 * 10 + 1]);
+                face.conduct.insert(format!("port {member}"), "double".to_owned());
+                face.lineage.insert(format!("port {member}"), BTreeSet::from(["standing".to_owned()]));
+            }
+            face.resources.insert("launches".to_owned(), BigUint::from(order.len()));
+            let key = order.iter().fold(0usize, |acc, m| acc * 10 + m);
+            // stored per order under its lexical key, sorted by member so the endpoint is order-free
+            let mut sorted: Vec<(usize, Vec<i64>)> = order.iter().copied().zip(ports).collect();
+            sorted.sort();
+            self.written.insert(key, sorted.into_iter().flat_map(|(_, p)| p).collect());
+            Ok(face)
+        }
+        fn endpoints_disagree(&mut self, a: usize, b: usize) -> Result<Vec<(String, u64)>, String> {
+            let keys: Vec<usize> = self.written.keys().copied().collect();
+            let differing = self.written[&keys[a]]
+                .iter()
+                .zip(&self.written[&keys[b]])
+                .filter(|(x, y)| x != y)
+                .count() as u64;
+            Ok(vec![("all".to_owned(), differing)])
+        }
+    }
+
+    /// Two members that share one mutable slot: the order decides the endpoint.
+    struct Coupled {
+        endpoints: Vec<i64>,
+    }
+
+    impl EnactsInOrder for Coupled {
+        fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String> {
+            let mut slot = 0i64;
+            for member in order {
+                slot = slot * 2 + *member as i64; // not commutative
+            }
+            self.endpoints.push(slot);
+            let mut face = EnactedFace::default();
+            face.conduct.insert("slot".to_owned(), "fold".to_owned());
+            Ok(face)
+        }
+        fn endpoints_disagree(&mut self, a: usize, b: usize) -> Result<Vec<(String, u64)>, String> {
+            Ok(vec![("slot".to_owned(), u64::from(self.endpoints[a] != self.endpoints[b]))])
+        }
+    }
+
+    /// One order is illegal: the enactor refuses it.
+    struct Illegal;
+
+    impl EnactsInOrder for Illegal {
+        fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String> {
+            if order[0] == 1 {
+                return Err("member 1 reads a standing member 0 has not written".to_owned());
+            }
+            Ok(EnactedFace::default())
+        }
+        fn endpoints_disagree(&mut self, _: usize, _: usize) -> Result<Vec<(String, u64)>, String> {
+            Ok(Vec::new())
+        }
+    }
+
+    #[test]
+    fn independent_members_interchange_over_every_order() {
+        let mut enactor = Independent { written: BTreeMap::new() };
+        let certificate = certify_front(&all_orders(3), &mut enactor);
+        assert!(certificate.is_interchangeable(), "{:?}", certificate.verdict);
+        assert!(matches!(certificate.coherence, Coherence::AllOrders { orders_compared: 6, orders_lawful: 6, agreed: true, .. }));
+        assert!(!certificate.lineage_changed_the_verdict());
+    }
+
+    #[test]
+    fn a_shared_mutable_slot_orders_the_front_and_the_word_names_the_port() {
+        let mut enactor = Coupled { endpoints: Vec::new() };
+        let certificate = certify_front(&all_orders(2), &mut enactor);
+        assert!(!certificate.is_interchangeable());
+        assert!(matches!(
+            certificate.because(),
+            Some(DistinguishingWord::ReturnDiffers { coordinate, port, differing: 1, .. }) if port == "slot" && coordinate == "endpoint"
+        ));
+    }
+
+    #[test]
+    fn a_declared_order_that_cannot_be_enacted_refuses_the_front_by_name() {
+        let certificate = certify_front(&all_orders(2), &mut Illegal);
+        assert!(matches!(certificate.because(), Some(DistinguishingWord::EnactmentRefused { order: 1, .. })));
+        assert!(!certificate.endpoint_only_verdict());
+    }
+
+    /// Endpoint agreement is NOT the certificate: a face coordinate can refuse what the endpoint admits.
+    struct SameEndpointDifferentLineage;
+
+    impl EnactsInOrder for SameEndpointDifferentLineage {
+        fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String> {
+            let mut face = EnactedFace::default();
+            face.lineage.insert("port".to_owned(), BTreeSet::from([format!("first was {}", order[0])]));
+            Ok(face)
+        }
+        fn endpoints_disagree(&mut self, _: usize, _: usize) -> Result<Vec<(String, u64)>, String> {
+            Ok(vec![("port".to_owned(), 0)])
+        }
+    }
+
+    #[test]
+    fn equal_endpoints_do_not_identify_ordered_fronts() {
+        let certificate = certify_front(&all_orders(2), &mut SameEndpointDifferentLineage);
+        assert!(certificate.endpoint_only_verdict());
+        assert!(!certificate.is_interchangeable());
+        assert!(certificate.lineage_changed_the_verdict());
+        assert!(matches!(certificate.because(), Some(DistinguishingWord::ReturnDiffers { coordinate, .. }) if coordinate == "lineage"));
+    }
+}
+
 #[cfg(test)]
 mod order_price_tests {
     use super::*;
@@ -1577,5 +2027,29 @@ mod order_price_tests {
             assert!(bits <= n * log2n, "n = {population}: {bits} > {n}·{log2n}");
             assert!(bits > n, "n = {population}: the price must exceed n bits");
         }
+    }
+}
+
+#[cfg(test)]
+mod footprint_tests {
+    use super::*;
+
+    #[test]
+    fn disjoint_footprints_certify_and_a_shared_written_address_refuses_by_name() {
+        let a = MemberFootprint { reads: vec![(0, 100)], writes: vec![(1000, 1100)] };
+        let b = MemberFootprint { reads: vec![(0, 100)], writes: vec![(1100, 1200)] };
+        let c = MemberFootprint { reads: vec![(50, 60)], writes: vec![(2000, 2100)] };
+        let certificate = certify_footprints(&[a.clone(), b.clone(), c]);
+        assert!(certificate.is_interchangeable());
+        assert!(matches!(certificate.coherence, Coherence::FootprintDisjoint { occurrences: 3, pairs_checked: 3 }));
+        // A member reading what another writes is ordered, and the word names the pair.
+        let reader = MemberFootprint { reads: vec![(1050, 1060)], writes: vec![(3000, 3100)] };
+        let ordered = certify_footprints(&[a.clone(), reader]);
+        assert!(matches!(ordered.because(), Some(DistinguishingWord::FootprintShared { members: (0, 1), address: 1050 })));
+        // Two members writing one address are ordered too.
+        let writer = MemberFootprint { reads: vec![], writes: vec![(1099, 1101)] };
+        assert!(!certify_footprints(&[a, writer]).is_interchangeable());
+        // A front of one member is trivially interchangeable and checked zero pairs.
+        assert!(matches!(certify_footprints(&[b]).coherence, Coherence::FootprintDisjoint { pairs_checked: 0, .. }));
     }
 }

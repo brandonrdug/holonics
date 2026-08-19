@@ -38,7 +38,7 @@ It distinguishes exact instruments, bounded experiments, and this blueprint’s 
 | source manifestation and exact binary mouths | bounded instruments stand; complete source admission remains open |
 | exact linear fibres, rebases, and metric adjoints | implemented-exact |
 | generic typed ported words and lift-defect law | implemented-exact at the substrate aperture |
-| contextual active Gemma path | open; current site/layer diagrams are proposed, incomplete, and CPU-owned outside contraction leaves |
+| contextual active Gemma path | open as a master station; **the layer-zero deed with its per-layer input is bound as one CUDA graph, admitted whole before allocation, launched once and read once, with source bindings validated and the source-runtime defect carried** (2026-08-19 record); layers `1`–`41` and the head remain outside the aperture |
 | source intervention taxonomy | open; candidate distinguishability was measured but two real source questions remain unsettled |
 | native morphology | open; no lattice, state, generator, or source-independent ecology was founded |
 | condensation | open; one axis-block sensitivity census returned, with no quotient runtime or decoder |
@@ -47,10 +47,48 @@ It distinguishes exact instruments, bounded experiments, and this blueprint’s 
 | runtime and frozen inference | open; one proposed layer reaches a tied potential face, but no application accepts new material or enacts the tower |
 | reborn-body dissection and Phoenix grade | open |
 
-The bounded returns remain evidence. None is deleted or demoted merely because its master station
-remains open. The next gate is one source-authenticated complete layer whose whole semantic path is
-GPU resident, whose approximation fibres propagate, whose two K/V families and PLE branch are
-complete, and whose work is admitted before execution.
+The bounded returns remain evidence. None is deleted merely because its master station remains open.
+The first resident-section return did not advance a master obligation: it established CUDA interval
+operations and one terminal card read-out while a host `ResidentBinding` dispatch still owned the
+semantic chronology, every local kernel synchronized back to that host, the composed PLE-plus-layer
+work was not admitted as one deed, and source bindings were not content-validated individually.
+**Repaired 2026-08-19** (record
+[`research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md`](../research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md)):
+the deed is one graph launched once, admitted whole before allocation, with footprint-derived
+certificates, a mode-bound cover, validated source bindings, and the source-runtime `chi` slot;
+sixteen falsifiers pass. **Closed 2026-08-19** (record
+[`research/records/2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md`](../research/records/2026-08-19_THE_REFUSAL_TRAVELS_ALONG_THE_LINEAGE_THE_ADMISSION_IS_TYPED_AND_THE_RATCHET_IS_DISPOSITIONED.md)):
+the global refusal word is replaced by lineage-local transport with the complete obstruction lineage
+returned, the admission is typed and product-ordered with nothing `None` and the material admission
+cited, the binding cabinet is replaced by owner-local laws, and the architecture ratchet is
+dispositioned and clean — twenty-four falsifiers pass. That is Station A of the complete sequence
+and no master station of this table is promoted by it.
+
+## Validation discipline for active construction
+
+Validation has four apertures, and the complete gate is never the inner one.
+
+**Owner iteration.** Run only the affected package/library check, changed owner's focused tests,
+targeted source scans, and relevant cheap named gates. A local source edit does not authorize a
+workspace test, all-target build, or complete gate.
+
+**Changed-cone verification.** After one owner closes, run the affected package's library/tests and
+the directly dependent Phoenix driver. Compile or execute only the realization whose closure moved.
+
+**Real deed.** Run the declared GPU deed after changed-cone checks pass. Record command, code/source/
+configuration closure, apparatus identity, elapsed time, exit status, and addressed artifact. If
+that closure and input occurrence are unchanged, inspect the existing receipt rather than rerunning
+the deed or serial reference.
+
+**Release reading.** Regenerate documents and ledgers once after the implementation and artifact
+stand, then run `bash tools/gates.sh` once. It already executes the full workspace suite, so running
+`cargo test --workspace` immediately before it is forbidden. A cheap post-reading repair reruns only
+the named affected gate when no code, kernel, driver, or returned artifact changed, and the report
+states the split scope rather than claiming a fresh complete-gate result.
+
+No test or driver is retired merely because the suite is large. Classify it first as owner guard,
+real deed, persisted-artifact consumer, serial/reference control, or redundant replay. Only a
+measured duplicate or superseded path with no independent receiver consequence may be removed.
 
 The normalization and Markov corrections are derived in
 [THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md](../research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md).

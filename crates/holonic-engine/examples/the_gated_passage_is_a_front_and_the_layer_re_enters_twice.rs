@@ -35,7 +35,7 @@ use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_operation::{realize, PortedOperationKind};
+use holonic_engine::ported_reference::{realize, PortedOperationKind};
 use num_traits::Zero;
 use site::{
     found_reaching, gelu_inner, Reach, ResidentSourceCarrier, BAND_POPULATION, BASE,
