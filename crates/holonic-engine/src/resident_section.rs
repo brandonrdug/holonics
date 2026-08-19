@@ -87,9 +87,11 @@ pub const SLOT_WORDS: usize = 16;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 14] = [
+pub const KERNELS: [&str; 16] = [
     "section_from_bfloat16",
     "section_carry",
+    "section_withdraw_rows",
+    "section_permute_columns",
     "section_contract",
     "section_rms_rebase",
     "section_chronology",
@@ -449,6 +451,9 @@ pub struct Positions<'chart> {
 impl Positions<'_> {
     pub fn rows(&self) -> usize {
         self.rows
+    }
+    pub(crate) fn device_ptr(&self) -> u64 {
+        self.buffer.device_ptr()
     }
     pub fn resident_octets(&self) -> u64 {
         self.octets
@@ -1153,6 +1158,43 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
     }
 
+    /// The intervention withdrawing rows `[from, from + span)`.
+    pub fn shape_withdraw_rows(&self, rows: usize, width: usize, input_octaves: u32, from: usize, span: usize) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "withdraw-rows";
+        if from + span > rows {
+            return Err(ResidentRefusal::RowsDisagree { operation: OPERATION, left: from + span, right: rows });
+        }
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
+    }
+
+    /// The intervention permuting the column blocks of `block` by a declared permutation.
+    pub fn shape_permute_columns(&self, rows: usize, width: usize, input_octaves: u32, block: usize, permutation: &[usize]) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "permute-columns";
+        if block == 0 || width % block != 0 || permutation.len() != width / block {
+            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: permutation.len() * block, right: width });
+        }
+        let mut seen = vec![false; permutation.len()];
+        for p in permutation {
+            if *p >= permutation.len() || seen[*p] {
+                return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{permutation:?} is not a permutation of {} blocks", permutation.len()) });
+            }
+            seen[*p] = true;
+        }
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
+    }
+
     /// **A control, unsound by construction**: the enclosure collapsed to a midpoint at this site.
     pub fn shape_collapse_control(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "collapse-control";
@@ -1378,6 +1420,22 @@ impl<'chart> ResidentSurface<'chart> {
         params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(from as u32).u32(span as u32)
             .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_flat(lane, "section_withdraw_columns", input.count(), &mut params, "withdraw-columns")
+    }
+
+    pub fn record_withdraw_rows(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, from: usize, span: usize, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(from as u32).u32(span as u32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_flat(lane, "section_withdraw_rows", input.count(), &mut params, "withdraw-rows")
+    }
+
+    /// Record the block-permutation intervention; `permutation` is a mounted positions-like array of
+    /// block indices (see [`ResidentSurface::mount_positions`]).
+    pub fn record_permute_columns(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, block: usize, permutation: &Positions<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(block as u32).ptr(permutation.device_ptr())
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_flat(lane, "section_permute_columns", input.count(), &mut params, "permute-columns")
     }
 
     pub fn record_collapse_control(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {

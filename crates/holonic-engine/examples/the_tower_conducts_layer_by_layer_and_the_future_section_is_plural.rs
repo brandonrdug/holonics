@@ -63,7 +63,7 @@ use holonic_engine::source_occurrence::{RegionIdentity, SourceOccurrence};
 use num_bigint::BigInt;
 use relational_geometry::Rat;
 use resident_layer::Source;
-use tower::{Entry, KvRole, Sibling, Species};
+use tower::{Entry, KvRole, Species};
 
 struct Args {
     root: String,
@@ -504,7 +504,7 @@ fn conduct_tower_inner(
         }
         // the source occurrence for this layer's testimony: every region this layer reads, hashed
         let occurrence: SourceOccurrence = resident_layer::source_occurrence(root, regions.clone(), Some(content_sha256.to_owned()))?;
-        let founded = tower::found_layer(layer, entry, chart, &scales, terms, layer_scalar, Sibling::Base, tokens.len())?;
+        let founded = tower::found_layer(layer, entry, chart, &scales, terms, layer_scalar, &tower::Intervention::None, tokens.len())?;
         let bind_clock = Instant::now();
         let mut bound = passage.bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), founded.returns[tower::LAYER_RETURN]).map_err(|o| format!("layer {layer} refused at bind: {}", describe(&o)))?;
         let bind_wall_s = bind_clock.elapsed().as_secs_f64();
@@ -618,7 +618,7 @@ fn conduct_tower_inner(
     let (section, bound_octaves) = carried.take().ok_or("no carried standing")?;
     material.standings.insert(tower::CARRIED_STANDING.to_owned(), (section, bound_octaves));
     let occurrence = resident_layer::source_occurrence(root, regions.clone(), Some(content_sha256.to_owned()))?;
-    let founded = tower::found_final(chart, &scales)?;
+    let founded = tower::found_final(chart, &tower::Intervention::None, &scales)?;
     let bound = passage.bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), founded.returns[tower::POTENTIAL]).map_err(|o| format!("final refused at bind: {}", describe(&o)))?;
     peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
     let returned = bound.launch(&surface.mode()).map_err(|o| format!("final refused at launch: {}", describe(&o)))?;

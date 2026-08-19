@@ -93,7 +93,8 @@ use mount::GraphCensus;
 
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
-    MidpointQuotient, MountedPopulation, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
+    MidpointQuotient, MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
+    WithdrawRows,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
@@ -841,6 +842,14 @@ impl<'chart> FrontPassage<'chart> {
                 .map(|l| l.name.clone())
                 .ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
             let validation = source_bindings.iter().find(|v| v.operation == operation).ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
+            // An occurrence that is WHOLLY the caller's intervention — intervention testimony and
+            // nothing exterior — is entailed by its declaration whatever its law: the matched
+            // sibling's rebase, permutation or replacement is the caller's and says so.
+            let wholly_intervention = !validation.interventions.is_empty() && validation.symbols.is_empty() && validation.fields.is_empty() && validation.shapes.is_empty();
+            if wholly_intervention {
+                entailments.push((*occurrence, LawEntailment { law: law.name(), parameters: vec![("intervention".to_owned(), law.name().to_owned(), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() }));
+                continue;
+            }
             match law.entailment(validation) {
                 Ok(entailment) => entailments.push((*occurrence, entailment)),
                 Err(refusal) => return Err(CompileRefusal::Entailment { occurrence: *occurrence, operation, refusal }.into()),

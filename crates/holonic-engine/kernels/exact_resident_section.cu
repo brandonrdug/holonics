@@ -884,6 +884,40 @@ extern "C" __global__ void section_withdraw_columns(
     out_hi[flat] = withdrawn ? 0 : hi[flat];
 }
 
+// **An intervention, typed as one by the passage**: the rows `[from, from + span)` withdrawn —
+// zeroed — so a contact over these standings sees no such positions. Exact.
+extern "C" __global__ void section_withdraw_rows(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width, uint32_t from, uint32_t span,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t r = flat / width;
+    int withdrawn = (r >= from && r < from + span);
+    out_lo[flat] = withdrawn ? 0 : lo[flat];
+    out_hi[flat] = withdrawn ? 0 : hi[flat];
+}
+
+// **An intervention, typed as one by the passage**: the columns permuted in blocks of `block` —
+// `out[r, b·block + i] = in[r, perm[b]·block + i]` for a declared permutation `perm` of the
+// `width / block` blocks (a head permutation when `block` is the head width). A rebase: invertible,
+// exact, width-preserving.
+extern "C" __global__ void section_permute_columns(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width, uint32_t block, const uint32_t *perm,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t r = flat / width;
+    uint32_t c = flat % width;
+    uint32_t b = c / block, i = c % block;
+    uint32_t source = perm[b] * block + i;
+    out_lo[flat] = lo[(size_t)r * width + source];
+    out_hi[flat] = hi[(size_t)r * width + source];
+}
+
 // **A CONTROL, and it is unsound by construction**: every enclosure collapsed to its lower midpoint,
 // the widths dropped. It exists so a driver can show that the propagated remainder is load-bearing.
 extern "C" __global__ void section_collapse_control(

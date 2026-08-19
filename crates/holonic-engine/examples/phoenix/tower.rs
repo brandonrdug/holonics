@@ -42,7 +42,7 @@ use std::collections::BTreeMap;
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
-use holonic_engine::front_passage::{Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MaterialPlan, MidpointQuotient, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, WithdrawColumns};
+use holonic_engine::front_passage::{Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MaterialPlan, MidpointQuotient, PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, WithdrawColumns, WithdrawRows};
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex};
 use holonic_engine::resident_section::{Dyadic, DyadicEnclosure, SeriesAperture};
 use num_bigint::BigInt;
@@ -85,6 +85,8 @@ pub const LAYER_ENCLOSURE: &str = "layer enclosure";
 pub const K_STANDING: &str = "k standing";
 pub const V_STANDING: &str = "v standing";
 pub const CONTACT: &str = "contact";
+/// The layer's per-layer input section after the join, scale and (under the midpoint chart) seal.
+pub const PLE_SECTION: &str = "ple section";
 pub const FINAL_NORMED: &str = "final normed";
 pub const POTENTIAL: &str = "potential section";
 
@@ -405,11 +407,65 @@ pub enum Entry {
     Carried,
 }
 
-/// Which K/V family, if any, a matched-sibling run withdraws (only where the layer builds its own).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Sibling {
-    Base,
-    WithdrawFamily(usize),
+/// **The matched sibling's intervention, at one declared site of one layer.** Every variant is
+/// realized as an occurrence typed as the caller's intervention (quotient or intervention-only
+/// transport), never as source law; the base deed carries `None`. Remove / replace / permute /
+/// rebase / isolate, by the directive's panel.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Intervention {
+    None,
+    /// initial embedding: the columns `[from, from+span)` of `x0` withdrawn (remove)
+    WithdrawEmbeddingColumns { from: usize, span: usize },
+    /// per-layer embedding: the layer's PLE section withdrawn whole (remove)
+    WithdrawPle,
+    /// normalization: the standing rebased by `by` BEFORE the input rebase — a gauge the norm
+    /// quotients away up to its epsilon (rebase)
+    ScaleBeforeInputRebase { by: i64 },
+    /// normalization: the standing rebased by `by` AFTER the input rebase (rebase)
+    ScaleAfterInputRebase { by: i64 },
+    /// chronology: the band elements replaced by the identity — no rotation (replace)
+    IdentityChronology,
+    /// chronology: the positions reversed (permute) — the driver mounts reversed positions
+    ReversedPositions,
+    /// Q/K contact: two receiver heads permuted after the chronology (permute)
+    PermuteReceiverHeads { a: usize, b: usize },
+    /// softmax ratio geometry: the receiver standing rebased by `by` before the contact — the
+    /// ratio family's temperature (rebase)
+    ScaleReceiver { by: i64 },
+    /// K/V weights: one presented+carried family withdrawn after the head rebases, where the layer
+    /// builds its own (remove) — Station A's family intervention
+    WithdrawKvFamily { family: usize },
+    /// V/O transport: two heads of the carried construction permuted before the output transport (permute)
+    PermuteCarriedHeads { a: usize, b: usize },
+    /// residual standing: the retained standing withdrawn at the first re-entry (isolate the return)
+    WithdrawResidualAtFirstReEntry,
+    /// MLP/gated transport: the gated passage's columns `[from, from+span)` withdrawn after the GELU (remove)
+    WithdrawGateSpan { from: usize, span: usize },
+    /// sliding versus global chronology: every key/value position but the last withdrawn (a window of one)
+    KeepOnlyLastKeyPosition { tokens: usize },
+    /// KV reuse: one family of the SHARED presented+carried standings withdrawn at this shared
+    /// layer only — separates the reuse from the weights (remove)
+    WithdrawSharedKvFamily { family: usize },
+    /// output boundary: the columns `[from, from+span)` of the final normed standing withdrawn
+    WithdrawFinalSpan { from: usize, span: usize },
+}
+
+pub const IDENTITY_BANDS: &str = "identity band elements (intervention: no rotation)";
+pub const HEAD_PERMUTATION: &str = "head permutation (intervention)";
+
+/// The identity band elements: cos 1, sin 0 at the band grain, for every pair.
+pub fn identity_bands(pairs: usize) -> Vec<((i64, i64), (i64, i64))> {
+    let one = 1i64 << BAND_GRAIN;
+    (0..pairs).map(|_| ((one, one), (0, 0))).collect()
+}
+
+/// The permutation of `blocks` swapping `a` and `b`.
+pub fn swap_permutation(blocks: usize, a: usize, b: usize) -> Vec<usize> {
+    (0..blocks).map(|i| if i == a { b } else if i == b { a } else { i }).collect()
+}
+
+fn intervention_statement(kind: &str, detail: &str) -> String {
+    format!("matched sibling: {kind} — {detail}; the caller's intervention, not a source law")
 }
 
 /// **One layer's deed**: the per-layer input predecessor (from `x0`) and the layer proper, as one
@@ -418,7 +474,7 @@ pub enum Sibling {
 /// layer builds its own K/V — `K_STANDING` (after the chronology) and `V_STANDING` (after the
 /// rebase), which an `OwnAndStore` layer releases for the shared layers.
 #[allow(clippy::too_many_arguments)]
-pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAperture, layer_scalar: Dyadic, sibling: Sibling, tokens: usize) -> Result<Founded, String> {
+pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnclosure, DyadicEnclosure), terms: SeriesAperture, layer_scalar: Dyadic, sibling: &Intervention, tokens: usize) -> Result<Founded, String> {
     let species = Species::of(layer);
     let role = KvRole::of(layer);
     let head = species.head_width();
@@ -450,6 +506,15 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
     ])?;
     realization.bind(x0, Enter { population: ENTERING.to_owned(), scale: EMBED_SCALE });
     returns.insert(X0, x0);
+    let x0 = if let Intervention::WithdrawEmbeddingColumns { from, span } = sibling {
+        let w = law(&mut complex, "initial embedding withdrawn (intervention)", OperationSpecies::Quotient, vec![standing], vec![standing], None,
+            vec![intervention(&intervention_statement("initial embedding", &format!("columns {from}..{} of x0 withdrawn", from + span)))])?;
+        realization.bind(w, WithdrawColumns { from: *from, span: *span });
+        bond(&mut complex, "x0 withdrawn", standing, x0, w, 0)?;
+        w
+    } else {
+        x0
+    };
 
     // --- the residual stream entering this layer ---
     let residual_in = match entry {
@@ -506,14 +571,42 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
     realization.bind(halved, Scale { by: scales.1 });
     bond(&mut complex, "join scales", ple, joined, halved, 0)?;
     let halved = seal(chart, &mut complex, &mut realization, halved, ple, "halved")?;
+    let halved = if matches!(sibling, Intervention::WithdrawPle) {
+        let w = law(&mut complex, "per-layer input withdrawn (intervention)", OperationSpecies::Quotient, vec![ple], vec![ple], None,
+            vec![intervention(&intervention_statement("per-layer embedding", "the layer's PLE section withdrawn whole"))])?;
+        realization.bind(w, WithdrawColumns { from: 0, span: PLE_WIDTH });
+        bond(&mut complex, "ple withdrawn", ple, halved, w, 0)?;
+        w
+    } else {
+        halved
+    };
+    returns.insert(PLE_SECTION, halved);
 
     // --- the layer ---
     let decoder = "Gemma4TextDecoderLayer.forward";
+    let rebase_in = if let Intervention::ScaleBeforeInputRebase { by } = sibling {
+        let sc = law(&mut complex, "standing rebased before the input rebase (intervention)", OperationSpecies::Transport, vec![standing], vec![standing], None,
+            vec![intervention(&intervention_statement("normalization, rebase before", &format!("the standing multiplied by {by} before the input rebase: a gauge the norm quotients away up to its epsilon")))])?;
+        realization.bind(sc, Scale { by: DyadicEnclosure { lo: *by, hi: *by, grain: 0 } });
+        bond(&mut complex, "rebased before", standing, residual_in, sc, 0)?;
+        sc
+    } else {
+        residual_in
+    };
     let rebased = law(&mut complex, "input rebase", OperationSpecies::Transport, vec![standing], vec![standing], Some(n("input_layernorm.weight")),
         rebase_testimony("Gemma4TextDecoderLayer.forward (hidden_states = self.input_layernorm(hidden_states))", &n("input_layernorm.weight"), HIDDEN))?;
     realization.bind(rebased, RmsRebase { group: HIDDEN, gain: Some(n("input_layernorm.weight")), eps });
-    bond(&mut complex, "standing rebases", standing, residual_in, rebased, 0)?;
+    bond(&mut complex, "standing rebases", standing, rebase_in, rebased, 0)?;
     let rebased = seal(chart, &mut complex, &mut realization, rebased, standing, "rebased")?;
+    let rebased = if let Intervention::ScaleAfterInputRebase { by } = sibling {
+        let sc = law(&mut complex, "standing rebased after the input rebase (intervention)", OperationSpecies::Transport, vec![standing], vec![standing], None,
+            vec![intervention(&intervention_statement("normalization, rebase after", &format!("the rebased standing multiplied by {by}")))])?;
+        realization.bind(sc, Scale { by: DyadicEnclosure { lo: *by, hi: *by, grain: 0 } });
+        bond(&mut complex, "rebased after", standing, rebased, sc, 0)?;
+        sc
+    } else {
+        rebased
+    };
 
     // the receiver projection, always the layer's own
     let q = law(&mut complex, "receiver projection", OperationSpecies::Transport, vec![standing], vec![receivers], Some(n("self_attn.q_proj.weight")), vec![
@@ -564,11 +657,37 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
         }
         t
     };
-    let qr = law(&mut complex, "receiver chronology", OperationSpecies::Transport, vec![receivers], vec![receivers], None,
-        chronology_testimony("Gemma4TextAttention.forward (query_states = apply_rotary_pos_emb(query_states, cos, sin, unsqueeze_dim=2))"))?;
-    realization.bind(qr, Chronology { bands: species.bands().to_owned(), heads: HEADS, head_width: head });
+    let chronology_intervened = matches!(sibling, Intervention::IdentityChronology | Intervention::ReversedPositions);
+    let bands_name = if matches!(sibling, Intervention::IdentityChronology) { IDENTITY_BANDS.to_owned() } else { species.bands().to_owned() };
+    let chronology_law_testimony = |site: &str| -> Vec<holonic_engine::ported_operation::SourceTestimony> {
+        match sibling {
+            Intervention::IdentityChronology => vec![intervention(&intervention_statement("chronology replaced", "the band elements replaced by the identity: no rotation"))],
+            Intervention::ReversedPositions => vec![intervention(&intervention_statement("chronology permuted", "the positions reversed"))],
+            _ => chronology_testimony(site),
+        }
+    };
+    let qr = law(&mut complex, if chronology_intervened { "receiver chronology (intervention)" } else { "receiver chronology" }, OperationSpecies::Transport, vec![receivers], vec![receivers], None,
+        chronology_law_testimony("Gemma4TextAttention.forward (query_states = apply_rotary_pos_emb(query_states, cos, sin, unsqueeze_dim=2))"))?;
+    realization.bind(qr, Chronology { bands: bands_name.clone(), heads: HEADS, head_width: head });
     bond(&mut complex, "q turns", receivers, qn, qr, 0)?;
     let qr = seal(chart, &mut complex, &mut realization, qr, receivers, "qr")?;
+    let qr = match sibling {
+        Intervention::PermuteReceiverHeads { a, b } => {
+            let pm = law(&mut complex, "receiver heads permuted (intervention)", OperationSpecies::Transport, vec![receivers], vec![receivers], None,
+                vec![intervention(&intervention_statement("Q/K contact permuted", &format!("receiver heads {a} and {b} swapped after the chronology")))])?;
+            realization.bind(pm, PermuteColumns { block: head, permutation: swap_permutation(HEADS, *a, *b), mounted: HEAD_PERMUTATION.to_owned() });
+            bond(&mut complex, "q heads permuted", receivers, qr, pm, 0)?;
+            pm
+        }
+        Intervention::ScaleReceiver { by } => {
+            let sc = law(&mut complex, "receiver rebased before the contact (intervention)", OperationSpecies::Transport, vec![receivers], vec![receivers], None,
+                vec![intervention(&intervention_statement("softmax ratio geometry", &format!("the receiver standing multiplied by {by}: the ratio family's temperature")))])?;
+            realization.bind(sc, Scale { by: DyadicEnclosure { lo: *by, hi: *by, grain: 0 } });
+            bond(&mut complex, "q rebased", receivers, qr, sc, 0)?;
+            sc
+        }
+        _ => qr,
+    };
 
     // the presented and carried standings: the layer's own, or the stored ones
     let (k_in, v_in) = match role {
@@ -614,22 +733,22 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
             bond(&mut complex, "v rebases", families, v, vn, 0)?;
             let vn = seal(chart, &mut complex, &mut realization, vn, families, "vn")?;
             let (k_source, v_source) = match sibling {
-                Sibling::Base => (kn, vn),
-                Sibling::WithdrawFamily(family) => {
-                    let ka = law(&mut complex, "presented family withdrawn", OperationSpecies::Quotient, vec![families], vec![families], None,
+                Intervention::WithdrawKvFamily { family } => {
+                    let ka = law(&mut complex, "presented family withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
                         vec![intervention(&format!("matched sibling: presented family {family} withdrawn after its head rebase; not a source law"))])?;
                     realization.bind(ka, WithdrawColumns { from: family * head, span: head });
                     bond(&mut complex, "k withdrawn", families, kn, ka, 0)?;
-                    let va = law(&mut complex, "carried family withdrawn", OperationSpecies::Quotient, vec![families], vec![families], None,
+                    let va = law(&mut complex, "carried family withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
                         vec![intervention(&format!("matched sibling: carried family {family} withdrawn after its head rebase; not a source law"))])?;
                     realization.bind(va, WithdrawColumns { from: family * head, span: head });
                     bond(&mut complex, "v withdrawn", families, vn, va, 0)?;
                     (ka, va)
                 }
+                _ => (kn, vn),
             };
-            let kr = law(&mut complex, "presented chronology", OperationSpecies::Transport, vec![families], vec![families], None,
-                chronology_testimony("Gemma4TextAttention.forward (key_states = apply_rotary_pos_emb(key_states, cos, sin, unsqueeze_dim=2))"))?;
-            realization.bind(kr, Chronology { bands: species.bands().to_owned(), heads: KV_HEADS, head_width: head });
+            let kr = law(&mut complex, if chronology_intervened { "presented chronology (intervention)" } else { "presented chronology" }, OperationSpecies::Transport, vec![families], vec![families], None,
+                chronology_law_testimony("Gemma4TextAttention.forward (key_states = apply_rotary_pos_emb(key_states, cos, sin, unsqueeze_dim=2))"))?;
+            realization.bind(kr, Chronology { bands: bands_name.clone(), heads: KV_HEADS, head_width: head });
             bond(&mut complex, "k turns", families, k_source, kr, 0)?;
             let kr = seal(chart, &mut complex, &mut realization, kr, families, "kr")?;
             returns.insert(K_STANDING, kr);
@@ -662,6 +781,32 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
         }
     };
 
+    // the K/V interventions at the contact's presented and carried inputs
+    let (k_in, v_in) = match sibling {
+        Intervention::WithdrawSharedKvFamily { family } if role == KvRole::Shared => {
+            let ka = law(&mut complex, "shared presented family withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
+                vec![intervention(&intervention_statement("KV reuse", &format!("shared presented family {family} withdrawn at this shared layer only")))])?;
+            realization.bind(ka, WithdrawColumns { from: family * head, span: head });
+            bond(&mut complex, "shared k withdrawn", families, k_in, ka, 0)?;
+            let va = law(&mut complex, "shared carried family withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
+                vec![intervention(&intervention_statement("KV reuse", &format!("shared carried family {family} withdrawn at this shared layer only")))])?;
+            realization.bind(va, WithdrawColumns { from: family * head, span: head });
+            bond(&mut complex, "shared v withdrawn", families, v_in, va, 0)?;
+            (ka, va)
+        }
+        Intervention::KeepOnlyLastKeyPosition { tokens: t } if *t > 1 => {
+            let ka = law(&mut complex, "key positions but the last withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
+                vec![intervention(&intervention_statement("chronology window", &format!("positions 0..{} of the presented standing withdrawn: a window of one", t - 1)))])?;
+            realization.bind(ka, WithdrawRows { from: 0, span: t - 1 });
+            bond(&mut complex, "k positions withdrawn", families, k_in, ka, 0)?;
+            let va = law(&mut complex, "value positions but the last withdrawn (intervention)", OperationSpecies::Quotient, vec![families], vec![families], None,
+                vec![intervention(&intervention_statement("chronology window", &format!("positions 0..{} of the carried standing withdrawn", t - 1)))])?;
+            realization.bind(va, WithdrawRows { from: 0, span: t - 1 });
+            bond(&mut complex, "v positions withdrawn", families, v_in, va, 0)?;
+            (ka, va)
+        }
+        _ => (k_in, v_in),
+    };
     let mut contact_testimony = vec![
         implementation("eager_attention_forward (attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling)"),
         implementation("eager_attention_forward (attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype))"),
@@ -689,6 +834,15 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
     bond(&mut complex, "contact carried", families, v_in, contact, 2)?;
     let contact = seal(chart, &mut complex, &mut realization, contact, receivers, "contact")?;
     returns.insert(CONTACT, contact);
+    let contact = if let Intervention::PermuteCarriedHeads { a, b } = sibling {
+        let pm = law(&mut complex, "carried heads permuted before the output transport (intervention)", OperationSpecies::Transport, vec![receivers], vec![receivers], None,
+            vec![intervention(&intervention_statement("V/O transport permuted", &format!("heads {a} and {b} of the carried construction swapped before o_proj")))])?;
+        realization.bind(pm, PermuteColumns { block: head, permutation: swap_permutation(HEADS, *a, *b), mounted: HEAD_PERMUTATION.to_owned() });
+        bond(&mut complex, "carried heads permuted", receivers, contact, pm, 0)?;
+        pm
+    } else {
+        contact
+    };
 
     let o = law(&mut complex, "contact returns", OperationSpecies::Transport, vec![receivers], vec![standing], Some(n("self_attn.o_proj.weight")), vec![
         implementation("Gemma4TextAttention.forward (attn_output = self.o_proj(attn_output))"),
@@ -702,10 +856,19 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
     realization.bind(on, RmsRebase { group: HIDDEN, gain: Some(n("post_attention_layernorm.weight")), eps });
     bond(&mut complex, "return rebases", standing, o, on, 0)?;
     let on = seal(chart, &mut complex, &mut realization, on, standing, "on")?;
+    let retained = if matches!(sibling, Intervention::WithdrawResidualAtFirstReEntry) {
+        let w = law(&mut complex, "retained standing withdrawn at the first re-entry (intervention)", OperationSpecies::Quotient, vec![standing], vec![standing], None,
+            vec![intervention(&intervention_statement("residual standing", "the retained standing withdrawn whole at the first re-entry: the return stands alone"))])?;
+        realization.bind(w, WithdrawColumns { from: 0, span: HIDDEN });
+        bond(&mut complex, "residual withdrawn", standing, residual_in, w, 0)?;
+        w
+    } else {
+        residual_in
+    };
     let r1 = law(&mut complex, "first re-entry", OperationSpecies::Construction, vec![standing, standing], vec![standing], None,
         vec![implementation(&format!("{decoder} (hidden_states = residual + hidden_states)"))])?;
     realization.bind(r1, ReEntry);
-    bond(&mut complex, "re-entry retains the standing", standing, residual_in, r1, 0)?;
+    bond(&mut complex, "re-entry retains the standing", standing, retained, r1, 0)?;
     bond(&mut complex, "re-entry returns", standing, on, r1, 1)?;
     let r1 = seal(chart, &mut complex, &mut realization, r1, standing, "r1")?;
 
@@ -734,6 +897,15 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
     realization.bind(gated, GeluTanh { c1, c2, terms });
     bond(&mut complex, "gate turns", passage, branches[0], gated, 0)?;
     let gated = seal(chart, &mut complex, &mut realization, gated, passage, "gated")?;
+    let gated = if let Intervention::WithdrawGateSpan { from, span } = sibling {
+        let w = law(&mut complex, "gated passage span withdrawn (intervention)", OperationSpecies::Quotient, vec![passage], vec![passage], None,
+            vec![intervention(&intervention_statement("MLP/gated transport", &format!("columns {from}..{} of the gated passage withdrawn after the GELU", from + span)))])?;
+        realization.bind(w, WithdrawColumns { from: *from, span: *span });
+        bond(&mut complex, "gate span withdrawn", passage, gated, w, 0)?;
+        w
+    } else {
+        gated
+    };
     let admitted = law(&mut complex, "gate admits", OperationSpecies::Construction, vec![passage, passage], vec![passage], None, vec![
         implementation("Gemma4TextMLP.forward (down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x)))"),
     ])?;
@@ -818,7 +990,7 @@ pub fn found_layer(layer: usize, entry: Entry, chart: Chart, scales: &(DyadicEnc
 /// other direction — the illicial potential section over the whole vocabulary, one row per token.
 /// `final_logit_softcapping = 30` is a strictly monotone transformation of every coordinate, so the
 /// order faces of this section are its order faces; it is reported, not enacted.
-pub fn found_final(chart: Chart, scales_unused: &(DyadicEnclosure, DyadicEnclosure)) -> Result<Founded, String> {
+pub fn found_final(chart: Chart, sibling: &Intervention, scales_unused: &(DyadicEnclosure, DyadicEnclosure)) -> Result<Founded, String> {
     let _ = scales_unused;
     let eps = Dyadic::of_binary64_bits(EPS_BITS).map_err(|e| e.to_string())?;
     let mut complex = PortedOperationComplex::new("Gemma-4-E4B final normalization and tied output boundary");
@@ -837,6 +1009,15 @@ pub fn found_final(chart: Chart, scales_unused: &(DyadicEnclosure, DyadicEnclosu
     bond(&mut complex, "final rebases", standing, carried, normed, 0)?;
     let normed = seal(chart, &mut complex, &mut realization, normed, standing, "final normed")?;
     returns.insert(FINAL_NORMED, normed);
+    let normed = if let Intervention::WithdrawFinalSpan { from, span } = sibling {
+        let w = law(&mut complex, "final normed span withdrawn (intervention)", OperationSpecies::Quotient, vec![standing], vec![standing], None,
+            vec![intervention(&intervention_statement("output boundary", &format!("columns {from}..{} of the final normed standing withdrawn before the tied boundary", from + span)))])?;
+        realization.bind(w, WithdrawColumns { from: *from, span: *span });
+        bond(&mut complex, "final span withdrawn", standing, normed, w, 0)?;
+        w
+    } else {
+        normed
+    };
     let potential = law(&mut complex, "tied output boundary", OperationSpecies::Transport, vec![standing], vec![vocabulary], Some(EMBED.to_owned()), vec![
         implementation("Gemma4ForConditionalGeneration.forward (logits = self.lm_head(hidden_states[:, slice_indices, :]))"),
         implementation("Gemma4ForConditionalGeneration._tied_weights_keys (_tied_weights_keys = {\"lm_head.weight\": \"model.language_model.embed_tokens.weight\"})"),

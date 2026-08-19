@@ -50,11 +50,13 @@ pub struct ResidentMaterial<'chart> {
     /// (a stored K/V) enters several later passages and is written by none of them — a shared
     /// pointer to an immutable section is not a second owner of a continuing body.
     pub standings: BTreeMap<String, (std::rc::Rc<ResidentSection<'chart>>, u32)>,
+    /// Mounted permutation arrays for [`PermuteColumns`] interventions, by name.
+    pub permutations: BTreeMap<String, Positions<'chart>>,
 }
 
 impl ResidentMaterial<'_> {
     pub fn empty() -> Self {
-        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new() }
+        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), permutations: BTreeMap::new() }
     }
 
     /// The resident octets of every mounted map, band and position — the source-map residency the
@@ -63,6 +65,7 @@ impl ResidentMaterial<'_> {
         self.populations.values().map(|p| p.readout.resident_octets() as u64).sum::<u64>()
             + self.bands.values().map(|(b, _)| b.resident_octets()).sum::<u64>()
             + self.positions.as_ref().map(Positions::resident_octets).unwrap_or(0)
+            + self.permutations.values().map(Positions::resident_octets).sum::<u64>()
     }
 
     /// The resident octets of the standings carried in from earlier passages — resident already,
@@ -289,6 +292,95 @@ impl MidpointQuotient {
             return Err(unentailed("midpoint-quotient", "declaration", "a declared quotient chart", validation));
         }
         Ok(LawEntailment { law: "midpoint-quotient", parameters: vec![("chart".to_owned(), "midpoint of the certified enclosure; the enclosure retained in the predecessor".to_owned(), format!("the receiver's declaration: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+    }
+}
+
+/// **An intervention: the rows `[from, from + span)` withdrawn** — zeroed — so a contact over these
+/// presented/carried standings sees no such positions (a window, or a removed chronology extent).
+/// Species: quotient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct WithdrawRows {
+    pub from: usize,
+    pub span: usize,
+}
+
+impl ResidentLaw for WithdrawRows {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if validation.interventions.is_empty() {
+            return Err(unentailed("withdraw-rows", "intervention", format!("{}..{}", self.from, self.from + self.span), validation));
+        }
+        Ok(LawEntailment { law: "withdraw-rows", parameters: vec![("rows".to_owned(), format!("{}..{}", self.from, self.from + self.span), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+    }
+    fn name(&self) -> &'static str {
+        "withdraw-rows"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
+        Ok(())
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_withdraw_rows(rows, width, octaves, self.from, self.span)
+    }
+    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        Vec::new()
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_withdraw_rows(lane, inputs[0], self.from, self.span, out)
+    }
+}
+
+/// **An intervention: the column blocks permuted** — `out[·, b·block + i] = in[·, perm[b]·block + i]`
+/// for a declared permutation of the `width / block` blocks (a head permutation when `block` is the
+/// head width). Invertible and exact: a rebase sibling. The permutation is mounted as a positions
+/// array under the name `permutation` in the material. Species: transport.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PermuteColumns {
+    pub block: usize,
+    pub permutation: Vec<usize>,
+    /// The name of the mounted permutation array in `material.permutations`.
+    pub mounted: String,
+}
+
+impl ResidentLaw for PermuteColumns {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if validation.interventions.is_empty() {
+            return Err(unentailed("permute-columns", "intervention", format!("{:?} in blocks of {}", self.permutation, self.block), validation));
+        }
+        Ok(LawEntailment { law: "permute-columns", parameters: vec![("permutation".to_owned(), format!("{:?} in blocks of {}", self.permutation, self.block), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+    }
+    fn name(&self) -> &'static str {
+        "permute-columns"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Transport
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        if material.permutations.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_permute_columns(rows, width, octaves, self.block, &self.permutation)
+    }
+    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        vec![material.permutations[&self.mounted].range()]
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_permute_columns(lane, inputs[0], self.block, &material.permutations[&self.mounted], out)
     }
 }
 

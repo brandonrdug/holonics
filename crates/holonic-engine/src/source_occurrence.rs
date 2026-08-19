@@ -638,13 +638,18 @@ impl SourceOccurrence {
                         exterior = true;
                     }
                     SourceTestimony::Intervention { statement } => {
-                        if operation.species != OperationSpecies::Quotient {
-                            return Err(SourceRefusal::InterventionOnSourceLaw { operation: name, species: operation.species });
-                        }
                         validation.interventions.push(statement.clone());
                     }
                     SourceTestimony::AuthoritativeDescription { .. } | SourceTestimony::Undecided { .. } => {}
                 }
+            }
+            // An intervention is the caller's, never source law: an operation carrying both an
+            // intervention and exterior testimony (implementation, configuration, shape) is refused
+            // — a quotient may carry interventions freely (it removes), and a transport or
+            // construction may be an intervention occurrence only when it carries NOTHING else, so a
+            // rebase, a permutation or a replacement sibling is admitted as wholly the caller's.
+            if !validation.interventions.is_empty() && exterior && operation.species != OperationSpecies::Quotient {
+                return Err(SourceRefusal::InterventionOnSourceLaw { operation: name, species: operation.species });
             }
             if !exterior && validation.interventions.is_empty() {
                 return Err(SourceRefusal::TestimonyNotExterior {
@@ -821,11 +826,13 @@ class Attention(nn.Module):
         );
         assert!(matches!(occurrence.validate(&foreign), Err(SourceRefusal::LocatorForeign { .. })));
         let intervention_on_law = complex_with(
-            vec![SourceTestimony::Intervention { statement: "withdraw".to_owned() }],
+            vec![SourceTestimony::Intervention { statement: "withdraw".to_owned() }, SourceTestimony::Implementation { locator: "/impl.py".to_owned(), symbol: "Norm.forward".to_owned() }],
             OperationSpecies::Transport,
             None,
         );
-        assert!(matches!(occurrence.validate(&intervention_on_law), Err(SourceRefusal::InterventionOnSourceLaw { .. })));
+        assert!(matches!(occurrence.validate(&intervention_on_law), Err(SourceRefusal::InterventionOnSourceLaw { .. })), "an intervention offered beside source law on a transport refuses");
+        let intervention_only = complex_with(vec![SourceTestimony::Intervention { statement: "rebase by two".to_owned() }], OperationSpecies::Transport, None);
+        assert!(occurrence.validate(&intervention_only).is_ok(), "a transport that is wholly the caller's intervention is admitted as one");
         let intervention_on_quotient = complex_with(
             vec![SourceTestimony::Intervention { statement: "withdraw".to_owned() }],
             OperationSpecies::Quotient,

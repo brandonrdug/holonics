@@ -295,6 +295,28 @@ projection crossed its typed ports (256 vision soft tokens, native chart on the 
 393,190 of 655,360). Fourteen falsifiers pass; rest, condensation, cultivation and reborn dissection
 stay open by name. `CONSTRUCTION_STATE.md` does not move.
 
+**THE SOURCE IS DISSECTED BY INTERVENTION, AND THE REUSE IS SEPARATED FROM THE WEIGHTS — Station D
+PASSED 2026-08-19.** Record:
+[`research/records/2026-08-19_THE_SOURCE_IS_DISSECTED_BY_INTERVENTION_AND_THE_REUSE_IS_SEPARATED_FROM_THE_WEIGHTS.md`](../research/records/2026-08-19_THE_SOURCE_IS_DISSECTED_BY_INTERVENTION_AND_THE_REUSE_IS_SEPARATED_FROM_THE_WEIGHTS.md).
+Every taxon of the panel — initial and per-layer embedding, normalization before and after the
+rebase, chronology replaced and permuted, Q/K heads permuted, the ratio's temperature, K/V weights
+at an own and at the stored layer against the **shared standing withdrawn at layer 24**, V/O heads
+permuted, the residual standing, a span of the gated passage, a window of one at a full layer, a
+span of the final normed standing, a span of the vision soft tokens — is enacted on the card as a
+matched sibling of one fixed base deed (replayed bit-identically over 128 receiver faces), each
+sibling exactly the base's complexes plus its intervention occurrences typed as the caller's by
+testimony; the receiver family is declared once (per layer: PLE section, contact, return; then the
+final normed standing and the potential with its order face) and compared enclosure by enclosure.
+Per taxon: the shortest separating history with its positions, the unchanged unrelated control
+measured (layers before the site bit-identical; position 0 bit-identical under every contact-side
+intervention, a single-key contact; every layer identical under the final-only intervention; the
+order face unmoved under the gauge), the remaining ambiguity. **The KV reuse is separated from the
+K/V weights** (the same 5,120 of 10,240 entries at the same widest gap, first at layer 22 under the
+weights and first at layer 24 under the reuse with layers 0–23 identical), and **the normalization's
+gauge is exhibited by domination** (×1.8e4) rather than a threshold, the exact receiver still seeing
+the residue. Twelve falsifiers pass; the native baseline, lift, condensation, cultivation, rest and
+reborn dissection stay open by name. `CONSTRUCTION_STATE.md` does not move.
+
 **The workflow was separately re-audited the same day.** The complete gate was being used as an
 inner loop, release all-target builds repeatedly linked the evidence-driver population, and selected
 gate results were spliced into a complete-gate report. The binding validation cadence is deposited
@@ -335,6 +357,16 @@ standing exact owners conduct; derivation, checker and analytic-scene faces retu
 correction is deposited; and a source-detached held-out passage moves and reopens under targeted
 ablation. The active Gemma Phoenix instance remains the current construction. CONSTRUCTION_STATE.md
 does not move.
+
+**A non-scheduling exterior equation atlas was seeded 2026-08-19.**
+[`research/equation-atlas/README.md`](../research/equation-atlas/README.md) carries 45 graded formulation occurrences
+and 36 typed research relations spanning polygonal filling, the smooth/discrete Stokes seam,
+normalization and probability, phase/scale, manifold charts, conservation, fluids, cosmological
+symmetry reduction, Hodge and zeta. Its governing synthesis is
+[`research/records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md`](../research/records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md).
+The store is exterior testimony, not a recovered operation complex, parser, ontology, training
+event or passed mathematics-codec station. Phoenix remains the active construction and
+`CONSTRUCTION_STATE.md` does not move.
 
 ## THE EROS CYCLE AS AN INFORMATION ENGINE — ratified 2026-08-16
 
