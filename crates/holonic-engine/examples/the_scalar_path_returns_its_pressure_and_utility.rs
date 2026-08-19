@@ -149,6 +149,7 @@ fn describe(obstruction: &FrontPassageObstruction) -> String {
         FrontPassageObstruction::Interchange { front, because, .. } => format!("InterchangeRefusal at front {front}: {because:?}"),
         FrontPassageObstruction::Resource(resource) => format!("ResourceObstruction: {resource:?}"),
         FrontPassageObstruction::Compile(refusal) => format!("CompileRefusal: {refusal}"),
+        FrontPassageObstruction::Sealed { occurrence, quotient, reopening } => format!("the section at {occurrence:?} was sealed away by the fused quotient {quotient:?}; {reopening}"),
         FrontPassageObstruction::Refused { occurrence, operation, refusal, lineage, .. } => {
             format!("the card refused at {occurrence:?} ({operation}): {refusal}; lineage {:?}", lineage.refusals)
         }

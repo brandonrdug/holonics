@@ -249,7 +249,7 @@ fn read_equality(
     let out_width = map.rows();
     let input_octaves = entered_octaves(entering, grain);
     let staged = surface.stage_words(entering, tokens, inner).map_err(|e| e.to_string())?;
-    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain, entering).map_err(|e| e.to_string())?;
     let scalar_shape = surface.shape_contract(tokens, inner, input_octaves, map).map_err(|e| e.to_string())?;
 
     // every path in ONE passage, on ONE entered section: the equality is between two realizations
@@ -284,7 +284,7 @@ fn read_equality(
     let mut builder = surface.begin_passage(&lineage).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(input_octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     surface.record_contract(&lane, &x, map, &scalar_out).map_err(|e| e.to_string())?;
     builder.close(1, &scalar_out, scalar_shape.needed).map_err(|e| e.to_string())?;
@@ -363,8 +363,8 @@ fn read_equality(
 
     // the two walls, each its own passage so nothing else is in the span, each launched twice and
     // the warm launch reported.
-    let scalar_wall_s = time_one(surface, &staged, map, tokens, inner, grain, input_octaves, None)?;
-    let tiled_wall_s = time_one(surface, &staged, map, tokens, inner, grain, input_octaves, Some(declared))?;
+    let scalar_wall_s = time_one(surface, &staged, map, tokens, inner, grain, input_octaves, entering, None)?;
+    let tiled_wall_s = time_one(surface, &staged, map, tokens, inner, grain, input_octaves, entering, Some(declared))?;
 
     Ok(EqualityReading {
         map: name.to_owned(),
@@ -398,10 +398,11 @@ fn time_one(
     inner: usize,
     grain: ResidentGrain,
     input_octaves: u32,
+    entering: &[u16],
     tile: Option<TileGeometry>,
 ) -> Result<f64, String> {
     let out_width = map.rows();
-    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain, entering).map_err(|e| e.to_string())?;
     let shape = match tile {
         None => surface.shape_contract(tokens, inner, input_octaves, map).map_err(|e| e.to_string())?,
         Some(tile) => surface.shape_contract_tiled(tokens, inner, input_octaves, map, tile).map_err(|e| e.to_string())?,
@@ -411,7 +412,7 @@ fn time_one(
     let mut builder = surface.begin_passage(&[vec![], vec![0]]).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(input_octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     match tile {
         None => surface.record_contract(&lane, &x, map, &out).map_err(|e| e.to_string())?,
@@ -480,7 +481,7 @@ fn run_fixture(
     let aligned = align_bfloat16(map_words).map_err(|e| format!("{e:?}"))?;
     let input_octaves = entered_octaves(entering, grain);
     let staged = surface.stage_words(entering, tokens, inner).map_err(|e| e.to_string())?;
-    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, grain, entering).map_err(|e| e.to_string())?;
     let scalar_shape = surface.shape_contract(tokens, inner, input_octaves, &map).map_err(|e| e.to_string())?;
     let tiled_shape = surface.shape_contract_tiled(tokens, inner, input_octaves, &map, tile).map_err(|e| e.to_string())?;
     let x = surface.fresh_section(tokens, inner, grain).map_err(|e| e.to_string())?;
@@ -489,7 +490,7 @@ fn run_fixture(
     let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(input_octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     surface.record_contract(&lane, &x, &map, &scalar_out).map_err(|e| e.to_string())?;
     builder.close(1, &scalar_out, scalar_shape.needed).map_err(|e| e.to_string())?;
@@ -756,8 +757,8 @@ fn run() -> Result<(), String> {
             let entering: Vec<u16> = words[..tokens * inner].to_vec();
             let octaves = entered_octaves(&entering, GRAIN);
             let staged = surface.stage_words(&entering, tokens, inner).map_err(|e| e.to_string())?;
-            let scalar = time_one(surface, &staged, &map, tokens, inner, GRAIN, octaves, None)?;
-            let tiled = time_one(surface, &staged, &map, tokens, inner, GRAIN, octaves, Some(declared))?;
+            let scalar = time_one(surface, &staged, &map, tokens, inner, GRAIN, octaves, &entering, None)?;
+            let tiled = time_one(surface, &staged, &map, tokens, inner, GRAIN, octaves, &entering, Some(declared))?;
             println!("{name} T={tokens} scalar {scalar:.6}s tiled {tiled:.6}s");
         }
         return Ok(());
@@ -970,14 +971,12 @@ fn run() -> Result<(), String> {
     let _ = writeln!(form, "    interval lo < hi. Without that the sign rule `w<0 -> (lo*hi, hi*lo)` is unexercised and (d)");
     let _ = writeln!(form, "    could not fail under a swapped rule. The swapped rule is enacted on the SERIAL referee — no");
     let _ = writeln!(form, "    kernel is edited mid-deed — and the column `swapped-sign-rule-differs` is that perturbation.");
-    let _ = writeln!(form, "    A FINDING, REPORTED RATHER THAN REPAIRED: `shape_enter`'s a-priori octave bound is");
-    let _ = writeln!(form, "    `8 + scale octaves + grain + 8` and does NOT read the entering words. A bf16 population with a");
-    let _ = writeln!(form, "    large exponent — which is what a near-carrier fixture needs — exceeds it, and the entering");
-    let _ = writeln!(form, "    occurrence then refuses BOUND and every successor refuses UPSTREAM. This driver therefore closes");
-    let _ = writeln!(form, "    the entering occurrence at max(shape.needed, the octaves computed FROM THE WORDS THEMSELVES),");
-    let _ = writeln!(form, "    which is material-derived and not authored. On the real Gemma maps at the closure's grain the two");
-    let _ = writeln!(form, "    agree and the max changes nothing; it bites only the constructed wide fixtures. The bound belongs");
-    let _ = writeln!(form, "    to the `enter` law and repairing it is not H2's.");
+    let _ = writeln!(form, "    THE FINDING H2 REPORTED IS REPAIRED AND THE WORKAROUND IS DELETED: `shape_enter`'s a-priori");
+    let _ = writeln!(form, "    octave bound was `8 + scale octaves + grain + 8` and did not read the entering words, so a bf16");
+    let _ = writeln!(form, "    population with a large exponent refused BOUND at the mouth and poisoned every successor UPSTREAM.");
+    let _ = writeln!(form, "    This driver closed the entering occurrence at max(shape.needed, the octaves computed from the words)");
+    let _ = writeln!(form, "    to work around it. `shape_enter` now reads the staged words itself and the entering occurrence is");
+    let _ = writeln!(form, "    closed at `enter.needed` alone; the max is gone from this driver.");
     let fixture_tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 128, splits: 1 };
     let mut fixtures: Vec<FixtureReading> = Vec::new();
     // a genuine interval: 205 · 2^-11 = 0.1001..., whose low three bits fall below grain 8
@@ -1062,7 +1061,7 @@ fn run() -> Result<(), String> {
     // the node aperture, inside the admission: the tiled kernel refuses at the node; the scalar
     // owner has no per-step check and returns what it always did.
     let staged = surface.stage_words(&[interval_word; 4], 1, 4).map_err(|e| e.to_string())?;
-    let enter = surface.shape_enter(1, 4, Dyadic::ONE, FIXTURE_GRAIN).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(1, 4, Dyadic::ONE, FIXTURE_GRAIN, &[interval_word; 4]).map_err(|e| e.to_string())?;
     let octaves = entered_octaves(&[interval_word; 4], FIXTURE_GRAIN);
     let scalar_shape = surface.shape_contract(1, 4, octaves, &edge).map_err(|e| e.to_string())?;
     let tiled_shape = surface.shape_contract_tiled(1, 4, octaves, &edge, fixture_tile).map_err(|e| e.to_string())?;
@@ -1072,7 +1071,7 @@ fn run() -> Result<(), String> {
     let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     surface.record_contract(&lane, &x, &edge, &a).map_err(|e| e.to_string())?;
     builder.close(1, &a, scalar_shape.needed).map_err(|e| e.to_string())?;
@@ -1129,7 +1128,7 @@ fn run() -> Result<(), String> {
             let map = readout.mount_bfloat16(&map_words, inner).map_err(|e| format!("{e:?}"))?;
             let octaves = entered_octaves(&entering, GRAIN);
             let staged = surface.stage_words(&entering, tokens, inner).map_err(|e| e.to_string())?;
-            let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, GRAIN).map_err(|e| e.to_string())?;
+            let enter = surface.shape_enter(tokens, inner, Dyadic::ONE, GRAIN, &entering).map_err(|e| e.to_string())?;
             let scalar_shape = surface.shape_contract(tokens, inner, octaves, &map).map_err(|e| e.to_string())?;
             let split_shape = surface.shape_contract_tiled(tokens, inner, octaves, &map, tile).map_err(|e| e.to_string())?;
             let standing = surface.retain_partials(tokens, out_rows, tile.splits).map_err(|e| e.to_string())?;
@@ -1139,7 +1138,7 @@ fn run() -> Result<(), String> {
             let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).map_err(|e| e.to_string())?;
             let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
             surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-            builder.close(0, &x, enter.needed.max(octaves)).map_err(|e| e.to_string())?;
+            builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
             let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
             surface.record_contract(&lane, &x, &map, &sc).map_err(|e| e.to_string())?;
             builder.close(1, &sc, scalar_shape.needed).map_err(|e| e.to_string())?;
@@ -1197,7 +1196,7 @@ fn run() -> Result<(), String> {
     let octaves = entered_octaves(&entering, GRAIN);
     let staged = surface.stage_words(&entering, perm_tokens, perm_inner).map_err(|e| e.to_string())?;
     let mounted_perm = surface.mount_positions(&permutation).map_err(|e| e.to_string())?;
-    let enter = surface.shape_enter(perm_tokens, perm_inner, Dyadic::ONE, GRAIN).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(perm_tokens, perm_inner, Dyadic::ONE, GRAIN, &entering).map_err(|e| e.to_string())?;
     let permute_shape = surface.shape_permute_columns(perm_tokens, perm_inner, octaves, 1, &permutation.iter().map(|p| *p as usize).collect::<Vec<_>>()).map_err(|e| e.to_string())?;
     let plain_shape = surface.shape_contract_tiled(perm_tokens, perm_inner, octaves, &plain, fixture_tile).map_err(|e| e.to_string())?;
     let turned_shape = surface.shape_contract_tiled(perm_tokens, perm_inner, octaves, &turned, fixture_tile).map_err(|e| e.to_string())?;
@@ -1209,7 +1208,7 @@ fn run() -> Result<(), String> {
     let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0], vec![1], vec![0]]).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     surface.record_permute_columns(&lane, &x, 1, &mounted_perm, &xp).map_err(|e| e.to_string())?;
     builder.close(1, &xp, permute_shape.needed).map_err(|e| e.to_string())?;
@@ -1303,7 +1302,7 @@ fn run() -> Result<(), String> {
     let k_entering: Vec<u16> = k_words[..k_tokens * k_inner].to_vec();
     let k_octaves = entered_octaves(&k_entering, GRAIN);
     let staged = surface.stage_words(&k_entering, k_tokens, k_inner).map_err(|e| e.to_string())?;
-    let enter = surface.shape_enter(k_tokens, k_inner, Dyadic::ONE, GRAIN).map_err(|e| e.to_string())?;
+    let enter = surface.shape_enter(k_tokens, k_inner, Dyadic::ONE, GRAIN, &k_entering).map_err(|e| e.to_string())?;
     let split_shape = surface.shape_contract_tiled(k_tokens, k_inner, k_octaves, &k_map, split_tile).map_err(|e| e.to_string())?;
     let standing = surface.retain_partials(k_tokens, k_map.rows(), split_tile.splits).map_err(|e| e.to_string())?;
     let x = surface.fresh_section(k_tokens, k_inner, GRAIN).map_err(|e| e.to_string())?;
@@ -1311,7 +1310,7 @@ fn run() -> Result<(), String> {
     let mut builder = surface.begin_passage(&[vec![], vec![0]]).map_err(|e| e.to_string())?;
     let lane = builder.open(0, &[]).map_err(|e| e.to_string())?;
     surface.record_enter(&lane, &staged, Dyadic::ONE, &x).map_err(|e| e.to_string())?;
-    builder.close(0, &x, enter.needed.max(k_octaves)).map_err(|e| e.to_string())?;
+    builder.close(0, &x, enter.needed).map_err(|e| e.to_string())?;
     let lane = builder.open(1, &[0]).map_err(|e| e.to_string())?;
     surface.record_contract_split_k(&lane, &x, &k_map, split_tile, &standing, ResidentSurface::carrier_octaves(), LaneTree::Descending, &out).map_err(|e| e.to_string())?;
     builder.close(1, &out, split_shape.needed).map_err(|e| e.to_string())?;

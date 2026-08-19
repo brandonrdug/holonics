@@ -3,7 +3,7 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap. **Deeds H0, H1 and H2 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md)); H3 is the open deed; every later deed is open.
+**Status:** active construction contract when named by the roadmap. **Deeds H0 through H3 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md), [H3](../research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md)); H4 is the open deed; every later deed is open.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -593,6 +593,11 @@ warps ×4, 5–20× faster; gate_proj: DRAM 95 %, L2 hit 83 % → 7 %, 0.91×); 
 
 Port RMS/contact and other shared-population reductions to H1. Remove avoidable per-output census
 atomics only with exact census equality. Fuse only a receiver-certified word and retain reopening.
+
+**Returned 2026-08-19** — the record named in the status line. 260/260 census slot words equal with
+the serial control retained forever; 32 of 33 layer-1 quotients fused under the computed §4.6 check
+with terminal and censuses bit-equal and the collapsed population unchanged; the mouth's bound reads
+its material.
 
 ### Deed H4 — the tower is one streamed resident circulation
 

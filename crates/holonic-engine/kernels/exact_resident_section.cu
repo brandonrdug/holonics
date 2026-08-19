@@ -947,12 +947,142 @@ extern "C" __global__ void section_carry(
     out_hi[at] = in_hi[at];
 }
 
+// ---------------------------------------------------------------------------------------------
+// the census: six commutative receivers, aggregated in the block and deposited once
+// ---------------------------------------------------------------------------------------------
+//
+// **Every word this census writes is a max, an or, or an add over the coordinates.** Each is
+// commutative and associative and each coordinate's contribution is independent of every other, so
+// the fold may be taken in any order and by any grouping: warp, then block, then one atomic per
+// block per word. The atomics testify for exactly those receivers and for nothing ordered, which is
+// the only thing they were ever entitled to testify for.
+//
+//   SLOT_OCTAVE          max over coordinates of the wider endpoint's octaves
+//   SLOT_WIDTH  [6..8]   max over coordinates of `hi - lo`, saturated at the 64-bit word
+//   SLOT_WIDTH_SUM       add over coordinates of the same width
+//   SLOT_NONZERO_WIDTHS  add over coordinates of `width != 0`
+//   SLOT_INVERTED        or  over coordinates of `hi < lo`   (and `REFUSED_INVERTED` with it)
+//   SLOT_BOUND           or  over coordinates of `octaves > admitted`  (and `REFUSED_BOUND`)
+//   SLOT_WRITTEN         a plain store of 1 by one thread — not a reduction and not an atomic
+//
+// `section_census_serial_control` below is the per-thread-atomic form this replaces, kept verbatim
+// so the equality is measured forever rather than argued once.
+//
+// **One order-dependence is inherited and is not this aggregation's**: both forms decide whether to
+// measure at all by reading `slot[SLOT_REFUSED]`, and both also OR `REFUSED_INVERTED` /
+// `REFUSED_BOUND` into that same word. On material where the census itself raises a refusal, a
+// thread (control) or a block (this form) that entered before the raise measures its coordinates and
+// one that entered after does not. The occurrence refuses either way and its face may not be read;
+// what moves is the measured octave/width the receipt displays. Where the census raises nothing —
+// every standing occurrence — both forms are exactly order-free.
+
+#define CENSUS_MAX_WARPS 32
+
+__device__ __forceinline__ uint32_t warp_max_u32(uint32_t v) {
+    for (int d = 16; d > 0; d >>= 1) { uint32_t o = __shfl_down_sync(0xffffffffu, v, (unsigned)d, 32); if (o > v) v = o; }
+    return v;
+}
+__device__ __forceinline__ uint32_t warp_or_u32(uint32_t v) {
+    for (int d = 16; d > 0; d >>= 1) v |= __shfl_down_sync(0xffffffffu, v, (unsigned)d, 32);
+    return v;
+}
+__device__ __forceinline__ uint32_t warp_add_u32(uint32_t v) {
+    for (int d = 16; d > 0; d >>= 1) v += __shfl_down_sync(0xffffffffu, v, (unsigned)d, 32);
+    return v;
+}
+__device__ __forceinline__ unsigned long long warp_max_u64(unsigned long long v) {
+    for (int d = 16; d > 0; d >>= 1) { unsigned long long o = __shfl_down_sync(0xffffffffu, v, (unsigned)d, 32); if (o > v) v = o; }
+    return v;
+}
+__device__ __forceinline__ unsigned long long warp_add_u64(unsigned long long v) {
+    for (int d = 16; d > 0; d >>= 1) v += __shfl_down_sync(0xffffffffu, v, (unsigned)d, 32);
+    return v;
+}
+
 // The census of one written section into the occurrence's own slot: the widest octave, the widest
 // enclosure, whether any coordinate inverted, and whether the a-priori octave bound the occurrence
 // was admitted under HELD. A refuted bound is written into THIS occurrence's refusal word, which
 // every declared successor inspects at entry, so no successor computes on words wider than it was
 // admitted for. Writes the marker. Nothing here is shared with an unrelated occurrence.
+//
+// The block is a whole number of warps by the surface's own launch derivation; the launcher refuses
+// a block that is not, because a warp fold with an incomplete mask is undefined.
 extern "C" __global__ void section_census(
+    const int64_t *lo, const int64_t *hi, uint32_t count, uint32_t admitted_octaves,
+    uint32_t *slot
+) {
+    __shared__ uint32_t entry_refused;
+    __shared__ uint32_t part_oct[CENSUS_MAX_WARPS];
+    __shared__ unsigned long long part_wid[CENSUS_MAX_WARPS];
+    __shared__ unsigned long long part_sum[CENSUS_MAX_WARPS];
+    __shared__ uint32_t part_nz[CENSUS_MAX_WARPS];
+    __shared__ uint32_t part_inv[CENSUS_MAX_WARPS];
+    __shared__ uint32_t part_bnd[CENSUS_MAX_WARPS];
+    // An occurrence whose semantic kernel refused — of its own, or upstream — has no standing face
+    // to measure. The reading is taken once per block so the whole block leaves together: a warp
+    // fold requires every lane of the warp, so no thread may return early here.
+    if (threadIdx.x == 0) entry_refused = slot[SLOT_REFUSED];
+    __syncthreads();
+    if (entry_refused != 0u) {
+        if (blockIdx.x == 0 && threadIdx.x == 0 && count > 0u) slot[SLOT_WRITTEN] = 1u;
+        return;
+    }
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t oct = 0u, nonzero = 0u, inverted = 0u, bound = 0u;
+    unsigned long long w64 = 0ull, wsum = 0ull;
+    if (at < count) {
+        wide a = lo[at], b = hi[at];
+        uwide ma = magnitude(a), mb = magnitude(b);
+        oct = octaves_of(ma > mb ? ma : mb);
+        if (b >= a) {
+            uwide width = (uwide)(b - a);   // b − a of two int64 words: at most 2^64, exact in the wide carrier
+            w64 = (unsigned long long)(width > (uwide)UINT64_MAX ? UINT64_MAX : (uint64_t)width);
+            wsum = w64;
+            nonzero = (w64 != 0ull) ? 1u : 0u;
+        } else {
+            inverted = 1u;
+        }
+        if (oct > admitted_octaves) bound = 1u;
+    }
+    const uint32_t lane = threadIdx.x & 31u;
+    const uint32_t warp = threadIdx.x >> 5;
+    const uint32_t warps = (blockDim.x + 31u) >> 5;
+    oct = warp_max_u32(oct);
+    w64 = warp_max_u64(w64);
+    wsum = warp_add_u64(wsum);
+    nonzero = warp_add_u32(nonzero);
+    inverted = warp_or_u32(inverted);
+    bound = warp_or_u32(bound);
+    if (lane == 0u && warp < CENSUS_MAX_WARPS) {
+        part_oct[warp] = oct; part_wid[warp] = w64; part_sum[warp] = wsum;
+        part_nz[warp] = nonzero; part_inv[warp] = inverted; part_bnd[warp] = bound;
+    }
+    __syncthreads();
+    if (threadIdx.x == 0) {
+        for (uint32_t w = 1; w < warps && w < CENSUS_MAX_WARPS; ++w) {
+            if (part_oct[w] > part_oct[0]) part_oct[0] = part_oct[w];
+            if (part_wid[w] > part_wid[0]) part_wid[0] = part_wid[w];
+            part_sum[0] += part_sum[w];
+            part_nz[0] += part_nz[w];
+            part_inv[0] |= part_inv[w];
+            part_bnd[0] |= part_bnd[w];
+        }
+        // One atomic per block per word, and none at all where the block's fold is the identity.
+        if (part_oct[0] != 0u) atomicMax(slot + SLOT_OCTAVE, part_oct[0]);
+        if (part_wid[0] != 0ull) atomicMax((unsigned long long *)(slot + SLOT_WIDTH), part_wid[0]);
+        if (part_sum[0] != 0ull) atomicAdd((unsigned long long *)(slot + SLOT_WIDTH_SUM), part_sum[0]);
+        if (part_nz[0] != 0u) atomicAdd(slot + SLOT_NONZERO_WIDTHS, part_nz[0]);
+        if (part_inv[0] != 0u) { atomicOr(slot + SLOT_INVERTED, 1u); atomicOr(slot + SLOT_REFUSED, REFUSED_INVERTED); }
+        if (part_bnd[0] != 0u) { atomicOr(slot + SLOT_BOUND, 1u); atomicOr(slot + SLOT_REFUSED, REFUSED_BOUND); }
+        if (blockIdx.x == 0 && count > 0u) slot[SLOT_WRITTEN] = 1u;
+    }
+}
+
+// **THE CONTROL, kept verbatim**: the per-thread-atomic census the block-aggregated one above
+// replaces. It is never recorded into a passage; a driver launches both on one section and the slot
+// words must agree word for word. Deleting it would make the equality an argument instead of a
+// measurement.
+extern "C" __global__ void section_census_serial_control(
     const int64_t *lo, const int64_t *hi, uint32_t count, uint32_t admitted_octaves,
     uint32_t *slot
 ) {
@@ -982,6 +1112,75 @@ extern "C" __global__ void section_census(
         atomicOr(slot + SLOT_REFUSED, REFUSED_BOUND);
     }
     if (at == 0) slot[SLOT_WRITTEN] = 1u;
+}
+
+// ---------------------------------------------------------------------------------------------
+// the midpoint quotient, FUSED: the collapse and this occurrence's own census in one node
+// ---------------------------------------------------------------------------------------------
+//
+// **This is an apparatus compression declared per occurrence, never occurrence identity.** The
+// quotient remains an occurrence of the diagram with its own law, its own slot and its own census;
+// what is compressed is that its collapse and its census are one launch instead of two, and that its
+// section is its predecessor's own words rewritten in place instead of a second allocation.
+//
+// The predecessor's section is therefore GONE — its words are the midpoints after this node — which
+// is why the passage refuses the fusion unless the predecessor's only consumer is this quotient and
+// no receiver declared its face. The reopening route is the unfused law: bind `MidpointQuotient`
+// instead and the predecessor's enclosure stands in its own section, censused and readable.
+//
+// **Why it is exactly the unfused pair, on every path.**
+//   * the collapse originates no refusal: `shift_floor(lo + hi, -1)` on two `int64` words leaves the
+//     wide carrier untouched, so the only flag this occurrence can carry is `REFUSED_UPSTREAM`;
+//   * the upstream decision is thread-uniform and final at entry, because this node is ordered after
+//     the predecessor's census by the graph's own edge — exactly where the unfused collapse kernel
+//     sat;
+//   * the census of a collapsed section measures `lo == hi`, so every width is zero: `SLOT_WIDTH`,
+//     `SLOT_WIDTH_SUM` and `SLOT_NONZERO_WIDTHS` are the identity and `SLOT_INVERTED` is
+//     unreachable. Only the octave max and the bound or remain, and both are block-aggregated
+//     exactly as the census above aggregates them.
+// The predecessor's own census — the PRE-quotient widths, which are the collapsed population this
+// chart retains — is untouched: it is its own node on the predecessor's lane and it ran first.
+extern "C" __global__ void section_midpoint_seal(
+    int64_t *lo, int64_t *hi, uint32_t count, uint32_t admitted_octaves,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    __shared__ uint32_t stopped;
+    __shared__ uint32_t part_oct[CENSUS_MAX_WARPS];
+    __shared__ uint32_t part_bnd[CENSUS_MAX_WARPS];
+    if (threadIdx.x == 0) stopped = upstream_refused(census, lineage, lineage_count, slot) ? 1u : 0u;
+    __syncthreads();
+    if (stopped != 0u) {
+        if (blockIdx.x == 0 && threadIdx.x == 0 && count > 0u) slot[SLOT_WRITTEN] = 1u;
+        return;
+    }
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t oct = 0u, bound = 0u;
+    if (at < count) {
+        // IN PLACE, and lawfully so: this thread reads and writes only coordinate `at`, no other
+        // thread touches it, and no other occurrence reads this section — the compile refused the
+        // fusion otherwise.
+        wide m = shift_floor((wide)lo[at] + (wide)hi[at], -1, slot);
+        lo[at] = (int64_t)m;
+        hi[at] = (int64_t)m;
+        oct = octaves_of(magnitude(m));
+        if (oct > admitted_octaves) bound = 1u;
+    }
+    const uint32_t lane = threadIdx.x & 31u;
+    const uint32_t warp = threadIdx.x >> 5;
+    const uint32_t warps = (blockDim.x + 31u) >> 5;
+    oct = warp_max_u32(oct);
+    bound = warp_or_u32(bound);
+    if (lane == 0u && warp < CENSUS_MAX_WARPS) { part_oct[warp] = oct; part_bnd[warp] = bound; }
+    __syncthreads();
+    if (threadIdx.x == 0) {
+        for (uint32_t w = 1; w < warps && w < CENSUS_MAX_WARPS; ++w) {
+            if (part_oct[w] > part_oct[0]) part_oct[0] = part_oct[w];
+            part_bnd[0] |= part_bnd[w];
+        }
+        if (part_oct[0] != 0u) atomicMax(slot + SLOT_OCTAVE, part_oct[0]);
+        if (part_bnd[0] != 0u) { atomicOr(slot + SLOT_BOUND, 1u); atomicOr(slot + SLOT_REFUSED, REFUSED_BOUND); }
+        if (blockIdx.x == 0 && count > 0u) slot[SLOT_WRITTEN] = 1u;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------

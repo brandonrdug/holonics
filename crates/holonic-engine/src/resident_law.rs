@@ -103,6 +103,18 @@ pub trait ResidentLaw: std::fmt::Debug {
     fn stages(&self) -> Option<&str> {
         None
     }
+    /// **A declared apparatus fusion: this law collapses its predecessor's section IN PLACE and
+    /// carries no section of its own.** The passage records the fused kernel instead of this law's
+    /// `record`, allocates no section for the occurrence, and refuses at compile unless the
+    /// predecessor's only consumer is this occurrence and no receiver declared the predecessor's
+    /// face. It is never inferred from a law's name; a caller binds the sealing variant or does not.
+    fn seals_predecessor(&self) -> bool {
+        false
+    }
+    /// This law's kernel writes its own census slot, so the passage records no census node for it.
+    fn fuses_census(&self) -> bool {
+        false
+    }
     /// Beyond its inputs' sections, the resident ranges this law's kernel reads — mounted maps,
     /// gains, bands, positions, staged words. For the footprint certificate.
     fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)>;
@@ -171,22 +183,18 @@ impl ResidentLaw for Enter {
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
         if material.entering.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
     }
+    /// The a-priori bound and the carrier admission are ONE reading of the entering words
+    /// ([`ResidentSurface::entering_octaves`]), so a mouth cannot be admitted at one bound and
+    /// censused against another. Until 2026-08-19 the shape's admission was authored from the
+    /// scale and the grain alone while this law already read the material; the two are now the
+    /// same function.
     fn bound_octaves(&self, grain: ResidentGrain, _inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
-        let f = i64::from(grain.0);
         let entering = &material.entering[&self.population];
-        let mut widest = 0i64;
-        for word in &entering.words {
-            if let Ok(dyadic) = Dyadic::of_bfloat16_bits(*word) {
-                let magnitude = i64::from(dyadic.octaves()) + i64::from(self.scale.octaves());
-                let shifted = magnitude + i64::from(dyadic.exponent) + i64::from(self.scale.exponent) + f;
-                widest = widest.max(shifted);
-            }
-        }
-        widest + 1
+        i64::from(ResidentSurface::entering_octaves(&entering.words, self.scale, grain))
     }
     fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, _inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
         let entering = &material.entering[&self.population];
-        surface.shape_enter(entering.rows, entering.width, self.scale, grain)
+        surface.shape_enter(entering.rows, entering.width, self.scale, grain, &entering.words)
     }
     fn stages(&self) -> Option<&str> {
         Some(&self.population)
@@ -292,6 +300,79 @@ impl MidpointQuotient {
             return Err(unentailed("midpoint-quotient", "declaration", "a declared quotient chart", validation));
         }
         Ok(LawEntailment { law: "midpoint-quotient", parameters: vec![("chart".to_owned(), "midpoint of the certified enclosure; the enclosure retained in the predecessor".to_owned(), format!("the receiver's declaration: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+    }
+}
+
+/// **The same midpoint quotient, with its realization fused into one node** — an APPARATUS
+/// compression declared per occurrence by the caller and named on the receipt, never taken silently
+/// and never a second semantics.
+///
+/// The occurrence is unchanged: same species, same arity, same law entailment from the same declared
+/// quotient chart, its own census slot, its own a-priori bound. What is compressed is that its
+/// collapse and its census are one launch instead of two, and that it carries no section of its own
+/// — the predecessor's words are rewritten in place.
+///
+/// **The condition, and the compile enforces it from the diagram** ([`crate::front_passage`]): the
+/// predecessor must have exactly one consumer, this occurrence; it must not be the declared
+/// terminal; and it must not be a face the receiver declared. Those are exactly the statement that
+/// every declared future receiver factors through the fused output. An occurrence whose pre-seal
+/// enclosure any receiver reads — the dissection's layer-enclosure face is the standing example —
+/// refuses the fusion by name.
+///
+/// **The reopening route** is [`MidpointQuotient`]: binding it instead leaves the predecessor's
+/// enclosure in its own section, censused and readable, and the pair runs as two nodes. The
+/// collapsed population the chart retains is unchanged either way, because the predecessor's own
+/// census — the PRE-quotient widest, summed and nonzero widths — is its own node and runs first.
+/// Species: quotient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SealedMidpointQuotient;
+
+impl ResidentLaw for SealedMidpointQuotient {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut entailment = MidpointQuotient.entail(validation)?;
+        entailment.law = "midpoint-quotient(fused seal)";
+        entailment.parameters.push((
+            "fusion".to_owned(),
+            "the collapse and this occurrence's census in one node; the predecessor's section rewritten in place".to_owned(),
+            "the caller's declared APPARATUS compression — no source testimony carries it, the returned words do not move with it, and the unfused law is the reopening route".to_owned(),
+        ));
+        Ok(entailment)
+    }
+    fn name(&self) -> &'static str {
+        "midpoint-quotient(fused seal)"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
+        Ok(())
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_midpoint_seal(rows, width, octaves)
+    }
+    fn seals_predecessor(&self) -> bool {
+        true
+    }
+    fn fuses_census(&self) -> bool {
+        true
+    }
+    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        Vec::new()
+    }
+    fn record<'chart>(&self, _surface: &ResidentSurface<'chart>, _lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, _out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        // The passage records the fused kernel itself: the fusion is its apparatus compression and
+        // the a-priori bound the fused census compares against is its reading, not the law's.
+        Err(ResidentRefusal::Declaration {
+            operation: "midpoint-quotient(fused seal)",
+            what: "the fused seal is recorded by the passage, which alone holds the a-priori bound its census compares against; a caller recording it directly has bypassed the fusion's compile condition".to_owned(),
+        })
     }
 }
 

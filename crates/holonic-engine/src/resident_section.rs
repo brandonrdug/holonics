@@ -95,9 +95,20 @@ pub const SLOT_WORDS: usize = 16;
 /// `resident_blocks_per_sm` of every kernel the profiler has already read.
 const REGISTER_GRAIN_PER_WARP: u32 = 256;
 
+/// **The warps the block-aggregated census folds across**, mirroring `CENSUS_MAX_WARPS` in
+/// `kernels/exact_resident_section.cu`, which sizes the shared cross-warp buffers to it. It is the
+/// mounted architecture's own ceiling — the maximum block is 1024 threads and a warp is 32 lanes, so
+/// no legal block has more — and it is stated here rather than left as a literal because the kernel's
+/// array and this guard must be one number. [`ResidentSurface::refuse_partial_warp_block`] REFUSES a
+/// geometry past it by name; nothing is truncated and no fold runs with an incomplete mask.
+///
+/// Falsifier: a device whose `MAX_THREADS_PER_BLOCK / WARP_SIZE` exceeds this must refuse the census
+/// rather than return one, and the refusal names the derived block and the warp.
+const CENSUS_MAX_WARPS: u32 = 32;
+
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 25] = [
+pub const KERNELS: [&str; 27] = [
     "section_from_bfloat16",
     "section_carry",
     "section_withdraw_rows",
@@ -113,6 +124,13 @@ pub const KERNELS: [&str; 25] = [
     "section_withdraw_columns",
     "section_collapse_control",
     "section_census",
+    // The per-thread-atomic census the block-aggregated one replaced, kept so a driver can run both
+    // on one section and measure the equality rather than argue it.
+    "section_census_serial_control",
+    // The midpoint quotient fused with its own census — one node, and the predecessor's own words
+    // rewritten in place. Declared per occurrence; the passage refuses it unless the predecessor's
+    // only consumer is the quotient and no receiver declared the predecessor's face.
+    "section_midpoint_seal",
     "section_arithmetic_control",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
@@ -555,6 +573,30 @@ fn ceil_log2(n: usize) -> u32 {
     }
 }
 
+/// **The mouth's a-priori octave bound, read off the entering words.** For each codeword the mouth
+/// decodes, the placed value is `significand · scale · 2^(ulp + scale exponent + F)`; its octaves
+/// are the significand's plus the scale's plus that exponent, and the directed ceiling adds one.
+/// The greatest over the population is the bound. A non-finite codeword contributes nothing — the
+/// kernel refuses it as malformed rather than placing it.
+///
+/// This is the one reading; [`ResidentSurface::shape_enter`] and [`crate::resident_law::Enter`]'s
+/// a-priori law both take it, so a carrier admission and a census comparison cannot disagree.
+fn entering_octaves(words: &[u16], scale: Dyadic, grain: ResidentGrain) -> u32 {
+    let f = i64::from(grain.0);
+    let mut widest = 0i64;
+    for word in words {
+        if let Ok(dyadic) = Dyadic::of_bfloat16_bits(*word) {
+            if dyadic.significand == 0 {
+                continue;
+            }
+            let magnitude = i64::from(dyadic.octaves()) + i64::from(scale.octaves());
+            let shifted = magnitude + i64::from(dyadic.exponent) + i64::from(scale.exponent) + f;
+            widest = widest.max(shifted);
+        }
+    }
+    u32::try_from(widest + 1).unwrap_or(1).max(1)
+}
+
 /// The parameter words of one launch, each in its own 64-bit slot so `cuLaunchKernel` reads every
 /// argument from a stable address of its own size (little-endian: a 32-bit argument is the low
 /// half of its slot).
@@ -926,6 +968,13 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(lo.into_iter().zip(hi).collect())
     }
 
+    /// The octaves the entering words occupy after the exact dyadic scale and the placement at the
+    /// grain — the mouth's a-priori bound, read from the material. Public so a caller can take the
+    /// same reading the law takes.
+    pub fn entering_octaves(words: &[u16], scale: Dyadic, grain: ResidentGrain) -> u32 {
+        entering_octaves(words, scale, grain)
+    }
+
     fn admit_octaves(operation: &'static str, needed: u32) -> Result<(), ResidentRefusal> {
         let admitted = Self::carrier_octaves();
         if needed > admitted {
@@ -938,12 +987,27 @@ impl<'chart> ResidentSurface<'chart> {
     // the laws' shapes and prices — pure, before any launch
     // -----------------------------------------------------------------------------------------
 
-    /// **The mouth**: entering codewords scaled by an exact dyadic and placed at the grain.
-    pub fn shape_enter(&self, rows: usize, width: usize, scale: Dyadic, grain: ResidentGrain) -> Result<LawShape, ResidentRefusal> {
+    /// **The mouth reads its material**: entering codewords scaled by an exact dyadic and placed at
+    /// the grain, admitted under the octaves THE ENTERING WORDS THEMSELVES occupy.
+    ///
+    /// Until 2026-08-19 this was `8 + scale octaves + grain + 8` — the significand's width, the
+    /// scale's, the grain and eight more — computed without ever looking at a word. That is an
+    /// authored level wearing a derivation: it is a bound on a *hypothetical* codeword of full
+    /// significand at exponent zero, and it is simultaneously too generous for the real Gemma maps
+    /// (whose exponents are negative) and too small for any population with a large exponent, which
+    /// then refuses BOUND at the mouth and poisons every successor UPSTREAM. The H2 driver worked
+    /// around it caller-side by closing the entering occurrence at
+    /// `max(shape.needed, octaves computed from the words)`; that workaround is deleted and the
+    /// reading is here, where the law is.
+    ///
+    /// The bound is the greatest, over the entering words, of the octaves of
+    /// `significand · scale · 2^(ulp + scale exponent + F)` — the exact placement the kernel
+    /// performs — plus one for the directed ceiling. A non-finite codeword contributes nothing to
+    /// the bound; it is refused by the kernel as malformed. `[`Enter::bound_octaves`] states the same
+    /// reading for the a-priori law and the two agree by construction.
+    pub fn shape_enter(&self, rows: usize, width: usize, scale: Dyadic, grain: ResidentGrain, words: &[u16]) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "enter";
-        // A BF16 significand is eight octaves; the product with the scale must sit in the word
-        // after the grain shift.
-        let needed = 8 + scale.octaves() + grain.0 + 8;
+        let needed = entering_octaves(words, scale, grain);
         Self::admit_octaves(OPERATION, needed)?;
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1267,6 +1331,25 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
     }
 
+    /// **The midpoint quotient, fused with its own census.** One node instead of two, and no section
+    /// of its own: the predecessor's words are rewritten in place. The predicted price is the
+    /// collapse's, and `launches` is ONE — the receipt's apparatus prediction moves with the fusion
+    /// rather than describing the unfused pair.
+    pub fn shape_midpoint_seal(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "midpoint-quotient(fused seal)";
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.added(count);
+        work.entries_written = BigUint::from(2 * count);
+        // The census this kernel folds is the collapsed section's: an octave max and a bound or.
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.stepped();
+        let mut shape = self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())?;
+        shape.launches = 1;
+        Ok(shape)
+    }
+
     /// The carry of a resident standing into this passage: one read and one write per coordinate,
     /// no arithmetic, the octave bound unchanged.
     pub fn shape_carry(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
@@ -1518,9 +1601,74 @@ impl<'chart> ResidentSurface<'chart> {
     /// The census of one written section into the occurrence's slot, and the a-priori bound it was
     /// admitted under, which the census compares against.
     fn record_census(&self, lane: &Lane<'_, 'chart>, out: &ResidentSection<'chart>, admitted_octaves: u32) -> Result<(), ResidentRefusal> {
+        self.refuse_partial_warp_block("census")?;
         let mut params = Params::new();
         params.ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).u32(out.count() as u32).u32(admitted_octaves).ptr(lane.slot);
         self.record_flat(lane, "section_census", out.count(), &mut params, "census")
+    }
+
+    /// **The fused midpoint quotient**: the collapse and this occurrence's census in one node,
+    /// writing the midpoints over the predecessor's own words. Recorded by the passage rather than
+    /// by the law, because the fusion is the passage's apparatus compression and the a-priori bound
+    /// the census compares against is the passage's reading.
+    pub fn record_midpoint_seal(&self, lane: &Lane<'_, 'chart>, predecessor: &ResidentSection<'chart>, admitted_octaves: u32) -> Result<(), ResidentRefusal> {
+        self.refuse_partial_warp_block("midpoint-quotient(fused seal)")?;
+        let mut params = Params::new();
+        params.ptr(predecessor.lo.device_ptr()).ptr(predecessor.hi.device_ptr()).u32(predecessor.count() as u32).u32(admitted_octaves)
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_flat(lane, "section_midpoint_seal", predecessor.count(), &mut params, "midpoint-quotient(fused seal)")
+    }
+
+    /// A warp fold with an incomplete mask is undefined, so a block that is not a whole number of
+    /// warps refuses here rather than returning a plausible census. The surface's own launch
+    /// derivation takes the block down to a whole number of warps, so this cannot fire on a mounted
+    /// device; it is stated because the aggregation depends on it.
+    fn refuse_partial_warp_block(&self, operation: &'static str) -> Result<(), ResidentRefusal> {
+        let warp = self.launch.warp.max(1);
+        if self.launch.block_x % warp != 0 || self.launch.block_x / warp > CENSUS_MAX_WARPS {
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("the block-aggregated census needs a whole number of warps, at most {CENSUS_MAX_WARPS}; the derived block is {} at warp {warp}", self.launch.block_x),
+            });
+        }
+        Ok(())
+    }
+
+    /// **Both censuses, on one section, into two fresh slots** — the equality this deed measures
+    /// rather than argues. `entry_refused` is the refusal word the slot carries when the census
+    /// enters, so a poisoned lineage can be exhibited under both forms. Launched directly and
+    /// synchronized, outside any passage, and counted as such.
+    pub fn census_both(&self, section: &ResidentSection<'chart>, admitted_octaves: u32, entry_refused: u32) -> Result<(SlotReading, SlotReading), ResidentRefusal> {
+        let aggregated = self.census_once("section_census", section, admitted_octaves, entry_refused)?;
+        let control = self.census_once("section_census_serial_control", section, admitted_octaves, entry_refused)?;
+        Ok((aggregated, control))
+    }
+
+    /// One census kernel on one section, into a fresh slot seeded with `entry_refused`.
+    pub fn census_once(&self, symbol: &str, section: &ResidentSection<'chart>, admitted_octaves: u32, entry_refused: u32) -> Result<SlotReading, ResidentRefusal> {
+        self.context.make_current()?;
+        let slot = self.alloc::<u32>(SLOT_WORDS)?;
+        let mut words = vec![0u32; SLOT_WORDS];
+        words[0] = entry_refused;
+        slot.copy_from_slice(&words)?;
+        let count = section.count();
+        let mut params = Params::new();
+        params.ptr(section.lo.device_ptr()).ptr(section.hi.device_ptr()).u32(count as u32).u32(admitted_octaves).ptr(slot.device_ptr());
+        let function = self.function(symbol)?;
+        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture { operation: "census", rows: count, width: 1 })?;
+        let grid = self.launch.grid_for(count32.max(1)).map_err(|_| ResidentRefusal::GridAperture { operation: "census", rows: count, width: 1 })?;
+        let stream = Stream::create()?;
+        let mut pointers = params.pointers();
+        function.launch_on_shared(&stream, Dim3::x(grid), Dim3::x(self.launch.block_x), 0, &mut pointers)?;
+        stream.synchronize()?;
+        slot.copy_to_slice(&mut words)?;
+        {
+            let mut census = self.census.borrow_mut();
+            census.captured_launches += 1;
+            census.synchronizations += 1;
+            census.egress_receipt_octets += (SLOT_WORDS * 4) as u64;
+        }
+        Ok(SlotReading::of(&words))
     }
 
     // -----------------------------------------------------------------------------------------
@@ -2176,6 +2324,19 @@ impl<'chart> PassageBuilder<'chart> {
         Ok(())
     }
 
+    /// **Close an occurrence whose kernel wrote its own census.** No census node is recorded and no
+    /// edge is added: the fused kernel is the only node this occurrence contributes. The a-priori
+    /// bound it compares against was handed to that kernel when it was recorded.
+    pub fn close_fused(&mut self, index: usize) -> Result<(), ResidentRefusal> {
+        if !self.opened[index] || self.closed[index] {
+            return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} closed before it was opened, or twice") });
+        }
+        self.events[index].record(&self.lanes[index])?;
+        self.closed[index] = true;
+        self.nodes += 1;
+        Ok(())
+    }
+
     /// **Bind the passage**: join every lane back to the origin, end the capture, read the graph's
     /// own census, instantiate. What comes back is launchable and reads back once.
     pub fn finish(self) -> Result<ResidentPassage<'chart>, ResidentRefusal> {
@@ -2415,7 +2576,7 @@ mod tests {
     /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
     fn enter_once(surface: &'static ResidentSurface<'static>, words: &[u16], rows: usize, width: usize, scale: Dyadic, grain: ResidentGrain) -> (Vec<(i64, i64)>, PassageReading) {
         let staged = surface.stage_words(words, rows, width).expect("stage");
-        let shape = surface.shape_enter(rows, width, scale, grain).expect("shape");
+        let shape = surface.shape_enter(rows, width, scale, grain, words).expect("shape");
         let out = surface.fresh_section(rows, width, grain).expect("section");
         let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
@@ -2425,6 +2586,124 @@ mod tests {
         let reading = passage.launch().expect("launch");
         let read = surface.read_out(&out).expect("read");
         (read, reading)
+    }
+
+    /// A bf16 word from a signed 8-bit significand and a binary exponent, so a fixture's octaves are
+    /// declared rather than hoped for.
+    fn bfloat16(significand: i32, exponent: i32) -> u16 {
+        let negative = significand < 0;
+        let magnitude = significand.unsigned_abs();
+        assert!(magnitude != 0 && magnitude < 256, "a bf16 significand is eight octaves");
+        let bits = 32 - magnitude.leading_zeros();
+        let normalized = magnitude << (8 - bits);
+        let unbiased = exponent + (bits as i32) - 1;
+        let biased = unbiased + 127;
+        assert!(biased > 0 && biased < 255, "the fixture exponent must be a normal bf16");
+        ((negative as u16) << 15) | ((biased as u16) << 7) | ((normalized & 0x7f) as u16)
+    }
+
+    /// **PART B: the block-aggregated census and the per-thread-atomic control, on one section.**
+    /// Every slot word, plural shapes, and the poisoned-lineage entry. The a-priori is that max, or
+    /// and add are the same commutative and associative receivers the atomics implemented, so the
+    /// fold's grouping cannot move a word; this measures it instead of asserting it.
+    #[test]
+    fn the_block_aggregated_census_returns_the_serial_controls_census_word_for_word() {
+        let Some((_, surface)) = surface() else { return };
+        // 205 · 2^-11 falls below a grain of 8, so the mouth returns a GENUINE interval and the
+        // width faces are exercised rather than sitting at zero.
+        let narrow = bfloat16(205, -11);
+        // A grain of 8 leaves the low three bits of 205·2^-11 below it, so those words enter as
+        // genuine intervals; a grain of 20 carries every fixture word exactly, so its widths are all
+        // zero — both are shapes the census must return, and the second is not a degenerate case.
+        let shapes: [(usize, usize, u32); 5] = [(1, 1, 8), (1, 32, 8), (7, 129, 8), (4, 1024, 8), (2, 64, 20)];
+        for (rows, width, grain) in shapes {
+            let grain = ResidentGrain(grain);
+            let words: Vec<u16> = (0..rows * width)
+                .map(|i| match i % 5 {
+                    0 => narrow,
+                    1 => ONE,
+                    2 => MINUS_ONE_AND_HALF,
+                    3 => bfloat16(-205, -11),
+                    _ => HALF,
+                })
+                .collect();
+            let staged = surface.stage_words(&words, rows, width).expect("stage");
+            let shape = surface.shape_enter(rows, width, Dyadic::ONE, grain, &words).expect("shape");
+            let section = surface.fresh_section(rows, width, grain).expect("section");
+            let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
+            let lane = builder.open(0, &[]).expect("open");
+            surface.record_enter(&lane, &staged, Dyadic::ONE, &section).expect("record");
+            builder.close(0, &section, shape.needed).expect("close");
+            builder.finish().expect("finish").launch().expect("launch");
+            // (a) a standing occurrence: nothing refuses and both forms are exactly order-free.
+            let (aggregated, control) = surface.census_both(&section, shape.needed, 0).expect("census");
+            assert_eq!(aggregated, control, "the census disagrees at {rows}x{width} grain {}", grain.0);
+            assert!(aggregated.written && aggregated.max_octave > 0);
+            if grain.0 < 11 {
+                assert!(aggregated.width_sum > 0 && aggregated.nonzero_widths > 0, "the interval fixture must exercise the width faces");
+            } else {
+                assert_eq!((aggregated.width_sum, aggregated.nonzero_widths, aggregated.max_width), (0, 0, 0), "an exactly carried fixture has no width, under both forms");
+            }
+            assert!(!aggregated.inverted && aggregated.refused == 0);
+            // (b) a refused occurrence's census still measures nothing, under both forms.
+            for poison in [REFUSED_UPSTREAM, REFUSED_MALFORMED, REFUSED_CARRIER] {
+                let (aggregated, control) = surface.census_both(&section, shape.needed, poison).expect("census");
+                assert_eq!(aggregated, control, "the poisoned census disagrees at {rows}x{width}");
+                assert_eq!(aggregated.refused, poison, "a refused occurrence acquires no second refusal from its own census");
+                assert!(aggregated.written, "the census still marks that it ran");
+                assert_eq!((aggregated.max_octave, aggregated.max_width, aggregated.width_sum, aggregated.nonzero_widths), (0, 0, 0, 0), "and it measures nothing");
+            }
+            // (c) the bound refuted: both forms raise it, and both are stable across repetitions.
+            // This is the ONE order-dependent class, and it is inherited: both forms decide whether
+            // to measure by reading the same word they OR into. The refusal itself is order-free.
+            let low = 1u32;
+            let mut readings = Vec::new();
+            for _ in 0..4 {
+                let (aggregated, control) = surface.census_both(&section, low, 0).expect("census");
+                assert_eq!(aggregated.refused & REFUSED_BOUND, REFUSED_BOUND);
+                assert_eq!(control.refused & REFUSED_BOUND, REFUSED_BOUND);
+                assert!(aggregated.bound_violated && control.bound_violated);
+                readings.push((aggregated, control));
+            }
+            assert!(readings.windows(2).all(|w| w[0].0.refused == w[1].0.refused), "the refusal is order-free even where the measurement is not");
+        }
+    }
+
+    /// **PART D: the mouth's a-priori bound is read off the entering words.** The shape's carrier
+    /// admission and the `enter` law's a-priori bound are one function, so a population whose
+    /// exponent is large is admitted for what it is rather than refused BOUND at the mouth.
+    #[test]
+    fn the_mouths_a_priori_bound_is_read_off_the_entering_words_and_not_authored_from_scale_and_grain() {
+        let Some((_, surface)) = surface() else { return };
+        let grain = ResidentGrain(8);
+        let authored = 8 + Dyadic::ONE.octaves() + grain.0 + 8; // what the bound was until 2026-08-19
+        // (i) a wide population: the authored bound is BELOW the octaves the words occupy, so the
+        //     mouth used to refuse its own material. The reading is above them.
+        let wide = [bfloat16(255, 46), bfloat16(-255, 46), ONE];
+        let read = ResidentSurface::entering_octaves(&wide, Dyadic::ONE, grain);
+        assert!(read > authored, "the wide fixture is exactly the population the authored bound could not carry: read {read}, authored {authored}");
+        let shape = surface.shape_enter(1, 3, Dyadic::ONE, grain, &wide).expect("shape");
+        assert_eq!(shape.needed, read);
+        // and the words the mouth actually writes sit inside it
+        let (words, reading) = enter_once(surface, &wide, 1, 3, Dyadic::ONE, grain);
+        assert_eq!(reading.slots[0].refused, 0, "the mouth no longer refuses the material it was handed");
+        let measured = words.iter().map(|(lo, hi)| 64 - lo.unsigned_abs().max(hi.unsigned_abs()).leading_zeros()).max().expect("words");
+        assert!(measured <= read, "measured {measured} octaves against an a-priori bound of {read}");
+        assert_eq!(reading.slots[0].max_octave, measured);
+        // (ii) a narrow population: the reading is far BELOW the authored bound, so the admission is
+        //      no longer a constant wearing a derivation.
+        let narrow = [HALF, bfloat16(205, -11)];
+        let narrow_read = ResidentSurface::entering_octaves(&narrow, Dyadic::ONE, grain);
+        assert!(narrow_read < authored, "read {narrow_read} against authored {authored}");
+        // (iii) the shape and the law take the same reading, so the census cannot compare against a
+        //       different bound from the one the carrier admitted.
+        use crate::resident_law::{Enter, EnteringRows, ResidentLaw, ResidentMaterial};
+        let mut material = ResidentMaterial::empty();
+        material.entering.insert("x".to_owned(), EnteringRows { words: wide.to_vec(), rows: 1, width: 3 });
+        let law = Enter { population: "x".to_owned(), scale: Dyadic::ONE };
+        assert_eq!(law.bound_octaves(grain, &[], &material), i64::from(read));
+        // (iv) an empty population reads one octave rather than a negative bound.
+        assert_eq!(ResidentSurface::entering_octaves(&[], Dyadic::ONE, grain), 1);
     }
 
     #[test]
@@ -2507,7 +2786,7 @@ mod tests {
         let grain = ResidentGrain(20);
         let words = [ONE, TWO, HALF, MINUS_ONE_AND_HALF];
         let staged = surface.stage_words(&words, 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &words).expect("shape");
         let by = DyadicEnclosure { lo: 2, hi: 2, grain: 0 };
         let scale = surface.shape_scale(1, 4, 22, by).expect("shape");
         let hadamard = surface.shape_hadamard(1, 4, 22, 22).expect("shape");
@@ -2594,7 +2873,7 @@ mod tests {
         let mut runs = Vec::new();
         for grain in [coarse, fine] {
             let staged = surface.stage_words(&[THREE, FOUR], 1, 2).expect("stage");
-            let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+            let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[THREE, FOUR]).expect("shape");
             let rms = surface.shape_rms_rebase(1, 2, 2, grain.0 + 3, None).expect("shape");
             assert!(rms.couplings.iter().any(|c| c.coupling.contains("quadratic")));
             let x = surface.fresh_section(1, 2, grain).expect("x");
@@ -2751,7 +3030,7 @@ mod tests {
         let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
         let scalar_shape = surface.shape_contract(1, 2, enter.needed.min(22), &map).expect("shape");
         let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
         let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
@@ -2797,7 +3076,7 @@ mod tests {
         let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
         let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
         let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
         let x = surface.fresh_section(1, 2, grain).expect("x");
@@ -2824,7 +3103,7 @@ mod tests {
         let map = readout.mount_bfloat16(&map_words, 4).expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO, ONE, FOUR], 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &[ONE, TWO, ONE, FOUR]).expect("shape");
         let scalar_shape = surface.shape_contract(1, 4, enter.needed.min(24), &map).expect("shape");
         let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 2 };
         let split_shape = surface.shape_contract_tiled(1, 4, enter.needed.min(24), &map, tile).expect("shape");
@@ -2869,7 +3148,7 @@ mod tests {
         let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
         let contract = surface.shape_contract(1, 2, enter.needed.min(22), &map).expect("shape");
         assert!(contract.needed <= ResidentSurface::carrier_octaves());
         let x = surface.fresh_section(1, 2, grain).expect("x");
@@ -2897,7 +3176,7 @@ mod tests {
         let sq = surface.stage_words(&q_words, 2, 2).expect("stage");
         let sk = surface.stage_words(&q_words, 2, 2).expect("stage");
         let sv = surface.stage_words(&v_words, 2, 2).expect("stage");
-        let enter = surface.shape_enter(2, 2, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(2, 2, Dyadic::ONE, grain, &q_words).expect("shape");
         let contact = surface.shape_contact(2, 2, 2, 2, 1, 1, 2, 512, SeriesAperture(12), grain, 26, 26, 26).expect("shape");
         assert_eq!(contact.couplings.len(), 3);
         let q = surface.fresh_section(2, 2, grain).expect("q");
@@ -2955,7 +3234,7 @@ mod tests {
         let b_words = if poison { [ONE, TWO, 0x7F80, THREE] } else { [ONE, TWO, HALF, THREE] };
         let sa = surface.stage_words(&a_words, 1, 4).expect("stage");
         let sb = surface.stage_words(&b_words, 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain).expect("shape");
+        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &a_words).expect("shape");
         let by = DyadicEnclosure { lo: 2, hi: 2, grain: 0 };
         let scale = surface.shape_scale(1, 4, 23, by).expect("shape");
         let join = surface.shape_re_entry(1, 4, 24, 24).expect("shape");

@@ -122,6 +122,25 @@ and remains the owner and referee, the tiled laws standing beside it with their 
 hand-offs to H3: `shape_enter`'s authored a-priori bound, and the strided-partial certification
 absence. `CONSTRUCTION_STATE.md` does not move.
 
+**DEED H3 PASSED 2026-08-19 — the census drops its atomics, the quotient fuses where the receiver
+factors, and the mouth reads its material.** Record:
+[`research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md`](../research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md).
+The standing block reductions expose their words with per-node widths from a bit-exact i128 mirror
+over values read off the card (and one finding: two of the contact's three couplings are serial
+thread-0 words while the receipt names a block); the census is aggregated — warp fold, cross-warp
+fold, one atomic per block per word — under **260 of 260 slot-word equalities** against its serial
+predecessor, which is kept as a permanent control, with the commutativity audit a table and one
+inherited order-dependence reported; **the midpoint quotient fuses only where the diagram proves
+every declared receiver factors through the seal** (32 of 33 on layer 1, kernel nodes 138 → 106,
+allocations −64, terminal bit-equal, all censuses word-for-word equal, the collapsed population —
+the retained fiber — unchanged; the one refusal and the read-time `Sealed` refusal verbatim with a
+reopening route that is shown to return); and the mouth's a-priori bound now reads its staged words
+after a fixture showed the authored bound sat BELOW wide material. One lawful deviation from the
+contract's letter with its reason stated: the fusion is the quotient's collapse + census in one
+in-place node after the predecessor's census, not a producer epilogue, because an epilogue cannot
+see a refusal the producer's census has not yet decided. **Deed H4 (one streamed resident tower
+circulation) is next.** `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

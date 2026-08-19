@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 59 drivers, 15516 returns, 10279897176 bytes.
+# 60 drivers, 15519 returns, 10279943066 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -59,6 +59,7 @@ cc1e4532897a6734e33a897c4fd7ed71eb08be73b5724b21b01811cb600c1237	16	9711887	outp
 7ca8b7191a2e03f9733f4cf7f448b25882b920d166bdb73e0cefc69fdddb5383	8	2123819733	output/the_material_mouth_seals_the_declared_body
 cef0c6e09382be8c6445002369ecd33ee3032a787378a7c2eaa58eb7bcd44ea6	1	12720	output/the_operation_survives_the_codec
 b310ca4fd170e3a58905bdc8c9885456da28a46a44c930df6b1699cc22be12db	1	15214	output/the_partition_is_typed_and_the_reduction_is_a_junction
+419611f68dc2c84af26a2d4ef3070dd3fbd09569342d098bce9cd696594e7d3d	3	45890	output/the_reductions_expose_their_words
 db968af0fb8f4faf8c1156a19bf2d16600764aa7df94853f77f5a479736cb916	14	6155706	output/the_scalar_path_returns_its_pressure_and_utility
 b1a58025984212dd27caf60fc34dd275816f577aebcb5bb4b0f3565fad624102	3	1199102	output/the_source_is_admitted_whole
 178f9b08b7802b0a2502ef2c6f6eb183c87a221a26a485fad0110f615e5cfab0	2	28838539	output/the_source_is_dissected

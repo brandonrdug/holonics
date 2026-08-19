@@ -63,7 +63,7 @@ crates/holonic-engine/src/exponentiated_ratio.rs	.clone()=9	.collect()=2	BTreeMa
 crates/holonic-engine/src/field_atlas.rs	.clone()=60	.collect()=22	.flat_map()=1	.into_iter()=10	BTreeMap=50	BTreeSet=56	Vec=48	VecDeque=2
 crates/holonic-engine/src/foreign_map.rs	.clone()=18	.collect()=19	.into_iter()=1	BTreeMap=19	BTreeSet=2	Vec=29
 crates/holonic-engine/src/founded_receiver.rs	.clone()=19	.collect()=30	.into_iter()=4	BTreeMap=6	BTreeSet=13	Vec=47
-crates/holonic-engine/src/front_passage.rs	.clone()=35	.collect()=22	.flat_map()=2	.into_iter()=2	BTreeMap=31	BTreeSet=5	Vec=85
+crates/holonic-engine/src/front_passage.rs	.clone()=35	.collect()=23	.flat_map()=4	.into_iter()=2	BTreeMap=38	BTreeSet=11	Vec=86
 crates/holonic-engine/src/generative_transport.rs	.clone()=43	.collect()=17	.flat_map()=1	.into_iter()=5	BTreeSet=10	Vec=93
 crates/holonic-engine/src/gluing.rs	.clone()=4	.collect()=10	BTreeSet=26	Vec=10
 crates/holonic-engine/src/graded_complex_form.rs	.clone()=7	.collect()=3	BTreeSet=7	Vec=15
@@ -120,8 +120,8 @@ crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.fla
 crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57
 crates/holonic-engine/src/regime_reading.rs	.clone()=1	.collect()=5	Vec=7
 crates/holonic-engine/src/reopening.rs	.clone()=40	.collect()=15	.flat_map()=2	.into_iter()=1	Vec=55
-crates/holonic-engine/src/resident_law.rs	.clone()=21	.collect()=11	.into_iter()=4	BTreeMap=47	Vec=51
-crates/holonic-engine/src/resident_section.rs	.clone()=8	.collect()=16	.into_iter()=3	Vec=75
+crates/holonic-engine/src/resident_law.rs	.clone()=21	.collect()=11	.into_iter()=4	BTreeMap=49	Vec=53
+crates/holonic-engine/src/resident_section.rs	.clone()=8	.collect()=17	.into_iter()=3	Vec=78
 crates/holonic-engine/src/resource.rs	.clone()=6	BTreeMap=10
 crates/holonic-engine/src/returned_reading.rs	.clone()=30	.collect()=33	.flat_map()=2	.into_iter()=9	BTreeMap=5	BTreeSet=20	Vec=54
 crates/holonic-engine/src/running_integral.rs	.clone()=14	.collect()=12	.into_iter()=2	BTreeMap=12	BTreeSet=24	Vec=13	VecDeque=2

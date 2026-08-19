@@ -93,8 +93,8 @@ use mount::GraphCensus;
 
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
-    MidpointQuotient, MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, Standing, WithdrawColumns,
-    WithdrawRows,
+    MidpointQuotient, MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, SealedMidpointQuotient,
+    Standing, WithdrawColumns, WithdrawRows,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
@@ -180,6 +180,12 @@ pub enum CompileRefusal {
     /// The validated testimony of an occurrence does not entail the law bound to it — a valid but
     /// unrelated slice, or a parameter no field, shape or slice accounts for.
     Entailment { occurrence: EventId, operation: String, refusal: EntailmentRefusal },
+    /// **A declared fusion whose predecessor's face does not factor through it.** A sealing law
+    /// rewrites its predecessor's section in place, so the predecessor's own face is gone; §4.6
+    /// admits that only when every declared future receiver reads through the fused output.
+    /// `because` names which of the three conditions failed and `reopening` names the law to bind
+    /// instead, so the refusal carries its own route out.
+    FusionUnfactored { quotient: EventId, predecessor: EventId, because: String, reopening: &'static str },
 }
 
 impl From<SourceRefusal> for CompileRefusal {
@@ -230,6 +236,10 @@ pub enum FrontPassageObstruction {
     /// order that stands between the entering material and the terminal — with the slot it saw
     /// and the **complete** obstruction lineage of the deed beside it.
     Refused { occurrence: EventId, operation: String, refusal: ResidentRefusal, slot: SlotReading, lineage: ObstructionLineage },
+    /// **A face a declared fusion sealed away.** The occurrence's section carries the quotient's
+    /// midpoints now; its own pre-quotient enclosure was the apparatus compression the caller
+    /// declared. `reopening` names the route back, and it is a recompile rather than a read.
+    Sealed { occurrence: EventId, quotient: EventId, reopening: &'static str },
 }
 
 impl From<CompileRefusal> for FrontPassageObstruction {
@@ -712,21 +722,34 @@ pub struct FrontPassage<'chart> {
     /// Open each front's members in reverse order — another legal completion order of the same
     /// diagram, meaningful under the serialized schedule.
     pub reverse_fronts: bool,
+    /// **The faces the receiver declared it will read**, beside the terminal. A declared face is a
+    /// future receiver, so an occurrence in this set may not have its section fused away by a
+    /// sealing successor: [`FrontPassage::compile`] refuses the fusion by name and the reopening
+    /// route is the unfused law. Empty by default, which is the strictest reading of "no receiver
+    /// declared anything but the terminal" — a caller that will read further faces must say so.
+    pub declared_faces: BTreeSet<EventId>,
 }
 
 impl<'chart> FrontPassage<'chart> {
     pub fn new(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::CoPresent, reverse_fronts: false }
+        Self { surface, grain, schedule: Schedule::CoPresent, reverse_fronts: false, declared_faces: BTreeSet::new() }
     }
 
     /// The serialized-realization control over the same diagram.
     pub fn serialized(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: false }
+        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: false, declared_faces: BTreeSet::new() }
     }
 
     /// The serialized control with every front opened in reverse member order.
     pub fn serialized_reversed(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: true }
+        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: true, declared_faces: BTreeSet::new() }
+    }
+
+    /// **Declare the faces this receiver will read**, beside the terminal. Every occurrence named
+    /// here keeps its own section: a sealing successor over one of them refuses at compile.
+    pub fn reading(mut self, faces: impl IntoIterator<Item = EventId>) -> Self {
+        self.declared_faces.extend(faces);
+        self
     }
 
     /// The dataflow: every bond indexed by the port it carries to.
@@ -738,6 +761,20 @@ impl<'chart> FrontPassage<'chart> {
             }
         }
         arriving
+    }
+
+    /// **Who reads each occurrence**, read off the same bonds `arriving` reads: every bond's source
+    /// occurrence to the occurrences its output carries into. This is how a declared fusion's
+    /// condition — *the predecessor's only consumer is the quotient* — is decided from the diagram
+    /// at compile rather than hoped for at run time.
+    fn consumers(complex: &PortedOperationComplex) -> BTreeMap<EventId, BTreeSet<EventId>> {
+        let mut consumers: BTreeMap<EventId, BTreeSet<EventId>> = BTreeMap::new();
+        for interaction in complex.shape.interactions.values() {
+            for bond in &interaction.bonds {
+                consumers.entry(bond.source.event).or_default().insert(bond.target.event);
+            }
+        }
+        consumers
     }
 
     /// The members of each front in the order this passage opens them.
@@ -875,6 +912,7 @@ impl<'chart> FrontPassage<'chart> {
         }
         let fronts = complex.fronts().map_err(|error| CompileRefusal::Shape(error.to_string()))?;
         let arriving = Self::arriving(complex);
+        let consumers = Self::consumers(complex);
 
         // Every occurrence, in front order: shape, price, bound.
         let mut plans: Vec<Plan<'a>> = Vec::with_capacity(complex.shape.occurrences.len());
@@ -900,6 +938,41 @@ impl<'chart> FrontPassage<'chart> {
                     inputs.push(source_port);
                     producers.push(producer);
                 }
+                // **The fusion's condition, decided from the diagram.** A sealing law rewrites its
+                // predecessor's section in place, so that section's face is gone after the deed.
+                // §4.6 admits the fusion only when every declared future receiver factors through
+                // the fused output, and that is exactly three readings of the diagram: the
+                // predecessor is read by this occurrence and by nothing else; it is not the declared
+                // terminal; and the receiver did not declare its face. The refusal names which one
+                // failed and the law to bind instead.
+                if law.seals_predecessor() {
+                    let predecessor = inputs[0].event;
+                    let reading = consumers.get(&predecessor).cloned().unwrap_or_default();
+                    let because = if reading.len() != 1 || !reading.contains(occurrence) {
+                        Some(format!(
+                            "the predecessor's section is read by {} occurrences ({:?}) and the fusion rewrites it in place; only the quotient may read it",
+                            reading.len(),
+                            reading.iter().map(|e| e.0).collect::<Vec<_>>()
+                        ))
+                    } else if predecessor == terminal {
+                        Some("the predecessor is the declared terminal, so the receiver reads its pre-quotient enclosure".to_owned())
+                    } else if self.declared_faces.contains(&predecessor) {
+                        Some("the receiver declared the predecessor's pre-quotient enclosure as a face it reads".to_owned())
+                    } else if realization.bindings.get(&predecessor).map(|l| l.seals_predecessor()).unwrap_or(false) {
+                        Some("the predecessor is itself a fused seal, so its section is already another occurrence's".to_owned())
+                    } else {
+                        None
+                    };
+                    if let Some(because) = because {
+                        return Err(CompileRefusal::FusionUnfactored {
+                            quotient: *occurrence,
+                            predecessor,
+                            because,
+                            reopening: "bind MidpointQuotient instead: the pair runs as two nodes, the predecessor keeps its own section, and its enclosure is censused and readable",
+                        }
+                        .into());
+                    }
+                }
                 let shapes: Vec<(usize, usize, u32)> = inputs.iter().map(|port| field.get(port).copied().unwrap_or((0, 0, 0))).collect();
                 let octaves: Vec<u32> = shapes.iter().map(|(_, _, o)| *o).collect();
                 let (bound, uncapped) = self.bound_octaves(law, &octaves, material);
@@ -910,17 +983,22 @@ impl<'chart> FrontPassage<'chart> {
                 let shape = law.shape(self.surface, self.grain, &shapes, material).map_err(|refusal| FrontPassageObstruction::Resource(ResourceObstruction::Carrier(refusal)))?;
                 field.insert(OccurrencePort::output(*occurrence, 0), (shape.rows, shape.width, bound));
                 front_work = co_present(&front_work, &shape.predicted);
-                let section = (shape.rows * shape.width * 8) as u64;
-                section_octets += 2 * section;
-                charged += 2 * rounded_to(section.max(8), grain);
-                allocation_octets.push(section.max(8));
-                allocation_octets.push(section.max(8));
+                // A sealing occurrence carries no section of its own: its words ARE its
+                // predecessor's, rewritten in place. Nothing is allocated and nothing is charged for
+                // it, which is the second half of the apparatus compression and is predicted here.
+                if !law.seals_predecessor() {
+                    let section = (shape.rows * shape.width * 8) as u64;
+                    section_octets += 2 * section;
+                    charged += 2 * rounded_to(section.max(8), grain);
+                    allocation_octets.push(section.max(8));
+                    allocation_octets.push(section.max(8));
+                    apparatus.allocations += 2;
+                }
                 apparatus.captured_launches += u64::from(shape.launches);
                 apparatus.reductions += shape.couplings.len() as u64;
                 apparatus.scratch_octets = apparatus.scratch_octets.max(u64::from(shape.shared_octets));
                 apparatus.grid_extent = apparatus.grid_extent.max((shape.rows * shape.width) as u64);
                 apparatus.carrier_peak_octaves = apparatus.carrier_peak_octaves.max(u64::from(bound));
-                apparatus.allocations += 2;
                 let index = plans.len();
                 index_of.insert(*occurrence, index);
                 plans.push(Plan { index, occurrence: *occurrence, depth: front.depth, law, inputs, producers, shape, bound });
@@ -980,14 +1058,16 @@ impl<'chart> FrontPassage<'chart> {
         apparatus.ingress_octets = staged_octets + (lineage_words * 4) as u64;
         apparatus.egress_receipt_octets = census_octets;
         apparatus.egress_section_octets = 2 * (terminal_plan.shape.rows * terminal_plan.shape.width * 8) as u64;
-        apparatus.graph_nodes = 1 + 2 * plans.len() as u64;
+        // One node per launch plus the memset: an occurrence whose kernel wrote its own census
+        // records one node and no census edge, so both counts move with the declared fusion.
+        apparatus.graph_nodes = 1 + plans.iter().map(|plan| u64::from(plan.shape.launches)).sum::<u64>();
         apparatus.graph_edges = plans
             .iter()
             .map(|plan| {
                 let mut distinct: Vec<usize> = plan.producers.clone();
                 distinct.sort_unstable();
                 distinct.dedup();
-                (if distinct.is_empty() { 1 } else { distinct.len() as u64 }) + 1
+                (if distinct.is_empty() { 1 } else { distinct.len() as u64 }) + u64::from(!plan.law.fuses_census())
             })
             .sum();
         if self.schedule == Schedule::Serialized {
@@ -1121,11 +1201,17 @@ impl<'chart> FrontPassage<'chart> {
         admission: DeedAdmission,
     ) -> Result<CompiledPassage<'chart>, FrontPassageObstruction> {
         let surface = self.surface;
-        // 1. Sections and staging.
+        // 1. Sections and staging. A sealing occurrence allocates nothing: its section IS its
+        //    predecessor's, and the alias is recorded so every later lookup resolves to one buffer.
         let mut sections: BTreeMap<EventId, ResidentSection<'chart>> = BTreeMap::new();
+        let mut sealed: BTreeMap<EventId, EventId> = BTreeMap::new();
         let mut staged: BTreeMap<String, StagedWords<'chart>> = BTreeMap::new();
         for p in &plan.plans {
-            sections.insert(p.occurrence, surface.fresh_section(p.shape.rows, p.shape.width, plan.grain).map_err(surface_refusal)?);
+            if p.law.seals_predecessor() {
+                sealed.insert(p.occurrence, p.inputs[0].event);
+            } else {
+                sections.insert(p.occurrence, surface.fresh_section(p.shape.rows, p.shape.width, plan.grain).map_err(surface_refusal)?);
+            }
             if let Some(population) = p.law.stages() {
                 if !staged.contains_key(population) {
                     let entering = &material.entering[population];
@@ -1186,14 +1272,18 @@ impl<'chart> FrontPassage<'chart> {
                 .map(|p| {
                     let mut reads: Vec<(u64, u64)> = Vec::new();
                     for input in &p.inputs {
-                        reads.extend(sections[&input.event].ranges());
+                        reads.extend(sections[&owner_of(&sealed, input.event)].ranges());
                     }
                     reads.extend(p.law.reads(material, &staged));
                     for predecessor in builder.declared_lineage(p.index) {
                         reads.push(builder.slot_range(*predecessor));
                     }
                     reads.push(builder.lineage_range(p.index));
-                    let mut writes: Vec<(u64, u64)> = sections[&p.occurrence].ranges().to_vec();
+                    // A sealing occurrence's write footprint IS its predecessor's section — the same
+                    // range it reads. Self-overlap is not a barrier: each thread touches only its own
+                    // coordinate, and the compile refused the fusion unless this occurrence is the
+                    // section's only other reader.
+                    let mut writes: Vec<(u64, u64)> = sections[&owner_of(&sealed, p.occurrence)].ranges().to_vec();
                     writes.push(builder.slot_range(p.index));
                     MemberFootprint { reads, writes }
                 })
@@ -1210,11 +1300,19 @@ impl<'chart> FrontPassage<'chart> {
             let mut predicted = ExactWork::nothing();
             let mut couplings = Vec::new();
             for p in self.ordered(&members) {
-                let out = &sections[&p.occurrence];
+                let out = &sections[&owner_of(&sealed, p.occurrence)];
                 let lane = builder.open(p.index, &p.producers).map_err(surface_refusal)?;
-                let inputs: Vec<&ResidentSection<'chart>> = p.inputs.iter().map(|port| &sections[&port.event]).collect();
-                p.law.record(surface, &lane, &inputs, material, &staged, &p.shape, out).map_err(surface_refusal)?;
-                builder.close(p.index, out, p.bound).map_err(surface_refusal)?;
+                let inputs: Vec<&ResidentSection<'chart>> = p.inputs.iter().map(|port| &sections[&owner_of(&sealed, port.event)]).collect();
+                if p.law.seals_predecessor() {
+                    // The passage records the fused kernel: the fusion is its compression and the
+                    // a-priori bound the fused census compares against is its reading. One node, no
+                    // census node, no edge between them.
+                    surface.record_midpoint_seal(&lane, inputs[0], p.bound).map_err(surface_refusal)?;
+                    builder.close_fused(p.index).map_err(surface_refusal)?;
+                } else {
+                    p.law.record(surface, &lane, &inputs, material, &staged, &p.shape, out).map_err(surface_refusal)?;
+                    builder.close(p.index, out, p.bound).map_err(surface_refusal)?;
+                }
                 predicted = co_present(&predicted, &p.shape.predicted);
                 for coupling in &p.shape.couplings {
                     couplings.push(CouplingReceipt {
@@ -1252,6 +1350,7 @@ impl<'chart> FrontPassage<'chart> {
             surface,
             passage,
             sections,
+            sealed,
             staged,
             receipts,
             index_of,
@@ -1286,6 +1385,23 @@ impl<'chart> FrontPassage<'chart> {
         let admission = self.admit(&plan, receiver, material_admission)?;
         self.realize(plan, material, admission)
     }
+}
+
+/// **Which occurrence owns the buffer an occurrence's words live in.** A sealing occurrence's
+/// section is its predecessor's, rewritten in place; every lookup resolves through this. Chained
+/// seals are refused at compile, so the walk takes at most one step, and the loop is written anyway
+/// because a resolver that assumes its own precondition is not a resolver.
+fn owner_of(sealed: &BTreeMap<EventId, EventId>, occurrence: EventId) -> EventId {
+    let mut at = occurrence;
+    let mut steps = 0usize;
+    while let Some(next) = sealed.get(&at) {
+        at = *next;
+        steps += 1;
+        if steps > sealed.len() {
+            break;
+        }
+    }
+    at
 }
 
 /// Two co-present deeds compose co-presently: counts add, peaks and spans take the maximum,
@@ -1411,6 +1527,10 @@ pub struct CompiledPassage<'chart> {
     surface: &'chart ResidentSurface<'chart>,
     passage: ResidentPassage<'chart>,
     sections: BTreeMap<EventId, ResidentSection<'chart>>,
+    /// A sealing occurrence to the predecessor whose buffer it rewrote in place. The key's words
+    /// live in the value's section; the value's own pre-quotient face no longer exists, and
+    /// [`CompiledPassage::read_section`] refuses it by name.
+    sealed: BTreeMap<EventId, EventId>,
     staged: BTreeMap<String, StagedWords<'chart>>,
     receipts: Vec<FrontReceipt>,
     index_of: BTreeMap<EventId, usize>,
@@ -1432,9 +1552,20 @@ pub struct CompiledPassage<'chart> {
 }
 
 impl<'chart> CompiledPassage<'chart> {
-    /// The section written at an occurrence's output, for the receiver to copy out.
+    /// The section written at an occurrence's output, for the receiver to copy out. A sealing
+    /// occurrence resolves to the buffer it rewrote; a sealed predecessor resolves to nothing,
+    /// because after the deed those words are the quotient's.
     pub fn section(&self, occurrence: EventId) -> Option<&ResidentSection<'chart>> {
-        self.sections.get(&occurrence)
+        if self.sealed_by(occurrence).is_some() {
+            return None;
+        }
+        self.sections.get(&owner_of(&self.sealed, occurrence))
+    }
+
+    /// The occurrence that sealed this one, if any: the quotient whose fused kernel rewrote this
+    /// occurrence's section in place. Its face is the one the receiver reads.
+    pub fn sealed_by(&self, occurrence: EventId) -> Option<EventId> {
+        self.sealed.iter().find(|(_, predecessor)| **predecessor == occurrence).map(|(quotient, _)| *quotient)
     }
     pub fn terminal(&self) -> EventId {
         self.terminal
@@ -1444,9 +1575,13 @@ impl<'chart> CompiledPassage<'chart> {
     /// passage's material as a [`Standing`]. This passage may not be launched again afterwards;
     /// the section it wrote has moved.
     pub fn release_section(&mut self, occurrence: EventId) -> Option<(ResidentSection<'chart>, u32)> {
+        if self.sealed_by(occurrence).is_some() {
+            return None;
+        }
         let bound = self.bounds.get(&occurrence).map(|(b, _, _)| *b)?;
         self.released = true;
-        self.sections.remove(&occurrence).map(|section| (section, bound))
+        let owner = owner_of(&self.sealed, occurrence);
+        self.sections.remove(&owner).map(|section| (section, bound))
     }
     /// The passage index of an occurrence, as the lineage names it.
     pub fn index_of(&self, occurrence: EventId) -> Option<usize> {
@@ -1473,7 +1608,21 @@ impl<'chart> CompiledPassage<'chart> {
     }
 
     /// A section at any occurrence, read only against a reading in which that occurrence stood.
+    ///
+    /// **A face a declared fusion sealed away is refused by name.** The compile admitted the fusion
+    /// because no consumer read this occurrence's section and no receiver declared it; a receiver
+    /// asking for it afterwards is asking for words that are now the quotient's midpoints, and it is
+    /// given the refusal and the reopening route instead of the collapsed words. Readability at read
+    /// time is not knowable at compile — `read_section` takes any occurrence — so the guard lives at
+    /// both ends and neither is decorative.
     pub fn read_section(&self, returned: &PassageReturn, occurrence: EventId) -> Result<Vec<(i64, i64)>, FrontPassageObstruction> {
+        if let Some(quotient) = self.sealed_by(occurrence) {
+            return Err(FrontPassageObstruction::Sealed {
+                occurrence,
+                quotient,
+                reopening: "bind MidpointQuotient at the quotient instead of SealedMidpointQuotient, or declare this occurrence through FrontPassage::reading before compiling: the unfused pair keeps this section and censuses its enclosure",
+            });
+        }
         let index = self.index_of.get(&occurrence).copied().ok_or(FrontPassageObstruction::Compile(CompileRefusal::ForeignOccurrence { occurrence }))?;
         if !returned.obstruction.stands(index) {
             let (bound, _, operation) = self.bounds[&occurrence];
@@ -1632,6 +1781,161 @@ mod tests {
         let mut material = ResidentMaterial::empty();
         material.entering.insert("x".to_owned(), EnteringRows { words, rows: 1, width: 32 });
         material
+    }
+
+    /// `enter x` → `scale x by 2` → a midpoint quotient sealing the scale. The quotient's law is the
+    /// caller's to choose: `MidpointQuotient` is the unfused pair, `SealedMidpointQuotient` the
+    /// declared fusion. `extra_consumer` bonds a second reader onto the scale, which is exactly the
+    /// receiver the fusion may not fuse away.
+    fn sealed_diagram(fused: bool, extra_consumer: bool) -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId) {
+        let mut complex = PortedOperationComplex::new("sealed");
+        let standing = complex.port("standing");
+        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
+        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
+        let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
+        let quotient = complex
+            .bind_operation("scale · midpoint quotient", OperationSpecies::Quotient, vec![standing], vec![standing], None, vec![SourceTestimony::Intervention { statement: "declared quotient chart: the certified enclosure is collapsed to its midpoint for the successors".to_owned() }])
+            .expect("law");
+        let e = complex.occur(enter).expect("occur");
+        let s = complex.occur(scale).expect("occur");
+        let q = complex.occur(quotient).expect("occur");
+        complex.carries_precedence("x scales", standing, OccurrencePort::output(e, 0), OccurrencePort::input(s, 0)).expect("bond");
+        complex.carries_precedence("scale sealed", standing, OccurrencePort::output(s, 0), OccurrencePort::input(q, 0)).expect("bond");
+        let mut realization = ResidentRealization::default();
+        realization.bind(e, Enter { population: "x".to_owned(), scale: Dyadic::ONE });
+        realization.bind(s, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        if fused {
+            realization.bind(q, SealedMidpointQuotient);
+        } else {
+            realization.bind(q, MidpointQuotient);
+        }
+        if extra_consumer {
+            let second = complex.bind_operation("second reader", OperationSpecies::Quotient, vec![standing], vec![standing], None, vec![SourceTestimony::Intervention { statement: "the receiver reads the pre-quotient enclosure through a second consumer".to_owned() }]).expect("law");
+            let r = complex.occur(second).expect("occur");
+            complex.carries_precedence("scale read again", standing, OccurrencePort::output(s, 0), OccurrencePort::input(r, 0)).expect("bond");
+            realization.bind(r, WithdrawColumns { from: 0, span: 1 });
+        }
+        (complex, realization, e, s, q)
+    }
+
+    /// **Part C's fusion condition, decided at compile from the diagram.** The legal case binds and
+    /// predicts one node fewer and one section fewer; each of the three illegal cases refuses by
+    /// name and the refusal carries the reopening route.
+    #[test]
+    fn a_declared_fusion_binds_only_when_every_declared_receiver_factors_through_it() {
+        let Some((_, surface)) = surface() else { return };
+        let material = material();
+        let receiver = DeedReceiver::unbounded();
+        // (i) legal: the scale's only consumer is the quotient, the quotient is the terminal, and
+        //     the receiver declared no other face.
+        let (complex, realization, _, _, q) = sealed_diagram(true, false);
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let fused = passage.bind(&complex, &realization, &material, &occurrence(), &receiver, None, q).expect("the fusion binds");
+        // (ii) the same diagram unfused, for the counts to be read against.
+        let (uc, ur, _, us, uq) = sealed_diagram(false, false);
+        let unfused_passage = FrontPassage::new(surface, ResidentGrain(20));
+        let unfused = unfused_passage.bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("the unfused pair binds");
+        let (fused_graph, _) = fused.graph();
+        let (unfused_graph, _) = unfused.graph();
+        assert_eq!(fused_graph.nodes + 1, unfused_graph.nodes, "the fusion is exactly one node fewer");
+        assert_eq!(fused.apparatus_prediction.graph_nodes as usize, fused_graph.nodes, "and the prediction moved with it");
+        assert_eq!(unfused.apparatus_prediction.graph_nodes as usize, unfused_graph.nodes);
+        assert_eq!(fused.apparatus_prediction.captured_launches + 1, unfused.apparatus_prediction.captured_launches);
+        assert_eq!(fused.apparatus_prediction.allocations + 2, unfused.apparatus_prediction.allocations, "and two allocations fewer: the quotient carries no section");
+        assert!(fused.apparatus_prediction.section_octets < unfused.apparatus_prediction.section_octets);
+        // the sealed predecessor's face is refused by name, with the reopening route, and the
+        // unfused pair returns it.
+        let returned = fused.launch(&surface.mode()).expect("launches");
+        let sealed_read = fused.read_section(&returned, fused.occurrence_at(1).expect("the scale"));
+        match sealed_read {
+            Err(FrontPassageObstruction::Sealed { reopening, .. }) => assert!(reopening.contains("MidpointQuotient")),
+            other => panic!("a sealed face must refuse by name, not return words: {other:?}"),
+        }
+        let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
+        assert!(unfused.read_section(&unfused_returned, us).is_ok(), "the reopening route returns the pre-quotient enclosure");
+        // and the terminals are bit-equal: the fusion moved apparatus, not words.
+        assert_eq!(fused.read_terminal(&returned).expect("fused terminal"), unfused.read_terminal(&unfused_returned).expect("unfused terminal"));
+        // (iii) the pre-seal section declared as a return: the terminal itself.
+        let (c2, r2, _, s2, _) = sealed_diagram(true, false);
+        let refused = FrontPassage::new(surface, ResidentGrain(20)).bind(&c2, &r2, &material, &occurrence(), &receiver, None, s2);
+        assert!(matches!(refused.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("terminal")), "{:?}", refused.err());
+        // (iv) the pre-seal section declared as a face the receiver reads.
+        let (c3, r3, _, s3, q3) = sealed_diagram(true, false);
+        let declared = FrontPassage::new(surface, ResidentGrain(20)).reading([s3]).bind(&c3, &r3, &material, &occurrence(), &receiver, None, q3);
+        assert!(matches!(declared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("declared")), "{:?}", declared.err());
+        // (v) a second consumer reads the pre-seal section.
+        let (c4, r4, _, _, q4) = sealed_diagram(true, true);
+        let shared = FrontPassage::new(surface, ResidentGrain(20)).bind(&c4, &r4, &material, &occurrence(), &receiver, None, q4);
+        assert!(matches!(shared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("read by 2")), "{:?}", shared.err());
+    }
+
+    /// **The fused quotient's census is the unfused pair's, word for word** — including the collapsed
+    /// population the predecessor's own census carries, which the fusion does not touch.
+    #[test]
+    fn the_fused_seal_returns_the_same_census_as_the_unfused_pair_including_the_collapsed_population() {
+        let Some((_, surface)) = surface() else { return };
+        let material = material();
+        let receiver = DeedReceiver::unbounded();
+        let (fc, fr, _, _, fq) = sealed_diagram(true, false);
+        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq).expect("binds");
+        let (uc, ur, _, us, uq) = sealed_diagram(false, false);
+        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("binds");
+        let fused_returned = fused.launch(&surface.mode()).expect("launches");
+        let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
+        let slot_of = |ret: &PassageReturn, at: EventId| ret.fronts.iter().flat_map(|f| f.readings.iter()).find(|r| r.occurrence == at).expect("reading").measured;
+        // the predecessor's census — the PRE-quotient widest, summed and nonzero widths
+        let fused_pre = slot_of(&fused_returned, fused.occurrence_at(1).expect("the scale"));
+        let unfused_pre = slot_of(&unfused_returned, us);
+        assert_eq!(fused_pre, unfused_pre, "the collapsed population the chart retains is unchanged by the fusion");
+        // the quotient's own census
+        let fused_q = slot_of(&fused_returned, fq);
+        let unfused_q = slot_of(&unfused_returned, uq);
+        assert_eq!(fused_q, unfused_q, "the quotient's census is the unfused pair's, word for word");
+        assert_eq!(fused_q.max_width, 0, "a collapsed section has no width");
+        assert_eq!(fused_q.width_sum, 0);
+        assert_eq!(fused_q.nonzero_widths, 0);
+        assert!(fused_q.written && unfused_q.written);
+        assert_eq!(fused_q.lineage_inspected, 1);
+    }
+
+    /// **The fusion is the unfused pair on the REFUSING path too**, and that is the load-bearing
+    /// half: a fused quotient's only possible flag is UPSTREAM, its upstream decision is
+    /// thread-uniform and final at entry because the fused node sits after its predecessor's census
+    /// on the graph's own edge, and a refused occurrence's census measures nothing. Poison the
+    /// entering material and require the two deeds' slots to agree word for word.
+    #[test]
+    fn a_poisoned_lineage_refuses_identically_through_the_fused_seal_and_the_unfused_pair() {
+        let Some((_, surface)) = surface() else { return };
+        // 0x7F80 is +inf in bfloat16: a non-finite stored codeword the mouth refuses as malformed.
+        let mut words = vec![ONE, TWO, 0x7F80, MINUS_ONE_AND_HALF];
+        words.resize(32, ONE);
+        let mut material = ResidentMaterial::empty();
+        material.entering.insert("x".to_owned(), EnteringRows { words, rows: 1, width: 32 });
+        let receiver = DeedReceiver::unbounded();
+        let (fc, fr, fe, fs, fq) = sealed_diagram(true, false);
+        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq).expect("binds");
+        let (uc, ur, ue, us, uq) = sealed_diagram(false, false);
+        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("binds");
+        let fused_returned = fused.launch(&surface.mode()).expect("launches");
+        let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
+        let slot_of = |ret: &PassageReturn, at: EventId| ret.fronts.iter().flat_map(|f| f.readings.iter()).find(|r| r.occurrence == at).expect("reading").measured;
+        for (f, u, what) in [(fe, ue, "the mouth"), (fs, us, "the scale"), (fq, uq, "the quotient")] {
+            assert_eq!(slot_of(&fused_returned, f), slot_of(&unfused_returned, u), "{what}'s slot moved with the fusion");
+        }
+        let quotient = slot_of(&fused_returned, fq);
+        assert_eq!(quotient.refused, REFUSED_UPSTREAM, "a fused quotient's only possible flag is UPSTREAM");
+        assert_eq!(quotient.upstream_count, 1);
+        assert_eq!(quotient.upstream_first, Some(1), "the least refusing predecessor is the scale, at passage index 1");
+        // the lineage join is of the PREDECESSOR's own refusal word, so the quotient reads the
+        // scale's UPSTREAM and the scale reads the mouth's MALFORMED — the flag travels a hop at a
+        // time and is never flattened, and the fused seal reads exactly what the unfused collapse did
+        assert_eq!(quotient.upstream_flags, REFUSED_UPSTREAM);
+        let scale = slot_of(&fused_returned, fs);
+        assert_eq!(scale.upstream_flags & REFUSED_MALFORMED, REFUSED_MALFORMED, "the malformed codeword's flag reached the scale");
+        assert!(quotient.written, "the census still marks that it ran");
+        assert_eq!((quotient.max_octave, quotient.max_width, quotient.width_sum, quotient.nonzero_widths), (0, 0, 0, 0), "and it measures nothing");
+        // and neither deed will hand back a face that did not stand
+        assert!(fused.read_terminal(&fused_returned).is_err() && unfused.read_terminal(&unfused_returned).is_err());
     }
 
     #[test]
