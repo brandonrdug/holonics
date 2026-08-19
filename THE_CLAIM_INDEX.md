@@ -129,7 +129,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (141 deposits of 433)
+## 4 · The 2026-08 record line (142 deposits of 434)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -262,6 +262,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-18_A_LICENSED_WALK_EMITS_SUBSTRINGS_AND_THE_ARC_IS_THE_COMPOSITION_OPERATOR.md` | A licensed walk emits substrings, and the arc is the composition operator |
 | `2026-08-18_FREQUENCY_DISAGREES_WITH_EVERY_OTHER_FACE_AT_EVERY_JUNCTION.md` | Frequency disagrees with every other face, at every junction |
 | `2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md` | Hexis is rested conditional transport; tuning deforms it, and distillation condenses families |
+| `2026-08-18_THE_ARCHITECTURE_IS_A_DOMAIN_ACTION_THE_GAUGE_CARRIES_THE_SECTION_AND_THE_COARSENING_OWES_ITS_FIBRE.md` | The architecture is a domain action, the gauge carries the section, and the coarsening owes its fibre |
 | `2026-08-18_THE_ATLAS_CONDUCTS_AND_THE_CONTAINER_IS_THE_TRANSPORT.md` | The atlas conducts, and the container is the transport |
 | `2026-08-18_THE_ATLAS_IS_A_NAVMESH_AND_THE_TRANSITION_TO_A_TENSOR_SPLITS_INTO_A_FREE_TREE_AND_A_CYCLE_RANK.md` | The atlas is a navmesh, and the transition to a tensor splits into a free tree and a cycle rank |
 | `2026-08-18_THE_ATLAS_WAS_THE_GROUND_AND_THE_SCALE_IS_THE_SUFFIX_LINK_TREE.md` | The atlas was the ground, and the scale is the suffix-link tree |
