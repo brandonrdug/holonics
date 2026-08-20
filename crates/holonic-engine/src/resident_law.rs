@@ -50,13 +50,17 @@ pub struct ResidentMaterial<'chart> {
     /// (a stored K/V) enters several later passages and is written by none of them — a shared
     /// pointer to an immutable section is not a second owner of a continuing body.
     pub standings: BTreeMap<String, (std::rc::Rc<ResidentSection<'chart>>, u32)>,
-    /// Mounted permutation arrays for [`PermuteColumns`] interventions, by name.
-    pub permutations: BTreeMap<String, Positions<'chart>>,
+    /// **Mounted `u32` arrays by name.** A head permutation for the [`PermuteColumns`]
+    /// intervention, and the native atlas's compressed-sparse-row transport, standings, suffix
+    /// links, prompts and prompt offsets. One population because they are one thing — an integer
+    /// array the caller mounted at the apparatus boundary — and a second map keyed by what the
+    /// array happens to mean would be a semantic taxonomy over an apparatus fact.
+    pub arrays: BTreeMap<String, Positions<'chart>>,
 }
 
 impl ResidentMaterial<'_> {
     pub fn empty() -> Self {
-        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), permutations: BTreeMap::new() }
+        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), arrays: BTreeMap::new() }
     }
 
     /// The resident octets of every mounted map, band and position — the source-map residency the
@@ -65,7 +69,7 @@ impl ResidentMaterial<'_> {
         self.populations.values().map(|p| p.readout.resident_octets() as u64).sum::<u64>()
             + self.bands.values().map(|(b, _)| b.resident_octets()).sum::<u64>()
             + self.positions.as_ref().map(Positions::resident_octets).unwrap_or(0)
-            + self.permutations.values().map(Positions::resident_octets).sum::<u64>()
+            + self.arrays.values().map(Positions::resident_octets).sum::<u64>()
     }
 
     /// The resident octets of the standings carried in from earlier passages — resident already,
@@ -427,7 +431,7 @@ impl ResidentLaw for WithdrawRows {
 pub struct PermuteColumns {
     pub block: usize,
     pub permutation: Vec<usize>,
-    /// The name of the mounted permutation array in `material.permutations`.
+    /// The name of the mounted permutation array in `material.arrays`.
     pub mounted: String,
 }
 
@@ -448,7 +452,7 @@ impl ResidentLaw for PermuteColumns {
         (1, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.permutations.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
+        if material.arrays.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
     }
     fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
         first(inputs, 0)
@@ -458,10 +462,10 @@ impl ResidentLaw for PermuteColumns {
         surface.shape_permute_columns(rows, width, octaves, self.block, &self.permutation)
     }
     fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
-        vec![material.permutations[&self.mounted].range()]
+        vec![material.arrays[&self.mounted].range()]
     }
     fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_permute_columns(lane, inputs[0], self.block, &material.permutations[&self.mounted], out)
+        surface.record_permute_columns(lane, inputs[0], self.block, &material.arrays[&self.mounted], out)
     }
 }
 
@@ -1440,6 +1444,7 @@ mod tests {
             fields: fields.iter().map(|(f, v)| ((*f).to_owned(), (*v).to_owned())).collect(),
             shapes: shapes.iter().map(|(p, s)| ((*p).to_owned(), s.to_vec())).collect(),
             interventions: Vec::new(),
+            descriptions: Vec::new(),
         }
     }
 

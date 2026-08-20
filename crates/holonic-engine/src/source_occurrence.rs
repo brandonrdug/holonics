@@ -78,6 +78,10 @@ pub enum SourceRefusal {
     /// An operation whose testimony is a description alone — a name — has no source behind it.
     TestimonyNotExterior { operation: String, testimony: Vec<String> },
     ContainerMalformed { locator: String, reason: String },
+    /// A native rest is asked to witness a law it does not itself declare.
+    DeclarationNotInRest { operation: String, statement: String },
+    /// Implementation or configuration testimony offered to a native rest, which has neither.
+    TestimonyForeignToNativeRest { operation: String, testimony: String },
 }
 
 impl std::fmt::Display for SourceRefusal {
@@ -303,6 +307,41 @@ pub struct BindingValidation {
     pub fields: Vec<(String, String)>,
     pub shapes: Vec<(String, Vec<usize>)>,
     pub interventions: Vec<String>,
+    /// Authoritative descriptions the witness VERIFIED as its own — a native rest's declarations,
+    /// carried in the container's own metadata. The foreign source records none: a description is
+    /// not exterior testimony there, because a foreign container does not declare its own laws.
+    pub descriptions: Vec<String>,
+}
+
+/// **What validates a complex's testimony before the passage compiles it.**
+///
+/// Two witnesses stand: the foreign [`SourceOccurrence`] — an implementation text, a configuration,
+/// a container — and the native rest ([`crate::native_occurrence::NativeOccurrence`]) — its own
+/// container and its own declarations. The passage asks the witness and never reads a file itself,
+/// so the arm a deed runs on is decided by which witness it was handed and by nothing else.
+///
+/// **The seam, and why it is this one.** Deed P0's material was quarantined together with this
+/// trait, so the choice was open: re-found it, or compose differently. The tree offers no other
+/// seam — `FrontPassage::compile` called `SourceOccurrence::validate` on a concrete type, and every
+/// alternative (a second `compile`, an enum of witnesses, a `SourceOccurrence` with empty foreign
+/// texts) either duplicates the compile path or lies about what authenticated the deed. One
+/// trait with two implementors is the composition; the passage's signature is the only line that
+/// moves.
+pub trait OccurrenceWitness {
+    /// Which witness this is, for the receipt.
+    fn witness(&self) -> &'static str;
+    /// Every operation's testimony checked against content; refuses on the first that does not
+    /// resolve.
+    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal>;
+}
+
+impl OccurrenceWitness for SourceOccurrence {
+    fn witness(&self) -> &'static str {
+        "foreign source"
+    }
+    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
+        SourceOccurrence::validate(self, complex)
+    }
 }
 
 /// **The source occurrence.** Built by the caller at the apparatus boundary; consumed by the
@@ -604,6 +643,7 @@ impl SourceOccurrence {
                 fields: Vec::new(),
                 shapes: Vec::new(),
                 interventions: Vec::new(),
+                descriptions: Vec::new(),
             };
             let mut exterior = false;
             for testimony in &operation.testimony {

@@ -182,6 +182,27 @@ would have orphaned committed artifacts' producers. **Phoenix resumes at Deed P0
 Station E material is rederived through the H owners; ARM N runs without foreign hexis beside the
 lifted arm. `CONSTRUCTION_STATE.md` does not move (only P5 moves it).
 
+**DEED P0 PASSED 2026-08-20 — the native baseline conducts from its own rest, and the manifest
+measures what is founded and names what is open.** Record:
+[`research/records/2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md`](../research/records/2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md).
+ARM N is executable and source-detached: a rest of 59,698 classes / 102,904 transitions / 5,385
+germs built from eight declared canon documents by the ecology, conducted on the card by the engine
+with the rest as the only semantic input, returning **plural future sections decoded to actual
+surfaces** (no argmax, no sampler); fresh-process remount bit-equal (5.3 MB of faces) with a live
+descriptor audit showing no corpus/Gemma/phoenix access; construction-level ablation with its honest
+boundary measured (depth-0 supports bit-identical on unrelated prompts; standings move everywhere
+because a standing is a corpus-wide count). The quarantined material was REDERIVED through the H
+owners, never cherry-picked: the convicted one-thread flat climb is replaced by a derived geometry
+(grid 2,635 × 64, the chain staged in shared memory, 122,880/122,880 lanes, a 260-candidate family
+with 47 retained moving under the declared axes; one PIN excised during the build). The
+NativeEcologyManifest measures incidence (cycle rank 43,207 with reconvergent classes exhibited by
+name), proves the germ transport a DAG, reads the scale and interval chart with the collapsed fibre
+exhibited, takes the memory order (3) at a declared receiver family and scope with the whole-atlas
+aperture measured and its lift named inside `receiver_exact_compression`, measures that **no group
+action is founded** (a monoid), and leaves winding/phase OPEN with the falsifier a crystal claim
+would owe. Eleven of eleven controls held. **Deed P1 (the cross-chart lift) is next.**
+`CONSTRUCTION_STATE.md` does not move (only P5 moves it).
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

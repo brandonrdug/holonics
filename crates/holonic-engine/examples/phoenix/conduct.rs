@@ -211,7 +211,7 @@ pub fn conduct(
         material.positions = Some(surface.mount_positions(layer_positions).map_err(|e| e.to_string())?);
         if let Intervention::PermuteReceiverHeads { a, b } | Intervention::PermuteCarriedHeads { a, b } = applied {
             let permutation: Vec<u32> = tower::swap_permutation(tower::HEADS, *a, *b).into_iter().map(|i| i as u32).collect();
-            material.permutations.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
+            material.arrays.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
         }
         tower::enter(source, tokens, layer, &mut material)?;
         let entry = if layer == 0 { Entry::Rows } else { Entry::Carried };

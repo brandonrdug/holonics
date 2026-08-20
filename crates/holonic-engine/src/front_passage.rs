@@ -87,7 +87,7 @@ use crate::resident_section::{
     CouplingPlan, LawShape, ObstructionLineage, ResidentGrain, ResidentPassage, ResidentRefusal, ResidentSection, ResidentSurface, Schedule,
     SlotReading, StagedWords, TransferCensus, SLOT_WORDS, WORD_OCTAVES,
 };
-use crate::source_occurrence::{BindingValidation, SourceOccurrence, SourceRefusal};
+use crate::source_occurrence::{BindingValidation, OccurrenceWitness, SourceRefusal};
 use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainStanding};
 use mount::{GraphCensus, Stream};
 
@@ -909,7 +909,7 @@ impl<'chart> FrontPassage<'chart> {
         complex: &PortedOperationComplex,
         realization: &'a ResidentRealization,
         material: &ResidentMaterial<'chart>,
-        source: &SourceOccurrence,
+        source: &dyn OccurrenceWitness,
         terminal: EventId,
     ) -> Result<CompiledPlan<'a>, FrontPassageObstruction> {
         realization.validate(complex)?;
@@ -1408,7 +1408,7 @@ impl<'chart> FrontPassage<'chart> {
         complex: &PortedOperationComplex,
         realization: &ResidentRealization,
         material: &ResidentMaterial<'chart>,
-        source: &SourceOccurrence,
+        source: &dyn OccurrenceWitness,
         receiver: &DeedReceiver,
         material_admission: Option<&MaterialAdmission>,
         terminal: EventId,
@@ -1891,8 +1891,8 @@ mod tests {
 
     const IMPLEMENTATION: &str = "class Site:\n    def enter(self):\n        x = embed(words) * scale\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n";
 
-    fn occurrence() -> SourceOccurrence {
-        SourceOccurrence {
+    fn occurrence() -> crate::source_occurrence::SourceOccurrence {
+        crate::source_occurrence::SourceOccurrence {
             implementation: AuthenticatedText::of_text("/site.py", IMPLEMENTATION, None),
             configuration: AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 20, "width": 1}}"#, None),
             configuration_scope: vec!["text_config".to_owned()],

@@ -316,7 +316,7 @@ fn key_of(
     if residency >= Residency::Whole {
         addressed.extend(material.populations.iter().map(|(name, mounted)| (name.clone(), mounted.readout.aligned_address(), mounted.readout.rows(), mounted.readout.width())));
         addressed.extend(material.bands.iter().map(|(name, (bands, raised))| (name.clone(), bands.resident_address(), bands.bands(), *raised as usize)));
-        addressed.extend(material.permutations.iter().map(|(name, positions)| (name.clone(), positions.resident_address(), positions.rows(), 0)));
+        addressed.extend(material.arrays.iter().map(|(name, positions)| (name.clone(), positions.resident_address(), positions.rows(), 0)));
         // The positions are a single unnamed slot on the material, and they are the one addressed
         // thing two matched siblings can differ by while every name in the diagram agrees — the
         // reversed-position sibling and the identity-chronology sibling name their laws identically.
@@ -430,7 +430,7 @@ pub fn circulate_cohort(
     let mut spare_positions: Option<Positions<'static>> = Some(surface.mount_positions(&backward).map_err(|e| e.to_string())?);
     if declarations.iter().any(|d| matches!(d.intervention, Intervention::PermuteReceiverHeads { .. } | Intervention::PermuteCarriedHeads { .. })) {
         let permutation: Vec<u32> = tower::swap_permutation(tower::HEADS, 0, 1).into_iter().map(|i| i as u32).collect();
-        material.permutations.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
+        material.arrays.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
     }
 
     // the runtime-supplied entering rows, read ONCE for the whole cohort

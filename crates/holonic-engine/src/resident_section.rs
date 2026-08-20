@@ -108,7 +108,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 27] = [
+pub const KERNELS: [&str; 29] = [
     "section_from_bfloat16",
     "section_carry",
     "section_withdraw_rows",
@@ -144,6 +144,11 @@ pub const KERNELS: [&str; 27] = [
     "section_contract_partial_r1_l32",
     "section_contract_partial_r4_l32",
     "section_contract_join",
+    // The native atlas: one warp per prompt walking a 32-ary cooperative row search, and the
+    // future section tiled over positions x germs with the suffix chain staged once per block.
+    // Both carry `__launch_bounds__(512)` for the same reason the tiled family does.
+    "athena_walk_cooperative",
+    "athena_future_staged",
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
@@ -1981,6 +1986,273 @@ impl<'chart> ResidentSurface<'chart> {
         }
         Ok(family)
     }
+
+    // -----------------------------------------------------------------------------------------
+    // the native atlas — the suffix automaton walked and read on the card
+    // -----------------------------------------------------------------------------------------
+
+    /// **The finite candidate family for one native future section**, from the device's own
+    /// attributes and the module's MEASURED registers. Every member is admitted: a whole-warp block
+    /// the module carries an entry for, whose staged chain the device admits and whose grid the
+    /// device can cover. Nothing here is ordered and nothing is called optimal — domination is the
+    /// caller's declared axis set, and [`athena_non_dominated`] takes it.
+    pub fn athena_future_candidates(&self, positions: usize, vocabulary: usize, tree_height: u32) -> Result<Vec<AthenaCandidate>, ResidentRefusal> {
+        const SYMBOL: &str = "athena_future_staged";
+        let registers = self.measured_registers(SYMBOL)?;
+        let static_shared = self.measured_static_shared(SYMBOL)?;
+        let local_octets = self.function(SYMBOL)?.local_size_bytes()? as u32;
+        let limits = self.sm_limits;
+        let mut family = Vec::new();
+        for geometry in AthenaFutureGeometry::enumerate() {
+            if geometry.admit("athena-future", self.launch.block_x, self.launch.warp, self.max_shared_octets).is_err() {
+                continue;
+            }
+            let blocks = geometry.blocks(positions, vocabulary);
+            if blocks == 0 || blocks > u64::from(self.launch.max_grid_x) {
+                continue;
+            }
+            let shared = geometry.shared_octets() + static_shared;
+            let block = geometry.block();
+            let warps = block.div_ceil(limits.warp.max(1)).max(1);
+            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1)) * limits.register_grain.max(1);
+            let by_blocks = limits.max_blocks;
+            let by_threads = limits.max_threads / block.max(1);
+            let by_registers = if per_warp == 0 { u32::MAX } else { limits.max_registers / (per_warp * warps).max(1) };
+            let by_shared = if shared == 0 { u32::MAX } else { limits.max_shared_octets / shared };
+            let resident = by_blocks.min(by_threads).min(by_registers).min(by_shared);
+            let bound_by = if resident == by_registers && by_registers <= by_shared && by_registers <= by_threads && by_registers <= by_blocks {
+                "registers"
+            } else if resident == by_shared && by_shared <= by_threads && by_shared <= by_blocks {
+                "shared"
+            } else if resident == by_threads && by_threads <= by_blocks {
+                "threads"
+            } else {
+                "blocks"
+            };
+            let cover = u64::from(resident) * u64::from(limits.multiprocessors);
+            // Past the staged prefix a lane climbs in global memory; the atlas's own tree height
+            // bounds how far, so the coordinate is a fact about the material and the aperture.
+            let climb_past_stage = tree_height.saturating_sub(geometry.chain_stage);
+            family.push(AthenaCandidate {
+                geometry,
+                symbol: SYMBOL,
+                block,
+                shared_octets: shared,
+                registers,
+                local_octets,
+                resident_blocks: resident,
+                occupancy: (resident * block, limits.max_threads.max(1)),
+                blocks,
+                residency_waves: (blocks, cover.max(1)),
+                lane_waves: (blocks * u64::from(block), u64::from(limits.max_threads) * u64::from(limits.multiprocessors)),
+                cover_occupied: {
+                    let resident_lanes = u64::from(limits.max_threads) * u64::from(limits.multiprocessors);
+                    ((blocks * u64::from(block)).min(resident_lanes), resident_lanes)
+                },
+                chain_reuse: geometry.chain_reuse(),
+                climb_past_stage,
+                dependency_span: u64::from(geometry.germs_per_lane) * u64::from(tree_height.max(1)),
+                bound_by,
+            });
+        }
+        Ok(family)
+    }
+
+    /// **The native atlas walked**: one warp per prompt, carrying its germs from the root through
+    /// compressed-sparse-row transport, falling along the suffix link when a row has no such germ.
+    /// Out `positions × 2`: the landed class and the mark.
+    pub fn shape_athena_walk(&self, positions: usize, prompts: usize, classes: usize, transitions: usize, geometry: AthenaWalkGeometry) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "athena-walk";
+        if positions == 0 || prompts == 0 || classes == 0 {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{positions} positions over {prompts} prompts and {classes} classes") });
+        }
+        geometry.admit(OPERATION, self.launch.block_x, self.launch.warp)?;
+        let blocks = geometry.blocks(prompts);
+        if blocks > u64::from(self.launch.max_grid_x) {
+            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows: prompts, width: 1 });
+        }
+        let height = ceil_log2(classes.max(2)) as u64;
+        // **The warp's cooperative row search narrows the row by the warp's own extent per round**,
+        // so the rounds are `ceil(log_W |row|)` where `W` is the device's warp — read from the
+        // device, never the literal 32, because the arity of the search IS the warp and a card with
+        // another warp would make the literal wrong rather than merely stale.
+        let probes = u64::from(self.launch.warp.max(2));
+        let per_round = u64::from(ceil_log2(self.launch.warp.max(2) as usize)).max(1);
+        let row_rounds = u64::from(ceil_log2(transitions.max(2))).div_ceil(per_round).max(1);
+        let mut work = ExactWork::nothing();
+        work.additions = BigUint::from(positions as u64 * height * row_rounds * probes);
+        work.entries_written = BigUint::from(2 * 2 * positions as u64);
+        work.resident(2 * 2 * positions as u64);
+        work.peak_bits = BigUint::from(33u64);
+        work.cumulative_bits = BigUint::from(2 * 2 * positions as u64 * 33);
+        // One prompt is a chain; the span is its own positions, each at the tree height and the
+        // cooperative row search's rounds. Distinct prompts are co-present, not sequential.
+        let longest = positions.div_ceil(prompts) as u64;
+        work.dependency_span = BigUint::from(longest * (height + 1) * row_rounds);
+        let couplings = vec![CouplingPlan {
+            coupling: "the transport row searched 32-ary by one warp, the ballot naming the lane",
+            kernel: "athena_walk_cooperative",
+            extent: transitions as u64,
+            block: geometry.block(self.launch.warp),
+            predicted: {
+                let mut reduction = ExactWork::nothing();
+                reduction.added(positions as u64 * height * row_rounds);
+                reduction.dependency_span = BigUint::from(row_rounds);
+                reduction
+            },
+        }];
+        Ok(LawShape {
+            operation: OPERATION,
+            rows: positions,
+            width: 2,
+            needed: 33,
+            predicted: work,
+            couplings,
+            launches: 2,
+            shared_octets: 0,
+            block: geometry.block(self.launch.warp),
+        })
+    }
+
+    /// **The native future section**: for every position and vocabulary germ, one climb of the
+    /// suffix chain with a binary search per class. Out `positions × vocabulary`.
+    pub fn shape_athena_future(&self, positions: usize, vocabulary: usize, classes: usize, transitions: usize, depth_face: bool, geometry: AthenaFutureGeometry) -> Result<LawShape, ResidentRefusal> {
+        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
+        if positions == 0 || vocabulary == 0 || classes == 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("{positions} positions × {vocabulary} germs over {classes} classes") });
+        }
+        geometry.admit(operation, self.launch.block_x, self.launch.warp, self.max_shared_octets)?;
+        let blocks = geometry.blocks(positions, vocabulary);
+        if blocks > u64::from(self.launch.max_grid_x) {
+            return Err(ResidentRefusal::GridAperture { operation, rows: positions, width: vocabulary });
+        }
+        let height = ceil_log2(classes.max(2)) as u64;
+        let row = ceil_log2(transitions.max(2)) as u64;
+        let count = (positions * vocabulary) as u64;
+        let mut work = ExactWork::nothing();
+        work.additions = BigUint::from(count * height * row);
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(33u64);
+        work.cumulative_bits = BigUint::from(2 * count * 33);
+        // One lane's span: its germs, each climbing at most the tree's height with a binary search
+        // per class. The staged prefix moves those reads out of global memory; it does not shorten
+        // the chain, so the span is the aperture-independent one and the staging shows in residency.
+        work.dependency_span = BigUint::from(u64::from(geometry.germs_per_lane) * (height + 1) * row);
+        let couplings = vec![CouplingPlan {
+            coupling: "one suffix chain staged in shared and read by every germ lane of its position",
+            kernel: "athena_future_staged",
+            extent: u64::from(geometry.chain_stage),
+            block: geometry.block(),
+            predicted: {
+                let mut reduction = ExactWork::nothing();
+                reduction.added(u64::from(geometry.positions_per_block) * u64::from(geometry.chain_stage) * blocks);
+                reduction.dependency_span = BigUint::from(u64::from(geometry.chain_stage));
+                reduction
+            },
+        }];
+        Ok(LawShape {
+            operation,
+            rows: positions,
+            width: vocabulary,
+            needed: 33,
+            predicted: work,
+            couplings,
+            launches: 2,
+            shared_octets: geometry.shared_octets(),
+            block: geometry.block(),
+        })
+    }
+
+    /// Record the native walk: the prompts' germs carried through the rest's transport, one warp
+    /// per prompt.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_athena_walk(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        indptr: &Positions<'chart>,
+        germ: &Positions<'chart>,
+        target: &Positions<'chart>,
+        suffix: &Positions<'chart>,
+        prompt: &Positions<'chart>,
+        offsets: &Positions<'chart>,
+        classes: usize,
+        vocabulary: usize,
+        geometry: AthenaWalkGeometry,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        const OPERATION: &str = "athena-walk";
+        if out.rows() != prompt.rows() || out.width() != 2 {
+            return Err(ResidentRefusal::Ragged { operation: OPERATION, words: prompt.rows() * 2, rows: out.rows, width: out.width });
+        }
+        let prompts = offsets.rows().saturating_sub(1);
+        let mut params = Params::new();
+        params
+            .ptr(indptr.device_ptr())
+            .ptr(germ.device_ptr())
+            .ptr(target.device_ptr())
+            .ptr(suffix.device_ptr())
+            .ptr(prompt.device_ptr())
+            .ptr(offsets.device_ptr())
+            .u32(prompts as u32)
+            .u32(prompt.rows() as u32)
+            .u32(classes as u32)
+            .u32(vocabulary as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        let blocks = geometry.blocks(prompts);
+        self.record_blocks(lane, "athena_walk_cooperative", blocks as usize, geometry.block(self.launch.warp), 0, &mut params, OPERATION)
+    }
+
+    /// Record the native future section (standing face, or depth face).
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_athena_future(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        indptr: &Positions<'chart>,
+        germ: &Positions<'chart>,
+        target: &Positions<'chart>,
+        standing: &Positions<'chart>,
+        suffix: &Positions<'chart>,
+        walk: &ResidentSection<'chart>,
+        classes: usize,
+        vocabulary: usize,
+        depth_face: bool,
+        geometry: AthenaFutureGeometry,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
+        if walk.width() != 2 || out.rows() != walk.rows() || out.width() != vocabulary {
+            return Err(ResidentRefusal::Ragged { operation, words: walk.rows() * vocabulary, rows: out.rows, width: out.width });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(indptr.device_ptr())
+            .ptr(germ.device_ptr())
+            .ptr(target.device_ptr())
+            .ptr(standing.device_ptr())
+            .ptr(suffix.device_ptr())
+            .ptr(walk.lo.device_ptr())
+            .u32(walk.rows() as u32)
+            .u32(classes as u32)
+            .u32(vocabulary as u32)
+            .u32(geometry.positions_per_block)
+            .u32(geometry.germs_per_lane)
+            .u32(geometry.chain_stage)
+            .u32(u32::from(depth_face))
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        let blocks = geometry.blocks(walk.rows(), vocabulary);
+        self.record_blocks(lane, "athena_future_staged", blocks as usize, geometry.block(), geometry.shared_octets(), &mut params, operation)
+    }
 }
 
 
@@ -2202,17 +2474,238 @@ impl CandidateAxis {
 /// receiver declared, exactly as a compression's remainder is. Changing the axis set changes the
 /// set, which is the falsifier: a return that did not move under a changed declaration was ranking.
 pub fn non_dominated(family: &[LaunchCandidate], axes: &[CandidateAxis]) -> Vec<usize> {
+    let axes: Vec<Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>> = axes.iter().map(|axis| {
+        let axis = *axis;
+        Box::new(move |candidate: &LaunchCandidate| axis.read(candidate)) as Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>
+    }).collect();
+    non_dominated_by(family, &axes)
+}
+
+/// **The domination rule itself, over any candidate species and any declared axis set.**
+///
+/// Lifted out of [`non_dominated`] 2026-08-20 when the native atlas's launch family arrived: its
+/// geometry has no inner extent, no map and no split, so the contraction's axes do not read it —
+/// but the *rule* is the same rule and a second spelling of a Pareto front is how a pre-check and
+/// a guard drift apart. Each axis is a ratio oriented so that GREATER is better; no axis is summed
+/// with another, and changing the declared set changes the returned set.
+pub fn non_dominated_by<C>(family: &[C], axes: &[Box<dyn Fn(&C) -> (u128, u128) + '_>]) -> Vec<usize> {
     let ratio_ge = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 >= b.0 * a.1;
     let ratio_gt = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 > b.0 * a.1;
     (0..family.len())
         .filter(|at| {
             !family.iter().enumerate().any(|(other, rival)| {
                 other != *at
-                    && axes.iter().all(|axis| ratio_ge(axis.read(rival), axis.read(&family[*at])))
-                    && axes.iter().any(|axis| ratio_gt(axis.read(rival), axis.read(&family[*at])))
+                    && axes.iter().all(|axis| ratio_ge(axis(rival), axis(&family[*at])))
+                    && axes.iter().any(|axis| ratio_gt(axis(rival), axis(&family[*at])))
             })
         })
         .collect()
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// the native atlas's launch geometry — a caller's declaration, never a semantic level
+// ---------------------------------------------------------------------------------------------
+
+/// **The walk's geometry: how many warps one block carries.** One warp owns one prompt, so the
+/// grid is `ceil(prompts / warps)` and the front is covered by the prompt population's extent.
+/// Nothing here is semantic: the returned classes and marks are bit-identical under every admitted
+/// member, which is what the equality control asserts.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct AthenaWalkGeometry {
+    pub warps: u32,
+}
+
+impl AthenaWalkGeometry {
+    pub fn block(&self, warp: u32) -> u32 {
+        self.warps * warp.max(1)
+    }
+    pub fn blocks(&self, prompts: usize) -> u64 {
+        (prompts as u64).div_ceil(u64::from(self.warps.max(1)))
+    }
+    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32) -> Result<(), ResidentRefusal> {
+        if self.warps == 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: "a walk block carrying no warp".to_owned() });
+        }
+        let block = self.block(warp);
+        if block > block_ceiling {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+        }
+        Ok(())
+    }
+    /// The finite population of walk geometries this module can realize at all.
+    pub fn enumerate() -> Vec<AthenaWalkGeometry> {
+        [1u32, 2, 4, 8, 16].into_iter().map(|warps| AthenaWalkGeometry { warps }).collect()
+    }
+}
+
+/// **The future section's geometry, declared by the caller.** Every field is an APPARATUS aperture
+/// and none is semantic.
+///
+/// * `positions_per_block` — the walk positions one block owns; each has its own suffix chain;
+/// * `lanes` — the germ lanes cooperating for one position, so the block is `positions · lanes`;
+/// * `germs_per_lane` — how many germs one lane carries, so the block's germ tile is `lanes · G`;
+/// * `chain_stage` — how many classes of each position's suffix chain cross into shared once and
+///   are read by every germ lane; `0` stages nothing and every lane climbs in global memory.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct AthenaFutureGeometry {
+    pub positions_per_block: u32,
+    pub lanes: u32,
+    pub germs_per_lane: u32,
+    pub chain_stage: u32,
+}
+
+impl AthenaFutureGeometry {
+    pub fn block(&self) -> u32 {
+        self.positions_per_block * self.lanes
+    }
+    /// The germ extent one block covers.
+    pub fn germ_tile(&self) -> u32 {
+        self.lanes * self.germs_per_lane
+    }
+    /// The staged chain plus the two per-position words the staging writes: depth and tail.
+    pub fn shared_octets(&self) -> u32 {
+        (self.positions_per_block * self.chain_stage + 2 * self.positions_per_block) * 4
+    }
+    /// `ceil(vocabulary / germ_tile) · ceil(positions / positions_per_block)`, linearized on x.
+    pub fn blocks(&self, positions: usize, vocabulary: usize) -> u64 {
+        let tiles_v = (vocabulary as u64).div_ceil(u64::from(self.germ_tile().max(1)));
+        let tiles_t = (positions as u64).div_ceil(u64::from(self.positions_per_block.max(1)));
+        tiles_v * tiles_t
+    }
+    /// **How many germ lanes read one staged suffix chain** — the reuse the staging buys, exactly
+    /// the germ tile. `chain_stage == 0` buys none and the coordinate is 1.
+    pub fn chain_reuse(&self) -> u32 {
+        if self.chain_stage == 0 {
+            1
+        } else {
+            self.germ_tile()
+        }
+    }
+    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32, shared_ceiling: u32) -> Result<(), ResidentRefusal> {
+        if self.lanes == 0 || self.positions_per_block == 0 || self.germs_per_lane == 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("{self:?} carries no lane, no position or no germ") });
+        }
+        let block = self.block();
+        if block % warp.max(1) != 0 {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} is not a whole number of warps of {warp}") });
+        }
+        if block > block_ceiling {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+        }
+        if self.shared_octets() > shared_ceiling {
+            return Err(ResidentRefusal::Declaration { operation, what: format!("a staged chain of {} octets exceeds the device's {shared_ceiling} per block", self.shared_octets()) });
+        }
+        Ok(())
+    }
+    /// **The finite population of future geometries this module can realize at all**, before any
+    /// device reads it. Membership of the family a given shape admits is decided by
+    /// [`ResidentSurface::athena_future_candidates`], which reads the device.
+    pub fn enumerate() -> Vec<AthenaFutureGeometry> {
+        let mut family = Vec::new();
+        for positions_per_block in [1u32, 2, 4, 8] {
+            for lanes in [32u32, 64, 128, 256] {
+                for germs_per_lane in [1u32, 2, 4, 8] {
+                    for chain_stage in [0u32, 4, 8, 16, 32] {
+                        let geometry = AthenaFutureGeometry { positions_per_block, lanes, germs_per_lane, chain_stage };
+                        if geometry.block() > 512 || geometry.block() % 32 != 0 {
+                            continue;
+                        }
+                        family.push(geometry);
+                    }
+                }
+            }
+        }
+        family
+    }
+}
+
+/// **One admitted native-atlas launch geometry, with what the device and the module say about it.**
+/// Every coordinate is measured or derived from a measurement; there is no combined coordinate, no
+/// score and no ordering. Occupancy and the two wave faces are exact integer ratios.
+///
+/// A separate species from [`LaunchCandidate`] because the coordinates differ: the atlas climb has
+/// no inner extent to partition, no mounted map to reuse and no split to join, and it has a staged
+/// chain and a germ tile that a contraction has no name for. The *domination rule* is shared —
+/// [`non_dominated_by`] — because a second spelling of a Pareto front is how two spellings drift.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AthenaCandidate {
+    pub geometry: AthenaFutureGeometry,
+    pub symbol: &'static str,
+    pub block: u32,
+    pub shared_octets: u32,
+    /// **Measured** through `cuFuncGetAttribute(NUM_REGS)` on the loaded module. One entry serves
+    /// the whole family, so this coordinate is constant across it and says so.
+    pub registers: u32,
+    /// **Measured** per-thread local surface; nonzero means the entry spilled or holds a stack.
+    pub local_octets: u32,
+    pub resident_blocks: u32,
+    /// `(resident lanes, the multiprocessor's ceiling)` — a ratio, never divided.
+    pub occupancy: (u32, u32),
+    pub blocks: u64,
+    /// `(blocks, resident_blocks · multiprocessors)` — the residency wave face.
+    pub residency_waves: (u64, u64),
+    /// `(threads, the card's resident lanes)` — the lane wave face.
+    pub lane_waves: (u64, u64),
+    /// **The cover: `(the lanes this launch occupies of the card's resident population, that
+    /// population)`.** It saturates at the card's own ceiling because a launch cannot occupy more
+    /// of the card than the card has — the saturation is the device's, not a threshold anyone
+    /// chose. A front is covered by EXTENT and this is the reading of it.
+    pub cover_occupied: (u64, u64),
+    /// How many germ lanes read one staged suffix chain.
+    pub chain_reuse: u32,
+    /// The serial climb one lane performs past the staged prefix, at the atlas's tree height.
+    pub climb_past_stage: u32,
+    /// The dependency span one lane realizes: its germs, each climbing the chain with a binary
+    /// search per class.
+    pub dependency_span: u64,
+    /// Which term of the resource equation bound the residency.
+    pub bound_by: &'static str,
+}
+
+/// One apparatus coordinate of a native-atlas candidate, and the hand it reads it with.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AthenaAxis {
+    ResidentBlocksUp,
+    OccupancyUp,
+    /// The fraction of the card's resident lane population this launch occupies. Saturates at the
+    /// device's own ceiling and nowhere else.
+    CoverUp,
+    ChainReuseUp,
+    LanesUp,
+    SharedDown,
+    BlocksDown,
+    DependencySpanDown,
+    ClimbPastStageDown,
+}
+
+impl AthenaAxis {
+    /// The axis's coordinate as a ratio, oriented so that GREATER is better on the declared hand.
+    pub fn read(&self, candidate: &AthenaCandidate) -> (u128, u128) {
+        match self {
+            AthenaAxis::ResidentBlocksUp => (u128::from(candidate.resident_blocks), 1),
+            AthenaAxis::OccupancyUp => (u128::from(candidate.occupancy.0), u128::from(candidate.occupancy.1.max(1))),
+            AthenaAxis::CoverUp => (u128::from(candidate.cover_occupied.0), u128::from(candidate.cover_occupied.1.max(1))),
+            AthenaAxis::ChainReuseUp => (u128::from(candidate.chain_reuse), 1),
+            AthenaAxis::LanesUp => (u128::from(candidate.geometry.lanes), 1),
+            AthenaAxis::SharedDown => (1, u128::from(candidate.shared_octets) + 1),
+            AthenaAxis::BlocksDown => (1, u128::from(candidate.blocks) + 1),
+            AthenaAxis::DependencySpanDown => (1, u128::from(candidate.dependency_span) + 1),
+            AthenaAxis::ClimbPastStageDown => (1, u128::from(candidate.climb_past_stage) + 1),
+        }
+    }
+}
+
+/// The non-dominated members of a native-atlas family under a DECLARED axis set.
+pub fn athena_non_dominated(family: &[AthenaCandidate], axes: &[AthenaAxis]) -> Vec<usize> {
+    let axes: Vec<Box<dyn Fn(&AthenaCandidate) -> (u128, u128)>> = axes
+        .iter()
+        .map(|axis| {
+            let axis = *axis;
+            Box::new(move |candidate: &AthenaCandidate| axis.read(candidate)) as Box<dyn Fn(&AthenaCandidate) -> (u128, u128)>
+        })
+        .collect();
+    non_dominated_by(family, &axes)
 }
 
 /// One occurrence's lane in an open capture: its stream, its own census slot, and the lineage it
@@ -3040,6 +3533,125 @@ mod tests {
         assert_eq!(with_reuse, vec![0, 1, 2]);
         // and a declaration that reads only one axis retains only its extremum
         assert_eq!(non_dominated(&candidates, &[CandidateAxis::MapReuseUp]), vec![1]);
+    }
+
+    fn athena(geometry: AthenaFutureGeometry, resident_blocks: u32, blocks: u64, chain_reuse: u32, climb_past_stage: u32, cover: (u64, u64)) -> AthenaCandidate {
+        AthenaCandidate {
+            geometry,
+            symbol: "athena_future_staged",
+            block: geometry.block(),
+            shared_octets: geometry.shared_octets(),
+            registers: 23,
+            local_octets: 0,
+            resident_blocks,
+            occupancy: (resident_blocks * geometry.block(), 1536),
+            blocks,
+            residency_waves: (blocks, 1920),
+            lane_waves: (blocks * u64::from(geometry.block()), 122_880),
+            cover_occupied: cover,
+            chain_reuse,
+            climb_past_stage,
+            dependency_span: 1,
+            bound_by: "blocks",
+        }
+    }
+
+    #[test]
+    fn the_native_atlas_geometry_family_is_finite_and_every_member_is_a_whole_warp_block() {
+        let family = AthenaFutureGeometry::enumerate();
+        assert!(!family.is_empty());
+        for geometry in &family {
+            assert_eq!(geometry.block() % 32, 0);
+            assert!(geometry.block() <= 512);
+            // the germ tile is what one block covers, and the staged chain is what it reuses
+            assert_eq!(geometry.germ_tile(), geometry.lanes * geometry.germs_per_lane);
+            assert_eq!(geometry.shared_octets(), (geometry.positions_per_block * geometry.chain_stage + 2 * geometry.positions_per_block) * 4);
+            // staging nothing buys no reuse, and that is stated rather than assumed
+            if geometry.chain_stage == 0 {
+                assert_eq!(geometry.chain_reuse(), 1);
+            } else {
+                assert_eq!(geometry.chain_reuse(), geometry.germ_tile());
+            }
+        }
+        // the grid is the extent, linearized: germ tiles x position tiles
+        let geometry = AthenaFutureGeometry { positions_per_block: 2, lanes: 32, germs_per_lane: 4, chain_stage: 8 };
+        assert_eq!(geometry.blocks(31, 5385), 43 * 16);
+        assert_eq!(geometry.block(), 64);
+        // a block past the module's admitted extent refuses at the geometry, before any launch
+        assert!(geometry.admit("athena-future", 32, 32, 49_152).is_err());
+        assert!(geometry.admit("athena-future", 512, 32, 8).is_err());
+        assert!(geometry.admit("athena-future", 512, 32, 49_152).is_ok());
+        // the walk's grid is the PROMPT population, never a flat word count
+        assert_eq!(AthenaWalkGeometry { warps: 4 }.blocks(8), 2);
+        assert_eq!(AthenaWalkGeometry { warps: 4 }.blocks(9), 3);
+        assert_eq!(AthenaWalkGeometry { warps: 8 }.block(32), 256);
+        assert!(AthenaWalkGeometry { warps: 32 }.admit("athena-walk", 512, 32).is_err());
+    }
+
+    #[test]
+    fn the_native_retained_set_moves_with_the_declared_axes_and_the_domination_rule_is_the_shared_one() {
+        let staged = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 8, chain_stage: 16 };
+        let spread = AthenaFutureGeometry { positions_per_block: 1, lanes: 32, germs_per_lane: 1, chain_stage: 0 };
+        let middle = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 1, chain_stage: 16 };
+        let candidates = vec![
+            athena(staged, 24, 341, 512, 0, (21_824, 122_880)),
+            athena(spread, 24, 5239, 1, 9, (122_880, 122_880)),
+            athena(middle, 24, 2635, 64, 0, (122_880, 122_880)),
+        ];
+        // reuse alone crowns the deepest stage; cover alone crowns the two that fill the card
+        assert_eq!(athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]), vec![0]);
+        assert_eq!(athena_non_dominated(&candidates, &[AthenaAxis::CoverUp]), vec![1, 2]);
+        // and a declaration reading both retains the ones neither dominates
+        let both = athena_non_dominated(&candidates, &[AthenaAxis::CoverUp, AthenaAxis::ChainReuseUp, AthenaAxis::ClimbPastStageDown]);
+        assert_eq!(both, vec![0, 2]);
+        // the retained set MOVED under a changed declaration, which is the falsifier: a return that
+        // did not move was ranking rather than reading a declared front
+        assert_ne!(athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]), both);
+    }
+
+    #[test]
+    fn the_native_atlas_shapes_price_the_deed_and_refuse_a_non_integer_grain_extent() {
+        let Some((_, surface)) = surface() else { return };
+        let geometry = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 1, chain_stage: 16 };
+        let shape = surface.shape_athena_future(31, 5385, 59_698, 102_904, false, geometry).expect("future shape");
+        assert_eq!((shape.rows, shape.width), (31, 5385));
+        assert_eq!(shape.block, 64);
+        assert_eq!(shape.shared_octets, geometry.shared_octets());
+        assert_eq!(shape.launches, 2);
+        assert_eq!(shape.couplings.len(), 1);
+        assert_eq!(shape.couplings[0].kernel, "athena_future_staged");
+        // an empty extent refuses at the shape rather than launching an empty grid
+        assert!(surface.shape_athena_future(0, 5385, 59_698, 102_904, false, geometry).is_err());
+        assert!(surface.shape_athena_future(31, 0, 59_698, 102_904, false, geometry).is_err());
+        let walk = surface.shape_athena_walk(31, 8, 59_698, 102_904, AthenaWalkGeometry { warps: 8 }).expect("walk shape");
+        assert_eq!((walk.rows, walk.width), (31, 2));
+        assert_eq!(walk.block, 256);
+        assert_eq!(walk.couplings[0].kernel, "athena_walk_cooperative");
+    }
+
+    #[test]
+    fn the_native_atlas_family_reads_its_registers_from_the_loaded_module_and_covers_the_card() {
+        let Some((_, surface)) = surface() else { return };
+        for symbol in ["athena_walk_cooperative", "athena_future_staged"] {
+            let registers = surface.measured_registers(symbol).expect("registers");
+            assert!(registers > 0 && registers <= 255, "{symbol} reported {registers} registers");
+            assert!(surface.measured_block_ceiling(symbol).expect("ceiling") >= 512, "{symbol} admits fewer than 512 threads");
+        }
+        let family = surface.athena_future_candidates(31, 5385, 9).expect("family");
+        assert!(!family.is_empty());
+        let mut covers_the_card = false;
+        for member in &family {
+            assert!(member.resident_blocks >= 1, "{member:?} is resident nowhere");
+            assert!(member.registers > 0);
+            assert!(member.blocks >= 1);
+            // the cover saturates at the device's own ceiling and nowhere else
+            assert!(member.cover_occupied.0 <= member.cover_occupied.1);
+            assert_eq!(member.cover_occupied.0, member.lane_waves.0.min(member.cover_occupied.1));
+            if member.cover_occupied.0 == member.cover_occupied.1 {
+                covers_the_card = true;
+            }
+        }
+        assert!(covers_the_card, "no admitted member covers the card's resident lanes on this extent");
     }
 
     #[test]

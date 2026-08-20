@@ -328,6 +328,9 @@ pub mod source_occurrence;
 // The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
 // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
 pub mod front_passage;
+// The native arm: a rest that witnesses its own laws, and the atlas walked and read on the card.
+pub mod native_law;
+pub mod native_occurrence;
 // Pooled source standing, refilled from an exterior container while the card conducts: one device
 // allocation reused across many deeds, page-locked host staging, and the events that order a
 // refill against the deed still reading the slot it replaces. The apparatus half of Deed H4; it
