@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 63 drivers, 15529 returns, 10283905602 bytes.
+# 64 drivers, 15532 returns, 10284230382 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -57,6 +57,7 @@ b58302651bd37e48ae76def9e952f8c98fdd6bd483e3dbb5c5b442ec383d9d30	7	255768	output
 cc1e4532897a6734e33a897c4fd7ed71eb08be73b5724b21b01811cb600c1237	16	9711887	output/the_deposit_licenses_the_re_emission
 a5b31335a26d12669ef194c3d20d9a74d6b2c2e3c7eae0225d341668137a6bcd	2	82968	output/the_dissection_shares_its_prefixes
 0b73fb1e42bc90d16126c7180ad0df1bac0d732b981cde2bef7cf09f73742bd9	3	2770217	output/the_layer_stays_on_the_card
+1aca04df4256048f4e9d14052e877d8f606dc718f650914cb4807d0213400a5d	3	324780	output/the_lift_returns_its_defect
 7ca8b7191a2e03f9733f4cf7f448b25882b920d166bdb73e0cefc69fdddb5383	8	2123819733	output/the_material_mouth_seals_the_declared_body
 36a7eba09c0051669c4d9cb82ce6b7f9589641df708d2be1182ab86c67e30dde	4	3215295	output/the_native_baseline_conducts
 cef0c6e09382be8c6445002369ecd33ee3032a787378a7c2eaa58eb7bcd44ea6	1	12720	output/the_operation_survives_the_codec

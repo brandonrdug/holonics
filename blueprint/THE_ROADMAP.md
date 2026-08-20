@@ -203,6 +203,25 @@ action is founded** (a monoid), and leaves winding/phase OPEN with the falsifier
 would owe. Eleven of eleven controls held. **Deed P1 (the cross-chart lift) is next.**
 `CONSTRUCTION_STATE.md` does not move (only P5 moves it).
 
+**DEED P1 PASSED 2026-08-20 — the lift returns its defect, the fibres partition the reals, and the
+recombination is absent from the source closure.** Record:
+[`research/records/2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md`](../research/records/2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md).
+Typed Φ receipts (rebases exhibiting both inverse identities as matrices; the grouped-sharing
+quotient exhibiting its 48-dimensional kernel and refusing an inverse by name; the bare-transpose
+perturbation exact — defect 44265/1024 under the declared gain metric against the metric adjoint's
+0); χ_γ = Φ_Y T_γ − S_γ Φ_X computed exactly for four real families with full faces and the §8
+tautology note where the shape forces agreement; the chain law derived in one line and verified as a
+zero operator residual and on real vectors; **the exact BF16 rounding preimage founded**
+(`RoundingFibre`: both endpoints belong to the even significand, adjacent codewords always opposite
+parity including across a binade re-seat — verified over all 65,536 patterns) and **censused over
+the whole real map** (5,242,880 of 5,242,880 entries, 0 outside, 0 overlaps, 1.1 M exact ties, the
+asymmetric/subnormal/zero cells exhibited); the recombination a bounded demonstration stated as such
+— two lifted families composing into an exact reconstruction fibre absent from the declared
+35-operation source closure (measured, zero hits), each cause ablated with its attributable part
+leaving plural-diffed and the unrelated control bit-identical. Apertures declared with what would
+derive them. **Deed P2 (receiver-exact condensation) is next.** `CONSTRUCTION_STATE.md` does not
+move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

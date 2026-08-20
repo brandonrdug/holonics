@@ -31,6 +31,7 @@ crates/holonic-engine/src/conic.rs	.clone()=34	.collect()=2	BTreeMap=3	Vec=4
 crates/holonic-engine/src/contact_gluing.rs	.clone()=85	.collect()=31	.into_iter()=7	BTreeMap=42	BTreeSet=22	Vec=70
 crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()=6	BTreeMap=11	Vec=46
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
+crates/holonic-engine/src/cross_chart.rs	.clone()=32	.collect()=1	Vec=24
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=21	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
 crates/holonic-engine/src/cuda_refine.rs	.collect()=8	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=22
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10

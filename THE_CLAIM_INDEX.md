@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (162 deposits of 454)
+## 4 · The 2026-08 record line (163 deposits of 455)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -299,6 +299,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` | The tower is a streamed circulation, the single graph returns its three cuts, and the transfers cross under the kernels |
 | `2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md` | The warp scheduler does not schedule the holon, the reduction is a typed junction, and the card owes its pressure field |
 | `2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md` | The dissection shares its prefixes, the key learns an address is not content, and the hardware foundation is complete |
+| `2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md` | The lift returns its defect, the fibres partition the reals, and the recombination is absent from the source closure |
 | `2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md` | The native baseline conducts from its own rest, and the manifest measures what is founded and names what is open |
 
 ---
@@ -316,7 +317,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 23 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 24 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

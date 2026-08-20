@@ -186,6 +186,7 @@ pub mod dimensional_wave;
 pub mod display;
 pub mod divisor_reconstruction;
 pub mod evolution;
+pub mod cross_chart;
 pub mod exact_linear;
 // The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
 // `<a|b>²/(<a|a><b|b>)`, whose dyadic frames cancel identically, so the face crosses where the
