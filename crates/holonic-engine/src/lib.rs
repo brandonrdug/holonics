@@ -328,6 +328,11 @@ pub mod source_occurrence;
 // The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
 // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
 pub mod front_passage;
+// Pooled source standing, refilled from an exterior container while the card conducts: one device
+// allocation reused across many deeds, page-locked host staging, and the events that order a
+// refill against the deed still reading the slot it replaces. The apparatus half of Deed H4; it
+// carries no semantics and owns no reader.
+pub mod streamed_standing;
 // The coordinate-region partition of one section, with its completeness and disjointness computed
 // rather than asserted, its cover and independence certificate composed, and its pressure one
 // covector per resource species. `FrontCell` carries an index and an extent and no coordinate;

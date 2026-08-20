@@ -3,7 +3,7 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap. **Deeds H0 through H3 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md), [H3](../research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md)); H4 is the open deed; every later deed is open.
+**Status:** active construction contract when named by the roadmap. **Deeds H0 through H4 returned 2026-08-19** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md), [H3](../research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md), [H4](../research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md)); H5 is the open deed; every later deed is open.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -607,6 +607,11 @@ one complete graph return, one terminal synchronization.
 
 Re-run Station C's committed input closure only after focused tests pass. The original Station C
 artifact remains the independent predecessor.
+
+**Returned 2026-08-19** — the record named in the status line. One admission, one conducting
+synchronization, bit-equality with the committed artifact, the single graph's three limiting cuts
+returned by name with measurements, 85.1 % transfer/kernel overlap, the apparatus census table
+(2,112 mount syncs → 0; 9,416 allocs → 3,105; wall 23.8 s → 9.1 s; busy 10.2 % → 28.6 %).
 
 ### Deed H5 — Station D returns with shared branches
 

@@ -120,6 +120,7 @@ unsafe extern "C" {
     fn cuMemFree_v2(pointer: CuDevicePtr) -> i32;
     fn cuMemcpyHtoD_v2(destination: CuDevicePtr, source: *const c_void, bytes: usize) -> i32;
     fn cuMemcpyDtoH_v2(destination: *mut c_void, source: CuDevicePtr, bytes: usize) -> i32;
+    fn cuStreamSynchronize(stream: CuStream) -> i32;
     fn cuLaunchKernel(
         function: CuFunction,
         grid_x: u32,
@@ -595,6 +596,7 @@ impl ResidentReadout {
                 entry_octaves: readout.entry_octaves,
                 exponent: readout.exponent,
                 octets: bytes,
+                owned: true,
             })
         }
     }
@@ -796,6 +798,7 @@ impl ResidentReadout {
                 entry_octaves: read_back[1],
                 exponent: lowest,
                 octets: aligned_octets,
+                owned: true,
             })
         }
     }
@@ -821,6 +824,223 @@ impl ResidentReadout {
     }
 }
 
+
+/// **One map's place in a batched pooled mount.** Every address is the caller's pool: the stored
+/// codewords already copied in, the aligned standing to write, and the row-mass pair to reduce
+/// into. Nothing here allocates.
+#[derive(Clone, Copy, Debug)]
+pub struct PooledMount {
+    /// The stored BF16 codewords, resident (`count` words).
+    pub stored: CuDevicePtr,
+    /// Where the aligned exact words are written (`count * 8` octets).
+    pub aligned: CuDevicePtr,
+    /// Where the row masses are reduced: `rows` low words then `rows` high words.
+    pub mass: CuDevicePtr,
+    pub count: u32,
+    pub rows: usize,
+    pub dim: usize,
+}
+
+/// What a batched mount returned for one map: the readout borrowing the pool, and the octaves of
+/// its widest row absolute mass **as a value**.
+pub struct PooledReadout<'chart> {
+    pub readout: MountedReadout<'chart>,
+    pub mass_value_octaves: u32,
+}
+
+impl ResidentReadout {
+    /// ★ **MOUNT A WHOLE LAYER'S MAPS AT ONCE, INTO THE CALLER'S POOL, ON THE CALLER'S STREAM.**
+    ///
+    /// [`mount_bfloat16`] is one map's mount and pays for it three times: it allocates, launches
+    /// `bfloat16_lowest_exponent`, **synchronizes the whole context**, reads the exponent back,
+    /// launches `bfloat16_align`, synchronizes again, and a caller that wants row masses launches
+    /// `exact_row_absolute_mass` and synchronizes a third time. Measured over the committed tower
+    /// (H0's profile): 704 mounts, 2,112 `cuCtxSynchronize` calls, 3,520 allocate/free pairs, and
+    /// every one of those synchronizations drains the card.
+    ///
+    /// Nothing about the law needs that. The host round-trip is real — the aligning kernel takes
+    /// the common exponent as an argument, and the exponent is a reduction over the material — but
+    /// it is **one** round trip per batch rather than one per map, and the reduction of every map
+    /// in the batch can be in flight at once. So this takes a whole layer's maps and returns:
+    ///
+    /// ```text
+    ///   n × bfloat16_lowest_exponent  ->  ONE stream synchronize  ->  ONE scratch read
+    ///   n × bfloat16_align + n × exact_row_absolute_mass -> ONE stream synchronize -> 2 reads
+    /// ```
+    ///
+    /// **Two synchronizations for a whole layer, on the caller's stream, and none of them touches
+    /// the context.** The caller's compute stream keeps conducting.
+    ///
+    /// The refusals are unchanged and are raised by the same names: a non-finite codeword
+    /// (`MouthRefused`) after the first phase, a shift that would cross the hand
+    /// (`AlignmentSpread`) after the second. The returned readouts **borrow** the pool.
+    ///
+    /// `scratch` addresses `4 * requests.len()` 32-bit words, seeded here.
+    ///
+    /// # Safety
+    /// `stream` must be a live stream of this readout's context, and every address in `requests`
+    /// must name pool standing that no other current is writing.
+    pub unsafe fn mount_bfloat16_pooled<'chart>(
+        &'chart self,
+        stream: *mut c_void,
+        scratch: CuDevicePtr,
+        requests: &[PooledMount],
+    ) -> Result<Vec<PooledReadout<'chart>>, FiberError> {
+        if requests.is_empty() {
+            return Ok(Vec::new());
+        }
+        let block = self.launch.block_x;
+        let mut grids = Vec::with_capacity(requests.len());
+        for request in requests {
+            if request.dim == 0 || request.count as usize % request.dim != 0 {
+                return Err(FiberError::RaggedReadout { words: request.count as usize, dim: request.dim });
+            }
+            grids.push(
+                self.launch
+                    .grid_for(request.count)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?,
+            );
+        }
+        unsafe {
+            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            // The frame every reduction starts from: the exponent slot at the greatest possible
+            // value so a minimum lands, the rest at zero.
+            let mut seed = vec![0u32; 4 * requests.len()];
+            for which in 0..requests.len() {
+                seed[4 * which] = i32::MAX as u32;
+            }
+            checked(
+                cuMemcpyHtoD_v2(scratch, seed.as_ptr().cast(), seed.len() * 4),
+                "cuMemcpy(pooled scratch seed)",
+            )?;
+
+            // Phase one: every map's exponent reduction, in flight together.
+            for (which, request) in requests.iter().enumerate() {
+                let mut stored = request.stored;
+                let mut count = request.count;
+                let lowest_slot = scratch + (16 * which) as u64;
+                let refused_slot = scratch + (16 * which + 12) as u64;
+                let mut parameters: [*mut c_void; 4] = [
+                    (&raw mut stored).cast(),
+                    (&raw mut count).cast(),
+                    (&raw const lowest_slot as *mut CuDevicePtr).cast(),
+                    (&raw const refused_slot as *mut CuDevicePtr).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(self.lowest_exponent, grids[which], 1, 1, block, 1, 1, 0, stream, parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    "cuLaunchKernel(bfloat16_lowest_exponent)",
+                )?;
+            }
+            checked(cuStreamSynchronize(stream), "cuStreamSynchronize(pooled mount, exponents)")?;
+            let mut words = vec![0u32; 4 * requests.len()];
+            checked(
+                cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
+                "cuMemcpy(pooled scratch back)",
+            )?;
+            let mut lowest = Vec::with_capacity(requests.len());
+            for which in 0..requests.len() {
+                if words[4 * which + 3] & 1 != 0 {
+                    return Err(FiberError::MouthRefused {
+                        reason: format!("stored map {which} of the batch carries a pattern that is not a finite BF16 value"),
+                    });
+                }
+                let read = words[4 * which] as i32;
+                // Every word zero: the map has no scale of its own and the frame is the origin.
+                lowest.push(if read == i32::MAX { 0 } else { read });
+            }
+
+            // Phase two: every alignment, and every row-mass reduction after its own alignment —
+            // one stream, so each map's mass waits on its own aligned words and on nothing else's.
+            for (which, request) in requests.iter().enumerate() {
+                let mut stored = request.stored;
+                let mut count = request.count;
+                let mut lowest_arg = lowest[which];
+                let mut resident = request.aligned;
+                let octaves_slot = scratch + (16 * which + 4) as u64;
+                let negatives_slot = scratch + (16 * which + 8) as u64;
+                let refused_slot = scratch + (16 * which + 12) as u64;
+                let mut parameters: [*mut c_void; 7] = [
+                    (&raw mut stored).cast(),
+                    (&raw mut count).cast(),
+                    (&raw mut lowest_arg).cast(),
+                    (&raw mut resident).cast(),
+                    (&raw const octaves_slot as *mut CuDevicePtr).cast(),
+                    (&raw const negatives_slot as *mut CuDevicePtr).cast(),
+                    (&raw const refused_slot as *mut CuDevicePtr).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(self.align, grids[which], 1, 1, block, 1, 1, 0, stream, parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    "cuLaunchKernel(bfloat16_align)",
+                )?;
+                if request.rows == 0 {
+                    continue;
+                }
+                let mass_work = u32::try_from(request.rows).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mass_grid = self.launch.grid_for(mass_work).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mut mass_resident = request.aligned;
+                let mut rows_arg = mass_work;
+                let mut dim_arg = u32::try_from(request.dim).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mut low = request.mass;
+                let mut high = request.mass + (request.rows * 8) as u64;
+                let mut mass_parameters: [*mut c_void; 5] = [
+                    (&raw mut mass_resident).cast(),
+                    (&raw mut rows_arg).cast(),
+                    (&raw mut dim_arg).cast(),
+                    (&raw mut low).cast(),
+                    (&raw mut high).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(self.row_mass, mass_grid, 1, 1, block, 1, 1, 0, stream, mass_parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    "cuLaunchKernel(exact_row_absolute_mass)",
+                )?;
+            }
+            checked(cuStreamSynchronize(stream), "cuStreamSynchronize(pooled mount, alignment)")?;
+            checked(
+                cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
+                "cuMemcpy(pooled scratch back)",
+            )?;
+            let mut mounted = Vec::with_capacity(requests.len());
+            for (which, request) in requests.iter().enumerate() {
+                if words[4 * which + 3] & 2 != 0 {
+                    return Err(FiberError::AlignmentSpread { spread: u32::MAX });
+                }
+                // The widest row absolute mass as a value: the aligned mass octaves plus the map's
+                // own exponent. Read back per map; the reduction itself ran on the card.
+                let mass_value_octaves = if request.rows == 0 {
+                    0
+                } else {
+                    let mut low = vec![0u64; request.rows];
+                    let mut high = vec![0i64; request.rows];
+                    checked(cuMemcpyDtoH_v2(low.as_mut_ptr().cast(), request.mass, request.rows * 8), "cuMemcpy(pooled mass low)")?;
+                    checked(cuMemcpyDtoH_v2(high.as_mut_ptr().cast(), request.mass + (request.rows * 8) as u64, request.rows * 8), "cuMemcpy(pooled mass high)")?;
+                    let widest = low
+                        .iter()
+                        .zip(&high)
+                        .map(|(low, high)| (((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF)).unsigned_abs())
+                        .max()
+                        .unwrap_or(0);
+                    let octaves = i64::from(128 - widest.leading_zeros()) + i64::from(lowest[which]);
+                    u32::try_from(octaves.max(0)).unwrap_or(0)
+                };
+                mounted.push(PooledReadout {
+                    readout: MountedReadout {
+                        chart: self,
+                        resident: request.aligned,
+                        rows: request.count as usize / request.dim,
+                        dim: request.dim,
+                        entry_octaves: words[4 * which + 1],
+                        exponent: lowest[which],
+                        octets: request.count as usize * std::mem::size_of::<i64>(),
+                        owned: false,
+                    },
+                    mass_value_octaves,
+                });
+            }
+            Ok(mounted)
+        }
+    }
+}
+
 /// A readout resident on the card, with the questions a caller may ask of it.
 ///
 /// The device allocation is owned here and released on drop. It borrows the chart, so the context
@@ -833,6 +1053,11 @@ pub struct MountedReadout<'chart> {
     entry_octaves: u32,
     exponent: i32,
     octets: usize,
+    /// Whether this handle owns the allocation it names. A readout mounted into a caller's pooled
+    /// standing borrows it: the pool outlives the handle and releases once, so a borrowed handle
+    /// that freed on drop would free a live slot. **The flag is about ownership, not about the
+    /// material** — every other face of the two is identical, which is why they are one type.
+    owned: bool,
 }
 
 impl MountedReadout<'_> {
@@ -1371,6 +1596,9 @@ impl MountedReadout<'_> {
 
 impl Drop for MountedReadout<'_> {
     fn drop(&mut self) {
+        if !self.owned {
+            return;
+        }
         unsafe {
             let _ = cuCtxSetCurrent(self.chart.context);
             let _ = cuMemFree_v2(self.resident);

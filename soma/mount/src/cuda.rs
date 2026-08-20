@@ -261,6 +261,38 @@ impl Stream {
         unsafe { check(ffi::cuMemsetD32Async(pointer, value, count, self.stream), "cuMemsetD32Async") }
     }
 
+    /// **A host→device copy ordered on this stream**, from page-locked host standing.
+    ///
+    /// The apparatus contract this exposes: the source must be [`PinnedHost`] (or otherwise
+    /// registered), because the driver will not start a copy engine against pageable memory
+    /// without first staging it through its own bounce buffer — which is what makes a
+    /// "asynchronous" copy from a `Vec` neither asynchronous nor overlapping. Nothing about the
+    /// caller's semantics is implied; this is a transport, and the ordering is the stream's.
+    ///
+    /// # Safety
+    /// `source` must point at `bytes` readable octets that stay valid and unwritten until this
+    /// stream reaches the copy. The caller owns that ordering; the type system cannot.
+    pub unsafe fn copy_host_to_device_async(
+        &self,
+        destination: ffi::CUdeviceptr,
+        source: *const c_void,
+        bytes: usize,
+    ) -> Result<()> {
+        unsafe {
+            check(
+                ffi::cuMemcpyHtoDAsync_v2(destination, source, bytes, self.stream),
+                "cuMemcpyHtoDAsync_v2",
+            )
+        }
+    }
+
+    /// The raw stream handle, for a sibling owner in this workspace that carries its own minimal
+    /// binding of the same driver (`holonic_engine::embedding_fiber`) and must order its launches
+    /// on this same current rather than on the default one.
+    pub fn raw(&self) -> *mut c_void {
+        self.stream
+    }
+
     /// A device-to-device copy ordered on this stream (a memcpy node under capture). Nothing
     /// crosses the apparatus boundary.
     pub fn copy_device_to_device_async(
@@ -274,6 +306,57 @@ impl Stream {
                 ffi::cuMemcpyDtoDAsync_v2(destination, source, bytes, self.stream),
                 "cuMemcpyDtoDAsync_v2",
             )
+        }
+    }
+}
+
+/// **Page-locked host standing.** One allocation the driver may read from a copy engine without
+/// staging it through a bounce buffer, so a refill of it can genuinely cross while the card
+/// conducts. It is host memory and carries no semantics; it is named `PinnedHost` rather than
+/// `HostBuffer` because being pinned is the whole of what distinguishes it.
+///
+/// The octets are **not** initialized by the allocator; the caller writes them before the copy.
+pub struct PinnedHost {
+    pointer: *mut c_void,
+    octets: usize,
+}
+
+impl PinnedHost {
+    /// Allocate `octets` page-locked host octets. Zero is refused: an empty pinned slot is a
+    /// declaration error rather than a degenerate buffer.
+    pub fn alloc(octets: usize) -> Result<Self> {
+        let mut pointer: *mut c_void = core::ptr::null_mut();
+        unsafe { check(ffi::cuMemAllocHost_v2(&mut pointer, octets.max(1)), "cuMemAllocHost_v2")? };
+        Ok(Self { pointer, octets: octets.max(1) })
+    }
+
+    pub fn octets(&self) -> usize {
+        self.octets
+    }
+
+    pub fn as_ptr(&self) -> *const c_void {
+        self.pointer
+    }
+
+    /// The whole slot as octets, for a reader filling it from an exterior container.
+    pub fn as_mut_octets(&mut self) -> &mut [u8] {
+        unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
+    }
+
+    /// The slot as octets without a unique borrow, for a caller that has proved by construction
+    /// (the stream's own ordering) that no copy is reading it.
+    ///
+    /// # Safety
+    /// No copy engine may be reading this slot while the returned slice is written.
+    pub unsafe fn as_octets_unchecked(&self) -> &mut [u8] {
+        unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
+    }
+}
+
+impl Drop for PinnedHost {
+    fn drop(&mut self) {
+        unsafe {
+            let _ = ffi::cuMemFreeHost(self.pointer);
         }
     }
 }
@@ -295,6 +378,15 @@ impl Event {
     /// Record this event at the current tail of `stream`.
     pub fn record(&self, stream: &Stream) -> Result<()> {
         unsafe { check(ffi::cuEventRecord(self.event, stream.stream), "cuEventRecord") }
+    }
+
+    /// **Wait, on the apparatus, until this point has been reached.** Narrower than synchronizing a
+    /// stream: a caller that must not rewrite one staging slot waits on the copy that read *that*
+    /// slot, and every later copy on the same current keeps crossing. Synchronizing the stream
+    /// instead would wait for the copy that is meant to be overlapping the deed — measured
+    /// 2026-08-19, when it did, and the overlap read 0 ns.
+    pub fn synchronize(&self) -> Result<()> {
+        unsafe { check(ffi::cuEventSynchronize(self.event), "cuEventSynchronize") }
     }
 }
 

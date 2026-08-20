@@ -888,6 +888,30 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(buffer)
     }
 
+    /// **One counted pooled allocation of raw octets**, for a caller that reuses one standing
+    /// across many deeds instead of allocating one per deed. The surface counts it exactly as it
+    /// counts a section, so a pooled realization's allocation census is comparable with a
+    /// per-deed one rather than invisible beside it.
+    pub fn alloc_octets(&self, octets: usize) -> Result<DeviceBuffer<u8>, ResidentRefusal> {
+        self.alloc::<u8>(octets)
+    }
+
+    /// Release a pooled allocation's octets from the resident census. The buffer's own `Drop`
+    /// frees the card; this is the census half, which a `DeviceBuffer` cannot do for itself
+    /// because it does not know the surface.
+    pub fn released_octets(&self, octets: u64) {
+        self.census.borrow_mut().resident_shrank(octets);
+    }
+
+    /// **Synchronize a caller's stream and count it.** The terminal synchronization of a deed
+    /// that launched its graphs onto a stream of its own rather than onto a passage's origin.
+    pub fn synchronize_counted(&self, stream: &Stream) -> Result<(), ResidentRefusal> {
+        self.context.make_current()?;
+        stream.synchronize()?;
+        self.census.borrow_mut().synchronizations += 1;
+        Ok(())
+    }
+
     /// A fresh section, allocated and unwritten. Allocation is counted; nothing launches.
     pub fn fresh_section(&'chart self, rows: usize, width: usize, grain: ResidentGrain) -> Result<ResidentSection<'chart>, ResidentRefusal> {
         let count = rows * width;
@@ -2485,6 +2509,37 @@ impl<'chart> ResidentPassage<'chart> {
         self.surface.census.borrow_mut().deed_launches += 1;
         self.origin.synchronize()?;
         self.surface.census.borrow_mut().synchronizations += 1;
+        self.read_census(census_before)
+    }
+
+    /// **Launch this passage onto a caller's stream and return immediately.**
+    ///
+    /// The deed is the same deed; what moves is where the terminal synchronization sits. A caller
+    /// conducting many passages in succession orders them on one stream — the card carries the
+    /// standing from one graph into the next without the apparatus waiting between them — and
+    /// synchronizes once at the end, then reads every census with [`ResidentPassage::census`].
+    ///
+    /// The census array is zeroed by a memset node **inside** the graph, so a launch cannot read a
+    /// previous launch's words, and the ordering of the zeroing against the kernels is the
+    /// graph's own. Nothing here waits, and no census is readable until the caller has
+    /// synchronized: reading before that returns the words of a deed that has not finished, which
+    /// is why [`ResidentPassage::census`] is a separate call and not folded into this one.
+    pub fn launch_on(&self, stream: &Stream) -> Result<TransferCensus, ResidentRefusal> {
+        let census_before = self.surface.census();
+        self.surface.context.make_current()?;
+        self.exec.launch(stream)?;
+        self.surface.census.borrow_mut().deed_launches += 1;
+        Ok(census_before)
+    }
+
+    /// **Read this passage's census after the caller has synchronized.** The same reading
+    /// [`ResidentPassage::launch`] returns, from the same words.
+    pub fn census(&self, census_before: TransferCensus) -> Result<PassageReading, ResidentRefusal> {
+        self.surface.context.make_current()?;
+        self.read_census(census_before)
+    }
+
+    fn read_census(&self, census_before: TransferCensus) -> Result<PassageReading, ResidentRefusal> {
         let words_count = SLOT_WORDS * self.occurrences.max(1);
         let mut words = vec![0u32; words_count];
         self.census_buffer.copy_to_slice(&mut words)?;

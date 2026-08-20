@@ -141,6 +141,26 @@ in-place node after the predecessor's census, not a producer epilogue, because a
 see a refusal the producer's census has not yet decided. **Deed H4 (one streamed resident tower
 circulation) is next.** `CONSTRUCTION_STATE.md` does not move.
 
+**DEED H4 PASSED 2026-08-19 — the tower is a streamed circulation, the single graph returns its
+three cuts, and the transfers cross under the kernels.** Record:
+[`research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md`](../research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md).
+The whole tower runs as 43 segments under ONE pre-deed admission and ONE terminal synchronization of
+the conducting current, staging the next layer's regions into pinned slots while the card conducts,
+the copies crossing asynchronously (**85.1 % of transfer time concurrent with a kernel, against
+H0's 0 ns**), the mount kernels captured (2,112 `cuCtxSynchronize` → 0), allocations pooled
+(9,416 → 3,105), no region re-digested in the hot path, and **no CPU semantic inspection between
+segments** — structural and censused. The semantic return is bit-equal to Station C's committed
+artifact (future section, final normed standing, every collapsed population, the exact work), with
+the reliance on H3's fusion stated. The whole-tower single graph was attempted and refused with
+three cuts returned by name — residency (37.2 GB of maps against 16.4 GB), pinned standing
+(9.3 GB), and the decisive circular cut (the mouth's common exponent is a reduction over material
+the same graph would produce; 2,112 host-held kernel parameters). Wall 23.8 s → 9.1 s; card busy
+10.2 % → 28.6 %. Two defects found and repaired by the deed's own falsifiers, one of which conducted
+ten layers on wrong material before an a-priori bound refused — wrong material returns numbers, and
+the staged bytes are now compared word-for-word against the container's own reader. **Deed H5
+(Station D through shared prefixes; the foreman path then deleted from live construction) is
+next.** `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

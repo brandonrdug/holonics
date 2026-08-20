@@ -132,7 +132,18 @@ extern "C" {
         properties: *const CUmemAllocationProp,
         option: c_uint,
     ) -> CUresult;
+    /// Page-locked host standing. The apparatus may only start an asynchronous host→device copy
+    /// from memory it knows will not move, so a staged refill that is to overlap a conduction is
+    /// obliged to live here. Added 2026-08-19 for the streamed circulation.
+    pub fn cuMemAllocHost_v2(pp: *mut *mut c_void, bytesize: usize) -> CUresult;
+    pub fn cuMemFreeHost(p: *mut c_void) -> CUresult;
     pub fn cuMemcpyHtoD_v2(dst: CUdeviceptr, src: *const c_void, bytes: usize) -> CUresult;
+    pub fn cuMemcpyHtoDAsync_v2(
+        dst: CUdeviceptr,
+        src: *const c_void,
+        bytes: usize,
+        hStream: CUstream,
+    ) -> CUresult;
     pub fn cuMemcpyDtoH_v2(dst: *mut c_void, src: CUdeviceptr, bytes: usize) -> CUresult;
     pub fn cuMemcpyDtoD_v2(dst: CUdeviceptr, src: CUdeviceptr, bytes: usize) -> CUresult;
 
@@ -161,6 +172,7 @@ extern "C" {
     pub fn cuEventCreate(phEvent: *mut CUevent, flags: c_uint) -> CUresult;
     pub fn cuEventRecord(hEvent: CUevent, hStream: CUstream) -> CUresult;
     pub fn cuEventDestroy_v2(hEvent: CUevent) -> CUresult;
+    pub fn cuEventSynchronize(hEvent: CUevent) -> CUresult;
     pub fn cuStreamWaitEvent(hStream: CUstream, hEvent: CUevent, flags: c_uint) -> CUresult;
     pub fn cuStreamBeginCapture_v2(hStream: CUstream, mode: c_int) -> CUresult;
     pub fn cuStreamEndCapture(hStream: CUstream, phGraph: *mut CUgraph) -> CUresult;

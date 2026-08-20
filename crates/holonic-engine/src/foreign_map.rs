@@ -799,10 +799,19 @@ pub fn manifest_safetensors(address: &str) -> Result<(File, ForeignContainer), F
 }
 
 impl ForeignContainer {
-    fn base(&self) -> u64 {
+    /// **Where the payload begins in the file**: every `ForeignTensor::start` is relative to it,
+    /// so a reader that addresses the file directly — a staged refill into pinned standing, which
+    /// does not go through [`ForeignContainer::read_elements`] — must add it. It is public because
+    /// a region's declared identity carries the payload-relative span while a `pread` needs the
+    /// absolute one, and a reader that conflates the two reads the wrong octets.
+    pub fn payload_base(&self) -> u64 {
         match self.species {
             ContainerSpecies::Safetensors { base, .. } => base,
         }
+    }
+
+    fn base(&self) -> u64 {
+        self.payload_base()
     }
 
     pub fn tensor(&self, name: &str) -> Result<&ForeignTensor, ForeignMapError> {

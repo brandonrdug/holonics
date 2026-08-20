@@ -89,7 +89,7 @@ use crate::resident_section::{
 };
 use crate::source_occurrence::{BindingValidation, SourceOccurrence, SourceRefusal};
 use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainStanding};
-use mount::GraphCensus;
+use mount::{GraphCensus, Stream};
 
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
@@ -837,6 +837,46 @@ impl<'chart> FrontPassage<'chart> {
         prediction
     }
 
+    /// **Predict a POOLED material deed**: standing slots admitted once and rewritten between
+    /// deeds, rather than one mount allocated and released per deed.
+    ///
+    /// The difference from [`FrontPassage::predict_material`] is exactly where the stored
+    /// codewords sit. In the per-deed path they are a **transient** staging that exists only while
+    /// one map aligns, so the prediction carries the largest of them as a peak beyond the resident
+    /// standing. In the pooled path the stored region is part of the slot and stays for the life
+    /// of the circulation, so it is **resident** and the transient peak is zero — there is no
+    /// moment at which the pool holds more than it was admitted for.
+    ///
+    /// `ingress_octets` is the whole tower's crossing, not one slot's: a slot is refilled once per
+    /// segment and the caller declares how many segments each slot carries.
+    pub fn predict_pooled_material(&self, slots: &[crate::streamed_standing::SlotShape], refills: &[u64], band_elements: usize, positions: usize) -> MaterialPrediction {
+        let grain = self.surface.allocation_grain();
+        let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
+        for (which, slot) in slots.iter().enumerate() {
+            let octets = slot.octets() as u64;
+            prediction.maps.push((slot.name.clone(), octets, slot.stored_octets as u64));
+            prediction.resident_octets += octets;
+            prediction.ingress_octets += slot.stored_octets as u64 * refills.get(which).copied().unwrap_or(1);
+            prediction.allocations += 1;
+            prediction.charged_octets += rounded_to(octets, grain);
+        }
+        if band_elements > 0 {
+            let octets = (band_elements * 4 * 8) as u64;
+            prediction.resident_octets += octets;
+            prediction.ingress_octets += octets;
+            prediction.allocations += 4;
+            prediction.charged_octets += 4 * rounded_to(octets / 4, grain);
+        }
+        if positions > 0 {
+            let octets = (positions * 4) as u64;
+            prediction.resident_octets += octets;
+            prediction.ingress_octets += octets;
+            prediction.allocations += 1;
+            prediction.charged_octets += rounded_to(octets, grain);
+        }
+        prediction
+    }
+
     /// **Admit the material deed** against the device's free memory now, before any map is
     /// allocated: the charged residency plus the transient peak must fit. A refusal names the
     /// coordinate; nothing was allocated.
@@ -947,22 +987,14 @@ impl<'chart> FrontPassage<'chart> {
                 // failed and the law to bind instead.
                 if law.seals_predecessor() {
                     let predecessor = inputs[0].event;
-                    let reading = consumers.get(&predecessor).cloned().unwrap_or_default();
-                    let because = if reading.len() != 1 || !reading.contains(occurrence) {
-                        Some(format!(
-                            "the predecessor's section is read by {} occurrences ({:?}) and the fusion rewrites it in place; only the quotient may read it",
-                            reading.len(),
-                            reading.iter().map(|e| e.0).collect::<Vec<_>>()
-                        ))
-                    } else if predecessor == terminal {
-                        Some("the predecessor is the declared terminal, so the receiver reads its pre-quotient enclosure".to_owned())
-                    } else if self.declared_faces.contains(&predecessor) {
-                        Some("the receiver declared the predecessor's pre-quotient enclosure as a face it reads".to_owned())
-                    } else if realization.bindings.get(&predecessor).map(|l| l.seals_predecessor()).unwrap_or(false) {
-                        Some("the predecessor is itself a fused seal, so its section is already another occurrence's".to_owned())
-                    } else {
-                        None
-                    };
+                    let because = seal_unfactored(
+                        &consumers,
+                        *occurrence,
+                        predecessor,
+                        terminal,
+                        &self.declared_faces,
+                        realization.bindings.get(&predecessor).map(|l| l.seals_predecessor()).unwrap_or(false),
+                    );
                     if let Some(because) = because {
                         return Err(CompileRefusal::FusionUnfactored {
                             quotient: *occurrence,
@@ -1387,6 +1419,83 @@ impl<'chart> FrontPassage<'chart> {
     }
 }
 
+/// **The §4.6 fusion condition, decided from the diagram alone.** `None` when the seal is
+/// factored — every declared future receiver reads through the fused output — and otherwise the
+/// sentence naming which of the four readings failed.
+///
+/// It lives as one function because two callers need the same verdict: [`FrontPassage::compile`],
+/// which ENFORCES it and refuses the deed, and [`factored_seals`], which a caller uses to decide
+/// which quotients to bind fused **before** compiling. Two spellings of one condition is how a
+/// pre-check and a guard drift apart.
+fn seal_unfactored(
+    consumers: &BTreeMap<EventId, BTreeSet<EventId>>,
+    quotient: EventId,
+    predecessor: EventId,
+    terminal: EventId,
+    declared: &BTreeSet<EventId>,
+    predecessor_is_itself_a_seal: bool,
+) -> Option<String> {
+    let reading = consumers.get(&predecessor).cloned().unwrap_or_default();
+    if reading.len() != 1 || !reading.contains(&quotient) {
+        return Some(format!(
+            "the predecessor's section is read by {} occurrences ({:?}) and the fusion rewrites it in place; only the quotient may read it",
+            reading.len(),
+            reading.iter().map(|e| e.0).collect::<Vec<_>>()
+        ));
+    }
+    if predecessor == terminal {
+        return Some("the predecessor is the declared terminal, so the receiver reads its pre-quotient enclosure".to_owned());
+    }
+    if declared.contains(&predecessor) {
+        return Some("the receiver declared the predecessor's pre-quotient enclosure as a face it reads".to_owned());
+    }
+    if predecessor_is_itself_a_seal {
+        return Some("the predecessor is itself a fused seal, so its section is already another occurrence's".to_owned());
+    }
+    None
+}
+
+/// **Which of a founded diagram's midpoint quotients may be bound as FUSED seals**, and why each
+/// of the rest may not.
+///
+/// A caller that founded a diagram with the unfused [`MidpointQuotient`] everywhere — because the
+/// site that founds it does not know which faces this receiver will read — asks this, rebinds the
+/// returned occurrences to [`SealedMidpointQuotient`], and compiles. The refused list is the
+/// receipt of what the receiver's own declarations cost: each entry is an occurrence whose
+/// pre-quotient enclosure something reads.
+///
+/// **This decides nothing semantic.** Fusion moves no returned word; it is the apparatus
+/// compression of two nodes into one, and the reopening route is to bind the unfused law.
+pub fn factored_seals(
+    complex: &PortedOperationComplex,
+    realization: &ResidentRealization,
+    terminal: EventId,
+    declared: &BTreeSet<EventId>,
+) -> (Vec<EventId>, Vec<(EventId, String)>) {
+    let consumers = FrontPassage::consumers(complex);
+    let arriving = FrontPassage::arriving(complex);
+    let quotients: BTreeSet<EventId> = realization
+        .bindings
+        .iter()
+        .filter(|(_, law)| law.name().starts_with("midpoint-quotient"))
+        .map(|(occurrence, _)| *occurrence)
+        .collect();
+    let mut fusable = Vec::new();
+    let mut refused = Vec::new();
+    for quotient in &quotients {
+        let Some(source) = arriving.get(&OccurrencePort::input(*quotient, 0)) else {
+            refused.push((*quotient, "the quotient's input carries no bond".to_owned()));
+            continue;
+        };
+        let predecessor = source.event;
+        match seal_unfactored(&consumers, *quotient, predecessor, terminal, declared, quotients.contains(&predecessor)) {
+            None => fusable.push(*quotient),
+            Some(because) => refused.push((*quotient, because)),
+        }
+    }
+    (fusable, refused)
+}
+
 /// **Which occurrence owns the buffer an occurrence's words live in.** A sealing occurrence's
 /// section is its predecessor's, rewritten in place; every lookup resolves through this. Chained
 /// seals are refused at compile, so the walk takes at most one step, and the loop is written anyway
@@ -1630,7 +1739,12 @@ impl<'chart> CompiledPassage<'chart> {
             let refusal = slot.refusal(operation, bound).unwrap_or(ResidentRefusal::Upstream { operation: operation.to_owned() });
             return Err(FrontPassageObstruction::Refused { occurrence, operation: operation.to_owned(), refusal, slot, lineage: returned.obstruction.clone() });
         }
-        self.surface.read_out(&self.sections[&occurrence]).map_err(surface_refusal)
+        // A FUSED occurrence's words are its predecessor's buffer, rewritten in place, so the
+        // lookup resolves through the seal exactly as [`CompiledPassage::section`] does. Reading a
+        // fused quotient's OWN face is lawful and is what a receiver declaring the quotient asks
+        // for; it was a panic until 2026-08-19, when the streamed circulation read the final
+        // normed standing — a quotient — through a fused seal for the first time.
+        self.surface.read_out(&self.sections[&owner_of(&self.sealed, occurrence)]).map_err(surface_refusal)
     }
 
     /// The graph as the apparatus bound it, and what the builder intended.
@@ -1666,6 +1780,40 @@ impl<'chart> CompiledPassage<'chart> {
             return Err(surface_refusal(ResidentRefusal::ModeMismatch { expected: Box::new(expected.clone()), actual: Box::new(actual) }));
         }
         let reading = self.passage.launch().map_err(surface_refusal)?;
+        Ok(self.compose(reading))
+    }
+
+    /// **Launch this deed onto a caller's stream, and return nothing yet.**
+    ///
+    /// The same mode guard, the same graph, the same deed. What is deferred is the terminal
+    /// synchronization: a caller conducting a succession of passages whose standings cross on the
+    /// card orders every graph on one stream, so the apparatus never waits between them, and then
+    /// synchronizes once and asks each passage for its return through
+    /// [`CompiledPassage::returned`]. Returns the census reading taken **before** the launch,
+    /// which the return needs and which cannot be re-taken later.
+    ///
+    /// A caller that reads a section before synchronizing reads a deed that has not finished; the
+    /// two calls are separate exactly so that the synchronization is a declared act rather than a
+    /// side effect of asking a question.
+    pub fn launch_on(&self, expected: &ModeIdentity, stream: &Stream) -> Result<TransferCensus, FrontPassageObstruction> {
+        if self.released {
+            return Err(surface_refusal(ResidentRefusal::Declaration { operation: "passage", what: "a section was released to a later passage; this passage may not launch again".to_owned() }));
+        }
+        let actual = self.surface.mode();
+        if *expected != actual {
+            return Err(surface_refusal(ResidentRefusal::ModeMismatch { expected: Box::new(expected.clone()), actual: Box::new(actual) }));
+        }
+        self.passage.launch_on(stream).map_err(surface_refusal)
+    }
+
+    /// **The return of a deed launched with [`CompiledPassage::launch_on`]**, read after the
+    /// caller's terminal synchronization. Identical in every field to what `launch` returns.
+    pub fn returned(&self, census_before: TransferCensus) -> Result<PassageReturn, FrontPassageObstruction> {
+        let reading = self.passage.census(census_before).map_err(surface_refusal)?;
+        Ok(self.compose(reading))
+    }
+
+    fn compose(&self, reading: crate::resident_section::PassageReading) -> PassageReturn {
         let mut fronts = Vec::with_capacity(self.receipts.len());
         let mut measured_octaves = BTreeMap::new();
         let mut refusals = Vec::new();
@@ -1698,7 +1846,7 @@ impl<'chart> CompiledPassage<'chart> {
                 .collect();
             fronts.push(FrontDeedReading { depth: front.depth, readings, couplings });
         }
-        Ok(PassageReturn { fronts, census_before: reading.census_before, census_after: reading.census_after, measured_octaves, obstruction: reading.obstruction, refusals })
+        PassageReturn { fronts, census_before: reading.census_before, census_after: reading.census_after, measured_octaves, obstruction: reading.obstruction, refusals }
     }
 
     /// The first refusal in front order as a typed obstruction, or `Ok` when every occurrence
@@ -1816,6 +1964,97 @@ mod tests {
             realization.bind(r, WithdrawColumns { from: 0, span: 1 });
         }
         (complex, realization, e, s, q)
+    }
+
+    /// **`factored_seals` answers, from the diagram alone, exactly what the compile enforces.**
+    ///
+    /// A caller founding a diagram with the unfused quotient everywhere — which is what
+    /// `phoenix/tower.rs` does, because a site does not know which faces a receiver will read —
+    /// asks this before compiling and rebinds what it returns. The falsifier is that the two must
+    /// never disagree: an occurrence `factored_seals` names must bind fused, and one it refuses
+    /// must refuse at compile with the same sentence.
+    #[test]
+    fn factored_seals_and_the_compile_agree_on_which_quotients_may_fuse_in_this_circulation() {
+        // (i) the legal shape: the quotient's predecessor has exactly one consumer.
+        let (complex, realization, _, scale, q) = sealed_diagram(false, false);
+        let (fusable, refused) = factored_seals(&complex, &realization, q, &BTreeSet::new());
+        assert_eq!(fusable, vec![q], "the one quotient is factored");
+        assert!(refused.is_empty(), "{refused:?}");
+
+        // (ii) the receiver declares the predecessor's pre-quotient face: the seal is unfactored,
+        //      and the sentence is the compile's own.
+        let declared: BTreeSet<EventId> = [scale].into_iter().collect();
+        let (fusable, refused) = factored_seals(&complex, &realization, q, &declared);
+        assert!(fusable.is_empty());
+        assert_eq!(refused.len(), 1);
+        assert!(refused[0].1.contains("declared"), "{:?}", refused[0]);
+
+        // (iii) the terminal is the predecessor itself.
+        let (fusable, refused) = factored_seals(&complex, &realization, scale, &BTreeSet::new());
+        assert!(fusable.is_empty());
+        assert!(refused[0].1.contains("terminal"), "{:?}", refused[0]);
+
+        // (iv) a second consumer reads the predecessor.
+        let (complex, realization, _, _, q) = sealed_diagram(false, true);
+        let (fusable, refused) = factored_seals(&complex, &realization, q, &BTreeSet::new());
+        assert!(fusable.is_empty(), "a second reader is exactly what the fusion may not fuse away");
+        assert!(refused[0].1.contains("read by 2"), "{:?}", refused[0]);
+    }
+
+    /// **A fused quotient's OWN face is readable, and it is the collapsed one.**
+    ///
+    /// The seal rewrites its predecessor's buffer in place, so the quotient carries no section of
+    /// its own and the lookup must resolve through the seal. Reading it was a panic until the
+    /// streamed circulation asked for the final normed standing — which is a quotient — through a
+    /// fused seal. The falsifier is that the fused and unfused readings of the same occurrence are
+    /// the same words.
+    #[test]
+    fn a_fused_quotients_own_face_is_readable_and_equals_the_unfused_pairs() {
+        let Some((_, surface)) = surface() else { return };
+        let material = material();
+        let receiver = DeedReceiver::unbounded();
+        let (complex, realization, _, _, q) = sealed_diagram(true, false);
+        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&complex, &realization, &material, &occurrence(), &receiver, None, q).expect("the fusion binds");
+        let returned = fused.launch(&surface.mode()).expect("the fused deed");
+        let fused_face = fused.read_section(&returned, q).expect("the fused quotient's own face is readable");
+
+        let (uc, ur, _, _, uq) = sealed_diagram(false, false);
+        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("the unfused pair binds");
+        let unreturned = unfused.launch(&surface.mode()).expect("the unfused deed");
+        let unfused_face = unfused.read_section(&unreturned, uq).expect("the unfused quotient's face");
+        assert_eq!(fused_face, unfused_face, "the fusion moved a returned word");
+    }
+
+    /// **The deferred launch returns the same deed as the immediate one.** `launch_on` records the
+    /// graph onto a caller's stream and waits for nothing; `returned` reads the same census words
+    /// after the caller's own terminal synchronization. The falsifier is that the two readings must
+    /// agree in every field — one synchronization for a whole circulation is only lawful if what
+    /// comes back is what `launch` would have returned.
+    #[test]
+    fn a_deferred_launch_onto_a_callers_stream_returns_the_same_deed_as_an_immediate_one() {
+        let Some((_, surface)) = surface() else { return };
+        let material = material();
+        let (complex, realization, _, _, h) = small_diagram();
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let bound = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, h).expect("binds");
+        let immediate = bound.launch(&surface.mode()).expect("the immediate deed");
+        let immediate_face = bound.read_terminal(&immediate).expect("the immediate terminal");
+
+        let stream = Stream::create().expect("a conducting stream");
+        let before = bound.launch_on(&surface.mode(), &stream).expect("the deferred deed");
+        surface.synchronize_counted(&stream).expect("the terminal synchronization");
+        let deferred = bound.returned(before).expect("the deferred return");
+        let deferred_face = bound.read_terminal(&deferred).expect("the deferred terminal");
+
+        assert_eq!(immediate_face, deferred_face, "the deed does not move with where its terminal synchronization sits");
+        assert_eq!(immediate.obstruction, deferred.obstruction);
+        assert_eq!(immediate.measured_octaves, deferred.measured_octaves);
+        for (a, b) in immediate.fronts.iter().zip(&deferred.fronts) {
+            assert_eq!(a.depth, b.depth);
+            for (x, y) in a.readings.iter().zip(&b.readings) {
+                assert_eq!(x.measured, y.measured, "occurrence {:?} censused differently", x.occurrence);
+            }
+        }
     }
 
     /// **Part C's fusion condition, decided at compile from the diagram.** The legal case binds and
