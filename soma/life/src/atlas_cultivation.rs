@@ -80,6 +80,9 @@ use crate::suffix_ecology::{AbsorbLineage, ExactSuffixEcology, ExtendEvent};
 /// The schema the P0 rest declares and this cultivation preserves.
 pub const REST_SCHEMA: &str = "holonic-engine.athena-native-rest.v1";
 
+/// The container region carrying [`AthenaRest::extent`]. Optional, and absent from P0's rest.
+pub const EXTENT_REGION: &str = "athena.class.extent";
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CultivationRefusal {
     /// A rest the reader cannot resolve as the declared container.
@@ -135,6 +138,22 @@ pub struct AthenaRest {
     pub target: Vec<u64>,
     pub standing: Vec<u64>,
     pub suffix: Vec<u64>,
+    /// **The longest substring each class represents** — the transport's own `class_extent`.
+    ///
+    /// **Empty means the container does not carry it**, which is the P0 rest's state: P0 emitted
+    /// the transport, the standings, the suffix links and the vocabulary, and every one of the
+    /// three declared laws reads only those, so a rest without this array *conducts* perfectly.
+    /// It cannot be **deposited into** from itself: [`crate::suffix_ecology::ExactSuffixEcology`]
+    /// finds the class the concatenation ends in as the unique class of greatest extent, decides a
+    /// split by comparing extents, and orders the occurrence fold by extent, so an extent that is
+    /// absent or guessed is three wrong answers rather than one. Measured on the committed P0 rest
+    /// 2026-08-20: 23 of its 59,698 classes are unreachable from the root over the germ transport
+    /// alone — the classes whose longest string crosses a path boundary — so the array is not
+    /// derivable from what P0 carried and is carried here instead.
+    ///
+    /// Emitting it is opt-in ([`crate::phoenix_rest::seal`]), so every standing container's octets
+    /// are unmoved.
+    pub extent: Vec<u64>,
     pub vocabulary: Vec<String>,
     pub height: u32,
     pub metadata: BTreeMap<String, String>,
@@ -260,12 +279,20 @@ impl AthenaRest {
                 .push(String::from_utf8(bytes).map_err(|_| refuse("a vocabulary germ is not UTF-8"))?);
         }
         let architecture = words("athena.architecture")?;
+        // The extent region is optional and its absence is a fact about the container rather than
+        // a fault: P0 emitted no extents and this reader must still mount P0's rest.
+        let extent = if header.contains(&format!("\"{EXTENT_REGION}\":")) {
+            words(EXTENT_REGION)?
+        } else {
+            Vec::new()
+        };
         Ok(Self {
             indptr: words("athena.transport.indptr")?,
             germ: words("athena.transport.germ")?,
             target: words("athena.transport.target")?,
             standing: words("athena.class.standing")?,
             suffix: words("athena.class.suffix")?,
+            extent,
             vocabulary,
             height: u32::try_from(architecture[0]).map_err(|_| refuse("architecture height"))?,
             metadata,
@@ -285,12 +312,18 @@ impl AthenaRest {
             emit_integers(name, values, 1, dtype)
                 .map_err(|error| CultivationRefusal::Container(format!("{name}: {error:?}")))
         };
-        let tensors = vec![
+        let mut tensors = vec![
             emit("athena.transport.indptr", &self.indptr, IntegerDtype::U32)?,
             emit("athena.transport.germ", &self.germ, IntegerDtype::U32)?,
             emit("athena.transport.target", &self.target, IntegerDtype::U32)?,
             emit("athena.class.standing", &self.standing, IntegerDtype::U32)?,
             emit("athena.class.suffix", &self.suffix, IntegerDtype::U32)?,
+        ];
+        // Written only where it is carried, so a container that never had it is octet-unmoved.
+        if !self.extent.is_empty() {
+            tensors.push(emit(EXTENT_REGION, &self.extent, IntegerDtype::U32)?);
+        }
+        tensors.extend([
             emit("athena.vocabulary.octets", &vocabulary_octets, IntegerDtype::U16)?,
             emit("athena.vocabulary.offsets", &vocabulary_offsets, IntegerDtype::U32)?,
             emit(
@@ -303,7 +336,7 @@ impl AthenaRest {
                 ],
                 IntegerDtype::U32,
             )?,
-        ];
+        ]);
         Ok(write_container(&tensors, &self.metadata))
     }
 }
@@ -443,6 +476,8 @@ pub fn emit_rest(
         target,
         standing,
         suffix,
+        // The emission is P0's face exactly. `phoenix_rest::seal` attaches the extents.
+        extent: Vec::new(),
         vocabulary: ordered,
         height: chart.height,
         metadata,
@@ -1163,6 +1198,11 @@ pub fn commit(
         target,
         standing: delta.standing.clone(),
         suffix,
+        // A commit derives the germ side by replay. A class extent is not among the rows the delta
+        // carries — `ExtendEvent` records what was founded, not how long it is — so the successor's
+        // extents come from the transport that deposited, and `phoenix_rest::cultivate` attaches
+        // them there and says so.
+        extent: Vec::new(),
         vocabulary,
         height: chart.height,
         metadata: predecessor.metadata.clone(),
@@ -1278,6 +1318,8 @@ pub fn withdraw(
         target,
         standing,
         suffix,
+        // A withdrawal cannot restore an extent it never carried; the ablated body is the P0 face.
+        extent: Vec::new(),
         vocabulary,
         height: chart.height,
         metadata,

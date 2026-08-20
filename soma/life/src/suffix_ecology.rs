@@ -782,6 +782,92 @@ impl ExactSuffixEcology {
         Ok((ecology, source_catalogue, source_incidence))
     }
 
+    /// ★ **MOUNT A STANDING ECOLOGY FROM THE ARRAYS IT EMITTED — the container's return edge.**
+    ///
+    /// **Added 2026-08-20 for Deed P4.** [`crate::atlas_cultivation::emit_rest`] takes a standing
+    /// ecology to a container; nothing took a container back to a standing ecology, so an
+    /// application handed a sealed rest could conduct it and could not deposit into it. Cultivating
+    /// therefore required the corpus — the P3 driver rebuilds the predecessor from its eight
+    /// documents — which is exactly the source lookup a frozen runtime may not perform.
+    ///
+    /// # What the container has to carry for this to be exact, and what it does not
+    ///
+    /// The **germ transport, the suffix links, the folded standings and the class extents** are the
+    /// whole of the frozen body's germ side, and this reconstructs it from them alone. Two things
+    /// the emission drops are genuinely not needed:
+    ///
+    /// - **the path-boundary transitions.** A boundary symbol occurs once, so a later germ
+    ///   extension never traverses one, and a later boundary extension is handed a symbol no class
+    ///   offers — which walks to the root adding transitions and clones nothing, whether the older
+    ///   boundaries are present or absent. The classes those extensions founded are all present;
+    ///   only their boundary rows are gone, and the next emission drops those again.
+    /// - **the boundary counter.** With no boundary rows the next separator is `0`, which is fresh
+    ///   in this body for the same reason.
+    ///
+    /// The **extents are needed and are not derivable**: the class reached by the whole
+    /// concatenation is the unique class of greatest extent, a split is decided by comparing
+    /// extents, and the occurrence fold is ordered by extent. Longest-path over the germ transport
+    /// recovers an extent only for a class whose longest string crosses no boundary — measured on
+    /// the committed P0 rest, 23 of 59,698 classes are not even reachable that way.
+    ///
+    /// The suffix-link invariant every one of those three uses is **checked here rather than
+    /// trusted**: a link climbs to a strictly shorter class.
+    pub fn mount_emitted(
+        extent: &[u64],
+        suffix: &[u64],
+        standing: &[u64],
+        rows: &[Vec<(ResonanceGerm, u32)>],
+    ) -> Result<Self, ExactSuffixEcologyError> {
+        let classes = extent.len();
+        if classes == 0
+            || suffix.len() != classes
+            || standing.len() != classes
+            || rows.len() != classes
+        {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        if extent[0] != 0 {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        let mut states = Vec::new();
+        states
+            .try_reserve_exact(classes)
+            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+        let mut material_transitions = 0usize;
+        for (at, row) in rows.iter().enumerate() {
+            let parent = if at == 0 {
+                None
+            } else {
+                let parent = usize::try_from(suffix[at])
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                if parent >= classes || parent == at || extent[parent] >= extent[at] {
+                    return Err(ExactSuffixEcologyError::InvalidWire);
+                }
+                Some(parent)
+            };
+            let mut transitions = LocalRelations::new();
+            for (germ, target) in row {
+                let target = usize::try_from(*target)
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                if target >= classes {
+                    return Err(ExactSuffixEcologyError::InvalidWire);
+                }
+                transitions.try_insert(SuffixSymbol::Germ(GermKey::from_germ(germ)), target)?;
+                material_transitions = material_transitions
+                    .checked_add(1)
+                    .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
+            }
+            states.push(SuffixBuilderState {
+                maximum_length: usize::try_from(extent[at])
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                suffix: parent,
+                material_end_multiplicity: standing[at],
+                transitions,
+            });
+        }
+        SuffixEcologyBuilder { states }.freeze(material_transitions)
+    }
+
     /// ★ **ABSORB ONE FURTHER PATH INTO A STANDING ECOLOGY.**
     ///
     /// Measured 2026-08-18: `CausalLanguageEcology` carried **no `&mut self` method at all** and

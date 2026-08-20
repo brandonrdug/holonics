@@ -51,6 +51,10 @@ pub mod live_current_cuda;
 pub mod material_incidence;
 pub mod material_shadow_cuda;
 pub mod morphological_language;
+// Deed P4: the rest is mounted alone — conducted, deposited into, and re-sealed — with the
+// corpus and the source absent from the path. It composes `atlas_cultivation`'s law with
+// `suffix_ecology`'s new return edge and founds no organ of its own.
+pub mod phoenix_rest;
 pub mod presentation_quotient;
 pub mod relational_language;
 // The receiver-relative preimage population of a presented token occurrence. It lives here because

@@ -175,8 +175,8 @@ soma/life/src/agentic_language/relational_return.rs	.collect()=1	.flat_map()=2
 soma/life/src/agentic_language/tests.rs	.clone()=4	BTreeSet=1
 soma/life/src/agentic_research.rs	.flat_map()=1	BTreeSet=2	Vec=7
 soma/life/src/algorithmic_material.rs	.clone()=10	.collect()=15	.into_iter()=6	BTreeMap=10	BTreeSet=7	Vec=34
-soma/life/src/atlas_cultivation.rs	.clone()=25	.collect()=30	.into_iter()=4	BTreeMap=34	BTreeSet=14	Vec=93
-soma/life/src/bin/eros.rs	.clone()=3	.collect()=15	.flat_map()=1	BTreeMap=5	BTreeSet=11	Vec=28
+soma/life/src/atlas_cultivation.rs	.clone()=25	.collect()=30	.into_iter()=4	BTreeMap=34	BTreeSet=14	Vec=98
+soma/life/src/bin/eros.rs	.clone()=4	.collect()=18	.flat_map()=1	BTreeMap=7	BTreeSet=11	Vec=34
 soma/life/src/causal_language.rs	.clone()=45	.collect()=27	.flat_map()=1	.into_iter()=9	BTreeMap=48	BTreeSet=44	Vec=58
 soma/life/src/causal_section.rs	.clone()=16	.collect()=23	.flat_map()=1	.into_iter()=3	BTreeMap=9	BTreeSet=15	Vec=28
 soma/life/src/causal_section/tests.rs	.collect()=3	.into_iter()=1	BTreeMap=2	BTreeSet=7	Vec=1
@@ -212,6 +212,7 @@ soma/life/src/morphological_language/current.rs	.clone()=12	.collect()=15	.flat_
 soma/life/src/morphological_language/ecology.rs	.clone()=104	.collect()=58	.flat_map()=9	.into_iter()=11	BTreeMap=41	BTreeSet=103	Vec=65
 soma/life/src/morphological_language/generated.rs	.clone()=8	.collect()=5	.into_iter()=3	BTreeMap=3	BTreeSet=33	Vec=19
 soma/life/src/morphological_language/tests.rs	.clone()=2	.collect()=10	.flat_map()=3	.into_iter()=4	BTreeSet=6	Vec=3
+soma/life/src/phoenix_rest.rs	.clone()=7	.collect()=14	.into_iter()=1	BTreeMap=5	BTreeSet=3	Vec=28
 soma/life/src/presentation_quotient.rs	.clone()=17	.collect()=16	.into_iter()=2	BTreeMap=22	BTreeSet=12	Vec=59
 soma/life/src/reconstruction_fiber.rs	.clone()=6	.collect()=12	.flat_map()=1	BTreeMap=2	BTreeSet=14	Vec=17
 soma/life/src/reconstruction_fiber/edit.rs	.clone()=3	.collect()=4	BTreeSet=5	Vec=4
@@ -229,7 +230,7 @@ soma/life/src/research_intelligence.rs	.clone()=14	.collect()=10	.into_iter()=2	
 soma/life/src/resonance_ecology.rs	.clone()=13	.collect()=3	.into_iter()=2	BTreeMap=3	BTreeSet=3	Vec=47
 soma/life/src/resonance_ecology/ecology.rs	.clone()=22	.collect()=6	.into_iter()=3	BTreeMap=3	BTreeSet=2	Vec=12
 soma/life/src/resonance_ecology/tests.rs	.collect()=1
-soma/life/src/suffix_ecology.rs	.clone()=19	.collect()=29	.flat_map()=1	.into_iter()=9	BTreeMap=4	BTreeSet=11	Vec=44
+soma/life/src/suffix_ecology.rs	.clone()=19	.collect()=29	.flat_map()=1	.into_iter()=9	BTreeMap=4	BTreeSet=11	Vec=46
 soma/life/src/synchronized_occurrence.rs	.collect()=1	.into_iter()=1	BTreeMap=2	BTreeSet=4	Vec=11
 soma/life/src/synchronized_occurrence/chart.rs	.clone()=19	.collect()=20	.into_iter()=6	BTreeMap=7	BTreeSet=3	Vec=52
 soma/life/src/synchronized_occurrence/ecology.rs	.clone()=11	.collect()=6	BTreeMap=12	BTreeSet=10	Vec=3

@@ -260,6 +260,29 @@ Composed with the standing training owner (`ConsequenceRelation` imported, `abso
 lineage and bit-identical). Ten of ten controls. **Deed P4 (native rest, export, frozen inference)
 is next.** `CONSTRUCTION_STATE.md` does not move.
 
+**DEED P4 PASSED 2026-08-20 — the application infers and cultivates from the rest alone, and the
+corpus lookup is gone.** Record:
+[`research/records/2026-08-20_THE_APPLICATION_INFERS_AND_CULTIVATES_FROM_THE_REST_ALONE_AND_THE_CORPUS_LOOKUP_IS_GONE.md`](../research/records/2026-08-20_THE_APPLICATION_INFERS_AND_CULTIVATES_FROM_THE_REST_ALONE_AND_THE_CORPUS_LOOKUP_IS_GONE.md).
+`eros phoenix infer` and `eros phoenix cultivate` are wired into the standing application under its
+own conventions (unwired stays named unwired; `--card` refuses UNWIRED); the law lives in
+`phoenix_rest.rs`, the binary holds no reading of its own. **The deed's main finding: the P3 driver
+still rebuilt its predecessor from the corpus — the blueprint's own falsifier — and the missing
+rest→atlas mount exposed a real P0 container gap** (class extents underivable; 23 classes unreachable
+over the germ transport, measured), repaired by one optional region that leaves every standing
+container octet-identical, refused by name when absent, and falsified by a unit test (mounted-equals-
+corpus-built, identical lineage and emitted container). Ten controls held: two-process seal byte
+identity; the application's own descriptor audit; the missing-rest typed refusal; frozen inference
+re-read from disk; a distinct successor whose conduct diverges while the predecessor stands — with
+the three-face honesty table naming depth-0 support as the only face a subject-disjoint control can
+be taken on; unseen material at runtime plus a second-generation cultivation; the honest GPU form
+(the device never opened; the first form of the check convicted the audit of naming what it refuses
+and was repaired); no subprocess; the export round trip with 0 of 59,698 classes differing; the
+content bar measured with the vocabulary honestly noted as material-derived surfaces. **GGUF refused
+with its reason** (the payload is expressible; the law has no lawful home; a false architecture
+declaration or an unloadable file both fail the recovered-atlas criterion). **Deed P5 — the reborn
+dissection and the complete Phoenix grade, the only deed that moves `CONSTRUCTION_STATE.md` — is
+next.**
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

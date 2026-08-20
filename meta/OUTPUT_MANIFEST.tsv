@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 66 drivers, 15539 returns, 10293256185 bytes.
+# 67 drivers, 15544 returns, 10298933198 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -50,6 +50,7 @@ bcb7bd027c399a57a2f7acf8de054227fc251736109b2a9ec3b596712d424510	256	5229153	out
 b5a3ff8a8b0f6c0d9f8f51217e25f1d5ca1d55164b9abd79acd96d36c3d94474	258	175889	output/the-returned-difference-is-a-ratio
 95223e6711842c604a3b411079eb0ebda82f5d2b3c0119f3fe95d5bf4e38ca19	17	2889	output/the-two-theorem-deed
 ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output/the_ablated_body_rests_and_remounts
+058603759b3439b0bc9979ee5a21475e56f00ecb59f3adb1bee578e850838394	5	5677013	output/the_application_infers
 4d20fe96b9fcd6039b03fdf059911caea2b2321ab6214ad3f0718f4ff3d10359	4	4890211	output/the_atlas_condenses
 c2b103d4e0827cf01d8f1598fd24c635277a58f89d44945e6991dbf86ba2ddb0	2	162371	output/the_code_material_returns_its_world_line
 f5334896fa342e21b7f669d011fab545c6fd4a7299cd358472a1594e2a944cc8	2	363732	output/the_conditioned_section_returns_after_detachment
