@@ -161,6 +161,27 @@ the staged bytes are now compared word-for-word against the container's own read
 (Station D through shared prefixes; the foreman path then deleted from live construction) is
 next.** `CONSTRUCTION_STATE.md` does not move.
 
+**DEED H5 PASSED 2026-08-20 — the dissection shares its prefixes, and THE HARDWARE FOUNDATION IS
+COMPLETE (H0–H5).** Record:
+[`research/records/2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md`](../research/records/2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md).
+Station D's complete atlas reproduced through prefix-sharing and cohort conduction on the streamed
+realization: **168 of 168 committed cells UNCHANGED** (bit-exact rationals, every control verdict),
+the base conducted once and each taxon only its suffix on a read-only shared standing (proved
+structurally, measured on the card, and by a focused GPU test); one taxon conducted both ways in
+one circulation — 128 of 128 faces bit-identical including the 72 the shared sibling never
+conducted — replacing the fifteen controls prefix-sharing makes structural, each so labelled.
+Apparatus against the committed predecessor: source octets ×18 down (167 GB → 9.3 GB), mount
+synchronizations ~38,016 → 86, conduction wall ~8 min → 38.9 s, semantic work −6.3 % while
+conducting one more tower. **H4's graph key was refuted twice by measurement and repaired** — an
+address is not content (689 unsound hits keyed on residency; a pooled slot is refilled) and a count
+is not a diagram (two different one-occurrence interventions collided) — the lawful key carries the
+law names in order and every addressed thing, 3 lawful hits, one taken relaunch bit-equal, one
+boundary named open (realization parameters naming no addressed material). §10 taken by the header
+route: the foreman site is superseded evidence, the new path cannot reach it, and file deletion
+would have orphaned committed artifacts' producers. **Phoenix resumes at Deed P0**: the quarantined
+Station E material is rederived through the H owners; ARM N runs without foreign hexis beside the
+lifted arm. `CONSTRUCTION_STATE.md` does not move (only P5 moves it).
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

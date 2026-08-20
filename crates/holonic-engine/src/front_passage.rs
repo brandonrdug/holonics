@@ -2562,4 +2562,70 @@ mod tests {
         assert_eq!(reading.earliest_arrival, 1, "the skip reaches the terminal in one hop");
         assert_eq!(reading.deferred_arrivals, 1, "the chain's arrival is retained as deferred");
     }
+
+    /// **A released standing is shared READ-ONLY between sibling passages** — the relation Deed
+    /// H5's cohort rests on, measured rather than promised.
+    ///
+    /// One deed releases its terminal as a standing. Two siblings then enter on that same standing
+    /// through [`Standing`], whose realization is `section_carry`: it names the standing as an
+    /// input address and writes only its own fresh output section. Each sibling then withdraws a
+    /// DIFFERENT span of its own copy. The falsifier is direct: after both have conducted, the
+    /// released standing's words are bit-identical to what they were before either ran, and the two
+    /// siblings' returns differ from each other — so both really did read it and neither wrote it.
+    #[test]
+    fn the_cohort_shares_a_released_standing_read_only_between_sibling_passages() {
+        let Some((_, surface)) = surface() else { return };
+        let grain = ResidentGrain(20);
+        let source = occurrence();
+        let receiver = DeedReceiver::unbounded();
+
+        // the base deed: enter x, scale it, seal it, and RELEASE the seal as a standing
+        let (complex, realization, _, _, quotient) = sealed_diagram(false, false);
+        let material = material();
+        let passage = FrontPassage::new(surface, grain);
+        let mut bound = passage.bind(&complex, &realization, &material, &source, &receiver, None, quotient).expect("the base deed binds");
+        let returned = bound.launch(&surface.mode()).expect("the base deed launches");
+        bound.standing(&returned).expect("the base deed stands");
+        let (section, octaves) = bound.release_section(quotient).expect("the terminal releases as a standing");
+        let standing = std::rc::Rc::new(section);
+        let before = surface.read_out(&standing).expect("the standing reads out");
+        drop(bound);
+
+        // two siblings, each entering on the SAME standing and withdrawing a different span
+        let sibling = |from: usize, span: usize| -> Vec<(i64, i64)> {
+            let mut complex = PortedOperationComplex::new("sibling");
+            let port = complex.port("standing");
+            let declared = |what: &str| vec![SourceTestimony::Intervention { statement: what.to_owned() }];
+            let carry = complex
+                .bind_operation("carried standing", OperationSpecies::Construction, vec![], vec![port], None, declared("the sibling enters on the base's released standing"))
+                .expect("law");
+            let withdraw = complex
+                .bind_operation("span withdrawn (intervention)", OperationSpecies::Quotient, vec![port], vec![port], None, declared("the caller's intervention on its OWN copy of the shared standing"))
+                .expect("law");
+            let c = complex.occur(carry).expect("occur");
+            let w = complex.occur(withdraw).expect("occur");
+            complex.carries_precedence("the carried standing is withdrawn from", port, OccurrencePort::output(c, 0), OccurrencePort::input(w, 0)).expect("bond");
+            let mut realization = ResidentRealization::default();
+            realization.bind(c, Standing { name: "shared".to_owned() });
+            realization.bind(w, WithdrawColumns { from, span });
+            let mut material = ResidentMaterial::empty();
+            material.standings.insert("shared".to_owned(), (std::rc::Rc::clone(&standing), octaves));
+            let passage = FrontPassage::new(surface, grain);
+            let bound = passage.bind(&complex, &realization, &material, &source, &receiver, None, w).expect("the sibling binds");
+            let returned = bound.launch(&surface.mode()).expect("the sibling launches");
+            bound.standing(&returned).expect("the sibling stands");
+            bound.read_terminal(&returned).expect("the sibling returns its terminal")
+        };
+        let left = sibling(0, 16);
+        let right = sibling(16, 16);
+
+        let after = surface.read_out(&standing).expect("the standing reads out again");
+        assert_eq!(before, after, "the shared standing was written by a sibling: the read-only share is broken");
+        assert_ne!(left, right, "the two siblings withdrew different spans, so their returns must differ");
+        // and each sibling really read the shared standing: outside its withdrawn span it carries
+        // exactly the standing's own words
+        assert_eq!(left[16..], before[16..], "the left sibling's untouched half is the standing's");
+        assert_eq!(right[..16], before[..16], "the right sibling's untouched half is the standing's");
+        assert!(left[..16].iter().all(|(lo, hi)| *lo == 0 && *hi == 0), "the withdrawn span is withdrawn");
+    }
 }

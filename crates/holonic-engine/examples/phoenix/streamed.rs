@@ -287,7 +287,7 @@ pub fn describe(obstruction: &FrontPassageObstruction) -> String {
 
 /// Read one BF16 word straight out of the container — the layer scalar, which is a host dyadic and
 /// is mounted nowhere.
-fn scalar_word(file: &std::fs::File, region: &StagedRegion) -> Result<u16, String> {
+pub fn scalar_word_of(file: &std::fs::File, region: &StagedRegion) -> Result<u16, String> {
     let mut octets = [0u8; 2];
     file.read_exact_at(&mut octets, region.start).map_err(|e| e.to_string())?;
     Ok(u16::from_le_bytes(octets))
@@ -385,7 +385,7 @@ pub fn circulate(
     let mut layer_scalars = Vec::with_capacity(tower::LAYERS);
     for segment in &layer_segments {
         let region = segment.scalar.as_ref().ok_or("the layer segment carries no layer scalar")?;
-        layer_scalars.push(Dyadic::of_bfloat16_bits(scalar_word(&source.file, region)?).map_err(|e| e.to_string())?);
+        layer_scalars.push(Dyadic::of_bfloat16_bits(scalar_word_of(&source.file, region)?).map_err(|e| e.to_string())?);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -715,6 +715,19 @@ pub fn circulate(
             "the declared terminal of each segment ({} layer returns and one potential section); no other face was declared, which is why every seal factored",
             receipts.len() - 1
         ),
+        // The residency this circulation's executables baked in: the final deed's carried standing
+        // is the one addressed section that is not the pool's, and the pool's own addresses are
+        // fixed for the whole circulation. One tower, so no second deed contends for it — which is
+        // exactly why H4 could not have found this field, and H5's cohort is where it is exercised.
+        // H4 declares no chronology on its key: the circulation holds 43 diagrams and drops each
+        // as it launches, so the names are not retained here. Deed H5's cohort retains them,
+        // because a cohort is where two deeds share every count and differ by one occurrence.
+        chronology: Vec::new(),
+        material: material
+            .standings
+            .iter()
+            .map(|(name, (section, _))| (name.clone(), section.ranges()[0].0, section.rows(), section.width()))
+            .collect(),
     };
 
     let census_after = surface.census();

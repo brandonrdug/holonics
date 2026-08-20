@@ -484,6 +484,13 @@ pub struct BandElements<'chart> {
 }
 
 impl BandElements<'_> {
+    /// **Where the mounted elements live.** An apparatus coordinate, exposed for the same reason
+    /// as [`crate::embedding_fiber::MountedReadout::aligned_address`]: a graph executable's kernel
+    /// parameters bake this address in, so a caller keying an instantiated executable must be able
+    /// to say which band set it was bound over.
+    pub fn resident_address(&self) -> u64 {
+        self.cos_lo.device_ptr()
+    }
     pub fn bands(&self) -> usize {
         self.bands
     }
@@ -515,6 +522,10 @@ pub struct Positions<'chart> {
 }
 
 impl Positions<'_> {
+    /// **Where the mounted positions live** — the same apparatus coordinate, for the same reason.
+    pub fn resident_address(&self) -> u64 {
+        self.buffer.device_ptr()
+    }
     pub fn rows(&self) -> usize {
         self.rows
     }

@@ -1068,6 +1068,19 @@ impl MountedReadout<'_> {
         self.resident
     }
 
+    /// **Where the aligned words live.** An apparatus coordinate, exposed because a pooled mount
+    /// is a slot that is REFILLED between segments: a caller keying an instantiated graph
+    /// executable must be able to say which address the kernels baked in, and an address alone is
+    /// not enough — the population's name says what is in the slot now. Deed H5 measures both.
+    pub fn aligned_address(&self) -> u64 {
+        self.resident
+    }
+
+    /// The declared last-axis width of the mounted map.
+    pub fn width(&self) -> usize {
+        self.dim
+    }
+
     /// Rows the mounted map carries.
     pub fn rows(&self) -> usize {
         self.rows

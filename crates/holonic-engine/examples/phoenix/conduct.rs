@@ -1,3 +1,38 @@
+//! # SUPERSEDED 2026-08-20 BY DEED H5. COMMITTED EVIDENCE, NOT A SITE FOR NEW CONSTRUCTION.
+//!
+//! This is the per-layer apparatus foreman: it rebuilds a `SourceOccurrence` per layer, re-reads
+//! and re-digests every region per layer, mounts one map at a time, allocates and frees per deed,
+//! launches once and **synchronizes once per layer**, and conducts one complete tower per matched
+//! sibling. Deed H4 replaced its circulation (`phoenix/streamed.rs`) and **Deed H5 replaced its
+//! dissection** (`phoenix/cohort.rs`): the base prefix conducts once, every sibling conducts only
+//! its suffix on the base's standing shared read-only, and one layer's maps mount once for the
+//! whole cohort crossing that layer. Every receiver-family comparison of this foreman's committed
+//! artifact returns unchanged under the new site — 104 cells of
+//! `output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form`, parsed and compared
+//! programmatically by `examples/the_dissection_shares_its_prefixes.rs`, 0 drifted — and the same
+//! taxon conducted both ways in one circulation returns all 128 faces bit-identical.
+//!
+//! **Why the file is still here.** The plan's §10 requires that an old path be deleted without
+//! fallback once every consumer is located, and every consumer IS located: this module has exactly
+//! one, `examples/the_source_is_dissected_by_intervention.rs`, which is the producer of Station D's
+//! committed artifact. `meta/DRIVER_CATALOG.tsv` requires every catalogued driver to be in the
+//! tree and `meta/OUTPUT_MANIFEST.tsv` binds that artifact to that producer, so deleting either
+//! would orphan committed evidence. The lawful form of the deletion is therefore this header: the
+//! path is deleted from **live construction**, not from the tree.
+//!
+//! **What that means concretely, and it is checkable.** No new driver may include this module. The
+//! H5 driver includes `phoenix/cohort.rs`, `phoenix/streamed.rs`, `phoenix/tower.rs` and
+//! `phoenix/resident_layer.rs` and nothing else; it declares its own `Site` rather than importing
+//! this one, so there is **no alias, no fallback and no dual schema** — the new path cannot reach
+//! this one at all. `grep -rn 'phoenix/conduct.rs' crates/holonic-engine/examples/` returns exactly
+//! one file, measured 2026-08-20, and that file is the committed predecessor. The same holds for
+//! the tower-conducting foreman inside Station C's own driver
+//! (`examples/the_tower_conducts_layer_by_layer_and_the_future_section_is_plural.rs`): it has no
+//! consumer outside itself, it is the producer of Station C's committed artifact, and it stays as
+//! evidence under the same rule.
+//!
+//! ---
+//!
 //! **The tower deed with one declared intervention site** — the conduction Station C enacts,
 //! parameterized by a matched sibling's intervention at one site, reading the receiver family's
 //! faces (every layer's return, contact and per-layer input section, the final normed standing and

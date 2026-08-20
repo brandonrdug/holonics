@@ -38,6 +38,7 @@
 //! census face or a terminal can be reached, so *"the apparatus made no semantic choice between
 //! segments"* is a property of the type rather than a promise of the loop.
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::os::unix::fs::FileExt;
 
@@ -210,6 +211,20 @@ pub struct StreamedCensus {
 /// measured 2026-08-19 by `grep -c cuGraphExec soma/mount/src/ffi.rs` → 1, which is
 /// `cuGraphExecDestroy`. Deed H5's cohort conduction is where a second extent
 /// enters.
+///
+/// # The residency the key omitted, found by Deed H5
+///
+/// H4 founded this key over the mode, the source, the topology, the port extents, the grain and
+/// the receiver boundary — every field a *diagram* has. It carried nothing about **where the
+/// deed's carried standings live**, because H4 conducts one tower and every standing in it is
+/// produced and consumed by the same circulation. A cohort is the first caller for which that is
+/// false: sixteen matched siblings conduct the same layer diagram, at the same extents, under the
+/// same mode and source, over **different carried standings** — different device sections, whose
+/// addresses the executable's kernel parameters baked in at capture. Under H4's fields alone those
+/// deeds' keys are equal, so a cache keyed on them would relaunch one sibling's executable for
+/// another and the second sibling would read the first's standing. [`GraphKey::material`] is that
+/// missing field, and [`GraphKey::reuse_refused`] is the comparison that names which field stopped
+/// a reuse rather than merely reporting that two keys differ.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GraphKey {
     /// The surface's complete mode identity, said whole: source law, ABI, kernel, device,
@@ -220,7 +235,14 @@ pub struct GraphKey {
     pub source: String,
     /// The diagram as it was bound: occurrences, fronts, graph nodes and graph edges per segment.
     /// Plural, not a digest — a topology that differs is meant to be readable, not merely unequal.
+    ///
+    /// **These are COUNTS, and Deed H5 measured what a count cannot separate.** Two matched
+    /// siblings whose interventions each insert exactly one occurrence at different sites carry the
+    /// same four numbers at every segment. [`GraphKey::chronology`] is the diagram itself.
     pub topology: Vec<(usize, usize, usize, usize)>,
+    /// **Every occurrence's law name, in the chronology the passage bound them in.** The diagram,
+    /// not its census. Empty means the caller declared none, which is a statement about the caller.
+    pub chronology: Vec<String>,
     /// The declared port extents this executable's kernels were sized for: `(name, rows, width)`.
     pub ports: Vec<(String, usize, usize)>,
     /// The carrier grain `2^-F` and the series aperture.
@@ -231,22 +253,190 @@ pub struct GraphKey {
     pub reductions: Vec<(String, u64)>,
     /// The receiver's boundary: the declared terminal and every face it said it would read.
     pub receiver_boundary: String,
+    /// **The residency the executable's kernel parameters baked in**: every carried standing and
+    /// mounted map the deed reads by address, as `(name, device address, rows, width)`. Two deeds
+    /// whose every other field agrees but whose material sits elsewhere are **not** the same
+    /// executable, and the whole content of this field is that a reuse hit on the rest would read
+    /// the wrong section. Empty means the caller declared no addressed material — which is a
+    /// statement about the caller, not a licence.
+    pub material: Vec<(String, u64, usize, usize)>,
 }
 
 impl GraphKey {
     /// One line, for a receipt. Every field verbatim; nothing is hashed here.
     pub fn stated(&self) -> String {
         format!(
-            "mode {} · source {} · grain 2^-{} · terms {} · segments {} · ports {} · reductions {} · receiver {}",
+            "mode {} · source {} · grain 2^-{} · terms {} · segments {} · occurrences {} · ports {} · reductions {} · material {} · receiver {}",
             self.mode,
             self.source,
             self.grain,
             self.series_terms,
             self.topology.len(),
+            self.chronology.len(),
             self.ports.len(),
             self.reductions.len(),
+            self.material.len(),
             self.receiver_boundary
         )
+    }
+
+    /// **Why an executable bound under `self` may not be relaunched for a deed keyed `other`** —
+    /// the first field that differs, said in words. `None` when every field agrees, which is the
+    /// only condition under which relaunching an instantiated executable returns the deed the
+    /// caller asked for.
+    ///
+    /// The order is the order in which a difference is *cheap to see*, and `material` is checked
+    /// last because it is the one H4's key did not carry: a caller reading this receipt sees
+    /// immediately whether two deeds were separated by their diagram or only by where their
+    /// standings live.
+    pub fn reuse_refused(&self, other: &GraphKey) -> Option<String> {
+        if self.mode != other.mode {
+            return Some(format!("the mode differs: {} against {}", self.mode, other.mode));
+        }
+        if self.source != other.source {
+            return Some("the authenticated source container differs".to_owned());
+        }
+        if self.grain != other.grain || self.series_terms != other.series_terms {
+            return Some(format!(
+                "the carrier differs: grain 2^-{} terms {} against grain 2^-{} terms {}",
+                self.grain, self.series_terms, other.grain, other.series_terms
+            ));
+        }
+        if self.ports != other.ports {
+            return Some("the declared port extents differ, so the kernels were sized for other sections".to_owned());
+        }
+        if self.chronology != other.chronology {
+            let mine: BTreeSet<&str> = self.chronology.iter().map(String::as_str).collect();
+            let theirs: BTreeSet<&str> = other.chronology.iter().map(String::as_str).collect();
+            let only_mine: Vec<&&str> = mine.difference(&theirs).collect();
+            let only_theirs: Vec<&&str> = theirs.difference(&mine).collect();
+            // The difference is a MULTISET difference, not a positional one: inserting one
+            // occurrence early shifts every later name, and reporting 68 of 68 for a
+            // one-occurrence intervention would be a count standing in for the object.
+            let mut mine_counted: BTreeMap<&str, usize> = BTreeMap::new();
+            for name in &self.chronology {
+                *mine_counted.entry(name.as_str()).or_default() += 1;
+            }
+            let mut theirs_counted: BTreeMap<&str, usize> = BTreeMap::new();
+            for name in &other.chronology {
+                *theirs_counted.entry(name.as_str()).or_default() += 1;
+            }
+            let differing: usize = mine_counted
+                .keys()
+                .chain(theirs_counted.keys())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .map(|name| mine_counted.get(name).copied().unwrap_or(0).abs_diff(theirs_counted.get(name).copied().unwrap_or(0)))
+                .sum();
+            return Some(format!(
+                "the diagram's chronology differs by {differing} occurrence(s) of {}; only in the instantiated one {only_mine:?}, only in the offered one {only_theirs:?}",
+                self.chronology.len()
+            ));
+        }
+        if self.topology != other.topology {
+            return Some(format!(
+                "the diagram's census differs: {:?} against {:?} (occurrences, fronts, graph nodes, graph edges)",
+                self.topology, other.topology
+            ));
+        }
+        if self.reductions != other.reductions {
+            return Some("the named reductions differ".to_owned());
+        }
+        if self.receiver_boundary != other.receiver_boundary {
+            return Some("the receiver declared a different boundary, so a different population of seals factored".to_owned());
+        }
+        if self.material != other.material {
+            let mine: Vec<&str> = self.material.iter().map(|(n, _, _, _)| n.as_str()).collect();
+            let theirs: Vec<&str> = other.material.iter().map(|(n, _, _, _)| n.as_str()).collect();
+            if mine != theirs {
+                return Some(format!("the addressed material differs by name: {mine:?} against {theirs:?}"));
+            }
+            let moved: Vec<String> = self
+                .material
+                .iter()
+                .zip(&other.material)
+                .filter(|((_, a, _, _), (_, b, _, _))| a != b)
+                .map(|((n, a, _, _), (_, b, _, _))| format!("{n} at {a:#x} against {b:#x}"))
+                .collect();
+            return Some(format!(
+                "every field of the diagram agrees and the RESIDENCY differs — {} of {} addressed sections moved: {}",
+                moved.len(),
+                self.material.len(),
+                moved.join("; ")
+            ));
+        }
+        None
+    }
+}
+
+/// **Instantiations counted against launches, with every refusal named.**
+///
+/// A caller binding many deeds offers each one's key here before instantiating. An offer that
+/// matches a stored key is a [`Instantiation::Reused`] — the caller may relaunch that executable —
+/// and every other offer is a [`Instantiation::New`] carrying, where one exists, the nearest
+/// stored key and the sentence saying what stopped the reuse. Nothing here launches anything, and
+/// nothing here decides a semantics: it is the apparatus ledger §5.4 asks a cohort to keep.
+#[derive(Debug, Default)]
+pub struct KeyedInstantiations {
+    keys: Vec<(String, GraphKey)>,
+    /// Every offer that did not match, with the offered label, the nearest stored key's label and
+    /// the sentence naming the field that stopped it.
+    pub refusals: Vec<(String, String, String)>,
+    /// Every offer that DID match, with the offered label and the instantiated one's. A hit is a
+    /// claim that two deeds are one executable, so it is kept by name and never as a count alone.
+    pub hits_named: Vec<(String, String)>,
+    pub offers: u64,
+    pub hits: u64,
+}
+
+/// What an offer returned: an executable to relaunch, or a new instantiation with the nearest
+/// stored key and why it did not serve.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Instantiation {
+    Reused { index: usize, label: String },
+    New { index: usize, nearest: Option<(String, String)> },
+}
+
+impl KeyedInstantiations {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// The stored keys, in instantiation order.
+    pub fn instantiations(&self) -> usize {
+        self.keys.len()
+    }
+
+    /// **Offer one deed's key.** `label` names the deed for the receipt; it takes no part in the
+    /// comparison, so two deeds cannot be separated by their names.
+    pub fn offer(&mut self, label: &str, key: &GraphKey) -> Instantiation {
+        self.offers += 1;
+        if let Some((index, (stored_label, _))) = self.keys.iter().enumerate().find(|(_, (_, stored))| stored.reuse_refused(key).is_none()) {
+            self.hits += 1;
+            self.hits_named.push((label.to_owned(), stored_label.clone()));
+            return Instantiation::Reused { index, label: stored_label.clone() };
+        }
+        // The nearest stored key: the last one whose refusal is the residency alone, else the last
+        // stored key at all. "Nearest" is a reading aid and never a licence.
+        let nearest = self
+            .keys
+            .iter()
+            .rev()
+            .find_map(|(stored_label, stored)| {
+                stored.reuse_refused(key).filter(|because| because.starts_with("every field of the diagram agrees")).map(|because| (stored_label.clone(), because))
+            })
+            .or_else(|| self.keys.last().and_then(|(stored_label, stored)| stored.reuse_refused(key).map(|because| (stored_label.clone(), because))));
+        if let Some((stored_label, because)) = &nearest {
+            self.refusals.push((label.to_owned(), stored_label.clone(), because.clone()));
+        }
+        self.keys.push((label.to_owned(), key.clone()));
+        Instantiation::New { index: self.keys.len() - 1, nearest }
+    }
+
+    /// How many refusals were the residency alone — every field of the diagram agreeing while the
+    /// addressed sections differ. This is the population H4's key could not have separated.
+    pub fn residency_only_refusals(&self) -> usize {
+        self.refusals.iter().filter(|(_, _, because)| because.starts_with("every field of the diagram agrees")).count()
     }
 }
 
@@ -552,12 +742,105 @@ mod tests {
             series_terms: 14,
             reductions: vec![("section_rms_rebase".to_owned(), 2560)],
             receiver_boundary: "terminal EventId(0)".to_owned(),
+            material: vec![("carried standing".to_owned(), 0x7f00_0000, 5, 2560)],
+            chronology: vec!["entering standing".to_owned(), "input rebase".to_owned()],
         };
         let stated = key.stated();
         assert!(stated.contains("grain 2^-48"), "{stated}");
         assert!(stated.contains("terms 14"), "{stated}");
         assert!(stated.contains("segments 1"), "{stated}");
+        assert!(stated.contains("material 1"), "{stated}");
+        assert!(stated.contains("occurrences 2"), "{stated}");
         assert_eq!(key.clone(), key, "the key is a value, compared field by field");
+    }
+
+    fn cohort_key(standing: u64) -> GraphKey {
+        GraphKey {
+            mode: "exact-integer-interval-v2/exact_resident_section".to_owned(),
+            source: "identity+header".to_owned(),
+            topology: vec![(69, 45, 106, 113)],
+            ports: vec![("continuing standing, 2560".to_owned(), 5, 2560)],
+            grain: 48,
+            series_terms: 14,
+            reductions: vec![("section_rms_rebase".to_owned(), 2560)],
+            receiver_boundary: "terminal EventId(0)".to_owned(),
+            material: vec![("carried standing".to_owned(), standing, 5, 2560)],
+            chronology: vec!["entering standing".to_owned(), "input rebase".to_owned(), "contact and carried construction".to_owned()],
+        }
+    }
+
+    /// **The cohort's decisive key reading.** Two matched siblings conduct the same layer diagram
+    /// at the same extents under the same mode and source; only their carried standings sit at
+    /// different addresses. Under H4's fields alone the two keys are equal, so a cache keyed on
+    /// them would relaunch one sibling's executable for the other and the second would read the
+    /// first's standing. The residency field is what refuses it, and the refusal says so in words.
+    #[test]
+    fn a_cohort_sibling_may_not_reuse_a_sibling_executable_whose_standing_sits_elsewhere() {
+        let first = cohort_key(0x7f00_0000);
+        let second = cohort_key(0x7f10_0000);
+        let because = first.reuse_refused(&second).expect("the residency differs, so the reuse is refused");
+        assert!(because.starts_with("every field of the diagram agrees"), "{because}");
+        assert!(because.contains("carried standing"), "{because}");
+        assert!(because.contains("0x7f000000") && because.contains("0x7f100000"), "{because}");
+        // and the diagram itself is identical: nothing but the residency separates them
+        let mut stripped = second.clone();
+        stripped.material = first.material.clone();
+        assert_eq!(first.reuse_refused(&stripped), None, "with one residency the two deeds are one executable");
+    }
+
+    /// A key difference in the diagram is named as such, and never confused with a residency move.
+    #[test]
+    fn a_cohort_key_names_which_field_stopped_the_reuse() {
+        let base = cohort_key(0x7f00_0000);
+        let mut intervened = base.clone();
+        intervened.topology = vec![(71, 45, 108, 116)];
+        let because = base.reuse_refused(&intervened).expect("the diagram differs");
+        assert!(because.starts_with("the diagram's census differs"), "{because}");
+        // **What a count cannot separate, and the chronology can.** Two matched siblings whose
+        // interventions each insert exactly ONE occurrence, at different sites, carry the same four
+        // numbers — measured on the real cohort, where keying on the census admitted 697 of 714
+        // offers as reuses. The chronology names the occurrence and refuses.
+        let mut left = base.clone();
+        left.chronology.push("per-layer input withdrawn (intervention)".to_owned());
+        left.topology = vec![(70, 45, 109, 116)];
+        let mut right = base.clone();
+        right.chronology.push("gated passage span withdrawn (intervention)".to_owned());
+        right.topology = vec![(70, 45, 109, 116)];
+        assert_eq!(left.topology, right.topology, "one inserted occurrence each: the census cannot tell them apart");
+        let because = left.reuse_refused(&right).expect("the chronology differs");
+        assert!(because.starts_with("the diagram's chronology differs by 2 occurrence(s)"), "{because}");
+        assert!(because.contains("per-layer input withdrawn") && because.contains("gated passage span withdrawn"), "{because}");
+        let mut coarser = base.clone();
+        coarser.grain = 24;
+        assert!(base.reuse_refused(&coarser).is_some_and(|b| b.starts_with("the carrier differs")));
+        let mut other_extent = base.clone();
+        other_extent.ports = vec![("continuing standing, 2560".to_owned(), 7, 2560)];
+        assert!(base.reuse_refused(&other_extent).is_some_and(|b| b.starts_with("the declared port extents differ")));
+    }
+
+    /// The ledger counts instantiations against offers and keeps every refusal by name — including
+    /// the population H4's key could not have separated.
+    #[test]
+    fn the_cohort_instantiation_ledger_counts_hits_and_keeps_every_refusal() {
+        let mut ledger = KeyedInstantiations::new();
+        let first = ledger.offer("base layer 24", &cohort_key(0x7f00_0000));
+        assert!(matches!(first, Instantiation::New { index: 0, nearest: None }));
+        let sibling = ledger.offer("sibling layer 24", &cohort_key(0x7f10_0000));
+        match sibling {
+            Instantiation::New { index, nearest: Some((label, because)) } => {
+                assert_eq!(index, 1);
+                assert_eq!(label, "base layer 24");
+                assert!(because.starts_with("every field of the diagram agrees"), "{because}");
+            }
+            other => panic!("a sibling on another standing is a new instantiation: {other:?}"),
+        }
+        // the same deed offered again on the same material is one executable relaunched
+        let again = ledger.offer("base layer 24 relaunched", &cohort_key(0x7f00_0000));
+        assert!(matches!(again, Instantiation::Reused { index: 0, .. }), "{again:?}");
+        assert_eq!(ledger.instantiations(), 2);
+        assert_eq!(ledger.offers, 3);
+        assert_eq!(ledger.hits, 1);
+        assert_eq!(ledger.residency_only_refusals(), 1);
     }
 
     #[test]
