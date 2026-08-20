@@ -44,6 +44,8 @@
 mod resident_layer;
 #[path = "phoenix/tower.rs"]
 mod tower;
+#[path = "phoenix/modality.rs"]
+mod modality;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
@@ -569,8 +571,6 @@ fn rustc_identity() -> String {
 /// projection into the shared stream. Typed and entailed like every text operation; their towers'
 /// interiors are not posed here.
 fn modality_projections(root: &str, regions: &BTreeMap<String, RegionIdentity>, content_sha256: &str, assets: &[AssetDeclaration], refusals: &mut Vec<String>, bound_by: &mut BTreeMap<String, String>) -> Vec<AtlasRow> {
-    use holonic_engine::front_passage::{Contract, ResidentRealization, RmsRebase, Standing};
-    use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex};
     let mut rows = Vec::new();
     for (modality, scope, population, width, width_field) in [("vision", "vision_config", "model.embed_vision.embedding_projection.weight", 768usize, "hidden_size"), ("audio", "audio_config", "model.embed_audio.embedding_projection.weight", 1536usize, "output_proj_dims")] {
         let implementation = AuthenticatedText::read(resident_layer::IMPLEMENTATION, resident_layer::implementation_version().as_deref()).expect("implementation");
@@ -595,32 +595,13 @@ fn modality_projections(root: &str, regions: &BTreeMap<String, RegionIdentity>, 
                 continue;
             }
         };
-        let mut complex = PortedOperationComplex::new(&format!("{modality} projection into the shared stream"));
-        let modality_port = complex.port(&format!("{modality} tower output, {width}"));
-        let standing = complex.port("continuing standing, 2560");
-        let mut realization = ResidentRealization::default();
-        let tower_output = resident_layer::law(&mut complex, &format!("{modality} tower output"), OperationSpecies::Construction, vec![], vec![modality_port], None, vec![
-            resident_layer::implementation(if modality == "vision" { "Gemma4Model.get_image_features (vision_outputs.pooler_output = self.embed_vision(inputs_embeds=last_hidden_state))" } else { "Gemma4Model.get_audio_features (audio_outputs.pooler_output = self.embed_audio(inputs_embeds=audio_outputs.last_hidden_state))" }),
-            resident_layer::implementation("Gemma4MultimodalEmbedder.forward (embs_normed = self.embedding_pre_projection_norm(inputs_embeds))"),
-        ]).expect("law");
-        realization.bind(tower_output, Standing { name: format!("{modality} tower output") });
-        let rebase = resident_layer::law(&mut complex, &format!("{modality} pre-projection rebase, no gain"), OperationSpecies::Transport, vec![modality_port], vec![modality_port], None, vec![
-            resident_layer::implementation("Gemma4MultimodalEmbedder.forward (embs_normed = self.embedding_pre_projection_norm(inputs_embeds))"),
-            resident_layer::implementation("Gemma4MultimodalEmbedder.__init__ (self.embedding_pre_projection_norm = Gemma4RMSNorm(self.multimodal_hidden_size, eps=self.eps, with_scale=False))"),
-            resident_layer::implementation("Gemma4RMSNorm._norm (return hidden_states * torch.pow(mean_squared, -0.5))"),
-            resident_layer::implementation("Gemma4MultimodalEmbedder.__init__ (self.multimodal_hidden_size = getattr(multimodal_config, \"output_proj_dims\", multimodal_config.hidden_size))"),
-            resident_layer::configuration("rms_norm_eps", &eps_text),
-            resident_layer::configuration(width_field, &width.to_string()),
-        ]).expect("law");
-        realization.bind(rebase, RmsRebase { group: width, gain: None, eps });
-        resident_layer::bond(&mut complex, "tower output rebases", modality_port, tower_output, rebase, 0).expect("bond");
-        let projection = resident_layer::law(&mut complex, &format!("{modality} projection"), OperationSpecies::Transport, vec![modality_port], vec![standing], Some(population.to_owned()), vec![
-            resident_layer::implementation("Gemma4MultimodalEmbedder.forward (return self.embedding_projection(embs_normed))"),
-            resident_layer::implementation("Gemma4MultimodalEmbedder.__init__ (self.embedding_projection = nn.Linear(self.multimodal_hidden_size, self.text_hidden_size, bias=False))"),
-            resident_layer::shape(population, &[tower::HIDDEN, width]),
-        ]).expect("law");
-        realization.bind(projection, Contract { population: population.to_owned() });
-        resident_layer::bond(&mut complex, "projects into the stream", modality_port, rebase, projection, 0).expect("bond");
+        let (complex, realization) = match modality::found(modality, width, width_field, population, &eps_text, eps) {
+            Ok(found) => found,
+            Err(refusal) => {
+                refusals.push(format!("modality {modality}: deed construction {refusal}"));
+                continue;
+            }
+        };
         if let Err(refusal) = realization.validate(&complex) {
             refusals.push(format!("modality {modality}: realization {refusal}"));
             continue;

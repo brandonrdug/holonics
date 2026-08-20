@@ -46,6 +46,7 @@
 use std::collections::BTreeMap;
 use std::io::Read;
 
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use crate::exact_json;
@@ -182,7 +183,7 @@ impl AuthenticatedText {
 
 /// One stored population's byte region in the container, with its content identity where the
 /// region was hashed as it was read.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RegionIdentity {
     pub population: String,
     pub dtype: String,

@@ -151,6 +151,13 @@ governs the rebuild.
   section and causal adjoint return; lattice/crystal/fractal/lightning morphology regimes; founded
   capacity; and the boundary by which inherited transformer hexis may be lifted, cultivated,
   condensed, rested, and ablated without claiming recovery of its original corpus.
+- **The whole foreign map crossed once and the native rest returned without its source:**
+  `records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`
+  — Phoenix Deed W1: 45 authenticated operation complexes, 1,466 resident-law correspondences,
+  all 2,130 exact source populations, and the complete 262,144-row exterior codebook sealed into
+  a manifest-authenticated native rest in one source pass; content-addressed tokenizer companions,
+  path-free topology identity, fresh-process remount, and the explicit boundary that execution,
+  condensation, cultivation, frozen inference, and the Phoenix grade remain W2–W5.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

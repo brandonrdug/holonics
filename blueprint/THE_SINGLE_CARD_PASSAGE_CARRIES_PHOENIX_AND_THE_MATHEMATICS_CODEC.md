@@ -9,9 +9,11 @@ The former P1–P4 promotions were regraded 2026-08-20 by
 [THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md):
 they are respectively a bounded lift-law instrument, an ARM N condensation experiment, an ARM N
 cultivation mechanism, and a CPU ARM N application. They are retained, but none is the corresponding
-whole-Phoenix deed. The dirty former P5 is an unadmitted ARM N dissection candidate. **W1, the whole
-foreign-to-native rest and correspondence, is the open deed.** M0–M3 remain blocked until W5 closes
-the indivisible Phoenix grade.
+whole-Phoenix deed. The dirty former P5 is an unadmitted ARM N dissection candidate. **W1 returned
+2026-08-20 with all 45 admitted complexes, 1,466 operation correspondences, 2,130 exact
+populations, and 262,144 codec rows in a source-detached native rest. W2, lifted native execution
+and structural condensation, is the open deed.** M0–M3 remain blocked until W5 closes the
+indivisible Phoenix grade.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -719,6 +721,12 @@ original model.safetensors must be absent and inaccessible.
 
 No compression is required. A source-shaped native rest is a lawful negative on transfiguration if
 it is complete and executable.
+
+**Returned 2026-08-20.** The exact return and its scope are recorded in
+[`2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`](../research/records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md).
+The 16,022,507,913-octet rest remounts source-detached with complete operation, population, graph,
+and codec correspondence. It is not compressed and has not executed the lifted tower; those are
+W2's questions.
 
 ### Deed W2 — lifted native execution and structural condensation
 

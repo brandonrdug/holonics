@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (167 deposits of 459)
+## 4 · The 2026-08 record line (168 deposits of 460)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -305,6 +305,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md` | The native baseline conducts from its own rest, and the manifest measures what is founded and names what is open |
 | `2026-08-20_THE_REST_IS_CULTIVATED_THE_DELTA_IS_DERIVED_AND_THE_ABLATION_RESTORES_THE_PREDECESSOR_OCTET_FOR_OCTET.md` | The rest is cultivated, the delta is derived, and the ablation restores the predecessor octet for octet |
 | `2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md` | The transport does not condense, the tree falls for free, and no factor is quoted |
+| `2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md` | The whole foreign map crossed once and the native rest returned without its source |
 
 ---
 

@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 67 drivers, 15544 returns, 10298933198 bytes.
+# 68 drivers, 15549 returns, 26357596292 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -71,5 +71,6 @@ b1a58025984212dd27caf60fc34dd275816f577aebcb5bb4b0f3565fad624102	3	1199102	outpu
 178f9b08b7802b0a2502ef2c6f6eb183c87a221a26a485fad0110f615e5cfab0	2	28838539	output/the_source_is_dissected
 1f038afa34c18e09dfc30256ee3bfd3ec26a338f56f7932a100dfa2e76ec9698	11	220775118	output/the_tower_conducts
 42717ffd48806e0cc314e0d4929e26ad76397be73bf39ef6e592da7a0970cc35	4	664273	output/the_tower_is_one_streamed_circulation
+028ba619536044de48758ba0ee6acd751ed20ccbc1e64c594dbaeb05ba072bb6	5	16058663094	output/the_whole_foreign_map_crosses_into_native_rest
 51b28f16aa0ebb686f45b26fc872784a3ac2c56d3970ab5dca095b097a35b9e6	5	694	output/zzy-kernel-teeth-probe
 fa918b668cc305d8275de0d95c12cd2b7d78d16edb963410a7326eebf489e12a	62	9800	output/zzz-adversarial-probe

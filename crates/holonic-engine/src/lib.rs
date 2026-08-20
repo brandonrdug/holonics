@@ -74,6 +74,8 @@ pub mod causal_body;
 pub mod causal_reflection;
 pub mod causal_state_grammar;
 pub mod codec_recovery;
+/// Source-detached exterior codebook correspondence for the Phoenix W1 boundary.
+pub mod foreign_codec_rest;
 // The adapter from a recovered codec to `receiver_exact_compression::ObservedSystem`, and the
 // cross-check between its Nerode congruence and `RecoveredCodec::shortest_separating_input`.
 // Declared, never glob-exported: `ItemId`, `Observation`, `ReceiverId` and `Disagreement` collide
@@ -297,6 +299,9 @@ pub mod returned_conduct;
 // The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
 // with the obstruction named when the target chart cannot represent the answer.
 // `canon/TABLET_THE_CHART.md:280`.
+/// Complete source/native operation and population coverage for Phoenix W1. This is a
+/// serialization-ready correspondence ledger, not a runtime or graph executor.
+pub mod operation_correspondence;
 pub mod ported_operation;
 // The serial reference realization of a ported diagram, quarantined from the production cone
 // 2026-08-18: admission and parity testimony only. The resident owner is `resident_section`.
@@ -332,6 +337,7 @@ pub mod front_passage;
 // The native arm: a rest that witnesses its own laws, and the atlas walked and read on the card.
 pub mod native_law;
 pub mod native_occurrence;
+pub mod native_rest;
 // Pooled source standing, refilled from an exterior container while the card conducts: one device
 // allocation reused across many deeds, page-locked host staging, and the events that order a
 // refill against the deed still reading the slot it replaces. The apparatus half of Deed H4; it

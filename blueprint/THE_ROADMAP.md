@@ -302,13 +302,24 @@ The dirty P5 source states the decisive boundary itself: the lift is a bounded l
 independent of Gemma; no Φ maps the source codebook into the native vocabulary. It therefore cannot
 assemble the Phoenix rebirth grade. `CONSTRUCTION_STATE.md` remains unchanged.
 
-**The next deed is W1 — whole foreign-to-native rest and correspondence.** W1 seals the complete
-admitted Gemma operation topology, active populations, native bindings/graph identities and
-source/native codec correspondence so the original implementation/configuration/container can
-depart. W2 executes and grades structural condensation on that lifted body; W3 cultivates that
-lifted body with genuine held-out change and resident adjoint return; W4 supplies source-detached
-card inference; W5 repeats dissection and closes the indivisible grade. Independent ARM N remains a
-control. M0–M3 remain blocked until W5 passes.
+**DEED W1 PASSED 2026-08-20 — the whole foreign map crossed once and the native rest returned
+without its source.** Authoritative record:
+[`research/records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`](../research/records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md).
+The manifest-authenticated rest carries **45** admitted operation complexes, **1,466** exact
+source/native resident-law correspondences, all **2,130** exact stored populations, one
+nonduplicated graph registry, and the complete **262,144**-row exterior codebook with authenticated
+content-addressed tokenizer companions. A fresh process received only the rest and companion
+directory, returned the complete census and three exact region hashes, and opened no original
+source descriptor. The crossing is one-pass and quotes no compression factor: the
+16,022,507,913-octet rest is source-shaped, not yet a condensed ecology. `CONSTRUCTION_STATE.md`
+remains unchanged because W5 alone closes the indivisible Phoenix phase.
+
+**The next deed is W2 — lifted native execution and structural condensation.** W2 mounts this W1
+body in a fresh process, reproduces Station C/H4 plural futures and intervention consequences on
+the card, and attempts receiver-exact condensation on the lifted body. W3 cultivates that body with
+genuine held-out change and resident adjoint return; W4 supplies source-detached card inference; W5
+repeats dissection and closes the indivisible grade. Independent ARM N remains a control. M0–M3
+remain blocked until W5 passes.
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
