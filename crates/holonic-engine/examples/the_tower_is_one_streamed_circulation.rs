@@ -42,23 +42,28 @@ mod resident_layer;
 mod streamed;
 #[path = "phoenix/tower.rs"]
 mod tower;
+#[path = "phoenix/tower_receiver.rs"]
+mod receiver;
 
 use std::io::Write;
 use std::time::Instant;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::resident_section::{word_value, ResidentGrain, ResidentSurface, SeriesAperture};
+use holonic_engine::resident_section::{ResidentGrain, ResidentSurface, SeriesAperture};
 use holonic_engine::source_occurrence::AuthenticatedContainer;
 use num_bigint::BigInt;
-use relational_geometry::Rat;
-use resident_layer::Source;
+use holonic_engine::foreign_codec_rest::ExteriorCodebookRest;
+use receiver::{compare, future_section, read_committed, Vocabulary};
+use streamed::{ForeignMaterialSource, MaterialSource};
 
 const COMMITTED: &str = "output/the_tower_conducts/tower-5-inputs-grain-48-terms-14.form";
+const CODEBOOK: &str = "standing/output/phoenix/w1/gemma_exterior_codebook.tsv";
 
 struct Args {
     root: String,
     out: String,
     committed: String,
+    codebook: String,
     tokens: Vec<usize>,
     grain: u32,
     terms: u32,
@@ -77,6 +82,7 @@ fn parse_args() -> Args {
         root: "/home/b/models/gemma-4-E4B-it".to_owned(),
         out: "output/the_tower_is_one_streamed_circulation".to_owned(),
         committed: COMMITTED.to_owned(),
+        codebook: CODEBOOK.to_owned(),
         // The committed input closure: "The capital of France is". The token identities are the
         // committed ones; no tokenizer subprocess runs here.
         tokens: vec![818, 5279, 529, 7001, 563],
@@ -95,6 +101,7 @@ fn parse_args() -> Args {
             "--root" => args.root = it.next().expect("--root <dir>"),
             "--out" => args.out = it.next().expect("--out <dir>"),
             "--committed" => args.committed = it.next().expect("--committed <path>"),
+            "--codebook" => args.codebook = it.next().expect("--codebook <path>"),
             "--tokens" => args.tokens = it.next().expect("--tokens a,b").split(',').map(|t| t.trim().parse().expect("token id")).collect(),
             "--grain" => args.grain = it.next().expect("--grain F").parse().expect("u32"),
             "--terms" => args.terms = it.next().expect("--terms N").parse().expect("u32"),
@@ -108,127 +115,6 @@ fn parse_args() -> Args {
         }
     }
     args
-}
-
-// ---------------------------------------------------------------------------------------------
-// the receiver face: the plural future section, exactly as Station C computes it
-// ---------------------------------------------------------------------------------------------
-
-struct FutureSection {
-    position: usize,
-    top_lower: Rat,
-    plural: Vec<(usize, Rat, Rat)>,
-    separated: usize,
-}
-
-fn future_section(potential: &[(i64, i64)], position: usize, vocabulary: usize, grain: ResidentGrain, top: usize) -> FutureSection {
-    let row = &potential[position * vocabulary..(position + 1) * vocabulary];
-    let mut top_lower = word_value(row[0].0, grain);
-    for (lo, _) in row {
-        let v = word_value(*lo, grain);
-        if v > top_lower {
-            top_lower = v;
-        }
-    }
-    let mut plural: Vec<(usize, Rat, Rat)> = row
-        .iter()
-        .enumerate()
-        .filter(|(_, (_, hi))| word_value(*hi, grain) >= top_lower)
-        .map(|(v, (lo, hi))| (v, word_value(*lo, grain), word_value(*hi, grain)))
-        .collect();
-    plural.sort_by(|a, b| b.1.cmp(&a.1));
-    let separated = vocabulary - plural.len();
-    plural.truncate(top.max(plural.len().min(top)));
-    FutureSection { position, top_lower, plural, separated }
-}
-
-/// The native decode of `tokenizer.json`'s vocabulary — an exterior display codec. Nothing about it
-/// governs the transport, and the comparison against the committed artifact is over the exact
-/// rationals, not over the pieces.
-struct Vocabulary {
-    pieces: Vec<String>,
-}
-
-impl Vocabulary {
-    fn read(root: &str) -> Result<Self, String> {
-        let text = std::fs::read_to_string(format!("{root}/tokenizer.json")).map_err(|e| e.to_string())?;
-        let json: serde_json::Value = serde_json::from_str(&text).map_err(|e| e.to_string())?;
-        let vocab = json.get("model").and_then(|m| m.get("vocab")).and_then(|v| v.as_object()).ok_or("no model.vocab")?;
-        let mut pieces = vec![String::new(); vocab.len()];
-        for (piece, id) in vocab {
-            let id = id.as_u64().ok_or("id")? as usize;
-            if id < pieces.len() {
-                pieces[id] = piece.clone();
-            }
-        }
-        Ok(Self { pieces })
-    }
-    fn surface(&self, id: usize) -> String {
-        let piece = self.pieces.get(id).cloned().unwrap_or_default();
-        if let Some(hex) = piece.strip_prefix("<0x").and_then(|rest| rest.strip_suffix('>')) {
-            if let Ok(octet) = u8::from_str_radix(hex, 16) {
-                return String::from_utf8_lossy(&[octet]).into_owned();
-            }
-        }
-        piece.replace('\u{2581}', " ")
-    }
-}
-
-// ---------------------------------------------------------------------------------------------
-// the committed predecessor, read (never re-run)
-// ---------------------------------------------------------------------------------------------
-
-struct Committed {
-    collapsed: String,
-    future: String,
-    candidates: Vec<String>,
-    final_normed: Vec<(i64, i64)>,
-}
-
-/// Read the committed Station C artifact and take, for the input whose token identities are the
-/// ones this deed conducts, the four faces that decide the equality: the per-layer collapsed
-/// population line, the plural future section line, its candidate lines, and every coordinate of
-/// the final normed standing.
-fn read_committed(path: &str, tokens: &[usize]) -> Result<Committed, String> {
-    let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
-    let wanted = format!("tokens {tokens:?} ");
-    let mut lines = text.lines();
-    let mut found = false;
-    while let Some(line) = lines.next() {
-        if line.starts_with("input ") && line.contains(&wanted) {
-            found = true;
-            break;
-        }
-    }
-    if !found {
-        return Err(format!("{path} carries no input with tokens {tokens:?}"));
-    }
-    let mut collapsed = String::new();
-    let mut future = String::new();
-    let mut candidates = Vec::new();
-    let mut final_normed = Vec::new();
-    let mut reading_final = false;
-    for line in lines {
-        if line.starts_with("input ") {
-            break;
-        }
-        if let Some(rest) = line.strip_prefix("  collapsed population per layer ") {
-            collapsed = rest.to_owned();
-        } else if line.starts_with("  plural future section at position ") {
-            future = line.to_owned();
-        } else if !future.is_empty() && !reading_final && line.starts_with("    ") {
-            candidates.push(line.to_owned());
-        } else if line.starts_with("  final normed standing (") {
-            reading_final = true;
-        } else if reading_final && line.starts_with("    ") {
-            let mut parts = line.split_whitespace();
-            let _at = parts.next();
-            let lo: i64 = parts.next().ok_or("final normed lo")?.parse().map_err(|_| "final normed lo")?;
-            let hi: i64 = parts.next().ok_or("final normed hi")?.parse().map_err(|_| "final normed hi")?;
-            final_normed.push((lo, hi));
-        }
-    }
-    Ok(Committed { collapsed, future, candidates, final_normed })
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -352,8 +238,6 @@ fn main() {
 
     let grain = ResidentGrain(args.grain);
     let terms = SeriesAperture(args.terms);
-    let mut source = Source::open(&args.root).expect("the container");
-
     // The whole-content digest: reused from the committed manifest, or re-taken on demand.
     let locator = format!("{}/model.safetensors", args.root);
     let digest_clock = Instant::now();
@@ -364,11 +248,12 @@ fn main() {
         (streamed::COMMITTED_CONTENT_SHA256.to_owned(), format!("reused from the committed manifest, taken {}", streamed::COMMITTED_CONTENT_TAKEN))
     };
     println!("  container content sha256 {content_sha256} ({digest_provenance})");
+    let mut source = ForeignMaterialSource::open(&args.root, Some(content_sha256.clone())).expect("the authenticated foreign source");
 
     // -----------------------------------------------------------------------------------------
     // the deed
     // -----------------------------------------------------------------------------------------
-    let circulated = match streamed::circulate(surface, readout, &mut source, &args.root, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, Some(content_sha256.clone()), tower::LAYERS, false) {
+    let circulated = match streamed::circulate(surface, readout, &mut source, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, tower::LAYERS, false) {
         Ok(returned) => returned,
         Err(error) => {
             println!("REFUSED: the circulation did not return — {error}");
@@ -377,13 +262,25 @@ fn main() {
     };
     println!("  {} segments · {} launches · wall {:.1} s (loop {:.1} s)", circulated.segments.len(), circulated.deed_launches, circulated.wall_s, circulated.loop_wall_s);
 
-    let vocabulary = Vocabulary::read(&args.root).ok();
+    let codebook = match ExteriorCodebookRest::read_tsv(&args.codebook) {
+        Ok(codebook) => codebook,
+        Err(error) => {
+            println!("REFUSED: W1 exterior codebook did not mount — {error}");
+            std::process::exit(2);
+        }
+    };
+    let vocabulary = Vocabulary::new(&codebook);
     let positions = args.tokens.len();
-    let vocabulary_extent = if positions == 0 { 0 } else { circulated.potential.len() / positions };
     let future = if circulated.potential.is_empty() {
         None
     } else {
-        Some(future_section(&circulated.potential, positions - 1, vocabulary_extent, grain, args.top))
+        match future_section(&circulated.potential, positions - 1, &vocabulary, grain, args.top) {
+            Ok(future) => Some(future),
+            Err(error) => {
+                println!("REFUSED: terminal future receiver did not return — {error}");
+                std::process::exit(2);
+            }
+        }
     };
 
     // -----------------------------------------------------------------------------------------
@@ -466,16 +363,19 @@ fn main() {
     // [5] the terminal potential and the plural future section are the committed predecessor's
     match (&committed, &future) {
         (Ok(committed), Some(future)) => {
-            let mine = format!("  plural future section at position {}: top lower {} · {} not separated · {} separated", future.position, future.top_lower, future.plural.len(), future.separated);
-            let my_candidates: Vec<String> = future
-                .plural
-                .iter()
-                .map(|(id, lo, hi)| format!("    {id} {:?} [{lo}, {hi}]", vocabulary.as_ref().map(|v| v.surface(*id)).unwrap_or_default()))
-                .collect();
-            let equal = mine == committed.future && my_candidates == committed.candidates;
+            let comparison = match compare(committed, future, &vocabulary, &circulated.final_normed, &format!("(quotients, Σ widths, widest, nonzero): {:?}",
+                circulated.segments.iter().filter(|s| s.layer.is_some()).map(|s| (s.layer.unwrap(), s.quotients, s.collapsed_width_sum, s.collapsed_width_max, s.collapsed_nonzero)).collect::<Vec<_>>())) {
+                Ok(comparison) => comparison,
+                Err(error) => {
+                    verdicts.record(5, "the plural future section has a returned codebook surface for every candidate", false, error);
+                    std::process::exit(2);
+                }
+            };
+            let my_candidates = comparison.candidates.clone();
+            let equal = comparison.future_equal;
             verdicts.record(5, "the plural future section is BIT-EQUAL to Station C's committed artifact for the committed input closure",
                 equal,
-                format!("mine   {}\n        theirs {}\n        candidates: mine {:?} · committed {:?}", mine.trim(), committed.future.trim(), my_candidates, committed.candidates));
+                format!("mine   {}\n        theirs {}\n        candidates: mine {:?} · committed {:?}\n        summary {}", comparison.future_line.trim(), committed.future.trim(), my_candidates, committed.candidates, comparison.summary));
         }
         (Err(error), _) => verdicts.record(5, "the plural future section is BIT-EQUAL to Station C's committed artifact for the committed input closure", false, format!("the committed artifact could not be read: {error}")),
         (_, None) => verdicts.record(5, "the plural future section is BIT-EQUAL to Station C's committed artifact for the committed input closure", false, "the circulation returned no potential section".to_owned()),
@@ -484,12 +384,21 @@ fn main() {
     // [6] the final normed standing, coordinate by coordinate
     match &committed {
         Ok(committed) => {
-            let same = committed.final_normed.len() == circulated.final_normed.len()
-                && committed.final_normed.iter().zip(&circulated.final_normed).all(|(a, b)| a == b);
-            let first_difference = committed.final_normed.iter().zip(&circulated.final_normed).position(|(a, b)| a != b);
+            let collapsed = format!("(quotients, Σ widths, widest, nonzero): {:?}",
+                circulated.segments.iter().filter(|s| s.layer.is_some()).map(|s| (s.layer.unwrap(), s.quotients, s.collapsed_width_sum, s.collapsed_width_max, s.collapsed_nonzero)).collect::<Vec<_>>());
+            let future_for_compare = future.as_ref().expect("future was checked above");
+            let comparison = match compare(committed, future_for_compare, &vocabulary, &circulated.final_normed, &collapsed) {
+                Ok(comparison) => comparison,
+                Err(error) => {
+                    verdicts.record(6, "the final normed standing has a returned codebook comparison", false, error);
+                    std::process::exit(2);
+                }
+            };
+            let same = comparison.final_normed_equal;
+            let first_difference = comparison.final_difference;
             verdicts.record(6, "the final normed standing is BIT-EQUAL to the committed artifact, coordinate by coordinate",
                 same,
-                format!("{} committed coordinates against {} returned; first difference {:?}", committed.final_normed.len(), circulated.final_normed.len(), first_difference));
+                format!("{} committed coordinates against {} returned; first difference {:?}; summary {}", committed.final_normed.len(), circulated.final_normed.len(), first_difference, comparison.summary));
         }
         Err(error) => verdicts.record(6, "the final normed standing is BIT-EQUAL to the committed artifact, coordinate by coordinate", false, format!("the committed artifact could not be read: {error}")),
     }
@@ -499,7 +408,15 @@ fn main() {
         circulated.segments.iter().filter(|s| s.layer.is_some()).map(|s| (s.layer.unwrap(), s.quotients, s.collapsed_width_sum, s.collapsed_width_max, s.collapsed_nonzero)).collect::<Vec<_>>());
     match &committed {
         Ok(committed) => {
-            let equal = mine_collapsed == committed.collapsed;
+            let future_for_compare = future.as_ref().expect("future was checked above");
+            let comparison = match compare(committed, future_for_compare, &vocabulary, &circulated.final_normed, &mine_collapsed) {
+                Ok(comparison) => comparison,
+                Err(error) => {
+                    verdicts.record(7, "the collapsed population has a returned codebook comparison", false, error);
+                    std::process::exit(2);
+                }
+            };
+            let equal = comparison.collapsed_equal;
             verdicts.record(7, "every layer's collapsed population is the committed one — the FUSED seal moved no returned word and censused no differently",
                 equal,
                 if equal {
@@ -549,7 +466,7 @@ fn main() {
         verdicts.open(11, "the poisoned-lineage refusal through the whole circulation", "not run: --only-circulation conducts the circulation alone so an exterior profiler measures it and nothing beside it");
         verdicts.open(12, "hiding the card returns a typed refusal", "not run: --only-circulation");
     }
-    let poisoned = if args.only_circulation { Err("not run".to_owned()) } else { streamed::circulate(surface, readout, &mut source, &args.root, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, Some(content_sha256.clone()), args.poison_layers, true) };
+    let poisoned = if args.only_circulation { Err("not run".to_owned()) } else { streamed::circulate(surface, readout, &mut source, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, args.poison_layers, true) };
     match poisoned {
         Ok(poisoned) => {
             let refused_here = !poisoned.obstructions.is_empty();
@@ -597,6 +514,14 @@ fn main() {
     writeln!(file, "root {} · grain 2^-{} · terms {} · chart Midpoint · fused seal {} · device {} · mode {:?}", args.root, args.grain, args.terms, args.fuse, surface.device_name(), surface.mode()).unwrap();
     writeln!(file, "container content sha256 {content_sha256} ({digest_provenance})").unwrap();
     writeln!(file, "committed predecessor {} (read, never re-run)", args.committed).unwrap();
+    if let Ok(committed) = &committed {
+        writeln!(
+            file,
+            "committed source/runtime cross-chart face {}",
+            committed.source_runtime_cross_chart
+        )
+        .unwrap();
+    }
     writeln!(file, "input tokens {:?}", args.tokens).unwrap();
     writeln!(file, "  wall {:.3} s · loop {:.3} s · deed launches {} · peak charge of one deed {}", circulated.wall_s, circulated.loop_wall_s, circulated.deed_launches, circulated.peak_charged_octets).unwrap();
     writeln!(file, "  streamed census {:?}", circulated.streamed).unwrap();
@@ -628,7 +553,14 @@ fn main() {
     if let Some(future) = &future {
         writeln!(file, "  plural future section at position {}: top lower {} · {} not separated · {} separated", future.position, future.top_lower, future.plural.len(), future.separated).unwrap();
         for (id, lo, hi) in &future.plural {
-            writeln!(file, "    {id} {:?} [{lo}, {hi}]", vocabulary.as_ref().map(|v| v.surface(*id)).unwrap_or_default()).unwrap();
+            let surface = match vocabulary.surface(*id) {
+                Ok(surface) => surface,
+                Err(error) => {
+                    println!("REFUSED: output receiver codebook surface did not return — {error}");
+                    std::process::exit(2);
+                }
+            };
+            writeln!(file, "    {id} {:?} [{lo}, {hi}]", surface).unwrap();
         }
     }
     writeln!(file, "  final normed standing ({} coordinates):", circulated.final_normed.len()).unwrap();

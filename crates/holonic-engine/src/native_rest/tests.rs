@@ -5,8 +5,8 @@ mod tests {
         CandidateDiagrams, OperationSpecies, PortedOperationComplex, SourceTestimony,
     };
     use crate::source_occurrence::{
-        AssetDeclaration, AuthenticatedContainer, AuthenticatedText, RegionIdentity,
-        SourceOccurrence,
+        AssetDeclaration, AuthenticatedContainer, AuthenticatedText, OccurrenceWitness,
+        RegionIdentity, SourceOccurrence,
     };
     use sha2::{Digest, Sha256};
     use std::collections::BTreeMap;
@@ -386,6 +386,15 @@ mod tests {
         NativeRest::seal_streamed(input, &mut output).unwrap();
         drop(output);
         let mounted = MountedNativeRest::open(&rest_path).unwrap();
+        assert!(mounted.total_file_octets() > mounted.payload_offset());
+        let extent = mounted.population_extent("layer.weight").unwrap();
+        assert_eq!(extent.start, mounted.payload_offset());
+        assert_eq!(extent.end - extent.start, 8);
+        assert_eq!(extent.shape, vec![2, 2]);
+        assert_eq!(extent.dtype, "BF16");
+        let mut handle = mounted.open_file().unwrap();
+        use std::io::Seek;
+        handle.seek(std::io::SeekFrom::Start(extent.start)).unwrap();
         let mut region = Vec::new();
         mounted
             .read_population_to("layer.weight", &mut region)
@@ -393,5 +402,259 @@ mod tests {
         assert_eq!(region, vec![0, 1, 2, 3, 4, 5, 6, 7]);
         std::fs::remove_file(source_path).unwrap();
         std::fs::remove_file(rest_path).unwrap();
+    }
+
+    #[test]
+    fn mounted_witness_accepts_locator_rebase_but_refuses_foreign_topologies() {
+        let path =
+            std::env::temp_dir().join(format!("native-rest-witness-{}.rest", std::process::id()));
+        let input = fixture();
+        let mut output = std::fs::File::create(&path).unwrap();
+        NativeRest::seal_streamed(input, &mut output).unwrap();
+        drop(output);
+        let mounted = MountedNativeRest::open(&path).unwrap();
+        let mut relocated = fixture().topology.remove(0);
+        if let SourceTestimony::Implementation { locator, .. } =
+            &mut relocated.operations.values_mut().next().unwrap().testimony[0]
+        {
+            *locator = "/a/different/apparatus/path.py".to_owned();
+        }
+        let validated = mounted.validate(&relocated).unwrap();
+        assert_eq!(validated.len(), 1);
+
+        for mutate in [
+            |complex: &mut PortedOperationComplex| {
+                if let SourceTestimony::Implementation { symbol, .. } =
+                    &mut complex.operations.values_mut().next().unwrap().testimony[0]
+                {
+                    *symbol = "Foreign.forward".to_owned();
+                }
+            },
+            |complex: &mut PortedOperationComplex| {
+                complex
+                    .operations
+                    .values_mut()
+                    .next()
+                    .unwrap()
+                    .testimony
+                    .push(SourceTestimony::Configuration {
+                        field: "hidden_size".to_owned(),
+                        value: "2560".to_owned(),
+                    });
+            },
+            |complex: &mut PortedOperationComplex| {
+                if let SourceTestimony::Implementation { symbol, .. } =
+                    &mut complex.operations.values_mut().next().unwrap().testimony[0]
+                {
+                    *symbol = "Attention.forward (changed)".to_owned();
+                }
+            },
+            |complex: &mut PortedOperationComplex| {
+                complex.operations.values_mut().next().unwrap().carrier =
+                    Some("foreign.carrier".to_owned());
+            },
+            |complex: &mut PortedOperationComplex| complex.name = "different topology".to_owned(),
+        ] {
+            let mut changed = fixture().topology.remove(0);
+            mutate(&mut changed);
+            assert!(mounted.validate(&changed).is_err());
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn mounted_witness_accepts_canonical_bf16_spellings() {
+        let path = std::env::temp_dir().join(format!(
+            "native-rest-witness-bf16-{}.rest",
+            std::process::id()
+        ));
+        let mut input = fixture();
+        input.populations[0].source.dtype = "Bf16".to_owned();
+        input
+            .source
+            .container
+            .regions
+            .get_mut("layer.weight")
+            .unwrap()
+            .dtype = "Bf16".to_owned();
+        let complex = input.topology[0].clone();
+        let mut output = std::fs::File::create(&path).unwrap();
+        NativeRest::seal_streamed(input, &mut output).unwrap();
+        drop(output);
+        let mounted = MountedNativeRest::open(&path).unwrap();
+        assert!(mounted.validate(&complex).is_ok());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn interval_source_accepts_midpoint_quotient_extension_but_not_fake_source_or_carrier() {
+        let path = std::env::temp_dir().join(format!(
+            "native-rest-witness-midpoint-{}.rest",
+            std::process::id()
+        ));
+        let input = fixture();
+        let source = input.topology[0].clone();
+        let mut output = std::fs::File::create(&path).unwrap();
+        NativeRest::seal_streamed(input, &mut output).unwrap();
+        drop(output);
+        let mounted = MountedNativeRest::open(&path).unwrap();
+
+        let mut midpoint = source.clone();
+        let input_port = *midpoint.shape.boundaries.objects.keys().next().unwrap();
+        let output_port = *midpoint
+            .shape
+            .boundaries
+            .objects
+            .keys()
+            .next_back()
+            .unwrap();
+        midpoint
+            .bind_operation(
+                "midpoint quotient",
+                OperationSpecies::Quotient,
+                vec![input_port],
+                vec![output_port],
+                None,
+                vec![SourceTestimony::Intervention {
+                    statement: "the interval remainder is sealed at its midpoint".to_owned(),
+                }],
+            )
+            .unwrap();
+        let validation = mounted.validate(&midpoint).unwrap();
+        assert!(validation.iter().any(|entry| {
+            entry.operation == "midpoint quotient"
+                && entry.interventions == vec!["the interval remainder is sealed at its midpoint"]
+        }));
+
+        let mut fake_source = source.clone();
+        fake_source
+            .bind_operation(
+                "fake source operation",
+                OperationSpecies::Transport,
+                vec![input_port],
+                vec![output_port],
+                None,
+                vec![SourceTestimony::Implementation {
+                    locator: "/foreign.py".to_owned(),
+                    symbol: "Fake.forward".to_owned(),
+                }],
+            )
+            .unwrap();
+        assert!(matches!(
+            mounted.validate(&fake_source),
+            Err(crate::source_occurrence::SourceRefusal::OperationForeign { operation })
+                if operation == "fake source operation"
+        ));
+
+        let mut carrier_intervention = source;
+        carrier_intervention
+            .bind_operation(
+                "carrier midpoint quotient",
+                OperationSpecies::Quotient,
+                vec![input_port],
+                vec![output_port],
+                Some("layer.weight".to_owned()),
+                vec![SourceTestimony::Intervention {
+                    statement: "carrier-bearing intervention is forbidden".to_owned(),
+                }],
+            )
+            .unwrap();
+        assert!(matches!(
+            mounted.validate(&carrier_intervention),
+            Err(crate::source_occurrence::SourceRefusal::OperationForeign { operation })
+                if operation == "carrier midpoint quotient"
+        ));
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn stored_source_may_be_replaced_only_by_its_typed_intervention_name() {
+        let path = std::env::temp_dir().join(format!(
+            "native-rest-witness-replacement-{}.rest",
+            std::process::id()
+        ));
+        let input = fixture();
+        let source = input.topology[0].clone();
+        let source_law = *source.operations.keys().next().unwrap();
+        let source_name = source.shape.laws.get(&source_law).unwrap().name.clone();
+        let input_port = *source.shape.boundaries.objects.keys().next().unwrap();
+        let output_port = *source.shape.boundaries.objects.keys().next_back().unwrap();
+        let mut output = std::fs::File::create(&path).unwrap();
+        NativeRest::seal_streamed(input, &mut output).unwrap();
+        drop(output);
+        let mounted = MountedNativeRest::open(&path).unwrap();
+
+        let mut replacement = source.clone();
+        replacement.operations.remove(&source_law);
+        replacement
+            .bind_operation(
+                format!("{source_name} (intervention)"),
+                OperationSpecies::Transport,
+                vec![input_port],
+                vec![output_port],
+                None,
+                vec![SourceTestimony::Intervention {
+                    statement: "reverse the presented chronology".to_owned(),
+                }],
+            )
+            .unwrap();
+        let validation = mounted.validate(&replacement).unwrap();
+        assert_eq!(validation.len(), 1);
+        assert!(validation[0].symbols.is_empty());
+        assert_eq!(
+            validation[0].interventions,
+            vec!["reverse the presented chronology"]
+        );
+
+        let mut near_name = source.clone();
+        near_name.operations.remove(&source_law);
+        near_name
+            .bind_operation(
+                format!("{source_name} intervention"),
+                OperationSpecies::Transport,
+                vec![input_port],
+                vec![output_port],
+                None,
+                vec![SourceTestimony::Intervention {
+                    statement: "near name is not a replacement".to_owned(),
+                }],
+            )
+            .unwrap();
+        assert!(mounted.validate(&near_name).is_err());
+
+        let mut wrong_ports = source.clone();
+        wrong_ports.operations.remove(&source_law);
+        wrong_ports
+            .bind_operation(
+                format!("{source_name} (intervention)"),
+                OperationSpecies::Transport,
+                vec![output_port],
+                vec![input_port],
+                None,
+                vec![SourceTestimony::Intervention {
+                    statement: "wrong ports are not a replacement".to_owned(),
+                }],
+            )
+            .unwrap();
+        assert!(mounted.validate(&wrong_ports).is_err());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn mounted_witness_refuses_a_replaced_rest_occurrence() {
+        let path = std::env::temp_dir().join(format!(
+            "native-rest-witness-drift-{}.rest",
+            std::process::id()
+        ));
+        let replacement = path.with_extension("replacement");
+        let input = fixture();
+        let mut output = std::fs::File::create(&path).unwrap();
+        NativeRest::seal_streamed(input, &mut output).unwrap();
+        drop(output);
+        let mounted = MountedNativeRest::open(&path).unwrap();
+        std::fs::copy(&path, &replacement).unwrap();
+        std::fs::rename(&replacement, &path).unwrap();
+        assert!(mounted.verify_still().is_err());
+        std::fs::remove_file(path).unwrap();
     }
 }

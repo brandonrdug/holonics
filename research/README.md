@@ -158,6 +158,12 @@ governs the rebuild.
   a manifest-authenticated native rest in one source pass; content-addressed tokenizer companions,
   path-free topology identity, fresh-process remount, and the explicit boundary that execution,
   condensation, cultivation, frozen inference, and the Phoenix grade remain W2–W5.
+- **The native rest conducts, the dissection is unchanged, and every tempting quotient reopens:**
+  `records/2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md`
+  — Phoenix Deed W2: source-detached GPU execution bit-identical to the committed native passage;
+  all 168 dissection cells unchanged; exact QK, OV, and sliding/full KV member populations retained;
+  four nontrivial one-shot layer fibres all reopened by complete successor conduct; and no false
+  structural or byte compression factor quoted.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

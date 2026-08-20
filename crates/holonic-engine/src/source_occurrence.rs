@@ -83,6 +83,10 @@ pub enum SourceRefusal {
     DeclarationNotInRest { operation: String, statement: String },
     /// Implementation or configuration testimony offered to a native rest, which has neither.
     TestimonyForeignToNativeRest { operation: String, testimony: String },
+    /// No stored concrete topology has the authenticated identity requested by the passage.
+    TopologyAbsent { identity: String },
+    /// A stored topology was found, but the operation occurrence is not present in that topology.
+    OperationForeign { operation: String },
 }
 
 impl std::fmt::Display for SourceRefusal {
@@ -299,6 +303,59 @@ pub struct ResolvedSymbol {
     pub line: usize,
 }
 
+/// Parse the exterior symbol grammar without resolving it against implementation text. Native
+/// rests retain the authenticated symbol but not the foreign source text, so they use this same
+/// parser and return line zero as the honest absence of source-line evidence.
+pub(crate) fn parse_symbol(
+    operation: &str,
+    symbol: &str,
+) -> Result<ResolvedSymbol, SourceRefusal> {
+    let (path_text, slice) = match symbol.find(" (") {
+        Some(open) => {
+            let close = symbol.rfind(')').ok_or(SourceRefusal::SymbolMalformed {
+                operation: operation.to_owned(),
+                symbol: symbol.to_owned(),
+                why: "an opening ' (' with no closing ')'",
+            })?;
+            if close <= open + 2 {
+                return Err(SourceRefusal::SymbolMalformed {
+                    operation: operation.to_owned(),
+                    symbol: symbol.to_owned(),
+                    why: "an empty slice",
+                });
+            }
+            (&symbol[..open], Some(symbol[open + 2..close].to_owned()))
+        }
+        None => (symbol, None),
+    };
+    if path_text.is_empty() {
+        return Err(SourceRefusal::SymbolMalformed {
+            operation: operation.to_owned(),
+            symbol: symbol.to_owned(),
+            why: "an empty path",
+        });
+    }
+    let path: Vec<String> = path_text.split('.').map(str::to_owned).collect();
+    for segment in &path {
+        let lawful = !segment.is_empty()
+            && segment.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+            && !segment.chars().next().is_some_and(|c| c.is_ascii_digit());
+        if !lawful {
+            return Err(SourceRefusal::SymbolMalformed {
+                operation: operation.to_owned(),
+                symbol: symbol.to_owned(),
+                why: "a path segment that is not an identifier",
+            });
+        }
+    }
+    Ok(ResolvedSymbol {
+        symbol: symbol.to_owned(),
+        path,
+        slice,
+        line: 0,
+    })
+}
+
 /// What one bound operation's testimony resolved to. Every entry was checked against content.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BindingValidation {
@@ -482,44 +539,9 @@ impl SourceOccurrence {
 
     /// Resolve one implementation symbol against the authenticated implementation text.
     pub fn resolve_symbol(&self, operation: &str, symbol: &str) -> Result<ResolvedSymbol, SourceRefusal> {
-        let (path_text, slice) = match symbol.find(" (") {
-            Some(open) => {
-                let close = symbol.rfind(')').ok_or(SourceRefusal::SymbolMalformed {
-                    operation: operation.to_owned(),
-                    symbol: symbol.to_owned(),
-                    why: "an opening ' (' with no closing ')'",
-                })?;
-                if close <= open + 2 {
-                    return Err(SourceRefusal::SymbolMalformed {
-                        operation: operation.to_owned(),
-                        symbol: symbol.to_owned(),
-                        why: "an empty slice",
-                    });
-                }
-                (&symbol[..open], Some(&symbol[open + 2..close]))
-            }
-            None => (symbol, None),
-        };
-        if path_text.is_empty() {
-            return Err(SourceRefusal::SymbolMalformed {
-                operation: operation.to_owned(),
-                symbol: symbol.to_owned(),
-                why: "an empty path",
-            });
-        }
-        let path: Vec<String> = path_text.split('.').map(str::to_owned).collect();
-        for segment in &path {
-            let lawful = !segment.is_empty()
-                && segment.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
-                && !segment.chars().next().is_some_and(|c| c.is_ascii_digit());
-            if !lawful {
-                return Err(SourceRefusal::SymbolMalformed {
-                    operation: operation.to_owned(),
-                    symbol: symbol.to_owned(),
-                    why: "a path segment that is not an identifier",
-                });
-            }
-        }
+        let mut parsed = parse_symbol(operation, symbol)?;
+        let path = &parsed.path;
+        let slice = parsed.slice.as_deref();
         // Resolution reads the SCRUBBED text: comments and string bodies are blank, so a segment
         // or a slice that occurs only in a docstring or a comment does not resolve.
         let text = self.implementation.scrubbed();
@@ -571,12 +593,8 @@ impl SourceOccurrence {
                 });
             }
         }
-        Ok(ResolvedSymbol {
-            symbol: symbol.to_owned(),
-            path,
-            slice: slice.map(str::to_owned),
-            line,
-        })
+        parsed.line = line;
+        Ok(parsed)
     }
 
     /// The exact JSON span of a configuration field under the declared scope. Field grammar:

@@ -53,7 +53,7 @@ use holonic_engine::front_passage::{
     SealedMidpointQuotient,
 };
 use holonic_engine::resident_section::{Dyadic, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, TransferCensus};
-use holonic_engine::source_occurrence::{RegionIdentity, SourceOccurrence};
+use holonic_engine::source_occurrence::{OccurrenceWitness, RegionIdentity, SourceOccurrence};
 use holonic_engine::streamed_standing::{GraphKey, SlotShape, StagedRegion, StreamedCensus, StreamedCirculation};
 
 use super::resident_layer::Source;
@@ -64,6 +64,118 @@ pub const SLOTS: usize = 3;
 pub const FINAL_SLOT: usize = 2;
 /// The final boundary's own pinned slot, after the three the source layers alternate between.
 pub const FINAL_PINNED: usize = 3;
+
+/// The one material-source face H4 needs.  The streamed circulation owns the transport and
+/// tower laws; this trait owns only the exterior crossing which supplies them.  In particular,
+/// a source is not a tensor container in the circulation: it is a stable file extent, exact
+/// region testimony, row/word access, one occurrence witness, and a post-deed drift check.
+pub trait MaterialSource {
+    fn file(&self) -> Result<&std::fs::File, String>;
+    fn file_octets(&self) -> Result<u64, String>;
+    fn region(&self, population: &str) -> Result<RegionIdentity, String>;
+    fn staged(&self, population: &str) -> Result<StagedRegion, String>;
+    fn rows(&mut self, population: &str, from: usize, count: usize) -> Result<(Vec<u16>, usize), String>;
+    fn occurrence(&self) -> &dyn OccurrenceWitness;
+    fn source_identity(&self) -> String;
+    fn verify_stable(&self) -> Result<(), String>;
+}
+
+/// Foreign adapter: the existing Gemma `Source` remains the reader, while the already
+/// authenticated `SourceOccurrence` is the witness passed into the resident passage.
+pub struct ForeignMaterialSource {
+    pub source: Source,
+    pub witness: SourceOccurrence,
+}
+
+impl ForeignMaterialSource {
+    pub fn open(root: &str, content_sha256: Option<String>) -> Result<Self, String> {
+        let source = Source::open(root)?;
+        let regions = foreign_header_regions(&source)?;
+        let witness = super::resident_layer::source_occurrence(root, regions, content_sha256)?;
+        Ok(Self { source, witness })
+    }
+
+    /// Exterior comparison helper used by H4's staged-read falsifier; it is not part of the
+    /// circulation's material contract because the circulation never reads a whole population.
+    pub fn whole(&mut self, population: &str) -> Result<(Vec<u16>, Vec<usize>), String> {
+        self.source.whole(population)
+    }
+}
+
+impl MaterialSource for ForeignMaterialSource {
+    fn file(&self) -> Result<&std::fs::File, String> {
+        Ok(&self.source.file)
+    }
+
+    fn file_octets(&self) -> Result<u64, String> {
+        Ok(self.source.container.file_octets)
+    }
+
+    fn region(&self, population: &str) -> Result<RegionIdentity, String> {
+        self.source.region(population, None)
+    }
+
+    fn staged(&self, population: &str) -> Result<StagedRegion, String> {
+        let tensor = self.source.container.tensor(population).map_err(|e| e.to_string())?;
+        let words = (tensor.end - tensor.start) / 2;
+        let dim = *tensor.shape.last().unwrap_or(&0);
+        if tensor.dtype != holonic_engine::foreign_map::ForeignDtype::Bf16 {
+            return Err(format!("{population} is {:?}; the mouth this circulation stages through admits BF16", tensor.dtype));
+        }
+        Ok(StagedRegion {
+            population: population.to_owned(),
+            start: self.source.container.payload_base() + tensor.start,
+            words: u32::try_from(words).map_err(|_| format!("{population} is wider than one staged region"))?,
+            dim,
+        })
+    }
+
+    fn rows(&mut self, population: &str, from: usize, count: usize) -> Result<(Vec<u16>, usize), String> {
+        self.source.rows(population, from, count)
+    }
+
+    fn occurrence(&self) -> &dyn OccurrenceWitness {
+        &self.witness
+    }
+
+    fn source_identity(&self) -> String {
+        let container = &self.witness.container;
+        format!(
+            "{} octets, header {} octets, header sha256 {}, content sha256 {:?}, identity {:?}",
+            container.octets, container.header_octets, container.header_sha256, container.content_sha256, container.identity
+        )
+    }
+
+    fn verify_stable(&self) -> Result<(), String> {
+        self.witness.container.verify_still().map_err(|e| e.to_string())
+    }
+}
+
+/// The foreign adapter must authenticate its occurrence after the container header is opened.
+/// This pre-adapter inventory is therefore intentionally limited to the existing `Source` header
+/// reader; once the witness exists all streamed sites use only [`MaterialSource`].
+fn foreign_header_regions(source: &Source) -> Result<BTreeMap<String, RegionIdentity>, String> {
+    let mut regions = BTreeMap::new();
+    for layer in 0..tower::LAYERS {
+        for name in tower::populations(layer) {
+            regions.insert(name.clone(), source.region(&name, None)?);
+        }
+        let scalar = tower::named(layer, "layer_scalar");
+        regions.insert(scalar.clone(), source.region(&scalar, None)?);
+        let whole = source.container.tensor(tower::PLE_MODEL_PROJECTION).map_err(|e| e.to_string())?;
+        let dim = whole.shape[1];
+        let mut slice = source.region(tower::PLE_MODEL_PROJECTION, None)?;
+        slice.population = format!("{} rows {}..{}", tower::PLE_MODEL_PROJECTION, tower::PLE_WIDTH * layer, tower::PLE_WIDTH * (layer + 1));
+        slice.shape = vec![tower::PLE_WIDTH, dim];
+        slice.start += (tower::PLE_WIDTH * layer * dim * 2) as u64;
+        slice.end = slice.start + (tower::PLE_WIDTH * dim * 2) as u64;
+        regions.insert(slice.population.clone(), slice);
+    }
+    for name in [tower::PLE_MODEL_PROJECTION, tower::PLE_PROJECTION_NORM, tower::EMBED, tower::PLE_EMBED, tower::FINAL_NORM] {
+        regions.insert(name.to_owned(), source.region(name, None)?);
+    }
+    Ok(regions)
+}
 
 /// **The whole-content digest of the committed container, reused rather than re-taken.**
 ///
@@ -92,40 +204,21 @@ pub struct Segment {
 }
 
 /// The header identity of one population, without a content digest.
-fn region_of(source: &Source, population: &str) -> Result<RegionIdentity, String> {
-    let tensor = source.container.tensor(population).map_err(|e| e.to_string())?;
-    Ok(RegionIdentity {
-        population: population.to_owned(),
-        dtype: format!("{:?}", tensor.dtype),
-        shape: tensor.shape.clone(),
-        start: tensor.start,
-        end: tensor.end,
-        sha256: None,
-    })
+fn region_of(source: &dyn MaterialSource, population: &str) -> Result<RegionIdentity, String> {
+    source.region(population)
 }
 
 /// A staged region addresses the FILE, so it carries the payload base; a `RegionIdentity`
 /// addresses the container's payload, so it does not. Conflating the two reads the wrong octets and
 /// the deed still returns numbers — measured 2026-08-19, when it did: the tower conducted ten
 /// layers on the wrong weights before an a-priori octave bound refused at layer 10.
-fn staged_of(source: &Source, population: &str) -> Result<StagedRegion, String> {
-    let tensor = source.container.tensor(population).map_err(|e| e.to_string())?;
-    let words = (tensor.end - tensor.start) / 2;
-    let dim = *tensor.shape.last().unwrap_or(&0);
-    if tensor.dtype != holonic_engine::foreign_map::ForeignDtype::Bf16 {
-        return Err(format!("{population} is {:?}; the mouth this circulation stages through admits BF16", tensor.dtype));
-    }
-    Ok(StagedRegion {
-        population: population.to_owned(),
-        start: source.container.payload_base() + tensor.start,
-        words: u32::try_from(words).map_err(|_| format!("{population} is wider than one staged region"))?,
-        dim,
-    })
+fn staged_of(source: &dyn MaterialSource, population: &str) -> Result<StagedRegion, String> {
+    source.staged(population)
 }
 
 /// **Every region the whole tower reads, declared from the container's header alone.** Nothing is
 /// opened, nothing is digested, and this is what the one pre-deed source occurrence carries.
-pub fn header_regions(source: &Source) -> Result<BTreeMap<String, RegionIdentity>, String> {
+pub fn header_regions(source: &dyn MaterialSource) -> Result<BTreeMap<String, RegionIdentity>, String> {
     let mut regions = BTreeMap::new();
     for layer in 0..tower::LAYERS {
         for name in tower::populations(layer) {
@@ -134,7 +227,7 @@ pub fn header_regions(source: &Source) -> Result<BTreeMap<String, RegionIdentity
         let scalar = tower::named(layer, "layer_scalar");
         regions.insert(scalar.clone(), region_of(source, &scalar)?);
         // The layer's own slice of the per-layer model projection: the octet span read, named.
-        let whole = source.container.tensor(tower::PLE_MODEL_PROJECTION).map_err(|e| e.to_string())?;
+        let whole = source.region(tower::PLE_MODEL_PROJECTION)?;
         let dim = whole.shape[1];
         let mut slice = region_of(source, tower::PLE_MODEL_PROJECTION)?;
         slice.population = format!("{} rows {}..{}", tower::PLE_MODEL_PROJECTION, tower::PLE_WIDTH * layer, tower::PLE_WIDTH * (layer + 1));
@@ -151,7 +244,7 @@ pub fn header_regions(source: &Source) -> Result<BTreeMap<String, RegionIdentity
 
 /// The regions one layer's segment stages, **in the order `tower::mount_layer` mounts them**, so
 /// the pooled mount and the per-deed mount name the same maps in the same order.
-pub fn layer_segment(source: &Source, layer: usize, slot: usize, pinned: usize) -> Result<Segment, String> {
+pub fn layer_segment(source: &dyn MaterialSource, layer: usize, slot: usize, pinned: usize) -> Result<Segment, String> {
     let mut regions = Vec::new();
     let mut names = Vec::new();
     for name in tower::populations(layer) {
@@ -159,11 +252,11 @@ pub fn layer_segment(source: &Source, layer: usize, slot: usize, pinned: usize) 
         names.push(name);
     }
     // The layer's 256 rows of the per-layer model projection, mounted under the whole tensor's name.
-    let whole = source.container.tensor(tower::PLE_MODEL_PROJECTION).map_err(|e| e.to_string())?;
-    let dim = whole.shape[1];
+    let whole = source.staged(tower::PLE_MODEL_PROJECTION)?;
+    let dim = whole.dim;
     regions.push(StagedRegion {
         population: format!("{} rows {}..{}", tower::PLE_MODEL_PROJECTION, tower::PLE_WIDTH * layer, tower::PLE_WIDTH * (layer + 1)),
-        start: source.container.payload_base() + whole.start + (tower::PLE_WIDTH * layer * dim * 2) as u64,
+        start: whole.start + (tower::PLE_WIDTH * layer * dim * 2) as u64,
         words: (tower::PLE_WIDTH * dim) as u32,
         dim,
     });
@@ -175,7 +268,7 @@ pub fn layer_segment(source: &Source, layer: usize, slot: usize, pinned: usize) 
 }
 
 /// The final deed's segment: the final norm gain and the tied output table.
-pub fn final_segment(source: &Source, slot: usize, pinned: usize) -> Result<Segment, String> {
+pub fn final_segment(source: &dyn MaterialSource, slot: usize, pinned: usize) -> Result<Segment, String> {
     let mut regions = Vec::new();
     let mut names = Vec::new();
     for name in [tower::FINAL_NORM, tower::EMBED] {
@@ -303,14 +396,12 @@ pub fn scalar_word_of(file: &std::fs::File, region: &StagedRegion) -> Result<u16
 pub fn circulate(
     surface: &'static ResidentSurface<'static>,
     _readout: &'static ResidentReadout,
-    source: &mut Source,
-    root: &str,
+    source: &mut dyn MaterialSource,
     tokens: &[usize],
     grain: ResidentGrain,
     terms: SeriesAperture,
     chart: tower::Chart,
     fuse: bool,
-    content_sha256: Option<String>,
     // `limit`: how many source layers to conduct. The whole tower is `tower::LAYERS`; a control
     // conducts fewer and the final boundary still runs on whatever standing arrived.
     // `poison`: a control — one entering codeword replaced by a pattern that is not a finite BF16
@@ -339,9 +430,7 @@ pub fn circulate(
     let prediction = passage.predict_pooled_material(&shapes, &refills, bands_elements, tokens.len());
     let admission = passage.admit_material(&prediction).map_err(|o| format!("the tower's pooled material refused: {}", describe(&o)))?;
 
-    let regions = header_regions(source)?;
-    let occurrence: SourceOccurrence = super::resident_layer::source_occurrence(root, regions, content_sha256)?;
-    let identity_before = occurrence.container.identity.clone();
+    let identity_before = source.source_identity();
 
     // THREE pinned slots for the source layers and one for the final boundary. Three, not two,
     // because the staged read runs two segments ahead of the mount while the crossing runs one
@@ -385,7 +474,8 @@ pub fn circulate(
     let mut layer_scalars = Vec::with_capacity(tower::LAYERS);
     for segment in &layer_segments {
         let region = segment.scalar.as_ref().ok_or("the layer segment carries no layer scalar")?;
-        layer_scalars.push(Dyadic::of_bfloat16_bits(scalar_word_of(&source.file, region)?).map_err(|e| e.to_string())?);
+        let file = source.file()?;
+        layer_scalars.push(Dyadic::of_bfloat16_bits(scalar_word_of(file, region)?).map_err(|e| e.to_string())?);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -414,13 +504,15 @@ pub fn circulate(
     {
         let first = at(0);
         let clock = Instant::now();
-        offsets[0] = circulation.stage(first.pinned, &source.file, source.container.file_octets, &first.regions).map_err(|e| e.to_string())?;
+        let file = source.file()?;
+        offsets[0] = circulation.stage(first.pinned, file, source.file_octets()?, &first.regions).map_err(|e| e.to_string())?;
         stage_wall[0] = clock.elapsed().as_secs_f64();
         requests[0] = circulation.cross(first.slot, first.pinned, &offsets[0], &first.regions).map_err(|e| e.to_string())?;
         if segments > 1 {
             let second = at(1);
             let clock = Instant::now();
-            offsets[1] = circulation.stage(second.pinned, &source.file, source.container.file_octets, &second.regions).map_err(|e| e.to_string())?;
+            let file = source.file()?;
+            offsets[1] = circulation.stage(second.pinned, file, source.file_octets()?, &second.regions).map_err(|e| e.to_string())?;
             stage_wall[1] = clock.elapsed().as_secs_f64();
         }
     }
@@ -481,7 +573,7 @@ pub fn circulate(
             founded.realization.bind(*occurrence, SealedMidpointQuotient);
         }
         let bound = passage
-            .bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), terminal)
+            .bind(&founded.complex, &founded.realization, &material, source.occurrence(), &receiver, Some(&admission), terminal)
             .map_err(|o| format!("layer {layer} refused at bind: {}", describe(&o)))?;
         let bind_wall_s = bind_clock.elapsed().as_secs_f64();
         peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
@@ -505,7 +597,8 @@ pub fn circulate(
         if layer + 2 < segments {
             let after = at(layer + 2);
             let clock = Instant::now();
-            offsets[layer + 2] = circulation.stage(after.pinned, &source.file, source.container.file_octets, &after.regions).map_err(|e| e.to_string())?;
+            let file = source.file()?;
+            offsets[layer + 2] = circulation.stage(after.pinned, file, source.file_octets()?, &after.regions).map_err(|e| e.to_string())?;
             stage_wall[layer + 2] = clock.elapsed().as_secs_f64();
         }
 
@@ -584,7 +677,7 @@ pub fn circulate(
         founded.realization.bind(*occurrence, SealedMidpointQuotient);
     }
     let bound = passage_final
-        .bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), terminal)
+        .bind(&founded.complex, &founded.realization, &material, source.occurrence(), &receiver, Some(&admission), terminal)
         .map_err(|o| format!("the final deed refused at bind: {}", describe(&o)))?;
     let bind_wall_s = bind_clock.elapsed().as_secs_f64();
     peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
@@ -677,8 +770,8 @@ pub fn circulate(
     }
 
     // The container has not moved under the deed.
-    occurrence.container.verify_still().map_err(|e| format!("the container moved under the circulation: {e}"))?;
-    if occurrence.container.identity != identity_before {
+    source.verify_stable().map_err(|e| format!("the container moved under the circulation: {e}"))?;
+    if source.source_identity() != identity_before {
         return Err("the container's identity moved under the circulation".to_owned());
     }
 
@@ -694,13 +787,9 @@ pub fn circulate(
             }
         }
     }
-    let container = &occurrence.container;
     let graph_key = GraphKey {
         mode: format!("{:?}", surface.mode()),
-        source: format!(
-            "{} octets, header {} octets, header sha256 {}, content sha256 {:?}, identity {:?}",
-            container.octets, container.header_octets, container.header_sha256, container.content_sha256, container.identity
-        ),
+        source: source.source_identity(),
         topology: receipts.iter().map(|r| (r.operations, r.fronts, r.graph_nodes, r.graph_edges)).collect(),
         ports: vec![
             ("continuing standing".to_owned(), tokens.len(), tower::HIDDEN),

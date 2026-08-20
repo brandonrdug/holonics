@@ -11,9 +11,10 @@ they are respectively a bounded lift-law instrument, an ARM N condensation exper
 cultivation mechanism, and a CPU ARM N application. They are retained, but none is the corresponding
 whole-Phoenix deed. The dirty former P5 is an unadmitted ARM N dissection candidate. **W1 returned
 2026-08-20 with all 45 admitted complexes, 1,466 operation correspondences, 2,130 exact
-populations, and 262,144 codec rows in a source-detached native rest. W2, lifted native execution
-and structural condensation, is the open deed.** M0–M3 remain blocked until W5 closes the
-indivisible Phoenix grade.
+populations, and 262,144 codec rows in a source-detached native rest. **W2 returned 2026-08-20: the
+lifted rest conducts on the card, all 168 committed intervention cells are unchanged, and all four
+nontrivial condensation candidates reopen under complete successor conduct. W3, cultivation of the
+lifted body, is the open deed.** M0–M3 remain blocked until W5 closes the indivisible Phoenix grade.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -735,6 +736,12 @@ standing, source-runtime comparison faces and intervention consequences on the c
 receiver-exact condensation to this lifted body. Preserve already-founded QK/OV/grouped-sharing
 structure; report no further factor if the future family prevents one. The independent ARM N
 condensation remains a control, never the subject.
+
+**Returned 2026-08-20.** The exact return and scope are recorded in
+[`2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md`](../research/records/2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md).
+The five-token text passage and complete sixteen-taxon panel reproduce their committed native
+receivers on the GPU. The current future family permits no nontrivial quotient, so W2 retains four
+complete reconstruction fibres and quotes no factor.
 
 ### Deed W3 — cultivation of the lifted body
 

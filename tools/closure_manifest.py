@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -63,6 +64,16 @@ HEADER = (
     "# `producer` is `ORPHAN` when no driver in the tree bears the directory's name: that is a\n"
     "# return the tree cannot reproduce, and it is reported rather than skipped.\n"
     "driver\tproducer\tclosure\tsources\n"
+)
+
+# Explicit path modules are compiled into the declaring driver/helper even when they live outside
+# the crate's ordinary `src/` tree.  Resolve them relative to the declaring file, as rustc does
+# for a non-inline `mod`, and walk their own path modules transitively.  This does not scan sibling
+# examples or infer ordinary `mod foo;` resolution: the crate closure owns the latter.
+PATH_MODULE = re.compile(
+    r"#\[\s*path\s*=\s*\"([^\"]+)\"\s*\]\s*"
+    r"mod\s+[A-Za-z_][A-Za-z0-9_]*\s*;",
+    re.MULTILINE,
 )
 
 
@@ -100,10 +111,54 @@ def crate_members(crate: Path) -> tuple[Path, ...]:
     return tuple(member for member in sorted(set(members)) if member.is_file())
 
 
+def path_module_references(text: str) -> tuple[str, ...]:
+    """Return declared `#[path]` targets in source order for a pure parser exercise."""
+
+    return tuple(match.group(1) for match in PATH_MODULE.finditer(text))
+
+
+def path_module_sources(source: Path) -> tuple[Path, ...]:
+    """Return the transitive regular-file closure of explicit path modules for ``source``.
+
+    The walk is cycle-safe and deterministic. Missing targets and paths outside this repository
+    are not source occurrences and therefore do not enter this manifest's closure.
+    """
+
+    entry = source.resolve()
+    seen: set[Path] = set()
+    discovered: set[Path] = set()
+    pending = [entry]
+    while pending:
+        current = pending.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        if not current.is_file():
+            continue
+        try:
+            current.relative_to(ROOT)
+        except ValueError:
+            continue
+        text = current.read_text(encoding="utf-8", errors="replace")
+        for relative in path_module_references(text):
+            target = (current.parent / relative).resolve()
+            if not target.is_file():
+                continue
+            try:
+                target.relative_to(ROOT)
+            except ValueError:
+                continue
+            if target not in discovered:
+                discovered.add(target)
+                pending.append(target)
+    discovered.discard(entry)
+    return tuple(sorted(discovered))
+
+
 def closure_of(source: Path) -> tuple[str, int]:
-    """Hash the driver, its crate's sources, and its crate manifest. Returns (hash, file count)."""
+    """Hash the driver, its path modules, crate sources, and manifest. Returns (hash, count)."""
     crate = crate_of(source)
-    members = [source, *crate_members(crate)]
+    members = [source, *path_module_sources(source), *crate_members(crate)]
     digest = hashlib.sha256()
     counted = 0
     for member in sorted(set(members)):

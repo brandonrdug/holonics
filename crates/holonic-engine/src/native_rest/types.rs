@@ -268,6 +268,9 @@ pub enum NativeRestRefusal {
     ActivePopulationMissing {
         population: String,
     },
+    PopulationOpen {
+        population: String,
+    },
     DuplicateIdentity {
         owner: String,
         identity: String,
@@ -321,6 +324,7 @@ impl std::fmt::Display for NativeRestRefusal {
             | Self::DuplicatePopulation { population }
             | Self::PopulationShapeDiffers { population }
             | Self::ActivePopulationMissing { population }
+            | Self::PopulationOpen { population }
             | Self::ExternalRequiresStreaming { population }
             | Self::CorrespondencePopulationMismatch { population } => f.write_str(population),
             Self::PopulationExtentDiffers {

@@ -314,12 +314,23 @@ source descriptor. The crossing is one-pass and quotes no compression factor: th
 16,022,507,913-octet rest is source-shaped, not yet a condensed ecology. `CONSTRUCTION_STATE.md`
 remains unchanged because W5 alone closes the indivisible Phoenix phase.
 
-**The next deed is W2 — lifted native execution and structural condensation.** W2 mounts this W1
-body in a fresh process, reproduces Station C/H4 plural futures and intervention consequences on
-the card, and attempts receiver-exact condensation on the lifted body. W3 cultivates that body with
-genuine held-out change and resident adjoint return; W4 supplies source-detached card inference; W5
-repeats dissection and closes the indivisible grade. Independent ARM N remains a control. M0–M3
-remain blocked until W5 passes.
+**DEED W2 PASSED 2026-08-20 — the native rest conducts, the dissection is unchanged, and every
+tempting quotient reopens.** Authoritative record:
+[`research/records/2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md`](../research/records/2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md).
+The W1 rest alone drove 43 GPU deeds with one terminal synchronization and returned Station C's
+plural future, all 12,800 final-normed coordinates, and all 42 collapsed-population rows bit-exactly.
+The native base/replay/sixteen-taxon/prefix-control cohort returned **168 of 168** committed cells
+unchanged. Receiver-exact structural grading covered all 1,466 W1 operations through 45 deed states:
+four nontrivial one-shot fibres appeared and complete successor conduct reopened all four, so no
+structural or byte factor is quoted. QK, OV, and the two KV producer/consumer families remain
+explicit separated structures. `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes
+the indivisible Phoenix phase.
+
+**The next deed is W3 — cultivation of the lifted body.** W3 joins material-founded morphology to
+this exact W2 predecessor and must return genuine held-out change, a resident derived adjoint/delta,
+source-detached remount, and targeted ablation restoring W2. W4 supplies source-detached card
+inference; W5 repeats dissection and closes the indivisible grade. Independent ARM N remains a
+control. M0–M3 remain blocked until W5 passes.
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section

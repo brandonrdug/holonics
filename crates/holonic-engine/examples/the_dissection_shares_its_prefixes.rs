@@ -40,6 +40,8 @@ mod cohort;
 mod resident_layer;
 #[path = "phoenix/streamed.rs"]
 mod streamed;
+#[path = "phoenix/native_streamed.rs"]
+mod native_streamed;
 #[path = "phoenix/tower.rs"]
 mod tower;
 
@@ -52,7 +54,8 @@ use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::resident_section::{word_value, ResidentGrain, ResidentSurface, SeriesAperture};
 use num_bigint::BigInt;
 use relational_geometry::Rat;
-use resident_layer::Source;
+use native_streamed::NativeMaterialSource;
+use streamed::{ForeignMaterialSource, MaterialSource};
 use tower::Intervention;
 
 // ---------------------------------------------------------------------------------------------
@@ -61,6 +64,7 @@ use tower::Intervention;
 
 struct Args {
     root: String,
+    native_rest: Option<String>,
     out: String,
     committed: String,
     text: Option<String>,
@@ -75,6 +79,7 @@ struct Args {
 fn parse_args() -> Args {
     let mut args = Args {
         root: "/home/b/models/gemma-4-E4B-it".to_owned(),
+        native_rest: None,
         out: "output/the_dissection_shares_its_prefixes".to_owned(),
         committed: "output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form".to_owned(),
         text: None,
@@ -89,6 +94,7 @@ fn parse_args() -> Args {
     while let Some(flag) = it.next() {
         match flag.as_str() {
             "--root" => args.root = it.next().expect("--root <dir>"),
+            "--native-rest" => args.native_rest = Some(it.next().expect("--native-rest <path>")),
             "--out" => args.out = it.next().expect("--out <dir>"),
             "--committed" => args.committed = it.next().expect("--committed <path>"),
             "--text" => args.text = Some(it.next().expect("--text <text>")),
@@ -482,7 +488,16 @@ struct Outcome {
 fn main() {
     let args = parse_args();
     let clock = Instant::now();
-    println!("THE DISSECTION SHARES ITS PREFIXES — {}", args.root);
+    if args.native_rest.is_some() && args.tokens.is_none() {
+        println!("REFUSED: --native-rest requires --tokens; native W1 has no Python/source tokenizer");
+        std::process::exit(2);
+    }
+    if args.native_rest.is_some() && args.text.is_some() {
+        println!("REFUSED: --native-rest accepts --tokens only; --text would reopen the foreign tokenizer");
+        std::process::exit(2);
+    }
+    let mode_label = if args.native_rest.is_some() { "native W1" } else { "foreign Gemma" };
+    println!("THE DISSECTION SHARES ITS PREFIXES — {mode_label}");
     std::fs::create_dir_all(&args.out).expect("output directory");
     let committed = match read_committed(&args.committed) {
         Ok(c) => c,
@@ -536,16 +551,22 @@ fn main() {
     };
     println!("  the fixed input: {text:?} → {tokens:?} {pieces:?}");
 
-    let mut source = Source::open(&args.root).expect("source opens");
-    let content_sha256 = if args.digest_container {
-        let digest_clock = Instant::now();
-        let digest = holonic_engine::source_occurrence::AuthenticatedContainer::digest_whole(&format!("{}/model.safetensors", args.root)).expect("digest");
-        println!("  container content sha256 {} re-taken in {:.1} s", &digest[..16], digest_clock.elapsed().as_secs_f64());
-        Some(digest)
+    let mut source: Box<dyn MaterialSource> = if let Some(rest_path) = &args.native_rest {
+        println!("  source: native W1 rest {rest_path} (path-detached; no root/model/config/tokenizer opened)");
+        Box::new(NativeMaterialSource::open(rest_path).expect("native W1 rest opens"))
     } else {
-        println!("  container content sha256 {} REUSED from the committed manifest ({})", &streamed::COMMITTED_CONTENT_SHA256[..16], streamed::COMMITTED_CONTENT_TAKEN);
-        Some(streamed::COMMITTED_CONTENT_SHA256.to_owned())
+        let content_sha256 = if args.digest_container {
+            let digest_clock = Instant::now();
+            let digest = holonic_engine::source_occurrence::AuthenticatedContainer::digest_whole(&format!("{}/model.safetensors", args.root)).expect("digest");
+            println!("  container content sha256 {} re-taken in {:.1} s", &digest[..16], digest_clock.elapsed().as_secs_f64());
+            Some(digest)
+        } else {
+            println!("  container content sha256 {} REUSED from the committed manifest ({})", &streamed::COMMITTED_CONTENT_SHA256[..16], streamed::COMMITTED_CONTENT_TAKEN);
+            Some(streamed::COMMITTED_CONTENT_SHA256.to_owned())
+        };
+        Box::new(ForeignMaterialSource::open(&args.root, content_sha256).expect("source opens"))
     };
+    let source_identity = format!("{mode_label} · {}", source.source_identity());
 
     // ------------------------------------------------------------------------------------------
     // the towers: the base, the replay, the sixteen matched siblings, the prefix control
@@ -581,13 +602,47 @@ fn main() {
         println!("    {:<78} enters at {:>2} · conducts {:>2} deeds · shares prefix {}", declaration.name, declaration.enters_at, conducted, declaration.shares_prefix);
     }
 
-    let cohorted: Cohorted = match cohort::circulate_cohort(surface, readout, &mut source, &args.root, &tokens, grain, terms, chart, &declarations, args.band, content_sha256) {
+    let cohorted: Cohorted = match cohort::circulate_cohort(surface, readout, source.as_mut(), &tokens, grain, terms, chart, &declarations, args.band) {
         Ok(c) => c,
         Err(error) => {
             println!("REFUSED: the cohort did not conduct — {error}");
             std::process::exit(6);
         }
     };
+    let mut native_fd_audit = "foreign source mode; native descriptor audit not applicable".to_owned();
+    if args.native_rest.is_some() {
+        let mut opened = Vec::new();
+        if let Ok(entries) = std::fs::read_dir("/proc/self/fd") {
+            for entry in entries.flatten() {
+                if let Ok(target) = std::fs::read_link(entry.path()) {
+                    opened.push(target.to_string_lossy().into_owned());
+                }
+            }
+        }
+        let forbidden_descriptors = [
+            "model.safetensors",
+            "modeling_gemma4.py",
+            "config.json",
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "generation_config.json",
+        ];
+        let foreign_descriptor_seen = opened.iter().any(|path| {
+            forbidden_descriptors.iter().any(|descriptor| {
+                path.ends_with(&format!("/{descriptor}")) || path == descriptor
+            })
+        });
+        if foreign_descriptor_seen {
+            println!("REFUSED: native W1 conduct left an original Gemma/config/tokenizer descriptor open: {opened:?}");
+            std::process::exit(7);
+        }
+        native_fd_audit = format!(
+            "HELD: no original Gemma/config/tokenizer descriptor among {} open descriptors",
+            opened.len()
+        );
+        println!("  native W1 /proc/self/fd audit after conduct: no original Gemma/config/tokenizer descriptor open");
+    }
     println!(
         "  conducted in {:.1} s (loop {:.1} s) · {} graph launches from {} bound passages · the ledger would have instantiated {} · widest charge {} octets",
         cohorted.wall_s, cohorted.loop_wall_s, cohorted.deed_launches, cohorted.passages_bound, cohorted.graph_instantiations, cohorted.peak_charged_octets
@@ -1096,9 +1151,11 @@ fn main() {
     // ------------------------------------------------------------------------------------------
     let mut form: Vec<String> = Vec::new();
     form.push(format!(
-        "THE DISSECTION SHARES ITS PREFIXES — {} · chart {chart:?} · grain 2^-{} · terms {} · device {} · mode {}",
-        args.root, grain.0, terms.0, surface.device_name(), surface.mode().kernel_content.as_deref().unwrap_or("?")
+        "THE DISSECTION SHARES ITS PREFIXES — {mode_label} · chart {chart:?} · grain 2^-{} · terms {} · device {} · mode {}",
+        grain.0, terms.0, surface.device_name(), surface.mode().kernel_content.as_deref().unwrap_or("?")
     ));
+    form.push(format!("source identity: {source_identity}"));
+    form.push(format!("source descriptor audit: {native_fd_audit}"));
     form.push(format!("fixed input {text:?} tokens {tokens:?} pieces {pieces:?}"));
     form.push(format!("the committed predecessor compared against: {}", args.committed));
     form.push(format!(

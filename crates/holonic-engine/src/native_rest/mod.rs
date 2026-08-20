@@ -12,7 +12,7 @@ mod types;
 
 pub use crate::operation_correspondence::NativeGraphIdentity;
 pub use manifest::{NativePayloadDescriptor, NativePopulationDescriptor, NativeRest};
-pub use mounted::MountedNativeRest;
+pub use mounted::{MountedNativeRest, MountedPopulationExtent};
 pub use types::{
     NativeLawIdentity, NativeOperation, NativeOwnerIdentity, NativePopulation,
     NativePopulationPayload, NativeRestInput, NativeRestRefusal, NativeSourceIdentity,

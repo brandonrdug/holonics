@@ -60,11 +60,9 @@ use holonic_engine::front_passage::{
     ResidentMaterial, SealedMidpointQuotient,
 };
 use holonic_engine::resident_section::{Dyadic, Positions, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, TransferCensus};
-use holonic_engine::source_occurrence::SourceOccurrence;
 use holonic_engine::streamed_standing::{GraphKey, Instantiation, KeyedInstantiations, StreamedCensus, StreamedCirculation};
 
-use super::resident_layer::Source;
-use super::streamed::{final_segment, header_regions, layer_segment, slot_shapes, Segment, FINAL_PINNED, FINAL_SLOT};
+use super::streamed::{final_segment, layer_segment, slot_shapes, MaterialSource, Segment, FINAL_PINNED, FINAL_SLOT};
 use super::tower::{self, Entry, Intervention, KvRole, Species};
 
 /// Where a matched sibling's intervention is applied. The same four sites the committed
@@ -284,7 +282,7 @@ pub enum Residency {
 #[allow(clippy::too_many_arguments)]
 fn key_of(
     surface: &ResidentSurface<'_>,
-    occurrence: &SourceOccurrence,
+    source_identity: &str,
     bound: &CompiledPassage<'_>,
     material: &ResidentMaterial<'_>,
     tokens: usize,
@@ -303,7 +301,6 @@ fn key_of(
             reductions.push((coupling.plan.kernel.to_owned(), coupling.plan.extent));
         }
     }
-    let container = &occurrence.container;
     let mut addressed: Vec<(String, u64, usize, usize)> = Vec::new();
     if residency >= Residency::Standings {
         addressed.extend(
@@ -328,8 +325,8 @@ fn key_of(
     GraphKey {
         mode: format!("{:?}", surface.mode()),
         source: format!(
-            "{} octets, header {} octets, header sha256 {}, content sha256 {:?}, identity {:?}",
-            container.octets, container.header_octets, container.header_sha256, container.content_sha256, container.identity
+            "{}",
+            source_identity
         ),
         topology: vec![(operations, bound.fronts().len(), graph_nodes, graph_edges)],
         ports: vec![
@@ -356,15 +353,13 @@ fn key_of(
 pub fn circulate_cohort(
     surface: &'static ResidentSurface<'static>,
     _readout: &'static ResidentReadout,
-    source: &mut Source,
-    root: &str,
+    source: &mut dyn MaterialSource,
     tokens: &[usize],
     grain: ResidentGrain,
     terms: SeriesAperture,
     chart: tower::Chart,
     declarations: &[TowerDeclaration],
     band: usize,
-    content_sha256: Option<String>,
 ) -> Result<Cohorted, String> {
     let clock = Instant::now();
     let census_before = surface.census();
@@ -397,9 +392,7 @@ pub fn circulate_cohort(
     let prediction = passage_zero.predict_pooled_material(&shapes, &refills, bands_elements, 2 * tokens.len() + tower::HEADS);
     let admission = passage_zero.admit_material(&prediction).map_err(|o| format!("the cohort's pooled material refused: {}", describe(&o)))?;
 
-    let regions = header_regions(source)?;
-    let occurrence: SourceOccurrence = super::resident_layer::source_occurrence(root, regions, content_sha256)?;
-    let identity_before = occurrence.container.identity.clone();
+    let identity_before = source.source_identity();
 
     let pinned = vec![shapes[0].stored_octets, shapes[0].stored_octets, shapes[0].stored_octets, shapes[2].stored_octets];
     let mut circulation = StreamedCirculation::open(surface, &shapes, &pinned).map_err(|e| e.to_string())?;
@@ -450,7 +443,7 @@ pub fn circulate_cohort(
     let mut layer_scalars = Vec::with_capacity(tower::LAYERS);
     for segment in &layer_segments {
         let region = segment.scalar.as_ref().ok_or("the layer segment carries no layer scalar")?;
-        layer_scalars.push(Dyadic::of_bfloat16_bits(super::streamed::scalar_word_of(&source.file, region)?).map_err(|e| e.to_string())?);
+        layer_scalars.push(Dyadic::of_bfloat16_bits(super::streamed::scalar_word_of(source.file()?, region)?).map_err(|e| e.to_string())?);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -513,10 +506,10 @@ pub fn circulate_cohort(
     let mut requests: Vec<Vec<holonic_engine::embedding_fiber::PooledMount>> = vec![Vec::new(); segments];
     {
         let first = at(0);
-        offsets[0] = circulation.stage(first.pinned, &source.file, source.container.file_octets, &first.regions).map_err(|e| e.to_string())?;
+        offsets[0] = circulation.stage(first.pinned, source.file()?, source.file_octets()?, &first.regions).map_err(|e| e.to_string())?;
         requests[0] = circulation.cross(first.slot, first.pinned, &offsets[0], &first.regions).map_err(|e| e.to_string())?;
         let second = at(1);
-        offsets[1] = circulation.stage(second.pinned, &source.file, source.container.file_octets, &second.regions).map_err(|e| e.to_string())?;
+        offsets[1] = circulation.stage(second.pinned, source.file()?, source.file_octets()?, &second.regions).map_err(|e| e.to_string())?;
     }
 
     let mut band_open = surface.census();
@@ -605,7 +598,7 @@ pub fn circulate_cohort(
             }
             let passage = FrontPassage::new(surface, grain).reading(declared.iter().copied());
             let mut bound = passage
-                .bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), terminal)
+                .bind(&founded.complex, &founded.realization, &material, source.occurrence(), &receiver, Some(&admission), terminal)
                 .map_err(|o| format!("{} layer {layer} refused at bind: {}", declaration.name, describe(&o)))?;
             peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
             let (graph, _) = bound.graph();
@@ -618,7 +611,7 @@ pub fn circulate_cohort(
                 (Residency::Standings, &mut instantiations_standings),
                 (Residency::Whole, &mut instantiations),
             ] {
-                let key = key_of(surface, &occurrence, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary.clone(), level, &operations);
+                let key = key_of(surface, &identity_before, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary.clone(), level, &operations);
                 let _ = ledger.offer(&label, &key);
             }
 
@@ -687,7 +680,7 @@ pub fn circulate_cohort(
         }
         if layer + 2 < segments {
             let after = at(layer + 2);
-            offsets[layer + 2] = circulation.stage(after.pinned, &source.file, source.container.file_octets, &after.regions).map_err(|e| e.to_string())?;
+            offsets[layer + 2] = circulation.stage(after.pinned, source.file()?, source.file_octets()?, &after.regions).map_err(|e| e.to_string())?;
         }
 
         // **The band boundary.** A residency aperture, declared before the first launch: which
@@ -740,7 +733,7 @@ pub fn circulate_cohort(
         }
         let passage = FrontPassage::new(surface, grain).reading(declared.iter().copied());
         let bound = passage
-            .bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), terminal)
+            .bind(&founded.complex, &founded.realization, &material, source.occurrence(), &receiver, Some(&admission), terminal)
             .map_err(|o| format!("{} refused at the final bind: {}", declaration.name, describe(&o)))?;
         peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
         let (graph, _) = bound.graph();
@@ -751,10 +744,10 @@ pub fn circulate_cohort(
             (Residency::AsH4Founded, &mut instantiations_as_h4),
             (Residency::Standings, &mut instantiations_standings),
         ] {
-            let key = key_of(surface, &occurrence, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary.clone(), level, &operations);
+            let key = key_of(surface, &identity_before, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary.clone(), level, &operations);
             let _ = ledger.offer(&label, &key);
         }
-        let key = key_of(surface, &occurrence, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary, Residency::Whole, &operations);
+        let key = key_of(surface, &identity_before, &bound, &material, tokens.len(), grain, terms, founded.complex.operations.len(), graph_nodes, graph_edges, boundary, Residency::Whole, &operations);
         let _ = instantiations.offer(&label, &key);
         let census_at_launch = bound
             .launch_on(&surface.mode(), circulation.conducting())
@@ -827,8 +820,8 @@ pub fn circulate_cohort(
         shared_after.insert((*name).to_owned(), surface.read_out(section).map_err(|e| e.to_string())?);
     }
 
-    occurrence.container.verify_still().map_err(|e| format!("the container moved under the circulation: {e}"))?;
-    if occurrence.container.identity != identity_before {
+    source.verify_stable().map_err(|e| format!("the container moved under the circulation: {e}"))?;
+    if source.source_identity() != identity_before {
         return Err("the container's identity moved under the circulation".to_owned());
     }
 

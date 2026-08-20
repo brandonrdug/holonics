@@ -101,9 +101,9 @@ crates/holonic-engine/src/name_elaboration.rs	.clone()=29	.collect()=32	.into_it
 crates/holonic-engine/src/native_law.rs	.clone()=5	.collect()=3	BTreeMap=5	Vec=13
 crates/holonic-engine/src/native_occurrence.rs	.clone()=19	.collect()=1	BTreeMap=3	Vec=10
 crates/holonic-engine/src/native_rest/manifest.rs	.clone()=22	.collect()=6	.into_iter()=2	BTreeSet=8	Vec=8
-crates/holonic-engine/src/native_rest/mounted.rs	.clone()=1
+crates/holonic-engine/src/native_rest/mounted.rs	.clone()=33	.collect()=7	BTreeSet=3	Vec=22
 crates/holonic-engine/src/native_rest/seal_stream.rs	.clone()=20	.collect()=3	.flat_map()=1	.into_iter()=2	BTreeMap=2	BTreeSet=4	Vec=5
-crates/holonic-engine/src/native_rest/tests.rs	.clone()=6	BTreeMap=2	Vec=4
+crates/holonic-engine/src/native_rest/tests.rs	.clone()=15	BTreeMap=2	Vec=4
 crates/holonic-engine/src/native_rest/types.rs	.clone()=10	.collect()=1	BTreeMap=2	BTreeSet=2	Vec=13
 crates/holonic-engine/src/observation_ecology.rs	.clone()=49	.collect()=41	.flat_map()=1	.into_iter()=4	BTreeMap=38	BTreeSet=27	Vec=106
 crates/holonic-engine/src/operation_correspondence/schema.rs	.clone()=13	.collect()=2	BTreeMap=4	Vec=25
