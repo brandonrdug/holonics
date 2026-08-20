@@ -3,16 +3,15 @@
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
-**Status:** active construction contract when named by the roadmap. **Deeds H0 through H5 returned 2026-08-19/20 — the hardware foundation is complete** ([H0](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md), [H1](../research/records/2026-08-19_THE_PARTITION_IS_TYPED_THE_REDUCTION_IS_A_JUNCTION_AND_THE_ADVERSARY_REFUTED_EIGHT_CLAIMS_BEFORE_THE_DEED_WAS_RECORDED.md), [H2](../research/records/2026-08-19_THE_CONTRACTION_IS_TILED_THE_SCALAR_OWNER_REFEREES_AND_THE_OBSTRUCTION_IS_SHAPE_CONDITIONAL_AND_MEASURED.md), [H3](../research/records/2026-08-19_THE_CENSUS_DROPS_ITS_ATOMICS_THE_QUOTIENT_FUSES_WHERE_THE_RECEIVER_FACTORS_AND_THE_MOUTH_READS_ITS_MATERIAL.md), [H4](../research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md), [H5](../research/records/2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md)); [P0](../research/records/2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md) returned 2026-08-20;
-[P1](../research/records/2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md),
-[P2](../research/records/2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md),
-[P3](../research/records/2026-08-20_THE_REST_IS_CULTIVATED_THE_DELTA_IS_DERIVED_AND_THE_ABLATION_RESTORES_THE_PREDECESSOR_OCTET_FOR_OCTET.md) and
-[P4](../research/records/2026-08-20_THE_APPLICATION_INFERS_AND_CULTIVATES_FROM_THE_REST_ALONE_AND_THE_CORPUS_LOOKUP_IS_GONE.md)
-returned 2026-08-20; **P5 is the open deed**; M0–M3 remain open after it. (This status line stood
-stale at "P1 is the open deed" from the P1 commit until 2026-08-20: four successive edits failed
-their anchors silently inside multi-step scripts whose tracebacks scrolled out of backgrounded
-output — the roadmap, the sole scheduler, was correct throughout; repaired with this note so the
-drift is on the record.)
+**Status:** active construction contract when named by the roadmap. **Deeds H0 through H5 returned
+2026-08-19/20 as the bounded hardware foundation; P0 returned as the independent ARM N baseline.**
+The former P1–P4 promotions were regraded 2026-08-20 by
+[THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md):
+they are respectively a bounded lift-law instrument, an ARM N condensation experiment, an ARM N
+cultivation mechanism, and a CPU ARM N application. They are retained, but none is the corresponding
+whole-Phoenix deed. The dirty former P5 is an unadmitted ARM N dissection candidate. **W1, the whole
+foreign-to-native rest and correspondence, is the open deed.** M0–M3 remain blocked until W5 closes
+the indivisible Phoenix grade.
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -653,7 +652,7 @@ quarantined material rederived through the H owners with the flat shape replaced
 geometry; the manifest's measured rows exhibited and its winding/phase rows OPEN with falsifiers;
 no group action founded (a monoid, measured).
 
-### Deed P1 — cross-chart lift
+### Instrument L1 — bounded cross-chart lift law
 
 Construct \(\Phi_X,\Phi_Y\), inverse-or-quotient receipts and
 
@@ -664,30 +663,93 @@ Construct \(\Phi_X,\Phi_Y\), inverse-or-quotient receipts and
 over the declared source/native receiver and intervention family. Return complete defect, fibres,
 shortest separators and source-independent native recombination.
 
-### Deed P2 — receiver-exact condensation
+**Returned boundedly 2026-08-20 and regraded.** Exact on hidden window 64 of 2,560, head window 16
+of 256, family 0 of 2 and grain 2^-8. It proves the lift law and BF16 fibres; it does not map the
+whole foreign body or its codebook into ARM N.
+
+### Experiment N1 — receiver-exact condensation of ARM N
 
 Condense only where plural future histories, remount, intervention, derivative/adjoint, diffusion,
 cross-codec and native recombination consequences factor. Mark unexcited material separately.
 Report sparse/generator/state/group structural compression, not presumed dense rank truncation.
 
-### Deed P3 — cultivation
+**Returned boundedly 2026-08-20 and regraded.** The independent native transport does not condense;
+the tree axis falls for free; no factor is quoted. This is not condensation of a lifted Gemma body.
+
+### Mechanism N2 — cultivation of ARM N
 
 Use lineage-separated development, held-out, codec-variant, structurally related and
 subject-disjoint material. The resident adjoint/reduction lineage derives the delta. Same-body
 changed conduct survives detached remount; no-op and subject-disjoint controls stand; targeted
 ablation restores the predecessor consequence.
 
-### Deed P4 — native rest and frozen runtime
+**Returned as a mechanism 2026-08-20 and regraded.** The delta/adjoint/foil/remount/ablation
+mechanisms stand. The changed probes are development probes, the genuinely held-out probes remain
+unchanged, the deed is CPU-exact, and the cultivated body is independent ARM N. The Phoenix
+cultivation grade remains open.
+
+### Prototype N3 — CPU ARM N rest/application
 
 Seal native morphology, realization, decoder, condensation and cultivation receipts. The foreign
 source departs. A fresh process mounts through an application entry, accepts new material, emits an
 actual surface/plural future and leaves frozen rest byte-identical. No driver shell or source lookup.
 
-### Deed P5 — reborn dissection and complete Phoenix grade
+**Returned as a CPU application prototype 2026-08-20 and regraded.** Rest-only inference and
+cultivation, frozen identity, unseen runtime material, a second generation and the GGUF refusal
+stand. The application never opens the device and --card refuses UNWIRED; it is not the resident
+Phoenix runtime.
+
+### Candidate D0 — native ARM N dissection and honesty grade
 
 Repeat the intervention atlas on source, lifted predecessor and cultivated native body. Compare
 native recombination, held-out conduct, exact work/utility and targeted family/cultivation
 ablations. Only this complete grade moves CONSTRUCTION_STATE.md.
+
+**Unadmitted.** The dirty source does not compile, its artifacts are stale/unmanifested, its
+apparatus-utility grade remains open, and it correctly states that ARM N is not a Gemma lift. Retain
+as quarantine material; do not move CONSTRUCTION_STATE.md.
+
+### Deed W1 — whole foreign-to-native rest and correspondence
+
+Seal a source-detached native rest carrying the complete admitted Gemma operation topology, every
+population required by active inference, native resident-law/graph/tiling/reduction identities, and
+the source/native vocabulary-codec correspondence. Every source operation/population maps to a
+native occurrence or a named open remainder. After seal, modeling_gemma4.py, config.json and the
+original model.safetensors must be absent and inaccessible.
+
+No compression is required. A source-shaped native rest is a lawful negative on transfiguration if
+it is complete and executable.
+
+### Deed W2 — lifted native execution and structural condensation
+
+Mount W1 in a fresh process and reproduce the committed Station C/H4 plural futures, terminal
+standing, source-runtime comparison faces and intervention consequences on the card. Apply
+receiver-exact condensation to this lifted body. Preserve already-founded QK/OV/grouped-sharing
+structure; report no further factor if the future family prevents one. The independent ARM N
+condensation remains a control, never the subject.
+
+### Deed W3 — cultivation of the lifted body
+
+Join new material-founded native morphology to W2 at typed ports. The foreign-derived frozen base
+may remain immutable; the productive body is the lifted base plus attributable native morphology.
+Require a lineage-separated development set, structurally related held-out set which changes,
+codec variant, subject-disjoint still control, no-op, matched foil, resident derived adjoint/delta,
+detached remount and targeted ablation restoring W2. Cultivating independent ARM N does not pass.
+
+### Deed W4 — source-detached resident frozen runtime
+
+eros phoenix infer mounts only the W3 rest and its declared exterior codec, opens the card, accepts
+new material, emits plural future/surface and exact causal/apparatus receipts, and leaves frozen
+rest byte-identical. CPU owns I/O and codec boundaries only. A CPU answer or UNWIRED card path
+fails.
+
+### Deed W5 — reborn dissection and indivisible Phoenix grade
+
+Compare the foreign source, W2 lifted predecessor, W3 cultivated Phoenix body and independent ARM N
+control. The first three share an explicit codebook/receiver correspondence. Repeat matched
+interventions, shortest separators, held-out conduct, condensation remainder, exact work and
+calibrated utility; ablate every causing lifted family and cultivation delta. Close every grade row
+before moving CONSTRUCTION_STATE.md.
 
 ### Deed M0 — mathematical source circulation
 
@@ -782,7 +844,8 @@ The plan refuses when:
 This blueprint is complete only when:
 
 1. H0-H5 replace the poor single-card foundation;
-2. P0-P5 return the complete Phoenix frozen native model and reborn dissection;
+2. P0 stands as the independent native control and W1-W5 return the whole lifted/cultivated
+   Phoenix frozen native model and reborn dissection;
 3. M0-M3 return the mathematics-codec vertical circulation;
 4. superseded scheduling blueprints and implementation paths are removed from live authority;
 5. every final artifact is source-detached, inspectable, mode-bound and graded with exact semantic

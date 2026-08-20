@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 447 research deposits current through 19 August 2026, including all 307
+`records/` contains 459 research deposits current through 20 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -34,6 +34,12 @@ governs the rebuild.
   section/tensor tiling, reduction/adjoint, local pressure covectors, product-ordered surface
   utility, double-buffered circulation and branch-sharing dissection; freezes Station A–D while
   quarantining unfinished Station E until the common hardware foundation passes.
+- **Phoenix regrade after the hardware and native-arm campaign:**
+  `records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md`
+  — preserves H0–H5 and the independent ARM N baseline; regrades the bounded lift law, ARM N
+  condensation/cultivation and CPU application; records the held-out and resident-card
+  counterexamples; quarantines the non-compiling native dissection; and makes the whole
+  foreign-to-native rest/correspondence the next Phoenix deed.
 - **Boundary/interior and returned stress:**
   `records/2026-08-02_THE_INTERIOR_RETURNS_AT_THE_BOUNDARY_THE_STRESS_REFORMS_THE_SAME_BODY.md`
 - **Warp/weft, navigation, and concurrency:**

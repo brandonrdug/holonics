@@ -283,6 +283,33 @@ declaration or an unloadable file both fail the recovered-atlas criterion). **De
 dissection and the complete Phoenix grade, the only deed that moves `CONSTRUCTION_STATE.md` — is
 next.**
 
+**RE-AUDITED AND REGRADED 2026-08-20 — the hardware foundation stands, ARM N is not the lift, and
+Phoenix remains OPEN.** Authoritative audit:
+[`research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md`](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md).
+
+The H0–H5 paragraphs above remain **established-bounded passes**. P0 remains the executable
+independent ARM N baseline. The later promotions are corrected without deleting their evidence:
+
+| former name | authoritative grade |
+|---|---|
+| P1 cross-chart lift | bounded lift-law instrument over hidden 64/2,560, head 16/256, family 0/2; no whole foreign map or codebook lift |
+| P2 condensation | bounded negative on independent ARM N; not condensation of a lifted Gemma body |
+| P3 cultivation | ARM N delta/adjoint/ablation mechanism; development moved, genuine held-out stayed unchanged; CPU-exact; lifted cultivation open |
+| P4 runtime | CPU ARM N application/rest prototype; card path UNWIRED; resident lifted runtime open |
+| dirty P5 | unadmitted ARM N dissection candidate; source does not compile, gates red, artifacts stale, complete utility open |
+
+The dirty P5 source states the decisive boundary itself: the lift is a bounded law and ARM N is
+independent of Gemma; no Φ maps the source codebook into the native vocabulary. It therefore cannot
+assemble the Phoenix rebirth grade. `CONSTRUCTION_STATE.md` remains unchanged.
+
+**The next deed is W1 — whole foreign-to-native rest and correspondence.** W1 seals the complete
+admitted Gemma operation topology, active populations, native bindings/graph identities and
+source/native codec correspondence so the original implementation/configuration/container can
+depart. W2 executes and grades structural condensation on that lifted body; W3 cultivates that
+lifted body with genuine held-out change and resident adjoint return; W4 supplies source-detached
+card inference; W5 repeats dissection and closes the indivisible grade. Independent ARM N remains a
+control. M0–M3 remain blocked until W5 passes.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without
