@@ -241,6 +241,25 @@ is not one)**; unexcited material (54,100 classes) retained in the fibre and the
 additive cost vector does not strictly fall and no factor is quoted**. Seventeen of seventeen
 verdicts. **Deed P3 (cultivation) is next.** `CONSTRUCTION_STATE.md` does not move.
 
+**DEED P3 PASSED 2026-08-20 — the rest is cultivated, the delta is derived, and the ablation
+restores the predecessor octet for octet.** Record:
+[`research/records/2026-08-20_THE_REST_IS_CULTIVATED_THE_DELTA_IS_DERIVED_AND_THE_ABLATION_RESTORES_THE_PREDECESSOR_OCTET_FOR_OCTET.md`](../research/records/2026-08-20_THE_REST_IS_CULTIVATED_THE_DELTA_IS_DERIVED_AND_THE_ABLATION_RESTORES_THE_PREDECESSOR_OCTET_FOR_OCTET.md).
+The fixture table fixed and printed before exposure and checked against the rest's own metadata; the
+structured residual plural with lineage; **commit == derive octet-for-octet** on the successor rest,
+non-tautologically (derive is never handed the deposited body); **the adjoint load-bearing by
+perturbation** (a declared metric change moves 5,462 committed increments at scale; the sparse
+adjoint equals exact_linear's dense result; a non-integral metric refuses by name); the germ-permuted
+foil separates structure from population (only 516 founded pairs shared); held-out changed and
+unchanged conduct at faces growth cannot forge, with the whole-support movement stated before it is
+read; the still control non-vacuous (the counterfactual commit derived and not committed); the
+fresh-process remount bit-equal; **the ablation an in-body withdrawal restoring the predecessor
+octet-identically** — strictly stronger than P0's rebuild; the no-op's empty structural delta with
+the separator-seam founding counted and named as the licensing's honest asymmetry; no factorized
+overlay, so no rank receipt owed; one authored recursion bound excised for a structural argument.
+Composed with the standing training owner (`ConsequenceRelation` imported, `absorb` extended with
+lineage and bit-identical). Ten of ten controls. **Deed P4 (native rest, export, frozen inference)
+is next.** `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

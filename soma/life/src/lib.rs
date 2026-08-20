@@ -7,6 +7,7 @@
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod algorithmic_material;
+pub mod atlas_cultivation;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
 // through receiver-exact compression. Codec/material names remain lineage and never route conduct.

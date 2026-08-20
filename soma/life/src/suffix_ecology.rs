@@ -116,6 +116,90 @@ struct SuffixEcologyBuilder {
     states: Vec<SuffixBuilderState>,
 }
 
+/// One elementary deposit an extension makes into the standing body.
+///
+/// Class indices are the builder's, which [`SuffixEcologyBuilder::freeze`] preserves one for one,
+/// so they are the frozen body's own class indices and the emitted container's.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ExtendEvent {
+    /// A class founded here. `split_from: None` is the class the material's own occurrence carried;
+    /// `Some(t)` is a **split** of the standing class `t` — a class the arrival divided, which
+    /// inherits `t`'s transport row and suffix link as they stand at this instant.
+    Founded {
+        class: usize,
+        split_from: Option<usize>,
+    },
+    /// A transition on the extension's own symbol added exactly where the class offered none. This
+    /// is the founding a refusal licenses.
+    TransitionAdded { class: usize, target: usize },
+    /// A transition on the extension's own symbol rebased onto a split.
+    TransitionRebased {
+        class: usize,
+        before: usize,
+        after: usize,
+    },
+    /// A suffix link set or rebased. `before: None` is a class founded by this same extension.
+    SuffixRebased {
+        class: usize,
+        before: Option<usize>,
+        after: usize,
+    },
+}
+
+/// **What one extension deposited, in the order it deposited it.**
+///
+/// The order is load-bearing: a split copies the row of the class it divides *as that row stands at
+/// that instant*, so a replay that reorders the events founds a different body.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ExtendRecord {
+    pub events: Vec<ExtendEvent>,
+}
+
+impl ExtendRecord {
+    pub fn is_empty(&self) -> bool {
+        self.events.is_empty()
+    }
+
+    /// The classes this extension founded, with the class each split divides.
+    pub fn founded(&self) -> impl Iterator<Item = (usize, Option<usize>)> + '_ {
+        self.events.iter().filter_map(|event| match event {
+            ExtendEvent::Founded { class, split_from } => Some((*class, *split_from)),
+            _ => None,
+        })
+    }
+
+    /// The `(class, target)` transitions this extension added where the class offered none.
+    pub fn transitions_added(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        self.events.iter().filter_map(|event| match event {
+            ExtendEvent::TransitionAdded { class, target } => Some((*class, *target)),
+            _ => None,
+        })
+    }
+}
+
+/// **The complete forward lineage of one absorb**, positionally addressed.
+///
+/// Every row of a cultivation delta is caused by one entry here, which is what makes the delta
+/// carry its cause rather than being a difference between two whole bodies.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct AbsorbLineage {
+    /// The class population before the deposit. Every class at or above this index was founded by
+    /// it; every class below it stood already and keeps its index.
+    pub classes_before: usize,
+    /// The germ-transition population before the deposit.
+    pub transitions_before: usize,
+    /// Per material position, the class the deposit stood in before carrying that germ.
+    pub stood_in: Vec<u32>,
+    /// Per material position, the class the deposit landed in.
+    pub landed: Vec<u32>,
+    /// Per material position, what that position's extension deposited.
+    pub per_position: Vec<ExtendRecord>,
+    /// The separator's own extension. It carries no germ and no material occurrence.
+    pub boundary: ExtendRecord,
+    /// The separator this path was given, one past the greatest the body already carried.
+    pub boundary_symbol: u64,
+}
+
 /// A suffix-scale receiver reached by the question.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SuffixContext {
@@ -740,9 +824,34 @@ impl ExactSuffixEcology {
     /// A body that absorbed `A` then `B` is a body with a lineage; that it is distinguishable from
     /// one handed both at once is the chronology being real, not a defect to canonicalise away.
     pub fn absorb(&mut self, path: &[ResonanceGerm]) -> Result<(), ExactSuffixEcologyError> {
+        self.absorb_returning_lineage(path).map(|_| ())
+    }
+
+    /// ★ **THE SAME DEPOSIT, RETURNING ITS FORWARD LINEAGE.**
+    ///
+    /// Added 2026-08-20 for Deed P3. [`Self::absorb`] delegates here and discards the lineage, so
+    /// nothing that stands moves; its falsifiers are unchanged and still cover it.
+    ///
+    /// The deposit already computes, per material position, the class it stood in, the class it
+    /// landed in, the classes it founded, the transitions it added exactly where a class offered
+    /// none, and the links a split rebased. Discarding that made a cultivation observable only as
+    /// the difference between two whole bodies — which is a **measurement of a diff**, not a delta
+    /// with a cause. Retaining it is what lets a delta name the position that founded each of its
+    /// rows, and it is the same repair, one grain down, that
+    /// [`crate::holonic_training::TrainingCultivationProposal`] makes at the transduction grain by
+    /// deriving the complete changed population before mutation.
+    pub fn absorb_returning_lineage(
+        &mut self,
+        path: &[ResonanceGerm],
+    ) -> Result<AbsorbLineage, ExactSuffixEcologyError> {
         if path.is_empty() {
             return Err(ExactSuffixEcologyError::EmptyPath);
         }
+        let mut lineage = AbsorbLineage {
+            classes_before: self.states.len(),
+            transitions_before: self.material_transitions,
+            ..AbsorbLineage::default()
+        };
 
         // ---- thaw ----
         let mut builder = SuffixEcologyBuilder {
@@ -808,14 +917,31 @@ impl ExactSuffixEcology {
                 held.checked_add(1).ok_or(ExactSuffixEcologyError::CarrierExtent)
             })?;
         let mut last = last_state;
+        lineage.boundary_symbol = boundary;
         for germ in path {
-            last = builder.extend(last, SuffixSymbol::Germ(GermKey::from_germ(germ)))?;
+            let mut record = ExtendRecord::default();
+            lineage
+                .stood_in
+                .push(u32::try_from(last).map_err(|_| ExactSuffixEcologyError::CarrierExtent)?);
+            last = builder.extend_recording(
+                last,
+                SuffixSymbol::Germ(GermKey::from_germ(germ)),
+                Some(&mut record),
+            )?;
+            lineage
+                .landed
+                .push(u32::try_from(last).map_err(|_| ExactSuffixEcologyError::CarrierExtent)?);
+            lineage.per_position.push(record);
             builder.states[last].material_end_multiplicity = builder.states[last]
                 .material_end_multiplicity
                 .checked_add(1)
                 .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
         }
-        builder.extend(last, SuffixSymbol::Boundary(boundary))?;
+        builder.extend_recording(
+            last,
+            SuffixSymbol::Boundary(boundary),
+            Some(&mut lineage.boundary),
+        )?;
 
         // ---- retake the fold ----
         let mut descending = (1..builder.states.len()).collect::<Vec<_>>();
@@ -851,7 +977,7 @@ impl ExactSuffixEcology {
                     .ok_or(ExactSuffixEcologyError::CarrierExtent)
             })?;
         *self = builder.freeze(material_transitions)?;
-        Ok(())
+        Ok(lineage)
     }
 
     /// **How much material stands behind one transport class.**
@@ -1394,12 +1520,34 @@ impl SuffixEcologyBuilder {
         last: usize,
         symbol: SuffixSymbol,
     ) -> Result<usize, ExactSuffixEcologyError> {
+        self.extend_recording(last, symbol, None)
+    }
+
+    /// The same extension with its deposit retained.
+    ///
+    /// **Added 2026-08-20 for Deed P3.** The extension already computes exactly which classes it
+    /// founds, which transitions it adds where a class offered none, and which links a split
+    /// rebases — and then discards all of it, so a cultivation could observe only the difference
+    /// between two whole bodies. `record: None` reproduces [`Self::extend`] bit-for-bit; nothing
+    /// that stands moves.
+    fn extend_recording(
+        &mut self,
+        last: usize,
+        symbol: SuffixSymbol,
+        mut record: Option<&mut ExtendRecord>,
+    ) -> Result<usize, ExactSuffixEcologyError> {
         let current_length = self.states[last]
             .maximum_length
             .checked_add(1)
             .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
         let current = self.states.len();
         self.states.push(SuffixBuilderState::new(current_length));
+        if let Some(record) = record.as_deref_mut() {
+            record.events.push(ExtendEvent::Founded {
+                class: current,
+                split_from: None,
+            });
+        }
         let mut cursor = Some(last);
         while let Some(state) = cursor {
             if self.states[state].transitions.contains(&symbol) {
@@ -1408,10 +1556,25 @@ impl SuffixEcologyBuilder {
             self.states[state]
                 .transitions
                 .try_insert(symbol.clone(), current)?;
+            if let Some(record) = record.as_deref_mut() {
+                record.events.push(ExtendEvent::TransitionAdded {
+                    class: state,
+                    target: current,
+                });
+            }
             cursor = self.states[state].suffix;
         }
         match cursor {
-            None => self.states[current].suffix = Some(0),
+            None => {
+                self.states[current].suffix = Some(0);
+                if let Some(record) = record.as_deref_mut() {
+                    record.events.push(ExtendEvent::SuffixRebased {
+                        class: current,
+                        before: None,
+                        after: 0,
+                    });
+                }
+            }
             Some(state) => {
                 let target = *self.states[state]
                     .transitions
@@ -1424,6 +1587,13 @@ impl SuffixEcologyBuilder {
                     == self.states[target].maximum_length
                 {
                     self.states[current].suffix = Some(target);
+                    if let Some(record) = record.as_deref_mut() {
+                        record.events.push(ExtendEvent::SuffixRebased {
+                            class: current,
+                            before: None,
+                            after: target,
+                        });
+                    }
                 } else {
                     let clone = self.states.len();
                     let mut cloned = self.states[target].clone();
@@ -1433,6 +1603,12 @@ impl SuffixEcologyBuilder {
                         .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
                     cloned.material_end_multiplicity = 0;
                     self.states.push(cloned);
+                    if let Some(record) = record.as_deref_mut() {
+                        record.events.push(ExtendEvent::Founded {
+                            class: clone,
+                            split_from: Some(target),
+                        });
+                    }
                     let mut rewrite = Some(state);
                     while let Some(at) = rewrite {
                         if self.states[at].transitions.get(&symbol).copied() != Some(target) {
@@ -1441,7 +1617,26 @@ impl SuffixEcologyBuilder {
                         self.states[at]
                             .transitions
                             .try_insert(symbol.clone(), clone)?;
+                        if let Some(record) = record.as_deref_mut() {
+                            record.events.push(ExtendEvent::TransitionRebased {
+                                class: at,
+                                before: target,
+                                after: clone,
+                            });
+                        }
                         rewrite = self.states[at].suffix;
+                    }
+                    if let Some(record) = record.as_deref_mut() {
+                        record.events.push(ExtendEvent::SuffixRebased {
+                            class: target,
+                            before: self.states[target].suffix,
+                            after: clone,
+                        });
+                        record.events.push(ExtendEvent::SuffixRebased {
+                            class: current,
+                            before: None,
+                            after: clone,
+                        });
                     }
                     self.states[target].suffix = Some(clone);
                     self.states[current].suffix = Some(clone);
