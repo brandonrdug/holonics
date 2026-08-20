@@ -1268,7 +1268,7 @@ condition and may never be implemented as a numerical threshold.**
 
 **And it is already computed.** Two constructions are within tolerance for a declared receiver family
 **exactly when no word in that family separates them** — which is the collapsed-pair relation, with
-`receiver_exact_compression.rs:143` `distinguishing_word` as **the arc that does reach**. The body's
+`receiver_exact_compression.rs` `distinguishing_word` (grep `fn distinguishing_word`; the line drifted twice — cite the construct, let the line be a hint) as **the arc that does reach**. The body's
 highest-degree organ has been computing tolerance under another name since it was written. **No organ
 is owed here; a reading is.**
 

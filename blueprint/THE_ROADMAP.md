@@ -222,6 +222,25 @@ leaving plural-diffed and the unrelated control bit-identical. Apertures declare
 derive them. **Deed P2 (receiver-exact condensation) is next.** `CONSTRUCTION_STATE.md` does not
 move.
 
+**DEED P2 PASSED 2026-08-20 — the transport does not condense, the tree falls for free, and no
+factor is quoted.** Record:
+[`research/records/2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md`](../research/records/2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md).
+The named repair inside `receiver_exact_compression` (an item→block index, a streamed Moore round —
+the 2.57 GB dense signature never allocated — and an optional sparse successor face) with the P0
+scope re-read bit-identically; **the whole-atlas Markov reading P0 refused taken in 2.0 s** (order
+56 read off the round count on a closed population, the theorem checked on real material; the
+per-pair words returned as the new measured aperture). The condensation, under a receiver family
+declared before fitting: **the transport does not condense** (the conduct quotient merges 14 of
+59,698 classes — the structural search's honest negative), **the tree half falls for free with an
+empty remainder** (3.67× against a materialised ancestry relation, and honestly trading against the
+stored parent array), the 43,215-arc reconvergent remainder retained load-bearing (the Nerode face
+recomputed from the condensed rest through it; one collapsed pair reopened by its retained word);
+lumpability measured on three partitions — exact on the conduct quotient, complete defects on the
+two controls, **the height-1 suffix ancestor answering P0's OPEN sufficient-state row by name (it
+is not one)**; unexcited material (54,100 classes) retained in the fibre and the cost; **the
+additive cost vector does not strictly fall and no factor is quoted**. Seventeen of seventeen
+verdicts. **Deed P3 (cultivation) is next.** `CONSTRUCTION_STATE.md` does not move.
+
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
 explicitly composes it.** This sentence supersedes those historical scheduling phrases without

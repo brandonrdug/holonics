@@ -91,6 +91,25 @@ pub trait ObservedSystem {
     fn inputs(&self) -> Vec<InputId>;
     fn observation(&self, item: ItemId, receiver: ReceiverId) -> Observation;
     fn successor(&self, item: ItemId, input: InputId) -> Option<ItemId>;
+
+    /// **The sparse face of the successor relation, optional and semantics-preserving.**
+    ///
+    /// A caller that already holds the transport as a sparse population may name, for one input,
+    /// exactly the items that admit a continuation on it and where each continues. Returning
+    /// `Some(pairs)` is an assertion the caller owes and the refinement relies on:
+    ///
+    /// ```text
+    ///   for every (item, next) in pairs      successor(item, input) == Some(next)
+    ///   for every item NOT named in pairs    successor(item, input) == None
+    /// ```
+    ///
+    /// `None` — the default — means *ask [`ObservedSystem::successor`] item by item*, which is the
+    /// dense reading and the only reading before 2026-08-20. Nothing about the returned partition
+    /// changes: this face moves a round's cost from `|items| x |inputs|` to `|transitions|`, which
+    /// is the difference between a whole atlas being readable and not.
+    fn admitted(&self, _input: InputId) -> Option<Vec<(ItemId, ItemId)>> {
+        None
+    }
 }
 
 /// A partition of the population into blocks, canonically ordered so two runs compare directly.
@@ -122,6 +141,31 @@ impl Partition {
         self.blocks.iter().position(|block| block.contains(&item))
     }
 
+    /// **The same lookup, built once instead of scanned once per question.**
+    ///
+    /// [`Partition::block_of`] walks the block vector and asks each block whether it holds the item,
+    /// so resolving every item costs `|items| x |blocks|` set lookups. Deed P0 measured that as one
+    /// of the two things holding the whole-atlas reading out of reach. This builds the inverse map
+    /// in one pass over the blocks and answers in `log |items|`; the answers are identical by
+    /// construction, which the tests assert rather than assume.
+    pub fn index(&self) -> BlockIndex {
+        let mut of = BTreeMap::new();
+        for (at, block) in self.blocks.iter().enumerate() {
+            for item in block {
+                of.insert(*item, at);
+            }
+        }
+        BlockIndex { of }
+    }
+
+    /// Every item this partition holds, in ascending order — the canonical traversal order the
+    /// collapsed population is exhibited in.
+    pub fn items_in_order(&self) -> Vec<ItemId> {
+        let mut items: Vec<ItemId> = self.blocks.iter().flatten().copied().collect();
+        items.sort_unstable();
+        items
+    }
+
     /// Every pair this partition holds together.
     pub fn identified_pairs(&self) -> BTreeSet<(ItemId, ItemId)> {
         let mut pairs = BTreeSet::new();
@@ -134,6 +178,26 @@ impl Partition {
             }
         }
         pairs
+    }
+}
+
+/// The item-to-block inverse of a [`Partition`], built once.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BlockIndex {
+    of: BTreeMap<ItemId, usize>,
+}
+
+impl BlockIndex {
+    pub fn block_of(&self, item: ItemId) -> Option<usize> {
+        self.of.get(&item).copied()
+    }
+
+    pub fn len(&self) -> usize {
+        self.of.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.of.is_empty()
     }
 }
 
@@ -246,11 +310,97 @@ pub fn one_shot_partition(system: &dyn ObservedSystem) -> Partition {
     }))
 }
 
+/// The refinement alone: the two partitions and the rounds, with no collapsed population exhibited.
+///
+/// Separated out 2026-08-20 because the two halves have wildly different costs and a caller may
+/// genuinely want only the first. The refinement is `|transitions|` per round through the sparse
+/// face; exhibiting the collapsed population is a breadth-first search **per pair**, and a
+/// population of pairs is quadratic in a block. Reporting the partition reading and stating the
+/// exhibition's aperture is a measurement; forcing the exhibition is not.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PartitionReading {
+    /// `x ~_R y` — H.0016 exactly, one-shot.
+    pub one_shot: Partition,
+    /// The Nerode congruence of the declared family.
+    pub conduct: Partition,
+    /// Refinement rounds to stability.
+    pub rounds: usize,
+}
+
+/// One synchronous Moore round, as a **sequence of exact intersections rather than one dense key**.
+///
+/// A round's key is the tuple `(current block, successor block per input)`, and grouping by a tuple
+/// **is** the common refinement of grouping by each coordinate in turn. So the round can be taken
+/// one input at a time, holding one label per item, instead of materialising the whole
+/// `|items| x |inputs|` signature matrix — which at the whole atlas is 321,473,730 entries and
+/// 2,571,789,840 octets in one allocation, the figure Deed P0 measured as the aperture.
+///
+/// A label is refreshed only where the successor **resolves to a block**. An input on which an item
+/// terminates, or on which it continues to something outside the declared item population, leaves
+/// the label where it was — which is exactly the dense reading's `None`, and is why an unclosed
+/// scope behaves identically here.
+fn refine_round(
+    system: &dyn ObservedSystem,
+    items: &[ItemId],
+    inputs: &[InputId],
+    current: &Partition,
+    index: &BlockIndex,
+) -> Partition {
+    let mut labels: BTreeMap<ItemId, u64> = items
+        .iter()
+        .filter_map(|item| index.block_of(*item).map(|block| (*item, block as u64 + 1)))
+        .collect();
+    let mut next_label = current.len() as u64 + 1;
+    let mut moved: Vec<(ItemId, u64)> = Vec::new();
+    let mut fresh: BTreeMap<(u64, usize), u64> = BTreeMap::new();
+    for input in inputs {
+        fresh.clear();
+        moved.clear();
+        match system.admitted(*input) {
+            Some(named) => {
+                for (item, next) in named {
+                    let (Some(block), Some(old)) =
+                        (index.block_of(next), labels.get(&item).copied())
+                    else {
+                        continue;
+                    };
+                    let label = *fresh.entry((old, block)).or_insert_with(|| {
+                        next_label += 1;
+                        next_label - 1
+                    });
+                    moved.push((item, label));
+                }
+            }
+            None => {
+                for item in items {
+                    let (Some(block), Some(old)) = (
+                        system
+                            .successor(*item, *input)
+                            .and_then(|next| index.block_of(next)),
+                        labels.get(item).copied(),
+                    ) else {
+                        continue;
+                    };
+                    let label = *fresh.entry((old, block)).or_insert_with(|| {
+                        next_label += 1;
+                        next_label - 1
+                    });
+                    moved.push((*item, label));
+                }
+            }
+        }
+        for (item, label) in moved.drain(..) {
+            labels.insert(item, label);
+        }
+    }
+    Partition::from_keys(labels)
+}
+
 /// Refine the one-shot partition until successor conduct is stable — Moore's algorithm.
 ///
 /// Two items survive together only if, for every admitted input, their successors lie in the same
 /// block *and* they agree on whether a successor exists at all.
-pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
+pub fn refine(system: &dyn ObservedSystem) -> PartitionReading {
     let one_shot = one_shot_partition(system);
     let items = system.items();
     let inputs = system.inputs();
@@ -258,34 +408,30 @@ pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
     let mut current = one_shot.clone();
     let mut rounds = 0usize;
     loop {
-        let index: BTreeMap<ItemId, usize> = items
-            .iter()
-            .filter_map(|item| current.block_of(*item).map(|block| (*item, block)))
-            .collect();
-        let refined = Partition::from_keys(items.iter().map(|item| {
-            let signature: Vec<Option<usize>> = inputs
-                .iter()
-                .map(|input| {
-                    system
-                        .successor(*item, *input)
-                        .and_then(|next| index.get(&next).copied())
-                })
-                .collect();
-            (*item, (index.get(item).copied(), signature))
-        }));
+        let index = current.index();
+        let refined = refine_round(system, &items, &inputs, &current, &index);
         if refined == current {
             break;
         }
         current = refined;
         rounds += 1;
     }
-
-    let collapsed = exhibit_collapsed(system, &one_shot, &current);
-    ReceiverExactCompression {
-        schema: "holonic-engine.receiver-exact-compression.v1".to_owned(),
+    PartitionReading {
         one_shot,
         conduct: current,
         rounds,
+    }
+}
+
+/// The refinement **and** the complete collapsed population with its shortest separators.
+pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
+    let reading = refine(system);
+    let collapsed = exhibit_collapsed(system, &reading.one_shot, &reading.conduct);
+    ReceiverExactCompression {
+        schema: "holonic-engine.receiver-exact-compression.v1".to_owned(),
+        one_shot: reading.one_shot,
+        conduct: reading.conduct,
+        rounds: reading.rounds,
         collapsed,
     }
 }
@@ -378,14 +524,74 @@ fn exhibit_collapsed(
     one_shot: &Partition,
     conduct: &Partition,
 ) -> Vec<CollapsedPair> {
+    exhibit_collapsed_within(system, one_shot, conduct, None)
+}
+
+/// **How many pairs the one-shot reading holds together that the conduct partition separates.**
+///
+/// Counted from the block sizes rather than enumerated: within a one-shot block of `n` items whose
+/// conduct sub-blocks have sizes `n_1..n_k`, the separated pairs number `(n^2 - sum n_i^2) / 2`.
+/// Exact, and it costs one pass over the population instead of a quadratic enumeration.
+///
+/// **This is an upper bound on `collapsed.len()` and equals it exactly when the item population is
+/// closed under the successor relation.** Where a declared scope is not closed, refinement reads a
+/// successor that leaves the scope as an absence and separates on it, while the search for a
+/// distinguishing word follows that successor out of the scope and may find no receiver difference
+/// at all. The two readings then disagree, and the disagreement is a fact about the scope.
+pub fn separated_pair_population(one_shot: &Partition, conduct: &Partition) -> u128 {
+    let index = conduct.index();
+    let mut total = 0u128;
+    let mut sub: BTreeMap<usize, u128> = BTreeMap::new();
+    for block in &one_shot.blocks {
+        sub.clear();
+        let mut size = 0u128;
+        for item in block {
+            size += 1;
+            *sub.entry(index.block_of(*item).unwrap_or(usize::MAX)).or_default() += 1;
+        }
+        let within: u128 = sub.values().map(|count| count * count).sum();
+        total += (size * size - within) / 2;
+    }
+    total
+}
+
+/// The collapsed population in canonical `(left, right)` order, optionally bounded.
+///
+/// `limit` is an **aperture**, not a sample: it takes the first `n` pairs of the canonical order the
+/// unbounded call would return, so a bounded exhibition is a prefix of the complete one rather than
+/// a selection from it.
+pub fn exhibit_collapsed_within(
+    system: &dyn ObservedSystem,
+    one_shot: &Partition,
+    conduct: &Partition,
+    limit: Option<usize>,
+) -> Vec<CollapsedPair> {
     let receivers = system.receivers();
     let inputs = system.inputs();
+    let one_shot_index = one_shot.index();
+    let conduct_index = conduct.index();
     let mut collapsed = Vec::new();
 
-    for (left, right) in one_shot.identified_pairs() {
-        if conduct.block_of(left) == conduct.block_of(right) {
+    // Ascending by `left`, then by `right` inside `left`'s one-shot block: the same order the pair
+    // set gave, without materialising a set that is quadratic in a block.
+    'population: for left in one_shot.items_in_order() {
+        let Some(block) = one_shot_index
+            .block_of(left)
+            .and_then(|at| one_shot.blocks.get(at))
+        else {
             continue;
-        }
+        };
+        for right in block.range((
+            std::ops::Bound::Excluded(left),
+            std::ops::Bound::Unbounded::<ItemId>,
+        )) {
+            let right = *right;
+            if limit.is_some_and(|bound| collapsed.len() >= bound) {
+                break 'population;
+            }
+            if conduct_index.block_of(left) == conduct_index.block_of(right) {
+                continue;
+            }
         let mut seen = BTreeSet::from([(Some(left), Some(right))]);
         let mut frontier = VecDeque::from([(Some(left), Some(right), Vec::<InputId>::new())]);
         while let Some((here, there, word)) = frontier.pop_front() {
@@ -442,6 +648,7 @@ fn exhibit_collapsed(
                     frontier.push_back((next.0, next.1, extended));
                 }
             }
+        }
         }
     }
     collapsed
@@ -919,6 +1126,158 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    /// The indexed lookup and the scan answer the same question. Added with the index, 2026-08-20.
+    #[test]
+    fn the_indexed_block_lookup_agrees_with_the_scan_everywhere() {
+        for n in 2..=18u64 {
+            let system = CyclicCounter {
+                n,
+                moduli: vec![2, 3, 5],
+            };
+            let reading = refine(&system);
+            for partition in [&reading.one_shot, &reading.conduct] {
+                let index = partition.index();
+                for item in system.items() {
+                    assert_eq!(index.block_of(item), partition.block_of(item));
+                }
+                assert_eq!(index.len(), system.items().len());
+                assert_eq!(partition.items_in_order(), system.items());
+            }
+        }
+    }
+
+    /// **The sparse successor face must not move the partition.** A system that names its admitted
+    /// items per input and the same system read densely are the same system, and the whole value of
+    /// the face is that this is checkable rather than argued.
+    ///
+    /// `TwoRoutes` is the fixture with a genuine branch structure and terminating rows, so both the
+    /// "resolves to a block" and "keeps its label" arms are exercised.
+    struct SparseTwoRoutes;
+    impl ObservedSystem for SparseTwoRoutes {
+        fn items(&self) -> Vec<ItemId> {
+            TwoRoutes.items()
+        }
+        fn receivers(&self) -> Vec<ReceiverId> {
+            TwoRoutes.receivers()
+        }
+        fn inputs(&self) -> Vec<InputId> {
+            TwoRoutes.inputs()
+        }
+        fn observation(&self, item: ItemId, receiver: ReceiverId) -> Observation {
+            TwoRoutes.observation(item, receiver)
+        }
+        fn successor(&self, item: ItemId, input: InputId) -> Option<ItemId> {
+            TwoRoutes.successor(item, input)
+        }
+        fn admitted(&self, input: InputId) -> Option<Vec<(ItemId, ItemId)>> {
+            Some(
+                TwoRoutes
+                    .items()
+                    .into_iter()
+                    .filter_map(|item| TwoRoutes.successor(item, input).map(|next| (item, next)))
+                    .collect(),
+            )
+        }
+    }
+
+    /// The same, over a fixture whose rows genuinely terminate, so the arm that keeps a label is the
+    /// one under test.
+    struct SparseBothStop;
+    impl ObservedSystem for SparseBothStop {
+        fn items(&self) -> Vec<ItemId> {
+            BothStop.items()
+        }
+        fn receivers(&self) -> Vec<ReceiverId> {
+            BothStop.receivers()
+        }
+        fn inputs(&self) -> Vec<InputId> {
+            BothStop.inputs()
+        }
+        fn observation(&self, item: ItemId, receiver: ReceiverId) -> Observation {
+            BothStop.observation(item, receiver)
+        }
+        fn successor(&self, item: ItemId, input: InputId) -> Option<ItemId> {
+            BothStop.successor(item, input)
+        }
+        fn admitted(&self, input: InputId) -> Option<Vec<(ItemId, ItemId)>> {
+            Some(
+                BothStop
+                    .items()
+                    .into_iter()
+                    .filter_map(|item| BothStop.successor(item, input).map(|next| (item, next)))
+                    .collect(),
+            )
+        }
+    }
+
+    #[test]
+    fn the_sparse_successor_face_returns_the_same_compression_as_the_dense_reading() {
+        let dense = compress(&TwoRoutes);
+        let sparse = compress(&SparseTwoRoutes);
+        assert_eq!(dense.one_shot, sparse.one_shot);
+        assert_eq!(dense.conduct, sparse.conduct);
+        assert_eq!(dense.rounds, sparse.rounds);
+        assert_eq!(dense.collapsed, sparse.collapsed);
+        assert!(!dense.collapsed.is_empty(), "the fixture must lose something");
+
+        let dense = compress(&BothStop);
+        let sparse = compress(&SparseBothStop);
+        assert_eq!(dense.one_shot, sparse.one_shot);
+        assert_eq!(dense.conduct, sparse.conduct);
+        assert_eq!(dense.rounds, sparse.rounds);
+        assert_eq!(dense.collapsed, sparse.collapsed);
+    }
+
+    /// **On a population closed under the successor relation the round count IS the memory order.**
+    ///
+    /// Moore's round `k` separates exactly the pairs whose shortest distinguishing word has length
+    /// `k`, so the last round that changed anything is the longest such word. This is what makes the
+    /// whole-atlas memory order readable without a per-pair search — and it is stated as a condition
+    /// rather than a fact, because Deed P0's declared scope is *not* closed and there the two
+    /// readings disagree by construction.
+    #[test]
+    fn on_a_closed_population_the_rounds_are_the_memory_order() {
+        for n in 2..=24u64 {
+            for moduli in [vec![2u64], vec![3], vec![2, 3], vec![4, 6]] {
+                let system = CyclicCounter { n, moduli };
+                let compression = compress(&system);
+                match compression.memory_order() {
+                    None => assert_eq!(compression.rounds, 0),
+                    Some(order) => assert_eq!(
+                        compression.rounds, order,
+                        "n={n}: rounds {} against memory order {order}",
+                        compression.rounds
+                    ),
+                }
+            }
+        }
+    }
+
+    /// The counted separated population and the exhibited one agree on a closed system, and the
+    /// bounded exhibition is a **prefix** of the complete one rather than a selection from it.
+    #[test]
+    fn the_counted_separated_population_matches_the_exhibited_one_and_the_bound_is_a_prefix() {
+        let system = CyclicCounter {
+            n: 5,
+            moduli: vec![2],
+        };
+        let compression = compress(&system);
+        assert_eq!(
+            separated_pair_population(&compression.one_shot, &compression.conduct),
+            compression.collapsed.len() as u128
+        );
+        for bound in 0..=compression.collapsed.len() {
+            let bounded = exhibit_collapsed_within(
+                &system,
+                &compression.one_shot,
+                &compression.conduct,
+                Some(bound),
+            );
+            assert_eq!(bounded.len(), bound);
+            assert_eq!(bounded.as_slice(), &compression.collapsed[..bound]);
         }
     }
 

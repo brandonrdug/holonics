@@ -118,7 +118,7 @@ crates/holonic-engine/src/rebase_invariants.rs	.clone()=8	.collect()=15	.flat_ma
 crates/holonic-engine/src/receiver.rs	.clone()=110	.collect()=27	.into_iter()=4	BTreeMap=25	BTreeSet=16	Vec=58
 crates/holonic-engine/src/receiver_current.rs	.clone()=14	.collect()=1	Vec=12
 crates/holonic-engine/src/receiver_ecology.rs	.clone()=18	.collect()=16	.into_iter()=1	BTreeMap=10	BTreeSet=10	Vec=28
-crates/holonic-engine/src/receiver_exact_compression.rs	.clone()=3	.collect()=17	.into_iter()=2	BTreeMap=5	BTreeSet=9	Vec=32	VecDeque=2
+crates/holonic-engine/src/receiver_exact_compression.rs	.clone()=3	.collect()=19	.into_iter()=4	BTreeMap=11	BTreeSet=9	Vec=45	VecDeque=2
 crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.flat_map()=2	.into_iter()=1	BTreeMap=14	BTreeSet=18	Vec=25
 crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57
 crates/holonic-engine/src/regime_reading.rs	.clone()=1	.collect()=5	Vec=7
