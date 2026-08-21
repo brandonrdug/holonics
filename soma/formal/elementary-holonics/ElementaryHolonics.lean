@@ -56,3 +56,7 @@ import ElementaryHolonics.Millennium.Sturm
 import ElementaryHolonics.Millennium.FaithfulFace
 import ElementaryHolonics.Millennium.ChainRule
 import ElementaryHolonics.Millennium.Closure
+import ElementaryHolonics.Millennium.ElementaryChart
+import ElementaryHolonics.Millennium.WindingLedger
+import ElementaryHolonics.Millennium.SelmerLanding
+import ElementaryHolonics.Millennium.SignChange

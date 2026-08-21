@@ -130,6 +130,41 @@ does not reduce (numeral instances stick), so the computational layers run on `�
 constructor-matching definitions with `norm_num` — a reusable discipline for every future
 exact-carrier file.
 
+## 4c. The refusal-and-landing wave — landed the same day, after the commit at `6ddc535`
+
+Posed under the anti-churn discipline (each target carrying Brandon's port order or a route's
+own next falsifier; the refused candidates recorded with reasons) and landed 4/4. The tree now
+measures **54 files, 17,631 lines, 898 theorems** at 3,370 jobs, the wave's **135 theorems
+batch-audited clean**:
+
+- **`ElementaryChart.lean`** (44 declarations) — the ordered port: non-elementarity as refusal,
+  never as failed search. The Gaussian refused **twice by independent routes** (the negative
+  degree prediction; the immortal odd coefficient chain), the witness combination reproducing
+  the Rust owner's `MonomialObstruction {0 ↦ −2, 2 ↦ 1} → −1` exactly, the satisfied-degree
+  control showing the signature insufficient, and the pole species. **The enactor refuted the
+  orchestrator's own proof sketch** — the proposed all-coefficients-vanish route does not exist
+  (the odd chain is `1, 2/3, 4/15, 8/105, …`, all nonzero); the true statement was proved and
+  the discrepancy reported.
+- **`WindingLedger.lean`** (26 theorems) — the ordered port: the crossing ledger with the
+  standing falsifier made a theorem (two populations, one net), the aperture moving the
+  population and not the net, and **a named-path error in the orchestrator's order caught**
+  (`polygon_winding` lives in `crates/relational-geometry/src/exact_analysis.rs`, not
+  `holonic-engine`; cited correctly).
+- **`SelmerLanding.lean`** (55 declarations) — the four descent classes landed in mathlib's
+  `selmerGroup` at `K({(2)}, 2)` over `ℚ` with the valuation avoidance facts proved, closure as
+  the Klein group, and the Ш[2] proposition made statable. **The enactor refuted its own first
+  draft by exact enumeration**: the Selmer group *equals* the four classes
+  (`[−2, −1, 1, 2]`, swept to ±300) — the boundary was repaired before deposit rather than
+  shipped false.
+- **`SignChange.lean`** (34 theorems) — the flip and constancy lemmas toward the Sturm law,
+  with a planned negative control discovered to be **false** (the flip holds at every odd
+  multiplicity — `p′(r) ≠ 0` is sufficient, not necessary) and converted into the stronger
+  general-multiplicity theorem plus `theFlipDoesNotDetectMultiplicity`; the law itself stays
+  open in `Sturm.lean`, restated nowhere.
+
+The day's committed state is `6ddc535`; this wave awaits its own commit under the same
+stage-by-path discipline.
+
 ## 5. Boundaries
 
 No named conjecture is claimed, approached, or graded by anything in this record; every file

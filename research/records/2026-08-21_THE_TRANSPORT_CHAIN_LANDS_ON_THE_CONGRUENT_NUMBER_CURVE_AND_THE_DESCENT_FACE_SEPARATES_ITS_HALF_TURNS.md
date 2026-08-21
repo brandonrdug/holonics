@@ -64,7 +64,12 @@ Three real propositions about this curve, carried open with their classical stat
   well-foundedness of the terrain as its termination. Open here.
 
 The Tate–Shafarevich correspondence is carried in prose only: declaring the Selmer group by hand
-would author the partition the grading rules forbid. Classically, for this curve, Selmer equals
+would author the partition the grading rules forbid. **ADVANCED 2026-08-21, same day:**
+`ElementaryHolonics/Millennium/SelmerLanding.lean` lands the four classes in **mathlib's own**
+`selmerGroup` at `K({(2)}, 2)` over `ℚ` — valuation avoidance proved, closure as the Klein
+group, the Ш[2] proposition statable over mathlib objects — and its enactor proved by exact
+enumeration that `K({(2)}, 2)` *equals* the four classes, so nothing was authored: the ambient
+group is the computed image. Classically, for this curve, Selmer equals
 the computed image and `Ш(E/ℚ)[2] = 0` — imported, cited, not proved.
 
 ## 3. A measurement corrected in the making, and what it found
