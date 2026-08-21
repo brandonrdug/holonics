@@ -63,6 +63,13 @@ declarations, PDF pages, OCR readings, and explanatory language are receiver fac
 construction. No face becomes the construction merely because it is convenient to store, render,
 execute, or grade.
 
+The highest target is a reusable causal archetype, not merely an answer: a constraint ecology,
+generator family, chart/word law, environment aperture, active interface, phase/failure boundary,
+catalytic work reduction and complete reconstruction fibre which may be presented as mathematics,
+physical morphology or inherited model transport. Protein folds and enzymes are exterior evidence
+for this morphology regime, not the ontology of the codec. The governing whole-arsenal audit is
+[THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md](../research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md).
+
 The complete circulation is:
 
 ~~~text
@@ -1073,6 +1080,21 @@ Eros' native arm remains beside it as the control.
 
 Complex plots broaden to exact and bounded implicit scenes, surface and volumetric meshes, optical
 systems, crystals, fractals, fields, animations and multimodal sensor returns.
+
+### Physical morphology tests the archetype
+
+After the first complete vertical, external molecular structures and assays test whether the same
+codec recovers environment-indexed constraints, rotation words, rigidity/motion and self-stress,
+active interfaces, phase seams, kinetics and catalytic work without becoming a protein predictor.
+The preferred first material is the public Claude protein-binder release because one designed
+occurrence crosses ten structure predictors, multiple seeds and stoichiometries, two physical assay
+systems, raw kinetic traces, aggregation/failure and an ordered but incomplete design lineage.
+
+Admission begins with its documentation/tables tier. Structure and PAE files enter only after a
+receiver question addresses them. Predictor confidence, assay calls and Claude's final rubric are
+separate testimony; no one becomes source truth. UnsolvedMath supplies the complementary external
+problem/route population, with every machine-generated solution claim held outside standing until
+independently checked.
 
 ### The mathematics model rests
 

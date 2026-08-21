@@ -35,7 +35,9 @@ M1–M4 remain ordered behind it: mathematical particles and typed sameness; cod
 transport cover; generator-native codec pivot; and leader/return cultivation with the complete
 mathematical return. No exceptional compression factor is admitted before that generator ecology
 strictly reduces the complete artifact-plus-decoder/work/residency/transfer vector without receiver
-regression.
+regression. The higher M1–M4 objective is a reusable catalytic constraint morphology, derived in
+[`research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md`](research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md);
+it does not displace M0 or admit protein material into the first deed.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

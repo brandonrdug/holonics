@@ -802,7 +802,11 @@ tiling/reduction passage. Every comparison separately returns occurrence identit
 equality, marked-diagram isomorphism, doctrine/receiver-history equivalence, classification,
 characteristic similarity and face/byte/digest equality where each is actually witnessed. The
 operation complex, its plural presentation fibre and its reconstruction fibre form the first
-mathematical particle; no tokenizer token is called the particle.
+mathematical particle; no tokenizer token is called the particle. Where the material founds them,
+the particle also carries configuration generators, exact constraints and shared vertices,
+environment/constitutive aperture, constraint Jacobian with motion/self-stress fibres, energy/work
+sections, phase seams and active external interfaces. These are optional typed faces of the same
+operation complex, not a protein-shaped ontology imposed on mathematics.
 
 ### Deed M2 — the mathematics codec excites the active transport cover
 
@@ -812,7 +816,9 @@ through the frozen Gemma lift using H4/H5 resident streaming and shared prefixes
 separate activity faces—apparatus switching where calibrated, residency, realization-path
 participation and receiver-visible causal support—plus first separators, overlap nerve, ordered
 response cochains, unchanged controls and complete open fibres. Source architecture names remain
-lineage and cannot classify the native cover.
+lineage and cannot classify the native cover. A common fold/face must remain separable from distinct
+constraint, energy, lineage, apparatus and environmental realizations; multi-receiver disagreement
+is material rather than label noise.
 
 ### Deed M3 — generator recovery and the native codec pivot
 
@@ -822,7 +828,10 @@ negation and its word normal form while a lineage receiver reopens the original 
 rest omits foreign matrices except where a named ReconstructionFiber still requires them, carries an
 executable decoder/reopening law, conducts on the card, and compares the complete artifact-plus-
 decoder/work/residency/transfer vector. A source-shaped tensor inventory or identity codebook map
-does not pass.
+does not pass. The native ecology is additionally graded as catalytic: for its declared receiver
+family it must preserve lawful endpoint conduct while lowering exact work, retain its environment
+and active-interface aperture, remain reusable, and lose the reduction or enabled conduct under
+targeted withdrawal.
 
 ### Deed M4 — leader/return cultivation and proof/value/visual return
 
@@ -832,7 +841,23 @@ changed conduct survives source-detached remount and targeted ablation removes i
 circulation returns derivation, exact value/enclosure, Lean exterior testimony, analytic scene,
 mesh/vector/raster round trip, singularities and complete ReconstructionFiber. This is the first
 complete mathematics-codec vertical and the first possible completion of species-changing Phoenix
-rebirth.
+rebirth. Environment-shift and phase-seam controls must make the organ change conduct or refuse
+outside its constitutive regime rather than silently extrapolate; loss of function may not be
+reported as loss of occurrence identity.
+
+### Expansion after the first vertical — physical morphology testimony
+
+After M0–M4 pass, the preferred physical-morphology material is the public Claude protein-binder
+release, used for its constraint geometry, multi-predictor structure fibres, design lineage,
+stoichiometric symmetries, epitopes, association/dissociation kinetics, assay disagreement,
+aggregation and environmental failure—not to reproduce its LLM workflow or design proteins.
+
+Admission is incremental: the approximately 33 MB documentation/tables tier first; one declared
+receiver question next; only then the addressed CIF/PAE/raw sensorgram population required by that
+question. The approximately 84 GB structure tiers are not scanned because they exist. UnsolvedMath
+is the complementary exterior problem/route population; its machine-generated solution labels
+remain unverified testimony and never route Eros's constitutive law. Governing synthesis:
+[THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md](../research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md).
 
 ---
 

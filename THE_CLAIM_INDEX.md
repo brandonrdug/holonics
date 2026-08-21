@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (203 deposits of 495)
+## 4 · The 2026-08 record line (204 deposits of 496)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -338,6 +338,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THREE_MORE_DECLARATIONS_WERE_WEARING_THEOREM_NAMES.md` | Three more declarations were wearing theorem names |
 | `2026-08-20_THREE_NAMES_ONE_SUBGROUP.md` | Three names, one subgroup |
 | `2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md` | Equality is occurrence identity, the soul maps kinship, and the leader returns through the active codec |
+| `2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md` | The fold is a constraint ecology, the active site is a catalytic receiver, and the codec recovers archetypes |
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
 | `2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md` | The heat kernel returns a Fisher metric, the trace defect counts missing directions, and entropy carries the volume |
 | `2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` | The proof terms survived, the connective tissue cooled, and M0 begins from two source families |

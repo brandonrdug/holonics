@@ -4,7 +4,7 @@
   "truth_status": "definition",
   "kind": "CURATED_EXTERIOR_RESEARCH_MATERIAL",
   "governing_record": "research/records/2026-08-19_THE_FILLED_POLYGON_IS_A_TWO_CHAIN_THE_COSMOLOGICAL_FLOW_IS_A_SYMMETRY_QUOTIENT_AND_THE_EQUATION_ATLAS_RETAINS_ITS_FIBRES.md",
-  "question": "Which prominent equation formulations, hypotheses, receiver scopes, collapsed fibres, and graded research relations should be available as exterior material for later mathematics-codec recovery? Extended 2026-08-20 with the exponential's kernel and cokernel, the Gamma reflection/multiplication/hypertranscendence family, the nested-radical winding law, the polygon-to-circle defect, discrete-chain dispersion, continued-fraction route laws, and the hyperbolic mass shell. Extended again 2026-08-20 with the gluing-passage frame, the obstruction group, the paying pairing, the seam as a fixed locus, the magnitude-implies-order implication, and the blind-aperture theorem — all nine kernel-checked in soma/formal/elementary-holonics. Extended 2026-08-20 with the swing as harmonic conjugation, its frozen-board degeneration, the parity and unimodular invariants, the lattice puzzle it decides, and the achromatic-transport boundary. Cooled 2026-08-21: truth status is separated from evidence tags; every formulation and relation carries a boundary and typed provenance reference; cross-carrier correspondences retain interpretation grade unless a declared proof composes them. Added 2026-08-21 a bounded external heat-kernel/Fisher/volume-growth family from Ge arXiv:2608.13553v1 with pole-vs-output and unreviewed-source boundaries. Primary cooling follow-up 2026-08-21: finite trace and repeated-root equations are kept algebraic; Gibbs/softmax, swing, and three-locus links remain relations.",
+  "question": "Which prominent equation formulations, hypotheses, receiver scopes, collapsed fibres, and graded research relations should be available as exterior material for later mathematics-codec recovery? Extended 2026-08-20 with the exponential's kernel and cokernel, the Gamma reflection/multiplication/hypertranscendence family, the nested-radical winding law, the polygon-to-circle defect, discrete-chain dispersion, continued-fraction route laws, and the hyperbolic mass shell. Extended again 2026-08-20 with the gluing-passage frame, the obstruction group, the paying pairing, the seam as a fixed locus, the magnitude-implies-order implication, and the blind-aperture theorem — all nine kernel-checked in soma/formal/elementary-holonics. Extended 2026-08-20 with the swing as harmonic conjugation, its frozen-board degeneration, the parity and unimodular invariants, the lattice puzzle it decides, and the achromatic-transport boundary. Cooled 2026-08-21: truth status is separated from evidence tags; every formulation and relation carries a boundary and typed provenance reference; cross-carrier correspondences retain interpretation grade unless a declared proof composes them. Added 2026-08-21 a bounded external heat-kernel/Fisher/volume-growth family from Ge arXiv:2608.13553v1 with pole-vs-output and unreviewed-source boundaries. Primary cooling follow-up 2026-08-21: finite trace and repeated-root equations are kept algebraic; Gibbs/softmax, swing, and three-locus links remain relations. Extended 2026-08-21 with a protein/constraint-morphology family: rigidity kernel and self-stress, constraint-rank seams, folding and protonation sigmoid charts, binding kinetics, catalytic barriers, and their explicitly bounded relations to phase, softmax and compression.",
   "artifacts": [
     {
       "path": "schema.json",
@@ -13,15 +13,15 @@
     },
     {
       "path": "equations.jsonl",
-      "bytes": 232919,
-      "sha256": "af50522aae1eeb266d7512f6663f3f6df996d0a47c121edc46dee87d2b53a5df",
-      "records": 204
+      "bytes": 241092,
+      "sha256": "9b09ffc2d28117accc4be65206f615b188f25f623589147ffca337499df8c257",
+      "records": 210
     },
     {
       "path": "relations.jsonl",
-      "bytes": 128212,
-      "sha256": "27cf162ea648533f6bea6e09c7495c689203b5a93fb73fb9086abc0952dc7a3b",
-      "records": 188
+      "bytes": 132770,
+      "sha256": "618cbf8349884f1604d2523681af91d75855f43ebc86a2c65bbb6acd3ef76ec1",
+      "records": 194
     }
   ],
   "boundary": "This manifest certifies stored bytes and counts only. It does not certify mathematical truth, recovered topology, training, or native conduct.",
@@ -49,6 +49,7 @@
     "research/records/2026-08-20_THE_TRACE_SEQUENCE_CARRIES_THE_WEIL_EXPONENT.md",
     "research/records/2026-08-20_THREE_MORE_DECLARATIONS_WERE_WEARING_THEOREM_NAMES.md",
     "research/records/2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md",
-    "research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md"
+    "research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md",
+    "research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md"
   ]
 }

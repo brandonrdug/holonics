@@ -305,6 +305,23 @@ other populations remain path-inactive. Conversely a path-active word may be inv
 receiver through cancellation or quotient. An activation magnitude proves none of these relations
 by itself.
 
+### 11.1 Catalytic morphology
+
+`project-postulate`: the strongest reusable organ is catalytic. For a declared receiver/history
+family, its conduct reaches the same lawful endpoint class through a strictly smaller exact
+work/barrier vector, the organ remains available after the deed, its active interface and
+environment aperture are explicit, and targeted withdrawal removes the reduction or enabled
+conduct while unrelated paths stand. It is not an answer lookup, scalar reward, or promise that
+every family admits such a factorization.
+
+Protein folds, enzymes and allosteric structures are exterior evidence for this morphology regime:
+local generators joined by shared constraints, environment-dependent rigidity and phase, reusable
+active interfaces, remote response and denaturation outside the constitutive stratum. They do not
+make Eros a protein model. The operative machine question is whether existing exact owners compose
+into an environment occurrence -> constraint section -> active path -> adjoint return -> reusable
+work reduction. A new Catalyst or Protein cabinet is forbidden until that composition returns a
+concrete absent type.
+
 ## 12. Phoenix rebirth is a lineage pivot
 
 `interpretation`: **phoenix rebirth** is the passage by which foreign inherited hexis becomes native
