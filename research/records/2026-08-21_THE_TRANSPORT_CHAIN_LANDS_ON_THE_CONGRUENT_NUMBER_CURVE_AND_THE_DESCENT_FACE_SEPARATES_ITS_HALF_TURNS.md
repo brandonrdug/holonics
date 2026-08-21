@@ -58,10 +58,13 @@ Three real propositions about this curve, carried open with their classical stat
   (the multiplicativity half of `E(ℚ)/2E(ℚ) ↪ (ℚ*/ℚ*²)²`). Classical; open here.
 - **`TheKernelIsTheDoubledPopulation`** — trivial slots exactly on `2E(ℚ)` (the exactness half).
   Classical; open here.
-- **`TheFourHalfTurnsAreTheWholePopulation`** — the rank is zero and the computed Klein group is
-  everything. **Equivalent to one not being a congruent number**; classically Fermat's infinite
-  descent, the first descent argument in mathematics — the FOUND stroke of navigation with the
-  well-foundedness of the terrain as its termination. Open here.
+- ~~**`TheFourHalfTurnsAreTheWholePopulation`**~~ — **DISCHARGED AS A THEOREM 2026-08-21, same
+  day**: `ElementaryHolonics/Millennium/RankZero.lean` proves it
+  (`theFourHalfTurnsAreTheWholePopulationHolds`), riding `MinusFourth.lean`'s kernel-checked
+  infinite descent for `x⁴ − y⁴ = z²` — Fermat's theorem by Fermat's method. The rank is zero,
+  the Mordell–Weil group is the computed Klein four-group, and **one is not a congruent
+  number** (`theOneIsNotACongruentNumber`). The record is
+  [the descent-climbed record](2026-08-21_THE_DESCENT_IS_CLIMBED_THE_RANK_IS_ZERO_AND_ONE_IS_NOT_A_CONGRUENT_NUMBER.md).
 
 The Tate–Shafarevich correspondence is carried in prose only: declaring the Selmer group by hand
 would author the partition the grading rules forbid. **ADVANCED 2026-08-21, same day:**
