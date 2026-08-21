@@ -773,11 +773,12 @@ cosines, the hinge deficit, and Brandon's own *"in friction triangles are the qu
 ```
 
 A covering per organ is the cabinet failure one level down, exactly as a device path per organ is.
-`hardware_cover::expand_front` (`crates/holonic-engine/src/hardware_cover.rs:1044`) is the law: the
+`hardware_cover::expand_front` (`crates/holonic-engine/src/hardware_cover.rs:1258`; the line has
+drifted before — `grep -n "pub fn expand_front"` is the durable route) is the law: the
 material supplies `cell -> successors`, the law covers it by **extent**, and successors are
 reassembled in the **front's own order** so a lane's completion order never becomes chronology.
-Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front (`:778-803`), with a failing cell
-surfacing from any lane (`:807`).
+Proved identical at 1, 2, 3, 8 and 64 lanes over a branching front (`:1113-1146`), with a failing
+cell surfacing from any lane (`:1150`).
 
 **Corrected 2026-08-10: the migration is one organ of three, and this subsection claimed all three.**
 `expand_front` has **six** occurrences in the tree — the definition, three of its own tests
