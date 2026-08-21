@@ -20,7 +20,10 @@ sidecar are addressed by the `the_phoenix_rebirth_is_graded` row in
 
 **NEXT DEED: M0 — mathematical source circulation.** [open] Admit born-digital PDF/vector and
 raster equation material plus the exterior equation atlas; recover plural source/layout incidence
-without an authored mathematical grammar. M1–M3 remain ordered behind it. The complete Phoenix
+without an authored mathematical grammar. The first fixture is fixed by
+[`research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md`](research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md):
+harmonic-conjugation calibration plus the heat-Fisher paper's bounded natural-document control.
+M1–M3 remain ordered behind it. The complete Phoenix
 receiver family permits no nontrivial W2 base condensation, so no exceptional compression factor
 is admitted and a later receiver family may reopen that question.
 

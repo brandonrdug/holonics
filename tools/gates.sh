@@ -55,10 +55,10 @@ CARGO_PATH=/opt/cuda/bin:$PATH   # holonic-engine's build script shells out to n
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-GATES=(tests authored-levels named-paths line-citations claim-index driver-catalog
+GATES=(tests authored-levels named-paths line-citations claim-index equation-atlas driver-catalog
        output-manifest closure-manifest boundary-artifacts typst architecture-lint document-law)
 
-# TWELVE, and the twelfth was added 2026-08-16 because the population it covers had no catalog of
+# THIRTEEN. The driver catalog was added 2026-08-16 because its population had no catalog of
 # any kind. Measured that morning: **203 example drivers, 163,332 lines — 42% the size of every
 # library crate combined — accrued over ten days**, of which 0 appeared in `THE_CLAIM_INDEX.md`, 39
 # were named in no governing document or research record, and 40 carried no module doc at all.
@@ -70,6 +70,10 @@ GATES=(tests authored-levels named-paths line-citations claim-index driver-catal
 # gate does not judge a driver; it asserts only that every driver in the tree is in the ledger and
 # every ledger row is in the tree, which is the condition under which the atlas that DOES judge them
 # can stay true.
+
+# The thirteenth was added 2026-08-21 after the M0 cooling audit found that all 72 equation-atlas
+# rows appended the prior day parsed, hashed and joined without dangling endpoints while violating
+# the atlas's own JSON Schema. A content manifest cannot detect a malformed content contract.
 
 # EIGHT, and the sixth was not requested. `tools/boundary_artifacts.py` is the third verifier this
 # repository owns that nothing invoked, and its own header states the exposure: *"Nothing in `cargo
@@ -247,6 +251,20 @@ gate_line-citations() {
 gate_claim-index() {
     local out="$WORK/claim.out"
     python3 "$ROOT/tools/claim_index.py" --check >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(tail -1 "$out")"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 4b · the exterior equation atlas agrees with its schema, manifest and relation endpoints
+# ---------------------------------------------------------------------------------------------
+
+gate_equation-atlas() {
+    local out="$WORK/equation-atlas.out"
+    python3 "$ROOT/tools/equation_atlas.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"

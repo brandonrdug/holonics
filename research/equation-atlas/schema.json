@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "holonics.exterior-equation-atlas.v1",
+  "$id": "holonics.exterior-equation-atlas.v2",
   "title": "Holonics exterior equation atlas",
-  "description": "Storage schema for curated equation formulation occurrences and their graded research relations.",
+  "description": "Storage schema for curated equation formulation occurrences and their graded research relations. Truth status is epistemic; evidence_tags record formal, exact, measured, or witness testimony separately. source_ref is a typed local path or external citation label and boundary is mandatory.",
   "$defs": {
     "truth_status": {
       "type": "string",
@@ -13,9 +13,20 @@
         "established-bounded",
         "interpretation",
         "conditional",
+        "conjecture",
+        "project-postulate",
         "open",
         "counterexample",
         "historical"
+      ]
+    },
+    "evidence_tag": {
+      "type": "string",
+      "enum": [
+        "formal-checked",
+        "implemented-exact",
+        "measured",
+        "computational-witness"
       ]
     },
     "string_list": {
@@ -39,8 +50,10 @@
         "receiver",
         "collapsed_fibre",
         "source",
+        "source_ref",
         "boundary",
-        "tags"
+        "tags",
+        "evidence_tags"
       ],
       "properties": {
         "record_type": { "const": "equation" },
@@ -56,8 +69,18 @@
         "receiver": { "type": "string" },
         "collapsed_fibre": { "type": "string" },
         "source": { "type": "string" },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(research/records/|soma/formal/|papers/source/|external:)"
+        },
         "boundary": { "type": "string" },
-        "tags": { "$ref": "#/$defs/string_list" }
+        "tags": { "$ref": "#/$defs/string_list" },
+        "evidence_tags": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_tag" },
+          "uniqueItems": true
+        }
       }
     },
     "relation": {
@@ -73,7 +96,9 @@
         "hypotheses",
         "receiver",
         "source",
-        "boundary"
+        "source_ref",
+        "boundary",
+        "evidence_tags"
       ],
       "properties": {
         "record_type": { "const": "relation" },
@@ -85,7 +110,17 @@
         "hypotheses": { "$ref": "#/$defs/string_list" },
         "receiver": { "type": "string" },
         "source": { "type": "string" },
-        "boundary": { "type": "string" }
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(research/records/|soma/formal/|papers/source/|external:)"
+        },
+        "boundary": { "type": "string" },
+        "evidence_tags": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_tag" },
+          "uniqueItems": true
+        }
       }
     }
   },

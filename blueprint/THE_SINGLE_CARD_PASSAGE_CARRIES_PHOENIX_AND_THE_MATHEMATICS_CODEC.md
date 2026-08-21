@@ -778,6 +778,15 @@ factor is quoted. Phoenix advances; M0 is next.
 After Phoenix completion, admit born-digital PDF/vector and raster equation material plus the
 exterior equation atlas. Recover plural source/layout incidence without an authored grammar.
 
+**First fixture fixed by the 2026-08-21 cooling audit.** The synthetic calibration is harmonic
+conjugation in its finite-board projective chart and affine board-at-infinity specialization. The
+natural document control is pages 5 and 10 of Ge, arXiv:2608.13553v1: pole/output roles, heat Fisher
+pullback, trace defect and the pointwise defect-source equation. M0 returns only plural source and
+layout incidence, presentation invariance, semantic-perturbation separation and the complete
+cross-chart disagreement fibre. PGL₂ action, heat geometry and Lean acceptance are exterior
+testimony; operation elaboration remains M1 and proof/checker return remains M2. Contract:
+[THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md](../research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md).
+
 ### Deed M1 — mathematical operation complex
 
 Elaborate binders, tensor variance, algebraic carriers, dimensions/units, hypotheses, branches and

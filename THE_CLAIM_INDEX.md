@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (172 deposits of 464)
+## 4 · The 2026-08 record line (202 deposits of 494)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -298,18 +298,48 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md` | The tower conducts layer by layer, and the certified enclosure diverges at 2^35 per layer |
 | `2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` | The tower is a streamed circulation, the single graph returns its three cuts, and the transfers cross under the kernels |
 | `2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md` | The warp scheduler does not schedule the holon, the reduction is a typed junction, and the card owes its pressure field |
+| `2026-08-20_AN_APERTURE_IS_LEGAL_ONLY_IN_ITS_FRAME.md` | An aperture is legal only in its frame |
+| `2026-08-20_AN_AUDIT_REQUEST_FOR_THE_MILLENNIUM_LEAN_DEVELOPMENT.md` | An audit request for the Millennium Lean development |
+| `2026-08-20_AN_OBSTRUCTION_BELONGS_TO_A_FRAME.md` | An obstruction belongs to a frame |
+| `2026-08-20_A_DECLARED_FIELD_IS_NOT_A_FINDING.md` | A declared field is not a finding |
+| `2026-08-20_A_TRANSPORT_IS_A_WORD_AND_THE_CHAIN_SERIES_IS_WHAT_NON_COMMUTATION_FORCES.md` | A transport is a word, and the chain series is what non-commutation forces |
+| `2026-08-20_E_NAMES_THE_MAP_PI_NAMES_ITS_KERNEL_AND_HYPERTRANSCENDENCE_IS_A_CHART_MISS.md` | `e` is an exponential value, `π` names the complex winding kernel, and hypertranscendence is a chart miss |
+| `2026-08-20_FAITHFULNESS_WAS_NEVER_AN_AXIOM_AND_THE_FORM_DESCENDS_ON_ITS_RADICAL.md` | Faithfulness was never an axiom, and the form descends on its radical |
+| `2026-08-20_LANDMARKS_AND_MODULI.md` | Landmarks and moduli |
+| `2026-08-20_SHADOWS_OF_HOLONIC_INTERACTIONS.md` | Shadows of holonic interactions |
 | `2026-08-20_THE_APPLICATION_INFERS_AND_CULTIVATES_FROM_THE_REST_ALONE_AND_THE_CORPUS_LOOKUP_IS_GONE.md` | The application infers and cultivates from the rest alone, and the corpus lookup is gone |
+| `2026-08-20_THE_BOUNDARY_SUPPLIES_ITS_OWN_RADICAL.md` | The boundary supplies its own radical |
+| `2026-08-20_THE_CHEAPEST_SPLIT_IS_A_FIXED_LOCUS_AND_A_COST_WORD_IS_A_CHRONOLOGY.md` | The cheapest split is a fixed locus, and a cost word is a chronology |
+| `2026-08-20_THE_CUTOFF_HAS_A_LARGEST_SOLUTION.md` | The cutoff has a largest solution |
+| `2026-08-20_THE_DESCENT_IS_PLACED_AT_ITS_CHAINS_TARGET.md` | The descent is placed at its chain's target |
 | `2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md` | The dissection shares its prefixes, the key learns an address is not content, and the hardware foundation is complete |
+| `2026-08-20_THE_FIFTEEN_ITERATIONS_CONSOLIDATED.md` | The fifteen iterations, consolidated |
+| `2026-08-20_THE_FORM_NAMES_ITS_OWN_QUOTIENT.md` | The form names its own quotient |
 | `2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md` | The hardware foundation stands, the native arm is not the lift, and Phoenix remains open |
+| `2026-08-20_THE_HOLLOW_TRIANGLE_CARRIES_THE_WELD.md` | The hollow triangle carries the weld |
+| `2026-08-20_THE_INDEX_STATEMENT_IS_THE_REVERSE_OF_CAUCHY_SCHWARZ.md` | The index statement is the reverse of Cauchy–Schwarz |
 | `2026-08-20_THE_LIFTED_BODY_WAS_CULTIVATED_THE_FACTOR_WORD_STAYED_ON_THE_CARD_AND_ABLATION_RETURNED_THE_PREDECESSOR.md` | The lifted body was cultivated, the factor word stayed on the card, and ablation returned the predecessor |
 | `2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md` | The lift returns its defect, the fibres partition the reals, and the recombination is absent from the source closure |
 | `2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md` | The native baseline conducts from its own rest, and the manifest measures what is founded and names what is open |
 | `2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md` | The native rest conducts, the dissection is unchanged, and every tempting quotient reopens |
+| `2026-08-20_THE_PLACEMENT_IS_A_MONODROMY_AND_THE_REMAINDER_IS_WHAT_PAYS.md` | The placement is a monodromy, and the remainder is what pays |
+| `2026-08-20_THE_POSITIVITY_LIVES_ON_A_SUBSPACE_AND_I_AIMED_AT_A_QUOTIENT.md` | The positivity lives on a subspace, and I aimed at a quotient |
+| `2026-08-20_THE_PROOF_LINES_ARE_ONE_GLUING_SHAPE_AND_A_BARRIER_IS_A_BLIND_APERTURE.md` | The proof-lines are one gluing shape, and a barrier is a blind aperture |
+| `2026-08-20_THE_RADICAL_TRAVELS_AND_THE_PERP_DOES_NOT.md` | The radical travels and the perp does not |
+| `2026-08-20_THE_REFLECTION_IS_THE_FIRST_SLOT_OF_THE_FORM.md` | The reflection is the first slot of the form |
+| `2026-08-20_THE_REMAINDERS_ARE_POSITIONS_ON_ONE_CHAIN_AND_A_SECTIONING_IS_FREE.md` | The remainders are positions on one chain, and a sectioning is free |
 | `2026-08-20_THE_REST_IS_CULTIVATED_THE_DELTA_IS_DERIVED_AND_THE_ABLATION_RESTORES_THE_PREDECESSOR_OCTET_FOR_OCTET.md` | The rest is cultivated, the delta is derived, and the ablation restores the predecessor octet for octet |
 | `2026-08-20_THE_STANDING_APPLICATION_MOUNTED_THE_CULTIVATED_BODY_AND_SIX_FRESH_CURRENTS_RETURNED_FROM_THE_CARD.md` | The standing application mounted the cultivated body, and six fresh currents returned from the card |
+| `2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION_AND_THE_FROZEN_BOARD_DECIDES_ITS_PUZZLE.md` | The swing is harmonic conjugation, and the frozen board decides its puzzle |
+| `2026-08-20_THE_THETA_CARRIES_BOTH_AND_THE_PULLBACK_CANNOT_PAY.md` | The theta carries both, and the pullback cannot pay |
+| `2026-08-20_THE_TRACE_SEQUENCE_CARRIES_THE_WEIL_EXPONENT.md` | The trace sequence carries the Weil exponent |
 | `2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md` | The transport does not condense, the tree falls for free, and no factor is quoted |
 | `2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md` | The whole foreign map crossed once and the native rest returned without its source |
+| `2026-08-20_THREE_MORE_DECLARATIONS_WERE_WEARING_THEOREM_NAMES.md` | Three more declarations were wearing theorem names |
+| `2026-08-20_THREE_NAMES_ONE_SUBGROUP.md` | Three names, one subgroup |
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
+| `2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md` | The heat kernel returns a Fisher metric, the trace defect counts missing directions, and entropy carries the volume |
+| `2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` | The proof terms survived, the connective tissue cooled, and M0 begins from two source families |
 
 ---
 
@@ -326,7 +356,8 @@ outside `tools/` that names the verifier — not declared.
 | `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `CONSTRUCTION_STATE.md`, `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `blueprint/THE_ROADMAP.md`, and 3 more |
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 28 more |
+| `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 30 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

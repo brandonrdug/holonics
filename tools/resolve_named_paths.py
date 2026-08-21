@@ -219,7 +219,10 @@ def top_level_directories() -> set[str]:
 
     The archived roots matter: `src/` is not a directory of this body, but it is the root every
     archived C++ path is written against, and those are precisely the tokens a live document must
-    not name in the present tense.
+    not name in the present tense. Anchored gitignored roots matter for the complementary reason:
+    `output/` and `target/` may be absent in a clean clone, but a document which names a runtime
+    path below either root is still making a path claim. Reading those root names from `.gitignore`
+    keeps this verdict independent of whether a local deed happened to materialize the directory.
     """
     global _TOP_LEVEL
     if _TOP_LEVEL is None:
@@ -235,6 +238,14 @@ def top_level_directories() -> set[str]:
                 if not name.startswith(".")
                 and os.path.isdir(os.path.join(directory, name))
             )
+        try:
+            with open(os.path.join(ROOT, ".gitignore"), encoding="utf-8") as ignored:
+                for line in ignored:
+                    match = re.fullmatch(r"/([A-Za-z0-9_.-]+)/", line.strip())
+                    if match:
+                        names.add(match.group(1))
+        except OSError:
+            pass
         _TOP_LEVEL = names
     return _TOP_LEVEL
 

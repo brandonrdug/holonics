@@ -37,11 +37,17 @@ move [CONSTRUCTION_STATE.md](../CONSTRUCTION_STATE.md).
 [A Geometric Perspective on Autoencoders](https://arxiv.org/abs/2309.08247),
 [Geometry-Aware Generative Autoencoders](https://arxiv.org/abs/2410.12779),
 [Manifold-Matching Autoencoders](https://arxiv.org/abs/2603.16568), and
-[Layer Normalization](https://arxiv.org/abs/1607.06450). Their exact synthesis and limits are
+[Layer Normalization](https://arxiv.org/abs/1607.06450). The diffusion/geometry intermediary also
+includes Jian Ge,
+[Heat kernel geometry and Gromov's volume growth conjecture](https://arxiv.org/abs/2608.13553),
+read as conditional external arXiv-v1 testimony. Their exact synthesis and limits are
 deposited in
 [the geometric-action record](../research/records/2026-08-18_THE_ARCHITECTURE_IS_A_DOMAIN_ACTION_THE_GAUGE_CARRIES_THE_SECTION_AND_THE_COARSENING_OWES_ITS_FIBRE.md)
 and
 [the Markov/normalization record](../research/records/2026-08-18_THE_MARKOV_KERNEL_IS_A_SOFTMAX_CHART_THE_NORMALIZATIONS_ARE_QUOTIENT_SECTIONS_AND_THE_MANIFOLD_IS_NOT_THE_RECONSTRUCTION.md).
+[The heat-kernel record](../research/records/2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md)
+keeps the new source's Fisher, diffusion, entropy and volume chain separate from learned-manifold
+and exact-compression claims.
 They supply exterior mathematical receivers and no construction authority.
 
 ---

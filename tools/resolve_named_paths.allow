@@ -51,6 +51,7 @@ blueprint/THE_ROADMAP.md :: causal_layers.tsv :: same driver
 blueprint/THE_ROADMAP.md :: grain_cells.tsv :: same driver
 blueprint/THE_ROADMAP.md :: quotients.tsv :: same driver
 blueprint/THE_ROADMAP.md :: overlap_nerve.tsv :: same driver
+CONSTRUCTION_STATE.md :: output/the_deposit_licenses_the_re_emission :: gitignored runtime grade directory named as measured provenance, not a repository-owned source path
 
 # --- A path a movement proposes to create ---
 blueprint/THE_ROADMAP.md :: crates/holonic-engine/src/homology.rs :: the integer-homology movement's target; absent by design until it is built
@@ -75,6 +76,7 @@ canon/THE_DOCUMENT_LAW.md :: provenance/ :: named as a repaired README link; the
 # constant really is that, at crates/holonic-engine/examples/curved_receiver_phase_atlas.rs:22.
 # It names an output location under `target/`, which is a build directory this checker prunes and
 # git ignores, so the token can never resolve and must never be "fixed" by inventing a path.
+canon/THE_QUOTE_NETWORK.md :: target/holonic-engine/curved-receiver-phase-atlas-tiger :: verbatim gitignored DEFAULT_OUTPUT constant quoted as historical runtime provenance
 
 # --- Build directories quoted as ignore patterns, not as paths to follow ---
 # `.lake/` is Lake's generated-artifact directory. All four mentions quote it as a `.gitignore`
@@ -83,6 +85,7 @@ canon/THE_DOCUMENT_LAW.md :: provenance/ :: named as a repaired README link; the
 # contents are `build/` and `packages/` — both in this checker's own PRUNED set.
 CONSTRUCTION_STATE.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
 blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
+canon/THE_QUOTE_NETWORK.md :: target/debug/deps :: gitignored Cargo test-binary directory quoted as measured runtime provenance
 
 # --- Laboratory owners deleted BY the pinned commit, and one permanent loss ---
 # `a07ff376` is itself the commit that removed the symbolic-reasoning family; §5 names these in
