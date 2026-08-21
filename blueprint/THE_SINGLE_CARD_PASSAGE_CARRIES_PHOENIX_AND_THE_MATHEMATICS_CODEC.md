@@ -5,12 +5,17 @@
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
 **Status:** active construction contract when named by the roadmap. **Deeds H0 through H5 returned
 2026-08-19/20 as the bounded hardware foundation; P0 returned as the independent ARM N baseline;
-W1 through W5 returned the whole lifted, cultivated, source-detached Phoenix first instance by
-2026-08-21. Deed M0 is next.** The former P1–P5 promotions were regraded 2026-08-20 by
+W1 through W5 returned a whole source-shaped Gemma lift, intervention dissection, attributable
+cultivation and source-detached GPU runtime by 2026-08-21. They did not return the species-changing
+generator/codec compression required for Phoenix rebirth. Deed M0 is next and M1–M4 now compose the
+mathematics codec with that open transfiguration.** The former P1–P5 promotions were regraded
+2026-08-20 by
 [THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md)
-and remain bounded ARM-N/lift-law provenance; W1–W5 are their authoritative whole-Phoenix
-replacements. W5's complete return is
+and remain bounded ARM-N/lift-law provenance. W1–W5 replace them as the authoritative Gemma lift
+evidence, not as a completed compressed ecology. W5's complete source-shaped return is
 [THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
+Its equality/activity/compression regrade and the new integrated construction are
+[EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -770,8 +775,10 @@ correctly refused an impossible body-wide subject invariance and was rederived a
 
 `AblationControlKind::{CausalPrefix, SubjectDisjoint}`. The authoritative record is
 [THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
-The complete receiver family still permits no nontrivial base condensation, so no compression
-factor is quoted. Phoenix advances; M0 is next.
+The complete receiver family still permits no nontrivial quotient of the source-shaped deed states,
+so no quotient factor is quoted. This does not test whether the same distinct transports factor
+through a smaller generator/chart/word ecology. W5 closes the bounded source-shaped lift grade;
+species-changing Phoenix compression remains open and is now composed with M0–M4. M0 is next.
 
 ### Deed M0 — mathematical source circulation
 
@@ -791,18 +798,41 @@ testimony; operation elaboration remains M1 and proof/checker return remains M2.
 
 Elaborate binders, tensor variance, algebraic carriers, dimensions/units, hypotheses, branches and
 rendering receivers. At least two standing exact method owners conduct through the same H
-tiling/reduction passage.
+tiling/reduction passage. Every comparison separately returns occurrence identity, typed carrier
+equality, marked-diagram isomorphism, doctrine/receiver-history equivalence, classification,
+characteristic similarity and face/byte/digest equality where each is actually witnessed. The
+operation complex, its plural presentation fibre and its reconstruction fibre form the first
+mathematical particle; no tokenizer token is called the particle.
 
-### Deed M2 — proof/value/visual return
+### Deed M2 — the mathematics codec excites the active transport cover
 
-Return derivation, exact value/enclosure, Lean exterior testimony, analytic scene, mesh/vector and
-raster round trip with singularities and ReconstructionFiber.
+Derive a finite cohort from the M1 particle's presentation generators and semantic boundary
+perturbations, never from random strings or a Cartesian product of glyphs. Conduct that cohort
+through the frozen Gemma lift using H4/H5 resident streaming and shared prefixes. Return four
+separate activity faces—apparatus switching where calibrated, residency, realization-path
+participation and receiver-visible causal support—plus first separators, overlap nerve, ordered
+response cochains, unchanged controls and complete open fibres. Source architecture names remain
+lineage and cannot classify the native cover.
 
-### Deed M3 — mathematical cultivation and rest
+### Deed M3 — generator recovery and the native codec pivot
 
-One attributable correction changes held-out cross-codec mathematical conduct after detached
-remount and disappears under targeted ablation. This is the first mathematics-codec complete
-vertical deed.
+Recover typed generators, chart maps, ordered words, relations and defects for the M2 cover. The
+swing is the anti-vacuity calibration: its presented population must factor through conjugated
+negation and its word normal form while a lineage receiver reopens the original word. The native
+rest omits foreign matrices except where a named ReconstructionFiber still requires them, carries an
+executable decoder/reopening law, conducts on the card, and compares the complete artifact-plus-
+decoder/work/residency/transfer vector. A source-shaped tensor inventory or identity codebook map
+does not pass.
+
+### Deed M4 — leader/return cultivation and proof/value/visual return
+
+A held-out mathematical receiver difference FOUNDs a leader through the M3 ecology; the causal
+adjoint RIDEs only that retained path and deposits an attributable local morphology delta. The
+changed conduct survives source-detached remount and targeted ablation removes it. The same
+circulation returns derivation, exact value/enclosure, Lean exterior testimony, analytic scene,
+mesh/vector/raster round trip, singularities and complete ReconstructionFiber. This is the first
+complete mathematics-codec vertical and the first possible completion of species-changing Phoenix
+rebirth.
 
 ---
 
@@ -864,6 +894,19 @@ The plan refuses when:
 - equation names or JSON edges select operations;
 - source runtime floats govern native state;
 - source-detached rest retains source/corpus lookup;
+- a deterministic rerun, equal face, equal bytes, equal digest, common classification or
+  structure-preserving rebase is called occurrence equality;
+- a causal signature comparison omits the natural map over prefix extension, intervention and
+  return;
+- apparatus switching, residency, realization-path participation and receiver-visible causal
+  support are collapsed into one untyped activation;
+- a tokenizer token is called the mathematical particle rather than one presentation face of an
+  operation complex;
+- scalar activation clustering is called a transport-family atlas without its overlap nerve,
+  ordered paths and reconstruction fibres;
+- a global parameter replay replaces local leader formation and the causal-adjoint return;
+- a reflection/rotation drops its hand, word or holonomy;
+- a source-shaped matrix population is called generator-native compression;
 - unfinished Station E is extended before H5;
 - Station A-D evidence is erased rather than composed; or
 - any later deed begins while an earlier grade is open.
@@ -875,9 +918,10 @@ The plan refuses when:
 This blueprint is complete only when:
 
 1. H0-H5 replace the poor single-card foundation;
-2. P0 stands as the independent native control and W1-W5 return the whole lifted/cultivated
-   Phoenix frozen native model and reborn dissection;
-3. M0-M3 return the mathematics-codec vertical circulation;
+2. P0 stands as the independent native control and W1-W5 retain the bounded source-shaped Gemma
+   lift/cultivation/runtime/dissection evidence;
+3. M0-M4 return the mathematics-codec vertical, the codec-excited active cover, generator-native
+   Phoenix rest and leader/return cultivation;
 4. superseded scheduling blueprints and implementation paths are removed from live authority;
 5. every final artifact is source-detached, inspectable, mode-bound and graded with exact semantic
    receipts separate from telemetry.

@@ -58,14 +58,17 @@ native morphology, condensation or cultivation.
 occurrence/law material begins on the convicted flat-thread/max-block substrate. It schedules
 nothing and is not extended until the common hardware foundation passes.
 
-**The next deed is H0:** return a calibrated physical profile of the unchanged scalar path—kernel,
-transfer and CPU timeline; resource/occupancy and scheduler-state faces where the apparatus can
-measure them; exact work; local pressure/current; and a product-ordered SurfaceUtilityReceipt.
-H1 then founds typed tiling/reduction, H2 tiles real Gemma contractions, H3 closes reductions/fusion,
-H4 builds one streamed resident tower circulation, and H5 reproduces Station D through shared
-prefixes/cohorts. Only after H0–H5 pass does Phoenix resume at native morphology. The mathematics
-vertical follows Phoenix completion on the same execution owners. `CONSTRUCTION_STATE.md` does not
-move.
+**Current frontier after the 2026-08-21 equality/compression regrade:** H0–H5 have returned the
+single-card foundation and W1–W5 have returned a complete source-shaped Gemma lift, intervention
+dissection, rank-one cultivation and source-detached resident runtime. W2 tested quotienting the
+source-shaped deed states; it did not test generator/chart/word re-expression. Therefore the
+species-changing compression required by the Phoenix contract remains open. M0 remains next. M1
+founds mathematical particles and typed sameness; M2 uses them to excite an active transport cover;
+M3 recovers the generator-native codec pivot; M4 closes leader/return cultivation and the complete
+mathematical return. The integrated contract is
+[`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
+and its derivation is
+[`research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).
@@ -353,8 +356,9 @@ bound to morphology. The independent ARM N CPU path remains an explicitly separa
 bounded to this compiled first instance and makes no language-quality or arbitrary-product claim.
 `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes the phase.
 
-**DEED W5 PASSED 2026-08-21 — the four bodies returned, the causal prefix held, and PHOENIX
-REBIRTH IS COMPLETE FOR THE GEMMA FIRST INSTANCE.** Authoritative record:
+**DEED W5 PASSED 2026-08-21 — the four bodies returned and the causal prefix held; the
+SOURCE-SHAPED GEMMA LIFT GRADE IS COMPLETE AND GENERATOR-NATIVE PHOENIX REBIRTH REMAINS OPEN.**
+Original return record:
 [`research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md`](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
 Foreign, W2 and W3 share the complete 262,144-address correspondence and one authenticated source
 closure while retaining distinct deed closures; ARM N remains independent. Sixteen interventions
@@ -363,8 +367,12 @@ withdrawals and the subject-disjoint cultivation-delta withdrawal all returned w
 restoration and their correct control species. Forty-three actual tower admissions per source/W2/W3
 body plus the W3 overlay admission, exact work, raw non-double-counted apparatus censuses, unknown
 energy, and the complete receiver evidence are content-bound by the compact grade. The W2 receiver
-family still reopens every nontrivial candidate, so no base-compression factor is quoted. W5 moves
-`CONSTRUCTION_STATE.md`; **Deed M0 is next.**
+family still reopens every nontrivial quotient candidate, so no quotient factor is quoted. The
+source/native address map remains identity-shaped and the rest remains source-shaped; no smaller
+generator/chart/word ecology was posed. The authoritative regrade is
+[`2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
+W5 moves `CONSTRUCTION_STATE.md` only to the bounded lift/cultivation/runtime/dissection frontier;
+**Deed M0 is next.**
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section

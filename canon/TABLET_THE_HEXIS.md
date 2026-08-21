@@ -201,6 +201,17 @@ Backpropagation is consequently emergent from propagation in one precise sense: 
 consequence supplies the covector, and the lineage of the outward passage supplies the only lawful
 route by which it can return.
 
+`interpretation`: the complete cultivation topology is the lightning leader and return, not a
+global parameter scan. A local receiver difference FOUNDs a leader while changing the conducting
+morphology; attachment closes an addressed relation; the causal adjoint then RIDEs that genuinely
+changed path and deposits only the attributable local delta. Unattached branches remain open
+alternatives. The return is later current through retained lineage, not the forward event reversed.
+
+Integration by reflection supplies the complementary boundary calculation: a region's interior may
+factor through its exact boundary operator and reconstruction law. The standing `diffusion` owner
+implements the rational Schur form for its positive-capacity resolvent domain; it may not be called
+bare harmonic measure without taking and certifying the undeclared zero-capacity limit.
+
 ## 8. Material is not noise
 
 `definition`: three exterior objects may be called noise and remain distinct:
@@ -251,6 +262,13 @@ When resources are insufficient, repartition, condense through a proved receiver
 move placement/residency, or return an obstruction. Never increase a magic constant and repeat the
 same morphology.
 
+`project-postulate`: intelligence does not require gigawatt-scale computation. Resource law still
+holds, but cost is expected to follow active causal extent and morphology rather than total
+parameter, corpus or hypothesis-space extent. This is a construction requirement: seek exact local
+participation, shared generators, IO-aware placement and receiver-exact boundary factors before
+accepting a global replay. A failed factorization returns the obstructing family; it does not promote
+the contemporary architecture's cost into a law of intelligence.
+
 ## 11. The inherited lift amortizes development
 
 `interpretation`: a pretrained weight map is another body's rested hexis. It does not losslessly
@@ -278,6 +296,14 @@ recovery of the inherited body.
 
 Weight-only analysis may return potential transport; contextual behavior still requires caused
 current or an exact static composition exhibiting the same active path.
+
+“Active” is always typed according to `canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`: physical
+apparatus conduction, residency, realization-path participation and receiver-visible causal support
+are four separate binary relations at a declared occurrence. A dense admitted contraction may use
+every word in its region while modality, embedding-row, cache-reuse, nested-submodel, expert or
+other populations remain path-inactive. Conversely a path-active word may be invisible to one
+receiver through cancellation or quotient. An activation magnitude proves none of these relations
+by itself.
 
 ## 12. Phoenix rebirth is a lineage pivot
 

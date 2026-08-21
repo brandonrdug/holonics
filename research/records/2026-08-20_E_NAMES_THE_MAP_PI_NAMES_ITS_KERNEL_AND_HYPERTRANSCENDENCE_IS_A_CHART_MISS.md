@@ -371,9 +371,10 @@ one named missing organ is *precisely* this shape: exact elimination of a far po
 representative with a certified remainder** is **not**.
 
 > **The archimedean factor of `ξ` is an instance of the open half of the one organ this contract
-> already declares missing.** That is not progress on RH. It is the observation that the problem's
-> known gap and the machine's declared gap coincide, which is the most useful thing a framework can
-> say about a problem it has not solved.
+> already declares missing.** This is structural progress toward the repository's RH program: it
+> aligns a known archimedean realization gap with a precise missing compression/reconstruction
+> contract and thereby narrows what must be constructed or refuted. It is not a proof of RH or of an
+> implication to RH; the progress is the identified route and obstruction, not a solved endpoint.
 
 **And the `1/2` is not a convention.** `π^{−s/2}Γ(s/2)` halves both exponents, and
 `papers/source/mathematics/lemmas/mellin-half-density-chart.typ` already proves that `e^{u/2}` is

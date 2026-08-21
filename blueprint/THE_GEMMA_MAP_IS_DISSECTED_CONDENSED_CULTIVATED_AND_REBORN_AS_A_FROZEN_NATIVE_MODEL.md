@@ -5,6 +5,12 @@
 > retained as component-contract provenance where
 > [THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
 > composes them. This file schedules no work. [THE_ROADMAP.md](THE_ROADMAP.md) is the sole scheduler.
+>
+> **2026-08-21 GRADE CORRECTION.** The bounded Gemma lift/dissection/cultivation/runtime stands;
+> the source-shaped rest and identity-shaped address correspondence do not satisfy this file's
+> native compressed-model objective. Generator-native rebirth remains open under the active
+> integrated plan and
+> [the equality/activity/leader regrade](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
 **Date:** 2026-08-18
 **Kind:** first executable construction under

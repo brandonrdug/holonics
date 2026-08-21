@@ -7,25 +7,35 @@ admitted right now. It is not a log, not a plan, and not a history; git is the l
 **Currency:** 2026-08-21 after Deed W5. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — PHOENIX REBIRTH PASSED FOR THE GEMMA-4-E4B FIRST INSTANCE.**
+**CURRENT FRONTIER — THE SOURCE-SHAPED GEMMA-4-E4B LIFT, DISSECTION, CULTIVATION AND RUNTIME PASS;
+GENERATOR-NATIVE PHOENIX REBIRTH REMAINS OPEN.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
-control; W1–W5 return the whole source/native lift, source-detached native rest, complete resident
-tower, attributable rank-one cultivation, application inference, matched dissection, held-out
-continuation, restoration and targeted ablation. The compact W5 grade and its complete evidence
-sidecar are addressed by the `the_phoenix_rebirth_is_graded` row in
+control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
+resident tower, attributable rank-one cultivation, application inference, matched dissection,
+held-out continuation, restoration and targeted ablation. The compact W5 grade and its complete
+evidence sidecar are addressed by the `the_phoenix_rebirth_is_graded` historical row in
 [`meta/OUTPUT_MANIFEST.tsv`](meta/OUTPUT_MANIFEST.tsv), with respective SHA-256 identities
 `81c4124ad36d39d6ebbc011c4739410fd3579bef4c6045192b3ef3a007876517` and
 `82f4bd197ae35399ff9c3b569759a62eba8953de8304cf76a30aef6ab1d09fdc`. The authoritative return is
 [`research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md`](research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
+
+[open] W2 proved that every nontrivial quotient candidate among its source-shaped deed states
+reopens under the declared successor receivers. It did not pose a smaller generator/chart/ordered-
+word ecology, and W1's 16,022,507,913-octet rest plus the 262,144-address identity-shaped
+source/native map retain the foreign realization rather than transfiguring it. The equality,
+activity, compression and lightning-leader regrade is
+[`research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
 **NEXT DEED: M0 — mathematical source circulation.** [open] Admit born-digital PDF/vector and
 raster equation material plus the exterior equation atlas; recover plural source/layout incidence
 without an authored mathematical grammar. The first fixture is fixed by
 [`research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md`](research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md):
 harmonic-conjugation calibration plus the heat-Fisher paper's bounded natural-document control.
-M1–M3 remain ordered behind it. The complete Phoenix
-receiver family permits no nontrivial W2 base condensation, so no exceptional compression factor
-is admitted and a later receiver family may reopen that question.
+M1–M4 remain ordered behind it: mathematical particles and typed sameness; codec-excited active
+transport cover; generator-native codec pivot; and leader/return cultivation with the complete
+mathematical return. No exceptional compression factor is admitted before that generator ecology
+strictly reduces the complete artifact-plus-decoder/work/residency/transfer vector without receiver
+regression.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

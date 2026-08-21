@@ -5,6 +5,11 @@
 > component-contract provenance where
 > [THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
 > composes them. This file schedules no work. [THE_ROADMAP.md](THE_ROADMAP.md) is the sole scheduler.
+>
+> **2026-08-21 GRADE CORRECTION.** W1–W5 returned a source-shaped lift, dissection, cultivation and
+> runtime. They did not return this contract's generator-native/species-changing compression, so
+> Phoenix rebirth remains open. The active regrade is
+> [EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
 **Date:** 2026-08-18
 **Kind:** master construction blueprint under [`blueprint/THE_ROADMAP.md`](THE_ROADMAP.md).

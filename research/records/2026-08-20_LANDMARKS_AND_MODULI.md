@@ -113,8 +113,11 @@ at `906,150,257`, three orders of magnitude above our largest aperture.
 of the earlier experiment and as an aperture control. The modulus law is proved for the divisibility
 criterion and the least-depth table; the full correspondence to the nested-radical values —
 `2cos(π m / (2^p ∓ 1))` with the parity rule — is verified numerically to fifteen places on six
-words and is **not** proved in Lean. Every named conjecture above is imported with its status and
-none is approached. Nothing here is a claim about any Millennium problem.
+words and is **not** proved in Lean. Every named conjecture above is imported with its status. The
+finite experiment does not decide one of them at this aperture; it advances the research program by
+returning an exact aperture control, a counterexample to naive finite extrapolation, and a proved
+period/modulus mechanism which later routes may compose. Nothing here claims a resolution of a
+Millennium problem.
 
 **Measured:** `Millennium/` is **21 files, 4,838 lines, 251 theorems**, zero `sorry`; the library
 builds at 3,305 jobs; all ten theorems in `LandmarksAndModuli.lean` audit clean with six named open

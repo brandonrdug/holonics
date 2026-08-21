@@ -353,12 +353,23 @@ transport word coexist without one becoming the ontology of the others.
 
 ### Identity laws
 
-The codec must keep four relations separate:
+The codec must implement the complete typed sameness family from
+[`canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`](../canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md):
 
-1. source-presentation identity;
-2. denoted-value equality;
-3. equality under a declared receiver family;
-4. occurrence and construction identity.
+1. unqualified occurrence identity;
+2. equality inside a declared mathematical carrier;
+3. marked-diagram/soul isomorphism;
+4. doctrine and receiver/history equivalence;
+5. receiver-face and denoted-value equality;
+6. common classification and declared characteristic similarity;
+7. presentation/coordinate, byte and digest equality.
+
+A causal signature is a receiver/history functor with source marks, ports, incidence, ordered word,
+first separator, obstruction, reconstruction fibre and return lineage. Two signature occurrences
+are not literally equal because their received faces agree. Receiver/history equivalence requires a
+natural family of chart isomorphisms commuting with every admitted prefix extension, intervention,
+receiver transition and return. Soul isomorphism additionally maps the complete marked causal
+diagrams. A deterministic rerun remains a distinct occurrence.
 
 Thus \(4\), \(2+2\), \(2^2\), and \(2\cdot2\) may collapse under a value receiver while remaining
 distinct under operation-lineage, derivative, intervention, work, or proof-route receivers.
@@ -367,6 +378,10 @@ A term is never identified by its printed name. Bound-variable renaming is a reb
 typesetting, color, scale, and harmless page reflow are presentation gauges. Changing an exponent,
 operator hand, contraction, index variance, unit, branch, or hypothesis changes the operation
 complex or returns a refusal.
+
+The mathematical particle is the operation complex together with its plural presentation and
+reconstruction fibres. A tokenizer token, glyph, equation-atlas row or receiver face is one
+presentation occurrence and never the particle by itself.
 
 ---
 
@@ -927,6 +942,11 @@ Every executable front owes:
 - exact local or delta return;
 - typed refusal under pressure;
 - measured transfer, time, energy and thermal testimony kept separate.
+
+Every activity claim also names its cut: physical apparatus conduction, residency, participation
+in the enacted transport path, or receiver-visible causal support under matched intervention.
+These populations may overlap and none is inferred from an activation magnitude, nonzero word,
+parameter count or common source label.
 
 Resource pressure changes partition, factorization, placement, residency, schedule or aperture, or
 returns an obstruction. Raising a magic bound and retrying the same morphology is forbidden.

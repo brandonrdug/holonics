@@ -16,9 +16,16 @@ library.
 passes its v2 schema; identities are unique; every relation endpoint resolves; every local
 `source_ref` resolves; and the manifest’s byte extents, counts, and SHA-256 identities agree.
 
-[interpretation] The individual proof terms form a useful common vocabulary of transport words,
-rebases, radicals, fixed loci, recurrences, receiver kernels, and quotients. They do not yet form one
-argument toward a Millennium problem.
+[established-bounded] The individual proof terms advance the repository's Millennium research
+program by replacing verbal correspondences with reusable, kernel-checked constructions over their
+declared carriers: ordered transport words, rebases, radicals, fixed loci, recurrences, receiver
+kernels, reflection forms, obstruction groups, and quotients. Their value is neither machine-local
+nor confined to the fixtures which first posed them; they are composable mathematical lemmas and
+explicit route constraints.
+
+[open] No complete implication from these constructions to the full hypotheses and conclusion of a
+named Millennium statement has yet been composed and checked. That is the present route boundary,
+not an assertion that the work has made no progress toward those problems.
 
 ## What the chronology established
 
@@ -182,8 +189,15 @@ again be reported as green.
 [open] Upstream novelty of the algebraic GNS and reverse-inequality files has not been established by
 a comprehensive literature search.
 
-[open] None of the named Millennium problems is proved or approached by the local finite carriers.
-Their names remain exterior comparison lineages.
+[established-bounded] The formal corpus is progress toward the named problems at the level it has
+actually reached: it proves reusable transport, positivity, quotient, reflection, recurrence and
+obstruction relations; discovers where several proposed identifications require additional
+hypotheses; and turns those missing bridges into explicit open constructions rather than leaving
+them as rhetoric.
+
+[open] None of the named Millennium problems is claimed resolved. The next mathematical burden is
+to compose the bounded constructions into problem-specific routes whose target is the complete
+classical statement, with every carrier change and imported theorem exposed.
 
 [open] The heat-kernel paper is an external arXiv v1 and requires independent expert scrutiny.
 

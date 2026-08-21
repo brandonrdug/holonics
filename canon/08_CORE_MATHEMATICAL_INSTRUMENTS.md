@@ -48,6 +48,68 @@ Current spine: `H.0015` in [`foundations.typ`](../papers/source/holonics/foundat
 and [`situated-knot-receiver.typ`](../papers/source/mathematics/definitions/situated-knot-receiver.typ)
 are supporting source material, not independently promoted authority.
 
+### 1.1 Unqualified equality is occurrence identity; every other equality is typed
+
+For situated holons, `x = y` is reserved for one owner-minted occurrence identity. A clone,
+deterministic rerun, later state, rechart, reserialization, or returned loop is another occurrence.
+It may be isomorphic or equivalent under a declared relation and is not literally equal.
+
+Ordinary equality inside a declared mathematical carrier remains exact and indispensable. Write or
+read it as `a =_X b`: equality in `X`, under `X`'s equality law. It does not identify two embodied
+inscriptions or enactments of that equality. The historical correction is binding: **same is struck
+for souls, not for typed equality.**
+
+No universal `Soul<T>` wrapper is required or permitted. The soul is already carried by the marked
+occurrences, incidence, ordered transport words, ports, returns, open fibres and lineage owned by
+their exact local types. A comparison receipt names the relation it established; it does not mint a
+second identity cabinet.
+
+### 1.2 Causal signatures are receiver/history functors, not souls
+
+For an occurrence `x`, admitted history category `H_x`, and versioned receiver family `R`, a causal
+signature is the received functorial family
+
+```text
+Sigma_(x;R) : H_x -> Product_(rho in R) O_rho
+```
+
+together with the typed source marks, ports, incidence, ordered word, first separating prefix,
+returned difference/obstruction, reconstruction fibre and return lineage owed by those faces.
+
+Two signature occurrences are literally equal only when they are the same occurrence. They are
+**soul-isomorphic** only through an invertible marking-, orientation-, port-, incidence-, word- and
+lineage-preserving map of their complete causal diagrams. They are **receiver/history equivalent**
+when a natural family of target-chart isomorphisms commutes with every admitted prefix extension,
+intervention, receiver transition and return. The latter can hold after a receiver has forgotten a
+source distinction and therefore never implies occurrence identity.
+
+A deterministic rerun can consequently be soul-isomorphic and receiver/history equivalent while
+remaining occurrence-distinct and physically nonidentical. Byte equality, digest equality and
+apparatus-telemetry equivalence remain separate receipts.
+
+### 1.3 Similarity, classification and activity are declared relations
+
+For a characteristic family `K` and frame `F`, exact similarity is
+
+```text
+x ~_(K,F) y  iff  kappa_(i,F)(x) = kappa_(i,F)(y) for every kappa_i in K.
+```
+
+This becomes an equivalence relation only when the declared characteristic laws make it one. A
+common classification means equality after a named classifier and says nothing by itself about
+member identity, state, lineage or complete structure.
+
+Activity likewise has no unqualified form. Every claim must name one of:
+
+1. apparatus switching/conduction at a physical cut;
+2. residency/admission on an apparatus surface;
+3. parameter or transport participation in the enacted realization path; or
+4. receiver-visible causal support under a matched intervention and admitted successor history.
+
+A resident word can be path-inactive; a path-active word can be receiver-silent through
+cancellation or quotient; and a nonresident word can remain potential inherited transport. Counts,
+activation magnitudes and nonzero gradients do not replace these addressed populations.
+
 ## 2. Cross-ratio swing
 
 For four distinct affine representatives over a field, define the projective swing first:
