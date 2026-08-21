@@ -25,8 +25,9 @@ mod native_streamed;
 mod resident_layer;
 #[path = "phoenix/streamed.rs"]
 mod streamed;
-#[path = "phoenix/tower.rs"]
-mod tower;
+mod tower {
+    pub use holonic_engine::phoenix::tower::*;
+}
 #[path = "phoenix/w3_fixture.rs"]
 mod w3_fixture;
 #[path = "phoenix/w3_grade.rs"]
@@ -231,7 +232,10 @@ fn base(
         &tokens.iter().map(|id| *id as usize).collect::<Vec<_>>(),
         ResidentGrain(law.grain),
         SeriesAperture(law.series_aperture),
-        match law.chart { holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint, holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval },
+        match law.chart {
+            holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint,
+            holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval,
+        },
         law.fuse,
         tower::LAYERS,
         false,
@@ -393,7 +397,10 @@ fn child(
                 .collect::<Vec<_>>(),
             ResidentGrain(law.grain),
             SeriesAperture(law.series_aperture),
-            match law.chart { holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint, holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval },
+            match law.chart {
+                holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint,
+                holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval,
+            },
             law.fuse,
             &request,
         )?;

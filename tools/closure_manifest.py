@@ -38,9 +38,10 @@ the shape of the loss: it leaves no trace to find.**
 
 # No aperture
 
-Every driver directory under `output/` is bound, uniformly. The producing driver is located by name:
-`output/<slug>/` is produced by the driver whose file stem is `<slug>` with `-` read as `_`. A
-directory whose driver cannot be located is reported rather than skipped silently.
+Every driver directory under `output/` is bound, uniformly. The producing driver is located by its
+file stem (with `-` read as `_`) or by a literal `DEFAULT_OUT = "output/<slug>/…"` in that driver.
+Two drivers declaring one address refuse. A directory whose driver cannot be located is reported
+rather than skipped silently.
 """
 
 from __future__ import annotations
@@ -76,14 +77,38 @@ PATH_MODULE = re.compile(
     re.MULTILINE,
 )
 
+# A driver may name a returned deed rather than itself. A literal DEFAULT_OUT keeps that exterior
+# address in the producing source, where closure_of can bind it without an authored alias table.
+# Only output/<one slug>/... is admitted; computed paths remain unresolved and therefore ORPHAN.
+DEFAULT_OUTPUT_SLUG = re.compile(
+    r'^\s*(?:pub\s+)?const\s+DEFAULT_OUT\s*:\s*&str\s*=\s*"output/([^"/]+)/[^"/]+"\s*;',
+    re.MULTILINE,
+)
+
 
 def driver_sources() -> dict[str, Path]:
     """Every example driver in the workspace, keyed by its file stem."""
     found: dict[str, Path] = {}
-    for crate in sorted((ROOT / "crates").glob("*/examples/*.rs")):
-        found[crate.stem] = crate
-    for crate in sorted((ROOT / "soma").glob("*/examples/*.rs")):
-        found.setdefault(crate.stem, crate)
+    sources = [
+        *sorted((ROOT / "crates").glob("*/examples/*.rs")),
+        *sorted((ROOT / "soma").glob("*/examples/*.rs")),
+    ]
+
+    def bind(address: str, source: Path) -> None:
+        prior = found.get(address)
+        if prior is not None and prior != source:
+            raise RuntimeError(
+                f"return address {address!r} is declared by both "
+                f"{prior.relative_to(ROOT)} and {source.relative_to(ROOT)}"
+            )
+        found[address] = source
+
+    for source in sources:
+        bind(source.stem, source)
+    for source in sources:
+        text = source.read_text(encoding="utf-8", errors="replace")
+        for match in DEFAULT_OUTPUT_SLUG.finditer(text):
+            bind(match.group(1), source)
     return found
 
 

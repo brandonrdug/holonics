@@ -44,12 +44,16 @@ use std::os::unix::fs::FileExt;
 use std::rc::Rc;
 use std::time::Instant;
 
+use serde::Serialize;
+use sha2::{Digest, Sha256};
+
 use crate::causal::EventId;
 use crate::embedding_fiber::ResidentReadout;
 use crate::exact_work::ExactWork;
 use crate::front_passage::{
     DeedReceiver, EnteringRows, FrontPassage, FrontPassageObstruction, MaterialAdmission,
-    MountedPopulation, ResidentMaterial, SealedMidpointQuotient, factored_seals,
+    MountedPopulation, PooledMaterialAuxiliary, ResidentMaterial, SealedMidpointQuotient,
+    factored_seals,
 };
 use crate::interaction::OccurrencePort;
 use crate::resident_section::{
@@ -61,6 +65,138 @@ use crate::streamed_standing::{
 };
 
 use super::tower::{self, Entry, Intervention, KvRole, Species};
+
+/// The one place in the streamed tower at which a matched sibling is changed.
+///
+/// This is an apparatus-facing site declaration, not an operation taxonomy.  The tower still
+/// owns the intervention law; the circulation only decides which layer receives the caller's
+/// occurrence.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InterventionSite {
+    /// The W2/W3 base deed: no intervention is enacted.
+    Nowhere,
+    /// Enact the same intervention at every layer graph.
+    EveryLayer,
+    /// Enact it at one layer graph only.
+    Layer(usize),
+    /// Enact it at the final normalization/output graph only.
+    Final,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{tower_admission_receipt, ApparatusCensus};
+    use crate::front_passage::DeedAdmission;
+    use crate::resident_section::TransferCensus;
+    use crate::streamed_standing::StreamedCensus;
+
+    #[test]
+    fn tower_admission_receipt_binds_the_actual_serialized_admissions() {
+        let admission = DeedAdmission {
+            semantic: Vec::new(),
+            apparatus: Vec::new(),
+            cited_material: None,
+            free_octets_at_admission: 17,
+        };
+        let receipt = tower_admission_receipt(vec![admission.clone()]).expect("serializes");
+        let expected = serde_json::to_string(&[admission]).expect("admission serialization");
+        assert_eq!(receipt.serialized, expected);
+        assert!(!receipt.identity.is_empty());
+    }
+
+    #[test]
+    fn apparatus_census_type_keeps_overlay_window_separate() {
+        let census = ApparatusCensus {
+            resident_before: TransferCensus::default(),
+            resident_after_tower: TransferCensus::default(),
+            resident_after: TransferCensus { deed_launches: 1, ..TransferCensus::default() },
+            overlay_before: Some(TransferCensus::default()),
+            overlay_after: Some(TransferCensus { deed_launches: 1, ..TransferCensus::default() }),
+            streamed: StreamedCensus { graph_launches: 1, terminal_synchronizations: 1, ..StreamedCensus::default() },
+            tower_deed_launches: 1,
+            total_deed_launches: 2,
+            terminal_synchronizations: 1,
+        };
+        assert_eq!(census.tower_deed_launches + 1, census.total_deed_launches);
+        assert!(census.overlay_before.is_some() && census.overlay_after.is_some());
+    }
+}
+
+/// Short alias for callers which use the exterior site chart's name.
+pub type Site = InterventionSite;
+
+impl InterventionSite {
+    fn applies_to_layer(self, layer: usize) -> bool {
+        match self {
+            Self::EveryLayer => true,
+            Self::Layer(at) => at == layer,
+            Self::Nowhere | Self::Final => false,
+        }
+    }
+
+    fn applies_to_final(self) -> bool {
+        matches!(self, Self::Final)
+    }
+}
+
+/// Receiver declaration for the streamed circulation.  Terminal output is the historical W2/W3
+/// receiver.  `Complete` additionally asks for all layer PLE/contact/layer-return faces; those
+/// faces are copied only after the single terminal synchronization.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceiverOption {
+    Terminal,
+    Complete,
+}
+
+pub type CirculationReceiver = ReceiverOption;
+pub type Receiver = ReceiverOption;
+
+/// The three named layer returns retained by the complete receiver family.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LayerReceiverFaces {
+    pub layer: usize,
+    pub ple: Vec<(i64, i64)>,
+    pub contact: Vec<(i64, i64)>,
+    pub layer_return: Vec<(i64, i64)>,
+}
+
+pub type LayerFaces = LayerReceiverFaces;
+
+/// Complete post-synchronization receiver return for one streamed tower.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceiverFaces {
+    pub layers: Vec<LayerReceiverFaces>,
+    pub final_normed: Vec<(i64, i64)>,
+    pub potential: Vec<(i64, i64)>,
+}
+
+pub type CompleteFaces = ReceiverFaces;
+
+/// The actual admissions of every bound deed in one tower, retained in launch order. The
+/// serialized form and identity are derived from these returned admissions; no prediction or
+/// reconstructed summary stands in for the admission the card used.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct TowerAdmissionReceipt {
+    pub deeds: Vec<crate::front_passage::DeedAdmission>,
+    pub serialized: String,
+    pub identity: String,
+}
+
+/// A non-double-counted apparatus window. `resident_*` are absolute surface censuses over the
+/// tower; an optional overlay window is a separate nested deed, while `streamed` is the pooled
+/// transport census. Consumers must not add the absolute windows as if they were deltas.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ApparatusCensus {
+    pub resident_before: TransferCensus,
+    pub resident_after_tower: TransferCensus,
+    pub resident_after: TransferCensus,
+    pub overlay_before: Option<TransferCensus>,
+    pub overlay_after: Option<TransferCensus>,
+    pub streamed: StreamedCensus,
+    pub tower_deed_launches: u64,
+    pub total_deed_launches: u64,
+    pub terminal_synchronizations: u64,
+}
 
 #[path = "cultivation_overlay.rs"]
 pub mod cultivation_overlay;
@@ -326,6 +462,8 @@ pub struct Circulated {
     pub tower_work: ExactWork,
     pub streamed: StreamedCensus,
     pub census_before: TransferCensus,
+    /// Surface census immediately after the terminal tower deed and before any W3 overlay.
+    pub census_after_tower: TransferCensus,
     pub census_after: TransferCensus,
     pub census_at_loop_open: TransferCensus,
     pub census_at_loop_close: TransferCensus,
@@ -344,6 +482,49 @@ pub struct Circulated {
     pub graph_key: GraphKey,
     pub final_normed_bound: u32,
     pub potential_bound: u32,
+    /// The receiver declaration used for this deed.  W2/W3 entry points use `Terminal`.
+    pub receiver: ReceiverOption,
+    /// Complete layer and terminal faces, populated only after the one terminal synchronization
+    /// when `receiver == ReceiverOption::Complete`.  `None` is the historical narrow receiver.
+    pub receiver_faces: Option<ReceiverFaces>,
+    /// The actual per-segment/final admissions and their whole-tower identity.
+    pub tower_admission: TowerAdmissionReceipt,
+}
+
+impl Circulated {
+    /// Return the tower's resident and pooled transport testimony without converting absolute
+    /// census windows into invented deltas.
+    pub fn apparatus_census(&self) -> ApparatusCensus {
+        ApparatusCensus {
+            resident_before: self.census_before.clone(),
+            resident_after_tower: self.census_after_tower.clone(),
+            resident_after: self.census_after.clone(),
+            overlay_before: None,
+            overlay_after: None,
+            streamed: self.streamed.clone(),
+            tower_deed_launches: self.deed_launches,
+            total_deed_launches: self.deed_launches,
+            terminal_synchronizations: self.streamed.terminal_synchronizations,
+        }
+    }
+}
+
+impl CultivatedCirculated {
+    /// Return the tower window plus the overlay's own absolute window. The overlay is not folded
+    /// into the tower census, so its ingress/egress testimony cannot be counted twice.
+    pub fn apparatus_census(&self) -> ApparatusCensus {
+        ApparatusCensus {
+            resident_before: self.execution.resident_transfer_before.clone(),
+            resident_after_tower: self.base.census_after_tower.clone(),
+            resident_after: self.execution.resident_transfer_after.clone(),
+            overlay_before: Some(self.execution.overlay_transfer_before.clone()),
+            overlay_after: Some(self.execution.overlay_transfer_after.clone()),
+            streamed: self.execution.streamed.clone(),
+            tower_deed_launches: self.base.deed_launches,
+            total_deed_launches: self.total_deed_launches,
+            terminal_synchronizations: self.execution.terminal_synchronizations,
+        }
+    }
 }
 
 /// One obstruction, said whole. The same shape `phoenix/conduct.rs` prints, restated here so the
@@ -391,6 +572,19 @@ pub fn scalar_word_of(file: &std::fs::File, region: &StagedRegion) -> Result<u16
     Ok(u16::from_le_bytes(octets))
 }
 
+fn tower_admission_receipt(
+    deeds: Vec<crate::front_passage::DeedAdmission>,
+) -> Result<TowerAdmissionReceipt, String> {
+    let serialized = serde_json::to_string(&deeds)
+        .map_err(|error| format!("serialize tower deed admissions: {error}"))?;
+    let identity = format!("{:x}", Sha256::digest(serialized.as_bytes()));
+    Ok(TowerAdmissionReceipt {
+        deeds,
+        serialized,
+        identity,
+    })
+}
+
 /// **The tower, as one streamed circulation.**
 ///
 /// One pre-deed admission, 43 segments each bounded by a pinned-staging refill, 43 graph
@@ -411,11 +605,63 @@ pub fn circulate<'chart>(
     poison: bool,
 ) -> Result<Circulated, String> {
     match circulate_inner(
-        surface, readout, source, tokens, grain, terms, chart, fuse, limit, poison, None,
+        surface,
+        readout,
+        source,
+        tokens,
+        grain,
+        terms,
+        chart,
+        fuse,
+        limit,
+        poison,
+        None,
+        InterventionSite::Nowhere,
+        &Intervention::None,
+        ReceiverOption::Terminal,
     )? {
         CirculationOutput::Base(base) => Ok(base),
         CirculationOutput::Cultivated(_) => {
             Err("the no-overlay circulation returned a cultivated tail".to_owned())
+        }
+    }
+}
+
+/// Base W2 circulation with one typed intervention site and an optional complete receiver family.
+/// The old [`circulate`] entry remains the exact no-intervention/narrow-receiver case.
+#[allow(clippy::too_many_arguments)]
+pub fn circulate_with_intervention<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    readout: &'chart ResidentReadout,
+    source: &mut dyn MaterialSource,
+    tokens: &[usize],
+    grain: ResidentGrain,
+    terms: SeriesAperture,
+    chart: tower::Chart,
+    fuse: bool,
+    site: InterventionSite,
+    intervention: &Intervention,
+    receiver: ReceiverOption,
+) -> Result<Circulated, String> {
+    match circulate_inner(
+        surface,
+        readout,
+        source,
+        tokens,
+        grain,
+        terms,
+        chart,
+        fuse,
+        tower::LAYERS,
+        false,
+        None,
+        site,
+        intervention,
+        receiver,
+    )? {
+        CirculationOutput::Base(base) => Ok(base),
+        CirculationOutput::Cultivated(_) => {
+            Err("the intervention-aware base circulation returned a cultivated tail".to_owned())
         }
     }
 }
@@ -446,10 +692,54 @@ pub fn circulate_cultivated<'chart, 'request>(
         tower::LAYERS,
         false,
         Some(request),
+        InterventionSite::Nowhere,
+        &Intervention::None,
+        ReceiverOption::Terminal,
     )? {
         CirculationOutput::Cultivated(cultivated) => Ok(cultivated),
         CirculationOutput::Base(_) => {
             Err("the cultivated circulation returned no overlay tail".to_owned())
+        }
+    }
+}
+
+/// Cultivated W3 circulation with the same typed intervention site as the base tower.  The
+/// overlay is launched after the intervened tower on that tower's conducting stream, before its
+/// sole terminal synchronization.
+#[allow(clippy::too_many_arguments)]
+pub fn circulate_cultivated_with_intervention<'chart, 'request>(
+    surface: &'chart ResidentSurface<'chart>,
+    readout: &'chart ResidentReadout,
+    source: &mut dyn MaterialSource,
+    tokens: &[usize],
+    grain: ResidentGrain,
+    terms: SeriesAperture,
+    chart: tower::Chart,
+    fuse: bool,
+    site: InterventionSite,
+    intervention: &Intervention,
+    receiver: ReceiverOption,
+    request: &'request CultivationRequest<'request>,
+) -> Result<CultivatedCirculated, String> {
+    match circulate_inner(
+        surface,
+        readout,
+        source,
+        tokens,
+        grain,
+        terms,
+        chart,
+        fuse,
+        tower::LAYERS,
+        false,
+        Some(request),
+        site,
+        intervention,
+        receiver,
+    )? {
+        CirculationOutput::Cultivated(cultivated) => Ok(cultivated),
+        CirculationOutput::Base(_) => {
+            Err("the intervention-aware cultivated circulation returned no overlay tail".to_owned())
         }
     }
 }
@@ -471,6 +761,9 @@ fn circulate_inner<'chart, 'request>(
     limit: usize,
     poison: bool,
     cultivation: Option<&'request CultivationRequest<'request>>,
+    intervention_site: InterventionSite,
+    intervention: &Intervention,
+    receiver_option: ReceiverOption,
 ) -> Result<CirculationOutput, String> {
     let clock = Instant::now();
     let census_before = surface.census();
@@ -493,9 +786,48 @@ fn circulate_inner<'chart, 'request>(
         (tower::LAYERS as u64) / 2,
         1,
     ];
-    let bands_elements = tower::SLIDING_HEAD / 2 + tower::FULL_HEAD / 2;
-    let prediction =
-        passage.predict_pooled_material(&shapes, &refills, bands_elements, tokens.len());
+    // Every resident auxiliary below is a separate allocation. Keep the plan decomposed so the
+    // card's allocation-grain rounding is applied to each mounted band/position population.
+    let mut auxiliaries = vec![
+        PooledMaterialAuxiliary::BandElements(tower::SLIDING_HEAD / 2),
+        PooledMaterialAuxiliary::BandElements(tower::FULL_HEAD / 2),
+        PooledMaterialAuxiliary::Positions(tokens.len()),
+    ];
+    let layer_site = |site: InterventionSite| match site {
+        InterventionSite::EveryLayer => true,
+        InterventionSite::Layer(_) => true,
+        InterventionSite::Nowhere | InterventionSite::Final => false,
+    };
+    if layer_site(intervention_site) {
+        if matches!(intervention, Intervention::IdentityChronology) {
+            match intervention_site {
+                InterventionSite::EveryLayer => {
+                    auxiliaries.push(PooledMaterialAuxiliary::BandElements(
+                        tower::SLIDING_HEAD / 2,
+                    ));
+                    auxiliaries.push(PooledMaterialAuxiliary::BandElements(tower::FULL_HEAD / 2));
+                }
+                InterventionSite::Layer(layer) => match Species::of(layer) {
+                    Species::Sliding => auxiliaries.push(PooledMaterialAuxiliary::BandElements(
+                        tower::SLIDING_HEAD / 2,
+                    )),
+                    Species::Full => auxiliaries
+                        .push(PooledMaterialAuxiliary::BandElements(tower::FULL_HEAD / 2)),
+                },
+                InterventionSite::Nowhere | InterventionSite::Final => {}
+            }
+        }
+        if matches!(intervention, Intervention::ReversedPositions) {
+            auxiliaries.push(PooledMaterialAuxiliary::Positions(tokens.len()));
+        }
+        if matches!(
+            intervention,
+            Intervention::PermuteReceiverHeads { .. } | Intervention::PermuteCarriedHeads { .. }
+        ) {
+            auxiliaries.push(PooledMaterialAuxiliary::Positions(tower::HEADS));
+        }
+    }
+    let prediction = passage.predict_pooled_material(&shapes, &refills, &auxiliaries);
     let admission = passage
         .admit_material(&prediction)
         .map_err(|o| format!("the tower's pooled material refused: {}", describe(&o)))?;
@@ -545,11 +877,28 @@ fn circulate_inner<'chart, 'request>(
         ),
     );
     let positions: Vec<u32> = (0..tokens.len() as u32).collect();
+    let reversed_positions: Vec<u32> = positions.iter().copied().rev().collect();
     material.positions = Some(
         surface
             .mount_positions(&positions)
             .map_err(|e| e.to_string())?,
     );
+    // Keep both position charts resident for the whole circulation. Swapping ownership between
+    // the active/inactive slots cannot free a buffer still named by an earlier launched graph.
+    let mut alternate_positions = if intervention_site != InterventionSite::Nowhere
+        && matches!(intervention, Intervention::ReversedPositions)
+    {
+        Some(
+            surface
+                .mount_positions(&reversed_positions)
+                .map_err(|e| e.to_string())?,
+        )
+    } else {
+        None
+    };
+    // A permutation is one immutable auxiliary population for the whole selected site. Keeping
+    // it in `material.arrays` avoids dropping a buffer still named by an earlier graph when the
+    // site is EveryLayer.
 
     // The runtime-supplied entering rows, read ONCE for the whole tower: the embedding row of each
     // token, and its per-layer embedding row, which every layer slices differently.
@@ -631,6 +980,8 @@ fn circulate_inner<'chart, 'request>(
     let mut overlay_admission: Option<crate::front_passage::DeedAdmission> = None;
     let mut overlay_execution: Option<OverlayExecutionIdentity> = None;
     let mut overlay_return: Option<crate::front_passage::PassageReturn> = None;
+    let mut positions_reversed = false;
+    let mut tower_deeds = Vec::with_capacity(tower::LAYERS + 1);
 
     // **The pipeline.** The staged read runs two segments ahead of the mount and the crossing one
     // ahead, so segment k+1's copy is issued IMMEDIATELY after segment k's graph is launched and
@@ -694,6 +1045,62 @@ fn circulate_inner<'chart, 'request>(
             },
         );
 
+        // These are the only extra apparatus faces needed by tower interventions.  They are
+        // mounted for the selected layer before its graph is bound; no semantic section is read
+        // and no host branch occurs between launches.
+        let applied = if intervention_site.applies_to_layer(layer) {
+            intervention
+        } else {
+            &no_intervention
+        };
+        if positions_reversed && !matches!(applied, Intervention::ReversedPositions) {
+            std::mem::swap(&mut material.positions, &mut alternate_positions);
+            positions_reversed = false;
+        }
+        if matches!(applied, Intervention::IdentityChronology) {
+            let pairs = species.head_width() / 2;
+            let identity = tower::identity_bands(pairs);
+            let identity_name = match species {
+                Species::Sliding => tower::IDENTITY_BANDS,
+                Species::Full => tower::IDENTITY_BANDS_FULL,
+            };
+            if !material.bands.contains_key(identity_name) {
+                material.bands.insert(
+                    identity_name.to_owned(),
+                    (
+                        surface
+                            .mount_bands(&identity, tower::BAND_GRAIN)
+                            .map_err(|e| e.to_string())?,
+                        (tokens.len() - 1) as u32,
+                    ),
+                );
+            }
+        }
+        if matches!(applied, Intervention::ReversedPositions) {
+            if !positions_reversed {
+                std::mem::swap(&mut material.positions, &mut alternate_positions);
+                positions_reversed = true;
+            }
+        }
+        if let Intervention::PermuteReceiverHeads { a, b }
+        | Intervention::PermuteCarriedHeads { a, b } = applied
+        {
+            if material.arrays.contains_key(tower::HEAD_PERMUTATION) {
+                // The same immutable permutation is valid at every selected layer.
+            } else {
+                let permutation: Vec<u32> = tower::swap_permutation(tower::HEADS, *a, *b)
+                    .into_iter()
+                    .map(|index| index as u32)
+                    .collect();
+                material.arrays.insert(
+                    tower::HEAD_PERMUTATION.to_owned(),
+                    surface
+                        .mount_positions(&permutation)
+                        .map_err(|e| e.to_string())?,
+                );
+            }
+        }
+
         // --- the mouth, on its own current, over the slot the copy already filled ---
         let mount_clock = Instant::now();
         let mounted = circulation
@@ -752,17 +1159,22 @@ fn circulate_inner<'chart, 'request>(
             &scales,
             terms,
             layer_scalar,
-            &no_intervention,
+            applied,
             tokens.len(),
         )?;
         let terminal = founded.returns[tower::LAYER_RETURN];
+        let mut declared = BTreeSet::new();
+        if receiver_option == ReceiverOption::Complete {
+            declared.insert(founded.returns[tower::PLE_SECTION]);
+            declared.insert(founded.returns[tower::CONTACT]);
+            // The enclosure is the receiver-visible layer-return face.  The later
+            // `LAYER_RETURN` is the standing transferred to the next deed and is released as
+            // ownership crosses the layer boundary.
+            declared.insert(founded.returns[tower::LAYER_ENCLOSURE]);
+            declared.insert(founded.returns[tower::LAYER_RETURN]);
+        }
         let (fusable, refused) = if fuse {
-            factored_seals(
-                &founded.complex,
-                &founded.realization,
-                terminal,
-                &BTreeSet::new(),
-            )
+            factored_seals(&founded.complex, &founded.realization, terminal, &declared)
         } else {
             (Vec::new(), Vec::new())
         };
@@ -793,6 +1205,7 @@ fn circulate_inner<'chart, 'request>(
         circulation
             .admit_segment(segment.slot)
             .map_err(|e| e.to_string())?;
+        tower_deeds.push(bound.admission.clone());
         let census_at_launch = bound
             .launch_on(&surface.mode(), circulation.conducting())
             .map_err(|o| format!("layer {layer} refused at launch: {}", describe(&o)))?;
@@ -899,13 +1312,22 @@ fn circulate_inner<'chart, 'request>(
         .standings
         .insert(tower::CARRIED_STANDING.to_owned(), (section, bound_octaves));
     let bind_clock = Instant::now();
-    let mut founded = tower::found_final(chart, &no_intervention, &scales)?;
+    let applied_final = if intervention_site.applies_to_final() {
+        intervention
+    } else {
+        &no_intervention
+    };
+    let mut founded = tower::found_final(chart, applied_final, &scales)?;
     let terminal = founded.returns[tower::POTENTIAL];
     // The final normed standing is a face this receiver reads, and it is itself the QUOTIENT: its
     // own face is the collapsed one, which the fused seal writes into its predecessor's buffer and
     // `read_section` resolves through. Nothing is declared, because the fusion condition is about a
     // quotient's PREDECESSOR and no receiver reads the pre-quotient enclosure here.
-    let declared: BTreeSet<EventId> = BTreeSet::new();
+    let mut declared: BTreeSet<EventId> = BTreeSet::new();
+    if receiver_option == ReceiverOption::Complete {
+        declared.insert(founded.returns[tower::FINAL_NORMED]);
+        declared.insert(founded.returns[tower::POTENTIAL]);
+    }
     let passage_final = FrontPassage::new(surface, grain);
     let (fusable, refused) = if fuse {
         factored_seals(&founded.complex, &founded.realization, terminal, &declared)
@@ -950,6 +1372,7 @@ fn circulate_inner<'chart, 'request>(
     circulation
         .admit_segment(last.slot)
         .map_err(|e| e.to_string())?;
+    tower_deeds.push(bound.admission.clone());
     let census_at_launch = bound
         .launch_on(&surface.mode(), circulation.conducting())
         .map_err(|o| format!("the final deed refused at launch: {}", describe(&o)))?;
@@ -992,6 +1415,9 @@ fn circulate_inner<'chart, 'request>(
         named.insert(name, *event);
     }
     bound_deeds.push((bound, census_at_launch, named));
+    // This is the tower-only resident window. W3's overlay starts after this point and owns a
+    // separate census window, so the two are never presented as one additive delta.
+    let census_after_tower = surface.census();
 
     // --- W3 tail: release h and y0 from the final W2 deed, then launch once on the same stream ---
     if let Some(request) = cultivation {
@@ -1082,6 +1508,7 @@ fn circulate_inner<'chart, 'request>(
     let mut final_normed = Vec::new();
     let mut obstructions: Vec<(usize, String, usize, usize)> = Vec::new();
     let mut terminal_refusal: Option<String> = None;
+    let mut receiver_layers = Vec::new();
     for (at, (bound, census_at_launch, named)) in bound_deeds.iter().enumerate() {
         let returned = bound
             .returned(census_at_launch.clone())
@@ -1110,6 +1537,38 @@ fn circulate_inner<'chart, 'request>(
                     receipt.collapsed_nonzero += u64::from(reading.measured.nonzero_widths);
                 }
             }
+        }
+        if receiver_option == ReceiverOption::Complete && at + 1 < bound_deeds.len() {
+            let ple = bound
+                .read_section(&returned, named[tower::PLE_SECTION])
+                .map_err(|obstruction| {
+                    format!(
+                        "layer {at} PLE receiver did not return: {}",
+                        describe(&obstruction)
+                    )
+                })?;
+            let contact = bound
+                .read_section(&returned, named[tower::CONTACT])
+                .map_err(|obstruction| {
+                    format!(
+                        "layer {at} contact receiver did not return: {}",
+                        describe(&obstruction)
+                    )
+                })?;
+            let layer_return = bound
+                .read_section(&returned, named[tower::LAYER_ENCLOSURE])
+                .map_err(|obstruction| {
+                    format!(
+                        "layer {at} return receiver did not return: {}",
+                        describe(&obstruction)
+                    )
+                })?;
+            receiver_layers.push(LayerReceiverFaces {
+                layer: at,
+                ple,
+                contact,
+                layer_return,
+            });
         }
         if at + 1 == bound_deeds.len() && cultivation.is_none() {
             match bound.read_section(&returned, named[tower::FINAL_NORMED]) {
@@ -1160,6 +1619,12 @@ fn circulate_inner<'chart, 'request>(
             .map_err(|error| format!("W3 cultivated potential return: {}", describe(&error)))?;
     }
 
+    let receiver_faces = (receiver_option == ReceiverOption::Complete).then(|| ReceiverFaces {
+        layers: receiver_layers,
+        final_normed: final_normed.clone(),
+        potential: potential.clone(),
+    });
+
     // The container has not moved under the deed.
     source
         .verify_stable()
@@ -1208,10 +1673,16 @@ fn circulate_inner<'chart, 'request>(
         grain: grain.0,
         series_terms: terms.0,
         reductions,
-        receiver_boundary: format!(
-            "the declared terminal of each segment ({} layer returns and one potential section); no other face was declared, which is why every seal factored",
-            receipts.len() - 1
-        ),
+        receiver_boundary: match receiver_option {
+            ReceiverOption::Terminal => format!(
+                "the declared terminal of each segment ({} layer returns and one potential section); no other face was declared, which is why every seal factored",
+                receipts.len() - 1
+            ),
+            ReceiverOption::Complete => format!(
+                "the complete receiver: per-layer PLE/contact/enclosure, final normed standing, and potential ({} layer returns)",
+                receipts.len() - 1
+            ),
+        },
         // The residency this circulation's executables baked in: the final deed's carried standing
         // is the one addressed section that is not the pool's, and the pool's own addresses are
         // fixed for the whole circulation. One tower, so no second deed contends for it — which is
@@ -1245,6 +1716,7 @@ fn circulate_inner<'chart, 'request>(
         tower_work,
         streamed,
         census_before,
+        census_after_tower,
         census_after,
         census_at_loop_open,
         census_at_loop_close,
@@ -1258,6 +1730,9 @@ fn circulate_inner<'chart, 'request>(
         graph_key,
         final_normed_bound,
         potential_bound,
+        receiver: receiver_option,
+        receiver_faces,
+        tower_admission: tower_admission_receipt(tower_deeds)?,
     };
     if cultivation.is_some() {
         let overlay_work = overlay_work.ok_or("W3 overlay work receipt is absent")?;

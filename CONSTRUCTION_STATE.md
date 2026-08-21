@@ -4,18 +4,27 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-12 after the resident-circulation posture correction. No executable
-capability is promoted by that documentation deposit: the interpreter-free code-material
-world-line still marks the admitted production frontier, beside returns 1–4 of the authorized
-recurrent-section construction on mandatory CUDA owners. The earlier fourth return
-conditions on the mixed corpus, founds an exact generative law, deposits only anonymous conduct
-keys and exact coefficients, makes its founding material unreachable, remounts the native rest,
-and governs a later disjoint causal-section reading with exact targeted ablation. The sealed corpus is
-`a6fb9343b4fb23399ddf50fb0769465e29a311889c49b0afa307a8d26739e971` — **the first corpus in this
-project's history that carries no coordinate of the machine that sealed it.** The addresses in the
-paragraph this replaces (`28028c1`, rest `45084ed2…`, grade `8125caa2…`) are the **superseded**
-host-dependent seal and are retained on disk as the before-arm of that repair. **Body:** Rust. The
-C++/CUDA engine under `archive/cpp-engine/` governs nothing.
+**Currency:** 2026-08-21 after Deed W5. **Body:** the root Rust workspace with the resident CUDA
+apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
+
+**CURRENT FRONTIER — PHOENIX REBIRTH PASSED FOR THE GEMMA-4-E4B FIRST INSTANCE.**
+[established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
+control; W1–W5 return the whole source/native lift, source-detached native rest, complete resident
+tower, attributable rank-one cultivation, application inference, matched dissection, held-out
+continuation, restoration and targeted ablation. The compact W5 grade and its complete evidence
+sidecar are addressed by the `the_phoenix_rebirth_is_graded` row in
+[`meta/OUTPUT_MANIFEST.tsv`](meta/OUTPUT_MANIFEST.tsv), with respective SHA-256 identities
+`81c4124ad36d39d6ebbc011c4739410fd3579bef4c6045192b3ef3a007876517` and
+`82f4bd197ae35399ff9c3b569759a62eba8953de8304cf76a30aef6ab1d09fdc`. The authoritative return is
+[`research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md`](research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
+
+**NEXT DEED: M0 — mathematical source circulation.** [open] Admit born-digital PDF/vector and
+raster equation material plus the exterior equation atlas; recover plural source/layout incidence
+without an authored mathematical grammar. M1–M3 remain ordered behind it. The complete Phoenix
+receiver family permits no nontrivial W2 base condensation, so no exceptional compression factor
+is admitted and a later receiver family may reopen that question.
+
+**Everything below is dated provenance and does not override this frontier or schedule work.**
 
 **THE PARSER IS SUPERSEDED AND THE CODEC IS RECOVERED AT EVERY SCALE — 2026-08-17.**
 `crates/holonic-engine/src/statement_grammar.rs` is superseded as a contaminant by

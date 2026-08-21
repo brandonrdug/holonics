@@ -1,7 +1,10 @@
 //! Example-only foreign source adapter. It is intentionally absent from production Phoenix.
 
 use holonic_engine::foreign_map::ForeignDtype;
-use holonic_engine::source_occurrence::{OccurrenceWitness, RegionIdentity, SourceOccurrence};
+use holonic_engine::ported_operation::{PortedOperationComplex, SourceTestimony};
+use holonic_engine::source_occurrence::{
+    BindingValidation, OccurrenceWitness, RegionIdentity, SourceOccurrence, SourceRefusal,
+};
 use holonic_engine::streamed_standing::StagedRegion;
 
 use super::super::resident_layer::Source;
@@ -10,7 +13,38 @@ use super::MaterialSource;
 
 pub struct ForeignMaterialSource {
     pub source: Source,
-    pub witness: SourceOccurrence,
+    pub witness: ForeignOccurrenceWitness,
+}
+
+/// Example-only chart transition from production's path-free rested symbols back to the live
+/// source occurrence. The production complex is cloned locally, each rested symbol receives this
+/// authenticated source's locator, and the foreign witness performs its ordinary exact resolution.
+pub struct ForeignOccurrenceWitness {
+    inner: SourceOccurrence,
+}
+
+impl OccurrenceWitness for ForeignOccurrenceWitness {
+    fn witness(&self) -> &'static str {
+        "foreign source rebased from rested testimony"
+    }
+
+    fn validate(
+        &self,
+        complex: &PortedOperationComplex,
+    ) -> Result<Vec<BindingValidation>, SourceRefusal> {
+        let mut foreign = complex.clone();
+        for operation in foreign.operations.values_mut() {
+            for testimony in &mut operation.testimony {
+                if let SourceTestimony::RestedImplementation { symbol } = testimony {
+                    *testimony = SourceTestimony::Implementation {
+                        locator: self.inner.implementation.locator.clone(),
+                        symbol: symbol.clone(),
+                    };
+                }
+            }
+        }
+        self.inner.validate(&foreign)
+    }
 }
 
 impl ForeignMaterialSource {
@@ -51,7 +85,10 @@ impl ForeignMaterialSource {
         }
         let witness =
             super::super::resident_layer::source_occurrence(root, regions, content_sha256)?;
-        Ok(Self { source, witness })
+        Ok(Self {
+            source,
+            witness: ForeignOccurrenceWitness { inner: witness },
+        })
     }
     pub fn whole(&mut self, population: &str) -> Result<(Vec<u16>, Vec<usize>), String> {
         self.source.whole(population)
@@ -98,7 +135,7 @@ impl MaterialSource for ForeignMaterialSource {
         &self.witness
     }
     fn source_identity(&self) -> String {
-        let container = &self.witness.container;
+        let container = &self.witness.inner.container;
         format!(
             "{} octets, header {} octets, header sha256 {}, content sha256 {:?}, identity {:?}",
             container.octets,
@@ -110,6 +147,7 @@ impl MaterialSource for ForeignMaterialSource {
     }
     fn verify_stable(&self) -> Result<(), String> {
         self.witness
+            .inner
             .container
             .verify_still()
             .map_err(|e| e.to_string())

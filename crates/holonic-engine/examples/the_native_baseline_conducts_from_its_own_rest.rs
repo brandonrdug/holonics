@@ -45,25 +45,36 @@ use std::io::Write;
 use std::time::Instant;
 
 use holonic_engine::athena::TreeChart;
+use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::ResidentReadout;
+use holonic_engine::exact_work::ExactWork;
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::front_passage::{
-    factored_seals, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialPlan, ResidentMaterial,
+    factored_seals, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialPlan,
+    ResidentMaterial,
 };
-use holonic_engine::native_law::{AthenaArrays, AthenaFuture, AthenaWalk, DEPTH_LAW, FUTURE_LAW, WALK_LAW};
+use holonic_engine::native_law::{
+    AthenaArrays, AthenaFuture, AthenaWalk, DEPTH_LAW, FUTURE_LAW, WALK_LAW,
+};
 use holonic_engine::native_occurrence::NativeOccurrence;
-use holonic_engine::category::BoundaryId;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
-use holonic_engine::receiver_exact_compression::{compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId};
+use holonic_engine::receiver_exact_compression::{
+    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+};
 use holonic_engine::resident_section::{
-    athena_non_dominated, AthenaAxis, AthenaCandidate, AthenaFutureGeometry, AthenaWalkGeometry, ResidentGrain, ResidentSurface, KERNELS,
+    athena_non_dominated, AthenaAxis, AthenaCandidate, AthenaFutureGeometry, AthenaWalkGeometry,
+    ResidentGrain, ResidentSurface, KERNELS,
 };
 use holonic_engine::source_occurrence::OccurrenceWitness;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 const OUT: &str = "output/the_native_baseline_conducts";
 const REST: &str = "output/the_native_baseline_conducts/rest.safetensors";
 const ABLATED: &str = "output/the_native_baseline_conducts/rest-without-hexis.safetensors";
+const W5_SCHEMA: &str = "holonic-engine.phoenix.w5-arm-n-return.v1";
+const W5_DEED_SCHEMA: &str = "holonic-engine.phoenix.w5-arm-n-deed.v1";
 
 /// **Runtime-supplied prompts, in the native codec: the lexical tokens of holonics prose.** The
 /// last is deliberately outside the material's vocabulary, so the walk's arc law returns the root's
@@ -78,6 +89,132 @@ const PROMPTS: &[&str] = &[
     "an operation is a construction",
     "the quantum wobbleflux",
 ];
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5RestIdentity {
+    sha256: String,
+    extent: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+struct W5Face {
+    name: String,
+    material_digest: String,
+    intervals: Vec<(i64, i64)>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5SourceAudit {
+    audit_identity: String,
+    forbidden: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5Deed {
+    deed_identity: String,
+    faces: Vec<W5Face>,
+    return_digest: String,
+    source_audit: W5SourceAudit,
+    exact_work: ExactWork,
+    admission_digest: String,
+    apparatus_prediction_digest: String,
+    admission_json: String,
+    owner_receipt_digest: String,
+    execution_kind: String,
+    device_name: String,
+    mode: String,
+    kernel_identity: String,
+    launches: u64,
+    synchronizations: u64,
+    transfer_octets: u64,
+    active_warps: String,
+    energy: String,
+    calibration: BTreeMap<String, String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5DeedArtifact {
+    schema: String,
+    rest_identity: W5RestIdentity,
+    codebook_identity: String,
+    codebook_extent: u32,
+    material_lineage_digest: String,
+    closure_identity: String,
+    deed: W5Deed,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5ArtifactAddress {
+    role: String,
+    locator: String,
+    sha256: String,
+    extent: u64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct W5Return {
+    schema: String,
+    schema_version: String,
+    rest_identity: W5RestIdentity,
+    codebook_identity: String,
+    codebook_extent: u32,
+    material_lineage_digest: String,
+    closure_identity: String,
+    current: W5Deed,
+    prior: W5Deed,
+    artifacts: Vec<W5ArtifactAddress>,
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    format!("{:x}", Sha256::digest(bytes))
+}
+
+fn frame_w5(out: &mut Vec<u8>, bytes: &[u8]) {
+    out.extend((bytes.len() as u64).to_le_bytes());
+    out.extend(bytes);
+}
+
+/// W5's receiver digest: frame(face name), frame(shared material digest), then frame(the
+/// canonical interval bytes, whose first word is the interval extent).
+fn w5_return_digest(faces: &[W5Face]) -> String {
+    let mut bytes = Vec::new();
+    for face in faces {
+        frame_w5(&mut bytes, face.name.as_bytes());
+        frame_w5(&mut bytes, face.material_digest.as_bytes());
+        let mut intervals = Vec::with_capacity(face.intervals.len() * 16 + 8);
+        intervals.extend((face.intervals.len() as u64).to_le_bytes());
+        for (lower, upper) in &face.intervals {
+            intervals.extend(lower.to_le_bytes());
+            intervals.extend(upper.to_le_bytes());
+        }
+        frame_w5(&mut bytes, &intervals);
+    }
+    sha256_hex(&bytes)
+}
+
+fn canonical_json<T: Serialize + ?Sized>(value: &T) -> Result<Vec<u8>, String> {
+    serde_json::to_vec(value).map_err(|error| error.to_string())
+}
+
+fn codebook_identity(rest: &Rest) -> String {
+    let mut bytes = Vec::new();
+    bytes.extend((rest.vocabulary as u64).to_le_bytes());
+    for surface in &rest.surfaces {
+        frame_w5(&mut bytes, surface.as_bytes());
+    }
+    sha256_hex(&bytes)
+}
+
+fn material_lineage_digest(prompts: &[String]) -> Result<String, String> {
+    Ok(sha256_hex(&canonical_json(prompts)?))
+}
+
+fn closure_identity() -> Result<String, String> {
+    let executable = std::env::current_exe().map_err(|error| error.to_string())?;
+    let bytes =
+        std::fs::read(&executable).map_err(|error| format!("{}: {error}", executable.display()))?;
+    Ok(sha256_hex(&bytes))
+}
 
 // ---------------------------------------------------------------------------------------------
 // the rest, read host-side: the atlas, its vocabulary, and the codec that turns prose into germs
@@ -103,28 +240,43 @@ struct Rest {
 }
 
 fn read_rest(locator: &str) -> Result<Rest, String> {
-    let occurrence = NativeOccurrence::read(locator).map_err(|error| format!("{locator}: {error}"))?;
-    let (_, container) = manifest_safetensors(locator).map_err(|error| format!("{locator}: {error}"))?;
+    let occurrence =
+        NativeOccurrence::read(locator).map_err(|error| format!("{locator}: {error}"))?;
+    let (_, container) =
+        manifest_safetensors(locator).map_err(|error| format!("{locator}: {error}"))?;
     let raw = std::fs::read(locator).map_err(|error| format!("{locator}: {error}"))?;
     let header = u64::from_le_bytes(raw[..8].try_into().map_err(|_| "short container")?) as usize;
     let payload = &raw[8 + header..];
     let region = |name: &str| -> Result<(usize, usize), String> {
-        container.tensors.get(name).map(|t| (t.start as usize, t.end as usize)).ok_or_else(|| format!("{locator} does not identify {name}"))
+        container
+            .tensors
+            .get(name)
+            .map(|t| (t.start as usize, t.end as usize))
+            .ok_or_else(|| format!("{locator} does not identify {name}"))
     };
     let u32s = |name: &str| -> Result<Vec<u32>, String> {
         let (start, end) = region(name)?;
-        Ok(payload[start..end].chunks_exact(4).map(|w| u32::from_le_bytes([w[0], w[1], w[2], w[3]])).collect())
+        Ok(payload[start..end]
+            .chunks_exact(4)
+            .map(|w| u32::from_le_bytes([w[0], w[1], w[2], w[3]]))
+            .collect())
     };
     let u16s = |name: &str| -> Result<Vec<u16>, String> {
         let (start, end) = region(name)?;
-        Ok(payload[start..end].chunks_exact(2).map(|w| u16::from_le_bytes([w[0], w[1]])).collect())
+        Ok(payload[start..end]
+            .chunks_exact(2)
+            .map(|w| u16::from_le_bytes([w[0], w[1]]))
+            .collect())
     };
     let architecture = u32s("athena.architecture")?;
     let octets = u16s("athena.vocabulary.octets")?;
     let offsets = u32s("athena.vocabulary.offsets")?;
     let mut surfaces = Vec::with_capacity(offsets.len().saturating_sub(1));
     for pair in offsets.windows(2) {
-        let bytes: Vec<u8> = octets[pair[0] as usize..pair[1] as usize].iter().map(|w| *w as u8).collect();
+        let bytes: Vec<u8> = octets[pair[0] as usize..pair[1] as usize]
+            .iter()
+            .map(|w| *w as u8)
+            .collect();
         surfaces.push(String::from_utf8(bytes).map_err(|e| e.to_string())?);
     }
     let mut index_of = BTreeMap::new();
@@ -146,7 +298,11 @@ fn read_rest(locator: &str) -> Result<Rest, String> {
         vocabulary: architecture[3] as usize,
         declarations: occurrence.declarations.clone(),
         octets: occurrence.container.octets,
-        content_sha256: occurrence.container.content_sha256.clone().unwrap_or_default(),
+        content_sha256: occurrence
+            .container
+            .content_sha256
+            .clone()
+            .unwrap_or_default(),
     })
 }
 
@@ -166,7 +322,15 @@ impl Rest {
     /// The rest's own codec: the same lexical split the ecology conditioned on, reproduced from the
     /// vocabulary the container carries. A germ index at or above the vocabulary marks unseen.
     fn germs(&self, prompt: &str) -> Vec<u32> {
-        lexical_tokens(prompt).into_iter().map(|token| self.index_of.get(&token).copied().unwrap_or(self.vocabulary as u32)).collect()
+        lexical_tokens(prompt)
+            .into_iter()
+            .map(|token| {
+                self.index_of
+                    .get(&token)
+                    .copied()
+                    .unwrap_or(self.vocabulary as u32)
+            })
+            .collect()
     }
     /// The class's own continuation population and every one its suffix chain offers, with the
     /// standing and the arc depth. Read from the rest alone; nothing is ranked and nothing crowned.
@@ -178,7 +342,8 @@ impl Rest {
             let from = self.indptr[at as usize] as usize;
             let to = self.indptr[at as usize + 1] as usize;
             for slot in from..to {
-                held.entry(self.germ[slot]).or_insert((self.standing[self.target[slot] as usize], depth));
+                held.entry(self.germ[slot])
+                    .or_insert((self.standing[self.target[slot] as usize], depth));
             }
             let parent = self.suffix[at as usize];
             if parent == at {
@@ -187,7 +352,11 @@ impl Rest {
             at = parent;
             depth += 1;
         }
-        held.into_iter().map(|(germ, (standing, depth))| (self.surfaces[germ as usize].clone(), standing, depth)).collect()
+        held.into_iter()
+            .map(|(germ, (standing, depth))| {
+                (self.surfaces[germ as usize].clone(), standing, depth)
+            })
+            .collect()
     }
 }
 
@@ -230,11 +399,16 @@ struct Founded {
 }
 
 fn shape(population: &str, extent: &[usize]) -> SourceTestimony {
-    SourceTestimony::DeclaredShape { population: population.to_owned(), shape: extent.to_vec() }
+    SourceTestimony::DeclaredShape {
+        population: population.to_owned(),
+        shape: extent.to_vec(),
+    }
 }
 
 fn declares(statement: &str) -> SourceTestimony {
-    SourceTestimony::AuthoritativeDescription { statement: statement.to_owned() }
+    SourceTestimony::AuthoritativeDescription {
+        statement: statement.to_owned(),
+    }
 }
 
 fn law(
@@ -245,13 +419,20 @@ fn law(
     outputs: Vec<BoundaryId>,
     testimony: Vec<SourceTestimony>,
 ) -> Result<EventId, String> {
-    let law = complex.bind_operation(name, species, inputs, outputs, None, testimony).map_err(|e| e.to_string())?;
+    let law = complex
+        .bind_operation(name, species, inputs, outputs, None, testimony)
+        .map_err(|e| e.to_string())?;
     complex.occur(law).map_err(|e| e.to_string())
 }
 
-fn found(rest: &Rest, walk_geometry: AthenaWalkGeometry, future_geometry: AthenaFutureGeometry) -> Result<Founded, String> {
+fn found(
+    rest: &Rest,
+    walk_geometry: AthenaWalkGeometry,
+    future_geometry: AthenaFutureGeometry,
+) -> Result<Founded, String> {
     let arrays = rest.arrays();
-    let mut complex = PortedOperationComplex::new("the native Athena atlas walked and read from its own rest");
+    let mut complex =
+        PortedOperationComplex::new("the native Athena atlas walked and read from its own rest");
     let landed = complex.port("landed class and mark, positions x 2");
     let section = complex.port("future section, positions x vocabulary");
     let mut realization = holonic_engine::front_passage::ResidentRealization::default();
@@ -271,7 +452,14 @@ fn found(rest: &Rest, walk_geometry: AthenaWalkGeometry, future_geometry: Athena
 
     let mut walk_testimony = atlas_shapes(false);
     walk_testimony.push(declares(WALK_LAW));
-    let walk = law(&mut complex, "athena walk", OperationSpecies::Construction, vec![], vec![landed], walk_testimony)?;
+    let walk = law(
+        &mut complex,
+        "athena walk",
+        OperationSpecies::Construction,
+        vec![],
+        vec![landed],
+        walk_testimony,
+    )?;
     realization.bind(
         walk,
         AthenaWalk {
@@ -284,8 +472,22 @@ fn found(rest: &Rest, walk_geometry: AthenaWalkGeometry, future_geometry: Athena
 
     let mut future_testimony = atlas_shapes(true);
     future_testimony.push(declares(FUTURE_LAW));
-    let future = law(&mut complex, "athena future standing", OperationSpecies::Transport, vec![landed], vec![section], future_testimony)?;
-    realization.bind(future, AthenaFuture { arrays: arrays.clone(), depth: false, geometry: future_geometry });
+    let future = law(
+        &mut complex,
+        "athena future standing",
+        OperationSpecies::Transport,
+        vec![landed],
+        vec![section],
+        future_testimony,
+    )?;
+    realization.bind(
+        future,
+        AthenaFuture {
+            arrays: arrays.clone(),
+            depth: false,
+            geometry: future_geometry,
+        },
+    );
     complex
         .carries_precedence(
             "the landed class carries into the future section",
@@ -297,8 +499,22 @@ fn found(rest: &Rest, walk_geometry: AthenaWalkGeometry, future_geometry: Athena
 
     let mut depth_testimony = atlas_shapes(false);
     depth_testimony.push(declares(DEPTH_LAW));
-    let depth = law(&mut complex, "athena future depth", OperationSpecies::Transport, vec![landed], vec![section], depth_testimony)?;
-    realization.bind(depth, AthenaFuture { arrays, depth: true, geometry: future_geometry });
+    let depth = law(
+        &mut complex,
+        "athena future depth",
+        OperationSpecies::Transport,
+        vec![landed],
+        vec![section],
+        depth_testimony,
+    )?;
+    realization.bind(
+        depth,
+        AthenaFuture {
+            arrays,
+            depth: true,
+            geometry: future_geometry,
+        },
+    );
     complex
         .carries_precedence(
             "the landed class carries into the depth face",
@@ -308,7 +524,13 @@ fn found(rest: &Rest, walk_geometry: AthenaWalkGeometry, future_geometry: Athena
         )
         .map_err(|e| e.to_string())?;
 
-    Ok(Founded { complex, realization, walk, future, depth })
+    Ok(Founded {
+        complex,
+        realization,
+        walk,
+        future,
+        depth,
+    })
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -334,6 +556,151 @@ struct Conducted {
     entailments: Vec<(String, usize, usize)>,
     charged_octets: u64,
     wall_s: f64,
+    exact_work: ExactWork,
+    admission_digest: String,
+    admission_json: String,
+    apparatus_prediction_json: String,
+    device_name: String,
+    mode: String,
+    kernel_identity: String,
+    census_before: holonic_engine::resident_section::TransferCensus,
+    census_after: holonic_engine::resident_section::TransferCensus,
+}
+
+fn descriptor_audit() -> W5SourceAudit {
+    let mut opened = Vec::new();
+    if let Ok(entries) = std::fs::read_dir("/proc/self/fd") {
+        for entry in entries.flatten() {
+            if let Ok(target) = std::fs::read_link(entry.path()) {
+                opened.push(target.to_string_lossy().into_owned());
+            }
+        }
+    }
+    opened.sort();
+    let forbidden_names = [
+        "corpus",
+        "gemma",
+        "phoenix",
+        "/canon/",
+        "canon/",
+        "tokenizer",
+    ];
+    let forbidden: Vec<String> = opened
+        .iter()
+        .filter(|path| {
+            let lower = path.to_lowercase();
+            forbidden_names.iter().any(|needle| lower.contains(needle))
+                && !lower.ends_with("rest.safetensors")
+        })
+        .cloned()
+        .collect();
+    let bytes = canonical_json(&opened).unwrap_or_default();
+    W5SourceAudit {
+        audit_identity: sha256_hex(&bytes),
+        forbidden,
+    }
+}
+
+fn w5_deed(
+    rest: &Rest,
+    prompts: &[String],
+    conducted: &Conducted,
+    tag: &str,
+) -> Result<W5Deed, String> {
+    let material_digest = material_lineage_digest(prompts)?;
+    let faces = vec![
+        W5Face {
+            name: "athena-walk".to_owned(),
+            material_digest: material_digest.clone(),
+            intervals: conducted.walk.clone(),
+        },
+        W5Face {
+            name: "athena-future".to_owned(),
+            material_digest: material_digest.clone(),
+            intervals: conducted.future.clone(),
+        },
+        W5Face {
+            name: "athena-depth".to_owned(),
+            material_digest,
+            intervals: conducted.depth.clone(),
+        },
+    ];
+    let return_digest = w5_return_digest(&faces);
+    let deed_identity = sha256_hex(&[tag.as_bytes(), return_digest.as_bytes()].concat());
+    let admission_digest = conducted.admission_digest.clone();
+    let owner_json = serde_json::to_vec(&(
+        conducted.exact_work.clone(),
+        admission_digest.clone(),
+        return_digest.clone(),
+    ))
+    .map_err(|error| error.to_string())?;
+    let owner_receipt_digest = sha256_hex(&owner_json);
+    let delta = |before: u64, after: u64| after.saturating_sub(before);
+    let launches = delta(
+        conducted.census_before.deed_launches,
+        conducted.census_after.deed_launches,
+    );
+    let synchronizations = delta(
+        conducted.census_before.synchronizations,
+        conducted.census_after.synchronizations,
+    );
+    let transfer_octets = delta(
+        conducted.census_before.ingress_octets,
+        conducted.census_after.ingress_octets,
+    ) + delta(
+        conducted.census_before.egress_section_octets,
+        conducted.census_after.egress_section_octets,
+    ) + delta(
+        conducted.census_before.egress_receipt_octets,
+        conducted.census_after.egress_receipt_octets,
+    ) + delta(
+        conducted.census_before.device_to_device_octets,
+        conducted.census_after.device_to_device_octets,
+    );
+    let mut calibration = BTreeMap::new();
+    calibration.insert(
+        "coordinates".to_owned(),
+        "octets; graph launches; synchronizations".to_owned(),
+    );
+    calibration.insert(
+        "wall_time".to_owned(),
+        "prose only; excluded from semantic digests".to_owned(),
+    );
+    calibration.insert(
+        "active_warps".to_owned(),
+        "Unknown in downstream adapter".to_owned(),
+    );
+    calibration.insert(
+        "energy".to_owned(),
+        "Unknown in downstream adapter".to_owned(),
+    );
+    calibration.insert("rest_extent".to_owned(), rest.octets.to_string());
+    Ok(W5Deed {
+        deed_identity,
+        faces,
+        return_digest,
+        source_audit: descriptor_audit(),
+        exact_work: conducted.exact_work.clone(),
+        admission_digest,
+        apparatus_prediction_digest: sha256_hex(conducted.apparatus_prediction_json.as_bytes()),
+        admission_json: conducted.admission_json.clone(),
+        owner_receipt_digest,
+        execution_kind: "NativeRuntime".to_owned(),
+        device_name: conducted.device_name.clone(),
+        mode: conducted.mode.clone(),
+        kernel_identity: conducted.kernel_identity.clone(),
+        launches,
+        synchronizations,
+        transfer_octets,
+        active_warps: "Unknown".to_owned(),
+        energy: "Unknown".to_owned(),
+        calibration,
+    })
+}
+
+fn write_json<T: Serialize>(path: &str, value: &T) -> Result<(), String> {
+    let bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
+    std::fs::write(path, bytes).map_err(|error| format!("{path}: {error}"))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -347,6 +714,7 @@ fn conduct(
     poison: bool,
 ) -> Result<Conducted, String> {
     let clock = Instant::now();
+    let census_before = surface.census();
     let grain = ResidentGrain(0);
     let passage = FrontPassage::new(surface, grain);
     let receiver = DeedReceiver::unbounded();
@@ -370,10 +738,22 @@ fn conduct(
     }
 
     let mut material = ResidentMaterial::empty();
-    let words = rest.indptr.len() + rest.germ.len() + rest.target.len() + rest.standing.len() + rest.suffix.len() + germs.len() + offsets.len();
-    let plan = MaterialPlan { maps: Vec::new(), band_elements: 0, positions: words };
+    let words = rest.indptr.len()
+        + rest.germ.len()
+        + rest.target.len()
+        + rest.standing.len()
+        + rest.suffix.len()
+        + germs.len()
+        + offsets.len();
+    let plan = MaterialPlan {
+        maps: Vec::new(),
+        band_elements: 0,
+        positions: words,
+    };
     let prediction = passage.predict_material(&plan);
-    let admission = passage.admit_material(&prediction).map_err(|o| format!("the atlas material refused: {}", describe(&o)))?;
+    let admission = passage
+        .admit_material(&prediction)
+        .map_err(|o| format!("the atlas material refused: {}", describe(&o)))?;
     for (name, array) in [
         ("athena.transport.indptr", &rest.indptr),
         ("athena.transport.germ", &rest.germ),
@@ -381,36 +761,95 @@ fn conduct(
         ("athena.class.standing", &rest.standing),
         ("athena.class.suffix", &rest.suffix),
     ] {
-        material.arrays.insert(name.to_owned(), surface.mount_positions(array).map_err(|e| e.to_string())?);
+        material.arrays.insert(
+            name.to_owned(),
+            surface.mount_positions(array).map_err(|e| e.to_string())?,
+        );
     }
-    material.arrays.insert("prompt.germs".to_owned(), surface.mount_positions(&germs).map_err(|e| e.to_string())?);
-    material.arrays.insert("prompt.offsets".to_owned(), surface.mount_positions(&offsets).map_err(|e| e.to_string())?);
+    material.arrays.insert(
+        "prompt.germs".to_owned(),
+        surface.mount_positions(&germs).map_err(|e| e.to_string())?,
+    );
+    material.arrays.insert(
+        "prompt.offsets".to_owned(),
+        surface
+            .mount_positions(&offsets)
+            .map_err(|e| e.to_string())?,
+    );
 
     let founded = found(rest, walk_geometry, future_geometry)?;
     // Nothing here is a midpoint quotient, so the factored-seal reading is empty by construction —
     // taken anyway because a caller that never asks cannot report that it did not apply.
-    let (fused, refused_seals) = factored_seals(&founded.complex, &founded.realization, founded.future, &BTreeSet::new());
+    let (fused, refused_seals) = factored_seals(
+        &founded.complex,
+        &founded.realization,
+        founded.future,
+        &BTreeSet::new(),
+    );
     if !fused.is_empty() || !refused_seals.is_empty() {
-        return Err(format!("the native diagram declared {} fusable and {} unfusable quotients; it has none", fused.len(), refused_seals.len()));
+        return Err(format!(
+            "the native diagram declared {} fusable and {} unfusable quotients; it has none",
+            fused.len(),
+            refused_seals.len()
+        ));
     }
 
     let bound = passage
-        .bind(&founded.complex, &founded.realization, &material, witness, &receiver, Some(&admission), founded.future)
+        .bind(
+            &founded.complex,
+            &founded.realization,
+            &material,
+            witness,
+            &receiver,
+            Some(&admission),
+            founded.future,
+        )
         .map_err(|o| format!("the native deed refused at bind: {}", describe(&o)))?;
+    let exact_work = bound.deed_prediction.clone();
+    let admission_bytes = canonical_json(&bound.admission)?;
+    let admission_digest = sha256_hex(&admission_bytes);
+    let admission_json = String::from_utf8(admission_bytes).map_err(|error| error.to_string())?;
+    let apparatus_prediction_json = String::from_utf8(canonical_json(&bound.apparatus_prediction)?)
+        .map_err(|error| error.to_string())?;
+    let device_name = surface.device_name().to_owned();
+    let mode_identity = bound.mode.clone();
+    let mode = format!("{mode_identity:?}");
+    let kernel_identity = mode_identity
+        .kernel_content
+        .clone()
+        .unwrap_or_else(|| surface.ptx_sha256().to_owned());
     let occurrences = bound.entailments.len();
     let entailments: Vec<(String, usize, usize)> = bound
         .entailments
         .iter()
-        .map(|(_, entailment)| (entailment.law.to_owned(), entailment.parameters.len(), entailment.naming_slices.len()))
+        .map(|(_, entailment)| {
+            (
+                entailment.law.to_owned(),
+                entailment.parameters.len(),
+                entailment.naming_slices.len(),
+            )
+        })
         .collect();
-    let returned = bound.launch(&surface.mode()).map_err(|o| format!("the native deed refused at launch: {}", describe(&o)))?;
+    let returned = bound
+        .launch(&surface.mode())
+        .map_err(|o| format!("the native deed refused at launch: {}", describe(&o)))?;
+    let census_after = surface.census();
     if let Err(obstruction) = bound.standing(&returned) {
-        return Err(format!("the native deed did not stand: {}", describe(&obstruction)));
+        return Err(format!(
+            "the native deed did not stand: {}",
+            describe(&obstruction)
+        ));
     }
     let (graph, _) = bound.graph();
-    let walk = bound.read_section(&returned, founded.walk).map_err(|o| describe(&o))?;
-    let future = bound.read_section(&returned, founded.future).map_err(|o| describe(&o))?;
-    let depth = bound.read_section(&returned, founded.depth).map_err(|o| describe(&o))?;
+    let walk = bound
+        .read_section(&returned, founded.walk)
+        .map_err(|o| describe(&o))?;
+    let future = bound
+        .read_section(&returned, founded.future)
+        .map_err(|o| describe(&o))?;
+    let depth = bound
+        .read_section(&returned, founded.depth)
+        .map_err(|o| describe(&o))?;
     let fronts = bound.fronts().len();
     Ok(Conducted {
         walk,
@@ -428,21 +867,45 @@ fn conduct(
         future_blocks: future_geometry.blocks(germs.len(), rest.vocabulary),
         future_shared: future_geometry.shared_octets(),
         entailments,
-        charged_octets: admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets,
+        charged_octets: admission.prediction.charged_octets
+            + bound.apparatus_prediction.charged_octets,
         wall_s: clock.elapsed().as_secs_f64(),
+        exact_work,
+        admission_digest,
+        admission_json,
+        apparatus_prediction_json,
+        device_name,
+        mode,
+        kernel_identity,
+        census_before,
+        census_after,
     })
 }
 
 fn describe(obstruction: &FrontPassageObstruction) -> String {
     match obstruction {
-        FrontPassageObstruction::Cover { front, barriers } => format!("CoverBarrier at front {front}: {barriers:?}"),
-        FrontPassageObstruction::Interchange { front, because, .. } => format!("InterchangeRefusal at front {front}: {because:?}"),
+        FrontPassageObstruction::Cover { front, barriers } => {
+            format!("CoverBarrier at front {front}: {barriers:?}")
+        }
+        FrontPassageObstruction::Interchange { front, because, .. } => {
+            format!("InterchangeRefusal at front {front}: {because:?}")
+        }
         FrontPassageObstruction::Resource(resource) => format!("ResourceObstruction: {resource:?}"),
         FrontPassageObstruction::Compile(refusal) => format!("CompileRefusal: {refusal}"),
-        FrontPassageObstruction::Refused { occurrence, operation, refusal, lineage, .. } => {
+        FrontPassageObstruction::Refused {
+            occurrence,
+            operation,
+            refusal,
+            lineage,
+            ..
+        } => {
             format!("the card refused at {occurrence:?} ({operation}): {refusal}; lineage refusals {:?}", lineage.refusals)
         }
-        FrontPassageObstruction::Sealed { occurrence, quotient, reopening } => format!("the section at {occurrence:?} was sealed by {quotient:?}; {reopening}"),
+        FrontPassageObstruction::Sealed {
+            occurrence,
+            quotient,
+            reopening,
+        } => format!("the section at {occurrence:?} was sealed by {quotient:?}; {reopening}"),
     }
 }
 
@@ -513,10 +976,15 @@ struct Manifest {
 
 impl Manifest {
     fn measured(&mut self, row: &str, value: impl AsRef<str>) {
-        self.lines.push(format!("MEASURED  {row}\n    {}", value.as_ref()));
+        self.lines
+            .push(format!("MEASURED  {row}\n    {}", value.as_ref()));
     }
     fn open(&mut self, row: &str, why: impl AsRef<str>, falsifier: impl AsRef<str>) {
-        self.lines.push(format!("OPEN      {row}\n    {}\n    FALSIFIER: {}", why.as_ref(), falsifier.as_ref()));
+        self.lines.push(format!(
+            "OPEN      {row}\n    {}\n    FALSIFIER: {}",
+            why.as_ref(),
+            falsifier.as_ref()
+        ));
     }
 }
 
@@ -543,7 +1011,9 @@ impl ObservedSystem for AtlasSystem<'_> {
         let class = item.0 as u32;
         match receiver.0 {
             // the class's own out-degree — how many continuations the full context licenses
-            0 => Observation(u64::from(self.rest.indptr[class as usize + 1] - self.rest.indptr[class as usize])),
+            0 => Observation(u64::from(
+                self.rest.indptr[class as usize + 1] - self.rest.indptr[class as usize],
+            )),
             // whether the class is its own suffix parent — the root, the coarsest context
             _ => Observation(u64::from(self.rest.suffix[class as usize] == class)),
         }
@@ -553,11 +1023,22 @@ impl ObservedSystem for AtlasSystem<'_> {
         let germ = input.0 as u32;
         let from = self.rest.indptr[class as usize] as usize;
         let to = self.rest.indptr[class as usize + 1] as usize;
-        self.rest.germ[from..to].binary_search(&germ).ok().map(|at| ItemId(self.rest.target[from + at] as u64))
+        self.rest.germ[from..to]
+            .binary_search(&germ)
+            .ok()
+            .map(|at| ItemId(self.rest.target[from + at] as u64))
     }
 }
 
-fn build_manifest(rest: &Rest, conducted: &Conducted, sections: &[Section], family: &[AthenaCandidate], retained: &[usize], chosen: usize, taxa: usize) -> Manifest {
+fn build_manifest(
+    rest: &Rest,
+    conducted: &Conducted,
+    sections: &[Section],
+    family: &[AthenaCandidate],
+    retained: &[usize],
+    chosen: usize,
+    taxa: usize,
+) -> Manifest {
     let mut manifest = Manifest { lines: Vec::new() };
 
     // ---- incidence ----
@@ -571,7 +1052,10 @@ fn build_manifest(rest: &Rest, conducted: &Conducted, sections: &[Section], fami
     for (slot, reaches) in rest.target.iter().enumerate() {
         indegree.entry(*reaches).or_default().push(slot);
     }
-    let reconvergent: Vec<(&u32, &Vec<usize>)> = indegree.iter().filter(|(_, slots)| slots.len() > 1).collect();
+    let reconvergent: Vec<(&u32, &Vec<usize>)> = indegree
+        .iter()
+        .filter(|(_, slots)| slots.len() > 1)
+        .collect();
     let reconvergent_arcs: usize = reconvergent.iter().map(|(_, slots)| slots.len() - 1).sum();
     manifest.measured(
         "incidence: cycle rank of the transition graph, and the transport population it names",
@@ -585,13 +1069,33 @@ fn build_manifest(rest: &Rest, conducted: &Conducted, sections: &[Section], fami
     for (class, slots) in reconvergent.iter().take(6) {
         let mut arrivals = Vec::new();
         for slot in slots.iter().take(4) {
-            let from = rest.indptr.iter().position(|start| *start as usize > *slot).map(|at| at - 1).unwrap_or(0);
+            let from = rest
+                .indptr
+                .iter()
+                .position(|start| *start as usize > *slot)
+                .map(|at| at - 1)
+                .unwrap_or(0);
             let germ = rest.germ[*slot];
-            arrivals.push(format!("class {from} --{:?}--> ", rest.surfaces.get(germ as usize).cloned().unwrap_or_default()));
+            arrivals.push(format!(
+                "class {from} --{:?}--> ",
+                rest.surfaces
+                    .get(germ as usize)
+                    .cloned()
+                    .unwrap_or_default()
+            ));
         }
-        exhibited.push(format!("class {} standing {} reached by {} arcs: {}", class, rest.standing[**class as usize], slots.len(), arrivals.join(", ")));
+        exhibited.push(format!(
+            "class {} standing {} reached by {} arcs: {}",
+            class,
+            rest.standing[**class as usize],
+            slots.len(),
+            arrivals.join(", ")
+        ));
     }
-    manifest.measured("incidence: EXHIBITED reconvergent classes (a sample, named, not a count)", exhibited.join("\n    "));
+    manifest.measured(
+        "incidence: EXHIBITED reconvergent classes (a sample, named, not a count)",
+        exhibited.join("\n    "),
+    );
 
     // directedness: the germ transport alone is acyclic; the arc closes the loops
     let acyclic = germ_transport_is_acyclic(rest);
@@ -605,7 +1109,14 @@ fn build_manifest(rest: &Rest, conducted: &Conducted, sections: &[Section], fami
     );
 
     // ---- generator / scale ----
-    let chart = TreeChart::label(rest.classes, |state| if rest.suffix[state as usize] == state { None } else { Some(rest.suffix[state as usize]) }).ok();
+    let chart = TreeChart::label(rest.classes, |state| {
+        if rest.suffix[state as usize] == state {
+            None
+        } else {
+            Some(rest.suffix[state as usize])
+        }
+    })
+    .ok();
     let mut heights: BTreeMap<u32, usize> = BTreeMap::new();
     for class in 0..rest.classes as u32 {
         heights.entry(suffix_height(rest, class)).or_default().add();
@@ -724,7 +1235,9 @@ fn germ_transport_is_acyclic(rest: &Rest) -> bool {
     for reaches in &rest.target {
         indegree[*reaches as usize] += 1;
     }
-    let mut frontier: Vec<u32> = (0..rest.classes as u32).filter(|class| indegree[*class as usize] == 0).collect();
+    let mut frontier: Vec<u32> = (0..rest.classes as u32)
+        .filter(|class| indegree[*class as usize] == 0)
+        .collect();
     let mut removed = 0usize;
     while let Some(class) = frontier.pop() {
         removed += 1;
@@ -749,7 +1262,10 @@ fn germ_action_census(rest: &Rest) -> (usize, usize, usize) {
         let from = rest.indptr[class as usize] as usize;
         let to = rest.indptr[class as usize + 1] as usize;
         for slot in from..to {
-            reached.entry(rest.germ[slot]).or_default().push(rest.target[slot]);
+            reached
+                .entry(rest.germ[slot])
+                .or_default()
+                .push(rest.target[slot]);
         }
     }
     let mut bijective = 0usize;
@@ -806,7 +1322,11 @@ fn markov_row(rest: &Rest, sections: &[Section]) -> String {
     // search inside each, so the whole atlas is 59,698 x 5,385 x |blocks| per round.
     let whole = (rest.classes as u128) * (rest.vocabulary as u128);
     let scoped = (items.len() as u128) * (inputs.len() as u128);
-    let system = AtlasSystem { rest, items: items.clone(), inputs: inputs.clone() };
+    let system = AtlasSystem {
+        rest,
+        items: items.clone(),
+        inputs: inputs.clone(),
+    };
     let scope_clock = Instant::now();
     let compression = compress(&system);
     let scope_wall = scope_clock.elapsed().as_secs_f64();
@@ -815,7 +1335,21 @@ fn markov_row(rest: &Rest, sections: &[Section]) -> String {
         .beyond_order(1)
         .iter()
         .take(4)
-        .map(|pair| format!("classes {} and {} separated only by {:?}", pair.left.0, pair.right.0, pair.distinguishing_word.iter().map(|input| rest.surfaces.get(input.0 as usize).cloned().unwrap_or_default()).collect::<Vec<_>>()))
+        .map(|pair| {
+            format!(
+                "classes {} and {} separated only by {:?}",
+                pair.left.0,
+                pair.right.0,
+                pair.distinguishing_word
+                    .iter()
+                    .map(|input| rest
+                        .surfaces
+                        .get(input.0 as usize)
+                        .cloned()
+                        .unwrap_or_default())
+                    .collect::<Vec<_>>()
+            )
+        })
         .collect();
     format!(
         "MEASURED  state: the memory order under a DECLARED receiver family, at a DECLARED scope\n    \
@@ -857,7 +1391,10 @@ impl Verdicts {
         if !pass {
             self.failed += 1;
         }
-        let line = format!("  [{number:>2}] {verdict}  {name}\n        {}", detail.as_ref());
+        let line = format!(
+            "  [{number:>2}] {verdict}  {name}\n        {}",
+            detail.as_ref()
+        );
         println!("{line}");
         self.lines.push(line);
     }
@@ -865,11 +1402,30 @@ impl Verdicts {
 
 fn main() {
     let arguments: Vec<String> = std::env::args().collect();
-    if let Some(at) = arguments.iter().position(|argument| argument == "--conduct") {
+    if let Some(at) = arguments
+        .iter()
+        .position(|argument| argument == "--conduct")
+    {
         let rest = arguments.get(at + 1).cloned().unwrap_or_default();
-        let faces = arguments.iter().position(|a| a == "--faces").and_then(|at| arguments.get(at + 1)).cloned().unwrap_or_default();
-        let prompts: Vec<String> = arguments.iter().enumerate().filter(|(_, a)| a.as_str() == "--prompt").filter_map(|(at, _)| arguments.get(at + 1).cloned()).collect();
-        child(&rest, &faces, &prompts);
+        let faces = arguments
+            .iter()
+            .position(|a| a == "--faces")
+            .and_then(|at| arguments.get(at + 1))
+            .cloned()
+            .unwrap_or_default();
+        let receipt = arguments
+            .iter()
+            .position(|a| a == "--receipt")
+            .and_then(|at| arguments.get(at + 1))
+            .cloned()
+            .unwrap_or_default();
+        let prompts: Vec<String> = arguments
+            .iter()
+            .enumerate()
+            .filter(|(_, a)| a.as_str() == "--prompt")
+            .filter_map(|(at, _)| arguments.get(at + 1).cloned())
+            .collect();
+        child(&rest, &faces, &receipt, &prompts);
         return;
     }
     if let Err(reason) = parent(&arguments) {
@@ -880,7 +1436,7 @@ fn main() {
 
 /// **THE CHILD.** It is handed a rest path and the prompts, and nothing else. There is no corpus
 /// path, no Gemma path and no phoenix path in this function's reach.
-fn child(rest_path: &str, faces_path: &str, prompts: &[String]) {
+fn child(rest_path: &str, faces_path: &str, receipt_path: &str, prompts: &[String]) {
     let readout = match ResidentReadout::new() {
         Ok(readout) => Box::leak(Box::new(readout)) as &'static ResidentReadout,
         Err(error) => {
@@ -916,7 +1472,15 @@ fn child(rest_path: &str, faces_path: &str, prompts: &[String]) {
             std::process::exit(4);
         }
     };
-    let conducted = match conduct(surface, &rest, &witness, prompts, walk_geometry, future_geometry, false) {
+    let conducted = match conduct(
+        surface,
+        &rest,
+        &witness,
+        prompts,
+        walk_geometry,
+        future_geometry,
+        false,
+    ) {
         Ok(conducted) => conducted,
         Err(error) => {
             println!("CHILD-REFUSED while conducting: {error}");
@@ -925,18 +1489,12 @@ fn child(rest_path: &str, faces_path: &str, prompts: &[String]) {
     };
 
     // **THE LIVE ACCESS AUDIT**, taken after the deed. A preflight declaration is not evidence.
-    let mut opened = Vec::new();
-    if let Ok(entries) = std::fs::read_dir("/proc/self/fd") {
-        for entry in entries.flatten() {
-            if let Ok(target) = std::fs::read_link(entry.path()) {
-                opened.push(target.to_string_lossy().into_owned());
-            }
-        }
-    }
-    opened.sort();
-    println!("CHILD-OPENED {}", opened.join(" | "));
+    let audit = descriptor_audit();
+    println!("CHILD-OPENED {}", audit.audit_identity);
 
-    let mut octets = Vec::with_capacity((conducted.walk.len() + conducted.future.len() + conducted.depth.len()) * 16);
+    let mut octets = Vec::with_capacity(
+        (conducted.walk.len() + conducted.future.len() + conducted.depth.len()) * 16,
+    );
     for face in [&conducted.walk, &conducted.future, &conducted.depth] {
         for (lo, hi) in face {
             octets.extend_from_slice(&lo.to_le_bytes());
@@ -946,18 +1504,73 @@ fn child(rest_path: &str, faces_path: &str, prompts: &[String]) {
     if !faces_path.is_empty() {
         let _ = std::fs::write(faces_path, &octets);
     }
+    if !receipt_path.is_empty() {
+        let deed = match w5_deed(&rest, prompts, &conducted, "prior") {
+            Ok(deed) => deed,
+            Err(error) => {
+                println!("CHILD-REFUSED writing W5 deed: {error}");
+                std::process::exit(5);
+            }
+        };
+        let prompts_owned: Vec<String> = prompts.to_vec();
+        let material_digest = match material_lineage_digest(&prompts_owned) {
+            Ok(digest) => digest,
+            Err(error) => {
+                println!("CHILD-REFUSED material lineage: {error}");
+                std::process::exit(5);
+            }
+        };
+        let artifact = W5DeedArtifact {
+            schema: W5_DEED_SCHEMA.to_owned(),
+            rest_identity: W5RestIdentity {
+                sha256: rest.content_sha256.clone(),
+                extent: rest.octets,
+            },
+            codebook_identity: codebook_identity(&rest),
+            codebook_extent: rest.vocabulary as u32,
+            material_lineage_digest: material_digest,
+            closure_identity: match closure_identity() {
+                Ok(identity) => identity,
+                Err(error) => {
+                    println!("CHILD-REFUSED closure identity: {error}");
+                    std::process::exit(5);
+                }
+            },
+            deed,
+        };
+        if let Err(error) = write_json(receipt_path, &artifact) {
+            println!("CHILD-REFUSED writing W5 receipt: {error}");
+            std::process::exit(5);
+        }
+        println!("CHILD-RECEIPT {}", receipt_path);
+    }
     let sections = decode(&rest, &conducted, prompts);
     println!("CHILD-POSITIONS {}", conducted.positions);
     println!("CHILD-FACE-OCTETS {}", octets.len());
     for section in &sections {
-        println!("CHILD-SECTION {} class {} standing {} offered {}", section.prompt, section.class, section.standing, section.offered.len());
+        println!(
+            "CHILD-SECTION {} class {} standing {} offered {}",
+            section.prompt,
+            section.class,
+            section.standing,
+            section.offered.len()
+        );
     }
 }
 
 /// The candidate family, the declared axes, the retained set, and the caller's chosen member.
-fn choose(surface: &ResidentSurface<'_>, rest: &Rest, prompts: &[String]) -> Result<(AthenaWalkGeometry, AthenaFutureGeometry), String> {
-    let positions: usize = prompts.iter().map(|prompt| lexical_tokens(prompt).len()).sum();
-    let family = surface.athena_future_candidates(positions, rest.vocabulary, rest.height).map_err(|e| e.to_string())?;
+fn choose(
+    surface: &ResidentSurface<'_>,
+    rest: &Rest,
+    prompts: &[String],
+) -> Result<(AthenaWalkGeometry, AthenaFutureGeometry), String> {
+    let positions: usize = prompts
+        .iter()
+        .map(|prompt| lexical_tokens(prompt).len())
+        .sum();
+    let family = surface
+        .athena_future_candidates(positions, rest.vocabulary, rest.height)
+        .map_err(|e| e.to_string())?;
     if family.is_empty() {
         return Err("the device admits no member of the native future family".to_owned());
     }
@@ -971,7 +1584,13 @@ fn choose(surface: &ResidentSurface<'_>, rest: &Rest, prompts: &[String]) -> Res
 /// **The receiver's declared axes.** Changing this set changes the retained set, which is the
 /// falsifier: a return that did not move under a changed declaration was ranking.
 fn declared_axes() -> Vec<AthenaAxis> {
-    vec![AthenaAxis::CoverUp, AthenaAxis::ResidentBlocksUp, AthenaAxis::ChainReuseUp, AthenaAxis::SharedDown, AthenaAxis::ClimbPastStageDown]
+    vec![
+        AthenaAxis::CoverUp,
+        AthenaAxis::ResidentBlocksUp,
+        AthenaAxis::ChainReuseUp,
+        AthenaAxis::SharedDown,
+        AthenaAxis::ClimbPastStageDown,
+    ]
 }
 
 /// **The caller's choice from the retained set, declared in words before it is computed.**
@@ -1007,7 +1626,10 @@ fn walk_warps(surface: &ResidentSurface<'_>, prompts: usize) -> AthenaWalkGeomet
     let ceiling = 512 / warp.max(1);
     let mut warps = 1u32;
     for candidate in AthenaWalkGeometry::enumerate() {
-        if candidate.warps <= ceiling && candidate.warps as usize <= prompts.max(1) && candidate.warps > warps {
+        if candidate.warps <= ceiling
+            && candidate.warps as usize <= prompts.max(1)
+            && candidate.warps > warps
+        {
             warps = candidate.warps;
         }
     }
@@ -1017,12 +1639,16 @@ fn walk_warps(surface: &ResidentSurface<'_>, prompts: usize) -> AthenaWalkGeomet
 fn parent(arguments: &[String]) -> Result<(), String> {
     let mut rest_path = REST.to_owned();
     let mut ablated_path = ABLATED.to_owned();
+    let mut w5_receipt_path: Option<String> = None;
     let mut prompts: Vec<String> = Vec::new();
     let mut it = arguments.iter().skip(1);
     while let Some(flag) = it.next() {
         match flag.as_str() {
             "--rest" => rest_path = it.next().cloned().ok_or("--rest <path>")?,
             "--ablated" => ablated_path = it.next().cloned().ok_or("--ablated <path>")?,
+            "--w5-receipt" => {
+                w5_receipt_path = Some(it.next().cloned().ok_or("--w5-receipt <path>")?)
+            }
             "--prompt" => prompts.push(it.next().cloned().ok_or("--prompt <text>")?),
             other => return Err(format!("unknown argument {other}")),
         }
@@ -1032,32 +1658,61 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     }
     std::fs::create_dir_all(OUT).map_err(|e| e.to_string())?;
     let clock = Instant::now();
-    let mut verdicts = Verdicts { lines: Vec::new(), failed: 0 };
+    let mut verdicts = Verdicts {
+        lines: Vec::new(),
+        failed: 0,
+    };
 
     println!("THE NATIVE BASELINE CONDUCTS FROM ITS OWN REST — Deed P0, ARM N\n");
 
-    let readout: &'static ResidentReadout = Box::leak(Box::new(ResidentReadout::new().map_err(|e| format!("{e:?}"))?));
-    let surface: &'static ResidentSurface<'static> = Box::leak(Box::new(ResidentSurface::on(readout).map_err(|e| e.to_string())?));
+    let readout: &'static ResidentReadout = Box::leak(Box::new(
+        ResidentReadout::new().map_err(|e| format!("{e:?}"))?,
+    ));
+    let surface: &'static ResidentSurface<'static> = Box::leak(Box::new(
+        ResidentSurface::on(readout).map_err(|e| e.to_string())?,
+    ));
     println!("  resident chart            {}", surface.device_name());
     println!("  kernels in the module     {}", KERNELS.len());
-    println!("  PTX content               {}", &surface.ptx_sha256()[..16]);
+    println!(
+        "  PTX content               {}",
+        &surface.ptx_sha256()[..16]
+    );
 
     let rest = read_rest(&rest_path)?;
     let witness = NativeOccurrence::read(&rest_path).map_err(|e| e.to_string())?;
     println!();
     println!("  THE REST — the only semantic input of this deed");
-    println!("    {}  {} octets  content {}", rest.locator, rest.octets, &rest.content_sha256[..16]);
-    println!("    classes {}  transitions {}  vocabulary {}  tree height {}", rest.classes, rest.transitions, rest.vocabulary, rest.height);
-    println!("    the rest's own declarations ({}):", rest.declarations.len());
+    println!(
+        "    {}  {} octets  content {}",
+        rest.locator,
+        rest.octets,
+        &rest.content_sha256[..16]
+    );
+    println!(
+        "    classes {}  transitions {}  vocabulary {}  tree height {}",
+        rest.classes, rest.transitions, rest.vocabulary, rest.height
+    );
+    println!(
+        "    the rest's own declarations ({}):",
+        rest.declarations.len()
+    );
     for (key, statement) in &rest.declarations {
-        println!("      {key}: {}", statement.chars().take(110).collect::<String>());
+        println!(
+            "      {key}: {}",
+            statement.chars().take(110).collect::<String>()
+        );
     }
 
     // ---------------------------------------------------------------------------------------
     // the launch geometry: the family, the declared axes, the retained set, the chosen member
     // ---------------------------------------------------------------------------------------
-    let positions: usize = prompts.iter().map(|prompt| lexical_tokens(prompt).len()).sum();
-    let family = surface.athena_future_candidates(positions, rest.vocabulary, rest.height).map_err(|e| e.to_string())?;
+    let positions: usize = prompts
+        .iter()
+        .map(|prompt| lexical_tokens(prompt).len())
+        .sum();
+    let family = surface
+        .athena_future_candidates(positions, rest.vocabulary, rest.height)
+        .map_err(|e| e.to_string())?;
     let axes = declared_axes();
     let retained = athena_non_dominated(&family, &axes);
     let coarse_axes = [AthenaAxis::ResidentBlocksUp, AthenaAxis::SharedDown];
@@ -1070,13 +1725,34 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     println!("    multiprocessors {}  warp {}  max blocks/SM {}  max threads/SM {}  max registers/SM {}  max shared/SM {}", limits.multiprocessors, limits.warp, limits.max_blocks, limits.max_threads, limits.max_registers, limits.max_shared_octets);
     println!("    the module's derived block ceiling {} (the MINIMUM over every kernel's own admission, a refusal bound and not an optimum)", surface.multiprocessor_limits().warp * 0 + block_ceiling(surface));
     println!("    admitted candidates {}   retained under {:?}: {}   retained under a coarser declaration {:?}: {}", family.len(), axes, retained.len(), coarse_axes, coarser.len());
-    println!("      {:<34} {:>6} {:>8} {:>6} {:>6} {:>9} {:>12} {:>14} {:>7}", "geometry (pos x lanes x G, stage)", "block", "shared", "regs", "res/SM", "blocks", "residency wv", "cover of card", "reuse");
-    for at in retained.iter().take(18).chain(retained.iter().skip(18).filter(|at| **at == chosen)) {
+    println!(
+        "      {:<34} {:>6} {:>8} {:>6} {:>6} {:>9} {:>12} {:>14} {:>7}",
+        "geometry (pos x lanes x G, stage)",
+        "block",
+        "shared",
+        "regs",
+        "res/SM",
+        "blocks",
+        "residency wv",
+        "cover of card",
+        "reuse"
+    );
+    for at in retained
+        .iter()
+        .take(18)
+        .chain(retained.iter().skip(18).filter(|at| **at == chosen))
+    {
         let candidate = &family[*at];
         let geometry = candidate.geometry;
         println!(
             "      {:<34} {:>6} {:>8} {:>6} {:>6} {:>9} {:>5}/{:<6} {:>6}/{:<7} {:>7}{}",
-            format!("{} x {} x {}, stage {}", geometry.positions_per_block, geometry.lanes, geometry.germs_per_lane, geometry.chain_stage),
+            format!(
+                "{} x {} x {}, stage {}",
+                geometry.positions_per_block,
+                geometry.lanes,
+                geometry.germs_per_lane,
+                geometry.chain_stage
+            ),
             candidate.block,
             candidate.shared_octets,
             candidate.registers,
@@ -1087,13 +1763,21 @@ fn parent(arguments: &[String]) -> Result<(), String> {
             candidate.cover_occupied.0,
             candidate.cover_occupied.1,
             candidate.chain_reuse,
-            if *at == chosen { "  <- CHOSEN, caller-declared" } else { "" }
+            if *at == chosen {
+                "  <- CHOSEN, caller-declared"
+            } else {
+                ""
+            }
         );
     }
     if retained.len() > 18 {
-        println!("      … {} more retained, every one in the receipt", retained.len() - 18);
+        println!(
+            "      … {} more retained, every one in the receipt",
+            retained.len() - 18
+        );
     }
-    let convicted_blocks = ((positions * rest.vocabulary) as u64).div_ceil(u64::from(block_ceiling(surface)));
+    let convicted_blocks =
+        ((positions * rest.vocabulary) as u64).div_ceil(u64::from(block_ceiling(surface)));
     println!();
     println!("    THE CONVICTED SHAPE, on this same extent, for comparison:");
     println!("      walk    predecessor: grid {} x block {}, `if (flat != 0) return;` — 1 working lane out of {}",
@@ -1106,10 +1790,30 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     // ---------------------------------------------------------------------------------------
     // the deed
     // ---------------------------------------------------------------------------------------
-    let conducted = conduct(surface, &rest, &witness, &prompts, walk_geometry, family[chosen].geometry, false)?;
+    let conducted = conduct(
+        surface,
+        &rest,
+        &witness,
+        &prompts,
+        walk_geometry,
+        family[chosen].geometry,
+        false,
+    )?;
+    let current_w5 = if w5_receipt_path.is_some() {
+        Some(w5_deed(&rest, &prompts, &conducted, "current")?)
+    } else {
+        None
+    };
     let sections = decode(&rest, &conducted, &prompts);
     println!();
-    println!("  THE DEED — {} occurrences, {} fronts, {} graph nodes, witness {:?}, {:.3} s", conducted.occurrences, conducted.fronts, conducted.graph_nodes, conducted.witness, conducted.wall_s);
+    println!(
+        "  THE DEED — {} occurrences, {} fronts, {} graph nodes, witness {:?}, {:.3} s",
+        conducted.occurrences,
+        conducted.fronts,
+        conducted.graph_nodes,
+        conducted.witness,
+        conducted.wall_s
+    );
     for (law, parameters, naming) in &conducted.entailments {
         println!("      {law:<16} entailed by {parameters} parameters, {naming} naming statement(s) the rest itself carries");
     }
@@ -1120,19 +1824,40 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         println!();
         println!("    {:?}", section.prompt);
         println!("      walk        {}", section.trace.join(" -> "));
-        println!("      class       {}   standing {}   germs in the section {}", section.class, section.standing, section.offered.len());
+        println!(
+            "      class       {}   standing {}   germs in the section {}",
+            section.class,
+            section.standing,
+            section.offered.len()
+        );
         let mut by_depth: BTreeMap<i64, Vec<(String, i64)>> = BTreeMap::new();
         for (surface_text, standing, depth) in &section.offered {
-            by_depth.entry(*depth).or_default().push((surface_text.clone(), *standing));
+            by_depth
+                .entry(*depth)
+                .or_default()
+                .push((surface_text.clone(), *standing));
         }
         for (depth, members) in by_depth.iter().take(3) {
-            let label = if *depth == 0 { "the class's own — what the FULL context licenses".to_owned() } else { format!("reached by arcing {depth} shorter") };
-            println!("        depth {depth}: {:<5} germs — {label}", members.len());
+            let label = if *depth == 0 {
+                "the class's own — what the FULL context licenses".to_owned()
+            } else {
+                format!("reached by arcing {depth} shorter")
+            };
+            println!(
+                "        depth {depth}: {:<5} germs — {label}",
+                members.len()
+            );
             for (surface_text, standing) in members.iter().take(8) {
-                println!("          {:<28} standing {standing}", format!("{surface_text:?}"));
+                println!(
+                    "          {:<28} standing {standing}",
+                    format!("{surface_text:?}")
+                );
             }
             if members.len() > 8 {
-                println!("          … {} more at this depth, every one retained", members.len() - 8);
+                println!(
+                    "          … {} more at this depth, every one retained",
+                    members.len() - 8
+                );
             }
         }
     }
@@ -1153,7 +1878,10 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         ),
     );
 
-    let unseen: Vec<&Section> = sections.iter().filter(|section| !section.unseen.is_empty()).collect();
+    let unseen: Vec<&Section> = sections
+        .iter()
+        .filter(|section| !section.unseen.is_empty())
+        .collect();
     let root_offered = rest.continuations(0).len();
     verdicts.record(
         2,
@@ -1169,9 +1897,23 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     );
 
     // ---- the geometry equality control: two admitted members, the same words ----
-    let second = retained.iter().copied().find(|at| *at != chosen).unwrap_or(chosen);
-    let alternative = conduct(surface, &rest, &witness, &prompts, AthenaWalkGeometry { warps: 1 }, family[second].geometry, false)?;
-    let geometry_equal = alternative.walk == conducted.walk && alternative.future == conducted.future && alternative.depth == conducted.depth;
+    let second = retained
+        .iter()
+        .copied()
+        .find(|at| *at != chosen)
+        .unwrap_or(chosen);
+    let alternative = conduct(
+        surface,
+        &rest,
+        &witness,
+        &prompts,
+        AthenaWalkGeometry { warps: 1 },
+        family[second].geometry,
+        false,
+    )?;
+    let geometry_equal = alternative.walk == conducted.walk
+        && alternative.future == conducted.future
+        && alternative.depth == conducted.depth;
     verdicts.record(
         5,
         "the launch geometry is APPARATUS: two admitted members of the family return bit-identical words, and the convicted flat shape is measurably gone",
@@ -1193,7 +1935,15 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     );
 
     // ---- the poisoned lineage ----
-    let poisoned = conduct(surface, &rest, &witness, &prompts, walk_geometry, family[chosen].geometry, true);
+    let poisoned = conduct(
+        surface,
+        &rest,
+        &witness,
+        &prompts,
+        walk_geometry,
+        family[chosen].geometry,
+        true,
+    );
     verdicts.record(
         6,
         "the census is aggregated and the refusal is LINEAGE-LOCAL: a poisoned prompt span refuses MALFORMED on the card and the successors report it upstream",
@@ -1210,23 +1960,70 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     let ablated_rest = read_rest(&ablated_path)?;
     let ablated_witness = NativeOccurrence::read(&ablated_path).map_err(|e| e.to_string())?;
     let ablated_geometry = {
-        let ablated_family = surface.athena_future_candidates(positions, ablated_rest.vocabulary, ablated_rest.height).map_err(|e| e.to_string())?;
+        let ablated_family = surface
+            .athena_future_candidates(positions, ablated_rest.vocabulary, ablated_rest.height)
+            .map_err(|e| e.to_string())?;
         let ablated_retained = athena_non_dominated(&ablated_family, &axes);
         ablated_family[pick(&ablated_family, &ablated_retained)].geometry
     };
-    let ablated_conducted = conduct(surface, &ablated_rest, &ablated_witness, &prompts, walk_geometry, ablated_geometry, false)?;
+    let ablated_conducted = conduct(
+        surface,
+        &ablated_rest,
+        &ablated_witness,
+        &prompts,
+        walk_geometry,
+        ablated_geometry,
+        false,
+    )?;
     let ablated_sections = decode(&ablated_rest, &ablated_conducted, &prompts);
-    println!("    {:<48} {:>9} {:>9} {:>9} {:>9} {:>10}", "prompt", "germs", "germs'", "moved", "gone", "depth-0");
+    println!(
+        "    {:<48} {:>9} {:>9} {:>9} {:>9} {:>10}",
+        "prompt", "germs", "germs'", "moved", "gone", "depth-0"
+    );
     let mut ablation_rows = Vec::new();
     for (whole, ablated) in sections.iter().zip(ablated_sections.iter()) {
-        let before: BTreeMap<&str, (i64, i64)> = whole.offered.iter().map(|(s, standing, depth)| (s.as_str(), (*standing, *depth))).collect();
-        let after: BTreeMap<&str, (i64, i64)> = ablated.offered.iter().map(|(s, standing, depth)| (s.as_str(), (*standing, *depth))).collect();
-        let gone: Vec<&str> = before.keys().filter(|surface_text| !after.contains_key(*surface_text)).copied().collect();
-        let arrived: Vec<&str> = after.keys().filter(|surface_text| !before.contains_key(*surface_text)).copied().collect();
-        let moved: Vec<&str> = before.iter().filter(|(surface_text, face)| after.get(**surface_text).is_some_and(|other| other != *face)).map(|(s, _)| *s).collect();
+        let before: BTreeMap<&str, (i64, i64)> = whole
+            .offered
+            .iter()
+            .map(|(s, standing, depth)| (s.as_str(), (*standing, *depth)))
+            .collect();
+        let after: BTreeMap<&str, (i64, i64)> = ablated
+            .offered
+            .iter()
+            .map(|(s, standing, depth)| (s.as_str(), (*standing, *depth)))
+            .collect();
+        let gone: Vec<&str> = before
+            .keys()
+            .filter(|surface_text| !after.contains_key(*surface_text))
+            .copied()
+            .collect();
+        let arrived: Vec<&str> = after
+            .keys()
+            .filter(|surface_text| !before.contains_key(*surface_text))
+            .copied()
+            .collect();
+        let moved: Vec<&str> = before
+            .iter()
+            .filter(|(surface_text, face)| {
+                after
+                    .get(**surface_text)
+                    .is_some_and(|other| other != *face)
+            })
+            .map(|(s, _)| *s)
+            .collect();
         let support_identical = gone.is_empty() && arrived.is_empty();
-        let depth0_before: BTreeSet<&str> = whole.offered.iter().filter(|(_, _, d)| *d == 0).map(|(s, _, _)| s.as_str()).collect();
-        let depth0_after: BTreeSet<&str> = ablated.offered.iter().filter(|(_, _, d)| *d == 0).map(|(s, _, _)| s.as_str()).collect();
+        let depth0_before: BTreeSet<&str> = whole
+            .offered
+            .iter()
+            .filter(|(_, _, d)| *d == 0)
+            .map(|(s, _, _)| s.as_str())
+            .collect();
+        let depth0_after: BTreeSet<&str> = ablated
+            .offered
+            .iter()
+            .filter(|(_, _, d)| *d == 0)
+            .map(|(s, _, _)| s.as_str())
+            .collect();
         let depth0_identical = depth0_before == depth0_after;
         println!(
             "    {:<48} {:>9} {:>9} {:>9} {:>9} {:>10}",
@@ -1235,15 +2032,56 @@ fn parent(arguments: &[String]) -> Result<(), String> {
             ablated.offered.len(),
             moved.len(),
             gone.len(),
-            if depth0_identical { "IDENTICAL" } else { "moved" }
+            if depth0_identical {
+                "IDENTICAL"
+            } else {
+                "moved"
+            }
         );
-        ablation_rows.push((whole.prompt.clone(), whole.offered.len(), ablated.offered.len(), moved.len(), gone.len(), arrived.len(), support_identical, depth0_identical, gone.iter().take(6).map(|s| (*s).to_owned()).collect::<Vec<_>>()));
+        ablation_rows.push((
+            whole.prompt.clone(),
+            whole.offered.len(),
+            ablated.offered.len(),
+            moved.len(),
+            gone.len(),
+            arrived.len(),
+            support_identical,
+            depth0_identical,
+            gone.iter()
+                .take(6)
+                .map(|s| (*s).to_owned())
+                .collect::<Vec<_>>(),
+        ));
     }
-    let hexis_prompts: Vec<&(String, usize, usize, usize, usize, usize, bool, bool, Vec<String>)> =
-        ablation_rows.iter().filter(|row| row.0.contains("hexis") || row.0.contains("cultivation")).collect();
+    let hexis_prompts: Vec<&(
+        String,
+        usize,
+        usize,
+        usize,
+        usize,
+        usize,
+        bool,
+        bool,
+        Vec<String>,
+    )> = ablation_rows
+        .iter()
+        .filter(|row| row.0.contains("hexis") || row.0.contains("cultivation"))
+        .collect();
     let moved_by_ablation = hexis_prompts.iter().all(|row| row.3 > 0 || row.4 > 0);
-    let unrelated: Vec<&(String, usize, usize, usize, usize, usize, bool, bool, Vec<String>)> =
-        ablation_rows.iter().filter(|row| !row.0.contains("hexis") && !row.0.contains("cultivation")).collect();
+    let unrelated: Vec<&(
+        String,
+        usize,
+        usize,
+        usize,
+        usize,
+        usize,
+        bool,
+        bool,
+        Vec<String>,
+    )> = ablation_rows
+        .iter()
+        .filter(|row| !row.0.contains("hexis") && !row.0.contains("cultivation"))
+        .collect();
     let depth0_held = unrelated.iter().filter(|row| row.7).count();
     verdicts.record(
         4,
@@ -1270,7 +2108,9 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     // the fresh process
     // ---------------------------------------------------------------------------------------
     println!();
-    println!("  THE FRESH PROCESS — re-executed with the rest's path and the prompts, and nothing else");
+    println!(
+        "  THE FRESH PROCESS — re-executed with the rest's path and the prompts, and nothing else"
+    );
     let mut parent_faces = Vec::new();
     for face in [&conducted.walk, &conducted.future, &conducted.depth] {
         for (lo, hi) in face {
@@ -1279,8 +2119,20 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         }
     }
     let exchange = std::env::temp_dir().join("native-baseline-child-faces.bin");
-    let mut command = std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
-    command.arg("--conduct").arg(&rest_path).arg("--faces").arg(&exchange);
+    let child_receipt_path = std::env::temp_dir().join(format!(
+        "native-baseline-child-{}-w5.json",
+        std::process::id()
+    ));
+    let mut command =
+        std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
+    command
+        .arg("--conduct")
+        .arg(&rest_path)
+        .arg("--faces")
+        .arg(&exchange);
+    if w5_receipt_path.is_some() {
+        command.arg("--receipt").arg(&child_receipt_path);
+    }
     for prompt in &prompts {
         command.arg("--prompt").arg(prompt);
     }
@@ -1290,17 +2142,30 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     let opened: Vec<String> = child_text
         .lines()
         .find(|line| line.starts_with("CHILD-OPENED "))
-        .map(|line| line.trim_start_matches("CHILD-OPENED ").split(" | ").map(|s| s.to_owned()).collect())
+        .map(|line| {
+            line.trim_start_matches("CHILD-OPENED ")
+                .split(" | ")
+                .map(|s| s.to_owned())
+                .collect()
+        })
         .unwrap_or_default();
     for line in child_text.lines().filter(|line| line.starts_with("CHILD-")) {
         println!("    {}", line.chars().take(200).collect::<String>());
     }
-    let forbidden = ["gemma", "phoenix", "/canon/", "canon/", "tokenizer", "model.safetensors"];
+    let forbidden = [
+        "gemma",
+        "phoenix",
+        "/canon/",
+        "canon/",
+        "tokenizer",
+        "model.safetensors",
+    ];
     let offending: Vec<&String> = opened
         .iter()
         .filter(|path| {
             let lower = path.to_lowercase();
-            forbidden.iter().any(|needle| lower.contains(needle)) && !lower.ends_with("rest.safetensors")
+            forbidden.iter().any(|needle| lower.contains(needle))
+                && !lower.ends_with("rest.safetensors")
         })
         .collect();
     verdicts.record(
@@ -1317,10 +2182,67 @@ fn parent(arguments: &[String]) -> Result<(), String> {
             offending
         ),
     );
+    let prior_w5 = if let (Some(current), Some(_)) = (&current_w5, &w5_receipt_path) {
+        let bytes = std::fs::read(&child_receipt_path)
+            .map_err(|error| format!("child W5 receipt: {error}"))?;
+        let artifact: W5DeedArtifact = serde_json::from_slice(&bytes)
+            .map_err(|error| format!("child W5 receipt JSON: {error}"))?;
+        let expected_rest = W5RestIdentity {
+            sha256: rest.content_sha256.clone(),
+            extent: rest.octets,
+        };
+        let expected_codebook = codebook_identity(&rest);
+        let expected_material = material_lineage_digest(&prompts)?;
+        let expected_closure = closure_identity()?;
+        if artifact.schema != W5_DEED_SCHEMA
+            || artifact.rest_identity.sha256 != expected_rest.sha256
+            || artifact.rest_identity.extent != expected_rest.extent
+            || artifact.codebook_identity != expected_codebook
+            || artifact.codebook_extent != rest.vocabulary as u32
+            || artifact.material_lineage_digest != expected_material
+            || artifact.closure_identity != expected_closure
+            || artifact.deed.source_audit.forbidden.len() != 0
+            || opened.first() != Some(&artifact.deed.source_audit.audit_identity)
+            || artifact.deed.faces != current.faces
+            || artifact.deed.exact_work != current.exact_work
+            || artifact.deed.apparatus_prediction_digest != current.apparatus_prediction_digest
+            || artifact.deed.execution_kind != "NativeRuntime"
+            || artifact.deed.device_name != current.device_name
+            || artifact.deed.mode != current.mode
+            || artifact.deed.kernel_identity != current.kernel_identity
+            || artifact.deed.return_digest != w5_return_digest(&artifact.deed.faces)
+            || artifact.deed.admission_digest != sha256_hex(artifact.deed.admission_json.as_bytes())
+        {
+            return Err(
+                "child W5 receipt failed rest/material/closure/face/admission verification"
+                    .to_owned(),
+            );
+        }
+        let owner_json = serde_json::to_vec(&(
+            artifact.deed.exact_work.clone(),
+            artifact.deed.admission_digest.clone(),
+            artifact.deed.return_digest.clone(),
+        ))
+        .map_err(|error| error.to_string())?;
+        if artifact.deed.owner_receipt_digest != sha256_hex(&owner_json)
+            || artifact.deed.deed_identity == current.deed_identity
+        {
+            return Err("child W5 receipt failed owner/deed identity verification".to_owned());
+        }
+        Some(artifact.deed)
+    } else {
+        None
+    };
 
     // the hidden card
-    let mut hidden = std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
-    hidden.env("CUDA_VISIBLE_DEVICES", "").arg("--conduct").arg(&rest_path).arg("--faces").arg("");
+    let mut hidden =
+        std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
+    hidden
+        .env("CUDA_VISIBLE_DEVICES", "")
+        .arg("--conduct")
+        .arg(&rest_path)
+        .arg("--faces")
+        .arg("");
     for prompt in &prompts {
         hidden.arg("--prompt").arg(prompt);
     }
@@ -1352,10 +2274,18 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     // ---------------------------------------------------------------------------------------
     // the manifest
     // ---------------------------------------------------------------------------------------
-    let taxa = std::fs::read_to_string("output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form")
-        .map(|text| text.lines().filter(|line| line.starts_with("TAXON")).count())
-        .unwrap_or(0);
-    let manifest = build_manifest(&rest, &conducted, &sections, &family, &retained, chosen, taxa);
+    let taxa = std::fs::read_to_string(
+        "output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form",
+    )
+    .map(|text| {
+        text.lines()
+            .filter(|line| line.starts_with("TAXON"))
+            .count()
+    })
+    .unwrap_or(0);
+    let manifest = build_manifest(
+        &rest, &conducted, &sections, &family, &retained, chosen, taxa,
+    );
     let manifest_path = format!("{OUT}/native-ecology-manifest.form");
     {
         let mut form = std::fs::File::create(&manifest_path).map_err(|e| e.to_string())?;
@@ -1373,7 +2303,10 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     for line in &manifest.lines {
         println!("    {}", line.replace('\n', "\n    "));
     }
-    let asserts_crystal = manifest.lines.iter().any(|line| line.to_lowercase().contains("crystal") && line.starts_with("MEASURED"));
+    let asserts_crystal = manifest
+        .lines
+        .iter()
+        .any(|line| line.to_lowercase().contains("crystal") && line.starts_with("MEASURED"));
     verdicts.record(
         7,
         "the cycle rank is measured AND its transport population is exhibited by name",
@@ -1395,19 +2328,54 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         let mut form = std::fs::File::create(&receipt_path).map_err(|e| e.to_string())?;
         let _ = writeln!(form, "THE NATIVE BASELINE CONDUCTS FROM ITS OWN REST — Deed P0, ARM N · device {} · PTX {} · {:.1} s", surface.device_name(), &surface.ptx_sha256()[..16], clock.elapsed().as_secs_f64());
         let _ = writeln!(form, "rest {} · {} octets · content {} · classes {} · transitions {} · vocabulary {} · tree height {}", rest.locator, rest.octets, rest.content_sha256, rest.classes, rest.transitions, rest.vocabulary, rest.height);
-        let _ = writeln!(form, "prompts {} · positions {} · future section {} x {} = {} cells · charged {} octets", prompts.len(), positions, conducted.positions, conducted.vocabulary, conducted.positions * conducted.vocabulary, conducted.charged_octets);
+        let _ = writeln!(
+            form,
+            "prompts {} · positions {} · future section {} x {} = {} cells · charged {} octets",
+            prompts.len(),
+            positions,
+            conducted.positions,
+            conducted.vocabulary,
+            conducted.positions * conducted.vocabulary,
+            conducted.charged_octets
+        );
         let _ = writeln!(form);
         let _ = writeln!(form, "LAUNCH GEOMETRY");
         let _ = writeln!(form, "  admitted candidates {} · retained under {:?} {} · retained under a coarser declaration {} (the retained set MOVES with the declaration, which is the falsifier)", family.len(), axes, retained.len(), coarser.len());
-        let _ = writeln!(form, "  {:<36} {:>6} {:>8} {:>6} {:>7} {:>10} {:>16} {:>16} {:>7}", "geometry", "block", "shared", "regs", "res/SM", "blocks", "residency waves", "cover of card", "reuse");
+        let _ = writeln!(
+            form,
+            "  {:<36} {:>6} {:>8} {:>6} {:>7} {:>10} {:>16} {:>16} {:>7}",
+            "geometry",
+            "block",
+            "shared",
+            "regs",
+            "res/SM",
+            "blocks",
+            "residency waves",
+            "cover of card",
+            "reuse"
+        );
         for at in &retained {
             let candidate = &family[*at];
             let _ = writeln!(
                 form,
                 "  {:<36} {:>6} {:>8} {:>6} {:>7} {:>10} {:>7}/{:<8} {:>7}/{:<8} {:>7}{}",
-                format!("{} pos x {} lanes x {} germs, stage {}", candidate.geometry.positions_per_block, candidate.geometry.lanes, candidate.geometry.germs_per_lane, candidate.geometry.chain_stage),
-                candidate.block, candidate.shared_octets, candidate.registers, candidate.resident_blocks, candidate.blocks,
-                candidate.residency_waves.0, candidate.residency_waves.1, candidate.cover_occupied.0, candidate.cover_occupied.1, candidate.chain_reuse,
+                format!(
+                    "{} pos x {} lanes x {} germs, stage {}",
+                    candidate.geometry.positions_per_block,
+                    candidate.geometry.lanes,
+                    candidate.geometry.germs_per_lane,
+                    candidate.geometry.chain_stage
+                ),
+                candidate.block,
+                candidate.shared_octets,
+                candidate.registers,
+                candidate.resident_blocks,
+                candidate.blocks,
+                candidate.residency_waves.0,
+                candidate.residency_waves.1,
+                candidate.cover_occupied.0,
+                candidate.cover_occupied.1,
+                candidate.chain_reuse,
                 if *at == chosen { "  <- chosen" } else { "" }
             );
         }
@@ -1417,20 +2385,56 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         let _ = writeln!(form);
         let _ = writeln!(form, "THE PLURAL SECTIONS");
         for section in &sections {
-            let _ = writeln!(form, "  {:?} -> class {} standing {} · {} germs offered · walk {}", section.prompt, section.class, section.standing, section.offered.len(), section.trace.join(" -> "));
+            let _ = writeln!(
+                form,
+                "  {:?} -> class {} standing {} · {} germs offered · walk {}",
+                section.prompt,
+                section.class,
+                section.standing,
+                section.offered.len(),
+                section.trace.join(" -> ")
+            );
             let mut by_depth: BTreeMap<i64, Vec<&(String, i64, i64)>> = BTreeMap::new();
             for offered in &section.offered {
                 by_depth.entry(offered.2).or_default().push(offered);
             }
             for (depth, members) in by_depth.iter().take(2) {
-                let _ = writeln!(form, "    depth {depth}: {} germs — {}", members.len(), members.iter().take(14).map(|(s, standing, _)| format!("{s:?}@{standing}")).collect::<Vec<_>>().join(" "));
+                let _ = writeln!(
+                    form,
+                    "    depth {depth}: {} germs — {}",
+                    members.len(),
+                    members
+                        .iter()
+                        .take(14)
+                        .map(|(s, standing, _)| format!("{s:?}@{standing}"))
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                );
             }
         }
         let _ = writeln!(form);
-        let _ = writeln!(form, "THE ABLATION — construction-level: the rest rebuilt without canon/TABLET_THE_HEXIS.md");
-        let _ = writeln!(form, "  {:<50} {:>7} {:>7} {:>7} {:>7} {:>8} {:>12} {:>10}", "prompt", "germs", "germs'", "moved", "gone", "arrived", "support same", "depth-0 same");
+        let _ = writeln!(
+            form,
+            "THE ABLATION — construction-level: the rest rebuilt without canon/TABLET_THE_HEXIS.md"
+        );
+        let _ = writeln!(
+            form,
+            "  {:<50} {:>7} {:>7} {:>7} {:>7} {:>8} {:>12} {:>10}",
+            "prompt", "germs", "germs'", "moved", "gone", "arrived", "support same", "depth-0 same"
+        );
         for row in &ablation_rows {
-            let _ = writeln!(form, "  {:<50} {:>7} {:>7} {:>7} {:>7} {:>8} {:>12} {:>10}", format!("{:?}", row.0), row.1, row.2, row.3, row.4, row.5, row.6, row.7);
+            let _ = writeln!(
+                form,
+                "  {:<50} {:>7} {:>7} {:>7} {:>7} {:>8} {:>12} {:>10}",
+                format!("{:?}", row.0),
+                row.1,
+                row.2,
+                row.3,
+                row.4,
+                row.5,
+                row.6,
+                row.7
+            );
         }
         let _ = writeln!(form);
         let _ = writeln!(form, "VERDICTS");
@@ -1439,14 +2443,69 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         }
     }
 
+    if let Some(path) = &w5_receipt_path {
+        let current = current_w5.ok_or("W5 current deed was not retained")?;
+        let prior = prior_w5.ok_or("W5 child deed was not returned")?;
+        if current.source_audit.forbidden.len() != 0 || prior.source_audit.forbidden.len() != 0 {
+            return Err("W5 source-access descriptor audit contains forbidden paths".to_owned());
+        }
+        let executable = std::env::current_exe().map_err(|error| error.to_string())?;
+        let executable_bytes = std::fs::read(&executable).map_err(|error| error.to_string())?;
+        let child_bytes = std::fs::read(&child_receipt_path).map_err(|error| error.to_string())?;
+        let receipt = W5Return {
+            schema: W5_SCHEMA.to_owned(),
+            schema_version: "v1".to_owned(),
+            rest_identity: W5RestIdentity {
+                sha256: rest.content_sha256.clone(),
+                extent: rest.octets,
+            },
+            codebook_identity: codebook_identity(&rest),
+            codebook_extent: rest.vocabulary as u32,
+            material_lineage_digest: material_lineage_digest(&prompts)?,
+            closure_identity: sha256_hex(&executable_bytes),
+            current,
+            prior,
+            artifacts: vec![
+                W5ArtifactAddress {
+                    role: "rest".to_owned(),
+                    locator: rest_path.clone(),
+                    sha256: rest.content_sha256.clone(),
+                    extent: rest.octets,
+                },
+                W5ArtifactAddress {
+                    role: "executable".to_owned(),
+                    locator: executable.display().to_string(),
+                    sha256: sha256_hex(&executable_bytes),
+                    extent: executable_bytes.len() as u64,
+                },
+                W5ArtifactAddress {
+                    role: "prior-deed".to_owned(),
+                    locator: child_receipt_path.display().to_string(),
+                    sha256: sha256_hex(&child_bytes),
+                    extent: child_bytes.len() as u64,
+                },
+            ],
+        };
+        write_json(path, &receipt)?;
+        println!("  W5 ARM N JSON receipt -> {path}");
+    }
+
     println!();
     println!("  receipt -> {receipt_path}");
     println!();
     if verdicts.failed == 0 {
-        println!("ALL {} CONTROLS HELD — the native baseline conducts from its own rest in {:.1} s", verdicts.lines.len(), clock.elapsed().as_secs_f64());
+        println!(
+            "ALL {} CONTROLS HELD — the native baseline conducts from its own rest in {:.1} s",
+            verdicts.lines.len(),
+            clock.elapsed().as_secs_f64()
+        );
         Ok(())
     } else {
-        Err(format!("{} of {} controls failed", verdicts.failed, verdicts.lines.len()))
+        Err(format!(
+            "{} of {} controls failed",
+            verdicts.failed,
+            verdicts.lines.len()
+        ))
     }
 }
 

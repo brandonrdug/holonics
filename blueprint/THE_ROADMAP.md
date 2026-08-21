@@ -22,7 +22,7 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-12; prior revision 2026-08-11
+## WHERE THIS STANDS — revised 2026-08-21; prior revision 2026-08-19
 
 **Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
 STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
@@ -353,16 +353,18 @@ bound to morphology. The independent ARM N CPU path remains an explicitly separa
 bounded to this compiled first instance and makes no language-quality or arbitrary-product claim.
 `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes the phase.
 
-**The next deed is W5 — reborn dissection and the indivisible Phoenix grade.** Compare four bodies:
-the authenticated foreign source, the exact W2 lifted predecessor, the W3 cultivated body executed
-through the W4 application, and independent ARM N. Bind the first three through one explicit
-source/native codebook and receiver correspondence. Repeat the complete matched intervention panel,
-shortest separators, held-out continuations and source/native cross-chart faces; return the W2
-no-factor condensation remainder under the enlarged future family; ablate every causing lifted
-family and the cultivation delta; and return exact work plus calibrated apparatus utility with
-unknown energy retained as unknown. The W5 artifact must close every Phoenix master/Gemma-instance
-row or issue a typed refusal. Only a complete pass updates `CONSTRUCTION_STATE.md`. M0–M3 remain
-blocked until then.
+**DEED W5 PASSED 2026-08-21 — the four bodies returned, the causal prefix held, and PHOENIX
+REBIRTH IS COMPLETE FOR THE GEMMA FIRST INSTANCE.** Authoritative record:
+[`research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md`](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
+Foreign, W2 and W3 share the complete 262,144-address correspondence and one authenticated source
+closure while retaining distinct deed closures; ARM N remains independent. Sixteen interventions
+per lifted body, five held-out kinds, native recombination, two exact layer-1 causal-prefix
+withdrawals and the subject-disjoint cultivation-delta withdrawal all returned with change,
+restoration and their correct control species. Forty-three actual tower admissions per source/W2/W3
+body plus the W3 overlay admission, exact work, raw non-double-counted apparatus censuses, unknown
+energy, and the complete receiver evidence are content-bound by the compact grade. The W2 receiver
+family still reopens every nontrivial candidate, so no base-compression factor is quoted. W5 moves
+`CONSTRUCTION_STATE.md`; **Deed M0 is next.**
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section

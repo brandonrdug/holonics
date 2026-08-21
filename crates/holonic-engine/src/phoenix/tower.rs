@@ -52,10 +52,10 @@ use num_bigint::BigInt;
 use relational_geometry::Rat;
 
 pub use super::site::{
-    BAND_GRAIN, EMBED, EMBED_SCALE, EPS_BITS, FFN, Founded, GAINS, GELU_CUBIC_BITS, GELU_SCALE_BITS, HEADS,
-    HIDDEN, KV_HEADS, PLE_EMBED, PLE_EMBED_SCALE, PLE_MODEL_PROJECTION, PLE_PROJECTION_NORM,
-    PLE_WIDTH, POPULATIONS, SLIDING_WINDOW, bond, configuration, implementation, intervention, law,
-    point_enclosure, rebase_testimony, shape,
+    BAND_GRAIN, EMBED, EMBED_SCALE, EPS_BITS, FFN, Founded, GAINS, GELU_CUBIC_BITS,
+    GELU_SCALE_BITS, HEADS, HIDDEN, KV_HEADS, PLE_EMBED, PLE_EMBED_SCALE, PLE_MODEL_PROJECTION,
+    PLE_PROJECTION_NORM, PLE_WIDTH, POPULATIONS, SLIDING_WINDOW, bond, configuration,
+    implementation, intervention, law, point_enclosure, rebase_testimony, shape,
 };
 
 pub const LAYERS: usize = 42;
@@ -402,6 +402,9 @@ pub enum Intervention {
 }
 
 pub const IDENTITY_BANDS: &str = "identity band elements (intervention: no rotation)";
+/// The full-attention identity chronology has a distinct extent from the sliding chronology.  The
+/// historical name remains the sliding face for the retired one-layer adapters.
+pub const IDENTITY_BANDS_FULL: &str = "identity full-band elements (intervention: no rotation)";
 pub const HEAD_PERMUTATION: &str = "head permutation (intervention)";
 
 /// The identity band elements: cos 1, sin 0 at the band grain, for every pair.
@@ -907,7 +910,10 @@ pub fn found_layer(
         Intervention::IdentityChronology | Intervention::ReversedPositions
     );
     let bands_name = if matches!(sibling, Intervention::IdentityChronology) {
-        IDENTITY_BANDS.to_owned()
+        match species {
+            Species::Sliding => IDENTITY_BANDS.to_owned(),
+            Species::Full => IDENTITY_BANDS_FULL.to_owned(),
+        }
     } else {
         species.bands().to_owned()
     };

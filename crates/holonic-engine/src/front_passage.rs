@@ -499,6 +499,16 @@ pub struct MaterialPrediction {
     pub allocation_grain: u64,
 }
 
+/// One separately mounted pooled auxiliary population. Band populations own four device
+/// buffers (lower/upper cosine and sine); a position population owns one `u32` buffer. The
+/// apparatus rounds every allocation independently, so aggregating these populations can
+/// understate the card's charged residency.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PooledMaterialAuxiliary {
+    BandElements(usize),
+    Positions(usize),
+}
+
 /// **The admission of the material deed**, before any map is allocated. The active deed cites it.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MaterialAdmission {
@@ -929,7 +939,7 @@ impl<'chart> FrontPassage<'chart> {
     ///
     /// `ingress_octets` is the whole tower's crossing, not one slot's: a slot is refilled once per
     /// segment and the caller declares how many segments each slot carries.
-    pub fn predict_pooled_material(&self, slots: &[crate::streamed_standing::SlotShape], refills: &[u64], band_elements: usize, positions: usize) -> MaterialPrediction {
+    pub fn predict_pooled_material(&self, slots: &[crate::streamed_standing::SlotShape], refills: &[u64], auxiliaries: &[PooledMaterialAuxiliary]) -> MaterialPrediction {
         let grain = self.surface.allocation_grain();
         let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
         for (which, slot) in slots.iter().enumerate() {
@@ -940,19 +950,24 @@ impl<'chart> FrontPassage<'chart> {
             prediction.allocations += 1;
             prediction.charged_octets += rounded_to(octets, grain);
         }
-        if band_elements > 0 {
-            let octets = (band_elements * 4 * 8) as u64;
-            prediction.resident_octets += octets;
-            prediction.ingress_octets += octets;
-            prediction.allocations += 4;
-            prediction.charged_octets += 4 * rounded_to(octets / 4, grain);
-        }
-        if positions > 0 {
-            let octets = (positions * 4) as u64;
-            prediction.resident_octets += octets;
-            prediction.ingress_octets += octets;
-            prediction.allocations += 1;
-            prediction.charged_octets += rounded_to(octets, grain);
+        for auxiliary in auxiliaries {
+            match auxiliary {
+                PooledMaterialAuxiliary::BandElements(elements) if *elements > 0 => {
+                    let octets = (*elements * 4 * 8) as u64;
+                    prediction.resident_octets += octets;
+                    prediction.ingress_octets += octets;
+                    prediction.allocations += 4;
+                    prediction.charged_octets += 4 * rounded_to(octets / 4, grain);
+                }
+                PooledMaterialAuxiliary::Positions(elements) if *elements > 0 => {
+                    let octets = (*elements * 4) as u64;
+                    prediction.resident_octets += octets;
+                    prediction.ingress_octets += octets;
+                    prediction.allocations += 1;
+                    prediction.charged_octets += rounded_to(octets, grain);
+                }
+                _ => {}
+            }
         }
         prediction
     }
@@ -2550,6 +2565,25 @@ mod tests {
                 assert!(reads.iter().all(|r| footprint.reads.contains(r)));
             }
         }
+    }
+
+    #[test]
+    fn pooled_auxiliaries_are_charged_as_separate_allocations() {
+        let Some((_, surface)) = surface() else { return };
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let slots = [crate::streamed_standing::SlotShape { name: "slot".to_owned(), aligned_octets: 0, stored_octets: 0, mass_octets: 0, scratch_octets: 0 }];
+        let prediction = passage.predict_pooled_material(&slots, &[1], &[
+            PooledMaterialAuxiliary::BandElements(128),
+            PooledMaterialAuxiliary::BandElements(256),
+            PooledMaterialAuxiliary::Positions(5),
+            PooledMaterialAuxiliary::Positions(8),
+        ]);
+        assert_eq!(prediction.resident_octets, ((128 + 256) * 4 * 8 + (5 + 8) * 4) as u64);
+        assert_eq!(prediction.ingress_octets, prediction.resident_octets);
+        assert_eq!(prediction.allocations, 1 + 4 + 4 + 1 + 1);
+        let grain = prediction.allocation_grain;
+        let expected_charge = rounded_to(128 * 8, grain) * 4 + rounded_to(256 * 8, grain) * 4 + rounded_to(5 * 4, grain) + rounded_to(8 * 4, grain);
+        assert_eq!(prediction.charged_octets, expected_charge);
     }
 
     #[test]

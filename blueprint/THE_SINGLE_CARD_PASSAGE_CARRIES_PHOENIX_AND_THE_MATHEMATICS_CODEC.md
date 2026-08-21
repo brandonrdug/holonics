@@ -4,17 +4,13 @@
 **Kind:** integrated construction blueprint, subordinate to
 [THE_ROADMAP.md](THE_ROADMAP.md), which remains the sole construction scheduler.
 **Status:** active construction contract when named by the roadmap. **Deeds H0 through H5 returned
-2026-08-19/20 as the bounded hardware foundation; P0 returned as the independent ARM N baseline.**
-The former P1–P4 promotions were regraded 2026-08-20 by
-[THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md):
-they are respectively a bounded lift-law instrument, an ARM N condensation experiment, an ARM N
-cultivation mechanism, and a CPU ARM N application. They are retained, but none is the corresponding
-whole-Phoenix deed. The dirty former P5 is an unadmitted ARM N dissection candidate. **W1 returned
-2026-08-20 with all 45 admitted complexes, 1,466 operation correspondences, 2,130 exact
-populations, and 262,144 codec rows in a source-detached native rest. **W2 returned 2026-08-20: the
-lifted rest conducts on the card, all 168 committed intervention cells are unchanged, and all four
-nontrivial condensation candidates reopen under complete successor conduct. W3, cultivation of the
-lifted body, is the open deed.** M0–M3 remain blocked until W5 closes the indivisible Phoenix grade.
+2026-08-19/20 as the bounded hardware foundation; P0 returned as the independent ARM N baseline;
+W1 through W5 returned the whole lifted, cultivated, source-detached Phoenix first instance by
+2026-08-21. Deed M0 is next.** The former P1–P5 promotions were regraded 2026-08-20 by
+[THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md)
+and remain bounded ARM-N/lift-law provenance; W1–W5 are their authoritative whole-Phoenix
+replacements. W5's complete return is
+[THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -765,6 +761,17 @@ control. The first three share an explicit codebook/receiver correspondence. Rep
 interventions, shortest separators, held-out conduct, condensation remainder, exact work and
 calibrated utility; ablate every causing lifted family and cultivation delta. Close every grade row
 before moving CONSTRUCTION_STATE.md.
+
+**Returned 2026-08-21.** Four authenticated bodies, the complete 48-row intervention family, all
+five held-out kinds, the W2 no-factor remainder, two source-family causal-prefix ablations, one
+subject-disjoint cultivation-delta ablation, actual tower/overlay admissions, exact work and raw
+apparatus testimony returned in one content-bound grade/evidence pair. The first attempted control
+correctly refused an impossible body-wide subject invariance and was rederived as the typed split
+
+`AblationControlKind::{CausalPrefix, SubjectDisjoint}`. The authoritative record is
+[THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
+The complete receiver family still permits no nontrivial base condensation, so no compression
+factor is quoted. Phoenix advances; M0 is next.
 
 ### Deed M0 — mathematical source circulation
 

@@ -57,7 +57,7 @@ use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_work::ExactWork;
 use holonic_engine::front_passage::{
     factored_seals, CompiledPassage, DeedReceiver, EnteringRows, FrontPassage, FrontPassageObstruction, MaterialAdmission, MountedPopulation,
-    ResidentMaterial, SealedMidpointQuotient,
+    PooledMaterialAuxiliary, ResidentMaterial, SealedMidpointQuotient,
 };
 use holonic_engine::resident_section::{Dyadic, Positions, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, TransferCensus};
 use holonic_engine::streamed_standing::{GraphKey, Instantiation, KeyedInstantiations, StreamedCensus, StreamedCirculation};
@@ -387,9 +387,18 @@ pub fn circulate_cohort(
             Site::Layer(l) => Some(Species::of(l)),
             _ => None,
         });
-    let bands_elements = tower::SLIDING_HEAD / 2 + tower::FULL_HEAD / 2 + identity_site_species.map(|s| s.head_width() / 2).unwrap_or(0);
+    let mut auxiliaries = vec![
+        PooledMaterialAuxiliary::BandElements(tower::SLIDING_HEAD / 2),
+        PooledMaterialAuxiliary::BandElements(tower::FULL_HEAD / 2),
+        PooledMaterialAuxiliary::Positions(tokens.len()),
+        PooledMaterialAuxiliary::Positions(tokens.len()),
+    ];
+    if let Some(species) = identity_site_species { auxiliaries.push(PooledMaterialAuxiliary::BandElements(species.head_width() / 2)); }
+    if declarations.iter().any(|declaration| matches!(declaration.intervention, Intervention::PermuteReceiverHeads { .. } | Intervention::PermuteCarriedHeads { .. })) {
+        auxiliaries.push(PooledMaterialAuxiliary::Positions(tower::HEADS));
+    }
     let passage_zero = FrontPassage::new(surface, grain);
-    let prediction = passage_zero.predict_pooled_material(&shapes, &refills, bands_elements, 2 * tokens.len() + tower::HEADS);
+    let prediction = passage_zero.predict_pooled_material(&shapes, &refills, &auxiliaries);
     let admission = passage_zero.admit_material(&prediction).map_err(|o| format!("the cohort's pooled material refused: {}", describe(&o)))?;
 
     let identity_before = source.source_identity();

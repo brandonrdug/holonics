@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (171 deposits of 463)
+## 4 · The 2026-08 record line (172 deposits of 464)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -309,6 +309,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THE_STANDING_APPLICATION_MOUNTED_THE_CULTIVATED_BODY_AND_SIX_FRESH_CURRENTS_RETURNED_FROM_THE_CARD.md` | The standing application mounted the cultivated body, and six fresh currents returned from the card |
 | `2026-08-20_THE_TRANSPORT_DOES_NOT_CONDENSE_THE_TREE_FALLS_FOR_FREE_AND_NO_FACTOR_IS_QUOTED.md` | The transport does not condense, the tree falls for free, and no factor is quoted |
 | `2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md` | The whole foreign map crossed once and the native rest returned without its source |
+| `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
 
 ---
 
