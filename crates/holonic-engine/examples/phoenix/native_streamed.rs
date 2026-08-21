@@ -5,6 +5,7 @@
 //! fallback, or second circulation is introduced here.
 
 use std::fs::File;
+use std::ops::Deref;
 use std::os::unix::fs::FileExt;
 
 use holonic_engine::native_rest::MountedNativeRest;
@@ -14,16 +15,38 @@ use holonic_engine::streamed_standing::StagedRegion;
 use super::streamed::MaterialSource;
 
 /// A mounted native rest and the stable file handle opened from that authenticated occurrence.
-pub struct NativeMaterialSource {
-    pub rest: MountedNativeRest,
-    pub file: File,
+pub enum RestHandle<'a> {
+    Borrowed(&'a MountedNativeRest),
+    #[allow(dead_code)]
+    Owned(MountedNativeRest),
 }
 
-impl NativeMaterialSource {
-    pub fn open(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
+impl Deref for RestHandle<'_> {
+    type Target = MountedNativeRest;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Borrowed(rest) => rest,
+            Self::Owned(rest) => rest,
+        }
+    }
+}
+
+pub struct NativeMaterialSource<'a> {
+    pub rest: RestHandle<'a>,
+}
+
+impl<'a> NativeMaterialSource<'a> {
+    #[allow(dead_code)]
+    pub fn open(path: impl AsRef<std::path::Path>) -> Result<NativeMaterialSource<'static>, String> {
         let rest = MountedNativeRest::open(path).map_err(|error| error.to_string())?;
-        let file = rest.open_file().map_err(|error| error.to_string())?;
-        Ok(Self { rest, file })
+        Ok(NativeMaterialSource { rest: RestHandle::Owned(rest) })
+    }
+
+    /// Borrow one already authenticated mount. The retained mount file descriptor is used
+    /// directly; this path performs neither a second open nor a second content scan.
+    pub fn from_mounted(rest: &'a MountedNativeRest) -> Self {
+        Self { rest: RestHandle::Borrowed(rest) }
     }
 
     fn extent(
@@ -53,9 +76,9 @@ impl NativeMaterialSource {
     }
 }
 
-impl MaterialSource for NativeMaterialSource {
+impl MaterialSource for NativeMaterialSource<'_> {
     fn file(&self) -> Result<&File, String> {
-        Ok(&self.file)
+        Ok(self.rest.file())
     }
 
     fn file_octets(&self) -> Result<u64, String> {
@@ -122,7 +145,7 @@ impl MaterialSource for NativeMaterialSource {
             .checked_add(byte_offset)
             .ok_or_else(|| format!("{population} row offset overflow"))?;
         let mut bytes = vec![0u8; octets];
-        self.file
+        self.rest.file()
             .read_exact_at(&mut bytes, start)
             .map_err(|error| error.to_string())?;
         let words = bytes
@@ -133,7 +156,7 @@ impl MaterialSource for NativeMaterialSource {
     }
 
     fn occurrence(&self) -> &dyn OccurrenceWitness {
-        &self.rest
+        &*self.rest
     }
 
     fn source_identity(&self) -> String {

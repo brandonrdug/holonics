@@ -475,6 +475,121 @@ pub struct Contract {
     pub population: String,
 }
 
+/// A rank-one contraction through two resident factors, enacted as one resident front.
+///
+/// The device computes the same rounded interval as `Contract(v)` followed by `Contract(u)` on
+/// their common i64-section aperture, but never exposes an intermediate section.  Its v reduction
+/// is shared-wide; a scalar wider than i64 may lawfully be brought back into the final i64 output
+/// by the u exponent. `rank` is testimony, not a width hint: this owner admits exactly the declared
+/// rank-one shape and refuses any other factor geometry.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FactorizedContract {
+    pub u_population: String,
+    pub v_population: String,
+    pub rank: usize,
+}
+
+impl ResidentLaw for FactorizedContract {
+    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        self.entail(validation)
+    }
+    fn name(&self) -> &'static str {
+        "factorized-contract"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Transport
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        if !material.populations.contains_key(&self.u_population) {
+            return Err(self.u_population.clone());
+        }
+        if !material.populations.contains_key(&self.v_population) {
+            return Err(self.v_population.clone());
+        }
+        Ok(())
+    }
+    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+        self.uncapped_output_octaves(first(inputs, 0), material)
+    }
+    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_factorized_contract(
+            rows,
+            width,
+            octaves,
+            &material.populations[&self.u_population].readout,
+            &material.populations[&self.v_population].readout,
+            self.rank,
+        )
+    }
+    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+        vec![
+            map_range(&material.populations[&self.u_population].readout),
+            map_range(&material.populations[&self.v_population].readout),
+        ]
+    }
+    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+        surface.record_factorized_contract(
+            lane,
+            inputs[0],
+            &material.populations[&self.u_population].readout,
+            &material.populations[&self.v_population].readout,
+            shape,
+            out,
+        )
+    }
+}
+
+impl FactorizedContract {
+    /// The logical output-word bound of the direct factorized map. This is distinct from the
+    /// wider internal carrier admitted by `shape_factorized_contract`: successor laws see the
+    /// returned i64 section, not its shared-wide reduction coordinate.
+    pub fn uncapped_output_octaves(&self, input: i64, material: &ResidentMaterial<'_>) -> i64 {
+        let v = &material.populations[&self.v_population];
+        let u = &material.populations[&self.u_population];
+        input
+            .saturating_add(i64::from(v.mass_value_octaves))
+            .saturating_add(i64::from(u.mass_value_octaves))
+            .saturating_add(2)
+    }
+
+    /// The exact bound carried by the returned resident word into a successor occurrence. This
+    /// mirrors `FrontPassage`'s general word-bound projection without exposing its private
+    /// compilation machinery to the W3 pre-admission chart.
+    pub fn output_word_octaves(&self, input: u32, material: &ResidentMaterial<'_>) -> u32 {
+        u32::try_from(self.uncapped_output_octaves(i64::from(input), material).max(1))
+            .unwrap_or(u32::MAX)
+            .min(i64::BITS - 1)
+    }
+
+    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if self.rank != 1 {
+            return Err(unentailed("factorized-contract", "rank", self.rank, validation));
+        }
+        // Both factor names must be carried by authenticated testimony.  Contract's
+        // population entailment is deliberately reused so this fused law cannot acquire a
+        // weaker source boundary than its two constituent contractions.
+        let left = Contract { population: self.u_population.clone() }.entail(validation)?;
+        let right = Contract { population: self.v_population.clone() }.entail(validation)?;
+        let mut naming_slices = left.naming_slices;
+        naming_slices.extend(right.naming_slices);
+        naming_slices.sort();
+        naming_slices.dedup();
+        Ok(LawEntailment {
+            law: "factorized-contract",
+            parameters: vec![
+                ("u_population".to_owned(), self.u_population.clone(), "declared native shape [V, 1]".to_owned()),
+                ("v_population".to_owned(), self.v_population.clone(), "declared native shape [1, H]".to_owned()),
+                ("rank".to_owned(), "1".to_owned(), "the exact rank certificate carried by the W3 derivation".to_owned()),
+            ],
+            naming_slices,
+        })
+    }
+}
+
 impl ResidentLaw for Contract {
     fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
@@ -1089,6 +1204,31 @@ fn naming(law: &'static str, validation: &BindingValidation, required_any_of: &[
     Ok(naming)
 }
 
+/// Resolve a native rest's authenticated description as the naming face of a basic resident law.
+///
+/// Foreign source witnesses intentionally leave `BindingValidation::descriptions` empty: their
+/// `AuthoritativeDescription` testimony is not source testimony and is rejected/ignored at that
+/// witness seam. Therefore this branch cannot turn an unverified foreign string into entailment;
+/// it is only reachable after [`crate::native_occurrence::NativeOccurrence`] checked that the
+/// description was emitted in the native rest's metadata. An unrelated native description returns
+/// a refusal rather than falling through to the foreign slice rules.
+fn native_description_naming(validation: &BindingValidation, law: &'static str, required_any_of: &[&str], required_label: &'static str) -> Option<Result<Vec<String>, EntailmentRefusal>> {
+    if validation.descriptions.is_empty() {
+        return None;
+    }
+    let naming: Vec<String> = validation
+        .descriptions
+        .iter()
+        .filter(|description| required_any_of.iter().any(|token| description.contains(token)))
+        .cloned()
+        .collect();
+    Some(if naming.is_empty() {
+        Err(EntailmentRefusal::SliceDoesNotEntail { law, required_any_of: vec![required_label], offered: validation.descriptions.clone() })
+    } else {
+        Ok(naming)
+    })
+}
+
 fn testimony_of(validation: &BindingValidation) -> Vec<String> {
     let mut out: Vec<String> = validation.fields.iter().map(|(f, v)| format!("{f}={v}")).collect();
     out.extend(validation.shapes.iter().map(|(p, s)| format!("{p}:{s:?}")));
@@ -1248,6 +1388,15 @@ impl Contract {
     pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
         let attribute = attribute_of(&self.population).to_owned();
         let slices = slices_of(validation);
+        if let Some(descriptions) = native_description_naming(validation, "contract", &[attribute.as_str()], "the population's attribute in an authenticated native description") {
+            let naming_slices = descriptions?;
+            let shape = validation.shapes.iter().find(|(p, _)| *p == self.population).ok_or_else(|| unentailed("contract", "population shape", &self.population, validation))?;
+            return Ok(LawEntailment {
+                law: "contract",
+                parameters: vec![("population".to_owned(), self.population.clone(), format!("declared shape {:?} identified in the container header", shape.1))],
+                naming_slices,
+            });
+        }
         let naming_slices: Vec<String> = slices.iter().filter(|slice| slice.contains(&attribute)).cloned().collect();
         if naming_slices.is_empty() {
             return Err(EntailmentRefusal::SliceDoesNotEntail { law: "contract", required_any_of: vec!["the population's own attribute in a resolved slice"], offered: slices });
@@ -1361,6 +1510,9 @@ impl Hadamard {
 
 impl ReEntry {
     pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if let Some(descriptions) = native_description_naming(validation, "re-entry", &["re-entry", "reentry", "+"], "the re-entry action in an authenticated native description") {
+            return Ok(LawEntailment { law: "re-entry", parameters: Vec::new(), naming_slices: descriptions? });
+        }
         let naming_slices = naming("re-entry", validation, &["+"])?;
         Ok(LawEntailment { law: "re-entry", parameters: Vec::new(), naming_slices })
     }
@@ -1537,10 +1689,42 @@ mod tests {
         let gelu = GeluTanh { c1: Dyadic::of_binary64_bits(0x3fe9884533d43651).unwrap(), c2: Dyadic::of_binary64_bits(0x3fa6e4e26d4801f7).unwrap(), terms: SeriesAperture(14) };
         assert!(gelu.entailment(&validation(&["hidden_states = self.act_fn(hidden_states)"], &[("hidden_activation", "gelu_pytorch_tanh")], &[])).is_ok());
     }
+
+    #[test]
+    fn authenticated_native_descriptions_entail_the_basic_laws_without_authenticating_foreign_text() {
+        let mut native = validation(&[], &[], &[("layer.q_proj.weight", &[2, 2])]);
+        native.descriptions = vec!["q_proj: contract the continuing standing".to_owned()];
+        let contract = Contract { population: "layer.q_proj.weight".to_owned() };
+        assert!(contract.entailment(&native).is_ok());
+        let missing_shape = validation(&[], &[], &[]);
+        let mut missing_shape = missing_shape;
+        missing_shape.descriptions = native.descriptions.clone();
+        assert!(matches!(contract.entailment(&missing_shape), Err(EntailmentRefusal::ParameterUnentailed { parameter: "population shape", .. })));
+
+        let mut standing = validation(&[], &[], &[]);
+        standing.descriptions = vec!["standing: carry the retained section".to_owned()];
+        assert!(Standing { name: "retained".to_owned() }.entailment(&standing).is_ok());
+        let mut re_entry = validation(&[], &[], &[]);
+        re_entry.descriptions = vec!["re-entry: retained standing plus returned current".to_owned()];
+        assert!(ReEntry.entailment(&re_entry).is_ok());
+
+        let mut unrelated = native;
+        unrelated.descriptions = vec!["a different law with no q projection action".to_owned()];
+        assert!(matches!(contract.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
+        let mut foreign = validation(&["query_states = self.q_proj(hidden_states)"], &[], &[("layer.q_proj.weight", &[2, 2])]);
+        // Foreign witnesses do not authenticate AuthoritativeDescription, so the field is empty
+        // and the ordinary source slice remains the only route.
+        assert!(foreign.descriptions.is_empty());
+        foreign.descriptions.clear();
+        assert!(contract.entailment(&foreign).is_ok());
+    }
 }
 
 impl Standing {
     pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+        if let Some(descriptions) = native_description_naming(validation, "standing", &["standing"], "the standing action in an authenticated native description") {
+            return Ok(LawEntailment { law: "standing", parameters: vec![("name".to_owned(), self.name.clone(), "the resident standing an earlier passage released under this name".to_owned())], naming_slices: descriptions? });
+        }
         let naming_slices = naming("standing", validation, &["decoder_layer(", "shared_kv_states", "hidden_states", "inputs_embeds", "pooler_output", "last_hidden_state"])?;
         Ok(LawEntailment { law: "standing", parameters: vec![("name".to_owned(), self.name.clone(), "the resident standing an earlier passage released under this name".to_owned())], naming_slices })
     }

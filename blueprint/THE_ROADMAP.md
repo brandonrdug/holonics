@@ -326,11 +326,30 @@ structural or byte factor is quoted. QK, OV, and the two KV producer/consumer fa
 explicit separated structures. `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes
 the indivisible Phoenix phase.
 
-**The next deed is W3 — cultivation of the lifted body.** W3 joins material-founded morphology to
-this exact W2 predecessor and must return genuine held-out change, a resident derived adjoint/delta,
-source-detached remount, and targeted ablation restoring W2. W4 supplies source-detached card
-inference; W5 repeats dissection and closes the indivisible grade. Independent ARM N remains a
-control. M0–M3 remain blocked until W5 passes.
+**DEED W3 PASSED 2026-08-20 — the lifted body was cultivated, the factor word stayed on the card,
+and ablation returned the predecessor.** Authoritative record:
+[`research/records/2026-08-20_THE_LIFTED_BODY_WAS_CULTIVATED_THE_FACTOR_WORD_STAYED_ON_THE_CARD_AND_ABLATION_RETURNED_THE_PREDECESSOR.md`](../research/records/2026-08-20_THE_LIFTED_BODY_WAS_CULTIVATED_THE_FACTOR_WORD_STAYED_ON_THE_CARD_AND_ABLATION_RETURNED_THE_PREDECESSOR.md).
+Six lineage-separated material arms founded an exact rank-one native morphology over the W2 body.
+A detached child remounted it and returned strict development conduct, changed terminal-only
+held-out conduct, a bit-identical subject-disjoint control, a separated matched foil, codec-path
+equivalence, and exact no-op/targeted-ablation restoration of W2. Four resident overlays each
+returned four fronts, 11 graph nodes, one graph launch, zero refusals, and one terminal
+synchronization. The hardware correction is now explicit: the canonical factor gauge is unit
+target incidence plus a scaled receiver covector, and an internal factor coordinate is not an
+apparatus placement boundary unless a receiver exposes it. No carrier bound or compression factor
+was raised or invented. `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes the
+indivisible phase.
+
+**The next deed is W4 — source-detached card inference through the standing application.** Promote
+the returned native-rest and cultivated-tail owners out of the example cabinet into the production
+runtime; wire `eros phoenix infer` to accept unseen runtime material through the authenticated
+exterior codec; mount only the cultivated product directory and its addressed native predecessor;
+execute the complete card-resident circulation with the original foreign source absent; return the
+actual generated face, factor/reconstruction identity, exact semantic work, admission, apparatus
+telemetry and source-access audit; and prove a fresh process can repeat it. W4 may not recreate the
+example foreman inside the CLI, run ARM N as the alleged lift, replay semantics on the CPU, or call
+one fixed fixture “inference.” W5 repeats the four-body dissection and alone closes the indivisible
+grade. Independent ARM N remains a control. M0–M3 remain blocked until W5 passes.
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section

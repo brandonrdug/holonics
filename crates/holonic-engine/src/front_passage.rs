@@ -92,7 +92,7 @@ use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainSta
 use mount::{GraphCensus, Stream};
 
 pub use crate::resident_law::{
-    Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, GeluTanh, Hadamard, LawEntailment,
+    Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, FactorizedContract, GeluTanh, Hadamard, LawEntailment,
     MidpointQuotient, MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, SealedMidpointQuotient,
     Standing, WithdrawColumns, WithdrawRows,
 };
@@ -468,13 +468,28 @@ pub struct MaterialPlan {
     pub positions: usize,
 }
 
+/// A typed material plan for [`ResidentReadout::mount`] over already aligned exact `i64` words.
+/// Unlike [`MaterialPlan`], its ingress is eight octets per entry because no BF16 codeword mouth
+/// is involved. The plan carries maps only: bands and positions have separate typed mouths.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct AlignedMaterialPlan {
+    pub maps: Vec<(String, usize, usize)>,
+}
+
+impl AlignedMaterialPlan {
+    pub fn maps(maps: Vec<(String, usize, usize)>) -> Self {
+        Self { maps }
+    }
+}
+
 /// The prediction of the material deed: what mounting the plan will occupy and move.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MaterialPrediction {
-    /// Per map: name, resident octets (the aligned i64 form), stored octets crossing the bus.
+    /// Per map: name, resident octets, and source octets crossing the bus.
     pub maps: Vec<(String, u64, u64)>,
     pub resident_octets: u64,
-    /// Stored octets crossing the bus: two per entry.
+    /// Source octets crossing the bus. The BF16 mouth contributes two per entry; the aligned exact
+    /// mouth contributes eight per entry.
     pub ingress_octets: u64,
     /// The transient peak beyond the resident: the largest map's stored staging while it aligns.
     pub transient_peak_octets: u64,
@@ -489,6 +504,16 @@ pub struct MaterialAdmission {
     pub prediction: MaterialPrediction,
     pub coordinates: Vec<CoordinateAdmission>,
     pub free_octets_at_admission: u64,
+}
+
+/// A semantic comparison refusal for two material admissions. Finite ceiling magnitudes and free
+/// octets are apparatus readings; the prediction, required values, admission verdicts and ceiling
+/// species/declarations are the consequence that must remain stable.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MaterialConsequenceMismatch {
+    Prediction,
+    CoordinateCount,
+    Coordinate { index: usize, name: &'static str, field: &'static str },
 }
 
 impl MaterialAdmission {
@@ -507,6 +532,41 @@ impl MaterialAdmission {
             .iter()
             .map(|(name, predicted, _)| (name.clone(), *predicted, material.populations.get(name).map(|p| p.readout.resident_octets() as u64).unwrap_or(0)))
             .collect()
+    }
+
+    /// Compare the returned material consequence while retaining the apparatus frame separately.
+    /// Bounded ceiling magnitudes and `free_octets_at_admission` may vary between runs; every
+    /// required/admitted value and every ceiling kind/declarer or unbounded reason must not.
+    pub fn consequence_equivalent(&self, other: &Self) -> Result<(), MaterialConsequenceMismatch> {
+        if self.prediction != other.prediction {
+            return Err(MaterialConsequenceMismatch::Prediction);
+        }
+        if self.coordinates.len() != other.coordinates.len() {
+            return Err(MaterialConsequenceMismatch::CoordinateCount);
+        }
+        for (index, (left, right)) in self.coordinates.iter().zip(&other.coordinates).enumerate() {
+            if left.name != right.name {
+                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "name" });
+            }
+            if left.required != right.required {
+                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "required" });
+            }
+            if left.admitted != right.admitted {
+                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "admitted" });
+            }
+            match (&left.ceiling, &right.ceiling) {
+                (Ceiling::Bounded { declared_by: left_by, .. }, Ceiling::Bounded { declared_by: right_by, .. }) if left_by == right_by => {}
+                (Ceiling::Unbounded { because: left_because, constrained_by: left_by }, Ceiling::Unbounded { because: right_because, constrained_by: right_by }) if left_because == right_because && left_by == right_by => {}
+                (Ceiling::Bounded { .. }, Ceiling::Unbounded { .. }) | (Ceiling::Unbounded { .. }, Ceiling::Bounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "ceiling-species" }),
+                (Ceiling::Bounded { .. }, Ceiling::Bounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "ceiling-declarer" }),
+                (Ceiling::Unbounded { .. }, Ceiling::Unbounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "unbounded-reason" }),
+            }
+        }
+        Ok(())
+    }
+
+    pub fn consequence_equal(&self, other: &Self) -> bool {
+        self.consequence_equivalent(other).is_ok()
     }
 }
 
@@ -833,6 +893,25 @@ impl<'chart> FrontPassage<'chart> {
             prediction.ingress_octets += octets;
             prediction.allocations += 1;
             prediction.charged_octets += rounded_to(octets, grain);
+        }
+        prediction
+    }
+
+    /// Predict the aligned exact-material mouth before any resident allocation. Each map's
+    /// ingress is its aligned `i64` body (`8` octets per entry), its device transient is zero (the
+    /// mouth allocates the resident body directly), and the same charge law as BF16 applies.
+    /// `predict_material` remains the stored-BF16 mouth and is intentionally unchanged.
+    pub fn predict_aligned_material(&self, plan: &AlignedMaterialPlan) -> MaterialPrediction {
+        let grain = self.surface.allocation_grain();
+        let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
+        for (name, rows, width) in &plan.maps {
+            let entries = (*rows as u64).saturating_mul(*width as u64);
+            let octets = entries.saturating_mul(8);
+            prediction.maps.push((name.clone(), octets, octets));
+            prediction.resident_octets = prediction.resident_octets.saturating_add(octets);
+            prediction.ingress_octets = prediction.ingress_octets.saturating_add(octets);
+            prediction.allocations = prediction.allocations.saturating_add(1);
+            prediction.charged_octets = prediction.charged_octets.saturating_add(rounded_to(octets, grain));
         }
         prediction
     }
@@ -2470,6 +2549,42 @@ mod tests {
                 assert!(reads.iter().all(|r| footprint.reads.contains(r)));
             }
         }
+    }
+
+    #[test]
+    fn aligned_material_prediction_counts_eight_octet_ingress_and_reconciles() {
+        let Some((readout, surface)) = surface() else { return };
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let plan = AlignedMaterialPlan::maps(vec![("aligned-factor".to_owned(), 2, 2)]);
+        let prediction = passage.predict_aligned_material(&plan);
+        assert_eq!(prediction.resident_octets, 32);
+        assert_eq!(prediction.ingress_octets, 32, "aligned i64 words cross at eight octets each");
+        assert_eq!(prediction.transient_peak_octets, 0);
+        assert_eq!(prediction.allocations, 1);
+        let admitted = passage.admit_material(&prediction).expect("aligned material admits");
+        assert!(admitted.is_admitted());
+        let aligned = crate::embedding_fiber::AlignedMaterial { entries: vec![1, 2, 3, 4], exponent: 0, entry_octaves: 2, negatives: 0 };
+        let mounted_map = readout.mount(&aligned, 2).expect("aligned mount");
+        let mut mounted = ResidentMaterial::empty();
+        mounted.populations.insert("aligned-factor".to_owned(), MountedPopulation { readout: mounted_map, mass_value_octaves: 3 });
+        assert_eq!(admitted.reconcile(&mounted), vec![("aligned-factor".to_owned(), 32, 32)]);
+    }
+
+    #[test]
+    fn material_admission_consequence_equivalence_separates_capacity_from_drift() {
+        let prediction = MaterialPrediction { maps: vec![("m".to_owned(), 32, 8)], resident_octets: 32, ingress_octets: 8, transient_peak_octets: 0, allocations: 1, charged_octets: 32, allocation_grain: 32 };
+        let coordinate = CoordinateAdmission { name: "material-charged-octets", required: BigUint::from(32u32), ceiling: Ceiling::Bounded { ceiling: BigUint::from(64u32), declared_by: "mounted device free memory" }, admitted: true };
+        let mut base = MaterialAdmission { prediction: prediction.clone(), coordinates: vec![coordinate.clone()], free_octets_at_admission: 1_000 };
+        let mut varied_capacity = base.clone();
+        varied_capacity.free_octets_at_admission = 2_000;
+        if let Ceiling::Bounded { ceiling, .. } = &mut varied_capacity.coordinates[0].ceiling { *ceiling = BigUint::from(128u32); }
+        assert!(base.consequence_equivalent(&varied_capacity).is_ok(), "finite capacity magnitude is apparatus testimony, not semantic consequence");
+        base.coordinates[0].required = BigUint::from(31u32);
+        assert!(matches!(base.consequence_equivalent(&varied_capacity), Err(MaterialConsequenceMismatch::Coordinate { field: "required", .. })));
+        let mut unbounded_drift = varied_capacity.clone();
+        unbounded_drift.coordinates[0].ceiling = Ceiling::Unbounded { because: "test aperture", constrained_by: vec!["device"] };
+        assert!(matches!(varied_capacity.consequence_equivalent(&unbounded_drift), Err(MaterialConsequenceMismatch::Coordinate { field: "ceiling-species", .. })));
+        let _ = coordinate;
     }
 
     /// A standing released from one passage enters the next as a `Standing` construction: the carry

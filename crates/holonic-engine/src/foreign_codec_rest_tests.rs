@@ -1,5 +1,8 @@
 use super::schema::digest_bytes;
 use super::*;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static TEST_NONCE: AtomicU64 = AtomicU64::new(0);
 
 fn source() -> SourceAssetIdentity {
     SourceAssetIdentity {
@@ -198,6 +201,11 @@ fn arbitrary_native_permutation_has_indexed_lookup() {
     assert_eq!(rest.native_surface(1).unwrap(), "C");
     assert_eq!(rest.native_surface(2).unwrap(), "A");
     assert_eq!(rest.source_id(0), Some(1));
+    assert_eq!(rest.native_id(0).unwrap(), 2);
+    assert_eq!(rest.native_id(1).unwrap(), 0);
+    assert_eq!(rest.native_id(2).unwrap(), 1);
+    assert_eq!(rest.read_source(9), SourceRead::Open { source_id: 9, extent: 3, represented: 3 });
+    assert!(matches!(rest.native_id(9), Err(RestError::MissingSourceId { id: 9, extent: 3 })));
 }
 
 #[test]
@@ -236,12 +244,13 @@ fn mount_rejects_descriptor_identity_without_companion_bytes() {
 #[test]
 fn companion_codec_bytes_survive_source_deletion_and_mount() {
     let suffix = format!(
-        "{}-{}",
+        "{}-{}-{}",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_nanos()
+            .as_nanos(),
+        TEST_NONCE.fetch_add(1, Ordering::Relaxed)
     );
     let tokenizer_path = std::env::temp_dir().join(format!("phoenix-tokenizer-{suffix}.json"));
     let config_path = std::env::temp_dir().join(format!("phoenix-tokenizer-config-{suffix}.json"));
@@ -291,12 +300,9 @@ fn committed_station_closure_asset_mounts_source_detached() {
             .windows(2)
             .all(|pair| pair[1].source_id == pair[0].source_id + 1)
     );
-    assert!(
-        rest.entries
-            .iter()
-            .all(|entry| entry.source_id == entry.native_id
-                && entry.source_piece == entry.native_surface)
-    );
+    assert!(rest.entries.iter().all(|entry| {
+        rest.native_id(entry.source_id).unwrap() == entry.native_id
+    }));
     assert_eq!(rest.native_surface(7_001).unwrap(), "▁France");
     assert_eq!(
         rest.codebook_sha256,

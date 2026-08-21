@@ -52,6 +52,21 @@ pub enum NativeRead<'a> {
     },
 }
 
+/// A source-address read is either an exact native address or an explicit retained fibre.
+///
+/// The source and native address spaces are distinct even when a particular W1 asset happens
+/// to seal an identity mapping.  Keeping this read separate from [`NativeRead`] prevents a
+/// missing source row from being mistaken for native/source equality.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SourceRead {
+    NativeId(u32),
+    Open {
+        source_id: u32,
+        extent: u32,
+        represented: u32,
+    },
+}
+
 impl ExteriorCodebookRest {
     /// Seal the caller's already-derived correspondence. The owner does not read tokenizer JSON
     /// or invent a surface transform; the caller supplies each native surface explicitly.
@@ -609,6 +624,30 @@ impl ExteriorCodebookRest {
             .ok()
             .map(|index| &self.entries[self.native_index[index] as usize])
             .map(|entry| entry.source_id)
+    }
+
+    /// Read the native address corresponding to one source address.  An unrepresented source
+    /// address remains an open fibre rather than being guessed to equal its numeric address.
+    pub fn read_source(&self, source_id: u32) -> SourceRead {
+        self.entries
+            .binary_search_by_key(&source_id, |entry| entry.source_id)
+            .ok()
+            .map(|index| SourceRead::NativeId(self.entries[index].native_id))
+            .unwrap_or(SourceRead::Open {
+                source_id,
+                extent: self.vocabulary_extent,
+                represented: self.entries.len() as u32,
+            })
+    }
+
+    /// Exact source-to-native correspondence for a represented source address.
+    pub fn native_id(&self, source_id: u32) -> Result<u32, RestError> {
+        match self.read_source(source_id) {
+            SourceRead::NativeId(native_id) => Ok(native_id),
+            SourceRead::Open { source_id, extent, .. } => {
+                Err(RestError::MissingSourceId { id: source_id, extent })
+            }
+        }
     }
 
     fn frame(hasher: &mut Sha256, bytes: &[u8]) {

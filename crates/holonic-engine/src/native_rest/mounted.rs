@@ -20,6 +20,36 @@ pub struct MountedNativeRest {
     wire: NativeRestWire,
     payload_offset: u64,
     identity: FileIdentity,
+    content_identity: ContentIdentity,
+    file: std::fs::File,
+}
+
+/// Content testimony captured while the mounted rest's payload is already being authenticated.
+/// It is deliberately neutral so product owners can bind it without reopening the file.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContentIdentity {
+    pub sha256: String,
+    pub extent: u64,
+}
+
+impl ContentIdentity {
+    /// Hash one exterior file occurrence in bounded chunks. Product owners consume this neutral
+    /// testimony and convert it into their wire-facing identity without carrying another hasher.
+    pub fn from_path(path: impl AsRef<Path>) -> std::io::Result<Self> {
+        let mut file = std::fs::File::open(path)?;
+        let mut hasher = Sha256::new();
+        let mut extent = 0u64;
+        let mut chunk = [0u8; 1 << 20];
+        loop {
+            let count = file.read(&mut chunk)?;
+            if count == 0 {
+                break;
+            }
+            hasher.update(&chunk[..count]);
+            extent = extent.saturating_add(count as u64);
+        }
+        Ok(Self { sha256: format!("{:x}", hasher.finalize()), extent })
+    }
 }
 
 /// A zero-copy staging locator. The offsets are absolute file offsets, while shape and dtype are
@@ -38,6 +68,7 @@ impl std::fmt::Debug for MountedNativeRest {
         f.debug_struct("MountedNativeRest")
             .field("path", &self.path)
             .field("payload_offset", &self.payload_offset)
+            .field("content_identity", &self.content_identity)
             .finish()
     }
 }
@@ -48,24 +79,29 @@ impl MountedNativeRest {
         let path = path.as_ref().to_owned();
         let mut file =
             std::fs::File::open(&path).map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
+        let mut content_hasher = Sha256::new();
         let mut prefix = vec![0u8; NATIVE_REST_PREFIX.len()];
         file.read_exact(&mut prefix)
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
+        content_hasher.update(&prefix);
         if prefix != NATIVE_REST_PREFIX {
             return Err(NativeRestRefusal::WirePrefix { opened: prefix });
         }
         let mut len = [0u8; 8];
         file.read_exact(&mut len)
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
+        content_hasher.update(len);
         let manifest_len = usize::try_from(u64::from_le_bytes(len)).map_err(|_| {
             NativeRestRefusal::WireDecode("manifest extent exceeds process".to_owned())
         })?;
         let mut expected_digest = [0u8; MANIFEST_DIGEST_OCTETS];
         file.read_exact(&mut expected_digest)
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
+        content_hasher.update(expected_digest);
         let mut manifest = vec![0u8; manifest_len];
         file.read_exact(&mut manifest)
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
+        content_hasher.update(&manifest);
         validate_manifest_digest(&expected_digest, &manifest)?;
         let wire: NativeRestWire = serde_json::from_slice(&manifest)
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
@@ -82,7 +118,7 @@ impl MountedNativeRest {
         validate_manifest_shape(&wire, payload_len)?;
         file.seek(std::io::SeekFrom::Start(payload_offset))
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
-        let actual = digest_stream(&mut file, payload_len)?;
+        let (actual, content_sha256) = digest_stream_dual(&mut file, payload_len, content_hasher)?;
         if actual != wire.payload_sha256 {
             return Err(NativeRestRefusal::PayloadDigest {
                 expected: wire.payload_sha256.clone(),
@@ -94,6 +130,8 @@ impl MountedNativeRest {
             wire,
             payload_offset,
             identity,
+            content_identity: ContentIdentity { sha256: content_sha256, extent: file_len },
+            file,
         })
     }
 
@@ -115,16 +153,16 @@ impl MountedNativeRest {
     /// scheduler or executor, only the exterior file handle.
     pub fn open_file(&self) -> Result<std::fs::File, NativeRestRefusal> {
         self.verify_still()?;
-        let file = std::fs::File::open(&self.path)
-            .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
-        let now = FileIdentity::of(&file, self.path.to_string_lossy().as_ref())
+        let now = FileIdentity::of(&self.file, self.path.to_string_lossy().as_ref())
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
         if now != self.identity {
             return Err(NativeRestRefusal::WireDecode(
                 "mounted native rest file occurrence drifted".to_owned(),
             ));
         }
-        Ok(file)
+        self.file
+            .try_clone()
+            .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))
     }
 
     pub fn total_file_octets(&self) -> u64 {
@@ -133,6 +171,15 @@ impl MountedNativeRest {
 
     pub fn payload_offset(&self) -> u64 {
         self.payload_offset
+    }
+
+    pub fn content_identity(&self) -> &ContentIdentity {
+        &self.content_identity
+    }
+
+    /// The descriptor-authenticated file handle retained by the mount.
+    pub fn file(&self) -> &std::fs::File {
+        &self.file
     }
 
     /// Resolve one exact population to its absolute file extent and authenticated tensor shape.
@@ -664,10 +711,11 @@ fn intervention_only(testimony: &[SourceTestimony]) -> bool {
             .all(|testimony| matches!(testimony, SourceTestimony::Intervention { .. }))
 }
 
-fn digest_stream(
+fn digest_stream_dual(
     file: &mut std::fs::File,
     mut remaining: u64,
-) -> Result<String, NativeRestRefusal> {
+    mut content_hasher: Sha256,
+) -> Result<(String, String), NativeRestRefusal> {
     let mut hasher = Sha256::new();
     let mut chunk = vec![0u8; 1 << 20];
     while remaining > 0 {
@@ -675,7 +723,8 @@ fn digest_stream(
         file.read_exact(&mut chunk[..take])
             .map_err(|e| NativeRestRefusal::WireDecode(e.to_string()))?;
         hasher.update(&chunk[..take]);
+        content_hasher.update(&chunk[..take]);
         remaining -= take as u64;
     }
-    Ok(format!("{:x}", hasher.finalize()))
+    Ok((format!("{:x}", hasher.finalize()), format!("{:x}", content_hasher.finalize())))
 }

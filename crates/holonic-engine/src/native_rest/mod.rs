@@ -12,7 +12,7 @@ mod types;
 
 pub use crate::operation_correspondence::NativeGraphIdentity;
 pub use manifest::{NativePayloadDescriptor, NativePopulationDescriptor, NativeRest};
-pub use mounted::{MountedNativeRest, MountedPopulationExtent};
+pub use mounted::{ContentIdentity, MountedNativeRest, MountedPopulationExtent};
 pub use types::{
     NativeLawIdentity, NativeOperation, NativeOwnerIdentity, NativePopulation,
     NativePopulationPayload, NativeRestInput, NativeRestRefusal, NativeSourceIdentity,
@@ -27,4 +27,4 @@ pub const NATIVE_REST_PREFIX: &[u8] = b"HOLONIC-NATIVE-REST\0\x02";
 pub const MANIFEST_DIGEST_OCTETS: usize = 32;
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;

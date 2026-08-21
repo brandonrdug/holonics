@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::super::*;
     use crate::ported_operation::{
         CandidateDiagrams, OperationSpecies, PortedOperationComplex, SourceTestimony,
@@ -12,7 +12,7 @@ mod tests {
     use std::collections::BTreeMap;
     use std::io::Cursor;
 
-    fn fixture() -> NativeRestInput {
+    pub(crate) fn fixture() -> NativeRestInput {
         let tokenizer_json = br#"{"model":"tiny"}"#.to_vec();
         let tokenizer_config_json = br#"{"tiny":true}"#.to_vec();
         let digest = |bytes: &[u8]| format!("{:x}", Sha256::digest(bytes));
@@ -137,6 +137,13 @@ mod tests {
             )
             .unwrap(),
         }
+    }
+
+    pub(crate) fn fixture_bytes() -> Vec<u8> {
+        NativeRest::seal(fixture())
+            .unwrap()
+            .encode_native_bytes()
+            .unwrap()
     }
 
     #[test]
@@ -386,6 +393,9 @@ mod tests {
         NativeRest::seal_streamed(input, &mut output).unwrap();
         drop(output);
         let mounted = MountedNativeRest::open(&rest_path).unwrap();
+        let whole = std::fs::read(&rest_path).unwrap();
+        assert_eq!(mounted.content_identity().extent, whole.len() as u64);
+        assert_eq!(mounted.content_identity().sha256, format!("{:x}", Sha256::digest(&whole)));
         assert!(mounted.total_file_octets() > mounted.payload_offset());
         let extent = mounted.population_extent("layer.weight").unwrap();
         assert_eq!(extent.start, mounted.payload_offset());

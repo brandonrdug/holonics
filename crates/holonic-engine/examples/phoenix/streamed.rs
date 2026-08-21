@@ -52,12 +52,20 @@ use holonic_engine::front_passage::{
     factored_seals, DeedReceiver, EnteringRows, FrontPassage, FrontPassageObstruction, MaterialAdmission, MountedPopulation, ResidentMaterial,
     SealedMidpointQuotient,
 };
+use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::resident_section::{Dyadic, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, TransferCensus};
 use holonic_engine::source_occurrence::{OccurrenceWitness, RegionIdentity, SourceOccurrence};
 use holonic_engine::streamed_standing::{GraphKey, SlotShape, StagedRegion, StreamedCensus, StreamedCirculation};
 
 use super::resident_layer::Source;
 use super::tower::{self, Entry, Intervention, KvRole, Species};
+
+#[path = "cultivation_overlay.rs"]
+pub mod cultivation_overlay;
+#[path = "streamed_cultivation.rs"]
+pub mod streamed_cultivation;
+pub use streamed_cultivation::{CultivatedCirculated, CultivationRequest};
+use streamed_cultivation::{digest_face, CirculationOutput, OverlayExecutionIdentity};
 
 /// The two pool slots the source layers alternate between, and the third the final deed uses.
 pub const SLOTS: usize = 3;
@@ -359,6 +367,8 @@ pub struct Circulated {
     /// **The §5.4 key this circulation's executables were bound under.** Founded, stated, and
     /// UNEXERCISED: no cache exists here and no reuse is claimed.
     pub graph_key: GraphKey,
+    pub final_normed_bound: u32,
+    pub potential_bound: u32,
 }
 
 /// One obstruction, said whole. The same shape `phoenix/conduct.rs` prints, restated here so the
@@ -395,7 +405,58 @@ pub fn scalar_word_of(file: &std::fs::File, region: &StagedRegion) -> Result<u16
 #[allow(clippy::too_many_arguments)]
 pub fn circulate(
     surface: &'static ResidentSurface<'static>,
-    _readout: &'static ResidentReadout,
+    readout: &'static ResidentReadout,
+    source: &mut dyn MaterialSource,
+    tokens: &[usize],
+    grain: ResidentGrain,
+    terms: SeriesAperture,
+    chart: tower::Chart,
+    fuse: bool,
+    limit: usize,
+    poison: bool,
+) -> Result<Circulated, String> {
+    match circulate_inner(surface, readout, source, tokens, grain, terms, chart, fuse, limit, poison, None)? {
+        CirculationOutput::Base(base) => Ok(base),
+        CirculationOutput::Cultivated(_) => Err("the no-overlay circulation returned a cultivated tail".to_owned()),
+    }
+}
+
+/// W3's separate typed entry. It conducts the complete W2 tower and adds exactly one overlay deed
+/// to the same conducting stream before the sole terminal synchronization.
+#[allow(clippy::too_many_arguments)]
+pub fn circulate_cultivated<'request>(
+    surface: &'static ResidentSurface<'static>,
+    readout: &'static ResidentReadout,
+    source: &mut dyn MaterialSource,
+    tokens: &[usize],
+    grain: ResidentGrain,
+    terms: SeriesAperture,
+    chart: tower::Chart,
+    fuse: bool,
+    request: &'request CultivationRequest<'request>,
+) -> Result<CultivatedCirculated, String> {
+    match circulate_inner(
+        surface,
+        readout,
+        source,
+        tokens,
+        grain,
+        terms,
+        chart,
+        fuse,
+        tower::LAYERS,
+        false,
+        Some(request),
+    )? {
+        CirculationOutput::Cultivated(cultivated) => Ok(cultivated),
+        CirculationOutput::Base(_) => Err("the cultivated circulation returned no overlay tail".to_owned()),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn circulate_inner<'request>(
+    surface: &'static ResidentSurface<'static>,
+    readout: &'static ResidentReadout,
     source: &mut dyn MaterialSource,
     tokens: &[usize],
     grain: ResidentGrain,
@@ -408,7 +469,8 @@ pub fn circulate(
     // value, so the mouth refuses it on the card and every successor in that deed carries it.
     limit: usize,
     poison: bool,
-) -> Result<Circulated, String> {
+    cultivation: Option<&'request CultivationRequest<'request>>,
+) -> Result<CirculationOutput, String> {
     let clock = Instant::now();
     let census_before = surface.census();
     let passage = FrontPassage::new(surface, grain);
@@ -478,6 +540,22 @@ pub fn circulate(
         layer_scalars.push(Dyadic::of_bfloat16_bits(scalar_word_of(file, region)?).map_err(|e| e.to_string())?);
     }
 
+    // The W3 candidate, exact factor residency, and pure overlay work are admitted before the
+    // first W2 launch; the final bind must agree with this receipt after h and y0 are released.
+    let (mut overlay_material, pre_admission) = if let Some(request) = cultivation {
+        let (material, receipt) = streamed_cultivation::prepare(
+            surface,
+            readout,
+            &passage,
+            request,
+            tokens.len(),
+            grain,
+        )?;
+        (Some(material), Some(receipt))
+    } else {
+        (None, None)
+    };
+
     // ---------------------------------------------------------------------------------------
     // the circulation
     // ---------------------------------------------------------------------------------------
@@ -490,6 +568,13 @@ pub fn circulate(
     let mut tower_work = ExactWork::nothing();
     let mut peak_charged_octets = 0u64;
     let mut deed_launches = 0u64;
+    let mut overlay_bound: Option<cultivation_overlay::OverlayPassage<'static>> = None;
+    let mut overlay_census: Option<TransferCensus> = None;
+    let mut overlay_work: Option<ExactWork> = None;
+    let mut overlay_apparatus: Option<holonic_engine::front_passage::ApparatusPrediction> = None;
+    let mut overlay_admission: Option<holonic_engine::front_passage::DeedAdmission> = None;
+    let mut overlay_execution: Option<OverlayExecutionIdentity> = None;
+    let mut overlay_return: Option<holonic_engine::front_passage::PassageReturn> = None;
 
     // **The pipeline.** The staged read runs two segments ahead of the mount and the crossing one
     // ahead, so segment k+1's copy is issued IMMEDIATELY after segment k's graph is launched and
@@ -679,6 +764,14 @@ pub fn circulate(
     let bound = passage_final
         .bind(&founded.complex, &founded.realization, &material, source.occurrence(), &receiver, Some(&admission), terminal)
         .map_err(|o| format!("the final deed refused at bind: {}", describe(&o)))?;
+    let final_normed_bound = *bound
+        .octave_field
+        .get(&OccurrencePort::output(founded.returns[tower::FINAL_NORMED], 0))
+        .ok_or("W2 final normed bound is absent")?;
+    let potential_bound = *bound
+        .octave_field
+        .get(&OccurrencePort::output(founded.returns[tower::POTENTIAL], 0))
+        .ok_or("W2 potential bound is absent")?;
     let bind_wall_s = bind_clock.elapsed().as_secs_f64();
     peak_charged_octets = peak_charged_octets.max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
     let (graph, _) = bound.graph();
@@ -720,6 +813,59 @@ pub fn circulate(
     }
     bound_deeds.push((bound, census_at_launch, named));
 
+    // --- W3 tail: release h and y0 from the final W2 deed, then launch once on the same stream ---
+    if let Some(request) = cultivation {
+        let (final_bound, _, final_named) = bound_deeds.last_mut().ok_or("W2 final deed is absent")?;
+        let h_event = *final_named.get(tower::FINAL_NORMED).ok_or("W2 final normed return is absent")?;
+        let y0_event = *final_named.get(tower::POTENTIAL).ok_or("W2 potential return is absent")?;
+        let (h, h_bound) = final_bound.release_section(h_event).ok_or("W2 final normed standing could not be released")?;
+        let (y0, y0_bound) = final_bound.release_section(y0_event).ok_or("W2 base potential could not be released")?;
+        if h_bound != request.input_bound || y0_bound != request.predecessor_bound {
+            return Err(format!(
+                "W3 bound drift: requested h/y0 {}/{} but W2 released {}/{}",
+                request.input_bound, request.predecessor_bound, h_bound, y0_bound
+            ));
+        }
+        let overlay_material_ref = overlay_material.as_mut().ok_or("W3 factor material is absent")?;
+        cultivation_overlay::carry_standing(overlay_material_ref, "phoenix.overlay.h", h, h_bound);
+        cultivation_overlay::carry_standing(overlay_material_ref, "phoenix.overlay.y0", y0, y0_bound);
+        cultivation_overlay::inspect_extents(request.candidate, overlay_material_ref)?;
+        let pre = pre_admission.as_ref().ok_or("W3 pre-admission receipt is absent")?;
+        let overlay = request.candidate.bind(
+            surface,
+            overlay_material_ref,
+            request.witness,
+            &receiver,
+            Some(&pre.material_admission),
+            "phoenix.overlay.h",
+            "phoenix.overlay.y0",
+            request.input_bound,
+            grain,
+            Some(request.derivation),
+        ).map_err(|error| format!("W3 overlay refused at bind: {}", describe(&error)))?;
+        if overlay.passage.deed_prediction != pre.overlay_work {
+            return Err(format!(
+                "W3 overlay work disagrees with its pre-admission prediction: predicted={:?}, compiled={:?}",
+                pre.overlay_work,
+                overlay.passage.deed_prediction,
+            ));
+        }
+        if u64::from(overlay.passage.apparatus_prediction.captured_launches) != pre.overlay_launches {
+            return Err("W3 overlay launch count disagrees with its pre-admission prediction".to_owned());
+        }
+        overlay_work = Some(overlay.passage.deed_prediction.clone());
+        overlay_apparatus = Some(overlay.passage.apparatus_prediction.clone());
+        overlay_admission = Some(overlay.passage.admission.clone());
+        overlay_execution = Some(streamed_cultivation::execution_identity(&overlay));
+        overlay_census = Some(
+            overlay
+                .passage
+                .launch_on(&surface.mode(), circulation.conducting())
+                .map_err(|error| format!("W3 overlay refused at launch: {}", describe(&error)))?,
+        );
+        overlay_bound = Some(overlay);
+    }
+
     let census_at_loop_close = surface.census();
     let loop_wall_s = loop_clock.elapsed().as_secs_f64();
 
@@ -757,7 +903,7 @@ pub fn circulate(
                 }
             }
         }
-        if at + 1 == bound_deeds.len() {
+        if at + 1 == bound_deeds.len() && cultivation.is_none() {
             match bound.read_section(&returned, named[tower::FINAL_NORMED]) {
                 Ok(read) => final_normed = read,
                 Err(obstruction) => terminal_refusal = Some(describe(&obstruction)),
@@ -767,6 +913,35 @@ pub fn circulate(
                 Err(obstruction) => terminal_refusal = Some(describe(&obstruction)),
             }
         }
+    }
+
+    let mut cultivated_potential = Vec::new();
+    let mut base_potential_digest = String::new();
+    if cultivation.is_some() {
+        let candidate_material = overlay_material.as_ref().ok_or("W3 factor material disappeared")?;
+        let h = &candidate_material
+            .standings
+            .get("phoenix.overlay.h")
+            .ok_or("W3 h standing disappeared")?
+            .0;
+        let y0 = &candidate_material
+            .standings
+            .get("phoenix.overlay.y0")
+            .ok_or("W3 y0 standing disappeared")?
+            .0;
+        final_normed = surface.read_out(h).map_err(|error| format!("W3 h return: {error}"))?;
+        potential = surface.read_out(y0).map_err(|error| format!("W3 base potential return: {error}"))?;
+        base_potential_digest = digest_face(&potential, grain);
+        let overlay = overlay_bound.as_ref().ok_or("W3 overlay passage disappeared")?;
+        let returned = overlay
+            .passage
+            .returned(overlay_census.take().ok_or("W3 overlay census is absent")?)
+            .map_err(|error| format!("W3 overlay did not return: {}", describe(&error)))?;
+        overlay_return = Some(returned.clone());
+        cultivated_potential = overlay
+            .passage
+            .read_terminal(&returned)
+            .map_err(|error| format!("W3 cultivated potential return: {}", describe(&error)))?;
     }
 
     // The container has not moved under the deed.
@@ -821,7 +996,7 @@ pub fn circulate(
 
     let census_after = surface.census();
     circulation.close();
-    Ok(Circulated {
+    let base = Circulated {
         tokens: tokens.to_vec(),
         segments: receipts,
         potential,
@@ -840,5 +1015,51 @@ pub fn circulate(
         obstructions,
         terminal_refusal,
         graph_key,
-    })
+        final_normed_bound,
+        potential_bound,
+    };
+    if cultivation.is_some() {
+        let overlay_work = overlay_work.ok_or("W3 overlay work receipt is absent")?;
+        let overlay_apparatus = overlay_apparatus.ok_or("W3 overlay apparatus receipt is absent")?;
+        let overlay_admission = overlay_admission.ok_or("W3 overlay deed admission receipt is absent")?;
+        let overlay_execution = overlay_execution.ok_or("W3 overlay execution identity is absent")?;
+        let overlay_return = overlay_return.ok_or("W3 overlay passage return receipt is absent")?;
+        let pre_admission = pre_admission.ok_or("W3 pre-admission receipt is absent")?;
+        let overlay_kernels_written = overlay_return
+            .fronts
+            .iter()
+            .all(|front| front.readings.iter().all(|reading| reading.measured.written && reading.measured.refused == 0)
+                && front.couplings.iter().all(|coupling| coupling.written && coupling.refused == 0));
+        let overlay_census_refusals = overlay_return
+            .fronts
+            .iter()
+            .flat_map(|front| front.readings.iter().map(|reading| u64::from(reading.measured.refused)))
+            .sum();
+        let factor_material_reconciliation = pre_admission.factor_material_reconciliation.clone();
+        let overlay_graph_identity = pre_admission.overlay_graph_identity.clone();
+        let total_work = base.tower_work.then(&overlay_work);
+        let total_deed_launches = base.deed_launches + overlay_execution.deed_launches;
+        Ok(CirculationOutput::Cultivated(CultivatedCirculated {
+            base,
+            base_potential_digest,
+            cultivated_potential,
+            overlay_work,
+            overlay_apparatus,
+            total_work,
+            overlay_launches: overlay_execution.deed_launches,
+            total_deed_launches,
+            pre_admission,
+            overlay_admission,
+            overlay_return: overlay_return.clone(),
+            overlay_fronts: overlay_return.fronts.clone(),
+            overlay_kernels_written,
+            overlay_census_refusals,
+            factor_material_reconciliation,
+            overlay_execution,
+            overlay_graph_identity,
+            witness_stability_obligation: "the caller must verify the authenticated W3 witness at its owning rest boundary; OccurrenceWitness has no post-deed stability method",
+        }))
+    } else {
+        Ok(CirculationOutput::Base(base))
+    }
 }

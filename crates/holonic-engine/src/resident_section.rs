@@ -108,12 +108,13 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 29] = [
+pub const KERNELS: [&str; 30] = [
     "section_from_bfloat16",
     "section_carry",
     "section_withdraw_rows",
     "section_permute_columns",
     "section_contract",
+    "section_factorized_contract",
     "section_rms_rebase",
     "section_chronology",
     "section_contact",
@@ -1085,6 +1086,86 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, out_width, needed, work, Vec::new())
     }
 
+    /// The resident rank-one contraction `h ↦ u(vᵀh)`.  The intermediate `rows × 1` carrier is
+    /// deliberately absent from the shape: this method admits one wide shared reduction and the
+    /// complete device-sized output front.  It is equivalent to sequential `Contract(v)` then
+    /// `Contract(u)` only on their common i64-section aperture; the internal scalar here remains
+    /// wide and may exceed i64 when the final u placement brings it back into the output carrier.
+    pub fn shape_factorized_contract(
+        &self,
+        rows: usize,
+        inner: usize,
+        input_octaves: u32,
+        u: &MountedReadout<'chart>,
+        v: &MountedReadout<'chart>,
+        rank: usize,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "factorized-contract";
+        if rank != 1 {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("rank {rank} is not the exact rank-one law") });
+        }
+        if u.dim() != 1 || v.rows() != 1 || v.dim() != inner {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("native factors require u=[V,1], v=[1,H], got u=[{},{}], v=[{},{}]", u.rows(), u.dim(), v.rows(), v.dim()),
+            });
+        }
+        // Admit the wide v reduction and the wide u product directly.  Calling shape_contract
+        // here would smuggle the retired i64 scalar-section claim into the receipt even though
+        // this law's internal junction is shared wide storage only.
+        let add = |left: u32, right: u32| -> Result<u32, ResidentRefusal> {
+            left.checked_add(right).ok_or(ResidentRefusal::CarrierRange { operation: OPERATION, needed: u32::MAX, admitted: Self::carrier_octaves() })
+        };
+        // Positive map exponents are left shifts in the wide helpers.  Negative exponents may
+        // narrow a later face, but cannot erase the earlier carrier obligation, so every stage is
+        // admitted independently in causal order.
+        let raw_v = add(add(add(input_octaves, v.entry_octaves())?, ceil_log2(inner))?, 1)?;
+        let scalar_v = add(raw_v, v.exponent().max(0) as u32)?;
+        let product_u = add(add(scalar_v, u.entry_octaves())?, 1)?;
+        let final_u = add(product_u, u.exponent().max(0) as u32)?;
+        for stage in [raw_v, scalar_v, product_u, final_u] {
+            Self::admit_octaves(OPERATION, stage)?;
+        }
+        let needed = final_u;
+        let out_width = u.rows();
+        let inner_power = inner.checked_next_power_of_two().unwrap_or(usize::MAX);
+        let inner_power_u32 = u32::try_from(inner_power).unwrap_or(u32::MAX);
+        let block = self.reduction_block.min(inner_power_u32).max(self.launch.warp);
+        let shared_u64 = 2u64 * u64::from(block) * 16;
+        let shared = u32::try_from(shared_u64).map_err(|_| ResidentRefusal::Declaration { operation: OPERATION, what: format!("the reduction block {block} has no representable shared extent") })?;
+        if shared > self.max_shared_octets {
+            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a reduction block of {block} needs {shared} shared octets; the device admits {}", self.max_shared_octets) });
+        }
+        if rows > self.launch.max_grid_x as usize {
+            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width: out_width });
+        }
+        let count = (rows * out_width) as u64;
+        // Retain the two constitutive work legs and their wide internal materialization in the
+        // receipt, while the graph allocates only the final i64 section.
+        let mut first_work = ExactWork::predicted_product(rows, inner, 1, u64::from(input_octaves.max(v.entry_octaves())));
+        first_work.entries_written = BigUint::from(2 * rows as u64);
+        first_work.resident(2 * rows as u64);
+        first_work.peak_bits = BigUint::from(u64::from(scalar_v));
+        first_work.cumulative_bits = BigUint::from(2 * rows as u64 * u64::from(scalar_v));
+        let mut second_work = ExactWork::predicted_product(rows, 1, out_width, u64::from(scalar_v.max(u.entry_octaves())));
+        second_work.entries_written = BigUint::from(2 * count);
+        second_work.resident(2 * count);
+        second_work.peak_bits = BigUint::from(u64::from(final_u));
+        second_work.cumulative_bits = BigUint::from(2 * count * u64::from(final_u));
+        let mut work = first_work.then(&second_work);
+        // The wide reduction has a logarithmic block span in this realization.  Preserve the
+        // constitutive counts and widths while returning the enacted dependency span.
+        work.dependency_span = work.dependency_span.max(BigUint::from(u64::from(ceil_log2(block as usize) + 1)));
+        let coupling = CouplingPlan {
+            coupling: "rank-one junction: one shared-wide v reduction then u placement, one i64 output front",
+            kernel: "section_factorized_contract",
+            extent: inner as u64,
+            block,
+            predicted: work.clone(),
+        };
+        Ok(LawShape { operation: OPERATION, rows, width: out_width, needed, predicted: work, couplings: vec![coupling], launches: 2, shared_octets: shared, block })
+    }
+
     /// The RMS rebase over runs of `group`: `x · (mean(x²) + eps)^{-1/2} · g`. The quadratic
     /// capacity is a named barrier realized as a resident block reduction.
     pub fn shape_rms_rebase(&self, rows: usize, width: usize, group: usize, input_octaves: u32, gain: Option<&MountedReadout<'chart>>) -> Result<LawShape, ResidentRefusal> {
@@ -1537,6 +1618,31 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(map.raw_resident()).i32(map.exponent()).u32(map.rows() as u32).i32(out.grain.0 as i32)
             .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_flat(lane, "section_contract", input.rows * map.rows(), &mut params, "contract")
+    }
+
+    /// Record the rank-one junction as one device kernel.  The parameter order mirrors the
+    /// kernel's two resident maps and keeps both factor ranges in the footprint certificate.
+    pub fn record_factorized_contract(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        u: &MountedReadout<'chart>,
+        v: &MountedReadout<'chart>,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr())
+            .u32(input.rows as u32).u32(input.width as u32)
+            .ptr(u.raw_resident()).i32(u.exponent()).u32(u.rows() as u32)
+            .ptr(v.raw_resident()).i32(v.exponent()).u32(v.dim() as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        // The factorized kernel is one block per input row; its shape's block and shared extent
+        // are therefore part of the record rather than inferred from the final output count.
+        self.record_blocks(lane, "section_factorized_contract", input.rows, shape.block, shape.shared_octets, &mut params, "factorized-contract")
     }
 
     pub fn record_rms_rebase(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, group: usize, gain: Option<&MountedReadout<'chart>>, eps: Dyadic, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
@@ -3743,6 +3849,112 @@ mod tests {
             assert_eq!(reading.slots[at].nonzero_widths, reading.slots[1].nonzero_widths);
             assert_eq!(reading.slots[at].refused, reading.slots[1].refused);
         }
+    }
+
+    #[test]
+    fn rank_one_factorized_front_is_bit_equal_to_sequential_contracts_on_common_i64_aperture() {
+        let Some((readout, surface)) = surface() else { return };
+        // Thirty-three output rows force the complete front past one warp.  This fixture stays on
+        // the common i64 aperture: the factors include negative entries, a zero row, and a
+        // fractional input so both directed placements and the exact-zero branch are exercised.
+        let u_words: Vec<u16> = (0..33)
+            .map(|row| match row % 5 {
+                0 => 0,
+                1 => MINUS_ONE_AND_HALF,
+                2 => TWO,
+                3 => HALF,
+                _ => bfloat16(-3, -1),
+            })
+            .collect();
+        let u = readout.mount_bfloat16(&u_words, 1).expect("u=[V,1]");
+        let v = readout.mount_bfloat16(&[MINUS_ONE_AND_HALF, TWO], 2).expect("v=[1,H]");
+        let grain = ResidentGrain(20);
+        let staged = surface.stage_words(&[ONE, HALF], 1, 2).expect("stage h");
+        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, HALF]).expect("enter shape");
+        let scalar = surface.shape_contract(1, 2, enter.needed, &v).expect("v contract shape");
+        let sequential = surface.shape_contract(1, 1, scalar.needed, &u).expect("u contract shape");
+        let fused = surface.shape_factorized_contract(1, 2, enter.needed, &u, &v, 1).expect("factorized shape");
+        assert_eq!((fused.rows, fused.width), (1, 33));
+        assert!(fused.width >= 32);
+        assert!(fused.shared_octets > 0 && fused.block >= 32);
+        assert_eq!(fused.predicted.multiplications, &scalar.predicted.multiplications + &sequential.predicted.multiplications);
+        assert!(fused.predicted.multiplications < BigUint::from(33u32 * 2u32), "the rank-one work must not be priced as a dense 33×2 product");
+        assert_eq!(fused.predicted.entries_written, &scalar.predicted.entries_written + &sequential.predicted.entries_written, "the internal scalar materialization remains in the work receipt");
+        let x = surface.fresh_section(1, 2, grain).expect("x");
+        let scalar_out = surface.fresh_section(1, 1, grain).expect("scalar");
+        let sequential_out = surface.fresh_section(1, 33, grain).expect("sequential");
+        let fused_out = surface.fresh_section(1, 33, grain).expect("fused");
+        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![1], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("enter lane");
+        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("record enter");
+        builder.close(0, &x, enter.needed).expect("close enter");
+        let lane = builder.open(1, &[0]).expect("v lane");
+        surface.record_contract(&lane, &x, &v, &scalar_out).expect("record v");
+        builder.close(1, &scalar_out, scalar.needed).expect("close v");
+        let lane = builder.open(2, &[1]).expect("u lane");
+        surface.record_contract(&lane, &scalar_out, &u, &sequential_out).expect("record u");
+        builder.close(2, &sequential_out, sequential.needed).expect("close u");
+        let lane = builder.open(3, &[0]).expect("fused lane");
+        surface.record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out).expect("record fused");
+        builder.close(3, &fused_out, fused.needed).expect("close fused");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "factorized passage refused: {:?}", reading.obstruction);
+        assert_eq!(surface.read_out(&fused_out).expect("read fused"), surface.read_out(&sequential_out).expect("read sequential"));
+        // The fused output has a complete resident extent, including the exact zero rows.
+        assert_eq!(reading.slots[3].written, true);
+        assert_eq!(reading.slots[3].nonzero_widths, reading.slots[2].nonzero_widths);
+    }
+
+    #[test]
+    fn rank_one_factorized_front_keeps_a_wide_internal_scalar_that_sequential_i64_cannot() {
+        let Some((readout, surface)) = surface() else { return };
+        // h = 2^40 and v = 2^40 produce a rounded scalar 2^80: it is inside the resident wide
+        // carrier but outside the sequential Contract section's i64 word.  u = 2^-20 brings the
+        // final factorized output back to 2^60, which fits the final i64 section exactly.
+        let h_word = bfloat16(1, 40);
+        let v = readout.mount_bfloat16(&[h_word], 1).expect("v=[1,1]");
+        let u = readout.mount_bfloat16(&[bfloat16(1, -20)], 1).expect("u=[1,1]");
+        let grain = ResidentGrain(0);
+        let staged = surface.stage_words(&[h_word], 1, 1).expect("stage h");
+        let enter = surface.shape_enter(1, 1, Dyadic::ONE, grain, &[h_word]).expect("enter shape");
+        let sequential_v = surface.shape_contract(1, 1, enter.needed, &v).expect("sequential v shape");
+        let fused = surface.shape_factorized_contract(1, 1, enter.needed, &u, &v, 1).expect("wide factorized shape");
+        assert!(sequential_v.needed <= ResidentSurface::carrier_octaves());
+        assert!(fused.needed <= ResidentSurface::carrier_octaves());
+        let positive_u = readout.mount_bfloat16(&[bfloat16(1, 60)], 1).expect("positive u exponent");
+        assert!(surface.shape_factorized_contract(1, 1, enter.needed, &positive_u, &v, 1).is_err(), "a positive final u shift must be admitted against the wide carrier");
+        let x = surface.fresh_section(1, 1, grain).expect("x");
+        let sequential_scalar = surface.fresh_section(1, 1, grain).expect("sequential scalar");
+        let fused_out = surface.fresh_section(1, 1, grain).expect("fused output");
+        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("enter lane");
+        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("record enter");
+        builder.close(0, &x, enter.needed).expect("close enter");
+        let lane = builder.open(1, &[0]).expect("sequential lane");
+        surface.record_contract(&lane, &x, &v, &sequential_scalar).expect("record sequential v");
+        builder.close(1, &sequential_scalar, sequential_v.needed).expect("close sequential v");
+        let lane = builder.open(2, &[0]).expect("fused lane");
+        surface.record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out).expect("record fused");
+        builder.close(2, &fused_out, fused.needed).expect("close fused");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert_eq!(reading.slots[1].refused & REFUSED_CARRIER, REFUSED_CARRIER, "sequential Contract must refuse its i64 intermediate");
+        assert_eq!(reading.slots[2].refused, 0, "the factorized wide junction must remain admitted");
+        assert_eq!(surface.read_out(&fused_out).expect("read fused"), vec![(1_i64 << 60, 1_i64 << 60)]);
+    }
+
+    #[test]
+    fn canonical_rank_one_gauge_admits_the_carrier_where_the_old_left_scale_reaches_the_horizon() {
+        let Some((readout, surface)) = surface() else { return };
+        let mut entries = vec![0_i64; 4096];
+        entries[0] = 1_i64 << 37;
+        let old_v = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: entries.clone(), exponent: -46, entry_octaves: 38, negatives: 0 }, 4096).expect("old v");
+        let canonical_v = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries, exponent: -35, entry_octaves: 38, negatives: 0 }, 4096).expect("canonical v");
+        let old_u = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: vec![1], exponent: 11, entry_octaves: 1, negatives: 0 }, 1).expect("old u");
+        let canonical_u = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: vec![1], exponent: 0, entry_octaves: 1, negatives: 0 }, 1).expect("canonical u");
+        let old = surface.shape_factorized_contract(1, 4096, 63, &old_u, &old_v, 1);
+        let canonical = surface.shape_factorized_contract(1, 4096, 63, &canonical_u, &canonical_v, 1).expect("canonical gauge admits");
+        assert!(old.is_err(), "the old positive left scale must reach the wide carrier horizon");
+        assert!(canonical.needed < ResidentSurface::carrier_octaves());
     }
 
     #[test]

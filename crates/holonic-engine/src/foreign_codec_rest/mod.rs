@@ -8,7 +8,7 @@ pub use schema::{
     CodebookEntry, CoverageSummary, ExteriorCodecArtifact, ExteriorCodecDescriptor, OpenFibre,
     RestError, SourceAssetIdentity,
 };
-pub use wire::{ExteriorCodebookRest, NativeRead};
+pub use wire::{ExteriorCodebookRest, NativeRead, SourceRead};
 
 #[cfg(test)]
 #[path = "../foreign_codec_rest_tests.rs"]

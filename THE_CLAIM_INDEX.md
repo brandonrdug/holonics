@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (169 deposits of 461)
+## 4 · The 2026-08 record line (170 deposits of 462)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -301,6 +301,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THE_APPLICATION_INFERS_AND_CULTIVATES_FROM_THE_REST_ALONE_AND_THE_CORPUS_LOOKUP_IS_GONE.md` | The application infers and cultivates from the rest alone, and the corpus lookup is gone |
 | `2026-08-20_THE_DISSECTION_SHARES_ITS_PREFIXES_THE_KEY_LEARNS_AN_ADDRESS_IS_NOT_CONTENT_AND_THE_HARDWARE_FOUNDATION_IS_COMPLETE.md` | The dissection shares its prefixes, the key learns an address is not content, and the hardware foundation is complete |
 | `2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md` | The hardware foundation stands, the native arm is not the lift, and Phoenix remains open |
+| `2026-08-20_THE_LIFTED_BODY_WAS_CULTIVATED_THE_FACTOR_WORD_STAYED_ON_THE_CARD_AND_ABLATION_RETURNED_THE_PREDECESSOR.md` | The lifted body was cultivated, the factor word stayed on the card, and ablation returned the predecessor |
 | `2026-08-20_THE_LIFT_RETURNS_ITS_DEFECT_THE_FIBRES_PARTITION_THE_REALS_AND_THE_RECOMBINATION_IS_ABSENT_FROM_THE_SOURCE_CLOSURE.md` | The lift returns its defect, the fibres partition the reals, and the recombination is absent from the source closure |
 | `2026-08-20_THE_NATIVE_BASELINE_CONDUCTS_FROM_ITS_OWN_REST_AND_THE_MANIFEST_MEASURES_WHAT_IS_FOUNDED_AND_NAMES_WHAT_IS_OPEN.md` | The native baseline conducts from its own rest, and the manifest measures what is founded and names what is open |
 | `2026-08-20_THE_NATIVE_REST_CONDUCTS_THE_DISSECTION_IS_UNCHANGED_AND_EVERY_TEMPTING_QUOTIENT_REOPENS.md` | The native rest conducts, the dissection is unchanged, and every tempting quotient reopens |

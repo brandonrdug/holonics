@@ -132,6 +132,10 @@ pub enum RestError {
         id: u32,
         extent: u32,
     },
+    MissingSourceId {
+        id: u32,
+        extent: u32,
+    },
     CoverageDisagrees {
         represented: u32,
         entries: u32,
@@ -188,6 +192,9 @@ impl std::fmt::Display for RestError {
             }
             Self::MissingNativeId { id, extent } => {
                 write!(f, "native id {id} remains open within extent {extent}")
+            }
+            Self::MissingSourceId { id, extent } => {
+                write!(f, "source id {id} remains open within extent {extent}")
             }
             Self::CoverageDisagrees {
                 represented,
