@@ -340,16 +340,29 @@ apparatus placement boundary unless a receiver exposes it. No carrier bound or c
 was raised or invented. `CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes the
 indivisible phase.
 
-**The next deed is W4 — source-detached card inference through the standing application.** Promote
-the returned native-rest and cultivated-tail owners out of the example cabinet into the production
-runtime; wire `eros phoenix infer` to accept unseen runtime material through the authenticated
-exterior codec; mount only the cultivated product directory and its addressed native predecessor;
-execute the complete card-resident circulation with the original foreign source absent; return the
-actual generated face, factor/reconstruction identity, exact semantic work, admission, apparatus
-telemetry and source-access audit; and prove a fresh process can repeat it. W4 may not recreate the
-example foreman inside the CLI, run ARM N as the alleged lift, replay semantics on the CPU, or call
-one fixed fixture “inference.” W5 repeats the four-body dissection and alone closes the indivisible
-grade. Independent ARM N remains a control. M0–M3 remain blocked until W5 passes.
+**DEED W4 PASSED 2026-08-20 — the standing application mounted the cultivated body, and six fresh
+currents returned from the card.** Authoritative record:
+[`research/records/2026-08-20_THE_STANDING_APPLICATION_MOUNTED_THE_CULTIVATED_BODY_AND_SIX_FRESH_CURRENTS_RETURNED_FROM_THE_CARD.md`](../research/records/2026-08-20_THE_STANDING_APPLICATION_MOUNTED_THE_CULTIVATED_BODY_AND_SIX_FRESH_CURRENTS_RETURNED_FROM_THE_CARD.md).
+`eros phoenix infer --product DIR --text ... --card` now mounts only cultivated-rest v2 and its
+addressed W1 predecessor, enacts the authenticated codec, conducts the complete tower plus native
+morphology on the GPU, and returns addressed exact plural futures, work/admission, prediction,
+actual apparatus telemetry, live source access and frozen-member testimony. Three unseen texts in
+two fresh processes each returned stable semantic receipts; missing-codec and retired-`--rest`
+controls refused without a face. Runtime apertures, extents, rank and factor names are rested and
+bound to morphology. The independent ARM N CPU path remains an explicitly separate control. W4 is
+bounded to this compiled first instance and makes no language-quality or arbitrary-product claim.
+`CONSTRUCTION_STATE.md` remains unchanged because W5 alone closes the phase.
+
+**The next deed is W5 — reborn dissection and the indivisible Phoenix grade.** Compare four bodies:
+the authenticated foreign source, the exact W2 lifted predecessor, the W3 cultivated body executed
+through the W4 application, and independent ARM N. Bind the first three through one explicit
+source/native codebook and receiver correspondence. Repeat the complete matched intervention panel,
+shortest separators, held-out continuations and source/native cross-chart faces; return the W2
+no-factor condensation remainder under the enlarged future family; ablate every causing lifted
+family and the cultivation delta; and return exact work plus calibrated apparatus utility with
+unknown energy retained as unknown. The W5 artifact must close every Phoenix master/Gemma-instance
+row or issue a typed refusal. Only a complete pass updates `CONSTRUCTION_STATE.md`. M0–M3 remain
+blocked until then.
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section

@@ -436,8 +436,23 @@ impl OccurrenceWitness for MountedNativeRest {
                         })
                         .collect::<Vec<_>>();
                     let [(runtime_law, runtime)] = replacements.as_slice() else {
+                        let offered = complex
+                            .operations
+                            .iter()
+                            .filter_map(|(runtime_law, runtime)| {
+                                complex
+                                    .shape
+                                    .laws
+                                    .get(runtime_law)
+                                    .filter(|law| law.name == stored_law_shape.name)
+                                    .map(|_| format!("{:?}", runtime.testimony))
+                            })
+                            .collect::<Vec<_>>();
                         return Err(SourceRefusal::OperationForeign {
-                            operation: stored_law_shape.name.clone(),
+                            operation: format!(
+                                "{}: offered {:?}, stored {:?}",
+                                stored_law_shape.name, offered, stored.testimony
+                            ),
                         });
                     };
                     if !matched_runtime.insert(**runtime_law) {
@@ -666,6 +681,10 @@ fn same_testimony(runtime: &[SourceTestimony], stored: &[NativeTestimony]) -> bo
             .all(|(runtime, stored)| match (runtime, stored) {
                 (
                     SourceTestimony::Implementation { symbol: left, .. },
+                    NativeTestimony::Implementation { symbol: right },
+                ) => left == right,
+                (
+                    SourceTestimony::RestedImplementation { symbol: left },
                     NativeTestimony::Implementation { symbol: right },
                 ) => left == right,
                 (

@@ -65,6 +65,7 @@ pub const SLIDING_THETA: u64 = 10_000;
 pub const FULL_THETA: u64 = 1_000_000;
 pub const VOCABULARY: usize = 262_144;
 pub const BAND_GRAIN: u32 = 60;
+pub const BAND_TERMS: usize = 40;
 pub const FINAL_NORM: &str = "model.language_model.norm.weight";
 
 pub const SLIDING_BANDS: &str = "sliding band elements (theta 1e4, 128 rotated pairs of 256)";
@@ -377,11 +378,7 @@ pub fn algebraic_scales() -> Result<(DyadicEnclosure, DyadicEnclosure), String> 
 /// collapsed population (widest, summed and nonzero widths) is censused. Each occurrence's enclosure
 /// is then certified relative to its midpoint predecessors; the composition is not, and the receipt
 /// says so.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Chart {
-    Interval,
-    Midpoint,
-}
+pub use holonic_engine::phoenix::tower::Chart;
 
 pub const QUOTIENT_DECLARATION: &str = "declared quotient chart: the certified enclosure is collapsed to its midpoint for the successors; the enclosure is retained in the predecessor's section as the complete per-entry residual and its collapsed population is censused; forced by the carrier's word at the measured amplification of the composed enclosure (about 2^35 per layer), not chosen to improve a number";
 

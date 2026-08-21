@@ -499,6 +499,32 @@ pub struct CultivatedRestInput {
     pub receipt: DerivationAdjointRankReceipt,
     pub reconstruction_fibre: ReconstructionFibre,
     pub ablation: TargetedAblation,
+    /// Authenticated resident runtime choices; the product schema requires this receipt.
+    pub runtime_law: RuntimeLawReceipt,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RuntimeChart {
+    Interval,
+    Midpoint,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RuntimeLawReceipt {
+    pub schema: String,
+    pub grain: u32,
+    pub series_aperture: u32,
+    pub band_terms: u32,
+    pub vocabulary_extent: u32,
+    pub hidden_extent: u32,
+    pub rank: u32,
+    pub left_population: String,
+    pub right_population: String,
+    pub chart: RuntimeChart,
+    pub fuse: bool,
+    pub add_special_tokens: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

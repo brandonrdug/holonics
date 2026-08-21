@@ -93,6 +93,20 @@ fn factor_fixture() -> (CultivatedRestInput, Vec<u8>, NativeOccurrence, PathBuf)
             removed_payload_sha256: hash(&payload_bytes),
             predecessor: predecessor_id,
         },
+        runtime_law: RuntimeLawReceipt {
+            schema: "holonic-engine.phoenix.runtime-law.v1".to_owned(),
+            grain: 48,
+            series_aperture: 14,
+            band_terms: 40,
+            vocabulary_extent: 2,
+            hidden_extent: 2,
+            rank: 1,
+            left_population: "left.factor".to_owned(),
+            right_population: "right.factor".to_owned(),
+            chart: RuntimeChart::Midpoint,
+            fuse: true,
+            add_special_tokens: false,
+        },
     };
     let path = unique_temp_path("holonic-native-factor", ".safetensors");
     write_native_morphology(
@@ -178,6 +192,20 @@ fn fixture() -> (CultivatedRestInput, Vec<u8>) {
             target: "cultivation.delta".to_owned(),
             removed_payload_sha256: hash(&payload_bytes),
             predecessor: predecessor_id,
+        },
+        runtime_law: RuntimeLawReceipt {
+            schema: "holonic-engine.phoenix.runtime-law.v1".to_owned(),
+            grain: 48,
+            series_aperture: 14,
+            band_terms: 40,
+            vocabulary_extent: 2,
+            hidden_extent: 3,
+            rank: 1,
+            left_population: "left.factor".to_owned(),
+            right_population: "right.factor".to_owned(),
+            chart: RuntimeChart::Midpoint,
+            fuse: true,
+            add_special_tokens: false,
         },
     };
     (input, predecessor)

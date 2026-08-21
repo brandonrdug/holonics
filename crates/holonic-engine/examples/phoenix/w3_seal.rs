@@ -7,7 +7,7 @@ use holonic_engine::cultivated_rest::{
     DerivationAdjointRankReceipt, DirectoryCompanion, ExtentOrigin, MorphologyPayload,
     NativeMorphologyInput, OctaveBoundOrigin, PortDirection, PortExtentAgreement,
     PredecessorProductIdentity, ReconstructionCandidate, ReconstructionFibre, TargetedAblation,
-    TypedLaw, TypedPort, write_native_morphology,
+    RuntimeChart, RuntimeLawReceipt, TypedLaw, TypedPort, write_native_morphology,
 };
 use holonic_engine::cultivation_derivation::{
     CultivationDerivation, HiddenPointSection, derive_w3_return_at_grain_with_target,
@@ -31,6 +31,23 @@ use super::{streamed, tower, w3_fixture};
 pub const LEFT_POPULATION: &str = "phoenix.w3.factor.left";
 pub const RIGHT_POPULATION: &str = "phoenix.w3.factor.right";
 pub const GRAIN: i32 = 48;
+
+pub fn runtime_law() -> RuntimeLawReceipt {
+    RuntimeLawReceipt {
+        schema: "holonic-engine.phoenix.runtime-law.v1".to_owned(),
+        grain: GRAIN as u32,
+        series_aperture: 14,
+        band_terms: tower::BAND_TERMS as u32,
+        vocabulary_extent: tower::VOCABULARY as u32,
+        hidden_extent: tower::HIDDEN as u32,
+        rank: 1,
+        left_population: LEFT_POPULATION.to_owned(),
+        right_population: RIGHT_POPULATION.to_owned(),
+        chart: RuntimeChart::Midpoint,
+        fuse: true,
+        add_special_tokens: false,
+    }
+}
 
 pub struct SealedProduct {
     pub product: CultivatedRest,
@@ -453,6 +470,7 @@ pub fn seal_product(
             removed_payload_sha256: digest_bytes(&payload_bytes),
             predecessor: predecessor.clone(),
         },
+        runtime_law: runtime_law(),
     };
     let product = CultivatedRest::seal_with_native_occurrence(input, &morphology)
         .map_err(|error| error.to_string())?;

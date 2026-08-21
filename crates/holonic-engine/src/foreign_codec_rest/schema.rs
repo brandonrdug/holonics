@@ -174,6 +174,7 @@ pub enum RestError {
     Json(String),
     MalformedTsv(String),
     Io(String),
+    CodecEncode(String),
 }
 
 impl std::fmt::Display for RestError {
@@ -250,6 +251,7 @@ impl std::fmt::Display for RestError {
             Self::Json(error) => write!(f, "rest json: {error}"),
             Self::MalformedTsv(error) => write!(f, "rest tsv: {error}"),
             Self::Io(error) => write!(f, "rest io: {error}"),
+            Self::CodecEncode(error) => write!(f, "rest codec encoding: {error}"),
         }
     }
 }

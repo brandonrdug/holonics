@@ -650,6 +650,29 @@ impl ExteriorCodebookRest {
         }
     }
 
+    /// Enact the authenticated exterior tokenizer against runtime text and cross every returned
+    /// source address through this rest's explicit source→native correspondence. The tokenizer
+    /// bytes are supplied by the already authenticated product directory; no source/model path
+    /// or fallback vocabulary is consulted.
+    pub fn encode_text(
+        &self,
+        artifact: &ExteriorCodecArtifact,
+        text: &str,
+        add_special_tokens: bool,
+    ) -> Result<Vec<u32>, RestError> {
+        self.validate_with_codec(artifact)?;
+        let tokenizer = tokenizers::Tokenizer::from_bytes(&artifact.tokenizer_json)
+            .map_err(|error| RestError::CodecEncode(error.to_string()))?;
+        let encoding = tokenizer
+            .encode(text, add_special_tokens)
+            .map_err(|error| RestError::CodecEncode(error.to_string()))?;
+        encoding
+            .get_ids()
+            .iter()
+            .map(|source_id| self.native_id(*source_id))
+            .collect()
+    }
+
     fn frame(hasher: &mut Sha256, bytes: &[u8]) {
         hasher.update((bytes.len() as u64).to_le_bytes());
         hasher.update(bytes);

@@ -603,6 +603,9 @@ pub(super) fn into_native_topology(complex: PortedOperationComplex) -> NativeTop
                     SourceTestimony::Implementation { symbol, .. } => {
                         NativeTestimony::Implementation { symbol }
                     }
+                    SourceTestimony::RestedImplementation { symbol } => {
+                        NativeTestimony::Implementation { symbol }
+                    }
                     SourceTestimony::Configuration { field, value } => {
                         NativeTestimony::Configuration { field, value }
                     }

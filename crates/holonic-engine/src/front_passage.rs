@@ -74,6 +74,7 @@ use holonic_structure::LocalSet;
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
 use relational_geometry::Rat;
+use serde::Serialize;
 
 use crate::causal::EventId;
 use crate::exact_work::{ExactWork, WorkBudget};
@@ -265,7 +266,7 @@ fn surface_refusal(refusal: ResidentRefusal) -> FrontPassageObstruction {
 /// **What a coordinate is admitted against.** Bounded by a receiver's declaration or by the
 /// mounted apparatus; or unbounded, with the reason stated and the apparatus limits that still
 /// constrain it named. `None` is not a value of this type.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum Ceiling {
     /// A finite ceiling, and who declared it.
     Bounded { ceiling: BigUint, declared_by: &'static str },
@@ -276,7 +277,7 @@ pub enum Ceiling {
 
 /// **One coordinate of the deed, admitted or not.** Required against its ceiling; an unbounded
 /// coordinate is admitted by exhibition — it is carried, named and reported, never hidden.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CoordinateAdmission {
     pub name: &'static str,
     pub required: BigUint,
@@ -348,7 +349,7 @@ fn semantic_constraints(coordinate: &str) -> &'static [&'static str] {
 
 /// **The apparatus prediction of one deed, before any allocation.** The same coordinates the
 /// census measures, so predicted and happened are compared coordinate by coordinate.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct ApparatusPrediction {
     /// Mounted maps, bands and positions the deed reads — resident already, required by the deed.
     pub source_map_octets: u64,
@@ -430,7 +431,7 @@ impl ApparatusPrediction {
 /// against the mounted card; the source standing against the cited [`MaterialAdmission`]. The
 /// deed is admitted exactly when every bounded coordinate is inside its ceiling — the product
 /// order, with nothing summed and no clock.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct DeedAdmission {
     pub semantic: Vec<CoordinateAdmission>,
     pub apparatus: Vec<CoordinateAdmission>,
@@ -483,7 +484,7 @@ impl AlignedMaterialPlan {
 }
 
 /// The prediction of the material deed: what mounting the plan will occupy and move.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct MaterialPrediction {
     /// Per map: name, resident octets, and source octets crossing the bus.
     pub maps: Vec<(String, u64, u64)>,
@@ -499,7 +500,7 @@ pub struct MaterialPrediction {
 }
 
 /// **The admission of the material deed**, before any map is allocated. The active deed cites it.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MaterialAdmission {
     pub prediction: MaterialPrediction,
     pub coordinates: Vec<CoordinateAdmission>,

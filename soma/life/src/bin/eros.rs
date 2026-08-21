@@ -3,7 +3,8 @@
 //! ```text
 //! eros mouth    --directory D [--extension E] [--radius N] [--scales N]
 //! eros atlas    --directory D [--extension E]
-//! eros phoenix infer     --rest R --text "..." [--text ...] [--export-manifest] [--card]
+//! eros phoenix infer     --rest R --text "..." [--text ...] [--export-manifest]
+//! eros phoenix infer     --product D --text "..." --card
 //! eros phoenix cultivate --rest R --material F --out S
 //! eros stations
 //! ```
@@ -45,6 +46,7 @@ use life::phoenix_rest::{
     content_bar, cultivate, forbidden_open, lineage_metadata, loss_digest, open_descriptors,
     read_rest, regions,
 };
+use holonic_engine::phoenix::runtime;
 
 fn main() {
     if let Err(trouble) = run() {
@@ -71,10 +73,14 @@ usage:
                 found terrain on two materials at once and ask what the JOIN reads that
                 neither half can, then ablate each half and require the reading back
 
-  eros phoenix infer     --rest R --text \"...\" [--text ...] [--export-manifest] [--card]
+  eros phoenix infer     --rest R --text \"...\" [--text ...] [--export-manifest]
                 mount a sealed native rest ALONE and conduct each prompt through the rest's
                 own declared walk, future and depth laws; the plural section is returned and
                 the rest is left octet-identical
+
+  eros phoenix infer     --product DIR --text \"...\" --card
+                mount the cultivated product directory and addressed W1 predecessor, then
+                conduct unseen runtime text on the resident card and return its plural face
 
   eros phoenix cultivate --rest R --material F --out S
                 expose one material to a sealed rest under the cultivation law and write a
@@ -102,6 +108,7 @@ fn run() -> Result<(), String> {
     // before it reaches for a value. Every other station's parse is unmoved.
     let mut deed: Option<String> = None;
     let mut rest: Option<PathBuf> = None;
+    let mut product: Option<PathBuf> = None;
     let mut material: Option<PathBuf> = None;
     let mut out: Option<PathBuf> = None;
     let mut texts: Vec<String> = Vec::new();
@@ -131,6 +138,7 @@ fn run() -> Result<(), String> {
             .ok_or_else(|| format!("{named} requires a value"))?;
         match named.as_str() {
             "--rest" => rest = Some(PathBuf::from(value)),
+            "--product" => product = Some(PathBuf::from(value)),
             "--material" => material = Some(PathBuf::from(value)),
             "--out" => out = Some(PathBuf::from(value)),
             // Repeatable: the material is the argument, and a station that took one prompt would
@@ -186,10 +194,21 @@ fn run() -> Result<(), String> {
         }
         "phoenix" => {
             let deed = deed.ok_or("phoenix requires a deed: infer or cultivate")?;
-            let rest = rest.ok_or("phoenix requires --rest <sealed native rest>")?;
             match deed.as_str() {
-                "infer" => phoenix_infer(&rest, &texts, export_manifest, card),
+                "infer" => {
+                    if card {
+                        let product = product.ok_or("phoenix infer --card requires --product <cultivated directory>")?;
+                        if rest.is_some() {
+                            return Err("phoenix infer --card accepts --product and rejects --rest".to_owned());
+                        }
+                        phoenix_card_infer(&product, &texts)
+                    } else {
+                        let rest = rest.ok_or("phoenix requires --rest <sealed native rest>")?;
+                        phoenix_infer(&rest, &texts, export_manifest)
+                    }
+                }
                 "cultivate" => {
+                    let rest = rest.ok_or("phoenix cultivate requires --rest <sealed native rest>")?;
                     let material = material.ok_or("phoenix cultivate requires --material <file>")?;
                     let out = out.ok_or("phoenix cultivate requires --out <successor path>")?;
                     phoenix_cultivate(&rest, &material, &out)
@@ -881,6 +900,29 @@ fn supersede(root: &Path, against: &Path) -> Result<(), String> {
 // phoenix — a sealed native rest, mounted alone
 // -------------------------------------------------------------------------------------------------
 
+/// The W4 application deed: one authenticated cultivated directory, one unseen runtime material,
+/// and one resident card circulation. The generated section is returned without ranking or
+/// sampling; all admission/work/apparatus coordinates are read from the resident return.
+fn phoenix_card_infer(product: &Path, texts: &[String]) -> Result<(), String> {
+    if texts.len() != 1 || texts[0].trim().is_empty() {
+        return Err("phoenix infer --card requires exactly one unseen non-empty --text".to_owned());
+    }
+    let text = &texts[0];
+    let returned = runtime::infer(product, text)?;
+    let receipt = serde_json::to_string(&returned.receipt).map_err(|error| error.to_string())?;
+    println!("EROS · PHOENIX · INFER · CARD · SOURCE-DETACHED");
+    println!("  product directory {}", product.display());
+    println!(
+        "  input addresses {} · terminal position {} · plural {} · separated {}",
+        returned.receipt.input.native_ids.len(),
+        returned.receipt.generated.terminal_position,
+        returned.receipt.generated.plural.len(),
+        returned.receipt.generated.separated,
+    );
+    println!("PHOENIX_RETURN {receipt}");
+    Ok(())
+}
+
 /// How much of a plural section is exhibited. The section itself is returned whole and its
 /// population is printed beside the exhibit, exactly as the atlas station's chain is: a cap applied
 /// to the *reading* would read as the reading's size.
@@ -898,27 +940,15 @@ const SECTION_EXHIBIT: usize = 24;
 ///
 /// # The surface this conducts on, stated because it is a reliance and not a result
 ///
-/// The conduct here is CPU-exact and integral throughout. It is the same three laws the card ran
-/// for Deed P0, and that the two agree is **Deed P3's measurement, not this one's**: P3 read the
-/// committed P0 receipt's eight recorded prompts and returned the landed class, the standing and
-/// the depth-0 / depth-1 populations for every one of them. This station relies on that and
-/// regenerates nothing. `--card` is named **unwired**: taking the resident path is an engine
-/// driver's deed and a station that printed something plausible for a card it never touched would
-/// be worse than an absent flag.
+/// This arm is the independent ARM N control. Its conduct is CPU-exact and integral throughout;
+/// the lifted Phoenix card path is the distinct `--product ... --card` application entry above.
+/// Keeping the two entries explicit prevents an ARM N answer from being reported as Gemma lift.
 fn phoenix_infer(
     rest_path: &Path,
     texts: &[String],
     export_manifest: bool,
-    card: bool,
 ) -> Result<(), String> {
     println!("EROS · PHOENIX · INFER");
-    if card {
-        return Err(
-            "--card is UNWIRED. The resident path is an engine driver's deed; this station \
-             conducts CPU-exact and says so rather than printing a plausible card face"
-                .to_owned(),
-        );
-    }
     if texts.is_empty() {
         return Err("infer requires at least one --text; the material is the argument".to_owned());
     }
@@ -1304,7 +1334,7 @@ fn stations() {
         (
             "phoenix infer",
             "WIRED",
-            "a sealed native rest mounted ALONE, conducted under its own declared laws",
+            "the independent ARM N rest mounted alone; retained as the CPU control",
         ),
         (
             "phoenix cultivate",
@@ -1313,8 +1343,8 @@ fn stations() {
         ),
         (
             "phoenix --card",
-            "unwired",
-            "the resident path is an engine driver's deed; this station conducts CPU-exact",
+            "WIRED",
+            "a cultivated lifted product mounted source-detached and conducted on the card",
         ),
         (
             "compress",

@@ -67,6 +67,7 @@ use std::ffi::c_void;
 
 use num_bigint::{BigInt, BigUint};
 use relational_geometry::Rat;
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
@@ -339,7 +340,7 @@ pub struct SeriesAperture(pub u32);
 /// the terminal synchronize the serial chart issues no launch and reads nothing, so `deed_launches`
 /// moves by one, `synchronizations` by one, and `captured_launches` — the launches recorded into
 /// the graph before the deed — by zero. Section egress moves once, at the declared receiver.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct TransferCensus {
     pub ingress_octets: u64,
     pub egress_section_octets: u64,

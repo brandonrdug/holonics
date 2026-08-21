@@ -43,6 +43,7 @@ use std::fs::File;
 use std::os::unix::fs::FileExt;
 
 use mount::{DeviceBuffer, Event, PinnedHost, Stream};
+use serde::Serialize;
 use thiserror::Error;
 
 use crate::embedding_fiber::{PooledMount, PooledReadout};
@@ -163,7 +164,7 @@ impl StagedRegion {
 
 /// **The census of the streamed path**, beside the surface's own. Every field is a count of an
 /// apparatus act; none of them decides anything.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct StreamedCensus {
     /// Page-locked host standing held at once.
     pub pinned_octets: u64,

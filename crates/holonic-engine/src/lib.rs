@@ -89,6 +89,8 @@ pub mod codec_system;
 pub mod cultivated_rest;
 /// Exact bounded two-coordinate W3 cultivation derivation and its receiver receipts.
 pub mod cultivation_derivation;
+/// Resident W1/W2/W3 Phoenix circulation, shared by deed drivers and the application runtime.
+pub mod phoenix;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
 // verbs in the crate root where nothing says what they read or step. `blueprint/THE_ASSEMBLY.md`.

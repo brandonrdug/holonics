@@ -29,6 +29,7 @@ pub(crate) struct CultivatedRestWire {
     pub(crate) reconstruction_fibre: ReconstructionFibre,
     pub(crate) ablation: TargetedAblation,
     pub(crate) native_morphology: Option<NativeMorphologyWitness>,
+    pub(crate) runtime_law: RuntimeLawReceipt,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -74,6 +75,7 @@ impl CultivatedRest {
             reconstruction_fibre: input.reconstruction_fibre,
             ablation: input.ablation,
             native_morphology: None,
+            runtime_law: input.runtime_law,
         };
         let rest = Self {
             wire,
@@ -365,6 +367,9 @@ impl CultivatedRest {
     pub fn native_morphology(&self) -> Option<&NativeMorphologyWitness> {
         self.wire.native_morphology.as_ref()
     }
+    pub fn runtime_law(&self) -> &RuntimeLawReceipt {
+        &self.wire.runtime_law
+    }
     pub fn payload_bytes(&self) -> &[u8] {
         &self.payload
     }
@@ -379,6 +384,21 @@ impl CultivatedRest {
     }
 
     fn validate(&self, predecessor: Option<&[u8]>) -> Result<(), CultivatedRestRefusal> {
+        let runtime = &self.wire.runtime_law;
+        if runtime.schema != "holonic-engine.phoenix.runtime-law.v1"
+            || runtime.grain == 0
+            || runtime.series_aperture == 0
+            || runtime.band_terms == 0
+            || runtime.vocabulary_extent == 0
+            || runtime.hidden_extent == 0
+            || runtime.rank == 0
+            || runtime.left_population.is_empty()
+            || runtime.right_population.is_empty()
+        {
+            return Err(CultivatedRestRefusal::InvalidIdentity(
+                "resident runtime-law receipt".to_owned(),
+            ));
+        }
         self.wire.predecessor.validate()?;
         self.wire.codebook_graph.validate()?;
         if self.wire.payload_octets != self.payload.len() as u64
@@ -387,6 +407,17 @@ impl CultivatedRest {
             return Err(CultivatedRestRefusal::PayloadDigestMismatch);
         }
         let morphology = MorphologyPayload::from_wire(&self.wire.payload, &self.payload)?;
+        if let MorphologyPayload::AlignedFactor(factor) = &morphology {
+            if runtime.grain != factor.resident_grain
+                || runtime.vocabulary_extent != factor.rows
+                || runtime.hidden_extent != factor.columns
+                || runtime.rank != factor.rank
+            {
+                return Err(CultivatedRestRefusal::InvalidIdentity(
+                    "runtime-law extents do not bind the resident factor".to_owned(),
+                ));
+            }
+        }
         let mut ports = self.wire.ports.clone();
         let mut laws = self.wire.laws.clone();
         validate_ports_laws(&mut ports, &mut laws)?;
@@ -409,6 +440,8 @@ impl CultivatedRest {
                     || witness.left_exponent != factor.left_exponent
                     || witness.right_exponent != factor.right_exponent
                     || witness.rank != factor.rank
+                    || witness.left_population != runtime.left_population
+                    || witness.right_population != runtime.right_population
                 {
                     return Err(CultivatedRestRefusal::InvalidIdentity(
                         "native morphology factor law binding".to_owned(),

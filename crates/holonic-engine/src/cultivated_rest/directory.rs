@@ -66,6 +66,11 @@ impl MountedCultivatedRest {
         &self.predecessor
     }
 
+    pub fn product_identity(&self) -> &PredecessorProductIdentity { &self.product_identity }
+    pub fn predecessor_identity(&self) -> &PredecessorProductIdentity { &self.predecessor_identity }
+    pub fn morphology_identity(&self) -> &PredecessorProductIdentity { &self.morphology_identity }
+    pub fn codec_companion_identities(&self) -> &[DirectoryCompanion] { &self.companion_identities }
+
     /// Re-authenticate every retained member of the cultivated directory. Changing a path,
     /// digest, or companion population is drift, even if the changed member remains readable.
     pub fn verify_still(&self) -> Result<(), CultivatedRestRefusal> {
@@ -235,7 +240,10 @@ pub(crate) fn contained_path(
     Ok(candidate)
 }
 
-pub(crate) fn mount_directory(
+/// Mount and authenticate a cultivated product directory. The manifest selects exactly one
+/// product, one addressed W1 predecessor, one morphology witness and the declared codec
+/// companions; no source-model locator is accepted by this boundary.
+pub fn mount_directory(
     directory: impl AsRef<Path>,
 ) -> Result<MountedCultivatedRest, CultivatedRestRefusal> {
     let root = std::fs::canonicalize(directory)

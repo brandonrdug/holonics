@@ -135,7 +135,9 @@ impl OccurrenceWitness for NativeOccurrence {
                         exterior = true;
                     }
                     SourceTestimony::Intervention { statement } => validation.interventions.push(statement.clone()),
-                    SourceTestimony::Implementation { .. } | SourceTestimony::Configuration { .. } => {
+                    SourceTestimony::Implementation { .. }
+                    | SourceTestimony::RestedImplementation { .. }
+                    | SourceTestimony::Configuration { .. } => {
                         return Err(SourceRefusal::TestimonyForeignToNativeRest { operation: name, testimony: format!("{testimony:?}") });
                     }
                     SourceTestimony::Undecided { .. } => {}

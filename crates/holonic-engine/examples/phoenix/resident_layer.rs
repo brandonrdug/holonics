@@ -24,7 +24,7 @@
 //! # Every binding names testimony that resolves
 //!
 //! Every law carries `SourceTestimony::Implementation { locator, symbol }` where `symbol` is
-//! `Class.method (verbatim source line)`; `crate::source_occurrence` resolves the path in the
+//! `Class.method (verbatim source line)`; `holonic_engine::source_occurrence` resolves the path in the
 //! authenticated file and requires the slice to occur in that scope. A fabricated symbol, a drifted
 //! configuration value, or a wrong declared shape refuses at compile. The matched sibling's
 //! withdrawal and the collapse control carry `SourceTestimony::Intervention` and are admissible

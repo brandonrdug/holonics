@@ -8,7 +8,7 @@ use sha2::{Digest, Sha256};
 
 const PREFIX: &[u8] = b"HOLONIC-CULTIVATED-REST\0\x01";
 const DIGEST_OCTETS: usize = 32;
-const SCHEMA: &str = "holonic-engine.phoenix.cultivated-rest.v1";
+const SCHEMA: &str = "holonic-engine.phoenix.cultivated-rest.v2";
 const DIRECTORY_SCHEMA: &str = "holonic-engine.phoenix.cultivated-rest-directory.v1";
 
 fn digest(bytes: &[u8]) -> String {
@@ -61,7 +61,7 @@ mod schema;
 mod tests;
 mod wire;
 
-pub use directory::{DirectoryCompanion, MountedCultivatedRest};
+pub use directory::{mount_directory, DirectoryCompanion, MountedCultivatedRest};
 pub use native_morphology::{
     NativeMorphologyInput, NativeMorphologyWitness, native_morphology_bytes,
     write_native_morphology,
@@ -71,6 +71,6 @@ pub use schema::{
     DerivationAdjointRankReceipt, ExactCertificate, ExtentOrigin, MorphologyPayload,
     OctaveBoundOrigin, PortDirection, PortExtentAgreement, PredecessorProductIdentity,
     ReconstructionCandidate, ReconstructionFibre, SparseDelta, SparseDeltaEntry, TargetedAblation,
-    TypedLaw, TypedPort,
+    RuntimeChart, RuntimeLawReceipt, TypedLaw, TypedPort,
 };
 pub use wire::CultivatedRest;

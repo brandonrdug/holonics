@@ -46,7 +46,6 @@ use streamed::cultivation_overlay::{
 
 const W1: &str = "output/the_whole_foreign_map_crosses_into_native_rest/gemma_native_rest.bin";
 const CODEC: &str = "output/the_whole_foreign_map_crosses_into_native_rest/codec";
-const GRAIN: ResidentGrain = ResidentGrain(48);
 
 fn digest_file(path: &Path) -> Result<String, String> {
     Ok(format!(
@@ -224,15 +223,16 @@ fn base(
     readout: &'static ResidentReadout,
     tokens: &[u32],
 ) -> Result<streamed::Circulated, String> {
+    let law = w3_seal::runtime_law();
     streamed::circulate(
         surface,
         readout,
         source,
         &tokens.iter().map(|id| *id as usize).collect::<Vec<_>>(),
-        GRAIN,
-        SeriesAperture(14),
-        tower::Chart::Midpoint,
-        true,
+        ResidentGrain(law.grain),
+        SeriesAperture(law.series_aperture),
+        match law.chart { holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint, holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval },
+        law.fuse,
         tower::LAYERS,
         false,
     )
@@ -246,6 +246,7 @@ fn child(
     expected_base_digest: &str,
 ) -> Result<(), String> {
     let fixture = w3_fixture::read(fixture_path)?;
+    let law = w3_seal::runtime_law();
     let manifest: CultivationMaterialManifest =
         serde_json::from_slice(&std::fs::read(material_path).map_err(|e| e.to_string())?)
             .map_err(|e| e.to_string())?;
@@ -379,6 +380,7 @@ fn child(
                 &mounted.product,
                 "phoenix.overlay/w2-predecessor-output",
             )?,
+            band_terms: law.band_terms as usize,
         };
         let result = streamed::circulate_cultivated(
             surface,
@@ -389,10 +391,10 @@ fn child(
                 .iter()
                 .map(|id| *id as usize)
                 .collect::<Vec<_>>(),
-            GRAIN,
-            SeriesAperture(14),
-            tower::Chart::Midpoint,
-            true,
+            ResidentGrain(law.grain),
+            SeriesAperture(law.series_aperture),
+            match law.chart { holonic_engine::cultivated_rest::RuntimeChart::Midpoint => tower::Chart::Midpoint, holonic_engine::cultivated_rest::RuntimeChart::Interval => tower::Chart::Interval },
+            law.fuse,
             &request,
         )?;
         cultivated_runs.push(result);

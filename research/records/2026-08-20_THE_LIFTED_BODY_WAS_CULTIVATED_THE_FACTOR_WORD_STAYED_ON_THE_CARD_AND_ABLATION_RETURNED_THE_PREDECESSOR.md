@@ -20,7 +20,7 @@ path entered the child. `CONSTRUCTION_STATE.md` remains unchanged because W5 alo
 
 The primary return is
 `output/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/receipt.json`, SHA-256
-`f8d2031d2070ff22b7e3846b1bc8de23bb617b6c7bc2627f7a27d8c61b391dfa`.
+`58da173bd1b6510dc9e8439c0c708cdd13d446d32944412ddd4c3683cbf034b9`.
 
 | return | measured consequence |
 |---|---:|
@@ -37,12 +37,20 @@ The primary return is
 
 The cultivated product is
 `output/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/product/cultivated.rest`,
-2,135,124 octets, SHA-256
-`955381585ccfcbcc1ddbd05901013d18595fd11cba8b19a6a7e75c2aa2747065`.
+2,135,440 octets, SHA-256
+`4a6a92baaa218d0228d8508669f0e61616f51952572c03798b02175bfd1438de`.
 Its native two-factor morphology is 2,119,936 octets, SHA-256
 `d006979b05ffd0a191c44dbb165397cf2dff79a3d1821b10621c1154dac6046c`.
 The 16,022,507,913-octet W1 predecessor remains a hard-linked, separately authenticated member; the
 small product does not quote a compression ratio against it and does not pretend to replace it.
+
+**Truth status: established-bounded.** W4 replaced the cultivated wire with required schema v2 and
+reran this complete deed. The product now rests the resident grain, series and band apertures,
+typed quotient chart, fusion law, codec special-token choice, vocabulary/hidden/rank extents, and
+the two factor-population names. The values are bound to the native morphology and predecessor;
+the older product schema is rejected rather than upgraded through a compatibility route. The W3
+semantic grade above remained unchanged; the content addresses in this record are the final v2
+return.
 
 ## The material population
 

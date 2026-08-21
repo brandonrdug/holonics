@@ -124,6 +124,10 @@ pub enum SourceTestimony {
     /// resident passage refuses to compile it unless it resolves in the authenticated file
     /// (`crate::source_occurrence`).
     Implementation { locator: String, symbol: String },
+    /// A source implementation symbol after it has crossed into an authenticated native rest.
+    /// The source locator has departed; only the exact path-free symbol retained by the rest may
+    /// witness this arm. A live foreign source occurrence refuses it by type.
+    RestedImplementation { symbol: String },
     /// **The caller's own intervention** — a matched sibling's withdrawal, a control's collapse.
     /// Not source law: admissible only on a quotient-species binding, and kept apart from source
     /// testimony so an intervention can never be mistaken for the source's implementation.

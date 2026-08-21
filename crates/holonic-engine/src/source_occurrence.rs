@@ -674,6 +674,12 @@ impl SourceOccurrence {
                         validation.symbols.push(self.resolve_symbol(&name, symbol)?);
                         exterior = true;
                     }
+                    SourceTestimony::RestedImplementation { .. } => {
+                        return Err(SourceRefusal::TestimonyNotExterior {
+                            operation: name,
+                            testimony: vec![format!("{testimony:?}")],
+                        });
+                    }
                     SourceTestimony::Configuration { field, value } => {
                         validation.fields.push(self.verify_field(&name, field, value)?);
                         exterior = true;
