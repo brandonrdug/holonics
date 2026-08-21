@@ -127,9 +127,9 @@ crates/holonic-engine/src/phoenix/runtime.rs	.clone()=30	.collect()=22	.flat_map
 crates/holonic-engine/src/phoenix/site.rs	.clone()=8	BTreeMap=2	Vec=6
 crates/holonic-engine/src/phoenix/streamed.rs	.clone()=39	.collect()=6	.flat_map()=1	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=60
 crates/holonic-engine/src/phoenix/streamed_cultivation.rs	.clone()=9	BTreeMap=2	Vec=4
+crates/holonic-engine/src/phoenix/tower.rs	.clone()=10	.collect()=3	BTreeMap=3	Vec=11
 crates/holonic-engine/src/phoenix/w5.rs	.clone()=37	.collect()=16	.into_iter()=4	BTreeMap=3	BTreeSet=23	Vec=55
 crates/holonic-engine/src/phoenix/w5/tests.rs	.clone()=60	.collect()=7	.into_iter()=5	Vec=8
-crates/holonic-engine/src/phoenix/tower.rs	.clone()=10	.collect()=3	BTreeMap=3	Vec=11
 crates/holonic-engine/src/physical.rs	.clone()=20	.collect()=5	.into_iter()=1	BTreeMap=16	BTreeSet=3	Vec=10
 crates/holonic-engine/src/placement.rs	.clone()=7	.collect()=2	BTreeMap=1	BTreeSet=3	Vec=18
 crates/holonic-engine/src/platform.rs	.clone()=2	VecDeque=3
@@ -233,6 +233,10 @@ soma/life/src/live_current_cuda/mount.rs	.clone()=2	BTreeMap=1	Vec=6
 soma/life/src/live_current_cuda/tests.rs	.clone()=14	.into_iter()=3	Vec=4
 soma/life/src/material_incidence.rs	.clone()=21	.collect()=44	.flat_map()=1	.into_iter()=1	BTreeMap=17	BTreeSet=36	Vec=78
 soma/life/src/material_shadow_cuda.rs	.clone()=2	Vec=9
+soma/life/src/mathematical_source.rs	.clone()=10	.collect()=8	.into_iter()=1	BTreeMap=2	BTreeSet=7	Vec=16
+soma/life/src/mathematical_source/correspondence.rs	.clone()=21	.collect()=8	BTreeMap=5	BTreeSet=10	Vec=12
+soma/life/src/mathematical_source/raster.rs	.clone()=6	Vec=5	VecDeque=2
+soma/life/src/mathematical_source/tests.rs	.clone()=8	BTreeSet=1
 soma/life/src/morphological_language.rs	BTreeMap=1	BTreeSet=1
 soma/life/src/morphological_language/condition_cuda.rs	.clone()=10	.collect()=16	.flat_map()=2	.into_iter()=5	BTreeMap=15	BTreeSet=8	Vec=35
 soma/life/src/morphological_language/conduct.rs	.clone()=15	.collect()=5	.into_iter()=2

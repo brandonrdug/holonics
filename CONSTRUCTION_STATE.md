@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-21 after Deed W5. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-21 after Deed M0. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE SOURCE-SHAPED GEMMA-4-E4B LIFT, DISSECTION, CULTIVATION AND RUNTIME PASS;
-GENERATOR-NATIVE PHOENIX REBIRTH REMAINS OPEN.**
+**CURRENT FRONTIER — MATHEMATICAL SOURCE CIRCULATION PASSED; THE FIRST TYPED MATHEMATICAL PARTICLE
+IS NEXT. GENERATOR-NATIVE PHOENIX REBIRTH REMAINS OPEN.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -26,18 +26,30 @@ source/native map retain the foreign realization rather than transfiguring it. T
 activity, compression and lightning-leader regrade is
 [`research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
-**NEXT DEED: M0 — mathematical source circulation.** [open] Admit born-digital PDF/vector and
-raster equation material plus the exterior equation atlas; recover plural source/layout incidence
-without an authored mathematical grammar. The first fixture is fixed by
-[`research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md`](research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md):
-harmonic-conjugation calibration plus the heat-Fisher paper's bounded natural-document control.
-M1–M4 remain ordered behind it: mathematical particles and typed sameness; codec-excited active
+[established-bounded] M0 admitted exact born-digital, vector, four/eight-connected raster and the
+210/194-row exterior equation atlas as distinct testimony. Reflow preserved the 97-occurrence
+serial face while moving planar incidence; the isolated `−χ→+χ` source perturbation returned one
+separator; pages 5/10 returned complete addressed candidate and unmatched populations. The diagram
+control first refused a falsely white background, then the material-read `(251,250,245)` border
+sample returned 83/83 components and a nontrivial disagreement fibre. The compact semantic return
+is 33,998,441 octets, SHA-256
+`3ca6c0342f7eb9dba5a7ee4b06f448036dc7af4f149981eacbfb95b901991ef8`.
+Authoritative grade:
+[`research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md`](research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md).
+
+**NEXT DEED: M1 — mathematical operation complex.** [open] Elaborate the M0 occurrence population
+into plural mathematical particles carrying binders, tensor variance, algebraic carriers,
+dimensions/units, hypotheses, ordered operation words, rendering receivers and complete
+reconstruction fibres. At least two standing exact owners must conduct through the same tiling and
+reduction passage. Occurrence identity, typed carrier equality, marked-diagram isomorphism,
+receiver/history equivalence, classification, characteristic similarity and face/byte/digest
+equality remain separate witnessed relations. M2–M4 remain ordered behind it: codec-excited active
 transport cover; generator-native codec pivot; and leader/return cultivation with the complete
 mathematical return. No exceptional compression factor is admitted before that generator ecology
 strictly reduces the complete artifact-plus-decoder/work/residency/transfer vector without receiver
 regression. The higher M1–M4 objective is a reusable catalytic constraint morphology, derived in
 [`research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md`](research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md);
-it does not displace M0 or admit protein material into the first deed.
+it does not admit protein material into M1.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

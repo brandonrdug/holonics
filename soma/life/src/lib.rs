@@ -49,6 +49,10 @@ pub mod lean_mathematics;
 // `research/records/2026-07-19_THE_INCIDENCE_REACTS_THE_COMPOUND_EXPOSES_ITS_BOUNDARY_THE_REGION_CARRIES_THE_FIELD.md` §I.
 pub mod live_current_cuda;
 pub mod material_incidence;
+// The heterogeneous source/layout seam for mathematical material. PDF/SVG decoding stays an
+// exterior apparatus face; this owner receives exact placed carriers or exact raster samples and
+// derives their generic serial/spatial incidence without accepting caller-authored links.
+pub mod mathematical_source;
 pub mod material_shadow_cuda;
 pub mod morphological_language;
 // Deed P4: the rest is mounted alone — conducted, deposited into, and re-sealed — with the

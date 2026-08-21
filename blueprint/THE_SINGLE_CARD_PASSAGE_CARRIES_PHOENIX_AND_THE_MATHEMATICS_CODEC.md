@@ -794,6 +794,20 @@ cross-chart disagreement fibre. PGL₂ action, heat geometry and Lean acceptance
 testimony; operation elaboration remains M1 and proof/checker return remains M2. Contract:
 [THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md](../research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md).
 
+**Returned 2026-08-21.** Exact born-digital, vector, four/eight-connected raster and exterior-atlas
+testimonies circulated through one derived source/layout owner. Reflow preserved the 97-occurrence
+serial face while moving planar incidence; the isolated `−χ→+χ` control returned one separator;
+pages 5/10 and all 210/194 atlas rows were admitted; every cross-chart candidate and unmatched
+occurrence remained addressed. The diagram control first refused because a falsely white
+background collapsed the cream sheet into one component, then returned 83/83 components and a
+nontrivial disagreement fibre after the exact border sample founded the background aperture. The
+33,998,441-octet semantic return has SHA-256
+`3ca6c0342f7eb9dba5a7ee4b06f448036dc7af4f149981eacbfb95b901991ef8`.
+This is a bounded CPU exterior/offline admission audit, not a GPU mathematical-semantic deed. The
+authoritative grade is
+[THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md](../research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md).
+M1 is next after the release boundary agrees.
+
 ### Deed M1 — mathematical operation complex
 
 Elaborate binders, tensor variance, algebraic carriers, dimensions/units, hypotheses, branches and

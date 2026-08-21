@@ -376,7 +376,21 @@ source/native address map remains identity-shaped and the rest remains source-sh
 generator/chart/word ecology was posed. The authoritative regrade is
 [`2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 W5 moves `CONSTRUCTION_STATE.md` only to the bounded lift/cultivation/runtime/dissection frontier;
-**Deed M0 is next.**
+generator-native Phoenix rebirth remains open.
+
+**DEED M0 PASSED 2026-08-21 — the mathematical source circulated, the false white background
+refused, and the complete bounded disagreement fibre returned.** Authoritative record:
+[`research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md`](../research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md).
+Born-digital, vector, exact four/eight-connected raster, and the 210/194-row exterior equation
+atlas entered as distinct content-addressed testimony. The 97-occurrence reflow face stayed serially
+invariant while its planar incidence moved; the isolated `−χ→+χ` perturbation returned one
+separator; natural pages 5/10 returned all correspondence candidates and unmatched occurrences.
+The diagram control first collapsed vacuously because its cream background had been declared white,
+then returned 83/83 components and a nontrivial disagreement after the exact border sample founded
+the aperture. The compact semantic artifact is 33,998,441 octets, SHA-256
+`3ca6c0342f7eb9dba5a7ee4b06f448036dc7af4f149981eacbfb95b901991ef8`.
+This is a bounded CPU exterior/offline source-admission audit and no GPU semantic deed.
+**Deed M1 is next.**
 
 **Every later occurrence in this file of “active plan,” “present deed,” or an older next-station
 claim is a dated ledger/provenance statement and schedules nothing unless this 2026-08-19 section
