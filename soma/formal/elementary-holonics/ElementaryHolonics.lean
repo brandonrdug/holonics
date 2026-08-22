@@ -88,3 +88,4 @@ import ElementaryHolonics.Millennium.HeckeEuler
 import ElementaryHolonics.Millennium.HeckeWitness
 import ElementaryHolonics.Millennium.GaussCoefficient
 import ElementaryHolonics.Millennium.FiveTwist
+import ElementaryHolonics.Millennium.FiveTheta
