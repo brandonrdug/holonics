@@ -135,6 +135,13 @@ Each row names its grade; none claims a result.
   lines (Moffatt 1969) — a winding census conserved by ideal transport, with dissipation as
   the aperture that opens it.
 
+**The compression face of this record is deposited separately, same day:**
+[the compact-frame compression record](2026-08-21_THE_COMPACT_FRAME_IS_A_LAWFUL_COMPRESSION_AND_THE_HORIZON_LAW_PREDICTS_WHAT_CROSSES.md)
+— the frame classified under the three species, the horizon-law prediction of what crosses
+(winding whole, magnitude not at all, ratio as the local factor), tolerance and the
+separating prime as distinguishing word, and the obstruction group as the frame family's
+certified remainder.
+
 ## 4. What is owed, with falsifiers
 
 **None scheduled; the roadmap alone schedules.**

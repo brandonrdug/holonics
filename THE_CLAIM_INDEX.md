@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (216 deposits of 508)
+## 4 · The 2026-08 record line (217 deposits of 509)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -339,6 +339,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THREE_NAMES_ONE_SUBGROUP.md` | Three names, one subgroup |
 | `2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md` | Equality is occurrence identity, the soul maps kinship, and the leader returns through the active codec |
 | `2026-08-21_THE_BSD_ROUTE_READS_PLACEMENT_AS_A_FAITHFUL_RECEIVER_OF_REALIZATION_AND_ARAKELOV_IS_THE_SHARED_ORGAN.md` | The BSD route reads placement as a faithful receiver of realization, and Arakelov is the shared organ |
+| `2026-08-21_THE_COMPACT_FRAME_IS_A_LAWFUL_COMPRESSION_AND_THE_HORIZON_LAW_PREDICTS_WHAT_CROSSES.md` | The compact frame is a lawful compression, and the horizon law predicts what crosses |
 | `2026-08-21_THE_DESCENT_IS_CLIMBED_THE_RANK_IS_ZERO_AND_ONE_IS_NOT_A_CONGRUENT_NUMBER.md` | The descent is climbed, the rank is zero, and one is not a congruent number |
 | `2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md` | The fold is a constraint ecology, the active site is a catalytic receiver, and the codec recovers archetypes |
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
