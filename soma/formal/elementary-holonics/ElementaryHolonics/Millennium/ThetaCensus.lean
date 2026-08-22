@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.RankZero
+import ElementaryHolonics.Millennium.DistantWindings
 import Mathlib.Tactic
 
 /-!
@@ -143,5 +144,63 @@ theorem theAnalyticAndRealizedSidesAgreeAtOne :
     (thickSolutions.card ≠ thinSolutions.card / 2) ∧
       (∀ a b c : ℚ, a * b = 2 → a ^ 2 + b ^ 2 = c ^ 2 → False) :=
   ⟨by decide, fun a b c hab hpyth => RankZero.theOneIsNotACongruentNumber a b c hab hpyth⟩
+
+/-! ## The laboratory continues: three and five -/
+
+private lemma abs_le_one_of_sq_le_one {x : ℤ} (h : x ^ 2 ≤ 1) : -1 ≤ x ∧ x ≤ 1 := by
+  constructor <;> nlinarith [sq_nonneg (x + 2), sq_nonneg (x - 2)]
+
+/-- **The censuses differ at three**: each form represents three in exactly the four ways
+`(±1, ±1, 0)`, and four is not half of four — the vanishing condition fails, the cited
+chain reads rank zero, and three is classically not a congruent number. -/
+theorem theCensusesDifferAtThree :
+    (∀ x y z : ℤ, 2 * x ^ 2 + y ^ 2 + 32 * z ^ 2 = 3 ↔
+      (z = 0 ∧ (x = 1 ∨ x = -1) ∧ (y = 1 ∨ y = -1))) ∧
+    (∀ x y z : ℤ, 2 * x ^ 2 + y ^ 2 + 8 * z ^ 2 = 3 ↔
+      (z = 0 ∧ (x = 1 ∨ x = -1) ∧ (y = 1 ∨ y = -1))) ∧
+    ¬ ((4 : ℤ) = 4 / 2) := by
+  refine ⟨?_, ?_, by norm_num⟩ <;>
+  · intro x y z
+    constructor
+    · intro h
+      have hz : z = 0 := by
+        by_contra hz0
+        have := sq_ge_one hz0
+        nlinarith [sq_nonneg x, sq_nonneg y]
+      subst hz
+      have hx2 : x ^ 2 ≤ 1 := by nlinarith [sq_nonneg y]
+      obtain ⟨hxl, hxr⟩ := abs_le_one_of_sq_le_one hx2
+      have hy2 : y ^ 2 ≤ 3 := by nlinarith [sq_nonneg x]
+      have hyl : -1 ≤ y ∧ y ≤ 1 := by
+        constructor <;> nlinarith [sq_nonneg (y + 2), sq_nonneg (y - 2)]
+      obtain ⟨hyl', hyr'⟩ := hyl
+      interval_cases x <;> interval_cases y <;> simp_all
+    · rintro ⟨rfl, hx | hx, hy | hy⟩ <;> subst hx <;> subst hy <;> norm_num
+
+/-- **The censuses vanish together at five, and the realized side supplies the infinite
+chain.**  Neither form represents five at all, so the vanishing condition holds — the cited
+chain reads a vanishing central value, the signature of positive rank — and this tree's
+realized side answers with the kernel-checked infinite-order point `(−4, 6)` on
+`y² = x³ − 25x`.  At one the census refuses and the descent proves emptiness; at five the
+census vanishes and the walk proves an infinite chain: **the two sides move together, in
+opposite directions, across the first two instances — both sides exact in this tree.** -/
+theorem theVanishingCensusMeetsTheInfiniteChainAtFive :
+    (∀ x y z : ℤ, 2 * x ^ 2 + y ^ 2 + 32 * z ^ 2 ≠ 5) ∧
+    (∀ x y z : ℤ, 2 * x ^ 2 + y ^ 2 + 8 * z ^ 2 ≠ 5) ∧
+    RankOne.ThePointHasInfiniteOrder := by
+  refine ⟨?_, ?_, DistantWindings.thePointHasInfiniteOrderHolds⟩ <;>
+  · intro x y z h
+    have hz : z = 0 := by
+      by_contra hz0
+      have := sq_ge_one hz0
+      nlinarith [sq_nonneg x, sq_nonneg y]
+    subst hz
+    have hx1 : -1 ≤ x ∧ x ≤ 1 := by
+      constructor <;> nlinarith [sq_nonneg y, sq_nonneg (x + 2), sq_nonneg (x - 2)]
+    have hy2 : -2 ≤ y ∧ y ≤ 2 := by
+      constructor <;> nlinarith [sq_nonneg x, sq_nonneg (y + 3), sq_nonneg (y - 3)]
+    obtain ⟨hxa, hxb⟩ := hx1
+    obtain ⟨hya, hyb⟩ := hy2
+    interval_cases x <;> interval_cases y <;> norm_num at h
 
 end Soma.Holonics.Millennium.ThetaCensus

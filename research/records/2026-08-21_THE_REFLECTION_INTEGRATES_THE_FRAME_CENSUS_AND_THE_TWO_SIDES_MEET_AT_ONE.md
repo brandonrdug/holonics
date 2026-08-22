@@ -10,7 +10,7 @@ authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
 [`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
-**Truth grades:** `proved-derived` with `formal-checked` evidence for the twelve Lean
+**Truth grades:** `proved-derived` with `formal-checked` evidence for the fourteen Lean
 theorems (`#print axioms` → `[propext, Classical.choice, Quot.sound]`, zero `sorryAx`);
 `proved-standard` for the cited bridges, named; `measured` where a command is stated.
 
@@ -41,9 +41,11 @@ through torsor classes.  None is scheduled here.
 ## 1. What was proved
 
 Owners: `ElementaryHolonics/Millennium/ReflectionCensus.lean` and
-`ElementaryHolonics/Millennium/ThetaCensus.lean` — **12 theorems, zero `sorry`, all
-audited**.  Measured after the merge: `Millennium/` is **63 files, 20,641 lines, 988
-top-level `theorem` declarations**; the library builds at **3,388 jobs**.
+`ElementaryHolonics/Millennium/ThetaCensus.lean` — **14 theorems, zero `sorry`, all
+audited**.  Measured after the merge: `Millennium/` is **63 files, 20,700 lines, 990
+top-level `theorem` declarations** (`grep -h "^theorem " ElementaryHolonics/Millennium/*.lean | wc -l`,
+2026-08-21; three files are Sol's in the shared tree); the library builds at **3,388
+jobs**.
 
 **B1 — the reflection integrates the census** (`theReflectionIntegratesTheCensus`):
 over every half-turn prime (`p ≡ 3 mod 4`), the affine census of **every** odd cubic
@@ -96,7 +98,7 @@ frame's inability to represent the quarter-turn.
 
 | owed | falsifier |
 |---|---|
-| the per-`n` Tunnell instrument: for any odd squarefree `n`, both theta censuses as bounded decidable enumerations, giving a both-sides reading for every small congruent-number instance | an `n` whose census enumeration the box bound fails to close |
+| the per-`n` Tunnell instrument — **ADVANCED 2026-08-21, same day, to three and five**: `theCensusesDifferAtThree` (four ways each, four is not half of four — rank zero read, three not congruent, consistent with the classical record) and `theVanishingCensusMeetsTheInfiniteChainAtFive` (**neither form represents five at all**, so the vanishing condition *holds* — the signature of positive rank — and the tree's realized side answers with the kernel-checked infinite-order point: **across one and five the two sides move together, in opposite directions, both exact**) | an `n` whose census enumeration the box bound fails to close |
 | the sighted-frame sign law (Gauss) proved rather than cited: `a_p = 2a` with the normalized split | a sighted prime whose normalized split disagrees with the enumerated trace |
 | the count census lifted from the affine equation to `E(𝔽_p)` as mathlib's point type, joining B1 to the group structure the torsion census uses | a frame where the affine count plus one differs from the point count |
 | the reflection law stated once at the Poisson grain: the finite aliasing identity `Σ_j ζ^{jk} = n·[n ∣ k]` as the common owner of B1's mechanism and the frame census | a winding the identity misreads |
