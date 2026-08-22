@@ -10,7 +10,7 @@
 use std::{
     collections::BTreeSet,
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Read},
     ops::Range,
     path::Path,
 };
@@ -161,9 +161,28 @@ impl ExactDialogueLineage {
         if !metadata.is_file() {
             return Err(format!("{} is not a Codex rollout file", path.display()));
         }
+        Self::import_codex_rollout_prefix(path, metadata.len(), spec)
+    }
+
+    /// Import exactly one already-captured prefix. An append which happens after the source
+    /// occurrence is declared cannot leak a later message into that occurrence.
+    pub fn import_codex_rollout_prefix(
+        path: &Path,
+        captured_extent: u64,
+        spec: &CodexDialogueImportSpec,
+    ) -> Result<Self, String> {
+        let metadata = path
+            .metadata()
+            .map_err(|error| format!("inspect {}: {error}", path.display()))?;
+        if !metadata.is_file() || metadata.len() < captured_extent {
+            return Err(format!(
+                "{} no longer carries the captured {captured_extent}-octet prefix",
+                path.display()
+            ));
+        }
         let input =
             File::open(path).map_err(|error| format!("open {}: {error}", path.display()))?;
-        let mut input = BufReader::new(input);
+        let mut input = BufReader::new(input.take(captured_extent));
         let mut raw = Vec::new();
         let mut raw_at = 0_u64;
         let mut record = 0_u64;
@@ -185,12 +204,19 @@ impl ExactDialogueLineage {
                 .ok_or_else(|| "raw dialogue extent".to_owned())?;
             prefix.update(&raw);
             if raw.iter().any(|octet| !octet.is_ascii_whitespace()) {
-                let value: Value = serde_json::from_slice(&raw).map_err(|error| {
-                    format!(
-                        "parse {} record {record} raw[{raw_at}..{raw_end}]: {error}",
-                        path.display()
-                    )
-                })?;
+                let value: Value = match serde_json::from_slice(&raw) {
+                    Ok(value) => value,
+                    Err(_) if raw_end == captured_extent && raw.last() != Some(&b'\n') => {
+                        raw_at = raw_end;
+                        break;
+                    }
+                    Err(error) => {
+                        return Err(format!(
+                            "parse {} record {record} raw[{raw_at}..{raw_end}]: {error}",
+                            path.display()
+                        ));
+                    }
+                };
                 if let Some(candidate) = visible_message(&value, spec.include_commentary)? {
                     match candidate {
                         VisibleMessage::Control => {
@@ -324,6 +350,146 @@ impl ExactDialogueLineage {
             .map(DialogueLineageOccurrence::passage)
             .collect()
     }
+}
+
+/// One Claude Code visible-message face. It deliberately carries no caused-by relation: the richer
+/// exchange atlas owns parent UUID and tool-return contacts, and this remains only a codec membrane.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ClaudeVisibleOccurrence {
+    pub identity: String,
+    pub speaker: DialogueSpeaker,
+    pub text: String,
+    pub raw_record: u64,
+    pub raw_range: Range<u64>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ClaudeVisibleReceipt {
+    pub schema: String,
+    pub source: String,
+    pub raw_extent: u64,
+    pub raw_prefix_sha256: String,
+    pub complete_records: u64,
+    pub visible_occurrences: usize,
+    pub excluded_control_occurrences: usize,
+}
+
+/// Exterior Claude Code membrane over one captured JSONL prefix. Tool use, tool results and
+/// unavailable thinking remain in the richer record atlas but are not mislabeled as visible prose.
+pub fn import_claude_visible_prefix(
+    path: &Path,
+    captured_extent: u64,
+) -> Result<(Vec<ClaudeVisibleOccurrence>, ClaudeVisibleReceipt), String> {
+    let metadata = path
+        .metadata()
+        .map_err(|error| format!("inspect {}: {error}", path.display()))?;
+    if !metadata.is_file() || metadata.len() < captured_extent {
+        return Err(format!(
+            "{} no longer carries the captured {captured_extent}-octet prefix",
+            path.display()
+        ));
+    }
+    let input = File::open(path).map_err(|error| format!("open {}: {error}", path.display()))?;
+    let mut input = BufReader::new(input.take(captured_extent));
+    let mut raw = Vec::new();
+    let mut raw_at = 0u64;
+    let mut record = 0u64;
+    let mut prefix = Sha256::new();
+    let mut visible = Vec::new();
+    let mut excluded = 0usize;
+    loop {
+        raw.clear();
+        let read = input
+            .read_until(b'\n', &mut raw)
+            .map_err(|error| format!("read {} record {record}: {error}", path.display()))?;
+        if read == 0 {
+            break;
+        }
+        let raw_end = raw_at
+            .checked_add(read as u64)
+            .ok_or_else(|| "Claude visible raw extent".to_owned())?;
+        prefix.update(&raw);
+        if raw.iter().any(|octet| !octet.is_ascii_whitespace()) {
+            let value: Value = match serde_json::from_slice(&raw) {
+                Ok(value) => value,
+                Err(_) if raw_end == captured_extent && raw.last() != Some(&b'\n') => {
+                    raw_at = raw_end;
+                    break;
+                }
+                Err(error) => {
+                    return Err(format!(
+                        "parse {} record {record} raw[{raw_at}..{raw_end}]: {error}",
+                        path.display()
+                    ));
+                }
+            };
+            if let Some((speaker, text)) = claude_visible_message(&value)? {
+                if text.trim().len() < 2 {
+                    excluded = excluded.saturating_add(1);
+                } else {
+                    let identity = value
+                        .get("uuid")
+                        .and_then(Value::as_str)
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| format!("claude-record/{record}/{raw_at}-{raw_end}"));
+                    visible.push(ClaudeVisibleOccurrence {
+                        identity,
+                        speaker,
+                        text,
+                        raw_record: record,
+                        raw_range: raw_at..raw_end,
+                    });
+                }
+            }
+            record = record
+                .checked_add(1)
+                .ok_or_else(|| "Claude visible record population".to_owned())?;
+        }
+        raw_at = raw_end;
+    }
+    let visible_occurrences = visible.len();
+    Ok((
+        visible,
+        ClaudeVisibleReceipt {
+            schema: "life.claude-visible-dialogue.v1".to_owned(),
+            source: path.display().to_string(),
+            raw_extent: raw_at,
+            raw_prefix_sha256: hex_digest(prefix.finalize().as_slice()),
+            complete_records: record,
+            visible_occurrences,
+            excluded_control_occurrences: excluded,
+        },
+    ))
+}
+
+fn claude_visible_message(value: &Value) -> Result<Option<(DialogueSpeaker, String)>, String> {
+    let speaker = match value.get("type").and_then(Value::as_str) {
+        Some("user") => DialogueSpeaker::User,
+        Some("assistant") => DialogueSpeaker::Assistant,
+        _ => return Ok(None),
+    };
+    let Some(message) = value.get("message") else {
+        return Ok(None);
+    };
+    let mut text = String::new();
+    match message.get("content") {
+        Some(Value::String(surface)) => text.push_str(surface),
+        Some(Value::Array(blocks)) => {
+            for block in blocks {
+                if block.get("type").and_then(Value::as_str) != Some("text") {
+                    continue;
+                }
+                if let Some(surface) = block.get("text").and_then(Value::as_str) {
+                    text.push_str(surface);
+                }
+            }
+        }
+        _ => return Ok(None),
+    }
+    if text.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some((speaker, text)))
 }
 
 enum VisibleMessage {
@@ -588,6 +754,42 @@ mod tests {
             "a founded identity carries the addressed lineage exactly as a supplied one does"
         );
         assert_eq!(lineage.passages()[2].text, "Apply that correction.");
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn a_captured_codex_prefix_cannot_admit_a_later_append() {
+        let path = temporary();
+        let first = "{\"timestamp\":\"t0\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"first\",\"content\":[{\"type\":\"input_text\",\"text\":\"First visible passage.\"}]}}\n";
+        let later = "{\"timestamp\":\"t1\",\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"later\",\"content\":[{\"type\":\"input_text\",\"text\":\"Later visible passage.\"}]}}\n";
+        std::fs::write(&path, format!("{first}{later}")).unwrap();
+        let lineage = ExactDialogueLineage::import_codex_rollout_prefix(
+            &path,
+            first.len() as u64,
+            &CodexDialogueImportSpec::default(),
+        )
+        .unwrap();
+        assert_eq!(lineage.occurrences.len(), 1);
+        assert_eq!(lineage.occurrences[0].identity, "first");
+        assert_eq!(lineage.receipt.raw_extent, first.len() as u64);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn claude_visible_prose_remains_a_membrane_over_tool_records() {
+        let path = temporary();
+        let material = concat!(
+            "{\"type\":\"user\",\"uuid\":\"user\",\"message\":{\"content\":\"Pose the construction.\"}}\n",
+            "{\"type\":\"assistant\",\"uuid\":\"assistant\",\"message\":{\"content\":[{\"type\":\"text\",\"text\":\"I will return it.\"},{\"type\":\"tool_use\",\"id\":\"tool\"}]}}\n",
+            "{\"type\":\"user\",\"uuid\":\"return\",\"message\":{\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"tool\",\"content\":\"world return\"}]}}\n"
+        );
+        std::fs::write(&path, material).unwrap();
+        let (visible, receipt) =
+            import_claude_visible_prefix(&path, material.len() as u64).unwrap();
+        assert_eq!(visible.len(), 2);
+        assert_eq!(visible[0].text, "Pose the construction.");
+        assert_eq!(visible[1].text, "I will return it.");
+        assert_eq!(receipt.complete_records, 3);
         std::fs::remove_file(path).unwrap();
     }
 }

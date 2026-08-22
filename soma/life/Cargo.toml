@@ -23,6 +23,7 @@ mount = { path = "../mount" }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 sha2 = "0.11"
+thiserror = { workspace = true }
 libc = "0.2"
 hound = "3.5"
 num-bigint = "0.4"

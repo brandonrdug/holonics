@@ -31,6 +31,10 @@ pub mod exact_world;
 // happened, with `occurs` and `recurs` as the only contact. It lives here because it assembles
 // `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
 pub mod eros_rest;
+// The provider-neutral record-incidence owner for Athena's exchange world-tube. JSONL and visible
+// dialogue are exterior codec faces; occurrence identity, ordered tree incidence, exact scalar
+// contact classes, chronology receivers, and the source-detached rest are the live construction.
+pub mod exchange_world_tube;
 pub mod exposure_codec;
 pub mod form_mouth;
 pub mod founded_mouth;

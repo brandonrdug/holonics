@@ -123,11 +123,16 @@ authoritative record is
 The exact product contract and the ordered A1--A6 continuation are in
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
 
-**A1 is next.** Mount the operator-authorized Codex and Claude Code exchange world-tubes through
-the existing mouths without flattening their agent, tool, world, proof, commit, gate and later-return
-branches into transcript order or provider labels. A1 moves the frontier only when its ten returns,
-including source-detached remount, branch-permutation separator, lineage ablations and an inspected
-real mounted artifact, stand together.
+**A1 PASSED.** One 404,556,551-octet operator-authorized Codex/Claude Code occurrence streamed into
+provider-neutral record/tree incidence, exact resident scalar-contact classes, visible-message
+faces, agent/tool/world joins, a chronology separator and one source-detached executable atlas.
+All ten returns stand together. Authoritative grade:
+[`research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md`](../research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md).
+
+**A2 is next.** Derive sibling continuations from A1's operation/contact classes, presentation
+generators, shortest separators and open fibres while holding Athena rest and addressed history
+fixed. Return the full receiver-indexed defect complex, tool/world consequences and provider-removal
+controls without inventing teacher interiors, flattening the exchange, or choosing a scalar winner.
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).

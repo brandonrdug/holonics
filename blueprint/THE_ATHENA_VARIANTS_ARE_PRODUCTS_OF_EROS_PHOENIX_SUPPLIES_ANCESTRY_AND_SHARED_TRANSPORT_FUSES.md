@@ -3,14 +3,14 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current deed:** A1. M6 / Athena-A0 returned all twelve required consequences on 2026-08-22.
+**Current deed:** A2. A1 returned all ten required consequences on 2026-08-22.
 **Scheduling boundary:** this file orders the Athena-product continuation. It does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md); only a returned deed and passing grade do that.
 
 **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts;
 `established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived` for the
 named local Lean theorems; `interpretation` for their transfer into the construction geometry; and
-`open` for A1 and every later Athena product deed.
+`open` for A2 and every later Athena product deed.
 
 **Governing doctrine:**
 [`TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -409,9 +409,9 @@ unexcited Gemma conduct remains outside the Athena-A0 receiver/history aperture.
 
 ---
 
-## 8. Deed A1 — the exchange world-tube is mounted without flattening its branches
+## 8. Deed A1 — the exchange world-tube is mounted without flattening its branches — PASSED
 
-[open] A1 composes existing mouths over the operator-authorized Codex and Claude Code rollouts,
+[established-bounded] A1 composes existing mouths over the operator-authorized Codex and Claude Code rollouts,
 including user/assistant messages, tool calls and returns, sub-agent branches, commits, proof
 returns, gates, artifacts and later corrections. It derives identities from content-addressed
 container/record incidence, never absolute host path or provider label.
@@ -428,6 +428,19 @@ A1 passes only when:
 8. no hidden reasoning, transcript parser or authored role semantics enters the native topology;
 9. complete unresolved and excluded populations are returned; and
 10. the real mounted exchange artifact is inspected.
+
+[established-bounded; implemented-exact; measured] All ten returns stand together. One
+404,556,551-octet occurrence streamed 59,445 records into 2,592,724 situated nodes and 1,032,546
+scalar sites. Eight RTX 4080 SUPER quotient launches founded 300,294 content classes; 1,179 visible
+messages factor through richer record occurrences; exact parent, session and tool/world receivers
+return with unresolved fibres; branch permutation changes chronology; provider/file-kind ablation
+preserves the content law; and the 264,138,601-octet detached rest reproduces the complete atlas
+inside a source-absent private mount namespace.
+The authoritative return is
+[`research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md`](../research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md).
+
+[open] Equal-scalar classes not yet selected by a declared receiver remain complete
+correspondence fibres. A1 makes no training, response-quality or sibling-defect claim.
 
 ---
 

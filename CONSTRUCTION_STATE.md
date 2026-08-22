@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed M6 / Athena-A0. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed A1. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE TOTAL DESCENT ROUTE CULTIVATED THE FIRST ATHENA MATHEMATICS VARIANT,
-THE WITHHELD PASSAGE SEPARATED, AND THE PRODUCT NOW ENTERS THE EXCHANGE WORLD-TUBE.**
+**CURRENT FRONTIER — THE EXCHANGE WORLD-TUBE RETAINED ITS BRANCHES, ITS CONTACT FIBRE FACTORED,
+AND ATHENA NOW ENTERS THE SIBLING DEFECT COMPLEX.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -136,13 +136,30 @@ ignored-runtime basenames read as body paths and nine stale boundary-artifact bi
 test now passes, the ABI and path retakes return zero failures, and all three boundary artifacts are
 bound; the complete expensive receiver was not replayed.
 
-**NEXT DEED: A1 — the exchange world-tube is mounted without flattening its branches.** [open]
-Compose the existing mouths over operator-authorized Codex and Claude Code rollouts. Mount one
-source occurrence incrementally; preserve message faces inside richer addressed passages; retain
-agent/tool/world join witnesses; separate identical text at distinct causal cuts; return a
-chronology separator under an unlicensed branch permutation; remount the atlas source-detached;
-and return provider/material ablations, excluded populations and the inspected real artifact. The
-ten-part grade and refusal boundary are in the Athena-product blueprint named above.
+**A1 PASSED — the exchange world-tube retained its branches.** [established-bounded] One
+404,556,551-octet captured Codex/Claude Code occurrence streamed 59,445 records into 2,592,724
+situated tree nodes and 1,032,546 scalar sites. Eight RTX 4080 SUPER quotient launches founded
+300,294 exact content classes with no CPU semantic replay. All 1,179 visible messages factor through
+richer record occurrences; parent, cross-container session and tool/world joins remain exact;
+ten repeated visible-content classes retain distinct causal occurrences; an unlicensed branch
+permutation changes chronology; provider/material-kind ablations preserve the content law; and the
+264,138,601-octet detached rest reproduces the complete atlas inside a source-absent private mount
+namespace. The authoritative grade is
+[`research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md`](research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md).
+The six-member returned family is bound by `meta/OUTPUT_MANIFEST.tsv` at SHA-256
+`af047f8dfe53dfb595ad28c32576aa8c9ff779d6bc7a473dd7742904826466f4`; its producing closure is
+bound by `meta/CLOSURE_MANIFEST.tsv` at SHA-256
+`7feaf4adcc82ad1e0cf8a1d3c7428083e82b98ee4776225188ca5823957109a6`.
+[established-bounded; measured] The sole complete A1 release receiver passed all thirteen scopes in
+242.95 seconds: 2,820 tests passed, none failed, 22 were explicitly ignored, every example target
+type-checked and all twelve non-test scopes were green.
+
+**NEXT DEED: A2 — sibling continuations return a defect spectrum and active cover.** [open]
+Derive the cohort from A1's operation/contact classes, presentation generators, shortest separators
+and open fibres. Hold Athena rest and addressed history fixed; return plural continuations,
+tool/world consequences, the complete receiver-indexed defect complex and provider-removal controls.
+Do not invent unavailable teacher interiors, replace world consequence with prose, or select a
+scalar winner. The complete grade and refusals are in the Athena-product blueprint named above.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

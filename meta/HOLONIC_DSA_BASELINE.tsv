@@ -224,8 +224,13 @@ soma/life/src/conditioned_rest.rs	.clone()=40	.collect()=7	BTreeMap=1	BTreeSet=3
 soma/life/src/coupled_informant_current.rs	.clone()=2	.collect()=2	.flat_map()=1	.into_iter()=2	BTreeMap=3	BTreeSet=2	Vec=12
 soma/life/src/current_world.rs	.clone()=6	.flat_map()=1	.into_iter()=2	Vec=21
 soma/life/src/decomposing_codec.rs	.clone()=28	.collect()=48	.into_iter()=7	BTreeMap=12	BTreeSet=36	Vec=114
-soma/life/src/dialogue_lineage.rs	.clone()=10	.collect()=2	BTreeSet=4	Vec=4
+soma/life/src/dialogue_lineage.rs	.clone()=10	.collect()=2	BTreeSet=4	Vec=7
 soma/life/src/eros_rest.rs	.clone()=11	.collect()=3	Vec=43
+soma/life/src/exchange_world_tube/json_record.rs	Vec=11
+soma/life/src/exchange_world_tube/mod.rs	.clone()=2	BTreeMap=2	Vec=8
+soma/life/src/exchange_world_tube/mount.rs	.clone()=3	.collect()=1	.into_iter()=2	BTreeMap=4	Vec=17
+soma/life/src/exchange_world_tube/receiver.rs	.collect()=3	.into_iter()=1	BTreeMap=6	BTreeSet=2	Vec=12
+soma/life/src/exchange_world_tube/rest.rs	BTreeMap=2	Vec=19
 soma/life/src/exposure_codec.rs	.clone()=9	.collect()=34	.into_iter()=8	BTreeMap=19	BTreeSet=30	HashMap=5	Vec=98
 soma/life/src/form_mouth.rs	.clone()=3	.collect()=3	Vec=4
 soma/life/src/founded_mouth.rs	.clone()=1	.collect()=3	.into_iter()=2	Vec=21
