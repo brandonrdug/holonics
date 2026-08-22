@@ -83,3 +83,4 @@ import ElementaryHolonics.Millennium.StratumDescent
 import ElementaryHolonics.Millennium.SeventeenObstruction
 import ElementaryHolonics.Millennium.BirchSwinnertonDyer
 import ElementaryHolonics.Millennium.HeckeTheta
+import ElementaryHolonics.Millennium.HeckeWitness

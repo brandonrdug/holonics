@@ -103,17 +103,32 @@ structure LDatum (n : ℕ) where
   L : ℂ → ℂ
   /-- Entirety. -/
   analytic : Differentiable ℂ L
-  /-- Agreement with the Dirichlet series where it converges. -/
-  agrees : ∀ s : ℂ, 3 / 2 < s.re → L s = LSeries coeff s
+  /-- Agreement with the Dirichlet series on a right half-plane.  The half-plane
+  `re s > 3` is enough to pin the entire `L` uniquely (agreement on any half-plane
+  plus entirety determines the function everywhere); the classical convergence
+  abscissa `3/2` is the Hasse-bound refinement `|coeff m| = O(m^{1/2+ε})`, which the
+  pose does not need. -/
+  agrees : ∀ s : ℂ, 3 < s.re → L s = LSeries coeff s
   /-- The conductor. -/
   conductor : ℕ
   conductor_pos : 0 < conductor
   /-- The sign of the functional equation. -/
   sign : ℤ
   sign_pm : sign = 1 ∨ sign = -1
+  /-- The completed L-function, carried as its own entire function. -/
+  Lambda : ℂ → ℂ
+  /-- The completed function is entire. -/
+  Lambda_analytic : Differentiable ℂ Lambda
+  /-- Away from the poles of `Γ`, the completed function is the product
+  `(√N/2π)^s·Γ(s)·L(s)`.  The exclusion is load-bearing and was measured by attempting
+  the witness (2026-08-22): mathlib's `Γ` carries the junk value `0` at the nonpositive
+  integers, so demanding the naive product identity at every `s` would force
+  `L(2+m) = 0` through the reflection — a vanishing the true object refuses.  The
+  classical completed function is entire and *extends* the product past the poles; the
+  product formula is one chart of it, not its definition. -/
+  Lambda_eq : ∀ s : ℂ, (∀ m : ℕ, s ≠ -(m : ℂ)) → Lambda s = completed conductor L s
   /-- The completed functional equation. -/
-  functional_equation : ∀ s : ℂ,
-    completed conductor L (2 - s) = (sign : ℂ) * completed conductor L s
+  functional_equation : ∀ s : ℂ, Lambda (2 - s) = (sign : ℂ) * Lambda s
 
 /-- **The analytic rank**: the order of vanishing of the continued L-function at the
 center of the functional equation. -/
@@ -273,12 +288,17 @@ theorem theOddSignForcesCentralVanishing {n : ℕ} (W : LDatum n) (hw : W.sign =
     W.L 1 = 0 := by
   have h := W.functional_equation 1
   rw [hw] at h
-  have h2 : (2 : ℂ) * completed W.conductor W.L 1 = 0 := by
+  have hone : ∀ m : ℕ, (1 : ℂ) ≠ -(m : ℂ) := by
+    intro m hm
+    have hre : (1 : ℝ) = -(m : ℝ) := by exact_mod_cast congrArg Complex.re hm
+    nlinarith [Nat.cast_nonneg (α := ℝ) m]
+  have h2 : (2 : ℂ) * W.Lambda 1 = 0 := by
     push_cast at h
     have hsub : (2 : ℂ) - 1 = 1 := by norm_num
     rw [hsub] at h
     linear_combination h
   have h1 : completed W.conductor W.L 1 = 0 := by
+    rw [← W.Lambda_eq 1 hone]
     have h20 : (2 : ℂ) ≠ 0 := by norm_num
     exact (mul_eq_zero.mp h2).resolve_left h20
   unfold completed at h1

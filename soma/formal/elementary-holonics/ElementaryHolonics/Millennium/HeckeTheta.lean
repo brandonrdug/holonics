@@ -1237,4 +1237,207 @@ theorem theHeckeThetaIsTheGaussianClassSum {x : ℝ} (hx : 0 < x) :
   rw [hfun, ← hval]
   exact (summable_hPlus hd).hasSum
 
+/-! ## 17. The Dirichlet coefficients: norm shells of the Gaussian lattice
+
+Regrouping the class sum along the shells `a² + b² = m` presents the theta as a
+Dirichlet exponential series with **computable integer coefficients** — the Hecke
+eigenvalue stream of the congruent-number curve at one. -/
+
+/-- The norm-`m` shell of the positive quartic class, as a computable finset. -/
+def heckeShell (m : ℕ) : Finset (ℤ × ℤ) :=
+  ((Finset.Icc (-(m : ℤ)) (m : ℤ)) ×ˢ (Finset.Icc (-(m : ℤ)) (m : ℤ))).filter
+    (fun p => p.1 ^ 2 + p.2 ^ 2 = (m : ℤ) ∧ (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0)
+
+/-- The `m`-th Hecke coefficient: the weight sum over the norm-`m` shell. -/
+def heckeCoeff (m : ℕ) : ℤ := ∑ p ∈ heckeShell m, p.1
+
+private lemma norm_shell_bound {m : ℕ} {a b : ℤ} (h : a ^ 2 + b ^ 2 = (m : ℤ)) :
+    -(m : ℤ) ≤ a ∧ a ≤ (m : ℤ) ∧ -(m : ℤ) ≤ b ∧ b ≤ (m : ℤ) := by
+  have hm : (0 : ℤ) ≤ (m : ℤ) := Int.natCast_nonneg m
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg (a + m), sq_nonneg (a - m),
+      sq_nonneg (b + m), sq_nonneg (b - m)]
+
+/-- The norm fibration of the lattice. -/
+private def latticeNorm (p : ℤ × ℤ) : ℕ := (p.1 ^ 2 + p.2 ^ 2).toNat
+
+private lemma latticeNorm_eq_iff {p : ℤ × ℤ} {m : ℕ} :
+    latticeNorm p = m ↔ p.1 ^ 2 + p.2 ^ 2 = (m : ℤ) := by
+  unfold latticeNorm
+  have h1 : (0 : ℤ) ≤ p.1 ^ 2 + p.2 ^ 2 := by positivity
+  omega
+
+/-- The fiber sum: on the norm-`m` shell the envelope is constant, so the class weights
+collect into `heckeCoeff m`. -/
+private lemma fiber_hasSum (d : ℝ) (m : ℕ) :
+    HasSum (fun c : {p : ℤ × ℤ // latticeNorm p = m} => hPlus d (c : ℤ × ℤ))
+      (((heckeCoeff m : ℤ) : ℂ) * ((rexp (-2 * π * d * (m : ℝ)) : ℝ) : ℂ)) := by
+  classical
+  refine (hasSum_subtype_iff_indicator
+    (s := {q : ℤ × ℤ | latticeNorm q = m}) (f := hPlus d)).mpr ?_
+  have hvanish : ∀ p : ℤ × ℤ,
+      p ∉ ((Finset.Icc (-(m : ℤ)) (m : ℤ)) ×ˢ (Finset.Icc (-(m : ℤ)) (m : ℤ))) →
+      Set.indicator {q : ℤ × ℤ | latticeNorm q = m} (hPlus d) p = 0 := by
+    rintro ⟨a, b⟩ hp
+    by_cases hmem : latticeNorm (a, b) = m
+    · exfalso
+      apply hp
+      have hb := norm_shell_bound (latticeNorm_eq_iff.mp hmem)
+      rw [Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+      exact ⟨⟨hb.1, hb.2.1⟩, ⟨hb.2.2.1, hb.2.2.2⟩⟩
+    · exact Set.indicator_of_notMem (s := {q : ℤ × ℤ | latticeNorm q = m}) hmem (hPlus d)
+  have hval : ∑ p ∈ ((Finset.Icc (-(m : ℤ)) (m : ℤ)) ×ˢ (Finset.Icc (-(m : ℤ)) (m : ℤ))),
+      Set.indicator {q : ℤ × ℤ | latticeNorm q = m} (hPlus d) p
+      = ((heckeCoeff m : ℤ) : ℂ) * ((rexp (-2 * π * d * (m : ℝ)) : ℝ) : ℂ) := by
+    have hterm : ∀ p ∈ ((Finset.Icc (-(m : ℤ)) (m : ℤ)) ×ˢ (Finset.Icc (-(m : ℤ)) (m : ℤ))),
+        Set.indicator {q : ℤ × ℤ | latticeNorm q = m} (hPlus d) p
+        = (if p.1 ^ 2 + p.2 ^ 2 = (m : ℤ) ∧ (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0
+            then ((p.1 : ℤ) : ℂ) else 0) * ((rexp (-2 * π * d * (m : ℝ)) : ℝ) : ℂ) := by
+      rintro ⟨a, b⟩ -
+      rw [Set.indicator_apply]
+      by_cases hnorm : latticeNorm (a, b) = m
+      · rw [if_pos (show (a, b) ∈ {q : ℤ × ℤ | latticeNorm q = m} from hnorm)]
+        have hnorm' := latticeNorm_eq_iff.mp hnorm
+        simp only [hPlus]
+        by_cases hclass : ((a + b) % 4 = 1 ∧ b % 2 = 0)
+        · rw [if_pos hclass, if_pos ⟨hnorm', hclass.1, hclass.2⟩]
+          have henv : env d a b = rexp (-2 * π * d * (m : ℝ)) := by
+            unfold env
+            congr 1
+            have : ((a : ℝ) ^ 2 + (b : ℝ) ^ 2) = (m : ℝ) := by
+              exact_mod_cast congrArg (Int.cast : ℤ → ℝ) hnorm'
+            rw [this]
+          rw [henv]
+        · rw [if_neg hclass, if_neg (by tauto)]
+          ring
+      · have hnorm' : ¬(a ^ 2 + b ^ 2 = (m : ℤ)) := fun hc => hnorm (latticeNorm_eq_iff.mpr hc)
+        rw [if_neg (show (a, b) ∉ {q : ℤ × ℤ | latticeNorm q = m} from hnorm),
+          if_neg (by tauto)]
+        ring
+    rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul]
+    congr 1
+    rw [heckeCoeff, heckeShell, Finset.sum_filter]
+    push_cast
+    rfl
+  rw [← hval]
+  exact hasSum_sum_of_ne_finset_zero hvanish
+
+set_option maxHeartbeats 1000000 in
+/-- **The theta function is its Dirichlet series**: `heckeTheta x` is the exponential
+series `Σ_m heckeCoeff m · exp(−2πmx/√32)` with computable integer coefficients. -/
+theorem theHeckeThetaIsItsDirichletSeries {x : ℝ} (hx : 0 < x) :
+    HasSum (fun m : ℕ => ((heckeCoeff m : ℤ) : ℂ) *
+      ((rexp (-2 * π * (x / (4 * Real.sqrt 2)) * (m : ℝ)) : ℝ) : ℂ))
+      ((heckeTheta x : ℝ) : ℂ) := by
+  have hcls : HasSum (hPlus (x / (4 * Real.sqrt 2))) ((heckeTheta x : ℝ) : ℂ) :=
+    theHeckeThetaIsTheGaussianClassSum hx
+  have hσ : HasSum (fun q : Σ m : ℕ, {p : ℤ × ℤ // latticeNorm p = m} =>
+      hPlus (x / (4 * Real.sqrt 2)) ((Equiv.sigmaFiberEquiv latticeNorm) q))
+      ((heckeTheta x : ℝ) : ℂ) :=
+    ((Equiv.sigmaFiberEquiv latticeNorm).hasSum_iff).mpr hcls
+  exact hσ.sigma fun m => fiber_hasSum (x / (4 * Real.sqrt 2)) m
+
+/-! ## 18. First laws of the coefficient stream
+
+The class forces `a` odd and `b` even, so every even-norm shell is empty; a norm
+`≡ 3 (mod 4)` is refused by the two-squares frame; and the crude circle bound
+`|c_m| ≤ 9m²` carries the Dirichlet half-plane. -/
+
+theorem heckeCoeff_zero : heckeCoeff 0 = 0 := by decide
+
+theorem heckeCoeff_one : heckeCoeff 1 = 1 := by decide
+
+private lemma shell_refused {m : ℕ}
+    (h : ∀ a b : ℤ, a ^ 2 + b ^ 2 = (m : ℤ) → (a + b) % 4 = 1 → b % 2 = 0 → False) :
+    heckeCoeff m = 0 := by
+  rw [heckeCoeff]
+  apply Finset.sum_eq_zero
+  intro p hp
+  rw [heckeShell, Finset.mem_filter] at hp
+  exact (h p.1 p.2 hp.2.1 hp.2.2.1 hp.2.2.2).elim
+
+/-- Every even-norm shell is empty: the class has `a` odd and `b` even. -/
+theorem heckeCoeff_even {m : ℕ} (hm : m % 2 = 0) : heckeCoeff m = 0 := by
+  refine shell_refused fun a b hnorm hcls hb => ?_
+  obtain ⟨c, rfl⟩ : ∃ c, b = 2 * c := ⟨b / 2, by omega⟩
+  obtain ⟨e, rfl⟩ : ∃ e, a = 2 * e + 1 := ⟨(a - 1) / 2, by omega⟩
+  obtain ⟨f, rfl⟩ : ∃ f, m = 2 * f := ⟨m / 2, by omega⟩
+  have h2 : (2 * e + 1) ^ 2 + (2 * c) ^ 2 = 2 * (f : ℤ) := by exact_mod_cast hnorm
+  have hdvd : (2 : ℤ) ∣ 1 := ⟨(f : ℤ) - 2 * e ^ 2 - 2 * e - 2 * c ^ 2, by linarith [h2, sq_nonneg e]⟩
+  norm_num at hdvd
+
+/-- A norm `≡ 3 (mod 4)` is refused by the two-squares frame. -/
+theorem heckeCoeff_three_mod_four {m : ℕ} (hm : m % 4 = 3) : heckeCoeff m = 0 := by
+  refine shell_refused fun a b hnorm _ _ => ?_
+  have key : ∀ x y : ZMod 4, x ^ 2 + y ^ 2 ≠ 3 := by decide
+  obtain ⟨q, rfl⟩ : ∃ q, m = 4 * q + 3 := ⟨m / 4, by omega⟩
+  have hc := congrArg (fun z : ℤ => (z : ZMod 4)) hnorm
+  push_cast at hc
+  apply key (a : ZMod 4) (b : ZMod 4)
+  rw [hc, show ((4 : ZMod 4)) = 0 from by decide]
+  ring
+
+private lemma shell_coord_bound {m : ℕ} {a b : ℤ} (hnorm : a ^ 2 + b ^ 2 = (m : ℤ)) :
+    -(Nat.sqrt m : ℤ) ≤ a ∧ a ≤ (Nat.sqrt m : ℤ) := by
+  have ha2 : a ^ 2 ≤ (m : ℤ) := by nlinarith [sq_nonneg b]
+  have hlt : (m : ℤ) < ((Nat.sqrt m : ℤ) + 1) ^ 2 := by
+    have h := Nat.lt_succ_sqrt' m
+    have h2 : (m : ℤ) < ((Nat.sqrt m + 1 : ℕ) : ℤ) ^ 2 := by exact_mod_cast h
+    push_cast at h2
+    nlinarith [h2]
+  constructor <;>
+    nlinarith [ha2, hlt, sq_nonneg (a + (Nat.sqrt m : ℤ) + 1),
+      sq_nonneg (a - (Nat.sqrt m : ℤ) - 1)]
+
+/-- The crude circle bound on the coefficients. -/
+theorem heckeCoeff_abs_le (m : ℕ) : |heckeCoeff m| ≤ 9 * (m : ℤ) ^ 2 := by
+  rcases Nat.eq_zero_or_pos m with rfl | hm
+  · decide
+  have hs2 : ((Nat.sqrt m : ℤ)) ^ 2 ≤ (m : ℤ) := by
+    exact_mod_cast Nat.sqrt_le' m
+  have hsle : ((Nat.sqrt m : ℤ)) ≤ (m : ℤ) := by exact_mod_cast Nat.sqrt_le_self m
+  have hm1 : (1 : ℤ) ≤ (m : ℤ) := by exact_mod_cast hm
+  have hsub : heckeShell m ⊆
+      (Finset.Icc (-(Nat.sqrt m : ℤ)) (Nat.sqrt m : ℤ)) ×ˢ
+        (Finset.Icc (-(Nat.sqrt m : ℤ)) (Nat.sqrt m : ℤ)) := by
+    rintro ⟨a, b⟩ hp
+    rw [heckeShell, Finset.mem_filter] at hp
+    have hnorm := hp.2.1
+    have hA := shell_coord_bound hnorm
+    have hB := shell_coord_bound (show b ^ 2 + a ^ 2 = (m : ℤ) from by linarith)
+    exact Finset.mem_product.mpr
+      ⟨Finset.mem_Icc.mpr ⟨hA.1, hA.2⟩, Finset.mem_Icc.mpr ⟨hB.1, hB.2⟩⟩
+  have hcard : ((heckeShell m).card : ℤ) ≤ (2 * (Nat.sqrt m : ℤ) + 1) ^ 2 := by
+    have h1 := Finset.card_le_card hsub
+    have h2 : ((Finset.Icc (-(Nat.sqrt m : ℤ)) (Nat.sqrt m : ℤ)) ×ˢ
+        (Finset.Icc (-(Nat.sqrt m : ℤ)) (Nat.sqrt m : ℤ))).card
+        = (2 * Nat.sqrt m + 1) * (2 * Nat.sqrt m + 1) := by
+      rw [Finset.card_product, Int.card_Icc]
+      have : ((Nat.sqrt m : ℤ) + 1 - -(Nat.sqrt m : ℤ)).toNat = 2 * Nat.sqrt m + 1 := by
+        omega
+      rw [this]
+    have h3 := h1.trans_eq h2
+    have h4 : ((heckeShell m).card : ℤ) ≤ ((2 * Nat.sqrt m + 1) * (2 * Nat.sqrt m + 1) : ℕ) := by
+      exact_mod_cast h3
+    push_cast at h4
+    nlinarith [h4]
+  have habs : |heckeCoeff m| ≤ ((heckeShell m).card : ℤ) * (Nat.sqrt m : ℤ) := by
+    rw [heckeCoeff]
+    calc |∑ p ∈ heckeShell m, p.1| ≤ ∑ p ∈ heckeShell m, |p.1| :=
+          Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ _p ∈ heckeShell m, (Nat.sqrt m : ℤ) := by
+          apply Finset.sum_le_sum
+          rintro ⟨a, b⟩ hp
+          rw [heckeShell, Finset.mem_filter] at hp
+          have hA := shell_coord_bound hp.2.1
+          rw [abs_le]
+          exact ⟨hA.1, hA.2⟩
+      _ = ((heckeShell m).card : ℤ) * (Nat.sqrt m : ℤ) := by
+          rw [Finset.sum_const, nsmul_eq_mul]
+  have hsnn : (0 : ℤ) ≤ (Nat.sqrt m : ℤ) := Int.natCast_nonneg _
+  calc |heckeCoeff m| ≤ ((heckeShell m).card : ℤ) * (Nat.sqrt m : ℤ) := habs
+    _ ≤ (2 * (Nat.sqrt m : ℤ) + 1) ^ 2 * (Nat.sqrt m : ℤ) :=
+        mul_le_mul_of_nonneg_right hcard hsnn
+    _ ≤ 9 * (m : ℤ) ^ 2 := by nlinarith [hs2, hsle, hm1, hsnn]
+
 end Soma.Holonics.Millennium.HeckeTheta
