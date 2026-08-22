@@ -332,6 +332,7 @@ pub struct CudaRefineExecutor {
     native_trace: CuFunction,
     returned_recurrence: CuFunction,
     condensed_recurrence: CuFunction,
+    heterogeneous_fusion: CuFunction,
     contact_pairs: CuFunction,
     contact_compare: CuFunction,
     device_name: String,
@@ -400,6 +401,7 @@ impl CudaRefineExecutor {
             let mut native_trace = ptr::null_mut();
             let mut returned_recurrence = ptr::null_mut();
             let mut condensed_recurrence = ptr::null_mut();
+            let mut heterogeneous_fusion = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
             let mut contact_compare = ptr::null_mut();
             for (slot, symbol, operation) in [
@@ -439,6 +441,11 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(conduct_condensed_recurrences)",
                 ),
                 (
+                    &mut heterogeneous_fusion as *mut CuFunction,
+                    c"conduct_heterogeneous_fusion",
+                    "cuModuleGetFunction(conduct_heterogeneous_fusion)",
+                ),
+                (
                     &mut contact_pairs as *mut CuFunction,
                     c"classify_contact_pairs",
                     "cuModuleGetFunction(classify_contact_pairs)",
@@ -470,6 +477,7 @@ impl CudaRefineExecutor {
                 native_trace,
                 returned_recurrence,
                 condensed_recurrence,
+                heterogeneous_fusion,
                 contact_pairs,
                 contact_compare,
             ] {
@@ -492,6 +500,7 @@ impl CudaRefineExecutor {
                 native_trace,
                 returned_recurrence,
                 condensed_recurrence,
+                heterogeneous_fusion,
                 contact_pairs,
                 contact_compare,
                 device_name,
@@ -742,6 +751,28 @@ pub struct DeviceCondensedRecurrences {
     pub block_threads: u32,
     pub active_lanes: u32,
     pub visited_words: usize,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One shared heterogeneous generator, its global withdrawal, and every single-port withdrawal
+/// returned from one card front. The consequences are native addresses; complete source members
+/// remain in the separately authenticated reconstruction fibres.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceHeterogeneousFusion {
+    /// Family-major, port-major cells.
+    pub predecessor_consequence: Vec<u32>,
+    pub successor_consequence: Vec<u32>,
+    pub shared_ablated_consequence: Vec<u32>,
+    /// Row-major `[cell][withdrawn port]`.
+    pub local_ablated_consequence: Vec<u32>,
+    pub families: usize,
+    pub ports: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
     pub host_ingress_octets: u64,
     pub host_egress_octets: u64,
     pub resident_octets: u64,
@@ -1552,6 +1583,144 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Conduct one shared state action through every declared modality and receiver family.
+    ///
+    /// `decoder` is family-major, port-major, state-minor. The same `successor_action` is read by
+    /// every lane; a second per-port action table is neither accepted nor constructed. The global
+    /// and every single-port ablation are returned together after one terminal synchronization.
+    pub fn conduct_heterogeneous_fusion_on_device(
+        &mut self,
+        successor_action: &[u32],
+        decoder: &[u32],
+        native_start: &[u32],
+        families: usize,
+        ports: usize,
+    ) -> Result<DeviceHeterogeneousFusion, CudaRefineError> {
+        let states = successor_action.len();
+        let cells = families
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let expected_decoder = cells
+            .checked_mul(states)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let local_entries = cells
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if states == 0
+            || families == 0
+            || ports < 2
+            || cells == 0
+            || cells > u32::MAX as usize
+            || states > u32::MAX as usize
+            || ports > u32::MAX as usize
+            || decoder.len() != expected_decoder
+            || native_start.len() != cells
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = successor_action
+            .iter()
+            .chain(native_start)
+            .copied()
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let action = Buffer::of(successor_action)?;
+        let decoder_device = Buffer::of(decoder)?;
+        let starts = Buffer::of(native_start)?;
+        let cell_octets = cells * std::mem::size_of::<u32>();
+        let predecessor = Buffer::alloc(cell_octets)?;
+        let successor = Buffer::alloc(cell_octets)?;
+        let shared_ablated = Buffer::alloc(cell_octets)?;
+        let local_octets = local_entries * std::mem::size_of::<u32>();
+        let local_ablated = Buffer::alloc(local_octets)?;
+
+        let grid = self.grid_for(cells as u64)?;
+        let mut action_pointer = action.pointer;
+        let mut decoder_pointer = decoder_device.pointer;
+        let mut starts_pointer = starts.pointer;
+        let mut predecessor_pointer = predecessor.pointer;
+        let mut successor_pointer = successor.pointer;
+        let mut shared_ablated_pointer = shared_ablated.pointer;
+        let mut local_ablated_pointer = local_ablated.pointer;
+        let mut cell_count = cells as u32;
+        let mut state_count = states as u32;
+        let mut port_count = ports as u32;
+        let mut arguments: [*mut c_void; 10] = [
+            &mut action_pointer as *mut u64 as *mut c_void,
+            &mut decoder_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_pointer as *mut u64 as *mut c_void,
+            &mut successor_pointer as *mut u64 as *mut c_void,
+            &mut shared_ablated_pointer as *mut u64 as *mut c_void,
+            &mut local_ablated_pointer as *mut u64 as *mut c_void,
+            &mut cell_count as *mut u32 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+            &mut port_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.heterogeneous_fusion,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_heterogeneous_fusion)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut predecessor_consequence = vec![0u32; cells];
+        let mut successor_consequence = vec![0u32; cells];
+        let mut shared_ablated_consequence = vec![0u32; cells];
+        let mut local_ablated_consequence = vec![0u32; local_entries];
+        predecessor.read(&mut predecessor_consequence)?;
+        successor.read(&mut successor_consequence)?;
+        shared_ablated.read(&mut shared_ablated_consequence)?;
+        local_ablated.read(&mut local_ablated_consequence)?;
+
+        let action_octets = std::mem::size_of_val(successor_action) as u64;
+        let decoder_octets = std::mem::size_of_val(decoder) as u64;
+        let start_octets = std::mem::size_of_val(native_start) as u64;
+        let cell_octets = cell_octets as u64;
+        let local_octets = local_octets as u64;
+        let scalar_ingress_octets = 3 * std::mem::size_of::<u32>() as u64;
+        Ok(DeviceHeterogeneousFusion {
+            predecessor_consequence,
+            successor_consequence,
+            shared_ablated_consequence,
+            local_ablated_consequence,
+            families,
+            ports,
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: cells as u32,
+            host_ingress_octets: action_octets
+                + decoder_octets
+                + start_octets
+                + scalar_ingress_octets,
+            host_egress_octets: cell_octets * 3 + local_octets,
+            resident_octets: action_octets
+                + decoder_octets
+                + start_octets
+                + cell_octets * 3
+                + local_octets,
+        })
+    }
+
     /// Classify exact coordinate-box contacts and compare matched presentations without returning
     /// to the host between the two laws.
     ///
@@ -1886,5 +2055,32 @@ mod tests {
         assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
         assert_eq!(returned.visited_words, 1);
+    }
+
+    /// I4's conservation-of-faces law: the shared generator moves every port, while withdrawing
+    /// one port leaves the other on the shared successor.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_enacts_one_shared_generator_and_every_local_withdrawal() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        // Two families × two ports × two states. Each native consequence has its own address.
+        let returned = card
+            .conduct_heterogeneous_fusion_on_device(
+                &[1, 1],
+                &[0, 1, 2, 3, 4, 5, 6, 7],
+                &[0, 0, 0, 0],
+                2,
+                2,
+            )
+            .expect("the heterogeneous front returns");
+        assert_eq!(returned.predecessor_consequence, vec![0, 2, 4, 6]);
+        assert_eq!(returned.successor_consequence, vec![1, 3, 5, 7]);
+        assert_eq!(returned.shared_ablated_consequence, vec![0, 2, 4, 6]);
+        assert_eq!(
+            returned.local_ablated_consequence,
+            vec![0, 1, 3, 2, 4, 5, 7, 6]
+        );
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
     }
 }

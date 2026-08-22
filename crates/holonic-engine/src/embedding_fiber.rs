@@ -63,10 +63,11 @@
 //! # Exactness, checked before dispatch
 //!
 //! Entries arrive through [`crate::exact_value`]'s declared float mouth as integers aligned to one
-//! power of two, so every product and every sum is exact. A `dim`-term sum of products bounded by
-//! `2^b` needs `2b + ceil(log2 dim)` bits. **That bound is computed from the material and refused
-//! when it exceeds the carrier**, rather than truncated: [`FiberError::CarrierTooNarrow`] names the
-//! octaves the material required.
+//! power of two, so every product and every sum is exact. If readout and query entries respectively
+//! occupy `a` and `b` octaves, a `dim`-term sum needs
+//! `a + b + ceil(log2 dim) + 1` signed-carrier octaves. **That bound is computed from both situated
+//! operands and refused when it exceeds the carrier**, rather than truncating either face:
+//! [`FiberError::CarrierTooNarrow`] names the octaves the material required.
 
 use std::collections::BTreeMap;
 use std::ffi::{CStr, c_char, c_void};
@@ -152,12 +153,14 @@ pub enum FiberError {
     /// The material needs more octaves than the exact carrier holds. **Refused, never truncated** —
     /// the whole point of the carrier is that nothing in it rounds.
     #[error(
-        "an exact {dim}-term contraction of {entry_octaves}-octave entries needs {needed} octaves, \
-         past the {carrier}-octave exact carrier"
+        "an exact {dim}-term contraction of a {readout_octaves}-octave readout with a \
+         {query_octaves}-octave query needs {needed} octaves, past the {carrier}-octave exact \
+         carrier"
     )]
     CarrierTooNarrow {
         dim: usize,
-        entry_octaves: u32,
+        readout_octaves: u32,
+        query_octaves: u32,
         needed: u32,
         carrier: u32,
     },
@@ -544,12 +547,24 @@ impl ResidentReadout {
 
     /// The carrier headroom this material needs, computed from the material and never assumed.
     ///
-    /// An exact `dim`-term sum of products of `b`-octave entries needs `2b + ceil(log2 dim)`
-    /// octaves. Returned so a caller can read what it cost even when it fits.
+    /// An exact `dim`-term sum of products of `b`-octave entries needs
+    /// `2b + ceil(log2 dim) + 1` carrier octaves. This symmetric convenience is retained for
+    /// callers whose two operands share one bound.
     pub fn needed_octaves(entry_octaves: u32, dim: usize) -> u32 {
+        Self::needed_product_octaves(entry_octaves, entry_octaves, dim)
+    }
+
+    /// Carrier headroom for two differently situated operands.
+    ///
+    /// If `|r_i| < 2^a` and `|q_i| < 2^b`, then
+    /// `|Σ r_i q_i| < dim · 2^(a+b)`. Therefore the signed carrier needs
+    /// `a + b + ceil(log2 dim) + 1` octaves. Replacing `(a,b)` by
+    /// `(max(a,b),max(a,b))` is a lossy receiver quotient: it conserves neither operand face and
+    /// can falsely refuse a narrow query against a wide invariant map.
+    pub fn needed_product_octaves(readout_octaves: u32, query_octaves: u32, dim: usize) -> u32 {
         let terms = u32::try_from(dim.max(1).next_power_of_two().ilog2()).unwrap_or(u32::MAX);
-        entry_octaves
-            .saturating_mul(2)
+        readout_octaves
+            .saturating_add(query_octaves)
             .saturating_add(terms)
             .saturating_add(1)
     }
@@ -1195,12 +1210,16 @@ impl MountedReadout<'_> {
         };
 
         // The headroom check, before anything is dispatched. Refused, never truncated.
-        let entry_octaves = readout.entry_octaves.max(query.entry_octaves);
-        let needed = ResidentReadout::needed_octaves(entry_octaves, dim);
+        let needed = ResidentReadout::needed_product_octaves(
+            readout.entry_octaves,
+            query.entry_octaves,
+            dim,
+        );
         if needed > CARRIER_OCTAVES {
             return Err(FiberError::CarrierTooNarrow {
                 dim,
-                entry_octaves,
+                readout_octaves: readout.entry_octaves,
+                query_octaves: query.entry_octaves,
                 needed,
                 carrier: CARRIER_OCTAVES,
             });
@@ -1511,7 +1530,7 @@ impl MountedReadout<'_> {
         if queries.is_empty() || rows == 0 {
             return Ok(Vec::new());
         }
-        let mut entry_octaves = self.entry_octaves;
+        let mut query_octaves = 0;
         for query in queries {
             if query.entries.len() != dim {
                 return Err(FiberError::WidthDisagrees {
@@ -1519,13 +1538,15 @@ impl MountedReadout<'_> {
                     dim,
                 });
             }
-            entry_octaves = entry_octaves.max(query.entry_octaves);
+            query_octaves = query_octaves.max(query.entry_octaves);
         }
-        let needed = ResidentReadout::needed_octaves(entry_octaves, dim);
+        let needed =
+            ResidentReadout::needed_product_octaves(self.entry_octaves, query_octaves, dim);
         if needed > CARRIER_OCTAVES {
             return Err(FiberError::CarrierTooNarrow {
                 dim,
-                entry_octaves,
+                readout_octaves: self.entry_octaves,
+                query_octaves,
                 needed,
                 carrier: CARRIER_OCTAVES,
             });
@@ -2024,6 +2045,19 @@ mod tests {
         // And the material this was built for fits, with the figure stated rather than assumed.
         let bf16 = ResidentReadout::needed_octaves(8, 2560);
         assert!(bf16 <= CARRIER_OCTAVES, "bf16 needed {bf16}");
+    }
+
+    /// The operand faces must remain distinct in the aperture theorem. A wide deposited map and a
+    /// narrow integer query do not pay the square of the wider bound.
+    #[test]
+    fn heterogeneous_operand_octaves_are_conserved_in_the_exact_bound() {
+        assert_eq!(ResidentReadout::needed_product_octaves(62, 8, 786), 81);
+        assert!(ResidentReadout::needed_product_octaves(62, 8, 786) <= CARRIER_OCTAVES);
+        assert!(ResidentReadout::needed_product_octaves(62, 62, 786) > CARRIER_OCTAVES);
+        assert_eq!(
+            ResidentReadout::needed_octaves(62, 786),
+            ResidentReadout::needed_product_octaves(62, 62, 786)
+        );
     }
 
     /// The mouth is the only way a float enters, and the alignment is a rebase with **zero

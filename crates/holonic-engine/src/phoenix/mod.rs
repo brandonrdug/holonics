@@ -8,6 +8,8 @@
 pub mod cohort;
 /// One addressed local cultivation over an already-cultivated Phoenix product.
 pub mod continuation;
+/// Receiver-exact shared transport across separately typed inherited source ports.
+pub mod heterogeneous_fusion;
 pub mod native_streamed;
 pub mod recurrent;
 pub mod recurrent_condensation;

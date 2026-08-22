@@ -398,8 +398,15 @@ if the visualization supplies the proposed topology.
 
 ## 11. Deed I4 — Gemma's heterogeneous ports found shared transport
 
-[open] I4 is the first fusion deed. It uses Gemma's already-admitted text, vision, audio, and video
-source ports before mounting a second model.
+[established-bounded; implemented-exact; measured] I4 passed release on 2026-08-22. Real text and
+vision entry-port conduct, a predeclared common-world pullback, four exact naturality squares, one
+shared native action, complete modality fibres, shared/local cross-port ablations, strict detached
+product descent, and an inspected exact atlas returned. The real passage also corrected the exact
+carrier law from a squared maximum to the conserved two-operand bound
+`a+b+ceil(log₂ n)+1`. Candidate record:
+[`2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md`](../research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md).
 
 ### 11.1 Source selection
 
@@ -432,7 +439,7 @@ native contact law, or shared-route ablation has no cross-port consequence.
 
 ## 12. Deed I5 — Athena-Gemma freezes as an inference ecology
 
-[open] I5 emits the first complete Athena-Gemma product under the admitted language/world/modal
+[open; active] I5 emits the first complete Athena-Gemma product under the admitted language/world/modal
 receiver family. Its canonical object is the generator-native rest and retained-continuation law,
 not a source-shaped tensor container.
 

@@ -263,14 +263,29 @@ complete source/native product fell strictly: artifact 14,288/566, decoder 257/2
 seconds. Its sole red scope was documentary driver-catalog drift; regeneration and the named retake
 returned 345 catalogued drivers and zero uncatalogued.
 
-**NEXT DEED: I4 GEMMA'S HETEROGENEOUS PORTS FOUND SHARED TRANSPORT.**
-[open] I4 selects a genuinely executable non-text port from authenticated source testimony and a
-real occurrence. It owes separately typed source/native conduct, retained spatial/temporal/phase
-incidence, a declared common-world pullback, local naturality for every proposed shared generator,
-one enacted shared subcomplex, complete modality-specific fibres, shared and local ablations, a
-held-out cross-port consequence, strict detached product descent, and an inspectable multimodal
-realization atlas. A placeholder modality token, random or zero embedding, authored transcript, or
-concatenated source stream does not pass.
+**I4 PASSED — Gemma's heterogeneous ports conserved their faces through shared transport.**
+[established-bounded; implemented-exact; measured] Real Gemma text-codeword and vision-patch
+occurrences crossed separately typed boundaries. Four exact naturality squares found one shared
+two-state world generator while all eight modality/family/state source faces remained complete
+reconstruction fibres. A source-absent RTX 4080 SUPER front returned predecessors `[0,2,4,6]`,
+successors `[1,3,5,7]`, global withdrawal and every single-port withdrawal in one launch and one
+synchronization with no forbidden source access or CPU semantic callback. Every complete-product
+coordinate fell strictly: artifact 1,035,035/1,578, decoder 652,506/2,030, fibre 655,915/5,188,
+work 21,731,530/32, span 786/2, residency 4,829,184/136, transfer 2,910,272/148. Authoritative
+grade:
+[`research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md`](research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md).
+[established-bounded; measured] The sole complete receiver passed all thirteen scopes in 347.202
+seconds: 2,835 tests passed, none failed, 25 were explicitly ignored, every example target
+type-checked, and all twelve non-test scopes were green.
+
+**NEXT DEED: I5 ATHENA-GEMMA FREEZES AS AN INFERENCE ECOLOGY.**
+[open] I5 owes a source-detached canonical generator-native rest and executable inference entry;
+recurrent full-passage emission; explicit optional cultivation commit/decline; enacted world return
+and changed later conduct; text plus every admitted real modality; strict complete-product descent;
+a dissection atlas of source/native/shared routes, defects, fibres, basins, caustics, holonomy,
+ablations and open exterior; exact semantic work and separate telemetry; fresh-process restoration;
+and targeted source/native/shared-route withdrawal. A source-shaped tensor container, one output,
+or an entry-port demonstration does not pass.
 
 [open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
 return, durable cultivation, generator-native compression, complete answers, and multimodality are

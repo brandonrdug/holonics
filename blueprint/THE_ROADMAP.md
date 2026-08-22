@@ -210,6 +210,24 @@ regeneration and the required named retake returned 345 catalogued drivers and z
 Release admission:
 [`research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md`](../research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md).
 
+**I4 PASSED.** Real Gemma text-codeword and vision-patch occurrences crossed separate typed ports
+and formed four exact naturality squares over one predeclared world passage. One two-state action is
+stored and enacted once; all modality/occurrence/incidence/consequence faces remain complete
+reconstruction fibres. Source-absent shared and local withdrawals returned in one RTX launch, the
+held-out PDF-raster family required the joint ecology, and all seven complete-product coordinates
+fell strictly. The exact atlas and interactive projection were inspected. Candidate record:
+[`research/records/2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md).
+The complete invocation returned 2,835 passing tests, zero failures, 25 explicit ignores and all
+thirteen green release scopes in 347.202 seconds. Release admission:
+[`research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md`](../research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md).
+
+**CURRENT DEED: I5 ATHENA-GEMMA FREEZES AS AN INFERENCE ECOLOGY.** I5 must return the
+source-detached canonical rest and executable recurrent inference entry, full-passage emission,
+optional committed/declined cultivation, enacted world return and changed later conduct, every
+admitted real modality, generator-native condensation and complete cost, dissection atlas, exact
+work/telemetry separation, fresh-process restoration, and targeted source/native/shared-route
+ablations. A source-shaped tensor face or entry-port result does not substitute for this product.
+
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
 emission; I2 closes emission/world/return/reflection/deposit/later-current; I3 performs recurrent

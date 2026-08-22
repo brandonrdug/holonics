@@ -402,6 +402,46 @@ extern "C" __global__ void conduct_condensed_recurrences(
         withdrawn_trace + trace_at);
 }
 
+/// **One shared world-state generator crosses every typed port while local faces remain local.**
+///
+/// `decoder` is family-major, port-major, state-minor.  Each lane owns one family/port cell.  The
+/// shared withdrawal returns every cell to its predecessor consequence.  The local-ablation matrix
+/// has one column per port: withdrawing port `p` returns only cells of `p` to their predecessor and
+/// leaves every other port on the shared successor.  Thus a shared generator is enacted once; it
+/// is not copied into one modality-specific table per port.
+extern "C" __global__ void conduct_heterogeneous_fusion(
+    const uint32_t *successor_action,
+    const uint32_t *decoder,
+    const uint32_t *native_start,
+    uint32_t *predecessor_consequence,
+    uint32_t *successor_consequence,
+    uint32_t *shared_ablated_consequence,
+    uint32_t *local_ablated_consequence,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t port_count)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= cell_count) {
+        return;
+    }
+    const uint32_t start = native_start[at];
+    const uint32_t next = successor_action[start];
+    const uint64_t decoder_at = (uint64_t)at * (uint64_t)state_count;
+    const uint32_t before = decoder[decoder_at + start];
+    const uint32_t after = decoder[decoder_at + next];
+    predecessor_consequence[at] = before;
+    successor_consequence[at] = after;
+    shared_ablated_consequence[at] = before;
+
+    const uint32_t local_port = at % port_count;
+    const uint64_t local_at = (uint64_t)at * (uint64_t)port_count;
+    for (uint32_t withdrawn_port = 0; withdrawn_port < port_count; ++withdrawn_port) {
+        local_ablated_consequence[local_at + withdrawn_port] =
+            local_port == withdrawn_port ? before : after;
+    }
+}
+
 __device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
     // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
     // aperture; this expression is nevertheless total over the full wire.

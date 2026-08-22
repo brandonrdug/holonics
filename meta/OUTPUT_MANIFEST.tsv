@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 103 drivers, 19134 returns, 56290102482 bytes.
+# 104 drivers, 19150 returns, 56291275108 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -65,6 +65,7 @@ d46dddb154161da4af8888244372afb3e425ecb9b1c465850158cd4d6a338f8e	4	166577	output
 13ef0c87f4a987e48a1e74cbbbb93af54375993d7ddb73b871262c11f1903e78	20	12542680	output/the_exchange_return_cultivates_athena_gemma
 af047f8dfe53dfb595ad28c32576aa8c9ff779d6bc7a473dd7742904826466f4	6	265137360	output/the_exchange_world_tube_retains_its_branches
 81e79e7357e85ca164d1739c579a3acf2460f758f152408aa52f539c6e0298a9	16	36104	output/the_exterior_return_changes_the_later_current
+52bbb5ba39bc33b6143a0cd54eea3d5806c692634e6638327598d298ca89e8dd	16	1172626	output/the_heterogeneous_ports_found_one_shared_phoenix_ecology
 0b73fb1e42bc90d16126c7180ad0df1bac0d732b981cde2bef7cf09f73742bd9	3	2770217	output/the_layer_stays_on_the_card
 1aca04df4256048f4e9d14052e877d8f606dc718f650914cb4807d0213400a5d	3	324780	output/the_lift_returns_its_defect
 e5e93c6c51f62403d6a901cb03f0ba4cd4aa6c279e578990464e1a1cd94cca97	2	1100120	output/the_lifted_body_condenses_only_where_future_receivers_factor

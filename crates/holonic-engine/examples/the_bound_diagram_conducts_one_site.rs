@@ -112,7 +112,8 @@ struct ResidentSourceCarrier<'chart> {
 /// `b`-octave entries needs `2b + ceil(log2 d) + 1` octaves against a `128`-octave carrier, and the
 /// widest contraction this diagram performs is `d = 10240`. So `2(reach + 8) + 14 + 1 <= 128` gives
 /// `reach <= 48`, and forty-six leaves two octaves of margin. That was also refused by name before
-/// it was read: `CarrierTooNarrow { dim: 10240, entry_octaves: 62, needed: 139, carrier: 128 }`.
+/// it was read: `CarrierTooNarrow { dim: 10240, readout_octaves: 62,
+/// query_octaves: 62, needed: 139, carrier: 128 }`.
 ///
 /// **Both bounds are read off the carrier and the diagram, never chosen for a result.**
 const CARRIER_REACH: i32 = 46;
