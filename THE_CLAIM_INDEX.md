@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (231 deposits of 523)
+## 4 · The 2026-08 record line (232 deposits of 524)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -343,6 +343,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md` | The codec excited the active cover, the prefix returned by pullback, and M2 passed |
 | `2026-08-21_THE_COMPACT_FRAME_IS_A_LAWFUL_COMPRESSION_AND_THE_HORIZON_LAW_PREDICTS_WHAT_CROSSES.md` | The compact frame is a lawful compression, and the horizon law predicts what crosses |
 | `2026-08-21_THE_DESCENT_IS_CLIMBED_THE_RANK_IS_ZERO_AND_ONE_IS_NOT_A_CONGRUENT_NUMBER.md` | The descent is climbed, the rank is zero, and one is not a congruent number |
+| `2026-08-21_THE_FACE_IS_A_HOMOMORPHISM_EVERYWHERE_AND_THE_RANK_ONE_DESCENT_CERTIFICATE_IS_UNCONDITIONAL.md` | The face is a homomorphism everywhere, and the rank-one descent certificate is unconditional |
 | `2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md` | The fold is a constraint ecology, the active site is a catalytic receiver, and the codec recovers archetypes |
 | `2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md` | The fold returned its constraint complex, the shared junction separated the presentations, and M5 passed |
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
