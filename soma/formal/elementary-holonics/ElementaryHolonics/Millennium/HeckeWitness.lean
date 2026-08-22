@@ -1,6 +1,7 @@
 import ElementaryHolonics.Millennium.HeckeTheta
 import ElementaryHolonics.Millennium.BirchSwinnertonDyer
 import Mathlib.NumberTheory.LSeries.MellinEqDirichlet
+import ElementaryHolonics.Millennium.HeckeEuler
 
 /-!
 # HeckeWitness: the analytic datum of the congruent-number curve at one
@@ -34,6 +35,7 @@ namespace Soma.Holonics.Millennium.HeckeWitness
 open Real Complex
 open Soma.Holonics.Millennium.HeckeTheta
 open Soma.Holonics.Millennium.BirchSwinnertonDyer
+open Soma.Holonics.Millennium.GaussCoefficient
 
 /-- The L-function of the congruent-number curve at one: the completed function with
 its archimedean factor removed.  Entire, because `1/Γ` is entire. -/
@@ -285,5 +287,114 @@ theorem theBadPrimeClauseHolds (p k : ℕ) (hp : p.Prime) (hdvd : p ∣ 2 * 1) :
   subst hp2
   rw [heckeCoeff_even (by simp [Nat.pow_mod]), heckeCoeff_even (by norm_num)]
   norm_num
+
+/-! ## The witness
+
+Every field of the pose's analytic datum is now a theorem.  The declared receiver of
+`BirchSwinnertonDyer.lean` — posed 2026-08-22 as conditional — is inhabited. -/
+
+open Soma.Holonics.Millennium.HeckeEuler in
+/-- **THE WITNESS**: the analytic datum of the congruent-number curve at one.  Every
+field is kernel-checked: the coefficients are the computable shell sums, their prime
+values are the point counts (Gauss), their Euler structure is the Gaussian-integer
+factorization, the L-function is the Mellin transform of the theta function, and the
+functional equation is the theta transformation law with sign `+1`. -/
+noncomputable def theWitness : LDatum 1 where
+  coeff := fun m => ((heckeCoeff m : ℤ) : ℂ)
+  coeff_one := by
+    rw [heckeCoeff_one]
+    norm_num
+  coeff_prime := fun p hp hpd => by
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hp2 : p ≠ 2 := by
+      intro h
+      exact hpd ⟨1, show 2 * 1 = p * 1 from by rw [h]⟩
+    have h := theCoefficientsAgreeAtEveryOddPrime (p := p) hp2
+    exact_mod_cast h
+  coeff_mul := fun a b hab => by
+    have h := heckeCoeff_mul hab
+    exact_mod_cast h
+  coeff_prime_pow := fun p k hp hpd => by
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hp2 : p ≠ 2 := by
+      intro h
+      exact hpd ⟨1, show 2 * 1 = p * 1 from by rw [h]⟩
+    have h := heckeCoeff_prime_pow_recursion (p := p) hp2 k
+    exact_mod_cast h
+  coeff_bad := fun p k hp hpd => theBadPrimeClauseHolds p k hp hpd
+  L := heckeL
+  analytic := theLFunctionIsEntire
+  agrees := fun s hs => theLFunctionAgreesWithItsDirichletSeries hs
+  conductor := 32
+  conductor_pos := by norm_num
+  sign := 1
+  sign_pm := Or.inl rfl
+  Lambda := heckeLambda
+  Lambda_analytic := theCompletedLFunctionIsEntire
+  Lambda_eq := fun s hs => (theCompletedProductFormulaHolds s hs).symm
+  functional_equation := fun s => by
+    rw [theCompletedLFunctionalEquation s]
+    push_cast
+    ring
+
+/-- **The pose is unconditional at one**: the analytic datum exists. -/
+theorem theWitnessExists : Nonempty (LDatum 1) := ⟨theWitness⟩
+
+/-- **The analytic rank at one is zero**: the witness's L-function does not vanish at
+the center, because its central value is `(2π/√32)` times the integral of the positive
+theta function. -/
+theorem theAnalyticRankAtOneIsZero : analyticRank theWitness = 0 := by
+  unfold analyticRank
+  rw [analyticOrderAt_eq_zero]
+  right
+  exact theLFunctionDoesNotVanishAtOne
+
+/-! ## The two-sided rank-zero instance -/
+
+/-- Every point of the curve at one is two-torsion: the four-point classification. -/
+private lemma every_point_two_torsion (P : (FamilyFace.E ((1 : ℕ) : ℚ)).Point) :
+    P + P = 0 := by
+  have hEq : FamilyFace.E ((1 : ℕ) : ℚ) = Descent.E := by
+    unfold FamilyFace.E Descent.E
+    norm_num
+  revert P
+  rw [hEq]
+  intro P
+  rcases RankZero.theFourHalfTurnsAreTheWholePopulationHolds P with h | h | h | h <;> subst h
+  · rfl
+  · exact Descent.theThreePointsAreHalfTurns.1
+  · exact Descent.theThreePointsAreHalfTurns.2.1
+  · exact Descent.theThreePointsAreHalfTurns.2.2
+
+/-- **The algebraic rank at one is zero**: rank at least zero holds vacuously, and no
+point is independent modulo torsion because every point is two-torsion — the completed
+descent (`RankZero`: one is not a congruent number) speaking as the posed rank
+predicate. -/
+theorem theAlgebraicRankAtOneIsZero : AlgebraicRankIs 1 0 := by
+  constructor
+  · exact ⟨fun i => i.elim0, fun c _ i => i.elim0⟩
+  · rintro ⟨Pts, hInd⟩
+    have h2 : (2 : ℤ) = 0 := by
+      refine hInd (fun _ => 2) ?_ 0
+      refine ⟨1, one_pos, ?_⟩
+      have hsum : (∑ i : Fin 1, (2 : ℤ) • Pts i) = (2 : ℤ) • Pts 0 := by
+        rw [Finset.sum_fin_eq_sum_range]
+        simp
+      rw [hsum]
+      have h2t : (2 : ℤ) • Pts 0 = 0 := by
+        rw [show (2 : ℤ) = 1 + 1 from rfl, add_zsmul, one_zsmul]
+        exact every_point_two_torsion (Pts 0)
+      rw [h2t]
+      simp
+    norm_num at h2
+
+/-- **THE TWO-SIDED RANK-ZERO INSTANCE AT ONE.**  The witness's analytic rank and the
+curve's algebraic rank are both zero: the first fully kernel-checked two-sided instance
+of the Birch–Swinnerton-Dyer rank correspondence.  On the analytic side the central
+value is the integral of the positive theta function; on the algebraic side the
+completed descent leaves only the four half-turns. -/
+theorem theTwoSidedRankZeroInstance :
+    analyticRank theWitness = (0 : ℕ) ∧ AlgebraicRankIs 1 0 :=
+  ⟨theAnalyticRankAtOneIsZero, theAlgebraicRankAtOneIsZero⟩
 
 end Soma.Holonics.Millennium.HeckeWitness

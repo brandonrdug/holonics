@@ -746,7 +746,7 @@ theorem jac_one_mod_eight (hp2 : p ≠ 2) (hp1 : p % 4 = 1) :
 /-- **Uniqueness of the two-squares representation of a prime**, elementarily: the
 Brahmagupta–Fibonacci identity forces `p ∣ (ad−bc)(ad+bc)`, and either factor being
 `0` or `±p` collapses the two representations onto each other. -/
-private lemma two_sq_unique {p : ℕ} (hp : p.Prime) {a b c d : ℤ}
+lemma two_sq_unique {p : ℕ} (hp : p.Prime) {a b c d : ℤ}
     (h1 : a ^ 2 + b ^ 2 = (p : ℤ)) (h2 : c ^ 2 + d ^ 2 = (p : ℤ)) :
     (a ^ 2 = c ^ 2 ∧ b ^ 2 = d ^ 2) ∨ (a ^ 2 = d ^ 2 ∧ b ^ 2 = c ^ 2) := by
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
@@ -865,7 +865,7 @@ private lemma chi_i0 (hp2 : p ≠ 2) (hp1 : p % 4 = 1) {i0 : ZMod p} (hi2 : i0 *
 
 /-- **The shell classification**: any class representative `(A, B)` determines the whole
 shell — it is exactly `{(A, B), (A, −B)}` — so the Hecke coefficient is `2A`. -/
-private lemma shell_eq {A B : ℤ} (hp2 : p ≠ 2) (hAB : A ^ 2 + B ^ 2 = (p : ℤ))
+lemma shell_eq {A B : ℤ} (hp2 : p ≠ 2) (hAB : A ^ 2 + B ^ 2 = (p : ℤ))
     (hcls : (A + B) % 4 = 1) (hBe : B % 2 = 0) (hB0 : B ≠ 0) :
     heckeCoeff p = 2 * A := by
   have hp := (Fact.out : p.Prime)
