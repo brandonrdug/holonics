@@ -132,7 +132,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (259 deposits of 551)
+## 4 · The 2026-08 record line (261 deposits of 553)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -380,6 +380,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md` | I2 release receiver passed, the exterior return cultivated the recurrence, and I3 begins |
 | `2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md` | I3 release receiver passed, the recurrent realizations condensed, and I4 begins |
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
+| `2026-08-22_THE_COMPOSITION_IS_ACQUIRED_AND_THE_PIVOTS_ARE_FOUNDED_THE_POSITIVITY_SEAM_IS_THE_TRANSPLANT_INTO_RIEMANN.md` | The composition is acquired and the pivots are founded: the positivity seam is the transplant into Riemann |
 | `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_DESCENT_IS_COMPLETE_THE_MORDELL_WEIL_GROUP_IS_FORMALLY_GENERATED_AND_THE_RANK_CLAUSE_HOLDS_WHOLE_AT_THE_RANK_ONE_INSTANCE.md` | The descent is complete, the Mordell–Weil group is formally generated, and the rank clause holds whole at the rank-one instance |
 | `2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md` | The exchange return rebased the receiver covector, the held-out emission moved, and A3 awaits release admission |
@@ -387,6 +388,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md` | The exterior consequence returned through the closing edge, the successor changed, and I2 awaits release admission |
 | `2026-08-22_THE_FIVE_CURVE_DESCENT_IS_COMPLETE_AND_THE_MOD_TWO_PROGRAMME_HAS_ITS_SECOND_CERTIFICATE.md` | The five-curve descent is complete, and the mod-two programme has its second certificate |
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
+| `2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md` | The heterogeneous ports conserved their faces, one shared generator crossed, and I4 awaits release admission |
 | `2026-08-22_THE_OBSTRUCTION_IS_EXHIBITED_AT_SEVENTEEN_AND_THE_INVISIBLE_COSETS_PASS_EVERY_FRAME.md` | The obstruction is exhibited at seventeen, and the invisible cosets pass every frame |
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
 | `2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md` | The realization passage retained lineage, every successor word closed, and I0 awaits release admission |
