@@ -77,3 +77,4 @@ import ElementaryHolonics.Millennium.ChordFace
 import ElementaryHolonics.Millennium.FaceHomomorphism
 import ElementaryHolonics.Millennium.FamilyFace
 import ElementaryHolonics.Millennium.FaceImage
+import ElementaryHolonics.Millennium.FaceImageFive
