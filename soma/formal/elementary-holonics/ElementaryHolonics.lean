@@ -76,6 +76,7 @@ import ElementaryHolonics.Millennium.AlternatingParity
 import ElementaryHolonics.Millennium.Congruum
 import ElementaryHolonics.Millennium.ChordFace
 import ElementaryHolonics.Millennium.FaceHomomorphism
+import ElementaryHolonics.Millennium.FamilyGauss
 import ElementaryHolonics.Millennium.FamilyFace
 import ElementaryHolonics.Millennium.FaceImage
 import ElementaryHolonics.Millennium.FaceImageFive
