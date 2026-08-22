@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed A1. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed A2. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE EXCHANGE WORLD-TUBE RETAINED ITS BRANCHES, ITS CONTACT FIBRE FACTORED,
-AND ATHENA NOW ENTERS THE SIBLING DEFECT COMPLEX.**
+**CURRENT FRONTIER — THE SIBLING CONTINUATIONS RETURNED THEIR DEFECT COMPLEX, THE MESSAGE
+PARTITION RETAINED ITS SOURCE FIBRE, AND THE LIGHTNING LEADER MAY NOW CULTIVATE ATHENA.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -154,12 +154,36 @@ bound by `meta/CLOSURE_MANIFEST.tsv` at SHA-256
 242.95 seconds: 2,820 tests passed, none failed, 22 were explicitly ignored, every example target
 type-checked and all twelve non-test scopes were green.
 
-**NEXT DEED: A2 — sibling continuations return a defect spectrum and active cover.** [open]
-Derive the cohort from A1's operation/contact classes, presentation generators, shortest separators
-and open fibres. Hold Athena rest and addressed history fixed; return plural continuations,
-tool/world consequences, the complete receiver-indexed defect complex and provider-removal controls.
-Do not invent unavailable teacher interiors, replace world consequence with prose, or select a
-scalar winner. The complete grade and refusals are in the Athena-product blueprint named above.
+**A2 PASSED — sibling continuations returned their defect spectrum and active cover.**
+[established-bounded; implemented-exact; measured] A1's ten repeated visible-content classes
+returned 22 admitted shortest-history cuts and two exclusions. One fixed Athena-Gemma product
+conducted 22 base histories and one presentation control. The exact addressed-partition receiver
+retains all 49,550 tokenizer rows and their byte/token incidence while 49 message rows enter the
+inherited tower. The return contains 22 separated next-front candidates, 22 receiver-indexed
+defects, nine distinct native candidate addresses, 176 open fibres, 15 tool/world-bearing
+histories, 22 later-operator returns, fixed-body/source-access testimony and passing
+presentation/provider controls. No candidate world action was invented, no response probability
+replaced the causal return and no scalar winner was selected. The authoritative grade is
+[`research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md`](research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md).
+The 49-member artifact family is bound by `meta/OUTPUT_MANIFEST.tsv` at SHA-256
+`c6f8e03ab043136c0aa4117d7d5aa37c883998175fdfd6e4d64b193ec9953a43`; its 108-member producing
+closure is bound by `meta/CLOSURE_MANIFEST.tsv` at SHA-256
+`7c47da77486b1a9beec16a3a05c7709690cab69178d31a3ca32ff0e467579e8e`.
+[established-bounded; measured] The final complete invocation returned 2,823 passing tests, zero
+failures, 22 explicit ignores, every example target type-checked and twelve green non-driver
+scopes in 134.737 seconds. Its only red scope was a cheap driver-ledger drift caused by the restored
+historical local-tower calls; regeneration followed by the named retake returned 340 catalogued
+drivers and zero uncatalogued. All thirteen release scopes are therefore green under the required
+separate complete/cheap-retake reporting.
+
+**NEXT DEED: A3 — the exchange return cultivates Athena-Gemma.** [open]
+Let one declared receiver defect found a lightning leader through A2's active cover. Carry its
+metric-adjoint return only along addressed forward lineage and deposit one attributable local
+native morphology delta. Require an unchanged predecessor and distinct successor rest,
+source-detached held-out world-consequence improvement, nontrivial revisit holonomy, a
+subject/provider-disjoint control, targeted ablation restoring the predecessor consequence, no
+retained exchange lookup, and exact semantic work beside separate card telemetry. The complete
+grade and refusals are in the Athena-product blueprint named above.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

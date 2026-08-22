@@ -696,8 +696,30 @@ __device__ void exp_nonpositive(wide x, int grain, uint32_t terms, wide *out_lo,
 // the contact: the bracket, the declared null, the certified ratio family, the carried construction
 // ---------------------------------------------------------------------------------------------
 
+__device__ __forceinline__ void contact_bracket(
+    const int64_t *q_lo, const int64_t *q_hi, const int64_t *k_lo, const int64_t *k_hi,
+    size_t q_base, size_t k_base, uint32_t head_width, int bracket_shift, int32_t grain,
+    wide *s_lo, wide *s_hi, uint32_t *refused
+) {
+    wide acc_lo = 0, acc_hi = 0;
+    for (uint32_t d = 0; d < head_width; ++d) {
+        wide ql = shift_floor(q_lo[q_base + d], -bracket_shift, refused);
+        wide qh = shift_ceil(q_hi[q_base + d], -bracket_shift, refused);
+        wide kl = shift_floor(k_lo[k_base + d], -bracket_shift, refused);
+        wide kh = shift_ceil(k_hi[k_base + d], -bracket_shift, refused);
+        wide l, u;
+        corners(ql, qh, kl, kh, &l, &u, refused);
+        acc_lo += l; acc_hi += u;
+    }
+    *s_lo = shift_floor(acc_lo, -(grain - 2 * bracket_shift), refused);
+    *s_hi = shift_ceil(acc_hi, -(grain - 2 * bracket_shift), refused);
+}
+
 // One block per `(row, receiver head)`. K/V family `g = h / (H / KH)` serves head `h`, which is the
-// source's `repeat_kv`. Shared memory: `reach` slots each of `s_lo, s_hi, w_lo, w_hi` (wide).
+// source's `repeat_kv`. The reach is traversed in block-derived tiles. Shared memory is therefore
+// `2 * blockDim` exact words, independent of history length: no caller-authored context ceiling and
+// no whole-reach staging buffer. The null, partition, and carried construction remain three exact
+// passes over the same founded reach.
 extern "C" __global__ void section_contact(
     const int64_t *q_lo, const int64_t *q_hi, const int64_t *k_lo, const int64_t *k_hi,
     const int64_t *v_lo, const int64_t *v_hi,
@@ -717,10 +739,8 @@ extern "C" __global__ void section_contact(
     uint32_t g = h / group;
     uint32_t start = (t + 1 > window) ? (t + 1 - window) : 0;
     uint32_t reach = t - start + 1;
-    wide *s_lo = (wide *)shared_raw;
-    wide *s_hi = s_lo + reach;
-    wide *w_lo = s_hi + reach;
-    wide *w_hi = w_lo + reach;
+    wide *scratch_lo = (wide *)shared_raw;
+    wide *scratch_hi = scratch_lo + blockDim.x;
     __shared__ wide null_value, total_lo, total_hi;
 
     size_t q_base = ((size_t)t * heads + h) * head_width;
@@ -759,64 +779,78 @@ extern "C" __global__ void section_contact(
         __syncthreads();
     }
     int bs = bracket_shift;
-    // (a) the brackets, at grain 2^-2(F − bs), then back to 2^-F
+    // (a) the null: each lane traverses its part of the reach, then one exact maximum reduction.
+    wide local_null = -(((wide)1) << 126);
     for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
         uint32_t j = start + r;
         size_t k_base = ((size_t)j * kv_heads + g) * head_width;
-        wide acc_lo = 0, acc_hi = 0;
-        for (uint32_t d = 0; d < head_width; ++d) {
-            wide ql = shift_floor(q_lo[q_base + d], -bs, refused), qh = shift_ceil(q_hi[q_base + d], -bs, refused);
-            wide kl = shift_floor(k_lo[k_base + d], -bs, refused), kh = shift_ceil(k_hi[k_base + d], -bs, refused);
-            wide l, u;
-            corners(ql, qh, kl, kh, &l, &u, refused);
-            acc_lo += l; acc_hi += u;
+        wide sl, sh;
+        contact_bracket(q_lo, q_hi, k_lo, k_hi, q_base, k_base, head_width, bs, grain, &sl, &sh, refused);
+        if (sh > local_null) local_null = sh;
+    }
+    scratch_hi[threadIdx.x] = local_null;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride && scratch_hi[threadIdx.x + stride] > scratch_hi[threadIdx.x]) {
+            scratch_hi[threadIdx.x] = scratch_hi[threadIdx.x + stride];
         }
-        s_lo[r] = shift_floor(acc_lo, -(grain - 2 * bs), refused);
-        s_hi[r] = shift_ceil(acc_hi, -(grain - 2 * bs), refused);
+        __syncthreads();
     }
+    if (threadIdx.x == 0) { null_value = scratch_hi[0]; atomicMax(reach_census, reach); }
     __syncthreads();
-    // (b) the null: the greatest upper bracket, a gauge that enters no ratio.
-    if (threadIdx.x == 0) {
-        wide c = s_hi[0];
-        for (uint32_t r = 1; r < reach; ++r) if (s_hi[r] > c) c = s_hi[r];
-        null_value = c;
-        atomicMax(reach_census, reach);
-    }
+
+    // (b) partition and carried construction in one tiled pass. Each founded weight contributes
+    // once to the directed partition and simultaneously to every carried coordinate before the
+    // scratch row is reused. The null pass remains separate because every ratio shares its gauge.
+    if (threadIdx.x == 0) { total_lo = 0; total_hi = 0; }
     __syncthreads();
-    // (c) the certified weights
-    for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
-        wide lo_arg = s_lo[r] - null_value, hi_arg = s_hi[r] - null_value;
-        if (hi_arg > 0) hi_arg = 0;
-        wide e_lo_lo, e_lo_hi, e_hi_lo, e_hi_hi;
-        exp_nonpositive(lo_arg, grain, terms, &e_lo_lo, &e_lo_hi, refused);
-        exp_nonpositive(hi_arg, grain, terms, &e_hi_lo, &e_hi_hi, refused);
-        w_lo[r] = e_lo_lo;
-        w_hi[r] = e_hi_hi;
-    }
-    __syncthreads();
-    if (threadIdx.x == 0) {
-        wide tl = 0, th = 0;
-        for (uint32_t r = 0; r < reach; ++r) { tl += w_lo[r]; th += w_hi[r]; }
-        total_lo = tl; total_hi = th;
-        if (tl <= 0) atomicOr(refused, REFUSED_MALFORMED);
-    }
-    __syncthreads();
-    // (d) the carried construction, one coordinate per thread
-    wide tl = total_lo, th = total_hi;
-    if (tl <= 0) return;
-    for (uint32_t d = threadIdx.x; d < head_width; d += blockDim.x) {
-        wide num_lo = 0, num_hi = 0;
-        wide hull_lo = 0, hull_hi = 0;
-        for (uint32_t r = 0; r < reach; ++r) {
+    uint32_t d = threadIdx.x;
+    wide num_lo = 0, num_hi = 0, hull_lo = 0, hull_hi = 0;
+    for (uint32_t tile = 0; tile < reach; tile += blockDim.x) {
+        uint32_t r = tile + threadIdx.x;
+        if (r < reach) {
             uint32_t j = start + r;
-            size_t v_at = ((size_t)j * kv_heads + g) * head_width + d;
-            wide vl = v_lo[v_at], vh = v_hi[v_at];
-            wide pl, ph;
-            corners(w_lo[r], w_hi[r], vl, vh, &pl, &ph, refused);
-            num_lo += pl; num_hi += ph;
-            if (r == 0) { hull_lo = vl; hull_hi = vh; }
-            else { if (vl < hull_lo) hull_lo = vl; if (vh > hull_hi) hull_hi = vh; }
+            size_t k_base = ((size_t)j * kv_heads + g) * head_width;
+            wide sl, sh;
+            contact_bracket(q_lo, q_hi, k_lo, k_hi, q_base, k_base, head_width, bs, grain, &sl, &sh, refused);
+            wide lo_arg = sl - null_value, hi_arg = sh - null_value;
+            if (hi_arg > 0) hi_arg = 0;
+            wide e_lo_lo, e_lo_hi, e_hi_lo, e_hi_hi;
+            exp_nonpositive(lo_arg, grain, terms, &e_lo_lo, &e_lo_hi, refused);
+            exp_nonpositive(hi_arg, grain, terms, &e_hi_lo, &e_hi_hi, refused);
+            scratch_lo[threadIdx.x] = e_lo_lo;
+            scratch_hi[threadIdx.x] = e_hi_hi;
         }
+        __syncthreads();
+        uint32_t tile_reach = (reach - tile) < blockDim.x ? (reach - tile) : blockDim.x;
+        if (threadIdx.x == 0) {
+            wide tile_total_lo = 0, tile_total_hi = 0;
+            for (uint32_t within = 0; within < tile_reach; ++within) {
+                tile_total_lo += scratch_lo[within];
+                tile_total_hi += scratch_hi[within];
+            }
+            total_lo += tile_total_lo;
+            total_hi += tile_total_hi;
+        }
+        if (d < head_width) {
+            for (uint32_t within = 0; within < tile_reach; ++within) {
+                uint32_t j = start + tile + within;
+                size_t v_at = ((size_t)j * kv_heads + g) * head_width + d;
+                wide vl = v_lo[v_at], vh = v_hi[v_at], pl, ph;
+                corners(scratch_lo[within], scratch_hi[within], vl, vh, &pl, &ph, refused);
+                num_lo += pl; num_hi += ph;
+                if (tile == 0 && within == 0) { hull_lo = vl; hull_hi = vh; }
+                else { if (vl < hull_lo) hull_lo = vl; if (vh > hull_hi) hull_hi = vh; }
+            }
+        }
+        __syncthreads();
+    }
+    wide tl = total_lo, th = total_hi;
+    if (tl <= 0) {
+        if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED);
+        return;
+    }
+    if (d < head_width) {
         // num at 2^-2F over total at 2^-F gives the quotient at 2^-F: the interval quotient with
         // the sign-correct denominator choice, no lift.
         wide q_lo, q_hi;
@@ -977,6 +1011,54 @@ extern "C" __global__ void section_withdraw_rows(
     int withdrawn = (r >= from && r < from + span);
     out_lo[flat] = withdrawn ? 0 : lo[flat];
     out_hi[flat] = withdrawn ? 0 : hi[flat];
+}
+
+// The terminal receiver's exact factorization: retain only the last row of a non-empty section.
+// No unrequested row is allocated or zero-filled, and every coordinate preserves its enclosure.
+extern "C" __global__ void section_terminal_row(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t column = blockIdx.x * blockDim.x + threadIdx.x;
+    if (column >= width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    size_t source = (size_t)(rows - 1) * width + column;
+    out_lo[column] = lo[source];
+    out_hi[column] = hi[source];
+}
+
+// The receiver-directed integral of each non-empty row block. `boundaries[0] = 0`, the last
+// boundary is `rows`, and strict increase is established by the resident law before launch. One
+// thread owns one `(block, coordinate)` and returns the directed exact mean; the source section is
+// untouched and remains the reconstruction fibre.
+extern "C" __global__ void section_partition_mean(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width,
+    const uint32_t *boundaries, uint32_t groups,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused,
+    const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= groups * width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t group = flat / width;
+    uint32_t coordinate = flat % width;
+    uint32_t first = boundaries[group];
+    uint32_t after = boundaries[group + 1];
+    if (first >= after || after > rows) {
+        atomicOr(refused, REFUSED_MALFORMED);
+        out_lo[flat] = 0;
+        out_hi[flat] = 0;
+        return;
+    }
+    wide lower = 0, upper = 0;
+    for (uint32_t row = first; row < after; ++row) {
+        size_t at = (size_t)row * width + coordinate;
+        lower += (wide)lo[at];
+        upper += (wide)hi[at];
+    }
+    wide population = (wide)(after - first);
+    out_lo[flat] = to_word(div_floor(lower, population, refused), refused);
+    out_hi[flat] = to_word(div_ceil(upper, population, refused), refused);
 }
 
 // **An intervention, typed as one by the passage**: the columns permuted in blocks of `block` —

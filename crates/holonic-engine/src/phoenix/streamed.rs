@@ -51,9 +51,9 @@ use crate::causal::EventId;
 use crate::embedding_fiber::ResidentReadout;
 use crate::exact_work::ExactWork;
 use crate::front_passage::{
-    DeedReceiver, EnteringRows, FrontPassage, FrontPassageObstruction, MaterialAdmission,
-    MountedPopulation, PooledMaterialAuxiliary, ResidentMaterial, SealedMidpointQuotient,
-    factored_seals,
+    CompiledPassage, DeedReceiver, EnteringRows, FrontPassage, FrontPassageObstruction,
+    MaterialAdmission, MountedPopulation, PooledMaterialAuxiliary, ResidentMaterial,
+    ResourceObstruction, SealedMidpointQuotient, factored_seals,
 };
 use crate::interaction::OccurrencePort;
 use crate::resident_section::{
@@ -433,6 +433,38 @@ pub fn slot_shapes(layers: &[Segment], last: &Segment) -> Vec<SlotShape> {
     ]
 }
 
+/// One pressure-resilient resident source slot, derived as the componentwise cover of the layer
+/// and final slots. Reusing it removes copy overlap but changes no mounted population: its event
+/// orders every refill after the preceding graph, and every region keeps the same source address
+/// and exact mounted extent. This is the apparatus partition used by the productive runtime.
+pub fn resident_window_slot_shape(layers: &[Segment], last: &Segment) -> Vec<SlotShape> {
+    let plural = slot_shapes(layers, last);
+    vec![SlotShape {
+        name: "one reusable resident source slot covering every layer and final boundary"
+            .to_owned(),
+        aligned_octets: plural
+            .iter()
+            .map(|shape| shape.aligned_octets)
+            .max()
+            .unwrap_or(0),
+        stored_octets: plural
+            .iter()
+            .map(|shape| shape.stored_octets)
+            .max()
+            .unwrap_or(0),
+        mass_octets: plural
+            .iter()
+            .map(|shape| shape.mass_octets)
+            .max()
+            .unwrap_or(0),
+        scratch_octets: plural
+            .iter()
+            .map(|shape| shape.scratch_octets)
+            .max()
+            .unwrap_or(0),
+    }]
+}
+
 /// One layer's receipt in the circulation. Deliberately narrow: the faces a receiver reads are the
 /// terminal ones, and the loop reads none of them.
 pub struct SegmentReceipt {
@@ -461,6 +493,108 @@ pub struct SegmentReceipt {
     pub stage_wall_s: f64,
     pub mount_wall_s: f64,
     pub bind_wall_s: f64,
+}
+
+type BoundDeed<'chart> = (
+    CompiledPassage<'chart>,
+    TransferCensus,
+    BTreeMap<&'chart str, EventId>,
+    usize,
+);
+
+fn residency_pressure(obstruction: &FrontPassageObstruction) -> bool {
+    matches!(
+        obstruction,
+        FrontPassageObstruction::Resource(ResourceObstruction::Apparatus { coordinate })
+            if coordinate.name == "charged-resident-octets"
+    )
+}
+
+/// Discharge one completed resident window. Every section read here was explicitly declared by
+/// the receiver, and the function is called only after the conducting current was fenced. Layer
+/// returns and shared K/V already crossed by ownership transfer and therefore survive passage
+/// release without a host semantic copy.
+#[allow(clippy::too_many_arguments)]
+fn discharge_window<'chart>(
+    deeds: &mut Vec<BoundDeed<'chart>>,
+    receipts: &mut [SegmentReceipt],
+    receiver_option: ReceiverOption,
+    cultivation_present: bool,
+    obstructions: &mut Vec<(usize, String, usize, usize)>,
+    receiver_layers: &mut Vec<LayerReceiverFaces>,
+    final_normed: &mut Vec<(i64, i64)>,
+    potential: &mut Vec<(i64, i64)>,
+    terminal_refusal: &mut Option<String>,
+) -> Result<(), String> {
+    for (bound, census_at_launch, named, receipt_index) in deeds.drain(..) {
+        let returned = bound.returned(census_at_launch).map_err(|obstruction| {
+            format!(
+                "segment receipt {receipt_index} did not return: {}",
+                describe(&obstruction)
+            )
+        })?;
+        if let Err(obstruction) = bound.standing(&returned) {
+            obstructions.push((
+                receipt_index,
+                describe(&obstruction),
+                returned.obstruction.refusals.len(),
+                returned.obstruction.origins().count(),
+            ));
+        }
+        let receipt = &mut receipts[receipt_index];
+        receipt.lineage_empty = returned.stands();
+        receipt.a_priori_held = returned.measured_octaves.iter().all(|(port, measured)| {
+            bound.octave_field.get(port).copied().unwrap_or(0) >= *measured
+        });
+        for front in &returned.fronts {
+            for reading in &front.readings {
+                if reading.operation.starts_with("midpoint-quotient") {
+                    receipt.quotients += 1;
+                } else if reading.operation != "enter" && reading.operation != "carry" {
+                    receipt.collapsed_width_sum += u128::from(reading.measured.width_sum);
+                    receipt.collapsed_width_max =
+                        receipt.collapsed_width_max.max(reading.measured.max_width);
+                    receipt.collapsed_nonzero += u64::from(reading.measured.nonzero_widths);
+                }
+            }
+        }
+        if receiver_option == ReceiverOption::Complete {
+            if let Some(layer) = receipt.layer {
+                let ple = bound
+                    .read_section(&returned, named[tower::PLE_SECTION])
+                    .map_err(|obstruction| {
+                        format!("layer {layer} PLE receiver: {}", describe(&obstruction))
+                    })?;
+                let contact = bound
+                    .read_section(&returned, named[tower::CONTACT])
+                    .map_err(|obstruction| {
+                        format!("layer {layer} contact receiver: {}", describe(&obstruction))
+                    })?;
+                let layer_return = bound
+                    .read_section(&returned, named[tower::LAYER_ENCLOSURE])
+                    .map_err(|obstruction| {
+                        format!("layer {layer} return receiver: {}", describe(&obstruction))
+                    })?;
+                receiver_layers.push(LayerReceiverFaces {
+                    layer,
+                    ple,
+                    contact,
+                    layer_return,
+                });
+            }
+        }
+        if receipt.layer.is_none() && !cultivation_present {
+            match bound.read_section(&returned, named[tower::FINAL_NORMED]) {
+                Ok(read) => *final_normed = read,
+                Err(obstruction) => *terminal_refusal = Some(describe(&obstruction)),
+            }
+            match bound.read_terminal(&returned) {
+                Ok(read) => *potential = read,
+                Err(obstruction) => *terminal_refusal = Some(describe(&obstruction)),
+            }
+        }
+    }
+    Ok(())
 }
 
 /// What the whole circulation returned.
@@ -626,6 +760,7 @@ pub fn circulate<'chart>(
         limit,
         poison,
         None,
+        None,
         InterventionSite::Nowhere,
         &Intervention::None,
         ReceiverOption::Terminal,
@@ -665,6 +800,7 @@ pub fn circulate_with_intervention<'chart>(
         tower::LAYERS,
         false,
         None,
+        None,
         site,
         intervention,
         receiver,
@@ -701,6 +837,7 @@ pub fn circulate_cultivated<'chart, 'request>(
         fuse,
         tower::LAYERS,
         false,
+        None,
         Some(request),
         InterventionSite::Nowhere,
         &Intervention::None,
@@ -742,6 +879,7 @@ pub fn circulate_cultivated_with_intervention<'chart, 'request>(
         fuse,
         tower::LAYERS,
         false,
+        None,
         Some(request),
         site,
         intervention,
@@ -750,6 +888,49 @@ pub fn circulate_cultivated_with_intervention<'chart, 'request>(
         CirculationOutput::Cultivated(cultivated) => Ok(cultivated),
         CirculationOutput::Base(_) => {
             Err("the intervention-aware cultivated circulation returned no overlay tail".to_owned())
+        }
+    }
+}
+
+/// The same cultivated circulation with an addressed partition of the entering source rows. The
+/// partition is a receiver presentation: all token rows still cross, and each block's exact mean
+/// becomes one row of the inherited tower.
+#[allow(clippy::too_many_arguments)]
+pub fn circulate_cultivated_with_partitioned_intervention<'chart, 'request>(
+    surface: &'chart ResidentSurface<'chart>,
+    readout: &'chart ResidentReadout,
+    source: &mut dyn MaterialSource,
+    tokens: &[usize],
+    partition_boundaries: &[u32],
+    grain: ResidentGrain,
+    terms: SeriesAperture,
+    chart: tower::Chart,
+    fuse: bool,
+    site: InterventionSite,
+    intervention: &Intervention,
+    receiver: ReceiverOption,
+    request: &'request CultivationRequest<'request>,
+) -> Result<CultivatedCirculated, String> {
+    match circulate_inner(
+        surface,
+        readout,
+        source,
+        tokens,
+        grain,
+        terms,
+        chart,
+        fuse,
+        tower::LAYERS,
+        false,
+        Some(partition_boundaries),
+        Some(request),
+        site,
+        intervention,
+        receiver,
+    )? {
+        CirculationOutput::Cultivated(cultivated) => Ok(cultivated),
+        CirculationOutput::Base(_) => {
+            Err("the partitioned cultivated circulation returned no overlay tail".to_owned())
         }
     }
 }
@@ -770,6 +951,7 @@ fn circulate_inner<'chart, 'request>(
     // value, so the mouth refuses it on the card and every successor in that deed carries it.
     limit: usize,
     poison: bool,
+    partition_boundaries: Option<&[u32]>,
     cultivation: Option<&'request CultivationRequest<'request>>,
     intervention_site: InterventionSite,
     intervention: &Intervention,
@@ -781,28 +963,48 @@ fn circulate_inner<'chart, 'request>(
     let receiver = DeedReceiver::unbounded();
     let scales = tower::algebraic_scales()?;
     let no_intervention = Intervention::None;
+    if tokens.is_empty() {
+        return Err("the tower received no entering rows".to_owned());
+    }
+    let model_rows = match partition_boundaries {
+        Some(boundaries)
+            if boundaries.len() >= 2
+                && boundaries[0] == 0
+                && boundaries.last().copied() == Some(tokens.len() as u32)
+                && boundaries.windows(2).all(|pair| pair[0] < pair[1]) =>
+        {
+            boundaries.len() - 1
+        }
+        Some(boundaries) => {
+            return Err(format!(
+                "the entering partition does not cover {} source rows exactly: {boundaries:?}",
+                tokens.len()
+            ));
+        }
+        None => tokens.len(),
+    };
 
     // ---------------------------------------------------------------------------------------
     // before the deed: the segments, the admission, the standing, and the one native-rest occurrence
     // ---------------------------------------------------------------------------------------
     let mut layer_segments = Vec::with_capacity(tower::LAYERS);
     for layer in 0..tower::LAYERS {
-        layer_segments.push(layer_segment(source, layer, layer % 2, layer % 3)?);
+        layer_segments.push(layer_segment(source, layer, 0, layer % 3)?);
     }
-    let last = final_segment(source, FINAL_SLOT, FINAL_PINNED)?;
-    let shapes = slot_shapes(&layer_segments, &last);
-    let refills = vec![
-        (tower::LAYERS as u64).div_ceil(2),
-        (tower::LAYERS as u64) / 2,
-        1,
-    ];
+    let last = final_segment(source, 0, FINAL_PINNED)?;
+    let staging_shapes = slot_shapes(&layer_segments, &last);
+    let shapes = resident_window_slot_shape(&layer_segments, &last);
+    let refills = vec![tower::LAYERS as u64 + 1];
     // Every resident auxiliary below is a separate allocation. Keep the plan decomposed so the
     // card's allocation-grain rounding is applied to each mounted band/position population.
     let mut auxiliaries = vec![
         PooledMaterialAuxiliary::BandElements(tower::SLIDING_HEAD / 2),
         PooledMaterialAuxiliary::BandElements(tower::FULL_HEAD / 2),
-        PooledMaterialAuxiliary::Positions(tokens.len()),
+        PooledMaterialAuxiliary::Positions(model_rows),
     ];
+    if let Some(boundaries) = partition_boundaries {
+        auxiliaries.push(PooledMaterialAuxiliary::Positions(boundaries.len()));
+    }
     let layer_site = |site: InterventionSite| match site {
         InterventionSite::EveryLayer => true,
         InterventionSite::Layer(_) => true,
@@ -828,7 +1030,7 @@ fn circulate_inner<'chart, 'request>(
             }
         }
         if matches!(intervention, Intervention::ReversedPositions) {
-            auxiliaries.push(PooledMaterialAuxiliary::Positions(tokens.len()));
+            auxiliaries.push(PooledMaterialAuxiliary::Positions(model_rows));
         }
         if matches!(
             intervention,
@@ -849,13 +1051,14 @@ fn circulate_inner<'chart, 'request>(
     // ahead: with two slots the read of segment k+2 would have to wait on the copy of segment k+1,
     // which is the copy that is supposed to be crossing while segment k's graph conducts.
     let pinned = vec![
-        shapes[0].stored_octets,
-        shapes[0].stored_octets,
-        shapes[0].stored_octets,
-        shapes[2].stored_octets,
+        staging_shapes[0].stored_octets,
+        staging_shapes[0].stored_octets,
+        staging_shapes[0].stored_octets,
+        staging_shapes[2].stored_octets,
     ];
     let mut circulation =
-        StreamedCirculation::open(surface, &shapes, &pinned).map_err(|e| e.to_string())?;
+        StreamedCirculation::open(surface, std::slice::from_ref(&staging_shapes[0]), &pinned)
+            .map_err(|e| e.to_string())?;
 
     // The material, held for the WHOLE circulation. The bands, the positions and the entering
     // codewords cross once; only the maps and the carried standings move between segments.
@@ -874,7 +1077,7 @@ fn circulate_inner<'chart, 'request>(
             surface
                 .mount_bands(&sliding_bands, tower::BAND_GRAIN)
                 .map_err(|e| e.to_string())?,
-            (tokens.len() - 1) as u32,
+            (model_rows - 1) as u32,
         ),
     );
     material.bands.insert(
@@ -883,16 +1086,24 @@ fn circulate_inner<'chart, 'request>(
             surface
                 .mount_bands(&full_bands, tower::BAND_GRAIN)
                 .map_err(|e| e.to_string())?,
-            (tokens.len() - 1) as u32,
+            (model_rows - 1) as u32,
         ),
     );
-    let positions: Vec<u32> = (0..tokens.len() as u32).collect();
+    let positions: Vec<u32> = (0..model_rows as u32).collect();
     let reversed_positions: Vec<u32> = positions.iter().copied().rev().collect();
     material.positions = Some(
         surface
             .mount_positions(&positions)
             .map_err(|e| e.to_string())?,
     );
+    if let Some(boundaries) = partition_boundaries {
+        material.arrays.insert(
+            tower::INPUT_PARTITION.to_owned(),
+            surface
+                .mount_positions(boundaries)
+                .map_err(|error| error.to_string())?,
+        );
+    }
     // Keep both position charts resident for the whole circulation. Swapping ownership between
     // the active/inactive slots cannot free a buffer still named by an earlier launched graph.
     let mut alternate_positions = if intervention_site != InterventionSite::Nowhere
@@ -954,12 +1165,16 @@ fn circulate_inner<'chart, 'request>(
     // The W3 candidate, exact factor residency, and pure overlay work are admitted before the
     // first W2 launch; the final bind must agree with this receipt after h and y0 are released.
     let (mut overlay_material, pre_admission) = if let Some(request) = cultivation {
+        let receiver_rows = match receiver_option {
+            ReceiverOption::Terminal => 1,
+            ReceiverOption::Complete => model_rows,
+        };
         let (material, receipt) = streamed_cultivation::prepare(
             surface,
             readout,
             &passage,
             request,
-            tokens.len(),
+            receiver_rows,
             grain,
         )?;
         (Some(material), Some(receipt))
@@ -974,12 +1189,14 @@ fn circulate_inner<'chart, 'request>(
     let loop_clock = Instant::now();
     let mut carried: Option<(Rc<ResidentSection<'chart>>, u32)> = None;
     let mut shared: BTreeMap<&'chart str, (Rc<ResidentSection<'chart>>, u32)> = BTreeMap::new();
-    let mut bound_deeds: Vec<(
-        crate::front_passage::CompiledPassage<'chart>,
-        TransferCensus,
-        BTreeMap<&'chart str, EventId>,
-    )> = Vec::new();
+    let mut bound_deeds: Vec<BoundDeed<'chart>> = Vec::new();
     let mut receipts: Vec<SegmentReceipt> = Vec::new();
+    let mut potential = Vec::new();
+    let mut final_normed = Vec::new();
+    let mut obstructions: Vec<(usize, String, usize, usize)> = Vec::new();
+    let mut terminal_refusal: Option<String> = None;
+    let mut receiver_layers = Vec::new();
+    let mut reductions: Vec<(String, u64)> = Vec::new();
     let mut tower_work = ExactWork::nothing();
     let mut peak_charged_octets = 0u64;
     let mut deed_launches = 0u64;
@@ -998,17 +1215,11 @@ fn circulate_inner<'chart, 'request>(
     // crosses while that graph conducts. Measured 2026-08-19: with the copy issued after the next
     // staged read instead, every copy landed after the graph it was meant to overlap and the
     // profiler read 0 ns of overlap — every stream asynchronous, and nothing concurrent.
-    let segments = tower::LAYERS.min(limit) + 1;
-    let at = |i: usize| -> &Segment {
-        if i + 1 < segments {
-            &layer_segments[i]
-        } else {
-            &last
-        }
-    };
-    let mut offsets: Vec<Vec<usize>> = vec![Vec::new(); segments];
-    let mut requests: Vec<Vec<crate::embedding_fiber::PooledMount>> = vec![Vec::new(); segments];
-    let mut stage_wall: Vec<f64> = vec![0.0; segments];
+    let layer_count = tower::LAYERS.min(limit);
+    let at = |i: usize| -> &Segment { &layer_segments[i] };
+    let mut offsets: Vec<Vec<usize>> = vec![Vec::new(); layer_count];
+    let mut requests: Vec<Vec<crate::embedding_fiber::PooledMount>> = vec![Vec::new(); layer_count];
+    let mut stage_wall: Vec<f64> = vec![0.0; layer_count];
     {
         let first = at(0);
         let clock = Instant::now();
@@ -1020,7 +1231,7 @@ fn circulate_inner<'chart, 'request>(
         requests[0] = circulation
             .cross(first.slot, first.pinned, &offsets[0], &first.regions)
             .map_err(|e| e.to_string())?;
-        if segments > 1 {
+        if layer_count > 1 {
             let second = at(1);
             let clock = Instant::now();
             let file = source.file()?;
@@ -1081,7 +1292,7 @@ fn circulate_inner<'chart, 'request>(
                         surface
                             .mount_bands(&identity, tower::BAND_GRAIN)
                             .map_err(|e| e.to_string())?,
-                        (tokens.len() - 1) as u32,
+                        (model_rows - 1) as u32,
                     ),
                 );
             }
@@ -1170,7 +1381,11 @@ fn circulate_inner<'chart, 'request>(
             terms,
             layer_scalar,
             applied,
-            tokens.len(),
+            model_rows,
+            match partition_boundaries {
+                Some(boundaries) => tower::InputSectionReceiver::PartitionMeans(boundaries),
+                None => tower::InputSectionReceiver::SourceRows,
+            },
         )?;
         let terminal = founded.returns[tower::LAYER_RETURN];
         let mut declared = BTreeSet::new();
@@ -1193,18 +1408,63 @@ fn circulate_inner<'chart, 'request>(
                 .realization
                 .bind(*occurrence, SealedMidpointQuotient);
         }
-        let bound = passage
-            .bind(
-                &founded.complex,
-                &founded.realization,
-                &material,
-                source.occurrence(),
-                &receiver,
-                Some(&admission),
-                terminal,
-            )
-            .map_err(|o| format!("layer {layer} refused at bind: {}", describe(&o)))?;
+        let bound = match passage.bind(
+            &founded.complex,
+            &founded.realization,
+            &material,
+            source.occurrence(),
+            &receiver,
+            Some(&admission),
+            terminal,
+        ) {
+            Ok(bound) => bound,
+            Err(obstruction) if residency_pressure(&obstruction) && !bound_deeds.is_empty() => {
+                circulation
+                    .residency_boundary()
+                    .map_err(|error| error.to_string())?;
+                discharge_window(
+                    &mut bound_deeds,
+                    &mut receipts,
+                    receiver_option,
+                    cultivation.is_some(),
+                    &mut obstructions,
+                    &mut receiver_layers,
+                    &mut final_normed,
+                    &mut potential,
+                    &mut terminal_refusal,
+                )?;
+                passage
+                    .bind(
+                        &founded.complex,
+                        &founded.realization,
+                        &material,
+                        source.occurrence(),
+                        &receiver,
+                        Some(&admission),
+                        terminal,
+                    )
+                    .map_err(|retry| {
+                        format!(
+                            "layer {layer} refused after a pressure-derived resident boundary: {}",
+                            describe(&retry)
+                        )
+                    })?
+            }
+            Err(obstruction) => {
+                return Err(format!(
+                    "layer {layer} refused at bind: {}",
+                    describe(&obstruction)
+                ));
+            }
+        };
         let bind_wall_s = bind_clock.elapsed().as_secs_f64();
+        if reductions.is_empty() {
+            for front in bound.fronts() {
+                for coupling in &front.couplings {
+                    reductions.push((coupling.plan.kernel.to_owned(), coupling.plan.extent));
+                }
+            }
+        }
         peak_charged_octets = peak_charged_octets
             .max(admission.prediction.charged_octets + bound.apparatus_prediction.charged_octets);
         let (graph, _) = bound.graph();
@@ -1227,13 +1487,13 @@ fn circulate_inner<'chart, 'request>(
 
         // The next segment's copy, issued now so it crosses while THIS deed conducts, and the one
         // after it staged from the container. Neither reads a semantic value; both are transports.
-        if layer + 1 < segments {
+        if layer + 1 < layer_count {
             let next = at(layer + 1);
             requests[layer + 1] = circulation
                 .cross(next.slot, next.pinned, &offsets[layer + 1], &next.regions)
                 .map_err(|e| e.to_string())?;
         }
-        if layer + 2 < segments {
+        if layer + 2 < layer_count {
             let after = at(layer + 2);
             let clock = Instant::now();
             let file = source.file()?;
@@ -1296,14 +1556,46 @@ fn circulate_inner<'chart, 'request>(
         for (name, event) in &founded.returns {
             named.insert(name, *event);
         }
-        bound_deeds.push((bound, census_at_launch, named));
+        bound_deeds.push((bound, census_at_launch, named, receipts.len() - 1));
     }
 
-    // --- the final deed: the same circulation, its own slot, its crossing already in flight ---
-    let stage_wall_s = stage_wall[segments - 1];
+    // --- the final deed: retire the mutually-exclusive layer-map slot, then found the larger
+    // final-table slot. The carried semantic standing survives this exterior apparatus rebase. ---
+    circulation
+        .retire_slots()
+        .map_err(|error| error.to_string())?;
+    discharge_window(
+        &mut bound_deeds,
+        &mut receipts,
+        receiver_option,
+        cultivation.is_some(),
+        &mut obstructions,
+        &mut receiver_layers,
+        &mut final_normed,
+        &mut potential,
+        &mut terminal_refusal,
+    )?;
+    material.standings.clear();
+    shared.clear();
+    circulation
+        .found_slots(std::slice::from_ref(&staging_shapes[2]))
+        .map_err(|error| error.to_string())?;
+    let stage_clock = Instant::now();
+    let final_offsets = circulation
+        .stage(
+            last.pinned,
+            source.file()?,
+            source.file_octets()?,
+            &last.regions,
+        )
+        .map_err(|error| error.to_string())?;
+    let stage_wall_s = stage_clock.elapsed().as_secs_f64();
+    let final_requests = circulation
+        .cross(last.slot, last.pinned, &final_offsets, &last.regions)
+        .map_err(|error| error.to_string())?;
     let mount_clock = Instant::now();
     let mounted = circulation
-        .mount(last.slot, last.pinned, &requests[segments - 1])
+        .mount(last.slot, last.pinned, &final_requests)
         .map_err(|e| e.to_string())?;
     material.populations.clear();
     for (name, pooled) in last.names.iter().zip(mounted) {
@@ -1327,7 +1619,11 @@ fn circulate_inner<'chart, 'request>(
     } else {
         &no_intervention
     };
-    let mut founded = tower::found_final(chart, applied_final, &scales)?;
+    let output_receiver = match receiver_option {
+        ReceiverOption::Terminal => tower::OutputSectionReceiver::TerminalRow,
+        ReceiverOption::Complete => tower::OutputSectionReceiver::Whole,
+    };
+    let mut founded = tower::found_final(chart, applied_final, &scales, output_receiver)?;
     let terminal = founded.returns[tower::POTENTIAL];
     // The final normed standing is a face this receiver reads, and it is itself the QUOTIENT: its
     // own face is the collapsed one, which the fused seal writes into its predecessor's buffer and
@@ -1349,17 +1645,55 @@ fn circulate_inner<'chart, 'request>(
             .realization
             .bind(*occurrence, SealedMidpointQuotient);
     }
-    let bound = passage_final
-        .bind(
-            &founded.complex,
-            &founded.realization,
-            &material,
-            source.occurrence(),
-            &receiver,
-            Some(&admission),
-            terminal,
-        )
-        .map_err(|o| format!("the final deed refused at bind: {}", describe(&o)))?;
+    let bound = match passage_final.bind(
+        &founded.complex,
+        &founded.realization,
+        &material,
+        source.occurrence(),
+        &receiver,
+        Some(&admission),
+        terminal,
+    ) {
+        Ok(bound) => bound,
+        Err(obstruction) if residency_pressure(&obstruction) && !bound_deeds.is_empty() => {
+            circulation
+                .residency_boundary()
+                .map_err(|error| error.to_string())?;
+            discharge_window(
+                &mut bound_deeds,
+                &mut receipts,
+                receiver_option,
+                cultivation.is_some(),
+                &mut obstructions,
+                &mut receiver_layers,
+                &mut final_normed,
+                &mut potential,
+                &mut terminal_refusal,
+            )?;
+            passage_final
+                .bind(
+                    &founded.complex,
+                    &founded.realization,
+                    &material,
+                    source.occurrence(),
+                    &receiver,
+                    Some(&admission),
+                    terminal,
+                )
+                .map_err(|retry| {
+                    format!(
+                        "the final deed refused after a pressure-derived resident boundary: {}",
+                        describe(&retry)
+                    )
+                })?
+        }
+        Err(obstruction) => {
+            return Err(format!(
+                "the final deed refused at bind: {}",
+                describe(&obstruction)
+            ));
+        }
+    };
     let final_normed_bound = *bound
         .octave_field
         .get(&OccurrencePort::output(
@@ -1424,14 +1758,14 @@ fn circulate_inner<'chart, 'request>(
     for (name, event) in &founded.returns {
         named.insert(name, *event);
     }
-    bound_deeds.push((bound, census_at_launch, named));
+    bound_deeds.push((bound, census_at_launch, named, receipts.len() - 1));
     // This is the tower-only resident window. W3's overlay starts after this point and owns a
     // separate census window, so the two are never presented as one additive delta.
     let census_after_tower = surface.census();
 
     // --- W3 tail: release h and y0 from the final W2 deed, then launch once on the same stream ---
     if let Some(request) = cultivation {
-        let (final_bound, _, final_named) =
+        let (final_bound, _, final_named, _) =
             bound_deeds.last_mut().ok_or("W2 final deed is absent")?;
         let h_event = *final_named
             .get(tower::FINAL_NORMED)
@@ -1514,83 +1848,17 @@ fn circulate_inner<'chart, 'request>(
     circulation.terminal().map_err(|e| e.to_string())?;
     let streamed = circulation.census().clone();
 
-    let mut potential = Vec::new();
-    let mut final_normed = Vec::new();
-    let mut obstructions: Vec<(usize, String, usize, usize)> = Vec::new();
-    let mut terminal_refusal: Option<String> = None;
-    let mut receiver_layers = Vec::new();
-    for (at, (bound, census_at_launch, named)) in bound_deeds.iter().enumerate() {
-        let returned = bound
-            .returned(census_at_launch.clone())
-            .map_err(|o| format!("segment {at} did not return: {}", describe(&o)))?;
-        if let Err(obstruction) = bound.standing(&returned) {
-            // The circulation does not stop: stopping would require the apparatus to inspect a
-            // semantic value between segments, which is the one thing this deed forbids. The
-            // complete lineage is returned here, after the fact, whole.
-            let lineage = returned.obstruction.refusals.len();
-            let origins = returned.obstruction.origins().count();
-            obstructions.push((at, describe(&obstruction), lineage, origins));
-        }
-        let receipt = &mut receipts[at];
-        receipt.lineage_empty = returned.stands();
-        receipt.a_priori_held = returned.measured_octaves.iter().all(|(port, measured)| {
-            bound.octave_field.get(port).copied().unwrap_or(0) >= *measured
-        });
-        for front in &returned.fronts {
-            for reading in &front.readings {
-                if reading.operation.starts_with("midpoint-quotient") {
-                    receipt.quotients += 1;
-                } else if reading.operation != "enter" && reading.operation != "carry" {
-                    receipt.collapsed_width_sum += u128::from(reading.measured.width_sum);
-                    receipt.collapsed_width_max =
-                        receipt.collapsed_width_max.max(reading.measured.max_width);
-                    receipt.collapsed_nonzero += u64::from(reading.measured.nonzero_widths);
-                }
-            }
-        }
-        if receiver_option == ReceiverOption::Complete && at + 1 < bound_deeds.len() {
-            let ple = bound
-                .read_section(&returned, named[tower::PLE_SECTION])
-                .map_err(|obstruction| {
-                    format!(
-                        "layer {at} PLE receiver did not return: {}",
-                        describe(&obstruction)
-                    )
-                })?;
-            let contact = bound
-                .read_section(&returned, named[tower::CONTACT])
-                .map_err(|obstruction| {
-                    format!(
-                        "layer {at} contact receiver did not return: {}",
-                        describe(&obstruction)
-                    )
-                })?;
-            let layer_return = bound
-                .read_section(&returned, named[tower::LAYER_ENCLOSURE])
-                .map_err(|obstruction| {
-                    format!(
-                        "layer {at} return receiver did not return: {}",
-                        describe(&obstruction)
-                    )
-                })?;
-            receiver_layers.push(LayerReceiverFaces {
-                layer: at,
-                ple,
-                contact,
-                layer_return,
-            });
-        }
-        if at + 1 == bound_deeds.len() && cultivation.is_none() {
-            match bound.read_section(&returned, named[tower::FINAL_NORMED]) {
-                Ok(read) => final_normed = read,
-                Err(obstruction) => terminal_refusal = Some(describe(&obstruction)),
-            }
-            match bound.read_terminal(&returned) {
-                Ok(read) => potential = read,
-                Err(obstruction) => terminal_refusal = Some(describe(&obstruction)),
-            }
-        }
-    }
+    discharge_window(
+        &mut bound_deeds,
+        &mut receipts,
+        receiver_option,
+        cultivation.is_some(),
+        &mut obstructions,
+        &mut receiver_layers,
+        &mut final_normed,
+        &mut potential,
+        &mut terminal_refusal,
+    )?;
 
     let mut cultivated_potential = Vec::new();
     let mut base_potential_digest = String::new();
@@ -1647,14 +1915,6 @@ fn circulate_inner<'chart, 'request>(
     // nothing is invented: the mode is the surface's, the source is the occurrence's container, the
     // topology is every segment's own census, the ports are the extents this input closure sizes
     // every kernel by, and the reductions are the first segment's coupling plans verbatim.
-    let mut reductions: Vec<(String, u64)> = Vec::new();
-    if let Some((first, _, _)) = bound_deeds.first() {
-        for front in first.fronts() {
-            for coupling in &front.couplings {
-                reductions.push((coupling.plan.kernel.to_owned(), coupling.plan.extent));
-            }
-        }
-    }
     let graph_key = GraphKey {
         mode: format!("{:?}", surface.mode()),
         source: source.source_identity(),
@@ -1663,20 +1923,15 @@ fn circulate_inner<'chart, 'request>(
             .map(|r| (r.operations, r.fronts, r.graph_nodes, r.graph_edges))
             .collect(),
         ports: vec![
-            (
-                "continuing standing".to_owned(),
-                tokens.len(),
-                tower::HIDDEN,
-            ),
-            (
-                "per-layer section".to_owned(),
-                tokens.len(),
-                tower::PLE_WIDTH,
-            ),
-            ("gated passage chart".to_owned(), tokens.len(), tower::FFN),
+            ("continuing standing".to_owned(), model_rows, tower::HIDDEN),
+            ("per-layer section".to_owned(), model_rows, tower::PLE_WIDTH),
+            ("gated passage chart".to_owned(), model_rows, tower::FFN),
             (
                 "potential section".to_owned(),
-                tokens.len(),
+                match receiver_option {
+                    ReceiverOption::Terminal => 1,
+                    ReceiverOption::Complete => model_rows,
+                },
                 tower::VOCABULARY,
             ),
         ],

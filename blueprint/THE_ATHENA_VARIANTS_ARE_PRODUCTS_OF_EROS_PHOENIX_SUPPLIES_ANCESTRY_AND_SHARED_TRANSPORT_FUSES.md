@@ -3,14 +3,14 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current deed:** A2. A1 returned all ten required consequences on 2026-08-22.
+**Current deed:** A3. A2 returned all ten required consequences on 2026-08-22.
 **Scheduling boundary:** this file orders the Athena-product continuation. It does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md); only a returned deed and passing grade do that.
 
 **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts;
 `established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived` for the
 named local Lean theorems; `interpretation` for their transfer into the construction geometry; and
-`open` for A2 and every later Athena product deed.
+`open` for A3 and every later Athena product deed.
 
 **Governing doctrine:**
 [`TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -444,12 +444,13 @@ correspondence fibres. A1 makes no training, response-quality or sibling-defect 
 
 ---
 
-## 9. Deed A2 — sibling continuations return a defect spectrum and active cover
+## 9. Deed A2 — sibling continuations return a defect spectrum and active cover — PASSED
 
-[open] A2 derives its cohort from operation-complex classes, presentation generators, shortest
-separators and open fibres. It does not choose a prompt count. At each addressed history cut, one
-fixed Athena rest emits plural continuations while the corresponding Codex/Claude passages remain
-exterior siblings.
+[established-bounded; implemented-exact; measured] A2 derived its cohort from A1's ten repeated
+visible-content classes, shortest distinguishing histories, presentation boundaries and open
+fibres rather than choosing a prompt count. Twenty-two admitted history cuts and two exclusions
+returned. One fixed Athena-Gemma product conducted 22 base histories plus one presentation
+intervention while the corresponding Codex/Claude passages remained exterior siblings.
 
 The return includes:
 
@@ -464,6 +465,24 @@ The return includes:
 A2 fails if “same prompt” omits the rested body/history identity, if unavailable teacher interiors
 are invented, if response text replaces world consequence, or if output probability is treated as
 the causal object.
+
+[established-bounded; implemented-exact] All required returns stand together. An explicit
+addressed-partition receiver integrates each nonempty message's tokenizer rows by exact directed
+mean on the card while retaining the text, every native token row, byte/token boundary and
+straddling-token population as its reconstruction fibre. Thus 49,550 tokenizer rows remain bound
+while 49 message rows enter the inherited tower. This is an Athena receiver presentation, not a
+claim of tokenwise Gemma equivalence.
+
+[established-bounded; implemented-exact; measured] The terminal receiver returned 22 nonempty,
+non-vocabulary-wide candidate fronts, 22 receiver-indexed defect cells, nine distinct candidate
+addresses, 176 named open fibres, 15 tool/world-bearing histories and 22 later-operator returns.
+The fixed body, presentation law and source-access audit remained unchanged; the boundary rebase
+and provider-removal controls passed; no scalar winner, probability substitution or provider
+priority entered the result. The authoritative return is
+[`research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md`](../research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md).
+
+[open] Complete response suffixes, enacted candidate world consequences, cultivation and larger
+successor receivers remain open. They are A3 obligations, not hidden A2 claims.
 
 ---
 

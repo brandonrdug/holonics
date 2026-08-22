@@ -148,13 +148,13 @@ pub(crate) fn prepare<'chart>(
     readout: &'chart ResidentReadout,
     passage: &FrontPassage<'chart>,
     request: &CultivationRequest<'_>,
-    token_count: usize,
+    receiver_rows: usize,
     grain: crate::resident_section::ResidentGrain,
 ) -> Result<(ResidentMaterial<'chart>, CultivationPreAdmission), String> {
-    if request.candidate.terminal_rows != token_count {
+    if request.candidate.terminal_rows != receiver_rows {
         return Err(format!(
-            "W3 candidate terminal rows {} disagree with {} input tokens",
-            request.candidate.terminal_rows, token_count
+            "W3 candidate terminal rows {} disagree with {} receiver-visible output rows",
+            request.candidate.terminal_rows, receiver_rows
         ));
     }
     let (complex, events) = request

@@ -129,10 +129,18 @@ faces, agent/tool/world joins, a chronology separator and one source-detached ex
 All ten returns stand together. Authoritative grade:
 [`research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md`](../research/records/2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md).
 
-**A2 is next.** Derive sibling continuations from A1's operation/contact classes, presentation
-generators, shortest separators and open fibres while holding Athena rest and addressed history
-fixed. Return the full receiver-indexed defect complex, tool/world consequences and provider-removal
-controls without inventing teacher interiors, flattening the exchange, or choosing a scalar winner.
+**A2 PASSED.** The A1 rest returned 22 admitted shortest-history cuts and two exclusions. One fixed
+Athena-Gemma product conducted 49 addressed message rows while retaining all 49,550 tokenizer rows
+and their exact presentation reconstruction fibres. Twenty-two separated terminal candidate
+fronts, the complete receiver-indexed defect complex, recorded tool/world and later-operator
+returns, boundary/provider controls, fixed-body/source-access audits and 23 real GPU deeds returned
+without a scalar winner or invented teacher interior. Authoritative grade:
+[`research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md`](../research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md).
+
+**A3 is next.** Let one declared receiver defect found a lightning leader through A2's active cover;
+return its metric-adjoint passage as one attributable local native morphology delta; then require a
+distinct successor rest, source-detached held-out world-consequence improvement, nontrivial revisit
+holonomy, subject/provider-disjoint control, targeted restoration and exact work/card testimony.
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).

@@ -174,6 +174,130 @@ impl ProductSession {
             .map_err(|error| error.to_string())
     }
 
+    fn encode_partitioned(
+        &self,
+        text: &str,
+        byte_boundaries: &[usize],
+    ) -> Result<(Vec<u32>, RuntimeInputPresentation), String> {
+        if byte_boundaries.len() < 2
+            || byte_boundaries[0] != 0
+            || byte_boundaries.last().copied() != Some(text.len())
+            || byte_boundaries.windows(2).any(|pair| pair[0] >= pair[1])
+            || byte_boundaries
+                .iter()
+                .any(|boundary| !text.is_char_boundary(*boundary))
+        {
+            return Err(format!(
+                "the byte partition does not cover the UTF-8 occurrence exactly: {byte_boundaries:?} over {} octets",
+                text.len()
+            ));
+        }
+        self.mounted
+            .predecessor()
+            .codebook()
+            .validate_with_codec(&self.artifact)
+            .map_err(|error| error.to_string())?;
+        let tokenizer = tokenizers::Tokenizer::from_bytes(&self.artifact.tokenizer_json)
+            .map_err(|error| error.to_string())?;
+        let encoding = tokenizer
+            .encode(text, self.runtime_law.add_special_tokens)
+            .map_err(|error| error.to_string())?;
+        let source_ids = encoding.get_ids();
+        if encoding.get_offsets().len() != source_ids.len() {
+            return Err("the tokenizer did not return one byte face per source row".to_owned());
+        }
+        let native_ids = source_ids
+            .iter()
+            .map(|source| {
+                self.mounted
+                    .predecessor()
+                    .codebook()
+                    .native_id(*source)
+                    .map_err(|error| error.to_string())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        if native_ids.is_empty() {
+            return Err("the partitioned codec crossing returned no source rows".to_owned());
+        }
+        let groups = byte_boundaries.len() - 1;
+        let mut populations = vec![0u32; groups];
+        let mut crossings = Vec::new();
+        let mut previous_group = 0usize;
+        for (token, (start, end)) in encoding.get_offsets().iter().copied().enumerate() {
+            let group = if start == end {
+                if token == 0 { 0 } else { previous_group }
+            } else {
+                byte_boundaries[1..]
+                    .iter()
+                    .position(|boundary| end <= *boundary)
+                    .unwrap_or(groups - 1)
+            };
+            if group < previous_group {
+                return Err(
+                    "the tokenizer's offset chart moved backwards across the partition".to_owned(),
+                );
+            }
+            for (boundary_index, boundary) in byte_boundaries[1..groups].iter().enumerate() {
+                if start < *boundary && *boundary < end {
+                    crossings.push(RuntimeBoundaryCrossing {
+                        native_row: token as u32,
+                        source_id: source_ids[token],
+                        byte_range: (start as u64, end as u64),
+                        crossed_boundary: (boundary_index + 1) as u32,
+                    });
+                }
+            }
+            populations[group] = populations[group].saturating_add(1);
+            previous_group = group;
+        }
+        if let Some(group) = populations.iter().position(|population| *population == 0) {
+            return Err(format!(
+                "byte block {group} owns no complete tokenizer row; its boundary crossing remains an obstruction"
+            ));
+        }
+        let mut partition_boundaries = Vec::with_capacity(groups + 1);
+        partition_boundaries.push(0u32);
+        for population in populations {
+            let next = partition_boundaries
+                .last()
+                .copied()
+                .unwrap_or(0u32)
+                .checked_add(population)
+                .ok_or_else(|| "the token partition left the u32 address carrier".to_owned())?;
+            partition_boundaries.push(next);
+        }
+        if partition_boundaries.last().copied() != Some(native_ids.len() as u32) {
+            return Err("the token partition did not reconstruct its source population".to_owned());
+        }
+        let law_identity = format!(
+            "{:x}",
+            Sha256::digest(b"athena/input-presentation/partition-directed-mean/v1: each strict addressed source-row block maps to its exact directed coordinate mean; all native rows, byte boundaries, cross-boundary tokens and the source text remain its reconstruction fibre")
+        );
+        let reconstruction_sha256 = digest_input_reconstruction(
+            text,
+            &native_ids,
+            byte_boundaries,
+            partition_boundaries.len(),
+            partition_boundaries.iter().copied(),
+            &crossings,
+        );
+        Ok((
+            native_ids,
+            RuntimeInputPresentation {
+                schema: "holonic-engine.athena.input-presentation.v1".to_owned(),
+                kind: "addressed-partition-directed-mean".to_owned(),
+                law_sha256: law_identity,
+                source_rows: source_ids.len(),
+                received_rows: groups,
+                byte_boundaries: byte_boundaries.iter().map(|value| *value as u64).collect(),
+                partition_boundaries,
+                boundary_crossings: crossings,
+                reconstruction_sha256,
+                source_rows_retained: true,
+            },
+        ))
+    }
+
     /// Return the source IDs for a foreign-source deed, retaining the explicit reverse chart
     /// rather than treating a native address as source identity.
     pub fn source_ids(&self, native_ids: &[u32]) -> Result<Vec<u32>, String> {
@@ -322,6 +446,17 @@ impl ProductSession {
     /// Construct the authenticated factor request for one input extent. The candidate is owned by
     /// the preparation, so callers can repeat this method for every intervention safely.
     pub fn prepare(&self, native_ids: &[u32]) -> Result<PreparedProduct<'_>, String> {
+        self.prepare_with_rows(native_ids, native_ids.len())
+    }
+
+    /// Construct the same authenticated factor request over the receiver-visible output rows.
+    /// The terminal receiver factors the final section to one row before the overlay; the complete
+    /// receiver preserves every source row.  The input tower still receives every `native_id`.
+    fn prepare_with_rows(
+        &self,
+        native_ids: &[u32],
+        receiver_rows: usize,
+    ) -> Result<PreparedProduct<'_>, String> {
         self.mounted
             .verify_still()
             .map_err(|error| error.to_string())?;
@@ -349,7 +484,7 @@ impl ProductSession {
                 rows: self.runtime_law.vocabulary_extent as usize,
                 input_width: self.runtime_law.hidden_extent as usize,
             },
-            native_ids.len(),
+            receiver_rows,
             testimony(
                 &morphology.left_population,
                 &morphology.right_population,
@@ -374,16 +509,63 @@ impl ProductSession {
         intervention: &tower::Intervention,
         receiver: streamed::ReceiverOption,
     ) -> Result<RuntimeReturn, String> {
+        let native_ids = self.encode(text)?;
+        if native_ids.is_empty() {
+            return Err("authenticated codec returned no runtime tokens".to_owned());
+        }
+        let presentation = RuntimeInputPresentation::source_rows(text, &native_ids);
+        self.infer_encoded_with_intervention(
+            text,
+            native_ids,
+            presentation,
+            site,
+            intervention,
+            receiver,
+        )
+    }
+
+    /// Conduct one addressed exterior partition through the authenticated product. Every source
+    /// token remains in the input receipt; the resident card integrates the strict token blocks
+    /// into the receiver rows which enter the inherited tower.
+    pub fn infer_partitioned_with_intervention(
+        &self,
+        text: &str,
+        byte_boundaries: &[usize],
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+        receiver: streamed::ReceiverOption,
+    ) -> Result<RuntimeReturn, String> {
+        let (native_ids, presentation) = self.encode_partitioned(text, byte_boundaries)?;
+        self.infer_encoded_with_intervention(
+            text,
+            native_ids,
+            presentation,
+            site,
+            intervention,
+            receiver,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn infer_encoded_with_intervention(
+        &self,
+        text: &str,
+        native_ids: Vec<u32>,
+        presentation: RuntimeInputPresentation,
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+        receiver: streamed::ReceiverOption,
+    ) -> Result<RuntimeReturn, String> {
         self.mounted.verify_still().map_err(|e| e.to_string())?;
         let product_identity = self.mounted.product_identity().clone();
         let predecessor_identity = self.mounted.predecessor_identity().clone();
         let morphology_identity = self.mounted.morphology_identity().clone();
         let codec_companion_identities = self.mounted.codec_companion_identities().to_vec();
-        let native_ids = self.encode(text)?;
-        if native_ids.is_empty() {
-            return Err("authenticated codec returned no runtime tokens".to_owned());
-        }
-        let prepared = self.prepare(&native_ids)?;
+        let receiver_rows = match receiver {
+            streamed::ReceiverOption::Terminal => 1,
+            streamed::ReceiverOption::Complete => presentation.received_rows,
+        };
+        let prepared = self.prepare_with_rows(&native_ids, receiver_rows)?;
         let request = prepared.request()?;
         let mut source = prepared.source();
         let readout = ResidentReadout::new().map_err(|e| format!("resident card: {e:?}"))?;
@@ -394,20 +576,39 @@ impl ProductSession {
             RuntimeChart::Midpoint => tower::Chart::Midpoint,
             RuntimeChart::Interval => tower::Chart::Interval,
         };
-        let cultivated = streamed::circulate_cultivated_with_intervention(
-            &surface,
-            &readout,
-            &mut source,
-            &native_ids.iter().map(|id| *id as usize).collect::<Vec<_>>(),
-            ResidentGrain(runtime_law.grain),
-            SeriesAperture(runtime_law.series_aperture),
-            chart,
-            runtime_law.fuse,
-            site,
-            intervention,
-            receiver,
-            &request,
-        )?;
+        let token_rows = native_ids.iter().map(|id| *id as usize).collect::<Vec<_>>();
+        let cultivated = if presentation.kind == "addressed-partition-directed-mean" {
+            streamed::circulate_cultivated_with_partitioned_intervention(
+                &surface,
+                &readout,
+                &mut source,
+                &token_rows,
+                &presentation.partition_boundaries,
+                ResidentGrain(runtime_law.grain),
+                SeriesAperture(runtime_law.series_aperture),
+                chart,
+                runtime_law.fuse,
+                site,
+                intervention,
+                receiver,
+                &request,
+            )?
+        } else {
+            streamed::circulate_cultivated_with_intervention(
+                &surface,
+                &readout,
+                &mut source,
+                &token_rows,
+                ResidentGrain(runtime_law.grain),
+                SeriesAperture(runtime_law.series_aperture),
+                chart,
+                runtime_law.fuse,
+                site,
+                intervention,
+                receiver,
+                &request,
+            )?
+        };
         source.verify_stable()?;
         self.mounted.verify_still().map_err(|e| e.to_string())?;
         let frozen_identity_equal = product_identity == *self.mounted.product_identity()
@@ -449,6 +650,7 @@ impl ProductSession {
         let reconstruction_identity =
             streamed::cultivation_overlay::canonical_rank_derivation_digest(&self.derivation);
         let codec_identity = self.artifact.descriptor().tokenizer_json_sha256;
+        let terminal_position = presentation.received_rows - 1;
         let receipt = RuntimeReceipt {
             schema: "holonic-engine.phoenix.runtime-return.v1",
             product_identity,
@@ -462,9 +664,10 @@ impl ProductSession {
                 text_sha256: format!("{:x}", Sha256::digest(text.as_bytes())),
                 text_octets: text.len() as u64,
                 native_ids,
+                presentation,
             },
             generated: GeneratedFuture {
-                terminal_position: terminal_rows - 1,
+                terminal_position,
                 row_count: terminal_rows,
                 vocabulary_extent,
                 grain: runtime_law.grain,
@@ -609,6 +812,65 @@ pub struct RuntimeInputReceipt {
     pub text_sha256: String,
     pub text_octets: u64,
     pub native_ids: Vec<u32>,
+    pub presentation: RuntimeInputPresentation,
+}
+
+/// One tokenizer row whose byte face intersects an addressed exterior boundary. It remains in
+/// exactly one resident partition, while this receipt prevents that choice from becoming a false
+/// equality between tokenizer and message incidence.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct RuntimeBoundaryCrossing {
+    pub native_row: u32,
+    pub source_id: u32,
+    pub byte_range: (u64, u64),
+    pub crossed_boundary: u32,
+}
+
+/// The explicit chart from an exterior occurrence to the rows which enter the inherited tower.
+/// `source_rows_retained` never claims losslessness by itself: the reconstruction digest binds the
+/// text, every native row, both boundary charts and every straddling tokenizer row.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct RuntimeInputPresentation {
+    pub schema: String,
+    pub kind: String,
+    pub law_sha256: String,
+    pub source_rows: usize,
+    pub received_rows: usize,
+    pub byte_boundaries: Vec<u64>,
+    pub partition_boundaries: Vec<u32>,
+    pub boundary_crossings: Vec<RuntimeBoundaryCrossing>,
+    pub reconstruction_sha256: String,
+    pub source_rows_retained: bool,
+}
+
+impl RuntimeInputPresentation {
+    fn source_rows(text: &str, native_ids: &[u32]) -> Self {
+        let byte_boundaries = vec![0usize, text.len()];
+        let crossings = Vec::new();
+        let reconstruction_sha256 = digest_input_reconstruction(
+            text,
+            native_ids,
+            &byte_boundaries,
+            native_ids.len() + 1,
+            0..=native_ids.len() as u32,
+            &crossings,
+        );
+        Self {
+            schema: "holonic-engine.athena.input-presentation.v1".to_owned(),
+            kind: "source-token-rows".to_owned(),
+            law_sha256: format!(
+                "{:x}",
+                Sha256::digest(b"athena/input-presentation/source-token-rows/v1")
+            ),
+            source_rows: native_ids.len(),
+            received_rows: native_ids.len(),
+            byte_boundaries: byte_boundaries.iter().map(|value| *value as u64).collect(),
+            partition_boundaries: (0..=native_ids.len() as u32).collect(),
+            boundary_crossings: crossings,
+            reconstruction_sha256,
+            source_rows_retained: true,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -932,6 +1194,46 @@ fn terminal_plural(
         .filter_map(|(native_id, point)| (point.1 >= top_lower).then_some((native_id, *point)))
         .collect();
     Ok((rows, top_lower, selected))
+}
+
+fn digest_input_reconstruction(
+    text: &str,
+    native_ids: &[u32],
+    byte_boundaries: &[usize],
+    partition_boundary_population: usize,
+    partition_boundaries: impl Iterator<Item = u32>,
+    crossings: &[RuntimeBoundaryCrossing],
+) -> String {
+    fn frame(hasher: &mut Sha256, bytes: &[u8]) {
+        hasher.update((bytes.len() as u64).to_le_bytes());
+        hasher.update(bytes);
+    }
+    let mut hasher = Sha256::new();
+    frame(
+        &mut hasher,
+        b"holonic-engine.athena.input-reconstruction.v1",
+    );
+    frame(&mut hasher, text.as_bytes());
+    hasher.update((native_ids.len() as u64 * 4).to_le_bytes());
+    for value in native_ids {
+        hasher.update(value.to_le_bytes());
+    }
+    hasher.update((byte_boundaries.len() as u64 * 8).to_le_bytes());
+    for value in byte_boundaries {
+        hasher.update((*value as u64).to_le_bytes());
+    }
+    hasher.update((partition_boundary_population as u64 * 4).to_le_bytes());
+    for value in partition_boundaries {
+        hasher.update(value.to_le_bytes());
+    }
+    for crossing in crossings {
+        hasher.update(crossing.native_row.to_le_bytes());
+        hasher.update(crossing.source_id.to_le_bytes());
+        hasher.update(crossing.byte_range.0.to_le_bytes());
+        hasher.update(crossing.byte_range.1.to_le_bytes());
+        hasher.update(crossing.crossed_boundary.to_le_bytes());
+    }
+    format!("{:x}", hasher.finalize())
 }
 
 /// Mount one authenticated product directory and conduct one unseen text on the resident card.

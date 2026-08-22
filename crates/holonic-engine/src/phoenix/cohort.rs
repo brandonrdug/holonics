@@ -939,6 +939,7 @@ pub fn circulate_cohort(
                 layer_scalar,
                 applied,
                 tokens.len(),
+                tower::InputSectionReceiver::SourceRows,
             )?;
             if let Some(shared) = entering_over {
                 let mut legs = Vec::with_capacity(shared.len());
@@ -1295,7 +1296,8 @@ pub fn circulate_cohort(
         material
             .standings
             .insert(tower::CARRIED_STANDING.to_owned(), standing.material());
-        let mut founded = tower::found_final(chart, applied, &scales)?;
+        let mut founded =
+            tower::found_final(chart, applied, &scales, tower::OutputSectionReceiver::Whole)?;
         if declaration.shares_prefix && declaration.enters_at == tower::LAYERS {
             let standing = live[index]
                 .carried

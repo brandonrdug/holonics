@@ -131,7 +131,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (240 deposits of 532)
+## 4 · The 2026-08 record line (241 deposits of 533)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -377,6 +377,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
 | `2026-08-22_THE_OBSTRUCTION_IS_EXHIBITED_AT_SEVENTEEN_AND_THE_INVISIBLE_COSETS_PASS_EVERY_FRAME.md` | The obstruction is exhibited at seventeen, and the invisible cosets pass every frame |
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
+| `2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md` | The sibling continuations returned their defect complex, the message partition retained its source fibre, and A2 passed |
 | `2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md` | The total descent route cultivated Athena, the withheld passage separated, and M6 passed |
 | `2026-08-22_THE_TWO_DESCENT_AT_THIRTY_FOUR_IS_COMPLETE_AND_THE_IMAGE_IS_EXACTLY_THE_REALIZED_SIXTEEN.md` | The two-descent at thirty-four is complete, and the image is exactly the realized sixteen |
 
@@ -397,9 +398,9 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 32 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 33 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
-| `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
+| `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |
 | `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `canon/THE_DRIVER_ATLAS.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, and 1 more |

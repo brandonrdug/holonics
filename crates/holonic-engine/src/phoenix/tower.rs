@@ -43,8 +43,9 @@ use crate::category::BoundaryId;
 use crate::causal::EventId;
 use crate::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use crate::front_passage::{
-    Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MidpointQuotient, PermuteColumns,
-    ReEntry, ResidentRealization, RmsRebase, Scale, Standing, WithdrawColumns, WithdrawRows,
+    Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MidpointQuotient, PartitionMean,
+    PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, TerminalRow,
+    WithdrawColumns, WithdrawRows,
 };
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex};
 use crate::resident_section::{Dyadic, DyadicEnclosure, SeriesAperture};
@@ -74,6 +75,8 @@ pub const FINAL_NORM: &str = "model.language_model.norm.weight";
 pub const SLIDING_BANDS: &str = "sliding band elements (theta 1e4, 128 rotated pairs of 256)";
 pub const FULL_BANDS: &str = "full band elements (theta 1e6, 64 rotated pairs of 512, 192 fixed)";
 pub const ENTERING: &str = "entering rows";
+/// The addressed row-block boundaries used by a receiver presentation condensation.
+pub const INPUT_PARTITION: &str = "entering row partition boundaries";
 /// The residual stream carried in from the previous layer.
 pub const CARRIED_STANDING: &str = "carried standing";
 /// The occurrence which presents `CARRIED_STANDING` inside the receiving layer/final complex.
@@ -326,12 +329,63 @@ pub fn seal(
     }
 }
 
+fn receive_entering_partition(
+    receiver: InputSectionReceiver<'_>,
+    complex: &mut PortedOperationComplex,
+    realization: &mut ResidentRealization,
+    event: EventId,
+    port: BoundaryId,
+    label: &str,
+) -> Result<EventId, String> {
+    match receiver {
+        InputSectionReceiver::SourceRows => Ok(event),
+        InputSectionReceiver::PartitionMeans(boundaries) => {
+            let quotient = law(
+                complex,
+                &format!("{label} · addressed partition mean"),
+                OperationSpecies::Quotient,
+                vec![port],
+                vec![port],
+                None,
+                vec![intervention(
+                    "receiver partition: every addressed source-row block integrates into its exact directed mean; the source rows remain the complete reconstruction fibre",
+                )],
+            )?;
+            realization.bind(
+                quotient,
+                PartitionMean {
+                    boundaries: boundaries.to_vec(),
+                    mounted: INPUT_PARTITION.to_owned(),
+                },
+            );
+            bond(
+                complex,
+                &format!("{label} crosses its addressed partition"),
+                port,
+                event,
+                quotient,
+                0,
+            )?;
+            Ok(quotient)
+        }
+    }
+}
+
 /// How a layer's deed enters its standing: layer zero from the embedding rows the runtime supplied;
 /// every later layer from the residual stream the previous layer released.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Entry {
     Rows,
     Carried,
+}
+
+/// The exterior receiver over the tower's entering rows. The partitioned form is an Athena codec
+/// face: the source token rows remain its reconstruction fibre and each declared block contributes
+/// one exact mean row to the inherited organ.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InputSectionReceiver<'a> {
+    SourceRows,
+    PartitionMeans(&'a [u32]),
 }
 
 /// **The matched sibling's intervention, at one declared site of one layer.** Every variant is
@@ -450,6 +504,7 @@ pub fn found_layer(
     layer_scalar: Dyadic,
     sibling: &Intervention,
     tokens: usize,
+    input_receiver: InputSectionReceiver<'_>,
 ) -> Result<Founded, String> {
     let species = Species::of(layer);
     let role = KvRole::of(layer);
@@ -500,6 +555,14 @@ pub fn found_layer(
             scale: EMBED_SCALE,
         },
     );
+    let x0 = receive_entering_partition(
+        input_receiver,
+        &mut complex,
+        &mut realization,
+        x0,
+        standing,
+        "entering standing",
+    )?;
     returns.insert(X0, x0);
     let x0 = if let Intervention::WithdrawEmbeddingColumns { from, span } = sibling {
         let w = law(
@@ -653,6 +716,14 @@ pub fn found_layer(
             scale: PLE_EMBED_SCALE,
         },
     );
+    let token = receive_entering_partition(
+        input_receiver,
+        &mut complex,
+        &mut realization,
+        token,
+        ple,
+        "per-layer entering standing",
+    )?;
     let joined = law(
         &mut complex,
         "per-layer join",
@@ -1933,10 +2004,20 @@ pub fn found_layer(
 /// other direction — the illicial potential section over the whole vocabulary, one row per token.
 /// `final_logit_softcapping = 30` is a strictly monotone transformation of every coordinate, so the
 /// order faces of this section are its order faces; it is reported, not enacted.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OutputSectionReceiver {
+    /// Preserve the whole normalized section and its whole potential field.
+    Whole,
+    /// Preserve the exact terminal normalized row and leave earlier rows in the reconstruction
+    /// fibre before the tied output contraction.
+    TerminalRow,
+}
+
 pub fn found_final(
     chart: Chart,
     sibling: &Intervention,
     scales_unused: &(DyadicEnclosure, DyadicEnclosure),
+    output_receiver: OutputSectionReceiver,
 ) -> Result<Founded, String> {
     let _ = scales_unused;
     let eps = Dyadic::of_binary64_bits(EPS_BITS).map_err(|e| e.to_string())?;
@@ -1997,6 +2078,32 @@ pub fn found_final(
         standing,
         "final normed",
     )?;
+    let normed = if output_receiver == OutputSectionReceiver::TerminalRow {
+        let received = law(
+            &mut complex,
+            "terminal normalized row received",
+            OperationSpecies::Quotient,
+            vec![standing],
+            vec![standing],
+            None,
+            vec![intervention(&intervention_statement(
+                "terminal output receiver",
+                "the declared next-continuation receiver reads the complete final normalized row and leaves earlier rows in its reconstruction fibre",
+            ))],
+        )?;
+        realization.bind(received, TerminalRow);
+        bond(
+            &mut complex,
+            "terminal receiver factors the normalized section",
+            standing,
+            normed,
+            received,
+            0,
+        )?;
+        received
+    } else {
+        normed
+    };
     returns.insert(FINAL_NORMED, normed);
     let normed = if let Intervention::WithdrawFinalSpan { from, span } = sibling {
         let w = law(

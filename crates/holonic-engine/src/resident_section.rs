@@ -112,9 +112,11 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 30] = [
+pub const KERNELS: [&str; 32] = [
     "section_from_bfloat16",
     "section_carry",
+    "section_terminal_row",
+    "section_partition_mean",
     "section_withdraw_rows",
     "section_permute_columns",
     "section_contract",
@@ -1709,12 +1711,14 @@ impl<'chart> ResidentSurface<'chart> {
             .reduction_block
             .min(head_width.max(reach).next_power_of_two() as u32)
             .max(self.launch.warp);
-        let shared = (4 * reach * 16) as u32;
+        // Two exact scratch rows, each one block wide. The reach is traversed in these tiles and
+        // therefore does not become an authored context ceiling or a shared-memory allocation.
+        let shared = 2 * block * 16;
         if shared > self.max_shared_octets {
             return Err(ResidentRefusal::Declaration {
                 operation: OPERATION,
                 what: format!(
-                    "a reach of {reach} needs {shared} shared octets; the device admits {}",
+                    "a block of {block} needs {shared} shared octets; the device admits {}",
                     self.max_shared_octets
                 ),
             });
@@ -1727,7 +1731,7 @@ impl<'chart> ResidentSurface<'chart> {
             });
         }
         let reach_sum: u64 = (0..rows).map(|t| (t + 1).min(window.max(1)) as u64).sum();
-        let brackets = reach_sum * heads as u64 * head_width as u64;
+        let brackets = 2 * reach_sum * heads as u64 * head_width as u64;
         let series = reach_sum * heads as u64 * 2 * (u64::from(terms.0) + 1);
         let carried = reach_sum * heads as u64 * head_width as u64;
         let mut work = ExactWork::nothing();
@@ -1735,7 +1739,7 @@ impl<'chart> ResidentSurface<'chart> {
         work.added(2 * brackets + 2 * series + 2 * carried);
         work.divided(2 * series + 2 * (rows * heads * head_width) as u64);
         work.entries_written = BigUint::from(2 * (rows * heads * head_width) as u64);
-        work.resident(2 * (rows * heads * head_width) as u64 + 4 * window.max(1) as u64);
+        work.resident(2 * (rows * heads * head_width) as u64 + 2 * u64::from(block));
         let peak = (2 * q_octaves.max(k_octaves) + ceil_log2(head_width) + 1).max(v_octaves + 40);
         work.peak_bits = BigUint::from(u64::from(peak));
         work.cumulative_bits =
@@ -1931,6 +1935,88 @@ impl<'chart> ResidentSurface<'chart> {
         work.peak_bits = BigUint::from(u64::from(input_octaves));
         work.stepped();
         self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
+    }
+
+    /// The receiver-directed restriction of a non-empty section to its terminal row.  This is an
+    /// exact factorization of every future consequence which reads only that row: unlike
+    /// [`Self::shape_withdraw_rows`], the unrequested rows are not allocated as zeroes.
+    pub fn shape_terminal_row(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "terminal-row";
+        if rows == 0 {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: OPERATION,
+                left: rows,
+                right: 1,
+            });
+        }
+        let count = width as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves));
+        work.stepped();
+        self.flat_shape(OPERATION, 1, width, input_octaves, work, vec![])
+    }
+
+    /// The exact directed mean of every non-empty row block declared by `boundaries`.  The
+    /// predecessor remains the complete reconstruction fibre; this shape allocates only the
+    /// receiver's block means.
+    pub fn shape_partition_mean(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        boundaries: &[u32],
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "partition-mean";
+        if boundaries.len() < 2
+            || boundaries[0] != 0
+            || boundaries.last().copied() != Some(rows as u32)
+            || boundaries.windows(2).any(|pair| pair[0] >= pair[1])
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("{rows} source rows with boundaries {boundaries:?}"),
+            });
+        }
+        let groups = boundaries.len() - 1;
+        let longest = boundaries
+            .windows(2)
+            .map(|pair| pair[1] - pair[0])
+            .max()
+            .unwrap_or(1);
+        let intermediate = input_octaves.saturating_add(ceil_log2(longest as usize));
+        Self::admit_octaves(OPERATION, intermediate)?;
+        let source_count = (rows * width) as u64;
+        let output_count = (groups * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.added(2 * source_count.saturating_sub(output_count));
+        work.divided(2 * output_count);
+        work.entries_written = BigUint::from(2 * output_count);
+        work.resident(2 * output_count);
+        work.peak_bits = BigUint::from(u64::from(intermediate));
+        work.cumulative_bits = BigUint::from(2 * output_count * u64::from(input_octaves));
+        work.dependency_span = BigUint::from(u64::from(ceil_log2(longest as usize)) + 1);
+        self.flat_shape(
+            OPERATION,
+            groups,
+            width,
+            input_octaves,
+            work,
+            vec![CouplingPlan {
+                coupling: "each declared block integrates every source row before its directed mean",
+                kernel: "section_partition_mean",
+                extent: rows as u64,
+                block: self.launch.block_x,
+                predicted: ExactWork::nothing(),
+            }],
+        )
     }
 
     /// The intervention permuting the column blocks of `block` by a declared permutation.
@@ -2608,6 +2694,87 @@ impl<'chart> ResidentSurface<'chart> {
             input.count(),
             &mut params,
             "withdraw-rows",
+        )
+    }
+
+    /// Record the exact terminal-row restriction.  The source row stays resident; only the
+    /// requested receiver fibre is copied into the successor section.
+    pub fn record_terminal_row(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if out.rows != 1 || out.width != input.width || input.rows == 0 {
+            return Err(ResidentRefusal::Ragged {
+                operation: "terminal-row",
+                words: out.count(),
+                rows: 1,
+                width: input.width,
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_terminal_row",
+            input.width,
+            &mut params,
+            "terminal-row",
+        )
+    }
+
+    /// Record the exact block means of a row partition already mounted on the card.
+    pub fn record_partition_mean(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        boundaries: &Positions<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if boundaries.rows() != out.rows + 1 || out.width != input.width {
+            return Err(ResidentRefusal::Declaration {
+                operation: "partition-mean",
+                what: format!(
+                    "input={}x{}, boundary population={}, output={}x{}",
+                    input.rows,
+                    input.width,
+                    boundaries.rows(),
+                    out.rows,
+                    out.width
+                ),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(boundaries.device_ptr())
+            .u32(out.rows as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_partition_mean",
+            out.count(),
+            &mut params,
+            "partition-mean",
         )
     }
 
@@ -4831,6 +4998,127 @@ mod tests {
         ((negative as u16) << 15) | ((biased as u16) << 7) | ((normalized & 0x7f) as u16)
     }
 
+    #[test]
+    fn the_terminal_receiver_retains_the_exact_last_row_without_materializing_the_prefix() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let rows = 3;
+        let width = 4;
+        let grain = ResidentGrain(8);
+        let words = [
+            ONE,
+            TWO,
+            THREE,
+            FOUR,
+            HALF,
+            ONE,
+            TWO,
+            THREE,
+            MINUS_ONE_AND_HALF,
+            HALF,
+            THREE,
+            FOUR,
+        ];
+        let staged = surface.stage_words(&words, rows, width).expect("stage");
+        let entered_shape = surface
+            .shape_enter(rows, width, Dyadic::ONE, grain, &words)
+            .expect("enter shape");
+        let terminal_shape = surface
+            .shape_terminal_row(rows, width, entered_shape.needed)
+            .expect("terminal shape");
+        assert_eq!((terminal_shape.rows, terminal_shape.width), (1, width));
+        let entered = surface.fresh_section(rows, width, grain).expect("entered");
+        let terminal = surface.fresh_section(1, width, grain).expect("terminal");
+        let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
+        let enter_lane = builder.open(0, &[]).expect("enter lane");
+        surface
+            .record_enter(&enter_lane, &staged, Dyadic::ONE, &entered)
+            .expect("record enter");
+        builder
+            .close(0, &entered, entered_shape.needed)
+            .expect("close enter");
+        let terminal_lane = builder.open(1, &[0]).expect("terminal lane");
+        surface
+            .record_terminal_row(&terminal_lane, &entered, &terminal)
+            .expect("record terminal");
+        builder
+            .close(1, &terminal, terminal_shape.needed)
+            .expect("close terminal");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(
+            reading.obstruction.refusals.is_empty(),
+            "{:?}",
+            reading.obstruction
+        );
+        let full = surface.read_out(&entered).expect("full face");
+        let received = surface.read_out(&terminal).expect("terminal face");
+        assert_eq!(received, full[(rows - 1) * width..].to_vec());
+    }
+
+    #[test]
+    fn the_partition_receiver_integrates_every_addressed_source_row_and_retains_the_predecessor() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let rows = 5;
+        let width = 2;
+        let grain = ResidentGrain(8);
+        let words = [
+            ONE,
+            TWO,
+            THREE,
+            FOUR,
+            HALF,
+            ONE,
+            TWO,
+            THREE,
+            MINUS_ONE_AND_HALF,
+            HALF,
+        ];
+        let boundaries = [0u32, 2, 5];
+        let mounted = surface.mount_positions(&boundaries).expect("boundaries");
+        let staged = surface.stage_words(&words, rows, width).expect("stage");
+        let entered_shape = surface
+            .shape_enter(rows, width, Dyadic::ONE, grain, &words)
+            .expect("enter shape");
+        let mean_shape = surface
+            .shape_partition_mean(rows, width, entered_shape.needed, &boundaries)
+            .expect("partition shape");
+        assert_eq!((mean_shape.rows, mean_shape.width), (2, width));
+        let entered = surface.fresh_section(rows, width, grain).expect("entered");
+        let means = surface.fresh_section(2, width, grain).expect("means");
+        let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
+        let enter_lane = builder.open(0, &[]).expect("enter lane");
+        surface
+            .record_enter(&enter_lane, &staged, Dyadic::ONE, &entered)
+            .expect("record enter");
+        builder
+            .close(0, &entered, entered_shape.needed)
+            .expect("close enter");
+        let mean_lane = builder.open(1, &[0]).expect("mean lane");
+        surface
+            .record_partition_mean(&mean_lane, &entered, &mounted, &means)
+            .expect("record means");
+        builder
+            .close(1, &means, mean_shape.needed)
+            .expect("close means");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        let predecessor = surface.read_out(&entered).expect("predecessor");
+        assert_eq!(predecessor.len(), rows * width);
+        let received = surface.read_out(&means).expect("means");
+        assert_eq!(received[0], (2 << grain.0, 2 << grain.0));
+        assert_eq!(received[1], (3 << grain.0, 3 << grain.0));
+        let contains = |enclosure: (i64, i64), value: &Rat| {
+            word_value(enclosure.0, grain) <= *value && *value <= word_value(enclosure.1, grain)
+        };
+        assert!(contains(received[2], &rat(1, 3)), "{:?}", received[2]);
+        assert!(contains(received[3], &rat(3, 2)), "{:?}", received[3]);
+        assert!(received[2].1 - received[2].0 <= 1);
+        assert!(received[3].1 - received[3].0 <= 1);
+    }
+
     /// **PART B: the block-aggregated census and the per-thread-atomic control, on one section.**
     /// Every slot word, plural shapes, and the poisoned-lineage entry. The a-priori is that max, or
     /// and add are the same commutative and associative receivers the atomics implemented, so the
@@ -6503,6 +6791,91 @@ mod tests {
             "{:?} {:?}",
             words[2],
             words[3]
+        );
+    }
+
+    #[test]
+    fn the_contact_tiles_a_reach_larger_than_one_block_without_a_history_sized_shared_allocation() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let rows = 513;
+        let width = 1;
+        let grain = ResidentGrain(20);
+        let words = vec![ONE; rows];
+        let staged_q = surface.stage_words(&words, rows, width).expect("stage q");
+        let staged_k = surface.stage_words(&words, rows, width).expect("stage k");
+        let staged_v = surface.stage_words(&words, rows, width).expect("stage v");
+        let enter = surface
+            .shape_enter(rows, width, Dyadic::ONE, grain, &words)
+            .expect("enter shape");
+        let contact = surface
+            .shape_contact(
+                rows,
+                width,
+                width,
+                width,
+                1,
+                1,
+                1,
+                rows,
+                SeriesAperture(2),
+                grain,
+                enter.needed,
+                enter.needed,
+                enter.needed,
+            )
+            .expect("tiled contact shape");
+        assert_eq!(contact.shared_octets, 2 * contact.block * 16);
+        assert!(contact.shared_octets < (4 * rows * 16) as u32);
+
+        let q = surface.fresh_section(rows, width, grain).expect("q");
+        let k = surface.fresh_section(rows, width, grain).expect("k");
+        let v = surface.fresh_section(rows, width, grain).expect("v");
+        let out = surface.fresh_section(rows, width, grain).expect("out");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![], vec![], vec![0, 1, 2]])
+            .expect("begin");
+        for (index, &(staged, section)) in [(&staged_q, &q), (&staged_k, &k), (&staged_v, &v)]
+            .iter()
+            .enumerate()
+        {
+            let lane = builder.open(index, &[]).expect("open");
+            surface
+                .record_enter(&lane, staged, Dyadic::ONE, section)
+                .expect("enter");
+            builder
+                .close(index, section, enter.needed)
+                .expect("close enter");
+        }
+        let lane = builder.open(3, &[0, 1, 2]).expect("contact lane");
+        surface
+            .record_contact(
+                &lane,
+                &q,
+                &k,
+                &v,
+                1,
+                1,
+                1,
+                rows,
+                SeriesAperture(2),
+                &contact,
+                &out,
+            )
+            .expect("record contact");
+        builder
+            .close(3, &out, contact.needed)
+            .expect("close contact");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        let unit = 1i64 << grain.0;
+        assert!(
+            surface
+                .read_out(&out)
+                .expect("read")
+                .iter()
+                .all(|face| *face == (unit, unit))
         );
     }
 

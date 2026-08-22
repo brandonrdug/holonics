@@ -641,6 +641,198 @@ pub struct WithdrawRows {
     pub span: usize,
 }
 
+/// **A receiver factorization:** retain the terminal row of a non-empty section and leave every
+/// earlier row in the reconstruction fibre.  This is not a positional winner or a truncation
+/// aperture: the declaring receiver asks only for the last causal position, and the law copies
+/// that complete interval row exactly. Species: quotient.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct TerminalRow;
+
+impl ResidentLaw for TerminalRow {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if validation.interventions.is_empty() {
+            return Err(unentailed(
+                "terminal-row",
+                "receiver declaration",
+                "a declared terminal-row receiver quotient",
+                validation,
+            ));
+        }
+        Ok(LawEntailment {
+            law: "terminal-row",
+            parameters: vec![(
+                "receiver".to_owned(),
+                "terminal row".to_owned(),
+                format!(
+                    "the caller's typed receiver intervention: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
+    }
+    fn name(&self) -> &'static str {
+        "terminal-row"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
+        Ok(())
+    }
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_terminal_row(rows, width, octaves)
+    }
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
+        Vec::new()
+    }
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_terminal_row(lane, inputs[0], out)
+    }
+}
+
+/// A receiver-directed condensation of row blocks through their exact directed means. Every
+/// boundary is part of the occurrence and the complete predecessor section remains its
+/// reconstruction fibre. Species: quotient.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PartitionMean {
+    pub boundaries: Vec<u32>,
+    pub mounted: String,
+}
+
+impl ResidentLaw for PartitionMean {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if !validation
+            .interventions
+            .iter()
+            .any(|declaration| declaration.contains("partition"))
+        {
+            return Err(unentailed(
+                "partition-mean",
+                "receiver declaration",
+                "a declared boundary partition whose exact mean is requested",
+                validation,
+            ));
+        }
+        Ok(LawEntailment {
+            law: "partition-mean",
+            parameters: vec![
+                (
+                    "boundaries".to_owned(),
+                    format!("{:?}", self.boundaries),
+                    "the addressed exterior boundary crossing mounted for this occurrence"
+                        .to_owned(),
+                ),
+                (
+                    "reconstruction".to_owned(),
+                    "the complete predecessor row section".to_owned(),
+                    validation.interventions.join(" | "),
+                ),
+            ],
+            naming_slices: Vec::new(),
+        })
+    }
+    fn name(&self) -> &'static str {
+        "partition-mean"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        match material.arrays.get(&self.mounted) {
+            Some(array) if array.rows() == self.boundaries.len() => Ok(()),
+            Some(array) => Err(format!(
+                "{} carries {} boundaries; the occurrence declares {}",
+                self.mounted,
+                array.rows(),
+                self.boundaries.len()
+            )),
+            None => Err(self.mounted.clone()),
+        }
+    }
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_partition_mean(rows, width, octaves, &self.boundaries)
+    }
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
+        material
+            .arrays
+            .get(&self.mounted)
+            .map(|array| vec![array.range()])
+            .unwrap_or_default()
+    }
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_partition_mean(lane, inputs[0], &material.arrays[&self.mounted], out)
+    }
+}
+
 impl ResidentLaw for WithdrawRows {
     fn entailment(
         &self,

@@ -202,6 +202,10 @@ pub struct StreamedCensus {
     pub staging_synchronizations: u64,
     /// Graph executables launched onto the conducting current without waiting for them.
     pub graph_launches: u64,
+    /// Resident-window boundaries forced by measured device pressure. Each waits only for the
+    /// conducting current so already-returned sections can be released; no semantic coordinate is
+    /// read and the next window carries the same owned standing.
+    pub residency_boundary_synchronizations: u64,
     /// Synchronizations of the conducting current. The deed's terminal.
     pub terminal_synchronizations: u64,
 }
@@ -837,6 +841,66 @@ impl<'chart> StreamedCirculation<'chart> {
         self.slots[slot].freed.record(&self.conducting)?;
         self.slots[slot].conducted = true;
         self.census.graph_launches += 1;
+        Ok(())
+    }
+
+    /// **Close one resident apparatus window without closing the circulation.** Resource pressure
+    /// may change the partition of one body. This fence waits for the already-launched semantic
+    /// front and exposes no section, census or decision to the caller; after it returns, the caller
+    /// may discharge and release completed passages while retaining their explicitly transferred
+    /// successor standing. Copy and mount currents remain their own ordered apparatus charts.
+    pub fn residency_boundary(&mut self) -> Result<(), StreamedRefusal> {
+        self.surface.synchronize_counted(&self.conducting)?;
+        self.census.residency_boundary_synchronizations += 1;
+        Ok(())
+    }
+
+    /// Retire the current source-map slots after every current that can address them has closed.
+    /// The continuing semantic sections are owned by their passages, not these slots, and survive.
+    /// No replacement is allocated here, so a larger mutually-exclusive exterior boundary does
+    /// not have to coexist with the retired layer maps.
+    pub fn retire_slots(&mut self) -> Result<(), StreamedRefusal> {
+        self.surface.synchronize_counted(&self.conducting)?;
+        self.copying.synchronize()?;
+        self.mounting.synchronize()?;
+        self.census.residency_boundary_synchronizations += 1;
+        self.census.staging_synchronizations += 2;
+        let released: u64 = self
+            .slots
+            .iter()
+            .map(|slot| slot.shape.octets() as u64)
+            .sum();
+        self.slots.clear();
+        self.surface.released_octets(released);
+        Ok(())
+    }
+
+    /// Found a new mutually-exclusive source-map slot family after the old family was retired.
+    /// The census retains peak simultaneous pool octets and the complete allocation population.
+    pub fn found_slots(&mut self, shapes: &[SlotShape]) -> Result<(), StreamedRefusal> {
+        if !self.slots.is_empty() {
+            return Err(StreamedRefusal::Declaration {
+                what: "new source slots requested while the preceding family remains resident"
+                    .to_owned(),
+            });
+        }
+        let mut resident = 0u64;
+        for shape in shapes {
+            let buffer = self.surface.alloc_octets(shape.octets())?;
+            resident += shape.octets() as u64;
+            self.census.pool_allocations += 1;
+            self.slots.push(StandingSlot {
+                shape: shape.clone(),
+                buffer,
+                freed: Event::create()?,
+                conducted: false,
+                stored_cursor: 0,
+                aligned_cursor: 0,
+                mass_cursor: 0,
+                maps: 0,
+            });
+        }
+        self.census.pool_octets = self.census.pool_octets.max(resident);
         Ok(())
     }
 

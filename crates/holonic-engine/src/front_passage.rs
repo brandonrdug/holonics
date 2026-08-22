@@ -105,8 +105,8 @@ use mount::{GraphCensus, Stream};
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, ContractTiled, EntailmentRefusal, Enter,
     EnteringRows, FactorizedContract, GeluTanh, Hadamard, LawEntailment, MidpointQuotient,
-    MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale,
-    SealedMidpointQuotient, Standing, WithdrawColumns, WithdrawRows,
+    MountedPopulation, PartitionMean, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial,
+    RmsRebase, Scale, SealedMidpointQuotient, Standing, TerminalRow, WithdrawColumns, WithdrawRows,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
