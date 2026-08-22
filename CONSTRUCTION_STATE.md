@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed A3. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed I0. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE EXCHANGE RETURN REBASED THE RECEIVER COVECTOR, THE HELD-OUT EMISSION
-MOVED, AND A3 PASSED ITS COMPLETE RELEASE RECEIVER.**
+**CURRENT FRONTIER — THE REALIZATION PASSAGE RETAINED LINEAGE, EVERY SUCCESSOR WORD CLOSED, AND I0
+PASSED ITS RELEASE RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -198,10 +198,32 @@ The authoritative release admission is
 seconds: 2,824 tests passed, none failed, 22 were explicitly ignored, every example target
 type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: I0 — PHYSICAL-REALIZATION / FUNCTIONAL-AFFECT CALCULUS.**
-[open] I0 must return one addressed finite passage in which occurrence identity, lineage kinship,
-receiver equivalence, stable similarity, generator action, reconstruction fibre, defect and
-apparatus realization stand together without being conflated.
+**I0 PASSED — the physical-realization / functional-affect calculus closed.**
+[established-bounded; implemented-exact; proved-derived; measured] The formal calculus now keeps
+occurrence identity, passage equivalence, receiver-history equivalence, rebase and compression as
+distinct types; proves addressed composition, every-ordered-word naturality, complete fibres and
+the composite-defect origin law; and returns equal-endpoint and static-reopening controls. The
+executable passage binds M3's 12,255 source states, 6,376 native states, 24,510 local squares,
+6,376 complete fibres and 19,128 receiver factors to the A3 continuation. Its five-member exact
+atlas family is 5,861,222 octets with directory SHA-256
+`3fa6afd363517abb51346c472817a786ad11a2d4f222c556821851844b11c3e0`.
+Candidate record:
+[`research/records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md).
+
+The authoritative release admission is
+[`research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`](research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md).
+[established-bounded; measured] The complete invocation returned 2,826 passing tests, zero failures,
+22 explicit ignores, every example target type-checked and twelve green non-driver scopes in 350.80
+seconds. A concurrent documentary Lean commit made only the cheap 342-driver catalog stale;
+regeneration and its named retake passed with zero uncatalogued drivers. All thirteen scopes are
+green under the required complete/cheap-retake reporting.
+
+**NEXT DEED: I1 RETAINS THE RECURRENT CAUSAL BOUNDARY AND RETURNS A COMPLETE EMITTED PASSAGE.**
+[open] I1 composes the admitted I0 realization passage, Gemma tower, A2 plural continuation,
+causal/recurrent sections and current-world boundary. It owes source-detached retained sections at
+every recurrence, exact lineage, complete boundary-response fibres, a matched source-schedule
+control, a longer-history reopening control, and one complete textual passage whose extent is
+derived from frontier/exterior closure on the resident GPU.
 
 [open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
 return, durable cultivation, generator-native compression, complete answers, and multimodality are

@@ -14,6 +14,7 @@ import ElementaryHolonics.Millennium.Seam
 import ElementaryHolonics.Millennium.Swing
 import ElementaryHolonics.Millennium.Chronology
 import ElementaryHolonics.Millennium.LineageCompression
+import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling

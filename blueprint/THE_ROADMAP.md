@@ -160,7 +160,21 @@ seconds. A3 is the admitted construction frontier. Construction record:
 Release admission:
 [`research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`](../research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md).
 
-**I0--I5 supersede A4--A6.** I0 now closes the physical-realization and
+**I0 PASSED.** The Lean calculus distinguishes
+occurrence identity, passage equivalence, receiver-history equivalence, rebase and compression;
+proves addressed composition, ordered-word closure, complete fibres and the general chain-defect
+origin law; and returns the equal-endpoint and static-reopening controls. The executable join binds
+M3's 12,255 source states, 6,376 native states, 24,510 local squares, 6,376 fibres and 19,128
+receiver factors to the A3 continuation and an exact 5.8 MB operation atlas. Focused formal,
+owner-package, real-deed and artifact receivers pass. The sole complete receiver returned 2,826
+passing tests, zero failures, and twelve green non-driver scopes in 350.80 seconds; the one cheap
+driver-catalog drift caused by a concurrent documentary commit passed its required named retake.
+Candidate record:
+[`research/records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`](../research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md).
+
+**I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
 emission; I2 closes emission/world/return/reflection/deposit/later-current; I3 performs recurrent
 generator-native Phoenix condensation; I4 fuses real heterogeneous ports already present in Gemma;

@@ -3,16 +3,17 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** A3 release admission remains the immediate release receiver. I0 is the next
-construction deed after that admission; I0--I5 replace the former second-LLM-first A4--A6 schedule.
+**Current boundary:** I0 passed its complete/cheap-retake release boundary. I1 is the active deed.
+I0--I5 replace the former
+second-LLM-first A4--A6 schedule.
 **Scheduling boundary:** this file does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md). Only a returned deed and passing grade move the
 position record.
 
 **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and
-fusion contracts; `established-bounded` for the cited M3--M6 and A1--A3 evidence; `proved-derived`
+fusion contracts; `established-bounded` for the cited M3--M6 and A1--I0 evidence; `proved-derived`
 for the named Lean theorems; `project-postulate` for placement and operator discipline; `open` for
-I0--I5 and every later heterogeneous-source deed.
+I1--I5 and every later heterogeneous-source deed.
 
 **Derivation:**
 [`2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md`](../research/records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md).
@@ -236,8 +237,17 @@ absent type, port, law, or consequence by name.
 
 ## 7. Deed I0 — the realization calculus closes locally and over every successor word
 
-[open] I0 is the first construction deed after A3 release admission. It supplies the exact common
+[established-bounded; implemented-exact; proved-derived; measured] I0 supplies the exact common
 contract used by every later inference grade.
+
+[established-bounded; implemented-exact; proved-derived; measured] I0 returned its complete
+candidate on 2026-08-22. The formal passage calculus, executable M3/A3 owner join, exact operation
+atlas, controls and focused receivers pass. Its complete receiver returned 2,826 passing tests and
+twelve green non-driver scopes; the concurrent documentary driver-catalog drift passed its named
+retake. Candidate record:
+[`2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`](../research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md).
 
 ### 7.1 Source owners and event
 

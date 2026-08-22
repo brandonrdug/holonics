@@ -15,6 +15,10 @@ use crate::{
     OccurrencePort, ReceiverError, ReceiverFace, ReceiverFaceSpec, receive_face_entities,
 };
 
+/// Addressed source/native passages assembled from the existing compression, chart, lineage and
+/// apparatus owners.
+pub mod passage;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RealizationWitness {
     pub schema: String,

@@ -134,6 +134,12 @@ pub struct ReceiverHistoryCompression {
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum ReceiverHistoryRefusal {
+    #[error("receiver-history wire refused: {0}")]
+    Wire(String),
+    #[error("the source population is empty or repeats an identity")]
+    SourcePopulation,
+    #[error("the native population is empty or repeats an identity")]
+    NativePopulation,
     #[error("source item {0:?} occurs in no conduct fibre")]
     SourceOutsideQuotient(ItemId),
     #[error("source item {0:?} occurs in more than one conduct fibre")]
@@ -181,9 +187,233 @@ pub enum ReceiverHistoryRefusal {
         native: NativeStateId,
         receiver: ReceiverId,
     },
+    #[error("receiver factors do not form one complete declared family on native state {0:?}")]
+    ReceiverFactorPopulation(NativeStateId),
+    #[error("generator {0:?} is repeated")]
+    DuplicateGenerator(InputId),
+    #[error("the exact construction-work receipt disagrees with the validated relation population")]
+    ConstructionWork,
+    #[error("a shortest separator is malformed or leaves the declared passage")]
+    Separator,
 }
 
 impl ReceiverHistoryCompression {
+    /// Reopen a serialized compression and rederive every structural law it claims.
+    pub fn read(bytes: &[u8]) -> Result<Self, ReceiverHistoryRefusal> {
+        let compression: Self = serde_json::from_slice(bytes)
+            .map_err(|error| ReceiverHistoryRefusal::Wire(error.to_string()))?;
+        compression.validate()?;
+        Ok(compression)
+    }
+
+    /// Validate the complete finite passage without consulting the source system which founded it.
+    ///
+    /// This is deliberately stronger than a schema check.  It reopens the quotient partition,
+    /// complete reconstruction fibres, receiver-factor family, total source/native generators,
+    /// every local naturality square, shortest-separator addresses and exact structural-work
+    /// population.  The observations themselves remain opaque exact faces.
+    pub fn validate(&self) -> Result<(), ReceiverHistoryRefusal> {
+        if self.schema != "holonic-engine.receiver-history-compression.v1" {
+            return Err(ReceiverHistoryRefusal::Wire(format!(
+                "unknown schema {}",
+                self.schema
+            )));
+        }
+        let mut source_set = BTreeSet::new();
+        for source in &self.source_population {
+            source_set.insert(*source);
+        }
+        if source_set.is_empty() || source_set.len() != self.source_population.len() {
+            return Err(ReceiverHistoryRefusal::SourcePopulation);
+        }
+        let mut native_set = BTreeSet::new();
+        for native in &self.native_population {
+            native_set.insert(*native);
+        }
+        if native_set.is_empty() || native_set.len() != self.native_population.len() {
+            return Err(ReceiverHistoryRefusal::NativePopulation);
+        }
+
+        let mut encoded = BTreeMap::<ItemId, NativeStateId>::new();
+        for assignment in &self.quotient {
+            if !source_set.contains(&assignment.source)
+                || !native_set.contains(&assignment.native)
+                || encoded
+                    .insert(assignment.source, assignment.native)
+                    .is_some()
+            {
+                return Err(ReceiverHistoryRefusal::SourceOccursInPluralFibres(
+                    assignment.source,
+                ));
+            }
+        }
+        for source in &source_set {
+            if !encoded.contains_key(source) {
+                return Err(ReceiverHistoryRefusal::SourceOutsideQuotient(*source));
+            }
+        }
+
+        let mut fibre_by_native = BTreeMap::<NativeStateId, &BTreeSet<ItemId>>::new();
+        let mut fibre_union = BTreeSet::new();
+        for fibre in &self.reconstruction_fibres {
+            if !native_set.contains(&fibre.native)
+                || fibre.sources.is_empty()
+                || fibre_by_native
+                    .insert(fibre.native, &fibre.sources)
+                    .is_some()
+            {
+                return Err(ReceiverHistoryRefusal::EmptyFibre(fibre.native));
+            }
+            for source in &fibre.sources {
+                if !source_set.contains(source)
+                    || !fibre_union.insert(*source)
+                    || encoded.get(source) != Some(&fibre.native)
+                {
+                    return Err(ReceiverHistoryRefusal::SourceOccursInPluralFibres(*source));
+                }
+            }
+        }
+        if fibre_by_native.len() != native_set.len()
+            || native_set
+                .iter()
+                .any(|native| !fibre_by_native.contains_key(native))
+            || fibre_union != source_set
+        {
+            return Err(ReceiverHistoryRefusal::NativePopulation);
+        }
+
+        let mut receiver_set = BTreeSet::new();
+        for factor in &self.receiver_factors {
+            receiver_set.insert(factor.receiver);
+        }
+        let mut factor_keys = BTreeSet::new();
+        let mut receivers_by_native = BTreeMap::<NativeStateId, BTreeSet<ReceiverId>>::new();
+        for factor in &self.receiver_factors {
+            if !native_set.contains(&factor.native)
+                || !factor_keys.insert((factor.native, factor.receiver))
+            {
+                return Err(ReceiverHistoryRefusal::UnknownReceiverFactor {
+                    native: factor.native,
+                    receiver: factor.receiver,
+                });
+            }
+            receivers_by_native
+                .entry(factor.native)
+                .or_default()
+                .insert(factor.receiver);
+        }
+        for native in &native_set {
+            if receivers_by_native.get(native) != Some(&receiver_set) {
+                return Err(ReceiverHistoryRefusal::ReceiverFactorPopulation(*native));
+            }
+        }
+
+        let mut generator_ids = BTreeSet::new();
+        for square in &self.generators {
+            if !generator_ids.insert(square.generator) {
+                return Err(ReceiverHistoryRefusal::DuplicateGenerator(square.generator));
+            }
+            let mut source_map = BTreeMap::new();
+            for edge in &square.source {
+                if !source_set.contains(&edge.from)
+                    || !source_set.contains(&edge.to)
+                    || source_map.insert(edge.from, edge.to).is_some()
+                {
+                    return Err(ReceiverHistoryRefusal::SourceTransportLeavesPopulation {
+                        generator: square.generator,
+                        source_item: edge.from,
+                        target: edge.to,
+                    });
+                }
+            }
+            if source_map.len() != source_set.len()
+                || source_set
+                    .iter()
+                    .any(|source| !source_map.contains_key(source))
+            {
+                let missing = source_set
+                    .iter()
+                    .find(|source| !source_map.contains_key(source))
+                    .copied()
+                    .unwrap_or(ItemId(0));
+                return Err(ReceiverHistoryRefusal::SourceTransportTerminates {
+                    generator: square.generator,
+                    source_item: missing,
+                });
+            }
+
+            let mut native_map = BTreeMap::new();
+            for edge in &square.native {
+                if !native_set.contains(&edge.from)
+                    || !native_set.contains(&edge.to)
+                    || native_map.insert(edge.from, edge.to).is_some()
+                {
+                    return Err(ReceiverHistoryRefusal::GeneratorDoesNotDescend {
+                        generator: square.generator,
+                        native: edge.from,
+                    });
+                }
+            }
+            if native_map.len() != native_set.len()
+                || native_set
+                    .iter()
+                    .any(|native| !native_map.contains_key(native))
+            {
+                let missing = native_set
+                    .iter()
+                    .find(|native| !native_map.contains_key(native))
+                    .copied()
+                    .unwrap_or(NativeStateId(0));
+                return Err(ReceiverHistoryRefusal::GeneratorDoesNotDescend {
+                    generator: square.generator,
+                    native: missing,
+                });
+            }
+            for (source, target) in source_map {
+                if encoded[&target] != native_map[&encoded[&source]] {
+                    return Err(ReceiverHistoryRefusal::GeneratorSquareDoesNotCommute {
+                        generator: square.generator,
+                        source_item: source,
+                    });
+                }
+            }
+        }
+
+        for separator in &self.first_separators {
+            if separator.left == separator.right
+                || !source_set.contains(&separator.left)
+                || !source_set.contains(&separator.right)
+                || separator.distinguishing_word.is_empty()
+                || separator
+                    .distinguishing_word
+                    .iter()
+                    .any(|generator| !generator_ids.contains(generator))
+                || separator.witness.is_some_and(|(receiver, left, right)| {
+                    !receiver_set.contains(&receiver) || left == right
+                })
+                || (!separator.separated_by_terminus && separator.witness.is_none())
+            {
+                return Err(ReceiverHistoryRefusal::Separator);
+            }
+        }
+
+        let source_count = self.source_population.len() as u64;
+        let native_count = self.native_population.len() as u64;
+        let generator_count = self.generators.len() as u64;
+        let receiver_count = receiver_set.len() as u64;
+        let expected = ReceiverHistoryWork {
+            quotient_assignments: source_count,
+            receiver_factor_reads: source_count * receiver_count,
+            source_transport_reads: source_count * generator_count,
+            native_transport_entries: native_count * generator_count,
+            generator_square_checks: source_count * generator_count,
+        };
+        if self.construction_work != expected {
+            return Err(ReceiverHistoryRefusal::ConstructionWork);
+        }
+        Ok(())
+    }
+
     /// Found the native action from an already-computed stable receiver/history partition.
     pub fn found(
         system: &dyn ObservedSystem,
@@ -324,7 +554,7 @@ impl ReceiverHistoryCompression {
             });
         }
 
-        Ok(Self {
+        let compression = Self {
             schema: "holonic-engine.receiver-history-compression.v1".to_owned(),
             source_population,
             native_population,
@@ -340,7 +570,9 @@ impl ReceiverHistoryCompression {
                 native_transport_entries,
                 generator_square_checks,
             },
-        })
+        };
+        compression.validate()?;
+        Ok(compression)
     }
 
     pub fn encode(&self, source: ItemId) -> Result<NativeStateId, ReceiverHistoryRefusal> {

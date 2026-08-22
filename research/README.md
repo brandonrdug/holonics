@@ -164,6 +164,17 @@ governs the rebuild.
   — binds the owner-local continuation test, affected `life` package return, coherent ledgers and
   sole thirteen-scope release receiver to the existing nine-consequence Athena-Gemma continuation;
   admits A3 without enlarging its one-codeword receiver family; and places I0 at the live frontier.
+- **I0 addressed physical-realization passage candidate:**
+  `records/2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md`
+  — formalizes distinct occurrence, passage, receiver-history, rebase and compression relations;
+  proves ordered-word closure and the composite-defect origin law; binds the admitted M3 and A3
+  products through complete fibres, shortest separators and exact chart defects; and returns the
+  exact source/native operation atlas while retaining the release-admission boundary.
+- **I0 release admission:**
+  `records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`
+  — admits the distinct realization relations, ordered-word closure, complete reconstruction
+  fibres, executable M3/A3 passage and exact atlas; records 2,826 passing tests and the separated
+  cheap catalog retake; and places I1 at the recurrent causal-boundary frontier.
 - **The whole foreign map crossed once and the native rest returned without its source:**
   `records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`
   — Phoenix Deed W1: 45 authenticated operation complexes, 1,466 resident-law correspondences,

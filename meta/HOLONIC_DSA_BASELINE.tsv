@@ -82,6 +82,7 @@ crates/holonic-engine/src/foreign_map.rs	.clone()=18	.collect()=19	.into_iter()=
 crates/holonic-engine/src/founded_receiver.rs	.clone()=19	.collect()=30	.into_iter()=4	BTreeMap=6	BTreeSet=13	Vec=47
 crates/holonic-engine/src/front_passage.rs	.clone()=59	.collect()=37	.flat_map()=7	.into_iter()=3	BTreeMap=55	BTreeSet=23	Vec=105
 crates/holonic-engine/src/generative_transport.rs	.clone()=43	.collect()=17	.flat_map()=1	.into_iter()=5	BTreeSet=10	Vec=93
+crates/holonic-engine/src/generator_native_rest.rs	.clone()=1	.collect()=1	BTreeSet=5	Vec=9
 crates/holonic-engine/src/gluing.rs	.clone()=4	.collect()=10	BTreeSet=26	Vec=10
 crates/holonic-engine/src/graded_complex_form.rs	.clone()=7	.collect()=3	BTreeSet=7	Vec=15
 crates/holonic-engine/src/graph_receiver.rs	.clone()=51	.collect()=37	.flat_map()=10	.into_iter()=3	BTreeMap=58	BTreeSet=53	Vec=8	VecDeque=2
@@ -90,7 +91,6 @@ crates/holonic-engine/src/hardware_cover.rs	.clone()=4	.collect()=17	.flat_map()
 crates/holonic-engine/src/hermite_reduction.rs	.clone()=9	.collect()=7	Vec=8
 crates/holonic-engine/src/holonic_complex.rs	.clone()=8	.collect()=18	.flat_map()=1	.into_iter()=5	BTreeMap=31	BTreeSet=22	Vec=38
 crates/holonic-engine/src/hypergeometric_closure.rs	.clone()=8	.collect()=4	BTreeMap=3	BTreeSet=1	Vec=6
-crates/holonic-engine/src/generator_native_rest.rs	.clone()=1	.collect()=1	BTreeSet=5	Vec=9
 crates/holonic-engine/src/image.rs	Vec=3
 crates/holonic-engine/src/implicit.rs	.clone()=32	.collect()=8	.into_iter()=1	BTreeMap=3	BTreeSet=11	Vec=31
 crates/holonic-engine/src/inertia.rs	.clone()=17	.collect()=29	.into_iter()=2	Vec=45
@@ -133,7 +133,7 @@ crates/holonic-engine/src/phoenix/cultivation_overlay_tests.rs	.clone()=2	.colle
 crates/holonic-engine/src/phoenix/native_streamed.rs	.clone()=1	.collect()=2	Vec=2
 crates/holonic-engine/src/phoenix/runtime.rs	.clone()=34	.collect()=26	.flat_map()=2	.into_iter()=2	BTreeSet=3	Vec=39
 crates/holonic-engine/src/phoenix/site.rs	.clone()=8	BTreeMap=2	Vec=6
-crates/holonic-engine/src/phoenix/streamed.rs	.clone()=39	.collect()=6	.flat_map()=1	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=66
+crates/holonic-engine/src/phoenix/streamed.rs	.clone()=38	.collect()=6	.flat_map()=1	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=66
 crates/holonic-engine/src/phoenix/streamed_cultivation.rs	.clone()=9	BTreeMap=2	Vec=4
 crates/holonic-engine/src/phoenix/tower.rs	.clone()=10	.collect()=3	BTreeMap=3	Vec=11
 crates/holonic-engine/src/phoenix/w5.rs	.clone()=37	.collect()=16	.into_iter()=4	BTreeMap=3	BTreeSet=23	Vec=55
@@ -153,12 +153,13 @@ crates/holonic-engine/src/quantity.rs	.clone()=49	.collect()=23	.into_iter()=3	B
 crates/holonic-engine/src/quintic_chart.rs	.clone()=61	.collect()=21	.into_iter()=2	BTreeMap=4	BTreeSet=16	Vec=42
 crates/holonic-engine/src/rational_polynomial.rs	.clone()=40	.collect()=17	BTreeMap=2	BTreeSet=1	Vec=29
 crates/holonic-engine/src/realization.rs	.clone()=4	.collect()=3	.flat_map()=3	BTreeMap=9	BTreeSet=5	Vec=1
+crates/holonic-engine/src/realization/passage.rs	.clone()=4	.collect()=7	BTreeSet=7	Vec=18
 crates/holonic-engine/src/rebase_invariants.rs	.clone()=8	.collect()=15	.flat_map()=2	.into_iter()=1	BTreeMap=4	BTreeSet=21	Vec=35
 crates/holonic-engine/src/receiver.rs	.clone()=110	.collect()=27	.into_iter()=4	BTreeMap=25	BTreeSet=16	Vec=58
 crates/holonic-engine/src/receiver_current.rs	.clone()=14	.collect()=1	Vec=12
 crates/holonic-engine/src/receiver_ecology.rs	.clone()=18	.collect()=16	.into_iter()=1	BTreeMap=10	BTreeSet=10	Vec=28
 crates/holonic-engine/src/receiver_exact_compression.rs	.clone()=3	.collect()=19	.into_iter()=4	BTreeMap=11	BTreeSet=9	Vec=45	VecDeque=2
-crates/holonic-engine/src/receiver_history_compression.rs	.clone()=3	.collect()=6	BTreeMap=4	BTreeSet=5	Vec=23
+crates/holonic-engine/src/receiver_history_compression.rs	.clone()=3	.collect()=6	BTreeMap=9	BTreeSet=13	Vec=23
 crates/holonic-engine/src/receiver_history_cultivation.rs	.clone()=14	.collect()=4	Vec=20
 crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.flat_map()=2	.into_iter()=1	BTreeMap=14	BTreeSet=18	Vec=25
 crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57
