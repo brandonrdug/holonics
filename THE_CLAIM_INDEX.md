@@ -131,7 +131,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (242 deposits of 534)
+## 4 · The 2026-08 record line (243 deposits of 535)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -379,6 +379,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_OBSTRUCTION_IS_EXHIBITED_AT_SEVENTEEN_AND_THE_INVISIBLE_COSETS_PASS_EVERY_FRAME.md` | The obstruction is exhibited at seventeen, and the invisible cosets pass every frame |
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
 | `2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md` | The sibling continuations returned their defect complex, the message partition retained its source fibre, and A2 passed |
+| `2026-08-22_THE_THETA_LAW_IS_PROVED_THE_DUPLICATION_IS_A_LATTICE_REARRANGEMENT_AND_THE_KERNEL_ADMITS_WEIGHT_TWO.md` | The theta law is proved: the duplication is a lattice rearrangement, and the kernel admits weight two |
 | `2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md` | The total descent route cultivated Athena, the withheld passage separated, and M6 passed |
 | `2026-08-22_THE_TWO_DESCENT_AT_THIRTY_FOUR_IS_COMPLETE_AND_THE_IMAGE_IS_EXACTLY_THE_REALIZED_SIXTEEN.md` | The two-descent at thirty-four is complete, and the image is exactly the realized sixteen |
 
