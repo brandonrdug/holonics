@@ -67,3 +67,5 @@ import ElementaryHolonics.Millennium.FrameDescent
 import ElementaryHolonics.Millennium.DistantWindings
 import ElementaryHolonics.Millennium.ReflectionCensus
 import ElementaryHolonics.Millennium.ThetaCensus
+import ElementaryHolonics.Millennium.TateLedger
+import ElementaryHolonics.Millennium.AlternatingParity
