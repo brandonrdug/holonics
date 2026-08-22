@@ -96,7 +96,12 @@ fn census(name: &str, text: String) -> Result<Reading, String> {
         let mut rows: Vec<(u16, u32)> = atlas
             .outgoing(state)
             .into_iter()
-            .map(|(g, t)| (vocabulary[&fiber_bytes(g.identity()).unwrap_or_default()], t))
+            .map(|(g, t)| {
+                (
+                    vocabulary[&fiber_bytes(g.identity()).unwrap_or_default()],
+                    t,
+                )
+            })
             .collect();
         rows.sort();
         for (index, reaches) in rows {
@@ -127,7 +132,9 @@ fn census(name: &str, text: String) -> Result<Reading, String> {
     let mut nontrivial = 0usize;
     let mut longest_cycle = 1usize;
     for symbol in 0..vocabulary.len() as u16 {
-        let map: Vec<u32> = (0..classes as u32).map(|state| carry(state, symbol)).collect();
+        let map: Vec<u32> = (0..classes as u32)
+            .map(|state| carry(state, symbol))
+            .collect();
         let image: BTreeSet<u32> = map.iter().copied().collect();
         total_image += image.len();
         let mut live = image.clone();
@@ -205,15 +212,21 @@ fn run() -> Result<(), String> {
     }
     println!();
     if any {
-        println!("  GROUP CONTENT APPEARS. Periodic material gives the monoid nontrivial orbits, so");
-        println!("  aperiodicity is a property of the MATERIAL and not of the construction. A crystal");
+        println!(
+            "  GROUP CONTENT APPEARS. Periodic material gives the monoid nontrivial orbits, so"
+        );
+        println!(
+            "  aperiodicity is a property of the MATERIAL and not of the construction. A crystal"
+        );
         println!("  is therefore a material choice an operator can aim for, and the orbit is the");
         println!("  symmetry that can be stored as a generator instead of enumerated.");
     } else {
         println!("  NO GROUP CONTENT ANYWHERE, INCLUDING IN PURELY PERIODIC MATERIAL.");
         println!("  So the aperiodicity is a property of the CONSTRUCTION, not of the material:");
         println!("  `carry` takes the longest matching suffix, and a longest-suffix map cannot");
-        println!("  permute — it either extends or falls, and both are monotone in matched length.");
+        println!(
+            "  permute — it either extends or falls, and both are monotone in matched length."
+        );
         println!("  No material will yield a space group through this organ, and a crystal model");
         println!("  would need a DIFFERENT transport law rather than different material.");
         println!("  That forecloses the route by measurement, which is worth more than the plan.");

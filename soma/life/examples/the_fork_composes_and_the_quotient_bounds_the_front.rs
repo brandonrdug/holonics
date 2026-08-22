@@ -192,7 +192,16 @@ fn run() -> Result<(), String> {
         standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
         extent.push(atlas.class_extent(state).unwrap_or(0) as u32);
     }
-    let body = Body { indptr, germ, target, suffix, standing, extent, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        standing,
+        extent,
+        surfaces,
+        index_of,
+    };
 
     println!("COMPOSITION BY FORK, WITH THE QUOTIENT BOUNDING THE FRONT\n");
     println!("  forced -> conduct · fork -> BRANCH · front -> DIVIDE at the declared grain");
@@ -315,7 +324,9 @@ fn run() -> Result<(), String> {
         }
         println!();
     }
-    println!("A surface that is not a contiguous window of any source did not come from one place.");
+    println!(
+        "A surface that is not a contiguous window of any source did not come from one place."
+    );
     println!("If no grain produces one, the front is not composing and this run says so.");
     Ok(())
 }

@@ -158,16 +158,23 @@ fn run() -> Result<(), String> {
         maximum.push(high as u32);
         standing.push(atlas.standing_at(state).unwrap_or(0));
     }
-    let body = Body { indptr, germ, target, suffix, minimum, maximum, standing, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        minimum,
+        maximum,
+        standing,
+        surfaces,
+        index_of,
+    };
 
     println!("REPETITION SATURATES INTO ITS CYCLIC SUBGROUP — measuring the order\n");
     for prompt in PROMPTS {
         println!("═══ {prompt:?}");
         for bound in BOUNDS {
-            for (reading, coarsen) in [
-                ("maxlen (defective)", true),
-                ("minlen (correct)", false),
-            ] {
+            for (reading, coarsen) in [("maxlen (defective)", true), ("minlen (correct)", false)] {
                 let mut state = 0u32;
                 for token in &lexical_tokens(prompt) {
                     state = match body.index_of.get(token) {
@@ -214,7 +221,11 @@ fn run() -> Result<(), String> {
                     let shown: Vec<&String> = emitted.iter().take(28).collect();
                     println!(
                         "       {}",
-                        shown.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(" ")
+                        shown
+                            .iter()
+                            .map(|s| s.as_str())
+                            .collect::<Vec<_>>()
+                            .join(" ")
                     );
                 }
             }
@@ -222,7 +233,9 @@ fn run() -> Result<(), String> {
         println!();
     }
     println!("The order is `ord(hol(gamma))` from the 2026-08-16 deposit: after that many passes");
-    println!("every further repetition returns something already seen. Breadth generates the group;");
+    println!(
+        "every further repetition returns something already seen. Breadth generates the group;"
+    );
     println!("repetition explores one cyclic subgroup of it.");
     Ok(())
 }

@@ -53,10 +53,10 @@ use num_bigint::BigInt;
 use relational_geometry::Rat;
 
 pub use super::resident_layer::{
-    bond, configuration, implementation, intervention, law, point_enclosure, rebase_testimony,
-    shape, Founded, Source, EMBED, EMBED_SCALE, EPS_BITS, FFN, GAINS, GELU_CUBIC_BITS,
-    GELU_SCALE_BITS, HEADS, HIDDEN, KV_HEADS, PLE_EMBED, PLE_EMBED_SCALE, PLE_MODEL_PROJECTION,
-    PLE_PROJECTION_NORM, PLE_WIDTH, POPULATIONS, SLIDING_WINDOW,
+    EMBED, EMBED_SCALE, EPS_BITS, FFN, Founded, GAINS, GELU_CUBIC_BITS, GELU_SCALE_BITS, HEADS,
+    HIDDEN, KV_HEADS, PLE_EMBED, PLE_EMBED_SCALE, PLE_MODEL_PROJECTION, PLE_PROJECTION_NORM,
+    PLE_WIDTH, POPULATIONS, SLIDING_WINDOW, Source, bond, configuration, implementation,
+    intervention, law, point_enclosure, rebase_testimony, shape,
 };
 
 pub const LAYERS: usize = 42;

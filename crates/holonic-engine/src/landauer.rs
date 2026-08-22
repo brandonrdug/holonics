@@ -52,7 +52,7 @@
 use num_bigint::BigUint;
 use num_traits::One;
 use relational_geometry::exact_analysis::log_rational_interval;
-use relational_geometry::{integer, Rat};
+use relational_geometry::{Rat, integer};
 
 use crate::exact_value::ExactOrdering;
 
@@ -179,7 +179,8 @@ pub fn read(
 
     // Energy in joules: microwatts × nanoseconds = 10^-6 W × 10^-9 s = 10^-15 J.
     let energy = Rat::new(
-        num_bigint::BigInt::from(frame.power_microwatts) * num_bigint::BigInt::from(frame.interval_nanoseconds),
+        num_bigint::BigInt::from(frame.power_microwatts)
+            * num_bigint::BigInt::from(frame.interval_nanoseconds),
         num_bigint::BigInt::from(1_000_000_000_000_000u64),
     );
     // Boltzmann's constant, exact since the 2019 SI redefinition: 1.380649e-23 J/K.
@@ -197,7 +198,8 @@ pub fn read(
 
     // budget = energy / (k · T · ln2). Larger ln2 gives a SMALLER budget, so the enclosure inverts.
     let scale = boltzmann * temperature;
-    if scale <= Rat::from(num_bigint::BigInt::from(0u32)) || ln_two.lower <= Rat::from(num_bigint::BigInt::from(0u32))
+    if scale <= Rat::from(num_bigint::BigInt::from(0u32))
+        || ln_two.lower <= Rat::from(num_bigint::BigInt::from(0u32))
     {
         return Err(LandauerError::FrameIsNotPositive);
     }
@@ -220,9 +222,9 @@ mod tests {
 
     fn frame() -> ThermalFrame {
         ThermalFrame {
-            power_microwatts: 250_000_000, // 250 W
+            power_microwatts: 250_000_000,       // 250 W
             interval_nanoseconds: 1_000_000_000, // one second
-            temperature_millikelvin: 300_000, // 300 K
+            temperature_millikelvin: 300_000,    // 300 K
             display_active: false,
             declared_by: "a declared control frame".to_owned(),
         }

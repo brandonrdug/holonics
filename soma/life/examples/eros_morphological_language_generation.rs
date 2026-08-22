@@ -299,10 +299,8 @@ fn run() -> Result<(), String> {
     let ecology = if force_cpu {
         eprintln!("eros morphological language generation: carrier = cpu, {workers} lanes");
         let mut cpu = ParallelCpuLiveCurrentExecutor::new(workers.max(1));
-        MorphologicalLanguageEcology::condition_with_executor(
-            &passages, action, workers, &mut cpu,
-        )
-        .map_err(debug)?
+        MorphologicalLanguageEcology::condition_with_executor(&passages, action, workers, &mut cpu)
+            .map_err(debug)?
     } else {
         match CudaMorphologicalConditioner::new(0) {
             Ok(mut conditioner) => {

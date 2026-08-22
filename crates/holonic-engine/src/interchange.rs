@@ -247,7 +247,10 @@ pub enum DistinguishingWord {
     /// **Two members of a front share an address one of them writes.** Their complete
     /// consequences cannot commute, so the front stays ordered — derived from the footprints
     /// before any launch, never from a replay. Added 2026-08-18 for [`certify_footprints`].
-    FootprintShared { members: (usize, usize), address: u64 },
+    FootprintShared {
+        members: (usize, usize),
+        address: u64,
+    },
 }
 
 /// The verdict. Refusal is a first-class return.
@@ -284,7 +287,10 @@ pub enum Coherence {
     /// resource during the deed, and each is a deterministic function of its inputs. On such a
     /// front every order — and every physical interleaving — returns one complete consequence by
     /// construction, which is what a factorial replay could only sample. Added 2026-08-18.
-    FootprintDisjoint { occurrences: usize, pairs_checked: usize },
+    FootprintDisjoint {
+        occurrences: usize,
+        pairs_checked: usize,
+    },
 }
 
 impl Coherence {
@@ -1705,7 +1711,10 @@ pub fn certify_footprints(members: &[MemberFootprint]) -> FrontCertificate {
             for write in &a.writes {
                 for other in b.reads.iter().chain(b.writes.iter()) {
                     if let Some(address) = ranges_meet(*write, *other) {
-                        because = Some(DistinguishingWord::FootprintShared { members: (i, j), address });
+                        because = Some(DistinguishingWord::FootprintShared {
+                            members: (i, j),
+                            address,
+                        });
                         break 'outer;
                     }
                 }
@@ -1713,7 +1722,10 @@ pub fn certify_footprints(members: &[MemberFootprint]) -> FrontCertificate {
             for write in &b.writes {
                 for other in a.reads.iter() {
                     if let Some(address) = ranges_meet(*write, *other) {
-                        because = Some(DistinguishingWord::FootprintShared { members: (i, j), address });
+                        because = Some(DistinguishingWord::FootprintShared {
+                            members: (i, j),
+                            address,
+                        });
                         break 'outer;
                     }
                 }
@@ -1738,7 +1750,10 @@ pub fn certify_footprints(members: &[MemberFootprint]) -> FrontCertificate {
             Some(because) => Interchange::Ordered { because },
             None => Interchange::Interchangeable,
         },
-        coherence: Coherence::FootprintDisjoint { occurrences: members.len(), pairs_checked: pairs },
+        coherence: Coherence::FootprintDisjoint {
+            occurrences: members.len(),
+            pairs_checked: pairs,
+        },
     }
 }
 
@@ -1829,7 +1844,11 @@ pub fn certify_front(orders: &[Vec<usize>], enactor: &mut dyn EnactsInOrder) -> 
             note("conduct", port, &mut certificate.conduct_agrees);
         }
         if first.obstruction != other.obstruction {
-            note("obstruction", String::new(), &mut certificate.obstruction_agrees);
+            note(
+                "obstruction",
+                String::new(),
+                &mut certificate.obstruction_agrees,
+            );
         }
         if first.lineage != other.lineage {
             let port = first_disagreeing_key(&first.lineage, &other.lineage);
@@ -1862,7 +1881,10 @@ pub fn certify_front(orders: &[Vec<usize>], enactor: &mut dyn EnactsInOrder) -> 
     certificate
 }
 
-fn first_disagreeing_key<V: PartialEq>(left: &BTreeMap<String, V>, right: &BTreeMap<String, V>) -> String {
+fn first_disagreeing_key<V: PartialEq>(
+    left: &BTreeMap<String, V>,
+    right: &BTreeMap<String, V>,
+) -> String {
     for (key, value) in left {
         match right.get(key) {
             Some(other) if other == value => {}
@@ -1891,15 +1913,21 @@ mod front_certificate_tests {
             let mut ports = Vec::new();
             for member in order {
                 ports.push(vec![*member as i64 * 10, *member as i64 * 10 + 1]);
-                face.conduct.insert(format!("port {member}"), "double".to_owned());
-                face.lineage.insert(format!("port {member}"), BTreeSet::from(["standing".to_owned()]));
+                face.conduct
+                    .insert(format!("port {member}"), "double".to_owned());
+                face.lineage.insert(
+                    format!("port {member}"),
+                    BTreeSet::from(["standing".to_owned()]),
+                );
             }
-            face.resources.insert("launches".to_owned(), BigUint::from(order.len()));
+            face.resources
+                .insert("launches".to_owned(), BigUint::from(order.len()));
             let key = order.iter().fold(0usize, |acc, m| acc * 10 + m);
             // stored per order under its lexical key, sorted by member so the endpoint is order-free
             let mut sorted: Vec<(usize, Vec<i64>)> = order.iter().copied().zip(ports).collect();
             sorted.sort();
-            self.written.insert(key, sorted.into_iter().flat_map(|(_, p)| p).collect());
+            self.written
+                .insert(key, sorted.into_iter().flat_map(|(_, p)| p).collect());
             Ok(face)
         }
         fn endpoints_disagree(&mut self, a: usize, b: usize) -> Result<Vec<(String, u64)>, String> {
@@ -1930,7 +1958,10 @@ mod front_certificate_tests {
             Ok(face)
         }
         fn endpoints_disagree(&mut self, a: usize, b: usize) -> Result<Vec<(String, u64)>, String> {
-            Ok(vec![("slot".to_owned(), u64::from(self.endpoints[a] != self.endpoints[b]))])
+            Ok(vec![(
+                "slot".to_owned(),
+                u64::from(self.endpoints[a] != self.endpoints[b]),
+            )])
         }
     }
 
@@ -1951,16 +1982,32 @@ mod front_certificate_tests {
 
     #[test]
     fn independent_members_interchange_over_every_order() {
-        let mut enactor = Independent { written: BTreeMap::new() };
+        let mut enactor = Independent {
+            written: BTreeMap::new(),
+        };
         let certificate = certify_front(&all_orders(3), &mut enactor);
-        assert!(certificate.is_interchangeable(), "{:?}", certificate.verdict);
-        assert!(matches!(certificate.coherence, Coherence::AllOrders { orders_compared: 6, orders_lawful: 6, agreed: true, .. }));
+        assert!(
+            certificate.is_interchangeable(),
+            "{:?}",
+            certificate.verdict
+        );
+        assert!(matches!(
+            certificate.coherence,
+            Coherence::AllOrders {
+                orders_compared: 6,
+                orders_lawful: 6,
+                agreed: true,
+                ..
+            }
+        ));
         assert!(!certificate.lineage_changed_the_verdict());
     }
 
     #[test]
     fn a_shared_mutable_slot_orders_the_front_and_the_word_names_the_port() {
-        let mut enactor = Coupled { endpoints: Vec::new() };
+        let mut enactor = Coupled {
+            endpoints: Vec::new(),
+        };
         let certificate = certify_front(&all_orders(2), &mut enactor);
         assert!(!certificate.is_interchangeable());
         assert!(matches!(
@@ -1972,7 +2019,10 @@ mod front_certificate_tests {
     #[test]
     fn a_declared_order_that_cannot_be_enacted_refuses_the_front_by_name() {
         let certificate = certify_front(&all_orders(2), &mut Illegal);
-        assert!(matches!(certificate.because(), Some(DistinguishingWord::EnactmentRefused { order: 1, .. })));
+        assert!(matches!(
+            certificate.because(),
+            Some(DistinguishingWord::EnactmentRefused { order: 1, .. })
+        ));
         assert!(!certificate.endpoint_only_verdict());
     }
 
@@ -1982,7 +2032,10 @@ mod front_certificate_tests {
     impl EnactsInOrder for SameEndpointDifferentLineage {
         fn enact_in(&mut self, order: &[usize]) -> Result<EnactedFace, String> {
             let mut face = EnactedFace::default();
-            face.lineage.insert("port".to_owned(), BTreeSet::from([format!("first was {}", order[0])]));
+            face.lineage.insert(
+                "port".to_owned(),
+                BTreeSet::from([format!("first was {}", order[0])]),
+            );
             Ok(face)
         }
         fn endpoints_disagree(&mut self, _: usize, _: usize) -> Result<Vec<(String, u64)>, String> {
@@ -1996,7 +2049,9 @@ mod front_certificate_tests {
         assert!(certificate.endpoint_only_verdict());
         assert!(!certificate.is_interchangeable());
         assert!(certificate.lineage_changed_the_verdict());
-        assert!(matches!(certificate.because(), Some(DistinguishingWord::ReturnDiffers { coordinate, .. }) if coordinate == "lineage"));
+        assert!(
+            matches!(certificate.because(), Some(DistinguishingWord::ReturnDiffers { coordinate, .. }) if coordinate == "lineage")
+        );
     }
 }
 
@@ -2036,20 +2091,53 @@ mod footprint_tests {
 
     #[test]
     fn disjoint_footprints_certify_and_a_shared_written_address_refuses_by_name() {
-        let a = MemberFootprint { reads: vec![(0, 100)], writes: vec![(1000, 1100)] };
-        let b = MemberFootprint { reads: vec![(0, 100)], writes: vec![(1100, 1200)] };
-        let c = MemberFootprint { reads: vec![(50, 60)], writes: vec![(2000, 2100)] };
+        let a = MemberFootprint {
+            reads: vec![(0, 100)],
+            writes: vec![(1000, 1100)],
+        };
+        let b = MemberFootprint {
+            reads: vec![(0, 100)],
+            writes: vec![(1100, 1200)],
+        };
+        let c = MemberFootprint {
+            reads: vec![(50, 60)],
+            writes: vec![(2000, 2100)],
+        };
         let certificate = certify_footprints(&[a.clone(), b.clone(), c]);
         assert!(certificate.is_interchangeable());
-        assert!(matches!(certificate.coherence, Coherence::FootprintDisjoint { occurrences: 3, pairs_checked: 3 }));
+        assert!(matches!(
+            certificate.coherence,
+            Coherence::FootprintDisjoint {
+                occurrences: 3,
+                pairs_checked: 3
+            }
+        ));
         // A member reading what another writes is ordered, and the word names the pair.
-        let reader = MemberFootprint { reads: vec![(1050, 1060)], writes: vec![(3000, 3100)] };
+        let reader = MemberFootprint {
+            reads: vec![(1050, 1060)],
+            writes: vec![(3000, 3100)],
+        };
         let ordered = certify_footprints(&[a.clone(), reader]);
-        assert!(matches!(ordered.because(), Some(DistinguishingWord::FootprintShared { members: (0, 1), address: 1050 })));
+        assert!(matches!(
+            ordered.because(),
+            Some(DistinguishingWord::FootprintShared {
+                members: (0, 1),
+                address: 1050
+            })
+        ));
         // Two members writing one address are ordered too.
-        let writer = MemberFootprint { reads: vec![], writes: vec![(1099, 1101)] };
+        let writer = MemberFootprint {
+            reads: vec![],
+            writes: vec![(1099, 1101)],
+        };
         assert!(!certify_footprints(&[a, writer]).is_interchangeable());
         // A front of one member is trivially interchangeable and checked zero pairs.
-        assert!(matches!(certify_footprints(&[b]).coherence, Coherence::FootprintDisjoint { pairs_checked: 0, .. }));
+        assert!(matches!(
+            certify_footprints(&[b]).coherence,
+            Coherence::FootprintDisjoint {
+                pairs_checked: 0,
+                ..
+            }
+        ));
     }
 }

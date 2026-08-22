@@ -353,8 +353,8 @@ impl TransferMatrix {
     /// why that one would carry no information — so a returned `Obstructed` is a real refusal.
     pub fn conserved_form(&self) -> ConservedForm {
         let forward = &self.through * &self.through - &self.returned * &self.returned;
-        let returned = &self.into_forward * &self.into_forward
-            - &self.into_returned * &self.into_returned;
+        let returned =
+            &self.into_forward * &self.into_forward - &self.into_returned * &self.into_returned;
         let cross = &self.through * &self.into_forward - &self.returned * &self.into_returned;
         if cross.is_zero() && forward == -&returned {
             ConservedForm::Scaled(forward)
@@ -721,8 +721,7 @@ impl PhasedTransfer {
     /// conic. The forward half advances and the returned half retards, which is why the reverse
     /// carries the inverse — the same convention `dimensional_wave` applies per port.
     pub fn of_propagation(phase: &ExactWavePhaseTransport) -> Self {
-        let forward =
-            ExactComplexWaveCurrent::new(phase.cosine.clone(), -phase.sine.clone());
+        let forward = ExactComplexWaveCurrent::new(phase.cosine.clone(), -phase.sine.clone());
         let returned = ExactComplexWaveCurrent::new(phase.cosine.clone(), phase.sine.clone());
         Self {
             through: forward,
@@ -1322,8 +1321,8 @@ impl BandReading {
 mod tests {
     use super::*;
     use holonic_structure::{DeclaredGauge, Disposition};
-    use std::collections::BTreeSet;
     use num_bigint::BigInt;
+    use std::collections::BTreeSet;
 
     fn admittance(numerator: i64, denominator: i64) -> Admittance {
         Admittance::declared(Rat::new(numerator.into(), denominator.into())).expect("positive")
@@ -1488,7 +1487,10 @@ mod tests {
         assert_eq!(plain.transport(), scaled.transport());
 
         // The magnitude does not: the reach is the admittance, and it moved by exactly the factor.
-        assert_eq!(scaled.reach(), &(plain.reach() * Rat::from_integer(4.into())));
+        assert_eq!(
+            scaled.reach(),
+            &(plain.reach() * Rat::from_integer(4.into()))
+        );
         assert_ne!(plain.reach(), scaled.reach());
     }
 
@@ -1552,10 +1554,13 @@ mod tests {
         // WHAT CROSSES: the crossing against a fixed partner scaled by the same factor. Its whole
         // transport depends only on the ratio, so the matrix is bit-identical entry by entry.
         let partner = |y: &Admittance| {
-            Crossing::meet(y, &Admittance::declared(y.value() * Rat::from_integer(3.into())).expect("positive"))
-                .expect("admits")
-                .transport()
-                .clone()
+            Crossing::meet(
+                y,
+                &Admittance::declared(y.value() * Rat::from_integer(3.into())).expect("positive"),
+            )
+            .expect("admits")
+            .transport()
+            .clone()
         };
         assert!(
             gauge.projection_moved(partner).is_empty(),
@@ -1606,14 +1611,9 @@ mod tests {
 
                 // ★ THE MATRIX ITSELF, entry by entry, across the two charts.
                 let ((diagonal, off_diagonal), matrix_denominator) = counted.transfer_pair();
-                let diagonal = Rat::new(
-                    BigInt::from(diagonal),
-                    BigInt::from(matrix_denominator),
-                );
-                let off_diagonal = Rat::new(
-                    BigInt::from(off_diagonal),
-                    BigInt::from(matrix_denominator),
-                );
+                let diagonal = Rat::new(BigInt::from(diagonal), BigInt::from(matrix_denominator));
+                let off_diagonal =
+                    Rat::new(BigInt::from(off_diagonal), BigInt::from(matrix_denominator));
                 assert_eq!(*exact.transport().through(), diagonal);
                 assert_eq!(*exact.transport().into_returned(), diagonal);
                 assert_eq!(*exact.transport().returned(), off_diagonal);
@@ -1642,7 +1642,9 @@ mod tests {
     #[test]
     fn a_match_is_one_round_and_the_zero_population_is_a_terminus_on_the_device_face_too() {
         assert_eq!(
-            CountedCrossing::meet(9, 9).expect("positive").service_rounds(),
+            CountedCrossing::meet(9, 9)
+                .expect("positive")
+                .service_rounds(),
             1
         );
         assert!(CountedCrossing::meet(9, 9).expect("positive").is_matched());
@@ -1660,7 +1662,8 @@ mod tests {
         let mut foil_disagreed = 0usize;
         for incident in 1..=16i64 {
             for transmitted in 1..=16i64 {
-                let crossing = Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets");
+                let crossing =
+                    Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets");
 
                 // Derived from the matrix against computed by `analytic_field`.
                 assert_eq!(
@@ -1753,7 +1756,9 @@ mod tests {
                         );
                     assert_eq!(
                         through,
-                        *Crossing::meet(&whole(i), &whole(k)).expect("meets").transport(),
+                        *Crossing::meet(&whole(i), &whole(k))
+                            .expect("meets")
+                            .transport(),
                         "composition failed at ({i}, {j}, {k})"
                     );
                     swept += 1;
@@ -1778,9 +1783,13 @@ mod tests {
                     let right = Crossing::meet(&whole(j), &whole(k)).expect("meets");
                     let direct = Crossing::meet(&whole(i), &whole(k)).expect("meets");
 
-                    let (left_reflection, right_reflection) = (left.reflection(), right.reflection());
+                    let (left_reflection, right_reflection) =
+                        (left.reflection(), right.reflection());
                     let denominator = Rat::one() + &left_reflection * &right_reflection;
-                    assert!(!denominator.is_zero(), "|Γ| < 1 so the denominator is positive");
+                    assert!(
+                        !denominator.is_zero(),
+                        "|Γ| < 1 so the denominator is positive"
+                    );
 
                     // Γ_ik = (Γ_ij + Γ_jk) / (1 + Γ_ij Γ_jk)
                     assert_eq!(
@@ -1831,7 +1840,8 @@ mod tests {
         let mut swept = 0usize;
         for incident in 1..=12i64 {
             for transmitted in 1..=12i64 {
-                let crossing = Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets");
+                let crossing =
+                    Crossing::meet(&whole(incident), &whole(transmitted)).expect("meets");
                 let ratio = rational(transmitted, incident);
                 // Mᵀ J M = ρ J, with ρ the admittance ratio — and the SAME ρ as the determinant,
                 // which is a property of the family rather than a definition.
@@ -2102,7 +2112,9 @@ mod tests {
         assert_eq!(joined, left_first);
         assert_eq!(
             joined,
-            *Crossing::meet(&whole(3), &whole(7)).expect("meets").transport()
+            *Crossing::meet(&whole(3), &whole(7))
+                .expect("meets")
+                .transport()
         );
         // The chain carrier agrees with the hand-composed product.
         assert_eq!(chain_over(&[3, 2, 5, 7]).compose(), joined);
@@ -2123,7 +2135,10 @@ mod tests {
         let disagreeing = Crossing::meet(&whole(2), &whole(10)).expect("meets");
         let defect = through.defect_against(disagreeing.transport());
         assert!(!TransferMatrix::closed(&defect));
-        assert_eq!(defect, TransferMatrix::of_ratio(&Rat::from_integer(2.into())));
+        assert_eq!(
+            defect,
+            TransferMatrix::of_ratio(&Rat::from_integer(2.into()))
+        );
         assert_eq!(defect.determinant(), Rat::from_integer(2.into()));
     }
 
@@ -2147,7 +2162,11 @@ mod tests {
         let carried = admittance(1, 1);
         let mut chain = found("source", &carried, Standing::NoTravelingSection);
         let crossed = Crossing::meet(&carried, &admittance(1, 1)).expect("matched");
-        chain.carry(crossed, "crossed", Standing::Carrying(carried.value().clone()));
+        chain.carry(
+            crossed,
+            "crossed",
+            Standing::Carrying(carried.value().clone()),
+        );
 
         let turned_away = Crossing::meet(&carried, &admittance(1, 9)).expect("admits");
         chain.reflect(
@@ -2210,7 +2229,9 @@ mod tests {
 
         // THE CONTROL, and it is the module's own receipt: two interfaces still commute.
         let other = PhasedTransfer::of_interface(
-            Crossing::meet(&whole(3), &whole(7)).expect("meets").transport(),
+            Crossing::meet(&whole(3), &whole(7))
+                .expect("meets")
+                .transport(),
         );
         assert_eq!(
             matrix.compose(&other),
@@ -2297,10 +2318,14 @@ mod tests {
         let turning = phase((3, 5), (4, 5));
         let whole_turn = ExactWavePhaseTransport::identity();
         let matched = PhasedTransfer::of_interface(
-            Crossing::meet(&whole(5), &whole(5)).expect("meets").transport(),
+            Crossing::meet(&whole(5), &whole(5))
+                .expect("meets")
+                .transport(),
         );
         let mismatched = PhasedTransfer::of_interface(
-            Crossing::meet(&whole(2), &whole(9)).expect("meets").transport(),
+            Crossing::meet(&whole(2), &whole(9))
+                .expect("meets")
+                .transport(),
         );
 
         // matched junction + real phase -> commutes (the interface is the identity matrix)
@@ -2396,7 +2421,10 @@ mod tests {
         );
         assert!(!standing.matched);
         assert_eq!(standing.reflected_share, Rat::new(1.into(), 4.into()));
-        assert_eq!(standing.standing_wave_ratio, Some(Rat::from_integer(3.into())));
+        assert_eq!(
+            standing.standing_wave_ratio,
+            Some(Rat::from_integer(3.into()))
+        );
         // the extremes are the roots of x² − (5/2)x + (9/16), i.e. 9/4 and 1/4, ratio 9 = SWR².
         assert_eq!(standing.extreme_sum, Rat::new(5.into(), 2.into()));
         assert_eq!(standing.extreme_product, Rat::new(9.into(), 16.into()));
@@ -2496,14 +2524,19 @@ mod tests {
                 reading.half_trace, classical,
                 "the bilayer dispersion, against the composed transport"
             );
-            assert!(coupling >= Rat::one(), "AM-GM: the coupling never drops below one");
+            assert!(
+                coupling >= Rat::one(),
+                "AM-GM: the coupling never drops below one"
+            );
         }
         assert_eq!(seen.len(), 3, "all three band classes must be reachable");
 
         // THE FOIL: a cell that does not return to its own admittance is not a period, and the
         // reading says so rather than classifying it anyway.
         let not_a_period = PhasedTransfer::of_interface(
-            Crossing::meet(&whole(1), &whole(3)).expect("meets").transport(),
+            Crossing::meet(&whole(1), &whole(3))
+                .expect("meets")
+                .transport(),
         );
         let reading = BlochReading::of_cell(&not_a_period);
         assert!(!reading.is_a_period());
@@ -2640,8 +2673,13 @@ mod tests {
         // orthogonal case rather than a null".
         let matched = PhasedLink::interface(Crossing::meet(&whole(5), &whole(5)).expect("meets"));
         assert_eq!(matched.hand(), Hand::Ortho);
-        let mismatched = PhasedLink::interface(Crossing::meet(&whole(1), &whole(3)).expect("meets"));
-        assert_ne!(mismatched.hand(), Hand::Ortho, "a mismatch stores something");
+        let mismatched =
+            PhasedLink::interface(Crossing::meet(&whole(1), &whole(3)).expect("meets"));
+        assert_ne!(
+            mismatched.hand(),
+            Hand::Ortho,
+            "a mismatch stores something"
+        );
     }
 
     /// The real chart embeds without moving a single entry, so the phased carrier is a widening and

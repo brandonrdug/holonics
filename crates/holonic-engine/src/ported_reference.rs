@@ -42,7 +42,6 @@ use crate::exact_work::ExactWork;
 use crate::interaction::OccurrencePort;
 use crate::ported_operation::{Front, OperationSpecies, PortedError, PortedOperationComplex};
 
-
 // ---------------------------------------------------------------------------------------------
 // THE REALIZATION: a BINDING of occurrences to exact operations, ordered by the diagram itself
 // ---------------------------------------------------------------------------------------------
@@ -300,7 +299,9 @@ impl PortedProgram {
             }
             if let Some(existing) = law_species.insert(occurrence.law, operation.species()) {
                 if existing != operation.species() {
-                    return Err(PortedError::OneLawManySpecies { law: occurrence.law });
+                    return Err(PortedError::OneLawManySpecies {
+                        law: occurrence.law,
+                    });
                 }
             }
         }
@@ -364,7 +365,11 @@ impl PortedRealizationReceipt {
                     continue;
                 }
                 nonzero += 1;
-                if widest.as_ref().map(|(_, held)| magnitude > *held).unwrap_or(true) {
+                if widest
+                    .as_ref()
+                    .map(|(_, held)| magnitude > *held)
+                    .unwrap_or(true)
+                {
                     widest = Some((*occurrence, magnitude));
                 }
             }
@@ -580,7 +585,14 @@ fn realize_handed(
                 );
             }
             let clock = std::time::Instant::now();
-            let emitted = enact(operation, &admitted, carrier, &mut work, occurrence, &mut retained)?;
+            let emitted = enact(
+                operation,
+                &admitted,
+                carrier,
+                &mut work,
+                occurrence,
+                &mut retained,
+            )?;
             if std::env::var("PORTED_TRACE").is_ok() {
                 eprintln!(
                     "    {:?} {:?} in {:?} -> {} entries",
@@ -632,11 +644,9 @@ fn enact(
         PortedOperationKind::Lookup { population, row } => {
             carrier.stored_row(population, *row).map_err(apparatus)?
         }
-        PortedOperationKind::Contract { population } => {
-            carrier
-                .contract(population, &admitted[0])
-                .map_err(apparatus)?
-        }
+        PortedOperationKind::Contract { population } => carrier
+            .contract(population, &admitted[0])
+            .map_err(apparatus)?,
         PortedOperationKind::RebaseByGain {
             population,
             floor,
@@ -658,8 +668,12 @@ fn enact(
                 work.added(1);
             }
             let mean = squares / width + floor;
-            let root = AlgebraicRoot::reciprocal_square_root(&mean, ROOT_OCTAVES)
-                .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
+            let root =
+                AlgebraicRoot::reciprocal_square_root(&mean, ROOT_OCTAVES).map_err(|error| {
+                    PortedError::Value {
+                        reason: format!("{error:?}"),
+                    }
+                })?;
             let enclosure = root.enclosure();
             let two = Rat::from_integer(BigInt::from(2));
             let mut out = Vec::with_capacity(section.len());
@@ -673,7 +687,11 @@ fn enact(
                 let scaled = value * (gain + &unit);
                 let low = &enclosure.lower * &scaled;
                 let high = &enclosure.upper * &scaled;
-                let (below, above) = if low <= high { (low, high) } else { (high, low) };
+                let (below, above) = if low <= high {
+                    (low, high)
+                } else {
+                    (high, low)
+                };
                 out.push((&below + &above) / &two);
                 widths.push((&above - &below) / &two);
                 work.multiplied(2);
@@ -730,10 +748,16 @@ fn enact(
                     }
                 };
                 let turned = CertifiedSeries::hyperbolic_tangent_enclosure(&argument, *terms)
-                    .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
+                    .map_err(|error| PortedError::Value {
+                        reason: format!("{error:?}"),
+                    })?;
                 let low = (&turned.lower + &one) * value / &two;
                 let high = (&turned.upper + &one) * value / &two;
-                let (below, above) = if low <= high { (low, high) } else { (high, low) };
+                let (below, above) = if low <= high {
+                    (low, high)
+                } else {
+                    (high, low)
+                };
                 out.push((&below + &above) / &two);
                 widths.push((&above - &below) / &two);
                 work.multiplied(3);
@@ -763,8 +787,12 @@ fn enact(
             let mut widths = vec![Rat::zero(); section.len()];
             for band in 0..bands {
                 // The band's group element is the site's; a position is its integer power.
-                let (cosine, sine) = compose_rotation(&elements[band], *position)
-                    .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
+                let (cosine, sine) =
+                    compose_rotation(&elements[band], *position).map_err(|error| {
+                        PortedError::Value {
+                            reason: format!("{error:?}"),
+                        }
+                    })?;
                 let (first, second) = if *pairs_halves {
                     (band, band + bands)
                 } else {
@@ -795,10 +823,11 @@ fn enact(
                 &Rat::from_integer(BigInt::from(*scale_width as u64)),
                 ROOT_OCTAVES,
             )
-            .map_err(|error| PortedError::Value { reason: format!("{error:?}") })?;
+            .map_err(|error| PortedError::Value {
+                reason: format!("{error:?}"),
+            })?;
             let two = Rat::from_integer(BigInt::from(2));
-            let scale_point =
-                (&scale.enclosure().lower + &scale.enclosure().upper) / &two;
+            let scale_point = (&scale.enclosure().lower + &scale.enclosure().upper) / &two;
             // The faces, exactly, and the population's own hand retained beside each.
             let mut faces = Vec::with_capacity(reach);
             for orientation in presented {
@@ -868,9 +897,10 @@ fn enact(
             retained.entry(*occurrence).or_default().extend(widths);
             out
         }
-        PortedOperationKind::Concatenate => {
-            admitted.iter().flat_map(|part| part.iter().cloned()).collect()
-        }
+        PortedOperationKind::Concatenate => admitted
+            .iter()
+            .flat_map(|part| part.iter().cloned())
+            .collect(),
         PortedOperationKind::Ablate { from, count } => {
             let section = &admitted[0];
             let upper = (from + count).min(section.len());
@@ -978,7 +1008,9 @@ mod tests {
                     map[row * width..(row + 1) * width]
                         .iter()
                         .zip(standing)
-                        .fold(Rat::from_integer(BigInt::from(0)), |sum, (a, b)| sum + a * b)
+                        .fold(Rat::from_integer(BigInt::from(0)), |sum, (a, b)| {
+                            sum + a * b
+                        })
                 })
                 .collect())
         }
@@ -1212,10 +1244,7 @@ mod tests {
 
         let mut carrier = DeclaredCarrier {
             stored: BTreeMap::from([
-                (
-                    "entering".to_owned(),
-                    vec![rat(3), rat(-1)],
-                ),
+                ("entering".to_owned(), vec![rat(3), rat(-1)]),
                 (
                     // A doubling map, so a branch's output is checkable by hand.
                     "map".to_owned(),
@@ -1229,7 +1258,11 @@ mod tests {
         // The chronology returned three fronts, and the middle one carries BOTH branches.
         assert_eq!(receipt.fronts.len(), 3);
         assert_eq!(receipt.fronts[0].breadth(), 1);
-        assert_eq!(receipt.fronts[1].breadth(), 2, "the branches are co-present");
+        assert_eq!(
+            receipt.fronts[1].breadth(),
+            2,
+            "the branches are co-present"
+        );
         assert_eq!(receipt.fronts[2].breadth(), 1);
 
         // Each branch doubled the entering construction, and the reconvergence summed them.
@@ -1250,9 +1283,14 @@ mod tests {
         // was carrying the defect, which is the shape `CLAUDE.md` records for the eleven tests that
         // asserted `ComparativeMultiplicity`'s.
         assert_eq!(receipt.fronts.len(), 3);
-        assert!(receipt.work.coordinates().iter().any(|(name, count)| *name
-            == "dependency-span"
-            && *count == num_bigint::BigUint::from(3u32)));
+        assert!(
+            receipt
+                .work
+                .coordinates()
+                .iter()
+                .any(|(name, count)| *name == "dependency-span"
+                    && *count == num_bigint::BigUint::from(3u32))
+        );
     }
 
     /// **A grain boundary's residual is retained per occurrence and exhibited**, never propagated.
@@ -1331,5 +1369,4 @@ mod tests {
             Some(Rat::new(BigInt::from(1), BigInt::from(2)))
         );
     }
-
 }

@@ -32,8 +32,8 @@ pub mod exact_world;
 // `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
 pub mod eros_rest;
 pub mod exposure_codec;
-pub mod founded_mouth;
 pub mod form_mouth;
+pub mod founded_mouth;
 pub mod holonic_training;
 // Production on the oriented incidence complex rather than on a tape chart. It consumes
 // `body::incidence` for `∂∂ = 0`, hands, ports and cells, and `holonic-engine`'s
@@ -49,11 +49,15 @@ pub mod lean_mathematics;
 // `research/records/2026-07-19_THE_INCIDENCE_REACTS_THE_COMPOUND_EXPOSES_ITS_BOUNDARY_THE_REGION_CARRIES_THE_FIELD.md` §I.
 pub mod live_current_cuda;
 pub mod material_incidence;
+pub mod material_shadow_cuda;
+// M1's owner-local join: M0 source/layout lineage, standing operation words, exact owner returns,
+// mathematical typing attachments, plural fibres, and the fixed typed sameness family. It parses
+// nothing and owns no arithmetic; the exact owners remain in `holonic-engine`.
+pub mod mathematical_particle;
 // The heterogeneous source/layout seam for mathematical material. PDF/SVG decoding stays an
 // exterior apparatus face; this owner receives exact placed carriers or exact raster samples and
 // derives their generic serial/spatial incidence without accepting caller-authored links.
 pub mod mathematical_source;
-pub mod material_shadow_cuda;
 pub mod morphological_language;
 // Deed P4: the rest is mounted alone — conducted, deposited into, and re-sealed — with the
 // corpus and the source absent from the path. It composes `atlas_cultivation`'s law with

@@ -35,8 +35,8 @@ use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::ported_operation::PortedError;
-use holonic_engine::ported_reference::{realize_under, FrontHand};
-use site::{found, ResidentSourceCarrier, BAND_POPULATION, BASE};
+use holonic_engine::ported_reference::{FrontHand, realize_under};
+use site::{BAND_POPULATION, BASE, ResidentSourceCarrier, found};
 
 const HANDS: [(FrontHand, &str); 3] = [
     (FrontHand::AsFounded, "as the chronology founded it"),
@@ -62,7 +62,10 @@ fn main() {
     };
     println!("PHOENIX STATION FOUR — THE FRONT IS CO-PRESENT, OR THE GAUGE MOVES IT");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     let (site, container, file) = match found(&root, BASE, terms, None) {
         Ok(triple) => triple,
@@ -79,14 +82,21 @@ fn main() {
     // -----------------------------------------------------------------------------------------
     let movable: Vec<&holonic_engine::ported_operation::Front> =
         fronts.iter().filter(|front| front.breadth() > 1).collect();
-    let widest = fronts.iter().map(|front| front.breadth()).max().unwrap_or(0);
+    let widest = fronts
+        .iter()
+        .map(|front| front.breadth())
+        .max()
+        .unwrap_or(0);
     let permutable: usize = movable.iter().map(|front| front.breadth()).sum();
     println!();
     println!("  CAN THE GAUGE MOVE ANYTHING? — asked before the verdict");
     println!("    fronts                            {}", fronts.len());
     println!("    fronts of breadth > 1             {}", movable.len());
     println!("    widest front                      {widest}");
-    println!("    occurrences the hand can permute  {permutable} of {}", site.program.operations.len());
+    println!(
+        "    occurrences the hand can permute  {permutable} of {}",
+        site.program.operations.len()
+    );
     if movable.is_empty() {
         println!("    THE GAUGE IS VACUOUS on this material — every front is a singleton, so all");
         println!("    three lawful hands are the identity map and agreement carries no evidence.");
@@ -118,7 +128,10 @@ fn main() {
             Ok(receipt) => {
                 println!();
                 println!("  REALIZED {told}");
-                println!("    ports written                   {}", receipt.carried.len());
+                println!(
+                    "    ports written                   {}",
+                    receipt.carried.len()
+                );
                 println!("    wall clock                      {:?}", clock.elapsed());
                 readings.push((hand, told, receipt));
             }
@@ -147,7 +160,9 @@ fn main() {
             .filter(|port| !receipt.carried.contains_key(port))
             .count();
         let work_moved = receipt.work != founded.work;
-        println!("    {told:<32} ports moved {moved}   ports absent {absent}   work moved {work_moved}");
+        println!(
+            "    {told:<32} ports moved {moved}   ports absent {absent}   work moved {work_moved}"
+        );
         orbit_empty &= moved == 0 && absent == 0 && !work_moved;
     }
     println!("    the orbit is empty                {orbit_empty}");
@@ -172,9 +187,9 @@ fn main() {
     println!();
     println!("  THE CONTROL — an occurrence dragged into the front of a producer it depends on");
     match disturbed {
-        Some((consumer, producer)) => println!(
-            "    it moved {consumer:?} onto its producer {producer:?}"
-        ),
+        Some((consumer, producer)) => {
+            println!("    it moved {consumer:?} onto its producer {producer:?}")
+        }
         None => {
             println!("    THE CONTROL DID NOT FIRE — no consumer has a producer in an earlier");
             println!("    front, so there is no illegal order to build and the empty orbit above");
@@ -182,7 +197,10 @@ fn main() {
             std::process::exit(1);
         }
     }
-    println!("    fronts the drag disturbed         {displaced} of {}", fronts.len());
+    println!(
+        "    fronts the drag disturbed         {displaced} of {}",
+        fronts.len()
+    );
     match &outcome {
         Err(PortedError::StandingAbsent { port }) => {
             println!("    the realization REFUSED           true");
@@ -207,30 +225,52 @@ fn main() {
     println!();
     println!("THE STATION'S VERDICT");
     println!();
-    println!("  the front census is adjudicated             {}", orbit_empty && refused);
+    println!(
+        "  the front census is adjudicated             {}",
+        orbit_empty && refused
+    );
     println!();
-    println!("  `CausalDiagram::layers()` declared {} fronts, {} of them of breadth greater", fronts.len(), movable.len());
-    println!("  than one, covering {permutable} of {} occurrences. Permuting WITHIN those fronts —", site.program.operations.len());
+    println!(
+        "  `CausalDiagram::layers()` declared {} fronts, {} of them of breadth greater",
+        fronts.len(),
+        movable.len()
+    );
+    println!(
+        "  than one, covering {permutable} of {} occurrences. Permuting WITHIN those fronts —",
+        site.program.operations.len()
+    );
     println!("  against the founding hand, and rotated — moves nothing at any occurrence port and");
     println!("  does not move the exact work vector either. Permuting ACROSS them refuses.");
     println!();
-    println!("  So co-presence is a property the diagram carries and not a label a driver applied,");
-    println!("  and the gauge is not vacuous: it has elements that CAN differ, and the control that");
+    println!(
+        "  So co-presence is a property the diagram carries and not a label a driver applied,"
+    );
+    println!(
+        "  and the gauge is not vacuous: it has elements that CAN differ, and the control that"
+    );
     println!("  makes them differ is exhibited beside them rather than argued.");
     println!();
     println!("  AND A QUALIFICATION THE CONTROL FOUND ON THE WAY, which the empty orbit hides.");
     println!("  A front is realized SEQUENTIALLY, not simultaneously: `realize` writes each");
-    println!("  occurrence's output into the standing map as it goes, so a later member of the same");
+    println!(
+        "  occurrence's output into the standing map as it goes, so a later member of the same"
+    );
     println!("  front can read an earlier one's output. Dragging a consumer into its producer's");
-    println!("  front and appending it AFTER the producer therefore returns identically and refuses");
+    println!(
+        "  front and appending it AFTER the producer therefore returns identically and refuses"
+    );
     println!("  nothing — measured, twice, before this control was rebuilt to insert it FIRST.");
     println!();
     println!("  What `realize` enforces is DATAFLOW, not front membership. The fronts are honest");
-    println!("  because `layers()` puts no producer and consumer in one front, and the empty orbit");
+    println!(
+        "  because `layers()` puts no producer and consumer in one front, and the empty orbit"
+    );
     println!("  above is evidence of exactly that and of nothing stronger.");
     println!();
     println!("  THE APERTURE. This certifies the diagram the seal and the cultivation conduct —");
-    println!("  the one `phoenix/site.rs` founds. `the_bound_diagram_conducts_one_site` builds its");
+    println!(
+        "  the one `phoenix/site.rs` founds. `the_bound_diagram_conducts_one_site` builds its"
+    );
     println!("  own complex of the SAME physical site and returns 120 occurrences over 21 fronts,");
     println!("  and that diagram is NOT certified here. The known difference between them is that");
     println!("  the shared site supplies the band ladder from the carrier by name instead of");

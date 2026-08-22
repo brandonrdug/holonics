@@ -35,7 +35,8 @@ use std::collections::BTreeMap;
 use crate::ported_operation::OperationSpecies;
 use crate::resident_law::{EntailmentRefusal, LawEntailment, ResidentLaw, ResidentMaterial};
 use crate::resident_section::{
-    AthenaFutureGeometry, AthenaWalkGeometry, Lane, LawShape, Positions, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, StagedWords,
+    AthenaFutureGeometry, AthenaWalkGeometry, Lane, LawShape, Positions, ResidentGrain,
+    ResidentRefusal, ResidentSection, ResidentSurface, StagedWords,
 };
 use crate::source_occurrence::BindingValidation;
 
@@ -73,7 +74,12 @@ impl AthenaArrays {
         Ok(())
     }
 
-    fn shapes_entailed(&self, validation: &BindingValidation, law: &'static str, with_standing: bool) -> Result<Vec<(String, String, String)>, EntailmentRefusal> {
+    fn shapes_entailed(
+        &self,
+        validation: &BindingValidation,
+        law: &'static str,
+        with_standing: bool,
+    ) -> Result<Vec<(String, String, String)>, EntailmentRefusal> {
         let mut parameters = Vec::new();
         let mut need: Vec<(&str, &String, Vec<usize>)> = vec![
             ("indptr", &self.indptr, vec![self.classes + 1, 1]),
@@ -85,14 +91,26 @@ impl AthenaArrays {
             need.push(("standing", &self.standing, vec![self.classes, 1]));
         }
         for (parameter, name, shape) in need {
-            match validation.shapes.iter().find(|(p, s)| p == name && *s == shape) {
-                Some((p, s)) => parameters.push((parameter.to_owned(), format!("{name} {shape:?}"), format!("declared shape {p}: {s:?}"))),
+            match validation
+                .shapes
+                .iter()
+                .find(|(p, s)| p == name && *s == shape)
+            {
+                Some((p, s)) => parameters.push((
+                    parameter.to_owned(),
+                    format!("{name} {shape:?}"),
+                    format!("declared shape {p}: {s:?}"),
+                )),
                 None => {
                     return Err(EntailmentRefusal::ParameterUnentailed {
                         law,
                         parameter,
                         value: format!("{name} {shape:?}"),
-                        testimony: validation.shapes.iter().map(|(p, s)| format!("{p}: {s:?}")).collect(),
+                        testimony: validation
+                            .shapes
+                            .iter()
+                            .map(|(p, s)| format!("{p}: {s:?}"))
+                            .collect(),
                     });
                 }
             }
@@ -116,17 +134,39 @@ impl AthenaArrays {
 
 /// A law binds only when the rest itself carries the statement. A description is exterior testimony
 /// **here** because the rest emitted it; the same testimony on a foreign container is a name.
-fn declared(validation: &BindingValidation, law: &'static str, statement: &str) -> Result<(String, String, String), EntailmentRefusal> {
-    if validation.descriptions.iter().any(|carried| carried == statement) {
-        Ok(("law".to_owned(), law.to_owned(), "the rest's own declaration of this law".to_owned()))
+fn declared(
+    validation: &BindingValidation,
+    law: &'static str,
+    statement: &str,
+) -> Result<(String, String, String), EntailmentRefusal> {
+    if validation
+        .descriptions
+        .iter()
+        .any(|carried| carried == statement)
+    {
+        Ok((
+            "law".to_owned(),
+            law.to_owned(),
+            "the rest's own declaration of this law".to_owned(),
+        ))
     } else {
-        Err(EntailmentRefusal::SliceDoesNotEntail { law, required_any_of: vec![law], offered: validation.descriptions.clone() })
+        Err(EntailmentRefusal::SliceDoesNotEntail {
+            law,
+            required_any_of: vec![law],
+            offered: validation.descriptions.clone(),
+        })
     }
 }
 
 fn integer_grain(operation: &'static str, grain: ResidentGrain) -> Result<(), ResidentRefusal> {
     if grain.0 != 0 {
-        return Err(ResidentRefusal::Declaration { operation, what: format!("the native atlas words are integers: grain 2^0 is declared, not 2^-{}", grain.0) });
+        return Err(ResidentRefusal::Declaration {
+            operation,
+            what: format!(
+                "the native atlas words are integers: grain 2^0 is declared, not 2^-{}",
+                grain.0
+            ),
+        });
     }
     Ok(())
 }
@@ -148,15 +188,28 @@ pub struct AthenaWalk {
 
 impl AthenaWalk {
     fn prompts(&self, material: &ResidentMaterial<'_>) -> usize {
-        material.arrays.get(&self.offsets).map(|offsets| offsets.rows().saturating_sub(1)).unwrap_or(0)
+        material
+            .arrays
+            .get(&self.offsets)
+            .map(|offsets| offsets.rows().saturating_sub(1))
+            .unwrap_or(0)
     }
 }
 
 impl ResidentLaw for AthenaWalk {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let mut parameters = self.arrays.shapes_entailed(validation, "athena-walk", false)?;
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut parameters = self
+            .arrays
+            .shapes_entailed(validation, "athena-walk", false)?;
         parameters.push(declared(validation, "athena-walk", WALK_LAW)?);
-        Ok(LawEntailment { law: "athena-walk", parameters, naming_slices: vec![WALK_LAW.to_owned()] })
+        Ok(LawEntailment {
+            law: "athena-walk",
+            parameters,
+            naming_slices: vec![WALK_LAW.to_owned()],
+        })
     }
     fn name(&self) -> &'static str {
         "athena-walk"
@@ -176,15 +229,36 @@ impl ResidentLaw for AthenaWalk {
         }
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, _inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        _inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         33 // a class index or a mark, below 2^32, at grain 2^0
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, _inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        _inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         integer_grain("athena-walk", grain)?;
         let positions = material.arrays[&self.prompt].rows();
-        surface.shape_athena_walk(positions, self.prompts(material), self.arrays.classes, self.arrays.transitions, self.geometry)
+        surface.shape_athena_walk(
+            positions,
+            self.prompts(material),
+            self.arrays.classes,
+            self.arrays.transitions,
+            self.geometry,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         let mut out = self.arrays.ranges(material, false);
         out.push(material.arrays[&self.prompt].range());
         out.push(material.arrays[&self.offsets].range());
@@ -240,11 +314,20 @@ impl AthenaFuture {
 }
 
 impl ResidentLaw for AthenaFuture {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let statement = if self.depth { DEPTH_LAW } else { FUTURE_LAW };
-        let mut parameters = self.arrays.shapes_entailed(validation, self.law(), !self.depth)?;
+        let mut parameters = self
+            .arrays
+            .shapes_entailed(validation, self.law(), !self.depth)?;
         parameters.push(declared(validation, self.law(), statement)?);
-        Ok(LawEntailment { law: self.law(), parameters, naming_slices: vec![statement.to_owned()] })
+        Ok(LawEntailment {
+            law: self.law(),
+            parameters,
+            naming_slices: vec![statement.to_owned()],
+        })
     }
     fn name(&self) -> &'static str {
         self.law()
@@ -258,18 +341,44 @@ impl ResidentLaw for AthenaFuture {
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
         self.arrays.present(material, !self.depth)
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, _inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        _inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         33 // a standing below 2^32, or a depth below the class count, at grain 2^0
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         integer_grain(self.law(), grain)?;
         let (positions, width, _) = inputs.first().copied().unwrap_or((0, 0, 0));
         if width != 2 {
-            return Err(ResidentRefusal::WidthDisagrees { operation: self.law(), left: width, right: 2 });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: self.law(),
+                left: width,
+                right: 2,
+            });
         }
-        surface.shape_athena_future(positions, self.arrays.vocabulary, self.arrays.classes, self.arrays.transitions, self.depth, self.geometry)
+        surface.shape_athena_future(
+            positions,
+            self.arrays.vocabulary,
+            self.arrays.classes,
+            self.arrays.transitions,
+            self.depth,
+            self.geometry,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         self.arrays.ranges(material, !self.depth)
     }
     fn record<'chart>(
@@ -284,7 +393,11 @@ impl ResidentLaw for AthenaFuture {
     ) -> Result<(), ResidentRefusal> {
         // The depth face reads no standing: the value it returns is the height of the arc, so the
         // suffix array stands in for the standing pointer and the kernel never dereferences it.
-        let standing = if self.depth { &material.arrays[&self.arrays.suffix] } else { &material.arrays[&self.arrays.standing] };
+        let standing = if self.depth {
+            &material.arrays[&self.arrays.suffix]
+        } else {
+            &material.arrays[&self.arrays.standing]
+        };
         surface.record_athena_future(
             lane,
             &material.arrays[&self.arrays.indptr],
@@ -327,9 +440,13 @@ mod tests {
             species: OperationSpecies::Construction,
             symbols: Vec::new(),
             fields: Vec::new(),
-            shapes: shapes.iter().map(|(p, s)| ((*p).to_owned(), s.to_vec())).collect(),
+            shapes: shapes
+                .iter()
+                .map(|(p, s)| ((*p).to_owned(), s.to_vec()))
+                .collect(),
             interventions: Vec::new(),
             descriptions: descriptions.iter().map(|d| (*d).to_owned()).collect(),
+            exact_owner_licenses: Vec::new(),
         }
     }
 
@@ -350,7 +467,9 @@ mod tests {
             ("athena.transport.target", &[6, 1]),
             ("athena.class.suffix", &[4, 1]),
         ];
-        let entailed = walk().entailment(&validation(&complete, &[WALK_LAW])).expect("the rest declares the walk");
+        let entailed = walk()
+            .entailment(&validation(&complete, &[WALK_LAW]))
+            .expect("the rest declares the walk");
         assert_eq!(entailed.law, "athena-walk");
         // four populations plus the rest's own statement of the law
         assert_eq!(entailed.parameters.len(), 5);
@@ -358,7 +477,11 @@ mod tests {
 
         // **An unrelated statement does not authenticate this law.** This is the native twin of a
         // valid but unrelated implementation slice refusing to authenticate a foreign binding.
-        assert!(walk().entailment(&validation(&complete, &[FUTURE_LAW])).is_err());
+        assert!(
+            walk()
+                .entailment(&validation(&complete, &[FUTURE_LAW]))
+                .is_err()
+        );
         assert!(walk().entailment(&validation(&complete, &[])).is_err());
         // and a declared shape that disagrees with the law's own extents refuses by parameter
         let drifted: Vec<(&str, &[usize])> = vec![
@@ -367,12 +490,21 @@ mod tests {
             ("athena.transport.target", &[6, 1]),
             ("athena.class.suffix", &[4, 1]),
         ];
-        assert!(walk().entailment(&validation(&drifted, &[WALK_LAW])).is_err());
+        assert!(
+            walk()
+                .entailment(&validation(&drifted, &[WALK_LAW]))
+                .is_err()
+        );
     }
 
     #[test]
     fn the_future_face_needs_the_standing_and_the_depth_face_does_not() {
-        let geometry = AthenaFutureGeometry { positions_per_block: 1, lanes: 32, germs_per_lane: 1, chain_stage: 0 };
+        let geometry = AthenaFutureGeometry {
+            positions_per_block: 1,
+            lanes: 32,
+            germs_per_lane: 1,
+            chain_stage: 0,
+        };
         let without_standing: Vec<(&str, &[usize])> = vec![
             ("athena.transport.indptr", &[5, 1]),
             ("athena.transport.germ", &[6, 1]),
@@ -382,21 +514,49 @@ mod tests {
         let mut with_standing = without_standing.clone();
         with_standing.push(("athena.class.standing", &[4, 1]));
 
-        let standing_face = AthenaFuture { arrays: arrays(), depth: false, geometry };
-        let depth_face = AthenaFuture { arrays: arrays(), depth: true, geometry };
+        let standing_face = AthenaFuture {
+            arrays: arrays(),
+            depth: false,
+            geometry,
+        };
+        let depth_face = AthenaFuture {
+            arrays: arrays(),
+            depth: true,
+            geometry,
+        };
         assert_eq!(standing_face.name(), "athena-future");
         assert_eq!(depth_face.name(), "athena-depth");
         assert_eq!(standing_face.species(), OperationSpecies::Transport);
         assert_eq!(standing_face.arity(), (1, 1));
 
-        assert!(standing_face.entailment(&validation(&with_standing, &[FUTURE_LAW])).is_ok());
+        assert!(
+            standing_face
+                .entailment(&validation(&with_standing, &[FUTURE_LAW]))
+                .is_ok()
+        );
         // the standing face without the standing population is unentailed, by name
-        assert!(standing_face.entailment(&validation(&without_standing, &[FUTURE_LAW])).is_err());
+        assert!(
+            standing_face
+                .entailment(&validation(&without_standing, &[FUTURE_LAW]))
+                .is_err()
+        );
         // the depth face returns the height of the arc and reads no standing at all
-        assert!(depth_face.entailment(&validation(&without_standing, &[DEPTH_LAW])).is_ok());
+        assert!(
+            depth_face
+                .entailment(&validation(&without_standing, &[DEPTH_LAW]))
+                .is_ok()
+        );
         // and neither face is authenticated by the other's statement
-        assert!(depth_face.entailment(&validation(&with_standing, &[FUTURE_LAW])).is_err());
-        assert!(standing_face.entailment(&validation(&with_standing, &[DEPTH_LAW])).is_err());
+        assert!(
+            depth_face
+                .entailment(&validation(&with_standing, &[FUTURE_LAW]))
+                .is_err()
+        );
+        assert!(
+            standing_face
+                .entailment(&validation(&with_standing, &[DEPTH_LAW]))
+                .is_err()
+        );
     }
 
     #[test]

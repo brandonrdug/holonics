@@ -576,6 +576,12 @@ impl ResidentReadout {
             });
         }
         let rows = readout.entries.len() / dim;
+        let exact_matrix_sha256 = crate::exact_owner_testimony::aligned_matrix_identity(
+            readout, dim,
+        )
+        .map_err(|error| FiberError::MouthRefused {
+            reason: error.to_string(),
+        })?;
         let bytes = std::mem::size_of_val(readout.entries.as_slice());
         unsafe {
             checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
@@ -596,6 +602,7 @@ impl ResidentReadout {
                 entry_octaves: readout.entry_octaves,
                 exponent: readout.exponent,
                 octets: bytes,
+                exact_matrix_sha256: Some(exact_matrix_sha256),
                 owned: true,
             })
         }
@@ -798,6 +805,7 @@ impl ResidentReadout {
                 entry_octaves: read_back[1],
                 exponent: lowest,
                 octets: aligned_octets,
+                exact_matrix_sha256: None,
                 owned: true,
             })
         }
@@ -823,7 +831,6 @@ impl ResidentReadout {
         self.mount(readout, dim)?.score(query, addresses)
     }
 }
-
 
 /// **One map's place in a batched pooled mount.** Every address is the caller's pool: the stored
 /// codewords already copied in, the aligned standing to write, and the row-mass pair to reduce
@@ -893,7 +900,10 @@ impl ResidentReadout {
         let mut grids = Vec::with_capacity(requests.len());
         for request in requests {
             if request.dim == 0 || request.count as usize % request.dim != 0 {
-                return Err(FiberError::RaggedReadout { words: request.count as usize, dim: request.dim });
+                return Err(FiberError::RaggedReadout {
+                    words: request.count as usize,
+                    dim: request.dim,
+                });
             }
             grids.push(
                 self.launch
@@ -927,11 +937,26 @@ impl ResidentReadout {
                     (&raw const refused_slot as *mut CuDevicePtr).cast(),
                 ];
                 checked(
-                    cuLaunchKernel(self.lowest_exponent, grids[which], 1, 1, block, 1, 1, 0, stream, parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    cuLaunchKernel(
+                        self.lowest_exponent,
+                        grids[which],
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
                     "cuLaunchKernel(bfloat16_lowest_exponent)",
                 )?;
             }
-            checked(cuStreamSynchronize(stream), "cuStreamSynchronize(pooled mount, exponents)")?;
+            checked(
+                cuStreamSynchronize(stream),
+                "cuStreamSynchronize(pooled mount, exponents)",
+            )?;
             let mut words = vec![0u32; 4 * requests.len()];
             checked(
                 cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
@@ -941,7 +966,9 @@ impl ResidentReadout {
             for which in 0..requests.len() {
                 if words[4 * which + 3] & 1 != 0 {
                     return Err(FiberError::MouthRefused {
-                        reason: format!("stored map {which} of the batch carries a pattern that is not a finite BF16 value"),
+                        reason: format!(
+                            "stored map {which} of the batch carries a pattern that is not a finite BF16 value"
+                        ),
                     });
                 }
                 let read = words[4 * which] as i32;
@@ -969,17 +996,34 @@ impl ResidentReadout {
                     (&raw const refused_slot as *mut CuDevicePtr).cast(),
                 ];
                 checked(
-                    cuLaunchKernel(self.align, grids[which], 1, 1, block, 1, 1, 0, stream, parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    cuLaunchKernel(
+                        self.align,
+                        grids[which],
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
                     "cuLaunchKernel(bfloat16_align)",
                 )?;
                 if request.rows == 0 {
                     continue;
                 }
-                let mass_work = u32::try_from(request.rows).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
-                let mass_grid = self.launch.grid_for(mass_work).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mass_work = u32::try_from(request.rows)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mass_grid = self
+                    .launch
+                    .grid_for(mass_work)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
                 let mut mass_resident = request.aligned;
                 let mut rows_arg = mass_work;
-                let mut dim_arg = u32::try_from(request.dim).map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mut dim_arg = u32::try_from(request.dim)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
                 let mut low = request.mass;
                 let mut high = request.mass + (request.rows * 8) as u64;
                 let mut mass_parameters: [*mut c_void; 5] = [
@@ -990,11 +1034,26 @@ impl ResidentReadout {
                     (&raw mut high).cast(),
                 ];
                 checked(
-                    cuLaunchKernel(self.row_mass, mass_grid, 1, 1, block, 1, 1, 0, stream, mass_parameters.as_mut_ptr(), std::ptr::null_mut()),
+                    cuLaunchKernel(
+                        self.row_mass,
+                        mass_grid,
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        mass_parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
                     "cuLaunchKernel(exact_row_absolute_mass)",
                 )?;
             }
-            checked(cuStreamSynchronize(stream), "cuStreamSynchronize(pooled mount, alignment)")?;
+            checked(
+                cuStreamSynchronize(stream),
+                "cuStreamSynchronize(pooled mount, alignment)",
+            )?;
             checked(
                 cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
                 "cuMemcpy(pooled scratch back)",
@@ -1011,15 +1070,29 @@ impl ResidentReadout {
                 } else {
                     let mut low = vec![0u64; request.rows];
                     let mut high = vec![0i64; request.rows];
-                    checked(cuMemcpyDtoH_v2(low.as_mut_ptr().cast(), request.mass, request.rows * 8), "cuMemcpy(pooled mass low)")?;
-                    checked(cuMemcpyDtoH_v2(high.as_mut_ptr().cast(), request.mass + (request.rows * 8) as u64, request.rows * 8), "cuMemcpy(pooled mass high)")?;
+                    checked(
+                        cuMemcpyDtoH_v2(low.as_mut_ptr().cast(), request.mass, request.rows * 8),
+                        "cuMemcpy(pooled mass low)",
+                    )?;
+                    checked(
+                        cuMemcpyDtoH_v2(
+                            high.as_mut_ptr().cast(),
+                            request.mass + (request.rows * 8) as u64,
+                            request.rows * 8,
+                        ),
+                        "cuMemcpy(pooled mass high)",
+                    )?;
                     let widest = low
                         .iter()
                         .zip(&high)
-                        .map(|(low, high)| (((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF)).unsigned_abs())
+                        .map(|(low, high)| {
+                            (((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF))
+                                .unsigned_abs()
+                        })
                         .max()
                         .unwrap_or(0);
-                    let octaves = i64::from(128 - widest.leading_zeros()) + i64::from(lowest[which]);
+                    let octaves =
+                        i64::from(128 - widest.leading_zeros()) + i64::from(lowest[which]);
                     u32::try_from(octaves.max(0)).unwrap_or(0)
                 };
                 mounted.push(PooledReadout {
@@ -1031,6 +1104,7 @@ impl ResidentReadout {
                         entry_octaves: words[4 * which + 1],
                         exponent: lowest[which],
                         octets: request.count as usize * std::mem::size_of::<i64>(),
+                        exact_matrix_sha256: None,
                         owned: false,
                     },
                     mass_value_octaves,
@@ -1053,6 +1127,8 @@ pub struct MountedReadout<'chart> {
     entry_octaves: u32,
     exponent: i32,
     octets: usize,
+    /// Exact rational content identity where the aligned mouth carried one complete matrix.
+    exact_matrix_sha256: Option<String>,
     /// Whether this handle owns the allocation it names. A readout mounted into a caller's pooled
     /// standing borrows it: the pool outlives the handle and releases once, so a borrowed handle
     /// that freed on drop would free a live slot. **The flag is about ownership, not about the
@@ -1061,6 +1137,9 @@ pub struct MountedReadout<'chart> {
 }
 
 impl MountedReadout<'_> {
+    pub fn exact_matrix_sha256(&self) -> Option<&str> {
+        self.exact_matrix_sha256.as_deref()
+    }
     /// The resident aligned words, for a sibling owner in this crate contracting a resident section
     /// through this map inside the same context. Crate-private for the same reason as
     /// [`ResidentReadout::raw_context`].

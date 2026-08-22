@@ -53,12 +53,14 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use holonic_engine::causal::EventId;
-use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
+use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
 use holonic_engine::front_passage::{
-    CompileRefusal, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialAdmission, ResidentMaterial,
-    SealedMidpointQuotient,
+    CompileRefusal, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialAdmission,
+    ResidentMaterial, SealedMidpointQuotient,
 };
-use holonic_engine::resident_section::{Dyadic, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, SlotReading};
+use holonic_engine::resident_section::{
+    Dyadic, ResidentGrain, ResidentSection, ResidentSurface, SeriesAperture, SlotReading,
+};
 use holonic_engine::source_occurrence::{RegionIdentity, SourceOccurrence};
 use resident_layer::Source;
 use tower::{Entry, Intervention, Species};
@@ -96,7 +98,13 @@ fn parse_args() -> Args {
             "--out" => args.out = PathBuf::from(it.next().expect("--out <dir>")),
             "--grain" => args.grain = it.next().expect("--grain F").parse().expect("u32"),
             "--terms" => args.terms = it.next().expect("--terms N").parse().expect("u32"),
-            "--census-repeats" => args.census_repeats = it.next().expect("--census-repeats N").parse().expect("usize"),
+            "--census-repeats" => {
+                args.census_repeats = it
+                    .next()
+                    .expect("--census-repeats N")
+                    .parse()
+                    .expect("usize")
+            }
             other => panic!("unknown argument {other}"),
         }
     }
@@ -105,15 +113,34 @@ fn parse_args() -> Args {
 
 fn describe(obstruction: &FrontPassageObstruction) -> String {
     match obstruction {
-        FrontPassageObstruction::Cover { front, barriers } => format!("CoverBarrier at front {front}: {barriers:?}"),
-        FrontPassageObstruction::Interchange { front, because, .. } => format!("InterchangeRefusal at front {front}: {because:?}"),
+        FrontPassageObstruction::Cover { front, barriers } => {
+            format!("CoverBarrier at front {front}: {barriers:?}")
+        }
+        FrontPassageObstruction::Interchange { front, because, .. } => {
+            format!("InterchangeRefusal at front {front}: {because:?}")
+        }
         FrontPassageObstruction::Resource(resource) => format!("ResourceObstruction: {resource:?}"),
         FrontPassageObstruction::Compile(refusal) => format!("CompileRefusal: {refusal:?}"),
-        FrontPassageObstruction::Refused { occurrence, operation, refusal, lineage, .. } => {
-            format!("the card refused at {occurrence:?} ({operation}): {refusal}; lineage {:?}", lineage.refusals)
+        FrontPassageObstruction::Refused {
+            occurrence,
+            operation,
+            refusal,
+            lineage,
+            ..
+        } => {
+            format!(
+                "the card refused at {occurrence:?} ({operation}): {refusal}; lineage {:?}",
+                lineage.refusals
+            )
         }
-        FrontPassageObstruction::Sealed { occurrence, quotient, reopening } => {
-            format!("the face at {occurrence:?} was sealed away by the fused quotient {quotient:?}; reopening: {reopening}")
+        FrontPassageObstruction::Sealed {
+            occurrence,
+            quotient,
+            reopening,
+        } => {
+            format!(
+                "the face at {occurrence:?} was sealed away by the fused quotient {quotient:?}; reopening: {reopening}"
+            )
         }
     }
 }
@@ -153,7 +180,11 @@ mod mirror {
         let m = magnitude(v);
         if s >= 0 {
             let shifted = m << (s as u32);
-            return if negative { -(shifted as W) } else { shifted as W };
+            return if negative {
+                -(shifted as W)
+            } else {
+                shifted as W
+            };
         }
         let k = (-s) as u32;
         if k >= 128 {
@@ -171,7 +202,11 @@ mod mirror {
         let m = magnitude(v);
         if s >= 0 {
             let shifted = m << (s as u32);
-            return if negative { -(shifted as W) } else { shifted as W };
+            return if negative {
+                -(shifted as W)
+            } else {
+                shifted as W
+            };
         }
         let k = (-s) as u32;
         if k >= 128 {
@@ -186,20 +221,12 @@ mod mirror {
 
     pub fn div_floor(n: W, d: W) -> W {
         let q = n / d;
-        if n % d != 0 && n < 0 {
-            q - 1
-        } else {
-            q
-        }
+        if n % d != 0 && n < 0 { q - 1 } else { q }
     }
 
     pub fn div_ceil(n: W, d: W) -> W {
         let q = n / d;
-        if n % d != 0 && n > 0 {
-            q + 1
-        } else {
-            q
-        }
+        if n % d != 0 && n > 0 { q + 1 } else { q }
     }
 
     fn mul_magnitude_256(a: u128, b: u128) -> (u128, u128) {
@@ -272,22 +299,24 @@ mod mirror {
 
     pub fn isqrt_ceil(a: W) -> W {
         let f = isqrt_floor(a);
-        if f * f == a {
-            f
-        } else {
-            f + 1
-        }
+        if f * f == a { f } else { f + 1 }
     }
 
     pub fn corners(a: W, b: W, c: W, d: W) -> (W, W) {
         let p = [a * c, a * d, b * c, b * d];
-        (*p.iter().min().expect("four"), *p.iter().max().expect("four"))
+        (
+            *p.iter().min().expect("four"),
+            *p.iter().max().expect("four"),
+        )
     }
 
     pub fn interval_quotient(n_lo: W, n_hi: W, d_lo: W, d_hi: W, lift: i32) -> (W, W) {
         let nl = shift_floor(n_lo, lift);
         let nh = shift_ceil(n_hi, lift);
-        (div_floor(nl, if nl < 0 { d_lo } else { d_hi }), div_ceil(nh, if nh < 0 { d_hi } else { d_lo }))
+        (
+            div_floor(nl, if nl < 0 { d_lo } else { d_hi }),
+            div_ceil(nh, if nh < 0 { d_hi } else { d_lo }),
+        )
     }
 
     pub const SERIES_GRAIN: i32 = 60;
@@ -344,7 +373,10 @@ mod mirror {
                 e_hi = one;
             }
         }
-        (shift_floor(e_lo, grain - SERIES_GRAIN), shift_ceil(e_hi, grain - SERIES_GRAIN))
+        (
+            shift_floor(e_lo, grain - SERIES_GRAIN),
+            shift_ceil(e_hi, grain - SERIES_GRAIN),
+        )
     }
 }
 
@@ -395,8 +427,16 @@ struct ReductionExposure {
 fn write_exposure(form: &mut String, exposure: &ReductionExposure) {
     let _ = writeln!(form, "    ---- {} · {}", exposure.owner, exposure.coupling);
     let _ = writeln!(form, "      kernel                {}", exposure.kernel);
-    let _ = writeln!(form, "      pivot                 {} (extent {})", exposure.pivot, exposure.extent);
-    let _ = writeln!(form, "      capacity per round    {} lanes", exposure.capacity);
+    let _ = writeln!(
+        form,
+        "      pivot                 {} (extent {})",
+        exposure.pivot, exposure.extent
+    );
+    let _ = writeln!(
+        form,
+        "      capacity per round    {} lanes",
+        exposure.capacity
+    );
     let _ = writeln!(form, "      the FIXED word        {}", exposure.word);
     let _ = writeln!(form, "      leaves                {}", exposure.leaves);
     let _ = writeln!(
@@ -409,14 +449,36 @@ fn write_exposure(form: &mut String, exposure: &ReductionExposure) {
             "a strided set is NOT a SectionRegion, so H1's junction cannot certify this partition as it stands; the word, depth, widths and on-card agreement are carried instead"
         }
     );
-    let _ = writeln!(form, "      depth                 {} joins from root to leaf", exposure.depth);
-    let _ = writeln!(form, "      barriers              {} __syncthreads in this pass; {} in the kernel", exposure.barriers_this_pass, exposure.barriers_kernel_total);
-    let _ = writeln!(form, "      per-node widths, by level (level, widest node octaves, nodes at that level):");
+    let _ = writeln!(
+        form,
+        "      depth                 {} joins from root to leaf",
+        exposure.depth
+    );
+    let _ = writeln!(
+        form,
+        "      barriers              {} __syncthreads in this pass; {} in the kernel",
+        exposure.barriers_this_pass, exposure.barriers_kernel_total
+    );
+    let _ = writeln!(
+        form,
+        "      per-node widths, by level (level, widest node octaves, nodes at that level):"
+    );
     for (level, widest, nodes) in &exposure.level_widths {
-        let _ = writeln!(form, "        level {level:>2}  widest {widest:>4} octaves  {nodes:>6} nodes");
+        let _ = writeln!(
+            form,
+            "        level {level:>2}  widest {widest:>4} octaves  {nodes:>6} nodes"
+        );
     }
-    let _ = writeln!(form, "      peak intermediate     {} octaves", exposure.peak_width_bits);
-    let _ = writeln!(form, "      a-priori bound        {} octaves — {}", exposure.a_priori_bound_bits, exposure.a_priori_law);
+    let _ = writeln!(
+        form,
+        "      peak intermediate     {} octaves",
+        exposure.peak_width_bits
+    );
+    let _ = writeln!(
+        form,
+        "      a-priori bound        {} octaves — {}",
+        exposure.a_priori_bound_bits, exposure.a_priori_law
+    );
     let _ = writeln!(
         form,
         "      the bound HOLDS: {} ({} <= {})",
@@ -433,7 +495,11 @@ fn write_exposure(form: &mut String, exposure: &ReductionExposure) {
 /// The per-level widths of the shared-memory tree the kernel enacts:
 /// `for (stride = B/2; stride > 0; stride >>= 1) if (t < stride) s[t] = join(s[t], s[t + stride])`.
 /// The leaves are already the per-thread strided partials; this returns `(level, widest, nodes)`.
-fn tree_levels<T: Copy, F: Fn(T, T) -> T, M: Fn(T) -> u32>(leaves: &[T], join: F, measure: M) -> (Vec<(usize, u32, usize)>, u32) {
+fn tree_levels<T: Copy, F: Fn(T, T) -> T, M: Fn(T) -> u32>(
+    leaves: &[T],
+    join: F,
+    measure: M,
+) -> (Vec<(usize, u32, usize)>, u32) {
     let mut nodes: Vec<T> = leaves.to_vec();
     let mut levels = Vec::new();
     let mut peak = nodes.iter().map(|n| measure(*n)).max().unwrap_or(0);
@@ -444,7 +510,11 @@ fn tree_levels<T: Copy, F: Fn(T, T) -> T, M: Fn(T) -> u32>(leaves: &[T], join: F
         for t in 0..stride {
             nodes[t] = join(nodes[t], nodes[t + stride]);
         }
-        let widest = nodes[..stride].iter().map(|n| measure(*n)).max().unwrap_or(0);
+        let widest = nodes[..stride]
+            .iter()
+            .map(|n| measure(*n))
+            .max()
+            .unwrap_or(0);
         peak = peak.max(widest);
         levels.push((level, widest, stride));
         level += 1;
@@ -498,30 +568,52 @@ struct Conducted<'a> {
     launch_wall_s: f64,
 }
 
-fn names_of(complex: &holonic_engine::ported_operation::PortedOperationComplex) -> BTreeMap<EventId, String> {
+fn names_of(
+    complex: &holonic_engine::ported_operation::PortedOperationComplex,
+) -> BTreeMap<EventId, String> {
     complex
         .shape
         .occurrences
         .iter()
-        .map(|(event, occurrence)| (*event, complex.shape.laws.get(&occurrence.law).map(|l| l.name.clone()).unwrap_or_default()))
+        .map(|(event, occurrence)| {
+            (
+                *event,
+                complex
+                    .shape
+                    .laws
+                    .get(&occurrence.law)
+                    .map(|l| l.name.clone())
+                    .unwrap_or_default(),
+            )
+        })
         .collect()
 }
 
-fn arriving_of(complex: &holonic_engine::ported_operation::PortedOperationComplex) -> BTreeMap<EventId, Vec<EventId>> {
+fn arriving_of(
+    complex: &holonic_engine::ported_operation::PortedOperationComplex,
+) -> BTreeMap<EventId, Vec<EventId>> {
     let mut arriving: BTreeMap<EventId, Vec<EventId>> = BTreeMap::new();
     for interaction in complex.shape.interactions.values() {
         for bond in &interaction.bonds {
-            arriving.entry(bond.target.event).or_default().push(bond.source.event);
+            arriving
+                .entry(bond.target.event)
+                .or_default()
+                .push(bond.source.event);
         }
     }
     arriving
 }
 
-fn consumers_of(complex: &holonic_engine::ported_operation::PortedOperationComplex) -> BTreeMap<EventId, Vec<EventId>> {
+fn consumers_of(
+    complex: &holonic_engine::ported_operation::PortedOperationComplex,
+) -> BTreeMap<EventId, Vec<EventId>> {
     let mut consumers: BTreeMap<EventId, Vec<EventId>> = BTreeMap::new();
     for interaction in complex.shape.interactions.values() {
         for bond in &interaction.bonds {
-            consumers.entry(bond.source.event).or_default().push(bond.target.event);
+            consumers
+                .entry(bond.source.event)
+                .or_default()
+                .push(bond.target.event);
         }
     }
     consumers
@@ -545,10 +637,19 @@ fn mount_material<'chart>(
     let layer_scalar = mount.layer_scalar.ok_or("layer_scalar")?;
     let species = Species::of(layer);
     let bands = tower::found_bands(species, resident_layer::BAND_TERMS)?;
-    let mounted_bands = surface.mount_bands(&bands, tower::BAND_GRAIN).map_err(|e| e.to_string())?;
-    material.bands.insert(species.bands().to_owned(), (mounted_bands, (tokens.len() - 1) as u32));
+    let mounted_bands = surface
+        .mount_bands(&bands, tower::BAND_GRAIN)
+        .map_err(|e| e.to_string())?;
+    material.bands.insert(
+        species.bands().to_owned(),
+        (mounted_bands, (tokens.len() - 1) as u32),
+    );
     let positions: Vec<u32> = (0..tokens.len() as u32).collect();
-    material.positions = Some(surface.mount_positions(&positions).map_err(|e| e.to_string())?);
+    material.positions = Some(
+        surface
+            .mount_positions(&positions)
+            .map_err(|e| e.to_string())?,
+    );
     tower::enter(source, tokens, layer, &mut material)?;
     Ok((material, layer_scalar))
 }
@@ -566,7 +667,10 @@ fn main() {
         .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
         .unwrap_or_else(|| "unknown".to_owned());
     let mut form = String::new();
-    let _ = writeln!(form, "THE REDUCTIONS EXPOSE THEIR WORDS AND THE QUOTIENT FUSES LAWFULLY — Deed H3");
+    let _ = writeln!(
+        form,
+        "THE REDUCTIONS EXPOSE THEIR WORDS AND THE QUOTIENT FUSES LAWFULLY — Deed H3"
+    );
     let _ = writeln!(form, "  closure commit {commit}");
 
     let readout: &'static ResidentReadout = match ResidentReadout::new() {
@@ -593,7 +697,11 @@ fn main() {
         surface.memory_at_mount().free_bytes,
         surface.memory_at_mount().total_bytes
     );
-    let _ = writeln!(form, "  tokens {:?} · grain 2^-{} · series terms {}", args.tokens, args.grain, args.terms);
+    let _ = writeln!(
+        form,
+        "  tokens {:?} · grain 2^-{} · series terms {}",
+        args.tokens, args.grain, args.terms
+    );
     let _ = writeln!(form);
 
     if let Err(error) = run(surface, readout, &args, &mut form) {
@@ -602,9 +710,16 @@ fn main() {
         let _ = std::fs::write(args.out.join("receipt.form"), &form);
         std::process::exit(4);
     }
-    let _ = writeln!(form, "  whole deed wall {:.3} s (frame: this process, one card, display attached)", whole.elapsed().as_secs_f64());
+    let _ = writeln!(
+        form,
+        "  whole deed wall {:.3} s (frame: this process, one card, display attached)",
+        whole.elapsed().as_secs_f64()
+    );
     std::fs::write(args.out.join("receipt.form"), &form).expect("receipt");
-    println!("\n  receipt written to {}", args.out.join("receipt.form").display());
+    println!(
+        "\n  receipt written to {}",
+        args.out.join("receipt.form").display()
+    );
 }
 
 #[allow(clippy::too_many_lines)]
@@ -631,19 +746,51 @@ fn run(
     //     the entering occurrence stands at all
     // -----------------------------------------------------------------------------------------
     println!("  [D] the mouth's a-priori bound, on the real embedding rows");
-    let _ = writeln!(form, "  [D] THE MOUTH READS ITS MATERIAL — shape_enter's a-priori octave bound");
-    let _ = writeln!(form, "    Until 2026-08-19 `shape_enter` returned `8 + scale octaves + grain + 8` and never looked at a");
-    let _ = writeln!(form, "    word. That is an authored level wearing a derivation: it bounds a HYPOTHETICAL codeword of full");
-    let _ = writeln!(form, "    significand at exponent zero. The H2 driver closed its entering occurrence at");
-    let _ = writeln!(form, "    max(shape.needed, octaves computed from the words) to work around it; that workaround is deleted");
-    let _ = writeln!(form, "    and the reading is in the law. Both `shape_enter` and `Enter::bound_octaves` now take it.");
+    let _ = writeln!(
+        form,
+        "  [D] THE MOUTH READS ITS MATERIAL — shape_enter's a-priori octave bound"
+    );
+    let _ = writeln!(
+        form,
+        "    Until 2026-08-19 `shape_enter` returned `8 + scale octaves + grain + 8` and never looked at a"
+    );
+    let _ = writeln!(
+        form,
+        "    word. That is an authored level wearing a derivation: it bounds a HYPOTHETICAL codeword of full"
+    );
+    let _ = writeln!(
+        form,
+        "    significand at exponent zero. The H2 driver closed its entering occurrence at"
+    );
+    let _ = writeln!(
+        form,
+        "    max(shape.needed, octaves computed from the words) to work around it; that workaround is deleted"
+    );
+    let _ = writeln!(
+        form,
+        "    and the reading is in the law. Both `shape_enter` and `Enter::bound_octaves` now take it."
+    );
     let _ = writeln!(form);
     {
         let mut material = ResidentMaterial::empty();
-        tower::enter(&mut source, &args.tokens, REPRESENTATIVE_LAYER, &mut material)?;
-        let _ = writeln!(form, "    population                            rows x width    authored   read from the words   difference");
-        for (name, scale) in [(tower::ENTERING, tower::EMBED_SCALE), (resident_layer::PLE_ENTERING, tower::PLE_EMBED_SCALE)] {
-            let entering = material.entering.get(name).ok_or_else(|| format!("{name} did not enter"))?;
+        tower::enter(
+            &mut source,
+            &args.tokens,
+            REPRESENTATIVE_LAYER,
+            &mut material,
+        )?;
+        let _ = writeln!(
+            form,
+            "    population                            rows x width    authored   read from the words   difference"
+        );
+        for (name, scale) in [
+            (tower::ENTERING, tower::EMBED_SCALE),
+            (resident_layer::PLE_ENTERING, tower::PLE_EMBED_SCALE),
+        ] {
+            let entering = material
+                .entering
+                .get(name)
+                .ok_or_else(|| format!("{name} did not enter"))?;
             let authored = 8 + scale.octaves() + grain.0 + 8;
             let read = ResidentSurface::entering_octaves(&entering.words, scale, grain);
             let _ = writeln!(
@@ -660,13 +807,20 @@ fn run(
         let wide = [bfloat16_word(255, 46), bfloat16_word(-255, 46)];
         let narrow = [bfloat16_word(1, -20), bfloat16_word(-3, -18)];
         let authored = 8 + Dyadic::ONE.octaves() + grain.0 + 8;
-        let _ = writeln!(form, "    the two fixtures that decide it, at grain 2^-{}:", grain.0);
+        let _ = writeln!(
+            form,
+            "    the two fixtures that decide it, at grain 2^-{}:",
+            grain.0
+        );
         let _ = writeln!(
             form,
             "      a wide bf16 population (255 x 2^46): authored {authored}, read {} — the authored bound was BELOW the",
             ResidentSurface::entering_octaves(&wide, Dyadic::ONE, grain)
         );
-        let _ = writeln!(form, "      material, so the mouth refused BOUND on words it had itself been handed and every successor");
+        let _ = writeln!(
+            form,
+            "      material, so the mouth refused BOUND on words it had itself been handed and every successor"
+        );
         let _ = writeln!(form, "      refused UPSTREAM;");
         let _ = writeln!(
             form,
@@ -674,7 +828,10 @@ fn run(
             ResidentSurface::entering_octaves(&narrow, Dyadic::ONE, grain)
         );
         let _ = writeln!(form, "      no reading behind it.");
-        let _ = writeln!(form, "    The H2 driver's seven `close(0, &x, enter.needed.max(...))` sites are now `close(0, &x, enter.needed)`.");
+        let _ = writeln!(
+            form,
+            "    The H2 driver's seven `close(0, &x, enter.needed.max(...))` sites are now `close(0, &x, enter.needed)`."
+        );
         let _ = writeln!(form);
     }
 
@@ -683,23 +840,51 @@ fn run(
     // -----------------------------------------------------------------------------------------
     println!("  conducting layer 0 to produce layer {REPRESENTATIVE_LAYER}'s entry");
     let passage = FrontPassage::new(surface, grain);
-    let occurrence: SourceOccurrence = resident_layer::source_occurrence(&args.root, regions.clone(), None)?;
+    let occurrence: SourceOccurrence =
+        resident_layer::source_occurrence(&args.root, regions.clone(), None)?;
 
     let carried: Rc<ResidentSection<'static>>;
     let carried_bound: u32;
     {
         let plan = tower::material_plan(&source, 0, args.tokens.len())?;
         let prediction = passage.predict_material(&plan);
-        let admission: MaterialAdmission = passage.admit_material(&prediction).map_err(|o| format!("layer 0 material refused: {}", describe(&o)))?;
-        let (material, layer_scalar) = mount_material(readout, surface, &mut source, 0, &args.tokens, &mut regions)?;
-        let occurrence0: SourceOccurrence = resident_layer::source_occurrence(&args.root, regions.clone(), None)?;
-        let founded = tower::found_layer(0, Entry::Rows, tower::Chart::Midpoint, &scales, terms, layer_scalar, &Intervention::None, args.tokens.len())?;
+        let admission: MaterialAdmission = passage
+            .admit_material(&prediction)
+            .map_err(|o| format!("layer 0 material refused: {}", describe(&o)))?;
+        let (material, layer_scalar) =
+            mount_material(readout, surface, &mut source, 0, &args.tokens, &mut regions)?;
+        let occurrence0: SourceOccurrence =
+            resident_layer::source_occurrence(&args.root, regions.clone(), None)?;
+        let founded = tower::found_layer(
+            0,
+            Entry::Rows,
+            tower::Chart::Midpoint,
+            &scales,
+            terms,
+            layer_scalar,
+            &Intervention::None,
+            args.tokens.len(),
+        )?;
         let mut bound = passage
-            .bind(&founded.complex, &founded.realization, &material, &occurrence0, &receiver, Some(&admission), founded.returns[tower::LAYER_RETURN])
+            .bind(
+                &founded.complex,
+                &founded.realization,
+                &material,
+                &occurrence0,
+                &receiver,
+                Some(&admission),
+                founded.returns[tower::LAYER_RETURN],
+            )
             .map_err(|o| format!("layer 0 refused at bind: {}", describe(&o)))?;
-        let returned = bound.launch(&surface.mode()).map_err(|o| format!("layer 0 refused at launch: {}", describe(&o)))?;
-        bound.standing(&returned).map_err(|o| format!("layer 0 did not stand: {}", describe(&o)))?;
-        let (section, b) = bound.release_section(founded.returns[tower::LAYER_RETURN]).ok_or("layer 0 released nothing")?;
+        let returned = bound
+            .launch(&surface.mode())
+            .map_err(|o| format!("layer 0 refused at launch: {}", describe(&o)))?;
+        bound
+            .standing(&returned)
+            .map_err(|o| format!("layer 0 did not stand: {}", describe(&o)))?;
+        let (section, b) = bound
+            .release_section(founded.returns[tower::LAYER_RETURN])
+            .ok_or("layer 0 released nothing")?;
         carried = Rc::new(section);
         carried_bound = b;
     }
@@ -707,33 +892,75 @@ fn run(
     let layer = REPRESENTATIVE_LAYER;
     let plan = tower::material_plan(&source, layer, args.tokens.len())?;
     let prediction = passage.predict_material(&plan);
-    let admission: MaterialAdmission = passage.admit_material(&prediction).map_err(|o| format!("layer {layer} material refused: {}", describe(&o)))?;
-    let (mut material, layer_scalar) = mount_material(readout, surface, &mut source, layer, &args.tokens, &mut regions)?;
+    let admission: MaterialAdmission = passage
+        .admit_material(&prediction)
+        .map_err(|o| format!("layer {layer} material refused: {}", describe(&o)))?;
+    let (mut material, layer_scalar) = mount_material(
+        readout,
+        surface,
+        &mut source,
+        layer,
+        &args.tokens,
+        &mut regions,
+    )?;
     // The rebase's gain, aligned exactly as the mount aligned it, so the replay reads the same
     // integers the kernel reads.
-    let (gain_words, _) = source.whole(&tower::named(REPRESENTATIVE_LAYER, "input_layernorm.weight"))?;
-    let gain_entries = align_bfloat16(&gain_words).map_err(|e| format!("{e:?}"))?.entries;
-    material.standings.insert(tower::CARRIED_STANDING.to_owned(), (Rc::clone(&carried), carried_bound));
-    let occurrence: SourceOccurrence = resident_layer::source_occurrence(&args.root, regions.clone(), None).unwrap_or(occurrence);
+    let (gain_words, _) = source.whole(&tower::named(
+        REPRESENTATIVE_LAYER,
+        "input_layernorm.weight",
+    ))?;
+    let gain_entries = align_bfloat16(&gain_words)
+        .map_err(|e| format!("{e:?}"))?
+        .entries;
+    material.standings.insert(
+        tower::CARRIED_STANDING.to_owned(),
+        (Rc::clone(&carried), carried_bound),
+    );
+    let occurrence: SourceOccurrence =
+        resident_layer::source_occurrence(&args.root, regions.clone(), None).unwrap_or(occurrence);
 
-    let founded = tower::found_layer(layer, Entry::Carried, tower::Chart::Midpoint, &scales, terms, layer_scalar, &Intervention::None, args.tokens.len())?;
+    let founded = tower::found_layer(
+        layer,
+        Entry::Carried,
+        tower::Chart::Midpoint,
+        &scales,
+        terms,
+        layer_scalar,
+        &Intervention::None,
+        args.tokens.len(),
+    )?;
     let names = names_of(&founded.complex);
     let arriving = arriving_of(&founded.complex);
     let consumers = consumers_of(&founded.complex);
     let terminal = founded.returns[tower::LAYER_RETURN];
     let declared_faces: BTreeSet<EventId> = founded.returns.values().copied().collect();
 
-    println!("  binding layer {layer} UNFUSED ({} occurrences)", founded.complex.shape.occurrences.len());
+    println!(
+        "  binding layer {layer} UNFUSED ({} occurrences)",
+        founded.complex.shape.occurrences.len()
+    );
     let bind_clock = Instant::now();
     let unfused_bound = FrontPassage::new(surface, grain)
         .reading(declared_faces.iter().copied())
-        .bind(&founded.complex, &founded.realization, &material, &occurrence, &receiver, Some(&admission), terminal)
+        .bind(
+            &founded.complex,
+            &founded.realization,
+            &material,
+            &occurrence,
+            &receiver,
+            Some(&admission),
+            terminal,
+        )
         .map_err(|o| format!("layer {layer} refused at bind: {}", describe(&o)))?;
     let unfused_bind_s = bind_clock.elapsed().as_secs_f64();
     let launch_clock = Instant::now();
-    let unfused_returned = unfused_bound.launch(&surface.mode()).map_err(|o| format!("layer {layer} refused at launch: {}", describe(&o)))?;
+    let unfused_returned = unfused_bound
+        .launch(&surface.mode())
+        .map_err(|o| format!("layer {layer} refused at launch: {}", describe(&o)))?;
     let unfused_launch_s = launch_clock.elapsed().as_secs_f64();
-    unfused_bound.standing(&unfused_returned).map_err(|o| format!("layer {layer} did not stand: {}", describe(&o)))?;
+    unfused_bound
+        .standing(&unfused_returned)
+        .map_err(|o| format!("layer {layer} did not stand: {}", describe(&o)))?;
     let (unfused_graph, _) = unfused_bound.graph();
     let unfused = Conducted {
         graph_nodes: unfused_graph.nodes,
@@ -755,48 +982,142 @@ fn run(
     // [A] the reduction exposures
     // -----------------------------------------------------------------------------------------
     println!("  [A] exposing the block reductions");
-    let _ = writeln!(form, "  [A] THE STANDING BLOCK REDUCTIONS EXPOSE THEIR RECEIPTS");
-    let _ = writeln!(form, "    Layer {layer}, {} tokens, grain 2^-{}. Each exposure is the shape H1's ReductionReceipt states,", args.tokens.len(), grain.0);
-    let _ = writeln!(form, "    minus the two fields that owner cannot hold for a strided leaf set, named where they are missing.");
+    let _ = writeln!(
+        form,
+        "  [A] THE STANDING BLOCK REDUCTIONS EXPOSE THEIR RECEIPTS"
+    );
+    let _ = writeln!(
+        form,
+        "    Layer {layer}, {} tokens, grain 2^-{}. Each exposure is the shape H1's ReductionReceipt states,",
+        args.tokens.len(),
+        grain.0
+    );
+    let _ = writeln!(
+        form,
+        "    minus the two fields that owner cannot hold for a strided leaf set, named where they are missing."
+    );
     let _ = writeln!(form);
-    let exposures = expose_reductions(surface, &unfused, &material, &gain_entries, args, grain, terms)?;
+    let exposures = expose_reductions(
+        surface,
+        &unfused,
+        &material,
+        &gain_entries,
+        args,
+        grain,
+        terms,
+    )?;
     for exposure in &exposures {
         write_exposure(form, exposure);
     }
-    let _ = writeln!(form, "    THE STRIDED-PARTIAL BOUNDARY, RESTATED. H2 found it for the lane tree of the tiled contraction:");
-    let _ = writeln!(form, "    `PartialTerm::inner` is a half-open `SectionRegion` and a per-lane strided set {{i : i = t (mod L)}}");
-    let _ = writeln!(form, "    is not one, so `ReductionJunction::certify` cannot certify that partition of K. Every block");
-    let _ = writeln!(form, "    reduction above has the same shape one level out: its leaves are the per-thread strided partials");
-    let _ = writeln!(form, "    over the group or the reach. Nothing here forces them into a region; the word, its depth, its");
-    let _ = writeln!(form, "    per-node widths, its barriers, its boundary residual and its bit-exact agreement with the card are");
-    let _ = writeln!(form, "    carried instead, which is what the receipt is for. Founding a strided partial type is not H3's");
+    let _ = writeln!(
+        form,
+        "    THE STRIDED-PARTIAL BOUNDARY, RESTATED. H2 found it for the lane tree of the tiled contraction:"
+    );
+    let _ = writeln!(
+        form,
+        "    `PartialTerm::inner` is a half-open `SectionRegion` and a per-lane strided set {{i : i = t (mod L)}}"
+    );
+    let _ = writeln!(
+        form,
+        "    is not one, so `ReductionJunction::certify` cannot certify that partition of K. Every block"
+    );
+    let _ = writeln!(
+        form,
+        "    reduction above has the same shape one level out: its leaves are the per-thread strided partials"
+    );
+    let _ = writeln!(
+        form,
+        "    over the group or the reach. Nothing here forces them into a region; the word, its depth, its"
+    );
+    let _ = writeln!(
+        form,
+        "    per-node widths, its barriers, its boundary residual and its bit-exact agreement with the card are"
+    );
+    let _ = writeln!(
+        form,
+        "    carried instead, which is what the receipt is for. Founding a strided partial type is not H3's"
+    );
     let _ = writeln!(form, "    deed and no receipt here needed one.");
     let _ = writeln!(form);
-    let _ = writeln!(form, "    AND ONE FINDING, MEASURED RATHER THAN INFERRED: two of `section_contact`'s three declared");
-    let _ = writeln!(form, "    couplings are NOT block trees. The null (the greatest upper bracket) and the partition function");
-    let _ = writeln!(form, "    (the sum of the certified weights) are enacted by thread 0 alone, as LEFT-LEANING serial words of");
-    let _ = writeln!(form, "    depth reach-1, while `CouplingPlan::block` reports the reduction block the shape derived. The hull");
-    let _ = writeln!(form, "    is serial too, but per coordinate — one thread per `d` folding over the reach — so its capacity is");
-    let _ = writeln!(form, "    the head width and not one lane. The block's only true tree is its octave census. That is a");
-    let _ = writeln!(form, "    realization fact about the kernel, not a defect in the plan, and it is what the receipt was missing.");
+    let _ = writeln!(
+        form,
+        "    AND ONE FINDING, MEASURED RATHER THAN INFERRED: two of `section_contact`'s three declared"
+    );
+    let _ = writeln!(
+        form,
+        "    couplings are NOT block trees. The null (the greatest upper bracket) and the partition function"
+    );
+    let _ = writeln!(
+        form,
+        "    (the sum of the certified weights) are enacted by thread 0 alone, as LEFT-LEANING serial words of"
+    );
+    let _ = writeln!(
+        form,
+        "    depth reach-1, while `CouplingPlan::block` reports the reduction block the shape derived. The hull"
+    );
+    let _ = writeln!(
+        form,
+        "    is serial too, but per coordinate — one thread per `d` folding over the reach — so its capacity is"
+    );
+    let _ = writeln!(
+        form,
+        "    the head width and not one lane. The block's only true tree is its octave census. That is a"
+    );
+    let _ = writeln!(
+        form,
+        "    realization fact about the kernel, not a defect in the plan, and it is what the receipt was missing."
+    );
     let _ = writeln!(form);
 
     // -----------------------------------------------------------------------------------------
     // [B] the census equality matrix and its durations
     // -----------------------------------------------------------------------------------------
     println!("  [B] the census equality matrix");
-    let _ = writeln!(form, "  [B] THE CENSUS LOSES ITS AVOIDABLE ATOMICS, UNDER EXACT CENSUS EQUALITY");
-    let _ = writeln!(form, "    `section_census` is block-aggregated: a warp shuffle fold, then a cross-warp fold in shared");
-    let _ = writeln!(form, "    standing, then ONE atomic per block per slot word — and none where the block's fold is the");
-    let _ = writeln!(form, "    identity. `section_census_serial_control` is the per-thread-atomic form it replaced, kept in the");
-    let _ = writeln!(form, "    module so the equality is measured forever rather than argued once.");
+    let _ = writeln!(
+        form,
+        "  [B] THE CENSUS LOSES ITS AVOIDABLE ATOMICS, UNDER EXACT CENSUS EQUALITY"
+    );
+    let _ = writeln!(
+        form,
+        "    `section_census` is block-aggregated: a warp shuffle fold, then a cross-warp fold in shared"
+    );
+    let _ = writeln!(
+        form,
+        "    standing, then ONE atomic per block per slot word — and none where the block's fold is the"
+    );
+    let _ = writeln!(
+        form,
+        "    identity. `section_census_serial_control` is the per-thread-atomic form it replaced, kept in the"
+    );
+    let _ = writeln!(
+        form,
+        "    module so the equality is measured forever rather than argued once."
+    );
     let _ = writeln!(form);
-    let _ = writeln!(form, "    THE A-PRIORI. Every word this census writes is a max, an or, or an add over the coordinates, and");
-    let _ = writeln!(form, "    each coordinate's contribution is independent of every other. Max, or and add are commutative and");
-    let _ = writeln!(form, "    associative, so the fold may be taken in any order and by any grouping and the result cannot move.");
-    let _ = writeln!(form, "    The warp-scheduler audit states the licence exactly: atomics testify only for the exact");
-    let _ = writeln!(form, "    commutative/associative receiver they implement, and their contention order is not path lineage.");
-    let _ = writeln!(form, "    The aggregation implements the same receivers, so it testifies for the same thing.");
+    let _ = writeln!(
+        form,
+        "    THE A-PRIORI. Every word this census writes is a max, an or, or an add over the coordinates, and"
+    );
+    let _ = writeln!(
+        form,
+        "    each coordinate's contribution is independent of every other. Max, or and add are commutative and"
+    );
+    let _ = writeln!(
+        form,
+        "    associative, so the fold may be taken in any order and by any grouping and the result cannot move."
+    );
+    let _ = writeln!(
+        form,
+        "    The warp-scheduler audit states the licence exactly: atomics testify only for the exact"
+    );
+    let _ = writeln!(
+        form,
+        "    commutative/associative receiver they implement, and their contention order is not path lineage."
+    );
+    let _ = writeln!(
+        form,
+        "    The aggregation implements the same receivers, so it testifies for the same thing."
+    );
     let _ = writeln!(form);
     census_equality(surface, &unfused, args, form)?;
 
@@ -804,12 +1125,39 @@ fn run(
     // [C] the fusion
     // -----------------------------------------------------------------------------------------
     println!("  [C] the fusion, and its refusal control");
-    let _ = writeln!(form, "  [C] RECEIVER-DEPENDENT FUSION OF THE MIDPOINT QUOTIENT");
+    let _ = writeln!(
+        form,
+        "  [C] RECEIVER-DEPENDENT FUSION OF THE MIDPOINT QUOTIENT"
+    );
     let refound = |value: (usize, Dyadic)| -> Result<tower::Founded, String> {
-        tower::found_layer(value.0, Entry::Carried, tower::Chart::Midpoint, &scales, terms, value.1, &Intervention::None, args.tokens.len())
+        tower::found_layer(
+            value.0,
+            Entry::Carried,
+            tower::Chart::Midpoint,
+            &scales,
+            terms,
+            value.1,
+            &Intervention::None,
+            args.tokens.len(),
+        )
     };
     let refound = move || refound((layer, layer_scalar));
-    fusion_controls(surface, &founded, &refound, &material, &occurrence, &receiver, &admission, terminal, &declared_faces, &consumers, &names, &unfused, grain, form)?;
+    fusion_controls(
+        surface,
+        &founded,
+        &refound,
+        &material,
+        &occurrence,
+        &receiver,
+        &admission,
+        terminal,
+        &declared_faces,
+        &consumers,
+        &names,
+        &unfused,
+        grain,
+        form,
+    )?;
     Ok(())
 }
 
@@ -828,16 +1176,15 @@ fn bfloat16_word(significand: i32, exponent: i32) -> u16 {
 // ---------------------------------------------------------------------------------------------
 
 fn ceil_log2(n: usize) -> u32 {
-    if n <= 1 {
-        0
-    } else {
-        (n - 1).ilog2() + 1
-    }
+    if n <= 1 { 0 } else { (n - 1).ilog2() + 1 }
 }
 
 /// The occurrence whose law the complex names exactly `name`.
 fn occurrence_named(names: &BTreeMap<EventId, String>, name: &str) -> Option<EventId> {
-    names.iter().find(|(_, n)| n.as_str() == name).map(|(e, _)| *e)
+    names
+        .iter()
+        .find(|(_, n)| n.as_str() == name)
+        .map(|(e, _)| *e)
 }
 
 fn expose_reductions(
@@ -854,13 +1201,30 @@ fn expose_reductions(
     let f = grain.0 as i32;
 
     // ---- section_rms_rebase: the input rebase over the whole standing ----
-    let rebase = occurrence_named(&unfused.names, "input rebase").ok_or("no input rebase occurrence")?;
-    let producer = *unfused.arriving.get(&rebase).and_then(|p| p.first()).ok_or("the input rebase carries nothing")?;
-    let x = unfused.bound.read_section(&unfused.returned, producer).map_err(|o| describe(&o))?;
-    let y = unfused.bound.read_section(&unfused.returned, rebase).map_err(|o| describe(&o))?;
+    let rebase =
+        occurrence_named(&unfused.names, "input rebase").ok_or("no input rebase occurrence")?;
+    let producer = *unfused
+        .arriving
+        .get(&rebase)
+        .and_then(|p| p.first())
+        .ok_or("the input rebase carries nothing")?;
+    let x = unfused
+        .bound
+        .read_section(&unfused.returned, producer)
+        .map_err(|o| describe(&o))?;
+    let y = unfused
+        .bound
+        .read_section(&unfused.returned, rebase)
+        .map_err(|o| describe(&o))?;
     let group = resident_layer::HIDDEN;
     let width = x.len() / rows;
-    let gain = material.populations.get(&tower::named(REPRESENTATIVE_LAYER, "input_layernorm.weight")).ok_or("no input_layernorm gain")?;
+    let gain = material
+        .populations
+        .get(&tower::named(
+            REPRESENTATIVE_LAYER,
+            "input_layernorm.weight",
+        ))
+        .ok_or("no input_layernorm gain")?;
     let gain_e = gain.readout.exponent();
     let eps = Dyadic::of_binary64_bits(resident_layer::EPS_BITS).map_err(|e| e.to_string())?;
     let input_octaves = unfused
@@ -871,7 +1235,9 @@ fn expose_reductions(
         .find(|r| r.occurrence == rebase)
         .map(|r| r.bound)
         .ok_or("no reading for the input rebase")?;
-    let shape = surface.shape_rms_rebase(rows, width, group, input_octaves, Some(&gain.readout)).map_err(|e| e.to_string())?;
+    let shape = surface
+        .shape_rms_rebase(rows, width, group, input_octaves, Some(&gain.readout))
+        .map_err(|e| e.to_string())?;
     let block = shape.block as usize;
     let barriers_total = 5 + 2 * (block.trailing_zeros() as usize);
 
@@ -926,7 +1292,11 @@ fn expose_reductions(
     // the levels the kernel derives from that census
     let lg = ceil_log2(group);
     let squares = 2 * oct0 + lg + 1;
-    let s: i32 = if squares > 126 { ((squares - 126 + 1) / 2) as i32 } else { 0 };
+    let s: i32 = if squares > 126 {
+        ((squares - 126 + 1) / 2) as i32
+    } else {
+        0
+    };
     let f_prime = f - s;
     let rg = (126 - f_prime).clamp(0, 60);
 
@@ -979,19 +1349,40 @@ fn expose_reductions(
     for i in 0..group {
         let (a, b) = (i128::from(x[i].0), i128::from(x[i].1));
         let g = i128::from(gain_entries[i]);
-        let (xg_lo, xg_hi) = if g >= 0 { (a * g, b * g) } else { (b * g, a * g) };
+        let (xg_lo, xg_hi) = if g >= 0 {
+            (a * g, b * g)
+        } else {
+            (b * g, a * g)
+        };
         let shift = (rg - gain_e) as u32;
         let (y_lo, y_hi) = if xg_lo >= 0 {
-            (mirror::product_shift(xg_lo, r_lo, shift, false), mirror::product_shift(xg_hi, r_hi, shift, true))
+            (
+                mirror::product_shift(xg_lo, r_lo, shift, false),
+                mirror::product_shift(xg_hi, r_hi, shift, true),
+            )
         } else if xg_hi <= 0 {
-            (mirror::product_shift(xg_lo, r_hi, shift, false), mirror::product_shift(xg_hi, r_lo, shift, true))
+            (
+                mirror::product_shift(xg_lo, r_hi, shift, false),
+                mirror::product_shift(xg_hi, r_lo, shift, true),
+            )
         } else {
-            (mirror::product_shift(xg_lo, r_hi, shift, false), mirror::product_shift(xg_hi, r_hi, shift, true))
+            (
+                mirror::product_shift(xg_lo, r_hi, shift, false),
+                mirror::product_shift(xg_hi, r_hi, shift, true),
+            )
         };
         replayed.push((y_lo as i64, y_hi as i64));
     }
     let disagreements = (0..group).filter(|i| replayed[*i] != y[*i]).count();
-    let first_disagreement = (0..group).find(|i| replayed[*i] != y[*i]).map(|i| format!(" first at coordinate {i}: replay {:?} card {:?}", replayed[i], y[i])).unwrap_or_default();
+    let first_disagreement = (0..group)
+        .find(|i| replayed[*i] != y[*i])
+        .map(|i| {
+            format!(
+                " first at coordinate {i}: replay {:?} card {:?}",
+                replayed[i], y[i]
+            )
+        })
+        .unwrap_or_default();
     exposures.push(ReductionExposure {
         owner: "section_rms_rebase",
         kernel: "section_rms_rebase (one block per (row, group))",
@@ -1030,15 +1421,31 @@ fn expose_reductions(
     });
 
     // ---- section_contact: the block octave census, the null, the partition function, the hull ----
-    let contact = occurrence_named(&unfused.names, "contact and carried construction").ok_or("no contact occurrence")?;
-    let inputs = unfused.arriving.get(&contact).ok_or("the contact carries nothing")?;
+    let contact = occurrence_named(&unfused.names, "contact and carried construction")
+        .ok_or("no contact occurrence")?;
+    let inputs = unfused
+        .arriving
+        .get(&contact)
+        .ok_or("the contact carries nothing")?;
     if inputs.len() != 3 {
         return Err(format!("the contact carries {} inputs", inputs.len()));
     }
-    let q = unfused.bound.read_section(&unfused.returned, inputs[0]).map_err(|o| describe(&o))?;
-    let k = unfused.bound.read_section(&unfused.returned, inputs[1]).map_err(|o| describe(&o))?;
-    let v = unfused.bound.read_section(&unfused.returned, inputs[2]).map_err(|o| describe(&o))?;
-    let out = unfused.bound.read_section(&unfused.returned, contact).map_err(|o| describe(&o))?;
+    let q = unfused
+        .bound
+        .read_section(&unfused.returned, inputs[0])
+        .map_err(|o| describe(&o))?;
+    let k = unfused
+        .bound
+        .read_section(&unfused.returned, inputs[1])
+        .map_err(|o| describe(&o))?;
+    let v = unfused
+        .bound
+        .read_section(&unfused.returned, inputs[2])
+        .map_err(|o| describe(&o))?;
+    let out = unfused
+        .bound
+        .read_section(&unfused.returned, contact)
+        .map_err(|o| describe(&o))?;
     let heads = resident_layer::HEADS;
     let kv_heads = resident_layer::KV_HEADS;
     let head_width = q.len() / (rows * heads);
@@ -1055,7 +1462,21 @@ fn expose_reductions(
         .map(|r| r.bound)
         .ok_or("no reading for the contact")?;
     let contact_shape = surface
-        .shape_contact(rows, heads * head_width, kv_heads * head_width, kv_heads * head_width, heads, kv_heads, head_width, window, terms, grain, contact_octaves, contact_octaves, contact_octaves)
+        .shape_contact(
+            rows,
+            heads * head_width,
+            kv_heads * head_width,
+            kv_heads * head_width,
+            heads,
+            kv_heads,
+            head_width,
+            window,
+            terms,
+            grain,
+            contact_octaves,
+            contact_octaves,
+            contact_octaves,
+        )
         .map_err(|e| e.to_string())?;
     let cblock = contact_shape.block as usize;
     // 7 fixed __syncthreads in section_contact plus one per level of its octave-census tree.
@@ -1074,7 +1495,8 @@ fn expose_reductions(
         let mut w = 0u32;
         let mut d = tid;
         while d < head_width {
-            let m = mirror::magnitude(i128::from(q[q_base + d].0)).max(mirror::magnitude(i128::from(q[q_base + d].1)));
+            let m = mirror::magnitude(i128::from(q[q_base + d].0))
+                .max(mirror::magnitude(i128::from(q[q_base + d].1)));
             w = w.max(mirror::octaves_of(m));
             d += cblock;
         }
@@ -1082,14 +1504,16 @@ fn expose_reductions(
             let k_base = ((start + r) * kv_heads + g) * head_width;
             let mut d = tid;
             while d < head_width {
-                let m = mirror::magnitude(i128::from(k[k_base + d].0)).max(mirror::magnitude(i128::from(k[k_base + d].1)));
+                let m = mirror::magnitude(i128::from(k[k_base + d].0))
+                    .max(mirror::magnitude(i128::from(k[k_base + d].1)));
                 w = w.max(mirror::octaves_of(m));
                 d += cblock;
             }
         }
         *leaf = w;
     }
-    let (coct_levels, coct_peak) = tree_levels(&oct_leaf, |a, b| a.max(b), |v| 32 - v.leading_zeros());
+    let (coct_levels, coct_peak) =
+        tree_levels(&oct_leaf, |a, b| a.max(b), |v| 32 - v.leading_zeros());
     let coct = {
         let mut nodes = oct_leaf.clone();
         let mut stride = cblock / 2;
@@ -1103,7 +1527,11 @@ fn expose_reductions(
     };
     let clg = ceil_log2(head_width);
     let need = 2 * coct + clg + 2;
-    let bs: i32 = if need > 126 { ((need - 126 + 1) / 2) as i32 } else { 0 };
+    let bs: i32 = if need > 126 {
+        ((need - 126 + 1) / 2) as i32
+    } else {
+        0
+    };
     exposures.push(ReductionExposure {
         owner: "section_contact",
         kernel: "section_contact (one block per (row, receiver head))",
@@ -1146,7 +1574,8 @@ fn expose_reductions(
     }
 
     // (b) the null: thread 0's LEFT-LEANING serial max over the reach
-    let (null_levels, null_peak, null_value) = left_leaning(&s_hi, |a, b| if b > a { b } else { a });
+    let (null_levels, null_peak, null_value) =
+        left_leaning(&s_hi, |a, b| if b > a { b } else { a });
     exposures.push(ReductionExposure {
         owner: "section_contact",
         kernel: "section_contact",
@@ -1247,10 +1676,17 @@ fn expose_reductions(
         replayed_out.push((q_lo as i64, q_hi as i64));
     }
     let card_row = &out[q_base..q_base + head_width];
-    let contact_disagreements = (0..head_width).filter(|d| replayed_out[*d] != card_row[*d]).count();
+    let contact_disagreements = (0..head_width)
+        .filter(|d| replayed_out[*d] != card_row[*d])
+        .count();
     let contact_first = (0..head_width)
         .find(|d| replayed_out[*d] != card_row[*d])
-        .map(|d| format!(" first at coordinate {d}: replay {:?} card {:?}", replayed_out[d], card_row[d]))
+        .map(|d| {
+            format!(
+                " first at coordinate {d}: replay {:?} card {:?}",
+                replayed_out[d], card_row[d]
+            )
+        })
         .unwrap_or_default();
     exposures.push(ReductionExposure {
         owner: "section_contact",
@@ -1283,12 +1719,19 @@ fn expose_reductions(
 /// The per-node widths of a LEFT-LEANING serial word `((((0 op 1) op 2) op 3) ...)` — the word one
 /// thread enacts when it folds a shared array in a `for` loop. Returns the levels, the peak and the
 /// root.
-fn left_leaning<T: Copy>(leaves: &[T], join: impl Fn(T, T) -> T) -> (Vec<(usize, u32, usize)>, u32, T)
+fn left_leaning<T: Copy>(
+    leaves: &[T],
+    join: impl Fn(T, T) -> T,
+) -> (Vec<(usize, u32, usize)>, u32, T)
 where
     T: Into<i128> + Copy,
 {
     let mut levels = Vec::new();
-    let mut peak = leaves.iter().map(|l| mirror::width_bits((*l).into())).max().unwrap_or(0);
+    let mut peak = leaves
+        .iter()
+        .map(|l| mirror::width_bits((*l).into()))
+        .max()
+        .unwrap_or(0);
     levels.push((0usize, peak, leaves.len()));
     let mut node = leaves[0];
     for (at, leaf) in leaves.iter().enumerate().skip(1) {
@@ -1305,7 +1748,11 @@ fn left_leaning_word(leaves: usize, join: &str) -> String {
         return "(empty)".to_owned();
     }
     if leaves > 12 {
-        return format!("((((0 {join} 1) {join} 2) {join} 3) ... {join} {}) — a left-leaning serial word of depth {}", leaves - 1, leaves - 1);
+        return format!(
+            "((((0 {join} 1) {join} 2) {join} 3) ... {join} {}) — a left-leaning serial word of depth {}",
+            leaves - 1,
+            leaves - 1
+        );
     }
     let mut word = "0".to_owned();
     for leaf in 1..leaves {
@@ -1330,7 +1777,10 @@ fn slot_words(slot: &SlotReading) -> Vec<(&'static str, u64)> {
         ("bound_violated", u64::from(slot.bound_violated)),
         ("max_width", slot.max_width),
         ("upstream_flags", u64::from(slot.upstream_flags)),
-        ("upstream_first", slot.upstream_first.map(|f| f as u64 + 1).unwrap_or(0)),
+        (
+            "upstream_first",
+            slot.upstream_first.map(|f| f as u64 + 1).unwrap_or(0),
+        ),
         ("upstream_count", u64::from(slot.upstream_count)),
         ("lineage_inspected", u64::from(slot.lineage_inspected)),
         ("width_sum", slot.width_sum),
@@ -1353,24 +1803,45 @@ fn census_equality(
             if let Some(section) = unfused.bound.section(reading.occurrence) {
                 let count = section.rows() * section.width();
                 if seen.insert(count) {
-                    shapes.push((reading.occurrence, unfused.names.get(&reading.occurrence).cloned().unwrap_or_default(), count, reading.bound));
+                    shapes.push((
+                        reading.occurrence,
+                        unfused
+                            .names
+                            .get(&reading.occurrence)
+                            .cloned()
+                            .unwrap_or_default(),
+                        count,
+                        reading.bound,
+                    ));
                 }
             }
         }
     }
     shapes.sort_by_key(|(_, _, count, _)| *count);
 
-    let _ = writeln!(form, "    THE EQUALITY MATRIX. Every slot word, both kernels, one section each. `entry` is the refusal");
-    let _ = writeln!(form, "    word the slot carried when the census entered — 0 is a standing occurrence, the rest are the");
-    let _ = writeln!(form, "    poisoned-lineage entries a refused occurrence's census sees.");
+    let _ = writeln!(
+        form,
+        "    THE EQUALITY MATRIX. Every slot word, both kernels, one section each. `entry` is the refusal"
+    );
+    let _ = writeln!(
+        form,
+        "    word the slot carried when the census entered — 0 is a standing occurrence, the rest are the"
+    );
+    let _ = writeln!(
+        form,
+        "    poisoned-lineage entries a refused occurrence's census sees."
+    );
     let _ = writeln!(form);
     let mut all_equal = true;
     let mut rows_measured = 0usize;
-    let mut tsv = String::from("shape\toccurrence\tcount\tentry\tword\taggregated\tcontrol\tequal\n");
+    let mut tsv =
+        String::from("shape\toccurrence\tcount\tentry\tword\taggregated\tcontrol\tequal\n");
     for (occurrence, name, count, bound) in &shapes {
         let section = unfused.bound.section(*occurrence).ok_or("no section")?;
         for entry in [0u32, 8u32, 2u32, 1u32] {
-            let (aggregated, control) = surface.census_both(section, *bound, entry).map_err(|e| e.to_string())?;
+            let (aggregated, control) = surface
+                .census_both(section, *bound, entry)
+                .map_err(|e| e.to_string())?;
             let equal = aggregated == control;
             all_equal &= equal;
             let words_a = slot_words(&aggregated);
@@ -1382,64 +1853,183 @@ fn census_equality(
                 count,
                 bound,
                 entry,
-                if equal { "EQUAL, word for word" } else { "DIFFER" }
+                if equal {
+                    "EQUAL, word for word"
+                } else {
+                    "DIFFER"
+                }
             );
             for ((word, a), (_, c)) in words_a.iter().zip(words_c.iter()) {
                 rows_measured += 1;
-                let _ = writeln!(tsv, "{count}\t{name}\t{count}\t{entry}\t{word}\t{a}\t{c}\t{}", a == c);
+                let _ = writeln!(
+                    tsv,
+                    "{count}\t{name}\t{count}\t{entry}\t{word}\t{a}\t{c}\t{}",
+                    a == c
+                );
                 if !equal {
-                    let _ = writeln!(form, "        {word:<20} aggregated {a:>22}   control {c:>22}   {}", if a == c { "=" } else { "DIFFER" });
+                    let _ = writeln!(
+                        form,
+                        "        {word:<20} aggregated {a:>22}   control {c:>22}   {}",
+                        if a == c { "=" } else { "DIFFER" }
+                    );
                 }
             }
             if equal {
                 let _ = writeln!(
                     form,
                     "        refused {:#06x}  written {}  inverted {}  max_octave {}  bound {}  max_width {}  width_sum {}  nonzero {}",
-                    aggregated.refused, aggregated.written, aggregated.inverted, aggregated.max_octave, aggregated.bound_violated, aggregated.max_width, aggregated.width_sum, aggregated.nonzero_widths
+                    aggregated.refused,
+                    aggregated.written,
+                    aggregated.inverted,
+                    aggregated.max_octave,
+                    aggregated.bound_violated,
+                    aggregated.max_width,
+                    aggregated.width_sum,
+                    aggregated.nonzero_widths
                 );
             }
         }
     }
     let _ = writeln!(form);
-    let _ = writeln!(form, "    {rows_measured} slot-word comparisons over {} section shapes x 4 entry words: {}", shapes.len(), if all_equal { "EVERY ONE EQUAL" } else { "AT LEAST ONE DIFFERS — see above" });
+    let _ = writeln!(
+        form,
+        "    {rows_measured} slot-word comparisons over {} section shapes x 4 entry words: {}",
+        shapes.len(),
+        if all_equal {
+            "EVERY ONE EQUAL"
+        } else {
+            "AT LEAST ONE DIFFERS — see above"
+        }
+    );
     let _ = writeln!(form);
 
     // the commutativity audit, word by word
-    let _ = writeln!(form, "    THE COMMUTATIVITY AUDIT — every slot word, its update rule, and its disposition.");
-    let _ = writeln!(form, "    word                  written by            update rule                     disposition");
+    let _ = writeln!(
+        form,
+        "    THE COMMUTATIVITY AUDIT — every slot word, its update rule, and its disposition."
+    );
+    let _ = writeln!(
+        form,
+        "    word                  written by            update rule                     disposition"
+    );
     for row in [
-        ("refused", "the semantic kernel; the census", "atomicOr of the flag bits", "AGGREGATED — or is commutative and associative; the census's own two bits (INVERTED, BOUND) are folded in the block and deposited once"),
-        ("reach", "section_contact, thread 0", "atomicMax over the blocks of one occurrence", "KEPT AS IT IS — it is not the census kernel's word; one thread per block already deposits one atomic, and max is the receiver it implements"),
-        ("written", "the census, one thread", "a plain store of 1", "KEPT AS A STORE — not a reduction and not an atomic; the same thread of the same block writes the same value"),
+        (
+            "refused",
+            "the semantic kernel; the census",
+            "atomicOr of the flag bits",
+            "AGGREGATED — or is commutative and associative; the census's own two bits (INVERTED, BOUND) are folded in the block and deposited once",
+        ),
+        (
+            "reach",
+            "section_contact, thread 0",
+            "atomicMax over the blocks of one occurrence",
+            "KEPT AS IT IS — it is not the census kernel's word; one thread per block already deposits one atomic, and max is the receiver it implements",
+        ),
+        (
+            "written",
+            "the census, one thread",
+            "a plain store of 1",
+            "KEPT AS A STORE — not a reduction and not an atomic; the same thread of the same block writes the same value",
+        ),
         ("inverted", "the census", "atomicOr of 1", "AGGREGATED — or"),
         ("max_octave", "the census", "atomicMax", "AGGREGATED — max"),
-        ("bound_violated", "the census", "atomicOr of 1", "AGGREGATED — or"),
-        ("max_width", "the census", "atomicMax on a 64-bit word", "AGGREGATED — max"),
-        ("width_sum", "the census", "atomicAdd on a 64-bit word", "AGGREGATED — add"),
-        ("nonzero_widths", "the census", "atomicAdd of 1", "AGGREGATED — add, as a per-block count"),
-        ("upstream_flags", "upstream_refused, at kernel entry", "atomicOr of the joined predecessor flags", "KEPT AS IT IS — it is not the census kernel's word; every thread computes the same join from final words"),
-        ("upstream_first", "upstream_refused", "a PLAIN STORE of 1 + the LEAST refusing predecessor index", "KEPT AS A STORE, and this is the word the audit was aimed at: it is a MIN by index, which IS commutative and associative, but it is not an atomic at all — the lineage array is declared in ascending index order and every thread scans it serially from final words, so every thread stores the identical value. A first-writer-wins would have been unlawful; a min is not, and this is not even a min across threads"),
-        ("upstream_count", "upstream_refused", "a plain store of the refusing count", "KEPT AS A STORE — same reading, same value in every thread"),
-        ("lineage_inspected", "upstream_refused", "a plain store of the declared lineage length", "KEPT AS A STORE"),
+        (
+            "bound_violated",
+            "the census",
+            "atomicOr of 1",
+            "AGGREGATED — or",
+        ),
+        (
+            "max_width",
+            "the census",
+            "atomicMax on a 64-bit word",
+            "AGGREGATED — max",
+        ),
+        (
+            "width_sum",
+            "the census",
+            "atomicAdd on a 64-bit word",
+            "AGGREGATED — add",
+        ),
+        (
+            "nonzero_widths",
+            "the census",
+            "atomicAdd of 1",
+            "AGGREGATED — add, as a per-block count",
+        ),
+        (
+            "upstream_flags",
+            "upstream_refused, at kernel entry",
+            "atomicOr of the joined predecessor flags",
+            "KEPT AS IT IS — it is not the census kernel's word; every thread computes the same join from final words",
+        ),
+        (
+            "upstream_first",
+            "upstream_refused",
+            "a PLAIN STORE of 1 + the LEAST refusing predecessor index",
+            "KEPT AS A STORE, and this is the word the audit was aimed at: it is a MIN by index, which IS commutative and associative, but it is not an atomic at all — the lineage array is declared in ascending index order and every thread scans it serially from final words, so every thread stores the identical value. A first-writer-wins would have been unlawful; a min is not, and this is not even a min across threads",
+        ),
+        (
+            "upstream_count",
+            "upstream_refused",
+            "a plain store of the refusing count",
+            "KEPT AS A STORE — same reading, same value in every thread",
+        ),
+        (
+            "lineage_inspected",
+            "upstream_refused",
+            "a plain store of the declared lineage length",
+            "KEPT AS A STORE",
+        ),
     ] {
-        let _ = writeln!(form, "    {:<21} {:<21} {:<31} {}", row.0, row.1, row.2, row.3);
+        let _ = writeln!(
+            form,
+            "    {:<21} {:<21} {:<31} {}",
+            row.0, row.1, row.2, row.3
+        );
     }
     let _ = writeln!(form);
-    let _ = writeln!(form, "    ONE ORDER-DEPENDENCE IS INHERITED AND IS NOT THE AGGREGATION'S. Both forms decide whether to");
-    let _ = writeln!(form, "    measure at all by reading `slot[SLOT_REFUSED]`, and both also OR `REFUSED_INVERTED` and");
-    let _ = writeln!(form, "    `REFUSED_BOUND` into that same word. On material where the census itself raises a refusal, a");
-    let _ = writeln!(form, "    thread (control) or a block (aggregated) that entered before the raise measures its coordinates and");
-    let _ = writeln!(form, "    one that entered after does not. The occurrence refuses either way and its face may not be read;");
-    let _ = writeln!(form, "    what can move is the measured octave and width the receipt DISPLAYS. Where the census raises");
-    let _ = writeln!(form, "    nothing — every occurrence that stands, which is every row of the matrix above — both forms are");
-    let _ = writeln!(form, "    exactly order-free. The refusal itself is order-free in both, and that is measured below.");
+    let _ = writeln!(
+        form,
+        "    ONE ORDER-DEPENDENCE IS INHERITED AND IS NOT THE AGGREGATION'S. Both forms decide whether to"
+    );
+    let _ = writeln!(
+        form,
+        "    measure at all by reading `slot[SLOT_REFUSED]`, and both also OR `REFUSED_INVERTED` and"
+    );
+    let _ = writeln!(
+        form,
+        "    `REFUSED_BOUND` into that same word. On material where the census itself raises a refusal, a"
+    );
+    let _ = writeln!(
+        form,
+        "    thread (control) or a block (aggregated) that entered before the raise measures its coordinates and"
+    );
+    let _ = writeln!(
+        form,
+        "    one that entered after does not. The occurrence refuses either way and its face may not be read;"
+    );
+    let _ = writeln!(
+        form,
+        "    what can move is the measured octave and width the receipt DISPLAYS. Where the census raises"
+    );
+    let _ = writeln!(
+        form,
+        "    nothing — every occurrence that stands, which is every row of the matrix above — both forms are"
+    );
+    let _ = writeln!(
+        form,
+        "    exactly order-free. The refusal itself is order-free in both, and that is measured below."
+    );
     let _ = writeln!(form);
     {
         let (occurrence, name, count, _) = shapes.last().ok_or("no shapes")?;
         let section = unfused.bound.section(*occurrence).ok_or("no section")?;
         let mut refusals: Vec<(u32, u32)> = Vec::new();
         for _ in 0..8 {
-            let (a, c) = surface.census_both(section, 1, 0).map_err(|e| e.to_string())?;
+            let (a, c) = surface
+                .census_both(section, 1, 0)
+                .map_err(|e| e.to_string())?;
             refusals.push((a.refused, c.refused));
         }
         let stable = refusals.windows(2).all(|w| w[0] == w[1]);
@@ -1447,51 +2037,112 @@ fn census_equality(
             form,
             "    the bound refuted deliberately (admitted = 1 octave) on {name} ({count} coordinates), 8 repetitions:",
         );
-        let _ = writeln!(form, "      refusal words: {refusals:?} — stable across repetitions: {stable}");
+        let _ = writeln!(
+            form,
+            "      refusal words: {refusals:?} — stable across repetitions: {stable}"
+        );
     }
     let _ = writeln!(form);
-    let _ = writeln!(form, "    THE TWO LINEAGE CONTROLS ARE OWNER-LOCAL TESTS AND THEY RUN AGAINST THE AGGREGATED CENSUS:");
-    let _ = writeln!(form, "      front_passage: a_runtime_refusal_in_one_branch_returns_the_complete_lineage_and_the_terminal_cannot_be_read_as_standing");
-    let _ = writeln!(form, "        — the two-branch poisoned lineage: one branch's malformed codeword refuses, the sibling stands,");
-    let _ = writeln!(form, "          and the complete obstruction lineage comes back with the terminal refused by name;");
-    let _ = writeln!(form, "      resident_section: a_runtime_refusal_at_a_nonzero_coordinate_travels_only_along_its_lineage_and_the_sibling_is_bit_identical");
-    let _ = writeln!(form, "        — a refusal raised at a NONZERO coordinate returns the identical lineage and leaves the");
-    let _ = writeln!(form, "          unrelated branch bit-identical. Both are green under this census.");
+    let _ = writeln!(
+        form,
+        "    THE TWO LINEAGE CONTROLS ARE OWNER-LOCAL TESTS AND THEY RUN AGAINST THE AGGREGATED CENSUS:"
+    );
+    let _ = writeln!(
+        form,
+        "      front_passage: a_runtime_refusal_in_one_branch_returns_the_complete_lineage_and_the_terminal_cannot_be_read_as_standing"
+    );
+    let _ = writeln!(
+        form,
+        "        — the two-branch poisoned lineage: one branch's malformed codeword refuses, the sibling stands,"
+    );
+    let _ = writeln!(
+        form,
+        "          and the complete obstruction lineage comes back with the terminal refused by name;"
+    );
+    let _ = writeln!(
+        form,
+        "      resident_section: a_runtime_refusal_at_a_nonzero_coordinate_travels_only_along_its_lineage_and_the_sibling_is_bit_identical"
+    );
+    let _ = writeln!(
+        form,
+        "        — a refusal raised at a NONZERO coordinate returns the identical lineage and leaves the"
+    );
+    let _ = writeln!(
+        form,
+        "          unrelated branch bit-identical. Both are green under this census."
+    );
     let _ = writeln!(form);
 
     // the duration comparison — apparatus measurement, in the frame it was taken in, selecting nothing
-    let _ = writeln!(form, "    THE DURATION COMPARISON, on the layer's own shapes. {} launches of each kernel per shape,", args.census_repeats);
-    let _ = writeln!(form, "    each with its own fresh slot allocation and its own synchronize, measured on the wall clock of");
-    let _ = writeln!(form, "    this process with a display attached to the card. It is a REPORT: no semantics depend on it and");
-    let _ = writeln!(form, "    the equality above is what admits the aggregation.");
+    let _ = writeln!(
+        form,
+        "    THE DURATION COMPARISON, on the layer's own shapes. {} launches of each kernel per shape,",
+        args.census_repeats
+    );
+    let _ = writeln!(
+        form,
+        "    each with its own fresh slot allocation and its own synchronize, measured on the wall clock of"
+    );
+    let _ = writeln!(
+        form,
+        "    this process with a display attached to the card. It is a REPORT: no semantics depend on it and"
+    );
+    let _ = writeln!(
+        form,
+        "    the equality above is what admits the aggregation."
+    );
     let _ = writeln!(form);
-    let _ = writeln!(form, "    coordinates  occurrence                                   aggregated (s)    control (s)   ratio");
+    let _ = writeln!(
+        form,
+        "    coordinates  occurrence                                   aggregated (s)    control (s)   ratio"
+    );
     let mut tsv_durations = String::from("count\toccurrence\taggregated_s\tcontrol_s\n");
     for (occurrence, name, count, bound) in &shapes {
         let section = unfused.bound.section(*occurrence).ok_or("no section")?;
         // one warm launch of each before the clock starts
-        let _ = surface.census_once("section_census", section, *bound, 0).map_err(|e| e.to_string())?;
-        let _ = surface.census_once("section_census_serial_control", section, *bound, 0).map_err(|e| e.to_string())?;
+        let _ = surface
+            .census_once("section_census", section, *bound, 0)
+            .map_err(|e| e.to_string())?;
+        let _ = surface
+            .census_once("section_census_serial_control", section, *bound, 0)
+            .map_err(|e| e.to_string())?;
         let clock = Instant::now();
         for _ in 0..args.census_repeats {
-            let _ = surface.census_once("section_census", section, *bound, 0).map_err(|e| e.to_string())?;
+            let _ = surface
+                .census_once("section_census", section, *bound, 0)
+                .map_err(|e| e.to_string())?;
         }
         let aggregated_s = clock.elapsed().as_secs_f64();
         let clock = Instant::now();
         for _ in 0..args.census_repeats {
-            let _ = surface.census_once("section_census_serial_control", section, *bound, 0).map_err(|e| e.to_string())?;
+            let _ = surface
+                .census_once("section_census_serial_control", section, *bound, 0)
+                .map_err(|e| e.to_string())?;
         }
         let control_s = clock.elapsed().as_secs_f64();
         let _ = writeln!(
             form,
             "    {count:>11}  {:<44} {aggregated_s:>12.6}   {control_s:>12.6}   {:>6.3}",
             name.chars().take(44).collect::<String>(),
-            if aggregated_s > 0.0 { control_s / aggregated_s } else { 0.0 }
+            if aggregated_s > 0.0 {
+                control_s / aggregated_s
+            } else {
+                0.0
+            }
         );
-        let _ = writeln!(tsv_durations, "{count}\t{name}\t{aggregated_s:.9}\t{control_s:.9}");
+        let _ = writeln!(
+            tsv_durations,
+            "{count}\t{name}\t{aggregated_s:.9}\t{control_s:.9}"
+        );
     }
-    let _ = writeln!(form, "    Each row includes one allocation, one upload of the seeded slot, one launch and one");
-    let _ = writeln!(form, "    synchronize per repetition, so the row is a bound on the kernel and not the kernel alone.");
+    let _ = writeln!(
+        form,
+        "    Each row includes one allocation, one upload of the seeded slot, one launch and one"
+    );
+    let _ = writeln!(
+        form,
+        "    synchronize per repetition, so the row is a bound on the kernel and not the kernel alone."
+    );
     let _ = writeln!(form);
     let out = PathBuf::from("output/the_reductions_expose_their_words");
     let _ = std::fs::write(out.join("census-equality.tsv"), &tsv);
@@ -1520,27 +2171,84 @@ fn fusion_controls(
     grain: ResidentGrain,
     form: &mut String,
 ) -> Result<(), String> {
-    let _ = writeln!(form, "    The midpoint chart seals nearly every occurrence: under it a MidpointQuotient follows each");
-    let _ = writeln!(form, "    producer, and each is a separate kernel launch and a separate census. The fusion declared here");
-    let _ = writeln!(form, "    is `SealedMidpointQuotient`: the collapse and the quotient's own census in ONE node, writing the");
-    let _ = writeln!(form, "    midpoints over the predecessor's own words rather than into a second section.");
+    let _ = writeln!(
+        form,
+        "    The midpoint chart seals nearly every occurrence: under it a MidpointQuotient follows each"
+    );
+    let _ = writeln!(
+        form,
+        "    producer, and each is a separate kernel launch and a separate census. The fusion declared here"
+    );
+    let _ = writeln!(
+        form,
+        "    is `SealedMidpointQuotient`: the collapse and the quotient's own census in ONE node, writing the"
+    );
+    let _ = writeln!(
+        form,
+        "    midpoints over the predecessor's own words rather than into a second section."
+    );
     let _ = writeln!(form);
-    let _ = writeln!(form, "    WHY IT IS EXACTLY THE UNFUSED PAIR, ON EVERY PATH. The collapse originates no refusal:");
-    let _ = writeln!(form, "    `shift_floor(lo + hi, -1)` on two int64 words cannot leave the wide carrier, so the only flag the");
-    let _ = writeln!(form, "    quotient can carry is UPSTREAM. The upstream decision is thread-uniform and final at entry, because");
-    let _ = writeln!(form, "    the fused node sits after the predecessor's census on the graph's own edge — exactly where the");
-    let _ = writeln!(form, "    unfused collapse kernel sat. And the census of a collapsed section measures lo == hi, so every");
-    let _ = writeln!(form, "    width face is the identity and only the octave max and the bound or remain, both aggregated as the");
-    let _ = writeln!(form, "    census aggregates them. The PRE-quotient widths — the collapsed population this chart retains —");
-    let _ = writeln!(form, "    are the predecessor's own census, which is its own node and runs first, untouched by the fusion.");
+    let _ = writeln!(
+        form,
+        "    WHY IT IS EXACTLY THE UNFUSED PAIR, ON EVERY PATH. The collapse originates no refusal:"
+    );
+    let _ = writeln!(
+        form,
+        "    `shift_floor(lo + hi, -1)` on two int64 words cannot leave the wide carrier, so the only flag the"
+    );
+    let _ = writeln!(
+        form,
+        "    quotient can carry is UPSTREAM. The upstream decision is thread-uniform and final at entry, because"
+    );
+    let _ = writeln!(
+        form,
+        "    the fused node sits after the predecessor's census on the graph's own edge — exactly where the"
+    );
+    let _ = writeln!(
+        form,
+        "    unfused collapse kernel sat. And the census of a collapsed section measures lo == hi, so every"
+    );
+    let _ = writeln!(
+        form,
+        "    width face is the identity and only the octave max and the bound or remain, both aggregated as the"
+    );
+    let _ = writeln!(
+        form,
+        "    census aggregates them. The PRE-quotient widths — the collapsed population this chart retains —"
+    );
+    let _ = writeln!(
+        form,
+        "    are the predecessor's own census, which is its own node and runs first, untouched by the fusion."
+    );
     let _ = writeln!(form);
-    let _ = writeln!(form, "    THE CONDITION, DECIDED FROM THE DIAGRAM AT COMPILE. A sealing law rewrites its predecessor's");
-    let _ = writeln!(form, "    section in place, so that section's face is gone. Section 4.6 admits the fusion only when every");
-    let _ = writeln!(form, "    declared future receiver factors through the fused output, and that is three readings of the");
-    let _ = writeln!(form, "    diagram: the predecessor is read by this occurrence and by nothing else; it is not the declared");
-    let _ = writeln!(form, "    terminal; and the receiver did not declare its face. Readability at READ time is not knowable at");
-    let _ = writeln!(form, "    compile — `read_section` takes any occurrence — so the guard stands at both ends: a face the");
-    let _ = writeln!(form, "    fusion sealed away is refused by name at read time, with the reopening route, and never returned");
+    let _ = writeln!(
+        form,
+        "    THE CONDITION, DECIDED FROM THE DIAGRAM AT COMPILE. A sealing law rewrites its predecessor's"
+    );
+    let _ = writeln!(
+        form,
+        "    section in place, so that section's face is gone. Section 4.6 admits the fusion only when every"
+    );
+    let _ = writeln!(
+        form,
+        "    declared future receiver factors through the fused output, and that is three readings of the"
+    );
+    let _ = writeln!(
+        form,
+        "    diagram: the predecessor is read by this occurrence and by nothing else; it is not the declared"
+    );
+    let _ = writeln!(
+        form,
+        "    terminal; and the receiver did not declare its face. Readability at READ time is not knowable at"
+    );
+    let _ = writeln!(
+        form,
+        "    compile — `read_section` takes any occurrence — so the guard stands at both ends: a face the"
+    );
+    let _ = writeln!(
+        form,
+        "    fusion sealed away is refused by name at read time, with the reopening route, and never returned"
+    );
     let _ = writeln!(form, "    as collapsed words.");
     let _ = writeln!(form);
 
@@ -1556,7 +2264,11 @@ fn fusion_controls(
             None => continue,
         };
         let reading = consumers.get(&predecessor).cloned().unwrap_or_default();
-        if reading.len() == 1 && reading[0] == *event && predecessor != terminal && !declared_faces.contains(&predecessor) {
+        if reading.len() == 1
+            && reading[0] == *event
+            && predecessor != terminal
+            && !declared_faces.contains(&predecessor)
+        {
             fusible.push(*event);
         } else {
             refused_by_face.push(*event);
@@ -1575,11 +2287,21 @@ fn fusion_controls(
             form,
             "      {} — its predecessor {} is {}",
             names.get(event).cloned().unwrap_or_default(),
-            predecessor.map(|p| names.get(&p).cloned().unwrap_or_default()).unwrap_or_default(),
+            predecessor
+                .map(|p| names.get(&p).cloned().unwrap_or_default())
+                .unwrap_or_default(),
             if predecessor == Some(terminal) {
                 "the declared terminal".to_owned()
-            } else if predecessor.map(|p| declared_faces.contains(&p)).unwrap_or(false) {
-                let name = founded.returns.iter().find(|(_, e)| Some(**e) == predecessor).map(|(n, _)| (*n).to_owned()).unwrap_or_default();
+            } else if predecessor
+                .map(|p| declared_faces.contains(&p))
+                .unwrap_or(false)
+            {
+                let name = founded
+                    .returns
+                    .iter()
+                    .find(|(_, e)| Some(**e) == predecessor)
+                    .map(|(n, _)| (*n).to_owned())
+                    .unwrap_or_default();
                 format!("a face the receiver declared: `{name}`")
             } else {
                 "read by more than one consumer".to_owned()
@@ -1589,76 +2311,181 @@ fn fusion_controls(
     let _ = writeln!(form);
 
     // (1) THE REFUSAL CONTROL: fuse the quotient over a declared return and require the compile to refuse
-    let _ = writeln!(form, "    THE REFUSAL CONTROL. The layer's own dissection face — the layer enclosure, the scalar's output");
-    let _ = writeln!(form, "    BEFORE the terminal quotient — is a declared return. Declaring the fusion over it and compiling:");
+    let _ = writeln!(
+        form,
+        "    THE REFUSAL CONTROL. The layer's own dissection face — the layer enclosure, the scalar's output"
+    );
+    let _ = writeln!(
+        form,
+        "    BEFORE the terminal quotient — is a declared return. Declaring the fusion over it and compiling:"
+    );
     {
         let control = founded_with_fusion(refound, &fusible, &refused_by_face, true)?;
         let outcome = FrontPassage::new(surface, grain)
             .reading(declared_faces.iter().copied())
-            .compile(&control.complex, &control.realization, material, occurrence, terminal);
+            .compile(
+                &control.complex,
+                &control.realization,
+                material,
+                occurrence,
+                terminal,
+            );
         match outcome {
-            Err(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { quotient, predecessor, because, reopening })) => {
+            Err(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored {
+                quotient,
+                predecessor,
+                because,
+                reopening,
+            })) => {
                 let _ = writeln!(form, "      REFUSED, by name: FusionUnfactored");
-                let _ = writeln!(form, "        quotient      {} {quotient:?}", names.get(&quotient).cloned().unwrap_or_default());
-                let _ = writeln!(form, "        predecessor   {} {predecessor:?}", names.get(&predecessor).cloned().unwrap_or_default());
+                let _ = writeln!(
+                    form,
+                    "        quotient      {} {quotient:?}",
+                    names.get(&quotient).cloned().unwrap_or_default()
+                );
+                let _ = writeln!(
+                    form,
+                    "        predecessor   {} {predecessor:?}",
+                    names.get(&predecessor).cloned().unwrap_or_default()
+                );
                 let _ = writeln!(form, "        because       {because}");
                 let _ = writeln!(form, "        reopening     {reopening}");
             }
-            Err(other) => return Err(format!("the refusal control returned the wrong obstruction: {}", describe(&other))),
-            Ok(_) => return Err("the refusal control COMPILED: a declared face was fused away without a refusal".to_owned()),
+            Err(other) => {
+                return Err(format!(
+                    "the refusal control returned the wrong obstruction: {}",
+                    describe(&other)
+                ));
+            }
+            Ok(_) => return Err(
+                "the refusal control COMPILED: a declared face was fused away without a refusal"
+                    .to_owned(),
+            ),
         }
     }
     let _ = writeln!(form);
 
     // (2) the legal fusion, bound and launched
     let fused_founded = founded_with_fusion(refound, &fusible, &refused_by_face, false)?;
-    println!("  binding layer {REPRESENTATIVE_LAYER} FUSED ({} quotients sealed)", fusible.len());
+    println!(
+        "  binding layer {REPRESENTATIVE_LAYER} FUSED ({} quotients sealed)",
+        fusible.len()
+    );
     let bind_clock = Instant::now();
     let fused_bound = FrontPassage::new(surface, grain)
         .reading(declared_faces.iter().copied())
-        .bind(&fused_founded.complex, &fused_founded.realization, material, occurrence, receiver, Some(admission), terminal)
+        .bind(
+            &fused_founded.complex,
+            &fused_founded.realization,
+            material,
+            occurrence,
+            receiver,
+            Some(admission),
+            terminal,
+        )
         .map_err(|o| format!("the fused layer refused at bind: {}", describe(&o)))?;
     let fused_bind_s = bind_clock.elapsed().as_secs_f64();
     let launch_clock = Instant::now();
-    let fused_returned = fused_bound.launch(&surface.mode()).map_err(|o| format!("the fused layer refused at launch: {}", describe(&o)))?;
+    let fused_returned = fused_bound
+        .launch(&surface.mode())
+        .map_err(|o| format!("the fused layer refused at launch: {}", describe(&o)))?;
     let fused_launch_s = launch_clock.elapsed().as_secs_f64();
-    fused_bound.standing(&fused_returned).map_err(|o| format!("the fused layer did not stand: {}", describe(&o)))?;
+    fused_bound
+        .standing(&fused_returned)
+        .map_err(|o| format!("the fused layer did not stand: {}", describe(&o)))?;
     let (fused_graph, _) = fused_bound.graph();
 
     let _ = writeln!(form, "    THE KERNEL COUNT AND THE ALLOCATIONS, PER GRAPH");
-    let _ = writeln!(form, "                                  unfused      fused     delta");
+    let _ = writeln!(
+        form,
+        "                                  unfused      fused     delta"
+    );
     for (what, u, f) in [
-        ("graph nodes", unfused.graph_nodes as i64, fused_graph.nodes as i64),
-        ("graph kernel nodes", unfused.kernel_nodes as i64, fused_graph.kernel_nodes as i64),
-        ("graph edges", unfused.graph_edges as i64, fused_graph.edges as i64),
-        ("captured launches (predicted)", unfused.predicted_launches as i64, fused_bound.apparatus_prediction.captured_launches as i64),
-        ("allocations (predicted)", unfused.predicted_allocations as i64, fused_bound.apparatus_prediction.allocations as i64),
-        ("section octets (predicted)", unfused.predicted_section_octets as i64, fused_bound.apparatus_prediction.section_octets as i64),
+        (
+            "graph nodes",
+            unfused.graph_nodes as i64,
+            fused_graph.nodes as i64,
+        ),
+        (
+            "graph kernel nodes",
+            unfused.kernel_nodes as i64,
+            fused_graph.kernel_nodes as i64,
+        ),
+        (
+            "graph edges",
+            unfused.graph_edges as i64,
+            fused_graph.edges as i64,
+        ),
+        (
+            "captured launches (predicted)",
+            unfused.predicted_launches as i64,
+            fused_bound.apparatus_prediction.captured_launches as i64,
+        ),
+        (
+            "allocations (predicted)",
+            unfused.predicted_allocations as i64,
+            fused_bound.apparatus_prediction.allocations as i64,
+        ),
+        (
+            "section octets (predicted)",
+            unfused.predicted_section_octets as i64,
+            fused_bound.apparatus_prediction.section_octets as i64,
+        ),
     ] {
         let _ = writeln!(form, "    {what:<30} {u:>9} {f:>10} {:>+9}", f - u);
     }
-    let _ = writeln!(form, "    the prediction and the driver agree: nodes {} == {}, edges {} == {}",
-        fused_bound.apparatus_prediction.graph_nodes, fused_graph.nodes, fused_bound.apparatus_prediction.graph_edges, fused_graph.edges);
-    let _ = writeln!(form, "    bind wall: unfused {:.3} s, fused {:.3} s; launch wall: unfused {:.6} s, fused {:.6} s", unfused.bind_wall_s, fused_bind_s, unfused.launch_wall_s, fused_launch_s);
-    let _ = writeln!(form, "    (elapsed times are apparatus measurements in this process's frame with a display attached; they");
-    let _ = writeln!(form, "    select nothing and the equality below is what admits the fusion.)");
+    let _ = writeln!(
+        form,
+        "    the prediction and the driver agree: nodes {} == {}, edges {} == {}",
+        fused_bound.apparatus_prediction.graph_nodes,
+        fused_graph.nodes,
+        fused_bound.apparatus_prediction.graph_edges,
+        fused_graph.edges
+    );
+    let _ = writeln!(
+        form,
+        "    bind wall: unfused {:.3} s, fused {:.3} s; launch wall: unfused {:.6} s, fused {:.6} s",
+        unfused.bind_wall_s, fused_bind_s, unfused.launch_wall_s, fused_launch_s
+    );
+    let _ = writeln!(
+        form,
+        "    (elapsed times are apparatus measurements in this process's frame with a display attached; they"
+    );
+    let _ = writeln!(
+        form,
+        "    select nothing and the equality below is what admits the fusion.)"
+    );
     let _ = writeln!(form);
 
     // (3) the terminal faces, bit-equal
-    let unfused_terminal = unfused.bound.read_terminal(&unfused.returned).map_err(|o| describe(&o))?;
-    let fused_terminal = fused_bound.read_terminal(&fused_returned).map_err(|o| describe(&o))?;
+    let unfused_terminal = unfused
+        .bound
+        .read_terminal(&unfused.returned)
+        .map_err(|o| describe(&o))?;
+    let fused_terminal = fused_bound
+        .read_terminal(&fused_returned)
+        .map_err(|o| describe(&o))?;
     let terminal_equal = unfused_terminal == fused_terminal;
     let first_terminal_difference = unfused_terminal
         .iter()
         .zip(fused_terminal.iter())
         .position(|(a, b)| a != b)
-        .map(|at| format!(" first at coordinate {at}: unfused {:?} fused {:?}", unfused_terminal[at], fused_terminal[at]))
+        .map(|at| {
+            format!(
+                " first at coordinate {at}: unfused {:?} fused {:?}",
+                unfused_terminal[at], fused_terminal[at]
+            )
+        })
         .unwrap_or_default();
     let _ = writeln!(
         form,
         "    THE TERMINAL FACE: {} coordinates, {}{}",
         unfused_terminal.len(),
-        if terminal_equal { "BIT-EQUAL" } else { "DIFFERENT" },
+        if terminal_equal {
+            "BIT-EQUAL"
+        } else {
+            "DIFFERENT"
+        },
         first_terminal_difference
     );
 
@@ -1679,7 +2506,9 @@ fn fusion_controls(
     let mut census_differences: Vec<String> = Vec::new();
     let mut collapsed_population_rows: Vec<(String, u64, u32, u64)> = Vec::new();
     for (event, unfused_slot) in &unfused_slots {
-        let fused_slot = fused_slots.get(event).ok_or("the fused deed lost an occurrence")?;
+        let fused_slot = fused_slots
+            .get(event)
+            .ok_or("the fused deed lost an occurrence")?;
         if unfused_slot != fused_slot {
             census_differences.push(format!(
                 "{} {event:?}: unfused {unfused_slot:?} fused {fused_slot:?}",
@@ -1705,7 +2534,11 @@ fn fusion_controls(
         "    EVERY CENSUS, WORD FOR WORD: {} occurrences compared, {} differ{}",
         unfused_slots.len(),
         census_differences.len(),
-        if census_differences.is_empty() { " — every slot word of every occurrence is equal".to_owned() } else { ":".to_owned() }
+        if census_differences.is_empty() {
+            " — every slot word of every occurrence is equal".to_owned()
+        } else {
+            ":".to_owned()
+        }
     );
     for difference in census_differences.iter().take(8) {
         let _ = writeln!(form, "      {difference}");
@@ -1718,46 +2551,98 @@ fn fusion_controls(
         "    THE COLLAPSED POPULATION THE CHART RETAINS — the PRE-quotient widths of the {} sealed",
         collapsed_population_rows.len()
     );
-    let _ = writeln!(form, "    predecessors, summed over the layer: width_sum {total_collapsed} grains over {total_nonzero} coordinates that had");
-    let _ = writeln!(form, "    a width at all. It is the predecessor's own census node in BOTH deeds, so it is unchanged by");
-    let _ = writeln!(form, "    the fusion, and Station C's receipt reads the same population it always did. The five widest:");
+    let _ = writeln!(
+        form,
+        "    predecessors, summed over the layer: width_sum {total_collapsed} grains over {total_nonzero} coordinates that had"
+    );
+    let _ = writeln!(
+        form,
+        "    a width at all. It is the predecessor's own census node in BOTH deeds, so it is unchanged by"
+    );
+    let _ = writeln!(
+        form,
+        "    the fusion, and Station C's receipt reads the same population it always did. The five widest:"
+    );
     let mut widest = collapsed_population_rows.clone();
     widest.sort_by_key(|r| std::cmp::Reverse(r.1));
     for (name, width_sum, nonzero, max_width) in widest.iter().take(5) {
-        let _ = writeln!(form, "      {:<50} width_sum {width_sum:>16}  nonzero {nonzero:>8}  widest {max_width:>16}", name.chars().take(50).collect::<String>());
+        let _ = writeln!(
+            form,
+            "      {:<50} width_sum {width_sum:>16}  nonzero {nonzero:>8}  widest {max_width:>16}",
+            name.chars().take(50).collect::<String>()
+        );
     }
     let _ = writeln!(form);
 
     // (5) the read-time refusal, exhibited
-    let _ = writeln!(form, "    THE READ-TIME REFUSAL, EXHIBITED. Asking the fused deed for a face the fusion sealed away:");
+    let _ = writeln!(
+        form,
+        "    THE READ-TIME REFUSAL, EXHIBITED. Asking the fused deed for a face the fusion sealed away:"
+    );
     let sealed_predecessor = fusible
         .first()
         .and_then(|q| unfused.arriving.get(q).and_then(|p| p.first()).copied())
         .ok_or("no fused quotient")?;
     match fused_bound.read_section(&fused_returned, sealed_predecessor) {
-        Err(FrontPassageObstruction::Sealed { occurrence, quotient, reopening }) => {
+        Err(FrontPassageObstruction::Sealed {
+            occurrence,
+            quotient,
+            reopening,
+        }) => {
             let _ = writeln!(form, "      REFUSED, by name: Sealed");
-            let _ = writeln!(form, "        occurrence    {} {occurrence:?}", names.get(&occurrence).cloned().unwrap_or_default());
-            let _ = writeln!(form, "        sealed by     {} {quotient:?}", names.get(&quotient).cloned().unwrap_or_default());
+            let _ = writeln!(
+                form,
+                "        occurrence    {} {occurrence:?}",
+                names.get(&occurrence).cloned().unwrap_or_default()
+            );
+            let _ = writeln!(
+                form,
+                "        sealed by     {} {quotient:?}",
+                names.get(&quotient).cloned().unwrap_or_default()
+            );
             let _ = writeln!(form, "        reopening     {reopening}");
         }
-        Err(other) => return Err(format!("the sealed read returned the wrong obstruction: {}", describe(&other))),
-        Ok(words) => return Err(format!("the sealed read returned {} collapsed words instead of refusing", words.len())),
+        Err(other) => {
+            return Err(format!(
+                "the sealed read returned the wrong obstruction: {}",
+                describe(&other)
+            ));
+        }
+        Ok(words) => {
+            return Err(format!(
+                "the sealed read returned {} collapsed words instead of refusing",
+                words.len()
+            ));
+        }
     }
-    let unfused_face = unfused.bound.read_section(&unfused.returned, sealed_predecessor).map_err(|o| describe(&o))?;
+    let unfused_face = unfused
+        .bound
+        .read_section(&unfused.returned, sealed_predecessor)
+        .map_err(|o| describe(&o))?;
     let widths = unfused_face.iter().filter(|(lo, hi)| hi > lo).count();
     let _ = writeln!(
         form,
         "      AND THE REOPENING ROUTE RETURNS IT: the same occurrence in the unfused deed returns {} coordinates,",
         unfused_face.len()
     );
-    let _ = writeln!(form, "      {widths} of them with a width the quotient would have collapsed. The route is a recompile, not a read.");
+    let _ = writeln!(
+        form,
+        "      {widths} of them with a width the quotient would have collapsed. The route is a recompile, not a read."
+    );
     let _ = writeln!(form);
     let _ = writeln!(
         form,
         "    PART C VERDICT: terminal {} · censuses {} · collapsed population {} · kernel nodes {} -> {} ({:+}) · refusal control {}",
-        if terminal_equal { "BIT-EQUAL" } else { "DIFFERENT" },
-        if census_differences.is_empty() { "EQUAL word for word" } else { "DIFFER" },
+        if terminal_equal {
+            "BIT-EQUAL"
+        } else {
+            "DIFFERENT"
+        },
+        if census_differences.is_empty() {
+            "EQUAL word for word"
+        } else {
+            "DIFFER"
+        },
         "unchanged",
         unfused.kernel_nodes,
         fused_graph.kernel_nodes,
@@ -1781,7 +2666,11 @@ fn founded_with_fusion(
     everything: bool,
 ) -> Result<tower::Founded, String> {
     let mut founded = refound()?;
-    for event in fusible.iter().chain(if everything { refused_by_face.iter() } else { [].iter() }) {
+    for event in fusible.iter().chain(if everything {
+        refused_by_face.iter()
+    } else {
+        [].iter()
+    }) {
         founded.realization.bind(*event, SealedMidpointQuotient);
     }
     Ok(founded)

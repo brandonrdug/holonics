@@ -401,10 +401,7 @@ impl DecompositionPass {
     /// revision took the population from 1,320 parts over 700 kinds to 8,380 parts over 105 kinds —
     /// the parse got longer and the code got smaller.
     pub fn part_count(&self) -> usize {
-        self.decomposed
-            .iter()
-            .map(|whole| whole.parts.len())
-            .sum()
+        self.decomposed.iter().map(|whole| whole.parts.len()).sum()
     }
 
     /// The population the crossing is driven by. Never a count on its way anywhere.
@@ -534,7 +531,10 @@ pub enum DecompositionError {
     /// An aperture admitting a word no pair asked for is not an aperture on this population.
     EmptyRevisionAperture,
     /// The declared aperture admitted none of the words the collapsed population asked for.
-    ApertureAdmittedNothing { asked: usize, minimum: usize },
+    ApertureAdmittedNothing {
+        asked: usize,
+        minimum: usize,
+    },
     EmptyWhole(usize),
     InputIsNotASymbol(InputId),
     NoOpenReflection,
@@ -719,7 +719,8 @@ impl RevisionAperture {
     /// Refuses a floor outside `(0, 1]`. Zero admits everything and is not an aperture; above one
     /// admits nothing, since no word exceeds the most-asked.
     pub fn at_ratio(floor: Rat) -> Result<Self, DecompositionError> {
-        if floor <= Rat::from_integer(BigInt::from(0)) || floor > Rat::from_integer(BigInt::from(1)) {
+        if floor <= Rat::from_integer(BigInt::from(0)) || floor > Rat::from_integer(BigInt::from(1))
+        {
             return Err(DecompositionError::EmptyRevisionAperture);
         }
         Ok(Self {
@@ -2632,7 +2633,10 @@ mod tests {
             panic!("the refusal names the aperture: {refusal:?}");
         };
         assert_eq!(minimum, 1_000);
-        assert!(asked > 0, "the refusal reports what the population did ask for");
+        assert!(
+            asked > 0,
+            "the refusal reports what the population did ask for"
+        );
     }
 
     /// The multiset is the population; the set is its shadow. Both are returned, and on real

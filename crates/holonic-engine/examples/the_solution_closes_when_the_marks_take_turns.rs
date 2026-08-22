@@ -57,8 +57,8 @@
 //! ```
 
 use holonic_engine::hypergeometric_closure::{
-    closing_turn_table, read_from_turns, read_return_group, ClosureReading, CurvatureSign,
-    LocalTurns, ThreeSiteDials,
+    ClosureReading, CurvatureSign, LocalTurns, ThreeSiteDials, closing_turn_table, read_from_turns,
+    read_return_group,
 };
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -84,7 +84,9 @@ fn main() {
     println!("{}", "=".repeat(96));
     println!();
     println!("  Three sites. Three local turn numbers. Put the dials on a circle as two families");
-    println!("  of marks and ask whether they alternate -- under every restretching of the circle.");
+    println!(
+        "  of marks and ask whether they alternate -- under every restretching of the circle."
+    );
     println!();
 
     println!("{}", "-".repeat(96));
@@ -121,7 +123,11 @@ fn main() {
             ),
             reading.closure.circle(),
             spins,
-            if reading.closure.closes() { "YES" } else { "NO" },
+            if reading.closure.closes() {
+                "YES"
+            } else {
+                "NO"
+            },
             solid
         );
     }
@@ -165,8 +171,12 @@ fn main() {
                     adjacency.family, adjacency.first, adjacency.second
                 );
             }
-            ClosureReading::Closes { .. } => println!("      CLOSES -- which would refute the split"),
-            ClosureReading::Splits { coincident_mark, .. } => {
+            ClosureReading::Closes { .. } => {
+                println!("      CLOSES -- which would refute the split")
+            }
+            ClosureReading::Splits {
+                coincident_mark, ..
+            } => {
                 println!("      SPLITS at mark {coincident_mark}")
             }
         }
@@ -176,7 +186,9 @@ fn main() {
     println!("{}", "-".repeat(96));
     println!("THE THIRD OUTCOME -- THE FLAT LOCUS IS THE SPLITTING LOCUS");
     println!("{}", "-".repeat(96));
-    println!("  The signed turn sum is 1 - 2b identically, so a FLAT triple forces a dial to zero,");
+    println!(
+        "  The signed turn sum is 1 - 2b identically, so a FLAT triple forces a dial to zero,"
+    );
     println!("  and a dial at zero lands on the denominator family's mark at zero. Every flat");
     println!("  triple therefore splits rather than merely failing to close. This was found by");
     println!("  this driver refuting a fixture that had listed a flat triple as a refusal.");
@@ -215,7 +227,9 @@ fn main() {
 
     println!();
     println!("{}", "-".repeat(96));
-    println!("THE RESTRETCHING IS LOAD-BEARING -- material that alternates AS DRAWN and fails spun");
+    println!(
+        "THE RESTRETCHING IS LOAD-BEARING -- material that alternates AS DRAWN and fails spun"
+    );
     println!("{}", "-".repeat(96));
     let mut found = Vec::new();
     for numerator in 1..30_i64 {
@@ -273,16 +287,25 @@ fn main() {
     println!("WHAT RETURNED");
     println!("{}", "=".repeat(96));
     println!("  classically closing rows, all decided by the test   {rows_closing} of 15");
-    println!("  declared non-closing triples refused                {refusals} of {}", refused.len());
+    println!(
+        "  declared non-closing triples refused                {refusals} of {}",
+        refused.len()
+    );
     println!("  every flat triple split rather than refusing        {splits_by_name}");
-    println!("  restretching loop exercised by real material        {restretching_is_load_bearing}");
+    println!(
+        "  restretching loop exercised by real material        {restretching_is_load_bearing}"
+    );
 
     println!();
     println!("{}", "-".repeat(96));
     println!("WHAT THIS RUN DOES NOT ESTABLISH");
     println!("{}", "-".repeat(96));
-    println!("  This decides FINITENESS of the return group. It does not build the group, does not");
-    println!("  produce the algebraic solution, and does not integrate anything. Second order only,");
+    println!(
+        "  This decides FINITENESS of the return group. It does not build the group, does not"
+    );
+    println!(
+        "  produce the algebraic solution, and does not integrate anything. Second order only,"
+    );
     println!("  rational dials only. The fifteen rows were never consulted to decide any verdict.");
 
     println!();
@@ -293,10 +316,16 @@ fn main() {
         && restretching_is_load_bearing
     {
         println!("HELD -- every classically closing row was recovered by sorting integers, every");
-        println!("        declared non-closing triple was refused with its adjacent pair exhibited,");
-        println!("        and the restretching is doing work rather than decorating the criterion.");
+        println!(
+            "        declared non-closing triple was refused with its adjacent pair exhibited,"
+        );
+        println!(
+            "        and the restretching is doing work rather than decorating the criterion."
+        );
     } else {
-        println!("REFUTED -- rows={rows_closing}/15 refusals={refusals} splits={splits_by_name} spins={restretching_is_load_bearing}");
+        println!(
+            "REFUTED -- rows={rows_closing}/15 refusals={refusals} splits={splits_by_name} spins={restretching_is_load_bearing}"
+        );
         println!("{}", "=".repeat(96));
         std::process::exit(1);
     }

@@ -43,7 +43,10 @@ fn whole(value: i64) -> Rat {
 }
 
 fn render(vector: &[Rat]) -> String {
-    let parts: Vec<String> = vector.iter().map(std::string::ToString::to_string).collect();
+    let parts: Vec<String> = vector
+        .iter()
+        .map(std::string::ToString::to_string)
+        .collect();
     format!("({})", parts.join(", "))
 }
 
@@ -86,21 +89,29 @@ fn main() {
     println!("                 the QUOTIENT        the REMAINDER");
     println!("                 a scalar            an oriented area");
     println!();
-    println!("  `soma/body/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO");
+    println!(
+        "  `soma/body/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO"
+    );
     println!("  dimensions, with the note \"The whole arrow, never one scalar.\" The carrier read");
-    println!("  below is that arrow at d dimensions over exact rationals, in the library, with the");
+    println!(
+        "  below is that arrow at d dimensions over exact rationals, in the library, with the"
+    );
     println!("  algebra that carries its hand.");
 
     // ---------------------------------------------------------------- the algebra
     println!();
     println!("{}", "=".repeat(100));
-    println!("[0]  THE ALGEBRA  --  and the one factor that separates it from the standing carrier");
+    println!(
+        "[0]  THE ALGEBRA  --  and the one factor that separates it from the standing carrier"
+    );
     println!("{}", "=".repeat(100));
     println!();
     println!("    multiquadratic   e_S e_T  =              (prod_{{S^T}} k_i) . e_{{S x T}}");
     println!("    Clifford         e_S e_T  =  sigma(S,T) . (prod_{{S^T}} q_i) . e_{{S x T}}");
     println!();
-    println!("  sigma(S,T) = (-1)^#{{(i,j) : i in S, j in T, i > j}} -- the exterior sign, the parity");
+    println!(
+        "  sigma(S,T) = (-1)^#{{(i,j) : i in S, j in T, i > j}} -- the exterior sign, the parity"
+    );
     println!("  of the transpositions that sort S concatenated with T.");
     println!();
 
@@ -116,12 +127,18 @@ fn main() {
     );
     assert_ne!(forward, backward, "the product must not commute");
     println!();
-    println!("  THE FALSIFIER STATION ONE NAMES: if the product commuted, the sign was not installed");
+    println!(
+        "  THE FALSIFIER STATION ONE NAMES: if the product commuted, the sign was not installed"
+    );
     println!("  and the whole station is decoration. It does not commute.");
     println!();
     println!("  AND THE OBVIOUS REPAIR IS NOT AVAILABLE. mu(S) = (-1)^|S| is a CHARACTER of the");
-    println!("  grading group -- mu(S)mu(T) = mu(S x T) -- hence a coboundary, so twisting by it is");
-    println!("  an isomorphism and preserves commutativity. sigma is asymmetric in its arguments and");
+    println!(
+        "  grading group -- mu(S)mu(T) = mu(S x T) -- hence a coboundary, so twisting by it is"
+    );
+    println!(
+        "  an isomorphism and preserves commutativity. sigma is asymmetric in its arguments and"
+    );
     println!("  every character of an abelian group is symmetric, so sigma is not one:");
     let sigma_forward = merge_blades(&[0], &[1]);
     let sigma_backward = merge_blades(&[1], &[0]);
@@ -130,7 +147,9 @@ fn main() {
         sigma_forward.sign, sigma_backward.sign, sigma_forward.surviving
     );
     println!();
-    println!("  So the crossing-word algebra that carries a hand IS the even Clifford algebra, and");
+    println!(
+        "  So the crossing-word algebra that carries a hand IS the even Clifford algebra, and"
+    );
     println!("  `soul::FormedRotor {{aim, cross}}` is already its two-dimensional case.");
 
     // ---------------------------------------------------------------- station one
@@ -232,7 +251,9 @@ fn main() {
         "the material must exhibit both, or the reading cannot fail"
     );
     println!();
-    println!("  AND THE RECONSTRUCTION IS NOW A PRODUCT. `a = (a b^-1) b` is computed in the algebra");
+    println!(
+        "  AND THE RECONSTRUCTION IS NOW A PRODUCT. `a = (a b^-1) b` is computed in the algebra"
+    );
     println!("  -- the actual quotient times the actual divisor -- not a contraction written to");
     println!("  invert the way the blade was built. That is what makes it a measurement.");
 
@@ -243,15 +264,26 @@ fn main() {
     println!("{}", "=".repeat(100));
     println!();
     println!("  A score is the aim. Two crossings with the SAME aim and DIFFERENT blades are");
-    println!("  indistinguishable to it. In d >= 3 this is immediate: the same angle, another plane.");
+    println!(
+        "  indistinguishable to it. In d >= 3 this is immediate: the same angle, another plane."
+    );
     println!();
 
     let euclidean4 = Signature::euclidean(4);
     let q = vec![whole(1), whole(0), whole(0), whole(0)];
     let keys: Vec<(&str, Vec<Rat>)> = vec![
-        ("k1 = (2,3,0,0)", vec![whole(2), whole(3), whole(0), whole(0)]),
-        ("k2 = (2,0,3,0)", vec![whole(2), whole(0), whole(3), whole(0)]),
-        ("k3 = (2,0,0,3)", vec![whole(2), whole(0), whole(0), whole(3)]),
+        (
+            "k1 = (2,3,0,0)",
+            vec![whole(2), whole(3), whole(0), whole(0)],
+        ),
+        (
+            "k2 = (2,0,3,0)",
+            vec![whole(2), whole(0), whole(3), whole(0)],
+        ),
+        (
+            "k3 = (2,0,0,3)",
+            vec![whole(2), whole(0), whole(0), whole(3)],
+        ),
     ];
     let arrows: Vec<(&str, Arrow)> = keys
         .iter()
@@ -264,7 +296,10 @@ fn main() {
         .collect();
     println!("  q = {}", render(&q));
     println!();
-    println!("  {:<18} {:>6} {:>10}   {}", "key", "aim", "area^2", "blade");
+    println!(
+        "  {:<18} {:>6} {:>10}   {}",
+        "key", "aim", "area^2", "blade"
+    );
     for (name, arrow) in &arrows {
         println!(
             "  {name:<18} {:>6} {:>10}   {}",
@@ -274,7 +309,11 @@ fn main() {
         );
     }
     for pair in arrows.windows(2) {
-        assert_eq!(pair[0].1.aim(), pair[1].1.aim(), "the aims must be exactly equal");
+        assert_eq!(
+            pair[0].1.aim(),
+            pair[1].1.aim(),
+            "the aims must be exactly equal"
+        );
         assert_eq!(
             pair[0].1.area_squared().value,
             pair[1].1.area_squared().value,
@@ -290,12 +329,16 @@ fn main() {
     println!("  Every aim is EXACTLY equal.  Every area^2 is EXACTLY equal.  Every blade DIFFERS.");
     println!();
     println!("  THE FALSIFIER THE PLAN NAMED, AND IT RETURNS AGAINST THE WEAKER READING:");
-    println!("  a scalar summary of the wedge does not suffice either. The area is the same in all");
+    println!(
+        "  a scalar summary of the wedge does not suffice either. The area is the same in all"
+    );
     println!("  three; only the blade separates them. So the wedge must be carried WHOLE, and");
     println!("  reducing it to its magnitude would be a second float.");
     println!();
     println!("  This is the phase-object theorem at the attention score. A pure phase grating has");
-    println!("  |t| = 1 everywhere and an intensity receiver measures nothing. The dot product is a");
+    println!(
+        "  |t| = 1 everywhere and an intensity receiver measures nothing. The dot product is a"
+    );
     println!("  magnitude receiver; the plane of the crossing is a phase object.");
 
     // ---------------------------------------------------------------- the ortho population
@@ -306,8 +349,12 @@ fn main() {
     println!();
     println!("  `soma/body/src/arrow.rs:32-34`, on Aim::Ortho:");
     println!();
-    println!("    \"the cohere is null, but the CROSS/gyration is MAXIMAL: the pure orthogonal turn,");
-    println!("     the FOUNDING hand, the magnitude looked-past. NOT 'no current' -- it is the most");
+    println!(
+        "    \"the cohere is null, but the CROSS/gyration is MAXIMAL: the pure orthogonal turn,"
+    );
+    println!(
+        "     the FOUNDING hand, the magnitude looked-past. NOT 'no current' -- it is the most"
+    );
     println!("     turn there is, mis-read as nothing because the cohere face is null.\"");
     println!();
     let sweep: Vec<Vec<Rat>> = (0..6)
@@ -336,13 +383,20 @@ fn main() {
             }
         }
     }
-    println!("  a small exact sweep, {} pairs:", sweep.len() * sweep.len());
+    println!(
+        "  a small exact sweep, {} pairs:",
+        sweep.len() * sweep.len()
+    );
     for (hand, count) in &census {
         println!("    {hand:<8} {count}");
     }
     println!();
-    println!("  of the ORTHO pairs, {ortho_with_area} carry a NON-ZERO area — the score reads zero");
-    println!("  and the arrow carries a whole plane. Those are the pairs an attention head is told");
+    println!(
+        "  of the ORTHO pairs, {ortho_with_area} carry a NON-ZERO area — the score reads zero"
+    );
+    println!(
+        "  and the arrow carries a whole plane. Those are the pairs an attention head is told"
+    );
     println!("  are unrelated, and on which the law body says the turn is maximal.");
     assert!(
         ortho_with_area > 0,
@@ -357,9 +411,15 @@ fn main() {
         println!("    {class:<10} {count}");
     }
     println!();
-    println!("  A zero score names two utterly different causal facts -- ORTHO, where the gyration");
-    println!("  is maximal, and UNREAD, where the relating is behind the pole's own horizon and has");
-    println!("  no causal character at all. The score returns the same number for both. Station six");
+    println!(
+        "  A zero score names two utterly different causal facts -- ORTHO, where the gyration"
+    );
+    println!(
+        "  is maximal, and UNREAD, where the relating is behind the pole's own horizon and has"
+    );
+    println!(
+        "  no causal character at all. The score returns the same number for both. Station six"
+    );
     println!("  takes this census to a real head for exactly that reason.");
 
     println!();
@@ -368,12 +428,20 @@ fn main() {
     println!("{}", "=".repeat(100));
     println!();
     println!("  It measures what a score CANNOT see. It does not claim a model would behave");
-    println!("  differently with the blade carried -- that is a separate question needing a separate");
-    println!("  falsifier, and station six of the plan puts the census to real weights rather than");
+    println!(
+        "  differently with the blade carried -- that is a separate question needing a separate"
+    );
+    println!(
+        "  falsifier, and station six of the plan puts the census to real weights rather than"
+    );
     println!("  to the small exact sweep above.");
     println!();
-    println!("  Nothing here rests on the receiver family being orthogonal. The dot and the wedge are");
-    println!("  bilinear forms on coordinates; they need no orthonormal basis and no projector, which");
+    println!(
+        "  Nothing here rests on the receiver family being orthogonal. The dot and the wedge are"
+    );
+    println!(
+        "  bilinear forms on coordinates; they need no orthonormal basis and no projector, which"
+    );
     println!("  is why this line survives the refutation that removed the projector reading.");
 }
 

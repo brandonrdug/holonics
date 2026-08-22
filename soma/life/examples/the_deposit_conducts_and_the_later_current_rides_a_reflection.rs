@@ -63,8 +63,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::dimensional_wave::ExactWavePhaseTransport;
 use holonic_engine::running_integral::CoefficientGroup;
 use holonic_engine::traversible_chain::{
-    Admittance, BandClass, BlochReading, Crossing, PhasedLink, PhasedTransfer, Standing,
-    StandingWaveReading, found_phased,
+    found_phased, Admittance, BandClass, BlochReading, Crossing, PhasedLink, PhasedTransfer,
+    Standing, StandingWaveReading,
 };
 use holonic_structure::Composes;
 use life::incidence_production::{
@@ -267,8 +267,8 @@ fn conduct(
         .chain(std::iter::once(&profile.admittances[0]))
         .collect();
     for (at, pair) in ring.windows(2).enumerate() {
-        let crossing = Crossing::meet(pair[0], pair[1])
-            .map_err(|error| format!("junction {at}: {error}"))?;
+        let crossing =
+            Crossing::meet(pair[0], pair[1]).map_err(|error| format!("junction {at}: {error}"))?;
         let reflection = crossing.reflection();
         twists.push(if reflection.is_zero() {
             "MATCHED"
@@ -345,8 +345,7 @@ fn print_profile(profile: &ConductionProfile) {
         "    {:<16} {:>8} {:>10} {:>12}",
         "constituent", "took", "arriving", "admittance"
     );
-    for ((surface, shared, arriving), admittance) in
-        profile.sites.iter().zip(&profile.admittances)
+    for ((surface, shared, arriving), admittance) in profile.sites.iter().zip(&profile.admittances)
     {
         println!(
             "    {:<16} {:>8} {:>10} {:>12}",
@@ -364,11 +363,7 @@ fn print_profile(profile: &ConductionProfile) {
 fn print_conduction(label: &str, reading: &ConductionReading) {
     println!("  {label}");
     print!("    per-junction Γ  ");
-    for (reflection, twist) in reading
-        .junction_reflections
-        .iter()
-        .zip(&reading.twists)
-    {
+    for (reflection, twist) in reading.junction_reflections.iter().zip(&reading.twists) {
         print!("{reflection} [{twist}]   ");
     }
     println!();
@@ -394,19 +389,23 @@ fn run() -> Result<(), String> {
     let group = CoefficientGroup::Integers;
     // A declared phase on the exact unit conic. (3/5, 4/5) is the smallest rational point that is
     // neither a whole nor a quarter turn, so it is the honest witness rather than a degenerate one.
-    let phase = ExactWavePhaseTransport::new(
-        Rat::new(3.into(), 5.into()),
-        Rat::new(4.into(), 5.into()),
-    )
-    .map_err(|error| format!("the declared phase is off the unit conic: {error:?}"))?;
+    let phase =
+        ExactWavePhaseTransport::new(Rat::new(3.into(), 5.into()), Rat::new(4.into(), 5.into()))
+            .map_err(|error| format!("the declared phase is off the unit conic: {error:?}"))?;
 
     println!("{}", "=".repeat(100));
     println!("THE DEPOSIT CONDUCTS, AND THE LATER CURRENT RIDES A REFLECTION");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  Two standing organs that had never touched: the mouth, which deposits material at a");
-    println!("  site and returns reached/reopened/saturated/untouched; and the chain, which crosses");
-    println!("  junctions with exact reflection and — since the phase wire — carries a round trip.");
+    println!(
+        "  Two standing organs that had never touched: the mouth, which deposits material at a"
+    );
+    println!(
+        "  site and returns reached/reopened/saturated/untouched; and the chain, which crosses"
+    );
+    println!(
+        "  junctions with exact reflection and — since the phase wire — carries a round trip."
+    );
     println!();
 
     println!("THE STANDING TERRAIN");
@@ -437,10 +436,14 @@ fn run() -> Result<(), String> {
         .map_err(|error| format!("admit A: {error:?}"))?;
     print_arrival("A · the deposit arrives", &response_a);
     println!();
-    println!("  THE ADMITTANCE PROFILE THE ARRIVAL FOUNDED. Nothing below is declared per junction:");
+    println!(
+        "  THE ADMITTANCE PROFILE THE ARRIVAL FOUNDED. Nothing below is declared per junction:"
+    );
     println!("  each site is one the arrival actually raised, and its admittance is that site's");
     println!("  share of the arrival's own total deposit. `traversible_chain`'s law verbatim —");
-    println!("  \"how much of an arriving current a site can take… what the site shares with it.\"");
+    println!(
+        "  \"how much of an arriving current a site can take… what the site shares with it.\""
+    );
     println!();
     let constituents_a = constituent_profile(&response_a);
     println!("  at the CONSTITUENT grain — what A added to standing constituents:");
@@ -453,9 +456,13 @@ fn run() -> Result<(), String> {
     let conduction_a = conduct(&profile_a, &phase)?;
     print_conduction("A · conducted as a closed phased ring", &conduction_a);
     println!();
-    println!("  The current crossed {} junctions and came back. Every junction that did not match",
-        conduction_a.junction_reflections.len());
-    println!("  retained what did not cross — reflection is not loss, it is the fiber of a junction");
+    println!(
+        "  The current crossed {} junctions and came back. Every junction that did not match",
+        conduction_a.junction_reflections.len()
+    );
+    println!(
+        "  retained what did not cross — reflection is not loss, it is the fiber of a junction"
+    );
     println!("  that did not match — and the composite carries the whole return.");
 
     // -- station seven: deposit, then ride, across a reflecting junction -----------------------
@@ -544,10 +551,16 @@ fn run() -> Result<(), String> {
             .map(|(name, shared, arriving)| (name.clone(), *shared, *arriving))
             .collect::<Vec<_>>();
     println!();
-    println!("  >> THE CONSTITUENT GRAIN MOVED: {constituent_grain_moved}. It does not, and that is a");
-    println!("  >> measurement rather than a disappointment. B uses none of A's two new constituents,");
+    println!(
+        "  >> THE CONSTITUENT GRAIN MOVED: {constituent_grain_moved}. It does not, and that is a"
+    );
+    println!(
+        "  >> measurement rather than a disappointment. B uses none of A's two new constituents,"
+    );
     println!("  >> so its deposit onto STANDING constituents cannot move. What A changed is the");
-    println!("  >> CLOSED-BOUNDARY structure, and a profile read at the constituent grain is blind to");
+    println!(
+        "  >> CLOSED-BOUNDARY structure, and a profile read at the constituent grain is blind to"
+    );
     println!("  >> it -- the phase-object theorem on a third subject.");
     println!();
     println!("  B's BOUNDARY-grain profile, with the deposit standing:");
@@ -559,7 +572,10 @@ fn run() -> Result<(), String> {
     let conduction_b_with = conduct(&profile_b_with, &phase)?;
     let conduction_b_without = conduct(&profile_b_without, &phase)?;
     println!();
-    print_conduction("B · conducted WITH the deposit standing", &conduction_b_with);
+    print_conduction(
+        "B · conducted WITH the deposit standing",
+        &conduction_b_with,
+    );
     println!();
     print_conduction("B · conducted WITHOUT it", &conduction_b_without);
 
@@ -626,7 +642,10 @@ fn run() -> Result<(), String> {
     note(
         "conduction: |Γ|²",
         conduction_b_with.standing_wave.reflected_share.to_string(),
-        conduction_b_without.standing_wave.reflected_share.to_string(),
+        conduction_b_without
+            .standing_wave
+            .reflected_share
+            .to_string(),
     );
     note(
         "conduction: half-trace",
@@ -644,7 +663,10 @@ fn run() -> Result<(), String> {
         conduction_b_without.is_rebase.to_string(),
     );
 
-    println!("  {:<30} {:>22} {:>22}", "coordinate", "WITH the deposit", "WITHOUT it");
+    println!(
+        "  {:<30} {:>22} {:>22}",
+        "coordinate", "WITH the deposit", "WITHOUT it"
+    );
     for (name, with, without) in &moved {
         println!("  {name:<30} {with:>22} {without:>22}   MOVED");
     }
@@ -652,7 +674,11 @@ fn run() -> Result<(), String> {
         println!("  {name:<30} {:>22}", "unmoved");
     }
     println!();
-    println!("  {} coordinates moved, {} did not.", moved.len(), unmoved.len());
+    println!(
+        "  {} coordinates moved, {} did not.",
+        moved.len(),
+        unmoved.len()
+    );
 
     if moved.is_empty() {
         println!();
@@ -663,27 +689,39 @@ fn run() -> Result<(), String> {
     }
 
     println!();
-    println!("  >> B RODE THE DEPOSIT. The difference is attributable by construction: the two runs");
+    println!(
+        "  >> B RODE THE DEPOSIT. The difference is attributable by construction: the two runs"
+    );
     println!("  >> declare B identically and differ only in whether A stands, and the withdrawal");
     println!("  >> returned the complex bit-identical to base before the second run was taken.");
 
     // -- the authored-partition arm ------------------------------------------------------------
     println!();
     println!("{}", "=".repeat(100));
-    println!("THE SECOND FALSIFIER  --  is the conduction the preimage of a field this driver wrote?");
+    println!(
+        "THE SECOND FALSIFIER  --  is the conduction the preimage of a field this driver wrote?"
+    );
     println!("{}", "=".repeat(100));
     println!();
     println!("  The plan's own test: \"which declared input, if varied across two members of one");
-    println!("  returned class, would move them apart? If the answer is a field this driver wrote,");
+    println!(
+        "  returned class, would move them apart? If the answer is a field this driver wrote,"
+    );
     println!("  the partition is authored.\"");
     println!();
     println!("  This driver declares THREE things and none of them is an admittance: the base");
     println!("  material, the two arrivals, and one propagation phase. Every admittance above is");
-    println!("  `shared : arriving` read off the arrival's own response — which closed boundaries it");
-    println!("  reached and which of their constituents it touched — so varying the MATERIAL moves");
+    println!(
+        "  `shared : arriving` read off the arrival's own response — which closed boundaries it"
+    );
+    println!(
+        "  reached and which of their constituents it touched — so varying the MATERIAL moves"
+    );
     println!("  the profile and there is no field to vary that would move it otherwise.");
     println!();
-    println!("  And the arm that shows it: the two boundary profiles above differ, and they differ");
+    println!(
+        "  And the arm that shows it: the two boundary profiles above differ, and they differ"
+    );
     println!("  because the terrain differed. B's declaration is byte-identical in both runs.");
     let with_shares: BTreeMap<&str, u64> = profile_b_with
         .sites
@@ -717,9 +755,13 @@ fn run() -> Result<(), String> {
         || unphased.composite_reflection != conduction_a.composite_reflection;
     println!("  the phase moved the conduction: {phase_moved}");
     println!();
-    println!("  A closed ring of interfaces alone returns the identity BY CONSTRUCTION — the composed");
+    println!(
+        "  A closed ring of interfaces alone returns the identity BY CONSTRUCTION — the composed"
+    );
     println!("  admittance ratio is Y_source/Y_source — so that receipt could not have come out");
-    println!("  otherwise and carries no evidence. With a phase in the loop it can, and does, differ.");
+    println!(
+        "  otherwise and carries no evidence. With a phase in the loop it can, and does, differ."
+    );
     if !phase_moved {
         return Err("the phase changed nothing; it is not in the loop".into());
     }
@@ -729,15 +771,23 @@ fn run() -> Result<(), String> {
     println!("WHAT THIS RUN DOES NOT CLAIM");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  The conduction is a reading of the profile the arrival founded. It does not claim the");
-    println!("  complex itself conducts — `IncidenceComplex` is a deposit carrier and `diffusion` is");
-    println!("  immutable after `new`; joining them at the level of state is a separate deed with its");
+    println!(
+        "  The conduction is a reading of the profile the arrival founded. It does not claim the"
+    );
+    println!(
+        "  complex itself conducts — `IncidenceComplex` is a deposit carrier and `diffusion` is"
+    );
+    println!(
+        "  immutable after `new`; joining them at the level of state is a separate deed with its"
+    );
     println!("  own falsifier.");
     println!();
     println!("  Nothing here quotes `energy_residual`, which `traversible_chain` records as");
     println!("  identically zero for its convention, algebraically.");
     println!();
-    println!("  The material is small and declared, and the surface is the serial path deliberately:");
+    println!(
+        "  The material is small and declared, and the surface is the serial path deliberately:"
+    );
     println!("  a handful of occurrences and one exact rational chain per arrival has no front to");
     println!("  distribute. Stations five and six are where this plan's current needs the card.");
     Ok(())

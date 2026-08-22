@@ -1867,7 +1867,11 @@ fn validate_ablation(
                 ));
             }
             if control_before != control_after
-                || !strict_equal_prefix(&ablation.before, &ablation.ablated, &ablation.control_before)
+                || !strict_equal_prefix(
+                    &ablation.before,
+                    &ablation.ablated,
+                    &ablation.control_before,
+                )
                 || ablation.control_deeds[0] != ablation.deeds[0]
                 || ablation.control_deeds[1] != ablation.deeds[1]
             {
@@ -1897,13 +1901,11 @@ fn validate_ablation(
                     "subject-disjoint control before/after returns differ".to_owned(),
                 ));
             }
-            if ablation
-                .control_deeds
-                .iter()
-                .any(|deed| deed.execution.deed_identity == ablation.deeds[0].execution.deed_identity
+            if ablation.control_deeds.iter().any(|deed| {
+                deed.execution.deed_identity == ablation.deeds[0].execution.deed_identity
                     || deed.execution.deed_identity == ablation.deeds[1].execution.deed_identity
-                    || deed.execution.deed_identity == ablation.deeds[2].execution.deed_identity)
-            {
+                    || deed.execution.deed_identity == ablation.deeds[2].execution.deed_identity
+            }) {
                 return Err(GradeRefusal::Invalid(
                     "subject-disjoint control reused a causal deed".to_owned(),
                 ));
@@ -1938,15 +1940,14 @@ fn strict_equal_prefix(
 
 fn control_held(ablation: &CauseAblation) -> bool {
     match ablation.control_kind {
-        AblationControlKind::CausalPrefix => {
-            strict_equal_prefix(&ablation.before, &ablation.ablated, &ablation.control_before)
-        }
-        AblationControlKind::SubjectDisjoint => {
-            ablation.control_before == ablation.control_after
-        }
+        AblationControlKind::CausalPrefix => strict_equal_prefix(
+            &ablation.before,
+            &ablation.ablated,
+            &ablation.control_before,
+        ),
+        AblationControlKind::SubjectDisjoint => ablation.control_before == ablation.control_after,
     }
 }
-
 
 fn work_bound(value: &WorkReceipt, return_digest: &str) -> bool {
     if value.returned_artifact_digest != return_digest

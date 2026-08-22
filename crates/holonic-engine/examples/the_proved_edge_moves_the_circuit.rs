@@ -33,10 +33,10 @@ use holonic_engine::derivation_atlas::{
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, ReachOrientation,
     RecruitmentCoefficient, StatementIncidence, found_circuit, invariant_movement, route_movement,
 };
-use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::lean_development::{
     BinderGrain, ConductGrain, DeclarationGrain, read_development_at,
 };
+use holonic_engine::rebase_invariants::PivotRule;
 
 const PROJECT: &str = "soma/formal/rh-source-transport";
 const CORPUS: &str = "SomaRHSourceTransport/FiniteTransport.lean";

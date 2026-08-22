@@ -59,14 +59,17 @@ use std::collections::{BTreeMap, BTreeSet};
 use num_traits::Zero;
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::causal::EventId;
 use crate::category::BoundaryId;
+use crate::causal::EventId;
 use crate::evolution::{EvolutionError, EvolutionLawId, EvolutionShape};
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
 use crate::exact_work::{Admission, ExactWork, WorkBudget};
-use crate::interaction::{InteractionBond, InteractionPattern, InteractionTemporality, OccurrencePort};
+use crate::interaction::{
+    InteractionBond, InteractionPattern, InteractionTemporality, OccurrencePort,
+};
 use crate::realization::{RealizationError, RealizationWitness};
 
 /// The four operation species of `canon/TABLET_THE_OPERATIONS.md`. **Every ported operation is
@@ -116,7 +119,10 @@ pub enum SourceTestimony {
     /// A field of the source's own declared configuration.
     Configuration { field: String, value: String },
     /// A declared population's shape, which constrains the ports it can carry.
-    DeclaredShape { population: String, shape: Vec<usize> },
+    DeclaredShape {
+        population: String,
+        shape: Vec<usize>,
+    },
     /// A statement from the source's authoritative description of itself.
     AuthoritativeDescription { statement: String },
     /// The source's executable implementation, where it is available. `symbol` is a path of
@@ -338,7 +344,10 @@ pub struct PortedWord {
 
 impl PortedWord {
     /// Found a word, checking every join. **Ports must agree by identity, not by extent.**
-    pub fn founded(name: impl Into<String>, steps: Vec<PortedTransport>) -> Result<Self, PortedError> {
+    pub fn founded(
+        name: impl Into<String>,
+        steps: Vec<PortedTransport>,
+    ) -> Result<Self, PortedError> {
         for pair in steps.windows(2) {
             if pair[0].target_port != pair[1].source_port {
                 return Err(PortedError::PortsDoNotCompose {
@@ -412,7 +421,10 @@ impl PortedWord {
     /// separates `AB` from `BA` for noncommuting factors. A chart comparison cannot.
     pub fn applied_receiver(&self, standing: &[Rat]) -> Result<Vec<Rat>, PortedError> {
         let lineage = self.enact(standing)?;
-        lineage.into_iter().next_back().ok_or(PortedError::EmptyWord)
+        lineage
+            .into_iter()
+            .next_back()
+            .ok_or(PortedError::EmptyWord)
     }
 
     /// The exact predicted work of enacting this word, before anything is dispatched.
@@ -732,6 +744,274 @@ impl PortedOperationComplex {
             operations_without_deciding_testimony: unbound,
         })
     }
+
+    /// Name-independent identity of the complete caused operation complex.
+    ///
+    /// Display names, schema spellings, carriers, and source testimony do not conduct this
+    /// identity. It binds the nominal boundary population, law species and exact port words,
+    /// occurrence-to-law incidence, causal precedence, and the complete interaction/bond
+    /// population. A post-card receipt uses this to refuse substitution by a different complex
+    /// which happens to reuse the same law and event identifiers.
+    pub(crate) fn canonical_identity(&self) -> Option<String> {
+        self.canonical_identity_over(None)
+    }
+
+    /// Name-independent identity of the subcomplex induced by `events`.
+    ///
+    /// Every precedence edge and every interaction bond whose endpoints both lie in the selected
+    /// event population is retained. Repeated bonds remain repeated incidence. An absent event is
+    /// not silently omitted.
+    pub(crate) fn canonical_induced_identity(&self, events: &BTreeSet<EventId>) -> Option<String> {
+        if events.is_empty()
+            || events
+                .iter()
+                .any(|event| !self.shape.occurrences.contains_key(event))
+        {
+            return None;
+        }
+        self.canonical_identity_over(Some(events))
+    }
+
+    fn canonical_identity_over(&self, selected: Option<&BTreeSet<EventId>>) -> Option<String> {
+        if !self.canonical_addresses_stand() {
+            return None;
+        }
+        let events = selected.cloned().unwrap_or_else(|| {
+            self.shape
+                .occurrences
+                .keys()
+                .copied()
+                .collect::<BTreeSet<_>>()
+        });
+        if events
+            .iter()
+            .any(|event| !self.shape.chronology.events.contains_key(event))
+        {
+            return None;
+        }
+        let laws = if selected.is_none() {
+            self.shape.laws.keys().copied().collect::<BTreeSet<_>>()
+        } else {
+            events
+                .iter()
+                .map(|event| {
+                    self.shape
+                        .occurrences
+                        .get(event)
+                        .map(|occurrence| occurrence.law)
+                })
+                .collect::<Option<BTreeSet<_>>>()?
+        };
+        let boundaries = if selected.is_none() {
+            self.shape
+                .boundaries
+                .objects
+                .keys()
+                .copied()
+                .collect::<BTreeSet<_>>()
+        } else {
+            laws.iter()
+                .flat_map(|law| {
+                    self.shape
+                        .laws
+                        .get(law)
+                        .into_iter()
+                        .flat_map(|law| law.inputs.iter().chain(&law.outputs))
+                        .copied()
+                })
+                .collect::<BTreeSet<_>>()
+        };
+
+        let mut hash = Sha256::new();
+        hash.update(b"holonic-engine.ported-operation-complex.canonical.v1");
+        put_len(&mut hash, boundaries.len());
+        for boundary in &boundaries {
+            put_u64(&mut hash, boundary.0);
+        }
+        let arrows = self
+            .shape
+            .boundaries
+            .arrows
+            .iter()
+            .filter(|(_, arrow)| {
+                boundaries.contains(&arrow.domain) && boundaries.contains(&arrow.codomain)
+            })
+            .collect::<Vec<_>>();
+        put_len(&mut hash, arrows.len());
+        for (arrow_id, arrow) in arrows {
+            put_u64(&mut hash, arrow_id.0);
+            put_u64(&mut hash, arrow.domain.0);
+            put_u64(&mut hash, arrow.codomain.0);
+        }
+        put_len(&mut hash, laws.len());
+        for law_id in laws {
+            let law = self.shape.laws.get(&law_id)?;
+            let operation = self.operations.get(&law_id)?;
+            put_u64(&mut hash, law_id.0);
+            hash.update([operation_species_tag(operation.species)]);
+            put_boundary_word(&mut hash, &law.inputs);
+            put_boundary_word(&mut hash, &law.outputs);
+        }
+        put_len(&mut hash, events.len());
+        for event in &events {
+            let occurrence = self.shape.occurrences.get(event)?;
+            put_u64(&mut hash, event.0);
+            put_u64(&mut hash, occurrence.law.0);
+        }
+        let precedence = self
+            .shape
+            .chronology
+            .precedence
+            .iter()
+            .filter(|(before, after)| events.contains(before) && events.contains(after))
+            .collect::<Vec<_>>();
+        put_len(&mut hash, precedence.len());
+        for (before, after) in precedence {
+            put_u64(&mut hash, before.0);
+            put_u64(&mut hash, after.0);
+        }
+        let interactions = self
+            .shape
+            .interactions
+            .iter()
+            .filter_map(|(id, interaction)| {
+                let mut bonds = interaction
+                    .bonds
+                    .iter()
+                    .filter(|bond| {
+                        events.contains(&bond.source.event) && events.contains(&bond.target.event)
+                    })
+                    .cloned()
+                    .collect::<Vec<_>>();
+                bonds.sort_by_key(|bond| {
+                    (
+                        bond.source.event,
+                        bond.source.hand,
+                        bond.source.ordinal,
+                        bond.target.event,
+                        bond.target.hand,
+                        bond.target.ordinal,
+                    )
+                });
+                (!bonds.is_empty()).then_some((*id, interaction, bonds))
+            })
+            .collect::<Vec<_>>();
+        put_len(&mut hash, interactions.len());
+        for (id, interaction, bonds) in interactions {
+            put_u64(&mut hash, id.0);
+            put_u64(&mut hash, interaction.boundary.0);
+            hash.update([temporality_tag(interaction.temporality)]);
+            match interaction.receiver_scope {
+                Some(receiver) => {
+                    hash.update([1]);
+                    put_u64(&mut hash, receiver.0);
+                }
+                None => hash.update([0]),
+            }
+            put_len(&mut hash, bonds.len());
+            for bond in bonds {
+                put_occurrence_port(&mut hash, bond.source);
+                put_occurrence_port(&mut hash, bond.target);
+            }
+        }
+        Some(
+            hash.finalize()
+                .iter()
+                .map(|octet| format!("{octet:02x}"))
+                .collect(),
+        )
+    }
+
+    /// Every address hashed above is carried twice by its owner map and its addressed body. Public
+    /// mutation may not make those two readings disagree and then let the map key conceal it.
+    fn canonical_addresses_stand(&self) -> bool {
+        self.shape.validate().is_ok()
+            && self
+                .shape
+                .boundaries
+                .objects
+                .iter()
+                .all(|(key, boundary)| *key == boundary.id)
+            && self.shape.boundaries.arrows.iter().all(|(key, arrow)| {
+                *key == arrow.id
+                    && self.shape.boundaries.objects.contains_key(&arrow.domain)
+                    && self.shape.boundaries.objects.contains_key(&arrow.codomain)
+            })
+            && self.shape.laws.iter().all(|(key, law)| {
+                *key == law.id
+                    && law
+                        .inputs
+                        .iter()
+                        .chain(&law.outputs)
+                        .all(|boundary| self.shape.boundaries.objects.contains_key(boundary))
+            })
+            && self.operations.keys().eq(self.shape.laws.keys())
+            && self
+                .operations
+                .iter()
+                .all(|(key, operation)| *key == operation.law)
+            && self
+                .shape
+                .occurrences
+                .iter()
+                .all(|(key, occurrence)| *key == occurrence.event)
+            && self
+                .shape
+                .chronology
+                .events
+                .iter()
+                .all(|(key, occurrence)| *key == occurrence.id)
+            && self
+                .shape
+                .occurrences
+                .keys()
+                .eq(self.shape.chronology.events.keys())
+            && self
+                .shape
+                .interactions
+                .iter()
+                .all(|(key, interaction)| *key == interaction.id)
+    }
+}
+
+fn put_u64(hash: &mut Sha256, value: u64) {
+    hash.update(value.to_be_bytes());
+}
+
+fn put_len(hash: &mut Sha256, value: usize) {
+    hash.update((value as u128).to_be_bytes());
+}
+
+fn put_boundary_word(hash: &mut Sha256, boundaries: &[BoundaryId]) {
+    put_len(hash, boundaries.len());
+    for boundary in boundaries {
+        put_u64(hash, boundary.0);
+    }
+}
+
+fn put_occurrence_port(hash: &mut Sha256, port: OccurrencePort) {
+    put_u64(hash, port.event.0);
+    hash.update([match port.hand {
+        crate::interaction::PortHand::Input => 0,
+        crate::interaction::PortHand::Output => 1,
+    }]);
+    put_len(hash, port.ordinal);
+}
+
+const fn operation_species_tag(species: OperationSpecies) -> u8 {
+    match species {
+        OperationSpecies::Construction => 0,
+        OperationSpecies::Transport => 1,
+        OperationSpecies::Face => 2,
+        OperationSpecies::Quotient => 3,
+    }
+}
+
+const fn temporality_tag(temporality: InteractionTemporality) -> u8 {
+    match temporality {
+        InteractionTemporality::CarriesPrecedence => 0,
+        InteractionTemporality::CoPresent => 1,
+    }
 }
 
 /// What the bridge returns when asked whether the diagram is closed.
@@ -790,7 +1070,6 @@ impl WordSeparation {
         self.separating_standings.is_empty()
     }
 }
-
 
 #[derive(Debug, Error)]
 pub enum PortedError {
@@ -878,7 +1157,6 @@ pub fn word_ports(word: &PortedWord) -> Vec<BoundaryId> {
     }
     ordered
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -1016,13 +1294,9 @@ mod tests {
             matrix(&[&[1, 0], &[0, 1]]),
             matrix(&[&[1, 0], &[0, 1]]),
         ];
-        let direct = LiftDefect::whole_word_direct(
-            &source,
-            &native,
-            &charts[0],
-            &charts[charts.len() - 1],
-        )
-        .expect("direct");
+        let direct =
+            LiftDefect::whole_word_direct(&source, &native, &charts[0], &charts[charts.len() - 1])
+                .expect("direct");
         let iterated =
             LiftDefect::whole_word_by_recurrence(&source, &native, &charts).expect("recurrence");
         assert_eq!(
@@ -1032,8 +1306,8 @@ mod tests {
         assert!(!direct.is_filled(), "this square is a genuine obstruction");
 
         // A perfect lift fills every cell, and both readings agree on that too.
-        let perfect = LiftDefect::whole_word_by_recurrence(&source, &source, &charts)
-            .expect("recurrence");
+        let perfect =
+            LiftDefect::whole_word_by_recurrence(&source, &source, &charts).expect("recurrence");
         assert!(perfect.is_filled(), "an exact lift has no obstruction");
     }
 
@@ -1178,14 +1452,15 @@ mod tests {
             RebaseReceipt::Refused { .. }
         ));
         assert_eq!(
-            collapsing.factorization().expect("factored").collapsed_dimension(),
+            collapsing
+                .factorization()
+                .expect("factored")
+                .collapsed_dimension(),
             1
         );
         // The adjoint swaps the ports, because a covector travels the other way.
         let metric = matrix(&[&[3, 0], &[0, 5]]);
-        let adjoint = rebase
-            .metric_adjoint(&metric, &metric)
-            .expect("adjoint");
+        let adjoint = rebase.metric_adjoint(&metric, &metric).expect("adjoint");
         assert_eq!(adjoint.source_port, to);
         assert_eq!(adjoint.target_port, from);
         // And the species decides what may be asked at all.
@@ -1218,9 +1493,11 @@ mod tests {
         );
         // The compiled chart also returns what asking for it cost.
         let (_, spent) = word.compiled_chart().expect("compiled");
-        assert!(spent
-            .coordinates()
-            .iter()
-            .any(|(name, count)| *name == "multiplications" && !count.is_zero()));
+        assert!(
+            spent
+                .coordinates()
+                .iter()
+                .any(|(name, count)| *name == "multiplications" && !count.is_zero())
+        );
     }
 }

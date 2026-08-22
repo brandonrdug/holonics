@@ -483,7 +483,9 @@ fn main() {
 
     println!("\n  THE READING");
     if !word_climbs {
-        println!("    THE INSTRUMENT IS BLIND. The known-good path did not climb either, so nothing");
+        println!(
+            "    THE INSTRUMENT IS BLIND. The known-good path did not climb either, so nothing"
+        );
         println!("    below separates an entry from the material and no reading is available.");
     } else if atom_folds && atom.completed == 0 {
         // THE FINDING, and it is one level above where four repairs were aimed.
@@ -492,34 +494,62 @@ fn main() {
             "    folds : arrivals carried as a pair, never divided —  {} : {}",
             atom.sub_folds, atom.arrivals
         );
-        println!("    So the compatibility mouth is NOT the defect: its gate opens, the brick reaches");
-        println!("    `perceive_node_emitting`, and there the beat completes no thought and climbs no");
-        println!("    depth. The same octets entering at the word grain complete {} and deposit {}.",
-            word.completed, word.deposited);
+        println!(
+            "    So the compatibility mouth is NOT the defect: its gate opens, the brick reaches"
+        );
+        println!(
+            "    `perceive_node_emitting`, and there the beat completes no thought and climbs no"
+        );
+        println!(
+            "    depth. The same octets entering at the word grain complete {} and deposit {}.",
+            word.completed, word.deposited
+        );
         println!();
-        println!("    AND THE WINDING SAYS WHAT KIND OF NOTHING. The atom path is not inert — it moved");
-        println!("    {} own words — but its deposited hands are ⟳{:?} against ⟲{:?}, a drift of {:?}",
-            atom.own_moved, atom.winding.0, atom.winding.1,
-            atom.winding.0.zip(atom.winding.1).map(|(a, b)| a - b));
-        println!("    over {:?} deposits. The word-grain path drifts ⟳{:?} against ⟲{:?}.",
-            atom.winding.0.zip(atom.winding.1).map(|(a, b)| a + b), word.winding.0, word.winding.1);
-        println!("    A balanced pair is the DESTRUCTIVE regime of the worldline reading: the atom");
-        println!("    stream deposits and its hands cancel, so nothing accumulates a preferred turn");
+        println!(
+            "    AND THE WINDING SAYS WHAT KIND OF NOTHING. The atom path is not inert — it moved"
+        );
+        println!(
+            "    {} own words — but its deposited hands are ⟳{:?} against ⟲{:?}, a drift of {:?}",
+            atom.own_moved,
+            atom.winding.0,
+            atom.winding.1,
+            atom.winding.0.zip(atom.winding.1).map(|(a, b)| a - b)
+        );
+        println!(
+            "    over {:?} deposits. The word-grain path drifts ⟳{:?} against ⟲{:?}.",
+            atom.winding.0.zip(atom.winding.1).map(|(a, b)| a + b),
+            word.winding.0,
+            word.winding.1
+        );
+        println!(
+            "    A balanced pair is the DESTRUCTIVE regime of the worldline reading: the atom"
+        );
+        println!(
+            "    stream deposits and its hands cancel, so nothing accumulates a preferred turn"
+        );
         println!("    and no thought is ever founded to complete. That is a statement about the");
-        println!("    SWING at the word grain, not about which mouth the membrane drives, and it is");
+        println!(
+            "    SWING at the word grain, not about which mouth the membrane drives, and it is"
+        );
         println!("    upstream of all four repairs aimed at the mouth — three withdrawn on");
         println!("    measurement, and the fourth built and reverted.");
     } else if atom_folds {
-        println!("    THE SUB-ILLICIUM FOLDS AND THE WORD GRAIN COMPLETES {} THOUGHTS, so the whole",
-            atom.completed);
-        println!("    path from atom to word grain conducts and the compatibility mouth is not the");
+        println!(
+            "    THE SUB-ILLICIUM FOLDS AND THE WORD GRAIN COMPLETES {} THOUGHTS, so the whole",
+            atom.completed
+        );
+        println!(
+            "    path from atom to word grain conducts and the compatibility mouth is not the"
+        );
         println!("    defect. What the live ecology does differently is then the object.");
     } else {
         println!("    THE SUB-ILLICIUM NEVER FOLDED. The atom stream never completes a");
         println!("    sub-composition, so `perceive_node_emitting` is unreachable from this entry");
         println!("    and the word grain never forms — the same fact as that function having zero");
         println!("    live callers, seen from the other side.");
-        println!("    THE DEFECT IS IN THE SUB-COMPOSITION, not in which mouth the membrane drives,");
+        println!(
+            "    THE DEFECT IS IN THE SUB-COMPOSITION, not in which mouth the membrane drives,"
+        );
         println!("    which puts it upstream of all four repairs aimed at it: three withdrawn on");
         println!("    measurement, and the fourth built and reverted.");
     }

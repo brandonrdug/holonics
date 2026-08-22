@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-21 after Deed M0. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-21 after Deed M5. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — MATHEMATICAL SOURCE CIRCULATION PASSED; THE FIRST TYPED MATHEMATICAL PARTICLE
-IS NEXT. GENERATOR-NATIVE PHOENIX REBIRTH REMAINS OPEN.**
+**CURRENT FRONTIER — THE PHYSICAL FOLD RETURNED AS AN EXACT CONSTRAINT COMPLEX, THE SHARED
+JUNCTION SEPARATED ITS PRESENTATIONS, AND THE MATHEMATICS CODEC NOW ENTERS THE TOTAL DESCENT FACE.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -19,11 +19,13 @@ evidence sidecar are addressed by the `the_phoenix_rebirth_is_graded` historical
 `82f4bd197ae35399ff9c3b569759a62eba8953de8304cf76a30aef6ab1d09fdc`. The authoritative return is
 [`research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md`](research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
 
-[open] W2 proved that every nontrivial quotient candidate among its source-shaped deed states
-reopens under the declared successor receivers. It did not pose a smaller generator/chart/ordered-
-word ecology, and W1's 16,022,507,913-octet rest plus the 262,144-address identity-shaped
-source/native map retain the foreign realization rather than transfiguring it. The equality,
-activity, compression and lightning-leader regrade is
+[established-bounded] W2 proved that every nontrivial quotient candidate among its source-shaped
+deed states reopens under the declared successor receivers. It did not pose a smaller
+generator/chart/ordered-word ecology, and W1's 16,022,507,913-octet rest plus the 262,144-address
+identity-shaped source/native map retain the foreign realization. M3 and M4 subsequently supplied
+the generator-native re-expression and rested local cultivation for their declared family;
+unexcited foreign conduct and broader successor families remain open. The equality, activity,
+compression and lightning-leader regrade is
 [`research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
 
 [established-bounded] M0 admitted exact born-digital, vector, four/eight-connected raster and the
@@ -37,19 +39,91 @@ is 33,998,441 octets, SHA-256
 Authoritative grade:
 [`research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md`](research/records/2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md).
 
-**NEXT DEED: M1 — mathematical operation complex.** [open] Elaborate the M0 occurrence population
-into plural mathematical particles carrying binders, tensor variance, algebraic carriers,
-dimensions/units, hypotheses, ordered operation words, rendering receivers and complete
-reconstruction fibres. At least two standing exact owners must conduct through the same tiling and
-reduction passage. Occurrence identity, typed carrier equality, marked-diagram isomorphism,
-receiver/history equivalence, classification, characteristic similarity and face/byte/digest
-equality remain separate witnessed relations. M2–M4 remain ordered behind it: codec-excited active
-transport cover; generator-native codec pivot; and leader/return cultivation with the complete
-mathematical return. No exceptional compression factor is admitted before that generator ecology
-strictly reduces the complete artifact-plus-decoder/work/residency/transfer vector without receiver
-regression. The higher M1–M4 objective is a reusable catalytic constraint morphology, derived in
-[`research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md`](research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md);
-it does not admit protein material into M1.
+**M1 PASSED — mathematical operation complex.** [established-bounded] One six-event particle now
+carries exact exterior/typed-port boundary maps, three interaction-witnessed pullback joins,
+ordered words, separately marked relational shadows and complete fibres. The harmless
+baseline/reflow involution moved sixteen source occurrences while preserving both passage boundary
+maps. Exact-linear and quantity owners returned their mathematical consequences through one
+two-front GPU deed on the RTX 4080 SUPER: one launch, one synchronization, zero CPU semantic cells
+and zero resident obstruction. The `the_mathematical_particle_is_an_addressed_passage` row in
+[`meta/OUTPUT_MANIFEST.tsv`](meta/OUTPUT_MANIFEST.tsv) binds the fourteen-member family; its thirteen
+non-grade members have
+SHA-256 `2fa053e0a8007231620639f4eaf3262c9cd096b45d5533453280ebc2de5d433b`, and
+`grade.form` has SHA-256 `27738bdd97f6583b1452822b957e8fd9f35cf7f676b3f342b7f57c0ba1c4704b`.
+Authoritative grade:
+[`research/records/2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md`](research/records/2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md).
+
+**M2 PASSED — codec-excited active transport cover.** [established-bounded] Five addressed M1
+excitations crossed the frozen W1 Gemma lift as nineteen H4/H5 resident circulations each. The
+return contains ninety-five complete 128-face response cochains, eighty-five exact first
+separators, seven witnessed overlap-nerve cells per family, held whole-replay and cross-occurrence
+controls, and separately returned apparatus, residency, realization-path and receiver-visible
+activity. Prefix sharing now composes through exact source/receiving occurrence-port pullback legs;
+the fifth family returned seven dynamic same-body pressure partitions without widening an
+aperture. Its amended exact-work-bearing semantic artifact is 77,739,684 octets with SHA-256
+`37c526c3525aa53286d47ae169bc23b33a5e84f5e267433bcbc665c8abb0a45e`; the
+`the_mathematics_codec_excites_the_active_transport_cover` row in
+[`meta/OUTPUT_MANIFEST.tsv`](meta/OUTPUT_MANIFEST.tsv) binds the two-member artifact family.
+Authoritative grade:
+[`research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md`](research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md).
+
+**M3 PASSED — generator recovery and native codec pivot.** [established-bounded] M3 mounted 12,160
+M2 face states, adjoined ninety-five explicit exterior termini, and condensed the resulting 12,255
+source states to 6,376 native states through two complete generator squares. The return carries
+59,279 shortest separators, every source fibre, 129 transition-monoid elements, 130 word relations,
+3,570 unclosed intervention-composite defects, a source-detached 1,217,120-octet executable rest and
+one complete card-resident native word deed. The complete artifact/decoder/work/span/residency/
+transfer product vector strictly fell with no coordinate regression. Authoritative grade:
+[`research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md`](research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md).
+The sole complete release receiver returned eleven passing gates and two unrelated open gates:
+four stale boundary-artifact closure bindings and eighteen architecture-ratchet disagreements, none
+in the M3 implementation or artifact family. M3's focused owner, CUDA, remount, Lean and manifest
+receivers all passed; the complete gate was not replayed.
+
+**M4 PASSED — leader/return cultivation and complete mathematical return.**
+[established-bounded] The maximum-depth M3 receiver separator selected one depth-73 leader. Its
+addressed metric-adjoint return founded a symmetric rank-one morphology; coordinate-transport
+closure derived five Soddy--Gossett reflection hands. The held-out word returned
+`[11,17,2,3,3]` through one ten-kernel CUDA graph launch and one synchronization with zero CPU
+semantic cells. Exact algebra, a complete two-root analytic face, Lean acceptance, exact
+vector/raster/mesh round trips, source-detached remount and targeted ablation returned together.
+The 16-member artifact family occupies 3,304,332 octets. Authoritative grade:
+[`research/records/2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md`](research/records/2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md).
+This completes M0--M4 and the bounded species-changing Phoenix return for the declared
+receiver/history and metric-reflection family; arbitrary mathematics, sphere centres/non-overlap,
+fractal dimension and unexcited Gemma capability remain open.
+The sole complete release receiver returned 2,809 passing tests and eleven passing gates; its only
+two open gates are the same four stale `arrow.rs` boundary-closure bindings and eighteen unrelated
+ownership-ratchet disagreements. No M4 source or artifact is named by either failure, and the gate
+was not replayed.
+
+**M5 PASSED — one physical fold returned as an exact constraint complex.**
+[established-bounded] The documentation/table tier addressed one RBX1 lineage before five
+structure/uncertainty payloads were mounted; the 84 GB tier was not scanned. Two complete
+predictor-backed complexes return 40 shared and 24 separating binder/RBX1 contacts, eleven shared
+higher cells and shortest separator `(2,23)`. A free-RBX1 binder/CUL1-RBX1 non-binder assay change,
+one 70,632-pair resident RTX 4080 SUPER passage, the abstract shared-junction Lean theorem and a
+570-vertex gauge-safe mesh return together. The sixteen addressed artifacts occupy 42,269,305
+octets and the grade is 8/8. No reusable morphology changed, so no cultivation, remount or ablation
+claim is made. Authoritative grade:
+[`research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md`](research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md).
+The sole complete release receiver returned 2,814 passing tests and eleven passing gate scopes;
+its only open gates are the same four stale `arrow.rs` boundary-closure bindings and eighteen
+unrelated ownership-ratchet disagreements. Focused owners, GPU conduct, Lean, artifact rehash, RON
+remount, visual inspection and the exact eight-part grade pass; the complete gate was not replayed.
+
+**NEXT DEED: M6 / Athena-A0 — the total descent route cultivates the first Athena mathematics
+variant.** [open] Commit `4776099` has discharged the formal theorem the former M6 wording posed, so
+the productive source is content-addressed commit `75597c4`, including `ChordFace` and excluding
+`FaceHomomorphism`; the latter proof passage is withheld exterior teacher/checker testimony and
+must be unavailable to the body. Mount `75597c4` incrementally and recover theorem transport from
+caused hypothesis/state transitions, not names, syntax or imports. Return native and Phoenix Athena
+siblings, the complete point-addition case/fibre complex, targeted source ablations, one resident
+GPU route passage, an independently emitted `sorry`-free total theorem, operation/history
+comparison against the withheld proof, a cultivated source-detached held-out successor, targeted
+route ablation, shortest separators, and the frozen variant manifest. The complete source-access
+refusal and twelve-part grade are in
+[`blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

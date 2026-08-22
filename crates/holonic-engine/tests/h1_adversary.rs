@@ -172,7 +172,10 @@ fn an_overlap_between_the_first_and_last_declared_cells_is_found() {
             _ => None,
         })
         .collect();
-    assert!(pairs.contains(&(0, 2)), "the non-adjacent pair is found: {pairs:?}");
+    assert!(
+        pairs.contains(&(0, 2)),
+        "the non-adjacent pair is found: {pairs:?}"
+    );
 }
 
 /// **A(iii).** A DEGENERATE cell: `row_from == row_to`. `SectionRegion::new` refuses it by name, but
@@ -415,19 +418,22 @@ fn a_cell_reading_its_own_write_is_not_a_hazard() {
 fn two_cells_writing_one_region_without_a_junction_refuse() {
     let cover = HardwareCover::cpu_only();
     let shape = SectionShape::of(4, 8, 0);
-    let cells = vec![
-        owned_cell(0, shape.whole()),
-        owned_cell(1, shape.whole()),
-    ];
+    let cells = vec![owned_cell(0, shape.whole()), owned_cell(1, shape.whole())];
     let defects = partition_of(shape, cells)
         .certify(&cover, &[], &written_species(8), KERNEL)
         .expect_err("a shared output without a junction is not independent");
-    assert!(defects
-        .iter()
-        .any(|defect| matches!(defect, PartitionDefect::RegionsOverlap { .. })));
-    assert!(defects
-        .iter()
-        .any(|defect| matches!(defect, PartitionDefect::FootprintRefused { region: Some(_), .. })));
+    assert!(
+        defects
+            .iter()
+            .any(|defect| matches!(defect, PartitionDefect::RegionsOverlap { .. }))
+    );
+    assert!(defects.iter().any(|defect| matches!(
+        defect,
+        PartitionDefect::FootprintRefused {
+            region: Some(_),
+            ..
+        }
+    )));
 }
 
 /// **C(b).** A junction is declared and its two partial cells write only a 1x1 corner of an output
@@ -755,7 +761,12 @@ fn read_word_must_refuse_a_leaf_that_names_no_partial() {
         ),
     };
     let mut defects: Vec<ReductionDefect> = Vec::new();
-    let reading = junction.read_word(&bogus, &carried, RoundingPolicy::OnceAtBoundary, &mut defects);
+    let reading = junction.read_word(
+        &bogus,
+        &carried,
+        RoundingPolicy::OnceAtBoundary,
+        &mut defects,
+    );
     assert!(
         !defects.is_empty(),
         "leaf 99 names no partial; the reader returned {:?} with no defect",
@@ -928,7 +939,11 @@ fn the_roundings_field_is_a_constant_and_not_a_count() {
         vec![rat(1, 1), rat(1, 1)],
     );
     let receipt = junction.certify().expect("certifies");
-    assert_eq!(receipt.boundary_value.len(), 2, "two coordinates were rounded");
+    assert_eq!(
+        receipt.boundary_value.len(),
+        2,
+        "two coordinates were rounded"
+    );
     assert_eq!(receipt.boundary_residual.len(), 2);
     assert_eq!(
         receipt.roundings, 2,
@@ -1041,18 +1056,19 @@ fn the_adjoint_is_exact_under_a_non_diagonal_spd_metric_and_the_bare_transpose_i
     // And the residual itself is exhibited rather than summarized.
     assert_eq!(
         receipt.adjoints[0].bare_transpose_residual.to_rows(),
-        vec![
-            vec![rat(2, 1), rat(0, 1)],
-            vec![rat(0, 1), rat(-2, 1)]
-        ]
+        vec![vec![rat(2, 1), rat(0, 1)], vec![rat(0, 1), rat(-2, 1)]]
     );
-    assert!(receipt.adjoints[0]
-        .residual
-        .entries()
-        .iter()
-        .all(|entry| entry.is_zero()));
+    assert!(
+        receipt.adjoints[0]
+            .residual
+            .entries()
+            .iter()
+            .all(|entry| entry.is_zero())
+    );
     // The adjoint carries the covector into a genuinely different chart than the transpose would.
-    let transposed_return = receipt.adjoints[0].adjoint.apply(&junction.returned_covector);
+    let transposed_return = receipt.adjoints[0]
+        .adjoint
+        .apply(&junction.returned_covector);
     assert!(transposed_return.is_ok());
 }
 
@@ -1156,7 +1172,14 @@ fn the_pressure_receipt_names_no_combined_coordinate() {
         .expect("certifies");
     let rendered = format!("{:?}", receipt.pressure[0]);
     for forbidden in [
-        "total", "sum:", "combined", "utilization", "utilisation", "score", "aggregate", "overall",
+        "total",
+        "sum:",
+        "combined",
+        "utilization",
+        "utilisation",
+        "score",
+        "aggregate",
+        "overall",
     ] {
         assert!(
             !rendered.to_lowercase().contains(forbidden),
@@ -1263,7 +1286,9 @@ fn a_zero_demand_is_returned_as_beyond_the_aperture() {
     let receipt = partition_of(shape, vec![owned_cell(0, shape.whole())])
         .certify(&cover, &[], &resources, KERNEL)
         .expect("certifies");
-    let species = receipt.pressure[0].species_named("map-ingress").expect("declared");
+    let species = receipt.pressure[0]
+        .species_named("map-ingress")
+        .expect("declared");
     assert!(species.incoming.is_zero());
     match &species.enacted {
         EnactedCurrent::NoDemand { face } => {
@@ -1322,10 +1347,8 @@ fn the_refusals_name_their_regions_in_words() {
     .certify(&cover, &[], &written_species(8), KERNEL)
     .expect_err("refuses");
     assert!(
-        defects
-            .iter()
-            .any(|defect| defect.to_string()
-                == "cell 1 writes [0..5) x [4..8), which lies outside the 4 x 8 section"),
+        defects.iter().any(|defect| defect.to_string()
+            == "cell 1 writes [0..5) x [4..8), which lies outside the 4 x 8 section"),
         "{:?}",
         defects.iter().map(ToString::to_string).collect::<Vec<_>>()
     );

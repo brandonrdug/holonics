@@ -42,9 +42,7 @@ use std::process::Command;
 
 use life::atlas_cultivation::{conduct, AthenaRest, EXTENT_REGION};
 use life::causal_language::{lexical_tokens, token_germs_public};
-use life::phoenix_rest::{
-    content_bar, loss_digest, mount_atlas, seal, FORBIDDEN_DESCRIPTORS,
-};
+use life::phoenix_rest::{content_bar, loss_digest, mount_atlas, seal, FORBIDDEN_DESCRIPTORS};
 use life::suffix_ecology::ExactSuffixEcology;
 
 const P0_REST: &str = "output/the_native_baseline_conducts/rest.safetensors";
@@ -179,13 +177,17 @@ fn run() -> Result<(), String> {
     let atlas = ExactSuffixEcology::condition(&paths)
         .map_err(|error| format!("conditioning refused: {error:?}"))?;
     let sealed = seal(&atlas, p0.metadata.clone()).map_err(|error| error.to_string())?;
-    let sealed_octets = sealed.write_container().map_err(|error| error.to_string())?;
+    let sealed_octets = sealed
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let rest_path = format!("{OUT}/rest.safetensors");
     std::fs::write(&rest_path, &sealed_octets).map_err(|error| format!("{rest_path}: {error}"))?;
 
     let mut stripped = sealed.clone();
     stripped.extent = Vec::new();
-    let stripped_octets = stripped.write_container().map_err(|error| error.to_string())?;
+    let stripped_octets = stripped
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let seal_is_p0_plus_extents = stripped_octets == p0_octets;
 
     say!("THE SEAL — the eight declared documents conditioned once, and the last document opened");
@@ -271,11 +273,19 @@ fn run() -> Result<(), String> {
     ])?;
     let digest_after = loss_digest(&std::fs::read(&rest_path).map_err(|e| e.to_string())?);
     let frozen = digest_before == digest_between && digest_between == digest_after;
-    let bit_equal = surfaces(&first.stdout) == surfaces(&second.stdout) && !surfaces(&first.stdout).is_empty();
+    let bit_equal =
+        surfaces(&first.stdout) == surfaces(&second.stdout) && !surfaces(&first.stdout).is_empty();
     let both_returned = first.status == Some(0) && second.status == Some(0);
 
-    say!("[ 1] SEAL -> SEPARATE-PROCESS MOUNT -> SEAL BYTE IDENTITY   {}", verdict(frozen && bit_equal && both_returned));
-    say!("  two processes, each handed one path and two prompts, each exiting {:?}/{:?}", first.status, second.status);
+    say!(
+        "[ 1] SEAL -> SEPARATE-PROCESS MOUNT -> SEAL BYTE IDENTITY   {}",
+        verdict(frozen && bit_equal && both_returned)
+    );
+    say!(
+        "  two processes, each handed one path and two prompts, each exiting {:?}/{:?}",
+        first.status,
+        second.status
+    );
     say!("  the rest's sha256 before / between / after");
     say!("    {digest_before}");
     say!("    {digest_between}");
@@ -285,7 +295,10 @@ fn run() -> Result<(), String> {
         if bit_equal { "BIT-EQUAL" } else { "DIFFERENT" },
         surfaces(&first.stdout).len()
     );
-    say!("[ 4] FROZEN INFERENCE LEAVES THE REST BYTE-IDENTICAL         {}", verdict(frozen));
+    say!(
+        "[ 4] FROZEN INFERENCE LEAVES THE REST BYTE-IDENTICAL         {}",
+        verdict(frozen)
+    );
     say!("  the same three digests; the application re-reads the file from the disk after conducting");
     say!("  and refuses its own run if it moved, so this is the runtime's own check as well as ours.");
     say!("");
@@ -323,20 +336,48 @@ fn run() -> Result<(), String> {
         .filter(|line| line.starts_with("    ") && !line.contains("forbidden targets open"))
         .collect();
     let no_card = !targets.iter().any(|target| target.contains("/dev/nvidia"));
-    say!("[ 2] SOURCE MODEL AND DEVELOPMENT MATERIAL UNREACHABLE       {}", verdict(clean));
+    say!(
+        "[ 2] SOURCE MODEL AND DEVELOPMENT MATERIAL UNREACHABLE       {}",
+        verdict(clean)
+    );
     for line in &audited {
         say!("  |{line}");
     }
-    say!("  the audit is the process asking /proc/self/fd about ITSELF, printed by the application.");
+    say!(
+        "  the audit is the process asking /proc/self/fd about ITSELF, printed by the application."
+    );
     say!("  A rest is opened, read whole and closed, so what remains is this process's own stdio.");
-    say!("[ 7] THE CARD IS NEVER OPENED                                {}", verdict(no_card && clean));
-    say!("  The blueprint's control is GPU hidden -> typed refusal. This application's inference is");
+    say!(
+        "[ 7] THE CARD IS NEVER OPENED                                {}",
+        verdict(no_card && clean)
+    );
+    say!(
+        "  The blueprint's control is GPU hidden -> typed refusal. This application's inference is"
+    );
     say!("  CPU-exact, so that control has no honest form here and this is the one it does have: the");
-    say!("  device is never opened at all. {:?} appear in no descriptor of either run, and `--card`", FORBIDDEN_DESCRIPTORS);
-    let card_run = eros(&["phoenix", "infer", "--rest", &rest_path, "--text", STILL_PROBE, "--card"])?;
+    say!(
+        "  device is never opened at all. {:?} appear in no descriptor of either run, and `--card`",
+        FORBIDDEN_DESCRIPTORS
+    );
+    let card_run = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &rest_path,
+        "--text",
+        STILL_PROBE,
+        "--card",
+    ])?;
     let card_refused = card_run.status != Some(0) && card_run.stderr.contains("UNWIRED");
-    say!("  is NAMED UNWIRED rather than stubbed: {} exit {:?}", card_run.stderr.trim(), card_run.status);
-    say!("  the flag refuses instead of printing a plausible card face: {}", verdict(card_refused));
+    say!(
+        "  is NAMED UNWIRED rather than stubbed: {} exit {:?}",
+        card_run.stderr.trim(),
+        card_run.status
+    );
+    say!(
+        "  the flag refuses instead of printing a plausible card face: {}",
+        verdict(card_refused)
+    );
     say!("");
 
     // -----------------------------------------------------------------------------------------
@@ -344,12 +385,25 @@ fn run() -> Result<(), String> {
     // -----------------------------------------------------------------------------------------
     let missing = format!("{OUT}/there-is-no-rest-here.safetensors");
     let _ = std::fs::remove_file(&missing);
-    let refused = eros(&["phoenix", "infer", "--rest", &missing, "--text", STILL_PROBE])?;
+    let refused = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &missing,
+        "--text",
+        STILL_PROBE,
+    ])?;
     let names_it = refused.stderr.contains(&missing);
     let no_output = !refused.stdout.contains("PROMPT");
     let non_zero = refused.status.map(|code| code != 0).unwrap_or(true);
-    say!("[ 3] DELETING THE REST MAKES INFERENCE REFUSE                {}", verdict(names_it && no_output && non_zero));
-    say!("  exit {:?}   the refusal names the rest: {names_it}   no plausible output: {no_output}", refused.status);
+    say!(
+        "[ 3] DELETING THE REST MAKES INFERENCE REFUSE                {}",
+        verdict(names_it && no_output && non_zero)
+    );
+    say!(
+        "  exit {:?}   the refusal names the rest: {names_it}   no plausible output: {no_output}",
+        refused.status
+    );
     say!("  | {}", refused.stderr.trim());
     say!("");
 
@@ -387,11 +441,40 @@ fn run() -> Result<(), String> {
     let predecessor_untouched = predecessor_after == digest_after;
 
     // the changed conduct, and the unchanged conduct, each taken in ITS OWN fresh process
-    let moved_on_successor = eros(&["phoenix", "infer", "--rest", &successor_path, "--text", MOVED_PROBE])?;
-    let moved_on_predecessor = eros(&["phoenix", "infer", "--rest", &rest_path, "--text", MOVED_PROBE])?;
-    let still_on_successor = eros(&["phoenix", "infer", "--rest", &successor_path, "--text", STILL_PROBE])?;
-    let still_on_predecessor = eros(&["phoenix", "infer", "--rest", &rest_path, "--text", STILL_PROBE])?;
-    let printed_moved = surfaces(&moved_on_successor.stdout) != surfaces(&moved_on_predecessor.stdout);
+    let moved_on_successor = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &successor_path,
+        "--text",
+        MOVED_PROBE,
+    ])?;
+    let moved_on_predecessor = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &rest_path,
+        "--text",
+        MOVED_PROBE,
+    ])?;
+    let still_on_successor = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &successor_path,
+        "--text",
+        STILL_PROBE,
+    ])?;
+    let still_on_predecessor = eros(&[
+        "phoenix",
+        "infer",
+        "--rest",
+        &rest_path,
+        "--text",
+        STILL_PROBE,
+    ])?;
+    let printed_moved =
+        surfaces(&moved_on_successor.stdout) != surfaces(&moved_on_predecessor.stdout);
 
     // **The face carries the standings and the support does not, and that distinction is P0's own
     // measurement rather than a convenience here**: a deposit re-folds the occurrence counts over
@@ -420,12 +503,18 @@ fn run() -> Result<(), String> {
         && still_on_successor.status == Some(0)
         && still_on_predecessor.status == Some(0);
 
-    say!("[ 5] CULTIVATION FOUNDS A DISTINCT SUCCESSOR                 {}", verdict(distinct && predecessor_untouched && conduct_moved));
+    say!(
+        "[ 5] CULTIVATION FOUNDS A DISTINCT SUCCESSOR                 {}",
+        verdict(distinct && predecessor_untouched && conduct_moved)
+    );
     say!("  the predecessor  {rest_path}");
     say!("    sha256 before {digest_after}");
     say!("    sha256 after  {predecessor_after}   untouched: {predecessor_untouched}");
     say!("  the successor    {successor_path}");
-    say!("    sha256        {successor_digest}   {} octets   distinct: {distinct}", successor_octets.len());
+    say!(
+        "    sha256        {successor_digest}   {} octets   distinct: {distinct}",
+        successor_octets.len()
+    );
     say!("  THE DELTA, AS THE APPLICATION PRINTED IT");
     for line in grown
         .stdout
@@ -456,7 +545,13 @@ fn run() -> Result<(), String> {
     }
     say!("  THE CONDUCT, ON THREE FACES OF THE SAME SECTION, SUCCESSOR AGAINST PREDECESSOR");
     let moved_word = |moved: bool| if moved { "MOVED    " } else { "unchanged" };
-    say!("    {:<28} {:>10} {:>10} {:>10}", "probe", "depth-0", "support", "face");
+    say!(
+        "    {:<28} {:>10} {:>10} {:>10}",
+        "probe",
+        "depth-0",
+        "support",
+        "face"
+    );
     say!(
         "    {:<28} {:>10} {:>10} {:>10}",
         format!("{MOVED_PROBE:?}"),
@@ -474,10 +569,16 @@ fn run() -> Result<(), String> {
     say!("    and that table is the finding rather than a caveat. The FACE carries every offered");
     say!("    germ's standing, and a deposit re-folds the occurrence counts over the whole suffix");
     say!("    tree, so every probe's face moves after any cultivation whatever its subject. The");
-    say!("    SUPPORT drops the standings and keeps germ-and-depth, and it still moves for a probe");
-    say!("    whose ladder reaches the root, because the vocabulary itself grew by three germs and");
+    say!(
+        "    SUPPORT drops the standings and keeps germ-and-depth, and it still moves for a probe"
+    );
+    say!(
+        "    whose ladder reaches the root, because the vocabulary itself grew by three germs and"
+    );
     say!("    the root offers them — that is the vocabulary growing, not the subject moving. The");
-    say!("    DEPTH-0 SUPPORT is what the full context alone licenses, and it is the face on which");
+    say!(
+        "    DEPTH-0 SUPPORT is what the full context alone licenses, and it is the face on which"
+    );
     say!("    a subject-disjoint control can honestly be taken: it moves for the material's own");
     say!("    subject and does not move for a subject the material never touched.");
     let landed = |stdout: &str| -> String {
@@ -488,8 +589,14 @@ fn run() -> Result<(), String> {
             .trim()
             .to_owned()
     };
-    say!("    on the predecessor   {}", landed(&moved_on_predecessor.stdout));
-    say!("    on the successor     {}", landed(&moved_on_successor.stdout));
+    say!(
+        "    on the predecessor   {}",
+        landed(&moved_on_predecessor.stdout)
+    );
+    say!(
+        "    on the successor     {}",
+        landed(&moved_on_successor.stdout)
+    );
     // The seal is closed under its own law only if the successor can be cultivated in turn, so
     // the same material is exposed to it a second time: a re-exposure of standing material must
     // found nothing structurally and move only the occupancy.
@@ -544,7 +651,8 @@ fn run() -> Result<(), String> {
     say!("  THE SEAL IS CLOSED UNDER ITS OWN LAW — the successor is cultivated in turn");
     say!(
         "    the same material exposed to the SUCCESSOR: exit {:?}, {:?}",
-        second.status, second_delta
+        second.status,
+        second_delta
     );
     say!("    | {inside_line}");
     say!(
@@ -559,7 +667,12 @@ fn run() -> Result<(), String> {
     say!("    say something, so the material's own transport is untouched, which is the law's own");
     say!("    face and not an exception to it. Calling that whole delta empty would be false and");
     say!("    the first form of this control did.");
-    say!("[ 6] A FRESH RUNTIME ACCEPTS UNSEEN MATERIAL                 {}", verdict(unseen_germ_absent && conduct_moved && moved_on_successor.status == Some(0) && chains));
+    say!(
+        "[ 6] A FRESH RUNTIME ACCEPTS UNSEEN MATERIAL                 {}",
+        verdict(
+            unseen_germ_absent && conduct_moved && moved_on_successor.status == Some(0) && chains
+        )
+    );
     say!("  the material was WRITTEN AT RUN TIME to {material_path} from a paragraph authored in this");
     say!("  driver's source: it is no document, no fixture and no permutation of one. The surface");
     say!("  \"wobbleflux\" is absent from the sealed rest's {} germ vocabulary: {unseen_germ_absent}", sealed.vocabulary.len());
@@ -582,9 +695,17 @@ fn run() -> Result<(), String> {
             }
         }
     }
-    say!("[ 8] THE APPLICATION SHELLS OUT TO NOTHING                   {}", verdict(shells.is_empty()));
-    say!("  searched Command::new / std::process::Command / libc::fork / execve over the whole code");
-    say!("  path the station takes: {APPLICATION_SOURCE:?} — {} hit(s)", shells.len());
+    say!(
+        "[ 8] THE APPLICATION SHELLS OUT TO NOTHING                   {}",
+        verdict(shells.is_empty())
+    );
+    say!(
+        "  searched Command::new / std::process::Command / libc::fork / execve over the whole code"
+    );
+    say!(
+        "  path the station takes: {APPLICATION_SOURCE:?} — {} hit(s)",
+        shells.len()
+    );
     for hit in &shells {
         say!("    {hit}");
     }
@@ -606,8 +727,9 @@ fn run() -> Result<(), String> {
     ])?;
     // the round trip, exactly: the octets a separate process mounted, mounted again and compared
     // class by class against the atlas the seal was taken from.
-    let recovered_rest = AthenaRest::read_container(&std::fs::read(&rest_path).map_err(|e| e.to_string())?)
-        .map_err(|error| error.to_string())?;
+    let recovered_rest =
+        AthenaRest::read_container(&std::fs::read(&rest_path).map_err(|e| e.to_string())?)
+            .map_err(|error| error.to_string())?;
     let recovered = mount_atlas(&recovered_rest, &rest_path).map_err(|error| error.to_string())?;
     let mut moved_classes = 0usize;
     for class in 0..atlas.state_count() as u32 {
@@ -620,7 +742,10 @@ fn run() -> Result<(), String> {
         }
     }
     let round_trip = moved_classes == 0 && recovered.state_count() == atlas.state_count();
-    say!("[ 9] EXPORT, AND THE ROUND TRIP THAT DECIDES WHETHER IT IS A MODEL   {}", verdict(round_trip && manifest_run.status == Some(0)));
+    say!(
+        "[ 9] EXPORT, AND THE ROUND TRIP THAT DECIDES WHETHER IT IS A MODEL   {}",
+        verdict(round_trip && manifest_run.status == Some(0))
+    );
     say!("  THE REALIZATION MANIFEST, AS THE APPLICATION PRINTED IT");
     for line in manifest_run
         .stdout
@@ -634,23 +759,45 @@ fn run() -> Result<(), String> {
     say!("  no export step to perform and nothing to convert. The blueprint's criterion is the round");
     say!("  trip, native atlas -> serialized form -> separate-process remount -> recovered atlas:");
     say!("    the separate-process remount is control 1, twice, and the manifest run above;");
-    say!("    the recovered atlas is exact — {} of {} classes differ in extent, standing, suffix", moved_classes, atlas.state_count());
+    say!(
+        "    the recovered atlas is exact — {} of {} classes differ in extent, standing, suffix",
+        moved_classes,
+        atlas.state_count()
+    );
     say!("    link or transport row after octets -> container -> transport;");
     say!("    and P3's own remount of a sealed successor stands beside it, unrerun.");
     say!("  GGUF: REFUSED, and here is the reason rather than the refusal.");
-    say!("    The payload is expressible — GGUF carries integer tensor types, so the CSR rows, the");
-    say!("    standings, the suffix links and the extents would all fit as 1-D integer tensors, and");
-    say!("    the vocabulary would fit as an array of strings. What has no lawful home is the LAW.");
+    say!(
+        "    The payload is expressible — GGUF carries integer tensor types, so the CSR rows, the"
+    );
+    say!(
+        "    standings, the suffix links and the extents would all fit as 1-D integer tensors, and"
+    );
+    say!(
+        "    the vocabulary would fit as an array of strings. What has no lawful home is the LAW."
+    );
     say!("    A GGUF file is read by dispatching on general.architecture and that architecture's");
     say!("    expected tensor names and hyperparameters; there is no architecture whose graph is");
-    say!("    `walk the transport row, fall along the suffix link, return the whole offered family");
+    say!(
+        "    `walk the transport row, fall along the suffix link, return the whole offered family"
+    );
     say!("    with its depth`. So the file would be one of two things, and both are refused: it");
-    say!("    would name an architecture whose graph does not compute these three laws, which is a");
-    say!("    false declaration inside the container; or it would name an architecture no consumer");
-    say!("    knows, which every consumer refuses to load. Either way the atlas is not RECOVERABLE");
+    say!(
+        "    would name an architecture whose graph does not compute these three laws, which is a"
+    );
+    say!(
+        "    false declaration inside the container; or it would name an architecture no consumer"
+    );
+    say!(
+        "    knows, which every consumer refuses to load. Either way the atlas is not RECOVERABLE"
+    );
     say!("    from it, and the blueprint's own criterion is exactly that — a parseable tensor file is");
-    say!("    not a model. Writing the tensors under a tokenizer key would be worse still: it would");
-    say!("    assert a BPE/SPM decoder this body does not have. The lossy mapping is not invented.");
+    say!(
+        "    not a model. Writing the tensors under a tokenizer key would be worse still: it would"
+    );
+    say!(
+        "    assert a BPE/SPM decoder this body does not have. The lossy mapping is not invented."
+    );
     say!("");
 
     // -----------------------------------------------------------------------------------------
@@ -658,7 +805,10 @@ fn run() -> Result<(), String> {
     // -----------------------------------------------------------------------------------------
     let bar = content_bar(&sealed_octets, &sealed);
     let bar_held = bar.iter().all(|row| row.held);
-    say!("[10] THE CONTENT BAR, MEASURED ON THE SEALED OCTETS          {}", verdict(bar_held));
+    say!(
+        "[10] THE CONTENT BAR, MEASURED ON THE SEALED OCTETS          {}",
+        verdict(bar_held)
+    );
     say!("  AS THE APPLICATION PRINTED IT, in the same run that printed the manifest");
     let printed_bar: Vec<&str> = manifest_run
         .stdout
@@ -673,7 +823,10 @@ fn run() -> Result<(), String> {
         && !printed_bar.iter().any(|line| line.contains("[BROKEN]"));
     let successor_bar = content_bar(&successor_octets, &successor_rest_read);
     let successor_bar_held = successor_bar.iter().all(|row| row.held);
-    say!("  and the SUCCESSOR, which carries a cultivation lineage the predecessor does not: {}", verdict(successor_bar_held));
+    say!(
+        "  and the SUCCESSOR, which carries a cultivation lineage the predecessor does not: {}",
+        verdict(successor_bar_held)
+    );
     for row in &successor_bar {
         if !row.held {
             say!("      BROKEN {}: {}", row.claim, row.evidence);
@@ -690,8 +843,16 @@ fn run() -> Result<(), String> {
     // the reliance, stated
     // -----------------------------------------------------------------------------------------
     let receiver_section = conduct(&sealed, STILL_PROBE, &lexical_tokens(STILL_PROBE));
-    let depth_zero = receiver_section.offered.iter().filter(|(_, _, depth)| *depth == 0).count();
-    let depth_one = receiver_section.offered.iter().filter(|(_, _, depth)| *depth == 1).count();
+    let depth_zero = receiver_section
+        .offered
+        .iter()
+        .filter(|(_, _, depth)| *depth == 0)
+        .count();
+    let depth_one = receiver_section
+        .offered
+        .iter()
+        .filter(|(_, _, depth)| *depth == 1)
+        .count();
     let agrees = (
         receiver_section.class,
         receiver_section.standing,
@@ -712,16 +873,34 @@ fn run() -> Result<(), String> {
 
     // -----------------------------------------------------------------------------------------
     let held = [
-        ("1 seal -> separate-process mount -> byte identity", frozen && bit_equal && both_returned),
+        (
+            "1 seal -> separate-process mount -> byte identity",
+            frozen && bit_equal && both_returned,
+        ),
         ("2 source and development material unreachable", clean),
-        ("3 a missing rest refuses, typed, naming it", names_it && no_output && non_zero),
+        (
+            "3 a missing rest refuses, typed, naming it",
+            names_it && no_output && non_zero,
+        ),
         ("4 frozen inference leaves the rest byte-identical", frozen),
-        ("5 cultivation founds a distinct successor with changed conduct", distinct && predecessor_untouched && conduct_moved && conduct_still),
-        ("6 a fresh runtime accepts unseen material, and the successor is cultivable in turn", unseen_germ_absent && conduct_moved && chains),
-        ("7 the card is never opened, and --card is unwired", no_card && clean && card_refused),
+        (
+            "5 cultivation founds a distinct successor with changed conduct",
+            distinct && predecessor_untouched && conduct_moved && conduct_still,
+        ),
+        (
+            "6 a fresh runtime accepts unseen material, and the successor is cultivable in turn",
+            unseen_germ_absent && conduct_moved && chains,
+        ),
+        (
+            "7 the card is never opened, and --card is unwired",
+            no_card && clean && card_refused,
+        ),
         ("8 the application shells out to nothing", shells.is_empty()),
         ("9 the round trip recovers the atlas exactly", round_trip),
-        ("10 the content bar, measured and printed by the application itself", bar_held && successor_bar_held && application_agrees),
+        (
+            "10 the content bar, measured and printed by the application itself",
+            bar_held && successor_bar_held && application_agrees,
+        ),
     ];
     say!("THE TEN CONTROLS");
     for (name, stood) in &held {

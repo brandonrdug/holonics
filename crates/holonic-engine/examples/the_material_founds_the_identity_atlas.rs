@@ -49,16 +49,15 @@ use std::path::{Path, PathBuf};
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
-use holonic_engine::lean_development::{DeclarationGrain, header_nests, read_development};
 use holonic_engine::hypergeometric_closure::{ClosureReading, ThreeSiteDials, read_return_group};
+use holonic_engine::lean_development::{DeclarationGrain, header_nests, read_development};
 use holonic_engine::multiquadratic::Multiquadratic;
+use holonic_engine::statement_grammar::{
+    GrammarAperture, RecoveredStatementGrammar, SeparatorOrientation, recover, recover_under,
+};
+use relational_geometry::Rat;
 use relational_geometry::exact::RatVec2;
 use relational_geometry::receiver_atlas;
-use relational_geometry::Rat;
-use holonic_engine::statement_grammar::{
-    GrammarAperture, RecoveredStatementGrammar, SeparatorOrientation, recover,
-    recover_under,
-};
 
 /// The declared material. A subtree, named so the aperture is visible: this is one region of one
 /// library, and every figure below is about it.
@@ -211,7 +210,8 @@ fn rust_signatures(text: &str) -> Vec<(String, String, BTreeSet<String>)> {
                 for piece in statement[open + 1..close].split(',') {
                     if let Some((left, _)) = piece.split_once(':') {
                         let word = left.trim().trim_start_matches("mut ").trim();
-                        if !word.is_empty() && word.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                        if !word.is_empty() && word.chars().all(|c| c.is_alphanumeric() || c == '_')
+                        {
                             bound.insert(word.to_owned());
                         }
                     }
@@ -242,7 +242,13 @@ fn prose_sentences(text: &str) -> Vec<(String, String)> {
         let mut carried = String::new();
         for symbol in line.chars() {
             carried.push(symbol);
-            if symbol == '.' && carried.chars().rev().nth(1).is_some_and(char::is_alphanumeric) {
+            if symbol == '.'
+                && carried
+                    .chars()
+                    .rev()
+                    .nth(1)
+                    .is_some_and(char::is_alphanumeric)
+            {
                 let sentence = carried.trim().to_owned();
                 if sentence.split_whitespace().count() >= 5 {
                     found.push((format!("line{}", at + 1), sentence));
@@ -430,12 +436,36 @@ fn hypergeometric_partial(argument: &[Rat]) -> Option<Rat> {
 
 /// The resolvers this body owns, as a population. Nothing here is chosen for an identity.
 const RESOLVERS: [Resolver; 6] = [
-    Resolver { name: "additive-composition", arity: 2, evaluate: additive },
-    Resolver { name: "oriented-difference", arity: 2, evaluate: oriented_difference },
-    Resolver { name: "squared-separation", arity: 2, evaluate: squared_separation },
-    Resolver { name: "beta-on-integers", arity: 2, evaluate: beta_on_integers },
-    Resolver { name: "corner-cosine", arity: 3, evaluate: corner_cosine },
-    Resolver { name: "cross-ratio", arity: 4, evaluate: cross_ratio },
+    Resolver {
+        name: "additive-composition",
+        arity: 2,
+        evaluate: additive,
+    },
+    Resolver {
+        name: "oriented-difference",
+        arity: 2,
+        evaluate: oriented_difference,
+    },
+    Resolver {
+        name: "squared-separation",
+        arity: 2,
+        evaluate: squared_separation,
+    },
+    Resolver {
+        name: "beta-on-integers",
+        arity: 2,
+        evaluate: beta_on_integers,
+    },
+    Resolver {
+        name: "corner-cosine",
+        arity: 3,
+        evaluate: corner_cosine,
+    },
+    Resolver {
+        name: "cross-ratio",
+        arity: 4,
+        evaluate: cross_ratio,
+    },
 ];
 
 /// A seventh, kept out of the array above only because it shares an arity with the cross ratio and
@@ -476,7 +506,10 @@ fn permutations(degree: usize) -> Vec<Vec<usize>> {
     loop {
         found.push(current.clone());
         // next lexicographic permutation
-        let Some(pivot) = (0..degree - 1).rev().find(|at| current[*at] < current[at + 1]) else {
+        let Some(pivot) = (0..degree - 1)
+            .rev()
+            .find(|at| current[*at] < current[at + 1])
+        else {
             return found;
         };
         let swap = (pivot + 1..degree)
@@ -582,9 +615,11 @@ fn generated(generators: &BTreeSet<Vec<usize>>) -> Option<BTreeSet<Vec<usize>>> 
 }
 
 fn is_abelian(group: &BTreeSet<Vec<usize>>) -> bool {
-    group
-        .iter()
-        .all(|sigma| group.iter().all(|tau| compose(sigma, tau) == compose(tau, sigma)))
+    group.iter().all(|sigma| {
+        group
+            .iter()
+            .all(|tau| compose(sigma, tau) == compose(tau, sigma))
+    })
 }
 
 /// The order of one element: how many times it must be applied to return.
@@ -648,7 +683,13 @@ fn print_aperture(grammar: &RecoveredStatementGrammar, headline: &str) {
             GrammarAperture::LeadingRegionCarriesABareToken { .. } => "supposition-is-a-bare-token",
             other => {
                 by_species
-                    .entry(format!("{other:?}").split_whitespace().next().unwrap_or("other").to_owned())
+                    .entry(
+                        format!("{other:?}")
+                            .split_whitespace()
+                            .next()
+                            .unwrap_or("other")
+                            .to_owned(),
+                    )
                     .and_modify(|count| *count += 1)
                     .or_insert(1);
                 continue;
@@ -668,7 +709,9 @@ fn main() {
     let root = workspace_root();
     // the subtree is declared, and may be re-declared on the command line so the same reading can
     // be taken over a second material without the driver choosing which
-    let declared = std::env::args().nth(1).unwrap_or_else(|| SUBTREE.to_owned());
+    let declared = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| SUBTREE.to_owned());
     let codec = Codec::of(&std::env::args().nth(2).unwrap_or_else(|| "lean".to_owned()));
     let subtree = root.join(&declared);
 
@@ -726,7 +769,10 @@ fn main() {
                     declarations += 1;
                     if header_nests(&statement) {
                         by_statement.entry(statement.clone()).or_insert(name);
-                        bindings_of.entry(statement.clone()).or_default().extend(bound);
+                        bindings_of
+                            .entry(statement.clone())
+                            .or_default()
+                            .extend(bound);
                         statements.insert(statement);
                     } else {
                         unwhole.insert(statement, name);
@@ -745,30 +791,39 @@ fn main() {
                 }
             }
         }
-        {
-        }
+        {}
     }
 
     println!("  subtree                    {declared}");
-    println!("  codec                      {codec:?}   -- the ONLY thing that changes between runs");
+    println!(
+        "  codec                      {codec:?}   -- the ONLY thing that changes between runs"
+    );
     println!("  source files               {}", files.len());
     println!("  lines                      {lines}");
     println!("  declarations opened        {declarations}");
+    println!("  distinct theorem/lemma statements  {}", statements.len());
     println!(
-        "  distinct theorem/lemma statements  {}",
-        statements.len()
+        "  headers that do not nest   {}   EXCLUDED and exhibited below",
+        unwhole.len()
     );
-    println!("  headers that do not nest   {}   EXCLUDED and exhibited below", unwhole.len());
     println!();
-    println!("  A founding quantified over the whole population is as strong as its worst member, so");
-    println!("  the intake is the reader's own audit of its own return: a header that opens a bracket");
-    println!("  and does not close it is not a whole statement. Every one is named here, never dropped.");
+    println!(
+        "  A founding quantified over the whole population is as strong as its worst member, so"
+    );
+    println!(
+        "  the intake is the reader's own audit of its own return: a header that opens a bracket"
+    );
+    println!(
+        "  and does not close it is not a whole statement. Every one is named here, never dropped."
+    );
     for (statement, name) in &unwhole {
         println!("    {name}");
         println!("      {}", clipped(&statement, 108));
     }
     println!();
-    println!("  the reader cuts a header off a proof and knows the formers. It does not know what a");
+    println!(
+        "  the reader cuts a header off a proof and knows the formers. It does not know what a"
+    );
     println!("  statement means, and the name is dropped here because a name is an address.");
     println!();
     for statement in statements.iter().take(4) {
@@ -819,7 +874,10 @@ fn main() {
         refusals.push(((open, close), refusing));
     }
     refusals.sort_by_key(|(_, refusing)| refusing.len());
-    println!("  {:<8} {:>10}   {}", "species", "refusing", "the statements that refuse it");
+    println!(
+        "  {:<8} {:>10}   {}",
+        "species", "refusing", "the statements that refuse it"
+    );
     for ((open, close), refusing) in &refusals {
         println!("  {open}{close:<7} {:>10}", refusing.len());
         for statement in refusing.iter().take(2) {
@@ -847,7 +905,11 @@ fn main() {
         .iter()
         .map(|(open, close)| format!("{open}{close}"))
         .collect();
-    println!("  bracket species founded    {}   [{}]", family.len(), family.join(" "));
+    println!(
+        "  bracket species founded    {}   [{}]",
+        family.len(),
+        family.join(" ")
+    );
     println!("  the single-pair reading    {:?}", grammar.bracket());
     println!("  separator                  {:?}", grammar.separator());
     println!(
@@ -860,8 +922,13 @@ fn main() {
         grammar.orientation()
     );
     println!();
-    println!("  A family of {} species is what the material groups in. One pair could not found the", family.len());
-    println!("  depth at all here, and with a flat depth no split is founded either -- one refusal");
+    println!(
+        "  A family of {} species is what the material groups in. One pair could not found the",
+        family.len()
+    );
+    println!(
+        "  depth at all here, and with a flat depth no split is founded either -- one refusal"
+    );
     println!("  cascading into three. Each group carries WHICH species opened it, recovered.");
     println!();
     print_aperture(&grammar, "the aperture, by species:");
@@ -883,7 +950,10 @@ fn main() {
         }
     }
     println!();
-    println!("  statements split           {split_founded} of {}", grammar.readings().len());
+    println!(
+        "  statements split           {split_founded} of {}",
+        grammar.readings().len()
+    );
     println!("  suppositions by species    (nobody named these; the material exhibits them)");
     for (species, count) in &species_census {
         println!("    {species}   {count}");
@@ -904,9 +974,14 @@ fn main() {
         .filter(|(last, first)| last.split_at != first.split_at)
         .map(|(last, first)| (last.statement.as_str(), first.split_at, last.split_at))
         .collect();
-    println!("  statements whose split moved between the two orientations   {}", moved.len());
+    println!(
+        "  statements whose split moved between the two orientations   {}",
+        moved.len()
+    );
     println!();
-    println!("  The split is chosen by the MATERIAL wherever one candidate leaves a leading region");
+    println!(
+        "  The split is chosen by the MATERIAL wherever one candidate leaves a leading region"
+    );
     println!("  of groups and whitespace. The orientation is the tiebreak, and where the material");
     println!("  decides, the two readings are the same map -- which is what makes the difference");
     println!("  below evidence rather than an artifact of the instrument.");
@@ -940,8 +1015,12 @@ fn main() {
     }
     println!("  conclusions                {}", conclusions.len());
     println!();
-    println!("  A conclusion is a statement at a smaller scale, so the identical organ is applied to");
-    println!("  it. Nothing is told that `=` relates two sides; the population exhibits a character");
+    println!(
+        "  A conclusion is a statement at a smaller scale, so the identical organ is applied to"
+    );
+    println!(
+        "  it. Nothing is told that `=` relates two sides; the population exhibits a character"
+    );
     println!("  standing at depth zero throughout, and the recovery founds it.");
     println!();
 
@@ -998,7 +1077,9 @@ fn main() {
     // ------------------------------------------------------------------ identities and permutations
     println!();
     println!("{}", "=".repeat(100));
-    println!("[4]  THE IDENTITY ATLAS  --  every identity is a permutation, and the heads found groups");
+    println!(
+        "[4]  THE IDENTITY ATLAS  --  every identity is a permutation, and the heads found groups"
+    );
     println!("{}", "=".repeat(100));
     println!();
 
@@ -1061,15 +1142,23 @@ fn main() {
     let mut cross_head = 0usize;
     for relation in &relations {
         if relation.left.0 == relation.right.0 {
-            by_head.entry(relation.left.0.clone()).or_default().push(relation);
+            by_head
+                .entry(relation.left.0.clone())
+                .or_default()
+                .push(relation);
         } else {
             cross_head += 1;
         }
     }
-    println!("  relating ONE head to itself {}   relating two heads {cross_head}", by_head.values().map(Vec::len).sum::<usize>());
+    println!(
+        "  relating ONE head to itself {}   relating two heads {cross_head}",
+        by_head.values().map(Vec::len).sum::<usize>()
+    );
     println!();
     println!("  A relation between two applications of one head rearranges its arguments. That");
-    println!("  rearrangement is a permutation -- an element of a group -- and it is computed from");
+    println!(
+        "  rearrangement is a permutation -- an element of a group -- and it is computed from"
+    );
     println!("  the argument tokens alone. This driver writes neither side.");
     println!();
 
@@ -1107,10 +1196,16 @@ fn main() {
     }
     groups.sort_by_key(|(head, _, closed, _)| (std::cmp::Reverse(closed.len()), head.clone()));
 
-    println!("  {:<34} {:>6} {:>7} {:>9}  {}", "head", "degree", "order", "abelian", "generators");
+    println!(
+        "  {:<34} {:>6} {:>7} {:>9}  {}",
+        "head", "degree", "order", "abelian", "generators"
+    );
     for (head, generators, closed, _) in groups.iter().take(SHOWN * 2) {
         let degree = closed.iter().next().map_or(0, Vec::len);
-        let rendered: Vec<String> = generators.iter().map(|sigma| render_permutation(sigma)).collect();
+        let rendered: Vec<String> = generators
+            .iter()
+            .map(|sigma| render_permutation(sigma))
+            .collect();
         println!(
             "  {head:<34} {degree:>6} {:>7} {:>9}  {}",
             closed.len(),
@@ -1119,7 +1214,10 @@ fn main() {
         );
     }
     if groups.len() > SHOWN * 2 {
-        println!("  ... {} further heads, all retained", groups.len() - SHOWN * 2);
+        println!(
+            "  ... {} further heads, all retained",
+            groups.len() - SHOWN * 2
+        );
     }
 
     println!();
@@ -1130,7 +1228,8 @@ fn main() {
             continue;
         };
         for relation in family {
-            if let Rearrangement::Permutation(sigma) = rearrangement(&relation.left.1, &relation.right.1)
+            if let Rearrangement::Permutation(sigma) =
+                rearrangement(&relation.left.1, &relation.right.1)
             {
                 if sigma == identity_of(sigma.len()) {
                     continue;
@@ -1153,7 +1252,9 @@ fn main() {
     }
 
     println!();
-    println!("  THE FALSIFIER  --  transports that are NOT symmetries, retained rather than dropped:");
+    println!(
+        "  THE FALSIFIER  --  transports that are NOT symmetries, retained rather than dropped:"
+    );
     println!("    {}", not_symmetries.len());
     for (relation, reason) in not_symmetries.iter().take(4) {
         println!();
@@ -1170,7 +1271,10 @@ fn main() {
 
     let mut by_rebase: BTreeMap<String, Vec<&Relation>> = BTreeMap::new();
     for relation in &relations {
-        by_rebase.entry(rebased(relation)).or_default().push(relation);
+        by_rebase
+            .entry(rebased(relation))
+            .or_default()
+            .push(relation);
     }
     let collapsed: Vec<(&String, &Vec<&Relation>)> = by_rebase
         .iter()
@@ -1179,10 +1283,15 @@ fn main() {
     let singletons = by_rebase.len() - collapsed.len();
     println!("  relations                  {}", relations.len());
     println!("  rebased forms              {}", by_rebase.len());
-    println!("  forms carrying more than one   {}   singletons {singletons}", collapsed.len());
+    println!(
+        "  forms carrying more than one   {}   singletons {singletons}",
+        collapsed.len()
+    );
     println!();
     println!("  A rebase renames; it does not lose. Two identities sharing a rebased form are one");
-    println!("  identity in two alphabets, and that is a compression whose remainder is ZERO. What");
+    println!(
+        "  identity in two alphabets, and that is a compression whose remainder is ZERO. What"
+    );
     println!("  the rebase cannot identify is the remainder, and it is the singleton population.");
     println!();
     for (form, carried) in collapsed.iter().take(SHOWN * 3) {
@@ -1195,7 +1304,10 @@ fn main() {
         }
     }
     if collapsed.len() > SHOWN * 3 {
-        println!("    ... {} further forms, all retained", collapsed.len() - SHOWN * 3);
+        println!(
+            "    ... {} further forms, all retained",
+            collapsed.len() - SHOWN * 3
+        );
     }
 
     // ------------------------------------------------------------------ the transport atlas
@@ -1204,16 +1316,22 @@ fn main() {
     println!("[6]  THE TRANSPORT ATLAS  --  what each head admits, and the verdict on each");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  A head's transports are the rebased forms its identities take. Read as a table this");
+    println!(
+        "  A head's transports are the rebased forms its identities take. Read as a table this"
+    );
     println!("  is what a reference page for that operation would carry, and nothing in it was");
     println!("  written here: every row is one statement of the corpus with its letters rebased.");
     println!();
     println!("  A same-head relation is one of THREE species, founded from the two argument lists");
     println!("  and from nothing else:");
     println!();
-    println!("    SYMMETRY      the right arguments are the left ones rearranged -- a permutation,");
+    println!(
+        "    SYMMETRY      the right arguments are the left ones rearranged -- a permutation,"
+    );
     println!("                  and an element of the head's own group");
-    println!("    SUBSTITUTION  the same arity, with some position carrying a different construction");
+    println!(
+        "    SUBSTITUTION  the same arity, with some position carrying a different construction"
+    );
     println!("                  -- the head is invariant under changing that position");
     println!("    ARITY MOVE    the two sides apply the head to different numbers of arguments");
     println!();
@@ -1222,8 +1340,12 @@ fn main() {
     println!("  carries both a symmetry and a substitution -- which says its behaviour depends on");
     println!("  something its name does not carry, and is the junction reading, not a fault.");
     println!();
-    println!("  APERTURE: a head with no symmetry here is one THIS MATERIAL states none for. `dist`");
-    println!("  is symmetric and mathlib says so in `Topology`, which this subtree does not contain.");
+    println!(
+        "  APERTURE: a head with no symmetry here is one THIS MATERIAL states none for. `dist`"
+    );
+    println!(
+        "  is symmetric and mathlib says so in `Topology`, which this subtree does not contain."
+    );
     println!();
 
     #[derive(Default)]
@@ -1286,7 +1408,9 @@ fn main() {
     }
     let admitted = heads
         .values()
-        .filter(|reading| reading.symmetries > 0 && reading.substitutions + reading.arity_moves == 0)
+        .filter(|reading| {
+            reading.symmetries > 0 && reading.substitutions + reading.arity_moves == 0
+        })
         .count();
     let conflicted = heads
         .values()
@@ -1294,7 +1418,9 @@ fn main() {
         .count();
     let silent = heads
         .values()
-        .filter(|reading| reading.symmetries == 0 && reading.substitutions + reading.arity_moves > 0)
+        .filter(|reading| {
+            reading.symmetries == 0 && reading.substitutions + reading.arity_moves > 0
+        })
         .count();
     println!(
         "  heads reached {}   ADMITTED {admitted}   CONFLICTED {conflicted}   no symmetry stated \
@@ -1308,7 +1434,9 @@ fn main() {
     println!("[7]  THE TRANSPORT GRAPH  --  how to get from one operation to another");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  A relation between TWO heads is an edge: it says this operation may be re-presented");
+    println!(
+        "  A relation between TWO heads is an edge: it says this operation may be re-presented"
+    );
     println!("  as that one. The rebased form is the edge's own label, and composing two edges is");
     println!("  composing two transports -- a route through the atlas rather than a lookup in it.");
     println!();
@@ -1342,8 +1470,14 @@ fn main() {
             .or_default()
             .insert(rebased(relation));
     }
-    println!("  relations whose head is a name the statement itself binds   {}", variable_headed.len());
-    println!("  relations whose head is a numeral                            {}", numeral_headed.len());
+    println!(
+        "  relations whose head is a name the statement itself binds   {}",
+        variable_headed.len()
+    );
+    println!(
+        "  relations whose head is a numeral                            {}",
+        numeral_headed.len()
+    );
     println!("  held out of the graph, because a bound name is a variable and not an operation:");
     for relation in variable_headed.iter().take(3) {
         println!("    {}", clipped(&relation.conclusion, 104));
@@ -1390,12 +1524,16 @@ fn main() {
     let mut successors: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
     let mut nodes: BTreeSet<&str> = BTreeSet::new();
     for (from, to) in edges.keys() {
-        successors.entry(from.as_str()).or_default().push(to.as_str());
+        successors
+            .entry(from.as_str())
+            .or_default()
+            .push(to.as_str());
         nodes.insert(from.as_str());
         nodes.insert(to.as_str());
     }
     let order: Vec<&str> = nodes.iter().copied().collect();
-    let index_of: BTreeMap<&str, usize> = order.iter().enumerate().map(|(at, n)| (*n, at)).collect();
+    let index_of: BTreeMap<&str, usize> =
+        order.iter().enumerate().map(|(at, n)| (*n, at)).collect();
     let count = order.len();
 
     // Kosaraju: two linear passes, iterative so a deep graph cannot exhaust the stack
@@ -1454,7 +1592,10 @@ fn main() {
     let mut quotient: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); components];
     let mut incoming = vec![0usize; components];
     for (from, to) in edges.keys() {
-        let (left, right) = (component[index_of[from.as_str()]], component[index_of[to.as_str()]]);
+        let (left, right) = (
+            component[index_of[from.as_str()]],
+            component[index_of[to.as_str()]],
+        );
         if left != right && quotient[left].insert(right) {
             incoming[right] += 1;
         }
@@ -1545,9 +1686,7 @@ fn main() {
         .unwrap_or("material")
         .to_lowercase();
     let deposit = root.join("meta").join(format!("IDENTITY_ATLAS_{leaf}.tsv"));
-    let mut rows = vec![
-        ["kind", "head", "detail", "form", "witness"].join("\t"),
-    ];
+    let mut rows = vec![["kind", "head", "detail", "form", "witness"].join("\t")];
     for (head, generators, closed, _) in &groups {
         let degree = closed.iter().next().map_or(0, Vec::len);
         for sigma in generators {
@@ -1555,7 +1694,11 @@ fn main() {
                 [
                     "symmetry",
                     head.as_str(),
-                    &format!("degree {degree} order {} abelian {}", closed.len(), is_abelian(closed)),
+                    &format!(
+                        "degree {degree} order {} abelian {}",
+                        closed.len(),
+                        is_abelian(closed)
+                    ),
                     &render_permutation(sigma),
                     "",
                 ]
@@ -1609,12 +1752,22 @@ fn main() {
             println!();
             println!("  Columns: kind, head, detail, form, witness. Four kinds:");
             println!("    symmetry    a head, its group's degree and order, and one generator");
-            println!("    transport   a head and one rebased form it takes, with its species census");
-            println!("    edge        one head re-presented as another, labelled by the rebased form");
-            println!("    identity    one rebased form and the statement of the corpus it came from");
+            println!(
+                "    transport   a head and one rebased form it takes, with its species census"
+            );
+            println!(
+                "    edge        one head re-presented as another, labelled by the rebased form"
+            );
+            println!(
+                "    identity    one rebased form and the statement of the corpus it came from"
+            );
             println!();
-            println!("  The witness column carries the corpus statement verbatim, so every row in the");
-            println!("  atlas can be taken back to the material it was read off. An atlas whose rows");
+            println!(
+                "  The witness column carries the corpus statement verbatim, so every row in the"
+            );
+            println!(
+                "  atlas can be taken back to the material it was read off. An atlas whose rows"
+            );
             println!("  cannot be reopened is a summary, and a summary is not a deposit.");
         }
         Err(refusal) => println!("  the deposit was refused: {refusal}"),
@@ -1626,23 +1779,37 @@ fn main() {
     println!("[9]  THE PROOF IS A WORD  --  crossings as binary states over a causal order");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  A proof is a sequence of moves. Each move is a CROSSING and its state is binary --");
+    println!(
+        "  A proof is a sequence of moves. Each move is a CROSSING and its state is binary --"
+    );
     println!("  the move is either in the word or not -- so a proof is a subset, and two proofs");
     println!("  compose by symmetric difference. That is exactly the grading group of");
     println!("  `multiquadratic`, the twisted group algebra of (Z/2)^n over Q, whose own opening");
     println!("  says the crossing-word algebra and the turn-composition algebra are one algebra.");
     println!();
-    println!("  Each distinct move is given a distinct PRIME, so the generators are independent by");
+    println!(
+        "  Each distinct move is given a distinct PRIME, so the generators are independent by"
+    );
     println!("  construction. A move used twice contributes sqrt(p)*sqrt(p) = p and leaves the");
     println!("  grading: it CANCELS. So the word of a proof splits exactly two ways --");
     println!();
     println!("    the GRADE        the moves used an ODD number of times -- what survives");
-    println!("    the COEFFICIENT  the product of primes used an EVEN number of times -- what cancelled");
+    println!(
+        "    the COEFFICIENT  the product of primes used an EVEN number of times -- what cancelled"
+    );
     println!();
-    println!("  BOUND, stated because it is real: this algebra is COMMUTATIVE, so the word forgets");
-    println!("  the order in which the moves were made and keeps only their parity. It records what");
-    println!("  survived cancellation, never the sequence. A carrier that keeps the order would have");
-    println!("  to be non-commutative, and that is `structure_group::curvature_commutator`'s subject.");
+    println!(
+        "  BOUND, stated because it is real: this algebra is COMMUTATIVE, so the word forgets"
+    );
+    println!(
+        "  the order in which the moves were made and keeps only their parity. It records what"
+    );
+    println!(
+        "  survived cancellation, never the sequence. A carrier that keeps the order would have"
+    );
+    println!(
+        "  to be non-commutative, and that is `structure_group::curvature_commutator`'s subject."
+    );
     println!();
 
     // the moves a proof made, read off the declaration's own tactic population
@@ -1676,7 +1843,10 @@ fn main() {
     let mut primes: Vec<u64> = Vec::new();
     let mut candidate = 2u64;
     while primes.len() < vocabulary.len() {
-        if (2..candidate).take_while(|d| d * d <= candidate).all(|d| candidate % d != 0) {
+        if (2..candidate)
+            .take_while(|d| d * d <= candidate)
+            .all(|d| candidate % d != 0)
+        {
             primes.push(candidate);
         }
         candidate += 1;
@@ -1803,14 +1973,23 @@ fn main() {
     if tail > 0 {
         println!("    larger grades      {tail} proofs");
     }
-    println!("  Both the grade and the cancelled rational are asserted equal to what multiplying in");
-    println!("  `multiquadratic` returns, so the parity reading is the algebra and not a paraphrase.");
+    println!(
+        "  Both the grade and the cancelled rational are asserted equal to what multiplying in"
+    );
+    println!(
+        "  `multiquadratic` returns, so the parity reading is the algebra and not a paraphrase."
+    );
     println!();
 
     // now compare proofs of ONE identity family -- the compression above supplies the pairs
     let mut same_grade = 0usize;
-    let mut different_grade: Vec<(&String, BTreeSet<String>, BTreeSet<String>, &String, &String)> =
-        Vec::new();
+    let mut different_grade: Vec<(
+        &String,
+        BTreeSet<String>,
+        BTreeSet<String>,
+        &String,
+        &String,
+    )> = Vec::new();
     for (form, carried) in &by_rebase {
         if carried.len() < 2 {
             continue;
@@ -1840,18 +2019,22 @@ fn main() {
         }
     }
     println!("  PAIRS OF PROOFS REACHING ONE REBASED IDENTITY");
-    println!("    same grade      {same_grade}   the two proofs differ only by moves that cancelled");
-    println!("    grade differs   {}   the symmetric difference is the remainder", different_grade.len());
+    println!(
+        "    same grade      {same_grade}   the two proofs differ only by moves that cancelled"
+    );
+    println!(
+        "    grade differs   {}   the symmetric difference is the remainder",
+        different_grade.len()
+    );
     println!();
-    println!("  A pair with the same grade is a REBASE between two proofs: they survive to the same");
+    println!(
+        "  A pair with the same grade is a REBASE between two proofs: they survive to the same"
+    );
     println!("  element and what separated them cancelled. A pair whose grades differ carries a");
     println!("  remainder, and the remainder is named -- it is the moves one proof needs an odd");
     println!("  number of times and the other does not.");
     for (form, left, right, left_statement, right_statement) in different_grade.iter().take(4) {
-        let only_left: Vec<&str> = left
-            .difference(right)
-            .map(String::as_str)
-            .collect();
+        let only_left: Vec<&str> = left.difference(right).map(String::as_str).collect();
         let only_right: Vec<&str> = right.difference(left).map(String::as_str).collect();
         println!();
         println!("    {form}");
@@ -1867,11 +2050,17 @@ fn main() {
     // ------------------------------------------------------------------ the resolvers
     println!();
     println!("{}", "=".repeat(100));
-    println!("[10]  THE IDENTITY MEETS ARITHMETIC  --  the founded claim, put to organs that compute");
+    println!(
+        "[10]  THE IDENTITY MEETS ARITHMETIC  --  the founded claim, put to organs that compute"
+    );
     println!("{}", "=".repeat(100));
     println!();
-    println!("  Everything above is a report about a CORPUS: what the writing exhibits. A symmetry");
-    println!("  becomes a claim about mathematics only when something computes it. These are organs");
+    println!(
+        "  Everything above is a report about a CORPUS: what the writing exhibits. A symmetry"
+    );
+    println!(
+        "  becomes a claim about mathematics only when something computes it. These are organs"
+    );
     println!("  that return an exact rational from exact rational arguments, and each one's own");
     println!("  symmetry group is recovered the same way -- by testing every permutation of its");
     println!("  arguments and admitting one only if it holds on EVERY probe.");
@@ -1931,7 +2120,10 @@ fn main() {
         });
     }
 
-    println!("  {:<30} {:>6} {:>7} {:>11}  {}", "resolver", "arity", "order", "separates", "group");
+    println!(
+        "  {:<30} {:>6} {:>7} {:>11}  {}",
+        "resolver", "arity", "order", "separates", "group"
+    );
     for reading in &resolved {
         let rendered: Vec<String> = reading
             .group
@@ -1958,20 +2150,35 @@ fn main() {
     println!("  returns a group of order 4 on four letters -- recovered by exact arithmetic, not");
     println!("  quoted -- and that is the classical invariance of the cross ratio.");
     println!();
-    println!("  A resolver that does not SEPARATE is refused: a constant satisfies every permutation");
+    println!(
+        "  A resolver that does not SEPARATE is refused: a constant satisfies every permutation"
+    );
     println!("  and would confirm anything put to it.");
     println!();
-    println!("  HOW MUCH THE TEST CAN SAY, BY ARITY. A permutation group on n letters sits inside a");
-    println!("  symmetric group of order n!, so a confirmation at arity 2 distinguishes one of TWO");
+    println!(
+        "  HOW MUCH THE TEST CAN SAY, BY ARITY. A permutation group on n letters sits inside a"
+    );
+    println!(
+        "  symmetric group of order n!, so a confirmation at arity 2 distinguishes one of TWO"
+    );
     println!("  possibilities and at arity 4 one of twenty-four:");
     for arity in 2..=4usize {
         let total: usize = (1..=arity).product();
-        println!("    arity {arity}   permutations {total:>3}   subsets of them a confirmation rules out {:>3}", total - 1);
+        println!(
+            "    arity {arity}   permutations {total:>3}   subsets of them a confirmation rules out {:>3}",
+            total - 1
+        );
     }
     println!();
-    println!("  So four confirmations of a two-letter symmetry are NOT four independent facts: every");
-    println!("  symmetric binary operation confirms every stated exchange, and the only thing that");
-    println!("  can fail there is the control. The discrimination is at the higher arities, and the");
+    println!(
+        "  So four confirmations of a two-letter symmetry are NOT four independent facts: every"
+    );
+    println!(
+        "  symmetric binary operation confirms every stated exchange, and the only thing that"
+    );
+    println!(
+        "  can fail there is the control. The discrimination is at the higher arities, and the"
+    );
     println!("  cross ratio against the hypergeometric sum is where this run actually separates.");
 
     println!();
@@ -1988,7 +2195,9 @@ fn main() {
             .collect();
         if candidates.is_empty() {
             unreached += 1;
-            println!("  {head}   degree {degree}   NO RESOLVER OF THIS ARITY -- unreached, not refuted");
+            println!(
+                "  {head}   degree {degree}   NO RESOLVER OF THIS ARITY -- unreached, not refuted"
+            );
             continue;
         }
         let rendered: Vec<String> = closed
@@ -2026,7 +2235,9 @@ fn main() {
     println!("  refuted by one                                 {refuted}");
     println!("  of an arity no resolver reaches                {unreached}");
     println!();
-    println!("  A refutation is not a defect in the corpus and not one in the resolver: it says the");
+    println!(
+        "  A refutation is not a defect in the corpus and not one in the resolver: it says the"
+    );
     println!("  two are different operations that share an arity, which is exactly what a test");
     println!("  matched on arity alone should say most of the time. What carries evidence is that");
     println!("  the test CAN refute, and does.");
@@ -2039,13 +2250,21 @@ fn main() {
     println!("{}", "=".repeat(100));
     println!();
     println!("  The previous station asked a VALUE question: does an organ return the same number");
-    println!("  when its arguments are permuted. This asks a STRUCTURE question, which is stronger:");
+    println!(
+        "  when its arguments are permuted. This asks a STRUCTURE question, which is stronger:"
+    );
     println!("  does the permutation preserve the CLASSIFICATION the organ computes?");
     println!();
     println!("  `hypergeometric_closure` decides whether a three-site turning equation's solution");
-    println!("  closes -- whether its return group is finite -- by sorting integers on a circle. Its");
-    println!("  dials must be exact rationals. A universally quantified statement is a claim about");
-    println!("  EVERY instance, so it licenses instantiation: the parameter family is swept HERE, by");
+    println!(
+        "  closes -- whether its return group is finite -- by sorting integers on a circle. Its"
+    );
+    println!(
+        "  dials must be exact rationals. A universally quantified statement is a claim about"
+    );
+    println!(
+        "  EVERY instance, so it licenses instantiation: the parameter family is swept HERE, by"
+    );
     println!("  this body, and the corpus supplies only the permutation.");
     println!();
 
@@ -2082,7 +2301,11 @@ fn main() {
     for (_, species) in &swept {
         *census.entry(species).or_insert(0) += 1;
     }
-    println!("  dial values swept          {}   triples {}", dial_values.len(), swept.len());
+    println!(
+        "  dial values swept          {}   triples {}",
+        dial_values.len(),
+        swept.len()
+    );
     print!("  the classification         ");
     for (species, count) in &census {
         print!("{species} {count}   ");
@@ -2124,7 +2347,10 @@ fn main() {
         match preserves(&tau) {
             None => {
                 locus_group.insert(tau.clone());
-                println!("    {}   PRESERVES the classification everywhere", render_permutation(&tau));
+                println!(
+                    "    {}   PRESERVES the classification everywhere",
+                    render_permutation(&tau)
+                );
             }
             Some(counterexample) => {
                 let rendered: Vec<String> = counterexample
@@ -2180,7 +2406,10 @@ fn main() {
                             .expect("the subset is preserved")
                     })
                     .collect();
-                if !restrictions.iter().any(|(carried, _)| *carried == restricted) {
+                if !restrictions
+                    .iter()
+                    .any(|(carried, _)| *carried == restricted)
+                {
                     restrictions.push((restricted, places.clone()));
                 }
             }
@@ -2221,8 +2450,12 @@ fn main() {
     println!();
     println!("  This is the join the earlier plan called shut. It was shut only because a codec's");
     println!("  surface was read as a limit: mathlib writes the parameters as variables, and a");
-    println!("  universally quantified claim is a claim about every instance. The corpus supplies a");
-    println!("  permutation; this body supplies the parameter family and the organ that classifies");
+    println!(
+        "  universally quantified claim is a claim about every instance. The corpus supplies a"
+    );
+    println!(
+        "  permutation; this body supplies the parameter family and the organ that classifies"
+    );
     println!("  it; and the question is whether the two commute.");
 
     // ------------------------------------------------------------------ what this is not
@@ -2231,13 +2464,21 @@ fn main() {
     println!("WHAT THIS RUN DOES NOT CLAIM");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  The atlas is over ONE subtree of ONE library, named at the head of this run. A head");
+    println!(
+        "  The atlas is over ONE subtree of ONE library, named at the head of this run. A head"
+    );
     println!("  whose group is trivial is absent from the table because it generated nothing, not");
     println!("  because it has no symmetry -- the material here did not state one.");
     println!();
-    println!("  Nothing was elaborated, type-checked or submitted to a kernel. A group returned here");
-    println!("  is the group the WRITING exhibits, which is a claim about the corpus and not about");
-    println!("  the mathematics behind it. The two agree exactly when the corpus states its head's");
+    println!(
+        "  Nothing was elaborated, type-checked or submitted to a kernel. A group returned here"
+    );
+    println!(
+        "  is the group the WRITING exhibits, which is a claim about the corpus and not about"
+    );
+    println!(
+        "  the mathematics behind it. The two agree exactly when the corpus states its head's"
+    );
     println!("  symmetries, and that is a property of the corpus.");
     println!();
     println!("  The permutation is computed from argument tokens this driver does not author. The");

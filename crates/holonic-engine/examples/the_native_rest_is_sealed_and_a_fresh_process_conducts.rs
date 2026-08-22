@@ -34,18 +34,16 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::exact_value::ExactInterval;
+use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::PortedOperationComplex;
-use holonic_engine::ported_reference::{realize, PortedProgram};
+use holonic_engine::ported_reference::{PortedProgram, realize};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
-use site::{
-    digest_of, found, write_container, NativeRestCarrier, BAND_POPULATION, BASE, CAUSED,
-};
+use site::{BAND_POPULATION, BASE, CAUSED, NativeRestCarrier, digest_of, found, write_container};
 
 /// The rest's own schema, carried in its metadata so a later reader is not guessing.
 const REST_SCHEMA: &str = "holonic-engine.phoenix-native-rest.v1";
@@ -54,7 +52,10 @@ const REST_SCHEMA: &str = "holonic-engine.phoenix-native-rest.v1";
 
 fn main() {
     let arguments: Vec<String> = std::env::args().collect();
-    if let Some(at) = arguments.iter().position(|argument| argument == "--conduct") {
+    if let Some(at) = arguments
+        .iter()
+        .position(|argument| argument == "--conduct")
+    {
         let rest = arguments
             .get(at + 1)
             .cloned()
@@ -142,15 +143,15 @@ fn conduct_from_rest_alone(rest: &str) {
             }
         }
     }
-    println!("CHILD-OPENED {}", serde_json::to_string(&opened).expect("audit"));
+    println!(
+        "CHILD-OPENED {}",
+        serde_json::to_string(&opened).expect("audit")
+    );
 
     let carried: Vec<Vec<String>> = returns
         .iter()
         .map(|event| {
-            receipt.carried[&OccurrencePort::output(
-                holonic_engine::causal::EventId(*event),
-                0,
-            )]
+            receipt.carried[&OccurrencePort::output(holonic_engine::causal::EventId(*event), 0)]
                 .iter()
                 .map(ToString::to_string)
                 .collect()
@@ -186,7 +187,10 @@ fn seal_and_hand_over(arguments: &[String]) {
 
     println!("PHOENIX STATIONS EIGHT AND NINE — THE SOURCE DEPARTS AND A FRESH PROCESS CONDUCTS");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     // ---------------------------------------------------------------------------------------
     // THE FOUNDING, and the reference conduct with the source present.
@@ -200,8 +204,14 @@ fn seal_and_hand_over(arguments: &[String]) {
     };
     println!();
     println!("  THE FOUNDING");
-    println!("    operations                      {}", site.program.operations.len());
-    println!("    stored populations NAMED        {}", site.populations.len());
+    println!(
+        "    operations                      {}",
+        site.program.operations.len()
+    );
+    println!(
+        "    stored populations NAMED        {}",
+        site.populations.len()
+    );
     for population in &site.populations {
         println!("        {population}");
     }
@@ -233,7 +243,9 @@ fn seal_and_hand_over(arguments: &[String]) {
             }
             rows
         } else {
-            container.read_bf16_whole(&mut file, population).expect("read")
+            container
+                .read_bf16_whole(&mut file, population)
+                .expect("read")
         };
         source_octets += tensor.declared_octets();
         let shape = if is_row && tensor.rank() == 2 {
@@ -279,10 +291,8 @@ fn seal_and_hand_over(arguments: &[String]) {
     );
     metadata.insert(
         "returns".to_owned(),
-        serde_json::to_string(
-            &site.returns.iter().map(|event| event.0).collect::<Vec<_>>(),
-        )
-        .expect("returns"),
+        serde_json::to_string(&site.returns.iter().map(|event| event.0).collect::<Vec<_>>())
+            .expect("returns"),
     );
     metadata.insert(
         "realization".to_owned(),
@@ -309,7 +319,10 @@ fn seal_and_hand_over(arguments: &[String]) {
     let second = digest_of(&round_trip);
     println!();
     println!("  CONTROL — seal, mount, seal");
-    println!("    the rest remounts               {} populations", remounted.tensors.len());
+    println!(
+        "    the rest remounts               {} populations",
+        remounted.tensors.len()
+    );
     println!("    seal -> mount -> seal identical {}", first == second);
     let _ = std::fs::remove_file(&round_trip);
 
@@ -340,7 +353,10 @@ fn seal_and_hand_over(arguments: &[String]) {
         .expect("spawned");
     let text = String::from_utf8_lossy(&child.stdout);
     if !child.status.success() {
-        println!("    the child REFUSED: {}", String::from_utf8_lossy(&child.stderr));
+        println!(
+            "    the child REFUSED: {}",
+            String::from_utf8_lossy(&child.stderr)
+        );
         std::process::exit(1);
     }
     let opened: Vec<String> = text
@@ -353,7 +369,10 @@ fn seal_and_hand_over(arguments: &[String]) {
         .find_map(|line| line.strip_prefix("CHILD-RETURN "))
         .and_then(|json| serde_json::from_str(json).ok())
         .unwrap_or_default();
-    println!("    the child conducted             {} position(s)", native.len());
+    println!(
+        "    the child conducted             {} position(s)",
+        native.len()
+    );
 
     println!();
     println!("  THE LIVE ACCESS AUDIT — taken AFTER the deed, not declared before it");
@@ -366,7 +385,10 @@ fn seal_and_hand_over(arguments: &[String]) {
     for path in opened.iter().take(6) {
         println!("        {path}");
     }
-    println!("    any resolving to the source     {}", !touched.is_empty());
+    println!(
+        "    any resolving to the source     {}",
+        !touched.is_empty()
+    );
     println!("    the source it did not open      {source_map}");
 
     // ---------------------------------------------------------------------------------------
@@ -390,7 +412,10 @@ fn seal_and_hand_over(arguments: &[String]) {
     }
     println!("    the sealed body returns what the source-fed body returned  {agreed}");
     let after = digest_of(&rest_path);
-    println!("    frozen conduct left the rest byte-identical                {}", first == after);
+    println!(
+        "    frozen conduct left the rest byte-identical                {}",
+        first == after
+    );
 
     // Deleting the rest must make the conduct refuse.
     let hidden = format!("{rest_path}.withdrawn");
@@ -400,7 +425,10 @@ fn seal_and_hand_over(arguments: &[String]) {
         .arg(&rest_path)
         .output()
         .expect("spawned");
-    println!("    with the rest withdrawn, the conduct refuses               {}", !without.status.success());
+    println!(
+        "    with the rest withdrawn, the conduct refuses               {}",
+        !without.status.success()
+    );
     std::fs::rename(&hidden, &rest_path).expect("restored");
 
     println!();
@@ -411,7 +439,9 @@ fn seal_and_hand_over(arguments: &[String]) {
     println!("  container species the source arrived in, so remounting it uses the standing mouth");
     println!("  and the atlas-to-weights round trip is literal.");
     println!();
-    println!("  A fresh process was handed the rest and NO source path. Its carrier holds no source");
+    println!(
+        "  A fresh process was handed the rest and NO source path. Its carrier holds no source"
+    );
     println!("  handle, so the code path to the source does not exist rather than being declined,");
     println!("  and a live audit of every descriptor it actually held confirms it after the deed.");
     println!();
@@ -419,6 +449,8 @@ fn seal_and_hand_over(arguments: &[String]) {
     println!("  coordinate. Frozen conduct left the rest byte-identical, and withdrawing the rest");
     println!("  makes the conduct refuse.");
     println!();
-    println!("  This is ONE site's contact half. Cultivation is not performed and no capability is");
+    println!(
+        "  This is ONE site's contact half. Cultivation is not performed and no capability is"
+    );
     println!("  promoted; CONSTRUCTION_STATE is untouched.");
 }

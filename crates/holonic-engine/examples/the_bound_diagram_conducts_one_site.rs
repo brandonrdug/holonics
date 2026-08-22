@@ -33,12 +33,14 @@ use std::time::Instant;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
-use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
+use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
 use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
-use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
-use holonic_engine::ported_reference::{realize, PortedCarrier, PortedOperationKind, PortedProgram};
+use holonic_engine::ported_reference::{
+    PortedCarrier, PortedOperationKind, PortedProgram, realize,
+};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
@@ -90,7 +92,10 @@ struct ResidentSourceCarrier<'chart> {
     below_the_frame: usize,
     rotations: std::collections::BTreeMap<
         String,
-        Vec<(holonic_engine::exact_value::ExactInterval, holonic_engine::exact_value::ExactInterval)>,
+        Vec<(
+            holonic_engine::exact_value::ExactInterval,
+            holonic_engine::exact_value::ExactInterval,
+        )>,
     >,
 }
 
@@ -158,7 +163,9 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
             .chart
             .mount_bfloat16(&stored, tensor.shape[1])
             .map_err(|e| format!("{e:?}"))?;
-        let population_scores = mounted.score_many(&[&query]).map_err(|e| format!("{e:?}"))?;
+        let population_scores = mounted
+            .score_many(&[&query])
+            .map_err(|e| format!("{e:?}"))?;
         self.contractions += 1;
         let scores = &population_scores[0];
         let unit = two_to(scores.readout_exponent as i64 + scores.query_exponent as i64);
@@ -196,7 +203,13 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
     fn rotations(
         &mut self,
         population: &str,
-    ) -> Result<Vec<(holonic_engine::exact_value::ExactInterval, holonic_engine::exact_value::ExactInterval)>, String> {
+    ) -> Result<
+        Vec<(
+            holonic_engine::exact_value::ExactInterval,
+            holonic_engine::exact_value::ExactInterval,
+        )>,
+        String,
+    > {
         self.rotations
             .get(population)
             .cloned()
@@ -209,7 +222,11 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
         for value in standing {
             let (word, remainder) = round_into_bfloat16(value).map_err(|e| format!("{e:?}"))?;
             let datum = decode_bfloat16_bits(word).map_err(|e| format!("{e:?}"))?;
-            rounded.push((datum.value(), datum.ulp_exponent, datum.significand.bits() == 0));
+            rounded.push((
+                datum.value(),
+                datum.ulp_exponent,
+                datum.significand.bits() == 0,
+            ));
             residual.push(remainder);
         }
         let top = rounded
@@ -236,7 +253,9 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
 
 fn two_to(exponent: i64) -> Rat {
     if exponent >= 0 {
-        Rat::from_integer(BigInt::from(num_bigint::BigUint::from(1u8) << exponent as usize))
+        Rat::from_integer(BigInt::from(
+            num_bigint::BigUint::from(1u8) << exponent as usize,
+        ))
     } else {
         Rat::new(
             BigInt::from(1),
@@ -275,7 +294,10 @@ fn main() {
 
     println!("PHOENIX STATION THREE — THE BOUND DIAGRAM CONDUCTS");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     let chart_width = container
         .tensor(&named("self_attn.q_norm.weight"))
@@ -335,7 +357,8 @@ fn main() {
         .expect("positive");
         let two = Rat::from_integer(BigInt::from(2));
         let mut angles: Vec<Rat> = Vec::with_capacity(bands);
-        let mut current = holonic_engine::exact_value::ExactInterval::point(Rat::from_integer(BigInt::from(1)));
+        let mut current =
+            holonic_engine::exact_value::ExactInterval::point(Rat::from_integer(BigInt::from(1)));
         for _ in 0..bands {
             angles.push((&current.lower + &current.upper) / &two);
             // Held outward on a dyadic grid at every step. Without it the ladder's denominators
@@ -424,7 +447,14 @@ fn main() {
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("rebase admits"), grained, entering_grain, rebase_event, 0);
+        join(
+            &mut complex,
+            tag("rebase admits"),
+            grained,
+            entering_grain,
+            rebase_event,
+            0,
+        );
         let front_grain = grain_after(
             &mut complex,
             &mut program,
@@ -437,9 +467,21 @@ fn main() {
         // THE FIRST FRONT: three co-present branches of one predecessor.
         let mut branches = Vec::new();
         for (what, suffix, port) in [
-            ("receiver projection", "self_attn.q_proj.weight", receiver_wide),
-            ("presented projection", "self_attn.k_proj.weight", presented_wide),
-            ("carried projection", "self_attn.v_proj.weight", carried_wide),
+            (
+                "receiver projection",
+                "self_attn.q_proj.weight",
+                receiver_wide,
+            ),
+            (
+                "presented projection",
+                "self_attn.k_proj.weight",
+                presented_wide,
+            ),
+            (
+                "carried projection",
+                "self_attn.v_proj.weight",
+                carried_wide,
+            ),
         ] {
             let carrier = named(suffix);
             let law = bind(
@@ -452,7 +494,12 @@ fn main() {
                 shape_of(&carrier),
             );
             let event = complex.occur(law).expect("occurs");
-            program.bind(event, PortedOperationKind::Contract { population: carrier });
+            program.bind(
+                event,
+                PortedOperationKind::Contract {
+                    population: carrier,
+                },
+            );
             join(&mut complex, tag(what), grained, front_grain, event, 0);
             branches.push((event, port));
         }
@@ -548,7 +595,14 @@ fn main() {
                     pairs_halves: candidate.pairs_halves,
                 },
             );
-            join(&mut complex, tag(&format!("{what} turns")), presented_head, event, turn_event, 0);
+            join(
+                &mut complex,
+                tag(&format!("{what} turns")),
+                presented_head,
+                event,
+                turn_event,
+                0,
+            );
             turned_presented_here.push(turn_event);
         }
         turned_presented.push(turned_presented_here);
@@ -579,7 +633,14 @@ fn main() {
                     count: chart_width,
                 },
             );
-            join(&mut complex, tag(&what), receiver_wide, branches[0].0, projected, 0);
+            join(
+                &mut complex,
+                tag(&what),
+                receiver_wide,
+                branches[0].0,
+                projected,
+                0,
+            );
 
             let carrier = named("self_attn.q_norm.weight");
             let law = bind(
@@ -600,7 +661,14 @@ fn main() {
                     gain_carries_unit: candidate.gain_carries_unit,
                 },
             );
-            join(&mut complex, tag(&format!("{what} rebase")), receiver_head, projected, rebased, 0);
+            join(
+                &mut complex,
+                tag(&format!("{what} rebase")),
+                receiver_head,
+                projected,
+                rebased,
+                0,
+            );
 
             let law = bind(
                 &mut complex,
@@ -622,7 +690,14 @@ fn main() {
                     pairs_halves: candidate.pairs_halves,
                 },
             );
-            join(&mut complex, tag(&format!("{what} turns")), receiver_head, rebased, turned, 0);
+            join(
+                &mut complex,
+                tag(&format!("{what} turns")),
+                receiver_head,
+                rebased,
+                turned,
+                0,
+            );
 
             // THE CONTACT. Its reach is every retained position up to this one, and the DIAGRAM
             // declares it: the law's arity is 1 + 2n and the bonds carry each member.
@@ -638,9 +713,10 @@ fn main() {
                 vec![carried_head],
                 None,
                 vec![SourceTestimony::AuthoritativeDescription {
-                    statement: "a carried construction is a convex combination and lies inside its \
+                    statement:
+                        "a carried construction is a convex combination and lies inside its \
                                 population's hull"
-                        .to_owned(),
+                            .to_owned(),
                 }],
             );
             let contact = complex.occur(law).expect("occurs");
@@ -651,7 +727,14 @@ fn main() {
                     scale_width: candidate.contact_scale_width(chart_width),
                 },
             );
-            join(&mut complex, tag(&format!("{what} contact receiver")), receiver_head, turned, contact, 0);
+            join(
+                &mut complex,
+                tag(&format!("{what} contact receiver")),
+                receiver_head,
+                turned,
+                contact,
+                0,
+            );
             for at in 0..reach {
                 join(
                     &mut complex,
@@ -720,8 +803,20 @@ fn main() {
             shape_of(&carrier),
         );
         let returning_event = complex.occur(law).expect("occurs");
-        program.bind(returning_event, PortedOperationKind::Contract { population: carrier });
-        join(&mut complex, tag("return admits"), carried_wide, contact_grain, returning_event, 0);
+        program.bind(
+            returning_event,
+            PortedOperationKind::Contract {
+                population: carrier,
+            },
+        );
+        join(
+            &mut complex,
+            tag("return admits"),
+            carried_wide,
+            contact_grain,
+            returning_event,
+            0,
+        );
 
         let law = bind(
             &mut complex,
@@ -741,7 +836,14 @@ fn main() {
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("return rebase admits"), standing, returning_event, return_rebase, 0);
+        join(
+            &mut complex,
+            tag("return rebase admits"),
+            standing,
+            returning_event,
+            return_rebase,
+            0,
+        );
 
         let reentry = bind(
             &mut complex,
@@ -758,8 +860,22 @@ fn main() {
         );
         let reentry_event = complex.occur(reentry).expect("occurs");
         program.bind(reentry_event, PortedOperationKind::ReEntry);
-        join(&mut complex, tag("re-entry retains"), grained, entering_grain, reentry_event, 0);
-        join(&mut complex, tag("re-entry admits"), standing, return_rebase, reentry_event, 1);
+        join(
+            &mut complex,
+            tag("re-entry retains"),
+            grained,
+            entering_grain,
+            reentry_event,
+            0,
+        );
+        join(
+            &mut complex,
+            tag("re-entry admits"),
+            standing,
+            return_rebase,
+            reentry_event,
+            1,
+        );
 
         // THE SECOND FRONT and the constitutive passage.
         let constitutive_grain = grain_after(
@@ -786,8 +902,20 @@ fn main() {
                 shape_of(&carrier),
             );
             let event = complex.occur(law).expect("occurs");
-            program.bind(event, PortedOperationKind::Contract { population: carrier });
-            join(&mut complex, tag(what), grained, constitutive_grain, event, 0);
+            program.bind(
+                event,
+                PortedOperationKind::Contract {
+                    population: carrier,
+                },
+            );
+            join(
+                &mut complex,
+                tag(what),
+                grained,
+                constitutive_grain,
+                event,
+                0,
+            );
             second.push(event);
         }
         let passage = bind(
@@ -803,8 +931,18 @@ fn main() {
             }],
         );
         let passage_event = complex.occur(passage).expect("occurs");
-        program.bind(passage_event, PortedOperationKind::GatedPassage { terms, inner: None });
-        join(&mut complex, tag("passage admits"), intermediate, second[0], passage_event, 0);
+        program.bind(
+            passage_event,
+            PortedOperationKind::GatedPassage { terms, inner: None },
+        );
+        join(
+            &mut complex,
+            tag("passage admits"),
+            intermediate,
+            second[0],
+            passage_event,
+            0,
+        );
 
         let mixed = bind(
             &mut complex,
@@ -819,8 +957,22 @@ fn main() {
         );
         let mixed_event = complex.occur(mixed).expect("occurs");
         program.bind(mixed_event, PortedOperationKind::Hadamard);
-        join(&mut complex, tag("product admits gate"), intermediate, passage_event, mixed_event, 0);
-        join(&mut complex, tag("product admits raise"), intermediate, second[1], mixed_event, 1);
+        join(
+            &mut complex,
+            tag("product admits gate"),
+            intermediate,
+            passage_event,
+            mixed_event,
+            0,
+        );
+        join(
+            &mut complex,
+            tag("product admits raise"),
+            intermediate,
+            second[1],
+            mixed_event,
+            1,
+        );
 
         let lowering_grain = grain_after(
             &mut complex,
@@ -846,7 +998,14 @@ fn main() {
                 population: named("mlp.down_proj.weight"),
             },
         );
-        join(&mut complex, tag("lowering admits"), intermediate, lowering_grain, lowering_event, 0);
+        join(
+            &mut complex,
+            tag("lowering admits"),
+            intermediate,
+            lowering_grain,
+            lowering_event,
+            0,
+        );
 
         let constitutive_reentry = bind(
             &mut complex,
@@ -861,8 +1020,22 @@ fn main() {
         );
         let successor = complex.occur(constitutive_reentry).expect("occurs");
         program.bind(successor, PortedOperationKind::ReEntry);
-        join(&mut complex, tag("successor retains"), standing, reentry_event, successor, 0);
-        join(&mut complex, tag("successor admits"), standing, lowering_event, successor, 1);
+        join(
+            &mut complex,
+            tag("successor retains"),
+            standing,
+            reentry_event,
+            successor,
+            0,
+        );
+        join(
+            &mut complex,
+            tag("successor admits"),
+            standing,
+            lowering_event,
+            successor,
+            1,
+        );
         successors.push(successor);
     }
 
@@ -871,7 +1044,10 @@ fn main() {
     println!("  THE BINDING");
     println!("    typed ports                     {}", closure.ports);
     println!("    bound operations                {}", closure.operations);
-    println!("    occurrences                     {}", closure.occurrences);
+    println!(
+        "    occurrences                     {}",
+        closure.occurrences
+    );
     println!("    CO-PRESENT FRONTS               {}", closure.fronts);
     println!("    species census:");
     for (species, count) in complex.species_census() {
@@ -921,12 +1097,30 @@ fn main() {
     println!();
     println!("THE SITE'S RETURN");
     println!();
-    println!("  fronts conducted, in the chronology's order  {}", receipt.fronts.len());
-    println!("  occurrence ports written                     {}", receipt.ports_written());
-    println!("  resident contractions                        {}", carrier.contractions);
-    println!("  stored codewords across the bus              {} octets", carrier.stored_octets);
-    println!("  declared grain crossings                     {}", carrier.grain_crossings);
-    println!("  entries BELOW THE FRAME, retained whole      {}", carrier.below_the_frame);
+    println!(
+        "  fronts conducted, in the chronology's order  {}",
+        receipt.fronts.len()
+    );
+    println!(
+        "  occurrence ports written                     {}",
+        receipt.ports_written()
+    );
+    println!(
+        "  resident contractions                        {}",
+        carrier.contractions
+    );
+    println!(
+        "  stored codewords across the bus              {} octets",
+        carrier.stored_octets
+    );
+    println!(
+        "  declared grain crossings                     {}",
+        carrier.grain_crossings
+    );
+    println!(
+        "  entries BELOW THE FRAME, retained whole      {}",
+        carrier.below_the_frame
+    );
     println!("  conducted in                                 {spent:?}");
     println!();
     println!("  EXACT WORK, counted rather than timed:");
@@ -935,7 +1129,10 @@ fn main() {
     }
     println!();
     println!("  THE RETAINED FIBRE — exhibited per occurrence, never propagated");
-    println!("    occurrences that retained something        {}", receipt.retained.len());
+    println!(
+        "    occurrences that retained something        {}",
+        receipt.retained.len()
+    );
     let (retained_entries, retained_nonzero, widest) = receipt.retained_population();
     println!("    entries retained                           {retained_entries}");
     println!("    of those, genuinely nonzero                {retained_nonzero}");

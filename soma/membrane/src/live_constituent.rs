@@ -605,8 +605,8 @@ impl LivePin {
                 // WHICH SIDE IS THE HORIZON. `chi_against` returns None only when a face's arrow has
                 // BOTH aim and cross zero — `arms_form` admits ORTHO, so this is not the eyes-only
                 // crime. It means the compared face carries no geometry at all.
-                let arriving_null = arriving.meeting.arrow.aim.mag == 0
-                    && arriving.meeting.arrow.cross.mag == 0;
+                let arriving_null =
+                    arriving.meeting.arrow.aim.mag == 0 && arriving.meeting.arrow.cross.mag == 0;
                 let held_null =
                     held.meeting.arrow.aim.mag == 0 && held.meeting.arrow.cross.mag == 0;
                 if arriving.meeting.arrow.reach.mag == 0 {
@@ -622,7 +622,9 @@ impl LivePin {
                 };
                 NO_PROJECTIVE_READ.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
             }
-            Some(chi) if chi.wound() => WOUND_COMPARISON.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+            Some(chi) if chi.wound() => {
+                WOUND_COMPARISON.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
+            }
             Some(_) if hand_residual.is_some() => {
                 HAND_RESIDUAL.fetch_add(1, core::sync::atomic::Ordering::Relaxed)
             }
@@ -2429,7 +2431,11 @@ impl LiveConstituent {
             // The front's own propagation depth and its co-present demand, both read off the
             // active population rather than declared here.
             let vision = FrontVision {
-                depth: active.iter().map(|part| part.front_depth).max().unwrap_or(0),
+                depth: active
+                    .iter()
+                    .map(|part| part.front_depth)
+                    .max()
+                    .unwrap_or(0),
                 horizon: aperture.vision_horizon(),
                 co_present: u64::try_from(active.len()).unwrap_or(u64::MAX),
             };
@@ -5204,8 +5210,12 @@ mod tests {
         // And the dilation is a function of the RATIO, so it is invariant under a common rescaling
         // — a count in this position could not be.
         assert_eq!(
-            CountedCrossing::meet(60, 1).expect("positive").service_rounds(),
-            CountedCrossing::meet(600, 10).expect("positive").service_rounds()
+            CountedCrossing::meet(60, 1)
+                .expect("positive")
+                .service_rounds(),
+            CountedCrossing::meet(600, 10)
+                .expect("positive")
+                .service_rounds()
         );
     }
 

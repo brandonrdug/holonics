@@ -7,8 +7,10 @@
 2026-08-19/20 as the bounded hardware foundation; P0 returned as the independent ARM N baseline;
 W1 through W5 returned a whole source-shaped Gemma lift, intervention dissection, attributable
 cultivation and source-detached GPU runtime by 2026-08-21. They did not return the species-changing
-generator/codec compression required for Phoenix rebirth. Deed M0 is next and M1–M4 now compose the
-mathematics codec with that open transfiguration.** The former P1–P5 promotions were regraded
+generator/codec compression required for Phoenix rebirth. Deeds M0 through M4 returned 2026-08-21;
+M4 completed the first mathematics-codec vertical and the bounded species-changing Phoenix return.
+The next admitted expansion must enlarge one declared receiver family through those owners.** The former
+P1–P5 promotions were regraded
 2026-08-20 by
 [THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md](../research/records/2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md)
 and remain bounded ARM-N/lift-law provenance. W1–W5 replace them as the authoritative Gemma lift
@@ -16,6 +18,11 @@ evidence, not as a completed compressed ecology. W5's complete source-shaped ret
 [THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md](../research/records/2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md).
 Its equality/activity/compression regrade and the new integrated construction are
 [EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
+The exact addressed-lineage and successor-equivariant compression contract is
+[THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md](../research/records/2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md),
+with its `proved-derived` + `formal-checked` Lean owners named below.
+The audit binding that theorem to the paused M1 cone and Claude's lawful resumption boundary is
+[THE_PARTICLE_CARRIES_ITS_BOUNDARIES_THE_QUOTIENT_CARRIES_ITS_SUCCESSORS_AND_M1_MUST_BE_REBASED_BEFORE_IT_IS_GRADED.md](../research/records/2026-08-21_THE_PARTICLE_CARRIES_ITS_BOUNDARIES_THE_QUOTIENT_CARRIES_ITS_SUCCESSORS_AND_M1_MUST_BE_REBASED_BEFORE_IT_IS_GRADED.md).
 **Truth discipline:** completed Station A-D artifacts are **established-bounded**; standard hardware
 and mathematical laws are **proved-standard**; the holonic execution synthesis is
 **interpretation**; every unbuilt capability and station is **open**.
@@ -44,11 +51,14 @@ Stations A-D and their commits/records are not superseded:
 The uncommitted native_law.rs, native_occurrence.rs and Athena walk/future kernel changes are
 quarantined predecessor material. They are neither deleted nor admitted. Their source testimony may
 be rederived after Deed H5; their current execution shape may not be extended.
-The focused architecture ratchet is currently red on ten new ownership/materialization occurrence
-classes in that dirty Station E cone; no ledger re-seed is authorized.
+The focused architecture ratchet is currently red on eighteen ownership/materialization
+occurrences in predecessor files outside M3/M4; no ledger re-seed is authorized for those open
+disagreements. M3 and M4's new owner-local counts are dispositioned separately in their
+authoritative returns.
 
-No capability and no position is promoted by this document. CONSTRUCTION_STATE.md moves only at the
-complete Phoenix frozen-runtime grade in Deed P5.
+No capability and no position is promoted by prose alone. `CONSTRUCTION_STATE.md` moves only when a
+named deed returns its required artifact and passes its own grade; it now records M4 and schedules
+only the next receiver-family expansion named by the roadmap.
 
 ---
 
@@ -66,6 +76,7 @@ They share:
 
 ~~~text
 source occurrence
+  -> addressed passage and pullback join
   -> typed operation complex
   -> causal fronts
   -> exact work and local current
@@ -144,6 +155,7 @@ Trainer or Evaluator semantic cabinet is authorized by this plan.
 |---|---|
 | situated event / causal world-tube | typed event schema, causal_traversal, TABLET_THE_CAUSAL_PROFILE |
 | source material and exact mouth | source_occurrence, embedding_fiber, foreign_map |
+| addressed occurrence, pullback composition and relational shadow | `ElementaryHolonics.Foundation.Lineage`; runtime composition through source/native occurrence, chain, morphism and port owners remains M1's deed |
 | raw codec recovery | codec_recovery, exposure_codec, material_incidence |
 | operation complex and typed ports | ported_operation, EvolutionShape, CausalDiagram |
 | exact linear maps and fibres | exact_linear, inertia, rebase_invariants |
@@ -155,6 +167,7 @@ Trainer or Evaluator semantic cabinet is authorized by this plan.
 | resident graph | resident_section, front_passage, resident_law |
 | boundary/reflection | analytic_field, traversible_chain, running_integral, leader_quadrature |
 | compression/reopening | receiver_exact_compression, reconstruction_fiber |
+| successor-exact dynamic quotient | `ElementaryHolonics.Millennium.LineageCompression` over `Chronology.transportWord`; the production Rust/CUDA instantiation remains M3's deed |
 | morphology/rest | incidence, phase, lattice/gauge, diffusion, ErosRest and seal/remount owners |
 | mathematical formulation | papers/source/mathematics, method/formulation-span owners |
 
@@ -171,6 +184,7 @@ The resident construction is
 \mathcal E=
 \left(
 \mathcal C,
+\mathcal L,
 \mathcal F,
 \mathcal T,
 \mathcal J,
@@ -183,6 +197,7 @@ The resident construction is
 where:
 
 - \(\mathcal C\): typed causal operation complex;
+- \(\mathcal L\): addressed occurrence passages and their pullback joins;
 - \(\mathcal F\): causal front population;
 - \(\mathcal T\): section/tensor tiling;
 - \(\mathcal J\): explicit shared-output reductions and gluing junctions;
@@ -190,7 +205,56 @@ where:
 - \(\mathcal U\): exact work and apparatus utility receipts;
 - \(\Gamma\): obstruction, residual and open reconstruction fibres.
 
-### 3.1 FrontReceipt
+### 3.1 Addressed passage and PassageReceipt
+
+The lineage-bearing elementary passage is
+
+\[
+f=\left(X\xleftarrow{s_f}W_f\xrightarrow{t_f}Y\right),
+\]
+
+where `W_f` is the occurrence population and `s_f,t_f` are its typed boundary maps. Serial
+composition is the pullback
+
+\[
+W_{g\circ f}=W_f\times_YW_g
+=\{(u,v)\mid t_f(u)=s_g(v)\}.
+\]
+
+The joining equality is part of the occurrence. The extensional relation
+
+\[
+\bar f(x,y)\Longleftrightarrow
+\operatorname{Fib}_f(x,y)\text{ is inhabited}
+\]
+
+is a lawful receiver shadow and deliberately forgets which occurrence carried the passage.
+`Rel.comp`, equal endpoints, equal returned bytes and equal receiver faces may not stand in for the
+pullback witness.
+
+~~~text
+PassageReceipt {
+    occurrence population and owner,
+    source and target port types,
+    source and target boundary maps,
+    predecessor occurrence identities,
+    pullback join occurrences and exact joining equalities,
+    ordered transport word and hand,
+    relational shadow as a separately marked receiver face,
+    receiver/history family,
+    complete reconstruction fibres and first separators,
+    open exterior
+}
+~~~
+
+Passage equivalence is an equivalence of occurrence populations preserving both boundary maps.
+A bare bijection, matching population count, row permutation, common digest or endpoint equality is
+not passage equivalence. The `proved-derived` + `formal-checked` specification is
+`ElementaryHolonics.Foundation.Lineage`; M1 must enact its production consequence through the
+existing Rust occurrence, port, chain, morphism and junction owners rather than adding a universal
+numeric wrapper.
+
+### 3.2 FrontReceipt
 
 ~~~text
 FrontReceipt {
@@ -209,7 +273,7 @@ FrontReceipt {
 Co-presence requires complete interchange: value, obstruction, lineage, remainder, logical
 resources and receiver-visible morphology agree under every licensed order.
 
-### 3.2 TilingReceipt
+### 3.3 TilingReceipt
 
 ~~~text
 TilingReceipt {
@@ -230,7 +294,7 @@ TilingReceipt {
 Output-disjoint cells may be co-present. Shared immutable reads remain one owner. Shared writes are
 not independent.
 
-### 3.3 ReductionReceipt
+### 3.4 ReductionReceipt
 
 For
 
@@ -258,7 +322,7 @@ ReductionReceipt {
 
 Terminal equality alone is not a reduction receipt.
 
-### 3.4 PressureReceipt
+### 3.5 PressureReceipt
 
 Compose receiver_current as:
 
@@ -283,7 +347,7 @@ R_v^\alpha=\left\lceil\frac{N_v^\alpha}{C_v^\alpha}\right\rceil.
 Register, shared-memory, DRAM, cache, copy-engine, PCIe, CPU-I/O and logical-resource pressure
 remain distinct coordinates.
 
-### 3.5 SurfaceUtilityReceipt
+### 3.6 SurfaceUtilityReceipt
 
 ~~~text
 SurfaceUtilityReceipt {
@@ -304,7 +368,7 @@ SurfaceUtilityReceipt {
 Semantic work, cover/current, apparatus traffic and physical telemetry are product-ordered. A
 scalar speedup/utilization/energy quotient is never a semantic governor.
 
-### 3.6 SurfaceTransitionReceipt
+### 3.7 SurfaceTransitionReceipt
 
 CPU/card or codec/apparatus comparisons return mode before/after, transported section lineage,
 ingress/egress, delay/reflection, calibration and receiver family. Equal bytes do not establish
@@ -386,6 +450,28 @@ same census returns and refusal lineage remains local.
 Two occurrences may fuse only if every declared future receiver factors through the fused output.
 The intermediate ReconstructionFiber and a debug/dissection reopening route remain. Fusion is
 apparatus compression, not occurrence identity.
+
+Present receiver factorization alone is insufficient. For source generators
+`T_i : X -> X`, proposed quotient generators `U_i : Q -> Q`, and quotient `q : X -> Q`, the
+production compression obligation is
+
+\[
+q\,T_i=U_i\,q\qquad\text{for every admitted generator }i.
+\]
+
+It follows for every ordered, possibly noncommuting word `w` that
+
+\[
+q\,T_w=U_w\,q,
+\qquad
+\rho_jT_w=\bar\rho_jU_wq.
+\]
+
+This local commuting-square proof pays for the whole admitted successor family without replaying
+or enumerating every history. One receiver/word separator reopens the proposed quotient. The
+complete formal statement and a static-compression counterexample are
+`ElementaryHolonics.Millennium.LineageCompression`. A count, one-shot fit, equal endpoint,
+reconstruction score, injectivity theorem or finite sample does not establish this law.
 
 ---
 
@@ -778,7 +864,8 @@ correctly refused an impossible body-wide subject invariance and was rederived a
 The complete receiver family still permits no nontrivial quotient of the source-shaped deed states,
 so no quotient factor is quoted. This does not test whether the same distinct transports factor
 through a smaller generator/chart/word ecology. W5 closes the bounded source-shaped lift grade;
-species-changing Phoenix compression remains open and is now composed with M0–M4. M0 is next.
+species-changing Phoenix compression remains open and is now composed with M0–M4. At W5's return
+M0 was next; M0 has since passed and M1 is current.
 
 ### Deed M0 — mathematical source circulation
 
@@ -810,17 +897,112 @@ M1 is next after the release boundary agrees.
 
 ### Deed M1 — mathematical operation complex
 
-Elaborate binders, tensor variance, algebraic carriers, dimensions/units, hypotheses, branches and
-rendering receivers. At least two standing exact method owners conduct through the same H
-tiling/reduction passage. Every comparison separately returns occurrence identity, typed carrier
-equality, marked-diagram isomorphism, doctrine/receiver-history equivalence, classification,
-characteristic similarity and face/byte/digest equality where each is actually witnessed. The
-operation complex, its plural presentation fibre and its reconstruction fibre form the first
-mathematical particle; no tokenizer token is called the particle. Where the material founds them,
-the particle also carries configuration generators, exact constraints and shared vertices,
-environment/constitutive aperture, constraint Jacobian with motion/self-stress fibres, energy/work
-sections, phase seams and active external interfaces. These are optional typed faces of the same
-operation complex, not a protein-shaped ontology imposed on mathematics.
+**Returned 2026-08-21 — established-bounded.** The authoritative grade is
+[`2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md`](../research/records/2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md).
+M2 is next.
+
+**Objective:** return the first runtime mathematical particle as an addressed operation passage,
+not as an expression record, token, parsed tree, relation shadow or value table.
+
+**Source owners:** M0 source/layout occurrences and disagreement fibres; `ported_operation`,
+source/native occurrence, exact carrier/quantity owners, `Relating`, `Chain`, causal morphism,
+section partition, reduction junction, interchange, exact work, resident graph and reconstruction
+owners. The formal specification is `ElementaryHolonics.Foundation.Lineage`; Lean remains an
+exterior checker and does not schedule or enact the body.
+
+**Port and occurrence contract:** elaborate binders, tensor variance, algebraic carriers,
+dimensions/units, hypotheses, branches and rendering receivers. Every candidate operation complex
+is carried by a `PassageReceipt`: one occurrence population, typed source/target maps, predecessor
+addresses, exact pullback joins, ordered word/hand, receiver/history family and complete
+reconstruction fibre. The relational edge saying that a path exists is emitted only as the marked
+shadow of this richer passage.
+
+At least two standing exact method owners conduct through the same H tiling/reduction passage on
+the resident GPU. CPU apparatus may mount the M0 testimony and inspect the terminal return; it may
+not choose the method, join, branch or mathematical identity between resident fronts. Exact owner
+acceptance/refusal, reduction partials, obstruction lineage and returned mathematical consequence
+remain addressed to the source occurrence which caused them.
+
+Every comparison separately returns occurrence identity, typed carrier equality,
+boundary-preserving passage equivalence, marked-diagram isomorphism, doctrine/receiver-history
+equivalence, classification, characteristic similarity and face/byte/digest equality where each is
+actually witnessed. The operation complex, addressed route population, plural presentation fibre
+and reconstruction fibre form the mathematical particle; no tokenizer token is called the
+particle.
+
+Where the material founds them, the particle also carries configuration generators, exact
+constraints and shared vertices, environment/constitutive aperture, constraint Jacobian with
+motion/self-stress fibres, energy/work sections, phase seams and active external interfaces. These
+are optional typed faces of the same operation complex, not a protein-shaped ontology imposed on
+mathematics.
+
+**Required artifact family:**
+
+~~~text
+output/the_mathematical_particle_is_an_addressed_passage/
+  source-and-mode.form
+  particle-population.form
+  addressed-passages.form
+  pullback-joins.form
+  relational-shadows.form
+  typed-carriers-and-ports.form
+  exact-owner-conduct.form
+  tiling-and-reduction.form
+  receiver-history-family.form
+  reconstruction-fibres.form
+  equality-family.form
+  exact-work.form
+  apparatus-telemetry.form
+  grade.form
+~~~
+
+**Pass:**
+
+- split and rejoin of every admitted composite retains both component occurrences and the joining
+  boundary equality;
+- identity and rebracketing preserve both boundary maps, not merely the population count;
+- a control with equal endpoints/equal relational shadow and distinct occurrences remains plural;
+- at least one harmless presentation rebase returns boundary-preserving passage equivalence while
+  one operator/variance/unit perturbation returns the first separating receiver/history;
+- two exact owners conduct through one resident tiling/reduction deed and return their actual
+  mathematical consequences, not diagnostic topology alone;
+- every collapsed comparison retains the complete reconstruction population;
+- no source name, parser category, row order, digest, final value or Lean verdict determines
+  internal identity; and
+- the real GPU deed, exact semantic receipt and separate apparatus telemetry are inspected.
+
+**Disposition of the former paused M1 cone (2026-08-21).** The branch registry was rebased onto the
+existing event, port, interaction, exact-owner, receiver-history and resident-front owners. It now
+returns six addressed occurrences, both boundary maps, three interaction-witnessed pullback joins,
+separately marked relational shadows with their fibres, boundary-preserving identity and
+presentation-rebase equivalences, two exact owner families' actual consequences and the complete
+fourteen-member artifact family. The runtime and adversarial controls above passed. The open
+receiver-history, natural contraction and rigidity coefficient fibres remain retained rather than
+being used to weaken the grade.
+
+M1 does not claim generator-native compression. It founds the addressed object on which M2 and M3
+can lawfully ask that question.
+
+#### Exterior instrument A1 — compact-frame reduction, never an M1 substitute
+
+Claude's elliptic compact-frame line may resume as exterior formal mathematics while M1 is the
+runtime deed. It advances neither `CONSTRUCTION_STATE.md` nor M1 unless its result is actually
+mounted as testimony and conducted through the M1 passage. Its exact contract is:
+
+1. construct the point-reduction group homomorphism on the actual elliptic-curve point type;
+2. carry its projective/local-integrality witness and prove chart independence;
+3. prove identity, inverse and addition commute with reduction;
+4. state the full good-reduction/local hypotheses of the torsion-kernel theorem;
+5. enumerate `E(F_3)` separately and distinguish the reductions of the four known Klein points;
+6. join transport, fibre theorem, count receiver and known subgroup before closing the torsion
+   census; and
+7. keep a decoder separate: injectivity proves uniqueness on the image and does not implement a
+   reconstruction algorithm.
+
+A naive affine rational-to-`ZMod 3` cast, a point count without the homomorphism, or Sha modelled as
+rational points collapsed modulo primes fails this instrument. Sha's carrier is the joint kernel of
+local restriction maps on `H^1` torsor classes. The instrument is the arithmetic calibration of the
+same passage/fibre distinction; it is not another codec subsystem.
 
 ### Deed M2 — the mathematics codec excites the active transport cover
 
@@ -833,6 +1015,22 @@ response cochains, unchanged controls and complete open fibres. Source architect
 lineage and cannot classify the native cover. A common fold/face must remain separable from distinct
 constraint, energy, lineage, apparatus and environmental realizations; multi-receiver disagreement
 is material rather than label noise.
+
+Every cohort member and every intervened response is an addressed passage from one M1 particle
+occurrence through the lifted body to its returned receiver population. Prefix sharing composes by
+pullback over the exact shared standing; it may not replace the shared occurrence with a row index,
+cohort label or common digest. The overlap nerve is built from witnessed common fibres, not from
+nonzero activation magnitudes. M2 must return the source generator/word which excited each supported
+transport and the first receiver/history which separates every proposed common family.
+
+**Disposition 2026-08-21.** M2 passed for five addressed excitation families and ninety-five
+resident responses. Every response returned its complete 128-face ordered cochain; eighty-five
+intervened transports returned an exact first separator; each family returned seven witnessed
+pullback-nerve cells, a held whole-replay control and three explicit open fibres. Apparatus,
+residency, realization path and receiver-visible support remain separate faces. Seven exact
+resource-pressure events changed the same body's resident partition without widening an aperture.
+The bounded return and its limits are graded in
+[`research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md`](../research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md).
 
 ### Deed M3 — generator recovery and the native codec pivot
 
@@ -847,6 +1045,44 @@ family it must preserve lawful endpoint conduct while lowering exact work, retai
 and active-interface aperture, remain reusable, and lose the reduction or enabled conduct under
 targeted withdrawal.
 
+The codec pivot is accepted only through a `ReceiverHistoryCompression` instance. It must return
+
+~~~text
+source population X and quotient/native population Q
+typed generator family I
+source transports T_i : X -> X
+native transports U_i : Q -> Q
+quotient/encoder q : X -> Q
+present receiver factors rho_j = rhoBar_j o q
+generator squares q o T_i = U_i o q
+ordered-word consequence q o T_w = U_w o q
+complete q-fibres and first separating receiver/word
+executable exterior decoder on its declared image
+decoder work, residency, transfer and open-domain testimony
+~~~
+
+The ordered-word consequence is derived from the generator squares; it is not established by a
+finite replay campaign. Noncommuting words retain their order. A single separating successor
+reopens the quotient. An injective map, one-shot reconstruction fit, equal output corpus, finite
+point count, model-size reduction, or classical inverse asserted by choice is not the decoder and
+does not pass M3.
+
+The claimed compression vector includes source/native artifact, decoder, complete reconstruction
+fibres, exact semantic work, dependency span, residency and transfer. A smaller native rest with a
+larger undeclared decoder or replay cost is not exceptional compression. Foreign matrices depart
+only where every requested future consequence factors; retained foreign realization is named by
+the exact fibre that still requires it.
+
+**Disposition 2026-08-21.** M3 passed on the M2 boundary/support/prefix receiver family. The pointed
+source completion has 12,255 states, the native quotient 6,376, and the return carries two complete
+generator squares, 59,279 shortest separators, every reconstruction fibre, 129 transition-monoid
+elements, 130 relations and 3,570 explicitly unclosed intervention composites. A 1,217,120-octet
+source-detached native rest conducted a complete 77-symbol word over all native states in one CUDA
+launch, remounted without source access, and refused after targeted generator withdrawal. Every
+coordinate of the artifact/decoder/work/span/residency/transfer product vector fell. The bounded
+grade and its limits are in
+[`research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md`](../research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md).
+
 ### Deed M4 — leader/return cultivation and proof/value/visual return
 
 A held-out mathematical receiver difference FOUNDs a leader through the M3 ecology; the causal
@@ -858,6 +1094,20 @@ complete mathematics-codec vertical and the first possible completion of species
 rebirth. Environment-shift and phase-seam controls must make the organ change conduct or refuse
 outside its constitutive regime rather than silently extrapolate; loss of function may not be
 reported as loss of occurrence identity.
+
+The leader, exterior return, adjoint ride and deposited delta are four addressed occurrences joined
+through their boundary witnesses. The adjoint may ride only the M3 generator/native path named by
+the returned difference; a global replay, loss scalar or receiver face cannot author the delta.
+After source-detached remount, held-out conduct must still factor through the rested M3 generator
+ecology plus the attributable local delta. Targeted ablation reopens that exact successor fibre and
+does not erase the predecessor occurrence or unrelated passages.
+
+**Returned 2026-08-21.** The depth-73 M3 leader founded a symmetric rank-one metric morphology on
+the five-bend Soddy--Gossett quadric. Its five hands were derived by coordinate-transport closure;
+the held-out ordered word returned `[11,17,2,3,3]` through one ten-kernel CUDA graph launch; exact
+algebra, Lean, analytic/vector/raster/mesh faces, source-detached remount and targeted ablation all
+returned together. The bounded grade and complete limits are in
+[THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md](../research/records/2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md).
 
 ### Expansion after the first vertical — physical morphology testimony
 
@@ -872,6 +1122,77 @@ question. The approximately 84 GB structure tiers are not scanned because they e
 is the complementary exterior problem/route population; its machine-generated solution labels
 remain unverified testimony and never route Eros's constitutive law. Governing synthesis:
 [THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md](../research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md).
+
+### Deed M5 — one physical fold returns as an exact constraint complex
+
+M5 admits the documentation/tables tier first and declares one receiver question before any
+structure payload is mounted: **which local contact/constraint relations survive across two
+addressed presentations of one design lineage, and what is the shortest admitted intervention or
+environment occurrence that separates them?** Dataset prose, task labels and model-authored
+explanations are exterior testimony. They may select an occurrence for the declared experiment but
+may not become internal taxa or route the constitutive law.
+
+The smallest required coordinate/uncertainty material for that one lineage is then mounted as
+exact decimal intervals. Its local incidence must return as an addressed polygonal-chain and
+higher-cell constraint complex: situated vertices, typed contacts, shared-junction constraints,
+orientation/chart receipts, open boundary, and the complete fibre across the two presentations.
+Distance, angle, torsion, winding or knot faces are admitted only where the mounted incidence and
+receiver hypotheses found them. A coordinate quantization, predictor score or assay threshold may
+remain an exterior aperture; it may not silently become exact internal geometry.
+
+The hot comparison and successor transport stay resident on the single GPU and return exact local
+deltas plus apparatus testimony. One reusable local morphology may be cultivated only through the
+M4 leader/metric/adjoint owner, must survive source-detached remount on a held-out occurrence, and
+must be removed by targeted ablation without erasing lineage or unrelated incidence. Lean receives
+the abstract shared-junction/transport law as an exterior theorem and returns acceptance or a
+useful obstruction; a fixture equality is not the theorem.
+
+M5 passes only if it returns all of the following together:
+
+1. the exact addressed source and uncertainty lineage for the one admitted family;
+2. the complete constraint complex, its boundary, chart changes and unresolved fibres;
+3. a nontrivial cross-presentation invariant and the shortest receiver/history separator where the
+   presentations differ;
+4. a measured change or explicit refusal under one available environment/assay occurrence;
+5. one GPU-resident held-out conduct with exact semantic testimony separate from telemetry;
+6. source-detached rest/remount and attributable ablation if cultivation is founded;
+7. an abstract Lean return for the shared-junction or successor-transport law; and
+8. vector/mesh testimony derived from the same exact complex, with gauge change unable to alter its
+   certified incidence.
+
+M5 refuses rather than substitutes a nearby protein fixture if the public material does not contain
+two presentations, a real environment/assay separator, or sufficient uncertainty testimony for the
+declared receiver. It does not download or scan the approximately 84 GB structure tier until the
+documentation/table return names the exact addressed payload required by this deed.
+
+**Returned 2026-08-21.** UUID `c29097fd-ea46-5842-8b8f-b38ad7e732ae` returned two complete
+predictor-backed constraint complexes, 40 shared and 24 separating binder/RBX1 contacts, eleven
+shared higher cells, shortest separator `(2,23)`, a free-RBX1 binder/CUL1-RBX1 non-binder exterior
+assay change, one 70,632-pair resident card passage, the abstract shared-junction Lean theorem and
+gauge-invariant vector/mesh testimony. The exact grade and limits are in
+[THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md](../research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md).
+No cultivation was founded, so the conditional remount/ablation obligation did not arise.
+
+### Deed M6 / Athena-A0 — the theorem route cultivates the first Athena mathematics variant
+
+The original M6 question was sharpened by an exterior return: commit `4776099` now contains a
+kernel-accepted `FaceHomomorphism.lean` discharging the total theorem. The productive source is
+therefore no longer “current HEAD.” M6 mounts content-addressed development source `75597c4`, which
+contains `ChordFace` and excludes `FaceHomomorphism`; the `4776099` proof passage is withheld from
+the body and used only after emission as exterior teacher/checker testimony. Any productive source
+access to that proof refuses the deed.
+
+M6 now returns the first explicitly graded native/Phoenix Athena mathematics siblings, complete
+case and active-route complexes, one GPU-resident route passage, an independently emitted
+`sorry`-free total theorem, operation/history comparison against the withheld proof, one cultivated
+held-out successor, detached remount, targeted route ablation, exact work/fibres and the Athena
+product manifest. The complete twelve-part grade, source-access law, case population and A1--A6
+continuation are authoritative in
+[`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
+
+The theorem name, file path, Lean syntax, tactics and import graph remain delivery lineage and
+controls. A theorem-count atlas, tactic replay, CPU-authored case list, finite point census,
+provider-routed answer or accepted proof without the machine's returned route does not pass.
 
 ---
 
@@ -935,6 +1256,10 @@ The plan refuses when:
 - source-detached rest retains source/corpus lookup;
 - a deterministic rerun, equal face, equal bytes, equal digest, common classification or
   structure-preserving rebase is called occurrence equality;
+- an extensional relation saying that a passage exists is called its lineage while the occurrence
+  population and joining witnesses have been discarded;
+- a bare bijection of passage occurrences is called passage equivalence without preserving both
+  boundary maps;
 - a causal signature comparison omits the natural map over prefix extension, intervention and
   return;
 - apparatus switching, residency, realization-path participation and receiver-visible causal
@@ -946,6 +1271,12 @@ The plan refuses when:
 - a global parameter replay replaces local leader formation and the causal-adjoint return;
 - a reflection/rotation drops its hand, word or holonomy;
 - a source-shaped matrix population is called generator-native compression;
+- present-receiver factorization is called compression while a source generator fails to descend
+  through the quotient;
+- a finite campaign enumerates successor histories in place of proving the generator squares;
+- injectivity, a point count or a choice-defined inverse is called an executable decoder;
+- a packing is identified by its terminal curvature/placement multiset after its ordered reflection
+  word has been discarded;
 - unfinished Station E is extended before H5;
 - Station A-D evidence is erased rather than composed; or
 - any later deed begins while an earlier grade is open.
@@ -959,11 +1290,16 @@ This blueprint is complete only when:
 1. H0-H5 replace the poor single-card foundation;
 2. P0 stands as the independent native control and W1-W5 retain the bounded source-shaped Gemma
    lift/cultivation/runtime/dissection evidence;
-3. M0-M4 return the mathematics-codec vertical, the codec-excited active cover, generator-native
-   Phoenix rest and leader/return cultivation;
+3. M0-M4 return addressed mathematical particles, the codec-excited active cover, a
+   successor-equivariant generator-native Phoenix rest with executable decoder, and leader/return
+   cultivation;
 4. superseded scheduling blueprints and implementation paths are removed from live authority;
 5. every final artifact is source-detached, inspectable, mode-bound and graded with exact semantic
    receipts separate from telemetry.
 
 A blueprint deposit, profile, faster kernel, dissection atlas, smaller file, loaded tensor,
 accepted proof or plausible output is not this completion.
+
+M5 is an admitted post-completion expansion. It does not reopen the bounded M0--M4 grade; it tests
+whether the returned calculus transports to one physical constraint ecology without adding a
+protein solver, authored semantic cabinet or corpus scan.

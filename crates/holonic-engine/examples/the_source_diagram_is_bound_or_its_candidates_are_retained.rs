@@ -28,7 +28,7 @@ use std::collections::BTreeMap;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::exact_json;
-use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::{
     CandidateDiagrams, OperationSpecies, PortedOperationComplex, SourceTestimony,
@@ -52,9 +52,18 @@ fn main() {
     };
     println!("PHOENIX STATION ONE — THE SOURCE'S TESTIMONY IS BOUND");
     println!();
-    println!("  declared populations              {}", container.tensors.len());
-    println!("  refused by name                   {}", container.refused.len());
-    println!("  entries claiming the same octets  {}", container.overlaps().len());
+    println!(
+        "  declared populations              {}",
+        container.tensors.len()
+    );
+    println!(
+        "  refused by name                   {}",
+        container.refused.len()
+    );
+    println!(
+        "  entries claiming the same octets  {}",
+        container.overlaps().len()
+    );
 
     // ---------------------------------------------------------------------------------------
     // The declared configuration.
@@ -181,9 +190,10 @@ fn main() {
             vec![symbol],
             None,
             vec![SourceTestimony::AuthoritativeDescription {
-                statement: "the exterior codec delivers one symbol; it is admitted material, not an \
+                statement:
+                    "the exterior codec delivers one symbol; it is admitted material, not an \
                             operation of this map"
-                    .to_owned(),
+                        .to_owned(),
             }],
         )
         .expect("bound");
@@ -216,8 +226,9 @@ fn main() {
 
     // The per-site material: a lookup the description explicitly types.
     let per_site_table = "model.language_model.embed_tokens_per_layer.weight";
-    let mut per_site_testimony: Vec<SourceTestimony> =
-        shape_testimony(&container, per_site_table).into_iter().collect();
+    let mut per_site_testimony: Vec<SourceTestimony> = shape_testimony(&container, per_site_table)
+        .into_iter()
+        .collect();
     if let Some((_, sentence)) = statements
         .iter()
         .find(|(phrase, _)| phrase == "only used for quick lookups")
@@ -265,9 +276,10 @@ fn main() {
                 vec![standing],
                 vec![standing],
                 Some(entering_gain.clone()),
-                vec![
-                    configuration_testimony("rms_norm_eps", &field("rms_norm_eps").unwrap_or_default()),
-                ]
+                vec![configuration_testimony(
+                    "rms_norm_eps",
+                    &field("rms_norm_eps").unwrap_or_default(),
+                )]
                 .into_iter()
                 .chain(shape_testimony(&container, &entering_gain))
                 .collect(),
@@ -324,7 +336,11 @@ fn main() {
                 None,
                 vec![configuration_testimony(
                     "layer_types",
-                    if whole { "full_attention" } else { "sliding_attention" },
+                    if whole {
+                        "full_attention"
+                    } else {
+                        "sliding_attention"
+                    },
                 )],
             )
             .expect("bound");
@@ -333,7 +349,11 @@ fn main() {
             complex
                 .carries_precedence(
                     format!("site {site} contact receives branch {at}"),
-                    if at == 0 { receiver_port } else { presented_port },
+                    if at == 0 {
+                        receiver_port
+                    } else {
+                        presented_port
+                    },
                     OccurrencePort::output(*source, 0),
                     OccurrencePort::input(faces_event, at),
                 )
@@ -348,9 +368,10 @@ fn main() {
                 vec![presented_port],
                 None,
                 vec![SourceTestimony::AuthoritativeDescription {
-                    statement: "a ratio family is the additive chart carried to the multiplicative \
+                    statement:
+                        "a ratio family is the additive chart carried to the multiplicative \
                                 one, with a declared null that enters no ratio"
-                        .to_owned(),
+                            .to_owned(),
                 }],
             )
             .expect("bound");
@@ -478,7 +499,10 @@ fn main() {
 
         let intermediate = complex.port(format!("site {site} intermediate chart"));
         let mut second_front = Vec::new();
-        for (label, suffix) in [("gate", "mlp.gate_proj.weight"), ("raise", "mlp.up_proj.weight")] {
+        for (label, suffix) in [
+            ("gate", "mlp.gate_proj.weight"),
+            ("raise", "mlp.up_proj.weight"),
+        ] {
             let carrier = named(suffix);
             let law = complex
                 .bind_operation(
@@ -592,7 +616,9 @@ fn main() {
             vec![standing],
             vec![standing],
             Some(boundary_gain.to_owned()),
-            shape_testimony(&container, boundary_gain).into_iter().collect(),
+            shape_testimony(&container, boundary_gain)
+                .into_iter()
+                .collect(),
         )
         .expect("bound");
     let closing_event = complex.occur(closing).expect("occurs");
@@ -687,7 +713,10 @@ fn main() {
     println!();
     println!("  typed ports                       {}", closure.ports);
     println!("  bound operations                  {}", closure.operations);
-    println!("  occurrences                       {}", closure.occurrences);
+    println!(
+        "  occurrences                       {}",
+        closure.occurrences
+    );
     println!("  CO-PRESENT FRONTS                 {}", closure.fronts);
     println!(
         "  dependency span                   {}",
@@ -703,7 +732,10 @@ fn main() {
     let branching: Vec<_> = fronts.iter().filter(|front| !front.is_serial()).collect();
     println!();
     println!("  fronts of breadth greater than one {}", branching.len());
-    println!("  widest front                       {}", branching.iter().map(|f| f.breadth()).max().unwrap_or(0));
+    println!(
+        "  widest front                       {}",
+        branching.iter().map(|f| f.breadth()).max().unwrap_or(0)
+    );
     println!();
     println!("  A CONTRACTION COUNT IS NOT A DEPENDENCY SPAN.");
     let transports = complex
@@ -761,7 +793,9 @@ fn main() {
             "OPEN"
         }
     );
-    println!("  the chronology species             DECIDED by the description: proportional, partial");
+    println!(
+        "  the chronology species             DECIDED by the description: proportional, partial"
+    );
     println!("  the per-site material's species    DECIDED by the description: a lookup");
 
     println!();
@@ -780,15 +814,23 @@ fn main() {
 
     println!("THE STATION'S OWN VERDICT");
     println!();
-    println!("  diagram closed                    {}", closure.is_closed());
-    println!("  open questions                    {}", closure.open_questions.len());
+    println!(
+        "  diagram closed                    {}",
+        closure.is_closed()
+    );
+    println!(
+        "  open questions                    {}",
+        closure.open_questions.len()
+    );
     println!(
         "  operations with no deciding testimony {}",
         closure.operations_without_deciding_testimony.len()
     );
     println!();
     println!("  The diagram is bound and its chronology stands. It is NOT closed, and the station");
-    println!("  returns that rather than a composition. No transport is posed and no capability is");
+    println!(
+        "  returns that rather than a composition. No transport is posed and no capability is"
+    );
     println!("  promoted; the next station may pose transports only where testimony decided them.");
 }
 

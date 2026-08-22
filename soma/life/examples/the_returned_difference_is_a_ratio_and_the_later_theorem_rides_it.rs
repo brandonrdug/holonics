@@ -135,8 +135,7 @@ variable (incident : Old → New → Prop) [DecidableRel incident]"#;
 ///   carry. It is expected to be reachable and **obstructed**, and that is a real return: a
 ///   population of refusals on a statement nothing in the tree states.
 fn later_problems(deposited: Option<&str>) -> Vec<(&'static str, LeanProofProblem)> {
-    let scope =
-        BTreeSet::from(["self-emanated/receiver_load_under_capacity.lean".to_owned()]);
+    let scope = BTreeSet::from(["self-emanated/receiver_load_under_capacity.lean".to_owned()]);
     // **The deposit must reach the world, not only the standing.** Before 2026-08-14 this driver
     // posed the later theorems in a preamble that imports the corpus and nothing else, so the
     // self-emanated declaration the deposit founded was in scope for the BODY and out of scope for
@@ -377,7 +376,9 @@ fn main() {
     let mut standing: BTreeMap<String, BigUint> = BTreeMap::new();
     for member in returns.members() {
         let species = species_of(member.kernel_admitted(), member.diagnostic());
-        *standing.entry(species).or_insert_with(|| BigUint::from(0u32)) += BigUint::from(1u32);
+        *standing
+            .entry(species)
+            .or_insert_with(|| BigUint::from(0u32)) += BigUint::from(1u32);
     }
     let names: Vec<String> = standing.keys().cloned().collect();
     println!("  the kernel's own species, and how many paths landed in each:");
@@ -426,7 +427,9 @@ fn main() {
         );
 
         // ---------------------------------------------------------- the gauge measurement
-        println!("\n  THE GAUGE: softmax is invariant under x -> x + c. Applying an additive shift");
+        println!(
+            "\n  THE GAUGE: softmax is invariant under x -> x + c. Applying an additive shift"
+        );
         println!("  to EVERY species must leave every ratio exactly unmoved, while an absolute");
         println!("  threshold on the additive chart moves. Magnitudes do not cross; ratios do.");
         let shift = SymbolicSurprisal::term(2, Rat::one()).expect("a one-bit shift");
@@ -438,7 +441,8 @@ fn main() {
         let ratios_unmoved = family.members() == shifted_family.members()
             && family.members().iter().all(|left| {
                 family.members().iter().all(|right| {
-                    left == right || family.ratio(*left, *right) == shifted_family.ratio(*left, *right)
+                    left == right
+                        || family.ratio(*left, *right) == shifted_family.ratio(*left, *right)
                 })
             });
         failures.require(
@@ -579,7 +583,9 @@ fn main() {
                     transformed_admitted = graded.kernel_admitted_extent();
                 }
                 for admitted in graded.kernel_admitted().take(1) {
-                    println!("      --- an ADMITTED path on a statement nothing in the corpus states");
+                    println!(
+                        "      --- an ADMITTED path on a statement nothing in the corpus states"
+                    );
                     for line in admitted.candidate().proof.lines() {
                         println!("          {line}");
                     }
@@ -588,7 +594,10 @@ fn main() {
                     let mut heads: Vec<&str> = graded
                         .obstructions()
                         .filter_map(|returned| {
-                            returned.diagnostic().lines().find(|line| line.contains("error:"))
+                            returned
+                                .diagnostic()
+                                .lines()
+                                .find(|line| line.contains("error:"))
                         })
                         .collect();
                     heads.sort_unstable();
@@ -599,7 +608,10 @@ fn main() {
                     );
                     for head in heads.iter().take(2) {
                         let at = head.find("error:").unwrap_or(0);
-                        println!("        {}", &head[at..].chars().take(88).collect::<String>());
+                        println!(
+                            "        {}",
+                            &head[at..].chars().take(88).collect::<String>()
+                        );
                     }
                 }
             }

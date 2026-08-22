@@ -453,14 +453,8 @@ fn run_cpu(source: Source, source_sha256: String) -> Result<Value, String> {
         ));
     }
 
-    let checkpoint_reads = run_checkpoint_probes(
-        &budget,
-        cpu_threads,
-        &source,
-        &samples,
-        &taxa,
-        &checkpoints,
-    )?;
+    let checkpoint_reads =
+        run_checkpoint_probes(&budget, cpu_threads, &source, &samples, &taxa, &checkpoints)?;
     let final_rest = machine.rest_image().map_err(debug)?;
     let final_remount = LiveCurrentMachine::from_rest_image(final_rest.clone()).map_err(debug)?;
     let final_chart_after_remount = standing_chart(

@@ -87,7 +87,8 @@ fn rank_mod(block: &[u64], height: usize, width: usize, prime: u64) -> usize {
         let inverse = mod_inverse(matrix[rank * width + column], prime);
         for at in column..width {
             let cell = matrix[rank * width + at];
-            matrix[rank * width + at] = (u128::from(cell) * u128::from(inverse) % u128::from(prime)) as u64;
+            matrix[rank * width + at] =
+                (u128::from(cell) * u128::from(inverse) % u128::from(prime)) as u64;
         }
         for row in 0..height {
             if row == rank {
@@ -98,9 +99,11 @@ fn rank_mod(block: &[u64], height: usize, width: usize, prime: u64) -> usize {
                 continue;
             }
             for at in column..width {
-                let take = u128::from(factor) * u128::from(matrix[rank * width + at]) % u128::from(prime);
+                let take =
+                    u128::from(factor) * u128::from(matrix[rank * width + at]) % u128::from(prime);
                 let held = u128::from(matrix[row * width + at]);
-                matrix[row * width + at] = ((held + u128::from(prime) - take) % u128::from(prime)) as u64;
+                matrix[row * width + at] =
+                    ((held + u128::from(prime) - take) % u128::from(prime)) as u64;
             }
         }
         rank += 1;
@@ -139,19 +142,21 @@ fn run() -> Result<(), String> {
     // Words that occur: every unigram, and every bigram the stream actually carries. Both sides of
     // the Hankel range over words, so a one-symbol block would be a bigram table rather than a
     // Hankel and its rank would answer a different question.
-    let unigrams: BTreeSet<Vec<String>> =
-        stream.iter().map(|token| vec![token.clone()]).collect();
-    let bigrams: BTreeSet<Vec<String>> = stream
-        .windows(2)
-        .map(|pair| pair.to_vec())
-        .collect();
+    let unigrams: BTreeSet<Vec<String>> = stream.iter().map(|token| vec![token.clone()]).collect();
+    let bigrams: BTreeSet<Vec<String>> = stream.windows(2).map(|pair| pair.to_vec()).collect();
     let mut words: Vec<Vec<String>> = unigrams.iter().cloned().collect();
     words.extend(bigrams.iter().cloned());
 
     println!("THE MATERIAL");
     println!("  classes                {}", atlas.state_count());
-    println!("  germ transitions       {}", atlas.material_transition_count());
-    println!("  occurrences            {}", atlas.material_occurrence_count());
+    println!(
+        "  germ transitions       {}",
+        atlas.material_transition_count()
+    );
+    println!(
+        "  occurrences            {}",
+        atlas.material_occurrence_count()
+    );
     println!("  distinct unigrams      {}", unigrams.len());
     println!("  distinct bigrams       {}", bigrams.len());
     println!("  Hankel word population {}", words.len());
@@ -163,12 +168,7 @@ fn run() -> Result<(), String> {
     let mut canonical = words.clone();
     canonical.sort();
     let mut by_standing = words.clone();
-    by_standing.sort_by_key(|word| {
-        (
-            std::cmp::Reverse(occurrences(atlas, word)),
-            word.clone(),
-        )
-    });
+    by_standing.sort_by_key(|word| (std::cmp::Reverse(occurrences(atlas, word)), word.clone()));
 
     for (frame, ordered) in [("canonical", &canonical), ("by standing", &by_standing)] {
         println!("APERTURE SWEEP — {frame} order");
@@ -179,7 +179,10 @@ fn run() -> Result<(), String> {
         let mut previous: Option<usize> = None;
         for aperture in APERTURES {
             if aperture > ordered.len() {
-                println!("  {aperture:>7}  excluded: the word population is only {}", ordered.len());
+                println!(
+                    "  {aperture:>7}  excluded: the word population is only {}",
+                    ordered.len()
+                );
                 break;
             }
             let contexts = &ordered[..aperture];
@@ -222,7 +225,10 @@ fn run() -> Result<(), String> {
     println!("  Fliess-Kalman. If it tracks the aperture, the block is measuring the aperture and");
     println!("  the material's own rank is above what was swept. If it SATURATES, that value is");
     println!("  the width an Athena container can have and the file size follows from it.");
-    println!("  A rank near the class count ({}) refutes the linear-representation route", atlas.state_count());
+    println!(
+        "  A rank near the class count ({}) refutes the linear-representation route",
+        atlas.state_count()
+    );
     println!("  for the transport half, and that is a real negative rather than a tuning failure.");
     Ok(())
 }

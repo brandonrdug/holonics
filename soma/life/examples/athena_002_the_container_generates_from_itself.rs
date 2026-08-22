@@ -16,9 +16,7 @@
 use std::collections::BTreeMap;
 
 use body::num::Cog;
-use holonic_engine::athena::{
-    emit_integers, emit_tensor, IntegerDtype, IntegerTensor, TreeChart,
-};
+use holonic_engine::athena::{emit_integers, emit_tensor, IntegerDtype, IntegerTensor, TreeChart};
 use life::causal_language::{
     fiber_bytes, lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
 };
@@ -34,7 +32,11 @@ const MATERIAL: &[(&str, u64)] = &[
 ];
 
 const LAYERS: u32 = 6;
-const PROMPTS: &[&str] = &["the receiver", "a compression is a codec", "the quantum wobbleflux"];
+const PROMPTS: &[&str] = &[
+    "the receiver",
+    "a compression is a codec",
+    "the quantum wobbleflux",
+];
 
 fn main() {
     if let Err(reason) = run() {
@@ -165,7 +167,9 @@ fn run() -> Result<(), String> {
     for token in &ordered {
         let germs = token_germs_public(std::slice::from_ref(token))
             .map_err(|error| format!("{error:?}"))?;
-        let landed = atlas.receive_path(&germs).map_err(|error| format!("{error:?}"))?;
+        let landed = atlas
+            .receive_path(&germs)
+            .map_err(|error| format!("{error:?}"))?;
         let mut row = Vec::with_capacity(LAYERS as usize * 3);
         for height in 0..LAYERS {
             let class = atlas.suffix_ancestor(landed.state(), height);
@@ -179,12 +183,19 @@ fn run() -> Result<(), String> {
         }
         rows.push(row);
     }
-    let embedding = emit_tensor("athena.embed.minkowski", &rows)
-        .map_err(|error| format!("{error:?}"))?;
+    let embedding =
+        emit_tensor("athena.embed.minkowski", &rows).map_err(|error| format!("{error:?}"))?;
 
     println!("ATHENA-002\n");
-    println!("  classes {classes}   transitions {}   vocabulary {}", germ.len(), ordered.len());
-    println!("  suffix-link tree height {}   layers emitted {LAYERS}", chart.height);
+    println!(
+        "  classes {classes}   transitions {}   vocabulary {}",
+        germ.len(),
+        ordered.len()
+    );
+    println!(
+        "  suffix-link tree height {}   layers emitted {LAYERS}",
+        chart.height
+    );
     println!();
     println!("  THE REBASE — ATHENA-000 measured a widest residual of 64 on ABSOLUTE indices");
     println!(
@@ -203,13 +214,30 @@ fn run() -> Result<(), String> {
     }
 
     let integers: Vec<IntegerTensor> = vec![
-        emit_integers("athena.transport.indptr", &indptr, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.transport.germ", &germ, 1, IntegerDtype::U16).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.transport.target", &target, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.class.standing", &standing, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.class.suffix", &suffix, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.vocabulary.octets", &vocabulary_octets, 1, IntegerDtype::U16).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.vocabulary.offsets", &vocabulary_offsets, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.indptr", &indptr, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.germ", &germ, 1, IntegerDtype::U16)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.target", &target, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.class.standing", &standing, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.class.suffix", &suffix, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers(
+            "athena.vocabulary.octets",
+            &vocabulary_octets,
+            1,
+            IntegerDtype::U16,
+        )
+        .map_err(|e| format!("{e:?}"))?,
+        emit_integers(
+            "athena.vocabulary.offsets",
+            &vocabulary_offsets,
+            1,
+            IntegerDtype::U32,
+        )
+        .map_err(|e| format!("{e:?}"))?,
         // **The architecture, declared IN the container.** layer k = suffix height k; the layer
         // count is the tree's own; the arc is `athena.class.suffix`. Nothing here implies a
         // transformer and nothing outside the file is needed to run it.
@@ -236,7 +264,10 @@ fn run() -> Result<(), String> {
         let end = offset + tensor.octets.len();
         header.push_str(&format!(
             "\"{}\":{{\"dtype\":\"{}\",\"shape\":[{},{}],\"data_offsets\":[{offset},{end}]}},",
-            tensor.name, tensor.dtype.name(), tensor.rows, tensor.width
+            tensor.name,
+            tensor.dtype.name(),
+            tensor.rows,
+            tensor.width
         ));
         spans.insert(tensor.name.clone(), (offset, end));
         offset = end;
@@ -262,7 +293,11 @@ fn run() -> Result<(), String> {
     let path = "output/athena-002/model.safetensors";
     std::fs::write(path, &container).map_err(|error| format!("{path}: {error}"))?;
     println!();
-    println!("  CONTAINER  {} octets = {} KiB  -> {path}", container.len(), container.len() / 1024);
+    println!(
+        "  CONTAINER  {} octets = {} KiB  -> {path}",
+        container.len(),
+        container.len() / 1024
+    );
 
     // ================= from here on, ONLY the file =================
     let raw = std::fs::read(path).map_err(|error| format!("{path}: {error}"))?;
@@ -270,11 +305,17 @@ fn run() -> Result<(), String> {
     let payload = &raw[8 + length..];
     let u32s = |name: &str| -> Vec<u32> {
         let (start, end) = spans[name];
-        payload[start..end].chunks_exact(4).map(|r| u32::from_le_bytes([r[0], r[1], r[2], r[3]])).collect()
+        payload[start..end]
+            .chunks_exact(4)
+            .map(|r| u32::from_le_bytes([r[0], r[1], r[2], r[3]]))
+            .collect()
     };
     let u16s = |name: &str| -> Vec<u16> {
         let (start, end) = spans[name];
-        payload[start..end].chunks_exact(2).map(|r| u16::from_le_bytes([r[0], r[1]])).collect()
+        payload[start..end]
+            .chunks_exact(2)
+            .map(|r| u16::from_le_bytes([r[0], r[1]]))
+            .collect()
     };
     let architecture = u32s("athena.architecture");
     let octets = u16s("athena.vocabulary.octets");
@@ -330,8 +371,14 @@ fn run() -> Result<(), String> {
         let population = athena.continuations(state);
         println!("  {prompt:?}");
         println!("    walk        {}", trace.join(" -> "));
-        println!("    class       {state}   standing {}", athena.standing[state as usize]);
-        println!("    continuations {}  (the whole fiber, nothing ranked)", population.len());
+        println!(
+            "    class       {state}   standing {}",
+            athena.standing[state as usize]
+        );
+        println!(
+            "    continuations {}  (the whole fiber, nothing ranked)",
+            population.len()
+        );
 
         // **Grouped by arc depth, which is the structure the material has.** Depth 0 is the class's
         // own span -- the most specific continuations, the ones the full context licenses. Each step
@@ -352,13 +399,19 @@ fn run() -> Result<(), String> {
             } else {
                 format!("reached by arcing {depth} shorter")
             };
-            println!("      depth {depth}: {:<5} continuations — {label}", members.len());
+            println!(
+                "      depth {depth}: {:<5} continuations — {label}",
+                members.len()
+            );
             if depth <= 1 {
                 for (surface, standing) in members.iter().take(10) {
                     println!("        {:<24} standing {standing}", format!("{surface:?}"));
                 }
                 if members.len() > 10 {
-                    println!("        … {} more at this depth, all retained", members.len() - 10);
+                    println!(
+                        "        … {} more at this depth, all retained",
+                        members.len() - 10
+                    );
                 }
             }
         }

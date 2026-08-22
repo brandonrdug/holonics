@@ -95,14 +95,22 @@ fn main() {
     println!("  `traversible_chain.rs` has said this about itself since it was written:");
     println!();
     println!("    \"With no phase element between interfaces the family {{M(rho)}} is abelian and");
-    println!("     one-parameter, so a closed chain returns rho = 1 and its holonomy is the identity");
+    println!(
+        "     one-parameter, so a closed chain returns rho = 1 and its holonomy is the identity"
+    );
     println!("     BY CONSTRUCTION. That receipt could not have come out otherwise and carries no");
     println!("     evidence. Holonomy needs a link that does not commute with M(rho).\"");
     println!();
-    println!("  The two parts were both standing. `analytic_field::ExactStratifiedLayer` declares an");
-    println!("  exact propagation phase on the unit conic; `dimensional_wave` applies one per port");
+    println!(
+        "  The two parts were both standing. `analytic_field::ExactStratifiedLayer` declares an"
+    );
+    println!(
+        "  exact propagation phase on the unit conic; `dimensional_wave` applies one per port"
+    );
     println!("  with the reverse carrying its inverse. What was missing was a carrier that could");
-    println!("  hold both, because in the wave chart a propagation is diag(e^-i.phi, e^+i.phi) and");
+    println!(
+        "  hold both, because in the wave chart a propagation is diag(e^-i.phi, e^+i.phi) and"
+    );
     println!("  a real 2x2 cannot hold it.");
     println!();
 
@@ -123,16 +131,20 @@ fn main() {
     println!();
     let forward = matrix.compose(&propagation);
     let backward = propagation.compose(&matrix);
-    println!("  M P  M12 = {:>16}      P M  M12 = {:>16}",
+    println!(
+        "  M P  M12 = {:>16}      P M  M12 = {:>16}",
         render_complex(forward.into_forward()),
-        render_complex(backward.into_forward()));
+        render_complex(backward.into_forward())
+    );
     assert_ne!(forward, backward);
     println!();
     println!("  AND THE NON-COMMUTATION IS CONDITIONAL, which is what makes it evidence:");
     println!();
     println!("      M P - P M  =  (1-rho)/2 . [[ 0, p - pbar ], [ pbar - p, 0 ]]");
     println!();
-    println!("  so they commute IFF sin(phi) = 0 or rho = 1 -- a whole turn, or a matched junction.");
+    println!(
+        "  so they commute IFF sin(phi) = 0 or rho = 1 -- a whole turn, or a matched junction."
+    );
     println!("  Both controls, run:");
     let matched = PhasedTransfer::of_interface(
         Crossing::meet(&admittance(5), &admittance(5))
@@ -144,11 +156,16 @@ fn main() {
     let commutes_whole_turn = matrix.compose(&no_turn) == no_turn.compose(&matrix);
     println!("    matched junction (rho = 1) + real phase       commutes: {commutes_matched}");
     println!("    mismatch (rho = 3)         + whole turn       commutes: {commutes_whole_turn}");
-    println!("    mismatch (rho = 3)         + real phase       commutes: {}", forward == backward);
+    println!(
+        "    mismatch (rho = 3)         + real phase       commutes: {}",
+        forward == backward
+    );
     assert!(commutes_matched && commutes_whole_turn);
 
     println!();
-    println!("  A CLOSED CHAIN, Y: 1 -> 3 -> 7 -> 1, with one declared propagation after the first");
+    println!(
+        "  A CLOSED CHAIN, Y: 1 -> 3 -> 7 -> 1, with one declared propagation after the first"
+    );
     println!("  junction. Nothing about the material changed -- det is multiplicative and a phase");
     println!("  has det 1, so the admittance ratio still closes at exactly one.");
     println!();
@@ -176,23 +193,43 @@ fn main() {
     );
     let composed = loop_chain.compose();
     let holonomy = loop_chain.holonomy().expect("the chain closes");
-    println!("    det (the admittance ratio around the loop)   {}", render_complex(&composed.determinant()));
-    println!("    holonomy  M11 = {:>22}   M12 = {}",
-        render_complex(holonomy.through()), render_complex(holonomy.into_forward()));
-    println!("              M21 = {:>22}   M22 = {}",
-        render_complex(holonomy.returned()), render_complex(holonomy.into_returned()));
-    println!("    is it the identity?  {}", holonomy == PhasedTransfer::identity());
+    println!(
+        "    det (the admittance ratio around the loop)   {}",
+        render_complex(&composed.determinant())
+    );
+    println!(
+        "    holonomy  M11 = {:>22}   M12 = {}",
+        render_complex(holonomy.through()),
+        render_complex(holonomy.into_forward())
+    );
+    println!(
+        "              M21 = {:>22}   M22 = {}",
+        render_complex(holonomy.returned()),
+        render_complex(holonomy.into_returned())
+    );
+    println!(
+        "    is it the identity?  {}",
+        holonomy == PhasedTransfer::identity()
+    );
     assert_ne!(holonomy, PhasedTransfer::identity());
     assert_eq!(composed.determinant(), ExactComplexWaveCurrent::one());
     println!();
     println!("  THE FALSIFIER THE PLAN NAMED: the module's own abelian test must still PASS on an");
-    println!("  unphased chain and the holonomy must NOT be the identity on a phased one. Both hold");
-    println!("  -- `the_interface_family_is_abelian_which_is_why_its_holonomy_is_forced` is unchanged");
+    println!(
+        "  unphased chain and the holonomy must NOT be the identity on a phased one. Both hold"
+    );
+    println!(
+        "  -- `the_interface_family_is_abelian_which_is_why_its_holonomy_is_forced` is unchanged"
+    );
     println!("  and green, because it is a true statement about the interface family.");
     println!();
-    println!("  AND THE CONSERVATION LAW SURVIVES IT. P is unitary, so P+ J P = |p|^2 J = J: a phase");
+    println!(
+        "  AND THE CONSERVATION LAW SURVIVES IT. P is unitary, so P+ J P = |p|^2 J = J: a phase"
+    );
     println!("  is an isometry of the admittance metric with scale exactly ONE, carrying no");
-    println!("  admittance change, while an interface scales by rho. A wire that broke this would be");
+    println!(
+        "  admittance change, while an interface scales by rho. A wire that broke this would be"
+    );
     println!("  transporting energy it invented.");
     println!(
         "    phase scale {:?}      interface (1->3) scale {:?}",
@@ -206,7 +243,9 @@ fn main() {
     println!("[4a]  THE STANDING WAVE  --  and the root that is refused rather than taken");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  A junction that does not match returns part of what arrives, and the returned half");
+    println!(
+        "  A junction that does not match returns part of what arrives, and the returned half"
+    );
     println!("  interferes with the arriving half. The classical figure is SWR = (1+|G|)/(1-|G|),");
     println!("  and |G| is a SQUARE ROOT. |G|^2 is exact over Rat; |G| generally is not. So:");
     println!();
@@ -216,10 +255,22 @@ fn main() {
     println!("      their product (1 - |G|^2)^2                            exact");
     println!("      their ratio   SWR^2                                    irrational in general");
     println!();
-    println!("  {:<14} {:>10} {:>12} {:>12} {:>12}", "Y_i -> Y_t", "Gamma", "|G|^2", "sum", "SWR");
+    println!(
+        "  {:<14} {:>10} {:>12} {:>12} {:>12}",
+        "Y_i -> Y_t", "Gamma", "|G|^2", "sum", "SWR"
+    );
     let mut refusals = 0usize;
-    for (incident, transmitted) in [(5i64, 5i64), (1, 3), (1, 2), (1, 4), (1, 9), (2, 9), (1, 100)] {
-        let crossing = Crossing::meet(&admittance(incident), &admittance(transmitted)).expect("meets");
+    for (incident, transmitted) in [
+        (5i64, 5i64),
+        (1, 3),
+        (1, 2),
+        (1, 4),
+        (1, 9),
+        (2, 9),
+        (1, 100),
+    ] {
+        let crossing =
+            Crossing::meet(&admittance(incident), &admittance(transmitted)).expect("meets");
         let reading = StandingWaveReading::of_reflection(
             &ExactComplexWaveCurrent::new(crossing.reflection(), Rat::zero()),
             KERNEL_BOUND,
@@ -242,7 +293,9 @@ fn main() {
     }
     println!();
     println!("  A REAL-Gamma junction always has |G| rational, so nothing above is refused. The");
-    println!("  refusal is reachable and here it is -- a COMPOSITE reflection with both parts non-zero:");
+    println!(
+        "  refusal is reachable and here it is -- a COMPOSITE reflection with both parts non-zero:"
+    );
     let complex_reflection =
         ExactComplexWaveCurrent::new(Rat::new(1.into(), 2.into()), Rat::new(1.into(), 2.into()));
     let refused = StandingWaveReading::of_reflection(&complex_reflection, KERNEL_BOUND);
@@ -271,8 +324,12 @@ fn main() {
     println!("[4b]  THE BAND STRUCTURE  --  decided by one exact rational comparison");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  A period that returns to its own admittance has rho = 1, so its composed transport");
-    println!("  lies in the group preserving the admittance metric with scale one -- SU(1,1) -- and");
+    println!(
+        "  A period that returns to its own admittance has rho = 1, so its composed transport"
+    );
+    println!(
+        "  lies in the group preserving the admittance metric with scale one -- SU(1,1) -- and"
+    );
     println!("  its TRACE IS REAL. Its eigenvalues satisfy lambda + 1/lambda = Tr, so");
     println!();
     println!("      |Tr/2| < 1   lambda on the unit circle    the mode PROPAGATES   pass band");
@@ -282,33 +339,47 @@ fn main() {
     println!("  One rational comparison decides it. No eigenvalue is extracted, no angle taken.");
     println!();
     println!("  A PERIOD IS A BILAYER, and the first attempt at this found out why by FAILING.");
-    println!("  Composing M(rho).P.M(1/rho) -- propagation inside the slab and none outside -- gives");
+    println!(
+        "  Composing M(rho).P.M(1/rho) -- propagation inside the slab and none outside -- gives"
+    );
     println!("  half-trace cos(phi) for EVERY rho, so no such stack ever has a stop band. That is");
     println!("  physically right and it convicts the cell: consecutive cells' junctions cancel,");
-    println!("  M(1/rho)M(rho) = I, and the structure collapses to a uniform medium. A real period");
+    println!(
+        "  M(1/rho)M(rho) = I, and the structure collapses to a uniform medium. A real period"
+    );
     println!("  propagates through BOTH media: P(a) M(rho) P(b) M(1/rho).");
     println!();
 
-    let bilayer = |transmitted: i64, first: &ExactWavePhaseTransport, second: &ExactWavePhaseTransport| {
-        PhasedTransfer::of_propagation(first)
-            .compose(&PhasedTransfer::of_interface(
-                Crossing::meet(&admittance(1), &admittance(transmitted))
-                    .expect("meets")
-                    .transport(),
-            ))
-            .compose(&PhasedTransfer::of_propagation(second))
-            .compose(&PhasedTransfer::of_interface(
-                Crossing::meet(&admittance(transmitted), &admittance(1))
-                    .expect("meets")
-                    .transport(),
-            ))
-    };
+    let bilayer =
+        |transmitted: i64, first: &ExactWavePhaseTransport, second: &ExactWavePhaseTransport| {
+            PhasedTransfer::of_propagation(first)
+                .compose(&PhasedTransfer::of_interface(
+                    Crossing::meet(&admittance(1), &admittance(transmitted))
+                        .expect("meets")
+                        .transport(),
+                ))
+                .compose(&PhasedTransfer::of_propagation(second))
+                .compose(&PhasedTransfer::of_interface(
+                    Crossing::meet(&admittance(transmitted), &admittance(1))
+                        .expect("meets")
+                        .transport(),
+                ))
+        };
 
     println!("  A SWEEP over the rational unit conic, equal phase in both media, by the tangent");
     println!("  half-angle chart p(t) = ((1-t^2)/(1+t^2), 2t/(1+t^2)):");
     println!();
     let sweep: Vec<Rat> = [
-        (0i64, 1i64), (1, 8), (1, 4), (1, 3), (2, 5), (1, 2), (3, 5), (2, 3), (4, 5), (1, 1),
+        (0i64, 1i64),
+        (1, 8),
+        (1, 4),
+        (1, 3),
+        (2, 5),
+        (1, 2),
+        (3, 5),
+        (2, 3),
+        (4, 5),
+        (1, 1),
     ]
     .iter()
     .map(|(numerator, denominator)| Rat::new((*numerator).into(), (*denominator).into()))
@@ -338,7 +409,9 @@ fn main() {
     println!();
     println!();
     println!("  rho = 1 IS THE CONTROL and it is PASS everywhere but the half-wave point: with");
-    println!("  nothing to reflect there is no gap. Every stop band in the table needs a mismatch.");
+    println!(
+        "  nothing to reflect there is no gap. Every stop band in the table needs a mismatch."
+    );
 
     // ------------------------------------------------------------------ the band edge law
     println!();
@@ -360,17 +433,25 @@ fn main() {
     println!("  >>  rational square -- exactly when Gamma is a leg of a Pythagorean triple.");
     println!("  >>  Otherwise the exact edge needs the quadratic extension Q(sqrt(rho)).");
     println!();
-    println!("  {:<6} {:>9} {:>10} {:>12} {:>26}", "rho", "Gamma", "cos(edge)", "sin^2(edge)", "sin(edge)");
+    println!(
+        "  {:<6} {:>9} {:>10} {:>12} {:>26}",
+        "rho", "Gamma", "cos(edge)", "sin^2(edge)", "sin(edge)"
+    );
     let mut rational_edges = 0usize;
     let mut extension_edges = 0usize;
     for transmitted in [1i64, 2, 3, 4, 5, 7, 9, 16] {
         let rho = whole(transmitted);
         let reflection = (Rat::one() - &rho) / (Rat::one() + &rho);
-        let cosine = if reflection.is_negative() { -reflection.clone() } else { reflection.clone() };
+        let cosine = if reflection.is_negative() {
+            -reflection.clone()
+        } else {
+            reflection.clone()
+        };
         let sine_square = Rat::one() - &cosine * &cosine;
-        let sine = holonic_engine::multiquadratic::Multiquadratic::square_root(&sine_square, KERNEL_BOUND)
-            .ok()
-            .and_then(|root| root.as_rational());
+        let sine =
+            holonic_engine::multiquadratic::Multiquadratic::square_root(&sine_square, KERNEL_BOUND)
+                .ok()
+                .and_then(|root| root.as_rational());
         let rendered = match &sine {
             Some(value) => {
                 rational_edges += 1;
@@ -378,7 +459,11 @@ fn main() {
                 let point = ExactWavePhaseTransport::new(cosine.clone(), value.clone())
                     .expect("on the conic");
                 let reading = BlochReading::of_cell(&bilayer(transmitted, &point, &point));
-                assert_eq!(reading.class, BandClass::Edge, "the law must land on the edge");
+                assert_eq!(
+                    reading.class,
+                    BandClass::Edge,
+                    "the law must land on the edge"
+                );
                 assert_eq!(reading.half_trace, -Rat::one());
                 format!("{value}   (checked: half-trace {})", reading.half_trace)
             }
@@ -389,20 +474,35 @@ fn main() {
                     KERNEL_BOUND,
                 )
                 .expect("a real radicand");
-                format!("in Q(sqrt {})  -- leaves the rationals", root.generators()[0])
+                format!(
+                    "in Q(sqrt {})  -- leaves the rationals",
+                    root.generators()[0]
+                )
             }
         };
-        println!("  {:<6} {:>9} {:>10} {:>12} {:>26}", transmitted, reflection, cosine, sine_square, rendered);
+        println!(
+            "  {:<6} {:>9} {:>10} {:>12} {:>26}",
+            transmitted, reflection, cosine, sine_square, rendered
+        );
     }
     println!();
-    println!("  {rational_edges} of the swept ratios have a rational band edge; {extension_edges} need the extension.");
-    assert!(rational_edges > 0 && extension_edges > 0, "both arms must be reachable");
+    println!(
+        "  {rational_edges} of the swept ratios have a rational band edge; {extension_edges} need the extension."
+    );
+    assert!(
+        rational_edges > 0 && extension_edges > 0,
+        "both arms must be reachable"
+    );
     println!();
     println!("  AND rho = 3 LANDS SOMEWHERE THIS TREE ALREADY OWNS. cos(edge) = 1/2 with");
-    println!("  sin(edge) = sqrt(3)/2 is the order-SIX rotation -- a Niven angle, the crystallographic");
+    println!(
+        "  sin(edge) = sqrt(3)/2 is the order-SIX rotation -- a Niven angle, the crystallographic"
+    );
     println!("  row `winding_inertia::lattice_admits_order` owns, and the exact generator");
     println!("  `contact_gluing` already names when it calls `multiquadratic::exact_sine` for");
-    println!("  cos = 1/2 -> sin = sqrt(3)/2. The plan predicted this from the Niven bound before the");
+    println!(
+        "  cos = 1/2 -> sin = sqrt(3)/2. The plan predicted this from the Niven bound before the"
+    );
     println!("  band was computed, and it arrived by a route that knew nothing about it.");
     println!();
     println!("  THE EDGE AS AN ALGEBRAIC NUMBER, in the half-angle chart. Substituting");
@@ -410,7 +510,9 @@ fn main() {
     println!();
     println!("      rho . t^4  -  (1 + rho^2) . t^2  +  rho  =  0");
     println!();
-    println!("  and the tree's own `AlgebraicRoot::isolate` certifies its roots by Sturm sequences:");
+    println!(
+        "  and the tree's own `AlgebraicRoot::isolate` certifies its roots by Sturm sequences:"
+    );
     println!();
     for transmitted in [2i64, 3, 5, 7] {
         let quartic = IntegerPolynomial::new(vec![
@@ -422,13 +524,12 @@ fn main() {
         ])
         .expect("non-zero");
         // The edge in (0, 1): t = tan(a/2) with a in (0, pi).
-        let interval = ExactInterval::new(Rat::new(1.into(), 100.into()), Rat::one())
-            .expect("ordered");
+        let interval =
+            ExactInterval::new(Rat::new(1.into(), 100.into()), Rat::one()).expect("ordered");
         match AlgebraicRoot::isolate(quartic, interval) {
             Ok(root) => println!(
                 "    rho = {transmitted:<3}  root isolated in ({}, {})   Sturm certificate held",
-                root.isolating_interval.lower,
-                root.isolating_interval.upper
+                root.isolating_interval.lower, root.isolating_interval.upper
             ),
             Err(refusal) => println!("    rho = {transmitted:<3}  {refusal}"),
         }
@@ -445,14 +546,28 @@ fn main() {
     println!();
     println!("      Gamma_total = (G1 + G2 e^{{2i.phi}}) / (1 + G1 G2 e^{{2i.phi}})");
     println!();
-    println!("  is asserted AGAINST it rather than implemented, which is the discipline the module");
+    println!(
+        "  is asserted AGAINST it rather than implemented, which is the discipline the module"
+    );
     println!("  already applies to the reflection addition law.");
     println!();
     println!("  Y: 1 -> 3 -> 1, sweeping the round trip over the rational conic:");
     println!();
-    println!("  {:<8} {:>18} {:>14} {:>12} {:>10}", "t", "round trip p^2", "Gamma_total", "|G|^2", "SWR");
+    println!(
+        "  {:<8} {:>18} {:>14} {:>12} {:>10}",
+        "t", "round trip p^2", "Gamma_total", "|G|^2", "SWR"
+    );
     let mut resonances = 0usize;
-    for (numerator, denominator) in [(0i64, 1i64), (1, 4), (1, 3), (1, 2), (2, 3), (1, 1), (2, 1), (3, 1)] {
+    for (numerator, denominator) in [
+        (0i64, 1i64),
+        (1, 4),
+        (1, 3),
+        (1, 2),
+        (2, 3),
+        (1, 1),
+        (2, 1),
+        (3, 1),
+    ] {
         let t = Rat::new(numerator.into(), denominator.into());
         let point = conic_point(&t);
         let reading = cavity(&admittance(1), &admittance(3), &point, KERNEL_BOUND)
@@ -464,7 +579,10 @@ fn main() {
         println!(
             "  {:<8} {:>18} {:>14} {:>12} {:>10}",
             format!("{t}"),
-            format!("{} + {}i", reading.round_trip.cosine, reading.round_trip.sine),
+            format!(
+                "{} + {}i",
+                reading.round_trip.cosine, reading.round_trip.sine
+            ),
             render_complex(&reflection),
             reading.standing_wave.reflected_share,
             match &reading.standing_wave.standing_wave_ratio {
@@ -474,18 +592,29 @@ fn main() {
         );
     }
     println!();
-    println!("  {resonances} of the swept phases are transparent. The resonance condition is EXACTLY");
-    println!("  p^2 = 1 -- a rational equation on the conic, decided without any angle. At p^2 = -1");
+    println!(
+        "  {resonances} of the swept phases are transparent. The resonance condition is EXACTLY"
+    );
+    println!(
+        "  p^2 = 1 -- a rational equation on the conic, decided without any angle. At p^2 = -1"
+    );
     println!("  the two returns add instead and the cavity is at its most opaque, which is the");
     println!("  quarter-wave anti-resonance.");
     println!();
-    println!("  THE CONTROL: a MATCHED cavity, Y: 1 -> 1 -> 1, is transparent at EVERY phase. A sweep");
+    println!(
+        "  THE CONTROL: a MATCHED cavity, Y: 1 -> 1 -> 1, is transparent at EVERY phase. A sweep"
+    );
     println!("  that showed variation there would be measuring the instrument.");
     let mut matched_shares: Vec<Rat> = Vec::new();
     for (numerator, denominator) in [(0i64, 1i64), (1, 3), (1, 2), (1, 1), (3, 1)] {
         let t = Rat::new(numerator.into(), denominator.into());
-        let reading = cavity(&admittance(1), &admittance(1), &conic_point(&t), KERNEL_BOUND)
-            .expect("both junctions meet");
+        let reading = cavity(
+            &admittance(1),
+            &admittance(1),
+            &conic_point(&t),
+            KERNEL_BOUND,
+        )
+        .expect("both junctions meet");
         matched_shares.push(reading.standing_wave.reflected_share);
     }
     println!(
@@ -505,15 +634,21 @@ fn main() {
     println!();
     println!("  The phase is DECLARED, not derived from a thickness -- `k_normal . d` is the");
     println!("  irrational the exact stack exists to avoid, and `analytic_field` makes the same");
-    println!("  choice for the same reason. A run that inferred a phase from a rendered angle would");
+    println!(
+        "  choice for the same reason. A run that inferred a phase from a rendered angle would"
+    );
     println!("  have taken the root this whole line refuses.");
     println!();
     println!("  Nothing here quotes `energy_residual`, which `traversible_chain` records as");
-    println!("  identically zero for its convention, algebraically. The conserved quantity reported");
+    println!(
+        "  identically zero for its convention, algebraically. The conserved quantity reported"
+    );
     println!("  above is the METRIC SCALE of M+ J M, which can and does return Obstructed on a");
     println!("  transport outside the group.");
     println!();
-    println!("  This is a reading of the standing carrier. It does not claim the machine's language");
+    println!(
+        "  This is a reading of the standing carrier. It does not claim the machine's language"
+    );
     println!("  ecology resonates -- that is the deposit-and-ride question, and it has its own");
     println!("  falsifier in station seven.");
 }

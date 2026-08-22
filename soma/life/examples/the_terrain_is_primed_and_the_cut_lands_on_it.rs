@@ -279,7 +279,10 @@ fn run() -> Result<(), String> {
         "  KNOWN lane       {} words from the delivered priming, beginning at word {known_at}",
         known.len()
     );
-    println!("  FOREIGN lane     {} words the priming never carried", foreign.len());
+    println!(
+        "  FOREIGN lane     {} words the priming never carried",
+        foreign.len()
+    );
     println!("  axis {AXIS}   one arrival = ONE WORD   drive {DRIVE}");
 
     // ★ THE LATER CURRENT, ACROSS A PROCESS. With `--resume` the terrain this run stands on was
@@ -384,7 +387,10 @@ fn run() -> Result<(), String> {
                 continue;
             }
             println!("\n  ── words {from}..{} ──", from + 28);
-            println!("    bare    {}", bracket(lane, &over_bare.cuts, from, from + 28));
+            println!(
+                "    bare    {}",
+                bracket(lane, &over_bare.cuts, from, from + 28)
+            );
             println!(
                 "    primed  {}",
                 bracket(lane, &over_primed.cuts, from, from + 28)

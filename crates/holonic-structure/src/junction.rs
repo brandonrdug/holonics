@@ -197,7 +197,7 @@ mod tests {
     /// power face squares it away.
     #[test]
     fn the_declared_pairs_are_entries_of_the_transfer_matrix_and_the_power_face_is_blind_to_the_hand()
-    {
+     {
         let mut swept = 0usize;
         let mut hands_that_differed = 0usize;
         for incident in 1..=16u64 {

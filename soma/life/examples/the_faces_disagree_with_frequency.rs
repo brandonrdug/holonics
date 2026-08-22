@@ -33,7 +33,12 @@ const MATERIAL: &[(&str, u64)] = &[
     ("canon/TABLET_THE_COMPRESSION.md", 4),
 ];
 const PROMPTS: &[&str] = &[
-    "a compression is", "the receiver", "the machine", "every claim", "the trace", "a probability",
+    "a compression is",
+    "the receiver",
+    "the machine",
+    "every claim",
+    "the trace",
+    "a probability",
 ];
 const BOUND: u32 = 3;
 const STEPS: usize = 30;
@@ -128,13 +133,15 @@ impl Body {
             at = parent;
         }
         held.into_iter()
-            .map(|(germ, (multiplicity, depths, deepest, deepest_multiplicity))| Face {
-                germ,
-                multiplicity,
-                scale_breadth: depths.len(),
-                deepest,
-                deepest_multiplicity,
-            })
+            .map(
+                |(germ, (multiplicity, depths, deepest, deepest_multiplicity))| Face {
+                    germ,
+                    multiplicity,
+                    scale_breadth: depths.len(),
+                    deepest,
+                    deepest_multiplicity,
+                },
+            )
             .collect()
     }
 }
@@ -186,7 +193,16 @@ fn run() -> Result<(), String> {
         minimum.push(atlas.class_interval(state).map_or(0, |(low, _)| low as u32));
         standing.push(atlas.standing_at(state).unwrap_or(0));
     }
-    let body = Body { indptr, germ, target, suffix, minimum, standing, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        minimum,
+        standing,
+        surfaces,
+        index_of,
+    };
 
     println!("HOW OFTEN DO THE FACES DISAGREE WITH FREQUENCY?\n");
     println!("  Four readings of the same junction, all from the machine's own carriers:");
@@ -213,7 +229,9 @@ fn run() -> Result<(), String> {
             let read = body.bounded(state, BOUND);
             let faces = body.faces(read);
             if faces.len() < 2 {
-                if faces.is_empty() { break; }
+                if faces.is_empty() {
+                    break;
+                }
                 state = body.carry(read, faces[0].germ);
                 continue;
             }
@@ -229,9 +247,15 @@ fn run() -> Result<(), String> {
             let by_scale = pick(|f| (f.scale_breadth as u64, 0));
             let by_deepest = pick(|f| (u64::from(f.deepest), 0));
             let by_deep_mul = pick(|f| (u64::from(f.deepest), f.deepest_multiplicity));
-            if by_scale != by_frequency { differ_scale += 1; }
-            if by_deepest != by_frequency { differ_deep += 1; }
-            if by_deep_mul != by_frequency { differ_deepmul += 1; }
+            if by_scale != by_frequency {
+                differ_scale += 1;
+            }
+            if by_deepest != by_frequency {
+                differ_deep += 1;
+            }
+            if by_deep_mul != by_frequency {
+                differ_deepmul += 1;
+            }
             if by_deepest != by_frequency && examples.len() < 8 {
                 let f = |g: u16| body.surfaces[g as usize].clone();
                 let fq = faces.iter().find(|x| x.germ == by_frequency).unwrap();
@@ -265,7 +289,9 @@ fn run() -> Result<(), String> {
         println!("{line}");
     }
     println!();
-    println!("  A face that never disagreed would make frequency a lawful stand-in for the others.");
+    println!(
+        "  A face that never disagreed would make frequency a lawful stand-in for the others."
+    );
     println!("  Every disagreement is a continuation the frequency reading discarded and another");
     println!("  reading of the SAME return kept.");
     Ok(())

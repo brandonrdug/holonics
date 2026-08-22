@@ -102,15 +102,23 @@ fn is_span(atlas: &ExactSuffixEcology, tokens: &[String]) -> bool {
     if tokens.is_empty() {
         return true;
     }
-    let Ok(germs) = token_germs_public(tokens) else { return false };
-    let Ok(current) = atlas.receive_path(&germs) else { return false };
+    let Ok(germs) = token_germs_public(tokens) else {
+        return false;
+    };
+    let Ok(current) = atlas.receive_path(&germs) else {
+        return false;
+    };
     current.matched_length() as usize == tokens.len()
 }
 
 /// The longest suffix of `tokens` that occurs contiguously — where the last arc handed off.
 fn longest_contiguous_tail(atlas: &ExactSuffixEcology, tokens: &[String]) -> usize {
-    let Ok(germs) = token_germs_public(tokens) else { return 0 };
-    let Ok(current) = atlas.receive_path(&germs) else { return 0 };
+    let Ok(germs) = token_germs_public(tokens) else {
+        return 0;
+    };
+    let Ok(current) = atlas.receive_path(&germs) else {
+        return 0;
+    };
     current.matched_length() as usize
 }
 
@@ -161,7 +169,16 @@ fn run() -> Result<(), String> {
         extent.push(atlas.class_extent(state).unwrap_or(0) as u32);
         standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
     }
-    let body = Body { indptr, germ, target, suffix, extent, standing, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        extent,
+        standing,
+        surfaces,
+        index_of,
+    };
 
     println!("EMISSION WITH THE ARC — context bounded to {BOUND} tokens\n");
     for prompt in PROMPTS {
@@ -189,7 +206,10 @@ fn run() -> Result<(), String> {
             // Divide the front: tips in one class at this bound are ONE tip to this receiver.
             let mut blocks: BTreeMap<u32, Vec<(u32, Vec<String>)>> = BTreeMap::new();
             for (at, emitted) in next {
-                blocks.entry(body.bounded(at, BOUND)).or_default().push((at, emitted));
+                blocks
+                    .entry(body.bounded(at, BOUND))
+                    .or_default()
+                    .push((at, emitted));
             }
             front = blocks
                 .into_values()

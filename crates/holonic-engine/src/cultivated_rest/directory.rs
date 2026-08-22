@@ -66,10 +66,18 @@ impl MountedCultivatedRest {
         &self.predecessor
     }
 
-    pub fn product_identity(&self) -> &PredecessorProductIdentity { &self.product_identity }
-    pub fn predecessor_identity(&self) -> &PredecessorProductIdentity { &self.predecessor_identity }
-    pub fn morphology_identity(&self) -> &PredecessorProductIdentity { &self.morphology_identity }
-    pub fn codec_companion_identities(&self) -> &[DirectoryCompanion] { &self.companion_identities }
+    pub fn product_identity(&self) -> &PredecessorProductIdentity {
+        &self.product_identity
+    }
+    pub fn predecessor_identity(&self) -> &PredecessorProductIdentity {
+        &self.predecessor_identity
+    }
+    pub fn morphology_identity(&self) -> &PredecessorProductIdentity {
+        &self.morphology_identity
+    }
+    pub fn codec_companion_identities(&self) -> &[DirectoryCompanion] {
+        &self.companion_identities
+    }
 
     /// Re-authenticate every retained member of the cultivated directory. Changing a path,
     /// digest, or companion population is drift, even if the changed member remains readable.

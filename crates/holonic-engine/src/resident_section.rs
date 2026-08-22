@@ -76,7 +76,10 @@ use crate::embedding_fiber::{MountedReadout, ResidentReadout};
 use crate::exact_value::ExactInterval;
 use crate::exact_work::ExactWork;
 use crate::hardware_cover::{DeviceDeclaration, HardwareCover, ModeIdentity};
-use mount::{BorrowedContext, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec, MemoryInfo, Module, Stream};
+use mount::{
+    BorrowedContext, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec,
+    MemoryInfo, Module, Stream,
+};
 
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_resident_section.ptx"));
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
@@ -182,18 +185,31 @@ pub enum ResidentRefusal {
     #[error("the CUDA driver reports no device; the resident chart is not mounted")]
     NoResidentChart,
     #[error("CUDA {operation} returned {code} ({name}): {message}")]
-    Driver { operation: String, code: i32, name: String, message: String },
+    Driver {
+        operation: String,
+        code: i32,
+        name: String,
+        message: String,
+    },
     /// The mounted device (through `mount`) and the readout's device do not name one card.
     #[error("the readout mounted {readout:?} and the apparatus census names {mounted:?}")]
     DeviceDisagrees { readout: String, mounted: String },
     /// The measured or a-priori octaves plus the operation's own growth would leave the exact
     /// carrier. Decided before the launch; **nothing is truncated**.
-    #[error("{operation}: the exact carrier admits {admitted} octaves and this material needs {needed}")]
-    CarrierRange { operation: &'static str, needed: u32, admitted: u32 },
+    #[error(
+        "{operation}: the exact carrier admits {admitted} octaves and this material needs {needed}"
+    )]
+    CarrierRange {
+        operation: &'static str,
+        needed: u32,
+        admitted: u32,
+    },
     /// The card raised the carrier flag during the deed at the named occurrence.
     #[error("{operation}: a coordinate left the exact carrier on the card")]
     CarrierLeft { operation: String },
-    #[error("{operation}: malformed material — a non-finite codeword or a non-positive denominator")]
+    #[error(
+        "{operation}: malformed material — a non-finite codeword or a non-positive denominator"
+    )]
     Malformed { operation: String },
     /// A lawful step produced `lo > hi`. A soundness fault in the law itself, reported by name.
     #[error("{operation}: an enclosure inverted on the card")]
@@ -202,23 +218,62 @@ pub enum ResidentRefusal {
     #[error("{operation}: a predecessor refused upstream")]
     Upstream { operation: String },
     /// The a-priori octave bound this occurrence was admitted under was refuted by its own census.
-    #[error("{operation}: admitted at {admitted} octaves and measured {measured}; the a-priori law is refuted here")]
-    BoundRefuted { operation: String, admitted: u32, measured: u32 },
+    #[error(
+        "{operation}: admitted at {admitted} octaves and measured {measured}; the a-priori law is refuted here"
+    )]
+    BoundRefuted {
+        operation: String,
+        admitted: u32,
+        measured: u32,
+    },
     #[error("{operation}: sections of width {left} and {right} do not meet")]
-    WidthDisagrees { operation: &'static str, left: usize, right: usize },
+    WidthDisagrees {
+        operation: &'static str,
+        left: usize,
+        right: usize,
+    },
     #[error("{operation}: sections of {left} and {right} rows do not meet")]
-    RowsDisagree { operation: &'static str, left: usize, right: usize },
-    #[error("{operation}: {rows} rows of {width} exceeds the resident chart's declared grid aperture")]
-    GridAperture { operation: &'static str, rows: usize, width: usize },
+    RowsDisagree {
+        operation: &'static str,
+        left: usize,
+        right: usize,
+    },
+    #[error(
+        "{operation}: {rows} rows of {width} exceeds the resident chart's declared grid aperture"
+    )]
+    GridAperture {
+        operation: &'static str,
+        rows: usize,
+        width: usize,
+    },
     #[error("{operation}: {words} words is not {rows} rows of {width}")]
-    Ragged { operation: &'static str, words: usize, rows: usize, width: usize },
-    #[error("{operation}: sections at grains {left} and {right} do not meet; a grain is declared once per deed")]
-    GrainsDisagree { operation: &'static str, left: u32, right: u32 },
+    Ragged {
+        operation: &'static str,
+        words: usize,
+        rows: usize,
+        width: usize,
+    },
+    #[error(
+        "{operation}: sections at grains {left} and {right} do not meet; a grain is declared once per deed"
+    )]
+    GrainsDisagree {
+        operation: &'static str,
+        left: u32,
+        right: u32,
+    },
     #[error("{operation}: {what}")]
-    Declaration { operation: &'static str, what: String },
+    Declaration {
+        operation: &'static str,
+        what: String,
+    },
     /// The mode the caller declared for the launch is not the mode this surface stands in.
-    #[error("the declared mode is not the surface's: expected {expected:?}, the surface is {actual:?}")]
-    ModeMismatch { expected: Box<ModeIdentity>, actual: Box<ModeIdentity> },
+    #[error(
+        "the declared mode is not the surface's: expected {expected:?}, the surface is {actual:?}"
+    )]
+    ModeMismatch {
+        expected: Box<ModeIdentity>,
+        actual: Box<ModeIdentity>,
+    },
     /// The deed's predicted resident octets exceed what the mounted device has free.
     #[error("the deed requires {required} resident octets and the device has {free} free")]
     MemoryAperture { required: u64, free: u64 },
@@ -226,7 +281,12 @@ pub enum ResidentRefusal {
 
 impl From<mount::CudaError> for ResidentRefusal {
     fn from(error: mount::CudaError) -> Self {
-        Self::Driver { operation: error.context.to_owned(), code: error.code, name: error.name, message: error.message }
+        Self::Driver {
+            operation: error.context.to_owned(),
+            code: error.code,
+            name: error.name,
+            message: error.message,
+        }
     }
 }
 
@@ -243,7 +303,10 @@ pub struct Dyadic {
 }
 
 impl Dyadic {
-    pub const ONE: Self = Self { significand: 1, exponent: 0 };
+    pub const ONE: Self = Self {
+        significand: 1,
+        exponent: 0,
+    };
 
     pub fn octaves(&self) -> u32 {
         64 - self.significand.unsigned_abs().leading_zeros()
@@ -251,44 +314,71 @@ impl Dyadic {
 
     /// The exact dyadic of a `binary64` word, through the workspace's declared float mouth.
     pub fn of_binary64_bits(bits: u64) -> Result<Self, ResidentRefusal> {
-        let datum = crate::exact_value::ieee754::decode_binary64_bits(bits).map_err(|error| ResidentRefusal::Declaration {
-            operation: "dyadic",
-            what: format!("{error:?}"),
+        let datum = crate::exact_value::ieee754::decode_binary64_bits(bits).map_err(|error| {
+            ResidentRefusal::Declaration {
+                operation: "dyadic",
+                what: format!("{error:?}"),
+            }
         })?;
-        let magnitude = i64::try_from(&datum.significand).map_err(|_| ResidentRefusal::Declaration {
-            operation: "dyadic",
-            what: "a binary64 significand exceeds the signed word".to_owned(),
-        })?;
-        Ok(Self { significand: if datum.negative { -magnitude } else { magnitude }, exponent: datum.ulp_exponent })
+        let magnitude =
+            i64::try_from(&datum.significand).map_err(|_| ResidentRefusal::Declaration {
+                operation: "dyadic",
+                what: "a binary64 significand exceeds the signed word".to_owned(),
+            })?;
+        Ok(Self {
+            significand: if datum.negative {
+                -magnitude
+            } else {
+                magnitude
+            },
+            exponent: datum.ulp_exponent,
+        })
     }
 
     /// The exact dyadic of a `bfloat16` word.
     pub fn of_bfloat16_bits(word: u16) -> Result<Self, ResidentRefusal> {
-        let datum = crate::exact_value::ieee754::decode_bfloat16_bits(word).map_err(|error| ResidentRefusal::Declaration {
-            operation: "dyadic",
-            what: format!("{error:?}"),
+        let datum = crate::exact_value::ieee754::decode_bfloat16_bits(word).map_err(|error| {
+            ResidentRefusal::Declaration {
+                operation: "dyadic",
+                what: format!("{error:?}"),
+            }
         })?;
-        let magnitude = i64::try_from(&datum.significand).map_err(|_| ResidentRefusal::Declaration {
-            operation: "dyadic",
-            what: "a bfloat16 significand exceeds the signed word".to_owned(),
-        })?;
-        Ok(Self { significand: if datum.negative { -magnitude } else { magnitude }, exponent: datum.ulp_exponent })
+        let magnitude =
+            i64::try_from(&datum.significand).map_err(|_| ResidentRefusal::Declaration {
+                operation: "dyadic",
+                what: "a bfloat16 significand exceeds the signed word".to_owned(),
+            })?;
+        Ok(Self {
+            significand: if datum.negative {
+                -magnitude
+            } else {
+                magnitude
+            },
+            exponent: datum.ulp_exponent,
+        })
     }
 
     /// The exact rational this dyadic is.
     pub fn value(&self) -> Rat {
         let significand = Rat::from_integer(BigInt::from(self.significand));
         if self.exponent >= 0 {
-            significand * Rat::from_integer(BigInt::from(BigUint::from(1u8) << self.exponent as usize))
+            significand
+                * Rat::from_integer(BigInt::from(BigUint::from(1u8) << self.exponent as usize))
         } else {
-            significand / Rat::from_integer(BigInt::from(BigUint::from(1u8) << (-self.exponent) as usize))
+            significand
+                / Rat::from_integer(BigInt::from(
+                    BigUint::from(1u8) << (-self.exponent) as usize,
+                ))
         }
     }
 }
 
 /// The exact rational a section word denotes at a grain: `word · 2^-F`.
 pub fn word_value(word: i64, grain: ResidentGrain) -> Rat {
-    Rat::new(BigInt::from(word), BigInt::from(BigUint::from(1u8) << grain.0 as usize))
+    Rat::new(
+        BigInt::from(word),
+        BigInt::from(BigUint::from(1u8) << grain.0 as usize),
+    )
 }
 
 /// A certified enclosure `[lo, hi] · 2^-grain` of an algebraic or transcendental constant, founded
@@ -302,7 +392,11 @@ pub struct DyadicEnclosure {
 
 impl DyadicEnclosure {
     pub fn octaves(&self) -> u32 {
-        64 - self.lo.unsigned_abs().max(self.hi.unsigned_abs()).leading_zeros()
+        64 - self
+            .lo
+            .unsigned_abs()
+            .max(self.hi.unsigned_abs())
+            .leading_zeros()
     }
 
     /// An exact interval widened outward onto the grain: the lower bound floors, the upper ceils,
@@ -315,7 +409,11 @@ impl DyadicEnclosure {
             operation: "enclosure",
             what: format!("an enclosure at grain {grain} leaves the signed word"),
         };
-        Ok(Self { lo: i64::try_from(&floor).map_err(|_| refuse())?, hi: i64::try_from(&ceil).map_err(|_| refuse())?, grain })
+        Ok(Self {
+            lo: i64::try_from(&floor).map_err(|_| refuse())?,
+            hi: i64::try_from(&ceil).map_err(|_| refuse())?,
+            grain,
+        })
     }
 }
 
@@ -466,14 +564,20 @@ impl ResidentSection<'_> {
     /// The address ranges this section occupies — its footprint as a realization coordinate.
     pub fn ranges(&self) -> [(u64, u64); 2] {
         let octets = (self.count() * std::mem::size_of::<i64>()) as u64;
-        [(self.lo.device_ptr(), self.lo.device_ptr() + octets), (self.hi.device_ptr(), self.hi.device_ptr() + octets)]
+        [
+            (self.lo.device_ptr(), self.lo.device_ptr() + octets),
+            (self.hi.device_ptr(), self.hi.device_ptr() + octets),
+        ]
     }
 }
 
 impl Drop for ResidentSection<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.census.borrow_mut().resident_shrank(self.octets);
+        self.surface
+            .census
+            .borrow_mut()
+            .resident_shrank(self.octets);
     }
 }
 
@@ -509,14 +613,18 @@ impl BandElements<'_> {
     }
     pub fn ranges(&self) -> [(u64, u64); 4] {
         let octets = (self.bands * 8) as u64;
-        [&self.cos_lo, &self.cos_hi, &self.sin_lo, &self.sin_hi].map(|b| (b.device_ptr(), b.device_ptr() + octets))
+        [&self.cos_lo, &self.cos_hi, &self.sin_lo, &self.sin_hi]
+            .map(|b| (b.device_ptr(), b.device_ptr() + octets))
     }
 }
 
 impl Drop for BandElements<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.census.borrow_mut().resident_shrank(self.octets);
+        self.surface
+            .census
+            .borrow_mut()
+            .resident_shrank(self.octets);
     }
 }
 
@@ -543,14 +651,20 @@ impl Positions<'_> {
         self.octets
     }
     pub fn range(&self) -> (u64, u64) {
-        (self.buffer.device_ptr(), self.buffer.device_ptr() + (self.rows * 4) as u64)
+        (
+            self.buffer.device_ptr(),
+            self.buffer.device_ptr() + (self.rows * 4) as u64,
+        )
     }
 }
 
 impl Drop for Positions<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.census.borrow_mut().resident_shrank(self.octets);
+        self.surface
+            .census
+            .borrow_mut()
+            .resident_shrank(self.octets);
     }
 }
 
@@ -572,23 +686,25 @@ impl StagedWords<'_> {
         self.width
     }
     pub fn range(&self) -> (u64, u64) {
-        (self.buffer.device_ptr(), self.buffer.device_ptr() + self.octets)
+        (
+            self.buffer.device_ptr(),
+            self.buffer.device_ptr() + self.octets,
+        )
     }
 }
 
 impl Drop for StagedWords<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.census.borrow_mut().resident_shrank(self.octets);
+        self.surface
+            .census
+            .borrow_mut()
+            .resident_shrank(self.octets);
     }
 }
 
 fn ceil_log2(n: usize) -> u32 {
-    if n <= 1 {
-        0
-    } else {
-        (n - 1).ilog2() + 1
-    }
+    if n <= 1 { 0 } else { (n - 1).ilog2() + 1 }
 }
 
 /// **The mouth's a-priori octave bound, read off the entering words.** For each codeword the mouth
@@ -624,7 +740,9 @@ struct Params {
 
 impl Params {
     fn new() -> Self {
-        Self { words: Vec::with_capacity(20) }
+        Self {
+            words: Vec::with_capacity(20),
+        }
     }
     fn ptr(&mut self, pointer: u64) -> &mut Self {
         self.words.push(pointer);
@@ -643,7 +761,10 @@ impl Params {
         self
     }
     fn pointers(&mut self) -> Vec<*mut c_void> {
-        self.words.iter_mut().map(|word| (word as *mut u64).cast::<c_void>()).collect()
+        self.words
+            .iter_mut()
+            .map(|word| (word as *mut u64).cast::<c_void>())
+            .collect()
     }
 }
 
@@ -719,7 +840,11 @@ impl SlotReading {
             bound_violated: words[5] != 0,
             max_width: u64::from(words[6]) | (u64::from(words[7]) << 32),
             upstream_flags: words[8],
-            upstream_first: if words[9] == 0 { None } else { Some(words[9] as usize - 1) },
+            upstream_first: if words[9] == 0 {
+                None
+            } else {
+                Some(words[9] as usize - 1)
+            },
             upstream_count: words[10],
             lineage_inspected: words[11],
             width_sum: u64::from(words[12]) | (u64::from(words[13]) << 32),
@@ -740,7 +865,11 @@ impl SlotReading {
             return Some(ResidentRefusal::Upstream { operation: name });
         }
         if self.refused & REFUSED_BOUND != 0 || self.bound_violated {
-            return Some(ResidentRefusal::BoundRefuted { operation: name, admitted, measured: self.max_octave });
+            return Some(ResidentRefusal::BoundRefuted {
+                operation: name,
+                admitted,
+                measured: self.max_octave,
+            });
         }
         if self.refused & REFUSED_CARRIER != 0 {
             return Some(ResidentRefusal::CarrierLeft { operation: name });
@@ -766,7 +895,10 @@ impl<'chart> ResidentSurface<'chart> {
         }
         let device = Device::get(0)?;
         if device.name != readout.device_name() {
-            return Err(ResidentRefusal::DeviceDisagrees { readout: readout.device_name().to_owned(), mounted: device.name.clone() });
+            return Err(ResidentRefusal::DeviceDisagrees {
+                readout: readout.device_name().to_owned(),
+                mounted: device.name.clone(),
+            });
         }
         let context = BorrowedContext::adopt(readout.raw_context())?;
         context.make_current()?;
@@ -821,7 +953,10 @@ impl<'chart> ResidentSurface<'chart> {
         };
         let allocation_grain = context.allocation_grain_bytes()? as u64;
         let memory_at_mount = context.memory_info()?;
-        let ptx_sha256 = Sha256::digest(PTX).iter().map(|byte| format!("{byte:02x}")).collect();
+        let ptx_sha256 = Sha256::digest(PTX)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect();
         Ok(Self {
             readout,
             context,
@@ -864,8 +999,13 @@ impl<'chart> ResidentSurface<'chart> {
     /// arithmetic tier and apparatus chart. Two surfaces with one kernel name and different PTX
     /// are two modes.
     pub fn mode(&self) -> ModeIdentity {
-        ModeIdentity::of(&self.cover, "holonic_engine::resident_section", "exact-integer-interval-v2", "exact_resident_section")
-            .with_kernel_content(self.ptx_sha256.clone())
+        ModeIdentity::of(
+            &self.cover,
+            "holonic_engine::resident_section",
+            "exact-integer-interval-v2",
+            "exact_resident_section",
+        )
+        .with_kernel_content(self.ptx_sha256.clone())
     }
     /// The memory the device reported at mount, and now.
     pub fn memory_at_mount(&self) -> MemoryInfo {
@@ -890,7 +1030,11 @@ impl<'chart> ResidentSurface<'chart> {
     /// The launch geometry derived from the device and the kernels: the block, the grid ceiling,
     /// the warp. Read by the passage to place cells on the cover's device chart.
     pub fn derived_launch(&self) -> (u32, u32, u32) {
-        (self.launch.block_x, self.launch.max_grid_x, self.launch.warp)
+        (
+            self.launch.block_x,
+            self.launch.max_grid_x,
+            self.launch.warp,
+        )
     }
 
     // -----------------------------------------------------------------------------------------
@@ -931,29 +1075,67 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// A fresh section, allocated and unwritten. Allocation is counted; nothing launches.
-    pub fn fresh_section(&'chart self, rows: usize, width: usize, grain: ResidentGrain) -> Result<ResidentSection<'chart>, ResidentRefusal> {
+    pub fn fresh_section(
+        &'chart self,
+        rows: usize,
+        width: usize,
+        grain: ResidentGrain,
+    ) -> Result<ResidentSection<'chart>, ResidentRefusal> {
         let count = rows * width;
         let lo = self.alloc::<i64>(count)?;
         let hi = self.alloc::<i64>(count)?;
-        Ok(ResidentSection { surface: self, lo, hi, rows, width, grain, octets: 2 * (count.max(1) * 8) as u64 })
+        Ok(ResidentSection {
+            surface: self,
+            lo,
+            hi,
+            rows,
+            width,
+            grain,
+            octets: 2 * (count.max(1) * 8) as u64,
+        })
     }
 
     /// Stage entering codewords: allocate once and upload (ingress). Refillable.
-    pub fn stage_words(&'chart self, words: &[u16], rows: usize, width: usize) -> Result<StagedWords<'chart>, ResidentRefusal> {
+    pub fn stage_words(
+        &'chart self,
+        words: &[u16],
+        rows: usize,
+        width: usize,
+    ) -> Result<StagedWords<'chart>, ResidentRefusal> {
         if words.len() != rows * width {
-            return Err(ResidentRefusal::Ragged { operation: "stage", words: words.len(), rows, width });
+            return Err(ResidentRefusal::Ragged {
+                operation: "stage",
+                words: words.len(),
+                rows,
+                width,
+            });
         }
         let buffer = self.alloc::<u16>(words.len())?;
-        let staged = StagedWords { surface: self, buffer, rows, width, octets: (words.len().max(1) * 2) as u64 };
+        let staged = StagedWords {
+            surface: self,
+            buffer,
+            rows,
+            width,
+            octets: (words.len().max(1) * 2) as u64,
+        };
         self.refill(&staged, words)?;
         Ok(staged)
     }
 
     /// Upload new entering codewords into a staged buffer of the same extent — a later deed's
     /// material crossing once.
-    pub fn refill(&self, staged: &StagedWords<'chart>, words: &[u16]) -> Result<(), ResidentRefusal> {
+    pub fn refill(
+        &self,
+        staged: &StagedWords<'chart>,
+        words: &[u16],
+    ) -> Result<(), ResidentRefusal> {
         if words.len() != staged.rows * staged.width {
-            return Err(ResidentRefusal::Ragged { operation: "refill", words: words.len(), rows: staged.rows, width: staged.width });
+            return Err(ResidentRefusal::Ragged {
+                operation: "refill",
+                words: words.len(),
+                rows: staged.rows,
+                width: staged.width,
+            });
         }
         self.context.make_current()?;
         staged.buffer.copy_from_slice(words)?;
@@ -963,39 +1145,58 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// Lay the site's band group elements down once. `elements[b] = ((cos_lo, cos_hi), (sin_lo,
     /// sin_hi))` at `2^-grain`, founded on the serial chart from the exact algebraic angle.
-    pub fn mount_bands(&'chart self, elements: &[((i64, i64), (i64, i64))], grain: u32) -> Result<BandElements<'chart>, ResidentRefusal> {
+    pub fn mount_bands(
+        &'chart self,
+        elements: &[((i64, i64), (i64, i64))],
+        grain: u32,
+    ) -> Result<BandElements<'chart>, ResidentRefusal> {
         let n = elements.len();
         let cos_lo = self.alloc::<i64>(n)?;
         let cos_hi = self.alloc::<i64>(n)?;
         let sin_lo = self.alloc::<i64>(n)?;
         let sin_hi = self.alloc::<i64>(n)?;
         let mut words = vec![0i64; n];
-        for (buffer, pick) in [
-            (&cos_lo, 0usize),
-            (&cos_hi, 1),
-            (&sin_lo, 2),
-            (&sin_hi, 3),
-        ] {
+        for (buffer, pick) in [(&cos_lo, 0usize), (&cos_hi, 1), (&sin_lo, 2), (&sin_hi, 3)] {
             for (slot, ((cl, ch), (sl, sh))) in words.iter_mut().zip(elements) {
                 *slot = [*cl, *ch, *sl, *sh][pick];
             }
             buffer.copy_from_slice(&words)?;
         }
         self.census.borrow_mut().ingress_octets += (4 * n * 8) as u64;
-        Ok(BandElements { surface: self, cos_lo, cos_hi, sin_lo, sin_hi, bands: n, grain, octets: (4 * n.max(1) * 8) as u64 })
+        Ok(BandElements {
+            surface: self,
+            cos_lo,
+            cos_hi,
+            sin_lo,
+            sin_hi,
+            bands: n,
+            grain,
+            octets: (4 * n.max(1) * 8) as u64,
+        })
     }
 
     /// The integer positions of a section's rows, laid down once.
-    pub fn mount_positions(&'chart self, positions: &[u32]) -> Result<Positions<'chart>, ResidentRefusal> {
+    pub fn mount_positions(
+        &'chart self,
+        positions: &[u32],
+    ) -> Result<Positions<'chart>, ResidentRefusal> {
         let buffer = self.alloc::<u32>(positions.len())?;
         buffer.copy_from_slice(positions)?;
         self.census.borrow_mut().ingress_octets += (positions.len() * 4) as u64;
-        Ok(Positions { surface: self, buffer, rows: positions.len(), octets: (positions.len().max(1) * 4) as u64 })
+        Ok(Positions {
+            surface: self,
+            buffer,
+            rows: positions.len(),
+            octets: (positions.len().max(1) * 4) as u64,
+        })
     }
 
     /// **The terminal receiver's copy.** The one place a section crosses to the serial chart, and it
     /// is counted as such. Returns `(lo, hi)` per coordinate at the section's grain, row-major.
-    pub fn read_out(&self, section: &ResidentSection<'chart>) -> Result<Vec<(i64, i64)>, ResidentRefusal> {
+    pub fn read_out(
+        &self,
+        section: &ResidentSection<'chart>,
+    ) -> Result<Vec<(i64, i64)>, ResidentRefusal> {
         self.context.make_current()?;
         let count = section.count();
         let mut lo = vec![0i64; count];
@@ -1020,7 +1221,11 @@ impl<'chart> ResidentSurface<'chart> {
     fn admit_octaves(operation: &'static str, needed: u32) -> Result<(), ResidentRefusal> {
         let admitted = Self::carrier_octaves();
         if needed > admitted {
-            return Err(ResidentRefusal::CarrierRange { operation, needed, admitted });
+            return Err(ResidentRefusal::CarrierRange {
+                operation,
+                needed,
+                admitted,
+            });
         }
         Ok(())
     }
@@ -1047,7 +1252,14 @@ impl<'chart> ResidentSurface<'chart> {
     /// performs — plus one for the directed ceiling. A non-finite codeword contributes nothing to
     /// the bound; it is refused by the kernel as malformed. `[`Enter::bound_octaves`] states the same
     /// reading for the a-priori law and the two agree by construction.
-    pub fn shape_enter(&self, rows: usize, width: usize, scale: Dyadic, grain: ResidentGrain, words: &[u16]) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_enter(
+        &self,
+        rows: usize,
+        width: usize,
+        scale: Dyadic,
+        grain: ResidentGrain,
+        words: &[u16],
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "enter";
         let needed = entering_octaves(words, scale, grain);
         Self::admit_octaves(OPERATION, needed)?;
@@ -1062,26 +1274,72 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
     }
 
-    fn flat_shape(&self, operation: &'static str, rows: usize, width: usize, needed: u32, predicted: ExactWork, couplings: Vec<CouplingPlan>) -> Result<LawShape, ResidentRefusal> {
+    fn flat_shape(
+        &self,
+        operation: &'static str,
+        rows: usize,
+        width: usize,
+        needed: u32,
+        predicted: ExactWork,
+        couplings: Vec<CouplingPlan>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let count = rows * width;
-        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture { operation, rows, width })?;
-        self.launch.grid_for(count32.max(1)).map_err(|_| ResidentRefusal::GridAperture { operation, rows, width })?;
-        Ok(LawShape { operation, rows, width, needed, predicted, couplings, launches: 2, shared_octets: 0, block: self.launch.block_x })
+        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture {
+            operation,
+            rows,
+            width,
+        })?;
+        self.launch
+            .grid_for(count32.max(1))
+            .map_err(|_| ResidentRefusal::GridAperture {
+                operation,
+                rows,
+                width,
+            })?;
+        Ok(LawShape {
+            operation,
+            rows,
+            width,
+            needed,
+            predicted,
+            couplings,
+            launches: 2,
+            shared_octets: 0,
+            block: self.launch.block_x,
+        })
     }
 
     /// The contraction through a mounted map: `out = section · mapᵀ`.
-    pub fn shape_contract(&self, rows: usize, inner: usize, input_octaves: u32, map: &MountedReadout<'chart>) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_contract(
+        &self,
+        rows: usize,
+        inner: usize,
+        input_octaves: u32,
+        map: &MountedReadout<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "contract";
         if inner != map.dim() {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: inner, right: map.dim() });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: inner,
+                right: map.dim(),
+            });
         }
         let needed = input_octaves + map.entry_octaves() + ceil_log2(inner) + 1;
         Self::admit_octaves(OPERATION, needed)?;
         let out_width = map.rows();
-        let mut work = ExactWork::predicted_product(rows, inner, out_width, u64::from(input_octaves.max(map.entry_octaves())));
+        let mut work = ExactWork::predicted_product(
+            rows,
+            inner,
+            out_width,
+            u64::from(input_octaves.max(map.entry_octaves())),
+        );
         work.entries_written = BigUint::from(2 * (rows * out_width) as u64);
         work.resident(2 * (rows * out_width) as u64);
-        let peak = u64::from(input_octaves) + u64::from(map.entry_octaves()) + u64::from(ceil_log2(inner)) + 1;
+        let peak = u64::from(input_octaves)
+            + u64::from(map.entry_octaves())
+            + u64::from(ceil_log2(inner))
+            + 1;
         work.peak_bits = BigUint::from(peak);
         work.cumulative_bits = BigUint::from(2 * (rows * out_width) as u64 * peak);
         self.flat_shape(OPERATION, rows, out_width, needed, work, Vec::new())
@@ -1103,24 +1361,41 @@ impl<'chart> ResidentSurface<'chart> {
     ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "factorized-contract";
         if rank != 1 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("rank {rank} is not the exact rank-one law") });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("rank {rank} is not the exact rank-one law"),
+            });
         }
         if u.dim() != 1 || v.rows() != 1 || v.dim() != inner {
             return Err(ResidentRefusal::Declaration {
                 operation: OPERATION,
-                what: format!("native factors require u=[V,1], v=[1,H], got u=[{},{}], v=[{},{}]", u.rows(), u.dim(), v.rows(), v.dim()),
+                what: format!(
+                    "native factors require u=[V,1], v=[1,H], got u=[{},{}], v=[{},{}]",
+                    u.rows(),
+                    u.dim(),
+                    v.rows(),
+                    v.dim()
+                ),
             });
         }
         // Admit the wide v reduction and the wide u product directly.  Calling shape_contract
         // here would smuggle the retired i64 scalar-section claim into the receipt even though
         // this law's internal junction is shared wide storage only.
         let add = |left: u32, right: u32| -> Result<u32, ResidentRefusal> {
-            left.checked_add(right).ok_or(ResidentRefusal::CarrierRange { operation: OPERATION, needed: u32::MAX, admitted: Self::carrier_octaves() })
+            left.checked_add(right)
+                .ok_or(ResidentRefusal::CarrierRange {
+                    operation: OPERATION,
+                    needed: u32::MAX,
+                    admitted: Self::carrier_octaves(),
+                })
         };
         // Positive map exponents are left shifts in the wide helpers.  Negative exponents may
         // narrow a later face, but cannot erase the earlier carrier obligation, so every stage is
         // admitted independently in causal order.
-        let raw_v = add(add(add(input_octaves, v.entry_octaves())?, ceil_log2(inner))?, 1)?;
+        let raw_v = add(
+            add(add(input_octaves, v.entry_octaves())?, ceil_log2(inner))?,
+            1,
+        )?;
         let scalar_v = add(raw_v, v.exponent().max(0) as u32)?;
         let product_u = add(add(scalar_v, u.entry_octaves())?, 1)?;
         let final_u = add(product_u, u.exponent().max(0) as u32)?;
@@ -1131,24 +1406,50 @@ impl<'chart> ResidentSurface<'chart> {
         let out_width = u.rows();
         let inner_power = inner.checked_next_power_of_two().unwrap_or(usize::MAX);
         let inner_power_u32 = u32::try_from(inner_power).unwrap_or(u32::MAX);
-        let block = self.reduction_block.min(inner_power_u32).max(self.launch.warp);
+        let block = self
+            .reduction_block
+            .min(inner_power_u32)
+            .max(self.launch.warp);
         let shared_u64 = 2u64 * u64::from(block) * 16;
-        let shared = u32::try_from(shared_u64).map_err(|_| ResidentRefusal::Declaration { operation: OPERATION, what: format!("the reduction block {block} has no representable shared extent") })?;
+        let shared = u32::try_from(shared_u64).map_err(|_| ResidentRefusal::Declaration {
+            operation: OPERATION,
+            what: format!("the reduction block {block} has no representable shared extent"),
+        })?;
         if shared > self.max_shared_octets {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a reduction block of {block} needs {shared} shared octets; the device admits {}", self.max_shared_octets) });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "a reduction block of {block} needs {shared} shared octets; the device admits {}",
+                    self.max_shared_octets
+                ),
+            });
         }
         if rows > self.launch.max_grid_x as usize {
-            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width: out_width });
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width: out_width,
+            });
         }
         let count = (rows * out_width) as u64;
         // Retain the two constitutive work legs and their wide internal materialization in the
         // receipt, while the graph allocates only the final i64 section.
-        let mut first_work = ExactWork::predicted_product(rows, inner, 1, u64::from(input_octaves.max(v.entry_octaves())));
+        let mut first_work = ExactWork::predicted_product(
+            rows,
+            inner,
+            1,
+            u64::from(input_octaves.max(v.entry_octaves())),
+        );
         first_work.entries_written = BigUint::from(2 * rows as u64);
         first_work.resident(2 * rows as u64);
         first_work.peak_bits = BigUint::from(u64::from(scalar_v));
         first_work.cumulative_bits = BigUint::from(2 * rows as u64 * u64::from(scalar_v));
-        let mut second_work = ExactWork::predicted_product(rows, 1, out_width, u64::from(scalar_v.max(u.entry_octaves())));
+        let mut second_work = ExactWork::predicted_product(
+            rows,
+            1,
+            out_width,
+            u64::from(scalar_v.max(u.entry_octaves())),
+        );
         second_work.entries_written = BigUint::from(2 * count);
         second_work.resident(2 * count);
         second_work.peak_bits = BigUint::from(u64::from(final_u));
@@ -1156,7 +1457,9 @@ impl<'chart> ResidentSurface<'chart> {
         let mut work = first_work.then(&second_work);
         // The wide reduction has a logarithmic block span in this realization.  Preserve the
         // constitutive counts and widths while returning the enacted dependency span.
-        work.dependency_span = work.dependency_span.max(BigUint::from(u64::from(ceil_log2(block as usize) + 1)));
+        work.dependency_span = work
+            .dependency_span
+            .max(BigUint::from(u64::from(ceil_log2(block as usize) + 1)));
         let coupling = CouplingPlan {
             coupling: "rank-one junction: one shared-wide v reduction then u placement, one i64 output front",
             kernel: "section_factorized_contract",
@@ -1164,19 +1467,43 @@ impl<'chart> ResidentSurface<'chart> {
             block,
             predicted: work.clone(),
         };
-        Ok(LawShape { operation: OPERATION, rows, width: out_width, needed, predicted: work, couplings: vec![coupling], launches: 2, shared_octets: shared, block })
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width: out_width,
+            needed,
+            predicted: work,
+            couplings: vec![coupling],
+            launches: 2,
+            shared_octets: shared,
+            block,
+        })
     }
 
     /// The RMS rebase over runs of `group`: `x · (mean(x²) + eps)^{-1/2} · g`. The quadratic
     /// capacity is a named barrier realized as a resident block reduction.
-    pub fn shape_rms_rebase(&self, rows: usize, width: usize, group: usize, input_octaves: u32, gain: Option<&MountedReadout<'chart>>) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_rms_rebase(
+        &self,
+        rows: usize,
+        width: usize,
+        group: usize,
+        input_octaves: u32,
+        gain: Option<&MountedReadout<'chart>>,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "rms-rebase";
         if group == 0 || width % group != 0 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a group of {group} does not tile a width of {width}") });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("a group of {group} does not tile a width of {width}"),
+            });
         }
         if let Some(gain) = gain {
             if gain.rows() * gain.dim() != group {
-                return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: group, right: gain.rows() * gain.dim() });
+                return Err(ResidentRefusal::WidthDisagrees {
+                    operation: OPERATION,
+                    left: group,
+                    right: gain.rows() * gain.dim(),
+                });
             }
         }
         let gain_octaves = gain.map(MountedReadout::entry_octaves).unwrap_or(0);
@@ -1185,16 +1512,31 @@ impl<'chart> ResidentSurface<'chart> {
         // the kernel derives s from the group's own census, so here s is bounded from the a-priori
         // octaves and the product x·g must fit the wide carrier.
         let squares = 2 * oct + ceil_log2(group) + 1;
-        let needed = squares.min(Self::carrier_octaves()).max(oct + gain_octaves + 1);
+        let needed = squares
+            .min(Self::carrier_octaves())
+            .max(oct + gain_octaves + 1);
         Self::admit_octaves(OPERATION, needed)?;
-        let block = self.reduction_block.min(group.next_power_of_two() as u32).max(self.launch.warp);
+        let block = self
+            .reduction_block
+            .min(group.next_power_of_two() as u32)
+            .max(self.launch.warp);
         let shared = 2 * block * 16 + block * 4;
         if shared > self.max_shared_octets {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a block of {block} needs {shared} shared octets; the device admits {}", self.max_shared_octets) });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "a block of {block} needs {shared} shared octets; the device admits {}",
+                    self.max_shared_octets
+                ),
+            });
         }
         let blocks = rows * (width / group);
         if blocks > self.launch.max_grid_x as usize {
-            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width });
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width,
+            });
         }
         let count = (rows * width) as u64;
         let groups = blocks as u64;
@@ -1206,8 +1548,12 @@ impl<'chart> ResidentSurface<'chart> {
         work.entries_written = BigUint::from(2 * count);
         work.resident(2 * count);
         let peak = 2 * u64::from(oct) + u64::from(ceil_log2(group)) + 1;
-        work.peak_bits = BigUint::from(peak.min(u64::from(Self::carrier_octaves())).max(u64::from(oct + gain_octaves + 10)));
-        work.cumulative_bits = BigUint::from(2 * count * (u64::from(oct) + u64::from(gain_octaves)));
+        work.peak_bits = BigUint::from(
+            peak.min(u64::from(Self::carrier_octaves()))
+                .max(u64::from(oct + gain_octaves + 10)),
+        );
+        work.cumulative_bits =
+            BigUint::from(2 * count * (u64::from(oct) + u64::from(gain_octaves)));
         work.dependency_span = BigUint::from(2 * u64::from(ceil_log2(group)) + 3);
         let mut reduction = ExactWork::nothing();
         reduction.added(2 * count);
@@ -1220,21 +1566,55 @@ impl<'chart> ResidentSurface<'chart> {
             block,
             predicted: reduction,
         }];
-        Ok(LawShape { operation: OPERATION, rows, width, needed, predicted: work, couplings, launches: 2, shared_octets: shared, block })
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width,
+            needed,
+            predicted: work,
+            couplings,
+            launches: 2,
+            shared_octets: shared,
+            block,
+        })
     }
 
     /// The chronology: every head's pair `(x[b], x[b + D/2])` turned by the band element raised to
     /// the row's integer position.
-    pub fn shape_chronology(&self, rows: usize, width: usize, heads: usize, head_width: usize, input_octaves: u32, bands: &BandElements<'chart>, positions: &Positions<'chart>, max_position: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_chronology(
+        &self,
+        rows: usize,
+        width: usize,
+        heads: usize,
+        head_width: usize,
+        input_octaves: u32,
+        bands: &BandElements<'chart>,
+        positions: &Positions<'chart>,
+        max_position: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "chronology";
         if width != heads * head_width {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: width, right: heads * head_width });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: width,
+                right: heads * head_width,
+            });
         }
         if bands.bands != head_width / 2 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{} band elements for a head width of {head_width}", bands.bands) });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "{} band elements for a head width of {head_width}",
+                    bands.bands
+                ),
+            });
         }
         if positions.rows != rows {
-            return Err(ResidentRefusal::RowsDisagree { operation: OPERATION, left: rows, right: positions.rows });
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: OPERATION,
+                left: rows,
+                right: positions.rows,
+            });
         }
         let needed = (input_octaves + bands.grain + 1).max(2 * bands.grain + 2);
         Self::admit_octaves(OPERATION, needed)?;
@@ -1246,27 +1626,74 @@ impl<'chart> ResidentSurface<'chart> {
         work.entries_written = BigUint::from(2 * (rows * width) as u64);
         work.resident(2 * (rows * width) as u64);
         work.peak_bits = BigUint::from(u64::from(input_octaves + bands.grain + 1));
-        work.cumulative_bits = BigUint::from(2 * (rows * width) as u64 * u64::from(input_octaves + 1));
+        work.cumulative_bits =
+            BigUint::from(2 * (rows * width) as u64 * u64::from(input_octaves + 1));
         work.dependency_span = BigUint::from(u64::from(ceil_log2(max_position as usize + 1)) + 1);
         // The launch is flat over (row, head, band).
         let threads = rows * heads * (head_width / 2);
-        let count32 = u32::try_from(threads).map_err(|_| ResidentRefusal::GridAperture { operation: OPERATION, rows, width })?;
-        self.launch.grid_for(count32.max(1)).map_err(|_| ResidentRefusal::GridAperture { operation: OPERATION, rows, width })?;
-        Ok(LawShape { operation: OPERATION, rows, width, needed, predicted: work, couplings: Vec::new(), launches: 2, shared_octets: 0, block: self.launch.block_x })
+        let count32 = u32::try_from(threads).map_err(|_| ResidentRefusal::GridAperture {
+            operation: OPERATION,
+            rows,
+            width,
+        })?;
+        self.launch
+            .grid_for(count32.max(1))
+            .map_err(|_| ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width,
+            })?;
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width,
+            needed,
+            predicted: work,
+            couplings: Vec::new(),
+            launches: 2,
+            shared_octets: 0,
+            block: self.launch.block_x,
+        })
     }
 
     /// The contact and carried construction over `(q, k, v)`, sliding causal window.
     #[allow(clippy::too_many_arguments)]
-    pub fn shape_contact(&self, rows: usize, q_width: usize, k_width: usize, v_width: usize, heads: usize, kv_heads: usize, head_width: usize, window: usize, terms: SeriesAperture, grain: ResidentGrain, q_octaves: u32, k_octaves: u32, v_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_contact(
+        &self,
+        rows: usize,
+        q_width: usize,
+        k_width: usize,
+        v_width: usize,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        terms: SeriesAperture,
+        grain: ResidentGrain,
+        q_octaves: u32,
+        k_octaves: u32,
+        v_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "contact";
         if q_width != heads * head_width {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: q_width, right: heads * head_width });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: q_width,
+                right: heads * head_width,
+            });
         }
         if k_width != kv_heads * head_width || v_width != kv_heads * head_width {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: k_width.max(v_width), right: kv_heads * head_width });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: k_width.max(v_width),
+                right: kv_heads * head_width,
+            });
         }
         if kv_heads == 0 || heads % kv_heads != 0 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{heads} heads over {kv_heads} families") });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("{heads} heads over {kv_heads} families"),
+            });
         }
         let f = grain.0;
         let reach = rows.min(window.max(1));
@@ -1278,13 +1705,26 @@ impl<'chart> ResidentSurface<'chart> {
             .max(f + 1 + v_octaves + ceil_log2(reach) + 1)
             .max(2 * f + 4);
         Self::admit_octaves(OPERATION, needed)?;
-        let block = self.reduction_block.min(head_width.max(reach).next_power_of_two() as u32).max(self.launch.warp);
+        let block = self
+            .reduction_block
+            .min(head_width.max(reach).next_power_of_two() as u32)
+            .max(self.launch.warp);
         let shared = (4 * reach * 16) as u32;
         if shared > self.max_shared_octets {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a reach of {reach} needs {shared} shared octets; the device admits {}", self.max_shared_octets) });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "a reach of {reach} needs {shared} shared octets; the device admits {}",
+                    self.max_shared_octets
+                ),
+            });
         }
         if rows * heads > self.launch.max_grid_x as usize {
-            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width: q_width });
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width: q_width,
+            });
         }
         let reach_sum: u64 = (0..rows).map(|t| (t + 1).min(window.max(1)) as u64).sum();
         let brackets = reach_sum * heads as u64 * head_width as u64;
@@ -1298,24 +1738,59 @@ impl<'chart> ResidentSurface<'chart> {
         work.resident(2 * (rows * heads * head_width) as u64 + 4 * window.max(1) as u64);
         let peak = (2 * q_octaves.max(k_octaves) + ceil_log2(head_width) + 1).max(v_octaves + 40);
         work.peak_bits = BigUint::from(u64::from(peak));
-        work.cumulative_bits = BigUint::from(2 * (rows * heads * head_width) as u64 * u64::from(v_octaves + 1));
+        work.cumulative_bits =
+            BigUint::from(2 * (rows * heads * head_width) as u64 * u64::from(v_octaves + 1));
         work.dependency_span = BigUint::from(5u64 + u64::from(terms.0));
         let coupling = |name: &'static str, extent: u64| {
             let mut reduction = ExactWork::nothing();
             reduction.added(reach_sum * heads as u64);
             reduction.dependency_span = BigUint::from(u64::from(ceil_log2(reach)) + 1);
-            CouplingPlan { coupling: name, kernel: "section_contact", extent, block, predicted: reduction }
+            CouplingPlan {
+                coupling: name,
+                kernel: "section_contact",
+                extent,
+                block,
+                predicted: reduction,
+            }
         };
         let couplings = vec![
-            coupling("the null: greatest upper bracket over the reach", reach as u64),
-            coupling("the partition function: sum of certified weights over the reach", reach as u64),
-            coupling("the hull: least and greatest carried coordinate over the reach", reach as u64),
+            coupling(
+                "the null: greatest upper bracket over the reach",
+                reach as u64,
+            ),
+            coupling(
+                "the partition function: sum of certified weights over the reach",
+                reach as u64,
+            ),
+            coupling(
+                "the hull: least and greatest carried coordinate over the reach",
+                reach as u64,
+            ),
         ];
-        Ok(LawShape { operation: OPERATION, rows, width: heads * head_width, needed, predicted: work, couplings, launches: 2, shared_octets: shared, block })
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width: heads * head_width,
+            needed,
+            predicted: work,
+            couplings,
+            launches: 2,
+            shared_octets: shared,
+            block,
+        })
     }
 
     /// `½ x (1 + tanh(c1 (x + c2 x³)))` with the source's `binary64` constants as exact dyadics.
-    pub fn shape_gelu_tanh(&self, rows: usize, width: usize, input_octaves: u32, grain: ResidentGrain, c1: Dyadic, c2: Dyadic, terms: SeriesAperture) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_gelu_tanh(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        grain: ResidentGrain,
+        c1: Dyadic,
+        c2: Dyadic,
+        terms: SeriesAperture,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "gelu-tanh";
         let f = i64::from(grain.0);
         let oct = i64::from(input_octaves);
@@ -1340,7 +1815,13 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The pointwise product of two standings.
-    pub fn shape_hadamard(&self, rows: usize, width: usize, a_octaves: u32, b_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_hadamard(
+        &self,
+        rows: usize,
+        width: usize,
+        a_octaves: u32,
+        b_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "hadamard";
         // Two magnitudes below 2^a and 2^b multiply below 2^(a+b).
         let needed = a_octaves + b_octaves;
@@ -1357,7 +1838,13 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The re-entry: a retained standing and a returned current, joined.
-    pub fn shape_re_entry(&self, rows: usize, width: usize, a_octaves: u32, b_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_re_entry(
+        &self,
+        rows: usize,
+        width: usize,
+        a_octaves: u32,
+        b_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "re-entry";
         let needed = a_octaves.max(b_octaves) + 1;
         Self::admit_octaves(OPERATION, needed)?;
@@ -1373,7 +1860,13 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The product with an enclosed constant carried as its certified enclosure.
-    pub fn shape_scale(&self, rows: usize, width: usize, input_octaves: u32, by: DyadicEnclosure) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_scale(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        by: DyadicEnclosure,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "scale";
         let needed = input_octaves + by.octaves() + 1;
         Self::admit_octaves(OPERATION, needed)?;
@@ -1389,10 +1882,21 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The matched-sibling intervention: a declared span of columns withdrawn, out of place.
-    pub fn shape_withdraw_columns(&self, rows: usize, width: usize, input_octaves: u32, from: usize, span: usize) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_withdraw_columns(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        from: usize,
+        span: usize,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "withdraw-columns";
         if from + span > width {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: from + span, right: width });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: from + span,
+                right: width,
+            });
         }
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1404,10 +1908,21 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The intervention withdrawing rows `[from, from + span)`.
-    pub fn shape_withdraw_rows(&self, rows: usize, width: usize, input_octaves: u32, from: usize, span: usize) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_withdraw_rows(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        from: usize,
+        span: usize,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "withdraw-rows";
         if from + span > rows {
-            return Err(ResidentRefusal::RowsDisagree { operation: OPERATION, left: from + span, right: rows });
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: OPERATION,
+                left: from + span,
+                right: rows,
+            });
         }
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1419,15 +1934,32 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// The intervention permuting the column blocks of `block` by a declared permutation.
-    pub fn shape_permute_columns(&self, rows: usize, width: usize, input_octaves: u32, block: usize, permutation: &[usize]) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_permute_columns(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        block: usize,
+        permutation: &[usize],
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "permute-columns";
         if block == 0 || width % block != 0 || permutation.len() != width / block {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: permutation.len() * block, right: width });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: permutation.len() * block,
+                right: width,
+            });
         }
         let mut seen = vec![false; permutation.len()];
         for p in permutation {
             if *p >= permutation.len() || seen[*p] {
-                return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{permutation:?} is not a permutation of {} blocks", permutation.len()) });
+                return Err(ResidentRefusal::Declaration {
+                    operation: OPERATION,
+                    what: format!(
+                        "{permutation:?} is not a permutation of {} blocks",
+                        permutation.len()
+                    ),
+                });
             }
             seen[*p] = true;
         }
@@ -1441,7 +1973,12 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// **A control, unsound by construction**: the enclosure collapsed to a midpoint at this site.
-    pub fn shape_collapse_control(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_collapse_control(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "collapse-control";
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1457,7 +1994,12 @@ impl<'chart> ResidentSurface<'chart> {
     /// of its own: the predecessor's words are rewritten in place. The predicted price is the
     /// collapse's, and `launches` is ONE — the receipt's apparatus prediction moves with the fusion
     /// rather than describing the unfused pair.
-    pub fn shape_midpoint_seal(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_midpoint_seal(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "midpoint-quotient(fused seal)";
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1474,7 +2016,12 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// The carry of a resident standing into this passage: one read and one write per coordinate,
     /// no arithmetic, the octave bound unchanged.
-    pub fn shape_carry(&self, rows: usize, width: usize, input_octaves: u32) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_carry(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "carry";
         let count = (rows * width) as u64;
         let mut work = ExactWork::nothing();
@@ -1496,20 +2043,30 @@ impl<'chart> ResidentSurface<'chart> {
     /// indices, sorted and deduplicated, uploaded before the capture opens — are allocated here;
     /// the capture opens with the memset that zeroes the census. Nothing launches until
     /// [`ResidentPassage::launch`].
-    pub fn begin_passage(&'chart self, lineage: &[Vec<usize>]) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
+    pub fn begin_passage(
+        &'chart self,
+        lineage: &[Vec<usize>],
+    ) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
         self.begin_passage_scheduled(lineage, Schedule::CoPresent)
     }
 
     /// The same passage bound with every occurrence ALSO ordered after the one opened before it —
     /// a total order over the same kernels. A control: the co-present realization and this one
     /// must return one complete receipt, or the interchange claim is refuted physically.
-    pub fn begin_passage_serialized(&'chart self, lineage: &[Vec<usize>]) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
+    pub fn begin_passage_serialized(
+        &'chart self,
+        lineage: &[Vec<usize>],
+    ) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
         self.begin_passage_scheduled(lineage, Schedule::Serialized)
     }
 
     /// Begin a passage under a declared [`Schedule`]. The schedule adds edges; it never removes
     /// the diagram's, and it never changes which slots a kernel reads.
-    pub fn begin_passage_scheduled(&'chart self, lineage: &[Vec<usize>], schedule: Schedule) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
+    pub fn begin_passage_scheduled(
+        &'chart self,
+        lineage: &[Vec<usize>],
+        schedule: Schedule,
+    ) -> Result<PassageBuilder<'chart>, ResidentRefusal> {
         self.context.make_current()?;
         let occurrences = lineage.len();
         let mut declared: Vec<Vec<usize>> = Vec::with_capacity(occurrences);
@@ -1521,7 +2078,12 @@ impl<'chart> ResidentSurface<'chart> {
             sorted.dedup();
             for producer in &sorted {
                 if *producer >= index {
-                    return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} declares predecessor {producer}, which is not earlier in the passage") });
+                    return Err(ResidentRefusal::Declaration {
+                        operation: "passage",
+                        what: format!(
+                            "occurrence {index} declares predecessor {producer}, which is not earlier in the passage"
+                        ),
+                    });
                 }
             }
             offsets.push((flat.len(), sorted.len()));
@@ -1571,14 +2133,36 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(self.module.function(symbol)?)
     }
 
-    fn flat_grid(&self, count: usize, operation: &'static str) -> Result<(Dim3, Dim3), ResidentRefusal> {
-        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture { operation, rows: count, width: 1 })?;
-        let grid = self.launch.grid_for(count32.max(1)).map_err(|_| ResidentRefusal::GridAperture { operation, rows: count, width: 1 })?;
+    fn flat_grid(
+        &self,
+        count: usize,
+        operation: &'static str,
+    ) -> Result<(Dim3, Dim3), ResidentRefusal> {
+        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture {
+            operation,
+            rows: count,
+            width: 1,
+        })?;
+        let grid =
+            self.launch
+                .grid_for(count32.max(1))
+                .map_err(|_| ResidentRefusal::GridAperture {
+                    operation,
+                    rows: count,
+                    width: 1,
+                })?;
         Ok((Dim3::x(grid), Dim3::x(self.launch.block_x)))
     }
 
     /// Record one flat kernel onto a lane. Counted as a captured launch.
-    fn record_flat(&self, lane: &Lane<'_, 'chart>, symbol: &str, count: usize, params: &mut Params, operation: &'static str) -> Result<(), ResidentRefusal> {
+    fn record_flat(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        symbol: &str,
+        count: usize,
+        params: &mut Params,
+        operation: &'static str,
+    ) -> Result<(), ResidentRefusal> {
         let function = self.function(symbol)?;
         let (grid, block) = self.flat_grid(count, operation)?;
         let mut pointers = params.pointers();
@@ -1587,14 +2171,37 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(())
     }
 
-    fn record_blocks(&self, lane: &Lane<'_, 'chart>, symbol: &str, blocks: usize, block: u32, shared: u32, params: &mut Params, operation: &'static str) -> Result<(), ResidentRefusal> {
+    fn record_blocks(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        symbol: &str,
+        blocks: usize,
+        block: u32,
+        shared: u32,
+        params: &mut Params,
+        operation: &'static str,
+    ) -> Result<(), ResidentRefusal> {
         let function = self.function(symbol)?;
-        let blocks32 = u32::try_from(blocks).map_err(|_| ResidentRefusal::GridAperture { operation, rows: blocks, width: 1 })?;
+        let blocks32 = u32::try_from(blocks).map_err(|_| ResidentRefusal::GridAperture {
+            operation,
+            rows: blocks,
+            width: 1,
+        })?;
         if blocks32 > self.launch.max_grid_x {
-            return Err(ResidentRefusal::GridAperture { operation, rows: blocks, width: 1 });
+            return Err(ResidentRefusal::GridAperture {
+                operation,
+                rows: blocks,
+                width: 1,
+            });
         }
         let mut pointers = params.pointers();
-        function.launch_on_shared(lane.stream, Dim3::x(blocks32.max(1)), Dim3::x(block), shared, &mut pointers)?;
+        function.launch_on_shared(
+            lane.stream,
+            Dim3::x(blocks32.max(1)),
+            Dim3::x(block),
+            shared,
+            &mut pointers,
+        )?;
         self.census.borrow_mut().captured_launches += 1;
         Ok(())
     }
@@ -1602,23 +2209,68 @@ impl<'chart> ResidentSurface<'chart> {
     // Each `record_*` writes one occurrence's semantic kernel onto its lane. The parameter layout
     // is the kernel's signature, in order.
 
-    pub fn record_enter(&self, lane: &Lane<'_, 'chart>, staged: &StagedWords<'chart>, scale: Dyadic, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_enter(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        staged: &StagedWords<'chart>,
+        scale: Dyadic,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let count = staged.rows * staged.width;
         if count != out.count() {
-            return Err(ResidentRefusal::Ragged { operation: "enter", words: count, rows: out.rows, width: out.width });
+            return Err(ResidentRefusal::Ragged {
+                operation: "enter",
+                words: count,
+                rows: out.rows,
+                width: out.width,
+            });
         }
         let mut params = Params::new();
-        params.ptr(staged.buffer.device_ptr()).u32(count as u32).i64(scale.significand).i32(scale.exponent).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(staged.buffer.device_ptr())
+            .u32(count as u32)
+            .i64(scale.significand)
+            .i32(scale.exponent)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         self.record_flat(lane, "section_from_bfloat16", count, &mut params, "enter")
     }
 
-    pub fn record_contract(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, map: &MountedReadout<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_contract(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        map: &MountedReadout<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32)
-            .ptr(map.raw_resident()).i32(map.exponent()).u32(map.rows() as u32).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_contract", input.rows * map.rows(), &mut params, "contract")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(map.raw_resident())
+            .i32(map.exponent())
+            .u32(map.rows() as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_contract",
+            input.rows * map.rows(),
+            &mut params,
+            "contract",
+        )
     }
 
     /// Record the rank-one junction as one device kernel.  The parameter order mirrors the
@@ -1634,123 +2286,434 @@ impl<'chart> ResidentSurface<'chart> {
     ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
         params
-            .ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr())
-            .u32(input.rows as u32).u32(input.width as u32)
-            .ptr(u.raw_resident()).i32(u.exponent()).u32(u.rows() as u32)
-            .ptr(v.raw_resident()).i32(v.exponent()).u32(v.dim() as u32)
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(u.raw_resident())
+            .i32(u.exponent())
+            .u32(u.rows() as u32)
+            .ptr(v.raw_resident())
+            .i32(v.exponent())
+            .u32(v.dim() as u32)
             .i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         // The factorized kernel is one block per input row; its shape's block and shared extent
         // are therefore part of the record rather than inferred from the final output count.
-        self.record_blocks(lane, "section_factorized_contract", input.rows, shape.block, shape.shared_octets, &mut params, "factorized-contract")
+        self.record_blocks(
+            lane,
+            "section_factorized_contract",
+            input.rows,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "factorized-contract",
+        )
     }
 
-    pub fn record_rms_rebase(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, group: usize, gain: Option<&MountedReadout<'chart>>, eps: Dyadic, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_rms_rebase(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        group: usize,
+        gain: Option<&MountedReadout<'chart>>,
+        eps: Dyadic,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(group as u32)
-            .ptr(gain.map(MountedReadout::raw_resident).unwrap_or(0)).i32(gain.map(MountedReadout::exponent).unwrap_or(0))
-            .i64(eps.significand).i32(eps.exponent).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(group as u32)
+            .ptr(gain.map(MountedReadout::raw_resident).unwrap_or(0))
+            .i32(gain.map(MountedReadout::exponent).unwrap_or(0))
+            .i64(eps.significand)
+            .i32(eps.exponent)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         let blocks = input.rows * (input.width / group);
-        self.record_blocks(lane, "section_rms_rebase", blocks, shape.block, shape.shared_octets, &mut params, "rms-rebase")
+        self.record_blocks(
+            lane,
+            "section_rms_rebase",
+            blocks,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "rms-rebase",
+        )
     }
 
-    pub fn record_chronology(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, heads: usize, head_width: usize, bands: &BandElements<'chart>, positions: &Positions<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_chronology(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        heads: usize,
+        head_width: usize,
+        bands: &BandElements<'chart>,
+        positions: &Positions<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(heads as u32).u32(head_width as u32)
-            .ptr(bands.cos_lo.device_ptr()).ptr(bands.cos_hi.device_ptr()).ptr(bands.sin_lo.device_ptr()).ptr(bands.sin_hi.device_ptr())
-            .i32(bands.grain as i32).ptr(positions.buffer.device_ptr()).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_chronology", input.rows * heads * (head_width / 2), &mut params, "chronology")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(heads as u32)
+            .u32(head_width as u32)
+            .ptr(bands.cos_lo.device_ptr())
+            .ptr(bands.cos_hi.device_ptr())
+            .ptr(bands.sin_lo.device_ptr())
+            .ptr(bands.sin_hi.device_ptr())
+            .i32(bands.grain as i32)
+            .ptr(positions.buffer.device_ptr())
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_chronology",
+            input.rows * heads * (head_width / 2),
+            &mut params,
+            "chronology",
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn record_contact(&self, lane: &Lane<'_, 'chart>, q: &ResidentSection<'chart>, k: &ResidentSection<'chart>, v: &ResidentSection<'chart>, heads: usize, kv_heads: usize, head_width: usize, window: usize, terms: SeriesAperture, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_contact(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        q: &ResidentSection<'chart>,
+        k: &ResidentSection<'chart>,
+        v: &ResidentSection<'chart>,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        terms: SeriesAperture,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(q.lo.device_ptr()).ptr(q.hi.device_ptr()).ptr(k.lo.device_ptr()).ptr(k.hi.device_ptr()).ptr(v.lo.device_ptr()).ptr(v.hi.device_ptr())
-            .u32(q.rows as u32).u32(heads as u32).u32(kv_heads as u32).u32(head_width as u32).u32(window.max(1) as u32)
-            .i32(out.grain.0 as i32).u32(terms.0)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.slot + 4).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane, "section_contact", q.rows * heads, shape.block, shape.shared_octets, &mut params, "contact")
+        params
+            .ptr(q.lo.device_ptr())
+            .ptr(q.hi.device_ptr())
+            .ptr(k.lo.device_ptr())
+            .ptr(k.hi.device_ptr())
+            .ptr(v.lo.device_ptr())
+            .ptr(v.hi.device_ptr())
+            .u32(q.rows as u32)
+            .u32(heads as u32)
+            .u32(kv_heads as u32)
+            .u32(head_width as u32)
+            .u32(window.max(1) as u32)
+            .i32(out.grain.0 as i32)
+            .u32(terms.0)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.slot + 4)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_contact",
+            q.rows * heads,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "contact",
+        )
     }
 
-    pub fn record_gelu_tanh(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, c1: Dyadic, c2: Dyadic, terms: SeriesAperture, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_gelu_tanh(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        c1: Dyadic,
+        c2: Dyadic,
+        terms: SeriesAperture,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.count() as u32)
-            .i64(c1.significand).i32(c1.exponent).i64(c2.significand).i32(c2.exponent).i32(out.grain.0 as i32).u32(terms.0)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_gelu_tanh", input.count(), &mut params, "gelu-tanh")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.count() as u32)
+            .i64(c1.significand)
+            .i32(c1.exponent)
+            .i64(c2.significand)
+            .i32(c2.exponent)
+            .i32(out.grain.0 as i32)
+            .u32(terms.0)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_gelu_tanh",
+            input.count(),
+            &mut params,
+            "gelu-tanh",
+        )
     }
 
-    pub fn record_hadamard(&self, lane: &Lane<'_, 'chart>, a: &ResidentSection<'chart>, b: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_hadamard(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        a: &ResidentSection<'chart>,
+        b: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(a.lo.device_ptr()).ptr(a.hi.device_ptr()).ptr(b.lo.device_ptr()).ptr(b.hi.device_ptr()).u32(a.count() as u32).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(a.lo.device_ptr())
+            .ptr(a.hi.device_ptr())
+            .ptr(b.lo.device_ptr())
+            .ptr(b.hi.device_ptr())
+            .u32(a.count() as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         self.record_flat(lane, "section_hadamard", a.count(), &mut params, "hadamard")
     }
 
-    pub fn record_re_entry(&self, lane: &Lane<'_, 'chart>, a: &ResidentSection<'chart>, b: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_re_entry(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        a: &ResidentSection<'chart>,
+        b: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(a.lo.device_ptr()).ptr(a.hi.device_ptr()).ptr(b.lo.device_ptr()).ptr(b.hi.device_ptr()).u32(a.count() as u32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(a.lo.device_ptr())
+            .ptr(a.hi.device_ptr())
+            .ptr(b.lo.device_ptr())
+            .ptr(b.hi.device_ptr())
+            .u32(a.count() as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         self.record_flat(lane, "section_re_entry", a.count(), &mut params, "re-entry")
     }
 
-    pub fn record_scale(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, by: DyadicEnclosure, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_scale(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        by: DyadicEnclosure,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.count() as u32).i64(by.lo).i64(by.hi).i32(by.grain as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.count() as u32)
+            .i64(by.lo)
+            .i64(by.hi)
+            .i32(by.grain as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         self.record_flat(lane, "section_scale", input.count(), &mut params, "scale")
     }
 
-    pub fn record_withdraw_columns(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, from: usize, span: usize, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_withdraw_columns(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        from: usize,
+        span: usize,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(from as u32).u32(span as u32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_withdraw_columns", input.count(), &mut params, "withdraw-columns")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(from as u32)
+            .u32(span as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_withdraw_columns",
+            input.count(),
+            &mut params,
+            "withdraw-columns",
+        )
     }
 
-    pub fn record_withdraw_rows(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, from: usize, span: usize, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_withdraw_rows(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        from: usize,
+        span: usize,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(from as u32).u32(span as u32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_withdraw_rows", input.count(), &mut params, "withdraw-rows")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(from as u32)
+            .u32(span as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_withdraw_rows",
+            input.count(),
+            &mut params,
+            "withdraw-rows",
+        )
     }
 
     /// Record the block-permutation intervention; `permutation` is a mounted positions-like array of
     /// block indices (see [`ResidentSurface::mount_positions`]).
-    pub fn record_permute_columns(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, block: usize, permutation: &Positions<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_permute_columns(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        block: usize,
+        permutation: &Positions<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32).u32(block as u32).ptr(permutation.device_ptr())
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_permute_columns", input.count(), &mut params, "permute-columns")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(block as u32)
+            .ptr(permutation.device_ptr())
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_permute_columns",
+            input.count(),
+            &mut params,
+            "permute-columns",
+        )
     }
 
-    pub fn record_collapse_control(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_collapse_control(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.count() as u32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_collapse_control", input.count(), &mut params, "collapse-control")
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.count() as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_collapse_control",
+            input.count(),
+            &mut params,
+            "collapse-control",
+        )
     }
 
     /// Record the carry of a resident standing into `out`.
-    pub fn record_carry(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_carry(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         if input.rows() != out.rows() || input.width() != out.width() {
-            return Err(ResidentRefusal::RowsDisagree { operation: "carry", left: input.rows() * input.width(), right: out.rows() * out.width() });
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "carry",
+                left: input.rows() * input.width(),
+                right: out.rows() * out.width(),
+            });
         }
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(out.count() as u32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(out.count() as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         self.record_flat(lane, "section_carry", out.count(), &mut params, "carry")
     }
 
     /// The census of one written section into the occurrence's slot, and the a-priori bound it was
     /// admitted under, which the census compares against.
-    fn record_census(&self, lane: &Lane<'_, 'chart>, out: &ResidentSection<'chart>, admitted_octaves: u32) -> Result<(), ResidentRefusal> {
+    fn record_census(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        out: &ResidentSection<'chart>,
+        admitted_octaves: u32,
+    ) -> Result<(), ResidentRefusal> {
         self.refuse_partial_warp_block("census")?;
         let mut params = Params::new();
-        params.ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).u32(out.count() as u32).u32(admitted_octaves).ptr(lane.slot);
+        params
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .u32(out.count() as u32)
+            .u32(admitted_octaves)
+            .ptr(lane.slot);
         self.record_flat(lane, "section_census", out.count(), &mut params, "census")
     }
 
@@ -1758,12 +2721,30 @@ impl<'chart> ResidentSurface<'chart> {
     /// writing the midpoints over the predecessor's own words. Recorded by the passage rather than
     /// by the law, because the fusion is the passage's apparatus compression and the a-priori bound
     /// the census compares against is the passage's reading.
-    pub fn record_midpoint_seal(&self, lane: &Lane<'_, 'chart>, predecessor: &ResidentSection<'chart>, admitted_octaves: u32) -> Result<(), ResidentRefusal> {
+    pub fn record_midpoint_seal(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        predecessor: &ResidentSection<'chart>,
+        admitted_octaves: u32,
+    ) -> Result<(), ResidentRefusal> {
         self.refuse_partial_warp_block("midpoint-quotient(fused seal)")?;
         let mut params = Params::new();
-        params.ptr(predecessor.lo.device_ptr()).ptr(predecessor.hi.device_ptr()).u32(predecessor.count() as u32).u32(admitted_octaves)
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_midpoint_seal", predecessor.count(), &mut params, "midpoint-quotient(fused seal)")
+        params
+            .ptr(predecessor.lo.device_ptr())
+            .ptr(predecessor.hi.device_ptr())
+            .u32(predecessor.count() as u32)
+            .u32(admitted_octaves)
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_midpoint_seal",
+            predecessor.count(),
+            &mut params,
+            "midpoint-quotient(fused seal)",
+        )
     }
 
     /// A warp fold with an incomplete mask is undefined, so a block that is not a whole number of
@@ -1775,7 +2756,10 @@ impl<'chart> ResidentSurface<'chart> {
         if self.launch.block_x % warp != 0 || self.launch.block_x / warp > CENSUS_MAX_WARPS {
             return Err(ResidentRefusal::Declaration {
                 operation,
-                what: format!("the block-aggregated census needs a whole number of warps, at most {CENSUS_MAX_WARPS}; the derived block is {} at warp {warp}", self.launch.block_x),
+                what: format!(
+                    "the block-aggregated census needs a whole number of warps, at most {CENSUS_MAX_WARPS}; the derived block is {} at warp {warp}",
+                    self.launch.block_x
+                ),
             });
         }
         Ok(())
@@ -1785,14 +2769,31 @@ impl<'chart> ResidentSurface<'chart> {
     /// rather than argues. `entry_refused` is the refusal word the slot carries when the census
     /// enters, so a poisoned lineage can be exhibited under both forms. Launched directly and
     /// synchronized, outside any passage, and counted as such.
-    pub fn census_both(&self, section: &ResidentSection<'chart>, admitted_octaves: u32, entry_refused: u32) -> Result<(SlotReading, SlotReading), ResidentRefusal> {
-        let aggregated = self.census_once("section_census", section, admitted_octaves, entry_refused)?;
-        let control = self.census_once("section_census_serial_control", section, admitted_octaves, entry_refused)?;
+    pub fn census_both(
+        &self,
+        section: &ResidentSection<'chart>,
+        admitted_octaves: u32,
+        entry_refused: u32,
+    ) -> Result<(SlotReading, SlotReading), ResidentRefusal> {
+        let aggregated =
+            self.census_once("section_census", section, admitted_octaves, entry_refused)?;
+        let control = self.census_once(
+            "section_census_serial_control",
+            section,
+            admitted_octaves,
+            entry_refused,
+        )?;
         Ok((aggregated, control))
     }
 
     /// One census kernel on one section, into a fresh slot seeded with `entry_refused`.
-    pub fn census_once(&self, symbol: &str, section: &ResidentSection<'chart>, admitted_octaves: u32, entry_refused: u32) -> Result<SlotReading, ResidentRefusal> {
+    pub fn census_once(
+        &self,
+        symbol: &str,
+        section: &ResidentSection<'chart>,
+        admitted_octaves: u32,
+        entry_refused: u32,
+    ) -> Result<SlotReading, ResidentRefusal> {
         self.context.make_current()?;
         let slot = self.alloc::<u32>(SLOT_WORDS)?;
         let mut words = vec![0u32; SLOT_WORDS];
@@ -1800,13 +2801,35 @@ impl<'chart> ResidentSurface<'chart> {
         slot.copy_from_slice(&words)?;
         let count = section.count();
         let mut params = Params::new();
-        params.ptr(section.lo.device_ptr()).ptr(section.hi.device_ptr()).u32(count as u32).u32(admitted_octaves).ptr(slot.device_ptr());
+        params
+            .ptr(section.lo.device_ptr())
+            .ptr(section.hi.device_ptr())
+            .u32(count as u32)
+            .u32(admitted_octaves)
+            .ptr(slot.device_ptr());
         let function = self.function(symbol)?;
-        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture { operation: "census", rows: count, width: 1 })?;
-        let grid = self.launch.grid_for(count32.max(1)).map_err(|_| ResidentRefusal::GridAperture { operation: "census", rows: count, width: 1 })?;
+        let count32 = u32::try_from(count).map_err(|_| ResidentRefusal::GridAperture {
+            operation: "census",
+            rows: count,
+            width: 1,
+        })?;
+        let grid =
+            self.launch
+                .grid_for(count32.max(1))
+                .map_err(|_| ResidentRefusal::GridAperture {
+                    operation: "census",
+                    rows: count,
+                    width: 1,
+                })?;
         let stream = Stream::create()?;
         let mut pointers = params.pointers();
-        function.launch_on_shared(&stream, Dim3::x(grid), Dim3::x(self.launch.block_x), 0, &mut pointers)?;
+        function.launch_on_shared(
+            &stream,
+            Dim3::x(grid),
+            Dim3::x(self.launch.block_x),
+            0,
+            &mut pointers,
+        )?;
         stream.synchronize()?;
         slot.copy_to_slice(&mut words)?;
         {
@@ -1826,10 +2849,19 @@ impl<'chart> ResidentSurface<'chart> {
     /// per-operand refusal words. A control, outside any passage; launched directly and
     /// synchronized, and counted as such.
     #[allow(clippy::type_complexity)]
-    pub fn arithmetic_control(&self, a: &[i64], b: &[i64], s: &[i32], span: &[i64]) -> Result<(Vec<[i128; 10]>, Vec<u32>), ResidentRefusal> {
+    pub fn arithmetic_control(
+        &self,
+        a: &[i64],
+        b: &[i64],
+        s: &[i32],
+        span: &[i64],
+    ) -> Result<(Vec<[i128; 10]>, Vec<u32>), ResidentRefusal> {
         let n = a.len();
         if b.len() != n || s.len() != n || span.len() != n {
-            return Err(ResidentRefusal::Declaration { operation: "arithmetic-control", what: "operand arrays of unequal length".to_owned() });
+            return Err(ResidentRefusal::Declaration {
+                operation: "arithmetic-control",
+                what: "operand arrays of unequal length".to_owned(),
+            });
         }
         self.context.make_current()?;
         let a_dev = self.alloc::<i64>(n)?;
@@ -1844,7 +2876,14 @@ impl<'chart> ResidentSurface<'chart> {
         span_dev.copy_from_slice(span)?;
         refused.copy_from_slice(&vec![0u32; n.max(1)])?;
         let mut params = Params::new();
-        params.ptr(a_dev.device_ptr()).ptr(b_dev.device_ptr()).ptr(s_dev.device_ptr()).ptr(span_dev.device_ptr()).u32(n as u32).ptr(out.device_ptr()).ptr(refused.device_ptr());
+        params
+            .ptr(a_dev.device_ptr())
+            .ptr(b_dev.device_ptr())
+            .ptr(s_dev.device_ptr())
+            .ptr(span_dev.device_ptr())
+            .u32(n as u32)
+            .ptr(out.device_ptr())
+            .ptr(refused.device_ptr());
         let function = self.function("section_arithmetic_control")?;
         let (grid, block) = self.flat_grid(n, "arithmetic-control")?;
         let stream = Stream::create()?;
@@ -1914,23 +2953,51 @@ impl<'chart> ResidentSurface<'chart> {
     /// `input_octaves + entry_octaves + ceil_log2(inner) + 1` is subset-monotone, so no tree over
     /// any K-partition can widen it and no new admission law is needed. What the tile adds is
     /// apparatus: the block, the dynamic shared extent and the launch count.
-    pub fn shape_contract_tiled(&self, rows: usize, inner: usize, input_octaves: u32, map: &MountedReadout<'chart>, tile: TileGeometry) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_contract_tiled(
+        &self,
+        rows: usize,
+        inner: usize,
+        input_octaves: u32,
+        map: &MountedReadout<'chart>,
+        tile: TileGeometry,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "contract-tiled";
         if inner != map.dim() {
-            return Err(ResidentRefusal::WidthDisagrees { operation: OPERATION, left: inner, right: map.dim() });
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: inner,
+                right: map.dim(),
+            });
         }
         let out_width = map.rows();
-        tile.admit(OPERATION, self.launch.block_x, self.launch.warp, self.max_shared_octets)?;
+        tile.admit(
+            OPERATION,
+            self.launch.block_x,
+            self.launch.warp,
+            self.max_shared_octets,
+        )?;
         let needed = input_octaves + map.entry_octaves() + ceil_log2(inner) + 1;
         Self::admit_octaves(OPERATION, needed)?;
         let blocks = tile.blocks(rows, out_width);
         if blocks > u64::from(self.launch.max_grid_x) {
-            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows, width: out_width });
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width: out_width,
+            });
         }
-        let mut work = ExactWork::predicted_product(rows, inner, out_width, u64::from(input_octaves.max(map.entry_octaves())));
+        let mut work = ExactWork::predicted_product(
+            rows,
+            inner,
+            out_width,
+            u64::from(input_octaves.max(map.entry_octaves())),
+        );
         work.entries_written = BigUint::from(2 * (rows * out_width) as u64);
         work.resident(2 * (rows * out_width) as u64);
-        let peak = u64::from(input_octaves) + u64::from(map.entry_octaves()) + u64::from(ceil_log2(inner)) + 1;
+        let peak = u64::from(input_octaves)
+            + u64::from(map.entry_octaves())
+            + u64::from(ceil_log2(inner))
+            + 1;
         work.peak_bits = BigUint::from(peak);
         work.cumulative_bits = BigUint::from(2 * (rows * out_width) as u64 * peak);
         // The dependency span the geometry realizes: the serial K a lane walks, then the lane tree,
@@ -1938,7 +3005,11 @@ impl<'chart> ResidentSurface<'chart> {
         let lanes = u64::from(tile.lanes);
         let splits = u64::from(tile.splits.max(1));
         let serial = (inner as u64).div_ceil(lanes * splits);
-        work.dependency_span = BigUint::from(serial + u64::from(ceil_log2(tile.lanes as usize)) + u64::from(ceil_log2(tile.splits.max(1) as usize)));
+        work.dependency_span = BigUint::from(
+            serial
+                + u64::from(ceil_log2(tile.lanes as usize))
+                + u64::from(ceil_log2(tile.splits.max(1) as usize)),
+        );
         let couplings = vec![CouplingPlan {
             coupling: "the inner contraction over K, folded by a fixed lane tree inside one block",
             kernel: tile.symbol(OPERATION)?,
@@ -1947,43 +3018,82 @@ impl<'chart> ResidentSurface<'chart> {
             predicted: {
                 let mut reduction = ExactWork::nothing();
                 reduction.added((rows * out_width) as u64 * (inner as u64));
-                reduction.dependency_span = BigUint::from(serial + u64::from(ceil_log2(tile.lanes as usize)));
+                reduction.dependency_span =
+                    BigUint::from(serial + u64::from(ceil_log2(tile.lanes as usize)));
                 reduction
             },
         }];
         // K-complete: the semantic kernel and its census. Split-K: the partial, the join, the census.
         let launches = if tile.splits > 1 { 3 } else { 2 };
-        Ok(LawShape { operation: OPERATION, rows, width: out_width, needed, predicted: work, couplings, launches, shared_octets: tile.shared_octets(), block: tile.block() })
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width: out_width,
+            needed,
+            predicted: work,
+            couplings,
+            launches,
+            shared_octets: tile.shared_octets(),
+            block: tile.block(),
+        })
     }
 
     /// **Retain one split-K partial standing on the card.** `4` exact `i64` words per output
     /// coordinate per partial: the low and high halves of the lower accumulator, then of the upper.
     /// Nothing here is at the grain and nothing here is rounded.
-    pub fn retain_partials(&self, rows: usize, out_width: usize, splits: u32) -> Result<PartialStanding, ResidentRefusal> {
+    pub fn retain_partials(
+        &self,
+        rows: usize,
+        out_width: usize,
+        splits: u32,
+    ) -> Result<PartialStanding, ResidentRefusal> {
         if splits == 0 || !splits.is_power_of_two() || splits > 16 {
-            return Err(ResidentRefusal::Declaration { operation: "contract-split-k", what: format!("a split factor of {splits} is not a power of two in 1..=16") });
+            return Err(ResidentRefusal::Declaration {
+                operation: "contract-split-k",
+                what: format!("a split factor of {splits} is not a power of two in 1..=16"),
+            });
         }
         let words = 4 * rows * out_width * splits as usize;
         let buffer = self.alloc::<i64>(words)?;
         let pointer = buffer.device_ptr();
         let mut held = self.partials.borrow_mut();
         held.push(buffer);
-        Ok(PartialStanding { index: held.len() - 1, pointer, rows, out_width, splits, words })
+        Ok(PartialStanding {
+            index: held.len() - 1,
+            pointer,
+            rows,
+            out_width,
+            splits,
+            words,
+        })
     }
 
     /// Read one retained partial standing back as its exact 128-bit accumulations, indexed
     /// `((a * rows) + row) * out_width + column`. The CPU-side replay of the declared join tree
     /// runs on exactly these words.
-    pub fn read_partials(&self, standing: &PartialStanding) -> Result<Vec<(i128, i128)>, ResidentRefusal> {
+    pub fn read_partials(
+        &self,
+        standing: &PartialStanding,
+    ) -> Result<Vec<(i128, i128)>, ResidentRefusal> {
         let held = self.partials.borrow();
-        let buffer = held.get(standing.index).ok_or_else(|| ResidentRefusal::Declaration { operation: "contract-split-k", what: "a partial standing this surface does not hold".to_owned() })?;
+        let buffer = held
+            .get(standing.index)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "contract-split-k",
+                what: "a partial standing this surface does not hold".to_owned(),
+            })?;
         let mut words = vec![0i64; standing.words];
         buffer.copy_to_slice(&mut words)?;
         self.census.borrow_mut().egress_receipt_octets += (standing.words * 8) as u64;
         Ok((0..standing.words / 4)
             .map(|p| {
-                let compose = |low: i64, high: i64| -> i128 { (((high as u64 as u128) << 64) | (low as u64 as u128)) as i128 };
-                (compose(words[4 * p], words[4 * p + 1]), compose(words[4 * p + 2], words[4 * p + 3]))
+                let compose = |low: i64, high: i64| -> i128 {
+                    (((high as u64 as u128) << 64) | (low as u64 as u128)) as i128
+                };
+                (
+                    compose(words[4 * p], words[4 * p + 1]),
+                    compose(words[4 * p + 2], words[4 * p + 3]),
+                )
             })
             .collect())
     }
@@ -1992,46 +3102,145 @@ impl<'chart> ResidentSurface<'chart> {
     /// inner extent. `tree` selects which fixed word the lanes fold under; `Descending` is the
     /// declared word and `Ascending` is the reversed control.
     #[allow(clippy::too_many_arguments)]
-    pub fn record_contract_tiled(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, map: &MountedReadout<'chart>, tile: TileGeometry, admitted_node_octaves: u32, tree: LaneTree, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_contract_tiled(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        map: &MountedReadout<'chart>,
+        tile: TileGeometry,
+        admitted_node_octaves: u32,
+        tree: LaneTree,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         const OPERATION: &str = "contract-tiled";
         if tile.splits != 1 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("a K-complete record with a split factor of {}", tile.splits) });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("a K-complete record with a split factor of {}", tile.splits),
+            });
         }
         let mut params = Params::new();
-        params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32)
-            .ptr(map.raw_resident()).i32(map.exponent()).u32(map.rows() as u32).i32(out.grain.0 as i32)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
-            .u32(tile.outs_per_block).u32(tile.k_tile).u32(admitted_node_octaves).u32(tree.word())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(map.raw_resident())
+            .i32(map.exponent())
+            .u32(map.rows() as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .u32(tile.outs_per_block)
+            .u32(tile.k_tile)
+            .u32(admitted_node_octaves)
+            .u32(tree.word())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         let blocks = tile.blocks(input.rows, map.rows());
-        self.record_blocks(lane, tile.symbol(OPERATION)?, blocks as usize, tile.block(), tile.shared_octets(), &mut params, OPERATION)
+        self.record_blocks(
+            lane,
+            tile.symbol(OPERATION)?,
+            blocks as usize,
+            tile.block(),
+            tile.shared_octets(),
+            &mut params,
+            OPERATION,
+        )
     }
 
     /// Record the split-K pair onto one lane: the exact 128-bit partial, then the join that folds
     /// the partials under the fixed balanced word and performs THE ONE OUTWARD ROUNDING. Both are
     /// one occurrence — one law, one output section, one census — recorded in order on one stream.
     #[allow(clippy::too_many_arguments)]
-    pub fn record_contract_split_k(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, map: &MountedReadout<'chart>, tile: TileGeometry, standing: &PartialStanding, admitted_node_octaves: u32, tree: LaneTree, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    pub fn record_contract_split_k(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        map: &MountedReadout<'chart>,
+        tile: TileGeometry,
+        standing: &PartialStanding,
+        admitted_node_octaves: u32,
+        tree: LaneTree,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         const OPERATION: &str = "contract-split-k";
         if tile.splits <= 1 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: "a split-K record with no split".to_owned() });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: "a split-K record with no split".to_owned(),
+            });
         }
-        if standing.rows != input.rows || standing.out_width != map.rows() || standing.splits != tile.splits {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("the partial standing is {}x{}x{} and the launch is {}x{}x{}", standing.splits, standing.rows, standing.out_width, tile.splits, input.rows, map.rows()) });
+        if standing.rows != input.rows
+            || standing.out_width != map.rows()
+            || standing.splits != tile.splits
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "the partial standing is {}x{}x{} and the launch is {}x{}x{}",
+                    standing.splits,
+                    standing.rows,
+                    standing.out_width,
+                    tile.splits,
+                    input.rows,
+                    map.rows()
+                ),
+            });
         }
         let mut partial_params = Params::new();
-        partial_params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.rows as u32).u32(input.width as u32)
-            .ptr(map.raw_resident()).u32(map.rows() as u32).ptr(standing.pointer)
-            .u32(tile.splits).u32(tile.outs_per_block).u32(tile.k_tile).u32(admitted_node_octaves).u32(tree.word())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        partial_params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(map.raw_resident())
+            .u32(map.rows() as u32)
+            .ptr(standing.pointer)
+            .u32(tile.splits)
+            .u32(tile.outs_per_block)
+            .u32(tile.k_tile)
+            .u32(admitted_node_octaves)
+            .u32(tree.word())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
         let blocks = tile.blocks(input.rows, map.rows());
-        self.record_blocks(lane, tile.symbol(OPERATION)?, blocks as usize, tile.block(), tile.shared_octets(), &mut partial_params, OPERATION)?;
+        self.record_blocks(
+            lane,
+            tile.symbol(OPERATION)?,
+            blocks as usize,
+            tile.block(),
+            tile.shared_octets(),
+            &mut partial_params,
+            OPERATION,
+        )?;
         let mut join_params = Params::new();
-        join_params.ptr(standing.pointer).u32(tile.splits).u32(input.rows as u32).u32(map.rows() as u32)
-            .i32(map.exponent()).i32(out.grain.0 as i32).u32(admitted_node_octaves).u32(tree.word())
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_flat(lane, "section_contract_join", input.rows * map.rows(), &mut join_params, OPERATION)
+        join_params
+            .ptr(standing.pointer)
+            .u32(tile.splits)
+            .u32(input.rows as u32)
+            .u32(map.rows() as u32)
+            .i32(map.exponent())
+            .i32(out.grain.0 as i32)
+            .u32(admitted_node_octaves)
+            .u32(tree.word())
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_contract_join",
+            input.rows * map.rows(),
+            &mut join_params,
+            OPERATION,
+        )
     }
 
     /// **The finite candidate family for one contraction shape, from the device's own attributes
@@ -2039,13 +3248,30 @@ impl<'chart> ResidentSurface<'chart> {
     /// module carries an entry for, whose dynamic shared extent the device admits and whose grid the
     /// device can cover. Nothing here is ordered and nothing here is called optimal — domination is
     /// the caller's declared axis set, and [`non_dominated`] takes it.
-    pub fn contract_candidates(&self, rows: usize, inner: usize, out_width: usize) -> Result<Vec<LaunchCandidate>, ResidentRefusal> {
+    pub fn contract_candidates(
+        &self,
+        rows: usize,
+        inner: usize,
+        out_width: usize,
+    ) -> Result<Vec<LaunchCandidate>, ResidentRefusal> {
         let mut family = Vec::new();
         for tile in TileGeometry::enumerate() {
-            if tile.admit("contract-tiled", self.launch.block_x, self.launch.warp, self.max_shared_octets).is_err() {
+            if tile
+                .admit(
+                    "contract-tiled",
+                    self.launch.block_x,
+                    self.launch.warp,
+                    self.max_shared_octets,
+                )
+                .is_err()
+            {
                 continue;
             }
-            let symbol = match tile.symbol(if tile.splits > 1 { "contract-split-k" } else { "contract-tiled" }) {
+            let symbol = match tile.symbol(if tile.splits > 1 {
+                "contract-split-k"
+            } else {
+                "contract-tiled"
+            }) {
                 Ok(symbol) => symbol,
                 Err(_) => continue,
             };
@@ -2058,13 +3284,26 @@ impl<'chart> ResidentSurface<'chart> {
             let block = tile.block();
             let limits = self.sm_limits;
             let warps = block.div_ceil(limits.warp.max(1)).max(1);
-            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1)) * limits.register_grain.max(1);
+            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1))
+                * limits.register_grain.max(1);
             let by_blocks = limits.max_blocks;
             let by_threads = limits.max_threads / block.max(1);
-            let by_registers = if per_warp == 0 { u32::MAX } else { limits.max_registers / (per_warp * warps).max(1) };
-            let by_shared = if shared == 0 { u32::MAX } else { limits.max_shared_octets / shared };
+            let by_registers = if per_warp == 0 {
+                u32::MAX
+            } else {
+                limits.max_registers / (per_warp * warps).max(1)
+            };
+            let by_shared = if shared == 0 {
+                u32::MAX
+            } else {
+                limits.max_shared_octets / shared
+            };
             let resident = by_blocks.min(by_threads).min(by_registers).min(by_shared);
-            let bound_by = if resident == by_registers && by_registers <= by_shared && by_registers <= by_threads && by_registers <= by_blocks {
+            let bound_by = if resident == by_registers
+                && by_registers <= by_shared
+                && by_registers <= by_threads
+                && by_registers <= by_blocks
+            {
                 "registers"
             } else if resident == by_shared && by_shared <= by_threads && by_shared <= by_blocks {
                 "shared"
@@ -2085,9 +3324,16 @@ impl<'chart> ResidentSurface<'chart> {
                 occupancy: (resident * block, limits.max_threads.max(1)),
                 blocks,
                 residency_waves: (blocks, cover.max(1)),
-                lane_waves: (blocks * u64::from(block), u64::from(limits.max_threads) * u64::from(limits.multiprocessors)),
-                serial_k_per_lane: (inner as u64).div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1))),
-                dependency_span: (inner as u64).div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1))) + u64::from(ceil_log2(tile.lanes as usize)) + u64::from(ceil_log2(tile.splits.max(1) as usize)),
+                lane_waves: (
+                    blocks * u64::from(block),
+                    u64::from(limits.max_threads) * u64::from(limits.multiprocessors),
+                ),
+                serial_k_per_lane: (inner as u64)
+                    .div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1))),
+                dependency_span: (inner as u64)
+                    .div_ceil(u64::from(tile.lanes) * u64::from(tile.splits.max(1)))
+                    + u64::from(ceil_log2(tile.lanes as usize))
+                    + u64::from(ceil_log2(tile.splits.max(1) as usize)),
                 bound_by,
             });
         }
@@ -2103,7 +3349,12 @@ impl<'chart> ResidentSurface<'chart> {
     /// the module carries an entry for, whose staged chain the device admits and whose grid the
     /// device can cover. Nothing here is ordered and nothing is called optimal — domination is the
     /// caller's declared axis set, and [`athena_non_dominated`] takes it.
-    pub fn athena_future_candidates(&self, positions: usize, vocabulary: usize, tree_height: u32) -> Result<Vec<AthenaCandidate>, ResidentRefusal> {
+    pub fn athena_future_candidates(
+        &self,
+        positions: usize,
+        vocabulary: usize,
+        tree_height: u32,
+    ) -> Result<Vec<AthenaCandidate>, ResidentRefusal> {
         const SYMBOL: &str = "athena_future_staged";
         let registers = self.measured_registers(SYMBOL)?;
         let static_shared = self.measured_static_shared(SYMBOL)?;
@@ -2111,7 +3362,15 @@ impl<'chart> ResidentSurface<'chart> {
         let limits = self.sm_limits;
         let mut family = Vec::new();
         for geometry in AthenaFutureGeometry::enumerate() {
-            if geometry.admit("athena-future", self.launch.block_x, self.launch.warp, self.max_shared_octets).is_err() {
+            if geometry
+                .admit(
+                    "athena-future",
+                    self.launch.block_x,
+                    self.launch.warp,
+                    self.max_shared_octets,
+                )
+                .is_err()
+            {
                 continue;
             }
             let blocks = geometry.blocks(positions, vocabulary);
@@ -2121,13 +3380,26 @@ impl<'chart> ResidentSurface<'chart> {
             let shared = geometry.shared_octets() + static_shared;
             let block = geometry.block();
             let warps = block.div_ceil(limits.warp.max(1)).max(1);
-            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1)) * limits.register_grain.max(1);
+            let per_warp = (registers * limits.warp).div_ceil(limits.register_grain.max(1))
+                * limits.register_grain.max(1);
             let by_blocks = limits.max_blocks;
             let by_threads = limits.max_threads / block.max(1);
-            let by_registers = if per_warp == 0 { u32::MAX } else { limits.max_registers / (per_warp * warps).max(1) };
-            let by_shared = if shared == 0 { u32::MAX } else { limits.max_shared_octets / shared };
+            let by_registers = if per_warp == 0 {
+                u32::MAX
+            } else {
+                limits.max_registers / (per_warp * warps).max(1)
+            };
+            let by_shared = if shared == 0 {
+                u32::MAX
+            } else {
+                limits.max_shared_octets / shared
+            };
             let resident = by_blocks.min(by_threads).min(by_registers).min(by_shared);
-            let bound_by = if resident == by_registers && by_registers <= by_shared && by_registers <= by_threads && by_registers <= by_blocks {
+            let bound_by = if resident == by_registers
+                && by_registers <= by_shared
+                && by_registers <= by_threads
+                && by_registers <= by_blocks
+            {
                 "registers"
             } else if resident == by_shared && by_shared <= by_threads && by_shared <= by_blocks {
                 "shared"
@@ -2151,10 +3423,17 @@ impl<'chart> ResidentSurface<'chart> {
                 occupancy: (resident * block, limits.max_threads.max(1)),
                 blocks,
                 residency_waves: (blocks, cover.max(1)),
-                lane_waves: (blocks * u64::from(block), u64::from(limits.max_threads) * u64::from(limits.multiprocessors)),
+                lane_waves: (
+                    blocks * u64::from(block),
+                    u64::from(limits.max_threads) * u64::from(limits.multiprocessors),
+                ),
                 cover_occupied: {
-                    let resident_lanes = u64::from(limits.max_threads) * u64::from(limits.multiprocessors);
-                    ((blocks * u64::from(block)).min(resident_lanes), resident_lanes)
+                    let resident_lanes =
+                        u64::from(limits.max_threads) * u64::from(limits.multiprocessors);
+                    (
+                        (blocks * u64::from(block)).min(resident_lanes),
+                        resident_lanes,
+                    )
                 },
                 chain_reuse: geometry.chain_reuse(),
                 climb_past_stage,
@@ -2168,15 +3447,29 @@ impl<'chart> ResidentSurface<'chart> {
     /// **The native atlas walked**: one warp per prompt, carrying its germs from the root through
     /// compressed-sparse-row transport, falling along the suffix link when a row has no such germ.
     /// Out `positions × 2`: the landed class and the mark.
-    pub fn shape_athena_walk(&self, positions: usize, prompts: usize, classes: usize, transitions: usize, geometry: AthenaWalkGeometry) -> Result<LawShape, ResidentRefusal> {
+    pub fn shape_athena_walk(
+        &self,
+        positions: usize,
+        prompts: usize,
+        classes: usize,
+        transitions: usize,
+        geometry: AthenaWalkGeometry,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "athena-walk";
         if positions == 0 || prompts == 0 || classes == 0 {
-            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{positions} positions over {prompts} prompts and {classes} classes") });
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("{positions} positions over {prompts} prompts and {classes} classes"),
+            });
         }
         geometry.admit(OPERATION, self.launch.block_x, self.launch.warp)?;
         let blocks = geometry.blocks(prompts);
         if blocks > u64::from(self.launch.max_grid_x) {
-            return Err(ResidentRefusal::GridAperture { operation: OPERATION, rows: prompts, width: 1 });
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows: prompts,
+                width: 1,
+            });
         }
         let height = ceil_log2(classes.max(2)) as u64;
         // **The warp's cooperative row search narrows the row by the warp's own extent per round**,
@@ -2185,7 +3478,9 @@ impl<'chart> ResidentSurface<'chart> {
         // another warp would make the literal wrong rather than merely stale.
         let probes = u64::from(self.launch.warp.max(2));
         let per_round = u64::from(ceil_log2(self.launch.warp.max(2) as usize)).max(1);
-        let row_rounds = u64::from(ceil_log2(transitions.max(2))).div_ceil(per_round).max(1);
+        let row_rounds = u64::from(ceil_log2(transitions.max(2)))
+            .div_ceil(per_round)
+            .max(1);
         let mut work = ExactWork::nothing();
         work.additions = BigUint::from(positions as u64 * height * row_rounds * probes);
         work.entries_written = BigUint::from(2 * 2 * positions as u64);
@@ -2223,15 +3518,39 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// **The native future section**: for every position and vocabulary germ, one climb of the
     /// suffix chain with a binary search per class. Out `positions × vocabulary`.
-    pub fn shape_athena_future(&self, positions: usize, vocabulary: usize, classes: usize, transitions: usize, depth_face: bool, geometry: AthenaFutureGeometry) -> Result<LawShape, ResidentRefusal> {
-        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
+    pub fn shape_athena_future(
+        &self,
+        positions: usize,
+        vocabulary: usize,
+        classes: usize,
+        transitions: usize,
+        depth_face: bool,
+        geometry: AthenaFutureGeometry,
+    ) -> Result<LawShape, ResidentRefusal> {
+        let operation: &'static str = if depth_face {
+            "athena-depth"
+        } else {
+            "athena-future"
+        };
         if positions == 0 || vocabulary == 0 || classes == 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("{positions} positions × {vocabulary} germs over {classes} classes") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("{positions} positions × {vocabulary} germs over {classes} classes"),
+            });
         }
-        geometry.admit(operation, self.launch.block_x, self.launch.warp, self.max_shared_octets)?;
+        geometry.admit(
+            operation,
+            self.launch.block_x,
+            self.launch.warp,
+            self.max_shared_octets,
+        )?;
         let blocks = geometry.blocks(positions, vocabulary);
         if blocks > u64::from(self.launch.max_grid_x) {
-            return Err(ResidentRefusal::GridAperture { operation, rows: positions, width: vocabulary });
+            return Err(ResidentRefusal::GridAperture {
+                operation,
+                rows: positions,
+                width: vocabulary,
+            });
         }
         let height = ceil_log2(classes.max(2)) as u64;
         let row = ceil_log2(transitions.max(2)) as u64;
@@ -2245,7 +3564,8 @@ impl<'chart> ResidentSurface<'chart> {
         // One lane's span: its germs, each climbing at most the tree's height with a binary search
         // per class. The staged prefix moves those reads out of global memory; it does not shorten
         // the chain, so the span is the aperture-independent one and the staging shows in residency.
-        work.dependency_span = BigUint::from(u64::from(geometry.germs_per_lane) * (height + 1) * row);
+        work.dependency_span =
+            BigUint::from(u64::from(geometry.germs_per_lane) * (height + 1) * row);
         let couplings = vec![CouplingPlan {
             coupling: "one suffix chain staged in shared and read by every germ lane of its position",
             kernel: "athena_future_staged",
@@ -2253,7 +3573,11 @@ impl<'chart> ResidentSurface<'chart> {
             block: geometry.block(),
             predicted: {
                 let mut reduction = ExactWork::nothing();
-                reduction.added(u64::from(geometry.positions_per_block) * u64::from(geometry.chain_stage) * blocks);
+                reduction.added(
+                    u64::from(geometry.positions_per_block)
+                        * u64::from(geometry.chain_stage)
+                        * blocks,
+                );
                 reduction.dependency_span = BigUint::from(u64::from(geometry.chain_stage));
                 reduction
             },
@@ -2290,7 +3614,12 @@ impl<'chart> ResidentSurface<'chart> {
     ) -> Result<(), ResidentRefusal> {
         const OPERATION: &str = "athena-walk";
         if out.rows() != prompt.rows() || out.width() != 2 {
-            return Err(ResidentRefusal::Ragged { operation: OPERATION, words: prompt.rows() * 2, rows: out.rows, width: out.width });
+            return Err(ResidentRefusal::Ragged {
+                operation: OPERATION,
+                words: prompt.rows() * 2,
+                rows: out.rows,
+                width: out.width,
+            });
         }
         let prompts = offsets.rows().saturating_sub(1);
         let mut params = Params::new();
@@ -2312,7 +3641,15 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(lane.lineage)
             .u32(lane.lineage_count);
         let blocks = geometry.blocks(prompts);
-        self.record_blocks(lane, "athena_walk_cooperative", blocks as usize, geometry.block(self.launch.warp), 0, &mut params, OPERATION)
+        self.record_blocks(
+            lane,
+            "athena_walk_cooperative",
+            blocks as usize,
+            geometry.block(self.launch.warp),
+            0,
+            &mut params,
+            OPERATION,
+        )
     }
 
     /// Record the native future section (standing face, or depth face).
@@ -2332,9 +3669,18 @@ impl<'chart> ResidentSurface<'chart> {
         geometry: AthenaFutureGeometry,
         out: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
-        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
+        let operation: &'static str = if depth_face {
+            "athena-depth"
+        } else {
+            "athena-future"
+        };
         if walk.width() != 2 || out.rows() != walk.rows() || out.width() != vocabulary {
-            return Err(ResidentRefusal::Ragged { operation, words: walk.rows() * vocabulary, rows: out.rows, width: out.width });
+            return Err(ResidentRefusal::Ragged {
+                operation,
+                words: walk.rows() * vocabulary,
+                rows: out.rows,
+                width: out.width,
+            });
         }
         let mut params = Params::new();
         params
@@ -2358,10 +3704,17 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(lane.lineage)
             .u32(lane.lineage_count);
         let blocks = geometry.blocks(walk.rows(), vocabulary);
-        self.record_blocks(lane, "athena_future_staged", blocks as usize, geometry.block(), geometry.shared_octets(), &mut params, operation)
+        self.record_blocks(
+            lane,
+            "athena_future_staged",
+            blocks as usize,
+            geometry.block(),
+            geometry.shared_octets(),
+            &mut params,
+            operation,
+        )
     }
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // the tiled contraction's apparatus geometry — a caller's declaration, never a semantic level
@@ -2416,28 +3769,66 @@ impl TileGeometry {
             (true, 4, 32) => Some("section_contract_partial_r4_l32"),
             _ => None,
         };
-        emitted.ok_or(ResidentRefusal::Declaration { operation, what: format!("no entry is emitted for {self:?}; the family is the one the module carries") })
+        emitted.ok_or(ResidentRefusal::Declaration {
+            operation,
+            what: format!(
+                "no entry is emitted for {self:?}; the family is the one the module carries"
+            ),
+        })
     }
     /// Refuse a geometry the device or the module cannot carry, naming which aperture refused.
-    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32, shared_ceiling: u32) -> Result<(), ResidentRefusal> {
+    pub fn admit(
+        &self,
+        operation: &'static str,
+        block_ceiling: u32,
+        warp: u32,
+        shared_ceiling: u32,
+    ) -> Result<(), ResidentRefusal> {
         if self.lanes == 0 || !self.lanes.is_power_of_two() || self.lanes > warp.max(1) {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("{} lanes is not a power of two inside one warp of {warp}", self.lanes) });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!(
+                    "{} lanes is not a power of two inside one warp of {warp}",
+                    self.lanes
+                ),
+            });
         }
         if self.tile_rows == 0 || self.outs_per_block == 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: "a tile with no rows or no output coordinates".to_owned() });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: "a tile with no rows or no output coordinates".to_owned(),
+            });
         }
         if self.splits == 0 || !self.splits.is_power_of_two() || self.splits > 16 {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a split factor of {} is not a power of two in 1..=16", self.splits) });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!(
+                    "a split factor of {} is not a power of two in 1..=16",
+                    self.splits
+                ),
+            });
         }
         let block = self.block();
         if block == 0 || block % warp.max(1) != 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} is not a whole number of warps of {warp}") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("a block of {block} is not a whole number of warps of {warp}"),
+            });
         }
         if block > block_ceiling {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("a block of {block} exceeds the module's admitted {block_ceiling}"),
+            });
         }
         if self.shared_octets() > shared_ceiling {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a staged tile of {} octets exceeds the device's {shared_ceiling} per block", self.shared_octets()) });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!(
+                    "a staged tile of {} octets exceeds the device's {shared_ceiling} per block",
+                    self.shared_octets()
+                ),
+            });
         }
         self.symbol(operation)?;
         Ok(())
@@ -2448,11 +3839,33 @@ impl TileGeometry {
     /// device.
     pub fn enumerate() -> Vec<TileGeometry> {
         let mut family = Vec::new();
-        for (tile_rows, lanes, splits) in [(1, 32, 1), (2, 32, 1), (4, 32, 1), (1, 16, 1), (4, 16, 1), (1, 8, 1), (1, 32, 2), (1, 32, 4), (1, 32, 8), (1, 32, 16), (4, 32, 2), (4, 32, 4), (4, 32, 8), (4, 32, 16)] {
+        for (tile_rows, lanes, splits) in [
+            (1, 32, 1),
+            (2, 32, 1),
+            (4, 32, 1),
+            (1, 16, 1),
+            (4, 16, 1),
+            (1, 8, 1),
+            (1, 32, 2),
+            (1, 32, 4),
+            (1, 32, 8),
+            (1, 32, 16),
+            (4, 32, 2),
+            (4, 32, 4),
+            (4, 32, 8),
+            (4, 32, 16),
+        ] {
             for outs_per_block in [1u32, 2, 4, 8, 16, 32, 64] {
                 for k_tile in [0u32, 128, 256, 512, 1024] {
-                    let tile = TileGeometry { tile_rows, lanes, outs_per_block, k_tile, splits };
-                    if tile.block() > 512 || tile.block() % 32 != 0 || tile.shared_octets() > 49_152 {
+                    let tile = TileGeometry {
+                        tile_rows,
+                        lanes,
+                        outs_per_block,
+                        k_tile,
+                        splits,
+                    };
+                    if tile.block() > 512 || tile.block() % 32 != 0 || tile.shared_octets() > 49_152
+                    {
                         continue;
                     }
                     family.push(tile);
@@ -2505,7 +3918,14 @@ impl PartialStanding {
     /// read before any surface is mounted. It addresses nothing: `record` refuses it, because the
     /// surface it names holds no buffer at that index.
     pub fn declared(rows: usize, out_width: usize, splits: u32) -> Self {
-        Self { index: usize::MAX, pointer: 0, rows, out_width, splits, words: 4 * rows * out_width * splits as usize }
+        Self {
+            index: usize::MAX,
+            pointer: 0,
+            rows,
+            out_width,
+            splits,
+            words: 4 * rows * out_width * splits as usize,
+        }
     }
     /// The address range the partial occupies — a footprint coordinate, for a receipt.
     pub fn range(&self) -> (u64, u64) {
@@ -2561,7 +3981,10 @@ impl CandidateAxis {
     fn read(&self, candidate: &LaunchCandidate) -> (u128, u128) {
         match self {
             CandidateAxis::ResidentBlocksUp => (u128::from(candidate.resident_blocks), 1),
-            CandidateAxis::OccupancyUp => (u128::from(candidate.occupancy.0), u128::from(candidate.occupancy.1.max(1))),
+            CandidateAxis::OccupancyUp => (
+                u128::from(candidate.occupancy.0),
+                u128::from(candidate.occupancy.1.max(1)),
+            ),
             CandidateAxis::MapReuseUp => (u128::from(candidate.tile.tile_rows), 1),
             CandidateAxis::LanesUp => (u128::from(candidate.tile.lanes), 1),
             CandidateAxis::SharedDown => (1, u128::from(candidate.shared_octets) + 1),
@@ -2581,10 +4004,14 @@ impl CandidateAxis {
 /// receiver declared, exactly as a compression's remainder is. Changing the axis set changes the
 /// set, which is the falsifier: a return that did not move under a changed declaration was ranking.
 pub fn non_dominated(family: &[LaunchCandidate], axes: &[CandidateAxis]) -> Vec<usize> {
-    let axes: Vec<Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>> = axes.iter().map(|axis| {
-        let axis = *axis;
-        Box::new(move |candidate: &LaunchCandidate| axis.read(candidate)) as Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>
-    }).collect();
+    let axes: Vec<Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>> = axes
+        .iter()
+        .map(|axis| {
+            let axis = *axis;
+            Box::new(move |candidate: &LaunchCandidate| axis.read(candidate))
+                as Box<dyn Fn(&LaunchCandidate) -> (u128, u128)>
+        })
+        .collect();
     non_dominated_by(family, &axes)
 }
 
@@ -2595,20 +4022,26 @@ pub fn non_dominated(family: &[LaunchCandidate], axes: &[CandidateAxis]) -> Vec<
 /// but the *rule* is the same rule and a second spelling of a Pareto front is how a pre-check and
 /// a guard drift apart. Each axis is a ratio oriented so that GREATER is better; no axis is summed
 /// with another, and changing the declared set changes the returned set.
-pub fn non_dominated_by<C>(family: &[C], axes: &[Box<dyn Fn(&C) -> (u128, u128) + '_>]) -> Vec<usize> {
+pub fn non_dominated_by<C>(
+    family: &[C],
+    axes: &[Box<dyn Fn(&C) -> (u128, u128) + '_>],
+) -> Vec<usize> {
     let ratio_ge = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 >= b.0 * a.1;
     let ratio_gt = |a: (u128, u128), b: (u128, u128)| a.0 * b.1 > b.0 * a.1;
     (0..family.len())
         .filter(|at| {
             !family.iter().enumerate().any(|(other, rival)| {
                 other != *at
-                    && axes.iter().all(|axis| ratio_ge(axis(rival), axis(&family[*at])))
-                    && axes.iter().any(|axis| ratio_gt(axis(rival), axis(&family[*at])))
+                    && axes
+                        .iter()
+                        .all(|axis| ratio_ge(axis(rival), axis(&family[*at])))
+                    && axes
+                        .iter()
+                        .any(|axis| ratio_gt(axis(rival), axis(&family[*at])))
             })
         })
         .collect()
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // the native atlas's launch geometry — a caller's declaration, never a semantic level
@@ -2630,19 +4063,33 @@ impl AthenaWalkGeometry {
     pub fn blocks(&self, prompts: usize) -> u64 {
         (prompts as u64).div_ceil(u64::from(self.warps.max(1)))
     }
-    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32) -> Result<(), ResidentRefusal> {
+    pub fn admit(
+        &self,
+        operation: &'static str,
+        block_ceiling: u32,
+        warp: u32,
+    ) -> Result<(), ResidentRefusal> {
         if self.warps == 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: "a walk block carrying no warp".to_owned() });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: "a walk block carrying no warp".to_owned(),
+            });
         }
         let block = self.block(warp);
         if block > block_ceiling {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("a block of {block} exceeds the module's admitted {block_ceiling}"),
+            });
         }
         Ok(())
     }
     /// The finite population of walk geometries this module can realize at all.
     pub fn enumerate() -> Vec<AthenaWalkGeometry> {
-        [1u32, 2, 4, 8, 16].into_iter().map(|warps| AthenaWalkGeometry { warps }).collect()
+        [1u32, 2, 4, 8, 16]
+            .into_iter()
+            .map(|warps| AthenaWalkGeometry { warps })
+            .collect()
     }
 }
 
@@ -2689,19 +4136,40 @@ impl AthenaFutureGeometry {
             self.germ_tile()
         }
     }
-    pub fn admit(&self, operation: &'static str, block_ceiling: u32, warp: u32, shared_ceiling: u32) -> Result<(), ResidentRefusal> {
+    pub fn admit(
+        &self,
+        operation: &'static str,
+        block_ceiling: u32,
+        warp: u32,
+        shared_ceiling: u32,
+    ) -> Result<(), ResidentRefusal> {
         if self.lanes == 0 || self.positions_per_block == 0 || self.germs_per_lane == 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("{self:?} carries no lane, no position or no germ") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("{self:?} carries no lane, no position or no germ"),
+            });
         }
         let block = self.block();
         if block % warp.max(1) != 0 {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} is not a whole number of warps of {warp}") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("a block of {block} is not a whole number of warps of {warp}"),
+            });
         }
         if block > block_ceiling {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a block of {block} exceeds the module's admitted {block_ceiling}") });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!("a block of {block} exceeds the module's admitted {block_ceiling}"),
+            });
         }
         if self.shared_octets() > shared_ceiling {
-            return Err(ResidentRefusal::Declaration { operation, what: format!("a staged chain of {} octets exceeds the device's {shared_ceiling} per block", self.shared_octets()) });
+            return Err(ResidentRefusal::Declaration {
+                operation,
+                what: format!(
+                    "a staged chain of {} octets exceeds the device's {shared_ceiling} per block",
+                    self.shared_octets()
+                ),
+            });
         }
         Ok(())
     }
@@ -2714,7 +4182,12 @@ impl AthenaFutureGeometry {
             for lanes in [32u32, 64, 128, 256] {
                 for germs_per_lane in [1u32, 2, 4, 8] {
                     for chain_stage in [0u32, 4, 8, 16, 32] {
-                        let geometry = AthenaFutureGeometry { positions_per_block, lanes, germs_per_lane, chain_stage };
+                        let geometry = AthenaFutureGeometry {
+                            positions_per_block,
+                            lanes,
+                            germs_per_lane,
+                            chain_stage,
+                        };
                         if geometry.block() > 512 || geometry.block() % 32 != 0 {
                             continue;
                         }
@@ -2791,8 +4264,14 @@ impl AthenaAxis {
     pub fn read(&self, candidate: &AthenaCandidate) -> (u128, u128) {
         match self {
             AthenaAxis::ResidentBlocksUp => (u128::from(candidate.resident_blocks), 1),
-            AthenaAxis::OccupancyUp => (u128::from(candidate.occupancy.0), u128::from(candidate.occupancy.1.max(1))),
-            AthenaAxis::CoverUp => (u128::from(candidate.cover_occupied.0), u128::from(candidate.cover_occupied.1.max(1))),
+            AthenaAxis::OccupancyUp => (
+                u128::from(candidate.occupancy.0),
+                u128::from(candidate.occupancy.1.max(1)),
+            ),
+            AthenaAxis::CoverUp => (
+                u128::from(candidate.cover_occupied.0),
+                u128::from(candidate.cover_occupied.1.max(1)),
+            ),
             AthenaAxis::ChainReuseUp => (u128::from(candidate.chain_reuse), 1),
             AthenaAxis::LanesUp => (u128::from(candidate.geometry.lanes), 1),
             AthenaAxis::SharedDown => (1, u128::from(candidate.shared_octets) + 1),
@@ -2809,7 +4288,8 @@ pub fn athena_non_dominated(family: &[AthenaCandidate], axes: &[AthenaAxis]) -> 
         .iter()
         .map(|axis| {
             let axis = *axis;
-            Box::new(move |candidate: &AthenaCandidate| axis.read(candidate)) as Box<dyn Fn(&AthenaCandidate) -> (u128, u128)>
+            Box::new(move |candidate: &AthenaCandidate| axis.read(candidate))
+                as Box<dyn Fn(&AthenaCandidate) -> (u128, u128)>
         })
         .collect();
     non_dominated_by(family, &axes)
@@ -2872,16 +4352,30 @@ impl<'chart> PassageBuilder<'chart> {
     }
     fn lineage_of(&self, index: usize) -> (u64, u32) {
         let (offset, count) = self.offsets[index];
-        (self.lineage_buffer.device_ptr() + (offset * 4) as u64, count as u32)
+        (
+            self.lineage_buffer.device_ptr() + (offset * 4) as u64,
+            count as u32,
+        )
     }
     fn lane_of(&self, index: usize) -> Lane<'_, 'chart> {
         let (lineage, lineage_count) = self.lineage_of(index);
-        Lane { stream: &self.lanes[index], slot: self.slot_of(index), census: self.census_buffer.device_ptr(), lineage, lineage_count, index, _surface: std::marker::PhantomData }
+        Lane {
+            stream: &self.lanes[index],
+            slot: self.slot_of(index),
+            census: self.census_buffer.device_ptr(),
+            lineage,
+            lineage_count,
+            index,
+            _surface: std::marker::PhantomData,
+        }
     }
 
     /// The address range of an occurrence's own slot — written by its kernels.
     pub fn slot_range(&self, index: usize) -> (u64, u64) {
-        (self.slot_of(index), self.slot_of(index) + (SLOT_WORDS * 4) as u64)
+        (
+            self.slot_of(index),
+            self.slot_of(index) + (SLOT_WORDS * 4) as u64,
+        )
     }
     /// The address range of an occurrence's list in the lineage array — read by its kernel.
     pub fn lineage_range(&self, index: usize) -> (u64, u64) {
@@ -2903,20 +4397,38 @@ impl<'chart> PassageBuilder<'chart> {
     /// `producers` must be the lineage declared at [`ResidentSurface::begin_passage`] — a
     /// mismatch is a declaration error, because the kernel will read exactly the declared slots.
     /// The lane is where the occurrence's one semantic kernel is recorded.
-    pub fn open(&mut self, index: usize, producers: &[usize]) -> Result<Lane<'_, 'chart>, ResidentRefusal> {
+    pub fn open(
+        &mut self,
+        index: usize,
+        producers: &[usize],
+    ) -> Result<Lane<'_, 'chart>, ResidentRefusal> {
         if index >= self.occurrences || self.opened[index] {
-            return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} opened twice or out of range") });
+            return Err(ResidentRefusal::Declaration {
+                operation: "passage",
+                what: format!("occurrence {index} opened twice or out of range"),
+            });
         }
         let mut given: Vec<usize> = producers.to_vec();
         given.sort_unstable();
         given.dedup();
         if given != self.declared[index] {
-            return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} opens with producers {given:?} but declared lineage {:?}", self.declared[index]) });
+            return Err(ResidentRefusal::Declaration {
+                operation: "passage",
+                what: format!(
+                    "occurrence {index} opens with producers {given:?} but declared lineage {:?}",
+                    self.declared[index]
+                ),
+            });
         }
         let lane = &self.lanes[index];
         for producer in &self.declared[index] {
             if !self.closed[*producer] {
-                return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} reads occurrence {producer}, which no earlier front wrote") });
+                return Err(ResidentRefusal::Declaration {
+                    operation: "passage",
+                    what: format!(
+                        "occurrence {index} reads occurrence {producer}, which no earlier front wrote"
+                    ),
+                });
             }
             lane.wait_event(&self.events[*producer])?;
             self.edges += 1;
@@ -2930,7 +4442,12 @@ impl<'chart> PassageBuilder<'chart> {
             if let Some(previous) = self.last_opened {
                 if !self.declared[index].contains(&previous) {
                     if !self.closed[previous] {
-                        return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("serialized: occurrence {previous} was not closed before {index}") });
+                        return Err(ResidentRefusal::Declaration {
+                            operation: "passage",
+                            what: format!(
+                                "serialized: occurrence {previous} was not closed before {index}"
+                            ),
+                        });
                     }
                     lane.wait_event(&self.events[previous])?;
                     self.edges += 1;
@@ -2945,9 +4462,17 @@ impl<'chart> PassageBuilder<'chart> {
     /// **Close occurrence `index`**: record its census after its semantic kernel and record the
     /// event successors wait on. The a-priori bound is what the census compares the measured
     /// octave against.
-    pub fn close(&mut self, index: usize, out: &ResidentSection<'chart>, admitted_octaves: u32) -> Result<(), ResidentRefusal> {
+    pub fn close(
+        &mut self,
+        index: usize,
+        out: &ResidentSection<'chart>,
+        admitted_octaves: u32,
+    ) -> Result<(), ResidentRefusal> {
         if !self.opened[index] || self.closed[index] {
-            return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} closed before it was opened, or twice") });
+            return Err(ResidentRefusal::Declaration {
+                operation: "passage",
+                what: format!("occurrence {index} closed before it was opened, or twice"),
+            });
         }
         let lane = self.lane_of(index);
         self.surface.record_census(&lane, out, admitted_octaves)?;
@@ -2964,7 +4489,10 @@ impl<'chart> PassageBuilder<'chart> {
     /// bound it compares against was handed to that kernel when it was recorded.
     pub fn close_fused(&mut self, index: usize) -> Result<(), ResidentRefusal> {
         if !self.opened[index] || self.closed[index] {
-            return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} closed before it was opened, or twice") });
+            return Err(ResidentRefusal::Declaration {
+                operation: "passage",
+                what: format!("occurrence {index} closed before it was opened, or twice"),
+            });
         }
         self.events[index].record(&self.lanes[index])?;
         self.closed[index] = true;
@@ -2977,7 +4505,10 @@ impl<'chart> PassageBuilder<'chart> {
     pub fn finish(self) -> Result<ResidentPassage<'chart>, ResidentRefusal> {
         for index in 0..self.occurrences {
             if !self.closed[index] {
-                return Err(ResidentRefusal::Declaration { operation: "passage", what: format!("occurrence {index} was never bound") });
+                return Err(ResidentRefusal::Declaration {
+                    operation: "passage",
+                    what: format!("occurrence {index} was never bound"),
+                });
             }
             self.origin.wait_event(&self.events[index])?;
         }
@@ -3150,12 +4681,17 @@ impl<'chart> ResidentPassage<'chart> {
         self.read_census(census_before)
     }
 
-    fn read_census(&self, census_before: TransferCensus) -> Result<PassageReading, ResidentRefusal> {
+    fn read_census(
+        &self,
+        census_before: TransferCensus,
+    ) -> Result<PassageReading, ResidentRefusal> {
         let words_count = SLOT_WORDS * self.occurrences.max(1);
         let mut words = vec![0u32; words_count];
         self.census_buffer.copy_to_slice(&mut words)?;
         self.surface.census.borrow_mut().egress_receipt_octets += (words_count * 4) as u64;
-        let slots: Vec<SlotReading> = (0..self.occurrences).map(|i| SlotReading::of(&words[i * SLOT_WORDS..(i + 1) * SLOT_WORDS])).collect();
+        let slots: Vec<SlotReading> = (0..self.occurrences)
+            .map(|i| SlotReading::of(&words[i * SLOT_WORDS..(i + 1) * SLOT_WORDS]))
+            .collect();
         let refusals = slots
             .iter()
             .enumerate()
@@ -3169,14 +4705,22 @@ impl<'chart> ResidentPassage<'chart> {
                 upstream_count: slot.upstream_count,
             })
             .collect();
-        Ok(PassageReading { slots, obstruction: ObstructionLineage { refusals }, census_before, census_after: self.surface.census() })
+        Ok(PassageReading {
+            slots,
+            obstruction: ObstructionLineage { refusals },
+            census_before,
+            census_after: self.surface.census(),
+        })
     }
 }
 
 impl Drop for ResidentPassage<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.census.borrow_mut().resident_shrank(self.census_octets() + self.lineage_octets());
+        self.surface
+            .census
+            .borrow_mut()
+            .resident_shrank(self.census_octets() + self.lineage_octets());
     }
 }
 
@@ -3188,7 +4732,9 @@ impl Drop for ResidentPassage<'_> {
 /// the quarantined serial-reference realization or its host semantic dispatch. The behavioural
 /// half is the census: between a graph launch and its terminal synchronize the surface issues no
 /// launch, which a renamed loop cannot pass.
-pub fn production_cone_reaches_the_reference(sources: &[(&str, &str)]) -> Vec<(String, &'static str)> {
+pub fn production_cone_reaches_the_reference(
+    sources: &[(&str, &str)],
+) -> Vec<(String, &'static str)> {
     const FORBIDDEN: [&str; 8] = [
         "ported_reference",
         "PortedOperationKind",
@@ -3240,13 +4786,24 @@ mod tests {
     }
 
     /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
-    fn enter_once(surface: &'static ResidentSurface<'static>, words: &[u16], rows: usize, width: usize, scale: Dyadic, grain: ResidentGrain) -> (Vec<(i64, i64)>, PassageReading) {
+    fn enter_once(
+        surface: &'static ResidentSurface<'static>,
+        words: &[u16],
+        rows: usize,
+        width: usize,
+        scale: Dyadic,
+        grain: ResidentGrain,
+    ) -> (Vec<(i64, i64)>, PassageReading) {
         let staged = surface.stage_words(words, rows, width).expect("stage");
-        let shape = surface.shape_enter(rows, width, scale, grain, words).expect("shape");
+        let shape = surface
+            .shape_enter(rows, width, scale, grain, words)
+            .expect("shape");
         let out = surface.fresh_section(rows, width, grain).expect("section");
         let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, scale, &out).expect("record");
+        surface
+            .record_enter(&lane, &staged, scale, &out)
+            .expect("record");
         builder.close(0, &out, shape.needed).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
@@ -3259,12 +4816,18 @@ mod tests {
     fn bfloat16(significand: i32, exponent: i32) -> u16 {
         let negative = significand < 0;
         let magnitude = significand.unsigned_abs();
-        assert!(magnitude != 0 && magnitude < 256, "a bf16 significand is eight octaves");
+        assert!(
+            magnitude != 0 && magnitude < 256,
+            "a bf16 significand is eight octaves"
+        );
         let bits = 32 - magnitude.leading_zeros();
         let normalized = magnitude << (8 - bits);
         let unbiased = exponent + (bits as i32) - 1;
         let biased = unbiased + 127;
-        assert!(biased > 0 && biased < 255, "the fixture exponent must be a normal bf16");
+        assert!(
+            biased > 0 && biased < 255,
+            "the fixture exponent must be a normal bf16"
+        );
         ((negative as u16) << 15) | ((biased as u16) << 7) | ((normalized & 0x7f) as u16)
     }
 
@@ -3274,14 +4837,22 @@ mod tests {
     /// fold's grouping cannot move a word; this measures it instead of asserting it.
     #[test]
     fn the_block_aggregated_census_returns_the_serial_controls_census_word_for_word() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         // 205 · 2^-11 falls below a grain of 8, so the mouth returns a GENUINE interval and the
         // width faces are exercised rather than sitting at zero.
         let narrow = bfloat16(205, -11);
         // A grain of 8 leaves the low three bits of 205·2^-11 below it, so those words enter as
         // genuine intervals; a grain of 20 carries every fixture word exactly, so its widths are all
         // zero — both are shapes the census must return, and the second is not a degenerate case.
-        let shapes: [(usize, usize, u32); 5] = [(1, 1, 8), (1, 32, 8), (7, 129, 8), (4, 1024, 8), (2, 64, 20)];
+        let shapes: [(usize, usize, u32); 5] = [
+            (1, 1, 8),
+            (1, 32, 8),
+            (7, 129, 8),
+            (4, 1024, 8),
+            (2, 64, 20),
+        ];
         for (rows, width, grain) in shapes {
             let grain = ResidentGrain(grain);
             let words: Vec<u16> = (0..rows * width)
@@ -3294,30 +4865,68 @@ mod tests {
                 })
                 .collect();
             let staged = surface.stage_words(&words, rows, width).expect("stage");
-            let shape = surface.shape_enter(rows, width, Dyadic::ONE, grain, &words).expect("shape");
+            let shape = surface
+                .shape_enter(rows, width, Dyadic::ONE, grain, &words)
+                .expect("shape");
             let section = surface.fresh_section(rows, width, grain).expect("section");
             let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
             let lane = builder.open(0, &[]).expect("open");
-            surface.record_enter(&lane, &staged, Dyadic::ONE, &section).expect("record");
+            surface
+                .record_enter(&lane, &staged, Dyadic::ONE, &section)
+                .expect("record");
             builder.close(0, &section, shape.needed).expect("close");
             builder.finish().expect("finish").launch().expect("launch");
             // (a) a standing occurrence: nothing refuses and both forms are exactly order-free.
-            let (aggregated, control) = surface.census_both(&section, shape.needed, 0).expect("census");
-            assert_eq!(aggregated, control, "the census disagrees at {rows}x{width} grain {}", grain.0);
+            let (aggregated, control) = surface
+                .census_both(&section, shape.needed, 0)
+                .expect("census");
+            assert_eq!(
+                aggregated, control,
+                "the census disagrees at {rows}x{width} grain {}",
+                grain.0
+            );
             assert!(aggregated.written && aggregated.max_octave > 0);
             if grain.0 < 11 {
-                assert!(aggregated.width_sum > 0 && aggregated.nonzero_widths > 0, "the interval fixture must exercise the width faces");
+                assert!(
+                    aggregated.width_sum > 0 && aggregated.nonzero_widths > 0,
+                    "the interval fixture must exercise the width faces"
+                );
             } else {
-                assert_eq!((aggregated.width_sum, aggregated.nonzero_widths, aggregated.max_width), (0, 0, 0), "an exactly carried fixture has no width, under both forms");
+                assert_eq!(
+                    (
+                        aggregated.width_sum,
+                        aggregated.nonzero_widths,
+                        aggregated.max_width
+                    ),
+                    (0, 0, 0),
+                    "an exactly carried fixture has no width, under both forms"
+                );
             }
             assert!(!aggregated.inverted && aggregated.refused == 0);
             // (b) a refused occurrence's census still measures nothing, under both forms.
             for poison in [REFUSED_UPSTREAM, REFUSED_MALFORMED, REFUSED_CARRIER] {
-                let (aggregated, control) = surface.census_both(&section, shape.needed, poison).expect("census");
-                assert_eq!(aggregated, control, "the poisoned census disagrees at {rows}x{width}");
-                assert_eq!(aggregated.refused, poison, "a refused occurrence acquires no second refusal from its own census");
+                let (aggregated, control) = surface
+                    .census_both(&section, shape.needed, poison)
+                    .expect("census");
+                assert_eq!(
+                    aggregated, control,
+                    "the poisoned census disagrees at {rows}x{width}"
+                );
+                assert_eq!(
+                    aggregated.refused, poison,
+                    "a refused occurrence acquires no second refusal from its own census"
+                );
                 assert!(aggregated.written, "the census still marks that it ran");
-                assert_eq!((aggregated.max_octave, aggregated.max_width, aggregated.width_sum, aggregated.nonzero_widths), (0, 0, 0, 0), "and it measures nothing");
+                assert_eq!(
+                    (
+                        aggregated.max_octave,
+                        aggregated.max_width,
+                        aggregated.width_sum,
+                        aggregated.nonzero_widths
+                    ),
+                    (0, 0, 0, 0),
+                    "and it measures nothing"
+                );
             }
             // (c) the bound refuted: both forms raise it, and both are stable across repetitions.
             // This is the ONE order-dependent class, and it is inherited: both forms decide whether
@@ -3331,7 +4940,12 @@ mod tests {
                 assert!(aggregated.bound_violated && control.bound_violated);
                 readings.push((aggregated, control));
             }
-            assert!(readings.windows(2).all(|w| w[0].0.refused == w[1].0.refused), "the refusal is order-free even where the measurement is not");
+            assert!(
+                readings
+                    .windows(2)
+                    .all(|w| w[0].0.refused == w[1].0.refused),
+                "the refusal is order-free even where the measurement is not"
+            );
         }
     }
 
@@ -3339,37 +4953,71 @@ mod tests {
     /// admission and the `enter` law's a-priori bound are one function, so a population whose
     /// exponent is large is admitted for what it is rather than refused BOUND at the mouth.
     #[test]
-    fn the_mouths_a_priori_bound_is_read_off_the_entering_words_and_not_authored_from_scale_and_grain() {
-        let Some((_, surface)) = surface() else { return };
+    fn the_mouths_a_priori_bound_is_read_off_the_entering_words_and_not_authored_from_scale_and_grain()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(8);
         let authored = 8 + Dyadic::ONE.octaves() + grain.0 + 8; // what the bound was until 2026-08-19
         // (i) a wide population: the authored bound is BELOW the octaves the words occupy, so the
         //     mouth used to refuse its own material. The reading is above them.
         let wide = [bfloat16(255, 46), bfloat16(-255, 46), ONE];
         let read = ResidentSurface::entering_octaves(&wide, Dyadic::ONE, grain);
-        assert!(read > authored, "the wide fixture is exactly the population the authored bound could not carry: read {read}, authored {authored}");
-        let shape = surface.shape_enter(1, 3, Dyadic::ONE, grain, &wide).expect("shape");
+        assert!(
+            read > authored,
+            "the wide fixture is exactly the population the authored bound could not carry: read {read}, authored {authored}"
+        );
+        let shape = surface
+            .shape_enter(1, 3, Dyadic::ONE, grain, &wide)
+            .expect("shape");
         assert_eq!(shape.needed, read);
         // and the words the mouth actually writes sit inside it
         let (words, reading) = enter_once(surface, &wide, 1, 3, Dyadic::ONE, grain);
-        assert_eq!(reading.slots[0].refused, 0, "the mouth no longer refuses the material it was handed");
-        let measured = words.iter().map(|(lo, hi)| 64 - lo.unsigned_abs().max(hi.unsigned_abs()).leading_zeros()).max().expect("words");
-        assert!(measured <= read, "measured {measured} octaves against an a-priori bound of {read}");
+        assert_eq!(
+            reading.slots[0].refused, 0,
+            "the mouth no longer refuses the material it was handed"
+        );
+        let measured = words
+            .iter()
+            .map(|(lo, hi)| 64 - lo.unsigned_abs().max(hi.unsigned_abs()).leading_zeros())
+            .max()
+            .expect("words");
+        assert!(
+            measured <= read,
+            "measured {measured} octaves against an a-priori bound of {read}"
+        );
         assert_eq!(reading.slots[0].max_octave, measured);
         // (ii) a narrow population: the reading is far BELOW the authored bound, so the admission is
         //      no longer a constant wearing a derivation.
         let narrow = [HALF, bfloat16(205, -11)];
         let narrow_read = ResidentSurface::entering_octaves(&narrow, Dyadic::ONE, grain);
-        assert!(narrow_read < authored, "read {narrow_read} against authored {authored}");
+        assert!(
+            narrow_read < authored,
+            "read {narrow_read} against authored {authored}"
+        );
         // (iii) the shape and the law take the same reading, so the census cannot compare against a
         //       different bound from the one the carrier admitted.
         use crate::resident_law::{Enter, EnteringRows, ResidentLaw, ResidentMaterial};
         let mut material = ResidentMaterial::empty();
-        material.entering.insert("x".to_owned(), EnteringRows { words: wide.to_vec(), rows: 1, width: 3 });
-        let law = Enter { population: "x".to_owned(), scale: Dyadic::ONE };
+        material.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words: wide.to_vec(),
+                rows: 1,
+                width: 3,
+            },
+        );
+        let law = Enter {
+            population: "x".to_owned(),
+            scale: Dyadic::ONE,
+        };
         assert_eq!(law.bound_octaves(grain, &[], &material), i64::from(read));
         // (iv) an empty population reads one octave rather than a negative bound.
-        assert_eq!(ResidentSurface::entering_octaves(&[], Dyadic::ONE, grain), 1);
+        assert_eq!(
+            ResidentSurface::entering_octaves(&[], Dyadic::ONE, grain),
+            1
+        );
     }
 
     #[test]
@@ -3377,9 +5025,17 @@ mod tests {
         let clean = [("resident", "use crate::exact_work::ExactWork;")];
         assert!(production_cone_reaches_the_reference(&clean).is_empty());
         let dirty = [("driver", "use holonic_engine::ported_reference::realize;")];
-        assert!(production_cone_reaches_the_reference(&dirty).iter().any(|(_, token)| *token == "ported_reference"));
+        assert!(
+            production_cone_reaches_the_reference(&dirty)
+                .iter()
+                .any(|(_, token)| *token == "ported_reference")
+        );
         let loop_shaped = [("owner", "impl EnactsInOrder for X {}")];
-        assert!(production_cone_reaches_the_reference(&loop_shaped).iter().any(|(_, token)| *token == "impl EnactsInOrder"));
+        assert!(
+            production_cone_reaches_the_reference(&loop_shaped)
+                .iter()
+                .any(|(_, token)| *token == "impl EnactsInOrder")
+        );
     }
 
     #[test]
@@ -3403,14 +5059,22 @@ mod tests {
         assert_eq!(scale.octaves(), 53);
         assert_eq!(scale.exponent, -53);
         assert!(scale.value() < Rat::one() && scale.value() > rat(1, 2));
-        assert_eq!(Dyadic::of_bfloat16_bits(HALF).expect("half").value(), rat(1, 2));
+        assert_eq!(
+            Dyadic::of_bfloat16_bits(HALF).expect("half").value(),
+            rat(1, 2)
+        );
     }
 
     #[test]
     fn the_surface_binds_one_apparatus_occurrence_and_states_its_mode() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         assert_eq!(surface.device_name(), readout.device_name());
-        assert_eq!(surface.cover().device().map(|d| d.name.as_str()), Some(surface.device_name()));
+        assert_eq!(
+            surface.cover().device().map(|d| d.name.as_str()),
+            Some(surface.device_name())
+        );
         let mode = surface.mode();
         assert_eq!(mode.kernel_content.as_deref(), Some(surface.ptx_sha256()));
         assert!(mode.device.is_some());
@@ -3419,28 +5083,69 @@ mod tests {
 
     #[test]
     fn a_passage_of_one_occurrence_launches_once_synchronizes_once_and_reads_once() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(20);
-        let (words, reading) = enter_once(surface, &[ONE, TWO, HALF, MINUS_ONE_AND_HALF], 2, 2, Dyadic::ONE, grain);
+        let (words, reading) = enter_once(
+            surface,
+            &[ONE, TWO, HALF, MINUS_ONE_AND_HALF],
+            2,
+            2,
+            Dyadic::ONE,
+            grain,
+        );
         let unit = 1i64 << 20;
-        assert_eq!(words, vec![(unit, unit), (2 * unit, 2 * unit), (unit / 2, unit / 2), (-3 * unit / 2, -3 * unit / 2)]);
+        assert_eq!(
+            words,
+            vec![
+                (unit, unit),
+                (2 * unit, 2 * unit),
+                (unit / 2, unit / 2),
+                (-3 * unit / 2, -3 * unit / 2)
+            ]
+        );
         assert_eq!(reading.slots[0].max_octave, 22);
         assert_eq!(reading.slots[0].max_width, 0);
         assert!(reading.slots[0].written);
         assert!(reading.obstruction.is_empty());
-        assert_eq!(reading.slots[0].lineage_inspected, 0, "an entering occurrence inspects no predecessor");
+        assert_eq!(
+            reading.slots[0].lineage_inspected, 0,
+            "an entering occurrence inspects no predecessor"
+        );
         let (before, after) = (&reading.census_before, &reading.census_after);
         assert_eq!(after.deed_launches, before.deed_launches + 1);
         assert_eq!(after.synchronizations, before.synchronizations + 1);
-        assert_eq!(after.captured_launches, before.captured_launches, "no launch is issued during the deed");
-        assert_eq!(after.egress_receipt_octets - before.egress_receipt_octets, (SLOT_WORDS * 4) as u64);
-        assert_eq!(after.egress_section_octets, before.egress_section_octets, "the deed itself reads no section");
+        assert_eq!(
+            after.captured_launches, before.captured_launches,
+            "no launch is issued during the deed"
+        );
+        assert_eq!(
+            after.egress_receipt_octets - before.egress_receipt_octets,
+            (SLOT_WORDS * 4) as u64
+        );
+        assert_eq!(
+            after.egress_section_octets, before.egress_section_octets,
+            "the deed itself reads no section"
+        );
     }
 
     #[test]
     fn a_dyadic_scale_finer_than_the_grain_widens_by_one_grain_and_never_rounds_toward_a_value() {
-        let Some((_, surface)) = surface() else { return };
-        let (words, _) = enter_once(surface, &[HALF], 1, 1, Dyadic { significand: 3, exponent: -20 }, ResidentGrain(20));
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let (words, _) = enter_once(
+            surface,
+            &[HALF],
+            1,
+            1,
+            Dyadic {
+                significand: 3,
+                exponent: -20,
+            },
+            ResidentGrain(20),
+        );
         assert_eq!(words, vec![(1, 2)]);
     }
 
@@ -3448,12 +5153,20 @@ mod tests {
     /// with the graph's own census read back beside what was intended.
     #[test]
     fn a_two_front_passage_binds_the_bonds_as_edges_and_the_co_present_members_share_no_edge() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(20);
         let words = [ONE, TWO, HALF, MINUS_ONE_AND_HALF];
         let staged = surface.stage_words(&words, 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &words).expect("shape");
-        let by = DyadicEnclosure { lo: 2, hi: 2, grain: 0 };
+        let enter = surface
+            .shape_enter(1, 4, Dyadic::ONE, grain, &words)
+            .expect("shape");
+        let by = DyadicEnclosure {
+            lo: 2,
+            hi: 2,
+            grain: 0,
+        };
         let scale = surface.shape_scale(1, 4, 22, by).expect("shape");
         let hadamard = surface.shape_hadamard(1, 4, 22, 22).expect("shape");
         let re_entry = surface.shape_re_entry(1, 4, 22, 22).expect("shape");
@@ -3461,68 +5174,135 @@ mod tests {
         let scaled = surface.fresh_section(1, 4, grain).expect("s");
         let squared = surface.fresh_section(1, 4, grain).expect("h");
         let doubled = surface.fresh_section(1, 4, grain).expect("r");
-        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0, 0], vec![0, 0]]).expect("begin");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![0, 0], vec![0, 0]])
+            .expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, enter.needed).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
         surface.record_scale(&lane, &x, by, &scaled).expect("scale");
         builder.close(1, &scaled, scale.needed).expect("close");
         let lane = builder.open(2, &[0, 0]).expect("open");
-        surface.record_hadamard(&lane, &x, &x, &squared).expect("hadamard");
+        surface
+            .record_hadamard(&lane, &x, &x, &squared)
+            .expect("hadamard");
         builder.close(2, &squared, hadamard.needed).expect("close");
         let lane = builder.open(3, &[0, 0]).expect("open");
-        surface.record_re_entry(&lane, &x, &x, &doubled).expect("re-entry");
+        surface
+            .record_re_entry(&lane, &x, &x, &doubled)
+            .expect("re-entry");
         builder.close(3, &doubled, re_entry.needed).expect("close");
         let passage = builder.finish().expect("finish");
         // memset + 4 × (kernel + census) = 9 nodes; edges: memset→enter (1), enter.census→{scale,
         // hadamard, re-entry} (3), kernel→census (4) = 8.
         assert_eq!(passage.intended(), (9, 8));
-        assert_eq!(passage.graph_census().nodes, 9, "{:?}", passage.graph_census());
-        assert_eq!(passage.graph_census().edges, 8, "{:?}", passage.graph_census());
+        assert_eq!(
+            passage.graph_census().nodes,
+            9,
+            "{:?}",
+            passage.graph_census()
+        );
+        assert_eq!(
+            passage.graph_census().edges,
+            8,
+            "{:?}",
+            passage.graph_census()
+        );
         assert_eq!(passage.graph_census().kernel_nodes, 8);
         assert_eq!(passage.graph_census().memset_nodes, 1);
         let reading = passage.launch().expect("launch");
         assert!(reading.obstruction.is_empty());
-        assert_eq!(reading.slots[2].lineage_inspected, 1, "a doubled bond is one predecessor slot, read once");
+        assert_eq!(
+            reading.slots[2].lineage_inspected, 1,
+            "a doubled bond is one predecessor slot, read once"
+        );
         let unit = 1i64 << 20;
-        assert_eq!(surface.read_out(&scaled).expect("read"), vec![(2 * unit, 2 * unit), (4 * unit, 4 * unit), (unit, unit), (-3 * unit, -3 * unit)]);
+        assert_eq!(
+            surface.read_out(&scaled).expect("read"),
+            vec![
+                (2 * unit, 2 * unit),
+                (4 * unit, 4 * unit),
+                (unit, unit),
+                (-3 * unit, -3 * unit)
+            ]
+        );
         let sq = surface.read_out(&squared).expect("read");
         assert_eq!(sq[3], (9 * unit / 4, 9 * unit / 4));
-        assert_eq!(surface.read_out(&doubled).expect("read")[1], (4 * unit, 4 * unit));
+        assert_eq!(
+            surface.read_out(&doubled).expect("read")[1],
+            (4 * unit, 4 * unit)
+        );
         // Launching the same bound passage again returns the same faces: it is a graph, not a replay.
         let again = passage.launch().expect("launch again");
         assert_eq!(again.slots, reading.slots);
-        assert_eq!(surface.read_out(&scaled).expect("read")[0], (2 * unit, 2 * unit));
+        assert_eq!(
+            surface.read_out(&scaled).expect("read")[0],
+            (2 * unit, 2 * unit)
+        );
     }
 
     #[test]
     fn a_refuted_a_priori_bound_refuses_downstream_on_the_card_and_names_the_occurrence() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[TWO], 1, 1).expect("stage");
         let x = surface.fresh_section(1, 1, grain).expect("x");
         let y = surface.fresh_section(1, 1, grain).expect("y");
         let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         // Admit the entry at 3 octaves; the word 2·2^20 occupies 22. The census must refute it.
         builder.close(0, &x, 3).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
-        surface.record_scale(&lane, &x, DyadicEnclosure { lo: 2, hi: 2, grain: 0 }, &y).expect("scale");
+        surface
+            .record_scale(
+                &lane,
+                &x,
+                DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+                &y,
+            )
+            .expect("scale");
         builder.close(1, &y, 30).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
         assert!(reading.slots[0].bound_violated);
-        assert!(matches!(reading.slots[0].refusal("enter", 3), Some(ResidentRefusal::BoundRefuted { admitted: 3, measured: 22, .. })));
-        assert!(matches!(reading.slots[1].refusal("scale", 30), Some(ResidentRefusal::Upstream { .. })));
+        assert!(matches!(
+            reading.slots[0].refusal("enter", 3),
+            Some(ResidentRefusal::BoundRefuted {
+                admitted: 3,
+                measured: 22,
+                ..
+            })
+        ));
+        assert!(matches!(
+            reading.slots[1].refusal("scale", 30),
+            Some(ResidentRefusal::Upstream { .. })
+        ));
         assert_eq!(reading.slots[1].upstream_first, Some(0));
         assert_eq!(reading.slots[1].upstream_count, 1);
-        assert_eq!(reading.slots[1].upstream_flags & REFUSED_BOUND, REFUSED_BOUND);
+        assert_eq!(
+            reading.slots[1].upstream_flags & REFUSED_BOUND,
+            REFUSED_BOUND
+        );
         let lineage = &reading.obstruction;
         assert_eq!(lineage.refusals.len(), 2);
         assert!(lineage.refusals[0].origin && lineage.refusals[0].index == 0);
-        assert!(!lineage.refusals[1].origin && lineage.refusals[1].index == 1 && lineage.refusals[1].upstream_first == Some(0));
+        assert!(
+            !lineage.refusals[1].origin
+                && lineage.refusals[1].index == 1
+                && lineage.refusals[1].upstream_first == Some(0)
+        );
         assert!(lineage.joined_flags() & (REFUSED_BOUND | REFUSED_UPSTREAM) != 0);
         // The successor wrote nothing plausible: its section holds only what allocation left, and
         // its census marker still says the census ran.
@@ -3531,25 +5311,42 @@ mod tests {
 
     #[test]
     fn the_rms_rebase_encloses_the_exact_value_and_a_finer_grain_nests() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let coarse = ResidentGrain(24);
         let fine = ResidentGrain(40);
-        let eps = Dyadic { significand: 1, exponent: -30 };
+        let eps = Dyadic {
+            significand: 1,
+            exponent: -30,
+        };
         let radicand = rat(25, 2) + eps.value();
         let mut runs = Vec::new();
         for grain in [coarse, fine] {
             let staged = surface.stage_words(&[THREE, FOUR], 1, 2).expect("stage");
-            let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[THREE, FOUR]).expect("shape");
-            let rms = surface.shape_rms_rebase(1, 2, 2, grain.0 + 3, None).expect("shape");
-            assert!(rms.couplings.iter().any(|c| c.coupling.contains("quadratic")));
+            let enter = surface
+                .shape_enter(1, 2, Dyadic::ONE, grain, &[THREE, FOUR])
+                .expect("shape");
+            let rms = surface
+                .shape_rms_rebase(1, 2, 2, grain.0 + 3, None)
+                .expect("shape");
+            assert!(
+                rms.couplings
+                    .iter()
+                    .any(|c| c.coupling.contains("quadratic"))
+            );
             let x = surface.fresh_section(1, 2, grain).expect("x");
             let y = surface.fresh_section(1, 2, grain).expect("y");
             let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
             let lane = builder.open(0, &[]).expect("open");
-            surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+            surface
+                .record_enter(&lane, &staged, Dyadic::ONE, &x)
+                .expect("enter");
             builder.close(0, &x, enter.needed).expect("close");
             let lane = builder.open(1, &[0]).expect("open");
-            surface.record_rms_rebase(&lane, &x, 2, None, eps, &rms, &y).expect("rms");
+            surface
+                .record_rms_rebase(&lane, &x, 2, None, eps, &rms, &y)
+                .expect("rms");
             builder.close(1, &y, rms.needed).expect("close");
             let passage = builder.finish().expect("finish");
             let reading = passage.launch().expect("launch");
@@ -3560,10 +5357,20 @@ mod tests {
                 let lo = word_value(enclosure.0, grain);
                 let hi = word_value(enclosure.1, grain);
                 assert!(lo >= Rat::from_integer(BigInt::from(0)));
-                assert!(&lo * &lo * &radicand <= &x * &x, "lower bound below the value");
-                assert!(&hi * &hi * &radicand >= &x * &x, "upper bound above the value");
+                assert!(
+                    &lo * &lo * &radicand <= &x * &x,
+                    "lower bound below the value"
+                );
+                assert!(
+                    &hi * &hi * &radicand >= &x * &x,
+                    "upper bound above the value"
+                );
             }
-            runs.push(out.into_iter().map(|(l, h)| (word_value(l, grain), word_value(h, grain))).collect::<Vec<_>>());
+            runs.push(
+                out.into_iter()
+                    .map(|(l, h)| (word_value(l, grain), word_value(h, grain)))
+                    .collect::<Vec<_>>(),
+            );
         }
         for ((cl, ch), (fl, fh)) in runs[0].iter().zip(&runs[1]) {
             assert!(cl <= fl && fh <= ch, "finer grain must nest");
@@ -3571,8 +5378,12 @@ mod tests {
         }
     }
 
-
-    fn candidate(tile: TileGeometry, registers: u32, resident_blocks: u32, shared: u32) -> LaunchCandidate {
+    fn candidate(
+        tile: TileGeometry,
+        registers: u32,
+        resident_blocks: u32,
+        shared: u32,
+    ) -> LaunchCandidate {
         LaunchCandidate {
             tile,
             symbol: "section_contract_tiled_r1_l32",
@@ -3594,31 +5405,109 @@ mod tests {
     #[test]
     fn a_contract_tiled_geometry_outside_the_emitted_family_refuses_by_name() {
         // the module carries an entry for (T_t, L) = (1, 32) and none for (3, 32)
-        let admitted = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
-        assert_eq!(admitted.symbol("contract-tiled").expect("emitted"), "section_contract_tiled_r1_l32");
+        let admitted = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 1,
+        };
+        assert_eq!(
+            admitted.symbol("contract-tiled").expect("emitted"),
+            "section_contract_tiled_r1_l32"
+        );
         assert_eq!(admitted.block(), 128);
         assert_eq!(admitted.shared_octets(), 1 * 256 * 16);
-        let unemitted = TileGeometry { tile_rows: 3, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
-        assert!(matches!(unemitted.symbol("contract-tiled"), Err(ResidentRefusal::Declaration { .. })));
+        let unemitted = TileGeometry {
+            tile_rows: 3,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 1,
+        };
+        assert!(matches!(
+            unemitted.symbol("contract-tiled"),
+            Err(ResidentRefusal::Declaration { .. })
+        ));
         // a partial block of lanes, a lane count past the warp, a split that is not a power of two,
         // a block past the module's ceiling and a staged tile past the device — each refuses, and
         // each names which aperture it left
-        assert!(TileGeometry { tile_rows: 1, lanes: 8, outs_per_block: 3, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
-        assert!(TileGeometry { tile_rows: 1, lanes: 64, outs_per_block: 1, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
-        assert!(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 3 }.admit("t", 512, 32, 49_152).is_err());
-        assert!(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 32, k_tile: 0, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
-        assert!(TileGeometry { tile_rows: 4, lanes: 32, outs_per_block: 4, k_tile: 1024, splits: 1 }.admit("t", 512, 32, 49_152).is_err());
+        assert!(
+            TileGeometry {
+                tile_rows: 1,
+                lanes: 8,
+                outs_per_block: 3,
+                k_tile: 0,
+                splits: 1
+            }
+            .admit("t", 512, 32, 49_152)
+            .is_err()
+        );
+        assert!(
+            TileGeometry {
+                tile_rows: 1,
+                lanes: 64,
+                outs_per_block: 1,
+                k_tile: 0,
+                splits: 1
+            }
+            .admit("t", 512, 32, 49_152)
+            .is_err()
+        );
+        assert!(
+            TileGeometry {
+                tile_rows: 1,
+                lanes: 32,
+                outs_per_block: 4,
+                k_tile: 0,
+                splits: 3
+            }
+            .admit("t", 512, 32, 49_152)
+            .is_err()
+        );
+        assert!(
+            TileGeometry {
+                tile_rows: 1,
+                lanes: 32,
+                outs_per_block: 32,
+                k_tile: 0,
+                splits: 1
+            }
+            .admit("t", 512, 32, 49_152)
+            .is_err()
+        );
+        assert!(
+            TileGeometry {
+                tile_rows: 4,
+                lanes: 32,
+                outs_per_block: 4,
+                k_tile: 1024,
+                splits: 1
+            }
+            .admit("t", 512, 32, 49_152)
+            .is_err()
+        );
         assert!(admitted.admit("t", 512, 32, 49_152).is_ok());
         // the blocks the geometry launches, including both tails
         assert_eq!(admitted.blocks(5, 2048), 512 * 5);
         assert_eq!(admitted.blocks(3, 2049), 513 * 3);
-        let split = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 8 };
+        let split = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 8,
+        };
         assert_eq!(split.blocks(1, 512), 128 * 8);
-        assert_eq!(split.symbol("contract-split-k").expect("emitted"), "section_contract_partial_r1_l32");
+        assert_eq!(
+            split.symbol("contract-split-k").expect("emitted"),
+            "section_contract_partial_r1_l32"
+        );
     }
 
     #[test]
-    fn the_contract_tiled_candidate_family_is_finite_and_the_retained_set_moves_with_the_declared_axes() {
+    fn the_contract_tiled_candidate_family_is_finite_and_the_retained_set_moves_with_the_declared_axes()
+     {
         // every enumerated member is a whole-warp block the device could carry
         let family = TileGeometry::enumerate();
         assert!(!family.is_empty());
@@ -3629,20 +5518,73 @@ mod tests {
         }
         // domination is the receiver's declaration, and the retained set moves when it changes
         let candidates = vec![
-            candidate(TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 1 }, 40, 10, 0),
-            candidate(TileGeometry { tile_rows: 4, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 }, 64, 6, 16_384),
-            candidate(TileGeometry { tile_rows: 2, lanes: 32, outs_per_block: 4, k_tile: 0, splits: 1 }, 47, 9, 0),
+            candidate(
+                TileGeometry {
+                    tile_rows: 1,
+                    lanes: 32,
+                    outs_per_block: 4,
+                    k_tile: 0,
+                    splits: 1,
+                },
+                40,
+                10,
+                0,
+            ),
+            candidate(
+                TileGeometry {
+                    tile_rows: 4,
+                    lanes: 32,
+                    outs_per_block: 4,
+                    k_tile: 256,
+                    splits: 1,
+                },
+                64,
+                6,
+                16_384,
+            ),
+            candidate(
+                TileGeometry {
+                    tile_rows: 2,
+                    lanes: 32,
+                    outs_per_block: 4,
+                    k_tile: 0,
+                    splits: 1,
+                },
+                47,
+                9,
+                0,
+            ),
         ];
-        let coarse = non_dominated(&candidates, &[CandidateAxis::ResidentBlocksUp, CandidateAxis::SharedDown]);
+        let coarse = non_dominated(
+            &candidates,
+            &[CandidateAxis::ResidentBlocksUp, CandidateAxis::SharedDown],
+        );
         // the four-row tile is dominated on both coarse axes by the one-row tile
         assert_eq!(coarse, vec![0]);
-        let with_reuse = non_dominated(&candidates, &[CandidateAxis::ResidentBlocksUp, CandidateAxis::SharedDown, CandidateAxis::MapReuseUp]);
+        let with_reuse = non_dominated(
+            &candidates,
+            &[
+                CandidateAxis::ResidentBlocksUp,
+                CandidateAxis::SharedDown,
+                CandidateAxis::MapReuseUp,
+            ],
+        );
         assert_eq!(with_reuse, vec![0, 1, 2]);
         // and a declaration that reads only one axis retains only its extremum
-        assert_eq!(non_dominated(&candidates, &[CandidateAxis::MapReuseUp]), vec![1]);
+        assert_eq!(
+            non_dominated(&candidates, &[CandidateAxis::MapReuseUp]),
+            vec![1]
+        );
     }
 
-    fn athena(geometry: AthenaFutureGeometry, resident_blocks: u32, blocks: u64, chain_reuse: u32, climb_past_stage: u32, cover: (u64, u64)) -> AthenaCandidate {
+    fn athena(
+        geometry: AthenaFutureGeometry,
+        resident_blocks: u32,
+        blocks: u64,
+        chain_reuse: u32,
+        climb_past_stage: u32,
+        cover: (u64, u64),
+    ) -> AthenaCandidate {
         AthenaCandidate {
             geometry,
             symbol: "athena_future_staged",
@@ -3671,8 +5613,16 @@ mod tests {
             assert_eq!(geometry.block() % 32, 0);
             assert!(geometry.block() <= 512);
             // the germ tile is what one block covers, and the staged chain is what it reuses
-            assert_eq!(geometry.germ_tile(), geometry.lanes * geometry.germs_per_lane);
-            assert_eq!(geometry.shared_octets(), (geometry.positions_per_block * geometry.chain_stage + 2 * geometry.positions_per_block) * 4);
+            assert_eq!(
+                geometry.germ_tile(),
+                geometry.lanes * geometry.germs_per_lane
+            );
+            assert_eq!(
+                geometry.shared_octets(),
+                (geometry.positions_per_block * geometry.chain_stage
+                    + 2 * geometry.positions_per_block)
+                    * 4
+            );
             // staging nothing buys no reuse, and that is stated rather than assumed
             if geometry.chain_stage == 0 {
                 assert_eq!(geometry.chain_reuse(), 1);
@@ -3681,7 +5631,12 @@ mod tests {
             }
         }
         // the grid is the extent, linearized: germ tiles x position tiles
-        let geometry = AthenaFutureGeometry { positions_per_block: 2, lanes: 32, germs_per_lane: 4, chain_stage: 8 };
+        let geometry = AthenaFutureGeometry {
+            positions_per_block: 2,
+            lanes: 32,
+            germs_per_lane: 4,
+            chain_stage: 8,
+        };
         assert_eq!(geometry.blocks(31, 5385), 43 * 16);
         assert_eq!(geometry.block(), 64);
         // a block past the module's admitted extent refuses at the geometry, before any launch
@@ -3692,35 +5647,80 @@ mod tests {
         assert_eq!(AthenaWalkGeometry { warps: 4 }.blocks(8), 2);
         assert_eq!(AthenaWalkGeometry { warps: 4 }.blocks(9), 3);
         assert_eq!(AthenaWalkGeometry { warps: 8 }.block(32), 256);
-        assert!(AthenaWalkGeometry { warps: 32 }.admit("athena-walk", 512, 32).is_err());
+        assert!(
+            AthenaWalkGeometry { warps: 32 }
+                .admit("athena-walk", 512, 32)
+                .is_err()
+        );
     }
 
     #[test]
-    fn the_native_retained_set_moves_with_the_declared_axes_and_the_domination_rule_is_the_shared_one() {
-        let staged = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 8, chain_stage: 16 };
-        let spread = AthenaFutureGeometry { positions_per_block: 1, lanes: 32, germs_per_lane: 1, chain_stage: 0 };
-        let middle = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 1, chain_stage: 16 };
+    fn the_native_retained_set_moves_with_the_declared_axes_and_the_domination_rule_is_the_shared_one()
+     {
+        let staged = AthenaFutureGeometry {
+            positions_per_block: 1,
+            lanes: 64,
+            germs_per_lane: 8,
+            chain_stage: 16,
+        };
+        let spread = AthenaFutureGeometry {
+            positions_per_block: 1,
+            lanes: 32,
+            germs_per_lane: 1,
+            chain_stage: 0,
+        };
+        let middle = AthenaFutureGeometry {
+            positions_per_block: 1,
+            lanes: 64,
+            germs_per_lane: 1,
+            chain_stage: 16,
+        };
         let candidates = vec![
             athena(staged, 24, 341, 512, 0, (21_824, 122_880)),
             athena(spread, 24, 5239, 1, 9, (122_880, 122_880)),
             athena(middle, 24, 2635, 64, 0, (122_880, 122_880)),
         ];
         // reuse alone crowns the deepest stage; cover alone crowns the two that fill the card
-        assert_eq!(athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]), vec![0]);
-        assert_eq!(athena_non_dominated(&candidates, &[AthenaAxis::CoverUp]), vec![1, 2]);
+        assert_eq!(
+            athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]),
+            vec![0]
+        );
+        assert_eq!(
+            athena_non_dominated(&candidates, &[AthenaAxis::CoverUp]),
+            vec![1, 2]
+        );
         // and a declaration reading both retains the ones neither dominates
-        let both = athena_non_dominated(&candidates, &[AthenaAxis::CoverUp, AthenaAxis::ChainReuseUp, AthenaAxis::ClimbPastStageDown]);
+        let both = athena_non_dominated(
+            &candidates,
+            &[
+                AthenaAxis::CoverUp,
+                AthenaAxis::ChainReuseUp,
+                AthenaAxis::ClimbPastStageDown,
+            ],
+        );
         assert_eq!(both, vec![0, 2]);
         // the retained set MOVED under a changed declaration, which is the falsifier: a return that
         // did not move was ranking rather than reading a declared front
-        assert_ne!(athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]), both);
+        assert_ne!(
+            athena_non_dominated(&candidates, &[AthenaAxis::ChainReuseUp]),
+            both
+        );
     }
 
     #[test]
     fn the_native_atlas_shapes_price_the_deed_and_refuse_a_non_integer_grain_extent() {
-        let Some((_, surface)) = surface() else { return };
-        let geometry = AthenaFutureGeometry { positions_per_block: 1, lanes: 64, germs_per_lane: 1, chain_stage: 16 };
-        let shape = surface.shape_athena_future(31, 5385, 59_698, 102_904, false, geometry).expect("future shape");
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let geometry = AthenaFutureGeometry {
+            positions_per_block: 1,
+            lanes: 64,
+            germs_per_lane: 1,
+            chain_stage: 16,
+        };
+        let shape = surface
+            .shape_athena_future(31, 5385, 59_698, 102_904, false, geometry)
+            .expect("future shape");
         assert_eq!((shape.rows, shape.width), (31, 5385));
         assert_eq!(shape.block, 64);
         assert_eq!(shape.shared_octets, geometry.shared_octets());
@@ -3728,9 +5728,19 @@ mod tests {
         assert_eq!(shape.couplings.len(), 1);
         assert_eq!(shape.couplings[0].kernel, "athena_future_staged");
         // an empty extent refuses at the shape rather than launching an empty grid
-        assert!(surface.shape_athena_future(0, 5385, 59_698, 102_904, false, geometry).is_err());
-        assert!(surface.shape_athena_future(31, 0, 59_698, 102_904, false, geometry).is_err());
-        let walk = surface.shape_athena_walk(31, 8, 59_698, 102_904, AthenaWalkGeometry { warps: 8 }).expect("walk shape");
+        assert!(
+            surface
+                .shape_athena_future(0, 5385, 59_698, 102_904, false, geometry)
+                .is_err()
+        );
+        assert!(
+            surface
+                .shape_athena_future(31, 0, 59_698, 102_904, false, geometry)
+                .is_err()
+        );
+        let walk = surface
+            .shape_athena_walk(31, 8, 59_698, 102_904, AthenaWalkGeometry { warps: 8 })
+            .expect("walk shape");
         assert_eq!((walk.rows, walk.width), (31, 2));
         assert_eq!(walk.block, 256);
         assert_eq!(walk.couplings[0].kernel, "athena_walk_cooperative");
@@ -3738,36 +5748,70 @@ mod tests {
 
     #[test]
     fn the_native_atlas_family_reads_its_registers_from_the_loaded_module_and_covers_the_card() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         for symbol in ["athena_walk_cooperative", "athena_future_staged"] {
             let registers = surface.measured_registers(symbol).expect("registers");
-            assert!(registers > 0 && registers <= 255, "{symbol} reported {registers} registers");
-            assert!(surface.measured_block_ceiling(symbol).expect("ceiling") >= 512, "{symbol} admits fewer than 512 threads");
+            assert!(
+                registers > 0 && registers <= 255,
+                "{symbol} reported {registers} registers"
+            );
+            assert!(
+                surface.measured_block_ceiling(symbol).expect("ceiling") >= 512,
+                "{symbol} admits fewer than 512 threads"
+            );
         }
-        let family = surface.athena_future_candidates(31, 5385, 9).expect("family");
+        let family = surface
+            .athena_future_candidates(31, 5385, 9)
+            .expect("family");
         assert!(!family.is_empty());
         let mut covers_the_card = false;
         for member in &family {
-            assert!(member.resident_blocks >= 1, "{member:?} is resident nowhere");
+            assert!(
+                member.resident_blocks >= 1,
+                "{member:?} is resident nowhere"
+            );
             assert!(member.registers > 0);
             assert!(member.blocks >= 1);
             // the cover saturates at the device's own ceiling and nowhere else
             assert!(member.cover_occupied.0 <= member.cover_occupied.1);
-            assert_eq!(member.cover_occupied.0, member.lane_waves.0.min(member.cover_occupied.1));
+            assert_eq!(
+                member.cover_occupied.0,
+                member.lane_waves.0.min(member.cover_occupied.1)
+            );
             if member.cover_occupied.0 == member.cover_occupied.1 {
                 covers_the_card = true;
             }
         }
-        assert!(covers_the_card, "no admitted member covers the card's resident lanes on this extent");
+        assert!(
+            covers_the_card,
+            "no admitted member covers the card's resident lanes on this extent"
+        );
     }
 
     #[test]
-    fn the_contract_tiled_shape_admits_exactly_what_the_scalar_owner_admits_and_prices_the_tile_beside_it() {
-        let Some((readout, surface)) = surface() else { return };
-        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
-        let scalar = surface.shape_contract(1, 2, 22, &map).expect("scalar shape");
-        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
-        let tiled = surface.shape_contract_tiled(1, 2, 22, &map, tile).expect("tiled shape");
+    fn the_contract_tiled_shape_admits_exactly_what_the_scalar_owner_admits_and_prices_the_tile_beside_it()
+     {
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
+        let map = readout
+            .mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2)
+            .expect("map");
+        let scalar = surface
+            .shape_contract(1, 2, 22, &map)
+            .expect("scalar shape");
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 1,
+        };
+        let tiled = surface
+            .shape_contract_tiled(1, 2, 22, &map, tile)
+            .expect("tiled shape");
         // the same octave admission, by the subset-monotone argument, and the same output shape
         assert_eq!(tiled.needed, scalar.needed);
         assert_eq!((tiled.rows, tiled.width), (scalar.rows, scalar.width));
@@ -3777,65 +5821,152 @@ mod tests {
         assert_eq!(tiled.launches, 2);
         assert_eq!(tiled.couplings.len(), 1);
         // a split-K geometry records three launches, because the join is the third
-        let split = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 4 };
-        assert_eq!(surface.shape_contract_tiled(1, 2, 22, &map, split).expect("split shape").launches, 3);
+        let split = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 4,
+        };
+        assert_eq!(
+            surface
+                .shape_contract_tiled(1, 2, 22, &map, split)
+                .expect("split shape")
+                .launches,
+            3
+        );
         // a geometry the module emits no entry for refuses at the shape, before any launch
-        let unemitted = TileGeometry { tile_rows: 8, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
-        assert!(surface.shape_contract_tiled(1, 2, 22, &map, unemitted).is_err());
+        let unemitted = TileGeometry {
+            tile_rows: 8,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 1,
+        };
+        assert!(
+            surface
+                .shape_contract_tiled(1, 2, 22, &map, unemitted)
+                .is_err()
+        );
         // a width that disagrees with the map refuses by name
         assert!(surface.shape_contract_tiled(1, 3, 22, &map, tile).is_err());
     }
 
     #[test]
     fn the_contract_tiled_family_reads_its_registers_from_the_loaded_module() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         // every emitted entry answers, and the scalar owner's own measured count stands beside them
-        for symbol in ["section_contract", "section_contract_tiled_r1_l32", "section_contract_tiled_r4_l32", "section_contract_partial_r1_l32", "section_contract_join"] {
+        for symbol in [
+            "section_contract",
+            "section_contract_tiled_r1_l32",
+            "section_contract_tiled_r4_l32",
+            "section_contract_partial_r1_l32",
+            "section_contract_join",
+        ] {
             let registers = surface.measured_registers(symbol).expect("registers");
-            assert!(registers > 0 && registers <= 255, "{symbol} reported {registers} registers");
+            assert!(
+                registers > 0 && registers <= 255,
+                "{symbol} reported {registers} registers"
+            );
         }
         // the module-wide block derivation did not move when the family was added
         assert_eq!(surface.derived_launch().0, 512);
         for symbol in KERNELS {
-            assert!(surface.measured_block_ceiling(symbol).expect("ceiling") >= 512, "{symbol} admits fewer than 512 threads");
+            assert!(
+                surface.measured_block_ceiling(symbol).expect("ceiling") >= 512,
+                "{symbol} admits fewer than 512 threads"
+            );
         }
         let limits = surface.multiprocessor_limits();
         assert!(limits.max_blocks > 0 && limits.max_registers > 0 && limits.max_shared_octets > 0);
         let family = surface.contract_candidates(5, 2560, 2048).expect("family");
         assert!(!family.is_empty());
         for member in &family {
-            assert!(member.resident_blocks >= 1, "{member:?} is resident nowhere");
+            assert!(
+                member.resident_blocks >= 1,
+                "{member:?} is resident nowhere"
+            );
             assert!(member.registers > 0);
         }
     }
 
     #[test]
     fn a_contract_tiled_return_is_bit_equal_to_the_scalar_owner_and_the_reversed_tree_agrees() {
-        let Some((readout, surface)) = surface() else { return };
-        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
+        let map = readout
+            .mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2)
+            .expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
-        let scalar_shape = surface.shape_contract(1, 2, enter.needed.min(22), &map).expect("shape");
-        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
-        let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
+        let enter = surface
+            .shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO])
+            .expect("shape");
+        let scalar_shape = surface
+            .shape_contract(1, 2, enter.needed.min(22), &map)
+            .expect("shape");
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 2,
+            k_tile: 128,
+            splits: 1,
+        };
+        let tiled_shape = surface
+            .shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile)
+            .expect("shape");
         let x = surface.fresh_section(1, 2, grain).expect("x");
         let scalar_out = surface.fresh_section(1, 2, grain).expect("scalar");
         let descending = surface.fresh_section(1, 2, grain).expect("descending");
         let ascending = surface.fresh_section(1, 2, grain).expect("ascending");
-        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0], vec![0]]).expect("begin");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![0], vec![0]])
+            .expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, enter.needed).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
-        surface.record_contract(&lane, &x, &map, &scalar_out).expect("scalar");
-        builder.close(1, &scalar_out, scalar_shape.needed).expect("close");
+        surface
+            .record_contract(&lane, &x, &map, &scalar_out)
+            .expect("scalar");
+        builder
+            .close(1, &scalar_out, scalar_shape.needed)
+            .expect("close");
         let lane = builder.open(2, &[0]).expect("open");
-        surface.record_contract_tiled(&lane, &x, &map, tile, ResidentSurface::carrier_octaves(), LaneTree::Descending, &descending).expect("tiled");
-        builder.close(2, &descending, tiled_shape.needed).expect("close");
+        surface
+            .record_contract_tiled(
+                &lane,
+                &x,
+                &map,
+                tile,
+                ResidentSurface::carrier_octaves(),
+                LaneTree::Descending,
+                &descending,
+            )
+            .expect("tiled");
+        builder
+            .close(2, &descending, tiled_shape.needed)
+            .expect("close");
         let lane = builder.open(3, &[0]).expect("open");
-        surface.record_contract_tiled(&lane, &x, &map, tile, ResidentSurface::carrier_octaves(), LaneTree::Ascending, &ascending).expect("tiled");
-        builder.close(3, &ascending, tiled_shape.needed).expect("close");
+        surface
+            .record_contract_tiled(
+                &lane,
+                &x,
+                &map,
+                tile,
+                ResidentSurface::carrier_octaves(),
+                LaneTree::Ascending,
+                &ascending,
+            )
+            .expect("tiled");
+        builder
+            .close(3, &ascending, tiled_shape.needed)
+            .expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
         assert!(reading.obstruction.is_empty(), "{:?}", reading.obstruction);
@@ -3847,14 +5978,19 @@ mod tests {
             assert_eq!(reading.slots[at].max_octave, reading.slots[1].max_octave);
             assert_eq!(reading.slots[at].max_width, reading.slots[1].max_width);
             assert_eq!(reading.slots[at].width_sum, reading.slots[1].width_sum);
-            assert_eq!(reading.slots[at].nonzero_widths, reading.slots[1].nonzero_widths);
+            assert_eq!(
+                reading.slots[at].nonzero_widths,
+                reading.slots[1].nonzero_widths
+            );
             assert_eq!(reading.slots[at].refused, reading.slots[1].refused);
         }
     }
 
     #[test]
     fn rank_one_factorized_front_is_bit_equal_to_sequential_contracts_on_common_i64_aperture() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         // Thirty-three output rows force the complete front past one warp.  This fixture stays on
         // the common i64 aperture: the factors include negative entries, a zero row, and a
         // fractional input so both directed placements and the exact-zero branch are exercised.
@@ -3868,154 +6004,351 @@ mod tests {
             })
             .collect();
         let u = readout.mount_bfloat16(&u_words, 1).expect("u=[V,1]");
-        let v = readout.mount_bfloat16(&[MINUS_ONE_AND_HALF, TWO], 2).expect("v=[1,H]");
+        let v = readout
+            .mount_bfloat16(&[MINUS_ONE_AND_HALF, TWO], 2)
+            .expect("v=[1,H]");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, HALF], 1, 2).expect("stage h");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, HALF]).expect("enter shape");
-        let scalar = surface.shape_contract(1, 2, enter.needed, &v).expect("v contract shape");
-        let sequential = surface.shape_contract(1, 1, scalar.needed, &u).expect("u contract shape");
-        let fused = surface.shape_factorized_contract(1, 2, enter.needed, &u, &v, 1).expect("factorized shape");
+        let enter = surface
+            .shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, HALF])
+            .expect("enter shape");
+        let scalar = surface
+            .shape_contract(1, 2, enter.needed, &v)
+            .expect("v contract shape");
+        let sequential = surface
+            .shape_contract(1, 1, scalar.needed, &u)
+            .expect("u contract shape");
+        let fused = surface
+            .shape_factorized_contract(1, 2, enter.needed, &u, &v, 1)
+            .expect("factorized shape");
         assert_eq!((fused.rows, fused.width), (1, 33));
         assert!(fused.width >= 32);
         assert!(fused.shared_octets > 0 && fused.block >= 32);
-        assert_eq!(fused.predicted.multiplications, &scalar.predicted.multiplications + &sequential.predicted.multiplications);
-        assert!(fused.predicted.multiplications < BigUint::from(33u32 * 2u32), "the rank-one work must not be priced as a dense 33×2 product");
-        assert_eq!(fused.predicted.entries_written, &scalar.predicted.entries_written + &sequential.predicted.entries_written, "the internal scalar materialization remains in the work receipt");
+        assert_eq!(
+            fused.predicted.multiplications,
+            &scalar.predicted.multiplications + &sequential.predicted.multiplications
+        );
+        assert!(
+            fused.predicted.multiplications < BigUint::from(33u32 * 2u32),
+            "the rank-one work must not be priced as a dense 33×2 product"
+        );
+        assert_eq!(
+            fused.predicted.entries_written,
+            &scalar.predicted.entries_written + &sequential.predicted.entries_written,
+            "the internal scalar materialization remains in the work receipt"
+        );
         let x = surface.fresh_section(1, 2, grain).expect("x");
         let scalar_out = surface.fresh_section(1, 1, grain).expect("scalar");
         let sequential_out = surface.fresh_section(1, 33, grain).expect("sequential");
         let fused_out = surface.fresh_section(1, 33, grain).expect("fused");
-        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![1], vec![0]]).expect("begin");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![1], vec![0]])
+            .expect("begin");
         let lane = builder.open(0, &[]).expect("enter lane");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("record enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("record enter");
         builder.close(0, &x, enter.needed).expect("close enter");
         let lane = builder.open(1, &[0]).expect("v lane");
-        surface.record_contract(&lane, &x, &v, &scalar_out).expect("record v");
-        builder.close(1, &scalar_out, scalar.needed).expect("close v");
+        surface
+            .record_contract(&lane, &x, &v, &scalar_out)
+            .expect("record v");
+        builder
+            .close(1, &scalar_out, scalar.needed)
+            .expect("close v");
         let lane = builder.open(2, &[1]).expect("u lane");
-        surface.record_contract(&lane, &scalar_out, &u, &sequential_out).expect("record u");
-        builder.close(2, &sequential_out, sequential.needed).expect("close u");
+        surface
+            .record_contract(&lane, &scalar_out, &u, &sequential_out)
+            .expect("record u");
+        builder
+            .close(2, &sequential_out, sequential.needed)
+            .expect("close u");
         let lane = builder.open(3, &[0]).expect("fused lane");
-        surface.record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out).expect("record fused");
-        builder.close(3, &fused_out, fused.needed).expect("close fused");
+        surface
+            .record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out)
+            .expect("record fused");
+        builder
+            .close(3, &fused_out, fused.needed)
+            .expect("close fused");
         let reading = builder.finish().expect("finish").launch().expect("launch");
-        assert!(reading.obstruction.is_empty(), "factorized passage refused: {:?}", reading.obstruction);
-        assert_eq!(surface.read_out(&fused_out).expect("read fused"), surface.read_out(&sequential_out).expect("read sequential"));
+        assert!(
+            reading.obstruction.is_empty(),
+            "factorized passage refused: {:?}",
+            reading.obstruction
+        );
+        assert_eq!(
+            surface.read_out(&fused_out).expect("read fused"),
+            surface.read_out(&sequential_out).expect("read sequential")
+        );
         // The fused output has a complete resident extent, including the exact zero rows.
         assert_eq!(reading.slots[3].written, true);
-        assert_eq!(reading.slots[3].nonzero_widths, reading.slots[2].nonzero_widths);
+        assert_eq!(
+            reading.slots[3].nonzero_widths,
+            reading.slots[2].nonzero_widths
+        );
     }
 
     #[test]
     fn rank_one_factorized_front_keeps_a_wide_internal_scalar_that_sequential_i64_cannot() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         // h = 2^40 and v = 2^40 produce a rounded scalar 2^80: it is inside the resident wide
         // carrier but outside the sequential Contract section's i64 word.  u = 2^-20 brings the
         // final factorized output back to 2^60, which fits the final i64 section exactly.
         let h_word = bfloat16(1, 40);
         let v = readout.mount_bfloat16(&[h_word], 1).expect("v=[1,1]");
-        let u = readout.mount_bfloat16(&[bfloat16(1, -20)], 1).expect("u=[1,1]");
+        let u = readout
+            .mount_bfloat16(&[bfloat16(1, -20)], 1)
+            .expect("u=[1,1]");
         let grain = ResidentGrain(0);
         let staged = surface.stage_words(&[h_word], 1, 1).expect("stage h");
-        let enter = surface.shape_enter(1, 1, Dyadic::ONE, grain, &[h_word]).expect("enter shape");
-        let sequential_v = surface.shape_contract(1, 1, enter.needed, &v).expect("sequential v shape");
-        let fused = surface.shape_factorized_contract(1, 1, enter.needed, &u, &v, 1).expect("wide factorized shape");
+        let enter = surface
+            .shape_enter(1, 1, Dyadic::ONE, grain, &[h_word])
+            .expect("enter shape");
+        let sequential_v = surface
+            .shape_contract(1, 1, enter.needed, &v)
+            .expect("sequential v shape");
+        let fused = surface
+            .shape_factorized_contract(1, 1, enter.needed, &u, &v, 1)
+            .expect("wide factorized shape");
         assert!(sequential_v.needed <= ResidentSurface::carrier_octaves());
         assert!(fused.needed <= ResidentSurface::carrier_octaves());
-        let positive_u = readout.mount_bfloat16(&[bfloat16(1, 60)], 1).expect("positive u exponent");
-        assert!(surface.shape_factorized_contract(1, 1, enter.needed, &positive_u, &v, 1).is_err(), "a positive final u shift must be admitted against the wide carrier");
+        let positive_u = readout
+            .mount_bfloat16(&[bfloat16(1, 60)], 1)
+            .expect("positive u exponent");
+        assert!(
+            surface
+                .shape_factorized_contract(1, 1, enter.needed, &positive_u, &v, 1)
+                .is_err(),
+            "a positive final u shift must be admitted against the wide carrier"
+        );
         let x = surface.fresh_section(1, 1, grain).expect("x");
-        let sequential_scalar = surface.fresh_section(1, 1, grain).expect("sequential scalar");
+        let sequential_scalar = surface
+            .fresh_section(1, 1, grain)
+            .expect("sequential scalar");
         let fused_out = surface.fresh_section(1, 1, grain).expect("fused output");
-        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).expect("begin");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![0]])
+            .expect("begin");
         let lane = builder.open(0, &[]).expect("enter lane");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("record enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("record enter");
         builder.close(0, &x, enter.needed).expect("close enter");
         let lane = builder.open(1, &[0]).expect("sequential lane");
-        surface.record_contract(&lane, &x, &v, &sequential_scalar).expect("record sequential v");
-        builder.close(1, &sequential_scalar, sequential_v.needed).expect("close sequential v");
+        surface
+            .record_contract(&lane, &x, &v, &sequential_scalar)
+            .expect("record sequential v");
+        builder
+            .close(1, &sequential_scalar, sequential_v.needed)
+            .expect("close sequential v");
         let lane = builder.open(2, &[0]).expect("fused lane");
-        surface.record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out).expect("record fused");
-        builder.close(2, &fused_out, fused.needed).expect("close fused");
+        surface
+            .record_factorized_contract(&lane, &x, &u, &v, &fused, &fused_out)
+            .expect("record fused");
+        builder
+            .close(2, &fused_out, fused.needed)
+            .expect("close fused");
         let reading = builder.finish().expect("finish").launch().expect("launch");
-        assert_eq!(reading.slots[1].refused & REFUSED_CARRIER, REFUSED_CARRIER, "sequential Contract must refuse its i64 intermediate");
-        assert_eq!(reading.slots[2].refused, 0, "the factorized wide junction must remain admitted");
-        assert_eq!(surface.read_out(&fused_out).expect("read fused"), vec![(1_i64 << 60, 1_i64 << 60)]);
+        assert_eq!(
+            reading.slots[1].refused & REFUSED_CARRIER,
+            REFUSED_CARRIER,
+            "sequential Contract must refuse its i64 intermediate"
+        );
+        assert_eq!(
+            reading.slots[2].refused, 0,
+            "the factorized wide junction must remain admitted"
+        );
+        assert_eq!(
+            surface.read_out(&fused_out).expect("read fused"),
+            vec![(1_i64 << 60, 1_i64 << 60)]
+        );
     }
 
     #[test]
     fn canonical_rank_one_gauge_admits_the_carrier_where_the_old_left_scale_reaches_the_horizon() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         let mut entries = vec![0_i64; 4096];
         entries[0] = 1_i64 << 37;
-        let old_v = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: entries.clone(), exponent: -46, entry_octaves: 38, negatives: 0 }, 4096).expect("old v");
-        let canonical_v = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries, exponent: -35, entry_octaves: 38, negatives: 0 }, 4096).expect("canonical v");
-        let old_u = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: vec![1], exponent: 11, entry_octaves: 1, negatives: 0 }, 1).expect("old u");
-        let canonical_u = readout.mount(&crate::embedding_fiber::AlignedMaterial { entries: vec![1], exponent: 0, entry_octaves: 1, negatives: 0 }, 1).expect("canonical u");
+        let old_v = readout
+            .mount(
+                &crate::embedding_fiber::AlignedMaterial {
+                    entries: entries.clone(),
+                    exponent: -46,
+                    entry_octaves: 38,
+                    negatives: 0,
+                },
+                4096,
+            )
+            .expect("old v");
+        let canonical_v = readout
+            .mount(
+                &crate::embedding_fiber::AlignedMaterial {
+                    entries,
+                    exponent: -35,
+                    entry_octaves: 38,
+                    negatives: 0,
+                },
+                4096,
+            )
+            .expect("canonical v");
+        let old_u = readout
+            .mount(
+                &crate::embedding_fiber::AlignedMaterial {
+                    entries: vec![1],
+                    exponent: 11,
+                    entry_octaves: 1,
+                    negatives: 0,
+                },
+                1,
+            )
+            .expect("old u");
+        let canonical_u = readout
+            .mount(
+                &crate::embedding_fiber::AlignedMaterial {
+                    entries: vec![1],
+                    exponent: 0,
+                    entry_octaves: 1,
+                    negatives: 0,
+                },
+                1,
+            )
+            .expect("canonical u");
         let old = surface.shape_factorized_contract(1, 4096, 63, &old_u, &old_v, 1);
-        let canonical = surface.shape_factorized_contract(1, 4096, 63, &canonical_u, &canonical_v, 1).expect("canonical gauge admits");
-        assert!(old.is_err(), "the old positive left scale must reach the wide carrier horizon");
+        let canonical = surface
+            .shape_factorized_contract(1, 4096, 63, &canonical_u, &canonical_v, 1)
+            .expect("canonical gauge admits");
+        assert!(
+            old.is_err(),
+            "the old positive left scale must reach the wide carrier horizon"
+        );
         assert!(canonical.needed < ResidentSurface::carrier_octaves());
     }
 
     #[test]
     fn a_contract_tiled_node_aperture_refuses_where_the_scalar_owner_wraps_silently() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         // a one-octave node aperture is narrower than any real accumulation: the tiled kernel
         // refuses at the node and names REFUSED_CARRIER; the scalar owner has no per-step check
         // at all and returns the same words it always did. That is the behavioural difference.
-        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let map = readout
+            .mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2)
+            .expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
-        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 1 };
-        let tiled_shape = surface.shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile).expect("shape");
+        let enter = surface
+            .shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO])
+            .expect("shape");
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 2,
+            k_tile: 128,
+            splits: 1,
+        };
+        let tiled_shape = surface
+            .shape_contract_tiled(1, 2, enter.needed.min(22), &map, tile)
+            .expect("shape");
         let x = surface.fresh_section(1, 2, grain).expect("x");
         let out = surface.fresh_section(1, 2, grain).expect("out");
         let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, enter.needed).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
-        surface.record_contract_tiled(&lane, &x, &map, tile, 1, LaneTree::Descending, &out).expect("tiled");
+        surface
+            .record_contract_tiled(&lane, &x, &map, tile, 1, LaneTree::Descending, &out)
+            .expect("tiled");
         builder.close(1, &out, tiled_shape.needed).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
         assert_eq!(reading.slots[1].refused & REFUSED_CARRIER, REFUSED_CARRIER);
-        assert!(reading.obstruction.origins().any(|refusal| refusal.index == 1));
+        assert!(
+            reading
+                .obstruction
+                .origins()
+                .any(|refusal| refusal.index == 1)
+        );
     }
 
     #[test]
     fn a_split_k_partial_is_exact_and_the_join_rounds_once() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         // four inner coordinates, split two ways: each partial carries an exact 128-bit sum at the
         // product grain, and only the join places anything at the section's grain.
         let map_words = [ONE, TWO, THREE, FOUR, HALF, ONE, TWO, HALF];
         let map = readout.mount_bfloat16(&map_words, 4).expect("map");
         let grain = ResidentGrain(20);
-        let staged = surface.stage_words(&[ONE, TWO, ONE, FOUR], 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &[ONE, TWO, ONE, FOUR]).expect("shape");
-        let scalar_shape = surface.shape_contract(1, 4, enter.needed.min(24), &map).expect("shape");
-        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 2, k_tile: 128, splits: 2 };
-        let split_shape = surface.shape_contract_tiled(1, 4, enter.needed.min(24), &map, tile).expect("shape");
+        let staged = surface
+            .stage_words(&[ONE, TWO, ONE, FOUR], 1, 4)
+            .expect("stage");
+        let enter = surface
+            .shape_enter(1, 4, Dyadic::ONE, grain, &[ONE, TWO, ONE, FOUR])
+            .expect("shape");
+        let scalar_shape = surface
+            .shape_contract(1, 4, enter.needed.min(24), &map)
+            .expect("shape");
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 2,
+            k_tile: 128,
+            splits: 2,
+        };
+        let split_shape = surface
+            .shape_contract_tiled(1, 4, enter.needed.min(24), &map, tile)
+            .expect("shape");
         let standing = surface.retain_partials(1, 2, 2).expect("partials");
         let x = surface.fresh_section(1, 4, grain).expect("x");
         let scalar_out = surface.fresh_section(1, 2, grain).expect("scalar");
         let split_out = surface.fresh_section(1, 2, grain).expect("split");
-        let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).expect("begin");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![0]])
+            .expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, enter.needed).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
-        surface.record_contract(&lane, &x, &map, &scalar_out).expect("scalar");
-        builder.close(1, &scalar_out, scalar_shape.needed).expect("close");
+        surface
+            .record_contract(&lane, &x, &map, &scalar_out)
+            .expect("scalar");
+        builder
+            .close(1, &scalar_out, scalar_shape.needed)
+            .expect("close");
         let lane = builder.open(2, &[0]).expect("open");
-        surface.record_contract_split_k(&lane, &x, &map, tile, &standing, ResidentSurface::carrier_octaves(), LaneTree::Descending, &split_out).expect("split");
-        builder.close(2, &split_out, split_shape.needed).expect("close");
+        surface
+            .record_contract_split_k(
+                &lane,
+                &x,
+                &map,
+                tile,
+                &standing,
+                ResidentSurface::carrier_octaves(),
+                LaneTree::Descending,
+                &split_out,
+            )
+            .expect("split");
+        builder
+            .close(2, &split_out, split_shape.needed)
+            .expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
         assert!(reading.obstruction.is_empty(), "{:?}", reading.obstruction);
-        assert_eq!(surface.read_out(&split_out).expect("read"), surface.read_out(&scalar_out).expect("read"));
+        assert_eq!(
+            surface.read_out(&split_out).expect("read"),
+            surface.read_out(&scalar_out).expect("read")
+        );
         // the partials themselves: two per output coordinate, and their exact sum is the whole
         let partials = surface.read_partials(&standing).expect("partials");
         assert_eq!(partials.len(), 2 * 1 * 2);
@@ -4026,62 +6359,127 @@ mod tests {
             let whole_hi = a_hi + b_hi;
             // the join's one rounding takes the exact sum at 2^(map_e − F) down to 2^-F
             let exponent = map.exponent();
-            let floor = |value: i128| -> i128 { if exponent >= 0 { value << exponent } else { value >> (-exponent) } };
+            let floor = |value: i128| -> i128 {
+                if exponent >= 0 {
+                    value << exponent
+                } else {
+                    value >> (-exponent)
+                }
+            };
             let read = surface.read_out(&split_out).expect("read")[column];
-            assert_eq!(floor(whole_lo), i128::from(read.0), "the lower word is the floor of the exact sum");
+            assert_eq!(
+                floor(whole_lo),
+                i128::from(read.0),
+                "the lower word is the floor of the exact sum"
+            );
             assert!(i128::from(read.1) >= floor(whole_hi));
         }
     }
 
     #[test]
     fn a_contract_through_a_mounted_map_is_the_exact_product() {
-        let Some((readout, surface)) = surface() else { return };
-        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
+        let map = readout
+            .mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2)
+            .expect("map");
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE, TWO], 1, 2).expect("stage");
-        let enter = surface.shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO]).expect("shape");
-        let contract = surface.shape_contract(1, 2, enter.needed.min(22), &map).expect("shape");
+        let enter = surface
+            .shape_enter(1, 2, Dyadic::ONE, grain, &[ONE, TWO])
+            .expect("shape");
+        let contract = surface
+            .shape_contract(1, 2, enter.needed.min(22), &map)
+            .expect("shape");
         assert!(contract.needed <= ResidentSurface::carrier_octaves());
         let x = surface.fresh_section(1, 2, grain).expect("x");
         let y = surface.fresh_section(1, 2, grain).expect("y");
         let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, enter.needed).expect("close");
         let lane = builder.open(1, &[0]).expect("open");
-        surface.record_contract(&lane, &x, &map, &y).expect("contract");
+        surface
+            .record_contract(&lane, &x, &map, &y)
+            .expect("contract");
         builder.close(1, &y, contract.needed).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
         assert!(reading.obstruction.is_empty());
         let unit = 1i64 << 20;
-        assert_eq!(surface.read_out(&y).expect("read"), vec![(5 * unit, 5 * unit), (-unit / 2, -unit / 2)]);
+        assert_eq!(
+            surface.read_out(&y).expect("read"),
+            vec![(5 * unit, 5 * unit), (-unit / 2, -unit / 2)]
+        );
     }
 
     #[test]
-    fn the_contact_carries_a_convex_combination_inside_the_hull_and_the_negative_numerator_law_holds() {
-        let Some((_, surface)) = surface() else { return };
+    fn the_contact_carries_a_convex_combination_inside_the_hull_and_the_negative_numerator_law_holds()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(24);
         let q_words = [ONE, 0, ONE, 0];
         let v_words = [MINUS_ONE_AND_HALF, TWO, HALF, ONE];
         let sq = surface.stage_words(&q_words, 2, 2).expect("stage");
         let sk = surface.stage_words(&q_words, 2, 2).expect("stage");
         let sv = surface.stage_words(&v_words, 2, 2).expect("stage");
-        let enter = surface.shape_enter(2, 2, Dyadic::ONE, grain, &q_words).expect("shape");
-        let contact = surface.shape_contact(2, 2, 2, 2, 1, 1, 2, 512, SeriesAperture(12), grain, 26, 26, 26).expect("shape");
+        let enter = surface
+            .shape_enter(2, 2, Dyadic::ONE, grain, &q_words)
+            .expect("shape");
+        let contact = surface
+            .shape_contact(
+                2,
+                2,
+                2,
+                2,
+                1,
+                1,
+                2,
+                512,
+                SeriesAperture(12),
+                grain,
+                26,
+                26,
+                26,
+            )
+            .expect("shape");
         assert_eq!(contact.couplings.len(), 3);
         let q = surface.fresh_section(2, 2, grain).expect("q");
         let k = surface.fresh_section(2, 2, grain).expect("k");
         let v = surface.fresh_section(2, 2, grain).expect("v");
         let out = surface.fresh_section(2, 2, grain).expect("out");
-        let mut builder = surface.begin_passage(&[vec![], vec![], vec![], vec![0, 1, 2]]).expect("begin");
-        for (index, (staged, section)) in [(&sq, &q), (&sk, &k), (&sv, &v)].into_iter().enumerate() {
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![], vec![], vec![0, 1, 2]])
+            .expect("begin");
+        for (index, (staged, section)) in [(&sq, &q), (&sk, &k), (&sv, &v)].into_iter().enumerate()
+        {
             let lane = builder.open(index, &[]).expect("open");
-            surface.record_enter(&lane, staged, Dyadic::ONE, section).expect("enter");
+            surface
+                .record_enter(&lane, staged, Dyadic::ONE, section)
+                .expect("enter");
             builder.close(index, section, enter.needed).expect("close");
         }
         let lane = builder.open(3, &[0, 1, 2]).expect("open");
-        surface.record_contact(&lane, &q, &k, &v, 1, 1, 2, 512, SeriesAperture(12), &contact, &out).expect("contact");
+        surface
+            .record_contact(
+                &lane,
+                &q,
+                &k,
+                &v,
+                1,
+                1,
+                2,
+                512,
+                SeriesAperture(12),
+                &contact,
+                &out,
+            )
+            .expect("contact");
         builder.close(3, &out, contact.needed).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
@@ -4089,27 +6487,56 @@ mod tests {
         assert_eq!(reading.slots[3].lineage_inspected, 3);
         assert_eq!(reading.slots[3].reach, 2);
         let words = surface.read_out(&out).expect("read");
-        let contains = |enclosure: (i64, i64), value: &Rat| word_value(enclosure.0, grain) <= *value && *value <= word_value(enclosure.1, grain);
+        let contains = |enclosure: (i64, i64), value: &Rat| {
+            word_value(enclosure.0, grain) <= *value && *value <= word_value(enclosure.1, grain)
+        };
         assert!(contains(words[0], &rat(-3, 2)) && words[0].0 == words[0].1);
         assert!(contains(words[1], &rat(2, 1)) && words[1].0 == words[1].1);
         assert!(contains(words[2], &rat(-1, 2)), "{:?}", words[2]);
-        assert!(word_value(words[2].0, grain) >= rat(-3, 2) && word_value(words[2].1, grain) <= rat(1, 2));
+        assert!(
+            word_value(words[2].0, grain) >= rat(-3, 2)
+                && word_value(words[2].1, grain) <= rat(1, 2)
+        );
         assert!(contains(words[3], &rat(3, 2)), "{:?}", words[3]);
-        assert!(words[2].1 - words[2].0 <= 1 && words[3].1 - words[3].0 <= 1, "{:?} {:?}", words[2], words[3]);
+        assert!(
+            words[2].1 - words[2].0 <= 1 && words[3].1 - words[3].0 <= 1,
+            "{:?} {:?}",
+            words[2],
+            words[3]
+        );
     }
 
     #[test]
     fn a_carrier_range_is_refused_before_any_launch_and_names_the_octaves() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         // a product of sixty-four and sixty-three octaves would need one hundred and twenty-seven
         let launches = surface.census().captured_launches;
         let outcome = surface.shape_hadamard(1, 1, 64, 63);
-        assert!(matches!(outcome, Err(ResidentRefusal::CarrierRange { operation: "hadamard", needed: 127, admitted: 126 })), "{outcome:?}");
-        assert_eq!(surface.census().captured_launches, launches, "no launch on a refused budget");
+        assert!(
+            matches!(
+                outcome,
+                Err(ResidentRefusal::CarrierRange {
+                    operation: "hadamard",
+                    needed: 127,
+                    admitted: 126
+                })
+            ),
+            "{outcome:?}"
+        );
+        assert_eq!(
+            surface.census().captured_launches,
+            launches,
+            "no launch on a refused budget"
+        );
         // and a word that leaves the signed carrier ON the card raises the carrier flag, typed
         let (words, reading) = enter_once(surface, &[TWO], 1, 1, Dyadic::ONE, ResidentGrain(62));
         assert_eq!(words, vec![(0, 0)]);
-        assert!(matches!(reading.slots[0].refusal("enter", 80), Some(ResidentRefusal::CarrierLeft { .. })));
+        assert!(matches!(
+            reading.slots[0].refusal("enter", 80),
+            Some(ResidentRefusal::CarrierLeft { .. })
+        ));
     }
 
     /// **The lineage falsifiers.** Two branches enter side by side; branch B's entering material
@@ -4118,15 +6545,36 @@ mod tests {
     /// bit-identical to the unpoisoned run; the join of A and B refuses upstream naming B alone;
     /// and the complete obstruction lineage is one reading under the co-present schedule, the
     /// serialized schedule, and the serialized schedule with the front opened in reverse.
-    fn two_branch_passage(surface: &'static ResidentSurface<'static>, poison: bool, schedule: Schedule, reverse_front: bool) -> (PassageReading, Vec<(i64, i64)>, Vec<(i64, i64)>, Vec<(i64, i64)>, Vec<(i64, i64)>) {
+    fn two_branch_passage(
+        surface: &'static ResidentSurface<'static>,
+        poison: bool,
+        schedule: Schedule,
+        reverse_front: bool,
+    ) -> (
+        PassageReading,
+        Vec<(i64, i64)>,
+        Vec<(i64, i64)>,
+        Vec<(i64, i64)>,
+        Vec<(i64, i64)>,
+    ) {
         let grain = ResidentGrain(20);
         let a_words = [ONE, TWO, HALF, FOUR];
         // 0x7F80 is +inf in bfloat16: a non-finite stored codeword, at coordinate 2.
-        let b_words = if poison { [ONE, TWO, 0x7F80, THREE] } else { [ONE, TWO, HALF, THREE] };
+        let b_words = if poison {
+            [ONE, TWO, 0x7F80, THREE]
+        } else {
+            [ONE, TWO, HALF, THREE]
+        };
         let sa = surface.stage_words(&a_words, 1, 4).expect("stage");
         let sb = surface.stage_words(&b_words, 1, 4).expect("stage");
-        let enter = surface.shape_enter(1, 4, Dyadic::ONE, grain, &a_words).expect("shape");
-        let by = DyadicEnclosure { lo: 2, hi: 2, grain: 0 };
+        let enter = surface
+            .shape_enter(1, 4, Dyadic::ONE, grain, &a_words)
+            .expect("shape");
+        let by = DyadicEnclosure {
+            lo: 2,
+            hi: 2,
+            grain: 0,
+        };
         let scale = surface.shape_scale(1, 4, 23, by).expect("shape");
         let join = surface.shape_re_entry(1, 4, 24, 24).expect("shape");
         let a = surface.fresh_section(1, 4, grain).expect("a");
@@ -4136,23 +6584,41 @@ mod tests {
         let joined = surface.fresh_section(1, 4, grain).expect("j");
         // occurrences: 0 enter A · 1 enter B · 2 scale A · 3 scale B · 4 re-entry(A2, B2)
         let lineage = vec![vec![], vec![], vec![0], vec![1], vec![2, 3]];
-        let mut builder = surface.begin_passage_scheduled(&lineage, schedule).expect("begin");
-        let front0: Vec<usize> = if reverse_front { vec![1, 0] } else { vec![0, 1] };
+        let mut builder = surface
+            .begin_passage_scheduled(&lineage, schedule)
+            .expect("begin");
+        let front0: Vec<usize> = if reverse_front {
+            vec![1, 0]
+        } else {
+            vec![0, 1]
+        };
         for index in front0 {
             let (staged, out) = if index == 0 { (&sa, &a) } else { (&sb, &b) };
             let lane = builder.open(index, &[]).expect("open");
-            surface.record_enter(&lane, staged, Dyadic::ONE, out).expect("enter");
+            surface
+                .record_enter(&lane, staged, Dyadic::ONE, out)
+                .expect("enter");
             builder.close(index, out, enter.needed).expect("close");
         }
-        let front1: Vec<usize> = if reverse_front { vec![3, 2] } else { vec![2, 3] };
+        let front1: Vec<usize> = if reverse_front {
+            vec![3, 2]
+        } else {
+            vec![2, 3]
+        };
         for index in front1 {
-            let (input, out, producer) = if index == 2 { (&a, &a2, 0) } else { (&b, &b2, 1) };
+            let (input, out, producer) = if index == 2 {
+                (&a, &a2, 0)
+            } else {
+                (&b, &b2, 1)
+            };
             let lane = builder.open(index, &[producer]).expect("open");
             surface.record_scale(&lane, input, by, out).expect("scale");
             builder.close(index, out, scale.needed).expect("close");
         }
         let lane = builder.open(4, &[2, 3]).expect("open");
-        surface.record_re_entry(&lane, &a2, &b2, &joined).expect("join");
+        surface
+            .record_re_entry(&lane, &a2, &b2, &joined)
+            .expect("join");
         builder.close(4, &joined, join.needed).expect("close");
         let passage = builder.finish().expect("finish");
         let reading = passage.launch().expect("launch");
@@ -4164,23 +6630,44 @@ mod tests {
     }
 
     #[test]
-    fn a_runtime_refusal_at_a_nonzero_coordinate_travels_only_along_its_lineage_and_the_sibling_is_bit_identical() {
-        let Some((_, surface)) = surface() else { return };
-        let (clean, clean_a, clean_a2, clean_b2, clean_j) = two_branch_passage(surface, false, Schedule::CoPresent, false);
+    fn a_runtime_refusal_at_a_nonzero_coordinate_travels_only_along_its_lineage_and_the_sibling_is_bit_identical()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let (clean, clean_a, clean_a2, clean_b2, clean_j) =
+            two_branch_passage(surface, false, Schedule::CoPresent, false);
         assert!(clean.obstruction.is_empty(), "{:?}", clean.slots);
-        let (poisoned, a, a2, b2, j) = two_branch_passage(surface, true, Schedule::CoPresent, false);
+        let (poisoned, a, a2, b2, j) =
+            two_branch_passage(surface, true, Schedule::CoPresent, false);
         // B refused at runtime, of its own: MALFORMED, originating.
-        assert!(matches!(poisoned.slots[1].refusal("enter", 30), Some(ResidentRefusal::Malformed { .. })), "{:?}", poisoned.slots[1]);
+        assert!(
+            matches!(
+                poisoned.slots[1].refusal("enter", 30),
+                Some(ResidentRefusal::Malformed { .. })
+            ),
+            "{:?}",
+            poisoned.slots[1]
+        );
         assert!(poisoned.slots[1].originates_refusal());
         // every successor of B refuses UPSTREAM, deterministically, naming B
-        assert!(matches!(poisoned.slots[3].refusal("scale", 30), Some(ResidentRefusal::Upstream { .. })));
+        assert!(matches!(
+            poisoned.slots[3].refusal("scale", 30),
+            Some(ResidentRefusal::Upstream { .. })
+        ));
         assert_eq!(poisoned.slots[3].upstream_first, Some(1));
         assert_eq!(poisoned.slots[3].upstream_count, 1);
         assert_eq!(poisoned.slots[3].upstream_flags, REFUSED_MALFORMED);
         // the join of A and B refuses upstream naming B's successor alone (A's stood)
-        assert!(matches!(poisoned.slots[4].refusal("re-entry", 30), Some(ResidentRefusal::Upstream { .. })));
+        assert!(matches!(
+            poisoned.slots[4].refusal("re-entry", 30),
+            Some(ResidentRefusal::Upstream { .. })
+        ));
         assert_eq!(poisoned.slots[4].upstream_first, Some(3));
-        assert_eq!(poisoned.slots[4].upstream_count, 1, "A's successor did not refuse; only B's did");
+        assert_eq!(
+            poisoned.slots[4].upstream_count, 1,
+            "A's successor did not refuse; only B's did"
+        );
         assert_eq!(poisoned.slots[4].lineage_inspected, 2);
         // the unrelated sibling and its successor are bit-identical to the clean run
         assert_eq!(a, clean_a);
@@ -4190,17 +6677,31 @@ mod tests {
         assert!(poisoned.obstruction.stands(0) && poisoned.obstruction.stands(2));
         // B's own section and the join are NOT standing: partially written words are refused by
         // the lineage, whatever they hold.
-        assert!(!poisoned.obstruction.stands(1) && !poisoned.obstruction.stands(3) && !poisoned.obstruction.stands(4));
+        assert!(
+            !poisoned.obstruction.stands(1)
+                && !poisoned.obstruction.stands(3)
+                && !poisoned.obstruction.stands(4)
+        );
         let _ = (b2, j, clean_b2, clean_j);
         // the complete lineage, as a population: origins {1}, carried {3, 4}
         let origins: Vec<usize> = poisoned.obstruction.origins().map(|r| r.index).collect();
         assert_eq!(origins, vec![1]);
-        assert_eq!(poisoned.obstruction.refusals.iter().map(|r| r.index).collect::<Vec<_>>(), vec![1, 3, 4]);
+        assert_eq!(
+            poisoned
+                .obstruction
+                .refusals
+                .iter()
+                .map(|r| r.index)
+                .collect::<Vec<_>>(),
+            vec![1, 3, 4]
+        );
     }
 
     #[test]
     fn the_complete_obstruction_lineage_is_one_reading_under_every_legal_schedule() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (co_present, ..) = two_branch_passage(surface, true, Schedule::CoPresent, false);
         let (serialized, ..) = two_branch_passage(surface, true, Schedule::Serialized, false);
         let (reversed, ..) = two_branch_passage(surface, true, Schedule::Serialized, true);
@@ -4214,18 +6715,32 @@ mod tests {
     }
 
     #[test]
-    fn a_lineage_that_disagrees_with_the_producers_opened_is_a_declaration_error_not_a_silent_read() {
-        let Some((_, surface)) = surface() else { return };
+    fn a_lineage_that_disagrees_with_the_producers_opened_is_a_declaration_error_not_a_silent_read()
+    {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(20);
         let staged = surface.stage_words(&[ONE], 1, 1).expect("stage");
         let x = surface.fresh_section(1, 1, grain).expect("x");
         let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
         let lane = builder.open(0, &[]).expect("open");
-        surface.record_enter(&lane, &staged, Dyadic::ONE, &x).expect("enter");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("enter");
         builder.close(0, &x, 30).expect("close");
-        assert!(matches!(builder.open(1, &[]), Err(ResidentRefusal::Declaration { .. })), "opening with an undeclared lineage must refuse");
+        assert!(
+            matches!(
+                builder.open(1, &[]),
+                Err(ResidentRefusal::Declaration { .. })
+            ),
+            "opening with an undeclared lineage must refuse"
+        );
         // a predecessor not earlier in the passage is refused at declaration
-        assert!(matches!(surface.begin_passage(&[vec![1], vec![]]), Err(ResidentRefusal::Declaration { .. })));
+        assert!(matches!(
+            surface.begin_passage(&[vec![1], vec![]]),
+            Err(ResidentRefusal::Declaration { .. })
+        ));
     }
 
     /// The kernel's helpers against an independent exact reference: signed minimum, its negation,
@@ -4233,7 +6748,9 @@ mod tests {
     /// products, denominators touching zero, and the negative quotient enclosure.
     #[test]
     fn the_arithmetic_helpers_agree_with_the_serial_exact_reference_on_the_signed_edge_cases() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let cases: Vec<(i64, i64, i32, i64)> = vec![
             (i64::MIN, 3, 0, 0),
             (i64::MIN, 3, -1, 0),
@@ -4245,30 +6762,40 @@ mod tests {
             (-1, 1, -70, 0),
             (1, 1, -70, 0),
             (0, 5, 60, 0),
-            (-2, 1, 1, 1),         // interval quotient N=[-2,-1], D=[1,2] lifted by 1
-            (-2, 1, 0, 1),         // corners of [-2,-1]·[1,2]
-            (3, 4, 0, 2),          // corners of [3,5]·[4,6]
-            (-5, 3, 0, 4),         // corners of [-5,-1]·[3,7]
+            (-2, 1, 1, 1), // interval quotient N=[-2,-1], D=[1,2] lifted by 1
+            (-2, 1, 0, 1), // corners of [-2,-1]·[1,2]
+            (3, 4, 0, 2),  // corners of [3,5]·[4,6]
+            (-5, 3, 0, 4), // corners of [-5,-1]·[3,7]
             (i64::MAX, i64::MAX, 0, 0),
             (-i64::MAX, i64::MAX, 3, 0),
-            (5, 0, 0, 0),          // denominator zero: refused, not divided
-            (5, 1, 126, 0),        // shift by the carrier width refuses
+            (5, 0, 0, 0),   // denominator zero: refused, not divided
+            (5, 1, 126, 0), // shift by the carrier width refuses
             (1, 1, 127, 0),
         ];
         let a: Vec<i64> = cases.iter().map(|c| c.0).collect();
         let b: Vec<i64> = cases.iter().map(|c| c.1).collect();
         let s: Vec<i32> = cases.iter().map(|c| c.2).collect();
         let span: Vec<i64> = cases.iter().map(|c| c.3).collect();
-        let (results, flags) = surface.arithmetic_control(&a, &b, &s, &span).expect("control");
+        let (results, flags) = surface
+            .arithmetic_control(&a, &b, &s, &span)
+            .expect("control");
         let two = BigInt::from(2);
         let pow = |k: u32| BigInt::from(BigUint::from(1u8) << k as usize);
         let floor_div = |n: &BigInt, d: &BigInt| -> BigInt {
             let q = n / d;
-            if (n % d) != BigInt::from(0) && ((n < &BigInt::from(0)) != (d < &BigInt::from(0))) { q - 1 } else { q }
+            if (n % d) != BigInt::from(0) && ((n < &BigInt::from(0)) != (d < &BigInt::from(0))) {
+                q - 1
+            } else {
+                q
+            }
         };
         let ceil_div = |n: &BigInt, d: &BigInt| -> BigInt {
             let q = n / d;
-            if (n % d) != BigInt::from(0) && ((n < &BigInt::from(0)) == (d < &BigInt::from(0))) { q + 1 } else { q }
+            if (n % d) != BigInt::from(0) && ((n < &BigInt::from(0)) == (d < &BigInt::from(0))) {
+                q + 1
+            } else {
+                q
+            }
         };
         let carrier = pow(127);
         for (i, (av, bv, sv, sp)) in cases.iter().enumerate() {
@@ -4286,7 +6813,10 @@ mod tests {
                 (floor_div(&a, &d), ceil_div(&a, &d), false)
             };
             if overflow {
-                assert!(flag & REFUSED_CARRIER != 0, "case {i}: an overflowing shift must refuse");
+                assert!(
+                    flag & REFUSED_CARRIER != 0,
+                    "case {i}: an overflowing shift must refuse"
+                );
             } else {
                 assert_eq!(BigInt::from(row[0]), expected_floor, "case {i} floor");
                 assert_eq!(BigInt::from(row[1]), expected_ceil, "case {i} ceil");
@@ -4298,14 +6828,19 @@ mod tests {
             if product.magnitude() < pow(253).magnitude() {
                 let pf = floor_div(&product, &d);
                 let pc = ceil_div(&product, &d);
-                if pf.magnitude() <= pow(126).magnitude() && pc.magnitude() <= pow(126).magnitude() {
+                if pf.magnitude() <= pow(126).magnitude() && pc.magnitude() <= pow(126).magnitude()
+                {
                     assert_eq!(BigInt::from(row[2]), pf, "case {i} product floor");
                     assert_eq!(BigInt::from(row[3]), pc, "case {i} product ceil");
                 }
             }
             // div_floor / div_ceil for b > 0
             if *bv > 0 {
-                assert_eq!(BigInt::from(row[4]), floor_div(&a, &b), "case {i} div floor");
+                assert_eq!(
+                    BigInt::from(row[4]),
+                    floor_div(&a, &b),
+                    "case {i} div floor"
+                );
                 assert_eq!(BigInt::from(row[5]), ceil_div(&a, &b), "case {i} div ceil");
                 // the interval quotient of [a, a+span] / [b, b+span], lifted by one
                 let n_lo = &a * &two;
@@ -4314,12 +6849,16 @@ mod tests {
                 let d_hi = &b + BigInt::from(*sp);
                 let q_lo = floor_div(&n_lo, if n_lo < BigInt::from(0) { &d_lo } else { &d_hi });
                 let q_hi = ceil_div(&n_hi, if n_hi < BigInt::from(0) { &d_hi } else { &d_lo });
-                if n_lo.magnitude() < carrier.magnitude() && n_hi.magnitude() < carrier.magnitude() {
+                if n_lo.magnitude() < carrier.magnitude() && n_hi.magnitude() < carrier.magnitude()
+                {
                     assert_eq!(BigInt::from(row[6]), q_lo, "case {i} quotient lo");
                     assert_eq!(BigInt::from(row[7]), q_hi, "case {i} quotient hi");
                 }
             } else {
-                assert!(flag & REFUSED_MALFORMED != 0, "case {i}: a non-positive denominator must refuse");
+                assert!(
+                    flag & REFUSED_MALFORMED != 0,
+                    "case {i}: a non-positive denominator must refuse"
+                );
             }
             // corners of [a, a+span]·[b, b+span]
             let ends = [
@@ -4336,7 +6875,10 @@ mod tests {
             }
         }
         // The named negative quotient: N=[-2,-1] over D=[1,2] is exactly [-2, -1/2].
-        let named = cases.iter().position(|c| *c == (-2, 1, 1, 1)).expect("the named case");
+        let named = cases
+            .iter()
+            .position(|c| *c == (-2, 1, 1, 1))
+            .expect("the named case");
         assert_eq!(results[named][6], -4, "lo = -2 at half-grain resolution");
         assert_eq!(results[named][7], -1, "hi = -1/2 at half-grain resolution");
         assert_eq!(flags[named], 0);

@@ -847,8 +847,8 @@ impl ExactSuffixEcology {
             };
             let mut transitions = LocalRelations::new();
             for (germ, target) in row {
-                let target = usize::try_from(*target)
-                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                let target =
+                    usize::try_from(*target).map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
                 if target >= classes {
                     return Err(ExactSuffixEcologyError::InvalidWire);
                 }
@@ -998,10 +998,10 @@ impl ExactSuffixEcology {
             .max_by_key(|(at, state)| (state.maximum_length, *at))
             .map(|(at, _)| at)
             .ok_or(ExactSuffixEcologyError::InvalidWire)?;
-        let boundary = greatest_boundary
-            .map_or(Ok(0), |held| {
-                held.checked_add(1).ok_or(ExactSuffixEcologyError::CarrierExtent)
-            })?;
+        let boundary = greatest_boundary.map_or(Ok(0), |held| {
+            held.checked_add(1)
+                .ok_or(ExactSuffixEcologyError::CarrierExtent)
+        })?;
         let mut last = last_state;
         lineage.boundary_symbol = boundary;
         for germ in path {
@@ -2207,8 +2207,7 @@ mod tests {
         let first = vec![germ(1), germ(2), germ(3)];
         let second = vec![germ(4), germ(2), germ(5)];
 
-        let together =
-            ExactSuffixEcology::condition(&[first.clone(), second.clone()]).unwrap();
+        let together = ExactSuffixEcology::condition(&[first.clone(), second.clone()]).unwrap();
         let mut absorbed = ExactSuffixEcology::condition(&[first.clone()]).unwrap();
         let before_states = absorbed.state_count();
         let before_transitions = absorbed.material_transition_count();

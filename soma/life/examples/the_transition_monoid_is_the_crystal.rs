@@ -36,9 +36,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::Cog;
-use life::causal_language::{
-    fiber_bytes, CausalLanguageEcology, CausalLanguagePassage,
-};
+use life::causal_language::{fiber_bytes, CausalLanguageEcology, CausalLanguagePassage};
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;
 
@@ -166,7 +164,11 @@ enum Grain {
 
 fn run() -> Result<(), String> {
     for grain in [Grain::Word, Grain::Character] {
-        let label = if grain == Grain::Word { "WORD GRAIN" } else { "CHARACTER GRAIN" };
+        let label = if grain == Grain::Word {
+            "WORD GRAIN"
+        } else {
+            "CHARACTER GRAIN"
+        };
         println!("\n================ {label} ================\n");
         census(grain)?;
     }
@@ -223,9 +225,18 @@ fn census(grain: Grain) -> Result<(), String> {
         suffix.push(atlas.suffix_link(state).unwrap_or(0));
         standing.push(atlas.standing_at(state).unwrap_or(0));
     }
-    let transport = Transport { indptr, germ, target, suffix, classes };
+    let transport = Transport {
+        indptr,
+        germ,
+        target,
+        suffix,
+        classes,
+    };
 
-    println!("THE TRANSITION MONOID — {classes} classes, {} generators\n", surfaces.len());
+    println!(
+        "THE TRANSITION MONOID — {classes} classes, {} generators\n",
+        surfaces.len()
+    );
     println!("  Each generator is `carry` for one germ: a TOTAL map on every class, arc included.");
     println!("  Nothing below is imposed. No layer, no head, no dimension.\n");
 
@@ -254,7 +265,13 @@ fn census(grain: Grain) -> Result<(), String> {
         fixed_points.extend(stable.iter().copied());
 
         // Buckets, base-2, so the shape is legible rather than 3,125 rows.
-        let bucket = |value: usize| if value == 0 { 0 } else { 64 - (value as u64).leading_zeros() as usize };
+        let bucket = |value: usize| {
+            if value == 0 {
+                0
+            } else {
+                64 - (value as u64).leading_zeros() as usize
+            }
+        };
         *contraction.entry(bucket(image.len())).or_default() += 1;
         *attractor_sizes.entry(bucket(stable.len())).or_default() += 1;
         *indices.entry(steps).or_default() += 1;
@@ -268,14 +285,20 @@ fn census(grain: Grain) -> Result<(), String> {
     }
 
     println!("ONE STEP — how far a single symbol contracts the state space");
-    println!("  |image(f_a)| bucketed by octave, over {} generators", surfaces.len());
+    println!(
+        "  |image(f_a)| bucketed by octave, over {} generators",
+        surfaces.len()
+    );
     for (octave, count) in &contraction {
         let low = if *octave == 0 { 0 } else { 1 << (octave - 1) };
         println!("    2^{:<2} ({:>6}..)   {count:>6} generators", octave, low);
     }
-    let mean_image: usize = largest.iter().map(|(image, _, _, _)| *image).sum::<usize>() / largest.len().max(1);
-    println!("  mean image {mean_image} of {classes} — a single symbol collapses the space by {}x",
-        classes / mean_image.max(1));
+    let mean_image: usize =
+        largest.iter().map(|(image, _, _, _)| *image).sum::<usize>() / largest.len().max(1);
+    println!(
+        "  mean image {mean_image} of {classes} — a single symbol collapses the space by {}x",
+        classes / mean_image.max(1)
+    );
 
     println!();
     println!("THE ATTRACTORS — the emergent charts, where each symbol's dynamics live");
@@ -283,11 +306,20 @@ fn census(grain: Grain) -> Result<(), String> {
         let low = if *octave == 0 { 0 } else { 1 << (octave - 1) };
         println!("    2^{:<2} ({:>6}..)   {count:>6} generators", octave, low);
     }
-    let mean_attractor: usize = largest.iter().map(|(_, stable, _, _)| *stable).sum::<usize>() / largest.len().max(1);
+    let mean_attractor: usize = largest
+        .iter()
+        .map(|(_, stable, _, _)| *stable)
+        .sum::<usize>()
+        / largest.len().max(1);
     println!("  mean attractor {mean_attractor} classes");
-    println!("  union of the FIXED POINTS: {} of {classes}", fixed_points.len());
-    println!("  union of the IMAGES:      {} of {classes} = every class reachable in ONE step",
-        reachable.len());
+    println!(
+        "  union of the FIXED POINTS: {} of {classes}",
+        fixed_points.len()
+    );
+    println!(
+        "  union of the IMAGES:      {} of {classes} = every class reachable in ONE step",
+        reachable.len()
+    );
     println!("  from anywhere. That is the set a walk can occupy; the rest is reachable only");
     println!("  through longer words.");
 

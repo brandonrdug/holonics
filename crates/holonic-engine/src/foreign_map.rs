@@ -403,8 +403,16 @@ fn census_word(region: &mut RegionCensus, table: &[CodewordClass], word: u16) {
         }
         CodewordClass::Normal { exponent } => {
             region.finite += 1;
-            region.exponent_min = Some(region.exponent_min.map_or(exponent, |e: i32| e.min(exponent)));
-            region.exponent_max = Some(region.exponent_max.map_or(exponent, |e: i32| e.max(exponent)));
+            region.exponent_min = Some(
+                region
+                    .exponent_min
+                    .map_or(exponent, |e: i32| e.min(exponent)),
+            );
+            region.exponent_max = Some(
+                region
+                    .exponent_max
+                    .map_or(exponent, |e: i32| e.max(exponent)),
+            );
         }
         CodewordClass::NonFinite => region.non_finite += 1,
     }
@@ -428,7 +436,10 @@ impl FileIdentity {
     /// Read the identity of an open file.
     pub fn of(file: &File, address: &str) -> Result<Self, ForeignMapError> {
         use std::os::unix::fs::MetadataExt;
-        let metadata = file.metadata().map_err(|error| ForeignMapError::Open { address: address.to_owned(), reason: error.to_string() })?;
+        let metadata = file.metadata().map_err(|error| ForeignMapError::Open {
+            address: address.to_owned(),
+            reason: error.to_string(),
+        })?;
         Ok(Self {
             device: metadata.dev(),
             inode: metadata.ino(),
@@ -441,7 +452,10 @@ impl FileIdentity {
     }
     /// Read the identity at an address, opening it only to stat it.
     pub fn at(address: &str) -> Result<Self, ForeignMapError> {
-        let file = File::open(address).map_err(|error| ForeignMapError::Open { address: address.to_owned(), reason: error.to_string() })?;
+        let file = File::open(address).map_err(|error| ForeignMapError::Open {
+            address: address.to_owned(),
+            reason: error.to_string(),
+        })?;
         Self::of(&file, address)
     }
 }
@@ -1123,10 +1137,17 @@ impl ForeignContainer {
     /// octets hashed (twice — once for the whole, once for the region) and the codewords decoded.
     /// `FileIdentity` is read before the pass and after it; if it moved, the census is refused
     /// rather than returned — the digest must read one stable occurrence.
-    pub fn streamed_census(&self, file: &mut File, chunk_octets: usize) -> Result<StreamedCensus, ForeignMapError> {
+    pub fn streamed_census(
+        &self,
+        file: &mut File,
+        chunk_octets: usize,
+    ) -> Result<StreamedCensus, ForeignMapError> {
         use sha2::{Digest, Sha256};
         let identity_before = FileIdentity::of(file, &self.address)?;
-        let ContainerSpecies::Safetensors { header_octets, base } = &self.species;
+        let ContainerSpecies::Safetensors {
+            header_octets,
+            base,
+        } = &self.species;
         let header_octets = *header_octets;
         let base = *base;
         // the codeword table: one mouth, evaluated once per distinct word
@@ -1139,7 +1160,9 @@ impl ForeignContainer {
                         CodewordClass::Subnormal
                     } else {
                         // the unbiased exponent of the leading one: value ∈ [2^e, 2^(e+1))
-                        CodewordClass::Normal { exponent: datum.ulp_exponent + 7 }
+                        CodewordClass::Normal {
+                            exponent: datum.ulp_exponent + 7,
+                        }
                     }
                 }
                 Err(_) => CodewordClass::NonFinite,
@@ -1172,13 +1195,31 @@ impl ForeignContainer {
         let mut carry: Vec<Option<u8>> = vec![None; regions.len()];
         let mut whole = Sha256::new();
         // the header, as it lies
-        file.seek(SeekFrom::Start(0)).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
-        let mut head = vec![0u8; usize::try_from(base).map_err(|_| ForeignMapError::HeaderTooLong { address: self.address.clone(), declared: header_octets })?];
-        file.read_exact(&mut head).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
+        file.seek(SeekFrom::Start(0))
+            .map_err(|error| ForeignMapError::Read {
+                name: self.address.clone(),
+                reason: error.to_string(),
+            })?;
+        let mut head = vec![
+            0u8;
+            usize::try_from(base).map_err(|_| ForeignMapError::HeaderTooLong {
+                address: self.address.clone(),
+                declared: header_octets
+            })?
+        ];
+        file.read_exact(&mut head)
+            .map_err(|error| ForeignMapError::Read {
+                name: self.address.clone(),
+                reason: error.to_string(),
+            })?;
         whole.update(&head);
         let mut header_hasher = Sha256::new();
         header_hasher.update(&head[8..]);
-        let header_sha256: String = header_hasher.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+        let header_sha256: String = header_hasher
+            .finalize()
+            .iter()
+            .map(|octet| format!("{octet:02x}"))
+            .collect();
         // the payload, chunk by chunk
         let chunk = chunk_octets.max(2) & !1usize;
         let mut buffer = vec![0u8; chunk];
@@ -1190,9 +1231,17 @@ impl ForeignContainer {
         let payload = self.payload_octets;
         while offset < payload {
             let want = usize::try_from((payload - offset).min(chunk as u64)).unwrap_or(chunk);
-            let read = file.read(&mut buffer[..want]).map_err(|error| ForeignMapError::Read { name: self.address.clone(), reason: error.to_string() })?;
+            let read = file
+                .read(&mut buffer[..want])
+                .map_err(|error| ForeignMapError::Read {
+                    name: self.address.clone(),
+                    reason: error.to_string(),
+                })?;
             if read == 0 {
-                return Err(ForeignMapError::Read { name: self.address.clone(), reason: format!("the payload ended at {offset} of {payload}") });
+                return Err(ForeignMapError::Read {
+                    name: self.address.clone(),
+                    reason: format!("the payload ended at {offset} of {payload}"),
+                });
             }
             let piece = &buffer[..read];
             whole.update(piece);
@@ -1239,7 +1288,11 @@ impl ForeignContainer {
                 if region.end <= chunk_to {
                     // finished: seal its hash and its admission
                     if let Some(hasher) = hashers[at].take() {
-                        region.sha256 = hasher.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+                        region.sha256 = hasher
+                            .finalize()
+                            .iter()
+                            .map(|octet| format!("{octet:02x}"))
+                            .collect();
                     }
                     region.admission = if region.dtype != ForeignDtype::Bf16 {
                         AdmissionClass::ManifestedOnly
@@ -1264,10 +1317,19 @@ impl ForeignContainer {
                 region.admission = AdmissionClass::UnreadRefused;
             }
         }
-        let content_sha256: String = whole.finalize().iter().map(|octet| format!("{octet:02x}")).collect();
+        let content_sha256: String = whole
+            .finalize()
+            .iter()
+            .map(|octet| format!("{octet:02x}"))
+            .collect();
         let identity_after = FileIdentity::of(file, &self.address)?;
         if identity_before != identity_after {
-            return Err(ForeignMapError::Read { name: self.address.clone(), reason: format!("the file occurrence moved during the pass: {identity_before:?} → {identity_after:?}") });
+            return Err(ForeignMapError::Read {
+                name: self.address.clone(),
+                reason: format!(
+                    "the file occurrence moved during the pass: {identity_before:?} → {identity_after:?}"
+                ),
+            });
         }
         Ok(StreamedCensus {
             address: self.address.clone(),
@@ -1520,17 +1582,31 @@ mod tests {
         let b_words: [u16; 3] = [0x3F80, 0x7F80, 0x4040];
         // region c: one f32 1.0 at 20..24
         let mut payload: Vec<u8> = Vec::new();
-        for w in a_words { payload.extend_from_slice(&w.to_le_bytes()); }
+        for w in a_words {
+            payload.extend_from_slice(&w.to_le_bytes());
+        }
         payload.extend_from_slice(&[0xAA, 0xBB]);
-        for w in b_words { payload.extend_from_slice(&w.to_le_bytes()); }
+        for w in b_words {
+            payload.extend_from_slice(&w.to_le_bytes());
+        }
         payload.extend_from_slice(&1.0f32.to_le_bytes());
         let header = r#"{"a":{"dtype":"BF16","shape":[2,3],"data_offsets":[0,12]},"b":{"dtype":"BF16","shape":[3],"data_offsets":[14,20]},"c":{"dtype":"F32","shape":[],"data_offsets":[20,24]}}"#;
         write_container(&path, header, &payload);
-        let (mut file, container) = manifest_safetensors(path.to_str().expect("path")).expect("manifest");
+        let (mut file, container) =
+            manifest_safetensors(path.to_str().expect("path")).expect("manifest");
         for chunk in [2usize, 3, 5, 1 << 20] {
             let census = container.streamed_census(&mut file, chunk).expect("census");
-            let hex = |bytes: &[u8]| -> String { Sha256::digest(bytes).iter().map(|o| format!("{o:02x}")).collect() };
-            assert_eq!(census.region("a").expect("a").sha256, hex(&payload[0..12]), "chunk {chunk}");
+            let hex = |bytes: &[u8]| -> String {
+                Sha256::digest(bytes)
+                    .iter()
+                    .map(|o| format!("{o:02x}"))
+                    .collect()
+            };
+            assert_eq!(
+                census.region("a").expect("a").sha256,
+                hex(&payload[0..12]),
+                "chunk {chunk}"
+            );
             assert_eq!(census.region("b").expect("b").sha256, hex(&payload[14..20]));
             assert_eq!(census.region("c").expect("c").sha256, hex(&payload[20..24]));
             let mut whole: Vec<u8> = Vec::new();
@@ -1540,12 +1616,19 @@ mod tests {
             assert_eq!(census.content_sha256, hex(&whole));
             assert_eq!(census.header_sha256, hex(header.as_bytes()));
             let a = census.region("a").expect("a");
-            assert_eq!((a.codewords, a.finite, a.non_finite, a.zero, a.subnormal), (6, 6, 0, 1, 1));
+            assert_eq!(
+                (a.codewords, a.finite, a.non_finite, a.zero, a.subnormal),
+                (6, 6, 0, 1, 1)
+            );
             assert_eq!((a.exponent_min, a.exponent_max), (Some(-1), Some(1)));
             assert_eq!(a.admission, AdmissionClass::DecodedExact);
             let b = census.region("b").expect("b");
             assert_eq!((b.codewords, b.finite, b.non_finite), (3, 2, 1));
-            assert_eq!(b.admission, AdmissionClass::UnreadRefused, "a non-finite codeword refuses the region by name");
+            assert_eq!(
+                b.admission,
+                AdmissionClass::UnreadRefused,
+                "a non-finite codeword refuses the region by name"
+            );
             let c = census.region("c").expect("c");
             assert_eq!(c.admission, AdmissionClass::ManifestedOnly);
             assert_eq!(c.codewords, 0);

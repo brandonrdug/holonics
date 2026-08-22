@@ -11,8 +11,8 @@ use body::incidence::{
 use body::num::Cog;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent,
-    DirectedCurrentRelation, CpuLiveCurrentExecutor, InterfaceCapability, LiveCurrentMachine,
+    ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
+    CurrentEvent, DirectedCurrentRelation, InterfaceCapability, LiveCurrentMachine,
     ParallelCpuLiveCurrentExecutor,
 };
 
@@ -41,14 +41,12 @@ fn assert_live_equal(
             card.lineage_channel(*card_lineage)
         );
         assert_eq!(
-            cpu.lineage_carrier(*cpu_lineage)
-                .map(|body| body.header()),
+            cpu.lineage_carrier(*cpu_lineage).map(|body| body.header()),
             card.lineage_carrier(*card_lineage)
                 .map(|body| body.header())
         );
         assert_eq!(
-            cpu.lineage_carrier(*cpu_lineage)
-                .map(|body| body.carrier()),
+            cpu.lineage_carrier(*cpu_lineage).map(|body| body.carrier()),
             card.lineage_carrier(*card_lineage)
                 .map(|body| body.carrier())
         );
@@ -686,13 +684,7 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
 
     let departure_face = [ResidueChartWorld::atom(137)];
     let cpu_departure = cpu_zero
-        .present_with(
-            &mut cpu,
-            &mut cpu_executor,
-            &departure_face,
-            action(),
-            true,
-        )
+        .present_with(&mut cpu, &mut cpu_executor, &departure_face, action(), true)
         .unwrap();
     let card_departure = card_zero
         .present_with(&mut card, &mut cuda, &departure_face, action(), true)
@@ -1238,11 +1230,7 @@ fn directed_current_hand_is_formed_on_card_and_matches_cpu() {
         )
         .unwrap();
     assert_eq!(cpu_forward_return, card_forward_return);
-    assert_live_equal(
-        &cpu_forward,
-        &card_forward,
-        &[(left, left), (right, right)],
-    );
+    assert_live_equal(&cpu_forward, &card_forward, &[(left, left), (right, right)]);
 
     let cpu_reverse_return = cpu_reverse
         .receive(ContemporaryEvent::new(&reverse_currents, &reverse_relation))
@@ -1254,16 +1242,9 @@ fn directed_current_hand_is_formed_on_card_and_matches_cpu() {
         )
         .unwrap();
     assert_eq!(cpu_reverse_return, card_reverse_return);
-    assert_live_equal(
-        &cpu_reverse,
-        &card_reverse,
-        &[(left, left), (right, right)],
-    );
+    assert_live_equal(&cpu_reverse, &card_reverse, &[(left, left), (right, right)]);
 
-    assert_eq!(
-        cpu_forward_return.currents(),
-        cpu_reverse_return.currents()
-    );
+    assert_eq!(cpu_forward_return.currents(), cpu_reverse_return.currents());
     assert_ne!(
         cpu_forward_return.relations()[0].contact(),
         cpu_reverse_return.relations()[0].contact()
@@ -1628,10 +1609,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
         ],
     );
 
-    assert_eq!(
-        cpu_forward_return.currents(),
-        cpu_reverse_return.currents()
-    );
+    assert_eq!(cpu_forward_return.currents(), cpu_reverse_return.currents());
     assert_eq!(
         cpu_forward_return.currents(),
         cpu_independent_return.currents()
@@ -1755,8 +1733,7 @@ fn program_world_hand_crosses_the_native_cuda_mouth() {
             NativeEventCurrent::continuing(&mut cpu_forward_left, &cpu_probe.left, action()),
             NativeEventCurrent::continuing(&mut cpu_forward_right, &cpu_probe.right, action()),
         ];
-        present_native_event_with(&mut cpu_forward, &mut cpu_executor, &mut currents, &[])
-            .unwrap()
+        present_native_event_with(&mut cpu_forward, &mut cpu_executor, &mut currents, &[]).unwrap()
     };
     cpu_forward_world.receive(&[], &cpu_probe_return);
     let card_probe_return = {

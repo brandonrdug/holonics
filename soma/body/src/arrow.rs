@@ -286,11 +286,18 @@ mod tests {
         let b = p(1, -1);
         let f = p(0, 0);
         let arr = relate(a, b, f);
-        assert_eq!(arr.aim.mag, 0, "the cohere face cancelled from two standing arms");
+        assert_eq!(
+            arr.aim.mag, 0,
+            "the cohere face cancelled from two standing arms"
+        );
         // Not at horizon: the gyration survives, so this is ORTHO and not a null relating at all.
         assert!(!arr.at_horizon());
         assert_eq!(arr.sense(), Aim::Ortho);
-        assert_eq!(null_species(a, b, f), None, "not null: only one face cancelled");
+        assert_eq!(
+            null_species(a, b, f),
+            None,
+            "not null: only one face cancelled"
+        );
         // A relating is annihilated only when BOTH faces cancel from standing arms.
         assert_eq!(
             null_species(p(2, 0), p(2, 0), p(0, 0)),
@@ -332,7 +339,11 @@ mod tests {
                 affine(b, scale, shift),
                 affine(f, scale, shift),
             );
-            assert_eq!(here.sense(), there.sense(), "the hand is an affine invariant");
+            assert_eq!(
+                here.sense(),
+                there.sense(),
+                "the hand is an affine invariant"
+            );
             assert_eq!(
                 here.founds(),
                 there.founds(),

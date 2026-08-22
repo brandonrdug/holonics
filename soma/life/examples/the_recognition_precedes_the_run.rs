@@ -327,7 +327,14 @@ fn main() {
     println!("  every edge below is a KERNEL-PROVED transformation carrying a node to that node");
     println!("  while preserving its invariant, which is `H.0362`'s definition of an atlas edge.");
     for edge in &typed.edges {
-        println!("\n    from   {}", if edge.from.is_empty() { "(none recruited)" } else { &edge.from });
+        println!(
+            "\n    from   {}",
+            if edge.from.is_empty() {
+                "(none recruited)"
+            } else {
+                &edge.from
+            }
+        );
         println!("    species {}", edge.species);
         println!("    proof   {}", edge.proof);
     }

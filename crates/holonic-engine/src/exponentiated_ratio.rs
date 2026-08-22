@@ -426,7 +426,8 @@ mod tests {
         for (numerator, denominator) in [(1, 2), (1, 3), (3, 4), (5, 12), (1, 1)] {
             let probability = rat(numerator, denominator);
             let form = SymbolicSurprisal::of_probability(&probability).expect("a probability");
-            let recovered = exponentiate(&form.scaled(&-Rat::one())).expect("integral coefficients");
+            let recovered =
+                exponentiate(&form.scaled(&-Rat::one())).expect("integral coefficients");
             assert_eq!(recovered, probability);
         }
     }
@@ -437,8 +438,14 @@ mod tests {
     fn the_ratio_of_two_probabilities_is_returned_exactly() {
         let half = surprisal_of(1, 2);
         let quarter = surprisal_of(1, 4);
-        assert_eq!(probability_ratio(&half, &quarter).expect("exact"), rat(2, 1));
-        assert_eq!(probability_ratio(&quarter, &half).expect("exact"), rat(1, 2));
+        assert_eq!(
+            probability_ratio(&half, &quarter).expect("exact"),
+            rat(2, 1)
+        );
+        assert_eq!(
+            probability_ratio(&quarter, &half).expect("exact"),
+            rat(1, 2)
+        );
         // And a ratio that is not an integer.
         let third = surprisal_of(1, 3);
         assert_eq!(probability_ratio(&half, &third).expect("exact"), rat(3, 2));

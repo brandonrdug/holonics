@@ -79,10 +79,12 @@ fn build(material: &[(&str, u64)], into: &str) -> Result<Built, String> {
         let text = std::fs::read_to_string(path).map_err(|error| format!("{path}: {error}"))?;
         passages.push(CausalLanguagePassage::new(*path, *receiver, text));
     }
-    let ecology = CausalLanguageEcology::condition(&passages, current()?, 8).map_err(|error| format!("conditioning refused: {error:?}"))?;
+    let ecology = CausalLanguageEcology::condition(&passages, current()?, 8)
+        .map_err(|error| format!("conditioning refused: {error:?}"))?;
     let atlas = ecology.global_suffix();
     let classes = atlas.state_count();
-    let chart = TreeChart::label(classes, |state| atlas.suffix_link(state)).map_err(|error| format!("{error:?}"))?;
+    let chart = TreeChart::label(classes, |state| atlas.suffix_link(state))
+        .map_err(|error| format!("{error:?}"))?;
 
     // ---- vocabulary, canonical ----
     let mut index_of: BTreeMap<String, u32> = BTreeMap::new();
@@ -138,16 +140,38 @@ fn build(material: &[(&str, u64)], into: &str) -> Result<Built, String> {
     // vocabulary; a 16-bit carrier would put a second ceiling under the first and refuse a
     // vocabulary the material can perfectly well found.
     let integers: Vec<IntegerTensor> = vec![
-        emit_integers("athena.transport.indptr", &indptr, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.transport.germ", &germ, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.transport.target", &target, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.class.standing", &standing, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.class.suffix", &suffix, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.vocabulary.octets", &vocabulary_octets, 1, IntegerDtype::U16).map_err(|e| format!("{e:?}"))?,
-        emit_integers("athena.vocabulary.offsets", &vocabulary_offsets, 1, IntegerDtype::U32).map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.indptr", &indptr, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.germ", &germ, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.transport.target", &target, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.class.standing", &standing, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers("athena.class.suffix", &suffix, 1, IntegerDtype::U32)
+            .map_err(|e| format!("{e:?}"))?,
+        emit_integers(
+            "athena.vocabulary.octets",
+            &vocabulary_octets,
+            1,
+            IntegerDtype::U16,
+        )
+        .map_err(|e| format!("{e:?}"))?,
+        emit_integers(
+            "athena.vocabulary.offsets",
+            &vocabulary_offsets,
+            1,
+            IntegerDtype::U32,
+        )
+        .map_err(|e| format!("{e:?}"))?,
         emit_integers(
             "athena.architecture",
-            &[u64::from(chart.height), classes as u64, germ.len() as u64, ordered.len() as u64],
+            &[
+                u64::from(chart.height),
+                classes as u64,
+                germ.len() as u64,
+                ordered.len() as u64,
+            ],
             1,
             IntegerDtype::U32,
         )
@@ -170,7 +194,11 @@ fn build(material: &[(&str, u64)], into: &str) -> Result<Built, String> {
     );
     metadata.insert(
         "material".to_owned(),
-        material.iter().map(|(path, receiver)| format!("{path}@{receiver}")).collect::<Vec<_>>().join(" "),
+        material
+            .iter()
+            .map(|(path, receiver)| format!("{path}@{receiver}"))
+            .collect::<Vec<_>>()
+            .join(" "),
     );
     metadata.insert(
         "carriers".to_owned(),
@@ -180,14 +208,24 @@ fn build(material: &[(&str, u64)], into: &str) -> Result<Built, String> {
     let container = write_container(&integers, &metadata);
     std::fs::create_dir_all(OUT).map_err(|error| format!("{OUT}: {error}"))?;
     std::fs::write(into, &container).map_err(|error| format!("{into}: {error}"))?;
-    Ok(Built { classes, transitions: germ.len(), vocabulary: ordered.len(), height: chart.height, octets: container.len() })
+    Ok(Built {
+        classes,
+        transitions: germ.len(),
+        vocabulary: ordered.len(),
+        height: chart.height,
+        octets: container.len(),
+    })
 }
 
 /// The safetensors header with a `__metadata__` object. Written here because the format is a
 /// length, a JSON map and a flat payload, and the reader (`foreign_map::manifest_safetensors`) is
 /// already in this project's own source.
 fn write_container(tensors: &[IntegerTensor], metadata: &BTreeMap<String, String>) -> Vec<u8> {
-    let escape = |text: &str| text.replace('\\', "\\\\").replace('"', "\\\"").replace('\n', "\\n");
+    let escape = |text: &str| {
+        text.replace('\\', "\\\\")
+            .replace('"', "\\\"")
+            .replace('\n', "\\n")
+    };
     let mut header = String::from("{\"__metadata__\":{");
     for (at, (key, value)) in metadata.iter().enumerate() {
         if at > 0 {
@@ -234,11 +272,22 @@ fn run() -> Result<(), String> {
         "    classes {}   transitions {}   vocabulary {}   suffix-link tree height {}",
         built.classes, built.transitions, built.vocabulary, built.height
     );
-    println!("    cycle rank of the transition graph  b1 = |E| - |S| + 1 = {}", built.transitions as i64 - built.classes as i64 + 1);
-    println!("    container {} octets = {} KiB  -> {whole}", built.octets, built.octets / 1024);
+    println!(
+        "    cycle rank of the transition graph  b1 = |E| - |S| + 1 = {}",
+        built.transitions as i64 - built.classes as i64 + 1
+    );
+    println!(
+        "    container {} octets = {} KiB  -> {whole}",
+        built.octets,
+        built.octets / 1024
+    );
     println!("    declared laws in the container's own metadata: walk, future, depth");
 
-    let ablated_material: Vec<(&str, u64)> = MATERIAL.iter().copied().filter(|(path, _)| *path != WITHDRAWN).collect();
+    let ablated_material: Vec<(&str, u64)> = MATERIAL
+        .iter()
+        .copied()
+        .filter(|(path, _)| *path != WITHDRAWN)
+        .collect();
     let ablated_path = format!("{OUT}/rest-without-hexis.safetensors");
     let ablated = build(&ablated_material, &ablated_path)?;
     println!();
@@ -247,8 +296,15 @@ fn run() -> Result<(), String> {
         "    classes {}   transitions {}   vocabulary {}   suffix-link tree height {}",
         ablated.classes, ablated.transitions, ablated.vocabulary, ablated.height
     );
-    println!("    cycle rank b1 = {}", ablated.transitions as i64 - ablated.classes as i64 + 1);
-    println!("    container {} octets = {} KiB  -> {ablated_path}", ablated.octets, ablated.octets / 1024);
+    println!(
+        "    cycle rank b1 = {}",
+        ablated.transitions as i64 - ablated.classes as i64 + 1
+    );
+    println!(
+        "    container {} octets = {} KiB  -> {ablated_path}",
+        ablated.octets,
+        ablated.octets / 1024
+    );
     println!();
     println!(
         "    the withdrawal removes {} classes, {} transitions and {} vocabulary germs",

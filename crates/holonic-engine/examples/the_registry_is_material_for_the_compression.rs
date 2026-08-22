@@ -108,7 +108,10 @@ impl ObservedSystem for Registry {
     }
 
     fn observation(&self, item: ItemId, receiver: ReceiverId) -> Observation {
-        let Some(entry) = self.entries.get(usize::try_from(item.0).unwrap_or(usize::MAX)) else {
+        let Some(entry) = self
+            .entries
+            .get(usize::try_from(item.0).unwrap_or(usize::MAX))
+        else {
             return Observation(0);
         };
         match receiver.0 {
@@ -133,7 +136,10 @@ impl ObservedSystem for Registry {
 }
 
 fn main() {
-    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../meta/REGISTRY_INCIDENCE.tsv");
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../meta/REGISTRY_INCIDENCE.tsv"
+    );
     let Ok(text) = fs::read_to_string(path) else {
         println!("meta/REGISTRY_INCIDENCE.tsv is absent — run tools/registry_incidence.py first");
         return;

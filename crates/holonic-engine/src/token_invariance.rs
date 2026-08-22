@@ -206,7 +206,7 @@ use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
 use crate::hardware_cover::{
-    Chart, ChartId, CoverDecomposition, FrontCell, HardwareCover, CpuDeclaration, expand_front,
+    Chart, ChartId, CoverDecomposition, CpuDeclaration, FrontCell, HardwareCover, expand_front,
 };
 use crate::receiver_exact_compression::{
     AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,

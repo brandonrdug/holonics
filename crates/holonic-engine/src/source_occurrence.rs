@@ -50,43 +50,106 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use crate::exact_json;
+use crate::exact_owner_testimony::{ExactOwnerLicense, ExactOwnerWitnessRefusal};
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
 
 /// Every way an occurrence refuses. Each names the material that refused; none is a count.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SourceRefusal {
-    Unreadable { locator: String, reason: String },
+    Unreadable {
+        locator: String,
+        reason: String,
+    },
     /// The content at the locator no longer hashes to what the occurrence declared.
-    Drifted { locator: String, declared: String, measured: String },
+    Drifted {
+        locator: String,
+        declared: String,
+        measured: String,
+    },
     /// Testimony cites a locator this occurrence does not authenticate.
-    LocatorForeign { operation: String, locator: String },
-    SymbolMalformed { operation: String, symbol: String, why: &'static str },
+    LocatorForeign {
+        operation: String,
+        locator: String,
+    },
+    SymbolMalformed {
+        operation: String,
+        symbol: String,
+        why: &'static str,
+    },
     /// A path segment occurs nowhere in the scope the previous segment opened.
-    SymbolUnresolved { operation: String, symbol: String, segment: String },
+    SymbolUnresolved {
+        operation: String,
+        symbol: String,
+        segment: String,
+    },
     /// The parenthesised slice does not occur verbatim in the symbol's scope.
-    SliceAbsent { operation: String, symbol: String, slice: String },
-    ConfigurationFieldAbsent { operation: String, field: String },
-    ConfigurationValueDiffers { operation: String, field: String, declared: String, measured: String },
+    SliceAbsent {
+        operation: String,
+        symbol: String,
+        slice: String,
+    },
+    ConfigurationFieldAbsent {
+        operation: String,
+        field: String,
+    },
+    ConfigurationValueDiffers {
+        operation: String,
+        field: String,
+        declared: String,
+        measured: String,
+    },
     /// A declared shape disagrees with the authenticated container header.
-    ShapeDiffers { operation: String, population: String, declared: Vec<usize>, measured: Vec<usize> },
+    ShapeDiffers {
+        operation: String,
+        population: String,
+        declared: Vec<usize>,
+        measured: Vec<usize>,
+    },
     /// The container header declares a dtype for the population other than the exact carrier the
     /// deed decodes — checked, not recorded.
-    DtypeDiffers { operation: String, population: String, declared: String, measured: String },
+    DtypeDiffers {
+        operation: String,
+        population: String,
+        declared: String,
+        measured: String,
+    },
     /// A binding names a stored population the container does not identify by region.
-    PopulationNotIdentified { operation: String, population: String },
+    PopulationNotIdentified {
+        operation: String,
+        population: String,
+    },
     /// An intervention offered as testimony for a source law, or a source law with none.
-    InterventionOnSourceLaw { operation: String, species: OperationSpecies },
+    InterventionOnSourceLaw {
+        operation: String,
+        species: OperationSpecies,
+    },
     /// An operation whose testimony is a description alone — a name — has no source behind it.
-    TestimonyNotExterior { operation: String, testimony: Vec<String> },
-    ContainerMalformed { locator: String, reason: String },
+    TestimonyNotExterior {
+        operation: String,
+        testimony: Vec<String>,
+    },
+    ContainerMalformed {
+        locator: String,
+        reason: String,
+    },
     /// A native rest is asked to witness a law it does not itself declare.
-    DeclarationNotInRest { operation: String, statement: String },
+    DeclarationNotInRest {
+        operation: String,
+        statement: String,
+    },
     /// Implementation or configuration testimony offered to a native rest, which has neither.
-    TestimonyForeignToNativeRest { operation: String, testimony: String },
+    TestimonyForeignToNativeRest {
+        operation: String,
+        testimony: String,
+    },
     /// No stored concrete topology has the authenticated identity requested by the passage.
-    TopologyAbsent { identity: String },
+    TopologyAbsent {
+        identity: String,
+    },
     /// A stored topology was found, but the operation occurrence is not present in that topology.
-    OperationForeign { operation: String },
+    OperationForeign {
+        operation: String,
+    },
 }
 
 impl std::fmt::Display for SourceRefusal {
@@ -155,7 +218,11 @@ impl AuthenticatedText {
         if !self.read_from_locator {
             let measured = hex(&Sha256::digest(self.text.as_bytes()));
             if measured != self.sha256 {
-                return Err(SourceRefusal::Drifted { locator: self.locator.clone(), declared: self.sha256.clone(), measured });
+                return Err(SourceRefusal::Drifted {
+                    locator: self.locator.clone(),
+                    declared: self.sha256.clone(),
+                    measured,
+                });
             }
             return Ok(());
         }
@@ -220,10 +287,21 @@ pub struct AuthenticatedContainer {
 impl AuthenticatedContainer {
     /// Re-read the file occurrence at the locator and refuse when it is not the one authenticated.
     pub fn verify_still(&self) -> Result<(), SourceRefusal> {
-        let Some(declared) = &self.identity else { return Ok(()) };
-        let now = crate::foreign_map::FileIdentity::at(&self.locator).map_err(|error| SourceRefusal::Unreadable { locator: self.locator.clone(), reason: error.to_string() })?;
+        let Some(declared) = &self.identity else {
+            return Ok(());
+        };
+        let now = crate::foreign_map::FileIdentity::at(&self.locator).map_err(|error| {
+            SourceRefusal::Unreadable {
+                locator: self.locator.clone(),
+                reason: error.to_string(),
+            }
+        })?;
         if now != *declared {
-            return Err(SourceRefusal::Drifted { locator: self.locator.clone(), declared: format!("{declared:?}"), measured: format!("{now:?}") });
+            return Err(SourceRefusal::Drifted {
+                locator: self.locator.clone(),
+                declared: format!("{declared:?}"),
+                measured: format!("{now:?}"),
+            });
         }
         Ok(())
     }
@@ -236,23 +314,29 @@ impl AuthenticatedContainer {
         })?;
         let octets = file
             .metadata()
-            .map_err(|error| SourceRefusal::Unreadable { locator: locator.to_owned(), reason: error.to_string() })?
+            .map_err(|error| SourceRefusal::Unreadable {
+                locator: locator.to_owned(),
+                reason: error.to_string(),
+            })?
             .len();
         let mut length = [0u8; 8];
-        file.read_exact(&mut length).map_err(|error| SourceRefusal::ContainerMalformed {
-            locator: locator.to_owned(),
-            reason: error.to_string(),
-        })?;
+        file.read_exact(&mut length)
+            .map_err(|error| SourceRefusal::ContainerMalformed {
+                locator: locator.to_owned(),
+                reason: error.to_string(),
+            })?;
         let header_octets = u64::from_le_bytes(length);
-        let extent = usize::try_from(header_octets).map_err(|_| SourceRefusal::ContainerMalformed {
-            locator: locator.to_owned(),
-            reason: format!("a header of {header_octets} octets exceeds this machine"),
-        })?;
+        let extent =
+            usize::try_from(header_octets).map_err(|_| SourceRefusal::ContainerMalformed {
+                locator: locator.to_owned(),
+                reason: format!("a header of {header_octets} octets exceeds this machine"),
+            })?;
         let mut header = vec![0u8; extent];
-        file.read_exact(&mut header).map_err(|error| SourceRefusal::ContainerMalformed {
-            locator: locator.to_owned(),
-            reason: error.to_string(),
-        })?;
+        file.read_exact(&mut header)
+            .map_err(|error| SourceRefusal::ContainerMalformed {
+                locator: locator.to_owned(),
+                reason: error.to_string(),
+            })?;
         let mut hasher = Sha256::new();
         hasher.update(length);
         hasher.update(&header);
@@ -269,10 +353,12 @@ impl AuthenticatedContainer {
         let mut hasher = Sha256::new();
         let mut buffer = vec![0u8; 1 << 22];
         loop {
-            let read = file.read(&mut buffer).map_err(|error| SourceRefusal::Unreadable {
-                locator: locator.to_owned(),
-                reason: error.to_string(),
-            })?;
+            let read = file
+                .read(&mut buffer)
+                .map_err(|error| SourceRefusal::Unreadable {
+                    locator: locator.to_owned(),
+                    reason: error.to_string(),
+                })?;
             if read == 0 {
                 break;
             }
@@ -306,10 +392,7 @@ pub struct ResolvedSymbol {
 /// Parse the exterior symbol grammar without resolving it against implementation text. Native
 /// rests retain the authenticated symbol but not the foreign source text, so they use this same
 /// parser and return line zero as the honest absence of source-line evidence.
-pub(crate) fn parse_symbol(
-    operation: &str,
-    symbol: &str,
-) -> Result<ResolvedSymbol, SourceRefusal> {
+pub(crate) fn parse_symbol(operation: &str, symbol: &str) -> Result<ResolvedSymbol, SourceRefusal> {
     let (path_text, slice) = match symbol.find(" (") {
         Some(open) => {
             let close = symbol.rfind(')').ok_or(SourceRefusal::SymbolMalformed {
@@ -338,7 +421,9 @@ pub(crate) fn parse_symbol(
     let path: Vec<String> = path_text.split('.').map(str::to_owned).collect();
     for segment in &path {
         let lawful = !segment.is_empty()
-            && segment.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+            && segment
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '_')
             && !segment.chars().next().is_some_and(|c| c.is_ascii_digit());
         if !lawful {
             return Err(SourceRefusal::SymbolMalformed {
@@ -369,6 +454,39 @@ pub struct BindingValidation {
     /// carried in the container's own metadata. The foreign source records none: a description is
     /// not exterior testimony there, because a foreign container does not declare its own laws.
     pub descriptions: Vec<String>,
+    /// Structural licenses issued by exact mathematical owners. Foreign and native witnesses leave
+    /// this empty; a mathematical occurrence cannot populate any source/native field as a proxy.
+    pub exact_owner_licenses: Vec<ExactOwnerLicense>,
+}
+
+/// A witness refusal keeps source/native material failures separate from exact-owner failures.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum OccurrenceWitnessRefusal {
+    Source(SourceRefusal),
+    ExactOwner(ExactOwnerWitnessRefusal),
+}
+
+impl std::fmt::Display for OccurrenceWitnessRefusal {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Source(refusal) => write!(formatter, "{refusal}"),
+            Self::ExactOwner(refusal) => write!(formatter, "{refusal}"),
+        }
+    }
+}
+
+impl std::error::Error for OccurrenceWitnessRefusal {}
+
+impl From<SourceRefusal> for OccurrenceWitnessRefusal {
+    fn from(refusal: SourceRefusal) -> Self {
+        Self::Source(refusal)
+    }
+}
+
+impl From<ExactOwnerWitnessRefusal> for OccurrenceWitnessRefusal {
+    fn from(refusal: ExactOwnerWitnessRefusal) -> Self {
+        Self::ExactOwner(refusal)
+    }
 }
 
 /// **What validates a complex's testimony before the passage compiles it.**
@@ -390,15 +508,21 @@ pub trait OccurrenceWitness {
     fn witness(&self) -> &'static str;
     /// Every operation's testimony checked against content; refuses on the first that does not
     /// resolve.
-    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal>;
+    fn validate(
+        &self,
+        complex: &PortedOperationComplex,
+    ) -> Result<Vec<BindingValidation>, OccurrenceWitnessRefusal>;
 }
 
 impl OccurrenceWitness for SourceOccurrence {
     fn witness(&self) -> &'static str {
         "foreign source"
     }
-    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
-        SourceOccurrence::validate(self, complex)
+    fn validate(
+        &self,
+        complex: &PortedOperationComplex,
+    ) -> Result<Vec<BindingValidation>, OccurrenceWitnessRefusal> {
+        SourceOccurrence::validate(self, complex).map_err(Into::into)
     }
 }
 
@@ -492,7 +616,10 @@ fn segment_position(scope: &str, segment: &str) -> Option<usize> {
     let identifier_octet = |octet: u8| octet.is_ascii_alphanumeric() || octet == b'_';
     let mut best: Option<usize> = None;
     for form in forms {
-        let ends_in_identifier = form.as_bytes().last().is_some_and(|octet| identifier_octet(*octet));
+        let ends_in_identifier = form
+            .as_bytes()
+            .last()
+            .is_some_and(|octet| identifier_octet(*octet));
         let mut from = 0usize;
         while let Some(found) = scope[from..].find(&form) {
             let at = from + found;
@@ -500,7 +627,11 @@ fn segment_position(scope: &str, segment: &str) -> Option<usize> {
             // ends in an identifier the octet after must not either — `class Norm` may not resolve
             // at `class NormOutput`.
             let before = at == 0 || !identifier_octet(scope.as_bytes()[at - 1]);
-            let after = !ends_in_identifier || scope.as_bytes().get(at + form.len()).is_none_or(|octet| !identifier_octet(*octet));
+            let after = !ends_in_identifier
+                || scope
+                    .as_bytes()
+                    .get(at + form.len())
+                    .is_none_or(|octet| !identifier_octet(*octet));
             if before && after && best.is_none_or(|b| at < b) {
                 best = Some(at);
                 break;
@@ -518,7 +649,9 @@ fn scope_after(text: &str, at: usize) -> &str {
     let mut end = rest.len();
     let mut offset = 0usize;
     for (index, line) in rest.split_inclusive('\n').enumerate() {
-        if index > 0 && (line.starts_with("class ") || line.starts_with("def ") || line.starts_with('@')) {
+        if index > 0
+            && (line.starts_with("class ") || line.starts_with("def ") || line.starts_with('@'))
+        {
             end = offset;
             break;
         }
@@ -538,7 +671,11 @@ impl SourceOccurrence {
     }
 
     /// Resolve one implementation symbol against the authenticated implementation text.
-    pub fn resolve_symbol(&self, operation: &str, symbol: &str) -> Result<ResolvedSymbol, SourceRefusal> {
+    pub fn resolve_symbol(
+        &self,
+        operation: &str,
+        symbol: &str,
+    ) -> Result<ResolvedSymbol, SourceRefusal> {
         let mut parsed = parse_symbol(operation, symbol)?;
         let path = &parsed.path;
         let slice = parsed.slice.as_deref();
@@ -608,7 +745,10 @@ impl SourceOccurrence {
             let (name, index) = match part.find('[') {
                 Some(open) => {
                     let close = part.rfind(']')?;
-                    (&part[..open], Some(part[open + 1..close].parse::<usize>().ok()?))
+                    (
+                        &part[..open],
+                        Some(part[open + 1..close].parse::<usize>().ok()?),
+                    )
                 }
                 None => (part, None),
             };
@@ -625,10 +765,17 @@ impl SourceOccurrence {
 
     /// Verify one configuration testimony: the declared value must equal the exact span, or the
     /// string it quotes.
-    pub fn verify_field(&self, operation: &str, field: &str, value: &str) -> Result<(String, String), SourceRefusal> {
-        let span = self.configuration_span(field).ok_or_else(|| SourceRefusal::ConfigurationFieldAbsent {
-            operation: operation.to_owned(),
-            field: field.to_owned(),
+    pub fn verify_field(
+        &self,
+        operation: &str,
+        field: &str,
+        value: &str,
+    ) -> Result<(String, String), SourceRefusal> {
+        let span = self.configuration_span(field).ok_or_else(|| {
+            SourceRefusal::ConfigurationFieldAbsent {
+                operation: operation.to_owned(),
+                field: field.to_owned(),
+            }
         })?;
         let measured = exact_json::as_string(&span).unwrap_or_else(|| span.clone());
         if measured != value {
@@ -644,7 +791,10 @@ impl SourceOccurrence {
 
     /// **Validate every bound operation's testimony against this occurrence.** Refuses on the
     /// first testimony that does not resolve; returns what each binding resolved to.
-    pub fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
+    pub fn validate(
+        &self,
+        complex: &PortedOperationComplex,
+    ) -> Result<Vec<BindingValidation>, SourceRefusal> {
         self.implementation.verify()?;
         self.configuration.verify()?;
         let mut validated = Vec::with_capacity(complex.operations.len());
@@ -663,13 +813,17 @@ impl SourceOccurrence {
                 shapes: Vec::new(),
                 interventions: Vec::new(),
                 descriptions: Vec::new(),
+                exact_owner_licenses: Vec::new(),
             };
             let mut exterior = false;
             for testimony in &operation.testimony {
                 match testimony {
                     SourceTestimony::Implementation { locator, symbol } => {
                         if *locator != self.implementation.locator {
-                            return Err(SourceRefusal::LocatorForeign { operation: name, locator: locator.clone() });
+                            return Err(SourceRefusal::LocatorForeign {
+                                operation: name,
+                                locator: locator.clone(),
+                            });
                         }
                         validation.symbols.push(self.resolve_symbol(&name, symbol)?);
                         exterior = true;
@@ -681,12 +835,17 @@ impl SourceOccurrence {
                         });
                     }
                     SourceTestimony::Configuration { field, value } => {
-                        validation.fields.push(self.verify_field(&name, field, value)?);
+                        validation
+                            .fields
+                            .push(self.verify_field(&name, field, value)?);
                         exterior = true;
                     }
                     SourceTestimony::DeclaredShape { population, shape } => {
                         let region = self.container.regions.get(population).ok_or_else(|| {
-                            SourceRefusal::PopulationNotIdentified { operation: name.clone(), population: population.clone() }
+                            SourceRefusal::PopulationNotIdentified {
+                                operation: name.clone(),
+                                population: population.clone(),
+                            }
                         })?;
                         if region.shape != *shape {
                             return Err(SourceRefusal::ShapeDiffers {
@@ -697,7 +856,12 @@ impl SourceOccurrence {
                             });
                         }
                         if region.dtype != "Bf16" && region.dtype != "BF16" {
-                            return Err(SourceRefusal::DtypeDiffers { operation: name.clone(), population: population.clone(), declared: "BF16".to_owned(), measured: region.dtype.clone() });
+                            return Err(SourceRefusal::DtypeDiffers {
+                                operation: name.clone(),
+                                population: population.clone(),
+                                declared: "BF16".to_owned(),
+                                measured: region.dtype.clone(),
+                            });
                         }
                         validation.shapes.push((population.clone(), shape.clone()));
                         exterior = true;
@@ -705,7 +869,8 @@ impl SourceOccurrence {
                     SourceTestimony::Intervention { statement } => {
                         validation.interventions.push(statement.clone());
                     }
-                    SourceTestimony::AuthoritativeDescription { .. } | SourceTestimony::Undecided { .. } => {}
+                    SourceTestimony::AuthoritativeDescription { .. }
+                    | SourceTestimony::Undecided { .. } => {}
                 }
             }
             // An intervention is the caller's, never source law: an operation carrying both an
@@ -713,18 +878,31 @@ impl SourceOccurrence {
             // — a quotient may carry interventions freely (it removes), and a transport or
             // construction may be an intervention occurrence only when it carries NOTHING else, so a
             // rebase, a permutation or a replacement sibling is admitted as wholly the caller's.
-            if !validation.interventions.is_empty() && exterior && operation.species != OperationSpecies::Quotient {
-                return Err(SourceRefusal::InterventionOnSourceLaw { operation: name, species: operation.species });
+            if !validation.interventions.is_empty()
+                && exterior
+                && operation.species != OperationSpecies::Quotient
+            {
+                return Err(SourceRefusal::InterventionOnSourceLaw {
+                    operation: name,
+                    species: operation.species,
+                });
             }
             if !exterior && validation.interventions.is_empty() {
                 return Err(SourceRefusal::TestimonyNotExterior {
                     operation: name,
-                    testimony: operation.testimony.iter().map(|t| format!("{t:?}")).collect(),
+                    testimony: operation
+                        .testimony
+                        .iter()
+                        .map(|t| format!("{t:?}"))
+                        .collect(),
                 });
             }
             if let Some(carrier) = &operation.carrier {
                 if !self.identifies(carrier) {
-                    return Err(SourceRefusal::PopulationNotIdentified { operation: name, population: carrier.clone() });
+                    return Err(SourceRefusal::PopulationNotIdentified {
+                        operation: name,
+                        population: carrier.clone(),
+                    });
                 }
             }
             validated.push(validation);
@@ -764,7 +942,14 @@ class Attention(nn.Module):
         let mut regions = BTreeMap::new();
         regions.insert(
             "w".to_owned(),
-            RegionIdentity { population: "w".to_owned(), dtype: "BF16".to_owned(), shape: vec![4, 2], start: 0, end: 16, sha256: Some("00".repeat(32)) },
+            RegionIdentity {
+                population: "w".to_owned(),
+                dtype: "BF16".to_owned(),
+                shape: vec![4, 2],
+                start: 0,
+                end: 16,
+                sha256: Some("00".repeat(32)),
+            },
         );
         SourceOccurrence {
             implementation: AuthenticatedText::of_text("/impl.py", IMPLEMENTATION, Some("test")),
@@ -785,35 +970,69 @@ class Attention(nn.Module):
 
     #[test]
     fn resolution_reads_code_and_not_a_comment_or_a_docstring() {
-        let scrubbed = scrub_python("x = 1  # self.fake = 2\ns = \"self.other(\"\nt = '''doc self.third( more\nlines'''\ny = self.real(\n");
+        let scrubbed = scrub_python(
+            "x = 1  # self.fake = 2\ns = \"self.other(\"\nt = '''doc self.third( more\nlines'''\ny = self.real(\n",
+        );
         assert!(scrubbed.contains("x = 1  #"));
         assert!(!scrubbed.contains("self.fake"));
         assert!(!scrubbed.contains("self.other"));
         assert!(!scrubbed.contains("self.third"));
         assert!(scrubbed.contains("self.real("));
-        assert_eq!(scrubbed.matches('\n').count(), 5, "newlines are kept so line numbers hold");
+        assert_eq!(
+            scrubbed.matches('\n').count(),
+            5,
+            "newlines are kept so line numbers hold"
+        );
         // a symbol whose only occurrence is in a comment does not resolve
         let text = "class Site:\n    def enter(self):\n        # self.phantom = words\n        x = words * scale\n        doc = \"\"\"phantom = x\"\"\"\n";
         let occurrence = SourceOccurrence {
             implementation: AuthenticatedText::of_text("/site.py", text, None),
             configuration: AuthenticatedText::of_text("/config.json", "{}", None),
             configuration_scope: Vec::new(),
-            container: AuthenticatedContainer { locator: "/none".to_owned(), octets: 0, header_octets: 0, header_sha256: String::new(), content_sha256: None, regions: BTreeMap::new(), identity: None },
+            container: AuthenticatedContainer {
+                locator: "/none".to_owned(),
+                octets: 0,
+                header_octets: 0,
+                header_sha256: String::new(),
+                content_sha256: None,
+                regions: BTreeMap::new(),
+                identity: None,
+            },
             assets: Vec::new(),
         };
-        assert!(matches!(occurrence.resolve_symbol("op", "Site.enter.phantom"), Err(SourceRefusal::SymbolUnresolved { .. })));
-        assert!(matches!(occurrence.resolve_symbol("op", "Site.enter (phantom = x)"), Err(SourceRefusal::SliceAbsent { .. })));
-        assert!(occurrence.resolve_symbol("op", "Site.enter (x = words * scale)").is_ok());
+        assert!(matches!(
+            occurrence.resolve_symbol("op", "Site.enter.phantom"),
+            Err(SourceRefusal::SymbolUnresolved { .. })
+        ));
+        assert!(matches!(
+            occurrence.resolve_symbol("op", "Site.enter (phantom = x)"),
+            Err(SourceRefusal::SliceAbsent { .. })
+        ));
+        assert!(
+            occurrence
+                .resolve_symbol("op", "Site.enter (x = words * scale)")
+                .is_ok()
+        );
     }
 
     #[test]
     fn a_symbol_resolves_in_scope_and_a_slice_must_be_verbatim() {
         let occurrence = occurrence();
-        let resolved = occurrence.resolve_symbol("op", "Norm.forward (normed_output * self.weight.float())").expect("resolves");
+        let resolved = occurrence
+            .resolve_symbol("op", "Norm.forward (normed_output * self.weight.float())")
+            .expect("resolves");
         assert_eq!(resolved.path, vec!["Norm", "forward"]);
         assert_eq!(resolved.line, 5);
-        assert!(occurrence.resolve_symbol("op", "rotate_half (torch.cat((-x2, x1), dim=-1))").is_ok());
-        assert!(occurrence.resolve_symbol("op", "Attention.__init__ (self.scaling = 1.0)").is_ok());
+        assert!(
+            occurrence
+                .resolve_symbol("op", "rotate_half (torch.cat((-x2, x1), dim=-1))")
+                .is_ok()
+        );
+        assert!(
+            occurrence
+                .resolve_symbol("op", "Attention.__init__ (self.scaling = 1.0)")
+                .is_ok()
+        );
         // A fabricated segment refuses by name.
         assert!(matches!(
             occurrence.resolve_symbol("op", "Norm.backward"),
@@ -825,46 +1044,129 @@ class Attention(nn.Module):
             Err(SourceRefusal::SliceAbsent { .. })
         ));
         // A segment outside the class scope does not resolve through it.
-        assert!(matches!(occurrence.resolve_symbol("op", "Norm.rotate_half"), Err(SourceRefusal::SymbolUnresolved { .. })));
+        assert!(matches!(
+            occurrence.resolve_symbol("op", "Norm.rotate_half"),
+            Err(SourceRefusal::SymbolUnresolved { .. })
+        ));
         // A class whose name is a prefix of another's resolves at its own declaration, not the other's.
         let prefixed = SourceOccurrence {
-            implementation: AuthenticatedText::of_text("/impl.py", "class NormOutput:\n    def other(self):\n        pass\n\nclass Norm:\n    def forward(self):\n        return x\n", None),
+            implementation: AuthenticatedText::of_text(
+                "/impl.py",
+                "class NormOutput:\n    def other(self):\n        pass\n\nclass Norm:\n    def forward(self):\n        return x\n",
+                None,
+            ),
             ..occurrence.clone()
         };
-        assert_eq!(prefixed.resolve_symbol("op", "Norm.forward (return x)").expect("resolves").line, 6);
-        assert!(matches!(occurrence.resolve_symbol("op", "Norm.forward ()"), Err(SourceRefusal::SymbolMalformed { .. })));
-        assert!(matches!(occurrence.resolve_symbol("op", "1Norm"), Err(SourceRefusal::SymbolMalformed { .. })));
+        assert_eq!(
+            prefixed
+                .resolve_symbol("op", "Norm.forward (return x)")
+                .expect("resolves")
+                .line,
+            6
+        );
+        assert!(matches!(
+            occurrence.resolve_symbol("op", "Norm.forward ()"),
+            Err(SourceRefusal::SymbolMalformed { .. })
+        ));
+        assert!(matches!(
+            occurrence.resolve_symbol("op", "1Norm"),
+            Err(SourceRefusal::SymbolMalformed { .. })
+        ));
     }
 
     #[test]
     fn a_configuration_field_is_the_exact_span_and_a_drifted_value_refuses() {
         let occurrence = occurrence();
-        assert_eq!(occurrence.verify_field("op", "rms_norm_eps", "1e-06").expect("field").1, "1e-06");
-        assert_eq!(occurrence.verify_field("op", "hidden_size", "2560").expect("field").1, "2560");
-        assert_eq!(occurrence.verify_field("op", "layer_types[0]", "sliding_attention").expect("field").1, "sliding_attention");
-        assert_eq!(occurrence.verify_field("op", "rope_parameters.sliding_attention.rope_theta", "10000.0").expect("field").1, "10000.0");
-        assert_eq!(occurrence.verify_field("op", "rope_parameters.sliding_attention.rope_type", "default").expect("field").1, "default");
-        assert!(matches!(occurrence.verify_field("op", "rms_norm_eps", "1e-05"), Err(SourceRefusal::ConfigurationValueDiffers { .. })));
-        assert!(matches!(occurrence.verify_field("op", "no_such_field", "1"), Err(SourceRefusal::ConfigurationFieldAbsent { .. })));
-        assert!(matches!(occurrence.verify_field("op", "layer_types[7]", "x"), Err(SourceRefusal::ConfigurationFieldAbsent { .. })));
+        assert_eq!(
+            occurrence
+                .verify_field("op", "rms_norm_eps", "1e-06")
+                .expect("field")
+                .1,
+            "1e-06"
+        );
+        assert_eq!(
+            occurrence
+                .verify_field("op", "hidden_size", "2560")
+                .expect("field")
+                .1,
+            "2560"
+        );
+        assert_eq!(
+            occurrence
+                .verify_field("op", "layer_types[0]", "sliding_attention")
+                .expect("field")
+                .1,
+            "sliding_attention"
+        );
+        assert_eq!(
+            occurrence
+                .verify_field(
+                    "op",
+                    "rope_parameters.sliding_attention.rope_theta",
+                    "10000.0"
+                )
+                .expect("field")
+                .1,
+            "10000.0"
+        );
+        assert_eq!(
+            occurrence
+                .verify_field(
+                    "op",
+                    "rope_parameters.sliding_attention.rope_type",
+                    "default"
+                )
+                .expect("field")
+                .1,
+            "default"
+        );
+        assert!(matches!(
+            occurrence.verify_field("op", "rms_norm_eps", "1e-05"),
+            Err(SourceRefusal::ConfigurationValueDiffers { .. })
+        ));
+        assert!(matches!(
+            occurrence.verify_field("op", "no_such_field", "1"),
+            Err(SourceRefusal::ConfigurationFieldAbsent { .. })
+        ));
+        assert!(matches!(
+            occurrence.verify_field("op", "layer_types[7]", "x"),
+            Err(SourceRefusal::ConfigurationFieldAbsent { .. })
+        ));
     }
 
-    fn complex_with(testimony: Vec<SourceTestimony>, species: OperationSpecies, carrier: Option<String>) -> PortedOperationComplex {
+    fn complex_with(
+        testimony: Vec<SourceTestimony>,
+        species: OperationSpecies,
+        carrier: Option<String>,
+    ) -> PortedOperationComplex {
         let mut complex = PortedOperationComplex::new("test");
         let port: BoundaryId = complex.port("p");
-        let inputs = if species == OperationSpecies::Construction { vec![] } else { vec![port] };
-        let law = complex.bind_operation("op", species, inputs, vec![port], carrier, testimony).expect("law");
+        let inputs = if species == OperationSpecies::Construction {
+            vec![]
+        } else {
+            vec![port]
+        };
+        let law = complex
+            .bind_operation("op", species, inputs, vec![port], carrier, testimony)
+            .expect("law");
         complex.occur(law).expect("occur");
         complex
     }
 
     #[test]
-    fn validation_refuses_a_fabricated_symbol_a_wrong_shape_a_foreign_locator_and_an_intervention_on_a_law() {
+    fn validation_refuses_a_fabricated_symbol_a_wrong_shape_a_foreign_locator_and_an_intervention_on_a_law()
+     {
         let occurrence = occurrence();
         let good = complex_with(
             vec![
-                SourceTestimony::Implementation { locator: "/impl.py".to_owned(), symbol: "Norm.forward".to_owned() },
-                SourceTestimony::DeclaredShape { population: "w".to_owned(), shape: vec![4, 2] },
+                SourceTestimony::Implementation {
+                    locator: "/impl.py".to_owned(),
+                    symbol: "Norm.forward".to_owned(),
+                },
+                SourceTestimony::DeclaredShape {
+                    population: "w".to_owned(),
+                    shape: vec![4, 2],
+                },
             ],
             OperationSpecies::Transport,
             Some("w".to_owned()),
@@ -873,54 +1175,115 @@ class Attention(nn.Module):
         assert_eq!(validated.len(), 1);
         assert_eq!(validated[0].symbols[0].path, vec!["Norm", "forward"]);
         let fabricated = complex_with(
-            vec![SourceTestimony::Implementation { locator: "/impl.py".to_owned(), symbol: "Norm.forwardz".to_owned() }],
+            vec![SourceTestimony::Implementation {
+                locator: "/impl.py".to_owned(),
+                symbol: "Norm.forwardz".to_owned(),
+            }],
             OperationSpecies::Transport,
             None,
         );
-        assert!(matches!(occurrence.validate(&fabricated), Err(SourceRefusal::SymbolUnresolved { .. })));
+        assert!(matches!(
+            occurrence.validate(&fabricated),
+            Err(SourceRefusal::SymbolUnresolved { .. })
+        ));
         let wrong_shape = complex_with(
-            vec![SourceTestimony::DeclaredShape { population: "w".to_owned(), shape: vec![4, 3] }],
+            vec![SourceTestimony::DeclaredShape {
+                population: "w".to_owned(),
+                shape: vec![4, 3],
+            }],
             OperationSpecies::Transport,
             None,
         );
-        assert!(matches!(occurrence.validate(&wrong_shape), Err(SourceRefusal::ShapeDiffers { .. })));
+        assert!(matches!(
+            occurrence.validate(&wrong_shape),
+            Err(SourceRefusal::ShapeDiffers { .. })
+        ));
         let foreign = complex_with(
-            vec![SourceTestimony::Implementation { locator: "/other.py".to_owned(), symbol: "Norm.forward".to_owned() }],
+            vec![SourceTestimony::Implementation {
+                locator: "/other.py".to_owned(),
+                symbol: "Norm.forward".to_owned(),
+            }],
             OperationSpecies::Transport,
             None,
         );
-        assert!(matches!(occurrence.validate(&foreign), Err(SourceRefusal::LocatorForeign { .. })));
+        assert!(matches!(
+            occurrence.validate(&foreign),
+            Err(SourceRefusal::LocatorForeign { .. })
+        ));
         let intervention_on_law = complex_with(
-            vec![SourceTestimony::Intervention { statement: "withdraw".to_owned() }, SourceTestimony::Implementation { locator: "/impl.py".to_owned(), symbol: "Norm.forward".to_owned() }],
+            vec![
+                SourceTestimony::Intervention {
+                    statement: "withdraw".to_owned(),
+                },
+                SourceTestimony::Implementation {
+                    locator: "/impl.py".to_owned(),
+                    symbol: "Norm.forward".to_owned(),
+                },
+            ],
             OperationSpecies::Transport,
             None,
         );
-        assert!(matches!(occurrence.validate(&intervention_on_law), Err(SourceRefusal::InterventionOnSourceLaw { .. })), "an intervention offered beside source law on a transport refuses");
-        let intervention_only = complex_with(vec![SourceTestimony::Intervention { statement: "rebase by two".to_owned() }], OperationSpecies::Transport, None);
-        assert!(occurrence.validate(&intervention_only).is_ok(), "a transport that is wholly the caller's intervention is admitted as one");
+        assert!(
+            matches!(
+                occurrence.validate(&intervention_on_law),
+                Err(SourceRefusal::InterventionOnSourceLaw { .. })
+            ),
+            "an intervention offered beside source law on a transport refuses"
+        );
+        let intervention_only = complex_with(
+            vec![SourceTestimony::Intervention {
+                statement: "rebase by two".to_owned(),
+            }],
+            OperationSpecies::Transport,
+            None,
+        );
+        assert!(
+            occurrence.validate(&intervention_only).is_ok(),
+            "a transport that is wholly the caller's intervention is admitted as one"
+        );
         let intervention_on_quotient = complex_with(
-            vec![SourceTestimony::Intervention { statement: "withdraw".to_owned() }],
+            vec![SourceTestimony::Intervention {
+                statement: "withdraw".to_owned(),
+            }],
             OperationSpecies::Quotient,
             None,
         );
-        assert_eq!(occurrence.validate(&intervention_on_quotient).expect("lawful").len(), 1);
+        assert_eq!(
+            occurrence
+                .validate(&intervention_on_quotient)
+                .expect("lawful")
+                .len(),
+            1
+        );
         let described = complex_with(
-            vec![SourceTestimony::AuthoritativeDescription { statement: "enter".to_owned() }],
+            vec![SourceTestimony::AuthoritativeDescription {
+                statement: "enter".to_owned(),
+            }],
             OperationSpecies::Construction,
             None,
         );
-        assert!(matches!(occurrence.validate(&described), Err(SourceRefusal::TestimonyNotExterior { .. })));
+        assert!(matches!(
+            occurrence.validate(&described),
+            Err(SourceRefusal::TestimonyNotExterior { .. })
+        ));
         let unidentified_carrier = complex_with(
-            vec![SourceTestimony::Implementation { locator: "/impl.py".to_owned(), symbol: "Norm.forward".to_owned() }],
+            vec![SourceTestimony::Implementation {
+                locator: "/impl.py".to_owned(),
+                symbol: "Norm.forward".to_owned(),
+            }],
             OperationSpecies::Transport,
             Some("q".to_owned()),
         );
-        assert!(matches!(occurrence.validate(&unidentified_carrier), Err(SourceRefusal::PopulationNotIdentified { .. })));
+        assert!(matches!(
+            occurrence.validate(&unidentified_carrier),
+            Err(SourceRefusal::PopulationNotIdentified { .. })
+        ));
     }
 
     #[test]
     fn a_text_read_from_disk_verifies_by_content_and_a_drift_refuses() {
-        let path = std::env::temp_dir().join(format!("source_occurrence_{}.py", std::process::id()));
+        let path =
+            std::env::temp_dir().join(format!("source_occurrence_{}.py", std::process::id()));
         std::fs::write(&path, IMPLEMENTATION).expect("write");
         let text = AuthenticatedText::read(path.to_str().expect("utf-8 path"), None).expect("read");
         assert_eq!(text.octets, IMPLEMENTATION.len() as u64);

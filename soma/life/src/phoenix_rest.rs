@@ -142,12 +142,11 @@ pub fn read_rest(path: &Path) -> Result<(Vec<u8>, AthenaRest), PhoenixRefusal> {
         rest: rest.clone(),
         why: error.to_string(),
     })?;
-    let mounted = AthenaRest::read_container(&octets).map_err(|error| {
-        PhoenixRefusal::NotAContainer {
+    let mounted =
+        AthenaRest::read_container(&octets).map_err(|error| PhoenixRefusal::NotAContainer {
             rest: rest.clone(),
             why: error.to_string(),
-        }
-    })?;
+        })?;
     Ok((octets, mounted))
 }
 
@@ -171,16 +170,17 @@ pub fn mount_atlas(rest: &AthenaRest, named: &str) -> Result<ExactSuffixEcology,
         );
         let mut row = Vec::with_capacity(end - start);
         for slot in start..end {
-            let germ = germs
-                .get(rest.germ[slot] as usize)
-                .ok_or_else(|| PhoenixRefusal::Unmountable {
-                    rest: named.to_owned(),
-                    why: format!(
-                        "transport slot {slot} names germ {} and the vocabulary holds {}",
-                        rest.germ[slot],
-                        germs.len()
-                    ),
-                })?;
+            let germ =
+                germs
+                    .get(rest.germ[slot] as usize)
+                    .ok_or_else(|| PhoenixRefusal::Unmountable {
+                        rest: named.to_owned(),
+                        why: format!(
+                            "transport slot {slot} names germ {} and the vocabulary holds {}",
+                            rest.germ[slot],
+                            germs.len()
+                        ),
+                    })?;
             row.push((germ.clone(), rest.target[slot] as u32));
         }
         rows.push(row);
@@ -244,23 +244,18 @@ pub fn cultivate(
     let residual = read_residual(rest, label, &surfaces);
     // 2 — DEPOSIT into the atlas mounted from the rest, returning the forward lineage.
     let mut atlas = mount_atlas(rest, named)?;
-    let lineage = atlas
-        .absorb_returning_lineage(&germs)
-        .map_err(|error| PhoenixRefusal::Unmountable {
-            rest: named.to_owned(),
-            why: format!("the deposit refused: {error:?}"),
-        })?;
+    let lineage =
+        atlas
+            .absorb_returning_lineage(&germs)
+            .map_err(|error| PhoenixRefusal::Unmountable {
+                rest: named.to_owned(),
+                why: format!("the deposit refused: {error:?}"),
+            })?;
     let incidence = DepositIncidence::of(&atlas, &lineage);
     // 3 — DERIVE, under the declared metric and the unit covector.
     let covector: Vec<BigRational> = unit_covector(&residual);
     let delta = derive(
-        rest,
-        &residual,
-        &lineage,
-        &incidence,
-        metric,
-        &covector,
-        &surfaces,
+        rest, &residual, &lineage, &incidence, metric, &covector, &surfaces,
     )?;
     // 4 — COMMIT by replay onto the predecessor, then check it against the transport's own body.
     let committed = commit(rest, &delta)?;
@@ -357,15 +352,21 @@ pub fn regions(octets: &[u8]) -> Vec<Region> {
     while let Some(at) = rest.find("\"dtype\":\"") {
         // the name is the quoted key immediately before this object
         let before = &rest[..at];
-        let Some(open) = before.rfind(":{") else { break };
+        let Some(open) = before.rfind(":{") else {
+            break;
+        };
         let head = &before[..open];
-        let Some(name_end) = head.rfind('"') else { break };
+        let Some(name_end) = head.rfind('"') else {
+            break;
+        };
         let Some(name_start) = head[..name_end].rfind('"') else {
             break;
         };
         let name = head[name_start + 1..name_end].to_owned();
         let after = &rest[at + "\"dtype\":\"".len()..];
-        let Some(dtype_end) = after.find('"') else { break };
+        let Some(dtype_end) = after.find('"') else {
+            break;
+        };
         let dtype = after[..dtype_end].to_owned();
         let (start, end) = match after.find("\"data_offsets\":[") {
             Some(marker) => {
@@ -537,8 +538,17 @@ pub fn content_bar(octets: &[u8], rest: &AthenaRest) -> Vec<BarRow> {
         .collect::<Vec<_>>()
         .join("\n");
     let routing = [
-        "gemma", "phoenix", "q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj",
-        "down_proj", "self_attn", "mlp.",
+        "gemma",
+        "phoenix",
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+        "self_attn",
+        "mlp.",
     ];
     let routing_hits: Vec<&str> = routing
         .iter()
@@ -673,7 +683,10 @@ mod tests {
         let sealed = seal(&atlas, declarations()).expect("sealed");
         let mounted = mount_atlas(&sealed, "test").expect("mounted");
         let again = seal(&mounted, declarations()).expect("re-sealed");
-        assert_eq!(sealed.write_container().unwrap(), again.write_container().unwrap());
+        assert_eq!(
+            sealed.write_container().unwrap(),
+            again.write_container().unwrap()
+        );
         assert_eq!(mounted.state_count(), atlas.state_count());
         for class in 0..atlas.state_count() as u32 {
             assert_eq!(mounted.class_extent(class), atlas.class_extent(class));
@@ -695,9 +708,13 @@ mod tests {
         let germs = token_germs_public(&lexical_tokens(exposure)).expect("germs");
 
         let mut from_corpus = corpus_built;
-        let corpus_lineage = from_corpus.absorb_returning_lineage(&germs).expect("absorbed");
+        let corpus_lineage = from_corpus
+            .absorb_returning_lineage(&germs)
+            .expect("absorbed");
         let mut from_rest = mounted;
-        let rest_lineage = from_rest.absorb_returning_lineage(&germs).expect("absorbed");
+        let rest_lineage = from_rest
+            .absorb_returning_lineage(&germs)
+            .expect("absorbed");
 
         assert_eq!(corpus_lineage.stood_in, rest_lineage.stood_in);
         assert_eq!(corpus_lineage.landed, rest_lineage.landed);
@@ -737,7 +754,9 @@ mod tests {
         let germs = token_germs_public(&lexical_tokens(exposure)).expect("germs");
         let surfaces = surfaces_of(&germs).expect("surfaces");
         let residual = read_residual(&sealed, "exposure", &surfaces);
-        let lineage = corpus_built.absorb_returning_lineage(&germs).expect("absorbed");
+        let lineage = corpus_built
+            .absorb_returning_lineage(&germs)
+            .expect("absorbed");
         let incidence = DepositIncidence::of(&corpus_built, &lineage);
         let delta = derive(
             &sealed,
@@ -758,11 +777,7 @@ mod tests {
         let atlas = atlas_of(MATERIAL);
         let p0_shaped = emit_rest(&atlas, declarations()).expect("emitted");
         assert!(p0_shaped.extent.is_empty());
-        let section = conduct(
-            &p0_shaped,
-            "the receiver",
-            &lexical_tokens("the receiver"),
-        );
+        let section = conduct(&p0_shaped, "the receiver", &lexical_tokens("the receiver"));
         assert!(!section.offered.is_empty());
         let refusal = mount_atlas(&p0_shaped, "output/x/rest.safetensors").unwrap_err();
         assert!(matches!(refusal, PhoenixRefusal::NoExtents { .. }));
@@ -800,9 +815,14 @@ mod tests {
         let octets = sealed.write_container().expect("written");
         let regions = regions(&octets);
         assert_eq!(regions.len(), 9);
-        assert!(regions.iter().all(|region| region.name.starts_with("athena.")));
+        assert!(regions
+            .iter()
+            .all(|region| region.name.starts_with("athena.")));
         assert!(regions.iter().any(|region| region.name == EXTENT_REGION));
-        assert_eq!(regions.last().unwrap().end, octets.len() - 8 - header_of(&octets).unwrap().len());
+        assert_eq!(
+            regions.last().unwrap().end,
+            octets.len() - 8 - header_of(&octets).unwrap().len()
+        );
         for row in content_bar(&octets, &sealed) {
             assert!(row.held, "{}: {}", row.claim, row.evidence);
         }

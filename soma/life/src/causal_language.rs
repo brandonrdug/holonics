@@ -14,14 +14,16 @@ use std::time::Instant;
 
 use body::num::Cog;
 use holonic_engine::exponentiated_ratio::{RatioError, RatioFamily};
-use holonic_engine::surprisal::{section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal};
+use holonic_engine::surprisal::{
+    section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal,
+};
 use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor,
-    ReceiverFiberIdentity, SparseStandingSurface,
+    LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor, ReceiverFiberIdentity,
+    SparseStandingSurface,
 };
 
 use crate::{
@@ -287,14 +289,16 @@ impl<'wire> RestCursor<'wire> {
     fn u64(&mut self) -> Result<u64, CausalLanguageError> {
         let raw = self.take(core::mem::size_of::<u64>())?;
         Ok(u64::from_le_bytes(
-            raw.try_into().map_err(|_| CausalLanguageError::MalformedFiber)?,
+            raw.try_into()
+                .map_err(|_| CausalLanguageError::MalformedFiber)?,
         ))
     }
 
     fn u32(&mut self) -> Result<u32, CausalLanguageError> {
         let raw = self.take(core::mem::size_of::<u32>())?;
         Ok(u32::from_le_bytes(
-            raw.try_into().map_err(|_| CausalLanguageError::MalformedFiber)?,
+            raw.try_into()
+                .map_err(|_| CausalLanguageError::MalformedFiber)?,
         ))
     }
 
@@ -404,9 +408,8 @@ impl CausalLanguageGeneration {
         let mut named: BTreeMap<String, crate::presentation_quotient::PresentedCandidate> =
             BTreeMap::new();
         for output in &self.outputs {
-            named
-                .entry(output.text.clone())
-                .or_insert_with(|| crate::presentation_quotient::PresentedCandidate {
+            named.entry(output.text.clone()).or_insert_with(|| {
+                crate::presentation_quotient::PresentedCandidate {
                     identity: output.text.clone(),
                     tokens: output
                         .tokens
@@ -423,7 +426,8 @@ impl CausalLanguageGeneration {
                         .iter()
                         .map(|token| token.sources.clone())
                         .collect(),
-                });
+                }
+            });
         }
         named.into_values().collect()
     }
@@ -751,13 +755,16 @@ impl CausalLanguageEcology {
         // The route side: merge the sections, re-found only the receptors they touched.
         let features = route_features(&tokens);
         let added_relations = features.len();
-        let source_order =
-            u64::try_from(self.passage_population).map_err(|_| CausalLanguageError::CarrierExtent)?;
+        let source_order = u64::try_from(self.passage_population)
+            .map_err(|_| CausalLanguageError::CarrierExtent)?;
         let mut touched: BTreeMap<ReceiverFiberIdentity, Vec<RouteTrainingSection>> =
             BTreeMap::new();
         for feature in features {
             let feature_identity = route_feature_fiber(&feature);
-            let sections = self.route_material.entry(feature_identity.clone()).or_default();
+            let sections = self
+                .route_material
+                .entry(feature_identity.clone())
+                .or_default();
             sections.push(RouteTrainingSection {
                 source_order,
                 source: source.clone(),
@@ -953,12 +960,7 @@ impl CausalLanguageEcology {
         if passage_population != passages.len() {
             return Err(CausalLanguageError::MalformedFiber);
         }
-        if route_relations
-            != route_sections
-                .values()
-                .map(BTreeSet::len)
-                .sum::<usize>()
-        {
+        if route_relations != route_sections.values().map(BTreeSet::len).sum::<usize>() {
             return Err(CausalLanguageError::MalformedFiber);
         }
 
@@ -1025,7 +1027,6 @@ impl CausalLanguageEcology {
         let front_refused_at: Option<usize> = None;
         let mut peak_front_extent = states.len();
         for _ in 0..spec.maximum_generated_tokens {
-
             // **The leader's front: branch tips are co-present, an arc is serial.**
             //
             // `states` is a front of branch tips; `continuations` is the junction each opens; the
@@ -1059,8 +1060,7 @@ impl CausalLanguageEcology {
                     // gate it is the kept half of the horizon division; under the ratio family it
                     // is the complete population, with the horizon carried as a coordinate on each
                     // member instead of consumed by a filter ahead of the branching.
-                    let mut branches =
-                        self.junction_steps(&state.history, &active_hexis, spec)?;
+                    let mut branches = self.junction_steps(&state.history, &active_hexis, spec)?;
                     if branches.is_empty() {
                         active_hexis = self.recruit(&state.history).sources;
                         branches = self.junction_steps(&state.history, &active_hexis, spec)?;
@@ -1403,7 +1403,10 @@ impl CausalLanguageEcology {
         if !members.is_empty() {
             for member in &members {
                 let probability = Rat::new(BigInt::from(member.multiplicity), extent.clone());
-                forms.insert(member.name, SymbolicSurprisal::of_probability(&probability)?);
+                forms.insert(
+                    member.name,
+                    SymbolicSurprisal::of_probability(&probability)?,
+                );
             }
         }
 
@@ -1478,7 +1481,9 @@ impl CausalLanguageEcology {
                 let mut steps = Vec::with_capacity(population.profile.len());
                 for (token, horizons) in &population.profile {
                     let Some((&horizon, (_, source_fibers))) = (match spec.continuation_receiver {
-                        ContinuationReceiver::MostSpecificAttestation => horizons.iter().next_back(),
+                        ContinuationReceiver::MostSpecificAttestation => {
+                            horizons.iter().next_back()
+                        }
                         ContinuationReceiver::BroadestAttestation => horizons.iter().next(),
                     }) else {
                         continue;
@@ -1916,9 +1921,7 @@ pub(crate) fn germ(identity: ReceiverFiberIdentity) -> Result<ResonanceGerm, Cau
 }
 
 /// The germ population of a token sequence, for a caller probing the atlas directly.
-pub fn token_germs_public(
-    tokens: &[String],
-) -> Result<Vec<ResonanceGerm>, CausalLanguageError> {
+pub fn token_germs_public(tokens: &[String]) -> Result<Vec<ResonanceGerm>, CausalLanguageError> {
     token_germs(tokens)
 }
 
@@ -2186,9 +2189,18 @@ mod lexical_aperture_tests {
         // of which six glyphs were written down.
         assert!(inherited.iter().any(|token| token == "-"), "{inherited:?}");
         assert!(inherited.iter().any(|token| token == ">"), "{inherited:?}");
-        assert!(!inherited.iter().any(|token| token == "->"), "{inherited:?}");
-        assert!(!inherited.iter().any(|token| token == "&&"), "{inherited:?}");
-        assert!(!inherited.iter().any(|token| token == ".."), "{inherited:?}");
+        assert!(
+            !inherited.iter().any(|token| token == "->"),
+            "{inherited:?}"
+        );
+        assert!(
+            !inherited.iter().any(|token| token == "&&"),
+            "{inherited:?}"
+        );
+        assert!(
+            !inherited.iter().any(|token| token == ".."),
+            "{inherited:?}"
+        );
         assert!(
             inherited.iter().any(|token| token == "!="),
             "the asymmetry: `=` is whitelisted so `!=` survives — {inherited:?}"
@@ -2314,7 +2326,11 @@ mod tests {
                 .map(|continuation| continuation.token)
                 .collect();
             let reading = ecology
-                .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+                .read_junction(
+                    &history,
+                    &hexis,
+                    ContinuationReceiver::MostSpecificAttestation,
+                )
                 .unwrap();
             let recomputed: BTreeSet<String> = reading
                 .members
@@ -2327,7 +2343,11 @@ mod tests {
             if !inherited.is_empty() && !recomputed.is_empty() {
                 assert_eq!(inherited, recomputed, "prompt {prompt:?}");
             }
-            assert_eq!(reading.gate_would_keep, recomputed.len(), "prompt {prompt:?}");
+            assert_eq!(
+                reading.gate_would_keep,
+                recomputed.len(),
+                "prompt {prompt:?}"
+            );
         }
     }
 
@@ -2340,7 +2360,11 @@ mod tests {
         let history = lexical_tokens("the receiver returns the");
         let hexis = ecology.recruit(&history).sources;
         let reading = ecology
-            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .read_junction(
+                &history,
+                &hexis,
+                ContinuationReceiver::MostSpecificAttestation,
+            )
             .unwrap();
         assert!(reading.members.len() >= 2, "{:?}", reading.members);
         let family = reading.ratios.as_ref().expect("a family of at least two");
@@ -2351,7 +2375,9 @@ mod tests {
                 if left.name == right.name {
                     continue;
                 }
-                let carried = family.ratio(left.name, right.name).expect("an ordered pair");
+                let carried = family
+                    .ratio(left.name, right.name)
+                    .expect("an ordered pair");
                 let bare = Rat::new(
                     BigInt::from(left.multiplicity),
                     BigInt::from(right.multiplicity),
@@ -2369,7 +2395,11 @@ mod tests {
         let history = lexical_tokens("the receiver returns the");
         let hexis = ecology.recruit(&history).sources;
         let reading = ecology
-            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .read_junction(
+                &history,
+                &hexis,
+                ContinuationReceiver::MostSpecificAttestation,
+            )
             .unwrap();
         assert_eq!(
             reading.members.len(),
@@ -2393,17 +2423,27 @@ mod tests {
         let history = lexical_tokens("the receiver returns the");
         let hexis = ecology.recruit(&history).sources;
         let specific = ecology
-            .read_junction(&history, &hexis, ContinuationReceiver::MostSpecificAttestation)
+            .read_junction(
+                &history,
+                &hexis,
+                ContinuationReceiver::MostSpecificAttestation,
+            )
             .unwrap();
         let broad = ecology
             .read_junction(&history, &hexis, ContinuationReceiver::BroadestAttestation)
             .unwrap();
-        assert_eq!(specific.receiver, ContinuationReceiver::MostSpecificAttestation);
+        assert_eq!(
+            specific.receiver,
+            ContinuationReceiver::MostSpecificAttestation
+        );
         assert_eq!(broad.receiver, ContinuationReceiver::BroadestAttestation);
         // The same tokens are attested either way; what moves is the horizon each is read at and
         // the multiplicity that horizon carries.
-        let specific_tokens: Vec<&String> =
-            specific.members.iter().map(|member| &member.token).collect();
+        let specific_tokens: Vec<&String> = specific
+            .members
+            .iter()
+            .map(|member| &member.token)
+            .collect();
         let broad_tokens: Vec<&String> = broad.members.iter().map(|member| &member.token).collect();
         assert_eq!(specific_tokens, broad_tokens);
         for member in &specific.members {

@@ -36,11 +36,12 @@ fn show(value: &ComplexInterval, grain: u32) -> String {
     format!("re={} im={}", coarse.re, coarse.im)
 }
 
-
 /// An exact rational, shown as the exact dyadic enclosure at a declared grain.
 /// This is a widening, never a decimal: the true value lies inside what is printed.
 fn grain_text(value: &BigRational, grain: u32) -> String {
-    RatInterval::point(value.clone()).round_out(grain).to_string()
+    RatInterval::point(value.clone())
+        .round_out(grain)
+        .to_string()
 }
 
 /// The integer `k` with `2^-(k+1) < value <= 2^-k` — how many octaves below one the
@@ -265,14 +266,32 @@ fn chain_probe(tau: i64, config: &ExactSeriesConfig, grain: u32) {
     println!("           That decides which terms exist before any magnitude is computed.");
 
     println!("\n3. THE CHART TRANSITION — what summation pays to become integration");
-    println!("   integral term  N^(1-s)/(s-1)   {}", show(&chain.integral_term, grain));
-    println!("   boundary half  N^(-s)/2        {}", show(&chain.boundary_half, grain));
-    println!("   remainder radius (certified)   {}", format_rat(&chain.remainder_radius));
+    println!(
+        "   integral term  N^(1-s)/(s-1)   {}",
+        show(&chain.integral_term, grain)
+    );
+    println!(
+        "   boundary half  N^(-s)/2        {}",
+        show(&chain.boundary_half, grain)
+    );
+    println!(
+        "   remainder radius (certified)   {}",
+        format_rat(&chain.remainder_radius)
+    );
 
     println!("\n4. TWO FRAMES ON ONE VALUE");
-    println!("   zeta                           {}", show(&chain.zeta, grain));
-    println!("   alternating rebase 1 - 2^(1-s) {}", show(&chain.alternating_factor, grain));
-    println!("   eta  (Euler-Maclaurin)         {}", show(&chain.eta, grain));
+    println!(
+        "   zeta                           {}",
+        show(&chain.zeta, grain)
+    );
+    println!(
+        "   alternating rebase 1 - 2^(1-s) {}",
+        show(&chain.alternating_factor, grain)
+    );
+    println!(
+        "   eta  (Euler-Maclaurin)         {}",
+        show(&chain.eta, grain)
+    );
 
     println!("\n   Borwein's depth sweep. His bound carries 1/|Gamma(s)|, which grows with the");
     println!("   height, so the depth the second frame needs is a function of tau — and this");
@@ -312,7 +331,8 @@ fn chain_probe(tau: i64, config: &ExactSeriesConfig, grain: u32) {
     for depth in 6u32..=32 {
         let borwein = eta_borwein_chain(&point, depth, config).expect("the Borwein chain");
         let middle = borwein.value.midpoint();
-        let Some((last_re, last_im)) = previous_value.replace((middle.re.clone(), middle.im.clone()))
+        let Some((last_re, last_im)) =
+            previous_value.replace((middle.re.clone(), middle.im.clone()))
         else {
             continue;
         };

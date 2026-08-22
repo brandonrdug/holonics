@@ -549,7 +549,8 @@ fn main() {
         let core_environment = in_core
             .obstructions()
             .filter(|returned| {
-                obstruction_species(returned.diagnostic()) == ObstructionSpecies::EnvironmentAperture
+                obstruction_species(returned.diagnostic())
+                    == ObstructionSpecies::EnvironmentAperture
             })
             .count();
         let mathlib_module_refusals = in_mathlib
@@ -662,8 +663,8 @@ fn main() {
     // prior predictions because it only watches; here the kernel ANSWERS, so `Obstructed` is a
     // refusal of the motions that submission carried, with a verbatim diagnostic behind it.
     {
-        use life::lean_mathematics::kernel_returns::motion_admissions;
         use life::holonic_training::FiberAdmission;
+        use life::lean_mathematics::kernel_returns::motion_admissions;
         let sorted = motion_admissions(&returns);
         let extent: usize = sorted.values().map(Vec::len).sum();
         println!("\n    --- the motions, admitted by quotient closure rather than by a count");
@@ -677,11 +678,16 @@ fn main() {
             let members = sorted.get(&verdict).map_or(0, Vec::len);
             let gloss = match verdict {
                 FiberAdmission::Admitted => "carried every time it was submitted",
-                FiberAdmission::Conflicted => "carried sometimes — its chart is doing work its name does not",
+                FiberAdmission::Conflicted => {
+                    "carried sometimes — its chart is doing work its name does not"
+                }
                 FiberAdmission::Refuted => "never carried",
                 FiberAdmission::Open => "never submitted",
             };
-            println!("      {:<12} {members:>4}   {gloss}", format!("{verdict:?}"));
+            println!(
+                "      {:<12} {members:>4}   {gloss}",
+                format!("{verdict:?}")
+            );
         }
         for verdict in [FiberAdmission::Admitted, FiberAdmission::Conflicted] {
             let Some(members) = sorted.get(&verdict) else {
@@ -736,13 +742,13 @@ fn main() {
                         Err(refusal) => {
                             println!("    {identity:<26} no candidates: {refusal:?}");
                         }
-                        Ok((reached, candidates)) => match world.grade_all(&kernel_problem, &candidates)
-                        {
-                            Err(refusal) => {
-                                println!("    {identity:<26} grading refused: {refusal:?}");
-                            }
-                            Ok(returns) => {
-                                println!(
+                        Ok((reached, candidates)) => {
+                            match world.grade_all(&kernel_problem, &candidates) {
+                                Err(refusal) => {
+                                    println!("    {identity:<26} grading refused: {refusal:?}");
+                                }
+                                Ok(returns) => {
+                                    println!(
                                     "    {identity:<26} reached {:>3} declarations, {:>3} paths, \
                                      {:>2} admitted, {:>3} obstructed",
                                     reached.len(),
@@ -750,9 +756,10 @@ fn main() {
                                     returns.kernel_admitted_extent(),
                                     returns.obstruction_extent()
                                 );
-                                families.push(returns);
+                                    families.push(returns);
+                                }
                             }
-                        },
+                        }
                     }
                 }
                 if families.is_empty() {
@@ -784,7 +791,9 @@ fn main() {
                     ] {
                         let members: Vec<_> = standing
                             .iter()
-                            .filter(|(_, (confirmed, refuted))| verdict(*confirmed, *refuted) == wanted)
+                            .filter(|(_, (confirmed, refuted))| {
+                                verdict(*confirmed, *refuted) == wanted
+                            })
                             .collect();
                         println!("      {:<12} {:>3}", format!("{wanted:?}"), members.len());
                         for (name, (confirmed, refuted)) in members.iter().take(8) {

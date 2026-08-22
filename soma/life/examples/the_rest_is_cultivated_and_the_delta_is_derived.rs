@@ -36,7 +36,9 @@ use life::atlas_cultivation::{
     AthenaRest, ConductedSection, CultivationDelta, DepositIncidence, ExposureResidual,
     FoundedSpecies, MetricDeclaration,
 };
-use life::causal_language::{lexical_tokens, lexical_tokens_under, token_germs_public, LexicalAperture};
+use life::causal_language::{
+    lexical_tokens, lexical_tokens_under, token_germs_public, LexicalAperture,
+};
 use life::suffix_ecology::ExactSuffixEcology;
 use num_bigint::BigInt;
 use num_rational::BigRational;
@@ -206,7 +208,8 @@ fn build_predecessor() -> Result<ExactSuffixEcology, String> {
         let tokens = lexical_tokens(&text);
         paths.push(token_germs_public(&tokens).map_err(|error| format!("{path}: {error:?}"))?);
     }
-    ExactSuffixEcology::condition(&paths).map_err(|error| format!("conditioning refused: {error:?}"))
+    ExactSuffixEcology::condition(&paths)
+        .map_err(|error| format!("conditioning refused: {error:?}"))
 }
 
 struct Cultivation {
@@ -245,9 +248,10 @@ fn cultivate(
     )
     .map_err(|error| format!("{}: {error}", material.name))?;
     // 4 — COMMIT.
-    let successor = commit(predecessor, &delta).map_err(|error| format!("{}: {error}", material.name))?;
-    let transported =
-        emit_rest(&atlas, predecessor.metadata.clone()).map_err(|error| format!("{}: {error}", material.name))?;
+    let successor =
+        commit(predecessor, &delta).map_err(|error| format!("{}: {error}", material.name))?;
+    let transported = emit_rest(&atlas, predecessor.metadata.clone())
+        .map_err(|error| format!("{}: {error}", material.name))?;
     Ok(Cultivation {
         residual,
         delta,
@@ -290,17 +294,60 @@ fn run() -> Result<(), String> {
 
     say!("THE FIXTURE TABLE — fixed before exposure, and every absence VERIFIED against the rest's own metadata");
     say!("  the standing rest       {P0_REST}");
-    say!("    {} octets · {} classes · {} transitions · {} vocabulary · tree height {}", p0_octets.len(), p0.classes(), p0.transitions(), p0.vocabulary.len(), p0.height);
+    say!(
+        "    {} octets · {} classes · {} transitions · {} vocabulary · tree height {}",
+        p0_octets.len(),
+        p0.classes(),
+        p0.transitions(),
+        p0.vocabulary.len(),
+        p0.height
+    );
     say!("    its declared material  {declared_material}");
     say!("");
     let mut fixtures: Vec<(&str, &str, &str, bool)> = Vec::new();
-    fixtures.push(("DEVELOPMENT", DEVELOPMENT, "exposed; the delta is derived from its residual and SEALED", false));
-    fixtures.push(("HELD-OUT", HELD_OUT, "never exposed; its subject's probes are a second still control", false));
-    fixtures.push(("CODEC-VARIANT", DEVELOPMENT, "the same subject under LexicalAperture::runs_are_maximal; exposed, derived, NOT sealed", false));
-    fixtures.push(("SUBJECT-DISJOINT", SUBJECT_DISJOINT, "exposed to the PREDICTION only; nothing is committed", false));
-    fixtures.push(("MATCHED FOIL", DEVELOPMENT, "germ-permuted sibling; exposed, derived, NOT sealed", false));
-    fixtures.push(("NO-OP", NO_OP, "already in the rest verbatim; exposed, derived, NOT sealed", true));
-    say!("  {:<17} {:<62} {:<8} {}", "role", "material", "in rest", "disposition");
+    fixtures.push((
+        "DEVELOPMENT",
+        DEVELOPMENT,
+        "exposed; the delta is derived from its residual and SEALED",
+        false,
+    ));
+    fixtures.push((
+        "HELD-OUT",
+        HELD_OUT,
+        "never exposed; its subject's probes are a second still control",
+        false,
+    ));
+    fixtures.push((
+        "CODEC-VARIANT",
+        DEVELOPMENT,
+        "the same subject under LexicalAperture::runs_are_maximal; exposed, derived, NOT sealed",
+        false,
+    ));
+    fixtures.push((
+        "SUBJECT-DISJOINT",
+        SUBJECT_DISJOINT,
+        "exposed to the PREDICTION only; nothing is committed",
+        false,
+    ));
+    fixtures.push((
+        "MATCHED FOIL",
+        DEVELOPMENT,
+        "germ-permuted sibling; exposed, derived, NOT sealed",
+        false,
+    ));
+    fixtures.push((
+        "NO-OP",
+        NO_OP,
+        "already in the rest verbatim; exposed, derived, NOT sealed",
+        true,
+    ));
+    say!(
+        "  {:<17} {:<62} {:<8} {}",
+        "role",
+        "material",
+        "in rest",
+        "disposition"
+    );
     for (role, path, disposition, expect_present) in &fixtures {
         let present = declared_material.contains(&format!("{path}@"));
         if present != *expect_present {
@@ -311,18 +358,47 @@ fn run() -> Result<(), String> {
             ));
         }
         let octets = std::fs::metadata(path).map(|held| held.len()).unwrap_or(0);
-        say!("  {:<17} {:<62} {:<8} {}", role, format!("{path} ({octets} octets)"), if present { "yes" } else { "NO" }, disposition);
+        say!(
+            "  {:<17} {:<62} {:<8} {}",
+            role,
+            format!("{path} ({octets} octets)"),
+            if present { "yes" } else { "NO" },
+            disposition
+        );
     }
     say!("");
     say!("  THE PROBES — fixed before exposure and never used as material");
-    say!("    development subject ({}): {:?}", DEVELOPMENT_PROBES.len(), DEVELOPMENT_PROBES);
-    say!("    no-op subject       ({}): {:?}", NO_OP_PROBES.len(), NO_OP_PROBES);
-    say!("    held-out subject    ({}): {:?}", HELD_OUT_PROBES.len(), HELD_OUT_PROBES);
-    say!("    the P0 eight        ({}): {:?}", P0_PROBES.len(), P0_PROBES);
+    say!(
+        "    development subject ({}): {:?}",
+        DEVELOPMENT_PROBES.len(),
+        DEVELOPMENT_PROBES
+    );
+    say!(
+        "    no-op subject       ({}): {:?}",
+        NO_OP_PROBES.len(),
+        NO_OP_PROBES
+    );
+    say!(
+        "    held-out subject    ({}): {:?}",
+        HELD_OUT_PROBES.len(),
+        HELD_OUT_PROBES
+    );
+    say!(
+        "    the P0 eight        ({}): {:?}",
+        P0_PROBES.len(),
+        P0_PROBES
+    );
     say!("");
-    say!("  THE DECLARED METRIC for the sealed successor: {}", MetricDeclaration::identity().name);
-    say!("  NO FACTORIZED OVERLAY is used. A counting atlas has no dense transport to factor — its");
-    say!("  transport is a sparse partial function and its standings are occurrence counts — so no");
+    say!(
+        "  THE DECLARED METRIC for the sealed successor: {}",
+        MetricDeclaration::identity().name
+    );
+    say!(
+        "  NO FACTORIZED OVERLAY is used. A counting atlas has no dense transport to factor — its"
+    );
+    say!(
+        "  transport is a sparse partial function and its standings are occurrence counts — so no"
+    );
     say!("  rank is declared, chosen or truncated anywhere in this deed and no RankDerivationReceipt");
     say!("  is owed. The word `rank` does not appear in the owner.");
     say!("");
@@ -333,12 +409,33 @@ fn run() -> Result<(), String> {
     let conditioning = Instant::now();
     let predecessor_atlas = build_predecessor()?;
     let conditioning = conditioning.elapsed();
-    let predecessor = emit_rest(&predecessor_atlas, p0.metadata.clone()).map_err(|error| error.to_string())?;
-    let rebuilt = predecessor.write_container().map_err(|error| error.to_string())?;
+    let predecessor =
+        emit_rest(&predecessor_atlas, p0.metadata.clone()).map_err(|error| error.to_string())?;
+    let rebuilt = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let identical = rebuilt == p0_octets;
-    say!("THE PREDECESSOR — rebuilt from the eight declared documents in {:.1} s", conditioning.as_secs_f64());
-    say!("  classes {} · transitions {} · vocabulary {} · height {}", predecessor.classes(), predecessor.transitions(), predecessor.vocabulary.len(), predecessor.height);
-    say!("  the rebuilt container against the committed P0 artifact: {} ({} against {} octets)", if identical { "OCTET-IDENTICAL" } else { "DIFFERENT" }, rebuilt.len(), p0_octets.len());
+    say!(
+        "THE PREDECESSOR — rebuilt from the eight declared documents in {:.1} s",
+        conditioning.as_secs_f64()
+    );
+    say!(
+        "  classes {} · transitions {} · vocabulary {} · height {}",
+        predecessor.classes(),
+        predecessor.transitions(),
+        predecessor.vocabulary.len(),
+        predecessor.height
+    );
+    say!(
+        "  the rebuilt container against the committed P0 artifact: {} ({} against {} octets)",
+        if identical {
+            "OCTET-IDENTICAL"
+        } else {
+            "DIFFERENT"
+        },
+        rebuilt.len(),
+        p0_octets.len()
+    );
     if !identical {
         return Err("the rebuilt predecessor is not the committed P0 rest; nothing below would be about that rest".to_owned());
     }
@@ -347,26 +444,63 @@ fn run() -> Result<(), String> {
     say!("  AND THE CONDUCT IS THE SAME R1 FACE THE CARD RETURNED. This deed reads the three laws on the CPU,");
     say!("  exactly and integrally; the committed P0 receipt records what the card returned for its eight");
     say!("  prompts. Against those recorded values, with nothing here regenerated:");
-    say!("    {:<44} {:>7} {:>9} {:>8} {:>8} {}", "prompt", "class", "standing", "depth-0", "depth-1", "agrees");
+    say!(
+        "    {:<44} {:>7} {:>9} {:>8} {:>8} {}",
+        "prompt",
+        "class",
+        "standing",
+        "depth-0",
+        "depth-1",
+        "agrees"
+    );
     let mut agreeing = 0usize;
     for (probe, class, standing, depth_zero, depth_one) in P0_RECORDED {
         let section = conduct(&predecessor, probe, &lexical_tokens(probe));
-        let zero = section.offered.iter().filter(|(_, _, depth)| *depth == 0).count();
-        let one = section.offered.iter().filter(|(_, _, depth)| *depth == 1).count();
-        let agrees = section.class == *class && section.standing == *standing && zero == *depth_zero && one == *depth_one;
+        let zero = section
+            .offered
+            .iter()
+            .filter(|(_, _, depth)| *depth == 0)
+            .count();
+        let one = section
+            .offered
+            .iter()
+            .filter(|(_, _, depth)| *depth == 1)
+            .count();
+        let agrees = section.class == *class
+            && section.standing == *standing
+            && zero == *depth_zero
+            && one == *depth_one;
         if agrees {
             agreeing += 1;
         }
-        say!("    {:<44} {:>7} {:>9} {:>8} {:>8} {}", format!("{probe:?}"), section.class, section.standing, zero, one, if agrees { "yes" } else { "NO" });
+        say!(
+            "    {:<44} {:>7} {:>9} {:>8} {:>8} {}",
+            format!("{probe:?}"),
+            section.class,
+            section.standing,
+            zero,
+            one,
+            if agrees { "yes" } else { "NO" }
+        );
     }
-    say!("  {agreeing} of {} agree with the card's committed receipt exactly.", P0_RECORDED.len());
+    say!(
+        "  {agreeing} of {} agree with the card's committed receipt exactly.",
+        P0_RECORDED.len()
+    );
     say!("");
 
     // -----------------------------------------------------------------------------------------
     // CONTROL 10 — cultivation is not mounting
     // -----------------------------------------------------------------------------------------
-    let development = read_material("DEVELOPMENT", DEVELOPMENT, DEVELOPMENT, &LexicalAperture::inherited())?;
-    let before_mounting = predecessor.write_container().map_err(|error| error.to_string())?;
+    let development = read_material(
+        "DEVELOPMENT",
+        DEVELOPMENT,
+        DEVELOPMENT,
+        &LexicalAperture::inherited(),
+    )?;
+    let before_mounting = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let mounted: Vec<ConductedSection> = development
         .surfaces
         .chunks(64)
@@ -376,7 +510,9 @@ fn run() -> Result<(), String> {
             conduct(&predecessor, &prompt, &window.to_vec())
         })
         .collect();
-    let after_mounting = predecessor.write_container().map_err(|error| error.to_string())?;
+    let after_mounting = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     say!("[10] CULTIVATION IS A DEPOSIT EVENT WITH LINEAGE, NOT A PROMPT");
     say!("  the development material was MOUNTED as {} prompts of 64 germs each, returning {} plural sections", mounted.len(), mounted.len());
     say!("  the rest before and after that mounting: {} — mounting returns a face and deposits nothing", if before_mounting == after_mounting { "OCTET-IDENTICAL" } else { "MOVED" });
@@ -392,20 +528,45 @@ fn run() -> Result<(), String> {
     let grown = cultivate(&predecessor, &development, &metric)?;
     let exposure = exposure.elapsed();
 
-    say!("THE STRUCTURED RESIDUAL — {} carried {} germ occurrences into the standing rest ({:.1} s)", DEVELOPMENT, development.surfaces.len(), exposure.as_secs_f64());
+    say!(
+        "THE STRUCTURED RESIDUAL — {} carried {} germ occurrences into the standing rest ({:.1} s)",
+        DEVELOPMENT,
+        development.surfaces.len(),
+        exposure.as_secs_f64()
+    );
     exhibit_residual(&mut form, &grown.residual);
     say!("");
 
     // -----------------------------------------------------------------------------------------
     // CONTROL 1 — commit == derive, octet for octet
     // -----------------------------------------------------------------------------------------
-    let committed = grown.successor.write_container().map_err(|error| error.to_string())?;
-    let transported = grown.transported.write_container().map_err(|error| error.to_string())?;
+    let committed = grown
+        .successor
+        .write_container()
+        .map_err(|error| error.to_string())?;
+    let transported = grown
+        .transported
+        .write_container()
+        .map_err(|error| error.to_string())?;
     say!("[ 1] COMMIT == DERIVE — the derived delta applied to the predecessor IS the deposit");
-    say!("  the committed container {} octets · the transport's own container {} octets · {}", committed.len(), transported.len(), if committed == transported { "OCTET-IDENTICAL" } else { "DIFFERENT" });
+    say!(
+        "  the committed container {} octets · the transport's own container {} octets · {}",
+        committed.len(),
+        transported.len(),
+        if committed == transported {
+            "OCTET-IDENTICAL"
+        } else {
+            "DIFFERENT"
+        }
+    );
     if committed != transported {
-        let first = committed.iter().zip(&transported).position(|(left, right)| left != right);
-        return Err(format!("commit != derive; first differing octet at {first:?}"));
+        let first = committed
+            .iter()
+            .zip(&transported)
+            .position(|(left, right)| left != right);
+        return Err(format!(
+            "commit != derive; first differing octet at {first:?}"
+        ));
     }
     say!("  and the parts of that identity that are NOT carried by the lineage:");
     say!("    every standing class's transport row is replayed from the PREDECESSOR's own row plus the");
@@ -433,10 +594,25 @@ fn run() -> Result<(), String> {
     // -----------------------------------------------------------------------------------------
     std::fs::create_dir_all(OUT).map_err(|error| format!("{OUT}: {error}"))?;
     let mut sealed = grown.successor.clone();
-    sealed.metadata.insert("cultivation.law".to_owned(), CULTIVATION_LAW.to_owned());
-    sealed.metadata.insert("cultivation.metric".to_owned(), metric.name.clone());
-    sealed.metadata.insert("cultivation.predecessor".to_owned(), format!("{P0_REST} · {} classes · {} transitions · {} vocabulary", predecessor.classes(), predecessor.transitions(), predecessor.vocabulary.len()));
-    sealed.metadata.insert("cultivation.material".to_owned(), format!("{DEVELOPMENT}@9 (development, exposed once, lexical aperture: inherited)"));
+    sealed
+        .metadata
+        .insert("cultivation.law".to_owned(), CULTIVATION_LAW.to_owned());
+    sealed
+        .metadata
+        .insert("cultivation.metric".to_owned(), metric.name.clone());
+    sealed.metadata.insert(
+        "cultivation.predecessor".to_owned(),
+        format!(
+            "{P0_REST} · {} classes · {} transitions · {} vocabulary",
+            predecessor.classes(),
+            predecessor.transitions(),
+            predecessor.vocabulary.len()
+        ),
+    );
+    sealed.metadata.insert(
+        "cultivation.material".to_owned(),
+        format!("{DEVELOPMENT}@9 (development, exposed once, lexical aperture: inherited)"),
+    );
     sealed.metadata.insert("cultivation.delta".to_owned(), format!(
         "germs +{} · classes +{} of which {} are splits · transitions founded {} of which {} inside the standing body · links rebased {} of which {} on standing classes · standings moved at {} classes",
         grown.delta.germs_founded.len(),
@@ -448,15 +624,30 @@ fn run() -> Result<(), String> {
         grown.delta.suffix_rebased.iter().filter(|row| row.on_standing_class).count(),
         grown.delta.standing_increments.len()
     ));
-    sealed.metadata.insert(life::atlas_cultivation::PREDECESSOR_MATERIAL_KEY.to_owned(), declared_material.clone());
+    sealed.metadata.insert(
+        life::atlas_cultivation::PREDECESSOR_MATERIAL_KEY.to_owned(),
+        declared_material.clone(),
+    );
     let mut existing: Vec<String> = declared_material.split(' ').map(str::to_owned).collect();
     existing.push(format!("{DEVELOPMENT}@9"));
-    sealed.metadata.insert("material".to_owned(), existing.join(" "));
-    let sealed_octets = sealed.write_container().map_err(|error| error.to_string())?;
+    sealed
+        .metadata
+        .insert("material".to_owned(), existing.join(" "));
+    let sealed_octets = sealed
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let sealed_path = format!("{OUT}/successor-rest.safetensors");
-    std::fs::write(&sealed_path, &sealed_octets).map_err(|error| format!("{sealed_path}: {error}"))?;
+    std::fs::write(&sealed_path, &sealed_octets)
+        .map_err(|error| format!("{sealed_path}: {error}"))?;
     say!("THE SUCCESSOR REST — sealed as its own container, in the P0 format, declaring its cultivation lineage");
-    say!("  {sealed_path} · {} octets · classes {} · transitions {} · vocabulary {} · height {}", sealed_octets.len(), sealed.classes(), sealed.transitions(), sealed.vocabulary.len(), sealed.height);
+    say!(
+        "  {sealed_path} · {} octets · classes {} · transitions {} · vocabulary {} · height {}",
+        sealed_octets.len(),
+        sealed.classes(),
+        sealed.transitions(),
+        sealed.vocabulary.len(),
+        sealed.height
+    );
     say!("  it declares the same three laws the predecessor does, plus cultivation.law, .metric, .predecessor, .material and .delta");
     say!("  the sealed container differs from the octet-compared one ONLY in that declared metadata; the arrays are {}", if sealed.indptr == grown.transported.indptr && sealed.standing == grown.transported.standing && sealed.germ == grown.transported.germ && sealed.target == grown.transported.target && sealed.suffix == grown.transported.suffix && sealed.vocabulary == grown.transported.vocabulary { "IDENTICAL" } else { "DIFFERENT" });
     say!("");
@@ -465,31 +656,93 @@ fn run() -> Result<(), String> {
     // CONTROL 4 — held-out changed and unchanged conduct
     // -----------------------------------------------------------------------------------------
     say!("[ 4] HELD-OUT CONDUCT — changed where the material landed, and measured everywhere else");
-    let founded: BTreeSet<&str> = grown.delta.germs_founded.iter().map(String::as_str).collect();
+    let founded: BTreeSet<&str> = grown
+        .delta
+        .germs_founded
+        .iter()
+        .map(String::as_str)
+        .collect();
     say!("  A germ this cultivation founded enters the ROOT's own family, and every suffix ladder ends at the");
     say!("  root, so all {} founded germs enter EVERY prompt's section by the atlas's own law. The unchanged", founded.len());
     say!("  reading is therefore taken at the two faces that growth cannot forge: the section restricted to the");
     say!("  germs that already STOOD, and the depth-0 support — what the full context alone licenses.");
-    let changed = exhibit_conduct(&mut form, "the development subject", DEVELOPMENT_PROBES, &predecessor, &sealed, &founded);
-    let unchanged_no_op = exhibit_conduct(&mut form, "the no-op document's subject", NO_OP_PROBES, &predecessor, &sealed, &founded);
-    let unchanged_held_out = exhibit_conduct(&mut form, "the HELD-OUT document's subject, never exposed", HELD_OUT_PROBES, &predecessor, &sealed, &founded);
-    let p0_eight = exhibit_conduct(&mut form, "the P0 eight", P0_PROBES, &predecessor, &sealed, &founded);
+    let changed = exhibit_conduct(
+        &mut form,
+        "the development subject",
+        DEVELOPMENT_PROBES,
+        &predecessor,
+        &sealed,
+        &founded,
+    );
+    let unchanged_no_op = exhibit_conduct(
+        &mut form,
+        "the no-op document's subject",
+        NO_OP_PROBES,
+        &predecessor,
+        &sealed,
+        &founded,
+    );
+    let unchanged_held_out = exhibit_conduct(
+        &mut form,
+        "the HELD-OUT document's subject, never exposed",
+        HELD_OUT_PROBES,
+        &predecessor,
+        &sealed,
+        &founded,
+    );
+    let p0_eight = exhibit_conduct(
+        &mut form,
+        "the P0 eight",
+        P0_PROBES,
+        &predecessor,
+        &sealed,
+        &founded,
+    );
     say!("");
 
     // -----------------------------------------------------------------------------------------
     // CONTROL 5 — the subject-disjoint still control
     // -----------------------------------------------------------------------------------------
     say!("[ 5] THE SUBJECT-DISJOINT STILL CONTROL");
-    let disjoint = read_material("SUBJECT-DISJOINT", SUBJECT_DISJOINT, SUBJECT_DISJOINT, &LexicalAperture::inherited())?;
-    let before_still = predecessor.write_container().map_err(|error| error.to_string())?;
+    let disjoint = read_material(
+        "SUBJECT-DISJOINT",
+        SUBJECT_DISJOINT,
+        SUBJECT_DISJOINT,
+        &LexicalAperture::inherited(),
+    )?;
+    let before_still = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let still = read_residual(&predecessor, &disjoint.label, &disjoint.surfaces);
-    let after_still = predecessor.write_container().map_err(|error| error.to_string())?;
+    let after_still = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let still_faces_before = conduct_all(&predecessor, P0_PROBES);
     let still_faces_after = conduct_all(&predecessor, P0_PROBES);
     say!("  {SUBJECT_DISJOINT} — {} germ occurrences carried to the PREDICTION and nothing committed", disjoint.surfaces.len());
-    say!("  its residual: {} novel germs · {} refusals · {} unreached · census {:?}", still.novel_germs.len(), still.refusals.len(), still.unreached.len(), still.census());
-    say!("  the rest before and after that prediction: {}", if before_still == after_still { "OCTET-IDENTICAL" } else { "MOVED" });
-    say!("  the P0 eight's faces before and after: {} of 8 bit-identical", still_faces_before.iter().zip(&still_faces_after).filter(|(left, right)| left.face() == right.face()).count());
+    say!(
+        "  its residual: {} novel germs · {} refusals · {} unreached · census {:?}",
+        still.novel_germs.len(),
+        still.refusals.len(),
+        still.unreached.len(),
+        still.census()
+    );
+    say!(
+        "  the rest before and after that prediction: {}",
+        if before_still == after_still {
+            "OCTET-IDENTICAL"
+        } else {
+            "MOVED"
+        }
+    );
+    say!(
+        "  the P0 eight's faces before and after: {} of 8 bit-identical",
+        still_faces_before
+            .iter()
+            .zip(&still_faces_after)
+            .filter(|(left, right)| left.face() == right.face())
+            .count()
+    );
     say!("  a prediction is a reading. The still control is that a reading with a large residual still");
     say!("  deposits nothing, which is exactly what distinguishes it from the exposure above.");
     say!("  AND THE STILLNESS IS NOT VACUOUS — here is exactly what a commit of this same material WOULD");
@@ -502,8 +755,15 @@ fn run() -> Result<(), String> {
         counterfactual.delta.transitions_founded.len(),
         counterfactual.delta.transitions_founded_on_standing(),
         counterfactual.delta.standing_increments.len());
-    say!("    the container that commit would have written: {} octets against the predecessor's {}",
-        counterfactual.successor.write_container().map(|held| held.len()).unwrap_or(0), before_still.len());
+    say!(
+        "    the container that commit would have written: {} octets against the predecessor's {}",
+        counterfactual
+            .successor
+            .write_container()
+            .map(|held| held.len())
+            .unwrap_or(0),
+        before_still.len()
+    );
     say!("    so the material is very far from inert, and the still control is a fact about the COMMIT.");
     say!("");
 
@@ -520,20 +780,75 @@ fn run() -> Result<(), String> {
     // THE CODEC VARIANT
     // -----------------------------------------------------------------------------------------
     say!("THE CODEC VARIANT — the same subject arriving through a declared lexical aperture");
-    let variant = read_material("CODEC-VARIANT", &format!("{DEVELOPMENT} under runs_are_maximal"), DEVELOPMENT, &LexicalAperture::runs_are_maximal())?;
+    let variant = read_material(
+        "CODEC-VARIANT",
+        &format!("{DEVELOPMENT} under runs_are_maximal"),
+        DEVELOPMENT,
+        &LexicalAperture::runs_are_maximal(),
+    )?;
     let variant_grown = cultivate(&predecessor, &variant, &metric)?;
-    say!("  LexicalAperture::inherited        {} germ occurrences · {} distinct surfaces", development.surfaces.len(), development.surfaces.iter().collect::<BTreeSet<_>>().len());
-    say!("  LexicalAperture::runs_are_maximal {} germ occurrences · {} distinct surfaces", variant.surfaces.len(), variant.surfaces.iter().collect::<BTreeSet<_>>().len());
+    say!(
+        "  LexicalAperture::inherited        {} germ occurrences · {} distinct surfaces",
+        development.surfaces.len(),
+        development.surfaces.iter().collect::<BTreeSet<_>>().len()
+    );
+    say!(
+        "  LexicalAperture::runs_are_maximal {} germ occurrences · {} distinct surfaces",
+        variant.surfaces.len(),
+        variant.surfaces.iter().collect::<BTreeSet<_>>().len()
+    );
     say!("  the two deltas, plurally:");
     say!("    {:<34} {:>10} {:>10}", "", "inherited", "maximal");
-    say!("    {:<34} {:>10} {:>10}", "germs founded", grown.delta.germs_founded.len(), variant_grown.delta.germs_founded.len());
-    say!("    {:<34} {:>10} {:>10}", "classes founded", grown.delta.classes_after - grown.delta.classes_before, variant_grown.delta.classes_after - variant_grown.delta.classes_before);
-    say!("    {:<34} {:>10} {:>10}", "of which splits", grown.delta.classes_split(), variant_grown.delta.classes_split());
-    say!("    {:<34} {:>10} {:>10}", "transitions founded", grown.delta.transitions_founded.len(), variant_grown.delta.transitions_founded.len());
-    say!("    {:<34} {:>10} {:>10}", "  inside the standing body", grown.delta.transitions_founded_on_standing(), variant_grown.delta.transitions_founded_on_standing());
-    say!("    {:<34} {:>10} {:>10}", "classes whose standing moved", grown.delta.standing_increments.len(), variant_grown.delta.standing_increments.len());
-    let only_maximal: Vec<&String> = variant_grown.delta.germs_founded.iter().filter(|germ| !grown.delta.germs_founded.contains(germ)).take(10).collect();
-    let only_inherited: Vec<&String> = grown.delta.germs_founded.iter().filter(|germ| !variant_grown.delta.germs_founded.contains(germ)).take(10).collect();
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "germs founded",
+        grown.delta.germs_founded.len(),
+        variant_grown.delta.germs_founded.len()
+    );
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "classes founded",
+        grown.delta.classes_after - grown.delta.classes_before,
+        variant_grown.delta.classes_after - variant_grown.delta.classes_before
+    );
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "of which splits",
+        grown.delta.classes_split(),
+        variant_grown.delta.classes_split()
+    );
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "transitions founded",
+        grown.delta.transitions_founded.len(),
+        variant_grown.delta.transitions_founded.len()
+    );
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "  inside the standing body",
+        grown.delta.transitions_founded_on_standing(),
+        variant_grown.delta.transitions_founded_on_standing()
+    );
+    say!(
+        "    {:<34} {:>10} {:>10}",
+        "classes whose standing moved",
+        grown.delta.standing_increments.len(),
+        variant_grown.delta.standing_increments.len()
+    );
+    let only_maximal: Vec<&String> = variant_grown
+        .delta
+        .germs_founded
+        .iter()
+        .filter(|germ| !grown.delta.germs_founded.contains(germ))
+        .take(10)
+        .collect();
+    let only_inherited: Vec<&String> = grown
+        .delta
+        .germs_founded
+        .iter()
+        .filter(|germ| !variant_grown.delta.germs_founded.contains(germ))
+        .take(10)
+        .collect();
     say!("  germs the maximal aperture founds and the inherited does not: {only_maximal:?}");
     say!("  germs the inherited aperture founds and the maximal does not: {only_inherited:?}");
     say!("");
@@ -550,8 +865,17 @@ fn run() -> Result<(), String> {
         .iter()
         .filter(|row| row.on_standing_class && !predecessor.offered(row.class).is_empty())
         .collect();
-    say!("  {NO_OP} — {} germ occurrences, every one of them already in the rest", no_op.surfaces.len());
-    say!("  its residual: {} novel germs · {} refusals · {} unreached · census {:?}", no_op_grown.residual.novel_germs.len(), no_op_grown.residual.refusals.len(), no_op_grown.residual.unreached.len(), no_op_grown.residual.census());
+    say!(
+        "  {NO_OP} — {} germ occurrences, every one of them already in the rest",
+        no_op.surfaces.len()
+    );
+    say!(
+        "  its residual: {} novel germs · {} refusals · {} unreached · census {:?}",
+        no_op_grown.residual.novel_germs.len(),
+        no_op_grown.residual.refusals.len(),
+        no_op_grown.residual.unreached.len(),
+        no_op_grown.residual.census()
+    );
     say!("  THE STRUCTURAL DELTA IS EMPTY where the rest had anything to say: {} transitions founded at a class that offers a nonempty family", inside.len());
     say!("  what it DOES found, and the law's own face rather than an exception to it:");
     say!("    {} transitions, every one at a TERMINUS — a class whose longest string ends in a previous", no_op_grown.delta.transitions_founded_on_standing());
@@ -575,10 +899,38 @@ fn run() -> Result<(), String> {
         .collect();
     let child_faces: Vec<String> = child.faces.clone();
     let bit_equal = parent == child_faces;
-    say!("  child exit {:?} · argv: the successor rest's path and the {} probes, and nothing else", child.status, DEVELOPMENT_PROBES.len());
-    say!("  the child returned classes {} · transitions {} · vocabulary {}", child.classes, child.transitions, child.vocabulary);
-    say!("  its faces against the parent's: {} ({} of {} bit-equal)", if bit_equal { "BIT-EQUAL" } else { "DIFFERENT" }, parent.iter().zip(&child_faces).filter(|(left, right)| left == right).count(), parent.len());
-    let forbidden: Vec<&String> = child.descriptors.iter().filter(|held| held.contains("canon/") || held.contains("research/") || held.contains("phoenix") || held.contains("gemma") || held.contains("Gemma")).collect();
+    say!(
+        "  child exit {:?} · argv: the successor rest's path and the {} probes, and nothing else",
+        child.status,
+        DEVELOPMENT_PROBES.len()
+    );
+    say!(
+        "  the child returned classes {} · transitions {} · vocabulary {}",
+        child.classes,
+        child.transitions,
+        child.vocabulary
+    );
+    say!(
+        "  its faces against the parent's: {} ({} of {} bit-equal)",
+        if bit_equal { "BIT-EQUAL" } else { "DIFFERENT" },
+        parent
+            .iter()
+            .zip(&child_faces)
+            .filter(|(left, right)| left == right)
+            .count(),
+        parent.len()
+    );
+    let forbidden: Vec<&String> = child
+        .descriptors
+        .iter()
+        .filter(|held| {
+            held.contains("canon/")
+                || held.contains("research/")
+                || held.contains("phoenix")
+                || held.contains("gemma")
+                || held.contains("Gemma")
+        })
+        .collect();
     say!("  its live descriptors: {:?}", child.descriptors);
     say!("  forbidden among them (a corpus, a source, a foreign map): {forbidden:?}");
     say!("");
@@ -588,8 +940,12 @@ fn run() -> Result<(), String> {
     // -----------------------------------------------------------------------------------------
     say!("[ 7] THE TARGETED ABLATION — the delta is WITHDRAWN in place");
     let ablated = withdraw(&sealed, &grown.delta).map_err(|error| error.to_string())?;
-    let ablated_octets = ablated.write_container().map_err(|error| error.to_string())?;
-    let predecessor_octets = predecessor.write_container().map_err(|error| error.to_string())?;
+    let ablated_octets = ablated
+        .write_container()
+        .map_err(|error| error.to_string())?;
+    let predecessor_octets = predecessor
+        .write_container()
+        .map_err(|error| error.to_string())?;
     let arrays_return = ablated.indptr == predecessor.indptr
         && ablated.germ == predecessor.germ
         && ablated.target == predecessor.target
@@ -597,11 +953,35 @@ fn run() -> Result<(), String> {
         && ablated.suffix == predecessor.suffix
         && ablated.vocabulary == predecessor.vocabulary
         && ablated.height == predecessor.height;
-    say!("  the successor minus its delta, against the predecessor: {} ({} against {} octets)", if ablated_octets == predecessor_octets { "OCTET-IDENTICAL" } else { "DIFFERENT" }, ablated_octets.len(), predecessor_octets.len());
-    say!("  every array separately — indptr, germ, target, standing, suffix, vocabulary, height: {}", if arrays_return { "IDENTICAL" } else { "DIFFERENT" });
+    say!(
+        "  the successor minus its delta, against the predecessor: {} ({} against {} octets)",
+        if ablated_octets == predecessor_octets {
+            "OCTET-IDENTICAL"
+        } else {
+            "DIFFERENT"
+        },
+        ablated_octets.len(),
+        predecessor_octets.len()
+    );
+    say!(
+        "  every array separately — indptr, germ, target, standing, suffix, vocabulary, height: {}",
+        if arrays_return {
+            "IDENTICAL"
+        } else {
+            "DIFFERENT"
+        }
+    );
     say!("  and the declaration: the withdrawal strikes the cultivation lineage and restores the predecessor's");
     say!("  own material declaration, because a body that no longer carries the deposit must not declare it.");
-    say!("  classes {} -> {} · transitions {} -> {} · vocabulary {} -> {}", sealed.classes(), ablated.classes(), sealed.transitions(), ablated.transitions(), sealed.vocabulary.len(), ablated.vocabulary.len());
+    say!(
+        "  classes {} -> {} · transitions {} -> {} · vocabulary {} -> {}",
+        sealed.classes(),
+        ablated.classes(),
+        sealed.transitions(),
+        ablated.transitions(),
+        sealed.vocabulary.len(),
+        ablated.vocabulary.len()
+    );
     let reverted = DEVELOPMENT_PROBES
         .iter()
         .filter(|probe| {
@@ -624,7 +1004,10 @@ fn run() -> Result<(), String> {
     // -----------------------------------------------------------------------------------------
     say!("VERDICTS");
     let verdict = |held: bool| if held { "PASS" } else { "OPEN" };
-    say!("  [ 1] {}  commit == derive(residual), octet for octet on the container", verdict(committed == transported));
+    say!(
+        "  [ 1] {}  commit == derive(residual), octet for octet on the container",
+        verdict(committed == transported)
+    );
     say!("  [ 2] {}  the no-op founds nothing inside the material's transport; the occupancy moves and that is declared", verdict(inside.is_empty() && no_op_grown.residual.structurally_empty()));
     say!("  [ 3] {}  the foil's delta differs plurally from the development delta on the SAME germ population", verdict(foil_differs(&grown.delta, &foil_grown.delta)));
     let held_out_changed = changed.total - changed.standing_support_held;
@@ -643,8 +1026,14 @@ fn run() -> Result<(), String> {
     say!("       claim they do: the cultivation founded transitions on classes that lie on those probes' own");
     say!("       ladders, so a germ that already stood is now offered at a SHALLOWER depth. Those germs are");
     say!("       named above, and there are four of them across the two probes.");
-    say!("  [ 5] {}  the subject-disjoint prediction deposits nothing and moves no face", verdict(before_still == after_still));
-    say!("  [ 6] {}  the fresh process conducts from the successor rest alone, bit-equal", verdict(bit_equal && child.status == Some(0) && forbidden.is_empty()));
+    say!(
+        "  [ 5] {}  the subject-disjoint prediction deposits nothing and moves no face",
+        verdict(before_still == after_still)
+    );
+    say!(
+        "  [ 6] {}  the fresh process conducts from the successor rest alone, bit-equal",
+        verdict(bit_equal && child.status == Some(0) && forbidden.is_empty())
+    );
     say!("  [ 7] {}  the targeted ablation returns the predecessor octet for octet (arrays and declaration) and the conduct reverts", verdict(ablated_octets == predecessor_octets && arrays_return && reverted == DEVELOPMENT_PROBES.len()));
     say!("  [ 8] {}  the declared metric is LOAD-BEARING: perturbing it moves the committed increments at {} classes at scale", verdict(moved_at_scale > 0), moved_at_scale);
     say!("  [ 9] {}  no factorized overlay: no rank is declared, chosen or truncated, so no RankDerivationReceipt is owed", verdict(true));
@@ -660,7 +1049,8 @@ fn run() -> Result<(), String> {
     say!("");
     say!("  elapsed {:.1} s", started.elapsed().as_secs_f64());
 
-    std::fs::write(format!("{OUT}/receipt.form"), form.as_bytes()).map_err(|error| format!("{OUT}/receipt.form: {error}"))?;
+    std::fs::write(format!("{OUT}/receipt.form"), form.as_bytes())
+        .map_err(|error| format!("{OUT}/receipt.form: {error}"))?;
     write_delta_form(&predecessor, &grown.delta)?;
     Ok(())
 }
@@ -680,7 +1070,10 @@ macro_rules! line {
 }
 
 fn exhibit_residual(form: &mut String, residual: &ExposureResidual) {
-    line!(form, "  the relation between what each class OFFERED and what the material CARRIED, by species:");
+    line!(
+        form,
+        "  the relation between what each class OFFERED and what the material CARRIED, by species:"
+    );
     let census = residual.census();
     for species in ["None", "Ride", "OpenIncluded", "OpenResidual"] {
         let held = census.get(species).copied().unwrap_or(0);
@@ -697,47 +1090,160 @@ fn exhibit_residual(form: &mut String, residual: &ExposureResidual) {
     for (depth, held) in depths.iter().take(8) {
         match depth {
             Some(depth) => line!(form, "    depth {depth:<8} {held:>7}"),
-            None => line!(form, "    {:<14} {held:>7}   no class on the whole ladder offers it", "UNREACHED"),
+            None => line!(
+                form,
+                "    {:<14} {held:>7}   no class on the whole ladder offers it",
+                "UNREACHED"
+            ),
         }
     }
-    line!(form, "  novel germs the rest's vocabulary has never carried: {}", residual.novel_germs.len());
+    line!(
+        form,
+        "  novel germs the rest's vocabulary has never carried: {}",
+        residual.novel_germs.len()
+    );
     let sample: Vec<&String> = residual.novel_germs.iter().take(12).collect();
     line!(form, "    {sample:?}");
-    line!(form, "  refusals — distinct (class, germ) pairs the standing rest did not offer: {}", residual.refusals.len());
-    let refusals: Vec<String> = residual.refusals.iter().take(8).map(|(class, germ)| format!("class {class} refused {germ:?}")).collect();
+    line!(
+        form,
+        "  refusals — distinct (class, germ) pairs the standing rest did not offer: {}",
+        residual.refusals.len()
+    );
+    let refusals: Vec<String> = residual
+        .refusals
+        .iter()
+        .take(8)
+        .map(|(class, germ)| format!("class {class} refused {germ:?}"))
+        .collect();
     line!(form, "    {}", refusals.join(" · "));
-    line!(form, "  unreached — pairs no class on the whole ladder offers: {}", residual.unreached.len());
+    line!(
+        form,
+        "  unreached — pairs no class on the whole ladder offers: {}",
+        residual.unreached.len()
+    );
 }
 
 fn exhibit_delta(form: &mut String, predecessor: &AthenaRest, delta: &CultivationDelta) {
-    line!(form, "  germs founded            {:>7}", delta.germs_founded.len());
-    line!(form, "  classes founded          {:>7}   of which {} are SPLITS of a class that stood", delta.classes_after - delta.classes_before, delta.classes_split());
-    line!(form, "  transitions founded      {:>7}   of which {} are INSIDE the standing body", delta.transitions_founded.len(), delta.transitions_founded_on_standing());
-    let refusing = delta.transitions_founded.iter().filter(|row| row.on_standing_class && !predecessor.offered(row.class).is_empty()).count();
+    line!(
+        form,
+        "  germs founded            {:>7}",
+        delta.germs_founded.len()
+    );
+    line!(
+        form,
+        "  classes founded          {:>7}   of which {} are SPLITS of a class that stood",
+        delta.classes_after - delta.classes_before,
+        delta.classes_split()
+    );
+    line!(
+        form,
+        "  transitions founded      {:>7}   of which {} are INSIDE the standing body",
+        delta.transitions_founded.len(),
+        delta.transitions_founded_on_standing()
+    );
+    let refusing = delta
+        .transitions_founded
+        .iter()
+        .filter(|row| row.on_standing_class && !predecessor.offered(row.class).is_empty())
+        .count();
     line!(form, "    at a class that offered a family without this germ  {refusing:>7}   (an OpenResidual refusal)");
-    line!(form, "    at a class that offered nothing at all             {:>7}   (a terminus — a None)", delta.transitions_founded_on_standing() - refusing);
-    line!(form, "  transitions rebased      {:>7}   of which {} on classes that stood", delta.transitions_rebased.len(), delta.transitions_rebased.iter().filter(|row| row.on_standing_class).count());
-    line!(form, "  suffix links rebased     {:>7}   of which {} on classes that stood", delta.suffix_rebased.len(), delta.suffix_rebased.iter().filter(|row| row.on_standing_class).count());
-    line!(form, "  classes whose standing moved  {:>7}", delta.standing_increments.len());
-    line!(form, "  SAMPLES, by name, each carrying the material position that caused it:");
-    for row in delta.transitions_founded.iter().filter(|row| row.on_standing_class).take(6) {
-        line!(form, "    transition+  class {:<7} on {:<24} -> class {:<7}   caused by position {}", row.class, format!("{:?}", row.germ), row.target, row.caused_by);
+    line!(
+        form,
+        "    at a class that offered nothing at all             {:>7}   (a terminus — a None)",
+        delta.transitions_founded_on_standing() - refusing
+    );
+    line!(
+        form,
+        "  transitions rebased      {:>7}   of which {} on classes that stood",
+        delta.transitions_rebased.len(),
+        delta
+            .transitions_rebased
+            .iter()
+            .filter(|row| row.on_standing_class)
+            .count()
+    );
+    line!(
+        form,
+        "  suffix links rebased     {:>7}   of which {} on classes that stood",
+        delta.suffix_rebased.len(),
+        delta
+            .suffix_rebased
+            .iter()
+            .filter(|row| row.on_standing_class)
+            .count()
+    );
+    line!(
+        form,
+        "  classes whose standing moved  {:>7}",
+        delta.standing_increments.len()
+    );
+    line!(
+        form,
+        "  SAMPLES, by name, each carrying the material position that caused it:"
+    );
+    for row in delta
+        .transitions_founded
+        .iter()
+        .filter(|row| row.on_standing_class)
+        .take(6)
+    {
+        line!(
+            form,
+            "    transition+  class {:<7} on {:<24} -> class {:<7}   caused by position {}",
+            row.class,
+            format!("{:?}", row.germ),
+            row.target,
+            row.caused_by
+        );
     }
-    for row in delta.classes_founded.iter().filter(|row| matches!(row.species, FoundedSpecies::Split { .. })).take(4) {
+    for row in delta
+        .classes_founded
+        .iter()
+        .filter(|row| matches!(row.species, FoundedSpecies::Split { .. }))
+        .take(4)
+    {
         if let FoundedSpecies::Split { from } = row.species {
             line!(form, "    class+       {:<7} SPLIT of class {:<7} which stood, inheriting its row, its link and its occupancy   caused by position {} carrying {:?}", row.class, from, row.caused_by, row.germ);
         }
     }
-    for row in delta.classes_founded.iter().filter(|row| matches!(row.species, FoundedSpecies::Carried)).take(3) {
+    for row in delta
+        .classes_founded
+        .iter()
+        .filter(|row| matches!(row.species, FoundedSpecies::Carried))
+        .take(3)
+    {
         line!(form, "    class+       {:<7} CARRIED by the material itself   caused by position {} carrying {:?}", row.class, row.caused_by, row.germ);
     }
-    for row in delta.suffix_rebased.iter().filter(|row| row.on_standing_class).take(3) {
-        line!(form, "    suffix~      class {:<7} {:?} -> {}   caused by position {}", row.class, row.before, row.after, row.caused_by);
+    for row in delta
+        .suffix_rebased
+        .iter()
+        .filter(|row| row.on_standing_class)
+        .take(3)
+    {
+        line!(
+            form,
+            "    suffix~      class {:<7} {:?} -> {}   caused by position {}",
+            row.class,
+            row.before,
+            row.after,
+            row.caused_by
+        );
     }
     let mut increments: Vec<(&u32, &u64)> = delta.standing_increments.iter().collect();
     increments.sort_by_key(|(_, held)| core::cmp::Reverse(**held));
     for (class, held) in increments.iter().take(4) {
-        line!(form, "    standing~    class {:<7} {} -> {}   an increment of {}", class, if (**class as usize) < delta.classes_before { predecessor.standing[**class as usize].to_string() } else { "founded".to_owned() }, delta.standing[**class as usize], held);
+        line!(
+            form,
+            "    standing~    class {:<7} {} -> {}   an increment of {}",
+            class,
+            if (**class as usize) < delta.classes_before {
+                predecessor.standing[**class as usize].to_string()
+            } else {
+                "founded".to_owned()
+            },
+            delta.standing[**class as usize],
+            held
+        );
     }
 }
 
@@ -755,26 +1261,49 @@ fn exhibit_adjoint(
     line!(form, "  and the exact differential of that face with respect to the standings is the 0/1 deposit");
     line!(form, "  incidence A, with A[p][s] = 1 exactly when class s lies on that ladder. Cultivation returns the");
     line!(form, "  covector through the declared metrics: dq = G_X^-1 A^T G_Y r, and the committed standing of");
-    line!(form, "  every class is its carried part plus that image. Nothing is computed beside it.");
+    line!(
+        form,
+        "  every class is its carried part plus that image. Nothing is computed beside it."
+    );
     line!(form, "");
     let (columns, rows) = grown.incidence.window(WINDOW);
     line!(form, "  THE EXACT EXAMPLE — the first {WINDOW} positions of {}, and the {} classes their ladders touch.", DEVELOPMENT, columns.len());
     let matrix = ExactRatMatrix::new(rows.clone()).map_err(|error| format!("{error:?}"))?;
-    let class_side = ExactRatMatrix::identity(columns.len()).map_err(|error| format!("{error:?}"))?;
-    let identity_receiver = ExactRatMatrix::identity(WINDOW).map_err(|error| format!("{error:?}"))?;
+    let class_side =
+        ExactRatMatrix::identity(columns.len()).map_err(|error| format!("{error:?}"))?;
+    let identity_receiver =
+        ExactRatMatrix::identity(WINDOW).map_err(|error| format!("{error:?}"))?;
     let covector: Vec<BigRational> = (0..WINDOW).map(|_| rational(1, 1)).collect();
     let adjoint = matrix
         .metric_adjoint(&class_side, &identity_receiver)
         .map_err(|error| format!("{error:?}"))?;
-    let image = adjoint.apply(&covector).map_err(|error| format!("{error:?}"))?;
-    line!(form, "    A is {} x {}; exact_linear::metric_adjoint returns G_X^-1 A^T G_Y at {} x {}", matrix.rows(), matrix.columns(), adjoint.rows(), adjoint.columns());
-    line!(form, "    the material's first {WINDOW} germs: {:?}", &development.surfaces[..WINDOW]);
-    line!(form, "    their ladders: {:?}", &grown.incidence.ladders[..WINDOW]);
+    let image = adjoint
+        .apply(&covector)
+        .map_err(|error| format!("{error:?}"))?;
+    line!(
+        form,
+        "    A is {} x {}; exact_linear::metric_adjoint returns G_X^-1 A^T G_Y at {} x {}",
+        matrix.rows(),
+        matrix.columns(),
+        adjoint.rows(),
+        adjoint.columns()
+    );
+    line!(
+        form,
+        "    the material's first {WINDOW} germs: {:?}",
+        &development.surfaces[..WINDOW]
+    );
+    line!(
+        form,
+        "    their ladders: {:?}",
+        &grown.incidence.ladders[..WINDOW]
+    );
     line!(form, "");
 
     // the perturbation
     let mut perturbed_metric = MetricDeclaration::identity();
-    perturbed_metric.name = "a receiver that weighs a REFUSED continuation three and a ridden one one".to_owned();
+    perturbed_metric.name =
+        "a receiver that weighs a REFUSED continuation three and a ridden one one".to_owned();
     perturbed_metric.open_residual = rational(3, 1);
     let diagonal = perturbed_metric.codomain_diagonal(&ExposureResidual {
         material: grown.residual.material.clone(),
@@ -802,17 +1331,39 @@ fn exhibit_adjoint(
     let perturbed_adjoint = matrix
         .metric_adjoint(&class_side, &receiver_metric)
         .map_err(|error| format!("{error:?}"))?;
-    let perturbed_image = perturbed_adjoint.apply(&covector).map_err(|error| format!("{error:?}"))?;
+    let perturbed_image = perturbed_adjoint
+        .apply(&covector)
+        .map_err(|error| format!("{error:?}"))?;
 
     line!(form, "    the declared receiver metric G_Y is DIAGONAL OVER THE RESIDUAL SPECIES — the receiver says");
-    line!(form, "    what one occurrence of each species of returned difference weighs:");
+    line!(
+        form,
+        "    what one occurrence of each species of returned difference weighs:"
+    );
     line!(form, "      position  species        G_Y   ladder");
     for at in 0..WINDOW {
-        line!(form, "      {:<9} {:<14} {:<5} {:?}", at, relation_name(grown.residual.positions[at].relation), diagonal[at], grown.incidence.ladders[at]);
+        line!(
+            form,
+            "      {:<9} {:<14} {:<5} {:?}",
+            at,
+            relation_name(grown.residual.positions[at].relation),
+            diagonal[at],
+            grown.incidence.ladders[at]
+        );
     }
     line!(form, "");
-    line!(form, "    the committed increment at each class in the window, exactly:");
-    line!(form, "      {:<10} {:>14} {:>14}  {}", "class", "G_Y = I", "G_Y perturbed", "moved");
+    line!(
+        form,
+        "    the committed increment at each class in the window, exactly:"
+    );
+    line!(
+        form,
+        "      {:<10} {:>14} {:>14}  {}",
+        "class",
+        "G_Y = I",
+        "G_Y perturbed",
+        "moved"
+    );
     let mut moved_in_window = 0usize;
     for (at, class) in columns.iter().enumerate() {
         let moved = image[at] != perturbed_image[at];
@@ -820,13 +1371,27 @@ fn exhibit_adjoint(
             moved_in_window += 1;
         }
         if at < 14 {
-            line!(form, "      {:<10} {:>14} {:>14}  {}", class, image[at], perturbed_image[at], if moved { "YES" } else { "-" });
+            line!(
+                form,
+                "      {:<10} {:>14} {:>14}  {}",
+                class,
+                image[at],
+                perturbed_image[at],
+                if moved { "YES" } else { "-" }
+            );
         }
     }
-    line!(form, "    {moved_in_window} of the window's {} classes move when the metric moves.", columns.len());
+    line!(
+        form,
+        "    {moved_in_window} of the window's {} classes move when the metric moves.",
+        columns.len()
+    );
     line!(form, "");
     line!(form, "    AND THE SPARSE LAW AGREES WITH THE DENSE CARRIER. The same window computed by the owner's");
-    line!(form, "    own sparse adjoint, against the dense exact_linear result:");
+    line!(
+        form,
+        "    own sparse adjoint, against the dense exact_linear result:"
+    );
     let windowed_residual = ExposureResidual {
         material: grown.residual.material.clone(),
         positions: grown.residual.positions[..WINDOW].to_vec(),
@@ -844,11 +1409,20 @@ fn exhibit_adjoint(
     let agrees = columns.iter().enumerate().all(|(at, class)| {
         sparse.get(class).cloned().unwrap_or_else(|| rational(0, 1)) == image[at]
     });
-    line!(form, "      {} at all {} classes of the window", if agrees { "EXACTLY EQUAL" } else { "DIFFERENT" }, columns.len());
+    line!(
+        form,
+        "      {} at all {} classes of the window",
+        if agrees { "EXACTLY EQUAL" } else { "DIFFERENT" },
+        columns.len()
+    );
     line!(form, "");
 
     // at scale
-    line!(form, "  AT SCALE — the same law over all {} positions.", grown.incidence.ladders.len());
+    line!(
+        form,
+        "  AT SCALE — the same law over all {} positions.",
+        grown.incidence.ladders.len()
+    );
     let mut at_scale_metric = MetricDeclaration::identity();
     at_scale_metric.name = perturbed_metric.name.clone();
     at_scale_metric.open_residual = rational(3, 1);
@@ -862,21 +1436,73 @@ fn exhibit_adjoint(
         .collect::<BTreeSet<u32>>()
         .into_iter()
         .filter(|class| {
-            grown.delta.standing_increments.get(class) != perturbed.delta.standing_increments.get(class)
+            grown.delta.standing_increments.get(class)
+                != perturbed.delta.standing_increments.get(class)
         })
         .collect();
-    line!(form, "    under G_Y = I           {} classes take an increment, total deposited {}", grown.delta.standing_increments.len(), grown.delta.standing_increments.values().sum::<u64>());
-    line!(form, "    under G_Y perturbed     {} classes take an increment, total deposited {}", perturbed.delta.standing_increments.len(), perturbed.delta.standing_increments.values().sum::<u64>());
-    line!(form, "    classes whose committed increment MOVED: {}", moved.len());
+    line!(
+        form,
+        "    under G_Y = I           {} classes take an increment, total deposited {}",
+        grown.delta.standing_increments.len(),
+        grown.delta.standing_increments.values().sum::<u64>()
+    );
+    line!(
+        form,
+        "    under G_Y perturbed     {} classes take an increment, total deposited {}",
+        perturbed.delta.standing_increments.len(),
+        perturbed.delta.standing_increments.values().sum::<u64>()
+    );
+    line!(
+        form,
+        "    classes whose committed increment MOVED: {}",
+        moved.len()
+    );
     for class in moved.iter().take(6) {
-        line!(form, "      class {:<8} {} -> {}", class, grown.delta.standing_increments.get(class).copied().unwrap_or(0), perturbed.delta.standing_increments.get(class).copied().unwrap_or(0));
+        line!(
+            form,
+            "      class {:<8} {} -> {}",
+            class,
+            grown
+                .delta
+                .standing_increments
+                .get(class)
+                .copied()
+                .unwrap_or(0),
+            perturbed
+                .delta
+                .standing_increments
+                .get(class)
+                .copied()
+                .unwrap_or(0)
+        );
     }
-    line!(form, "    and the successor container itself moves with the metric: {} against {} octets, {}",
-        perturbed.successor.write_container().map(|held| held.len()).unwrap_or(0),
-        grown.successor.write_container().map(|held| held.len()).unwrap_or(0),
-        if perturbed.successor.standing == grown.successor.standing { "SAME standings" } else { "DIFFERENT standings" });
-    line!(form, "    A metric the law never read could not do this. The sealed successor is the G_Y = I");
-    line!(form, "    declaration, which is a DECLARATION and not an absence.");
+    line!(
+        form,
+        "    and the successor container itself moves with the metric: {} against {} octets, {}",
+        perturbed
+            .successor
+            .write_container()
+            .map(|held| held.len())
+            .unwrap_or(0),
+        grown
+            .successor
+            .write_container()
+            .map(|held| held.len())
+            .unwrap_or(0),
+        if perturbed.successor.standing == grown.successor.standing {
+            "SAME standings"
+        } else {
+            "DIFFERENT standings"
+        }
+    );
+    line!(
+        form,
+        "    A metric the law never read could not do this. The sealed successor is the G_Y = I"
+    );
+    line!(
+        form,
+        "    declaration, which is a DECLARATION and not an absence."
+    );
     Ok(moved.len())
 }
 
@@ -911,21 +1537,47 @@ fn exhibit_conduct(
         standing_support_held: 0,
         depth_zero_held: 0,
     };
-    line!(form, "    {:<52} {:>6} {:>6} {:>8} {:>8} {:>9} {:>7}", "probe", "germs", "germs'", "arrived", "founded", "stood-supp", "depth-0");
+    line!(
+        form,
+        "    {:<52} {:>6} {:>6} {:>8} {:>8} {:>9} {:>7}",
+        "probe",
+        "germs",
+        "germs'",
+        "arrived",
+        "founded",
+        "stood-supp",
+        "depth-0"
+    );
     for probe in probes {
         let before = conduct(predecessor, probe, &lexical_tokens(probe));
         let after = conduct(successor, probe, &lexical_tokens(probe));
-        let held: BTreeMap<&str, usize> = before.offered.iter().map(|(surface, _, depth)| (surface.as_str(), *depth)).collect();
+        let held: BTreeMap<&str, usize> = before
+            .offered
+            .iter()
+            .map(|(surface, _, depth)| (surface.as_str(), *depth))
+            .collect();
         let moved_cells: Vec<&(String, u64, usize)> = after
             .offered
             .iter()
             .filter(|(surface, _, depth)| held.get(surface.as_str()) != Some(depth))
             .collect();
         let arrived = moved_cells.len();
-        let by_founding = moved_cells.iter().filter(|(surface, _, _)| founded.contains(surface.as_str())).count();
+        let by_founding = moved_cells
+            .iter()
+            .filter(|(surface, _, _)| founded.contains(surface.as_str()))
+            .count();
         // the support restricted to the germs that already stood: a face the growth cannot forge
-        let standing_before: Vec<(&str, usize)> = before.offered.iter().map(|(surface, _, depth)| (surface.as_str(), *depth)).collect();
-        let standing_after: Vec<(&str, usize)> = after.offered.iter().filter(|(surface, _, _)| !founded.contains(surface.as_str())).map(|(surface, _, depth)| (surface.as_str(), *depth)).collect();
+        let standing_before: Vec<(&str, usize)> = before
+            .offered
+            .iter()
+            .map(|(surface, _, depth)| (surface.as_str(), *depth))
+            .collect();
+        let standing_after: Vec<(&str, usize)> = after
+            .offered
+            .iter()
+            .filter(|(surface, _, _)| !founded.contains(surface.as_str()))
+            .map(|(surface, _, depth)| (surface.as_str(), *depth))
+            .collect();
         let standing_held = standing_before == standing_after;
         if before.face() != after.face() {
             diff.moved += 1;
@@ -939,9 +1591,27 @@ fn exhibit_conduct(
         if before.depth_zero_support() == after.depth_zero_support() {
             diff.depth_zero_held += 1;
         }
-        line!(form, "    {:<52} {:>6} {:>6} {:>8} {:>8} {:>9} {:>7}", format!("{probe:?}"), before.offered.len(), after.offered.len(), arrived, by_founding, if standing_held { "same" } else { "MOVED" }, if before.depth_zero_support() == after.depth_zero_support() { "same" } else { "MOVED" });
+        line!(
+            form,
+            "    {:<52} {:>6} {:>6} {:>8} {:>8} {:>9} {:>7}",
+            format!("{probe:?}"),
+            before.offered.len(),
+            after.offered.len(),
+            arrived,
+            by_founding,
+            if standing_held { "same" } else { "MOVED" },
+            if before.depth_zero_support() == after.depth_zero_support() {
+                "same"
+            } else {
+                "MOVED"
+            }
+        );
         if !standing_held {
-            let before_depth: BTreeMap<&str, usize> = before.offered.iter().map(|(surface, _, depth)| (surface.as_str(), *depth)).collect();
+            let before_depth: BTreeMap<&str, usize> = before
+                .offered
+                .iter()
+                .map(|(surface, _, depth)| (surface.as_str(), *depth))
+                .collect();
             let moved_depth: Vec<String> = after
                 .offered
                 .iter()
@@ -957,11 +1627,24 @@ fn exhibit_conduct(
             line!(form, "        germs that already STOOD and are now offered at another depth: {moved_depth:?}");
         }
         if before.depth_zero_support() != after.depth_zero_support() {
-            let before_zero: BTreeSet<&str> = before.offered.iter().filter(|(_, _, depth)| *depth == 0).map(|(surface, _, _)| surface.as_str()).collect();
-            let after_zero: BTreeSet<&str> = after.offered.iter().filter(|(_, _, depth)| *depth == 0).map(|(surface, _, _)| surface.as_str()).collect();
+            let before_zero: BTreeSet<&str> = before
+                .offered
+                .iter()
+                .filter(|(_, _, depth)| *depth == 0)
+                .map(|(surface, _, _)| surface.as_str())
+                .collect();
+            let after_zero: BTreeSet<&str> = after
+                .offered
+                .iter()
+                .filter(|(_, _, depth)| *depth == 0)
+                .map(|(surface, _, _)| surface.as_str())
+                .collect();
             let gained: Vec<&&str> = after_zero.difference(&before_zero).take(10).collect();
             let lost: Vec<&&str> = before_zero.difference(&after_zero).take(10).collect();
-            line!(form, "        what the full context now licenses and did not: {gained:?}");
+            line!(
+                form,
+                "        what the full context now licenses and did not: {gained:?}"
+            );
             if !lost.is_empty() {
                 line!(form, "        and what it no longer licenses: {lost:?}");
             }
@@ -984,38 +1667,134 @@ fn exhibit_foil(
     let development_population: BTreeMap<&str, usize> = tally(&development.surfaces);
     let foil_population: BTreeMap<&str, usize> = tally(&foil.surfaces);
     line!(form, "  the permutation, declared: position i -> (i * {stride}) mod {}, a bijection on positions", development.surfaces.len());
-    line!(form, "  the germ POPULATION is identical: {} · {} distinct surfaces each, multiset equal {}", development.surfaces.len(), development_population.len(), development_population == foil_population);
-    line!(form, "  the ADJACENCY is broken: {} of {} adjacent pairs survive", surviving_pairs(&development.surfaces, &foil.surfaces), development.surfaces.len().saturating_sub(1));
+    line!(
+        form,
+        "  the germ POPULATION is identical: {} · {} distinct surfaces each, multiset equal {}",
+        development.surfaces.len(),
+        development_population.len(),
+        development_population == foil_population
+    );
+    line!(
+        form,
+        "  the ADJACENCY is broken: {} of {} adjacent pairs survive",
+        surviving_pairs(&development.surfaces, &foil.surfaces),
+        development.surfaces.len().saturating_sub(1)
+    );
     line!(form, "  the two deltas, plurally:");
     line!(form, "    {:<38} {:>12} {:>12}", "", "development", "foil");
-    line!(form, "    {:<38} {:>12} {:>12}", "germs founded", grown.delta.germs_founded.len(), foil_grown.delta.germs_founded.len());
-    line!(form, "    {:<38} {:>12} {:>12}", "classes founded", grown.delta.classes_after - grown.delta.classes_before, foil_grown.delta.classes_after - foil_grown.delta.classes_before);
-    line!(form, "    {:<38} {:>12} {:>12}", "  of which splits", grown.delta.classes_split(), foil_grown.delta.classes_split());
-    line!(form, "    {:<38} {:>12} {:>12}", "transitions founded", grown.delta.transitions_founded.len(), foil_grown.delta.transitions_founded.len());
-    line!(form, "    {:<38} {:>12} {:>12}", "  inside the standing body", grown.delta.transitions_founded_on_standing(), foil_grown.delta.transitions_founded_on_standing());
-    line!(form, "    {:<38} {:>12} {:>12}", "suffix links rebased", grown.delta.suffix_rebased.len(), foil_grown.delta.suffix_rebased.len());
-    line!(form, "    {:<38} {:>12} {:>12}", "classes whose standing moved", grown.delta.standing_increments.len(), foil_grown.delta.standing_increments.len());
-    line!(form, "    {:<38} {:>12} {:>12}", "total occupancy deposited", grown.delta.standing_increments.values().sum::<u64>(), foil_grown.delta.standing_increments.values().sum::<u64>());
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "germs founded",
+        grown.delta.germs_founded.len(),
+        foil_grown.delta.germs_founded.len()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "classes founded",
+        grown.delta.classes_after - grown.delta.classes_before,
+        foil_grown.delta.classes_after - foil_grown.delta.classes_before
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "  of which splits",
+        grown.delta.classes_split(),
+        foil_grown.delta.classes_split()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "transitions founded",
+        grown.delta.transitions_founded.len(),
+        foil_grown.delta.transitions_founded.len()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "  inside the standing body",
+        grown.delta.transitions_founded_on_standing(),
+        foil_grown.delta.transitions_founded_on_standing()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "suffix links rebased",
+        grown.delta.suffix_rebased.len(),
+        foil_grown.delta.suffix_rebased.len()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "classes whose standing moved",
+        grown.delta.standing_increments.len(),
+        foil_grown.delta.standing_increments.len()
+    );
+    line!(
+        form,
+        "    {:<38} {:>12} {:>12}",
+        "total occupancy deposited",
+        grown.delta.standing_increments.values().sum::<u64>(),
+        foil_grown.delta.standing_increments.values().sum::<u64>()
+    );
     let development_census = grown.residual.census();
     let foil_census = foil_grown.residual.census();
-    line!(form, "  and the residual that caused each of them, by species:");
+    line!(
+        form,
+        "  and the residual that caused each of them, by species:"
+    );
     for species in ["None", "Ride", "OpenIncluded", "OpenResidual"] {
-        line!(form, "    {:<38} {:>12} {:>12}", species, development_census.get(species).copied().unwrap_or(0), foil_census.get(species).copied().unwrap_or(0));
+        line!(
+            form,
+            "    {:<38} {:>12} {:>12}",
+            species,
+            development_census.get(species).copied().unwrap_or(0),
+            foil_census.get(species).copied().unwrap_or(0)
+        );
     }
-    let development_founded: BTreeSet<(u32, &str)> = grown.delta.transitions_founded.iter().filter(|row| row.on_standing_class).map(|row| (row.class, row.germ.as_str())).collect();
-    let foil_founded: BTreeSet<(u32, &str)> = foil_grown.delta.transitions_founded.iter().filter(|row| row.on_standing_class).map(|row| (row.class, row.germ.as_str())).collect();
+    let development_founded: BTreeSet<(u32, &str)> = grown
+        .delta
+        .transitions_founded
+        .iter()
+        .filter(|row| row.on_standing_class)
+        .map(|row| (row.class, row.germ.as_str()))
+        .collect();
+    let foil_founded: BTreeSet<(u32, &str)> = foil_grown
+        .delta
+        .transitions_founded
+        .iter()
+        .filter(|row| row.on_standing_class)
+        .map(|row| (row.class, row.germ.as_str()))
+        .collect();
     let shared = development_founded.intersection(&foil_founded).count();
-    line!(form, "  the (class, germ) pairs founded INSIDE the standing body: {} shared of {} and {}", shared, development_founded.len(), foil_founded.len());
-    let only_foil: Vec<&(u32, &str)> = foil_founded.difference(&development_founded).take(6).collect();
+    line!(
+        form,
+        "  the (class, germ) pairs founded INSIDE the standing body: {} shared of {} and {}",
+        shared,
+        development_founded.len(),
+        foil_founded.len()
+    );
+    let only_foil: Vec<&(u32, &str)> = foil_founded
+        .difference(&development_founded)
+        .take(6)
+        .collect();
     line!(form, "    founded only by the foil: {only_foil:?}");
-    line!(form, "  **The germ population is the same and the delta is not.** So the delta is caused by the");
-    line!(form, "  material's STRUCTURE — which germ follows which — and not by which germs are present.");
+    line!(
+        form,
+        "  **The germ population is the same and the delta is not.** So the delta is caused by the"
+    );
+    line!(
+        form,
+        "  material's STRUCTURE — which germ follows which — and not by which germs are present."
+    );
 }
 
 fn foil_differs(development: &CultivationDelta, foil: &CultivationDelta) -> bool {
     development.germs_founded == foil.germs_founded
         && (development.classes_after != foil.classes_after
-            || development.transitions_founded_on_standing() != foil.transitions_founded_on_standing()
+            || development.transitions_founded_on_standing()
+                != foil.transitions_founded_on_standing()
             || development.standing_increments != foil.standing_increments)
 }
 
@@ -1055,7 +1834,9 @@ fn permute(development: &Material) -> Result<(Material, usize), String> {
     // above establishes; assert it rather than trusting it.
     let distinct: BTreeSet<usize> = order.iter().copied().collect();
     if distinct.len() != extent {
-        return Err(format!("the declared foil permutation is not a bijection at stride {stride}"));
+        return Err(format!(
+            "the declared foil permutation is not a bijection at stride {stride}"
+        ));
     }
     for (at, from) in order.iter().enumerate() {
         surfaces[at] = development.surfaces[*from].clone();
@@ -1137,7 +1918,11 @@ fn write_delta_form(predecessor: &AthenaRest, delta: &CultivationDelta) -> Resul
     let _ = writeln!(form, "# material   {}", delta.material);
     let _ = writeln!(form, "# metric     {}", delta.metric);
     let _ = writeln!(form, "# law        {CULTIVATION_LAW}");
-    let _ = writeln!(form, "# classes    {} -> {}", delta.classes_before, delta.classes_after);
+    let _ = writeln!(
+        form,
+        "# classes    {} -> {}",
+        delta.classes_before, delta.classes_after
+    );
     let _ = writeln!(form, "#");
     let _ = writeln!(form, "# Every row carries the material position that caused it. The structural rows are licensed");
     let _ = writeln!(form, "# by the residual: a transition is founded exactly where the class did not offer that germ,");
@@ -1150,21 +1935,66 @@ fn write_delta_form(predecessor: &AthenaRest, delta: &CultivationDelta) -> Resul
     for row in &delta.classes_founded {
         match row.species {
             FoundedSpecies::Carried => {
-                let _ = writeln!(form, "class+\t{}\tcarried\tposition {}\tgerm {:?}\tstanding {}", row.class, row.caused_by, row.germ, delta.standing[row.class as usize]);
+                let _ = writeln!(
+                    form,
+                    "class+\t{}\tcarried\tposition {}\tgerm {:?}\tstanding {}",
+                    row.class, row.caused_by, row.germ, delta.standing[row.class as usize]
+                );
             }
             FoundedSpecies::Split { from } => {
-                let _ = writeln!(form, "class+\t{}\tsplit-of {}\tposition {}\tgerm {:?}\tstanding {}", row.class, from, row.caused_by, row.germ, delta.standing[row.class as usize]);
+                let _ = writeln!(
+                    form,
+                    "class+\t{}\tsplit-of {}\tposition {}\tgerm {:?}\tstanding {}",
+                    row.class, from, row.caused_by, row.germ, delta.standing[row.class as usize]
+                );
             }
         }
     }
     for row in &delta.transitions_founded {
-        let _ = writeln!(form, "transition+\t{}\t{:?}\t-> {}\tposition {}\t{}", row.class, row.germ, row.target, row.caused_by, if row.on_standing_class { "inside-the-standing-body" } else { "on-a-founded-class" });
+        let _ = writeln!(
+            form,
+            "transition+\t{}\t{:?}\t-> {}\tposition {}\t{}",
+            row.class,
+            row.germ,
+            row.target,
+            row.caused_by,
+            if row.on_standing_class {
+                "inside-the-standing-body"
+            } else {
+                "on-a-founded-class"
+            }
+        );
     }
     for row in &delta.transitions_rebased {
-        let _ = writeln!(form, "transition~\t{}\t{:?}\t{} -> {}\tposition {}\t{}", row.class, row.germ, row.before, row.after, row.caused_by, if row.on_standing_class { "inside-the-standing-body" } else { "on-a-founded-class" });
+        let _ = writeln!(
+            form,
+            "transition~\t{}\t{:?}\t{} -> {}\tposition {}\t{}",
+            row.class,
+            row.germ,
+            row.before,
+            row.after,
+            row.caused_by,
+            if row.on_standing_class {
+                "inside-the-standing-body"
+            } else {
+                "on-a-founded-class"
+            }
+        );
     }
     for row in &delta.suffix_rebased {
-        let _ = writeln!(form, "suffix~\t{}\t{:?} -> {}\tposition {}\t{}", row.class, row.before, row.after, row.caused_by, if row.on_standing_class { "inside-the-standing-body" } else { "on-a-founded-class" });
+        let _ = writeln!(
+            form,
+            "suffix~\t{}\t{:?} -> {}\tposition {}\t{}",
+            row.class,
+            row.before,
+            row.after,
+            row.caused_by,
+            if row.on_standing_class {
+                "inside-the-standing-body"
+            } else {
+                "on-a-founded-class"
+            }
+        );
     }
     for (class, held) in &delta.standing_increments {
         let carried = if (*class as usize) < delta.classes_before {
@@ -1172,7 +2002,12 @@ fn write_delta_form(predecessor: &AthenaRest, delta: &CultivationDelta) -> Resul
         } else {
             "founded".to_owned()
         };
-        let _ = writeln!(form, "standing~\t{class}\t{carried} -> {}\t+{held}", delta.standing[*class as usize]);
+        let _ = writeln!(
+            form,
+            "standing~\t{class}\t{carried} -> {}\t+{held}",
+            delta.standing[*class as usize]
+        );
     }
-    std::fs::write(format!("{OUT}/delta.form"), form.as_bytes()).map_err(|error| format!("{OUT}/delta.form: {error}"))
+    std::fs::write(format!("{OUT}/delta.form"), form.as_bytes())
+        .map_err(|error| format!("{OUT}/delta.form: {error}"))
 }

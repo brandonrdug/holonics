@@ -809,18 +809,14 @@ fn main() {
 /// pole of `(2,1,1,3)`.
 fn quadruples_meeting_a_pole() -> Vec<(&'static str, Vec<Rat>)> {
     vec![
-        ("contains t=0  (the swap's pole)", vec![
-            integer(0),
-            integer(1),
-            integer(2),
-            integer(4),
-        ]),
-        ("contains t=-3 (the pole of 2,1;1,3)", vec![
-            integer(-3),
-            integer(1),
-            integer(2),
-            integer(4),
-        ]),
+        (
+            "contains t=0  (the swap's pole)",
+            vec![integer(0), integer(1), integer(2), integer(4)],
+        ),
+        (
+            "contains t=-3 (the pole of 2,1;1,3)",
+            vec![integer(-3), integer(1), integer(2), integer(4)],
+        ),
     ]
 }
 
@@ -910,7 +906,10 @@ fn classify_mechanisms(pencils: &[(&'static str, ProjectivePencil)]) {
                     preserved += 1;
                 } else {
                     moved += 1;
-                    failing.push(format!("{material_name} on {}", &pencil_name[..7.min(pencil_name.len())]));
+                    failing.push(format!(
+                        "{material_name} on {}",
+                        &pencil_name[..7.min(pencil_name.len())]
+                    ));
                 }
             }
         }

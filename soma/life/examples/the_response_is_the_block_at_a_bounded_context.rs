@@ -149,7 +149,16 @@ fn run() -> Result<(), String> {
         standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
         extent.push(atlas.class_extent(state).unwrap_or(0) as u32);
     }
-    let body = Body { indptr, germ, target, suffix, standing, extent, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        standing,
+        extent,
+        surfaces,
+        index_of,
+    };
     let ground = PresentationGround::Atlas(atlas);
 
     println!("GENERATION ON THE QUOTIENT — the response is the block\n");
@@ -194,12 +203,9 @@ fn run() -> Result<(), String> {
                         }
                     })
                     .collect();
-                let division = divide_junction(
-                    &candidates,
-                    &ground,
-                    &PresentationReceiver::transport_at(1),
-                )
-                .map_err(|error| format!("the junction would not divide: {error:?}"))?;
+                let division =
+                    divide_junction(&candidates, &ground, &PresentationReceiver::transport_at(1))
+                        .map_err(|error| format!("the junction would not divide: {error:?}"))?;
                 println!(
                     "     step {step}: {} licensed -> {} BLOCKS  (collapsed {} pairs)",
                     licensed.len(),
@@ -211,9 +217,7 @@ fn run() -> Result<(), String> {
                         .surfaces
                         .iter()
                         .take(6)
-                        .map(|surface| {
-                            surface.rsplit(' ').next().unwrap_or(surface).to_owned()
-                        })
+                        .map(|surface| surface.rsplit(' ').next().unwrap_or(surface).to_owned())
                         .collect();
                     println!(
                         "        block of {:<4} : {}{}",
@@ -223,12 +227,17 @@ fn run() -> Result<(), String> {
                     );
                 }
                 if division.blocks.len() > 4 {
-                    println!("        … {} more blocks, all retained", division.blocks.len() - 4);
+                    println!(
+                        "        … {} more blocks, all retained",
+                        division.blocks.len() - 4
+                    );
                 }
                 // Continue the walk through the FIRST block's first member. The states in a block
                 // are one state to this receiver, so this is the quotient continuing -- not a pick
                 // among distinguishable options.
-                let Some(first) = licensed.first().copied() else { break };
+                let Some(first) = licensed.first().copied() else {
+                    break;
+                };
                 carried.push(body.surfaces[first as usize].clone());
                 state = body.carry(read, first);
             }
@@ -237,7 +246,9 @@ fn run() -> Result<(), String> {
         println!();
     }
     println!("Within a block no word of the declared family separates the members, so the block");
-    println!("IS the response. A determinate step returns one block; a plural step returns several,");
+    println!(
+        "IS the response. A determinate step returns one block; a plural step returns several,"
+    );
     println!("and that is where a clarifying question is owed rather than a pick.");
     Ok(())
 }

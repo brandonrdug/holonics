@@ -61,7 +61,7 @@ mod schema;
 mod tests;
 mod wire;
 
-pub use directory::{mount_directory, DirectoryCompanion, MountedCultivatedRest};
+pub use directory::{DirectoryCompanion, MountedCultivatedRest, mount_directory};
 pub use native_morphology::{
     NativeMorphologyInput, NativeMorphologyWitness, native_morphology_bytes,
     write_native_morphology,
@@ -70,7 +70,7 @@ pub use schema::{
     AlignedFactor, CodebookGraphIdentity, CultivatedRestInput, CultivatedRestRefusal,
     DerivationAdjointRankReceipt, ExactCertificate, ExtentOrigin, MorphologyPayload,
     OctaveBoundOrigin, PortDirection, PortExtentAgreement, PredecessorProductIdentity,
-    ReconstructionCandidate, ReconstructionFibre, SparseDelta, SparseDeltaEntry, TargetedAblation,
-    RuntimeChart, RuntimeLawReceipt, TypedLaw, TypedPort,
+    ReconstructionCandidate, ReconstructionFibre, RuntimeChart, RuntimeLawReceipt, SparseDelta,
+    SparseDeltaEntry, TargetedAblation, TypedLaw, TypedPort,
 };
 pub use wire::CultivatedRest;

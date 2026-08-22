@@ -395,7 +395,10 @@ pub(crate) mod tests {
         let mounted = MountedNativeRest::open(&rest_path).unwrap();
         let whole = std::fs::read(&rest_path).unwrap();
         assert_eq!(mounted.content_identity().extent, whole.len() as u64);
-        assert_eq!(mounted.content_identity().sha256, format!("{:x}", Sha256::digest(&whole)));
+        assert_eq!(
+            mounted.content_identity().sha256,
+            format!("{:x}", Sha256::digest(&whole))
+        );
         assert!(mounted.total_file_octets() > mounted.payload_offset());
         let extent = mounted.population_extent("layer.weight").unwrap();
         assert_eq!(extent.start, mounted.payload_offset());
@@ -552,7 +555,9 @@ pub(crate) mod tests {
             .unwrap();
         assert!(matches!(
             mounted.validate(&fake_source),
-            Err(crate::source_occurrence::SourceRefusal::OperationForeign { operation })
+            Err(crate::source_occurrence::OccurrenceWitnessRefusal::Source(
+                crate::source_occurrence::SourceRefusal::OperationForeign { operation }
+            ))
                 if operation == "fake source operation"
         ));
 
@@ -571,7 +576,9 @@ pub(crate) mod tests {
             .unwrap();
         assert!(matches!(
             mounted.validate(&carrier_intervention),
-            Err(crate::source_occurrence::SourceRefusal::OperationForeign { operation })
+            Err(crate::source_occurrence::OccurrenceWitnessRefusal::Source(
+                crate::source_occurrence::SourceRefusal::OperationForeign { operation }
+            ))
                 if operation == "carrier midpoint quotient"
         ));
         std::fs::remove_file(path).unwrap();

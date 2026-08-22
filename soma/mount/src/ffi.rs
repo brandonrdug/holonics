@@ -184,7 +184,11 @@ extern "C" {
     pub fn cuGraphLaunch(hGraphExec: CUgraphExec, hStream: CUstream) -> CUresult;
     pub fn cuGraphExecDestroy(hGraphExec: CUgraphExec) -> CUresult;
     pub fn cuGraphDestroy(hGraph: CUgraph) -> CUresult;
-    pub fn cuGraphGetNodes(hGraph: CUgraph, nodes: *mut CUgraphNode, numNodes: *mut usize) -> CUresult;
+    pub fn cuGraphGetNodes(
+        hGraph: CUgraph,
+        nodes: *mut CUgraphNode,
+        numNodes: *mut usize,
+    ) -> CUresult;
     pub fn cuGraphGetEdges(
         hGraph: CUgraph,
         from: *mut CUgraphNode,
@@ -192,7 +196,12 @@ extern "C" {
         numEdges: *mut usize,
     ) -> CUresult;
     pub fn cuGraphNodeGetType(hNode: CUgraphNode, kind: *mut c_int) -> CUresult;
-    pub fn cuMemsetD32Async(dstDevice: CUdeviceptr, ui: c_uint, n: usize, hStream: CUstream) -> CUresult;
+    pub fn cuMemsetD32Async(
+        dstDevice: CUdeviceptr,
+        ui: c_uint,
+        n: usize,
+        hStream: CUstream,
+    ) -> CUresult;
     pub fn cuMemcpyDtoDAsync_v2(
         dst: CUdeviceptr,
         src: CUdeviceptr,

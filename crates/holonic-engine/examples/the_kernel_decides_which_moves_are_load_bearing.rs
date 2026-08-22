@@ -65,7 +65,10 @@ fn check(project: &Path, path: &Path) -> (bool, String) {
         .expect("lake env lean runs");
     let mut diagnostic = String::from_utf8_lossy(&output.stdout).into_owned();
     diagnostic.push_str(&String::from_utf8_lossy(&output.stderr));
-    (output.status.success() && diagnostic.trim().is_empty(), diagnostic)
+    (
+        output.status.success() && diagnostic.trim().is_empty(),
+        diagnostic,
+    )
 }
 
 /// A refusal is inconclusive when the remaining text did not parse. Lean says so in its own words,
@@ -82,10 +85,7 @@ fn verdict_of(clean: bool, diagnostic: &str) -> Verdict {
         "unexpected end of input",
         "expected command",
     ];
-    if syntactic
-        .iter()
-        .any(|marker| diagnostic.contains(marker))
-    {
+    if syntactic.iter().any(|marker| diagnostic.contains(marker)) {
         return Verdict::Inconclusive;
     }
     Verdict::LoadBearing
@@ -143,7 +143,14 @@ fn main() {
         if baseline_clean { "CLEAN" } else { "NOT CLEAN" }
     );
     if !baseline_clean {
-        println!("{}", baseline_diagnostic.lines().take(4).collect::<Vec<_>>().join("\n"));
+        println!(
+            "{}",
+            baseline_diagnostic
+                .lines()
+                .take(4)
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
         println!("  nothing below would mean anything; stopping");
         std::process::exit(1);
     }
@@ -157,14 +164,12 @@ fn main() {
                     .declarations
                     .iter()
                     .position(|form| std::ptr::eq(form, declaration))
-                    .expect("the declaration is in the reading") as u32,
+                    .expect("the declaration is in the reading")
+                    as u32,
                 step: step_index as u32,
             };
             // Several binders of one destructuring share a line; ablating it once is enough.
-            if rows
-                .iter()
-                .any(|(_, _, line, _, _)| *line == step.line)
-            {
+            if rows.iter().any(|(_, _, line, _, _)| *line == step.line) {
                 continue;
             }
             let ablated: String = lines
@@ -190,7 +195,11 @@ fn main() {
             println!(
                 "    line {:4}  {:9}  {:?}  {}  {head}",
                 step.line,
-                if is_connected { "connected" } else { "isolated" },
+                if is_connected {
+                    "connected"
+                } else {
+                    "isolated"
+                },
                 verdict,
                 step.former
             );
@@ -230,9 +239,7 @@ fn main() {
 
     let connected_decided = connected_removable + connected_load;
     let isolated_decided = isolated_removable + isolated_load;
-    println!(
-        "\n    removable, as a ratio over the DECIDED population only:"
-    );
+    println!("\n    removable, as a ratio over the DECIDED population only:");
     println!("      connected  {connected_removable}/{connected_decided}");
     println!("      isolated   {isolated_removable}/{isolated_decided}");
 
@@ -242,15 +249,21 @@ fn main() {
         );
         return;
     }
-    println!("\n  THE PREDICTION, declared before the run: an isolated move is removable more often.");
+    println!(
+        "\n  THE PREDICTION, declared before the run: an isolated move is removable more often."
+    );
 
     // A comparison whose material cannot vary the property under test is the same defect as a check
     // that cannot fail — it just wears a verdict. If NOTHING is removable in either population the
     // question is undetermined here, and saying "the rates are equal" would dress a degenerate
     // material up as a finding.
     if connected_removable == 0 && isolated_removable == 0 {
-        println!("  UNDETERMINED — not one decided move in either population is removable, so this");
-        println!("  material carries no variation in the property under test. The comparison has no");
+        println!(
+            "  UNDETERMINED — not one decided move in either population is removable, so this"
+        );
+        println!(
+            "  material carries no variation in the property under test. The comparison has no"
+        );
         println!("  resolving power here and no verdict is stated.");
     } else {
         // Cross-multiplied so the comparison stays in integers and no ratio is ever divided.
@@ -291,7 +304,8 @@ fn main() {
             if !isolated.contains(&occurrence) {
                 continue;
             }
-            let end = declaration.line + declaration.steps.iter().map(|s| s.line).max().unwrap_or(0);
+            let end =
+                declaration.line + declaration.steps.iter().map(|s| s.line).max().unwrap_or(0);
             let named_later = lines
                 .iter()
                 .enumerate()
@@ -316,9 +330,15 @@ fn main() {
     );
     if isolated_but_named_later > 0 {
         println!("    So `isolated` is NOT `unused`. The arrival graph joins step to step, and a");
-        println!("    declaration's closing term is not a step — a `have` consumed only by the final");
-        println!("    tactic has no outgoing arrival and is called isolated while the kernel needs it.");
-        println!("    The repair is a terminal node for the closing term, so such a move is connected");
+        println!(
+            "    declaration's closing term is not a step — a `have` consumed only by the final"
+        );
+        println!(
+            "    tactic has no outgoing arrival and is called isolated while the kernel needs it."
+        );
+        println!(
+            "    The repair is a terminal node for the closing term, so such a move is connected"
+        );
         println!("    to it. Until that exists, `isolated` means *no later STEP arrives here* and");
         println!("    must not be read as *nothing uses this*.");
     }

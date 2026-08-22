@@ -80,10 +80,20 @@ construction merely because its current implementation is being replaced.
 - Serial composition preserves typed port lineage. Parallel composition requires an exact
   independence/interchange receipt for complete successor, obstruction, lineage, and logical
   resource state. Worker count and collection membership prove nothing.
+- The elementary lineage-bearing passage is an addressed span `X <- W_f -> Y`. Serial composition
+  retains the pullback occurrence population `W_f ×_Y W_g` and its joining equality. The
+  extensional relation saying only that an endpoint pair is connected is a receiver shadow, not
+  lineage. Passage equivalence must preserve both boundary maps; a bare occurrence bijection,
+  equal endpoints, equal count or equal digest does not.
 - Co-presence is not contact. Contact requires a declared interaction. Equal receiver output is
   not source equality.
 - A boundary condensation is lawful only for a declared future receiver family through which
   every requested consequence provably factors. Enlarging that family reopens the retained fiber.
+- A dynamic condensation additionally returns descended generators satisfying `q T_i = U_i q` for
+  every admitted source generator. This generator law, not an enumerated campaign, carries the
+  factorization through every ordered successor word. Injectivity, finite point count and a
+  choice-defined inverse are not an executable decoder; decoder work, residency, transfer, image
+  and open domain remain part of the compression return.
 - A file store is an exterior serialized chart, never the runtime topology. Mount broad material
   incrementally into native local incidence; preserve paths/bytes as lineage, not identity.
 
@@ -246,6 +256,15 @@ construction merely because its current implementation is being replaced.
   receiver-exact or remainder-carrying condensation, source-detached rest, later conduct, matched
   siblings, and targeted ablation. A renamed tensor container or equal output on one corpus does not
   grade it.
+- Athena variants are products of Eros. A foreign model name is ancestry and source testimony,
+  never native topology. Plural lifted organs may fuse only after a successor-equivariant common
+  transport subcomplex has been founded by addressed correspondence, natural generator squares and
+  matched intervention. The fused ecology is the pushout through that subcomplex; apparent
+  agreement remains a defect-bearing span, and modality-specific ports remain plural.
+- Dialogue and agent rollouts are addressed world-tubes, not prompt/answer tables. Visible text is
+  one codec face beside tool deeds, world returns, branches, later corrections, code/artifact
+  closure and open exterior. Provider identity never crowns a candidate; cultivation follows a
+  declared receiver defect through retained lineage and survives detached remount and ablation.
 - For every inherited-model pathway, read `canon/TABLET_THE_OPERATIONS.md`,
   `canon/TABLET_THE_MANIFOLD.md`, and `canon/THE_SURFACES_ARE_PATHS.md`. The computational holon is
   the live operation complex—incidence, ordered transport words, event readings, and open exterior—

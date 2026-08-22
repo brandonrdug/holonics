@@ -27,7 +27,11 @@ const MATERIAL: &[(&str, u64)] = &[
     ("canon/TABLET_THE_COMPRESSION.md", 4),
 ];
 
-const PROMPTS: &[&str] = &["the receiver", "a probability distribution over", "the quotient is"];
+const PROMPTS: &[&str] = &[
+    "the receiver",
+    "a probability distribution over",
+    "the quotient is",
+];
 /// **How many forks may be crossed.** A declared aperture on composition depth — never on which
 /// branch is taken, and every branch of every crossed fork is followed.
 const FORKS: usize = 3;
@@ -83,8 +87,12 @@ fn is_span(atlas: &ExactSuffixEcology, tokens: &[String]) -> bool {
     if tokens.is_empty() {
         return true;
     }
-    let Ok(germs) = token_germs_public(tokens) else { return false };
-    let Ok(current) = atlas.receive_path(&germs) else { return false };
+    let Ok(germs) = token_germs_public(tokens) else {
+        return false;
+    };
+    let Ok(current) = atlas.receive_path(&germs) else {
+        return false;
+    };
     current.matched_length() as usize == tokens.len()
 }
 
@@ -133,7 +141,15 @@ fn run() -> Result<(), String> {
         suffix.push(atlas.suffix_link(state).unwrap_or(0));
         standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
     }
-    let body = Body { indptr, germ, target, suffix, standing, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        standing,
+        surfaces,
+        index_of,
+    };
 
     for prompt in PROMPTS {
         println!("═════ PROMPT {prompt:?}\n");
@@ -161,12 +177,7 @@ fn run() -> Result<(), String> {
                         for germ in licensed {
                             let mut carried = emitted.clone();
                             carried.push(body.surfaces[germ as usize].clone());
-                            live.push((
-                                body.carry(at, germ),
-                                carried,
-                                crossed + 1,
-                                joins.clone(),
-                            ));
+                            live.push((body.carry(at, germ), carried, crossed + 1, joins.clone()));
                         }
                     } else {
                         finished.push((emitted.clone(), joins.clone()));

@@ -115,7 +115,10 @@ fn run() -> Result<(), String> {
         emit_integers("athena.class.suffix", &suffix, 1, IntegerDtype::U32)
             .map_err(|error| format!("{error:?}"))?,
     ];
-    println!("  {:<32} {:>10} {:>8} {:>12}", "tensor", "entries", "dtype", "octets");
+    println!(
+        "  {:<32} {:>10} {:>8} {:>12}",
+        "tensor", "entries", "dtype", "octets"
+    );
     for tensor in &tensors {
         println!(
             "  {:<32} {:>10} {:>8} {:>12}",
@@ -131,12 +134,17 @@ fn run() -> Result<(), String> {
     let path = "output/athena-001/model.safetensors";
     std::fs::write(path, &container).map_err(|error| format!("{path}: {error}"))?;
     println!();
-    println!("  CONTAINER              {} octets = {} KiB", container.len(), container.len() / 1024);
+    println!(
+        "  CONTAINER              {} octets = {} KiB",
+        container.len(),
+        container.len() / 1024
+    );
     println!("  every entry an INTEGER: no scale, no zero point, no rounding, no residual.");
 
     // ---- read it back and REPLAY THE TRANSPORT from the container alone ----
     let length = u64::from_le_bytes(container[..8].try_into().unwrap()) as usize;
-    let header = core::str::from_utf8(&container[8..8 + length]).map_err(|error| format!("{error}"))?;
+    let header =
+        core::str::from_utf8(&container[8..8 + length]).map_err(|error| format!("{error}"))?;
     let payload = &container[8 + length..];
     let mut spans: BTreeMap<String, (usize, usize, usize)> = BTreeMap::new();
     for tensor in &tensors {
@@ -233,7 +241,9 @@ fn run() -> Result<(), String> {
     println!("WHAT THIS SETTLES");
     println!("  The transport half crosses into the industry's container as pure integers, and it");
     println!("  replays. The dense route was refuted by measurement rather than abandoned: the");
-    println!("  Hankel rank does not saturate, so a linear chart of this transport is an expansion");
+    println!(
+        "  Hankel rank does not saturate, so a linear chart of this transport is an expansion"
+    );
     println!("  of it. Sparsity is the compression, and it is exact.");
     Ok(())
 }

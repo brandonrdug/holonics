@@ -204,8 +204,18 @@ fn arbitrary_native_permutation_has_indexed_lookup() {
     assert_eq!(rest.native_id(0).unwrap(), 2);
     assert_eq!(rest.native_id(1).unwrap(), 0);
     assert_eq!(rest.native_id(2).unwrap(), 1);
-    assert_eq!(rest.read_source(9), SourceRead::Open { source_id: 9, extent: 3, represented: 3 });
-    assert!(matches!(rest.native_id(9), Err(RestError::MissingSourceId { id: 9, extent: 3 })));
+    assert_eq!(
+        rest.read_source(9),
+        SourceRead::Open {
+            source_id: 9,
+            extent: 3,
+            represented: 3
+        }
+    );
+    assert!(matches!(
+        rest.native_id(9),
+        Err(RestError::MissingSourceId { id: 9, extent: 3 })
+    ));
 }
 
 #[test]
@@ -300,9 +310,11 @@ fn committed_station_closure_asset_mounts_source_detached() {
             .windows(2)
             .all(|pair| pair[1].source_id == pair[0].source_id + 1)
     );
-    assert!(rest.entries.iter().all(|entry| {
-        rest.native_id(entry.source_id).unwrap() == entry.native_id
-    }));
+    assert!(
+        rest.entries
+            .iter()
+            .all(|entry| { rest.native_id(entry.source_id).unwrap() == entry.native_id })
+    );
     assert_eq!(rest.native_surface(7_001).unwrap(), "▁France");
     assert_eq!(
         rest.codebook_sha256,

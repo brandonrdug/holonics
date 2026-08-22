@@ -39,13 +39,13 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::time::Instant;
 
-use holonic_engine::athena::{emit_integers, IntegerDtype, IntegerTensor, TreeChart};
+use holonic_engine::athena::{IntegerDtype, IntegerTensor, TreeChart, emit_integers};
 use holonic_engine::exact_work::ExactWork;
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::native_occurrence::NativeOccurrence;
 use holonic_engine::receiver_exact_compression::{
-    compress, exhibit_collapsed_within, refine, separated_pair_population, InputId, ItemId,
-    Observation, ObservedSystem, Partition, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
+    exhibit_collapsed_within, refine, separated_pair_population,
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -368,7 +368,9 @@ impl Family {
     fn text(self) -> &'static str {
         match self {
             Self::P0 => "(a) the class's own out-degree, (b) whether the class is the root",
-            Self::Condensation => "(a) the class's own out-degree, (b) whether the class is the root, (c) the class's standing",
+            Self::Condensation => {
+                "(a) the class's own out-degree, (b) whether the class is the root, (c) the class's standing"
+            }
         }
     }
 }
@@ -384,7 +386,13 @@ struct AtlasSystem<'a> {
 }
 
 impl<'a> AtlasSystem<'a> {
-    fn new(rest: &'a Rest, family: Family, items: Vec<ItemId>, inputs: Vec<InputId>, sparse: bool) -> Self {
+    fn new(
+        rest: &'a Rest,
+        family: Family,
+        items: Vec<ItemId>,
+        inputs: Vec<InputId>,
+        sparse: bool,
+    ) -> Self {
         let by_germ = sparse.then(|| {
             let mut by_germ: BTreeMap<u32, Vec<(ItemId, ItemId)>> = BTreeMap::new();
             for item in &items {
@@ -399,7 +407,13 @@ impl<'a> AtlasSystem<'a> {
             }
             by_germ
         });
-        Self { rest, family, items, inputs, by_germ }
+        Self {
+            rest,
+            family,
+            items,
+            inputs,
+            by_germ,
+        }
     }
 }
 
@@ -443,7 +457,10 @@ fn whole_atlas(rest: &Rest) -> (Vec<ItemId>, Vec<InputId>) {
 /// Deed P0's declared scope, rebuilt from the rest and the eight landed classes.
 fn p0_scope(rest: &Rest, landed: &[u32]) -> (Vec<ItemId>, Vec<InputId>) {
     let scope = rest.excited(landed);
-    let items: Vec<ItemId> = scope.iter().map(|class| ItemId(u64::from(*class))).collect();
+    let items: Vec<ItemId> = scope
+        .iter()
+        .map(|class| ItemId(u64::from(*class)))
+        .collect();
     let mut germs: BTreeSet<u32> = BTreeSet::new();
     for class in &scope {
         let (from, to) = rest.row(*class);
@@ -664,15 +681,28 @@ fn container(condensed: &Condensed) -> Result<Vec<u8>, String> {
         u32s("condensed.block.target", &condensed.block_target)?,
         u32s("condensed.block.standing", &condensed.block_standing)?,
         u32s("condensed.remainder.target", &condensed.remainder_target)?,
-        u32s("condensed.remainder.reconvergent", &condensed.reconvergent_slot)?,
+        u32s(
+            "condensed.remainder.reconvergent",
+            &condensed.reconvergent_slot,
+        )?,
         u32s("condensed.unexcited.class", &condensed.unexcited)?,
         u32s("condensed.fibre.pair", &fibre_pair)?,
         u32s("condensed.fibre.word", &fibre_word)?,
         u32s("condensed.fibre.offset", &fibre_offset)?,
-        emit_integers("condensed.vocabulary.octets", &vocabulary_octets, 1, IntegerDtype::U16)
-            .map_err(|error| format!("{error:?}"))?,
-        emit_integers("condensed.vocabulary.offsets", &vocabulary_offsets, 1, IntegerDtype::U32)
-            .map_err(|error| format!("{error:?}"))?,
+        emit_integers(
+            "condensed.vocabulary.octets",
+            &vocabulary_octets,
+            1,
+            IntegerDtype::U16,
+        )
+        .map_err(|error| format!("{error:?}"))?,
+        emit_integers(
+            "condensed.vocabulary.offsets",
+            &vocabulary_offsets,
+            1,
+            IntegerDtype::U32,
+        )
+        .map_err(|error| format!("{error:?}"))?,
         emit_integers(
             "condensed.architecture",
             &[
@@ -691,7 +721,10 @@ fn container(condensed: &Condensed) -> Result<Vec<u8>, String> {
         .map_err(|error| format!("{error:?}"))?,
     ];
     let mut metadata: BTreeMap<String, String> = BTreeMap::new();
-    metadata.insert("schema".to_owned(), "holonics.athena.condensed-rest.v1".to_owned());
+    metadata.insert(
+        "schema".to_owned(),
+        "holonics.athena.condensed-rest.v1".to_owned(),
+    );
     metadata.insert("law.tree".to_owned(), TREE_LAW.to_owned());
     metadata.insert("law.block".to_owned(), BLOCK_LAW.to_owned());
     metadata.insert("law.remainder".to_owned(), REMAINDER_LAW.to_owned());
@@ -831,7 +864,10 @@ fn read_condensed(locator: &str) -> Result<CondensedRest, String> {
     let mut remainder_at = vec![0u32; classes + 1];
     for class in 0..classes {
         let block = block_of[class] as usize;
-        let (from, to) = (block_indptr[block] as usize, block_indptr[block + 1] as usize);
+        let (from, to) = (
+            block_indptr[block] as usize,
+            block_indptr[block + 1] as usize,
+        );
         let widening = (from..to)
             .filter(|slot| plural[block_target[*slot] as usize])
             .count() as u32;
@@ -1058,7 +1094,9 @@ fn aggregate_row(rest: &Rest, class: u32, block_of: &[u32]) -> BTreeMap<u32, Rat
     let degree = (to - from) as i64;
     let mut counts: BTreeMap<u32, i64> = BTreeMap::new();
     for slot in from..to {
-        *counts.entry(block_of[rest.target[slot] as usize]).or_default() += 1;
+        *counts
+            .entry(block_of[rest.target[slot] as usize])
+            .or_default() += 1;
     }
     counts
         .into_iter()
@@ -1103,8 +1141,7 @@ fn lumpability(rest: &Rest, partition: &Partition) -> Lumpability {
             if row != reference {
                 block_disagrees = true;
                 if defect.is_none() {
-                    let keys: BTreeSet<u32> =
-                        reference.keys().chain(row.keys()).copied().collect();
+                    let keys: BTreeSet<u32> = reference.keys().chain(row.keys()).copied().collect();
                     for key in keys {
                         let left = reference.get(&key).cloned().unwrap_or_else(Rat::zero);
                         let right = row.get(&key).cloned().unwrap_or_else(Rat::zero);
@@ -1252,10 +1289,19 @@ fn deed() -> Result<(), String> {
         failed: 0,
     };
 
-    say(&mut receipt, "THE ATLAS CONDENSES WHERE THE RECEIVER FACTORS — Deed P2, ARM N");
+    say(
+        &mut receipt,
+        "THE ATLAS CONDENSES WHERE THE RECEIVER FACTORS — Deed P2, ARM N",
+    );
     say(&mut receipt, "");
-    say(&mut receipt, "THE DECLARED FUTURE RECEIVER FAMILY — printed before any condensation code runs, and the");
-    say(&mut receipt, "driver's structure makes the declaration prior: nothing below reads a condensation result.");
+    say(
+        &mut receipt,
+        "THE DECLARED FUTURE RECEIVER FAMILY — printed before any condensation code runs, and the",
+    );
+    say(
+        &mut receipt,
+        "driver's structure makes the declaration prior: nothing below reads a condensation result.",
+    );
     for line in [
         "  R1  plural future sections at every reached class — the germ population the whole suffix",
         "      chain offers, each with the standing of the class it reaches and the arc depth, first-",
@@ -1299,7 +1345,10 @@ fn deed() -> Result<(), String> {
 
     // ---- PART 0: the repaired owner re-reads P0's declared scope ----
     say(&mut receipt, "");
-    say(&mut receipt, "PART 0 — THE REPAIR INSIDE receiver_exact_compression, AND ITS EQUALITY");
+    say(
+        &mut receipt,
+        "PART 0 — THE REPAIR INSIDE receiver_exact_compression, AND ITS EQUALITY",
+    );
     let (items, inputs) = p0_scope(&rest, &landed);
     let sparse = AtlasSystem::new(&rest, Family::P0, items.clone(), inputs.clone(), true);
     let clock = Instant::now();
@@ -1381,9 +1430,18 @@ fn deed() -> Result<(), String> {
 
     // ---- the whole-atlas reading P0 refused ----
     say(&mut receipt, "");
-    say(&mut receipt, "THE WHOLE-ATLAS READING — the one Deed P0 named its aperture against");
+    say(
+        &mut receipt,
+        "THE WHOLE-ATLAS READING — the one Deed P0 named its aperture against",
+    );
     let (all_items, all_inputs) = whole_atlas(&rest);
-    let atlas = AtlasSystem::new(&rest, Family::P0, all_items.clone(), all_inputs.clone(), true);
+    let atlas = AtlasSystem::new(
+        &rest,
+        Family::P0,
+        all_items.clone(),
+        all_inputs.clone(),
+        true,
+    );
     let clock = Instant::now();
     let whole = refine(&atlas);
     let whole_wall = clock.elapsed().as_secs_f64();
@@ -1472,8 +1530,10 @@ fn deed() -> Result<(), String> {
                 closed_germs.insert(rest.germ[slot]);
             }
         }
-        let closed_inputs: Vec<InputId> =
-            closed_germs.iter().map(|g| InputId(u64::from(*g))).collect();
+        let closed_inputs: Vec<InputId> = closed_germs
+            .iter()
+            .map(|g| InputId(u64::from(*g)))
+            .collect();
         let closed_system =
             AtlasSystem::new(&rest, Family::P0, closed_items, closed_inputs.clone(), true);
         let closed_reading = compress(&closed_system);
@@ -1501,7 +1561,10 @@ fn deed() -> Result<(), String> {
 
     // ---- the condensation quotient ----
     say(&mut receipt, "");
-    say(&mut receipt, "THE CONDENSATION QUOTIENT — at the family declared above, over the whole atlas");
+    say(
+        &mut receipt,
+        "THE CONDENSATION QUOTIENT — at the family declared above, over the whole atlas",
+    );
     let condensing = AtlasSystem::new(
         &rest,
         Family::Condensation,
@@ -1544,14 +1607,20 @@ fn deed() -> Result<(), String> {
         &mut receipt,
         format!(
             "  block sizes {:?} · {plural_blocks} plural blocks holding {condensed_classes} of {} classes: that population is what the transport condensation can pay for, and the rest is a discrete quotient which condenses nothing.",
-            sizes.iter().map(|(size, count)| (*size, *count)).collect::<Vec<_>>(),
+            sizes
+                .iter()
+                .map(|(size, count)| (*size, *count))
+                .collect::<Vec<_>>(),
             rest.classes
         ),
     );
 
     // ---- lumpability, measured on two partitions so the check can fail ----
     say(&mut receipt, "");
-    say(&mut receipt, "LUMPABILITY — P C = C P-bar, exact over Rat, MEASURED on two partitions");
+    say(
+        &mut receipt,
+        "LUMPABILITY — P C = C P-bar, exact over Rat, MEASURED on two partitions",
+    );
     let conduct_lump = lumpability(&rest, &quotient.conduct);
     let one_shot_lump = lumpability(&rest, &quotient.one_shot);
     say(
@@ -1590,8 +1659,9 @@ fn deed() -> Result<(), String> {
     let height_lump = lumpability(&rest, &coarsening);
     let height_pairs = separated_pair_population(&coarsening, &quotient.conduct);
     let height_line = match &height_lump.defect {
-        None => "no defect: the height-1 coarsening IS a sufficient state for this transport"
-            .to_owned(),
+        None => {
+            "no defect: the height-1 coarsening IS a sufficient state for this transport".to_owned()
+        }
         Some((block, left, right, target, left_value, right_value)) => {
             let word = separator(&condensing, *left, *right).map(|word| {
                 word.iter()
@@ -1662,7 +1732,9 @@ fn deed() -> Result<(), String> {
             "  TREE: {} intervals, height {}. Containment IS ancestry, so the descendant population of every class — {} ancestor-descendant pairs in total — is two words per class. Remainder EMPTY.",
             condensed.entry.len(),
             condensed.height,
-            (0..rest.classes as u32).map(|class| u64::from(rest.suffix_height(class)) + 1).sum::<u64>()
+            (0..rest.classes as u32)
+                .map(|class| u64::from(rest.suffix_height(class)) + 1)
+                .sum::<u64>()
         ),
     );
     say(
@@ -1707,15 +1779,22 @@ fn deed() -> Result<(), String> {
     let bytes = container(&condensed)?;
     std::fs::create_dir_all(OUT).map_err(|error| format!("{OUT}: {error}"))?;
     let condensed_path = format!("{OUT}/condensed-rest.safetensors");
-    std::fs::write(&condensed_path, &bytes).map_err(|error| format!("{condensed_path}: {error}"))?;
+    std::fs::write(&condensed_path, &bytes)
+        .map_err(|error| format!("{condensed_path}: {error}"))?;
     say(
         &mut receipt,
-        format!("  the condensed rest: {condensed_path} · {} octets", bytes.len()),
+        format!(
+            "  the condensed rest: {condensed_path} · {} octets",
+            bytes.len()
+        ),
     );
 
     // ---- the decoder, and R1 through R5 read from the condensed body ----
     say(&mut receipt, "");
-    say(&mut receipt, "THE DECLARED FACES, RECONSTRUCTED FROM THE CONDENSED REST");
+    say(
+        &mut receipt,
+        "THE DECLARED FACES, RECONSTRUCTED FROM THE CONDENSED REST",
+    );
     let mut reader = read_condensed(&condensed_path)?;
 
     // R1
@@ -1774,8 +1853,12 @@ fn deed() -> Result<(), String> {
     );
 
     // R4
-    let source_heights: Vec<u32> = (0..rest.classes as u32).map(|c| rest.suffix_height(c)).collect();
-    let condensed_heights: Vec<u32> = (0..reader.classes as u32).map(|c| reader.height_of(c)).collect();
+    let source_heights: Vec<u32> = (0..rest.classes as u32)
+        .map(|c| rest.suffix_height(c))
+        .collect();
+    let condensed_heights: Vec<u32> = (0..reader.classes as u32)
+        .map(|c| reader.height_of(c))
+        .collect();
     let ancestry_agrees = (0..rest.classes as u32).take(4096).all(|class| {
         let mut at = class;
         loop {
@@ -1833,7 +1916,9 @@ fn deed() -> Result<(), String> {
     // The reopening demonstration.
     let reopened = fibre.first().cloned();
     let reopening = match &reopened {
-        None => "no pair collapsed at the declared family, so there is nothing to reopen".to_owned(),
+        None => {
+            "no pair collapsed at the declared family, so there is nothing to reopen".to_owned()
+        }
         Some((left, right, word)) => {
             let mut here = *left;
             let mut there = *right;
@@ -1859,7 +1944,9 @@ fn deed() -> Result<(), String> {
                 before.2,
                 before.1,
                 before.3,
-                word.iter().map(|germ| rest.surfaces[*germ as usize].clone()).collect::<Vec<_>>(),
+                word.iter()
+                    .map(|germ| rest.surfaces[*germ as usize].clone())
+                    .collect::<Vec<_>>(),
                 (after.0, after.1),
                 (after.2, after.3)
             )
@@ -1896,14 +1983,21 @@ fn deed() -> Result<(), String> {
         .flat_map(|class| {
             let mut lines = Vec::new();
             for (germ, standing, depth) in reader.section(*class) {
-                lines.push(format!("{class} {} {standing} {depth}", reader.surfaces[germ as usize]));
+                lines.push(format!(
+                    "{class} {} {standing} {depth}",
+                    reader.surfaces[germ as usize]
+                ));
             }
             lines
         })
         .collect::<Vec<_>>()
         .join("\n");
-    let mut command = std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
-    command.arg("--remount").arg(&condensed_path).arg("--landed");
+    let mut command =
+        std::process::Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
+    command
+        .arg("--remount")
+        .arg(&condensed_path)
+        .arg("--landed");
     for class in &landed {
         command.arg(class.to_string());
     }
@@ -1924,7 +2018,10 @@ fn deed() -> Result<(), String> {
 
     // ---- R3: the intervention factors ----
     say(&mut receipt, "");
-    say(&mut receipt, "R3 — THE CONSTRUCTION-LEVEL ABLATION, CONDENSED ON BOTH SIDES");
+    say(
+        &mut receipt,
+        "R3 — THE CONSTRUCTION-LEVEL ABLATION, CONDENSED ON BOTH SIDES",
+    );
     let mut ablated = read_rest(ABLATED)?;
     let ablated_landed: Vec<u32> = PROMPTS.iter().map(|prompt| ablated.walk(prompt)).collect();
     let (ablated_items, ablated_inputs) = whole_atlas(&ablated);
@@ -1949,28 +2046,29 @@ fn deed() -> Result<(), String> {
         .map_err(|error| format!("{ablated_path}: {error}"))?;
     let mut ablated_reader = read_condensed(&ablated_path)?;
 
-    let diff = |before: &[(String, u32, u32)], after: &[(String, u32, u32)]| -> (usize, usize, usize) {
-        let before_map: BTreeMap<&String, (u32, u32)> =
-            before.iter().map(|(g, s, d)| (g, (*s, *d))).collect();
-        let after_map: BTreeMap<&String, (u32, u32)> =
-            after.iter().map(|(g, s, d)| (g, (*s, *d))).collect();
-        let gone = before_map
-            .keys()
-            .filter(|germ| !after_map.contains_key(*germ))
-            .count();
-        let arrived = after_map
-            .keys()
-            .filter(|germ| !before_map.contains_key(*germ))
-            .count();
-        // `moved` counts germs present on BOTH sides whose face changed — a germ that left is
-        // `gone`, not moved. That is Deed P0's own accounting, and it is what makes the two tables
-        // comparable rather than merely similar.
-        let moved = before_map
-            .iter()
-            .filter(|(germ, value)| after_map.get(*germ).is_some_and(|other| other != *value))
-            .count();
-        (moved, gone, arrived)
-    };
+    let diff =
+        |before: &[(String, u32, u32)], after: &[(String, u32, u32)]| -> (usize, usize, usize) {
+            let before_map: BTreeMap<&String, (u32, u32)> =
+                before.iter().map(|(g, s, d)| (g, (*s, *d))).collect();
+            let after_map: BTreeMap<&String, (u32, u32)> =
+                after.iter().map(|(g, s, d)| (g, (*s, *d))).collect();
+            let gone = before_map
+                .keys()
+                .filter(|germ| !after_map.contains_key(*germ))
+                .count();
+            let arrived = after_map
+                .keys()
+                .filter(|germ| !before_map.contains_key(*germ))
+                .count();
+            // `moved` counts germs present on BOTH sides whose face changed — a germ that left is
+            // `gone`, not moved. That is Deed P0's own accounting, and it is what makes the two tables
+            // comparable rather than merely similar.
+            let moved = before_map
+                .iter()
+                .filter(|(germ, value)| after_map.get(*germ).is_some_and(|other| other != *value))
+                .count();
+            (moved, gone, arrived)
+        };
     let source_diff: Vec<(usize, usize, usize)> = PROMPTS
         .iter()
         .enumerate()
@@ -1993,7 +2091,11 @@ fn deed() -> Result<(), String> {
                 .section(ablated_landed[at])
                 .into_iter()
                 .map(|(germ, standing, depth)| {
-                    (ablated_reader.surfaces[germ as usize].clone(), standing, depth)
+                    (
+                        ablated_reader.surfaces[germ as usize].clone(),
+                        standing,
+                        depth,
+                    )
                 })
                 .collect();
             diff(&condensed_faces[at], &after)
@@ -2004,8 +2106,12 @@ fn deed() -> Result<(), String> {
             &mut receipt,
             format!(
                 "  {prompt:<42} source (moved {}, gone {}, arrived {}) · condensed (moved {}, gone {}, arrived {})",
-                source_diff[at].0, source_diff[at].1, source_diff[at].2,
-                condensed_diff[at].0, condensed_diff[at].1, condensed_diff[at].2
+                source_diff[at].0,
+                source_diff[at].1,
+                source_diff[at].2,
+                condensed_diff[at].0,
+                condensed_diff[at].1,
+                condensed_diff[at].2
             ),
         );
     }
@@ -2030,8 +2136,10 @@ fn deed() -> Result<(), String> {
         (609, 216),
         (630, 216),
     ];
-    let measured_ablation: Vec<(usize, usize)> =
-        source_diff.iter().map(|(moved, gone, _)| (*moved, *gone)).collect();
+    let measured_ablation: Vec<(usize, usize)> = source_diff
+        .iter()
+        .map(|(moved, gone, _)| (*moved, *gone))
+        .collect();
     verdicts.record(
         16,
         "R3's ablation table equals Deed P0's committed one, so the intervention being condensed is the same intervention",
@@ -2083,7 +2191,10 @@ fn deed() -> Result<(), String> {
 
     // ---- R6 and the cost law ----
     say(&mut receipt, "");
-    say(&mut receipt, "THE COST, ADDITIVELY — artifact octets + decoder octets + decoder exact work");
+    say(
+        &mut receipt,
+        "THE COST, ADDITIVELY — artifact octets + decoder octets + decoder exact work",
+    );
     let baseline_decoder = marked_octets("// BASELINE-DECODER-BEGIN", "// BASELINE-DECODER-END");
     let condensed_decoder = marked_octets("// DECODER-BEGIN", "// DECODER-END");
 
@@ -2226,8 +2337,7 @@ fn deed() -> Result<(), String> {
         coordinate(&condensed_work, "resident-entries"),
         if strict_fall { "yes" } else { "NONE" }
     );
-    std::fs::write(format!("{OUT}/cost-vector.form"), &cost)
-        .map_err(|error| format!("{error}"))?;
+    std::fs::write(format!("{OUT}/cost-vector.form"), &cost).map_err(|error| format!("{error}"))?;
 
     say(&mut receipt, "");
     say(&mut receipt, "VERDICTS");

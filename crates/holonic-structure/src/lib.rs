@@ -42,11 +42,10 @@ mod relating;
 mod relation_atlas;
 
 pub use branch_lineage::{BranchForkReceipt, BranchLineage, BranchLineageIter};
-pub use gauge::{DeclaredGauge, TrivialGauge};
 pub use chain::{Chain, ChainEnd, Disposition, Unconnected};
 pub use face::Face;
+pub use gauge::{DeclaredGauge, TrivialGauge};
 pub use junction::CountedCrossing;
-pub use relating::{Composes, Hand, Relating};
 pub use keyed_atlas::{
     GrowingKeyAtlas, KeyAtlasError, KeyAtlasIter, KeyAtlasKeys, KeyAtlasMemory, KeyAtlasValues,
 };
@@ -58,6 +57,7 @@ pub use membrane::CausalMembrane;
 pub use ordinal_atlas::{
     OrdinalAtlasError, OrdinalAtlasIter, OrdinalAtlasMemory, OrdinalAtlasValues, SparseOrdinalAtlas,
 };
+pub use relating::{Composes, Hand, Relating};
 pub use relation_atlas::{
     FrozenRelationAtlas, FrozenRelationBuilder, FrozenRelationIter, LocalRelationIter,
     LocalRelations, LocalRelationsIntoIter, RelationAtlasError, RelationSpan,

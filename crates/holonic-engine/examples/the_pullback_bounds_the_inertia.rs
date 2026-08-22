@@ -118,7 +118,6 @@ fn report(label: &str, pullback: &PullbackInertia) {
     );
 }
 
-
 /// **`In(H) = In(A) + In(H/A)` — Haynsworth's inertia additivity, on a declared block split.**
 ///
 /// This is the second sentence of `H.0127` *Schur complement and inertia*, `proved-standard`, and
@@ -173,8 +172,8 @@ fn haynsworth(name: &str, rows: &[Vec<i64>], split: usize) {
         .and_then(|left| left.multiply(&cross))
         .expect("the correction composes");
     let complement = lower.subtract(&correction).expect("the shapes meet");
-    let schur = SymmetricForm::from_rows(complement.to_rows())
-        .expect("the Schur complement is symmetric");
+    let schur =
+        SymmetricForm::from_rows(complement.to_rows()).expect("the Schur complement is symmetric");
 
     let leading_inertia = inertia(&leading);
     let schur_inertia = inertia(&schur);

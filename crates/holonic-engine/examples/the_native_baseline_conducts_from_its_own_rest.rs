@@ -51,8 +51,8 @@ use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_work::ExactWork;
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::front_passage::{
-    factored_seals, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialPlan,
-    ResidentMaterial,
+    DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialPlan, ResidentMaterial,
+    factored_seals,
 };
 use holonic_engine::native_law::{
     AthenaArrays, AthenaFuture, AthenaWalk, DEPTH_LAW, FUTURE_LAW, WALK_LAW,
@@ -60,11 +60,11 @@ use holonic_engine::native_law::{
 use holonic_engine::native_occurrence::NativeOccurrence;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 use holonic_engine::resident_section::{
-    athena_non_dominated, AthenaAxis, AthenaCandidate, AthenaFutureGeometry, AthenaWalkGeometry,
-    ResidentGrain, ResidentSurface, KERNELS,
+    AthenaAxis, AthenaCandidate, AthenaFutureGeometry, AthenaWalkGeometry, KERNELS, ResidentGrain,
+    ResidentSurface, athena_non_dominated,
 };
 use holonic_engine::source_occurrence::OccurrenceWitness;
 use serde::{Deserialize, Serialize};
@@ -899,7 +899,10 @@ fn describe(obstruction: &FrontPassageObstruction) -> String {
             lineage,
             ..
         } => {
-            format!("the card refused at {occurrence:?} ({operation}): {refusal}; lineage refusals {:?}", lineage.refusals)
+            format!(
+                "the card refused at {occurrence:?} ({operation}): {refusal}; lineage refusals {:?}",
+                lineage.refusals
+            )
         }
         FrontPassageObstruction::Sealed {
             occurrence,
@@ -1722,9 +1725,27 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     let limits = surface.multiprocessor_limits();
     println!();
     println!("  THE LAUNCH GEOMETRY — derived from the device and the module's measured registers");
-    println!("    multiprocessors {}  warp {}  max blocks/SM {}  max threads/SM {}  max registers/SM {}  max shared/SM {}", limits.multiprocessors, limits.warp, limits.max_blocks, limits.max_threads, limits.max_registers, limits.max_shared_octets);
-    println!("    the module's derived block ceiling {} (the MINIMUM over every kernel's own admission, a refusal bound and not an optimum)", surface.multiprocessor_limits().warp * 0 + block_ceiling(surface));
-    println!("    admitted candidates {}   retained under {:?}: {}   retained under a coarser declaration {:?}: {}", family.len(), axes, retained.len(), coarse_axes, coarser.len());
+    println!(
+        "    multiprocessors {}  warp {}  max blocks/SM {}  max threads/SM {}  max registers/SM {}  max shared/SM {}",
+        limits.multiprocessors,
+        limits.warp,
+        limits.max_blocks,
+        limits.max_threads,
+        limits.max_registers,
+        limits.max_shared_octets
+    );
+    println!(
+        "    the module's derived block ceiling {} (the MINIMUM over every kernel's own admission, a refusal bound and not an optimum)",
+        surface.multiprocessor_limits().warp * 0 + block_ceiling(surface)
+    );
+    println!(
+        "    admitted candidates {}   retained under {:?}: {}   retained under a coarser declaration {:?}: {}",
+        family.len(),
+        axes,
+        retained.len(),
+        coarse_axes,
+        coarser.len()
+    );
     println!(
         "      {:<34} {:>6} {:>8} {:>6} {:>6} {:>9} {:>12} {:>14} {:>7}",
         "geometry (pos x lanes x G, stage)",
@@ -1780,12 +1801,35 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         ((positions * rest.vocabulary) as u64).div_ceil(u64::from(block_ceiling(surface)));
     println!();
     println!("    THE CONVICTED SHAPE, on this same extent, for comparison:");
-    println!("      walk    predecessor: grid {} x block {}, `if (flat != 0) return;` — 1 working lane out of {}",
-        (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface))), block_ceiling(surface), (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface))) * u64::from(block_ceiling(surface)));
-    println!("      future  predecessor: grid {convicted_blocks} x block {} — one thread per cell, the chain climbed per cell, nothing staged, reuse 1", block_ceiling(surface));
-    println!("      walk    HERE: grid {} x block {} — one warp per prompt over {} prompts, the transport row searched 32-ary", walk_geometry.blocks(prompts.len()), walk_geometry.block(limits.warp), prompts.len());
-    println!("      future  HERE: grid {} x block {} — {} shared octets ({} dynamic + {} static), one chain staged {} deep and read by {} germ lanes, {}/{} of the card's resident lanes occupied",
-        family[chosen].blocks, family[chosen].block, family[chosen].shared_octets, family[chosen].geometry.shared_octets(), family[chosen].shared_octets - family[chosen].geometry.shared_octets(), family[chosen].geometry.chain_stage, family[chosen].chain_reuse, family[chosen].cover_occupied.0, family[chosen].cover_occupied.1);
+    println!(
+        "      walk    predecessor: grid {} x block {}, `if (flat != 0) return;` — 1 working lane out of {}",
+        (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface))),
+        block_ceiling(surface),
+        (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface)))
+            * u64::from(block_ceiling(surface))
+    );
+    println!(
+        "      future  predecessor: grid {convicted_blocks} x block {} — one thread per cell, the chain climbed per cell, nothing staged, reuse 1",
+        block_ceiling(surface)
+    );
+    println!(
+        "      walk    HERE: grid {} x block {} — one warp per prompt over {} prompts, the transport row searched 32-ary",
+        walk_geometry.blocks(prompts.len()),
+        walk_geometry.block(limits.warp),
+        prompts.len()
+    );
+    println!(
+        "      future  HERE: grid {} x block {} — {} shared octets ({} dynamic + {} static), one chain staged {} deep and read by {} germ lanes, {}/{} of the card's resident lanes occupied",
+        family[chosen].blocks,
+        family[chosen].block,
+        family[chosen].shared_octets,
+        family[chosen].geometry.shared_octets(),
+        family[chosen].shared_octets - family[chosen].geometry.shared_octets(),
+        family[chosen].geometry.chain_stage,
+        family[chosen].chain_reuse,
+        family[chosen].cover_occupied.0,
+        family[chosen].cover_occupied.1
+    );
 
     // ---------------------------------------------------------------------------------------
     // the deed
@@ -1815,11 +1859,15 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         conducted.wall_s
     );
     for (law, parameters, naming) in &conducted.entailments {
-        println!("      {law:<16} entailed by {parameters} parameters, {naming} naming statement(s) the rest itself carries");
+        println!(
+            "      {law:<16} entailed by {parameters} parameters, {naming} naming statement(s) the rest itself carries"
+        );
     }
 
     println!();
-    println!("  THE PLURAL SECTIONS — decoded from the rest's own vocabulary; nothing ranked, nothing crowned");
+    println!(
+        "  THE PLURAL SECTIONS — decoded from the rest's own vocabulary; nothing ranked, nothing crowned"
+    );
     for section in &sections {
         println!();
         println!("    {:?}", section.prompt);
@@ -1956,7 +2004,9 @@ fn parent(arguments: &[String]) -> Result<(), String> {
 
     // ---- the ablation ----
     println!();
-    println!("  THE ABLATION — the rest rebuilt WITHOUT canon/TABLET_THE_HEXIS.md (construction-level; a founded class is not deleted in place)");
+    println!(
+        "  THE ABLATION — the rest rebuilt WITHOUT canon/TABLET_THE_HEXIS.md (construction-level; a founded class is not deleted in place)"
+    );
     let ablated_rest = read_rest(&ablated_path)?;
     let ablated_witness = NativeOccurrence::read(&ablated_path).map_err(|e| e.to_string())?;
     let ablated_geometry = {
@@ -2289,9 +2339,23 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     let manifest_path = format!("{OUT}/native-ecology-manifest.form");
     {
         let mut form = std::fs::File::create(&manifest_path).map_err(|e| e.to_string())?;
-        let _ = writeln!(form, "THE NATIVE ECOLOGY MANIFEST — Deed P0, from the rest at {} · device {} · {} classes, {} transitions, {} germs", rest.locator, surface.device_name(), rest.classes, rest.transitions, rest.vocabulary);
-        let _ = writeln!(form, "Every MEASURED row was computed from the rest alone. Every OPEN row carries what would move it.");
-        let _ = writeln!(form, "No layer count, latent width, head, rank or 42-layer restatement appears in this manifest; the only depth receiver is the suffix-link height, read off the material.");
+        let _ = writeln!(
+            form,
+            "THE NATIVE ECOLOGY MANIFEST — Deed P0, from the rest at {} · device {} · {} classes, {} transitions, {} germs",
+            rest.locator,
+            surface.device_name(),
+            rest.classes,
+            rest.transitions,
+            rest.vocabulary
+        );
+        let _ = writeln!(
+            form,
+            "Every MEASURED row was computed from the rest alone. Every OPEN row carries what would move it."
+        );
+        let _ = writeln!(
+            form,
+            "No layer count, latent width, head, rank or 42-layer restatement appears in this manifest; the only depth receiver is the suffix-link height, read off the material."
+        );
         let _ = writeln!(form);
         for line in &manifest.lines {
             let _ = writeln!(form, "{line}");
@@ -2326,8 +2390,24 @@ fn parent(arguments: &[String]) -> Result<(), String> {
     let receipt_path = format!("{OUT}/receipt.form");
     {
         let mut form = std::fs::File::create(&receipt_path).map_err(|e| e.to_string())?;
-        let _ = writeln!(form, "THE NATIVE BASELINE CONDUCTS FROM ITS OWN REST — Deed P0, ARM N · device {} · PTX {} · {:.1} s", surface.device_name(), &surface.ptx_sha256()[..16], clock.elapsed().as_secs_f64());
-        let _ = writeln!(form, "rest {} · {} octets · content {} · classes {} · transitions {} · vocabulary {} · tree height {}", rest.locator, rest.octets, rest.content_sha256, rest.classes, rest.transitions, rest.vocabulary, rest.height);
+        let _ = writeln!(
+            form,
+            "THE NATIVE BASELINE CONDUCTS FROM ITS OWN REST — Deed P0, ARM N · device {} · PTX {} · {:.1} s",
+            surface.device_name(),
+            &surface.ptx_sha256()[..16],
+            clock.elapsed().as_secs_f64()
+        );
+        let _ = writeln!(
+            form,
+            "rest {} · {} octets · content {} · classes {} · transitions {} · vocabulary {} · tree height {}",
+            rest.locator,
+            rest.octets,
+            rest.content_sha256,
+            rest.classes,
+            rest.transitions,
+            rest.vocabulary,
+            rest.height
+        );
         let _ = writeln!(
             form,
             "prompts {} · positions {} · future section {} x {} = {} cells · charged {} octets",
@@ -2340,7 +2420,14 @@ fn parent(arguments: &[String]) -> Result<(), String> {
         );
         let _ = writeln!(form);
         let _ = writeln!(form, "LAUNCH GEOMETRY");
-        let _ = writeln!(form, "  admitted candidates {} · retained under {:?} {} · retained under a coarser declaration {} (the retained set MOVES with the declaration, which is the falsifier)", family.len(), axes, retained.len(), coarser.len());
+        let _ = writeln!(
+            form,
+            "  admitted candidates {} · retained under {:?} {} · retained under a coarser declaration {} (the retained set MOVES with the declaration, which is the falsifier)",
+            family.len(),
+            axes,
+            retained.len(),
+            coarser.len()
+        );
         let _ = writeln!(
             form,
             "  {:<36} {:>6} {:>8} {:>6} {:>7} {:>10} {:>16} {:>16} {:>7}",
@@ -2380,8 +2467,21 @@ fn parent(arguments: &[String]) -> Result<(), String> {
             );
         }
         let _ = writeln!(form, "  bound by: {}", family[chosen].bound_by);
-        let _ = writeln!(form, "  the convicted predecessor shape on this extent: future grid {convicted_blocks} x block {} at one thread per cell with no staging; walk grid {} x block {} with one working lane.", block_ceiling(surface), (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface))), block_ceiling(surface));
-        let _ = writeln!(form, "  HERE: future grid {} x block {}; walk grid {} x block {} with one warp per prompt and a 32-ary row search.", family[chosen].blocks, family[chosen].block, walk_geometry.blocks(prompts.len()), walk_geometry.block(limits.warp));
+        let _ = writeln!(
+            form,
+            "  the convicted predecessor shape on this extent: future grid {convicted_blocks} x block {} at one thread per cell with no staging; walk grid {} x block {} with one working lane.",
+            block_ceiling(surface),
+            (positions as u64 * 2).div_ceil(u64::from(block_ceiling(surface))),
+            block_ceiling(surface)
+        );
+        let _ = writeln!(
+            form,
+            "  HERE: future grid {} x block {}; walk grid {} x block {} with one warp per prompt and a 32-ary row search.",
+            family[chosen].blocks,
+            family[chosen].block,
+            walk_geometry.blocks(prompts.len()),
+            walk_geometry.block(limits.warp)
+        );
         let _ = writeln!(form);
         let _ = writeln!(form, "THE PLURAL SECTIONS");
         for section in &sections {

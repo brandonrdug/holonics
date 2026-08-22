@@ -244,6 +244,14 @@ The complete defect \(PC-C\bar P\), within-block histories, and shortest separat
 belong in the ReconstructionFiber. Geometry, reconstruction error, and stationary mass do not
 substitute for this dynamic law.
 
+This Markov equation is one instance of the general production obligation. For every admitted
+source generator `T_i`, a quotient `q : X -> Q` must return a descended generator `U_i` satisfying
+`q T_i = U_i q`. These generator squares imply `q T_w = U_w q` for every ordered, possibly
+noncommuting successor word `w`. Receiver factorization at the present instant is only a static
+control and does not establish this law. The proved-derived/formal-checked specification and its
+static counterexample are deposited in
+[the addressed-lineage record](../research/records/2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md).
+
 ### Normalization sections
 
 Every normalization return carries:
@@ -308,6 +316,7 @@ The decoded object is the following contract:
  C_{\bullet},
  \partial,
  \mathsf P,
+ \mathsf L,
  \mathsf W,
  \mathsf V,
  \mathsf D,
@@ -327,6 +336,11 @@ mathematical atom.
 
 **\(\mathsf P\): typed ports.** Domain and codomain, arity, algebraic carrier, tensor slots,
 variance, binder scope, index contraction, chart or bundle, and exposed boundary.
+
+**\(\mathsf L\): addressed passage lineage.** Every elementary passage is an occurrence span
+`X <- W_f -> Y`; serial composition retains the pullback population `W_f ×_Y W_g` and its exact
+joining equality. The extensional relation saying only that an endpoint pair is connected is a
+separately marked receiver shadow, not the lineage object.
 
 **\(\mathsf W\): the operation population.** Ordered transport words, parallel fronts,
 constructions, inversions, contractions, quotients, joins, recurrence, substitutions, and
@@ -370,6 +384,9 @@ The codec must implement the complete typed sameness family from
 5. receiver-face and denoted-value equality;
 6. common classification and declared characteristic similarity;
 7. presentation/coordinate, byte and digest equality.
+
+Passage equivalence is a bijection of occurrence populations commuting with both boundary maps.
+A bare bijection, equal endpoint relation, equal count or equal digest is not passage equivalence.
 
 A causal signature is a receiver/history functor with source marks, ports, incidence, ordered word,
 first separator, obstruction, reconstruction fibre and return lineage. Two signature occurrences
@@ -425,6 +442,7 @@ Nothing in this table is rebuilt.
 
 | standing owner family | bounded responsibility already present |
 |---|---|
+| **`ElementaryHolonics.Foundation.Lineage`**, **`ElementaryHolonics.Millennium.LineageCompression`** | proved-derived/formal-checked addressed occurrence spans, pullback composition, relational shadows and generator-equivariant receiver/history quotient laws; these are exterior specifications until M1/M3 enact them in the Rust/CUDA body |
 | **TABLET_THE_OPERATIONS**, **EvolutionShape**, **CategoryPresentation**, **ported_operation**, **ExactCausalTraversal**, **CausalSectionMorphism**, **Relating**, **Chain**, **InterchangeCertificate** | computational holons, typed ports, operation species, words, fronts, composition, defects and independence testimony |
 | **exact_linear**, **algebraic**, **rational_polynomial**, **rebase_invariants**, **inertia**, **multiquadratic**, **clifford** | exact linear maps, kernels, images, preimage fibers, rebases, metric adjoints, Smith invariants, forms and noncommutative products |
 | **quantity** | caller-declared base units, rational-exponent dimensions, dimensioned quantities, exact powers, explicit casts, mismatch refusals and Buckingham-pi groups |
@@ -437,11 +455,11 @@ Nothing in this table is rebuilt.
 | **form_mouth**, **exact_world**, **returned_reading**, **returned_conduct**, **ErosRest**, **ConditionedRest** | addressed radiation, exterior return, durable rest, detached remount and attributable later conduct |
 | **exact_work**, **hardware_cover**, resident CUDA owners | pre-deed work, lawful fronts, resource refusal, exact resident returns and apparatus testimony |
 
-The missing edges are concrete:
+The missing edges are concrete after M0's bounded source/layout return:
 
-- no mathematical document section joins page or raster incidence to typed operation complexes;
-- no PDF container mouth, page-layout intake, OCR owner, or mathematical glyph-to-operation
-  passage exists in the live Rust body;
+- no addressed mathematical passage joins M0 page/raster/source incidence to typed operation
+  complexes while retaining occurrence populations, boundary maps and pullback witnesses;
+- no general OCR owner or mathematical glyph-to-operation passage exists in the live Rust body;
 - no bridge asks which exact method owners accept a recovered operation complex and retains all
   refusals;
 - no general expression-to-analytic-scene compiler exists;
@@ -968,24 +986,29 @@ A passing complete construction returns:
 2. born-digital, vector and raster co-testimony ledger;
 3. recovered codec and scale atlas;
 4. plural formulation and OCR ReconstructionFiber;
-5. typed mathematical operation complex;
-6. binder, tensor-index, algebraic-carrier, dimension and unit receipt;
-7. method-route atlas with every accepted and refused owner;
-8. exact value, algebraic certificate, analytic enclosure or OPEN return;
-9. derivation and proof-route population;
-10. identity quotient with reopening receiver and shortest separator;
-11. candidate proposal and evaluation atlas with unsampled remainder;
-12. exact admissibility, objective, generalization and realization receiver panels;
-13. analytic scene;
-14. vector, raster and mesh presentations with round-trip receipts;
-15. exterior execution, checker or sensor return;
-16. attributable morphological delta;
-17. predecessor and successor rest addresses;
-18. source-detached remount receipt;
-19. held-out changed and unchanged successor histories;
-20. targeted ablation;
-21. exact semantic work;
-22. separate calibrated apparatus telemetry.
+5. addressed passage populations, typed boundary maps, pullback joins and marked relational
+   shadows;
+6. typed mathematical operation complex;
+7. binder, tensor-index, algebraic-carrier, dimension and unit receipt;
+8. method-route atlas with every accepted and refused owner;
+9. exact value, algebraic certificate, analytic enclosure or OPEN return;
+10. derivation and proof-route population;
+11. typed sameness family with reopening receiver and shortest separator;
+12. receiver/history quotient with every generator square, ordered-word consequence and complete
+    reconstruction fibres;
+13. executable decoder with declared image, cost, residency, transfer and open domain;
+14. candidate proposal and evaluation atlas with unsampled remainder;
+15. exact admissibility, objective, generalization and realization receiver panels;
+16. analytic scene;
+17. vector, raster and mesh presentations with round-trip receipts;
+18. exterior execution, checker or sensor return;
+19. attributable morphological delta;
+20. predecessor and successor rest addresses;
+21. source-detached remount receipt;
+22. held-out changed and unchanged successor histories;
+23. targeted ablation;
+24. exact semantic work;
+25. separate calibrated apparatus telemetry.
 
 No scalar dashboard can substitute for this family.
 
@@ -1021,8 +1044,10 @@ exact source
 → admit only the exterior artifacts
 → recover plural visible incidence
 → form plural mathematical sections
+→ form addressed occurrence spans and compose them through pullback witnesses
 → elaborate tensor/index and physical-dimension constraints separately
 → compose at least two standing exact mathematical owners
+→ declare the receiver/history family and prove every proposed quotient generator square
 → generate at least two derivation routes and one proposal population
 → return exact certificate and exterior checker testimony
 → return analytic scene plus vector/raster presentation
@@ -1041,6 +1066,10 @@ exact source
 - change one unit; invalid addition or comparison must refuse;
 - move the ambiguous glyph between baseline and subscript; the formulation fiber must move;
 - disagree embedded text and raster testimony; both candidates must remain;
+- present the same endpoint relation through two distinct passage populations; the lineage must
+  remain plural;
+- preserve every present receiver while perturbing one successor generator so its commuting square
+  fails; the proposed compression must reopen;
 - offer a numerically attractive candidate violating one exact invariant; it must refuse;
 - offer two valid candidates with crossing objective vectors; the comparison must return OPEN;
 - delete the sealed exterior return; the later changed conduct must disappear;
@@ -1049,9 +1078,10 @@ exact source
 ### Passing grade
 
 The deed passes only if the returned artifact contains the actual recovered formulation population,
-typed operation complex, derivations, exact certificate, visual result, exterior testimony, durable
-change, detached remount, held-out movement and ablation. OCR accuracy, proof count, evaluator
-score, or pixel similarity alone cannot pass it.
+addressed passage and pullback populations, typed operation complex, derivations, exact certificate,
+generator-equivariant receiver/history quotient with decoder and complete fibres, visual result,
+exterior testimony, durable change, detached remount, held-out movement and ablation. OCR accuracy,
+proof count, evaluator score, injectivity, point count, or pixel similarity alone cannot pass it.
 
 ---
 
@@ -1121,6 +1151,10 @@ replacement for the Gemma rebirth.
 | search versus learning | remove proposal archive and founding material before remount; native cultivated conduct must remain |
 | training attribution | targeted ablation removes the held-out movement and no unrelated one |
 | PDF co-testimony | text layer and raster disagree; neither is silently selected |
+| addressed lineage | equal endpoints and the same relational shadow arise from distinct occurrence populations; they must remain plural |
+| passage equivalence | a bijection moves an occurrence to different source or target boundaries; equivalence must refuse |
+| dynamic compression | every present receiver factors but one admitted generator does not descend through the quotient; compression must refuse |
+| decoder | quotient is injective on a finite population but no executable reconstruction on the declared image is returned; completion must refuse |
 | renderer honesty | distinct scenes with equal coarse pixels remain distinct |
 | mesh honesty | retriangulation preserves declared invariants; projection collision creates no source edge |
 | optics honesty | equal final spot under different phase or path families remains plural |
@@ -1145,11 +1179,15 @@ The mathematics codec is complete at a declared receiver family when:
 
 - mathematical material crosses arbitrary admitted exterior charts into one typed operation
   complex;
+- every operation route is an addressed occurrence span whose serial joins retain their pullback
+  witnesses and whose relational shadow remains explicitly lossy;
 - the complex is navigated by exact owners rather than surface-name dispatch;
 - plural formulations and derivations remain reconstructable;
 - exact, certified, numerical and open returns are never conflated;
 - mathematical and visual faces round-trip through declared receivers;
 - proposal search can improve generators without a scalar becoming truth;
+- every claimed compression commutes with the admitted successor generators, carries all reopened
+  fibres and returns an executable decoder with its complete cost;
 - genuine exterior returns can cultivate reusable native morphology;
 - the cultivated body survives source-detached rest and remount;
 - held-out later conduct rides the change;

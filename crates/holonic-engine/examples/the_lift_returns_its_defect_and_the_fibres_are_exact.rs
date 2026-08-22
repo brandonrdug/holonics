@@ -34,16 +34,16 @@ use std::fs::File;
 use std::time::Instant;
 
 use holonic_engine::cross_chart::{
+    ChartReceipt, CrossChartDefect, PathwiseFibre, PortStep, RoundingFibre, SummedFibre,
     bare_transpose_adjoint_defect, chain_law, chart_receipt, cross_chart_defect, rat_text,
-    shortest_reopening_separator, ChartReceipt, CrossChartDefect, PathwiseFibre,
-    PortStep, RoundingFibre, SummedFibre,
+    shortest_reopening_separator,
 };
 use holonic_engine::embedding_fiber::align_bfloat16;
 use holonic_engine::exact_linear::ExactRatMatrix;
 use holonic_engine::exact_value::ieee754;
-use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 use num_bigint::BigInt;
 use num_traits::{Euclid, One, Signed, Zero};
@@ -116,14 +116,23 @@ fn power_of_two(exponent: i32) -> Rat {
 fn digest_of(text: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(text.as_bytes());
-    hasher.finalize().iter().map(|b| format!("{b:02x}")).collect::<String>()[..16].to_owned()
+    hasher
+        .finalize()
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect::<String>()[..16]
+        .to_owned()
 }
 
 fn matrix_text(matrix: &ExactRatMatrix) -> String {
     let mut text = String::new();
     for row in 0..matrix.rows() {
         for column in 0..matrix.columns() {
-            let _ = write!(text, "{} ", rat_text(matrix.get(row, column).expect("inside")));
+            let _ = write!(
+                text,
+                "{} ",
+                rat_text(matrix.get(row, column).expect("inside"))
+            );
         }
         text.push('\n');
     }
@@ -206,7 +215,12 @@ impl Material {
     }
 
     fn shape(&self, name: &str) -> Result<Vec<usize>, String> {
-        Ok(self.container.tensor(name).map_err(|e| e.to_string())?.shape.clone())
+        Ok(self
+            .container
+            .tensor(name)
+            .map_err(|e| e.to_string())?
+            .shape
+            .clone())
     }
 
     /// A window of a stored rank-2 map: `rows` starting at `from_row`, columns `0..columns`.
@@ -233,7 +247,10 @@ impl Material {
         columns: usize,
     ) -> Result<Vec<Vec<u16>>, String> {
         let (words, width) = self.rows(name, from_row, row_count)?;
-        Ok(words.chunks(width).map(|row| row[..columns].to_vec()).collect())
+        Ok(words
+            .chunks(width)
+            .map(|row| row[..columns].to_vec())
+            .collect())
     }
 }
 
@@ -272,7 +289,9 @@ impl ObservedSystem for GrainReceiver {
         let mut hasher = Sha256::new();
         hasher.update(word.to_string().as_bytes());
         let digest = hasher.finalize();
-        Observation(u64::from_le_bytes(digest[..8].try_into().expect("eight octets")))
+        Observation(u64::from_le_bytes(
+            digest[..8].try_into().expect("eight octets"),
+        ))
     }
 
     fn successor(&self, item: ItemId, _input: InputId) -> Option<ItemId> {
@@ -433,7 +452,9 @@ fn parse_args() -> Args {
     let mut args = Args {
         root: "/home/b/models/gemma-4-E4B-it".to_owned(),
         census_limit: None,
-        threads: std::thread::available_parallelism().map_or(8, |n| n.get()).min(16),
+        threads: std::thread::available_parallelism()
+            .map_or(8, |n| n.get())
+            .min(16),
     };
     let raw: Vec<String> = std::env::args().collect();
     let mut at = 1;
@@ -480,7 +501,10 @@ fn main() -> Result<(), String> {
     // ==========================================================================================
     // the declared charts and their receipts
     // ==========================================================================================
-    let _ = writeln!(receipt, "== 0. THE DECLARED CHARTS, THEIR APERTURES AND THEIR RECEIPTS ==\n");
+    let _ = writeln!(
+        receipt,
+        "== 0. THE DECLARED CHARTS, THEIR APERTURES AND THEIR RECEIPTS ==\n"
+    );
 
     let q_shape = material.shape(&named("self_attn.q_proj.weight"))?;
     let k_shape = material.shape(&named("self_attn.k_proj.weight"))?;
@@ -498,12 +522,17 @@ fn main() -> Result<(), String> {
 
     // Phi_X — the layer's input rebase gain, a source-declared per-coordinate chart transition on
     // the hidden chart. Whether it is a rebase or a quotient is decided by the material, not here.
-    let (gain_words, _) = material.rows(&named("input_layernorm.weight"), 0, 1).or_else(|_| {
-        let words = material.whole(&named("input_layernorm.weight"))?;
-        let width = words.len();
-        Ok::<_, String>((words, width))
-    })?;
-    let gains: Vec<Rat> = gain_words[..HIDDEN_WINDOW].iter().map(|w| value_of(*w)).collect();
+    let (gain_words, _) = material
+        .rows(&named("input_layernorm.weight"), 0, 1)
+        .or_else(|_| {
+            let words = material.whole(&named("input_layernorm.weight"))?;
+            let width = words.len();
+            Ok::<_, String>((words, width))
+        })?;
+    let gains: Vec<Rat> = gain_words[..HIDDEN_WINDOW]
+        .iter()
+        .map(|w| value_of(*w))
+        .collect();
     let zero_gains = gains.iter().filter(|g| g.is_zero()).count();
     let phi_x = ExactRatMatrix::from_diagonal(gains.clone()).map_err(|e| e.to_string())?;
     let phi_x_receipt = chart_receipt(&phi_x).map_err(|e| e.to_string())?;
@@ -511,8 +540,10 @@ fn main() -> Result<(), String> {
     // Phi_Z — the layer's post-attention rebase gain, the chart transition on the returning hidden
     // chart. A different real gain, so the chain law is not composed against itself.
     let post_words = material.whole(&named("post_attention_layernorm.weight"))?;
-    let post_gains: Vec<Rat> =
-        post_words[..HIDDEN_WINDOW].iter().map(|w| value_of(*w)).collect();
+    let post_gains: Vec<Rat> = post_words[..HIDDEN_WINDOW]
+        .iter()
+        .map(|w| value_of(*w))
+        .collect();
     let phi_z = ExactRatMatrix::from_diagonal(post_gains.clone()).map_err(|e| e.to_string())?;
     let phi_z_receipt = chart_receipt(&phi_z).map_err(|e| e.to_string())?;
 
@@ -528,12 +559,28 @@ fn main() -> Result<(), String> {
     let phi_y_receipt = chart_receipt(&phi_y).map_err(|e| e.to_string())?;
 
     for (name, receipt_value, shape) in [
-        ("Phi_X  input rebase gain (hidden chart)", &phi_x_receipt, (phi_x.rows(), phi_x.columns())),
-        ("Phi_Z  post-attention rebase gain (hidden chart)", &phi_z_receipt, (phi_z.rows(), phi_z.columns())),
-        ("Phi_Y  grouped-sharing quotient (receiver-head chart -> family chart)", &phi_y_receipt, (phi_y.rows(), phi_y.columns())),
+        (
+            "Phi_X  input rebase gain (hidden chart)",
+            &phi_x_receipt,
+            (phi_x.rows(), phi_x.columns()),
+        ),
+        (
+            "Phi_Z  post-attention rebase gain (hidden chart)",
+            &phi_z_receipt,
+            (phi_z.rows(), phi_z.columns()),
+        ),
+        (
+            "Phi_Y  grouped-sharing quotient (receiver-head chart -> family chart)",
+            &phi_y_receipt,
+            (phi_y.rows(), phi_y.columns()),
+        ),
     ] {
         match receipt_value {
-            ChartReceipt::Rebase { forward_identity, backward_identity, inverse } => {
+            ChartReceipt::Rebase {
+                forward_identity,
+                backward_identity,
+                inverse,
+            } => {
                 let _ = writeln!(
                     receipt,
                     "  {name}  [{} x {}]  RECEIPT: rebase.\n    \
@@ -548,7 +595,12 @@ fn main() -> Result<(), String> {
                 );
                 assert!(is_identity(forward_identity) && is_identity(backward_identity));
             }
-            ChartReceipt::Quotient { rank, kernel, cokernel_annihilator, refusal } => {
+            ChartReceipt::Quotient {
+                rank,
+                kernel,
+                cokernel_annihilator,
+                refusal,
+            } => {
                 let _ = writeln!(
                     receipt,
                     "  {name}  [{} x {}]  RECEIPT: quotient. NO INVERSE IS RETURNED — {refusal}\n    \
@@ -634,7 +686,10 @@ fn main() -> Result<(), String> {
     // ==========================================================================================
     // FAMILY 1 — the grouped-sharing quotient
     // ==========================================================================================
-    let _ = writeln!(receipt, "== 1. FAMILY ONE — THE GROUPED-SHARING QUOTIENT ==\n");
+    let _ = writeln!(
+        receipt,
+        "== 1. FAMILY ONE — THE GROUPED-SHARING QUOTIENT ==\n"
+    );
     let family_one_clock = Instant::now();
 
     // T_gamma: the receiver projection over the SHARED heads that read family FAMILY.
@@ -660,8 +715,9 @@ fn main() -> Result<(), String> {
     )?;
     let s_gamma = ExactRatMatrix::new(s_gamma_rows).map_err(|e| e.to_string())?;
 
-    let hidden_names: Vec<String> =
-        (0..HIDDEN_WINDOW).map(|at| format!("hidden[{at}]")).collect();
+    let hidden_names: Vec<String> = (0..HIDDEN_WINDOW)
+        .map(|at| format!("hidden[{at}]"))
+        .collect();
     let chi_gamma = cross_chart_defect(
         "gamma: receiver projection lifted through the grouped-sharing quotient",
         &phi_y,
@@ -671,7 +727,13 @@ fn main() -> Result<(), String> {
         &hidden_names,
     )
     .map_err(|e| e.to_string())?;
-    report_defect(&mut receipt, &mut chi_rows, &chi_gamma, "gamma", &format!("the hidden chart, {HIDDEN_WINDOW} of {HIDDEN} columns"));
+    report_defect(
+        &mut receipt,
+        &mut chi_rows,
+        &chi_gamma,
+        "gamma",
+        &format!("the hidden chart, {HIDDEN_WINDOW} of {HIDDEN} columns"),
+    );
 
     let separator = shortest_reopening_separator(&phi_y)
         .map_err(|e| e.to_string())?
@@ -747,8 +809,20 @@ fn main() -> Result<(), String> {
         &material_vectors,
     )
     .map_err(|e| e.to_string())?;
-    report_defect(&mut receipt, &mut chi_rows, &chi_eta, "eta", &format!("the receiver-head chart, {SHARED} x {HEAD_WINDOW} coordinates"));
-    report_defect(&mut receipt, &mut chi_rows, &chi_composite, "eta-after-gamma", &format!("the hidden chart, {HIDDEN_WINDOW} of {HIDDEN} columns"));
+    report_defect(
+        &mut receipt,
+        &mut chi_rows,
+        &chi_eta,
+        "eta",
+        &format!("the receiver-head chart, {SHARED} x {HEAD_WINDOW} coordinates"),
+    );
+    report_defect(
+        &mut receipt,
+        &mut chi_rows,
+        &chi_composite,
+        "eta-after-gamma",
+        &format!("the hidden chart, {HIDDEN_WINDOW} of {HIDDEN} columns"),
+    );
 
     let _ = writeln!(
         receipt,
@@ -786,7 +860,10 @@ fn main() -> Result<(), String> {
     // ==========================================================================================
     // FAMILY 2 — the bf16 mouth as a lift, with exact fibres
     // ==========================================================================================
-    let _ = writeln!(receipt, "== 2. FAMILY TWO — THE BF16 MOUTH, AND ITS FIBRES ARE EXACT ==\n");
+    let _ = writeln!(
+        receipt,
+        "== 2. FAMILY TWO — THE BF16 MOUTH, AND ITS FIBRES ARE EXACT ==\n"
+    );
 
     let _ = writeln!(
         receipt,
@@ -801,14 +878,12 @@ fn main() -> Result<(), String> {
     );
 
     // --- the four exhibits, verbatim ---
-    let _ = writeln!(receipt, "  EXHIBIT 1 — ties to even, on a real tie between two adjacent stored codewords:");
+    let _ = writeln!(
+        receipt,
+        "  EXHIBIT 1 — ties to even, on a real tie between two adjacent stored codewords:"
+    );
     let (tie_words, tie_probe, tie_emitted, tie_fibre, tie_loser) = {
-        let sample = material.window_words(
-            &named("self_attn.q_proj.weight"),
-            0,
-            1,
-            1024,
-        )?;
+        let sample = material.window_words(&named("self_attn.q_proj.weight"), 0, 1, 1024)?;
         let row = &sample[0];
         let mut found = None;
         for pair in row.windows(2) {
@@ -817,15 +892,21 @@ fn main() -> Result<(), String> {
                 continue;
             }
             let probe = (value_of(a) + value_of(b)) / two();
-            let Ok((emitted, _)) = ieee754::round_into_bfloat16(&probe) else { continue };
-            let Ok(fibre) = RoundingFibre::of_bfloat16(emitted) else { continue };
+            let Ok((emitted, _)) = ieee754::round_into_bfloat16(&probe) else {
+                continue;
+            };
+            let Ok(fibre) = RoundingFibre::of_bfloat16(emitted) else {
+                continue;
+            };
             // A genuine tie: the probe sits exactly on one of the cell's endpoints. The LOSER is
             // the codeword on the other side of that tie — the neighbour whose own cell has this
             // same endpoint — not one of the two summands, which need not be adjacent at all.
             if probe == fibre.lower || probe == fibre.upper {
                 let mut loser = None;
                 for candidate in [emitted.wrapping_sub(1), emitted.wrapping_add(1)] {
-                    let Ok(other) = RoundingFibre::of_bfloat16(candidate) else { continue };
+                    let Ok(other) = RoundingFibre::of_bfloat16(candidate) else {
+                        continue;
+                    };
                     if other.lower == probe || other.upper == probe {
                         loser = Some(candidate);
                         break;
@@ -880,7 +961,10 @@ fn main() -> Result<(), String> {
         &asymmetric.lower_half_width * two() == asymmetric.upper_half_width
     );
 
-    let _ = writeln!(receipt, "  EXHIBIT 3 — the subnormal grid, and it does NOT change at the normal boundary:");
+    let _ = writeln!(
+        receipt,
+        "  EXHIBIT 3 — the subnormal grid, and it does NOT change at the normal boundary:"
+    );
     for word in [0x0001u16, 0x007f, 0x0080] {
         let fibre = RoundingFibre::of_bfloat16(word).map_err(|e| e.to_string())?;
         let _ = writeln!(
@@ -907,7 +991,10 @@ fn main() -> Result<(), String> {
         smallest_normal.lower_closed
     );
 
-    let _ = writeln!(receipt, "  EXHIBIT 4 — the two zeros, splitting one magnitude cell:");
+    let _ = writeln!(
+        receipt,
+        "  EXHIBIT 4 — the two zeros, splitting one magnitude cell:"
+    );
     let positive_zero = RoundingFibre::of_bfloat16(0x0000).map_err(|e| e.to_string())?;
     let negative_zero = RoundingFibre::of_bfloat16(0x8000).map_err(|e| e.to_string())?;
     let _ = writeln!(
@@ -926,15 +1013,24 @@ fn main() -> Result<(), String> {
         negative_zero.interval_text(),
         rat_text(&negative_zero.lower),
         rat_text(&positive_zero.upper),
-        ieee754::round_into_bfloat16(&negative_zero.lower).map_err(|e| e.to_string())?.0,
-        ieee754::round_into_bfloat16(&positive_zero.upper).map_err(|e| e.to_string())?.0,
-        ieee754::round_into_bfloat16(&Rat::zero()).map_err(|e| e.to_string())?.0
+        ieee754::round_into_bfloat16(&negative_zero.lower)
+            .map_err(|e| e.to_string())?
+            .0,
+        ieee754::round_into_bfloat16(&positive_zero.upper)
+            .map_err(|e| e.to_string())?
+            .0,
+        ieee754::round_into_bfloat16(&Rat::zero())
+            .map_err(|e| e.to_string())?
+            .0
     );
 
     // --- the census over one real map ---
     let census_clock = Instant::now();
     let q_words = material.whole(&named("self_attn.q_proj.weight"))?;
-    let census_extent = args.census_limit.unwrap_or(q_words.len()).min(q_words.len());
+    let census_extent = args
+        .census_limit
+        .unwrap_or(q_words.len())
+        .min(q_words.len());
     let slice = &q_words[..census_extent];
     let chunk = census_extent.div_ceil(args.threads.max(1));
     let mut census = Census::default();
@@ -998,7 +1094,13 @@ fn main() -> Result<(), String> {
         census.asymmetric_hits
     );
     let _ = writeln!(receipt, "    by cell:");
-    for cell in ["normal", "binade low edge", "subnormal", "positive zero", "negative zero"] {
+    for cell in [
+        "normal",
+        "binade low edge",
+        "subnormal",
+        "positive zero",
+        "negative zero",
+    ] {
         match census.by_cell.get(cell) {
             Some(count) => {
                 let _ = writeln!(receipt, "      {cell:<18} {count}");
@@ -1051,8 +1153,8 @@ fn main() -> Result<(), String> {
 
         // Port two: the aligned integer chart. Exact — an integer and a common exponent, zero
         // remainder — so it contributes a point and deletes nothing.
-        let aligned_value = Rat::from_integer(BigInt::from(aligned.entries[at]))
-            * power_of_two(aligned.exponent);
+        let aligned_value =
+            Rat::from_integer(BigInt::from(aligned.entries[at])) * power_of_two(aligned.exponent);
         let aligned_exact = aligned_value == bf16_fibre.value;
 
         // Port three: the resident grain, a second rounding on a fixed dyadic grid.
@@ -1094,7 +1196,10 @@ fn main() -> Result<(), String> {
                 },
             ],
         );
-        assert!(aligned_exact, "the aligned port must carry the codeword exactly");
+        assert!(
+            aligned_exact,
+            "the aligned port must carry the codeword exactly"
+        );
         if at < 4 {
             let _ = writeln!(
                 receipt,
@@ -1115,7 +1220,10 @@ fn main() -> Result<(), String> {
                 rat_text(&aligned_value),
                 aligned_exact,
                 grain_word,
-                rat_text(&Rat::new(grain_word.clone(), BigInt::one() << (GRAIN as usize))),
+                rat_text(&Rat::new(
+                    grain_word.clone(),
+                    BigInt::one() << (GRAIN as usize)
+                )),
                 rat_text(&grain_residual),
                 if grain_even { '[' } else { '(' },
                 rat_text(&grain_lower),
@@ -1141,7 +1249,10 @@ fn main() -> Result<(), String> {
             slot.entry(*codeword).or_insert_with(|| fibre.clone());
         }
     }
-    let collapsing: Vec<_> = grain_distinct.iter().filter(|(_, held)| held.len() > 1).collect();
+    let collapsing: Vec<_> = grain_distinct
+        .iter()
+        .filter(|(_, held)| held.len() > 1)
+        .collect();
     let _ = writeln!(
         receipt,
         "\n    Note what the intersection did and did not say: at this material's magnitude the bf16 cell\n    \
@@ -1197,7 +1308,11 @@ fn main() -> Result<(), String> {
             }
         }
     }
-    let system = GrainReceiver { words: distinct.clone(), grain: GRAIN, depth: COMPRESSION_DEPTH };
+    let system = GrainReceiver {
+        words: distinct.clone(),
+        grain: GRAIN,
+        depth: COMPRESSION_DEPTH,
+    };
     let compression = compress(&system);
     let _ = writeln!(
         receipt,
@@ -1223,7 +1338,11 @@ fn main() -> Result<(), String> {
             rat_text(&value_of(left)),
             rat_text(&value_of(right)),
             pair.distinguishing_word.len(),
-            if pair.separated_by_terminus { " (by a terminus)" } else { "" }
+            if pair.separated_by_terminus {
+                " (by a terminus)"
+            } else {
+                ""
+            }
         );
     }
     let _ = writeln!(receipt);
@@ -1257,11 +1376,23 @@ fn main() -> Result<(), String> {
     }
     closure_words.sort();
     closure_words.dedup();
-    let forbidden = ["preimage", "fibre", "fiber", "reconstruct", "inverse", "kernel", "interval"];
+    let forbidden = [
+        "preimage",
+        "fibre",
+        "fiber",
+        "reconstruct",
+        "inverse",
+        "kernel",
+        "interval",
+    ];
     let closure_hits: Vec<&str> = forbidden
         .iter()
         .copied()
-        .filter(|term| closure_words.iter().any(|word| word.to_lowercase().contains(term)))
+        .filter(|term| {
+            closure_words
+                .iter()
+                .any(|word| word.to_lowercase().contains(term))
+        })
         .collect();
     let _ = writeln!(
         receipt,
@@ -1271,7 +1402,11 @@ fn main() -> Result<(), String> {
          The source descends; it returns no preimage of anything.\n",
         closure_words.len(),
         closure_words.join(" · "),
-        if closure_hits.is_empty() { "measured, zero hits" } else { "HITS FOUND" }
+        if closure_hits.is_empty() {
+            "measured, zero hits"
+        } else {
+            "HITS FOUND"
+        }
     );
 
     // The recombined native return: the exact reconstruction fibre of one grouped family coordinate.
@@ -1293,8 +1428,14 @@ fn main() -> Result<(), String> {
         summand_words.push(block[0][recombination_column]);
     }
 
-    let control_t_rows = material.window(&named("mlp.up_proj.weight"), 0, HEAD_WINDOW, HIDDEN_WINDOW)?;
-    let control_s_rows = material.window(&named("mlp.gate_proj.weight"), 0, HEAD_WINDOW, HIDDEN_WINDOW)?;
+    let control_t_rows =
+        material.window(&named("mlp.up_proj.weight"), 0, HEAD_WINDOW, HIDDEN_WINDOW)?;
+    let control_s_rows = material.window(
+        &named("mlp.gate_proj.weight"),
+        0,
+        HEAD_WINDOW,
+        HIDDEN_WINDOW,
+    )?;
     let control_t = ExactRatMatrix::new(control_t_rows).map_err(|e| e.to_string())?;
     let control_s = ExactRatMatrix::new(control_s_rows).map_err(|e| e.to_string())?;
     let control_identity_in = ExactRatMatrix::identity(HIDDEN_WINDOW).map_err(|e| e.to_string())?;
@@ -1389,7 +1530,12 @@ fn main() -> Result<(), String> {
             .enumerate()
             .filter(|(_, entry)| !entry.is_zero())
             .map(|(at, entry)| {
-                format!("{}*head[{}].coord[{}]", rat_text(entry), at / HEAD_WINDOW, at % HEAD_WINDOW)
+                format!(
+                    "{}*head[{}].coord[{}]",
+                    rat_text(entry),
+                    at / HEAD_WINDOW,
+                    at % HEAD_WINDOW
+                )
             })
             .collect::<Vec<_>>()
             .join(" + ")
@@ -1410,13 +1556,21 @@ fn main() -> Result<(), String> {
          So the return is an exact rational interval TIMES an exhibited affine kernel: which reals\n  \
          could have produced this family coordinate, and which receiver-head vectors are\n  \
          indistinguishable to the family chart. Neither factor is in the source closure above.\n",
-        summand_words.iter().map(|w| format!("{w:#06x}")).collect::<Vec<_>>().join(", "),
+        summand_words
+            .iter()
+            .map(|w| format!("{w:#06x}"))
+            .collect::<Vec<_>>()
+            .join(", "),
         baseline.summed,
         rat_text(&baseline.value),
         baseline.interval,
         rat_text(&baseline.width),
         baseline.kernel_dimension,
-        baseline.kernel.first().map(|d| name_direction(d)).unwrap_or_default()
+        baseline
+            .kernel
+            .first()
+            .map(|d| name_direction(d))
+            .unwrap_or_default()
     );
 
     report_defect(
@@ -1644,7 +1798,10 @@ fn report_defect(
             // The exact kernel coordinates are enormous rationals — the elimination's own growth,
             // which is what exactness costs. Their SIZE is the honest face to print beside the free
             // coordinate; the full vectors live in the matrix the digest covers.
-            let free = direction.iter().position(|entry| *entry == Rat::one()).unwrap_or(0);
+            let free = direction
+                .iter()
+                .position(|entry| *entry == Rat::one())
+                .unwrap_or(0);
             let widest = direction
                 .iter()
                 .map(|entry| entry.numer().bits().max(entry.denom().bits()))

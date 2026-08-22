@@ -175,7 +175,8 @@ impl GroupElement {
     /// Whether this element is the identity of its own carrier. An element past the carrier's
     /// reach has no identity to be, so it is not one.
     pub fn is_identity(&self) -> bool {
-        self.identity_like().is_some_and(|identity| *self == identity)
+        self.identity_like()
+            .is_some_and(|identity| *self == identity)
     }
 }
 

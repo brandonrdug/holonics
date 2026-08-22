@@ -169,7 +169,10 @@ impl Stage {
     }
 
     fn report(&self) {
-        println!("  {:<34} {:>10}   {}", "stage", "seconds", "work, and the path that carried it");
+        println!(
+            "  {:<34} {:>10}   {}",
+            "stage", "seconds", "work, and the path that carried it"
+        );
         for (name, seconds, work) in &self.stages {
             println!("  {name:<34} {seconds:>10.3}   {work}");
         }
@@ -182,12 +185,18 @@ fn run() -> Result<(), String> {
     println!("THE HEAD READS THE AIM, AND THE CENSUS IS FOUR CLASSES");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  An attention score is <q, k> -- the AIM of the arrow between two directions, and one");
-    println!("  third of it. A score of ZERO names two utterly different causal facts and returns the");
+    println!(
+        "  An attention score is <q, k> -- the AIM of the arrow between two directions, and one"
+    );
+    println!(
+        "  third of it. A score of ZERO names two utterly different causal facts and returns the"
+    );
     println!("  same number for both:");
     println!();
     println!("    ORTHO   the cohere is null and the gyration is MAXIMAL -- the founding hand");
-    println!("    UNREAD  the relating is behind this pole's own horizon and has no causal character");
+    println!(
+        "    UNREAD  the relating is behind this pole's own horizon and has no causal character"
+    );
     println!();
 
     // ---------------------------------------------------------------- the material
@@ -218,17 +227,11 @@ fn run() -> Result<(), String> {
         PROJECTED_TOKENS - CENSUS_TOKENS
     );
 
-    let (query_words, _) = safetensors::read_rows(
-        &mut file,
-        &header,
-        QUERY_MAP,
-        HEAD * HEAD_DIM,
-        HEAD_DIM,
-    )?;
+    let (query_words, _) =
+        safetensors::read_rows(&mut file, &header, QUERY_MAP, HEAD * HEAD_DIM, HEAD_DIM)?;
     let (key_words, _) =
         safetensors::read_rows(&mut file, &header, KEY_MAP, KEY_GROUP * HEAD_DIM, HEAD_DIM)?;
-    let (embed_words, _) =
-        safetensors::read_rows(&mut file, &header, EMBED, 0, PROJECTED_TOKENS)?;
+    let (embed_words, _) = safetensors::read_rows(&mut file, &header, EMBED, 0, PROJECTED_TOKENS)?;
 
     let query_map = align_bfloat16(&query_words).map_err(|error| format!("{error:?}"))?;
     let key_map = align_bfloat16(&key_words).map_err(|error| format!("{error:?}"))?;
@@ -252,13 +255,14 @@ fn run() -> Result<(), String> {
     // ---------------------------------------------------------------- the card's deed
     println!();
     println!("{}", "=".repeat(100));
-    println!("THE PROJECTIONS  --  the card's deed, on the standing kernel with standing residency");
+    println!(
+        "THE PROJECTIONS  --  the card's deed, on the standing kernel with standing residency"
+    );
     println!("{}", "=".repeat(100));
     println!();
     let mut stage = Stage::new();
-    let chart = ResidentReadout::new().map_err(|error| {
-        format!("the card refused and the projections are its deed: {error:?}")
-    })?;
+    let chart = ResidentReadout::new()
+        .map_err(|error| format!("the card refused and the projections are its deed: {error:?}"))?;
     stage.mark("open the card", "one context".to_owned());
     println!("  the card: {}", chart.device_name());
 
@@ -296,11 +300,20 @@ fn run() -> Result<(), String> {
             name,
             populations
                 .iter()
-                .map(|population| population.scores.iter().copied().map(BigInt::from).collect())
+                .map(|population| {
+                    population
+                        .scores
+                        .iter()
+                        .copied()
+                        .map(BigInt::from)
+                        .collect()
+                })
                 .collect(),
         );
     }
-    println!("    {accumulates} exact multiply-accumulates, counted as work and never as elapsed time");
+    println!(
+        "    {accumulates} exact multiply-accumulates, counted as work and never as elapsed time"
+    );
     stage.mark(
         "the projections (THE CARD)",
         format!("{accumulates} exact multiply-accumulates"),
@@ -320,18 +333,29 @@ fn run() -> Result<(), String> {
     println!("WHERE THE CARD'S CARRIER STOPS  --  measured on this material, not assumed");
     println!("{}", "=".repeat(100));
     println!();
-    println!("    aligned entry octaves          {:>4}", query_map.entry_octaves.max(key_map.entry_octaves));
-    println!("    one projection over d_model    {widest_projection:>4}   measured on the returned scores");
+    println!(
+        "    aligned entry octaves          {:>4}",
+        query_map.entry_octaves.max(key_map.entry_octaves)
+    );
+    println!(
+        "    one projection over d_model    {widest_projection:>4}   measured on the returned scores"
+    );
     println!(
         "    a SECOND contraction over d_head would need about {:>4}",
         2 * widest_projection + (HEAD_DIM as f64).log2().ceil() as u64
     );
     println!("    the card's declared carrier       127");
     println!();
-    println!("  So the pair census cannot cross in i128, and this is not a shortcoming of the card.");
-    println!("  It is the exact width the material demands, and truncating to reach the carrier is");
+    println!(
+        "  So the pair census cannot cross in i128, and this is not a shortcoming of the card."
+    );
+    println!(
+        "  It is the exact width the material demands, and truncating to reach the carrier is"
+    );
     println!("  precisely what `exact_readout_scores` refuses to do: \"the cpu checks that bound");
-    println!("  before dispatch and refuses rather than truncating\". The census below is carried in");
+    println!(
+        "  before dispatch and refuses rather than truncating\". The census below is carried in"
+    );
     println!("  arbitrary precision on the serial path, exactly, with nothing rounded.");
 
     // ---------------------------------------------------------------- the census
@@ -421,7 +445,9 @@ fn run() -> Result<(), String> {
         unread_pairs.len()
     );
     println!();
-    println!("  THE PLAN'S EXPECTATION was a non-trivial UNREAD population separate from the ORTHO");
+    println!(
+        "  THE PLAN'S EXPECTATION was a non-trivial UNREAD population separate from the ORTHO"
+    );
     println!("  one, and its falsifier was that if they coincide the widening bought nothing.");
     let widening = if ortho_pairs.is_empty() && unread_pairs.is_empty() {
         "NEITHER POPULATION EXISTS on this head: no pair of these directions scores exactly zero"
@@ -433,10 +459,16 @@ fn run() -> Result<(), String> {
     println!("    {widening}");
     println!();
     println!("  >> THE FALSIFIER FIRED, AND THE CAUSAL CLASS CENSUS IS A TAUTOLOGY AT THIS WIDTH.");
-    println!("  >> area^2 - aim^2 = ||q||^2||k||^2 - 2.aim^2, so TRANSPORT is exactly cos^2(theta) <");
-    println!("  >> 1/2 -- the causal wall sits at a quarter turn, 45 degrees from alignment. In d =");
+    println!(
+        "  >> area^2 - aim^2 = ||q||^2||k||^2 - 2.aim^2, so TRANSPORT is exactly cos^2(theta) <"
+    );
+    println!(
+        "  >> 1/2 -- the causal wall sits at a quarter turn, 45 degrees from alignment. In d ="
+    );
     println!("  >> 256 generic directions sit near cos(theta) = 0, so EVERY pair lands transport-");
-    println!("  >> dominant and would for any high-dimensional material whatsoever. A receipt that");
+    println!(
+        "  >> dominant and would for any high-dimensional material whatsoever. A receipt that"
+    );
     println!("  >> could not have come out otherwise carries no evidence. The class census is");
     println!("  >> reported as a dimension effect and NOT as a finding about this head.");
     println!();
@@ -456,7 +488,10 @@ fn run() -> Result<(), String> {
             *null_hands.entry(hand_name(&aim)).or_insert(0) += 1;
         }
     }
-    println!("  {:<24} {:>10} {:>14}", "", "as paired", "one coordinate shifted");
+    println!(
+        "  {:<24} {:>10} {:>14}",
+        "", "as paired", "one coordinate shifted"
+    );
     for name in ["COHERE", "ANTI", "ORTHO"] {
         println!(
             "  {name:<24} {:>10} {:>14}",
@@ -469,22 +504,36 @@ fn run() -> Result<(), String> {
     println!();
     let paired_anti = pairs - paired_cohere;
     let null_anti = pairs - null_cohere;
-    println!("  The shift preserves every span, every entry and the exact width. It destroys ONLY the");
+    println!(
+        "  The shift preserves every span, every entry and the exact width. It destroys ONLY the"
+    );
     println!("  correspondence between the query map's coordinates and the key map's.");
     println!();
-    println!("  >> AND IT SEPARATES TWO CONTRIBUTIONS RATHER THAN CONFIRMING ONE, which is why the");
+    println!(
+        "  >> AND IT SEPARATES TWO CONTRIBUTIONS RATHER THAN CONFIRMING ONE, which is why the"
+    );
     println!("  >> null was worth taking:");
     println!();
-    println!("  >>   the ANTI population moves {paired_anti} -> {null_anti}, a factor of {:.1}, so the",
-        null_anti as f64 / paired_anti.max(1) as f64);
-    println!("  >>   PAIRING carries that much of the asymmetry -- it is what this head learned, and");
+    println!(
+        "  >>   the ANTI population moves {paired_anti} -> {null_anti}, a factor of {:.1}, so the",
+        null_anti as f64 / paired_anti.max(1) as f64
+    );
+    println!(
+        "  >>   PAIRING carries that much of the asymmetry -- it is what this head learned, and"
+    );
     println!("  >>   the causal class census above is blind to all of it.");
     println!();
-    println!("  >>   But the shifted census is still {:.0}% cohere, nowhere near the half a genuinely",
-        100.0 * null_cohere as f64 / pairs as f64);
-    println!("  >>   independent pair would give. So the BULK of the cohere dominance survives the");
+    println!(
+        "  >>   But the shifted census is still {:.0}% cohere, nowhere near the half a genuinely",
+        100.0 * null_cohere as f64 / pairs as f64
+    );
+    println!(
+        "  >>   independent pair would give. So the BULK of the cohere dominance survives the"
+    );
     println!("  >>   shift and belongs to the entry population -- these directions share a large");
-    println!("  >>   common component before any pairing is applied. Crediting the whole 15,900 to");
+    println!(
+        "  >>   common component before any pairing is applied. Crediting the whole 15,900 to"
+    );
     println!("  >>   the head would have been exactly the authored-partition error one layer out.");
     println!();
     println!("  THE AIM'S OCTAVE CENSUS — a winding, an integer, counted with nothing rounded:");
@@ -517,7 +566,8 @@ fn run() -> Result<(), String> {
     let mut blade_norm = BigInt::zero();
     for i in 0..HEAD_DIM {
         for j in (i + 1)..HEAD_DIM {
-            let coordinate = &queries[left][i] * &keys[right][j] - &queries[left][j] * &keys[right][i];
+            let coordinate =
+                &queries[left][i] * &keys[right][j] - &queries[left][j] * &keys[right][i];
             if !coordinate.is_zero() {
                 blade_norm += &coordinate * &coordinate;
                 blade.push((i, j, coordinate));
@@ -552,30 +602,54 @@ fn run() -> Result<(), String> {
     println!();
     println!("  `inertia.rs:5-22` exists because this exact defect already happened here:");
     println!("  `supported_realizers` computed M^T M and tested positive semi-definiteness, and");
-    println!("  \"that test could not fail on any input whatsoever\". A Gram matrix of key vectors put");
+    println!(
+        "  \"that test could not fail on any input whatsoever\". A Gram matrix of key vectors put"
+    );
     println!("  to that module returns In(K+K) = (rank K, d_k - rank K, 0) BY CONSTRUCTION.");
     println!();
-    println!("  The principled form declares the receiver map FIRST. For the query family {{q_a}} with");
+    println!(
+        "  The principled form declares the receiver map FIRST. For the query family {{q_a}} with"
+    );
     println!("  A : k -> (q_a(k))_a and a declared positive weighting W,");
     println!();
     println!("      F_R = A+ W A          and          ker F_R = ker A");
     println!();
-    println!("  -- exactly the key directions invisible to every declared query. Here A is this head's");
+    println!(
+        "  -- exactly the key directions invisible to every declared query. Here A is this head's"
+    );
     println!("  own projection restricted to the declared token span, and W is declared as the");
     println!("  identity and named as a declaration rather than assumed.");
     println!();
-    println!("  AND THE SUBSPACE IS DECLARED FROM COUNTED WORK, not from a clock. The first version");
-    println!("  of this run fitted t ~ k^4.18 from ELAPSED SECONDS and used the projection to refuse");
-    println!("  k = 256. An adjudication convicted it: \"promoting a timeout into a cost law and using");
-    println!("  its fitted clock projection to select the aperture was the breach\" -- and observed");
-    println!("  that averaging adjacent log-slopes over DOUBLING extents telescopes, so the interior");
+    println!(
+        "  AND THE SUBSPACE IS DECLARED FROM COUNTED WORK, not from a clock. The first version"
+    );
+    println!(
+        "  of this run fitted t ~ k^4.18 from ELAPSED SECONDS and used the projection to refuse"
+    );
+    println!(
+        "  k = 256. An adjudication convicted it: \"promoting a timeout into a cost law and using"
+    );
+    println!(
+        "  its fitted clock projection to select the aperture was the breach\" -- and observed"
+    );
+    println!(
+        "  that averaging adjacent log-slopes over DOUBLING extents telescopes, so the interior"
+    );
     println!("  measurements did not affect the fitted exponent at all. `CLAUDE.md`: a cost is");
     println!("  measured in WORK; a clock may measure but may never select.");
     println!();
-    println!("  AND THE ADMISSION IS ON A PREDICTION, because a budget that admits on MEASURED work");
-    println!("  refuses nothing -- the deed is already paid for by the time the vector exists. This is");
-    println!("  `CarrierWork::of_cpu_authority`'s shape: \"that this is a prediction is what makes the");
-    println!("  cost law falsifiable -- running it either confirms the predicted ordering or refutes");
+    println!(
+        "  AND THE ADMISSION IS ON A PREDICTION, because a budget that admits on MEASURED work"
+    );
+    println!(
+        "  refuses nothing -- the deed is already paid for by the time the vector exists. This is"
+    );
+    println!(
+        "  `CarrierWork::of_cpu_authority`'s shape: \"that this is a prediction is what makes the"
+    );
+    println!(
+        "  cost law falsifiable -- running it either confirms the predicted ordering or refutes"
+    );
     println!("  it, and a refutation says the declared law is wrong about this material.\"");
     println!();
     println!("  The metric is a RECEIVER'S DECLARATION and is exhibited rather than hidden.");
@@ -606,8 +680,10 @@ fn run() -> Result<(), String> {
     let mut widest_kernel = 0usize;
     let mut admitted_any = false;
     let mut deferred_any = false;
-    let mut refutations: Vec<(usize, Vec<(&'static str, num_bigint::BigUint, num_bigint::BigUint)>)> =
-        Vec::new();
+    let mut refutations: Vec<(
+        usize,
+        Vec<(&'static str, num_bigint::BigUint, num_bigint::BigUint)>,
+    )> = Vec::new();
     for extent in [8usize, 16, 32, 64, 96, 128, 256] {
         if extent > CENSUS_TOKENS || extent > HEAD_DIM {
             continue;
@@ -615,7 +691,9 @@ fn run() -> Result<(), String> {
         // THE PREDICTION, composed exactly as the deed composes: two products, then two eliminations.
         let product_bits = 2 * entry_bits + (extent as u64).max(1).ilog2() as u64;
         let predicted = ExactWork::predicted_product(extent, extent, extent, entry_bits)
-            .then(&ExactWork::predicted_product(extent, extent, extent, entry_bits))
+            .then(&ExactWork::predicted_product(
+                extent, extent, extent, entry_bits,
+            ))
             .then(&ExactWork::predicted_elimination(extent, entry_bits))
             .then(&ExactWork::predicted_elimination(extent, product_bits));
         let priced = budget.metric.price(&predicted);
@@ -651,7 +729,9 @@ fn run() -> Result<(), String> {
             .map_err(|error| format!("the pullback refused: {error:?}"))?;
         let measured = phases
             .iter()
-            .fold(ExactWork::nothing(), |carried, (_, work)| carried.then(work));
+            .fold(ExactWork::nothing(), |carried, (_, work)| {
+                carried.then(work)
+            });
         println!(
             "  {:>7} {:>12} {:>10} {:>10} {:>11} {:>11}",
             extent,
@@ -682,21 +762,40 @@ fn run() -> Result<(), String> {
         return Err("the declared metric did not both admit and defer; it has not measured".into());
     }
     println!();
-    println!("  >> AND THE MATERIAL REFUTED THE METRIC ITSELF. Every deferral above was carried by");
-    println!("  >> \"multiplications\", not by width -- yet `TABLET_THE_CHART` §3.7 says the dominating");
-    println!("  >> quantity IS the intermediate bit-length. Both are right and the metric cannot hold");
-    println!("  >> both: under unit weights an operation on a 5,000-bit rational prices the same as");
-    println!("  >> one on a 60-bit rational. The width does not dominate the COUNT; it dominates the");
-    println!("  >> COST OF EACH OPERATION -- and that is a PRODUCT, which no weighted sum expresses.");
-    println!("  >> `ExactWork::width_weighted_operations` is the derived coordinate that does, added");
+    println!(
+        "  >> AND THE MATERIAL REFUTED THE METRIC ITSELF. Every deferral above was carried by"
+    );
+    println!(
+        "  >> \"multiplications\", not by width -- yet `TABLET_THE_CHART` §3.7 says the dominating"
+    );
+    println!(
+        "  >> quantity IS the intermediate bit-length. Both are right and the metric cannot hold"
+    );
+    println!(
+        "  >> both: under unit weights an operation on a 5,000-bit rational prices the same as"
+    );
+    println!(
+        "  >> one on a 60-bit rational. The width does not dominate the COUNT; it dominates the"
+    );
+    println!(
+        "  >> COST OF EACH OPERATION -- and that is a PRODUCT, which no weighted sum expresses."
+    );
+    println!(
+        "  >> `ExactWork::width_weighted_operations` is the derived coordinate that does, added"
+    );
     println!("  >> because this run found the gap:");
     {
         let widthwise = WorkBudget::declared(WorkMetric::width_weighted(), 1_500_000);
-        println!("       {:>7} {:>18} {:>22}", "extent", "unit-weight price", "width-weighted price");
+        println!(
+            "       {:>7} {:>18} {:>22}",
+            "extent", "unit-weight price", "width-weighted price"
+        );
         for extent in [8usize, 16, 32, 64] {
             let product_bits = 2 * entry_bits + (extent as u64).max(1).ilog2() as u64;
             let predicted = ExactWork::predicted_product(extent, extent, extent, entry_bits)
-                .then(&ExactWork::predicted_product(extent, extent, extent, entry_bits))
+                .then(&ExactWork::predicted_product(
+                    extent, extent, extent, entry_bits,
+                ))
                 .then(&ExactWork::predicted_elimination(extent, entry_bits))
                 .then(&ExactWork::predicted_elimination(extent, product_bits));
             println!(
@@ -709,7 +808,9 @@ fn run() -> Result<(), String> {
     }
     println!();
     println!("  >> AND THE PREDICTION IS REFUTED WHERE IT IS WRONG, per coordinate, at the widest");
-    println!("  >> admitted extent. A model that could not be exceeded would be a ceiling, not a law:");
+    println!(
+        "  >> admitted extent. A model that could not be exceeded would be a ceiling, not a law:"
+    );
     if let Some((extent, pairs)) = refutations.last() {
         println!("       extent {extent}");
         for (name, predicted, measured) in pairs {
@@ -718,7 +819,9 @@ fn run() -> Result<(), String> {
                 std::cmp::Ordering::Greater => "OVER-predicted",
                 std::cmp::Ordering::Equal => "exact",
             };
-            println!("         {name:<18} predicted {predicted:>12}   measured {measured:>12}   {verdict}");
+            println!(
+                "         {name:<18} predicted {predicted:>12}   measured {measured:>12}   {verdict}"
+            );
         }
     }
     stage.mark(
@@ -727,16 +830,26 @@ fn run() -> Result<(), String> {
     );
     println!();
     println!("  THE APERTURE, STATED. Exact rank over a rational lift of stored IEEE values is");
-    println!("  discontinuously sensitive and will commonly be FULL, so a full-rank return is not a");
-    println!("  discovery and is not reported as one. What the sweep says is bounded and true: over a");
-    println!("  declared {widest_declared} x {widest_declared} subspace of this head, the query map's");
+    println!(
+        "  discontinuously sensitive and will commonly be FULL, so a full-rank return is not a"
+    );
+    println!(
+        "  discovery and is not reported as one. What the sweep says is bounded and true: over a"
+    );
+    println!(
+        "  declared {widest_declared} x {widest_declared} subspace of this head, the query map's"
+    );
     println!("  kernel has dimension {widest_kernel}, and every wider extent was DEFERRED BY A");
     println!("  COUNTED WORK VECTOR against a declared metric -- a typed return, not prose.");
     println!();
     println!("  AND THE CONDITION THAT MAKES THE FIGURE MEAN ANYTHING: the plan warns that");
     println!("  z >= N - d_k whenever more keys than coordinates are supplied, which would make");
-    println!("  \"collapse\" grow with the population. The mirror holds here -- fewer queries than head");
-    println!("  coordinates FORCES a kernel -- so the sweep keeps the two extents EQUAL and the figure");
+    println!(
+        "  \"collapse\" grow with the population. The mirror holds here -- fewer queries than head"
+    );
+    println!(
+        "  coordinates FORCES a kernel -- so the sweep keeps the two extents EQUAL and the figure"
+    );
     println!("  can come back zero.");
 
     println!();
@@ -746,8 +859,12 @@ fn run() -> Result<(), String> {
     println!();
     stage.report();
     println!();
-    println!("  The card carried the projections and nothing else, and that is correct rather than a");
-    println!("  shortfall: the two reductions after them are serial for reasons that are about EXACT");
+    println!(
+        "  The card carried the projections and nothing else, and that is correct rather than a"
+    );
+    println!(
+        "  shortfall: the two reductions after them are serial for reasons that are about EXACT"
+    );
     println!("  WIDTH and about ELIMINATION GROWTH, not about which path they sit on.");
 
     println!();
@@ -755,14 +872,22 @@ fn run() -> Result<(), String> {
     println!("WHAT THIS RUN DOES NOT CLAIM");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  This is the direct path at zero position. RoPE, the query and key norms, the attention");
-    println!("  pattern, the per-layer embedding injection and every prior layer's write are absent by");
-    println!("  construction -- the same bound `the_foreign_map_founds_its_axes` declares for itself.");
+    println!(
+        "  This is the direct path at zero position. RoPE, the query and key norms, the attention"
+    );
+    println!(
+        "  pattern, the per-layer embedding injection and every prior layer's write are absent by"
+    );
+    println!(
+        "  construction -- the same bound `the_foreign_map_founds_its_axes` declares for itself."
+    );
     println!();
     println!("  It does not claim the model would behave differently with the blade carried. It");
     println!("  measures what a score cannot see, on directions the model actually holds.");
     println!();
-    println!("  The token population is a declared contiguous span and the pair census is a declared");
+    println!(
+        "  The token population is a declared contiguous span and the pair census is a declared"
+    );
     println!("  subset of it. Both are stated above with what they excluded, because a silent");
     println!("  truncation reads as coverage.");
     Ok(())

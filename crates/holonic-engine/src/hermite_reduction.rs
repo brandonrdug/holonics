@@ -76,8 +76,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::rational_polynomial::{
-    resultant_in_eliminated_variable, BivariatePolynomial, ExactPolynomialError,
-    RationalPolynomial,
+    BivariatePolynomial, ExactPolynomialError, RationalPolynomial, resultant_in_eliminated_variable,
 };
 
 /// `numerator / denominator` over `ℚ(x)`, kept as a pair and never divided.
@@ -283,9 +282,7 @@ pub fn reduce(
         // so the two schedules are the two ends of the same range. Neither
         // scans, and neither imposes an order the material does not have.
         let target = match schedule {
-            ReductionSchedule::HighestMultiplicityFirst => {
-                decomposition.range(2..).next_back()
-            }
+            ReductionSchedule::HighestMultiplicityFirst => decomposition.range(2..).next_back(),
             ReductionSchedule::LowestMultiplicityFirst => decomposition.range(2..).next(),
         };
         let Some((multiplicity, factor)) = target else {
@@ -383,9 +380,7 @@ pub fn reduce(
 /// No root is extracted. The residues are carried as the object that has them
 /// as roots, which is exact, is a `ℚ`-polynomial, and can be compared for
 /// equality without any isolation, magnitude, or ordering.
-pub fn rothstein_trager(
-    function: &RationalFunction,
-) -> Result<RationalPolynomial, HermiteError> {
+pub fn rothstein_trager(function: &RationalFunction) -> Result<RationalPolynomial, HermiteError> {
     let denominator = function.denominator.made_monic();
     let Some(degree) = denominator.degree() else {
         return Err(HermiteError::ZeroDenominator);
@@ -442,10 +437,7 @@ pub enum HermiteError {
         "the reduction visited {states} states against the {derived_bound} the initial squarefree \
          decomposition permits, so the pole order is not descending"
     )]
-    ReductionDidNotTerminate {
-        states: usize,
-        derived_bound: usize,
-    },
+    ReductionDidNotTerminate { states: usize, derived_bound: usize },
     #[error("the exact polynomial carrier refused: {0}")]
     Polynomial(#[from] ExactPolynomialError),
 }
@@ -469,7 +461,11 @@ mod tests {
         )
         .expect("the fixture reduces");
         assert!(reading.returns_under_differentiation);
-        assert!(reading.remaining.is_zero(), "{}", reading.remaining.written("x"));
+        assert!(
+            reading.remaining.is_zero(),
+            "{}",
+            reading.remaining.written("x")
+        );
         assert_eq!(reading.states.len(), 1);
     }
 
@@ -689,9 +685,7 @@ mod tests {
     fn the_extended_gcd_returns_a_relation_that_holds_exactly() {
         let left = polynomial(&[-1, 0, 1]);
         let right = polynomial(&[1, 1, 1]);
-        let (gcd, s, t) = left
-            .extended_monic_gcd(&right)
-            .expect("both are nonzero");
+        let (gcd, s, t) = left.extended_monic_gcd(&right).expect("both are nonzero");
         assert_eq!(left.times(&s).plus(&right.times(&t)), gcd);
     }
 

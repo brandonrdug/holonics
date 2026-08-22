@@ -35,11 +35,11 @@ use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::interaction::OccurrencePort;
-use holonic_engine::ported_reference::{realize, PortedOperationKind};
+use holonic_engine::ported_reference::{PortedOperationKind, realize};
 use num_traits::Zero;
 use site::{
-    found_reaching, gelu_inner, Reach, ResidentSourceCarrier, BAND_POPULATION, BASE,
-    WHOLE_LAYER_OPEN,
+    BAND_POPULATION, BASE, Reach, ResidentSourceCarrier, WHOLE_LAYER_OPEN, found_reaching,
+    gelu_inner,
 };
 
 fn main() {
@@ -60,10 +60,14 @@ fn main() {
     };
     println!("PHOENIX STATION SIX — THE GATED PASSAGE IS A FRONT, AND THE LAYER RE-ENTERS TWICE");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     let (half, _, _) = found_reaching(&root, BASE, terms, None, Reach::ContactHalf).expect("half");
-    let (site, container, file) = match found_reaching(&root, BASE, terms, None, Reach::WholeLayer) {
+    let (site, container, file) = match found_reaching(&root, BASE, terms, None, Reach::WholeLayer)
+    {
         Ok(triple) => triple,
         Err(error) => {
             println!("  the founding refused: {error}");
@@ -90,7 +94,10 @@ fn main() {
         fronts.iter().map(|f| f.breadth()).max().unwrap_or(0),
         half_fronts.iter().map(|f| f.breadth()).max().unwrap_or(0)
     );
-    println!("    stored populations NAMED        {}", site.populations.len());
+    println!(
+        "    stored populations NAMED        {}",
+        site.populations.len()
+    );
     for population in &site.populations {
         println!("        {population}");
     }
@@ -133,7 +140,10 @@ fn main() {
             co_present += 1;
         }
     }
-    println!("    co-present pairs                {co_present} of {}", gates.len());
+    println!(
+        "    co-present pairs                {co_present} of {}",
+        gates.len()
+    );
 
     let (scale, cubic) = gelu_inner();
     println!();
@@ -160,23 +170,38 @@ fn main() {
         Err(error) => {
             println!();
             println!("  THE LAYER REFUSED: {error}");
-            println!("  That is the station's return. The obstruction is named and nothing is claimed.");
+            println!(
+                "  That is the station's return. The obstruction is named and nothing is claimed."
+            );
             std::process::exit(1);
         }
     };
     let (entries, nonzero, widest) = receipt.retained_population();
     println!();
     println!("  THE LAYER'S RETURN");
-    println!("    fronts conducted                {}", receipt.fronts.len());
-    println!("    ports written                   {}", receipt.carried.len());
+    println!(
+        "    fronts conducted                {}",
+        receipt.fronts.len()
+    );
+    println!(
+        "    ports written                   {}",
+        receipt.carried.len()
+    );
     println!("    wall clock                      {:?}", clock.elapsed());
-    println!("    entries retained below the frame {}", carrier.below_the_frame);
+    println!(
+        "    entries retained below the frame {}",
+        carrier.below_the_frame
+    );
     println!("    retained fibre                  {entries} entries, {nonzero} nonzero");
     if let Some((event, value)) = &widest {
         let text = value.to_string();
         println!(
             "    widest single residual          {event:?}  {}",
-            if text.len() > 44 { format!("{}…", &text[..44]) } else { text }
+            if text.len() > 44 {
+                format!("{}…", &text[..44])
+            } else {
+                text
+            }
         );
     }
     println!("    exact work                      {:?}", receipt.work);
@@ -218,7 +243,10 @@ fn main() {
             .unwrap_or_default()
     };
     println!();
-    println!("  THE RE-ENTRIES — {} of them, two per position", re_entries.len());
+    println!(
+        "  THE RE-ENTRIES — {} of them, two per position",
+        re_entries.len()
+    );
     for (position, event) in site.returns.iter().enumerate() {
         let returned = &receipt.carried[&OccurrencePort::output(*event, 0)];
         let retained = through(OccurrencePort::input(*event, 0));
@@ -240,9 +268,14 @@ fn main() {
     // WHAT THE SOURCE DOES NOT DECIDE.
     // -----------------------------------------------------------------------------------------
     println!();
-    println!("  THE OPEN CANDIDATE POPULATIONS — layer zero carries them and this diagram does not");
+    println!(
+        "  THE OPEN CANDIDATE POPULATIONS — layer zero carries them and this diagram does not"
+    );
     for (population, question) in WHOLE_LAYER_OPEN {
-        let bound = site.populations.iter().any(|held| held.ends_with(population));
+        let bound = site
+            .populations
+            .iter()
+            .any(|held| held.ends_with(population));
         println!("    {population}");
         println!("        bound by this diagram       {bound}");
         println!("        {question}");
@@ -252,18 +285,29 @@ fn main() {
     println!("THE STATION'S VERDICT");
     println!();
     println!("  The whole layer the source's testimony decides conducts. `gate` and `up` land in");
-    println!("  ONE front at every position — {co_present} of {} — so the passage is a front rather", gates.len());
+    println!(
+        "  ONE front at every position — {co_present} of {} — so the passage is a front rather",
+        gates.len()
+    );
     println!("  than a serial chain, and station four already certified that a front's hand is a");
     println!("  gauge whose orbit is empty on this diagram.");
     println!();
-    println!("  The turn is the source's `gelu_pytorch_tanh`, with both constants read exactly from");
+    println!(
+        "  The turn is the source's `gelu_pytorch_tanh`, with both constants read exactly from"
+    );
     println!("  their stored `binary64` words rather than approximated. Before this station the");
-    println!("  operation computed `x·sigmoid(2x)`, which is a different function, and the diagram");
+    println!(
+        "  operation computed `x·sigmoid(2x)`, which is a different function, and the diagram"
+    );
     println!("  that used it is retained readable rather than rewritten.");
     println!();
-    println!("  Four populations the source does not decide are bound by NO operation here and are");
+    println!(
+        "  Four populations the source does not decide are bound by NO operation here and are"
+    );
     println!("  returned as questions. A layer that guessed them would conduct just as well and");
     println!("  would be a fiction, which is the whole reason they are named.");
     println!();
-    println!("  This is ONE layer of forty-two, and no emission head. CONSTRUCTION_STATE is untouched.");
+    println!(
+        "  This is ONE layer of forty-two, and no emission head. CONSTRUCTION_STATE is untouched."
+    );
 }

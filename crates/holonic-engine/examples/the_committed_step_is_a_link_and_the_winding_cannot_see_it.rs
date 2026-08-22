@@ -35,8 +35,8 @@
 //! aperture statement, not a surface defect.
 
 use holonic_engine::leader_quadrature::{
-    CommittedTransport, LeaderLaw, LocalJet, LeaderQuadrature, MaterialBoundary, RationalGerm, RideDiscipline,
-    WitnessDepth, chain_of, integrate_by_leaders,
+    CommittedTransport, LeaderLaw, LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm,
+    RideDiscipline, WitnessDepth, chain_of, integrate_by_leaders,
 };
 use holonic_structure::{Composes, Hand, Relating};
 use num_bigint::BigInt;
@@ -103,10 +103,15 @@ fn main() {
     println!();
     println!("    FOUND   the material is re-read at this tip; the span is one grain");
     println!("    RIDE    licensed only by a run of exact agreement, then one jet extrapolated");
-    println!("            across the whole reach WITH NO LANDING CHECK -- ballistic, and its error");
+    println!(
+        "            across the whole reach WITH NO LANDING CHECK -- ballistic, and its error"
+    );
     println!("            is legible only at the next tip, where the residual refounds the axis");
     println!();
-    println!("  declared material: 3 germs, span {}, grain {grain}", material.span());
+    println!(
+        "  declared material: 3 germs, span {}, grain {grain}",
+        material.span()
+    );
 
     let walked = grow(&material, &grain, RideDiscipline::GrainOnly);
     let ridden = grow(&material, &grain, RideDiscipline::GermBounded);
@@ -131,7 +136,10 @@ fn main() {
             growth.area
         );
     }
-    assert!(ridden.ride_count() > 0, "nothing rode; there is one law, not two");
+    assert!(
+        ridden.ride_count() > 0,
+        "nothing rode; there is one law, not two"
+    );
     assert_eq!(walked.ride_count(), 0, "the control must never ride");
     println!();
     println!("  THE CONTROL IS THE FIRST ROW: a growth that never rides re-reads the material at");
@@ -158,13 +166,19 @@ fn main() {
         "through (rides)", through.winding, through.uninspected
     );
     println!();
-    println!("  >> THE WINDINGS AGREE EXACTLY. That is this module's own theorem and it is why riding");
+    println!(
+        "  >> THE WINDINGS AGREE EXACTLY. That is this module's own theorem and it is why riding"
+    );
     println!("  >> is lawful at all: a commitment licensed by exact agreement deposits what the");
     println!("  >> re-reading would have deposited.");
     assert_eq!(straight.winding, through.winding);
     println!();
-    println!("  >> AND THE COMMITTED REMAINDERS DO NOT. A chain carrying only the running sum would");
-    println!("  >> have reported these two growths as IDENTICAL -- the difference between a closed");
+    println!(
+        "  >> AND THE COMMITTED REMAINDERS DO NOT. A chain carrying only the running sum would"
+    );
+    println!(
+        "  >> have reported these two growths as IDENTICAL -- the difference between a closed"
+    );
     println!("  >> loop and a ballistic commitment is invisible to the quantity being integrated.");
     assert!(straight.uninspected.is_zero());
     assert!(through.uninspected.is_positive());
@@ -174,13 +188,20 @@ fn main() {
         "  the cocycle defect, going through against going straight:  winding {}   uninspected {}",
         defect.winding, defect.uninspected
     );
-    println!("  closed: {}", <CommittedTransport as Composes>::closed(&defect));
+    println!(
+        "  closed: {}",
+        <CommittedTransport as Composes>::closed(&defect)
+    );
     assert!(defect.winding.is_zero());
     assert!(!defect.uninspected.is_zero());
     println!();
-    println!("  THE ONE COORDINATE IS THE DETERMINATION-LAW MISMATCH, and it is a transport defect");
+    println!(
+        "  THE ONE COORDINATE IS THE DETERMINATION-LAW MISMATCH, and it is a transport defect"
+    );
     println!("  rather than a value defect. `Chain::defect_against` returns it because the two");
-    println!("  species are now LINKS; before 2026-08-17 nothing in this tree could form the pair.");
+    println!(
+        "  species are now LINKS; before 2026-08-17 nothing in this tree could form the pair."
+    );
     println!();
     println!(
         "  is_rebase   straight {}   through {}",
@@ -195,9 +216,13 @@ fn main() {
     println!("[3]  THE STEPS, AND THE HAND AS THE SIGN OF THE STORED FACE");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  `Hand::Ortho` is \"cohere-null with the cross MAXIMAL -- the founding hand\", so it");
+    println!(
+        "  `Hand::Ortho` is \"cohere-null with the cross MAXIMAL -- the founding hand\", so it"
+    );
     println!("  names the step that stored NOTHING and transported everything. At an arrow the");
-    println!("  stored face is `aim`; at a junction it is `M21`, the half that came back; here it is");
+    println!(
+        "  stored face is `aim`; at a junction it is `M21`, the half that came back; here it is"
+    );
     println!("  the RESIDUAL -- what the material returned against this step's own prediction.");
     println!();
     println!(
@@ -227,9 +252,15 @@ fn main() {
     println!();
     println!("  {committed} committed step(s); {stored} step(s) stored a residual.");
     println!();
-    println!("  >> EVERY COMMITTED STEP READS ORTHO: it stored nothing, which is exactly the run of");
-    println!("  >> exact agreement that licensed it. The convention and the licence are one thing.");
-    println!("  >> AND A REFOUNDING STEP DOES NOT, so the hand is reading the material rather than");
+    println!(
+        "  >> EVERY COMMITTED STEP READS ORTHO: it stored nothing, which is exactly the run of"
+    );
+    println!(
+        "  >> exact agreement that licensed it. The convention and the licence are one thing."
+    );
+    println!(
+        "  >> AND A REFOUNDING STEP DOES NOT, so the hand is reading the material rather than"
+    );
     println!("  >> being a constant wearing an enum.");
     assert!(
         ridden_chain
@@ -251,18 +282,32 @@ fn main() {
     println!("WHAT THIS RUN DOES NOT CLAIM");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  It does not wire a prediction into a routing decision. `approach_front.rs` holds the");
-    println!("  predicted-crossing signal and refuses to route on it in writing -- \"it reports; it");
-    println!("  never routes. If it ever reaches a min, sort or argmax that discards a member it has");
-    println!("  become a governor.\" Whether a predicted crossing may determine a transport without");
+    println!(
+        "  It does not wire a prediction into a routing decision. `approach_front.rs` holds the"
+    );
+    println!(
+        "  predicted-crossing signal and refuses to route on it in writing -- \"it reports; it"
+    );
+    println!(
+        "  never routes. If it ever reaches a min, sort or argmax that discards a member it has"
+    );
+    println!(
+        "  become a governor.\" Whether a predicted crossing may determine a transport without"
+    );
     println!("  becoming a governor is a policy question and is not answered here.");
     println!();
-    println!("  The zero remainder of the straight chain is A DEFINITION and not evidence: a chain");
-    println!("  that re-reads at every grain commits past nothing by construction. The evidence is");
+    println!(
+        "  The zero remainder of the straight chain is A DEFINITION and not evidence: a chain"
+    );
+    println!(
+        "  that re-reads at every grain commits past nothing by construction. The evidence is"
+    );
     println!("  the mixed chain, whose remainder is not zero and whose refoundings are named.");
     println!();
     println!("  And the offset in the bookkeeping is reported rather than smoothed: a refounding");
-    println!("  obstruction is attributed to the extension whose founded axis failed, which is not");
+    println!(
+        "  obstruction is attributed to the extension whose founded axis failed, which is not"
+    );
     println!("  the index of the tip at which the failure was discovered. A first version of this");
     println!("  reading assumed otherwise and was refuted by its own test.");
 }

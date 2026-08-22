@@ -36,24 +36,24 @@
 //!     --tokens 818,5279,529,7001,563 [--grain 48] [--terms 14] [--no-fuse] [--digest-container]
 //! ```
 
+#[path = "phoenix/tower_receiver.rs"]
+mod receiver;
 #[path = "phoenix/resident_layer.rs"]
 mod resident_layer;
 #[path = "phoenix/streamed.rs"]
 mod streamed;
 #[path = "phoenix/tower.rs"]
 mod tower;
-#[path = "phoenix/tower_receiver.rs"]
-mod receiver;
 
 use std::io::Write;
 use std::time::Instant;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
+use holonic_engine::foreign_codec_rest::ExteriorCodebookRest;
 use holonic_engine::resident_section::{ResidentGrain, ResidentSurface, SeriesAperture};
 use holonic_engine::source_occurrence::AuthenticatedContainer;
 use num_bigint::BigInt;
-use holonic_engine::foreign_codec_rest::ExteriorCodebookRest;
-use receiver::{compare, future_section, read_committed, Vocabulary};
+use receiver::{Vocabulary, compare, future_section, read_committed};
 use streamed::{ForeignMaterialSource, MaterialSource};
 
 const COMMITTED: &str = "output/the_tower_conducts/tower-5-inputs-grain-48-terms-14.form";
@@ -102,14 +102,27 @@ fn parse_args() -> Args {
             "--out" => args.out = it.next().expect("--out <dir>"),
             "--committed" => args.committed = it.next().expect("--committed <path>"),
             "--codebook" => args.codebook = it.next().expect("--codebook <path>"),
-            "--tokens" => args.tokens = it.next().expect("--tokens a,b").split(',').map(|t| t.trim().parse().expect("token id")).collect(),
+            "--tokens" => {
+                args.tokens = it
+                    .next()
+                    .expect("--tokens a,b")
+                    .split(',')
+                    .map(|t| t.trim().parse().expect("token id"))
+                    .collect()
+            }
             "--grain" => args.grain = it.next().expect("--grain F").parse().expect("u32"),
             "--terms" => args.terms = it.next().expect("--terms N").parse().expect("u32"),
             "--top" => args.top = it.next().expect("--top N").parse().expect("usize"),
             "--no-fuse" => args.fuse = false,
             "--digest-container" => args.digest_container = true,
             "--hidden-card-control" => args.hidden_card_control = true,
-            "--poison-layers" => args.poison_layers = it.next().expect("--poison-layers N").parse().expect("usize"),
+            "--poison-layers" => {
+                args.poison_layers = it
+                    .next()
+                    .expect("--poison-layers N")
+                    .parse()
+                    .expect("usize")
+            }
             "--only-circulation" => args.only_circulation = true,
             other => panic!("unknown argument {other}"),
         }
@@ -196,14 +209,21 @@ impl Verdicts {
         if !passed {
             self.failed += 1;
         }
-        println!("  [{at:2}] {}  {claim}", if passed { "PASS" } else { "FAIL" });
+        println!(
+            "  [{at:2}] {}  {claim}",
+            if passed { "PASS" } else { "FAIL" }
+        );
         println!("        {evidence}");
-        self.lines.push(format!("  [{at:2}] {}  {claim}\n        {evidence}", if passed { "PASS" } else { "FAIL" }));
+        self.lines.push(format!(
+            "  [{at:2}] {}  {claim}\n        {evidence}",
+            if passed { "PASS" } else { "FAIL" }
+        ));
     }
     fn open(&mut self, at: usize, claim: &str, why: &str) {
         println!("  [{at:2}] OPEN  {claim}");
         println!("        {why}");
-        self.lines.push(format!("  [{at:2}] OPEN  {claim}\n        {why}"));
+        self.lines
+            .push(format!("  [{at:2}] OPEN  {claim}\n        {why}"));
     }
 }
 
@@ -211,7 +231,10 @@ fn main() {
     let args = parse_args();
     println!("THE TOWER IS ONE STREAMED CIRCULATION — {}", args.root);
     std::fs::create_dir_all(&args.out).expect("output directory");
-    let mut verdicts = Verdicts { lines: Vec::new(), failed: 0 };
+    let mut verdicts = Verdicts {
+        lines: Vec::new(),
+        failed: 0,
+    };
 
     let readout: &'static ResidentReadout = match ResidentReadout::new() {
         Ok(readout) => Box::leak(Box::new(readout)),
@@ -229,12 +252,21 @@ fn main() {
         }
     };
     if args.hidden_card_control {
-        println!("the card answered ({}); the hidden-card control did not hide it", surface.device_name());
+        println!(
+            "the card answered ({}); the hidden-card control did not hide it",
+            surface.device_name()
+        );
         std::process::exit(5);
     }
     let memory = surface.memory_at_mount();
-    println!("  resident chart: {} · mode {} · allocation grain {} · memory {} free of {}",
-        surface.device_name(), surface.mode().kernel_content.as_deref().unwrap_or("?"), surface.allocation_grain(), memory.free_bytes, memory.total_bytes);
+    println!(
+        "  resident chart: {} · mode {} · allocation grain {} · memory {} free of {}",
+        surface.device_name(),
+        surface.mode().kernel_content.as_deref().unwrap_or("?"),
+        surface.allocation_grain(),
+        memory.free_bytes,
+        memory.total_bytes
+    );
 
     let grain = ResidentGrain(args.grain);
     let terms = SeriesAperture(args.terms);
@@ -242,25 +274,56 @@ fn main() {
     let locator = format!("{}/model.safetensors", args.root);
     let digest_clock = Instant::now();
     let (content_sha256, digest_provenance) = if args.digest_container {
-        let taken = AuthenticatedContainer::digest_whole(&locator).expect("the container's content digest");
-        (taken, format!("re-taken by this deed in {:.1} s", digest_clock.elapsed().as_secs_f64()))
+        let taken =
+            AuthenticatedContainer::digest_whole(&locator).expect("the container's content digest");
+        (
+            taken,
+            format!(
+                "re-taken by this deed in {:.1} s",
+                digest_clock.elapsed().as_secs_f64()
+            ),
+        )
     } else {
-        (streamed::COMMITTED_CONTENT_SHA256.to_owned(), format!("reused from the committed manifest, taken {}", streamed::COMMITTED_CONTENT_TAKEN))
+        (
+            streamed::COMMITTED_CONTENT_SHA256.to_owned(),
+            format!(
+                "reused from the committed manifest, taken {}",
+                streamed::COMMITTED_CONTENT_TAKEN
+            ),
+        )
     };
     println!("  container content sha256 {content_sha256} ({digest_provenance})");
-    let mut source = ForeignMaterialSource::open(&args.root, Some(content_sha256.clone())).expect("the authenticated foreign source");
+    let mut source = ForeignMaterialSource::open(&args.root, Some(content_sha256.clone()))
+        .expect("the authenticated foreign source");
 
     // -----------------------------------------------------------------------------------------
     // the deed
     // -----------------------------------------------------------------------------------------
-    let circulated = match streamed::circulate(surface, readout, &mut source, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, tower::LAYERS, false) {
+    let circulated = match streamed::circulate(
+        surface,
+        readout,
+        &mut source,
+        &args.tokens,
+        grain,
+        terms,
+        tower::Chart::Midpoint,
+        args.fuse,
+        tower::LAYERS,
+        false,
+    ) {
         Ok(returned) => returned,
         Err(error) => {
             println!("REFUSED: the circulation did not return — {error}");
             std::process::exit(2);
         }
     };
-    println!("  {} segments · {} launches · wall {:.1} s (loop {:.1} s)", circulated.segments.len(), circulated.deed_launches, circulated.wall_s, circulated.loop_wall_s);
+    println!(
+        "  {} segments · {} launches · wall {:.1} s (loop {:.1} s)",
+        circulated.segments.len(),
+        circulated.deed_launches,
+        circulated.wall_s,
+        circulated.loop_wall_s
+    );
 
     let codebook = match ExteriorCodebookRest::read_tsv(&args.codebook) {
         Ok(codebook) => codebook,
@@ -274,7 +337,13 @@ fn main() {
     let future = if circulated.potential.is_empty() {
         None
     } else {
-        match future_section(&circulated.potential, positions - 1, &vocabulary, grain, args.top) {
+        match future_section(
+            &circulated.potential,
+            positions - 1,
+            &vocabulary,
+            grain,
+            args.top,
+        ) {
             Ok(future) => Some(future),
             Err(error) => {
                 println!("REFUSED: terminal future receiver did not return — {error}");
@@ -302,20 +371,34 @@ fn main() {
         let probe = streamed::layer_segment(&source, 0, 0, 0).expect("layer 0's segment");
         for (region, name) in probe.regions.iter().zip(&probe.names) {
             let mut octets = vec![0u8; region.octets()];
-            std::fs::File::open(&locator).and_then(|file| {
-                use std::os::unix::fs::FileExt;
-                file.read_exact_at(&mut octets, region.start)
-            }).expect("the staged read");
-            let staged: Vec<u16> = octets.chunks_exact(2).map(|pair| u16::from_le_bytes([pair[0], pair[1]])).collect();
+            std::fs::File::open(&locator)
+                .and_then(|file| {
+                    use std::os::unix::fs::FileExt;
+                    file.read_exact_at(&mut octets, region.start)
+                })
+                .expect("the staged read");
+            let staged: Vec<u16> = octets
+                .chunks_exact(2)
+                .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+                .collect();
             let theirs = if region.population.contains(" rows ") {
-                source.rows(name, tower::PLE_WIDTH * 0, tower::PLE_WIDTH).expect("the container's own reader").0
+                source
+                    .rows(name, tower::PLE_WIDTH * 0, tower::PLE_WIDTH)
+                    .expect("the container's own reader")
+                    .0
             } else {
                 source.whole(name).expect("the container's own reader").0
             };
             compared += 1;
             if staged != theirs {
                 let at = staged.iter().zip(&theirs).position(|(a, b)| a != b);
-                differing.push(format!("{} (first difference at word {:?}, staged {} words against {})", region.population, at, staged.len(), theirs.len()));
+                differing.push(format!(
+                    "{} (first difference at word {:?}, staged {} words against {})",
+                    region.population,
+                    at,
+                    staged.len(),
+                    theirs.len()
+                ));
             }
         }
         verdicts.record(0, "the staged pinned refill reads exactly the octets the container's own reader returns, region by region",
@@ -404,15 +487,39 @@ fn main() {
     }
 
     // [7] the collapsed population under the declared quotient chart
-    let mine_collapsed = format!("(quotients, Σ widths, widest, nonzero): {:?}",
-        circulated.segments.iter().filter(|s| s.layer.is_some()).map(|s| (s.layer.unwrap(), s.quotients, s.collapsed_width_sum, s.collapsed_width_max, s.collapsed_nonzero)).collect::<Vec<_>>());
+    let mine_collapsed = format!(
+        "(quotients, Σ widths, widest, nonzero): {:?}",
+        circulated
+            .segments
+            .iter()
+            .filter(|s| s.layer.is_some())
+            .map(|s| (
+                s.layer.unwrap(),
+                s.quotients,
+                s.collapsed_width_sum,
+                s.collapsed_width_max,
+                s.collapsed_nonzero
+            ))
+            .collect::<Vec<_>>()
+    );
     match &committed {
         Ok(committed) => {
             let future_for_compare = future.as_ref().expect("future was checked above");
-            let comparison = match compare(committed, future_for_compare, &vocabulary, &circulated.final_normed, &mine_collapsed) {
+            let comparison = match compare(
+                committed,
+                future_for_compare,
+                &vocabulary,
+                &circulated.final_normed,
+                &mine_collapsed,
+            ) {
                 Ok(comparison) => comparison,
                 Err(error) => {
-                    verdicts.record(7, "the collapsed population has a returned codebook comparison", false, error);
+                    verdicts.record(
+                        7,
+                        "the collapsed population has a returned codebook comparison",
+                        false,
+                        error,
+                    );
                     std::process::exit(2);
                 }
             };
@@ -429,12 +536,25 @@ fn main() {
                     format!("mine   {}\n        theirs {}", mine_collapsed, committed.collapsed)
                 });
         }
-        Err(error) => verdicts.record(7, "every layer's collapsed population is the committed one", false, format!("the committed artifact could not be read: {error}")),
+        Err(error) => verdicts.record(
+            7,
+            "every layer's collapsed population is the committed one",
+            false,
+            format!("the committed artifact could not be read: {error}"),
+        ),
     }
 
     // [8] the fused seal, where the receiver factors
     let fused: usize = circulated.segments.iter().map(|s| s.seals_fused).sum();
-    let refused: Vec<String> = circulated.segments.iter().flat_map(|s| s.seals_refused.iter().map(|(e, because)| format!("{:?}: {because}", e))).collect();
+    let refused: Vec<String> = circulated
+        .segments
+        .iter()
+        .flat_map(|s| {
+            s.seals_refused
+                .iter()
+                .map(|(e, because)| format!("{:?}: {because}", e))
+        })
+        .collect();
     let nodes: usize = circulated.segments.iter().map(|s| s.graph_nodes).sum();
     verdicts.record(8, "the midpoint quotient fuses exactly where every declared future receiver factors through the fused output, and refuses by name where one does not",
         !args.fuse || fused > 0,
@@ -442,14 +562,22 @@ fn main() {
             circulated.segments.len(), refused.len(), refused));
 
     // [9] the source is authenticated ONCE and verified after
-    let identity = AuthenticatedContainer::read_header(&locator).map(|(octets, header, sha)| format!("{octets} octets, header {header} octets, header sha256 {sha}")).unwrap_or_else(|e| e.to_string());
+    let identity = AuthenticatedContainer::read_header(&locator)
+        .map(|(octets, header, sha)| {
+            format!("{octets} octets, header {header} octets, header sha256 {sha}")
+        })
+        .unwrap_or_else(|e| e.to_string());
     verdicts.record(9, "the container is authenticated once before the deed and verified still afterwards; no region is re-digested inside the circulation",
         true,
         format!("{identity} · content sha256 {content_sha256} ({digest_provenance}) · identity verified after the circulation · regions declared from the header alone: per-region SHA-256 is ABSENT from the hot path (H0 attributed ~62 % of each 296 ms inter-graph gap to uninstrumented CPU in the mount phase, which is where it ran)"));
 
     // [10] the whole-tower SINGLE graph: attempted, and the limiting cut named
     let probe = probe_graph_inside_capture(surface);
-    let aligned_whole: u64 = circulated.segments.iter().map(|s| s.material_resident_octets).sum();
+    let aligned_whole: u64 = circulated
+        .segments
+        .iter()
+        .map(|s| s.material_resident_octets)
+        .sum();
     let stored_whole = streamed_census.asynchronous_copy_octets;
     let (host_total, host_available) = host_memory();
     // Values the host must hold BEFORE a graph can be instantiated, produced by kernels reading
@@ -464,9 +592,28 @@ fn main() {
     // [11] the poisoned lineage, through the whole circulation
     if args.only_circulation {
         verdicts.open(11, "the poisoned-lineage refusal through the whole circulation", "not run: --only-circulation conducts the circulation alone so an exterior profiler measures it and nothing beside it");
-        verdicts.open(12, "hiding the card returns a typed refusal", "not run: --only-circulation");
+        verdicts.open(
+            12,
+            "hiding the card returns a typed refusal",
+            "not run: --only-circulation",
+        );
     }
-    let poisoned = if args.only_circulation { Err("not run".to_owned()) } else { streamed::circulate(surface, readout, &mut source, &args.tokens, grain, terms, tower::Chart::Midpoint, args.fuse, args.poison_layers, true) };
+    let poisoned = if args.only_circulation {
+        Err("not run".to_owned())
+    } else {
+        streamed::circulate(
+            surface,
+            readout,
+            &mut source,
+            &args.tokens,
+            grain,
+            terms,
+            tower::Chart::Midpoint,
+            args.fuse,
+            args.poison_layers,
+            true,
+        )
+    };
     match poisoned {
         Ok(poisoned) => {
             let refused_here = !poisoned.obstructions.is_empty();
@@ -483,16 +630,38 @@ fn main() {
 
     // [12] the hidden card
     let exe = std::env::current_exe().expect("this driver's own path");
-    let hidden = if args.only_circulation { Err(std::io::Error::other("not run")) } else { std::process::Command::new(exe).env("CUDA_VISIBLE_DEVICES", "").args(["--hidden-card-control", "--root", &args.root]).output() };
+    let hidden = if args.only_circulation {
+        Err(std::io::Error::other("not run"))
+    } else {
+        std::process::Command::new(exe)
+            .env("CUDA_VISIBLE_DEVICES", "")
+            .args(["--hidden-card-control", "--root", &args.root])
+            .output()
+    };
     match hidden {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            verdicts.record(12, "hiding the card returns a typed refusal and no semantic answer",
+            verdicts.record(
+                12,
+                "hiding the card returns a typed refusal and no semantic answer",
                 output.status.code() == Some(3),
-                format!("subprocess with CUDA_VISIBLE_DEVICES='' exited {:?}; {}", output.status.code(),
-                    stdout.lines().filter(|l| l.contains("REFUSED") || l.contains("fallback")).collect::<Vec<_>>().join(" | ")));
+                format!(
+                    "subprocess with CUDA_VISIBLE_DEVICES='' exited {:?}; {}",
+                    output.status.code(),
+                    stdout
+                        .lines()
+                        .filter(|l| l.contains("REFUSED") || l.contains("fallback"))
+                        .collect::<Vec<_>>()
+                        .join(" | ")
+                ),
+            );
         }
-        Err(error) if !args.only_circulation => verdicts.record(12, "hiding the card returns a typed refusal and no semantic answer", false, error.to_string()),
+        Err(error) if !args.only_circulation => verdicts.record(
+            12,
+            "hiding the card returns a typed refusal and no semantic answer",
+            false,
+            error.to_string(),
+        ),
         Err(_) => {}
     }
 
@@ -511,9 +680,28 @@ fn main() {
     let path = format!("{}/receipt.form", args.out);
     let mut file = std::fs::File::create(&path).expect("receipt");
     writeln!(file, "THE TOWER IS ONE STREAMED CIRCULATION — receipt").unwrap();
-    writeln!(file, "root {} · grain 2^-{} · terms {} · chart Midpoint · fused seal {} · device {} · mode {:?}", args.root, args.grain, args.terms, args.fuse, surface.device_name(), surface.mode()).unwrap();
-    writeln!(file, "container content sha256 {content_sha256} ({digest_provenance})").unwrap();
-    writeln!(file, "committed predecessor {} (read, never re-run)", args.committed).unwrap();
+    writeln!(
+        file,
+        "root {} · grain 2^-{} · terms {} · chart Midpoint · fused seal {} · device {} · mode {:?}",
+        args.root,
+        args.grain,
+        args.terms,
+        args.fuse,
+        surface.device_name(),
+        surface.mode()
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "container content sha256 {content_sha256} ({digest_provenance})"
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "committed predecessor {} (read, never re-run)",
+        args.committed
+    )
+    .unwrap();
     if let Ok(committed) = &committed {
         writeln!(
             file,
@@ -523,16 +711,49 @@ fn main() {
         .unwrap();
     }
     writeln!(file, "input tokens {:?}", args.tokens).unwrap();
-    writeln!(file, "  wall {:.3} s · loop {:.3} s · deed launches {} · peak charge of one deed {}", circulated.wall_s, circulated.loop_wall_s, circulated.deed_launches, circulated.peak_charged_octets).unwrap();
+    writeln!(
+        file,
+        "  wall {:.3} s · loop {:.3} s · deed launches {} · peak charge of one deed {}",
+        circulated.wall_s,
+        circulated.loop_wall_s,
+        circulated.deed_launches,
+        circulated.peak_charged_octets
+    )
+    .unwrap();
     writeln!(file, "  streamed census {:?}", circulated.streamed).unwrap();
-    writeln!(file, "  surface census before {:?}", circulated.census_before).unwrap();
-    writeln!(file, "  surface census after  {:?}", circulated.census_after).unwrap();
-    writeln!(file, "  surface census at loop open  {:?}", circulated.census_at_loop_open).unwrap();
-    writeln!(file, "  surface census at loop close {:?}", circulated.census_at_loop_close).unwrap();
+    writeln!(
+        file,
+        "  surface census before {:?}",
+        circulated.census_before
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "  surface census after  {:?}",
+        circulated.census_after
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "  surface census at loop open  {:?}",
+        circulated.census_at_loop_open
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "  surface census at loop close {:?}",
+        circulated.census_at_loop_close
+    )
+    .unwrap();
     writeln!(file, "  pooled material admission: {} coordinates, resident {} octets, charged {} octets, free at admission {}",
         circulated.admission.coordinates.len(), circulated.admission.prediction.resident_octets, circulated.admission.prediction.charged_octets, circulated.admission.free_octets_at_admission).unwrap();
     for coordinate in &circulated.admission.coordinates {
-        writeln!(file, "    {} required {} ceiling {:?} admitted {}", coordinate.name, coordinate.required, coordinate.ceiling, coordinate.admitted).unwrap();
+        writeln!(
+            file,
+            "    {} required {} ceiling {:?} admitted {}",
+            coordinate.name, coordinate.required, coordinate.ceiling, coordinate.admitted
+        )
+        .unwrap();
     }
     for segment in &circulated.segments {
         writeln!(file, "  segment {:?} slot {} {:?} {:?} operations {} fronts {} graph {}/{} launches {} seals fused {} refused {} quotients {} collapsed (Σ {} widest {} nonzero {}) lineage-empty {} a-priori {} certified {} stage {:.3}s mount {:.3}s bind {:.3}s work {:?}",
@@ -542,13 +763,28 @@ fn main() {
             segment.lineage_empty, segment.a_priori_held, segment.every_front_certified,
             segment.stage_wall_s, segment.mount_wall_s, segment.bind_wall_s, segment.deed.coordinates()).unwrap();
     }
-    writeln!(file, "  graph key (§5.4, founded and unexercised) {}", circulated.graph_key.stated()).unwrap();
+    writeln!(
+        file,
+        "  graph key (§5.4, founded and unexercised) {}",
+        circulated.graph_key.stated()
+    )
+    .unwrap();
     writeln!(file, "    mode {}", circulated.graph_key.mode).unwrap();
     writeln!(file, "    source {}", circulated.graph_key.source).unwrap();
     writeln!(file, "    ports {:?}", circulated.graph_key.ports).unwrap();
     writeln!(file, "    reductions {:?}", circulated.graph_key.reductions).unwrap();
-    writeln!(file, "    topology (operations, fronts, nodes, edges) per segment {:?}", circulated.graph_key.topology).unwrap();
-    writeln!(file, "    receiver boundary {}", circulated.graph_key.receiver_boundary).unwrap();
+    writeln!(
+        file,
+        "    topology (operations, fronts, nodes, edges) per segment {:?}",
+        circulated.graph_key.topology
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "    receiver boundary {}",
+        circulated.graph_key.receiver_boundary
+    )
+    .unwrap();
     writeln!(file, "  collapsed population per layer {mine_collapsed}").unwrap();
     if let Some(future) = &future {
         writeln!(file, "  plural future section at position {}: top lower {} · {} not separated · {} separated", future.position, future.top_lower, future.plural.len(), future.separated).unwrap();
@@ -563,7 +799,12 @@ fn main() {
             writeln!(file, "    {id} {:?} [{lo}, {hi}]", surface).unwrap();
         }
     }
-    writeln!(file, "  final normed standing ({} coordinates):", circulated.final_normed.len()).unwrap();
+    writeln!(
+        file,
+        "  final normed standing ({} coordinates):",
+        circulated.final_normed.len()
+    )
+    .unwrap();
     for (at, (l, h)) in circulated.final_normed.iter().enumerate() {
         writeln!(file, "    {at} {l} {h}").unwrap();
     }
@@ -575,20 +816,84 @@ fn main() {
     // The census table, old against new, as its own artifact.
     let table = format!("{}/census-old-against-new.tsv", args.out);
     let mut tsv = std::fs::File::create(&table).expect("census table");
-    writeln!(tsv, "coordinate\tH0 (the committed scalar path)\tthis circulation\tsource").unwrap();
-    writeln!(tsv, "cuGraphLaunch\t43\t{}\tthe streamed census", streamed_census.graph_launches).unwrap();
-    writeln!(tsv, "conducting-stream synchronizations\t43\t{}\tthe surface census", circulated.census_after.synchronizations).unwrap();
-    writeln!(tsv, "cuCtxSynchronize (mount path)\t2112\t0\tthe mouth no longer synchronizes the context").unwrap();
-    writeln!(tsv, "mount-stream synchronizations\t0\t{}\tthe streamed census", streamed_census.mount_synchronizations).unwrap();
-    writeln!(tsv, "staging synchronizations\t0\t{}\tthe streamed census", streamed_census.staging_synchronizations).unwrap();
-    writeln!(tsv, "cuMemAlloc\t9416\t{}\tsurface allocations {} + pooled {}", circulated.census_after.allocations + streamed_census.pool_allocations, circulated.census_after.allocations, streamed_census.pool_allocations).unwrap();
-    writeln!(tsv, "host-to-device copies\t1745 (synchronous)\t{} (asynchronous)\tthe streamed census", streamed_census.asynchronous_copies).unwrap();
-    writeln!(tsv, "host-to-device octets\t9290000000\t{}\tthe streamed census", streamed_census.asynchronous_copy_octets).unwrap();
+    writeln!(
+        tsv,
+        "coordinate\tH0 (the committed scalar path)\tthis circulation\tsource"
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "cuGraphLaunch\t43\t{}\tthe streamed census",
+        streamed_census.graph_launches
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "conducting-stream synchronizations\t43\t{}\tthe surface census",
+        circulated.census_after.synchronizations
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "cuCtxSynchronize (mount path)\t2112\t0\tthe mouth no longer synchronizes the context"
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "mount-stream synchronizations\t0\t{}\tthe streamed census",
+        streamed_census.mount_synchronizations
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "staging synchronizations\t0\t{}\tthe streamed census",
+        streamed_census.staging_synchronizations
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "cuMemAlloc\t9416\t{}\tsurface allocations {} + pooled {}",
+        circulated.census_after.allocations + streamed_census.pool_allocations,
+        circulated.census_after.allocations,
+        streamed_census.pool_allocations
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "host-to-device copies\t1745 (synchronous)\t{} (asynchronous)\tthe streamed census",
+        streamed_census.asynchronous_copies
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "host-to-device octets\t9290000000\t{}\tthe streamed census",
+        streamed_census.asynchronous_copy_octets
+    )
+    .unwrap();
     writeln!(tsv, "regions re-digested per run\t704\t0\tthe header declares every region; the identity binds the bytes").unwrap();
-    writeln!(tsv, "source occurrences built\t43\t1\tone pre-deed authentication").unwrap();
-    writeln!(tsv, "pinned host octets\t0\t{}\tthe streamed census", streamed_census.pinned_octets).unwrap();
-    writeln!(tsv, "pooled device octets\t0\t{}\tthe streamed census", streamed_census.pool_octets).unwrap();
-    writeln!(tsv, "wall seconds\t23.8\t{:.1}\tStation C's committed face for this input against this deed", circulated.wall_s).unwrap();
+    writeln!(
+        tsv,
+        "source occurrences built\t43\t1\tone pre-deed authentication"
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "pinned host octets\t0\t{}\tthe streamed census",
+        streamed_census.pinned_octets
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "pooled device octets\t0\t{}\tthe streamed census",
+        streamed_census.pool_octets
+    )
+    .unwrap();
+    writeln!(
+        tsv,
+        "wall seconds\t23.8\t{:.1}\tStation C's committed face for this input against this deed",
+        circulated.wall_s
+    )
+    .unwrap();
 
     println!("\nreceipt: {path}\ncensus table: {table}");
     if verdicts.failed > 0 {

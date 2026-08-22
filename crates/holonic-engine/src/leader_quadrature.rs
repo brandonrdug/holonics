@@ -832,7 +832,11 @@ impl CommittedStep {
             // The ride read the jet at its tip and committed across the rest.
             ExtensionKind::Ride { .. } => {
                 let past = &extension.span - grain;
-                if past.is_positive() { past } else { Rat::zero() }
+                if past.is_positive() {
+                    past
+                } else {
+                    Rat::zero()
+                }
             }
         };
         Self {
@@ -2029,7 +2033,10 @@ mod tests {
         assert_eq!(walked.area, expected);
         assert_eq!(ridden.area, expected);
         // THE ANTI-VACUITY ARM: the ridden growth must actually ride, or there are not two laws here.
-        assert!(ridden.ride_count() > 0, "nothing was ridden; there is one law, not two");
+        assert!(
+            ridden.ride_count() > 0,
+            "nothing was ridden; there is one law, not two"
+        );
         assert_eq!(walked.ride_count(), 0, "the control must never ride");
 
         let walked_chain = chain_of(&walked);
@@ -2056,7 +2063,10 @@ mod tests {
         // THREE: the cocycle defect against the straight transport says exactly that, and says it in
         // one coordinate rather than in prose.
         let defect = ridden_chain.defect_against(&straight);
-        assert!(defect.winding.is_zero(), "the windings do not separate them");
+        assert!(
+            defect.winding.is_zero(),
+            "the windings do not separate them"
+        );
         assert!(!defect.uninspected.is_zero(), "the commitment does");
         assert!(
             !<CommittedTransport as Composes>::closed(&defect),
@@ -2064,7 +2074,10 @@ mod tests {
         );
 
         // FOUR: the chain's own remainder is the committed material, and `is_rebase` reads it.
-        assert!(walked_chain.is_rebase(), "walking every grain is a rebase with no remainder");
+        assert!(
+            walked_chain.is_rebase(),
+            "walking every grain is a rebase with no remainder"
+        );
         assert!(!ridden_chain.is_rebase(), "riding is not");
     }
 
@@ -2089,7 +2102,10 @@ mod tests {
         let ridden = run(&boundary, rat(1, 4), RideDiscipline::GermBounded);
         let chain = chain_of(&ridden);
         let links = chain.links();
-        assert!(links.iter().any(|step| step.is_committed()), "no ride to check");
+        assert!(
+            links.iter().any(|step| step.is_committed()),
+            "no ride to check"
+        );
         assert!(
             !ridden.obstructions.is_empty(),
             "the material must refound somewhere or the hand cannot vary"

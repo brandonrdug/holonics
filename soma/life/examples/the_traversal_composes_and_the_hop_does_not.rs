@@ -194,9 +194,19 @@ fn main() {
     let composite_transmission = composite.transmission().expect("a through entry");
     let composite_reflection = composite.reflection().expect("a through entry");
 
-    println!("  PATH      hops {}   reflecting links {}", chain.hops(), reflecting_links);
-    println!("            composite tau      {}", pair(&composite_transmission));
-    println!("            composite Gamma    {}", pair(&composite_reflection));
+    println!(
+        "  PATH      hops {}   reflecting links {}",
+        chain.hops(),
+        reflecting_links
+    );
+    println!(
+        "            composite tau      {}",
+        pair(&composite_transmission)
+    );
+    println!(
+        "            composite Gamma    {}",
+        pair(&composite_reflection)
+    );
     println!("            product of hop tau {}", pair(&scalar_product));
     println!(
         "            disposition {:?}   is_rebase {}",
@@ -252,10 +262,7 @@ fn main() {
             );
             let sub = chain_over(&window).expect("positive populations");
             let sub_composite = sub.compose();
-            let reflected_links = window
-                .windows(2)
-                .filter(|hop| hop[0] != hop[1])
-                .count();
+            let reflected_links = window.windows(2).filter(|hop| hop[0] != hop[1]).count();
             let distinct: BTreeSet<u64> = window.iter().copied().collect();
             println!(
                 "  falsifier 2  out-and-back {start}..={end}   links {}   reflecting {reflected_links}   \

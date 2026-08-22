@@ -50,9 +50,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::surprisal::{Grain, Support, SymbolicSurprisal, cross_entropy};
+use holonic_engine::surprisal::{cross_entropy, Grain, Support, SymbolicSurprisal};
 use life::decomposing_codec::{
-    DecomposingBody, DecompositionGrain, DecompositionPass, Symbol, read, render_word,
+    read, render_word, DecomposingBody, DecompositionGrain, DecompositionPass, Symbol,
 };
 use num_bigint::BigUint;
 
@@ -87,9 +87,7 @@ fn multiset(pass: &DecompositionPass) -> BTreeMap<Vec<Symbol>, BigUint> {
     let mut counted: BTreeMap<Vec<Symbol>, BigUint> = BTreeMap::new();
     for whole in &pass.decomposed {
         for part in &whole.parts {
-            *counted
-                .entry(part.clone())
-                .or_insert_with(BigUint::default) += 1u32;
+            *counted.entry(part.clone()).or_insert_with(BigUint::default) += 1u32;
         }
     }
     counted
@@ -160,7 +158,10 @@ fn score(
         Err(error) => panic!("the surprisal carrier refused: {error}"),
     };
     Reading {
-        parts: population.values().map(|count| count.to_string().parse::<usize>().unwrap_or(0)).sum(),
+        parts: population
+            .values()
+            .map(|count| count.to_string().parse::<usize>().unwrap_or(0))
+            .sum(),
         distinct: population.len(),
         collapsed: held_pass.collapsed().len(),
         unsupported,
@@ -197,9 +198,19 @@ fn main() {
     let held_out = words_of(HELD_OUT);
     let disjoint = words_of(HELD_OUT_DISJOINT);
 
-    println!("  conditioning material   {} lines over {} records", conditioning.len(), CONDITIONING.len());
-    println!("  held out                {} lines   {HELD_OUT}", held_out.len());
-    println!("  held out, disjoint      {} lines   {HELD_OUT_DISJOINT}", disjoint.len());
+    println!(
+        "  conditioning material   {} lines over {} records",
+        conditioning.len(),
+        CONDITIONING.len()
+    );
+    println!(
+        "  held out                {} lines   {HELD_OUT}",
+        held_out.len()
+    );
+    println!(
+        "  held out, disjoint      {} lines   {HELD_OUT_DISJOINT}",
+        disjoint.len()
+    );
     println!();
 
     // The origin grain: close a part after a space. Declared, and the only
@@ -217,7 +228,8 @@ fn main() {
 
     // The deposit: condition on A, then revise at the collapsed pairs' own words.
     let mut body = DecomposingBody::mount(origin.clone()).expect("the body mounts");
-    body.receive(conditioning.clone()).expect("the batch is received");
+    body.receive(conditioning.clone())
+        .expect("the batch is received");
     let revision = body.revise().expect("the pass opened a reflection");
     let revised = revision.grain.clone();
 
@@ -265,34 +277,36 @@ fn main() {
         match (&before.form, &after.form) {
             (Some(before_form), Some(after_form)) => {
                 let difference = after_form.minus(before_form);
-                println!(
-                    "      the difference form is exact and is the primary return:"
-                );
+                println!("      the difference form is exact and is the primary return:");
                 println!("          {}", difference.named());
                 println!(
                     "      moved at all (exact, never Open)          {}",
                     if difference.is_zero() { "NO" } else { "YES" }
                 );
                 match after_form.compare(before_form) {
-                    Ok(ordering) => println!("      direction at the default grain           {ordering:?}"),
+                    Ok(ordering) => {
+                        println!("      direction at the default grain           {ordering:?}")
+                    }
                     Err(error) => println!("      direction refused: {error}"),
                 }
                 match after_form.compare_grain(before_form, Grain::at(1, 4)) {
-                    Ok(ordering) => println!("      direction at a declared coarser grain    {ordering:?}"),
+                    Ok(ordering) => {
+                        println!("      direction at a declared coarser grain    {ordering:?}")
+                    }
                     Err(error) => println!("      direction refused: {error}"),
                 }
             }
             _ => {
-                println!(
-                    "      at least one side returned UNSUPPORTED for the whole reading."
-                );
+                println!("      at least one side returned UNSUPPORTED for the whole reading.");
                 println!(
                     "      That is the aggregate collapsing on the first novel event while the"
                 );
                 println!(
                     "      supported majority was already accumulated -- which is exactly what"
                 );
-                println!("      Step 2 of the plan repairs, and this run locates it on real material.");
+                println!(
+                    "      Step 2 of the plan repairs, and this run locates it on real material."
+                );
             }
         }
         println!(
@@ -310,10 +324,16 @@ fn main() {
     println!("{}", "-".repeat(100));
     println!("WHAT THIS RUN DOES NOT ESTABLISH");
     println!("{}", "-".repeat(100));
-    println!("  Nothing. It is a reading taken before construction, and the plan's steps 1 through 4");
-    println!("  are unchanged by it. In particular it does NOT establish that the deposit improved");
+    println!(
+        "  Nothing. It is a reading taken before construction, and the plan's steps 1 through 4"
+    );
+    println!(
+        "  are unchanged by it. In particular it does NOT establish that the deposit improved"
+    );
     println!("  anything: 'reduced founding cost is compression' was regraded 2026-07-19, and the");
-    println!("  later material here is IDENTICAL across the two grains, which is learning grade two.");
+    println!(
+        "  later material here is IDENTICAL across the two grains, which is learning grade two."
+    );
     println!("  Grade three needs a nonidentical neighbourhood and this driver does not reach it.");
     println!("{}", "=".repeat(100));
 }

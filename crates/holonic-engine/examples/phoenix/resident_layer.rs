@@ -39,7 +39,7 @@ use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
-use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::front_passage::{
     Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, GeluTanh, Hadamard,
     MaterialPlan, MountedPopulation, ReEntry, ResidentMaterial, ResidentRealization, RmsRebase,

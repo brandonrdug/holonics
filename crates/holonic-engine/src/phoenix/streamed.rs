@@ -85,7 +85,7 @@ pub enum InterventionSite {
 
 #[cfg(test)]
 mod tests {
-    use super::{tower_admission_receipt, ApparatusCensus};
+    use super::{ApparatusCensus, tower_admission_receipt};
     use crate::front_passage::DeedAdmission;
     use crate::resident_section::TransferCensus;
     use crate::streamed_standing::StreamedCensus;
@@ -109,10 +109,20 @@ mod tests {
         let census = ApparatusCensus {
             resident_before: TransferCensus::default(),
             resident_after_tower: TransferCensus::default(),
-            resident_after: TransferCensus { deed_launches: 1, ..TransferCensus::default() },
+            resident_after: TransferCensus {
+                deed_launches: 1,
+                ..TransferCensus::default()
+            },
             overlay_before: Some(TransferCensus::default()),
-            overlay_after: Some(TransferCensus { deed_launches: 1, ..TransferCensus::default() }),
-            streamed: StreamedCensus { graph_launches: 1, terminal_synchronizations: 1, ..StreamedCensus::default() },
+            overlay_after: Some(TransferCensus {
+                deed_launches: 1,
+                ..TransferCensus::default()
+            }),
+            streamed: StreamedCensus {
+                graph_launches: 1,
+                terminal_synchronizations: 1,
+                ..StreamedCensus::default()
+            },
             tower_deed_launches: 1,
             total_deed_launches: 2,
             terminal_synchronizations: 1,

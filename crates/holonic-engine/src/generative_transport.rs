@@ -1348,9 +1348,7 @@ fn zero_matrix(rows: usize, columns: usize) -> Vec<Vec<Rat>> {
 impl From<ExactLinearError> for GenerativeTransportError {
     fn from(error: ExactLinearError) -> Self {
         match error {
-            ExactLinearError::SingularMatrix => {
-                GenerativeTransportError::SingularGeneratedOperator
-            }
+            ExactLinearError::SingularMatrix => GenerativeTransportError::SingularGeneratedOperator,
             ExactLinearError::InverseCertificateFailure => {
                 GenerativeTransportError::InverseResidualNonzero
             }

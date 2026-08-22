@@ -619,7 +619,9 @@ impl From<ExactLinearError> for DiffusionError {
     fn from(error: ExactLinearError) -> Self {
         match error {
             ExactLinearError::SingularMatrix => DiffusionError::SingularLaw,
-            ExactLinearError::InverseCertificateFailure => DiffusionError::TransferCertificateFailure,
+            ExactLinearError::InverseCertificateFailure => {
+                DiffusionError::TransferCertificateFailure
+            }
             ExactLinearError::RaggedMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
@@ -637,7 +639,11 @@ impl From<ExactLinearError> for DiffusionError {
 /// carry no column count at all. Inferring there would turn a lawful empty product into a
 /// refusal.
 fn carrier(matrix: &[Vec<Rat>], columns: usize) -> Result<ExactRatMatrix, DiffusionError> {
-    Ok(ExactRatMatrix::shaped(matrix.len(), columns, matrix.to_vec())?)
+    Ok(ExactRatMatrix::shaped(
+        matrix.len(),
+        columns,
+        matrix.to_vec(),
+    )?)
 }
 
 fn identity_matrix(extent: usize) -> Result<Vec<Vec<Rat>>, DiffusionError> {
@@ -654,10 +660,7 @@ fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, DiffusionError> 
     Ok(carrier(&matrix, extent)?.inverse()?.to_rows())
 }
 
-fn matrix_multiply(
-    left: &[Vec<Rat>],
-    right: &[Vec<Rat>],
-) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+fn matrix_multiply(left: &[Vec<Rat>], right: &[Vec<Rat>]) -> Result<Vec<Vec<Rat>>, DiffusionError> {
     // The inner dimension is the right operand's row count, which is carried even when the left
     // operand has no rows to read it off.
     let inner = right.len();
@@ -671,10 +674,7 @@ fn matrix_vector(matrix: &[Vec<Rat>], vector: &[Rat]) -> Result<Vec<Rat>, Diffus
     Ok(carrier(matrix, vector.len())?.apply(vector)?)
 }
 
-fn matrix_subtract(
-    left: &[Vec<Rat>],
-    right: &[Vec<Rat>],
-) -> Result<Vec<Vec<Rat>>, DiffusionError> {
+fn matrix_subtract(left: &[Vec<Rat>], right: &[Vec<Rat>]) -> Result<Vec<Vec<Rat>>, DiffusionError> {
     let columns = left.first().or_else(|| right.first()).map_or(0, Vec::len);
     Ok(carrier(left, columns)?
         .subtract(&carrier(right, columns)?)?

@@ -583,7 +583,10 @@ mod fiber_tests {
         assert_eq!(unsupported, &vec![5]);
         assert!(!form_over_supported.is_zero());
         assert_eq!(supported_mass + unsupported_mass, Rat::one());
-        assert_eq!(unsupported_mass, &Rat::new(BigInt::from(4), BigInt::from(8)));
+        assert_eq!(
+            unsupported_mass,
+            &Rat::new(BigInt::from(4), BigInt::from(8))
+        );
         // The face keeps only the refusal, which is why it is a face.
         assert_eq!(fiber.face(), Support::Unsupported);
         assert_eq!(
@@ -744,7 +747,6 @@ pub enum SurprisalError {
     EmptyPopulation,
 }
 
-
 /// **The section modulus of a surprisal population: the second moment about its own mean, against
 /// the extreme deviation, carried as an UNDIVIDED PAIR.**
 ///
@@ -889,8 +891,8 @@ mod tests {
     #[test]
     fn the_section_modulus_is_unmoved_by_the_additive_gauge() {
         let base = modulus_population(&[(1, &[(2, 1)]), (2, &[(3, 1)]), (3, &[(2, 3)])]);
-        let shift = SymbolicSurprisal::term(5, Rat::from_integer(BigInt::from(7)))
-            .expect("a prime term");
+        let shift =
+            SymbolicSurprisal::term(5, Rat::from_integer(BigInt::from(7))).expect("a prime term");
         let shifted: BTreeMap<u64, SymbolicSurprisal> = base
             .iter()
             .map(|(name, form)| (*name, form.plus(&shift)))

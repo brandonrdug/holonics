@@ -444,10 +444,17 @@ mod tests {
     /// `soma/membrane/src`, `soma/life/src`.
     #[test]
     fn every_protected_root_resolves_in_this_repository() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(Path::parent)
-            .expect("the crate sits two levels under the repository root")
+        // Do not bake `CARGO_MANIFEST_DIR` into the test binary: this workspace deliberately
+        // shares a target directory with detached audit worktrees, and Cargo may lawfully reuse a
+        // binary compiled in one of them. Resolve the executing workspace at runtime instead.
+        let current = std::env::current_dir().expect("the test process has a current directory");
+        let root = current
+            .ancestors()
+            .find(|candidate| {
+                std::fs::read_to_string(candidate.join("Cargo.toml"))
+                    .is_ok_and(|manifest| manifest.contains("[workspace]"))
+            })
+            .expect("the test runs below a Cargo workspace")
             .to_path_buf();
         assert!(
             root.join("Cargo.toml").is_file(),

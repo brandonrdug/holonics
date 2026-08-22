@@ -48,7 +48,7 @@ use relational_geometry::Rat;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::exact_work::ExactWork;
-use crate::section_partition::{uncovered_regions, JunctionOutput, SectionRegion, SectionShape};
+use crate::section_partition::{JunctionOutput, SectionRegion, SectionShape, uncovered_regions};
 
 // -------------------------------------------------------------------------------------------------
 // the word
@@ -93,10 +93,9 @@ impl ReductionNode {
     fn relabel(&self, map: &dyn Fn(usize) -> usize) -> Self {
         match self {
             ReductionNode::Leaf(leaf) => ReductionNode::Leaf(map(*leaf)),
-            ReductionNode::Join(left, right) => ReductionNode::Join(
-                Box::new(left.relabel(map)),
-                Box::new(right.relabel(map)),
-            ),
+            ReductionNode::Join(left, right) => {
+                ReductionNode::Join(Box::new(left.relabel(map)), Box::new(right.relabel(map)))
+            }
         }
     }
 }
@@ -140,7 +139,9 @@ impl ReductionWord {
     /// reproduce the same node values and control nothing.
     pub fn reversed(&self, leaves: usize) -> Self {
         Self {
-            root: self.root.relabel(&move |leaf| leaves.saturating_sub(1) - leaf),
+            root: self
+                .root
+                .relabel(&move |leaf| leaves.saturating_sub(1) - leaf),
         }
     }
 
@@ -484,7 +485,10 @@ impl std::fmt::Display for ReductionDefect {
                  chart into a {output_dimension}-dimensional output"
             ),
             ReductionDefect::MetricShape { partial } => match partial {
-                Some(partial) => write!(formatter, "the metric declared on partial {partial} does not fit its chart"),
+                Some(partial) => write!(
+                    formatter,
+                    "the metric declared on partial {partial} does not fit its chart"
+                ),
                 None => write!(formatter, "the output metric does not fit the output chart"),
             },
             ReductionDefect::AdjointDefect {
@@ -588,7 +592,13 @@ fn widest_entry(matrix: &ExactRatMatrix) -> Rat {
     matrix
         .entries()
         .iter()
-        .map(|entry| if entry.numer().is_negative() { -entry } else { entry.clone() })
+        .map(|entry| {
+            if entry.numer().is_negative() {
+                -entry
+            } else {
+                entry.clone()
+            }
+        })
         .max()
         .unwrap_or_else(Rat::zero)
 }
@@ -698,8 +708,7 @@ impl ReductionJunction {
         }
 
         // ---- the charts and the metrics compose ----------------------------------------------
-        if self.codomain_metric.rows() != self.output_dimension
-            || !self.codomain_metric.is_square()
+        if self.codomain_metric.rows() != self.output_dimension || !self.codomain_metric.is_square()
         {
             defects.push(ReductionDefect::MetricShape { partial: None });
         }
@@ -892,7 +901,14 @@ impl ReductionJunction {
     ) -> WordReading {
         let mut nodes: Vec<NodeWidth> = Vec::new();
         let mut roundings = 0usize;
-        let value = self.walk(&word.root, carried, policy, &mut nodes, &mut roundings, defects);
+        let value = self.walk(
+            &word.root,
+            carried,
+            policy,
+            &mut nodes,
+            &mut roundings,
+            defects,
+        );
         let peak = nodes.iter().map(|node| node.width_bits).max().unwrap_or(0);
         for node in &nodes {
             if node.width_bits > self.overflow_aperture {
@@ -994,7 +1010,10 @@ impl ReductionJunction {
         let returned = adjoint.apply(&self.returned_covector)?;
         let transpose = partial.chart.transpose()?;
         let carried = transpose.multiply(&self.codomain_metric)?;
-        let residual = partial.domain_metric.multiply(&adjoint)?.subtract(&carried)?;
+        let residual = partial
+            .domain_metric
+            .multiply(&adjoint)?
+            .subtract(&carried)?;
         let bare_transpose_residual = partial
             .domain_metric
             .multiply(&transpose)?
@@ -1095,7 +1114,10 @@ mod tests {
         // 3. Value is forced by exactness; width is not, and it is the evidence.
         assert_eq!(receipt.declared.peak_width_bits, 9);
         assert_eq!(receipt.reversed.peak_width_bits, 5);
-        assert_ne!(receipt.declared.peak_width_bits, receipt.reversed.peak_width_bits);
+        assert_ne!(
+            receipt.declared.peak_width_bits,
+            receipt.reversed.peak_width_bits
+        );
         // One rounding per output coordinate, at the boundary, and the count is taken rather than
         // written down: a scalar output performs one `round_outward`.
         assert_eq!(receipt.roundings, 1);
@@ -1130,10 +1152,11 @@ mod tests {
     fn control_five_perturbed_rounding_at_every_node_is_refused_and_breaks_the_agreement() {
         let junction = scalar_junction(64, RoundingPolicy::AtEveryNode);
         let defects = junction.certify().expect_err("the policy is refused");
-        assert!(defects.iter().any(|defect| matches!(
-            defect,
-            ReductionDefect::RoundingNotAtBoundary { .. }
-        )));
+        assert!(
+            defects
+                .iter()
+                .any(|defect| matches!(defect, ReductionDefect::RoundingNotAtBoundary { .. }))
+        );
         // And the values genuinely part company under it.
         let carried: Vec<Vec<Rat>> = junction
             .partials
@@ -1207,7 +1230,10 @@ mod tests {
         for adjoint in &receipt.adjoints {
             // exact_linear::adjoint_defect is exactly zero for G_X^-1 T^T G_Y.
             assert!(adjoint.defect.is_zero());
-            assert_eq!(adjoint.returned.len(), junction.partials[adjoint.partial].carried.len());
+            assert_eq!(
+                adjoint.returned.len(),
+                junction.partials[adjoint.partial].carried.len()
+            );
         }
         // The second partial's chart is a rebase, so the adjoint carries the covector into a
         // genuinely different chart.
@@ -1222,10 +1248,12 @@ mod tests {
         let junction = charted_junction();
         let receipt = junction.certify().expect("the junction certifies");
         // At least one partial's bare transpose is refuted by the declared metrics.
-        assert!(receipt
-            .adjoints
-            .iter()
-            .any(|adjoint| !adjoint.bare_transpose_defect.is_zero()));
+        assert!(
+            receipt
+                .adjoints
+                .iter()
+                .any(|adjoint| !adjoint.bare_transpose_defect.is_zero())
+        );
         // And the claim is checked the same way the law checks its own: through exact_linear.
         let partial = &junction.partials[1];
         let transpose = partial.chart.transpose().expect("transpose");

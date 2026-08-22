@@ -423,7 +423,9 @@ impl TrainingEcology {
                 if self.standing.try_reserve_new_keys(1).is_err() {
                     continue;
                 }
-                let _ = self.standing.try_insert(fiber.clone(), FiberStanding::default());
+                let _ = self
+                    .standing
+                    .try_insert(fiber.clone(), FiberStanding::default());
             }
             if let Some(entry) = self.standing.get_mut(&fiber) {
                 let side = if confirmed {
@@ -1012,7 +1014,10 @@ impl TrainingPrediction {
     ///
     /// Nothing is authored: both sets are read off `candidates[*].support`, which the ecology
     /// already builds in order to name which occurrences founded a route.
-    pub fn two_sided_evidence(&self, actual: &[u8]) -> (BTreeSet<TransductionFiber>, BTreeSet<TransductionFiber>) {
+    pub fn two_sided_evidence(
+        &self,
+        actual: &[u8],
+    ) -> (BTreeSet<TransductionFiber>, BTreeSet<TransductionFiber>) {
         let mut spoke = BTreeSet::new();
         let mut confirmed = BTreeSet::new();
         for candidate in &self.candidates {
@@ -1343,7 +1348,6 @@ mod tests {
             .collect()
     }
 
-
     /// **The negative side is real evidence and it was already being computed.** A fiber whose
     /// routes spoke and returned something other than what the world returned is REFUTED, and the
     /// refutation is read off the prior prediction's own supports rather than authored.
@@ -1662,13 +1666,10 @@ mod tests {
             );
         }
         // And the remainder is not a second candidate population.
-        assert!(prediction
-            .candidates
+        assert!(prediction.candidates.iter().all(|candidate| !prediction
+            .withheld_below_rank
             .iter()
-            .all(|candidate| !prediction
-                .withheld_below_rank
-                .iter()
-                .any(|(_, path)| *path == candidate.path)));
+            .any(|(_, path)| *path == candidate.path)));
     }
 
     #[test]

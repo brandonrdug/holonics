@@ -13,11 +13,11 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentExecutionRequest, CurrentGeometry,
-    CurrentLineage, DirectedExecutionRequest, ExecutedContemporaryEvent, CpuLiveCurrentExecutor,
-    InterfaceCapability, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
-    LiveCurrentMachine, LiveMemory, RegionalExecutionRequest, RegionalRelationArc,
-    RegionalRelationCell, SparseStandingSurface,
+    ContemporaryEvent, CpuLiveCurrentExecutor, CurrentBoundaryPort, CurrentEvent,
+    CurrentExecutionRequest, CurrentGeometry, CurrentLineage, DirectedExecutionRequest,
+    ExecutedContemporaryEvent, InterfaceCapability, LiveConstituent, LiveCurrentError,
+    LiveCurrentExecutor, LiveCurrentMachine, LiveMemory, RegionalExecutionRequest,
+    RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
 };
 
 /// This driver's name at the plate mouth: `output/eros_formula_ecology/<name>-<sha256>.form`.

@@ -94,38 +94,116 @@ fn main() {
         "DEED H1 — THE PARTITION IS TYPED AND THE REDUCTION IS A JUNCTION",
     );
     line(&mut form, "");
-    line(&mut form, "the section partition carries coordinate regions with completeness and disjointness COMPUTED;");
-    line(&mut form, "the shared-output junction carries the fixed word, the per-node width, one directed");
-    line(&mut form, "outward rounding at the declared boundary, and the adjoint return into every partial chart.");
+    line(
+        &mut form,
+        "the section partition carries coordinate regions with completeness and disjointness COMPUTED;",
+    );
+    line(
+        &mut form,
+        "the shared-output junction carries the fixed word, the per-node width, one directed",
+    );
+    line(
+        &mut form,
+        "outward rounding at the declared boundary, and the adjoint return into every partial chart.",
+    );
     line(&mut form, "");
     line(&mut form, "APPARATUS FRAME");
-    line(&mut form, &format!("  source                            {root}"));
-    line(&mut form, "  cover                             HardwareCover::cpu_only() — NO DEVICE IS MOUNTED IN H1");
-    line(&mut form, &format!("  cpu declaration, resident lanes   {lanes}   (std::thread::available_parallelism)"));
-    line(&mut form, "  device chart lane faces           UNKNOWN — not consulted, and not zero");
-    line(&mut form, "  arithmetic                        exact: Rat / BigInt / BigUint / aligned i64. No float.");
-    line(&mut form, &format!("  declared boundary grain           2^-{DECLARED_BOUNDARY_EXPONENT}"));
-    line(&mut form, &format!("  declared overflow aperture        {DECLARED_OVERFLOW_APERTURE} bits"));
-    line(&mut form, &format!("  declared enactment aperture       {DECLARED_ENACTMENT_APERTURE} passages per site"));
-    line(&mut form, &format!("  declared transfer sector          {DECLARED_SECTOR_ENTRIES} section entries"));
-    line(&mut form, "  declared characteristic delays    1 / 2 / 3 chronology steps for the three species below.");
-    line(&mut form, "                                    DECLARED by this driver, in the order the species are named;");
-    line(&mut form, "                                    no apparatus was measured for any of them.");
-    line(&mut form, "  declared species capacities       every C is the caller's DeclaredSpecies field. The owner never");
-    line(&mut form, "                                    reads the cover; this driver couples C to the cpu's own lane count");
-    line(&mut form, "                                    BY HAND, and that coupling is the driver's and not the owner's.");
-    line(&mut form, &format!("  source row for the reduction      row {SOURCE_ROW} of the embedding population — the FIRST row"));
-    line(&mut form, "                                    the header offers, so the choice is the header's and not this driver's.");
+    line(
+        &mut form,
+        &format!("  source                            {root}"),
+    );
+    line(
+        &mut form,
+        "  cover                             HardwareCover::cpu_only() — NO DEVICE IS MOUNTED IN H1",
+    );
+    line(
+        &mut form,
+        &format!(
+            "  cpu declaration, resident lanes   {lanes}   (std::thread::available_parallelism)"
+        ),
+    );
+    line(
+        &mut form,
+        "  device chart lane faces           UNKNOWN — not consulted, and not zero",
+    );
+    line(
+        &mut form,
+        "  arithmetic                        exact: Rat / BigInt / BigUint / aligned i64. No float.",
+    );
+    line(
+        &mut form,
+        &format!("  declared boundary grain           2^-{DECLARED_BOUNDARY_EXPONENT}"),
+    );
+    line(
+        &mut form,
+        &format!("  declared overflow aperture        {DECLARED_OVERFLOW_APERTURE} bits"),
+    );
+    line(
+        &mut form,
+        &format!(
+            "  declared enactment aperture       {DECLARED_ENACTMENT_APERTURE} passages per site"
+        ),
+    );
+    line(
+        &mut form,
+        &format!("  declared transfer sector          {DECLARED_SECTOR_ENTRIES} section entries"),
+    );
+    line(
+        &mut form,
+        "  declared characteristic delays    1 / 2 / 3 chronology steps for the three species below.",
+    );
+    line(
+        &mut form,
+        "                                    DECLARED by this driver, in the order the species are named;",
+    );
+    line(
+        &mut form,
+        "                                    no apparatus was measured for any of them.",
+    );
+    line(
+        &mut form,
+        "  declared species capacities       every C is the caller's DeclaredSpecies field. The owner never",
+    );
+    line(
+        &mut form,
+        "                                    reads the cover; this driver couples C to the cpu's own lane count",
+    );
+    line(
+        &mut form,
+        "                                    BY HAND, and that coupling is the driver's and not the owner's.",
+    );
+    line(
+        &mut form,
+        &format!(
+            "  source row for the reduction      row {SOURCE_ROW} of the embedding population — the FIRST row"
+        ),
+    );
+    line(
+        &mut form,
+        "                                    the header offers, so the choice is the header's and not this driver's.",
+    );
     line(&mut form, "");
 
     // -------------------------------------------------------------------------------------------
     // 1. The real Gemma shapes, read from the source's own header.
     // -------------------------------------------------------------------------------------------
     let maps = [
-        ("q_proj", format!("model.language_model.layers.{LAYER}.self_attn.q_proj.weight")),
-        ("o_proj", format!("model.language_model.layers.{LAYER}.self_attn.o_proj.weight")),
-        ("gate_proj", format!("model.language_model.layers.{LAYER}.mlp.gate_proj.weight")),
-        ("down_proj", format!("model.language_model.layers.{LAYER}.mlp.down_proj.weight")),
+        (
+            "q_proj",
+            format!("model.language_model.layers.{LAYER}.self_attn.q_proj.weight"),
+        ),
+        (
+            "o_proj",
+            format!("model.language_model.layers.{LAYER}.self_attn.o_proj.weight"),
+        ),
+        (
+            "gate_proj",
+            format!("model.language_model.layers.{LAYER}.mlp.gate_proj.weight"),
+        ),
+        (
+            "down_proj",
+            format!("model.language_model.layers.{LAYER}.mlp.down_proj.weight"),
+        ),
     ];
     let mut shapes: Vec<(&str, String, usize, usize)> = Vec::new();
     line(&mut form, "THE REAL SHAPES, FROM THE SOURCE HEADER");
@@ -143,7 +221,10 @@ fn main() {
             }
             Ok(tensor) => line(
                 &mut form,
-                &format!("  {short:<12} OPEN — rank {} is not a map", tensor.shape.len()),
+                &format!(
+                    "  {short:<12} OPEN — rank {} is not a map",
+                    tensor.shape.len()
+                ),
             ),
             Err(error) => line(&mut form, &format!("  {short:<12} OPEN — {error}")),
         }
@@ -153,9 +234,18 @@ fn main() {
     // -------------------------------------------------------------------------------------------
     // 2. The tiling receipt on every shape at T in {1, 5, 16}.
     // -------------------------------------------------------------------------------------------
-    line(&mut form, "TILING RECEIPTS — the disjoint output partition (H.5), one cell per resident lane");
-    line(&mut form, "  cells are column bands of the output section; the last band is a NONMULTIPLE TAIL.");
-    line(&mut form, "  every cell reads the same token rows: one shared immutable standing, computed.");
+    line(
+        &mut form,
+        "TILING RECEIPTS — the disjoint output partition (H.5), one cell per resident lane",
+    );
+    line(
+        &mut form,
+        "  cells are column bands of the output section; the last band is a NONMULTIPLE TAIL.",
+    );
+    line(
+        &mut form,
+        "  every cell reads the same token rows: one shared immutable standing, computed.",
+    );
     line(&mut form, "");
     let mut first_receipt: Option<TilingReceipt> = None;
     for (short, _, out_features, in_features) in &shapes {
@@ -187,7 +277,11 @@ fn main() {
                             receipt.completeness.complete,
                             receipt.disjointness.disjoint,
                             receipt.disjointness.pairs_checked,
-                            if receipt.is_interchangeable() { "INTERCHANGEABLE" } else { "ORDERED" },
+                            if receipt.is_interchangeable() {
+                                "INTERCHANGEABLE"
+                            } else {
+                                "ORDERED"
+                            },
                         ),
                     );
                     let tail = receipt.cells.last().map(|cell| cell.write);
@@ -248,9 +342,18 @@ fn main() {
     // 3. The pressure receipt, one covector per species, on one real shape.
     // -------------------------------------------------------------------------------------------
     if let Some(receipt) = &first_receipt {
-        line(&mut form, "PRESSURE — one covector coordinate per resource species, per cell. NEVER SUMMED.");
-        line(&mut form, "  R = ceil(N/C) is receiver_current's own service dilation, taken from a founded and");
-        line(&mut form, "  radiated ExactReceiverCurrentLaw wherever the demand is inside the declared aperture.");
+        line(
+            &mut form,
+            "PRESSURE — one covector coordinate per resource species, per cell. NEVER SUMMED.",
+        );
+        line(
+            &mut form,
+            "  R = ceil(N/C) is receiver_current's own service dilation, taken from a founded and",
+        );
+        line(
+            &mut form,
+            "  radiated ExactReceiverCurrentLaw wherever the demand is inside the declared aperture.",
+        );
         for cell in receipt.pressure.iter().take(2) {
             line(&mut form, &format!("  cell {}", cell.cell));
             for species in &cell.species {
@@ -275,7 +378,10 @@ fn main() {
     // -------------------------------------------------------------------------------------------
     // 4. The reduction junction on REAL WORDS: the inner/K partition of one output coordinate.
     // -------------------------------------------------------------------------------------------
-    line(&mut form, "REDUCTION JUNCTION ON REAL WORDS — the inner/K partition (H.6)");
+    line(
+        &mut form,
+        "REDUCTION JUNCTION ON REAL WORDS — the inner/K partition (H.6)",
+    );
     let map_name = format!("model.language_model.layers.{LAYER}.self_attn.q_proj.weight");
     let row_name = "model.language_model.embed_tokens.weight".to_owned();
     let mut real_receipt: Option<(ReductionReceipt, ReductionJunction)> = None;
@@ -301,12 +407,33 @@ fn main() {
                     junction.word.written().chars().take(48).collect::<String>()
                 ),
             );
-            line(&mut form, &format!("  band width {bands} columns, last band is the nonmultiple tail"));
+            line(
+                &mut form,
+                &format!("  band width {bands} columns, last band is the nonmultiple tail"),
+            );
             match junction.certify() {
                 Ok(receipt) => {
                     line(&mut form, "");
-                    line(&mut form, &format!("  declared word   peak width {:>5} bits · span {:>3} · nodes {:>4} · roundings {}", receipt.declared.peak_width_bits, receipt.declared.dependency_span, receipt.declared.nodes.len(), receipt.declared.roundings));
-                    line(&mut form, &format!("  reversed control peak width {:>4} bits · span {:>3} · nodes {:>4} · roundings {}", receipt.reversed.peak_width_bits, receipt.reversed.dependency_span, receipt.reversed.nodes.len(), receipt.reversed.roundings));
+                    line(
+                        &mut form,
+                        &format!(
+                            "  declared word   peak width {:>5} bits · span {:>3} · nodes {:>4} · roundings {}",
+                            receipt.declared.peak_width_bits,
+                            receipt.declared.dependency_span,
+                            receipt.declared.nodes.len(),
+                            receipt.declared.roundings
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  reversed control peak width {:>4} bits · span {:>3} · nodes {:>4} · roundings {}",
+                            receipt.reversed.peak_width_bits,
+                            receipt.reversed.dependency_span,
+                            receipt.reversed.nodes.len(),
+                            receipt.reversed.roundings
+                        ),
+                    );
                     let differing_nodes = receipt
                         .declared
                         .nodes
@@ -314,18 +441,76 @@ fn main() {
                         .zip(&receipt.reversed.nodes)
                         .filter(|(left, right)| left.width_bits != right.width_bits)
                         .count();
-                    line(&mut form, &format!("  words agree on the value        {}", receipt.words_agree));
-                    line(&mut form, &format!("  nodes standing at DIFFERENT widths between the two words   {} of {}", differing_nodes, receipt.declared.nodes.len()));
-                    line(&mut form, &format!("  exact value before rounding    {}", short_rat(&receipt.declared.value[0])));
-                    line(&mut form, &format!("  boundary value (2^-{})        {}", receipt.boundary_exponent, receipt.boundary_value[0]));
-                    line(&mut form, &format!("  boundary residual              {}", short_rat(&receipt.boundary_residual[0])));
-                    line(&mut form, &format!("  roundings                      {} — COUNTED round_outward invocations on the certified", receipt.roundings));
-                    line(&mut form, "                                 path: one per output coordinate, at the declared boundary, and");
-                    line(&mut form, "                                 none inside the tree. It was the literal 1 until 2026-08-19.");
-                    line(&mut form, &format!("  inner partition: uncovered {} · overlaps {}", receipt.inner_uncovered.len(), receipt.inner_overlaps.len()));
-                    line(&mut form, "  the first four nodes of each word, with the width they stood at:");
-                    for (which, reading) in [("declared", &receipt.declared), ("reversed", &receipt.reversed)] {
-                        for node in reading.nodes.iter().filter(|node| node.leaves.len() > 1).take(3) {
+                    line(
+                        &mut form,
+                        &format!("  words agree on the value        {}", receipt.words_agree),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  nodes standing at DIFFERENT widths between the two words   {} of {}",
+                            differing_nodes,
+                            receipt.declared.nodes.len()
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  exact value before rounding    {}",
+                            short_rat(&receipt.declared.value[0])
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  boundary value (2^-{})        {}",
+                            receipt.boundary_exponent, receipt.boundary_value[0]
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  boundary residual              {}",
+                            short_rat(&receipt.boundary_residual[0])
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  roundings                      {} — COUNTED round_outward invocations on the certified",
+                            receipt.roundings
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        "                                 path: one per output coordinate, at the declared boundary, and",
+                    );
+                    line(
+                        &mut form,
+                        "                                 none inside the tree. It was the literal 1 until 2026-08-19.",
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "  inner partition: uncovered {} · overlaps {}",
+                            receipt.inner_uncovered.len(),
+                            receipt.inner_overlaps.len()
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        "  the first four nodes of each word, with the width they stood at:",
+                    );
+                    for (which, reading) in [
+                        ("declared", &receipt.declared),
+                        ("reversed", &receipt.reversed),
+                    ] {
+                        for node in reading
+                            .nodes
+                            .iter()
+                            .filter(|node| node.leaves.len() > 1)
+                            .take(3)
+                        {
                             line(
                                 &mut form,
                                 &format!(
@@ -338,11 +523,51 @@ fn main() {
                             );
                         }
                     }
-                    line(&mut form, "  the adjoint return into every partial chart, under the DECLARED metrics:");
-                    line(&mut form, &format!("    partials reached               {} of {}", receipt.adjoints.len(), receipt.partials.len()));
-                    line(&mut form, &format!("    every adjoint defect zero      {}", receipt.adjoints.iter().all(|adjoint| adjoint.defect.is_zero())));
-                    line(&mut form, &format!("    bare-transpose defects nonzero {} of {}", receipt.adjoints.iter().filter(|adjoint| !adjoint.bare_transpose_defect.is_zero()).count(), receipt.adjoints.len()));
-                    line(&mut form, &format!("    exact work: additions {} · multiplications {} · entries {} · peak bits {} · span {}", receipt.work.additions, receipt.work.multiplications, receipt.work.entries_written, receipt.work.peak_bits, receipt.work.dependency_span));
+                    line(
+                        &mut form,
+                        "  the adjoint return into every partial chart, under the DECLARED metrics:",
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "    partials reached               {} of {}",
+                            receipt.adjoints.len(),
+                            receipt.partials.len()
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "    every adjoint defect zero      {}",
+                            receipt
+                                .adjoints
+                                .iter()
+                                .all(|adjoint| adjoint.defect.is_zero())
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "    bare-transpose defects nonzero {} of {}",
+                            receipt
+                                .adjoints
+                                .iter()
+                                .filter(|adjoint| !adjoint.bare_transpose_defect.is_zero())
+                                .count(),
+                            receipt.adjoints.len()
+                        ),
+                    );
+                    line(
+                        &mut form,
+                        &format!(
+                            "    exact work: additions {} · multiplications {} · entries {} · peak bits {} · span {}",
+                            receipt.work.additions,
+                            receipt.work.multiplications,
+                            receipt.work.entries_written,
+                            receipt.work.peak_bits,
+                            receipt.work.dependency_span
+                        ),
+                    );
                     real_receipt = Some((receipt, junction));
                 }
                 Err(defects) => {
@@ -363,7 +588,9 @@ fn main() {
     // A failed header read REFUSES the controls; it does not run them on authored shapes. The
     // `.unwrap_or((2048, 2560))` that stood here would have reported seven verdicts about a section
     // no source declared.
-    let Some((out_features, in_features)) = shapes.first().map(|(_, _, rows, columns)| (*rows, *columns))
+    let Some((out_features, in_features)) = shapes
+        .first()
+        .map(|(_, _, rows, columns)| (*rows, *columns))
     else {
         println!(
             "the source declared none of the four maps, so the controls have no material and are \
@@ -473,8 +700,18 @@ fn main() {
             shape,
             populations: BTreeMap::new(),
             cells: vec![
-                SectionCell { index: 0, write: whole, reads: Vec::new(), partial_of: None },
-                SectionCell { index: 1, write: whole, reads: Vec::new(), partial_of: None },
+                SectionCell {
+                    index: 0,
+                    write: whole,
+                    reads: Vec::new(),
+                    partial_of: None,
+                },
+                SectionCell {
+                    index: 1,
+                    write: whole,
+                    reads: Vec::new(),
+                    partial_of: None,
+                },
             ],
         }
         .certify(&cover, &[], &resources, "h1_control_three");
@@ -488,13 +725,19 @@ fn main() {
                     index: 0,
                     write: whole,
                     reads: Vec::new(),
-                    partial_of: Some(PartialAddress { junction: 0, partial: 0 }),
+                    partial_of: Some(PartialAddress {
+                        junction: 0,
+                        partial: 0,
+                    }),
                 },
                 SectionCell {
                     index: 1,
                     write: whole,
                     reads: Vec::new(),
-                    partial_of: Some(PartialAddress { junction: 0, partial: 1 }),
+                    partial_of: Some(PartialAddress {
+                        junction: 0,
+                        partial: 1,
+                    }),
                 },
             ],
         }
@@ -682,7 +925,10 @@ fn main() {
                 perturbation: "the bare transpose is claimed as the adjoint under the declared G_Y",
                 verdict: verdict(
                     receipt.adjoints.len() == receipt.partials.len()
-                        && receipt.adjoints.iter().all(|adjoint| adjoint.defect.is_zero())
+                        && receipt
+                            .adjoints
+                            .iter()
+                            .all(|adjoint| adjoint.defect.is_zero())
                         && bare == receipt.adjoints.len(),
                 ),
                 control_says: format!(
@@ -819,27 +1065,72 @@ fn main() {
     // -------------------------------------------------------------------------------------------
     // 6. Report.
     // -------------------------------------------------------------------------------------------
-    line(&mut form, "THE SEVEN CONTROLS — each is a test that FAILS under its perturbation");
+    line(
+        &mut form,
+        "THE SEVEN CONTROLS — each is a test that FAILS under its perturbation",
+    );
     line(&mut form, "");
     controls.sort_by_key(|control| control.number);
     for control in &controls {
-        line(&mut form, &format!("  [{}] {}  — {}", control.number, control.verdict, control.name));
-        line(&mut form, &format!("      control      {}", control.control_says));
-        line(&mut form, &format!("      perturbation {}", control.perturbation));
-        line(&mut form, &format!("      perturbed    {}", control.perturbed_says));
+        line(
+            &mut form,
+            &format!(
+                "  [{}] {}  — {}",
+                control.number, control.verdict, control.name
+            ),
+        );
+        line(
+            &mut form,
+            &format!("      control      {}", control.control_says),
+        );
+        line(
+            &mut form,
+            &format!("      perturbation {}", control.perturbation),
+        );
+        line(
+            &mut form,
+            &format!("      perturbed    {}", control.perturbed_says),
+        );
         line(&mut form, "");
     }
 
     line(&mut form, "WHAT THIS DEED DOES NOT CLAIM");
-    line(&mut form, "  - no device was mounted; every apparatus capacity above is a DECLARATION, and every");
-    line(&mut form, "    device-chart face is unknown rather than zero;");
-    line(&mut form, "  - value agreement between the word and its reversed control is FORCED by exactness. The");
-    line(&mut form, "    evidence is the per-node width, which differs, and the aperture refusal, which does not;");
-    line(&mut form, "  - whether the two words DISAGREE under a per-node rounding is a property of the MATERIAL and");
-    line(&mut form, "    not of the policy — on symmetric material they agree — so it decides no verdict here;");
-    line(&mut form, "  - a partition is a decomposition and never a schedule, and tiling is not compression;");
-    line(&mut form, "  - CompiledPlan::occurrence_work was added as a read-only accessor and is NOT exercised");
-    line(&mut form, "    here: it needs a compiled plan, which needs the card.");
+    line(
+        &mut form,
+        "  - no device was mounted; every apparatus capacity above is a DECLARATION, and every",
+    );
+    line(
+        &mut form,
+        "    device-chart face is unknown rather than zero;",
+    );
+    line(
+        &mut form,
+        "  - value agreement between the word and its reversed control is FORCED by exactness. The",
+    );
+    line(
+        &mut form,
+        "    evidence is the per-node width, which differs, and the aperture refusal, which does not;",
+    );
+    line(
+        &mut form,
+        "  - whether the two words DISAGREE under a per-node rounding is a property of the MATERIAL and",
+    );
+    line(
+        &mut form,
+        "    not of the policy — on symmetric material they agree — so it decides no verdict here;",
+    );
+    line(
+        &mut form,
+        "  - a partition is a decomposition and never a schedule, and tiling is not compression;",
+    );
+    line(
+        &mut form,
+        "  - CompiledPlan::occurrence_work was added as a read-only accessor and is NOT exercised",
+    );
+    line(
+        &mut form,
+        "    here: it needs a compiled plan, which needs the card.",
+    );
 
     let form_text = form;
     print!("{form_text}");
@@ -862,11 +1153,7 @@ fn line(form: &mut String, text: &str) {
 }
 
 fn verdict(passed: bool) -> &'static str {
-    if passed {
-        "PASS"
-    } else {
-        "OPEN"
-    }
+    if passed { "PASS" } else { "OPEN" }
 }
 
 fn short_rat(value: &Rat) -> String {
@@ -900,7 +1187,9 @@ fn enacted_face(enacted: &holonic_engine::section_partition::EnactedCurrent) -> 
             format!("UNKNOWN — demand {demand} exceeds the declared enactment aperture {aperture}")
         }
         EnactedCurrent::NoDemand { face } => {
-            format!("NO DEMAND — the {face:?} face carries no material here. A zero, not an unknown")
+            format!(
+                "NO DEMAND — the {face:?} face carries no material here. A zero, not an unknown"
+            )
         }
     }
 }
@@ -987,8 +1276,14 @@ fn output_band_partition(
         column = end;
     }
     let mut populations = BTreeMap::new();
-    populations.insert("map".to_owned(), SectionShape::of(out_features, in_features, 0));
-    populations.insert("tokens".to_owned(), SectionShape::of(tokens, in_features, 0));
+    populations.insert(
+        "map".to_owned(),
+        SectionShape::of(out_features, in_features, 0),
+    );
+    populations.insert(
+        "tokens".to_owned(),
+        SectionShape::of(tokens, in_features, 0),
+    );
     SectionPartition {
         lineage: SectionLineage {
             source: "gemma".to_owned(),

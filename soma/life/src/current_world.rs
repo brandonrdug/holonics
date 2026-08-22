@@ -13,8 +13,8 @@ use body::{
 };
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent, CurrentGeometry,
-    CurrentLineage, DirectedCurrentRelation, CpuLiveCurrentExecutor, InterfaceCapability,
+    ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
+    CurrentEvent, CurrentGeometry, CurrentLineage, DirectedCurrentRelation, InterfaceCapability,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, ReceiverCausalPassage,
     RegionalRelationArc, RegionalRelationCell, RegionalSupportSection,
 };

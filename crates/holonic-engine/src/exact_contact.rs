@@ -333,7 +333,10 @@ mod tests {
     }
 
     fn rats(values: &[i64]) -> Vec<Rat> {
-        values.iter().map(|v| Rat::from_integer((*v).into())).collect()
+        values
+            .iter()
+            .map(|v| Rat::from_integer((*v).into()))
+            .collect()
     }
 
     #[test]
@@ -353,8 +356,8 @@ mod tests {
     #[test]
     fn the_two_faces_close_over_one_denominator() {
         for (aim, left, right) in [(3i64, 5i64, 29i64), (-7, 13, 41), (0, 2, 3), (6, 4, 9)] {
-            let contact =
-                ExactContact::of_brackets(aim.into(), left.into(), right.into(), 0, 0).expect("reads");
+            let contact = ExactContact::of_brackets(aim.into(), left.into(), right.into(), 0, 0)
+                .expect("reads");
             assert!(contact.closes(), "cos² + sin² must be exactly 1 at {aim}");
             let cohere = contact.cohere_square();
             let turn = contact.turn_square();
@@ -365,8 +368,10 @@ mod tests {
 
     #[test]
     fn the_square_deletes_the_hand_and_the_hand_is_returned_beside_it() {
-        let cohering = ExactContact::of_brackets(7.into(), 5.into(), 29.into(), 0, 0).expect("reads");
-        let anti = ExactContact::of_brackets((-7).into(), 5.into(), 29.into(), 0, 0).expect("reads");
+        let cohering =
+            ExactContact::of_brackets(7.into(), 5.into(), 29.into(), 0, 0).expect("reads");
+        let anti =
+            ExactContact::of_brackets((-7).into(), 5.into(), 29.into(), 0, 0).expect("reads");
         // The squared face cannot tell them apart -- that is the quotient by the phase circle.
         assert_eq!(cohering.cohere_square(), anti.cohere_square());
         // And the hand is what the quotient collapsed.
@@ -466,7 +471,8 @@ mod tests {
         // The refusal names the side and hands back the other span rather than reporting a
         // direction the geometry does not have.
         let signature = Signature::declared(rats(&[-1, 1, 1]));
-        let arrow = Arrow::between(&signature, &rats(&[1, 1, 0]), &rats(&[1, 0, 1])).expect("arrow");
+        let arrow =
+            Arrow::between(&signature, &rats(&[1, 1, 0]), &rats(&[1, 0, 1])).expect("arrow");
         assert!(arrow.left_span().is_zero() && arrow.right_span().is_zero());
         assert!(matches!(
             ExactContact::of_arrow(&arrow),

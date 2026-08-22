@@ -239,4 +239,50 @@ theorem theFlippedStressFailsOnTheFlex :
         + (1 : ℚ) * dot (u1 - u3) (u1 - u3) < 0 := by
   norm_num [dot, u1, u2, u3]
 
+/-! ## 4. A shared junction intersects continuation fibres
+
+The protein-fold deed needs no protein theorem. Its reusable law is the exact linear statement
+behind a junction carrying two simultaneous constraints. If `F` and `G` read two local constraint
+faces on the same continuation space, the combined receiver is `F.prod G`, and its invisible
+continuations are precisely `ker F ⊓ ker G`. A count such as “two constraints” cannot say this:
+the intersection may equal either kernel, may be strictly smaller, and its dimension depends on
+the actual maps. The separating theorem below exhibits the strict case without assuming finite
+dimension or choosing a basis. -/
+
+section SharedJunction
+
+variable {R V W₁ W₂ : Type*} [Semiring R]
+  [AddCommMonoid V] [Module R V]
+  [AddCommMonoid W₁] [Module R W₁]
+  [AddCommMonoid W₂] [Module R W₂]
+
+/-- **The shared-junction continuation fibre is the intersection of the two local fibres.**
+
+This is the exact object that a shared vertex contributes: not an independently subtracted degree
+count, but the pullback of the two zero sections. -/
+theorem theSharedJunctionFibreIsTheIntersection (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) :
+    LinearMap.ker (F.prod G) = LinearMap.ker F ⊓ LinearMap.ker G :=
+  LinearMap.ker_prod F G
+
+/-- Removing the second contact can only enlarge the continuation fibre. -/
+theorem removingTheSecondConstraintCanOnlyEnlargeTheFibre (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) :
+    LinearMap.ker (F.prod G) ≤ LinearMap.ker F := by
+  rw [theSharedJunctionFibreIsTheIntersection]
+  exact inf_le_left
+
+/-- **One continuation accepted by `F` and rejected by `G` is an exact separator.** It lies in the
+fibre after the second contact is removed and not in the joined fibre before removal. Thus the
+enlargement is material whenever such an occurrence exists; it is not inferred from the number of
+maps. -/
+theorem aContinuationSeenOnlyByTheSecondConstraintIsASeparator
+    (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) (x : V) (hF : F x = 0) (hG : G x ≠ 0) :
+    x ∈ LinearMap.ker F ∧ x ∉ LinearMap.ker (F.prod G) := by
+  constructor
+  · exact hF
+  · rw [theSharedJunctionFibreIsTheIntersection]
+    simp only [Submodule.mem_inf, LinearMap.mem_ker]
+    exact fun h => hG h.2
+
+end SharedJunction
+
 end Soma.Holonics.Millennium.Rigidity

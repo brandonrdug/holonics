@@ -56,12 +56,20 @@ impl Table {
         let path = dir.join(name);
         let text = std::fs::read_to_string(&path).ok()?;
         let mut lines = text.lines();
-        let header: Vec<String> = lines.next()?.split('\t').map(|c| c.trim().to_owned()).collect();
+        let header: Vec<String> = lines
+            .next()?
+            .split('\t')
+            .map(|c| c.trim().to_owned())
+            .collect();
         let rows: Vec<Vec<String>> = lines
             .filter(|line| !line.trim().is_empty())
             .map(|line| line.split('\t').map(|c| c.trim().to_owned()).collect())
             .collect();
-        Some(Table { path: path.display().to_string(), header, rows })
+        Some(Table {
+            path: path.display().to_string(),
+            header,
+            rows,
+        })
     }
 
     pub fn index(&self, column: &str) -> Option<usize> {
@@ -70,19 +78,35 @@ impl Table {
 
     /// The cell, or `unknown` — for an absent column, a short row, an empty cell, or the literal.
     pub fn cell<'a>(&'a self, row: &'a [String], column: &str) -> &'a str {
-        let Some(index) = self.index(column) else { return UNKNOWN };
-        let Some(value) = row.get(index) else { return UNKNOWN };
-        if value.is_empty() { UNKNOWN } else { value.as_str() }
+        let Some(index) = self.index(column) else {
+            return UNKNOWN;
+        };
+        let Some(value) = row.get(index) else {
+            return UNKNOWN;
+        };
+        if value.is_empty() {
+            UNKNOWN
+        } else {
+            value.as_str()
+        }
     }
 
     pub fn u64_at(&self, row: &[String], column: &str) -> Option<u64> {
         let cell = self.cell(row, column);
-        if cell == UNKNOWN { None } else { cell.parse::<u64>().ok() }
+        if cell == UNKNOWN {
+            None
+        } else {
+            cell.parse::<u64>().ok()
+        }
     }
 
     pub fn f64_at(&self, row: &[String], column: &str) -> Option<f64> {
         let cell = self.cell(row, column);
-        if cell == UNKNOWN { None } else { cell.parse::<f64>().ok() }
+        if cell == UNKNOWN {
+            None
+        } else {
+            cell.parse::<f64>().ok()
+        }
     }
 }
 
@@ -115,7 +139,11 @@ impl FormFacts {
                 Err(_) => missing.push((*name).to_owned()),
             }
         }
-        FormFacts { facts, read, missing }
+        FormFacts {
+            facts,
+            read,
+            missing,
+        }
     }
 
     pub fn get(&self, key: &str) -> &str {
@@ -148,7 +176,13 @@ pub struct KernelClass {
     pub min_ns: Option<u64>,
     pub max_ns: Option<u64>,
     /// Distinct launch geometries: (grid, block) → (count, median, min, max duration).
-    pub geometries: Vec<((u64, u64, u64, u64, u64, u64), usize, Option<u64>, Option<u64>, Option<u64>)>,
+    pub geometries: Vec<(
+        (u64, u64, u64, u64, u64, u64),
+        usize,
+        Option<u64>,
+        Option<u64>,
+        Option<u64>,
+    )>,
     pub registers_per_thread: Option<u64>,
     pub static_shared_octets: Option<u64>,
     pub dynamic_shared_octets: Option<u64>,
@@ -170,7 +204,11 @@ impl KernelClass {
     pub fn waves_per_sm(&self, resident_lanes: Option<u64>) -> Option<f64> {
         let threads = self.threads_per_launch? as f64;
         let lanes = resident_lanes? as f64;
-        if lanes == 0.0 { None } else { Some(threads / lanes) }
+        if lanes == 0.0 {
+            None
+        } else {
+            Some(threads / lanes)
+        }
     }
 }
 
@@ -207,12 +245,20 @@ pub fn read_timeline(table: &Table) -> Timeline {
     }
     let mut classes = Vec::new();
     for (name, rows) in &by_name {
-        let mut durations: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "duration_ns")).collect();
-        let summed = if durations.is_empty() { None } else { Some(durations.iter().sum()) };
+        let mut durations: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "duration_ns"))
+            .collect();
+        let summed = if durations.is_empty() {
+            None
+        } else {
+            Some(durations.iter().sum())
+        };
         let min = durations.iter().copied().min();
         let max = durations.iter().copied().max();
         let med = median(&mut durations);
-        let mut geometry_groups: BTreeMap<(u64, u64, u64, u64, u64, u64), Vec<u64>> = BTreeMap::new();
+        let mut geometry_groups: BTreeMap<(u64, u64, u64, u64, u64, u64), Vec<u64>> =
+            BTreeMap::new();
         for row in rows {
             let g = (
                 table.u64_at(row, "grid_x").unwrap_or(0),
@@ -241,7 +287,10 @@ pub fn read_timeline(table: &Table) -> Timeline {
         let mut extents: Vec<(u64, usize)> = Vec::new();
         for (g, count, _, _, _) in &geometries {
             if g.0 > 0 && g.3 > 0 {
-                extents.push((g.0 * g.1.max(1) * g.2.max(1) * g.3 * g.4.max(1) * g.5.max(1), *count));
+                extents.push((
+                    g.0 * g.1.max(1) * g.2.max(1) * g.3 * g.4.max(1) * g.5.max(1),
+                    *count,
+                ));
             }
         }
         let threads = extents.iter().map(|(e, _)| *e).max();
@@ -262,13 +311,22 @@ pub fn read_timeline(table: &Table) -> Timeline {
             threads_per_launch_min: threads_min,
             launches_under_one_wave: None,
             launches_with_extent: with_extent,
-            launch_indices: rows.iter().filter_map(|r| table.u64_at(r, "launch_index")).collect(),
+            launch_indices: rows
+                .iter()
+                .filter_map(|r| table.u64_at(r, "launch_index"))
+                .collect(),
         });
     }
     let mut graphs = Vec::new();
     for (index, rows) in &by_graph {
-        let starts: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "start_ns")).collect();
-        let ends: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "end_ns")).collect();
+        let starts: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "start_ns"))
+            .collect();
+        let ends: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "end_ns"))
+            .collect();
         let first_start = starts.iter().copied().min();
         let last_end = ends.iter().copied().max();
         let wall = match (first_start, last_end) {
@@ -276,13 +334,21 @@ pub fn read_timeline(table: &Table) -> Timeline {
             _ => None,
         };
         let summed: Option<u64> = {
-            let ds: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "duration_ns")).collect();
-            if ds.len() == rows.len() && !ds.is_empty() { Some(ds.iter().sum()) } else { None }
+            let ds: Vec<u64> = rows
+                .iter()
+                .filter_map(|r| table.u64_at(r, "duration_ns"))
+                .collect();
+            if ds.len() == rows.len() && !ds.is_empty() {
+                Some(ds.iter().sum())
+            } else {
+                None
+            }
         };
         // intervals: the union and the greatest simultaneous population
         let mut intervals: Vec<(u64, u64)> = Vec::new();
         for row in rows {
-            if let (Some(s), Some(e)) = (table.u64_at(row, "start_ns"), table.u64_at(row, "end_ns")) {
+            if let (Some(s), Some(e)) = (table.u64_at(row, "start_ns"), table.u64_at(row, "end_ns"))
+            {
                 intervals.push((s, e));
             }
         }
@@ -323,7 +389,11 @@ pub fn read_timeline(table: &Table) -> Timeline {
                 .filter(|r| table.cell(r, "kernel").starts_with(CENSUS_PREFIX))
                 .filter_map(|r| table.u64_at(r, "duration_ns"))
                 .collect();
-            if ds.is_empty() { None } else { Some(ds.iter().sum()) }
+            if ds.is_empty() {
+                None
+            } else {
+                Some(ds.iter().sum())
+            }
         };
         graphs.push(GraphLaunch {
             index: *index,
@@ -338,7 +408,11 @@ pub fn read_timeline(table: &Table) -> Timeline {
             census_ns: census,
         });
     }
-    Timeline { classes, total_launches: table.rows.len(), graphs }
+    Timeline {
+        classes,
+        total_launches: table.rows.len(),
+        graphs,
+    }
 }
 
 /// The `ncu` faces, per kernel name, when `scheduler-states.tsv` carried them.
@@ -364,12 +438,18 @@ pub struct SchedulerFace {
 pub fn read_scheduler(table: &Table) -> BTreeMap<String, SchedulerFace> {
     let mut grouped: BTreeMap<String, Vec<&Vec<String>>> = BTreeMap::new();
     for row in &table.rows {
-        grouped.entry(table.cell(row, "kernel").to_owned()).or_default().push(row);
+        grouped
+            .entry(table.cell(row, "kernel").to_owned())
+            .or_default()
+            .push(row);
     }
     let mut out: BTreeMap<String, SchedulerFace> = BTreeMap::new();
     for (kernel, rows) in grouped {
         let median_of = |column: &str| -> Option<f64> {
-            let mut values: Vec<f64> = rows.iter().filter_map(|r| table.f64_at(r, column)).collect();
+            let mut values: Vec<f64> = rows
+                .iter()
+                .filter_map(|r| table.f64_at(r, column))
+                .collect();
             if values.is_empty() {
                 return None;
             }
@@ -383,7 +463,12 @@ pub fn read_scheduler(table: &Table) -> BTreeMap<String, SchedulerFace> {
                 *stalls.entry(stall.to_owned()).or_default() += 1;
             }
         }
-        let stall_top1 = stalls.iter().max_by_key(|(_, count)| **count).map(|(name, count)| format!("{name} (in {count} of {} profiled launches)", rows.len()));
+        let stall_top1 = stalls
+            .iter()
+            .max_by_key(|(_, count)| **count)
+            .map(|(name, count)| {
+                format!("{name} (in {count} of {} profiled launches)", rows.len())
+            });
         out.insert(
             kernel.clone(),
             SchedulerFace {
@@ -437,11 +522,15 @@ pub const RUBRIC_ORDER: [&str; 9] = [
 ];
 
 fn fmt_opt_u64(value: Option<u64>) -> String {
-    value.map(|v| v.to_string()).unwrap_or_else(|| UNKNOWN.to_owned())
+    value
+        .map(|v| v.to_string())
+        .unwrap_or_else(|| UNKNOWN.to_owned())
 }
 
 fn fmt_opt_f64(value: Option<f64>, places: usize) -> String {
-    value.map(|v| format!("{v:.places$}", places = places)).unwrap_or_else(|| UNKNOWN.to_owned())
+    value
+        .map(|v| format!("{v:.places$}", places = places))
+        .unwrap_or_else(|| UNKNOWN.to_owned())
 }
 
 /// Classify one kernel class. The order of the rubric decides; every class that applied is kept.
@@ -463,7 +552,10 @@ pub fn classify_kernel(
     let median_ns = class.median_ns;
     deciding.push(("median_duration_ns".to_owned(), fmt_opt_u64(median_ns)));
     deciding.push(("launches".to_owned(), class.launches.to_string()));
-    deciding.push(("launch_share_of_graph".to_owned(), fmt_opt_f64(class_share, 4)));
+    deciding.push((
+        "launch_share_of_graph".to_owned(),
+        fmt_opt_f64(class_share, 4),
+    ));
     deciding.push(("equal_share".to_owned(), fmt_opt_f64(equal_share, 4)));
     let launch_latency = match (median_ns, class_share, equal_share) {
         (Some(m), Some(s), Some(e)) => Some(m <= 8_000 && s >= e),
@@ -488,14 +580,29 @@ pub fn classify_kernel(
         }
         under_one = Some(count);
     }
-    deciding.push(("threads_per_launch_widest".to_owned(), fmt_opt_u64(class.threads_per_launch)));
-    deciding.push(("threads_per_launch_narrowest".to_owned(), fmt_opt_u64(class.threads_per_launch_min)));
-    deciding.push(("device_resident_lanes".to_owned(), fmt_opt_u64(resident_lanes)));
-    deciding.push(("waves_per_card_widest_launch".to_owned(), fmt_opt_f64(waves, 4)));
+    deciding.push((
+        "threads_per_launch_widest".to_owned(),
+        fmt_opt_u64(class.threads_per_launch),
+    ));
+    deciding.push((
+        "threads_per_launch_narrowest".to_owned(),
+        fmt_opt_u64(class.threads_per_launch_min),
+    ));
+    deciding.push((
+        "device_resident_lanes".to_owned(),
+        fmt_opt_u64(resident_lanes),
+    ));
+    deciding.push((
+        "waves_per_card_widest_launch".to_owned(),
+        fmt_opt_f64(waves, 4),
+    ));
     deciding.push((
         "launches_below_one_wave".to_owned(),
         match under_one {
-            Some(count) => format!("{count} of {} launch(es) with a stated extent", class.launches_with_extent),
+            Some(count) => format!(
+                "{count} of {} launch(es) with a stated extent",
+                class.launches_with_extent
+            ),
             None => UNKNOWN.to_owned(),
         },
     ));
@@ -517,12 +624,19 @@ pub fn classify_kernel(
             if *launches >= 2 {
                 if let (Some(low), Some(high)) = (low, high) {
                     let ratio = *high as f64 / (*low).max(1) as f64;
-                    fixed_extent_ratio = Some(fixed_extent_ratio.map(|held: f64| held.max(ratio)).unwrap_or(ratio));
+                    fixed_extent_ratio = Some(
+                        fixed_extent_ratio
+                            .map(|held: f64| held.max(ratio))
+                            .unwrap_or(ratio),
+                    );
                     let _ = g;
                 }
             }
         }
-        deciding.push(("fixed_extent_duration_ratio".to_owned(), fmt_opt_f64(fixed_extent_ratio, 3)));
+        deciding.push((
+            "fixed_extent_duration_ratio".to_owned(),
+            fmt_opt_f64(fixed_extent_ratio, 3),
+        ));
         deciding.push((
             "fixed_extent_rule".to_owned(),
             "same grid AND block (so the same output count), widest ÷ narrowest duration; K is in no telemetry column".to_owned(),
@@ -540,7 +654,10 @@ pub fn classify_kernel(
     deciding.push(("dram_throughput_pct".to_owned(), fmt_opt_f64(dram, 2)));
     deciding.push(("sm_throughput_pct".to_owned(), fmt_opt_f64(sm, 2)));
     deciding.push(("no_eligible_pct".to_owned(), fmt_opt_f64(no_eligible, 2)));
-    deciding.push(("stall_top1".to_owned(), stall_top1.clone().unwrap_or_else(|| UNKNOWN.to_owned())));
+    deciding.push((
+        "stall_top1".to_owned(),
+        stall_top1.clone().unwrap_or_else(|| UNKNOWN.to_owned()),
+    ));
     if dram.is_none() {
         ncu_needed.push("MEMORY-BOUND (dram_throughput_pct)".to_owned());
     } else if dram.unwrap() >= 60.0 {
@@ -565,7 +682,11 @@ pub fn classify_kernel(
         }
     }
     let class_name = ordered.first().cloned().unwrap_or_else(|| {
-        if median_ns.is_none() { UNKNOWN.to_owned() } else { "UNCLASSIFIED (no rubric class applied)".to_owned() }
+        if median_ns.is_none() {
+            UNKNOWN.to_owned()
+        } else {
+            "UNCLASSIFIED (no rubric class applied)".to_owned()
+        }
     });
     // measured: every metric the rubric can ask for was reachable, ncu included, so the classes it
     // did NOT select were rejected on measurement rather than on absence.
@@ -583,13 +704,20 @@ pub fn classify_kernel(
     } else {
         let lo = class.launch_indices.iter().copied().min().unwrap_or(0);
         let hi = class.launch_indices.iter().copied().max().unwrap_or(0);
-        format!("kernel-timeline.tsv launch_index {lo}..{hi} ({} rows)", class.launch_indices.len())
+        format!(
+            "kernel-timeline.tsv launch_index {lo}..{hi} ({} rows)",
+            class.launch_indices.len()
+        )
     };
     let verdict = format!(
         "{} → {} ({})",
         class.name,
         class_name,
-        if ordered.len() > 1 { format!("secondary {}", ordered[1..].join(", ")) } else { "no secondary class".to_owned() }
+        if ordered.len() > 1 {
+            format!("secondary {}", ordered[1..].join(", "))
+        } else {
+            "no secondary class".to_owned()
+        }
     );
     Classification {
         object: class.name.clone(),
@@ -616,14 +744,27 @@ pub struct ApiFace {
 pub fn read_api(table: &Table) -> Vec<ApiFace> {
     let mut by_api: BTreeMap<String, Vec<&Vec<String>>> = BTreeMap::new();
     for row in &table.rows {
-        by_api.entry(table.cell(row, "api").to_owned()).or_default().push(row);
+        by_api
+            .entry(table.cell(row, "api").to_owned())
+            .or_default()
+            .push(row);
     }
     let mut out = Vec::new();
     for (api, rows) in by_api {
-        let mut ds: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "duration_ns")).collect();
-        let summed = if ds.is_empty() { None } else { Some(ds.iter().sum()) };
+        let mut ds: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "duration_ns"))
+            .collect();
+        let summed = if ds.is_empty() {
+            None
+        } else {
+            Some(ds.iter().sum())
+        };
         let med = median(&mut ds);
-        let indices: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "index")).collect();
+        let indices: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "index"))
+            .collect();
         out.push(ApiFace {
             api,
             calls: rows.len(),
@@ -666,19 +807,36 @@ pub struct TransferFace {
 pub fn read_transfers(table: &Table) -> Vec<TransferFace> {
     let mut by_kind: BTreeMap<String, Vec<&Vec<String>>> = BTreeMap::new();
     for row in &table.rows {
-        by_kind.entry(table.cell(row, "kind").to_owned()).or_default().push(row);
+        by_kind
+            .entry(table.cell(row, "kind").to_owned())
+            .or_default()
+            .push(row);
     }
     let mut out = Vec::new();
     for (kind, rows) in by_kind {
-        let octets: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "octets")).collect();
-        let durations: Vec<u64> = rows.iter().filter_map(|r| table.u64_at(r, "duration_ns")).collect();
-        let total_octets = (octets.len() == rows.len() && !octets.is_empty()).then(|| octets.iter().sum::<u64>());
-        let total_ns = (durations.len() == rows.len() && !durations.is_empty()).then(|| durations.iter().sum::<u64>());
+        let octets: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "octets"))
+            .collect();
+        let durations: Vec<u64> = rows
+            .iter()
+            .filter_map(|r| table.u64_at(r, "duration_ns"))
+            .collect();
+        let total_octets =
+            (octets.len() == rows.len() && !octets.is_empty()).then(|| octets.iter().sum::<u64>());
+        let total_ns = (durations.len() == rows.len() && !durations.is_empty())
+            .then(|| durations.iter().sum::<u64>());
         let rate = match (total_octets, total_ns) {
             (Some(o), Some(t)) if t > 0 => Some(o as f64 * 1e9 / t as f64),
             _ => None,
         };
-        out.push(TransferFace { kind, count: rows.len(), octets: total_octets, summed_ns: total_ns, octets_per_second: rate });
+        out.push(TransferFace {
+            kind,
+            count: rows.len(),
+            octets: total_octets,
+            summed_ns: total_ns,
+            octets_per_second: rate,
+        });
     }
     out
 }
@@ -710,12 +868,24 @@ pub fn classify_boundary(
     }
     let measured = cpu_foreman.is_some() || transfer_bound.is_some() || census_overhead.is_some();
     let class = ordered.first().cloned().unwrap_or_else(|| {
-        if measured { "UNCLASSIFIED (no rubric class applied)".to_owned() } else { UNKNOWN.to_owned() }
+        if measured {
+            "UNCLASSIFIED (no rubric class applied)".to_owned()
+        } else {
+            UNKNOWN.to_owned()
+        }
     });
-    let confidence = if measured { "inferred-from-nsys-only".to_owned() } else { UNKNOWN.to_owned() };
+    let confidence = if measured {
+        "inferred-from-nsys-only".to_owned()
+    } else {
+        UNKNOWN.to_owned()
+    };
     let verdict = format!(
         "{object} → {class} ({})",
-        if ordered.len() > 1 { format!("secondary {}", ordered[1..].join(", ")) } else { "no secondary class".to_owned() }
+        if ordered.len() > 1 {
+            format!("secondary {}", ordered[1..].join(", "))
+        } else {
+            "no secondary class".to_owned()
+        }
     );
     Classification {
         object: object.to_owned(),
@@ -749,7 +919,10 @@ pub fn unnamed_classes(timeline: &Timeline) -> Vec<String> {
 pub fn transfer_overlap(kernels: &Table, transfers: &Table, kind: &str) -> Option<(u64, u64)> {
     let mut intervals: Vec<(u64, u64)> = Vec::new();
     for row in &kernels.rows {
-        let (start, end) = (kernels.u64_at(row, "start_ns")?, kernels.u64_at(row, "end_ns")?);
+        let (start, end) = (
+            kernels.u64_at(row, "start_ns")?,
+            kernels.u64_at(row, "end_ns")?,
+        );
         if end > start {
             intervals.push((start, end));
         }
@@ -768,7 +941,10 @@ pub fn transfer_overlap(kernels: &Table, transfers: &Table, kind: &str) -> Optio
         if !transfers.cell(row, "kind").contains(kind) {
             continue;
         }
-        let (start, end) = match (transfers.u64_at(row, "start_ns"), transfers.u64_at(row, "end_ns")) {
+        let (start, end) = match (
+            transfers.u64_at(row, "start_ns"),
+            transfers.u64_at(row, "end_ns"),
+        ) {
             (Some(a), Some(b)) if b > a => (a, b),
             _ => continue,
         };
@@ -778,7 +954,9 @@ pub fn transfer_overlap(kernels: &Table, transfers: &Table, kind: &str) -> Optio
             if *kernel_start >= end {
                 break;
             }
-            overlapping += kernel_end.min(&end).saturating_sub(*kernel_start.max(&start));
+            overlapping += kernel_end
+                .min(&end)
+                .saturating_sub(*kernel_start.max(&start));
         }
     }
     Some((overlapping, total))
@@ -789,7 +967,10 @@ pub fn transfer_overlap(kernels: &Table, transfers: &Table, kind: &str) -> Optio
 pub fn max_concurrent_transfers(transfers: &Table) -> Option<usize> {
     let mut events: Vec<(u64, i64)> = Vec::new();
     for row in &transfers.rows {
-        match (transfers.u64_at(row, "start_ns"), transfers.u64_at(row, "end_ns")) {
+        match (
+            transfers.u64_at(row, "start_ns"),
+            transfers.u64_at(row, "end_ns"),
+        ) {
             (Some(start), Some(end)) if end > start => {
                 events.push((start, 1));
                 events.push((end, -1));

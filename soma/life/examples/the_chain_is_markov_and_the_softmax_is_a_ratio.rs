@@ -85,12 +85,12 @@
 use std::collections::BTreeMap;
 
 use holonic_engine::exponentiated_ratio::RatioFamily;
-use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
-};
 use holonic_engine::landauer::{self, ThermalFrame};
+use holonic_engine::receiver_exact_compression::{
+    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+};
 use holonic_engine::surprisal::SymbolicSurprisal;
-use life::decomposing_codec::{DecompositionGrain, Symbol, read, render_word};
+use life::decomposing_codec::{read, render_word, DecompositionGrain, Symbol};
 use life::material_incidence::strongly_connected_cores;
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -218,8 +218,16 @@ fn main() {
         .iter()
         .flat_map(|whole| whole.parts.iter().cloned())
         .collect();
-    println!("  material   {} lines over {} records", material.len(), declared.len());
-    println!("  the chain  {} parts in order, {} distinct", sequence.len(), pass.parts().len());
+    println!(
+        "  material   {} lines over {} records",
+        material.len(),
+        declared.len()
+    );
+    println!(
+        "  the chain  {} parts in order, {} distinct",
+        sequence.len(),
+        pass.parts().len()
+    );
     println!();
 
     // ---------------------------------------------------------------------------------
@@ -256,12 +264,21 @@ fn main() {
             for pair in compression.beyond_order(k.saturating_sub(1)).iter().take(3) {
                 println!(
                     "          {:?} vs {:?} separated only at depth {}",
-                    chain.parts.get(pair.left.0 as usize).map(|p| render_word(p)),
-                    chain.parts.get(pair.right.0 as usize).map(|p| render_word(p)),
+                    chain
+                        .parts
+                        .get(pair.left.0 as usize)
+                        .map(|p| render_word(p)),
+                    chain
+                        .parts
+                        .get(pair.right.0 as usize)
+                        .map(|p| render_word(p)),
                     pair.distinguishing_word.len()
                 );
             }
-            assert!(compression.is_markov_at(k), "the order must bound its own population");
+            assert!(
+                compression.is_markov_at(k),
+                "the order must bound its own population"
+            );
             assert!(!compression.is_markov_at(k - 1) || k == 0);
         }
         orders.push(order);
@@ -270,7 +287,11 @@ fn main() {
 
     println!(
         "  the SAME material read two ways returned different orders   {}",
-        if order_moved { "YES -- the order is the receiver's" } else { "NO" }
+        if order_moved {
+            "YES -- the order is the receiver's"
+        } else {
+            "NO"
+        }
     );
     // ---------------------------------------------------------------------------------
     // READING THREE -- what the families ARE under the symbol action, and what reaches what.
@@ -298,7 +319,9 @@ fn main() {
     let compression = compress(&reading_three);
     println!();
     println!("{}", "-".repeat(100));
-    println!("READING THREE -- the families under the symbol action: what permutes, what collapses,");
+    println!(
+        "READING THREE -- the families under the symbol action: what permutes, what collapses,"
+    );
     println!("                 what reaches what, and where a continuation has nowhere to go");
     println!("{}", "-".repeat(100));
 
@@ -341,7 +364,12 @@ fn main() {
             let Some(to) = family_of.get(&(*to_state as u64)).copied() else {
                 continue;
             };
-            per_symbol.entry(face).or_default().entry(from).or_default().insert(to);
+            per_symbol
+                .entry(face)
+                .or_default()
+                .entry(from)
+                .or_default()
+                .insert(to);
         }
     }
     for (face, image) in &per_symbol {
@@ -359,8 +387,10 @@ fn main() {
         if image.values().any(|onward| onward.len() > 1) {
             continue;
         }
-        let landed: std::collections::BTreeSet<usize> =
-            image.values().filter_map(|o| o.iter().next().copied()).collect();
+        let landed: std::collections::BTreeSet<usize> = image
+            .values()
+            .filter_map(|o| o.iter().next().copied())
+            .collect();
         if landed.len() == image.len() {
             permutes += 1;
         } else {
@@ -408,7 +438,9 @@ fn main() {
     println!(
         "      … {} further families, {} of them holding a single part",
         families.saturating_sub(5),
-        (0..families).filter(|f| compression.conduct.blocks[*f].len() == 1).count()
+        (0..families)
+            .filter(|f| compression.conduct.blocks[*f].len() == 1)
+            .count()
     );
 
     println!();
@@ -450,7 +482,9 @@ fn main() {
     );
 
     println!();
-    println!("  THE REVERSIBLE SUBPOPULATIONS — the cores of the action, and the arrows between them");
+    println!(
+        "  THE REVERSIBLE SUBPOPULATIONS — the cores of the action, and the arrows between them"
+    );
     // **A strongly connected core IS the subpopulation the action is reversible on**: inside a core
     // every family reaches every other, so the restricted action is invertible. The one-way edges
     // BETWEEN cores are exactly where an irreversible step put the arrow of the compression. The
@@ -471,7 +505,10 @@ fn main() {
         "      cores {core_count} over {families} families; {singletons} of them a single family",
     );
     for (core, extent) in widest_cores.iter().take(3) {
-        let held: Vec<usize> = (0..families).filter(|f| core_of[*f] == **core).take(4).collect();
+        let held: Vec<usize> = (0..families)
+            .filter(|f| core_of[*f] == **core)
+            .take(4)
+            .collect();
         let spelled: Vec<String> = held.iter().map(|f| members(*f, 2)).collect();
         println!(
             "      core {core:<4} {extent:>4} families, reversible within: {}",
@@ -518,12 +555,19 @@ fn main() {
     println!(
         "      the walk re-entered a family it had already stood in after {} steps: {}",
         route.len(),
-        if route.len() > 1 { "the pathway CLOSES" } else { "no cycle" }
+        if route.len() > 1 {
+            "the pathway CLOSES"
+        } else {
+            "no cycle"
+        }
     );
 
     println!();
     println!("  and the census of the above, which is the face and not the object:");
-    println!("      families {families} · symbols {} · permuting {permutes} · collapsing {collapses}", inputs.len());
+    println!(
+        "      families {families} · symbols {} · permuting {permutes} · collapsing {collapses}",
+        inputs.len()
+    );
     let plural_symbols: std::collections::BTreeSet<u64> =
         plural.iter().map(|(input, ..)| input.0).collect();
     println!(
@@ -544,7 +588,9 @@ fn main() {
     let sinks = (0..families)
         .filter(|family| edges.get(family).is_none_or(BTreeMap::is_empty))
         .count();
-    println!("      families with NO outgoing step (a continuation stops there) {sinks} of {families}");
+    println!(
+        "      families with NO outgoing step (a continuation stops there) {sinks} of {families}"
+    );
     println!();
 
     // ---------------------------------------------------------------------------------
@@ -552,7 +598,9 @@ fn main() {
     // ---------------------------------------------------------------------------------
     println!();
     println!("{}", "-".repeat(100));
-    println!("READING TWO -- a transition row is a COCYCLE OF EXACT RATIOS, and Z is a declared null");
+    println!(
+        "READING TWO -- a transition row is a COCYCLE OF EXACT RATIOS, and Z is a declared null"
+    );
     println!("{}", "-".repeat(100));
 
     let chain = PartChain::build(&sequence, true);
@@ -610,7 +658,9 @@ fn main() {
     }
 
     let reference = family.members()[0];
-    let weights = family.normalised_against(reference).expect("a distribution");
+    let weights = family
+        .normalised_against(reference)
+        .expect("a distribution");
     let weight_total: Rat = weights.values().cloned().sum();
     println!();
     println!(
@@ -670,7 +720,8 @@ fn main() {
                     interval_nanoseconds: 1_000_000_000,
                     temperature_millikelvin: ((celsius + 273).max(1) as u64) * 1000,
                     display_active: std::env::var_os("DISPLAY").is_some(),
-                    declared_by: "nvidia-smi, one second, at this run's device temperature".to_owned(),
+                    declared_by: "nvidia-smi, one second, at this run's device temperature"
+                        .to_owned(),
                 };
                 match landauer::read(&extents, frame.clone(), 64, 128) {
                     Ok(reading) => {
@@ -692,14 +743,21 @@ fn main() {
                             frame.power_microwatts,
                             frame.interval_nanoseconds,
                             frame.temperature_millikelvin,
-                            if frame.display_active { "ACTIVE" } else { "idle" }
+                            if frame.display_active {
+                                "ACTIVE"
+                            } else {
+                                "idle"
+                            }
                         );
                         println!("  declared by                    {}", frame.declared_by);
                         println!("  the budget an ENCLOSURE, because ln 2 is irrational:");
                         println!("      lower {lower}");
                         println!("      upper {upper}");
                         println!("  the reading is the UNDIVIDED PAIR (erased, budget) -- no quotient formed");
-                        println!("  where the erasure sits         {:?}", reading.against_budget());
+                        println!(
+                            "  where the erasure sits         {:?}",
+                            reading.against_budget()
+                        );
                         println!();
                         println!("  AND THE TRAJECTORY IS THE READING, not the value. A figure far below the");
                         println!("  bound says nothing on its own; what says something is whether it MOVES");
@@ -719,8 +777,14 @@ fn main() {
     println!("  the memory order moved with the receiver family      {order_moved}");
     println!("  the transition row is an exact cocycle                {cocycle}");
     println!("  the declared null carries no information             {null_trivial}");
-    println!("  the weights sum to exactly one over the rationals     {}", weight_total == Rat::from_integer(BigInt::from(1)));
-    println!("  temperature rebases the winding and stays a cocycle   {}", temperature_moves && colder_cocycle);
+    println!(
+        "  the weights sum to exactly one over the rationals     {}",
+        weight_total == Rat::from_integer(BigInt::from(1))
+    );
+    println!(
+        "  temperature rebases the winding and stays a cocycle   {}",
+        temperature_moves && colder_cocycle
+    );
 
     println!();
     println!("{}", "-".repeat(100));
@@ -728,8 +792,12 @@ fn main() {
     println!("{}", "-".repeat(100));
     println!("  No argmax is taken anywhere: every member's ratio against every other is returned");
     println!("  and none is discarded. T -> 0 is where softmax becomes a chooser and no path here");
-    println!("  reaches it. The row's counts are what happened; the ratios are their invariant face;");
-    println!("  and the normalisation appears only in a function whose name says a null was named.");
+    println!(
+        "  reaches it. The row's counts are what happened; the ratios are their invariant face;"
+    );
+    println!(
+        "  and the normalisation appears only in a function whose name says a null was named."
+    );
     println!("{}", "=".repeat(100));
 
     let held = order_moved && cocycle && null_trivial && temperature_moves && colder_cocycle;

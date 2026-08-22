@@ -414,9 +414,8 @@ pub(super) fn first_top_level_colon(text: &str) -> Option<usize> {
 /// put in that position, and one that never occurs costs nothing. What the list may not do is decide
 /// admissibility — that is [`principal_relation`]'s single-relation condition, and a conclusion the
 /// scan cannot resolve returns `None` and is counted rather than defaulted.
-const CONCLUSION_RELATIONS: [&str; 12] = [
-    "↔", "≠", "≤", "≥", "⊆", "∈", "∣", "∧", "∨", "=", "<", ">",
-];
+const CONCLUSION_RELATIONS: [&str; 12] =
+    ["↔", "≠", "≤", "≥", "⊆", "∈", "∣", "∧", "∨", "=", "<", ">"];
 
 /// The **principal relation** of a declaration's conclusion, if the material exposes exactly one.
 ///
@@ -450,7 +449,10 @@ pub(super) fn principal_relation(header: &str) -> Option<String> {
             continue;
         }
         // `:=` is not a relation, and neither is the `=` inside `≠` — which is one character here.
-        if character == '=' && byte > 0 && matches!(bytes.get(byte - 1), Some(b':' | b'=' | b'<' | b'>' | b'!')) {
+        if character == '='
+            && byte > 0
+            && matches!(bytes.get(byte - 1), Some(b':' | b'=' | b'<' | b'>' | b'!'))
+        {
             continue;
         }
         if character == '=' && matches!(bytes.get(byte + 1), Some(b'=' | b'>')) {

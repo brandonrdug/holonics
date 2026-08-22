@@ -61,10 +61,7 @@ use std::{
 use holonic_engine::{EulerReceiverId, QuinticProblemId};
 use life::{
     dialogue_lineage::{CodexDialogueImportSpec, ExactDialogueLineage},
-    laboratory_language::{
-        LaboratoryResearchLeader, LaboratorySourceAtlas,
-        LaboratoryWorldReturn,
-    },
+    laboratory_language::{LaboratoryResearchLeader, LaboratorySourceAtlas, LaboratoryWorldReturn},
     research_intelligence::{ExactQuinticResearchSpec, ExactResearchWorld, RustVerificationSpec},
 };
 use num_bigint::BigInt;

@@ -123,7 +123,8 @@ fn prompts_from_material(
     extent: usize,
     wanted: usize,
 ) -> Vec<String> {
-    let word = |token: &String| token.chars().count() >= 3 && token.chars().all(char::is_alphabetic);
+    let word =
+        |token: &String| token.chars().count() >= 3 && token.chars().all(char::is_alphabetic);
     let mut found: Vec<String> = Vec::new();
     for passage in passages {
         let tokens = lexical_tokens(&passage.text);
@@ -209,7 +210,9 @@ fn run(corpus: &DeclaredCorpus) {
     println!("================================================================");
     let passages = load(corpus);
     if passages.len() < 2 {
-        println!("  the declared material is not on this disk; skipped, and the skip is the return");
+        println!(
+            "  the declared material is not on this disk; skipped, and the skip is the return"
+        );
         return;
     }
     let octets: usize = passages.iter().map(|passage| passage.text.len()).sum();

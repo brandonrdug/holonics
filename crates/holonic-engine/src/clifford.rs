@@ -668,7 +668,10 @@ mod tests {
         assert_eq!(forward.coefficient(&[0, 1]), whole(1));
         assert_eq!(backward.coefficient(&[0, 1]), whole(-1));
         assert_eq!(forward, backward.negated(), "e0 e1 = -e1 e0");
-        assert_ne!(forward, backward, "and they are not equal, so the algebra is not abelian");
+        assert_ne!(
+            forward, backward,
+            "and they are not equal, so the algebra is not abelian"
+        );
         // A generator squares to its declared value, and the declaration is what decides it.
         assert_eq!(e0.product(&e0).expect("same").coefficient(&[]), whole(1));
         let minkowski = Signature::declared(vec![whole(-1), whole(1), whole(1)]);
@@ -725,7 +728,8 @@ mod tests {
         let generators = [2i64, 3, 5];
         let signature =
             Signature::declared(generators.iter().map(|k| whole(*k)).collect::<Vec<_>>());
-        let blade = |mask: usize| -> Vec<usize> { (0..3).filter(|bit| mask & (1 << bit) != 0).collect() };
+        let blade =
+            |mask: usize| -> Vec<usize> { (0..3).filter(|bit| mask & (1 << bit) != 0).collect() };
         // The basis monomial ∏_{i∈S} √kᵢ, built in the commutative carrier out of its own roots.
         let monomial = |mask: usize| -> Multiquadratic {
             (0..3).filter(|bit| mask & (1 << bit) != 0).fold(
@@ -943,7 +947,10 @@ mod tests {
             assert_eq!(product.coefficient(&[0, 1]), whole(ar * bi - ai * br));
             // The product of two vectors has grades 0 and 2 only — the even subalgebra.
             assert!(product.grade(1).is_zero());
-            assert_eq!(product.population(), product.grade(0).population() + product.grade(2).population());
+            assert_eq!(
+                product.population(),
+                product.grade(0).population() + product.grade(2).population()
+            );
         }
     }
 
@@ -991,7 +998,11 @@ mod tests {
         );
         let area = arrow.area_squared();
         assert_eq!(area.value, whole(-1), "the metric-weighted blade");
-        assert_eq!(area.lagrange, Some(whole(-1)), "and Lagrange agrees with it");
+        assert_eq!(
+            area.lagrange,
+            Some(whole(-1)),
+            "and Lagrange agrees with it"
+        );
         assert_eq!(area.frames_agree(), Some(true));
     }
 

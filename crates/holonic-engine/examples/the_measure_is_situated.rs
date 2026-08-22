@@ -24,12 +24,12 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::algebraic::CausalCellId;
+use holonic_engine::communication::{Neighbourhood, spread_from_each};
 use holonic_engine::conditioned_derivation::{
     ConditionedBody, DerivationQuery, Exposure, PassageId, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::exact_value::ExactOrdering;
-use holonic_engine::communication::{Neighbourhood, spread_from_each};
 use holonic_engine::gluing::{Cover, read_cover};
 use holonic_engine::rebase_invariants::PivotRule;
 use holonic_engine::situated_residual::{
@@ -857,7 +857,11 @@ fn main() {
     rule("THE NEIGHBOURHOOD — the same sections, iterated along contact");
 
     let neighbourhood = Neighbourhood {
-        sections: vec![all_cells.clone(), standing_cells_kept.clone(), derived_cells.clone()],
+        sections: vec![
+            all_cells.clone(),
+            standing_cells_kept.clone(),
+            derived_cells.clone(),
+        ],
     };
     match spread_from_each(
         circuit.circuit.complex(),

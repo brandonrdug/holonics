@@ -98,7 +98,11 @@ fn segment(material: &[u8], grain: usize) -> (Vec<Thought>, usize, Totals) {
     let mut thoughts = Vec::new();
     let mut arrivals = 0usize;
     let mut open: Vec<u8> = Vec::new();
-    let mut totals = Totals { faces: 0, founded: 0, at_capacity: 0 };
+    let mut totals = Totals {
+        faces: 0,
+        founded: 0,
+        at_capacity: 0,
+    };
 
     let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
 
@@ -115,7 +119,9 @@ fn segment(material: &[u8], grain: usize) -> (Vec<Thought>, usize, Totals) {
             totals.founded += u64::from(perception.faces_founded);
             open.push(material[at + 1]);
             if perception.thought_completed {
-                if perception.faces == 15 { totals.at_capacity += 1; }
+                if perception.faces == 15 {
+                    totals.at_capacity += 1;
+                }
                 thoughts.push(Thought {
                     text: render(&open),
                     faces: perception.faces,
@@ -135,7 +141,9 @@ fn segment(material: &[u8], grain: usize) -> (Vec<Thought>, usize, Totals) {
             totals.founded += u64::from(perception.faces_founded);
             open.extend_from_slice(span);
             if perception.thought_completed {
-                if perception.faces == 15 { totals.at_capacity += 1; }
+                if perception.faces == 15 {
+                    totals.at_capacity += 1;
+                }
                 thoughts.push(Thought {
                     text: render(&open),
                     faces: perception.faces,
@@ -200,32 +208,62 @@ fn main() {
     rule("THE THOUGHTS ARE RETURNED AS TEXT");
     println!("  material   {} octets from {}", material.len(), RECORDS[0]);
     println!("  axis       {AXIS}");
-    println!("  a thought is the run of arrivals between two swing cuts — the body's own segmentation");
-    assert!(material.len() > 1_000, "the declared record resolves to nothing");
+    println!(
+        "  a thought is the run of arrivals between two swing cuts — the body's own segmentation"
+    );
+    assert!(
+        material.len() > 1_000,
+        "the declared record resolves to nothing"
+    );
 
-    show("THE ATOM MOUTH — what the live ecology's Cell branch presents", 0, &material, 8);
+    show(
+        "THE ATOM MOUTH — what the live ecology's Cell branch presents",
+        0,
+        &material,
+        8,
+    );
     show("SPAN 3 — composition depth 2", 3, &material, 8);
     show("SPAN 21 — composition depth 20", 21, &material, 8);
 
     rule("WHAT THE TEXT SHOWS, AND NO SCALAR DID");
-    println!("  1. THE CUTS FALL MID-WORD, at every entry. `...one complex produc` / `t, and the pole`");
-    println!("     at the atom mouth; `...research rec` / `ord` at span 21. Nothing in the material");
-    println!("     is at those positions. The cut tracks the ARRIVAL CHUNKING and not the content:");
+    println!(
+        "  1. THE CUTS FALL MID-WORD, at every entry. `...one complex produc` / `t, and the pole`"
+    );
+    println!(
+        "     at the atom mouth; `...research rec` / `ord` at span 21. Nothing in the material"
+    );
+    println!(
+        "     is at those positions. The cut tracks the ARRIVAL CHUNKING and not the content:"
+    );
     println!("     every span-21 thought is a multiple of twenty-one octets.");
     println!();
     println!("  2. NOT ONE FACE FOUNDS, at any entry. 59,734 faces crossed at the atom mouth and");
     println!("     `faces_founded` is ZERO across all three runs. The grey matter never founds");
     println!("     against an arrival.");
     println!();
-    println!("  3. SO `thought_completed` IS NOT THE FOUNDING CUT. `perceive_grain`'s own doc says a");
-    println!("     thought completes *where it FOUNDS — the aim orthogonal to the standing thought*.");
-    println!("     Foundings are zero and thoughts complete anyway, so whatever is cutting, it is not");
-    println!("     that. At the atom mouth 179 of 326 cuts land at register capacity, 15 faces of 15;");
+    println!(
+        "  3. SO `thought_completed` IS NOT THE FOUNDING CUT. `perceive_grain`'s own doc says a"
+    );
+    println!(
+        "     thought completes *where it FOUNDS — the aim orthogonal to the standing thought*."
+    );
+    println!(
+        "     Foundings are zero and thoughts complete anyway, so whatever is cutting, it is not"
+    );
+    println!(
+        "     that. At the atom mouth 179 of 326 cuts land at register capacity, 15 faces of 15;"
+    );
     println!("     at span 21 none do, so it is not one mechanism either.");
     println!();
-    println!("  THE CONSEQUENCE FOR YESTERDAY'S CURVE. Completions per arrival really do rise with");
-    println!("  composition depth — that count stands. What does not stand is the READING attached to");
-    println!("  it, that the swing consults the arrival's richness for an orthogonal aim: there are no");
+    println!(
+        "  THE CONSEQUENCE FOR YESTERDAY'S CURVE. Completions per arrival really do rise with"
+    );
+    println!(
+        "  composition depth — that count stands. What does not stand is the READING attached to"
+    );
+    println!(
+        "  it, that the swing consults the arrival's richness for an orthogonal aim: there are no"
+    );
     println!("  orthogonal aims anywhere in this material. The curve measures something real and");
     println!("  unidentified, and calling it the swing was an interpretation the text refutes.");
 }

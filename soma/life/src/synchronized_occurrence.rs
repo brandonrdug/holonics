@@ -27,7 +27,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
-    ContemporaryRadiation, CurrentBoundaryPort, CpuLiveCurrentExecutor, LiveBoundaryTransition,
+    ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, LiveBoundaryTransition,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, LiveCurrentRestImage,
     ReceiverCausalPassage, ReceiverChartIdentity, ReceiverFiberIdentity, RegionalSupportSection,
 };

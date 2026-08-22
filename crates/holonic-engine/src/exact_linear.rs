@@ -694,8 +694,8 @@ pub enum ExactLinearError {
 
 #[cfg(test)]
 mod tests {
-    use num_bigint::BigInt;
     use super::*;
+    use num_bigint::BigInt;
 
     fn rat(numerator: i64, denominator: i64) -> Rat {
         Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -735,7 +735,10 @@ mod tests {
                 .iter()
                 .zip(column)
                 .fold(Rat::zero(), |sum, (a, b)| sum + a * b);
-            assert!(pairing.is_zero(), "the annihilator must annihilate the image");
+            assert!(
+                pairing.is_zero(),
+                "the annihilator must annihilate the image"
+            );
         }
     }
 
@@ -765,7 +768,9 @@ mod tests {
             .collect();
         assert_eq!(wide.apply(&moved).expect("applies"), target);
         assert!(
-            wide.preimage_obstruction(&target).expect("checked").is_none(),
+            wide.preimage_obstruction(&target)
+                .expect("checked")
+                .is_none(),
             "a reachable target has no obstruction"
         );
 
@@ -830,12 +835,17 @@ mod tests {
         let defect = transport
             .adjoint_defect(&adjoint, &domain_metric, &codomain_metric, &x, &y)
             .expect("paired");
-        assert!(defect.is_zero(), "the metric adjoint must satisfy its own law, got {defect}");
+        assert!(
+            defect.is_zero(),
+            "the metric adjoint must satisfy its own law, got {defect}"
+        );
 
         // And under identity metrics the two coincide, which is exactly when the shortcut is lawful.
         let identity = ExactRatMatrix::identity(2).expect("identity");
         assert_eq!(
-            transport.metric_adjoint(&identity, &identity).expect("adjoint"),
+            transport
+                .metric_adjoint(&identity, &identity)
+                .expect("adjoint"),
             bare
         );
     }
@@ -850,12 +860,13 @@ mod tests {
         assert_eq!(map.rank().expect("rank"), 2);
         let coordinates = work.coordinates();
         assert!(
-            coordinates.iter().any(|(name, count)| *name == "dependency-span"
-                && *count == num_bigint::BigUint::from(2u32)),
+            coordinates
+                .iter()
+                .any(|(name, count)| *name == "dependency-span"
+                    && *count == num_bigint::BigUint::from(2u32)),
             "the dependency span is the pivot count: {coordinates:?}"
         );
     }
-
 
     use super::*;
 

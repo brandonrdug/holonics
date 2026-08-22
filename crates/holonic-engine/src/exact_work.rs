@@ -149,7 +149,10 @@ impl ExactWork {
             entries_written: &self.entries_written + &next.entries_written,
             cumulative_bits: &self.cumulative_bits + &next.cumulative_bits,
             peak_bits: self.peak_bits.clone().max(next.peak_bits.clone()),
-            resident_entries: self.resident_entries.clone().max(next.resident_entries.clone()),
+            resident_entries: self
+                .resident_entries
+                .clone()
+                .max(next.resident_entries.clone()),
             dependency_span: &self.dependency_span + &next.dependency_span,
         }
     }
@@ -245,7 +248,10 @@ impl ExactWork {
             ("peak-bits", self.peak_bits.clone()),
             ("resident-entries", self.resident_entries.clone()),
             ("dependency-span", self.dependency_span.clone()),
-            ("width-weighted-operations", self.width_weighted_operations()),
+            (
+                "width-weighted-operations",
+                self.width_weighted_operations(),
+            ),
         ]
     }
 
@@ -455,8 +461,14 @@ mod tests {
         let mut dominated = many_narrow.clone();
         dominated.multiplied(1);
         assert_eq!(many_narrow.order_against(&dominated), ExactOrdering::Less);
-        assert_eq!(dominated.order_against(&many_narrow), ExactOrdering::Greater);
-        assert_eq!(many_narrow.order_against(&many_narrow), ExactOrdering::Equal);
+        assert_eq!(
+            dominated.order_against(&many_narrow),
+            ExactOrdering::Greater
+        );
+        assert_eq!(
+            many_narrow.order_against(&many_narrow),
+            ExactOrdering::Equal
+        );
     }
 
     /// ★ THE WIDTH IS NUMERATOR PLUS DENOMINATOR. A reduced fraction with a huge denominator is not
@@ -494,7 +506,11 @@ mod tests {
         assert_eq!(composed.multiplications, BigUint::from(8u32));
         assert_eq!(composed.entries_written, BigUint::from(2u32));
         assert_eq!(composed.peak_bits, second.peak_bits, "the wider of the two");
-        assert_eq!(composed.resident_entries, BigUint::from(16u32), "the wider body");
+        assert_eq!(
+            composed.resident_entries,
+            BigUint::from(16u32),
+            "the wider body"
+        );
         assert_eq!(composed.dependency_span, BigUint::from(2u32), "spans add");
         assert_eq!(
             composed.cumulative_bits,
@@ -530,7 +546,10 @@ mod tests {
         busy.wrote(&rational(3, 4));
         match budget.admits(&busy) {
             Admission::Deferred { dominating, .. } => {
-                assert_eq!(dominating.0, "multiplications", "the count carried this one");
+                assert_eq!(
+                    dominating.0, "multiplications",
+                    "the count carried this one"
+                );
             }
             Admission::Admitted { .. } => panic!("5000 multiplications exceed a ceiling of 100"),
         }

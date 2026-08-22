@@ -17,8 +17,8 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{
-    ContemporaryRadiation, CurrentBoundaryPort, CurrentExecutionRequest, DirectedExecutionRequest,
-    ExecutedContemporaryEvent, CpuLiveCurrentExecutor, InterfaceCapability,
+    ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, CurrentExecutionRequest,
+    DirectedExecutionRequest, ExecutedContemporaryEvent, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine, LiveCurrentRestImage, LiveMemory, RegionalExecutionRequest,
     SparseStandingSurface,

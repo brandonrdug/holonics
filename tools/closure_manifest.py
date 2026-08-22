@@ -79,9 +79,10 @@ PATH_MODULE = re.compile(
 
 # A driver may name a returned deed rather than itself. A literal DEFAULT_OUT keeps that exterior
 # address in the producing source, where closure_of can bind it without an authored alias table.
-# Only output/<one slug>/... is admitted; computed paths remain unresolved and therefore ORPHAN.
+# Both a directory family at output/<one slug> and a single member below that directory are
+# admitted; computed paths remain unresolved and therefore ORPHAN.
 DEFAULT_OUTPUT_SLUG = re.compile(
-    r'^\s*(?:pub\s+)?const\s+DEFAULT_OUT\s*:\s*&str\s*=\s*"output/([^"/]+)/[^"/]+"\s*;',
+    r'^\s*(?:pub\s+)?const\s+DEFAULT_OUT\s*:\s*&str\s*=\s*"output/([^"/]+)(?:/[^"/]+)?"\s*;',
     re.MULTILINE,
 )
 

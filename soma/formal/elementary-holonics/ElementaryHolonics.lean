@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.Receiver
+import ElementaryHolonics.Foundation.Lineage
 import ElementaryHolonics.Foundation.Presentation
 import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
@@ -12,6 +13,7 @@ import ElementaryHolonics.Millennium.Hand
 import ElementaryHolonics.Millennium.Seam
 import ElementaryHolonics.Millennium.Swing
 import ElementaryHolonics.Millennium.Chronology
+import ElementaryHolonics.Millennium.LineageCompression
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling
@@ -48,6 +50,7 @@ import ElementaryHolonics.Millennium.PlaceLedger
 import ElementaryHolonics.Millennium.Border
 import ElementaryHolonics.Millennium.Hinge
 import ElementaryHolonics.Millennium.Reflection
+import ElementaryHolonics.Millennium.SpherePacking
 import ElementaryHolonics.Millennium.PartitionWheel
 import ElementaryHolonics.Millennium.NormRelation
 import ElementaryHolonics.Millennium.LatticeNet

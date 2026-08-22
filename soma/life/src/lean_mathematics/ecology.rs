@@ -681,19 +681,19 @@ impl LeanMathematicsEcology {
                 // organ, which is the whole of the 105 structural refusals a seven-declaration
                 // corpus returned.
                 if grain == EmissionGrain::Inherited || organ.rewritable() {
-                push_candidate(
-                    &mut candidates,
-                    format!("by\n  rw [{}]\n  {closer}", organ.name),
-                    vec![
-                        LeanProofMotion::Rewrite {
-                            declaration: Arc::clone(organ_name),
-                        },
-                        LeanProofMotion::Close {
-                            tactic: Arc::clone(closer),
-                        },
-                    ],
-                    LocalSet::from([Arc::clone(organ_name)]),
-                )?;
+                    push_candidate(
+                        &mut candidates,
+                        format!("by\n  rw [{}]\n  {closer}", organ.name),
+                        vec![
+                            LeanProofMotion::Rewrite {
+                                declaration: Arc::clone(organ_name),
+                            },
+                            LeanProofMotion::Close {
+                                tactic: Arc::clone(closer),
+                            },
+                        ],
+                        LocalSet::from([Arc::clone(organ_name)]),
+                    )?;
                 }
                 push_candidate(
                     &mut candidates,
@@ -757,19 +757,18 @@ impl LeanMathematicsEcology {
             }
             let hypothesis_name = Arc::<str>::from(hypothesis.name.as_str());
             for (organ, organ_name) in organs.iter().zip(&organ_names) {
-                let application =
-                    match grain {
-                        EmissionGrain::Inherited => declaration_application_with_substitute(
-                            organ,
-                            &target_names,
-                            &hypothesis.name,
-                        ),
-                        EmissionGrain::Typed => declaration_application_in_frame_with_substitute(
-                            organ,
-                            &target_names,
-                            &hypothesis.name,
-                        ),
-                    };
+                let application = match grain {
+                    EmissionGrain::Inherited => declaration_application_with_substitute(
+                        organ,
+                        &target_names,
+                        &hypothesis.name,
+                    ),
+                    EmissionGrain::Typed => declaration_application_in_frame_with_substitute(
+                        organ,
+                        &target_names,
+                        &hypothesis.name,
+                    ),
+                };
                 push_candidate(
                     &mut candidates,
                     format!(

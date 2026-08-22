@@ -146,6 +146,110 @@ extern "C" __global__ void claim_identities(
     }
 }
 
+/// **The quotient action: one lane carries one native state through a complete ordered word.**
+///
+/// The table is the complete row-major family `U_i : Q -> Q`. The word and every table enter once;
+/// the card composes the noncommuting word locally. No host callback selects a semantic phase
+/// between generators, and no invariant table is re-uploaded per step.
+extern "C" __global__ void conduct_native_word(
+    const uint32_t *generator_table,
+    const uint32_t *word,
+    const uint32_t *native_start,
+    uint32_t *native_end,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t word_length)
+{
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= cell_count) {
+        return;
+    }
+    uint32_t state = native_start[at];
+    for (uint32_t step = 0; step < word_length; ++step) {
+        state = generator_table[word[step] * state_count + state];
+    }
+    native_end[at] = state;
+}
+
+__device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
+    // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
+    // aperture; this expression is nevertheless total over the full wire.
+    return value < 0 ? (uint64_t)(-(value + 1)) + 1ULL : (uint64_t)value;
+}
+
+__device__ __forceinline__ uint8_t contact_class_of_pair(
+    const int64_t *lower_xyz,
+    const int64_t *upper_xyz,
+    uint32_t left,
+    uint32_t right,
+    uint64_t aperture_squared)
+{
+    uint64_t minimum = 0ULL;
+    uint64_t maximum = 0ULL;
+    for (uint32_t axis = 0; axis < 3; ++axis) {
+        const uint64_t left_at = (uint64_t)left * 3ULL + axis;
+        const uint64_t right_at = (uint64_t)right * 3ULL + axis;
+        const int64_t low = lower_xyz[left_at] - upper_xyz[right_at];
+        const int64_t high = upper_xyz[left_at] - lower_xyz[right_at];
+        const uint64_t low_abs = contact_abs_i64(low);
+        const uint64_t high_abs = contact_abs_i64(high);
+        const uint64_t far = low_abs > high_abs ? low_abs : high_abs;
+        const uint64_t near = (low <= 0 && high >= 0)
+                                  ? 0ULL
+                                  : (low_abs < high_abs ? low_abs : high_abs);
+        minimum += near * near;
+        maximum += far * far;
+    }
+    if (maximum <= aperture_squared) {
+        return 1u; // Inside, including the exact boundary.
+    }
+    if (minimum > aperture_squared) {
+        return 0u; // Outside.
+    }
+    return 2u; // Open: the coordinate box crosses the receiver aperture.
+}
+
+/// One lane classifies one addressed pair from exact integer coordinate boxes. The common
+/// denominator has already been carried into `aperture_squared`; no division and no float occurs.
+extern "C" __global__ void classify_contact_pairs(
+    const int64_t *lower_xyz,
+    const int64_t *upper_xyz,
+    const uint32_t *left_vertex,
+    const uint32_t *right_vertex,
+    uint8_t *class_out,
+    uint32_t pair_count,
+    uint64_t aperture_squared)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= pair_count) {
+        return;
+    }
+    class_out[at] = contact_class_of_pair(
+        lower_xyz,
+        upper_xyz,
+        left_vertex[at],
+        right_vertex[at],
+        aperture_squared);
+}
+
+/// Compare two matched presentation readings while the contact population remains resident. The
+/// exact ordered pair is retained as `3*left + right`; unequal classes are not collapsed to a bit.
+extern "C" __global__ void compare_contact_presentations(
+    const uint8_t *contact_class,
+    const uint32_t *left_reading,
+    const uint32_t *right_reading,
+    uint8_t *paired_class_out,
+    uint32_t comparison_count)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= comparison_count) {
+        return;
+    }
+    const uint8_t left = contact_class[left_reading[at]];
+    const uint8_t right = contact_class[right_reading[at]];
+    paired_class_out[at] = (uint8_t)(3u * left + right);
+}
+
 /// Retained: the fused material-and-law entry, kept because the separation front already conducts
 /// through it and a working carrier is not withdrawn to make a point about factoring.
 extern "C" __global__ void refine_shell(

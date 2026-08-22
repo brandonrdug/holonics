@@ -425,8 +425,8 @@ fn common_circle<'a>(values: impl Iterator<Item = &'a Rat>) -> Result<u64, Closu
     let mut circle = 1_u64;
     for value in values {
         let reduced = fractional_turn(value);
-        let denominator = u64::try_from(reduced.denom().clone())
-            .map_err(|_| ClosureError::CircleTooLarge)?;
+        let denominator =
+            u64::try_from(reduced.denom().clone()).map_err(|_| ClosureError::CircleTooLarge)?;
         circle = lcm(circle, denominator)?;
     }
     Ok(circle)
@@ -439,8 +439,8 @@ fn marks_on(values: &[Rat], circle: u64) -> Result<Vec<u64>, ClosureError> {
             let reduced = fractional_turn(value);
             let numerator =
                 u64::try_from(reduced.numer().clone()).map_err(|_| ClosureError::CircleTooLarge)?;
-            let denominator = u64::try_from(reduced.denom().clone())
-                .map_err(|_| ClosureError::CircleTooLarge)?;
+            let denominator =
+                u64::try_from(reduced.denom().clone()).map_err(|_| ClosureError::CircleTooLarge)?;
             Ok(numerator * (circle / denominator))
         })
         .collect()

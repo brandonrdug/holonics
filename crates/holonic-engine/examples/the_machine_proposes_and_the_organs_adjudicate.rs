@@ -48,9 +48,9 @@ use num_traits::{One, Zero};
 
 use holonic_engine::hypergeometric_closure::{ClosureReading, ThreeSiteDials, read_return_group};
 use holonic_structure::Composes;
+use relational_geometry::Rat;
 use relational_geometry::exact::RatVec2;
 use relational_geometry::receiver_atlas;
-use relational_geometry::Rat;
 
 const DEFAULT_ATLAS: &str = "meta/IDENTITY_ATLAS_mathlib.tsv";
 const SHOWN: usize = 12;
@@ -104,7 +104,10 @@ fn permutations(degree: usize) -> Vec<Vec<usize>> {
     let mut current: Vec<usize> = (0..degree).collect();
     loop {
         found.push(current.clone());
-        let Some(pivot) = (0..degree - 1).rev().find(|at| current[*at] < current[at + 1]) else {
+        let Some(pivot) = (0..degree - 1)
+            .rev()
+            .find(|at| current[*at] < current[at + 1])
+        else {
             return found;
         };
         let swap = (pivot + 1..degree)
@@ -218,7 +221,11 @@ fn hypergeometric_partial(argument: &[Rat]) -> Option<Rat> {
 /// three-site turning equation. Its value face is the species index, so a permutation preserving it
 /// preserves the classification.
 fn closure_species(argument: &[Rat]) -> Option<Rat> {
-    let dials = ThreeSiteDials::new(argument[0].clone(), argument[1].clone(), argument[2].clone());
+    let dials = ThreeSiteDials::new(
+        argument[0].clone(),
+        argument[1].clone(),
+        argument[2].clone(),
+    );
     let reading = read_return_group(&dials).ok()?;
     Some(Rat::from_integer(BigInt::from(match reading.closure {
         ClosureReading::Closes { .. } => 1u32,
@@ -264,18 +271,66 @@ fn paired_separation_four(argument: &[Rat]) -> Option<Rat> {
 }
 
 const RESOLVERS: [Resolver; 12] = [
-    Resolver { name: "additive-composition", arity: 2, evaluate: additive },
-    Resolver { name: "oriented-difference", arity: 2, evaluate: oriented_difference },
-    Resolver { name: "squared-separation", arity: 2, evaluate: squared_separation },
-    Resolver { name: "beta-on-integers", arity: 2, evaluate: beta_on_integers },
-    Resolver { name: "corner-cosine", arity: 3, evaluate: corner_cosine },
-    Resolver { name: "symmetric-pair-sum-3", arity: 3, evaluate: symmetric_pair_sum_three },
-    Resolver { name: "alternating-product-3", arity: 3, evaluate: alternating_product_three },
-    Resolver { name: "symmetric-pair-sum-4", arity: 4, evaluate: symmetric_pair_sum_four },
-    Resolver { name: "paired-separation-4", arity: 4, evaluate: paired_separation_four },
-    Resolver { name: "closure-species", arity: 3, evaluate: closure_species },
-    Resolver { name: "cross-ratio", arity: 4, evaluate: cross_ratio },
-    Resolver { name: "hypergeometric-partial-sum", arity: 4, evaluate: hypergeometric_partial },
+    Resolver {
+        name: "additive-composition",
+        arity: 2,
+        evaluate: additive,
+    },
+    Resolver {
+        name: "oriented-difference",
+        arity: 2,
+        evaluate: oriented_difference,
+    },
+    Resolver {
+        name: "squared-separation",
+        arity: 2,
+        evaluate: squared_separation,
+    },
+    Resolver {
+        name: "beta-on-integers",
+        arity: 2,
+        evaluate: beta_on_integers,
+    },
+    Resolver {
+        name: "corner-cosine",
+        arity: 3,
+        evaluate: corner_cosine,
+    },
+    Resolver {
+        name: "symmetric-pair-sum-3",
+        arity: 3,
+        evaluate: symmetric_pair_sum_three,
+    },
+    Resolver {
+        name: "alternating-product-3",
+        arity: 3,
+        evaluate: alternating_product_three,
+    },
+    Resolver {
+        name: "symmetric-pair-sum-4",
+        arity: 4,
+        evaluate: symmetric_pair_sum_four,
+    },
+    Resolver {
+        name: "paired-separation-4",
+        arity: 4,
+        evaluate: paired_separation_four,
+    },
+    Resolver {
+        name: "closure-species",
+        arity: 3,
+        evaluate: closure_species,
+    },
+    Resolver {
+        name: "cross-ratio",
+        arity: 4,
+        evaluate: cross_ratio,
+    },
+    Resolver {
+        name: "hypergeometric-partial-sum",
+        arity: 4,
+        evaluate: hypergeometric_partial,
+    },
 ];
 
 fn probes(arity: usize) -> Vec<Vec<Rat>> {
@@ -435,7 +490,12 @@ impl Form {
             rhs_args: next
                 .rhs_args
                 .iter()
-                .map(|arg| binding.get(arg).map(|bound| (*bound).clone()).unwrap_or_else(|| arg.clone()))
+                .map(|arg| {
+                    binding
+                        .get(arg)
+                        .map(|bound| (*bound).clone())
+                        .unwrap_or_else(|| arg.clone())
+                })
                 .collect(),
         })
     }
@@ -581,7 +641,9 @@ enum Species {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum Verdict {
-    Admitted { by: Vec<&'static str> },
+    Admitted {
+        by: Vec<&'static str>,
+    },
     /// Exactly one qualified organ confirms it and none refutes.
     ///
     /// **Retained and never deposited.** An invariant is only visible across two frames. A
@@ -589,9 +651,17 @@ enum Verdict {
     /// and an organ agrees — but an `organ-predicted` one has only the organ, and a maximally
     /// symmetric organ qualifies for every head that states any transposition. Admitting on one
     /// witness let a single symmetric organ predict full symmetry for twenty heads at once.
-    SingleWitness { by: &'static str },
-    Refuted { by: &'static str, at: String },
-    Conflicted { confirming: Vec<&'static str>, refuting: &'static str },
+    SingleWitness {
+        by: &'static str,
+    },
+    Refuted {
+        by: &'static str,
+        at: String,
+    },
+    Conflicted {
+        confirming: Vec<&'static str>,
+        refuting: &'static str,
+    },
     Unreached,
     AlreadyStanding,
 }
@@ -722,7 +792,10 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
                 if closed.contains(sigma) {
                     continue;
                 }
-                predicted.entry(sigma.clone()).or_default().insert(organ.name);
+                predicted
+                    .entry(sigma.clone())
+                    .or_default()
+                    .insert(organ.name);
             }
         }
         for (sigma, organs_predicting) in predicted {
@@ -752,7 +825,8 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
     let mut composed = 0usize;
     // The held-out arm's tallies. Every one stands beside the population it counts.
     let (mut held_out, mut held_out_agree, mut held_out_weaker) = (0usize, 0usize, 0usize);
-    let (mut held_out_stronger, mut held_out_incomparable, mut held_out_rebase) = (0usize, 0usize, 0usize);
+    let (mut held_out_stronger, mut held_out_incomparable, mut held_out_rebase) =
+        (0usize, 0usize, 0usize);
     let (mut held_out_middle_refused, mut held_out_unreached) = (0usize, 0usize);
     // THE ARTIFACT. Counts are receipts; the composed word is the thing. Four species, each keeping
     // its own exhibit so a reader sees what the machine actually joined.
@@ -777,14 +851,12 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
                 for first in left {
                     for second in right {
                         match (Form::read(first), Form::read(second)) {
-                            (Some(first), Some(second)) => {
-                                match first.compose_at_middle(&second) {
-                                    Some(joined) => {
-                                        composed_forms.insert(joined.canonical());
-                                    }
-                                    None => middle_refused += 1,
+                            (Some(first), Some(second)) => match first.compose_at_middle(&second) {
+                                Some(joined) => {
+                                    composed_forms.insert(joined.canonical());
                                 }
-                            }
+                                None => middle_refused += 1,
+                            },
                             _ => middle_refused += 1,
                         }
                     }
@@ -873,8 +945,12 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
     }
     println!();
     println!("  THE HELD-OUT ARM — routes whose ends the corpus ALSO joins directly");
-    println!("  These are the run's ground truth and it used to discard them. A composed route is put");
-    println!("  to `Chain`'s own law: `Composes::defect` against the stated edge, and `remainder` for");
+    println!(
+        "  These are the run's ground truth and it used to discard them. A composed route is put"
+    );
+    println!(
+        "  to `Chain`'s own law: `Composes::defect` against the stated edge, and `remainder` for"
+    );
     println!("  whether the composition was a rebase. Nothing here is adjudicated by an exterior.");
     println!("    held-out routes                {held_out}");
     println!("    the defect CLOSED (agree)      {held_out_agree}");
@@ -882,10 +958,16 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
     println!("    composite strictly STRONGER    {held_out_stronger}");
     println!("    INCOMPARABLE                   {held_out_incomparable}");
     println!("    composed as a REBASE           {held_out_rebase}   (zero remainder)");
-    println!("    routes reaching no composite   {held_out_unreached}   (nothing unified at the middle)");
-    println!("    arity mismatches at the middle {held_out_middle_refused}   a TYPED refusal, not a failure");
+    println!(
+        "    routes reaching no composite   {held_out_unreached}   (nothing unified at the middle)"
+    );
+    println!(
+        "    arity mismatches at the middle {held_out_middle_refused}   a TYPED refusal, not a failure"
+    );
     println!();
-    println!("  THE COMPOSED WORDS THEMSELVES — the counts above are receipts, these are the object");
+    println!(
+        "  THE COMPOSED WORDS THEMSELVES — the counts above are receipts, these are the object"
+    );
     for species in ["AGREE", "WEAKER", "STRONGER", "INCOMPARABLE"] {
         let Some(kept) = exhibit.get(species) else {
             continue;
@@ -896,19 +978,26 @@ fn emit(atlas: &Atlas, organs: &[OrganReading]) -> Vec<Proposal> {
         }
     }
     if held_out == 0 {
-        println!("    NOTHING WAS HELD OUT: this arm cannot fail on this atlas and carries no evidence.");
+        println!(
+            "    NOTHING WAS HELD OUT: this arm cannot fail on this atlas and carries no evidence."
+        );
     } else if held_out_agree == held_out || held_out_agree == 0 {
         println!("    THE ARM RETURNED ALL-OR-NOTHING, so it adjudicated nothing and says so.");
     }
     println!();
     println!("  two-step transports the corpus states in no single theorem   {composed}");
-    println!("  of which exhibited here (the rest counted, never dropped)     {}", composed.min(COMPOSED_EXHIBIT));
+    println!(
+        "  of which exhibited here (the rest counted, never dropped)     {}",
+        composed.min(COMPOSED_EXHIBIT)
+    );
     proposals
 }
 
 fn main() {
     let root = workspace_root();
-    let declared = std::env::args().nth(1).unwrap_or_else(|| DEFAULT_ATLAS.to_owned());
+    let declared = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| DEFAULT_ATLAS.to_owned());
     let path = root.join(&declared);
 
     println!("{}", "=".repeat(100));
@@ -938,7 +1027,10 @@ fn main() {
     println!("{}", "=".repeat(100));
     println!();
     let organs = read_organs();
-    println!("  {:<30} {:>6} {:>7} {:>11}  {}", "organ", "arity", "order", "separates", "group");
+    println!(
+        "  {:<30} {:>6} {:>7} {:>11}  {}",
+        "organ", "arity", "order", "separates", "group"
+    );
     for organ in &organs {
         let rendered: Vec<String> = organ
             .group
@@ -952,11 +1044,17 @@ fn main() {
             organ.arity,
             organ.group.len(),
             organ.separates,
-            if rendered.is_empty() { "identity only".to_owned() } else { rendered.join(" ") }
+            if rendered.is_empty() {
+                "identity only".to_owned()
+            } else {
+                rendered.join(" ")
+            }
         );
     }
     println!();
-    println!("  Closure under composition is asserted for every one. `oriented-difference` returns");
+    println!(
+        "  Closure under composition is asserted for every one. `oriented-difference` returns"
+    );
     println!("  the identity alone and is the control: a proposal it confirms and nothing else");
     println!("  would convict the adjudication.");
 
@@ -994,7 +1092,9 @@ fn main() {
     // ---------------------------------------------------------------- adjudication
     println!();
     println!("{}", "=".repeat(100));
-    println!("[4b]  ADJUDICATION  --  every proposal to the organs, matched by arity, never by name");
+    println!(
+        "[4b]  ADJUDICATION  --  every proposal to the organs, matched by arity, never by name"
+    );
     println!("{}", "=".repeat(100));
     println!();
     let mut census: BTreeMap<(String, &str), usize> = BTreeMap::new();
@@ -1072,7 +1172,11 @@ fn main() {
         .filter(|proposal| matches!(proposal.verdict, Verdict::Conflicted { .. }))
         .collect();
     for proposal in conflicted.iter().take(SHOWN) {
-        if let Verdict::Conflicted { confirming, refuting } = &proposal.verdict {
+        if let Verdict::Conflicted {
+            confirming,
+            refuting,
+        } = &proposal.verdict
+        {
             println!(
                 "    {:<46}  confirmed by {} · refuted by {refuting}",
                 proposal.statement,
@@ -1090,8 +1194,12 @@ fn main() {
     println!("[5]  THE RETURN  --  the deposit changes what a later construction reaches");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  An admitted proposal is deposited as a generator of its head. The claim is not that");
-    println!("  the deposit happened; it is that a head's group GROWS, and that removing the deposit");
+    println!(
+        "  An admitted proposal is deposited as a generator of its head. The claim is not that"
+    );
+    println!(
+        "  the deposit happened; it is that a head's group GROWS, and that removing the deposit"
+    );
     println!("  removes the growth.");
     println!();
     let mut grew: Vec<(String, usize, usize, Vec<String>)> = Vec::new();
@@ -1119,24 +1227,40 @@ fn main() {
                 .difference(&before)
                 .map(|sigma| render_permutation(sigma))
                 .collect();
-            grew.push((format!("{head}/{degree}"), before.len(), after.len(), gained));
+            grew.push((
+                format!("{head}/{degree}"),
+                before.len(),
+                after.len(),
+                gained,
+            ));
         }
     }
-    println!("  heads whose group GREW after the deposit   {}", grew.len());
+    println!(
+        "  heads whose group GREW after the deposit   {}",
+        grew.len()
+    );
     for (head, before, after, gained) in grew.iter().take(SHOWN) {
-        println!("    {head}   order {before} -> {after}   gained {}", gained.join(" "));
+        println!(
+            "    {head}   order {before} -> {after}   gained {}",
+            gained.join(" ")
+        );
     }
     println!();
     println!("  THE ABLATION -- the deposit removed, and the growth must vanish:");
     let mut ablation_holds = true;
     for (label, before, _, _) in &grew {
-        let (head, degree) = label.rsplit_once('/').expect("the label carries its degree");
+        let (head, degree) = label
+            .rsplit_once('/')
+            .expect("the label carries its degree");
         let degree: usize = degree.parse().expect("a degree");
         let generators = &atlas.groups[&(head.to_owned(), degree)];
         let ablated = generated(generators, degree);
         if ablated.len() != *before {
             ablation_holds = false;
-            println!("    {label}   ABLATION FAILED — order {} against {before}", ablated.len());
+            println!(
+                "    {label}   ABLATION FAILED — order {} against {before}",
+                ablated.len()
+            );
         }
     }
     if ablation_holds {
@@ -1144,7 +1268,9 @@ fn main() {
             "    every one of the {} grown heads returns to its pre-deposit order when the",
             grew.len()
         );
-        println!("    deposited generators are removed. The growth is the deposit's and nothing else's.");
+        println!(
+            "    deposited generators are removed. The growth is the deposit's and nothing else's."
+        );
     }
 
     // ---------------------------------------------------------------- the seal
@@ -1160,7 +1286,9 @@ fn main() {
             Verdict::Admitted { by } => ("admitted".to_owned(), by.join(";")),
             Verdict::SingleWitness { by } => ("single-witness".to_owned(), (*by).to_owned()),
             Verdict::Refuted { by, .. } => ("refuted".to_owned(), (*by).to_owned()),
-            Verdict::Conflicted { refuting, .. } => ("conflicted".to_owned(), (*refuting).to_owned()),
+            Verdict::Conflicted { refuting, .. } => {
+                ("conflicted".to_owned(), (*refuting).to_owned())
+            }
             Verdict::Unreached => ("unreached".to_owned(), String::new()),
             Verdict::AlreadyStanding => ("already-standing".to_owned(), String::new()),
         };
@@ -1169,7 +1297,16 @@ fn main() {
             Species::Composed => "composed".to_owned(),
             Species::OrganPredicted { organ } => format!("organ-predicted:{organ}"),
         };
-        rows.push([species, proposal.head.clone(), proposal.statement.clone(), verdict, organ].join("\t"));
+        rows.push(
+            [
+                species,
+                proposal.head.clone(),
+                proposal.statement.clone(),
+                verdict,
+                organ,
+            ]
+            .join("\t"),
+        );
     }
     let sealed = rows.join("\n") + "\n";
     match fs::write(&sealed_path, &sealed) {
@@ -1195,11 +1332,20 @@ fn main() {
                 admitted.len(),
                 "the seal must reproduce the admitted family exactly"
             );
-            println!("  the admitted family reproduces exactly: {readmitted} against {} before the seal", admitted.len());
+            println!(
+                "  the admitted family reproduces exactly: {readmitted} against {} before the seal",
+                admitted.len()
+            );
             println!();
             println!("  COMPRESSION, carried with its decoder and as an ADDITIVE difference. The");
-            println!("  atlas is {} octets and this seal is {} octets; the second is a", text.len(), sealed.len());
-            println!("  DIFFERENT object rather than a smaller copy of the first -- it carries what");
+            println!(
+                "  atlas is {} octets and this seal is {} octets; the second is a",
+                text.len(),
+                sealed.len()
+            );
+            println!(
+                "  DIFFERENT object rather than a smaller copy of the first -- it carries what"
+            );
             println!("  the machine produced, not what it read -- so no ratio between them is a");
             println!("  compression figure and none is quoted.");
         }

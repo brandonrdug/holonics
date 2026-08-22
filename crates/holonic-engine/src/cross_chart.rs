@@ -69,8 +69,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
-use crate::exact_value::ieee754::{self, BinaryFloatSpecies};
 use crate::exact_value::ExactValueError;
+use crate::exact_value::ieee754::{self, BinaryFloatSpecies};
 
 // -------------------------------------------------------------------------------------------
 // the exact rounding preimage
@@ -169,9 +169,21 @@ impl RoundingFibre {
             // negative rational in the cell goes to `-0`.
             let half_ulp = &ulp * &half;
             let (lower, upper, lower_closed, upper_closed, cell) = if datum.negative {
-                (-half_ulp.clone(), Rat::zero(), true, false, FibreCell::NegativeZero)
+                (
+                    -half_ulp.clone(),
+                    Rat::zero(),
+                    true,
+                    false,
+                    FibreCell::NegativeZero,
+                )
             } else {
-                (Rat::zero(), half_ulp.clone(), true, true, FibreCell::PositiveZero)
+                (
+                    Rat::zero(),
+                    half_ulp.clone(),
+                    true,
+                    true,
+                    FibreCell::PositiveZero,
+                )
             };
             let lower_half_width = &value - &lower;
             let upper_half_width = &upper - &value;
@@ -198,9 +210,17 @@ impl RoundingFibre {
         // sits on the finer grid. The smallest normal is not such an edge: its neighbour is the
         // largest subnormal, which shares its ulp.
         let binade_low_edge = !datum.subnormal && datum.significand == hidden && raw_exponent > 1;
-        let down_step = if binade_low_edge { &ulp * &half } else { ulp.clone() };
+        let down_step = if binade_low_edge {
+            &ulp * &half
+        } else {
+            ulp.clone()
+        };
 
-        let magnitude = if datum.negative { -value.clone() } else { value.clone() };
+        let magnitude = if datum.negative {
+            -value.clone()
+        } else {
+            value.clone()
+        };
         let lower_magnitude = &magnitude - &(&down_step * &half);
         let upper_magnitude = &magnitude + &(&up_step * &half);
         let (lower, upper) = if datum.negative {
@@ -372,8 +392,16 @@ impl PathwiseFibre {
             }
         }
         let inside = {
-            let above = if lower_closed { entered >= lower } else { entered > lower };
-            let below = if upper_closed { entered <= upper } else { entered < upper };
+            let above = if lower_closed {
+                entered >= lower
+            } else {
+                entered > lower
+            };
+            let below = if upper_closed {
+                entered <= upper
+            } else {
+                entered < upper
+            };
             above && below
         };
         Self {
@@ -429,7 +457,14 @@ impl SummedFibre {
             lower_closed = lower_closed && fibre.lower_closed;
             upper_closed = upper_closed && fibre.upper_closed;
         }
-        Self { summands, value, lower, upper, lower_closed, upper_closed }
+        Self {
+            summands,
+            value,
+            lower,
+            upper,
+            lower_closed,
+            upper_closed,
+        }
     }
 
     pub fn width(&self) -> Rat {
@@ -509,7 +544,10 @@ pub fn chart_receipt(phi: &ExactRatMatrix) -> Result<ChartReceipt, CrossChartErr
                 backward_identity: Box::new(backward),
             })
         }
-        RebaseReceipt::Refused { factorization, reason } => Ok(ChartReceipt::Quotient {
+        RebaseReceipt::Refused {
+            factorization,
+            reason,
+        } => Ok(ChartReceipt::Quotient {
             rank: factorization.rank,
             kernel: factorization.kernel.clone(),
             cokernel_annihilator: factorization.cokernel_annihilator.clone(),
@@ -685,14 +723,27 @@ pub fn chain_law(
     t_eta: &ExactRatMatrix,
     s_eta: &ExactRatMatrix,
     material: &[(String, Vec<Rat>)],
-) -> Result<(CrossChartDefect, CrossChartDefect, CrossChartDefect, ChainLawReading), CrossChartError>
-{
+) -> Result<
+    (
+        CrossChartDefect,
+        CrossChartDefect,
+        CrossChartDefect,
+        ChainLawReading,
+    ),
+    CrossChartError,
+> {
     let chi_gamma = cross_chart_defect("gamma", phi_y, t_gamma, s_gamma, phi_x, &[])?;
     let chi_eta = cross_chart_defect("eta", phi_z, t_eta, s_eta, phi_y, &[])?;
     let t_composite = t_eta.multiply(t_gamma)?;
     let s_composite = s_eta.multiply(s_gamma)?;
-    let chi_composite =
-        cross_chart_defect("eta after gamma", phi_z, &t_composite, &s_composite, phi_x, &[])?;
+    let chi_composite = cross_chart_defect(
+        "eta after gamma",
+        phi_z,
+        &t_composite,
+        &s_composite,
+        phi_x,
+        &[],
+    )?;
 
     let composed_chi = chi_composite.chi.clone();
     let reconstructed = chi_eta
@@ -706,8 +757,7 @@ pub fn chain_law(
     for (name, vector) in material {
         let composed = chi_composite.chi.apply(vector)?;
         let recon = reconstructed.apply(vector)?;
-        let residual: Vec<Rat> =
-            composed.iter().zip(&recon).map(|(a, b)| a - b).collect();
+        let residual: Vec<Rat> = composed.iter().zip(&recon).map(|(a, b)| a - b).collect();
         let holds = residual.iter().all(num_traits::Zero::is_zero);
         vector_checks.push(ChainVectorCheck {
             name: name.clone(),
@@ -860,7 +910,10 @@ mod tests {
             }
         }
         assert!(checked > 190_000, "the sweep covered {checked} probes");
-        assert!(asymmetric > 0, "some cell must be asymmetric or the law is vacuous");
+        assert!(
+            asymmetric > 0,
+            "some cell must be asymmetric or the law is vacuous"
+        );
     }
 
     /// **Ties to even, on a real tie.** The midpoint between two adjacent codewords belongs to the
@@ -873,7 +926,10 @@ mod tests {
         assert!(even.significand_even);
         assert!(!odd.significand_even);
         let tie = &even.value + &(&(&odd.value - &even.value) / Rat::from_integer(BigInt::from(2)));
-        assert!(even.contains(&tie), "the tie belongs to the even significand");
+        assert!(
+            even.contains(&tie),
+            "the tie belongs to the even significand"
+        );
         assert!(!odd.contains(&tie), "and to nothing else");
         assert_eq!(ieee754::round_into_bfloat16(&tie).expect("emits").0, 0x3f80);
         assert!(even.upper_closed && !odd.lower_closed);
@@ -900,15 +956,31 @@ mod tests {
         assert_eq!(positive.cell, FibreCell::PositiveZero);
         assert_eq!(negative.cell, FibreCell::NegativeZero);
         assert!(positive.contains(&Rat::zero()));
-        assert!(!negative.contains(&Rat::zero()), "the origin is not negative");
-        assert!(positive.upper_closed, "the tie above zero is even and stays");
+        assert!(
+            !negative.contains(&Rat::zero()),
+            "the origin is not negative"
+        );
+        assert!(
+            positive.upper_closed,
+            "the tie above zero is even and stays"
+        );
         assert!(negative.lower_closed);
         assert!(!negative.upper_closed, "the origin is the other cell's");
         assert_eq!(negative.upper, Rat::zero());
         assert_eq!(&positive.upper, &-negative.lower.clone());
         // and the mouth agrees on both signs of the tie
-        assert_eq!(ieee754::round_into_bfloat16(&positive.upper).expect("emits").0, 0x0000);
-        assert_eq!(ieee754::round_into_bfloat16(&negative.lower).expect("emits").0, 0x8000);
+        assert_eq!(
+            ieee754::round_into_bfloat16(&positive.upper)
+                .expect("emits")
+                .0,
+            0x0000
+        );
+        assert_eq!(
+            ieee754::round_into_bfloat16(&negative.lower)
+                .expect("emits")
+                .0,
+            0x8000
+        );
     }
 
     /// **Subnormal cells are symmetric**, including across the boundary into the smallest normal,
@@ -920,7 +992,10 @@ mod tests {
         assert_eq!(largest_subnormal.cell, FibreCell::Subnormal);
         assert_eq!(smallest_normal.cell, FibreCell::Normal);
         assert!(!largest_subnormal.asymmetric());
-        assert!(!smallest_normal.asymmetric(), "the smallest normal is not a binade low edge");
+        assert!(
+            !smallest_normal.asymmetric(),
+            "the smallest normal is not a binade low edge"
+        );
         assert_eq!(largest_subnormal.upper, smallest_normal.lower);
         assert!(largest_subnormal.upper_closed != smallest_normal.lower_closed);
     }
@@ -930,12 +1005,16 @@ mod tests {
     #[test]
     fn cross_chart_the_cells_partition_the_representable_range() {
         for word in 0x0000u16..0x7f7f {
-            let (Ok(left), Ok(right)) =
-                (RoundingFibre::of_bfloat16(word), RoundingFibre::of_bfloat16(word + 1))
-            else {
+            let (Ok(left), Ok(right)) = (
+                RoundingFibre::of_bfloat16(word),
+                RoundingFibre::of_bfloat16(word + 1),
+            ) else {
                 continue;
             };
-            assert_eq!(left.upper, right.lower, "adjacent cells meet at {word:#06x}");
+            assert_eq!(
+                left.upper, right.lower,
+                "adjacent cells meet at {word:#06x}"
+            );
             assert!(
                 left.upper_closed ^ right.lower_closed,
                 "exactly one side holds the tie at {word:#06x}"
@@ -947,12 +1026,13 @@ mod tests {
 
     #[test]
     fn cross_chart_a_rebase_exhibits_both_identities_and_a_quotient_refuses_an_inverse() {
-        let rebase = matrix(vec![
-            vec![rat(2, 1), rat(0, 1)],
-            vec![rat(0, 1), rat(1, 3)],
-        ]);
+        let rebase = matrix(vec![vec![rat(2, 1), rat(0, 1)], vec![rat(0, 1), rat(1, 3)]]);
         match chart_receipt(&rebase).expect("typed") {
-            ChartReceipt::Rebase { forward_identity, backward_identity, .. } => {
+            ChartReceipt::Rebase {
+                forward_identity,
+                backward_identity,
+                ..
+            } => {
                 let identity = ExactRatMatrix::identity(2).expect("identity");
                 assert_eq!(*forward_identity, identity);
                 assert_eq!(*backward_identity, identity);
@@ -963,7 +1043,12 @@ mod tests {
         // The grouped-sharing quotient: two coordinates summed into one.
         let quotient = matrix(vec![vec![rat(1, 1), rat(1, 1)]]);
         match chart_receipt(&quotient).expect("typed") {
-            ChartReceipt::Quotient { rank, kernel, refusal, .. } => {
+            ChartReceipt::Quotient {
+                rank,
+                kernel,
+                refusal,
+                ..
+            } => {
                 assert_eq!(rank, 1);
                 assert_eq!(kernel.len(), 1);
                 assert!(refusal.contains("no inverse") || refusal.contains("quotient"));
@@ -976,10 +1061,7 @@ mod tests {
     /// adjoint's defect is zero; the bare transpose's is not, and it is returned exactly.
     #[test]
     fn cross_chart_the_bare_transpose_differs_from_the_metric_adjoint() {
-        let phi = matrix(vec![
-            vec![rat(1, 1), rat(2, 1)],
-            vec![rat(0, 1), rat(1, 1)],
-        ]);
+        let phi = matrix(vec![vec![rat(1, 1), rat(2, 1)], vec![rat(0, 1), rat(1, 1)]]);
         let identity = ExactRatMatrix::identity(2).expect("identity");
         let weighted = ExactRatMatrix::from_diagonal(vec![rat(1, 1), rat(3, 1)]).expect("metric");
         let x = vec![rat(1, 1), rat(1, 1)];
@@ -987,13 +1069,19 @@ mod tests {
 
         let (bare_euclidean, lawful_euclidean) =
             bare_transpose_adjoint_defect(&phi, &identity, &identity, &x, &y).expect("defects");
-        assert!(bare_euclidean.is_zero(), "under two identity metrics the transpose IS the adjoint");
+        assert!(
+            bare_euclidean.is_zero(),
+            "under two identity metrics the transpose IS the adjoint"
+        );
         assert!(lawful_euclidean.is_zero());
 
         let (bare, lawful) =
             bare_transpose_adjoint_defect(&phi, &weighted, &identity, &x, &y).expect("defects");
         assert!(lawful.is_zero(), "the metric adjoint balances the pairing");
-        assert!(!bare.is_zero(), "the bare transpose does not, and the defect is exhibited: {bare}");
+        assert!(
+            !bare.is_zero(),
+            "the bare transpose does not, and the defect is exhibited: {bare}"
+        );
     }
 
     // --- the defect and the chain law -------------------------------------------------------
@@ -1050,7 +1138,11 @@ mod tests {
             &phi_x, &phi_y, &phi_z, &t_gamma, &s_gamma, &t_eta, &s_eta, &material,
         )
         .expect("chain");
-        assert!(reading.operator_identity_holds, "residual {:?}", reading.residual);
+        assert!(
+            reading.operator_identity_holds,
+            "residual {:?}",
+            reading.residual
+        );
         assert_eq!(reading.vector_checks.len(), 3);
         for check in &reading.vector_checks {
             assert!(check.holds, "{} residual {:?}", check.name, check.residual);
@@ -1066,10 +1158,19 @@ mod tests {
             .expect("computed")
             .expect("a quotient collapses something");
         assert_eq!(separator.word_length, 1);
-        assert!(separator.identified_image.iter().all(num_traits::Zero::is_zero));
+        assert!(
+            separator
+                .identified_image
+                .iter()
+                .all(num_traits::Zero::is_zero)
+        );
         assert_ne!(separator.left_reading, separator.right_reading);
         let rebase = ExactRatMatrix::identity(3).expect("identity");
-        assert!(shortest_reopening_separator(&rebase).expect("computed").is_none());
+        assert!(
+            shortest_reopening_separator(&rebase)
+                .expect("computed")
+                .is_none()
+        );
     }
 
     // --- the composed fibres ---------------------------------------------------------------
@@ -1115,7 +1216,10 @@ mod tests {
             },
         ];
         let composed = PathwiseFibre::compose(entered.clone(), steps);
-        assert!(composed.entered_inside, "what entered must be inside its own preimage");
+        assert!(
+            composed.entered_inside,
+            "what entered must be inside its own preimage"
+        );
         assert_eq!(composed.total_residual, residual);
         assert_eq!(composed.composed_lower, fibre.lower);
         assert_eq!(&fibre.value + &composed.total_residual, entered);

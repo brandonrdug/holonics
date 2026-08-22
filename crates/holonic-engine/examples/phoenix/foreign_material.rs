@@ -3,7 +3,8 @@
 use holonic_engine::foreign_map::ForeignDtype;
 use holonic_engine::ported_operation::{PortedOperationComplex, SourceTestimony};
 use holonic_engine::source_occurrence::{
-    BindingValidation, OccurrenceWitness, RegionIdentity, SourceOccurrence, SourceRefusal,
+    BindingValidation, OccurrenceWitness, OccurrenceWitnessRefusal, RegionIdentity,
+    SourceOccurrence,
 };
 use holonic_engine::streamed_standing::StagedRegion;
 
@@ -31,7 +32,7 @@ impl OccurrenceWitness for ForeignOccurrenceWitness {
     fn validate(
         &self,
         complex: &PortedOperationComplex,
-    ) -> Result<Vec<BindingValidation>, SourceRefusal> {
+    ) -> Result<Vec<BindingValidation>, OccurrenceWitnessRefusal> {
         let mut foreign = complex.clone();
         for operation in foreign.operations.values_mut() {
             for testimony in &mut operation.testimony {
@@ -43,7 +44,7 @@ impl OccurrenceWitness for ForeignOccurrenceWitness {
                 }
             }
         }
-        self.inner.validate(&foreign)
+        Ok(self.inner.validate(&foreign)?)
     }
 }
 

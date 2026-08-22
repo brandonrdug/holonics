@@ -33,14 +33,14 @@ mod site;
 use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::exact_value::ieee754::round_into_bfloat16;
 use holonic_engine::exact_value::CertifiedSeries;
+use holonic_engine::exact_value::ieee754::round_into_bfloat16;
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_reference::realize;
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
-use site::{found_reaching, Reach, ResidentSourceCarrier, BAND_POPULATION, BASE, CAUSED};
+use site::{BAND_POPULATION, BASE, CAUSED, Reach, ResidentSourceCarrier, found_reaching};
 
 /// The declared cap, exactly. `config.json` says `final_logit_softcapping = 30.0`.
 const SOFTCAP: i64 = 30;
@@ -73,7 +73,10 @@ fn main() {
     };
     println!("PHOENIX STATION SEVEN — THE EMISSION IS A SECTION, AND THE ANSWER IS A BLOCK");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     let (site, container, file) =
         match found_reaching(&root, BASE, terms, None, Reach::ThroughEmission) {
@@ -86,10 +89,21 @@ fn main() {
     let fronts = site.complex.fronts().expect("fronts");
     println!();
     println!("  THE BODY");
-    println!("    operations                      {}", site.program.operations.len());
-    println!("    dependency span                 {} fronts", fronts.len());
-    println!("    stored populations NAMED        {}", site.populations.len());
-    println!("    the head is tied                embed_tokens read the other way; no lm_head exists");
+    println!(
+        "    operations                      {}",
+        site.program.operations.len()
+    );
+    println!(
+        "    dependency span                 {} fronts",
+        fronts.len()
+    );
+    println!(
+        "    stored populations NAMED        {}",
+        site.populations.len()
+    );
+    println!(
+        "    the head is tied                embed_tokens read the other way; no lm_head exists"
+    );
 
     let mut carrier = ResidentSourceCarrier {
         chart: &chart,
@@ -120,8 +134,14 @@ fn main() {
     println!("    positions returned              {}", sections.len());
     println!("    width                           {}", sections[0].len());
     println!("    wall clock                      {:?}", clock.elapsed());
-    println!("    mounts served from residency    {} — an invariant operand is uploaded ONCE", carrier.reused);
-    println!("    entries retained below the frame {}", carrier.below_the_frame);
+    println!(
+        "    mounts served from residency    {} — an invariant operand is uploaded ONCE",
+        carrier.reused
+    );
+    println!(
+        "    entries retained below the frame {}",
+        carrier.below_the_frame
+    );
     println!("    exact work                      {:?}", receipt.work);
 
     // -----------------------------------------------------------------------------------------
@@ -192,7 +212,11 @@ fn main() {
             CAUSED[position],
             block.len(),
             section.len(),
-            if widest_text.len() > 30 { format!("{}…", &widest_text[..30]) } else { widest_text }
+            if widest_text.len() > 30 {
+                format!("{}…", &widest_text[..30])
+            } else {
+                widest_text
+            }
         );
         println!(
             "        through the declared softcap over the widest {SHOULDER}: block {}   the SAME block {}",
@@ -201,10 +225,15 @@ fn main() {
         );
         println!(
             "        the coordinate past the shoulder falls outside it   {}",
-            boundary.map(|held| held.to_string()).unwrap_or_else(|| "no such coordinate".to_owned())
+            boundary
+                .map(|held| held.to_string())
+                .unwrap_or_else(|| "no such coordinate".to_owned())
         );
         let shown: Vec<usize> = block.iter().take(8).copied().collect();
-        println!("        coordinates {shown:?}{}", if block.len() > 8 { " …" } else { "" });
+        println!(
+            "        coordinates {shown:?}{}",
+            if block.len() > 8 { " …" } else { "" }
+        );
     }
 
     // The order face, checked directly on a declared sample rather than inferred from the block.
@@ -220,7 +249,10 @@ fn main() {
     }
     println!();
     println!("  THE ORDER FACE, checked pair by pair on a declared sample");
-    println!("    pairs compared                  {}", sample.len().saturating_sub(1) * sections.len());
+    println!(
+        "    pairs compared                  {}",
+        sample.len().saturating_sub(1) * sections.len()
+    );
     println!("    pairs the softcap reordered     {order_moved}");
 
     println!();
@@ -235,8 +267,12 @@ fn main() {
     println!("  declared receiver — the stored species the body actually carries — and a block of");
     println!("  one is as real an answer as a block of nine.");
     println!();
-    println!("  The declared `final_logit_softcapping` is applied as the receiver face it is rather");
-    println!("  than as an occurrence, and the claim that licenses that is checked twice: the block");
+    println!(
+        "  The declared `final_logit_softcapping` is applied as the receiver face it is rather"
+    );
+    println!(
+        "  than as an occurrence, and the claim that licenses that is checked twice: the block"
+    );
     println!("  is identical through it, and it reorders no pair of a declared sample. A strictly");
     println!("  monotone map cannot move an order, and an order is what crosses a frame.");
     println!();

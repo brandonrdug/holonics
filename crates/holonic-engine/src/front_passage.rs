@@ -75,27 +75,38 @@ use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
 use relational_geometry::Rat;
 use serde::Serialize;
+use sha2::{Digest, Sha256};
 
+use crate::approach_front::ApproachFront;
 use crate::causal::EventId;
+use crate::exact_owner_testimony::ExactOwnerWitnessRefusal;
 use crate::exact_work::{ExactWork, WorkBudget};
 use crate::hardware_cover::{ChartId, CoverBarrier, CoverDecomposition, FrontCell, ModeIdentity};
-use crate::interaction::OccurrencePort;
-use crate::interchange::{certify_footprints, DistinguishingWord, FrontCertificate, MemberFootprint};
-use crate::ported_operation::{DiagramClosure, Front, OperationSpecies, PortedOperationComplex};
-use crate::receiver_current::{ExactReceiverCurrentLaw, ExactReceiverCurrentPassage, ReceiverCurrentPassageId, ReceiverCurrentSiteId};
-use crate::approach_front::ApproachFront;
-use crate::resident_section::{
-    CouplingPlan, LawShape, ObstructionLineage, ResidentGrain, ResidentPassage, ResidentRefusal, ResidentSection, ResidentSurface, Schedule,
-    SlotReading, StagedWords, TransferCensus, SLOT_WORDS, WORD_OCTAVES,
+use crate::interaction::{InteractionTemporality, OccurrencePort};
+use crate::interchange::{
+    DistinguishingWord, FrontCertificate, MemberFootprint, certify_footprints,
 };
-use crate::source_occurrence::{BindingValidation, OccurrenceWitness, SourceRefusal};
-use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainStanding};
+use crate::ported_operation::{DiagramClosure, Front, OperationSpecies, PortedOperationComplex};
+use crate::receiver_current::{
+    ExactReceiverCurrentLaw, ExactReceiverCurrentPassage, ReceiverCurrentPassageId,
+    ReceiverCurrentSiteId,
+};
+use crate::resident_section::{
+    CouplingPlan, LawShape, ObstructionLineage, ResidentGrain, ResidentPassage, ResidentRefusal,
+    ResidentSection, ResidentSurface, SLOT_WORDS, Schedule, SlotReading, StagedWords,
+    TransferCensus, WORD_OCTAVES,
+};
+use crate::source_occurrence::{
+    BindingValidation, OccurrenceWitness, OccurrenceWitnessRefusal, SourceRefusal,
+};
+use crate::traversible_chain::{Admittance, Crossing, Standing as ChainStanding, found};
 use mount::{GraphCensus, Stream};
 
 pub use crate::resident_law::{
-    Chronology, CollapseControl, Contact, Contract, Enter, EnteringRows, EntailmentRefusal, FactorizedContract, GeluTanh, Hadamard, LawEntailment,
-    MidpointQuotient, MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale, SealedMidpointQuotient,
-    Standing, WithdrawColumns, WithdrawRows,
+    Chronology, CollapseControl, Contact, Contract, ContractTiled, EntailmentRefusal, Enter,
+    EnteringRows, FactorizedContract, GeluTanh, Hadamard, LawEntailment, MidpointQuotient,
+    MountedPopulation, PermuteColumns, ReEntry, ResidentLaw, ResidentMaterial, RmsRebase, Scale,
+    SealedMidpointQuotient, Standing, WithdrawColumns, WithdrawRows,
 };
 
 /// The binding of every occurrence in one complex to its law. **Binds; does not schedule.**
@@ -106,14 +117,21 @@ pub struct ResidentRealization {
 
 impl ResidentRealization {
     /// Bind an occurrence to a law; returns the law it displaced, if any.
-    pub fn bind(&mut self, occurrence: EventId, law: impl ResidentLaw + 'static) -> Option<Box<dyn ResidentLaw>> {
+    pub fn bind(
+        &mut self,
+        occurrence: EventId,
+        law: impl ResidentLaw + 'static,
+    ) -> Option<Box<dyn ResidentLaw>> {
         self.bindings.insert(occurrence, Box::new(law))
     }
 
     /// Every occurrence bound, every law's arity and species the diagram's, every input carried by
     /// a bond. The same checks `realization::ReceiverProgram` makes, at this seam.
     pub fn validate(&self, complex: &PortedOperationComplex) -> Result<(), CompileRefusal> {
-        complex.shape.validate().map_err(|error| CompileRefusal::Shape(error.to_string()))?;
+        complex
+            .shape
+            .validate()
+            .map_err(|error| CompileRefusal::Shape(error.to_string()))?;
         for event in complex.shape.occurrences.keys() {
             if !self.bindings.contains_key(event) {
                 return Err(CompileRefusal::OccurrenceUnbound { occurrence: *event });
@@ -150,11 +168,18 @@ impl ResidentRealization {
                 .map(|bound| bound.species)
                 .ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *event })?;
             if declared != binding.species() {
-                return Err(CompileRefusal::SpeciesDisagrees { occurrence: *event, declared, binding: binding.species() });
+                return Err(CompileRefusal::SpeciesDisagrees {
+                    occurrence: *event,
+                    declared,
+                    binding: binding.species(),
+                });
             }
             for input in 0..inputs {
                 if !targets.contains(&OccurrencePort::input(*event, input)) {
-                    return Err(CompileRefusal::InputUncarried { occurrence: *event, input });
+                    return Err(CompileRefusal::InputUncarried {
+                        occurrence: *event,
+                        input,
+                    });
                 }
             }
         }
@@ -166,32 +191,72 @@ impl ResidentRealization {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CompileRefusal {
     Shape(String),
-    OccurrenceUnbound { occurrence: EventId },
-    ForeignOccurrence { occurrence: EventId },
-    ArityDisagrees { occurrence: EventId, law_inputs: usize, law_outputs: usize, binding_inputs: usize, binding_outputs: usize },
-    SpeciesDisagrees { occurrence: EventId, declared: OperationSpecies, binding: OperationSpecies },
-    InputUncarried { occurrence: EventId, input: usize },
+    OccurrenceUnbound {
+        occurrence: EventId,
+    },
+    ForeignOccurrence {
+        occurrence: EventId,
+    },
+    ArityDisagrees {
+        occurrence: EventId,
+        law_inputs: usize,
+        law_outputs: usize,
+        binding_inputs: usize,
+        binding_outputs: usize,
+    },
+    SpeciesDisagrees {
+        occurrence: EventId,
+        declared: OperationSpecies,
+        binding: OperationSpecies,
+    },
+    InputUncarried {
+        occurrence: EventId,
+        input: usize,
+    },
     /// **An unresolved candidate diagram cannot compile.** The closure names the open questions.
     DiagramOpen(DiagramClosure),
     /// The source occurrence refused a binding's testimony — a fabricated symbol, a drifted field,
     /// a wrong shape, a foreign locator, an intervention on a law.
     Source(SourceRefusal),
+    /// An exact mathematical owner refused the structural resident binding.
+    ExactOwnerWitness(ExactOwnerWitnessRefusal),
     /// A law names material the caller did not mount or read.
-    MaterialAbsent { occurrence: EventId, name: String },
+    MaterialAbsent {
+        occurrence: EventId,
+        name: String,
+    },
     /// The validated testimony of an occurrence does not entail the law bound to it — a valid but
     /// unrelated slice, or a parameter no field, shape or slice accounts for.
-    Entailment { occurrence: EventId, operation: String, refusal: EntailmentRefusal },
+    Entailment {
+        occurrence: EventId,
+        operation: String,
+        refusal: EntailmentRefusal,
+    },
     /// **A declared fusion whose predecessor's face does not factor through it.** A sealing law
     /// rewrites its predecessor's section in place, so the predecessor's own face is gone; §4.6
     /// admits that only when every declared future receiver reads through the fused output.
     /// `because` names which of the three conditions failed and `reopening` names the law to bind
     /// instead, so the refusal carries its own route out.
-    FusionUnfactored { quotient: EventId, predecessor: EventId, because: String, reopening: &'static str },
+    FusionUnfactored {
+        quotient: EventId,
+        predecessor: EventId,
+        because: String,
+        reopening: &'static str,
+    },
 }
 
 impl From<SourceRefusal> for CompileRefusal {
     fn from(refusal: SourceRefusal) -> Self {
         Self::Source(refusal)
+    }
+}
+
+impl From<OccurrenceWitnessRefusal> for CompileRefusal {
+    fn from(refusal: OccurrenceWitnessRefusal) -> Self {
+        match refusal {
+            OccurrenceWitnessRefusal::Source(source) => Self::Source(source),
+            OccurrenceWitnessRefusal::ExactOwner(exact) => Self::ExactOwnerWitness(exact),
+        }
     }
 }
 
@@ -219,7 +284,11 @@ pub enum ResourceObstruction {
     /// The exact carrier cannot hold what an operation would need, or a launch aperture refused.
     Carrier(ResidentRefusal),
     /// A cell of the front was placed on a chart that carries no semantics here.
-    Placement { front: usize, cell: usize, chart: ChartId },
+    Placement {
+        front: usize,
+        cell: usize,
+        chart: ChartId,
+    },
     /// The surface refused: no device, a driver error.
     Surface(ResidentRefusal),
 }
@@ -229,18 +298,35 @@ pub enum ResourceObstruction {
 /// CPU execution.
 #[derive(Debug)]
 pub enum FrontPassageObstruction {
-    Cover { front: usize, barriers: Vec<CoverBarrier> },
-    Interchange { front: usize, because: DistinguishingWord, certificate: Box<FrontCertificate> },
+    Cover {
+        front: usize,
+        barriers: Vec<CoverBarrier>,
+    },
+    Interchange {
+        front: usize,
+        because: DistinguishingWord,
+        certificate: Box<FrontCertificate>,
+    },
     Resource(ResourceObstruction),
     Compile(CompileRefusal),
     /// The card refused at the named occurrence during the deed — the first refusal in front
     /// order that stands between the entering material and the terminal — with the slot it saw
     /// and the **complete** obstruction lineage of the deed beside it.
-    Refused { occurrence: EventId, operation: String, refusal: ResidentRefusal, slot: SlotReading, lineage: ObstructionLineage },
+    Refused {
+        occurrence: EventId,
+        operation: String,
+        refusal: ResidentRefusal,
+        slot: SlotReading,
+        lineage: ObstructionLineage,
+    },
     /// **A face a declared fusion sealed away.** The occurrence's section carries the quotient's
     /// midpoints now; its own pre-quotient enclosure was the apparatus compression the caller
     /// declared. `reopening` names the route back, and it is a recompile rather than a read.
-    Sealed { occurrence: EventId, quotient: EventId, reopening: &'static str },
+    Sealed {
+        occurrence: EventId,
+        quotient: EventId,
+        reopening: &'static str,
+    },
 }
 
 impl From<CompileRefusal> for FrontPassageObstruction {
@@ -252,6 +338,12 @@ impl From<CompileRefusal> for FrontPassageObstruction {
 impl From<SourceRefusal> for FrontPassageObstruction {
     fn from(refusal: SourceRefusal) -> Self {
         Self::Compile(CompileRefusal::Source(refusal))
+    }
+}
+
+impl From<OccurrenceWitnessRefusal> for FrontPassageObstruction {
+    fn from(refusal: OccurrenceWitnessRefusal) -> Self {
+        Self::Compile(refusal.into())
     }
 }
 
@@ -269,10 +361,16 @@ fn surface_refusal(refusal: ResidentRefusal) -> FrontPassageObstruction {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum Ceiling {
     /// A finite ceiling, and who declared it.
-    Bounded { ceiling: BigUint, declared_by: &'static str },
+    Bounded {
+        ceiling: BigUint,
+        declared_by: &'static str,
+    },
     /// No finite ceiling exists for this coordinate at this receiver: why, and what still bounds
     /// it in practice (a device limit, the word, the bus).
-    Unbounded { because: &'static str, constrained_by: Vec<&'static str> },
+    Unbounded {
+        because: &'static str,
+        constrained_by: Vec<&'static str>,
+    },
 }
 
 /// **One coordinate of the deed, admitted or not.** Required against its ceiling; an unbounded
@@ -286,12 +384,38 @@ pub struct CoordinateAdmission {
 }
 
 impl CoordinateAdmission {
-    fn bounded(name: &'static str, required: BigUint, ceiling: BigUint, declared_by: &'static str) -> Self {
+    fn bounded(
+        name: &'static str,
+        required: BigUint,
+        ceiling: BigUint,
+        declared_by: &'static str,
+    ) -> Self {
         let admitted = required <= ceiling;
-        Self { name, required, ceiling: Ceiling::Bounded { ceiling, declared_by }, admitted }
+        Self {
+            name,
+            required,
+            ceiling: Ceiling::Bounded {
+                ceiling,
+                declared_by,
+            },
+            admitted,
+        }
     }
-    fn unbounded(name: &'static str, required: BigUint, because: &'static str, constrained_by: &[&'static str]) -> Self {
-        Self { name, required, ceiling: Ceiling::Unbounded { because, constrained_by: constrained_by.to_vec() }, admitted: true }
+    fn unbounded(
+        name: &'static str,
+        required: BigUint,
+        because: &'static str,
+        constrained_by: &[&'static str],
+    ) -> Self {
+        Self {
+            name,
+            required,
+            ceiling: Ceiling::Unbounded {
+                because,
+                constrained_by: constrained_by.to_vec(),
+            },
+            admitted: true,
+        }
     }
     pub fn is_bounded(&self) -> bool {
         matches!(self.ceiling, Ceiling::Bounded { .. })
@@ -328,7 +452,8 @@ impl DeedReceiver {
         self
     }
     pub fn with_apparatus_aperture(mut self, coordinate: &str, aperture: u64) -> Self {
-        self.apparatus_apertures.insert(coordinate.to_owned(), aperture);
+        self.apparatus_apertures
+            .insert(coordinate.to_owned(), aperture);
         self
     }
 }
@@ -337,11 +462,23 @@ impl DeedReceiver {
 /// apparatus limit that still bounds it in practice, named so the receipt carries it.
 fn semantic_constraints(coordinate: &str) -> &'static [&'static str] {
     match coordinate {
-        "additions" | "multiplications" | "divisions" => &["the launch aperture: grid extent × block", "the lanes resident on the device chart"],
-        "entries-written" | "resident-entries" => &["the device's free memory (sections are two words per entry)"],
-        "cumulative-bits" => &["the device's free memory", "the word: 63 octaves per coordinate"],
-        "peak-bits" => &["the word: 63 octaves; admitted per occurrence by the a-priori octave law and refuted on the card by its census"],
-        "dependency-span" => &["nothing finite: a longer chain is a longer deed; the graph's depth is its own"],
+        "additions" | "multiplications" | "divisions" => &[
+            "the launch aperture: grid extent × block",
+            "the lanes resident on the device chart",
+        ],
+        "entries-written" | "resident-entries" => {
+            &["the device's free memory (sections are two words per entry)"]
+        }
+        "cumulative-bits" => &[
+            "the device's free memory",
+            "the word: 63 octaves per coordinate",
+        ],
+        "peak-bits" => &[
+            "the word: 63 octaves; admitted per occurrence by the a-priori octave law and refuted on the card by its census",
+        ],
+        "dependency-span" => {
+            &["nothing finite: a longer chain is a longer deed; the graph's depth is its own"]
+        }
         "width-weighted-operations" => &["the product of the launch aperture and the word"],
         _ => &["none named"],
     }
@@ -422,7 +559,10 @@ impl ApparatusPrediction {
     /// `charged_octets`; under a coarser grain it can only rise. Exhibited so the requirement's
     /// dependence on the grain is a law a caller can check, not a number it must trust.
     pub fn charged_under(&self, grain: u64) -> u64 {
-        self.allocation_octets.iter().map(|octets| rounded_to(*octets, grain)).sum()
+        self.allocation_octets
+            .iter()
+            .map(|octets| rounded_to(*octets, grain))
+            .sum()
     }
 }
 
@@ -445,17 +585,35 @@ pub struct DeedAdmission {
 
 impl DeedAdmission {
     pub fn is_admitted(&self) -> bool {
-        self.semantic.iter().chain(self.apparatus.iter()).all(|c| c.admitted)
+        self.semantic
+            .iter()
+            .chain(self.apparatus.iter())
+            .all(|c| c.admitted)
     }
     /// The first coordinate that refused, semantic before apparatus.
     pub fn refusing(&self) -> Option<(&'static str, &CoordinateAdmission)> {
-        self.semantic.iter().find(|c| !c.admitted).map(|c| ("semantic", c)).or_else(|| self.apparatus.iter().find(|c| !c.admitted).map(|c| ("apparatus", c)))
+        self.semantic
+            .iter()
+            .find(|c| !c.admitted)
+            .map(|c| ("semantic", c))
+            .or_else(|| {
+                self.apparatus
+                    .iter()
+                    .find(|c| !c.admitted)
+                    .map(|c| ("apparatus", c))
+            })
     }
     pub fn bounded(&self) -> impl Iterator<Item = &CoordinateAdmission> {
-        self.semantic.iter().chain(self.apparatus.iter()).filter(|c| c.is_bounded())
+        self.semantic
+            .iter()
+            .chain(self.apparatus.iter())
+            .filter(|c| c.is_bounded())
     }
     pub fn unbounded(&self) -> impl Iterator<Item = &CoordinateAdmission> {
-        self.semantic.iter().chain(self.apparatus.iter()).filter(|c| !c.is_bounded())
+        self.semantic
+            .iter()
+            .chain(self.apparatus.iter())
+            .filter(|c| !c.is_bounded())
     }
 }
 
@@ -524,7 +682,11 @@ pub struct MaterialAdmission {
 pub enum MaterialConsequenceMismatch {
     Prediction,
     CoordinateCount,
-    Coordinate { index: usize, name: &'static str, field: &'static str },
+    Coordinate {
+        index: usize,
+        name: &'static str,
+        field: &'static str,
+    },
 }
 
 impl MaterialAdmission {
@@ -541,7 +703,17 @@ impl MaterialAdmission {
         self.prediction
             .maps
             .iter()
-            .map(|(name, predicted, _)| (name.clone(), *predicted, material.populations.get(name).map(|p| p.readout.resident_octets() as u64).unwrap_or(0)))
+            .map(|(name, predicted, _)| {
+                (
+                    name.clone(),
+                    *predicted,
+                    material
+                        .populations
+                        .get(name)
+                        .map(|p| p.readout.resident_octets() as u64)
+                        .unwrap_or(0),
+                )
+            })
             .collect()
     }
 
@@ -557,20 +729,69 @@ impl MaterialAdmission {
         }
         for (index, (left, right)) in self.coordinates.iter().zip(&other.coordinates).enumerate() {
             if left.name != right.name {
-                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "name" });
+                return Err(MaterialConsequenceMismatch::Coordinate {
+                    index,
+                    name: left.name,
+                    field: "name",
+                });
             }
             if left.required != right.required {
-                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "required" });
+                return Err(MaterialConsequenceMismatch::Coordinate {
+                    index,
+                    name: left.name,
+                    field: "required",
+                });
             }
             if left.admitted != right.admitted {
-                return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "admitted" });
+                return Err(MaterialConsequenceMismatch::Coordinate {
+                    index,
+                    name: left.name,
+                    field: "admitted",
+                });
             }
             match (&left.ceiling, &right.ceiling) {
-                (Ceiling::Bounded { declared_by: left_by, .. }, Ceiling::Bounded { declared_by: right_by, .. }) if left_by == right_by => {}
-                (Ceiling::Unbounded { because: left_because, constrained_by: left_by }, Ceiling::Unbounded { because: right_because, constrained_by: right_by }) if left_because == right_because && left_by == right_by => {}
-                (Ceiling::Bounded { .. }, Ceiling::Unbounded { .. }) | (Ceiling::Unbounded { .. }, Ceiling::Bounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "ceiling-species" }),
-                (Ceiling::Bounded { .. }, Ceiling::Bounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "ceiling-declarer" }),
-                (Ceiling::Unbounded { .. }, Ceiling::Unbounded { .. }) => return Err(MaterialConsequenceMismatch::Coordinate { index, name: left.name, field: "unbounded-reason" }),
+                (
+                    Ceiling::Bounded {
+                        declared_by: left_by,
+                        ..
+                    },
+                    Ceiling::Bounded {
+                        declared_by: right_by,
+                        ..
+                    },
+                ) if left_by == right_by => {}
+                (
+                    Ceiling::Unbounded {
+                        because: left_because,
+                        constrained_by: left_by,
+                    },
+                    Ceiling::Unbounded {
+                        because: right_because,
+                        constrained_by: right_by,
+                    },
+                ) if left_because == right_because && left_by == right_by => {}
+                (Ceiling::Bounded { .. }, Ceiling::Unbounded { .. })
+                | (Ceiling::Unbounded { .. }, Ceiling::Bounded { .. }) => {
+                    return Err(MaterialConsequenceMismatch::Coordinate {
+                        index,
+                        name: left.name,
+                        field: "ceiling-species",
+                    });
+                }
+                (Ceiling::Bounded { .. }, Ceiling::Bounded { .. }) => {
+                    return Err(MaterialConsequenceMismatch::Coordinate {
+                        index,
+                        name: left.name,
+                        field: "ceiling-declarer",
+                    });
+                }
+                (Ceiling::Unbounded { .. }, Ceiling::Unbounded { .. }) => {
+                    return Err(MaterialConsequenceMismatch::Coordinate {
+                        index,
+                        name: left.name,
+                        field: "unbounded-reason",
+                    });
+                }
             }
         }
         Ok(())
@@ -754,9 +975,98 @@ pub struct CompiledPlan<'a> {
     pub source_bindings: Vec<BindingValidation>,
     /// Per occurrence: how its law's parameters are entailed by the validated testimony.
     pub entailments: Vec<(EventId, LawEntailment)>,
+    exact_owner_receipt: Option<ExactOwnerPassageReceipt>,
     pub closure: DiagramClosure,
     terminal: EventId,
     grain: ResidentGrain,
+}
+
+/// Addressed engine testimony that the resident compile entailed every exact-owner occurrence
+/// against actual mounted/entering material. A CPU-only `ExactOwnerOccurrence::validate` cannot
+/// construct this receipt.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+struct ExactOwnerPassageReceipt {
+    address: String,
+    licensed_laws: BTreeMap<crate::evolution::EvolutionLawId, String>,
+    entailed_occurrences: BTreeMap<EventId, crate::evolution::EvolutionLawId>,
+    input_identities: BTreeMap<crate::evolution::EvolutionLawId, String>,
+    operation_complex_identity: String,
+    selected_subcomplex_identity: String,
+}
+
+/// Opaque post-card testimony. Only [`CompiledPassage::launch_with_exact_owner_receipt`] mints it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ExactOwnerDeedReceipt {
+    address: String,
+    compiled_address: String,
+    licensed_laws: BTreeMap<crate::evolution::EvolutionLawId, String>,
+    entailed_occurrences: BTreeMap<EventId, crate::evolution::EvolutionLawId>,
+    readbacks: BTreeMap<EventId, Vec<(i64, i64)>>,
+    admission_identity: String,
+    material_identity: String,
+    device: String,
+    ptx_sha256: String,
+    graph_identity: String,
+    census_identity: String,
+    deed_prediction_identity: String,
+    apparatus_prediction_identity: String,
+    operation_complex_identity: String,
+    selected_subcomplex_identity: String,
+}
+
+impl ExactOwnerDeedReceipt {
+    pub fn address(&self) -> &str {
+        &self.address
+    }
+    pub fn licensed_laws(&self) -> &BTreeMap<crate::evolution::EvolutionLawId, String> {
+        &self.licensed_laws
+    }
+    pub fn entailed_occurrences(&self) -> &BTreeMap<EventId, crate::evolution::EvolutionLawId> {
+        &self.entailed_occurrences
+    }
+    pub fn readbacks(&self) -> &BTreeMap<EventId, Vec<(i64, i64)>> {
+        &self.readbacks
+    }
+    pub fn device(&self) -> &str {
+        &self.device
+    }
+    pub fn ptx_sha256(&self) -> &str {
+        &self.ptx_sha256
+    }
+    pub fn deed_prediction_identity(&self) -> &str {
+        &self.deed_prediction_identity
+    }
+    pub fn apparatus_prediction_identity(&self) -> &str {
+        &self.apparatus_prediction_identity
+    }
+    pub fn operation_complex_identity(&self) -> &str {
+        &self.operation_complex_identity
+    }
+    pub fn selected_subcomplex_identity(&self) -> &str {
+        &self.selected_subcomplex_identity
+    }
+
+    /// Verify that this post-card deed belongs to this complete operation complex and exactly this
+    /// selected event-induced subcomplex. Callers cannot reconstruct or compare the private
+    /// identities themselves.
+    pub fn matches_complex_and_selection(
+        &self,
+        complex: &PortedOperationComplex,
+        selected_events: &BTreeSet<EventId>,
+    ) -> bool {
+        selected_events
+            == &self
+                .entailed_occurrences
+                .keys()
+                .copied()
+                .collect::<BTreeSet<_>>()
+            && complex.canonical_identity().as_deref()
+                == Some(self.operation_complex_identity.as_str())
+            && complex
+                .canonical_induced_identity(selected_events)
+                .as_deref()
+                == Some(self.selected_subcomplex_identity.as_str())
+    }
 }
 
 impl CompiledPlan<'_> {
@@ -801,19 +1111,165 @@ pub struct FrontPassage<'chart> {
     pub declared_faces: BTreeSet<EventId>,
 }
 
+fn exact_input_identity_for(
+    complex: &PortedOperationComplex,
+    realization: &ResidentRealization,
+    material: &ResidentMaterial<'_>,
+    occurrence: EventId,
+    law: &dyn ResidentLaw,
+) -> Option<String> {
+    if let Some(identity) = law.exact_input_identity(material) {
+        return identity.ok();
+    }
+    let mut identities = complex
+        .shape
+        .interactions
+        .values()
+        .filter(|interaction| interaction.temporality == InteractionTemporality::CarriesPrecedence)
+        .flat_map(|interaction| &interaction.bonds)
+        .filter(|bond| bond.target.event == occurrence)
+        .filter_map(|bond| realization.bindings.get(&bond.source.event))
+        .filter_map(|predecessor| predecessor.exact_input_identity(material))
+        .collect::<Result<Vec<_>, _>>()
+        .ok()?;
+    identities.sort();
+    identities.dedup();
+    (identities.len() == 1).then(|| identities.remove(0))
+}
+
+fn exact_owner_passage_receipt(
+    complex: &PortedOperationComplex,
+    bindings: &[BindingValidation],
+    entailments: &[(EventId, LawEntailment)],
+) -> Option<ExactOwnerPassageReceipt> {
+    let licenses = bindings
+        .iter()
+        .flat_map(|binding| &binding.exact_owner_licenses)
+        .collect::<Vec<_>>();
+    if licenses.is_empty() {
+        return None;
+    }
+    let licensed_laws = licenses
+        .iter()
+        .map(|license| {
+            (
+                license.constraint().law(),
+                license.evidence_sha256().to_owned(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let input_identities = licenses
+        .iter()
+        .map(|license| {
+            (
+                license.constraint().law(),
+                license.constraint().input_identity().to_owned(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let entailed = entailments
+        .iter()
+        .map(|(event, entailment)| (*event, entailment))
+        .collect::<BTreeMap<_, _>>();
+    let entailed_occurrences = complex
+        .shape
+        .occurrences
+        .iter()
+        .filter(|(event, occurrence)| {
+            let Some(license) = licenses
+                .iter()
+                .find(|license| license.constraint().law() == occurrence.law)
+            else {
+                return false;
+            };
+            let Some(entailment) = entailed.get(event) else {
+                return false;
+            };
+            entailment.law == license.constraint().resident_law()
+                && entailment
+                    .parameters
+                    .iter()
+                    .any(|(_, value, _)| value == license.constraint().matrix_sha256())
+                && entailment
+                    .parameters
+                    .iter()
+                    .any(|(_, _, origin)| origin.contains(license.evidence_sha256()))
+        })
+        .map(|(event, occurrence)| (*event, occurrence.law))
+        .collect::<BTreeMap<_, _>>();
+    let expected = complex
+        .shape
+        .occurrences
+        .iter()
+        .filter(|(_, occurrence)| licensed_laws.contains_key(&occurrence.law))
+        .count();
+    if entailed_occurrences.len() != expected {
+        return None;
+    }
+    let selected_events = entailed_occurrences
+        .keys()
+        .copied()
+        .collect::<BTreeSet<_>>();
+    let operation_complex_identity = complex.canonical_identity()?;
+    let selected_subcomplex_identity = complex.canonical_induced_identity(&selected_events)?;
+    let body = format!(
+        "licenses={licensed_laws:?};occurrences={entailed_occurrences:?};inputs={input_identities:?};complex={operation_complex_identity};selected={selected_subcomplex_identity}"
+    );
+    let address = Sha256::digest(body.as_bytes())
+        .iter()
+        .map(|octet| format!("{octet:02x}"))
+        .collect();
+    Some(ExactOwnerPassageReceipt {
+        address,
+        licensed_laws,
+        entailed_occurrences,
+        input_identities,
+        operation_complex_identity,
+        selected_subcomplex_identity,
+    })
+}
+
+fn receipt_digest(value: impl AsRef<[u8]>) -> String {
+    Sha256::digest(value.as_ref())
+        .iter()
+        .map(|octet| format!("{octet:02x}"))
+        .collect()
+}
+
 impl<'chart> FrontPassage<'chart> {
     pub fn new(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::CoPresent, reverse_fronts: false, declared_faces: BTreeSet::new() }
+        Self {
+            surface,
+            grain,
+            schedule: Schedule::CoPresent,
+            reverse_fronts: false,
+            declared_faces: BTreeSet::new(),
+        }
     }
 
     /// The serialized-realization control over the same diagram.
     pub fn serialized(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: false, declared_faces: BTreeSet::new() }
+        Self {
+            surface,
+            grain,
+            schedule: Schedule::Serialized,
+            reverse_fronts: false,
+            declared_faces: BTreeSet::new(),
+        }
     }
 
     /// The serialized control with every front opened in reverse member order.
-    pub fn serialized_reversed(surface: &'chart ResidentSurface<'chart>, grain: ResidentGrain) -> Self {
-        Self { surface, grain, schedule: Schedule::Serialized, reverse_fronts: true, declared_faces: BTreeSet::new() }
+    pub fn serialized_reversed(
+        surface: &'chart ResidentSurface<'chart>,
+        grain: ResidentGrain,
+    ) -> Self {
+        Self {
+            surface,
+            grain,
+            schedule: Schedule::Serialized,
+            reverse_fronts: true,
+            declared_faces: BTreeSet::new(),
+        }
     }
 
     /// **Declare the faces this receiver will read**, beside the terminal. Every occurrence named
@@ -842,7 +1298,10 @@ impl<'chart> FrontPassage<'chart> {
         let mut consumers: BTreeMap<EventId, BTreeSet<EventId>> = BTreeMap::new();
         for interaction in complex.shape.interactions.values() {
             for bond in &interaction.bonds {
-                consumers.entry(bond.source.event).or_default().insert(bond.target.event);
+                consumers
+                    .entry(bond.source.event)
+                    .or_default()
+                    .insert(bond.target.event);
             }
         }
         consumers
@@ -859,7 +1318,12 @@ impl<'chart> FrontPassage<'chart> {
 
     /// The bound a law puts on the octaves of its output words, clamped to the word, with the
     /// uncapped bound beside it.
-    fn bound_octaves(&self, law: &dyn ResidentLaw, input_octaves: &[u32], material: &ResidentMaterial<'chart>) -> (u32, u32) {
+    fn bound_octaves(
+        &self,
+        law: &dyn ResidentLaw,
+        input_octaves: &[u32],
+        material: &ResidentMaterial<'chart>,
+    ) -> (u32, u32) {
         let bound = law.bound_octaves(self.grain, input_octaves, material);
         let uncapped = u32::try_from(bound.max(1)).unwrap_or(u32::MAX);
         // A written word occupies at most the signed word: a bound past it is a bound on nothing,
@@ -879,7 +1343,10 @@ impl<'chart> FrontPassage<'chart> {
     /// grain.
     pub fn predict_material(&self, plan: &MaterialPlan) -> MaterialPrediction {
         let grain = self.surface.allocation_grain();
-        let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
+        let mut prediction = MaterialPrediction {
+            allocation_grain: grain,
+            ..Default::default()
+        };
         for (name, rows, width) in &plan.maps {
             let entries = (*rows as u64) * (*width as u64);
             let resident = entries * 8;
@@ -887,7 +1354,9 @@ impl<'chart> FrontPassage<'chart> {
             prediction.maps.push((name.clone(), resident, stored));
             prediction.resident_octets += resident;
             prediction.ingress_octets += stored;
-            prediction.transient_peak_octets = prediction.transient_peak_octets.max(stored + 16 + 2 * rows.max(&1).to_owned() as u64 * 16);
+            prediction.transient_peak_octets = prediction
+                .transient_peak_octets
+                .max(stored + 16 + 2 * rows.max(&1).to_owned() as u64 * 16);
             prediction.allocations += 1;
             prediction.charged_octets += rounded_to(resident, grain);
         }
@@ -914,7 +1383,10 @@ impl<'chart> FrontPassage<'chart> {
     /// `predict_material` remains the stored-BF16 mouth and is intentionally unchanged.
     pub fn predict_aligned_material(&self, plan: &AlignedMaterialPlan) -> MaterialPrediction {
         let grain = self.surface.allocation_grain();
-        let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
+        let mut prediction = MaterialPrediction {
+            allocation_grain: grain,
+            ..Default::default()
+        };
         for (name, rows, width) in &plan.maps {
             let entries = (*rows as u64).saturating_mul(*width as u64);
             let octets = entries.saturating_mul(8);
@@ -922,7 +1394,9 @@ impl<'chart> FrontPassage<'chart> {
             prediction.resident_octets = prediction.resident_octets.saturating_add(octets);
             prediction.ingress_octets = prediction.ingress_octets.saturating_add(octets);
             prediction.allocations = prediction.allocations.saturating_add(1);
-            prediction.charged_octets = prediction.charged_octets.saturating_add(rounded_to(octets, grain));
+            prediction.charged_octets = prediction
+                .charged_octets
+                .saturating_add(rounded_to(octets, grain));
         }
         prediction
     }
@@ -939,14 +1413,25 @@ impl<'chart> FrontPassage<'chart> {
     ///
     /// `ingress_octets` is the whole tower's crossing, not one slot's: a slot is refilled once per
     /// segment and the caller declares how many segments each slot carries.
-    pub fn predict_pooled_material(&self, slots: &[crate::streamed_standing::SlotShape], refills: &[u64], auxiliaries: &[PooledMaterialAuxiliary]) -> MaterialPrediction {
+    pub fn predict_pooled_material(
+        &self,
+        slots: &[crate::streamed_standing::SlotShape],
+        refills: &[u64],
+        auxiliaries: &[PooledMaterialAuxiliary],
+    ) -> MaterialPrediction {
         let grain = self.surface.allocation_grain();
-        let mut prediction = MaterialPrediction { allocation_grain: grain, ..Default::default() };
+        let mut prediction = MaterialPrediction {
+            allocation_grain: grain,
+            ..Default::default()
+        };
         for (which, slot) in slots.iter().enumerate() {
             let octets = slot.octets() as u64;
-            prediction.maps.push((slot.name.clone(), octets, slot.stored_octets as u64));
+            prediction
+                .maps
+                .push((slot.name.clone(), octets, slot.stored_octets as u64));
             prediction.resident_octets += octets;
-            prediction.ingress_octets += slot.stored_octets as u64 * refills.get(which).copied().unwrap_or(1);
+            prediction.ingress_octets +=
+                slot.stored_octets as u64 * refills.get(which).copied().unwrap_or(1);
             prediction.allocations += 1;
             prediction.charged_octets += rounded_to(octets, grain);
         }
@@ -975,18 +1460,54 @@ impl<'chart> FrontPassage<'chart> {
     /// **Admit the material deed** against the device's free memory now, before any map is
     /// allocated: the charged residency plus the transient peak must fit. A refusal names the
     /// coordinate; nothing was allocated.
-    pub fn admit_material(&self, prediction: &MaterialPrediction) -> Result<MaterialAdmission, FrontPassageObstruction> {
+    pub fn admit_material(
+        &self,
+        prediction: &MaterialPrediction,
+    ) -> Result<MaterialAdmission, FrontPassageObstruction> {
         let free = self.surface.memory().map_err(surface_refusal)?.free_bytes as u64;
         let coordinates = vec![
-            CoordinateAdmission::bounded("material-charged-octets", BigUint::from(prediction.charged_octets), BigUint::from(free), "the device's free memory at admission"),
-            CoordinateAdmission::bounded("material-peak-octets", BigUint::from(prediction.charged_octets + prediction.transient_peak_octets), BigUint::from(free), "the device's free memory at admission"),
-            CoordinateAdmission::unbounded("material-ingress-octets", BigUint::from(prediction.ingress_octets), "stored octets crossing the bus once; no finite ceiling is declared", &["the bus"]),
-            CoordinateAdmission::unbounded("material-allocations", BigUint::from(prediction.allocations), "the driver publishes no finite allocation count", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("material-allocation-grain", BigUint::from(prediction.allocation_grain), "a measured apparatus constant, exhibited", &["the card's own charge law"]),
+            CoordinateAdmission::bounded(
+                "material-charged-octets",
+                BigUint::from(prediction.charged_octets),
+                BigUint::from(free),
+                "the device's free memory at admission",
+            ),
+            CoordinateAdmission::bounded(
+                "material-peak-octets",
+                BigUint::from(prediction.charged_octets + prediction.transient_peak_octets),
+                BigUint::from(free),
+                "the device's free memory at admission",
+            ),
+            CoordinateAdmission::unbounded(
+                "material-ingress-octets",
+                BigUint::from(prediction.ingress_octets),
+                "stored octets crossing the bus once; no finite ceiling is declared",
+                &["the bus"],
+            ),
+            CoordinateAdmission::unbounded(
+                "material-allocations",
+                BigUint::from(prediction.allocations),
+                "the driver publishes no finite allocation count",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "material-allocation-grain",
+                BigUint::from(prediction.allocation_grain),
+                "a measured apparatus constant, exhibited",
+                &["the card's own charge law"],
+            ),
         ];
-        let admission = MaterialAdmission { prediction: prediction.clone(), coordinates, free_octets_at_admission: free };
+        let admission = MaterialAdmission {
+            prediction: prediction.clone(),
+            coordinates,
+            free_octets_at_admission: free,
+        };
         if let Some(coordinate) = admission.coordinates.iter().find(|c| !c.admitted) {
-            return Err(FrontPassageObstruction::Resource(ResourceObstruction::Material { coordinate: coordinate.clone() }));
+            return Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Material {
+                    coordinate: coordinate.clone(),
+                },
+            ));
         }
         Ok(admission)
     }
@@ -1008,18 +1529,37 @@ impl<'chart> FrontPassage<'chart> {
         terminal: EventId,
     ) -> Result<CompiledPlan<'a>, FrontPassageObstruction> {
         realization.validate(complex)?;
-        let closure = complex.closure().map_err(|error| CompileRefusal::Shape(error.to_string()))?;
+        let source_bindings = source.validate(complex)?;
+        let mut closure = complex
+            .closure()
+            .map_err(|error| CompileRefusal::Shape(error.to_string()))?;
+        // A source/native binding decides through its own testimony in the complex. An exact
+        // mathematical owner decides through the structural license returned by its witness,
+        // which deliberately does not counterfeit source testimony.
+        let exactly_licensed_names = source_bindings
+            .iter()
+            .flat_map(|validation| &validation.exact_owner_licenses)
+            .filter_map(|license| complex.shape.laws.get(&license.constraint().law()))
+            .map(|law| law.name.as_str())
+            .collect::<BTreeSet<_>>();
+        closure
+            .operations_without_deciding_testimony
+            .retain(|operation| !exactly_licensed_names.contains(operation.as_str()));
         if !closure.is_closed() {
             return Err(CompileRefusal::DiagramOpen(closure).into());
         }
-        let source_bindings = source.validate(complex)?;
         // Every occurrence's law must be ENTAILED by the validated testimony of its operation: a
         // resolved slice names the operation and every parameter is accounted for by a field, a
         // shape or a slice. Validation says the testimony is real; entailment says it is THIS law's.
-        let mut entailments: Vec<(EventId, LawEntailment)> = Vec::with_capacity(realization.bindings.len());
+        let mut entailments: Vec<(EventId, LawEntailment)> =
+            Vec::with_capacity(realization.bindings.len());
         for (occurrence, law) in &realization.bindings {
             if let Err(name) = law.material(material) {
-                return Err(CompileRefusal::MaterialAbsent { occurrence: *occurrence, name }.into());
+                return Err(CompileRefusal::MaterialAbsent {
+                    occurrence: *occurrence,
+                    name,
+                }
+                .into());
             }
             let operation = complex
                 .shape
@@ -1027,25 +1567,195 @@ impl<'chart> FrontPassage<'chart> {
                 .get(occurrence)
                 .and_then(|o| complex.shape.laws.get(&o.law))
                 .map(|l| l.name.clone())
-                .ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
-            let validation = source_bindings.iter().find(|v| v.operation == operation).ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?;
+                .ok_or(CompileRefusal::OccurrenceUnbound {
+                    occurrence: *occurrence,
+                })?;
+            let proposed_law = complex.shape.occurrences[occurrence].law;
+            let validation = source_bindings
+                .iter()
+                .find(|validation| {
+                    validation
+                        .exact_owner_licenses
+                        .iter()
+                        .any(|license| license.constraint().law() == proposed_law)
+                        || (validation.exact_owner_licenses.is_empty()
+                            && validation.operation == operation)
+                })
+                .ok_or(CompileRefusal::OccurrenceUnbound {
+                    occurrence: *occurrence,
+                })?;
+            if !validation.exact_owner_licenses.is_empty() {
+                if !validation.symbols.is_empty()
+                    || !validation.fields.is_empty()
+                    || !validation.shapes.is_empty()
+                    || !validation.interventions.is_empty()
+                    || !validation.descriptions.is_empty()
+                {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal: EntailmentRefusal::ExactOwnerTestimonyMixed { law: law.name() },
+                    }
+                    .into());
+                }
+                if validation.exact_owner_licenses.len() != 1 {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal: EntailmentRefusal::ExactOwnerLicenseCount {
+                            law: law.name(),
+                            licenses: validation.exact_owner_licenses.len(),
+                        },
+                    }
+                    .into());
+                }
+                let license = &validation.exact_owner_licenses[0];
+                let constraint = license.constraint();
+                if constraint.law() != proposed_law || constraint.resident_law() != law.name() {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal: EntailmentRefusal::ExactOwnerLawDisagrees { law: law.name() },
+                    }
+                    .into());
+                }
+                let resident_parameters = law.exact_semantic_parameters();
+                if constraint.semantic_parameters() != &resident_parameters {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal: EntailmentRefusal::ExactOwnerParametersDisagree {
+                            law: law.name(),
+                            licensed: constraint.semantic_parameters().clone(),
+                            resident: resident_parameters,
+                        },
+                    }
+                    .into());
+                }
+                if let Some(population) = law.exact_population() {
+                    let resident_identity = material
+                        .populations
+                        .get(population)
+                        .and_then(|mounted| mounted.readout.exact_matrix_sha256())
+                        .map(str::to_owned);
+                    if resident_identity.as_deref() != Some(constraint.matrix_sha256()) {
+                        return Err(CompileRefusal::Entailment {
+                            occurrence: *occurrence,
+                            operation,
+                            refusal: EntailmentRefusal::ExactOwnerMatrixDisagrees {
+                                law: law.name(),
+                                population: population.to_owned(),
+                                licensed: constraint.matrix_sha256().to_owned(),
+                                resident: resident_identity,
+                            },
+                        }
+                        .into());
+                    }
+                }
+                let resident_input = exact_input_identity_for(
+                    complex,
+                    realization,
+                    material,
+                    *occurrence,
+                    law.as_ref(),
+                );
+                if resident_input.as_deref() != Some(constraint.input_identity()) {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal: EntailmentRefusal::ExactOwnerInputDisagrees {
+                            law: law.name(),
+                            licensed: constraint.input_identity().to_owned(),
+                            resident: resident_input,
+                        },
+                    }
+                    .into());
+                }
+                let mut parameters = constraint
+                    .semantic_parameters()
+                    .iter()
+                    .map(|(name, value)| {
+                        (
+                            name.clone(),
+                            value.clone(),
+                            format!(
+                                "{:?} exact-owner license {}",
+                                license.owner(),
+                                license.evidence_sha256()
+                            ),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                parameters.push((
+                    "matrix-sha256".to_owned(),
+                    constraint.matrix_sha256().to_owned(),
+                    format!("{:?} exact-owner matrix", license.owner()),
+                ));
+                parameters.push((
+                    "license-evidence-sha256".to_owned(),
+                    license.evidence_sha256().to_owned(),
+                    format!(
+                        "{:?} exact-owner license {}",
+                        license.owner(),
+                        license.evidence_sha256()
+                    ),
+                ));
+                entailments.push((
+                    *occurrence,
+                    LawEntailment {
+                        law: law.name(),
+                        parameters,
+                        naming_slices: Vec::new(),
+                    },
+                ));
+                continue;
+            }
             // An occurrence that is WHOLLY the caller's intervention — intervention testimony and
             // nothing exterior — is entailed by its declaration whatever its law: the matched
             // sibling's rebase, permutation or replacement is the caller's and says so.
-            let wholly_intervention = !validation.interventions.is_empty() && validation.symbols.is_empty() && validation.fields.is_empty() && validation.shapes.is_empty();
+            let wholly_intervention = !validation.interventions.is_empty()
+                && validation.symbols.is_empty()
+                && validation.fields.is_empty()
+                && validation.shapes.is_empty();
             if wholly_intervention {
-                entailments.push((*occurrence, LawEntailment { law: law.name(), parameters: vec![("intervention".to_owned(), law.name().to_owned(), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() }));
+                entailments.push((
+                    *occurrence,
+                    LawEntailment {
+                        law: law.name(),
+                        parameters: vec![(
+                            "intervention".to_owned(),
+                            law.name().to_owned(),
+                            format!(
+                                "the caller's typed intervention: {}",
+                                validation.interventions.join(" | ")
+                            ),
+                        )],
+                        naming_slices: Vec::new(),
+                    },
+                ));
                 continue;
             }
             match law.entailment(validation) {
                 Ok(entailment) => entailments.push((*occurrence, entailment)),
-                Err(refusal) => return Err(CompileRefusal::Entailment { occurrence: *occurrence, operation, refusal }.into()),
+                Err(refusal) => {
+                    return Err(CompileRefusal::Entailment {
+                        occurrence: *occurrence,
+                        operation,
+                        refusal,
+                    }
+                    .into());
+                }
             }
         }
         if !complex.shape.occurrences.contains_key(&terminal) {
-            return Err(CompileRefusal::ForeignOccurrence { occurrence: terminal }.into());
+            return Err(CompileRefusal::ForeignOccurrence {
+                occurrence: terminal,
+            }
+            .into());
         }
-        let fronts = complex.fronts().map_err(|error| CompileRefusal::Shape(error.to_string()))?;
+        let fronts = complex
+            .fronts()
+            .map_err(|error| CompileRefusal::Shape(error.to_string()))?;
         let arriving = Self::arriving(complex);
         let consumers = Self::consumers(complex);
 
@@ -1062,14 +1772,32 @@ impl<'chart> FrontPassage<'chart> {
         for front in &fronts {
             let mut front_work = ExactWork::nothing();
             for occurrence in &front.occurrences {
-                let law: &'a dyn ResidentLaw = realization.bindings.get(occurrence).ok_or(CompileRefusal::OccurrenceUnbound { occurrence: *occurrence })?.as_ref();
+                let law: &'a dyn ResidentLaw = realization
+                    .bindings
+                    .get(occurrence)
+                    .ok_or(CompileRefusal::OccurrenceUnbound {
+                        occurrence: *occurrence,
+                    })?
+                    .as_ref();
                 let (inputs_count, _) = law.arity();
                 let mut inputs = Vec::with_capacity(inputs_count);
                 let mut producers = Vec::with_capacity(inputs_count);
                 for input in 0..inputs_count {
                     let port = OccurrencePort::input(*occurrence, input);
-                    let source_port = arriving.get(&port).copied().ok_or(CompileRefusal::InputUncarried { occurrence: *occurrence, input })?;
-                    let producer = index_of.get(&source_port.event).copied().ok_or(CompileRefusal::InputUncarried { occurrence: *occurrence, input })?;
+                    let source_port =
+                        arriving
+                            .get(&port)
+                            .copied()
+                            .ok_or(CompileRefusal::InputUncarried {
+                                occurrence: *occurrence,
+                                input,
+                            })?;
+                    let producer = index_of.get(&source_port.event).copied().ok_or(
+                        CompileRefusal::InputUncarried {
+                            occurrence: *occurrence,
+                            input,
+                        },
+                    )?;
                     inputs.push(source_port);
                     producers.push(producer);
                 }
@@ -1088,7 +1816,11 @@ impl<'chart> FrontPassage<'chart> {
                         predecessor,
                         terminal,
                         &self.declared_faces,
-                        realization.bindings.get(&predecessor).map(|l| l.seals_predecessor()).unwrap_or(false),
+                        realization
+                            .bindings
+                            .get(&predecessor)
+                            .map(|l| l.seals_predecessor())
+                            .unwrap_or(false),
                     );
                     if let Some(because) = because {
                         return Err(CompileRefusal::FusionUnfactored {
@@ -1100,15 +1832,27 @@ impl<'chart> FrontPassage<'chart> {
                         .into());
                     }
                 }
-                let shapes: Vec<(usize, usize, u32)> = inputs.iter().map(|port| field.get(port).copied().unwrap_or((0, 0, 0))).collect();
+                let shapes: Vec<(usize, usize, u32)> = inputs
+                    .iter()
+                    .map(|port| field.get(port).copied().unwrap_or((0, 0, 0)))
+                    .collect();
                 let octaves: Vec<u32> = shapes.iter().map(|(_, _, o)| *o).collect();
                 let (bound, uncapped) = self.bound_octaves(law, &octaves, material);
                 if uncapped > WORD_OCTAVES {
                     apparatus.occurrences_admitted_at_the_word += 1;
                 }
-                apparatus.a_priori_peak_octaves_uncapped = apparatus.a_priori_peak_octaves_uncapped.max(u64::from(uncapped));
-                let shape = law.shape(self.surface, self.grain, &shapes, material).map_err(|refusal| FrontPassageObstruction::Resource(ResourceObstruction::Carrier(refusal)))?;
-                field.insert(OccurrencePort::output(*occurrence, 0), (shape.rows, shape.width, bound));
+                apparatus.a_priori_peak_octaves_uncapped = apparatus
+                    .a_priori_peak_octaves_uncapped
+                    .max(u64::from(uncapped));
+                let shape = law
+                    .shape(self.surface, self.grain, &shapes, material)
+                    .map_err(|refusal| {
+                        FrontPassageObstruction::Resource(ResourceObstruction::Carrier(refusal))
+                    })?;
+                field.insert(
+                    OccurrencePort::output(*occurrence, 0),
+                    (shape.rows, shape.width, bound),
+                );
                 front_work = co_present(&front_work, &shape.predicted);
                 // A sealing occurrence carries no section of its own: its words ARE its
                 // predecessor's, rewritten in place. Nothing is allocated and nothing is charged for
@@ -1123,12 +1867,24 @@ impl<'chart> FrontPassage<'chart> {
                 }
                 apparatus.captured_launches += u64::from(shape.launches);
                 apparatus.reductions += shape.couplings.len() as u64;
-                apparatus.scratch_octets = apparatus.scratch_octets.max(u64::from(shape.shared_octets));
-                apparatus.grid_extent = apparatus.grid_extent.max((shape.rows * shape.width) as u64);
-                apparatus.carrier_peak_octaves = apparatus.carrier_peak_octaves.max(u64::from(bound));
+                apparatus.scratch_octets =
+                    apparatus.scratch_octets.max(u64::from(shape.shared_octets));
+                apparatus.grid_extent =
+                    apparatus.grid_extent.max((shape.rows * shape.width) as u64);
+                apparatus.carrier_peak_octaves =
+                    apparatus.carrier_peak_octaves.max(u64::from(bound));
                 let index = plans.len();
                 index_of.insert(*occurrence, index);
-                plans.push(Plan { index, occurrence: *occurrence, depth: front.depth, law, inputs, producers, shape, bound });
+                plans.push(Plan {
+                    index,
+                    occurrence: *occurrence,
+                    depth: front.depth,
+                    law,
+                    inputs,
+                    producers,
+                    shape,
+                    bound,
+                });
             }
             deed = deed.then(&front_work);
         }
@@ -1164,7 +1920,12 @@ impl<'chart> FrontPassage<'chart> {
         charged += rounded_to(census_octets, grain) + rounded_to(lineage_octets, grain);
         allocation_octets.push(census_octets);
         allocation_octets.push(lineage_octets);
-        let terminal_plan = plans.iter().find(|plan| plan.occurrence == terminal).ok_or(CompileRefusal::ForeignOccurrence { occurrence: terminal })?;
+        let terminal_plan = plans
+            .iter()
+            .find(|plan| plan.occurrence == terminal)
+            .ok_or(CompileRefusal::ForeignOccurrence {
+                occurrence: terminal,
+            })?;
         apparatus.source_map_octets = material.resident_octets();
         apparatus.carried_standing_octets = material.standings_octets();
         apparatus.staged_octets = staged_octets;
@@ -1184,30 +1945,40 @@ impl<'chart> FrontPassage<'chart> {
         apparatus.graph_execs = 1;
         apparatus.ingress_octets = staged_octets + (lineage_words * 4) as u64;
         apparatus.egress_receipt_octets = census_octets;
-        apparatus.egress_section_octets = 2 * (terminal_plan.shape.rows * terminal_plan.shape.width * 8) as u64;
+        apparatus.egress_section_octets =
+            2 * (terminal_plan.shape.rows * terminal_plan.shape.width * 8) as u64;
         // One node per launch plus the memset: an occurrence whose kernel wrote its own census
         // records one node and no census edge, so both counts move with the declared fusion.
-        apparatus.graph_nodes = 1 + plans.iter().map(|plan| u64::from(plan.shape.launches)).sum::<u64>();
+        apparatus.graph_nodes = 1 + plans
+            .iter()
+            .map(|plan| u64::from(plan.shape.launches))
+            .sum::<u64>();
         apparatus.graph_edges = plans
             .iter()
             .map(|plan| {
                 let mut distinct: Vec<usize> = plan.producers.clone();
                 distinct.sort_unstable();
                 distinct.dedup();
-                (if distinct.is_empty() { 1 } else { distinct.len() as u64 }) + u64::from(!plan.law.fuses_census())
+                (if distinct.is_empty() {
+                    1
+                } else {
+                    distinct.len() as u64
+                }) + u64::from(!plan.law.fuses_census())
             })
             .sum();
         if self.schedule == Schedule::Serialized {
             // The serialized control orders every occurrence after the one opened before it, in
             // the order this passage opens them.
-            let by_depth: BTreeMap<usize, Vec<&Plan<'a>>> = plans.iter().fold(BTreeMap::new(), |mut map, p| {
-                map.entry(p.depth).or_default().push(p);
-                map
-            });
+            let by_depth: BTreeMap<usize, Vec<&Plan<'a>>> =
+                plans.iter().fold(BTreeMap::new(), |mut map, p| {
+                    map.entry(p.depth).or_default().push(p);
+                    map
+                });
             let mut previous: Option<usize> = None;
             let mut extra = 0u64;
             for front in &fronts {
-                let members: Vec<&Plan<'a>> = by_depth.get(&front.depth).cloned().unwrap_or_default();
+                let members: Vec<&Plan<'a>> =
+                    by_depth.get(&front.depth).cloned().unwrap_or_default();
                 for p in self.ordered(&members) {
                     if let Some(prev) = previous {
                         if !p.producers.contains(&prev) {
@@ -1221,7 +1992,12 @@ impl<'chart> FrontPassage<'chart> {
         }
         apparatus.dependency_span = fronts.len() as u64;
         apparatus.remainder_grain = u64::from(self.grain.0);
-        let octave_field = field.into_iter().map(|(port, (_, _, o))| (port, o)).collect();
+        let octave_field = field
+            .into_iter()
+            .map(|(port, (_, _, o))| (port, o))
+            .collect();
+        let exact_owner_receipt =
+            exact_owner_passage_receipt(complex, &source_bindings, &entailments);
         Ok(CompiledPlan {
             plans,
             fronts,
@@ -1230,6 +2006,7 @@ impl<'chart> FrontPassage<'chart> {
             octave_field,
             source_bindings,
             entailments,
+            exact_owner_receipt,
             closure,
             terminal,
             grain: self.grain,
@@ -1242,7 +2019,12 @@ impl<'chart> FrontPassage<'chart> {
     /// source standing cited from the material admission. Taken before any allocation. The deed is
     /// admitted exactly when every bounded coordinate is inside its ceiling; the first refusing
     /// coordinate is returned typed and named.
-    pub fn admit(&self, plan: &CompiledPlan<'_>, receiver: &DeedReceiver, material: Option<&MaterialAdmission>) -> Result<DeedAdmission, FrontPassageObstruction> {
+    pub fn admit(
+        &self,
+        plan: &CompiledPlan<'_>,
+        receiver: &DeedReceiver,
+        material: Option<&MaterialAdmission>,
+    ) -> Result<DeedAdmission, FrontPassageObstruction> {
         let free = self.surface.memory().map_err(surface_refusal)?.free_bytes as u64;
         let declaration = self.surface.declaration();
         let (_, max_grid, _) = self.surface.derived_launch();
@@ -1250,67 +2032,241 @@ impl<'chart> FrontPassage<'chart> {
         let mut semantic = Vec::new();
         for (name, required) in plan.deed_prediction.coordinates() {
             match receiver.ceilings.get(name) {
-                Some(ceiling) => semantic.push(CoordinateAdmission::bounded(name, required, BigUint::from(*ceiling), "the receiver's declared ceiling")),
-                None => semantic.push(CoordinateAdmission::unbounded(name, required, "the receiver declared no ceiling on this coordinate", semantic_constraints(name))),
+                Some(ceiling) => semantic.push(CoordinateAdmission::bounded(
+                    name,
+                    required,
+                    BigUint::from(*ceiling),
+                    "the receiver's declared ceiling",
+                )),
+                None => semantic.push(CoordinateAdmission::unbounded(
+                    name,
+                    required,
+                    "the receiver declared no ceiling on this coordinate",
+                    semantic_constraints(name),
+                )),
             }
         }
         if let Some(budget) = &receiver.scalar {
             let priced = budget.metric.price(&plan.deed_prediction);
-            semantic.push(CoordinateAdmission::bounded("scalar-price-under-declared-metric", priced, budget.ceiling.clone(), "the receiver's declared scalar budget"));
+            semantic.push(CoordinateAdmission::bounded(
+                "scalar-price-under-declared-metric",
+                priced,
+                budget.ceiling.clone(),
+                "the receiver's declared scalar budget",
+            ));
         }
         // apparatus
         let a = &plan.apparatus_prediction;
         let mut apparatus = vec![
-            CoordinateAdmission::bounded("carrier-peak-octaves", BigUint::from(a.carrier_peak_octaves), BigUint::from(u64::from(WORD_OCTAVES)), "the signed word the section is stored in (the a-priori bound is capped here; see the two coordinates below)"),
-            CoordinateAdmission::unbounded("a-priori-peak-octaves-uncapped", BigUint::from(a.a_priori_peak_octaves_uncapped), "the widest a-priori bound before the cap at the word; where it exceeds the word the occurrence is admitted at the word and its census refuses on the card", &["the word: 63 octaves, enforced by the census and by CarrierLeft on the card"]),
-            CoordinateAdmission::unbounded("occurrences-admitted-at-the-word", BigUint::from(a.occurrences_admitted_at_the_word), "occurrences whose a-priori bound stood above the word; the census alone decides them", &["the word"]),
-            CoordinateAdmission::bounded("charged-resident-octets", BigUint::from(a.charged_octets), BigUint::from(free), "the device's free memory at admission"),
-            CoordinateAdmission::bounded("scratch-octets", BigUint::from(a.scratch_octets), BigUint::from(u64::from(declaration.max_sectiond_bytes)), "the device's shared memory per block"),
-            CoordinateAdmission::bounded("grid-extent", BigUint::from(a.grid_extent), BigUint::from(u64::from(max_grid)) * BigUint::from(u64::from(self.surface.derived_launch().0)), "the launch aperture: grid ceiling × block"),
-            CoordinateAdmission::unbounded("resident-octets-as-words-sum", BigUint::from(a.deed_octets), "the words' own sum, beside the charge the card levies", &["the charged residency above"]),
-            CoordinateAdmission::unbounded("staged-octets", BigUint::from(a.staged_octets), "entering material crossing once; inside the charged residency", &["the charged residency above"]),
-            CoordinateAdmission::unbounded("census-octets", BigUint::from(a.census_octets), "one slot per occurrence; inside the charged residency", &["the charged residency above"]),
-            CoordinateAdmission::unbounded("lineage-octets", BigUint::from(a.lineage_octets), "the diagram's bond structure; inside the charged residency", &["the charged residency above"]),
-            CoordinateAdmission::unbounded("allocation-grain-octets", BigUint::from(a.allocation_grain), "a measured apparatus constant, exhibited", &["the card's own charge law"]),
-            CoordinateAdmission::unbounded("allocations", BigUint::from(a.allocations), "the driver publishes no finite allocation count", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("captured-launches", BigUint::from(a.captured_launches), "the driver publishes no finite graph-node count", &["the device's free memory for the graph executable"]),
-            CoordinateAdmission::unbounded("reductions", BigUint::from(a.reductions), "within-section barriers, one kernel each; no finite ceiling", &["the launch aperture"]),
-            CoordinateAdmission::unbounded("streams", BigUint::from(a.streams), "one lane per occurrence; the driver publishes no finite stream count", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("events", BigUint::from(a.events), "one per occurrence; the driver publishes no finite event count", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("graphs", BigUint::from(a.graphs), "one per passage", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("graph-execs", BigUint::from(a.graph_execs), "one per passage", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("graph-nodes", BigUint::from(a.graph_nodes), "one per launch plus the memset; no finite ceiling is published", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("graph-edges", BigUint::from(a.graph_edges), "the diagram's bonds; no finite ceiling is published", &["the device's free memory"]),
-            CoordinateAdmission::unbounded("dependency-span", BigUint::from(a.dependency_span), "the diagram's depth; nothing finite", &["none"]),
-            CoordinateAdmission::unbounded("ingress-octets", BigUint::from(a.ingress_octets), "entering material and the lineage, crossing once", &["the bus"]),
-            CoordinateAdmission::unbounded("egress-receipt-octets", BigUint::from(a.egress_receipt_octets), "the census array, read once", &["the bus"]),
-            CoordinateAdmission::unbounded("egress-section-octets", BigUint::from(a.egress_section_octets), "the terminal face, read once by the receiver", &["the bus"]),
-            CoordinateAdmission::unbounded("retained-remainder-grain", BigUint::from(a.remainder_grain), "the remainder is retained whole at this grain; no ceiling on its width is declared", &["the word: 63 octaves"]),
+            CoordinateAdmission::bounded(
+                "carrier-peak-octaves",
+                BigUint::from(a.carrier_peak_octaves),
+                BigUint::from(u64::from(WORD_OCTAVES)),
+                "the signed word the section is stored in (the a-priori bound is capped here; see the two coordinates below)",
+            ),
+            CoordinateAdmission::unbounded(
+                "a-priori-peak-octaves-uncapped",
+                BigUint::from(a.a_priori_peak_octaves_uncapped),
+                "the widest a-priori bound before the cap at the word; where it exceeds the word the occurrence is admitted at the word and its census refuses on the card",
+                &["the word: 63 octaves, enforced by the census and by CarrierLeft on the card"],
+            ),
+            CoordinateAdmission::unbounded(
+                "occurrences-admitted-at-the-word",
+                BigUint::from(a.occurrences_admitted_at_the_word),
+                "occurrences whose a-priori bound stood above the word; the census alone decides them",
+                &["the word"],
+            ),
+            CoordinateAdmission::bounded(
+                "charged-resident-octets",
+                BigUint::from(a.charged_octets),
+                BigUint::from(free),
+                "the device's free memory at admission",
+            ),
+            CoordinateAdmission::bounded(
+                "scratch-octets",
+                BigUint::from(a.scratch_octets),
+                BigUint::from(u64::from(declaration.max_sectiond_bytes)),
+                "the device's shared memory per block",
+            ),
+            CoordinateAdmission::bounded(
+                "grid-extent",
+                BigUint::from(a.grid_extent),
+                BigUint::from(u64::from(max_grid))
+                    * BigUint::from(u64::from(self.surface.derived_launch().0)),
+                "the launch aperture: grid ceiling × block",
+            ),
+            CoordinateAdmission::unbounded(
+                "resident-octets-as-words-sum",
+                BigUint::from(a.deed_octets),
+                "the words' own sum, beside the charge the card levies",
+                &["the charged residency above"],
+            ),
+            CoordinateAdmission::unbounded(
+                "staged-octets",
+                BigUint::from(a.staged_octets),
+                "entering material crossing once; inside the charged residency",
+                &["the charged residency above"],
+            ),
+            CoordinateAdmission::unbounded(
+                "census-octets",
+                BigUint::from(a.census_octets),
+                "one slot per occurrence; inside the charged residency",
+                &["the charged residency above"],
+            ),
+            CoordinateAdmission::unbounded(
+                "lineage-octets",
+                BigUint::from(a.lineage_octets),
+                "the diagram's bond structure; inside the charged residency",
+                &["the charged residency above"],
+            ),
+            CoordinateAdmission::unbounded(
+                "allocation-grain-octets",
+                BigUint::from(a.allocation_grain),
+                "a measured apparatus constant, exhibited",
+                &["the card's own charge law"],
+            ),
+            CoordinateAdmission::unbounded(
+                "allocations",
+                BigUint::from(a.allocations),
+                "the driver publishes no finite allocation count",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "captured-launches",
+                BigUint::from(a.captured_launches),
+                "the driver publishes no finite graph-node count",
+                &["the device's free memory for the graph executable"],
+            ),
+            CoordinateAdmission::unbounded(
+                "reductions",
+                BigUint::from(a.reductions),
+                "within-section barriers, one kernel each; no finite ceiling",
+                &["the launch aperture"],
+            ),
+            CoordinateAdmission::unbounded(
+                "streams",
+                BigUint::from(a.streams),
+                "one lane per occurrence; the driver publishes no finite stream count",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "events",
+                BigUint::from(a.events),
+                "one per occurrence; the driver publishes no finite event count",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "graphs",
+                BigUint::from(a.graphs),
+                "one per passage",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "graph-execs",
+                BigUint::from(a.graph_execs),
+                "one per passage",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "graph-nodes",
+                BigUint::from(a.graph_nodes),
+                "one per launch plus the memset; no finite ceiling is published",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "graph-edges",
+                BigUint::from(a.graph_edges),
+                "the diagram's bonds; no finite ceiling is published",
+                &["the device's free memory"],
+            ),
+            CoordinateAdmission::unbounded(
+                "dependency-span",
+                BigUint::from(a.dependency_span),
+                "the diagram's depth; nothing finite",
+                &["none"],
+            ),
+            CoordinateAdmission::unbounded(
+                "ingress-octets",
+                BigUint::from(a.ingress_octets),
+                "entering material and the lineage, crossing once",
+                &["the bus"],
+            ),
+            CoordinateAdmission::unbounded(
+                "egress-receipt-octets",
+                BigUint::from(a.egress_receipt_octets),
+                "the census array, read once",
+                &["the bus"],
+            ),
+            CoordinateAdmission::unbounded(
+                "egress-section-octets",
+                BigUint::from(a.egress_section_octets),
+                "the terminal face, read once by the receiver",
+                &["the bus"],
+            ),
+            CoordinateAdmission::unbounded(
+                "retained-remainder-grain",
+                BigUint::from(a.remainder_grain),
+                "the remainder is retained whole at this grain; no ceiling on its width is declared",
+                &["the word: 63 octaves"],
+            ),
         ];
-        apparatus.push(CoordinateAdmission::unbounded("carried-standing-octets", BigUint::from(a.carried_standing_octets), "standings released by earlier passages, resident already; no ceiling is declared", &["the device's memory"]));
+        apparatus.push(CoordinateAdmission::unbounded(
+            "carried-standing-octets",
+            BigUint::from(a.carried_standing_octets),
+            "standings released by earlier passages, resident already; no ceiling is declared",
+            &["the device's memory"],
+        ));
         // the source standing: cited from the material admission, or exhibited as already resident
         match material {
-            Some(admitted) => apparatus.push(CoordinateAdmission::bounded("source-standing-octets", BigUint::from(a.source_map_octets), BigUint::from(admitted.resident_octets()), "the cited material admission's admitted resident standing")),
-            None => apparatus.push(CoordinateAdmission::unbounded("source-standing-octets", BigUint::from(a.source_map_octets), "no material admission was cited; the standing is already resident and counted", &["the device's memory"])),
+            Some(admitted) => apparatus.push(CoordinateAdmission::bounded(
+                "source-standing-octets",
+                BigUint::from(a.source_map_octets),
+                BigUint::from(admitted.resident_octets()),
+                "the cited material admission's admitted resident standing",
+            )),
+            None => apparatus.push(CoordinateAdmission::unbounded(
+                "source-standing-octets",
+                BigUint::from(a.source_map_octets),
+                "no material admission was cited; the standing is already resident and counted",
+                &["the device's memory"],
+            )),
         }
         // the receiver's apertures narrow, never widen
         for coordinate in &mut apparatus {
             if let Some(aperture) = receiver.apparatus_apertures.get(coordinate.name) {
                 let aperture = BigUint::from(*aperture);
                 let (ceiling, declared_by) = match &coordinate.ceiling {
-                    Ceiling::Bounded { ceiling, .. } if *ceiling <= aperture => (ceiling.clone(), "the mounted apparatus (the receiver's aperture is wider)"),
-                    _ => (aperture, "the receiver's declared apparatus aperture, narrower than the apparatus"),
+                    Ceiling::Bounded { ceiling, .. } if *ceiling <= aperture => (
+                        ceiling.clone(),
+                        "the mounted apparatus (the receiver's aperture is wider)",
+                    ),
+                    _ => (
+                        aperture,
+                        "the receiver's declared apparatus aperture, narrower than the apparatus",
+                    ),
                 };
                 coordinate.admitted = coordinate.required <= ceiling;
-                coordinate.ceiling = Ceiling::Bounded { ceiling, declared_by };
+                coordinate.ceiling = Ceiling::Bounded {
+                    ceiling,
+                    declared_by,
+                };
             }
         }
-        let admission = DeedAdmission { semantic, apparatus, cited_material: material.cloned(), free_octets_at_admission: free };
+        let admission = DeedAdmission {
+            semantic,
+            apparatus,
+            cited_material: material.cloned(),
+            free_octets_at_admission: free,
+        };
         if let Some((kind, coordinate)) = admission.refusing() {
             return Err(FrontPassageObstruction::Resource(if kind == "semantic" {
-                ResourceObstruction::Semantic { coordinate: coordinate.clone() }
+                ResourceObstruction::Semantic {
+                    coordinate: coordinate.clone(),
+                }
             } else {
-                ResourceObstruction::Apparatus { coordinate: coordinate.clone() }
+                ResourceObstruction::Apparatus {
+                    coordinate: coordinate.clone(),
+                }
             }));
         }
         Ok(admission)
@@ -1328,7 +2284,49 @@ impl<'chart> FrontPassage<'chart> {
         admission: DeedAdmission,
     ) -> Result<CompiledPassage<'chart>, FrontPassageObstruction> {
         let surface = self.surface;
-        // 1. Sections and staging. A sealing occurrence allocates nothing: its section IS its
+        // 1. Preflight the required resident placement before allocating any section or staging
+        // buffer. The generic cover decomposition answers a different, comparative performance
+        // receiver and may lawfully place a sub-warp cell on CPU; this passage's semantic body is
+        // resident on the mounted device, so its explicit chart owns every unchanged cell and
+        // partial-warps return as idle-lane dilation.
+        let cover = surface.cover();
+        let resident_chart = ChartId::Device(surface.declaration().ordinal);
+        let by_depth: BTreeMap<usize, Vec<&Plan<'a>>> =
+            plan.plans.iter().fold(BTreeMap::new(), |mut map, p| {
+                map.entry(p.depth).or_default().push(p);
+                map
+            });
+        let mut resident_decompositions = Vec::with_capacity(plan.fronts.len());
+        for (at, front) in plan.fronts.iter().enumerate() {
+            let members = by_depth.get(&front.depth).cloned().unwrap_or_default();
+            let cells = members
+                .iter()
+                .enumerate()
+                .map(|(index, p)| FrontCell {
+                    index,
+                    extent: (p.shape.rows * p.shape.width) as u64,
+                })
+                .collect::<Vec<_>>();
+            let decomposition = CoverDecomposition::on_chart(
+                cover,
+                &cells,
+                "exact_resident_section",
+                resident_chart,
+            )
+            .map_err(|barrier| FrontPassageObstruction::Cover {
+                front: at,
+                barriers: vec![barrier],
+            })?;
+            decomposition.independence(&cells).map_err(|barriers| {
+                FrontPassageObstruction::Cover {
+                    front: at,
+                    barriers,
+                }
+            })?;
+            resident_decompositions.push(decomposition);
+        }
+
+        // 2. Sections and staging. A sealing occurrence allocates nothing: its section IS its
         //    predecessor's, and the alias is recorded so every later lookup resolves to one buffer.
         let mut sections: BTreeMap<EventId, ResidentSection<'chart>> = BTreeMap::new();
         let mut sealed: BTreeMap<EventId, EventId> = BTreeMap::new();
@@ -1337,35 +2335,36 @@ impl<'chart> FrontPassage<'chart> {
             if p.law.seals_predecessor() {
                 sealed.insert(p.occurrence, p.inputs[0].event);
             } else {
-                sections.insert(p.occurrence, surface.fresh_section(p.shape.rows, p.shape.width, plan.grain).map_err(surface_refusal)?);
+                sections.insert(
+                    p.occurrence,
+                    surface
+                        .fresh_section(p.shape.rows, p.shape.width, plan.grain)
+                        .map_err(surface_refusal)?,
+                );
             }
             if let Some(population) = p.law.stages() {
                 if !staged.contains_key(population) {
                     let entering = &material.entering[population];
-                    staged.insert(population.to_owned(), surface.stage_words(&entering.words, entering.rows, entering.width).map_err(surface_refusal)?);
+                    staged.insert(
+                        population.to_owned(),
+                        surface
+                            .stage_words(&entering.words, entering.rows, entering.width)
+                            .map_err(surface_refusal)?,
+                    );
                 }
             }
         }
-        // 2. The capture, opened over the declared lineage; per front: cover, footprints,
+        // 3. The capture, opened over the declared lineage; per front: cover, footprints,
         //    certificate, couplings, recording.
         let lineage: Vec<Vec<usize>> = plan.plans.iter().map(|p| p.producers.clone()).collect();
-        let mut builder = surface.begin_passage_scheduled(&lineage, self.schedule).map_err(surface_refusal)?;
-        let cover = surface.cover();
+        let mut builder = surface
+            .begin_passage_scheduled(&lineage, self.schedule)
+            .map_err(surface_refusal)?;
         let mut receipts: Vec<FrontReceipt> = Vec::with_capacity(plan.fronts.len());
         let mut lane_demand: Vec<(usize, u64, u64)> = Vec::with_capacity(plan.fronts.len());
-        let by_depth: BTreeMap<usize, Vec<&Plan<'a>>> = plan.plans.iter().fold(BTreeMap::new(), |mut map, p| {
-            map.entry(p.depth).or_default().push(p);
-            map
-        });
         for (at, front) in plan.fronts.iter().enumerate() {
             let members: Vec<&Plan<'a>> = by_depth.get(&front.depth).cloned().unwrap_or_default();
-            // The cover: every member is a cell of its output extent, placed against the device
-            // chart's own grain. Semantics live on the device chart only.
-            let cells: Vec<FrontCell> = members.iter().enumerate().map(|(index, p)| FrontCell { index, extent: (p.shape.rows * p.shape.width) as u64 }).collect();
-            let decomposition = CoverDecomposition::of(cover, &cells, "exact_resident_section");
-            if let Err(barriers) = decomposition.independence(&cells) {
-                return Err(FrontPassageObstruction::Cover { front: at, barriers });
-            }
+            let decomposition = &resident_decompositions[at];
             let mut device_cells = 0usize;
             let mut cpu_cells = 0usize;
             for section in &decomposition.sections {
@@ -1374,7 +2373,13 @@ impl<'chart> FrontPassage<'chart> {
                     ChartId::Cpu => {
                         cpu_cells += section.cells.len();
                         if let Some(cell) = section.cells.first() {
-                            return Err(FrontPassageObstruction::Resource(ResourceObstruction::Placement { front: at, cell: cell.index, chart: ChartId::Cpu }));
+                            return Err(FrontPassageObstruction::Resource(
+                                ResourceObstruction::Placement {
+                                    front: at,
+                                    cell: cell.index,
+                                    chart: ChartId::Cpu,
+                                },
+                            ));
                         }
                     }
                 }
@@ -1390,7 +2395,11 @@ impl<'chart> FrontPassage<'chart> {
                 occupied_lanes: occupied_lanes.clone(),
             };
             let idle: u64 = cover_reading.idle_lanes.to_u64().unwrap_or(u64::MAX);
-            lane_demand.push((front.depth, occupied_lanes.to_u64().unwrap_or(u64::MAX), idle));
+            lane_demand.push((
+                front.depth,
+                occupied_lanes.to_u64().unwrap_or(u64::MAX),
+                idle,
+            ));
             // The certificate, from footprints: what each member reads and writes — its inputs'
             // sections, the material its law names, its predecessors' census slots and its own
             // lineage list (read); its own section and its own slot (written).
@@ -1410,35 +2419,61 @@ impl<'chart> FrontPassage<'chart> {
                     // range it reads. Self-overlap is not a barrier: each thread touches only its own
                     // coordinate, and the compile refused the fusion unless this occurrence is the
                     // section's only other reader.
-                    let mut writes: Vec<(u64, u64)> = sections[&owner_of(&sealed, p.occurrence)].ranges().to_vec();
+                    let mut writes: Vec<(u64, u64)> =
+                        sections[&owner_of(&sealed, p.occurrence)].ranges().to_vec();
                     writes.push(builder.slot_range(p.index));
                     MemberFootprint { reads, writes }
                 })
                 .collect();
             let slot_footprints: Vec<(Vec<(u64, u64)>, (u64, u64))> = members
                 .iter()
-                .map(|p| (builder.declared_lineage(p.index).iter().map(|pr| builder.slot_range(*pr)).collect(), builder.slot_range(p.index)))
+                .map(|p| {
+                    (
+                        builder
+                            .declared_lineage(p.index)
+                            .iter()
+                            .map(|pr| builder.slot_range(*pr))
+                            .collect(),
+                        builder.slot_range(p.index),
+                    )
+                })
                 .collect();
             let certificate = certify_footprints(&footprints);
             if let Some(because) = certificate.because() {
-                return Err(FrontPassageObstruction::Interchange { front: at, because: because.clone(), certificate: Box::new(certificate) });
+                return Err(FrontPassageObstruction::Interchange {
+                    front: at,
+                    because: because.clone(),
+                    certificate: Box::new(certificate),
+                });
             }
             // The recording: every member's semantic kernel after its producers, then its census.
             let mut predicted = ExactWork::nothing();
             let mut couplings = Vec::new();
             for p in self.ordered(&members) {
                 let out = &sections[&owner_of(&sealed, p.occurrence)];
-                let lane = builder.open(p.index, &p.producers).map_err(surface_refusal)?;
-                let inputs: Vec<&ResidentSection<'chart>> = p.inputs.iter().map(|port| &sections[&owner_of(&sealed, port.event)]).collect();
+                let lane = builder
+                    .open(p.index, &p.producers)
+                    .map_err(surface_refusal)?;
+                let inputs: Vec<&ResidentSection<'chart>> = p
+                    .inputs
+                    .iter()
+                    .map(|port| &sections[&owner_of(&sealed, port.event)])
+                    .collect();
                 if p.law.seals_predecessor() {
                     // The passage records the fused kernel: the fusion is its compression and the
                     // a-priori bound the fused census compares against is its reading. One node, no
                     // census node, no edge between them.
-                    surface.record_midpoint_seal(&lane, inputs[0], p.bound).map_err(surface_refusal)?;
+                    surface
+                        .record_midpoint_seal(&lane, inputs[0], p.bound)
+                        .map_err(surface_refusal)?;
                     builder.close_fused(p.index).map_err(surface_refusal)?;
                 } else {
-                    p.law.record(surface, &lane, &inputs, material, &staged, &p.shape, out).map_err(surface_refusal)?;
-                    builder.close(p.index, out, p.bound).map_err(surface_refusal)?;
+                    p.law
+                        .record(surface, &lane, &inputs, material, &staged, &p.shape, out)
+                        .map_err(surface_refusal)?;
+                    builder
+                        .close(p.index, out, p.bound)
+                        .map_err(surface_refusal)?;
                 }
                 predicted = co_present(&predicted, &p.shape.predicted);
                 for coupling in &p.shape.couplings {
@@ -1457,7 +2492,10 @@ impl<'chart> FrontPassage<'chart> {
             }
             receipts.push(FrontReceipt {
                 depth: front.depth,
-                members: members.iter().map(|p| (p.occurrence, p.law.name())).collect(),
+                members: members
+                    .iter()
+                    .map(|p| (p.occurrence, p.law.name()))
+                    .collect(),
                 certificate,
                 footprints,
                 slot_footprints,
@@ -1467,12 +2505,34 @@ impl<'chart> FrontPassage<'chart> {
             });
         }
         let passage = builder.finish().map_err(surface_refusal)?;
-        let ecology: Vec<(EventId, usize, Vec<usize>)> = plan.plans.iter().map(|p| (p.occurrence, p.depth, p.producers.clone())).collect();
-        let terminal_index = plan.plans.iter().position(|p| p.occurrence == plan.terminal).unwrap_or(0);
-        let traffic = traffic_reading(surface.declaration().resident_lanes(), &lane_demand, &ecology, terminal_index);
-        let index_of: BTreeMap<EventId, usize> = plan.plans.iter().map(|p| (p.occurrence, p.index)).collect();
-        let bounds: BTreeMap<EventId, (u32, u32, &'static str)> = plan.plans.iter().map(|p| (p.occurrence, (p.bound, p.shape.needed, p.shape.operation))).collect();
-        let ancestry: BTreeMap<EventId, Vec<usize>> = plan.plans.iter().map(|p| (p.occurrence, p.producers.clone())).collect();
+        let ecology: Vec<(EventId, usize, Vec<usize>)> = plan
+            .plans
+            .iter()
+            .map(|p| (p.occurrence, p.depth, p.producers.clone()))
+            .collect();
+        let terminal_index = plan
+            .plans
+            .iter()
+            .position(|p| p.occurrence == plan.terminal)
+            .unwrap_or(0);
+        let traffic = traffic_reading(
+            surface.declaration().resident_lanes(),
+            &lane_demand,
+            &ecology,
+            terminal_index,
+        );
+        let index_of: BTreeMap<EventId, usize> =
+            plan.plans.iter().map(|p| (p.occurrence, p.index)).collect();
+        let bounds: BTreeMap<EventId, (u32, u32, &'static str)> = plan
+            .plans
+            .iter()
+            .map(|p| (p.occurrence, (p.bound, p.shape.needed, p.shape.operation)))
+            .collect();
+        let ancestry: BTreeMap<EventId, Vec<usize>> = plan
+            .plans
+            .iter()
+            .map(|p| (p.occurrence, p.producers.clone()))
+            .collect();
         Ok(CompiledPassage {
             surface,
             passage,
@@ -1489,6 +2549,7 @@ impl<'chart> FrontPassage<'chart> {
             octave_field: plan.octave_field,
             source_bindings: plan.source_bindings,
             entailments: plan.entailments,
+            exact_owner_receipt: plan.exact_owner_receipt,
             admission,
             mode: surface.mode(),
             traffic,
@@ -1542,7 +2603,10 @@ fn seal_unfactored(
         return Some("the predecessor is the declared terminal, so the receiver reads its pre-quotient enclosure".to_owned());
     }
     if declared.contains(&predecessor) {
-        return Some("the receiver declared the predecessor's pre-quotient enclosure as a face it reads".to_owned());
+        return Some(
+            "the receiver declared the predecessor's pre-quotient enclosure as a face it reads"
+                .to_owned(),
+        );
     }
     if predecessor_is_itself_a_seal {
         return Some("the predecessor is itself a fused seal, so its section is already another occurrence's".to_owned());
@@ -1583,7 +2647,14 @@ pub fn factored_seals(
             continue;
         };
         let predecessor = source.event;
-        match seal_unfactored(&consumers, *quotient, predecessor, terminal, declared, quotients.contains(&predecessor)) {
+        match seal_unfactored(
+            &consumers,
+            *quotient,
+            predecessor,
+            terminal,
+            declared,
+            quotients.contains(&predecessor),
+        ) {
             None => fusable.push(*quotient),
             Some(because) => refused.push((*quotient, because)),
         }
@@ -1619,17 +2690,29 @@ pub fn co_present(left: &ExactWork, right: &ExactWork) -> ExactWork {
         cumulative_bits: &left.cumulative_bits + &right.cumulative_bits,
         peak_bits: left.peak_bits.clone().max(right.peak_bits.clone()),
         resident_entries: &left.resident_entries + &right.resident_entries,
-        dependency_span: left.dependency_span.clone().max(right.dependency_span.clone()),
+        dependency_span: left
+            .dependency_span
+            .clone()
+            .max(right.dependency_span.clone()),
     }
 }
 
 /// The traffic reading composed from `receiver_current`, `traversible_chain` and the cover's own
 /// lanes. Reports; never routes. `ecology` is every occurrence with its depth and the indices of
 /// its producers; `terminal` is the index of the declared terminal.
-fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecology: &[(EventId, usize, Vec<usize>)], terminal: usize) -> TrafficReading {
+fn traffic_reading(
+    resident_lanes: u64,
+    lane_demand: &[(usize, u64, u64)],
+    ecology: &[(EventId, usize, Vec<usize>)],
+    terminal: usize,
+) -> TrafficReading {
     let mut fronts = Vec::with_capacity(lane_demand.len());
     for (depth, occupied, idle) in lane_demand {
-        let rounds = if resident_lanes == 0 { 0 } else { occupied.div_ceil(resident_lanes) };
+        let rounds = if resident_lanes == 0 {
+            0
+        } else {
+            occupied.div_ceil(resident_lanes)
+        };
         fronts.push((*depth, *occupied, *idle, rounds));
     }
     // receiver_current: sites are occurrences, passages are the bonds, one deed current radiated
@@ -1658,7 +2741,11 @@ fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecolo
             passage_id += 1;
         }
     }
-    let horizon = ecology.iter().map(|(_, depth, _)| *depth as u64).max().unwrap_or(0);
+    let horizon = ecology
+        .iter()
+        .map(|(_, depth, _)| *depth as u64)
+        .max()
+        .unwrap_or(0);
     let reconvergent_sites = ecology
         .iter()
         .filter(|(_, _, producers)| {
@@ -1668,33 +2755,53 @@ fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecolo
             distinct.len() >= 2
         })
         .count();
-    let (earliest_arrival, earliest_routes, deferred_arrivals, deferred_population) = if !sources.is_empty() && !ecology.is_empty() {
-        let terminal_site = ReceiverCurrentSiteId(terminal as u64);
-        match law.radiate_to_horizon(sources.into_iter().collect::<LocalSet<_>>(), horizon) {
-            Ok(radiation) => {
-                let arrival = radiation.arrivals.get(&terminal_site).map(|a| a.chronology).unwrap_or(0);
-                let routes = radiation.exact_path_population(terminal_site);
-                let approaching = ApproachFront::of(&radiation);
-                (arrival, routes, radiation.deferred_arrivals.len(), approaching.population())
+    let (earliest_arrival, earliest_routes, deferred_arrivals, deferred_population) =
+        if !sources.is_empty() && !ecology.is_empty() {
+            let terminal_site = ReceiverCurrentSiteId(terminal as u64);
+            match law.radiate_to_horizon(sources.into_iter().collect::<LocalSet<_>>(), horizon) {
+                Ok(radiation) => {
+                    let arrival = radiation
+                        .arrivals
+                        .get(&terminal_site)
+                        .map(|a| a.chronology)
+                        .unwrap_or(0);
+                    let routes = radiation.exact_path_population(terminal_site);
+                    let approaching = ApproachFront::of(&radiation);
+                    (
+                        arrival,
+                        routes,
+                        radiation.deferred_arrivals.len(),
+                        approaching.population(),
+                    )
+                }
+                Err(_) => (0, BigUint::zero(), 0, BigUint::zero()),
             }
-            Err(_) => (0, BigUint::zero(), 0, BigUint::zero()),
-        }
-    } else {
-        (0, BigUint::zero(), 0, BigUint::zero())
-    };
+        } else {
+            (0, BigUint::zero(), 0, BigUint::zero())
+        };
     // traversible_chain: each front-to-front junction as an admittance crossing.
     let mut junctions = Vec::new();
     let mut composite = None;
     if let Some(first) = lane_demand.first() {
         if let Ok(admittance) = Admittance::from_shared(first.1.max(1), 1) {
-            let mut chain = found(first.0, &admittance, ChainStanding::Carrying(admittance.value().clone()));
+            let mut chain = found(
+                first.0,
+                &admittance,
+                ChainStanding::Carrying(admittance.value().clone()),
+            );
             let mut carrying = admittance;
             let mut whole = true;
             for window in lane_demand.windows(2) {
                 let (from, incident_lanes, _) = window[0];
                 let (to, transmitted_lanes, _) = window[1];
-                let Ok(transmitted) = Admittance::from_shared(transmitted_lanes.max(1), 1) else { whole = false; break };
-                let Ok(crossing) = Crossing::meet(&carrying, &transmitted) else { whole = false; break };
+                let Ok(transmitted) = Admittance::from_shared(transmitted_lanes.max(1), 1) else {
+                    whole = false;
+                    break;
+                };
+                let Ok(crossing) = Crossing::meet(&carrying, &transmitted) else {
+                    whole = false;
+                    break;
+                };
                 junctions.push(JunctionReading {
                     from_depth: from,
                     to_depth: to,
@@ -1704,21 +2811,38 @@ fn traffic_reading(resident_lanes: u64, lane_demand: &[(usize, u64, u64)], ecolo
                     reflection: crossing.reflection(),
                     power_transmission: crossing.power_transmission(),
                 });
-                chain.carry(crossing, to, ChainStanding::Carrying(transmitted.value().clone()));
+                chain.carry(
+                    crossing,
+                    to,
+                    ChainStanding::Carrying(transmitted.value().clone()),
+                );
                 carrying = transmitted;
             }
             if whole && chain.hops() > 0 {
                 let matrix = chain.compose();
-                composite = match (matrix.transmission(), matrix.reflection(), matrix.power_transmission()) {
+                composite = match (
+                    matrix.transmission(),
+                    matrix.reflection(),
+                    matrix.power_transmission(),
+                ) {
                     (Some(t), Some(r), Some(p)) => Some((t, r, p)),
                     _ => None,
                 };
             }
         }
     }
-    TrafficReading { resident_lanes, fronts, earliest_arrival, earliest_routes, deferred_arrivals, deferred_population, reconvergent_sites, junctions, composite }
+    TrafficReading {
+        resident_lanes,
+        fronts,
+        earliest_arrival,
+        earliest_routes,
+        deferred_arrivals,
+        deferred_population,
+        reconvergent_sites,
+        junctions,
+        composite,
+    }
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // the bound passage
@@ -1747,6 +2871,7 @@ pub struct CompiledPassage<'chart> {
     pub source_bindings: Vec<BindingValidation>,
     /// Per occurrence: the entailment of its law by the validated testimony.
     pub entailments: Vec<(EventId, LawEntailment)>,
+    exact_owner_receipt: Option<ExactOwnerPassageReceipt>,
     pub admission: DeedAdmission,
     pub mode: ModeIdentity,
     pub traffic: TrafficReading,
@@ -1769,7 +2894,10 @@ impl<'chart> CompiledPassage<'chart> {
     /// The occurrence that sealed this one, if any: the quotient whose fused kernel rewrote this
     /// occurrence's section in place. Its face is the one the receiver reads.
     pub fn sealed_by(&self, occurrence: EventId) -> Option<EventId> {
-        self.sealed.iter().find(|(_, predecessor)| **predecessor == occurrence).map(|(quotient, _)| *quotient)
+        self.sealed
+            .iter()
+            .find(|(_, predecessor)| **predecessor == occurrence)
+            .map(|(quotient, _)| *quotient)
     }
     pub fn terminal(&self) -> EventId {
         self.terminal
@@ -1778,7 +2906,10 @@ impl<'chart> CompiledPassage<'chart> {
     /// the residual stream or a shared standing leaves this passage's ownership and enters the next
     /// passage's material as a [`Standing`]. This passage may not be launched again afterwards;
     /// the section it wrote has moved.
-    pub fn release_section(&mut self, occurrence: EventId) -> Option<(ResidentSection<'chart>, u32)> {
+    pub fn release_section(
+        &mut self,
+        occurrence: EventId,
+    ) -> Option<(ResidentSection<'chart>, u32)> {
         if self.sealed_by(occurrence).is_some() {
             return None;
         }
@@ -1807,7 +2938,10 @@ impl<'chart> CompiledPassage<'chart> {
     /// **The terminal face**: the one section this passage's receiver declared, copied out once —
     /// only when the reading says it stood. A terminal whose lineage carries a refusal is refused
     /// by name with the complete obstruction lineage; its words are never returned as a standing.
-    pub fn read_terminal(&self, returned: &PassageReturn) -> Result<Vec<(i64, i64)>, FrontPassageObstruction> {
+    pub fn read_terminal(
+        &self,
+        returned: &PassageReturn,
+    ) -> Result<Vec<(i64, i64)>, FrontPassageObstruction> {
         self.read_section(returned, self.terminal)
     }
 
@@ -1819,7 +2953,11 @@ impl<'chart> CompiledPassage<'chart> {
     /// given the refusal and the reopening route instead of the collapsed words. Readability at read
     /// time is not knowable at compile — `read_section` takes any occurrence — so the guard lives at
     /// both ends and neither is decorative.
-    pub fn read_section(&self, returned: &PassageReturn, occurrence: EventId) -> Result<Vec<(i64, i64)>, FrontPassageObstruction> {
+    pub fn read_section(
+        &self,
+        returned: &PassageReturn,
+        occurrence: EventId,
+    ) -> Result<Vec<(i64, i64)>, FrontPassageObstruction> {
         if let Some(quotient) = self.sealed_by(occurrence) {
             return Err(FrontPassageObstruction::Sealed {
                 occurrence,
@@ -1827,19 +2965,43 @@ impl<'chart> CompiledPassage<'chart> {
                 reopening: "bind MidpointQuotient at the quotient instead of SealedMidpointQuotient, or declare this occurrence through FrontPassage::reading before compiling: the unfused pair keeps this section and censuses its enclosure",
             });
         }
-        let index = self.index_of.get(&occurrence).copied().ok_or(FrontPassageObstruction::Compile(CompileRefusal::ForeignOccurrence { occurrence }))?;
+        let index =
+            self.index_of
+                .get(&occurrence)
+                .copied()
+                .ok_or(FrontPassageObstruction::Compile(
+                    CompileRefusal::ForeignOccurrence { occurrence },
+                ))?;
         if !returned.obstruction.stands(index) {
             let (bound, _, operation) = self.bounds[&occurrence];
-            let slot = returned.fronts.iter().flat_map(|f| f.readings.iter()).find(|r| r.occurrence == occurrence).map(|r| r.measured).unwrap_or_default();
-            let refusal = slot.refusal(operation, bound).unwrap_or(ResidentRefusal::Upstream { operation: operation.to_owned() });
-            return Err(FrontPassageObstruction::Refused { occurrence, operation: operation.to_owned(), refusal, slot, lineage: returned.obstruction.clone() });
+            let slot = returned
+                .fronts
+                .iter()
+                .flat_map(|f| f.readings.iter())
+                .find(|r| r.occurrence == occurrence)
+                .map(|r| r.measured)
+                .unwrap_or_default();
+            let refusal = slot
+                .refusal(operation, bound)
+                .unwrap_or(ResidentRefusal::Upstream {
+                    operation: operation.to_owned(),
+                });
+            return Err(FrontPassageObstruction::Refused {
+                occurrence,
+                operation: operation.to_owned(),
+                refusal,
+                slot,
+                lineage: returned.obstruction.clone(),
+            });
         }
         // A FUSED occurrence's words are its predecessor's buffer, rewritten in place, so the
         // lookup resolves through the seal exactly as [`CompiledPassage::section`] does. Reading a
         // fused quotient's OWN face is lawful and is what a receiver declaring the quotient asks
         // for; it was a panic until 2026-08-19, when the streamed circulation read the final
         // normed standing — a quotient — through a fused seal for the first time.
-        self.surface.read_out(&self.sections[&owner_of(&self.sealed, occurrence)]).map_err(surface_refusal)
+        self.surface
+            .read_out(&self.sections[&owner_of(&self.sealed, occurrence)])
+            .map_err(surface_refusal)
     }
 
     /// The graph as the apparatus bound it, and what the builder intended.
@@ -1853,10 +3015,20 @@ impl<'chart> CompiledPassage<'chart> {
 
     /// New entering material of the same extents, crossing once, for a later deed of this bound
     /// passage. Nothing else changes: the graph is invariant under the material.
-    pub fn refill(&self, material: &ResidentMaterial<'chart>) -> Result<(), FrontPassageObstruction> {
+    pub fn refill(
+        &self,
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<(), FrontPassageObstruction> {
         for (name, staged) in &self.staged {
-            let entering = material.entering.get(name).ok_or_else(|| FrontPassageObstruction::Compile(CompileRefusal::MaterialAbsent { occurrence: EventId(0), name: name.clone() }))?;
-            self.surface.refill(staged, &entering.words).map_err(surface_refusal)?;
+            let entering = material.entering.get(name).ok_or_else(|| {
+                FrontPassageObstruction::Compile(CompileRefusal::MaterialAbsent {
+                    occurrence: EventId(0),
+                    name: name.clone(),
+                })
+            })?;
+            self.surface
+                .refill(staged, &entering.words)
+                .map_err(surface_refusal)?;
         }
         Ok(())
     }
@@ -1866,16 +3038,107 @@ impl<'chart> CompiledPassage<'chart> {
     /// completes every receipt, and the complete obstruction lineage is returned beside it — the
     /// deed is returned whole whether or not the card refused somewhere, and what did not stand
     /// cannot be read as standing.
-    pub fn launch(&self, expected: &ModeIdentity) -> Result<PassageReturn, FrontPassageObstruction> {
+    pub fn launch(
+        &self,
+        expected: &ModeIdentity,
+    ) -> Result<PassageReturn, FrontPassageObstruction> {
         if self.released {
-            return Err(surface_refusal(ResidentRefusal::Declaration { operation: "passage", what: "a section was released to a later passage; this passage may not launch again".to_owned() }));
+            return Err(surface_refusal(ResidentRefusal::Declaration {
+                operation: "passage",
+                what:
+                    "a section was released to a later passage; this passage may not launch again"
+                        .to_owned(),
+            }));
         }
         let actual = self.surface.mode();
         if *expected != actual {
-            return Err(surface_refusal(ResidentRefusal::ModeMismatch { expected: Box::new(expected.clone()), actual: Box::new(actual) }));
+            return Err(surface_refusal(ResidentRefusal::ModeMismatch {
+                expected: Box::new(expected.clone()),
+                actual: Box::new(actual),
+            }));
         }
         let reading = self.passage.launch().map_err(surface_refusal)?;
         Ok(self.compose(reading))
+    }
+
+    /// Launch and mint the opaque exact-owner deed receipt only after the card returned, every
+    /// licensed occurrence stood, and every licensed face was actually read back.
+    pub fn launch_with_exact_owner_receipt(
+        &self,
+        expected: &ModeIdentity,
+    ) -> Result<(PassageReturn, ExactOwnerDeedReceipt), FrontPassageObstruction> {
+        let returned = self.launch(expected)?;
+        let receipt = self.mint_exact_owner_deed_receipt(&returned)?;
+        Ok((returned, receipt))
+    }
+
+    fn mint_exact_owner_deed_receipt(
+        &self,
+        returned: &PassageReturn,
+    ) -> Result<ExactOwnerDeedReceipt, FrontPassageObstruction> {
+        let compiled = self.exact_owner_receipt.as_ref().ok_or_else(|| {
+            surface_refusal(ResidentRefusal::Declaration {
+                operation: "exact-owner-deed",
+                what: "the compiled passage carries no exact-owner entailment".to_owned(),
+            })
+        })?;
+        if !returned.stands() || !self.admission.is_admitted() {
+            return Err(surface_refusal(ResidentRefusal::Declaration {
+                operation: "exact-owner-deed",
+                what: "the returned passage or its admission did not stand".to_owned(),
+            }));
+        }
+        let device = self.mode.device.clone().ok_or_else(|| {
+            surface_refusal(ResidentRefusal::Declaration {
+                operation: "exact-owner-deed",
+                what: "the mode carries no resident device identity".to_owned(),
+            })
+        })?;
+        let ptx_sha256 = self.mode.kernel_content.clone().ok_or_else(|| {
+            surface_refusal(ResidentRefusal::Declaration {
+                operation: "exact-owner-deed",
+                what: "the mode carries no PTX content identity".to_owned(),
+            })
+        })?;
+        let mut readbacks = BTreeMap::new();
+        for occurrence in compiled.entailed_occurrences.keys() {
+            readbacks.insert(*occurrence, self.read_section(returned, *occurrence)?);
+        }
+        // The declared terminal is read independently even when it is already licensed.
+        let _ = self.read_terminal(returned)?;
+        let admission_identity = receipt_digest(format!("{:?}", self.admission));
+        let material_identity = receipt_digest(format!("{:?}", self.admission.cited_material));
+        let graph_identity = receipt_digest(format!("{:?}", self.graph()));
+        let deed_prediction_identity = receipt_digest(format!("{:?}", self.deed_prediction));
+        let apparatus_prediction_identity =
+            receipt_digest(format!("{:?}", self.apparatus_prediction));
+        let census_identity = receipt_digest(format!(
+            "before={:?};after={:?};fronts={:?}",
+            returned.census_before, returned.census_after, returned.fronts
+        ));
+        let address = receipt_digest(format!(
+            "compiled={};admission={admission_identity};material={material_identity};device={device};ptx={ptx_sha256};graph={graph_identity};census={census_identity};deed-prediction={deed_prediction_identity};apparatus-prediction={apparatus_prediction_identity};complex={};selected={};readbacks={readbacks:?}",
+            compiled.address,
+            compiled.operation_complex_identity,
+            compiled.selected_subcomplex_identity,
+        ));
+        Ok(ExactOwnerDeedReceipt {
+            address,
+            compiled_address: compiled.address.clone(),
+            licensed_laws: compiled.licensed_laws.clone(),
+            entailed_occurrences: compiled.entailed_occurrences.clone(),
+            readbacks,
+            admission_identity,
+            material_identity,
+            device,
+            ptx_sha256,
+            graph_identity,
+            census_identity,
+            deed_prediction_identity,
+            apparatus_prediction_identity,
+            operation_complex_identity: compiled.operation_complex_identity.clone(),
+            selected_subcomplex_identity: compiled.selected_subcomplex_identity.clone(),
+        })
     }
 
     /// **Launch this deed onto a caller's stream, and return nothing yet.**
@@ -1890,21 +3153,39 @@ impl<'chart> CompiledPassage<'chart> {
     /// A caller that reads a section before synchronizing reads a deed that has not finished; the
     /// two calls are separate exactly so that the synchronization is a declared act rather than a
     /// side effect of asking a question.
-    pub fn launch_on(&self, expected: &ModeIdentity, stream: &Stream) -> Result<TransferCensus, FrontPassageObstruction> {
+    pub fn launch_on(
+        &self,
+        expected: &ModeIdentity,
+        stream: &Stream,
+    ) -> Result<TransferCensus, FrontPassageObstruction> {
         if self.released {
-            return Err(surface_refusal(ResidentRefusal::Declaration { operation: "passage", what: "a section was released to a later passage; this passage may not launch again".to_owned() }));
+            return Err(surface_refusal(ResidentRefusal::Declaration {
+                operation: "passage",
+                what:
+                    "a section was released to a later passage; this passage may not launch again"
+                        .to_owned(),
+            }));
         }
         let actual = self.surface.mode();
         if *expected != actual {
-            return Err(surface_refusal(ResidentRefusal::ModeMismatch { expected: Box::new(expected.clone()), actual: Box::new(actual) }));
+            return Err(surface_refusal(ResidentRefusal::ModeMismatch {
+                expected: Box::new(expected.clone()),
+                actual: Box::new(actual),
+            }));
         }
         self.passage.launch_on(stream).map_err(surface_refusal)
     }
 
     /// **The return of a deed launched with [`CompiledPassage::launch_on`]**, read after the
     /// caller's terminal synchronization. Identical in every field to what `launch` returns.
-    pub fn returned(&self, census_before: TransferCensus) -> Result<PassageReturn, FrontPassageObstruction> {
-        let reading = self.passage.census(census_before).map_err(surface_refusal)?;
+    pub fn returned(
+        &self,
+        census_before: TransferCensus,
+    ) -> Result<PassageReturn, FrontPassageObstruction> {
+        let reading = self
+            .passage
+            .census(census_before)
+            .map_err(surface_refusal)?;
         Ok(self.compose(reading))
     }
 
@@ -1922,7 +3203,13 @@ impl<'chart> CompiledPassage<'chart> {
                     refusals.push((*occurrence, *operation, slot));
                 }
                 measured_octaves.insert(OccurrencePort::output(*occurrence, 0), slot.max_octave);
-                readings.push(MemberReading { occurrence: *occurrence, operation, bound, needed, measured: slot });
+                readings.push(MemberReading {
+                    occurrence: *occurrence,
+                    operation,
+                    bound,
+                    needed,
+                    measured: slot,
+                });
             }
             let couplings = front
                 .couplings
@@ -1939,9 +3226,20 @@ impl<'chart> CompiledPassage<'chart> {
                     }
                 })
                 .collect();
-            fronts.push(FrontDeedReading { depth: front.depth, readings, couplings });
+            fronts.push(FrontDeedReading {
+                depth: front.depth,
+                readings,
+                couplings,
+            });
         }
-        PassageReturn { fronts, census_before: reading.census_before, census_after: reading.census_after, measured_octaves, obstruction: reading.obstruction, refusals }
+        PassageReturn {
+            fronts,
+            census_before: reading.census_before,
+            census_after: reading.census_after,
+            measured_octaves,
+            obstruction: reading.obstruction,
+            refusals,
+        }
     }
 
     /// The first refusal in front order as a typed obstruction, or `Ok` when every occurrence
@@ -1951,8 +3249,18 @@ impl<'chart> CompiledPassage<'chart> {
             None => Ok(()),
             Some((occurrence, operation, slot)) => {
                 let (bound, _, _) = self.bounds[occurrence];
-                let refusal = slot.refusal(operation, bound).unwrap_or(ResidentRefusal::Upstream { operation: (*operation).to_owned() });
-                Err(FrontPassageObstruction::Refused { occurrence: *occurrence, operation: (*operation).to_owned(), refusal, slot: *slot, lineage: returned.obstruction.clone() })
+                let refusal = slot
+                    .refusal(operation, bound)
+                    .unwrap_or(ResidentRefusal::Upstream {
+                        operation: (*operation).to_owned(),
+                    });
+                Err(FrontPassageObstruction::Refused {
+                    occurrence: *occurrence,
+                    operation: (*operation).to_owned(),
+                    refusal,
+                    slot: *slot,
+                    lineage: returned.obstruction.clone(),
+                })
             }
         }
     }
@@ -1961,10 +3269,16 @@ impl<'chart> CompiledPassage<'chart> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::embedding_fiber::ResidentReadout;
+    use crate::embedding_fiber::{AlignedMaterial, ResidentReadout};
+    use crate::exact_linear::ExactRatMatrix;
+    use crate::exact_owner_testimony::{
+        ExactOwnerLicense, ExactOwnerOccurrence, TypedMathematicalBoundary,
+    };
     use crate::exact_work::WorkMetric;
-    use crate::resident_section::{Dyadic, DyadicEnclosure, REFUSED_MALFORMED, REFUSED_UPSTREAM};
     use crate::ported_operation::SourceTestimony;
+    use crate::resident_section::{
+        Dyadic, DyadicEnclosure, LaneTree, REFUSED_MALFORMED, REFUSED_UPSTREAM, TileGeometry,
+    };
     use crate::source_occurrence::{AuthenticatedContainer, AuthenticatedText};
 
     const ONE: u16 = 0x3F80;
@@ -1989,30 +3303,126 @@ mod tests {
     fn occurrence() -> crate::source_occurrence::SourceOccurrence {
         crate::source_occurrence::SourceOccurrence {
             implementation: AuthenticatedText::of_text("/site.py", IMPLEMENTATION, None),
-            configuration: AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 20, "width": 1}}"#, None),
+            configuration: AuthenticatedText::of_text(
+                "/config.json",
+                r#"{"text_config": {"grain": 20, "width": 1}}"#,
+                None,
+            ),
             configuration_scope: vec!["text_config".to_owned()],
-            container: AuthenticatedContainer { locator: "/none".to_owned(), octets: 0, header_octets: 0, header_sha256: String::new(), content_sha256: None, regions: BTreeMap::new(), identity: None },
+            container: AuthenticatedContainer {
+                locator: "/none".to_owned(),
+                octets: 0,
+                header_octets: 0,
+                header_sha256: String::new(),
+                content_sha256: None,
+                regions: BTreeMap::new(),
+                identity: None,
+            },
             assets: Vec::new(),
         }
     }
 
     /// A two-front diagram: `enter x` then co-present `{scale x by 2, hadamard x·x}`.
-    fn small_diagram() -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId) {
+    fn small_diagram() -> (
+        PortedOperationComplex,
+        ResidentRealization,
+        EventId,
+        EventId,
+        EventId,
+    ) {
         let mut complex = PortedOperationComplex::new("small");
         let standing = complex.port("standing");
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
-        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
-        let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
-        let hadamard = complex.bind_operation("hadamard", OperationSpecies::Construction, vec![standing, standing], vec![standing], None, testimony("Site.hadamard (z = x * x)")).expect("law");
+        let testimony = |symbol: &str| {
+            vec![
+                SourceTestimony::Implementation {
+                    locator: "/site.py".to_owned(),
+                    symbol: symbol.to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "grain".to_owned(),
+                    value: "20".to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "width".to_owned(),
+                    value: "1".to_owned(),
+                },
+            ]
+        };
+        let enter = complex
+            .bind_operation(
+                "enter",
+                OperationSpecies::Construction,
+                vec![],
+                vec![standing],
+                None,
+                testimony("Site.enter (x = embed(words) * scale)"),
+            )
+            .expect("law");
+        let scale = complex
+            .bind_operation(
+                "scale",
+                OperationSpecies::Transport,
+                vec![standing],
+                vec![standing],
+                None,
+                testimony("Site.scale (y = x * 2)"),
+            )
+            .expect("law");
+        let hadamard = complex
+            .bind_operation(
+                "hadamard",
+                OperationSpecies::Construction,
+                vec![standing, standing],
+                vec![standing],
+                None,
+                testimony("Site.hadamard (z = x * x)"),
+            )
+            .expect("law");
         let e = complex.occur(enter).expect("occur");
         let s = complex.occur(scale).expect("occur");
         let h = complex.occur(hadamard).expect("occur");
-        complex.carries_precedence("x scales", standing, OccurrencePort::output(e, 0), OccurrencePort::input(s, 0)).expect("bond");
-        complex.carries_precedence("x squares left", standing, OccurrencePort::output(e, 0), OccurrencePort::input(h, 0)).expect("bond");
-        complex.carries_precedence("x squares right", standing, OccurrencePort::output(e, 0), OccurrencePort::input(h, 1)).expect("bond");
+        complex
+            .carries_precedence(
+                "x scales",
+                standing,
+                OccurrencePort::output(e, 0),
+                OccurrencePort::input(s, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "x squares left",
+                standing,
+                OccurrencePort::output(e, 0),
+                OccurrencePort::input(h, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "x squares right",
+                standing,
+                OccurrencePort::output(e, 0),
+                OccurrencePort::input(h, 1),
+            )
+            .expect("bond");
         let mut realization = ResidentRealization::default();
-        realization.bind(e, Enter { population: "x".to_owned(), scale: Dyadic::ONE });
-        realization.bind(s, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        realization.bind(
+            e,
+            Enter {
+                population: "x".to_owned(),
+                scale: Dyadic::ONE,
+            },
+        );
+        realization.bind(
+            s,
+            Scale {
+                by: DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+            },
+        );
         realization.bind(h, Hadamard);
         (complex, realization, e, s, h)
     }
@@ -2022,31 +3432,352 @@ mod tests {
         let mut words = vec![ONE, TWO, HALF, MINUS_ONE_AND_HALF];
         words.resize(32, ONE);
         let mut material = ResidentMaterial::empty();
-        material.entering.insert("x".to_owned(), EnteringRows { words, rows: 1, width: 32 });
+        material.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words,
+                rows: 1,
+                width: 32,
+            },
+        );
         material
+    }
+
+    fn exact_owner_constraint_fixture(
+        readout: &'static ResidentReadout,
+        resident_map: AlignedMaterial,
+        licensed_matrix: ExactRatMatrix,
+    ) -> (
+        PortedOperationComplex,
+        ResidentRealization,
+        ResidentMaterial<'static>,
+        ExactOwnerOccurrence,
+        EventId,
+    ) {
+        let mut complex = PortedOperationComplex::new("exact-owner constraint");
+        let standing = complex.port("standing");
+        let residual = complex.port("residual");
+        let enter_law = complex
+            .bind_operation(
+                "enter proposed standing",
+                OperationSpecies::Construction,
+                vec![],
+                vec![standing],
+                None,
+                Vec::new(),
+            )
+            .expect("enter law");
+        let constraint_law = complex
+            .bind_operation(
+                "value constraint",
+                OperationSpecies::Transport,
+                vec![standing],
+                vec![residual],
+                Some("constraint".to_owned()),
+                Vec::new(),
+            )
+            .expect("constraint law");
+        let enter = complex.occur(enter_law).expect("enter occurrence");
+        let constraint = complex
+            .occur(constraint_law)
+            .expect("constraint occurrence");
+        complex
+            .carries_precedence(
+                "standing enters constraint",
+                standing,
+                OccurrencePort::output(enter, 0),
+                OccurrencePort::input(constraint, 0),
+            )
+            .expect("bond");
+
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 1,
+            k_tile: 128,
+            splits: 1,
+        };
+        let mut realization = ResidentRealization::default();
+        realization.bind(
+            enter,
+            Enter {
+                population: "x".to_owned(),
+                scale: Dyadic::ONE,
+            },
+        );
+        realization.bind(
+            constraint,
+            ContractTiled {
+                population: "constraint-map".to_owned(),
+                tile,
+                admitted_node_octaves: ResidentSurface::carrier_octaves(),
+                tree: LaneTree::Descending,
+            },
+        );
+
+        let mounted = readout.mount(&resident_map, 2).expect("aligned mount");
+        let mut material = ResidentMaterial::empty();
+        material.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words: vec![TWO, TWO],
+                rows: 1,
+                width: 2,
+            },
+        );
+        material.populations.insert(
+            "constraint-map".to_owned(),
+            MountedPopulation {
+                readout: mounted,
+                mass_value_octaves: 2,
+            },
+        );
+
+        let unit_frame = crate::quantity::BaseUnits::declare(["one"])
+            .expect("dimensionless coordinate frame")
+            .dimensionless();
+        let standing_typed = TypedMathematicalBoundary::coordinate_word(
+            standing,
+            "Q",
+            vec![unit_frame.clone(), unit_frame.clone()],
+            Vec::new(),
+        )
+        .expect("two-coordinate standing type");
+        let residual_typed =
+            TypedMathematicalBoundary::new(residual, "Q", Some(unit_frame), Vec::new())
+                .expect("one-coordinate residual type");
+        let enter_matrix =
+            ExactRatMatrix::new(vec![vec![Rat::zero(), Rat::zero()]]).expect("zero matrix");
+        let enter_license = ExactOwnerLicense::exact_linear(
+            enter_law,
+            "enter lineage",
+            "enter",
+            OperationSpecies::Construction,
+            Vec::new(),
+            vec![standing_typed.clone()],
+            &enter_matrix,
+            &[Rat::from_integer(2.into()), Rat::from_integer(2.into())],
+            BTreeMap::from([
+                ("population".to_owned(), "x".to_owned()),
+                ("scale-significand".to_owned(), "1".to_owned()),
+                ("scale-exponent".to_owned(), "0".to_owned()),
+            ]),
+        )
+        .expect("enter license");
+        let constraint_license = ExactOwnerLicense::exact_linear(
+            constraint_law,
+            "constraint lineage",
+            "contract-tiled(apparatus tile)",
+            OperationSpecies::Transport,
+            vec![standing_typed],
+            vec![residual_typed],
+            &licensed_matrix,
+            &[Rat::from_integer(2.into()), Rat::from_integer(2.into())],
+            BTreeMap::from([
+                ("population".to_owned(), "constraint-map".to_owned()),
+                ("reduction-word".to_owned(), "Descending".to_owned()),
+            ]),
+        )
+        .expect("constraint license");
+        let witness = ExactOwnerOccurrence::new(vec![enter_license, constraint_license])
+            .expect("exact-owner witness");
+        (complex, realization, material, witness, constraint)
+    }
+
+    #[test]
+    fn exact_owner_matrix_identity_is_the_mounted_content_or_compile_refuses_without_allocating() {
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
+        let matching = ExactRatMatrix::new(vec![vec![
+            Rat::from_integer(1.into()),
+            Rat::from_integer((-1).into()),
+        ]])
+        .expect("matching matrix");
+        let aligned = AlignedMaterial {
+            entries: vec![1, -1],
+            exponent: 0,
+            entry_octaves: 1,
+            negatives: 1,
+        };
+        let (complex, realization, material, witness, terminal) =
+            exact_owner_constraint_fixture(readout, aligned.clone(), matching.clone());
+        let passage = FrontPassage::new(surface, ResidentGrain(20));
+        let before = surface.census().allocations;
+        let compiled = passage
+            .compile(&complex, &realization, &material, &witness, terminal)
+            .expect("matching aligned identity compiles");
+        assert!(compiled.exact_owner_receipt.is_some());
+        assert_eq!(
+            surface.census().allocations,
+            before,
+            "compile allocates nothing"
+        );
+
+        let (complex, realization, mut wrong_input, witness, terminal) =
+            exact_owner_constraint_fixture(readout, aligned.clone(), matching.clone());
+        wrong_input.entering.get_mut("x").expect("x").words = vec![TWO, 0x4040];
+        let before = surface.census().allocations;
+        let refused = passage.compile(&complex, &realization, &wrong_input, &witness, terminal);
+        assert!(matches!(
+            refused,
+            Err(FrontPassageObstruction::Compile(
+                CompileRefusal::Entailment {
+                    refusal: EntailmentRefusal::ExactOwnerInputDisagrees { .. },
+                    ..
+                }
+            ))
+        ));
+        assert_eq!(
+            surface.census().allocations,
+            before,
+            "input refusal allocates nothing"
+        );
+
+        let wrong = ExactRatMatrix::new(vec![vec![
+            Rat::from_integer(2.into()),
+            Rat::from_integer((-2).into()),
+        ]])
+        .expect("wrong matrix");
+        let (complex, realization, material, witness, terminal) =
+            exact_owner_constraint_fixture(readout, aligned, wrong);
+        let before = surface.census().allocations;
+        let refused = passage.compile(&complex, &realization, &material, &witness, terminal);
+        assert!(matches!(
+            refused,
+            Err(FrontPassageObstruction::Compile(
+                CompileRefusal::Entailment {
+                    refusal: EntailmentRefusal::ExactOwnerMatrixDisagrees { .. },
+                    ..
+                }
+            ))
+        ));
+        assert_eq!(
+            surface.census().allocations,
+            before,
+            "identity refusal allocates nothing"
+        );
+
+        // The BF16 mouth intentionally carries no exact rational matrix identity.
+        let map = readout.mount_bfloat16(&[ONE, 0xBF80], 2).expect("bf16 map");
+        let mut material = material;
+        material.populations.insert(
+            "constraint-map".to_owned(),
+            MountedPopulation {
+                readout: map,
+                mass_value_octaves: 2,
+            },
+        );
+        let before = surface.census().allocations;
+        let refused = passage.compile(&complex, &realization, &material, &witness, terminal);
+        assert!(matches!(
+            refused,
+            Err(FrontPassageObstruction::Compile(
+                CompileRefusal::Entailment {
+                    refusal: EntailmentRefusal::ExactOwnerMatrixDisagrees { resident: None, .. },
+                    ..
+                }
+            ))
+        ));
+        assert_eq!(
+            surface.census().allocations,
+            before,
+            "BF16 refusal allocates nothing"
+        );
     }
 
     /// `enter x` → `scale x by 2` → a midpoint quotient sealing the scale. The quotient's law is the
     /// caller's to choose: `MidpointQuotient` is the unfused pair, `SealedMidpointQuotient` the
     /// declared fusion. `extra_consumer` bonds a second reader onto the scale, which is exactly the
     /// receiver the fusion may not fuse away.
-    fn sealed_diagram(fused: bool, extra_consumer: bool) -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId) {
+    fn sealed_diagram(
+        fused: bool,
+        extra_consumer: bool,
+    ) -> (
+        PortedOperationComplex,
+        ResidentRealization,
+        EventId,
+        EventId,
+        EventId,
+    ) {
         let mut complex = PortedOperationComplex::new("sealed");
         let standing = complex.port("standing");
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
-        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
-        let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
+        let testimony = |symbol: &str| {
+            vec![
+                SourceTestimony::Implementation {
+                    locator: "/site.py".to_owned(),
+                    symbol: symbol.to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "grain".to_owned(),
+                    value: "20".to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "width".to_owned(),
+                    value: "1".to_owned(),
+                },
+            ]
+        };
+        let enter = complex
+            .bind_operation(
+                "enter",
+                OperationSpecies::Construction,
+                vec![],
+                vec![standing],
+                None,
+                testimony("Site.enter (x = embed(words) * scale)"),
+            )
+            .expect("law");
+        let scale = complex
+            .bind_operation(
+                "scale",
+                OperationSpecies::Transport,
+                vec![standing],
+                vec![standing],
+                None,
+                testimony("Site.scale (y = x * 2)"),
+            )
+            .expect("law");
         let quotient = complex
             .bind_operation("scale · midpoint quotient", OperationSpecies::Quotient, vec![standing], vec![standing], None, vec![SourceTestimony::Intervention { statement: "declared quotient chart: the certified enclosure is collapsed to its midpoint for the successors".to_owned() }])
             .expect("law");
         let e = complex.occur(enter).expect("occur");
         let s = complex.occur(scale).expect("occur");
         let q = complex.occur(quotient).expect("occur");
-        complex.carries_precedence("x scales", standing, OccurrencePort::output(e, 0), OccurrencePort::input(s, 0)).expect("bond");
-        complex.carries_precedence("scale sealed", standing, OccurrencePort::output(s, 0), OccurrencePort::input(q, 0)).expect("bond");
+        complex
+            .carries_precedence(
+                "x scales",
+                standing,
+                OccurrencePort::output(e, 0),
+                OccurrencePort::input(s, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "scale sealed",
+                standing,
+                OccurrencePort::output(s, 0),
+                OccurrencePort::input(q, 0),
+            )
+            .expect("bond");
         let mut realization = ResidentRealization::default();
-        realization.bind(e, Enter { population: "x".to_owned(), scale: Dyadic::ONE });
-        realization.bind(s, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        realization.bind(
+            e,
+            Enter {
+                population: "x".to_owned(),
+                scale: Dyadic::ONE,
+            },
+        );
+        realization.bind(
+            s,
+            Scale {
+                by: DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+            },
+        );
         if fused {
             realization.bind(q, SealedMidpointQuotient);
         } else {
@@ -2055,7 +3786,14 @@ mod tests {
         if extra_consumer {
             let second = complex.bind_operation("second reader", OperationSpecies::Quotient, vec![standing], vec![standing], None, vec![SourceTestimony::Intervention { statement: "the receiver reads the pre-quotient enclosure through a second consumer".to_owned() }]).expect("law");
             let r = complex.occur(second).expect("occur");
-            complex.carries_precedence("scale read again", standing, OccurrencePort::output(s, 0), OccurrencePort::input(r, 0)).expect("bond");
+            complex
+                .carries_precedence(
+                    "scale read again",
+                    standing,
+                    OccurrencePort::output(s, 0),
+                    OccurrencePort::input(r, 0),
+                )
+                .expect("bond");
             realization.bind(r, WithdrawColumns { from: 0, span: 1 });
         }
         (complex, realization, e, s, q)
@@ -2092,7 +3830,10 @@ mod tests {
         // (iv) a second consumer reads the predecessor.
         let (complex, realization, _, _, q) = sealed_diagram(false, true);
         let (fusable, refused) = factored_seals(&complex, &realization, q, &BTreeSet::new());
-        assert!(fusable.is_empty(), "a second reader is exactly what the fusion may not fuse away");
+        assert!(
+            fusable.is_empty(),
+            "a second reader is exactly what the fusion may not fuse away"
+        );
         assert!(refused[0].1.contains("read by 2"), "{:?}", refused[0]);
     }
 
@@ -2105,18 +3846,36 @@ mod tests {
     /// the same words.
     #[test]
     fn a_fused_quotients_own_face_is_readable_and_equals_the_unfused_pairs() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let material = material();
         let receiver = DeedReceiver::unbounded();
         let (complex, realization, _, _, q) = sealed_diagram(true, false);
-        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&complex, &realization, &material, &occurrence(), &receiver, None, q).expect("the fusion binds");
+        let fused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &receiver,
+                None,
+                q,
+            )
+            .expect("the fusion binds");
         let returned = fused.launch(&surface.mode()).expect("the fused deed");
-        let fused_face = fused.read_section(&returned, q).expect("the fused quotient's own face is readable");
+        let fused_face = fused
+            .read_section(&returned, q)
+            .expect("the fused quotient's own face is readable");
 
         let (uc, ur, _, _, uq) = sealed_diagram(false, false);
-        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("the unfused pair binds");
+        let unfused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq)
+            .expect("the unfused pair binds");
         let unreturned = unfused.launch(&surface.mode()).expect("the unfused deed");
-        let unfused_face = unfused.read_section(&unreturned, uq).expect("the unfused quotient's face");
+        let unfused_face = unfused
+            .read_section(&unreturned, uq)
+            .expect("the unfused quotient's face");
         assert_eq!(fused_face, unfused_face, "the fusion moved a returned word");
     }
 
@@ -2127,27 +3886,54 @@ mod tests {
     /// comes back is what `launch` would have returned.
     #[test]
     fn a_deferred_launch_onto_a_callers_stream_returns_the_same_deed_as_an_immediate_one() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let material = material();
         let (complex, realization, _, _, h) = small_diagram();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let bound = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, h).expect("binds");
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                h,
+            )
+            .expect("binds");
         let immediate = bound.launch(&surface.mode()).expect("the immediate deed");
-        let immediate_face = bound.read_terminal(&immediate).expect("the immediate terminal");
+        let immediate_face = bound
+            .read_terminal(&immediate)
+            .expect("the immediate terminal");
 
         let stream = Stream::create().expect("a conducting stream");
-        let before = bound.launch_on(&surface.mode(), &stream).expect("the deferred deed");
-        surface.synchronize_counted(&stream).expect("the terminal synchronization");
+        let before = bound
+            .launch_on(&surface.mode(), &stream)
+            .expect("the deferred deed");
+        surface
+            .synchronize_counted(&stream)
+            .expect("the terminal synchronization");
         let deferred = bound.returned(before).expect("the deferred return");
-        let deferred_face = bound.read_terminal(&deferred).expect("the deferred terminal");
+        let deferred_face = bound
+            .read_terminal(&deferred)
+            .expect("the deferred terminal");
 
-        assert_eq!(immediate_face, deferred_face, "the deed does not move with where its terminal synchronization sits");
+        assert_eq!(
+            immediate_face, deferred_face,
+            "the deed does not move with where its terminal synchronization sits"
+        );
         assert_eq!(immediate.obstruction, deferred.obstruction);
         assert_eq!(immediate.measured_octaves, deferred.measured_octaves);
         for (a, b) in immediate.fronts.iter().zip(&deferred.fronts) {
             assert_eq!(a.depth, b.depth);
             for (x, y) in a.readings.iter().zip(&b.readings) {
-                assert_eq!(x.measured, y.measured, "occurrence {:?} censused differently", x.occurrence);
+                assert_eq!(
+                    x.measured, y.measured,
+                    "occurrence {:?} censused differently",
+                    x.occurrence
+                );
             }
         }
     }
@@ -2157,74 +3943,167 @@ mod tests {
     /// name and the refusal carries the reopening route.
     #[test]
     fn a_declared_fusion_binds_only_when_every_declared_receiver_factors_through_it() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let material = material();
         let receiver = DeedReceiver::unbounded();
         // (i) legal: the scale's only consumer is the quotient, the quotient is the terminal, and
         //     the receiver declared no other face.
         let (complex, realization, _, _, q) = sealed_diagram(true, false);
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let fused = passage.bind(&complex, &realization, &material, &occurrence(), &receiver, None, q).expect("the fusion binds");
+        let fused = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &receiver,
+                None,
+                q,
+            )
+            .expect("the fusion binds");
         // (ii) the same diagram unfused, for the counts to be read against.
         let (uc, ur, _, us, uq) = sealed_diagram(false, false);
         let unfused_passage = FrontPassage::new(surface, ResidentGrain(20));
-        let unfused = unfused_passage.bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("the unfused pair binds");
+        let unfused = unfused_passage
+            .bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq)
+            .expect("the unfused pair binds");
         let (fused_graph, _) = fused.graph();
         let (unfused_graph, _) = unfused.graph();
-        assert_eq!(fused_graph.nodes + 1, unfused_graph.nodes, "the fusion is exactly one node fewer");
-        assert_eq!(fused.apparatus_prediction.graph_nodes as usize, fused_graph.nodes, "and the prediction moved with it");
-        assert_eq!(unfused.apparatus_prediction.graph_nodes as usize, unfused_graph.nodes);
-        assert_eq!(fused.apparatus_prediction.captured_launches + 1, unfused.apparatus_prediction.captured_launches);
-        assert_eq!(fused.apparatus_prediction.allocations + 2, unfused.apparatus_prediction.allocations, "and two allocations fewer: the quotient carries no section");
-        assert!(fused.apparatus_prediction.section_octets < unfused.apparatus_prediction.section_octets);
+        assert_eq!(
+            fused_graph.nodes + 1,
+            unfused_graph.nodes,
+            "the fusion is exactly one node fewer"
+        );
+        assert_eq!(
+            fused.apparatus_prediction.graph_nodes as usize, fused_graph.nodes,
+            "and the prediction moved with it"
+        );
+        assert_eq!(
+            unfused.apparatus_prediction.graph_nodes as usize,
+            unfused_graph.nodes
+        );
+        assert_eq!(
+            fused.apparatus_prediction.captured_launches + 1,
+            unfused.apparatus_prediction.captured_launches
+        );
+        assert_eq!(
+            fused.apparatus_prediction.allocations + 2,
+            unfused.apparatus_prediction.allocations,
+            "and two allocations fewer: the quotient carries no section"
+        );
+        assert!(
+            fused.apparatus_prediction.section_octets < unfused.apparatus_prediction.section_octets
+        );
         // the sealed predecessor's face is refused by name, with the reopening route, and the
         // unfused pair returns it.
         let returned = fused.launch(&surface.mode()).expect("launches");
         let sealed_read = fused.read_section(&returned, fused.occurrence_at(1).expect("the scale"));
         match sealed_read {
-            Err(FrontPassageObstruction::Sealed { reopening, .. }) => assert!(reopening.contains("MidpointQuotient")),
+            Err(FrontPassageObstruction::Sealed { reopening, .. }) => {
+                assert!(reopening.contains("MidpointQuotient"))
+            }
             other => panic!("a sealed face must refuse by name, not return words: {other:?}"),
         }
         let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
-        assert!(unfused.read_section(&unfused_returned, us).is_ok(), "the reopening route returns the pre-quotient enclosure");
+        assert!(
+            unfused.read_section(&unfused_returned, us).is_ok(),
+            "the reopening route returns the pre-quotient enclosure"
+        );
         // and the terminals are bit-equal: the fusion moved apparatus, not words.
-        assert_eq!(fused.read_terminal(&returned).expect("fused terminal"), unfused.read_terminal(&unfused_returned).expect("unfused terminal"));
+        assert_eq!(
+            fused.read_terminal(&returned).expect("fused terminal"),
+            unfused
+                .read_terminal(&unfused_returned)
+                .expect("unfused terminal")
+        );
         // (iii) the pre-seal section declared as a return: the terminal itself.
         let (c2, r2, _, s2, _) = sealed_diagram(true, false);
-        let refused = FrontPassage::new(surface, ResidentGrain(20)).bind(&c2, &r2, &material, &occurrence(), &receiver, None, s2);
-        assert!(matches!(refused.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("terminal")), "{:?}", refused.err());
+        let refused = FrontPassage::new(surface, ResidentGrain(20)).bind(
+            &c2,
+            &r2,
+            &material,
+            &occurrence(),
+            &receiver,
+            None,
+            s2,
+        );
+        assert!(
+            matches!(refused.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("terminal")),
+            "{:?}",
+            refused.err()
+        );
         // (iv) the pre-seal section declared as a face the receiver reads.
         let (c3, r3, _, s3, q3) = sealed_diagram(true, false);
-        let declared = FrontPassage::new(surface, ResidentGrain(20)).reading([s3]).bind(&c3, &r3, &material, &occurrence(), &receiver, None, q3);
-        assert!(matches!(declared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("declared")), "{:?}", declared.err());
+        let declared = FrontPassage::new(surface, ResidentGrain(20))
+            .reading([s3])
+            .bind(&c3, &r3, &material, &occurrence(), &receiver, None, q3);
+        assert!(
+            matches!(declared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("declared")),
+            "{:?}",
+            declared.err()
+        );
         // (v) a second consumer reads the pre-seal section.
         let (c4, r4, _, _, q4) = sealed_diagram(true, true);
-        let shared = FrontPassage::new(surface, ResidentGrain(20)).bind(&c4, &r4, &material, &occurrence(), &receiver, None, q4);
-        assert!(matches!(shared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("read by 2")), "{:?}", shared.err());
+        let shared = FrontPassage::new(surface, ResidentGrain(20)).bind(
+            &c4,
+            &r4,
+            &material,
+            &occurrence(),
+            &receiver,
+            None,
+            q4,
+        );
+        assert!(
+            matches!(shared.as_ref().err(), Some(FrontPassageObstruction::Compile(CompileRefusal::FusionUnfactored { because, .. })) if because.contains("read by 2")),
+            "{:?}",
+            shared.err()
+        );
     }
 
     /// **The fused quotient's census is the unfused pair's, word for word** — including the collapsed
     /// population the predecessor's own census carries, which the fusion does not touch.
     #[test]
-    fn the_fused_seal_returns_the_same_census_as_the_unfused_pair_including_the_collapsed_population() {
-        let Some((_, surface)) = surface() else { return };
+    fn the_fused_seal_returns_the_same_census_as_the_unfused_pair_including_the_collapsed_population()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let material = material();
         let receiver = DeedReceiver::unbounded();
         let (fc, fr, _, _, fq) = sealed_diagram(true, false);
-        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq).expect("binds");
+        let fused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq)
+            .expect("binds");
         let (uc, ur, _, us, uq) = sealed_diagram(false, false);
-        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("binds");
+        let unfused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq)
+            .expect("binds");
         let fused_returned = fused.launch(&surface.mode()).expect("launches");
         let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
-        let slot_of = |ret: &PassageReturn, at: EventId| ret.fronts.iter().flat_map(|f| f.readings.iter()).find(|r| r.occurrence == at).expect("reading").measured;
+        let slot_of = |ret: &PassageReturn, at: EventId| {
+            ret.fronts
+                .iter()
+                .flat_map(|f| f.readings.iter())
+                .find(|r| r.occurrence == at)
+                .expect("reading")
+                .measured
+        };
         // the predecessor's census — the PRE-quotient widest, summed and nonzero widths
         let fused_pre = slot_of(&fused_returned, fused.occurrence_at(1).expect("the scale"));
         let unfused_pre = slot_of(&unfused_returned, us);
-        assert_eq!(fused_pre, unfused_pre, "the collapsed population the chart retains is unchanged by the fusion");
+        assert_eq!(
+            fused_pre, unfused_pre,
+            "the collapsed population the chart retains is unchanged by the fusion"
+        );
         // the quotient's own census
         let fused_q = slot_of(&fused_returned, fq);
         let unfused_q = slot_of(&unfused_returned, uq);
-        assert_eq!(fused_q, unfused_q, "the quotient's census is the unfused pair's, word for word");
+        assert_eq!(
+            fused_q, unfused_q,
+            "the quotient's census is the unfused pair's, word for word"
+        );
         assert_eq!(fused_q.max_width, 0, "a collapsed section has no width");
         assert_eq!(fused_q.width_sum, 0);
         assert_eq!(fused_q.nonzero_widths, 0);
@@ -2239,70 +4118,199 @@ mod tests {
     /// entering material and require the two deeds' slots to agree word for word.
     #[test]
     fn a_poisoned_lineage_refuses_identically_through_the_fused_seal_and_the_unfused_pair() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         // 0x7F80 is +inf in bfloat16: a non-finite stored codeword the mouth refuses as malformed.
         let mut words = vec![ONE, TWO, 0x7F80, MINUS_ONE_AND_HALF];
         words.resize(32, ONE);
         let mut material = ResidentMaterial::empty();
-        material.entering.insert("x".to_owned(), EnteringRows { words, rows: 1, width: 32 });
+        material.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words,
+                rows: 1,
+                width: 32,
+            },
+        );
         let receiver = DeedReceiver::unbounded();
         let (fc, fr, fe, fs, fq) = sealed_diagram(true, false);
-        let fused = FrontPassage::new(surface, ResidentGrain(20)).bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq).expect("binds");
+        let fused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(&fc, &fr, &material, &occurrence(), &receiver, None, fq)
+            .expect("binds");
         let (uc, ur, ue, us, uq) = sealed_diagram(false, false);
-        let unfused = FrontPassage::new(surface, ResidentGrain(20)).bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq).expect("binds");
+        let unfused = FrontPassage::new(surface, ResidentGrain(20))
+            .bind(&uc, &ur, &material, &occurrence(), &receiver, None, uq)
+            .expect("binds");
         let fused_returned = fused.launch(&surface.mode()).expect("launches");
         let unfused_returned = unfused.launch(&surface.mode()).expect("launches");
-        let slot_of = |ret: &PassageReturn, at: EventId| ret.fronts.iter().flat_map(|f| f.readings.iter()).find(|r| r.occurrence == at).expect("reading").measured;
-        for (f, u, what) in [(fe, ue, "the mouth"), (fs, us, "the scale"), (fq, uq, "the quotient")] {
-            assert_eq!(slot_of(&fused_returned, f), slot_of(&unfused_returned, u), "{what}'s slot moved with the fusion");
+        let slot_of = |ret: &PassageReturn, at: EventId| {
+            ret.fronts
+                .iter()
+                .flat_map(|f| f.readings.iter())
+                .find(|r| r.occurrence == at)
+                .expect("reading")
+                .measured
+        };
+        for (f, u, what) in [
+            (fe, ue, "the mouth"),
+            (fs, us, "the scale"),
+            (fq, uq, "the quotient"),
+        ] {
+            assert_eq!(
+                slot_of(&fused_returned, f),
+                slot_of(&unfused_returned, u),
+                "{what}'s slot moved with the fusion"
+            );
         }
         let quotient = slot_of(&fused_returned, fq);
-        assert_eq!(quotient.refused, REFUSED_UPSTREAM, "a fused quotient's only possible flag is UPSTREAM");
+        assert_eq!(
+            quotient.refused, REFUSED_UPSTREAM,
+            "a fused quotient's only possible flag is UPSTREAM"
+        );
         assert_eq!(quotient.upstream_count, 1);
-        assert_eq!(quotient.upstream_first, Some(1), "the least refusing predecessor is the scale, at passage index 1");
+        assert_eq!(
+            quotient.upstream_first,
+            Some(1),
+            "the least refusing predecessor is the scale, at passage index 1"
+        );
         // the lineage join is of the PREDECESSOR's own refusal word, so the quotient reads the
         // scale's UPSTREAM and the scale reads the mouth's MALFORMED — the flag travels a hop at a
         // time and is never flattened, and the fused seal reads exactly what the unfused collapse did
         assert_eq!(quotient.upstream_flags, REFUSED_UPSTREAM);
         let scale = slot_of(&fused_returned, fs);
-        assert_eq!(scale.upstream_flags & REFUSED_MALFORMED, REFUSED_MALFORMED, "the malformed codeword's flag reached the scale");
+        assert_eq!(
+            scale.upstream_flags & REFUSED_MALFORMED,
+            REFUSED_MALFORMED,
+            "the malformed codeword's flag reached the scale"
+        );
         assert!(quotient.written, "the census still marks that it ran");
-        assert_eq!((quotient.max_octave, quotient.max_width, quotient.width_sum, quotient.nonzero_widths), (0, 0, 0, 0), "and it measures nothing");
+        assert_eq!(
+            (
+                quotient.max_octave,
+                quotient.max_width,
+                quotient.width_sum,
+                quotient.nonzero_widths
+            ),
+            (0, 0, 0, 0),
+            "and it measures nothing"
+        );
         // and neither deed will hand back a face that did not stand
-        assert!(fused.read_terminal(&fused_returned).is_err() && unfused.read_terminal(&unfused_returned).is_err());
+        assert!(
+            fused.read_terminal(&fused_returned).is_err()
+                && unfused.read_terminal(&unfused_returned).is_err()
+        );
     }
 
     #[test]
     fn a_sub_warp_cell_is_a_placement_obstruction_not_a_fallback() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, _, s, _) = small_diagram();
         let mut material = ResidentMaterial::empty();
-        material.entering.insert("x".to_owned(), EnteringRows { words: vec![ONE, TWO, HALF, MINUS_ONE_AND_HALF], rows: 1, width: 4 });
+        material.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words: vec![ONE, TWO, HALF, MINUS_ONE_AND_HALF],
+                rows: 1,
+                width: 4,
+            },
+        );
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let before = surface.census();
-        let outcome = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, s);
-        assert!(matches!(outcome, Err(FrontPassageObstruction::Resource(ResourceObstruction::Placement { chart: ChartId::Cpu, .. }))));
-        assert_eq!(surface.census().deed_launches, before.deed_launches, "no deed, no CPU computation");
+        let outcome = passage.bind(
+            &complex,
+            &realization,
+            &material,
+            &occurrence(),
+            &DeedReceiver::unbounded(),
+            None,
+            s,
+        );
+        assert!(matches!(
+            outcome,
+            Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Placement {
+                    chart: ChartId::Cpu,
+                    ..
+                }
+            ))
+        ));
+        assert_eq!(
+            surface.census().deed_launches,
+            before.deed_launches,
+            "no deed, no CPU computation"
+        );
     }
 
     #[test]
-    fn a_two_front_diagram_binds_launches_once_and_the_section_never_crosses_until_the_terminal_read() {
-        let Some((_, surface)) = surface() else { return };
+    fn a_two_front_diagram_binds_launches_once_and_the_section_never_crosses_until_the_terminal_read()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, _, s, h) = small_diagram();
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let bound = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, s).expect("binds");
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                s,
+            )
+            .expect("binds");
         assert!(bound.admission.is_admitted());
-        assert!(bound.admission.semantic.iter().all(|c| !c.is_bounded() && c.admitted), "no ceiling was declared: every semantic coordinate is exhibited as unbounded, none is invented");
+        assert!(
+            bound
+                .admission
+                .semantic
+                .iter()
+                .all(|c| !c.is_bounded() && c.admitted),
+            "no ceiling was declared: every semantic coordinate is exhibited as unbounded, none is invented"
+        );
         assert!(bound.admission.semantic.iter().all(|c| matches!(&c.ceiling, Ceiling::Unbounded { constrained_by, .. } if !constrained_by.is_empty())), "every unbounded coordinate names what still constrains it");
-        assert!(bound.admission.apparatus.iter().any(|c| c.name == "charged-resident-octets" && c.is_bounded() && c.admitted));
-        assert!(bound.admission.apparatus.iter().any(|c| c.name == "carrier-peak-octaves" && c.is_bounded() && c.admitted));
-        assert!(bound.admission.apparatus.iter().any(|c| c.name == "scratch-octets" && c.is_bounded()));
-        assert!(bound.admission.apparatus.iter().any(|c| c.name == "grid-extent" && c.is_bounded()));
+        assert!(
+            bound
+                .admission
+                .apparatus
+                .iter()
+                .any(|c| c.name == "charged-resident-octets" && c.is_bounded() && c.admitted)
+        );
+        assert!(
+            bound
+                .admission
+                .apparatus
+                .iter()
+                .any(|c| c.name == "carrier-peak-octaves" && c.is_bounded() && c.admitted)
+        );
+        assert!(
+            bound
+                .admission
+                .apparatus
+                .iter()
+                .any(|c| c.name == "scratch-octets" && c.is_bounded())
+        );
+        assert!(
+            bound
+                .admission
+                .apparatus
+                .iter()
+                .any(|c| c.name == "grid-extent" && c.is_bounded())
+        );
         assert_eq!(bound.fronts().len(), 2);
         assert!(bound.fronts()[1].certificate.is_interchangeable());
         assert_eq!(bound.fronts()[1].members.len(), 2);
-        assert!(bound.fronts().iter().all(|f| f.cover.cpu_cells == 0 && f.cover.device_cells > 0));
+        assert!(
+            bound
+                .fronts()
+                .iter()
+                .all(|f| f.cover.cpu_cells == 0 && f.cover.device_cells > 0)
+        );
         let (graph, intended) = bound.graph();
         assert_eq!((graph.nodes, graph.edges), intended);
         assert_eq!(bound.apparatus_prediction.graph_nodes as usize, graph.nodes);
@@ -2312,16 +4320,39 @@ mod tests {
         let after = surface.census();
         assert_eq!(after.deed_launches, before.deed_launches + 1);
         assert_eq!(after.synchronizations, before.synchronizations + 1);
-        assert_eq!(after.captured_launches, before.captured_launches, "nothing launched between the graph and the terminal");
-        assert_eq!(after.section_read_outs, before.section_read_outs, "no section crossed during the deed");
-        assert_eq!(after.egress_receipt_octets - before.egress_receipt_octets, bound.apparatus_prediction.egress_receipt_octets);
-        assert!(returned.fronts.iter().all(|f| f.readings.iter().all(|r| r.measured.written && r.measured.max_octave <= r.bound)));
+        assert_eq!(
+            after.captured_launches, before.captured_launches,
+            "nothing launched between the graph and the terminal"
+        );
+        assert_eq!(
+            after.section_read_outs, before.section_read_outs,
+            "no section crossed during the deed"
+        );
+        assert_eq!(
+            after.egress_receipt_octets - before.egress_receipt_octets,
+            bound.apparatus_prediction.egress_receipt_octets
+        );
+        assert!(returned.fronts.iter().all(|f| {
+            f.readings
+                .iter()
+                .all(|r| r.measured.written && r.measured.max_octave <= r.bound)
+        }));
         assert!(returned.stands());
         assert!(returned.measured_octaves.values().all(|o| *o > 0));
         let unit = 1i64 << 20;
         let scaled = bound.read_terminal(&returned).expect("read");
-        assert_eq!(&scaled[..4], &[(2 * unit, 2 * unit), (4 * unit, 4 * unit), (unit, unit), (-3 * unit, -3 * unit)]);
-        let squared = surface.read_out(bound.section(h).expect("squared")).expect("read");
+        assert_eq!(
+            &scaled[..4],
+            &[
+                (2 * unit, 2 * unit),
+                (4 * unit, 4 * unit),
+                (unit, unit),
+                (-3 * unit, -3 * unit)
+            ]
+        );
+        let squared = surface
+            .read_out(bound.section(h).expect("squared"))
+            .expect("read");
         assert_eq!(squared[3], (9 * unit / 4, 9 * unit / 4));
         assert!(bound.admission.is_admitted());
         assert!(bound.traffic.fronts.len() == 2 && bound.traffic.junctions.len() == 1);
@@ -2331,106 +4362,313 @@ mod tests {
         let mut second = ResidentMaterial::empty();
         let mut words = vec![TWO, TWO, HALF, MINUS_ONE_AND_HALF];
         words.resize(32, ONE);
-        second.entering.insert("x".to_owned(), EnteringRows { words, rows: 1, width: 32 });
+        second.entering.insert(
+            "x".to_owned(),
+            EnteringRows {
+                words,
+                rows: 1,
+                width: 32,
+            },
+        );
         bound.refill(&second).expect("refill");
         let second_return = bound.launch(&surface.mode()).expect("second deed");
-        assert_eq!(bound.read_terminal(&second_return).expect("read")[0], (4 * unit, 4 * unit));
+        assert_eq!(
+            bound.read_terminal(&second_return).expect("read")[0],
+            (4 * unit, 4 * unit)
+        );
     }
 
     #[test]
     fn a_budget_below_the_prediction_makes_zero_launches_and_zero_allocations() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, _, s, _) = small_diagram();
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let plan = passage.compile(&complex, &realization, &material, &occurrence(), s).expect("compiles");
+        let plan = passage
+            .compile(&complex, &realization, &material, &occurrence(), s)
+            .expect("compiles");
         let metric = WorkMetric::width_weighted();
         let price = metric.price(&plan.deed_prediction);
         let ceiling = u64::try_from(&price).expect("fits") - 1;
         let receiver = DeedReceiver::unbounded().with_scalar(WorkBudget::declared(metric, ceiling));
         let before = surface.census();
-        let outcome = passage.bind(&complex, &realization, &material, &occurrence(), &receiver, None, s);
-        assert!(matches!(outcome, Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic { .. }))));
+        let outcome = passage.bind(
+            &complex,
+            &realization,
+            &material,
+            &occurrence(),
+            &receiver,
+            None,
+            s,
+        );
+        assert!(matches!(
+            outcome,
+            Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Semantic { .. }
+            ))
+        ));
         // and a per-coordinate ceiling one below the requirement refuses naming that coordinate
         let written = u64::try_from(&plan.deed_prediction.entries_written).expect("fits");
         assert!(written > 0);
         let starved = DeedReceiver::unbounded().with_ceiling("entries-written", written - 1);
-        match passage.bind(&complex, &realization, &material, &occurrence(), &starved, None, s) {
-            Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic { coordinate })) => {
+        match passage.bind(
+            &complex,
+            &realization,
+            &material,
+            &occurrence(),
+            &starved,
+            None,
+            s,
+        ) {
+            Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic {
+                coordinate,
+            })) => {
                 assert_eq!(coordinate.name, "entries-written");
                 assert!(matches!(coordinate.ceiling, Ceiling::Bounded { .. }));
             }
-            other => panic!("expected a semantic refusal naming entries-written, got {:?}", other.map(|_| ())),
+            other => panic!(
+                "expected a semantic refusal naming entries-written, got {:?}",
+                other.map(|_| ())
+            ),
         }
-        assert_eq!(surface.census().allocations, before.allocations, "the per-coordinate refusal allocates nothing");
+        assert_eq!(
+            surface.census().allocations,
+            before.allocations,
+            "the per-coordinate refusal allocates nothing"
+        );
         let after = surface.census();
-        assert_eq!(after.deed_launches, before.deed_launches, "a refusal launches nothing");
-        assert_eq!(after.captured_launches, before.captured_launches, "a refusal captures nothing");
-        assert_eq!(after.allocations, before.allocations, "a refusal allocates nothing");
+        assert_eq!(
+            after.deed_launches, before.deed_launches,
+            "a refusal launches nothing"
+        );
+        assert_eq!(
+            after.captured_launches, before.captured_launches,
+            "a refusal captures nothing"
+        );
+        assert_eq!(
+            after.allocations, before.allocations,
+            "a refusal allocates nothing"
+        );
         assert_eq!(after.resident_octets_now, before.resident_octets_now);
     }
 
     #[test]
     fn a_fabricated_symbol_a_drifted_field_and_an_open_fibre_do_not_compile() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (mut complex, realization, _, s, _) = small_diagram();
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let mut fabricated = occurrence();
-        fabricated.implementation = AuthenticatedText::of_text("/site.py", "class Site:\n    def enter(self):\n        x = embed(words) * scale\n", None);
-        assert!(matches!(passage.compile(&complex, &realization, &material, &fabricated, s), Err(FrontPassageObstruction::Compile(CompileRefusal::Source(SourceRefusal::SymbolUnresolved { .. })))));
+        fabricated.implementation = AuthenticatedText::of_text(
+            "/site.py",
+            "class Site:\n    def enter(self):\n        x = embed(words) * scale\n",
+            None,
+        );
+        assert!(matches!(
+            passage.compile(&complex, &realization, &material, &fabricated, s),
+            Err(FrontPassageObstruction::Compile(CompileRefusal::Source(
+                SourceRefusal::SymbolUnresolved { .. }
+            )))
+        ));
         let mut drifted = occurrence();
-        drifted.configuration = AuthenticatedText::of_text("/config.json", r#"{"text_config": {"grain": 21, "width": 1}}"#, None);
-        assert!(matches!(passage.compile(&complex, &realization, &material, &drifted, s), Err(FrontPassageObstruction::Compile(CompileRefusal::Source(SourceRefusal::ConfigurationValueDiffers { .. })))));
+        drifted.configuration = AuthenticatedText::of_text(
+            "/config.json",
+            r#"{"text_config": {"grain": 21, "width": 1}}"#,
+            None,
+        );
+        assert!(matches!(
+            passage.compile(&complex, &realization, &material, &drifted, s),
+            Err(FrontPassageObstruction::Compile(CompileRefusal::Source(
+                SourceRefusal::ConfigurationValueDiffers { .. }
+            )))
+        ));
         complex.retain_undecided(crate::ported_operation::CandidateDiagrams {
             question: "which pairing?".to_owned(),
             candidates: vec!["halves".to_owned(), "adjacent".to_owned()],
             would_be_decided_by: vec!["the implementation".to_owned()],
         });
-        assert!(matches!(passage.compile(&complex, &realization, &material, &occurrence(), s), Err(FrontPassageObstruction::Compile(CompileRefusal::DiagramOpen(_)))));
+        assert!(matches!(
+            passage.compile(&complex, &realization, &material, &occurrence(), s),
+            Err(FrontPassageObstruction::Compile(
+                CompileRefusal::DiagramOpen(_)
+            ))
+        ));
     }
 
     #[test]
     fn a_mode_that_is_not_the_surfaces_refuses_the_launch_without_a_deed() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, _, s, _) = small_diagram();
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let bound = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, s).expect("binds");
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                s,
+            )
+            .expect("binds");
         let mut foreign = surface.mode();
         foreign.device = Some("a card that is not mounted".to_owned());
         let before = surface.census();
-        assert!(matches!(bound.launch(&foreign), Err(FrontPassageObstruction::Resource(ResourceObstruction::Surface(ResidentRefusal::ModeMismatch { .. })))));
+        assert!(matches!(
+            bound.launch(&foreign),
+            Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Surface(ResidentRefusal::ModeMismatch { .. })
+            ))
+        ));
         assert_eq!(surface.census().deed_launches, before.deed_launches);
         let mut other_kernel = surface.mode();
         other_kernel.kernel_content = Some("00".repeat(32));
-        assert!(matches!(bound.launch(&other_kernel), Err(FrontPassageObstruction::Resource(ResourceObstruction::Surface(ResidentRefusal::ModeMismatch { .. })))));
+        assert!(matches!(
+            bound.launch(&other_kernel),
+            Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Surface(ResidentRefusal::ModeMismatch { .. })
+            ))
+        ));
     }
-
 
     /// Two entering branches A and B, each scaled, then joined: B's entering words carry a
     /// non-finite codeword at a NONZERO coordinate, so B refuses `MALFORMED` on the card at runtime.
-    fn two_branch_diagram() -> (PortedOperationComplex, ResidentRealization, EventId, EventId, EventId, EventId, EventId) {
+    fn two_branch_diagram() -> (
+        PortedOperationComplex,
+        ResidentRealization,
+        EventId,
+        EventId,
+        EventId,
+        EventId,
+        EventId,
+    ) {
         let mut complex = PortedOperationComplex::new("two branches");
         let standing = complex.port("standing");
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }, SourceTestimony::Configuration { field: "width".to_owned(), value: "1".to_owned() }];
-        let enter = complex.bind_operation("enter", OperationSpecies::Construction, vec![], vec![standing], None, testimony("Site.enter (x = embed(words) * scale)")).expect("law");
-        let scale = complex.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
-        let join = complex.bind_operation("hadamard", OperationSpecies::Construction, vec![standing, standing], vec![standing], None, testimony("Site.hadamard (z = x * x)")).expect("law");
+        let testimony = |symbol: &str| {
+            vec![
+                SourceTestimony::Implementation {
+                    locator: "/site.py".to_owned(),
+                    symbol: symbol.to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "grain".to_owned(),
+                    value: "20".to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "width".to_owned(),
+                    value: "1".to_owned(),
+                },
+            ]
+        };
+        let enter = complex
+            .bind_operation(
+                "enter",
+                OperationSpecies::Construction,
+                vec![],
+                vec![standing],
+                None,
+                testimony("Site.enter (x = embed(words) * scale)"),
+            )
+            .expect("law");
+        let scale = complex
+            .bind_operation(
+                "scale",
+                OperationSpecies::Transport,
+                vec![standing],
+                vec![standing],
+                None,
+                testimony("Site.scale (y = x * 2)"),
+            )
+            .expect("law");
+        let join = complex
+            .bind_operation(
+                "hadamard",
+                OperationSpecies::Construction,
+                vec![standing, standing],
+                vec![standing],
+                None,
+                testimony("Site.hadamard (z = x * x)"),
+            )
+            .expect("law");
         let ea = complex.occur(enter).expect("occur");
         let eb = complex.occur(enter).expect("occur");
         let sa = complex.occur(scale).expect("occur");
         let sb = complex.occur(scale).expect("occur");
         let j = complex.occur(join).expect("occur");
-        complex.carries_precedence("a scales", standing, OccurrencePort::output(ea, 0), OccurrencePort::input(sa, 0)).expect("bond");
-        complex.carries_precedence("b scales", standing, OccurrencePort::output(eb, 0), OccurrencePort::input(sb, 0)).expect("bond");
-        complex.carries_precedence("a joins", standing, OccurrencePort::output(sa, 0), OccurrencePort::input(j, 0)).expect("bond");
-        complex.carries_precedence("b joins", standing, OccurrencePort::output(sb, 0), OccurrencePort::input(j, 1)).expect("bond");
+        complex
+            .carries_precedence(
+                "a scales",
+                standing,
+                OccurrencePort::output(ea, 0),
+                OccurrencePort::input(sa, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "b scales",
+                standing,
+                OccurrencePort::output(eb, 0),
+                OccurrencePort::input(sb, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "a joins",
+                standing,
+                OccurrencePort::output(sa, 0),
+                OccurrencePort::input(j, 0),
+            )
+            .expect("bond");
+        complex
+            .carries_precedence(
+                "b joins",
+                standing,
+                OccurrencePort::output(sb, 0),
+                OccurrencePort::input(j, 1),
+            )
+            .expect("bond");
         let mut realization = ResidentRealization::default();
-        realization.bind(ea, Enter { population: "a".to_owned(), scale: Dyadic::ONE });
-        realization.bind(eb, Enter { population: "b".to_owned(), scale: Dyadic::ONE });
-        realization.bind(sa, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
-        realization.bind(sb, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        realization.bind(
+            ea,
+            Enter {
+                population: "a".to_owned(),
+                scale: Dyadic::ONE,
+            },
+        );
+        realization.bind(
+            eb,
+            Enter {
+                population: "b".to_owned(),
+                scale: Dyadic::ONE,
+            },
+        );
+        realization.bind(
+            sa,
+            Scale {
+                by: DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+            },
+        );
+        realization.bind(
+            sb,
+            Scale {
+                by: DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+            },
+        );
         realization.bind(j, Hadamard);
         (complex, realization, ea, eb, sa, sb, j)
     }
@@ -2438,30 +4676,83 @@ mod tests {
     fn two_branch_material(poison: bool) -> ResidentMaterial<'static> {
         let mut a = vec![ONE, TWO, HALF, MINUS_ONE_AND_HALF];
         a.resize(32, ONE);
-        let mut b = vec![ONE, TWO, if poison { 0x7F80 } else { HALF }, MINUS_ONE_AND_HALF];
+        let mut b = vec![
+            ONE,
+            TWO,
+            if poison { 0x7F80 } else { HALF },
+            MINUS_ONE_AND_HALF,
+        ];
         b.resize(32, TWO);
         let mut material = ResidentMaterial::empty();
-        material.entering.insert("a".to_owned(), EnteringRows { words: a, rows: 1, width: 32 });
-        material.entering.insert("b".to_owned(), EnteringRows { words: b, rows: 1, width: 32 });
+        material.entering.insert(
+            "a".to_owned(),
+            EnteringRows {
+                words: a,
+                rows: 1,
+                width: 32,
+            },
+        );
+        material.entering.insert(
+            "b".to_owned(),
+            EnteringRows {
+                words: b,
+                rows: 1,
+                width: 32,
+            },
+        );
         material
     }
 
     #[test]
-    fn a_runtime_refusal_in_one_branch_returns_the_complete_lineage_and_the_terminal_cannot_be_read_as_standing() {
-        let Some((_, surface)) = surface() else { return };
+    fn a_runtime_refusal_in_one_branch_returns_the_complete_lineage_and_the_terminal_cannot_be_read_as_standing()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, ea, eb, sa, sb, j) = two_branch_diagram();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let clean = two_branch_material(false);
-        let bound_clean = passage.bind(&complex, &realization, &clean, &occurrence(), &DeedReceiver::unbounded(), None, j).expect("binds");
+        let bound_clean = passage
+            .bind(
+                &complex,
+                &realization,
+                &clean,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                j,
+            )
+            .expect("binds");
         let clean_return = bound_clean.launch(&surface.mode()).expect("deed");
         assert!(clean_return.stands());
-        let clean_a = bound_clean.read_section(&clean_return, sa).expect("a stood");
-        let clean_terminal = bound_clean.read_terminal(&clean_return).expect("terminal stood");
+        let clean_a = bound_clean
+            .read_section(&clean_return, sa)
+            .expect("a stood");
+        let clean_terminal = bound_clean
+            .read_terminal(&clean_return)
+            .expect("terminal stood");
         let poisoned = two_branch_material(true);
-        let bound = passage.bind(&complex, &realization, &poisoned, &occurrence(), &DeedReceiver::unbounded(), None, j).expect("binds");
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &poisoned,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                j,
+            )
+            .expect("binds");
         // every front certified from footprints that now include the predecessor slots read
-        assert!(bound.fronts().iter().all(|f| f.certificate.is_interchangeable()));
-        let returned = bound.launch(&surface.mode()).expect("the deed returns whole even when the card refused");
+        assert!(
+            bound
+                .fronts()
+                .iter()
+                .all(|f| f.certificate.is_interchangeable())
+        );
+        let returned = bound
+            .launch(&surface.mode())
+            .expect("the deed returns whole even when the card refused");
         assert!(!returned.stands());
         // the complete lineage: B originated (malformed), B's scale carried it, the join carried it
         let ib = bound.index_of(eb).expect("index");
@@ -2470,35 +4761,105 @@ mod tests {
         let ia = bound.index_of(ea).expect("index");
         let isa = bound.index_of(sa).expect("index");
         let lineage = &returned.obstruction;
-        assert_eq!(lineage.refusals.iter().map(|r| r.index).collect::<Vec<_>>(), { let mut v = vec![ib, isb, ij]; v.sort_unstable(); v });
-        assert!(lineage.refusals.iter().find(|r| r.index == ib).expect("B").origin);
-        let carried_sb = lineage.refusals.iter().find(|r| r.index == isb).expect("sB");
-        assert!(!carried_sb.origin && carried_sb.upstream_first == Some(ib) && carried_sb.upstream_flags == REFUSED_MALFORMED);
-        let carried_j = lineage.refusals.iter().find(|r| r.index == ij).expect("join");
-        assert!(!carried_j.origin && carried_j.upstream_first == Some(isb) && carried_j.upstream_count == 1 && carried_j.upstream_flags & REFUSED_UPSTREAM != 0);
+        assert_eq!(
+            lineage.refusals.iter().map(|r| r.index).collect::<Vec<_>>(),
+            {
+                let mut v = vec![ib, isb, ij];
+                v.sort_unstable();
+                v
+            }
+        );
+        assert!(
+            lineage
+                .refusals
+                .iter()
+                .find(|r| r.index == ib)
+                .expect("B")
+                .origin
+        );
+        let carried_sb = lineage
+            .refusals
+            .iter()
+            .find(|r| r.index == isb)
+            .expect("sB");
+        assert!(
+            !carried_sb.origin
+                && carried_sb.upstream_first == Some(ib)
+                && carried_sb.upstream_flags == REFUSED_MALFORMED
+        );
+        let carried_j = lineage
+            .refusals
+            .iter()
+            .find(|r| r.index == ij)
+            .expect("join");
+        assert!(
+            !carried_j.origin
+                && carried_j.upstream_first == Some(isb)
+                && carried_j.upstream_count == 1
+                && carried_j.upstream_flags & REFUSED_UPSTREAM != 0
+        );
         assert!(lineage.stands(ia) && lineage.stands(isa));
         // the unrelated sibling is bit-identical to the clean run
         assert_eq!(bound.read_section(&returned, sa).expect("A stood"), clean_a);
         // the terminal cannot be read as standing: refused by name with the lineage
         match bound.read_terminal(&returned) {
-            Err(FrontPassageObstruction::Refused { occurrence, lineage: l, .. }) => {
+            Err(FrontPassageObstruction::Refused {
+                occurrence,
+                lineage: l,
+                ..
+            }) => {
                 assert_eq!(occurrence, j);
                 assert_eq!(&l, lineage);
             }
             other => panic!("the terminal must refuse: {:?}", other.map(|_| ())),
         }
-        assert!(matches!(bound.standing(&returned), Err(FrontPassageObstruction::Refused { .. })));
+        assert!(matches!(
+            bound.standing(&returned),
+            Err(FrontPassageObstruction::Refused { .. })
+        ));
         let _ = clean_terminal;
         // the same diagram under the serialized and the reversed-serialized schedules: one lineage
-        for control in [FrontPassage::serialized(surface, ResidentGrain(20)), FrontPassage::serialized_reversed(surface, ResidentGrain(20))] {
-            let bound_control = control.bind(&complex, &realization, &poisoned, &occurrence(), &DeedReceiver::unbounded(), None, j).expect("binds");
+        for control in [
+            FrontPassage::serialized(surface, ResidentGrain(20)),
+            FrontPassage::serialized_reversed(surface, ResidentGrain(20)),
+        ] {
+            let bound_control = control
+                .bind(
+                    &complex,
+                    &realization,
+                    &poisoned,
+                    &occurrence(),
+                    &DeedReceiver::unbounded(),
+                    None,
+                    j,
+                )
+                .expect("binds");
             let (graph, intended) = bound_control.graph();
             assert_eq!((graph.nodes, graph.edges), intended);
-            assert_eq!(bound_control.apparatus_prediction.graph_edges as usize, graph.edges, "the serialized control's edges were predicted");
+            assert_eq!(
+                bound_control.apparatus_prediction.graph_edges as usize, graph.edges,
+                "the serialized control's edges were predicted"
+            );
             let control_return = bound_control.launch(&surface.mode()).expect("deed");
             assert_eq!(control_return.obstruction, returned.obstruction);
-            assert_eq!(control_return.refusals.iter().map(|(e, _, s)| (*e, *s)).collect::<Vec<_>>(), returned.refusals.iter().map(|(e, _, s)| (*e, *s)).collect::<Vec<_>>());
-            assert_eq!(bound_control.read_section(&control_return, sa).expect("A stood"), clean_a);
+            assert_eq!(
+                control_return
+                    .refusals
+                    .iter()
+                    .map(|(e, _, s)| (*e, *s))
+                    .collect::<Vec<_>>(),
+                returned
+                    .refusals
+                    .iter()
+                    .map(|(e, _, s)| (*e, *s))
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(
+                bound_control
+                    .read_section(&control_return, sa)
+                    .expect("A stood"),
+                clean_a
+            );
         }
         // and the co-present deed launched again: the same lineage
         let again = bound.launch(&surface.mode()).expect("deed");
@@ -2507,57 +4868,126 @@ mod tests {
 
     #[test]
     fn the_material_deed_is_predicted_admitted_and_cited_and_the_grain_moves_the_charge_lawfully() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let plan = MaterialPlan { maps: vec![("m".to_owned(), 2, 2)], band_elements: 0, positions: 0 };
+        let plan = MaterialPlan {
+            maps: vec![("m".to_owned(), 2, 2)],
+            band_elements: 0,
+            positions: 0,
+        };
         let prediction = passage.predict_material(&plan);
         assert_eq!(prediction.resident_octets, 2 * 2 * 8);
         assert_eq!(prediction.ingress_octets, 2 * 2 * 2);
         assert_eq!(prediction.allocation_grain, surface.allocation_grain());
-        assert!(prediction.charged_octets >= prediction.resident_octets && prediction.charged_octets % surface.allocation_grain() == 0);
+        assert!(
+            prediction.charged_octets >= prediction.resident_octets
+                && prediction.charged_octets % surface.allocation_grain() == 0
+        );
         let admitted = passage.admit_material(&prediction).expect("admits");
         assert!(admitted.is_admitted());
         // mount as predicted and reconcile
-        let map = readout.mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2).expect("map");
+        let map = readout
+            .mount_bfloat16(&[ONE, TWO, MINUS_ONE_AND_HALF, HALF], 2)
+            .expect("map");
         let mut mounted = ResidentMaterial::empty();
-        mounted.populations.insert("m".to_owned(), MountedPopulation { readout: map, mass_value_octaves: 3 });
+        mounted.populations.insert(
+            "m".to_owned(),
+            MountedPopulation {
+                readout: map,
+                mass_value_octaves: 3,
+            },
+        );
         let reconciled = admitted.reconcile(&mounted);
         assert_eq!(reconciled, vec![("m".to_owned(), 32, 32)]);
         // an impossible material refuses before any map is allocated, naming the coordinate
-        let huge = MaterialPlan { maps: vec![("too big".to_owned(), 1 << 40, 1 << 20)], band_elements: 0, positions: 0 };
+        let huge = MaterialPlan {
+            maps: vec![("too big".to_owned(), 1 << 40, 1 << 20)],
+            band_elements: 0,
+            positions: 0,
+        };
         let before = surface.census();
         match passage.admit_material(&passage.predict_material(&huge)) {
-            Err(FrontPassageObstruction::Resource(ResourceObstruction::Material { coordinate })) => assert_eq!(coordinate.name, "material-charged-octets"),
+            Err(FrontPassageObstruction::Resource(ResourceObstruction::Material {
+                coordinate,
+            })) => assert_eq!(coordinate.name, "material-charged-octets"),
             other => panic!("expected a material refusal, got {:?}", other.map(|_| ())),
         }
         assert_eq!(surface.census().allocations, before.allocations);
         // the deed cites the material admission: its source standing is bounded by it
         let (complex, realization, _, s, _) = small_diagram();
         let entering = material();
-        let bound = passage.bind(&complex, &realization, &entering, &occurrence(), &DeedReceiver::unbounded(), Some(&admitted), s).expect("binds");
-        let cited = bound.admission.apparatus.iter().find(|c| c.name == "source-standing-octets").expect("cited");
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &entering,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                Some(&admitted),
+                s,
+            )
+            .expect("binds");
+        let cited = bound
+            .admission
+            .apparatus
+            .iter()
+            .find(|c| c.name == "source-standing-octets")
+            .expect("cited");
         assert!(cited.is_bounded() && cited.admitted);
-        assert_eq!(bound.admission.cited_material.as_ref().map(|m| m.resident_octets()), Some(32));
+        assert_eq!(
+            bound
+                .admission
+                .cited_material
+                .as_ref()
+                .map(|m| m.resident_octets()),
+            Some(32)
+        );
         // the charge is the grain-rounded sum, and a coarser grain raises it lawfully
         let a = &bound.apparatus_prediction;
         assert!(a.charged_octets >= a.deed_octets);
         assert_eq!(a.charged_octets % a.allocation_grain, 0);
         assert_eq!(a.charged_under(a.allocation_grain), a.charged_octets);
-        assert_eq!(a.charged_under(1), a.deed_octets, "under grain one the charge is the words' own sum");
+        assert_eq!(
+            a.charged_under(1),
+            a.deed_octets,
+            "under grain one the charge is the words' own sum"
+        );
         assert!(a.charged_under(2 * a.allocation_grain) >= a.charged_octets);
-        assert_eq!(a.charged_under(2 * a.allocation_grain) % (2 * a.allocation_grain), 0);
+        assert_eq!(
+            a.charged_under(2 * a.allocation_grain) % (2 * a.allocation_grain),
+            0
+        );
         // a receiver aperture below the requirement on an apparatus coordinate refuses before
         // allocation, naming the coordinate and the aperture
-        let narrow = DeedReceiver::unbounded().with_apparatus_aperture("charged-resident-octets", a.charged_octets - 1);
+        let narrow = DeedReceiver::unbounded()
+            .with_apparatus_aperture("charged-resident-octets", a.charged_octets - 1);
         let before = surface.census();
-        match passage.bind(&complex, &realization, &entering, &occurrence(), &narrow, Some(&admitted), s) {
-            Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus { coordinate })) => {
+        match passage.bind(
+            &complex,
+            &realization,
+            &entering,
+            &occurrence(),
+            &narrow,
+            Some(&admitted),
+            s,
+        ) {
+            Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus {
+                coordinate,
+            })) => {
                 assert_eq!(coordinate.name, "charged-resident-octets");
-                assert!(matches!(&coordinate.ceiling, Ceiling::Bounded { declared_by, .. } if declared_by.contains("aperture")));
+                assert!(
+                    matches!(&coordinate.ceiling, Ceiling::Bounded { declared_by, .. } if declared_by.contains("aperture"))
+                );
             }
             other => panic!("expected an apparatus refusal, got {:?}", other.map(|_| ())),
         }
-        assert_eq!(surface.census().allocations, before.allocations, "the apparatus refusal allocates nothing");
+        assert_eq!(
+            surface.census().allocations,
+            before.allocations,
+            "the apparatus refusal allocates nothing"
+        );
         // every member's footprint carries its predecessors' slots as reads and its own as a write
         for front in bound.fronts() {
             for (footprint, (reads, own)) in front.footprints.iter().zip(&front.slot_footprints) {
@@ -2569,56 +4999,135 @@ mod tests {
 
     #[test]
     fn pooled_auxiliaries_are_charged_as_separate_allocations() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let slots = [crate::streamed_standing::SlotShape { name: "slot".to_owned(), aligned_octets: 0, stored_octets: 0, mass_octets: 0, scratch_octets: 0 }];
-        let prediction = passage.predict_pooled_material(&slots, &[1], &[
-            PooledMaterialAuxiliary::BandElements(128),
-            PooledMaterialAuxiliary::BandElements(256),
-            PooledMaterialAuxiliary::Positions(5),
-            PooledMaterialAuxiliary::Positions(8),
-        ]);
-        assert_eq!(prediction.resident_octets, ((128 + 256) * 4 * 8 + (5 + 8) * 4) as u64);
+        let slots = [crate::streamed_standing::SlotShape {
+            name: "slot".to_owned(),
+            aligned_octets: 0,
+            stored_octets: 0,
+            mass_octets: 0,
+            scratch_octets: 0,
+        }];
+        let prediction = passage.predict_pooled_material(
+            &slots,
+            &[1],
+            &[
+                PooledMaterialAuxiliary::BandElements(128),
+                PooledMaterialAuxiliary::BandElements(256),
+                PooledMaterialAuxiliary::Positions(5),
+                PooledMaterialAuxiliary::Positions(8),
+            ],
+        );
+        assert_eq!(
+            prediction.resident_octets,
+            ((128 + 256) * 4 * 8 + (5 + 8) * 4) as u64
+        );
         assert_eq!(prediction.ingress_octets, prediction.resident_octets);
         assert_eq!(prediction.allocations, 1 + 4 + 4 + 1 + 1);
         let grain = prediction.allocation_grain;
-        let expected_charge = rounded_to(128 * 8, grain) * 4 + rounded_to(256 * 8, grain) * 4 + rounded_to(5 * 4, grain) + rounded_to(8 * 4, grain);
+        let expected_charge = rounded_to(128 * 8, grain) * 4
+            + rounded_to(256 * 8, grain) * 4
+            + rounded_to(5 * 4, grain)
+            + rounded_to(8 * 4, grain);
         assert_eq!(prediction.charged_octets, expected_charge);
     }
 
     #[test]
     fn aligned_material_prediction_counts_eight_octet_ingress_and_reconciles() {
-        let Some((readout, surface)) = surface() else { return };
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let plan = AlignedMaterialPlan::maps(vec![("aligned-factor".to_owned(), 2, 2)]);
         let prediction = passage.predict_aligned_material(&plan);
         assert_eq!(prediction.resident_octets, 32);
-        assert_eq!(prediction.ingress_octets, 32, "aligned i64 words cross at eight octets each");
+        assert_eq!(
+            prediction.ingress_octets, 32,
+            "aligned i64 words cross at eight octets each"
+        );
         assert_eq!(prediction.transient_peak_octets, 0);
         assert_eq!(prediction.allocations, 1);
-        let admitted = passage.admit_material(&prediction).expect("aligned material admits");
+        let admitted = passage
+            .admit_material(&prediction)
+            .expect("aligned material admits");
         assert!(admitted.is_admitted());
-        let aligned = crate::embedding_fiber::AlignedMaterial { entries: vec![1, 2, 3, 4], exponent: 0, entry_octaves: 2, negatives: 0 };
+        let aligned = crate::embedding_fiber::AlignedMaterial {
+            entries: vec![1, 2, 3, 4],
+            exponent: 0,
+            entry_octaves: 2,
+            negatives: 0,
+        };
         let mounted_map = readout.mount(&aligned, 2).expect("aligned mount");
         let mut mounted = ResidentMaterial::empty();
-        mounted.populations.insert("aligned-factor".to_owned(), MountedPopulation { readout: mounted_map, mass_value_octaves: 3 });
-        assert_eq!(admitted.reconcile(&mounted), vec![("aligned-factor".to_owned(), 32, 32)]);
+        mounted.populations.insert(
+            "aligned-factor".to_owned(),
+            MountedPopulation {
+                readout: mounted_map,
+                mass_value_octaves: 3,
+            },
+        );
+        assert_eq!(
+            admitted.reconcile(&mounted),
+            vec![("aligned-factor".to_owned(), 32, 32)]
+        );
     }
 
     #[test]
     fn material_admission_consequence_equivalence_separates_capacity_from_drift() {
-        let prediction = MaterialPrediction { maps: vec![("m".to_owned(), 32, 8)], resident_octets: 32, ingress_octets: 8, transient_peak_octets: 0, allocations: 1, charged_octets: 32, allocation_grain: 32 };
-        let coordinate = CoordinateAdmission { name: "material-charged-octets", required: BigUint::from(32u32), ceiling: Ceiling::Bounded { ceiling: BigUint::from(64u32), declared_by: "mounted device free memory" }, admitted: true };
-        let mut base = MaterialAdmission { prediction: prediction.clone(), coordinates: vec![coordinate.clone()], free_octets_at_admission: 1_000 };
+        let prediction = MaterialPrediction {
+            maps: vec![("m".to_owned(), 32, 8)],
+            resident_octets: 32,
+            ingress_octets: 8,
+            transient_peak_octets: 0,
+            allocations: 1,
+            charged_octets: 32,
+            allocation_grain: 32,
+        };
+        let coordinate = CoordinateAdmission {
+            name: "material-charged-octets",
+            required: BigUint::from(32u32),
+            ceiling: Ceiling::Bounded {
+                ceiling: BigUint::from(64u32),
+                declared_by: "mounted device free memory",
+            },
+            admitted: true,
+        };
+        let mut base = MaterialAdmission {
+            prediction: prediction.clone(),
+            coordinates: vec![coordinate.clone()],
+            free_octets_at_admission: 1_000,
+        };
         let mut varied_capacity = base.clone();
         varied_capacity.free_octets_at_admission = 2_000;
-        if let Ceiling::Bounded { ceiling, .. } = &mut varied_capacity.coordinates[0].ceiling { *ceiling = BigUint::from(128u32); }
-        assert!(base.consequence_equivalent(&varied_capacity).is_ok(), "finite capacity magnitude is apparatus testimony, not semantic consequence");
+        if let Ceiling::Bounded { ceiling, .. } = &mut varied_capacity.coordinates[0].ceiling {
+            *ceiling = BigUint::from(128u32);
+        }
+        assert!(
+            base.consequence_equivalent(&varied_capacity).is_ok(),
+            "finite capacity magnitude is apparatus testimony, not semantic consequence"
+        );
         base.coordinates[0].required = BigUint::from(31u32);
-        assert!(matches!(base.consequence_equivalent(&varied_capacity), Err(MaterialConsequenceMismatch::Coordinate { field: "required", .. })));
+        assert!(matches!(
+            base.consequence_equivalent(&varied_capacity),
+            Err(MaterialConsequenceMismatch::Coordinate {
+                field: "required",
+                ..
+            })
+        ));
         let mut unbounded_drift = varied_capacity.clone();
-        unbounded_drift.coordinates[0].ceiling = Ceiling::Unbounded { because: "test aperture", constrained_by: vec!["device"] };
-        assert!(matches!(varied_capacity.consequence_equivalent(&unbounded_drift), Err(MaterialConsequenceMismatch::Coordinate { field: "ceiling-species", .. })));
+        unbounded_drift.coordinates[0].ceiling = Ceiling::Unbounded {
+            because: "test aperture",
+            constrained_by: vec!["device"],
+        };
+        assert!(matches!(
+            varied_capacity.consequence_equivalent(&unbounded_drift),
+            Err(MaterialConsequenceMismatch::Coordinate {
+                field: "ceiling-species",
+                ..
+            })
+        ));
         let _ = coordinate;
     }
 
@@ -2626,39 +5135,134 @@ mod tests {
     /// is bit-exact, no octet crosses the apparatus boundary, and the released passage may not
     /// launch again.
     #[test]
-    fn a_released_standing_enters_the_next_passage_bit_exactly_and_the_releasing_passage_cannot_relaunch() {
-        let Some((_, surface)) = surface() else { return };
+    fn a_released_standing_enters_the_next_passage_bit_exactly_and_the_releasing_passage_cannot_relaunch()
+     {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let (complex, realization, _, s, _) = small_diagram();
         let material = material();
         let passage = FrontPassage::new(surface, ResidentGrain(20));
-        let mut first = passage.bind(&complex, &realization, &material, &occurrence(), &DeedReceiver::unbounded(), None, s).expect("binds");
+        let mut first = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                s,
+            )
+            .expect("binds");
         let returned = first.launch(&surface.mode()).expect("deed");
         let face = first.read_terminal(&returned).expect("read");
         let ingress_before = surface.census().ingress_octets;
         let (section, bound) = first.release_section(s).expect("released");
-        assert!(matches!(first.launch(&surface.mode()), Err(FrontPassageObstruction::Resource(ResourceObstruction::Surface(ResidentRefusal::Declaration { .. })))));
+        assert!(matches!(
+            first.launch(&surface.mode()),
+            Err(FrontPassageObstruction::Resource(
+                ResourceObstruction::Surface(ResidentRefusal::Declaration { .. })
+            ))
+        ));
         // the next passage: standing → scale by 2, the carry entailed by the slice that names the standing
         let mut occ = occurrence();
-        occ.implementation = AuthenticatedText::of_text("/site.py", "class Site:\n    def enter(self):\n        x = embed(words) * scale\n        hidden_states = x\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n", None);
-        let testimony = |symbol: &str| vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: symbol.to_owned() }, SourceTestimony::Configuration { field: "grain".to_owned(), value: "20".to_owned() }];
+        occ.implementation = AuthenticatedText::of_text(
+            "/site.py",
+            "class Site:\n    def enter(self):\n        x = embed(words) * scale\n        hidden_states = x\n    def scale(self):\n        y = x * 2\n    def hadamard(self):\n        z = x * x\n",
+            None,
+        );
+        let testimony = |symbol: &str| {
+            vec![
+                SourceTestimony::Implementation {
+                    locator: "/site.py".to_owned(),
+                    symbol: symbol.to_owned(),
+                },
+                SourceTestimony::Configuration {
+                    field: "grain".to_owned(),
+                    value: "20".to_owned(),
+                },
+            ]
+        };
         let mut next = PortedOperationComplex::new("next");
         let standing = next.port("standing");
-        let carry = next.bind_operation("carry", OperationSpecies::Construction, vec![], vec![standing], None, vec![SourceTestimony::Implementation { locator: "/site.py".to_owned(), symbol: "Site.enter (hidden_states = x)".to_owned() }]).expect("law");
-        let scale = next.bind_operation("scale", OperationSpecies::Transport, vec![standing], vec![standing], None, testimony("Site.scale (y = x * 2)")).expect("law");
+        let carry = next
+            .bind_operation(
+                "carry",
+                OperationSpecies::Construction,
+                vec![],
+                vec![standing],
+                None,
+                vec![SourceTestimony::Implementation {
+                    locator: "/site.py".to_owned(),
+                    symbol: "Site.enter (hidden_states = x)".to_owned(),
+                }],
+            )
+            .expect("law");
+        let scale = next
+            .bind_operation(
+                "scale",
+                OperationSpecies::Transport,
+                vec![standing],
+                vec![standing],
+                None,
+                testimony("Site.scale (y = x * 2)"),
+            )
+            .expect("law");
         let c = next.occur(carry).expect("occur");
         let sc = next.occur(scale).expect("occur");
-        next.carries_precedence("carried scales", standing, OccurrencePort::output(c, 0), OccurrencePort::input(sc, 0)).expect("bond");
+        next.carries_precedence(
+            "carried scales",
+            standing,
+            OccurrencePort::output(c, 0),
+            OccurrencePort::input(sc, 0),
+        )
+        .expect("bond");
         let mut next_realization = ResidentRealization::default();
-        next_realization.bind(c, Standing { name: "x".to_owned() });
-        next_realization.bind(sc, Scale { by: DyadicEnclosure { lo: 2, hi: 2, grain: 0 } });
+        next_realization.bind(
+            c,
+            Standing {
+                name: "x".to_owned(),
+            },
+        );
+        next_realization.bind(
+            sc,
+            Scale {
+                by: DyadicEnclosure {
+                    lo: 2,
+                    hi: 2,
+                    grain: 0,
+                },
+            },
+        );
         let mut next_material = ResidentMaterial::empty();
-        next_material.standings.insert("x".to_owned(), (std::rc::Rc::new(section), bound));
-        let second = passage.bind(&next, &next_realization, &next_material, &occ, &DeedReceiver::unbounded(), None, sc).expect("binds");
+        next_material
+            .standings
+            .insert("x".to_owned(), (std::rc::Rc::new(section), bound));
+        let second = passage
+            .bind(
+                &next,
+                &next_realization,
+                &next_material,
+                &occ,
+                &DeedReceiver::unbounded(),
+                None,
+                sc,
+            )
+            .expect("binds");
         let returned2 = second.launch(&surface.mode()).expect("deed");
         let doubled = second.read_terminal(&returned2).expect("read");
         assert_eq!(doubled.len(), face.len());
-        assert!(doubled.iter().zip(&face).all(|((l2, h2), (l, h))| *l2 == 2 * l && *h2 == 2 * h));
-        assert_eq!(surface.census().ingress_octets - ingress_before, 4, "only the one lineage word crossed; the standing did not");
+        assert!(
+            doubled
+                .iter()
+                .zip(&face)
+                .all(|((l2, h2), (l, h))| *l2 == 2 * l && *h2 == 2 * h)
+        );
+        assert_eq!(
+            surface.census().ingress_octets - ingress_before,
+            4,
+            "only the one lineage word crossed; the standing did not"
+        );
     }
 
     #[test]
@@ -2691,12 +5295,25 @@ mod tests {
             (EventId(13), 2, vec![1, 2]),
         ];
         let reading = traffic_reading(1000, &[(0, 32, 0), (1, 2500, 0), (2, 64, 0)], &ecology, 3);
-        assert_eq!(reading.fronts[1].3, 3, "2500 lanes over 1000 resident lanes take three rounds");
+        assert_eq!(
+            reading.fronts[1].3, 3,
+            "2500 lanes over 1000 resident lanes take three rounds"
+        );
         assert_eq!(reading.junctions.len(), 2);
-        assert!(reading.junctions[0].reflection < Rat::zero(), "a widening channel returns an inverted half");
-        assert!(reading.junctions[1].reflection > Rat::zero(), "a narrowing channel returns a cohering half");
+        assert!(
+            reading.junctions[0].reflection < Rat::zero(),
+            "a widening channel returns an inverted half"
+        );
+        assert!(
+            reading.junctions[1].reflection > Rat::zero(),
+            "a narrowing channel returns a cohering half"
+        );
         assert_eq!(reading.earliest_arrival, 2);
-        assert_eq!(reading.earliest_routes, BigUint::from(2u32), "two equal-arrival routes superpose at the re-entry");
+        assert_eq!(
+            reading.earliest_routes,
+            BigUint::from(2u32),
+            "two equal-arrival routes superpose at the re-entry"
+        );
         assert_eq!(reading.reconvergent_sites, 1);
         assert_eq!(reading.deferred_arrivals, 0);
         assert_eq!(reading.deferred_population, BigUint::zero());
@@ -2708,9 +5325,20 @@ mod tests {
             (EventId(12), 2, vec![1]),
             (EventId(13), 3, vec![0, 2]),
         ];
-        let reading = traffic_reading(1000, &[(0, 32, 0), (1, 32, 0), (2, 32, 0), (3, 32, 0)], &skipped, 3);
-        assert_eq!(reading.earliest_arrival, 1, "the skip reaches the terminal in one hop");
-        assert_eq!(reading.deferred_arrivals, 1, "the chain's arrival is retained as deferred");
+        let reading = traffic_reading(
+            1000,
+            &[(0, 32, 0), (1, 32, 0), (2, 32, 0), (3, 32, 0)],
+            &skipped,
+            3,
+        );
+        assert_eq!(
+            reading.earliest_arrival, 1,
+            "the skip reaches the terminal in one hop"
+        );
+        assert_eq!(
+            reading.deferred_arrivals, 1,
+            "the chain's arrival is retained as deferred"
+        );
     }
 
     /// **A released standing is shared READ-ONLY between sibling passages** — the relation Deed
@@ -2724,7 +5352,9 @@ mod tests {
     /// siblings' returns differ from each other — so both really did read it and neither wrote it.
     #[test]
     fn the_cohort_shares_a_released_standing_read_only_between_sibling_passages() {
-        let Some((_, surface)) = surface() else { return };
+        let Some((_, surface)) = surface() else {
+            return;
+        };
         let grain = ResidentGrain(20);
         let source = occurrence();
         let receiver = DeedReceiver::unbounded();
@@ -2733,10 +5363,24 @@ mod tests {
         let (complex, realization, _, _, quotient) = sealed_diagram(false, false);
         let material = material();
         let passage = FrontPassage::new(surface, grain);
-        let mut bound = passage.bind(&complex, &realization, &material, &source, &receiver, None, quotient).expect("the base deed binds");
-        let returned = bound.launch(&surface.mode()).expect("the base deed launches");
+        let mut bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &source,
+                &receiver,
+                None,
+                quotient,
+            )
+            .expect("the base deed binds");
+        let returned = bound
+            .launch(&surface.mode())
+            .expect("the base deed launches");
         bound.standing(&returned).expect("the base deed stands");
-        let (section, octaves) = bound.release_section(quotient).expect("the terminal releases as a standing");
+        let (section, octaves) = bound
+            .release_section(quotient)
+            .expect("the terminal releases as a standing");
         let standing = std::rc::Rc::new(section);
         let before = surface.read_out(&standing).expect("the standing reads out");
         drop(bound);
@@ -2745,37 +5389,101 @@ mod tests {
         let sibling = |from: usize, span: usize| -> Vec<(i64, i64)> {
             let mut complex = PortedOperationComplex::new("sibling");
             let port = complex.port("standing");
-            let declared = |what: &str| vec![SourceTestimony::Intervention { statement: what.to_owned() }];
+            let declared = |what: &str| {
+                vec![SourceTestimony::Intervention {
+                    statement: what.to_owned(),
+                }]
+            };
             let carry = complex
-                .bind_operation("carried standing", OperationSpecies::Construction, vec![], vec![port], None, declared("the sibling enters on the base's released standing"))
+                .bind_operation(
+                    "carried standing",
+                    OperationSpecies::Construction,
+                    vec![],
+                    vec![port],
+                    None,
+                    declared("the sibling enters on the base's released standing"),
+                )
                 .expect("law");
             let withdraw = complex
-                .bind_operation("span withdrawn (intervention)", OperationSpecies::Quotient, vec![port], vec![port], None, declared("the caller's intervention on its OWN copy of the shared standing"))
+                .bind_operation(
+                    "span withdrawn (intervention)",
+                    OperationSpecies::Quotient,
+                    vec![port],
+                    vec![port],
+                    None,
+                    declared("the caller's intervention on its OWN copy of the shared standing"),
+                )
                 .expect("law");
             let c = complex.occur(carry).expect("occur");
             let w = complex.occur(withdraw).expect("occur");
-            complex.carries_precedence("the carried standing is withdrawn from", port, OccurrencePort::output(c, 0), OccurrencePort::input(w, 0)).expect("bond");
+            complex
+                .carries_precedence(
+                    "the carried standing is withdrawn from",
+                    port,
+                    OccurrencePort::output(c, 0),
+                    OccurrencePort::input(w, 0),
+                )
+                .expect("bond");
             let mut realization = ResidentRealization::default();
-            realization.bind(c, Standing { name: "shared".to_owned() });
+            realization.bind(
+                c,
+                Standing {
+                    name: "shared".to_owned(),
+                },
+            );
             realization.bind(w, WithdrawColumns { from, span });
             let mut material = ResidentMaterial::empty();
-            material.standings.insert("shared".to_owned(), (std::rc::Rc::clone(&standing), octaves));
+            material.standings.insert(
+                "shared".to_owned(),
+                (std::rc::Rc::clone(&standing), octaves),
+            );
             let passage = FrontPassage::new(surface, grain);
-            let bound = passage.bind(&complex, &realization, &material, &source, &receiver, None, w).expect("the sibling binds");
+            let bound = passage
+                .bind(
+                    &complex,
+                    &realization,
+                    &material,
+                    &source,
+                    &receiver,
+                    None,
+                    w,
+                )
+                .expect("the sibling binds");
             let returned = bound.launch(&surface.mode()).expect("the sibling launches");
             bound.standing(&returned).expect("the sibling stands");
-            bound.read_terminal(&returned).expect("the sibling returns its terminal")
+            bound
+                .read_terminal(&returned)
+                .expect("the sibling returns its terminal")
         };
         let left = sibling(0, 16);
         let right = sibling(16, 16);
 
-        let after = surface.read_out(&standing).expect("the standing reads out again");
-        assert_eq!(before, after, "the shared standing was written by a sibling: the read-only share is broken");
-        assert_ne!(left, right, "the two siblings withdrew different spans, so their returns must differ");
+        let after = surface
+            .read_out(&standing)
+            .expect("the standing reads out again");
+        assert_eq!(
+            before, after,
+            "the shared standing was written by a sibling: the read-only share is broken"
+        );
+        assert_ne!(
+            left, right,
+            "the two siblings withdrew different spans, so their returns must differ"
+        );
         // and each sibling really read the shared standing: outside its withdrawn span it carries
         // exactly the standing's own words
-        assert_eq!(left[16..], before[16..], "the left sibling's untouched half is the standing's");
-        assert_eq!(right[..16], before[..16], "the right sibling's untouched half is the standing's");
-        assert!(left[..16].iter().all(|(lo, hi)| *lo == 0 && *hi == 0), "the withdrawn span is withdrawn");
+        assert_eq!(
+            left[16..],
+            before[16..],
+            "the left sibling's untouched half is the standing's"
+        );
+        assert_eq!(
+            right[..16],
+            before[..16],
+            "the right sibling's untouched half is the standing's"
+        );
+        assert!(
+            left[..16].iter().all(|(lo, hi)| *lo == 0 && *hi == 0),
+            "the withdrawn span is withdrawn"
+        );
     }
 }

@@ -78,6 +78,18 @@ impl ExactRaster {
             sums
         })
     }
+
+    /// The binary PPM (`P6`) exterior codec.  The exact raster remains the invertible testimony;
+    /// this byte face carries the same sample population for ordinary image readers.
+    pub fn ppm_bytes(&self) -> Vec<u8> {
+        let mut bytes = format!("P6\n{} {}\n255\n", self.extent.width, self.extent.height)
+            .into_bytes();
+        bytes.reserve(self.samples.len() * 3);
+        for sample in &self.samples {
+            bytes.extend_from_slice(&sample.channels());
+        }
+        bytes
+    }
 }
 
 pub(crate) fn sample_ordinal(

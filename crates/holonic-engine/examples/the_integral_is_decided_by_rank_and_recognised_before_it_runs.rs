@@ -63,8 +63,8 @@
 //! ```
 
 use holonic_engine::elementary_chart::{
-    read_elementary_chart, ElementaryChartError, ElementaryReading, ExponentialIntegrand,
-    RecognitionOutcome,
+    ElementaryChartError, ElementaryReading, ExponentialIntegrand, RecognitionOutcome,
+    read_elementary_chart,
 };
 use holonic_engine::rational_polynomial::RationalPolynomial;
 use relational_geometry::exact::rat;
@@ -278,7 +278,10 @@ fn main() {
     println!("  outside the declared aperture            {outside_aperture}");
     println!("  elementary, realizer returned            {admitted}");
     println!("  of those, differentiated back exactly    {differentiates_back}");
-    println!("  refusals with an exhibited witness       {}", witnesses.len());
+    println!(
+        "  refusals with an exhibited witness       {}",
+        witnesses.len()
+    );
     println!();
     println!("  recognition settled it alone             {decisive}");
     println!("  recognition opened it, system found      {opened_and_found}");
@@ -290,7 +293,9 @@ fn main() {
     println!("WHAT THIS RUN DOES NOT ESTABLISH");
     println!("{}", "-".repeat(96));
     println!("  This is not integration and not Risch. The aperture is R = P/Q with Q squarefree");
-    println!("  and g a non-constant polynomial. No logarithmic or algebraic extension is touched,");
+    println!(
+        "  and g a non-constant polynomial. No logarithmic or algebraic extension is touched,"
+    );
     println!("  and a repeated denominator factor is refused by name rather than answered.");
 
     let every_admission_returns = differentiates_back == admitted && admitted > 0;
@@ -303,12 +308,12 @@ fn main() {
         println!(
             "HELD -- every realizer differentiated back, the recognition was never contradicted,"
         );
-        println!(
-            "        and it is decisive on refusal while genuinely open on admission, so the"
-        );
+        println!("        and it is decisive on refusal while genuinely open on admission, so the");
         println!("        signature and the solver are two frames rather than one.");
     } else {
-        println!("REFUTED -- differentiates_back={differentiates_back} of {admitted}, contradicted={contradicted}, decisive={decisive}, opened_found={opened_and_found}, opened_refused={opened_and_refused}");
+        println!(
+            "REFUTED -- differentiates_back={differentiates_back} of {admitted}, contradicted={contradicted}, decisive={decisive}, opened_found={opened_and_found}, opened_refused={opened_and_refused}"
+        );
         println!("{}", "=".repeat(96));
         std::process::exit(1);
     }

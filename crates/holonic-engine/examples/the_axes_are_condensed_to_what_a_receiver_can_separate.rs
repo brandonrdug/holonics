@@ -36,7 +36,7 @@ mod site;
 use holonic_engine::embedding_fiber::ResidentReadout;
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
-use site::{conduct, BASE, CAUSED};
+use site::{BASE, CAUSED, conduct};
 
 /// The declared partition of the entering construction. **Stated, and its outside reported.**
 const SPANS: usize = 64;
@@ -108,7 +108,10 @@ fn main() {
 
     println!("PHOENIX STATION FIVE (CONDENSATION) — RECEIVER-MINIMALITY ON REAL MATERIAL");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
     println!("  caused positions                  {}", CAUSED.len());
 
     let clock = std::time::Instant::now();
@@ -128,8 +131,11 @@ fn main() {
     println!("  entering construction width       {entering_width}");
     println!("  carried standing width            {carried_width}");
     println!("  declared spans                    {SPANS} of {span} coordinates each");
-    println!("  declared receivers                {} — a hand and an order at each of {} coordinates",
-        coordinates.len() * 2, coordinates.len());
+    println!(
+        "  declared receivers                {} — a hand and an order at each of {} coordinates",
+        coordinates.len() * 2,
+        coordinates.len()
+    );
 
     // ---------------------------------------------------------------------------------------
     // THE TWO CONTROLS.
@@ -138,10 +144,17 @@ fn main() {
     println!("  THE CONTROLS — a reading that fails these is measuring its own apparatus");
     let no_op = conduct(&root, &chart, BASE, terms, Some((0, 0))).expect("conducted");
     let no_op_moved = moved(&base, &no_op, &coordinates);
-    println!("    a NO-OP ablation moved                     {} receivers", no_op_moved.len());
-    let everything = conduct(&root, &chart, BASE, terms, Some((0, entering_width))).expect("conducted");
+    println!(
+        "    a NO-OP ablation moved                     {} receivers",
+        no_op_moved.len()
+    );
+    let everything =
+        conduct(&root, &chart, BASE, terms, Some((0, entering_width))).expect("conducted");
     let everything_moved = moved(&base, &everything, &coordinates);
-    println!("    withdrawing EVERYTHING moved               {} receivers", everything_moved.len());
+    println!(
+        "    withdrawing EVERYTHING moved               {} receivers",
+        everything_moved.len()
+    );
     if !no_op_moved.is_empty() || everything_moved.is_empty() {
         println!("    THE CONTROLS FAILED. The reading below would be about the apparatus.");
         std::process::exit(1);
@@ -173,9 +186,18 @@ fn main() {
             load_bearing.push((index, which));
         }
     }
-    println!("    swept in                                   {:?}", clock.elapsed());
-    println!("    spans that are LOAD-BEARING                {}", load_bearing.len());
-    println!("    spans no declared receiver separates       {}", collapsible.len());
+    println!(
+        "    swept in                                   {:?}",
+        clock.elapsed()
+    );
+    println!(
+        "    spans that are LOAD-BEARING                {}",
+        load_bearing.len()
+    );
+    println!(
+        "    spans no declared receiver separates       {}",
+        collapsible.len()
+    );
     println!();
     for (index, which) in load_bearing.iter().take(6) {
         println!(
@@ -205,7 +227,10 @@ fn main() {
     println!("    entering coordinates                       {entering_width}");
     println!("    load-bearing, retained in the body         {retained}");
     println!("    collapsed, retained in the FIBRE           {collapsed}");
-    println!("    their sum                                  {}", retained + collapsed);
+    println!(
+        "    their sum                                  {}",
+        retained + collapsed
+    );
     println!();
     println!("    A condensation factor is NOT quoted here. A collapsed coordinate is retained,");
     println!("    not deleted, and a figure that omitted the fibre would be the absolute-volume");
@@ -219,8 +244,13 @@ fn main() {
         println!("    The body is receiver-minimal for this family and this partition: nothing");
         println!("    can be withdrawn without moving a receiver.");
     } else {
-        println!("    {} of {SPANS} spans have a named separating consequence.", load_bearing.len());
-        println!("    The rest are collapsible FOR THIS FAMILY, and a richer receiver reopens them.");
+        println!(
+            "    {} of {SPANS} spans have a named separating consequence.",
+            load_bearing.len()
+        );
+        println!(
+            "    The rest are collapsible FOR THIS FAMILY, and a richer receiver reopens them."
+        );
     }
 
     println!();

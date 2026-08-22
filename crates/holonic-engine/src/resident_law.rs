@@ -13,7 +13,11 @@ use std::collections::BTreeMap;
 
 use crate::embedding_fiber::MountedReadout;
 use crate::ported_operation::OperationSpecies;
-use crate::resident_section::{BandElements, Dyadic, DyadicEnclosure, Lane, LaneTree, LawShape, PartialStanding, Positions, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, SeriesAperture, StagedWords, TileGeometry};
+use crate::resident_section::{
+    BandElements, Dyadic, DyadicEnclosure, Lane, LaneTree, LawShape, PartialStanding, Positions,
+    ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, SeriesAperture, StagedWords,
+    TileGeometry,
+};
 
 // ---------------------------------------------------------------------------------------------
 // material
@@ -60,25 +64,49 @@ pub struct ResidentMaterial<'chart> {
 
 impl ResidentMaterial<'_> {
     pub fn empty() -> Self {
-        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), arrays: BTreeMap::new() }
+        Self {
+            populations: BTreeMap::new(),
+            entering: BTreeMap::new(),
+            bands: BTreeMap::new(),
+            positions: None,
+            standings: BTreeMap::new(),
+            arrays: BTreeMap::new(),
+        }
     }
 
     /// The resident octets of every mounted map, band and position — the source-map residency the
     /// deed requires.
     pub fn resident_octets(&self) -> u64 {
-        self.populations.values().map(|p| p.readout.resident_octets() as u64).sum::<u64>()
-            + self.bands.values().map(|(b, _)| b.resident_octets()).sum::<u64>()
-            + self.positions.as_ref().map(Positions::resident_octets).unwrap_or(0)
-            + self.arrays.values().map(Positions::resident_octets).sum::<u64>()
+        self.populations
+            .values()
+            .map(|p| p.readout.resident_octets() as u64)
+            .sum::<u64>()
+            + self
+                .bands
+                .values()
+                .map(|(b, _)| b.resident_octets())
+                .sum::<u64>()
+            + self
+                .positions
+                .as_ref()
+                .map(Positions::resident_octets)
+                .unwrap_or(0)
+            + self
+                .arrays
+                .values()
+                .map(Positions::resident_octets)
+                .sum::<u64>()
     }
 
     /// The resident octets of the standings carried in from earlier passages — resident already,
     /// released by those passages, counted apart from the material deed that mounted the maps.
     pub fn standings_octets(&self) -> u64 {
-        self.standings.values().map(|(s, _)| s.resident_octets()).sum::<u64>()
+        self.standings
+            .values()
+            .map(|(s, _)| s.resident_octets())
+            .sum::<u64>()
     }
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // laws — owner-local: each one carries its species, its material, its bound, its shape, its
@@ -98,13 +126,41 @@ pub trait ResidentLaw: std::fmt::Debug {
     /// The material this law names that the caller must have mounted or read, checked at compile.
     /// `Err(name)` names what is absent.
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String>;
+    /// Structural semantic parameters an exact-owner license must match. Apparatus-only choices
+    /// such as tile geometry are deliberately absent.
+    fn exact_semantic_parameters(&self) -> BTreeMap<String, String> {
+        BTreeMap::new()
+    }
+    /// Resident matrix population whose exact content identity must equal the owner's matrix.
+    fn exact_population(&self) -> Option<&str> {
+        None
+    }
     /// The a-priori bound on the octaves of this law's output words, from the bounds on its
     /// inputs (in input order) and the material's extents, at the declared grain `2^-F`.
-    fn bound_octaves(&self, grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64;
+    fn bound_octaves(
+        &self,
+        grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64;
     /// The shape and price of this law on inputs of the given `(rows, width, octave bound)`.
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal>;
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal>;
     /// The entering population this law stages on the card before the deed, if it enters one.
     fn stages(&self) -> Option<&str> {
+        None
+    }
+    /// Exact identity of the actual entering/query word this law consumes, when it owns such a
+    /// mouth. The identity is computed from decoded material, never supplied by a caller.
+    fn exact_input_identity(
+        &self,
+        _material: &ResidentMaterial<'_>,
+    ) -> Option<Result<String, String>> {
         None
     }
     /// **A declared apparatus fusion: this law collapses its predecessor's section IN PLACE and
@@ -121,13 +177,20 @@ pub trait ResidentLaw: std::fmt::Debug {
     }
     /// Beyond its inputs' sections, the resident ranges this law's kernel reads — mounted maps,
     /// gains, bands, positions, staged words. For the footprint certificate.
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)>;
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)>;
     /// **The entailment of this law's parameters by the validated testimony of its occurrence** —
     /// asked at compile after the source occurrence validated every symbol, field and shape. A
     /// valid but unrelated slice must not authenticate this law: at least one resolved slice must
     /// NAME the operation, and every parameter the law holds must be entailed by a field, a shape
     /// or a slice.
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal>;
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal>;
     /// Record this law's one semantic kernel into the lane, after its producers.
     #[allow(clippy::too_many_arguments)]
     fn record<'chart>(
@@ -143,11 +206,7 @@ pub trait ResidentLaw: std::fmt::Debug {
 }
 
 fn ceil_log2(n: usize) -> u32 {
-    if n <= 1 {
-        0
-    } else {
-        (n - 1).ilog2() + 1
-    }
+    if n <= 1 { 0 } else { (n - 1).ilog2() + 1 }
 }
 
 fn map_range(map: &MountedReadout<'_>) -> (u64, u64) {
@@ -172,7 +231,10 @@ pub struct Enter {
 }
 
 impl ResidentLaw for Enter {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -185,28 +247,107 @@ impl ResidentLaw for Enter {
         (0, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.entering.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+        if material.entering.contains_key(&self.population) {
+            Ok(())
+        } else {
+            Err(self.population.clone())
+        }
+    }
+    fn exact_semantic_parameters(&self) -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("population".to_owned(), self.population.clone()),
+            (
+                "scale-significand".to_owned(),
+                self.scale.significand.to_string(),
+            ),
+            ("scale-exponent".to_owned(), self.scale.exponent.to_string()),
+        ])
     }
     /// The a-priori bound and the carrier admission are ONE reading of the entering words
     /// ([`ResidentSurface::entering_octaves`]), so a mouth cannot be admitted at one bound and
     /// censused against another. Until 2026-08-19 the shape's admission was authored from the
     /// scale and the grain alone while this law already read the material; the two are now the
     /// same function.
-    fn bound_octaves(&self, grain: ResidentGrain, _inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        grain: ResidentGrain,
+        _inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         let entering = &material.entering[&self.population];
-        i64::from(ResidentSurface::entering_octaves(&entering.words, self.scale, grain))
+        i64::from(ResidentSurface::entering_octaves(
+            &entering.words,
+            self.scale,
+            grain,
+        ))
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, _inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        _inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let entering = &material.entering[&self.population];
-        surface.shape_enter(entering.rows, entering.width, self.scale, grain, &entering.words)
+        surface.shape_enter(
+            entering.rows,
+            entering.width,
+            self.scale,
+            grain,
+            &entering.words,
+        )
     }
     fn stages(&self) -> Option<&str> {
         Some(&self.population)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn exact_input_identity(
+        &self,
+        material: &ResidentMaterial<'_>,
+    ) -> Option<Result<String, String>> {
+        let entering = &material.entering[&self.population];
+        let scale = if self.scale.exponent >= 0 {
+            Rat::from_integer(BigInt::from(self.scale.significand) << self.scale.exponent as usize)
+        } else {
+            Rat::new(
+                BigInt::from(self.scale.significand),
+                BigInt::from(1_u8) << self.scale.exponent.unsigned_abs() as usize,
+            )
+        };
+        let values = entering
+            .words
+            .iter()
+            .map(|word| {
+                crate::exact_value::ieee754::decode_bfloat16_bits(*word)
+                    .map(|datum| datum.value() * &scale)
+                    .map_err(|error| error.to_string())
+            })
+            .collect::<Result<Vec<_>, _>>();
+        Some(values.and_then(|values| {
+            crate::exact_owner_testimony::exact_input_population_identity(
+                entering.rows,
+                entering.width,
+                &values,
+            )
+            .map_err(|error| error.to_string())
+        }))
+    }
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         vec![staged[&self.population].range()]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        _inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_enter(lane, &staged[&self.population], self.scale, out)
     }
 }
@@ -221,7 +362,10 @@ pub struct Standing {
 }
 
 impl ResidentLaw for Standing {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -234,19 +378,47 @@ impl ResidentLaw for Standing {
         (0, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.standings.contains_key(&self.name) { Ok(()) } else { Err(self.name.clone()) }
+        if material.standings.contains_key(&self.name) {
+            Ok(())
+        } else {
+            Err(self.name.clone())
+        }
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, _inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        _inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         i64::from(material.standings[&self.name].1)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, _inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        _inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (section, octaves) = &material.standings[&self.name];
         surface.shape_carry(section.rows(), section.width(), *octaves)
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         material.standings[&self.name].0.ranges().to_vec()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        _inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_carry(lane, &material.standings[&self.name].0, out)
     }
 }
@@ -265,7 +437,10 @@ impl ResidentLaw for Standing {
 pub struct MidpointQuotient;
 
 impl ResidentLaw for MidpointQuotient {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -280,30 +455,80 @@ impl ResidentLaw for MidpointQuotient {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
-        surface.shape_collapse_control(rows, width, octaves).map(|mut shape| {
-            shape.operation = "midpoint-quotient";
-            shape
-        })
+        surface
+            .shape_collapse_control(rows, width, octaves)
+            .map(|mut shape| {
+                shape.operation = "midpoint-quotient";
+                shape
+            })
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_collapse_control(lane, inputs[0], out)
     }
 }
 
 impl MidpointQuotient {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        if !validation.interventions.iter().any(|s| s.contains("quotient")) {
-            return Err(unentailed("midpoint-quotient", "declaration", "a declared quotient chart", validation));
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if !validation
+            .interventions
+            .iter()
+            .any(|s| s.contains("quotient"))
+        {
+            return Err(unentailed(
+                "midpoint-quotient",
+                "declaration",
+                "a declared quotient chart",
+                validation,
+            ));
         }
-        Ok(LawEntailment { law: "midpoint-quotient", parameters: vec![("chart".to_owned(), "midpoint of the certified enclosure; the enclosure retained in the predecessor".to_owned(), format!("the receiver's declaration: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+        Ok(LawEntailment {
+            law: "midpoint-quotient",
+            parameters: vec![(
+                "chart".to_owned(),
+                "midpoint of the certified enclosure; the enclosure retained in the predecessor"
+                    .to_owned(),
+                format!(
+                    "the receiver's declaration: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
     }
 }
 
@@ -332,7 +557,10 @@ impl MidpointQuotient {
 pub struct SealedMidpointQuotient;
 
 impl ResidentLaw for SealedMidpointQuotient {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let mut entailment = MidpointQuotient.entail(validation)?;
         entailment.law = "midpoint-quotient(fused seal)";
         entailment.parameters.push((
@@ -354,10 +582,21 @@ impl ResidentLaw for SealedMidpointQuotient {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_midpoint_seal(rows, width, octaves)
     }
@@ -367,10 +606,23 @@ impl ResidentLaw for SealedMidpointQuotient {
     fn fuses_census(&self) -> bool {
         true
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, _surface: &ResidentSurface<'chart>, _lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, _out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        _surface: &ResidentSurface<'chart>,
+        _lane: &Lane<'_, 'chart>,
+        _inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        _out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         // The passage records the fused kernel itself: the fusion is its apparatus compression and
         // the a-priori bound the fused census compares against is its reading, not the law's.
         Err(ResidentRefusal::Declaration {
@@ -390,11 +642,30 @@ pub struct WithdrawRows {
 }
 
 impl ResidentLaw for WithdrawRows {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         if validation.interventions.is_empty() {
-            return Err(unentailed("withdraw-rows", "intervention", format!("{}..{}", self.from, self.from + self.span), validation));
+            return Err(unentailed(
+                "withdraw-rows",
+                "intervention",
+                format!("{}..{}", self.from, self.from + self.span),
+                validation,
+            ));
         }
-        Ok(LawEntailment { law: "withdraw-rows", parameters: vec![("rows".to_owned(), format!("{}..{}", self.from, self.from + self.span), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+        Ok(LawEntailment {
+            law: "withdraw-rows",
+            parameters: vec![(
+                "rows".to_owned(),
+                format!("{}..{}", self.from, self.from + self.span),
+                format!(
+                    "the caller's typed intervention: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
     }
     fn name(&self) -> &'static str {
         "withdraw-rows"
@@ -408,17 +679,41 @@ impl ResidentLaw for WithdrawRows {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_withdraw_rows(rows, width, octaves, self.from, self.span)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_withdraw_rows(lane, inputs[0], self.from, self.span, out)
     }
 }
@@ -436,11 +731,30 @@ pub struct PermuteColumns {
 }
 
 impl ResidentLaw for PermuteColumns {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         if validation.interventions.is_empty() {
-            return Err(unentailed("permute-columns", "intervention", format!("{:?} in blocks of {}", self.permutation, self.block), validation));
+            return Err(unentailed(
+                "permute-columns",
+                "intervention",
+                format!("{:?} in blocks of {}", self.permutation, self.block),
+                validation,
+            ));
         }
-        Ok(LawEntailment { law: "permute-columns", parameters: vec![("permutation".to_owned(), format!("{:?} in blocks of {}", self.permutation, self.block), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+        Ok(LawEntailment {
+            law: "permute-columns",
+            parameters: vec![(
+                "permutation".to_owned(),
+                format!("{:?} in blocks of {}", self.permutation, self.block),
+                format!(
+                    "the caller's typed intervention: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
     }
     fn name(&self) -> &'static str {
         "permute-columns"
@@ -452,20 +766,54 @@ impl ResidentLaw for PermuteColumns {
         (1, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.arrays.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
+        if material.arrays.contains_key(&self.mounted) {
+            Ok(())
+        } else {
+            Err(self.mounted.clone())
+        }
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_permute_columns(rows, width, octaves, self.block, &self.permutation)
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         vec![material.arrays[&self.mounted].range()]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_permute_columns(lane, inputs[0], self.block, &material.arrays[&self.mounted], out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_permute_columns(
+            lane,
+            inputs[0],
+            self.block,
+            &material.arrays[&self.mounted],
+            out,
+        )
     }
 }
 
@@ -490,7 +838,10 @@ pub struct FactorizedContract {
 }
 
 impl ResidentLaw for FactorizedContract {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -511,10 +862,21 @@ impl ResidentLaw for FactorizedContract {
         }
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         self.uncapped_output_octaves(first(inputs, 0), material)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_factorized_contract(
             rows,
@@ -525,13 +887,26 @@ impl ResidentLaw for FactorizedContract {
             self.rank,
         )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         vec![
             map_range(&material.populations[&self.u_population].readout),
             map_range(&material.populations[&self.v_population].readout),
         ]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_factorized_contract(
             lane,
             inputs[0],
@@ -560,20 +935,37 @@ impl FactorizedContract {
     /// mirrors `FrontPassage`'s general word-bound projection without exposing its private
     /// compilation machinery to the W3 pre-admission chart.
     pub fn output_word_octaves(&self, input: u32, material: &ResidentMaterial<'_>) -> u32 {
-        u32::try_from(self.uncapped_output_octaves(i64::from(input), material).max(1))
-            .unwrap_or(u32::MAX)
-            .min(i64::BITS - 1)
+        u32::try_from(
+            self.uncapped_output_octaves(i64::from(input), material)
+                .max(1),
+        )
+        .unwrap_or(u32::MAX)
+        .min(i64::BITS - 1)
     }
 
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         if self.rank != 1 {
-            return Err(unentailed("factorized-contract", "rank", self.rank, validation));
+            return Err(unentailed(
+                "factorized-contract",
+                "rank",
+                self.rank,
+                validation,
+            ));
         }
         // Both factor names must be carried by authenticated testimony.  Contract's
         // population entailment is deliberately reused so this fused law cannot acquire a
         // weaker source boundary than its two constituent contractions.
-        let left = Contract { population: self.u_population.clone() }.entail(validation)?;
-        let right = Contract { population: self.v_population.clone() }.entail(validation)?;
+        let left = Contract {
+            population: self.u_population.clone(),
+        }
+        .entail(validation)?;
+        let right = Contract {
+            population: self.v_population.clone(),
+        }
+        .entail(validation)?;
         let mut naming_slices = left.naming_slices;
         naming_slices.extend(right.naming_slices);
         naming_slices.sort();
@@ -581,9 +973,21 @@ impl FactorizedContract {
         Ok(LawEntailment {
             law: "factorized-contract",
             parameters: vec![
-                ("u_population".to_owned(), self.u_population.clone(), "declared native shape [V, 1]".to_owned()),
-                ("v_population".to_owned(), self.v_population.clone(), "declared native shape [1, H]".to_owned()),
-                ("rank".to_owned(), "1".to_owned(), "the exact rank certificate carried by the W3 derivation".to_owned()),
+                (
+                    "u_population".to_owned(),
+                    self.u_population.clone(),
+                    "declared native shape [V, 1]".to_owned(),
+                ),
+                (
+                    "v_population".to_owned(),
+                    self.v_population.clone(),
+                    "declared native shape [1, H]".to_owned(),
+                ),
+                (
+                    "rank".to_owned(),
+                    "1".to_owned(),
+                    "the exact rank certificate carried by the W3 derivation".to_owned(),
+                ),
             ],
             naming_slices,
         })
@@ -591,7 +995,10 @@ impl FactorizedContract {
 }
 
 impl ResidentLaw for Contract {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -604,23 +1011,60 @@ impl ResidentLaw for Contract {
         (1, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.populations.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+        if material.populations.contains_key(&self.population) {
+            Ok(())
+        } else {
+            Err(self.population.clone())
+        }
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + i64::from(material.populations[&self.population].mass_value_octaves) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
-        surface.shape_contract(rows, width, octaves, &material.populations[&self.population].readout)
+        surface.shape_contract(
+            rows,
+            width,
+            octaves,
+            &material.populations[&self.population].readout,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         vec![map_range(&material.populations[&self.population].readout)]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_contract(lane, inputs[0], &material.populations[&self.population].readout, out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_contract(
+            lane,
+            inputs[0],
+            &material.populations[&self.population].readout,
+            out,
+        )
     }
 }
-
 
 /// **The same contraction, realized as a tiled cooperative geometry.** One law, one species, one
 /// map, one output — and a caller-declared `tile` that is an APPARATUS aperture and nothing else.
@@ -654,7 +1098,10 @@ pub struct ContractTiled {
 }
 
 impl ResidentLaw for ContractTiled {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -667,26 +1114,83 @@ impl ResidentLaw for ContractTiled {
         (1, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.populations.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+        if material.populations.contains_key(&self.population) {
+            Ok(())
+        } else {
+            Err(self.population.clone())
+        }
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn exact_semantic_parameters(&self) -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("population".to_owned(), self.population.clone()),
+            ("reduction-word".to_owned(), format!("{:?}", self.tree)),
+        ])
+    }
+    fn exact_population(&self) -> Option<&str> {
+        Some(&self.population)
+    }
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + i64::from(material.populations[&self.population].mass_value_octaves) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
-        surface.shape_contract_tiled(rows, width, octaves, &material.populations[&self.population].readout, self.tile)
+        surface.shape_contract_tiled(
+            rows,
+            width,
+            octaves,
+            &material.populations[&self.population].readout,
+            self.tile,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         vec![map_range(&material.populations[&self.population].readout)]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_contract_tiled(lane, inputs[0], &material.populations[&self.population].readout, self.tile, self.admitted_node_octaves, self.tree, out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_contract_tiled(
+            lane,
+            inputs[0],
+            &material.populations[&self.population].readout,
+            self.tile,
+            self.admitted_node_octaves,
+            self.tree,
+            out,
+        )
     }
 }
 
 impl ContractTiled {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let mut entailment = Contract { population: self.population.clone() }.entail(validation)?;
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut entailment = Contract {
+            population: self.population.clone(),
+        }
+        .entail(validation)?;
         entailment.law = "contract-tiled";
         entailment.parameters.push((
             "tile".to_owned(),
@@ -727,7 +1231,10 @@ pub struct ContractSplitK {
 }
 
 impl ResidentLaw for ContractSplitK {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -740,26 +1247,78 @@ impl ResidentLaw for ContractSplitK {
         (1, 1)
     }
     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
-        if material.populations.contains_key(&self.population) { Ok(()) } else { Err(self.population.clone()) }
+        if material.populations.contains_key(&self.population) {
+            Ok(())
+        } else {
+            Err(self.population.clone())
+        }
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + i64::from(material.populations[&self.population].mass_value_octaves) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
-        surface.shape_contract_tiled(rows, width, octaves, &material.populations[&self.population].readout, self.tile)
+        surface.shape_contract_tiled(
+            rows,
+            width,
+            octaves,
+            &material.populations[&self.population].readout,
+            self.tile,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
-        vec![map_range(&material.populations[&self.population].readout), self.partials.range()]
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
+        vec![
+            map_range(&material.populations[&self.population].readout),
+            self.partials.range(),
+        ]
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_contract_split_k(lane, inputs[0], &material.populations[&self.population].readout, self.tile, &self.partials, self.admitted_node_octaves, self.tree, out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_contract_split_k(
+            lane,
+            inputs[0],
+            &material.populations[&self.population].readout,
+            self.tile,
+            &self.partials,
+            self.admitted_node_octaves,
+            self.tree,
+            out,
+        )
     }
 }
 
 impl ContractSplitK {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let mut entailment = Contract { population: self.population.clone() }.entail(validation)?;
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut entailment = Contract {
+            population: self.population.clone(),
+        }
+        .entail(validation)?;
         entailment.law = "contract-split-k";
         entailment.parameters.push((
             "tile".to_owned(),
@@ -790,7 +1349,10 @@ pub struct RmsRebase {
 }
 
 impl ResidentLaw for RmsRebase {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -808,7 +1370,12 @@ impl ResidentLaw for RmsRebase {
             _ => Ok(()),
         }
     }
-    fn bound_octaves(&self, grain: ResidentGrain, inputs: &[u32], material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        grain: ResidentGrain,
+        inputs: &[u32],
+        material: &ResidentMaterial<'_>,
+    ) -> i64 {
         let f = i64::from(grain.0);
         let gain_value = self
             .gain
@@ -821,18 +1388,47 @@ impl ResidentLaw for RmsRebase {
         // |y_i| ≤ sqrt(group) · |g_i| for a point section, in the word F + log2(group)/2 + gain + 1;
         // for an interval section the root is at most 1/sqrt(eps) < 2^10, so the word is at most
         // oct + 10 + gain. The larger bounds both.
-        (f + (i64::from(ceil_log2(self.group)) + 1) / 2 + gain_value.max(0) + 2).max(first(inputs, 0) + 10 + gain_value.max(0) + 1)
+        (f + (i64::from(ceil_log2(self.group)) + 1) / 2 + gain_value.max(0) + 2)
+            .max(first(inputs, 0) + 10 + gain_value.max(0) + 1)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
-        let gain = self.gain.as_ref().map(|name| &material.populations[name].readout);
+        let gain = self
+            .gain
+            .as_ref()
+            .map(|name| &material.populations[name].readout);
         surface.shape_rms_rebase(rows, width, self.group, octaves, gain)
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
-        self.gain.as_ref().map(|gain| vec![map_range(&material.populations[gain].readout)]).unwrap_or_default()
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
+        self.gain
+            .as_ref()
+            .map(|gain| vec![map_range(&material.populations[gain].readout)])
+            .unwrap_or_default()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        let gain = self.gain.as_ref().map(|name| &material.populations[name].readout);
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let gain = self
+            .gain
+            .as_ref()
+            .map(|name| &material.populations[name].readout);
         surface.record_rms_rebase(lane, inputs[0], self.group, gain, self.eps, shape, out)
     }
 }
@@ -846,7 +1442,10 @@ pub struct Chronology {
 }
 
 impl ResidentLaw for Chronology {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -867,25 +1466,78 @@ impl ResidentLaw for Chronology {
         }
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         let (elements, max_position) = &material.bands[&self.bands];
-        let positions = material.positions.as_ref().ok_or(ResidentRefusal::Declaration { operation: "chronology", what: "no positions were mounted".to_owned() })?;
-        surface.shape_chronology(rows, width, self.heads, self.head_width, octaves, elements, positions, *max_position)
+        let positions = material
+            .positions
+            .as_ref()
+            .ok_or(ResidentRefusal::Declaration {
+                operation: "chronology",
+                what: "no positions were mounted".to_owned(),
+            })?;
+        surface.shape_chronology(
+            rows,
+            width,
+            self.heads,
+            self.head_width,
+            octaves,
+            elements,
+            positions,
+            *max_position,
+        )
     }
-    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         let mut reads: Vec<(u64, u64)> = material.bands[&self.bands].0.ranges().to_vec();
         if let Some(positions) = &material.positions {
             reads.push(positions.range());
         }
         reads
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        let positions = material.positions.as_ref().ok_or(ResidentRefusal::Declaration { operation: "chronology", what: "no positions were mounted".to_owned() })?;
-        surface.record_chronology(lane, inputs[0], self.heads, self.head_width, &material.bands[&self.bands].0, positions, out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let positions = material
+            .positions
+            .as_ref()
+            .ok_or(ResidentRefusal::Declaration {
+                operation: "chronology",
+                what: "no positions were mounted".to_owned(),
+            })?;
+        surface.record_chronology(
+            lane,
+            inputs[0],
+            self.heads,
+            self.head_width,
+            &material.bands[&self.bands].0,
+            positions,
+            out,
+        )
     }
 }
 
@@ -900,7 +1552,10 @@ pub struct Contact {
 }
 
 impl ResidentLaw for Contact {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -915,20 +1570,70 @@ impl ResidentLaw for Contact {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 2) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, q_width, q_octaves) = shape_at(inputs, 0);
         let (_, k_width, k_octaves) = shape_at(inputs, 1);
         let (_, v_width, v_octaves) = shape_at(inputs, 2);
-        surface.shape_contact(rows, q_width, k_width, v_width, self.heads, self.kv_heads, self.head_width, self.window, self.terms, grain, q_octaves, k_octaves, v_octaves)
+        surface.shape_contact(
+            rows,
+            q_width,
+            k_width,
+            v_width,
+            self.heads,
+            self.kv_heads,
+            self.head_width,
+            self.window,
+            self.terms,
+            grain,
+            q_octaves,
+            k_octaves,
+            v_octaves,
+        )
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
-        surface.record_contact(lane, inputs[0], inputs[1], inputs[2], self.heads, self.kv_heads, self.head_width, self.window, self.terms, shape, out)
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_contact(
+            lane,
+            inputs[0],
+            inputs[1],
+            inputs[2],
+            self.heads,
+            self.kv_heads,
+            self.head_width,
+            self.window,
+            self.terms,
+            shape,
+            out,
+        )
     }
 }
 
@@ -941,7 +1646,10 @@ pub struct GeluTanh {
 }
 
 impl ResidentLaw for GeluTanh {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -956,17 +1664,41 @@ impl ResidentLaw for GeluTanh {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_gelu_tanh(rows, width, octaves, grain, self.c1, self.c2, self.terms)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_gelu_tanh(lane, inputs[0], self.c1, self.c2, self.terms, out)
     }
 }
@@ -976,7 +1708,10 @@ impl ResidentLaw for GeluTanh {
 pub struct Hadamard;
 
 impl ResidentLaw for Hadamard {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -991,17 +1726,41 @@ impl ResidentLaw for Hadamard {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + first(inputs, 1) - i64::from(grain.0) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, a) = shape_at(inputs, 0);
         surface.shape_hadamard(rows, width, a, shape_at(inputs, 1).2)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_hadamard(lane, inputs[0], inputs[1], out)
     }
 }
@@ -1011,7 +1770,10 @@ impl ResidentLaw for Hadamard {
 pub struct ReEntry;
 
 impl ResidentLaw for ReEntry {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -1026,17 +1788,41 @@ impl ResidentLaw for ReEntry {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0).max(first(inputs, 1)) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, a) = shape_at(inputs, 0);
         surface.shape_re_entry(rows, width, a, shape_at(inputs, 1).2)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_re_entry(lane, inputs[0], inputs[1], out)
     }
 }
@@ -1048,7 +1834,10 @@ pub struct Scale {
 }
 
 impl ResidentLaw for Scale {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -1063,17 +1852,48 @@ impl ResidentLaw for Scale {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn exact_semantic_parameters(&self) -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("scale-lo".to_owned(), self.by.lo.to_string()),
+            ("scale-hi".to_owned(), self.by.hi.to_string()),
+            ("scale-grain".to_owned(), self.by.grain.to_string()),
+        ])
+    }
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0) + i64::from(self.by.octaves()) - i64::from(self.by.grain) + 1
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_scale(rows, width, octaves, self.by)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_scale(lane, inputs[0], self.by, out)
     }
 }
@@ -1086,7 +1906,10 @@ pub struct WithdrawColumns {
 }
 
 impl ResidentLaw for WithdrawColumns {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -1101,17 +1924,41 @@ impl ResidentLaw for WithdrawColumns {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_withdraw_columns(rows, width, octaves, self.from, self.span)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_withdraw_columns(lane, inputs[0], self.from, self.span, out)
     }
 }
@@ -1122,7 +1969,10 @@ impl ResidentLaw for WithdrawColumns {
 pub struct CollapseControl;
 
 impl ResidentLaw for CollapseControl {
-    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         self.entail(validation)
     }
     fn name(&self) -> &'static str {
@@ -1137,21 +1987,44 @@ impl ResidentLaw for CollapseControl {
     fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
         Ok(())
     }
-    fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
         first(inputs, 0)
     }
-    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, _grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
         let (rows, width, octaves) = shape_at(inputs, 0);
         surface.shape_collapse_control(rows, width, octaves)
     }
-    fn reads<'chart>(&self, _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+    fn reads<'chart>(
+        &self,
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
         Vec::new()
     }
-    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], _material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        _material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
         surface.record_collapse_control(lane, inputs[0], out)
     }
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // entailment — the law's parameters are connected to the testimony that was validated, so a valid
@@ -1180,9 +2053,46 @@ pub struct LawEntailment {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EntailmentRefusal {
     /// No resolved slice names the operation this law realizes — a valid but unrelated slice.
-    SliceDoesNotEntail { law: &'static str, required_any_of: Vec<&'static str>, offered: Vec<String> },
+    SliceDoesNotEntail {
+        law: &'static str,
+        required_any_of: Vec<&'static str>,
+        offered: Vec<String>,
+    },
     /// A parameter the law holds is entailed by no field, shape or slice of the testimony.
-    ParameterUnentailed { law: &'static str, parameter: &'static str, value: String, testimony: Vec<String> },
+    ParameterUnentailed {
+        law: &'static str,
+        parameter: &'static str,
+        value: String,
+        testimony: Vec<String>,
+    },
+    /// Exact-owner testimony may not be mixed with source/native/intervention testimony.
+    ExactOwnerTestimonyMixed {
+        law: &'static str,
+    },
+    /// A mathematical binding carries exactly one structural license per operation.
+    ExactOwnerLicenseCount {
+        law: &'static str,
+        licenses: usize,
+    },
+    ExactOwnerLawDisagrees {
+        law: &'static str,
+    },
+    ExactOwnerParametersDisagree {
+        law: &'static str,
+        licensed: BTreeMap<String, String>,
+        resident: BTreeMap<String, String>,
+    },
+    ExactOwnerMatrixDisagrees {
+        law: &'static str,
+        population: String,
+        licensed: String,
+        resident: Option<String>,
+    },
+    ExactOwnerInputDisagrees {
+        law: &'static str,
+        licensed: String,
+        resident: Option<String>,
+    },
 }
 
 impl std::fmt::Display for EntailmentRefusal {
@@ -1192,14 +2102,30 @@ impl std::fmt::Display for EntailmentRefusal {
 }
 
 fn slices_of(validation: &BindingValidation) -> Vec<String> {
-    validation.symbols.iter().filter_map(|symbol| symbol.slice.clone()).collect()
+    validation
+        .symbols
+        .iter()
+        .filter_map(|symbol| symbol.slice.clone())
+        .collect()
 }
 
-fn naming(law: &'static str, validation: &BindingValidation, required_any_of: &[&'static str]) -> Result<Vec<String>, EntailmentRefusal> {
+fn naming(
+    law: &'static str,
+    validation: &BindingValidation,
+    required_any_of: &[&'static str],
+) -> Result<Vec<String>, EntailmentRefusal> {
     let slices = slices_of(validation);
-    let naming: Vec<String> = slices.iter().filter(|slice| required_any_of.iter().any(|token| slice.contains(token))).cloned().collect();
+    let naming: Vec<String> = slices
+        .iter()
+        .filter(|slice| required_any_of.iter().any(|token| slice.contains(token)))
+        .cloned()
+        .collect();
     if naming.is_empty() {
-        return Err(EntailmentRefusal::SliceDoesNotEntail { law, required_any_of: required_any_of.to_vec(), offered: slices });
+        return Err(EntailmentRefusal::SliceDoesNotEntail {
+            law,
+            required_any_of: required_any_of.to_vec(),
+            offered: slices,
+        });
     }
     Ok(naming)
 }
@@ -1212,46 +2138,85 @@ fn naming(law: &'static str, validation: &BindingValidation, required_any_of: &[
 /// it is only reachable after [`crate::native_occurrence::NativeOccurrence`] checked that the
 /// description was emitted in the native rest's metadata. An unrelated native description returns
 /// a refusal rather than falling through to the foreign slice rules.
-fn native_description_naming(validation: &BindingValidation, law: &'static str, required_any_of: &[&str], required_label: &'static str) -> Option<Result<Vec<String>, EntailmentRefusal>> {
+fn native_description_naming(
+    validation: &BindingValidation,
+    law: &'static str,
+    required_any_of: &[&str],
+    required_label: &'static str,
+) -> Option<Result<Vec<String>, EntailmentRefusal>> {
     if validation.descriptions.is_empty() {
         return None;
     }
     let naming: Vec<String> = validation
         .descriptions
         .iter()
-        .filter(|description| required_any_of.iter().any(|token| description.contains(token)))
+        .filter(|description| {
+            required_any_of
+                .iter()
+                .any(|token| description.contains(token))
+        })
         .cloned()
         .collect();
     Some(if naming.is_empty() {
-        Err(EntailmentRefusal::SliceDoesNotEntail { law, required_any_of: vec![required_label], offered: validation.descriptions.clone() })
+        Err(EntailmentRefusal::SliceDoesNotEntail {
+            law,
+            required_any_of: vec![required_label],
+            offered: validation.descriptions.clone(),
+        })
     } else {
         Ok(naming)
     })
 }
 
 fn testimony_of(validation: &BindingValidation) -> Vec<String> {
-    let mut out: Vec<String> = validation.fields.iter().map(|(f, v)| format!("{f}={v}")).collect();
+    let mut out: Vec<String> = validation
+        .fields
+        .iter()
+        .map(|(f, v)| format!("{f}={v}"))
+        .collect();
     out.extend(validation.shapes.iter().map(|(p, s)| format!("{p}:{s:?}")));
     out.extend(slices_of(validation));
     out
 }
 
-fn unentailed(law: &'static str, parameter: &'static str, value: impl std::fmt::Display, validation: &BindingValidation) -> EntailmentRefusal {
-    EntailmentRefusal::ParameterUnentailed { law, parameter, value: value.to_string(), testimony: testimony_of(validation) }
+fn unentailed(
+    law: &'static str,
+    parameter: &'static str,
+    value: impl std::fmt::Display,
+    validation: &BindingValidation,
+) -> EntailmentRefusal {
+    EntailmentRefusal::ParameterUnentailed {
+        law,
+        parameter,
+        value: value.to_string(),
+        testimony: testimony_of(validation),
+    }
 }
 
 /// A field whose value parses as this integer.
 fn field_with_integer(validation: &BindingValidation, value: usize) -> Option<String> {
-    validation.fields.iter().find(|(_, v)| v.trim().parse::<usize>().ok() == Some(value)).map(|(f, v)| format!("{f}={v}"))
+    validation
+        .fields
+        .iter()
+        .find(|(_, v)| v.trim().parse::<usize>().ok() == Some(value))
+        .map(|(f, v)| format!("{f}={v}"))
 }
 
 fn field_named(validation: &BindingValidation, names: &[&str]) -> Option<(String, String)> {
-    validation.fields.iter().find(|(f, _)| names.contains(&f.as_str())).cloned()
+    validation
+        .fields
+        .iter()
+        .find(|(f, _)| names.contains(&f.as_str()))
+        .cloned()
 }
 
 /// A field among `names` whose integer value is `value` — any of them, not the first named.
 fn field_among(validation: &BindingValidation, names: &[&str], value: usize) -> Option<String> {
-    validation.fields.iter().find(|(f, v)| names.contains(&f.as_str()) && v.trim().parse::<usize>().ok() == Some(value)).map(|(f, v)| format!("{f}={v}"))
+    validation
+        .fields
+        .iter()
+        .find(|(f, v)| names.contains(&f.as_str()) && v.trim().parse::<usize>().ok() == Some(value))
+        .map(|(f, v)| format!("{f}={v}"))
 }
 
 /// The last attribute of a stored population's name — `self_attn.q_proj.weight` → `q_proj`.
@@ -1334,12 +2299,19 @@ fn encloses(by: &DyadicEnclosure, target: &Rat) -> bool {
 /// `16·arctan(1/5) − 4·arctan(1/239)` — each with its alternating-tail certificate, so the
 /// enclosure is certified and nothing is a float.
 pub fn pi_enclosure(terms: u32) -> Option<(Rat, Rat)> {
-    let a = crate::reopening::arctan_unit_fraction(5, terms).ok()?.enclosure();
-    let b = crate::reopening::arctan_unit_fraction(239, terms).ok()?.enclosure();
+    let a = crate::reopening::arctan_unit_fraction(5, terms)
+        .ok()?
+        .enclosure();
+    let b = crate::reopening::arctan_unit_fraction(239, terms)
+        .ok()?
+        .enclosure();
     let sixteen = Rat::from_integer(BigInt::from(16));
     let four = Rat::from_integer(BigInt::from(4));
     // 16a − 4b: lower = 16·a.lower − 4·b.upper, upper = 16·a.upper − 4·b.lower
-    Some((&sixteen * &a.lower - &four * &b.upper, &sixteen * &a.upper - &four * &b.lower))
+    Some((
+        &sixteen * &a.lower - &four * &b.upper,
+        &sixteen * &a.upper - &four * &b.lower,
+    ))
 }
 
 impl Enter {
@@ -1360,128 +2332,378 @@ impl Enter {
             let half_ulp = pow2(e - 8); // ulp = 2^(e−7) for 8 significant bits; half of it
             let lower = &s - &half_ulp;
             let upper = &s + &half_ulp;
-            (&lower * &lower <= target_square && target_square <= &upper * &upper).then(|| format!("{field}={value}: scale = the bfloat16 nearest √{v}"))
+            (&lower * &lower <= target_square && target_square <= &upper * &upper)
+                .then(|| format!("{field}={value}: scale = the bfloat16 nearest √{v}"))
         })
     }
 }
 
 /// **The entailment of each law.** Asked by the passage at compile for every occurrence, after the
 /// source occurrence validated the testimony; refuses before any pricing.
-pub fn entailment_of(law: &dyn ResidentLaw, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+pub fn entailment_of(
+    law: &dyn ResidentLaw,
+    validation: &BindingValidation,
+) -> Result<LawEntailment, EntailmentRefusal> {
     law.entailment(validation)
 }
 
 impl Enter {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let naming_slices = naming("enter", validation, &["embed", "inputs_embeds"])?;
         // an unscaled standing entering from an exterior module (`inputs_embeds=`) is entailed at scale one
-        let by = if self.scale == Dyadic::ONE && slices_of(validation).iter().any(|s| s.contains("inputs_embeds=")) {
-            "an unscaled standing entering from an exterior module (inputs_embeds=) — scale one".to_owned()
+        let by = if self.scale == Dyadic::ONE
+            && slices_of(validation)
+                .iter()
+                .any(|s| s.contains("inputs_embeds="))
+        {
+            "an unscaled standing entering from an exterior module (inputs_embeds=) — scale one"
+                .to_owned()
         } else {
-            self.scale_entailed_by(validation).ok_or_else(|| unentailed("enter", "scale", format!("{}·2^{}", self.scale.significand, self.scale.exponent), validation))?
+            self.scale_entailed_by(validation).ok_or_else(|| {
+                unentailed(
+                    "enter",
+                    "scale",
+                    format!("{}·2^{}", self.scale.significand, self.scale.exponent),
+                    validation,
+                )
+            })?
         };
-        Ok(LawEntailment { law: "enter", parameters: vec![("scale".to_owned(), format!("{}·2^{}", self.scale.significand, self.scale.exponent), by), ("population".to_owned(), self.population.clone(), "the entering rows the runtime supplied under this name".to_owned())], naming_slices })
+        Ok(LawEntailment {
+            law: "enter",
+            parameters: vec![
+                (
+                    "scale".to_owned(),
+                    format!("{}·2^{}", self.scale.significand, self.scale.exponent),
+                    by,
+                ),
+                (
+                    "population".to_owned(),
+                    self.population.clone(),
+                    "the entering rows the runtime supplied under this name".to_owned(),
+                ),
+            ],
+            naming_slices,
+        })
     }
 }
 
 impl Contract {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let attribute = attribute_of(&self.population).to_owned();
         let slices = slices_of(validation);
-        if let Some(descriptions) = native_description_naming(validation, "contract", &[attribute.as_str()], "the population's attribute in an authenticated native description") {
+        if let Some(descriptions) = native_description_naming(
+            validation,
+            "contract",
+            &[attribute.as_str()],
+            "the population's attribute in an authenticated native description",
+        ) {
             let naming_slices = descriptions?;
-            let shape = validation.shapes.iter().find(|(p, _)| *p == self.population).ok_or_else(|| unentailed("contract", "population shape", &self.population, validation))?;
+            let shape = validation
+                .shapes
+                .iter()
+                .find(|(p, _)| *p == self.population)
+                .ok_or_else(|| {
+                    unentailed("contract", "population shape", &self.population, validation)
+                })?;
             return Ok(LawEntailment {
                 law: "contract",
-                parameters: vec![("population".to_owned(), self.population.clone(), format!("declared shape {:?} identified in the container header", shape.1))],
+                parameters: vec![(
+                    "population".to_owned(),
+                    self.population.clone(),
+                    format!(
+                        "declared shape {:?} identified in the container header",
+                        shape.1
+                    ),
+                )],
                 naming_slices,
             });
         }
-        let naming_slices: Vec<String> = slices.iter().filter(|slice| slice.contains(&attribute)).cloned().collect();
+        let naming_slices: Vec<String> = slices
+            .iter()
+            .filter(|slice| slice.contains(&attribute))
+            .cloned()
+            .collect();
         if naming_slices.is_empty() {
-            return Err(EntailmentRefusal::SliceDoesNotEntail { law: "contract", required_any_of: vec!["the population's own attribute in a resolved slice"], offered: slices });
+            return Err(EntailmentRefusal::SliceDoesNotEntail {
+                law: "contract",
+                required_any_of: vec!["the population's own attribute in a resolved slice"],
+                offered: slices,
+            });
         }
-        let shape = validation.shapes.iter().find(|(p, _)| *p == self.population).ok_or_else(|| unentailed("contract", "population shape", &self.population, validation))?;
-        Ok(LawEntailment { law: "contract", parameters: vec![("population".to_owned(), self.population.clone(), format!("declared shape {:?} identified in the container header", shape.1))], naming_slices })
+        let shape = validation
+            .shapes
+            .iter()
+            .find(|(p, _)| *p == self.population)
+            .ok_or_else(|| {
+                unentailed("contract", "population shape", &self.population, validation)
+            })?;
+        Ok(LawEntailment {
+            law: "contract",
+            parameters: vec![(
+                "population".to_owned(),
+                self.population.clone(),
+                format!(
+                    "declared shape {:?} identified in the container header",
+                    shape.1
+                ),
+            )],
+            naming_slices,
+        })
     }
 }
 
 impl RmsRebase {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let mut naming_slices = naming("rms-rebase", validation, &["pow(2).mean", "pow(mean_squared, -0.5)"])?;
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let mut naming_slices = naming(
+            "rms-rebase",
+            validation,
+            &["pow(2).mean", "pow(mean_squared, -0.5)"],
+        )?;
         let mut parameters = Vec::new();
         // eps: the binary64 nearest the declared decimal
-        let (field, value) = field_named(validation, &["rms_norm_eps"]).ok_or_else(|| unentailed("rms-rebase", "eps", format!("{}·2^{}", self.eps.significand, self.eps.exponent), validation))?;
-        let target = decimal_to_rat(&value).ok_or_else(|| unentailed("rms-rebase", "eps", value.clone(), validation))?;
+        let (field, value) = field_named(validation, &["rms_norm_eps"]).ok_or_else(|| {
+            unentailed(
+                "rms-rebase",
+                "eps",
+                format!("{}·2^{}", self.eps.significand, self.eps.exponent),
+                validation,
+            )
+        })?;
+        let target = decimal_to_rat(&value)
+            .ok_or_else(|| unentailed("rms-rebase", "eps", value.clone(), validation))?;
         if !is_nearest_binary64(&self.eps, &target) {
-            return Err(unentailed("rms-rebase", "eps", format!("{}·2^{} is not the binary64 nearest {value}", self.eps.significand, self.eps.exponent), validation));
+            return Err(unentailed(
+                "rms-rebase",
+                "eps",
+                format!(
+                    "{}·2^{} is not the binary64 nearest {value}",
+                    self.eps.significand, self.eps.exponent
+                ),
+                validation,
+            ));
         }
-        parameters.push(("eps".to_owned(), format!("{}·2^{}", self.eps.significand, self.eps.exponent), format!("{field}={value}: the binary64 nearest the declared decimal")));
+        parameters.push((
+            "eps".to_owned(),
+            format!("{}·2^{}", self.eps.significand, self.eps.exponent),
+            format!("{field}={value}: the binary64 nearest the declared decimal"),
+        ));
         // group: the gain's declared shape, or a field carrying the width
         match &self.gain {
             Some(gain) => {
                 let attribute = attribute_of(gain).to_owned();
-                let gain_slices: Vec<String> = slices_of(validation).into_iter().filter(|s| s.contains(&attribute)).collect();
+                let gain_slices: Vec<String> = slices_of(validation)
+                    .into_iter()
+                    .filter(|s| s.contains(&attribute))
+                    .collect();
                 if gain_slices.is_empty() {
-                    return Err(EntailmentRefusal::SliceDoesNotEntail { law: "rms-rebase", required_any_of: vec!["the gain population's own attribute in a resolved slice"], offered: slices_of(validation) });
+                    return Err(EntailmentRefusal::SliceDoesNotEntail {
+                        law: "rms-rebase",
+                        required_any_of: vec![
+                            "the gain population's own attribute in a resolved slice",
+                        ],
+                        offered: slices_of(validation),
+                    });
                 }
                 naming_slices.extend(gain_slices);
-                let shape = validation.shapes.iter().find(|(p, _)| p == gain).ok_or_else(|| unentailed("rms-rebase", "gain shape", gain, validation))?;
+                let shape = validation
+                    .shapes
+                    .iter()
+                    .find(|(p, _)| p == gain)
+                    .ok_or_else(|| unentailed("rms-rebase", "gain shape", gain, validation))?;
                 if shape.1 != vec![self.group] {
-                    return Err(unentailed("rms-rebase", "group", format!("{} against the gain's declared shape {:?}", self.group, shape.1), validation));
+                    return Err(unentailed(
+                        "rms-rebase",
+                        "group",
+                        format!(
+                            "{} against the gain's declared shape {:?}",
+                            self.group, shape.1
+                        ),
+                        validation,
+                    ));
                 }
-                parameters.push(("group".to_owned(), self.group.to_string(), format!("{gain} declared shape {:?}", shape.1)));
-                parameters.push(("gain".to_owned(), gain.clone(), "identified in the container header".to_owned()));
+                parameters.push((
+                    "group".to_owned(),
+                    self.group.to_string(),
+                    format!("{gain} declared shape {:?}", shape.1),
+                ));
+                parameters.push((
+                    "gain".to_owned(),
+                    gain.clone(),
+                    "identified in the container header".to_owned(),
+                ));
             }
             None => {
-                let by = field_with_integer(validation, self.group).ok_or_else(|| unentailed("rms-rebase", "group", self.group, validation))?;
+                let by = field_with_integer(validation, self.group)
+                    .ok_or_else(|| unentailed("rms-rebase", "group", self.group, validation))?;
                 parameters.push(("group".to_owned(), self.group.to_string(), by));
-                parameters.push(("gain".to_owned(), "none".to_owned(), "with_scale=False in a resolved slice".to_owned()));
-                if !slices_of(validation).iter().any(|s| s.contains("with_scale=False")) {
-                    return Err(unentailed("rms-rebase", "gain", "none (with_scale=False not in any slice)", validation));
+                parameters.push((
+                    "gain".to_owned(),
+                    "none".to_owned(),
+                    "with_scale=False in a resolved slice".to_owned(),
+                ));
+                if !slices_of(validation)
+                    .iter()
+                    .any(|s| s.contains("with_scale=False"))
+                {
+                    return Err(unentailed(
+                        "rms-rebase",
+                        "gain",
+                        "none (with_scale=False not in any slice)",
+                        validation,
+                    ));
                 }
             }
         }
-        Ok(LawEntailment { law: "rms-rebase", parameters, naming_slices })
+        Ok(LawEntailment {
+            law: "rms-rebase",
+            parameters,
+            naming_slices,
+        })
     }
 }
 
 impl Chronology {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let naming_slices = naming("chronology", validation, &["rotary", "rope", "cos", "sin"])?;
-        let heads_by = field_among(validation, &["num_attention_heads", "num_key_value_heads"], self.heads).ok_or_else(|| unentailed("chronology", "heads", self.heads, validation))?;
-        let width_by = field_among(validation, &["head_dim", "global_head_dim"], self.head_width).ok_or_else(|| unentailed("chronology", "head_width", self.head_width, validation))?;
-        Ok(LawEntailment { law: "chronology", parameters: vec![("heads".to_owned(), self.heads.to_string(), heads_by), ("head_width".to_owned(), self.head_width.to_string(), width_by), ("bands".to_owned(), self.bands.clone(), "the band elements the caller founded from the declared rope species and theta".to_owned())], naming_slices })
+        let heads_by = field_among(
+            validation,
+            &["num_attention_heads", "num_key_value_heads"],
+            self.heads,
+        )
+        .ok_or_else(|| unentailed("chronology", "heads", self.heads, validation))?;
+        let width_by = field_among(
+            validation,
+            &["head_dim", "global_head_dim"],
+            self.head_width,
+        )
+        .ok_or_else(|| unentailed("chronology", "head_width", self.head_width, validation))?;
+        Ok(LawEntailment {
+            law: "chronology",
+            parameters: vec![
+                ("heads".to_owned(), self.heads.to_string(), heads_by),
+                (
+                    "head_width".to_owned(),
+                    self.head_width.to_string(),
+                    width_by,
+                ),
+                (
+                    "bands".to_owned(),
+                    self.bands.clone(),
+                    "the band elements the caller founded from the declared rope species and theta"
+                        .to_owned(),
+                ),
+            ],
+            naming_slices,
+        })
     }
 }
 
 impl Contact {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let naming_slices = naming("contact", validation, &["attention_interface", "attn_weights", "softmax", "eager_attention_forward"])?;
-        let heads_by = field_among(validation, &["num_attention_heads"], self.heads).ok_or_else(|| unentailed("contact", "heads", self.heads, validation))?;
-        let kv_by = field_among(validation, &["num_key_value_heads"], self.kv_heads).ok_or_else(|| unentailed("contact", "kv_heads", self.kv_heads, validation))?;
-        let width_by = field_among(validation, &["head_dim", "global_head_dim"], self.head_width).ok_or_else(|| unentailed("contact", "head_width", self.head_width, validation))?;
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let naming_slices = naming(
+            "contact",
+            validation,
+            &[
+                "attention_interface",
+                "attn_weights",
+                "softmax",
+                "eager_attention_forward",
+            ],
+        )?;
+        let heads_by = field_among(validation, &["num_attention_heads"], self.heads)
+            .ok_or_else(|| unentailed("contact", "heads", self.heads, validation))?;
+        let kv_by = field_among(validation, &["num_key_value_heads"], self.kv_heads)
+            .ok_or_else(|| unentailed("contact", "kv_heads", self.kv_heads, validation))?;
+        let width_by = field_among(
+            validation,
+            &["head_dim", "global_head_dim"],
+            self.head_width,
+        )
+        .ok_or_else(|| unentailed("contact", "head_width", self.head_width, validation))?;
         let window_by = match field_named(validation, &["sliding_window"]) {
-            Some((f, v)) if v.trim().parse::<usize>().ok() == Some(self.window) => format!("{f}={v}"),
-            _ => match validation.fields.iter().find(|(_, v)| v == "full_attention") {
-                Some((f, v)) => format!("{f}={v}: no window; the declared context bounds the reach"),
+            Some((f, v)) if v.trim().parse::<usize>().ok() == Some(self.window) => {
+                format!("{f}={v}")
+            }
+            _ => match validation
+                .fields
+                .iter()
+                .find(|(_, v)| v == "full_attention")
+            {
+                Some((f, v)) => {
+                    format!("{f}={v}: no window; the declared context bounds the reach")
+                }
                 None => return Err(unentailed("contact", "window", self.window, validation)),
             },
         };
-        Ok(LawEntailment { law: "contact", parameters: vec![("heads".to_owned(), self.heads.to_string(), heads_by), ("kv_heads".to_owned(), self.kv_heads.to_string(), kv_by), ("head_width".to_owned(), self.head_width.to_string(), width_by), ("window".to_owned(), self.window.to_string(), window_by), ("terms".to_owned(), self.terms.0.to_string(), "a declared series aperture with a certified tail; apparatus, exhibited".to_owned())], naming_slices })
+        Ok(LawEntailment {
+            law: "contact",
+            parameters: vec![
+                ("heads".to_owned(), self.heads.to_string(), heads_by),
+                ("kv_heads".to_owned(), self.kv_heads.to_string(), kv_by),
+                (
+                    "head_width".to_owned(),
+                    self.head_width.to_string(),
+                    width_by,
+                ),
+                ("window".to_owned(), self.window.to_string(), window_by),
+                (
+                    "terms".to_owned(),
+                    self.terms.0.to_string(),
+                    "a declared series aperture with a certified tail; apparatus, exhibited"
+                        .to_owned(),
+                ),
+            ],
+            naming_slices,
+        })
     }
 }
 
 impl GeluTanh {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        let naming_slices = naming("gelu-tanh", validation, &["act_fn", "gelu", "hidden_activation"])?;
-        let activation = field_named(validation, &["hidden_activation"]).filter(|(_, v)| v == "gelu_pytorch_tanh").map(|(f, v)| format!("{f}={v}")).ok_or_else(|| unentailed("gelu-tanh", "activation", "gelu_pytorch_tanh", validation))?;
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        let naming_slices = naming(
+            "gelu-tanh",
+            validation,
+            &["act_fn", "gelu", "hidden_activation"],
+        )?;
+        let activation = field_named(validation, &["hidden_activation"])
+            .filter(|(_, v)| v == "gelu_pytorch_tanh")
+            .map(|(f, v)| format!("{f}={v}"))
+            .ok_or_else(|| {
+                unentailed("gelu-tanh", "activation", "gelu_pytorch_tanh", validation)
+            })?;
         // c2 = RN64(0.044715); c1 = RN64(√(2/π)) checked against a certified Machin enclosure of π
         let c2_target = decimal_to_rat("0.044715").expect("decimal");
         if !is_nearest_binary64(&self.c2, &c2_target) {
-            return Err(unentailed("gelu-tanh", "c2", format!("{}·2^{} is not the binary64 nearest 0.044715", self.c2.significand, self.c2.exponent), validation));
+            return Err(unentailed(
+                "gelu-tanh",
+                "c2",
+                format!(
+                    "{}·2^{} is not the binary64 nearest 0.044715",
+                    self.c2.significand, self.c2.exponent
+                ),
+                validation,
+            ));
         }
-        let (pi_lo, pi_hi) = pi_enclosure(40).ok_or_else(|| unentailed("gelu-tanh", "c1", "π enclosure unavailable", validation))?;
+        let (pi_lo, pi_hi) = pi_enclosure(40)
+            .ok_or_else(|| unentailed("gelu-tanh", "c1", "π enclosure unavailable", validation))?;
         // c1 nearest √(2/π) ⇔ (c1 − u/2)² ≤ 2/π ≤ (c1 + u/2)²; with π ∈ [lo, hi]: 2/hi ≤ 2/π ≤ 2/lo,
         // so require (c1 − u/2)² ≤ 2/hi and 2/lo ≤ (c1 + u/2)² — sufficient, never assumed.
         let c1 = self.c1.value();
@@ -1495,41 +2717,88 @@ impl GeluTanh {
         let two_over_hi = &two / &pi_hi;
         let two_over_lo = &two / &pi_lo;
         if !(&lower * &lower <= two_over_hi && two_over_lo <= &upper * &upper) {
-            return Err(unentailed("gelu-tanh", "c1", format!("{}·2^{} is not the binary64 nearest √(2/π) against the certified π enclosure", self.c1.significand, self.c1.exponent), validation));
+            return Err(unentailed(
+                "gelu-tanh",
+                "c1",
+                format!(
+                    "{}·2^{} is not the binary64 nearest √(2/π) against the certified π enclosure",
+                    self.c1.significand, self.c1.exponent
+                ),
+                validation,
+            ));
         }
         Ok(LawEntailment { law: "gelu-tanh", parameters: vec![("activation".to_owned(), "gelu_pytorch_tanh".to_owned(), activation), ("c1".to_owned(), format!("{}·2^{}", self.c1.significand, self.c1.exponent), "the binary64 nearest √(2/π), against Machin's certified enclosure of π (40 terms)".to_owned()), ("c2".to_owned(), format!("{}·2^{}", self.c2.significand, self.c2.exponent), "the binary64 nearest 0.044715".to_owned()), ("terms".to_owned(), self.terms.0.to_string(), "a declared series aperture with a certified tail; apparatus, exhibited".to_owned())], naming_slices })
     }
 }
 
 impl Hadamard {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let naming_slices = naming("hadamard", validation, &["*"])?;
-        Ok(LawEntailment { law: "hadamard", parameters: Vec::new(), naming_slices })
+        Ok(LawEntailment {
+            law: "hadamard",
+            parameters: Vec::new(),
+            naming_slices,
+        })
     }
 }
 
 impl ReEntry {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        if let Some(descriptions) = native_description_naming(validation, "re-entry", &["re-entry", "reentry", "+"], "the re-entry action in an authenticated native description") {
-            return Ok(LawEntailment { law: "re-entry", parameters: Vec::new(), naming_slices: descriptions? });
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if let Some(descriptions) = native_description_naming(
+            validation,
+            "re-entry",
+            &["re-entry", "reentry", "+"],
+            "the re-entry action in an authenticated native description",
+        ) {
+            return Ok(LawEntailment {
+                law: "re-entry",
+                parameters: Vec::new(),
+                naming_slices: descriptions?,
+            });
         }
         let naming_slices = naming("re-entry", validation, &["+"])?;
-        Ok(LawEntailment { law: "re-entry", parameters: Vec::new(), naming_slices })
+        Ok(LawEntailment {
+            law: "re-entry",
+            parameters: Vec::new(),
+            naming_slices,
+        })
     }
 }
 
 impl Scale {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         let slices = slices_of(validation);
         // (i) a power of a declared field: `hidden_size**-0.5` with hidden_size = v → by² ∋ 1/v
         for (field, value) in &validation.fields {
             if let Ok(v) = value.trim().parse::<u64>() {
                 if slices.iter().any(|s| s.contains("**-0.5")) {
                     let target = Rat::new(BigInt::from(1), BigInt::from(v));
-                    let lo = Rat::from_integer(BigInt::from(self.by.lo)) * pow2(-(self.by.grain as i32));
-                    let hi = Rat::from_integer(BigInt::from(self.by.hi)) * pow2(-(self.by.grain as i32));
+                    let lo =
+                        Rat::from_integer(BigInt::from(self.by.lo)) * pow2(-(self.by.grain as i32));
+                    let hi =
+                        Rat::from_integer(BigInt::from(self.by.hi)) * pow2(-(self.by.grain as i32));
                     if &lo * &lo <= target && target <= &hi * &hi {
-                        return Ok(LawEntailment { law: "scale", parameters: vec![("by".to_owned(), format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain), format!("{field}={value}: the enclosure's square encloses 1/{v}"))], naming_slices: slices.into_iter().filter(|s| s.contains("**-0.5")).collect() });
+                        return Ok(LawEntailment {
+                            law: "scale",
+                            parameters: vec![(
+                                "by".to_owned(),
+                                format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain),
+                                format!("{field}={value}: the enclosure's square encloses 1/{v}"),
+                            )],
+                            naming_slices: slices
+                                .into_iter()
+                                .filter(|s| s.contains("**-0.5"))
+                                .collect(),
+                        });
                     }
                 }
             }
@@ -1540,45 +2809,128 @@ impl Scale {
             let lo = Rat::from_integer(BigInt::from(self.by.lo)) * pow2(-(self.by.grain as i32));
             let hi = Rat::from_integer(BigInt::from(self.by.hi)) * pow2(-(self.by.grain as i32));
             if &lo * &lo <= target && target <= &hi * &hi {
-                return Ok(LawEntailment { law: "scale", parameters: vec![("by".to_owned(), format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain), "2.0**-0.5 in a resolved slice: the enclosure's square encloses 1/2".to_owned())], naming_slices: slices.into_iter().filter(|s| s.contains("2.0**-0.5")).collect() });
+                return Ok(LawEntailment {
+                    law: "scale",
+                    parameters: vec![(
+                        "by".to_owned(),
+                        format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain),
+                        "2.0**-0.5 in a resolved slice: the enclosure's square encloses 1/2"
+                            .to_owned(),
+                    )],
+                    naming_slices: slices
+                        .into_iter()
+                        .filter(|s| s.contains("2.0**-0.5"))
+                        .collect(),
+                });
             }
         }
         // (iii) a numeric literal the slice multiplies by: `y = x * 2`, `* 30.0` — the enclosure encloses it
         for slice in &slices {
-            for token in slice.split(|c: char| c.is_whitespace() || c == '(' || c == ')' || c == ',').filter(|t| !t.is_empty()) {
+            for token in slice
+                .split(|c: char| c.is_whitespace() || c == '(' || c == ')' || c == ',')
+                .filter(|t| !t.is_empty())
+            {
                 if let Some(literal) = decimal_to_rat(token) {
                     if slice.contains('*') && encloses(&self.by, &literal) {
-                        return Ok(LawEntailment { law: "scale", parameters: vec![("by".to_owned(), format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain), format!("the literal {token} in a resolved slice, enclosed"))], naming_slices: vec![slice.clone()] });
+                        return Ok(LawEntailment {
+                            law: "scale",
+                            parameters: vec![(
+                                "by".to_owned(),
+                                format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain),
+                                format!("the literal {token} in a resolved slice, enclosed"),
+                            )],
+                            naming_slices: vec![slice.clone()],
+                        });
                     }
                 }
             }
         }
         // (iv) a stored scalar population named in the testimony: the point enclosure is that codeword
-        if let Some((population, shape)) = validation.shapes.iter().find(|(_, s)| s.is_empty() || *s == vec![1]) {
+        if let Some((population, shape)) = validation
+            .shapes
+            .iter()
+            .find(|(_, s)| s.is_empty() || *s == vec![1])
+        {
             let attribute = attribute_of(population).to_owned();
             if slices.iter().any(|s| s.contains(&attribute)) && self.by.lo == self.by.hi {
-                return Ok(LawEntailment { law: "scale", parameters: vec![("by".to_owned(), format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain), format!("{population} declared shape {shape:?}: the stored scalar's exact codeword, read at mount"))], naming_slices: slices.into_iter().filter(|s| s.contains(&attribute)).collect() });
+                return Ok(LawEntailment {
+                    law: "scale",
+                    parameters: vec![(
+                        "by".to_owned(),
+                        format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain),
+                        format!(
+                            "{population} declared shape {shape:?}: the stored scalar's exact codeword, read at mount"
+                        ),
+                    )],
+                    naming_slices: slices
+                        .into_iter()
+                        .filter(|s| s.contains(&attribute))
+                        .collect(),
+                });
             }
         }
-        Err(unentailed("scale", "by", format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain), validation))
+        Err(unentailed(
+            "scale",
+            "by",
+            format!("[{}, {}]·2^-{}", self.by.lo, self.by.hi, self.by.grain),
+            validation,
+        ))
     }
 }
 
 impl WithdrawColumns {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         if validation.interventions.is_empty() {
-            return Err(unentailed("withdraw-columns", "intervention", format!("{}..{}", self.from, self.from + self.span), validation));
+            return Err(unentailed(
+                "withdraw-columns",
+                "intervention",
+                format!("{}..{}", self.from, self.from + self.span),
+                validation,
+            ));
         }
-        Ok(LawEntailment { law: "withdraw-columns", parameters: vec![("span".to_owned(), format!("{}..{}", self.from, self.from + self.span), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+        Ok(LawEntailment {
+            law: "withdraw-columns",
+            parameters: vec![(
+                "span".to_owned(),
+                format!("{}..{}", self.from, self.from + self.span),
+                format!(
+                    "the caller's typed intervention: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
     }
 }
 
 impl CollapseControl {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
         if validation.interventions.is_empty() {
-            return Err(unentailed("collapse-control", "intervention", "collapse", validation));
+            return Err(unentailed(
+                "collapse-control",
+                "intervention",
+                "collapse",
+                validation,
+            ));
         }
-        Ok(LawEntailment { law: "collapse-control", parameters: vec![("control".to_owned(), "midpoint collapse".to_owned(), format!("the caller's typed intervention: {}", validation.interventions.join(" | ")))], naming_slices: Vec::new() })
+        Ok(LawEntailment {
+            law: "collapse-control",
+            parameters: vec![(
+                "control".to_owned(),
+                "midpoint collapse".to_owned(),
+                format!(
+                    "the caller's typed intervention: {}",
+                    validation.interventions.join(" | ")
+                ),
+            )],
+            naming_slices: Vec::new(),
+        })
     }
 }
 
@@ -1588,24 +2940,55 @@ mod tests {
     use crate::ported_operation::OperationSpecies;
     use crate::source_occurrence::ResolvedSymbol;
 
-    fn validation(slices: &[&str], fields: &[(&str, &str)], shapes: &[(&str, &[usize])]) -> BindingValidation {
+    fn validation(
+        slices: &[&str],
+        fields: &[(&str, &str)],
+        shapes: &[(&str, &[usize])],
+    ) -> BindingValidation {
         BindingValidation {
             operation: "op".to_owned(),
             species: OperationSpecies::Transport,
-            symbols: slices.iter().map(|s| ResolvedSymbol { symbol: format!("X.y ({s})"), path: vec!["X".into(), "y".into()], slice: Some((*s).to_owned()), line: 1 }).collect(),
-            fields: fields.iter().map(|(f, v)| ((*f).to_owned(), (*v).to_owned())).collect(),
-            shapes: shapes.iter().map(|(p, s)| ((*p).to_owned(), s.to_vec())).collect(),
+            symbols: slices
+                .iter()
+                .map(|s| ResolvedSymbol {
+                    symbol: format!("X.y ({s})"),
+                    path: vec!["X".into(), "y".into()],
+                    slice: Some((*s).to_owned()),
+                    line: 1,
+                })
+                .collect(),
+            fields: fields
+                .iter()
+                .map(|(f, v)| ((*f).to_owned(), (*v).to_owned()))
+                .collect(),
+            shapes: shapes
+                .iter()
+                .map(|(p, s)| ((*p).to_owned(), s.to_vec()))
+                .collect(),
             interventions: Vec::new(),
             descriptions: Vec::new(),
+            exact_owner_licenses: Vec::new(),
         }
     }
 
     #[test]
     fn decimals_become_exact_rationals() {
-        assert_eq!(decimal_to_rat("1e-06"), Some(Rat::new(BigInt::from(1), BigInt::from(1_000_000))));
-        assert_eq!(decimal_to_rat("0.044715"), Some(Rat::new(BigInt::from(44715), BigInt::from(1_000_000))));
-        assert_eq!(decimal_to_rat("30.0"), Some(Rat::from_integer(BigInt::from(30))));
-        assert_eq!(decimal_to_rat("2560"), Some(Rat::from_integer(BigInt::from(2560))));
+        assert_eq!(
+            decimal_to_rat("1e-06"),
+            Some(Rat::new(BigInt::from(1), BigInt::from(1_000_000)))
+        );
+        assert_eq!(
+            decimal_to_rat("0.044715"),
+            Some(Rat::new(BigInt::from(44715), BigInt::from(1_000_000)))
+        );
+        assert_eq!(
+            decimal_to_rat("30.0"),
+            Some(Rat::from_integer(BigInt::from(30)))
+        );
+        assert_eq!(
+            decimal_to_rat("2560"),
+            Some(Rat::from_integer(BigInt::from(2560)))
+        );
         assert_eq!(decimal_to_rat("x"), None);
     }
 
@@ -1613,46 +2996,112 @@ mod tests {
     fn the_source_constants_are_entailed_exactly_and_a_drifted_one_is_not() {
         let eps = Dyadic::of_binary64_bits(0x3eb0c6f7a0b5ed8d).expect("eps");
         assert!(is_nearest_binary64(&eps, &decimal_to_rat("1e-06").unwrap()));
-        assert!(!is_nearest_binary64(&eps, &decimal_to_rat("1e-05").unwrap()));
+        assert!(!is_nearest_binary64(
+            &eps,
+            &decimal_to_rat("1e-05").unwrap()
+        ));
         let c2 = Dyadic::of_binary64_bits(0x3fa6e4e26d4801f7).expect("c2");
-        assert!(is_nearest_binary64(&c2, &decimal_to_rat("0.044715").unwrap()));
-        let drifted = Dyadic { significand: c2.significand + 1, exponent: c2.exponent };
-        assert!(!is_nearest_binary64(&drifted, &decimal_to_rat("0.044715").unwrap()));
+        assert!(is_nearest_binary64(
+            &c2,
+            &decimal_to_rat("0.044715").unwrap()
+        ));
+        let drifted = Dyadic {
+            significand: c2.significand + 1,
+            exponent: c2.exponent,
+        };
+        assert!(!is_nearest_binary64(
+            &drifted,
+            &decimal_to_rat("0.044715").unwrap()
+        ));
         let (lo, hi) = pi_enclosure(40).expect("pi");
         assert!(lo < hi);
-        assert!(lo > decimal_to_rat("3.14159265358979").unwrap() && hi < decimal_to_rat("3.1415926535898").unwrap());
+        assert!(
+            lo > decimal_to_rat("3.14159265358979").unwrap()
+                && hi < decimal_to_rat("3.1415926535898").unwrap()
+        );
     }
 
     #[test]
     fn the_tiled_law_is_entailed_by_the_same_testimony_and_names_the_tile_as_apparatus() {
         let population = "model.language_model.layers.0.self_attn.q_proj.weight".to_owned();
-        let tile = TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 1 };
-        let tiled = ContractTiled { population: population.clone(), tile, admitted_node_octaves: 126, tree: LaneTree::Descending };
-        let scalar = Contract { population: population.clone() };
-        let related = validation(&["query_states = self.q_proj(hidden_states).view(hidden_shape)"], &[], &[(&population, &[2048, 2560])]);
+        let tile = TileGeometry {
+            tile_rows: 1,
+            lanes: 32,
+            outs_per_block: 4,
+            k_tile: 256,
+            splits: 1,
+        };
+        let tiled = ContractTiled {
+            population: population.clone(),
+            tile,
+            admitted_node_octaves: 126,
+            tree: LaneTree::Descending,
+        };
+        let scalar = Contract {
+            population: population.clone(),
+        };
+        let related = validation(
+            &["query_states = self.q_proj(hidden_states).view(hidden_shape)"],
+            &[],
+            &[(&population, &[2048, 2560])],
+        );
         // the SAME testimony entails both, and the tiled law adds only apparatus rows
         let scalar_entailed = scalar.entailment(&related).expect("scalar entailed");
         let tiled_entailed = tiled.entailment(&related).expect("tiled entailed");
         assert_eq!(scalar_entailed.naming_slices, tiled_entailed.naming_slices);
         assert_eq!(tiled_entailed.parameters[0], scalar_entailed.parameters[0]);
-        assert_eq!(tiled_entailed.parameters.len(), scalar_entailed.parameters.len() + 3);
-        assert!(tiled_entailed.parameters.iter().any(|(name, _, by)| name == "tile" && by.contains("APPARATUS")));
-        assert!(tiled_entailed.parameters.iter().any(|(name, _, _)| name == "tree"));
+        assert_eq!(
+            tiled_entailed.parameters.len(),
+            scalar_entailed.parameters.len() + 3
+        );
+        assert!(
+            tiled_entailed
+                .parameters
+                .iter()
+                .any(|(name, _, by)| name == "tile" && by.contains("APPARATUS"))
+        );
+        assert!(
+            tiled_entailed
+                .parameters
+                .iter()
+                .any(|(name, _, _)| name == "tree")
+        );
         // and a slice that names a different population entails neither
-        let unrelated = validation(&["key_states = self.k_proj(hidden_states).view(hidden_shape)"], &[], &[(&population, &[2048, 2560])]);
-        assert!(matches!(scalar.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
-        assert!(matches!(tiled.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
+        let unrelated = validation(
+            &["key_states = self.k_proj(hidden_states).view(hidden_shape)"],
+            &[],
+            &[(&population, &[2048, 2560])],
+        );
+        assert!(matches!(
+            scalar.entailment(&unrelated),
+            Err(EntailmentRefusal::SliceDoesNotEntail { .. })
+        ));
+        assert!(matches!(
+            tiled.entailment(&unrelated),
+            Err(EntailmentRefusal::SliceDoesNotEntail { .. })
+        ));
         // the split-K law carries the partition factor and the partial standing as apparatus too
         let standing_free = ContractSplitK {
             population: population.clone(),
-            tile: TileGeometry { tile_rows: 1, lanes: 32, outs_per_block: 4, k_tile: 256, splits: 8 },
+            tile: TileGeometry {
+                tile_rows: 1,
+                lanes: 32,
+                outs_per_block: 4,
+                k_tile: 256,
+                splits: 8,
+            },
             partials: PartialStanding::declared(1, 2048, 8),
             admitted_node_octaves: 126,
             tree: LaneTree::Descending,
         };
         let split_entailed = standing_free.entailment(&related).expect("split entailed");
         assert_eq!(split_entailed.law, "contract-split-k");
-        assert!(split_entailed.parameters.iter().any(|(name, value, _)| name == "partials" && value.contains('8')));
+        assert!(
+            split_entailed
+                .parameters
+                .iter()
+                .any(|(name, value, _)| name == "partials" && value.contains('8'))
+        );
         // the laws are the same species and the same arity as the scalar owner
         assert_eq!(tiled.species(), scalar.species());
         assert_eq!(tiled.arity(), scalar.arity());
@@ -1662,56 +3111,182 @@ mod tests {
     #[test]
     fn an_unrelated_slice_does_not_authenticate_and_a_related_one_does() {
         // q_proj's slice offered for the k_proj contraction refuses; its own slice entails
-        let k = Contract { population: "model.language_model.layers.0.self_attn.k_proj.weight".to_owned() };
-        let unrelated = validation(&["query_states = self.q_proj(hidden_states).view(hidden_shape)"], &[], &[("model.language_model.layers.0.self_attn.k_proj.weight", &[512, 2560])]);
-        assert!(matches!(k.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
-        let related = validation(&["key_states = self.k_proj(hidden_states).view(hidden_shape)"], &[], &[("model.language_model.layers.0.self_attn.k_proj.weight", &[512, 2560])]);
+        let k = Contract {
+            population: "model.language_model.layers.0.self_attn.k_proj.weight".to_owned(),
+        };
+        let unrelated = validation(
+            &["query_states = self.q_proj(hidden_states).view(hidden_shape)"],
+            &[],
+            &[(
+                "model.language_model.layers.0.self_attn.k_proj.weight",
+                &[512, 2560],
+            )],
+        );
+        assert!(matches!(
+            k.entailment(&unrelated),
+            Err(EntailmentRefusal::SliceDoesNotEntail { .. })
+        ));
+        let related = validation(
+            &["key_states = self.k_proj(hidden_states).view(hidden_shape)"],
+            &[],
+            &[(
+                "model.language_model.layers.0.self_attn.k_proj.weight",
+                &[512, 2560],
+            )],
+        );
         assert!(k.entailment(&related).is_ok());
         // the rms rebase: eps, gain shape and the law's own slice
         let eps = Dyadic::of_binary64_bits(0x3eb0c6f7a0b5ed8d).expect("eps");
-        let rebase = RmsRebase { group: 2560, gain: Some("model.language_model.layers.0.input_layernorm.weight".to_owned()), eps };
-        let ok = validation(&["hidden_states = self.input_layernorm(hidden_states)", "mean_squared = hidden_states.pow(2).mean(-1, keepdim=True) + self.eps"], &[("rms_norm_eps", "1e-06")], &[("model.language_model.layers.0.input_layernorm.weight", &[2560])]);
+        let rebase = RmsRebase {
+            group: 2560,
+            gain: Some("model.language_model.layers.0.input_layernorm.weight".to_owned()),
+            eps,
+        };
+        let ok = validation(
+            &[
+                "hidden_states = self.input_layernorm(hidden_states)",
+                "mean_squared = hidden_states.pow(2).mean(-1, keepdim=True) + self.eps",
+            ],
+            &[("rms_norm_eps", "1e-06")],
+            &[(
+                "model.language_model.layers.0.input_layernorm.weight",
+                &[2560],
+            )],
+        );
         let entailed = rebase.entailment(&ok).expect("entailed");
         assert_eq!(entailed.parameters.len(), 3);
-        let wrong_group = RmsRebase { group: 256, gain: Some("model.language_model.layers.0.input_layernorm.weight".to_owned()), eps };
-        assert!(matches!(wrong_group.entailment(&ok), Err(EntailmentRefusal::ParameterUnentailed { parameter: "group", .. })));
-        let wrong_eps = validation(&["hidden_states = self.input_layernorm(hidden_states)", "mean_squared = hidden_states.pow(2).mean(-1, keepdim=True) + self.eps"], &[("rms_norm_eps", "1e-05")], &[("model.language_model.layers.0.input_layernorm.weight", &[2560])]);
-        assert!(matches!(rebase.entailment(&wrong_eps), Err(EntailmentRefusal::ParameterUnentailed { parameter: "eps", .. })));
+        let wrong_group = RmsRebase {
+            group: 256,
+            gain: Some("model.language_model.layers.0.input_layernorm.weight".to_owned()),
+            eps,
+        };
+        assert!(matches!(
+            wrong_group.entailment(&ok),
+            Err(EntailmentRefusal::ParameterUnentailed {
+                parameter: "group",
+                ..
+            })
+        ));
+        let wrong_eps = validation(
+            &[
+                "hidden_states = self.input_layernorm(hidden_states)",
+                "mean_squared = hidden_states.pow(2).mean(-1, keepdim=True) + self.eps",
+            ],
+            &[("rms_norm_eps", "1e-05")],
+            &[(
+                "model.language_model.layers.0.input_layernorm.weight",
+                &[2560],
+            )],
+        );
+        assert!(matches!(
+            rebase.entailment(&wrong_eps),
+            Err(EntailmentRefusal::ParameterUnentailed {
+                parameter: "eps",
+                ..
+            })
+        ));
         // enter: the scale is the bfloat16 nearest √hidden_size
-        let enter = Enter { population: "rows".to_owned(), scale: Dyadic { significand: 101, exponent: -1 } };
-        let ok = validation(&["return super().forward(input_ids) * self.embed_scale.to(self.weight.dtype)"], &[("hidden_size", "2560")], &[]);
+        let enter = Enter {
+            population: "rows".to_owned(),
+            scale: Dyadic {
+                significand: 101,
+                exponent: -1,
+            },
+        };
+        let ok = validation(
+            &["return super().forward(input_ids) * self.embed_scale.to(self.weight.dtype)"],
+            &[("hidden_size", "2560")],
+            &[],
+        );
         assert!(enter.entailment(&ok).is_ok());
-        let other = validation(&["return super().forward(input_ids) * self.embed_scale.to(self.weight.dtype)"], &[("hidden_size", "2048")], &[]);
-        assert!(matches!(enter.entailment(&other), Err(EntailmentRefusal::ParameterUnentailed { parameter: "scale", .. })));
-        let ple = Enter { population: "rows".to_owned(), scale: Dyadic { significand: 16, exponent: 0 } };
-        assert!(ple.entailment(&validation(&["return self.embed_tokens_per_layer(input_ids)"], &[("hidden_size_per_layer_input", "256")], &[])).is_ok());
+        let other = validation(
+            &["return super().forward(input_ids) * self.embed_scale.to(self.weight.dtype)"],
+            &[("hidden_size", "2048")],
+            &[],
+        );
+        assert!(matches!(
+            enter.entailment(&other),
+            Err(EntailmentRefusal::ParameterUnentailed {
+                parameter: "scale",
+                ..
+            })
+        ));
+        let ple = Enter {
+            population: "rows".to_owned(),
+            scale: Dyadic {
+                significand: 16,
+                exponent: 0,
+            },
+        };
+        assert!(
+            ple.entailment(&validation(
+                &["return self.embed_tokens_per_layer(input_ids)"],
+                &[("hidden_size_per_layer_input", "256")],
+                &[]
+            ))
+            .is_ok()
+        );
         // gelu: the two constants against the declared decimal and the certified pi
-        let gelu = GeluTanh { c1: Dyadic::of_binary64_bits(0x3fe9884533d43651).unwrap(), c2: Dyadic::of_binary64_bits(0x3fa6e4e26d4801f7).unwrap(), terms: SeriesAperture(14) };
-        assert!(gelu.entailment(&validation(&["hidden_states = self.act_fn(hidden_states)"], &[("hidden_activation", "gelu_pytorch_tanh")], &[])).is_ok());
+        let gelu = GeluTanh {
+            c1: Dyadic::of_binary64_bits(0x3fe9884533d43651).unwrap(),
+            c2: Dyadic::of_binary64_bits(0x3fa6e4e26d4801f7).unwrap(),
+            terms: SeriesAperture(14),
+        };
+        assert!(
+            gelu.entailment(&validation(
+                &["hidden_states = self.act_fn(hidden_states)"],
+                &[("hidden_activation", "gelu_pytorch_tanh")],
+                &[]
+            ))
+            .is_ok()
+        );
     }
 
     #[test]
-    fn authenticated_native_descriptions_entail_the_basic_laws_without_authenticating_foreign_text() {
+    fn authenticated_native_descriptions_entail_the_basic_laws_without_authenticating_foreign_text()
+    {
         let mut native = validation(&[], &[], &[("layer.q_proj.weight", &[2, 2])]);
         native.descriptions = vec!["q_proj: contract the continuing standing".to_owned()];
-        let contract = Contract { population: "layer.q_proj.weight".to_owned() };
+        let contract = Contract {
+            population: "layer.q_proj.weight".to_owned(),
+        };
         assert!(contract.entailment(&native).is_ok());
         let missing_shape = validation(&[], &[], &[]);
         let mut missing_shape = missing_shape;
         missing_shape.descriptions = native.descriptions.clone();
-        assert!(matches!(contract.entailment(&missing_shape), Err(EntailmentRefusal::ParameterUnentailed { parameter: "population shape", .. })));
+        assert!(matches!(
+            contract.entailment(&missing_shape),
+            Err(EntailmentRefusal::ParameterUnentailed {
+                parameter: "population shape",
+                ..
+            })
+        ));
 
         let mut standing = validation(&[], &[], &[]);
         standing.descriptions = vec!["standing: carry the retained section".to_owned()];
-        assert!(Standing { name: "retained".to_owned() }.entailment(&standing).is_ok());
+        assert!(
+            Standing {
+                name: "retained".to_owned()
+            }
+            .entailment(&standing)
+            .is_ok()
+        );
         let mut re_entry = validation(&[], &[], &[]);
-        re_entry.descriptions = vec!["re-entry: retained standing plus returned current".to_owned()];
+        re_entry.descriptions =
+            vec!["re-entry: retained standing plus returned current".to_owned()];
         assert!(ReEntry.entailment(&re_entry).is_ok());
 
         let mut unrelated = native;
         unrelated.descriptions = vec!["a different law with no q projection action".to_owned()];
-        assert!(matches!(contract.entailment(&unrelated), Err(EntailmentRefusal::SliceDoesNotEntail { .. })));
-        let mut foreign = validation(&["query_states = self.q_proj(hidden_states)"], &[], &[("layer.q_proj.weight", &[2, 2])]);
+        assert!(matches!(
+            contract.entailment(&unrelated),
+            Err(EntailmentRefusal::SliceDoesNotEntail { .. })
+        ));
+        let mut foreign = validation(
+            &["query_states = self.q_proj(hidden_states)"],
+            &[],
+            &[("layer.q_proj.weight", &[2, 2])],
+        );
         // Foreign witnesses do not authenticate AuthoritativeDescription, so the field is empty
         // and the ordinary source slice remains the only route.
         assert!(foreign.descriptions.is_empty());
@@ -1721,11 +3296,46 @@ mod tests {
 }
 
 impl Standing {
-    pub fn entail(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
-        if let Some(descriptions) = native_description_naming(validation, "standing", &["standing"], "the standing action in an authenticated native description") {
-            return Ok(LawEntailment { law: "standing", parameters: vec![("name".to_owned(), self.name.clone(), "the resident standing an earlier passage released under this name".to_owned())], naming_slices: descriptions? });
+    pub fn entail(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if let Some(descriptions) = native_description_naming(
+            validation,
+            "standing",
+            &["standing"],
+            "the standing action in an authenticated native description",
+        ) {
+            return Ok(LawEntailment {
+                law: "standing",
+                parameters: vec![(
+                    "name".to_owned(),
+                    self.name.clone(),
+                    "the resident standing an earlier passage released under this name".to_owned(),
+                )],
+                naming_slices: descriptions?,
+            });
         }
-        let naming_slices = naming("standing", validation, &["decoder_layer(", "shared_kv_states", "hidden_states", "inputs_embeds", "pooler_output", "last_hidden_state"])?;
-        Ok(LawEntailment { law: "standing", parameters: vec![("name".to_owned(), self.name.clone(), "the resident standing an earlier passage released under this name".to_owned())], naming_slices })
+        let naming_slices = naming(
+            "standing",
+            validation,
+            &[
+                "decoder_layer(",
+                "shared_kv_states",
+                "hidden_states",
+                "inputs_embeds",
+                "pooler_output",
+                "last_hidden_state",
+            ],
+        )?;
+        Ok(LawEntailment {
+            law: "standing",
+            parameters: vec![(
+                "name".to_owned(),
+                self.name.clone(),
+                "the resident standing an earlier passage released under this name".to_owned(),
+            )],
+            naming_slices,
+        })
     }
 }

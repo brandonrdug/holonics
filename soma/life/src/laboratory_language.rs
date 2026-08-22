@@ -10,8 +10,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::CpuExecutionReceipt;
 use holonic_engine::traversible_chain::CountedCrossing;
+use holonic_engine::CpuExecutionReceipt;
 
 /// The in-flight reading. **A phase that has not finished still has something to say.**
 ///

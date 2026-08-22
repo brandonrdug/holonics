@@ -74,8 +74,7 @@ use holonic_engine::receiver_exact_compression::{
 /// Term-position surfaces that are not mathematical objects. Stripped, and the
 /// count of what was stripped is returned rather than assumed.
 const NOT_AN_OBJECT: [&str; 12] = [
-    "_", "simp", "only", "rw", "rfl", "exact", "apply", "intro", "have", "refine", "obtain",
-    "at",
+    "_", "simp", "only", "rw", "rfl", "exact", "apply", "intro", "have", "refine", "obtain", "at",
 ];
 
 /// The declared axes. Each reads one banded coordinate; none reads a namespace,
@@ -138,7 +137,12 @@ fn read_material(roots: &[&str]) -> (Vec<Declaration>, u64, u64) {
                     let reading =
                         read_development(&text, DeclarationGrain::EveryTopLevelDeclaration);
                     for form in &reading.declarations {
-                        declarations.push(declaration_of(form, &not_an_object, &mut stripped, &mut kept));
+                        declarations.push(declaration_of(
+                            form,
+                            &not_an_object,
+                            &mut stripped,
+                            &mut kept,
+                        ));
                     }
                 }
             }
@@ -239,7 +243,9 @@ impl MaterialField {
     fn face(&self, at: usize) -> u64 {
         let mut face = 0u64;
         for axis in &self.axes {
-            face = face.wrapping_mul(64).wrapping_add(self.coordinate(at, *axis));
+            face = face
+                .wrapping_mul(64)
+                .wrapping_add(self.coordinate(at, *axis));
         }
         face
     }
@@ -381,7 +387,10 @@ fn main() {
 
     let roots = ["soma/formal"];
     let (declarations, stripped, kept) = read_material(&roots);
-    println!("  material          {} declarations under {roots:?}", declarations.len());
+    println!(
+        "  material          {} declarations under {roots:?}",
+        declarations.len()
+    );
     println!(
         "  term position     {kept} surfaces kept, {stripped} stripped as not-an-object and counted"
     );
@@ -410,7 +419,9 @@ fn main() {
         })
         .collect();
     let field = MaterialField::found(declarations, Axis::DECLARED.to_vec());
-    let banded: BTreeSet<u64> = (0..field.declarations.len()).map(|at| field.face(at)).collect();
+    let banded: BTreeSet<u64> = (0..field.declarations.len())
+        .map(|at| field.face(at))
+        .collect();
     println!(
         "  raw coordinates give {} distinct faces over {} items; banded gives {}",
         raw.len(),
@@ -450,7 +461,10 @@ fn main() {
         "  distinguishing-word lengths, material {:?}",
         observed.word_lengths
     );
-    println!("  distinguishing-word lengths, null     {:?}", null.word_lengths);
+    println!(
+        "  distinguishing-word lengths, null     {:?}",
+        null.word_lengths
+    );
 
     // ---------------------------------------------------------------------------------
     // The per-axis witness: withhold each axis and require the reading to move.
@@ -491,7 +505,11 @@ fn main() {
             observed.conduct,
             reading.collapsed,
             observed.collapsed,
-            if moved { "earns its place" } else { "CARRIES NOTHING" }
+            if moved {
+                "earns its place"
+            } else {
+                "CARRIES NOTHING"
+            }
         );
     }
 
@@ -499,8 +517,14 @@ fn main() {
     println!("{}", "=".repeat(112));
     println!("WHAT RETURNED");
     println!("{}", "=".repeat(112));
-    println!("  conduct refined the one-shot reading            {}", observed.rounds >= 1);
-    println!("  the strata are not all singletons               {}", observed.singletons < observed.conduct);
+    println!(
+        "  conduct refined the one-shot reading            {}",
+        observed.rounds >= 1
+    );
+    println!(
+        "  the strata are not all singletons               {}",
+        observed.singletons < observed.conduct
+    );
     println!("  the reading beats the degree-preserving null    {separates_beyond_degree}");
     println!("  every declared axis earns its place             {every_axis_earns_its_place}");
 
@@ -508,9 +532,15 @@ fn main() {
     println!("{}", "-".repeat(112));
     println!("WHAT THIS RUN DOES NOT ESTABLISH");
     println!("{}", "-".repeat(112));
-    println!("  No namespace, no former and no line entered any axis, so no stratum is the preimage");
-    println!("  of a directory tree or a keyword. That is a bar cleared, not a result. Nothing here");
-    println!("  claims the strata are meaningful -- only that they are the material's own response");
+    println!(
+        "  No namespace, no former and no line entered any axis, so no stratum is the preimage"
+    );
+    println!(
+        "  of a directory tree or a keyword. That is a bar cleared, not a result. Nothing here"
+    );
+    println!(
+        "  claims the strata are meaningful -- only that they are the material's own response"
+    );
     println!("  to a declared field, and that a degree-matched null does not reproduce them.");
     println!("{}", "=".repeat(112));
 }

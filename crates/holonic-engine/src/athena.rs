@@ -83,7 +83,7 @@ use num_traits::Zero;
 use relational_geometry::Rat;
 use thiserror::Error;
 
-use crate::exact_value::ieee754::{round_into_bfloat16, BinaryFloatSpecies};
+use crate::exact_value::ieee754::{BinaryFloatSpecies, round_into_bfloat16};
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum AthenaError {

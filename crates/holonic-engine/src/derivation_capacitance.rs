@@ -172,8 +172,8 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use thiserror::Error;
 
-use crate::approach_front::ApproachFront;
 use crate::algebraic::CausalCellId;
+use crate::approach_front::ApproachFront;
 use crate::derivation_atlas::{
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, statement_vertex_key,
 };

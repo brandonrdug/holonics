@@ -82,9 +82,9 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::{
+    InverseTransportError,
     inverse_transport::{AffineObstruction, ExactAffineVersionFiber},
     rational_polynomial::RationalPolynomial,
-    InverseTransportError,
 };
 
 /// `R(x) e^{g(x)}`, with `R = numerator / denominator`.
@@ -318,12 +318,11 @@ fn grade_recognition(recognised: Recognition, reading: &ElementaryReading) -> Re
                 RecognitionOutcome::Contradicted
             }
         }
-        (
-            Recognition::CandidateAtDegree(degree),
-            ElementaryReading::SystemInconsistent { .. },
-        ) => RecognitionOutcome::OpenedAndRefused {
-            predicted_degree: degree,
-        },
+        (Recognition::CandidateAtDegree(degree), ElementaryReading::SystemInconsistent { .. }) => {
+            RecognitionOutcome::OpenedAndRefused {
+                predicted_degree: degree,
+            }
+        }
         _ => RecognitionOutcome::Contradicted,
     }
 }
@@ -523,7 +522,8 @@ mod tests {
             polynomial(&[0, 2]),
             polynomial(&[0, 0, 1]),
         );
-        let reading = read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
+        let reading =
+            read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
         assert_eq!(reading.recognised, Recognition::CandidateAtDegree(0));
         assert!(reading.reading.is_elementary());
         assert!(reading.returns_under_differentiation);
@@ -541,7 +541,8 @@ mod tests {
             polynomial(&[0, 1]),
             polynomial(&[0, 0, 1]),
         );
-        let reading = read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
+        let reading =
+            read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
         let ElementaryReading::Admits { realizer, .. } = &reading.reading else {
             panic!("the reading admitted");
         };
@@ -554,7 +555,8 @@ mod tests {
         // ∫ e^{−x²} dx. The constant monomial demands 0 = 1.
         let integrand =
             ExponentialIntegrand::polynomial_coefficient(polynomial(&[1]), polynomial(&[0, 0, -1]));
-        let reading = read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
+        let reading =
+            read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
         assert_eq!(reading.recognised, Recognition::RealizerDegreeNegative);
         assert!(!reading.reading.is_elementary());
         let ElementaryReading::SystemInconsistent { obstruction } = &reading.reading else {
@@ -572,7 +574,8 @@ mod tests {
             polynomial(&[1, 1]),
             polynomial(&[0, 0, 1]),
         );
-        let reading = read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
+        let reading =
+            read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
         assert!(!reading.reading.is_elementary());
         let ElementaryReading::SystemInconsistent { obstruction } = &reading.reading else {
             panic!("the system was inconsistent");
@@ -588,7 +591,8 @@ mod tests {
             polynomial(&[0, 1]),
             polynomial(&[0, 1]),
         );
-        let reading = read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
+        let reading =
+            read_elementary_chart(&integrand).expect("the fixture is inside the aperture");
         assert_eq!(reading.recognised, Recognition::PoleObstructed);
         assert!(matches!(
             reading.reading,
@@ -666,7 +670,10 @@ mod tests {
                 RecognitionOutcome::Contradicted => panic!("the recognition law is wrong"),
             }
         }
-        assert!(decisive > 0, "no refusal was settled by the signature alone");
+        assert!(
+            decisive > 0,
+            "no refusal was settled by the signature alone"
+        );
         assert!(opened_and_found > 0, "no admission was located and found");
         assert!(
             opened_and_refused > 0,

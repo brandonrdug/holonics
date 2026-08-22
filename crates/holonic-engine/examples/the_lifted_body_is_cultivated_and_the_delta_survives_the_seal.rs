@@ -40,17 +40,17 @@ use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_linear::{ExactRatMatrix, RebaseReceipt};
-use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::exact_value::AlgebraicRoot;
+use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::foreign_map::manifest_safetensors;
-use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
-};
 use holonic_engine::ported_reference::PortedOperationKind;
+use holonic_engine::receiver_exact_compression::{
+    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
-use site::{digest_of, found, write_container, BASE, CAUSED};
+use site::{BASE, CAUSED, digest_of, found, write_container};
 
 /// The population cultivated. A rebase gain is the smallest thing in this site whose transport is
 /// diagonal at fixed material, so the adjoint and the exact solve are both readable.
@@ -82,23 +82,37 @@ fn main() {
     };
     println!("PHOENIX STATION ELEVEN — THE LIFTED BODY IS CULTIVATED");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
     println!("  cultivated population             {CULTIVATED}");
     println!("  cultivated coordinates            {SPAN}");
-    println!("  development symbol                {} of the caused material", CAUSED[DEVELOPMENT]);
-    println!("  held-out symbol                   {} — DIFFERENT, which is what makes it held out", CAUSED[HELD_OUT]);
+    println!(
+        "  development symbol                {} of the caused material",
+        CAUSED[DEVELOPMENT]
+    );
+    println!(
+        "  held-out symbol                   {} — DIFFERENT, which is what makes it held out",
+        CAUSED[HELD_OUT]
+    );
 
     let (site, container, mut file) = found(&root, BASE, terms, None).expect("founded");
 
     // -----------------------------------------------------------------------------------------
     // THE MATERIAL THE DELTA IS DERIVED FROM.
     // -----------------------------------------------------------------------------------------
-    let gain_words = container.read_bf16_whole(&mut file, CULTIVATED).expect("read");
+    let gain_words = container
+        .read_bf16_whole(&mut file, CULTIVATED)
+        .expect("read");
     let gain: Vec<Rat> = gain_words
         .iter()
         .map(|word| decode_bfloat16_bits(*word).expect("finite").value())
         .collect();
-    let entering = |symbol: usize, container: &holonic_engine::foreign_map::ForeignContainer, file: &mut std::fs::File| -> Vec<Rat> {
+    let entering = |symbol: usize,
+                    container: &holonic_engine::foreign_map::ForeignContainer,
+                    file: &mut std::fs::File|
+     -> Vec<Rat> {
         container
             .read_rows_bf16(file, "model.language_model.embed_tokens.weight", symbol, 1)
             .expect("read")
@@ -143,12 +157,21 @@ fn main() {
     let nonzero = residual.iter().filter(|value| !value.is_zero()).count();
     let widest = residual
         .iter()
-        .map(|value| if value.is_negative() { -value.clone() } else { value.clone() })
+        .map(|value| {
+            if value.is_negative() {
+                -value.clone()
+            } else {
+                value.clone()
+            }
+        })
         .max()
         .unwrap_or_else(Rat::zero);
     println!("    coordinates                     {SPAN}");
     println!("    genuinely nonzero               {nonzero}");
-    println!("    widest single residual          {}", shorten(&widest.to_string(), 40));
+    println!(
+        "    widest single residual          {}",
+        shorten(&widest.to_string(), 40)
+    );
     println!("    (no loss scalar is formed. A scalar is one receiver's face of this population.)");
 
     // -----------------------------------------------------------------------------------------
@@ -168,15 +191,27 @@ fn main() {
         .adjoint_defect(&bare, &domain_metric, &codomain_metric, &probe, &residual)
         .expect("paired");
     let metric_defect = diagonal
-        .adjoint_defect(&adjoint, &domain_metric, &codomain_metric, &probe, &residual)
+        .adjoint_defect(
+            &adjoint,
+            &domain_metric,
+            &codomain_metric,
+            &probe,
+            &residual,
+        )
         .expect("paired");
     let returned_covector = adjoint.apply(&residual).expect("returned");
     println!();
     println!("  THE RETURN LAW — a declared metric adjoint, not an inversion");
     println!("    both receiver metrics declared and non-Euclidean");
-    println!("    a bare transpose's defect       {}", shorten(&bare_defect.to_string(), 40));
+    println!(
+        "    a bare transpose's defect       {}",
+        shorten(&bare_defect.to_string(), 40)
+    );
     println!("    the metric adjoint's defect     {metric_defect}");
-    println!("    the returned covector's extent  {} coordinates", returned_covector.len());
+    println!(
+        "    the returned covector's extent  {} coordinates",
+        returned_covector.len()
+    );
     if !metric_defect.is_zero() {
         println!("    THE ADJOINT FAILED ITS OWN LAW. Nothing is committed.");
         std::process::exit(1);
@@ -190,9 +225,13 @@ fn main() {
         RebaseReceipt::Rebase { .. } => Vec::new(),
         RebaseReceipt::Refused { factorization, .. } => (0..SPAN)
             .filter(|at| transport[*at].is_zero())
-            .chain(factorization.kernel.iter().enumerate().filter_map(|(_, vector)| {
-                vector.iter().position(|value| !value.is_zero())
-            }))
+            .chain(
+                factorization
+                    .kernel
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(_, vector)| vector.iter().position(|value| !value.is_zero())),
+            )
             .collect(),
     };
     let mut delta = vec![Rat::zero(); SPAN];
@@ -212,7 +251,10 @@ fn main() {
         "    the transport is a rebase       {}",
         matches!(receipt, RebaseReceipt::Rebase { .. })
     );
-    println!("    coordinates cultivated          {}", SPAN - refused.len());
+    println!(
+        "    coordinates cultivated          {}",
+        SPAN - refused.len()
+    );
     println!("    coordinates REFUSED on the kernel  {}", refused.len());
     println!("    collapsed directions named      {}", collapsed.len());
     println!("    (a collapsed direction cannot be cultivated through, and inventing a step to");
@@ -256,19 +298,44 @@ fn main() {
     }
     let widest_collapsed = collapsed_by_the_seal
         .iter()
-        .map(|value| if value.is_negative() { -value.clone() } else { value.clone() })
+        .map(|value| {
+            if value.is_negative() {
+                -value.clone()
+            } else {
+                value.clone()
+            }
+        })
         .max()
         .unwrap_or_else(Rat::zero);
     println!();
     println!("  THE SEAL'S OWN GRAIN — a QUOTIENT, measured rather than assumed");
     println!("    deltas the stored species admitted      {committed}");
-    println!("    deltas BELOW the seal's grain           {}", below_the_seal.len());
-    println!("    coordinates the carrier REFUSED         {}", carrier_refused.len());
-    println!("    the collapsed population it deleted     {} entries", collapsed_by_the_seal.iter().filter(|value| !value.is_zero()).count());
-    println!("    widest single collapsed entry           {}", shorten(&widest_collapsed.to_string(), 40));
-    println!("    (what was DEPOSITED is what the seal admitted, not what the derivation proposed.");
+    println!(
+        "    deltas BELOW the seal's grain           {}",
+        below_the_seal.len()
+    );
+    println!(
+        "    coordinates the carrier REFUSED         {}",
+        carrier_refused.len()
+    );
+    println!(
+        "    the collapsed population it deleted     {} entries",
+        collapsed_by_the_seal
+            .iter()
+            .filter(|value| !value.is_zero())
+            .count()
+    );
+    println!(
+        "    widest single collapsed entry           {}",
+        shorten(&widest_collapsed.to_string(), 40)
+    );
+    println!(
+        "    (what was DEPOSITED is what the seal admitted, not what the derivation proposed."
+    );
     println!("     The ablation below withdraws the deposited one, because a quotient has no");
-    println!("     inverse and subtracting the proposed delta returned 42 of 64 on the first pass.)");
+    println!(
+        "     inverse and subtracting the proposed delta returned 42 of 64 on the first pass.)"
+    );
     // **ARM R — THE MATCHED SIBLING.** The SAME population of deltas, at the SAME coordinates,
     // with only the coordinate incidence withdrawn by a declared reversal. Every magnitude and
     // every hand the cultivation deposited is still present; what is gone is WHICH coordinate each
@@ -301,8 +368,14 @@ fn main() {
     println!("    ARM R, the SAME deltas with the coordinate incidence withdrawn");
     println!("                                       {sibling_rest}");
     println!("    coordinates committed              {committed}");
-    println!("    ARM L differs from ARM C           {}", digest_of(&control_rest) != digest_of(&cultivated_rest));
-    println!("    ARM R differs from ARM L           {}", digest_of(&sibling_rest) != digest_of(&cultivated_rest));
+    println!(
+        "    ARM L differs from ARM C           {}",
+        digest_of(&control_rest) != digest_of(&cultivated_rest)
+    );
+    println!(
+        "    ARM R differs from ARM L           {}",
+        digest_of(&sibling_rest) != digest_of(&cultivated_rest)
+    );
 
     // -----------------------------------------------------------------------------------------
     // THE ATTRIBUTABLE EXACT CONSEQUENCE, on the material the delta was derived from.
@@ -334,12 +407,23 @@ fn main() {
     println!();
     println!("  THE ATTRIBUTABLE CONSEQUENCE — coordinates the declared residual does NOT reach");
     println!("                                     exact frame     stored species");
-    println!("    under ARM C, the predecessor      {:>3} of {SPAN}      {:>3} of {SPAN}", under_control.0, under_control.1);
-    println!("    under ARM R, the matched sibling  {:>3} of {SPAN}      {:>3} of {SPAN}", under_sibling.0, under_sibling.1);
-    println!("    under ARM L, the cultivated body  {:>3} of {SPAN}      {:>3} of {SPAN}", under_cultivated.0, under_cultivated.1);
+    println!(
+        "    under ARM C, the predecessor      {:>3} of {SPAN}      {:>3} of {SPAN}",
+        under_control.0, under_control.1
+    );
+    println!(
+        "    under ARM R, the matched sibling  {:>3} of {SPAN}      {:>3} of {SPAN}",
+        under_sibling.0, under_sibling.1
+    );
+    println!(
+        "    under ARM L, the cultivated body  {:>3} of {SPAN}      {:>3} of {SPAN}",
+        under_cultivated.0, under_cultivated.1
+    );
     println!("    (TWO grains, because an invariant is only visible across two frames. The exact");
     println!("     frame asks whether the residual is identically zero; the stored species asks");
-    println!("     whether any word in ITS family separates the two, which is what tolerance means");
+    println!(
+        "     whether any word in ITS family separates the two, which is what tolerance means"
+    );
     println!("     here. The delta was admitted THROUGH that species, so that is the frame the");
     println!("     consequence is attributable in, and the exact frame is the honest remainder.)");
 
@@ -361,8 +445,12 @@ fn main() {
     let sibling_also_moved = control[HELD_OUT] != sibling_return[HELD_OUT];
     println!("    development conduct moved                  {development_moved}");
     println!("    HELD-OUT conduct moved                     {held_out_moved}");
-    println!("    ANTI-VACUITY: the matched sibling ALSO moved held-out conduct  {sibling_also_moved}");
-    println!("        (so movement is a statement about any change at all. What separates the arms");
+    println!(
+        "    ANTI-VACUITY: the matched sibling ALSO moved held-out conduct  {sibling_also_moved}"
+    );
+    println!(
+        "        (so movement is a statement about any change at all. What separates the arms"
+    );
     println!("         is below, and it is a receiver's reading rather than a magnitude.)");
 
     // **THE SEPARATION.** A declared receiver family reads hands and orders — the two faces that
@@ -377,12 +465,30 @@ fn main() {
     let system = ArmSystem::new(arms, coordinates.clone());
     let compression = compress(&system);
     println!();
-    println!("  THE SEPARATION — a declared receiver family of {} hand and order faces", coordinates.len() * 2);
-    println!("    items, one per arm and position   {}", system.states.len());
-    println!("    one-shot blocks                   {}", compression.one_shot.len());
-    println!("    conduct blocks                    {}", compression.conduct.len());
-    println!("    rounds to converge                {}", compression.rounds);
-    println!("    collapsed pairs                   {}", compression.collapsed.len());
+    println!(
+        "  THE SEPARATION — a declared receiver family of {} hand and order faces",
+        coordinates.len() * 2
+    );
+    println!(
+        "    items, one per arm and position   {}",
+        system.states.len()
+    );
+    println!(
+        "    one-shot blocks                   {}",
+        compression.one_shot.len()
+    );
+    println!(
+        "    conduct blocks                    {}",
+        compression.conduct.len()
+    );
+    println!(
+        "    rounds to converge                {}",
+        compression.rounds
+    );
+    println!(
+        "    collapsed pairs                   {}",
+        compression.collapsed.len()
+    );
     let (l_from_c, l_word) = system.separated(&compression, 0, 1, HELD_OUT);
     let (l_from_r, r_word) = system.separated(&compression, 1, 2, HELD_OUT);
     println!("    ARM L held-out separated from ARM C  {l_from_c}   {l_word}");
@@ -393,7 +499,11 @@ fn main() {
     let untouched_identical = gain[SPAN..] == cultivated[SPAN..];
     println!();
     println!("    the seal is local                          {untouched_identical}");
-    println!("        ({} of {} coordinates were never touched — true by construction of the", gain.len() - SPAN, gain.len());
+    println!(
+        "        ({} of {} coordinates were never touched — true by construction of the",
+        gain.len() - SPAN,
+        gain.len()
+    );
     println!("         commit, so it grades the seal and not the cultivation.)");
 
     // **TARGETED ABLATION, WITHDRAWN FROM THE CULTIVATED BODY** rather than resealed from the
@@ -405,7 +515,9 @@ fn main() {
     let ablated = conduct_child(&ablated_rest);
     let restored = !ablated.is_empty() && ablated == control;
     println!();
-    println!("    TARGETED ABLATION, withdrawn from the CULTIVATED rest and not resealed from source");
+    println!(
+        "    TARGETED ABLATION, withdrawn from the CULTIVATED rest and not resealed from source"
+    );
     println!("        coordinates the withdrawal returned    {returned} of {committed}");
     println!("        coordinates the seal's grain KEPT      {refused_by_grain}");
     println!("        the predecessor's conduct returns      {restored}");
@@ -417,8 +529,12 @@ fn main() {
     println!("  cultivation passes                          {passed}");
     println!();
     println!("  The residual was returned as a POPULATION before any scalar face, and passed");
-    println!("  through a declared metric adjoint whose own law returned exactly zero while a bare");
-    println!("  transpose's did not. The committed delta is the exact one that zeroes the declared");
+    println!(
+        "  through a declared metric adjoint whose own law returned exactly zero while a bare"
+    );
+    println!(
+        "  transpose's did not. The committed delta is the exact one that zeroes the declared"
+    );
     println!("  residual, with NO step size anywhere, and it is refused on every collapsed");
     println!("  direction rather than stepped through.");
     println!();
@@ -426,18 +542,21 @@ fn main() {
     println!("  own rest. Held-out conduct moved — AND SO DID THE MATCHED SIBLING'S, so movement");
     println!("  alone grades nothing. What grades the cultivation is that a declared receiver");
     println!("  family separates ARM L's held-out conduct from BOTH the predecessor's and the");
-    println!("  sibling's, with the separating face exhibited; and that withdrawing the delta from");
+    println!(
+        "  sibling's, with the separating face exhibited; and that withdrawing the delta from"
+    );
     println!("  the cultivated body — not resealing it from the source — returns the predecessor.");
     println!();
     println!("  WHAT THIS DOES NOT CLAIM. One development pair does not establish transfer. The");
-    println!("  held-out separation says the deposited delta's coordinate incidence is load-bearing");
+    println!(
+        "  held-out separation says the deposited delta's coordinate incidence is load-bearing"
+    );
     println!("  on material it was never derived from. It does not say the delta generalizes, and");
     println!("  no receiver here was asked whether it moved TOWARD anything.");
     println!();
     println!("  The aperture is one site's contact half and one rebase population.");
     println!("  CONSTRUCTION_STATE is untouched.");
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // THE SEPARATION INSTRUMENT. The receivers are FACES — a hand and an order — because those are
@@ -493,7 +612,10 @@ impl ArmSystem {
             .iter()
             .any(|block| block.contains(&a) && block.contains(&b));
         if together {
-            return (false, String::from("(collapsed — no declared face reaches it)"));
+            return (
+                false,
+                String::from("(collapsed — no declared face reaches it)"),
+            );
         }
         for receiver in self.receivers() {
             if self.observation(a, receiver) != self.observation(b, receiver) {
@@ -621,7 +743,12 @@ fn withdraw_from_rest(
         }
         header.push((
             name,
-            ("BF16".to_owned(), tensor.shape.clone(), start, payload.len() as u64),
+            (
+                "BF16".to_owned(),
+                tensor.shape.clone(),
+                start,
+                payload.len() as u64,
+            ),
         ));
     }
     write_container(into, &header, &container.container_metadata, &payload);
@@ -653,18 +780,26 @@ fn seal(
         } else if is_row && tensor.rank() == 2 {
             let mut rows = Vec::new();
             for symbol in CAUSED {
-                let (row, _) = container.read_rows_bf16(file, population, symbol, 1).expect("read");
+                let (row, _) = container
+                    .read_rows_bf16(file, population, symbol, 1)
+                    .expect("read");
                 rows.extend(row);
             }
             (rows, vec![CAUSED.len(), tensor.shape[1]])
         } else {
-            (container.read_bf16_whole(file, population).expect("read"), tensor.shape.clone())
+            (
+                container.read_bf16_whole(file, population).expect("read"),
+                tensor.shape.clone(),
+            )
         };
         let start = payload.len() as u64;
         for word in &words {
             payload.extend_from_slice(&word.to_le_bytes());
         }
-        header.push((population.clone(), ("BF16".to_owned(), shape, start, payload.len() as u64)));
+        header.push((
+            population.clone(),
+            ("BF16".to_owned(), shape, start, payload.len() as u64),
+        ));
     }
     let mut sealed_program = site.program.clone();
     for operation in sealed_program.operations.values_mut() {
@@ -673,9 +808,18 @@ fn seal(
         }
     }
     let mut metadata = BTreeMap::new();
-    metadata.insert("schema".to_owned(), "holonic-engine.phoenix-native-rest.v1".to_owned());
-    metadata.insert("diagram".to_owned(), serde_json::to_string(&site.complex).expect("diagram"));
-    metadata.insert("program".to_owned(), serde_json::to_string(&sealed_program).expect("program"));
+    metadata.insert(
+        "schema".to_owned(),
+        "holonic-engine.phoenix-native-rest.v1".to_owned(),
+    );
+    metadata.insert(
+        "diagram".to_owned(),
+        serde_json::to_string(&site.complex).expect("diagram"),
+    );
+    metadata.insert(
+        "program".to_owned(),
+        serde_json::to_string(&sealed_program).expect("program"),
+    );
     metadata.insert(
         "band-elements".to_owned(),
         serde_json::to_string(&site.band_elements).expect("bands"),

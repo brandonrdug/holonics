@@ -132,23 +132,23 @@ impl ExactInterval {
         let floor = |value: &Rat| -> Rat {
             let scaled = value * &scale;
             let truncated = scaled.to_integer();
-            let corrected = if scaled.is_negative() && Rat::from_integer(truncated.clone()) != scaled
-            {
-                truncated - BigInt::one()
-            } else {
-                truncated
-            };
+            let corrected =
+                if scaled.is_negative() && Rat::from_integer(truncated.clone()) != scaled {
+                    truncated - BigInt::one()
+                } else {
+                    truncated
+                };
             Rat::from_integer(corrected) * &unit
         };
         let ceiling = |value: &Rat| -> Rat {
             let scaled = value * &scale;
             let truncated = scaled.to_integer();
-            let corrected = if scaled.is_positive() && Rat::from_integer(truncated.clone()) != scaled
-            {
-                truncated + BigInt::one()
-            } else {
-                truncated
-            };
+            let corrected =
+                if scaled.is_positive() && Rat::from_integer(truncated.clone()) != scaled {
+                    truncated + BigInt::one()
+                } else {
+                    truncated
+                };
             Rat::from_integer(corrected) * &unit
         };
         Self::new(floor(&self.lower), ceiling(&self.upper))
@@ -423,10 +423,7 @@ impl AlgebraicRoot {
     ///
     /// **This is the return a normalization actually needs**, and taking it directly rather than
     /// inverting a root keeps one certificate instead of two.
-    pub fn reciprocal_square_root(
-        radicand: &Rat,
-        octaves: u32,
-    ) -> Result<Self, ExactValueError> {
+    pub fn reciprocal_square_root(radicand: &Rat, octaves: u32) -> Result<Self, ExactValueError> {
         Self::degree_two_root(radicand, octaves, true)
     }
 
@@ -601,7 +598,10 @@ impl CertifiedSeries {
         if negative && magnitude >= Rat::from_integer(BigInt::from(DECAY_REACH)) {
             return ExactInterval::new(
                 Rat::zero(),
-                Rat::new(BigInt::one(), BigInt::from(BigUint::one() << DECAY_REACH as usize)),
+                Rat::new(
+                    BigInt::one(),
+                    BigInt::from(BigUint::one() << DECAY_REACH as usize),
+                ),
             );
         }
         let whole = magnitude.to_integer();
@@ -675,7 +675,11 @@ impl CertifiedSeries {
         if terms == 0 {
             return Err(ExactValueError::EmptySeries);
         }
-        let magnitude = if x.is_negative() { -x.clone() } else { x.clone() };
+        let magnitude = if x.is_negative() {
+            -x.clone()
+        } else {
+            x.clone()
+        };
         if magnitude > Rat::one() {
             return Err(ExactValueError::TailDoesNotClose);
         }
@@ -736,13 +740,13 @@ impl CertifiedSeries {
         terms: usize,
     ) -> Result<(ExactInterval, ExactInterval), ExactValueError> {
         let (cosine, sine) = Self::circular_series(angle, terms)?;
-        let mut carried = (ExactInterval::point(Rat::one()), ExactInterval::point(Rat::zero()));
+        let mut carried = (
+            ExactInterval::point(Rat::one()),
+            ExactInterval::point(Rat::zero()),
+        );
         let step = (cosine.enclosure(), sine.enclosure());
         for _ in 0..power {
-            let real = carried
-                .0
-                .times(&step.0)?
-                .translated(&Rat::zero());
+            let real = carried.0.times(&step.0)?.translated(&Rat::zero());
             let cross = carried.1.times(&step.1)?;
             let cosine_out =
                 ExactInterval::new(&real.lower - &cross.upper, &real.upper - &cross.lower)?;
@@ -1124,7 +1128,7 @@ pub mod ieee754 {
 
     use super::{ExactInterval, ExactValueError};
 
-    /// The three binary interchange shapes this codec accepts.
+    /// The four binary interchange shapes this codec accepts.
     ///
     /// `bfloat16` is not an IEEE-754 interchange format, but it has the same three fields with the
     /// same meanings and the same subnormal convention, so one decode covers all three. It is here
@@ -1132,6 +1136,8 @@ pub mod ieee754 {
     /// `soma/life/examples/eros_self_emanated_law.rs` refuses every other dtype by name.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
     pub enum BinaryFloatSpecies {
+        /// IEEE-754 `binary16`: 1 sign, 5 exponent, 10 stored significand bits.
+        Binary16,
         /// 1 sign, 8 exponent, 7 stored significand bits. Same exponent range as `binary32`, eight
         /// significand bits of ratio.
         Bfloat16,
@@ -1142,10 +1148,16 @@ pub mod ieee754 {
     }
 
     impl BinaryFloatSpecies {
-        pub const ALL: [BinaryFloatSpecies; 3] = [Self::Bfloat16, Self::Binary32, Self::Binary64];
+        pub const ALL: [BinaryFloatSpecies; 4] = [
+            Self::Binary16,
+            Self::Bfloat16,
+            Self::Binary32,
+            Self::Binary64,
+        ];
 
         pub const fn name(self) -> &'static str {
             match self {
+                Self::Binary16 => "binary16",
                 Self::Bfloat16 => "bfloat16",
                 Self::Binary32 => "binary32",
                 Self::Binary64 => "binary64",
@@ -1154,7 +1166,7 @@ pub mod ieee754 {
 
         pub const fn width_bits(self) -> u32 {
             match self {
-                Self::Bfloat16 => 16,
+                Self::Binary16 | Self::Bfloat16 => 16,
                 Self::Binary32 => 32,
                 Self::Binary64 => 64,
             }
@@ -1164,6 +1176,7 @@ pub mod ieee754 {
         /// integer significand of a normal value has `stored_significand_bits() + 1` bits.
         pub const fn stored_significand_bits(self) -> u32 {
             match self {
+                Self::Binary16 => 10,
                 Self::Bfloat16 => 7,
                 Self::Binary32 => 23,
                 Self::Binary64 => 52,
@@ -1172,6 +1185,7 @@ pub mod ieee754 {
 
         pub const fn exponent_bits(self) -> u32 {
             match self {
+                Self::Binary16 => 5,
                 Self::Bfloat16 | Self::Binary32 => 8,
                 Self::Binary64 => 11,
             }
@@ -1463,6 +1477,12 @@ pub mod ieee754 {
         decode_bits(BinaryFloatSpecies::Bfloat16, u64::from(word))
     }
 
+    /// An IEEE-754 `binary16` word, including the `<f2` uncertainty arrays used by the admitted
+    /// physical-fold material.
+    pub fn decode_binary16_bits(word: u16) -> Result<BinaryFloatDatum, ExactValueError> {
+        decode_bits(BinaryFloatSpecies::Binary16, u64::from(word))
+    }
+
     /// An IEEE-754 `binary32` word.
     pub fn decode_binary32_bits(word: u32) -> Result<BinaryFloatDatum, ExactValueError> {
         decode_bits(BinaryFloatSpecies::Binary32, u64::from(word))
@@ -1512,7 +1532,11 @@ pub mod ieee754 {
         species: BinaryFloatSpecies,
     ) -> Result<(BinaryFloatDatum, Rat), ExactValueError> {
         let negative = num_traits::Signed::is_negative(value);
-        let magnitude = if negative { -value.clone() } else { value.clone() };
+        let magnitude = if negative {
+            -value.clone()
+        } else {
+            value.clone()
+        };
         let stored = species.stored_significand_bits() as i32;
         let subnormal_ulp = species.subnormal_ulp_exponent();
 
@@ -1672,13 +1696,12 @@ pub mod ieee754 {
     }
 }
 
-
 #[cfg(test)]
 mod emit_side_mouth_tests {
-    use super::ieee754::{
-        decode_bfloat16_bits, round_into, round_into_bfloat16, BinaryFloatSpecies,
-    };
     use super::Rat;
+    use super::ieee754::{
+        BinaryFloatSpecies, decode_bfloat16_bits, round_into, round_into_bfloat16,
+    };
     use num_bigint::BigInt;
     use num_traits::Zero;
 
@@ -1716,7 +1739,13 @@ mod emit_side_mouth_tests {
         // **The law: value = datum.value() + residual, exactly, over the rationals.** A tenth is
         // not a dyadic, so the residual is genuinely non-zero and must account for the whole
         // difference -- nothing is unknown about what the emission cost.
-        for value in [rat(1, 10), rat(-1, 3), rat(22, 7), rat(1, 1000), rat(-9999, 7)] {
+        for value in [
+            rat(1, 10),
+            rat(-1, 3),
+            rat(22, 7),
+            rat(1, 1000),
+            rat(-9999, 7),
+        ] {
             let (datum, residual) =
                 round_into(&value, BinaryFloatSpecies::Bfloat16).expect("emits");
             assert_eq!(
@@ -1763,7 +1792,10 @@ mod emit_side_mouth_tests {
             }
             checked += 1;
         }
-        assert!(checked > 60_000, "only {checked} finite patterns were swept");
+        assert!(
+            checked > 60_000,
+            "only {checked} finite patterns were swept"
+        );
     }
 
     #[test]
@@ -1787,7 +1819,9 @@ mod emit_side_mouth_tests {
             };
             assert!(magnitude <= half_ulp, "{value} rounded past half an ulp");
             // And the carried datum must re-encode, which is what the defect broke.
-            datum.to_bits().expect("the carried datum must hold in the format");
+            datum
+                .to_bits()
+                .expect("the carried datum must hold in the format");
         }
     }
 
@@ -1806,7 +1840,10 @@ mod emit_side_mouth_tests {
         let (low, residual) =
             round_into(&rat(513, 512), BinaryFloatSpecies::Bfloat16).expect("emits");
         assert_eq!(low.value() + residual, rat(513, 512));
-        assert!(low.significand.clone() % num_bigint::BigUint::from(2u32) == num_bigint::BigUint::from(0u32));
+        assert!(
+            low.significand.clone() % num_bigint::BigUint::from(2u32)
+                == num_bigint::BigUint::from(0u32)
+        );
     }
 }
 
@@ -1868,11 +1905,9 @@ mod tests {
                 .times(&ExactInterval::point(Rat::one()))
                 .expect("scaled");
             let cross = sine.times(&sine).expect("square");
-            let total = ExactInterval::new(
-                &modulus.lower + &cross.lower,
-                &modulus.upper + &cross.upper,
-            )
-            .expect("summed");
+            let total =
+                ExactInterval::new(&modulus.lower + &cross.lower, &modulus.upper + &cross.upper)
+                    .expect("summed");
             assert!(
                 total.lower <= Rat::one() && total.upper >= Rat::one(),
                 "position {position} left the circle: {total:?}"
@@ -1921,11 +1956,8 @@ mod tests {
         );
         // And the reduction keeps every caller inside the series' own domain: exp(-15) returns a
         // usable enclosure where a direct forty-term series' honest bound is wider than the value.
-        let far = CertifiedSeries::exponential_enclosure(
-            &Rat::from_integer(BigInt::from(-15)),
-            32,
-        )
-        .expect("reduced");
+        let far = CertifiedSeries::exponential_enclosure(&Rat::from_integer(BigInt::from(-15)), 32)
+            .expect("reduced");
         assert!(far.lower.is_positive(), "an exponential is never negative");
         assert!(far.upper < Rat::new(BigInt::from(1), BigInt::from(1_000_000)));
 
@@ -2022,6 +2054,11 @@ mod tests {
     fn every_accepted_bit_pattern_re_encodes_identically() {
         use ieee754::{BinaryFloatSpecies, decode_bits};
         let declared: &[(BinaryFloatSpecies, u64)] = &[
+            // IEEE binary16, including both zeros, the least subnormal and the maximum finite.
+            (BinaryFloatSpecies::Binary16, 0x3c00),
+            (BinaryFloatSpecies::Binary16, 0x0001),
+            (BinaryFloatSpecies::Binary16, 0x8000),
+            (BinaryFloatSpecies::Binary16, 0x7bff),
             // binary64: one, pi, both zeros, the extreme subnormals, a long mantissa, max finite.
             (BinaryFloatSpecies::Binary64, 0x3ff0_0000_0000_0000),
             (BinaryFloatSpecies::Binary64, 0x4009_21fb_5444_2d18),
@@ -2077,6 +2114,14 @@ mod tests {
         // A signalling pattern is refused for the same reason as a quiet one.
         assert!(matches!(
             decode_bits(BinaryFloatSpecies::Binary64, 0x7ff0_0000_0000_0001),
+            Err(ExactValueError::NotANumberFloat { .. })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary16, 0x7c00),
+            Err(ExactValueError::InfiniteFloat { .. })
+        ));
+        assert!(matches!(
+            decode_bits(BinaryFloatSpecies::Binary16, 0x7e00),
             Err(ExactValueError::NotANumberFloat { .. })
         ));
         assert!(matches!(
@@ -2140,6 +2185,34 @@ mod tests {
         assert_eq!(BinaryFloatSpecies::Bfloat16.subnormal_ulp_exponent(), -133);
         let subnormal = decode_bits(BinaryFloatSpecies::Bfloat16, 0x0001).unwrap();
         assert_eq!(subnormal.ulp_exponent, -133);
+    }
+
+    /// The admitted PAE matrices arrive as NumPy `<f2`: IEEE binary16, not bfloat16. The two
+    /// sixteen-bit species must therefore remain distinct even when their storage width agrees.
+    #[test]
+    fn the_binary16_mouth_is_exact_and_is_not_the_bfloat16_mouth() {
+        use ieee754::{BinaryFloatSpecies, decode_binary16_bits};
+
+        let one = decode_binary16_bits(0x3c00).expect("binary16 one");
+        assert_eq!(one.species, BinaryFloatSpecies::Binary16);
+        assert_eq!(one.value(), integer(1));
+        assert_eq!(one.ulp_exponent, -10);
+        assert_eq!(one.to_bits().expect("re-encodes"), 0x3c00);
+
+        let least = decode_binary16_bits(0x0001).expect("least binary16 subnormal");
+        assert!(least.subnormal);
+        assert_eq!(least.ulp_exponent, -24);
+        assert_eq!(least.value(), rat(1, 1_i64 << 24));
+        assert_eq!(BinaryFloatSpecies::Binary16.subnormal_ulp_exponent(), -24);
+
+        let largest = decode_binary16_bits(0x7bff).expect("largest finite binary16");
+        assert_eq!(largest.value(), integer(65_504));
+
+        // The same bits in bfloat16 name 1/128, not one. Width is an apparatus coincidence, not
+        // species equality.
+        let bfloat = ieee754::decode_bfloat16_bits(0x3c00).expect("finite bfloat16");
+        assert_eq!(bfloat.value(), rat(1, 128));
+        assert_ne!(one.value(), bfloat.value());
     }
 
     /// The three readings of one pattern are three different faces, and the difference is the

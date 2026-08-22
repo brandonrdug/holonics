@@ -337,7 +337,10 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
                 println!("    {}", line.trim());
             }
         }
-        Coherence::FootprintDisjoint { occurrences, pairs_checked } => {
+        Coherence::FootprintDisjoint {
+            occurrences,
+            pairs_checked,
+        } => {
             println!(
                 "\n  COHERENCE: FOOTPRINTS DISJOINT. {occurrences} occurrences, {pairs_checked} pairs \
                  checked for a shared written address; independence derived, not replayed."
@@ -499,16 +502,25 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
             );
             println!("    not a verdict.");
         }
-        DistinguishingWord::ReturnDiffers { orders, coordinate, port, differing } => {
+        DistinguishingWord::ReturnDiffers {
+            orders,
+            coordinate,
+            port,
+            differing,
+        } => {
             println!(
                 "    species  ReturnDiffers -- an enacted front's {coordinate} moved between orders {orders:?} at {port} ({differing} differing)"
             );
         }
         DistinguishingWord::EnactmentRefused { order, reason } => {
-            println!("    species  EnactmentRefused -- order {order} could not be enacted: {reason}");
+            println!(
+                "    species  EnactmentRefused -- order {order} could not be enacted: {reason}"
+            );
         }
         DistinguishingWord::FootprintShared { members, address } => {
-            println!("    species  FootprintShared -- members {members:?} share written address {address}");
+            println!(
+                "    species  FootprintShared -- members {members:?} share written address {address}"
+            );
         }
     }
 }

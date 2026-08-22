@@ -35,18 +35,18 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use holonic_engine::lean_development::{join, read_development, DeclarationGrain};
+use holonic_engine::phoenix::runtime;
+use life::atlas_cultivation::{conduct, MetricDeclaration};
 use life::causal_language::{lexical_tokens, lexical_tokens_under, LexicalAperture};
 use life::exposure_codec::{ladder, ExposureApertures, LadderStop, UnitRole};
-use holonic_engine::lean_development::{join, read_development, DeclarationGrain};
 use life::material_incidence::{
     face_quotient, lean_atlas, prose_atlas, rust_atlas, rust_items_of_section,
 };
-use life::atlas_cultivation::{conduct, MetricDeclaration};
 use life::phoenix_rest::{
     content_bar, cultivate, forbidden_open, lineage_metadata, loss_digest, open_descriptors,
     read_rest, regions,
 };
-use holonic_engine::phoenix::runtime;
 
 fn main() {
     if let Err(trouble) = run() {
@@ -177,8 +177,7 @@ fn run() -> Result<(), String> {
         }
         "condition" => {
             let directory = directory.ok_or("condition requires --directory")?;
-            let with_directory =
-                with_directory.ok_or("condition requires --with-directory")?;
+            let with_directory = with_directory.ok_or("condition requires --with-directory")?;
             condition(
                 &directory,
                 &extension,
@@ -197,9 +196,14 @@ fn run() -> Result<(), String> {
             match deed.as_str() {
                 "infer" => {
                     if card {
-                        let product = product.ok_or("phoenix infer --card requires --product <cultivated directory>")?;
+                        let product = product.ok_or(
+                            "phoenix infer --card requires --product <cultivated directory>",
+                        )?;
                         if rest.is_some() {
-                            return Err("phoenix infer --card accepts --product and rejects --rest".to_owned());
+                            return Err(
+                                "phoenix infer --card accepts --product and rejects --rest"
+                                    .to_owned(),
+                            );
                         }
                         phoenix_card_infer(&product, &texts)
                     } else {
@@ -208,8 +212,10 @@ fn run() -> Result<(), String> {
                     }
                 }
                 "cultivate" => {
-                    let rest = rest.ok_or("phoenix cultivate requires --rest <sealed native rest>")?;
-                    let material = material.ok_or("phoenix cultivate requires --material <file>")?;
+                    let rest =
+                        rest.ok_or("phoenix cultivate requires --rest <sealed native rest>")?;
+                    let material =
+                        material.ok_or("phoenix cultivate requires --material <file>")?;
                     let out = out.ok_or("phoenix cultivate requires --out <successor path>")?;
                     phoenix_cultivate(&rest, &material, &out)
                 }
@@ -289,7 +295,9 @@ fn mouth(
         exposures.len()
     );
     println!();
-    println!("  The recovery is handed octets and a radius and nothing else: no grammar, no keyword");
+    println!(
+        "  The recovery is handed octets and a radius and nothing else: no grammar, no keyword"
+    );
     println!("  list, no bracket table, no character classes, no encoding. The alphabet itself is");
     println!("  recovered by exhausting every declared candidate, so even it is testimony.");
     println!();
@@ -416,11 +424,21 @@ fn mouth(
 fn atlas(root: &Path, extension: &str, budget: usize) -> Result<(), String> {
     let files = read_files(root, extension)?;
     println!("EROS · ATLAS");
-    println!("  root {}   .{extension} files {}", root.display(), files.len());
+    println!(
+        "  root {}   .{extension} files {}",
+        root.display(),
+        files.len()
+    );
     println!();
-    println!("  The atlas is the material's own oriented incidence — constituents, contacts, and a");
-    println!("  dependency height that is never a line number. The rank gauge orbit is taken before");
-    println!("  any reading is believed: a representative that changed a rank would mean the intake");
+    println!(
+        "  The atlas is the material's own oriented incidence — constituents, contacts, and a"
+    );
+    println!(
+        "  dependency height that is never a line number. The rank gauge orbit is taken before"
+    );
+    println!(
+        "  any reading is believed: a representative that changed a rank would mean the intake"
+    );
     println!("  was reading its own bookkeeping.");
     println!();
 
@@ -434,8 +452,14 @@ fn atlas(root: &Path, extension: &str, budget: usize) -> Result<(), String> {
     let (heights, storage, top) = atlas.heights();
     println!("  constituents        {}", atlas.constituents().len());
     println!("  contacts            {}", atlas.contacts().len());
-    println!("  height ranks        {top} (over {} heights)", heights.len());
-    println!("  storage ordinals    {} carried beside them", storage.len());
+    println!(
+        "  height ranks        {top} (over {} heights)",
+        heights.len()
+    );
+    println!(
+        "  storage ordinals    {} carried beside them",
+        storage.len()
+    );
     match atlas.rank_gauge_orbit() {
         Ok(orbit) => println!("  rank gauge orbit    {orbit:?}"),
         Err(error) => println!("  rank gauge orbit    refused: {error:?}"),
@@ -512,9 +536,15 @@ fn atlas(root: &Path, extension: &str, budget: usize) -> Result<(), String> {
     // THE FACES, ASKED OF THE MATERIAL RATHER THAN READ OFF A TABLE.
     println!();
     println!("  THE FACE QUOTIENT — which declared faces the material can tell apart");
-    println!("  `ContactSpecies` is six variants written in this repository. This asks the material");
-    println!("  whether its own conduct distinguishes them: faces are states, composition at a shared");
-    println!("  constituent is the successor, and a block of more than one face is a distinction that");
+    println!(
+        "  `ContactSpecies` is six variants written in this repository. This asks the material"
+    );
+    println!(
+        "  whether its own conduct distinguishes them: faces are states, composition at a shared"
+    );
+    println!(
+        "  constituent is the successor, and a block of more than one face is a distinction that"
+    );
     println!("  was declared and is not carried.");
     let quotient = face_quotient(&atlas);
     println!(
@@ -578,10 +608,7 @@ fn condition(
     budget: usize,
 ) -> Result<(), String> {
     println!("EROS · CONDITION");
-    println!(
-        "  material A   {} (.{left_extension})",
-        left_root.display()
-    );
+    println!("  material A   {} (.{left_extension})", left_root.display());
     println!(
         "  material B   {} (.{right_extension})",
         right_root.display()
@@ -644,7 +671,9 @@ fn condition(
     );
     if crossing.is_empty() {
         println!("    the join keeps every cross-material face pair APART");
-        println!("    -- a reading neither half could take, and it separates rather than collapses");
+        println!(
+            "    -- a reading neither half could take, and it separates rather than collapses"
+        );
     } else {
         for (one, other) in &crossing {
             println!("    the join CANNOT TELL APART:  {one} ~ {other}");
@@ -674,15 +703,27 @@ fn condition(
     println!();
     println!("  THE BOUND ON A SEPARATION, STATED BECAUSE IT IS EASY TO OVERREAD");
     println!("  A join is disjoint, so two faces from two materials are read over two graphs of");
-    println!("  different shape. A separation therefore may reflect the MATERIALS differing rather");
+    println!(
+        "  different shape. A separation therefore may reflect the MATERIALS differing rather"
+    );
     println!("  than the FACES differing, and this run cannot tell those apart. What it does");
-    println!("  establish is that the pair became askable at all, and that the ablation removes it.");
-    println!("  The control that would sharpen it is two bodies of ONE codec joined: the same face");
-    println!("  appears on both sides and must then COLLAPSE, or the reading is about shape alone.");
+    println!(
+        "  establish is that the pair became askable at all, and that the ablation removes it."
+    );
+    println!(
+        "  The control that would sharpen it is two bodies of ONE codec joined: the same face"
+    );
+    println!(
+        "  appears on both sides and must then COLLAPSE, or the reading is about shape alone."
+    );
     if !pair_unaskable {
         println!();
-        println!("    THE CONTROL DID NOT FIRE: the two materials declare a face in common, so the");
-        println!("    cross-material pair was askable of one of them alone and the join added nothing.");
+        println!(
+            "    THE CONTROL DID NOT FIRE: the two materials declare a face in common, so the"
+        );
+        println!(
+            "    cross-material pair was askable of one of them alone and the join added nothing."
+        );
     }
     Ok(())
 }
@@ -890,8 +931,12 @@ fn supersede(root: &Path, against: &Path) -> Result<(), String> {
     }
     println!();
     println!("  Bound: the two routes are not the same reading and the overlap is not the point.");
-    println!("  The parser's edge joins two HEADS it split out of a statement; the incidence route's");
-    println!("  joins two DECLARATIONS. A low overlap with a larger incidence population means the");
+    println!(
+        "  The parser's edge joins two HEADS it split out of a statement; the incidence route's"
+    );
+    println!(
+        "  joins two DECLARATIONS. A low overlap with a larger incidence population means the"
+    );
     println!("  incidence route carries transports the split could not see, which is the claim.");
     Ok(())
 }
@@ -943,11 +988,7 @@ const SECTION_EXHIBIT: usize = 24;
 /// This arm is the independent ARM N control. Its conduct is CPU-exact and integral throughout;
 /// the lifted Phoenix card path is the distinct `--product ... --card` application entry above.
 /// Keeping the two entries explicit prevents an ARM N answer from being reported as Gemma lift.
-fn phoenix_infer(
-    rest_path: &Path,
-    texts: &[String],
-    export_manifest: bool,
-) -> Result<(), String> {
+fn phoenix_infer(rest_path: &Path, texts: &[String], export_manifest: bool) -> Result<(), String> {
     println!("EROS · PHOENIX · INFER");
     if texts.is_empty() {
         return Err("infer requires at least one --text; the material is the argument".to_owned());
@@ -968,7 +1009,10 @@ fn phoenix_infer(
         if rest.extent.is_empty() {
             "NOT CARRIED — this rest conducts and cannot be deposited into".to_owned()
         } else {
-            format!("{} carried, so this rest can also be cultivated", rest.extent.len())
+            format!(
+                "{} carried, so this rest can also be cultivated",
+                rest.extent.len()
+            )
         }
     );
     let before = loss_digest(&octets);
@@ -1053,11 +1097,20 @@ fn phoenix_infer(
                 region.start
             );
         }
-        println!("    metadata keys  {:?}", rest.metadata.keys().collect::<Vec<_>>());
+        println!(
+            "    metadata keys  {:?}",
+            rest.metadata.keys().collect::<Vec<_>>()
+        );
         println!();
-        println!("  THE CONTENT BAR — what the rest is required NOT to carry, measured on its octets");
+        println!(
+            "  THE CONTENT BAR — what the rest is required NOT to carry, measured on its octets"
+        );
         for row in content_bar(&octets, &rest) {
-            println!("    [{}] {}", if row.held { "held" } else { "BROKEN" }, row.claim);
+            println!(
+                "    [{}] {}",
+                if row.held { "held" } else { "BROKEN" },
+                row.claim
+            );
             println!("        {}", row.evidence);
         }
         println!();
@@ -1114,7 +1167,11 @@ fn print_source_audit() {
 /// four-state relation (the structured residual), deposit, derive the structural rows from the
 /// refusals the residual named and the standings through the declared metrics, and commit by
 /// replay. Nothing about it is restated here.
-fn phoenix_cultivate(rest_path: &Path, material_path: &Path, out_path: &Path) -> Result<(), String> {
+fn phoenix_cultivate(
+    rest_path: &Path,
+    material_path: &Path,
+    out_path: &Path,
+) -> Result<(), String> {
     println!("EROS · PHOENIX · CULTIVATE");
     let named = rest_path.display().to_string();
     let material_named = material_path.display().to_string();
@@ -1137,7 +1194,10 @@ fn phoenix_cultivate(rest_path: &Path, material_path: &Path, out_path: &Path) ->
         rest.transitions(),
         rest.vocabulary.len()
     );
-    println!("  the material    {material_named}   {} octets", material.len());
+    println!(
+        "  the material    {material_named}   {} octets",
+        material.len()
+    );
     println!("  the successor   {out_named}");
     println!();
     print_source_audit();
@@ -1147,7 +1207,10 @@ fn phoenix_cultivate(rest_path: &Path, material_path: &Path, out_path: &Path) ->
         .map_err(|refusal| refusal.to_string())?;
 
     println!("  THE STRUCTURED RESIDUAL — the prediction, taken before anything moved");
-    println!("    {} germ occurrences carried into the standing rest", grown.germs);
+    println!(
+        "    {} germ occurrences carried into the standing rest",
+        grown.germs
+    );
     for (relation, count) in grown.residual.census() {
         println!("      {relation:<28} {count:>8}");
     }
@@ -1162,7 +1225,10 @@ fn phoenix_cultivate(rest_path: &Path, material_path: &Path, out_path: &Path) ->
     println!();
 
     println!("  THE DELTA — plural, and every row names the position that caused it");
-    println!("    germs founded               {:>8}", grown.delta.germs_founded.len());
+    println!(
+        "    germs founded               {:>8}",
+        grown.delta.germs_founded.len()
+    );
     println!(
         "    classes founded             {:>8}   of which {} are SPLITS of a class that stood",
         grown.delta.classes_after - grown.delta.classes_before,
@@ -1222,7 +1288,10 @@ fn phoenix_cultivate(rest_path: &Path, material_path: &Path, out_path: &Path) ->
         println!(
             "    the germs the material founded{}: {}",
             if grown.delta.germs_founded.len() > SECTION_EXHIBIT {
-                format!(" (first {SECTION_EXHIBIT} of {} exhibited)", grown.delta.germs_founded.len())
+                format!(
+                    " (first {SECTION_EXHIBIT} of {} exhibited)",
+                    grown.delta.germs_founded.len()
+                )
             } else {
                 String::new()
             },
@@ -1305,9 +1374,13 @@ fn stations() {
     println!("EROS · STATIONS");
     println!();
     println!("  The cycle is one law: mount -> differentiate -> conduct -> glue -> radiate ->");
-    println!("  genuine exterior return -> reflect/deposit -> later current. What follows is which");
+    println!(
+        "  genuine exterior return -> reflect/deposit -> later current. What follows is which"
+    );
     println!("  of its stations this binary reaches TODAY. A station named unwired is unwired: a");
-    println!("  subcommand that printed something plausible for work it had not done would be worse");
+    println!(
+        "  subcommand that printed something plausible for work it had not done would be worse"
+    );
     println!("  than an absent one.");
     println!();
     let rows = [
@@ -1371,5 +1444,7 @@ fn stations() {
         println!("  {name:<18} {state:<8} {what}");
     }
     println!();
-    println!("  Plan: blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md");
+    println!(
+        "  Plan: blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md"
+    );
 }

@@ -1839,7 +1839,6 @@ mod tests {
         assert_eq!(ahead.against_the_turn.len(), behind.with_the_turn.len());
     }
 
-
     fn probe_config() -> ExactSeriesConfig {
         ExactSeriesConfig {
             dyadic_bits: 96,
@@ -1898,12 +1897,9 @@ mod tests {
     fn every_head_term_address_reopens_to_its_base() {
         let chain = eta_chain_decomposition(&probe_point(), &probe_config()).expect("the chain");
         for term in &chain.head {
-            let rebuilt = term
-                .address
-                .iter()
-                .fold(1u32, |product, valuation| {
-                    product * valuation.prime.pow(valuation.exponent)
-                });
+            let rebuilt = term.address.iter().fold(1u32, |product, valuation| {
+                product * valuation.prime.pow(valuation.exponent)
+            });
             assert_eq!(rebuilt, term.base, "address did not reopen to its base");
         }
     }
@@ -1928,7 +1924,9 @@ mod tests {
     fn the_two_frames_meet_only_once_borwein_is_deep_enough() {
         let config = probe_config();
         let point = probe_point();
-        let certified = eta_evaluate(&point, &config).expect("the certified frame").value;
+        let certified = eta_evaluate(&point, &config)
+            .expect("the certified frame")
+            .value;
         let overlaps = |left: &RatInterval, right: &RatInterval| {
             left.lower <= right.upper && right.lower <= left.upper
         };
@@ -1936,7 +1934,10 @@ mod tests {
             let borwein = eta_borwein_chain(&point, depth, &config).expect("the Borwein chain");
             overlaps(&borwein.value.re, &certified.re) && overlaps(&borwein.value.im, &certified.im)
         };
-        assert!(!agrees(6), "a shallow Borwein chain must NOT reach the enclosure");
+        assert!(
+            !agrees(6),
+            "a shallow Borwein chain must NOT reach the enclosure"
+        );
         assert!(agrees(32), "a deep Borwein chain must reach the enclosure");
     }
 

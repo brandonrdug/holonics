@@ -102,13 +102,7 @@ fn source_files(root: &Path) -> Vec<PathBuf> {
 
 /// The bracket species a mathematical statement nests in — the family the statement grammar
 /// recovers, reused here so one depth law serves every scale of this run.
-const FAMILY: [(char, char); 5] = [
-    ('(', ')'),
-    ('[', ']'),
-    ('{', '}'),
-    ('⟨', '⟩'),
-    ('⦃', '⦄'),
-];
+const FAMILY: [(char, char); 5] = [('(', ')'), ('[', ']'), ('{', '}'), ('⟨', '⟩'), ('⦃', '⦄')];
 
 /// Whether the region before an offset is bracket groups and whitespace and nothing else.
 ///
@@ -207,7 +201,9 @@ fn tokenize(text: &str) -> Option<Vec<Token>> {
         }
         let word = std::mem::take(carried);
         if word.chars().all(|symbol| symbol.is_ascii_digit()) {
-            found.push(Token::Number(word.parse::<BigInt>().unwrap_or_else(|_| BigInt::zero())));
+            found.push(Token::Number(
+                word.parse::<BigInt>().unwrap_or_else(|_| BigInt::zero()),
+            ));
         } else {
             found.push(Token::Name(word));
         }
@@ -382,7 +378,9 @@ impl<'a> Reader<'a> {
             carried = if symbol == '*' {
                 carried.times(&next)
             } else {
-                carried.divided_by(&next).ok_or(ReaderRefusal::ZeroDivisor)?
+                carried
+                    .divided_by(&next)
+                    .ok_or(ReaderRefusal::ZeroDivisor)?
             };
         }
         Ok(carried)
@@ -527,9 +525,7 @@ fn every_root_is_rational(polynomial: &RationalPolynomial) -> bool {
         let integral: Vec<BigInt> = carried
             .coefficients()
             .iter()
-            .map(|coefficient| {
-                (coefficient.numer() * &multiplier / coefficient.denom()).clone()
-            })
+            .map(|coefficient| (coefficient.numer() * &multiplier / coefficient.denom()).clone())
             .collect();
         let constant = integral.first().cloned().unwrap_or_else(BigInt::zero);
         let leading = integral.last().cloned().unwrap_or_else(BigInt::one);
@@ -599,7 +595,9 @@ fn divisors(value: &BigInt) -> Vec<BigInt> {
 
 fn main() {
     let root = workspace_root();
-    let declared = std::env::args().nth(1).unwrap_or_else(|| SUBTREE.to_owned());
+    let declared = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| SUBTREE.to_owned());
     let subtree = root.join(&declared);
 
     println!("{}", "=".repeat(100));
@@ -610,7 +608,9 @@ fn main() {
     println!();
     println!("  A mathlib statement is carried into an exact rational function and handed to");
     println!("  `hermite_reduction`, which splits it into a coboundary part and a remaining class");
-    println!("  and returns the RESIDUE POLYNOMIAL with no root extracted. That polynomial decides");
+    println!(
+        "  and returns the RESIDUE POLYNOMIAL with no root extracted. That polynomial decides"
+    );
     println!("  which transcendental the antiderivative needs:");
     println!();
     println!("    no residues            -> the antiderivative is RATIONAL");
@@ -642,7 +642,11 @@ fn main() {
             ));
         }
     }
-    println!("  source files {}   whole theorem statements {}", files.len(), statements.len());
+    println!(
+        "  source files {}   whole theorem statements {}",
+        files.len(),
+        statements.len()
+    );
 
     // ---------------------------------------------------------------- the founded splits
     // The conclusion is what follows the LAST depth-zero separator, which is the law the statement
@@ -680,7 +684,8 @@ fn main() {
         let Some(variable) = domain
             .split_whitespace()
             .find(|word| {
-                word.chars().all(|symbol| symbol.is_alphanumeric() || symbol == '_')
+                word.chars()
+                    .all(|symbol| symbol.is_alphanumeric() || symbol == '_')
                     && word.chars().next().is_some_and(char::is_alphabetic)
             })
             .map(ToOwned::to_owned)
@@ -840,7 +845,6 @@ fn main() {
         }
         {
             carried_all.push(Carried {
-
                 name: candidate.name.clone(),
                 integrand: candidate.integrand.clone(),
                 closed_form: candidate.closed_form.clone(),
@@ -870,20 +874,34 @@ fn main() {
             println!();
             println!("  {}", carried.name);
             println!("    integrand    {}", carried.integrand);
-            println!("    organ says   {}   residue polynomial {}", carried.predicted.name(), carried.residue);
+            println!(
+                "    organ says   {}   residue polynomial {}",
+                carried.predicted.name(),
+                carried.residue
+            );
             println!("    corpus says  {}", carried.closed_form);
         }
     }
 
     println!();
-    println!("  THE PARAMETER SWEEP -- each bound parameter was instantiated at 1, 2 and 3, and the");
-    println!("  predicted class must not move. Integrands whose class DOES move with a parameter: {}", parameter_dependent.len());
+    println!(
+        "  THE PARAMETER SWEEP -- each bound parameter was instantiated at 1, 2 and 3, and the"
+    );
+    println!(
+        "  predicted class must not move. Integrands whose class DOES move with a parameter: {}",
+        parameter_dependent.len()
+    );
     for (integrand, spread) in parameter_dependent.iter().take(4) {
         println!("    {integrand}   {spread}");
     }
     println!();
-    println!("  THE GAUGE -- both declared reduction schedules were run on every integrand, and the");
-    println!("  residue class must not move between them. Schedules disagreeing: {}", gauge_disagreements.len());
+    println!(
+        "  THE GAUGE -- both declared reduction schedules were run on every integrand, and the"
+    );
+    println!(
+        "  residue class must not move between them. Schedules disagreeing: {}",
+        gauge_disagreements.len()
+    );
     for integrand in gauge_disagreements.iter().take(3) {
         println!("    {integrand}");
     }
@@ -902,13 +920,14 @@ fn main() {
         }
     }
     for (class, members) in &by_class {
-        println!("  the organ predicts {class}   ({} integrands)", members.len());
+        println!(
+            "  the organ predicts {class}   ({} integrands)",
+            members.len()
+        );
         for carried in members.iter().take(6) {
             println!(
                 "    {:<34} {:<22} -> corpus: {}",
-                carried.name,
-                carried.integrand,
-                carried.closed_form
+                carried.name, carried.integrand, carried.closed_form
             );
         }
         if members.len() > 6 {
@@ -930,8 +949,12 @@ fn main() {
         }
     }
     println!();
-    println!("  A refusal is the aperture speaking. `sin x`, `log s` are not rational functions and");
-    println!("  `hermite_reduction` is not the organ for them. The EXPONENTIAL ones have an organ in");
+    println!(
+        "  A refusal is the aperture speaking. `sin x`, `log s` are not rational functions and"
+    );
+    println!(
+        "  `hermite_reduction` is not the organ for them. The EXPONENTIAL ones have an organ in"
+    );
     println!("  this tree, and the refusal above hands them to it rather than reporting a gap.");
 
     // ---------------------------------------------------------------- the second organ
@@ -940,13 +963,23 @@ fn main() {
     println!("THE SECOND ORGAN -- the exponential integrands, put to `elementary_chart`");
     println!("{}", "-".repeat(100));
     println!();
-    println!("  `elementary_chart` decides whether `∫ R·e^g` is elementary by the consistency of ONE");
-    println!("  exact rational linear system: `deg a = deg R - deg g + 1` is forced, so the candidate");
-    println!("  population is finite and exhaustible. Non-elementarity returns as a rank deficiency");
+    println!(
+        "  `elementary_chart` decides whether `∫ R·e^g` is elementary by the consistency of ONE"
+    );
+    println!(
+        "  exact rational linear system: `deg a = deg R - deg g + 1` is forced, so the candidate"
+    );
+    println!(
+        "  population is finite and exhaustible. Non-elementarity returns as a rank deficiency"
+    );
     println!("  with the annihilating combination exhibited, never as a search that gave up.");
     println!();
-    println!("  An exponential integrand is founded from the tokens the same way: a side reading as");
-    println!("  `exp <argument>` or `<coefficient> * exp <argument>`, with both parts built by the");
+    println!(
+        "  An exponential integrand is founded from the tokens the same way: a side reading as"
+    );
+    println!(
+        "  `exp <argument>` or `<coefficient> * exp <argument>`, with both parts built by the"
+    );
     println!("  same rational-function reader. Everything else is refused.");
     println!();
 
@@ -974,7 +1007,10 @@ fn main() {
         };
         let exponent = read_integrand(argument, &candidate.variable, &bound);
         let (Ok(coefficient), Ok(exponent)) = (coefficient, exponent) else {
-            println!("  {:<32} exp-shaped, but a part is outside the reader", candidate.name);
+            println!(
+                "  {:<32} exp-shaped, but a part is outside the reader",
+                candidate.name
+            );
             continue;
         };
         // the exponent must be a polynomial; a rational exponent is outside this organ
@@ -1011,20 +1047,30 @@ fn main() {
                 );
                 println!("      corpus: {}", candidate.closed_form);
                 if let holonic_engine::elementary_chart::ElementaryReading::Admits {
-                    realizer, ..
+                    realizer,
+                    ..
                 } = &reading.reading
                 {
-                    println!("      the realizer the organ built: {:?}", realizer.coefficients());
+                    println!(
+                        "      the realizer the organ built: {:?}",
+                        realizer.coefficients()
+                    );
                 }
             }
             Err(refusal) => println!("  {:<32} the organ refused: {refusal:?}", candidate.name),
         }
     }
     println!();
-    println!("  exponential integrands read {exponential}   the organ calls elementary {elementary}");
+    println!(
+        "  exponential integrands read {exponential}   the organ calls elementary {elementary}"
+    );
     println!();
-    println!("  `∫ exp x` is the whole of what this subtree's exponential rows state, and the organ");
-    println!("  returns the realizer `1` -- that is, `∫ e^x = 1·e^x` -- which the corpus writes as");
+    println!(
+        "  `∫ exp x` is the whole of what this subtree's exponential rows state, and the organ"
+    );
+    println!(
+        "  returns the realizer `1` -- that is, `∫ e^x = 1·e^x` -- which the corpus writes as"
+    );
     println!("  `exp b - exp a`, the same antiderivative evaluated at the two ends. The organ and");
     println!("  the table agree on the INDEFINITE object; the table adds the boundary the organ");
     println!("  does not carry.");
@@ -1037,21 +1083,31 @@ fn main() {
     println!();
     println!("  The sentence this run closes named four transports. Two are driven above and");
     println!("  `hypergeometric_closure` was reached on 2026-08-17. The fourth is");
-    println!("  `exponentiated_ratio`, whose law is `exp(a+b) = exp(a)·exp(b)` -- the homomorphism");
+    println!(
+        "  `exponentiated_ratio`, whose law is `exp(a+b) = exp(a)·exp(b)` -- the homomorphism"
+    );
     println!("  that makes a chart transition a chart transition rather than a statistic.");
     println!();
-    println!("  The corpus states that law: `Real.exp_add : exp (x + y) = exp x * exp y`. Putting it");
+    println!(
+        "  The corpus states that law: `Real.exp_add : exp (x + y) = exp x * exp y`. Putting it"
+    );
     println!("  to the organ would return agreement, and the agreement would carry NO EVIDENCE:");
-    println!("  `exponentiate` is `2^(Σ q_k log₂ p_k) = Π p_k^(q_k)`, so the homomorphism holds by");
+    println!(
+        "  `exponentiate` is `2^(Σ q_k log₂ p_k) = Π p_k^(q_k)`, so the homomorphism holds by"
+    );
     println!("  construction and no material could make it fail. That is a check whose material");
     println!("  cannot vary the property under test, which this project convicts by name.");
     println!();
     println!("  What IS a real difference between them, and it is one-sided: the organ REFUSES a");
-    println!("  fractional coefficient, because a fractional exponent leaves the rationals and lands");
+    println!(
+        "  fractional coefficient, because a fractional exponent leaves the rationals and lands"
+    );
     println!("  in an algebraic extension -- the finer chart. The corpus states the law over the");
     println!("  reals, where that boundary does not exist and the refusal is invisible.");
     println!();
-    println!("  So the two do not disagree; they are stated over different grounds, and the organ's");
+    println!(
+        "  So the two do not disagree; they are stated over different grounds, and the organ's"
+    );
     println!("  aperture is a distinction its own chart can see and the corpus's cannot.");
 
     println!();
@@ -1059,13 +1115,21 @@ fn main() {
     println!("WHAT THIS RUN DOES NOT CLAIM");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  The expression reader declares its precedence and does not found it: a corpus that");
+    println!(
+        "  The expression reader declares its precedence and does not found it: a corpus that"
+    );
     println!("  brackets whenever it matters never exhibits the precedence it relies on. The");
-    println!("  declaration is graded by the disagreement column above, which is external material");
+    println!(
+        "  declaration is graded by the disagreement column above, which is external material"
+    );
     println!("  this repository did not write -- not by any check this file performs on itself.");
     println!();
-    println!("  The organ's class is about the RESIDUES and therefore about which transcendental is");
-    println!("  needed. It is not a claim that the corpus's stated closed form is correct, and not a");
+    println!(
+        "  The organ's class is about the RESIDUES and therefore about which transcendental is"
+    );
+    println!(
+        "  needed. It is not a claim that the corpus's stated closed form is correct, and not a"
+    );
     println!("  claim that the integrand has no other antiderivative in another chart.");
     println!();
     println!("  Nothing was elaborated, type-checked, or submitted to a kernel.");

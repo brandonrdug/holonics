@@ -29,9 +29,7 @@ use serde::{Deserialize, Serialize};
 /// Mirrors `body::Aim` and carries its ruling: there is no "nothing" here, only which way the turn
 /// bites. `Ortho` is **cohere-null with the cross maximal** — the pure orthogonal turn, the founding
 /// hand — and is never to be read as an absent relation.
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum Hand {
     /// The aims align — the in-plane hand.
     Cohere,

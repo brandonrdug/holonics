@@ -282,13 +282,20 @@ fn drive_atom(material: &[u8]) -> Rung {
 
             let perception = eyes.perceive_node(node, 100);
             arrivals += 1;
-            if perception.thought_completed { completed += 1; }
-            if perception.thought_deposited { deposited += 1; }
+            if perception.thought_completed {
+                completed += 1;
+            }
+            if perception.thought_deposited {
+                deposited += 1;
+            }
 
             // the item is the RELATION, which is what this mouth presents
             let key = relation.mag.to_be_bytes().to_vec();
             let next = index.len() as u64;
-            let id = *index.entry(key).or_insert_with(|| { distinct.push(Vec::new()); next });
+            let id = *index.entry(key).or_insert_with(|| {
+                distinct.push(Vec::new());
+                next
+            });
             conduct.entry(id).or_insert((
                 perception.thought_completed,
                 perception.faces_founded > 0,
@@ -299,24 +306,40 @@ fn drive_atom(material: &[u8]) -> Rung {
                 perception.faces_founded > 0,
                 perception.landing.founds,
             ));
-            if let Some(from) = previous { followed.entry((from, class)).or_insert(id); }
+            if let Some(from) = previous {
+                followed.entry((from, class)).or_insert(id);
+            }
             previous = Some(id);
-            if eyes.resource_refused() { break; }
+            if eyes.resource_refused() {
+                break;
+            }
         }
         let census = eyes.channel().deposit_census();
         (
             eyes.standing_enclosures(),
-            (census.deposits.this_way().face(), census.deposits.that_way().face()),
+            (
+                census.deposits.this_way().face(),
+                census.deposits.that_way().face(),
+            ),
         )
     };
 
     let saturated = growth
-        .len().checked_mul(3).map(|t| t / 4)
+        .len()
+        .checked_mul(3)
+        .map(|t| t / 4)
         .and_then(|at| growth.get(at).copied())
         .is_some_and(|three_quarters| Some(&three_quarters) == growth.last());
-    let closed_after = growth.iter().position(|&n| n == seen.len()).map(|at| at + 1);
+    let closed_after = growth
+        .iter()
+        .position(|&n| n == seen.len())
+        .map(|at| at + 1);
 
-    let presentation = Presentation { spans: distinct, conduct, followed };
+    let presentation = Presentation {
+        spans: distinct,
+        conduct,
+        followed,
+    };
     let compression = compress(&presentation);
     Rung {
         grain: 0,
@@ -328,9 +351,15 @@ fn drive_atom(material: &[u8]) -> Rung {
         one_shot: compression.one_shot.len(),
         collapsed: compression.collapsed.len(),
         memory_order: compression.memory_order(),
-        shortest_separator: compression.collapsed.iter()
-            .map(|p| p.distinguishing_word.len()).min(),
-        completed, deposited, standing: standing_open, winding,
+        shortest_separator: compression
+            .collapsed
+            .iter()
+            .map(|p| p.distinguishing_word.len())
+            .min(),
+        completed,
+        deposited,
+        standing: standing_open,
+        winding,
         lattice_admits: lattice_admits_order(seen.len()),
     }
 }
@@ -342,7 +371,10 @@ fn drive(material: &[u8], grain: usize) -> Rung {
 
     // The spans: non-overlapping windows, so each octet is presented exactly once at every rung and
     // the rungs read the same material rather than different amounts of it.
-    let spans: Vec<&[u8]> = material.chunks(grain).filter(|c| c.len() == grain).collect();
+    let spans: Vec<&[u8]> = material
+        .chunks(grain)
+        .filter(|c| c.len() == grain)
+        .collect();
 
     let mut index: BTreeMap<Vec<u8>, u64> = BTreeMap::new();
     let mut distinct: Vec<Vec<u8>> = Vec::new();
@@ -412,7 +444,10 @@ fn drive(material: &[u8], grain: usize) -> Rung {
             .map(|three| three / 4)
             .and_then(|at| growth.get(at).copied())
             .is_some_and(|three_quarters| Some(&three_quarters) == growth.last());
-        let closed_after = growth.iter().position(|&n| n == seen.len()).map(|at| at + 1);
+        let closed_after = growth
+            .iter()
+            .position(|&n| n == seen.len())
+            .map(|at| at + 1);
 
         let presentation = Presentation {
             spans: distinct,
@@ -461,7 +496,11 @@ fn main() {
     let root = repository_root();
     let material = material(&root, 24_000);
     rule("THE ORBIT CLOSES, OR THE GRAIN ADMITS A STROKE");
-    println!("  material   {} octets from {} records", material.len(), RECORDS.len());
+    println!(
+        "  material   {} octets from {} records",
+        material.len(),
+        RECORDS.len()
+    );
     println!("  axis       {AXIS}   — a live receiver coordinate; every population below is at it");
     println!("  ladder     {LADDER:?}   — Fibonacci, so no rung is a multiple of another");
     assert!(
@@ -487,7 +526,8 @@ fn main() {
             r.one_shot,
             r.collapsed,
             r.memory_order.map_or("-".to_owned(), |o| o.to_string()),
-            r.shortest_separator.map_or("-".to_owned(), |s| s.to_string()),
+            r.shortest_separator
+                .map_or("-".to_owned(), |s| s.to_string()),
             r.completed,
             r.deposited,
             r.standing,
@@ -505,7 +545,12 @@ fn main() {
     rule("THE GAUGE — the ladder must have moved the orbit");
     let gauge = DeclaredGauge::of(
         rungs.iter().map(|r| r.orbit).collect(),
-        rungs.iter().skip(1).map(|r| r.orbit).chain(std::iter::once(0)).collect(),
+        rungs
+            .iter()
+            .skip(1)
+            .map(|r| r.orbit)
+            .chain(std::iter::once(0))
+            .collect(),
     );
     let gauge_acted = match &gauge {
         Ok(g) => {
@@ -529,11 +574,16 @@ fn main() {
     // A rung whose orbit is a single place is DEGENERATE, not settled: nothing was presented to it
     // that could reach anywhere. Counting one as a regime is how the first run's anti-vacuity arm
     // passed over a ladder that produced no genuine settled presentation.
-    let settled: Vec<&Rung> = rungs.iter().filter(|r| r.saturated && r.orbit > 1).collect();
+    let settled: Vec<&Rung> = rungs
+        .iter()
+        .filter(|r| r.saturated && r.orbit > 1)
+        .collect();
     let growing: Vec<&Rung> = rungs.iter().filter(|r| !r.saturated).collect();
     let degenerate = rungs.iter().filter(|r| r.orbit <= 1).count();
     if degenerate > 0 {
-        println!("  {degenerate} rung(s) DEGENERATE — orbit of one place, excluded from both regimes");
+        println!(
+            "  {degenerate} rung(s) DEGENERATE — orbit of one place, excluded from both regimes"
+        );
     }
     let both_regimes = !settled.is_empty() && !growing.is_empty();
     println!(
@@ -560,7 +610,11 @@ fn main() {
             if r.saturated { "SATURATED" } else { "growing" },
             r.blocks,
             r.one_shot,
-            if r.blocks == r.one_shot { "partition saturated" } else { "partition refined" }
+            if r.blocks == r.one_shot {
+                "partition saturated"
+            } else {
+                "partition refined"
+            }
         );
     }
 
@@ -581,8 +635,10 @@ fn main() {
     // form of this arm compared raw completions and contradicted its own declaration, which reads
     // "per arrival"; a coarse rung has an order of magnitude fewer arrivals, so raw counts compare
     // the extent of the presentation rather than its conduct.
-    let mut by_orbit: Vec<(usize, usize, usize)> =
-        rungs.iter().map(|r| (r.orbit, r.completed, r.arrivals)).collect();
+    let mut by_orbit: Vec<(usize, usize, usize)> = rungs
+        .iter()
+        .map(|r| (r.orbit, r.completed, r.arrivals))
+        .collect();
     by_orbit.sort();
     let richer = |a: (usize, usize, usize), b: (usize, usize, usize)| a.1 * b.2 <= b.1 * a.2;
     let arm_three = by_orbit.windows(2).all(|w| richer(w[0], w[1]))
@@ -592,7 +648,9 @@ fn main() {
         held(arm_three)
     );
     for (orbit, done, arrivals) in &by_orbit {
-        println!("                  orbit {orbit:>6}   completed {done:>5} : {arrivals:<6} arrivals");
+        println!(
+            "                  orbit {orbit:>6}   completed {done:>5} : {arrivals:<6} arrivals"
+        );
     }
 
     // THE SAME PAIRS, ORDERED BY COMPOSITION DEPTH — how many differences the arrival's node
@@ -603,12 +661,19 @@ fn main() {
     // The two entries at depth one are the two MOUTHS and are reported as one stratum: they are not
     // two settings of a ladder, and forcing them onto one curve was what made the grain-ordered form
     // of this reading fail.
-    let depth_of = |r: &Rung| if r.grain == 0 { 1 } else { r.grain.saturating_sub(1) };
-    let mut by_depth: Vec<(usize, usize, usize, usize)> =
-        rungs.iter().map(|r| (depth_of(r), r.grain, r.completed, r.arrivals)).collect();
+    let depth_of = |r: &Rung| {
+        if r.grain == 0 {
+            1
+        } else {
+            r.grain.saturating_sub(1)
+        }
+    };
+    let mut by_depth: Vec<(usize, usize, usize, usize)> = rungs
+        .iter()
+        .map(|r| (depth_of(r), r.grain, r.completed, r.arrivals))
+        .collect();
     by_depth.sort();
-    let deeper: Vec<&(usize, usize, usize, usize)> =
-        by_depth.iter().filter(|r| r.0 > 1).collect();
+    let deeper: Vec<&(usize, usize, usize, usize)> = by_depth.iter().filter(|r| r.0 > 1).collect();
     let monotone_in_depth = deeper
         .windows(2)
         .all(|w| w[0].2 * w[1].3 <= w[1].2 * w[0].3)
@@ -618,7 +683,11 @@ fn main() {
         held(monotone_in_depth)
     );
     for (depth, grain, done, arrivals) in &by_depth {
-        let label = if *grain == 0 { "atom mouth".to_owned() } else { format!("span {grain}") };
+        let label = if *grain == 0 {
+            "atom mouth".to_owned()
+        } else {
+            format!("span {grain}")
+        };
         println!(
             "                  depth {depth:>2}  {label:<12}  completed {done:>5} : {arrivals:<6} arrivals"
         );
@@ -627,47 +696,89 @@ fn main() {
     // ── THE READING ───────────────────────────────────────────────────────────────────────────────
     rule("THE READING");
     if !gauge_acted || !both_regimes {
-        println!("  VACUOUS. The ladder did not produce two regimes over a moved gauge, so arms one");
-        println!("  through three hold for free and separate nothing. The material or the ladder must");
-        println!("  widen before any of this is evidence — and that is the failure this driver's own");
+        println!(
+            "  VACUOUS. The ladder did not produce two regimes over a moved gauge, so arms one"
+        );
+        println!(
+            "  through three hold for free and separate nothing. The material or the ladder must"
+        );
+        println!(
+            "  widen before any of this is evidence — and that is the failure this driver's own"
+        );
         println!("  anti-vacuity arm exists to catch, reported rather than passed.");
     } else if arm_three {
         println!("  THE SWING CONSULTS THE TERRAIN. Completions rise as the orbit opens, over one");
-        println!("  material and a gauge measured non-trivial. A thought cuts where the arrival's aim");
-        println!("  is orthogonal to the standing thought, and a closed orbit offers finitely many");
+        println!(
+            "  material and a gauge measured non-trivial. A thought cuts where the arrival's aim"
+        );
+        println!(
+            "  is orthogonal to the standing thought, and a closed orbit offers finitely many"
+        );
         println!("  directions for the standing thought to occupy.");
         println!();
-        println!("  So a presentation's regime is readable BEFORE a stroke is chosen, from organs that");
-        println!("  already stand, and the mouth law becomes operational: the grain is co-founded by");
+        println!(
+            "  So a presentation's regime is readable BEFORE a stroke is chosen, from organs that"
+        );
+        println!(
+            "  already stand, and the mouth law becomes operational: the grain is co-founded by"
+        );
         println!("  reading what the material admits, not declared from outside.");
     } else if monotone_in_depth {
         println!("  ARM THREE IS REFUTED AND WHAT REPLACES IT IS SHARPER.");
         println!();
-        println!("  Completions per arrival do NOT rise with the orbit — they rise, monotonically and");
-        println!("  without exception, with the COMPOSITION DEPTH of the arrival. The orbit is not");
+        println!(
+            "  Completions per arrival do NOT rise with the orbit — they rise, monotonically and"
+        );
+        println!(
+            "  without exception, with the COMPOSITION DEPTH of the arrival. The orbit is not"
+        );
         println!("  monotone in the depth at all:");
         println!("  it peaks in the middle of the ladder, because a coarse presentation has fewer");
         println!("  arrivals with which to reach places. So orbit size and composition depth were");
         println!("  conflated, and the arm was aimed at the wrong one.");
         println!();
-        println!("  WHAT THE SWING CONSULTS IS THE COMPOSITION DEPTH OF THE ARRIVAL, not the extent of");
-        println!("  the terrain. A span of twenty-one octets carries twenty composed differences into");
-        println!("  its located node; an atom carries one. A thought cuts where the arrival's aim is");
-        println!("  orthogonal to the standing thought, and a richer node has more directions to be");
-        println!("  orthogonal in — which is a property of the ARRIVAL and not of the map it lands on.");
+        println!(
+            "  WHAT THE SWING CONSULTS IS THE COMPOSITION DEPTH OF THE ARRIVAL, not the extent of"
+        );
+        println!(
+            "  the terrain. A span of twenty-one octets carries twenty composed differences into"
+        );
+        println!(
+            "  its located node; an atom carries one. A thought cuts where the arrival's aim is"
+        );
+        println!(
+            "  orthogonal to the standing thought, and a richer node has more directions to be"
+        );
+        println!(
+            "  orthogonal in — which is a property of the ARRIVAL and not of the map it lands on."
+        );
         println!();
-        println!("  ARM ONE'S FAILURE SAYS THE SAME THING FROM THE OTHER SIDE. The atom mouth saturates");
-        println!("  its places and its conduct partition keeps refining — 128 blocks over an orbit of");
-        println!("  100 — so the causal state is FINER than the orbit. The body's response carries what");
-        println!("  the landing place does not, because it depends on the standing thought and not only");
+        println!(
+            "  ARM ONE'S FAILURE SAYS THE SAME THING FROM THE OTHER SIDE. The atom mouth saturates"
+        );
+        println!(
+            "  its places and its conduct partition keeps refining — 128 blocks over an orbit of"
+        );
+        println!(
+            "  100 — so the causal state is FINER than the orbit. The body's response carries what"
+        );
+        println!(
+            "  the landing place does not, because it depends on the standing thought and not only"
+        );
         println!("  on where the arrival fell. Place-closure and conduct-closure are two objects.");
         println!();
         println!("  So the regime reading is real and the terrain reading is withdrawn: what a");
-        println!("  presentation admits is decided by what it COMPOSES, and the live ecology's arrivals");
+        println!(
+            "  presentation admits is decided by what it COMPOSES, and the live ecology's arrivals"
+        );
         println!("  compose one difference each.");
     } else {
-        println!("  ARM THREE FAILED and nothing replaces it: completions rise with neither the orbit");
-        println!("  nor the composition depth. The swing's cut consults neither, and the whole line");
+        println!(
+            "  ARM THREE FAILED and nothing replaces it: completions rise with neither the orbit"
+        );
+        println!(
+            "  nor the composition depth. The swing's cut consults neither, and the whole line"
+        );
         println!("  presentation to generation is wrong at the root rather than mis-aimed.");
     }
 

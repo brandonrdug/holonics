@@ -102,9 +102,7 @@ fn admitted_standing() -> Vec<(String, String)> {
     deposited_lean(&repository_root().join(STANDING_DEPOSIT), &mut deposited);
     deposited
         .into_iter()
-        .filter(|(source, text)| {
-            ConditionedBody::mount([(source.clone(), text.clone())]).is_ok()
-        })
+        .filter(|(source, text)| ConditionedBody::mount([(source.clone(), text.clone())]).is_ok())
         .collect()
 }
 
@@ -142,7 +140,11 @@ fn encode_rest(rest: &ConditionedRest) -> Vec<u8> {
 /// `ErosRest::organ_difference` was a reading that **had never touched an organ** — and in this
 /// driver both organs carried the *identical* literal, which made it a control that could not fire
 /// on the arm it was there to watch. The grading rules convict exactly that shape.
-fn conditioned_organ(name: &str, standing: &[(String, String)], wholes: &[(String, String)]) -> OrganRest {
+fn conditioned_organ(
+    name: &str,
+    standing: &[(String, String)],
+    wholes: &[(String, String)],
+) -> OrganRest {
     let mut body = ConditionedBody::mount(standing.to_vec()).expect("real Lean standing mounts");
     body.condition_wholes(wholes.iter().map(|(at, text)| (at.as_str(), text.as_str())));
     let rest = ConditionedRest::seal(&body).expect("a founded morphology seals");
@@ -156,7 +158,10 @@ fn declared_organs() -> Vec<OrganRest> {
         "the declared Lean standing resolves to nothing; the organ arm would be authored again"
     );
     let wholes = read_material(WHOLES);
-    assert!(!wholes.is_empty(), "the declared conditioning material resolves to nothing");
+    assert!(
+        !wholes.is_empty(),
+        "the declared conditioning material resolves to nothing"
+    );
     vec![
         conditioned_organ("derivation", &standing, &wholes[..1]),
         conditioned_organ("language", &standing, &wholes),
@@ -189,13 +194,21 @@ fn organ_arm(frame: LineageChannel, standing: &[u32], own: &[u32], carrier: &[u3
 
     let before = ErosRest::seal(
         frame.clone(),
-        vec![block("standing", standing), block("own", own), block("carrier", carrier)],
+        vec![
+            block("standing", standing),
+            block("own", own),
+            block("carrier", carrier),
+        ],
         vec![thin.clone()],
     )
     .expect("seals");
     let after = ErosRest::seal(
         frame.clone(),
-        vec![block("standing", standing), block("own", own), block("carrier", carrier)],
+        vec![
+            block("standing", standing),
+            block("own", own),
+            block("carrier", carrier),
+        ],
         vec![thick],
     )
     .expect("seals");
@@ -211,7 +224,11 @@ fn organ_arm(frame: LineageChannel, standing: &[u32], own: &[u32], carrier: &[u3
     // reading above is a statement about the encoder rather than about the organ.
     let twin = ErosRest::seal(
         frame,
-        vec![block("standing", standing), block("own", own), block("carrier", carrier)],
+        vec![
+            block("standing", standing),
+            block("own", own),
+            block("carrier", carrier),
+        ],
         vec![thin],
     )
     .expect("seals");
@@ -389,7 +406,9 @@ fn report(name: &str, before: &ErosRest, after: &ErosRest, steps: usize) -> bool
         );
     }
     if medium.is_empty() {
-        println!("    carriers                 NONE moved — standing, own and carrier all unchanged");
+        println!(
+            "    carriers                 NONE moved — standing, own and carrier all unchanged"
+        );
     }
     println!(
         "    action ledger  before    ⟳ {:?}  ⟲ {:?}",
@@ -425,7 +444,10 @@ fn main() {
     println!("\n  the law under test");
     println!("    seal -> run -> seal must DIFFER, and the difference must be exhibited");
     println!("  both arms are required: a control that only ever passes has not been tested");
-    println!("\n  material            {} words, identical for both arms", material.len());
+    println!(
+        "\n  material            {} words, identical for both arms",
+        material.len()
+    );
 
     let (a0, a1, a_steps) = arm_perception(&material);
     let (b0, b1, b_steps) = arm_directed_contact(&material);
@@ -440,10 +462,17 @@ fn main() {
 
     // ARM C — the distant grip, on two disjoint stretches of the same material.
     let half = material.len() / 2;
-    let (first_moved, second_moved, overlap) = arm_distant_grip(&material[..half], &material[half..]);
+    let (first_moved, second_moved, overlap) =
+        arm_distant_grip(&material[..half], &material[half..]);
     println!("\n  ARM C — the distant grip (the no-catastrophic-forgetting control)");
-    println!("    own words moved by the first stretch    {}", first_moved.len());
-    println!("    own words moved by the second stretch   {}", second_moved.len());
+    println!(
+        "    own words moved by the first stretch    {}",
+        first_moved.len()
+    );
+    println!(
+        "    own words moved by the second stretch   {}",
+        second_moved.len()
+    );
     println!("    words the second stretch RE-moved       {overlap}");
     println!(
         "    THE CONTROL              {}",
@@ -466,14 +495,22 @@ fn main() {
     println!("\n  THE TWO-ARM READING");
     match (a_fired, b_fired) {
         (true, false) => {
-            println!("    AS EXPECTED. Perception conditions and the directed path deposits nothing,");
+            println!(
+                "    AS EXPECTED. Perception conditions and the directed path deposits nothing,"
+            );
             println!("    on the SAME substrate and the SAME material, so the control is");
-            println!("    discriminating rather than decorative. The directed path founds no stance,");
-            println!("    and live_carrier.rs:357-368 requires a born stance before a flywheel may");
+            println!(
+                "    discriminating rather than decorative. The directed path founds no stance,"
+            );
+            println!(
+                "    and live_carrier.rs:357-368 requires a born stance before a flywheel may"
+            );
             println!("    be live — that is the obstruction, not an impossibility.");
         }
         (true, true) => {
-            println!("    ARM B FIRED. Something now deposits on the directed path. Find what, and");
+            println!(
+                "    ARM B FIRED. Something now deposits on the directed path. Find what, and"
+            );
             println!("    check it against the born-stance law before reading this as a repair.");
         }
         (false, _) => {

@@ -563,5 +563,7 @@ fn main() {
         abelian_widest,
         "on an abelian connection repetition and breadth must reach the same subgroup"
     );
-    println!("  they coincide, so the gap measured above is the non-commutativity and not the method");
+    println!(
+        "  they coincide, so the gap measured above is the non-commutativity and not the method"
+    );
 }

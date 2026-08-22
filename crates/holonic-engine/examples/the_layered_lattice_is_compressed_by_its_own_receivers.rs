@@ -62,7 +62,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, quotient_on_cpu};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, ReceiverExactCompression, compress,
+    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
     compress_on_device,
 };
 
@@ -325,8 +325,10 @@ fn report(label: &str, reading: &ReceiverExactCompression, lattice: &LayeredLatt
             lattice.positions[right_position].surface,
             pair.distinguishing_word.len(),
             match &pair.witness {
-                Some((receiver, here, there)) =>
-                    format!(", receiver {} saw {} against {}", receiver.0, here.0, there.0),
+                Some((receiver, here, there)) => format!(
+                    ", receiver {} saw {} against {}",
+                    receiver.0, here.0, there.0
+                ),
                 None => ", separated by a terminus".to_string(),
             }
         );
@@ -366,7 +368,9 @@ fn report(label: &str, reading: &ReceiverExactCompression, lattice: &LayeredLatt
             "    >> EVERY ONE IS AT THE TERMINAL LAYER. Depth is what separates, and at layer {} there",
             lattice.layers - 1
         );
-        println!("    >> is none left: a site with no successor has no future to be distinguished by,");
+        println!(
+            "    >> is none left: a site with no successor has no future to be distinguished by,"
+        );
         println!("    >> so the last layer's quotient is exactly the one-shot reading's own. The");
         println!("    >> lattice ALONE cannot tell two occurrences of one surface apart there.");
     }
@@ -401,8 +405,12 @@ fn run() -> Result<(), String> {
     println!();
     println!("      (j,l) ~> (i,l')   <=>   j <= i  AND  l <= l'");
     println!();
-    println!("  a discrete light cone monotone on both axes, with NO same-depth lateral edge. So a");
-    println!("  chain of k dependencies in the material's causal order costs k LAYERS, and an input");
+    println!(
+        "  a discrete light cone monotone on both axes, with NO same-depth lateral edge. So a"
+    );
+    println!(
+        "  chain of k dependencies in the material's causal order costs k LAYERS, and an input"
+    );
     println!("  word in the compression below is literally a descent through depth.");
 
     // ---------------------------------------------------------------- the material
@@ -433,7 +441,9 @@ fn run() -> Result<(), String> {
         lattice.positions.len() * lattice.layers
     );
     println!();
-    println!("  THE OFFSETS ARE DERIVED, not chosen: the distinct gaps at which a surface recurs in");
+    println!(
+        "  THE OFFSETS ARE DERIVED, not chosen: the distinct gaps at which a surface recurs in"
+    );
     println!("  this corpus, ranked by how often they occur, plus the residual 0 which is a");
     println!("  structural edge rather than a recurrence.");
     println!("    admitted: {offsets:?}");
@@ -445,10 +455,16 @@ fn run() -> Result<(), String> {
     println!("  THE RECEIVERS, DECLARED BEFORE THE RUN. Each is a codec face of the octets AT the");
     println!("  site; none is a coordinate of the lattice and none is assigned per site by this");
     println!("  driver:");
-    println!("    {}  the dense identity, canonical over the sorted distinct surfaces", RECEIVER_IDENTITY.0);
+    println!(
+        "    {}  the dense identity, canonical over the sorted distinct surfaces",
+        RECEIVER_IDENTITY.0
+    );
     println!("    {}  the first octet", RECEIVER_FIRST_OCTET.0);
     println!("    {}  the octet count", RECEIVER_OCTET_COUNT.0);
-    println!("    {}  the adjacent-bit-transition winding of the octet stream", RECEIVER_OCTET_WINDING.0);
+    println!(
+        "    {}  the adjacent-bit-transition winding of the octet stream",
+        RECEIVER_OCTET_WINDING.0
+    );
 
     // ---------------------------------------------------------------- the two carriers
     println!();
@@ -485,13 +501,19 @@ fn run() -> Result<(), String> {
     report("the card", &resident, &lattice);
 
     println!();
-    println!("  THE TWO-FRAME CHECK. The partitions must agree exactly; the device claims identities");
-    println!("  in whatever order its lanes reach them, so NUMBERING is a realization coordinate and");
+    println!(
+        "  THE TWO-FRAME CHECK. The partitions must agree exactly; the device claims identities"
+    );
+    println!(
+        "  in whatever order its lanes reach them, so NUMBERING is a realization coordinate and"
+    );
     println!("  is not compared.");
     let agree = serial.one_shot == resident.one_shot && serial.conduct == resident.conduct;
     println!("    one-shot and conduct partitions agree: {agree}");
     if !agree {
-        return Err("the two carriers disagree; one of them is wrong and neither is trusted".into());
+        return Err(
+            "the two carriers disagree; one of them is wrong and neither is trusted".into(),
+        );
     }
     println!(
         "    collapsed populations agree: {}",
@@ -504,12 +526,21 @@ fn run() -> Result<(), String> {
     println!("WHERE THE APERTURE ACTUALLY SITS  --  measured, not assumed");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  The REFINEMENT scales: it is one quotient per receiver and one per input per round,");
-    println!("  and the card's table is sized from the material with no load factor. The EXHIBITION");
-    println!("  does not: it walks every pair inside a one-shot block, which is quadratic in block");
+    println!(
+        "  The REFINEMENT scales: it is one quotient per receiver and one per input per round,"
+    );
+    println!(
+        "  and the card's table is sized from the material with no load factor. The EXHIBITION"
+    );
+    println!(
+        "  does not: it walks every pair inside a one-shot block, which is quadratic in block"
+    );
     println!("  size. So the boundary is not where it looks.");
     println!();
-    println!("  {:>10} {:>10} {:>14} {:>16} {:>14}", "positions", "sites", "one-shot blocks", "pairs in blocks", "collapsed");
+    println!(
+        "  {:>10} {:>10} {:>14} {:>16} {:>14}",
+        "positions", "sites", "one-shot blocks", "pairs in blocks", "collapsed"
+    );
     for limit in [80usize, 160, 320, 640] {
         let positions = read_corpus(limit)?;
         let (offsets, _) = offsets_from(&positions, OFFSET_APERTURE);
@@ -539,7 +570,10 @@ fn run() -> Result<(), String> {
     println!("  driven directly and cross-checked against the serial reference at each step, with");
     println!("  no collapsed population exhibited:");
     println!();
-    println!("  {:>10} {:>10} {:>12} {:>16} {:>12}", "positions", "sites", "receivers", "conduct blocks", "agree");
+    println!(
+        "  {:>10} {:>10} {:>12} {:>16} {:>12}",
+        "positions", "sites", "receivers", "conduct blocks", "agree"
+    );
     for limit in [640usize, 2560, 10_240] {
         let positions = read_corpus(limit)?;
         let (offsets, _) = offsets_from(&positions, OFFSET_APERTURE);
@@ -616,20 +650,28 @@ fn run() -> Result<(), String> {
     println!("THE AUTHORED-PARTITION FALSIFIER");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  \"Which declared input, if varied across two members of one returned block, would move");
-    println!("  them apart? If the answer is the one I set equal for both, the class is authored.\"");
+    println!(
+        "  \"Which declared input, if varied across two members of one returned block, would move"
+    );
+    println!(
+        "  them apart? If the answer is the one I set equal for both, the class is authored.\""
+    );
     println!();
-    println!("  The answer here is THE MATERIAL AT THE POSITION, and the corpus owns it. Varying the");
-    println!("  corpus must move the partition, or the receivers were reading the lattice rather than");
+    println!(
+        "  The answer here is THE MATERIAL AT THE POSITION, and the corpus owns it. Varying the"
+    );
+    println!(
+        "  corpus must move the partition, or the receivers were reading the lattice rather than"
+    );
     println!("  reading the material. Two disjoint slices of the same corpus, same lattice shape:");
     println!();
     let whole = read_corpus(640)?;
-    println!("  {:<14} {:>12} {:>16} {:>14} {:>14}", "slice", "distinct", "one-shot blocks", "conduct blocks", "collapsed");
+    println!(
+        "  {:<14} {:>12} {:>16} {:>14} {:>14}",
+        "slice", "distinct", "one-shot blocks", "conduct blocks", "collapsed"
+    );
     let mut signatures: Vec<Vec<usize>> = Vec::new();
-    for (name, slice) in [
-        ("first 320", &whole[..320]),
-        ("last 320", &whole[320..]),
-    ] {
+    for (name, slice) in [("first 320", &whole[..320]), ("last 320", &whole[320..])] {
         let (offsets, _) = offsets_from(slice, OFFSET_APERTURE);
         let piece = LayeredLattice {
             positions: slice.to_vec(),
@@ -673,16 +715,26 @@ fn run() -> Result<(), String> {
     println!("{}", "=".repeat(100));
     println!();
     println!("  It does not claim to have compressed a transformer. It compresses THE LATTICE a");
-    println!("  transformer's admitted transports define, over a declared receiver family and real");
+    println!(
+        "  transformer's admitted transports define, over a declared receiver family and real"
+    );
     println!("  material, and returns the collapsed population that lattice forces. No weight is");
     println!("  read here; station six is where a real head enters.");
     println!();
-    println!("  The memory order is the memory order of the PAIR (material, receiver family), never");
-    println!("  of the material. A finer family un-collapses pairs this one merged, and the figure");
+    println!(
+        "  The memory order is the memory order of the PAIR (material, receiver family), never"
+    );
+    println!(
+        "  of the material. A finer family un-collapses pairs this one merged, and the figure"
+    );
     println!("  above speaks about the receivers as much as about the corpus.");
     println!();
-    println!("  Nothing here is a compression ratio. The invariance is additive and a ratio is the");
-    println!("  frame-dependent quantity; what is returned is the POPULATION, each pair carrying the");
+    println!(
+        "  Nothing here is a compression ratio. The invariance is additive and a ratio is the"
+    );
+    println!(
+        "  frame-dependent quantity; what is returned is the POPULATION, each pair carrying the"
+    );
     println!("  shortest word that separates it.");
     Ok(())
 }

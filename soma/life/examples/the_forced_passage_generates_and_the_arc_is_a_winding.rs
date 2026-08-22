@@ -163,7 +163,16 @@ fn run() -> Result<(), String> {
         standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
         depth.push(atlas.class_extent(state).unwrap_or(0) as u32);
     }
-    let body = Body { indptr, germ, target, suffix, standing, depth, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        standing,
+        depth,
+        surfaces,
+        index_of,
+    };
 
     // ================= GENERATION BY FORCED PASSAGE =================
     println!("GENERATION — the walk conducts through forced passages and HALTS AT A FORK.\n");
@@ -243,21 +252,28 @@ fn run() -> Result<(), String> {
         .filter(|(_, windings)| windings.len() > 1)
         .collect();
     println!("  classes reached           {}", arrivals.len());
-    println!("  reached at MORE THAN ONE accumulated winding: {}", plural.len());
+    println!(
+        "  reached at MORE THAN ONE accumulated winding: {}",
+        plural.len()
+    );
     for (class, windings) in plural.iter().take(8) {
         let held: Vec<String> = windings.iter().map(u32::to_string).collect();
         println!("    class {class:<8} windings {{{}}}", held.join(", "));
     }
     if plural.is_empty() {
         println!("  NONE. The accumulated arc is a function of the class alone, so it carries no");
-        println!("  phase and there is no holonomy to recover. The winding would have to come from");
+        println!(
+            "  phase and there is no holonomy to recover. The winding would have to come from"
+        );
         println!("  somewhere other than the arc depth.");
     } else {
         println!();
         println!("  HOLONOMY IS PRESENT. The same class is reached carrying different accumulated");
         println!("  windings, so the arc is a genuine PHASE on top of the class — the same place,");
         println!("  two turns. `{{class, matched_length}}` cannot see it and `{{class,");
-        println!("  matched_length, winding}}` can. That is the coordinate whose absence makes the");
+        println!(
+            "  matched_length, winding}}` can. That is the coordinate whose absence makes the"
+        );
         println!("  monoid aperiodic, and it is recoverable from transport this container already");
         println!("  carries rather than from anything new.");
     }

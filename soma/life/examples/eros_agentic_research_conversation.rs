@@ -553,10 +553,7 @@ fn run() -> Result<(), String> {
                 "    reflective codecs    committed {}  versions {}",
                 standing.reflective_codec_commits, standing.reflective_codec_versions
             );
-            println!(
-                "    generated answers    {}",
-                standing.generated_answers
-            );
+            println!("    generated answers    {}", standing.generated_answers);
         }
     }
 

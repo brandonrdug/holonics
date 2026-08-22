@@ -62,10 +62,10 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::surprisal::{CrossEntropyFiber, SymbolicSurprisal, cross_entropy_fiber};
+use holonic_engine::surprisal::{cross_entropy_fiber, CrossEntropyFiber, SymbolicSurprisal};
 use life::decomposing_codec::{
-    DecomposingBody, DecompositionGrain, DecompositionPass, RevisionAperture, Symbol, read,
-    render_word,
+    read, render_word, DecomposingBody, DecompositionGrain, DecompositionPass, RevisionAperture,
+    Symbol,
 };
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
@@ -287,15 +287,33 @@ fn main() {
     assert_eq!(near_circulation.len(), near_geometry.len());
 
     println!("  THE CROSSING -- two conditioning bodies, two later bodies, one near each.");
-    println!("  Every body sampled by STRIDE to a DECLARED COMMON EXTENT, so the absolute aperture");
+    println!(
+        "  Every body sampled by STRIDE to a DECLARED COMMON EXTENT, so the absolute aperture"
+    );
     println!("  threshold is comparable and the sample spans each body end to end.");
     println!();
-    println!("  conditioning A (circulation)  {:>5} lines   {:?}", circulation.len(), CIRCULATION_BODY);
-    println!("  conditioning C (geometry)     {:>5} lines   {:?}", geometry.len(), GEOMETRY_BODY);
-    println!("  later B, near A               {:>5} lines   {LATER_NEAR_CIRCULATION}", near_circulation.len());
-    println!("  later D, near C               {:>5} lines   {LATER_NEAR_GEOMETRY}", near_geometry.len());
+    println!(
+        "  conditioning A (circulation)  {:>5} lines   {:?}",
+        circulation.len(),
+        CIRCULATION_BODY
+    );
+    println!(
+        "  conditioning C (geometry)     {:>5} lines   {:?}",
+        geometry.len(),
+        GEOMETRY_BODY
+    );
+    println!(
+        "  later B, near A               {:>5} lines   {LATER_NEAR_CIRCULATION}",
+        near_circulation.len()
+    );
+    println!(
+        "  later D, near C               {:>5} lines   {LATER_NEAR_GEOMETRY}",
+        near_geometry.len()
+    );
     println!();
-    println!("  Both later bodies are NONIDENTICAL to both conditioning bodies and condition nothing.");
+    println!(
+        "  Both later bodies are NONIDENTICAL to both conditioning bodies and condition nothing."
+    );
     println!();
 
     let origin = DecompositionGrain::declare([vec![Symbol(b' ')]]).expect("a declared grain");
@@ -324,7 +342,11 @@ fn main() {
     let orbit_is_nontrivial = grains[0] != grains[1];
     println!(
         "  the two declared apertures reached different grains   {}",
-        if orbit_is_nontrivial { "YES" } else { "NO -- vacuous" }
+        if orbit_is_nontrivial {
+            "YES"
+        } else {
+            "NO -- vacuous"
+        }
     );
 
     // -----------------------------------------------------------------------------------------
@@ -343,8 +365,13 @@ fn main() {
     // therefore a measurement rather than a gauge.
     // -----------------------------------------------------------------------------------------
     println!();
-    println!("  THE APERTURE'S OWN FRAME -- a count needs its material normalised; a ratio does not");
-    let natural: Vec<Vec<Symbol>> = CIRCULATION_BODY.iter().flat_map(|path| lines_of(path)).collect();
+    println!(
+        "  THE APERTURE'S OWN FRAME -- a count needs its material normalised; a ratio does not"
+    );
+    let natural: Vec<Vec<Symbol>> = CIRCULATION_BODY
+        .iter()
+        .flat_map(|path| lines_of(path))
+        .collect();
     let extents: [(&str, Vec<Vec<Symbol>>); 2] = [
         ("stride-sampled", circulation.clone()),
         ("natural extent", natural),
@@ -356,7 +383,9 @@ fn main() {
         let mut counted = DecomposingBody::mount(origin.clone()).expect("mounts");
         counted.receive(body_lines.clone()).expect("readable");
         let counted = counted
-            .revise_within(RevisionAperture::asked_by_at_least(DECLARED_APERTURES[1]).expect("positive"))
+            .revise_within(
+                RevisionAperture::asked_by_at_least(DECLARED_APERTURES[1]).expect("positive"),
+            )
             .expect("admits");
         let mut rationed = DecomposingBody::mount(origin.clone()).expect("mounts");
         rationed.receive(body_lines.clone()).expect("readable");
@@ -388,8 +417,14 @@ fn main() {
     println!("{}", "-".repeat(104));
     println!("THE TWO DEPOSITS -- each derived from its own body's collapsed pairs");
     println!("{}", "-".repeat(104));
-    println!("  A (circulation) grain   {} cut words", grain_a.cuts().len());
-    println!("  C (geometry)    grain   {} cut words", grain_c.cuts().len());
+    println!(
+        "  A (circulation) grain   {} cut words",
+        grain_a.cuts().len()
+    );
+    println!(
+        "  C (geometry)    grain   {} cut words",
+        grain_c.cuts().len()
+    );
     let shared: BTreeSet<Vec<Symbol>> = grain_a
         .cuts()
         .intersection(grain_c.cuts())
@@ -405,11 +440,21 @@ fn main() {
     );
     println!(
         "  only A: {}",
-        only_a.iter().take(14).map(|w| render_word(w)).collect::<Vec<_>>().join("  ")
+        only_a
+            .iter()
+            .take(14)
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
+            .join("  ")
     );
     println!(
         "  only C: {}",
-        only_c.iter().take(14).map(|w| render_word(w)).collect::<Vec<_>>().join("  ")
+        only_c
+            .iter()
+            .take(14)
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
+            .join("  ")
     );
     let deposits_differ = !only_a.is_empty() && !only_c.is_empty();
 
@@ -456,8 +501,24 @@ fn main() {
         d_only_c.len()
     );
     println!();
-    println!("      B only through A: {}", b_only_a.iter().take(12).map(|w| render_word(w)).collect::<Vec<_>>().join("  "));
-    println!("      D only through C: {}", d_only_c.iter().take(12).map(|w| render_word(w)).collect::<Vec<_>>().join("  "));
+    println!(
+        "      B only through A: {}",
+        b_only_a
+            .iter()
+            .take(12)
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
+            .join("  ")
+    );
+    println!(
+        "      D only through C: {}",
+        d_only_c
+            .iter()
+            .take(12)
+            .map(|w| render_word(w))
+            .collect::<Vec<_>>()
+            .join("  ")
+    );
 
     // The crossing itself: does each later body favour its own neighbour's deposit?
     let b_favours_a = b_only_a.len() as i64 - b_only_c.len() as i64;
@@ -482,7 +543,11 @@ fn main() {
         Some((difference, zero)) => println!(
             "      difference form {}   {}",
             if zero { "IS EXACTLY ZERO" } else { "moved" },
-            if zero { String::new() } else { difference.named() }
+            if zero {
+                String::new()
+            } else {
+                difference.named()
+            }
         ),
         None => println!("      one side carried no supported part at all"),
     }
@@ -492,7 +557,9 @@ fn main() {
     // -----------------------------------------------------------------------------------------
     let mut unrevised = DecomposingBody::mount(origin.clone()).expect("mounts");
     unrevised.receive(circulation.clone()).expect("readable");
-    unrevised.resume_unrevised().expect("an open reflection closes");
+    unrevised
+        .resume_unrevised()
+        .expect("an open reflection closes");
     let b_unrevised = score(&origin, &circulation, &near_circulation);
     let noop = moved(&b_parent, &b_unrevised);
     let noop_is_zero = matches!(noop, Some((_, true)));
@@ -517,7 +584,9 @@ fn main() {
         }
         foil_words.push(candidate);
     }
-    let foil = origin.with_all(foil_words).expect("a foil grain of the same shape");
+    let foil = origin
+        .with_all(foil_words)
+        .expect("a foil grain of the same shape");
 
     // The foil must be measured by the SAME statistic as the derived cut, or the
     // comparison is between two different quantities. An earlier form of this
@@ -564,7 +633,9 @@ fn main() {
     println!("  The population is the object; the exact form is its magnitude face. The grade");
     println!("  claimed is exactly three -- a later NONIDENTICAL neighbourhood -- and every grade");
     println!("  below it stands as the carrier and never as the return.");
-    println!("  Two conditioning bodies and two later bodies is a crossing of FOUR readings, not a");
+    println!(
+        "  Two conditioning bodies and two later bodies is a crossing of FOUR readings, not a"
+    );
     println!("  population of experiments; nothing here is a rate and no figure is an average.");
     println!("{}", "=".repeat(104));
 }

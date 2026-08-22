@@ -199,7 +199,10 @@ fn main() {
     );
 
     let of = |wanted: Species| -> Vec<&Boundary> {
-        boundaries.iter().filter(|b| b.species() == wanted).collect()
+        boundaries
+            .iter()
+            .filter(|b| b.species() == wanted)
+            .collect()
     };
     let matched = of(Species::Matched);
     let partial = of(Species::Partial);
@@ -244,8 +247,15 @@ fn main() {
     println!("  enclosures standing      deepest {most_standing}");
 
     // A worked boundary of each species, returned as the artifact rather than described.
-    for (name, group) in [("MATCHED", &matched), ("PARTIAL", &partial), ("TOTAL  ", &total)] {
-        if let Some(b) = group.iter().max_by_key(|b| b.service_rounds.unwrap_or(u128::MAX)) {
+    for (name, group) in [
+        ("MATCHED", &matched),
+        ("PARTIAL", &partial),
+        ("TOTAL  ", &total),
+    ] {
+        if let Some(b) = group
+            .iter()
+            .max_by_key(|b| b.service_rounds.unwrap_or(u128::MAX))
+        {
             println!(
                 "\n  a {name} boundary     arrived {}  founded {}  Gamma {}  rounds {}  closed {}",
                 b.arrived,
@@ -285,45 +295,82 @@ fn main() {
 
     println!("\n  THE READING");
     if !both_species {
-        println!("    VACUOUS. Only one species of boundary occurred on this material, so arms 1 and 2");
+        println!(
+            "    VACUOUS. Only one species of boundary occurred on this material, so arms 1 and 2"
+        );
         println!("    hold for free and separate nothing. The material must be widened before the");
         println!("    correspondence can be read either way.");
     } else if match_closes && reflection_holds {
-        println!("    TERMINATION IS IMPEDANCE MATCHING, on this material. Every boundary where the");
+        println!(
+            "    TERMINATION IS IMPEDANCE MATCHING, on this material. Every boundary where the"
+        );
         println!("    arriving faces were all founded closed its thought, and no boundary that");
         println!("    reflected did. There is no stop token, no threshold and no chooser in the");
         println!("    path — the cycle halts because nothing comes back.");
     } else if reflection_holds {
-        println!("    THE MATCH IS NECESSARY AND NOT SUFFICIENT. No reflecting boundary closed, so");
-        println!("    nothing closes while current is still coming back — the halt condition holds.");
-        println!("    But not every matched boundary closed, so a match alone does not end the loop:");
-        println!("    something further is required at the match, and it is NOT a chooser, because a");
+        println!(
+            "    THE MATCH IS NECESSARY AND NOT SUFFICIENT. No reflecting boundary closed, so"
+        );
+        println!(
+            "    nothing closes while current is still coming back — the halt condition holds."
+        );
+        println!(
+            "    But not every matched boundary closed, so a match alone does not end the loop:"
+        );
+        println!(
+            "    something further is required at the match, and it is NOT a chooser, because a"
+        );
         println!("    chooser would have to close some reflecting boundary and none closed.");
         println!("    That is a bound on the law, returned rather than a failure of it.");
     } else {
         println!("    A REFLECTING BOUNDARY CLOSED, and the falsifier fired exactly as declared.");
-        println!("    Thoughts complete while the whole current is still coming back, so the halt is");
+        println!(
+            "    Thoughts complete while the whole current is still coming back, so the halt is"
+        );
         println!("    NOT decided by this junction's match.");
         println!();
-        println!("    AND THE THING THAT DECIDES IS NAMED, so this is a correction and not a mystery.");
-        println!("    `manifold.rs` states the completion law at the swing: *where it FOUNDS (the aim");
-        println!("    orthogonal to the standing thought), the thought COMPLETES — the swing's cut,");
-        println!("    the segmentation*. That is an ORTHOGONALITY on the arrival against the standing");
-        println!("    thought — exact, structural, and NOT a chooser: no threshold is consulted and");
+        println!(
+            "    AND THE THING THAT DECIDES IS NAMED, so this is a correction and not a mystery."
+        );
+        println!(
+            "    `manifold.rs` states the completion law at the swing: *where it FOUNDS (the aim"
+        );
+        println!(
+            "    orthogonal to the standing thought), the thought COMPLETES — the swing's cut,"
+        );
+        println!(
+            "    the segmentation*. That is an ORTHOGONALITY on the arrival against the standing"
+        );
+        println!(
+            "    thought — exact, structural, and NOT a chooser: no threshold is consulted and"
+        );
         println!("    no candidate is enumerated. The ban on a privileged scalar governor stands.");
         println!();
         println!("    WHAT IS WITHDRAWN is narrower and is this driver's own premise: that the");
-        println!("    boundary's admittances are (faces, faces_founded). They are not. Those two count");
-        println!("    the co-present register's faces and how many of them FOUND, which is a reading");
-        println!("    of the grey matter — while the cut is taken on the swing's second-order aim.");
+        println!(
+            "    boundary's admittances are (faces, faces_founded). They are not. Those two count"
+        );
+        println!(
+            "    the co-present register's faces and how many of them FOUND, which is a reading"
+        );
+        println!(
+            "    of the grey matter — while the cut is taken on the swing's second-order aim."
+        );
         println!("    A junction built from the wrong pair returns a real ratio about the wrong");
         println!("    boundary, which is why arm 2 could fail while arm 1 held.");
         println!();
-        println!("    WHAT SURVIVES: `Gamma = 0` is still sufficient here — {} of {} matched", 
-            matched_and_closed, matched.len());
-        println!("    boundaries closed, with none failing to. What is refuted is NECESSITY: {}",
-            reflecting_and_closed);
-        println!("    closures happened at boundaries where nothing crossed. The next attempt must");
+        println!(
+            "    WHAT SURVIVES: `Gamma = 0` is still sufficient here — {} of {} matched",
+            matched_and_closed,
+            matched.len()
+        );
+        println!(
+            "    boundaries closed, with none failing to. What is refuted is NECESSITY: {}",
+            reflecting_and_closed
+        );
+        println!(
+            "    closures happened at boundaries where nothing crossed. The next attempt must"
+        );
         println!("    build the junction from the swing's own admittances and re-run BOTH arms.");
     }
 }

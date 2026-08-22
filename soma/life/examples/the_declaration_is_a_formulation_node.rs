@@ -270,10 +270,7 @@ fn main() {
         // anonymous arrow for a hypothesis whose name its conclusion never mentions, so demanding
         // name-for-name equality would fail on material where nothing is wrong.
         let arity_agrees = row.ours.len() == row.their_arity;
-        let names_agree = row
-            .theirs
-            .iter()
-            .all(|name| row.ours.contains(name));
+        let names_agree = row.theirs.iter().all(|name| row.ours.contains(name));
         if arity_agrees && names_agree {
             agree += 1;
             println!(
@@ -284,7 +281,10 @@ fn main() {
             disagree.push(row.name.clone());
             println!("  {:42} DISAGREES", row.name);
             println!("      ours   arity {} {:?}", row.ours.len(), row.ours);
-            println!("      Lean   arity {} names {:?}", row.their_arity, row.theirs);
+            println!(
+                "      Lean   arity {} names {:?}",
+                row.their_arity, row.theirs
+            );
         }
     }
 
@@ -302,7 +302,9 @@ fn main() {
     println!("  is empty. An honest partial D with its failures exhibited is a completion.");
 
     if decided == 0 {
-        println!("\n  THE PLAN HALTS: no member of the sample could be decided against the oracle.");
+        println!(
+            "\n  THE PLAN HALTS: no member of the sample could be decided against the oracle."
+        );
         std::process::exit(1);
     }
     if agree * 2 <= decided {

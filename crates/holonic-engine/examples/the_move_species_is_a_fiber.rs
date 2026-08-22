@@ -108,7 +108,9 @@ fn main() {
 
     // ---------------------------------------------------------------- the binder aperture's orbit
     println!("\n=== the binder aperture, and what it costs");
-    println!("    `BinderGrain` was declared 2026-08-14. It was an unconditional filter before, and");
+    println!(
+        "    `BinderGrain` was declared 2026-08-14. It was an unconditional filter before, and"
+    );
     println!("    a filter whose orbit is unmeasured is not an aperture. Both grains, same text:");
     for (subject, relative) in AREAS {
         let mut row = format!("    {subject:11} {relative:52}");
@@ -166,9 +168,7 @@ fn main() {
         "    the closing term is not a step, so the two differ by {} moves the final tactic uses.",
         isolated.len() - unconsumed.len()
     );
-    println!(
-        "    THE ISOLATED POPULATION IS ITSELF A ROW: the moves no later step arrives at."
-    );
+    println!("    THE ISOLATED POPULATION IS ITSELF A ROW: the moves no later step arrives at.");
     println!(
         "    They present only the common exposed face, so no family can separate them and a focus"
     );
@@ -259,7 +259,10 @@ fn main() {
                 .fiber
                 .iter()
                 .all(|member| refinement.coarse.fiber.contains(member));
-            failures.require(subset, "the richer family's species is a subset of the coarse one");
+            failures.require(
+                subset,
+                "the richer family's species is a subset of the coarse one",
+            );
             if !refinement.moved() {
                 println!(
                     "    the causal axes departed nothing here, so on THIS material they see \
@@ -286,8 +289,8 @@ fn main() {
     let renamed = complex.with_renamed_formers(|former| format!("zzz-{former}"));
     let before = species_fiber(&complex, focus, &declare(MoveFamily::FULL, 1), &cover)
         .expect("before returns");
-    let after =
-        species_fiber(&renamed, focus, &declare(MoveFamily::FULL, 1), &cover).expect("after returns");
+    let after = species_fiber(&renamed, focus, &declare(MoveFamily::FULL, 1), &cover)
+        .expect("after returns");
     failures.require(
         before.fiber == after.fiber && before.conduct_blocks == after.conduct_blocks,
         "relabelling every founding tactic moves no block",

@@ -1092,10 +1092,8 @@ impl IncidenceComplex {
         // sites were moved to `.octets` on 2026-08-13 and this one was missed, so a reversed bond
         // carried a winding taken over a UTF-8 encoding of the constituent's identity — which is
         // exactly the defect `Site::octets` records as repaired.
-        bond.contact_winding = contact_winding(
-            &self.sites[bond.from].octets,
-            &self.sites[bond.to].octets,
-        );
+        bond.contact_winding =
+            contact_winding(&self.sites[bond.from].octets, &self.sites[bond.to].octets);
         bond.sheet = sheet_of(&self.sites[bond.to].octets);
         Self::assemble(
             self.grain,

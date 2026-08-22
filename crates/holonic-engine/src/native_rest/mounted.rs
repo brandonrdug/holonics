@@ -48,7 +48,10 @@ impl ContentIdentity {
             hasher.update(&chunk[..count]);
             extent = extent.saturating_add(count as u64);
         }
-        Ok(Self { sha256: format!("{:x}", hasher.finalize()), extent })
+        Ok(Self {
+            sha256: format!("{:x}", hasher.finalize()),
+            extent,
+        })
     }
 }
 
@@ -130,7 +133,10 @@ impl MountedNativeRest {
             wire,
             payload_offset,
             identity,
-            content_identity: ContentIdentity { sha256: content_sha256, extent: file_len },
+            content_identity: ContentIdentity {
+                sha256: content_sha256,
+                extent: file_len,
+            },
             file,
         })
     }
@@ -308,342 +314,350 @@ impl OccurrenceWitness for MountedNativeRest {
     fn validate(
         &self,
         complex: &PortedOperationComplex,
-    ) -> Result<Vec<BindingValidation>, SourceRefusal> {
-        self.verify_still()
-            .map_err(|error| SourceRefusal::Drifted {
-                locator: self.path.to_string_lossy().into_owned(),
-                declared: format!("{:?}", self.identity),
-                measured: error.to_string(),
-            })?;
-        let identity = crate::operation_correspondence::topology_identity(complex);
-        let named = self
-            .wire
-            .topology
-            .iter()
-            .filter(|topology| topology.name == complex.name)
-            .collect::<Vec<_>>();
-        let topology = match named.as_slice() {
-            [topology] => *topology,
-            _ => {
-                return Err(SourceRefusal::TopologyAbsent {
-                    identity: format!("{} ({})", complex.name, identity),
-                });
-            }
-        };
-        let exact_identity = topology.identity == identity;
-        let mut stored_names = std::collections::BTreeSet::new();
-        for (law_id, stored) in &topology.operations {
-            let name = topology
-                .shape
-                .laws
-                .get(law_id)
-                .map(|law| law.name.as_str())
-                .ok_or_else(|| SourceRefusal::OperationForeign {
-                    operation: format!("stored-law-{}", law_id.0),
+    ) -> Result<Vec<BindingValidation>, crate::source_occurrence::OccurrenceWitnessRefusal> {
+        let validate = || -> Result<Vec<BindingValidation>, SourceRefusal> {
+            self.verify_still()
+                .map_err(|error| SourceRefusal::Drifted {
+                    locator: self.path.to_string_lossy().into_owned(),
+                    declared: format!("{:?}", self.identity),
+                    measured: error.to_string(),
                 })?;
-            if !stored_names.insert(name) {
-                return Err(SourceRefusal::OperationForeign {
-                    operation: name.to_owned(),
-                });
-            }
-            let Some(source_law) = topology.shape.laws.get(law_id) else {
-                return Err(SourceRefusal::OperationForeign {
-                    operation: format!("stored-law-{}", law_id.0),
-                });
-            };
-            if stored.law != *law_id
-                || port_names(&topology.shape, &source_law.inputs).is_none()
-                || port_names(&topology.shape, &source_law.outputs).is_none()
-            {
-                return Err(SourceRefusal::OperationForeign {
-                    operation: name.to_owned(),
-                });
-            }
-        }
-        let mut runtime_names = std::collections::BTreeSet::new();
-        for operation in complex.operations.values() {
-            let name = complex
-                .shape
-                .laws
-                .get(&operation.law)
-                .map(|law| law.name.as_str())
-                .ok_or_else(|| SourceRefusal::OperationForeign {
-                    operation: format!("runtime-law-{}", operation.law.0),
-                })?;
-            if !runtime_names.insert(name) {
-                return Err(SourceRefusal::OperationForeign {
-                    operation: name.to_owned(),
-                });
-            }
-        }
-        let mut source_pairs = Vec::with_capacity(topology.operations.len());
-        let mut replacement_pairs = Vec::new();
-        let mut matched_runtime = std::collections::BTreeSet::new();
-        for (stored_law, stored) in &topology.operations {
-            let stored_law_shape = topology.shape.laws.get(stored_law).ok_or_else(|| {
-                SourceRefusal::OperationForeign {
-                    operation: format!("stored-law-{}", stored_law.0),
-                }
-            })?;
-            let candidates = complex
-                .operations
+            let identity = crate::operation_correspondence::topology_identity(complex);
+            let named = self
+                .wire
+                .topology
                 .iter()
-                .filter(|(runtime_law, runtime)| {
-                    let Some(runtime_law_shape) = complex.shape.laws.get(runtime_law) else {
-                        return false;
-                    };
-                    runtime_law_shape.name == stored_law_shape.name
-                        && runtime.species == stored.species
-                        && runtime.carrier == stored.carrier
-                        && same_ports(
-                            &topology.shape,
-                            stored_law_shape,
-                            &complex.shape,
-                            runtime_law_shape,
-                        )
-                        && same_testimony(&runtime.testimony, &stored.testimony)
-                })
+                .filter(|topology| topology.name == complex.name)
                 .collect::<Vec<_>>();
-            match candidates.as_slice() {
-                [(runtime_law, runtime)] => {
-                    if !matched_runtime.insert(**runtime_law) {
+            let topology = match named.as_slice() {
+                [topology] => *topology,
+                _ => {
+                    return Err(SourceRefusal::TopologyAbsent {
+                        identity: format!("{} ({})", complex.name, identity),
+                    });
+                }
+            };
+            let exact_identity = topology.identity == identity;
+            let mut stored_names = std::collections::BTreeSet::new();
+            for (law_id, stored) in &topology.operations {
+                let name = topology
+                    .shape
+                    .laws
+                    .get(law_id)
+                    .map(|law| law.name.as_str())
+                    .ok_or_else(|| SourceRefusal::OperationForeign {
+                        operation: format!("stored-law-{}", law_id.0),
+                    })?;
+                if !stored_names.insert(name) {
+                    return Err(SourceRefusal::OperationForeign {
+                        operation: name.to_owned(),
+                    });
+                }
+                let Some(source_law) = topology.shape.laws.get(law_id) else {
+                    return Err(SourceRefusal::OperationForeign {
+                        operation: format!("stored-law-{}", law_id.0),
+                    });
+                };
+                if stored.law != *law_id
+                    || port_names(&topology.shape, &source_law.inputs).is_none()
+                    || port_names(&topology.shape, &source_law.outputs).is_none()
+                {
+                    return Err(SourceRefusal::OperationForeign {
+                        operation: name.to_owned(),
+                    });
+                }
+            }
+            let mut runtime_names = std::collections::BTreeSet::new();
+            for operation in complex.operations.values() {
+                let name = complex
+                    .shape
+                    .laws
+                    .get(&operation.law)
+                    .map(|law| law.name.as_str())
+                    .ok_or_else(|| SourceRefusal::OperationForeign {
+                        operation: format!("runtime-law-{}", operation.law.0),
+                    })?;
+                if !runtime_names.insert(name) {
+                    return Err(SourceRefusal::OperationForeign {
+                        operation: name.to_owned(),
+                    });
+                }
+            }
+            let mut source_pairs = Vec::with_capacity(topology.operations.len());
+            let mut replacement_pairs = Vec::new();
+            let mut matched_runtime = std::collections::BTreeSet::new();
+            for (stored_law, stored) in &topology.operations {
+                let stored_law_shape = topology.shape.laws.get(stored_law).ok_or_else(|| {
+                    SourceRefusal::OperationForeign {
+                        operation: format!("stored-law-{}", stored_law.0),
+                    }
+                })?;
+                let candidates = complex
+                    .operations
+                    .iter()
+                    .filter(|(runtime_law, runtime)| {
+                        let Some(runtime_law_shape) = complex.shape.laws.get(runtime_law) else {
+                            return false;
+                        };
+                        runtime_law_shape.name == stored_law_shape.name
+                            && runtime.species == stored.species
+                            && runtime.carrier == stored.carrier
+                            && same_ports(
+                                &topology.shape,
+                                stored_law_shape,
+                                &complex.shape,
+                                runtime_law_shape,
+                            )
+                            && same_testimony(&runtime.testimony, &stored.testimony)
+                    })
+                    .collect::<Vec<_>>();
+                match candidates.as_slice() {
+                    [(runtime_law, runtime)] => {
+                        if !matched_runtime.insert(**runtime_law) {
+                            return Err(SourceRefusal::OperationForeign {
+                                operation: stored_law_shape.name.clone(),
+                            });
+                        }
+                        source_pairs.push((*runtime, stored));
+                    }
+                    [] => {
+                        let replacement_name = format!("{} (intervention)", stored_law_shape.name);
+                        let replacements = complex
+                            .operations
+                            .iter()
+                            .filter(|(runtime_law, runtime)| {
+                                let Some(runtime_law_shape) = complex.shape.laws.get(runtime_law)
+                                else {
+                                    return false;
+                                };
+                                runtime_law_shape.name == replacement_name
+                                    && runtime.species == stored.species
+                                    && runtime.carrier.is_none()
+                                    && same_ports(
+                                        &topology.shape,
+                                        stored_law_shape,
+                                        &complex.shape,
+                                        runtime_law_shape,
+                                    )
+                                    && intervention_only(&runtime.testimony)
+                            })
+                            .collect::<Vec<_>>();
+                        let [(runtime_law, runtime)] = replacements.as_slice() else {
+                            let offered = complex
+                                .operations
+                                .iter()
+                                .filter_map(|(runtime_law, runtime)| {
+                                    complex
+                                        .shape
+                                        .laws
+                                        .get(runtime_law)
+                                        .filter(|law| law.name == stored_law_shape.name)
+                                        .map(|_| format!("{:?}", runtime.testimony))
+                                })
+                                .collect::<Vec<_>>();
+                            return Err(SourceRefusal::OperationForeign {
+                                operation: format!(
+                                    "{}: offered {:?}, stored {:?}",
+                                    stored_law_shape.name, offered, stored.testimony
+                                ),
+                            });
+                        };
+                        if !matched_runtime.insert(**runtime_law) {
+                            return Err(SourceRefusal::OperationForeign {
+                                operation: replacement_name,
+                            });
+                        }
+                        replacement_pairs.push((*runtime, stored.species));
+                    }
+                    _ => {
                         return Err(SourceRefusal::OperationForeign {
                             operation: stored_law_shape.name.clone(),
                         });
                     }
-                    source_pairs.push((*runtime, stored));
-                }
-                [] => {
-                    let replacement_name = format!("{} (intervention)", stored_law_shape.name);
-                    let replacements = complex
-                        .operations
-                        .iter()
-                        .filter(|(runtime_law, runtime)| {
-                            let Some(runtime_law_shape) = complex.shape.laws.get(runtime_law)
-                            else {
-                                return false;
-                            };
-                            runtime_law_shape.name == replacement_name
-                                && runtime.species == stored.species
-                                && runtime.carrier.is_none()
-                                && same_ports(
-                                    &topology.shape,
-                                    stored_law_shape,
-                                    &complex.shape,
-                                    runtime_law_shape,
-                                )
-                                && intervention_only(&runtime.testimony)
-                        })
-                        .collect::<Vec<_>>();
-                    let [(runtime_law, runtime)] = replacements.as_slice() else {
-                        let offered = complex
-                            .operations
-                            .iter()
-                            .filter_map(|(runtime_law, runtime)| {
-                                complex
-                                    .shape
-                                    .laws
-                                    .get(runtime_law)
-                                    .filter(|law| law.name == stored_law_shape.name)
-                                    .map(|_| format!("{:?}", runtime.testimony))
-                            })
-                            .collect::<Vec<_>>();
-                        return Err(SourceRefusal::OperationForeign {
-                            operation: format!(
-                                "{}: offered {:?}, stored {:?}",
-                                stored_law_shape.name, offered, stored.testimony
-                            ),
-                        });
-                    };
-                    if !matched_runtime.insert(**runtime_law) {
-                        return Err(SourceRefusal::OperationForeign {
-                            operation: replacement_name,
-                        });
-                    }
-                    replacement_pairs.push((*runtime, stored.species));
-                }
-                _ => {
-                    return Err(SourceRefusal::OperationForeign {
-                        operation: stored_law_shape.name.clone(),
-                    });
                 }
             }
-        }
-        if exact_identity {
-            // The content identity is the cheap exact control. The signature match above remains
-            // the authority because midpoint insertion can shift local law ids.
-            debug_assert_eq!(source_pairs.len(), topology.operations.len());
-        }
-        let mut validated = Vec::with_capacity(complex.operations.len());
-        for (operation, stored) in source_pairs {
-            let name = complex
-                .shape
-                .laws
-                .get(&operation.law)
-                .map(|law| law.name.clone())
-                .unwrap_or_else(|| format!("law-{}", operation.law.0));
-            let mut validation = BindingValidation {
-                operation: name.clone(),
-                species: stored.species,
-                symbols: Vec::new(),
-                fields: Vec::new(),
-                shapes: Vec::new(),
-                interventions: Vec::new(),
-                descriptions: Vec::new(),
-            };
-            let mut exterior = false;
-            for testimony in &stored.testimony {
-                match testimony {
-                    NativeTestimony::Implementation { symbol } => {
-                        validation.symbols.push(parse_symbol(&name, symbol)?);
-                        exterior = true;
-                    }
-                    NativeTestimony::Configuration { field, value } => {
-                        validation.fields.push((field.clone(), value.clone()));
-                        exterior = true;
-                    }
-                    NativeTestimony::DeclaredShape { population, shape } => {
-                        let descriptor = self
-                            .wire
-                            .populations
-                            .iter()
-                            .find(|entry| entry.source.population == *population)
-                            .ok_or_else(|| SourceRefusal::PopulationNotIdentified {
-                                operation: name.clone(),
-                                population: population.clone(),
-                            })?;
-                        if descriptor.source.shape != *shape {
-                            return Err(SourceRefusal::ShapeDiffers {
-                                operation: name.clone(),
-                                population: population.clone(),
-                                declared: shape.clone(),
-                                measured: descriptor.source.shape.clone(),
-                            });
-                        }
-                        if descriptor.source.dtype != "BF16" && descriptor.source.dtype != "Bf16" {
-                            return Err(SourceRefusal::DtypeDiffers {
-                                operation: name.clone(),
-                                population: population.clone(),
-                                declared: "BF16".to_owned(),
-                                measured: descriptor.source.dtype.clone(),
-                            });
-                        }
-                        validation.shapes.push((population.clone(), shape.clone()));
-                        exterior = true;
-                    }
-                    NativeTestimony::AuthoritativeDescription { statement } => {
-                        validation.descriptions.push(statement.clone());
-                        exterior = true;
-                    }
-                    NativeTestimony::Intervention { statement } => {
-                        validation.interventions.push(statement.clone());
-                    }
-                    NativeTestimony::Undecided { .. } => {}
-                }
+            if exact_identity {
+                // The content identity is the cheap exact control. The signature match above remains
+                // the authority because midpoint insertion can shift local law ids.
+                debug_assert_eq!(source_pairs.len(), topology.operations.len());
             }
-            if let Some(carrier) = &stored.carrier {
-                let descriptor = self
-                    .wire
-                    .populations
-                    .iter()
-                    .find(|entry| entry.source.population == *carrier)
-                    .ok_or_else(|| SourceRefusal::PopulationNotIdentified {
-                        operation: name.clone(),
-                        population: carrier.clone(),
-                    })?;
-                if descriptor.source.dtype != "BF16" && descriptor.source.dtype != "Bf16" {
-                    return Err(SourceRefusal::DtypeDiffers {
-                        operation: name.clone(),
-                        population: carrier.clone(),
-                        declared: "BF16".to_owned(),
-                        measured: descriptor.source.dtype.clone(),
-                    });
-                }
-            }
-            if !validation.interventions.is_empty()
-                && exterior
-                && stored.species != OperationSpecies::Quotient
-            {
-                return Err(SourceRefusal::InterventionOnSourceLaw {
-                    operation: name,
+            let mut validated = Vec::with_capacity(complex.operations.len());
+            for (operation, stored) in source_pairs {
+                let name = complex
+                    .shape
+                    .laws
+                    .get(&operation.law)
+                    .map(|law| law.name.clone())
+                    .unwrap_or_else(|| format!("law-{}", operation.law.0));
+                let mut validation = BindingValidation {
+                    operation: name.clone(),
                     species: stored.species,
-                });
-            }
-            if !exterior && validation.interventions.is_empty() {
-                return Err(SourceRefusal::TestimonyNotExterior {
-                    operation: name,
-                    testimony: stored
-                        .testimony
+                    symbols: Vec::new(),
+                    fields: Vec::new(),
+                    shapes: Vec::new(),
+                    interventions: Vec::new(),
+                    descriptions: Vec::new(),
+                    exact_owner_licenses: Vec::new(),
+                };
+                let mut exterior = false;
+                for testimony in &stored.testimony {
+                    match testimony {
+                        NativeTestimony::Implementation { symbol } => {
+                            validation.symbols.push(parse_symbol(&name, symbol)?);
+                            exterior = true;
+                        }
+                        NativeTestimony::Configuration { field, value } => {
+                            validation.fields.push((field.clone(), value.clone()));
+                            exterior = true;
+                        }
+                        NativeTestimony::DeclaredShape { population, shape } => {
+                            let descriptor = self
+                                .wire
+                                .populations
+                                .iter()
+                                .find(|entry| entry.source.population == *population)
+                                .ok_or_else(|| SourceRefusal::PopulationNotIdentified {
+                                    operation: name.clone(),
+                                    population: population.clone(),
+                                })?;
+                            if descriptor.source.shape != *shape {
+                                return Err(SourceRefusal::ShapeDiffers {
+                                    operation: name.clone(),
+                                    population: population.clone(),
+                                    declared: shape.clone(),
+                                    measured: descriptor.source.shape.clone(),
+                                });
+                            }
+                            if descriptor.source.dtype != "BF16"
+                                && descriptor.source.dtype != "Bf16"
+                            {
+                                return Err(SourceRefusal::DtypeDiffers {
+                                    operation: name.clone(),
+                                    population: population.clone(),
+                                    declared: "BF16".to_owned(),
+                                    measured: descriptor.source.dtype.clone(),
+                                });
+                            }
+                            validation.shapes.push((population.clone(), shape.clone()));
+                            exterior = true;
+                        }
+                        NativeTestimony::AuthoritativeDescription { statement } => {
+                            validation.descriptions.push(statement.clone());
+                            exterior = true;
+                        }
+                        NativeTestimony::Intervention { statement } => {
+                            validation.interventions.push(statement.clone());
+                        }
+                        NativeTestimony::Undecided { .. } => {}
+                    }
+                }
+                if let Some(carrier) = &stored.carrier {
+                    let descriptor = self
+                        .wire
+                        .populations
                         .iter()
-                        .map(|testimony| format!("{testimony:?}"))
-                        .collect(),
-                });
+                        .find(|entry| entry.source.population == *carrier)
+                        .ok_or_else(|| SourceRefusal::PopulationNotIdentified {
+                            operation: name.clone(),
+                            population: carrier.clone(),
+                        })?;
+                    if descriptor.source.dtype != "BF16" && descriptor.source.dtype != "Bf16" {
+                        return Err(SourceRefusal::DtypeDiffers {
+                            operation: name.clone(),
+                            population: carrier.clone(),
+                            declared: "BF16".to_owned(),
+                            measured: descriptor.source.dtype.clone(),
+                        });
+                    }
+                }
+                if !validation.interventions.is_empty()
+                    && exterior
+                    && stored.species != OperationSpecies::Quotient
+                {
+                    return Err(SourceRefusal::InterventionOnSourceLaw {
+                        operation: name,
+                        species: stored.species,
+                    });
+                }
+                if !exterior && validation.interventions.is_empty() {
+                    return Err(SourceRefusal::TestimonyNotExterior {
+                        operation: name,
+                        testimony: stored
+                            .testimony
+                            .iter()
+                            .map(|testimony| format!("{testimony:?}"))
+                            .collect(),
+                    });
+                }
+                validated.push(validation);
             }
-            validated.push(validation);
-        }
-        for (operation, species) in replacement_pairs {
-            let name = complex
-                .shape
-                .laws
-                .get(&operation.law)
-                .map(|law| law.name.clone())
-                .unwrap_or_else(|| format!("law-{}", operation.law.0));
-            let interventions = operation
-                .testimony
-                .iter()
-                .map(|testimony| match testimony {
-                    SourceTestimony::Intervention { statement } => statement.clone(),
-                    _ => unreachable!("replacement was checked as intervention-only"),
-                })
-                .collect();
-            validated.push(BindingValidation {
-                operation: name,
-                species,
-                symbols: Vec::new(),
-                fields: Vec::new(),
-                shapes: Vec::new(),
-                interventions,
-                descriptions: Vec::new(),
-            });
-        }
-        for operation in complex.operations.values() {
-            if matched_runtime.contains(&operation.law) {
-                continue;
-            }
-            let name = complex
-                .shape
-                .laws
-                .get(&operation.law)
-                .map(|law| law.name.clone())
-                .unwrap_or_else(|| format!("law-{}", operation.law.0));
-            if operation.carrier.is_some()
-                || operation.testimony.is_empty()
-                || operation
+            for (operation, species) in replacement_pairs {
+                let name = complex
+                    .shape
+                    .laws
+                    .get(&operation.law)
+                    .map(|law| law.name.clone())
+                    .unwrap_or_else(|| format!("law-{}", operation.law.0));
+                let interventions = operation
                     .testimony
                     .iter()
-                    .any(|testimony| !matches!(testimony, SourceTestimony::Intervention { .. }))
-            {
-                return Err(SourceRefusal::OperationForeign { operation: name });
+                    .map(|testimony| match testimony {
+                        SourceTestimony::Intervention { statement } => statement.clone(),
+                        _ => unreachable!("replacement was checked as intervention-only"),
+                    })
+                    .collect();
+                validated.push(BindingValidation {
+                    operation: name,
+                    species,
+                    symbols: Vec::new(),
+                    fields: Vec::new(),
+                    shapes: Vec::new(),
+                    interventions,
+                    descriptions: Vec::new(),
+                    exact_owner_licenses: Vec::new(),
+                });
             }
-            let interventions = operation
-                .testimony
-                .iter()
-                .map(|testimony| match testimony {
-                    SourceTestimony::Intervention { statement } => statement.clone(),
-                    _ => unreachable!("the addition was checked as intervention-only"),
-                })
-                .collect();
-            validated.push(BindingValidation {
-                operation: name,
-                species: operation.species,
-                symbols: Vec::new(),
-                fields: Vec::new(),
-                shapes: Vec::new(),
-                interventions,
-                descriptions: Vec::new(),
-            });
-        }
-        Ok(validated)
+            for operation in complex.operations.values() {
+                if matched_runtime.contains(&operation.law) {
+                    continue;
+                }
+                let name = complex
+                    .shape
+                    .laws
+                    .get(&operation.law)
+                    .map(|law| law.name.clone())
+                    .unwrap_or_else(|| format!("law-{}", operation.law.0));
+                if operation.carrier.is_some()
+                    || operation.testimony.is_empty()
+                    || operation
+                        .testimony
+                        .iter()
+                        .any(|testimony| !matches!(testimony, SourceTestimony::Intervention { .. }))
+                {
+                    return Err(SourceRefusal::OperationForeign { operation: name });
+                }
+                let interventions = operation
+                    .testimony
+                    .iter()
+                    .map(|testimony| match testimony {
+                        SourceTestimony::Intervention { statement } => statement.clone(),
+                        _ => unreachable!("the addition was checked as intervention-only"),
+                    })
+                    .collect();
+                validated.push(BindingValidation {
+                    operation: name,
+                    species: operation.species,
+                    symbols: Vec::new(),
+                    fields: Vec::new(),
+                    shapes: Vec::new(),
+                    interventions,
+                    descriptions: Vec::new(),
+                    exact_owner_licenses: Vec::new(),
+                });
+            }
+            Ok(validated)
+        };
+        validate().map_err(Into::into)
     }
 }
 
@@ -745,5 +759,8 @@ fn digest_stream_dual(
         content_hasher.update(&chunk[..take]);
         remaining -= take as u64;
     }
-    Ok((format!("{:x}", hasher.finalize()), format!("{:x}", content_hasher.finalize())))
+    Ok((
+        format!("{:x}", hasher.finalize()),
+        format!("{:x}", content_hasher.finalize()),
+    ))
 }

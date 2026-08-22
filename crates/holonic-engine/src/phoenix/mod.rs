@@ -4,6 +4,8 @@
 //! tail live here so an application can conduct an authenticated product without importing an
 //! example module or rebuilding a foreman in its CLI.
 
+/// Resident shared-prefix circulation over a plural intervention cohort.
+pub mod cohort;
 pub mod native_streamed;
 pub mod runtime;
 pub mod site;

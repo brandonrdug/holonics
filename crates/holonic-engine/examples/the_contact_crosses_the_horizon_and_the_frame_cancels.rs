@@ -29,8 +29,8 @@
 use std::collections::BTreeMap;
 
 use holonic_engine::clifford::Aim;
+use holonic_engine::embedding_fiber::{AlignedMaterial, align_bfloat16, safetensors};
 use holonic_engine::exact_contact::{ContactError, ExactContact, RatioFace};
-use holonic_engine::embedding_fiber::{align_bfloat16, safetensors, AlignedMaterial};
 use holonic_engine::exact_value::ExactOrdering;
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -83,13 +83,21 @@ fn run() -> Result<(), String> {
     println!("THE MAP");
     println!("  container      {MAP}");
     println!("  tensor         {READOUT}");
-    println!("  declared       {rows_declared} rows x {dim}, dtype {}", entry.dtype);
+    println!(
+        "  declared       {rows_declared} rows x {dim}, dtype {}",
+        entry.dtype
+    );
     println!("  read           rows 0..{BAND}  (aperture declared by this caller)");
-    println!("  excluded       {} rows, reported not dropped", rows_declared - BAND);
+    println!(
+        "  excluded       {} rows, reported not dropped",
+        rows_declared - BAND
+    );
 
     let (words, width) = safetensors::read_rows(&mut file, &header, READOUT, 0, BAND)?;
     if width != dim {
-        return Err(format!("the intake returned width {width} against a declared {dim}"));
+        return Err(format!(
+            "the intake returned width {width} against a declared {dim}"
+        ));
     }
 
     // Each row is aligned onto ITS OWN exponent. That is what makes the cancellation a theorem
@@ -152,9 +160,18 @@ fn run() -> Result<(), String> {
         let (num_frame, den_frame) = contact.cancelled_frame();
         println!("  rows {row_a} / {row_b}");
         println!("    aim            {}", contact.aim());
-        println!("    hand           {:?}   (what the square deleted)", contact.hand());
-        println!("    cos^2          {} / {}", cohere.numerator, cohere.denominator);
-        println!("    sin^2          {} / {}", turn.numerator, turn.denominator);
+        println!(
+            "    hand           {:?}   (what the square deleted)",
+            contact.hand()
+        );
+        println!(
+            "    cos^2          {} / {}",
+            cohere.numerator, cohere.denominator
+        );
+        println!(
+            "    sin^2          {} / {}",
+            turn.numerator, turn.denominator
+        );
         println!(
             "    frame          2^{num_frame} over 2^{den_frame}   residual {}",
             num_frame - den_frame
@@ -231,9 +248,7 @@ fn run() -> Result<(), String> {
             else {
                 continue;
             };
-            let Some((_, original)) = contacts
-                .iter()
-                .find(|((x, y), _)| x == row_a && y == row_b)
+            let Some((_, original)) = contacts.iter().find(|((x, y), _)| x == row_a && y == row_b)
             else {
                 continue;
             };
@@ -248,7 +263,11 @@ fn run() -> Result<(), String> {
             // of pairs reads a coordinate and calls it the invariant, which is the exact defect
             // this whole line exists to remove. Cross-multiplication reads the value.
             if moved.cohere_square().compare(&original.cohere_square()) != ExactOrdering::Equal {
-                faces_moved.push(((*row_a, *row_b), original.cohere_square(), moved.cohere_square()));
+                faces_moved.push((
+                    (*row_a, *row_b),
+                    original.cohere_square(),
+                    moved.cohere_square(),
+                ));
             } else if moved.cohere_square() != original.cohere_square() {
                 representation_moved += 1;
                 if common_factors.len() < 3 {
@@ -266,7 +285,9 @@ fn run() -> Result<(), String> {
         }
     }
     println!("  contacts compared          {compared}");
-    println!("  brackets that MOVED        {brackets_moved}   (the gauge must move the coordinate)");
+    println!(
+        "  brackets that MOVED        {brackets_moved}   (the gauge must move the coordinate)"
+    );
     println!("  brackets that stood        {brackets_still}");
     println!(
         "  face VALUES that moved     {}   (the gauge must not move the invariant)",
@@ -281,13 +302,9 @@ fn run() -> Result<(), String> {
     println!(
         "  face PAIRS that moved      {representation_moved}   (the pair carries its own gauge: a"
     );
-    println!(
-        "                                 common factor is a representation, not a value)"
-    );
+    println!("                                 common factor is a representation, not a value)");
     for (pair, numerator_factor, denominator_factor) in &common_factors {
-        println!(
-            "    {pair:?}  numerator x{numerator_factor}  denominator x{denominator_factor}"
-        );
+        println!("    {pair:?}  numerator x{numerator_factor}  denominator x{denominator_factor}");
     }
     if brackets_moved == 0 {
         println!("  VACUOUS: the gauge moved no bracket, so it gauged nothing and this control is");
@@ -323,7 +340,9 @@ fn run() -> Result<(), String> {
     println!();
     println!("WHAT THIS DOES NOT ESTABLISH");
     println!("  The rows are addressed by index and no token surface is decoded here, so nothing");
-    println!("  above is a claim about what any row MEANS. That is station four's material, and it");
+    println!(
+        "  above is a claim about what any row MEANS. That is station four's material, and it"
+    );
     println!("  needs the bound tokenizer octets rather than an authored decoder.");
     println!("  The signature is the container's own chart read as declared-orthonormal by this");
     println!("  caller. A different declared metric moves every span and is a different reading.");

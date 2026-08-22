@@ -187,6 +187,7 @@ pub mod derivation_two_cells;
 // Declared, never glob-exported: it names `MoveSpecies`, `OpenClass`, `ClassReading` and
 // `substitutions`, and `OpenClass` collides with `placement`'s own while the verb `substitutions`
 // says nothing at the crate root about which family it means.
+pub mod cross_chart;
 pub mod derivation_skein;
 pub mod dilation;
 pub mod dimensional_receiver;
@@ -194,24 +195,24 @@ pub mod dimensional_wave;
 pub mod display;
 pub mod divisor_reconstruction;
 pub mod evolution;
-pub mod cross_chart;
 pub mod exact_linear;
 // The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
 // `<a|b>²/(<a|a><b|b>)`, whose dyadic frames cancel identically, so the face crosses where the
 // bracket cannot. Carried as a pair, ordered by cross-multiplication, with the hand the square
 // deleted returned beside it and the turn face closing against it by Lagrange.
 pub mod exact_contact;
+pub mod exact_json;
+pub mod exact_owner_testimony;
 pub mod exact_value;
 /// What an exact deed cost, counted rather than timed — the work vector `TABLET_THE_CHART` §3.7
 /// records as owed, with a typed admission and no clock anywhere in it.
 pub mod exact_work;
-pub mod landauer;
 pub mod executor;
 pub mod field_atlas;
-pub mod generative_transport;
-pub mod exact_json;
 pub mod foreign_map;
+pub mod generative_transport;
 pub mod gluing;
+pub mod landauer;
 // The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
 // deposited and re-lit by a different part. Declared, never glob-exported: it names
 // `encode_native_bytes` and `decode_native_bytes`, and a glob would put those verbs in the crate
@@ -278,6 +279,10 @@ pub mod parameter;
 pub mod parcel;
 pub mod phase_current;
 pub mod physical;
+// Exact addressed polygonal and higher-cell constraint incidence. Kept explicit because its
+// `ConstraintEdge`/`ConstraintFace` names are local to this carrier and must not collide with the
+// oriented simplicial or physical-world faces at the crate root.
+pub mod physical_constraint_complex;
 pub mod placement;
 pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]
@@ -319,6 +324,17 @@ pub mod rational_polynomial;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
+// A source-detached executable rest for a finite generator action.  This is the reusable runtime
+// face of `receiver_history_compression`; it deliberately carries neither the quotient map nor a
+// source representative.
+pub mod generator_native_rest;
+// The explicit finite action induced by a receiver/history quotient. Kept behind its module path:
+// its source/native identities and decoder are meaningful only with the quotient they witness.
+pub mod receiver_history_compression;
+// A returned receiver difference riding one addressed native word and depositing one exact local
+// rank-one morphology.  Kept behind its module path because the metric, port and predecessor
+// identity are part of every lawful use.
+pub mod receiver_history_cultivation;
 // Exact integer relation detection over `BigInt`: a collapsed numeric face read as the truncated
 // series expansion it is, and the basis in which it can continue founded by lattice reduction.
 // Declared, never glob-exported: it names `ExactFace`, `reopen`, `probe_at_grain` and
@@ -359,8 +375,8 @@ pub mod section_partition;
 // aperture, one directed outward rounding at the declared boundary with its residual, and the
 // adjoint return `T_a^*` into every partial chart under declared metrics.
 pub mod reduction_junction;
-pub mod resident_law;
 pub mod reopening;
+pub mod resident_law;
 pub mod resource;
 pub mod sheaf_diffusion;
 pub mod simplicial;

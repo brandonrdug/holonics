@@ -465,6 +465,8 @@ pub struct SectionWork {
 /// sequential CPU execution would have deleted the information that decides the repair.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CoverBarrier {
+    /// The caller required one resident chart which the admitted cover does not carry.
+    ChartAbsent { chart: ChartId },
     /// A cell is claimed more than once. `charts` carries one entry per CLAIM, with multiplicity,
     /// so two sections reads `[Cpu(0), Device(0)]` and one section holding an index twice reads
     /// `[Cpu(0), Cpu(0)]`. Counting sections rather than claims made the second invisible.
@@ -491,6 +493,12 @@ pub enum CoverBarrier {
 impl std::fmt::Display for CoverBarrier {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            CoverBarrier::ChartAbsent { chart } => {
+                write!(
+                    formatter,
+                    "required resident chart {chart} is absent from the cover"
+                )
+            }
             CoverBarrier::SharedCell { cell, charts } => write!(
                 formatter,
                 "cell {cell} is claimed by {} charts: {}",
@@ -533,6 +541,35 @@ pub struct CoverDecomposition {
 }
 
 impl CoverDecomposition {
+    /// Place the unchanged front on one explicitly required resident chart.
+    ///
+    /// This is the semantic-residency composition. It does not apply [`Self::of`]'s comparative
+    /// performance receiver and never routes a sub-grain cell to the CPU. The section's existing
+    /// exact work law retains the apparatus dilation as `ceil(extent / grain) * grain - extent`
+    /// idle lanes. An absent chart is a refusal, not a fallback.
+    pub fn on_chart(
+        cover: &HardwareCover,
+        front: &[FrontCell],
+        kernel: &'static str,
+        chart: ChartId,
+    ) -> Result<Self, CoverBarrier> {
+        if cover.chart(chart).is_none() {
+            return Err(CoverBarrier::ChartAbsent { chart });
+        }
+        Ok(Self {
+            sections: vec![CoverSection {
+                chart,
+                cells: front.to_vec(),
+            }],
+            mode: ModeIdentity::of(
+                cover,
+                "holonic_engine::hardware_cover",
+                "exact-integer-v1",
+                kernel,
+            ),
+        })
+    }
+
     /// **Decompose the front across the cover, by the material against each chart's own
     /// grain.**
     ///
@@ -641,7 +678,9 @@ impl CoverDecomposition {
             }
 
             match (claims, first_claim) {
-                (0, _) | (_, None) => barriers.push(CoverBarrier::UnplacedCell { cell: cell.index }),
+                (0, _) | (_, None) => {
+                    barriers.push(CoverBarrier::UnplacedCell { cell: cell.index })
+                }
                 (1, Some((chart, placed))) => {
                     if placed != cell.extent {
                         barriers.push(CoverBarrier::ExtentDisagrees {
@@ -876,6 +915,41 @@ mod tests {
         assert_eq!(work.idle_lanes, BigUint::from(31u32));
     }
 
+    #[test]
+    fn explicit_resident_placement_keeps_a_small_cell_on_device_and_returns_its_dilation() {
+        let cover = HardwareCover {
+            charts: vec![
+                Chart::Cpu(CpuDeclaration { lanes: 8 }),
+                Chart::Device(stated_device(32, 1024, 80)),
+            ],
+            refusals: Vec::new(),
+        };
+        let population = front(&[2]);
+        let generic = CoverDecomposition::of(&cover, &population, "test");
+        assert_eq!(generic.occupied_charts(), BTreeSet::from([ChartId::Cpu]));
+
+        let resident =
+            CoverDecomposition::on_chart(&cover, &population, "test", ChartId::Device(0))
+                .expect("the required device chart is present");
+        resident
+            .independence(&population)
+            .expect("resident placement retains every unchanged cell exactly once");
+        assert_eq!(
+            resident.occupied_charts(),
+            BTreeSet::from([ChartId::Device(0)])
+        );
+        let work = resident.work(&cover);
+        assert_eq!(work[0].members, BigUint::from(2u8));
+        assert_eq!(work[0].occupied_lanes, BigUint::from(32u8));
+        assert_eq!(work[0].idle_lanes, BigUint::from(30u8));
+        assert_eq!(
+            CoverDecomposition::on_chart(&cover, &population, "test", ChartId::Device(9),),
+            Err(CoverBarrier::ChartAbsent {
+                chart: ChartId::Device(9)
+            })
+        );
+    }
+
     /// **Independence is checked and the check can fail.** A decomposition that drops a cell or
     /// claims one twice must be refused by name, or the licence is a formality.
     #[test]
@@ -885,7 +959,10 @@ mod tests {
         let mut dropped = CoverDecomposition::of(&cover, &population, "test");
         dropped.sections[0].cells.pop();
         match dropped.independence(&population) {
-            Err(barriers) => assert!(matches!(barriers[0], CoverBarrier::UnplacedCell { cell: 1 })),
+            Err(barriers) => assert!(matches!(
+                barriers[0],
+                CoverBarrier::UnplacedCell { cell: 1 }
+            )),
             Ok(()) => panic!("a dropped cell must be refused"),
         }
 

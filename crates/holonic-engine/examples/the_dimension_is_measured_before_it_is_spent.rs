@@ -178,14 +178,19 @@ fn run() -> Result<(), String> {
         totals.len()
     );
     for (name, deficit) in &deficient {
-        println!("  DEFICIT {deficit:>4}  {}", name.trim_start_matches("model.language_model."));
+        println!(
+            "  DEFICIT {deficit:>4}  {}",
+            name.trim_start_matches("model.language_model.")
+        );
     }
     println!("  A full-rank circuit carries every dimension it declares: there is no free");
     println!("  low-rank factorisation of it, and shrinking its shape WOULD lose something exact.");
     println!("  A rank-deficient one carries less than it declares, and the deficit is dimension");
     println!("  that can be removed with a NAMED cokernel rather than a rounding error.");
     println!();
-    println!("  This is the honest test of dimension-instead-of-precision, and it is a measurement");
+    println!(
+        "  This is the honest test of dimension-instead-of-precision, and it is a measurement"
+    );
     println!("  about THESE circuits, not a claim about the thesis in general. Where the rank is");
     println!("  full the compression must come from somewhere else — from the material's own");
     println!("  structure rather than from the trained matrix's redundancy.");

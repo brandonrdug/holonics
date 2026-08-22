@@ -253,7 +253,6 @@ fn skip_value(bytes: &[u8], at: &mut usize) -> Result<(), String> {
     }
 }
 
-
 /// A signed integer field, exactly. **There is no float path here and that is the point.**
 pub fn as_i64(span: &str) -> Option<i64> {
     span.trim().parse::<i64>().ok()

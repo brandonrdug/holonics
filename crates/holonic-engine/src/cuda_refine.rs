@@ -115,6 +115,42 @@ pub enum CudaRefineError {
     ExtentOverflow { work: u64 },
     #[error("a corpus of {occurrences} occurrences exceeds the exact 32-bit site wire")]
     CorpusTooWide { occurrences: usize },
+    #[error(
+        "the native action has {table_entries} table entries for {generators} generators and {states} states"
+    )]
+    NativeTableExtentDisagrees {
+        table_entries: usize,
+        generators: usize,
+        states: usize,
+    },
+    #[error("native state {state} leaves the declared population of {states} states")]
+    NativeStateOutsidePopulation { state: u32, states: usize },
+    #[error("native generator {generator} leaves the declared family of {generators} generators")]
+    NativeGeneratorOutsideFamily { generator: u32, generators: usize },
+    #[error("the native action extent cannot cross the exact 32-bit device wire")]
+    NativeActionTooWide,
+    #[error("the contact coordinate wire has {lower} lower words and {upper} upper words; both must be equal multiples of three")]
+    ContactCoordinateShape { lower: usize, upper: usize },
+    #[error("contact coordinate interval {at} is reversed: lower {lower} exceeds upper {upper}")]
+    ReversedContactCoordinate { at: usize, lower: i64, upper: i64 },
+    #[error("contact task {task} addresses vertex {vertex} outside the {vertices}-vertex population")]
+    ContactVertexOutsidePopulation {
+        task: usize,
+        vertex: u32,
+        vertices: usize,
+    },
+    #[error("contact comparison {comparison} addresses reading {reading} outside the {readings}-reading population")]
+    ContactReadingOutsidePopulation {
+        comparison: usize,
+        reading: u32,
+        readings: usize,
+    },
+    #[error("the contact task and comparison index populations disagree")]
+    ContactIndexShape,
+    #[error("contact task {task} exceeds the exact unsigned 64-bit squared-distance wire")]
+    ContactDistanceOverflow { task: usize },
+    #[error("the contact passage extent cannot cross the exact 32-bit device wire")]
+    ContactPassageTooWide,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -284,6 +320,9 @@ pub struct CudaRefineExecutor {
     claimed: CuFunction,
     /// The LAW: the material-free quotient every organ with a front shares.
     claim: CuFunction,
+    native_word: CuFunction,
+    contact_pairs: CuFunction,
+    contact_compare: CuFunction,
     device_name: String,
     block_x: u32,
     max_grid_x: u32,
@@ -346,6 +385,9 @@ impl CudaRefineExecutor {
             let mut refine = ptr::null_mut();
             let mut claimed = ptr::null_mut();
             let mut claim = ptr::null_mut();
+            let mut native_word = ptr::null_mut();
+            let mut contact_pairs = ptr::null_mut();
+            let mut contact_compare = ptr::null_mut();
             for (slot, symbol, operation) in [
                 (
                     &mut refine as *mut CuFunction,
@@ -362,6 +404,21 @@ impl CudaRefineExecutor {
                     c"claim_identities",
                     "cuModuleGetFunction(claim_identities)",
                 ),
+                (
+                    &mut native_word as *mut CuFunction,
+                    c"conduct_native_word",
+                    "cuModuleGetFunction(conduct_native_word)",
+                ),
+                (
+                    &mut contact_pairs as *mut CuFunction,
+                    c"classify_contact_pairs",
+                    "cuModuleGetFunction(classify_contact_pairs)",
+                ),
+                (
+                    &mut contact_compare as *mut CuFunction,
+                    c"compare_contact_presentations",
+                    "cuModuleGetFunction(compare_contact_presentations)",
+                ),
             ] {
                 if let Err(error) = driver(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -376,7 +433,14 @@ impl CudaRefineExecutor {
             // The block must fit whichever the kernel and the device admit fewer of, down to a
             // whole warp: a partial warp issues with idle lanes.
             let mut kernel_block = device_block;
-            for function in [refine, claimed, claim] {
+            for function in [
+                refine,
+                claimed,
+                claim,
+                native_word,
+                contact_pairs,
+                contact_compare,
+            ] {
                 let mut value = 0i32;
                 driver(
                     cuFuncGetAttribute(&mut value, FUNCTION_MAX_THREADS_PER_BLOCK, function),
@@ -392,6 +456,9 @@ impl CudaRefineExecutor {
                 refine,
                 claimed,
                 claim,
+                native_word,
+                contact_pairs,
+                contact_compare,
                 device_name,
                 block_x,
                 max_grid_x,
@@ -573,6 +640,30 @@ impl CudaRefineExecutor {
             site_class: cpu_class,
         })
     }
+}
+
+/// One complete native ordered-word deed returned from the card.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceNativeWord {
+    pub native_end: Vec<u32>,
+    pub launches: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One exact contact population and its matched cross-presentation successor returned from the
+/// card. Contact classes use the standing wire `outside=0, inside=1, open=2`; each paired class is
+/// the complete ordered pair `3*left + right`, not a collapsed changed/unchanged bit.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceContactPassage {
+    pub contact_classes: Vec<u8>,
+    pub paired_classes: Vec<u8>,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
 }
 
 impl Drop for CudaRefineExecutor {
@@ -761,6 +852,326 @@ impl CudaRefineExecutor {
             carrier: QuotientCarrier::Device,
         })
     }
+
+    /// Carry a population through one complete ordered word on the resident card.
+    ///
+    /// `generator_table` is row-major `[generator][native state]`. It, the ordered word and the
+    /// starting population cross once; every intermediate state remains device-local.
+    pub fn conduct_native_word_on_device(
+        &mut self,
+        states: usize,
+        generators: usize,
+        generator_table: &[u32],
+        word: &[u32],
+        native_start: &[u32],
+    ) -> Result<DeviceNativeWord, CudaRefineError> {
+        let expected = states
+            .checked_mul(generators)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if generator_table.len() != expected {
+            return Err(CudaRefineError::NativeTableExtentDisagrees {
+                table_entries: generator_table.len(),
+                generators,
+                states,
+            });
+        }
+        if states > u32::MAX as usize
+            || generators > u32::MAX as usize
+            || word.len() > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = generator_table
+            .iter()
+            .chain(native_start)
+            .copied()
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+        if let Some(generator) = word
+            .iter()
+            .copied()
+            .find(|generator| *generator as usize >= generators)
+        {
+            return Err(CudaRefineError::NativeGeneratorOutsideFamily {
+                generator,
+                generators,
+            });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let table = Buffer::of(generator_table)?;
+        let device_word = Buffer::of(word)?;
+        let start = Buffer::of(native_start)?;
+        let end = Buffer::alloc(std::mem::size_of_val(native_start))?;
+        let count = native_start.len();
+        if count > 0 {
+            let grid = self.grid_for(count as u64)?;
+            let mut table_pointer = table.pointer;
+            let mut word_pointer = device_word.pointer;
+            let mut start_pointer = start.pointer;
+            let mut end_pointer = end.pointer;
+            let mut cell_count = count as u32;
+            let mut state_count = states as u32;
+            let mut word_length = word.len() as u32;
+            let mut arguments: Vec<*mut c_void> = vec![
+                &mut table_pointer as *mut u64 as *mut c_void,
+                &mut word_pointer as *mut u64 as *mut c_void,
+                &mut start_pointer as *mut u64 as *mut c_void,
+                &mut end_pointer as *mut u64 as *mut c_void,
+                &mut cell_count as *mut u32 as *mut c_void,
+                &mut state_count as *mut u32 as *mut c_void,
+                &mut word_length as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.native_word,
+                        grid,
+                        1,
+                        1,
+                        self.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(conduct_native_word)",
+            )?;
+            driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+            self.launches += 1;
+        }
+        let mut native_end = vec![0u32; count];
+        if count > 0 {
+            end.read(&mut native_end)?;
+        }
+        let table_octets = std::mem::size_of_val(generator_table) as u64;
+        let word_octets = std::mem::size_of_val(word) as u64;
+        let state_octets = std::mem::size_of_val(native_start) as u64;
+        Ok(DeviceNativeWord {
+            native_end,
+            launches: u64::from(count > 0),
+            host_ingress_octets: table_octets + word_octets + state_octets,
+            host_egress_octets: state_octets,
+            resident_octets: table_octets + word_octets + state_octets * 2,
+        })
+    }
+
+    /// Classify exact coordinate-box contacts and compare matched presentations without returning
+    /// to the host between the two laws.
+    ///
+    /// Every coordinate is an integer numerator over one caller-declared common denominator; the
+    /// aperture has already been multiplied by that denominator squared. The host verifies only
+    /// that the wire arithmetic cannot overflow. The classifications and their ordered
+    /// cross-presentation pairs are enacted on the card under one terminal synchronization.
+    pub fn contact_passage_on_device(
+        &mut self,
+        lower_xyz: &[i64],
+        upper_xyz: &[i64],
+        task_left: &[u32],
+        task_right: &[u32],
+        comparison_left: &[u32],
+        comparison_right: &[u32],
+        aperture_squared: u64,
+    ) -> Result<DeviceContactPassage, CudaRefineError> {
+        if lower_xyz.len() != upper_xyz.len() || lower_xyz.len() % 3 != 0 {
+            return Err(CudaRefineError::ContactCoordinateShape {
+                lower: lower_xyz.len(),
+                upper: upper_xyz.len(),
+            });
+        }
+        if task_left.len() != task_right.len()
+            || comparison_left.len() != comparison_right.len()
+        {
+            return Err(CudaRefineError::ContactIndexShape);
+        }
+        let vertices = lower_xyz.len() / 3;
+        if task_left.len() > u32::MAX as usize
+            || comparison_left.len() > u32::MAX as usize
+            || vertices > u32::MAX as usize
+        {
+            return Err(CudaRefineError::ContactPassageTooWide);
+        }
+        for (at, (lower, upper)) in lower_xyz.iter().zip(upper_xyz).enumerate() {
+            if lower > upper {
+                return Err(CudaRefineError::ReversedContactCoordinate {
+                    at,
+                    lower: *lower,
+                    upper: *upper,
+                });
+            }
+        }
+        for (task, (left, right)) in task_left.iter().zip(task_right).enumerate() {
+            for vertex in [*left, *right] {
+                if vertex as usize >= vertices {
+                    return Err(CudaRefineError::ContactVertexOutsidePopulation {
+                        task,
+                        vertex,
+                        vertices,
+                    });
+                }
+            }
+            let mut greatest_squared = 0_u128;
+            for axis in 0..3 {
+                let left_at = *left as usize * 3 + axis;
+                let right_at = *right as usize * 3 + axis;
+                let low = i128::from(lower_xyz[left_at]) - i128::from(upper_xyz[right_at]);
+                let high = i128::from(upper_xyz[left_at]) - i128::from(lower_xyz[right_at]);
+                if low < i128::from(i64::MIN)
+                    || low > i128::from(i64::MAX)
+                    || high < i128::from(i64::MIN)
+                    || high > i128::from(i64::MAX)
+                {
+                    return Err(CudaRefineError::ContactDistanceOverflow { task });
+                }
+                let far = low.unsigned_abs().max(high.unsigned_abs());
+                greatest_squared = greatest_squared
+                    .checked_add(far.checked_mul(far).ok_or(
+                        CudaRefineError::ContactDistanceOverflow { task },
+                    )?)
+                    .ok_or(CudaRefineError::ContactDistanceOverflow { task })?;
+            }
+            if greatest_squared > u128::from(u64::MAX) {
+                return Err(CudaRefineError::ContactDistanceOverflow { task });
+            }
+        }
+        for (comparison, (left, right)) in
+            comparison_left.iter().zip(comparison_right).enumerate()
+        {
+            for reading in [*left, *right] {
+                if reading as usize >= task_left.len() {
+                    return Err(CudaRefineError::ContactReadingOutsidePopulation {
+                        comparison,
+                        reading,
+                        readings: task_left.len(),
+                    });
+                }
+            }
+        }
+
+        let pair_count = task_left.len();
+        let comparison_count = comparison_left.len();
+        if pair_count == 0 {
+            return Ok(DeviceContactPassage {
+                contact_classes: Vec::new(),
+                paired_classes: Vec::new(),
+                launches: 0,
+                synchronizations: 0,
+                host_ingress_octets: 0,
+                host_egress_octets: 0,
+                resident_octets: 0,
+            });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let lower = Buffer::of(lower_xyz)?;
+        let upper = Buffer::of(upper_xyz)?;
+        let left = Buffer::of(task_left)?;
+        let right = Buffer::of(task_right)?;
+        let classes = Buffer::alloc(pair_count * std::mem::size_of::<u8>())?;
+        let comparison_left_device = Buffer::of(comparison_left)?;
+        let comparison_right_device = Buffer::of(comparison_right)?;
+        let paired = Buffer::alloc(comparison_count * std::mem::size_of::<u8>())?;
+
+        let mut lower_pointer = lower.pointer;
+        let mut upper_pointer = upper.pointer;
+        let mut left_pointer = left.pointer;
+        let mut right_pointer = right.pointer;
+        let mut class_pointer = classes.pointer;
+        let mut pair_count_wire = pair_count as u32;
+        let mut aperture_wire = aperture_squared;
+        let mut classify_arguments: Vec<*mut c_void> = vec![
+            &mut lower_pointer as *mut u64 as *mut c_void,
+            &mut upper_pointer as *mut u64 as *mut c_void,
+            &mut left_pointer as *mut u64 as *mut c_void,
+            &mut right_pointer as *mut u64 as *mut c_void,
+            &mut class_pointer as *mut u64 as *mut c_void,
+            &mut pair_count_wire as *mut u32 as *mut c_void,
+            &mut aperture_wire as *mut u64 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.contact_pairs,
+                    self.grid_for(pair_count as u64)?,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    classify_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(classify_contact_pairs)",
+        )?;
+        let mut launches = 1_u64;
+
+        if comparison_count > 0 {
+            let mut comparison_left_pointer = comparison_left_device.pointer;
+            let mut comparison_right_pointer = comparison_right_device.pointer;
+            let mut paired_pointer = paired.pointer;
+            let mut comparison_count_wire = comparison_count as u32;
+            let mut compare_arguments: Vec<*mut c_void> = vec![
+                &mut class_pointer as *mut u64 as *mut c_void,
+                &mut comparison_left_pointer as *mut u64 as *mut c_void,
+                &mut comparison_right_pointer as *mut u64 as *mut c_void,
+                &mut paired_pointer as *mut u64 as *mut c_void,
+                &mut comparison_count_wire as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.contact_compare,
+                        self.grid_for(comparison_count as u64)?,
+                        1,
+                        1,
+                        self.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        compare_arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(compare_contact_presentations)",
+            )?;
+            launches += 1;
+        }
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += launches;
+
+        let mut contact_classes = vec![0_u8; pair_count];
+        classes.read(&mut contact_classes)?;
+        let mut paired_classes = vec![0_u8; comparison_count];
+        if comparison_count > 0 {
+            paired.read(&mut paired_classes)?;
+        }
+        let ingress = std::mem::size_of_val(lower_xyz)
+            + std::mem::size_of_val(upper_xyz)
+            + std::mem::size_of_val(task_left)
+            + std::mem::size_of_val(task_right)
+            + std::mem::size_of_val(comparison_left)
+            + std::mem::size_of_val(comparison_right);
+        let egress = contact_classes.len() + paired_classes.len();
+        Ok(DeviceContactPassage {
+            contact_classes,
+            paired_classes,
+            launches,
+            synchronizations: 1,
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: (ingress + egress) as u64,
+        })
+    }
 }
 
 #[cfg(test)]
@@ -818,5 +1229,40 @@ mod tests {
             classes: 4,
             carrier: QuotientCarrier::Device,
         }));
+    }
+
+    /// The physical-fold carrier: exact coordinate boxes cross once, and the matched presentation
+    /// pair is formed before the one terminal synchronization.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_contact_classes_and_the_ordered_cross_presentation_pair() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        // Five vertices: a free pair at squared distance 1, an occluded pair at squared distance
+        // 9, and one interval [1,3] crossing the radius-2 aperture.
+        let lower = [
+            0_i64, 0, 0, // 0 free primary
+            0, 1, 0, // 1 free secondary
+            0, 0, 0, // 2 occluded primary
+            0, 3, 0, // 3 occluded secondary
+            1, 0, 0, // 4 uncertain secondary, x in [1,3]
+        ];
+        let upper = [
+            0_i64, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0,
+        ];
+        let returned = card
+            .contact_passage_on_device(
+                &lower,
+                &upper,
+                &[0, 2, 0],
+                &[1, 3, 4],
+                &[0],
+                &[1],
+                4,
+            )
+            .expect("the exact contact passage returns");
+        assert_eq!(returned.contact_classes, vec![1, 0, 2]);
+        assert_eq!(returned.paired_classes, vec![3]);
+        assert_eq!(returned.launches, 2);
+        assert_eq!(returned.synchronizations, 1);
     }
 }

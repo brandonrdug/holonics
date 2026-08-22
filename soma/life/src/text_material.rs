@@ -1028,23 +1028,25 @@ impl ExactTextMaterialAtlas {
         let mut deferred = Vec::new();
         let sections = sections
             .into_iter()
-            .filter(|section| match leader.admits(section.matched_features.len()) {
-                LeaderAdmission::Crosses { .. } => true,
-                LeaderAdmission::Defers {
-                    service_rounds,
-                    reflection,
-                } => {
-                    deferred.push(LaboratoryDeferredSection {
-                        source_identity: section.source_identity.clone(),
-                        source: section.source.clone(),
-                        matched_features: section.matched_features.iter().cloned().collect(),
+            .filter(
+                |section| match leader.admits(section.matched_features.len()) {
+                    LeaderAdmission::Crosses { .. } => true,
+                    LeaderAdmission::Defers {
                         service_rounds,
                         reflection,
-                    });
-                    false
-                }
-                LeaderAdmission::NoTravelingSection => false,
-            })
+                    } => {
+                        deferred.push(LaboratoryDeferredSection {
+                            source_identity: section.source_identity.clone(),
+                            source: section.source.clone(),
+                            matched_features: section.matched_features.iter().cloned().collect(),
+                            service_rounds,
+                            reflection,
+                        });
+                        false
+                    }
+                    LeaderAdmission::NoTravelingSection => false,
+                },
+            )
             .collect::<Vec<_>>();
         let omitted_population = complete_population.saturating_sub(sections.len());
         LaboratoryWorldReturn {

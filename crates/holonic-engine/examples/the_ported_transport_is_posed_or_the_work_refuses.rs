@@ -27,7 +27,7 @@
 
 use std::time::Instant;
 
-use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
+use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
 use holonic_engine::exact_linear::{ExactRatMatrix, RebaseReceipt};
 use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;
@@ -89,8 +89,14 @@ fn main() {
             )
             .expect("bound");
     }
-    println!("  typed ports declared              {}", complex.closure().map(|c| c.ports).unwrap_or(0));
-    println!("  operations bound                  {}", complex.operations.len());
+    println!(
+        "  typed ports declared              {}",
+        complex.closure().map(|c| c.ports).unwrap_or(0)
+    );
+    println!(
+        "  operations bound                  {}",
+        complex.operations.len()
+    );
 
     // ---------------------------------------------------------------------------------------
     // 1. APPLYING at full extent. The card owns this.
@@ -106,7 +112,10 @@ fn main() {
             std::process::exit(1);
         }
     };
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     let tensor = container.tensor(RECEIVER).expect("manifested").clone();
     let (rows, columns) = (tensor.shape[0], tensor.shape[1]);
@@ -144,7 +153,9 @@ fn main() {
 
     let stored_octets = (rows * columns * 2) as u64;
     let clock = Instant::now();
-    let words = container.read_bf16_whole(&mut file, RECEIVER).expect("read");
+    let words = container
+        .read_bf16_whole(&mut file, RECEIVER)
+        .expect("read");
     let read = clock.elapsed();
     let clock = Instant::now();
     let mounted = chart.mount_bfloat16(&words, columns).expect("mounted");
@@ -157,7 +168,10 @@ fn main() {
     println!();
     println!("  ACTUAL TRANSFER TELEMETRY — summed crossings, never a predicted counter");
     println!("      stored codewords across the bus  {stored_octets} octets");
-    println!("      query across the bus             {} octets", query.entries.len() * 8);
+    println!(
+        "      query across the bus             {} octets",
+        query.entries.len() * 8
+    );
     println!(
         "      resident expansion on the card   {} octets",
         (rows * columns * 8) as u64
@@ -172,7 +186,10 @@ fn main() {
         "      apparatus frame                  display active on this card; no clock selects here"
     );
     println!();
-    println!("  the transport carried the standing into {} exact entries", rows);
+    println!(
+        "  the transport carried the standing into {} exact entries",
+        rows
+    );
     println!(
         "      first three, exactly: {:?}",
         (0..3)
@@ -187,7 +204,10 @@ fn main() {
     println!("2. POSING THE SAME TRANSPORT DENSELY AS EXACT RATIONALS");
     println!();
     let posing = PortedTransport::predicted_posing_work(rows, columns, 8);
-    let residency_budget = WorkBudget::declared(WorkMetric::declared("residency", &[("resident-entries", 1)]), 1u64 << 20);
+    let residency_budget = WorkBudget::declared(
+        WorkMetric::declared("residency", &[("resident-entries", 1)]),
+        1u64 << 20,
+    );
     println!("  predicted residency               {rows} x {columns} exact rational entries");
     match residency_budget.admits(&posing) {
         Admission::Admitted { priced, ceiling } => {
@@ -199,9 +219,14 @@ fn main() {
             dominating,
         } => {
             println!("  REFUSED   priced {priced} against a declared ceiling of {ceiling}");
-            println!("            dominated by {} at {}", dominating.0, dominating.1);
+            println!(
+                "            dominated by {} at {}",
+                dominating.0, dominating.1
+            );
             println!();
-            println!("  **This refusal is the return.** The transport is not posed densely, and the");
+            println!(
+                "  **This refusal is the return.** The transport is not posed densely, and the"
+            );
             println!("  station changes its APERTURE rather than its ceiling.");
         }
     }
@@ -230,8 +255,7 @@ fn main() {
     )
     .expect("posed");
 
-    let factorization_budget =
-        WorkBudget::declared(WorkMetric::width_weighted(), 1u64 << 48);
+    let factorization_budget = WorkBudget::declared(WorkMetric::width_weighted(), 1u64 << 48);
     match posed
         .factorization_under(&factorization_budget, 8)
         .expect("priced")
@@ -247,7 +271,10 @@ fn main() {
                 "  open exterior                     {}",
                 factorization.open_exterior_dimension()
             );
-            println!("  is a rebase                       {}", factorization.is_rebase());
+            println!(
+                "  is a rebase                       {}",
+                factorization.is_rebase()
+            );
         }
     }
 
@@ -314,7 +341,12 @@ fn main() {
         format!("{RETURN} [0..{aperture}, 0..{aperture}]"),
         &block_of(
             &container
-                .read_bf16(&mut file, RETURN, 0, (aperture * return_tensor.shape[1]) as u64)
+                .read_bf16(
+                    &mut file,
+                    RETURN,
+                    0,
+                    (aperture * return_tensor.shape[1]) as u64,
+                )
                 .expect("read"),
             return_tensor.shape[1],
             aperture,
@@ -323,12 +355,17 @@ fn main() {
         aperture,
     )
     .expect("posed");
-    match PortedWord::founded("receiver then return", vec![posed.clone(), mismatched.clone()]) {
+    match PortedWord::founded(
+        "receiver then return",
+        vec![posed.clone(), mismatched.clone()],
+    ) {
         Ok(_) => println!("  the two composed, which they should not have"),
         Err(error) => {
             println!("  COMPOSITION REFUSED, by port identity and not by extent:");
             println!("      {error}");
-            println!("      both blocks are {aperture} x {aperture}. Matching extent is not a matching port.");
+            println!(
+                "      both blocks are {aperture} x {aperture}. Matching extent is not a matching port."
+            );
         }
     }
 
@@ -339,13 +376,15 @@ fn main() {
         "declared chart",
         posed.matrix.clone(),
     );
-    let word = PortedWord::founded("receiver then presented", vec![posed, through]).expect("composes");
+    let word =
+        PortedWord::founded("receiver then presented", vec![posed, through]).expect("composes");
     let standing_vector: Vec<Rat> = (0..aperture)
         .map(|k| Rat::new(BigInt::from((k as i64 % 5) - 2), BigInt::from(3)))
         .collect();
     let lineage = word.enact(&standing_vector).expect("enacted");
     println!();
-    println!("  the word retains {} standings: entering, {} intermediate, leaving",
+    println!(
+        "  the word retains {} standings: entering, {} intermediate, leaving",
         lineage.len(),
         lineage.len() - 2
     );

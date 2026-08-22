@@ -324,11 +324,7 @@ impl MoveComplex {
                 let Some(record) = records.get_mut(index) else {
                     continue;
                 };
-                let named = form
-                    .local_bindings
-                    .get(&step.binder)
-                    .copied()
-                    .unwrap_or(0) as usize;
+                let named = form.local_bindings.get(&step.binder).copied().unwrap_or(0) as usize;
                 record.terminal = named.saturating_sub(1) > record.downstream.len();
             }
         }

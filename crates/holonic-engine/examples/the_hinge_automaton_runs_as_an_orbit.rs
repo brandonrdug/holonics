@@ -64,12 +64,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::discrete_curvature::{
-    coefficient_species, total_multiplier, CurvatureFixedPoint, DiscreteCurvatureConfiguration,
-    DiscreteCurvatureError,
+    CurvatureFixedPoint, DiscreteCurvatureConfiguration, DiscreteCurvatureError,
+    coefficient_species, total_multiplier,
 };
 use holonic_engine::{HingeId, VertexId};
 use num_traits::Zero;
-use relational_geometry::{rat, Rat};
+use relational_geometry::{Rat, rat};
 
 /// The caller's declared orbit aperture. It bounds how far this run walks and decides nothing about
 /// the law: a walk that used all of it is reported as unresolved, never as divergent.
@@ -300,8 +300,12 @@ fn front_licence(body: &DiscreteCurvatureConfiguration, coefficient: &Rat) -> (b
 
 fn main() {
     rule("THE HINGE AUTOMATON RUNS AS AN ORBIT");
-    println!("  the law     r_e <- r_e + c*(h(u) + h(v)), applied to EVERY hinge from one snapshot");
-    println!("  the carrier exact Rat — an orbit reaches a fixed point, RECURS exactly, or is unresolved");
+    println!(
+        "  the law     r_e <- r_e + c*(h(u) + h(v)), applied to EVERY hinge from one snapshot"
+    );
+    println!(
+        "  the carrier exact Rat — an orbit reaches a fixed point, RECURS exactly, or is unresolved"
+    );
     println!("  aperture    {DECLARED_ORBIT_EXTENT} steps, caller-declared; using all of it is a");
     println!("              statement about the aperture and never about the law");
     println!();
@@ -349,8 +353,20 @@ fn main() {
             );
             assert!(agrees, "a front is a decomposition and never a schedule");
             assert!(closes, "the front did not return what departed");
-            let moving = walked.moved_per_step.iter().rev().take(1).copied().next().unwrap_or(0);
-            if walked.total_deficits.last().is_some_and(num_traits::Zero::is_zero) && moving > 0 {
+            let moving = walked
+                .moved_per_step
+                .iter()
+                .rev()
+                .take(1)
+                .copied()
+                .next()
+                .unwrap_or(0);
+            if walked
+                .total_deficits
+                .last()
+                .is_some_and(num_traits::Zero::is_zero)
+                && moving > 0
+            {
                 println!(
                     "      *** ZERO TOTAL, {moving} HINGES STILL MOVING — a circulation, not a rest"
                 );
@@ -363,7 +379,11 @@ fn main() {
             println!(
                 "      total deficit  {}{}",
                 trace.join("  ->  "),
-                if walked.total_deficits.len() > shown { "  ->  …" } else { "" }
+                if walked.total_deficits.len() > shown {
+                    "  ->  …"
+                } else {
+                    ""
+                }
             );
             if let CurvatureFixedPoint::AlternatingTracedDeviation { component_scale } =
                 &walked.landing
@@ -391,14 +411,22 @@ fn main() {
         let dropped = short.pop().expect("the bipyramid carries vertices");
         let partial: BTreeMap<VertexId, Rat> = short
             .iter()
-            .map(|vertex| (*vertex, body.traced_deviation(*vertex).expect("a deviation")))
+            .map(|vertex| {
+                (
+                    *vertex,
+                    body.traced_deviation(*vertex).expect("a deviation"),
+                )
+            })
             .collect();
         let serial = body.traced_deviations();
         let caught = partial.len() != serial.len();
         println!(
             "  dropping vertex {dropped:?} from the front: agreement check catches it  {caught}"
         );
-        assert!(caught, "an agreement check that misses a dropped cell checks nothing");
+        assert!(
+            caught,
+            "an agreement check that misses a dropped cell checks nothing"
+        );
 
         // Control 2 — the WRONG multiplier. The holonomy licence must refuse it.
         let before = body.total_deficit();
@@ -409,7 +437,10 @@ fn main() {
         println!(
             "  offering the multiplier for c = 1/4 against a step at c = 1: licence refuses  {refuses}"
         );
-        assert!(refuses, "a licence that admits the wrong multiplier licenses nothing");
+        assert!(
+            refuses,
+            "a licence that admits the wrong multiplier licenses nothing"
+        );
         println!(
             "  (the step returned {} and the wrong multiplier predicted {wrong})",
             taken.total_deficit_after
@@ -436,9 +467,13 @@ fn main() {
         println!("  REFUTED, and the refutation is the finding.");
         println!();
         println!("  At EVERY declared coefficient the materials landed in one class. The class is");
-        println!("  therefore a reading of the COEFFICIENT and not of the material, and this run has");
+        println!(
+            "  therefore a reading of the COEFFICIENT and not of the material, and this run has"
+        );
         println!("  exhibited the law rather than the material — which is exactly the defect a");
-        println!("  falsifier of this shape exists to catch. Two materials differing in bipartiteness,");
+        println!(
+            "  falsifier of this shape exists to catch. Two materials differing in bipartiteness,"
+        );
         println!("  in link-size population and in hinge population did not separate.");
         println!();
         println!("  WHAT THAT SAYS, and it is not a null result: the total-deficit law");

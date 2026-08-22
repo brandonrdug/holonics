@@ -1012,7 +1012,11 @@ fn depths_over(statement: &str, family: &[(char, char)]) -> Option<Vec<usize>> {
             }
         }
     }
-    if expected.is_empty() { Some(profile) } else { None }
+    if expected.is_empty() {
+        Some(profile)
+    } else {
+        None
+    }
 }
 
 /// Whether the region before a candidate split is bracket groups and whitespace and nothing else.
@@ -1271,12 +1275,19 @@ pub fn recover_under(
         let (mut shallow, mut deep) = (BTreeSet::new(), BTreeSet::new());
         let mut carried = String::new();
         let mut carried_is_shallow = true;
-        let flush = |carried: &mut String, shallow_run: bool, shallow: &mut BTreeSet<String>, deep: &mut BTreeSet<String>| {
+        let flush = |carried: &mut String,
+                     shallow_run: bool,
+                     shallow: &mut BTreeSet<String>,
+                     deep: &mut BTreeSet<String>| {
             if carried.is_empty() {
                 return;
             }
             let run = std::mem::take(carried);
-            if shallow_run { shallow.insert(run); } else { deep.insert(run); }
+            if shallow_run {
+                shallow.insert(run);
+            } else {
+                deep.insert(run);
+            }
         };
         for (at, symbol) in statement.char_indices() {
             let breaks = !punctuation.contains(&symbol) || family_characters.contains(&symbol);
@@ -1447,7 +1458,13 @@ pub fn recover_under(
                         };
                         let group_span = Span::new(at, closing.min(leading.through));
                         let interior = Span::new(opened, through.min(leading.through));
-                        match read_group(statement, group_span, interior, separator.as_deref(), &depth) {
+                        match read_group(
+                            statement,
+                            group_span,
+                            interior,
+                            separator.as_deref(),
+                            &depth,
+                        ) {
                             Ok(mut group) => {
                                 group.species = Some((open, close));
                                 binder_name_lengths.insert(group.names.len());
@@ -1469,7 +1486,9 @@ pub fn recover_under(
                     let start = at;
                     while at < leading.through
                         && !char_at(statement, at).is_whitespace()
-                        && !family.iter().any(|(open, _)| *open == char_at(statement, at))
+                        && !family
+                            .iter()
+                            .any(|(open, _)| *open == char_at(statement, at))
                     {
                         at = step(statement, at);
                     }
@@ -1656,7 +1675,10 @@ fn read_group(
             group: group_text,
         });
     }
-    let carried = tokens(statement, Span::new(cut + separator.len(), interior.through));
+    let carried = tokens(
+        statement,
+        Span::new(cut + separator.len(), interior.through),
+    );
     if carried.len() != 1
         || carried[0]
             .1
@@ -1976,7 +1998,10 @@ mod tests {
         // of punctuation. That is the whole content of the excision.
         assert_eq!(reading.binders.len(), 1);
         assert_eq!(reading.binders[0].names.len(), 1);
-        assert_eq!(reading.binders[0].names[0].span.text(&reading.statement), "α");
+        assert_eq!(
+            reading.binders[0].names[0].span.text(&reading.statement),
+            "α"
+        );
         assert!(matches!(
             &reading.body,
             Some(BodyReading::Applied { head, arguments })
@@ -2007,7 +2032,15 @@ mod tests {
             .reading("(α : ℝ) (β : ℝ) : dist α β = dist β α")
             .expect("the population carries it");
         assert_eq!(two.binders.len(), 2);
-        assert_eq!(two.binders[0].carried.as_ref().expect("a carried token").span.text(&two.statement), "ℝ");
+        assert_eq!(
+            two.binders[0]
+                .carried
+                .as_ref()
+                .expect("a carried token")
+                .span
+                .text(&two.statement),
+            "ℝ"
+        );
         assert_eq!(two.binders[1].names[0].span.text(&two.statement), "β");
     }
 
@@ -2072,9 +2105,11 @@ mod tests {
                 .any(|bound| matches!(bound, GrammarAperture::BracketFamilyIsPlural { .. }))
         );
         assert_eq!(grammar.separator(), None);
-        assert!(grammar.aperture().contains(
-            &GrammarAperture::NoSeparatorOccursAtDepthZeroInEveryStatement
-        ));
+        assert!(
+            grammar
+                .aperture()
+                .contains(&GrammarAperture::NoSeparatorOccursAtDepthZeroInEveryStatement)
+        );
         for reading in grammar.readings() {
             assert_eq!(reading.residue.len(), 1);
             assert_eq!(reading.residue[0].text, reading.statement);

@@ -2759,10 +2759,7 @@ mod tests {
             .admit(&initial, &initial_specification, &receivers, &executor)
             .unwrap();
         let admission_nanoseconds = admission_started.elapsed().as_nanos();
-        assert_eq!(
-            cuda.preferred_backend(),
-            ApertureExecutionBackend::ExactCpu
-        );
+        assert_eq!(cuda.preferred_backend(), ApertureExecutionBackend::ExactCpu);
         assert!(initial_receipt.cpu_parity);
         assert!(initial_receipt.intermediate_bits > BigUint::from(384_u16));
         assert!(initial_receipt.cpu_primitives > BigUint::from(0_u8));

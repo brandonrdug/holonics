@@ -1417,9 +1417,7 @@ fn classify(
                     // that would run through `have h : P := …` is not lost to a rule about
                     // recruitment; it is lost because `h` was never a move.
                     cohort += 1;
-                    for binder in
-                        identifier_tokens(pattern).filter(|name| binders.admits(name))
-                    {
+                    for binder in identifier_tokens(pattern).filter(|name| binders.admits(name)) {
                         form.steps.push(ProofStep {
                             former: name.to_owned(),
                             cohort,
@@ -1434,7 +1432,10 @@ fn classify(
                             // declaration's own line, which assumes a contiguity the material
                             // does not have. A consumer that deletes `line` to ablate a step
                             // then deletes a different line.
-                            line: source_lines.get(offset).copied().unwrap_or(form.line + offset),
+                            line: source_lines
+                                .get(offset)
+                                .copied()
+                                .unwrap_or(form.line + offset),
                         });
                         open_steps.push((column, form.steps.len() - 1));
                     }
@@ -1594,7 +1595,10 @@ theorem mem_maxTensorProduct {z : G} :
             statement.contains("(R := R)"),
             "the named argument is part of the statement: {statement:?}"
         );
-        assert!(statement.ends_with("↔ P z"), "cut at the real terminator: {statement:?}");
+        assert!(
+            statement.ends_with("↔ P z"),
+            "cut at the real terminator: {statement:?}"
+        );
         // and the header now closes every bracket it opens, which is what the grammar recovery
         // needs of every member of a population
         let opened = statement.chars().filter(|symbol| *symbol == '(').count();
@@ -1961,7 +1965,13 @@ pub fn read_development_at(
             let (header, closed) = cut_header(after);
             if closed {
                 form.statement = header;
-                open = Some((form, false, String::new(), vec![code.to_owned()], vec![index + 1]));
+                open = Some((
+                    form,
+                    false,
+                    String::new(),
+                    vec![code.to_owned()],
+                    vec![index + 1],
+                ));
             } else {
                 open = Some((form, true, header, vec![code.to_owned()], vec![index + 1]));
             }

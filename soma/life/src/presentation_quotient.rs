@@ -409,15 +409,16 @@ impl ObservedSystem for PrefixSystem {
         let token = self.alphabet.get(input.0 as usize)?;
         let mut extended = prefix.clone();
         extended.push(token.clone());
-        self.index
-            .get(&extended)
-            .map(|index| ItemId(*index as u64))
+        self.index.get(&extended).map(|index| ItemId(*index as u64))
     }
 }
 
 impl PrefixSystem {
     fn ancestor_of(&self, state: u32, height: u32) -> u32 {
-        self.ancestors.get(&(state, height)).copied().unwrap_or(state)
+        self.ancestors
+            .get(&(state, height))
+            .copied()
+            .unwrap_or(state)
     }
 
     fn face(&self, prefix: &[String], receiver: PresentationReceiver) -> u64 {
@@ -487,7 +488,9 @@ fn read_landing(
             coherent_depth: 0,
             standing: 0,
             class_extent: 0,
-            span: material.can_answer().then(|| material.is_contiguous_span(prefix)),
+            span: material
+                .can_answer()
+                .then(|| material.is_contiguous_span(prefix)),
         }),
         PresentationGround::Atlas(ecology) => {
             if prefix.is_empty() {
@@ -502,7 +505,8 @@ fn read_landing(
                 .map_err(|_| PresentationError::CarrierExtent)?;
             let state = current.state();
             let coherent_depth = current.matched_length();
-            let extent = u32::try_from(prefix.len()).map_err(|_| PresentationError::CarrierExtent)?;
+            let extent =
+                u32::try_from(prefix.len()).map_err(|_| PresentationError::CarrierExtent)?;
             Ok(PrefixReading {
                 state,
                 coherent_depth,
@@ -655,9 +659,9 @@ pub fn divide(
         let (distinguishing_word, witness, separated_by_terminus) = match pair {
             Some(collapsed) => (
                 word_of(&collapsed.distinguishing_word),
-                collapsed.witness.map(|(receiver, left, right)| {
-                    (receiver_of(receiver), left.0, right.0)
-                }),
+                collapsed
+                    .witness
+                    .map(|(receiver, left, right)| (receiver_of(receiver), left.0, right.0)),
                 collapsed.separated_by_terminus,
             ),
             // Different conduct blocks with no collapsed pair means the one-shot reading already
@@ -995,7 +999,10 @@ mod tests {
             // the same prefix, a different terminal token: separated by one receiver at once
             PresentedCandidate::new("crossed", tokens("the receiver returns the residual")),
             // a composition: no surface contains it as a window
-            PresentedCandidate::new("composed", tokens("the receiver returns the residual onward")),
+            PresentedCandidate::new(
+                "composed",
+                tokens("the receiver returns the residual onward"),
+            ),
         ]
     }
 
@@ -1022,8 +1029,12 @@ mod tests {
     fn the_window_test_separates_the_span_from_the_composition() {
         let division = divide(&population(), "inherited", &material()).unwrap();
         assert!(division.answer_is_inherited_span);
-        assert!(division.inherited_candidates.contains(&"inherited".to_owned()));
-        assert!(division.composed_candidates.contains(&"composed".to_owned()));
+        assert!(division
+            .inherited_candidates
+            .contains(&"inherited".to_owned()));
+        assert!(division
+            .composed_candidates
+            .contains(&"composed".to_owned()));
         // And uttering the composition instead flips the answer's own face without moving the
         // population it stood in for.
         let composed = divide(&population(), "composed", &material()).unwrap();
@@ -1083,7 +1094,9 @@ mod tests {
     fn an_unpresented_answer_is_refused() {
         assert_eq!(
             divide(&population(), "never-emitted", &material()),
-            Err(PresentationError::AnswerNotPresented("never-emitted".into()))
+            Err(PresentationError::AnswerNotPresented(
+                "never-emitted".into()
+            ))
         );
         assert_eq!(
             divide(&[], "anything", &material()),
@@ -1104,17 +1117,23 @@ mod tests {
         let narrow_division = divide(&population(), "inherited", &narrow).unwrap();
         let wide_division = divide(&population(), "inherited", &wide).unwrap();
         assert_ne!(
-            narrow_division.inherited_candidates,
-            wide_division.inherited_candidates,
+            narrow_division.inherited_candidates, wide_division.inherited_candidates,
             "a receiver family blind to the material would return the same partition on both"
         );
-        assert!(narrow_division.composed_candidates.contains(&"crossed".to_owned()));
-        assert!(wide_division.inherited_candidates.contains(&"crossed".to_owned()));
+        assert!(narrow_division
+            .composed_candidates
+            .contains(&"crossed".to_owned()));
+        assert!(wide_division
+            .inherited_candidates
+            .contains(&"crossed".to_owned()));
         // On this population the block COUNTS do not move, because the other three receivers
         // already separate the same prefixes. That is a real return about this material rather
         // than a failure, and the arm below is the one that isolates the span face.
         assert_eq!(
-            (narrow_division.one_shot_blocks, narrow_division.conduct_blocks),
+            (
+                narrow_division.one_shot_blocks,
+                narrow_division.conduct_blocks
+            ),
             (wide_division.one_shot_blocks, wide_division.conduct_blocks)
         );
     }

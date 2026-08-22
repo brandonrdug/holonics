@@ -31,11 +31,9 @@
 
 use std::time::Instant;
 
-use holonic_engine::embedding_fiber::{align_bfloat16, ResidentReadout};
+use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
 use holonic_engine::exact_contact::{ContactError, ExactContact, RatioFace};
-use holonic_engine::exact_value::{
-    CertifiedSeries, ExactOrdering, SeriesTailCertificate,
-};
+use holonic_engine::exact_value::{CertifiedSeries, ExactOrdering, SeriesTailCertificate};
 use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;
 use num_bigint::BigInt;
@@ -73,7 +71,10 @@ fn main() {
 
     println!("PHOENIX STATION THREE (CONTACT) — THE POPULATION IS READ EXACTLY");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
 
     // ---------------------------------------------------------------------------------------
     // THE FRONT: two co-present projections of one predecessor. The card carries it.
@@ -85,13 +86,14 @@ fn main() {
         .expect("read");
     let query = align_bfloat16(&standing_words).expect("aligned");
 
-    let front_work = ExactWork::predicted_product(receiver_tensor.shape[0], receiver_tensor.shape[1], 1, 8)
-        .then(&ExactWork::predicted_product(
-            presented_tensor.shape[0],
-            presented_tensor.shape[1],
-            1,
-            8,
-        ));
+    let front_work =
+        ExactWork::predicted_product(receiver_tensor.shape[0], receiver_tensor.shape[1], 1, 8)
+            .then(&ExactWork::predicted_product(
+                presented_tensor.shape[0],
+                presented_tensor.shape[1],
+                1,
+                8,
+            ));
     let budget = WorkBudget::declared(WorkMetric::width_weighted(), 1u64 << 40);
     println!();
     println!("  THE FRONT — two co-present branches of one predecessor");
@@ -107,7 +109,11 @@ fn main() {
         Admission::Admitted { priced, ceiling } => {
             println!("    ADMITTED  priced {priced} against {ceiling}")
         }
-        Admission::Deferred { priced, ceiling, dominating } => {
+        Admission::Deferred {
+            priced,
+            ceiling,
+            dominating,
+        } => {
             println!("    DEFERRED  {priced} against {ceiling}, dominated by {dominating:?}");
             std::process::exit(0);
         }
@@ -116,7 +122,9 @@ fn main() {
     let clock = Instant::now();
     let mut stored_octets = 0u64;
     let receiver = {
-        let words = container.read_bf16_whole(&mut file, RECEIVER).expect("read");
+        let words = container
+            .read_bf16_whole(&mut file, RECEIVER)
+            .expect("read");
         stored_octets += (words.len() * 2) as u64;
         let mounted = chart
             .mount_bfloat16(&words, receiver_tensor.shape[1])
@@ -125,7 +133,9 @@ fn main() {
         exact_entries(&population[0], receiver_tensor.shape[0])
     };
     let presented = {
-        let words = container.read_bf16_whole(&mut file, PRESENTED).expect("read");
+        let words = container
+            .read_bf16_whole(&mut file, PRESENTED)
+            .expect("read");
         stored_octets += (words.len() * 2) as u64;
         let mounted = chart
             .mount_bfloat16(&words, presented_tensor.shape[1])
@@ -170,7 +180,10 @@ fn main() {
         }
     }
     let faces = clock.elapsed();
-    println!("    contacts read                   {} in {faces:?}", contacts.len());
+    println!(
+        "    contacts read                   {} in {faces:?}",
+        contacts.len()
+    );
     println!("    refused by name                 {}", refusals.len());
     for ((r, p), error) in refusals.iter().take(3) {
         println!("        ({r}, {p})  {error}");
@@ -198,7 +211,10 @@ fn main() {
     let mut open_pairs = 0usize;
     for left in 0..contacts.len() {
         for right in (left + 1)..contacts.len() {
-            if contacts[left].1.cohere_square().compare(&contacts[right].1.cohere_square())
+            if contacts[left]
+                .1
+                .cohere_square()
+                .compare(&contacts[right].1.cohere_square())
                 == ExactOrdering::Open
             {
                 open_pairs += 1;
@@ -206,7 +222,11 @@ fn main() {
         }
     }
     ordering.sort_by(|a, b| {
-        match contacts[*b].1.cohere_square().compare(&contacts[*a].1.cohere_square()) {
+        match contacts[*b]
+            .1
+            .cohere_square()
+            .compare(&contacts[*a].1.cohere_square())
+        {
             ExactOrdering::Less => std::cmp::Ordering::Less,
             ExactOrdering::Greater => std::cmp::Ordering::Greater,
             _ => std::cmp::Ordering::Equal,
@@ -254,10 +274,7 @@ fn main() {
         (Ok(plain), Ok(moved)) => {
             let agree = plain.cohere_square().compare(&moved.cohere_square());
             println!("    the receiver chart scaled by 2^10");
-            println!(
-                "    cohere^2 under the two frames   {:?}",
-                agree
-            );
+            println!("    cohere^2 under the two frames   {:?}", agree);
             println!(
                 "    hands                           {:?} / {:?}",
                 plain.hand(),
@@ -311,7 +328,9 @@ fn main() {
     );
     println!(
         "      four-state order against a point   {:?}",
-        enclosure.disjoint_order(&holonic_engine::exact_value::ExactInterval::point(above.clone()))
+        enclosure.disjoint_order(&holonic_engine::exact_value::ExactInterval::point(
+            above.clone()
+        ))
     );
 
     println!();
@@ -319,7 +338,10 @@ fn main() {
     println!();
     println!("  The front is carried by the card and the local face by the serial chart, split by");
     println!("  the material's own causal geometry rather than by arithmetic volume.");
-    println!("  {} contacts were read exactly, each an undivided pair with its hand retained.", contacts.len());
+    println!(
+        "  {} contacts were read exactly, each an undivided pair with its hand retained.",
+        contacts.len()
+    );
     println!("  The complete ordering of the population needed no division and no transcendental.");
     println!("  The frame cancels: a ratio crossed the horizon and a magnitude did not.");
     println!("  Where a carried weight needs an exponential, the standing certified-value owner");

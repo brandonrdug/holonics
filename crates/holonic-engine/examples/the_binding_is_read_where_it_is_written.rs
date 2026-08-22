@@ -186,9 +186,18 @@ fn main() {
         .collect();
 
     println!("\n=== the reader over the whole library");
-    println!("  files                                     {:>8}", census.files);
-    println!("  declarations                              {:>8}", census.declarations);
-    println!("  proof steps                               {:>8}", census.steps);
+    println!(
+        "  files                                     {:>8}",
+        census.files
+    );
+    println!(
+        "  declarations                              {:>8}",
+        census.declarations
+    );
+    println!(
+        "  proof steps                               {:>8}",
+        census.steps
+    );
     println!("\n=== the four populations the repair must move");
     println!(
         "  empty recruitment (cannot be an arrival target) {:>8}   of {}",
@@ -242,9 +251,7 @@ fn main() {
                 isolated.len(),
                 complex.unconsumed().len()
             );
-            println!(
-                "  THE FALSIFIER: these must move after the repair. If they do not, the four"
-            );
+            println!("  THE FALSIFIER: these must move after the repair. If they do not, the four");
             println!(
                 "  defects were not load-bearing for the species reading and the movement must"
             );

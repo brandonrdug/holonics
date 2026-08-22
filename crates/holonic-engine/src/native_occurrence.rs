@@ -26,9 +26,12 @@
 
 use std::collections::BTreeMap;
 
-use crate::foreign_map::{manifest_safetensors, FileIdentity};
+use crate::foreign_map::{FileIdentity, manifest_safetensors};
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
-use crate::source_occurrence::{AuthenticatedContainer, BindingValidation, OccurrenceWitness, RegionIdentity, SourceRefusal};
+use crate::source_occurrence::{
+    AuthenticatedContainer, BindingValidation, OccurrenceWitness, OccurrenceWitnessRefusal,
+    RegionIdentity, SourceRefusal,
+};
 
 /// The native rest as an occurrence: its container, content-addressed, and its own declarations.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -47,14 +50,25 @@ impl NativeOccurrence {
     /// is the rest's identity; the digest is the apparatus frame — it detects a rest that moved
     /// under the deed, which is exactly what `verify_still` asks after the deed.
     pub fn read(locator: &str) -> Result<Self, SourceRefusal> {
-        let (_, manifest) = manifest_safetensors(locator).map_err(|error| SourceRefusal::ContainerMalformed { locator: locator.to_owned(), reason: error.to_string() })?;
+        let (_, manifest) =
+            manifest_safetensors(locator).map_err(|error| SourceRefusal::ContainerMalformed {
+                locator: locator.to_owned(),
+                reason: error.to_string(),
+            })?;
         let (octets, header_octets, header_sha256) = AuthenticatedContainer::read_header(locator)?;
         let content_sha256 = AuthenticatedContainer::digest_whole(locator)?;
         let mut regions = BTreeMap::new();
         for (name, tensor) in &manifest.tensors {
             regions.insert(
                 name.clone(),
-                RegionIdentity { population: name.clone(), dtype: tensor.dtype.declared().to_owned(), shape: tensor.shape.clone(), start: tensor.start, end: tensor.end, sha256: None },
+                RegionIdentity {
+                    population: name.clone(),
+                    dtype: tensor.dtype.declared().to_owned(),
+                    shape: tensor.shape.clone(),
+                    start: tensor.start,
+                    end: tensor.end,
+                    sha256: None,
+                },
             );
         }
         Ok(Self {
@@ -73,7 +87,9 @@ impl NativeOccurrence {
 
     /// Does the rest itself carry this statement?
     pub fn declares(&self, statement: &str) -> bool {
-        self.declarations.values().any(|carried| carried == statement)
+        self.declarations
+            .values()
+            .any(|carried| carried == statement)
     }
 
     /// Does the rest identify this population as a region of its own header?
@@ -83,7 +99,10 @@ impl NativeOccurrence {
 
     /// The rest's declared shape for one population, as its header states it.
     pub fn shape_of(&self, population: &str) -> Option<&[usize]> {
-        self.container.regions.get(population).map(|region| region.shape.as_slice())
+        self.container
+            .regions
+            .get(population)
+            .map(|region| region.shape.as_slice())
     }
 }
 
@@ -91,7 +110,10 @@ impl NativeOccurrence {
 /// is class indices, germ indices, standings and offsets, and a float carrier for any of them
 /// would put a deleted tail into an address.
 fn integer_carrier(dtype: &str) -> bool {
-    matches!(dtype, "U8" | "U16" | "U32" | "U64" | "I8" | "I16" | "I32" | "I64")
+    matches!(
+        dtype,
+        "U8" | "U16" | "U32" | "U64" | "I8" | "I16" | "I32" | "I64"
+    )
 }
 
 impl OccurrenceWitness for NativeOccurrence {
@@ -99,64 +121,116 @@ impl OccurrenceWitness for NativeOccurrence {
         "native rest"
     }
 
-    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
-        self.container.verify_still()?;
-        let mut validated = Vec::with_capacity(complex.operations.len());
-        for operation in complex.operations.values() {
-            let name = complex.shape.laws.get(&operation.law).map(|law| law.name.clone()).unwrap_or_default();
-            let mut validation = BindingValidation {
-                operation: name.clone(),
-                species: operation.species,
-                symbols: Vec::new(),
-                fields: Vec::new(),
-                shapes: Vec::new(),
-                interventions: Vec::new(),
-                descriptions: Vec::new(),
-            };
-            let mut exterior = false;
-            for testimony in &operation.testimony {
-                match testimony {
-                    SourceTestimony::DeclaredShape { population, shape } => {
-                        let region = self.container.regions.get(population).ok_or_else(|| SourceRefusal::PopulationNotIdentified { operation: name.clone(), population: population.clone() })?;
-                        if region.shape != *shape {
-                            return Err(SourceRefusal::ShapeDiffers { operation: name, population: population.clone(), declared: shape.clone(), measured: region.shape.clone() });
+    fn validate(
+        &self,
+        complex: &PortedOperationComplex,
+    ) -> Result<Vec<BindingValidation>, OccurrenceWitnessRefusal> {
+        let validate = || -> Result<Vec<BindingValidation>, SourceRefusal> {
+            self.container.verify_still()?;
+            let mut validated = Vec::with_capacity(complex.operations.len());
+            for operation in complex.operations.values() {
+                let name = complex
+                    .shape
+                    .laws
+                    .get(&operation.law)
+                    .map(|law| law.name.clone())
+                    .unwrap_or_default();
+                let mut validation = BindingValidation {
+                    operation: name.clone(),
+                    species: operation.species,
+                    symbols: Vec::new(),
+                    fields: Vec::new(),
+                    shapes: Vec::new(),
+                    interventions: Vec::new(),
+                    descriptions: Vec::new(),
+                    exact_owner_licenses: Vec::new(),
+                };
+                let mut exterior = false;
+                for testimony in &operation.testimony {
+                    match testimony {
+                        SourceTestimony::DeclaredShape { population, shape } => {
+                            let region =
+                                self.container.regions.get(population).ok_or_else(|| {
+                                    SourceRefusal::PopulationNotIdentified {
+                                        operation: name.clone(),
+                                        population: population.clone(),
+                                    }
+                                })?;
+                            if region.shape != *shape {
+                                return Err(SourceRefusal::ShapeDiffers {
+                                    operation: name,
+                                    population: population.clone(),
+                                    declared: shape.clone(),
+                                    measured: region.shape.clone(),
+                                });
+                            }
+                            if !integer_carrier(&region.dtype) {
+                                return Err(SourceRefusal::DtypeDiffers {
+                                    operation: name.clone(),
+                                    population: population.clone(),
+                                    declared: "an integer carrier".to_owned(),
+                                    measured: region.dtype.clone(),
+                                });
+                            }
+                            validation.shapes.push((population.clone(), shape.clone()));
+                            exterior = true;
                         }
-                        if !integer_carrier(&region.dtype) {
-                            return Err(SourceRefusal::DtypeDiffers { operation: name.clone(), population: population.clone(), declared: "an integer carrier".to_owned(), measured: region.dtype.clone() });
+                        SourceTestimony::AuthoritativeDescription { statement } => {
+                            if !self.declares(statement) {
+                                return Err(SourceRefusal::DeclarationNotInRest {
+                                    operation: name,
+                                    statement: statement.clone(),
+                                });
+                            }
+                            validation.descriptions.push(statement.clone());
+                            exterior = true;
                         }
-                        validation.shapes.push((population.clone(), shape.clone()));
-                        exterior = true;
-                    }
-                    SourceTestimony::AuthoritativeDescription { statement } => {
-                        if !self.declares(statement) {
-                            return Err(SourceRefusal::DeclarationNotInRest { operation: name, statement: statement.clone() });
+                        SourceTestimony::Intervention { statement } => {
+                            validation.interventions.push(statement.clone())
                         }
-                        validation.descriptions.push(statement.clone());
-                        exterior = true;
+                        SourceTestimony::Implementation { .. }
+                        | SourceTestimony::RestedImplementation { .. }
+                        | SourceTestimony::Configuration { .. } => {
+                            return Err(SourceRefusal::TestimonyForeignToNativeRest {
+                                operation: name,
+                                testimony: format!("{testimony:?}"),
+                            });
+                        }
+                        SourceTestimony::Undecided { .. } => {}
                     }
-                    SourceTestimony::Intervention { statement } => validation.interventions.push(statement.clone()),
-                    SourceTestimony::Implementation { .. }
-                    | SourceTestimony::RestedImplementation { .. }
-                    | SourceTestimony::Configuration { .. } => {
-                        return Err(SourceRefusal::TestimonyForeignToNativeRest { operation: name, testimony: format!("{testimony:?}") });
-                    }
-                    SourceTestimony::Undecided { .. } => {}
                 }
-            }
-            if !validation.interventions.is_empty() && exterior && operation.species != OperationSpecies::Quotient {
-                return Err(SourceRefusal::InterventionOnSourceLaw { operation: name, species: operation.species });
-            }
-            if !exterior && validation.interventions.is_empty() {
-                return Err(SourceRefusal::TestimonyNotExterior { operation: name, testimony: operation.testimony.iter().map(|t| format!("{t:?}")).collect() });
-            }
-            if let Some(carrier) = &operation.carrier {
-                if !self.identifies(carrier) {
-                    return Err(SourceRefusal::PopulationNotIdentified { operation: name, population: carrier.clone() });
+                if !validation.interventions.is_empty()
+                    && exterior
+                    && operation.species != OperationSpecies::Quotient
+                {
+                    return Err(SourceRefusal::InterventionOnSourceLaw {
+                        operation: name,
+                        species: operation.species,
+                    });
                 }
+                if !exterior && validation.interventions.is_empty() {
+                    return Err(SourceRefusal::TestimonyNotExterior {
+                        operation: name,
+                        testimony: operation
+                            .testimony
+                            .iter()
+                            .map(|t| format!("{t:?}"))
+                            .collect(),
+                    });
+                }
+                if let Some(carrier) = &operation.carrier {
+                    if !self.identifies(carrier) {
+                        return Err(SourceRefusal::PopulationNotIdentified {
+                            operation: name,
+                            population: carrier.clone(),
+                        });
+                    }
+                }
+                validated.push(validation);
             }
-            validated.push(validation);
-        }
-        Ok(validated)
+            Ok(validated)
+        };
+        validate().map_err(Into::into)
     }
 }
 
@@ -186,7 +260,16 @@ mod tests {
     fn complex(testimony: Vec<SourceTestimony>) -> PortedOperationComplex {
         let mut complex = PortedOperationComplex::new("a native rest witnessing one law");
         let out = complex.port("landed class");
-        complex.bind_operation("athena walk", OperationSpecies::Construction, vec![], vec![out], None, testimony).expect("bound");
+        complex
+            .bind_operation(
+                "athena walk",
+                OperationSpecies::Construction,
+                vec![],
+                vec![out],
+                None,
+                testimony,
+            )
+            .expect("bound");
         complex
     }
 
@@ -202,33 +285,83 @@ mod tests {
         assert_eq!(rest.shape_of("athena.class.suffix"), Some(&[2usize, 1][..]));
 
         let declared = complex(vec![
-            SourceTestimony::AuthoritativeDescription { statement: "the walk falls along the suffix link".to_owned() },
-            SourceTestimony::DeclaredShape { population: "athena.class.suffix".to_owned(), shape: vec![2, 1] },
+            SourceTestimony::AuthoritativeDescription {
+                statement: "the walk falls along the suffix link".to_owned(),
+            },
+            SourceTestimony::DeclaredShape {
+                population: "athena.class.suffix".to_owned(),
+                shape: vec![2, 1],
+            },
         ]);
         let validated = rest.validate(&declared).expect("the rest declares it");
         assert_eq!(validated.len(), 1);
-        assert_eq!(validated[0].descriptions, vec!["the walk falls along the suffix link".to_owned()]);
+        assert_eq!(
+            validated[0].descriptions,
+            vec!["the walk falls along the suffix link".to_owned()]
+        );
         assert_eq!(validated[0].shapes.len(), 1);
 
         // a statement the rest does not carry refuses, by name
         let undeclared = complex(vec![
-            SourceTestimony::AuthoritativeDescription { statement: "a law the rest never declared".to_owned() },
-            SourceTestimony::DeclaredShape { population: "athena.class.suffix".to_owned(), shape: vec![2, 1] },
+            SourceTestimony::AuthoritativeDescription {
+                statement: "a law the rest never declared".to_owned(),
+            },
+            SourceTestimony::DeclaredShape {
+                population: "athena.class.suffix".to_owned(),
+                shape: vec![2, 1],
+            },
         ]);
-        assert!(matches!(rest.validate(&undeclared), Err(SourceRefusal::DeclarationNotInRest { .. })));
+        assert!(matches!(
+            rest.validate(&undeclared),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::DeclarationNotInRest { .. }
+            ))
+        ));
 
         // a population the rest does not identify, and a shape that disagrees, both refuse
-        let absent = complex(vec![SourceTestimony::DeclaredShape { population: "athena.class.standing".to_owned(), shape: vec![2, 1] }]);
-        assert!(matches!(rest.validate(&absent), Err(SourceRefusal::PopulationNotIdentified { .. })));
-        let drifted = complex(vec![SourceTestimony::DeclaredShape { population: "athena.class.suffix".to_owned(), shape: vec![3, 1] }]);
-        assert!(matches!(rest.validate(&drifted), Err(SourceRefusal::ShapeDiffers { .. })));
+        let absent = complex(vec![SourceTestimony::DeclaredShape {
+            population: "athena.class.standing".to_owned(),
+            shape: vec![2, 1],
+        }]);
+        assert!(matches!(
+            rest.validate(&absent),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::PopulationNotIdentified { .. }
+            ))
+        ));
+        let drifted = complex(vec![SourceTestimony::DeclaredShape {
+            population: "athena.class.suffix".to_owned(),
+            shape: vec![3, 1],
+        }]);
+        assert!(matches!(
+            rest.validate(&drifted),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::ShapeDiffers { .. }
+            ))
+        ));
 
         // **and foreign testimony refuses by TYPE**: a native rest has no implementation text and
         // no configuration, so offering either is not a missing file but a category error.
-        let foreign = complex(vec![SourceTestimony::Implementation { locator: "modeling.py".to_owned(), symbol: "Attention.forward".to_owned() }]);
-        assert!(matches!(rest.validate(&foreign), Err(SourceRefusal::TestimonyForeignToNativeRest { .. })));
-        let configured = complex(vec![SourceTestimony::Configuration { field: "hidden_size".to_owned(), value: "2560".to_owned() }]);
-        assert!(matches!(rest.validate(&configured), Err(SourceRefusal::TestimonyForeignToNativeRest { .. })));
+        let foreign = complex(vec![SourceTestimony::Implementation {
+            locator: "modeling.py".to_owned(),
+            symbol: "Attention.forward".to_owned(),
+        }]);
+        assert!(matches!(
+            rest.validate(&foreign),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::TestimonyForeignToNativeRest { .. }
+            ))
+        ));
+        let configured = complex(vec![SourceTestimony::Configuration {
+            field: "hidden_size".to_owned(),
+            value: "2560".to_owned(),
+        }]);
+        assert!(matches!(
+            rest.validate(&configured),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::TestimonyForeignToNativeRest { .. }
+            ))
+        ));
         let _ = std::fs::remove_file(&path);
     }
 
@@ -237,8 +370,16 @@ mod tests {
         let path = std::env::temp_dir().join("holonic-native-occurrence-carrier.safetensors");
         write_rest(&path, "the walk falls along the suffix link", "BF16", 4);
         let rest = NativeOccurrence::read(path.to_str().expect("path")).expect("read");
-        let declared = complex(vec![SourceTestimony::DeclaredShape { population: "athena.class.suffix".to_owned(), shape: vec![4, 1] }]);
-        assert!(matches!(rest.validate(&declared), Err(SourceRefusal::DtypeDiffers { .. })));
+        let declared = complex(vec![SourceTestimony::DeclaredShape {
+            population: "athena.class.suffix".to_owned(),
+            shape: vec![4, 1],
+        }]);
+        assert!(matches!(
+            rest.validate(&declared),
+            Err(OccurrenceWitnessRefusal::Source(
+                SourceRefusal::DtypeDiffers { .. }
+            ))
+        ));
         let _ = std::fs::remove_file(&path);
     }
 }

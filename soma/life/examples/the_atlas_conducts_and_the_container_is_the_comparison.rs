@@ -59,8 +59,8 @@ fn current() -> Result<ActionCurrent, String> {
 /// ---------------------------------------------------------------------------------------------
 fn trace(atlas: &ExactSuffixEcology, prompt: &str) -> Result<(), String> {
     let tokens = lexical_tokens(prompt);
-    let germs = life::causal_language::token_germs_public(&tokens)
-        .map_err(|error| format!("{error:?}"))?;
+    let germs =
+        life::causal_language::token_germs_public(&tokens).map_err(|error| format!("{error:?}"))?;
     println!("  PROMPT {prompt:?}  ->  {} tokens", tokens.len());
     println!(
         "    {:<14} {:>6} {:>6} {:>9} {:>7} {:>8}  {}",
@@ -148,7 +148,11 @@ fn truncate(text: &str, at: usize) -> String {
     if cleaned.chars().count() <= at {
         cleaned
     } else {
-        cleaned.chars().take(at.saturating_sub(1)).chain("…".chars()).collect()
+        cleaned
+            .chars()
+            .take(at.saturating_sub(1))
+            .chain("…".chars())
+            .collect()
     }
 }
 
@@ -187,17 +191,29 @@ fn census(atlas: &ExactSuffixEcology) {
         }
     }
     println!("  classes                      {states}");
-    println!("  germ transitions             {}", atlas.material_transition_count());
-    println!("  material occurrences         {}", atlas.material_occurrence_count());
+    println!(
+        "  germ transitions             {}",
+        atlas.material_transition_count()
+    );
+    println!(
+        "  material occurrences         {}",
+        atlas.material_occurrence_count()
+    );
     println!();
     println!("  JUNCTION BREADTH — where the material is decided and where it forks");
     println!("    termini      (breadth 0)   {termini}");
     println!("    FORCED       (breadth 1)   {forced}   <- exactly one continuation admitted:");
-    println!("                                       nothing is decided here, no plurality to divide");
+    println!(
+        "                                       nothing is decided here, no plurality to divide"
+    );
     println!("    forks        (breadth >1)  {forks}");
     for (out, count) in &breadth {
         if *out >= 2 {
-            println!("      breadth {}{}          {count}", out, if *out == 8 { "+" } else { " " });
+            println!(
+                "      breadth {}{}          {count}",
+                out,
+                if *out == 8 { "+" } else { " " }
+            );
         }
     }
     println!();
@@ -206,10 +222,20 @@ fn census(atlas: &ExactSuffixEcology) {
     println!("    set. Over that whole range no declared receiver can separate them, so the width");
     println!("    IS a tolerance — read off the tree, never set as a number.");
     for (width, count) in &interval_width {
-        println!("    width {}{}                  {count}", width, if *width == 8 { "+" } else { " " });
+        println!(
+            "    width {}{}                  {count}",
+            width,
+            if *width == 8 { "+" } else { " " }
+        );
     }
-    println!("    widest interval            {} lengths, at class {}", widest.0, widest.1);
-    println!("    longest class extent       {} tokens, at class {}", deepest.0, deepest.1);
+    println!(
+        "    widest interval            {} lengths, at class {}",
+        widest.0, widest.1
+    );
+    println!(
+        "    longest class extent       {} tokens, at class {}",
+        deepest.0, deepest.1
+    );
 }
 
 /// ---------------------------------------------------------------------------------------------
@@ -237,22 +263,31 @@ fn containers(atlas: &ExactSuffixEcology, sealed: usize) -> Result<(), String> {
     println!("    what it does NOT carry     how any tensor participates in any transport.");
     println!("                               The header is COORDINATES. The composition law lives");
     println!("                               in config.json plus the modelling code, outside the");
-    println!("                               file. Hand someone this container with no architecture");
+    println!(
+        "                               file. Hand someone this container with no architecture"
+    );
     println!("                               and they hold exact values that compose in no way.");
 
     let vocabulary = std::fs::metadata(format!("{MAP_DIR}/tokenizer.json"))
         .map(|meta| meta.len())
         .unwrap_or(0);
     println!("    the symbols                a row index reopens to a token ONLY through");
-    println!("                               tokenizer.json, a separate {vocabulary}-octet artifact.");
+    println!(
+        "                               tokenizer.json, a separate {vocabulary}-octet artifact."
+    );
     println!("                               Lose it and the rows address nothing.");
     println!();
     println!("  THE ATLAS CONTAINER  (one ErosRest organ)");
     println!("    sealed octets              {sealed}");
     println!("    classes                    {}", atlas.state_count());
-    println!("    germ transitions           {}", atlas.material_transition_count());
+    println!(
+        "    germ transitions           {}",
+        atlas.material_transition_count()
+    );
     println!("    what the payload IS        the transport itself: classes, suffix links, the");
-    println!("                               transitions between them, and the occurrence count of");
+    println!(
+        "                               transitions between them, and the occurrence count of"
+    );
     println!("                               each class. There is no separate composition law,");
     println!("                               because the container is the composition law.");
     println!("    the symbols                a germ identity is a LENGTH-PREFIXED PACKING, not a");
@@ -261,8 +296,8 @@ fn containers(atlas: &ExactSuffixEcology, sealed: usize) -> Result<(), String> {
 
     // Demonstrate the reopening rather than asserting it.
     let probe = lexical_tokens("receiver");
-    let germs = life::causal_language::token_germs_public(&probe)
-        .map_err(|error| format!("{error:?}"))?;
+    let germs =
+        life::causal_language::token_germs_public(&probe).map_err(|error| format!("{error:?}"))?;
     if let Some(germ) = germs.first() {
         let back = fiber_bytes(germ.identity()).map_err(|error| format!("{error:?}"))?;
         println!("    demonstrated               \"receiver\" -> germ -> {back:?}");
@@ -285,7 +320,9 @@ fn run() -> Result<(), String> {
     let atlas = ecology.global_suffix();
 
     println!("PART ONE — THE CONDUCT: what the material does with each token\n");
-    println!("  class    = the transport class the current lands in (an occurrence set, one identity)");
+    println!(
+        "  class    = the transport class the current lands in (an occurrence set, one identity)"
+    );
     println!("  depth    = how far back the current is still coherent");
     println!("  standing = how much material stands behind that class");
     println!("  breadth  = how many germs continue out of it");

@@ -28,7 +28,9 @@ pub enum MorphologicalConditionCudaError {
     Suffix(ExactSuffixEcologyError),
     EmptyChart,
     /// The named chart carried no path at all.
-    ChartCarriesNoPath { chart: &'static str },
+    ChartCarriesNoPath {
+        chart: &'static str,
+    },
     /// The named chart's path population and its label population disagree.
     ChartLabelsDisagree {
         chart: &'static str,

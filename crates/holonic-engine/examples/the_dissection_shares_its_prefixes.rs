@@ -36,14 +36,15 @@
 
 #[path = "phoenix/cohort.rs"]
 mod cohort;
+#[path = "phoenix/native_streamed.rs"]
+mod native_streamed;
 #[path = "phoenix/resident_layer.rs"]
 mod resident_layer;
 #[path = "phoenix/streamed.rs"]
 mod streamed;
-#[path = "phoenix/native_streamed.rs"]
-mod native_streamed;
-#[path = "phoenix/tower.rs"]
-mod tower;
+mod tower {
+    pub use holonic_engine::phoenix::tower::*;
+}
 
 use std::collections::BTreeMap;
 use std::io::Write;
@@ -51,10 +52,12 @@ use std::time::Instant;
 
 use cohort::{Cohorted, LayerFace, Site, TowerDeclaration, TowerReturn};
 use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::resident_section::{word_value, ResidentGrain, ResidentSurface, SeriesAperture};
+use holonic_engine::resident_section::{
+    ResidentGrain, ResidentSurface, SeriesAperture, word_value,
+};
+use native_streamed::NativeMaterialSource;
 use num_bigint::BigInt;
 use relational_geometry::Rat;
-use native_streamed::NativeMaterialSource;
 use streamed::{ForeignMaterialSource, MaterialSource};
 use tower::Intervention;
 
@@ -81,7 +84,8 @@ fn parse_args() -> Args {
         root: "/home/b/models/gemma-4-E4B-it".to_owned(),
         native_rest: None,
         out: "output/the_dissection_shares_its_prefixes".to_owned(),
-        committed: "output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form".to_owned(),
+        committed: "output/the_source_is_dissected/dissection-5-tokens-grain-48-terms-14.form"
+            .to_owned(),
         text: None,
         tokens: None,
         grain: 48,
@@ -98,7 +102,15 @@ fn parse_args() -> Args {
             "--out" => args.out = it.next().expect("--out <dir>"),
             "--committed" => args.committed = it.next().expect("--committed <path>"),
             "--text" => args.text = Some(it.next().expect("--text <text>")),
-            "--tokens" => args.tokens = Some(it.next().expect("--tokens a,b").split(',').map(|t| t.trim().parse().expect("token id")).collect()),
+            "--tokens" => {
+                args.tokens = Some(
+                    it.next()
+                        .expect("--tokens a,b")
+                        .split(',')
+                        .map(|t| t.trim().parse().expect("token id"))
+                        .collect(),
+                )
+            }
             "--grain" => args.grain = it.next().expect("--grain F").parse().expect("u32"),
             "--terms" => args.terms = it.next().expect("--terms N").parse().expect("u32"),
             "--python" => args.python = it.next().expect("--python <path>"),
@@ -112,21 +124,39 @@ fn parse_args() -> Args {
 
 fn encode_text(python: &str, text: &str) -> Result<(Vec<usize>, Vec<String>), String> {
     let output = std::process::Command::new(python)
-        .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/examples/phoenix/source_runtime_tower.py"))
+        .arg(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/examples/phoenix/source_runtime_tower.py"
+        ))
         .arg("encode")
         .arg(text)
         .output()
         .map_err(|e| e.to_string())?;
     if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).chars().take(400).collect());
+        return Err(String::from_utf8_lossy(&output.stderr)
+            .chars()
+            .take(400)
+            .collect());
     }
     for line in String::from_utf8_lossy(&output.stdout).lines() {
         if !line.starts_with('{') {
             continue;
         }
         let json: serde_json::Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
-        let ids: Vec<usize> = json["ids"].as_array().ok_or("ids")?.iter().filter_map(|v| v.as_u64()).map(|v| v as usize).collect();
-        let pieces: Vec<String> = json["pieces"].as_array().ok_or("pieces")?.iter().filter_map(|v| v.as_str()).map(str::to_owned).collect();
+        let ids: Vec<usize> = json["ids"]
+            .as_array()
+            .ok_or("ids")?
+            .iter()
+            .filter_map(|v| v.as_u64())
+            .map(|v| v as usize)
+            .collect();
+        let pieces: Vec<String> = json["pieces"]
+            .as_array()
+            .ok_or("pieces")?
+            .iter()
+            .filter_map(|v| v.as_str())
+            .map(str::to_owned)
+            .collect();
         return Ok((ids, pieces));
     }
     Err("no encoding returned".to_owned())
@@ -162,7 +192,12 @@ struct FaceComparison {
     structural: bool,
 }
 
-fn compare(base: &[(i64, i64)], sibling: &[(i64, i64)], grain: ResidentGrain, width: usize) -> FaceComparison {
+fn compare(
+    base: &[(i64, i64)],
+    sibling: &[(i64, i64)],
+    grain: ResidentGrain,
+    width: usize,
+) -> FaceComparison {
     let entries = base.len().min(sibling.len());
     let mut identical = 0usize;
     let mut separated = 0usize;
@@ -180,7 +215,11 @@ fn compare(base: &[(i64, i64)], sibling: &[(i64, i64)], grain: ResidentGrain, wi
         let disjoint = bh < sl || sh < bl;
         if disjoint {
             separated += 1;
-            let gap = if bh < sl { word_value(sl, grain) - word_value(bh, grain) } else { word_value(bl, grain) - word_value(sh, grain) };
+            let gap = if bh < sl {
+                word_value(sl, grain) - word_value(bh, grain)
+            } else {
+                word_value(bl, grain) - word_value(sh, grain)
+            };
             if gap > widest_gap {
                 widest_gap = gap;
             }
@@ -200,13 +239,29 @@ fn compare(base: &[(i64, i64)], sibling: &[(i64, i64)], grain: ResidentGrain, wi
     }
     positions.sort_unstable();
     positions.dedup();
-    FaceComparison { entries, identical, separated, widest_gap, widest_shift, positions_separated: positions, structural: false }
+    FaceComparison {
+        entries,
+        identical,
+        separated,
+        widest_gap,
+        widest_shift,
+        positions_separated: positions,
+        structural: false,
+    }
 }
 
 /// The comparison of a face a sibling did not conduct: it IS the base's face, so every entry is
 /// identical by construction and nothing was measured.
 fn shared(entries: usize) -> FaceComparison {
-    FaceComparison { entries, identical: entries, separated: 0, widest_gap: zero(), widest_shift: zero(), positions_separated: Vec::new(), structural: true }
+    FaceComparison {
+        entries,
+        identical: entries,
+        separated: 0,
+        widest_gap: zero(),
+        widest_shift: zero(),
+        positions_separated: Vec::new(),
+        structural: true,
+    }
 }
 
 /// One face of the receiver family, named in chronology.
@@ -238,22 +293,39 @@ impl Face {
 }
 
 fn face_widths(face: &LayerFace) -> (usize, usize, usize) {
-    let head = if face.species == tower::Species::Full { tower::FULL_HEAD } else { tower::SLIDING_HEAD };
+    let head = if face.species == tower::Species::Full {
+        tower::FULL_HEAD
+    } else {
+        tower::SLIDING_HEAD
+    };
     (tower::PLE_WIDTH, tower::HEADS * head, tower::HIDDEN)
 }
 
 /// The whole receiver family compared, every face in chronology, with a face the sibling did not
 /// conduct returned as [`shared`].
-fn compare_family(base: &TowerReturn, sibling: &TowerReturn, grain: ResidentGrain) -> Vec<(Face, FaceComparison)> {
+fn compare_family(
+    base: &TowerReturn,
+    sibling: &TowerReturn,
+    grain: ResidentGrain,
+) -> Vec<(Face, FaceComparison)> {
     let mut out = Vec::new();
     for layer in 0..tower::LAYERS {
-        let b = base.layers.get(&layer).expect("the base conducted every layer");
+        let b = base
+            .layers
+            .get(&layer)
+            .expect("the base conducted every layer");
         let (ple_w, contact_w, return_w) = face_widths(b);
         match sibling.layers.get(&layer) {
             Some(s) => {
                 out.push((Face::Ple(layer), compare(&b.ple, &s.ple, grain, ple_w)));
-                out.push((Face::Contact(layer), compare(&b.contact, &s.contact, grain, contact_w)));
-                out.push((Face::Return(layer), compare(&b.terminal, &s.terminal, grain, return_w)));
+                out.push((
+                    Face::Contact(layer),
+                    compare(&b.contact, &s.contact, grain, contact_w),
+                ));
+                out.push((
+                    Face::Return(layer),
+                    compare(&b.terminal, &s.terminal, grain, return_w),
+                ));
             }
             None => {
                 out.push((Face::Ple(layer), shared(b.ple.len())));
@@ -262,13 +334,34 @@ fn compare_family(base: &TowerReturn, sibling: &TowerReturn, grain: ResidentGrai
             }
         }
     }
-    out.push((Face::FinalNormed, compare(&base.final_normed, &sibling.final_normed, grain, tower::HIDDEN)));
-    out.push((Face::Potential, compare(&base.potential, &sibling.potential, grain, tower::VOCABULARY)));
+    out.push((
+        Face::FinalNormed,
+        compare(
+            &base.final_normed,
+            &sibling.final_normed,
+            grain,
+            tower::HIDDEN,
+        ),
+    ));
+    out.push((
+        Face::Potential,
+        compare(
+            &base.potential,
+            &sibling.potential,
+            grain,
+            tower::VOCABULARY,
+        ),
+    ));
     out
 }
 
 /// The order face of the potential at the last position.
-fn order_face(potential: &[(i64, i64)], positions: usize, grain: ResidentGrain, n: usize) -> (Vec<usize>, Vec<usize>) {
+fn order_face(
+    potential: &[(i64, i64)],
+    positions: usize,
+    grain: ResidentGrain,
+    n: usize,
+) -> (Vec<usize>, Vec<usize>) {
     let row = &potential[(positions - 1) * tower::VOCABULARY..positions * tower::VOCABULARY];
     let mut top_lower = word_value(row[0].0, grain);
     for (lo, _) in row {
@@ -277,11 +370,23 @@ fn order_face(potential: &[(i64, i64)], positions: usize, grain: ResidentGrain, 
             top_lower = v;
         }
     }
-    let mut plural: Vec<usize> = row.iter().enumerate().filter(|(_, (_, hi))| word_value(*hi, grain) >= top_lower).map(|(v, _)| v).collect();
+    let mut plural: Vec<usize> = row
+        .iter()
+        .enumerate()
+        .filter(|(_, (_, hi))| word_value(*hi, grain) >= top_lower)
+        .map(|(v, _)| v)
+        .collect();
     plural.sort_unstable();
-    let mut by_lower: Vec<(usize, i64)> = row.iter().enumerate().map(|(v, (lo, _))| (v, *lo)).collect();
+    let mut by_lower: Vec<(usize, i64)> = row
+        .iter()
+        .enumerate()
+        .map(|(v, (lo, _))| (v, *lo))
+        .collect();
     by_lower.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
-    (plural, by_lower.into_iter().take(n).map(|(v, _)| v).collect())
+    (
+        plural,
+        by_lower.into_iter().take(n).map(|(v, _)| v).collect(),
+    )
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -308,22 +413,152 @@ struct Taxon {
 
 fn panel(tokens: usize) -> Vec<Taxon> {
     vec![
-        Taxon { name: "initial-embedding columns 0..256 withdrawn at every layer", dissects: "initial embedding", site: Site::EveryLayer, intervention: Intervention::WithdrawEmbeddingColumns { from: 0, span: 256 }, controls: vec![], ambiguity: "x0 enters every layer (the residual at layer 0 and the PLE projection everywhere), so the site is every layer and no predecessor control exists; the change is attributed to the columns, not to a layer" },
-        Taxon { name: "per-layer input withdrawn whole at layer 1", dissects: "per-layer embedding (PLE)", site: Site::Layer(1), intervention: Intervention::WithdrawPle, controls: vec![Control::LayersBeforeIdentical(1)], ambiguity: "the withdrawn section is the layer's joined PLE (embedding half + projected half); which half carries the change is not separated by this taxon" },
-        Taxon { name: "standing ×2 before the input rebase at layer 1", dissects: "normalization (gauge)", site: Site::Layer(1), intervention: Intervention::ScaleBeforeInputRebase { by: 2 }, controls: vec![Control::LayersBeforeIdentical(1), Control::OrderFaceUnmoved], ambiguity: "the RMS rebase quotients a positive scale away up to its epsilon and the rounding of its radical series, so what survives is that residue; the exact receiver at grain 2^-48 can see it while the order face cannot — tolerance is the receiver's aperture (the scale below which no arc reaches a receiver-relevant difference), so the gauge is stated relative to the after-rebase sibling (domination at every face) and to the order face, never as a threshold; the retained standing is not scaled (the re-entry reads the unscaled standing)" },
-        Taxon { name: "standing ×2 after the input rebase at layer 1", dissects: "normalization (not a gauge)", site: Site::Layer(1), intervention: Intervention::ScaleAfterInputRebase { by: 2 }, controls: vec![Control::LayersBeforeIdentical(1)], ambiguity: "Q, K and V all double, so the contact's ratio sharpens by 4 in the exponent and V doubles; the two are not separated by this taxon" },
-        Taxon { name: "identity band elements at layer 1", dissects: "chronology replaced (no rotation)", site: Site::Layer(1), intervention: Intervention::IdentityChronology, controls: vec![Control::LayersBeforeIdentical(1), Control::PositionZeroIdentical(1)], ambiguity: "position 0 is rotated by angle 0 in both deeds, so its self-contact is unchanged by construction; later positions change through the relative angle only" },
-        Taxon { name: "positions reversed at layer 1", dissects: "chronology permuted", site: Site::Layer(1), intervention: Intervention::ReversedPositions, controls: vec![Control::LayersBeforeIdentical(1), Control::PositionZeroUnseparated(1)], ambiguity: "position 0's query and key are rotated by one equal angle, whose dot product is invariant in exact arithmetic; at the dyadic grain the rotated words round, so position 0 is predicted unseparated rather than identical" },
-        Taxon { name: "receiver heads 0,1 swapped at layer 1", dissects: "Q/K contact permuted", site: Site::Layer(1), intervention: Intervention::PermuteReceiverHeads { a: 0, b: 1 }, controls: vec![Control::LayersBeforeIdentical(1), Control::PositionZeroIdentical(1)], ambiguity: "heads 0 and 1 read the same grouped K/V family, so the permutation moves which head's contact reaches which o_proj block; at position 0 the causal contact has one key, its ratio is 1 whatever the receiver, and both heads carry the same V row, so position 0 is predicted bit-identical — the change is the contact's weights at positions ≥ 1 routed through o_proj" },
-        Taxon { name: "receiver ×2 before the contact at layer 1", dissects: "softmax ratio geometry (temperature)", site: Site::Layer(1), intervention: Intervention::ScaleReceiver { by: 2 }, controls: vec![Control::LayersBeforeIdentical(1), Control::PositionZeroIdentical(1)], ambiguity: "a temperature of 1/2: the ratio family sharpens; V is unchanged, so the change is the contact's weights alone, and at position 0 (one key, ratio 1) there is no weight to sharpen — position 0 is predicted bit-identical" },
-        Taxon { name: "K/V family 0 withdrawn at layer 1", dissects: "K/V weights (own layer)", site: Site::Layer(1), intervention: Intervention::WithdrawKvFamily { family: 0 }, controls: vec![Control::LayersBeforeIdentical(1)], ambiguity: "layer 1 builds and does not store its K/V, so the change reaches later layers only through the residual" },
-        Taxon { name: "K/V family 0 withdrawn at layer 22 (the stored sliding layer)", dissects: "K/V weights at the stored layer", site: Site::Layer(22), intervention: Intervention::WithdrawKvFamily { family: 0 }, controls: vec![Control::LayersBeforeIdentical(22)], ambiguity: "layer 22's own contact and the shared standings both move; which carries the change into layer 24 is separated by the next taxon" },
-        Taxon { name: "SHARED K/V family 0 withdrawn at layer 24 only", dissects: "KV reuse (the reuse, not the weights)", site: Site::Layer(24), intervention: Intervention::WithdrawSharedKvFamily { family: 0 }, controls: vec![Control::LayersBeforeIdentical(24)], ambiguity: "layers 22 and 23 are untouched (their faces identical), so a change here is the reuse's alone; layers 25–41 read the unwithdrawn standings and move only through the residual" },
-        Taxon { name: "carried heads 0,1 swapped before o_proj at layer 1", dissects: "V/O transport permuted", site: Site::Layer(1), intervention: Intervention::PermuteCarriedHeads { a: 0, b: 1 }, controls: vec![Control::LayersBeforeIdentical(1), Control::PositionZeroIdentical(1)], ambiguity: "the contact section itself is unchanged (it is read before the permutation); the change begins at o_proj; at position 0 the two grouped heads carry the same single V row, so swapping them is the identity there and position 0 is predicted bit-identical" },
-        Taxon { name: "retained standing withdrawn at the first re-entry of layer 1", dissects: "residual standing", site: Site::Layer(1), intervention: Intervention::WithdrawResidualAtFirstReEntry, controls: vec![Control::LayersBeforeIdentical(1)], ambiguity: "the return stands alone at the first re-entry; the second and third re-entries still retain, so the layer is not made residual-free" },
-        Taxon { name: "gated passage columns 0..2560 withdrawn at layer 1", dissects: "MLP / gated transport", site: Site::Layer(1), intervention: Intervention::WithdrawGateSpan { from: 0, span: 2560 }, controls: vec![Control::LayersBeforeIdentical(1)], ambiguity: "a quarter of the passage; the contact is unchanged (read before the MLP), so the first separating face is predicted to be the layer return" },
-        Taxon { name: "every key/value position but the last withdrawn at layer 5 (full)", dissects: "sliding vs global chronology (a window of one)", site: Site::Layer(5), intervention: Intervention::KeepOnlyLastKeyPosition { tokens }, controls: vec![Control::LayersBeforeIdentical(5)], ambiguity: "every query but the last then reads no key (the causal contact over zero keys returns the empty ratio), and the last reads only itself; the window's effect on the last position alone is what the order face measures" },
-        Taxon { name: "final normed columns 0..256 withdrawn", dissects: "output boundary (tied embedding)", site: Site::Final, intervention: Intervention::WithdrawFinalSpan { from: 0, span: 256 }, controls: vec![Control::EveryLayerIdentical], ambiguity: "the tied boundary reads 2,560 columns; withdrawing a tenth moves the potential by those columns' contribution alone" },
+        Taxon {
+            name: "initial-embedding columns 0..256 withdrawn at every layer",
+            dissects: "initial embedding",
+            site: Site::EveryLayer,
+            intervention: Intervention::WithdrawEmbeddingColumns { from: 0, span: 256 },
+            controls: vec![],
+            ambiguity: "x0 enters every layer (the residual at layer 0 and the PLE projection everywhere), so the site is every layer and no predecessor control exists; the change is attributed to the columns, not to a layer",
+        },
+        Taxon {
+            name: "per-layer input withdrawn whole at layer 1",
+            dissects: "per-layer embedding (PLE)",
+            site: Site::Layer(1),
+            intervention: Intervention::WithdrawPle,
+            controls: vec![Control::LayersBeforeIdentical(1)],
+            ambiguity: "the withdrawn section is the layer's joined PLE (embedding half + projected half); which half carries the change is not separated by this taxon",
+        },
+        Taxon {
+            name: "standing ×2 before the input rebase at layer 1",
+            dissects: "normalization (gauge)",
+            site: Site::Layer(1),
+            intervention: Intervention::ScaleBeforeInputRebase { by: 2 },
+            controls: vec![Control::LayersBeforeIdentical(1), Control::OrderFaceUnmoved],
+            ambiguity: "the RMS rebase quotients a positive scale away up to its epsilon and the rounding of its radical series, so what survives is that residue; the exact receiver at grain 2^-48 can see it while the order face cannot — tolerance is the receiver's aperture (the scale below which no arc reaches a receiver-relevant difference), so the gauge is stated relative to the after-rebase sibling (domination at every face) and to the order face, never as a threshold; the retained standing is not scaled (the re-entry reads the unscaled standing)",
+        },
+        Taxon {
+            name: "standing ×2 after the input rebase at layer 1",
+            dissects: "normalization (not a gauge)",
+            site: Site::Layer(1),
+            intervention: Intervention::ScaleAfterInputRebase { by: 2 },
+            controls: vec![Control::LayersBeforeIdentical(1)],
+            ambiguity: "Q, K and V all double, so the contact's ratio sharpens by 4 in the exponent and V doubles; the two are not separated by this taxon",
+        },
+        Taxon {
+            name: "identity band elements at layer 1",
+            dissects: "chronology replaced (no rotation)",
+            site: Site::Layer(1),
+            intervention: Intervention::IdentityChronology,
+            controls: vec![
+                Control::LayersBeforeIdentical(1),
+                Control::PositionZeroIdentical(1),
+            ],
+            ambiguity: "position 0 is rotated by angle 0 in both deeds, so its self-contact is unchanged by construction; later positions change through the relative angle only",
+        },
+        Taxon {
+            name: "positions reversed at layer 1",
+            dissects: "chronology permuted",
+            site: Site::Layer(1),
+            intervention: Intervention::ReversedPositions,
+            controls: vec![
+                Control::LayersBeforeIdentical(1),
+                Control::PositionZeroUnseparated(1),
+            ],
+            ambiguity: "position 0's query and key are rotated by one equal angle, whose dot product is invariant in exact arithmetic; at the dyadic grain the rotated words round, so position 0 is predicted unseparated rather than identical",
+        },
+        Taxon {
+            name: "receiver heads 0,1 swapped at layer 1",
+            dissects: "Q/K contact permuted",
+            site: Site::Layer(1),
+            intervention: Intervention::PermuteReceiverHeads { a: 0, b: 1 },
+            controls: vec![
+                Control::LayersBeforeIdentical(1),
+                Control::PositionZeroIdentical(1),
+            ],
+            ambiguity: "heads 0 and 1 read the same grouped K/V family, so the permutation moves which head's contact reaches which o_proj block; at position 0 the causal contact has one key, its ratio is 1 whatever the receiver, and both heads carry the same V row, so position 0 is predicted bit-identical — the change is the contact's weights at positions ≥ 1 routed through o_proj",
+        },
+        Taxon {
+            name: "receiver ×2 before the contact at layer 1",
+            dissects: "softmax ratio geometry (temperature)",
+            site: Site::Layer(1),
+            intervention: Intervention::ScaleReceiver { by: 2 },
+            controls: vec![
+                Control::LayersBeforeIdentical(1),
+                Control::PositionZeroIdentical(1),
+            ],
+            ambiguity: "a temperature of 1/2: the ratio family sharpens; V is unchanged, so the change is the contact's weights alone, and at position 0 (one key, ratio 1) there is no weight to sharpen — position 0 is predicted bit-identical",
+        },
+        Taxon {
+            name: "K/V family 0 withdrawn at layer 1",
+            dissects: "K/V weights (own layer)",
+            site: Site::Layer(1),
+            intervention: Intervention::WithdrawKvFamily { family: 0 },
+            controls: vec![Control::LayersBeforeIdentical(1)],
+            ambiguity: "layer 1 builds and does not store its K/V, so the change reaches later layers only through the residual",
+        },
+        Taxon {
+            name: "K/V family 0 withdrawn at layer 22 (the stored sliding layer)",
+            dissects: "K/V weights at the stored layer",
+            site: Site::Layer(22),
+            intervention: Intervention::WithdrawKvFamily { family: 0 },
+            controls: vec![Control::LayersBeforeIdentical(22)],
+            ambiguity: "layer 22's own contact and the shared standings both move; which carries the change into layer 24 is separated by the next taxon",
+        },
+        Taxon {
+            name: "SHARED K/V family 0 withdrawn at layer 24 only",
+            dissects: "KV reuse (the reuse, not the weights)",
+            site: Site::Layer(24),
+            intervention: Intervention::WithdrawSharedKvFamily { family: 0 },
+            controls: vec![Control::LayersBeforeIdentical(24)],
+            ambiguity: "layers 22 and 23 are untouched (their faces identical), so a change here is the reuse's alone; layers 25–41 read the unwithdrawn standings and move only through the residual",
+        },
+        Taxon {
+            name: "carried heads 0,1 swapped before o_proj at layer 1",
+            dissects: "V/O transport permuted",
+            site: Site::Layer(1),
+            intervention: Intervention::PermuteCarriedHeads { a: 0, b: 1 },
+            controls: vec![
+                Control::LayersBeforeIdentical(1),
+                Control::PositionZeroIdentical(1),
+            ],
+            ambiguity: "the contact section itself is unchanged (it is read before the permutation); the change begins at o_proj; at position 0 the two grouped heads carry the same single V row, so swapping them is the identity there and position 0 is predicted bit-identical",
+        },
+        Taxon {
+            name: "retained standing withdrawn at the first re-entry of layer 1",
+            dissects: "residual standing",
+            site: Site::Layer(1),
+            intervention: Intervention::WithdrawResidualAtFirstReEntry,
+            controls: vec![Control::LayersBeforeIdentical(1)],
+            ambiguity: "the return stands alone at the first re-entry; the second and third re-entries still retain, so the layer is not made residual-free",
+        },
+        Taxon {
+            name: "gated passage columns 0..2560 withdrawn at layer 1",
+            dissects: "MLP / gated transport",
+            site: Site::Layer(1),
+            intervention: Intervention::WithdrawGateSpan {
+                from: 0,
+                span: 2560,
+            },
+            controls: vec![Control::LayersBeforeIdentical(1)],
+            ambiguity: "a quarter of the passage; the contact is unchanged (read before the MLP), so the first separating face is predicted to be the layer return",
+        },
+        Taxon {
+            name: "every key/value position but the last withdrawn at layer 5 (full)",
+            dissects: "sliding vs global chronology (a window of one)",
+            site: Site::Layer(5),
+            intervention: Intervention::KeepOnlyLastKeyPosition { tokens },
+            controls: vec![Control::LayersBeforeIdentical(5)],
+            ambiguity: "every query but the last then reads no key (the causal contact over zero keys returns the empty ratio), and the last reads only itself; the window's effect on the last position alone is what the order face measures",
+        },
+        Taxon {
+            name: "final normed columns 0..256 withdrawn",
+            dissects: "output boundary (tied embedding)",
+            site: Site::Final,
+            intervention: Intervention::WithdrawFinalSpan { from: 0, span: 256 },
+            controls: vec![Control::EveryLayerIdentical],
+            ambiguity: "the tied boundary reads 2,560 columns; withdrawing a tenth moves the potential by those columns' contribution alone",
+        },
     ]
 }
 
@@ -402,10 +637,30 @@ fn read_committed(path: &str) -> Result<Committed, String> {
                 committed.taxa.push(taxon);
             }
             let name = rest.split(" — dissects ").next().unwrap_or(rest).to_owned();
-            let dissects = rest.split(" — dissects ").nth(1).and_then(|r| r.split(" — site ").next()).unwrap_or("").to_owned();
-            let site = rest.split(" — site ").nth(1).and_then(|r| r.split(" — intervention ").next()).unwrap_or("").to_owned();
-            let intervention = rest.split(" — intervention ").nth(1).unwrap_or("").to_owned();
-            current = Some(CommittedTaxon { name, dissects, site, intervention, ..Default::default() });
+            let dissects = rest
+                .split(" — dissects ")
+                .nth(1)
+                .and_then(|r| r.split(" — site ").next())
+                .unwrap_or("")
+                .to_owned();
+            let site = rest
+                .split(" — site ")
+                .nth(1)
+                .and_then(|r| r.split(" — intervention ").next())
+                .unwrap_or("")
+                .to_owned();
+            let intervention = rest
+                .split(" — intervention ")
+                .nth(1)
+                .unwrap_or("")
+                .to_owned();
+            current = Some(CommittedTaxon {
+                name,
+                dissects,
+                site,
+                intervention,
+                ..Default::default()
+            });
         } else if let Some(taxon) = current.as_mut() {
             if let Some(rest) = line.strip_prefix("  stood ") {
                 taxon.line_stood = rest.to_owned();
@@ -432,15 +687,29 @@ fn read_committed(path: &str) -> Result<Committed, String> {
         committed.taxa.push(taxon);
     }
     if committed.base.is_empty() || committed.taxa.len() != 16 {
-        return Err(format!("{path}: parsed {} taxa and {} base lines", committed.taxa.len(), usize::from(!committed.base.is_empty())));
+        return Err(format!(
+            "{path}: parsed {} taxa and {} base lines",
+            committed.taxa.len(),
+            usize::from(!committed.base.is_empty())
+        ));
     }
     Ok(committed)
 }
 
 /// The committed base line's own two order faces.
 fn committed_order(base: &str) -> (String, String) {
-    let plural = base.split("plural top ").nth(1).and_then(|r| r.split(" · ").next()).unwrap_or("").to_owned();
-    let top = base.split("top-16 ").nth(1).and_then(|r| r.split(" · ").next()).unwrap_or("").to_owned();
+    let plural = base
+        .split("plural top ")
+        .nth(1)
+        .and_then(|r| r.split(" · ").next())
+        .unwrap_or("")
+        .to_owned();
+    let top = base
+        .split("top-16 ")
+        .nth(1)
+        .and_then(|r| r.split(" · ").next())
+        .unwrap_or("")
+        .to_owned();
     (plural, top)
 }
 
@@ -459,11 +728,15 @@ impl Verdicts {
         if !pass {
             self.failed += 1;
         }
-        self.lines.push(format!("  [{number:>2}] {tag}  {claim}\n        {evidence}"));
+        self.lines.push(format!(
+            "  [{number:>2}] {tag}  {claim}\n        {evidence}"
+        ));
         println!("  [{number:>2}] {tag}  {claim}\n        {evidence}");
     }
     fn inherited(&mut self, number: usize, claim: &str, evidence: &str) {
-        self.lines.push(format!("  [{number:>2}] INHERITED  {claim}\n        {evidence}"));
+        self.lines.push(format!(
+            "  [{number:>2}] INHERITED  {claim}\n        {evidence}"
+        ));
         println!("  [{number:>2}] INHERITED  {claim}\n        {evidence}");
     }
 }
@@ -489,14 +762,22 @@ fn main() {
     let args = parse_args();
     let clock = Instant::now();
     if args.native_rest.is_some() && args.tokens.is_none() {
-        println!("REFUSED: --native-rest requires --tokens; native W1 has no Python/source tokenizer");
+        println!(
+            "REFUSED: --native-rest requires --tokens; native W1 has no Python/source tokenizer"
+        );
         std::process::exit(2);
     }
     if args.native_rest.is_some() && args.text.is_some() {
-        println!("REFUSED: --native-rest accepts --tokens only; --text would reopen the foreign tokenizer");
+        println!(
+            "REFUSED: --native-rest accepts --tokens only; --text would reopen the foreign tokenizer"
+        );
         std::process::exit(2);
     }
-    let mode_label = if args.native_rest.is_some() { "native W1" } else { "foreign Gemma" };
+    let mode_label = if args.native_rest.is_some() {
+        "native W1"
+    } else {
+        "foreign Gemma"
+    };
     println!("THE DISSECTION SHARES ITS PREFIXES — {mode_label}");
     std::fs::create_dir_all(&args.out).expect("output directory");
     let committed = match read_committed(&args.committed) {
@@ -506,9 +787,16 @@ fn main() {
             std::process::exit(5);
         }
     };
-    println!("  the committed predecessor: {} — {} taxa parsed", args.committed, committed.taxa.len());
+    println!(
+        "  the committed predecessor: {} — {} taxa parsed",
+        args.committed,
+        committed.taxa.len()
+    );
 
-    let mut verdicts = Verdicts { lines: Vec::new(), failed: 0 };
+    let mut verdicts = Verdicts {
+        lines: Vec::new(),
+        failed: 0,
+    };
     let readout: &'static ResidentReadout = match ResidentReadout::new() {
         Ok(readout) => Box::leak(Box::new(readout)),
         Err(error) => {
@@ -535,8 +823,13 @@ fn main() {
     let terms = SeriesAperture(args.terms);
     let chart = tower::Chart::Midpoint;
 
-    let (text, tokens, pieces): (String, Vec<usize>, Vec<String>) = match (&args.text, &args.tokens) {
-        (_, Some(list)) => (format!("{list:?}"), list.clone(), list.iter().map(|t| t.to_string()).collect()),
+    let (text, tokens, pieces): (String, Vec<usize>, Vec<String>) = match (&args.text, &args.tokens)
+    {
+        (_, Some(list)) => (
+            format!("{list:?}"),
+            list.clone(),
+            list.iter().map(|t| t.to_string()).collect(),
+        ),
         (Some(text), None) => match encode_text(&args.python, text) {
             Ok((ids, pieces)) => (text.clone(), ids, pieces),
             Err(error) => {
@@ -552,16 +845,29 @@ fn main() {
     println!("  the fixed input: {text:?} → {tokens:?} {pieces:?}");
 
     let mut source: Box<dyn MaterialSource> = if let Some(rest_path) = &args.native_rest {
-        println!("  source: native W1 rest {rest_path} (path-detached; no root/model/config/tokenizer opened)");
+        println!(
+            "  source: native W1 rest {rest_path} (path-detached; no root/model/config/tokenizer opened)"
+        );
         Box::new(NativeMaterialSource::open(rest_path).expect("native W1 rest opens"))
     } else {
         let content_sha256 = if args.digest_container {
             let digest_clock = Instant::now();
-            let digest = holonic_engine::source_occurrence::AuthenticatedContainer::digest_whole(&format!("{}/model.safetensors", args.root)).expect("digest");
-            println!("  container content sha256 {} re-taken in {:.1} s", &digest[..16], digest_clock.elapsed().as_secs_f64());
+            let digest = holonic_engine::source_occurrence::AuthenticatedContainer::digest_whole(
+                &format!("{}/model.safetensors", args.root),
+            )
+            .expect("digest");
+            println!(
+                "  container content sha256 {} re-taken in {:.1} s",
+                &digest[..16],
+                digest_clock.elapsed().as_secs_f64()
+            );
             Some(digest)
         } else {
-            println!("  container content sha256 {} REUSED from the committed manifest ({})", &streamed::COMMITTED_CONTENT_SHA256[..16], streamed::COMMITTED_CONTENT_TAKEN);
+            println!(
+                "  container content sha256 {} REUSED from the committed manifest ({})",
+                &streamed::COMMITTED_CONTENT_SHA256[..16],
+                streamed::COMMITTED_CONTENT_TAKEN
+            );
             Some(streamed::COMMITTED_CONTENT_SHA256.to_owned())
         };
         Box::new(ForeignMaterialSource::open(&args.root, content_sha256).expect("source opens"))
@@ -579,15 +885,26 @@ fn main() {
     let mut taxon_tower: Vec<usize> = Vec::with_capacity(taxa.len());
     for taxon in &taxa {
         taxon_tower.push(declarations.len());
-        declarations.push(TowerDeclaration::sharing(taxon.name, taxon.site, taxon.intervention.clone()));
+        declarations.push(TowerDeclaration::sharing(
+            taxon.name,
+            taxon.site,
+            taxon.intervention.clone(),
+        ));
     }
     // THE PREFIX CONTROL: the taxon whose site is latest and whose suffix reads the base's STORED
     // K/V standings, conducted a second time as a COMPLETE tower that shares nothing — the
     // committed predecessor's own mechanism, in the same circulation, so the shared-prefix claim
     // is measured rather than assumed.
-    let control_taxon = taxa.iter().position(|t| matches!(t.intervention, Intervention::WithdrawSharedKvFamily { .. })).expect("the KV-reuse taxon");
+    let control_taxon = taxa
+        .iter()
+        .position(|t| matches!(t.intervention, Intervention::WithdrawSharedKvFamily { .. }))
+        .expect("the KV-reuse taxon");
     let control_tower = declarations.len();
-    declarations.push(TowerDeclaration::whole("prefix control · SHARED K/V family 0 withdrawn at layer 24 only, as a COMPLETE tower", taxa[control_taxon].site, taxa[control_taxon].intervention.clone()));
+    declarations.push(TowerDeclaration::whole(
+        "prefix control · SHARED K/V family 0 withdrawn at layer 24 only, as a COMPLETE tower",
+        taxa[control_taxon].site,
+        taxa[control_taxon].intervention.clone(),
+    ));
 
     println!(
         "\nTHE COHORT — {} towers, {} tokens, chart {chart:?}, grain 2^-{}, {} series terms, bands of {}",
@@ -599,17 +916,31 @@ fn main() {
     );
     for declaration in &declarations {
         let conducted = tower::LAYERS.saturating_sub(declaration.enters_at) + 1;
-        println!("    {:<78} enters at {:>2} · conducts {:>2} deeds · shares prefix {}", declaration.name, declaration.enters_at, conducted, declaration.shares_prefix);
+        println!(
+            "    {:<78} enters at {:>2} · conducts {:>2} deeds · shares prefix {}",
+            declaration.name, declaration.enters_at, conducted, declaration.shares_prefix
+        );
     }
 
-    let cohorted: Cohorted = match cohort::circulate_cohort(surface, readout, source.as_mut(), &tokens, grain, terms, chart, &declarations, args.band) {
+    let cohorted: Cohorted = match cohort::circulate_cohort(
+        surface,
+        readout,
+        source.as_mut(),
+        &tokens,
+        grain,
+        terms,
+        chart,
+        &declarations,
+        args.band,
+    ) {
         Ok(c) => c,
         Err(error) => {
             println!("REFUSED: the cohort did not conduct — {error}");
             std::process::exit(6);
         }
     };
-    let mut native_fd_audit = "foreign source mode; native descriptor audit not applicable".to_owned();
+    let mut native_fd_audit =
+        "foreign source mode; native descriptor audit not applicable".to_owned();
     if args.native_rest.is_some() {
         let mut opened = Vec::new();
         if let Ok(entries) = std::fs::read_dir("/proc/self/fd") {
@@ -629,34 +960,53 @@ fn main() {
             "generation_config.json",
         ];
         let foreign_descriptor_seen = opened.iter().any(|path| {
-            forbidden_descriptors.iter().any(|descriptor| {
-                path.ends_with(&format!("/{descriptor}")) || path == descriptor
-            })
+            forbidden_descriptors
+                .iter()
+                .any(|descriptor| path.ends_with(&format!("/{descriptor}")) || path == descriptor)
         });
         if foreign_descriptor_seen {
-            println!("REFUSED: native W1 conduct left an original Gemma/config/tokenizer descriptor open: {opened:?}");
+            println!(
+                "REFUSED: native W1 conduct left an original Gemma/config/tokenizer descriptor open: {opened:?}"
+            );
             std::process::exit(7);
         }
         native_fd_audit = format!(
             "HELD: no original Gemma/config/tokenizer descriptor among {} open descriptors",
             opened.len()
         );
-        println!("  native W1 /proc/self/fd audit after conduct: no original Gemma/config/tokenizer descriptor open");
+        println!(
+            "  native W1 /proc/self/fd audit after conduct: no original Gemma/config/tokenizer descriptor open"
+        );
     }
     println!(
         "  conducted in {:.1} s (loop {:.1} s) · {} graph launches from {} bound passages · the ledger would have instantiated {} · widest charge {} octets",
-        cohorted.wall_s, cohorted.loop_wall_s, cohorted.deed_launches, cohorted.passages_bound, cohorted.graph_instantiations, cohorted.peak_charged_octets
+        cohorted.wall_s,
+        cohorted.loop_wall_s,
+        cohorted.deed_launches,
+        cohorted.passages_bound,
+        cohorted.graph_instantiations,
+        cohorted.peak_charged_octets
     );
 
     let base = &cohorted.towers[0];
     let replay = &cohorted.towers[1];
     let (base_plural, base_top) = order_face(&base.potential, tokens.len(), grain, 16);
-    println!("  base: {} layers + final · order face plural {:?} · top-16 {:?}", base.layers.len(), base_plural, base_top);
+    println!(
+        "  base: {} layers + final · order face plural {:?} · top-16 {:?}",
+        base.layers.len(),
+        base_plural,
+        base_top
+    );
 
     // the replay: the committed second falsifier, re-taken whole
     let replay_family = compare_family(base, replay, grain);
-    let replay_identical = replay_family.iter().all(|(_, c)| c.identical == c.entries && !c.structural);
-    println!("  the replayed base tower: every face bit-identical {replay_identical} ({} faces, none structural)", replay_family.len());
+    let replay_identical = replay_family
+        .iter()
+        .all(|(_, c)| c.identical == c.entries && !c.structural);
+    println!(
+        "  the replayed base tower: every face bit-identical {replay_identical} ({} faces, none structural)",
+        replay_family.len()
+    );
 
     // ------------------------------------------------------------------------------------------
     // the sixteen matched siblings
@@ -665,7 +1015,10 @@ fn main() {
     for (at, taxon) in taxa.into_iter().enumerate() {
         let index = taxon_tower[at];
         let sibling = &cohorted.towers[index];
-        println!("\nTHE MATCHED SIBLING — {} (dissects: {})", taxon.name, taxon.dissects);
+        println!(
+            "\nTHE MATCHED SIBLING — {} (dissects: {})",
+            taxon.name, taxon.dissects
+        );
         let mut all_matched = true;
         let mut occurrences = 0usize;
         for layer in 0..tower::LAYERS {
@@ -687,7 +1040,10 @@ fn main() {
         let faces_total = family.len();
         let faces_separated = family.iter().filter(|(_, c)| c.separated > 0).count();
         let first = family.iter().find(|(_, c)| c.separated > 0).cloned();
-        let potential = family.iter().find(|(f, _)| *f == Face::Potential).map(|(_, c)| c.clone());
+        let potential = family
+            .iter()
+            .find(|(f, _)| *f == Face::Potential)
+            .map(|(_, c)| c.clone());
         let (plural, top) = order_face(&sibling.potential, tokens.len(), grain, 16);
         let order_moved = plural != base_plural || top != base_top;
 
@@ -695,46 +1051,116 @@ fn main() {
         for control in &taxon.controls {
             let (name, held, evidence, structural) = match control {
                 Control::LayersBeforeIdentical(l) => {
-                    let faces: Vec<&(Face, FaceComparison)> = family.iter().filter(|(f, _)| f.layer().is_some_and(|x| x < *l)).collect();
+                    let faces: Vec<&(Face, FaceComparison)> = family
+                        .iter()
+                        .filter(|(f, _)| f.layer().is_some_and(|x| x < *l))
+                        .collect();
                     let held = faces.iter().all(|(_, c)| c.identical == c.entries);
                     let structural = faces.iter().all(|(_, c)| c.structural);
-                    let moved: Vec<String> = faces.iter().filter(|(_, c)| c.identical != c.entries).map(|(f, c)| format!("{} ({} of {} identical)", f.name(), c.identical, c.entries)).collect();
+                    let moved: Vec<String> = faces
+                        .iter()
+                        .filter(|(_, c)| c.identical != c.entries)
+                        .map(|(f, c)| {
+                            format!("{} ({} of {} identical)", f.name(), c.identical, c.entries)
+                        })
+                        .collect();
                     (
                         format!("every face of layers before {l} bit-identical"),
                         held,
-                        if held { format!("{} faces, every entry identical", faces.len()) } else { format!("moved: {}", moved.join("; ")) },
+                        if held {
+                            format!("{} faces, every entry identical", faces.len())
+                        } else {
+                            format!("moved: {}", moved.join("; "))
+                        },
                         structural,
                     )
                 }
                 Control::EveryLayerIdentical => {
-                    let faces: Vec<&(Face, FaceComparison)> = family.iter().filter(|(f, _)| f.layer().is_some()).collect();
+                    let faces: Vec<&(Face, FaceComparison)> =
+                        family.iter().filter(|(f, _)| f.layer().is_some()).collect();
                     let held = faces.iter().all(|(_, c)| c.identical == c.entries);
                     let structural = faces.iter().all(|(_, c)| c.structural);
                     (
                         "every face of every layer bit-identical".to_owned(),
                         held,
-                        format!("{} layer faces; final normed identical {}", faces.len(), family.iter().find(|(f, _)| *f == Face::FinalNormed).is_some_and(|(_, c)| c.identical == c.entries)),
+                        format!(
+                            "{} layer faces; final normed identical {}",
+                            faces.len(),
+                            family
+                                .iter()
+                                .find(|(f, _)| *f == Face::FinalNormed)
+                                .is_some_and(|(_, c)| c.identical == c.entries)
+                        ),
                         structural,
                     )
                 }
                 Control::PositionZeroUnseparated(l) => {
-                    let (b, s) = (base.layers.get(l).expect("base layer"), sibling.layers.get(l).expect("the sibling conducts its own site"));
-                    let c = compare(&b.terminal[..tower::HIDDEN], &s.terminal[..tower::HIDDEN], grain, tower::HIDDEN);
+                    let (b, s) = (
+                        base.layers.get(l).expect("base layer"),
+                        sibling
+                            .layers
+                            .get(l)
+                            .expect("the sibling conducts its own site"),
+                    );
+                    let c = compare(
+                        &b.terminal[..tower::HIDDEN],
+                        &s.terminal[..tower::HIDDEN],
+                        grain,
+                        tower::HIDDEN,
+                    );
                     (
                         format!("layer {l} return at position 0 not separated"),
                         c.separated == 0,
-                        format!("{} of {} separated, {} identical, widest shift {:.3e}", c.separated, c.entries, c.identical, rat_f64(&c.widest_shift)),
+                        format!(
+                            "{} of {} separated, {} identical, widest shift {:.3e}",
+                            c.separated,
+                            c.entries,
+                            c.identical,
+                            rat_f64(&c.widest_shift)
+                        ),
                         false,
                     )
                 }
                 Control::PositionZeroIdentical(l) => {
-                    let (b, s) = (base.layers.get(l).expect("base layer"), sibling.layers.get(l).expect("the sibling conducts its own site"));
-                    let c = compare(&b.terminal[..tower::HIDDEN], &s.terminal[..tower::HIDDEN], grain, tower::HIDDEN);
-                    (format!("layer {l} return at position 0 bit-identical"), c.identical == c.entries, format!("{} of {} identical, {} separated", c.identical, c.entries, c.separated), false)
+                    let (b, s) = (
+                        base.layers.get(l).expect("base layer"),
+                        sibling
+                            .layers
+                            .get(l)
+                            .expect("the sibling conducts its own site"),
+                    );
+                    let c = compare(
+                        &b.terminal[..tower::HIDDEN],
+                        &s.terminal[..tower::HIDDEN],
+                        grain,
+                        tower::HIDDEN,
+                    );
+                    (
+                        format!("layer {l} return at position 0 bit-identical"),
+                        c.identical == c.entries,
+                        format!(
+                            "{} of {} identical, {} separated",
+                            c.identical, c.entries, c.separated
+                        ),
+                        false,
+                    )
                 }
                 Control::OrderFaceUnmoved => {
                     let held = plural == base_plural && top == base_top;
-                    ("the order face at the output unmoved".to_owned(), held, format!("plural {:?} top-16 {}", plural, if held { "identical".to_owned() } else { format!("{top:?}") }), false)
+                    (
+                        "the order face at the output unmoved".to_owned(),
+                        held,
+                        format!(
+                            "plural {:?} top-16 {}",
+                            plural,
+                            if held {
+                                "identical".to_owned()
+                            } else {
+                                format!("{top:?}")
+                            }
+                        ),
+                        false,
+                    )
                 }
             };
             controls_held.push((name, held, evidence, structural));
@@ -743,17 +1169,35 @@ fn main() {
         let shared_prefix_layers = tower::LAYERS - sibling.layers.len();
         println!(
             "  stood {} · matched {} (+{}) · {} of {} faces separated · {} layers shared with the base's prefix",
-            sibling.stood(), all_matched, occurrences, faces_separated, faces_total, shared_prefix_layers
+            sibling.stood(),
+            all_matched,
+            occurrences,
+            faces_separated,
+            faces_total,
+            shared_prefix_layers
         );
         match &first {
             Some((face, c)) => println!(
                 "  shortest separating history: {} — {} of {} separated at positions {:?}, widest gap {:.3e}, widest shift {:.3e}",
-                face.name(), c.separated, c.entries, c.positions_separated, rat_f64(&c.widest_gap), rat_f64(&c.widest_shift)
+                face.name(),
+                c.separated,
+                c.entries,
+                c.positions_separated,
+                rat_f64(&c.widest_gap),
+                rat_f64(&c.widest_shift)
             ),
             None => println!("  no face separated"),
         }
         for (name, held, evidence, structural) in &controls_held {
-            println!("  control: {name} — {} ({evidence}){}", if *held { "HELD" } else { "MOVED" }, if *structural { " [STRUCTURAL: the sibling did not conduct these layers]" } else { "" });
+            println!(
+                "  control: {name} — {} ({evidence}){}",
+                if *held { "HELD" } else { "MOVED" },
+                if *structural {
+                    " [STRUCTURAL: the sibling did not conduct these layers]"
+                } else {
+                    ""
+                }
+            );
         }
 
         outcomes.push(Outcome {
@@ -781,26 +1225,74 @@ fn main() {
     let mut equality: Vec<String> = vec!["taxon\tcolumn\tcommitted\treturned\tverdict".to_owned()];
     let mut drifted: Vec<String> = Vec::new();
     let mut checked = 0usize;
-    let compare_cell = |taxon: &str, column: &str, committed: &str, returned: &str, equality: &mut Vec<String>, drifted: &mut Vec<String>, checked: &mut usize| {
+    let compare_cell = |taxon: &str,
+                        column: &str,
+                        committed: &str,
+                        returned: &str,
+                        equality: &mut Vec<String>,
+                        drifted: &mut Vec<String>,
+                        checked: &mut usize| {
         *checked += 1;
         let same = committed == returned;
-        equality.push(format!("{taxon}\t{column}\t{committed}\t{returned}\t{}", if same { "UNCHANGED" } else { "DRIFTED" }));
+        equality.push(format!(
+            "{taxon}\t{column}\t{committed}\t{returned}\t{}",
+            if same { "UNCHANGED" } else { "DRIFTED" }
+        ));
         if !same {
-            drifted.push(format!("{taxon} · {column}: committed {committed:?} returned {returned:?}"));
+            drifted.push(format!(
+                "{taxon} · {column}: committed {committed:?} returned {returned:?}"
+            ));
         }
     };
     // the base line's order face and the replay verdict
     let (committed_plural, committed_top) = committed_order(&committed.base);
-    compare_cell("base", "plural top", &committed_plural, &format!("{base_plural:?}"), &mut equality, &mut drifted, &mut checked);
-    compare_cell("base", "top-16", &committed_top, &format!("{base_top:?}"), &mut equality, &mut drifted, &mut checked);
-    compare_cell("base", "replay bit-identical", "true", &format!("{replay_identical}"), &mut equality, &mut drifted, &mut checked);
-    let committed_launches = committed.base.split("launches ").nth(1).and_then(|r| r.split(" · ").next()).unwrap_or("").to_owned();
-    equality.push(format!("base\tlaunches (apparatus, not compared)\t{committed_launches}\t{}\tAPPARATUS", base.launches));
+    compare_cell(
+        "base",
+        "plural top",
+        &committed_plural,
+        &format!("{base_plural:?}"),
+        &mut equality,
+        &mut drifted,
+        &mut checked,
+    );
+    compare_cell(
+        "base",
+        "top-16",
+        &committed_top,
+        &format!("{base_top:?}"),
+        &mut equality,
+        &mut drifted,
+        &mut checked,
+    );
+    compare_cell(
+        "base",
+        "replay bit-identical",
+        "true",
+        &format!("{replay_identical}"),
+        &mut equality,
+        &mut drifted,
+        &mut checked,
+    );
+    let committed_launches = committed
+        .base
+        .split("launches ")
+        .nth(1)
+        .and_then(|r| r.split(" · ").next())
+        .unwrap_or("")
+        .to_owned();
+    equality.push(format!(
+        "base\tlaunches (apparatus, not compared)\t{committed_launches}\t{}\tAPPARATUS",
+        base.launches
+    ));
 
     let mut rows: Vec<(String, bool, Vec<String>)> = Vec::new();
     for outcome in &outcomes {
-        let Some(committed_taxon) = committed.taxa.iter().find(|t| t.name == outcome.taxon.name) else {
-            drifted.push(format!("{}: no committed taxon of this name", outcome.taxon.name));
+        let Some(committed_taxon) = committed.taxa.iter().find(|t| t.name == outcome.taxon.name)
+        else {
+            drifted.push(format!(
+                "{}: no committed taxon of this name",
+                outcome.taxon.name
+            ));
             continue;
         };
         let short = outcome.taxon.dissects;
@@ -808,55 +1300,174 @@ fn main() {
         // the taxon's own declaration: what it dissects, where it is applied, what the intervention
         // is, and the ambiguity it leaves — the panel carried verbatim, so a transcription error in
         // it is caught here rather than silently changing what was dissected
-        compare_cell(short, "dissects", &committed_taxon.dissects, outcome.taxon.dissects, &mut equality, &mut drifted, &mut checked);
-        compare_cell(short, "site", &committed_taxon.site, &format!("{:?}", outcome.taxon.site), &mut equality, &mut drifted, &mut checked);
-        compare_cell(short, "intervention", &committed_taxon.intervention, &format!("{:?}", outcome.taxon.intervention), &mut equality, &mut drifted, &mut checked);
-        compare_cell(short, "remaining ambiguity", &committed_taxon.ambiguity, outcome.taxon.ambiguity, &mut equality, &mut drifted, &mut checked);
+        compare_cell(
+            short,
+            "dissects",
+            &committed_taxon.dissects,
+            outcome.taxon.dissects,
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
+        compare_cell(
+            short,
+            "site",
+            &committed_taxon.site,
+            &format!("{:?}", outcome.taxon.site),
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
+        compare_cell(
+            short,
+            "intervention",
+            &committed_taxon.intervention,
+            &format!("{:?}", outcome.taxon.intervention),
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
+        compare_cell(
+            short,
+            "remaining ambiguity",
+            &committed_taxon.ambiguity,
+            outcome.taxon.ambiguity,
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
         // faces separated
-        compare_cell(short, "faces separated", &committed_taxon.faces, &format!("{} of {}", outcome.faces_separated, outcome.faces_total), &mut equality, &mut drifted, &mut checked);
+        compare_cell(
+            short,
+            "faces separated",
+            &committed_taxon.faces,
+            &format!("{} of {}", outcome.faces_separated, outcome.faces_total),
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
         // the shortest separating history, said exactly as the committed artifact says it
         let first = match &outcome.first {
             Some((f, c)) => format!(
                 "{} — {} of {} separated at positions {:?}, widest gap {:.6e}, widest midpoint shift {:.6e}, {} identical",
-                f.name(), c.separated, c.entries, c.positions_separated, rat_f64(&c.widest_gap), rat_f64(&c.widest_shift), c.identical
+                f.name(),
+                c.separated,
+                c.entries,
+                c.positions_separated,
+                rat_f64(&c.widest_gap),
+                rat_f64(&c.widest_shift),
+                c.identical
             ),
             None => "none — no face separated".to_owned(),
         };
-        compare_cell(short, "shortest separating history", &committed_taxon.first, &first, &mut equality, &mut drifted, &mut checked);
+        compare_cell(
+            short,
+            "shortest separating history",
+            &committed_taxon.first,
+            &first,
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
         // the potential and its order face
         if let Some(c) = &outcome.potential {
             let potential = format!(
                 "{} of {} separated, widest gap {:.6e}, widest shift {:.6e} · order face moved {} · plural {:?} · top-16 {:?}",
-                c.separated, c.entries, rat_f64(&c.widest_gap), rat_f64(&c.widest_shift), outcome.order_moved, outcome.plural, outcome.top
+                c.separated,
+                c.entries,
+                rat_f64(&c.widest_gap),
+                rat_f64(&c.widest_shift),
+                outcome.order_moved,
+                outcome.plural,
+                outcome.top
             );
-            compare_cell(short, "potential and order face", &committed_taxon.potential, &potential, &mut equality, &mut drifted, &mut checked);
+            compare_cell(
+                short,
+                "potential and order face",
+                &committed_taxon.potential,
+                &potential,
+                &mut equality,
+                &mut drifted,
+                &mut checked,
+            );
         }
         // stood / matched / intervention occurrences (the wall is apparatus and is not compared)
-        let committed_stood = committed_taxon.line_stood.split(" · wall ").next().unwrap_or("").to_owned();
-        let committed_matched = committed_taxon.line_stood.split(" s · ").nth(1).unwrap_or("").to_owned();
-        compare_cell(short, "stood", &format!("stood {committed_stood}"), &format!("stood {}", outcome.stood), &mut equality, &mut drifted, &mut checked);
+        let committed_stood = committed_taxon
+            .line_stood
+            .split(" · wall ")
+            .next()
+            .unwrap_or("")
+            .to_owned();
+        let committed_matched = committed_taxon
+            .line_stood
+            .split(" s · ")
+            .nth(1)
+            .unwrap_or("")
+            .to_owned();
+        compare_cell(
+            short,
+            "stood",
+            &format!("stood {committed_stood}"),
+            &format!("stood {}", outcome.stood),
+            &mut equality,
+            &mut drifted,
+            &mut checked,
+        );
         compare_cell(
             short,
             "matched sibling · intervention occurrences",
             &committed_matched,
-            &format!("matched sibling {} · intervention occurrences {}", outcome.matched, outcome.intervention_occurrences),
+            &format!(
+                "matched sibling {} · intervention occurrences {}",
+                outcome.matched, outcome.intervention_occurrences
+            ),
             &mut equality,
             &mut drifted,
             &mut checked,
         );
         // every control, in order
         for (at, (name, held, evidence, structural)) in outcome.controls_held.iter().enumerate() {
-            let ours = format!("{} — {name}: {evidence}", if *held { "HELD" } else { "MOVED" });
-            let theirs = committed_taxon.controls.get(at).cloned().unwrap_or_default();
-            compare_cell(short, &format!("control {at}{}", if *structural { " [structural]" } else { "" }), &theirs, &ours, &mut equality, &mut drifted, &mut checked);
+            let ours = format!(
+                "{} — {name}: {evidence}",
+                if *held { "HELD" } else { "MOVED" }
+            );
+            let theirs = committed_taxon
+                .controls
+                .get(at)
+                .cloned()
+                .unwrap_or_default();
+            compare_cell(
+                short,
+                &format!(
+                    "control {at}{}",
+                    if *structural { " [structural]" } else { "" }
+                ),
+                &theirs,
+                &ours,
+                &mut equality,
+                &mut drifted,
+                &mut checked,
+            );
         }
-        let names: Vec<String> = outcome.controls_held.iter().map(|(n, _, _, s)| format!("{n}{}", if *s { " [structural]" } else { " [measured]" })).collect();
+        let names: Vec<String> = outcome
+            .controls_held
+            .iter()
+            .map(|(n, _, _, s)| format!("{n}{}", if *s { " [structural]" } else { " [measured]" }))
+            .collect();
         rows.push((short.to_owned(), drifted.len() == before, names));
     }
     for (name, unchanged, controls) in &rows {
-        println!("  {:<48} {}   controls: {}", name, if *unchanged { "UNCHANGED" } else { "DRIFTED" }, controls.join(", "));
+        println!(
+            "  {:<48} {}   controls: {}",
+            name,
+            if *unchanged { "UNCHANGED" } else { "DRIFTED" },
+            controls.join(", ")
+        );
     }
-    println!("  {checked} committed cells compared; {} drifted", drifted.len());
+    println!(
+        "  {checked} committed cells compared; {} drifted",
+        drifted.len()
+    );
     for line in &drifted {
         println!("    DRIFT {line}");
     }
@@ -892,14 +1503,20 @@ fn main() {
         "every sibling is matched: its complexes are the base's plus exactly its intervention occurrences, each typed as the caller's",
         &outcomes.iter().map(|o| format!("{}: matched {} (+{})", o.taxon.dissects, o.matched, o.intervention_occurrences)).collect::<Vec<_>>().join(" · "),
     );
-    let caused: Vec<&Outcome> = outcomes.iter().filter(|o| o.taxon.dissects != "normalization (gauge)").collect();
+    let caused: Vec<&Outcome> = outcomes
+        .iter()
+        .filter(|o| o.taxon.dissects != "normalization (gauge)")
+        .collect();
     verdicts.record(
         4,
         caused.iter().all(|o| o.first.is_some()),
         "every non-gauge taxon causes a change the receiver family sees, with the shortest separating history located",
         &caused.iter().map(|o| match &o.first { Some((f, c)) => format!("{} → first at {} ({} of {})", o.taxon.dissects, f.name(), c.separated, c.entries), None => format!("{} → NO FACE SEPARATED", o.taxon.dissects) }).collect::<Vec<_>>().join(" · "),
     );
-    let controls_all: Vec<&(String, bool, String, bool)> = outcomes.iter().flat_map(|o| o.controls_held.iter()).collect();
+    let controls_all: Vec<&(String, bool, String, bool)> = outcomes
+        .iter()
+        .flat_map(|o| o.controls_held.iter())
+        .collect();
     let controls_held = controls_all.iter().filter(|(_, h, _, _)| *h).count();
     let structural = controls_all.iter().filter(|(_, _, _, s)| *s).count();
     verdicts.record(
@@ -914,8 +1531,12 @@ fn main() {
         ),
     );
     // the gauge
-    let gauge = outcomes.iter().find(|o| o.taxon.dissects == "normalization (gauge)");
-    let after = outcomes.iter().find(|o| o.taxon.dissects == "normalization (not a gauge)");
+    let gauge = outcomes
+        .iter()
+        .find(|o| o.taxon.dissects == "normalization (gauge)");
+    let after = outcomes
+        .iter()
+        .find(|o| o.taxon.dissects == "normalization (not a gauge)");
     let (gauge_pass, gauge_evidence) = match (gauge, after) {
         (Some(g), Some(a)) => {
             let mut dominated = true;
@@ -935,28 +1556,55 @@ fn main() {
                     if !(ca.separated > 0 && ca.widest_gap > cg.widest_gap) {
                         dominated = false;
                         if worst.is_none() {
-                            worst = Some(format!("{}: gauge gap {:.3e} vs after {:.3e}", fg.name(), rat_f64(&cg.widest_gap), rat_f64(&ca.widest_gap)));
+                            worst = Some(format!(
+                                "{}: gauge gap {:.3e} vs after {:.3e}",
+                                fg.name(),
+                                rat_f64(&cg.widest_gap),
+                                rat_f64(&ca.widest_gap)
+                            ));
                         }
                     }
                 }
             }
-            let ratio = if widest_g > zero() { rat_f64(&widest_a) / rat_f64(&widest_g) } else { f64::INFINITY };
-            let order_held = g.controls_held.iter().filter(|(n, _, _, _)| n.starts_with("the order face")).all(|(_, h, _, _)| *h);
+            let ratio = if widest_g > zero() {
+                rat_f64(&widest_a) / rat_f64(&widest_g)
+            } else {
+                f64::INFINITY
+            };
+            let order_held = g
+                .controls_held
+                .iter()
+                .filter(|(n, _, _, _)| n.starts_with("the order face"))
+                .all(|(_, h, _, _)| *h);
             (
                 dominated && order_held,
                 format!(
                     "gauge (before the rebase): {faces_g} of {} faces separated, widest gap anywhere {:.3e}, order face {}; after the rebase: widest gap anywhere {:.3e} (×{ratio:.2e} wider); domination at every separated face {dominated}{}",
-                    g.family.len(), rat_f64(&widest_g), if order_held { "unmoved" } else { "MOVED" }, rat_f64(&widest_a), worst.map(|w| format!("; first failure {w}")).unwrap_or_default()
+                    g.family.len(),
+                    rat_f64(&widest_g),
+                    if order_held { "unmoved" } else { "MOVED" },
+                    rat_f64(&widest_a),
+                    worst
+                        .map(|w| format!("; first failure {w}"))
+                        .unwrap_or_default()
                 ),
             )
         }
         _ => (false, "gauge or after-rebase sibling not run".to_owned()),
     };
     verdicts.record(6, gauge_pass, "the normalization gauge: quotiented away to the epsilon-and-rounding residue, dominated at every separated face by the after-rebase sibling, the order face unmoved, while the exact receiver still sees the residue", &gauge_evidence);
-    let k22 = outcomes.iter().find(|o| o.taxon.dissects == "K/V weights at the stored layer");
-    let k24 = outcomes.iter().find(|o| o.taxon.dissects == "KV reuse (the reuse, not the weights)");
+    let k22 = outcomes
+        .iter()
+        .find(|o| o.taxon.dissects == "K/V weights at the stored layer");
+    let k24 = outcomes
+        .iter()
+        .find(|o| o.taxon.dissects == "KV reuse (the reuse, not the weights)");
     let reuse_separated = match (k22, k24) {
-        (Some(a), Some(b)) => a.first.as_ref().is_some_and(|(f, _)| f.layer() == Some(22)) && b.first.as_ref().is_some_and(|(f, _)| f.layer() == Some(24)) && b.controls_held.iter().all(|(_, h, _, _)| *h),
+        (Some(a), Some(b)) => {
+            a.first.as_ref().is_some_and(|(f, _)| f.layer() == Some(22))
+                && b.first.as_ref().is_some_and(|(f, _)| f.layer() == Some(24))
+                && b.controls_held.iter().all(|(_, h, _, _)| *h)
+        }
         _ => false,
     };
     verdicts.record(
@@ -969,7 +1617,10 @@ fn main() {
             k24.and_then(|o| o.first.as_ref()).map(|(f, c)| format!("first at {} ({} of {})", f.name(), c.separated, c.entries)).unwrap_or_else(|| "not run".to_owned())
         ),
     );
-    let chron: Vec<&Outcome> = outcomes.iter().filter(|o| o.taxon.dissects.starts_with("chronology")).collect();
+    let chron: Vec<&Outcome> = outcomes
+        .iter()
+        .filter(|o| o.taxon.dissects.starts_with("chronology"))
+        .collect();
     verdicts.record(
         8,
         !chron.is_empty() && chron.iter().all(|o| o.controls_held.iter().all(|(_, h, _, _)| *h) && o.first.as_ref().is_some_and(|(f, _)| *f == Face::Contact(1))),
@@ -1018,25 +1669,63 @@ fn main() {
     let mut prefix_same = 0usize;
     let mut prefix_first_drift: Option<String> = None;
     for layer in 0..tower::LAYERS {
-        let whole = control_return.layers.get(&layer).expect("the control conducted every layer");
-        let shared_face = shared_sibling.layers.get(&layer).or_else(|| base.layers.get(&layer)).expect("shared or base");
-        for (what, a, b) in [("per-layer input", &whole.ple, &shared_face.ple), ("contact", &whole.contact, &shared_face.contact), ("return", &whole.terminal, &shared_face.terminal)] {
+        let whole = control_return
+            .layers
+            .get(&layer)
+            .expect("the control conducted every layer");
+        let shared_face = shared_sibling
+            .layers
+            .get(&layer)
+            .or_else(|| base.layers.get(&layer))
+            .expect("shared or base");
+        for (what, a, b) in [
+            ("per-layer input", &whole.ple, &shared_face.ple),
+            ("contact", &whole.contact, &shared_face.contact),
+            ("return", &whole.terminal, &shared_face.terminal),
+        ] {
             prefix_faces += 1;
             if a == b {
                 prefix_same += 1;
             } else if prefix_first_drift.is_none() {
-                let at = a.iter().zip(b.iter()).position(|(x, y)| x != y).unwrap_or(0);
-                prefix_first_drift = Some(format!("layer {layer} {what} entry {at}: {:?} against {:?}", a.get(at), b.get(at)));
+                let at = a
+                    .iter()
+                    .zip(b.iter())
+                    .position(|(x, y)| x != y)
+                    .unwrap_or(0);
+                prefix_first_drift = Some(format!(
+                    "layer {layer} {what} entry {at}: {:?} against {:?}",
+                    a.get(at),
+                    b.get(at)
+                ));
             }
         }
     }
-    for (what, a, b) in [("final normed", &control_return.final_normed, &shared_sibling.final_normed), ("potential", &control_return.potential, &shared_sibling.potential)] {
+    for (what, a, b) in [
+        (
+            "final normed",
+            &control_return.final_normed,
+            &shared_sibling.final_normed,
+        ),
+        (
+            "potential",
+            &control_return.potential,
+            &shared_sibling.potential,
+        ),
+    ] {
         prefix_faces += 1;
         if a == b {
             prefix_same += 1;
         } else if prefix_first_drift.is_none() {
-            let at = a.iter().zip(b.iter()).position(|(x, y)| x != y).unwrap_or(0);
-            prefix_first_drift = Some(format!("{what} entry {at}: {:?} against {:?}", a.get(at), b.get(at)));
+            let at = a
+                .iter()
+                .zip(b.iter())
+                .position(|(x, y)| x != y)
+                .unwrap_or(0);
+            prefix_first_drift = Some(format!(
+                "{what} entry {at}: {:?} against {:?}",
+                a.get(at),
+                b.get(at)
+            ));
         }
     }
     verdicts.record(
@@ -1058,10 +1747,18 @@ fn main() {
         .map(|(name, before)| {
             let after = cohorted.shared_after.get(name);
             let same = after.is_some_and(|a| a == before);
-            format!("{name}: {} of {} entries, unmoved {same}", before.len(), before.len(), )
+            format!(
+                "{name}: {} of {} entries, unmoved {same}",
+                before.len(),
+                before.len(),
+            )
         })
         .collect();
-    let read_only = !cohorted.shared_before.is_empty() && cohorted.shared_before.iter().all(|(n, b)| cohorted.shared_after.get(n).is_some_and(|a| a == b));
+    let read_only = !cohorted.shared_before.is_empty()
+        && cohorted
+            .shared_before
+            .iter()
+            .all(|(n, b)| cohorted.shared_after.get(n).is_some_and(|a| a == b));
     verdicts.record(
         15,
         read_only,
@@ -1082,9 +1779,20 @@ fn main() {
     let bands_clean: Vec<String> = cohorted
         .band_census
         .iter()
-        .map(|(first, open, close)| format!("band from layer {first}: read-outs {} → {}, egress {} → {}", open.section_read_outs, close.section_read_outs, open.egress_section_octets, close.egress_section_octets))
+        .map(|(first, open, close)| {
+            format!(
+                "band from layer {first}: read-outs {} → {}, egress {} → {}",
+                open.section_read_outs,
+                close.section_read_outs,
+                open.egress_section_octets,
+                close.egress_section_octets
+            )
+        })
         .collect();
-    let no_reads_inside = cohorted.band_census.iter().all(|(_, open, close)| open.section_read_outs == close.section_read_outs && open.egress_section_octets == close.egress_section_octets);
+    let no_reads_inside = cohorted.band_census.iter().all(|(_, open, close)| {
+        open.section_read_outs == close.section_read_outs
+            && open.egress_section_octets == close.egress_section_octets
+    });
     verdicts.record(
         17,
         no_reads_inside,
@@ -1092,7 +1800,9 @@ fn main() {
         &format!("{} bands: {}", cohorted.bands.len(), bands_clean.join(" · ")),
     );
     // the §5.4 ledger, at three residency levels in one run
-    let reuse_ok = cohorted.reuse.as_ref().is_some_and(|r| r.first_potential == r.second_potential && r.first_final_normed == r.second_final_normed);
+    let reuse_ok = cohorted.reuse.as_ref().is_some_and(|r| {
+        r.first_potential == r.second_potential && r.first_final_normed == r.second_final_normed
+    });
     let h4_hits = cohorted.instantiations_as_h4.hits;
     let standing_hits = cohorted.instantiations_standings.hits;
     let whole_hits = cohorted.instantiations.hits;
@@ -1156,8 +1866,13 @@ fn main() {
     ));
     form.push(format!("source identity: {source_identity}"));
     form.push(format!("source descriptor audit: {native_fd_audit}"));
-    form.push(format!("fixed input {text:?} tokens {tokens:?} pieces {pieces:?}"));
-    form.push(format!("the committed predecessor compared against: {}", args.committed));
+    form.push(format!(
+        "fixed input {text:?} tokens {tokens:?} pieces {pieces:?}"
+    ));
+    form.push(format!(
+        "the committed predecessor compared against: {}",
+        args.committed
+    ));
     form.push(format!(
         "the cohort: {} towers · {} graph launches from {} bound passages (one graph instantiation each) · the §5.4 ledger, offered the same keys, would have instantiated {} · widest charge {} · wall {:.1} s (loop {:.1} s) · bands of {} ({} bands)",
         cohorted.towers.len(), cohorted.deed_launches, cohorted.passages_bound, cohorted.graph_instantiations, cohorted.peak_charged_octets, cohorted.wall_s, cohorted.loop_wall_s, args.band, cohorted.bands.len()
@@ -1180,13 +1895,22 @@ fn main() {
     }
     form.push(String::new());
     for outcome in &outcomes {
-        form.push(format!("TAXON {} — dissects {} — site {:?} — intervention {:?}", outcome.taxon.name, outcome.taxon.dissects, outcome.taxon.site, outcome.taxon.intervention));
+        form.push(format!(
+            "TAXON {} — dissects {} — site {:?} — intervention {:?}",
+            outcome.taxon.name,
+            outcome.taxon.dissects,
+            outcome.taxon.site,
+            outcome.taxon.intervention
+        ));
         form.push(format!(
             "  stood {} · matched sibling {} · intervention occurrences {} · layer deeds conducted {} of {} ({} shared with the base's prefix)",
             outcome.stood, outcome.matched, outcome.intervention_occurrences,
             tower::LAYERS - outcome.shared_prefix_layers, tower::LAYERS, outcome.shared_prefix_layers
         ));
-        form.push(format!("  faces separated {} of {}", outcome.faces_separated, outcome.faces_total));
+        form.push(format!(
+            "  faces separated {} of {}",
+            outcome.faces_separated, outcome.faces_total
+        ));
         match &outcome.first {
             Some((f, c)) => form.push(format!(
                 "  shortest separating history: {} — {} of {} separated at positions {:?}, widest gap {:.6e}, widest midpoint shift {:.6e}, {} identical",
@@ -1207,25 +1931,52 @@ fn main() {
                 if *structural { "   [STRUCTURAL under prefix sharing: the sibling did not conduct these layers, so these faces ARE the base's and this control carries no evidence here; the committed predecessor measured it]" } else { "   [MEASURED]" }
             ));
         }
-        form.push(format!("  remaining ambiguity: {}", outcome.taxon.ambiguity));
+        form.push(format!(
+            "  remaining ambiguity: {}",
+            outcome.taxon.ambiguity
+        ));
         form.push(String::new());
     }
-    form.push(format!("{} (CARRIED AS COMMITTED EVIDENCE — not a tower, no cohort, no prefix; not re-measured)", committed.vision));
+    form.push(format!(
+        "{} (CARRIED AS COMMITTED EVIDENCE — not a tower, no cohort, no prefix; not re-measured)",
+        committed.vision
+    ));
     form.push(String::new());
     form.push("THE APPARATUS, AGAINST THE COMMITTED PREDECESSOR".to_owned());
     form.push(format!("  streamed census {:?}", cohorted.streamed));
-    form.push(format!("  surface census before {:?}", cohorted.census_before));
-    form.push(format!("  surface census after  {:?}", cohorted.census_after));
-    form.push(format!("  bands {:?} · snapshot layer {}", cohorted.bands, cohorted.snapshot_layer));
-    form.push(format!("  material admission: charged {} octets, free at admission {}", cohorted.admission.prediction.charged_octets, cohorted.admission.free_octets_at_admission));
+    form.push(format!(
+        "  surface census before {:?}",
+        cohorted.census_before
+    ));
+    form.push(format!(
+        "  surface census after  {:?}",
+        cohorted.census_after
+    ));
+    form.push(format!(
+        "  bands {:?} · snapshot layer {}",
+        cohorted.bands, cohorted.snapshot_layer
+    ));
+    form.push(format!(
+        "  material admission: charged {} octets, free at admission {}",
+        cohorted.admission.prediction.charged_octets, cohorted.admission.free_octets_at_admission
+    ));
     form.push(format!(
         "  §5.4 ledger, three readings of the same {} offers:",
         cohorted.instantiations.offers
     ));
     for (what, ledger) in [
-        ("as H4 founded the key (nothing addressed)", &cohorted.instantiations_as_h4),
-        ("plus the carried standings", &cohorted.instantiations_standings),
-        ("plus the mounted populations (the lawful key)", &cohorted.instantiations),
+        (
+            "as H4 founded the key (nothing addressed)",
+            &cohorted.instantiations_as_h4,
+        ),
+        (
+            "plus the carried standings",
+            &cohorted.instantiations_standings,
+        ),
+        (
+            "plus the mounted populations (the lawful key)",
+            &cohorted.instantiations,
+        ),
     ] {
         form.push(format!(
             "    {what}: {} instantiations, {} hits, {} refusals of which {} were the RESIDENCY ALONE",
@@ -1236,24 +1987,36 @@ fn main() {
         form.push(format!("    HIT under the lawful key: {offered} ← {stored} (the same executable; taking it requires the caller to copy the first deed's faces out first, because the two deeds also share the OUTPUT sections)"));
     }
     for (offered, stored) in cohorted.instantiations_as_h4.hits_named.iter().take(6) {
-        form.push(format!("    HIT under H4's key alone (UNSOUND): {offered} ← {stored}"));
+        form.push(format!(
+            "    HIT under H4's key alone (UNSOUND): {offered} ← {stored}"
+        ));
     }
     if cohorted.instantiations_as_h4.hits_named.len() > 6 {
-        form.push(format!("    … {} further unsound hits under H4's key alone", cohorted.instantiations_as_h4.hits_named.len() - 6));
+        form.push(format!(
+            "    … {} further unsound hits under H4's key alone",
+            cohorted.instantiations_as_h4.hits_named.len() - 6
+        ));
     }
     form.push("  the first refusals under the lawful key:".to_owned());
     for (offered, nearest, because) in cohorted.instantiations.refusals.iter().take(8) {
         form.push(format!("    {offered} ← nearest {nearest}: {because}"));
     }
     if cohorted.instantiations.refusals.len() > 8 {
-        form.push(format!("    … {} further refusals of the same two shapes", cohorted.instantiations.refusals.len() - 8));
+        form.push(format!(
+            "    … {} further refusals of the same two shapes",
+            cohorted.instantiations.refusals.len() - 8
+        ));
     }
     form.push(String::new());
     form.push("THE EXACT WORK, PER TOWER".to_owned());
     for tower_return in &cohorted.towers {
         form.push(format!(
             "  {:<80} launches {:>3} · additions {} · multiplications {} · entries written {}",
-            tower_return.declaration.name, tower_return.launches, tower_return.work.additions, tower_return.work.multiplications, tower_return.work.entries_written
+            tower_return.declaration.name,
+            tower_return.launches,
+            tower_return.work.additions,
+            tower_return.work.multiplications,
+            tower_return.work.entries_written
         ));
     }
     form.push(String::new());
@@ -1271,8 +2034,17 @@ fn main() {
         writeln!(equality_file, "{line}").expect("write");
     }
     println!("\n  artifact {path}");
-    println!("  equality table {equality_path} ({} rows)", equality.len() - 1);
-    println!("\n{} of {} falsifiers PASS; {} OPEN; total wall {:.1} s", verdicts.lines.len() - verdicts.failed, verdicts.lines.len(), verdicts.failed, clock.elapsed().as_secs_f64());
+    println!(
+        "  equality table {equality_path} ({} rows)",
+        equality.len() - 1
+    );
+    println!(
+        "\n{} of {} falsifiers PASS; {} OPEN; total wall {:.1} s",
+        verdicts.lines.len() - verdicts.failed,
+        verdicts.lines.len(),
+        verdicts.failed,
+        clock.elapsed().as_secs_f64()
+    );
     if verdicts.failed > 0 {
         std::process::exit(1);
     }

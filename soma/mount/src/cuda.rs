@@ -234,7 +234,12 @@ impl Stream {
     /// Order this stream's later work after an event: a dependency edge, not a cpu wait. Under
     /// capture it becomes a graph edge and nothing blocks.
     pub fn wait_event(&self, event: &Event) -> Result<()> {
-        unsafe { check(ffi::cuStreamWaitEvent(self.stream, event.event, 0), "cuStreamWaitEvent") }
+        unsafe {
+            check(
+                ffi::cuStreamWaitEvent(self.stream, event.event, 0),
+                "cuStreamWaitEvent",
+            )
+        }
     }
 
     /// Begin recording every launch, event, memset and copy issued to this stream — and to any
@@ -244,21 +249,41 @@ impl Stream {
     /// so a capture cannot silently interleave one — while other threads of the process, each
     /// with its own exact owner, are unaffected.
     pub fn begin_capture(&self) -> Result<()> {
-        unsafe { check(ffi::cuStreamBeginCapture_v2(self.stream, 1), "cuStreamBeginCapture_v2") }
+        unsafe {
+            check(
+                ffi::cuStreamBeginCapture_v2(self.stream, 1),
+                "cuStreamBeginCapture_v2",
+            )
+        }
     }
 
     /// Close the capture and return the bound graph. Every forked stream must have been joined
     /// back through an event this stream waited on; the driver refuses an unjoined capture.
     pub fn end_capture(&self) -> Result<Graph> {
         let mut graph: ffi::CUgraph = core::ptr::null_mut();
-        unsafe { check(ffi::cuStreamEndCapture(self.stream, &mut graph), "cuStreamEndCapture")? };
+        unsafe {
+            check(
+                ffi::cuStreamEndCapture(self.stream, &mut graph),
+                "cuStreamEndCapture",
+            )?
+        };
         Ok(Graph { graph })
     }
 
     /// Set `count` 32-bit words at `pointer` to `value`, ordered on this stream (a memset node
     /// under capture).
-    pub fn memset_u32_async(&self, pointer: ffi::CUdeviceptr, value: u32, count: usize) -> Result<()> {
-        unsafe { check(ffi::cuMemsetD32Async(pointer, value, count, self.stream), "cuMemsetD32Async") }
+    pub fn memset_u32_async(
+        &self,
+        pointer: ffi::CUdeviceptr,
+        value: u32,
+        count: usize,
+    ) -> Result<()> {
+        unsafe {
+            check(
+                ffi::cuMemsetD32Async(pointer, value, count, self.stream),
+                "cuMemsetD32Async",
+            )
+        }
     }
 
     /// **A host→device copy ordered on this stream**, from page-locked host standing.
@@ -326,8 +351,16 @@ impl PinnedHost {
     /// declaration error rather than a degenerate buffer.
     pub fn alloc(octets: usize) -> Result<Self> {
         let mut pointer: *mut c_void = core::ptr::null_mut();
-        unsafe { check(ffi::cuMemAllocHost_v2(&mut pointer, octets.max(1)), "cuMemAllocHost_v2")? };
-        Ok(Self { pointer, octets: octets.max(1) })
+        unsafe {
+            check(
+                ffi::cuMemAllocHost_v2(&mut pointer, octets.max(1)),
+                "cuMemAllocHost_v2",
+            )?
+        };
+        Ok(Self {
+            pointer,
+            octets: octets.max(1),
+        })
     }
 
     pub fn octets(&self) -> usize {
@@ -371,13 +404,23 @@ impl Event {
     /// `CU_EVENT_DISABLE_TIMING` (2): an event that orders and does not time.
     pub fn create() -> Result<Self> {
         let mut event: ffi::CUevent = core::ptr::null_mut();
-        unsafe { check(ffi::cuEventCreate(&mut event, 2), "cuEventCreate(DISABLE_TIMING)")? };
+        unsafe {
+            check(
+                ffi::cuEventCreate(&mut event, 2),
+                "cuEventCreate(DISABLE_TIMING)",
+            )?
+        };
         Ok(Self { event })
     }
 
     /// Record this event at the current tail of `stream`.
     pub fn record(&self, stream: &Stream) -> Result<()> {
-        unsafe { check(ffi::cuEventRecord(self.event, stream.stream), "cuEventRecord") }
+        unsafe {
+            check(
+                ffi::cuEventRecord(self.event, stream.stream),
+                "cuEventRecord",
+            )
+        }
     }
 
     /// **Wait, on the apparatus, until this point has been reached.** Narrower than synchronizing a
@@ -441,14 +484,24 @@ impl Graph {
         let mut edges = 0usize;
         unsafe {
             check(
-                ffi::cuGraphGetEdges(self.graph, core::ptr::null_mut(), core::ptr::null_mut(), &mut edges),
+                ffi::cuGraphGetEdges(
+                    self.graph,
+                    core::ptr::null_mut(),
+                    core::ptr::null_mut(),
+                    &mut edges,
+                ),
                 "cuGraphGetEdges(count)",
             )?
         };
         let (mut kernel_nodes, mut memset_nodes, mut memcpy_nodes, mut other_nodes) = (0, 0, 0, 0);
         for handle in handles.iter().take(nodes) {
             let mut kind: core::ffi::c_int = -1;
-            unsafe { check(ffi::cuGraphNodeGetType(*handle, &mut kind), "cuGraphNodeGetType")? };
+            unsafe {
+                check(
+                    ffi::cuGraphNodeGetType(*handle, &mut kind),
+                    "cuGraphNodeGetType",
+                )?
+            };
             // CUgraphNodeType: KERNEL 0, MEMCPY 1, MEMSET 2; everything else is counted apart.
             match kind {
                 0 => kernel_nodes += 1,
@@ -499,7 +552,12 @@ pub struct GraphExec {
 
 impl GraphExec {
     pub fn launch(&self, stream: &Stream) -> Result<()> {
-        unsafe { check(ffi::cuGraphLaunch(self.exec, stream.stream), "cuGraphLaunch") }
+        unsafe {
+            check(
+                ffi::cuGraphLaunch(self.exec, stream.stream),
+                "cuGraphLaunch",
+            )
+        }
     }
 }
 
@@ -525,7 +583,10 @@ impl BorrowedContext {
     /// Adopt a raw driver context handle. The caller asserts the owning body outlives every use.
     pub fn adopt(raw: *mut c_void) -> Result<Self> {
         if raw.is_null() {
-            return Err(invalid_driver_value("BorrowedContext::adopt", "a null context handle".into()));
+            return Err(invalid_driver_value(
+                "BorrowedContext::adopt",
+                "a null context handle".into(),
+            ));
         }
         Ok(Self { ctx: raw })
     }
@@ -544,8 +605,16 @@ impl BorrowedContext {
         self.make_current()?;
         let mut free_bytes = 0;
         let mut total_bytes = 0;
-        unsafe { check(ffi::cuMemGetInfo_v2(&mut free_bytes, &mut total_bytes), "cuMemGetInfo_v2")? };
-        Ok(MemoryInfo { free_bytes, total_bytes })
+        unsafe {
+            check(
+                ffi::cuMemGetInfo_v2(&mut free_bytes, &mut total_bytes),
+                "cuMemGetInfo_v2",
+            )?
+        };
+        Ok(MemoryInfo {
+            free_bytes,
+            total_bytes,
+        })
     }
 
     /// The measured `cuMemAlloc` charge grain in this borrowed context — the same probe as

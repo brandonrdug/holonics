@@ -59,11 +59,22 @@ pub enum StreamedRefusal {
     #[error("the mouth refused: {0}")]
     Mouth(String),
     #[error("slot {slot} carries {capacity} octets and the segment declared {required}")]
-    SlotTooNarrow { slot: usize, capacity: usize, required: usize },
+    SlotTooNarrow {
+        slot: usize,
+        capacity: usize,
+        required: usize,
+    },
     #[error("there is no slot {slot}; the pool was opened with {slots}")]
     NoSuchSlot { slot: usize, slots: usize },
-    #[error("region {population} reads {octets} octets at {start} of a container of {container} octets")]
-    RegionOutsideContainer { population: String, start: u64, octets: usize, container: u64 },
+    #[error(
+        "region {population} reads {octets} octets at {start} of a container of {container} octets"
+    )]
+    RegionOutsideContainer {
+        population: String,
+        start: u64,
+        octets: usize,
+        container: u64,
+    },
     #[error("reading {population} from the container returned {reason}")]
     Unreadable { population: String, reason: String },
     #[error("{what}")]
@@ -158,7 +169,11 @@ impl StagedRegion {
         self.words as usize * 2
     }
     pub fn rows(&self) -> usize {
-        if self.dim == 0 { 0 } else { self.words as usize / self.dim }
+        if self.dim == 0 {
+            0
+        } else {
+            self.words as usize / self.dim
+        }
     }
 }
 
@@ -292,7 +307,10 @@ impl GraphKey {
     /// standings live.
     pub fn reuse_refused(&self, other: &GraphKey) -> Option<String> {
         if self.mode != other.mode {
-            return Some(format!("the mode differs: {} against {}", self.mode, other.mode));
+            return Some(format!(
+                "the mode differs: {} against {}",
+                self.mode, other.mode
+            ));
         }
         if self.source != other.source {
             return Some("the authenticated source container differs".to_owned());
@@ -304,7 +322,10 @@ impl GraphKey {
             ));
         }
         if self.ports != other.ports {
-            return Some("the declared port extents differ, so the kernels were sized for other sections".to_owned());
+            return Some(
+                "the declared port extents differ, so the kernels were sized for other sections"
+                    .to_owned(),
+            );
         }
         if self.chronology != other.chronology {
             let mine: BTreeSet<&str> = self.chronology.iter().map(String::as_str).collect();
@@ -327,7 +348,13 @@ impl GraphKey {
                 .chain(theirs_counted.keys())
                 .collect::<BTreeSet<_>>()
                 .into_iter()
-                .map(|name| mine_counted.get(name).copied().unwrap_or(0).abs_diff(theirs_counted.get(name).copied().unwrap_or(0)))
+                .map(|name| {
+                    mine_counted
+                        .get(name)
+                        .copied()
+                        .unwrap_or(0)
+                        .abs_diff(theirs_counted.get(name).copied().unwrap_or(0))
+                })
                 .sum();
             return Some(format!(
                 "the diagram's chronology differs by {differing} occurrence(s) of {}; only in the instantiated one {only_mine:?}, only in the offered one {only_theirs:?}",
@@ -347,10 +374,20 @@ impl GraphKey {
             return Some("the receiver declared a different boundary, so a different population of seals factored".to_owned());
         }
         if self.material != other.material {
-            let mine: Vec<&str> = self.material.iter().map(|(n, _, _, _)| n.as_str()).collect();
-            let theirs: Vec<&str> = other.material.iter().map(|(n, _, _, _)| n.as_str()).collect();
+            let mine: Vec<&str> = self
+                .material
+                .iter()
+                .map(|(n, _, _, _)| n.as_str())
+                .collect();
+            let theirs: Vec<&str> = other
+                .material
+                .iter()
+                .map(|(n, _, _, _)| n.as_str())
+                .collect();
             if mine != theirs {
-                return Some(format!("the addressed material differs by name: {mine:?} against {theirs:?}"));
+                return Some(format!(
+                    "the addressed material differs by name: {mine:?} against {theirs:?}"
+                ));
             }
             let moved: Vec<String> = self
                 .material
@@ -394,8 +431,14 @@ pub struct KeyedInstantiations {
 /// stored key and why it did not serve.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Instantiation {
-    Reused { index: usize, label: String },
-    New { index: usize, nearest: Option<(String, String)> },
+    Reused {
+        index: usize,
+        label: String,
+    },
+    New {
+        index: usize,
+        nearest: Option<(String, String)>,
+    },
 }
 
 impl KeyedInstantiations {
@@ -412,10 +455,19 @@ impl KeyedInstantiations {
     /// comparison, so two deeds cannot be separated by their names.
     pub fn offer(&mut self, label: &str, key: &GraphKey) -> Instantiation {
         self.offers += 1;
-        if let Some((index, (stored_label, _))) = self.keys.iter().enumerate().find(|(_, (_, stored))| stored.reuse_refused(key).is_none()) {
+        if let Some((index, (stored_label, _))) = self
+            .keys
+            .iter()
+            .enumerate()
+            .find(|(_, (_, stored))| stored.reuse_refused(key).is_none())
+        {
             self.hits += 1;
-            self.hits_named.push((label.to_owned(), stored_label.clone()));
-            return Instantiation::Reused { index, label: stored_label.clone() };
+            self.hits_named
+                .push((label.to_owned(), stored_label.clone()));
+            return Instantiation::Reused {
+                index,
+                label: stored_label.clone(),
+            };
         }
         // The nearest stored key: the last one whose refusal is the residency alone, else the last
         // stored key at all. "Nearest" is a reading aid and never a licence.
@@ -424,20 +476,36 @@ impl KeyedInstantiations {
             .iter()
             .rev()
             .find_map(|(stored_label, stored)| {
-                stored.reuse_refused(key).filter(|because| because.starts_with("every field of the diagram agrees")).map(|because| (stored_label.clone(), because))
+                stored
+                    .reuse_refused(key)
+                    .filter(|because| because.starts_with("every field of the diagram agrees"))
+                    .map(|because| (stored_label.clone(), because))
             })
-            .or_else(|| self.keys.last().and_then(|(stored_label, stored)| stored.reuse_refused(key).map(|because| (stored_label.clone(), because))));
+            .or_else(|| {
+                self.keys.last().and_then(|(stored_label, stored)| {
+                    stored
+                        .reuse_refused(key)
+                        .map(|because| (stored_label.clone(), because))
+                })
+            });
         if let Some((stored_label, because)) = &nearest {
-            self.refusals.push((label.to_owned(), stored_label.clone(), because.clone()));
+            self.refusals
+                .push((label.to_owned(), stored_label.clone(), because.clone()));
         }
         self.keys.push((label.to_owned(), key.clone()));
-        Instantiation::New { index: self.keys.len() - 1, nearest }
+        Instantiation::New {
+            index: self.keys.len() - 1,
+            nearest,
+        }
     }
 
     /// How many refusals were the residency alone — every field of the diagram agreeing while the
     /// addressed sections differ. This is the population H4's key could not have separated.
     pub fn residency_only_refusals(&self) -> usize {
-        self.refusals.iter().filter(|(_, _, because)| because.starts_with("every field of the diagram agrees")).count()
+        self.refusals
+            .iter()
+            .filter(|(_, _, because)| because.starts_with("every field of the diagram agrees"))
+            .count()
     }
 }
 
@@ -535,11 +603,27 @@ impl<'chart> StreamedCirculation<'chart> {
     /// and it is a wait on an *apparatus transfer*, never on a deed.
     ///
     /// Returns each region's offset in the pinned slot, in the order given.
-    pub fn stage(&mut self, pinned_slot: usize, file: &File, container_octets: u64, regions: &[StagedRegion]) -> Result<Vec<usize>, StreamedRefusal> {
-        let slot = self.pinned.get(pinned_slot).ok_or(StreamedRefusal::NoSuchSlot { slot: pinned_slot, slots: self.pinned.len() })?;
+    pub fn stage(
+        &mut self,
+        pinned_slot: usize,
+        file: &File,
+        container_octets: u64,
+        regions: &[StagedRegion],
+    ) -> Result<Vec<usize>, StreamedRefusal> {
+        let slot = self
+            .pinned
+            .get(pinned_slot)
+            .ok_or(StreamedRefusal::NoSuchSlot {
+                slot: pinned_slot,
+                slots: self.pinned.len(),
+            })?;
         let required: usize = regions.iter().map(StagedRegion::octets).sum();
         if required > slot.octets() {
-            return Err(StreamedRefusal::SlotTooNarrow { slot: pinned_slot, capacity: slot.octets(), required });
+            return Err(StreamedRefusal::SlotTooNarrow {
+                slot: pinned_slot,
+                capacity: slot.octets(),
+                required,
+            });
         }
         // Wait on the copy that last read THIS slot, and on nothing else: synchronizing the copy
         // current would also wait for the copy that is meant to be crossing while a deed conducts,
@@ -556,10 +640,18 @@ impl<'chart> StreamedCirculation<'chart> {
         for region in regions {
             let span = region.octets();
             if region.start + span as u64 > container_octets {
-                return Err(StreamedRefusal::RegionOutsideContainer { population: region.population.clone(), start: region.start, octets: span, container: container_octets });
+                return Err(StreamedRefusal::RegionOutsideContainer {
+                    population: region.population.clone(),
+                    start: region.start,
+                    octets: span,
+                    container: container_octets,
+                });
             }
             file.read_exact_at(&mut octets[at..at + span], region.start)
-                .map_err(|error| StreamedRefusal::Unreadable { population: region.population.clone(), reason: error.to_string() })?;
+                .map_err(|error| StreamedRefusal::Unreadable {
+                    population: region.population.clone(),
+                    reason: error.to_string(),
+                })?;
             offsets.push(at);
             at += span;
             self.census.staged_regions += 1;
@@ -574,12 +666,27 @@ impl<'chart> StreamedCirculation<'chart> {
     /// launched — so the double buffering is a *device* dependency and the apparatus does not wait
     /// for it. It returns the per-map addresses the mouth will read and write, laid out from the
     /// slot's own base.
-    pub fn cross(&mut self, slot: usize, pinned_slot: usize, offsets: &[usize], regions: &[StagedRegion]) -> Result<Vec<PooledMount>, StreamedRefusal> {
+    pub fn cross(
+        &mut self,
+        slot: usize,
+        pinned_slot: usize,
+        offsets: &[usize],
+        regions: &[StagedRegion],
+    ) -> Result<Vec<PooledMount>, StreamedRefusal> {
         if slot >= self.slots.len() {
-            return Err(StreamedRefusal::NoSuchSlot { slot, slots: self.slots.len() });
+            return Err(StreamedRefusal::NoSuchSlot {
+                slot,
+                slots: self.slots.len(),
+            });
         }
         if offsets.len() != regions.len() {
-            return Err(StreamedRefusal::Declaration { what: format!("{} staged offsets for {} regions", offsets.len(), regions.len()) });
+            return Err(StreamedRefusal::Declaration {
+                what: format!(
+                    "{} staged offsets for {} regions",
+                    offsets.len(),
+                    regions.len()
+                ),
+            });
         }
         self.slots[slot].rewind();
         let (stored_base, aligned_base, mass_base) = {
@@ -602,21 +709,41 @@ impl<'chart> StreamedCirculation<'chart> {
             {
                 let shape = self.slots[slot].shape.clone();
                 if stored_at + stored_span > shape.stored_octets {
-                    return Err(StreamedRefusal::SlotTooNarrow { slot, capacity: shape.stored_octets, required: stored_at + stored_span });
+                    return Err(StreamedRefusal::SlotTooNarrow {
+                        slot,
+                        capacity: shape.stored_octets,
+                        required: stored_at + stored_span,
+                    });
                 }
                 if aligned_at + aligned_span > shape.aligned_octets {
-                    return Err(StreamedRefusal::SlotTooNarrow { slot, capacity: shape.aligned_octets, required: aligned_at + aligned_span });
+                    return Err(StreamedRefusal::SlotTooNarrow {
+                        slot,
+                        capacity: shape.aligned_octets,
+                        required: aligned_at + aligned_span,
+                    });
                 }
                 if mass_at + mass_span > shape.mass_octets {
-                    return Err(StreamedRefusal::SlotTooNarrow { slot, capacity: shape.mass_octets, required: mass_at + mass_span });
+                    return Err(StreamedRefusal::SlotTooNarrow {
+                        slot,
+                        capacity: shape.mass_octets,
+                        required: mass_at + mass_span,
+                    });
                 }
             }
             // SAFETY: the source is page-locked host standing owned here; the copy current waits
             // on the event that freed this slot, and the pinned slot is not rewritten until this
             // copy has completed (`stage` synchronizes the copy current first).
             unsafe {
-                let source = self.pinned[pinned_slot].as_ptr().cast::<u8>().add(*offset).cast();
-                self.copying.copy_host_to_device_async(stored_base + stored_at as u64, source, stored_span)?;
+                let source = self.pinned[pinned_slot]
+                    .as_ptr()
+                    .cast::<u8>()
+                    .add(*offset)
+                    .cast();
+                self.copying.copy_host_to_device_async(
+                    stored_base + stored_at as u64,
+                    source,
+                    stored_span,
+                )?;
             }
             self.census.asynchronous_copies += 1;
             self.census.asynchronous_copy_octets += stored_span as u64;
@@ -644,22 +771,39 @@ impl<'chart> StreamedCirculation<'chart> {
     /// round trip and cannot be otherwise — against `3 × maps` in the per-map path.
     ///
     /// The conducting current is untouched: whatever deed is running keeps running.
-    pub fn mount(&mut self, slot: usize, pinned_slot: usize, requests: &[PooledMount]) -> Result<Vec<PooledReadout<'chart>>, StreamedRefusal> {
+    pub fn mount(
+        &mut self,
+        slot: usize,
+        pinned_slot: usize,
+        requests: &[PooledMount],
+    ) -> Result<Vec<PooledReadout<'chart>>, StreamedRefusal> {
         if slot >= self.slots.len() {
-            return Err(StreamedRefusal::NoSuchSlot { slot, slots: self.slots.len() });
+            return Err(StreamedRefusal::NoSuchSlot {
+                slot,
+                slots: self.slots.len(),
+            });
         }
         let required = 16 * requests.len();
         if required > self.slots[slot].shape.scratch_octets {
-            return Err(StreamedRefusal::SlotTooNarrow { slot, capacity: self.slots[slot].shape.scratch_octets, required });
+            return Err(StreamedRefusal::SlotTooNarrow {
+                slot,
+                capacity: self.slots[slot].shape.scratch_octets,
+                required,
+            });
         }
         self.mounting.wait_event(&self.crossed[pinned_slot])?;
         let scratch = self.slots[slot].scratch_base();
         // SAFETY: the mount current is a live stream of this surface's context, and every address
         // in `requests` names this slot, which the copy current has just filled and which no other
         // current writes.
-        let mounted = unsafe { self.surface.readout().mount_bfloat16_pooled(self.mounting.raw(), scratch, requests) }
-            .map_err(|error| StreamedRefusal::Mouth(format!("{error:?}")))?;
-        self.census.mount_launches += (2 * requests.len() + requests.iter().filter(|r| r.rows > 0).count()) as u64;
+        let mounted = unsafe {
+            self.surface
+                .readout()
+                .mount_bfloat16_pooled(self.mounting.raw(), scratch, requests)
+        }
+        .map_err(|error| StreamedRefusal::Mouth(format!("{error:?}")))?;
+        self.census.mount_launches +=
+            (2 * requests.len() + requests.iter().filter(|r| r.rows > 0).count()) as u64;
         self.census.mount_synchronizations += 2;
         self.mounted.record(&self.mounting)?;
         Ok(mounted)
@@ -670,7 +814,10 @@ impl<'chart> StreamedCirculation<'chart> {
     /// and [`StreamedCirculation::conducted`].
     pub fn admit_segment(&mut self, slot: usize) -> Result<(), StreamedRefusal> {
         if slot >= self.slots.len() {
-            return Err(StreamedRefusal::NoSuchSlot { slot, slots: self.slots.len() });
+            return Err(StreamedRefusal::NoSuchSlot {
+                slot,
+                slots: self.slots.len(),
+            });
         }
         self.conducting.wait_event(&self.mounted)?;
         self.census.segments += 1;
@@ -682,7 +829,10 @@ impl<'chart> StreamedCirculation<'chart> {
     /// launch, so the refill cannot overtake the deed.
     pub fn conducted(&mut self, slot: usize) -> Result<(), StreamedRefusal> {
         if slot >= self.slots.len() {
-            return Err(StreamedRefusal::NoSuchSlot { slot, slots: self.slots.len() });
+            return Err(StreamedRefusal::NoSuchSlot {
+                slot,
+                slots: self.slots.len(),
+            });
         }
         self.slots[slot].freed.record(&self.conducting)?;
         self.slots[slot].conducted = true;
@@ -715,18 +865,34 @@ mod tests {
 
     #[test]
     fn a_slot_shape_sums_its_four_regions() {
-        let shape = SlotShape { name: "one".to_owned(), aligned_octets: 800, stored_octets: 200, mass_octets: 32, scratch_octets: 16 };
+        let shape = SlotShape {
+            name: "one".to_owned(),
+            aligned_octets: 800,
+            stored_octets: 200,
+            mass_octets: 32,
+            scratch_octets: 16,
+        };
         assert_eq!(shape.octets(), 1048);
     }
 
     #[test]
     fn a_staged_region_reports_its_octets_and_rows_from_the_header_alone() {
-        let region = StagedRegion { population: "m".to_owned(), start: 64, words: 2560 * 8, dim: 2560 };
+        let region = StagedRegion {
+            population: "m".to_owned(),
+            start: 64,
+            words: 2560 * 8,
+            dim: 2560,
+        };
         assert_eq!(region.octets(), 2560 * 8 * 2);
         assert_eq!(region.rows(), 8);
         // A rank-0 region has no width; it is a word, and the row population is empty rather than
         // a division by zero.
-        let scalar = StagedRegion { population: "s".to_owned(), start: 0, words: 1, dim: 0 };
+        let scalar = StagedRegion {
+            population: "s".to_owned(),
+            start: 0,
+            words: 1,
+            dim: 0,
+        };
         assert_eq!(scalar.rows(), 0);
     }
 
@@ -752,7 +918,11 @@ mod tests {
         assert!(stated.contains("segments 1"), "{stated}");
         assert!(stated.contains("material 1"), "{stated}");
         assert!(stated.contains("occurrences 2"), "{stated}");
-        assert_eq!(key.clone(), key, "the key is a value, compared field by field");
+        assert_eq!(
+            key.clone(),
+            key,
+            "the key is a value, compared field by field"
+        );
     }
 
     fn cohort_key(standing: u64) -> GraphKey {
@@ -766,7 +936,11 @@ mod tests {
             reductions: vec![("section_rms_rebase".to_owned(), 2560)],
             receiver_boundary: "terminal EventId(0)".to_owned(),
             material: vec![("carried standing".to_owned(), standing, 5, 2560)],
-            chronology: vec!["entering standing".to_owned(), "input rebase".to_owned(), "contact and carried construction".to_owned()],
+            chronology: vec![
+                "entering standing".to_owned(),
+                "input rebase".to_owned(),
+                "contact and carried construction".to_owned(),
+            ],
         }
     }
 
@@ -779,14 +953,26 @@ mod tests {
     fn a_cohort_sibling_may_not_reuse_a_sibling_executable_whose_standing_sits_elsewhere() {
         let first = cohort_key(0x7f00_0000);
         let second = cohort_key(0x7f10_0000);
-        let because = first.reuse_refused(&second).expect("the residency differs, so the reuse is refused");
-        assert!(because.starts_with("every field of the diagram agrees"), "{because}");
+        let because = first
+            .reuse_refused(&second)
+            .expect("the residency differs, so the reuse is refused");
+        assert!(
+            because.starts_with("every field of the diagram agrees"),
+            "{because}"
+        );
         assert!(because.contains("carried standing"), "{because}");
-        assert!(because.contains("0x7f000000") && because.contains("0x7f100000"), "{because}");
+        assert!(
+            because.contains("0x7f000000") && because.contains("0x7f100000"),
+            "{because}"
+        );
         // and the diagram itself is identical: nothing but the residency separates them
         let mut stripped = second.clone();
         stripped.material = first.material.clone();
-        assert_eq!(first.reuse_refused(&stripped), None, "with one residency the two deeds are one executable");
+        assert_eq!(
+            first.reuse_refused(&stripped),
+            None,
+            "with one residency the two deeds are one executable"
+        );
     }
 
     /// A key difference in the diagram is named as such, and never confused with a residency move.
@@ -795,28 +981,52 @@ mod tests {
         let base = cohort_key(0x7f00_0000);
         let mut intervened = base.clone();
         intervened.topology = vec![(71, 45, 108, 116)];
-        let because = base.reuse_refused(&intervened).expect("the diagram differs");
-        assert!(because.starts_with("the diagram's census differs"), "{because}");
+        let because = base
+            .reuse_refused(&intervened)
+            .expect("the diagram differs");
+        assert!(
+            because.starts_with("the diagram's census differs"),
+            "{because}"
+        );
         // **What a count cannot separate, and the chronology can.** Two matched siblings whose
         // interventions each insert exactly ONE occurrence, at different sites, carry the same four
         // numbers — measured on the real cohort, where keying on the census admitted 697 of 714
         // offers as reuses. The chronology names the occurrence and refuses.
         let mut left = base.clone();
-        left.chronology.push("per-layer input withdrawn (intervention)".to_owned());
+        left.chronology
+            .push("per-layer input withdrawn (intervention)".to_owned());
         left.topology = vec![(70, 45, 109, 116)];
         let mut right = base.clone();
-        right.chronology.push("gated passage span withdrawn (intervention)".to_owned());
+        right
+            .chronology
+            .push("gated passage span withdrawn (intervention)".to_owned());
         right.topology = vec![(70, 45, 109, 116)];
-        assert_eq!(left.topology, right.topology, "one inserted occurrence each: the census cannot tell them apart");
+        assert_eq!(
+            left.topology, right.topology,
+            "one inserted occurrence each: the census cannot tell them apart"
+        );
         let because = left.reuse_refused(&right).expect("the chronology differs");
-        assert!(because.starts_with("the diagram's chronology differs by 2 occurrence(s)"), "{because}");
-        assert!(because.contains("per-layer input withdrawn") && because.contains("gated passage span withdrawn"), "{because}");
+        assert!(
+            because.starts_with("the diagram's chronology differs by 2 occurrence(s)"),
+            "{because}"
+        );
+        assert!(
+            because.contains("per-layer input withdrawn")
+                && because.contains("gated passage span withdrawn"),
+            "{because}"
+        );
         let mut coarser = base.clone();
         coarser.grain = 24;
-        assert!(base.reuse_refused(&coarser).is_some_and(|b| b.starts_with("the carrier differs")));
+        assert!(
+            base.reuse_refused(&coarser)
+                .is_some_and(|b| b.starts_with("the carrier differs"))
+        );
         let mut other_extent = base.clone();
         other_extent.ports = vec![("continuing standing, 2560".to_owned(), 7, 2560)];
-        assert!(base.reuse_refused(&other_extent).is_some_and(|b| b.starts_with("the declared port extents differ")));
+        assert!(
+            base.reuse_refused(&other_extent)
+                .is_some_and(|b| b.starts_with("the declared port extents differ"))
+        );
     }
 
     /// The ledger counts instantiations against offers and keeps every refusal by name — including
@@ -825,19 +1035,34 @@ mod tests {
     fn the_cohort_instantiation_ledger_counts_hits_and_keeps_every_refusal() {
         let mut ledger = KeyedInstantiations::new();
         let first = ledger.offer("base layer 24", &cohort_key(0x7f00_0000));
-        assert!(matches!(first, Instantiation::New { index: 0, nearest: None }));
+        assert!(matches!(
+            first,
+            Instantiation::New {
+                index: 0,
+                nearest: None
+            }
+        ));
         let sibling = ledger.offer("sibling layer 24", &cohort_key(0x7f10_0000));
         match sibling {
-            Instantiation::New { index, nearest: Some((label, because)) } => {
+            Instantiation::New {
+                index,
+                nearest: Some((label, because)),
+            } => {
                 assert_eq!(index, 1);
                 assert_eq!(label, "base layer 24");
-                assert!(because.starts_with("every field of the diagram agrees"), "{because}");
+                assert!(
+                    because.starts_with("every field of the diagram agrees"),
+                    "{because}"
+                );
             }
             other => panic!("a sibling on another standing is a new instantiation: {other:?}"),
         }
         // the same deed offered again on the same material is one executable relaunched
         let again = ledger.offer("base layer 24 relaunched", &cohort_key(0x7f00_0000));
-        assert!(matches!(again, Instantiation::Reused { index: 0, .. }), "{again:?}");
+        assert!(
+            matches!(again, Instantiation::Reused { index: 0, .. }),
+            "{again:?}"
+        );
         assert_eq!(ledger.instantiations(), 2);
         assert_eq!(ledger.offers, 3);
         assert_eq!(ledger.hits, 1);

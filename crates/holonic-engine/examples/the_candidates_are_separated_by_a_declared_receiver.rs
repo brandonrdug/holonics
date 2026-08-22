@@ -40,11 +40,11 @@ mod site;
 
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::receiver_exact_compression::{
-    compress, AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
 };
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
-use site::{conduct, Candidate, BASE, CAUSED, SIBLINGS};
+use site::{BASE, CAUSED, Candidate, SIBLINGS, conduct};
 
 // ---------------------------------------------------------------------------------------------
 // THE DECLARED RECEIVER FAMILY
@@ -177,7 +177,10 @@ fn main() {
 
     println!("PHOENIX STATION FIVE (DISSECTION) — THE CANDIDATES ARE SEPARATED");
     println!();
-    println!("  resident chart                    {}", chart.device_name());
+    println!(
+        "  resident chart                    {}",
+        chart.device_name()
+    );
     println!("  caused positions                  {}", CAUSED.len());
     println!("  declared aperture                 the receiver/presented/carried front, its");
     println!("                                    chronology and its contact. The constitutive");
@@ -191,11 +194,7 @@ fn main() {
         let clock = std::time::Instant::now();
         match conduct(&root, &chart, *candidate, terms, None) {
             Ok(carried) => {
-                println!(
-                    "  conducted  {:<44} {:?}",
-                    candidate.name,
-                    clock.elapsed()
-                );
+                println!("  conducted  {:<44} {:?}", candidate.name, clock.elapsed());
                 returns.push(carried);
             }
             Err(error) => {
@@ -224,19 +223,34 @@ fn main() {
     println!();
     println!("  THE DECLARED RECEIVER FAMILY");
     println!("    coordinates declared            {}", coordinates.len());
-    println!("    receivers                       {} — a HAND and an ORDER at each", coordinates.len() * 2);
-    println!("    items                           {} — one per candidate per position", system.states.len());
+    println!(
+        "    receivers                       {} — a HAND and an ORDER at each",
+        coordinates.len() * 2
+    );
+    println!(
+        "    items                           {} — one per candidate per position",
+        system.states.len()
+    );
     println!("    (a hand is the phase a magnitude reading deletes; an order is a relation. Both");
     println!("     cross a frame where a value does not.)");
 
     let reading = compress(&system);
     println!();
     println!("  THE RECEIVER-EXACT QUOTIENT");
-    println!("    one-shot blocks                 {}", reading.one_shot.len());
-    println!("    blocks under successor conduct  {}", reading.conduct.len());
+    println!(
+        "    one-shot blocks                 {}",
+        reading.one_shot.len()
+    );
+    println!(
+        "    blocks under successor conduct  {}",
+        reading.conduct.len()
+    );
     println!("    refinement rounds               {}", reading.rounds);
     println!("    one-shot reading is exact       {}", reading.is_exact());
-    println!("    collapsed pairs later conduct separates  {}", reading.collapsed.len());
+    println!(
+        "    collapsed pairs later conduct separates  {}",
+        reading.collapsed.len()
+    );
 
     println!();
     println!("  WHAT THIS SETTLES, QUESTION BY QUESTION");
@@ -249,8 +263,12 @@ fn main() {
         println!("        sibling                 {}", candidate.name);
         if together {
             println!("        SEPARATED               no — no declared receiver tells them apart");
-            println!("        so the question is      MOOT at this aperture; both are one transport");
-            println!("                                for this family, and a richer receiver may reopen it");
+            println!(
+                "        so the question is      MOOT at this aperture; both are one transport"
+            );
+            println!(
+                "                                for this family, and a richer receiver may reopen it"
+            );
         } else {
             println!("        SEPARATED               YES — the family tells them apart");
             println!("        so the question is      REAL, and settling it needs SOURCE conduct,");
@@ -267,7 +285,9 @@ fn main() {
             pair.distinguishing_word.len()
         );
         if let Some((receiver, left, right)) = &pair.witness {
-            println!("        the receiver that finally saw it: {receiver:?} returning {left:?} against {right:?}");
+            println!(
+                "        the receiver that finally saw it: {receiver:?} returning {left:?} against {right:?}"
+            );
         }
     }
 
@@ -284,7 +304,10 @@ fn main() {
             individually_redundant += 1;
         }
     }
-    println!("    receivers withdrawn one at a time          {}", system.receivers().len());
+    println!(
+        "    receivers withdrawn one at a time          {}",
+        system.receivers().len()
+    );
     println!("    whose single withdrawal changed nothing    {individually_redundant}");
     println!();
     println!("    **That is redundancy, not decoration**, and reading it as decoration would be");
@@ -298,8 +321,14 @@ fn main() {
         kept: Vec::new(),
     };
     let without_any = compress(&empty);
-    println!("    with NO receiver at all, blocks            {}", without_any.conduct.len());
-    println!("    with the whole family, blocks              {}", reading.conduct.len());
+    println!(
+        "    with NO receiver at all, blocks            {}",
+        without_any.conduct.len()
+    );
+    println!(
+        "    with the whole family, blocks              {}",
+        reading.conduct.len()
+    );
     println!(
         "    the family does work                       {}",
         without_any.conduct.len() < reading.conduct.len()
@@ -309,7 +338,11 @@ fn main() {
     // Control two: a MINIMAL subfamily that still returns the same partition.
     let mut kept: Vec<ReceiverId> = system.receivers();
     for receiver in system.receivers() {
-        let trial: Vec<ReceiverId> = kept.iter().copied().filter(|held| *held != receiver).collect();
+        let trial: Vec<ReceiverId> = kept
+            .iter()
+            .copied()
+            .filter(|held| *held != receiver)
+            .collect();
         let restricted = RestrictedSystem {
             inner: &system,
             kept: trial.clone(),
@@ -318,7 +351,11 @@ fn main() {
             kept = trial;
         }
     }
-    println!("    a MINIMAL subfamily returning the same partition: {} of {}", kept.len(), system.receivers().len());
+    println!(
+        "    a MINIMAL subfamily returning the same partition: {} of {}",
+        kept.len(),
+        system.receivers().len()
+    );
     for receiver in &kept {
         let which = receiver.0 as usize / 2;
         println!(

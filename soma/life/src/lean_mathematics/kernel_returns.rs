@@ -3,8 +3,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_structure::{LocalRelations, LocalSequence};
 use serde::Serialize;
 
-use crate::holonic_training::{FiberAdmission, FiberStanding};
 use super::LeanProofMotion;
+use crate::holonic_training::{FiberAdmission, FiberStanding};
 
 use super::{LeanMathematicsError, LeanProofCandidate};
 

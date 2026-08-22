@@ -31,11 +31,15 @@ once you have sufficient context post-analysis campaign."*
 
 ## THE SINGLE-CARD PASSAGE CARRIES PHOENIX AND THE MATHEMATICS CODEC — 2026-08-19
 
-**The sole active integrated construction plan under this roadmap is now
-[`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).**
-It supersedes the scheduling/station order of the earlier Phoenix master, Gemma instance and
+**The returned H/W/M construction is governed by
+[`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md),
+and its Athena-product continuation is governed by
+[`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).**
+The latter folds M6 into the first explicitly graded Athena mathematics variant and orders the
+exchange, sibling-spectrum, cultivation, second-organ and fusion deeds behind it. Together they
+supersede the scheduling/station order of the earlier Phoenix master, Gemma instance and
 mathematics-codec blueprints while retaining their bounded artifacts and component obligations by
-explicit composition. It adds no Scheduler or hardware ontology: causal fronts, exact work,
+explicit composition. They add no Scheduler or hardware ontology: causal fronts, exact work,
 hardware cover, footprint interchange, receiver current, resident graphs, reflection and
 receiver-exact compression remain the owners.
 
@@ -61,18 +65,61 @@ nothing and is not extended until the common hardware foundation passes.
 **Current frontier after the 2026-08-21 equality/compression regrade:** H0–H5 have returned the
 single-card foundation and W1–W5 have returned a complete source-shaped Gemma lift, intervention
 dissection, rank-one cultivation and source-detached resident runtime. W2 tested quotienting the
-source-shaped deed states; it did not test generator/chart/word re-expression. Therefore the
-species-changing compression required by the Phoenix contract remains open. M0 remains next. M1
-founds mathematical particles and typed sameness; M2 uses them to excite an active transport cover;
-M3 recovers the generator-native codec pivot; M4 closes leader/return cultivation and the complete
-mathematical return. The integrated contract is
+source-shaped deed states; it did not test generator/chart/word re-expression. M3 and M4 have now
+closed that species-changing requirement for their declared receiver/history and metric-reflection
+family; unexcited foreign capability and broader successor families remain open. M0 returned its plural
+source/layout testimony and disagreement fibre on 2026-08-21. M1 returned each mathematical
+particle as an addressed operation passage `X <- W_f -> Y`, composed serial passages by witnessed
+pullback, kept the relational shadow as a marked receiver face, and carried two exact owner families
+through one resident GPU deed. M2 then carried five addressed excitations through ninety-five
+frozen-W1 resident circulations and returned the four distinct activity faces, exact first
+separators, witnessed prefix-pullback nerve, unchanged controls and complete open fibres. Its
+authoritative return is
+[`research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md`](../research/records/2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md).
+M3 returned the generator-native codec pivot on 2026-08-21: 12,255 source states condensed to 6,376
+native states through complete generator squares, with 59,279 shortest separators, all fibres, an
+executable detached rest, one card-resident word deed and a strictly reduced complete cost vector.
+Its authoritative return is
+[`research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md`](../research/records/2026-08-21_THE_PRESENT_COVER_REOPENED_UNDER_CHRONOLOGY_THE_GENERATORS_DESCENDED_AND_M3_RETURNED_A_NATIVE_CODEC.md).
+**M4 PASSED.** The depth-73 M3 leader founded a symmetric rank-one metric morphology on the
+five-bend Soddy--Gossett quadric. Its closure-derived five-hand reflection family returned the
+held-out ordered section `[11,17,2,3,3]` through one resident ten-kernel GPU graph; exact algebra,
+Lean, analytic/vector/raster/mesh faces, source-detached remount and targeted ablation returned
+together. This completes the bounded M0--M4 vertical and species-changing Phoenix grade. Its
+authoritative return is
+[`research/records/2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md`](../research/records/2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md).
+The integrated contract is
 [`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md)
 and its derivation is
 [`research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md`](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
+The addressed-lineage, dynamic-compression and ordered-packing theorem deposit is
+[`research/records/2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md`](../research/records/2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md).
+Its binding to the paused M1 implementation cone and exact resumption boundary is
+[`research/records/2026-08-21_THE_PARTICLE_CARRIES_ITS_BOUNDARIES_THE_QUOTIENT_CARRIES_ITS_SUCCESSORS_AND_M1_MUST_BE_REBASED_BEFORE_IT_IS_GRADED.md`](../research/records/2026-08-21_THE_PARTICLE_CARRIES_ITS_BOUNDARIES_THE_QUOTIENT_CARRIES_ITS_SUCCESSORS_AND_M1_MUST_BE_REBASED_BEFORE_IT_IS_GRADED.md).
+M1's authoritative return is
+[`research/records/2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md`](../research/records/2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md).
 The higher catalytic-morphology objective and the AlphaFold/AlphaEvolve/UnsolvedMath/protein-binder
 arsenal audit are
 [`research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md`](../research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md).
-It raises the M1–M4 completion contract and schedules no second branch before M0.
+It raises the M1–M4 completion contract and scheduled no second construction branch beside M1.
+**M5 PASSED.** One documentation-addressed RBX1 lineage returned two complete predictor-backed
+polygonal-chain/higher-cell complexes, their boundary and complete fibre, 40 shared contacts,
+24 separating contacts, eleven shared higher cells and shortest separator `(2,23)`. A real
+free-RBX1 binder/CUL1-RBX1 non-binder assay change, one 70,632-pair resident GPU passage, the
+abstract Lean shared-junction theorem and gauge-safe vector/mesh testimony returned together. The
+84 GB structure tier was not scanned and no cultivation was claimed. Its authoritative return is
+[`research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md`](../research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md).
+
+**M6 / Athena-A0 is next.** Commit `4776099` has now discharged the total face theorem the earlier
+M6 wording posed. The machine deed is therefore rebased against two content-addressed boundaries:
+development source `75597c4`, which includes `ChordFace` but excludes `FaceHomomorphism`, and the
+withheld `4776099` proof passage, which remains exterior teacher/checker testimony and is unavailable
+to the productive body. M6 must return native and Phoenix Athena siblings, independently recover the
+complete identity/inverse/doubling/secant/half-turn route, emit a `sorry`-free theorem, cultivate a
+held-out successor route, survive detached remount, lose the advantage under targeted ablation and
+return a resident GPU passage plus complete fibres. Its twelve-part grade, source-access audit and
+the ordered A1--A6 continuation are in
+[`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).

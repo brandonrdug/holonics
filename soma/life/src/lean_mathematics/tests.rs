@@ -618,8 +618,8 @@ fn a_motion_repeated_inside_one_proof_counts_once() {
     let motion = LeanProofMotion::Close {
         tactic: Arc::from("simp"),
     };
-    let family = LeanKernelReturnFamily::from_members(LocalSequence::from_iter([
-        LeanKernelReturn {
+    let family =
+        LeanKernelReturnFamily::from_members(LocalSequence::from_iter([LeanKernelReturn {
             candidate: LeanProofCandidate {
                 ordinal: 0,
                 proof: "proof".to_owned(),
@@ -631,9 +631,8 @@ fn a_motion_repeated_inside_one_proof_counts_once() {
             diagnostic_sha256: sha256(b""),
             diagnostic: String::new(),
             observed_millis: 0,
-        },
-    ]))
-    .unwrap();
+        }]))
+        .unwrap();
     let standing = motion_standing(&family);
     assert_eq!(standing[&motion_key(&motion)].confirmations, 1);
 }

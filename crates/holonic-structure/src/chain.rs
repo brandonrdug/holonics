@@ -195,7 +195,6 @@ impl<N, L, E> Chain<N, L, E> {
             Disposition::Saturated
         }
     }
-
 }
 
 impl<N, L, E> Chain<N, L, E>
@@ -271,8 +270,7 @@ where
     /// a large transport and is still a chain of zero-remainder rebases. Loop closure is
     /// [`Chain::holonomy`]; path-independence is [`Chain::defect_against`]; loss is here.
     pub fn is_rebase(&self) -> bool {
-        self.unconnected.is_empty()
-            && <L::Transport as Composes>::is_empty(&self.remainder())
+        self.unconnected.is_empty() && <L::Transport as Composes>::is_empty(&self.remainder())
     }
 }
 
@@ -405,7 +403,8 @@ mod tests {
 
     #[test]
     fn the_transport_composes_along_the_chain() {
-        let mut chain: Chain<u32, Step, &str> = Chain::founded(0, ChainEnd::Terminates("origin"), "s");
+        let mut chain: Chain<u32, Step, &str> =
+            Chain::founded(0, ChainEnd::Terminates("origin"), "s");
         chain.carry(step(1, 3), 1, "s");
         chain.carry(step(1, 4), 2, "s");
         chain.carry(step(1, 5), 3, "s");
@@ -438,7 +437,8 @@ mod tests {
     /// ★ THE ARM THAT WAS MISSING. A chain whose links themselves turned something back is not a
     /// rebase, and no caller told it so.
     #[test]
-    fn a_chain_whose_links_returned_something_is_not_a_rebase_though_nothing_was_reflected_by_hand() {
+    fn a_chain_whose_links_returned_something_is_not_a_rebase_though_nothing_was_reflected_by_hand()
+    {
         // Both chains have an EMPTY `unconnected` population, which is the only thing the old
         // `is_rebase` consulted. They must not read the same.
         let mut clean: Chain<u32, Step, &str> =
@@ -488,7 +488,8 @@ mod tests {
     fn holonomy_is_none_on_an_open_chain_and_a_defect_on_a_closed_one() {
         // Open: the chain transports something and never returns to its source. It has no holonomy,
         // and `None` says so rather than reporting a closure that did not happen.
-        let mut open: Chain<u32, Step, &str> = Chain::founded(0, ChainEnd::Terminates("origin"), "s");
+        let mut open: Chain<u32, Step, &str> =
+            Chain::founded(0, ChainEnd::Terminates("origin"), "s");
         open.carry(step(1, 3), 1, "s");
         open.carry(step(1, 4), 2, "s");
         assert_eq!(open.holonomy(), None);
@@ -497,7 +498,8 @@ mod tests {
         assert!(open.is_rebase());
 
         // Closed and flat: around the loop and back to the identity.
-        let mut flat: Chain<u32, Step, &str> = Chain::founded(0, ChainEnd::Terminates("origin"), "s");
+        let mut flat: Chain<u32, Step, &str> =
+            Chain::founded(0, ChainEnd::Terminates("origin"), "s");
         flat.carry(step(1, 5), 1, "s");
         flat.carry(step(1, -5), 0, "s");
         assert_eq!(flat.holonomy(), Some(Additive::identity()));

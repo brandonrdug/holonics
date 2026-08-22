@@ -35,7 +35,6 @@
 //! depended on which end it was seeded from, which is a coordinate rather than an invariant.
 //! [`FoundedMouth::found`] carries every one of them out rather than collapsing them to `None`.
 
-
 use crate::exposure_codec::{
     carried, octets_of, recover, ExposedMaterial, ExposureApertures, ExposureObstruction,
     ExposureRefusal, Unit, UnitRole,
@@ -191,7 +190,10 @@ mod tests {
         let mouth = FoundedMouth::found(material, &read, apertures()).expect("the mouth founds");
         assert!(!mouth.alphabet.is_empty(), "an alphabet was recovered");
         assert!(!mouth.founded.is_empty(), "the founded reading segmented");
-        assert!(!mouth.authored.is_empty(), "the authored reading is retained");
+        assert!(
+            !mouth.authored.is_empty(),
+            "the authored reading is retained"
+        );
         assert!(
             mouth.refusals > 0,
             "with no minimal refusal there is no rule to have recovered"
@@ -223,7 +225,11 @@ mod tests {
     fn a_radius_below_adjacency_is_refused_by_the_exposure_and_carried_out() {
         let material: Vec<Vec<u8>> = vec![b"anything".to_vec()];
         assert!(matches!(
-            FoundedMouth::found(material, b"anything", ExposureApertures::declared(1, 1 << 12)),
+            FoundedMouth::found(
+                material,
+                b"anything",
+                ExposureApertures::declared(1, 1 << 12)
+            ),
             Err(FoundedMouthRefusal::Exposure(
                 ExposureRefusal::RadiusBelowAdjacency { radius: 1 }
             ))

@@ -547,7 +547,8 @@ pub fn separated_pair_population(one_shot: &Partition, conduct: &Partition) -> u
         let mut size = 0u128;
         for item in block {
             size += 1;
-            *sub.entry(index.block_of(*item).unwrap_or(usize::MAX)).or_default() += 1;
+            *sub.entry(index.block_of(*item).unwrap_or(usize::MAX))
+                .or_default() += 1;
         }
         let within: u128 = sub.values().map(|count| count * count).sum();
         total += (size * size - within) / 2;
@@ -592,63 +593,63 @@ pub fn exhibit_collapsed_within(
             if conduct_index.block_of(left) == conduct_index.block_of(right) {
                 continue;
             }
-        let mut seen = BTreeSet::from([(Some(left), Some(right))]);
-        let mut frontier = VecDeque::from([(Some(left), Some(right), Vec::<InputId>::new())]);
-        while let Some((here, there, word)) = frontier.pop_front() {
-            // A terminus reached by one and not the other is itself a distinction.
-            if here.is_some() != there.is_some() {
-                collapsed.push(CollapsedPair {
-                    left,
-                    right,
-                    distinguishing_word: word,
-                    witness: None,
-                    separated_by_terminus: true,
-                });
-                break;
-            }
-            // BOTH sides terminate on this input. That is not a distinction and it is not the end of
-            // the search — the rest of the frontier may still separate them on another input.
-            //
-            // This read `break` until 2026-08-07, which abandoned the whole search and made
-            // `is_exact()` return true while `refinement()` was nonzero: adding an input the system
-            // admits could make the reported loss go from one pair to zero. No fixture in this
-            // module could catch it, because none of them ever enqueues a both-terminate frontier
-            // entry — the cyclic counter is total, and `TwoRoutes` rests where it is rather than
-            // stopping.
-            let (Some(here_item), Some(there_item)) = (here, there) else {
-                continue;
-            };
-            if !word.is_empty()
-                && let Some(receiver) = receivers.iter().copied().find(|receiver| {
-                    system.observation(here_item, *receiver)
-                        != system.observation(there_item, *receiver)
-                })
-            {
-                collapsed.push(CollapsedPair {
-                    left,
-                    right,
-                    distinguishing_word: word,
-                    witness: Some((
-                        receiver,
-                        system.observation(here_item, receiver),
-                        system.observation(there_item, receiver),
-                    )),
-                    separated_by_terminus: false,
-                });
-                break;
-            }
-            for input in &inputs {
-                let next = (
-                    system.successor(here_item, *input),
-                    system.successor(there_item, *input),
-                );
-                if seen.insert(next) {
-                    let mut extended = word.clone();
-                    extended.push(*input);
-                    frontier.push_back((next.0, next.1, extended));
+            let mut seen = BTreeSet::from([(Some(left), Some(right))]);
+            let mut frontier = VecDeque::from([(Some(left), Some(right), Vec::<InputId>::new())]);
+            while let Some((here, there, word)) = frontier.pop_front() {
+                // A terminus reached by one and not the other is itself a distinction.
+                if here.is_some() != there.is_some() {
+                    collapsed.push(CollapsedPair {
+                        left,
+                        right,
+                        distinguishing_word: word,
+                        witness: None,
+                        separated_by_terminus: true,
+                    });
+                    break;
+                }
+                // BOTH sides terminate on this input. That is not a distinction and it is not the end of
+                // the search — the rest of the frontier may still separate them on another input.
+                //
+                // This read `break` until 2026-08-07, which abandoned the whole search and made
+                // `is_exact()` return true while `refinement()` was nonzero: adding an input the system
+                // admits could make the reported loss go from one pair to zero. No fixture in this
+                // module could catch it, because none of them ever enqueues a both-terminate frontier
+                // entry — the cyclic counter is total, and `TwoRoutes` rests where it is rather than
+                // stopping.
+                let (Some(here_item), Some(there_item)) = (here, there) else {
+                    continue;
+                };
+                if !word.is_empty()
+                    && let Some(receiver) = receivers.iter().copied().find(|receiver| {
+                        system.observation(here_item, *receiver)
+                            != system.observation(there_item, *receiver)
+                    })
+                {
+                    collapsed.push(CollapsedPair {
+                        left,
+                        right,
+                        distinguishing_word: word,
+                        witness: Some((
+                            receiver,
+                            system.observation(here_item, receiver),
+                            system.observation(there_item, receiver),
+                        )),
+                        separated_by_terminus: false,
+                    });
+                    break;
+                }
+                for input in &inputs {
+                    let next = (
+                        system.successor(here_item, *input),
+                        system.successor(there_item, *input),
+                    );
+                    if seen.insert(next) {
+                        let mut extended = word.clone();
+                        extended.push(*input);
+                        frontier.push_back((next.0, next.1, extended));
+                    }
                 }
             }
-        }
         }
     }
     collapsed
@@ -880,7 +881,10 @@ mod tests {
         );
         for pair in &beyond {
             assert!(!pair.distinguishing_word.is_empty());
-            assert!(pair.witness.is_some(), "a pair beyond the order names its receiver");
+            assert!(
+                pair.witness.is_some(),
+                "a pair beyond the order names its receiver"
+            );
         }
 
         // And the split at an intermediate order is a genuine partition of the
@@ -1221,7 +1225,10 @@ mod tests {
         assert_eq!(dense.conduct, sparse.conduct);
         assert_eq!(dense.rounds, sparse.rounds);
         assert_eq!(dense.collapsed, sparse.collapsed);
-        assert!(!dense.collapsed.is_empty(), "the fixture must lose something");
+        assert!(
+            !dense.collapsed.is_empty(),
+            "the fixture must lose something"
+        );
 
         let dense = compress(&BothStop);
         let sparse = compress(&SparseBothStop);

@@ -39,8 +39,10 @@ use std::fmt::Write as _;
 use num_traits::Zero;
 use relational_geometry::{Rat, format_rat};
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 use crate::certified_face::CertifiedFace;
+use crate::image::{ExactRaster, ExactRgb, ImageCarrierError, ImageExtent};
 
 /// A declared palette. Named roles, not authored meanings.
 ///
@@ -311,6 +313,136 @@ pub fn render(face: &CertifiedFace, chart: &CanvasChart, gauge: &DisplayGauge) -
     }
     let _ = writeln!(out, "</svg>");
     out
+}
+
+/// Rasterize the same placed marks as [`render`].  All mathematical decisions and exact chart
+/// coordinates already exist before this boundary; the integer line walk is only a display-codec
+/// projection and cannot re-enter the construction.
+pub fn rasterize(
+    face: &CertifiedFace,
+    chart: &CanvasChart,
+    gauge: &DisplayGauge,
+) -> Result<ExactRaster, PresentationRasterError> {
+    let extent = ImageExtent {
+        width: chart.width,
+        height: chart.height,
+    };
+    let ground = parse_colour(&gauge.ground)?;
+    let curve = parse_colour(&gauge.curve)?;
+    let feature = parse_colour(&gauge.feature)?;
+    let obstruction = parse_colour(&gauge.obstruction)?;
+    let rule = parse_colour(&gauge.rule)?;
+    let mut samples = vec![ground; extent.sample_count()?];
+    let marks = place(face, chart);
+    let stations = marks
+        .iter()
+        .filter(|mark| mark.role == "station")
+        .map(|mark| (octet_coordinate(&mark.x), octet_coordinate(&mark.y)))
+        .collect::<Vec<_>>();
+    for pair in stations.windows(2) {
+        draw_line(&mut samples, extent, pair[0], pair[1], curve);
+    }
+    for mark in &marks {
+        let colour = match mark.role.as_str() {
+            "feature" => feature,
+            "obstruction" => obstruction,
+            _ => rule,
+        };
+        let radius = if mark.role == "station" { 2 } else { 5 };
+        draw_disc(
+            &mut samples,
+            extent,
+            (octet_coordinate(&mark.x), octet_coordinate(&mark.y)),
+            radius,
+            colour,
+        );
+    }
+    ExactRaster::new(extent, samples).map_err(PresentationRasterError::from)
+}
+
+fn parse_colour(value: &str) -> Result<ExactRgb, PresentationRasterError> {
+    if value.len() != 7 || !value.starts_with('#') {
+        return Err(PresentationRasterError::Colour(value.to_owned()));
+    }
+    let channel = |range: std::ops::Range<usize>| {
+        u8::from_str_radix(&value[range], 16)
+            .map_err(|_| PresentationRasterError::Colour(value.to_owned()))
+    };
+    Ok(ExactRgb {
+        red: channel(1..3)?,
+        green: channel(3..5)?,
+        blue: channel(5..7)?,
+    })
+}
+
+fn draw_line(
+    samples: &mut [ExactRgb],
+    extent: ImageExtent,
+    (mut x0, mut y0): (i64, i64),
+    (x1, y1): (i64, i64),
+    colour: ExactRgb,
+) {
+    let dx = (x1 - x0).abs();
+    let sx = if x0 < x1 { 1 } else { -1 };
+    let dy = -(y1 - y0).abs();
+    let sy = if y0 < y1 { 1 } else { -1 };
+    let mut error = dx + dy;
+    loop {
+        set_sample(samples, extent, x0, y0, colour);
+        if x0 == x1 && y0 == y1 {
+            break;
+        }
+        let doubled = 2 * error;
+        if doubled >= dy {
+            error += dy;
+            x0 += sx;
+        }
+        if doubled <= dx {
+            error += dx;
+            y0 += sy;
+        }
+    }
+}
+
+fn draw_disc(
+    samples: &mut [ExactRgb],
+    extent: ImageExtent,
+    (x, y): (i64, i64),
+    radius: i64,
+    colour: ExactRgb,
+) {
+    for dy in -radius..=radius {
+        for dx in -radius..=radius {
+            if dx * dx + dy * dy <= radius * radius {
+                set_sample(samples, extent, x + dx, y + dy, colour);
+            }
+        }
+    }
+}
+
+fn set_sample(
+    samples: &mut [ExactRgb],
+    extent: ImageExtent,
+    column: i64,
+    row: i64,
+    colour: ExactRgb,
+) {
+    let (Ok(column), Ok(row)) = (u32::try_from(column), u32::try_from(row)) else {
+        return;
+    };
+    if column >= extent.width || row >= extent.height {
+        return;
+    }
+    let ordinal = row as usize * extent.width as usize + column as usize;
+    samples[ordinal] = colour;
+}
+
+#[derive(Clone, Debug, Error, PartialEq, Eq)]
+pub enum PresentationRasterError {
+    #[error("display gauge colour {0} is not a six-digit RGB face")]
+    Colour(String),
+    #[error(transparent)]
+    Image(#[from] ImageCarrierError),
 }
 
 /// The emitted document with every gauge-supplied value neutralised, and nothing else touched.

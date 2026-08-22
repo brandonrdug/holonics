@@ -56,9 +56,7 @@
 //! cargo run --release -p holonic-engine --example the_representative_moves_and_the_residue_does_not
 //! ```
 
-use holonic_engine::hermite_reduction::{
-    reduce, RationalFunction, ReductionSchedule,
-};
+use holonic_engine::hermite_reduction::{RationalFunction, ReductionSchedule, reduce};
 use holonic_engine::rational_polynomial::RationalPolynomial;
 use relational_geometry::exact::rat;
 
@@ -93,7 +91,11 @@ fn main() {
     ]);
     let numerator = polynomial(&[1, 2, 3]);
 
-    println!("  f = ({}) / ({})", numerator.written("x"), denominator.written("x"));
+    println!(
+        "  f = ({}) / ({})",
+        numerator.written("x"),
+        denominator.written("x")
+    );
     println!("  D = (x - 1)^2 (x + 1)^3");
     println!();
 
@@ -130,13 +132,23 @@ fn main() {
     println!();
     println!(
         "  the two schedules visited different states   {}",
-        if orbit_is_nontrivial { "YES" } else { "NO -- the gauge is vacuous on this material" }
+        if orbit_is_nontrivial {
+            "YES"
+        } else {
+            "NO -- the gauge is vacuous on this material"
+        }
     );
     if readings[0].states.len() != readings[1].states.len() {
         println!();
-        println!("  They did not even take the same NUMBER of steps. Descending (x+1)^3 to (x+1)^2");
-        println!("  brings it level with (x-1)^2, so the squarefree decomposition then returns their");
-        println!("  PRODUCT at multiplicity two and one step descends both. Descending (x-1)^2 first");
+        println!(
+            "  They did not even take the same NUMBER of steps. Descending (x+1)^3 to (x+1)^2"
+        );
+        println!(
+            "  brings it level with (x-1)^2, so the squarefree decomposition then returns their"
+        );
+        println!(
+            "  PRODUCT at multiplicity two and one step descends both. Descending (x-1)^2 first"
+        );
         println!("  never creates that coincidence.");
     }
 
@@ -148,17 +160,22 @@ fn main() {
         println!("  {:?}", reading.schedule);
         println!("      h  = {}", reading.exact_part.written("x"));
         println!("      g  = {}", reading.remaining.written("x"));
-        println!(
-            "      Res(z) = {}",
-            reading.residue_polynomial.written("z")
-        );
+        println!("      Res(z) = {}", reading.residue_polynomial.written("z"));
         println!(
             "      f = h' + g verified exactly                  {}",
-            if reading.returns_under_differentiation { "YES" } else { "NO" }
+            if reading.returns_under_differentiation {
+                "YES"
+            } else {
+                "NO"
+            }
         );
         println!(
             "      remaining denominator squarefree             {}",
-            if reading.remaining_denominator_is_squarefree { "YES" } else { "NO" }
+            if reading.remaining_denominator_is_squarefree {
+                "YES"
+            } else {
+                "NO"
+            }
         );
     }
 
@@ -254,14 +271,21 @@ fn main() {
     let control_moves = doubled.residue_polynomial != plain.residue_polynomial;
     println!(
         "  the non-coboundary moved the class              {}",
-        if control_moves { "YES" } else { "NO -- the invariant is insensitive and proves nothing" }
+        if control_moves {
+            "YES"
+        } else {
+            "NO -- the invariant is insensitive and proves nothing"
+        }
     );
 
     println!();
     println!("{}", "=".repeat(96));
     println!("WHAT RETURNED");
     println!("{}", "=".repeat(96));
-    println!("  schedules declared                             {}", ReductionSchedule::DECLARED.len());
+    println!(
+        "  schedules declared                             {}",
+        ReductionSchedule::DECLARED.len()
+    );
     println!("  gauge orbit non-trivial on this material       {orbit_is_nontrivial}");
     println!("  every h differentiated back exactly            {both_return}");
     println!("  residue polynomials agree across the gauge     {residues_agree}");
@@ -286,10 +310,14 @@ fn main() {
         && new_pole_holds
         && control_moves
     {
-        println!("HELD -- the gauge has a real orbit, every reduction differentiated back, and the");
+        println!(
+            "HELD -- the gauge has a real orbit, every reduction differentiated back, and the"
+        );
         println!("        residues survived every coboundary while a non-coboundary moved them.");
     } else {
-        println!("REFUTED -- orbit={orbit_is_nontrivial} return={both_return} agree={residues_agree} standing={standing_pole_holds} fresh={new_pole_holds} control={control_moves}");
+        println!(
+            "REFUTED -- orbit={orbit_is_nontrivial} return={both_return} agree={residues_agree} standing={standing_pole_holds} fresh={new_pole_holds} control={control_moves}"
+        );
         println!("{}", "=".repeat(96));
         std::process::exit(1);
     }

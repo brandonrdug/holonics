@@ -225,28 +225,27 @@ impl AthenaRest {
         .map_err(|_| refuse("the header is not UTF-8"))?;
         let payload = &octets[8 + header_len..];
         let metadata = read_metadata(header)?;
-        let region = |name: &str| -> Result<(usize, usize), CultivationRefusal> {
-            let key = format!("\"{name}\":");
-            let at = header
-                .find(&key)
-                .ok_or_else(|| CultivationRefusal::Container(format!("no {name}")))?;
-            let rest = &header[at + key.len()..];
-            let marker = "\"data_offsets\":[";
-            let start = rest
-                .find(marker)
-                .ok_or_else(|| CultivationRefusal::Container(format!("{name} has no offsets")))?
-                + marker.len();
-            let end = rest[start..]
-                .find(']')
-                .ok_or_else(|| CultivationRefusal::Container(format!("{name} offsets unclosed")))?
-                + start;
-            let mut parts = rest[start..end].split(',');
-            let read = |part: Option<&str>| -> Result<usize, CultivationRefusal> {
-                part.and_then(|value| value.trim().parse::<usize>().ok())
-                    .ok_or_else(|| CultivationRefusal::Container(format!("{name} offset")))
+        let region =
+            |name: &str| -> Result<(usize, usize), CultivationRefusal> {
+                let key = format!("\"{name}\":");
+                let at = header
+                    .find(&key)
+                    .ok_or_else(|| CultivationRefusal::Container(format!("no {name}")))?;
+                let rest = &header[at + key.len()..];
+                let marker = "\"data_offsets\":[";
+                let start = rest.find(marker).ok_or_else(|| {
+                    CultivationRefusal::Container(format!("{name} has no offsets"))
+                })? + marker.len();
+                let end = rest[start..].find(']').ok_or_else(|| {
+                    CultivationRefusal::Container(format!("{name} offsets unclosed"))
+                })? + start;
+                let mut parts = rest[start..end].split(',');
+                let read = |part: Option<&str>| -> Result<usize, CultivationRefusal> {
+                    part.and_then(|value| value.trim().parse::<usize>().ok())
+                        .ok_or_else(|| CultivationRefusal::Container(format!("{name} offset")))
+                };
+                Ok((read(parts.next())?, read(parts.next())?))
             };
-            Ok((read(parts.next())?, read(parts.next())?))
-        };
         let words = |name: &str| -> Result<Vec<u64>, CultivationRefusal> {
             let (start, end) = region(name)?;
             let slice = payload
@@ -275,8 +274,9 @@ impl AthenaRest {
                 .iter()
                 .map(|word| *word as u8)
                 .collect();
-            vocabulary
-                .push(String::from_utf8(bytes).map_err(|_| refuse("a vocabulary germ is not UTF-8"))?);
+            vocabulary.push(
+                String::from_utf8(bytes).map_err(|_| refuse("a vocabulary germ is not UTF-8"))?,
+            );
         }
         let architecture = words("athena.architecture")?;
         // The extent region is optional and its absence is a fact about the container rather than
@@ -308,7 +308,10 @@ impl AthenaRest {
             vocabulary_octets.extend(token.as_bytes().iter().map(|octet| u64::from(*octet)));
             vocabulary_offsets.push(vocabulary_octets.len() as u64);
         }
-        let emit = |name: &str, values: &[u64], dtype: IntegerDtype| -> Result<IntegerTensor, CultivationRefusal> {
+        let emit = |name: &str,
+                    values: &[u64],
+                    dtype: IntegerDtype|
+         -> Result<IntegerTensor, CultivationRefusal> {
             emit_integers(name, values, 1, dtype)
                 .map_err(|error| CultivationRefusal::Container(format!("{name}: {error:?}")))
         };
@@ -324,8 +327,16 @@ impl AthenaRest {
             tensors.push(emit(EXTENT_REGION, &self.extent, IntegerDtype::U32)?);
         }
         tensors.extend([
-            emit("athena.vocabulary.octets", &vocabulary_octets, IntegerDtype::U16)?,
-            emit("athena.vocabulary.offsets", &vocabulary_offsets, IntegerDtype::U32)?,
+            emit(
+                "athena.vocabulary.octets",
+                &vocabulary_octets,
+                IntegerDtype::U16,
+            )?,
+            emit(
+                "athena.vocabulary.offsets",
+                &vocabulary_offsets,
+                IntegerDtype::U32,
+            )?,
             emit(
                 "athena.architecture",
                 &[
@@ -801,11 +812,7 @@ impl DepositIncidence {
 /// species is carried by the residual and weighed by the declared metric, which is where a
 /// receiver's declaration enters and the only place it does.
 pub fn unit_covector(residual: &ExposureResidual) -> Vec<BigRational> {
-    residual
-        .positions
-        .iter()
-        .map(|_| rational(1, 1))
-        .collect()
+    residual.positions.iter().map(|_| rational(1, 1)).collect()
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1006,7 +1013,9 @@ pub fn derive(
                 // A split inherits the occupancy of the class it divides. Its own subtree is that
                 // class's subtree, so the carried part is exactly that class's standing before.
                 Some(origin) if standing_class(*origin) => predecessor.standing[*origin as usize],
-                Some(origin) => carried_of_split(*origin, &split_origin, predecessor, classes_before),
+                Some(origin) => {
+                    carried_of_split(*origin, &split_origin, predecessor, classes_before)
+                }
                 None => 0,
             }
         };
@@ -1464,6 +1473,259 @@ pub fn surfaces_of(path: &[ResonanceGerm]) -> Result<Vec<String>, CultivationRef
         .collect()
 }
 
+// -------------------------------------------------------------------------------------------
+// 6. interventions on a standing rest — the native arm's matched siblings
+// -------------------------------------------------------------------------------------------
+
+/// **An intervention enacted on a COPY of a standing rest, so the sibling is matched.**
+///
+/// # The composition attempt, stated before the owner
+///
+/// Three interventions on a native rest already stand and are composed rather than restated:
+/// [`withdraw`] is the delta ablation (a deletion inside the standing body), the cultivation itself
+/// is the pre-versus-post intervention, and clearing [`AthenaRest::extent`] before
+/// [`AthenaRest::write_container`] is the region withdrawal whose refusal
+/// [`crate::phoenix_rest::mount_atlas`] already names. On the resident side,
+/// `holonic_engine::resident_law`'s `WithdrawRows` and `PermuteColumns` are Station D's two
+/// intervention laws — but they act on a dense device section of BF16 words addressed by row and
+/// column, and this arm's material is a **sparse integer transport addressed by (class, germ)**.
+/// Neither law can name a germ family or a suffix-height band, and the sparse row is not a column
+/// span, so the genuinely absent relation is exactly this: **an intervention on the native sparse
+/// transport that leaves the container conductible and its arithmetic exact.**
+///
+/// Every variant is the *caller's* declaration, exactly as Station D typed its siblings: none of
+/// them is a law the rest declares, and an intervened rest carries
+/// [`INTERVENTION_KEY`] in its metadata so a later reader cannot mistake a sibling for a body.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RestIntervention {
+    /// Withdraw every transition carrying one germ index — the family withdrawal. The germ stays in
+    /// the vocabulary (so the walk can still *ask* for it), and every class that offered it now
+    /// refuses it, which is the difference between withdrawing a family and shrinking a codec.
+    WithdrawGermFamily { germ: u64 },
+    /// Withdraw every transition whose **target** class sits at a suffix-ladder height inside the
+    /// closed band — the scale intervention. The rest's own depth law is the only ladder here.
+    WithdrawHeightBand { low: u32, high: u32 },
+    /// Transpose two germ labels throughout the transport — the adjacency permutation. The
+    /// transition population, every row's length and the whole target multiset are unmoved; only
+    /// which germ reaches which continuation moves.
+    TransposeGermLabels { left: u64, right: u64 },
+}
+
+/// The metadata key an intervened copy carries. A sibling that did not say so would be a body.
+pub const INTERVENTION_KEY: &str = "intervention.declared";
+
+/// What one intervention did, plurally. Counts are here because a matched sibling must be shown to
+/// be matched, and the populations are the evidence for it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InterventionReceipt {
+    pub declaration: String,
+    pub transitions_before: usize,
+    pub transitions_after: usize,
+    /// The transitions the intervention removed, by `(class, germ index, target)` — the artifact,
+    /// bounded for exhibition by the caller and complete here.
+    pub withdrawn: Vec<(u32, u64, u32)>,
+    /// The transitions whose germ label moved, by `(class, germ before, germ after)`.
+    pub relabelled: Vec<(u32, u64, u64)>,
+    /// Classes whose transport row changed at all.
+    pub classes_touched: BTreeSet<u32>,
+    /// True when the transition population, every row length and the target multiset are unmoved —
+    /// which is what makes a permutation sibling matched rather than smaller.
+    pub population_preserved: bool,
+}
+
+/// Every class's suffix-ladder height, read off `athena.class.suffix` and nothing else.
+///
+/// The height of a class is the number of suffix links between it and the root of its link tree —
+/// the same ladder [`AthenaRest::ladder`] climbs, and the only depth receiver this arm has. A class
+/// the links cannot resolve within the population (which would be a link cycle, and the committed
+/// rests carry none) is left at [`u32::MAX`] rather than given a number nothing measured.
+pub fn class_heights(rest: &AthenaRest) -> Vec<u32> {
+    let classes = rest.classes();
+    let mut height = vec![u32::MAX; classes];
+    for class in 0..classes as u32 {
+        if height[class as usize] != u32::MAX {
+            continue;
+        }
+        let mut climb: Vec<u32> = Vec::new();
+        let mut at = class;
+        loop {
+            if height[at as usize] != u32::MAX {
+                break;
+            }
+            let parent = rest.suffix[at as usize] as u32;
+            if parent == at {
+                height[at as usize] = 0;
+                break;
+            }
+            climb.push(at);
+            at = parent;
+            if climb.len() > classes {
+                // The links did not resolve. Nothing here invents a height for them.
+                climb.clear();
+                break;
+            }
+        }
+        if climb.is_empty() {
+            continue;
+        }
+        let mut base = height[at as usize];
+        if base == u32::MAX {
+            continue;
+        }
+        for held in climb.iter().rev() {
+            base += 1;
+            height[*held as usize] = base;
+        }
+    }
+    height
+}
+
+/// **Enact one intervention on a copy.** The rest handed in is never touched.
+pub fn intervene(
+    rest: &AthenaRest,
+    intervention: &RestIntervention,
+) -> Result<(AthenaRest, InterventionReceipt), CultivationRefusal> {
+    let refuse = |why: String| CultivationRefusal::Container(why);
+    let vocabulary = rest.vocabulary.len() as u64;
+    let declaration = match intervention {
+        RestIntervention::WithdrawGermFamily { germ } => {
+            if *germ >= vocabulary {
+                return Err(refuse(format!(
+                    "germ {germ} is outside the vocabulary of {vocabulary}"
+                )));
+            }
+            format!(
+                "withdraw the germ family {germ} ({:?}) from every transport row",
+                rest.vocabulary[*germ as usize]
+            )
+        }
+        RestIntervention::WithdrawHeightBand { low, high } => {
+            if low > high {
+                return Err(refuse(format!(
+                    "the band {low}..{high} is empty by its own order"
+                )));
+            }
+            format!("withdraw every transition whose target sits at suffix height {low}..={high}")
+        }
+        RestIntervention::TransposeGermLabels { left, right } => {
+            if *left >= vocabulary || *right >= vocabulary {
+                return Err(refuse(format!(
+                    "the transposition ({left},{right}) leaves the vocabulary of {vocabulary}"
+                )));
+            }
+            if left == right {
+                return Err(refuse(
+                    "a transposition of a germ with itself moves nothing and is not a sibling"
+                        .to_owned(),
+                ));
+            }
+            format!(
+                "transpose the germ labels {left} ({:?}) and {right} ({:?}) throughout the transport",
+                rest.vocabulary[*left as usize], rest.vocabulary[*right as usize]
+            )
+        }
+    };
+
+    let heights = match intervention {
+        RestIntervention::WithdrawHeightBand { .. } => class_heights(rest),
+        _ => Vec::new(),
+    };
+
+    let mut indptr: Vec<u64> = Vec::with_capacity(rest.indptr.len());
+    let mut germ: Vec<u64> = Vec::with_capacity(rest.germ.len());
+    let mut target: Vec<u64> = Vec::with_capacity(rest.target.len());
+    let mut withdrawn: Vec<(u32, u64, u32)> = Vec::new();
+    let mut relabelled: Vec<(u32, u64, u64)> = Vec::new();
+    let mut classes_touched: BTreeSet<u32> = BTreeSet::new();
+    let mut rows_preserved = true;
+    indptr.push(0);
+    for class in 0..rest.classes() as u32 {
+        let start = rest.indptr[class as usize] as usize;
+        let end = rest.indptr[class as usize + 1] as usize;
+        let mut row: Vec<(u64, u64)> = Vec::with_capacity(end - start);
+        for slot in start..end {
+            let held = rest.germ[slot];
+            let reaches = rest.target[slot];
+            match intervention {
+                RestIntervention::WithdrawGermFamily { germ: family } => {
+                    if held == *family {
+                        withdrawn.push((class, held, reaches as u32));
+                        classes_touched.insert(class);
+                        continue;
+                    }
+                    row.push((held, reaches));
+                }
+                RestIntervention::WithdrawHeightBand { low, high } => {
+                    let at = heights[reaches as usize];
+                    if at >= *low && at <= *high {
+                        withdrawn.push((class, held, reaches as u32));
+                        classes_touched.insert(class);
+                        continue;
+                    }
+                    row.push((held, reaches));
+                }
+                RestIntervention::TransposeGermLabels { left, right } => {
+                    let moved = if held == *left {
+                        *right
+                    } else if held == *right {
+                        *left
+                    } else {
+                        held
+                    };
+                    if moved != held {
+                        relabelled.push((class, held, moved));
+                        classes_touched.insert(class);
+                    }
+                    row.push((moved, reaches));
+                }
+            }
+        }
+        // The card searches a row 32-ary by germ index, so a row that is not ascending is a row the
+        // rest's own walk law cannot read. Sorting here is the sibling meeting the standing law.
+        row.sort_by_key(|(held, _)| *held);
+        if row.len() != end - start {
+            rows_preserved = false;
+        }
+        for (held, reaches) in row {
+            germ.push(held);
+            target.push(reaches);
+        }
+        indptr.push(germ.len() as u64);
+    }
+
+    let population_preserved = rows_preserved && {
+        let mut before: Vec<u64> = rest.target.clone();
+        let mut after: Vec<u64> = target.clone();
+        before.sort_unstable();
+        after.sort_unstable();
+        before == after
+    };
+
+    let mut metadata = rest.metadata.clone();
+    metadata.insert(INTERVENTION_KEY.to_owned(), declaration.clone());
+    let sibling = AthenaRest {
+        indptr,
+        germ,
+        target,
+        standing: rest.standing.clone(),
+        suffix: rest.suffix.clone(),
+        extent: rest.extent.clone(),
+        vocabulary: rest.vocabulary.clone(),
+        height: rest.height,
+        metadata,
+    };
+    let receipt = InterventionReceipt {
+        declaration,
+        transitions_before: rest.transitions(),
+        transitions_after: sibling.transitions(),
+        withdrawn,
+        relabelled,
+        classes_touched,
+        population_preserved,
+    };
+    Ok((sibling, receipt))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1489,6 +1751,218 @@ mod tests {
         let mut metadata = BTreeMap::new();
         metadata.insert("schema".to_owned(), REST_SCHEMA.to_owned());
         metadata
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // the interventions on a standing rest — the native arm's matched siblings
+    // ---------------------------------------------------------------------------------------
+
+    fn intervention_fixture() -> AthenaRest {
+        let (atlas, _) = atlas_of(&[
+            "a chart is a receiver and the transport is a jacobian",
+            "the receiver declares the grain it reads at",
+            "a chart forgets a winding and the receiver keeps the turn",
+        ]);
+        emit_rest(&atlas, declarations()).expect("emitted")
+    }
+
+    fn germ_index(rest: &AthenaRest, surface: &str) -> u64 {
+        rest.vocabulary
+            .iter()
+            .position(|held| held == surface)
+            .expect("the surface is in the vocabulary") as u64
+    }
+
+    /// The height of a class is the length of its own ladder, and the two readings are one reading.
+    #[test]
+    fn the_class_heights_are_exactly_the_ladders_the_rest_climbs() {
+        let rest = intervention_fixture();
+        let heights = class_heights(&rest);
+        assert_eq!(heights.len(), rest.classes());
+        for class in 0..rest.classes() as u32 {
+            assert_eq!(
+                heights[class as usize],
+                rest.ladder(class).len() as u32 - 1,
+                "class {class}"
+            );
+        }
+        assert_eq!(heights[0], 0, "the root sits at height zero");
+    }
+
+    /// The family leaves the transport and nothing else does; the vocabulary is unmoved, so the
+    /// walk can still ask for the germ and every class now refuses it.
+    #[test]
+    fn the_germ_family_withdrawal_removes_that_family_and_only_that_family() {
+        let rest = intervention_fixture();
+        let germ = germ_index(&rest, "receiver");
+        let carried = (0..rest.classes() as u32)
+            .filter(|class| rest.reaches(*class, germ).is_some())
+            .count();
+        assert!(
+            carried > 0,
+            "the fixture must carry the family being withdrawn"
+        );
+
+        let (sibling, receipt) =
+            intervene(&rest, &RestIntervention::WithdrawGermFamily { germ }).expect("intervened");
+        assert_eq!(receipt.withdrawn.len(), carried);
+        assert_eq!(
+            receipt.transitions_after + carried,
+            receipt.transitions_before
+        );
+        assert!(
+            !receipt.population_preserved,
+            "a withdrawal is not a permutation"
+        );
+        assert_eq!(
+            sibling.vocabulary, rest.vocabulary,
+            "the codec does not shrink"
+        );
+        for class in 0..rest.classes() as u32 {
+            assert!(
+                sibling.reaches(class, germ).is_none(),
+                "class {class} still offers it"
+            );
+            for held in rest.offered(class) {
+                if *held != germ {
+                    assert_eq!(
+                        sibling.reaches(class, *held),
+                        rest.reaches(class, *held),
+                        "class {class} germ {held} moved and should not have"
+                    );
+                }
+            }
+        }
+        assert!(sibling
+            .metadata
+            .get(INTERVENTION_KEY)
+            .expect("the sibling declares itself")
+            .contains("withdraw the germ family"));
+    }
+
+    /// The band is read off the target's own height, so a transition survives exactly when its
+    /// target sits outside the band.
+    #[test]
+    fn the_height_band_withdrawal_removes_exactly_the_transitions_into_that_band() {
+        let rest = intervention_fixture();
+        let heights = class_heights(&rest);
+        let (sibling, receipt) = intervene(
+            &rest,
+            &RestIntervention::WithdrawHeightBand { low: 2, high: 2 },
+        )
+        .expect("intervened");
+        assert!(
+            !receipt.withdrawn.is_empty(),
+            "the fixture must carry transitions into height 2"
+        );
+        for (_, _, target) in &receipt.withdrawn {
+            assert_eq!(heights[*target as usize], 2);
+        }
+        for class in 0..rest.classes() as u32 {
+            for held in sibling.offered(class) {
+                let target = sibling
+                    .reaches(class, *held)
+                    .expect("a row it just offered");
+                assert_ne!(heights[target as usize], 2, "a banded target survived");
+            }
+        }
+        assert_eq!(
+            receipt.transitions_after + receipt.withdrawn.len(),
+            receipt.transitions_before
+        );
+    }
+
+    /// A transposition is matched: the transition population, every row length and the whole target
+    /// multiset are unmoved, and only which germ reaches which continuation moves.
+    #[test]
+    fn the_germ_transposition_preserves_the_population_and_moves_the_adjacency() {
+        let rest = intervention_fixture();
+        let left = germ_index(&rest, "receiver");
+        let right = germ_index(&rest, "chart");
+        let (sibling, receipt) = intervene(
+            &rest,
+            &RestIntervention::TransposeGermLabels { left, right },
+        )
+        .expect("intervened");
+        assert!(receipt.population_preserved);
+        assert_eq!(receipt.transitions_before, receipt.transitions_after);
+        assert!(receipt.withdrawn.is_empty());
+        assert!(!receipt.relabelled.is_empty());
+        assert_eq!(sibling.indptr, rest.indptr, "no row changed length");
+        for class in 0..rest.classes() as u32 {
+            assert_eq!(sibling.reaches(class, left), rest.reaches(class, right));
+            assert_eq!(sibling.reaches(class, right), rest.reaches(class, left));
+        }
+        // Every row is ascending by germ index, which is the standing walk law's own requirement.
+        for class in 0..sibling.classes() as u32 {
+            let row = sibling.offered(class);
+            assert!(
+                row.windows(2).all(|pair| pair[0] < pair[1]),
+                "class {class} is unsorted"
+            );
+        }
+        // An involution: transposing twice returns the transport itself.
+        let (back, _) = intervene(
+            &sibling,
+            &RestIntervention::TransposeGermLabels { left, right },
+        )
+        .expect("intervened");
+        assert_eq!(back.germ, rest.germ);
+        assert_eq!(back.target, rest.target);
+        assert_eq!(back.indptr, rest.indptr);
+    }
+
+    /// The refusals are typed, and each names what it refused.
+    #[test]
+    fn an_intervention_outside_the_material_refuses_by_name() {
+        let rest = intervention_fixture();
+        let vocabulary = rest.vocabulary.len() as u64;
+        assert!(intervene(
+            &rest,
+            &RestIntervention::WithdrawGermFamily { germ: vocabulary }
+        )
+        .is_err());
+        assert!(intervene(
+            &rest,
+            &RestIntervention::TransposeGermLabels { left: 0, right: 0 }
+        )
+        .is_err());
+        assert!(intervene(
+            &rest,
+            &RestIntervention::WithdrawHeightBand { low: 3, high: 1 }
+        )
+        .is_err());
+    }
+
+    /// **The withdrawal is visible at the conduct face, and unrelated conduct is bit-identical.**
+    #[test]
+    fn a_withdrawn_family_moves_the_conduct_that_reaches_it_and_leaves_the_rest_bit_identical() {
+        let rest = intervention_fixture();
+        let germ = germ_index(&rest, "grain");
+        let (sibling, _) =
+            intervene(&rest, &RestIntervention::WithdrawGermFamily { germ }).expect("intervened");
+        let probe = "the receiver declares the";
+        let tokens = lexical_tokens(probe);
+        let base = conduct(&rest, probe, &tokens);
+        let moved = conduct(&sibling, probe, &tokens);
+        assert_ne!(
+            base.face(),
+            moved.face(),
+            "the family was on this probe's ladder"
+        );
+        assert!(
+            base.offered
+                .iter()
+                .any(|(surface, _, _)| surface == "grain"),
+            "the base must offer the family being withdrawn"
+        );
+        assert!(
+            !moved
+                .offered
+                .iter()
+                .any(|(surface, _, _)| surface == "grain"),
+            "no class offers a withdrawn family"
+        );
     }
 
     /// **The whole law, end to end, on material small enough to read by hand.**
@@ -1618,9 +2092,7 @@ mod tests {
         let moved = under_identity
             .standing_increments
             .iter()
-            .filter(|(class, held)| {
-                under_perturbed.standing_increments.get(class) != Some(*held)
-            })
+            .filter(|(class, held)| under_perturbed.standing_increments.get(class) != Some(*held))
             .count();
         assert!(moved > 0, "the perturbation must move named classes");
     }
@@ -1758,7 +2230,11 @@ mod tests {
             &surfaces,
         )
         .expect("derived");
-        for row in delta.transitions_founded.iter().filter(|row| row.on_standing_class) {
+        for row in delta
+            .transitions_founded
+            .iter()
+            .filter(|row| row.on_standing_class)
+        {
             assert!(
                 predecessor
                     .vocabulary
@@ -1783,7 +2259,11 @@ mod tests {
         for extent in 1..=12usize {
             let consequence = vec![b'a'; extent];
             let complex = consequence_complex(&faces, &consequence).expect("complex");
-            population.push(derive_templates(&complex, 1 << 20).expect("templates").len());
+            population.push(
+                derive_templates(&complex, 1 << 20)
+                    .expect("templates")
+                    .len(),
+            );
         }
         assert_eq!(
             population,

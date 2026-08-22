@@ -39,8 +39,8 @@
 //!   cargo run --release -p life --example the_conditioned_language_body_seals_and_a_later_process_produces
 //! ```
 
-use std::collections::BTreeSet;
 use life::causal_language::lexical_tokens;
+use std::collections::BTreeSet;
 use std::path::PathBuf;
 
 use body::channel::LineageChannel;
@@ -165,7 +165,10 @@ fn respond(division: &JunctionDivision) {
     println!("    one-shot blocks    {}", division.one_shot_blocks);
     println!("    conduct blocks     {blocks}   <- THE RESPONSE POPULATION");
     println!("    refinement rounds  {}", division.rounds);
-    println!("    collapsed pairs    {}   (the division's exact loss, exhibited)", division.collapsed_population);
+    println!(
+        "    collapsed pairs    {}   (the division's exact loss, exhibited)",
+        division.collapsed_population
+    );
     println!("    memory order       {:?}", division.memory_order);
     if division.is_determinate() {
         println!("    DETERMINATE: one block. The junction determined the continuation for this");
@@ -191,28 +194,41 @@ fn respond(division: &JunctionDivision) {
             println!("        {surface:?}");
         }
         if block.surfaces.len() > 4 {
-            println!("        ... {} more surfaces in this block", block.surfaces.len() - 4);
+            println!(
+                "        ... {} more surfaces in this block",
+                block.surfaces.len() - 4
+            );
         }
     }
     println!("    ---- THE QUESTIONS the machine would ask ----");
     if division.questions.is_empty() {
         println!("      none: no pair of blocks was separated by a word, so nothing to ask.");
     }
-    println!("    separating readings returned: {}", division.questions.len());
+    println!(
+        "    separating readings returned: {}",
+        division.questions.len()
+    );
     for question in division.questions.iter().take(6) {
         println!(
             "      blocks {} / {} separate on word {:?}{}",
             question.left_block,
             question.right_block,
             question.word,
-            if question.separated_by_terminus { "  (one continues, one ends)" } else { "" }
+            if question.separated_by_terminus {
+                "  (one continues, one ends)"
+            } else {
+                ""
+            }
         );
         if let Some((receiver, left, right)) = &question.witness {
             println!("        seen by {receiver:?}: {left} against {right}");
         }
     }
     if division.questions.len() > 6 {
-        println!("      ... {} more separating words retained", division.questions.len() - 6);
+        println!(
+            "      ... {} more separating words retained",
+            division.questions.len() - 6
+        );
     }
 }
 
@@ -230,7 +246,10 @@ fn report(label: &str, generation: &life::causal_language::CausalLanguageGenerat
         );
     }
     println!("    peak front extent  {}", generation.peak_front_extent);
-    println!("    emitted population {}   <- THE FIBER, not the answer", generation.outputs.len());
+    println!(
+        "    emitted population {}   <- THE FIBER, not the answer",
+        generation.outputs.len()
+    );
     if generation.peak_front_extent == generation.outputs.len() && generation.outputs.len() > 1 {
         println!("    ** THE FRONT NEVER CLOSED: peak extent EQUALS emitted population, so every");
         println!("       branch tip survived to be emitted and no junction terminated a branch.");
@@ -242,7 +261,10 @@ fn report(label: &str, generation: &life::causal_language::CausalLanguageGenerat
         println!("      -> {:?}", text.text);
     }
     if generation.outputs.len() > 6 {
-        println!("      ... {} more, all retained", generation.outputs.len() - 6);
+        println!(
+            "      ... {} more, all retained",
+            generation.outputs.len() - 6
+        );
     }
     if generation.outputs.is_empty() {
         println!("      (nothing was emitted; the population is empty, not withheld)");
@@ -267,7 +289,11 @@ fn seal_and_dispatch() -> Result<(), String> {
     println!(
         "  material           {} passages, {total} octets, {} declared receivers",
         material.len(),
-        material.iter().map(|p| p.receiver).collect::<BTreeSet<_>>().len()
+        material
+            .iter()
+            .map(|p| p.receiver)
+            .collect::<BTreeSet<_>>()
+            .len()
     );
 
     let ecology = CausalLanguageEcology::condition(&material, current()?, 8)
@@ -347,9 +373,13 @@ fn seal_and_dispatch() -> Result<(), String> {
             previous = Some(division.conduct_blocks);
         }
         if transport.conduct_blocks == transport.candidate_population {
-            println!("    Grain 0 is an IDENTITY face on this population: every candidate lands in");
+            println!(
+                "    Grain 0 is an IDENTITY face on this population: every candidate lands in"
+            );
             println!("    its own transport class, so the material distinguishes all of them at");
-            println!("    this length. That is a reading about the material, not a vacuous check --");
+            println!(
+                "    this length. That is a reading about the material, not a vacuous check --"
+            );
             println!("    and it is exactly why a grain must be declared.");
         }
         before.push((prompt.to_string(), surfaces(&generation)));
@@ -429,15 +459,27 @@ fn seal_and_dispatch() -> Result<(), String> {
     println!("  A return that survives the deletion of the world's record never went through it.");
 
     println!("\nWHAT THIS ESTABLISHES");
-    println!("  A conditioned language body seals whole, crosses a process boundary as octets, and");
-    println!("  produces on the far side with no corpus present. That is an INSTANCE rather than a");
-    println!("  run: the next process continues from where this one stood instead of starting at an");
+    println!(
+        "  A conditioned language body seals whole, crosses a process boundary as octets, and"
+    );
+    println!(
+        "  produces on the far side with no corpus present. That is an INSTANCE rather than a"
+    );
+    println!(
+        "  run: the next process continues from where this one stood instead of starting at an"
+    );
     println!("  origin.");
     println!("\nWHAT IT DOES NOT ESTABLISH");
-    println!("  The resumed body was not CHANGED by anything on the far side and did not re-seal, so");
+    println!(
+        "  The resumed body was not CHANGED by anything on the far side and did not re-seal, so"
+    );
     println!("  this is resume-and-produce, not yet condition-again-and-deposit. The declared");
-    println!("  aperture is {GENERATED_TOKENS} tokens because the front branches super-exponentially;");
-    println!("  that cost is a real open finding and the bound is a receiver parameter, never a law.");
+    println!(
+        "  aperture is {GENERATED_TOKENS} tokens because the front branches super-exponentially;"
+    );
+    println!(
+        "  that cost is a real open finding and the bound is a receiver parameter, never a law."
+    );
     Ok(())
 }
 
@@ -480,10 +522,17 @@ fn ride(path: Option<PathBuf>) -> Result<(), String> {
             horizons.insert((token.token.clone(), token.matched_horizon));
         }
     }
-    println!("    produced  {} emissions, {} distinct surfaces", generation.outputs.len(), surfaces.len());
+    println!(
+        "    produced  {} emissions, {} distinct surfaces",
+        generation.outputs.len(),
+        surfaces.len()
+    );
     println!("    divided   {} response blocks", division.conduct_blocks);
     println!("    collapsed {} pairs", division.collapsed_population);
-    println!("    horizons  {} distinct (token, matched horizon) readings", horizons.len());
+    println!(
+        "    horizons  {} distinct (token, matched horizon) readings",
+        horizons.len()
+    );
     println!(
         "    ATTEST    surfaces={} blocks={} collapsed={} horizons={}",
         surfaces.len(),
@@ -564,10 +613,7 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
     ecology
         .absorb(&own, current()?, 8)
         .map_err(|error| format!("the body would not absorb its own production: {error:?}"))?;
-    println!(
-        "    absorbed {} octets of its own emission",
-        returned.len()
-    );
+    println!("    absorbed {} octets of its own emission", returned.len());
     println!(
         "    passages    {before_passages} -> {}",
         ecology.passage_population()
@@ -618,10 +664,15 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
     println!("\n  ★ DOES A LATER CURRENT RIDE THE CHANGE?");
     println!("  Two further processes, each given ONE rest path and nothing else: the body as it");
     println!("  stood before the return, and the body after it. Same prompt, same law. If the two");
-    println!("  productions are identical, the absorb changed nothing later current rides, and that");
+    println!(
+        "  productions are identical, the absorb changed nothing later current rides, and that"
+    );
     println!("  is the finding rather than a thing to hide.\n");
     let self_path = std::env::current_exe().map_err(|error| format!("current_exe: {error}"))?;
-    for (label, rest) in [("BEFORE the return", &path), ("AFTER the return", &changed_path)] {
+    for (label, rest) in [
+        ("BEFORE the return", &path),
+        ("AFTER the return", &changed_path),
+    ] {
         println!("  --- {label} ---");
         let status = std::process::Command::new(&self_path)
             .arg("--ride")
@@ -650,14 +701,18 @@ fn resume(path: Option<PathBuf>) -> Result<(), String> {
         .filter(|surface| !surface.trim().is_empty())
         .collect();
     if fabricated.is_empty() {
-        println!("    AS REQUIRED: {} member(s) returned and every surface is EMPTY. Material the",
-            control.outputs.len());
+        println!(
+            "    AS REQUIRED: {} member(s) returned and every surface is EMPTY. Material the",
+            control.outputs.len()
+        );
         println!("    body never received emits nothing rather than fabricating.");
         println!("    (0 sources were recruited, so nothing conducted -- the empty surface is the");
         println!("     population saying so, not a vanished population.)");
     } else {
-        println!("    THE CONTROL FIRED: {} non-empty surface(s) from words the corpus does not",
-            fabricated.len());
+        println!(
+            "    THE CONTROL FIRED: {} non-empty surface(s) from words the corpus does not",
+            fabricated.len()
+        );
         println!("    carry. That is a finding and it is reported rather than suppressed:");
         for surface in fabricated.iter().take(8) {
             println!("      -> {surface:?}");

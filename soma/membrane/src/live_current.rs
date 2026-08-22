@@ -242,7 +242,11 @@ pub(crate) fn observe_after_founder(receiver: &body::manifold::EventReceiver) {
 /// Read the pole's placement against the pair, once per formed contact. No verdict, no threshold —
 /// four disjoint tallies and one overlapping one, exactly as `ArrivalResponse` reports.
 #[inline]
-pub(crate) fn observe_pole_placement(receiver: &body::manifold::EventReceiver, from: Place, to: Place) {
+pub(crate) fn observe_pole_placement(
+    receiver: &body::manifold::EventReceiver,
+    from: Place,
+    to: Place,
+) {
     use core::sync::atomic::Ordering::Relaxed;
     let frame = receiver.channel.frame();
     if frame.sweep == body::place::origin() {

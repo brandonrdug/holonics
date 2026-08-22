@@ -360,28 +360,19 @@ mod tests {
     fn a_constant_width_medium_reads_steady_and_a_narrowing_neck_does_not() {
         // The nearest waiting chronology falls by two, then by two again: a medium of constant
         // width, and the front is approaching at a steady rate.
-        let steady = ApproachReading::across(
-            &front(&[(10, 1)]),
-            &front(&[(8, 1)]),
-            &front(&[(6, 1)]),
-        );
+        let steady =
+            ApproachReading::across(&front(&[(10, 1)]), &front(&[(8, 1)]), &front(&[(6, 1)]));
         assert_eq!(steady, ApproachReading::Steady);
 
         // Falls by two, then by five: the closing is accelerating, which is the neck narrowing —
         // and it is readable here, before anything has reached the neck.
-        let narrowing = ApproachReading::across(
-            &front(&[(10, 1)]),
-            &front(&[(8, 1)]),
-            &front(&[(3, 1)]),
-        );
+        let narrowing =
+            ApproachReading::across(&front(&[(10, 1)]), &front(&[(8, 1)]), &front(&[(3, 1)]));
         assert_eq!(narrowing, ApproachReading::Narrowing { by: 3 });
 
         // And the other arm must be able to fire, or the reading is one-sided.
-        let opening = ApproachReading::across(
-            &front(&[(10, 1)]),
-            &front(&[(5, 1)]),
-            &front(&[(4, 1)]),
-        );
+        let opening =
+            ApproachReading::across(&front(&[(10, 1)]), &front(&[(5, 1)]), &front(&[(4, 1)]));
         assert_eq!(opening, ApproachReading::Opening { by: 4 });
     }
 

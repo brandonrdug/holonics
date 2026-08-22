@@ -89,7 +89,7 @@ after a comparative audit. It lives at `archive/cpp-engine/` and nothing there i
 below that speak of headers, deeds, `ctest`, CUDA executors or `R{i}` chains describe that archived
 body and are **provenance**, not the present position.
 
-Read these **twelve**, in order, and nothing else by default. (It said "nine" over a table of ten from
+Read these **fourteen**, in order, and nothing else by default. (It said "nine" over a table of ten from
 2026-08-13, when the timeline was inserted without recounting — the same defect as the paragraph
 below that convicts itself for saying "seven" gates; it said "ten" over twelve from 2026-08-19 until
 the single-card plan and its audit were added the same day. **Count the rows; do not carry the
@@ -106,8 +106,10 @@ word.**)
 | `canon/THE_MEASURED_CAPABILITIES.md` | **not a trophy list — a list of things the machine has already been made to do, successfully, as partials.** It is evidence that the theories work when applied. Its use is to stop you asserting a wall, or treating a future implementation as harder than it is: the machine has been observed doing all of these trivially, in one codec or another. Read it before proposing construction. |
 | `canon/THE_TIMELINE.md` | **every day of this repository** — who ran it, what Brandon asked for, what returned, what was deposited, and the ten corrections he has had to issue more than once. It also serves the purpose above: it is the record of what has already been worked through, so it is not worked through again. |
 | `blueprint/THE_ROADMAP.md` | the single active roadmap. **The open work is stated by station** at the top; everything below that is the returned ledger and its provenance. Its 2026-08-19 section names the sole active plan, the next deed, and says that every later "active plan / present deed" phrase in the file is a dated ledger statement that schedules nothing. |
-| **`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`** | **the sole active integrated construction plan, 2026-08-19.** Three material arms (foreign Gemma rest, native Eros/Athena, raw mathematics) through one execution calculus; the vocabulary firewall; the five receipts (`FrontReceipt`, `TilingReceipt`, `ReductionReceipt`, `PressureReceipt`, `SurfaceUtilityReceipt`, `SurfaceTransitionReceipt`); the ordered deeds **H0–H5** (single-card foundation) → **P0–P5** (Phoenix resumes at native morphology) → **M0–M3** (mathematics codec); the deprecation law; the complete falsifier matrix. **No later deed begins while an earlier grade is open.** |
+| **`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`** | **the returned integrated construction plan, 2026-08-19, revised through 2026-08-21.** Three material arms through one execution calculus; H0–H5, W1–W5 and M0–M5 returned. It remains the complete evidence and mechanism contract beneath the Athena continuation. |
+| **`blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`** | **the active Athena-product continuation.** M6/Athena-A0 mounts `75597c4` while withholding `4776099`'s completed face proof, returns native and Phoenix mathematics siblings, and cultivates a held-out route. A1–A6 then order exact exchange world-tubes, sibling defect spectra, exchange cultivation, a second inherited organ, transport pushout/fusion, and the frozen/dissected Athena product. **No later deed begins while an earlier grade is open.** |
 | `research/records/2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md` | the audit and derivation that forced the pivot: three schedulers were being called one thing (causal fronts, CUDA graph realization, physical warp issue); the tower is still a CPU foreman at every source layer; the exact contraction is output-parallel and inner-serial; the launch rule proves legality not utility; graph permission is not measured overlap; the reduction is a typed junction carrying `T_a`, a fixed tree, widths and adjoints; pressure is a local covector population; utility is a product, not a percentage. |
+| `research/records/2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md` | the exact correction beneath M1 and M3: lineage is an addressed occurrence span, serial composition is a pullback, the relation shadow is lossy, passage equivalence preserves boundaries, dynamic compression commutes with every admitted generator, and finite sphere packing is an ordered reflection orbit. Its Lean owners are specifications; they do not advance the runtime deed. |
 | `CONSTRUCTION_STATE.md` | the position record. What is admitted, what survived the transition, what must be re-established. |
 
 **Additional required indexes and frames, begun 2026-08-10 because three false absences were
@@ -650,6 +652,18 @@ for every admitted <rho| and gamma.
 cannot do so: `2*2` has that value too, while addition has `Df=[1,1]`, `D^2f=0` and multiplication
 has `Dg=[b,a]` with a mixed second-order cross term. The shortest intervention which separates a
 collapsed pair is part of the return.
+
+**Lineage is richer than the relation shadow.** An elementary passage is the addressed span
+`X <- W_f -> Y`; its serial composite retains the pullback population `W_f ×_Y W_g` and the exact
+joining equality. The proposition that an endpoint pair is connected forgets the occurrence which
+carried it. A passage isomorphism is therefore a bijection of occurrence populations commuting with
+both boundary maps, not a common row, count, endpoint, digest, or bare bijection.
+
+**Compression must survive motion.** For every admitted source generator `T_i`, the proposed
+quotient must return a native generator `U_i` and prove `q T_i = U_i q`. Those local squares imply
+the law for every ordered successor word; finite replay does not. Present-receiver factorization,
+injectivity, a point count, or a choice-defined inverse is not an executable decoder. The decoder's
+image, domain, work, residency, transfer, and open fibres are part of the compression artifact.
 
 Self-similarity means restriction plus rebase preserves a receiver class while scale, phase, and
 lineage remain. Eigen-, Fourier-, and Mellin faces are read only after the material has founded a
@@ -1453,9 +1467,11 @@ warp-scheduler record in the reading table above. What governs conduct:
   admitted**. Their source testimony may be rederived after Deed H5; their execution shape —
   one-thread flat kernels, maximum-legal-block launch — is the convicted substrate and may not be
   extended. The ratchet is red on that cone by construction; no ledger re-seed is authorized.
-- **The order is H0 → H1 → H2 → H3 → H4 → H5, then P0 → P5, then M0 → M3, and no later deed begins
-  while an earlier grade is open.** H0 is a measurement of the *unchanged* scalar path with no
-  semantic code change. `CONSTRUCTION_STATE.md` moves only at P5.
+- **The admitted order is H0–H5 returned; P0 is the independent control; W1–W5 returned the
+  bounded source-shaped lift; M0–M5 passed; M6/Athena-A0 is current; A1–A6 remain ordered behind it.
+  No later deed begins while an earlier grade is open.** `CONSTRUCTION_STATE.md` moves only when the current
+  deed returns its named artifact and passes its complete grade. Exterior Lean work may sharpen the
+  contract but never advances M1 by itself.
 - **The hardware vocabulary firewall.** Warp scheduler, thread scheduler, stream, block, grid,
   Tensor Core, CPU, GPU, cache and PCIe are apparatus charts that never determine semantic
   topology; "layer" is foreign lineage or one depth receiver; "tensor parallelism" here means

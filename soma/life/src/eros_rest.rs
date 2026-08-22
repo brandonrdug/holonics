@@ -416,7 +416,11 @@ impl ResumedStanding {
 // The wire's own small carriers. Local rather than shared, matching every other rest in `life`.
 // -------------------------------------------------------------------------------------------------
 
-fn put_extent(octets: &mut Vec<u8>, extent: usize, at: &'static str) -> Result<(), ErosRestRefusal> {
+fn put_extent(
+    octets: &mut Vec<u8>,
+    extent: usize,
+    at: &'static str,
+) -> Result<(), ErosRestRefusal> {
     let extent = u64::try_from(extent).map_err(|_| ErosRestRefusal::WireExtentExceeded { at })?;
     octets.extend_from_slice(&extent.to_le_bytes());
     Ok(())
@@ -600,8 +604,15 @@ mod wire_tests {
         let standing = sealed.resume().expect("a sealed body resumes");
         assert_eq!(standing.carrier("own"), Some([11u32, 0, 13, 0].as_slice()));
         assert_eq!(standing.carrier("standing"), Some([0u32, 0, 7].as_slice()));
-        assert_eq!(standing.carrier("flywheel"), None, "an absent name is absent");
-        assert_eq!(standing.organ("derivation"), Some(b"an organ's own wire".as_slice()));
+        assert_eq!(
+            standing.carrier("flywheel"),
+            None,
+            "an absent name is absent"
+        );
+        assert_eq!(
+            standing.organ("derivation"),
+            Some(b"an organ's own wire".as_slice())
+        );
         assert_eq!(
             standing.channel, frame,
             "the frame a body left is the frame it resumes on"
@@ -646,7 +657,8 @@ mod wire_tests {
         let mut deposited = vec![0u32; cells()];
         let mut carrier = vec![0u32; 64 * ENCLOSURE_WORDS];
         {
-            let mut first = ErosBody::over(&bare, &mut deposited, AXIS, SEED, 1 << 20, &mut carrier);
+            let mut first =
+                ErosBody::over(&bare, &mut deposited, AXIS, SEED, 1 << 20, &mut carrier);
             for word in &material {
                 first.perceive(word, 100);
             }
@@ -676,7 +688,11 @@ mod wire_tests {
         let terrain = resumed
             .carrier("own")
             .expect("the deposited region crossed under its declared name");
-        assert_eq!(terrain, deposited.as_slice(), "the terrain crossed unchanged");
+        assert_eq!(
+            terrain,
+            deposited.as_slice(),
+            "the terrain crossed unchanged"
+        );
 
         // The same lane, read twice: over the terrain that crossed, and over bare standing.
         let read = |standing: &[u32]| -> Vec<bool> {
@@ -722,10 +738,15 @@ mod tests {
     /// disk is a lossy image and no reading through it is evidence.
     #[test]
     fn a_rest_remounts_to_the_same_bytes_or_it_is_a_lossy_image() {
-        let sealed = ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a"), organ("language", b"b")])
-            .expect("a genesis frame seals");
+        let sealed = ErosRest::seal(
+            genesis(),
+            Vec::new(),
+            vec![organ("derivation", b"a"), organ("language", b"b")],
+        )
+        .expect("a genesis frame seals");
         let mounted = sealed.mount().expect("a sealed frame mounts");
-        let resealed = ErosRest::seal(mounted, sealed.medium().to_vec(), sealed.organs().to_vec()).expect("it seals again");
+        let resealed = ErosRest::seal(mounted, sealed.medium().to_vec(), sealed.organs().to_vec())
+            .expect("it seals again");
         assert_eq!(sealed, resealed, "seal -> mount -> seal is byte-identical");
         assert!(
             sealed.frame_difference(&resealed).is_empty(),
@@ -738,10 +759,13 @@ mod tests {
     /// in fact whatever the doctrine says.
     #[test]
     fn conditioning_moves_the_frame_and_the_moved_words_are_exhibited() {
-        let before = ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
+        let before =
+            ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
         // one passage, exactly as a run performs it — no update rule, no loss, no step
-        let after_channel = genesis().fold_formed_hand_or_self(Cog::lit(1), Cog::lit(2), true, false);
-        let after = ErosRest::seal(after_channel, Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
+        let after_channel =
+            genesis().fold_formed_hand_or_self(Cog::lit(1), Cog::lit(2), true, false);
+        let after = ErosRest::seal(after_channel, Vec::new(), vec![organ("derivation", b"a")])
+            .expect("seals");
 
         let moved = before.frame_difference(&after);
         assert!(
@@ -755,7 +779,8 @@ mod tests {
 
         // AND THE NEGATIVE ARM, which is what makes the control a control: a rest sealed twice from
         // the SAME frame must show no movement at all.
-        let twin = ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
+        let twin =
+            ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
         assert!(
             before.frame_difference(&twin).is_empty(),
             "an unmoved body must report an unmoved frame, or the control would pass on anything"
@@ -765,7 +790,8 @@ mod tests {
     /// An organ that changed is named, and one that appeared is a change rather than a gap.
     #[test]
     fn organ_movement_is_named_and_an_appearing_organ_counts_as_movement() {
-        let before = ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
+        let before =
+            ErosRest::seal(genesis(), Vec::new(), vec![organ("derivation", b"a")]).expect("seals");
         let after = ErosRest::seal(
             genesis(),
             Vec::new(),
@@ -775,14 +801,21 @@ mod tests {
         let mut moved = before.organ_difference(&after);
         moved.sort();
         assert_eq!(moved, vec!["derivation".to_owned(), "language".to_owned()]);
-        assert!(before.frame_difference(&after).is_empty(), "the frame did not move");
+        assert!(
+            before.frame_difference(&after).is_empty(),
+            "the frame did not move"
+        );
     }
 
     /// The structural refusals fire before any octet is composed.
     #[test]
     fn a_repeated_organ_name_and_an_empty_organ_block_are_both_refused() {
         assert_eq!(
-            ErosRest::seal(genesis(), Vec::new(), vec![organ("d", b"a"), organ("d", b"b")]),
+            ErosRest::seal(
+                genesis(),
+                Vec::new(),
+                vec![organ("d", b"a"), organ("d", b"b")]
+            ),
             Err(ErosRestRefusal::OrganNameRepeated { organ: "d".into() })
         );
         assert_eq!(

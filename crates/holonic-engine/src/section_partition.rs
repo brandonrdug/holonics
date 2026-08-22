@@ -61,7 +61,7 @@ use crate::hardware_cover::{
     ChartId, CoverBarrier, CoverDecomposition, FrontCell, HardwareCover, ModeIdentity, SectionWork,
 };
 use crate::interchange::{
-    certify_footprints, DistinguishingWord, FrontCertificate, MemberFootprint,
+    DistinguishingWord, FrontCertificate, MemberFootprint, certify_footprints,
 };
 use crate::receiver_current::{
     ExactReceiverCurrentLaw, ExactReceiverCurrentPassage, ReceiverCurrentPassageId,
@@ -178,7 +178,10 @@ impl SectionRegion {
     }
 
     pub fn contains(&self, row: usize, column: usize) -> bool {
-        row >= self.row_from && row < self.row_to && column >= self.column_from && column < self.column_to
+        row >= self.row_from
+            && row < self.row_to
+            && column >= self.column_from
+            && column < self.column_to
     }
 
     /// The half-open address ranges this region occupies in a row-major body of the given stride,
@@ -196,7 +199,10 @@ impl SectionRegion {
         (self.row_from..self.row_to)
             .map(|row| {
                 let start = base + row as u64 * stride;
-                (start + self.column_from as u64, start + self.column_to as u64)
+                (
+                    start + self.column_from as u64,
+                    start + self.column_to as u64,
+                )
             })
             .collect()
     }
@@ -466,7 +472,10 @@ impl std::fmt::Display for PartitionDefect {
                 write!(formatter, "no cell and no junction writes {region}")
             }
             PartitionDefect::RepeatedCellIndex { cell } => {
-                write!(formatter, "the partition declares cell {cell} more than once")
+                write!(
+                    formatter,
+                    "the partition declares cell {cell} more than once"
+                )
             }
             PartitionDefect::UnknownJunction { cell, junction } => write!(
                 formatter,
@@ -528,10 +537,7 @@ impl std::fmt::Display for PartitionDefect {
             ),
             PartitionDefect::Cover { barrier } => write!(formatter, "{barrier}"),
             PartitionDefect::FootprintRefused { because, region } => match region {
-                Some(region) => write!(
-                    formatter,
-                    "the front is ordered at {region}: {because:?}"
-                ),
+                Some(region) => write!(formatter, "the front is ordered at {region}: {because:?}"),
                 None => write!(formatter, "the front is ordered: {because:?}"),
             },
             PartitionDefect::ServiceRoundsDisagree {
@@ -545,7 +551,10 @@ impl std::fmt::Display for PartitionDefect {
                  the stated ceiling {stated}"
             ),
             PartitionDefect::DegenerateSpecies { species } => {
-                write!(formatter, "species {species} declares a zero capacity or unit")
+                write!(
+                    formatter,
+                    "species {species} declares a zero capacity or unit"
+                )
             }
         }
     }
@@ -814,7 +823,10 @@ impl SectionPartition {
 
         // ---- structural declarations: index, junction, population --------------------------------
         for (at, cell) in self.cells.iter().enumerate() {
-            if self.cells[..at].iter().any(|earlier| earlier.index == cell.index) {
+            if self.cells[..at]
+                .iter()
+                .any(|earlier| earlier.index == cell.index)
+            {
                 defects.push(PartitionDefect::RepeatedCellIndex { cell: cell.index });
             }
             // `SectionRegion::new` refuses a degenerate region, and its fields are public, so a
@@ -1090,7 +1102,10 @@ impl SectionPartition {
 
     /// The regions that must cover the section: every cell that owns its output, plus every
     /// junction's output. A partial's write is *not* a covering region — the junction's output is.
-    fn covering_regions(&self, junctions: &[JunctionOutput]) -> Vec<(CoveringOwner, SectionRegion)> {
+    fn covering_regions(
+        &self,
+        junctions: &[JunctionOutput],
+    ) -> Vec<(CoveringOwner, SectionRegion)> {
         let mut covering: Vec<(CoveringOwner, SectionRegion)> = self
             .cells
             .iter()
@@ -1240,8 +1255,7 @@ impl SectionPartition {
         }
         for base in candidates {
             if *address >= base && *address < base + section_extent {
-                let (row, column) =
-                    SectionRegion::coordinate_of(*address, self.shape.width, base)?;
+                let (row, column) = SectionRegion::coordinate_of(*address, self.shape.width, base)?;
                 return SectionRegion::new(row, row + 1, column, column + 1).ok();
             }
         }
@@ -1638,10 +1652,11 @@ mod tests {
         let defects = perturbed
             .certify(&cover, &[], &resources(), "section_partition_control")
             .expect_err("a read of another cell's write is not independent");
-        assert!(defects.iter().any(|defect| matches!(
-            defect,
-            PartitionDefect::FootprintRefused { .. }
-        )));
+        assert!(
+            defects
+                .iter()
+                .any(|defect| matches!(defect, PartitionDefect::FootprintRefused { .. }))
+        );
     }
 
     // ---------------------------------------------------------------------------------------
@@ -1901,11 +1916,7 @@ mod tests {
             .expect("certifies");
         assert_eq!(receipt.pressure.len(), 2);
         for cell in &receipt.pressure {
-            let names: Vec<&str> = cell
-                .coordinates()
-                .iter()
-                .map(|(name, _)| *name)
-                .collect();
+            let names: Vec<&str> = cell.coordinates().iter().map(|(name, _)| *name).collect();
             // Exactly the declared species, in the declared order, and nothing else. No `total`,
             // no `combined`, no scalar.
             assert_eq!(names, vec!["resident-lanes", "map-traffic"]);
@@ -1987,8 +1998,15 @@ mod tests {
             .expect("certifies");
         let rendered = format!("{:?}", receipt.pressure[0]);
         for forbidden in [
-            "total", "sum", "combined", "utilization", "utilisation", "overall", "aggregate",
-            "score", "pressure:",
+            "total",
+            "sum",
+            "combined",
+            "utilization",
+            "utilisation",
+            "overall",
+            "aggregate",
+            "score",
+            "pressure:",
         ] {
             assert!(
                 !rendered.to_lowercase().contains(forbidden),
@@ -2043,9 +2061,11 @@ mod tests {
         let defects = partition(cells)
             .certify(&cover, &[], &resources(), "section_partition_control")
             .expect_err("a zero-extent cell is refused");
-        assert!(defects
-            .iter()
-            .any(|defect| matches!(defect, PartitionDefect::EmptyRegion { .. })));
+        assert!(
+            defects
+                .iter()
+                .any(|defect| matches!(defect, PartitionDefect::EmptyRegion { .. }))
+        );
 
         let empty = SectionPartition {
             lineage: lineage(),
@@ -2055,9 +2075,11 @@ mod tests {
         }
         .certify(&cover, &[], &resources(), "section_partition_control")
         .expect_err("a partition of nothing is not a partition");
-        assert!(empty
-            .iter()
-            .any(|defect| matches!(defect, PartitionDefect::EmptySection { .. })));
+        assert!(
+            empty
+                .iter()
+                .any(|defect| matches!(defect, PartitionDefect::EmptySection { .. }))
+        );
     }
 
     /// A junction covers by computation, never by declaration.
@@ -2099,10 +2121,11 @@ mod tests {
                 "section_partition_control",
             )
             .expect_err("the partials do not cover the output");
-        assert!(defects.iter().any(|defect| matches!(
-            defect,
-            PartitionDefect::JunctionOutputUncovered { .. }
-        )));
+        assert!(
+            defects
+                .iter()
+                .any(|defect| matches!(defect, PartitionDefect::JunctionOutputUncovered { .. }))
+        );
 
         // And a junction output outside the section refuses the way a foreign cell does.
         let foreign = JunctionOutput {
@@ -2126,10 +2149,12 @@ mod tests {
             "section_partition_control",
         )
         .expect_err("a foreign junction output refuses");
-        assert!(defects.iter().any(|defect| matches!(
-            defect,
-            PartitionDefect::JunctionOutputOutsideSection { .. }
-        )));
+        assert!(
+            defects.iter().any(|defect| matches!(
+                defect,
+                PartitionDefect::JunctionOutputOutsideSection { .. }
+            ))
+        );
     }
 
     // ---------------------------------------------------------------------------------------
@@ -2139,10 +2164,7 @@ mod tests {
     #[test]
     fn the_uncovered_sweep_returns_one_region_for_one_missing_tile() {
         let shape = SectionShape::of(4, 4, 0);
-        let covering = vec![
-            region(0, 2, 0, 4),
-            region(2, 4, 0, 2),
-        ];
+        let covering = vec![region(0, 2, 0, 4), region(2, 4, 0, 2)];
         let uncovered = uncovered_regions(&shape, &covering);
         assert_eq!(uncovered, vec![region(2, 4, 2, 4)]);
     }

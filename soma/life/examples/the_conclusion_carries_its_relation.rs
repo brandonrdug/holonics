@@ -141,8 +141,16 @@ fn main() {
         println!(
             "  {:44} predicted {:14}  kernel {:14}  {}",
             organ.name,
-            if organ.rewritable() { "rewritable" } else { "not rewritable" },
-            if refused_as_relation { "not rewritable" } else { "rewritable" },
+            if organ.rewritable() {
+                "rewritable"
+            } else {
+                "not rewritable"
+            },
+            if refused_as_relation {
+                "not rewritable"
+            } else {
+                "rewritable"
+            },
             if agrees { "agrees" } else { "DISAGREES" }
         );
         if !agrees {
@@ -205,9 +213,7 @@ fn main() {
                 Ok(one) => {
                     for organ in one.declarations() {
                         total += 1;
-                        *census
-                            .entry(organ.relation_label().to_owned())
-                            .or_insert(0) += 1;
+                        *census.entry(organ.relation_label().to_owned()).or_insert(0) += 1;
                         if organ.rewritable() {
                             rewritable += 1;
                         }
@@ -225,25 +231,27 @@ fn main() {
             println!("      refused {path}");
         }
         {
-                let mut rows: Vec<(&String, &usize)> = census.iter().collect();
-                rows.sort_by(|left, right| right.1.cmp(left.1));
-                println!("  declarations opened {total}");
-                for (relation, count) in rows {
-                    let label = if relation == "?" {
-                        "?  — no single depth-zero relation, UNCLASSIFIED"
-                    } else {
-                        relation.as_str()
-                    };
-                    println!("    {label:48} {count:>8}");
-                }
-                println!("\n  rewritable — the population `rw` may be offered for: {rewritable} of {total}");
-                println!(
-                    "  The UNCLASSIFIED population is the honest half of this reading: the reader"
-                );
-                println!(
-                    "  does not guess a principal connective it cannot see, and it is counted rather"
-                );
-                println!("  than defaulted into either arm.");
+            let mut rows: Vec<(&String, &usize)> = census.iter().collect();
+            rows.sort_by(|left, right| right.1.cmp(left.1));
+            println!("  declarations opened {total}");
+            for (relation, count) in rows {
+                let label = if relation == "?" {
+                    "?  — no single depth-zero relation, UNCLASSIFIED"
+                } else {
+                    relation.as_str()
+                };
+                println!("    {label:48} {count:>8}");
+            }
+            println!(
+                "\n  rewritable — the population `rw` may be offered for: {rewritable} of {total}"
+            );
+            println!(
+                "  The UNCLASSIFIED population is the honest half of this reading: the reader"
+            );
+            println!(
+                "  does not guess a principal connective it cannot see, and it is counted rather"
+            );
+            println!("  than defaulted into either arm.");
             failures.require(
                 total > 0 && census.contains_key("="),
                 "the library census returns a population and an equality species within it",

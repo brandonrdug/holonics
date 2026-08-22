@@ -40,23 +40,28 @@
 //!     [--root /home/b/models/gemma-4-E4B-it] [--out output/the_source_is_admitted_whole] [--chunk-mib 32]
 //! ```
 
+#[path = "phoenix/modality.rs"]
+mod modality;
 #[path = "phoenix/resident_layer.rs"]
 mod resident_layer;
 #[path = "phoenix/tower.rs"]
 mod tower;
-#[path = "phoenix/modality.rs"]
-mod modality;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::time::Instant;
 
 use holonic_engine::exact_json;
-use holonic_engine::foreign_map::{manifest_safetensors, AdmissionClass, FileIdentity, StreamedCensus};
+use holonic_engine::foreign_map::{
+    AdmissionClass, FileIdentity, StreamedCensus, manifest_safetensors,
+};
 use holonic_engine::front_passage::{CompileRefusal, FrontPassageObstruction};
 use holonic_engine::ported_operation::SourceTestimony;
 use holonic_engine::resident_section::{Dyadic, SeriesAperture};
-use holonic_engine::source_occurrence::{AssetDeclaration, AuthenticatedContainer, AuthenticatedText, RegionIdentity, SourceOccurrence, SourceRefusal};
+use holonic_engine::source_occurrence::{
+    AssetDeclaration, AuthenticatedContainer, AuthenticatedText, RegionIdentity, SourceOccurrence,
+    SourceRefusal,
+};
 use sha2::{Digest, Sha256};
 use tower::{Entry, KvRole, Species};
 
@@ -67,13 +72,24 @@ struct Args {
 }
 
 fn parse_args() -> Args {
-    let mut args = Args { root: "/home/b/models/gemma-4-E4B-it".to_owned(), out: "output/the_source_is_admitted_whole".to_owned(), chunk_octets: 32 << 20 };
+    let mut args = Args {
+        root: "/home/b/models/gemma-4-E4B-it".to_owned(),
+        out: "output/the_source_is_admitted_whole".to_owned(),
+        chunk_octets: 32 << 20,
+    };
     let mut it = std::env::args().skip(1);
     while let Some(flag) = it.next() {
         match flag.as_str() {
             "--root" => args.root = it.next().expect("--root <dir>"),
             "--out" => args.out = it.next().expect("--out <dir>"),
-            "--chunk-mib" => args.chunk_octets = it.next().expect("--chunk-mib N").parse::<usize>().expect("usize") << 20,
+            "--chunk-mib" => {
+                args.chunk_octets = it
+                    .next()
+                    .expect("--chunk-mib N")
+                    .parse::<usize>()
+                    .expect("usize")
+                    << 20
+            }
             other => panic!("unknown argument {other}"),
         }
     }
@@ -91,7 +107,10 @@ impl Verdicts {
         if !pass {
             self.failed += 1;
         }
-        let line = format!("  [{number:>2}] {verdict}  {name}\n        {}", detail.as_ref());
+        let line = format!(
+            "  [{number:>2}] {verdict}  {name}\n        {}",
+            detail.as_ref()
+        );
         println!("{line}");
         self.lines.push(line);
     }
@@ -148,8 +167,14 @@ fn main() {
     let args = parse_args();
     let clock = Instant::now();
     std::fs::create_dir_all(&args.out).expect("output directory");
-    let mut verdicts = Verdicts { lines: Vec::new(), failed: 0 };
-    println!("THE SOURCE IS ADMITTED WHOLE AND THE POTENTIAL ATLAS COVERS THE TOWER — {}", args.root);
+    let mut verdicts = Verdicts {
+        lines: Vec::new(),
+        failed: 0,
+    };
+    println!(
+        "THE SOURCE IS ADMITTED WHOLE AND THE POTENTIAL ATLAS COVERS THE TOWER — {}",
+        args.root
+    );
 
     // ------------------------------------------------------------------------------------------
     // 1. the complete manifest: one streamed pass
@@ -163,8 +188,14 @@ fn main() {
         }
     };
     let identity_at_open = FileIdentity::of(&file, &address).expect("identity");
-    println!("  container manifested: {} tensors · {} refused · file {} octets · payload {} octets · overlaps {}",
-        container.tensors.len(), container.refused.len(), container.file_octets, container.payload_octets, container.overlaps().len());
+    println!(
+        "  container manifested: {} tensors · {} refused · file {} octets · payload {} octets · overlaps {}",
+        container.tensors.len(),
+        container.refused.len(),
+        container.file_octets,
+        container.payload_octets,
+        container.overlaps().len()
+    );
     let pass_clock = Instant::now();
     let census: StreamedCensus = match container.streamed_census(&mut file, args.chunk_octets) {
         Ok(census) => census,
@@ -176,9 +207,25 @@ fn main() {
     let pass_wall = pass_clock.elapsed();
     let admission_census = census.admission_census();
     let rank_census = census.rank_census();
-    println!("  streamed census in {:.1} s: {} regions · content sha256 {} · header sha256 {} · uncovered payload octets {} · chunk {} octets · peak resident {} octets · octets hashed {} · codewords decoded {}",
-        pass_wall.as_secs_f64(), census.regions.len(), &census.content_sha256[..16], &census.header_sha256[..16], census.uncovered_payload_octets, census.chunk_octets, census.peak_resident_octets, census.octets_hashed, census.codewords_decoded);
-    println!("  admission census: {:?}", admission_census.iter().map(|(k, v)| (k.name(), *v)).collect::<Vec<_>>());
+    println!(
+        "  streamed census in {:.1} s: {} regions · content sha256 {} · header sha256 {} · uncovered payload octets {} · chunk {} octets · peak resident {} octets · octets hashed {} · codewords decoded {}",
+        pass_wall.as_secs_f64(),
+        census.regions.len(),
+        &census.content_sha256[..16],
+        &census.header_sha256[..16],
+        census.uncovered_payload_octets,
+        census.chunk_octets,
+        census.peak_resident_octets,
+        census.octets_hashed,
+        census.codewords_decoded
+    );
+    println!(
+        "  admission census: {:?}",
+        admission_census
+            .iter()
+            .map(|(k, v)| (k.name(), *v))
+            .collect::<Vec<_>>()
+    );
     println!("  rank census (rank: count, octets): {:?}", rank_census);
     let identity_after_pass = FileIdentity::at(&address).expect("identity");
 
@@ -186,7 +233,11 @@ fn main() {
     // 2. assets and ports
     // ------------------------------------------------------------------------------------------
     let mut assets: Vec<AssetDeclaration> = Vec::new();
-    let mut entries: Vec<String> = std::fs::read_dir(&args.root).expect("root").filter_map(|e| e.ok()).map(|e| e.file_name().to_string_lossy().to_string()).collect();
+    let mut entries: Vec<String> = std::fs::read_dir(&args.root)
+        .expect("root")
+        .filter_map(|e| e.ok())
+        .map(|e| e.file_name().to_string_lossy().to_string())
+        .collect();
     entries.sort();
     for name in &entries {
         if name == "model.safetensors" {
@@ -203,16 +254,38 @@ fn main() {
             "README.md" => "authoritative description",
             _ => "other sibling file",
         };
-        let sha256 = std::fs::read(&path).ok().map(|bytes| Sha256::digest(&bytes).iter().map(|b| format!("{b:02x}")).collect::<String>());
+        let sha256 = std::fs::read(&path).ok().map(|bytes| {
+            Sha256::digest(&bytes)
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect::<String>()
+        });
         // This deed reads the configuration and the container; every other asset is declared unused.
-        assets.push(AssetDeclaration { role: role.to_owned(), locator: path, sha256, used: name == "config.json" });
+        assets.push(AssetDeclaration {
+            role: role.to_owned(),
+            locator: path,
+            sha256,
+            used: name == "config.json",
+        });
     }
-    println!("  assets: {} sibling files hashed, {} declared used by this deed", assets.len(), assets.iter().filter(|a| a.used).count());
+    println!(
+        "  assets: {} sibling files hashed, {} declared used by this deed",
+        assets.len(),
+        assets.iter().filter(|a| a.used).count()
+    );
 
-    let configuration_text = std::fs::read_to_string(format!("{}/config.json", args.root)).expect("config");
+    let configuration_text =
+        std::fs::read_to_string(format!("{}/config.json", args.root)).expect("config");
     let top = exact_json::top_level_pairs(&configuration_text).unwrap_or_default();
-    let scope = |name: &str| -> Option<String> { top.iter().find(|(k, _)| k == name).map(|(_, v)| (*v).to_owned()) };
-    let field_of = |object: &str, key: &str| -> Option<String> { exact_json::field(object, key).map(|span| exact_json::as_string(span).unwrap_or_else(|| span.trim().to_owned())) };
+    let scope = |name: &str| -> Option<String> {
+        top.iter()
+            .find(|(k, _)| k == name)
+            .map(|(_, v)| (*v).to_owned())
+    };
+    let field_of = |object: &str, key: &str| -> Option<String> {
+        exact_json::field(object, key)
+            .map(|span| exact_json::as_string(span).unwrap_or_else(|| span.trim().to_owned()))
+    };
     let text_config = scope("text_config").unwrap_or_default();
     let vision_config = scope("vision_config").unwrap_or_default();
     let audio_config = scope("audio_config").unwrap_or_default();
@@ -234,9 +307,26 @@ fn main() {
     let regions: BTreeMap<String, RegionIdentity> = census
         .regions
         .iter()
-        .map(|r| (r.name.clone(), RegionIdentity { population: r.name.clone(), dtype: format!("{:?}", r.dtype), shape: r.shape.clone(), start: r.start, end: r.end, sha256: Some(r.sha256.clone()) }))
+        .map(|r| {
+            (
+                r.name.clone(),
+                RegionIdentity {
+                    population: r.name.clone(),
+                    dtype: format!("{:?}", r.dtype),
+                    shape: r.shape.clone(),
+                    start: r.start,
+                    end: r.end,
+                    sha256: Some(r.sha256.clone()),
+                },
+            )
+        })
         .collect();
-    let mut occurrence = resident_layer::source_occurrence(&args.root, regions.clone(), Some(census.content_sha256.clone())).unwrap_or_else(|error| {
+    let mut occurrence = resident_layer::source_occurrence(
+        &args.root,
+        regions.clone(),
+        Some(census.content_sha256.clone()),
+    )
+    .unwrap_or_else(|error| {
         println!("REFUSED: the source occurrence could not be authenticated — {error}");
         std::process::exit(1);
     });
@@ -257,13 +347,32 @@ fn main() {
     let mut layer_closures: Vec<(usize, usize, usize, usize)> = Vec::new();
     let tower_clock = Instant::now();
     for layer in 0..tower::LAYERS {
-        let entry = if layer == 0 { Entry::Rows } else { Entry::Carried };
-        let founded = tower::found_layer(layer, entry, tower::Chart::Interval, &scales, terms, unit_scalar, &tower::Intervention::None, 1).unwrap_or_else(|error| {
+        let entry = if layer == 0 {
+            Entry::Rows
+        } else {
+            Entry::Carried
+        };
+        let founded = tower::found_layer(
+            layer,
+            entry,
+            tower::Chart::Interval,
+            &scales,
+            terms,
+            unit_scalar,
+            &tower::Intervention::None,
+            1,
+        )
+        .unwrap_or_else(|error| {
             println!("REFUSED: layer {layer} did not found — {error}");
             std::process::exit(1);
         });
         let closure = founded.complex.closure().expect("closure");
-        layer_closures.push((layer, closure.operations, closure.occurrences, closure.fronts));
+        layer_closures.push((
+            layer,
+            closure.operations,
+            closure.occurrences,
+            closure.fronts,
+        ));
         if let Err(refusal) = founded.realization.validate(&founded.complex) {
             validation_refusals.push(format!("layer {layer}: realization {refusal}"));
             continue;
@@ -275,38 +384,69 @@ fn main() {
                 continue;
             }
         };
-        let deed = format!("layer {layer} ({}, K/V {:?})", Species::of(layer).layer_type(), KvRole::of(layer));
+        let deed = format!(
+            "layer {layer} ({}, K/V {:?})",
+            Species::of(layer).layer_type(),
+            KvRole::of(layer)
+        );
         for (event, law) in &founded.realization.bindings {
             let occ = &founded.complex.shape.occurrences[event];
             let law_decl = &founded.complex.shape.laws[&occ.law];
             let op = &founded.complex.operations[&occ.law];
-            let validation = validations.iter().find(|v| v.operation == law_decl.name).expect("validated");
+            let validation = validations
+                .iter()
+                .find(|v| v.operation == law_decl.name)
+                .expect("validated");
             let entailment = match law.entailment(validation) {
                 Ok(e) => e,
                 Err(refusal) => {
-                    validation_refusals.push(format!("layer {layer} {}: entailment {refusal}", law_decl.name));
+                    validation_refusals.push(format!(
+                        "layer {layer} {}: entailment {refusal}",
+                        law_decl.name
+                    ));
                     continue;
                 }
             };
             entailed_total += 1;
             operations_total += 1;
-            *species_total.entry(format!("{:?}", op.species)).or_insert(0) += 1;
+            *species_total
+                .entry(format!("{:?}", op.species))
+                .or_insert(0) += 1;
             *laws_total.entry(law.name()).or_insert(0) += 1;
             symbols_total += validation.symbols.len();
             fields_total += validation.fields.len();
             shapes_total += validation.shapes.len();
-            let inputs: Vec<String> = law_decl.inputs.iter().map(|b| founded.complex.shape.boundaries.objects[b].name.clone()).collect();
-            let outputs: Vec<String> = law_decl.outputs.iter().map(|b| founded.complex.shape.boundaries.objects[b].name.clone()).collect();
-            let status = if layer == 0 { "stimulated (Station A)" } else { "potential-only" };
+            let inputs: Vec<String> = law_decl
+                .inputs
+                .iter()
+                .map(|b| founded.complex.shape.boundaries.objects[b].name.clone())
+                .collect();
+            let outputs: Vec<String> = law_decl
+                .outputs
+                .iter()
+                .map(|b| founded.complex.shape.boundaries.objects[b].name.clone())
+                .collect();
+            let status = if layer == 0 {
+                "stimulated (Station A)"
+            } else {
+                "potential-only"
+            };
             if let Some(carrier) = &op.carrier {
-                bound_by.entry(carrier.clone()).or_insert_with(|| format!("{deed}: {}", law_decl.name));
+                bound_by
+                    .entry(carrier.clone())
+                    .or_insert_with(|| format!("{deed}: {}", law_decl.name));
             }
             atlas.push(AtlasRow {
                 deed: deed.clone(),
                 operation: law_decl.name.clone(),
                 species: format!("{:?}", op.species),
                 law: law.name().to_owned(),
-                parameters: entailment.parameters.iter().map(|(p, v, by)| format!("{p}={v} ⟵ {by}")).collect::<Vec<_>>().join(" ; "),
+                parameters: entailment
+                    .parameters
+                    .iter()
+                    .map(|(p, v, by)| format!("{p}={v} ⟵ {by}"))
+                    .collect::<Vec<_>>()
+                    .join(" ; "),
                 inputs: inputs.join(" | "),
                 outputs: outputs.join(" | "),
                 carrier: op.carrier.clone().unwrap_or_default(),
@@ -318,35 +458,75 @@ fn main() {
         }
     }
     // the final deed
-    let final_founded = tower::found_final(tower::Chart::Interval, &tower::Intervention::None, &scales).expect("final founds");
+    let final_founded =
+        tower::found_final(tower::Chart::Interval, &tower::Intervention::None, &scales)
+            .expect("final founds");
     let final_closure = final_founded.complex.closure().expect("closure");
-    match final_founded.realization.validate(&final_founded.complex).map_err(|e| e.to_string()).and_then(|()| occurrence.validate(&final_founded.complex).map_err(|e| e.to_string())) {
+    match final_founded
+        .realization
+        .validate(&final_founded.complex)
+        .map_err(|e| e.to_string())
+        .and_then(|()| {
+            occurrence
+                .validate(&final_founded.complex)
+                .map_err(|e| e.to_string())
+        }) {
         Ok(validations) => {
             for (event, law) in &final_founded.realization.bindings {
                 let occ = &final_founded.complex.shape.occurrences[event];
                 let law_decl = &final_founded.complex.shape.laws[&occ.law];
                 let op = &final_founded.complex.operations[&occ.law];
-                let validation = validations.iter().find(|v| v.operation == law_decl.name).expect("validated");
+                let validation = validations
+                    .iter()
+                    .find(|v| v.operation == law_decl.name)
+                    .expect("validated");
                 match law.entailment(validation) {
                     Ok(entailment) => {
                         entailed_total += 1;
                         operations_total += 1;
-                        *species_total.entry(format!("{:?}", op.species)).or_insert(0) += 1;
+                        *species_total
+                            .entry(format!("{:?}", op.species))
+                            .or_insert(0) += 1;
                         *laws_total.entry(law.name()).or_insert(0) += 1;
                         symbols_total += validation.symbols.len();
                         fields_total += validation.fields.len();
                         shapes_total += validation.shapes.len();
                         if let Some(carrier) = &op.carrier {
-                            bound_by.entry(carrier.clone()).or_insert_with(|| format!("final deed: {}", law_decl.name));
+                            bound_by
+                                .entry(carrier.clone())
+                                .or_insert_with(|| format!("final deed: {}", law_decl.name));
                         }
                         atlas.push(AtlasRow {
                             deed: "final normalization and tied output boundary".to_owned(),
                             operation: law_decl.name.clone(),
                             species: format!("{:?}", op.species),
                             law: law.name().to_owned(),
-                            parameters: entailment.parameters.iter().map(|(p, v, by)| format!("{p}={v} ⟵ {by}")).collect::<Vec<_>>().join(" ; "),
-                            inputs: law_decl.inputs.iter().map(|b| final_founded.complex.shape.boundaries.objects[b].name.clone()).collect::<Vec<_>>().join(" | "),
-                            outputs: law_decl.outputs.iter().map(|b| final_founded.complex.shape.boundaries.objects[b].name.clone()).collect::<Vec<_>>().join(" | "),
+                            parameters: entailment
+                                .parameters
+                                .iter()
+                                .map(|(p, v, by)| format!("{p}={v} ⟵ {by}"))
+                                .collect::<Vec<_>>()
+                                .join(" ; "),
+                            inputs: law_decl
+                                .inputs
+                                .iter()
+                                .map(|b| {
+                                    final_founded.complex.shape.boundaries.objects[b]
+                                        .name
+                                        .clone()
+                                })
+                                .collect::<Vec<_>>()
+                                .join(" | "),
+                            outputs: law_decl
+                                .outputs
+                                .iter()
+                                .map(|b| {
+                                    final_founded.complex.shape.boundaries.objects[b]
+                                        .name
+                                        .clone()
+                                })
+                                .collect::<Vec<_>>()
+                                .join(" | "),
                             carrier: op.carrier.clone().unwrap_or_default(),
                             status: "potential-only",
                             symbols: validation.symbols.len(),
@@ -354,14 +534,22 @@ fn main() {
                             shapes: validation.shapes.len(),
                         });
                     }
-                    Err(refusal) => validation_refusals.push(format!("final {}: entailment {refusal}", law_decl.name)),
+                    Err(refusal) => validation_refusals
+                        .push(format!("final {}: entailment {refusal}", law_decl.name)),
                 }
             }
         }
         Err(refusal) => validation_refusals.push(format!("final: {refusal}")),
     }
     // the two modality projections: typed as potential transports under their own configuration scopes
-    let modality_rows = modality_projections(&args.root, &regions, &census.content_sha256, &assets, &mut validation_refusals, &mut bound_by);
+    let modality_rows = modality_projections(
+        &args.root,
+        &regions,
+        &census.content_sha256,
+        &assets,
+        &mut validation_refusals,
+        &mut bound_by,
+    );
     for row in modality_rows {
         operations_total += 1;
         entailed_total += 1;
@@ -370,8 +558,15 @@ fn main() {
     }
     let tower_wall = tower_clock.elapsed();
     let identity_after_tower = FileIdentity::at(&address).expect("identity");
-    println!("  potential atlas over the tower in {:.1} s: {} operations entailed across {} layer deeds + final + 2 modality projections · species {:?} · laws {:?} · symbols {symbols_total} · fields {fields_total} · shapes {shapes_total} · refusals {}",
-        tower_wall.as_secs_f64(), operations_total, tower::LAYERS, species_total, laws_total, validation_refusals.len());
+    println!(
+        "  potential atlas over the tower in {:.1} s: {} operations entailed across {} layer deeds + final + 2 modality projections · species {:?} · laws {:?} · symbols {symbols_total} · fields {fields_total} · shapes {shapes_total} · refusals {}",
+        tower_wall.as_secs_f64(),
+        operations_total,
+        tower::LAYERS,
+        species_total,
+        laws_total,
+        validation_refusals.len()
+    );
     for refusal in validation_refusals.iter().take(12) {
         println!("    REFUSAL {refusal}");
     }
@@ -404,30 +599,71 @@ fn main() {
     let mut rows: Vec<String> = Vec::new();
     for region in &census.regions {
         let transport = if stimulated.contains(&region.name) {
-            Transport::Stimulated { bound_by: bound_by.get(&region.name).cloned().unwrap_or_else(|| "the enacted layer-zero deed".to_owned()) }
+            Transport::Stimulated {
+                bound_by: bound_by
+                    .get(&region.name)
+                    .cloned()
+                    .unwrap_or_else(|| "the enacted layer-zero deed".to_owned()),
+            }
         } else if let Some(because) = unbound.get(&region.name) {
             Transport::Unbound { because }
         } else if let Some(by) = bound_by.get(&region.name) {
-            Transport::PotentialOnly { bound_by: by.clone() }
+            Transport::PotentialOnly {
+                bound_by: by.clone(),
+            }
         } else if region.name.starts_with("model.vision_tower") {
-            Transport::Unposed { population: "vision tower interior: no diagram posed here; the image port is typed and its projection is bound" }
+            Transport::Unposed {
+                population: "vision tower interior: no diagram posed here; the image port is typed and its projection is bound",
+            }
         } else if region.name.starts_with("model.audio_tower") {
-            Transport::Unposed { population: "audio tower interior: no diagram posed here; the audio port is typed and its projection is bound" }
+            Transport::Unposed {
+                population: "audio tower interior: no diagram posed here; the audio port is typed and its projection is bound",
+            }
         } else {
-            Transport::Unposed { population: "no operation of the posed diagrams names it" }
+            Transport::Unposed {
+                population: "no operation of the posed diagrams names it",
+            }
         };
         let entry = transport_census.entry(transport.name()).or_insert((0, 0));
         entry.0 += 1;
         entry.1 += region.octets;
-        let lb = load_bearing.get(&region.name).map(|s| (*s).to_owned()).unwrap_or_else(|| "not established".to_owned());
+        let lb = load_bearing
+            .get(&region.name)
+            .map(|s| (*s).to_owned())
+            .unwrap_or_else(|| "not established".to_owned());
         rows.push(format!(
             "{}\t{:?}\t{:?}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
-            region.name, region.dtype, region.shape, region.rank(), region.start, region.end, region.octets, region.sha256, region.codewords, region.finite, region.non_finite, region.zero, region.subnormal,
-            region.exponent_min.map(|e| e.to_string()).unwrap_or_default(), region.exponent_max.map(|e| e.to_string()).unwrap_or_default(),
-            region.admission.name(), transport.name(), transport.detail(), lb
+            region.name,
+            region.dtype,
+            region.shape,
+            region.rank(),
+            region.start,
+            region.end,
+            region.octets,
+            region.sha256,
+            region.codewords,
+            region.finite,
+            region.non_finite,
+            region.zero,
+            region.subnormal,
+            region
+                .exponent_min
+                .map(|e| e.to_string())
+                .unwrap_or_default(),
+            region
+                .exponent_max
+                .map(|e| e.to_string())
+                .unwrap_or_default(),
+            region.admission.name(),
+            transport.name(),
+            transport.detail(),
+            lb
         ));
     }
-    println!("  transport census (class: populations, octets): {:?}", transport_census);
+    println!(
+        "  transport census (class: populations, octets): {:?}",
+        transport_census
+    );
 
     // ------------------------------------------------------------------------------------------
     // 5. falsifiers
@@ -437,7 +673,10 @@ fn main() {
     verdicts.record(1, "every declared population is manifested, hashed and censused; none is dropped",
         census.regions.len() == container.tensors.len() && declared == 2130 && container.refused.is_empty() && census.regions.iter().all(|r| !r.sha256.is_empty() && r.octets == r.end - r.start),
         format!("declared {declared} · manifested {} · refused by name {} · regions censused {} · every region hashed over exactly its declared span", container.tensors.len(), container.refused.len(), census.regions.len()));
-    let decoded_exact = admission_census.get(&AdmissionClass::DecodedExact).copied().unwrap_or(0);
+    let decoded_exact = admission_census
+        .get(&AdmissionClass::DecodedExact)
+        .copied()
+        .unwrap_or(0);
     let total_codewords: u64 = census.regions.iter().map(|r| r.codewords).sum();
     verdicts.record(2, "every BF16 codeword was decoded exactly through the one float mouth, and the admission class is founded by the decode",
         decoded_exact == census.regions.len() && census.codewords_decoded == total_codewords && census.codewords_decoded * 2 == container.payload_octets - census.uncovered_payload_octets,
@@ -484,13 +723,31 @@ fn main() {
     verdicts.record(7, "every binding of the potential atlas is entailed by its validated testimony: parameters connected to fields, shapes and slices",
         validation_refusals.is_empty() && entailed_total == operations_total && operations_total > 0,
         format!("{entailed_total} of {operations_total} operations entailed; refusals {:?}", validation_refusals.iter().take(6).collect::<Vec<_>>()));
-    let sliding = layer_closures.iter().filter(|(l, ..)| Species::of(*l) == Species::Sliding).count();
-    let full = layer_closures.iter().filter(|(l, ..)| Species::of(*l) == Species::Full).count();
+    let sliding = layer_closures
+        .iter()
+        .filter(|(l, ..)| Species::of(*l) == Species::Sliding)
+        .count();
+    let full = layer_closures
+        .iter()
+        .filter(|(l, ..)| Species::of(*l) == Species::Full)
+        .count();
     let shared = (tower::FIRST_SHARED..tower::LAYERS).count();
-    let full_rows = atlas.iter().filter(|r| r.deed.contains("full_attention")).count();
-    let proportional = atlas.iter().filter(|r| r.law == "chronology" && r.parameters.contains("head_width=512")).count();
-    let default_rope = atlas.iter().filter(|r| r.law == "chronology" && r.parameters.contains("head_width=256")).count();
-    let shared_standings = atlas.iter().filter(|r| r.law == "standing" && r.operation.starts_with("shared")).count();
+    let full_rows = atlas
+        .iter()
+        .filter(|r| r.deed.contains("full_attention"))
+        .count();
+    let proportional = atlas
+        .iter()
+        .filter(|r| r.law == "chronology" && r.parameters.contains("head_width=512"))
+        .count();
+    let default_rope = atlas
+        .iter()
+        .filter(|r| r.law == "chronology" && r.parameters.contains("head_width=256"))
+        .count();
+    let shared_standings = atlas
+        .iter()
+        .filter(|r| r.law == "standing" && r.operation.starts_with("shared"))
+        .count();
     verdicts.record(8, "the atlas covers the full declared text tower: 42 layers, both species, both head widths, both RoPE species, the KV-sharing realization, every normalization and residual passage, PLE, the final norm, the tied output and the modality projections",
         layer_closures.len() == tower::LAYERS && sliding == 35 && full == 7 && full_rows > 0 && proportional == 7 * 1 + 7 * 0 + 7 * 0 + 0 + (FULL_OWN_K_CHRONOLOGIES) && default_rope > 0 && shared_standings == 2 * shared && atlas.iter().any(|r| r.operation == "final rebase") && atlas.iter().any(|r| r.operation == "tied output boundary") && atlas.iter().filter(|r| r.deed.starts_with("modality")).map(|r| r.deed.clone()).collect::<BTreeSet<_>>().len() == 2 && atlas.iter().filter(|r| r.deed.starts_with("modality")).count() == 6,
         format!("layers founded {} (sliding {sliding}, full {full}) · chronology laws at head 512 {proportional} (7 receiver + 4 presented where the full layer builds its own K), at head 256 {default_rope} · shared K/V standings {shared_standings} over {shared} shared layers · final rebase and tied boundary present · modality projection deeds 2 ({} operations) · per-layer (operations, occurrences, fronts): layer 0 {:?}, layer 23 {:?}, layer 24 {:?}, layer 41 {:?}",
@@ -518,27 +775,90 @@ fn main() {
     let mut atlas_file = std::fs::File::create(&atlas_path).expect("atlas");
     writeln!(atlas_file, "deed\toperation\tspecies\tlaw\tparameters\tinputs\toutputs\tcarrier\tstatus\tsymbols\tfields\tshapes").unwrap();
     for row in &atlas {
-        writeln!(atlas_file, "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", row.deed, row.operation, row.species, row.law, row.parameters, row.inputs, row.outputs, row.carrier, row.status, row.symbols, row.fields, row.shapes).unwrap();
+        writeln!(
+            atlas_file,
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            row.deed,
+            row.operation,
+            row.species,
+            row.law,
+            row.parameters,
+            row.inputs,
+            row.outputs,
+            row.carrier,
+            row.status,
+            row.symbols,
+            row.fields,
+            row.shapes
+        )
+        .unwrap();
     }
     let receipt_path = format!("{}/receipt.form", args.out);
     let mut receipt = std::fs::File::create(&receipt_path).expect("receipt");
-    writeln!(receipt, "THE SOURCE IS ADMITTED WHOLE AND THE POTENTIAL ATLAS COVERS THE TOWER — receipt").unwrap();
-    writeln!(receipt, "root {} (an apparatus address, never an identity)", args.root).unwrap();
-    writeln!(receipt, "container file octets {} payload octets {} header octets {} tensors {} refused {}", container.file_octets, container.payload_octets, match container.species { holonic_engine::foreign_map::ContainerSpecies::Safetensors { header_octets, .. } => header_octets }, container.tensors.len(), container.refused.len()).unwrap();
+    writeln!(
+        receipt,
+        "THE SOURCE IS ADMITTED WHOLE AND THE POTENTIAL ATLAS COVERS THE TOWER — receipt"
+    )
+    .unwrap();
+    writeln!(
+        receipt,
+        "root {} (an apparatus address, never an identity)",
+        args.root
+    )
+    .unwrap();
+    writeln!(
+        receipt,
+        "container file octets {} payload octets {} header octets {} tensors {} refused {}",
+        container.file_octets,
+        container.payload_octets,
+        match container.species {
+            holonic_engine::foreign_map::ContainerSpecies::Safetensors {
+                header_octets, ..
+            } => header_octets,
+        },
+        container.tensors.len(),
+        container.refused.len()
+    )
+    .unwrap();
     writeln!(receipt, "content sha256 {}", census.content_sha256).unwrap();
     writeln!(receipt, "header sha256 {}", census.header_sha256).unwrap();
     writeln!(receipt, "file identity {:?}", census.identity).unwrap();
     writeln!(receipt, "decoder: holonic_engine::foreign_map::ForeignContainer::streamed_census over exact_value::ieee754::decode_bfloat16_bits (one table of the mouth's verdicts); toolchain {}", rustc_identity()).unwrap();
-    writeln!(receipt, "implementation {} sha256 {} ({})", occurrence.implementation.locator, occurrence.implementation.sha256, occurrence.implementation.version.as_deref().unwrap_or("?")).unwrap();
-    writeln!(receipt, "configuration {} sha256 {}", occurrence.configuration.locator, occurrence.configuration.sha256).unwrap();
+    writeln!(
+        receipt,
+        "implementation {} sha256 {} ({})",
+        occurrence.implementation.locator,
+        occurrence.implementation.sha256,
+        occurrence.implementation.version.as_deref().unwrap_or("?")
+    )
+    .unwrap();
+    writeln!(
+        receipt,
+        "configuration {} sha256 {}",
+        occurrence.configuration.locator, occurrence.configuration.sha256
+    )
+    .unwrap();
     for asset in &assets {
-        writeln!(receipt, "asset {} {} sha256 {:?} used {}", asset.role, asset.locator, asset.sha256, asset.used).unwrap();
+        writeln!(
+            receipt,
+            "asset {} {} sha256 {:?} used {}",
+            asset.role, asset.locator, asset.sha256, asset.used
+        )
+        .unwrap();
     }
     for (port, law, population) in &ports {
         writeln!(receipt, "port {port}: {law} [{population}]").unwrap();
     }
     writeln!(receipt, "streamed census: chunk {} octets · peak resident {} octets · octets hashed {} · codewords decoded {} · uncovered payload octets {} · pass wall {:.1} s", census.chunk_octets, census.peak_resident_octets, census.octets_hashed, census.codewords_decoded, census.uncovered_payload_octets, pass_wall.as_secs_f64()).unwrap();
-    writeln!(receipt, "admission census {:?}", admission_census.iter().map(|(k, v)| (k.name(), *v)).collect::<Vec<_>>()).unwrap();
+    writeln!(
+        receipt,
+        "admission census {:?}",
+        admission_census
+            .iter()
+            .map(|(k, v)| (k.name(), *v))
+            .collect::<Vec<_>>()
+    )
+    .unwrap();
     writeln!(receipt, "rank census {:?}", rank_census).unwrap();
     writeln!(receipt, "transport census {:?}", transport_census).unwrap();
     writeln!(receipt, "load-bearing {:?}", load_bearing).unwrap();
@@ -547,7 +867,12 @@ fn main() {
     for line in &verdicts.lines {
         writeln!(receipt, "{line}").unwrap();
     }
-    println!("\nmanifest: {manifest_path} ({} rows)\natlas: {atlas_path} ({} rows)\nreceipt: {receipt_path}\nwall {:.1} s", rows.len(), atlas.len(), clock.elapsed().as_secs_f64());
+    println!(
+        "\nmanifest: {manifest_path} ({} rows)\natlas: {atlas_path} ({} rows)\nreceipt: {receipt_path}\nwall {:.1} s",
+        rows.len(),
+        atlas.len(),
+        clock.elapsed().as_secs_f64()
+    );
     if verdicts.failed > 0 {
         println!("\n{} falsifier(s) FAILED", verdicts.failed);
         std::process::exit(1);
@@ -560,48 +885,107 @@ fn main() {
 const FULL_OWN_K_CHRONOLOGIES: usize = 4;
 
 fn rustc_identity() -> String {
-    let rustc = std::process::Command::new("rustc").arg("--version").output().ok().map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned()).unwrap_or_else(|| "rustc (version unread)".to_owned());
-    let commit = std::process::Command::new("git").args(["rev-parse", "HEAD"]).output().ok().map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned()).unwrap_or_else(|| "(commit unread)".to_owned());
-    let dirty = std::process::Command::new("git").args(["status", "--porcelain"]).output().ok().map(|o| !o.stdout.is_empty()).unwrap_or(true);
-    format!("{rustc}; holonic-engine at {commit}{}", if dirty { " + uncommitted" } else { "" })
+    let rustc = std::process::Command::new("rustc")
+        .arg("--version")
+        .output()
+        .ok()
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+        .unwrap_or_else(|| "rustc (version unread)".to_owned());
+    let commit = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .ok()
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+        .unwrap_or_else(|| "(commit unread)".to_owned());
+    let dirty = std::process::Command::new("git")
+        .args(["status", "--porcelain"])
+        .output()
+        .ok()
+        .map(|o| !o.stdout.is_empty())
+        .unwrap_or(true);
+    format!(
+        "{rustc}; holonic-engine at {commit}{}",
+        if dirty { " + uncommitted" } else { "" }
+    )
 }
 
 /// The two modality projections — `embed_vision` and `embed_audio` — as potential transports under
 /// their own configuration scopes: a gain-less RMS rebase over the modality width, then the
 /// projection into the shared stream. Typed and entailed like every text operation; their towers'
 /// interiors are not posed here.
-fn modality_projections(root: &str, regions: &BTreeMap<String, RegionIdentity>, content_sha256: &str, assets: &[AssetDeclaration], refusals: &mut Vec<String>, bound_by: &mut BTreeMap<String, String>) -> Vec<AtlasRow> {
+fn modality_projections(
+    root: &str,
+    regions: &BTreeMap<String, RegionIdentity>,
+    content_sha256: &str,
+    assets: &[AssetDeclaration],
+    refusals: &mut Vec<String>,
+    bound_by: &mut BTreeMap<String, String>,
+) -> Vec<AtlasRow> {
     let mut rows = Vec::new();
-    for (modality, scope, population, width, width_field) in [("vision", "vision_config", "model.embed_vision.embedding_projection.weight", 768usize, "hidden_size"), ("audio", "audio_config", "model.embed_audio.embedding_projection.weight", 1536usize, "output_proj_dims")] {
-        let implementation = AuthenticatedText::read(resident_layer::IMPLEMENTATION, resident_layer::implementation_version().as_deref()).expect("implementation");
-        let configuration = AuthenticatedText::read(&format!("{root}/config.json"), None).expect("configuration");
+    for (modality, scope, population, width, width_field) in [
+        (
+            "vision",
+            "vision_config",
+            "model.embed_vision.embedding_projection.weight",
+            768usize,
+            "hidden_size",
+        ),
+        (
+            "audio",
+            "audio_config",
+            "model.embed_audio.embedding_projection.weight",
+            1536usize,
+            "output_proj_dims",
+        ),
+    ] {
+        let implementation = AuthenticatedText::read(
+            resident_layer::IMPLEMENTATION,
+            resident_layer::implementation_version().as_deref(),
+        )
+        .expect("implementation");
+        let configuration =
+            AuthenticatedText::read(&format!("{root}/config.json"), None).expect("configuration");
         let locator = format!("{root}/model.safetensors");
-        let (octets, header_octets, header_sha256) = AuthenticatedContainer::read_header(&locator).expect("header");
+        let (octets, header_octets, header_sha256) =
+            AuthenticatedContainer::read_header(&locator).expect("header");
         let occurrence = SourceOccurrence {
             implementation,
             configuration,
             configuration_scope: vec![scope.to_owned()],
-            container: AuthenticatedContainer { identity: FileIdentity::at(&locator).ok(), locator, octets, header_octets, header_sha256, content_sha256: Some(content_sha256.to_owned()), regions: regions.clone() },
+            container: AuthenticatedContainer {
+                identity: FileIdentity::at(&locator).ok(),
+                locator,
+                octets,
+                header_octets,
+                header_sha256,
+                content_sha256: Some(content_sha256.to_owned()),
+                regions: regions.clone(),
+            },
             assets: assets.to_vec(),
         };
-        let eps_text = occurrence.configuration_span("rms_norm_eps").unwrap_or_default();
+        let eps_text = occurrence
+            .configuration_span("rms_norm_eps")
+            .unwrap_or_default();
         let eps = match holonic_engine::resident_law::decimal_to_rat(&eps_text) {
             Some(target) => {
                 // the binary64 nearest the declared decimal: search the two dyadics around it
                 nearest_binary64(&target)
             }
             None => {
-                refusals.push(format!("modality {modality}: rms_norm_eps '{eps_text}' is not a decimal"));
+                refusals.push(format!(
+                    "modality {modality}: rms_norm_eps '{eps_text}' is not a decimal"
+                ));
                 continue;
             }
         };
-        let (complex, realization) = match modality::found(modality, width, width_field, population, &eps_text, eps) {
-            Ok(found) => found,
-            Err(refusal) => {
-                refusals.push(format!("modality {modality}: deed construction {refusal}"));
-                continue;
-            }
-        };
+        let (complex, realization) =
+            match modality::found(modality, width, width_field, population, &eps_text, eps) {
+                Ok(found) => found,
+                Err(refusal) => {
+                    refusals.push(format!("modality {modality}: deed construction {refusal}"));
+                    continue;
+                }
+            };
         if let Err(refusal) = realization.validate(&complex) {
             refusals.push(format!("modality {modality}: realization {refusal}"));
             continue;
@@ -617,20 +1001,40 @@ fn modality_projections(root: &str, regions: &BTreeMap<String, RegionIdentity>, 
             let occ = &complex.shape.occurrences[event];
             let law_decl = &complex.shape.laws[&occ.law];
             let op = &complex.operations[&occ.law];
-            let validation = validations.iter().find(|v| v.operation == law_decl.name).expect("validated");
+            let validation = validations
+                .iter()
+                .find(|v| v.operation == law_decl.name)
+                .expect("validated");
             match law.entailment(validation) {
                 Ok(entailment) => {
                     if let Some(carrier) = &op.carrier {
-                        bound_by.entry(carrier.clone()).or_insert_with(|| format!("{modality} projection: {}", law_decl.name));
+                        bound_by
+                            .entry(carrier.clone())
+                            .or_insert_with(|| format!("{modality} projection: {}", law_decl.name));
                     }
                     rows.push(AtlasRow {
                         deed: format!("modality projection ({modality})"),
                         operation: law_decl.name.clone(),
                         species: format!("{:?}", op.species),
                         law: law.name().to_owned(),
-                        parameters: entailment.parameters.iter().map(|(p, v, by)| format!("{p}={v} ⟵ {by}")).collect::<Vec<_>>().join(" ; "),
-                        inputs: law_decl.inputs.iter().map(|b| complex.shape.boundaries.objects[b].name.clone()).collect::<Vec<_>>().join(" | "),
-                        outputs: law_decl.outputs.iter().map(|b| complex.shape.boundaries.objects[b].name.clone()).collect::<Vec<_>>().join(" | "),
+                        parameters: entailment
+                            .parameters
+                            .iter()
+                            .map(|(p, v, by)| format!("{p}={v} ⟵ {by}"))
+                            .collect::<Vec<_>>()
+                            .join(" ; "),
+                        inputs: law_decl
+                            .inputs
+                            .iter()
+                            .map(|b| complex.shape.boundaries.objects[b].name.clone())
+                            .collect::<Vec<_>>()
+                            .join(" | "),
+                        outputs: law_decl
+                            .outputs
+                            .iter()
+                            .map(|b| complex.shape.boundaries.objects[b].name.clone())
+                            .collect::<Vec<_>>()
+                            .join(" | "),
                         carrier: op.carrier.clone().unwrap_or_default(),
                         status: "potential-only (portability control: its tower is not posed here)",
                         symbols: validation.symbols.len(),
@@ -638,7 +1042,10 @@ fn modality_projections(root: &str, regions: &BTreeMap<String, RegionIdentity>, 
                         shapes: validation.shapes.len(),
                     });
                 }
-                Err(refusal) => refusals.push(format!("modality {modality} {}: entailment {refusal}", law_decl.name)),
+                Err(refusal) => refusals.push(format!(
+                    "modality {modality} {}: entailment {refusal}",
+                    law_decl.name
+                )),
             }
         }
     }
@@ -654,14 +1061,33 @@ fn nearest_binary64(target: &relational_geometry::Rat) -> Dyadic {
     let two = relational_geometry::Rat::from_integer(BigInt::from(2));
     let one = relational_geometry::Rat::from_integer(BigInt::from(1));
     let mut t = target.abs();
-    while t >= two { t = &t / &two; e += 1; }
-    while t < one { t = &t * &two; e -= 1; }
+    while t >= two {
+        t = &t / &two;
+        e += 1;
+    }
+    while t < one {
+        t = &t * &two;
+        e -= 1;
+    }
     // significand = round(target · 2^(52 − e))
     let shift = 52 - e;
-    let scaled = if shift >= 0 { target.abs() * relational_geometry::Rat::from_integer(BigInt::from(1) << shift as usize) } else { target.abs() / relational_geometry::Rat::from_integer(BigInt::from(1) << (-shift) as usize) };
-    let rounded = (scaled + relational_geometry::Rat::new(BigInt::from(1), BigInt::from(2))).floor().to_integer();
+    let scaled = if shift >= 0 {
+        target.abs() * relational_geometry::Rat::from_integer(BigInt::from(1) << shift as usize)
+    } else {
+        target.abs() / relational_geometry::Rat::from_integer(BigInt::from(1) << (-shift) as usize)
+    };
+    let rounded = (scaled + relational_geometry::Rat::new(BigInt::from(1), BigInt::from(2)))
+        .floor()
+        .to_integer();
     let significand = rounded.to_i64().expect("53 bits");
-    Dyadic { significand: if target.is_negative() { -significand } else { significand }, exponent: -shift }
+    Dyadic {
+        significand: if target.is_negative() {
+            -significand
+        } else {
+            significand
+        },
+        exponent: -shift,
+    }
 }
 
 #[allow(dead_code)]

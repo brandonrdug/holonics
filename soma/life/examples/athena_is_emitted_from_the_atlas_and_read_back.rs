@@ -78,8 +78,12 @@ fn run() -> Result<(), String> {
     println!("  the tree (ancestry, scale)   2 dimensions, remainder ZERO");
     println!("  standing                     1 dimension,  remainder ZERO");
     println!("  transport as a linear map    cycle rank B1 = {transitions} - {classes} + 1 = {cycle_rank}");
-    println!("                               that is the reconvergence population: distinct contexts");
-    println!("                               landing in one class. A container below it has declared");
+    println!(
+        "                               that is the reconvergence population: distinct contexts"
+    );
+    println!(
+        "                               landing in one class. A container below it has declared"
+    );
     println!("                               a family that cannot separate some of them, and the");
     println!("                               collapsed population is the loss -- never unknown.");
 
@@ -89,7 +93,9 @@ fn run() -> Result<(), String> {
     println!();
     println!("THE TREE CHART");
     println!("  suffix-link tree height      {}", chart.height);
-    println!("  layers emitted               {LAYERS}   (declared; the height above is the material's)");
+    println!(
+        "  layers emitted               {LAYERS}   (declared; the height above is the material's)"
+    );
     if chart.height + 1 > LAYERS {
         println!(
             "  EXCLUDED                     {} scales above layer {}, reported not dropped",
@@ -110,7 +116,10 @@ fn run() -> Result<(), String> {
             }
         }
     }
-    println!("  ancestry as the light cone   {} of {checked} links hold, {failed} fail", checked - failed);
+    println!(
+        "  ancestry as the light cone   {} of {checked} links hold, {failed} fail",
+        checked - failed
+    );
     if failed > 0 {
         return Err(format!(
             "{failed} suffix links are not causal in the emitted chart: the transition is wrong"
@@ -156,13 +165,19 @@ fn run() -> Result<(), String> {
     let entries = tensor.words.len();
     println!();
     println!("THE EMISSION");
-    println!("  rows x width                 {} x {}", tensor.rows, tensor.width);
+    println!(
+        "  rows x width                 {} x {}",
+        tensor.rows, tensor.width
+    );
     println!("  entries                      {entries}");
     println!(
         "  crossed EXACTLY              {} of {entries}",
         tensor.exact_entries()
     );
-    println!("  widest residual              {}", tensor.widest_residual());
+    println!(
+        "  widest residual              {}",
+        tensor.widest_residual()
+    );
     println!("  every entry closes: stored + residual = the exact value asked for.");
 
     let container = safetensors_container(std::slice::from_ref(&tensor));
@@ -170,7 +185,10 @@ fn run() -> Result<(), String> {
         .map_err(|error| format!("output/athena-000: {error}"))?;
     let path = "output/athena-000/model.safetensors";
     std::fs::write(path, &container).map_err(|error| format!("{path}: {error}"))?;
-    println!("  container                    {} octets -> {path}", container.len());
+    println!(
+        "  container                    {} octets -> {path}",
+        container.len()
+    );
 
     // ---- read it back through the SAME intake that reads Gemma ----
     let (mut file, header) = safetensors::read_header(path)?;
@@ -181,12 +199,20 @@ fn run() -> Result<(), String> {
         "  declared                     {:?} {} rows x {}",
         entry.dtype, entry.shape[0], entry.shape[1]
     );
-    let (words, width) =
-        safetensors::read_rows(&mut file, &header, "athena.embed_tokens.weight", 0, tensor.rows)?;
+    let (words, width) = safetensors::read_rows(
+        &mut file,
+        &header,
+        "athena.embed_tokens.weight",
+        0,
+        tensor.rows,
+    )?;
     if width != tensor.width || words != tensor.words {
         return Err("the container did not return the words it was written with".to_owned());
     }
-    println!("  words returned               {} — bit-identical to what was written", words.len());
+    println!(
+        "  words returned               {} — bit-identical to what was written",
+        words.len()
+    );
 
     // And the exact mouth closes on the far side: aligning a row returns integers and a common
     // exponent with zero remainder, which is the read direction of the same bijection.
@@ -207,7 +233,9 @@ fn run() -> Result<(), String> {
     for (at, token) in kept.iter().enumerate().take(6) {
         let germs = token_germs_public(std::slice::from_ref(token))
             .map_err(|error| format!("{error:?}"))?;
-        let current = atlas.receive_path(&germs).map_err(|error| format!("{error:?}"))?;
+        let current = atlas
+            .receive_path(&germs)
+            .map_err(|error| format!("{error:?}"))?;
         let fine = atlas.suffix_ancestor(current.state(), 0);
         let coarse = atlas.suffix_ancestor(current.state(), 1);
         let nested = chart.contains(coarse, fine) == Some(true);
@@ -226,7 +254,9 @@ fn run() -> Result<(), String> {
     println!(
         "  {ancestor_pairs} of {demonstrated} shown rows have layer 0 causally inside layer 1 —"
     );
-    println!("  the ROW ITSELF carries the scale hierarchy, as a causal order rather than a metric.");
+    println!(
+        "  the ROW ITSELF carries the scale hierarchy, as a causal order rather than a metric."
+    );
 
     println!();
     println!("WHAT THIS IS NOT");
@@ -243,6 +273,10 @@ fn truncate(text: &str, at: usize) -> String {
     if cleaned.chars().count() <= at {
         cleaned
     } else {
-        cleaned.chars().take(at.saturating_sub(1)).chain("…".chars()).collect()
+        cleaned
+            .chars()
+            .take(at.saturating_sub(1))
+            .chain("…".chars())
+            .collect()
     }
 }

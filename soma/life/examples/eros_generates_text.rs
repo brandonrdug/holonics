@@ -111,8 +111,12 @@ fn is_span(atlas: &ExactSuffixEcology, tokens: &[String]) -> bool {
     if tokens.is_empty() {
         return true;
     }
-    let Ok(germs) = token_germs_public(tokens) else { return false };
-    let Ok(current) = atlas.receive_path(&germs) else { return false };
+    let Ok(germs) = token_germs_public(tokens) else {
+        return false;
+    };
+    let Ok(current) = atlas.receive_path(&germs) else {
+        return false;
+    };
     current.matched_length() as usize == tokens.len()
 }
 
@@ -163,7 +167,16 @@ fn run() -> Result<(), String> {
         extent.push(atlas.class_extent(state).unwrap_or(0) as u32);
         standing.push(atlas.standing_at(state).unwrap_or(0));
     }
-    let body = Body { indptr, germ, target, suffix, extent, standing, surfaces, index_of };
+    let body = Body {
+        indptr,
+        germ,
+        target,
+        suffix,
+        extent,
+        standing,
+        surfaces,
+        index_of,
+    };
 
     println!("EROS GENERATES\n");
     println!("  The machine returns the whole licensed population at every step.");
@@ -202,7 +215,11 @@ fn run() -> Result<(), String> {
                 emitted.push(body.surfaces[chosen as usize].clone());
                 state = body.carry(read, chosen);
             }
-            let verdict = if is_span(atlas, &emitted) { "VERBATIM" } else { "COMPOSED" };
+            let verdict = if is_span(atlas, &emitted) {
+                "VERBATIM"
+            } else {
+                "COMPOSED"
+            };
             let label = if bound == 0 {
                 "unbounded".to_owned()
             } else {

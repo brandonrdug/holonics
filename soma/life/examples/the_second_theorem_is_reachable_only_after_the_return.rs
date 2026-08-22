@@ -102,8 +102,8 @@ fn first_problem() -> LeanProofProblem {
         identity: "carry_twice".to_owned(),
         source_scope: BTreeSet::from(["KernelWitness.lean".to_owned()]),
         prefix: "import KernelWitness\nnamespace Soma".to_owned(),
-        theorem_header:
-            "theorem carry_twice {P : Prop} (h : P) : exactCarrier (exactCarrier P)".to_owned(),
+        theorem_header: "theorem carry_twice {P : Prop} (h : P) : exactCarrier (exactCarrier P)"
+            .to_owned(),
         suffix: "end Soma".to_owned(),
     }
 }
@@ -115,8 +115,8 @@ fn second_problem() -> LeanProofProblem {
         identity: "carry_thrice".to_owned(),
         source_scope: BTreeSet::from(["self-emanated/carry_twice.lean".to_owned()]),
         prefix: "import KernelWitness\nnamespace Soma".to_owned(),
-        theorem_header:
-            "theorem carry_thrice {P : Prop} (h : P) : exactCarrier (exactCarrier P)".to_owned(),
+        theorem_header: "theorem carry_thrice {P : Prop} (h : P) : exactCarrier (exactCarrier P)"
+            .to_owned(),
         suffix: "end Soma".to_owned(),
     }
 }
@@ -215,8 +215,11 @@ fn main() {
         "  asking for `carry_thrice`: {}",
         match &before {
             Err(error) => format!("{error:?}"),
-            Ok((reached, candidates)) =>
-                format!("REACHED {} declarations, {} candidates", reached.len(), candidates.len()),
+            Ok((reached, candidates)) => format!(
+                "REACHED {} declarations, {} candidates",
+                reached.len(),
+                candidates.len()
+            ),
         }
     );
 
@@ -233,10 +236,13 @@ fn main() {
     };
     let deed = ecology.open_kernel_deed().expect("a deed is open");
     let deed_identity = deed.identity().to_owned();
-    println!("  deed {deed_identity}   candidates {}", deed.candidates().len());
+    println!(
+        "  deed {deed_identity}   candidates {}",
+        deed.candidates().len()
+    );
 
-    let kernel = LeanKernelWorld::new(&project_root, &scratch_root, 2)
-        .expect("the kernel world mounts");
+    let kernel =
+        LeanKernelWorld::new(&project_root, &scratch_root, 2).expect("the kernel world mounts");
     let candidates = deed.candidates().to_vec();
     let returns = kernel
         .grade_all(&first_problem(), &candidates)
@@ -244,7 +250,12 @@ fn main() {
     let admitted = returns.kernel_admitted_extent();
     let obstructed = returns.obstruction_extent();
     println!("  kernel admitted {admitted}   obstructed {obstructed}");
-    for member in returns.members().iter().filter(|m| !m.kernel_admitted()).take(3) {
+    for member in returns
+        .members()
+        .iter()
+        .filter(|m| !m.kernel_admitted())
+        .take(3)
+    {
         let text = member.diagnostic().lines().next().unwrap_or("");
         println!("      obstructed: {text}");
     }
@@ -298,8 +309,10 @@ fn main() {
     // received, is the same body minus exactly the returned organ.
     let ablated = LeanMathematicsEcology::condition(&corpus()).expect("the corpus conditions");
     let ablated_reach = ablated.generate_proof_candidates(&second_problem());
-    let unreachable_after_ablation =
-        matches!(ablated_reach, Err(LeanMathematicsError::NoLocalDeclarations));
+    let unreachable_after_ablation = matches!(
+        ablated_reach,
+        Err(LeanMathematicsError::NoLocalDeclarations)
+    );
     println!(
         "  with the returned organ removed, `carry_thrice` is {}",
         match &ablated_reach {
@@ -313,8 +326,14 @@ fn main() {
     println!("WHAT RETURNED");
     println!("{}", "=".repeat(104));
     println!("  unreachable before the return                      {unreachable_before}");
-    println!("  the kernel admitted at least one path              {}", admitted > 0);
-    println!("  an organ mounted from the admitted family          {}", receipt.declaration_admitted);
+    println!(
+        "  the kernel admitted at least one path              {}",
+        admitted > 0
+    );
+    println!(
+        "  an organ mounted from the admitted family          {}",
+        receipt.declaration_admitted
+    );
     println!("  reachable after the return                         {reachable_after}");
     println!("  and its reach names the first theorem              {names_the_first}");
     println!("  unreachable again once the organ is removed        {unreachable_after_ablation}");
@@ -326,7 +345,9 @@ fn main() {
     println!("{}", "-".repeat(104));
     println!("  The corpus is Lean core only, because Mathlib is NOT COMPILED in this tree -- two");
     println!("  .olean files in total. So this is a kernel verdict on a carrier, not on real");
-    println!("  mathematics, and the deed's scale is what the offline project allows. Nothing here");
+    println!(
+        "  mathematics, and the deed's scale is what the offline project allows. Nothing here"
+    );
     println!("  claims the machine proved anything a person had not; the return is that a genuine");
     println!("  exterior verdict changed what a later construction could reach.");
 
@@ -339,7 +360,9 @@ fn main() {
     println!();
     println!("{}", "=".repeat(104));
     if held {
-        println!("HELD -- a real kernel return mounted an organ, a second theorem became reachable");
+        println!(
+            "HELD -- a real kernel return mounted an organ, a second theorem became reachable"
+        );
         println!("        only through it, and removing the organ made it unreachable again.");
     } else {
         println!("REFUTED -- before={unreachable_before} admitted={admitted} mounted={} after={reachable_after} ablated={unreachable_after_ablation} remount={remount_is_exact}", receipt.declaration_admitted);

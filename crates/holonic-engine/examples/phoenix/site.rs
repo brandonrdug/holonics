@@ -19,15 +19,17 @@ use std::io::Write;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
-use holonic_engine::embedding_fiber::{align_bfloat16, MountedReadout, ResidentReadout};
+use holonic_engine::embedding_fiber::{MountedReadout, ResidentReadout, align_bfloat16};
 use holonic_engine::exact_value::ieee754::{
     decode_bfloat16_bits, decode_binary64_bits, round_into_bfloat16,
 };
 use holonic_engine::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
-use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
-use holonic_engine::ported_reference::{realize, PortedCarrier, PortedOperationKind, PortedProgram};
+use holonic_engine::ported_reference::{
+    PortedCarrier, PortedOperationKind, PortedProgram, realize,
+};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
@@ -184,7 +186,11 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
         for value in standing {
             let (word, remainder) = round_into_bfloat16(value).map_err(|e| format!("{e:?}"))?;
             let datum = decode_bfloat16_bits(word).map_err(|e| format!("{e:?}"))?;
-            rounded.push((datum.value(), datum.ulp_exponent, datum.significand.bits() == 0));
+            rounded.push((
+                datum.value(),
+                datum.ulp_exponent,
+                datum.significand.bits() == 0,
+            ));
             residual.push(remainder);
         }
         let top = rounded
@@ -209,7 +215,9 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
 
 pub fn two_to(exponent: i64) -> Rat {
     if exponent >= 0 {
-        Rat::from_integer(BigInt::from(num_bigint::BigUint::from(1u8) << exponent as usize))
+        Rat::from_integer(BigInt::from(
+            num_bigint::BigUint::from(1u8) << exponent as usize,
+        ))
     } else {
         Rat::new(
             BigInt::from(1),
@@ -340,8 +348,13 @@ pub fn found_reaching(
         let (cosine, sine) =
             CertifiedSeries::circular_series(&angle, terms).map_err(|e| format!("{e:?}"))?;
         rotations.push((
-            cosine.enclosure().round_out(40).map_err(|e| format!("{e:?}"))?,
-            sine.enclosure().round_out(40).map_err(|e| format!("{e:?}"))?,
+            cosine
+                .enclosure()
+                .round_out(40)
+                .map_err(|e| format!("{e:?}"))?,
+            sine.enclosure()
+                .round_out(40)
+                .map_err(|e| format!("{e:?}"))?,
         ));
         current = current
             .times(&ratio)
@@ -350,7 +363,8 @@ pub fn found_reaching(
             .map_err(|e| format!("{e:?}"))?;
     }
 
-    let mut complex = PortedOperationComplex::new(format!("site {SITE} contact, {}", candidate.name));
+    let mut complex =
+        PortedOperationComplex::new(format!("site {SITE} contact, {}", candidate.name));
     let standing = complex.port("continuing standing");
     let grained = complex.port("grained standing");
     let receiver_wide = complex.port("receiver chart, all heads");
@@ -371,29 +385,63 @@ pub fn found_reaching(
 
     for (position, symbol) in CAUSED.iter().enumerate() {
         let tag = |what: &str| format!("position {position} {what}");
-        let lookup = law(&mut complex, tag("entering"), OperationSpecies::Construction, vec![], vec![standing]);
+        let lookup = law(
+            &mut complex,
+            tag("entering"),
+            OperationSpecies::Construction,
+            vec![],
+            vec![standing],
+        );
         let lookup_event = complex.occur(lookup).map_err(|e| e.to_string())?;
         program.bind(
             lookup_event,
-            PortedOperationKind::Lookup { population: SYMBOLS.to_owned(), row: *symbol },
+            PortedOperationKind::Lookup {
+                population: SYMBOLS.to_owned(),
+                row: *symbol,
+            },
         );
-        let mut entering =
-            grain_after(&mut complex, &mut program, tag("entering grain"), standing, grained, lookup_event)?;
+        let mut entering = grain_after(
+            &mut complex,
+            &mut program,
+            tag("entering grain"),
+            standing,
+            grained,
+            lookup_event,
+        )?;
         if let Some((from, count)) = ablation {
             // **A targeted ablation, as an occurrence in the diagram.** What it withdraws is its
             // retained fibre, so the predecessor stays reconstructible from the return and the
             // fibre together.
-            let l = law(&mut complex, tag("declared ablation"), OperationSpecies::Quotient, vec![grained], vec![grained]);
+            let l = law(
+                &mut complex,
+                tag("declared ablation"),
+                OperationSpecies::Quotient,
+                vec![grained],
+                vec![grained],
+            );
             let event = complex.occur(l).map_err(|e| e.to_string())?;
             program.bind(event, PortedOperationKind::Ablate { from, count });
-            join(&mut complex, tag("ablation admits"), grained, entering, event, 0)?;
+            join(
+                &mut complex,
+                tag("ablation admits"),
+                grained,
+                entering,
+                event,
+                0,
+            )?;
             entering = event;
         }
 
         // The residual stream is the value BEFORE the entering rebase, which is what both
         // re-entries below return to.
         entering_standing.push(entering);
-        let rebase = law(&mut complex, tag("entering rebase"), OperationSpecies::Transport, vec![grained], vec![standing]);
+        let rebase = law(
+            &mut complex,
+            tag("entering rebase"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![standing],
+        );
         let rebase_event = complex.occur(rebase).map_err(|e| e.to_string())?;
         program.bind(
             rebase_event,
@@ -403,8 +451,22 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("rebase admits"), grained, entering, rebase_event, 0)?;
-        let front = grain_after(&mut complex, &mut program, tag("front grain"), standing, grained, rebase_event)?;
+        join(
+            &mut complex,
+            tag("rebase admits"),
+            grained,
+            entering,
+            rebase_event,
+            0,
+        )?;
+        let front = grain_after(
+            &mut complex,
+            &mut program,
+            tag("front grain"),
+            standing,
+            grained,
+            rebase_event,
+        )?;
 
         let mut branches = Vec::new();
         for (what, suffix, port) in [
@@ -412,20 +474,56 @@ pub fn found_reaching(
             ("presented", "self_attn.k_proj.weight", presented_wide),
             ("carried", "self_attn.v_proj.weight", carried_wide),
         ] {
-            let l = law(&mut complex, tag(what), OperationSpecies::Transport, vec![grained], vec![port]);
+            let l = law(
+                &mut complex,
+                tag(what),
+                OperationSpecies::Transport,
+                vec![grained],
+                vec![port],
+            );
             let event = complex.occur(l).map_err(|e| e.to_string())?;
-            program.bind(event, PortedOperationKind::Contract { population: named(suffix) });
+            program.bind(
+                event,
+                PortedOperationKind::Contract {
+                    population: named(suffix),
+                },
+            );
             join(&mut complex, tag(what), grained, front, event, 0)?;
             branches.push(event);
         }
 
         // One presented and one carried family, and one receiver chart per family.
-        let l = law(&mut complex, tag("presented head"), OperationSpecies::Quotient, vec![presented_wide], vec![presented_head]);
+        let l = law(
+            &mut complex,
+            tag("presented head"),
+            OperationSpecies::Quotient,
+            vec![presented_wide],
+            vec![presented_head],
+        );
         let presented_projected = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(presented_projected, PortedOperationKind::Project { from: 0, count: chart_width });
-        join(&mut complex, tag("presented head"), presented_wide, branches[1], presented_projected, 0)?;
+        program.bind(
+            presented_projected,
+            PortedOperationKind::Project {
+                from: 0,
+                count: chart_width,
+            },
+        );
+        join(
+            &mut complex,
+            tag("presented head"),
+            presented_wide,
+            branches[1],
+            presented_projected,
+            0,
+        )?;
 
-        let l = law(&mut complex, tag("presented rebase"), OperationSpecies::Transport, vec![presented_head], vec![presented_head]);
+        let l = law(
+            &mut complex,
+            tag("presented rebase"),
+            OperationSpecies::Transport,
+            vec![presented_head],
+            vec![presented_head],
+        );
         let presented_rebased = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             presented_rebased,
@@ -435,9 +533,22 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("presented rebase"), presented_head, presented_projected, presented_rebased, 0)?;
+        join(
+            &mut complex,
+            tag("presented rebase"),
+            presented_head,
+            presented_projected,
+            presented_rebased,
+            0,
+        )?;
 
-        let l = law(&mut complex, tag("presented chronology"), OperationSpecies::Transport, vec![presented_head], vec![presented_head]);
+        let l = law(
+            &mut complex,
+            tag("presented chronology"),
+            OperationSpecies::Transport,
+            vec![presented_head],
+            vec![presented_head],
+        );
         let presented_turned = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             presented_turned,
@@ -447,24 +558,75 @@ pub fn found_reaching(
                 pairs_halves: candidate.pairs_halves,
             },
         );
-        join(&mut complex, tag("presented turns"), presented_head, presented_rebased, presented_turned, 0)?;
+        join(
+            &mut complex,
+            tag("presented turns"),
+            presented_head,
+            presented_rebased,
+            presented_turned,
+            0,
+        )?;
         turned_presented.push(presented_turned);
 
-        let l = law(&mut complex, tag("carried head"), OperationSpecies::Quotient, vec![carried_wide], vec![carried_head]);
+        let l = law(
+            &mut complex,
+            tag("carried head"),
+            OperationSpecies::Quotient,
+            vec![carried_wide],
+            vec![carried_head],
+        );
         let carried_projected = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(carried_projected, PortedOperationKind::Project { from: 0, count: chart_width });
-        join(&mut complex, tag("carried head"), carried_wide, branches[2], carried_projected, 0)?;
+        program.bind(
+            carried_projected,
+            PortedOperationKind::Project {
+                from: 0,
+                count: chart_width,
+            },
+        );
+        join(
+            &mut complex,
+            tag("carried head"),
+            carried_wide,
+            branches[2],
+            carried_projected,
+            0,
+        )?;
         carried_heads.push(carried_projected);
 
         let mut parts = Vec::new();
         for head in 0..receivers {
             let what = format!("receiver chart {head}");
-            let l = law(&mut complex, tag(&what), OperationSpecies::Quotient, vec![receiver_wide], vec![receiver_head]);
+            let l = law(
+                &mut complex,
+                tag(&what),
+                OperationSpecies::Quotient,
+                vec![receiver_wide],
+                vec![receiver_head],
+            );
             let projected = complex.occur(l).map_err(|e| e.to_string())?;
-            program.bind(projected, PortedOperationKind::Project { from: head * chart_width, count: chart_width });
-            join(&mut complex, tag(&what), receiver_wide, branches[0], projected, 0)?;
+            program.bind(
+                projected,
+                PortedOperationKind::Project {
+                    from: head * chart_width,
+                    count: chart_width,
+                },
+            );
+            join(
+                &mut complex,
+                tag(&what),
+                receiver_wide,
+                branches[0],
+                projected,
+                0,
+            )?;
 
-            let l = law(&mut complex, tag(&format!("{what} rebase")), OperationSpecies::Transport, vec![receiver_head], vec![receiver_head]);
+            let l = law(
+                &mut complex,
+                tag(&format!("{what} rebase")),
+                OperationSpecies::Transport,
+                vec![receiver_head],
+                vec![receiver_head],
+            );
             let rebased = complex.occur(l).map_err(|e| e.to_string())?;
             program.bind(
                 rebased,
@@ -474,9 +636,22 @@ pub fn found_reaching(
                     gain_carries_unit: candidate.gain_carries_unit,
                 },
             );
-            join(&mut complex, tag(&format!("{what} rebase")), receiver_head, projected, rebased, 0)?;
+            join(
+                &mut complex,
+                tag(&format!("{what} rebase")),
+                receiver_head,
+                projected,
+                rebased,
+                0,
+            )?;
 
-            let l = law(&mut complex, tag(&format!("{what} chronology")), OperationSpecies::Transport, vec![receiver_head], vec![receiver_head]);
+            let l = law(
+                &mut complex,
+                tag(&format!("{what} chronology")),
+                OperationSpecies::Transport,
+                vec![receiver_head],
+                vec![receiver_head],
+            );
             let turned = complex.occur(l).map_err(|e| e.to_string())?;
             program.bind(
                 turned,
@@ -486,34 +661,85 @@ pub fn found_reaching(
                     pairs_halves: candidate.pairs_halves,
                 },
             );
-            join(&mut complex, tag(&format!("{what} turns")), receiver_head, rebased, turned, 0)?;
+            join(
+                &mut complex,
+                tag(&format!("{what} turns")),
+                receiver_head,
+                rebased,
+                turned,
+                0,
+            )?;
 
             let reach = position + 1;
             let mut inputs = vec![receiver_head];
             inputs.extend(std::iter::repeat_n(presented_head, reach));
             inputs.extend(std::iter::repeat_n(carried_head, reach));
-            let l = law(&mut complex, tag(&format!("{what} contact")), OperationSpecies::Construction, inputs, vec![carried_head]);
+            let l = law(
+                &mut complex,
+                tag(&format!("{what} contact")),
+                OperationSpecies::Construction,
+                inputs,
+                vec![carried_head],
+            );
             let contact = complex.occur(l).map_err(|e| e.to_string())?;
             program.bind(
                 contact,
                 PortedOperationKind::ContactAndCarry {
                     terms,
-                    scale_width: if candidate.scale_contact { chart_width } else { 1 },
+                    scale_width: if candidate.scale_contact {
+                        chart_width
+                    } else {
+                        1
+                    },
                 },
             );
-            join(&mut complex, tag(&format!("{what} contact receiver")), receiver_head, turned, contact, 0)?;
+            join(
+                &mut complex,
+                tag(&format!("{what} contact receiver")),
+                receiver_head,
+                turned,
+                contact,
+                0,
+            )?;
             for at in 0..reach {
-                join(&mut complex, tag(&format!("{what} presented {at}")), presented_head, turned_presented[at], contact, 1 + at)?;
-                join(&mut complex, tag(&format!("{what} carried {at}")), carried_head, carried_heads[at], contact, 1 + reach + at)?;
+                join(
+                    &mut complex,
+                    tag(&format!("{what} presented {at}")),
+                    presented_head,
+                    turned_presented[at],
+                    contact,
+                    1 + at,
+                )?;
+                join(
+                    &mut complex,
+                    tag(&format!("{what} carried {at}")),
+                    carried_head,
+                    carried_heads[at],
+                    contact,
+                    1 + reach + at,
+                )?;
             }
             parts.push(contact);
         }
 
-        let l = law(&mut complex, tag("carried reconvergence"), OperationSpecies::Construction, vec![carried_head; receivers], vec![carried_wide]);
+        let l = law(
+            &mut complex,
+            tag("carried reconvergence"),
+            OperationSpecies::Construction,
+            vec![carried_head; receivers],
+            vec![carried_wide],
+        );
         let joined = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(joined, PortedOperationKind::Concatenate);
         for (at, part) in parts.iter().enumerate() {
-            join(&mut complex, tag(&format!("reconvergence {at}")), carried_head, *part, joined, at)?;
+            join(
+                &mut complex,
+                tag(&format!("reconvergence {at}")),
+                carried_head,
+                *part,
+                joined,
+                at,
+            )?;
         }
         if reach == Reach::ContactHalf {
             assembled.push(joined);
@@ -524,14 +750,45 @@ pub fn found_reaching(
         // THE GATED PASSAGE HALF. Every population below is named by the source; the four the
         // source does NOT decide are in `WHOLE_LAYER_OPEN` and appear nowhere in this diagram.
         // -------------------------------------------------------------------------------------
-        let returned_grain = grain_after(&mut complex, &mut program, tag("contact return grain"), carried_wide, carried_wide, joined)?;
+        let returned_grain = grain_after(
+            &mut complex,
+            &mut program,
+            tag("contact return grain"),
+            carried_wide,
+            carried_wide,
+            joined,
+        )?;
 
-        let l = law(&mut complex, tag("contact returns"), OperationSpecies::Transport, vec![carried_wide], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("contact returns"),
+            OperationSpecies::Transport,
+            vec![carried_wide],
+            vec![grained],
+        );
         let projected_back = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(projected_back, PortedOperationKind::Contract { population: named("self_attn.o_proj.weight") });
-        join(&mut complex, tag("contact returns"), carried_wide, returned_grain, projected_back, 0)?;
+        program.bind(
+            projected_back,
+            PortedOperationKind::Contract {
+                population: named("self_attn.o_proj.weight"),
+            },
+        );
+        join(
+            &mut complex,
+            tag("contact returns"),
+            carried_wide,
+            returned_grain,
+            projected_back,
+            0,
+        )?;
 
-        let l = law(&mut complex, tag("contact return rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("contact return rebase"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![grained],
+        );
         let returned_rebased = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             returned_rebased,
@@ -541,16 +798,49 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("contact return rebase"), grained, projected_back, returned_rebased, 0)?;
+        join(
+            &mut complex,
+            tag("contact return rebase"),
+            grained,
+            projected_back,
+            returned_rebased,
+            0,
+        )?;
 
         // **THE FIRST RE-ENTRY.** The retained standing and the returned current, joined.
-        let l = law(&mut complex, tag("contact re-entry"), OperationSpecies::Construction, vec![grained, grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("contact re-entry"),
+            OperationSpecies::Construction,
+            vec![grained, grained],
+            vec![grained],
+        );
         let first_re_entry = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(first_re_entry, PortedOperationKind::ReEntry);
-        join(&mut complex, tag("re-entry retains"), grained, entering_standing[position], first_re_entry, 0)?;
-        join(&mut complex, tag("re-entry returns"), grained, returned_rebased, first_re_entry, 1)?;
+        join(
+            &mut complex,
+            tag("re-entry retains"),
+            grained,
+            entering_standing[position],
+            first_re_entry,
+            0,
+        )?;
+        join(
+            &mut complex,
+            tag("re-entry returns"),
+            grained,
+            returned_rebased,
+            first_re_entry,
+            1,
+        )?;
 
-        let l = law(&mut complex, tag("passage entering rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("passage entering rebase"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![grained],
+        );
         let passage_entering = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             passage_entering,
@@ -560,38 +850,136 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("passage entering rebase"), grained, first_re_entry, passage_entering, 0)?;
-        let passage_grain = grain_after(&mut complex, &mut program, tag("passage entering grain"), grained, grained, passage_entering)?;
+        join(
+            &mut complex,
+            tag("passage entering rebase"),
+            grained,
+            first_re_entry,
+            passage_entering,
+            0,
+        )?;
+        let passage_grain = grain_after(
+            &mut complex,
+            &mut program,
+            tag("passage entering grain"),
+            grained,
+            grained,
+            passage_entering,
+        )?;
 
         // **THE FRONT.** The gate and the carried branch are CO-PRESENT — neither reads the other,
         // and `layers()` puts them in one front for exactly that reason.
         let mut passage_branches = Vec::new();
-        for (what, suffix) in [("gate", "mlp.gate_proj.weight"), ("up", "mlp.up_proj.weight")] {
-            let l = law(&mut complex, tag(what), OperationSpecies::Transport, vec![grained], vec![passage_wide]);
+        for (what, suffix) in [
+            ("gate", "mlp.gate_proj.weight"),
+            ("up", "mlp.up_proj.weight"),
+        ] {
+            let l = law(
+                &mut complex,
+                tag(what),
+                OperationSpecies::Transport,
+                vec![grained],
+                vec![passage_wide],
+            );
             let event = complex.occur(l).map_err(|e| e.to_string())?;
-            program.bind(event, PortedOperationKind::Contract { population: named(suffix) });
+            program.bind(
+                event,
+                PortedOperationKind::Contract {
+                    population: named(suffix),
+                },
+            );
             join(&mut complex, tag(what), grained, passage_grain, event, 0)?;
             passage_branches.push(event);
         }
 
-        let l = law(&mut complex, tag("the gate turns"), OperationSpecies::Transport, vec![passage_wide], vec![passage_wide]);
+        let l = law(
+            &mut complex,
+            tag("the gate turns"),
+            OperationSpecies::Transport,
+            vec![passage_wide],
+            vec![passage_wide],
+        );
         let gated = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(gated, PortedOperationKind::GatedPassage { terms, inner: Some(gelu_inner()) });
-        join(&mut complex, tag("the gate turns"), passage_wide, passage_branches[0], gated, 0)?;
+        program.bind(
+            gated,
+            PortedOperationKind::GatedPassage {
+                terms,
+                inner: Some(gelu_inner()),
+            },
+        );
+        join(
+            &mut complex,
+            tag("the gate turns"),
+            passage_wide,
+            passage_branches[0],
+            gated,
+            0,
+        )?;
 
-        let l = law(&mut complex, tag("the gate admits"), OperationSpecies::Construction, vec![passage_wide, passage_wide], vec![passage_wide]);
+        let l = law(
+            &mut complex,
+            tag("the gate admits"),
+            OperationSpecies::Construction,
+            vec![passage_wide, passage_wide],
+            vec![passage_wide],
+        );
         let admitted = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(admitted, PortedOperationKind::Hadamard);
-        join(&mut complex, tag("the gate admits gate"), passage_wide, gated, admitted, 0)?;
-        join(&mut complex, tag("the gate admits up"), passage_wide, passage_branches[1], admitted, 1)?;
-        let admitted_grain = grain_after(&mut complex, &mut program, tag("passage grain"), passage_wide, passage_wide, admitted)?;
+        join(
+            &mut complex,
+            tag("the gate admits gate"),
+            passage_wide,
+            gated,
+            admitted,
+            0,
+        )?;
+        join(
+            &mut complex,
+            tag("the gate admits up"),
+            passage_wide,
+            passage_branches[1],
+            admitted,
+            1,
+        )?;
+        let admitted_grain = grain_after(
+            &mut complex,
+            &mut program,
+            tag("passage grain"),
+            passage_wide,
+            passage_wide,
+            admitted,
+        )?;
 
-        let l = law(&mut complex, tag("the passage returns"), OperationSpecies::Transport, vec![passage_wide], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("the passage returns"),
+            OperationSpecies::Transport,
+            vec![passage_wide],
+            vec![grained],
+        );
         let passage_returned = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(passage_returned, PortedOperationKind::Contract { population: named("mlp.down_proj.weight") });
-        join(&mut complex, tag("the passage returns"), passage_wide, admitted_grain, passage_returned, 0)?;
+        program.bind(
+            passage_returned,
+            PortedOperationKind::Contract {
+                population: named("mlp.down_proj.weight"),
+            },
+        );
+        join(
+            &mut complex,
+            tag("the passage returns"),
+            passage_wide,
+            admitted_grain,
+            passage_returned,
+            0,
+        )?;
 
-        let l = law(&mut complex, tag("passage return rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("passage return rebase"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![grained],
+        );
         let passage_rebased = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             passage_rebased,
@@ -601,14 +989,41 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("passage return rebase"), grained, passage_returned, passage_rebased, 0)?;
+        join(
+            &mut complex,
+            tag("passage return rebase"),
+            grained,
+            passage_returned,
+            passage_rebased,
+            0,
+        )?;
 
         // **THE SECOND RE-ENTRY.** The layer's return.
-        let l = law(&mut complex, tag("passage re-entry"), OperationSpecies::Construction, vec![grained, grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("passage re-entry"),
+            OperationSpecies::Construction,
+            vec![grained, grained],
+            vec![grained],
+        );
         let second_re_entry = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(second_re_entry, PortedOperationKind::ReEntry);
-        join(&mut complex, tag("passage re-entry retains"), grained, first_re_entry, second_re_entry, 0)?;
-        join(&mut complex, tag("passage re-entry returns"), grained, passage_rebased, second_re_entry, 1)?;
+        join(
+            &mut complex,
+            tag("passage re-entry retains"),
+            grained,
+            first_re_entry,
+            second_re_entry,
+            0,
+        )?;
+        join(
+            &mut complex,
+            tag("passage re-entry returns"),
+            grained,
+            passage_rebased,
+            second_re_entry,
+            1,
+        )?;
         if reach == Reach::WholeLayer {
             assembled.push(second_re_entry);
             continue;
@@ -617,7 +1032,13 @@ pub fn found_reaching(
         // -------------------------------------------------------------------------------------
         // THE EMISSION. The body's final rebase, then the TIED head.
         // -------------------------------------------------------------------------------------
-        let l = law(&mut complex, tag("the body's rebase"), OperationSpecies::Transport, vec![grained], vec![grained]);
+        let l = law(
+            &mut complex,
+            tag("the body's rebase"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![grained],
+        );
         let body_rebased = complex.occur(l).map_err(|e| e.to_string())?;
         program.bind(
             body_rebased,
@@ -627,13 +1048,45 @@ pub fn found_reaching(
                 gain_carries_unit: candidate.gain_carries_unit,
             },
         );
-        join(&mut complex, tag("the body's rebase"), grained, second_re_entry, body_rebased, 0)?;
-        let emission_grain = grain_after(&mut complex, &mut program, tag("emission grain"), grained, grained, body_rebased)?;
+        join(
+            &mut complex,
+            tag("the body's rebase"),
+            grained,
+            second_re_entry,
+            body_rebased,
+            0,
+        )?;
+        let emission_grain = grain_after(
+            &mut complex,
+            &mut program,
+            tag("emission grain"),
+            grained,
+            grained,
+            body_rebased,
+        )?;
 
-        let l = law(&mut complex, tag("the emission"), OperationSpecies::Transport, vec![grained], vec![potential]);
+        let l = law(
+            &mut complex,
+            tag("the emission"),
+            OperationSpecies::Transport,
+            vec![grained],
+            vec![potential],
+        );
         let emitted = complex.occur(l).map_err(|e| e.to_string())?;
-        program.bind(emitted, PortedOperationKind::Contract { population: SYMBOLS.to_owned() });
-        join(&mut complex, tag("the emission"), grained, emission_grain, emitted, 0)?;
+        program.bind(
+            emitted,
+            PortedOperationKind::Contract {
+                population: SYMBOLS.to_owned(),
+            },
+        );
+        join(
+            &mut complex,
+            tag("the emission"),
+            grained,
+            emission_grain,
+            emitted,
+            0,
+        )?;
         assembled.push(emitted);
     }
 
@@ -736,7 +1189,12 @@ fn join(
     input: usize,
 ) -> Result<(), String> {
     complex
-        .carries_precedence(name, boundary, OccurrencePort::output(source, 0), OccurrencePort::input(target, input))
+        .carries_precedence(
+            name,
+            boundary,
+            OccurrencePort::output(source, 0),
+            OccurrencePort::input(target, input),
+        )
         .map_err(|error| error.to_string())
 }
 
@@ -748,13 +1206,18 @@ fn grain_after(
     to: BoundaryId,
     source: EventId,
 ) -> Result<EventId, String> {
-    let l = law(complex, name.clone(), OperationSpecies::Quotient, vec![from], vec![to]);
+    let l = law(
+        complex,
+        name.clone(),
+        OperationSpecies::Quotient,
+        vec![from],
+        vec![to],
+    );
     let event = complex.occur(l).map_err(|e| e.to_string())?;
     program.bind(event, PortedOperationKind::GrainBoundary);
     join(complex, name, from, source, event, 0)?;
     Ok(event)
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // THE NATIVE SIDE: a carrier that holds NO source handle, and the container writer it reads back.
@@ -778,7 +1241,6 @@ pub struct NativeRestCarrier<'chart> {
 
 /// Read off the carrier and the diagram, exactly as the source-fed conduct reads it.
 
-
 impl PortedCarrier for NativeRestCarrier<'_> {
     fn contract(&mut self, population: &str, standing: &[Rat]) -> Result<Vec<Rat>, String> {
         let tensor = self
@@ -794,8 +1256,8 @@ impl PortedCarrier for NativeRestCarrier<'_> {
             }
             words.push(word);
         }
-        let query =
-            holonic_engine::embedding_fiber::align_bfloat16(&words).map_err(|e| format!("{e:?}"))?;
+        let query = holonic_engine::embedding_fiber::align_bfloat16(&words)
+            .map_err(|e| format!("{e:?}"))?;
         if self.resident.contains_key(population) {
             self.reused += 1;
         } else {
@@ -860,7 +1322,11 @@ impl PortedCarrier for NativeRestCarrier<'_> {
         for value in standing {
             let (word, remainder) = round_into_bfloat16(value).map_err(|e| format!("{e:?}"))?;
             let datum = decode_bfloat16_bits(word).map_err(|e| format!("{e:?}"))?;
-            rounded.push((datum.value(), datum.ulp_exponent, datum.significand.bits() == 0));
+            rounded.push((
+                datum.value(),
+                datum.ulp_exponent,
+                datum.significand.bits() == 0,
+            ));
             residual.push(remainder);
         }
         let top = rounded
@@ -904,7 +1370,8 @@ pub fn write_container(
     }
     let text = serde_json::to_string(&serde_json::Value::Object(map)).expect("header");
     let mut file = std::fs::File::create(path).expect("create");
-    file.write_all(&(text.len() as u64).to_le_bytes()).expect("length");
+    file.write_all(&(text.len() as u64).to_le_bytes())
+        .expect("length");
     file.write_all(text.as_bytes()).expect("header");
     file.write_all(payload).expect("payload");
 }

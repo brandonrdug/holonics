@@ -76,6 +76,9 @@ pub const FULL_BANDS: &str = "full band elements (theta 1e6, 64 rotated pairs of
 pub const ENTERING: &str = "entering rows";
 /// The residual stream carried in from the previous layer.
 pub const CARRIED_STANDING: &str = "carried standing";
+/// The occurrence which presents `CARRIED_STANDING` inside the receiving layer/final complex.
+/// This is a lineage return, not a receiver reading or a released section.
+pub const CARRIED_ENTRY: &str = "carried standing entry";
 pub const SHARED_K_SLIDING: &str = "shared K, sliding (stored by layer 22)";
 pub const SHARED_V_SLIDING: &str = "shared V, sliding (stored by layer 22)";
 pub const SHARED_K_FULL: &str = "shared K, full (stored by layer 23)";
@@ -548,6 +551,7 @@ pub fn found_layer(
                     name: CARRIED_STANDING.to_owned(),
                 },
             );
+            returns.insert(CARRIED_ENTRY, carried);
             carried
         }
     };
@@ -1266,6 +1270,10 @@ pub fn found_layer(
                     name: v_name.to_owned(),
                 },
             );
+            // These lineage returns name the exact receiving occurrences for the stored K/V
+            // sections.  The population names are already unique within the layer complex.
+            returns.insert(k_name, k);
+            returns.insert(v_name, v);
             (k, v)
         }
     };
@@ -1958,6 +1966,7 @@ pub fn found_final(
             name: CARRIED_STANDING.to_owned(),
         },
     );
+    returns.insert(CARRIED_ENTRY, carried);
     let normed = law(
         &mut complex,
         "final rebase",

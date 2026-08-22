@@ -35,7 +35,6 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
-use life::founded_mouth::FoundedMouth;
 use holonic_engine::codec_recovery::{
     conform, Boundary, Conformance, OpaqueSymbolCodec, RecoveredCodec, Symbol,
 };
@@ -48,9 +47,10 @@ use holonic_engine::lean_development::{
     read_development, DeclarationGrain, BINDING_TACTICS, DECLARATION_MODIFIERS, PREAMBLE_FORMS,
 };
 use life::exposure_codec::{
-    carried, octets_of, recover, ExposedMaterial, ExposureApertures, ExposureObstruction,
-    ExposureRecovery, LadderStop, Unit, UnitRole, ladder,
+    carried, ladder, octets_of, recover, ExposedMaterial, ExposureApertures, ExposureObstruction,
+    ExposureRecovery, LadderStop, Unit, UnitRole,
 };
+use life::founded_mouth::FoundedMouth;
 use life::text_material::ExactTextMaterialAtlas;
 
 struct Settings {
@@ -154,9 +154,7 @@ fn run() -> Result<(), String> {
     println!(
         "  STRICTLY FINER and correct. Equality holds exactly when radius two already sufficed."
     );
-    println!(
-        "  The law is containment; the pairs only a longer context separated are the return."
-    );
+    println!("  The law is containment; the pairs only a longer context separated are the return.");
     let signature = signature_quotient(&material, &recovery.alphabet);
     let refined: BTreeSet<BTreeSet<Unit>> = recovery.direct_quotient.iter().cloned().collect();
     let signed: BTreeSet<BTreeSet<Unit>> = signature.iter().cloned().collect();
@@ -514,7 +512,8 @@ fn run() -> Result<(), String> {
                         .unwrap_or_else(|| "-".to_owned())
                 );
                 let recovered_here = step.codec.is_some();
-                let internal: BTreeSet<Unit> = step.opening_frame.internal.iter().copied().collect();
+                let internal: BTreeSet<Unit> =
+                    step.opening_frame.internal.iter().copied().collect();
                 let moved = rungs
                     .last()
                     .map(|(_, previous): &(u64, BTreeSet<Unit>)| {
@@ -558,21 +557,37 @@ fn run() -> Result<(), String> {
     answer_key_comparison(&codec, &held_out);
 
     println!("\n=== [9b] THE LADDER — THE SAME LAW, ONE SCALE UP ===");
-    println!("  Sections 2 through 9 are ONE rung. The recovery reads a candidate alphabet and returns");
-    println!("  the units the material founds out of it; declaring those units as the next alphabet and");
-    println!("  asking again is the same law at the next scale. Nothing below knows what a character, a");
+    println!(
+        "  Sections 2 through 9 are ONE rung. The recovery reads a candidate alphabet and returns"
+    );
+    println!(
+        "  the units the material founds out of it; declaring those units as the next alphabet and"
+    );
+    println!(
+        "  asking again is the same law at the next scale. Nothing below knows what a character, a"
+    );
     println!("  word or a statement is, and no rung is told what the rung under it recovered.");
     println!();
-    println!("  This is what supersedes an authored grammar. A separator founded once and used at every");
+    println!(
+        "  This is what supersedes an authored grammar. A separator founded once and used at every"
+    );
     println!("  depth is one material's self-similarity promoted to a law; here each rung founds its own,");
     println!("  and where a rung founds nothing it says so by name rather than returning an empty split.");
     ladder_report(founding.clone(), settings.radius, settings.family_words, 4);
 
     println!("\n=== [10] THE MOUTH, AGAINST THE AUTHORED TOKENIZER ===");
-    println!("  Every language ecology in this tree conditions on `lexical_tokens`, which is authored");
-    println!("  end to end — a word rule, a six-glyph punctuation set, a two-species partition, none");
-    println!("  of it read off any material. `FoundedMouth` reads the same octets through the codec");
-    println!("  recovered above and carries BOTH readings, because an excision is graded by its orbit");
+    println!(
+        "  Every language ecology in this tree conditions on `lexical_tokens`, which is authored"
+    );
+    println!(
+        "  end to end — a word rule, a six-glyph punctuation set, a two-species partition, none"
+    );
+    println!(
+        "  of it read off any material. `FoundedMouth` reads the same octets through the codec"
+    );
+    println!(
+        "  recovered above and carries BOTH readings, because an excision is graded by its orbit"
+    );
     println!("  and a replacement with no exhibited difference is bookkeeping.");
     // The HELD-OUT stream first, because its refusal is a return and not a failure: a codec
     // declines material carrying an octet the founding never showed, rather than guessing. That
@@ -603,7 +618,10 @@ fn run() -> Result<(), String> {
                 mouth.authored.len(),
                 disagreements.len()
             );
-            println!("  gauge freedoms the material never realised: {:?}", mouth.gauge_freedom);
+            println!(
+                "  gauge freedoms the material never realised: {:?}",
+                mouth.gauge_freedom
+            );
             println!("\n  the first parts each reading returns, side by side:");
             for at in 0..mouth.founded.len().min(12) {
                 println!(
@@ -851,7 +869,6 @@ fn report(recovery: &ExposureRecovery, extent: u64) {
         recovery.work.fixed_point_rounds
     );
 }
-
 
 /// Climb the recovery and report every rung, plus the named stop.
 ///

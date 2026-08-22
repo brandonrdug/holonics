@@ -261,11 +261,7 @@ impl MaterialAtlas {
     ///
     /// `kind` keeps this atlas's own, because [`MaterialKind`] documents itself as provenance that
     /// decides nothing; the contacts carry their faces and those are what a reading consults.
-    pub fn merge(
-        &self,
-        other: &Self,
-        other_prefix: &str,
-    ) -> Result<Self, MaterialIncidenceError> {
+    pub fn merge(&self, other: &Self, other_prefix: &str) -> Result<Self, MaterialIncidenceError> {
         if other_prefix.split_whitespace().count() != 1 {
             return Err(MaterialIncidenceError::ConstituentCarriesWhitespace(
                 other_prefix.to_owned(),
@@ -2148,7 +2144,12 @@ mod merged_atlas_tests {
             &[(0, 1, 0, ContactSpecies::Calls)],
         );
         let joined = left.merge(&right, "rust:").expect("the atlases join");
-        assert_eq!(joined.constituents().len(), 4, "{:?}", joined.constituents());
+        assert_eq!(
+            joined.constituents().len(),
+            4,
+            "{:?}",
+            joined.constituents()
+        );
         // and every contact still lands inside its own material
         for contact in joined.contacts() {
             let from_is_right = joined.constituents()[contact.from].starts_with("rust:");
@@ -2275,10 +2276,7 @@ mod face_quotient_tests {
     /// connection is abelian at winding one and no face reading can be evidence there.
     #[test]
     fn one_declared_face_returns_one_block_and_carries_no_evidence() {
-        let quotient = face_quotient(&atlas_of(
-            &["a", "b"],
-            &[(0, 1, 0, ContactSpecies::Calls)],
-        ));
+        let quotient = face_quotient(&atlas_of(&["a", "b"], &[(0, 1, 0, ContactSpecies::Calls)]));
         assert_eq!(quotient.declared, vec!["calls"]);
         assert_eq!(quotient.blocks.len(), 1);
         // and the single block is NOT undersupported: one face cannot be indistinguishable from

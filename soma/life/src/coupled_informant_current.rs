@@ -728,8 +728,8 @@ mod tests {
     use num_bigint::BigInt;
     use relational_geometry::{Rat, ReceiverId};
     use soma_membrane::{
-        CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent,
-        CpuLiveCurrentExecutor, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
+        CpuLiveCurrentExecutor, CurrentExecutionRequest, DirectedExecutionRequest,
+        ExecutedContemporaryEvent, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
         LiveCurrentRestImage, RegionalExecutionRequest, SparseStandingSurface,
     };
 

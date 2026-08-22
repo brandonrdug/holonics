@@ -45,22 +45,22 @@ mod serial_reference;
 
 use std::collections::BTreeMap;
 use std::io::Write;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::exact_work::{WorkBudget, WorkMetric};
 use holonic_engine::front_passage::{
-    Ceiling, CompileRefusal, CompiledPassage, DeedReceiver, FrontPassage, FrontPassageObstruction, MaterialAdmission,
-    PassageReturn, ResourceObstruction, ResidentMaterial,
+    Ceiling, CompileRefusal, CompiledPassage, DeedReceiver, FrontPassage, FrontPassageObstruction,
+    MaterialAdmission, PassageReturn, ResidentMaterial, ResourceObstruction,
 };
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::SourceTestimony;
 use holonic_engine::resident_section::{
-    production_cone_reaches_the_reference, word_value, Dyadic, ResidentGrain, ResidentSurface, SeriesAperture,
-    REFUSED_MALFORMED,
+    Dyadic, REFUSED_MALFORMED, ResidentGrain, ResidentSurface, SeriesAperture,
+    production_cone_reaches_the_reference, word_value,
 };
 use holonic_engine::source_occurrence::{AuthenticatedContainer, SourceOccurrence, SourceRefusal};
 use num_bigint::BigInt;
@@ -102,11 +102,27 @@ fn parse_args() -> Args {
     while let Some(flag) = it.next() {
         match flag.as_str() {
             "--root" => args.root = it.next().expect("--root <dir>"),
-            "--tokens" => args.tokens = it.next().expect("--tokens a,b").split(',').map(|t| t.trim().parse().expect("token id")).collect(),
-            "--second-tokens" => args.second_tokens = it.next().expect("--second-tokens a,b").split(',').map(|t| t.trim().parse().expect("token id")).collect(),
+            "--tokens" => {
+                args.tokens = it
+                    .next()
+                    .expect("--tokens a,b")
+                    .split(',')
+                    .map(|t| t.trim().parse().expect("token id"))
+                    .collect()
+            }
+            "--second-tokens" => {
+                args.second_tokens = it
+                    .next()
+                    .expect("--second-tokens a,b")
+                    .split(',')
+                    .map(|t| t.trim().parse().expect("token id"))
+                    .collect()
+            }
             "--grain" => args.grain = it.next().expect("--grain F").parse().expect("u32"),
             "--terms" => args.terms = it.next().expect("--terms N").parse().expect("u32"),
-            "--work-ceiling" => args.work_ceiling = Some(it.next().expect("--work-ceiling N").parse().expect("u64")),
+            "--work-ceiling" => {
+                args.work_ceiling = Some(it.next().expect("--work-ceiling N").parse().expect("u64"))
+            }
             "--no-serial" => args.serial = false,
             "--no-source-face" => args.source_face = false,
             "--no-whole-digest" => args.whole_digest = false,
@@ -130,7 +146,10 @@ impl Verdicts {
         if !pass {
             self.failed += 1;
         }
-        let line = format!("  [{number:>2}] {verdict}  {name}\n        {}", detail.as_ref());
+        let line = format!(
+            "  [{number:>2}] {verdict}  {name}\n        {}",
+            detail.as_ref()
+        );
         println!("{line}");
         self.lines.push(line);
     }
@@ -162,7 +181,13 @@ fn sample_utilization(stop: Arc<AtomicBool>) -> std::thread::JoinHandle<Vec<u32>
     std::thread::spawn(move || {
         let mut samples = Vec::new();
         while !stop.load(Ordering::Relaxed) {
-            if let Ok(output) = std::process::Command::new("nvidia-smi").args(["--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"]).output() {
+            if let Ok(output) = std::process::Command::new("nvidia-smi")
+                .args([
+                    "--query-gpu=utilization.gpu",
+                    "--format=csv,noheader,nounits",
+                ])
+                .output()
+            {
                 if let Ok(text) = String::from_utf8(output.stdout) {
                     if let Ok(value) = text.trim().parse::<u32>() {
                         samples.push(value);
@@ -177,12 +202,31 @@ fn sample_utilization(stop: Arc<AtomicBool>) -> std::thread::JoinHandle<Vec<u32>
 
 fn describe_obstruction(obstruction: &FrontPassageObstruction) -> String {
     match obstruction {
-        FrontPassageObstruction::Cover { front, barriers } => format!("CoverBarrier at front {front}: {barriers:?}"),
-        FrontPassageObstruction::Interchange { front, because, .. } => format!("InterchangeRefusal at front {front}: {because:?}"),
+        FrontPassageObstruction::Cover { front, barriers } => {
+            format!("CoverBarrier at front {front}: {barriers:?}")
+        }
+        FrontPassageObstruction::Interchange { front, because, .. } => {
+            format!("InterchangeRefusal at front {front}: {because:?}")
+        }
         FrontPassageObstruction::Resource(resource) => format!("ResourceObstruction: {resource:?}"),
         FrontPassageObstruction::Compile(refusal) => format!("CompileRefusal: {refusal}"),
-        FrontPassageObstruction::Refused { occurrence, operation, refusal, slot, lineage } => format!("the card refused at {occurrence:?} ({operation}): {refusal}; slot {slot:?}; complete obstruction lineage {:?}", lineage.refusals),
-        FrontPassageObstruction::Sealed { occurrence, quotient, reopening } => format!("the section at {occurrence:?} was sealed away by the fused quotient {quotient:?}; {reopening}"),
+        FrontPassageObstruction::Refused {
+            occurrence,
+            operation,
+            refusal,
+            slot,
+            lineage,
+        } => format!(
+            "the card refused at {occurrence:?} ({operation}): {refusal}; slot {slot:?}; complete obstruction lineage {:?}",
+            lineage.refusals
+        ),
+        FrontPassageObstruction::Sealed {
+            occurrence,
+            quotient,
+            reopening,
+        } => format!(
+            "the section at {occurrence:?} was sealed away by the fused quotient {quotient:?}; {reopening}"
+        ),
     }
 }
 
@@ -205,19 +249,41 @@ fn conduct<'chart>(
     material_admission: Option<&MaterialAdmission>,
     terms: SeriesAperture,
     layer_scalar: Dyadic,
-    scales: &(holonic_engine::resident_section::DyadicEnclosure, holonic_engine::resident_section::DyadicEnclosure),
+    scales: &(
+        holonic_engine::resident_section::DyadicEnclosure,
+        holonic_engine::resident_section::DyadicEnclosure,
+    ),
     sibling: Sibling,
     terminal: &'static str,
 ) -> Result<Deed<'chart>, FrontPassageObstruction> {
-    let founded = resident_layer::found_deed(scales, terms, layer_scalar, sibling).map_err(|e| FrontPassageObstruction::Compile(CompileRefusal::Shape(e)))?;
+    let founded = resident_layer::found_deed(scales, terms, layer_scalar, sibling)
+        .map_err(|e| FrontPassageObstruction::Compile(CompileRefusal::Shape(e)))?;
     let terminal_event = founded.returns[terminal];
-    let bound = passage.bind(&founded.complex, &founded.realization, material, source, receiver, material_admission, terminal_event)?;
+    let bound = passage.bind(
+        &founded.complex,
+        &founded.realization,
+        material,
+        source,
+        receiver,
+        material_admission,
+        terminal_event,
+    )?;
     let returned = bound.launch(&passage.surface.mode())?;
     let terminal = bound.read_terminal(&returned)?;
-    Ok(Deed { bound, returned, terminal, founded })
+    Ok(Deed {
+        bound,
+        returned,
+        terminal,
+        founded,
+    })
 }
 
-fn nested(coarse: &[(i64, i64)], coarse_grain: u32, fine: &[(i64, i64)], fine_grain: u32) -> (usize, usize) {
+fn nested(
+    coarse: &[(i64, i64)],
+    coarse_grain: u32,
+    fine: &[(i64, i64)],
+    fine_grain: u32,
+) -> (usize, usize) {
     let mut inside = 0usize;
     let mut outside = 0usize;
     for ((cl, ch), (fl, fh)) in coarse.iter().zip(fine) {
@@ -268,22 +334,40 @@ fn read_faces(path: &str) -> Result<BTreeMap<(String, String), SourceFace>, Stri
             continue;
         }
         let mut parts = line.split_whitespace();
-        let (Some(port), Some(dtype), Some(index), Some(hex)) = (parts.next(), parts.next(), parts.next(), parts.next()) else { continue };
+        let (Some(port), Some(dtype), Some(index), Some(hex)) =
+            (parts.next(), parts.next(), parts.next(), parts.next())
+        else {
+            continue;
+        };
         let index: usize = index.parse().map_err(|_| format!("bad index in {line}"))?;
         let bits = u64::from_str_radix(hex, 16).map_err(|_| format!("bad hex in {line}"))?;
         let dyadic = Dyadic::of_binary64_bits(bits).map_err(|e| e.to_string())?;
-        faces.entry((port.to_owned(), dtype.to_owned())).or_default().push((index, dyadic.value()));
+        faces
+            .entry((port.to_owned(), dtype.to_owned()))
+            .or_default()
+            .push((index, dyadic.value()));
     }
     Ok(faces
         .into_iter()
         .map(|(key, mut values)| {
             values.sort_by_key(|(index, _)| *index);
-            (key, SourceFace { values: values.into_iter().map(|(_, v)| v).collect() })
+            (
+                key,
+                SourceFace {
+                    values: values.into_iter().map(|(_, v)| v).collect(),
+                },
+            )
         })
         .collect())
 }
 
-fn defect_of(port: &'static str, dtype: &'static str, enclosure: &[(i64, i64)], grain: ResidentGrain, face: &SourceFace) -> PortDefect {
+fn defect_of(
+    port: &'static str,
+    dtype: &'static str,
+    enclosure: &[(i64, i64)],
+    grain: ResidentGrain,
+    face: &SourceFace,
+) -> PortDefect {
     let mut inside = 0usize;
     let mut outside = 0usize;
     let mut worst_gap = Rat::from_integer(BigInt::from(0));
@@ -302,7 +386,11 @@ fn defect_of(port: &'static str, dtype: &'static str, enclosure: &[(i64, i64)], 
             inside += 1;
         } else {
             outside += 1;
-            let gap = if *value < lo { &lo - value } else { value - &hi };
+            let gap = if *value < lo {
+                &lo - value
+            } else {
+                value - &hi
+            };
             if gap > worst_gap {
                 worst_gap = gap;
                 worst_at = Some(at);
@@ -314,7 +402,11 @@ fn defect_of(port: &'static str, dtype: &'static str, enclosure: &[(i64, i64)], 
         // The bf16 quantization fibre: every real that rounds to this codeword — half an ulp
         // either side of the value, the ulp being 2^(exponent−7) for the value's binade.
         if dtype == "bf16" {
-            let magnitude = if *value < Rat::from_integer(BigInt::from(0)) { -value.clone() } else { value.clone() };
+            let magnitude = if *value < Rat::from_integer(BigInt::from(0)) {
+                -value.clone()
+            } else {
+                value.clone()
+            };
             let ulp = bf16_ulp(&magnitude);
             let half = &ulp / Rat::from_integer(BigInt::from(2));
             let f_lo = value - &half;
@@ -324,7 +416,17 @@ fn defect_of(port: &'static str, dtype: &'static str, enclosure: &[(i64, i64)], 
             }
         }
     }
-    PortDefect { port, dtype, inside, outside, worst_gap, worst_at, first_separating, fibre_meets, widest_enclosure: widest }
+    PortDefect {
+        port,
+        dtype,
+        inside,
+        outside,
+        worst_gap,
+        worst_at,
+        first_separating,
+        fibre_meets,
+        widest_enclosure: widest,
+    }
 }
 
 /// The unit in the last place of a bfloat16 codeword at a magnitude: `2^(e−7)` where `2^e ≤ m < 2^(e+1)`,
@@ -334,7 +436,8 @@ fn bf16_ulp(magnitude: &Rat) -> Rat {
     let mut e: i64 = 0;
     let mut power = Rat::from_integer(BigInt::from(1));
     if magnitude.numer() == &BigInt::from(0) {
-        return Rat::new(BigInt::from(1), BigInt::from(1u128 << 100)) * Rat::new(BigInt::from(1), BigInt::from(1u64 << 33));
+        return Rat::new(BigInt::from(1), BigInt::from(1u128 << 100))
+            * Rat::new(BigInt::from(1), BigInt::from(1u64 << 33));
     }
     while &power * &two <= *magnitude {
         power = &power * &two;
@@ -356,11 +459,16 @@ fn bf16_ulp(magnitude: &Rat) -> Rat {
 fn main() {
     let args = parse_args();
     if args.tokens.is_empty() {
-        eprintln!("--tokens a,b,… is required: the material is supplied at runtime and compiled into nothing");
+        eprintln!(
+            "--tokens a,b,… is required: the material is supplied at runtime and compiled into nothing"
+        );
         std::process::exit(2);
     }
     println!("THE LAYER STAYS ON THE CARD — layer 0 of {}", args.root);
-    println!("  tokens {:?}   grain 2^-{}   series aperture {}   second deed tokens {:?}", args.tokens, args.grain, args.terms, args.second_tokens);
+    println!(
+        "  tokens {:?}   grain 2^-{}   series aperture {}   second deed tokens {:?}",
+        args.tokens, args.grain, args.terms, args.second_tokens
+    );
 
     // ------------------------------------------------------------------------------------------
     // the apparatus, or the typed refusal
@@ -381,18 +489,38 @@ fn main() {
         }
     };
     if args.hidden_card_control {
-        println!("the card answered ({}); the hidden-card control did not hide it", surface.device_name());
+        println!(
+            "the card answered ({}); the hidden-card control did not hide it",
+            surface.device_name()
+        );
         std::process::exit(5);
     }
     let declaration = surface.declaration().clone();
     let mode = surface.mode();
-    println!("  resident chart: {} · {} multiprocessors · warp {} · {} threads/block · compute {}.{} · resident lanes {}",
-        declaration.name, declaration.multiprocessors, declaration.warp_size, declaration.max_threads_per_block,
-        declaration.capability_major, declaration.capability_minor, declaration.resident_lanes());
-    println!("  mode: {} · {} · {} · kernel content {} · device {:?} · apparatus {}",
-        mode.source_law, mode.abi, mode.kernel, mode.kernel_content.as_deref().unwrap_or("?"), mode.device, mode.apparatus);
+    println!(
+        "  resident chart: {} · {} multiprocessors · warp {} · {} threads/block · compute {}.{} · resident lanes {}",
+        declaration.name,
+        declaration.multiprocessors,
+        declaration.warp_size,
+        declaration.max_threads_per_block,
+        declaration.capability_major,
+        declaration.capability_minor,
+        declaration.resident_lanes()
+    );
+    println!(
+        "  mode: {} · {} · {} · kernel content {} · device {:?} · apparatus {}",
+        mode.source_law,
+        mode.abi,
+        mode.kernel,
+        mode.kernel_content.as_deref().unwrap_or("?"),
+        mode.device,
+        mode.apparatus
+    );
     let memory = surface.memory_at_mount();
-    println!("  device memory at mount: {} free of {} octets", memory.free_bytes, memory.total_bytes);
+    println!(
+        "  device memory at mount: {} free of {} octets",
+        memory.free_bytes, memory.total_bytes
+    );
 
     // ------------------------------------------------------------------------------------------
     // the source occurrence and the material: mounted once
@@ -413,40 +541,96 @@ fn main() {
     let grain = ResidentGrain(args.grain);
     let passage = FrontPassage::new(surface, grain);
     // The material deed is predicted from the header and admitted before any map is allocated.
-    let material_plan = resident_layer::material_plan(&source, args.tokens.len().max(args.second_tokens.len())).expect("the material plan reads from the header");
+    let material_plan =
+        resident_layer::material_plan(&source, args.tokens.len().max(args.second_tokens.len()))
+            .expect("the material plan reads from the header");
     let material_prediction = passage.predict_material(&material_plan);
-    println!("  material deed predicted from the header: {} maps · {} resident octets · {} stored octets to cross · {} allocations · charged {} octets at the measured allocation grain {} · transient peak {} octets",
-        material_prediction.maps.len(), material_prediction.resident_octets, material_prediction.ingress_octets, material_prediction.allocations, material_prediction.charged_octets, material_prediction.allocation_grain, material_prediction.transient_peak_octets);
+    println!(
+        "  material deed predicted from the header: {} maps · {} resident octets · {} stored octets to cross · {} allocations · charged {} octets at the measured allocation grain {} · transient peak {} octets",
+        material_prediction.maps.len(),
+        material_prediction.resident_octets,
+        material_prediction.ingress_octets,
+        material_prediction.allocations,
+        material_prediction.charged_octets,
+        material_prediction.allocation_grain,
+        material_prediction.transient_peak_octets
+    );
     let material_admission = match passage.admit_material(&material_prediction) {
         Ok(admission) => admission,
         Err(obstruction) => {
-            println!("REFUSED at material admission, before any map was allocated: {}", describe_obstruction(&obstruction));
+            println!(
+                "REFUSED at material admission, before any map was allocated: {}",
+                describe_obstruction(&obstruction)
+            );
             std::process::exit(4);
         }
     };
-    println!("  material admitted: {} coordinates, {} bounded, free {} octets at admission",
-        material_admission.coordinates.len(), material_admission.coordinates.iter().filter(|c| c.is_bounded()).count(), material_admission.free_octets_at_admission);
+    println!(
+        "  material admitted: {} coordinates, {} bounded, free {} octets at admission",
+        material_admission.coordinates.len(),
+        material_admission
+            .coordinates
+            .iter()
+            .filter(|c| c.is_bounded())
+            .count(),
+        material_admission.free_octets_at_admission
+    );
     let clock = Instant::now();
-    let mount = resident_layer::mount(&mut source, readout, &mut material).expect("the populations mount");
+    let mount =
+        resident_layer::mount(&mut source, readout, &mut material).expect("the populations mount");
     let mount_ms = clock.elapsed().as_millis();
     let reconciled = material_admission.reconcile(&material);
-    let material_reconciles = reconciled.iter().all(|(_, predicted, measured)| predicted == measured) && reconciled.len() == material_plan.maps.len();
-    println!("  material reconciled: {} of {} maps measured exactly as predicted ({})",
-        reconciled.iter().filter(|(_, p, m)| p == m).count(), reconciled.len(), if material_reconciles { "every prediction held" } else { "A PREDICTION WAS REFUTED" });
+    let material_reconciles = reconciled
+        .iter()
+        .all(|(_, predicted, measured)| predicted == measured)
+        && reconciled.len() == material_plan.maps.len();
+    println!(
+        "  material reconciled: {} of {} maps measured exactly as predicted ({})",
+        reconciled.iter().filter(|(_, p, m)| p == m).count(),
+        reconciled.len(),
+        if material_reconciles {
+            "every prediction held"
+        } else {
+            "A PREDICTION WAS REFUTED"
+        }
+    );
     let layer_scalar = mount.layer_scalar.expect("layer_scalar read");
-    println!("  mounted {} populations · {} stored octets · {} resident octets · {} regions identified · layer_scalar {}·2^{} · {} ms",
-        mount.populations, mount.stored_octets, mount.resident_octets, mount.regions.len(), layer_scalar.significand, layer_scalar.exponent, mount_ms);
+    println!(
+        "  mounted {} populations · {} stored octets · {} resident octets · {} regions identified · layer_scalar {}·2^{} · {} ms",
+        mount.populations,
+        mount.stored_octets,
+        mount.resident_octets,
+        mount.regions.len(),
+        layer_scalar.significand,
+        layer_scalar.exponent,
+        mount_ms
+    );
     let bands = resident_layer::found_bands(resident_layer::BAND_TERMS).expect("bands found");
-    let mounted_bands = surface.mount_bands(&bands, resident_layer::BAND_GRAIN).expect("bands mount");
+    let mounted_bands = surface
+        .mount_bands(&bands, resident_layer::BAND_GRAIN)
+        .expect("bands mount");
     let max_position = (args.tokens.len().max(args.second_tokens.len()) - 1) as u32;
-    material.bands.insert(resident_layer::BANDS.to_owned(), (mounted_bands, max_position));
+    material.bands.insert(
+        resident_layer::BANDS.to_owned(),
+        (mounted_bands, max_position),
+    );
     let positions: Vec<u32> = (0..args.tokens.len() as u32).collect();
-    material.positions = Some(surface.mount_positions(&positions).expect("positions mount"));
+    material.positions = Some(
+        surface
+            .mount_positions(&positions)
+            .expect("positions mount"),
+    );
     let scales = resident_layer::algebraic_scales().expect("scales");
     let content_sha256 = match digest_thread {
         Some(handle) => match handle.join().expect("digest thread") {
             (Ok(digest), elapsed) => {
-                println!("  container content sha256 {digest} ({:.1} s, {} octets)", elapsed.as_secs_f64(), std::fs::metadata(&container_locator).map(|m| m.len()).unwrap_or(0));
+                println!(
+                    "  container content sha256 {digest} ({:.1} s, {} octets)",
+                    elapsed.as_secs_f64(),
+                    std::fs::metadata(&container_locator)
+                        .map(|m| m.len())
+                        .unwrap_or(0)
+                );
                 Some(digest)
             }
             (Err(error), _) => {
@@ -455,79 +639,188 @@ fn main() {
             }
         },
         None => {
-            println!("  container content digest NOT taken (--no-whole-digest); the header and every mounted region are still identified");
+            println!(
+                "  container content digest NOT taken (--no-whole-digest); the header and every mounted region are still identified"
+            );
             None
         }
     };
-    let source_occurrence = match resident_layer::source_occurrence(&args.root, mount.regions.clone(), content_sha256) {
+    let source_occurrence = match resident_layer::source_occurrence(
+        &args.root,
+        mount.regions.clone(),
+        content_sha256,
+    ) {
         Ok(occurrence) => occurrence,
         Err(error) => {
             println!("REFUSED: the source occurrence could not be authenticated — {error}");
             std::process::exit(3);
         }
     };
-    println!("  source implementation {} sha256 {} ({})", source_occurrence.implementation.locator, source_occurrence.implementation.sha256, source_occurrence.implementation.version.as_deref().unwrap_or("version unread"));
-    println!("  configuration {} sha256 {} · container header {} octets sha256 {} · {} assets declared ({} used)",
-        source_occurrence.configuration.locator, source_occurrence.configuration.sha256, source_occurrence.container.header_octets, source_occurrence.container.header_sha256,
-        source_occurrence.assets.len(), source_occurrence.assets.iter().filter(|a| a.used).count());
+    println!(
+        "  source implementation {} sha256 {} ({})",
+        source_occurrence.implementation.locator,
+        source_occurrence.implementation.sha256,
+        source_occurrence
+            .implementation
+            .version
+            .as_deref()
+            .unwrap_or("version unread")
+    );
+    println!(
+        "  configuration {} sha256 {} · container header {} octets sha256 {} · {} assets declared ({} used)",
+        source_occurrence.configuration.locator,
+        source_occurrence.configuration.sha256,
+        source_occurrence.container.header_octets,
+        source_occurrence.container.header_sha256,
+        source_occurrence.assets.len(),
+        source_occurrence.assets.iter().filter(|a| a.used).count()
+    );
     let census_after_mount = surface.census();
-    println!("  census after mount: ingress {} octets · allocations {} · resident {} octets", census_after_mount.ingress_octets, census_after_mount.allocations, census_after_mount.resident_octets_now);
+    println!(
+        "  census after mount: ingress {} octets · allocations {} · resident {} octets",
+        census_after_mount.ingress_octets,
+        census_after_mount.allocations,
+        census_after_mount.resident_octets_now
+    );
 
-    let enter_material = |material: &mut ResidentMaterial<'static>, source: &mut Source, tokens: &[usize]| {
-        resident_layer::enter(source, tokens, material).expect("the entering rows read");
-    };
+    let enter_material =
+        |material: &mut ResidentMaterial<'static>, source: &mut Source, tokens: &[usize]| {
+            resident_layer::enter(source, tokens, material).expect("the entering rows read");
+        };
     enter_material(&mut material, &mut source, &args.tokens);
     let terms = SeriesAperture(args.terms);
     let metric = WorkMetric::width_weighted();
     let receiver = match args.work_ceiling {
         Some(ceiling) => {
-            println!("  the receiver declares the scalar metric {} with ceiling {ceiling}; every other semantic coordinate is exhibited as unbounded with what constrains it", metric.name);
+            println!(
+                "  the receiver declares the scalar metric {} with ceiling {ceiling}; every other semantic coordinate is exhibited as unbounded with what constrains it",
+                metric.name
+            );
             DeedReceiver::unbounded().with_scalar(WorkBudget::declared(metric.clone(), ceiling))
         }
         None => {
-            println!("  the receiver declares NO ceiling on any semantic coordinate (--work-ceiling absent): every semantic coordinate is admitted as UNBOUNDED and exhibited with the apparatus limit that still constrains it; the apparatus coordinates are admitted against the mounted card; nothing is `None`");
+            println!(
+                "  the receiver declares NO ceiling on any semantic coordinate (--work-ceiling absent): every semantic coordinate is admitted as UNBOUNDED and exhibited with the apparatus limit that still constrains it; the apparatus coordinates are admitted against the mounted card; nothing is `None`"
+            );
             DeedReceiver::unbounded()
         }
     };
-    let mut verdicts = Verdicts { lines: Vec::new(), failed: 0 };
+    let mut verdicts = Verdicts {
+        lines: Vec::new(),
+        failed: 0,
+    };
 
     // ------------------------------------------------------------------------------------------
     // the diagram, the price of the whole deed, and the admission — before any allocation
     // ------------------------------------------------------------------------------------------
     println!("\nTHE DIAGRAM AND ITS PRICE, BEFORE ANY LAUNCH");
-    let founded = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base).expect("deed founded");
-    let plan = match passage.compile(&founded.complex, &founded.realization, &material, &source_occurrence, founded.returns[resident_layer::LAYER_RETURN]) {
+    let founded = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base)
+        .expect("deed founded");
+    let plan = match passage.compile(
+        &founded.complex,
+        &founded.realization,
+        &material,
+        &source_occurrence,
+        founded.returns[resident_layer::LAYER_RETURN],
+    ) {
         Ok(plan) => plan,
         Err(obstruction) => {
             println!("REFUSED at compile: {}", describe_obstruction(&obstruction));
             std::process::exit(4);
         }
     };
-    println!("  deed: {} ports · {} operations · {} occurrences · {} fronts · closed {} · species {:?}",
-        plan.closure.ports, plan.closure.operations, plan.closure.occurrences, plan.closure.fronts, plan.closure.is_closed(), founded.complex.species_census());
+    println!(
+        "  deed: {} ports · {} operations · {} occurrences · {} fronts · closed {} · species {:?}",
+        plan.closure.ports,
+        plan.closure.operations,
+        plan.closure.occurrences,
+        plan.closure.fronts,
+        plan.closure.is_closed(),
+        founded.complex.species_census()
+    );
     let widest_front = plan.fronts().iter().map(|f| f.breadth()).max().unwrap_or(0);
-    println!("  widest front: {widest_front} members · source bindings validated: {} operations, {} symbols resolved, {} configuration fields matched, {} shapes matched, {} interventions typed",
+    println!(
+        "  widest front: {widest_front} members · source bindings validated: {} operations, {} symbols resolved, {} configuration fields matched, {} shapes matched, {} interventions typed",
         plan.source_bindings.len(),
-        plan.source_bindings.iter().map(|b| b.symbols.len()).sum::<usize>(),
-        plan.source_bindings.iter().map(|b| b.fields.len()).sum::<usize>(),
-        plan.source_bindings.iter().map(|b| b.shapes.len()).sum::<usize>(),
-        plan.source_bindings.iter().map(|b| b.interventions.len()).sum::<usize>());
-    println!("  semantic work predicted a priori: {:?}", plan.deed_prediction.coordinates());
+        plan.source_bindings
+            .iter()
+            .map(|b| b.symbols.len())
+            .sum::<usize>(),
+        plan.source_bindings
+            .iter()
+            .map(|b| b.fields.len())
+            .sum::<usize>(),
+        plan.source_bindings
+            .iter()
+            .map(|b| b.shapes.len())
+            .sum::<usize>(),
+        plan.source_bindings
+            .iter()
+            .map(|b| b.interventions.len())
+            .sum::<usize>()
+    );
+    println!(
+        "  semantic work predicted a priori: {:?}",
+        plan.deed_prediction.coordinates()
+    );
     println!("  apparatus predicted: {:?}", plan.apparatus_prediction);
     let admission = match passage.admit(&plan, &receiver, Some(&material_admission)) {
         Ok(admission) => admission,
         Err(obstruction) => {
-            println!("REFUSED at admission: {}", describe_obstruction(&obstruction));
+            println!(
+                "REFUSED at admission: {}",
+                describe_obstruction(&obstruction)
+            );
             std::process::exit(4);
         }
     };
-    println!("  admission (typed, product-ordered): admitted {} · {} semantic coordinates ({} bounded, {} unbounded) · {} apparatus coordinates ({} bounded, {} unbounded) · free {} octets at admission",
-        admission.is_admitted(), admission.semantic.len(), admission.semantic.iter().filter(|c| c.is_bounded()).count(), admission.semantic.iter().filter(|c| !c.is_bounded()).count(),
-        admission.apparatus.len(), admission.apparatus.iter().filter(|c| c.is_bounded()).count(), admission.apparatus.iter().filter(|c| !c.is_bounded()).count(), admission.free_octets_at_admission);
+    println!(
+        "  admission (typed, product-ordered): admitted {} · {} semantic coordinates ({} bounded, {} unbounded) · {} apparatus coordinates ({} bounded, {} unbounded) · free {} octets at admission",
+        admission.is_admitted(),
+        admission.semantic.len(),
+        admission.semantic.iter().filter(|c| c.is_bounded()).count(),
+        admission
+            .semantic
+            .iter()
+            .filter(|c| !c.is_bounded())
+            .count(),
+        admission.apparatus.len(),
+        admission
+            .apparatus
+            .iter()
+            .filter(|c| c.is_bounded())
+            .count(),
+        admission
+            .apparatus
+            .iter()
+            .filter(|c| !c.is_bounded())
+            .count(),
+        admission.free_octets_at_admission
+    );
     for coordinate in admission.semantic.iter().chain(admission.apparatus.iter()) {
         match &coordinate.ceiling {
-            Ceiling::Bounded { ceiling, declared_by } => println!("    {:<36} required {:>20} ≤ ceiling {:>20}  [{}]  {}", coordinate.name, coordinate.required, ceiling, if coordinate.admitted { "admitted" } else { "REFUSED" }, declared_by),
-            Ceiling::Unbounded { because, constrained_by } => println!("    {:<36} required {:>20}   UNBOUNDED — {because}; constrained by {constrained_by:?}", coordinate.name, coordinate.required),
+            Ceiling::Bounded {
+                ceiling,
+                declared_by,
+            } => println!(
+                "    {:<36} required {:>20} ≤ ceiling {:>20}  [{}]  {}",
+                coordinate.name,
+                coordinate.required,
+                ceiling,
+                if coordinate.admitted {
+                    "admitted"
+                } else {
+                    "REFUSED"
+                },
+                declared_by
+            ),
+            Ceiling::Unbounded {
+                because,
+                constrained_by,
+            } => println!(
+                "    {:<36} required {:>20}   UNBOUNDED — {because}; constrained by {constrained_by:?}",
+                coordinate.name, coordinate.required
+            ),
         }
     }
     let deed_price = metric.price(&plan.deed_prediction);
@@ -539,11 +832,23 @@ fn main() {
     // ------------------------------------------------------------------------------------------
     // THE DEED — bound, launched once, read once
     // ------------------------------------------------------------------------------------------
-    println!("\nTHE DEED — layer 0 with its per-layer input, {} tokens, terminal = the layer's return", args.tokens.len());
+    println!(
+        "\nTHE DEED — layer 0 with its per-layer input, {} tokens, terminal = the layer's return",
+        args.tokens.len()
+    );
     let census_before_bind = surface.census();
     let bind_clock = Instant::now();
-    let founded = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base).expect("deed founded");
-    let bound = match passage.bind(&founded.complex, &founded.realization, &material, &source_occurrence, &receiver, Some(&material_admission), founded.returns[resident_layer::LAYER_RETURN]) {
+    let founded = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base)
+        .expect("deed founded");
+    let bound = match passage.bind(
+        &founded.complex,
+        &founded.realization,
+        &material,
+        &source_occurrence,
+        &receiver,
+        Some(&material_admission),
+        founded.returns[resident_layer::LAYER_RETURN],
+    ) {
         Ok(bound) => bound,
         Err(obstruction) => {
             println!("REFUSED at bind: {}", describe_obstruction(&obstruction));
@@ -553,9 +858,17 @@ fn main() {
     let bind_wall = bind_clock.elapsed();
     let census_after_bind = surface.census();
     let (graph, intended) = bound.graph();
-    println!("  bound in {:.3} s: graph {} nodes / {} edges as the driver holds it · intended {:?} · kernel nodes {} · memset nodes {} · captured launches {} (predicted {})",
-        bind_wall.as_secs_f64(), graph.nodes, graph.edges, intended, graph.kernel_nodes, graph.memset_nodes,
-        census_after_bind.captured_launches - census_before_bind.captured_launches, predicted_launches);
+    println!(
+        "  bound in {:.3} s: graph {} nodes / {} edges as the driver holds it · intended {:?} · kernel nodes {} · memset nodes {} · captured launches {} (predicted {})",
+        bind_wall.as_secs_f64(),
+        graph.nodes,
+        graph.edges,
+        intended,
+        graph.kernel_nodes,
+        graph.memset_nodes,
+        census_after_bind.captured_launches - census_before_bind.captured_launches,
+        predicted_launches
+    );
     let census_before = surface.census();
     let ticks_before = cpu_ticks();
     let stop = Arc::new(AtomicBool::new(false));
@@ -565,7 +878,10 @@ fn main() {
         Ok(returned) => returned,
         Err(obstruction) => {
             stop.store(true, Ordering::Relaxed);
-            println!("REFUSED during the deed: {}", describe_obstruction(&obstruction));
+            println!(
+                "REFUSED during the deed: {}",
+                describe_obstruction(&obstruction)
+            );
             std::process::exit(4);
         }
     };
@@ -577,20 +893,52 @@ fn main() {
     let terminal = match bound.read_terminal(&returned) {
         Ok(terminal) => terminal,
         Err(obstruction) => {
-            println!("REFUSED: the terminal did not stand — {}", describe_obstruction(&obstruction));
+            println!(
+                "REFUSED: the terminal did not stand — {}",
+                describe_obstruction(&obstruction)
+            );
             std::process::exit(4);
         }
     };
     let census_after_read = surface.census();
 
-    println!("  wall {:.3} s · CPU ticks {} · GPU utilization samples {:?} (telemetry, 40 ms aperture; supports, never grades)", wall.as_secs_f64(), ticks_after - ticks_before, samples);
-    println!("  crossing census across the deed: deed launches {} → {} · captured launches {} → {} · synchronizations {} → {} · receipt egress {} → {} octets · section egress {} → {} · section read-outs {} → {} · ingress {} → {}",
-        census_before.deed_launches, census_after.deed_launches, census_before.captured_launches, census_after.captured_launches,
-        census_before.synchronizations, census_after.synchronizations, census_before.egress_receipt_octets, census_after.egress_receipt_octets,
-        census_before.egress_section_octets, census_after.egress_section_octets, census_before.section_read_outs, census_after.section_read_outs,
-        census_before.ingress_octets, census_after.ingress_octets);
-    println!("  the terminal read afterwards: section egress {} → {} octets · read-outs {} → {}", census_after.egress_section_octets, census_after_read.egress_section_octets, census_after.section_read_outs, census_after_read.section_read_outs);
-    println!("  resident octets now {} · peak {} · obstruction lineage: {} refusals (every occurrence stood: {})", census_after.resident_octets_now, census_after.resident_octets_peak, returned.obstruction.refusals.len(), returned.stands());
+    println!(
+        "  wall {:.3} s · CPU ticks {} · GPU utilization samples {:?} (telemetry, 40 ms aperture; supports, never grades)",
+        wall.as_secs_f64(),
+        ticks_after - ticks_before,
+        samples
+    );
+    println!(
+        "  crossing census across the deed: deed launches {} → {} · captured launches {} → {} · synchronizations {} → {} · receipt egress {} → {} octets · section egress {} → {} · section read-outs {} → {} · ingress {} → {}",
+        census_before.deed_launches,
+        census_after.deed_launches,
+        census_before.captured_launches,
+        census_after.captured_launches,
+        census_before.synchronizations,
+        census_after.synchronizations,
+        census_before.egress_receipt_octets,
+        census_after.egress_receipt_octets,
+        census_before.egress_section_octets,
+        census_after.egress_section_octets,
+        census_before.section_read_outs,
+        census_after.section_read_outs,
+        census_before.ingress_octets,
+        census_after.ingress_octets
+    );
+    println!(
+        "  the terminal read afterwards: section egress {} → {} octets · read-outs {} → {}",
+        census_after.egress_section_octets,
+        census_after_read.egress_section_octets,
+        census_after.section_read_outs,
+        census_after_read.section_read_outs
+    );
+    println!(
+        "  resident octets now {} · peak {} · obstruction lineage: {} refusals (every occurrence stood: {})",
+        census_after.resident_octets_now,
+        census_after.resident_octets_peak,
+        returned.obstruction.refusals.len(),
+        returned.stands()
+    );
 
     println!("\nTHE FRONTS");
     let mut every_front_certified = true;
@@ -601,15 +949,34 @@ fn main() {
     let mut couplings_total = 0usize;
     for (front, deed_front) in bound.fronts().iter().zip(&returned.fronts) {
         every_front_certified &= front.certificate.is_interchangeable();
-        every_front_on_device &= front.cover.cpu_cells == 0 && front.cover.device_cells == front.members.len();
+        every_front_on_device &=
+            front.cover.cpu_cells == 0 && front.cover.device_cells == front.members.len();
         couplings_total += deed_front.couplings.len();
         for coupling in &deed_front.couplings {
             every_coupling_ran &= coupling.written && coupling.refused == 0;
         }
         let names: Vec<&str> = front.members.iter().map(|(_, n)| *n).collect();
-        let readings: Vec<String> = deed_front.readings.iter().map(|r| format!("{}:{}≤{}w{}", r.operation, r.measured.max_octave, r.bound, r.measured.max_width)).collect();
-        println!("  depth {:>2}  {:<52} certified {:?} · device cells {} · lanes {} (idle {}) · couplings {} · [octave≤bound width] {:?}",
-            front.depth, format!("{names:?}"), front.certificate.coherence, front.cover.device_cells, front.cover.occupied_lanes, front.cover.idle_lanes, deed_front.couplings.len(), readings);
+        let readings: Vec<String> = deed_front
+            .readings
+            .iter()
+            .map(|r| {
+                format!(
+                    "{}:{}≤{}w{}",
+                    r.operation, r.measured.max_octave, r.bound, r.measured.max_width
+                )
+            })
+            .collect();
+        println!(
+            "  depth {:>2}  {:<52} certified {:?} · device cells {} · lanes {} (idle {}) · couplings {} · [octave≤bound width] {:?}",
+            front.depth,
+            format!("{names:?}"),
+            front.certificate.coherence,
+            front.cover.device_cells,
+            front.cover.occupied_lanes,
+            front.cover.idle_lanes,
+            deed_front.couplings.len(),
+            readings
+        );
         for (_, name) in &front.members {
             if *name == "contract" {
                 contractions += 1;
@@ -628,19 +995,47 @@ fn main() {
         }
         slack_max = slack_max.max(i64::from(bound_octaves) - i64::from(*measured));
     }
-    println!("  contractions {contractions} · reductions {reductions} · couplings {couplings_total} (every one written and unrefused: {every_coupling_ran}) · a-priori bound ≥ measured on every port: {a_priori_holds} · widest slack {slack_max} octaves");
-    println!("  traffic: resident lanes {} · per front (depth, lanes, idle, rounds) {:?}", bound.traffic.resident_lanes, bound.traffic.fronts);
-    println!("           receiver_current over the diagram (earliest section, later arrivals deferred): the earliest section reaches the terminal at chronology {} with {} routes · {} later arrivals deferred (population {}) · {} reconvergent sites · traversible_chain junctions {} · composite (τ, Γ, T) {:?}",
-        bound.traffic.earliest_arrival, bound.traffic.earliest_routes, bound.traffic.deferred_arrivals, bound.traffic.deferred_population,
-        bound.traffic.reconvergent_sites, bound.traffic.junctions.len(),
-        bound.traffic.composite.as_ref().map(|(t, r, p)| (t.to_string(), r.to_string(), p.to_string())));
+    println!(
+        "  contractions {contractions} · reductions {reductions} · couplings {couplings_total} (every one written and unrefused: {every_coupling_ran}) · a-priori bound ≥ measured on every port: {a_priori_holds} · widest slack {slack_max} octaves"
+    );
+    println!(
+        "  traffic: resident lanes {} · per front (depth, lanes, idle, rounds) {:?}",
+        bound.traffic.resident_lanes, bound.traffic.fronts
+    );
+    println!(
+        "           receiver_current over the diagram (earliest section, later arrivals deferred): the earliest section reaches the terminal at chronology {} with {} routes · {} later arrivals deferred (population {}) · {} reconvergent sites · traversible_chain junctions {} · composite (τ, Γ, T) {:?}",
+        bound.traffic.earliest_arrival,
+        bound.traffic.earliest_routes,
+        bound.traffic.deferred_arrivals,
+        bound.traffic.deferred_population,
+        bound.traffic.reconvergent_sites,
+        bound.traffic.junctions.len(),
+        bound.traffic.composite.as_ref().map(|(t, r, p)| (
+            t.to_string(),
+            r.to_string(),
+            p.to_string()
+        ))
+    );
 
-    println!("\nTHE TERMINAL FACE — {} × 2560 enclosures at 2^-{}", args.tokens.len(), args.grain);
+    println!(
+        "\nTHE TERMINAL FACE — {} × 2560 enclosures at 2^-{}",
+        args.tokens.len(),
+        args.grain
+    );
     let widest = terminal.iter().map(|(l, h)| h - l).max().unwrap_or(0);
     let zero_width = terminal.iter().filter(|(l, h)| l == h).count();
-    println!("  widest enclosure {} grains · point enclosures {} of {}", widest, zero_width, terminal.len());
+    println!(
+        "  widest enclosure {} grains · point enclosures {} of {}",
+        widest,
+        zero_width,
+        terminal.len()
+    );
     for (at, (l, h)) in terminal.iter().enumerate().take(4) {
-        println!("    [{at:>4}]  [{}, {}]", word_value(*l, grain), word_value(*h, grain));
+        println!(
+            "    [{at:>4}]  [{}, {}]",
+            word_value(*l, grain),
+            word_value(*h, grain)
+        );
     }
 
     // ------------------------------------------------------------------------------------------
@@ -649,18 +1044,58 @@ fn main() {
     println!("\nTHE FALSIFIERS");
     // 1. the production cone: structural AND behavioural
     let cone = [
-        ("resident_section.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/resident_section.rs")).unwrap_or_default()),
-        ("front_passage.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/front_passage.rs")).unwrap_or_default()),
-        ("resident_law.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/resident_law.rs")).unwrap_or_default()),
-        ("source_occurrence.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/source_occurrence.rs")).unwrap_or_default()),
-        ("phoenix/resident_layer.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/examples/phoenix/resident_layer.rs")).unwrap_or_default()),
-        ("the_layer_stays_on_the_card.rs", std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/examples/the_layer_stays_on_the_card.rs")).unwrap_or_default()),
+        (
+            "resident_section.rs",
+            std::fs::read_to_string(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/src/resident_section.rs"
+            ))
+            .unwrap_or_default(),
+        ),
+        (
+            "front_passage.rs",
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/front_passage.rs"))
+                .unwrap_or_default(),
+        ),
+        (
+            "resident_law.rs",
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/resident_law.rs"))
+                .unwrap_or_default(),
+        ),
+        (
+            "source_occurrence.rs",
+            std::fs::read_to_string(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/src/source_occurrence.rs"
+            ))
+            .unwrap_or_default(),
+        ),
+        (
+            "phoenix/resident_layer.rs",
+            std::fs::read_to_string(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/examples/phoenix/resident_layer.rs"
+            ))
+            .unwrap_or_default(),
+        ),
+        (
+            "the_layer_stays_on_the_card.rs",
+            std::fs::read_to_string(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/examples/the_layer_stays_on_the_card.rs"
+            ))
+            .unwrap_or_default(),
+        ),
     ];
     let scanned: Vec<(&str, String)> = cone
         .iter()
         .map(|(name, text)| {
             let body = text.split("#[cfg(test)]").next().unwrap_or("");
-            let filtered: String = body.lines().filter(|line| !line.trim_start().starts_with('"')).collect::<Vec<_>>().join("\n");
+            let filtered: String = body
+                .lines()
+                .filter(|line| !line.trim_start().starts_with('"'))
+                .collect::<Vec<_>>()
+                .join("\n");
             (*name, filtered)
         })
         .collect();
@@ -678,7 +1113,9 @@ fn main() {
 
     // 2. the negative interval quotient, on the card, against the exact reference
     {
-        let (results, flags) = surface.arithmetic_control(&[-2], &[1], &[1], &[1]).expect("control");
+        let (results, flags) = surface
+            .arithmetic_control(&[-2], &[1], &[1], &[1])
+            .expect("control");
         let (q_lo, q_hi) = (results[0][6], results[0][7]);
         verdicts.record(2, "negative division: N=[-2,-1], D=[1,2] → [-2,-1/2] on the card",
             q_lo == -4 && q_hi == -1 && flags[0] == 0,
@@ -701,7 +1138,10 @@ fn main() {
         let mut from = 0usize;
         while let Some(found) = own[from..].find("verdicts.record(") {
             let at = from + found;
-            let end = own[at..].find("format!(").map(|e| at + e).unwrap_or(own.len());
+            let end = own[at..]
+                .find("format!(")
+                .map(|e| at + e)
+                .unwrap_or(own.len());
             // The predicate slice, with string literals removed so a verdict's own name cannot
             // count against it.
             let mut stripped = String::new();
@@ -715,7 +1155,10 @@ fn main() {
                     stripped.push(character);
                 }
             }
-            if stripped.contains("samples") || stripped.contains("ticks") || stripped.contains("utilization") {
+            if stripped.contains("samples")
+                || stripped.contains("ticks")
+                || stripped.contains("utilization")
+            {
                 predicates_clean = false;
             }
             inspected += 1;
@@ -732,25 +1175,79 @@ fn main() {
     //    predicted and measured apparatus populations reconcile; the allocation grain moves the
     //    requirement lawfully; and no clock enters the admission.
     {
-        let starved_scalar = DeedReceiver::unbounded().with_scalar(WorkBudget::declared(metric.clone(), u64::try_from(&deed_price).unwrap_or(u64::MAX).saturating_sub(1)));
+        let starved_scalar = DeedReceiver::unbounded().with_scalar(WorkBudget::declared(
+            metric.clone(),
+            u64::try_from(&deed_price)
+                .unwrap_or(u64::MAX)
+                .saturating_sub(1),
+        ));
         let written = u64::try_from(&predicted_entries_written).unwrap_or(u64::MAX);
-        let starved_named = DeedReceiver::unbounded().with_ceiling("entries-written", written.saturating_sub(1));
-        let narrow_apparatus = DeedReceiver::unbounded().with_apparatus_aperture("charged-resident-octets", predicted_apparatus.charged_octets.saturating_sub(1));
+        let starved_named =
+            DeedReceiver::unbounded().with_ceiling("entries-written", written.saturating_sub(1));
+        let narrow_apparatus = DeedReceiver::unbounded().with_apparatus_aperture(
+            "charged-resident-octets",
+            predicted_apparatus.charged_octets.saturating_sub(1),
+        );
         let before = surface.census();
         let mut outcomes = Vec::new();
-        for (what, rcv) in [("scalar", &starved_scalar), ("entries-written", &starved_named), ("charged-resident-octets", &narrow_apparatus)] {
-            let founded_starved = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base).expect("deed founded");
-            let outcome = passage.bind(&founded_starved.complex, &founded_starved.realization, &material, &source_occurrence, rcv, Some(&material_admission), founded_starved.returns[resident_layer::LAYER_RETURN]);
+        for (what, rcv) in [
+            ("scalar", &starved_scalar),
+            ("entries-written", &starved_named),
+            ("charged-resident-octets", &narrow_apparatus),
+        ] {
+            let founded_starved =
+                resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base)
+                    .expect("deed founded");
+            let outcome = passage.bind(
+                &founded_starved.complex,
+                &founded_starved.realization,
+                &material,
+                &source_occurrence,
+                rcv,
+                Some(&material_admission),
+                founded_starved.returns[resident_layer::LAYER_RETURN],
+            );
             let named = match &outcome {
-                Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic { coordinate })) => format!("semantic refusal naming {} (required {} > ceiling)", coordinate.name, coordinate.required),
-                Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus { coordinate })) => format!("apparatus refusal naming {} (required {} > aperture)", coordinate.name, coordinate.required),
-                Err(o) => format!("OTHER: {}", describe_obstruction(o).chars().take(120).collect::<String>()),
+                Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic {
+                    coordinate,
+                })) => format!(
+                    "semantic refusal naming {} (required {} > ceiling)",
+                    coordinate.name, coordinate.required
+                ),
+                Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus {
+                    coordinate,
+                })) => format!(
+                    "apparatus refusal naming {} (required {} > aperture)",
+                    coordinate.name, coordinate.required
+                ),
+                Err(o) => format!(
+                    "OTHER: {}",
+                    describe_obstruction(o)
+                        .chars()
+                        .take(120)
+                        .collect::<String>()
+                ),
                 Ok(_) => "BOUND (no refusal)".to_owned(),
             };
             let typed = match (what, &outcome) {
-                ("scalar", Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic { coordinate }))) => coordinate.name == "scalar-price-under-declared-metric",
-                ("entries-written", Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic { coordinate }))) => coordinate.name == "entries-written",
-                ("charged-resident-octets", Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus { coordinate }))) => coordinate.name == "charged-resident-octets",
+                (
+                    "scalar",
+                    Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic {
+                        coordinate,
+                    })),
+                ) => coordinate.name == "scalar-price-under-declared-metric",
+                (
+                    "entries-written",
+                    Err(FrontPassageObstruction::Resource(ResourceObstruction::Semantic {
+                        coordinate,
+                    })),
+                ) => coordinate.name == "entries-written",
+                (
+                    "charged-resident-octets",
+                    Err(FrontPassageObstruction::Resource(ResourceObstruction::Apparatus {
+                        coordinate,
+                    })),
+                ) => coordinate.name == "charged-resident-octets",
                 _ => false,
             };
             outcomes.push((what, typed, named));
@@ -767,8 +1264,20 @@ fn main() {
         //     cited, and nothing `None`
         let semantic_names: Vec<&str> = bound.admission.semantic.iter().map(|c| c.name).collect();
         let every_unbounded_constrained = bound.admission.unbounded().all(|c| matches!(&c.ceiling, Ceiling::Unbounded { constrained_by, because } if !constrained_by.is_empty() && !because.is_empty()));
-        let cited = bound.admission.apparatus.iter().find(|c| c.name == "source-standing-octets").map(|c| c.is_bounded() && c.admitted).unwrap_or(false);
-        let bounded_apparatus: Vec<&str> = bound.admission.apparatus.iter().filter(|c| c.is_bounded()).map(|c| c.name).collect();
+        let cited = bound
+            .admission
+            .apparatus
+            .iter()
+            .find(|c| c.name == "source-standing-octets")
+            .map(|c| c.is_bounded() && c.admitted)
+            .unwrap_or(false);
+        let bounded_apparatus: Vec<&str> = bound
+            .admission
+            .apparatus
+            .iter()
+            .filter(|c| c.is_bounded())
+            .map(|c| c.name)
+            .collect();
         verdicts.record(24, "the actual deed's admission is typed: every coordinate bounded or exhibited as unbounded with its reason and constraint; the material admission is cited; nothing is None",
             bound.admission.is_admitted() && bound.admission.semantic.len() == 9 && every_unbounded_constrained && cited && bound.admission.cited_material.is_some() && bounded_apparatus.contains(&"carrier-peak-octaves") && bounded_apparatus.contains(&"charged-resident-octets") && bounded_apparatus.contains(&"scratch-octets") && bounded_apparatus.contains(&"grid-extent"),
             format!("semantic coordinates {semantic_names:?}: {} bounded by the receiver, {} exhibited unbounded with their constraints; apparatus bounded {bounded_apparatus:?}, {} apparatus coordinates exhibited unbounded; source standing cited from the material admission ({} resident octets admitted against {} free)",
@@ -781,15 +1290,18 @@ fn main() {
         let captured = census_after_bind.captured_launches - census_before_bind.captured_launches;
         let allocations = census_after_bind.allocations - census_before_bind.allocations;
         let ingress = census_after_bind.ingress_octets - census_before_bind.ingress_octets;
-        let receipt_egress = census_after.egress_receipt_octets - census_before.egress_receipt_octets;
+        let receipt_egress =
+            census_after.egress_receipt_octets - census_before.egress_receipt_octets;
         let reconciles = captured == predicted_apparatus.captured_launches
             && allocations == predicted_apparatus.allocations
             && ingress == predicted_apparatus.ingress_octets
             && receipt_egress == predicted_apparatus.egress_receipt_octets
             && graph.nodes as u64 == predicted_apparatus.graph_nodes
             && graph.edges as u64 == predicted_apparatus.graph_edges
-            && census_after.deed_launches - census_before.deed_launches == predicted_apparatus.deed_launches
-            && census_after.synchronizations - census_before.synchronizations == predicted_apparatus.synchronizations
+            && census_after.deed_launches - census_before.deed_launches
+                == predicted_apparatus.deed_launches
+            && census_after.synchronizations - census_before.synchronizations
+                == predicted_apparatus.synchronizations
             && material_reconciles;
         verdicts.record(25, "predicted and measured apparatus populations reconcile, for the deed and for the material",
             reconciles,
@@ -811,7 +1323,14 @@ fn main() {
 
         // 27. no wall-clock, utilization or scalar pressure chooses admission: the admission owner's
         //     own text, production bodies only
-        let clock_tokens = ["Instant", "elapsed(", "SystemTime", "utilization", "nvidia-smi", "Duration"];
+        let clock_tokens = [
+            "Instant",
+            "elapsed(",
+            "SystemTime",
+            "utilization",
+            "nvidia-smi",
+            "Duration",
+        ];
         let mut reached_clock: Vec<String> = Vec::new();
         for (name, text) in scanned.iter().take(4) {
             for token in clock_tokens {
@@ -828,17 +1347,60 @@ fn main() {
     // 6. source symbol / configuration / shape mutation refuses
     {
         let mutate = |f: &dyn Fn(&mut Vec<SourceTestimony>)| {
-            let mut founded = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base).expect("deed");
-            let law_id = founded.complex.shape.laws.iter().find(|(_, law)| law.name == "input rebase").map(|(id, _)| *id).expect("input rebase");
+            let mut founded =
+                resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base)
+                    .expect("deed");
+            let law_id = founded
+                .complex
+                .shape
+                .laws
+                .iter()
+                .find(|(_, law)| law.name == "input rebase")
+                .map(|(id, _)| *id)
+                .expect("input rebase");
             let operation = founded.complex.operations.get_mut(&law_id).expect("bound");
             f(&mut operation.testimony);
-            passage.compile(&founded.complex, &founded.realization, &material, &source_occurrence, founded.returns[resident_layer::LAYER_RETURN]).map(|_| ())
+            passage
+                .compile(
+                    &founded.complex,
+                    &founded.realization,
+                    &material,
+                    &source_occurrence,
+                    founded.returns[resident_layer::LAYER_RETURN],
+                )
+                .map(|_| ())
         };
-        let symbol = mutate(&|t| t.push(SourceTestimony::Implementation { locator: resident_layer::IMPLEMENTATION.to_owned(), symbol: "Gemma4RMSNorm.forward_fabricated".to_owned() }));
-        let slice = mutate(&|t| t.push(SourceTestimony::Implementation { locator: resident_layer::IMPLEMENTATION.to_owned(), symbol: "Gemma4RMSNorm.forward (normed_output = normed_output * self.weight.double())".to_owned() }));
-        let field = mutate(&|t| t.push(SourceTestimony::Configuration { field: "rms_norm_eps".to_owned(), value: "1e-05".to_owned() }));
-        let shape = mutate(&|t| t.push(SourceTestimony::DeclaredShape { population: resident_layer::named("input_layernorm.weight"), shape: vec![2561] }));
-        let intervention = mutate(&|t| t.push(SourceTestimony::Intervention { statement: "an intervention offered as source law".to_owned() }));
+        let symbol = mutate(&|t| {
+            t.push(SourceTestimony::Implementation {
+                locator: resident_layer::IMPLEMENTATION.to_owned(),
+                symbol: "Gemma4RMSNorm.forward_fabricated".to_owned(),
+            })
+        });
+        let slice = mutate(&|t| {
+            t.push(SourceTestimony::Implementation {
+                locator: resident_layer::IMPLEMENTATION.to_owned(),
+                symbol:
+                    "Gemma4RMSNorm.forward (normed_output = normed_output * self.weight.double())"
+                        .to_owned(),
+            })
+        });
+        let field = mutate(&|t| {
+            t.push(SourceTestimony::Configuration {
+                field: "rms_norm_eps".to_owned(),
+                value: "1e-05".to_owned(),
+            })
+        });
+        let shape = mutate(&|t| {
+            t.push(SourceTestimony::DeclaredShape {
+                population: resident_layer::named("input_layernorm.weight"),
+                shape: vec![2561],
+            })
+        });
+        let intervention = mutate(&|t| {
+            t.push(SourceTestimony::Intervention {
+                statement: "an intervention offered as source law".to_owned(),
+            })
+        });
         let refused = |o: &Result<(), FrontPassageObstruction>, want: &str| -> bool {
             matches!(o, Err(FrontPassageObstruction::Compile(CompileRefusal::Source(refusal))) if format!("{refusal:?}").starts_with(want))
         };
@@ -865,7 +1427,16 @@ fn main() {
         let k = bound.launch(&foreign_kernel);
         let c = bound.launch(&foreign_cover);
         let after = surface.census();
-        let is_mismatch = |o: &Result<PassageReturn, FrontPassageObstruction>| matches!(o, Err(FrontPassageObstruction::Resource(ResourceObstruction::Surface(holonic_engine::resident_section::ResidentRefusal::ModeMismatch { .. }))));
+        let is_mismatch = |o: &Result<PassageReturn, FrontPassageObstruction>| {
+            matches!(
+                o,
+                Err(FrontPassageObstruction::Resource(
+                    ResourceObstruction::Surface(
+                        holonic_engine::resident_section::ResidentRefusal::ModeMismatch { .. }
+                    )
+                ))
+            )
+        };
         verdicts.record(7, "a cover/device/kernel-content/mode mismatch refuses the launch without a deed",
             is_mismatch(&d) && is_mismatch(&k) && is_mismatch(&c) && after.deed_launches == before.deed_launches,
             format!("a foreign device, a foreign kernel content and a foreign apparatus chart each returned ModeMismatch; deed launches {} → {}; the surface's cover is built from the mounted device's attributes and the passage reads it there — no cover parameter exists to hand it a fiction",
@@ -874,12 +1445,26 @@ fn main() {
 
     // 8. signed-negative shift controls: the card against the exact reference
     {
-        let cases: Vec<(i64, i64, i32, i64)> = vec![(i64::MIN, 3, 0, 0), (i64::MIN, 3, -1, 0), (i64::MIN, 3, 40, 0), (i64::MIN + 1, 7, -3, 0), (-7, 2, -1, 0), (-7, 2, 1, 0), (-1, 1, -70, 0), (0, 5, 60, 0), (5, 1, 126, 0), (5, 0, 0, 0), (-5, 3, 0, 4)];
+        let cases: Vec<(i64, i64, i32, i64)> = vec![
+            (i64::MIN, 3, 0, 0),
+            (i64::MIN, 3, -1, 0),
+            (i64::MIN, 3, 40, 0),
+            (i64::MIN + 1, 7, -3, 0),
+            (-7, 2, -1, 0),
+            (-7, 2, 1, 0),
+            (-1, 1, -70, 0),
+            (0, 5, 60, 0),
+            (5, 1, 126, 0),
+            (5, 0, 0, 0),
+            (-5, 3, 0, 4),
+        ];
         let a: Vec<i64> = cases.iter().map(|c| c.0).collect();
         let b: Vec<i64> = cases.iter().map(|c| c.1).collect();
         let s: Vec<i32> = cases.iter().map(|c| c.2).collect();
         let span: Vec<i64> = cases.iter().map(|c| c.3).collect();
-        let (results, flags) = surface.arithmetic_control(&a, &b, &s, &span).expect("control");
+        let (results, flags) = surface
+            .arithmetic_control(&a, &b, &s, &span)
+            .expect("control");
         let mut agreed = 0usize;
         let mut lines = Vec::new();
         for (i, (av, _bv, sv, _)) in cases.iter().enumerate() {
@@ -891,16 +1476,32 @@ fn main() {
             } else {
                 let d = BigInt::from(1) << (-*sv) as usize;
                 let q = &a / &d;
-                let floor = if (&a % &d) != BigInt::from(0) && a < BigInt::from(0) { &q - 1 } else { q.clone() };
-                let ceil = if (&a % &d) != BigInt::from(0) && a > BigInt::from(0) { &q + 1 } else { q };
+                let floor = if (&a % &d) != BigInt::from(0) && a < BigInt::from(0) {
+                    &q - 1
+                } else {
+                    q.clone()
+                };
+                let ceil = if (&a % &d) != BigInt::from(0) && a > BigInt::from(0) {
+                    &q + 1
+                } else {
+                    q
+                };
                 (floor, ceil, false)
             };
-            let ok = if overflow { flags[i] & 1 != 0 } else { BigInt::from(results[i][0]) == expected_floor && BigInt::from(results[i][1]) == expected_ceil };
+            let ok = if overflow {
+                flags[i] & 1 != 0
+            } else {
+                BigInt::from(results[i][0]) == expected_floor
+                    && BigInt::from(results[i][1]) == expected_ceil
+            };
             let ok = ok && (cases[i].1 > 0 || flags[i] & REFUSED_MALFORMED != 0);
             if ok {
                 agreed += 1;
             }
-            lines.push(format!("({av},{sv}):{}", if ok { "agree" } else { "DISAGREE" }));
+            lines.push(format!(
+                "({av},{sv}):{}",
+                if ok { "agree" } else { "DISAGREE" }
+            ));
         }
         verdicts.record(8, "the signed-shift helpers on the card agree with the exact serial reference on the edge cases",
             agreed == cases.len(),
@@ -913,15 +1514,47 @@ fn main() {
     {
         let mut lines = Vec::new();
         let mut all_same = true;
-        for (label, control) in [("serialized", FrontPassage::serialized(surface, grain)), ("serialized-reversed", FrontPassage::serialized_reversed(surface, grain))] {
-            let deed = conduct(&control, &material, &source_occurrence, &receiver, Some(&material_admission), terms, layer_scalar, &scales, Sibling::Base, resident_layer::LAYER_RETURN)
-                .unwrap_or_else(|o| { println!("REFUSED: {}", describe_obstruction(&o)); std::process::exit(4) });
+        for (label, control) in [
+            ("serialized", FrontPassage::serialized(surface, grain)),
+            (
+                "serialized-reversed",
+                FrontPassage::serialized_reversed(surface, grain),
+            ),
+        ] {
+            let deed = conduct(
+                &control,
+                &material,
+                &source_occurrence,
+                &receiver,
+                Some(&material_admission),
+                terms,
+                layer_scalar,
+                &scales,
+                Sibling::Base,
+                resident_layer::LAYER_RETURN,
+            )
+            .unwrap_or_else(|o| {
+                println!("REFUSED: {}", describe_obstruction(&o));
+                std::process::exit(4)
+            });
             let (sgraph, sintended) = deed.bound.graph();
             let same_terminal = deed.terminal == terminal;
             let same_census = deed.returned.measured_octaves == returned.measured_octaves
-                && deed.returned.fronts.iter().zip(&returned.fronts).all(|(a, b)| a.readings.iter().zip(&b.readings).all(|(x, y)| x.measured.max_width == y.measured.max_width && x.measured.max_octave == y.measured.max_octave));
+                && deed
+                    .returned
+                    .fronts
+                    .iter()
+                    .zip(&returned.fronts)
+                    .all(|(a, b)| {
+                        a.readings.iter().zip(&b.readings).all(|(x, y)| {
+                            x.measured.max_width == y.measured.max_width
+                                && x.measured.max_octave == y.measured.max_octave
+                        })
+                    });
             let same_lineage = deed.returned.obstruction == returned.obstruction;
-            let edges_predicted = sgraph.edges as u64 == deed.bound.apparatus_prediction.graph_edges && (sgraph.nodes, sgraph.edges) == sintended;
+            let edges_predicted = sgraph.edges as u64
+                == deed.bound.apparatus_prediction.graph_edges
+                && (sgraph.nodes, sgraph.edges) == sintended;
             all_same &= same_terminal && same_census && same_lineage && edges_predicted;
             lines.push(format!("{label} ({} nodes, {} edges, intended {:?}, predicted edges {}): terminal identical {same_terminal}, every port's measured octave and width identical {same_census}, obstruction lineage identical {same_lineage}",
                 sgraph.nodes, sgraph.edges, sintended, deed.bound.apparatus_prediction.graph_edges));
@@ -939,16 +1572,38 @@ fn main() {
     println!("\n  — the source runtime's face, chi_gamma per port");
     let mut chi_lines: Vec<String> = Vec::new();
     if args.source_face {
-        let faces_path = format!("{}/source-runtime-faces-{}-tokens.tsv", args.out, args.tokens.len());
+        let faces_path = format!(
+            "{}/source-runtime-faces-{}-tokens.tsv",
+            args.out,
+            args.tokens.len()
+        );
         std::fs::create_dir_all(&args.out).expect("output directory");
         let clock = Instant::now();
         let status = std::process::Command::new(&args.python)
-            .args([concat!(env!("CARGO_MANIFEST_DIR"), "/examples/phoenix/source_runtime_face.py"), "--tokens", &args.tokens.iter().map(|t| t.to_string()).collect::<Vec<_>>().join(","), "--emit", &faces_path])
+            .args([
+                concat!(
+                    env!("CARGO_MANIFEST_DIR"),
+                    "/examples/phoenix/source_runtime_face.py"
+                ),
+                "--tokens",
+                &args
+                    .tokens
+                    .iter()
+                    .map(|t| t.to_string())
+                    .collect::<Vec<_>>()
+                    .join(","),
+                "--emit",
+                &faces_path,
+            ])
             .output();
         match status {
             Ok(output) if output.status.success() => {
                 let faces = read_faces(&faces_path).expect("faces read");
-                println!("  source runtime emitted {} faces in {:.1} s → {faces_path}", faces.len(), clock.elapsed().as_secs_f64());
+                println!(
+                    "  source runtime emitted {} faces in {:.1} s → {faces_path}",
+                    faces.len(),
+                    clock.elapsed().as_secs_f64()
+                );
                 // The ports, read from the one bound deed after its terminal: extra section reads,
                 // counted, for the comparison slot and nothing else.
                 let ports: [(&'static str, &'static str); 6] = [
@@ -970,24 +1625,63 @@ fn main() {
                     }
                 }
                 for d in &defects {
-                    let line = format!("    chi[{:<19} {}] inside {:>5} outside {:>5} · worst gap {:.3e} at {:?} · first separating coordinate {:?} · bf16 fibre meets enclosure {:>5} · widest enclosure {:.3e}",
-                        d.port, d.dtype, d.inside, d.outside, rat_f64(&d.worst_gap), d.worst_at, d.first_separating, d.fibre_meets, rat_f64(&d.widest_enclosure));
+                    let line = format!(
+                        "    chi[{:<19} {}] inside {:>5} outside {:>5} · worst gap {:.3e} at {:?} · first separating coordinate {:?} · bf16 fibre meets enclosure {:>5} · widest enclosure {:.3e}",
+                        d.port,
+                        d.dtype,
+                        d.inside,
+                        d.outside,
+                        rat_f64(&d.worst_gap),
+                        d.worst_at,
+                        d.first_separating,
+                        d.fibre_meets,
+                        rat_f64(&d.widest_enclosure)
+                    );
                     println!("{line}");
                     chi_lines.push(line);
                 }
-                let terminal_bf16 = defects.iter().find(|d| d.port == "layer" && d.dtype == "bf16");
-                let earliest_bf16 = defects.iter().filter(|d| d.dtype == "bf16" && d.outside > 0).map(|d| d.port).next();
-                let terminal_f32 = defects.iter().find(|d| d.port == "layer" && d.dtype == "f32");
+                let terminal_bf16 = defects
+                    .iter()
+                    .find(|d| d.port == "layer" && d.dtype == "bf16");
+                let earliest_bf16 = defects
+                    .iter()
+                    .filter(|d| d.dtype == "bf16" && d.outside > 0)
+                    .map(|d| d.port)
+                    .next();
+                let terminal_f32 = defects
+                    .iter()
+                    .find(|d| d.port == "layer" && d.dtype == "f32");
                 verdicts.record(10, "the source/runtime chi is nonzero on the bf16 face and propagates from an earlier port to the terminal",
                     terminal_bf16.is_some_and(|d| d.outside > 0) && earliest_bf16.is_some_and(|p| p != "layer"),
                     format!("bf16 face: outside the resident enclosure at the terminal {} of {}; the earliest port where the bf16 face leaves the enclosure is {:?}; f32 face at the terminal: outside {}; the resident enclosure is an interval realization of the exact formula over the stored BF16 map and the source's runtime rounds every intermediate — chi is the source's rounding fibre, carried per port and not dismissed",
                         terminal_bf16.map(|d| d.outside).unwrap_or(0), terminal_bf16.map(|d| d.inside + d.outside).unwrap_or(0), earliest_bf16, terminal_f32.map(|d| d.outside).unwrap_or(0)));
             }
-            Ok(output) => verdicts.open(10, "the source/runtime chi slot", &format!("the source runtime refused: {}", String::from_utf8_lossy(&output.stderr).chars().take(300).collect::<String>())),
-            Err(error) => verdicts.open(10, "the source/runtime chi slot", &format!("the source runtime could not be invoked at {}: {error}", args.python)),
+            Ok(output) => verdicts.open(
+                10,
+                "the source/runtime chi slot",
+                &format!(
+                    "the source runtime refused: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                        .chars()
+                        .take(300)
+                        .collect::<String>()
+                ),
+            ),
+            Err(error) => verdicts.open(
+                10,
+                "the source/runtime chi slot",
+                &format!(
+                    "the source runtime could not be invoked at {}: {error}",
+                    args.python
+                ),
+            ),
         }
     } else {
-        verdicts.open(10, "the source/runtime chi slot", "not run (--no-source-face)");
+        verdicts.open(
+            10,
+            "the source/runtime chi slot",
+            "not run (--no-source-face)",
+        );
     }
 
     // 12. hiding the card returns a typed refusal and no answer — an executed subprocess control
@@ -996,44 +1690,112 @@ fn main() {
         let exe = std::env::current_exe().expect("this executable");
         let output = std::process::Command::new(exe)
             .env("CUDA_VISIBLE_DEVICES", "")
-            .args(["--tokens", "1", "--hidden-card-control", "--no-serial", "--no-source-face", "--no-whole-digest", "--root", &args.root])
+            .args([
+                "--tokens",
+                "1",
+                "--hidden-card-control",
+                "--no-serial",
+                "--no-source-face",
+                "--no-whole-digest",
+                "--root",
+                &args.root,
+            ])
             .output();
         match output {
             Ok(output) => {
                 let stdout = String::from_utf8_lossy(&output.stdout);
-                let refused = stdout.contains("REFUSED") && !stdout.contains("THE TERMINAL FACE") && output.status.code() == Some(3);
-                verdicts.record(12, "hiding the card returns a typed refusal and no semantic answer",
+                let refused = stdout.contains("REFUSED")
+                    && !stdout.contains("THE TERMINAL FACE")
+                    && output.status.code() == Some(3);
+                verdicts.record(
+                    12,
+                    "hiding the card returns a typed refusal and no semantic answer",
                     refused,
-                    format!("subprocess with CUDA_VISIBLE_DEVICES='' exited {:?}; stdout: {}", output.status.code(), stdout.lines().filter(|l| l.contains("REFUSED") || l.contains("fallback")).collect::<Vec<_>>().join(" | ")));
+                    format!(
+                        "subprocess with CUDA_VISIBLE_DEVICES='' exited {:?}; stdout: {}",
+                        output.status.code(),
+                        stdout
+                            .lines()
+                            .filter(|l| l.contains("REFUSED") || l.contains("fallback"))
+                            .collect::<Vec<_>>()
+                            .join(" | ")
+                    ),
+                );
             }
-            Err(error) => verdicts.record(12, "hiding the card returns a typed refusal and no semantic answer", false, format!("the control could not be spawned: {error}")),
+            Err(error) => verdicts.record(
+                12,
+                "hiding the card returns a typed refusal and no semantic answer",
+                false,
+                format!("the control could not be spawned: {error}"),
+            ),
         }
     }
 
     // 13. both K/V families are separately load-bearing
     println!("\n  — the K/V families");
     {
-        let base_contact = conduct(&passage, &material, &source_occurrence, &receiver, Some(&material_admission), terms, layer_scalar, &scales, Sibling::Base, resident_layer::CONTACT)
-            .unwrap_or_else(|o| { println!("REFUSED: {}", describe_obstruction(&o)); std::process::exit(4) });
+        let base_contact = conduct(
+            &passage,
+            &material,
+            &source_occurrence,
+            &receiver,
+            Some(&material_admission),
+            terms,
+            layer_scalar,
+            &scales,
+            Sibling::Base,
+            resident_layer::CONTACT,
+        )
+        .unwrap_or_else(|o| {
+            println!("REFUSED: {}", describe_obstruction(&o));
+            std::process::exit(4)
+        });
         let mut family_report = Vec::new();
         let mut families_separate = true;
         for family in 0..resident_layer::KV_HEADS {
-            let withdrawn = conduct(&passage, &material, &source_occurrence, &receiver, Some(&material_admission), terms, layer_scalar, &scales, Sibling::WithdrawFamily(family), resident_layer::CONTACT)
-                .unwrap_or_else(|o| { println!("REFUSED: {}", describe_obstruction(&o)); std::process::exit(4) });
+            let withdrawn = conduct(
+                &passage,
+                &material,
+                &source_occurrence,
+                &receiver,
+                Some(&material_admission),
+                terms,
+                layer_scalar,
+                &scales,
+                Sibling::WithdrawFamily(family),
+                resident_layer::CONTACT,
+            )
+            .unwrap_or_else(|o| {
+                println!("REFUSED: {}", describe_obstruction(&o));
+                std::process::exit(4)
+            });
             let per_head = resident_layer::HEAD_WIDTH;
             let heads_per_family = resident_layer::HEADS / resident_layer::KV_HEADS;
             let mut moved_by_head = vec![0usize; resident_layer::HEADS];
-            for (at, (a, b)) in base_contact.terminal.iter().zip(&withdrawn.terminal).enumerate() {
+            for (at, (a, b)) in base_contact
+                .terminal
+                .iter()
+                .zip(&withdrawn.terminal)
+                .enumerate()
+            {
                 if a != b {
                     let head = (at % (resident_layer::HEADS * per_head)) / per_head;
                     moved_by_head[head] += 1;
                 }
             }
-            let served: Vec<usize> = (family * heads_per_family..(family + 1) * heads_per_family).collect();
+            let served: Vec<usize> =
+                (family * heads_per_family..(family + 1) * heads_per_family).collect();
             let served_moved = served.iter().all(|h| moved_by_head[*h] > 0);
-            let others_still = (0..resident_layer::HEADS).filter(|h| !served.contains(h)).all(|h| moved_by_head[h] == 0);
+            let others_still = (0..resident_layer::HEADS)
+                .filter(|h| !served.contains(h))
+                .all(|h| moved_by_head[h] == 0);
             families_separate &= served_moved && others_still;
-            let interventions: usize = withdrawn.bound.source_bindings.iter().map(|b| b.interventions.len()).sum();
+            let interventions: usize = withdrawn
+                .bound
+                .source_bindings
+                .iter()
+                .map(|b| b.interventions.len())
+                .sum();
             family_report.push(format!("family {family} withdrawn (typed as {interventions} interventions): moved coordinates by head {moved_by_head:?} (served heads {served:?})"));
         }
         verdicts.record(13, "both K/V families are separately load-bearing, and the withdrawal is typed as an intervention", families_separate, family_report.join(" · "));
@@ -1043,11 +1805,37 @@ fn main() {
     println!("\n  — the finer aperture");
     {
         let fine_passage = FrontPassage::new(surface, ResidentGrain(args.grain + 4));
-        let fine = conduct(&fine_passage, &material, &source_occurrence, &receiver, Some(&material_admission), SeriesAperture(args.terms + 8), layer_scalar, &scales, Sibling::Base, resident_layer::LAYER_RETURN)
-            .unwrap_or_else(|o| { println!("REFUSED: {}", describe_obstruction(&o)); std::process::exit(4) });
+        let fine = conduct(
+            &fine_passage,
+            &material,
+            &source_occurrence,
+            &receiver,
+            Some(&material_admission),
+            SeriesAperture(args.terms + 8),
+            layer_scalar,
+            &scales,
+            Sibling::Base,
+            resident_layer::LAYER_RETURN,
+        )
+        .unwrap_or_else(|o| {
+            println!("REFUSED: {}", describe_obstruction(&o));
+            std::process::exit(4)
+        });
         let (inside, outside) = nested(&terminal, args.grain, &fine.terminal, args.grain + 4);
-        let fine_widest = fine.terminal.iter().map(|(l, h)| word_value(*h, ResidentGrain(args.grain + 4)) - word_value(*l, ResidentGrain(args.grain + 4))).max().unwrap_or_else(|| Rat::from_integer(0.into()));
-        let coarse_widest = terminal.iter().map(|(l, h)| word_value(*h, grain) - word_value(*l, grain)).max().unwrap_or_else(|| Rat::from_integer(0.into()));
+        let fine_widest = fine
+            .terminal
+            .iter()
+            .map(|(l, h)| {
+                word_value(*h, ResidentGrain(args.grain + 4))
+                    - word_value(*l, ResidentGrain(args.grain + 4))
+            })
+            .max()
+            .unwrap_or_else(|| Rat::from_integer(0.into()));
+        let coarse_widest = terminal
+            .iter()
+            .map(|(l, h)| word_value(*h, grain) - word_value(*l, grain))
+            .max()
+            .unwrap_or_else(|| Rat::from_integer(0.into()));
         verdicts.record(14, "increasing the approximation aperture nests the terminal enclosure",
             outside == 0 && fine_widest <= coarse_widest,
             format!("grain 2^-{} terms {} against grain 2^-{} terms {}: {inside} of {} terminal enclosures nested, {outside} not; widest coarse {:.3e} · widest fine {:.3e}",
@@ -1057,15 +1845,32 @@ fn main() {
     // 15. removing a local remainder reopens the terminal fibre or refuses
     println!("\n  — the remainder removed at one site");
     {
-        let collapsed = conduct(&passage, &material, &source_occurrence, &receiver, Some(&material_admission), terms, layer_scalar, &scales, Sibling::CollapseAfterInputRebase, resident_layer::LAYER_RETURN);
+        let collapsed = conduct(
+            &passage,
+            &material,
+            &source_occurrence,
+            &receiver,
+            Some(&material_admission),
+            terms,
+            layer_scalar,
+            &scales,
+            Sibling::CollapseAfterInputRebase,
+            resident_layer::LAYER_RETURN,
+        );
         match &collapsed {
             Ok(collapsed) => {
                 let m = moved(&collapsed.terminal, &terminal);
-                let (inside, outside) = nested(&terminal, args.grain, &collapsed.terminal, args.grain);
+                let (inside, outside) =
+                    nested(&terminal, args.grain, &collapsed.terminal, args.grain);
                 verdicts.record(15, "removing a local remainder reopens the terminal fibre or refuses", m > 0,
                     format!("input rebase collapsed to midpoints (typed as an intervention): {m} of {} terminal coordinates moved; the collapsed terminal sits inside the sound one at {inside} coordinates and outside it at {outside} — the sound enclosure is not reproduced by the unsound one", terminal.len()));
             }
-            Err(o) => verdicts.record(15, "removing a local remainder reopens the terminal fibre or refuses", true, format!("refused: {}", describe_obstruction(o))),
+            Err(o) => verdicts.record(
+                15,
+                "removing a local remainder reopens the terminal fibre or refuses",
+                true,
+                format!("refused: {}", describe_obstruction(o)),
+            ),
         }
     }
 
@@ -1080,7 +1885,9 @@ fn main() {
         let second = bound.launch(&mode).expect("second deed");
         let second_terminal = bound.read_terminal(&second).expect("read");
         let ingress_after = surface.census().ingress_octets;
-        let entering_rows_octets = (args.second_tokens.len() * (resident_layer::HIDDEN + resident_layer::PLE_WIDTH) * 2) as u64;
+        let entering_rows_octets = (args.second_tokens.len()
+            * (resident_layer::HIDDEN + resident_layer::PLE_WIDTH)
+            * 2) as u64;
         verdicts.record(16, "invariant weights mount once for repeated inference; new material crosses once into the bound passage",
             material.populations.len() == populations_before && ingress_after - ingress_before == entering_rows_octets && surface.census().allocations == allocations_before && second.stands(),
             format!("populations {} → {} · ingress for the second deed {} octets = entering rows {} · allocations {} → {} · the second terminal differs from the first in {} of {} coordinates",
@@ -1101,11 +1908,31 @@ fn main() {
     {
         let base = bound.launch(&mode).expect("the clean deed again");
         let base_terminal = bound.read_terminal(&base).expect("read");
-        let siblings: [(&str, &'static str); 5] = [("input-rebase", resident_layer::INPUT_REBASE), ("receiver-projection", resident_layer::RECEIVER_PROJECTION), ("contact", resident_layer::CONTACT), ("first-re-entry", resident_layer::FIRST_RE_ENTRY), ("second-re-entry", resident_layer::SECOND_RE_ENTRY)];
-        let base_siblings: Vec<(&str, Vec<(i64, i64)>)> = siblings.iter().map(|(label, name)| (*label, bound.read_section(&base, founded.returns[name]).expect("sibling stood"))).collect();
+        let siblings: [(&str, &'static str); 5] = [
+            ("input-rebase", resident_layer::INPUT_REBASE),
+            ("receiver-projection", resident_layer::RECEIVER_PROJECTION),
+            ("contact", resident_layer::CONTACT),
+            ("first-re-entry", resident_layer::FIRST_RE_ENTRY),
+            ("second-re-entry", resident_layer::SECOND_RE_ENTRY),
+        ];
+        let base_siblings: Vec<(&str, Vec<(i64, i64)>)> = siblings
+            .iter()
+            .map(|(label, name)| {
+                (
+                    *label,
+                    bound
+                        .read_section(&base, founded.returns[name])
+                        .expect("sibling stood"),
+                )
+            })
+            .collect();
         let coordinate = 7usize;
         let original = material.entering[resident_layer::PLE_ENTERING].words[coordinate];
-        material.entering.get_mut(resident_layer::PLE_ENTERING).expect("per-layer rows").words[coordinate] = 0x7F80;
+        material
+            .entering
+            .get_mut(resident_layer::PLE_ENTERING)
+            .expect("per-layer rows")
+            .words[coordinate] = 0x7F80;
         let mut lineages = Vec::new();
         let mut refusal_lists = Vec::new();
         let mut report = Vec::new();
@@ -1114,25 +1941,52 @@ fn main() {
         let mut terminal_refused = true;
         let mut origin_is_ple_entry = true;
         let mut footprints_carry_slots = true;
-        for (label, control) in [("co-present", FrontPassage::new(surface, grain)), ("serialized", FrontPassage::serialized(surface, grain)), ("serialized-reversed", FrontPassage::serialized_reversed(surface, grain))] {
-            let founded_p = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base).expect("deed founded");
-            let bound_p = control.bind(&founded_p.complex, &founded_p.realization, &material, &source_occurrence, &receiver, Some(&material_admission), founded_p.returns[resident_layer::LAYER_RETURN])
-                .unwrap_or_else(|o| { println!("REFUSED: {}", describe_obstruction(&o)); std::process::exit(4) });
+        for (label, control) in [
+            ("co-present", FrontPassage::new(surface, grain)),
+            ("serialized", FrontPassage::serialized(surface, grain)),
+            (
+                "serialized-reversed",
+                FrontPassage::serialized_reversed(surface, grain),
+            ),
+        ] {
+            let founded_p = resident_layer::found_deed(&scales, terms, layer_scalar, Sibling::Base)
+                .expect("deed founded");
+            let bound_p = control
+                .bind(
+                    &founded_p.complex,
+                    &founded_p.realization,
+                    &material,
+                    &source_occurrence,
+                    &receiver,
+                    Some(&material_admission),
+                    founded_p.returns[resident_layer::LAYER_RETURN],
+                )
+                .unwrap_or_else(|o| {
+                    println!("REFUSED: {}", describe_obstruction(&o));
+                    std::process::exit(4)
+                });
             for front in bound_p.fronts() {
-                for (footprint, (reads, own)) in front.footprints.iter().zip(&front.slot_footprints) {
-                    footprints_carry_slots &= footprint.writes.contains(own) && reads.iter().all(|r| footprint.reads.contains(r));
+                for (footprint, (reads, own)) in front.footprints.iter().zip(&front.slot_footprints)
+                {
+                    footprints_carry_slots &= footprint.writes.contains(own)
+                        && reads.iter().all(|r| footprint.reads.contains(r));
                 }
                 footprints_carry_slots &= front.certificate.is_interchangeable();
             }
-            let returned_p = bound_p.launch(&mode).expect("the poisoned deed returns whole");
+            let returned_p = bound_p
+                .launch(&mode)
+                .expect("the poisoned deed returns whole");
             let lineage = &returned_p.obstruction;
             // the origin: the per-layer token entry, MALFORMED, of its own
             let ple_index = bound_p.index_of(founded_p.returns[resident_layer::X0]).map(|_| bound_p.index_of(founded_p.complex.shape.occurrences.keys().copied().find(|e| bound_p.producers_of(*e).is_some_and(|p| p.is_empty()) && founded_p.returns.values().all(|r| r != e)).expect("the per-layer token entry is the entering occurrence that is not a named return")).expect("index"));
             let origins: Vec<usize> = lineage.origins().map(|r| r.index).collect();
-            origin_is_ple_entry &= origins.len() == 1 && Some(origins[0]) == ple_index && lineage.origins().all(|r| r.flags & REFUSED_MALFORMED != 0);
+            origin_is_ple_entry &= origins.len() == 1
+                && Some(origins[0]) == ple_index
+                && lineage.origins().all(|r| r.flags & REFUSED_MALFORMED != 0);
             // every successor of the origin refuses upstream, deterministically, naming a predecessor
             // that refused; no refusal stands outside the origin's forward cone
-            let mut cone: Vec<bool> = vec![false; bound_p.apparatus_prediction.graph_nodes as usize];
+            let mut cone: Vec<bool> =
+                vec![false; bound_p.apparatus_prediction.graph_nodes as usize];
             if let Some(origin) = origins.first() {
                 cone[*origin] = true;
                 for index in 0..cone.len() {
@@ -1145,13 +1999,26 @@ fn main() {
                     }
                 }
             }
-            let in_cone: Vec<usize> = cone.iter().enumerate().filter(|(_, c)| **c).map(|(i, _)| i).collect();
+            let in_cone: Vec<usize> = cone
+                .iter()
+                .enumerate()
+                .filter(|(_, c)| **c)
+                .map(|(i, _)| i)
+                .collect();
             let refused_indices: Vec<usize> = lineage.refusals.iter().map(|r| r.index).collect();
             successors_refuse &= refused_indices == in_cone
-                && lineage.refusals.iter().filter(|r| !r.origin).all(|r| r.upstream_first.is_some_and(|p| cone[p]) && r.upstream_count >= 1 && r.flags & holonic_engine::resident_section::REFUSED_UPSTREAM != 0);
+                && lineage.refusals.iter().filter(|r| !r.origin).all(|r| {
+                    r.upstream_first.is_some_and(|p| cone[p])
+                        && r.upstream_count >= 1
+                        && r.flags & holonic_engine::resident_section::REFUSED_UPSTREAM != 0
+                });
             // the unrelated siblings are bit-identical to the clean deed
             for (sibling_label, clean) in &base_siblings {
-                let name = siblings.iter().find(|(l, _)| l == sibling_label).map(|(_, n)| *n).expect("sibling");
+                let name = siblings
+                    .iter()
+                    .find(|(l, _)| l == sibling_label)
+                    .map(|(_, n)| *n)
+                    .expect("sibling");
                 match bound_p.read_section(&returned_p, founded_p.returns[name]) {
                     Ok(words) => siblings_identical &= words == *clean,
                     Err(_) => siblings_identical = false,
@@ -1160,15 +2027,29 @@ fn main() {
             // the terminal is refused by name, never read as standing
             let terminal_outcome = bound_p.read_terminal(&returned_p);
             terminal_refused &= matches!(&terminal_outcome, Err(FrontPassageObstruction::Refused { occurrence, lineage: l, .. }) if *occurrence == founded_p.returns[resident_layer::LAYER_RETURN] && l == lineage);
-            terminal_refused &= matches!(bound_p.standing(&returned_p), Err(FrontPassageObstruction::Refused { .. }));
+            terminal_refused &= matches!(
+                bound_p.standing(&returned_p),
+                Err(FrontPassageObstruction::Refused { .. })
+            );
             report.push(format!("{label}: origins {origins:?} (the per-layer token entry, MALFORMED at coordinate {coordinate}) · forward cone {} occurrences · refusals {} = cone {} · carried refusals each name a refusing predecessor · siblings identical {siblings_identical} · terminal refused {}",
                 in_cone.len(), refused_indices.len(), refused_indices == in_cone, matches!(terminal_outcome, Err(_))));
             lineages.push(lineage.clone());
-            refusal_lists.push(returned_p.refusals.iter().map(|(e, _, s)| (*e, *s)).collect::<Vec<_>>());
+            refusal_lists.push(
+                returned_p
+                    .refusals
+                    .iter()
+                    .map(|(e, _, s)| (*e, *s))
+                    .collect::<Vec<_>>(),
+            );
         }
-        material.entering.get_mut(resident_layer::PLE_ENTERING).expect("per-layer rows").words[coordinate] = original;
+        material
+            .entering
+            .get_mut(resident_layer::PLE_ENTERING)
+            .expect("per-layer rows")
+            .words[coordinate] = original;
         bound.refill(&material).expect("refill");
-        let schedules_agree = lineages.windows(2).all(|w| w[0] == w[1]) && refusal_lists.windows(2).all(|w| w[0] == w[1]);
+        let schedules_agree = lineages.windows(2).all(|w| w[0] == w[1])
+            && refusal_lists.windows(2).all(|w| w[0] == w[1]);
         let after_restore = bound.launch(&mode).expect("the clean deed after restoring");
         let restored_terminal = bound.read_terminal(&after_restore).expect("read");
         verdicts.record(28, "a runtime refusal at a nonzero coordinate in one branch makes every successor of that branch refuse deterministically, naming a refusing predecessor, and nothing outside the branch's forward cone",
@@ -1190,11 +2071,26 @@ fn main() {
     if args.serial && args.tokens.len() <= 4 {
         let clock = Instant::now();
         let serial = Serial::new(96);
-        let reference = serial_layer(&serial, &mut source, &args.tokens, layer_scalar, &scales, args.terms as usize + 8);
+        let reference = serial_layer(
+            &serial,
+            &mut source,
+            &args.tokens,
+            layer_scalar,
+            &scales,
+            args.terms as usize + 8,
+        );
         match reference {
             Ok(reference) => {
                 let parity = serial.parity(&terminal, args.grain, &reference);
-                let poisoned: Vec<_> = reference.iter().map(|(l, h)| (l + BigInt::from(1u64 << 40) * BigInt::from(1u64 << 56), h + BigInt::from(1u64 << 40) * BigInt::from(1u64 << 56))).collect();
+                let poisoned: Vec<_> = reference
+                    .iter()
+                    .map(|(l, h)| {
+                        (
+                            l + BigInt::from(1u64 << 40) * BigInt::from(1u64 << 56),
+                            h + BigInt::from(1u64 << 40) * BigInt::from(1u64 << 56),
+                        )
+                    })
+                    .collect();
                 let poisoned_parity = serial.parity(&terminal, args.grain, &poisoned);
                 let again = bound.launch(&mode).expect("the deed again");
                 let again_terminal = bound.read_terminal(&again).expect("read");
@@ -1204,21 +2100,48 @@ fn main() {
                         clock.elapsed().as_secs_f64(), parity.holds(), parity.coordinates, parity.disagreeing.len(), parity.widest_resident_grains, parity.widest_serial_grains,
                         poisoned_parity.disagreeing.len(), again_terminal == terminal));
             }
-            Err(error) => verdicts.record(11, "poisoning the CPU reference cannot move the GPU result", false, format!("the serial reference refused: {error}")),
+            Err(error) => verdicts.record(
+                11,
+                "poisoning the CPU reference cannot move the GPU result",
+                false,
+                format!("the serial reference refused: {error}"),
+            ),
         }
     } else {
-        verdicts.open(11, "poisoning the CPU reference cannot move the GPU result", "the serial reference was not run (--no-serial, or more than four tokens)");
+        verdicts.open(
+            11,
+            "poisoning the CPU reference cannot move the GPU result",
+            "the serial reference was not run (--no-serial, or more than four tokens)",
+        );
     }
 
     // stations not attempted here
     for (number, name) in [
-        (17u32, "seal → separate-process mount → seal without the original buffers"),
-        (18, "the native rest contains no program, event ordinals, hard-coded rows or source routing"),
+        (
+            17u32,
+            "seal → separate-process mount → seal without the original buffers",
+        ),
+        (
+            18,
+            "the native rest contains no program, event ordinals, hard-coded rows or source routing",
+        ),
         (19, "runtime inference does not spawn an example program"),
-        (20, "replacing the adjoint with a transpose changes the cultivation delta or refuses"),
-        (21, "held-out material is absent during development and cultivation"),
-        (22, "matched arms share one predecessor rather than three complete bodies"),
-        (23, "targeted ablation removes only the attributable cultivated consequence"),
+        (
+            20,
+            "replacing the adjoint with a transpose changes the cultivation delta or refuses",
+        ),
+        (
+            21,
+            "held-out material is absent during development and cultivation",
+        ),
+        (
+            22,
+            "matched arms share one predecessor rather than three complete bodies",
+        ),
+        (
+            23,
+            "targeted ablation removes only the attributable cultivated consequence",
+        ),
     ] {
         verdicts.open(number, name, "not attempted: the roadmap's execution order reaches rest, inference, condensation, cultivation and ablation only after this one-layer resident deed; this driver is that deed and claims no later station");
     }
@@ -1227,37 +2150,127 @@ fn main() {
     // the deposit
     // ------------------------------------------------------------------------------------------
     std::fs::create_dir_all(&args.out).expect("output directory");
-    let path = format!("{}/layer-0-resident-{}-tokens-grain-{}-terms-{}.form", args.out, args.tokens.len(), args.grain, args.terms);
+    let path = format!(
+        "{}/layer-0-resident-{}-tokens-grain-{}-terms-{}.form",
+        args.out,
+        args.tokens.len(),
+        args.grain,
+        args.terms
+    );
     let mut file = std::fs::File::create(&path).expect("receipt file");
     writeln!(file, "THE LAYER STAYS ON THE CARD — receipt").unwrap();
-    writeln!(file, "root {} · tokens {:?} · grain 2^-{} · terms {} · device {}", args.root, args.tokens, args.grain, args.terms, declaration.name).unwrap();
+    writeln!(
+        file,
+        "root {} · tokens {:?} · grain 2^-{} · terms {} · device {}",
+        args.root, args.tokens, args.grain, args.terms, declaration.name
+    )
+    .unwrap();
     writeln!(file, "mode {:?}", mode).unwrap();
-    writeln!(file, "source implementation {} sha256 {} ({})", source_occurrence.implementation.locator, source_occurrence.implementation.sha256, source_occurrence.implementation.version.as_deref().unwrap_or("?")).unwrap();
-    writeln!(file, "source configuration {} sha256 {}", source_occurrence.configuration.locator, source_occurrence.configuration.sha256).unwrap();
-    writeln!(file, "source container {} octets {} header octets {} header sha256 {} content sha256 {:?}", source_occurrence.container.locator, source_occurrence.container.octets, source_occurrence.container.header_octets, source_occurrence.container.header_sha256, source_occurrence.container.content_sha256).unwrap();
+    writeln!(
+        file,
+        "source implementation {} sha256 {} ({})",
+        source_occurrence.implementation.locator,
+        source_occurrence.implementation.sha256,
+        source_occurrence
+            .implementation
+            .version
+            .as_deref()
+            .unwrap_or("?")
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "source configuration {} sha256 {}",
+        source_occurrence.configuration.locator, source_occurrence.configuration.sha256
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "source container {} octets {} header octets {} header sha256 {} content sha256 {:?}",
+        source_occurrence.container.locator,
+        source_occurrence.container.octets,
+        source_occurrence.container.header_octets,
+        source_occurrence.container.header_sha256,
+        source_occurrence.container.content_sha256
+    )
+    .unwrap();
     for (name, region) in &source_occurrence.container.regions {
-        writeln!(file, "  region {name} dtype {} shape {:?} span {}..{} sha256 {:?}", region.dtype, region.shape, region.start, region.end, region.sha256).unwrap();
+        writeln!(
+            file,
+            "  region {name} dtype {} shape {:?} span {}..{} sha256 {:?}",
+            region.dtype, region.shape, region.start, region.end, region.sha256
+        )
+        .unwrap();
     }
     for asset in &source_occurrence.assets {
-        writeln!(file, "  asset {} {} sha256 {:?} used {}", asset.role, asset.locator, asset.sha256, asset.used).unwrap();
+        writeln!(
+            file,
+            "  asset {} {} sha256 {:?} used {}",
+            asset.role, asset.locator, asset.sha256, asset.used
+        )
+        .unwrap();
     }
     writeln!(file, "source bindings validated:").unwrap();
     for binding in &bound.source_bindings {
-        writeln!(file, "  {} [{:?}] symbols {:?} fields {:?} shapes {:?} interventions {:?}", binding.operation, binding.species,
-            binding.symbols.iter().map(|s| format!("{} @{}", s.symbol, s.line)).collect::<Vec<_>>(), binding.fields, binding.shapes, binding.interventions).unwrap();
+        writeln!(
+            file,
+            "  {} [{:?}] symbols {:?} fields {:?} shapes {:?} interventions {:?}",
+            binding.operation,
+            binding.species,
+            binding
+                .symbols
+                .iter()
+                .map(|s| format!("{} @{}", s.symbol, s.line))
+                .collect::<Vec<_>>(),
+            binding.fields,
+            binding.shapes,
+            binding.interventions
+        )
+        .unwrap();
     }
-    writeln!(file, "deed prediction {:?}", bound.deed_prediction.coordinates()).unwrap();
-    writeln!(file, "apparatus prediction {:?}", bound.apparatus_prediction).unwrap();
+    writeln!(
+        file,
+        "deed prediction {:?}",
+        bound.deed_prediction.coordinates()
+    )
+    .unwrap();
+    writeln!(
+        file,
+        "apparatus prediction {:?}",
+        bound.apparatus_prediction
+    )
+    .unwrap();
     writeln!(file, "admission {:?}", bound.admission).unwrap();
     writeln!(file, "graph {:?} intended {:?}", graph, intended).unwrap();
     writeln!(file, "census before {census_before:?}").unwrap();
     writeln!(file, "census after  {census_after:?}").unwrap();
-    writeln!(file, "wall {:.3} s · cpu ticks {} · utilization samples {:?}", wall.as_secs_f64(), ticks_after - ticks_before, samples).unwrap();
+    writeln!(
+        file,
+        "wall {:.3} s · cpu ticks {} · utilization samples {:?}",
+        wall.as_secs_f64(),
+        ticks_after - ticks_before,
+        samples
+    )
+    .unwrap();
     writeln!(file, "traffic {:?}", bound.traffic).unwrap();
     for (front, deed_front) in bound.fronts().iter().zip(&returned.fronts) {
-        writeln!(file, "front depth {} members {:?} certificate {:?} cover {:?} predicted {:?}", front.depth, front.members, front.certificate.coherence, front.cover, front.predicted.coordinates()).unwrap();
+        writeln!(
+            file,
+            "front depth {} members {:?} certificate {:?} cover {:?} predicted {:?}",
+            front.depth,
+            front.members,
+            front.certificate.coherence,
+            front.cover,
+            front.predicted.coordinates()
+        )
+        .unwrap();
         for reading in &deed_front.readings {
-            writeln!(file, "    {} bound {} needed {} measured {:?}", reading.operation, reading.bound, reading.needed, reading.measured).unwrap();
+            writeln!(
+                file,
+                "    {} bound {} needed {} measured {:?}",
+                reading.operation, reading.bound, reading.needed, reading.measured
+            )
+            .unwrap();
         }
         for coupling in &deed_front.couplings {
             writeln!(file, "    coupling {} kernel {} extent {} block {} written {} octave {} width {} refused {} reach {} predicted {:?}", coupling.plan.coupling, coupling.plan.kernel, coupling.plan.extent, coupling.plan.block, coupling.written, coupling.measured_octave, coupling.measured_width, coupling.refused, coupling.reach, coupling.plan.predicted.coordinates()).unwrap();
@@ -1267,7 +2280,13 @@ fn main() {
     for line in &chi_lines {
         writeln!(file, "{line}").unwrap();
     }
-    writeln!(file, "terminal face ({} coordinates, {} = tokens x 2560):", terminal.len(), resident_layer::LAYER_RETURN).unwrap();
+    writeln!(
+        file,
+        "terminal face ({} coordinates, {} = tokens x 2560):",
+        terminal.len(),
+        resident_layer::LAYER_RETURN
+    )
+    .unwrap();
     for (at, (l, h)) in terminal.iter().enumerate() {
         writeln!(file, "  {at} {l} {h}").unwrap();
     }
@@ -1298,7 +2317,10 @@ fn serial_layer(
     source: &mut Source,
     tokens: &[usize],
     layer_scalar: Dyadic,
-    scales: &(holonic_engine::resident_section::DyadicEnclosure, holonic_engine::resident_section::DyadicEnclosure),
+    scales: &(
+        holonic_engine::resident_section::DyadicEnclosure,
+        holonic_engine::resident_section::DyadicEnclosure,
+    ),
     terms: usize,
 ) -> Result<Vec<serial_reference::Iv>, String> {
     use resident_layer::*;
@@ -1309,13 +2331,32 @@ fn serial_layer(
     let mut entering = Vec::new();
     let mut per_layer = Vec::new();
     for token in tokens {
-        let (row, _) = source.container.read_rows_bf16(&mut source.file, EMBED, *token, 1).map_err(|e| e.to_string())?;
+        let (row, _) = source
+            .container
+            .read_rows_bf16(&mut source.file, EMBED, *token, 1)
+            .map_err(|e| e.to_string())?;
         entering.extend(row);
-        let (row, _) = source.container.read_rows_bf16(&mut source.file, PLE_EMBED, *token, 1).map_err(|e| e.to_string())?;
+        let (row, _) = source
+            .container
+            .read_rows_bf16(&mut source.file, PLE_EMBED, *token, 1)
+            .map_err(|e| e.to_string())?;
         per_layer.extend_from_slice(&row[LAYER * PLE_WIDTH..(LAYER + 1) * PLE_WIDTH]);
     }
-    let (ple_proj_words, _) = source.container.read_rows_bf16(&mut source.file, PLE_MODEL_PROJECTION, PLE_WIDTH * LAYER, PLE_WIDTH).map_err(|e| e.to_string())?;
-    let mut whole = |name: &str| -> Result<Vec<u16>, String> { source.container.read_bf16_whole(&mut source.file, name).map_err(|e| e.to_string()) };
+    let (ple_proj_words, _) = source
+        .container
+        .read_rows_bf16(
+            &mut source.file,
+            PLE_MODEL_PROJECTION,
+            PLE_WIDTH * LAYER,
+            PLE_WIDTH,
+        )
+        .map_err(|e| e.to_string())?;
+    let mut whole = |name: &str| -> Result<Vec<u16>, String> {
+        source
+            .container
+            .read_bf16_whole(&mut source.file, name)
+            .map_err(|e| e.to_string())
+    };
     let x0 = serial.enter(&entering, EMBED_SCALE)?;
     let proj = serial.contract(&x0, rows, HIDDEN, &ple_proj_words, PLE_WIDTH)?;
     let proj = serial.scale(&proj, scales.0);
@@ -1324,32 +2365,119 @@ fn serial_layer(
     let tok = serial.enter(&per_layer, PLE_EMBED_SCALE)?;
     let ple = serial.scale(&serial.re_entry(&proj, &tok), scales.1);
     let g = |suffix: &str| named(suffix);
-    let h = serial.rms(&x0, HIDDEN, Some(&whole(&g("input_layernorm.weight"))?), eps)?;
-    let q = serial.contract(&h, rows, HIDDEN, &whole(&g("self_attn.q_proj.weight"))?, HEADS * HEAD_WIDTH)?;
-    let k = serial.contract(&h, rows, HIDDEN, &whole(&g("self_attn.k_proj.weight"))?, KV_HEADS * HEAD_WIDTH)?;
-    let v = serial.contract(&h, rows, HIDDEN, &whole(&g("self_attn.v_proj.weight"))?, KV_HEADS * HEAD_WIDTH)?;
-    let qn = serial.rms(&q, HEAD_WIDTH, Some(&whole(&g("self_attn.q_norm.weight"))?), eps)?;
-    let kn = serial.rms(&k, HEAD_WIDTH, Some(&whole(&g("self_attn.k_norm.weight"))?), eps)?;
+    let h = serial.rms(
+        &x0,
+        HIDDEN,
+        Some(&whole(&g("input_layernorm.weight"))?),
+        eps,
+    )?;
+    let q = serial.contract(
+        &h,
+        rows,
+        HIDDEN,
+        &whole(&g("self_attn.q_proj.weight"))?,
+        HEADS * HEAD_WIDTH,
+    )?;
+    let k = serial.contract(
+        &h,
+        rows,
+        HIDDEN,
+        &whole(&g("self_attn.k_proj.weight"))?,
+        KV_HEADS * HEAD_WIDTH,
+    )?;
+    let v = serial.contract(
+        &h,
+        rows,
+        HIDDEN,
+        &whole(&g("self_attn.v_proj.weight"))?,
+        KV_HEADS * HEAD_WIDTH,
+    )?;
+    let qn = serial.rms(
+        &q,
+        HEAD_WIDTH,
+        Some(&whole(&g("self_attn.q_norm.weight"))?),
+        eps,
+    )?;
+    let kn = serial.rms(
+        &k,
+        HEAD_WIDTH,
+        Some(&whole(&g("self_attn.k_norm.weight"))?),
+        eps,
+    )?;
     let vn = serial.rms(&v, HEAD_WIDTH, None, eps)?;
     let qr = serial.chronology(&qn, rows, HEADS, HEAD_WIDTH, ROPE_THETA, terms)?;
     let kr = serial.chronology(&kn, rows, KV_HEADS, HEAD_WIDTH, ROPE_THETA, terms)?;
-    let c = serial.contact(&qr, &kr, &vn, rows, HEADS, KV_HEADS, HEAD_WIDTH, SLIDING_WINDOW, terms)?;
-    let o = serial.contract(&c, rows, HEADS * HEAD_WIDTH, &whole(&g("self_attn.o_proj.weight"))?, HIDDEN)?;
-    let on = serial.rms(&o, HIDDEN, Some(&whole(&g("post_attention_layernorm.weight"))?), eps)?;
+    let c = serial.contact(
+        &qr,
+        &kr,
+        &vn,
+        rows,
+        HEADS,
+        KV_HEADS,
+        HEAD_WIDTH,
+        SLIDING_WINDOW,
+        terms,
+    )?;
+    let o = serial.contract(
+        &c,
+        rows,
+        HEADS * HEAD_WIDTH,
+        &whole(&g("self_attn.o_proj.weight"))?,
+        HIDDEN,
+    )?;
+    let on = serial.rms(
+        &o,
+        HIDDEN,
+        Some(&whole(&g("post_attention_layernorm.weight"))?),
+        eps,
+    )?;
     let r1 = serial.re_entry(&x0, &on);
-    let h2 = serial.rms(&r1, HIDDEN, Some(&whole(&g("pre_feedforward_layernorm.weight"))?), eps)?;
+    let h2 = serial.rms(
+        &r1,
+        HIDDEN,
+        Some(&whole(&g("pre_feedforward_layernorm.weight"))?),
+        eps,
+    )?;
     let gate = serial.contract(&h2, rows, HIDDEN, &whole(&g("mlp.gate_proj.weight"))?, FFN)?;
     let up = serial.contract(&h2, rows, HIDDEN, &whole(&g("mlp.up_proj.weight"))?, FFN)?;
     let gated = serial.gelu(&gate, c1, c2, terms)?;
     let admitted = serial.hadamard(&gated, &up);
-    let down = serial.contract(&admitted, rows, FFN, &whole(&g("mlp.down_proj.weight"))?, HIDDEN)?;
-    let dn = serial.rms(&down, HIDDEN, Some(&whole(&g("post_feedforward_layernorm.weight"))?), eps)?;
+    let down = serial.contract(
+        &admitted,
+        rows,
+        FFN,
+        &whole(&g("mlp.down_proj.weight"))?,
+        HIDDEN,
+    )?;
+    let dn = serial.rms(
+        &down,
+        HIDDEN,
+        Some(&whole(&g("post_feedforward_layernorm.weight"))?),
+        eps,
+    )?;
     let r2 = serial.re_entry(&r1, &dn);
-    let pg = serial.contract(&r2, rows, HIDDEN, &whole(&g("per_layer_input_gate.weight"))?, PLE_WIDTH)?;
+    let pg = serial.contract(
+        &r2,
+        rows,
+        HIDDEN,
+        &whole(&g("per_layer_input_gate.weight"))?,
+        PLE_WIDTH,
+    )?;
     let pga = serial.gelu(&pg, c1, c2, terms)?;
     let pm = serial.hadamard(&pga, &ple);
-    let pp = serial.contract(&pm, rows, PLE_WIDTH, &whole(&g("per_layer_projection.weight"))?, HIDDEN)?;
-    let ppn = serial.rms(&pp, HIDDEN, Some(&whole(&g("post_per_layer_input_norm.weight"))?), eps)?;
+    let pp = serial.contract(
+        &pm,
+        rows,
+        PLE_WIDTH,
+        &whole(&g("per_layer_projection.weight"))?,
+        HIDDEN,
+    )?;
+    let ppn = serial.rms(
+        &pp,
+        HIDDEN,
+        Some(&whole(&g("post_per_layer_input_norm.weight"))?),
+        eps,
+    )?;
     let r3 = serial.re_entry(&r2, &ppn);
     Ok(serial.scale(&r3, resident_layer::point_enclosure(layer_scalar)))
 }

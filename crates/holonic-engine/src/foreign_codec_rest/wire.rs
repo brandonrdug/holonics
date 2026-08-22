@@ -644,9 +644,12 @@ impl ExteriorCodebookRest {
     pub fn native_id(&self, source_id: u32) -> Result<u32, RestError> {
         match self.read_source(source_id) {
             SourceRead::NativeId(native_id) => Ok(native_id),
-            SourceRead::Open { source_id, extent, .. } => {
-                Err(RestError::MissingSourceId { id: source_id, extent })
-            }
+            SourceRead::Open {
+                source_id, extent, ..
+            } => Err(RestError::MissingSourceId {
+                id: source_id,
+                extent,
+            }),
         }
     }
 

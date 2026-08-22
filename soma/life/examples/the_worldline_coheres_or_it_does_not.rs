@@ -170,8 +170,8 @@ fn prose_material(root: &Path) -> Result<Vec<Vec<u8>>, String> {
     let mut words = Vec::new();
     for relative in PROSE_RECORDS {
         let path = root.join(relative);
-        let text = fs::read_to_string(&path)
-            .map_err(|e| format!("read prose {}: {e}", path.display()))?;
+        let text =
+            fs::read_to_string(&path).map_err(|e| format!("read prose {}: {e}", path.display()))?;
         words.extend(words_of(&text));
     }
     Ok(words)
@@ -230,9 +230,14 @@ fn report(name: &str, ladder: &[Rung], stop: Option<usize>, extent: usize) -> Op
             "    {:>8}  {:>8} : {:<9}  {:>9} : {:<8}  {:>5} {:>5}  {}",
             rung.steps,
             rung.deposits_this + rung.deposits_that
-                - if at == 0 { 0 } else { ladder[at - 1].deposits_this + ladder[at - 1].deposits_that },
+                - if at == 0 {
+                    0
+                } else {
+                    ladder[at - 1].deposits_this + ladder[at - 1].deposits_that
+                },
             rung.steps - if at == 0 { 0 } else { ladder[at - 1].steps },
-            (rung.deposits_this - rung.deposits_that).saturating_mul(rung.deposits_this - rung.deposits_that),
+            (rung.deposits_this - rung.deposits_that)
+                .saturating_mul(rung.deposits_this - rung.deposits_that),
             rung.deposits_this + rung.deposits_that,
             rung.deposits_this,
             rung.deposits_that,
@@ -255,7 +260,9 @@ fn main() -> Result<(), String> {
     println!("    basis_(k+1) = basis_k · deed_k        phases ADD      — one path's amplitude");
     println!("    sweep_(k+1) = sweep_k + basis_(k+1)   amplitudes SUM  — the sum over prefixes");
     println!("    |sweep|² doubling the steps:  ×4 coherent · ×2 walk · ×1 destructive");
-    println!("\n  every comparison is a cross-multiplication; nothing is divided, no float exists here");
+    println!(
+        "\n  every comparison is a cross-multiplication; nothing is divided, no float exists here"
+    );
 
     let prose = prose_material(&root)?;
     let mathematics = mathematics_material(&root)?;
@@ -292,7 +299,11 @@ fn main() -> Result<(), String> {
     println!("\n  THE RESERVATION CONTROL — both materials at twice the axis");
     let (prose_wide, prose_stop_wide) = walk(&prose[..extent], b" p", AXIS * 2);
     let (mathematics_wide, mathematics_stop_wide) = walk(&mathematics[..extent], b" m", AXIS * 2);
-    let passages = |l: &[Rung]| l.last().map(|r| r.deposits_this + r.deposits_that).unwrap_or(0);
+    let passages = |l: &[Rung]| {
+        l.last()
+            .map(|r| r.deposits_this + r.deposits_that)
+            .unwrap_or(0)
+    };
     println!(
         "    prose        axis {AXIS} stop {prose_stop:?} passages {}  |  axis {} stop {prose_stop_wide:?} passages {}",
         passages(&prose_ladder),
@@ -309,7 +320,9 @@ fn main() -> Result<(), String> {
         println!("    NEITHER STOP MOVED — no apparatus bound is active at this axis, so the");
         println!("    passage counts above are comparable and the difference is the MATERIAL.");
     } else {
-        println!("    A STOP MOVED — an apparatus bound is still active; the passage counts at this");
+        println!(
+            "    A STOP MOVED — an apparatus bound is still active; the passage counts at this"
+        );
         println!("    axis are apparatus readings and may not be compared as material.");
     }
 

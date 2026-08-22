@@ -330,7 +330,9 @@ fn every_word_round_trips_through_its_slot() {
     let stride = system.stride();
     let mut seen = BTreeSet::new();
     for slot in 0..stride {
-        let word = system.word(slot).expect("every slot below the stride is a word");
+        let word = system
+            .word(slot)
+            .expect("every slot below the stride is a word");
         assert!(word.len() <= 2);
         assert_eq!(system.slot_of(&word), Some(slot));
         assert!(seen.insert(word), "two slots decoded to one word");

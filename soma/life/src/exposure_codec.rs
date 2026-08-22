@@ -1096,7 +1096,6 @@ pub fn octet_alphabet() -> SymbolAlphabet {
     .expect("the octet alphabet carries no repeat")
 }
 
-
 // -------------------------------------------------------------------------------------------------
 // The ladder — the same recovery, one scale up
 // -------------------------------------------------------------------------------------------------
@@ -1317,7 +1316,6 @@ mod tests {
     fn units(octets: &[u8]) -> Vec<Unit> {
         octets.iter().copied().map(Unit::from).collect()
     }
-
 
     /// A returned segmentation, read back as the octet strings it stands for. The carrier holds
     /// ordinals; a fixture asserts about the material, so this is where the two meet.
@@ -1623,11 +1621,17 @@ mod tests {
         }
         // and the quotient is finer than the role reading: `p` and `q` play one role and are still
         // separated, which is the bound the direct grain reports on itself.
-        assert_eq!(recovery.roles[&Unit::from(b'p')], recovery.roles[&Unit::from(b'q')]);
-        assert!(recovery
-            .direct_quotient
-            .iter()
-            .all(|block| !(block.contains(&Unit::from(b'p')) && block.contains(&Unit::from(b'q')))));
+        assert_eq!(
+            recovery.roles[&Unit::from(b'p')],
+            recovery.roles[&Unit::from(b'q')]
+        );
+        assert!(
+            recovery
+                .direct_quotient
+                .iter()
+                .all(|block| !(block.contains(&Unit::from(b'p'))
+                    && block.contains(&Unit::from(b'q'))))
+        );
     }
 
     #[test]
