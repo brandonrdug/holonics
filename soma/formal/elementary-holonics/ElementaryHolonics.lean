@@ -95,4 +95,5 @@ import ElementaryHolonics.Millennium.FiveWitness
 import ElementaryHolonics.Millennium.FiveHalving
 import ElementaryHolonics.Millennium.FiveHeight
 import ElementaryHolonics.Millennium.FiveDescent
+import ElementaryHolonics.Millennium.FiveRank
 import ElementaryHolonics.Millennium.FiveTranslation
