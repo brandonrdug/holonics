@@ -294,7 +294,7 @@ private lemma dvd_two_mul_prime (hp : p.Prime) {a : ℕ}
     · exact Or.inl rfl
     · exact Or.inr (Or.inr (Or.inl rfl))
 
-private lemma classFromEvenValuationsP (hp : p.Prime) (h8 : p % 8 = 3) {x : ℚ}
+private lemma classFromEvenValuationsP (hp : p.Prime) (hne2 : p ≠ 2) {x : ℚ}
     (hx : x ≠ 0)
     (h : ∀ ℓ : ℕ, ℓ.Prime → ℓ ≠ 2 → ℓ ≠ p → Even (padicValRat ℓ x)) :
     ∃ d : ℚ, OnDiscriminantP p d ∧ Descent.SqCls x d := by
@@ -400,16 +400,16 @@ private lemma classFromEvenValuationsP (hp : p.Prime) (h8 : p % 8 = 3) {x : ℚ}
       push_cast [← hab]
       ring
 
-theorem theSlotClassesAreSupportedOnTheStratum (hp : p.Prime) (h8 : p % 8 = 3)
+theorem theSlotClassesAreSupportedOnTheStratum (hp : p.Prime) (hne2 : p ≠ 2)
     {x y : ℚ} (hcurve : y ^ 2 = x ^ 3 - (p : ℚ) ^ 2 * x) (hy : y ≠ 0) :
     (∃ d₁ : ℚ, OnDiscriminantP p d₁ ∧ Descent.SqCls x d₁) ∧
     (∃ d₂ : ℚ, OnDiscriminantP p d₂ ∧ Descent.SqCls (x - p) d₂) := by
   obtain ⟨hx0, hxp, -⟩ := avoidP hcurve hy
   constructor
-  · exact classFromEvenValuationsP hp h8 hx0 fun ℓ hℓ h2 hnep =>
+  · exact classFromEvenValuationsP hp hne2 hx0 fun ℓ hℓ h2 hnep =>
       haveI : Fact ℓ.Prime := ⟨hℓ⟩
       (even_slot_valP hp h2 hnep hcurve hy).1
-  · exact classFromEvenValuationsP hp h8 (sub_ne_zero.mpr hxp) fun ℓ hℓ h2 hnep =>
+  · exact classFromEvenValuationsP hp hne2 (sub_ne_zero.mpr hxp) fun ℓ hℓ h2 hnep =>
       haveI : Fact ℓ.Prime := ⟨hℓ⟩
       (even_slot_valP hp h2 hnep hcurve hy).2
 
@@ -1640,7 +1640,7 @@ theorem theStratumDescentIsComplete (hp : p.Prime) (h8 : p % 8 = 3) [Fact p.Prim
           exact ⟨1, one_ne_zero, by ring⟩
     · obtain ⟨hx0, hxp, hxmp⟩ := avoidP hcurve hy
       obtain ⟨⟨d₁, hd₁, hc₁⟩, ⟨d₂, hd₂, hc₂⟩⟩ :=
-        theSlotClassesAreSupportedOnTheStratum hp h8 hcurve hy
+        theSlotClassesAreSupportedOnTheStratum hp (by omega) hcurve hy
       have hsig := theSignsAgreeOnTheStratum hp hcurve hy hc₁ hc₂
       have hs1 : Descent.SqCls (FamilyFace.slotOne p (Point.some hP)) d₁ := by
         rw [slotPOne_some, if_neg hx0]
