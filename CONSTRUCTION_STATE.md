@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I1. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed I2. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RECURRENT BOUNDARY RETURNED THE COMPLETE PASSAGE, THE LONGER HISTORY
-REOPENED, AND I1 PASSED ITS RELEASE RECEIVER.**
+**CURRENT FRONTIER — THE EXTERIOR CONSEQUENCE RETURNED THROUGH THE CLOSING EDGE, THE SUCCESSOR
+CHANGED, AND I2 PASSED ITS RELEASE RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -232,13 +232,30 @@ Authoritative grade:
 seconds: 2,827 tests passed, none failed, 22 were explicitly ignored, every example target
 type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: I2 EXTERIOR CONSEQUENCE RETURNS AND CHANGES LATER CONDUCT.**
-[open] I2 composes I1 emission, `current_world`/`exact_world`, returned conduct, metric-adjoint
-reflection and the existing A3 cultivation/rest owners. It owes distinct emitted and exterior
-events, an exact returned difference, a causal-adjoint passage through the actual forward lineage,
-explicit commit/decline, source-detached successor conduct, a nonidentical held-out change,
-subject/port-disjoint control, targeted ablation, revisit holonomy, reopened fibres, source audit,
-exact work and separate apparatus testimony.
+**I2 PASSED — the exterior consequence returned and changed later conduct.**
+[established-bounded; implemented-exact; measured] The I1 passage crossed a newly enacted
+byte-preserving `/usr/bin/tee` receiver as a distinct world occurrence. Its exact 17-octet residue
+returned through forward lineage `[0,1,2,1]` and committed rank-one generator difference
+`(e_2-e_1)e_2^T`, changing the source-detached main passage from `" France is France"` to
+`" France is is"` and the held-out passage from `" is France"` to `" is is"`. The disjoint port-0
+control held, targeted ablation restored all predecessor recurrences, and every admitted start
+reopened with rank-one revisit holonomy. One RTX 4080 SUPER launch/synchronization returned the
+complete predecessor/successor/ablation family with exact work, zero intermediate CPU semantic
+callbacks and no forbidden source access. The sixteen-member 36,104-octet family has rolled SHA-256
+`81e79e7357e85ca164d1739c579a3acf2460f758f152408aa52f539c6e0298a9`. Authoritative grade:
+[`research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md`](research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md).
+[established-bounded; measured] The sole complete receiver passed all thirteen scopes in 304.72
+seconds: 2,829 tests passed, none failed, 23 were explicitly ignored, every example target
+type-checked, and all twelve non-test scopes were green.
+
+**NEXT DEED: I3 RECURRENT PHOENIX CONDENSES PHYSICAL REALIZATIONS.**
+[open] I3 composes I1/I2 interventions and receiver histories with the I0 realization atlas and
+the existing generator-native compression owners. It owes overlapping active covers, stable local
+generator families, every source/native defect and shortest separator, future-exact condensation,
+retention of every visible or noncommuting route, an executable source-detached native rest and
+decoder, the same complete passage family plus a held-out continuation, shared-generator ablation,
+a strictly falling artifact/decoder/fibre/work/span/residency/transfer vector, and an inspectable
+source/native causal atlas with exact interactive mesh projection.
 
 [open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
 return, durable cultivation, generator-native compression, complete answers, and multimodality are

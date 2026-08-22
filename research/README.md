@@ -186,6 +186,19 @@ governs the rebuild.
   — admits the first-recurrence-derived complete passage, retained before/after sections, complete
   fibres, richer-history reopenings and source-detached one-launch GPU return; records all thirteen
   green release scopes and places I2 at the exterior-consequence/causal-return frontier.
+- **I2 exterior-return cultivation candidate:**
+  `records/2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md`
+  — enacts a distinct exact tool consequence, returns its positive residue through I1's actual
+  closing lineage as a rank-one metric adjoint, commits one local recurrent successor, and returns
+  source-detached main/held-out changes, disjoint control, complete ablation, nonzero holonomy,
+  every reopened fibre, exact work and separate one-launch card testimony while retaining the
+  release-admission boundary.
+- **I2 release admission:**
+  `records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md`
+  — admits the distinct emission/world/return events, exact causal-adjoint residue, committed
+  recurrent successor, source-detached main/held-out changes, disjoint control, complete ablation,
+  revisit holonomy and reopened fibres; records all thirteen green release scopes and places I3 at
+  the recurrent Phoenix condensation frontier.
 - **The whole foreign map crossed once and the native rest returned without its source:**
   `records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`
   — Phoenix Deed W1: 45 authenticated operation complexes, 1,466 resident-law correspondences,

@@ -155,7 +155,7 @@ factor/covector continuation changed one source-detached held-out durable emissi
 withdrew exactly to the immediate A2 predecessor. The bounded result does not claim a complete
 response or enacted external action. The affected package returned 423 passing tests, and the sole
 complete release receiver returned 2,824 passing tests and all thirteen green scopes in 285
-seconds. A3 is the admitted construction frontier. Construction record:
+seconds. A3 remains admitted predecessor evidence. Construction record:
 [`research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md).
 Release admission:
 [`research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`](../research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md).
@@ -183,6 +183,19 @@ terminal-potential receivers reopen the static quotient. All thirteen release sc
 [`research/records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md).
 Release admission:
 [`research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`](../research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md).
+
+**I2 PASSED.** The I1 passage crossed a newly enacted exact byte-preserving tool receiver as a
+distinct world occurrence. Its 17-octet residue returned through the actual closing lineage and
+committed the exact rank-one generator difference `(e_2-e_1)e_2^T`. Source-detached later current
+changed the main and nonidentical held-out passages, the disjoint control held, targeted ablation
+restored all predecessor traces, and every recurrence fibre reopened with nonzero revisit
+holonomy. One RTX 4080 SUPER launch/synchronization returned the predecessor/successor/ablation
+family with exact work and no forbidden source access or intermediate CPU semantic callback. The
+sole complete receiver returned 2,829 passing tests, zero failures and all thirteen green scopes in
+304.72 seconds. Candidate record:
+[`research/records/2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md`](../research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md).
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

@@ -200,6 +200,107 @@ extern "C" __global__ void conduct_native_trace(
     }
 }
 
+__device__ __forceinline__ uint32_t recurrent_native_trace(
+    const uint32_t *generator_table,
+    uint32_t generator,
+    uint32_t start,
+    uint32_t state_count,
+    bool apply_delta,
+    uint32_t delta_from,
+    uint32_t delta_to,
+    uint32_t *trace)
+{
+    uint32_t state = start;
+    trace[0] = state;
+    for (uint32_t step = 0; step < state_count; ++step) {
+        uint32_t next = generator_table[generator * state_count + state];
+        if (apply_delta && state == delta_from) {
+            next = delta_to;
+        }
+        trace[step + 1] = next;
+        bool repeated = false;
+        for (uint32_t prior = 0; prior <= step; ++prior) {
+            repeated = repeated || trace[prior] == next;
+        }
+        if (repeated) {
+            for (uint32_t fill = step + 2; fill <= state_count; ++fill) {
+                trace[fill] = next;
+            }
+            return step + 2;
+        }
+        state = next;
+    }
+    return 0;
+}
+
+/// **An exterior return deposits one local difference and every recurrence closes on the card.**
+///
+/// The finite native population derives the only traversal bound: a total endomap must repeat by
+/// `state_count + 1` visited boundaries. Each lane owns one entering occurrence and returns the
+/// predecessor, committed-successor and targeted-ablation traces. The returned exterior current
+/// decides commit versus decline once; no host callback inspects a boundary or supplies a response
+/// extent. The ablation is the same base action enacted beside the successor, not a rebuilt body.
+extern "C" __global__ void return_and_recur_native(
+    const uint32_t *generator_table,
+    const uint32_t *native_start,
+    uint32_t *predecessor_trace,
+    uint32_t *successor_trace,
+    uint32_t *ablated_trace,
+    uint32_t *predecessor_lengths,
+    uint32_t *successor_lengths,
+    uint32_t *ablated_lengths,
+    uint32_t *decision,
+    uint32_t *control_pair,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t generator,
+    uint64_t returned_difference_octets,
+    uint32_t delta_from,
+    uint32_t delta_to,
+    uint32_t control_from)
+{
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= cell_count) {
+        return;
+    }
+    const uint32_t stride = state_count + 1U;
+    const uint64_t trace_at = (uint64_t)at * (uint64_t)stride;
+    const bool committed = returned_difference_octets > 0ULL;
+    predecessor_lengths[at] = recurrent_native_trace(
+        generator_table,
+        generator,
+        native_start[at],
+        state_count,
+        false,
+        delta_from,
+        delta_to,
+        predecessor_trace + trace_at);
+    successor_lengths[at] = recurrent_native_trace(
+        generator_table,
+        generator,
+        native_start[at],
+        state_count,
+        committed,
+        delta_from,
+        delta_to,
+        successor_trace + trace_at);
+    ablated_lengths[at] = recurrent_native_trace(
+        generator_table,
+        generator,
+        native_start[at],
+        state_count,
+        false,
+        delta_from,
+        delta_to,
+        ablated_trace + trace_at);
+    if (at == 0U) {
+        decision[0] = committed ? 1U : 0U;
+        const uint32_t predecessor = generator_table[generator * state_count + control_from];
+        control_pair[0] = predecessor;
+        control_pair[1] = committed && control_from == delta_from ? delta_to : predecessor;
+    }
+}
+
 __device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
     // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
     // aperture; this expression is nevertheless total over the full wire.

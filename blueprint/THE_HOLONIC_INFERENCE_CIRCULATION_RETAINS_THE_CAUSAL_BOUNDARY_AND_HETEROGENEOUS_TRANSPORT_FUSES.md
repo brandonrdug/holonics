@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I1 passed its complete release boundary. I2 is the active deed.
+**Current boundary:** I2 passed its complete release boundary. I3 is the active deed.
 I0--I5 replace the former
 second-LLM-first A4--A6 schedule.
 **Scheduling boundary:** this file does not move
@@ -11,9 +11,9 @@ second-LLM-first A4--A6 schedule.
 position record.
 
 **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and
-fusion contracts; `established-bounded` for the cited M3--M6 and A1--I1 evidence; `proved-derived`
+fusion contracts; `established-bounded` for the cited M3--M6 and A1--I2 evidence; `proved-derived`
 for the named Lean theorems; `project-postulate` for placement and operator discipline; `open` for
-I2--I5 and every later heterogeneous-source deed.
+I3--I5 and every later heterogeneous-source deed.
 
 **Derivation:**
 [`2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md`](../research/records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md).
@@ -334,10 +334,15 @@ return, returns only diagnostic topology, or cannot inspect the emitted passage 
 
 ## 9. Deed I2 — exterior consequence returns and changes later conduct
 
-[open] I2 closes the productive loop over one predeclared exterior receiver. The first admissible
-receiver is derived from the available emitted passage and may be a Lean checker, exact tool deed,
-or another world occurrence already owned by `current_world`/`exact_world`; a recorded historical
-tool return is not substituted for a new consequence.
+[established-bounded; implemented-exact; measured] I2 is admitted. The I1 passage crossed a newly
+enacted exact byte-preserving tool receiver as a distinct world occurrence; its positive residue
+returned through the actual closing lineage; one exact rank-one generator difference committed;
+and source-detached later current returned changed main and held-out passages. The disjoint control,
+targeted ablation, nonzero revisit holonomy, every reopened recurrence fibre, exact work and one
+terminal GPU return passed with all thirteen release scopes. Candidate record:
+[`2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_EXTERIOR_CONSEQUENCE_RETURNED_THROUGH_THE_CLOSING_EDGE_THE_SUCCESSOR_CHANGED_AND_I2_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md`](../research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md).
 
 I2 returns:
 

@@ -129,6 +129,8 @@ pub enum CudaRefineError {
     NativeGeneratorOutsideFamily { generator: u32, generators: usize },
     #[error("the native action extent cannot cross the exact 32-bit device wire")]
     NativeActionTooWide,
+    #[error("native recurrence {at} did not close inside its finite state population")]
+    NativeRecurrenceDidNotClose { at: usize },
     #[error(
         "the contact coordinate wire has {lower} lower words and {upper} upper words; both must be equal multiples of three"
     )]
@@ -328,6 +330,7 @@ pub struct CudaRefineExecutor {
     claim: CuFunction,
     native_word: CuFunction,
     native_trace: CuFunction,
+    returned_recurrence: CuFunction,
     contact_pairs: CuFunction,
     contact_compare: CuFunction,
     device_name: String,
@@ -394,6 +397,7 @@ impl CudaRefineExecutor {
             let mut claim = ptr::null_mut();
             let mut native_word = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
+            let mut returned_recurrence = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
             let mut contact_compare = ptr::null_mut();
             for (slot, symbol, operation) in [
@@ -421,6 +425,11 @@ impl CudaRefineExecutor {
                     &mut native_trace as *mut CuFunction,
                     c"conduct_native_trace",
                     "cuModuleGetFunction(conduct_native_trace)",
+                ),
+                (
+                    &mut returned_recurrence as *mut CuFunction,
+                    c"return_and_recur_native",
+                    "cuModuleGetFunction(return_and_recur_native)",
                 ),
                 (
                     &mut contact_pairs as *mut CuFunction,
@@ -452,6 +461,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 native_trace,
+                returned_recurrence,
                 contact_pairs,
                 contact_compare,
             ] {
@@ -472,6 +482,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 native_trace,
+                returned_recurrence,
                 contact_pairs,
                 contact_compare,
                 device_name,
@@ -674,6 +685,29 @@ pub struct DeviceNativeTrace {
     pub native_trace: Vec<u32>,
     pub trace_stride: usize,
     pub starting_occurrences: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// Every finite predecessor/successor/ablation recurrence returned after one exterior difference.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceReturnedRecurrences {
+    /// Row-major traces with stride `state_count + 1`; each length selects its exact prefix.
+    pub predecessor_trace: Vec<u32>,
+    pub successor_trace: Vec<u32>,
+    pub ablated_trace: Vec<u32>,
+    pub predecessor_lengths: Vec<u32>,
+    pub successor_lengths: Vec<u32>,
+    pub ablated_lengths: Vec<u32>,
+    pub trace_stride: usize,
+    pub committed: bool,
+    pub control_predecessor: u32,
+    pub control_successor: u32,
     pub launches: u64,
     pub synchronizations: u64,
     pub block_threads: u32,
@@ -1121,6 +1155,200 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Return every finite predecessor/successor/targeted-ablation recurrence after one exterior
+    /// difference, under one terminal synchronization.
+    ///
+    /// The card derives closure from repetition inside the complete finite state population. A
+    /// positive returned occurrence commits the one addressed local delta; an empty return
+    /// declines it. The host supplies neither a traversal capacity nor a semantic stop case.
+    #[allow(clippy::too_many_arguments)]
+    pub fn conduct_returned_recurrences_on_device(
+        &mut self,
+        states: usize,
+        generators: usize,
+        generator_table: &[u32],
+        generator: u32,
+        native_start: &[u32],
+        returned_difference_octets: u64,
+        delta_from: u32,
+        delta_to: u32,
+        control_from: u32,
+    ) -> Result<DeviceReturnedRecurrences, CudaRefineError> {
+        let expected = states
+            .checked_mul(generators)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_stride = states
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_entries = native_start
+            .len()
+            .checked_mul(trace_stride)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if generator_table.len() != expected {
+            return Err(CudaRefineError::NativeTableExtentDisagrees {
+                table_entries: generator_table.len(),
+                generators,
+                states,
+            });
+        }
+        if states == 0
+            || native_start.is_empty()
+            || states > u32::MAX as usize
+            || generators > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if generator as usize >= generators {
+            return Err(CudaRefineError::NativeGeneratorOutsideFamily {
+                generator,
+                generators,
+            });
+        }
+        if let Some(state) = generator_table
+            .iter()
+            .chain(native_start)
+            .copied()
+            .chain([delta_from, delta_to, control_from])
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let table = Buffer::of(generator_table)?;
+        let starts = Buffer::of(native_start)?;
+        let predecessor = Buffer::alloc(trace_entries * std::mem::size_of::<u32>())?;
+        let successor = Buffer::alloc(trace_entries * std::mem::size_of::<u32>())?;
+        let ablated = Buffer::alloc(trace_entries * std::mem::size_of::<u32>())?;
+        let lengths_octets = native_start.len() * std::mem::size_of::<u32>();
+        let predecessor_lengths_device = Buffer::alloc(lengths_octets)?;
+        let successor_lengths_device = Buffer::alloc(lengths_octets)?;
+        let ablated_lengths_device = Buffer::alloc(lengths_octets)?;
+        let decision_device = Buffer::alloc(std::mem::size_of::<u32>())?;
+        let control_device = Buffer::alloc(2 * std::mem::size_of::<u32>())?;
+        let grid = self.grid_for(native_start.len() as u64)?;
+        let mut table_pointer = table.pointer;
+        let mut starts_pointer = starts.pointer;
+        let mut predecessor_pointer = predecessor.pointer;
+        let mut successor_pointer = successor.pointer;
+        let mut ablated_pointer = ablated.pointer;
+        let mut predecessor_lengths_pointer = predecessor_lengths_device.pointer;
+        let mut successor_lengths_pointer = successor_lengths_device.pointer;
+        let mut ablated_lengths_pointer = ablated_lengths_device.pointer;
+        let mut decision_pointer = decision_device.pointer;
+        let mut control_pointer = control_device.pointer;
+        let mut cell_count = native_start.len() as u32;
+        let mut state_count = states as u32;
+        let mut generator_row = generator;
+        let mut returned_octets = returned_difference_octets;
+        let mut local_from = delta_from;
+        let mut local_to = delta_to;
+        let mut disjoint_from = control_from;
+        let mut arguments: [*mut c_void; 17] = [
+            &mut table_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_pointer as *mut u64 as *mut c_void,
+            &mut successor_pointer as *mut u64 as *mut c_void,
+            &mut ablated_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut successor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut ablated_lengths_pointer as *mut u64 as *mut c_void,
+            &mut decision_pointer as *mut u64 as *mut c_void,
+            &mut control_pointer as *mut u64 as *mut c_void,
+            &mut cell_count as *mut u32 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+            &mut generator_row as *mut u32 as *mut c_void,
+            &mut returned_octets as *mut u64 as *mut c_void,
+            &mut local_from as *mut u32 as *mut c_void,
+            &mut local_to as *mut u32 as *mut c_void,
+            &mut disjoint_from as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.returned_recurrence,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(return_and_recur_native)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut predecessor_trace = vec![0u32; trace_entries];
+        let mut successor_trace = vec![0u32; trace_entries];
+        let mut ablated_trace = vec![0u32; trace_entries];
+        let mut predecessor_lengths = vec![0u32; native_start.len()];
+        let mut successor_lengths = vec![0u32; native_start.len()];
+        let mut ablated_lengths = vec![0u32; native_start.len()];
+        let mut decision = [0u32; 1];
+        let mut control = [0u32; 2];
+        predecessor.read(&mut predecessor_trace)?;
+        successor.read(&mut successor_trace)?;
+        ablated.read(&mut ablated_trace)?;
+        predecessor_lengths_device.read(&mut predecessor_lengths)?;
+        successor_lengths_device.read(&mut successor_lengths)?;
+        ablated_lengths_device.read(&mut ablated_lengths)?;
+        decision_device.read(&mut decision)?;
+        control_device.read(&mut control)?;
+        for (at, length) in predecessor_lengths
+            .iter()
+            .chain(&successor_lengths)
+            .chain(&ablated_lengths)
+            .copied()
+            .enumerate()
+        {
+            if length < 2 || length as usize > trace_stride {
+                return Err(CudaRefineError::NativeRecurrenceDidNotClose {
+                    at: at % native_start.len(),
+                });
+            }
+        }
+        if decision[0] > 1 {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        let table_octets = std::mem::size_of_val(generator_table) as u64;
+        let start_octets = std::mem::size_of_val(native_start) as u64;
+        let trace_octets = (trace_entries * std::mem::size_of::<u32>()) as u64;
+        let length_octets = lengths_octets as u64;
+        let scalar_ingress_octets = 7 * std::mem::size_of::<u32>() as u64
+            + std::mem::size_of::<u64>() as u64;
+        let scalar_egress_octets = 3 * std::mem::size_of::<u32>() as u64;
+        Ok(DeviceReturnedRecurrences {
+            predecessor_trace,
+            successor_trace,
+            ablated_trace,
+            predecessor_lengths,
+            successor_lengths,
+            ablated_lengths,
+            trace_stride,
+            committed: decision[0] == 1,
+            control_predecessor: control[0],
+            control_successor: control[1],
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: native_start.len() as u32,
+            host_ingress_octets: table_octets + start_octets + scalar_ingress_octets,
+            host_egress_octets: trace_octets * 3 + length_octets * 3 + scalar_egress_octets,
+            resident_octets: table_octets
+                + start_octets
+                + trace_octets * 3
+                + length_octets * 3
+                + scalar_egress_octets,
+        })
+    }
+
     /// Classify exact coordinate-box contacts and compare matched presentations without returning
     /// to the host between the two laws.
     ///
@@ -1410,6 +1638,39 @@ mod tests {
         assert_eq!(returned.contact_classes, vec![1, 0, 2]);
         assert_eq!(returned.paired_classes, vec![3]);
         assert_eq!(returned.launches, 2);
+        assert_eq!(returned.synchronizations, 1);
+    }
+
+    /// The I2 return: finite closure, local commit, held-out change, disjoint control and targeted
+    /// ablation all cross in one resident deed.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_every_recurrence_after_one_local_difference() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let returned = card
+            .conduct_returned_recurrences_on_device(
+                3,
+                1,
+                &[1, 2, 1],
+                0,
+                &[0, 1, 2],
+                17,
+                2,
+                2,
+                0,
+            )
+            .expect("the returned recurrences close");
+        assert!(returned.committed);
+        assert_eq!(returned.trace_stride, 4);
+        assert_eq!(returned.predecessor_lengths, vec![4, 3, 3]);
+        assert_eq!(returned.successor_lengths, vec![4, 3, 2]);
+        assert_eq!(returned.ablated_lengths, returned.predecessor_lengths);
+        assert_eq!(&returned.predecessor_trace[..4], &[0, 1, 2, 1]);
+        assert_eq!(&returned.successor_trace[..4], &[0, 1, 2, 2]);
+        assert_eq!(returned.ablated_trace, returned.predecessor_trace);
+        assert_eq!(returned.control_predecessor, 1);
+        assert_eq!(returned.control_successor, 1);
+        assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
     }
 }
