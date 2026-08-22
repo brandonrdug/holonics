@@ -1,5 +1,6 @@
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
 import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
+import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Tactic
 
 /-!
@@ -935,5 +936,305 @@ theorem theCompletedLFunctionalEquation (s : ℂ) : heckeLambda (2 - s) = heckeL
   have h := heckeFEPair.functional_equation s
   rw [show heckeFEPair.k = (2 : ℝ) from rfl, show heckeFEPair.ε = (1 : ℂ) from rfl] at h
   simpa [heckeLambda, StrongFEPair.Λ_eq, StrongFEPair.symm_Λ_eq, one_smul] using h
+
+/-! ## 14. Positivity: every kernel factor is positive
+
+`evenKernel` is a sum of positive exponentials; its functional equation transfers the
+positivity to `cosKernel`; a dominance estimate gives `oddKernel (1/4) > 0` on `[4, ∞)`;
+and the duplication identity transfers the sign across the reflection so the dominance
+range covers all of `(0, ∞)`. -/
+
+lemma evenKernel_half_pos {t : ℝ} (ht : 0 < t) :
+    0 < evenKernel ((1 / 2 : ℝ) : UnitAddCircle) t := by
+  have h := evenKernel_half_hasSum ht
+  rw [← h.tsum_eq]
+  exact h.summable.tsum_pos (fun n => Real.exp_nonneg _) 0 (Real.exp_pos _)
+
+lemma cosKernel_half_pos {t : ℝ} (ht : 0 < t) :
+    0 < cosKernel ((1 / 2 : ℝ) : UnitAddCircle) t := by
+  have hfe := evenKernel_functional_equation ((1 / 2 : ℝ) : UnitAddCircle) (1 / t)
+  rw [one_div_one_div] at hfe
+  have he := evenKernel_half_pos (show (0 : ℝ) < 1 / t by positivity)
+  rw [hfe] at he
+  have hc : (0 : ℝ) < 1 / (1 / t) ^ (1 / 2 : ℝ) := by positivity
+  rcases mul_pos_iff.mp he with ⟨_, h⟩ | ⟨hneg, _⟩
+  · exact h
+  · linarith
+
+private lemma oddKernel_quarter_pos_of_four_le {X : ℝ} (hX : 4 ≤ X) :
+    0 < oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X := by
+  have hX0 : (0 : ℝ) < X := by linarith
+  have h := oddKernel_quarter_hasSum hX0
+  set a : ℤ → ℝ := fun n => ((n : ℝ) + 1 / 4) * rexp (-π * ((n : ℝ) + 1 / 4) ^ 2 * X)
+    with ha_def
+  set r : ℝ := rexp (-π * X / 2) with hr_def
+  have hr0 : 0 ≤ r := Real.exp_nonneg _
+  have hr64 : r ≤ 1 / 64 := by
+    have h1 : rexp (-π * X / 2) ≤ rexp (-6) := by
+      apply Real.exp_le_exp.mpr
+      have hpi := Real.pi_gt_three
+      nlinarith
+    refine (hr_def ▸ h1).trans ?_
+    have he2 : (2 : ℝ) ≤ rexp 1 := by
+      have := Real.add_one_le_exp (1 : ℝ)
+      linarith
+    have h2 : (64 : ℝ) ≤ rexp 6 := by
+      calc (64 : ℝ) = 2 ^ (6 : ℕ) := by norm_num
+        _ ≤ rexp 1 ^ (6 : ℕ) := pow_le_pow_left₀ (by norm_num) he2 6
+        _ = rexp 6 := by rw [← Real.exp_nat_mul]; norm_num
+    have hprod : rexp (-6) * rexp 6 = 1 := by rw [← Real.exp_add]; norm_num
+    nlinarith [Real.exp_pos (-6), h2, hprod,
+      mul_nonneg (sub_nonneg.mpr h2) (Real.exp_pos (-6)).le]
+  have hrlt : r < 1 := lt_of_le_of_lt hr64 (by norm_num)
+  have ha0 : a 0 = 1 / 4 * rexp (-π * X / 16) := by
+    simp only [ha_def]
+    push_cast
+    rw [show -π * ((0 : ℝ) + 1 / 4) ^ 2 * X = -π * X / 16 from by ring]
+    norm_num
+  have ha0pos : 0 < a 0 := by rw [ha0]; positivity
+  have hb := h.nat_add_neg
+  have hbsum := hb.summable
+  have hterm : ∀ k : ℕ, |a ((k + 1 : ℕ) : ℤ) + a (-((k + 1 : ℕ) : ℤ))|
+      ≤ 8 * a 0 * ((((k + 1 : ℕ)) : ℝ) * r ^ (k + 1)) := by
+    intro k
+    have hj : (1 : ℝ) ≤ (k : ℝ) + 1 := by
+      have := Nat.cast_nonneg (α := ℝ) k
+      linarith
+    have hA : a ((k + 1 : ℕ) : ℤ)
+        = (((k : ℝ) + 1) + 1 / 4) * rexp (-π * (((k : ℝ) + 1) + 1 / 4) ^ 2 * X) := by
+      simp only [ha_def]
+      push_cast
+      ring_nf
+    have hB : a (-((k + 1 : ℕ) : ℤ))
+        = (-((k : ℝ) + 1) + 1 / 4) * rexp (-π * (((k : ℝ) + 1) - 1 / 4) ^ 2 * X) := by
+      simp only [ha_def]
+      push_cast
+      rw [show -π * (-((k : ℝ) + 1) + 1 / 4) ^ 2 * X
+          = -π * (((k : ℝ) + 1) - 1 / 4) ^ 2 * X from by ring]
+    rw [hA, hB]
+    set j : ℝ := (k : ℝ) + 1
+    have hE1 := Real.exp_nonneg (-π * (j + 1 / 4) ^ 2 * X)
+    have hE2 := Real.exp_nonneg (-π * (j - 1 / 4) ^ 2 * X)
+    have hexp1 : rexp (-π * (j + 1 / 4) ^ 2 * X) ≤ rexp (-π * (j - 1 / 4) ^ 2 * X) := by
+      apply Real.exp_le_exp.mpr
+      nlinarith [mul_nonneg Real.pi_pos.le hX0.le, hj]
+    have hexp2 : rexp (-π * (j - 1 / 4) ^ 2 * X) ≤ rexp (-π * X / 16) * r ^ (k + 1) := by
+      have hr_exp : rexp (-π * X / 16) * r ^ (k + 1)
+          = rexp (-π * X / 16 + ((k + 1 : ℕ) : ℝ) * (-π * X / 2)) := by
+        rw [Real.exp_add, Real.exp_nat_mul, hr_def]
+      rw [hr_exp]
+      apply Real.exp_le_exp.mpr
+      rw [show ((k + 1 : ℕ) : ℝ) = j from by push_cast; ring]
+      have hjj : (0 : ℝ) ≤ j * (j - 1) := mul_nonneg (by linarith) (by linarith)
+      nlinarith [mul_nonneg (mul_nonneg Real.pi_pos.le hX0.le) hjj]
+    have hup : (j + 1 / 4) * rexp (-π * (j + 1 / 4) ^ 2 * X)
+        ≤ (j + 1 / 4) * rexp (-π * (j - 1 / 4) ^ 2 * X) :=
+      mul_le_mul_of_nonneg_left hexp1 (by linarith)
+    have habs : |(j + 1 / 4) * rexp (-π * (j + 1 / 4) ^ 2 * X)
+        + (-j + 1 / 4) * rexp (-π * (j - 1 / 4) ^ 2 * X)|
+        ≤ 2 * j * rexp (-π * (j - 1 / 4) ^ 2 * X) := by
+      rw [abs_le]
+      constructor
+      · nlinarith [hup, hE1, hE2, hj, mul_nonneg (show (0:ℝ) ≤ j + 1/4 by linarith) hE1]
+      · nlinarith [hup, hE1, hE2, hj, mul_nonneg (show (0:ℝ) ≤ j + 1/4 by linarith) hE1,
+          mul_nonneg (show (0:ℝ) ≤ 2*j - 1/2 by linarith) hE2]
+    refine habs.trans ?_
+    rw [ha0, show ((k + 1 : ℕ) : ℝ) = j from by push_cast; ring]
+    calc 2 * j * rexp (-π * (j - 1 / 4) ^ 2 * X)
+        ≤ 2 * j * (rexp (-π * X / 16) * r ^ (k + 1)) := by
+          apply mul_le_mul_of_nonneg_left hexp2
+          nlinarith [hj]
+      _ = 8 * (1 / 4 * rexp (-π * X / 16)) * (j * r ^ (k + 1)) := by ring
+  have hgeo : HasSum (fun n : ℕ => (n : ℝ) * r ^ n) (r / (1 - r) ^ 2) := by
+    apply hasSum_coe_mul_geometric_of_norm_lt_one
+    rw [Real.norm_eq_abs, abs_of_nonneg hr0]
+    exact hrlt
+  have hshift : HasSum (fun k : ℕ => (((k + 1 : ℕ)) : ℝ) * r ^ (k + 1)) (r / (1 - r) ^ 2) := by
+    refine (hasSum_nat_add_iff (f := fun n : ℕ => (n : ℝ) * r ^ n) 1).mpr ?_
+    convert hgeo using 1
+    rw [Finset.sum_range_one]
+    norm_num
+  have hmaj : Summable (fun k : ℕ => 8 * a 0 * ((((k + 1 : ℕ)) : ℝ) * r ^ (k + 1))) :=
+    hshift.summable.mul_left _
+  have hb1 : HasSum (fun n : ℕ => a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))
+      (oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X - a 0) := by
+    refine (hasSum_nat_add_iff (f := fun n : ℕ => a (n : ℤ) + a (-(n : ℤ))) 1).mpr ?_
+    convert hb using 1
+    rw [Finset.sum_range_one]
+    simp only [Nat.cast_zero, neg_zero]
+    ring
+  have hTabs : Summable fun n : ℕ => |a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ))| :=
+    Summable.of_nonneg_of_le (fun n => abs_nonneg _) hterm hmaj
+  have htail : |∑' n : ℕ, (a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))|
+      ≤ 8 * a 0 * (r / (1 - r) ^ 2) := by
+    have h0 := norm_tsum_le_tsum_norm
+      (f := fun n : ℕ => a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))
+      (by simpa [Real.norm_eq_abs] using hTabs)
+    have h1 : ∑' n : ℕ, |a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ))|
+        ≤ ∑' n : ℕ, 8 * a 0 * ((((n + 1 : ℕ)) : ℝ) * r ^ (n + 1)) :=
+      hTabs.tsum_le_tsum hterm hmaj
+    have h2 : ∑' n : ℕ, 8 * a 0 * ((((n + 1 : ℕ)) : ℝ) * r ^ (n + 1))
+        = 8 * a 0 * (r / (1 - r) ^ 2) := by
+      rw [tsum_mul_left, hshift.tsum_eq]
+    calc |∑' n : ℕ, (a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))|
+        ≤ ∑' n : ℕ, |a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ))| := by
+          simpa [Real.norm_eq_abs] using h0
+      _ ≤ _ := h1
+      _ = _ := h2
+  have hfrac : r / (1 - r) ^ 2 ≤ 1 / 16 := by
+    have hpos : (0 : ℝ) < (1 - r) ^ 2 := by nlinarith
+    rw [div_le_iff₀ hpos]
+    nlinarith [sq_nonneg r]
+  have hhalf : |∑' n : ℕ, (a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))| ≤ a 0 / 2 := by
+    refine htail.trans ?_
+    calc 8 * a 0 * (r / (1 - r) ^ 2) ≤ 8 * a 0 * (1 / 16) :=
+          mul_le_mul_of_nonneg_left hfrac (by positivity)
+      _ = a 0 / 2 := by ring
+  rw [hb1.tsum_eq] at hhalf
+  have hb2 := abs_le.mp hhalf
+  linarith [hb2.1]
+
+lemma oddKernel_quarter_pos {X : ℝ} (hX : 0 < X) :
+    0 < oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X := by
+  rcases le_or_gt 4 X with h4 | h4
+  · exact oddKernel_quarter_pos_of_four_le h4
+  · have hd : (0 : ℝ) < 1 / X := by positivity
+    have hdup := theDuplicationIdentity hd
+    have hoddbig : 0 < oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (32 * (1 / X)) := by
+      apply oddKernel_quarter_pos_of_four_le
+      rw [mul_one_div, le_div_iff₀ hX]
+      nlinarith
+    have hcosbig := cosKernel_half_pos (show (0 : ℝ) < 8 * (1 / X) by positivity)
+    have hevenbig := evenKernel_half_pos (show (0 : ℝ) < 4 * (1 / X) by positivity)
+    have hprod : 0 < sinKernel ((1 / 4 : ℝ) : UnitAddCircle) (1 / X) *
+        evenKernel ((1 / 2 : ℝ) : UnitAddCircle) (4 * (1 / X)) := by
+      rw [hdup]
+      have := mul_pos hoddbig hcosbig
+      linarith
+    have hsin : 0 < sinKernel ((1 / 4 : ℝ) : UnitAddCircle) (1 / X) := by
+      rcases mul_pos_iff.mp hprod with ⟨h, _⟩ | ⟨_, hneg⟩
+      · exact h
+      · linarith
+    rw [oddKernel_functional_equation]
+    exact mul_pos (by positivity) hsin
+
+lemma sinKernel_quarter_pos {d : ℝ} (hd : 0 < d) :
+    0 < sinKernel ((1 / 4 : ℝ) : UnitAddCircle) d := by
+  have hdup := theDuplicationIdentity hd
+  have hodd := oddKernel_quarter_pos (show (0 : ℝ) < 32 * d by positivity)
+  have hcos := cosKernel_half_pos (show (0 : ℝ) < 8 * d by positivity)
+  have heven := evenKernel_half_pos (show (0 : ℝ) < 4 * d by positivity)
+  have hprod : 0 < sinKernel ((1 / 4 : ℝ) : UnitAddCircle) d *
+      evenKernel ((1 / 2 : ℝ) : UnitAddCircle) (4 * d) := by
+    rw [hdup]
+    have := mul_pos hodd hcos
+    linarith
+  rcases mul_pos_iff.mp hprod with ⟨h, _⟩ | ⟨_, hneg⟩
+  · exact h
+  · linarith
+
+/-- **The theta function is positive on the whole half-line.** -/
+theorem theHeckeThetaIsPositive {x : ℝ} (hx : 0 < x) : 0 < heckeTheta x := by
+  have h1 := oddKernel_quarter_pos (show (0 : ℝ) < 4 * Real.sqrt 2 * x by positivity)
+  have h2 := cosKernel_half_pos (show (0 : ℝ) < Real.sqrt 2 * x by positivity)
+  unfold heckeTheta heckeThetaA heckeThetaC
+  exact mul_pos (mul_pos (by norm_num) h1) h2
+
+/-! ## 15. The central value is a positive real
+
+`Λ(1)` is the Mellin transform at the center of the functional equation `s ↦ 2 − s`,
+i.e. the plain integral of the theta function over `(0, ∞)` — and the integrand is
+positive.  Classically `Λ(1) = (√32/2π)·Γ(1)·L(E₁, 1)`, so this is the analytic
+non-vanishing at the center for the rank-zero curve. -/
+
+theorem theCentralValueIsThePositiveThetaIntegral :
+    ∃ r : ℝ, 0 < r ∧ heckeLambda 1 = (r : ℂ) := by
+  obtain ⟨hconv, heval⟩ := theCompletedLFunctionHasMellin 1
+  have hEq : Set.EqOn (fun t : ℝ => ((t : ℂ) ^ ((1 : ℂ) - 1)) • (Complex.ofReal ∘ heckeTheta) t)
+      (fun t : ℝ => ((heckeTheta t : ℝ) : ℂ)) (Set.Ioi 0) := by
+    intro t ht
+    simp [Complex.cpow_zero]
+  have hL : heckeLambda 1 = ((∫ t in Set.Ioi (0 : ℝ), heckeTheta t : ℝ) : ℂ) := by
+    calc heckeLambda 1 = mellin (Complex.ofReal ∘ heckeTheta) 1 := heval.symm
+      _ = ∫ t in Set.Ioi (0 : ℝ), ((heckeTheta t : ℝ) : ℂ) :=
+          MeasureTheory.setIntegral_congr_fun measurableSet_Ioi hEq
+      _ = ((∫ t in Set.Ioi (0 : ℝ), heckeTheta t : ℝ) : ℂ) := integral_ofReal
+  have hint : MeasureTheory.IntegrableOn heckeTheta (Set.Ioi (0 : ℝ)) := by
+    have h2 : MeasureTheory.IntegrableOn (fun t : ℝ => ((heckeTheta t : ℝ) : ℂ))
+        (Set.Ioi (0 : ℝ)) := hconv.congr_fun hEq measurableSet_Ioi
+    have h3 := h2.re
+    exact h3.congr (Filter.Eventually.of_forall fun t => by simp)
+  have hpos : 0 < ∫ t in Set.Ioi (0 : ℝ), heckeTheta t := by
+    rw [MeasureTheory.setIntegral_pos_iff_support_of_nonneg_ae ?hae hint]
+    · have hsub : Set.Ioi (0 : ℝ) ⊆ Function.support heckeTheta ∩ Set.Ioi 0 := fun t ht =>
+        ⟨(theHeckeThetaIsPositive ht).ne', ht⟩
+      calc (0 : ENNReal) < MeasureTheory.volume (Set.Ioi (0 : ℝ)) := by
+            simp [Real.volume_Ioi]
+        _ ≤ MeasureTheory.volume (Function.support heckeTheta ∩ Set.Ioi 0) :=
+            MeasureTheory.measure_mono hsub
+    case hae =>
+      filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioi] with t ht
+      exact (theHeckeThetaIsPositive ht).le
+  exact ⟨_, hpos, hL⟩
+
+/-- **The central value of the completed L-function does not vanish.**  With the
+classical reading `Λ(1) = (√32/2π)·L(E₁,1)`, this is the analytic side of rank zero at
+one: `L(E₁, 1) ≠ 0`, matched on the algebraic side by the completed descent
+(`RankZero`: exactly four points, one is not a congruent number). -/
+theorem theCentralValueDoesNotVanish : heckeLambda 1 ≠ 0 := by
+  obtain ⟨r, hr, hEq⟩ := theCentralValueIsThePositiveThetaIntegral
+  rw [hEq]
+  exact_mod_cast hr.ne'
+
+/-! ## 16. The theta is the Gaussian class sum
+
+The positive quartic class `(a + b) ≡ 1 (mod 4)`, `b` even — equivalently `a` odd, `b`
+even, `a + b ≡ 1 (mod 4)` — with weight `a` and Gaussian envelope of norm `a² + b²` is
+exactly the `hPlus` family of the duplication ladder, so the identity
+`heckeTheta = Σ_class a·exp(−2π(a²+b²)x/√32)` is the chain already proved, read at its
+quarter point. -/
+
+/-- **The arithmetic identity of the theta function.**  `heckeTheta x` is the Gaussian
+lattice sum `Σ a·exp(−2π(a²+b²)·x/√32)` over the class `a + b ≡ 1 (mod 4)`, `b` even —
+the Hecke sum of the character `ψ(α) = ε(α)·α` on `ℤ[i]` in its folded real form.  The
+scale `x/(4√2) = x/√32` carries the level `32`. -/
+theorem theHeckeThetaIsTheGaussianClassSum {x : ℝ} (hx : 0 < x) :
+    HasSum (fun p : ℤ × ℤ =>
+      if (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0 then
+        ((p.1 : ℤ) : ℂ) * ((rexp (-2 * π * (x / (4 * Real.sqrt 2)) *
+          ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) : ℝ) : ℂ)
+      else 0)
+      ((heckeTheta x : ℝ) : ℂ) := by
+  have hd : (0 : ℝ) < x / (4 * Real.sqrt 2) := by positivity
+  have hss : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hne : (4 : ℝ) * Real.sqrt 2 ≠ 0 := by positivity
+  have h32 : 32 * (x / (4 * Real.sqrt 2)) = 4 * Real.sqrt 2 * x := by
+    rw [show 32 * (x / (4 * Real.sqrt 2)) = 32 * x / (4 * Real.sqrt 2) from by ring,
+      div_eq_iff hne]
+    linear_combination (-16 * x) * hss
+  have h8 : 8 * (x / (4 * Real.sqrt 2)) = Real.sqrt 2 * x := by
+    rw [show 8 * (x / (4 * Real.sqrt 2)) = 8 * x / (4 * Real.sqrt 2) from by ring,
+      div_eq_iff hne]
+    linear_combination (-4 * x) * hss
+  have e1 := tsum_hFinal_eq_four_hPlus hd
+  have e2 := tsum_hFinal_eq_primal (x / (4 * Real.sqrt 2))
+  have e3 := primal_product hd
+  rw [h32, h8] at e3
+  have hθ : ((heckeTheta x : ℝ) : ℂ)
+      = 4 * (((oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (4 * Real.sqrt 2 * x) : ℝ) : ℂ) *
+          ((cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x) : ℝ) : ℂ)) := by
+    unfold heckeTheta heckeThetaA heckeThetaC
+    push_cast
+    ring
+  have hval : ∑' p : ℤ × ℤ, hPlus (x / (4 * Real.sqrt 2)) p = ((heckeTheta x : ℝ) : ℂ) := by
+    rw [hθ, e3]
+    linear_combination (e2 - e1) / 4
+  have hfun : (fun p : ℤ × ℤ =>
+      if (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0 then
+        ((p.1 : ℤ) : ℂ) * ((rexp (-2 * π * (x / (4 * Real.sqrt 2)) *
+          ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) : ℝ) : ℂ)
+      else 0) = hPlus (x / (4 * Real.sqrt 2)) := funext fun p => rfl
+  rw [hfun, ← hval]
+  exact (summable_hPlus hd).hasSum
 
 end Soma.Holonics.Millennium.HeckeTheta
