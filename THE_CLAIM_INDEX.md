@@ -131,7 +131,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (241 deposits of 533)
+## 4 · The 2026-08 record line (242 deposits of 534)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -372,6 +372,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md` | The trapezoid is the interaction profile, and Poisson summation owns integration by reflection |
 | `2026-08-21_THE_UNIT_IS_A_DECLARED_WINDING_THE_CERTIFICATE_IS_A_REALIZER_AND_THE_RADIX_IS_RESONANT.md` | The unit is a declared winding, the certificate is a realizer, and the radix is resonant |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
+| `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_EXCHANGE_WORLD_TUBE_RETAINED_ITS_BRANCHES_THE_CONTACT_FIBRE_FACTORED_AND_A1_PASSED.md` | The exchange world-tube retained its branches, the contact fibre factored, and A1 passed |
 | `2026-08-22_THE_FIVE_CURVE_DESCENT_IS_COMPLETE_AND_THE_MOD_TWO_PROGRAMME_HAS_ITS_SECOND_CERTIFICATE.md` | The five-curve descent is complete, and the mod-two programme has its second certificate |
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
