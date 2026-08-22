@@ -1833,4 +1833,54 @@ theorem theFiveThetaIsItsLatticeSum {t : ℝ} (ht : 0 < t) :
     exact (hpt q).symm
   exact Complex.hasSum_ofReal.mp hSum2
 
+/-- **The theta at five is the twisted Gaussian class sum**: over the positive quartic
+class `(a+b) ≡ 1 (mod 4)`, `b` even, with weight `a·χ₅(a²+b²)` — the Hecke sum of the
+twisted character in its folded real form, at scale `√2·x/40 = x/√800`. -/
+theorem theFiveThetaIsTheTwistedClassSum {x : ℝ} (hx : 0 < x) :
+    HasSum (fun p : ℤ × ℤ =>
+      if (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0 then
+        ((p.1 : ℤ) : ℂ) * ((chi5 (p.1 ^ 2 + p.2 ^ 2) : ℤ) : ℂ) *
+          ((rexp (-2 * π * (Real.sqrt 2 * x / 40) *
+            ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) : ℝ) : ℂ)
+      else 0) ((theta5 x : ℝ) : ℂ) := by
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  set y : ℝ := Real.sqrt 2 * x / 40 with hy_def
+  have hy : 0 < y := by positivity
+  have h800 : 800 * y = 20 * Real.sqrt 2 * x := by rw [hy_def]; ring
+  have hCdef : ((theta5 x : ℝ) : ℂ)
+      = 20 * ∑ e ∈ Finset.range 5, ∑ d ∈ Finset.range 10,
+          ((w5 e d : ℤ) : ℂ) *
+            (((oddKernel (((4 * (e : ℝ) + 1) / 20 : ℝ) : UnitAddCircle) (800 * y) : ℝ) : ℂ) *
+             ((evenKernel (((d : ℝ) / 10 : ℝ) : UnitAddCircle) (800 * y) : ℝ) : ℂ)) := by
+    rw [h800]
+    unfold theta5
+    push_cast
+    rfl
+  have hC : ((theta5 x : ℝ) : ℂ) = -(1 / 10) * ∑' p : ℤ × ℤ, hPlus5 y p := by
+    rw [hCdef]
+    have h4 := tsum_hFinal5_eq_four_hPlus5 hy
+    linear_combination (1 / 40 : ℂ) * primal_side_eq hy - (1 / 40 : ℂ) * h4
+  have hSum : HasSum (fun p : ℤ × ℤ => -(1 / 10 : ℂ) * hPlus5 y p)
+      ((theta5 x : ℝ) : ℂ) := by
+    have h1 := (summable_hPlus5 hy).hasSum.mul_left (-(1 / 10 : ℂ))
+    rwa [← hC] at h1
+  refine hSum.congr_fun fun p => ?_
+  obtain ⟨a, b⟩ := p
+  show (if (a + b) % 4 = 1 ∧ b % 2 = 0 then
+      ((a : ℤ) : ℂ) * ((chi5 (a ^ 2 + b ^ 2) : ℤ) : ℂ) *
+        ((rexp (-2 * π * y * ((a : ℝ) ^ 2 + (b : ℝ) ^ 2)) : ℝ) : ℂ)
+    else 0) = -(1 / 10 : ℂ) * hPlus5 y (a, b)
+  unfold hPlus5
+  split_ifs with h
+  · have hchi : chi5 (2 * (a ^ 2 + b ^ 2)) = -chi5 (a ^ 2 + b ^ 2) := by
+      rw [chi5_mul, chi5_two]
+      ring
+    show _ = -(1 / 10 : ℂ) * (10 * (a : ℂ) * ((chi5 (2 * (a ^ 2 + b ^ 2)) : ℤ) : ℂ) *
+      ((envF y a b : ℝ) : ℂ))
+    rw [hchi]
+    unfold envF
+    push_cast
+    ring
+  · ring
+
 end Soma.Holonics.Millennium.FiveTheta
