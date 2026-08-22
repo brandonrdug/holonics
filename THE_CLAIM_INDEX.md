@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (215 deposits of 507)
+## 4 · The 2026-08 record line (216 deposits of 508)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -351,6 +351,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_RIEMANN_ROUTE_RUNS_FROM_A_KERNEL_CHECKED_ANCHOR_TO_A_REALIZER_AT_THE_ARCHIMEDEAN_PLACE.md` | The Riemann route runs from a kernel-checked anchor to a realizer at the archimedean place |
 | `2026-08-21_THE_SELF_STRESS_IS_A_SUPPORTED_REALIZER_AND_THE_FLEX_SPACE_IS_A_THIRD_SELECTOR.md` | The self-stress is a supported realizer, and the flex space is a third selector |
 | `2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md` | The source circulated, the diagram refused the white background, and M0 returned its disagreement fibre |
+| `2026-08-21_THE_TORSION_IS_A_CENSUS_OF_CLOSED_WINDINGS_AND_THE_COMPACT_FRAME_READS_IT_WHOLE.md` | The torsion is a census of closed windings, and the compact frame reads it whole |
 | `2026-08-21_THE_TRANSPORT_CHAIN_LANDS_ON_THE_CONGRUENT_NUMBER_CURVE_AND_THE_DESCENT_FACE_SEPARATES_ITS_HALF_TURNS.md` | The transport chain lands on the congruent-number curve, and the descent face separates its half-turns |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
 
