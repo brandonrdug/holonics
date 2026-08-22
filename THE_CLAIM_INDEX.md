@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (221 deposits of 513)
+## 4 · The 2026-08 record line (224 deposits of 516)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -339,6 +339,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THREE_NAMES_ONE_SUBGROUP.md` | Three names, one subgroup |
 | `2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md` | Equality is occurrence identity, the soul maps kinship, and the leader returns through the active codec |
 | `2026-08-21_THE_BSD_ROUTE_READS_PLACEMENT_AS_A_FAITHFUL_RECEIVER_OF_REALIZATION_AND_ARAKELOV_IS_THE_SHARED_ORGAN.md` | The BSD route reads placement as a faithful receiver of realization, and Arakelov is the shared organ |
+| `2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md` | The codec excited the active cover, the prefix returned by pullback, and M2 passed |
 | `2026-08-21_THE_COMPACT_FRAME_IS_A_LAWFUL_COMPRESSION_AND_THE_HORIZON_LAW_PREDICTS_WHAT_CROSSES.md` | The compact frame is a lawful compression, and the horizon law predicts what crosses |
 | `2026-08-21_THE_DESCENT_IS_CLIMBED_THE_RANK_IS_ZERO_AND_ONE_IS_NOT_A_CONGRUENT_NUMBER.md` | The descent is climbed, the rank is zero, and one is not a congruent number |
 | `2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md` | The fold is a constraint ecology, the active site is a catalytic receiver, and the codec recovers archetypes |
@@ -353,11 +354,13 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_POINCARE_PROOF_IS_A_FLOW_ON_THE_TERRAIN_WITH_AN_ADJOINT_RATCHET_AND_A_CONDENSATION_THAT_NAMES_ITS_CUT.md` | The Poincaré proof is a flow on the terrain, with an adjoint ratchet and a condensation that names its cut |
 | `2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` | The proof terms survived, the connective tissue cooled, and M0 begins from two source families |
 | `2026-08-21_THE_RANK_RECORDS_ARE_A_LATTICE_BUDGET_AND_THE_CEILING_IS_A_DIAL_WITH_ITS_VALUE_EXHIBITED.md` | The rank records are a lattice budget, and the ceiling is a dial with its value exhibited |
+| `2026-08-21_THE_REFLECTION_INTEGRATES_THE_FRAME_CENSUS_AND_THE_TWO_SIDES_MEET_AT_ONE.md` | The reflection integrates the frame census, and the two sides meet at one |
 | `2026-08-21_THE_RIEMANN_ROUTE_RUNS_FROM_A_KERNEL_CHECKED_ANCHOR_TO_A_REALIZER_AT_THE_ARCHIMEDEAN_PLACE.md` | The Riemann route runs from a kernel-checked anchor to a realizer at the archimedean place |
 | `2026-08-21_THE_SELF_STRESS_IS_A_SUPPORTED_REALIZER_AND_THE_FLEX_SPACE_IS_A_THIRD_SELECTOR.md` | The self-stress is a supported realizer, and the flex space is a third selector |
 | `2026-08-21_THE_SOURCE_CIRCULATED_THE_DIAGRAM_REFUSED_THE_WHITE_BACKGROUND_AND_M0_RETURNED_ITS_DISAGREEMENT_FIBRE.md` | The source circulated, the diagram refused the white background, and M0 returned its disagreement fibre |
 | `2026-08-21_THE_TORSION_IS_A_CENSUS_OF_CLOSED_WINDINGS_AND_THE_COMPACT_FRAME_READS_IT_WHOLE.md` | The torsion is a census of closed windings, and the compact frame reads it whole |
 | `2026-08-21_THE_TRANSPORT_CHAIN_LANDS_ON_THE_CONGRUENT_NUMBER_CURVE_AND_THE_DESCENT_FACE_SEPARATES_ITS_HALF_TURNS.md` | The transport chain lands on the congruent-number curve, and the descent face separates its half-turns |
+| `2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md` | The trapezoid is the interaction profile, and Poisson summation owns integration by reflection |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
 
 ---

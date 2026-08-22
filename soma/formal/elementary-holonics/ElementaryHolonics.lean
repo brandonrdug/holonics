@@ -65,3 +65,5 @@ import ElementaryHolonics.Millennium.RankZero
 import ElementaryHolonics.Millennium.WindingCensus
 import ElementaryHolonics.Millennium.FrameDescent
 import ElementaryHolonics.Millennium.DistantWindings
+import ElementaryHolonics.Millennium.ReflectionCensus
+import ElementaryHolonics.Millennium.ThetaCensus
