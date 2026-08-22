@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I2 passed its complete release boundary. I3 is the active deed.
+**Current boundary:** I3 passed its complete release boundary. I4 is the active deed.
 I0--I5 replace the former
 second-LLM-first A4--A6 schedule.
 **Scheduling boundary:** this file does not move
@@ -364,8 +364,17 @@ body, or if changed output is reported without changed reusable morphology.
 
 ## 10. Deed I3 — recurrent Phoenix condenses physical realizations
 
-[open] I3 makes the realization atlas load-bearing during inference. It does not cluster hidden
+[established-bounded] I3 makes the realization atlas load-bearing during inference. It does not cluster hidden
 states by distance or attach semantic names to neurons.
+
+[established-bounded; implemented-exact; measured] I3 passed release on 2026-08-22. Its
+source-absent recurrent rest, complete fibre product, shared-generator ablation, coordinatewise
+strict cost descent, exact atlas, and interactive projection pass the focused and affected-owner
+receivers. The complete invocation returned 2,831 passing tests, zero failures and twelve green
+non-driver scopes; the sole documentary catalog drift passed its named retake. Candidate record:
+[`2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md`](../research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md).
 
 I3 must:
 

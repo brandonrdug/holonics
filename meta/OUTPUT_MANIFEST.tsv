@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 102 drivers, 19121 returns, 56290068795 bytes.
+# 103 drivers, 19134 returns, 56290102482 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -82,6 +82,7 @@ d5d0972086aff87d10766147e9c4aea0ae91741c6d73ad35aeeb70c5c9489ee6	17	42273058	out
 3fa6afd363517abb51346c472817a786ad11a2d4f222c556821851844b11c3e0	5	5861222	output/the_physical_realization_passage_closes_over_every_successor_word
 1512e3ca4045ec2eb6dade7c9664a8f5543e1052e6f01144859e380859a6a52a	4	1956780	output/the_reborn_body_is_dissected
 ca2a00f84ab17968bb4b824f4539bb0801e95e7b05b7e43671bcd49fd9efbd6b	14	5079120	output/the_recurrent_boundary_returns_a_complete_passage
+687c423b0d227473667411a44fb2d8795e456bd6935b689ab2158504fc145c90	13	33687	output/the_recurrent_realizations_condense_into_a_phoenix_ecology
 419611f68dc2c84af26a2d4ef3070dd3fbd09569342d098bce9cd696594e7d3d	3	45890	output/the_reductions_expose_their_words
 065a9a81c9e0de8b9448014737521925a1341b68f371411bd77a3923049fce48	3	4135592	output/the_rest_is_cultivated
 db968af0fb8f4faf8c1156a19bf2d16600764aa7df94853f77f5a479736cb916	14	6155706	output/the_scalar_path_returns_its_pressure_and_utility

@@ -197,6 +197,19 @@ sole complete receiver returned 2,829 passing tests, zero failures and all thirt
 Release admission:
 [`research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md`](../research/records/2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md).
 
+**I3 PASSED.** The I1/I2 realization family condensed into
+independently priced standing, decoder, and complete reconstruction fibres. A source-absent RTX
+front returns main and held-out predecessor/successor recurrences plus shared-generator withdrawal;
+every coordinate of the complete cost product falls strictly. The exact atlas retains eleven
+defect/open rows, two richer receiver fibres, rank-one noncommutation, and the addressed exterior
+return. Candidate record:
+[`research/records/2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md).
+The complete invocation returned 2,831 passing tests, zero failures, 24 explicit ignores and twelve
+green non-driver scopes in 303.15 seconds. Its only red scope was documentary driver-catalog drift;
+regeneration and the required named retake returned 345 catalogued drivers and zero uncatalogued.
+Release admission:
+[`research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md`](../research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md).
+
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
 emission; I2 closes emission/world/return/reflection/deposit/later-current; I3 performs recurrent

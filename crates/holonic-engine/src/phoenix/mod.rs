@@ -10,6 +10,7 @@ pub mod cohort;
 pub mod continuation;
 pub mod native_streamed;
 pub mod recurrent;
+pub mod recurrent_condensation;
 pub mod recurrent_return;
 pub mod runtime;
 pub mod site;

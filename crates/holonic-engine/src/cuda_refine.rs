@@ -331,6 +331,7 @@ pub struct CudaRefineExecutor {
     native_word: CuFunction,
     native_trace: CuFunction,
     returned_recurrence: CuFunction,
+    condensed_recurrence: CuFunction,
     contact_pairs: CuFunction,
     contact_compare: CuFunction,
     device_name: String,
@@ -398,6 +399,7 @@ impl CudaRefineExecutor {
             let mut native_word = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
             let mut returned_recurrence = ptr::null_mut();
+            let mut condensed_recurrence = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
             let mut contact_compare = ptr::null_mut();
             for (slot, symbol, operation) in [
@@ -432,6 +434,11 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(return_and_recur_native)",
                 ),
                 (
+                    &mut condensed_recurrence as *mut CuFunction,
+                    c"conduct_condensed_recurrences",
+                    "cuModuleGetFunction(conduct_condensed_recurrences)",
+                ),
+                (
                     &mut contact_pairs as *mut CuFunction,
                     c"classify_contact_pairs",
                     "cuModuleGetFunction(classify_contact_pairs)",
@@ -462,6 +469,7 @@ impl CudaRefineExecutor {
                 native_word,
                 native_trace,
                 returned_recurrence,
+                condensed_recurrence,
                 contact_pairs,
                 contact_compare,
             ] {
@@ -483,6 +491,7 @@ impl CudaRefineExecutor {
                 native_word,
                 native_trace,
                 returned_recurrence,
+                condensed_recurrence,
                 contact_pairs,
                 contact_compare,
                 device_name,
@@ -712,6 +721,27 @@ pub struct DeviceReturnedRecurrences {
     pub synchronizations: u64,
     pub block_threads: u32,
     pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// The compact successor, retained predecessor route, and shared-generator withdrawal returned
+/// from one card front. Visited incidence replaces pairwise trace scanning.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceCondensedRecurrences {
+    pub predecessor_trace: Vec<u32>,
+    pub successor_trace: Vec<u32>,
+    pub withdrawn_trace: Vec<u32>,
+    pub predecessor_lengths: Vec<u32>,
+    pub successor_lengths: Vec<u32>,
+    pub withdrawn_lengths: Vec<u32>,
+    pub trace_stride: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub visited_words: usize,
     pub host_ingress_octets: u64,
     pub host_egress_octets: u64,
     pub resident_octets: u64,
@@ -1321,8 +1351,8 @@ impl CudaRefineExecutor {
         let start_octets = std::mem::size_of_val(native_start) as u64;
         let trace_octets = (trace_entries * std::mem::size_of::<u32>()) as u64;
         let length_octets = lengths_octets as u64;
-        let scalar_ingress_octets = 7 * std::mem::size_of::<u32>() as u64
-            + std::mem::size_of::<u64>() as u64;
+        let scalar_ingress_octets =
+            7 * std::mem::size_of::<u32>() as u64 + std::mem::size_of::<u64>() as u64;
         let scalar_egress_octets = 3 * std::mem::size_of::<u32>() as u64;
         Ok(DeviceReturnedRecurrences {
             predecessor_trace,
@@ -1346,6 +1376,179 @@ impl CudaRefineExecutor {
                 + trace_octets * 3
                 + length_octets * 3
                 + scalar_egress_octets,
+        })
+    }
+
+    /// Conduct the compact successor, the one retained predecessor override, and withdrawal of
+    /// their shared generator for every admitted starting occurrence in one resident front.
+    ///
+    /// The only closure extent is the finite native population. A derived bitset records visited
+    /// incidence, so recurrence detection is linear in the enacted trace rather than a quadratic
+    /// scan of preceding boundaries. The host observes all routes only after one synchronization.
+    pub fn conduct_condensed_recurrences_on_device(
+        &mut self,
+        successor_table: &[u32],
+        native_start: &[u32],
+        predecessor_from: u32,
+        predecessor_to: u32,
+    ) -> Result<DeviceCondensedRecurrences, CudaRefineError> {
+        let states = successor_table.len();
+        let trace_stride = states
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_entries = native_start
+            .len()
+            .checked_mul(trace_stride)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let visited_words = states
+            .checked_add(u32::BITS as usize - 1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?
+            / u32::BITS as usize;
+        let visited_entries = native_start
+            .len()
+            .checked_mul(3)
+            .and_then(|rows| rows.checked_mul(visited_words))
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if states == 0
+            || native_start.is_empty()
+            || states > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+            || visited_words > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = successor_table
+            .iter()
+            .chain(native_start)
+            .copied()
+            .chain([predecessor_from, predecessor_to])
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+        if successor_table[predecessor_from as usize] == predecessor_to {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let table = Buffer::of(successor_table)?;
+        let starts = Buffer::of(native_start)?;
+        let trace_octets = trace_entries * std::mem::size_of::<u32>();
+        let predecessor = Buffer::alloc(trace_octets)?;
+        let successor = Buffer::alloc(trace_octets)?;
+        let withdrawn = Buffer::alloc(trace_octets)?;
+        let lengths_octets = native_start.len() * std::mem::size_of::<u32>();
+        let predecessor_lengths_device = Buffer::alloc(lengths_octets)?;
+        let successor_lengths_device = Buffer::alloc(lengths_octets)?;
+        let withdrawn_lengths_device = Buffer::alloc(lengths_octets)?;
+        let visited_octets = visited_entries * std::mem::size_of::<u32>();
+        let visited = Buffer::alloc(visited_octets)?;
+        visited.fill(0, visited_octets)?;
+
+        let grid = self.grid_for(native_start.len() as u64)?;
+        let mut table_pointer = table.pointer;
+        let mut starts_pointer = starts.pointer;
+        let mut predecessor_pointer = predecessor.pointer;
+        let mut successor_pointer = successor.pointer;
+        let mut withdrawn_pointer = withdrawn.pointer;
+        let mut predecessor_lengths_pointer = predecessor_lengths_device.pointer;
+        let mut successor_lengths_pointer = successor_lengths_device.pointer;
+        let mut withdrawn_lengths_pointer = withdrawn_lengths_device.pointer;
+        let mut visited_pointer = visited.pointer;
+        let mut cell_count = native_start.len() as u32;
+        let mut state_count = states as u32;
+        let mut seen_words = visited_words as u32;
+        let mut local_from = predecessor_from;
+        let mut local_to = predecessor_to;
+        let mut arguments: [*mut c_void; 14] = [
+            &mut table_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_pointer as *mut u64 as *mut c_void,
+            &mut successor_pointer as *mut u64 as *mut c_void,
+            &mut withdrawn_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut successor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut withdrawn_lengths_pointer as *mut u64 as *mut c_void,
+            &mut visited_pointer as *mut u64 as *mut c_void,
+            &mut cell_count as *mut u32 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+            &mut seen_words as *mut u32 as *mut c_void,
+            &mut local_from as *mut u32 as *mut c_void,
+            &mut local_to as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.condensed_recurrence,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_condensed_recurrences)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut predecessor_trace = vec![0u32; trace_entries];
+        let mut successor_trace = vec![0u32; trace_entries];
+        let mut withdrawn_trace = vec![0u32; trace_entries];
+        let mut predecessor_lengths = vec![0u32; native_start.len()];
+        let mut successor_lengths = vec![0u32; native_start.len()];
+        let mut withdrawn_lengths = vec![0u32; native_start.len()];
+        predecessor.read(&mut predecessor_trace)?;
+        successor.read(&mut successor_trace)?;
+        withdrawn.read(&mut withdrawn_trace)?;
+        predecessor_lengths_device.read(&mut predecessor_lengths)?;
+        successor_lengths_device.read(&mut successor_lengths)?;
+        withdrawn_lengths_device.read(&mut withdrawn_lengths)?;
+        for (at, length) in predecessor_lengths
+            .iter()
+            .chain(&successor_lengths)
+            .chain(&withdrawn_lengths)
+            .copied()
+            .enumerate()
+        {
+            if length < 2 || length as usize > trace_stride {
+                return Err(CudaRefineError::NativeRecurrenceDidNotClose {
+                    at: at % native_start.len(),
+                });
+            }
+        }
+
+        let table_octets = std::mem::size_of_val(successor_table) as u64;
+        let start_octets = std::mem::size_of_val(native_start) as u64;
+        let trace_octets = trace_octets as u64;
+        let length_octets = lengths_octets as u64;
+        let visited_octets = visited_octets as u64;
+        let scalar_ingress_octets = 5 * std::mem::size_of::<u32>() as u64;
+        Ok(DeviceCondensedRecurrences {
+            predecessor_trace,
+            successor_trace,
+            withdrawn_trace,
+            predecessor_lengths,
+            successor_lengths,
+            withdrawn_lengths,
+            trace_stride,
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: native_start.len() as u32,
+            visited_words,
+            host_ingress_octets: table_octets + start_octets + scalar_ingress_octets,
+            host_egress_octets: trace_octets * 3 + length_octets * 3,
+            resident_octets: table_octets
+                + start_octets
+                + trace_octets * 3
+                + length_octets * 3
+                + visited_octets,
         })
     }
 
@@ -1648,17 +1851,7 @@ mod tests {
     fn the_card_returns_every_recurrence_after_one_local_difference() {
         let mut card = CudaRefineExecutor::new().expect("the card mounts");
         let returned = card
-            .conduct_returned_recurrences_on_device(
-                3,
-                1,
-                &[1, 2, 1],
-                0,
-                &[0, 1, 2],
-                17,
-                2,
-                2,
-                0,
-            )
+            .conduct_returned_recurrences_on_device(3, 1, &[1, 2, 1], 0, &[0, 1, 2], 17, 2, 2, 0)
             .expect("the returned recurrences close");
         assert!(returned.committed);
         assert_eq!(returned.trace_stride, 4);
@@ -1672,5 +1865,26 @@ mod tests {
         assert_eq!(returned.control_successor, 1);
         assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
+    }
+
+    /// I3's recurrent condensation: a visited-incidence front returns both physical routes and
+    /// withdrawal of their shared generator without a host callback or authored trace extent.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_the_condensed_routes_and_shared_generator_withdrawal() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let returned = card
+            .conduct_condensed_recurrences_on_device(&[1, 2, 2], &[0, 1], 2, 1)
+            .expect("the condensed recurrent family closes");
+        assert_eq!(returned.trace_stride, 4);
+        assert_eq!(returned.predecessor_lengths, vec![4, 3]);
+        assert_eq!(returned.successor_lengths, vec![4, 3]);
+        assert_eq!(returned.withdrawn_lengths, vec![2, 2]);
+        assert_eq!(&returned.predecessor_trace[..4], &[0, 1, 2, 1]);
+        assert_eq!(&returned.successor_trace[..4], &[0, 1, 2, 2]);
+        assert_eq!(&returned.withdrawn_trace[..2], &[0, 0]);
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
+        assert_eq!(returned.visited_words, 1);
     }
 }

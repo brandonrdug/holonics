@@ -132,7 +132,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (256 deposits of 548)
+## 4 · The 2026-08 record line (258 deposits of 550)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -378,6 +378,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md` | I0 release receiver passed, the realization calculus closed, and I1 begins |
 | `2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md` | I1 release receiver passed, the recurrent boundary returned, and I2 begins |
 | `2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md` | I2 release receiver passed, the exterior return cultivated the recurrence, and I3 begins |
+| `2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md` | I3 release receiver passed, the recurrent realizations condensed, and I4 begins |
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
 | `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md` | The exchange return rebased the receiver covector, the held-out emission moved, and A3 awaits release admission |
@@ -389,6 +390,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
 | `2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md` | The realization passage retained lineage, every successor word closed, and I0 awaits release admission |
 | `2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md` | The recurrent boundary returned the complete passage, the longer history reopened, and I1 awaits release admission |
+| `2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md` | The recurrent realizations condensed, the complete fibres remained, and I3 awaits release admission |
 | `2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md` | The sibling continuations returned their defect complex, the message partition retained its source fibre, and A2 passed |
 | `2026-08-22_THE_SIGN_IS_THE_HAND_OF_THE_REFLECTION_AND_THE_EVEN_SECTOR_NEEDS_A_SECOND_CHART.md` | The sign is the hand of the reflection, and the even sector needs a second chart |
 | `2026-08-22_THE_THETA_LAW_IS_PROVED_THE_DUPLICATION_IS_A_LATTICE_REARRANGEMENT_AND_THE_KERNEL_ADMITS_WEIGHT_TWO.md` | The theta law is proved: the duplication is a lattice rearrangement, and the kernel admits weight two |

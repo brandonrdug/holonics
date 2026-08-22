@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I2. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed I3. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE EXTERIOR CONSEQUENCE RETURNED THROUGH THE CLOSING EDGE, THE SUCCESSOR
-CHANGED, AND I2 PASSED ITS RELEASE RECEIVER.**
+**CURRENT FRONTIER — THE RECURRENT REALIZATIONS CONDENSED, THE COMPLETE FIBRES REMAINED, AND I3
+PASSED ITS RELEASE RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -248,14 +248,29 @@ callbacks and no forbidden source access. The sixteen-member 36,104-octet family
 seconds: 2,829 tests passed, none failed, 23 were explicitly ignored, every example target
 type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: I3 RECURRENT PHOENIX CONDENSES PHYSICAL REALIZATIONS.**
-[open] I3 composes I1/I2 interventions and receiver histories with the I0 realization atlas and
-the existing generator-native compression owners. It owes overlapping active covers, stable local
-generator families, every source/native defect and shortest separator, future-exact condensation,
-retention of every visible or noncommuting route, an executable source-detached native rest and
-decoder, the same complete passage family plus a held-out continuation, shared-generator ablation,
-a strictly falling artifact/decoder/fibre/work/span/residency/transfer vector, and an inspectable
-source/native causal atlas with exact interactive mesh projection.
+**I3 PASSED — recurrent Phoenix condensed physical realizations.**
+[established-bounded; implemented-exact; measured] Six enacted history/intervention cells returned
+an overlapping active cover and fourteen-edge nerve. Stable recurrence condensed into one
+three-state successor action plus one local predecessor deformation; eleven defect/open rows, two
+complete terminal-potential fibres, every shortest separator and rank-one noncommutation remain.
+A source-absent RTX 4080 SUPER front returned both main and held-out predecessor/successor passages
+plus shared-generator withdrawal in one launch/synchronization with no CPU semantic callback. The
+complete source/native product fell strictly: artifact 14,288/566, decoder 257/201, fibre
+4,993/1,748, work 90/48, span 4/3, residency 216/164, transfer 252/160. Authoritative grade:
+[`research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md`](research/records/2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md).
+[established-bounded; measured] The complete invocation returned 2,831 passing tests, zero failures,
+24 explicit ignores, every example target type-checked and twelve green non-driver scopes in 303.15
+seconds. Its sole red scope was documentary driver-catalog drift; regeneration and the named retake
+returned 345 catalogued drivers and zero uncatalogued.
+
+**NEXT DEED: I4 GEMMA'S HETEROGENEOUS PORTS FOUND SHARED TRANSPORT.**
+[open] I4 selects a genuinely executable non-text port from authenticated source testimony and a
+real occurrence. It owes separately typed source/native conduct, retained spatial/temporal/phase
+incidence, a declared common-world pullback, local naturality for every proposed shared generator,
+one enacted shared subcomplex, complete modality-specific fibres, shared and local ablations, a
+held-out cross-port consequence, strict detached product descent, and an inspectable multimodal
+realization atlas. A placeholder modality token, random or zero embedding, authored transcript, or
+concatenated source stream does not pass.
 
 [open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
 return, durable cultivation, generator-native compression, complete answers, and multimodality are

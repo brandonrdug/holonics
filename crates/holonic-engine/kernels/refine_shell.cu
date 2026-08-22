@@ -301,6 +301,107 @@ extern "C" __global__ void return_and_recur_native(
     }
 }
 
+__device__ __forceinline__ uint32_t condensed_recurrent_trace(
+    const uint32_t *successor_table,
+    uint32_t start,
+    uint32_t state_count,
+    bool predecessor_route,
+    bool withdraw_generator,
+    uint32_t predecessor_from,
+    uint32_t predecessor_to,
+    uint32_t *seen,
+    uint32_t *trace)
+{
+    uint32_t state = start;
+    trace[0] = state;
+    seen[state >> 5U] |= 1U << (state & 31U);
+    for (uint32_t step = 0; step < state_count; ++step) {
+        uint32_t next = withdraw_generator ? state : successor_table[state];
+        if (!withdraw_generator && predecessor_route && state == predecessor_from) {
+            next = predecessor_to;
+        }
+        trace[step + 1U] = next;
+        const uint32_t word = next >> 5U;
+        const uint32_t bit = 1U << (next & 31U);
+        if ((seen[word] & bit) != 0U) {
+            for (uint32_t fill = step + 2U; fill <= state_count; ++fill) {
+                trace[fill] = next;
+            }
+            return step + 2U;
+        }
+        seen[word] |= bit;
+        state = next;
+    }
+    return 0U;
+}
+
+/// **The condensed successor, its retained predecessor route, and shared-generator withdrawal
+/// recur through one resident front.**
+///
+/// The visited incidence is a bitset whose extent is derived from the native population. This
+/// removes the quadratic trace scan without imposing a fixed state capacity. Each lane owns one
+/// admitted starting occurrence; the three route rows are disjoint and therefore interchangeable.
+/// Withdrawing the shared generator leaves the same body at its entering boundary instead of
+/// constructing a fallback action.
+extern "C" __global__ void conduct_condensed_recurrences(
+    const uint32_t *successor_table,
+    const uint32_t *native_start,
+    uint32_t *predecessor_trace,
+    uint32_t *successor_trace,
+    uint32_t *withdrawn_trace,
+    uint32_t *predecessor_lengths,
+    uint32_t *successor_lengths,
+    uint32_t *withdrawn_lengths,
+    uint32_t *seen,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t seen_words,
+    uint32_t predecessor_from,
+    uint32_t predecessor_to)
+{
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= cell_count) {
+        return;
+    }
+    const uint32_t stride = state_count + 1U;
+    const uint64_t trace_at = (uint64_t)at * (uint64_t)stride;
+    const uint64_t predecessor_seen = (uint64_t)at * (uint64_t)seen_words;
+    const uint64_t successor_seen =
+        ((uint64_t)cell_count + (uint64_t)at) * (uint64_t)seen_words;
+    const uint64_t withdrawn_seen =
+        (2ULL * (uint64_t)cell_count + (uint64_t)at) * (uint64_t)seen_words;
+    predecessor_lengths[at] = condensed_recurrent_trace(
+        successor_table,
+        native_start[at],
+        state_count,
+        true,
+        false,
+        predecessor_from,
+        predecessor_to,
+        seen + predecessor_seen,
+        predecessor_trace + trace_at);
+    successor_lengths[at] = condensed_recurrent_trace(
+        successor_table,
+        native_start[at],
+        state_count,
+        false,
+        false,
+        predecessor_from,
+        predecessor_to,
+        seen + successor_seen,
+        successor_trace + trace_at);
+    withdrawn_lengths[at] = condensed_recurrent_trace(
+        successor_table,
+        native_start[at],
+        state_count,
+        false,
+        true,
+        predecessor_from,
+        predecessor_to,
+        seen + withdrawn_seen,
+        withdrawn_trace + trace_at);
+}
+
 __device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
     // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
     // aperture; this expression is nevertheless total over the full wire.
