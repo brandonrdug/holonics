@@ -1750,4 +1750,87 @@ theorem theOddHandForcesTheCentralVanishingAtFive : lambda5 1 = 0 := by
   rw [show (2 : ℂ) - 1 = 1 from by norm_num] at h
   linear_combination h / 2
 
+/-! ## 17. The theta as its lattice sum -/
+
+/-- **The theta at five is its own lattice class sum**: for `t > 0`,
+`θ₅(t) = Σ_{(k,l)∈ℤ²} (4k+1)·(−1)^l·χ₅((4k+1)²+4l²)·exp(−(π√2/20)·((4k+1)²+4l²)·t)` —
+the `χ₅`-weighted Gaussian class sum, returned as a `HasSum` so the receiver can
+integrate against it term by term. -/
+theorem theFiveThetaIsItsLatticeSum {t : ℝ} (ht : 0 < t) :
+    HasSum (fun p : ℤ × ℤ =>
+      ((4 * p.1 + 1 : ℤ) : ℝ) * (if p.2 % 2 = 0 then (1 : ℝ) else -1) *
+        (chi5 ((4 * p.1 + 1) ^ 2 + 4 * p.2 ^ 2) : ℝ) *
+        rexp (-(π * Real.sqrt 2 / 20) * (((4 * p.1 + 1) ^ 2 + 4 * p.2 ^ 2 : ℤ) : ℝ) * t))
+      (theta5 t) := by
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  set y : ℝ := Real.sqrt 2 * t / 40 with hy_def
+  have hy : 0 < y := by positivity
+  have h800 : 800 * y = 20 * Real.sqrt 2 * t := by rw [hy_def]; ring
+  -- the theta as the fifty kernel products at scale `800y`
+  have hCdef : ((theta5 t : ℝ) : ℂ)
+      = 20 * ∑ e ∈ Finset.range 5, ∑ d ∈ Finset.range 10,
+          ((w5 e d : ℤ) : ℂ) *
+            (((oddKernel (((4 * (e : ℝ) + 1) / 20 : ℝ) : UnitAddCircle) (800 * y) : ℝ) : ℂ) *
+             ((evenKernel (((d : ℝ) / 10 : ℝ) : UnitAddCircle) (800 * y) : ℝ) : ℂ)) := by
+    rw [h800]
+    unfold theta5
+    push_cast
+    rfl
+  -- fold in the primal reassembly: the theta is `−(1/40)` times the gathered target
+  have hC : ((theta5 t : ℝ) : ℂ) = -(1 / 40) * ∑' p : ℤ × ℤ, hFinal5 y p := by
+    rw [hCdef, primal_side_eq hy]
+    ring
+  -- the gathered target restricted to its grid, as a `HasSum`
+  have hSum : HasSum (fun q : ℤ × ℤ => -(1 / 40 : ℂ) * hFinal5 y (gridEmb q))
+      (((theta5 t : ℝ) : ℂ)) := by
+    have h1 : HasSum (hFinal5 y) (∑' p : ℤ × ℤ, hFinal5 y p) :=
+      (summable_hFinal5 hy).hasSum
+    have h2 : HasSum (fun q : ℤ × ℤ => hFinal5 y (gridEmb q))
+        (∑' p : ℤ × ℤ, hFinal5 y p) :=
+      (gridEmb_injective.hasSum_iff (hFinal5_support y)).mpr h1
+    have h3 := h2.mul_left (-(1 / 40 : ℂ))
+    rwa [← hC] at h3
+  -- identify each grid term with the real lattice term
+  have hpt : ∀ q : ℤ × ℤ, -(1 / 40 : ℂ) * hFinal5 y (gridEmb q)
+      = (((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
+          (chi5 ((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2) : ℝ) *
+          rexp (-(π * Real.sqrt 2 / 20) * (((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2 : ℤ) : ℝ) * t)
+          : ℝ) := by
+    rintro ⟨k, l⟩
+    show -(1 / 40 : ℂ) * hFinal5 y (4 * k + 1, 2 * l) = _
+    unfold hFinal5
+    rw [if_pos (show (4 * k + 1) % 4 = 1 by omega)]
+    have hcs : cs4 (2 * l) = ((if l % 2 = 0 then (1 : ℝ) else -1 : ℝ) : ℂ) := by
+      unfold cs4
+      rcases Int.even_or_odd l with ⟨u, hu⟩ | ⟨u, hu⟩
+      · rw [if_pos (by omega), if_pos (by omega)]
+        norm_num
+      · rw [if_neg (by omega), if_pos (by omega), if_neg (by omega)]
+        norm_num
+    have hchi : chi5 (2 * ((4 * k + 1) ^ 2 + (2 * l) ^ 2))
+        = -chi5 ((4 * k + 1) ^ 2 + 4 * l ^ 2) := by
+      rw [chi5_mul, chi5_two,
+        show (4 * k + 1) ^ 2 + (2 * l) ^ 2 = (4 * k + 1) ^ 2 + 4 * l ^ 2 from by ring]
+      ring
+    have henv : envF y (4 * k + 1) (2 * l)
+        = rexp (-(π * Real.sqrt 2 / 20) *
+            (((4 * k + 1) ^ 2 + 4 * l ^ 2 : ℤ) : ℝ) * t) := by
+      unfold envF
+      rw [hy_def]
+      congr 1
+      push_cast
+      ring
+    rw [hcs, hchi, henv]
+    push_cast
+    ring
+  have hSum2 : HasSum (fun q : ℤ × ℤ =>
+      ((((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
+        (chi5 ((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2) : ℝ) *
+        rexp (-(π * Real.sqrt 2 / 20) * (((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2 : ℤ) : ℝ) * t)
+        : ℝ) : ℂ)) (((theta5 t : ℝ) : ℂ)) := by
+    refine hSum.congr_fun ?_
+    intro q
+    exact (hpt q).symm
+  exact Complex.hasSum_ofReal.mp hSum2
+
 end Soma.Holonics.Millennium.FiveTheta
