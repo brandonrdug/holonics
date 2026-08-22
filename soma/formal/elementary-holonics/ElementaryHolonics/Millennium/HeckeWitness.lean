@@ -397,4 +397,55 @@ theorem theTwoSidedRankZeroInstance :
     analyticRank theWitness = (0 : ℕ) ∧ AlgebraicRankIs 1 0 :=
   ⟨theAnalyticRankAtOneIsZero, theAlgebraicRankAtOneIsZero⟩
 
+/-! ## The rank clause of the conjecture, whole, at one -/
+
+/-- Rank-at-least is monotone: independence of `r` points restricts to the first. -/
+private lemma atLeast_mono {n r : ℕ} (hr : 1 ≤ r) (h : AlgebraicRankAtLeast n r) :
+    AlgebraicRankAtLeast n 1 := by
+  obtain ⟨Pts, hInd⟩ := h
+  refine ⟨fun _ => Pts ⟨0, by omega⟩, fun c hc i => ?_⟩
+  have hext : IsTorsion n (∑ j : Fin r,
+      (if j = ⟨0, by omega⟩ then c 0 else 0) • Pts j) := by
+    have hsum : (∑ j : Fin r, (if j = ⟨0, by omega⟩ then c 0 else 0) • Pts j)
+        = c 0 • Pts ⟨0, by omega⟩ := by
+      rw [Finset.sum_eq_single ⟨0, by omega⟩]
+      · rw [if_pos rfl]
+      · intro b _ hb
+        rw [if_neg hb]
+        exact zero_zsmul _
+      · intro hb
+        exact absurd (Finset.mem_univ _) hb
+    rw [hsum]
+    have hsum1 : (∑ j : Fin 1, c j • (fun _ => Pts ⟨0, by omega⟩) j)
+        = c 0 • Pts ⟨0, by omega⟩ := by
+      rw [Finset.sum_fin_eq_sum_range]
+      simp
+    rw [← hsum1]
+    exact hc
+  have := hInd (fun j => if j = ⟨0, by omega⟩ then c 0 else 0) hext ⟨0, by omega⟩
+  rw [if_pos rfl] at this
+  have h0 : i = 0 := by omega
+  rw [h0]
+  exact this
+
+/-- **THE RANK CLAUSE OF THE CONJECTURE HOLDS AT ONE**: for every `r`, the analytic
+rank equals `r` exactly when the algebraic rank is `r` — both sides are decided (the
+analytic rank is zero because the central value is a positive integral; the algebraic
+rank is zero because every point is a half-turn), so the equivalence holds whole.  The
+first complete clause of the posed Birch–Swinnerton-Dyer conjecture proven at an
+instance. -/
+theorem theRankClauseHoldsAtOne : TheRankClause 1 theWitness := by
+  intro r
+  rcases Nat.eq_zero_or_pos r with rfl | hr
+  · exact ⟨fun _ => theAlgebraicRankAtOneIsZero, fun _ => theAnalyticRankAtOneIsZero⟩
+  · constructor
+    · intro h
+      exfalso
+      rw [theAnalyticRankAtOneIsZero] at h
+      have : (0 : ℕ) = r := by exact_mod_cast h
+      omega
+    · intro h
+      exfalso
+      exact theAlgebraicRankAtOneIsZero.2 (atLeast_mono hr h.1)
+
 end Soma.Holonics.Millennium.HeckeWitness
