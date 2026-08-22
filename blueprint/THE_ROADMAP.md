@@ -22,7 +22,7 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-21; prior revision 2026-08-19
+## WHERE THIS STANDS — revised 2026-08-22; prior revision 2026-08-21
 
 **Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
 STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
@@ -62,7 +62,7 @@ native morphology, condensation or cultivation.
 occurrence/law material begins on the convicted flat-thread/max-block substrate. It schedules
 nothing and is not extended until the common hardware foundation passes.
 
-**Current frontier after the 2026-08-21 equality/compression regrade:** H0–H5 have returned the
+**Current frontier after the 2026-08-22 Athena-A0 return:** H0–H5 have returned the
 single-card foundation and W1–W5 have returned a complete source-shaped Gemma lift, intervention
 dissection, rank-one cultivation and source-detached resident runtime. W2 tested quotienting the
 source-shaped deed states; it did not test generator/chart/word re-expression. M3 and M4 have now
@@ -110,16 +110,24 @@ abstract Lean shared-junction theorem and gauge-safe vector/mesh testimony retur
 84 GB structure tier was not scanned and no cultivation was claimed. Its authoritative return is
 [`research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md`](../research/records/2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md).
 
-**M6 / Athena-A0 is next.** Commit `4776099` has now discharged the total face theorem the earlier
-M6 wording posed. The machine deed is therefore rebased against two content-addressed boundaries:
-development source `75597c4`, which includes `ChordFace` but excludes `FaceHomomorphism`, and the
-withheld `4776099` proof passage, which remains exterior teacher/checker testimony and is unavailable
-to the productive body. M6 must return native and Phoenix Athena siblings, independently recover the
-complete identity/inverse/doubling/secant/half-turn route, emit a `sorry`-free theorem, cultivate a
-held-out successor route, survive detached remount, lose the advantage under targeted ablation and
-return a resident GPU passage plus complete fibres. Its twelve-part grade, source-access audit and
-the ordered A1--A6 continuation are in
+**M6 / Athena-A0 PASSED.** The content-addressed `75597c4` occurrence returned a complete
+ten-case/23-refinement/six-obstruction route, 109,137 source incidence contacts, nine source
+ablations and one 48-relation resident RTX 4080 SUPER junction while the `4776099` teacher face was
+absent from the productive namespace. Native and Phoenix rests independently emitted a `sorry`-free
+total theorem and a cultivated held-out successor; Lean accepted both, detached remount reproduced
+their conduct and targeted plate ablation reopened the attributable cases. The generated and
+withheld propositions agree at the declared receiver while their source and structural transition
+words remain distinct. The frozen product returns all twelve required consequences. Its
+authoritative record is
+[`research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`](../research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md).
+The exact product contract and the ordered A1--A6 continuation are in
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
+
+**A1 is next.** Mount the operator-authorized Codex and Claude Code exchange world-tubes through
+the existing mouths without flattening their agent, tool, world, proof, commit, gate and later-return
+branches into transcript order or provider labels. A1 moves the frontier only when its ten returns,
+including source-detached remount, branch-permutation separator, lineage ablations and an inspected
+real mounted artifact, stand together.
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).

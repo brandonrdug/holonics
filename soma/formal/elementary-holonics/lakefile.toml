@@ -4,8 +4,12 @@ defaultTargets = ["ElementaryHolonics"]
 [[lean_lib]]
 name = "ElementaryHolonics"
 
+[[lean_exe]]
+name = "m6_lean_causal_return"
+root = "M6CausalReturn"
+supportInterpreter = true
+
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
 rev = "v4.27.0"
-

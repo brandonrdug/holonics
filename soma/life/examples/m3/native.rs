@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, VecDeque};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceNativeWord};
 use holonic_engine::generator_native_rest::{GeneratorNativeRest, NativeGenerator};
-use holonic_engine::receiver_exact_compression::{InputId, ObservedSystem, compress_on_device};
+use holonic_engine::receiver_exact_compression::{compress_on_device, InputId, ObservedSystem};
 use holonic_engine::receiver_history_compression::{NativeStateId, ReceiverHistoryCompression};
 use serde::Serialize;
 

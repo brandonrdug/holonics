@@ -6,7 +6,7 @@ use std::process::Command;
 use serde::{Deserialize, Serialize};
 
 use super::fold::PhysicalFoldReturn;
-use super::visual::{ExactMesh, derive};
+use super::visual::{derive, ExactMesh};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct LeanReturn {
@@ -63,9 +63,7 @@ pub struct ArtifactReturn {
 
 pub fn emit(returned: &PhysicalFoldReturn) -> Result<ArtifactReturn, String> {
     let repository = repository_root()?;
-    let output = repository.join(
-        "output/the_physical_fold_returns_as_an_exact_constraint_complex",
-    );
+    let output = repository.join("output/the_physical_fold_returns_as_an_exact_constraint_complex");
     std::fs::create_dir_all(&output).map_err(|error| error.to_string())?;
 
     let visual = derive(
@@ -114,7 +112,11 @@ pub fn emit(returned: &PhysicalFoldReturn) -> Result<ArtifactReturn, String> {
 
     let mut paths = Vec::new();
     paths.push(write_json(&output, "00-summary.json", &summary)?);
-    paths.push(write_json(&output, "01-source-mount.json", &returned.source_mount)?);
+    paths.push(write_json(
+        &output,
+        "01-source-mount.json",
+        &returned.source_mount,
+    )?);
     paths.push(write_json(
         &output,
         "02-coordinate-presentations.json",
@@ -125,7 +127,11 @@ pub fn emit(returned: &PhysicalFoldReturn) -> Result<ArtifactReturn, String> {
         "03-uncertainty-presentations.json",
         &returned.uncertainty_presentations,
     )?);
-    paths.push(write_json(&output, "04-device-receipt.json", &returned.device_receipt)?);
+    paths.push(write_json(
+        &output,
+        "04-device-receipt.json",
+        &returned.device_receipt,
+    )?);
     paths.push(write_json(
         &output,
         "05-designed-contact-face.json",
@@ -203,9 +209,7 @@ pub fn emit(returned: &PhysicalFoldReturn) -> Result<ArtifactReturn, String> {
 
 pub fn refresh_visual() -> Result<String, String> {
     let repository = repository_root()?;
-    let output = repository.join(
-        "output/the_physical_fold_returns_as_an_exact_constraint_complex",
-    );
+    let output = repository.join("output/the_physical_fold_returns_as_an_exact_constraint_complex");
     let complex_file = std::fs::File::open(output.join("07-cul1-rbx1-constraint-complex.ron"))
         .map_err(|error| error.to_string())?;
     let complex: holonic_engine::physical_constraint_complex::PhysicalConstraintComplex =
@@ -260,15 +264,18 @@ fn lean_return(repository: &Path) -> Result<LeanReturn, String> {
     .collect::<Vec<_>>();
     for theorem in &abstract_theorems {
         if !text.contains(&format!("theorem {theorem}")) {
-            return Err(format!("the M5 Lean source has no abstract theorem {theorem}"));
+            return Err(format!(
+                "the M5 Lean source has no abstract theorem {theorem}"
+            ));
         }
     }
     let theorem_start = text
         .find("theorem theSharedJunctionFibreIsTheIntersection")
         .ok_or_else(|| "the shared-junction theorem body is absent".to_owned())?;
-    let theorem_bodies_contain_sorry = text[theorem_start..]
-        .lines()
-        .any(|line| line.split_whitespace().any(|word| word == "sorry" || word == "admit"));
+    let theorem_bodies_contain_sorry = text[theorem_start..].lines().any(|line| {
+        line.split_whitespace()
+            .any(|word| word == "sorry" || word == "admit")
+    });
     let output = Command::new("lake")
         .args(["env", "lean", relative.to_string_lossy().as_ref()])
         .current_dir(&formal)
@@ -390,7 +397,9 @@ fn item(requirement: &str, passed: bool, evidence: &str) -> GradeItem {
     }
 }
 
-fn inside_count(complex: &holonic_engine::physical_constraint_complex::PhysicalConstraintComplex) -> usize {
+fn inside_count(
+    complex: &holonic_engine::physical_constraint_complex::PhysicalConstraintComplex,
+) -> usize {
     complex
         .contact_families
         .iter()

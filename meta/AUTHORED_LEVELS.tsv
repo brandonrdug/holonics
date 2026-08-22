@@ -294,6 +294,23 @@ ABI	soma/abi/src/returned_contact_cuda.rs	RELATION_OCCURRENCE	1	wire-format posi
 ABI	soma/abi/src/returned_contact_cuda.rs	RELATION_STANDS_AFTER	3	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	RELATION_STOOD_BEFORE	2	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	RELATION_TARGET	0	wire-format position at the declared GPU boundary; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_CONTROL_EPOCH	1	wire-format position in the exact sparse returned-contact control row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_CONTROL_OCCURRENCES	3	wire-format position in the exact sparse returned-contact control row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_CONTROL_RELATIONS	4	wire-format position in the exact sparse returned-contact control row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_CONTROL_TARGETS	2	wire-format position in the exact sparse returned-contact control row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OCCURRENCE_FOUNDED	1	wire-format position in one exact sparse occurrence disposition row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OCCURRENCE_WITHDRAWN	0	wire-format position in one exact sparse occurrence disposition row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_EPOCH	2	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_INVALID_RELATIONS	6	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_OCCURRENCES	4	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_OCCURRENCE_ROWS_AT	8	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_RELATIONS	5	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_RELATION_ROWS_AT	9	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_STATUS	0	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_TARGETS	3	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_OUTPUT_TARGET_ROWS_AT	7	wire-format position in the exact sparse returned-contact header; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_TARGET_FOUNDED	1	wire-format position in one exact sparse target disposition row; `soma/abi` is the ABI
+ABI	soma/abi/src/returned_contact_cuda.rs	SPARSE_TARGET_WITHDRAWN	0	wire-format position in one exact sparse target disposition row; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	STATUS_COMPLETE	1	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	STATUS_INCOMPLETE	0	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI
 ABI	soma/abi/src/returned_contact_cuda.rs	STATUS_INVALID	2	wire-format status discriminant at the declared GPU boundary; `soma/abi` is the ABI

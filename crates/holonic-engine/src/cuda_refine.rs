@@ -129,17 +129,23 @@ pub enum CudaRefineError {
     NativeGeneratorOutsideFamily { generator: u32, generators: usize },
     #[error("the native action extent cannot cross the exact 32-bit device wire")]
     NativeActionTooWide,
-    #[error("the contact coordinate wire has {lower} lower words and {upper} upper words; both must be equal multiples of three")]
+    #[error(
+        "the contact coordinate wire has {lower} lower words and {upper} upper words; both must be equal multiples of three"
+    )]
     ContactCoordinateShape { lower: usize, upper: usize },
     #[error("contact coordinate interval {at} is reversed: lower {lower} exceeds upper {upper}")]
     ReversedContactCoordinate { at: usize, lower: i64, upper: i64 },
-    #[error("contact task {task} addresses vertex {vertex} outside the {vertices}-vertex population")]
+    #[error(
+        "contact task {task} addresses vertex {vertex} outside the {vertices}-vertex population"
+    )]
     ContactVertexOutsidePopulation {
         task: usize,
         vertex: u32,
         vertices: usize,
     },
-    #[error("contact comparison {comparison} addresses reading {reading} outside the {readings}-reading population")]
+    #[error(
+        "contact comparison {comparison} addresses reading {reading} outside the {readings}-reading population"
+    )]
     ContactReadingOutsidePopulation {
         comparison: usize,
         reading: u32,
@@ -985,9 +991,7 @@ impl CudaRefineExecutor {
                 upper: upper_xyz.len(),
             });
         }
-        if task_left.len() != task_right.len()
-            || comparison_left.len() != comparison_right.len()
-        {
+        if task_left.len() != task_right.len() || comparison_left.len() != comparison_right.len() {
             return Err(CudaRefineError::ContactIndexShape);
         }
         let vertices = lower_xyz.len() / 3;
@@ -1031,17 +1035,17 @@ impl CudaRefineExecutor {
                 }
                 let far = low.unsigned_abs().max(high.unsigned_abs());
                 greatest_squared = greatest_squared
-                    .checked_add(far.checked_mul(far).ok_or(
-                        CudaRefineError::ContactDistanceOverflow { task },
-                    )?)
+                    .checked_add(
+                        far.checked_mul(far)
+                            .ok_or(CudaRefineError::ContactDistanceOverflow { task })?,
+                    )
                     .ok_or(CudaRefineError::ContactDistanceOverflow { task })?;
             }
             if greatest_squared > u128::from(u64::MAX) {
                 return Err(CudaRefineError::ContactDistanceOverflow { task });
             }
         }
-        for (comparison, (left, right)) in
-            comparison_left.iter().zip(comparison_right).enumerate()
+        for (comparison, (left, right)) in comparison_left.iter().zip(comparison_right).enumerate()
         {
             for reading in [*left, *right] {
                 if reading as usize >= task_left.len() {
@@ -1246,19 +1250,9 @@ mod tests {
             0, 3, 0, // 3 occluded secondary
             1, 0, 0, // 4 uncertain secondary, x in [1,3]
         ];
-        let upper = [
-            0_i64, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0,
-        ];
+        let upper = [0_i64, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0];
         let returned = card
-            .contact_passage_on_device(
-                &lower,
-                &upper,
-                &[0, 2, 0],
-                &[1, 3, 4],
-                &[0],
-                &[1],
-                4,
-            )
+            .contact_passage_on_device(&lower, &upper, &[0, 2, 0], &[1, 3, 4], &[0], &[1], 4)
             .expect("the exact contact passage returns");
         assert_eq!(returned.contact_classes, vec![1, 0, 2]);
         assert_eq!(returned.paired_classes, vec![3]);

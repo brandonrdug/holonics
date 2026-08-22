@@ -4149,6 +4149,144 @@ pub unsafe extern "ptx-kernel" fn returned_contact_group(
     };
 }
 
+// --- sparse returned-contact grouping -----------------------------------------------------------
+
+/// Validate and census a strictly addressed sparse returned-contact population.
+///
+/// Lane zero returns the exact dynamic layout. One lane per relation validates its local row and
+/// the immediately preceding address, copies that row into the returned sparse sheet, and adds its
+/// exact target/occurrence disposition. The input order is a presentation chart only; strict
+/// adjacency lets the card prove uniqueness without materialising a target×occurrence bitmap.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn returned_contact_sparse_group(
+    control_words: *const u32,
+    control_words_len: usize,
+    relation_words: *const u32,
+    relation_words_len: usize,
+    output_words: *mut u32,
+    output_words_len: usize,
+    x_stride: u32,
+) {
+    let (x, y) = unsafe { global_xy() };
+    let lane = x as usize + y as usize * x_stride as usize;
+    if control_words_len != returned_cuda::SPARSE_CONTROL_WORDS
+        || output_words_len < returned_cuda::SPARSE_OUTPUT_HEADER_WORDS
+    {
+        return;
+    }
+    let control = unsafe { slice::from_raw_parts(control_words, control_words_len) };
+    if !returned_cuda::sparse_control_is_canonical(control) {
+        if lane == 0 {
+            let output = unsafe {
+                slice::from_raw_parts_mut(
+                    output_words,
+                    returned_cuda::SPARSE_OUTPUT_HEADER_WORDS,
+                )
+            };
+            output[returned_cuda::SPARSE_OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
+        }
+        return;
+    }
+    let epoch = control[returned_cuda::SPARSE_CONTROL_EPOCH];
+    let targets = control[returned_cuda::SPARSE_CONTROL_TARGETS] as usize;
+    let occurrences = control[returned_cuda::SPARSE_CONTROL_OCCURRENCES] as usize;
+    let relations = control[returned_cuda::SPARSE_CONTROL_RELATIONS] as usize;
+    let Some(expected_relation_words) = relations.checked_mul(returned_cuda::RELATION_WORDS) else {
+        return;
+    };
+    let Some(expected_output_words) = returned_cuda::sparse_output_words(
+        targets,
+        occurrences,
+        relations,
+    ) else {
+        return;
+    };
+    if relation_words_len != expected_relation_words || output_words_len != expected_output_words {
+        if lane == 0 {
+            let output = unsafe {
+                slice::from_raw_parts_mut(
+                    output_words,
+                    returned_cuda::SPARSE_OUTPUT_HEADER_WORDS,
+                )
+            };
+            output[returned_cuda::SPARSE_OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
+        }
+        return;
+    }
+    let output = unsafe { slice::from_raw_parts_mut(output_words, output_words_len) };
+    if lane == 0 {
+        output[returned_cuda::SPARSE_OUTPUT_STATUS] = returned_cuda::STATUS_COMPLETE;
+        output[returned_cuda::SPARSE_OUTPUT_VERSION] = returned_cuda::SPARSE_LAYOUT_VERSION;
+        output[returned_cuda::SPARSE_OUTPUT_EPOCH] = epoch;
+        output[returned_cuda::SPARSE_OUTPUT_TARGETS] = targets as u32;
+        output[returned_cuda::SPARSE_OUTPUT_OCCURRENCES] = occurrences as u32;
+        output[returned_cuda::SPARSE_OUTPUT_RELATIONS] = relations as u32;
+        output[returned_cuda::SPARSE_OUTPUT_TARGET_ROWS_AT] =
+            returned_cuda::SPARSE_OUTPUT_HEADER_WORDS as u32;
+        output[returned_cuda::SPARSE_OUTPUT_OCCURRENCE_ROWS_AT] =
+            returned_cuda::sparse_occurrence_rows_at(targets).unwrap_or(0) as u32;
+        output[returned_cuda::SPARSE_OUTPUT_RELATION_ROWS_AT] =
+            returned_cuda::sparse_relation_rows_at(targets, occurrences).unwrap_or(0) as u32;
+        output[returned_cuda::SPARSE_OUTPUT_TOTAL_WORDS] = expected_output_words as u32;
+        // INVALID_RELATIONS remains zero from the apparatus-owned pre-launch zero. Relation lanes
+        // are its only writers, through exact atomic addition.
+        return;
+    }
+    let relation = lane - 1;
+    if relation >= relations {
+        return;
+    }
+    let input = unsafe { slice::from_raw_parts(relation_words, relation_words_len) };
+    let at = relation * returned_cuda::RELATION_WORDS;
+    let row = &input[at..at + returned_cuda::RELATION_WORDS];
+    let relation_rows_at = returned_cuda::sparse_relation_rows_at(targets, occurrences).unwrap_or(0);
+    let returned_at = relation_rows_at + at;
+    let mut word = 0usize;
+    while word < returned_cuda::RELATION_WORDS {
+        output[returned_at + word] = row[word];
+        word += 1;
+    }
+    let before = row[returned_cuda::RELATION_STOOD_BEFORE];
+    let after = row[returned_cuda::RELATION_STANDS_AFTER];
+    let target = row[returned_cuda::RELATION_TARGET] as usize;
+    let occurrence = row[returned_cuda::RELATION_OCCURRENCE] as usize;
+    let mut valid = target < targets
+        && occurrence < occurrences
+        && before <= 1
+        && after <= 1
+        && before != after;
+    if relation != 0 {
+        let prior_at = at - returned_cuda::RELATION_WORDS;
+        let prior_target = input[prior_at + returned_cuda::RELATION_TARGET];
+        let prior_occurrence = input[prior_at + returned_cuda::RELATION_OCCURRENCE];
+        valid &= prior_target < row[returned_cuda::RELATION_TARGET]
+            || (prior_target == row[returned_cuda::RELATION_TARGET]
+                && prior_occurrence < row[returned_cuda::RELATION_OCCURRENCE]);
+    }
+    if !valid {
+        unsafe {
+            contact_add(
+                output_words,
+                returned_cuda::SPARSE_OUTPUT_INVALID_RELATIONS,
+                1,
+            )
+        };
+        return;
+    }
+    let disposition = if before == 1 { 0 } else { 1 };
+    let target_at = returned_cuda::SPARSE_OUTPUT_HEADER_WORDS
+        + target * returned_cuda::SPARSE_TARGET_ROW_WORDS
+        + disposition;
+    let occurrence_rows_at = returned_cuda::sparse_occurrence_rows_at(targets).unwrap_or(0);
+    let occurrence_at = occurrence_rows_at
+        + occurrence * returned_cuda::SPARSE_OCCURRENCE_ROW_WORDS
+        + disposition;
+    unsafe {
+        contact_add(output_words, target_at, 1);
+        contact_add(output_words, occurrence_at, 1);
+    }
+}
+
 // --- morphological-conduct attachment -----------------------------------------------------------
 
 #[derive(Clone, Copy)]

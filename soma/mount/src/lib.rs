@@ -105,6 +105,7 @@ mod tests {
         "text_incidence_select",
         "text_section_restrict",
         "returned_contact_group",
+        "returned_contact_sparse_group",
         "morphological_suffix_condition",
         "morphological_prefix_condition",
         "morphological_conduct_group",
@@ -137,7 +138,8 @@ mod tests {
     ];
 
     #[test]
-    fn soma_ptx_artifact_is_sm89_with_all_thirty_two_entries_and_required_atomics() {
+    fn soma_ptx_artifact_is_sm89_with_the_complete_declared_entry_population_and_required_atomics()
+    {
         let text = std::str::from_utf8(SOMA_PTX).expect("the soma PTX artifact is text");
         assert!(text.contains(".target sm_89"), "soma PTX must target sm_89");
 
@@ -248,6 +250,33 @@ mod tests {
             assert!(
                 !returned_body.contains(float_spelling),
                 "returned_contact_group carries forbidden {float_spelling}"
+            );
+        }
+
+        let sparse_returned_mouth = ".entry returned_contact_sparse_group(";
+        let sparse_returned = text
+            .split_once(sparse_returned_mouth)
+            .expect("PTX carries returned_contact_sparse_group")
+            .1;
+        let sparse_returned_signature = sparse_returned
+            .split_once(')')
+            .expect("PTX closes returned_contact_sparse_group signature")
+            .0;
+        assert_eq!(
+            sparse_returned_signature
+                .lines()
+                .filter(|line| line.contains(".param "))
+                .count(),
+            7,
+            "the sparse returned-contact entry retains three pointer/extent pairs plus x_stride",
+        );
+        let sparse_returned_body = sparse_returned
+            .split_once("\n.visible .entry ")
+            .map_or(sparse_returned, |(body, _)| body);
+        for float_spelling in [".f16", ".f32", ".f64"] {
+            assert!(
+                !sparse_returned_body.contains(float_spelling),
+                "returned_contact_sparse_group carries forbidden {float_spelling}"
             );
         }
 

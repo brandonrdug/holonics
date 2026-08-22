@@ -3,8 +3,8 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
+use holonic_engine::exact_value::ieee754::{decode_binary16_bits, FloatReading};
 use holonic_engine::exact_value::ExactInterval;
-use holonic_engine::exact_value::ieee754::{FloatReading, decode_binary16_bits};
 use holonic_engine::physical_constraint_complex::PairUncertainty;
 use serde::Serialize;
 
@@ -93,7 +93,8 @@ impl PaeAtlas {
                 let row_word = self.words[left_token * width + right_token];
                 let column_word = self.words[right_token * width + left_token];
                 let row = decode_binary16_bits(row_word).map_err(|error| error.to_string())?;
-                let column = decode_binary16_bits(column_word).map_err(|error| error.to_string())?;
+                let column =
+                    decode_binary16_bits(column_word).map_err(|error| error.to_string())?;
                 result.insert(
                     (left_at as u32 + 1, right_at as u32 + 1),
                     PairUncertainty {
@@ -223,7 +224,12 @@ impl NpyArray {
                 }
                 u32::from_le_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]) as usize
             }
-            _ => return Err(format!("{} uses unsupported NPY major {major}", path.display())),
+            _ => {
+                return Err(format!(
+                    "{} uses unsupported NPY major {major}",
+                    path.display()
+                ))
+            }
         };
         let header_start = if major == 1 { 10 } else { 12 };
         let data_start = header_start + header_octets;
@@ -293,12 +299,20 @@ impl NpyArray {
         let width = self
             .descr
             .strip_prefix("<U")
-            .ok_or_else(|| format!("{} is not a little-endian Unicode array", self.path.display()))?
+            .ok_or_else(|| {
+                format!(
+                    "{} is not a little-endian Unicode array",
+                    self.path.display()
+                )
+            })?
             .parse::<usize>()
             .map_err(|error| error.to_string())?;
         let bytes_per = width * 4;
         if self.data.len() != self.elements() * bytes_per {
-            return Err(format!("{} has a truncated Unicode payload", self.path.display()));
+            return Err(format!(
+                "{} has a truncated Unicode payload",
+                self.path.display()
+            ));
         }
         self.data
             .chunks_exact(bytes_per)
@@ -308,7 +322,10 @@ impl NpyArray {
                     .take_while(|code| *code != 0)
                     .map(|code| {
                         char::from_u32(code).ok_or_else(|| {
-                            format!("{} contains invalid Unicode scalar {code}", self.path.display())
+                            format!(
+                                "{} contains invalid Unicode scalar {code}",
+                                self.path.display()
+                            )
                         })
                     })
                     .collect()

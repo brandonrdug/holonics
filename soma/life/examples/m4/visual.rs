@@ -3,11 +3,11 @@
 use std::collections::BTreeMap;
 
 use holonic_engine::causal::EventId;
-use holonic_engine::certified_face::{ReceiverWindow, certify_face, mark_census};
+use holonic_engine::certified_face::{certify_face, mark_census, ReceiverWindow};
 use holonic_engine::exact_value::IntegerPolynomial;
 use holonic_engine::image::ExactRaster;
 use holonic_engine::presentation_gauge::{
-    CanvasChart, DisplayGauge, rasterize, render, structural_residue,
+    rasterize, render, structural_residue, CanvasChart, DisplayGauge,
 };
 use holonic_engine::simplicial::{Edge, SimplicialComplex, VertexId};
 use num_bigint::BigInt;

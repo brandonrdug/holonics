@@ -92,6 +92,56 @@ pub struct ReturnedContactCudaFront {
     relations: LocalSequence<ReturnedContactRelation>,
 }
 
+/// The same exact relation sheet in the strict address chart required by the sparse card return.
+/// Ordering is apparatus presentation; the card independently validates it and returns the rows.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReturnedContactSparseFront {
+    targets: usize,
+    occurrences: usize,
+    relations: LocalSequence<ReturnedContactRelation>,
+}
+
+impl ReturnedContactSparseFront {
+    pub fn new(
+        targets: usize,
+        occurrences: usize,
+        relations: LocalSequence<ReturnedContactRelation>,
+    ) -> Result<Self, ReturnedContactCudaError> {
+        u32::try_from(targets).map_err(|_| ReturnedContactCudaError::Extent)?;
+        u32::try_from(occurrences).map_err(|_| ReturnedContactCudaError::Extent)?;
+        u32::try_from(relations.len()).map_err(|_| ReturnedContactCudaError::Extent)?;
+        let mut prior = None;
+        for relation in &relations {
+            if relation.target() as usize >= targets
+                || relation.occurrence() as usize >= occurrences
+                || relation.stood_before() == relation.stands_after()
+            {
+                return Err(ReturnedContactCudaError::InvalidFront);
+            }
+            let address = (relation.target(), relation.occurrence());
+            if prior.is_some_and(|held| held >= address) {
+                return Err(ReturnedContactCudaError::InvalidFront);
+            }
+            prior = Some(address);
+        }
+        Ok(Self {
+            targets,
+            occurrences,
+            relations,
+        })
+    }
+
+    pub const fn targets(&self) -> usize {
+        self.targets
+    }
+    pub const fn occurrences(&self) -> usize {
+        self.occurrences
+    }
+    pub fn relations(&self) -> &[ReturnedContactRelation] {
+        self.relations.as_ref()
+    }
+}
+
 impl ReturnedContactCudaFront {
     pub fn new(
         targets: usize,
@@ -227,6 +277,7 @@ impl CudaReturnedContactExecutor {
         let context = Context::create(&device)?;
         let module = Module::load_ptx(SOMA_PTX)?;
         module.function(wire::ENTRY_SYMBOL)?;
+        module.function(wire::SPARSE_ENTRY_SYMBOL)?;
         let control = DeviceBuffer::<u32>::alloc_zeroed(wire::CONTROL_WORDS)?;
         let relations = DeviceBuffer::<u32>::alloc_zeroed(1)?;
         let output = DeviceBuffer::<u32>::alloc_zeroed(wire::OUTPUT_HEADER_WORDS)?;
@@ -274,6 +325,151 @@ impl CudaReturnedContactExecutor {
                 Err(error)
             }
         }
+    }
+
+    pub fn enact_sparse(
+        &mut self,
+        front: &ReturnedContactSparseFront,
+    ) -> Result<ReturnedContactCudaOutput, ReturnedContactCudaError> {
+        if self.poisoned {
+            return Err(ReturnedContactCudaError::PoisonedRealization);
+        }
+        match self.enact_sparse_inner(front) {
+            Ok(output) => Ok(output),
+            Err(error) => {
+                if error.poisons_realization() {
+                    self.poisoned = true;
+                }
+                Err(error)
+            }
+        }
+    }
+
+    fn enact_sparse_inner(
+        &mut self,
+        front: &ReturnedContactSparseFront,
+    ) -> Result<ReturnedContactCudaOutput, ReturnedContactCudaError> {
+        self.context.make_current()?;
+        let started = Instant::now();
+        let (epoch, epoch_reset) = match self.epoch.checked_add(1) {
+            Some(next) => (next, false),
+            None => (1, true),
+        };
+        self.epoch = epoch;
+        let control_words = wire::sparse_control(
+            epoch,
+            front.targets,
+            front.occurrences,
+            front.relations.len(),
+        )
+        .ok_or(ReturnedContactCudaError::Extent)?;
+        let relation_extent = front
+            .relations
+            .len()
+            .checked_mul(wire::RELATION_WORDS)
+            .ok_or(ReturnedContactCudaError::Extent)?;
+        let output_extent =
+            wire::sparse_output_words(front.targets, front.occurrences, front.relations.len())
+                .ok_or(ReturnedContactCudaError::Extent)?;
+        let mut relation_words = LocalSequence::with_capacity(relation_extent);
+        for relation in &front.relations {
+            for word in relation.words() {
+                relation_words.push(word);
+            }
+        }
+        let mut transient_allocation_operations = 0usize;
+        if grow_buffer(&mut self.relations, relation_extent)? {
+            transient_allocation_operations += 1;
+        }
+        if grow_buffer(&mut self.output, output_extent)? {
+            transient_allocation_operations += 1;
+        }
+        self.control.copy_range_from_slice(0, &control_words)?;
+        if !relation_words.is_empty() {
+            self.relations
+                .copy_range_from_slice(0, relation_words.as_ref())?;
+        }
+        self.output.zero()?;
+        self.context.synchronize()?;
+        let prepare_and_ingress_nanoseconds = started.elapsed().as_nanos();
+
+        let function = self.module.function(wire::SPARSE_ENTRY_SYMBOL)?;
+        let work = 1u64
+            .checked_add(
+                u64::try_from(front.relations.len())
+                    .map_err(|_| ReturnedContactCudaError::Extent)?,
+            )
+            .ok_or(ReturnedContactCudaError::Extent)?;
+        let launch = function.linear_launch(self.census, work)?;
+        let mut control_pointer = self.control.device_ptr();
+        let mut control_len = wire::SPARSE_CONTROL_WORDS;
+        let mut relation_pointer = self.relations.device_ptr();
+        let mut relation_len = relation_extent;
+        let mut output_pointer = self.output.device_ptr();
+        let mut output_len = output_extent;
+        let mut x_stride = launch.x_stride;
+        let mut parameters = [
+            &mut control_pointer as *mut u64 as *mut c_void,
+            &mut control_len as *mut usize as *mut c_void,
+            &mut relation_pointer as *mut u64 as *mut c_void,
+            &mut relation_len as *mut usize as *mut c_void,
+            &mut output_pointer as *mut u64 as *mut c_void,
+            &mut output_len as *mut usize as *mut c_void,
+            &mut x_stride as *mut u32 as *mut c_void,
+        ];
+        let kernel_started = Instant::now();
+        function.launch_on(&self.stream, launch.grid, launch.block, &mut parameters)?;
+        self.stream.synchronize()?;
+        let kernel_and_stream_nanoseconds = kernel_started.elapsed().as_nanos();
+
+        let egress_started = Instant::now();
+        let mut returned = LocalSequence::with_capacity(output_extent);
+        returned.resize_with(output_extent, || 0);
+        self.output.copy_range_to_slice(0, &mut returned)?;
+        let semantic = decode_sparse_card_output(&control_words, returned.as_ref())?;
+        let return_egress_nanoseconds = egress_started.elapsed().as_nanos();
+        self.launches = self
+            .launches
+            .checked_add(1)
+            .ok_or(ReturnedContactCudaError::Extent)?;
+        let apparatus = ReturnedContactCudaReceipt {
+            schema: "soma-life.returned-contact-sparse-cuda-receipt.v2".to_owned(),
+            device: self.device_name.to_owned(),
+            layout_version: wire::SPARSE_LAYOUT_VERSION,
+            launch_ordinal: self.launches,
+            epoch,
+            epoch_reset,
+            targets: front.targets,
+            occurrences: front.occurrences,
+            relations: front.relations.len(),
+            occurrence_mask_words: 0,
+            target_row_words: wire::SPARSE_TARGET_ROW_WORDS,
+            header_relation_validations: front.relations.len(),
+            target_relation_tests: front.relations.len(),
+            occurrence_relation_tests: front.relations.len(),
+            cpu_to_device_words: wire::SPARSE_CONTROL_WORDS
+                .checked_add(relation_extent)
+                .ok_or(ReturnedContactCudaError::Extent)?,
+            device_to_cpu_words: output_extent,
+            returned_intermediate_relation_words: 0,
+            kernel_launches: 1,
+            device_zero_operations: 1,
+            transient_allocation_operations,
+            grid: dimension_words(launch.grid),
+            block: dimension_words(launch.block),
+            retained_streams: 1,
+            stream_nonblocking: self.stream.is_nonblocking(),
+            stream_synchronizations: 1,
+            default_stream_barriers: 1,
+            prepare_and_ingress_nanoseconds,
+            kernel_and_stream_nanoseconds,
+            return_egress_nanoseconds,
+            elapsed_nanoseconds: started.elapsed().as_nanos(),
+        };
+        Ok(ReturnedContactCudaOutput {
+            semantic,
+            apparatus,
+        })
     }
 
     fn enact_inner(
@@ -628,6 +824,109 @@ fn decode_card_output(
     })
 }
 
+fn decode_sparse_card_output(
+    control: &[u32],
+    output: &[u32],
+) -> Result<ReturnedContactGroups, ReturnedContactCudaError> {
+    if !wire::sparse_control_is_canonical(control)
+        || output.len() < wire::SPARSE_OUTPUT_HEADER_WORDS
+    {
+        return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+    }
+    let targets = control[wire::SPARSE_CONTROL_TARGETS] as usize;
+    let occurrences = control[wire::SPARSE_CONTROL_OCCURRENCES] as usize;
+    let relations = control[wire::SPARSE_CONTROL_RELATIONS] as usize;
+    let occurrence_rows_at = wire::sparse_occurrence_rows_at(targets)
+        .ok_or(ReturnedContactCudaError::InvalidDeviceReturn)?;
+    let relation_rows_at = wire::sparse_relation_rows_at(targets, occurrences)
+        .ok_or(ReturnedContactCudaError::InvalidDeviceReturn)?;
+    let expected_output = wire::sparse_output_words(targets, occurrences, relations)
+        .ok_or(ReturnedContactCudaError::InvalidDeviceReturn)?;
+    let header_matches = output.len() == expected_output
+        && output[wire::SPARSE_OUTPUT_STATUS] == wire::STATUS_COMPLETE
+        && output[wire::SPARSE_OUTPUT_VERSION] == wire::SPARSE_LAYOUT_VERSION
+        && output[wire::SPARSE_OUTPUT_EPOCH] == control[wire::SPARSE_CONTROL_EPOCH]
+        && output[wire::SPARSE_OUTPUT_TARGETS] as usize == targets
+        && output[wire::SPARSE_OUTPUT_OCCURRENCES] as usize == occurrences
+        && output[wire::SPARSE_OUTPUT_RELATIONS] as usize == relations
+        && output[wire::SPARSE_OUTPUT_TARGET_ROWS_AT] as usize == wire::SPARSE_OUTPUT_HEADER_WORDS
+        && output[wire::SPARSE_OUTPUT_OCCURRENCE_ROWS_AT] as usize == occurrence_rows_at
+        && output[wire::SPARSE_OUTPUT_RELATION_ROWS_AT] as usize == relation_rows_at
+        && output[wire::SPARSE_OUTPUT_TOTAL_WORDS] as usize == expected_output;
+    if !header_matches {
+        return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+    }
+    if output[wire::SPARSE_OUTPUT_INVALID_RELATIONS] != 0 {
+        return Err(ReturnedContactCudaError::DeviceRefused { relation: None });
+    }
+    let mut target_groups = LocalSequence::with_capacity(targets);
+    for target in 0..targets {
+        target_groups.push(ReturnedTargetGroup {
+            target: u32::try_from(target).map_err(|_| ReturnedContactCudaError::Extent)?,
+            withdrawn_causes: LocalSequence::new(),
+            founded_causes: LocalSequence::new(),
+        });
+    }
+    let mut prior = None;
+    for relation_at in 0..relations {
+        let at = relation_rows_at + relation_at * wire::RELATION_WORDS;
+        let words = [output[at], output[at + 1], output[at + 2], output[at + 3]];
+        let relation = ReturnedContactRelation::from_words(words)
+            .ok_or(ReturnedContactCudaError::InvalidDeviceReturn)?;
+        if relation.target() as usize >= targets || relation.occurrence() as usize >= occurrences {
+            return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+        }
+        let address = (relation.target(), relation.occurrence());
+        if prior.is_some_and(|held| held >= address) {
+            return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+        }
+        prior = Some(address);
+        let group = &mut target_groups[relation.target() as usize];
+        if relation.stood_before() {
+            group.withdrawn_causes.push(relation.occurrence());
+        } else {
+            group.founded_causes.push(relation.occurrence());
+        }
+    }
+    let mut target_relation_sum = 0usize;
+    for (target, group) in target_groups.iter().enumerate() {
+        let at = wire::SPARSE_OUTPUT_HEADER_WORDS + target * wire::SPARSE_TARGET_ROW_WORDS;
+        if output[at + wire::SPARSE_TARGET_WITHDRAWN] as usize != group.withdrawn_causes.len()
+            || output[at + wire::SPARSE_TARGET_FOUNDED] as usize != group.founded_causes.len()
+        {
+            return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+        }
+        target_relation_sum = target_relation_sum
+            .checked_add(group.withdrawn_causes.len())
+            .and_then(|sum| sum.checked_add(group.founded_causes.len()))
+            .ok_or(ReturnedContactCudaError::Extent)?;
+    }
+    let mut occurrence_dispositions = LocalSequence::with_capacity(occurrences);
+    let mut occurrence_relation_sum = 0usize;
+    for occurrence in 0..occurrences {
+        let at = occurrence_rows_at + occurrence * wire::SPARSE_OCCURRENCE_ROW_WORDS;
+        let withdrawn_targets = output[at + wire::SPARSE_OCCURRENCE_WITHDRAWN];
+        let founded_targets = output[at + wire::SPARSE_OCCURRENCE_FOUNDED];
+        occurrence_relation_sum = occurrence_relation_sum
+            .checked_add(withdrawn_targets as usize)
+            .and_then(|sum| sum.checked_add(founded_targets as usize))
+            .ok_or(ReturnedContactCudaError::Extent)?;
+        occurrence_dispositions.push(ReturnedOccurrenceDisposition {
+            occurrence: u32::try_from(occurrence).map_err(|_| ReturnedContactCudaError::Extent)?,
+            withdrawn_targets,
+            founded_targets,
+        });
+    }
+    if target_relation_sum != relations || occurrence_relation_sum != relations {
+        return Err(ReturnedContactCudaError::InvalidDeviceReturn);
+    }
+    Ok(ReturnedContactGroups {
+        schema: "soma-life.returned-contact-groups.v1".to_owned(),
+        targets: target_groups,
+        occurrences: occurrence_dispositions,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -709,6 +1008,76 @@ mod tests {
             decode_card_output(&control, direction_forged.as_ref()),
             Err(ReturnedContactCudaError::InvalidDeviceReturn)
         ));
+    }
+
+    #[test]
+    fn sparse_decoder_opens_the_card_return_and_cross_checks_both_censuses() {
+        let control = wire::sparse_control(5, 2, 3, 3).expect("control");
+        let extent = wire::sparse_output_words(2, 3, 3).expect("extent");
+        let mut output = LocalSequence::with_capacity(extent);
+        output.resize_with(extent, || 0);
+        output[wire::SPARSE_OUTPUT_STATUS] = wire::STATUS_COMPLETE;
+        output[wire::SPARSE_OUTPUT_VERSION] = wire::SPARSE_LAYOUT_VERSION;
+        output[wire::SPARSE_OUTPUT_EPOCH] = 5;
+        output[wire::SPARSE_OUTPUT_TARGETS] = 2;
+        output[wire::SPARSE_OUTPUT_OCCURRENCES] = 3;
+        output[wire::SPARSE_OUTPUT_RELATIONS] = 3;
+        output[wire::SPARSE_OUTPUT_TARGET_ROWS_AT] = wire::SPARSE_OUTPUT_HEADER_WORDS as u32;
+        output[wire::SPARSE_OUTPUT_OCCURRENCE_ROWS_AT] = 15;
+        output[wire::SPARSE_OUTPUT_RELATION_ROWS_AT] = 21;
+        output[wire::SPARSE_OUTPUT_TOTAL_WORDS] = extent as u32;
+        output[wire::SPARSE_OUTPUT_HEADER_WORDS + wire::SPARSE_TARGET_WITHDRAWN] = 1;
+        output[wire::SPARSE_OUTPUT_HEADER_WORDS + wire::SPARSE_TARGET_FOUNDED] = 1;
+        output[wire::SPARSE_OUTPUT_HEADER_WORDS
+            + wire::SPARSE_TARGET_ROW_WORDS
+            + wire::SPARSE_TARGET_FOUNDED] = 1;
+        output[15 + wire::SPARSE_OCCURRENCE_WITHDRAWN] = 1;
+        output[15 + wire::SPARSE_OCCURRENCE_ROW_WORDS + wire::SPARSE_OCCURRENCE_FOUNDED] = 1;
+        output[15 + 2 * wire::SPARSE_OCCURRENCE_ROW_WORDS + wire::SPARSE_OCCURRENCE_FOUNDED] = 1;
+        for (at, relation) in [
+            relation(0, 0, true, false),
+            relation(0, 1, false, true),
+            relation(1, 2, false, true),
+        ]
+        .iter()
+        .copied()
+        .enumerate()
+        {
+            let row = 21 + at * wire::RELATION_WORDS;
+            output[row..row + wire::RELATION_WORDS].copy_from_slice(&relation.words());
+        }
+        let groups =
+            decode_sparse_card_output(&control, output.as_ref()).expect("sparse return opens");
+        assert_eq!(groups.targets[0].withdrawn_causes.as_ref(), &[0]);
+        assert_eq!(groups.targets[0].founded_causes.as_ref(), &[1]);
+        assert_eq!(groups.targets[1].founded_causes.as_ref(), &[2]);
+        output[15 + wire::SPARSE_OCCURRENCE_WITHDRAWN] = 0;
+        assert!(matches!(
+            decode_sparse_card_output(&control, output.as_ref()),
+            Err(ReturnedContactCudaError::InvalidDeviceReturn)
+        ));
+    }
+
+    #[test]
+    #[ignore = "requires a CUDA device and the committed returned_contact_sparse_group PTX entry"]
+    fn sparse_card_returns_linear_exact_groups() {
+        let relations = LocalSequence::from([
+            relation(0, 0, true, false),
+            relation(0, 1, false, true),
+            relation(1, 2, false, true),
+        ]);
+        let front = ReturnedContactSparseFront::new(2, 3, relations).expect("sparse front");
+        let mut cuda = CudaReturnedContactExecutor::new(0).expect("card mounts");
+        let returned = cuda.enact_sparse(&front).expect("sparse card groups");
+        assert_eq!(returned.semantic.targets[0].withdrawn_causes.as_ref(), &[0]);
+        assert_eq!(returned.semantic.targets[0].founded_causes.as_ref(), &[1]);
+        assert_eq!(returned.semantic.targets[1].founded_causes.as_ref(), &[2]);
+        assert_eq!(
+            returned.apparatus.device_to_cpu_words,
+            wire::sparse_output_words(2, 3, 3).unwrap()
+        );
+        assert_eq!(returned.apparatus.target_relation_tests, 3);
+        assert_eq!(returned.apparatus.occurrence_relation_tests, 3);
     }
 
     #[test]

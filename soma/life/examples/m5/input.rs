@@ -145,8 +145,7 @@ pub fn mount() -> Result<InputMount, String> {
 
     let structure_manifest_path = structure_root.join("STRUCTURE_MANIFEST.sha256");
     let structure_manifest_hash = digest_path(&structure_manifest_path)?;
-    if structure_manifest_hash
-        != "39325f6b6627ff8021dc4509008c0217ca621dde9d44bab44866a51b34c92bdf"
+    if structure_manifest_hash != "39325f6b6627ff8021dc4509008c0217ca621dde9d44bab44866a51b34c92bdf"
     {
         return Err(format!(
             "the structure manifest occurrence changed: {structure_manifest_hash}"
@@ -211,9 +210,9 @@ pub fn mount() -> Result<InputMount, String> {
         .map_err(|error| error.to_string())?;
     let wetlab = std::fs::read_to_string(table_root.join("docs/WETLAB.md"))
         .map_err(|error| error.to_string())?;
-    let documentation_founds_target_form_shift = data_notes.contains(
-        "RBX1: free RBX1 at Adaptyv, CUL1-RBX1 complex at Twist",
-    ) && wetlab.contains("RBX1 as the CUL1-RBX1 complex (Adaptyv used RBX1 alone)");
+    let documentation_founds_target_form_shift = data_notes
+        .contains("RBX1: free RBX1 at Adaptyv, CUL1-RBX1 complex at Twist")
+        && wetlab.contains("RBX1 as the CUL1-RBX1 complex (Adaptyv used RBX1 alone)");
     if !documentation_founds_target_form_shift {
         return Err("the admitted documentation no longer founds the RBX1 form shift".to_owned());
     }
@@ -316,7 +315,9 @@ fn read_manifest(path: &Path) -> Result<BTreeMap<String, (String, u64)>, String>
         .filter(|line| !line.trim().is_empty())
         .map(|line| {
             let mut fields = line.split_whitespace();
-            let hash = fields.next().ok_or_else(|| "manifest hash absent".to_owned())?;
+            let hash = fields
+                .next()
+                .ok_or_else(|| "manifest hash absent".to_owned())?;
             let octets = fields
                 .next()
                 .ok_or_else(|| "manifest extent absent".to_owned())?

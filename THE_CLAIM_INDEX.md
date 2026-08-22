@@ -108,7 +108,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md` | **The admission is a quotient and the breadth is a group** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` | **The arrow is the division and attention keeps only its aim** — **Evidence:** `measured` where stated; the arrow's own source is `soma/body/src/arrow.rs:17-26` and `:114-125`, read today. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
-| `blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md` | **The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses** — **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts; `established-bounded` for the admitted H0--H5, W1--W5 and M0--M5 returns; `proved-derived`… |
+| `blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md` | **The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses** — **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts; `established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived`… |
 | `blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md` | **The Clifford lift, the phase wire, and the four untaken readings** — Every citation below was verified at the line given on the day of writing. |
 | `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md` | **The codec is recovered at every scale, and the faces are a return** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
@@ -131,7 +131,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (238 deposits of 530)
+## 4 · The 2026-08 record line (239 deposits of 531)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -376,6 +376,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
 | `2026-08-22_THE_OBSTRUCTION_IS_EXHIBITED_AT_SEVENTEEN_AND_THE_INVISIBLE_COSETS_PASS_EVERY_FRAME.md` | The obstruction is exhibited at seventeen, and the invisible cosets pass every frame |
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
+| `2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md` | The total descent route cultivated Athena, the withheld passage separated, and M6 passed |
 | `2026-08-22_THE_TWO_DESCENT_AT_THIRTY_FOUR_IS_COMPLETE_AND_THE_IMAGE_IS_EXACTLY_THE_REALIZED_SIXTEEN.md` | The two-descent at thirty-four is complete, and the image is exactly the realized sixteen |
 
 ---

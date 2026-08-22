@@ -57,7 +57,9 @@ impl CifPoint {
                 // divisor; negating the floor of the negation is exact ceiling.
                 let divisor = 10_i64
                     .checked_pow(coordinate.decimal_places - decimal_places)
-                    .ok_or_else(|| "the coordinate divisor exceeds the exact i64 wire".to_owned())?;
+                    .ok_or_else(|| {
+                        "the coordinate divisor exceeds the exact i64 wire".to_owned()
+                    })?;
                 let lower_numerator = coordinate
                     .significand
                     .checked_sub(1)
@@ -343,7 +345,11 @@ fn unquote(token: &str) -> &str {
     token
         .strip_prefix('\'')
         .and_then(|body| body.strip_suffix('\''))
-        .or_else(|| token.strip_prefix('"').and_then(|body| body.strip_suffix('"')))
+        .or_else(|| {
+            token
+                .strip_prefix('"')
+                .and_then(|body| body.strip_suffix('"'))
+        })
         .unwrap_or(token)
 }
 
@@ -369,6 +375,8 @@ fn one_letter(monomer: &str) -> Result<char, String> {
         "TRP" => Ok('W'),
         "TYR" => Ok('Y'),
         "VAL" => Ok('V'),
-        other => Err(format!("the admitted protein component contains unsupported monomer {other}")),
+        other => Err(format!(
+            "the admitted protein component contains unsupported monomer {other}"
+        )),
     }
 }

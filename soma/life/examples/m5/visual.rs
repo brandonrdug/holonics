@@ -102,7 +102,10 @@ pub fn derive(
     // The gauged chart deliberately owns a new position map but obtains all incidence by vertex
     // address from the same complex. Rehash that independently after checking the map is total.
     if gauged.len() != complex.vertices.len()
-        || complex.vertices.keys().any(|vertex| !gauged.contains_key(vertex))
+        || complex
+            .vertices
+            .keys()
+            .any(|vertex| !gauged.contains_key(vertex))
     {
         return Err("the gauged chart lost a vertex occurrence".to_owned());
     }
@@ -182,7 +185,10 @@ fn exact_positions(
                 let center = (&interval.lower + &interval.upper) / BigInt::from(2);
                 let scaled = center * &scale;
                 if scaled.denom() != &BigInt::from(1) {
-                    return Err("the exact position does not land on the declared display lattice".to_owned());
+                    return Err(
+                        "the exact position does not land on the declared display lattice"
+                            .to_owned(),
+                    );
                 }
                 scaled
                     .numer()
@@ -288,13 +294,23 @@ fn svg(
         .checked_sub(minimum[1])
         .ok_or_else(|| "SVG height overflow".to_owned())?;
     let pad = width.max(height).checked_div(20).unwrap_or(0).max(1);
-    let view_x = minimum[0].checked_sub(pad).ok_or_else(|| "SVG x overflow".to_owned())?;
-    let view_y = minimum[1].checked_sub(pad).ok_or_else(|| "SVG y overflow".to_owned())?;
+    let view_x = minimum[0]
+        .checked_sub(pad)
+        .ok_or_else(|| "SVG x overflow".to_owned())?;
+    let view_y = minimum[1]
+        .checked_sub(pad)
+        .ok_or_else(|| "SVG y overflow".to_owned())?;
     let view_width = width
-        .checked_add(pad.checked_mul(2).ok_or_else(|| "SVG pad overflow".to_owned())?)
+        .checked_add(
+            pad.checked_mul(2)
+                .ok_or_else(|| "SVG pad overflow".to_owned())?,
+        )
         .ok_or_else(|| "SVG width overflow".to_owned())?;
     let view_height = height
-        .checked_add(pad.checked_mul(2).ok_or_else(|| "SVG pad overflow".to_owned())?)
+        .checked_add(
+            pad.checked_mul(2)
+                .ok_or_else(|| "SVG pad overflow".to_owned())?,
+        )
         .ok_or_else(|| "SVG height overflow".to_owned())?;
     let stroke = width.max(height).checked_div(700).unwrap_or(0).max(1);
     let contact_stroke = stroke.checked_div(2).unwrap_or(0).max(1);
@@ -333,8 +349,5 @@ fn svg(
 }
 
 fn hex(bytes: &[u8]) -> String {
-    bytes
-        .iter()
-        .map(|octet| format!("{octet:02x}"))
-        .collect()
+    bytes.iter().map(|octet| format!("{octet:02x}")).collect()
 }

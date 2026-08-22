@@ -3,12 +3,12 @@
 use std::collections::BTreeSet;
 use std::ops::Range;
 
-use holonic_engine::EventId;
 use holonic_engine::cuda_refine::CudaRefineExecutor;
 use holonic_engine::physical_constraint_complex::{
-    ConstraintComponentId, ContactClass, CrossPresentationFibre, DistanceAperture,
-    PhysicalConstraintComplex, cross_presentation_fibre,
+    cross_presentation_fibre, ConstraintComponentId, ContactClass, CrossPresentationFibre,
+    DistanceAperture, PhysicalConstraintComplex,
 };
+use holonic_engine::EventId;
 use num_bigint::BigInt;
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
@@ -121,7 +121,9 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
     // addresses used to join coordinate and PAE occurrences; they never select the biological role.
     let designed_binder = designed.component_with_sequence(&mount.family.binder_sequence)?;
     let designed_target = unique_other(&designed, &[designed_binder])?;
-    let target_sequence = designed.components[designed_target].one_letter_sequence.clone();
+    let target_sequence = designed.components[designed_target]
+        .one_letter_sequence
+        .clone();
     let free_binder = free.component_with_sequence(&mount.family.binder_sequence)?;
     let free_target = free.component_with_sequence(&target_sequence)?;
     let complex_binder = complex.component_with_sequence(&mount.family.binder_sequence)?;
@@ -132,10 +134,8 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
         .maximum_decimal_places
         .max(free.maximum_decimal_places)
         .max(complex.maximum_decimal_places);
-    let resident_decimal_places = derive_resident_places(
-        &[&designed, &free, &complex],
-        source_maximum_decimal_places,
-    )?;
+    let resident_decimal_places =
+        derive_resident_places(&[&designed, &free, &complex], source_maximum_decimal_places)?;
     let denominator = 10_u64
         .checked_pow(resident_decimal_places)
         .ok_or_else(|| "the coordinate denominator exceeds the resident u64 wire".to_owned())?;
@@ -146,12 +146,20 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
         .ok_or_else(|| "the exact contact aperture exceeds the resident u64 wire".to_owned())?;
 
     let mut wire = ContactWire::default();
-    let designed_binder_wire = wire.append(&designed.components[designed_binder], resident_decimal_places)?;
-    let designed_target_wire = wire.append(&designed.components[designed_target], resident_decimal_places)?;
+    let designed_binder_wire = wire.append(
+        &designed.components[designed_binder],
+        resident_decimal_places,
+    )?;
+    let designed_target_wire = wire.append(
+        &designed.components[designed_target],
+        resident_decimal_places,
+    )?;
     let free_binder_wire = wire.append(&free.components[free_binder], resident_decimal_places)?;
     let free_target_wire = wire.append(&free.components[free_target], resident_decimal_places)?;
-    let complex_binder_wire = wire.append(&complex.components[complex_binder], resident_decimal_places)?;
-    let complex_target_wire = wire.append(&complex.components[complex_target], resident_decimal_places)?;
+    let complex_binder_wire =
+        wire.append(&complex.components[complex_binder], resident_decimal_places)?;
+    let complex_target_wire =
+        wire.append(&complex.components[complex_target], resident_decimal_places)?;
     let cul1_wire = wire.append(&complex.components[cul1], resident_decimal_places)?;
 
     let designed_range = wire.cross(&designed_binder_wire, &designed_target_wire)?;
@@ -159,7 +167,9 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
     let complex_range = wire.cross(&complex_binder_wire, &complex_target_wire)?;
     let cul1_range = wire.cross(&cul1_wire, &complex_target_wire)?;
     if free_range.len() != complex_range.len() {
-        return Err("the two sequence-bound binder/target populations do not correspond".to_owned());
+        return Err(
+            "the two sequence-bound binder/target populations do not correspond".to_owned(),
+        );
     }
     let comparison_left = (free_range.start..free_range.end)
         .map(as_u32)
@@ -195,17 +205,22 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
     {
         let expected = 3 * passage.contact_classes[left] + passage.contact_classes[right];
         if *paired != expected {
-            return Err("the resident ordered cross-presentation pair disagrees with its returned classes".to_owned());
+            return Err(
+                "the resident ordered cross-presentation pair disagrees with its returned classes"
+                    .to_owned(),
+            );
         }
     }
 
-    let aperture = || DistanceAperture {
+    let aperture = || {
+        DistanceAperture {
         lineage: format!(
             "declared C-alpha contact receiver: exact distance not greater than {CONTACT_RADIUS_ANGSTROMS} angstroms"
         ),
         squared: Rat::from_integer(BigInt::from(
             CONTACT_RADIUS_ANGSTROMS * CONTACT_RADIUS_ANGSTROMS,
         )),
+    }
     };
     let mut free_complex = PhysicalConstraintComplex::found(
         format!("{} / predicted free RBX1", free_source.release_path),
@@ -242,11 +257,10 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
                 .material_at_places("predicted complex / binder", resident_decimal_places)?,
             complex.components[complex_target]
                 .material_at_places("predicted complex / target", resident_decimal_places)?,
-            complex.components[cul1]
-                .material_at_places(
-                    "predicted complex / accompanying component",
-                    resident_decimal_places,
-                )?,
+            complex.components[cul1].material_at_places(
+                "predicted complex / accompanying component",
+                resident_decimal_places,
+            )?,
         ],
     )
     .map_err(|error| error.to_string())?;
@@ -291,7 +305,9 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
     if cross_presentation_fibre.shared_inside.is_empty()
         || cross_presentation_fibre.shortest_separator.is_none()
     {
-        return Err("the admitted family did not return both a shared invariant and a separator".to_owned());
+        return Err(
+            "the admitted family did not return both a shared invariant and a separator".to_owned(),
+        );
     }
     let higher_face_invariant = higher_face_invariant(
         free_complex
@@ -342,7 +358,10 @@ pub fn enact() -> Result<PhysicalFoldReturn, String> {
         refusal: "[EXACT:conditional] The authenticated source proves a target-form change, an assay-response change, exact coordinate-incidence change and a nonempty CUL1/RBX1 contact population. These co-occurrences do not identify molecular causation, binding energetics, or assay comparability; no such law or calibrated receiver was supplied.".to_owned(),
     };
     if !environment_return.response_changed || !environment_return.binder_contact_fibre_reopened {
-        return Err("the physical family did not return its declared environment/response separation".to_owned());
+        return Err(
+            "the physical family did not return its declared environment/response separation"
+                .to_owned(),
+        );
     }
 
     let device_receipt = DeviceContactReceipt {
@@ -515,11 +534,7 @@ fn designed_contact_face(
                 &left_residue
                     .ca
                     .box3_at_places(resident_decimal_places)?
-                    .squared_distance(
-                        &right_residue
-                            .ca
-                            .box3_at_places(resident_decimal_places)?,
-                    ),
+                    .squared_distance(&right_residue.ca.box3_at_places(resident_decimal_places)?),
             );
             if classes[at] != exact {
                 return Err(format!(
@@ -624,8 +639,7 @@ fn higher_face_invariant(
         let mut result = BTreeSet::new();
         for left in 0..left_extent.saturating_sub(1) {
             for right in 0..right_extent {
-                if inside[left * right_extent + right]
-                    && inside[(left + 1) * right_extent + right]
+                if inside[left * right_extent + right] && inside[(left + 1) * right_extent + right]
                 {
                     result.insert((left as u32 + 1, left as u32 + 2, right as u32 + 1));
                 }
@@ -660,10 +674,7 @@ fn parse_designed_target_ordinals(values: &[String]) -> Result<BTreeSet<i32>, St
     values
         .iter()
         .map(|value| {
-            let body = value
-                .split_once(':')
-                .map(|(_, body)| body)
-                .unwrap_or(value);
+            let body = value.split_once(':').map(|(_, body)| body).unwrap_or(value);
             let digits = body
                 .trim_start_matches(|character: char| character.is_ascii_alphabetic())
                 .trim();

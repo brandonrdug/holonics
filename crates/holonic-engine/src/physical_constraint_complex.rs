@@ -17,8 +17,8 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::ExactInterval;
 use crate::EventId;
+use crate::exact_value::ExactInterval;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ConstraintVertexId(pub u64);
@@ -119,14 +119,29 @@ pub struct ConstraintEdge {
 }
 
 impl ConstraintEdge {
-    pub fn new(left: ConstraintVertexId, right: ConstraintVertexId) -> Result<(Self, i8), ConstraintError> {
+    pub fn new(
+        left: ConstraintVertexId,
+        right: ConstraintVertexId,
+    ) -> Result<(Self, i8), ConstraintError> {
         if left == right {
             return Err(ConstraintError::CollapsedEdge(left));
         }
         Ok(if left < right {
-            (Self { lower: left, upper: right }, 1)
+            (
+                Self {
+                    lower: left,
+                    upper: right,
+                },
+                1,
+            )
         } else {
-            (Self { lower: right, upper: left }, -1)
+            (
+                Self {
+                    lower: right,
+                    upper: left,
+                },
+                -1,
+            )
         })
     }
 }
@@ -403,13 +418,16 @@ impl PhysicalConstraintComplex {
                         vertices: [left_pair[0], left_pair[1], *right_vertex],
                     };
                     for (edge, hand) in face.boundary()? {
-                        *self.boundary.two_chain_boundary.entry(edge).or_default() += i64::from(hand);
+                        *self.boundary.two_chain_boundary.entry(edge).or_default() +=
+                            i64::from(hand);
                     }
                     self.faces.insert(id, face);
                 }
             }
         }
-        self.boundary.two_chain_boundary.retain(|_, hand| *hand != 0);
+        self.boundary
+            .two_chain_boundary
+            .retain(|_, hand| *hand != 0);
         self.contact_families.push(ContactFamily {
             left,
             right,
@@ -419,8 +437,13 @@ impl PhysicalConstraintComplex {
         Ok(())
     }
 
-    pub fn component(&self, id: ConstraintComponentId) -> Result<&PresentedComponent, ConstraintError> {
-        self.components.get(&id).ok_or(ConstraintError::MissingComponent(id))
+    pub fn component(
+        &self,
+        id: ConstraintComponentId,
+    ) -> Result<&PresentedComponent, ConstraintError> {
+        self.components
+            .get(&id)
+            .ok_or(ConstraintError::MissingComponent(id))
     }
 
     pub fn contact_family(
@@ -463,10 +486,7 @@ pub fn cross_presentation_fibre(
     left_pair: (ConstraintComponentId, ConstraintComponentId),
     right_pair: (ConstraintComponentId, ConstraintComponentId),
 ) -> Result<CrossPresentationFibre, ConstraintError> {
-    for (left, right) in [
-        (left_pair.0, right_pair.0),
-        (left_pair.1, right_pair.1),
-    ] {
+    for (left, right) in [(left_pair.0, right_pair.0), (left_pair.1, right_pair.1)] {
         if left_complex.component(left)?.sequence != right_complex.component(right)?.sequence {
             return Err(ConstraintError::ComponentSequenceDisagrees { left, right });
         }
@@ -536,9 +556,13 @@ pub enum ConstraintError {
     EmptyComponent(String),
     #[error("the edge collapses at vertex {0:?}")]
     CollapsedEdge(ConstraintVertexId),
-    #[error("the contact carrier returned {enacted} cells where the declared population has {expected}")]
+    #[error(
+        "the contact carrier returned {enacted} cells where the declared population has {expected}"
+    )]
     ContactPopulationDisagrees { expected: usize, enacted: usize },
-    #[error("the uncertainty carrier returned {supplied} cells where the declared population has {expected}")]
+    #[error(
+        "the uncertainty carrier returned {supplied} cells where the declared population has {expected}"
+    )]
     UncertaintyPopulationDisagrees { expected: usize, supplied: usize },
     #[error("the contact carrier returned unknown class word {0}")]
     UnknownContactClass(u8),

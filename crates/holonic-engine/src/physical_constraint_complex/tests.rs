@@ -51,10 +51,7 @@ fn material(first_target_y: i64) -> Vec<ComponentMaterial> {
         },
         ComponentMaterial {
             lineage: "secondary occurrence".to_owned(),
-            residues: vec![
-                residue(1, "D", 0, first_target_y),
-                residue(2, "E", 2, 1),
-            ],
+            residues: vec![residue(1, "D", 0, first_target_y), residue(2, "E", 2, 1)],
         },
     ]
 }

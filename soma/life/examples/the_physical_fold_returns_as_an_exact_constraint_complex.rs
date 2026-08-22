@@ -1,15 +1,15 @@
 //! M5: one authenticated physical fold returns as an exact constraint complex.
 
-#[path = "m5/cif.rs"]
-mod cif;
 #[path = "m5/artifact.rs"]
 mod artifact;
+#[path = "m5/cif.rs"]
+mod cif;
+#[path = "m5/fold.rs"]
+mod fold;
 #[path = "m5/input.rs"]
 mod input;
 #[path = "m5/npy.rs"]
 mod npy;
-#[path = "m5/fold.rs"]
-mod fold;
 #[path = "m5/visual.rs"]
 mod visual;
 

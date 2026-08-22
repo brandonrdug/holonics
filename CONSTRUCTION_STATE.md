@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-21 after Deed M5. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed M6 / Athena-A0. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE PHYSICAL FOLD RETURNED AS AN EXACT CONSTRAINT COMPLEX, THE SHARED
-JUNCTION SEPARATED ITS PRESENTATIONS, AND THE MATHEMATICS CODEC NOW ENTERS THE TOTAL DESCENT FACE.**
+**CURRENT FRONTIER — THE TOTAL DESCENT ROUTE CULTIVATED THE FIRST ATHENA MATHEMATICS VARIANT,
+THE WITHHELD PASSAGE SEPARATED, AND THE PRODUCT NOW ENTERS THE EXCHANGE WORLD-TUBE.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -112,18 +112,37 @@ its only open gates are the same four stale `arrow.rs` boundary-closure bindings
 unrelated ownership-ratchet disagreements. Focused owners, GPU conduct, Lean, artifact rehash, RON
 remount, visual inspection and the exact eight-part grade pass; the complete gate was not replayed.
 
-**NEXT DEED: M6 / Athena-A0 — the total descent route cultivates the first Athena mathematics
-variant.** [open] Commit `4776099` has discharged the formal theorem the former M6 wording posed, so
-the productive source is content-addressed commit `75597c4`, including `ChordFace` and excluding
-`FaceHomomorphism`; the latter proof passage is withheld exterior teacher/checker testimony and
-must be unavailable to the body. Mount `75597c4` incrementally and recover theorem transport from
-caused hypothesis/state transitions, not names, syntax or imports. Return native and Phoenix Athena
-siblings, the complete point-addition case/fibre complex, targeted source ablations, one resident
-GPU route passage, an independently emitted `sorry`-free total theorem, operation/history
-comparison against the withheld proof, a cultivated source-detached held-out successor, targeted
-route ablation, shortest separators, and the frozen variant manifest. The complete source-access
-refusal and twelve-part grade are in
+**M6 / ATHENA-A0 PASSED — the total descent route cultivated the first Athena mathematics
+variant.** [established-bounded] The `75597c4` source occurrence returned 3,509 declaration
+operations, 109,137 incidence contacts, a complete ten-case/23-refinement/six-obstruction complex,
+nine source ablations and a 48-relation resident RTX 4080 SUPER junction. The productive namespace
+could not access the withheld `4776099` teacher passage. Native and Phoenix rests emitted an
+independent `sorry`-free total theorem and a cultivated held-out successor; Lean accepted both,
+detached remount reproduced both consequences, and targeted removal of the secant/caustic plate
+reopened exactly four cases while identity survived. The generated and teacher propositions agree
+at the declared receiver, while their source and structural transition words remain distinct. The
+219,147,046-byte frozen product returns a 12/12 grade. Its product manifest, twelve-return grade and
+directory manifest have respective SHA-256 identities
+`537d37b2c65e285d7cd7f651c084c04a89eae65dd322482e23463bc8078fe0b6`,
+`5c2600f0aa265e05c028f7e0b56831e6320e2f3ad5dfd0a46fcf887ab51fc28e` and
+`7169916b979c2999b2d4547a8b5fbc2547ab961f1ee359be8ad36658fb56d9cd`.
+Authoritative grade:
+[`research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`](research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md).
+The complete product and continuation contracts are in
 [`blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
+[established-bounded] The sole complete release receiver returned nine passing scopes and four
+concrete defects: one stale sub-warp test, seventeen undispositioned sparse ABI positions, three
+ignored-runtime basenames read as body paths and nine stale boundary-artifact bindings. The exact
+test now passes, the ABI and path retakes return zero failures, and all three boundary artifacts are
+bound; the complete expensive receiver was not replayed.
+
+**NEXT DEED: A1 — the exchange world-tube is mounted without flattening its branches.** [open]
+Compose the existing mouths over operator-authorized Codex and Claude Code rollouts. Mount one
+source occurrence incrementally; preserve message faces inside richer addressed passages; retain
+agent/tool/world join witnesses; separate identical text at distinct causal cuts; return a
+chronology separator under an unlicensed branch permutation; remount the atlas source-detached;
+and return provider/material ablations, excluded populations and the inspected real artifact. The
+ten-part grade and refusal boundary are in the Athena-product blueprint named above.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

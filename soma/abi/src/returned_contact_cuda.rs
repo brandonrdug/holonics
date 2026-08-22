@@ -6,12 +6,94 @@
 //! their owner retains the exact atlases behind the two ordinals.
 
 pub const ENTRY_SYMBOL: &str = "returned_contact_group";
+pub const SPARSE_ENTRY_SYMBOL: &str = "returned_contact_sparse_group";
 pub const LAYOUT_VERSION: u32 = 1;
 
 pub const STATUS_INCOMPLETE: u32 = 0;
 pub const STATUS_COMPLETE: u32 = 1;
 pub const STATUS_INVALID: u32 = 2;
 pub const OPEN_RELATION: u32 = u32::MAX;
+
+// The sparse return is a distinct apparatus chart over the same relation sheet. It returns one
+// exact card-validated relation row, two target counts and two occurrence counts instead of a
+// target×occurrence bitmap. Input rows are strictly ordered by (target, occurrence); the card
+// independently checks that order and therefore detects duplicates without an all-pairs scan.
+pub const SPARSE_LAYOUT_VERSION: u32 = 1;
+pub const SPARSE_CONTROL_VERSION: usize = 0;
+pub const SPARSE_CONTROL_EPOCH: usize = 1;
+pub const SPARSE_CONTROL_TARGETS: usize = 2;
+pub const SPARSE_CONTROL_OCCURRENCES: usize = 3;
+pub const SPARSE_CONTROL_RELATIONS: usize = 4;
+pub const SPARSE_CONTROL_OUTPUT_WORDS: usize = 5;
+pub const SPARSE_CONTROL_WORDS: usize = 6;
+
+pub const SPARSE_OUTPUT_STATUS: usize = 0;
+pub const SPARSE_OUTPUT_VERSION: usize = 1;
+pub const SPARSE_OUTPUT_EPOCH: usize = 2;
+pub const SPARSE_OUTPUT_TARGETS: usize = 3;
+pub const SPARSE_OUTPUT_OCCURRENCES: usize = 4;
+pub const SPARSE_OUTPUT_RELATIONS: usize = 5;
+pub const SPARSE_OUTPUT_INVALID_RELATIONS: usize = 6;
+pub const SPARSE_OUTPUT_TARGET_ROWS_AT: usize = 7;
+pub const SPARSE_OUTPUT_OCCURRENCE_ROWS_AT: usize = 8;
+pub const SPARSE_OUTPUT_RELATION_ROWS_AT: usize = 9;
+pub const SPARSE_OUTPUT_TOTAL_WORDS: usize = 10;
+pub const SPARSE_OUTPUT_HEADER_WORDS: usize = 11;
+pub const SPARSE_TARGET_WITHDRAWN: usize = 0;
+pub const SPARSE_TARGET_FOUNDED: usize = 1;
+pub const SPARSE_TARGET_ROW_WORDS: usize = 2;
+pub const SPARSE_OCCURRENCE_WITHDRAWN: usize = 0;
+pub const SPARSE_OCCURRENCE_FOUNDED: usize = 1;
+pub const SPARSE_OCCURRENCE_ROW_WORDS: usize = 2;
+
+#[inline]
+pub fn sparse_occurrence_rows_at(targets: usize) -> Option<usize> {
+    SPARSE_OUTPUT_HEADER_WORDS.checked_add(targets.checked_mul(SPARSE_TARGET_ROW_WORDS)?)
+}
+
+#[inline]
+pub fn sparse_relation_rows_at(targets: usize, occurrences: usize) -> Option<usize> {
+    sparse_occurrence_rows_at(targets)?
+        .checked_add(occurrences.checked_mul(SPARSE_OCCURRENCE_ROW_WORDS)?)
+}
+
+#[inline]
+pub fn sparse_output_words(targets: usize, occurrences: usize, relations: usize) -> Option<usize> {
+    sparse_relation_rows_at(targets, occurrences)?
+        .checked_add(relations.checked_mul(RELATION_WORDS)?)
+}
+
+pub fn sparse_control(
+    epoch: u32,
+    targets: usize,
+    occurrences: usize,
+    relations: usize,
+) -> Option<[u32; SPARSE_CONTROL_WORDS]> {
+    if epoch == 0 {
+        return None;
+    }
+    Some([
+        SPARSE_LAYOUT_VERSION,
+        epoch,
+        u32::try_from(targets).ok()?,
+        u32::try_from(occurrences).ok()?,
+        u32::try_from(relations).ok()?,
+        u32::try_from(sparse_output_words(targets, occurrences, relations)?).ok()?,
+    ])
+}
+
+pub fn sparse_control_is_canonical(words: &[u32]) -> bool {
+    if words.len() != SPARSE_CONTROL_WORDS {
+        return false;
+    }
+    sparse_control(
+        words[SPARSE_CONTROL_EPOCH],
+        words[SPARSE_CONTROL_TARGETS] as usize,
+        words[SPARSE_CONTROL_OCCURRENCES] as usize,
+        words[SPARSE_CONTROL_RELATIONS] as usize,
+    )
+    .is_some_and(|expected| words == expected)
+}
 
 // One control row.  Redundant offsets and widths are carried deliberately: both sides validate the
 // exact dynamic layout before reading a variable-width target row.
@@ -246,5 +328,17 @@ mod tests {
         forged[CONTROL_TARGET_ROW_WORDS] += 1;
         assert!(!control_is_canonical(&forged));
         assert!(control(0, 3, 33, 7).is_none());
+    }
+
+    #[test]
+    fn sparse_layout_is_linear_in_the_returned_population() {
+        let control = sparse_control(3, 7, 11, 13).expect("sparse control");
+        assert!(sparse_control_is_canonical(&control));
+        assert_eq!(sparse_occurrence_rows_at(7), Some(25));
+        assert_eq!(sparse_relation_rows_at(7, 11), Some(47));
+        assert_eq!(sparse_output_words(7, 11, 13), Some(99));
+        let mut forged = control;
+        forged[SPARSE_CONTROL_OUTPUT_WORDS] += 1;
+        assert!(!sparse_control_is_canonical(&forged));
     }
 }

@@ -1,17 +1,16 @@
 # The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses
 
-**Date:** 2026-08-21
+**Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current deed:** M6, rebased below after the formal proof it originally posed returned at
-`4776099`.
+**Current deed:** A1. M6 / Athena-A0 returned all twelve required consequences on 2026-08-22.
 **Scheduling boundary:** this file orders the Athena-product continuation. It does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md); only a returned deed and passing grade do that.
 
 **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts;
-`established-bounded` for the admitted H0--H5, W1--W5 and M0--M5 returns; `proved-derived` for the
+`established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived` for the
 named local Lean theorems; `interpretation` for their transfer into the construction geometry; and
-`open` for M6 and every later Athena product deed.
+`open` for A1 and every later Athena product deed.
 
 **Governing doctrine:**
 [`TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -294,7 +293,7 @@ a substitute for proving the local generator squares.
 
 ---
 
-## 7. Deed M6 / Athena-A0 — the total descent route cultivates the first Athena mathematics variant
+## 7. Deed M6 / Athena-A0 — the total descent route cultivates the first Athena mathematics variant — PASSED
 
 ### 7.1 The source occurrence is rebased because the answer now exists
 
@@ -321,7 +320,7 @@ generated cache resolving to `T0` was available to the productive body.
 
 ### 7.2 The product
 
-[open] M6 returns the first explicitly graded product
+[established-bounded] M6 returned the first explicitly graded product
 
 ```text
 Athena^[Gemma]_(descent-face receiver/history family),
@@ -393,6 +392,20 @@ M6 refuses if:
 
 M6 moves construction state only when all twelve returns stand together. The already-committed Lean
 proof sharpens the target; it does not pre-pass the machine deed.
+
+### 7.6 Returned grade
+
+[established-bounded; implemented-exact; formal-checked; measured] All twelve returns stand
+together. The source-access audit excludes T0 from the productive namespace; the exact operation
+complex descends through ten cases, 23 refinement leaves and six impossible-overlap fibres; one
+48-relation RTX 4080 SUPER passage returns the refinement junction; native and Phoenix rests emit
+the checked primary and cultivated held-out theorems after source detachment; targeted ablation
+reopens the attributable four-case population; and the frozen product returns an inference entry,
+exact line mesh, work/fibre testimony and complete manifest. The authoritative record is
+[`research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`](../research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md).
+
+[open] The fixed five-plate Lean exterior projection is not unrestricted theorem synthesis, and
+unexcited Gemma conduct remains outside the Athena-A0 receiver/history aperture.
 
 ---
 

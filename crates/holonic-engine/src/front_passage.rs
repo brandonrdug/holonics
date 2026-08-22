@@ -4203,7 +4203,7 @@ mod tests {
     }
 
     #[test]
-    fn a_sub_warp_cell_is_a_placement_obstruction_not_a_fallback() {
+    fn a_sub_warp_cell_stays_resident_and_returns_idle_lane_dilation() {
         let Some((_, surface)) = surface() else {
             return;
         };
@@ -4219,28 +4219,32 @@ mod tests {
         );
         let passage = FrontPassage::new(surface, ResidentGrain(20));
         let before = surface.census();
-        let outcome = passage.bind(
-            &complex,
-            &realization,
-            &material,
-            &occurrence(),
-            &DeedReceiver::unbounded(),
-            None,
-            s,
+        let bound = passage
+            .bind(
+                &complex,
+                &realization,
+                &material,
+                &occurrence(),
+                &DeedReceiver::unbounded(),
+                None,
+                s,
+            )
+            .expect("the partial warp remains on the declared resident chart");
+        let resident_chart = ChartId::Device(surface.declaration().ordinal);
+        assert!(bound.receipts.iter().all(|front| {
+            front.cover.cpu_cells == 0 && front.cover.occupied.contains(&resident_chart)
+        }));
+        assert!(
+            bound
+                .receipts
+                .iter()
+                .any(|front| !front.cover.idle_lanes.is_zero()),
+            "unused lanes return as dilation instead of a CPU placement"
         );
-        assert!(matches!(
-            outcome,
-            Err(FrontPassageObstruction::Resource(
-                ResourceObstruction::Placement {
-                    chart: ChartId::Cpu,
-                    ..
-                }
-            ))
-        ));
         assert_eq!(
             surface.census().deed_launches,
             before.deed_launches,
-            "no deed, no CPU computation"
+            "binding the resident passage does not launch it"
         );
     }
 
