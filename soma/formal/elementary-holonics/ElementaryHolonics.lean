@@ -72,3 +72,4 @@ import ElementaryHolonics.Millennium.AlternatingParity
 import ElementaryHolonics.Millennium.Congruum
 import ElementaryHolonics.Millennium.ChordFace
 import ElementaryHolonics.Millennium.FaceHomomorphism
+import ElementaryHolonics.Millennium.FamilyFace
