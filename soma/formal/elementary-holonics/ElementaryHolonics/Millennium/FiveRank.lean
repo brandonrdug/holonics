@@ -465,4 +465,16 @@ theorem theRankClauseHoldsWholeAtFive :
     · exact_mod_cast FiveWitness.theAnalyticRankAtFiveIsOne
     · exact absurd h.1 (theAlgebraicRankAtFiveIsBelowTwo (m + 2) (by omega))
 
+/-- **THE POSED BIRCH–SWINNERTON-DYER CONJECTURE HOLDS AT FIVE**, for every choice of
+arithmetic parameters: the rank clause holds whole, and the rank-zero ledger clause
+discharges because the algebraic rank is one — its antecedent refutes against the
+kernel-checked point.  The rank-one leading-coefficient clause is the pose's own
+named successor and is not part of this proposition. -/
+theorem theBirchSwinnertonDyerConjectureHoldsAtFive (tamagawa torsion : ℕ) :
+    BirchSwinnertonDyer.TheBirchSwinnertonDyerConjecture 5
+      FiveWitness.theWitnessAtFive tamagawa torsion := by
+  refine ⟨theRankClauseHoldsWholeAtFive, ?_⟩
+  intro h0
+  exact absurd BirchSwinnertonDyer.theAlgebraicRankAtFiveIsAtLeastOne h0.2
+
 end Soma.Holonics.Millennium.FiveRank
