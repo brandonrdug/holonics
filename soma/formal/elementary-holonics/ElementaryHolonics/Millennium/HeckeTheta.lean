@@ -814,4 +814,126 @@ theorem theHeckeThetaFunctionalEquation {x : ℝ} (hx : 0 < x) :
     + (64 * oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (4 * Real.sqrt 2 * x) *
       cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x)) * rpow_sixteen hx
 
+/-! ## 13. The strong FE-pair: the completed L-function is entire and reflects at one
+
+`heckeTheta` is continuous on `(0, ∞)`, decays exponentially at `∞`, and satisfies the
+weight-two transformation law with sign `+1` and no constant term; so `(θ, θ)` is a
+`StrongFEPair` and mathlib's abstract Mellin machinery returns the completed L-function
+entire with `Λ(2−s) = Λ(s)` — no region of convergence, no analytic continuation step,
+the reflection carries everything. -/
+
+lemma continuousOn_heckeTheta : ContinuousOn heckeTheta (Set.Ioi 0) := by
+  have h1 : ContinuousOn
+      (fun x : ℝ => oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (4 * Real.sqrt 2 * x))
+      (Set.Ioi 0) := by
+    refine (continuousOn_oddKernel _).comp (Continuous.continuousOn (by fun_prop)) ?_
+    intro x hx
+    simp only [Set.mem_Ioi] at hx ⊢
+    positivity
+  have h2 : ContinuousOn
+      (fun x : ℝ => cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x))
+      (Set.Ioi 0) := by
+    refine (continuousOn_cosKernel _).comp (Continuous.continuousOn (by fun_prop)) ?_
+    intro x hx
+    simp only [Set.mem_Ioi] at hx ⊢
+    positivity
+  unfold heckeTheta heckeThetaA heckeThetaC
+  exact (continuousOn_const.mul h1).mul h2
+
+lemma isBigO_atTop_heckeTheta :
+    ∃ p, 0 < p ∧ (heckeTheta =O[Filter.atTop] fun x => rexp (-p * x)) := by
+  obtain ⟨p, hp, hp'⟩ := isBigO_atTop_oddKernel ((1 / 4 : ℝ) : UnitAddCircle)
+  obtain ⟨q, hq, hq'⟩ := isBigO_atTop_cosKernel_sub ((1 / 2 : ℝ) : UnitAddCircle)
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  have ht1 : Filter.Tendsto (fun x : ℝ => 4 * Real.sqrt 2 * x) Filter.atTop Filter.atTop :=
+    Filter.tendsto_id.const_mul_atTop (by positivity)
+  have ht2 : Filter.Tendsto (fun x : ℝ => Real.sqrt 2 * x) Filter.atTop Filter.atTop :=
+    Filter.tendsto_id.const_mul_atTop hs
+  have h1 : (fun x : ℝ => oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (4 * Real.sqrt 2 * x))
+      =O[Filter.atTop] fun x => rexp (-(4 * Real.sqrt 2 * p) * x) := by
+    refine (hp'.comp_tendsto ht1).congr' Filter.EventuallyEq.rfl ?_
+    exact Filter.Eventually.of_forall fun x => by
+      show rexp (-p * (4 * Real.sqrt 2 * x)) = rexp (-(4 * Real.sqrt 2 * p) * x)
+      congr 1
+      ring
+  have hcosB : (fun x : ℝ => cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x))
+      =O[Filter.atTop] fun _ : ℝ => (1 : ℝ) := by
+    have hsub : (fun x : ℝ => cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x) - 1)
+        =O[Filter.atTop] fun _ : ℝ => (1 : ℝ) := by
+      refine (hq'.comp_tendsto ht2).trans ?_
+      refine Asymptotics.IsBigO.of_bound 1 ?_
+      filter_upwards [Filter.eventually_ge_atTop (0 : ℝ)] with x hx
+      show |((fun x => rexp (-q * x)) ∘ fun x => Real.sqrt 2 * x) x| ≤ 1 * ‖(1 : ℝ)‖
+      simp only [Function.comp_apply]
+      rw [abs_of_nonneg (Real.exp_nonneg _), norm_one, mul_one]
+      exact Real.exp_le_one_iff.mpr (by nlinarith [mul_nonneg (mul_nonneg hq.le hs.le) hx])
+    have hone : (fun _ : ℝ => (1 : ℝ)) =O[Filter.atTop] fun _ : ℝ => (1 : ℝ) :=
+      Asymptotics.isBigO_refl _ _
+    have := hsub.add hone
+    refine this.congr_left fun x => ?_
+    ring
+  refine ⟨4 * Real.sqrt 2 * p, by positivity, ?_⟩
+  have hprod := (h1.const_mul_left 4).mul hcosB
+  have hL : ∀ x : ℝ, 4 * oddKernel ((1 / 4 : ℝ) : UnitAddCircle) (4 * Real.sqrt 2 * x) *
+      cosKernel ((1 / 2 : ℝ) : UnitAddCircle) (Real.sqrt 2 * x) = heckeTheta x := fun x => rfl
+  have hR : ∀ x : ℝ, rexp (-(4 * Real.sqrt 2 * p) * x) * 1 = rexp (-(4 * Real.sqrt 2 * p) * x) :=
+    fun x => mul_one _
+  exact (hprod.congr_left hL).congr_right hR
+
+/-- The strong FE-pair of the congruent-number curve at one: `f = g = heckeTheta`,
+weight `2`, sign `+1`, no constant terms. -/
+def heckeFEPair : StrongFEPair ℂ where
+  f := Complex.ofReal ∘ heckeTheta
+  g := Complex.ofReal ∘ heckeTheta
+  k := 2
+  hk := two_pos
+  ε := 1
+  hε := one_ne_zero
+  f₀ := 0
+  g₀ := 0
+  hf₀ := rfl
+  hg₀ := rfl
+  hf_int := (Complex.continuous_ofReal.comp_continuousOn
+    continuousOn_heckeTheta).locallyIntegrableOn measurableSet_Ioi
+  hg_int := (Complex.continuous_ofReal.comp_continuousOn
+    continuousOn_heckeTheta).locallyIntegrableOn measurableSet_Ioi
+  h_feq x hx := by
+    have hfe := theHeckeThetaFunctionalEquation (Set.mem_Ioi.mp hx)
+    simp only [Function.comp_apply, one_mul, smul_eq_mul, hfe]
+    rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) from by norm_num, Real.rpow_natCast]
+    push_cast
+    ring
+  hf_top r := by
+    obtain ⟨p, hp, hp'⟩ := isBigO_atTop_heckeTheta
+    simpa using isBigO_ofReal_left.mpr <|
+      hp'.trans (isLittleO_exp_neg_mul_rpow_atTop hp r).isBigO
+  hg_top r := by
+    obtain ⟨p, hp, hp'⟩ := isBigO_atTop_heckeTheta
+    simpa using isBigO_ofReal_left.mpr <|
+      hp'.trans (isLittleO_exp_neg_mul_rpow_atTop hp r).isBigO
+
+/-- **The completed L-function of the congruent-number curve at one**, defined as the
+Mellin transform of its theta function — the integral the classical
+`Λ(s) = (√32/2π)^s Γ(s) L(E₁,s)` equals, constructed with no convergence region. -/
+def heckeLambda : ℂ → ℂ := heckeFEPair.Λ
+
+/-- **The completed L-function is entire.**  No pole, no continuation step: the strong
+FE-pair machinery returns differentiability on all of `ℂ` at once. -/
+theorem theCompletedLFunctionIsEntire : Differentiable ℂ heckeLambda :=
+  heckeFEPair.differentiable_Λ
+
+/-- The Mellin representation: `heckeLambda s` is the convergent Mellin transform of the
+theta function at every `s`. -/
+theorem theCompletedLFunctionHasMellin (s : ℂ) :
+    HasMellin (Complex.ofReal ∘ heckeTheta) s (heckeLambda s) :=
+  heckeFEPair.hasMellin s
+
+/-- **The functional equation of the completed L-function**: `Λ(2 − s) = Λ(s)`.
+Weight two, sign `+1` — the analytic reflection of the congruent-number curve at one,
+kernel-checked with no analytic continuation argument. -/
+theorem theCompletedLFunctionalEquation (s : ℂ) : heckeLambda (2 - s) = heckeLambda s := by
+  have h := heckeFEPair.functional_equation s
+  rw [show heckeFEPair.k = (2 : ℝ) from rfl, show heckeFEPair.ε = (1 : ℂ) from rfl] at h
+  simpa [heckeLambda, StrongFEPair.Λ_eq, StrongFEPair.symm_Λ_eq, one_smul] using h
+
 end Soma.Holonics.Millennium.HeckeTheta
