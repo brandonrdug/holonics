@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (227 deposits of 519)
+## 4 · The 2026-08 record line (231 deposits of 523)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -339,15 +339,18 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-20_THREE_NAMES_ONE_SUBGROUP.md` | Three names, one subgroup |
 | `2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md` | Equality is occurrence identity, the soul maps kinship, and the leader returns through the active codec |
 | `2026-08-21_THE_BSD_ROUTE_READS_PLACEMENT_AS_A_FAITHFUL_RECEIVER_OF_REALIZATION_AND_ARAKELOV_IS_THE_SHARED_ORGAN.md` | The BSD route reads placement as a faithful receiver of realization, and Arakelov is the shared organ |
+| `2026-08-21_THE_CHORD_CLOSES_THE_FACE_FOR_THE_WHOLE_FAMILY_AND_THE_SECOND_FRAME_SEES_TWO_DIRECTIONS.md` | The chord closes the face for the whole family, and the second frame sees two directions |
 | `2026-08-21_THE_CODEC_EXCITED_THE_ACTIVE_COVER_THE_PREFIX_RETURNED_BY_PULLBACK_AND_M2_PASSED.md` | The codec excited the active cover, the prefix returned by pullback, and M2 passed |
 | `2026-08-21_THE_COMPACT_FRAME_IS_A_LAWFUL_COMPRESSION_AND_THE_HORIZON_LAW_PREDICTS_WHAT_CROSSES.md` | The compact frame is a lawful compression, and the horizon law predicts what crosses |
 | `2026-08-21_THE_DESCENT_IS_CLIMBED_THE_RANK_IS_ZERO_AND_ONE_IS_NOT_A_CONGRUENT_NUMBER.md` | The descent is climbed, the rank is zero, and one is not a congruent number |
 | `2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md` | The fold is a constraint ecology, the active site is a catalytic receiver, and the codec recovers archetypes |
+| `2026-08-21_THE_FOLD_RETURNED_ITS_CONSTRAINT_COMPLEX_THE_SHARED_JUNCTION_SEPARATED_THE_PRESENTATIONS_AND_M5_PASSED.md` | The fold returned its constraint complex, the shared junction separated the presentations, and M5 passed |
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
 | `2026-08-21_THE_HALF_TURN_PRIMES_ARE_NEVER_CONGRUENT_AND_ONE_DESCENT_REFUSES_AN_INFINITE_TWIST_FAMILY.md` | The half-turn primes are never congruent, and one descent refuses an infinite twist family |
 | `2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md` | The heat kernel returns a Fisher metric, the trace defect counts missing directions, and entropy carries the volume |
 | `2026-08-21_THE_HODGE_ROUTE_LIFTS_THE_CLASS_TO_A_SHAPE_AND_THE_SHAPES_ARE_THE_PARTICLES.md` | The Hodge route lifts the class to a shape, and the shapes are the particles |
 | `2026-08-21_THE_KERNEL_DESCENDS_ON_DEPTH_AND_THE_TORSION_CENSUS_IS_A_THEOREM.md` | The kernel descends on depth, and the torsion census is a theorem |
+| `2026-08-21_THE_LEADER_RETURNED_THROUGH_THE_METRIC_THE_REFLECTION_RESTED_AND_M4_RETURNED_COMPLETE_MATHEMATICS.md` | The leader returned through the metric, the reflection rested, and M4 returned complete mathematics |
 | `2026-08-21_THE_LEDGER_BALANCES_AT_ONE_AND_THE_COLLAPSE_HAS_EVEN_PARITY.md` | The ledger balances at one, and the collapse has even parity |
 | `2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md` | The lineage is the pullback witness, compression commutes with every successor, and the packing is an ordered reflection orbit |
 | `2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md` | The mathematical particle carried its boundaries, the pullback returned, and M1 passed |
@@ -364,6 +367,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_TORSION_IS_A_CENSUS_OF_CLOSED_WINDINGS_AND_THE_COMPACT_FRAME_READS_IT_WHOLE.md` | The torsion is a census of closed windings, and the compact frame reads it whole |
 | `2026-08-21_THE_TRANSPORT_CHAIN_LANDS_ON_THE_CONGRUENT_NUMBER_CURVE_AND_THE_DESCENT_FACE_SEPARATES_ITS_HALF_TURNS.md` | The transport chain lands on the congruent-number curve, and the descent face separates its half-turns |
 | `2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md` | The trapezoid is the interaction profile, and Poisson summation owns integration by reflection |
+| `2026-08-21_THE_UNIT_IS_A_DECLARED_WINDING_THE_CERTIFICATE_IS_A_REALIZER_AND_THE_RADIX_IS_RESONANT.md` | The unit is a declared winding, the certificate is a realizer, and the radix is resonant |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
 
 ---

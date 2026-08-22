@@ -70,3 +70,4 @@ import ElementaryHolonics.Millennium.ThetaCensus
 import ElementaryHolonics.Millennium.TateLedger
 import ElementaryHolonics.Millennium.AlternatingParity
 import ElementaryHolonics.Millennium.Congruum
+import ElementaryHolonics.Millennium.ChordFace
