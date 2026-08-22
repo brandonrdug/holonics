@@ -248,6 +248,22 @@ impl ProductSession {
             .map_err(|error| error.to_string())
     }
 
+    /// Return one exterior text face from authenticated native codebook addresses.
+    ///
+    /// The reverse source chart and tokenizer decoder are both declared W1 companions. This is a
+    /// codec crossing only: it neither chooses a boundary state nor determines recurrence extent.
+    pub fn decode_native_ids(&self, native_ids: &[u32]) -> Result<String, String> {
+        if native_ids.is_empty() {
+            return Err("the native decoder received no addressed occurrence".to_owned());
+        }
+        let source_ids = self.source_ids(native_ids)?;
+        let tokenizer = tokenizers::Tokenizer::from_bytes(&self.artifact.tokenizer_json)
+            .map_err(|error| error.to_string())?;
+        tokenizer
+            .decode(&source_ids, false)
+            .map_err(|error| error.to_string())
+    }
+
     fn encode_partitioned(
         &self,
         text: &str,

@@ -327,6 +327,7 @@ pub struct CudaRefineExecutor {
     /// The LAW: the material-free quotient every organ with a front shares.
     claim: CuFunction,
     native_word: CuFunction,
+    native_trace: CuFunction,
     contact_pairs: CuFunction,
     contact_compare: CuFunction,
     device_name: String,
@@ -392,6 +393,7 @@ impl CudaRefineExecutor {
             let mut claimed = ptr::null_mut();
             let mut claim = ptr::null_mut();
             let mut native_word = ptr::null_mut();
+            let mut native_trace = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
             let mut contact_compare = ptr::null_mut();
             for (slot, symbol, operation) in [
@@ -414,6 +416,11 @@ impl CudaRefineExecutor {
                     &mut native_word as *mut CuFunction,
                     c"conduct_native_word",
                     "cuModuleGetFunction(conduct_native_word)",
+                ),
+                (
+                    &mut native_trace as *mut CuFunction,
+                    c"conduct_native_trace",
+                    "cuModuleGetFunction(conduct_native_trace)",
                 ),
                 (
                     &mut contact_pairs as *mut CuFunction,
@@ -444,6 +451,7 @@ impl CudaRefineExecutor {
                 claimed,
                 claim,
                 native_word,
+                native_trace,
                 contact_pairs,
                 contact_compare,
             ] {
@@ -463,6 +471,7 @@ impl CudaRefineExecutor {
                 claimed,
                 claim,
                 native_word,
+                native_trace,
                 contact_pairs,
                 contact_compare,
                 device_name,
@@ -653,6 +662,22 @@ impl CudaRefineExecutor {
 pub struct DeviceNativeWord {
     pub native_end: Vec<u32>,
     pub launches: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One complete native ordered-word trace returned from the card after one terminal read.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceNativeTrace {
+    /// Row-major `[starting occurrence][word boundary]`, including the entering state.
+    pub native_trace: Vec<u32>,
+    pub trace_stride: usize,
+    pub starting_occurrences: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
     pub host_ingress_octets: u64,
     pub host_egress_octets: u64,
     pub resident_octets: u64,
@@ -965,6 +990,134 @@ impl CudaRefineExecutor {
             host_ingress_octets: table_octets + word_octets + state_octets,
             host_egress_octets: state_octets,
             resident_octets: table_octets + word_octets + state_octets * 2,
+        })
+    }
+
+    /// Carry every starting occurrence through one complete ordered word and retain every
+    /// intermediate boundary until the one terminal card read.
+    ///
+    /// This is the trace face of [`Self::conduct_native_word_on_device`], not another transition
+    /// law. The word extent comes from the caller's admitted causal section. No callback, scalar
+    /// winner, or stop case crosses between its steps.
+    pub fn conduct_native_trace_on_device(
+        &mut self,
+        states: usize,
+        generators: usize,
+        generator_table: &[u32],
+        word: &[u32],
+        native_start: &[u32],
+    ) -> Result<DeviceNativeTrace, CudaRefineError> {
+        let expected = states
+            .checked_mul(generators)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_stride = word
+            .len()
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_entries = native_start
+            .len()
+            .checked_mul(trace_stride)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if generator_table.len() != expected {
+            return Err(CudaRefineError::NativeTableExtentDisagrees {
+                table_entries: generator_table.len(),
+                generators,
+                states,
+            });
+        }
+        if states > u32::MAX as usize
+            || generators > u32::MAX as usize
+            || word.len() > u32::MAX as usize
+            || trace_stride > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = generator_table
+            .iter()
+            .chain(native_start)
+            .copied()
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+        if let Some(generator) = word
+            .iter()
+            .copied()
+            .find(|generator| *generator as usize >= generators)
+        {
+            return Err(CudaRefineError::NativeGeneratorOutsideFamily {
+                generator,
+                generators,
+            });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let table = Buffer::of(generator_table)?;
+        let device_word = Buffer::of(word)?;
+        let start = Buffer::of(native_start)?;
+        let trace = Buffer::alloc(trace_entries * std::mem::size_of::<u32>())?;
+        let count = native_start.len();
+        if count > 0 {
+            let grid = self.grid_for(count as u64)?;
+            let mut table_pointer = table.pointer;
+            let mut word_pointer = device_word.pointer;
+            let mut start_pointer = start.pointer;
+            let mut trace_pointer = trace.pointer;
+            let mut cell_count = count as u32;
+            let mut state_count = states as u32;
+            let mut word_length = word.len() as u32;
+            let mut stride = trace_stride as u32;
+            let mut arguments: [*mut c_void; 8] = [
+                &mut table_pointer as *mut u64 as *mut c_void,
+                &mut word_pointer as *mut u64 as *mut c_void,
+                &mut start_pointer as *mut u64 as *mut c_void,
+                &mut trace_pointer as *mut u64 as *mut c_void,
+                &mut cell_count as *mut u32 as *mut c_void,
+                &mut state_count as *mut u32 as *mut c_void,
+                &mut word_length as *mut u32 as *mut c_void,
+                &mut stride as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.native_trace,
+                        grid,
+                        1,
+                        1,
+                        self.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(conduct_native_trace)",
+            )?;
+            driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+            self.launches += 1;
+        }
+        let mut native_trace = vec![0u32; trace_entries];
+        if count > 0 {
+            trace.read(&mut native_trace)?;
+        }
+        let table_octets = std::mem::size_of_val(generator_table) as u64;
+        let word_octets = std::mem::size_of_val(word) as u64;
+        let state_octets = std::mem::size_of_val(native_start) as u64;
+        let trace_octets = (trace_entries * std::mem::size_of::<u32>()) as u64;
+        Ok(DeviceNativeTrace {
+            native_trace,
+            trace_stride,
+            starting_occurrences: count,
+            launches: u64::from(count > 0),
+            synchronizations: u64::from(count > 0),
+            block_threads: self.block_x,
+            active_lanes: count as u32,
+            host_ingress_octets: table_octets + word_octets + state_octets,
+            host_egress_octets: trace_octets,
+            resident_octets: table_octets + word_octets + state_octets + trace_octets,
         })
     }
 

@@ -175,6 +175,17 @@ governs the rebuild.
   — admits the distinct realization relations, ordered-word closure, complete reconstruction
   fibres, executable M3/A3 passage and exact atlas; records 2,826 passing tests and the separated
   cheap catalog retake; and places I1 at the recurrent causal-boundary frontier.
+- **I1 recurrent causal-boundary candidate:**
+  `records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md`
+  — derives a complete three-front passage from the first repeated boundary; retains five source
+  sections, complete fibres and two richer-receiver reopenings; executes the source-detached native
+  recurrence in one terminal GPU return; and records the passing nine-part candidate grade while
+  retaining the release-admission boundary.
+- **I1 release admission:**
+  `records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`
+  — admits the first-recurrence-derived complete passage, retained before/after sections, complete
+  fibres, richer-history reopenings and source-detached one-launch GPU return; records all thirteen
+  green release scopes and places I2 at the exterior-consequence/causal-return frontier.
 - **The whole foreign map crossed once and the native rest returned without its source:**
   `records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`
   — Phoenix Deed W1: 45 authenticated operation complexes, 1,466 resident-law correspondences,

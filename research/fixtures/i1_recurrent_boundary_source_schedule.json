@@ -1,0 +1,11 @@
+{
+  "schema": "holonics.i1.source-schedule-control.v1",
+  "truth_status": "established-bounded",
+  "formation": "The four contexts were fixed after an exploratory exact-source probe returned the alternating boundary faces. They are an exterior matched control only: no expected output, response length, terminal symbol, semantic class, or native transition is carried by this occurrence.",
+  "contexts": [
+    "The capital of France is",
+    "The capital of France is France",
+    "The capital of France is France is",
+    "The capital of France is France is France"
+  ]
+}

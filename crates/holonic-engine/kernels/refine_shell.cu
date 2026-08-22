@@ -171,6 +171,35 @@ extern "C" __global__ void conduct_native_word(
     native_end[at] = state;
 }
 
+/// **The same quotient action with every intermediate boundary retained for one terminal read.**
+///
+/// Each lane owns one starting occurrence and writes its complete ordered trace. The word, total
+/// action, and starting population cross once; no apparatus callback observes or selects an
+/// intermediate state. `trace_stride` is `word_length + 1`, derived by the caller from the word it
+/// is enacting rather than supplied as a second aperture.
+extern "C" __global__ void conduct_native_trace(
+    const uint32_t *generator_table,
+    const uint32_t *word,
+    const uint32_t *native_start,
+    uint32_t *native_trace,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t word_length,
+    uint32_t trace_stride)
+{
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= cell_count) {
+        return;
+    }
+    uint32_t state = native_start[at];
+    const uint64_t trace_at = (uint64_t)at * (uint64_t)trace_stride;
+    native_trace[trace_at] = state;
+    for (uint32_t step = 0; step < word_length; ++step) {
+        state = generator_table[word[step] * state_count + state];
+        native_trace[trace_at + (uint64_t)step + 1ULL] = state;
+    }
+}
+
 __device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
     // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
     // aperture; this expression is nevertheless total over the full wire.

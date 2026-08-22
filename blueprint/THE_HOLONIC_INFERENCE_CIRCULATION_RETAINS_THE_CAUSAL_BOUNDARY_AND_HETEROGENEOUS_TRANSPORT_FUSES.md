@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0 passed its complete/cheap-retake release boundary. I1 is the active deed.
+**Current boundary:** I1 passed its complete release boundary. I2 is the active deed.
 I0--I5 replace the former
 second-LLM-first A4--A6 schedule.
 **Scheduling boundary:** this file does not move
@@ -11,9 +11,9 @@ second-LLM-first A4--A6 schedule.
 position record.
 
 **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and
-fusion contracts; `established-bounded` for the cited M3--M6 and A1--I0 evidence; `proved-derived`
+fusion contracts; `established-bounded` for the cited M3--M6 and A1--I1 evidence; `proved-derived`
 for the named Lean theorems; `project-postulate` for placement and operator discipline; `open` for
-I1--I5 and every later heterogeneous-source deed.
+I2--I5 and every later heterogeneous-source deed.
 
 **Derivation:**
 [`2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md`](../research/records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md).
@@ -290,7 +290,17 @@ the apparatus already required by its source closure and reuses unchanged addres
 
 ## 8. Deed I1 — recurrence retains a causal boundary and returns a complete emitted passage
 
-[open] I1 composes the existing Gemma tower, A2 plural continuation section, I0 realization
+[established-bounded; implemented-exact; measured] I1 is admitted. Four
+fixed source controls expose a three-state boundary recurrence; its first repeated boundary derives
+the complete emitted passage `" France is France"`; the source-detached native rest executes the
+complete four-state trace in one terminal GPU return; and two fuller terminal-potential receivers
+reopen the repeated boundary classes. The nine-part candidate grade and all thirteen release scopes
+pass. Candidate record:
+[`2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`](../research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md).
+
+[definition] I1 composes the existing Gemma tower, A2 plural continuation section, I0 realization
 passages, causal/recurrent sections, and current-world boundary into one recurrent deed.
 
 ### 8.1 No authored response length

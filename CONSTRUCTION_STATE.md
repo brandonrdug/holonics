@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I0. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed I1. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE REALIZATION PASSAGE RETAINED LINEAGE, EVERY SUCCESSOR WORD CLOSED, AND I0
-PASSED ITS RELEASE RECEIVER.**
+**CURRENT FRONTIER — THE RECURRENT BOUNDARY RETURNED THE COMPLETE PASSAGE, THE LONGER HISTORY
+REOPENED, AND I1 PASSED ITS RELEASE RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -218,12 +218,27 @@ seconds. A concurrent documentary Lean commit made only the cheap 342-driver cat
 regeneration and its named retake passed with zero uncatalogued drivers. All thirteen scopes are
 green under the required complete/cheap-retake reporting.
 
-**NEXT DEED: I1 RETAINS THE RECURRENT CAUSAL BOUNDARY AND RETURNS A COMPLETE EMITTED PASSAGE.**
-[open] I1 composes the admitted I0 realization passage, Gemma tower, A2 plural continuation,
-causal/recurrent sections and current-world boundary. It owes source-detached retained sections at
-every recurrence, exact lineage, complete boundary-response fibres, a matched source-schedule
-control, a longer-history reopening control, and one complete textual passage whose extent is
-derived from frontier/exterior closure on the resident GPU.
+**I1 PASSED — the recurrent causal boundary returned one complete emitted passage.**
+[established-bounded; implemented-exact; measured] Four fixed source controls returned a total
+three-state boundary recurrence. Its first repeated state derived the complete trace `[0,1,2,1]`
+and emitted passage `" France is France"`; five source sections, three complete fibres and two
+richer terminal-potential reopenings retain what the boundary quotient condensed. The 1,418-octet
+source-detached rest returned the whole trace through one RTX 4080 SUPER launch/synchronization with
+no source access or intermediate CPU semantic callback. The fourteen-member 5,079,120-octet family
+has directory SHA-256 `ca2a00f84ab17968bb4b824f4539bb0801e95e7b05b7e43671bcd49fd9efbd6b`.
+Authoritative grade:
+[`research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`](research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md).
+[established-bounded; measured] The sole complete receiver passed all thirteen scopes in 349.77
+seconds: 2,827 tests passed, none failed, 22 were explicitly ignored, every example target
+type-checked, and all twelve non-test scopes were green.
+
+**NEXT DEED: I2 EXTERIOR CONSEQUENCE RETURNS AND CHANGES LATER CONDUCT.**
+[open] I2 composes I1 emission, `current_world`/`exact_world`, returned conduct, metric-adjoint
+reflection and the existing A3 cultivation/rest owners. It owes distinct emitted and exterior
+events, an exact returned difference, a causal-adjoint passage through the actual forward lineage,
+explicit commit/decline, source-detached successor conduct, a nonidentical held-out change,
+subject/port-disjoint control, targeted ablation, revisit holonomy, reopened fibres, source audit,
+exact work and separate apparatus testimony.
 
 [open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
 return, durable cultivation, generator-native compression, complete answers, and multimodality are

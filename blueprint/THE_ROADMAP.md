@@ -174,6 +174,16 @@ Candidate record:
 Release admission:
 [`research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`](../research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md).
 
+**I1 PASSED.** Four fixed foreign controls founded a
+three-state recurrent boundary whose first repeated state derives the complete passage
+`" France is France"`. The detached generator-native rest returns the complete trace in one GPU
+launch/synchronization with no source access or intermediate CPU semantic callback; two complete
+terminal-potential receivers reopen the static quotient. All thirteen release scopes pass in
+349.77 seconds. Candidate record:
+[`research/records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`](../research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md).
+
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
 emission; I2 closes emission/world/return/reflection/deposit/later-current; I3 performs recurrent
