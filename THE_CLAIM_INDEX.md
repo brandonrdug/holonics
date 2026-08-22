@@ -131,7 +131,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (233 deposits of 525)
+## 4 · The 2026-08 record line (234 deposits of 526)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -372,6 +372,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md` | The trapezoid is the interaction profile, and Poisson summation owns integration by reflection |
 | `2026-08-21_THE_UNIT_IS_A_DECLARED_WINDING_THE_CERTIFICATE_IS_A_REALIZER_AND_THE_RADIX_IS_RESONANT.md` | The unit is a declared winding, the certificate is a realizer, and the radix is resonant |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
+| `2026-08-22_THE_TWO_DESCENT_AT_THIRTY_FOUR_IS_COMPLETE_AND_THE_IMAGE_IS_EXACTLY_THE_REALIZED_SIXTEEN.md` | The two-descent at thirty-four is complete, and the image is exactly the realized sixteen |
 
 ---
 
@@ -390,7 +391,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md` |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 30 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 32 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

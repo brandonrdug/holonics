@@ -76,3 +76,4 @@ import ElementaryHolonics.Millennium.Congruum
 import ElementaryHolonics.Millennium.ChordFace
 import ElementaryHolonics.Millennium.FaceHomomorphism
 import ElementaryHolonics.Millennium.FamilyFace
+import ElementaryHolonics.Millennium.FaceImage
