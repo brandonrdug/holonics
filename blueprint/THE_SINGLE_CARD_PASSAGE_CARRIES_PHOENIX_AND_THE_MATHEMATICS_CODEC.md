@@ -1186,9 +1186,11 @@ M6 now returns the first explicitly graded native/Phoenix Athena mathematics sib
 case and active-route complexes, one GPU-resident route passage, an independently emitted
 `sorry`-free total theorem, operation/history comparison against the withheld proof, one cultivated
 held-out successor, detached remount, targeted route ablation, exact work/fibres and the Athena
-product manifest. The complete twelve-part grade, source-access law, case population and A1--A6
-continuation are authoritative in
+product manifest. The complete twelve-part grade, source-access law and case population remain
+authoritative in
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
+The superseding I0--I5 continuation is authoritative in
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
 
 The theorem name, file path, Lean syntax, tactics and import graph remain delivery lineage and
 controls. A theorem-count atlas, tactic replay, CPU-authored case list, finite point census,

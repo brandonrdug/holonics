@@ -3,10 +3,10 @@
 use std::collections::BTreeMap;
 
 use life::exchange_world_tube::{Digest32, ExchangeWorldTube, VisibleMessageFace};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HistoryMessage {
     pub occurrence: String,
     pub container: u32,
@@ -18,14 +18,14 @@ pub struct HistoryMessage {
     pub phase_face: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HistorySeparator {
     pub against_prompt_occurrence: String,
     pub suffix_messages: Option<usize>,
     pub separating_face: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowJoinWitness {
     pub class: u32,
     pub left_node: u64,
@@ -34,7 +34,7 @@ pub struct WindowJoinWitness {
     pub right_occurrence: Digest32,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowJoinPopulation {
     pub left_key_face: String,
     pub right_key_face: String,
@@ -44,7 +44,7 @@ pub struct WindowJoinPopulation {
     pub representatives: Vec<WindowJoinWitness>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExteriorWorldConsequence {
     pub record_window: (u64, u64),
     pub parent_returns: WindowJoinPopulation,
@@ -54,7 +54,7 @@ pub struct ExteriorWorldConsequence {
     pub open_fibres: Vec<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SiblingHistoryCut {
     pub occurrence: String,
     pub repeated_content_sha256: Digest32,
@@ -68,14 +68,14 @@ pub struct SiblingHistoryCut {
     pub native_history_sha256: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CohortExclusion {
     pub repeated_content_sha256: Digest32,
     pub prompt_occurrence: String,
     pub obstruction: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SiblingCohort {
     pub schema: String,
     pub source_occurrence_sha256: Digest32,

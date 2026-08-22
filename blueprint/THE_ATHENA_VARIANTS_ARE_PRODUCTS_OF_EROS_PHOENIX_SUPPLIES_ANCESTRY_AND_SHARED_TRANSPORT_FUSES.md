@@ -3,14 +3,17 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current deed:** A3. A2 returned all ten required consequences on 2026-08-22.
+**Current boundary:** A3 release admission. A3 returned a nine-consequence candidate on 2026-08-22,
+but the affected-package and complete release receivers remain open after direct operator pause.
+After admission, I0 begins the Holonic Inference construction. The former A4--A6 schedule is
+superseded.
 **Scheduling boundary:** this file orders the Athena-product continuation. It does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md); only a returned deed and passing grade do that.
 
 **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts;
 `established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived` for the
 named local Lean theorems; `interpretation` for their transfer into the construction geometry; and
-`open` for A3 and every later Athena product deed.
+`open` for I0--I5 and every later heterogeneous-source deed.
 
 **Governing doctrine:**
 [`TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -25,6 +28,11 @@ named local Lean theorems; `interpretation` for their transfer into the construc
 [`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 This file does not replace its H/W/M evidence or hardware laws. It gives M6 its correct product
 role and carries the resulting Athena family beyond the first mathematics return.
+
+**Active continuation:**
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
+That contract supersedes this file's former A4 second-LLM lift, A5 two-model pushout, and A6 freeze
+schedule. The definitions and bounded A1--A3 evidence below remain in force.
 
 ---
 
@@ -488,7 +496,7 @@ successor receivers remain open. They are A3 obligations, not hidden A2 claims.
 
 ## 10. Deed A3 — the exchange return cultivates Athena-Gemma
 
-[open] A3 lets one declared receiver defect found a lightning leader through the A2 active cover.
+[established-bounded] A3 let one declared receiver defect found a lightning leader through the A2 active cover.
 The metric-adjoint return travels only along addressed forward lineage and deposits one local native
 morphology delta. Navigation may revisit earlier material according to reopened fibres; it may not
 use a replay count, reward threshold or global epoch as a governor.
@@ -505,100 +513,72 @@ A3 passes only with:
 8. no retained lookup of the exchange passages; and
 9. exact semantic work plus separate card telemetry.
 
----
+[established-bounded; implemented-exact; measured] All nine candidate-artifact consequences stand together. A
+development-only greatest strict hidden-transition selector founded an exact metric-adjoint least
+lattice step `6`; its sparse factor/covector continuation changed the source-detached held-out
+durable emission from native address `531` / `▁to` to `6445` / `Now`. The revisit returned exact
+nonzero holonomy; an input-only provider/content/container-disjoint control retained candidate
+`107`; and withdrawing the continuation restored the immediate A2 predecessor. Repository and
+exchange stores were absent from the detached namespace. The semantic-work receipt excludes card
+admission and timing, which remain separate apparatus testimony. The affected-package test and
+complete release gate have not yet admitted the phase. The candidate record is
+[`research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md).
 
-## 11. Deed A4 — a second inherited organ is lifted and its shared subcomplex is founded
+[open] This is an attributable one-codeword emission change under the declared family. Complete
+response suffixes, enacted tool/world consequences, unrestricted exchange cultivation and
+unexcited Gemma conduct remain open.
 
-[open] Before A4 runs, `CONSTRUCTION_STATE.md` names the exact second source occurrence and its
-ports. The first source may be another language model for a close control or a voice/image organ for
-the heterogeneous return. The source's native schedule is preserved as lineage until its own
-generator lift passes.
-
-A4 repeats source admission, active excitation, intervention dissection, generator recovery,
-future-exact condensation, detached rest and cultivation for the second organ. It then returns the
-correspondence pullback with Athena-Gemma, every naturality square, the maximal founded shared
-subcomplex under the declared receiver/history family, and every unresolved defect. “Maximal” means
-that every excluded candidate has a separator; it is not a caller-chosen size.
-
----
-
-## 12. Deed A5 — shared transport fuses and source-specific fibres remain plural
-
-[open] A5 constructs the pushout through A4's founded common subcomplex and enacts it as one
-GPU-resident Athena ecology. The originals are unavailable during the detached grade. Every shared
-generator is stored/enacted once; every modality-specific port remains typed; every noncommuting or
-non-natural correspondence remains plural.
-
-A5 passes only if:
-
-1. both source injections and the common-subcomplex square commute;
-2. all declared successor receivers factor through the fused product;
-3. every collapsed source route retains its reconstruction testimony;
-4. a shared-route ablation moves both source families while a source-specific ablation moves only
-   its admitted family;
-5. an unmatched-source control remains unchanged;
-6. the complete product cost vector strictly falls before “compression” is claimed;
-7. one detached fused rest accepts material at both exterior ports; and
-8. one cross-port held-out consequence requires the fused ecology.
+[open] The former list of four missing fundamentals is superseded. Recurrent generation, exterior
+return, durable cultivation, and language-family condensation are four receiver grades of one
+Holonic Inference circulation. I0--I5 construct and grade that circulation without adding a second
+language model.
 
 ---
 
-## 13. Deed A6 — the Athena product is frozen, dissected and compiled through exterior faces
+## 11. The A4--A6 schedule is superseded
 
-[open] A6 emits the canonical generator-native rest, executable inference entry, product manifest,
-source/native/fused dissection atlas, receiver/history aperture, complete open exterior and
-restoration/ablation suite. A conventional `safetensors`, GGUF or other model container may be
-compiled only as an exterior realization with its expansion, defect and receiver boundary stated.
-It is never the canonical identity of Athena.
+[definition] The former A4 second-language-model lift, A5 two-model pushout, and A6 freeze sequence
+schedules nothing. Its correspondence-pullback, naturality, pushout, fibre, ablation, and complete
+cost laws remain the fusion contract and are now composed inside I4 and the later X-deeds.
 
-The complete product grade requires fresh-process inference with all developmental sources absent;
-multimodal port deeds where present; exact work, residency and transfer; calibrated telemetry where
-available; matched variants; targeted ablation; and inspection of the actual generated mathematical,
-textual, acoustic, visual or action artifacts requested by the declared product.
+[open] The parked Qwen GGUF remains an exterior occurrence with no scheduling status. A second
+similarly purposed language model is an optional later close control whose behavioral gain may be
+marginal or negative. It is not an Athena completion requirement.
 
----
+[open] The active continuation is I0--I5 in
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md):
 
-## 14. Hardware and validation law
+```text
+I0  physical-realization and functional-affect calculus
+I1  retained causal-boundary recurrence and complete emission
+I2  exterior return, reflection, deposit, and changed later conduct
+I3  recurrent generator-native Phoenix condensation
+I4  intra-Gemma heterogeneous modality fusion
+I5  frozen Athena-Gemma inference ecology and dissection atlas.
+```
 
-[project-postulate] The GPU owns every hot semantic front: normalization, chronology, contact,
-generator action, junction, residual join, active-cover comparison, leader and return. CPU apparatus
-may stream immutable source material, bind process/device boundaries, perform durable I/O and call
-the exterior Lean checker. It may not sequence semantic cases between leaf kernels or replay a host
-reference after the device deed.
-
-Every deed follows the repository cadence:
-
-1. owner-local `cargo check`, focused tests and exact driver while iterating;
-2. affected package/dependent driver when an owner closes;
-3. one real GPU deed and artifact inspection;
-4. one ledger regeneration after the coherent artifact stands;
-5. one complete release gate at the release boundary, never in the edit loop;
-6. one coherent bulk commit and push only after the grade passes.
-
-Every expensive invocation records command, closure, purpose, elapsed time and exit status. An
-unchanged addressed receipt is reused unless a named falsifier requires another enactment.
+Only after I5 may X0--X2 mount a genuinely complementary architecture such as an SSM,
+diffusion-labelled production model, or another perception/action organ and attempt a shared native
+subcomplex.
 
 ---
 
-## 15. Complete Athena-product grade
+## 12. Revised Athena-product grade
 
-[open] The Athena-variant programme is complete only when all of the following stand together:
+[open] The Athena-Gemma product is complete only when all of the following stand together:
 
-1. a native Eros Athena control;
-2. an inherited Phoenix Athena variant whose canonical rest is generator-native rather than
-   source-shaped;
-3. M6's cultivated mathematics route and held-out successor;
-4. exact exchange world-tubes and sibling defect spectra;
-5. chronology-aware cultivation with revisit holonomy, detached remount and ablation;
-6. a second lifted organ and its founded common subcomplex;
-7. a fused Athena variant with a strictly reduced complete cost vector;
-8. modality-specific ports plus at least one cross-port consequence when the second organ is
-   heterogeneous;
-9. canonical frozen inference, dissection, source-specific and shared-route ablations;
-10. complete receiver/history, reconstruction-fibre, work, residency, transfer and open-exterior
-    testimony; and
-11. optional conventional compiled faces whose defects are explicit.
+1. the admitted M6 mathematics route and A1--A3 exchange/cultivation evidence;
+2. exact realization passages and receiver-history functional-affect classes;
+3. recurrent full-passage Holonic Inference through a retained causal boundary;
+4. genuine emission/world/return/reflection/deposit/later-current circulation;
+5. source-detached generator-native compression with decoder, complete fibres, and a strictly
+   falling complete product vector;
+6. at least two real Gemma media ports and one shared cross-port consequence;
+7. source/native/shared-route dissection, visualization, restoration, and ablation;
+8. exact semantic work beside separate residency, transfer, and calibrated apparatus testimony;
+9. canonical frozen inference from the native rest; and
+10. optional conventional compiled faces whose expansion and defects are explicit.
 
-A copied checkpoint, averaged weights, adapter stack, shared embedding, transcript pair, accepted
-proof, lower byte count, one prompt, one modality demonstration or renamed tensor file is not an
-Athena product.
+A copied checkpoint, KV-cache rename, averaged weights, adapter stack, concatenated embedding,
+transcript pair, accepted proof, lower byte count, second language model, one prompt, one modality
+demonstration, or renamed tensor file is not an Athena product.

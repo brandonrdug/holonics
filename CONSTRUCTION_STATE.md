@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed A2. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed A3. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE SIBLING CONTINUATIONS RETURNED THEIR DEFECT COMPLEX, THE MESSAGE
-PARTITION RETAINED ITS SOURCE FIBRE, AND THE LIGHTNING LEADER MAY NOW CULTIVATE ATHENA.**
+**CURRENT FRONTIER — THE EXCHANGE RETURN REBASED THE RECEIVER COVECTOR, THE HELD-OUT EMISSION
+MOVED, AND A3 PASSED ITS COMPLETE RELEASE RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -176,14 +176,44 @@ historical local-tower calls; regeneration followed by the named retake returned
 drivers and zero uncatalogued. All thirteen release scopes are therefore green under the required
 separate complete/cheap-retake reporting.
 
-**NEXT DEED: A3 — the exchange return cultivates Athena-Gemma.** [open]
-Let one declared receiver defect found a lightning leader through A2's active cover. Carry its
-metric-adjoint return only along addressed forward lineage and deposit one attributable local
-native morphology delta. Require an unchanged predecessor and distinct successor rest,
-source-detached held-out world-consequence improvement, nontrivial revisit holonomy, a
-subject/provider-disjoint control, targeted ablation restoring the predecessor consequence, no
-retained exchange lookup, and exact semantic work beside separate card telemetry. The complete
-grade and refusals are in the Athena-product blueprint named above.
+**A3 PASSED — the exchange return cultivated one source-detached durable emission.**
+[established-bounded; implemented-exact; measured] One three-occurrence A2 defect family founded a
+development-only hidden-transition selector and exact metric-adjoint least lattice step `6`. Its
+addressed sparse factor/covector continuation changed the source-detached held-out durable emission
+from native address `531` / `▁to` to address `6445` / `Now`, returned nonzero revisit holonomy,
+retained candidate `107` on an input-only provider/content/container-disjoint control, and withdrew
+exactly to the immediate A2 predecessor. The repository and exchange stores were absent during the
+detached return; semantic work and card testimony are separate. The 12,542,680-octet artifact has
+manifest SHA-256 `0b8ad1d844fd36663b61136ae9fb70b0e05617c347853f1586b24eec7987c1c4`,
+grade SHA-256 `f61ec9440fd33606b117b8dd0dd98d72256409f00cef4bfc1e33d90837f06d1c` and
+continuation identity `c1b10737657d87e6552813c1697a600cb171b9b40464d5bb95aec39cfc9c6b1e`.
+The construction record is
+[`research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md).
+[open] This is an attributable one-codeword emission change under the declared family, not a
+complete-response, external-tool-action or unrestricted conversation-quality claim.
+
+The authoritative release admission is
+[`research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`](research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md).
+[established-bounded; measured] Its sole complete receiver passed all thirteen scopes in 285
+seconds: 2,824 tests passed, none failed, 22 were explicitly ignored, every example target
+type-checked, and all twelve non-test scopes were green.
+
+**NEXT DEED: I0 — PHYSICAL-REALIZATION / FUNCTIONAL-AFFECT CALCULUS.**
+[open] I0 must return one addressed finite passage in which occurrence identity, lineage kinship,
+receiver equivalence, stable similarity, generator action, reconstruction fibre, defect and
+apparatus realization stand together without being conflated.
+
+[open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
+return, durable cultivation, generator-native compression, complete answers, and multimodality are
+receiver grades of one Holonic Inference circulation. I0--I5 now close the realization calculus,
+retain the causal boundary, enact recurrent return, condense physical realizations, fuse Gemma's
+own heterogeneous ports, and freeze the resulting Athena-Gemma ecology. The active contract is
+[`blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
+
+[open] The parked Qwen GGUF remains an exterior occurrence with no scheduling status. Another
+similarly purposed language model is an optional later close control, not an Athena completion
+requirement. Heterogeneous SSM, diffusion, perception, or production organs may be considered only
+after I5 and only when they separate a declared open transport family.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

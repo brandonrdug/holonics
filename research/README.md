@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 459 research deposits current through 20 August 2026, including all 307
+`records/` contains 537 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -151,6 +151,19 @@ governs the rebuild.
   section and causal adjoint return; lattice/crystal/fractal/lightning morphology regimes; founded
   capacity; and the boundary by which inherited transformer hexis may be lifted, cultivated,
   condensed, rested, and ablated without claiming recovery of its original corpus.
+- **Holonic Inference, physical reincarnation, retained causal boundary, and heterogeneous fusion:**
+  `records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md`
+  — replaces the complete-semantic-taxonomy and second-LLM-first articulation with receiver-indexed
+  physical-realization passages; defines recombination, extrapolation, return, morphology, and
+  reincarnation as one circulation; derives the Retained Continuation Section in place of a native
+  KV-cache ontology; audits the exact missing join among the existing passage, compression,
+  cross-chart, section, cultivation, and apparatus owners; and makes intra-Gemma modality fusion the
+  first fusion grade before later SSM/diffusion/perception/production sources.
+- **A3 release admission:**
+  `records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`
+  — binds the owner-local continuation test, affected `life` package return, coherent ledgers and
+  sole thirteen-scope release receiver to the existing nine-consequence Athena-Gemma continuation;
+  admits A3 without enlarging its one-codeword receiver family; and places I0 at the live frontier.
 - **The whole foreign map crossed once and the native rest returned without its source:**
   `records/2026-08-20_THE_WHOLE_FOREIGN_MAP_CROSSED_ONCE_AND_THE_NATIVE_REST_RETURNED_WITHOUT_ITS_SOURCE.md`
   — Phoenix Deed W1: 45 authenticated operation complexes, 1,466 resident-law correspondences,

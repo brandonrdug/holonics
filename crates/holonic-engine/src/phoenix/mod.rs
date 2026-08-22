@@ -6,6 +6,8 @@
 
 /// Resident shared-prefix circulation over a plural intervention cohort.
 pub mod cohort;
+/// One addressed local cultivation over an already-cultivated Phoenix product.
+pub mod continuation;
 pub mod native_streamed;
 pub mod runtime;
 pub mod site;

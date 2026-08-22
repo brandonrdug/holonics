@@ -49,6 +49,7 @@ pub struct ProductSession {
     u: AlignedMaterial,
     v: AlignedMaterial,
     derivation: streamed::cultivation_overlay::RankDerivationReceipt,
+    continuation: Option<crate::phoenix::continuation::MountedContinuation>,
 }
 
 /// One input-shaped W3 request borrowed from an authenticated [`ProductSession`].
@@ -161,7 +162,80 @@ impl ProductSession {
             u,
             v,
             derivation,
+            continuation: None,
         })
+    }
+
+    /// Mount one addressed local continuation over this exact cultivated body.  The continuation
+    /// changes only the authenticated sparse factor supplied to the existing resident overlay;
+    /// it does not introduce a second inference path or flatten its predecessor lineage into W1.
+    pub fn open_with_continuation(
+        product_directory: impl AsRef<Path>,
+        continuation_directory: impl AsRef<Path>,
+    ) -> Result<Self, String> {
+        let mut session = Self::open(product_directory)?;
+        session.attach_continuation(continuation_directory)?;
+        Ok(session)
+    }
+
+    /// Attach a continuation to the already-mounted single owner.  This is the in-process
+    /// cultivation seam: the expensive immutable predecessor remains mounted once while its
+    /// addressed local difference becomes the factor supplied to later resident current.
+    pub fn attach_continuation(
+        &mut self,
+        continuation_directory: impl AsRef<Path>,
+    ) -> Result<(), String> {
+        if self.continuation.is_some() {
+            return Err("the product session already carries a continuation".to_owned());
+        }
+        let body = self.body_identity()?;
+        let base = match self
+            .mounted
+            .product
+            .morphology_payload()
+            .map_err(|error| error.to_string())?
+        {
+            MorphologyPayload::AlignedFactor(factor) => factor,
+            MorphologyPayload::SparseDelta(_) => {
+                return Err("cultivated predecessor has no resident aligned factor".to_owned());
+            }
+        };
+        let continuation = crate::phoenix::continuation::MountedContinuation::open(
+            continuation_directory,
+            &body,
+            &base,
+            &self.runtime_law,
+            self.mounted.product.laws(),
+            self.mounted.product.predecessor(),
+        )
+        .map_err(|error| error.to_string())?;
+        self.u = continuation.aligned_left();
+        self.v = continuation.aligned_right();
+        self.derivation = continuation.rank_receipt().clone();
+        self.continuation = Some(continuation);
+        Ok(())
+    }
+
+    /// Withdraw only the attached continuation and recover the immediate cultivated predecessor
+    /// inside the same owner.  The returned identity is the exact delta which was removed.
+    pub fn ablate_continuation(
+        &mut self,
+    ) -> Result<crate::phoenix::continuation::ContinuationRuntimeIdentity, String> {
+        let continuation = self
+            .continuation
+            .take()
+            .ok_or_else(|| "the product session carries no continuation to ablate".to_owned())?;
+        continuation
+            .verify_still()
+            .map_err(|error| error.to_string())?;
+        let identity = continuation
+            .runtime_identity()
+            .map_err(|error| error.to_string())?;
+        let (u, v, derivation, _) = factor_runtime(&self.mounted.product, &self.runtime_law)?;
+        self.u = u;
+        self.v = v;
+        self.derivation = derivation;
+        Ok(identity)
     }
 
     /// Encode through the authenticated product codec and cross the source address into the
@@ -225,7 +299,11 @@ impl ProductSession {
         let mut previous_group = 0usize;
         for (token, (start, end)) in encoding.get_offsets().iter().copied().enumerate() {
             let group = if start == end {
-                if token == 0 { 0 } else { previous_group }
+                if token == 0 {
+                    0
+                } else {
+                    previous_group
+                }
             } else {
                 byte_boundaries[1..]
                     .iter()
@@ -317,6 +395,18 @@ impl ProductSession {
 
     pub fn runtime_law(&self) -> &RuntimeLawReceipt {
         &self.runtime_law
+    }
+    pub fn body_identity(
+        &self,
+    ) -> Result<crate::phoenix::continuation::CultivatedBodyIdentity, String> {
+        crate::phoenix::continuation::CultivatedBodyIdentity::new(
+            self.mounted.product_identity().clone(),
+            self.mounted.predecessor_identity().clone(),
+            self.mounted.morphology_identity().clone(),
+            self.mounted.codec_companion_identities().to_vec(),
+            &self.runtime_law,
+        )
+        .map_err(|error| error.to_string())
     }
     pub fn mounted(&self) -> &crate::cultivated_rest::MountedCultivatedRest {
         &self.mounted
@@ -561,6 +651,15 @@ impl ProductSession {
         let predecessor_identity = self.mounted.predecessor_identity().clone();
         let morphology_identity = self.mounted.morphology_identity().clone();
         let codec_companion_identities = self.mounted.codec_companion_identities().to_vec();
+        let continuation_identity = self
+            .continuation
+            .as_ref()
+            .map(|continuation| {
+                continuation
+                    .runtime_identity()
+                    .map_err(|error| error.to_string())
+            })
+            .transpose()?;
         let receiver_rows = match receiver {
             streamed::ReceiverOption::Terminal => 1,
             streamed::ReceiverOption::Complete => presentation.received_rows,
@@ -611,10 +710,25 @@ impl ProductSession {
         };
         source.verify_stable()?;
         self.mounted.verify_still().map_err(|e| e.to_string())?;
+        if let Some(continuation) = &self.continuation {
+            continuation
+                .verify_still()
+                .map_err(|error| error.to_string())?;
+        }
         let frozen_identity_equal = product_identity == *self.mounted.product_identity()
             && predecessor_identity == *self.mounted.predecessor_identity()
             && morphology_identity == *self.mounted.morphology_identity()
-            && codec_companion_identities == self.mounted.codec_companion_identities();
+            && codec_companion_identities == self.mounted.codec_companion_identities()
+            && self
+                .continuation
+                .as_ref()
+                .map(|continuation| {
+                    continuation
+                        .runtime_identity()
+                        .map(|identity| Some(identity) == continuation_identity)
+                        .unwrap_or(false)
+                })
+                .unwrap_or(continuation_identity.is_none());
         let source_access = source_access_audit(&self.product_root);
         let vocabulary_extent = runtime_law.vocabulary_extent as usize;
         let (terminal_rows, top_lower, selected) =
@@ -657,6 +771,7 @@ impl ProductSession {
             predecessor_identity,
             morphology_identity,
             codec_companion_identities,
+            continuation_identity,
             runtime_law: runtime_law.clone(),
             frozen_members_verified: frozen_identity_equal,
             source_access,
@@ -731,7 +846,12 @@ impl PreparedProduct<'_> {
             derivation: &self.session.derivation,
             u: &self.session.u,
             v: &self.session.v,
-            witness: &self.session.mounted.morphology,
+            witness: self
+                .session
+                .continuation
+                .as_ref()
+                .map(crate::phoenix::continuation::MountedContinuation::morphology)
+                .unwrap_or(&self.session.mounted.morphology),
             input_bound: rested_bound(&self.session.mounted.product, "phoenix.overlay/input")?,
             predecessor_bound: rested_bound(
                 &self.session.mounted.product,
@@ -899,6 +1019,7 @@ pub struct RuntimeReceipt {
     pub predecessor_identity: PredecessorProductIdentity,
     pub morphology_identity: PredecessorProductIdentity,
     pub codec_companion_identities: Vec<DirectoryCompanion>,
+    pub continuation_identity: Option<crate::phoenix::continuation::ContinuationRuntimeIdentity>,
     pub runtime_law: RuntimeLawReceipt,
     pub frozen_members_verified: bool,
     pub source_access: SourceAccessAudit,
@@ -1058,9 +1179,10 @@ fn factor_runtime(
     {
         return Err("product factors disagree with the authenticated derivation".to_owned());
     }
-    let supported = crate::exact_linear::ExactRatMatrix::new(vec![
-        right_values.iter().map(|v| &left_value * v).collect(),
-    ])
+    let supported = crate::exact_linear::ExactRatMatrix::new(vec![right_values
+        .iter()
+        .map(|v| &left_value * v)
+        .collect()])
     .map_err(|e| e.to_string())?;
     let zero =
         crate::exact_linear::ExactRatMatrix::zero(1, columns.len()).map_err(|e| e.to_string())?;

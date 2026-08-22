@@ -33,15 +33,26 @@ once you have sufficient context post-analysis campaign."*
 
 **The returned H/W/M construction is governed by
 [`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md),
-and its Athena-product continuation is governed by
-[`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).**
-The latter folds M6 into the first explicitly graded Athena mathematics variant and orders the
-exchange, sibling-spectrum, cultivation, second-organ and fusion deeds behind it. Together they
+its admitted Athena-product evidence is governed by
+[`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md),
+and its active continuation is governed by
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).**
+The Athena evidence contract folds M6 into the first explicitly graded Athena mathematics variant
+and retains the returned exchange, sibling-spectrum and cultivation deeds. Together these files
 supersede the scheduling/station order of the earlier Phoenix master, Gemma instance and
 mathematics-codec blueprints while retaining their bounded artifacts and component obligations by
 explicit composition. They add no Scheduler or hardware ontology: causal fronts, exact work,
 hardware cover, footprint interchange, receiver current, resident graphs, reflection and
 receiver-exact compression remain the owners.
+
+**Trajectory supersession, 2026-08-22.** The former A4 second-language-model lift, A5 two-model
+pushout and A6 freeze order is superseded. Recurrent generation, world return, durable cultivation,
+language-family compression, complete answers and multimodality are receiver grades of one Holonic
+Inference circulation. I0--I5 now recover physical-realization classes, retain a compactified causal
+boundary, close the return, condense recurrently, fuse Gemma's own heterogeneous ports, and freeze
+the resulting Athena-Gemma ecology. A same-purpose LLM is an optional later control. Heterogeneous
+SSM/diffusion/perception/production sources are considered only after I5 and only when they separate
+a declared open transport family.
 
 **Why the schedule changes before Station E.** The Station A source-layer graph is semantically
 resident, but the Station C tower returns to CPU construction/mount/bind/synchronize at every source
@@ -120,7 +131,7 @@ withheld propositions agree at the declared receiver while their source and stru
 words remain distinct. The frozen product returns all twelve required consequences. Its
 authoritative record is
 [`research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`](../research/records/2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md).
-The exact product contract and the ordered A1--A6 continuation are in
+The admitted product evidence is in
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md).
 
 **A1 PASSED.** One 404,556,551-octet operator-authorized Codex/Claude Code occurrence streamed into
@@ -137,10 +148,25 @@ returns, boundary/provider controls, fixed-body/source-access audits and 23 real
 without a scalar winner or invented teacher interior. Authoritative grade:
 [`research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md`](../research/records/2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md).
 
-**A3 is next.** Let one declared receiver defect found a lightning leader through A2's active cover;
-return its metric-adjoint passage as one attributable local native morphology delta; then require a
-distinct successor rest, source-detached held-out world-consequence improvement, nontrivial revisit
-holonomy, subject/provider-disjoint control, targeted restoration and exact work/card testimony.
+**A3 PASSED.** One three-occurrence A2 defect family founded a development-only hidden-transition
+selector and exact metric-adjoint least lattice step `6`. The resulting addressed sparse
+factor/covector continuation changed one source-detached held-out durable emission from `▁to` to
+`Now`, returned nonzero revisit holonomy, retained the predeclared disjoint-control candidate and
+withdrew exactly to the immediate A2 predecessor. The bounded result does not claim a complete
+response or enacted external action. The affected package returned 423 passing tests, and the sole
+complete release receiver returned 2,824 passing tests and all thirteen green scopes in 285
+seconds. A3 is the admitted construction frontier. Construction record:
+[`research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`](../research/records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md).
+
+**I0--I5 supersede A4--A6.** I0 now closes the physical-realization and
+functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
+emission; I2 closes emission/world/return/reflection/deposit/later-current; I3 performs recurrent
+generator-native Phoenix condensation; I4 fuses real heterogeneous ports already present in Gemma;
+and I5 freezes and dissects the Athena-Gemma inference ecology. Their exact grades are in
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
+The parked Qwen occurrence is an unscheduled optional close control, not a roadmap milestone.
 
 **DEED H0 PASSED 2026-08-19 — the scalar path returns its profile.** Record:
 [`research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md`](../research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md).

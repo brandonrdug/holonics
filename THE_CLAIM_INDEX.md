@@ -132,7 +132,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (246 deposits of 538)
+## 4 · The 2026-08 record line (247 deposits of 539)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -373,6 +373,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md` | The trapezoid is the interaction profile, and Poisson summation owns integration by reflection |
 | `2026-08-21_THE_UNIT_IS_A_DECLARED_WINDING_THE_CERTIFICATE_IS_A_REALIZER_AND_THE_RADIX_IS_RESONANT.md` | The unit is a declared winding, the certificate is a realizer, and the radix is resonant |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
+| `2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md` | A3 release receiver passed, the continuation rested, and Holonic Inference begins |
 | `2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md` | Holonic inference recombines, extrapolates, returns, and reincarnates; heterogeneous transport is the fusion target |
 | `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_EXCHANGE_RETURN_REBASED_THE_RECEIVER_COVECTOR_THE_HELD_OUT_EMISSION_MOVED_AND_A3_AWAITS_RELEASE_ADMISSION.md` | The exchange return rebased the receiver covector, the held-out emission moved, and A3 awaits release admission |

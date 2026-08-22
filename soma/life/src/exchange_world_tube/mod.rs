@@ -12,7 +12,7 @@ mod rest;
 
 use std::{collections::BTreeMap, ops::Range, path::PathBuf};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub use mount::{mount_exchange_world_tube_on_device, ExchangeContainerSpec, ExchangeMountError};
@@ -25,7 +25,7 @@ pub use rest::{
 };
 
 /// One exact SHA-256 content address. It is not an occurrence identity.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Digest32([u8; 32]);
 
 impl Digest32 {
