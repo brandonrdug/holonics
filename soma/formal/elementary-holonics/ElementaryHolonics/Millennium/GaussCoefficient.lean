@@ -27,6 +27,7 @@ namespace Soma.Holonics.Millennium.GaussCoefficient
 
 open Finset
 open Soma.Holonics.Millennium.BirchSwinnertonDyer
+open Soma.Holonics.Millennium.HeckeTheta
 
 variable {p : ℕ} [Fact p.Prime]
 
@@ -741,5 +742,301 @@ theorem jac_one_mod_eight (hp2 : p ≠ 2) (hp1 : p % 4 = 1) :
     rw [hjac, hsplit, hsumS, hsumZB, hc2]
     have hpz : (p : ℤ) = 8 * (t : ℤ) + 5 := by exact_mod_cast ht
     linarith [hNz, hMz, hpz]
+
+/-- **Uniqueness of the two-squares representation of a prime**, elementarily: the
+Brahmagupta–Fibonacci identity forces `p ∣ (ad−bc)(ad+bc)`, and either factor being
+`0` or `±p` collapses the two representations onto each other. -/
+private lemma two_sq_unique {p : ℕ} (hp : p.Prime) {a b c d : ℤ}
+    (h1 : a ^ 2 + b ^ 2 = (p : ℤ)) (h2 : c ^ 2 + d ^ 2 = (p : ℤ)) :
+    (a ^ 2 = c ^ 2 ∧ b ^ 2 = d ^ 2) ∨ (a ^ 2 = d ^ 2 ∧ b ^ 2 = c ^ 2) := by
+  have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
+  have hp0 : (0 : ℤ) < (p : ℤ) := by exact_mod_cast hp.pos
+  have hdvd : (p : ℤ) ∣ (a * d - b * c) * (a * d + b * c) := by
+    refine ⟨a ^ 2 + d ^ 2 - p, ?_⟩
+    linear_combination (d ^ 2 - (p : ℤ)) * h1 - b ^ 2 * h2
+  have hid1 : (a * d - b * c) ^ 2 + (a * c + b * d) ^ 2 = (p : ℤ) ^ 2 := by
+    linear_combination (c ^ 2 + d ^ 2) * h1 + (p : ℤ) * h2
+  have hid2 : (a * d + b * c) ^ 2 + (a * c - b * d) ^ 2 = (p : ℤ) ^ 2 := by
+    linear_combination (c ^ 2 + d ^ 2) * h1 + (p : ℤ) * h2
+  rcases hpz.2.2 _ _ hdvd with h | h
+  · obtain ⟨k, hk⟩ := h
+    have hk2 : k ^ 2 ≤ 1 := by
+      by_contra hc
+      push_neg at hc
+      have hk' : (a * d - b * c) ^ 2 = (p : ℤ) ^ 2 * k ^ 2 := by rw [hk]; ring
+      have hp2 : (0 : ℤ) < (p : ℤ) ^ 2 := by positivity
+      nlinarith [hid1, hk', sq_nonneg (a * c + b * d),
+        mul_pos hp2 (by linarith : (0 : ℤ) < k ^ 2 - 1)]
+    have hkl : -1 ≤ k := by nlinarith [hk2, sq_nonneg (k + 1)]
+    have hkr : k ≤ 1 := by nlinarith [hk2, sq_nonneg (k - 1)]
+    interval_cases k
+    · right
+      have hzero : a * c + b * d = 0 := by
+        have h0 : (a * c + b * d) ^ 2 = 0 := by nlinarith [hid1, hk]
+        exact pow_eq_zero_iff (by norm_num) |>.mp h0
+      have hswap : a ^ 2 * (p : ℤ) = d ^ 2 * (p : ℤ) := by
+        linear_combination d ^ 2 * h1 - a ^ 2 * h2 + (a * c - b * d) * hzero
+      have ha : a ^ 2 = d ^ 2 := mul_right_cancel₀ hp0.ne' hswap
+      exact ⟨ha, by linarith⟩
+    · left
+      have had : a * d = b * c := by linarith
+      have halign : a ^ 2 * (p : ℤ) = c ^ 2 * (p : ℤ) := by
+        linear_combination c ^ 2 * h1 - a ^ 2 * h2 + (a * d + b * c) * had
+      have ha : a ^ 2 = c ^ 2 := mul_right_cancel₀ hp0.ne' halign
+      exact ⟨ha, by linarith⟩
+    · right
+      have hzero : a * c + b * d = 0 := by
+        have h0 : (a * c + b * d) ^ 2 = 0 := by nlinarith [hid1, hk]
+        exact pow_eq_zero_iff (by norm_num) |>.mp h0
+      have hswap : a ^ 2 * (p : ℤ) = d ^ 2 * (p : ℤ) := by
+        linear_combination d ^ 2 * h1 - a ^ 2 * h2 + (a * c - b * d) * hzero
+      have ha : a ^ 2 = d ^ 2 := mul_right_cancel₀ hp0.ne' hswap
+      exact ⟨ha, by linarith⟩
+  · obtain ⟨k, hk⟩ := h
+    have hk2 : k ^ 2 ≤ 1 := by
+      by_contra hc
+      push_neg at hc
+      have hk' : (a * d + b * c) ^ 2 = (p : ℤ) ^ 2 * k ^ 2 := by rw [hk]; ring
+      have hp2 : (0 : ℤ) < (p : ℤ) ^ 2 := by positivity
+      nlinarith [hid2, hk', sq_nonneg (a * c - b * d),
+        mul_pos hp2 (by linarith : (0 : ℤ) < k ^ 2 - 1)]
+    have hkl : -1 ≤ k := by nlinarith [hk2, sq_nonneg (k + 1)]
+    have hkr : k ≤ 1 := by nlinarith [hk2, sq_nonneg (k - 1)]
+    interval_cases k
+    · right
+      have hzero : a * c - b * d = 0 := by
+        have h0 : (a * c - b * d) ^ 2 = 0 := by nlinarith [hid2, hk]
+        exact pow_eq_zero_iff (by norm_num) |>.mp h0
+      have hswap : a ^ 2 * (p : ℤ) = d ^ 2 * (p : ℤ) := by
+        linear_combination d ^ 2 * h1 - a ^ 2 * h2 + (a * c + b * d) * hzero
+      have ha : a ^ 2 = d ^ 2 := mul_right_cancel₀ hp0.ne' hswap
+      exact ⟨ha, by linarith⟩
+    · left
+      have had0 : a * d + b * c = 0 := by linarith
+      have halign : a ^ 2 * (p : ℤ) = c ^ 2 * (p : ℤ) := by
+        linear_combination c ^ 2 * h1 - a ^ 2 * h2 + (a * d - b * c) * had0
+      have ha : a ^ 2 = c ^ 2 := mul_right_cancel₀ hp0.ne' halign
+      exact ⟨ha, by linarith⟩
+    · right
+      have hzero : a * c - b * d = 0 := by
+        have h0 : (a * c - b * d) ^ 2 = 0 := by nlinarith [hid2, hk]
+        exact pow_eq_zero_iff (by norm_num) |>.mp h0
+      have hswap : a ^ 2 * (p : ℤ) = d ^ 2 * (p : ℤ) := by
+        linear_combination d ^ 2 * h1 - a ^ 2 * h2 + (a * c + b * d) * hzero
+      have ha : a ^ 2 = d ^ 2 := mul_right_cancel₀ hp0.ne' hswap
+      exact ⟨ha, by linarith⟩
+
+/-- The reflection transfer: `jac(−1) = χ(i)·jac(1)` for `i² = −1`. -/
+private lemma jac_neg_one {i0 : ZMod p} (hi2 : i0 * i0 = -1) (hi0 : i0 ≠ 0) :
+    jac p (-1) = quadraticChar (ZMod p) i0 * jac p 1 := by
+  have h := jac_mul_sq hi0 (1 : ZMod p)
+  rw [mul_one, sq, hi2] at h
+  exact h
+
+/-- Euler's criterion for the fourth root: `χ(i) = (−1)^((p−1)/4)`, split by `p mod 8`. -/
+private lemma chi_i0 (hp2 : p ≠ 2) (hp1 : p % 4 = 1) {i0 : ZMod p} (hi2 : i0 * i0 = -1)
+    (hi0 : i0 ≠ 0) :
+    (p % 8 = 1 ∧ quadraticChar (ZMod p) i0 = 1) ∨
+      (p % 8 = 5 ∧ quadraticChar (ZMod p) i0 = -1) := by
+  have hchar : ringChar (ZMod p) ≠ 2 := by
+    rw [ZMod.ringChar_zmod_n]
+    exact hp2
+  have h2Z : (2 : ZMod p) ≠ 0 := Ring.two_ne_zero hchar
+  have hm1ne1 : (-1 : ZMod p) ≠ 1 := by
+    intro h
+    apply h2Z
+    linear_combination -h
+  obtain ⟨m, hm4⟩ : ∃ m, p = 4 * m + 1 := ⟨p / 4, by omega⟩
+  have hcard : Fintype.card (ZMod p) / 2 = 2 * m := by
+    rw [ZMod.card]
+    omega
+  have hpow : i0 ^ (Fintype.card (ZMod p) / 2) = ((-1 : ZMod p)) ^ m := by
+    rw [hcard, pow_mul, sq, hi2]
+  have hchi := quadraticChar_eq_pow_of_char_ne_two hchar hi0
+  rcases Nat.even_or_odd m with hev | hod
+  · left
+    obtain ⟨w, hw⟩ := hev
+    refine ⟨by omega, ?_⟩
+    rw [hchi, hpow, (show Even m from ⟨w, hw⟩).neg_one_pow, if_pos rfl]
+  · right
+    obtain ⟨w, hw⟩ := hod
+    refine ⟨by omega, ?_⟩
+    rw [hchi, hpow, (show Odd m from ⟨w, hw⟩).neg_one_pow, if_neg hm1ne1]
+
+/-- **The shell classification**: any class representative `(A, B)` determines the whole
+shell — it is exactly `{(A, B), (A, −B)}` — so the Hecke coefficient is `2A`. -/
+private lemma shell_eq {A B : ℤ} (hp2 : p ≠ 2) (hAB : A ^ 2 + B ^ 2 = (p : ℤ))
+    (hcls : (A + B) % 4 = 1) (hBe : B % 2 = 0) (hB0 : B ≠ 0) :
+    heckeCoeff p = 2 * A := by
+  have hp := (Fact.out : p.Prime)
+  have hAodd : A % 2 = 1 := by omega
+  have hbox : ∀ u v : ℤ, u ^ 2 + v ^ 2 = (p : ℤ) →
+      u ∈ Finset.Icc (-(p : ℤ)) (p : ℤ) := by
+    intro u v huv
+    have hu2 : u ^ 2 ≤ (p : ℤ) := by nlinarith [sq_nonneg v]
+    have hp1 : (1 : ℤ) ≤ (p : ℤ) := by exact_mod_cast hp.one_lt.le
+    rw [Finset.mem_Icc]
+    constructor <;> nlinarith [hu2, hp1, sq_nonneg (u + p), sq_nonneg (u - p)]
+  have hBne : B ≠ -B := by
+    intro h
+    apply hB0
+    omega
+  have hmem : ∀ u v : ℤ, ((u, v) ∈ heckeShell p ↔
+      (u = A ∧ v = B) ∨ (u = A ∧ v = -B)) := by
+    intro u v
+    rw [heckeShell, Finset.mem_filter, Finset.mem_product]
+    constructor
+    · rintro ⟨-, hnorm, hcl, hve⟩
+      have huodd : u % 2 = 1 := by omega
+      rcases two_sq_unique hp hnorm hAB with ⟨hu, hv⟩ | ⟨hu, hv⟩
+      · have hufac : (u - A) * (u + A) = 0 := by linear_combination hu
+        have hvfac : (v - B) * (v + B) = 0 := by linear_combination hv
+        have hucase : u = A ∨ u = -A := by
+          rcases mul_eq_zero.mp hufac with h | h
+          · exact Or.inl (by linarith)
+          · exact Or.inr (by linarith)
+        have hvcase : v = B ∨ v = -B := by
+          rcases mul_eq_zero.mp hvfac with h | h
+          · exact Or.inl (by linarith)
+          · exact Or.inr (by linarith)
+        rcases hucase with rfl | rfl
+        · rcases hvcase with rfl | rfl
+          · exact Or.inl ⟨rfl, rfl⟩
+          · exact Or.inr ⟨rfl, rfl⟩
+        · exfalso
+          rcases hvcase with rfl | rfl <;> omega
+      · exfalso
+        obtain ⟨c, hc⟩ : ∃ c, u = 2 * c + 1 := ⟨(u - 1) / 2, by omega⟩
+        obtain ⟨d, hd⟩ : ∃ d, B = 2 * d := ⟨B / 2, by omega⟩
+        have h4 : (4 : ℤ) ∣ 1 := by
+          refine ⟨d ^ 2 - c ^ 2 - c, ?_⟩
+          have hu' := hu
+          rw [hc, hd] at hu'
+          linear_combination hu'
+        norm_num at h4
+    · rintro (⟨h1, h2⟩ | ⟨h1, h2⟩)
+      · rw [h1, h2]
+        exact ⟨⟨hbox A B hAB, hbox B A (by linear_combination hAB)⟩, hAB, hcls, hBe⟩
+      · rw [h1, h2]
+        refine ⟨⟨hbox A (-B) (by linear_combination hAB), hbox (-B) A (by linear_combination hAB)⟩,
+          by linear_combination hAB, by omega, by omega⟩
+  have hshell : heckeShell p = {(A, B), (A, -B)} := by
+    ext q
+    obtain ⟨u, v⟩ := q
+    rw [hmem u v, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk.injEq]
+  rw [heckeCoeff, hshell]
+  rw [Finset.sum_insert (by
+    rw [Finset.mem_singleton]
+    intro h
+    exact hBne (congrArg Prod.snd h)), Finset.sum_singleton]
+  ring
+
+/-- **GAUSS'S COEFFICIENT THEOREM AT THE SIGHTED PRIMES.**  For every prime
+`p ≡ 1 (mod 4)`, the Hecke coefficient of the congruent-number theta at one equals the
+trace of Frobenius of `y² = x³ − x`: the shell weight `2A` normalized by
+`A + B ≡ 1 (mod 4)` is exactly the point-count defect.  The chain: the curve sum is
+the Jacobsthal sum at `−1`; the reflection transfers it to `χ(i)·jac(1)`; the square
+ledger and the mod-eight law pin `jac(1) = 2a₀` with `a₀ ≡ 3 (mod 4)` and
+`a₀² + b₀² = p`; uniqueness of the two-squares representation classifies the shell; and
+Euler's criterion for `χ(i)` aligns the two signs case by case in `p mod 8`. -/
+theorem theGaussCoefficientTheorem (hp2 : p ≠ 2) (hp1 : p % 4 = 1) :
+    (heckeCoeff p : ℤ) = traceOfFrobenius 1 p := by
+  have hchar : ringChar (ZMod p) ≠ 2 := by
+    rw [ZMod.ringChar_zmod_n]
+    exact hp2
+  obtain ⟨i0, hi⟩ : IsSquare (-1 : ZMod p) := by
+    rw [ZMod.exists_sq_eq_neg_one_iff]
+    omega
+  have hi2 : i0 * i0 = -1 := hi.symm
+  have hi0 : i0 ≠ 0 := by
+    intro h
+    apply one_ne_zero (α := ZMod p)
+    have h0 : (0 : ZMod p) = -1 := by rw [← hi2, h, mul_zero]
+    linear_combination h0
+  obtain ⟨k, hk⟩ := jac_one_mod_eight hp2 hp1
+  set a0 : ℤ := 4 * k - 1 with ha0_def
+  have hja : jac p 1 = 2 * a0 := by rw [hk, ha0_def]; ring
+  have ha0m : a0 % 4 = 3 := by omega
+  obtain ⟨r, hrns⟩ := FiniteField.exists_nonsquare (F := ZMod p) hchar
+  have hr : quadraticChar (ZMod p) r = -1 := quadraticChar_neg_one_iff_not_isSquare.mpr hrns
+  have hled := jac_sq_ledger hp2 hp1 hr
+  rw [hja] at hled
+  obtain ⟨b0, hjb⟩ : ∃ b0 : ℤ, jac p r = 2 * b0 := by
+    rcases Int.even_or_odd (jac p r) with ⟨b, hb⟩ | ⟨b, hb⟩
+    · exact ⟨b, by omega⟩
+    · exfalso
+      have h4 : (4 : ℤ) ∣ 1 := by
+        refine ⟨(p : ℤ) - a0 ^ 2 - b ^ 2 - b, ?_⟩
+        have hb' := hled
+        rw [hb] at hb'
+        linear_combination hb'
+      norm_num at h4
+  rw [hjb] at hled
+  have hpb4 : 4 * (a0 ^ 2 + b0 ^ 2) = 4 * (p : ℤ) := by linear_combination hled
+  have hpb : a0 ^ 2 + b0 ^ 2 = (p : ℤ) := by linarith
+  have hb0e : b0 % 2 = 0 := by
+    rcases Int.even_or_odd b0 with ⟨w, hw⟩ | ⟨w, hw⟩
+    · omega
+    · exfalso
+      obtain ⟨u, hu⟩ : ∃ u, a0 = 2 * u + 1 := ⟨(a0 - 1) / 2, by omega⟩
+      have hpar : (p : ℤ) = 4 * (u ^ 2 + u + w ^ 2 + w) + 2 := by
+        have hpb' := hpb
+        rw [hu, hw] at hpb'
+        linear_combination -hpb'
+      omega
+  have hb00 : b0 ≠ 0 := by
+    intro h
+    rw [h] at hpb
+    have hpa : a0 ^ 2 = (p : ℤ) := by linear_combination hpb
+    have hnat : a0.natAbs * a0.natAbs = p := by
+      have h2 := congrArg Int.natAbs hpa
+      rw [Int.natAbs_natCast] at h2
+      rw [← h2, sq, Int.natAbs_mul]
+    have hdvd : a0.natAbs ∣ p := ⟨a0.natAbs, hnat.symm⟩
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ hdvd with h1 | h1
+    · rw [h1, one_mul] at hnat
+      exact (Fact.out : p.Prime).one_lt.ne hnat
+    · rw [h1] at hnat
+      have hp1' := (Fact.out : p.Prime).one_lt
+      nlinarith [hnat]
+  have htr : traceOfFrobenius 1 p = -(quadraticChar (ZMod p) i0 * (2 * a0)) := by
+    rw [trace_eq_neg_charSum hp2, charSum_eq_jac, jac_neg_one hi2 hi0, hja]
+  rcases chi_i0 hp2 hp1 hi2 hi0 with ⟨h8, hchi⟩ | ⟨h8, hchi⟩
+  · have hb04 : b0 % 4 = 0 := by
+      by_contra hc
+      obtain ⟨v, hv⟩ : ∃ v, a0 = 4 * v + 3 := ⟨(a0 - 3) / 4, by omega⟩
+      obtain ⟨w, hw⟩ : ∃ w, b0 = 4 * w + 2 := ⟨(b0 - 2) / 4, by omega⟩
+      have hpar : (p : ℤ) = 8 * (2 * v ^ 2 + 3 * v + 2 * w ^ 2 + 2 * w + 1) + 5 := by
+        have hpb' := hpb
+        rw [hv, hw] at hpb'
+        linear_combination -hpb'
+      omega
+    have hcoeff := shell_eq (A := -a0) (B := b0) hp2 (by linear_combination hpb)
+      (by omega) hb0e hb00
+    rw [hcoeff, htr, hchi]
+    ring
+  · have hb04 : b0 % 4 = 2 := by
+      by_contra hc
+      obtain ⟨v, hv⟩ : ∃ v, a0 = 4 * v + 3 := ⟨(a0 - 3) / 4, by omega⟩
+      obtain ⟨w, hw⟩ : ∃ w, b0 = 4 * w := ⟨b0 / 4, by omega⟩
+      have hpar : (p : ℤ) = 8 * (2 * v ^ 2 + 3 * v + 2 * w ^ 2 + 1) + 1 := by
+        have hpb' := hpb
+        rw [hv, hw] at hpb'
+        linear_combination -hpb'
+      omega
+    have hcoeff := shell_eq (A := a0) (B := b0) hp2 hpb (by omega) hb0e hb00
+    rw [hcoeff, htr, hchi]
+    ring
+
+/-- **The coefficient identification at every odd prime**: the sighted frames by
+Gauss's theorem, the blind frames by the two-squares refusal against the reflection
+census. -/
+theorem theCoefficientsAgreeAtEveryOddPrime (hp2 : p ≠ 2) :
+    (heckeCoeff p : ℤ) = traceOfFrobenius 1 p := by
+  have hodd : p % 2 = 1 := Nat.Prime.eq_two_or_odd (Fact.out : p.Prime) |>.resolve_left hp2
+  have h14 : p % 4 = 1 ∨ p % 4 = 3 := by omega
+  rcases h14 with h | h
+  · exact theGaussCoefficientTheorem hp2 h
+  · rw [heckeCoeff_three_mod_four h, theCoefficientVanishesOnTheBlindFrames 1 p h]
 
 end Soma.Holonics.Millennium.GaussCoefficient
