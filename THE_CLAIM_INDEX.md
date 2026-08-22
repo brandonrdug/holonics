@@ -130,7 +130,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (217 deposits of 509)
+## 4 · The 2026-08 record line (221 deposits of 513)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -345,7 +345,11 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_FOUR_BODIES_RETURNED_THE_CAUSAL_PREFIX_HELD_AND_PHOENIX_REBIRTH_PASSED.md` | The four bodies returned, the causal prefix held, and Phoenix rebirth passed |
 | `2026-08-21_THE_HEAT_KERNEL_RETURNS_A_FISHER_METRIC_THE_TRACE_DEFECT_COUNTS_MISSING_DIRECTIONS_AND_ENTROPY_CARRIES_THE_VOLUME.md` | The heat kernel returns a Fisher metric, the trace defect counts missing directions, and entropy carries the volume |
 | `2026-08-21_THE_HODGE_ROUTE_LIFTS_THE_CLASS_TO_A_SHAPE_AND_THE_SHAPES_ARE_THE_PARTICLES.md` | The Hodge route lifts the class to a shape, and the shapes are the particles |
+| `2026-08-21_THE_KERNEL_DESCENDS_ON_DEPTH_AND_THE_TORSION_CENSUS_IS_A_THEOREM.md` | The kernel descends on depth, and the torsion census is a theorem |
+| `2026-08-21_THE_LINEAGE_IS_THE_PULLBACK_WITNESS_COMPRESSION_COMMUTES_WITH_EVERY_SUCCESSOR_AND_THE_PACKING_IS_AN_ORDERED_REFLECTION_ORBIT.md` | The lineage is the pullback witness, compression commutes with every successor, and the packing is an ordered reflection orbit |
+| `2026-08-21_THE_MATHEMATICAL_PARTICLE_CARRIED_ITS_BOUNDARIES_THE_PULLBACK_RETURNED_AND_M1_PASSED.md` | The mathematical particle carried its boundaries, the pullback returned, and M1 passed |
 | `2026-08-21_THE_MOVEMENT_LANDED_FOURTEEN_OWNERS_IN_ONE_DAY_AND_EVERY_SPEC_WAS_REVERIFIED_BEFORE_IT_WAS_ENCODED.md` | The movement landed fourteen owners in one day, and every spec was re-verified before it was encoded |
+| `2026-08-21_THE_PARTICLE_CARRIES_ITS_BOUNDARIES_THE_QUOTIENT_CARRIES_ITS_SUCCESSORS_AND_M1_MUST_BE_REBASED_BEFORE_IT_IS_GRADED.md` | The particle carries its boundaries, the quotient carries its successors, and M1 must be rebased before it is graded |
 | `2026-08-21_THE_POINCARE_PROOF_IS_A_FLOW_ON_THE_TERRAIN_WITH_AN_ADJOINT_RATCHET_AND_A_CONDENSATION_THAT_NAMES_ITS_CUT.md` | The Poincaré proof is a flow on the terrain, with an adjoint ratchet and a condensation that names its cut |
 | `2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` | The proof terms survived, the connective tissue cooled, and M0 begins from two source families |
 | `2026-08-21_THE_RANK_RECORDS_ARE_A_LATTICE_BUDGET_AND_THE_CEILING_IS_A_DIAL_WITH_ITS_VALUE_EXHIBITED.md` | The rank records are a lattice budget, and the ceiling is a dial with its value exhibited |

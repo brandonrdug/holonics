@@ -11,17 +11,26 @@ nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
 [`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
-**Truth grades:** `proved-derived` for the twelve Lean theorems, kernel-checked, all audited by
-`#print axioms` to `[propext, Classical.choice, Quot.sound]`, zero `sorryAx`; `proved-standard`
-for the cited classical mathematics; `measured` where a command and date are stated;
-`interpretation` for every correspondence, each marked where it sits.
+**Truth status and evidence:** `proved-derived` for the twelve Lean theorems, with
+`formal-checked` evidence from `#print axioms` (`[propext, Classical.choice, Quot.sound]`, zero
+`sorryAx`); `proved-standard` for the cited classical mathematics; `established-bounded` with
+`measured` evidence where a command and date are stated; `interpretation` for every correspondence,
+each marked where it sits.
+
+**Audit qualification, 2026-08-21.** The title's “reads it whole” is valid only for the named
+curve after four ingredients are joined: the reduction homomorphism, its torsion-kernel theorem,
+the four-point finite count, and the already exhibited four-element Klein subgroup with distinct
+reductions. A point count by itself does not read a torsion census. The reduction transport,
+fibre theorem, count receiver, and any codec decoder are separate objects; the linked compact-frame
+record now carries the authoritative split. (`proved-derived` + `formal-checked` for the abstract
+split; `interpretation` for this arithmetic instantiation until the reduction map is built.)
 
 ---
 
 ## 1. The framing
 
 **Torsion classification is a census of closed windings.** A rational point of an elliptic
-curve is a route; `n • Q` is its repeated traversal, and — Brandon's own ratified reading,
+curve is a route; `n • Q` is its repeated traversal, and — Brandon's own `project-postulate` reading,
 [the cyclic-subgroup record](2026-08-16_THE_WITNESS_HAS_NO_ADDRESS_AND_REPETITION_EXPLORES_ONLY_A_CYCLIC_SUBGROUP.md)
 — **repetition explores only a cyclic subgroup**. A winding is *closed* when the traversal
 returns to rest, `n • Q = 0`. The Mordell–Weil group `E(ℚ) ≅ T ⊕ ℤʳ` is then one census with
@@ -49,21 +58,26 @@ the rank `r` counts the independent routes whose windings never close.
   **aperture-incomplete for the census by construction** — the same shape as the method
   atlas's rule that only the finite strata are tables.
 
-**The completing instrument is a transport to a compact frame.** Reduce the curve at a good
-prime: in `E(𝔽_p)` *every* route closes, because the group is finite — the compact frame is
-where the whole census is one reading. The transport is faithful on closed windings: the
-kernel of reduction is winding-free, and its classical proof is a **well-founded descent
-through the p-adic filtration** — a torsion route in the kernel would strictly descend
-forever — which is *the same mechanism* as `MinusFourth.lean`'s Fermat descent. So both
-halves of the realized side of Birch–Swinnerton-Dyer on these curves run on one tool:
+**The completing instrument for this named curve is a transport to a compact frame.** Reduce the
+curve at a good prime: in `E(𝔽_p)` every route closes because the group is finite. The finite frame
+supplies a codomain and a count, not the classification by itself. Under the standard local
+hypotheses over `ℚ`, reduction at a good odd prime is faithful on torsion; its proof studies the
+formal-group kernel through a p-adic filtration. The filtration is structure on the kernel, not the
+kernel itself. This descent mechanism is comparable to `MinusFourth.lean`'s Fermat descent while
+remaining a different theorem on a different carrier. (`proved-standard` for the reduction
+theorem; `interpretation` for the mechanism correspondence.) Thus the two axes use related
+well-founded arguments without being identified:
 
 > **Rank is bounded by refusing an infinite descent on heights; torsion is bounded by
 > refusing an infinite descent on valuations. The census, on both axes, is the statement that
 > the terrain is well-founded.**
 
 For `y² = x³ − 25x` the compact frame at three has four points (`x ∈ {0, 1, 2}` each with
-`y = 0`, plus the identity — computed by hand, `proved-standard` classically, not yet enacted),
-so no prime winding of five or more survives the transport, and the census closes.
+`y = 0`, plus the identity — `established-bounded` + `computational-witness`, not yet enacted in
+Lean). The three
+known half-turns reduce to those three affine points. **Conditional on** the constructed reduction
+homomorphism and the stated torsion-injectivity theorem, the four known points exhaust the possible
+torsion and the census closes. The count alone would establish no such conclusion.
 
 ## 2. What is enacted, kernel-checked
 
@@ -103,13 +117,13 @@ files). The compact-frame transport on points is the owed instrument everywhere,
 
 Each row names its grade; none claims a result.
 
-- **BSD itself** (`interpretation`, and the sharpest row). The compact frame that reads the
-  torsion census **is the frame whose counts build the L-function**: `a_p = p + 1 − #E(𝔽_p)`,
-  and `LocalFactor.lean` already carries the Euler factor as `det(1 − T·companion)`. One
-  instrument, two faces — the count that pins the closed windings is the count the analytic
-  side is assembled from. BSD asks whether the family of compact frames is a *complete
-  receiver family* for the rational population: whether what every finite frame reads,
-  assembled, determines what never closes.
+- **BSD itself** (`interpretation`, and the sharpest row). The same reduced curves whose point
+  counts constrain injected torsion also supply `a_p = p + 1 − #E(𝔽_p)` and the Euler factors;
+  `LocalFactor.lean` carries the companion-determinant face. These are two consequences of one
+  finite curve, not one information object: the labelled point-reduction map contains transport
+  data the scalar count forgets. BSD relates the Euler-factor family's analytic continuation at
+  the centre to rank and regulator data; it does not reconstruct individual rational points from
+  their finite shadows.
 - **RH** (`proved-standard` for the instance). `#E(𝔽_p)` **is** the genus-one Weil/Hasse
   instance — `|a_p| ≤ 2√p` is the Riemann hypothesis for the curve over `𝔽_p`, proved, and it
   is the contract's own chain: ample class → Rosati positivity → placement. The torsion census
@@ -148,7 +162,7 @@ certified remainder.
 
 | owed | falsifier |
 |---|---|
-| `TheDistantPrimeWindingsNeverClose` discharged — the compact-frame instrument: the curve over `ZMod 3`, its four-point census (finite, enumerable), the reduction map on points, and its injectivity on closed windings via the valuation descent | a rational point of prime order ≥ 5, or a torsion route the transport collapses |
+| ~~`TheDistantPrimeWindingsNeverClose` discharged~~ — **DISCHARGED 2026-08-21, same day**: `ElementaryHolonics/Millennium/{FrameDescent,DistantWindings}.lean` prove it (`theDistantPrimeWindingsNeverCloseHolds`), and with it `RankOne.TheTorsionIsTheKleinGroup` and `RankOne.ThePointHasInfiniteOrder` — **without constructing the reduction map or using the four-point count**: the integral forcing (the frame at three is pure half-turns) plus the kernel's depth descent carried the whole census. [The kernel-descent record](2026-08-21_THE_KERNEL_DESCENDS_ON_DEPTH_AND_THE_TORSION_CENSUS_IS_A_THEOREM.md) | a rational point of prime order ≥ 5 |
 | the same census run on the rank-zero curve `y² = x³ − x` (its `TheKernelIsTheDoubledPopulation` converse half is the halving criterion this file's refusals instantiate) | a point `Q` with `2 • Q` a nonzero half-turn |
 | the winding census stated once, curve-generically — the refusals are quadratic-discriminant square classes and should quantify over `y² = x³ − n²x` | a curve in the family whose halving obstruction is not a square-class statement |
 

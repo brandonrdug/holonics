@@ -63,3 +63,5 @@ import ElementaryHolonics.Millennium.SignChange
 import ElementaryHolonics.Millennium.MinusFourth
 import ElementaryHolonics.Millennium.RankZero
 import ElementaryHolonics.Millennium.WindingCensus
+import ElementaryHolonics.Millennium.FrameDescent
+import ElementaryHolonics.Millennium.DistantWindings
