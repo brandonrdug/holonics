@@ -1,6 +1,7 @@
 import ElementaryHolonics.Millennium.FamilyGenocchi
 import ElementaryHolonics.Millennium.FamilyWitness
 import ElementaryHolonics.Millennium.FamilyFiveDescent
+import ElementaryHolonics.Millennium.FamilySevenDescent
 
 /-!
 # FamilyPairing: what the posed conjecture forces on each branch
@@ -91,6 +92,33 @@ theorem theConjectureIsSqueezedToASinglePointOnTheFiveModEightBranch
     theConjectureForcesAPointOfInfiniteOrderOnTheFiveModEightBranch p hp8 hclause
   have h2 : ¬ AlgebraicRankAtLeast p 2 :=
     FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime hp8
+  have hIs : AlgebraicRankIs p 1 := ⟨h1, h2⟩
+  exact ⟨hIs, (hclause 1).mpr hIs⟩
+
+
+
+/-- **THE CONJECTURE IS SQUEEZED TO A SINGLE POINT ON THE ENTIRE ODD-SIGN LOCUS**:
+under the rank clause for the odd-prime witness at any prime `p ≡ 5, 7 (mod 8)`,
+the algebraic rank is **exactly one** and the analytic rank is **exactly one** —
+the odd functional-equation sign supplies the lower bound as a theorem, the
+eight-cell descents on both branches supply the upper bound as a theorem, and the
+clause carries both onto the analytic side.  Everywhere the completed `L` is
+forced to vanish at the center, one rational point of infinite order is all that
+remains between this family and the conjecture\'s rank clause. -/
+theorem theConjectureIsSqueezedToASinglePointOnTheOddSignLocus
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5 ∨ p % 8 = 7)
+    (hclause : TheRankClause p
+      (FamilyWitness.theWitnessAtEveryOddPrime p
+        (by rcases hp8 with h | h <;> omega))) :
+    AlgebraicRankIs p 1 ∧
+      analyticRank (FamilyWitness.theWitnessAtEveryOddPrime p
+        (by rcases hp8 with h | h <;> omega)) = (1 : ℕ∞) := by
+  have h1 : AlgebraicRankAtLeast p 1 :=
+    theConjectureForcesAPointOfInfiniteOrderOnTheOddSignBranches p hp8 hclause
+  have h2 : ¬ AlgebraicRankAtLeast p 2 := by
+    rcases hp8 with h | h
+    · exact FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime h
+    · exact FamilySevenDescent.theRankIsAtMostOneAtEverySevenModEightPrime h
   have hIs : AlgebraicRankIs p 1 := ⟨h1, h2⟩
   exact ⟨hIs, (hclause 1).mpr hIs⟩
 

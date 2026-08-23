@@ -1,67 +1,68 @@
-import ElementaryHolonics.Millennium.FamilyGenocchi
-import Mathlib.Tactic
+import ElementaryHolonics.Millennium.FamilyFiveDescent
 
 /-!
-# FamilyFiveDescent: the descent collapses to eight cells at every prime five mod eight
+# FamilySevenDescent: the rank is at most one at every prime `p ≡ 7 (mod 8)`
 
-**The unconditional rank squeeze on the odd-sign branch.**  At `p ≡ 5 (mod 8)` the
-character table reads `χ_p(−1) = 1`, `χ_p(2) = χ_p(−2) = −1`, and the residue reads
-alone collapse the sixty-four descent cells to **eight** — four torsion cells and one
-coset:
+**The eight-cell collapse on the other odd-sign branch.**  At `p ≡ 7 (mod 8)` the
+character table reads `χ_p(−1) = −1`, `χ_p(2) = 1`, `χ_p(−2) = −1`, and the same
+descent engine collapses the slot-class pairs to eight cells — here the two-adic
+kill is uniform: **the first slot's rung never carries the factor two**, because
+`v₂(x)` odd forces `v₂(x−p)` and `v₂(x+p)` to differ in parity while both branches
+of the valuation trichotomy force them equal.
 
-* **`theSlotClassesCollapseOnTheFiveModEightBranch`** — the mod-`p` collapse;
-* (next stage) the eight-cell pigeonhole forces `2^{r+2} ≤ 8`, so the rank is at
-  most **one** at every prime `p ≡ 5 (mod 8)` — against the standing analytic rank
-  `≥ 1`, the conjecture's prediction of rank exactly one is squeezed to within a
-  single point.
+* **`theFirstSlotIsOddAtEveryOddPrime`** — the uniform two-adic kill.
+* **`theSlotClassesCollapseOnTheSevenModEightBranch`** — the eight cells
+  `(1,1), (1,2), (−1,−p), (−1,−2p), (p,1), (p,2), (−p,−p), (−p,−2p)`.
+* **`theRankIsAtMostOneAtEverySevenModEightPrime`** — the pigeonhole `3·2^r ≤ 8`.
 
 Every `theorem` is discharged and none depends on `sorryAx`.
 -/
 
 noncomputable section
 
-namespace Soma.Holonics.Millennium.FamilyFiveDescent
+namespace Soma.Holonics.Millennium.FamilySevenDescent
 
 open Soma.Holonics.Millennium
 open Soma.Holonics.Millennium.FamilyGenocchi
+open Soma.Holonics.Millennium.FamilyFiveDescent
 
 variable {p : ℕ} [Fact p.Prime]
 
-/-! ## 1. The character table at five mod eight -/
+/-! ## 1. The character table at seven mod eight -/
 
-lemma chi5_neg_one (hp8 : p % 8 = 5) :
-    quadraticChar (ZMod p) ((-1 : ℤ) : ZMod p) = 1 := by
+lemma chi7_neg_one (hp8 : p % 8 = 7) :
+    quadraticChar (ZMod p) ((-1 : ℤ) : ZMod p) = -1 := by
   have hp : p.Prime := Fact.out
   have hchar : ringChar (ZMod p) ≠ 2 := by
     rw [ZMod.ringChar_zmod_n]
     omega
   rw [show ((-1 : ℤ) : ZMod p) = (-1 : ZMod p) from by push_cast; ring,
-    quadraticChar_neg_one hchar, ZMod.card p, ZMod.χ₄_nat_one_mod_four (by omega)]
+    quadraticChar_neg_one hchar, ZMod.card p, ZMod.χ₄_nat_three_mod_four (by omega)]
 
-lemma chi5_two (hp8 : p % 8 = 5) :
-    quadraticChar (ZMod p) ((2 : ℤ) : ZMod p) = -1 := by
+lemma chi7_two (hp8 : p % 8 = 7) :
+    quadraticChar (ZMod p) ((2 : ℤ) : ZMod p) = 1 := by
   have hp : p.Prime := Fact.out
   have hchar : ringChar (ZMod p) ≠ 2 := by
     rw [ZMod.ringChar_zmod_n]
     omega
   rw [show ((2 : ℤ) : ZMod p) = (2 : ZMod p) from by push_cast; ring,
     quadraticChar_two hchar, ZMod.card p, ZMod.χ₈_nat_eq_if_mod_eight,
-    if_neg (by omega), if_neg (by omega)]
+    if_neg (by omega), if_pos (by omega)]
 
-lemma chi5_neg_two (hp8 : p % 8 = 5) :
+lemma chi7_neg_two (hp8 : p % 8 = 7) :
     quadraticChar (ZMod p) ((-2 : ℤ) : ZMod p) = -1 := by
   have h := congrArg (quadraticChar (ZMod p))
     (show ((-2 : ℤ) : ZMod p) = ((-1 : ℤ) : ZMod p) * ((2 : ℤ) : ZMod p) from by
       push_cast; ring)
-  rw [map_mul, chi5_neg_one hp8, chi5_two hp8] at h
+  rw [map_mul, chi7_neg_one hp8, chi7_two hp8] at h
   rw [h]
   ring
 
-/-- The `p`-free rungs with character one are `1` and `−1`. -/
-lemma rung5_char_one (hp8 : p % 8 = 5) {d : ℤ} (hd0 : d ≠ 0)
+/-- The `p`-free rungs with character one are `1` and `2`. -/
+lemma rung7_char_one (hp8 : p % 8 = 7) {d : ℤ} (hd0 : d ≠ 0)
     (hdvd : d.natAbs ∣ 2 * p) (hfree : ¬ (p : ℤ) ∣ d)
     (hchi : quadraticChar (ZMod p) ((d : ZMod p)) = 1) :
-    d = 1 ∨ d = -1 := by
+    d = 1 ∨ d = 2 := by
   have hp : p.Prime := Fact.out
   have h4 := FamilyPrimeRank.dvd_two_mul_prime hp hdvd
   have habs := Int.natAbs_eq d
@@ -74,17 +75,17 @@ lemma rung5_char_one (hp8 : p % 8 = 5) {d : ℤ} (hd0 : d ≠ 0)
     rcases h4 with h | h | h | h <;> omega
   rcases hd14 with rfl | rfl | rfl | rfl
   · exact Or.inl rfl
-  · exact Or.inr rfl
-  · rw [chi5_two hp8] at hchi
+  · rw [chi7_neg_one hp8] at hchi
     omega
-  · rw [chi5_neg_two hp8] at hchi
+  · exact Or.inr rfl
+  · rw [chi7_neg_two hp8] at hchi
     omega
 
-/-- The `p`-free rungs with character minus one are `2` and `−2`. -/
-lemma rung5_char_neg_one (hp8 : p % 8 = 5) {d : ℤ} (hd0 : d ≠ 0)
+/-- The `p`-free rungs with character minus one are `−1` and `−2`. -/
+lemma rung7_char_neg_one (hp8 : p % 8 = 7) {d : ℤ} (hd0 : d ≠ 0)
     (hdvd : d.natAbs ∣ 2 * p) (hfree : ¬ (p : ℤ) ∣ d)
     (hchi : quadraticChar (ZMod p) ((d : ZMod p)) = -1) :
-    d = 2 ∨ d = -2 := by
+    d = -1 ∨ d = -2 := by
   have hp : p.Prime := Fact.out
   have h4 := FamilyPrimeRank.dvd_two_mul_prime hp hdvd
   have habs := Int.natAbs_eq d
@@ -98,13 +99,88 @@ lemma rung5_char_neg_one (hp8 : p % 8 = 5) {d : ℤ} (hd0 : d ≠ 0)
   rcases hd14 with rfl | rfl | rfl | rfl
   · rw [chi_one'] at hchi
     omega
-  · rw [chi5_neg_one hp8] at hchi
-    omega
   · exact Or.inl rfl
+  · rw [chi7_two hp8] at hchi
+    omega
   · exact Or.inr rfl
 
+/-! ## 2. The uniform two-adic kill -/
 
-/-! ## 2. The collapse at five mod eight -/
+/-- **THE FIRST SLOT IS ODD AT EVERY ODD PRIME**: the rung of `x` never carries
+the factor two.  If it did, `v₂(x)` would be odd, so nonzero; both branches of
+the trichotomy then force `v₂(x−p)` and `v₂(x+p)` to be equal — to `v₂(x)` below
+zero, to `0` above — while their square classes `d₂` and `d₁d₂` differ by the odd
+`v₂(d₁)`, forcing opposite parities. -/
+lemma theFirstSlotIsOddAtEveryOddPrime (hp2' : p ≠ 2) {x : ℚ}
+    (hx0 : x ≠ 0) (hxm0 : x - ((p : ℕ) : ℚ) ≠ 0) (hxp0 : x + ((p : ℕ) : ℚ) ≠ 0)
+    {d₁ d₂ : ℤ} (h₁0 : d₁ ≠ 0) (h₂0 : d₂ ≠ 0)
+    (h₁v : d₁.natAbs ∣ 2 * p) (h₂v : d₂.natAbs ∣ 2 * p)
+    (h₁ : Descent.SqCls x ((d₁ : ℤ) : ℚ))
+    (h₂ : Descent.SqCls (x - ((p : ℕ) : ℚ)) ((d₂ : ℤ) : ℚ))
+    (h₃ : Descent.SqCls (x + ((p : ℕ) : ℚ)) (((d₁ * d₂ : ℤ)) : ℚ)) :
+    ¬ (2 : ℤ) ∣ d₁ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hp : p.Prime := Fact.out
+  intro h2d
+  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
+  have hvd₁ : padicValRat 2 ((d₁ : ℤ) : ℚ) = 1 := by
+    rcases rung_val_two hp2' h₁0 h₁v with ⟨-, hv⟩ | ⟨hf, -⟩
+    · exact hv
+    · exact absurd h2d hf
+  have hvd₂ : padicValRat 2 ((d₂ : ℤ) : ℚ) = 0 ∨ padicValRat 2 ((d₂ : ℤ) : ℚ) = 1 := by
+    rcases rung_val_two hp2' h₂0 h₂v with ⟨-, hv⟩ | ⟨-, hv⟩
+    · exact Or.inr hv
+    · exact Or.inl hv
+  have h₁₂0 : d₁ * d₂ ≠ 0 := mul_ne_zero h₁0 h₂0
+  have hd₁q : ((d₁ : ℤ) : ℚ) ≠ 0 := by exact_mod_cast h₁0
+  have hd₂q : ((d₂ : ℤ) : ℚ) ≠ 0 := by exact_mod_cast h₂0
+  have hvd₁₂ : padicValRat 2 (((d₁ * d₂ : ℤ)) : ℚ)
+      = padicValRat 2 ((d₁ : ℤ) : ℚ) + padicValRat 2 ((d₂ : ℤ) : ℚ) := by
+    rw [show (((d₁ * d₂ : ℤ)) : ℚ) = ((d₁ : ℤ) : ℚ) * ((d₂ : ℤ) : ℚ) from by
+      push_cast; ring, padicValRat.mul hd₁q hd₂q]
+  obtain ⟨f₁, hf₁⟩ := sqcls_val_parity (p := 2) hx0 h₁0 h₁
+  obtain ⟨f₂, hf₂⟩ := sqcls_val_parity (p := 2) hxm0 h₂0 h₂
+  obtain ⟨f₃, hf₃⟩ := sqcls_val_parity (p := 2) hxp0 h₁₂0 h₃
+  rw [hvd₁] at hf₁
+  set W : ℤ := padicValRat 2 x with hW
+  have hWodd : W = 2 * f₁ + 1 := hf₁
+  have hvp2 : padicValRat 2 (((p : ℕ) : ℚ)) = 0 := val2_p hp2'
+  rcases lt_trichotomy W 0 with hWlt | hWeq | hWgt
+  · -- below zero both neighbours read `W`
+    have hvxm : padicValRat 2 (x - ((p : ℕ) : ℚ)) = W := by
+      have he : x - ((p : ℕ) : ℚ) = x + (-((p : ℕ) : ℚ)) := by ring
+      rw [he]
+      refine FamilySupport.val_add_left hx0 (by rw [← he]; exact hxm0) ?_
+      rw [padicValRat.neg, hvp2]
+      omega
+    have hvxp : padicValRat 2 (x + ((p : ℕ) : ℚ)) = W := by
+      refine FamilySupport.val_add_left hx0 hxp0 ?_
+      rw [hvp2]
+      omega
+    rw [hvxm] at hf₂
+    rw [hvxp, hvd₁₂, hvd₁] at hf₃
+    rcases hvd₂ with hv | hv <;> rw [hv] at hf₂ hf₃ <;> omega
+  · omega
+  · -- above zero both neighbours read `0`
+    have hvxm : padicValRat 2 (x - ((p : ℕ) : ℚ)) = 0 := by
+      have he : x - ((p : ℕ) : ℚ) = -((p : ℕ) : ℚ) + x := by ring
+      rw [he]
+      have h0 : (-((p : ℕ) : ℚ)) ≠ 0 := neg_ne_zero.mpr hpq0
+      have := FamilySupport.val_add_left h0 (by rw [← he]; exact hxm0)
+        (by rw [padicValRat.neg, hvp2]; omega)
+      rw [this, padicValRat.neg, hvp2]
+    have hvxp : padicValRat 2 (x + ((p : ℕ) : ℚ)) = 0 := by
+      have he : x + ((p : ℕ) : ℚ) = ((p : ℕ) : ℚ) + x := by ring
+      rw [he]
+      have := FamilySupport.val_add_left hpq0 (by rw [← he]; exact hxp0)
+        (by rw [hvp2]; omega)
+      rw [this, hvp2]
+    rw [hvxm] at hf₂
+    rw [hvxp, hvd₁₂, hvd₁] at hf₃
+    rcases hvd₂ with hv | hv <;> rw [hv] at hf₂ hf₃ <;> omega
+
+
+/-! ## 3. The collapse at seven mod eight -/
 
 open WeierstrassCurve.Affine
 open DirectSum
@@ -112,21 +188,22 @@ open Soma.Holonics.Millennium.FamilyKernel
 open Soma.Holonics.Millennium.FamilySupport
 
 set_option maxHeartbeats 4000000 in
-/-- **THE SLOT CLASSES COLLAPSE ON THE FIVE-MOD-EIGHT BRANCH**: at every prime
-`p ≡ 5 (mod 8)`, the slot-class pair of any point of `y² = x³ − p²x` with `y ≠ 0`
+/-- **THE SLOT CLASSES COLLAPSE ON THE SEVEN-MOD-EIGHT BRANCH**: at every prime
+`p ≡ 7 (mod 8)`, the slot-class pair of any point of `y² = x³ − p²x` with `y ≠ 0`
 lies among **eight** named cells — four torsion cells and one coset — under the
-character table `χ_p(−1) = 1`, `χ_p(2) = χ_p(−2) = −1`. -/
-theorem theSlotClassesCollapseOnTheFiveModEightBranch
-    (hp8 : p % 8 = 5) {x y : ℚ}
+character table `χ_p(−1) = χ_p(−2) = −1`, `χ_p(2) = 1`, with the uniform two-adic
+kill holding the first slot odd. -/
+theorem theSlotClassesCollapseOnTheSevenModEightBranch
+    (hp8 : p % 8 = 7) {x y : ℚ}
     (hcurve : y ^ 2 = x ^ 3 - ((p : ℕ) : ℚ) ^ 2 * x) (hy : y ≠ 0)
     {d₁ d₂ : ℤ} (h₁0 : d₁ ≠ 0) (h₂0 : d₂ ≠ 0)
     (h₁v : d₁.natAbs ∣ 2 * p) (h₂v : d₂.natAbs ∣ 2 * p)
     (h₁ : Descent.SqCls x ((d₁ : ℤ) : ℚ))
     (h₂ : Descent.SqCls (x - ((p : ℕ) : ℚ)) ((d₂ : ℤ) : ℚ)) :
-    (d₁ = 1 ∧ d₂ = 1) ∨ (d₁ = -1 ∧ d₂ = -1) ∨
-    (d₁ = 1 ∧ d₂ = (p : ℤ)) ∨ (d₁ = -1 ∧ d₂ = -(p : ℤ)) ∨
-    (d₁ = (p : ℤ) ∧ d₂ = 2) ∨ (d₁ = -(p : ℤ) ∧ d₂ = -2) ∨
-    (d₁ = (p : ℤ) ∧ d₂ = 2 * p) ∨ (d₁ = -(p : ℤ) ∧ d₂ = -2 * p) := by
+    (d₁ = 1 ∧ d₂ = 1) ∨ (d₁ = 1 ∧ d₂ = 2) ∨
+    (d₁ = -1 ∧ d₂ = -(p : ℤ)) ∨ (d₁ = -1 ∧ d₂ = -2 * p) ∨
+    (d₁ = (p : ℤ) ∧ d₂ = 1) ∨ (d₁ = (p : ℤ) ∧ d₂ = 2) ∨
+    (d₁ = -(p : ℤ) ∧ d₂ = -(p : ℤ)) ∨ (d₁ = -(p : ℤ) ∧ d₂ = -2 * p) := by
   have hp : p.Prime := Fact.out
   have hp2 : 2 ≤ p := hp.two_le
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
@@ -151,6 +228,9 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
     sqcls_third hcurve hy hx0 hxm0 h₁ h₂
   have h₁₂0 : d₁ * d₂ ≠ 0 := mul_ne_zero h₁0 h₂0
   have h₁₂pos : 0 < d₁ * d₂ := sqcls_sign h₃ hxppos
+  have hp2' : p ≠ 2 := by intro h; omega
+  have hd₁odd : ¬ (2 : ℤ) ∣ d₁ :=
+    theFirstSlotIsOddAtEveryOddPrime hp2' hx0 hxm0 hxp0 h₁0 h₂0 h₁v h₂v h₁ h₂ h₃
   -- the valuation ledger
   have hvp : padicValRat p (((p : ℕ) : ℚ)) = 1 := val_p hp
   have hvsum : 2 * padicValRat p y = padicValRat p x
@@ -274,14 +354,12 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
       mul_left_cancel₀ hne₁ (by rw [← heqprod, mul_one])
     have hchi₁ : quadraticChar (ZMod p) ((d₁ : ZMod p)) = 1 := by
       rw [heq₁₂, hchi₂]
-    rcases rung5_char_one hp8 h₁0 h₁v hfree₁ hchi₁ with rfl | rfl <;>
-      rcases rung5_char_one hp8 h₂0 h₂v hfree₂ hchi₂ with rfl | rfl
+    rcases rung7_char_one hp8 h₁0 h₁v hfree₁ hchi₁ with rfl | rfl <;>
+      rcases rung7_char_one hp8 h₂0 h₂v hfree₂ hchi₂ with rfl | rfl
     · exact Or.inl ⟨rfl, rfl⟩
-    · exfalso
-      omega
-    · exfalso
-      omega
     · exact Or.inr (Or.inl ⟨rfl, rfl⟩)
+    · exact absurd ⟨1, by ring⟩ hd₁odd
+    · exact absurd ⟨1, by ring⟩ hd₁odd
   · -- the `p`-adic branch: at least one slot meets the prime
     push_neg at hVle
     have hVpos : 0 < V := hVle
@@ -434,11 +512,11 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
           try ring
         rw [hd, padicValRat.div hx0 hpq0, hvp]
         omega
-      have hchi₂' : quadraticChar (ZMod p) ((d₂' : ZMod p)) = 1 := by
-        rw [← hrz₂, hcong₂, chiRead_intCast, chi5_neg_one hp8]
+      have hchi₂' : quadraticChar (ZMod p) ((d₂' : ZMod p)) = -1 := by
+        rw [← hrz₂, hcong₂, chiRead_intCast, chi7_neg_one hp8]
       have hchi₁₂' : quadraticChar (ZMod p) (((d₁ * d₂' : ℤ)) : ZMod p) = 1 := by
         rw [← hrz₃, hcong₃, chiRead_intCast, chi_one']
-      have hchi₁ : quadraticChar (ZMod p) ((d₁ : ZMod p)) = 1 := by
+      have hchi₁ : quadraticChar (ZMod p) ((d₁ : ZMod p)) = -1 := by
         have hmul : quadraticChar (ZMod p) (((d₁ * d₂' : ℤ)) : ZMod p)
             = quadraticChar (ZMod p) ((d₁ : ZMod p)) *
               quadraticChar (ZMod p) ((d₂' : ZMod p)) := by
@@ -446,16 +524,12 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
               = ((d₁ : ZMod p)) * ((d₂' : ZMod p)) from by push_cast; ring, map_mul]
         rw [hmul, hchi₂'] at hchi₁₂'
         linarith
-      rcases rung5_char_one hp8 h₁0 h₁v hfree₁ hchi₁ with rfl | rfl <;>
-        rcases rung5_char_one hp8 hd₂'0 hd₂'v hd₂'free hchi₂' with rfl | rfl
+      rcases rung7_char_neg_one hp8 h₁0 h₁v hfree₁ hchi₁ with rfl | rfl <;>
+        rcases rung7_char_neg_one hp8 hd₂'0 hd₂'v hd₂'free hchi₂' with rfl | rfl
       · exact Or.inr (Or.inr (Or.inl ⟨rfl, by omega⟩))
-      · exfalso
-        rw [hd₂'] at h₁₂pos
-        nlinarith [h₁₂pos]
-      · exfalso
-        rw [hd₂'] at h₁₂pos
-        nlinarith [h₁₂pos]
       · exact Or.inr (Or.inr (Or.inr (Or.inl ⟨rfl, by omega⟩)))
+      · exact absurd ⟨-1, by ring⟩ hd₁odd
+      · exact absurd ⟨-1, by ring⟩ hd₁odd
     · -- `V = 1`; the even slot is the second or the third
       have hV1 : V = 1 := by
         by_contra hc
@@ -544,9 +618,9 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
           omega
         have hchi₁' : quadraticChar (ZMod p) ((d₁' : ZMod p)) = 1 := by
           rw [← hrz₁, hcong₁, chiRead_intCast, chi_one']
-        have hchi₁₂' : quadraticChar (ZMod p) (((d₁' * d₂ : ℤ)) : ZMod p) = -1 := by
-          rw [← hrz₃, hcong₃, chiRead_intCast, chi5_two hp8]
-        have hchi₂ : quadraticChar (ZMod p) ((d₂ : ZMod p)) = -1 := by
+        have hchi₁₂' : quadraticChar (ZMod p) (((d₁' * d₂ : ℤ)) : ZMod p) = 1 := by
+          rw [← hrz₃, hcong₃, chiRead_intCast, chi7_two hp8]
+        have hchi₂ : quadraticChar (ZMod p) ((d₂ : ZMod p)) = 1 := by
           have hmul : quadraticChar (ZMod p) (((d₁' * d₂ : ℤ)) : ZMod p)
               = quadraticChar (ZMod p) ((d₁' : ZMod p)) *
                 quadraticChar (ZMod p) ((d₂ : ZMod p)) := by
@@ -554,16 +628,12 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
                 = ((d₁' : ZMod p)) * ((d₂ : ZMod p)) from by push_cast; ring, map_mul]
           rw [hmul, hchi₁'] at hchi₁₂'
           linarith
-        rcases rung5_char_one hp8 hd₁'0 hd₁'v hd₁'free hchi₁' with rfl | rfl <;>
-          rcases rung5_char_neg_one hp8 h₂0 h₂v hfree₂ hchi₂ with rfl | rfl
+        rcases rung7_char_one hp8 hd₁'0 hd₁'v hd₁'free hchi₁' with rfl | rfl <;>
+          rcases rung7_char_one hp8 h₂0 h₂v hfree₂ hchi₂ with rfl | rfl
         · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨by omega, rfl⟩))))
-        · exfalso
-          rw [hd₁'] at h₁₂pos
-          nlinarith [h₁₂pos]
-        · exfalso
-          rw [hd₁'] at h₁₂pos
-          nlinarith [h₁₂pos]
         · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨by omega, rfl⟩)))))
+        · exact absurd (by rw [hd₁']; exact ⟨(p : ℤ), by ring⟩ : (2 : ℤ) ∣ d₁) hd₁odd
+        · exact absurd (by rw [hd₁']; exact ⟨(p : ℤ), by ring⟩ : (2 : ℤ) ∣ d₁) hd₁odd
       · -- `v₂ = 1` and `v₃` even: the cells `(2p, p)` and `(−p, −2p)`
         have hv₂1 : v₂ = 1 := by
           by_contra hc
@@ -620,401 +690,35 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
             try ring
           rw [hd, padicValRat.div hxp0 hpq0, hvp]
           omega
-        have hchi₁' : quadraticChar (ZMod p) ((d₁' : ZMod p)) = 1 := by
-          rw [← hrz₁, hcong₁, chiRead_intCast, chi5_neg_one hp8]
+        have hchi₁' : quadraticChar (ZMod p) ((d₁' : ZMod p)) = -1 := by
+          rw [← hrz₁, hcong₁, chiRead_intCast, chi7_neg_one hp8]
         have hchi₂' : quadraticChar (ZMod p) ((d₂' : ZMod p)) = -1 := by
-          rw [← hrz₂, hcong₂, chiRead_intCast, chi5_neg_two hp8]
-        rcases rung5_char_one hp8 hd₁'0 hd₁'v hd₁'free hchi₁' with rfl | rfl <;>
-          rcases rung5_char_neg_one hp8 hd₂'0 hd₂'v hd₂'free hchi₂' with rfl | rfl
+          rw [← hrz₂, hcong₂, chiRead_intCast, chi7_neg_two hp8]
+        rcases rung7_char_neg_one hp8 hd₁'0 hd₁'v hd₁'free hchi₁' with rfl | rfl <;>
+          rcases rung7_char_neg_one hp8 hd₂'0 hd₂'v hd₂'free hchi₂' with rfl | rfl
         · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl
             ⟨by omega, by omega⟩))))))
-        · exfalso
-          rw [hd₁', hd₂'] at h₁₂pos
-          nlinarith [h₁₂pos]
-        · exfalso
-          rw [hd₁', hd₂'] at h₁₂pos
-          nlinarith [h₁₂pos]
         · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr
             ⟨by omega, by omega⟩))))))
+        · exact absurd (by rw [hd₁']; exact ⟨-(p : ℤ), by ring⟩ : (2 : ℤ) ∣ d₁) hd₁odd
+        · exact absurd (by rw [hd₁']; exact ⟨-(p : ℤ), by ring⟩ : (2 : ℤ) ∣ d₁) hd₁odd
 
 
 
 
 
-/-! ## 3. The rung pins: three invariants determine the class -/
-
-lemma rung_cases (hp3 : 2 < p) {d : ℤ} (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) :
-    d = 1 ∨ d = -1 ∨ d = 2 ∨ d = -2 ∨ d = (p : ℤ) ∨ d = -(p : ℤ) ∨
-    d = 2 * p ∨ d = -(2 * (p : ℤ)) := by
-  have h4 := FamilyPrimeRank.dvd_two_mul_prime (Fact.out : p.Prime) hdvd
-  have habs := Int.natAbs_eq d
-  rcases h4 with h | h | h | h <;> omega
-
-lemma val2_p (hp2' : p ≠ 2) : padicValRat 2 (((p : ℕ) : ℚ)) = 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hpodd : p % 2 = 1 := by
-    rcases hp.eq_two_or_odd with h | h
-    · exact absurd h hp2'
-    · exact h
-  have hnd : ¬ (2 : ℤ) ∣ ((p : ℕ) : ℤ) := by
-    rw [show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, Int.natCast_dvd_natCast]
-    omega
-  have := int_val_zero (p := 2) hnd
-  push_cast at this ⊢
-  exact this
-
-lemma val2_two : padicValRat 2 ((2 : ℚ)) = 1 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have := padicValRat.self (p := 2) (by norm_num)
-  push_cast at this ⊢
-  exact this
-
-/-- The two-adic valuation of a rung tracks two-divisibility. -/
-lemma rung_val_two (hp2' : p ≠ 2) {d : ℤ} (hd0 : d ≠ 0) (hdvd : d.natAbs ∣ 2 * p) :
-    ((2 : ℤ) ∣ d ∧ padicValRat 2 ((d : ℤ) : ℚ) = 1) ∨
-    (¬ (2 : ℤ) ∣ d ∧ padicValRat 2 ((d : ℤ) : ℚ) = 0) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hp3 : 2 < p := by
-    have := hp.two_le
-    omega
-  have hpodd : p % 2 = 1 := by
-    rcases hp.eq_two_or_odd with h | h
-    · exact absurd h hp2'
-    · exact h
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · right
-    exact ⟨by norm_num, by
-      have := int_val_zero (p := 2) (show ¬ (2:ℤ) ∣ 1 from by norm_num)
-      push_cast at this ⊢
-      exact this⟩
-  · right
-    exact ⟨by norm_num, by
-      have := int_val_zero (p := 2) (show ¬ (2:ℤ) ∣ -1 from by norm_num)
-      push_cast at this ⊢
-      exact this⟩
-  · left
-    exact ⟨⟨1, by ring⟩, by push_cast; exact val2_two⟩
-  · left
-    refine ⟨⟨-1, by ring⟩, ?_⟩
-    have h1 : ((( -2 : ℤ)) : ℚ) = -(2 : ℚ) := by push_cast; ring
-    rw [h1, padicValRat.neg]
-    exact val2_two
-  · right
-    refine ⟨?_, by push_cast; exact val2_p hp2'⟩
-    rw [show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, Int.natCast_dvd_natCast]
-    omega
-  · right
-    refine ⟨?_, ?_⟩
-    · rw [Int.dvd_neg, show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl,
-        Int.natCast_dvd_natCast]
-      omega
-    · have h1 : (((-(p : ℤ)) : ℤ) : ℚ) = -(((p : ℕ) : ℚ)) := by push_cast; ring
-      rw [h1, padicValRat.neg]
-      exact val2_p hp2'
-  · left
-    refine ⟨⟨(p : ℤ), by ring⟩, ?_⟩
-    have h1 : (((2 * (p : ℤ)) : ℤ) : ℚ) = (2 : ℚ) * (((p : ℕ) : ℚ)) := by
-      push_cast; ring
-    rw [h1, padicValRat.mul (by norm_num) (by exact_mod_cast hp.pos.ne'),
-      val2_two, val2_p hp2']
-    ring
-  · left
-    refine ⟨⟨-(p : ℤ), by ring⟩, ?_⟩
-    have h1 : (((-(2 * (p : ℤ))) : ℤ) : ℚ) = -((2 : ℚ) * (((p : ℕ) : ℚ))) := by
-      push_cast; ring
-    rw [h1, padicValRat.neg,
-      padicValRat.mul (by norm_num) (by exact_mod_cast hp.pos.ne'),
-      val2_two, val2_p hp2']
-    ring
-
-/-- The master pin: the sign and the two valuation parities of a member read the
-sign and the two prime supports of its rung. -/
-lemma master_pin (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ)) :
-    (0 < z → 0 < d) ∧ (z < 0 → d < 0) ∧
-    (Even (padicValRat p z) → ¬ (p : ℤ) ∣ d) ∧
-    (Odd (padicValRat p z) → (p : ℤ) ∣ d) ∧
-    (Even (padicValRat 2 z) → ¬ (2 : ℤ) ∣ d) ∧
-    (Odd (padicValRat 2 z) → (2 : ℤ) ∣ d) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hp3 : 2 < p := by
-    have := hp.two_le
-    omega
-  have hpodd : p % 2 = 1 := by
-    rcases hp.eq_two_or_odd with h | h
-    · exact absurd h hp2'
-    · exact h
-  obtain ⟨ep, hep⟩ := sqcls_val_parity (p := p) hz0 hd0 hsq
-  obtain ⟨e2, he2⟩ := sqcls_val_parity (p := 2) hz0 hd0 hsq
-  -- the two-adic valuation of a rung tracks two-divisibility
-  have hv2d := rung_val_two hp2' hd0 hdvd
-  -- the `p`-adic valuation of a rung tracks `p`-divisibility
-  have hvpd : ((p : ℤ) ∣ d ∧ padicValRat p ((d : ℤ) : ℚ) = 1) ∨
-      (¬ (p : ℤ) ∣ d ∧ padicValRat p ((d : ℤ) : ℚ) = 0) := by
-    rcases rung_split (by omega) hd0 hdvd with ⟨hf, hv⟩ | ⟨hdv, -, -, -, -, -, hv⟩
-    · exact Or.inr ⟨hf, hv⟩
-    · exact Or.inl ⟨hdv, hv⟩
-  refine ⟨fun hz => sqcls_sign hsq hz, fun hz => ?_, fun he => ?_, fun ho => ?_,
-    fun he => ?_, fun ho => ?_⟩
-  · by_contra hdpos
-    push_neg at hdpos
-    have hd' : 0 < d := lt_of_le_of_ne hdpos (Ne.symm hd0)
-    obtain ⟨c, hc, hv⟩ := hsq
-    have : 0 < z := by
-      rw [hv]
-      have h1 : (0 : ℚ) < ((d : ℤ) : ℚ) := by exact_mod_cast hd'
-      positivity
-    linarith
-  · rcases hvpd with ⟨hdv, hv⟩ | ⟨hf, hv⟩
-    · rw [hv] at hep
-      obtain ⟨w, hw⟩ := he
-      omega
-    · exact hf
-  · rcases hvpd with ⟨hdv, hv⟩ | ⟨hf, hv⟩
-    · exact hdv
-    · rw [hv] at hep
-      obtain ⟨w, hw⟩ := ho
-      omega
-  · rcases hv2d with ⟨hdv, hv⟩ | ⟨hf, hv⟩
-    · rw [hv] at he2
-      obtain ⟨w, hw⟩ := he
-      omega
-    · exact hf
-  · rcases hv2d with ⟨hdv, hv⟩ | ⟨hf, hv⟩
-    · exact hdv
-    · rw [hv] at he2
-      obtain ⟨w, hw⟩ := ho
-      omega
-
-
-/-! ## 4. The six torsion pins -/
-
-lemma vp_neg_psq :
-    padicValRat p (-(((p : ℕ) : ℚ)) ^ 2) = 2 := by
-  have hp : p.Prime := Fact.out
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  rw [show (-(((p : ℕ) : ℚ)) ^ 2) = -((((p : ℕ) : ℚ)) ^ 2) from by ring,
-    padicValRat.neg, padicValRat.pow hpq0, val_p hp]
-  ring
-
-lemma v2_neg_psq (hp2' : p ≠ 2) :
-    padicValRat 2 (-(((p : ℕ) : ℚ)) ^ 2) = 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  rw [show (-(((p : ℕ) : ℚ)) ^ 2) = -((((p : ℕ) : ℚ)) ^ 2) from by ring,
-    padicValRat.neg, padicValRat.pow hpq0, val2_p hp2']
-  ring
-
-lemma vp_two_psq (hp2' : p ≠ 2) :
-    padicValRat p ((2 : ℚ) * (((p : ℕ) : ℚ)) ^ 2) = 2 := by
-  have hp : p.Prime := Fact.out
-  have hp3 : 2 < p := by have := hp.two_le; omega
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  have hv2 : padicValRat p ((2 : ℚ)) = 0 := by
-    have hnd : ¬ (p : ℤ) ∣ (2 : ℤ) := by
-      intro h
-      have := Int.le_of_dvd (by norm_num) h
-      omega
-    have := int_val_zero (p := p) hnd
-    push_cast at this ⊢
-    exact this
-  rw [padicValRat.mul (by norm_num) (pow_ne_zero 2 hpq0), hv2,
-    padicValRat.pow hpq0, val_p hp]
-  ring
-
-lemma v2_two_psq (hp2' : p ≠ 2) :
-    padicValRat 2 ((2 : ℚ) * (((p : ℕ) : ℚ)) ^ 2) = 1 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  rw [padicValRat.mul (by norm_num) (pow_ne_zero 2 hpq0), val2_two,
-    padicValRat.pow hpq0, val2_p hp2']
-  ring
-
-lemma vp_neg_p : padicValRat p (-((p : ℕ) : ℚ)) = 1 := by
-  have hp : p.Prime := Fact.out
-  rw [padicValRat.neg, val_p hp]
-
-lemma v2_neg_p (hp2' : p ≠ 2) : padicValRat 2 (-((p : ℕ) : ℚ)) = 0 := by
-  rw [padicValRat.neg, val2_p hp2']
-
-lemma vp_neg_2p (hp2' : p ≠ 2) :
-    padicValRat p (-((2 : ℚ) * ((p : ℕ) : ℚ))) = 1 := by
-  have hp : p.Prime := Fact.out
-  have hp3 : 2 < p := by have := hp.two_le; omega
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  have hv2 : padicValRat p ((2 : ℚ)) = 0 := by
-    have hnd : ¬ (p : ℤ) ∣ (2 : ℤ) := by
-      intro h
-      have := Int.le_of_dvd (by norm_num) h
-      omega
-    have := int_val_zero (p := p) hnd
-    push_cast at this ⊢
-    exact this
-  rw [padicValRat.neg, padicValRat.mul (by norm_num) hpq0, hv2, val_p hp]
-  ring
-
-lemma v2_neg_2p (hp2' : p ≠ 2) :
-    padicValRat 2 (-((2 : ℚ) * ((p : ℕ) : ℚ))) = 1 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hp : p.Prime := Fact.out
-  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
-  rw [padicValRat.neg, padicValRat.mul (by norm_num) hpq0, val2_two, val2_p hp2']
-  ring
-
-/-- Shared kill-kit for the pins. -/
-lemma pin_facts (hp2' : p ≠ 2) :
-    ¬ (p : ℤ) ∣ (1 : ℤ) ∧ ¬ (p : ℤ) ∣ (2 : ℤ) ∧ (0 : ℤ) < (p : ℤ) ∧ p % 2 = 1 := by
-  have hp : p.Prime := Fact.out
-  have hp3 : 2 < p := by have := hp.two_le; omega
-  refine ⟨fun h => ?_, fun h => ?_, by exact_mod_cast hp.pos, ?_⟩
-  · have := Int.le_of_dvd (by norm_num) h
-    omega
-  · have := Int.le_of_dvd (by norm_num) h
-    omega
-  · rcases hp.eq_two_or_odd with h | h
-    · exact absurd h hp2'
-    · exact h
-
-lemma pin_one' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzpos : 0 < z) (hvpe : Even (padicValRat p z)) (hv2e : Even (padicValRat 2 z)) :
-    d = 1 := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨hpos, -, hevp, -, hev2, -⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdpos := hpos hzpos
-  have hnp := hevp hvpe
-  have hn2 := hev2 hv2e
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · rfl
-  · omega
-  · exact absurd ⟨1, by ring⟩ hn2
-  · omega
-  · exact absurd (dvd_refl _) hnp
-  · omega
-  · exact absurd ⟨2, by ring⟩ hnp
-  · omega
-
-lemma pin_neg_one' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzneg : z < 0) (hvpe : Even (padicValRat p z)) (hv2e : Even (padicValRat 2 z)) :
-    d = -1 := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨-, hneg, hevp, -, hev2, -⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdneg := hneg hzneg
-  have hnp := hevp hvpe
-  have hn2 := hev2 hv2e
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · omega
-  · rfl
-  · omega
-  · exact absurd ⟨-1, by ring⟩ hn2
-  · omega
-  · exact absurd (dvd_neg.mpr (dvd_refl _)) hnp
-  · omega
-  · exact absurd (dvd_neg.mpr ⟨2, by ring⟩) hnp
-
-lemma pin_p' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzpos : 0 < z) (hvpo : Odd (padicValRat p z)) (hv2e : Even (padicValRat 2 z)) :
-    d = (p : ℤ) := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨hpos, -, -, hodp, hev2, -⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdpos := hpos hzpos
-  have hpd := hodp hvpo
-  have hn2 := hev2 hv2e
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact absurd hpd hdp1
-  · omega
-  · exact absurd hpd hdp2
-  · omega
-  · rfl
-  · omega
-  · exact absurd ⟨(p : ℤ), by ring⟩ hn2
-  · omega
-
-lemma pin_neg_p' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzneg : z < 0) (hvpo : Odd (padicValRat p z)) (hv2e : Even (padicValRat 2 z)) :
-    d = -(p : ℤ) := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨-, hneg, -, hodp, hev2, -⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdneg := hneg hzneg
-  have hpd := hodp hvpo
-  have hn2 := hev2 hv2e
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · omega
-  · exact absurd (Int.dvd_neg.mp hpd) hdp1
-  · omega
-  · exact absurd (Int.dvd_neg.mp hpd) hdp2
-  · omega
-  · rfl
-  · omega
-  · exact absurd ⟨-(p : ℤ), by ring⟩ hn2
-
-lemma pin_two' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzpos : 0 < z) (hvpe : Even (padicValRat p z)) (hv2o : Odd (padicValRat 2 z)) :
-    d = 2 := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨hpos, -, hevp, -, -, hod2⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdpos := hpos hzpos
-  have hnp := hevp hvpe
-  have h2d := hod2 hv2o
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · obtain ⟨c, hc⟩ := h2d
-    omega
-  · omega
-  · rfl
-  · omega
-  · obtain ⟨c, hc⟩ := h2d
-    omega
-  · omega
-  · exact absurd ⟨2, by ring⟩ hnp
-  · omega
-
-lemma pin_neg_2p' (hp2' : p ≠ 2) {z : ℚ} {d : ℤ} (hz0 : z ≠ 0) (hd0 : d ≠ 0)
-    (hdvd : d.natAbs ∣ 2 * p) (hsq : Descent.SqCls z ((d : ℤ) : ℚ))
-    (hzneg : z < 0) (hvpo : Odd (padicValRat p z)) (hv2o : Odd (padicValRat 2 z)) :
-    d = -(2 * (p : ℤ)) := by
-  obtain ⟨hdp1, hdp2, hpp, hpodd⟩ := pin_facts hp2'
-  have hp3 : 2 < p := by have := (Fact.out : p.Prime).two_le; omega
-  obtain ⟨-, hneg, -, hodp, -, hod2⟩ := master_pin hp2' hz0 hd0 hdvd hsq
-  have hdneg := hneg hzneg
-  have hpd := hodp hvpo
-  have h2d := hod2 hv2o
-  rcases rung_cases hp3 hd0 hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · omega
-  · exact absurd (Int.dvd_neg.mp hpd) hdp1
-  · omega
-  · exact absurd (Int.dvd_neg.mp hpd) hdp2
-  · omega
-  · obtain ⟨c, hc⟩ := h2d
-    omega
-  · omega
-  · rfl
 
 
 /-! ## 5. The eight cells and the collision -/
 
-/-- The eight admitted cells at `p ≡ 5 (mod 8)`. -/
-def cells5 (p : ℕ) : Finset (ℤ × ℤ) :=
-  {((1 : ℤ), (1 : ℤ)), ((-1 : ℤ), (-1 : ℤ)), ((1 : ℤ), (p : ℤ)),
-   ((-1 : ℤ), -(p : ℤ)), ((p : ℤ), (2 : ℤ)), (-(p : ℤ), (-2 : ℤ)),
-   ((p : ℤ), 2 * (p : ℤ)), (-(p : ℤ), -2 * (p : ℤ))}
+/-- The eight admitted cells at `p ≡ 7 (mod 8)`. -/
+def cells7 (p : ℕ) : Finset (ℤ × ℤ) :=
+  {((1 : ℤ), (1 : ℤ)), ((1 : ℤ), (2 : ℤ)), ((-1 : ℤ), -(p : ℤ)),
+   ((-1 : ℤ), -2 * (p : ℤ)), ((p : ℤ), (1 : ℤ)), ((p : ℤ), (2 : ℤ)),
+   (-(p : ℤ), -(p : ℤ)), (-(p : ℤ), -2 * (p : ℤ))}
 
-lemma cells5_card_le (p : ℕ) : (cells5 p).card ≤ 8 := by
-  unfold cells5
+lemma cells7_card_le (p : ℕ) : (cells7 p).card ≤ 8 := by
+  unfold cells7
   refine le_trans (Finset.card_insert_le _ _) ?_
   refine Nat.succ_le_succ ?_
   refine le_trans (Finset.card_insert_le _ _) ?_
@@ -1033,9 +737,9 @@ lemma cells5_card_le (p : ℕ) : (cells5 p).card ≤ 8 := by
 
 /-- **Every point lands in the eight cells**: the collapse places the moving
 points, and the six pins place the torsion. -/
-lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
+lemma classOf_mem_cells7 (hp2' : p ≠ 2) (hp8 : p % 8 = 7)
     (P : (FamilyFace.E (((p : ℕ) : ℚ))).Point) :
-    FamilyCollision.classOf (Fact.out : p.Prime).pos P ∈ cells5 p := by
+    FamilyCollision.classOf (Fact.out : p.Prime).pos P ∈ cells7 p := by
   have hp : p.Prime := Fact.out
   have hn : 0 < p := hp.pos
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
@@ -1043,7 +747,7 @@ lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
   obtain ⟨h10, h20, h1d, h2d, hsq1, hsq2⟩ := FamilyCollision.classOf_spec hn P
   set d₁ := (FamilyCollision.classOf hn P).1 with hd₁def
   set d₂ := (FamilyCollision.classOf hn P).2 with hd₂def
-  simp only [cells5, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
+  simp only [cells7, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
   rcases P with _ | @⟨x, y, hns⟩
   · -- the zero point: both slots read `1`
     have hs1 : slotOneAt (((p : ℕ) : ℚ)) 0 = 1 := rfl
@@ -1074,7 +778,7 @@ lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
         rw [slotTwoAt_some, if_neg (by rw [hx0]; exact fun hc => hpq0 hc.symm)] at hsq2
         have hs2v : x - ((p : ℕ) : ℚ) = -((p : ℕ) : ℚ) := by rw [hx0]; ring
         rw [hs2v] at hsq2
-        right; right; right; left
+        right; right; left
         rw [Prod.ext_iff]
         constructor
         · exact pin_neg_one' hp2' (neg_ne_zero.mpr (pow_ne_zero 2 hpq0)) h10 h1d hsq1
@@ -1088,7 +792,7 @@ lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
         rw [slotOneAt_some, if_neg (by rw [hxp']; exact hpq0)] at hsq1
         rw [slotTwoAt_some, if_pos hxp'] at hsq2
         rw [hxp'] at hsq1
-        right; right; right; right; left
+        right; right; right; right; right; left
         rw [Prod.ext_iff]
         constructor
         · exact pin_p' hp2' hpq0 h10 h1d hsq1 hpqpos
@@ -1123,7 +827,7 @@ lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
         FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots hcurve hy
       rw [if_neg hx0] at hsq1
       rw [if_neg hxn] at hsq2
-      rcases theSlotClassesCollapseOnTheFiveModEightBranch hp8 hcurve hy
+      rcases theSlotClassesCollapseOnTheSevenModEightBranch hp8 hcurve hy
           h10 h20 h1d h2d hsq1 hsq2 with
         ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ |
           ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -1138,19 +842,19 @@ lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
 
 /-- **THE CLASSES COLLIDE ON THE FIVE-MOD-EIGHT BRANCH**: any family of more than
 `8` points contains two whose difference is a double. -/
-theorem theClassesCollideOnTheFiveModEightBranch (hp8 : p % 8 = 5) {α : Type}
+theorem theClassesCollideOnTheSevenModEightBranch (hp8 : p % 8 = 7) {α : Type}
     [Fintype α] (hcard : 8 < Fintype.card α)
     (f : α → (FamilyFace.E (((p : ℕ) : ℚ))).Point) :
     ∃ a b, a ≠ b ∧ ∃ Q : (FamilyFace.E (((p : ℕ) : ℚ))).Point, f a - f b = Q + Q := by
   have hp : p.Prime := Fact.out
   have hp2' : p ≠ 2 := by intro h; omega
   have hn : 0 < p := hp.pos
-  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ cells5 p := fun a =>
-    classOf_mem_cells5 hp2' hp8 (f a)
-  have hlt : (cells5 p).card < Fintype.card α :=
-    lt_of_le_of_lt (cells5_card_le p) hcard
+  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ cells7 p := fun a =>
+    classOf_mem_cells7 hp2' hp8 (f a)
+  have hlt : (cells7 p).card < Fintype.card α :=
+    lt_of_le_of_lt (cells7_card_le p) hcard
   obtain ⟨a, -, b, -, hab, hfab⟩ :=
-    Finset.exists_ne_map_eq_of_card_lt_of_maps_to (s := Finset.univ) (t := cells5 p)
+    Finset.exists_ne_map_eq_of_card_lt_of_maps_to (s := Finset.univ) (t := cells7 p)
       (by rw [Finset.card_univ]; exact hlt) fun a _ => hmaps a
   exact ⟨a, b, hab, FamilyCollision.sameClass_double hn (f a) (f b) hfab⟩
 
@@ -1160,8 +864,8 @@ theorem theClassesCollideOnTheFiveModEightBranch (hp8 : p % 8 = 5) {α : Type}
 set_option maxHeartbeats 2000000 in
 /-- **THE ALGEBRAIC RANK IS BOUNDED ON THE FIVE-MOD-EIGHT BRANCH**: whenever
 `8 < 3·2^r`, no `r` points are independent modulo torsion. -/
-theorem theAlgebraicRankIsBoundedOnTheFiveModEightBranch (r : ℕ)
-    (hp8 : p % 8 = 5) (hr : 8 < 3 * 2 ^ r) :
+theorem theAlgebraicRankIsBoundedOnTheSevenModEightBranch (r : ℕ)
+    (hp8 : p % 8 = 7) (hr : 8 < 3 * 2 ^ r) :
     ¬ BirchSwinnertonDyer.AlgebraicRankAtLeast p r := by
   have hnp : p.Prime := Fact.out
   have hn : 0 < p := hnp.pos
@@ -1303,7 +1007,7 @@ theorem theAlgebraicRankIsBoundedOnTheFiveModEightBranch (r : ℕ)
       exact absurd (Finset.mem_univ i) habs
   -- the colliding family of `3·2^r` points
   obtain ⟨x, x', hnexx, Q, hQ⟩ :=
-    theClassesCollideOnTheFiveModEightBranch hp8
+    theClassesCollideOnTheSevenModEightBranch hp8
       (α := (Fin r → Bool) × Fin 3)
       (by
         simp only [Fintype.card_prod, Fintype.card_fin, Fintype.card_fun,
@@ -1360,19 +1064,20 @@ theorem theAlgebraicRankIsBoundedOnTheFiveModEightBranch (r : ℕ)
 /-- **THE RANK IS AT MOST ONE AT EVERY PRIME `p ≡ 5 (mod 8)`**: no two points of
 `y² = x³ − p²x` are independent modulo torsion — the eight-cell collapse forces
 `3·2^r ≤ 8`, so `r ≤ 1`.  Against the standing central vanishing
-(`theAnalyticRankIsPositiveOnTheFiveModEightBranch`), the conjecture's prediction
+(`theAnalyticRankIsPositiveOnTheSevenModEightBranch`), the conjecture's prediction
 of rank exactly one is squeezed to within a single point on this branch. -/
-theorem theRankIsAtMostOneAtEveryFiveModEightPrime (hp8 : p % 8 = 5) :
+theorem theRankIsAtMostOneAtEverySevenModEightPrime (hp8 : p % 8 = 7) :
     ¬ BirchSwinnertonDyer.AlgebraicRankAtLeast p 2 :=
-  theAlgebraicRankIsBoundedOnTheFiveModEightBranch 2 hp8 (by norm_num)
+  theAlgebraicRankIsBoundedOnTheSevenModEightBranch 2 hp8 (by norm_num)
 
 
-/-- **THE RANK IS ZERO OR ONE AT EVERY PRIME `p ≡ 5 (mod 8)`**, unconditionally:
+/-- **THE RANK IS ZERO OR ONE AT EVERY PRIME `p ≡ 7 (mod 8)`**, unconditionally:
 the eight cells leave no room for a second independent point. -/
-theorem theRankIsZeroOrOneAtEveryFiveModEightPrime (hp8 : p % 8 = 5) :
+theorem theRankIsZeroOrOneAtEverySevenModEightPrime (hp8 : p % 8 = 7) :
     BirchSwinnertonDyer.AlgebraicRankIs p 0 ∨ BirchSwinnertonDyer.AlgebraicRankIs p 1 := by
   by_cases h1 : BirchSwinnertonDyer.AlgebraicRankAtLeast p 1
-  · exact Or.inr ⟨h1, theRankIsAtMostOneAtEveryFiveModEightPrime hp8⟩
+  · exact Or.inr ⟨h1, theRankIsAtMostOneAtEverySevenModEightPrime hp8⟩
   · exact Or.inl ⟨⟨fun i => i.elim0, fun c _ i => i.elim0⟩, h1⟩
 
-end Soma.Holonics.Millennium.FamilyFiveDescent
+
+end Soma.Holonics.Millennium.FamilySevenDescent
