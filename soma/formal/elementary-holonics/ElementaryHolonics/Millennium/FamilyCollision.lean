@@ -42,30 +42,30 @@ variable {n : ℕ}
 
 /-! ## 1. Plumbing -/
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
+lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
     Descent.SqCls a c := by
   obtain ⟨k, hk, hkv⟩ := h₁
   obtain ⟨m, hm, hmv⟩ := h₂
   exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
 
-private lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
+lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
   obtain ⟨c, hc, hv⟩ := h
   exact ⟨c⁻¹, inv_ne_zero hc, by
     rw [hv, inv_pow, inv_mul_cancel_left₀ (pow_ne_zero 2 hc)]⟩
 
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
+lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
     Descent.SqCls (a * b) (c * d) := by
   obtain ⟨k, hk, hkv⟩ := h₁
   obtain ⟨m, hm, hmv⟩ := h₂
   exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
 
-private lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
+lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
   obtain ⟨c, hc, hv⟩ := h
   intro hb
   rw [hb, mul_zero] at hv
   exact ha hv
 
-private lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotOneAt ((n : ℚ)) P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
@@ -75,7 +75,7 @@ private lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
       exact neg_ne_zero.mpr (pow_ne_zero 2 h1)
     · exact hx
 
-private lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotTwoAt ((n : ℚ)) P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
@@ -85,25 +85,25 @@ private lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
       positivity
     · exact sub_ne_zero.mpr hx
 
-private lemma slot_neg_one (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slot_neg_one (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotOneAt ((n : ℚ)) (-P) = slotOneAt ((n : ℚ)) P := by
   rcases P with _ | @⟨x, y, h⟩
   · rw [← Point.zero_def, neg_zero]
   · rw [Point.neg_some]
     rfl
 
-private lemma slot_neg_two (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slot_neg_two (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotTwoAt ((n : ℚ)) (-P) = slotTwoAt ((n : ℚ)) P := by
   rcases P with _ | @⟨x, y, h⟩
   · rw [← Point.zero_def, neg_zero]
   · rw [Point.neg_some]
     rfl
 
-private def classOf (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) : ℤ × ℤ :=
+def classOf (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) : ℤ × ℤ :=
   ((FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose,
    (FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose_spec.choose)
 
-private lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     (classOf hn P).1 ≠ 0 ∧ (classOf hn P).2 ≠ 0 ∧
     (classOf hn P).1.natAbs ∣ 2 * n ∧ (classOf hn P).2.natAbs ∣ 2 * n ∧
     Descent.SqCls (slotOneAt ((n : ℚ)) P) (((classOf hn P).1 : ℤ) : ℚ) ∧
@@ -113,7 +113,7 @@ private lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
 
 /-! ## 2. Same class means the difference is a double -/
 
-private lemma sameClass_double (hn : 0 < n)
+lemma sameClass_double (hn : 0 < n)
     (X R : (FamilyFace.E ((n : ℚ))).Point) (hc : classOf hn X = classOf hn R) :
     ∃ Q : (FamilyFace.E ((n : ℚ))).Point, X - R = Q + Q := by
   have hnq : (0 : ℚ) < (n : ℚ) := by exact_mod_cast hn
@@ -173,7 +173,7 @@ theorem theClassesCollideAtEveryModulus (hn : 0 < n) {α : Type} [Fintype α]
 
 /-- The refusals feeding the trio: a double's slot class is trivial, so a
 non-square slot product refutes the collision. -/
-private lemma diff_gives_sqcls (hn : 0 < n)
+lemma diff_gives_sqcls (hn : 0 < n)
     {A B Q : (FamilyFace.E ((n : ℚ))).Point} (hAB : A - B = Q + Q)
     (useTwo : Bool) {pr : ℚ}
     (hpr : pr = if useTwo then slotTwoAt ((n : ℚ)) A * slotTwoAt ((n : ℚ)) B
