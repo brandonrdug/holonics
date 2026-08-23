@@ -3,8 +3,8 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L3 have passed. L4 is the
-sole active deed.
+**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L4 have passed. This
+campaign is complete and schedules no next deed.
 **Product:**
 
 ```text
@@ -17,8 +17,8 @@ geometric, physical, proof, diagram, unit, dimension, intervention, and world-re
 
 **Truth statuses:** `definition` for the product, source occurrence, circulation, cultivation,
 condensation, and grade contracts; `project-postulate` for construction, apparatus, and validation
-discipline; `established-bounded` for the cited admitted owners, returns, and L0--L3; and `open` for
-L4 until its release receiver passes.
+discipline; `established-bounded` for the cited admitted owners, returns, L0--L4, and campaign
+completion; and `open` for the explicit exterior retained by the frozen product.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
@@ -303,13 +303,20 @@ L3 passes only when:
 
 ### L4 — Athena freezes as the laboratory's holonics/mathematics production variant
 
-[open] L4 is the sole active deed. It freezes
+[established-bounded] L4 passed and froze
 
 ```text
 Athena^[Gemma]_(B_HM, H_lab)
 ```
 
 as the campaign product.
+
+The frozen product returns one canonical native rest and application entry, seven source-detached
+rich inquiries, repeated Lean returns with exact commit/decline lineage, later conduct, remount,
+three actual local ablations, exact withdrawal, every licensed product face, complete taxonomy,
+strict seven-coordinate compression, resident-card and purity testimony, capability atlas, and a
+frozen manifest. Authoritative admission is
+[`../research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md`](../research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md).
 
 The L4 product passes only when it returns together:
 
@@ -396,8 +403,8 @@ At each L release boundary:
 
 ## 10. Completion
 
-[open] This campaign completes only when L0--L4 pass in order and the frozen
-`Athena^[Gemma]_(B_HM, H_lab)` product returns all twelve L4 consequences together. The result is the
+[established-bounded] This campaign completed when L0--L4 passed in order and the frozen
+`Athena^[Gemma]_(B_HM, H_lab)` product returned all twelve L4 consequences together. The result is the
 laboratory's production holonics/mathematics Athena variant: inherited Phoenix hexis cultivated by
 the repository's addressed mathematical chronology, condensed into native reusable morphology,
 capable of continued Lean/world return, and executable source-detached on the admitted consumer

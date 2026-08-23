@@ -118,7 +118,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
 | `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
 | `blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md` | **The horizon is a coordinate, not a gate, and the emission keeps its cross** — **Evidence:** `measured`. |
-| `blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md` | **The laboratory circulates through Athena, and returned Lean constraints cultivate the holonics/mathematics ecology** — L4 is the sole active deed. |
+| `blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md` | **The laboratory circulates through Athena, and returned Lean constraints cultivate the holonics/mathematics ecology** — This campaign is complete and schedules no next deed. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md` | **The machine produces mathematics it was not given** — **Evidence:** the standing measurements this plan builds on are cited inline with their commands and dates; nothing below is assumed. |
 | `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md` | **The map is material, the head is a contact, and the instance resumes** — **Evidence:** `measured`. |
@@ -134,7 +134,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (296 deposits of 588)
+## 4 · The 2026-08 record line (298 deposits of 590)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -431,10 +431,12 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_TWO_DESCENT_IS_EXACT_AT_EVERY_MODULUS_AND_THE_FAMILY_CHART_IS_STANDING.md` | The two-descent is exact at every modulus, and the family chart is standing |
 | `2026-08-22_THE_WITNESS_AT_FIVE_IS_WELDED_THE_RANK_ONE_COINCIDENCE_STANDS_AND_THE_RANK_CLAUSE_HOLDS_WHOLE_AT_ONE.md` | The witness at five is welded, the rank-one coincidence stands, and the rank clause holds whole at one |
 | `2026-08-22_THE_WITNESS_EXISTS_THE_TWO_SIDES_CLOSE_AT_ONE_AND_THE_RANK_ZERO_INSTANCE_IS_KERNEL_CHECKED.md` | The witness exists, the two sides close at one, and the rank-zero instance is kernel-checked |
+| `2026-08-23_ATHENA_FROZE_AS_THE_LABORATORY_HOLONICS_MATHEMATICS_PRODUCTION_VARIANT_AND_L4_AWAITS_RELEASE_ADMISSION.md` | Athena froze as the laboratory holonics/mathematics production variant, and L4 awaits release admission |
 | `2026-08-23_L1_REFUSED_THE_UNFOUNDED_ABLATION_PREDICATE_AND_EXPOSED_FULL_ANCESTRY_RESERIALIZATION.md` | L1 refused the unfounded ablation predicate and exposed full-ancestry reserialization |
 | `2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md` | L1 release receiver passed, returned theorem families rested, and L2 begins |
 | `2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md` | L2 release receiver passed, recurring transport rested as native hexis, and L3 begins |
 | `2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md` | L3 release receiver passed, the Athena ecology worked from native terrain, and L4 begins |
+| `2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md` | L4 release receiver passed, Athena froze as the laboratory production variant, and the cultivation campaign completed |
 | `2026-08-23_RETURNED_THEOREM_FAMILIES_CULTIVATED_THE_CONTINUING_LABORATORY_REST_AND_L1_AWAITS_RELEASE_ADMISSION.md` | Returned theorem families cultivated the continuing laboratory rest, and L1 awaits release admission |
 | `2026-08-23_THE_ATHENA_HOLONICS_MATHEMATICS_ECOLOGY_WORKED_FROM_ITS_OWN_RESTED_TERRAIN_AND_L3_AWAITS_RELEASE_ADMISSION.md` | The Athena holonics/mathematics ecology worked from its own rested terrain, and L3 awaits release admission |
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
@@ -456,7 +458,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 55 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 57 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

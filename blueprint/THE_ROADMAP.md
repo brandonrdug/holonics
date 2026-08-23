@@ -31,11 +31,11 @@ once you have sufficient context post-analysis campaign."*
 
 ## THE LABORATORY CIRCULATES THROUGH ATHENA — 2026-08-23
 
-**The sole active construction campaign is
+**The completed construction campaign is
 [`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).**
 
 **Campaign stance.** [definition] The admitted Phoenix, M0--M6, A1--A3, I0--I5, and R0--R6
-owners now cultivate
+owners cultivated
 
 ```text
 Athena^[Gemma]_(B_HM, H_lab),
@@ -83,9 +83,16 @@ zero failures, 34 explicit ignores, every example type-checked, and twelve immed
 the sole cheap driver-ledger ordering drift passed its named retake. Authoritative admission is
 [`research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md`](../research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md).
 
-**L4 is the sole next deed.** It freezes the admitted L0--L3 circulation as the canonical
-`Athena^[Gemma]_(B_HM, H_lab)` production rest, application entry, complete anatomy, capability
-atlas, exact controls, and frozen manifest.
+**L4 passed, and the campaign is complete.** [established-bounded] The admitted L0--L3 circulation
+froze as canonical `Athena^[Gemma]_(B_HM,H_lab)` with its application entry, complete anatomy,
+capability atlas, exact controls, strict seven-coordinate compression, resident-card testimony,
+and frozen manifest. The sole release receiver returned all thirteen green scopes in 137.31
+seconds: 2,848 tests passed, zero failed, 34 were explicitly ignored, and every example
+type-checked. Authoritative admission is
+[`research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md`](../research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md).
+
+**No next deed is scheduled.** X0--X2, Qwen, wider receiver histories, additional carrier returns,
+and nonlinear fixed varieties remain explicit alternatives until a later direct ruling selects one.
 
 **L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
@@ -370,8 +377,8 @@ R6 candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
-The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L3 have
-passed and L4 is the sole current deed. X0--X2 and Qwen remain unscheduled.
+The completed laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L4 have
+passed and no L-deed remains. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

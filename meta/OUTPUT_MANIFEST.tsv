@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 116 drivers, 19529 returns, 56338340659 bytes.
+# 117 drivers, 19626 returns, 56338585159 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -72,6 +72,7 @@ af047f8dfe53dfb595ad28c32576aa8c9ff779d6bc7a473dd7742904826466f4	6	265137360	out
 81e79e7357e85ca164d1739c579a3acf2460f758f152408aa52f539c6e0298a9	16	36104	output/the_exterior_return_changes_the_later_current
 52bbb5ba39bc33b6143a0cd54eea3d5806c692634e6638327598d298ca89e8dd	16	1172626	output/the_heterogeneous_ports_found_one_shared_phoenix_ecology
 8b1104925b2cf155d3de9dd52f995dd617d916943bd91a35a9c465ed59905124	67	15206503	output/the_laboratory_chronology_cultivates_the_athena_mathematics_ecology
+0960c4f359292cd0465faa14cda423a5869ca958ebb4ce2b76f8c380c1920bd3	97	244500	output/the_laboratory_holonics_mathematics_athena_variant_freezes
 0b73fb1e42bc90d16126c7180ad0df1bac0d732b981cde2bef7cf09f73742bd9	3	2770217	output/the_layer_stays_on_the_card
 1aca04df4256048f4e9d14052e877d8f606dc718f650914cb4807d0213400a5d	3	324780	output/the_lift_returns_its_defect
 e5e93c6c51f62403d6a901cb03f0ba4cd4aa6c279e578990464e1a1cd94cca97	2	1100120	output/the_lifted_body_condenses_only_where_future_receivers_factor
