@@ -94,9 +94,11 @@ ABSENCE = re.compile(
     re.IGNORECASE,
 )
 
-#: A command a later reader can re-run.
+#: A command a later reader can re-run. `lake` is Lean's project/build apparatus in the same
+#: exterior-command class as Cargo; omitting it falsely rejects a section that supplies `lake
+#: build` and a date.
 COMMAND = re.compile(
-    r"`[^`]*\b(grep|rg|find|ls|wc|cargo|python3|git|bash|tools/[a-z_]+\.(?:py|sh))\b[^`]*`"
+    r"`[^`]*\b(grep|rg|find|ls|wc|cargo|lake|python3|git|bash|tools/[a-z_]+\.(?:py|sh))\b[^`]*`"
 )
 
 DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
@@ -149,25 +151,35 @@ def scanned_documents() -> list[Path]:
     return found
 
 
-def sections(text: str) -> list[tuple[int, str]]:
-    """(first line number, section text), split on markdown headings.
+def sections(text: str) -> list[tuple[int, str, str]]:
+    """(first line number, section text, ancestor headings), split on Markdown headings.
 
     A section is what a reader takes in around a claim: from the heading above it to the next
     heading. The command that measured an absence is very often a code block a paragraph away.
+    A ratification date in a parent heading governs its nested subsections, while a command in a
+    parent section does not discharge the child's measurement.
     """
-    out: list[tuple[int, str]] = []
+    out: list[tuple[int, str, str]] = []
     start = 1
     buffer: list[str] = []
+    ancestors: dict[int, str] = {}
+    inherited = ""
     for number, line in enumerate(text.splitlines(), start=1):
-        if line.startswith("#") and buffer:
-            out.append((start, "\n".join(buffer)))
+        heading = re.match(r"^(#{1,6})\s", line)
+        if heading and buffer:
+            out.append((start, "\n".join(buffer), inherited))
             buffer = []
             start = number
+        if heading:
+            level = len(heading.group(1))
+            ancestors = {depth: title for depth, title in ancestors.items() if depth < level}
+            inherited = "\n".join(ancestors[depth] for depth in sorted(ancestors))
+            ancestors[level] = line
         if not buffer:
             start = number
         buffer.append(line)
     if buffer:
-        out.append((start, "\n".join(buffer)))
+        out.append((start, "\n".join(buffer), inherited))
     return out
 
 
@@ -203,9 +215,9 @@ def read() -> tuple[list[Claim], list[str]]:
         if BANNERED.search(body[:800]):
             continue
 
-        for section_start, section in sections(body):
+        for section_start, section, ancestor_headings in sections(body):
             section_has_command = bool(COMMAND.search(section))
-            section_has_date = bool(DATE.search(section))
+            section_has_date = bool(DATE.search(section) or DATE.search(ancestor_headings))
             for offset, block in paragraphs(section):
                 if not ABSENCE.search(block):
                     continue

@@ -439,6 +439,20 @@ impl ProductSession {
         &self.source_codec_identity
     }
 
+    /// Return the exact local cultivation continuation mounted over this body, when one exists.
+    pub fn continuation_identity(
+        &self,
+    ) -> Result<Option<crate::phoenix::continuation::ContinuationRuntimeIdentity>, String> {
+        self.continuation
+            .as_ref()
+            .map(|continuation| {
+                continuation
+                    .runtime_identity()
+                    .map_err(|error| error.to_string())
+            })
+            .transpose()
+    }
+
     /// The complete source→native rows and the explicit open source-address remainder carried by
     /// the mounted W1 codebook.  No address is filled by numeric coincidence.
     pub fn source_native_correspondence(&self) -> SourceNativeCorrespondence {
@@ -623,6 +637,37 @@ impl ProductSession {
         self.infer_encoded_with_intervention(
             text,
             native_ids,
+            presentation,
+            site,
+            intervention,
+            receiver,
+        )
+    }
+
+    /// Conduct one already-addressed native word through this mounted product.
+    ///
+    /// The exterior decoder is used only to present the occurrence to the existing runtime
+    /// receipt. Re-encoding must recover the identical native word, so a lossy codec round-trip
+    /// cannot silently become a new predecessor. This is the recurrence seam: a card-returned
+    /// address word can found the next tower entry without a host-authored later prompt.
+    pub fn infer_native_with_intervention(
+        &self,
+        native_ids: &[u32],
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+        receiver: streamed::ReceiverOption,
+    ) -> Result<RuntimeReturn, String> {
+        let text = self.decode_native_ids(native_ids)?;
+        let reconstructed = self.encode(&text)?;
+        if reconstructed != native_ids {
+            return Err(format!(
+                "the exterior decoder does not reconstruct the addressed native occurrence: expected {native_ids:?}, returned {reconstructed:?}"
+            ));
+        }
+        let presentation = RuntimeInputPresentation::source_rows(&text, native_ids);
+        self.infer_encoded_with_intervention(
+            &text,
+            native_ids.to_vec(),
             presentation,
             site,
             intervention,

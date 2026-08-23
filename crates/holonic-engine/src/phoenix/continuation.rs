@@ -530,7 +530,8 @@ pub struct MountedContinuation {
     rank_receipt: RankDerivationReceipt,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ContinuationRuntimeIdentity {
     pub rest: PredecessorProductIdentity,
     pub morphology: PredecessorProductIdentity,

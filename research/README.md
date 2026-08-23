@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 577 research deposits current through 22 August 2026, including all 307
+`records/` contains 593 research deposits current through 23 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -295,6 +295,18 @@ governs the rebuild.
   complete fibres, exact generated media face, source-detached card remount, shared/local
   withdrawals and strict complete-product descent; records 2,844 passing tests and all thirteen
   green scopes; and places R6 at the first bounded production Athena freeze.
+- **E0 addressed full-tower emanation candidate:**
+  `records/2026-08-23_THE_FULL_TOWER_EMANATED_THROUGH_ONE_ADDRESSED_CONTINUATION_AND_E0_AWAITS_RELEASE_ADMISSION.md`
+  — joins four exact resident Phoenix frontiers through predecessor-addressed native occurrences,
+  detaches after the third, remounts in a child process, and continues the same section while
+  retaining the complete plural futures, exact semantic work, and separate card testimony; the
+  release receiver remains explicitly open.
+- **E0 release admission:**
+  `records/2026-08-23_E0_RELEASE_RECEIVER_PASSED_THE_FULL_TOWER_EMANATED_AND_E1_BEGINS.md`
+  — admits the four-front full-tower recurrence, one non-duplicated addressed continuation,
+  byte-identical same-closure rests, detached resumption, complete future fibres, and separated
+  semantic/apparatus testimony; records 2,855 passing tests and all thirteen green release scopes,
+  and places E1 at the hierarchical optical-holon frontier.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

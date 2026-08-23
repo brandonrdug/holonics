@@ -8,6 +8,8 @@
 pub mod cohort;
 /// One addressed local cultivation over an already-cultivated Phoenix product.
 pub mod continuation;
+/// Emanative full-tower recurrence and its addressed detachable continuation boundary.
+pub mod emanative;
 /// Receiver-exact shared transport across separately typed inherited source ports.
 pub mod heterogeneous_fusion;
 /// The addressed junction composing recurrent conduct with conserved heterogeneous faces.

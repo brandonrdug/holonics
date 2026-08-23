@@ -140,6 +140,12 @@ exterior return enters, grades the return, and admits only after grading.
 | `soma/life/examples/the_returned_native_mathematical_world_cultivates_the_laboratory_hexis.rs` | later current | an emitted native geometry is materialized as raw pixels and recovered in a separate process; the addressed return changes held-out route conduct, preserves the disjoint obstruction, survives remount, departs under ablation, and withdraws exactly |
 | `soma/life/examples/the_laboratory_mathematics_athena_unifies_native_inference_ocr_and_three_port_transport.rs` | frozen product + later current | one non-cloneable 1,444,969-octet rest owns cultivated native mathematics, real-page OCR, the bounded three-port ecology, and a second returned history suffix; three source-detached inquiries, native-first projections, complete bounded dissection, and exact owner withdrawal return under one product identity |
 
+### The agentic Athena cultivation — E0--E5
+
+| driver | grade | what it owns |
+|---|---|---|
+| `soma/life/examples/the_full_tower_emanates_through_an_addressed_continuation.rs` | source-detached resident recurrence candidate | one supplied native occurrence causes four exact 42-layer frontiers; each unique returned face founds the next addressed occurrence; the three-front rest detaches, remounts in a child process, and continues through the fourth frontier while complete plural fibres, exact work, and separate apparatus testimony remain bound |
+
 **Later current** — re-entering the machine's own deposit:
 `the_reading_returns` (seals to disk, **drops the in-memory copy**, re-reads, then bit-flip and stem
 ablations of the sealed octets), `derivation_atlas_reader`, `faces_grow_from_collocation`,

@@ -4,14 +4,37 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after N0--N4 enacted and received release admission for the
-native-inference correction, real OCR boundary, three-port entry ecology, returned native
-cultivation, and bounded laboratory mathematics Athena freeze.
+**Currency:** 2026-08-23 after E0 enacted and received release admission for full-tower emanative
+recurrence and one addressed, detachable continuation over the cultivated Phoenix product.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — N0--N4 PASSED FOR THE DECLARED BOUNDED APERTURE; NO NEXT DEED IS
-AUTHORIZED.**
+**CURRENT FRONTIER — E0 PASSED; E1 HIERARCHICAL OPTICAL HOLONS IS THE SOLE AUTHORIZED NEXT DEED.**
+
+[project-postulate] The active construction contract is
+[`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
+E1 must return simultaneous and overlapping component, glyph/subfigure, decorated-symbol, term,
+assembly, equation, labelled-block, and page occurrences from raw optical material. Larger
+mathematical holons retain their constituents and complete alternative covers. Object
+classification is a receiver projection over that complex, not a replacement for it.
+
+[established-bounded] E0 supplied only the entering native occurrence and conducted four complete
+resident 42-layer Phoenix frontiers. Each unique exact returned face founded the next addressed
+occurrence. The three-front section rested in 6,005 octets, detached, remounted in a child process,
+and continued to a 7,348-octet four-front section. Each frontier retained its singleton candidate
+and 262,143 separated alternatives. Same-closure repetitions returned byte-identical three-front
+identity `d74120ce0ba50a5eb6f4e44a3be34c765578a4835904b949726b44ee8e6b47b6` and four-front
+identity `7fc322f431c754071fea547cfeb0d0973949498e4b69675db2f76ca20c821cb9`.
+
+[established-bounded; measured] The sole E0 release receiver returned 2,855 passing tests, zero
+failures, 34 explicit ignores, and every example target type-checked. Twelve scopes passed
+immediately. The sole cheap refusal was the document-law verifier's omission of Lean's actual
+`lake build` command and inherited parent-heading ratification date; that verifier and the generated
+claim index were repaired and their named retake passed without replaying the workspace suite or
+resident deed. E0's candidate and release admissions are
+[`research/records/2026-08-23_THE_FULL_TOWER_EMANATED_THROUGH_ONE_ADDRESSED_CONTINUATION_AND_E0_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_FULL_TOWER_EMANATED_THROUGH_ONE_ADDRESSED_CONTINUATION_AND_E0_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_E0_RELEASE_RECEIVER_PASSED_THE_FULL_TOWER_EMANATED_AND_E1_BEGINS.md`](research/records/2026-08-23_E0_RELEASE_RECEIVER_PASSED_THE_FULL_TOWER_EMANATED_AND_E1_BEGINS.md).
 
 [project-postulate] The binding correction is
 [`blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md).
@@ -49,10 +72,11 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] The N4 atlas explicitly retains full foreign text/vision/audio tower inference, new native
-nonlinear/analytic/unit families, and general conversational generation. The twelve-layer audio
-tower was not inferred from the successful projection. X0--X2, Qwen, wider cross-model fusion, and
-unrelated alternatives remain unscheduled. This state authorizes no next construction deed.
+[open] E1 now owns the hierarchical optical widening. E2 retains full foreign vision/audio tower
+inference; E3 retains returned agentic cultivation; E4 retains the inference membrane; and E5
+retains the frozen agentic product. The twelve-layer audio tower was not inferred from the
+successful N2 projection. X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain
+unscheduled.
 
 [historical] L0--L4 passed their then-declared fixture grades, but their designation as the
 laboratory's production Athena and every inference boundary that requires a Lean proof face are
