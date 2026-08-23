@@ -1198,5 +1198,422 @@ theorem theCosetCellIsRefusedAtTwo (hpodd : p % 2 = 1) {x y : ℚ}
       rw [show -(s ^ 2) + t ^ 2 = t ^ 2 - s ^ 2 from by ring, hvdiff, hvs2] at hval
       omega
 
+
+
+/-! ## 6. The two-torsion points and the coset transport -/
+
+open WeierstrassCurve.Affine
+open Soma.Holonics.Millennium.FamilyKernel
+open Soma.Holonics.Millennium.FamilySupport
+
+private lemma hnq' (hp : p.Prime) : (0 : ℚ) < ((p : ℕ) : ℚ) := by
+  exact_mod_cast hp.pos
+
+private lemma nonsing00 (hp : p.Prime) :
+    (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular 0 0 := by
+  have h := hnq' hp
+  rw [nonsingular_iff, equation_iff]
+  constructor
+  · simp [FamilyFace.E]
+  · left
+    simp only [FamilyFace.E]
+    intro hc
+    nlinarith [hc, h]
+
+private lemma nonsingP (hp : p.Prime) :
+    (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular (((p : ℕ) : ℚ)) 0 := by
+  have h := hnq' hp
+  rw [nonsingular_iff, equation_iff]
+  constructor
+  · simp only [FamilyFace.E]
+    ring
+  · left
+    simp only [FamilyFace.E]
+    intro hc
+    nlinarith [hc, h]
+
+private lemma nonsingMP (hp : p.Prime) :
+    (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular (-((p : ℕ) : ℚ)) 0 := by
+  have h := hnq' hp
+  rw [nonsingular_iff, equation_iff]
+  constructor
+  · simp only [FamilyFace.E]
+    ring
+  · left
+    simp only [FamilyFace.E]
+    intro hc
+    nlinarith [hc, h]
+
+private lemma double_zero_of_Y_zero {x : ℚ}
+    (h : (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular x 0) :
+    Point.some h + Point.some h = 0 :=
+  Point.add_self_of_Y_eq (by simp [negY, FamilyFace.E])
+
+private lemma affine_not_two_torsion {x y : ℚ}
+    (h : (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular x y) (hy : y ≠ 0) :
+    Point.some h + Point.some h ≠ 0 := by
+  intro h0
+  have h1 : Point.some h = -(Point.some h) := eq_neg_of_add_eq_zero_left h0
+  rw [Point.neg_some] at h1
+  simp only [Point.some.injEq] at h1
+  have hyy := h1.2
+  simp only [negY, FamilyFace.E] at hyy
+  apply hy
+  linarith [hyy]
+
+set_option maxHeartbeats 4000000 in
+/-- **The coset is refused whole**: a `y ≠ 0` point carrying any of the four
+non-torsion cells transports, by adding the matching two-torsion point, onto the
+`(−2, −2)` cell — which is refused at two. -/
+private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
+    (h : (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular x y) (hy : y ≠ 0)
+    {d₁ d₂ : ℤ}
+    (h₁ : Descent.SqCls x ((d₁ : ℤ) : ℚ))
+    (h₂ : Descent.SqCls (x - ((p : ℕ) : ℚ)) ((d₂ : ℤ) : ℚ))
+    (hcell : (d₁ = -2 ∧ d₂ = -2) ∨ (d₁ = 2 ∧ d₂ = 2 * p) ∨
+      (d₁ = 2 * (p : ℤ) ∧ d₂ = (p : ℤ)) ∨ (d₁ = -2 * p ∧ d₂ = -1)) :
+    False := by
+  have hp : p.Prime := Fact.out
+  have hpodd : p % 2 = 1 := by omega
+  have hnq : (0 : ℚ) < ((p : ℕ) : ℚ) := hnq' hp
+  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := hnq.ne'
+  obtain ⟨hx0, hxn, hxmn⟩ :=
+    FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h) hy
+  obtain ⟨c₁, hc₁, hv₁⟩ := h₁
+  obtain ⟨c₂, hc₂, hv₂⟩ := h₂
+  rcases hcell with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+  · exact theCosetCellIsRefusedAtTwo hpodd (onCurveAt h) hy
+      ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩
+  · -- cell (2, 2p): translate by (0, 0)
+    have hT0 := nonsing00 hp
+    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    obtain ⟨hom1, hom2⟩ :=
+      FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+        (Point.some h) (Point.some hT0)
+    rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_pos rfl] at hom1
+    rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_neg hnq.ne] at hom2
+    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+      rw [neg_eq_of_add_eq_zero_left hT2] at h1
+      simp only [Point.some.injEq] at h1
+      exact hx0 h1.1
+    · rw [hPT] at hom1 hom2
+      by_cases hy' : y' = 0
+      · subst hy'
+        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some h + Point.some h = 0 := by
+          have he : Point.some h = Point.some h' - Point.some hT0 := by
+            rw [← hPT]
+            abel
+          rw [he, show Point.some h' - Point.some hT0 +
+              (Point.some h' - Point.some hT0)
+              = Point.some h' + Point.some h' -
+                (Point.some hT0 + Point.some hT0) from by abel,
+            hP'2, hT2, sub_zero]
+        exact affine_not_two_torsion h hy hPP
+      · obtain ⟨hx'0, hx'n, -⟩ :=
+          FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h') hy'
+        rw [slotOneAt_some h', if_neg hx'0] at hom1
+        rw [slotTwoAt_some h', if_neg hx'n] at hom2
+        refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+  · -- cell (2p, p): translate by (−p, 0)
+    have hT0 := nonsingMP hp
+    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    obtain ⟨hom1, hom2⟩ :=
+      FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+        (Point.some h) (Point.some hT0)
+    rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0,
+      if_neg (neg_ne_zero.mpr hpq0)] at hom1
+    rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn,
+      if_neg (show ¬(-((p : ℕ) : ℚ)) = ((p : ℕ) : ℚ) from fun hc =>
+        hpq0 (by linarith))] at hom2
+    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+      rw [neg_eq_of_add_eq_zero_left hT2] at h1
+      simp only [Point.some.injEq] at h1
+      exact hxmn h1.1
+    · rw [hPT] at hom1 hom2
+      by_cases hy' : y' = 0
+      · subst hy'
+        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some h + Point.some h = 0 := by
+          have he : Point.some h = Point.some h' - Point.some hT0 := by
+            rw [← hPT]
+            abel
+          rw [he, show Point.some h' - Point.some hT0 +
+              (Point.some h' - Point.some hT0)
+              = Point.some h' + Point.some h' -
+                (Point.some hT0 + Point.some hT0) from by abel,
+            hP'2, hT2, sub_zero]
+        exact affine_not_two_torsion h hy hPP
+      · obtain ⟨hx'0, hx'n, -⟩ :=
+          FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h') hy'
+        rw [slotOneAt_some h', if_neg hx'0] at hom1
+        rw [slotTwoAt_some h', if_neg hx'n] at hom2
+        refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+  · -- cell (−2p, −1): translate by (p, 0)
+    have hT0 := nonsingP hp
+    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    obtain ⟨hom1, hom2⟩ :=
+      FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+        (Point.some h) (Point.some hT0)
+    rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_neg hpq0] at hom1
+    rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_pos rfl] at hom2
+    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+      rw [neg_eq_of_add_eq_zero_left hT2] at h1
+      simp only [Point.some.injEq] at h1
+      exact hxn h1.1
+    · rw [hPT] at hom1 hom2
+      by_cases hy' : y' = 0
+      · subst hy'
+        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some h + Point.some h = 0 := by
+          have he : Point.some h = Point.some h' - Point.some hT0 := by
+            rw [← hPT]
+            abel
+          rw [he, show Point.some h' - Point.some hT0 +
+              (Point.some h' - Point.some hT0)
+              = Point.some h' + Point.some h' -
+                (Point.some hT0 + Point.some hT0) from by abel,
+            hP'2, hT2, sub_zero]
+        exact affine_not_two_torsion h hy hPP
+      · obtain ⟨hx'0, hx'n, -⟩ :=
+          FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h') hy'
+        rw [slotOneAt_some h', if_neg hx'0] at hom1
+        rw [slotTwoAt_some h', if_neg hx'n] at hom2
+        refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+
+
+/-! ## 7. The descent step and Genocchi's law -/
+
+set_option maxHeartbeats 4000000 in
+/-- **THE DESCENT STEP ON THE THREE-MOD-EIGHT BRANCH**: every rational point of
+`y² = x³ − p²x` is a double plus a two-torsion point — the four surviving cells are
+exactly the two-torsion cells, and each strips off through the kernel. -/
+theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
+    (P : (FamilyFace.E (((p : ℕ) : ℚ))).Point) :
+    ∃ Q T : (FamilyFace.E (((p : ℕ) : ℚ))).Point, (T + T = 0) ∧ P = Q + Q + T := by
+  have hp : p.Prime := Fact.out
+  have hnq : (0 : ℚ) < ((p : ℕ) : ℚ) := hnq' hp
+  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := hnq.ne'
+  rcases P with _ | @⟨x, y, h⟩
+  · exact ⟨0, 0, by rw [add_zero], by rw [add_zero, add_zero, ← Point.zero_def]⟩
+  · by_cases hy : y = 0
+    · subst hy
+      exact ⟨0, Point.some h, double_zero_of_Y_zero h, by rw [add_zero, zero_add]⟩
+    · obtain ⟨hx0, hxn, hxmn⟩ :=
+        FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h) hy
+      obtain ⟨d₁, d₂, h₁0, h₂0, h₁v, h₂v, h₁s, h₂s⟩ :=
+        FamilySupport.theSlotClassesAreSupportedAtEveryModulus p hp.pos
+          (Point.some h)
+      rw [slotOneAt_some h, if_neg hx0] at h₁s
+      rw [slotTwoAt_some h, if_neg hxn] at h₂s
+      have hcells := theSlotClassesCollapseOnTheThreeModEightBranch hp8
+        (onCurveAt h) hy h₁0 h₂0 h₁v h₂v h₁s h₂s
+      obtain ⟨c₁, hc₁, hv₁⟩ := h₁s
+      obtain ⟨c₂, hc₂, hv₂⟩ := h₂s
+      rcases hcells with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+      · -- cell (1, 1): the point is already a double
+        obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
+          (Point.some h)
+          (by rw [slotOneAt_some h, if_neg hx0, hv₁]
+              exact ⟨c₁, hc₁, by push_cast; ring⟩)
+          (by rw [slotTwoAt_some h, if_neg hxn, hv₂]
+              exact ⟨c₂, hc₂, by push_cast; ring⟩)
+        exact ⟨Q, 0, by rw [add_zero], by rw [add_zero, hQ]⟩
+      · exact (coset_refused hp8 h hy
+          ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inl ⟨rfl, rfl⟩)).elim
+      · -- cell (−1, −p): strip the point (0, 0)
+        have hT0 := nonsing00 hp
+        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        obtain ⟨hom1, hom2⟩ :=
+          FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+            (Point.some h) (Point.some hT0)
+        rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_pos rfl] at hom1
+        rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_neg hnq.ne]
+          at hom2
+        obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
+          (Point.some h + Point.some hT0)
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+        refine ⟨Q, Point.some hT0, hT2, ?_⟩
+        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
+      · exact (coset_refused hp8 h hy
+          ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inl ⟨rfl, rfl⟩))).elim
+      · -- cell (p, 2): strip the point (p, 0)
+        have hT0 := nonsingP hp
+        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        obtain ⟨hom1, hom2⟩ :=
+          FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+            (Point.some h) (Point.some hT0)
+        rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_neg hpq0] at hom1
+        rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_pos rfl] at hom2
+        obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
+          (Point.some h + Point.some hT0)
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨2 * c₂ * ((p : ℕ) : ℚ),
+              mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+        refine ⟨Q, Point.some hT0, hT2, ?_⟩
+        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
+      · exact (coset_refused hp8 h hy
+          ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inr (Or.inr ⟨rfl, rfl⟩)))).elim
+      · exact (coset_refused hp8 h hy
+          ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)))).elim
+      · -- cell (−p, −2p): strip the point (−p, 0)
+        have hT0 := nonsingMP hp
+        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        obtain ⟨hom1, hom2⟩ :=
+          FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
+            (Point.some h) (Point.some hT0)
+        rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0,
+          if_neg (neg_ne_zero.mpr hpq0)] at hom1
+        rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn,
+          if_neg (show ¬(-((p : ℕ) : ℚ)) = ((p : ℕ) : ℚ) from fun hc =>
+            hpq0 (by linarith))] at hom2
+        obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
+          (Point.some h + Point.some hT0)
+          (FamilyCollision.sqcls_trans hom1
+            ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
+              rw [hv₁]; push_cast; ring⟩)
+          (FamilyCollision.sqcls_trans hom2
+            ⟨2 * c₂ * ((p : ℕ) : ℚ),
+              mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
+              rw [hv₂]; push_cast; ring⟩)
+        refine ⟨Q, Point.some hT0, hT2, ?_⟩
+        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
+
+open DirectSum in
+set_option maxHeartbeats 4000000 in
+/-- **GENOCCHI'S LAW, FAMILY-WISE: THE RANK VANISHES ON THE THREE-MOD-EIGHT
+BRANCH.**  At every prime `p ≡ 3 (mod 8)`, no rational point of `y² = x³ − p²x` is
+of infinite order: the free part of any point is infinitely two-divisible through
+the descent step, hence zero.  Genocchi (1855), kernel-checked with the modulus a
+parameter. -/
+theorem theRankVanishesOnTheThreeModEightBranch (hp8 : p % 8 = 3) :
+    ¬ BirchSwinnertonDyer.AlgebraicRankAtLeast p 1 := by
+  intro hR
+  unfold BirchSwinnertonDyer.AlgebraicRankAtLeast
+    BirchSwinnertonDyer.IndependentModTorsion BirchSwinnertonDyer.IsTorsion at hR
+  obtain ⟨Pts, hind⟩ := hR
+  have hp : p.Prime := Fact.out
+  haveI : AddGroup.FG ((FamilyFace.E (((p : ℕ) : ℚ))).Point) :=
+    FamilyMordell.theMordellWeilTheoremAtEveryModulus p hp.pos
+  obtain ⟨m, ι, hι, q, hq, e, ⟨F⟩⟩ :=
+    AddCommGroup.equiv_free_prod_directSum_zmod ((FamilyFace.E (((p : ℕ) : ℚ))).Point)
+  haveI := hι
+  haveI : ∀ i, NeZero (q i ^ e i) := fun i => ⟨pow_ne_zero _ (hq i).pos.ne'⟩
+  haveI : Finite (⨁ i, ZMod (q i ^ e i)) :=
+    Finite.of_equiv _ DFinsupp.equivFunOnFintype.symm
+  have htor : ∀ X : (FamilyFace.E (((p : ℕ) : ℚ))).Point, (F X).1 = 0 →
+      ∃ k : ℕ, 0 < k ∧ k • X = 0 := by
+    intro X hX
+    refine ⟨Nat.card (⨁ i, ZMod (q i ^ e i)), Nat.card_pos, ?_⟩
+    apply F.injective
+    rw [map_nsmul, map_zero]
+    have h2 : (Nat.card (⨁ i, ZMod (q i ^ e i))) • F X
+        = ((Nat.card (⨁ i, ZMod (q i ^ e i))) • (F X).1,
+           (Nat.card (⨁ i, ZMod (q i ^ e i))) • (F X).2) := rfl
+    rw [h2, hX, smul_zero, card_nsmul_eq_zero']
+    rfl
+  have hfreeT : ∀ T : (FamilyFace.E (((p : ℕ) : ℚ))).Point, T + T = 0 →
+      (F T).1 = 0 := by
+    intro T hT
+    have h2 : F T + F T = 0 := by
+      rw [← map_add, hT, map_zero]
+    have h3 : (F T).1 + (F T).1 = 0 := by
+      have h4 := congrArg Prod.fst h2
+      simpa using h4
+    ext j
+    have h5 := DFunLike.congr_fun h3 j
+    simp only [Finsupp.add_apply, Finsupp.coe_zero, Pi.zero_apply] at h5 ⊢
+    omega
+  have hdiv : ∀ (k : ℕ) (P : (FamilyFace.E (((p : ℕ) : ℚ))).Point),
+      ∃ Q : (FamilyFace.E (((p : ℕ) : ℚ))).Point,
+        (F P).1 = (2 ^ k : ℤ) • (F Q).1 := by
+    intro k
+    induction k with
+    | zero => exact fun P => ⟨P, by simp⟩
+    | succ n ih =>
+        intro P
+        obtain ⟨Q, T, hT2, hPQT⟩ := theDescentStepOnTheThreeModEightBranch hp8 P
+        obtain ⟨R, hR⟩ := ih Q
+        refine ⟨R, ?_⟩
+        have hFP : (F P).1 = (F Q).1 + (F Q).1 + (F T).1 := by
+          rw [hPQT, map_add, map_add]
+          rfl
+        rw [hfreeT T hT2, add_zero, hR] at hFP
+        rw [hFP]
+        rw [show ((2 : ℤ) ^ n • (F R).1 + (2 : ℤ) ^ n • (F R).1 : Fin m →₀ ℤ)
+            = ((2 : ℤ) ^ (n + 1)) • (F R).1 from by
+          rw [← two_smul ℤ, smul_smul]
+          congr 1
+          ring]
+  have hP0 : (F (Pts 0)).1 = 0 := by
+    ext j
+    simp only [Finsupp.coe_zero, Pi.zero_apply]
+    by_contra hc0
+    have hdvd : ∀ k : ℕ, (2 : ℤ) ^ k ∣ (F (Pts 0)).1 j := by
+      intro k
+      obtain ⟨Q, hQ⟩ := hdiv k (Pts 0)
+      rw [hQ]
+      simp only [Finsupp.smul_apply, smul_eq_mul]
+      exact Dvd.intro _ rfl
+    set c : ℤ := (F (Pts 0)).1 j with hc
+    have hle := Int.le_of_dvd (abs_pos.mpr hc0) ((dvd_abs _ _).mpr (hdvd c.natAbs))
+    have hlt : c.natAbs < 2 ^ c.natAbs := Nat.lt_two_pow_self
+    rw [Int.abs_eq_natAbs] at hle
+    have : ((2 : ℤ)) ^ c.natAbs = ((2 ^ c.natAbs : ℕ) : ℤ) := by push_cast; ring
+    omega
+  obtain ⟨k, hk0, hkP⟩ := htor (Pts 0) hP0
+  have hsum : (∑ i, (fun _ : Fin 1 => (1 : ℤ)) i • Pts i) = Pts 0 := by
+    rw [Fin.sum_univ_one, one_smul]
+  have := hind (fun _ => 1) (by rw [hsum]; exact ⟨k, hk0, hkP⟩) 0
+  norm_num at this
+
+/-- The rank is at least zero, vacuously. -/
+private lemma rank_zero_trivial :
+    BirchSwinnertonDyer.AlgebraicRankAtLeast p 0 :=
+  ⟨fun i => i.elim0, fun c _ i => i.elim0⟩
+
+/-- **GENOCCHI'S THEOREM AT EVERY PRIME `p ≡ 3 (mod 8)`**: the algebraic rank of
+`y² = x³ − p²x` is exactly zero — the historical first theorem of the congruent
+number problem, family-wise and kernel-checked. -/
+theorem theGenocchiLawHoldsOnTheThreeModEightBranch (hp8 : p % 8 = 3) :
+    BirchSwinnertonDyer.AlgebraicRankIs p 0 :=
+  ⟨rank_zero_trivial, by
+    have h := theRankVanishesOnTheThreeModEightBranch hp8
+    simpa using h⟩
+
 end Soma.Holonics.Millennium.FamilyGenocchi
 

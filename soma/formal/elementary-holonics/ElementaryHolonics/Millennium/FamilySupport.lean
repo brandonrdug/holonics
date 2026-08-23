@@ -260,13 +260,13 @@ private lemma classFromEvenValuations {n : ℕ} (hn : 0 < n) {x : ℚ} (hx : x �
 
 /-! ## 3. The support theorem at every modulus -/
 
-private lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     slotOneAt n (.some h) = if x = 0 then -n ^ 2 else x := rfl
 
-private lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     slotTwoAt n (.some h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
-private lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     y ^ 2 = x ^ 3 - n ^ 2 * x := by
   have h1 := ((WeierstrassCurve.Affine.nonsingular_iff x y).mp h).1
   rw [WeierstrassCurve.Affine.equation_iff] at h1
