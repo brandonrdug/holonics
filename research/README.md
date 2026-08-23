@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 573 research deposits current through 22 August 2026, including all 307
+`records/` contains 575 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -282,6 +282,19 @@ governs the rebuild.
   richer-receiver reopening, detached one-launch card revisit, independent interchange,
   noncommuting order and strict complete-product descent; records 2,841 passing tests and all
   thirteen green scopes; and places R5 at the native multimodal mathematics/physics frontier.
+- **The mathematical, vector, and raster faces met at one native boundary, and R5 awaits admission:**
+  `records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md`
+  — composes real held-out notation, vector, and four/eight-connected raster occurrences through
+  one exact common-world pullback; returns 455 joint anchors, complete fibres, generator-wise
+  naturality, source-detached GPU remount, shared/local withdrawals, certified mesh/SVG/PNG
+  incidence, selectable dissection and strict seven-coordinate product descent while retaining the
+  release-admission boundary.
+- **R5 release admission:**
+  `records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`
+  — admits the real separately typed notation/vector/raster pullback, 455 held-out joint anchors,
+  complete fibres, exact generated media face, source-detached card remount, shared/local
+  withdrawals and strict complete-product descent; records 2,844 passing tests and all thirteen
+  green scopes; and places R6 at the first bounded production Athena freeze.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

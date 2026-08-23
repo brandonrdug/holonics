@@ -594,6 +594,93 @@ extern "C" __global__ void conduct_heterogeneous_fusion(
     }
 }
 
+/// **Every source correspondence contributes to one addressed anchor/port population.**
+///
+/// The exterior codec has already replaced long occurrence addresses by exact local indices.  A
+/// lane owns one `(anchor, port)` cell and visits the complete pair population; no atomics, winner,
+/// confidence threshold, or collection order can change the returned multiplicity.
+extern "C" __global__ void derive_media_candidate_counts(
+    const uint32_t *pair_anchor,
+    const uint32_t *pair_port,
+    uint32_t *candidate_counts,
+    uint32_t anchor_count,
+    uint32_t port_count,
+    uint32_t pair_count)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint64_t cell_count = (uint64_t)anchor_count * (uint64_t)port_count;
+    if ((uint64_t)at >= cell_count) {
+        return;
+    }
+    const uint32_t anchor = at / port_count;
+    const uint32_t port = at % port_count;
+    uint32_t count = 0U;
+    for (uint32_t pair = 0; pair < pair_count; ++pair) {
+        if (pair_anchor[pair] == anchor && pair_port[pair] == port) {
+            ++count;
+        }
+    }
+    candidate_counts[at] = count;
+}
+
+/// **One shared media subcomplex crosses every port and every held-out anchor.**
+///
+/// The first population is anchor-major/port-minor and retains correspondence multiplicity.  A
+/// joint anchor exists only when every typed port has a nonempty fibre.  The second population is
+/// family-major/port-major/state-minor and returns the shared and local withdrawals.  Both laws
+/// cross one launch so a host callback cannot choose whether the media faces meet.
+extern "C" __global__ void conduct_joint_media_transport(
+    const uint32_t *candidate_counts,
+    uint32_t *joint_anchor,
+    uint32_t *shared_ablated_joint_anchor,
+    uint32_t *local_ablated_joint_anchor,
+    uint32_t anchor_count,
+    const uint32_t *successor_action,
+    const uint32_t *decoder,
+    const uint32_t *native_start,
+    uint32_t *predecessor_consequence,
+    uint32_t *successor_consequence,
+    uint32_t *shared_ablated_consequence,
+    uint32_t *local_ablated_consequence,
+    uint32_t cell_count,
+    uint32_t state_count,
+    uint32_t port_count)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at < anchor_count) {
+        uint32_t joint = 1U;
+        const uint64_t count_at = (uint64_t)at * (uint64_t)port_count;
+        for (uint32_t port = 0; port < port_count; ++port) {
+            if (candidate_counts[count_at + port] == 0U) {
+                joint = 0U;
+            }
+        }
+        joint_anchor[at] = joint;
+        shared_ablated_joint_anchor[at] = 0U;
+        const uint64_t local_at = (uint64_t)at * (uint64_t)port_count;
+        for (uint32_t withdrawn_port = 0; withdrawn_port < port_count; ++withdrawn_port) {
+            local_ablated_joint_anchor[local_at + withdrawn_port] = 0U;
+        }
+    }
+    if (at >= cell_count) {
+        return;
+    }
+    const uint32_t start = native_start[at];
+    const uint32_t next = successor_action[start];
+    const uint64_t decoder_at = (uint64_t)at * (uint64_t)state_count;
+    const uint32_t before = decoder[decoder_at + start];
+    const uint32_t after = decoder[decoder_at + next];
+    predecessor_consequence[at] = before;
+    successor_consequence[at] = after;
+    shared_ablated_consequence[at] = before;
+    const uint32_t local_port = at % port_count;
+    const uint64_t local_at = (uint64_t)at * (uint64_t)port_count;
+    for (uint32_t withdrawn_port = 0; withdrawn_port < port_count; ++withdrawn_port) {
+        local_ablated_consequence[local_at + withdrawn_port] =
+            local_port == withdrawn_port ? before : after;
+    }
+}
+
 /// **The recurrent passage and every conserved modality face cross one inference front.**
 ///
 /// I3 and I4 retain different state spaces. Their only identification is the explicit binary

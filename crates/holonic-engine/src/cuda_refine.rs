@@ -165,6 +165,8 @@ pub enum CudaRefineError {
     DynamicMorphologyShape,
     #[error("the ragged native words, offsets, and starting occurrences do not form one addressed front")]
     RaggedNativePassageShape,
+    #[error("the media candidates, anchors, typed ports, action, and decoder do not form one joint passage")]
+    JointMediaPassageShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -341,6 +343,8 @@ pub struct CudaRefineExecutor {
     dynamic_morphology: CuFunction,
     condensed_recurrence: CuFunction,
     heterogeneous_fusion: CuFunction,
+    media_candidate_counts: CuFunction,
+    joint_media_transport: CuFunction,
     inference_ecology: CuFunction,
     material_operation_world_tube: CuFunction,
     contact_pairs: CuFunction,
@@ -414,6 +418,8 @@ impl CudaRefineExecutor {
             let mut dynamic_morphology = ptr::null_mut();
             let mut condensed_recurrence = ptr::null_mut();
             let mut heterogeneous_fusion = ptr::null_mut();
+            let mut media_candidate_counts = ptr::null_mut();
+            let mut joint_media_transport = ptr::null_mut();
             let mut inference_ecology = ptr::null_mut();
             let mut material_operation_world_tube = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
@@ -470,6 +476,16 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(conduct_heterogeneous_fusion)",
                 ),
                 (
+                    &mut media_candidate_counts as *mut CuFunction,
+                    c"derive_media_candidate_counts",
+                    "cuModuleGetFunction(derive_media_candidate_counts)",
+                ),
+                (
+                    &mut joint_media_transport as *mut CuFunction,
+                    c"conduct_joint_media_transport",
+                    "cuModuleGetFunction(conduct_joint_media_transport)",
+                ),
+                (
                     &mut inference_ecology as *mut CuFunction,
                     c"conduct_inference_ecology",
                     "cuModuleGetFunction(conduct_inference_ecology)",
@@ -514,6 +530,8 @@ impl CudaRefineExecutor {
                 dynamic_morphology,
                 condensed_recurrence,
                 heterogeneous_fusion,
+                media_candidate_counts,
+                joint_media_transport,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -541,6 +559,8 @@ impl CudaRefineExecutor {
                 dynamic_morphology,
                 condensed_recurrence,
                 heterogeneous_fusion,
+                media_candidate_counts,
+                joint_media_transport,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -851,6 +871,49 @@ pub struct DeviceHeterogeneousFusion {
     pub shared_ablated_consequence: Vec<u32>,
     /// Row-major `[cell][withdrawn port]`.
     pub local_ablated_consequence: Vec<u32>,
+    pub families: usize,
+    pub ports: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// The complete source correspondence multiplicity at each anchor/port cell.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceMediaCandidateCounts {
+    /// Anchor-major, port-minor.
+    pub candidate_counts: Vec<u32>,
+    pub anchors: usize,
+    pub ports: usize,
+    pub pairs: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub semantic_pair_visits: u128,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One compact joint-media consequence and every shared/local withdrawal returned together.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceJointMediaTransport {
+    pub joint_anchor: Vec<u32>,
+    pub shared_ablated_joint_anchor: Vec<u32>,
+    /// Anchor-major, withdrawn-port-minor.
+    pub local_ablated_joint_anchor: Vec<u32>,
+    /// Family-major, port-major cells.
+    pub predecessor_consequence: Vec<u32>,
+    pub successor_consequence: Vec<u32>,
+    pub shared_ablated_consequence: Vec<u32>,
+    /// Cell-major, withdrawn-port-minor.
+    pub local_ablated_consequence: Vec<u32>,
+    pub anchors: usize,
     pub families: usize,
     pub ports: usize,
     pub launches: u64,
@@ -2232,6 +2295,264 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Derive the complete candidate multiplicity of each source anchor/port cell on the card.
+    /// Long exterior addresses have already crossed the codec mouth into exact local indices; the
+    /// kernel visits every candidate for every cell and returns no winner or confidence quotient.
+    pub fn derive_media_candidate_counts_on_device(
+        &mut self,
+        pair_anchor: &[u32],
+        pair_port: &[u32],
+        anchors: usize,
+        ports: usize,
+    ) -> Result<DeviceMediaCandidateCounts, CudaRefineError> {
+        let cells = anchors
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        if anchors == 0
+            || ports < 2
+            || cells == 0
+            || cells > u32::MAX as usize
+            || pair_anchor.is_empty()
+            || pair_anchor.len() != pair_port.len()
+            || pair_anchor.len() > u32::MAX as usize
+            || pair_anchor.iter().any(|anchor| *anchor as usize >= anchors)
+            || pair_port.iter().any(|port| *port as usize >= ports)
+        {
+            return Err(CudaRefineError::JointMediaPassageShape);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let anchors_device = Buffer::of(pair_anchor)?;
+        let ports_device = Buffer::of(pair_port)?;
+        let count_octets = cells * std::mem::size_of::<u32>();
+        let counts_device = Buffer::alloc(count_octets)?;
+        let grid = self.grid_for(cells as u64)?;
+        let mut anchor_pointer = anchors_device.pointer;
+        let mut port_pointer = ports_device.pointer;
+        let mut count_pointer = counts_device.pointer;
+        let mut anchor_count = anchors as u32;
+        let mut port_count = ports as u32;
+        let mut pair_count = pair_anchor.len() as u32;
+        let mut arguments: [*mut c_void; 6] = [
+            &mut anchor_pointer as *mut u64 as *mut c_void,
+            &mut port_pointer as *mut u64 as *mut c_void,
+            &mut count_pointer as *mut u64 as *mut c_void,
+            &mut anchor_count as *mut u32 as *mut c_void,
+            &mut port_count as *mut u32 as *mut c_void,
+            &mut pair_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.media_candidate_counts,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(derive_media_candidate_counts)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+        let mut candidate_counts = vec![0u32; cells];
+        counts_device.read(&mut candidate_counts)?;
+
+        let anchor_octets = std::mem::size_of_val(pair_anchor) as u64;
+        let port_octets = std::mem::size_of_val(pair_port) as u64;
+        let scalar_octets = 3 * std::mem::size_of::<u32>() as u64;
+        let semantic_pair_visits = (cells as u128)
+            .checked_mul(pair_anchor.len() as u128)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        Ok(DeviceMediaCandidateCounts {
+            candidate_counts,
+            anchors,
+            ports,
+            pairs: pair_anchor.len(),
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: cells as u32,
+            semantic_pair_visits,
+            host_ingress_octets: anchor_octets + port_octets + scalar_octets,
+            host_egress_octets: count_octets as u64,
+            resident_octets: anchor_octets + port_octets + count_octets as u64,
+        })
+    }
+
+    /// Enact one compact shared-media subcomplex and all its withdrawals in one resident front.
+    #[allow(clippy::too_many_arguments)]
+    pub fn conduct_joint_media_transport_on_device(
+        &mut self,
+        candidate_counts: &[u32],
+        anchors: usize,
+        successor_action: &[u32],
+        decoder: &[u32],
+        native_start: &[u32],
+        families: usize,
+        ports: usize,
+    ) -> Result<DeviceJointMediaTransport, CudaRefineError> {
+        let states = successor_action.len();
+        let anchor_cells = anchors
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        let cells = families
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        let expected_decoder = cells
+            .checked_mul(states)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        let local_anchor_entries = anchor_cells;
+        let local_entries = cells
+            .checked_mul(ports)
+            .ok_or(CudaRefineError::JointMediaPassageShape)?;
+        let work = anchors.max(cells);
+        if anchors == 0
+            || families == 0
+            || ports < 2
+            || states == 0
+            || work == 0
+            || work > u32::MAX as usize
+            || candidate_counts.len() != anchor_cells
+            || candidate_counts.iter().any(|count| *count == 0)
+            || decoder.len() != expected_decoder
+            || native_start.len() != cells
+            || successor_action
+                .iter()
+                .chain(native_start)
+                .any(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::JointMediaPassageShape);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let counts_device = Buffer::of(candidate_counts)?;
+        let action_device = Buffer::of(successor_action)?;
+        let decoder_device = Buffer::of(decoder)?;
+        let starts_device = Buffer::of(native_start)?;
+        let anchor_octets = anchors * std::mem::size_of::<u32>();
+        let local_anchor_octets = local_anchor_entries * std::mem::size_of::<u32>();
+        let cell_octets = cells * std::mem::size_of::<u32>();
+        let local_octets = local_entries * std::mem::size_of::<u32>();
+        let joint_device = Buffer::alloc(anchor_octets)?;
+        let shared_joint_device = Buffer::alloc(anchor_octets)?;
+        let local_joint_device = Buffer::alloc(local_anchor_octets)?;
+        let predecessor_device = Buffer::alloc(cell_octets)?;
+        let successor_device = Buffer::alloc(cell_octets)?;
+        let shared_device = Buffer::alloc(cell_octets)?;
+        let local_device = Buffer::alloc(local_octets)?;
+
+        let grid = self.grid_for(work as u64)?;
+        let mut counts_pointer = counts_device.pointer;
+        let mut joint_pointer = joint_device.pointer;
+        let mut shared_joint_pointer = shared_joint_device.pointer;
+        let mut local_joint_pointer = local_joint_device.pointer;
+        let mut anchor_count = anchors as u32;
+        let mut action_pointer = action_device.pointer;
+        let mut decoder_pointer = decoder_device.pointer;
+        let mut starts_pointer = starts_device.pointer;
+        let mut predecessor_pointer = predecessor_device.pointer;
+        let mut successor_pointer = successor_device.pointer;
+        let mut shared_pointer = shared_device.pointer;
+        let mut local_pointer = local_device.pointer;
+        let mut cell_count = cells as u32;
+        let mut state_count = states as u32;
+        let mut port_count = ports as u32;
+        let mut arguments: [*mut c_void; 15] = [
+            &mut counts_pointer as *mut u64 as *mut c_void,
+            &mut joint_pointer as *mut u64 as *mut c_void,
+            &mut shared_joint_pointer as *mut u64 as *mut c_void,
+            &mut local_joint_pointer as *mut u64 as *mut c_void,
+            &mut anchor_count as *mut u32 as *mut c_void,
+            &mut action_pointer as *mut u64 as *mut c_void,
+            &mut decoder_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_pointer as *mut u64 as *mut c_void,
+            &mut successor_pointer as *mut u64 as *mut c_void,
+            &mut shared_pointer as *mut u64 as *mut c_void,
+            &mut local_pointer as *mut u64 as *mut c_void,
+            &mut cell_count as *mut u32 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+            &mut port_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.joint_media_transport,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_joint_media_transport)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut joint_anchor = vec![0u32; anchors];
+        let mut shared_ablated_joint_anchor = vec![0u32; anchors];
+        let mut local_ablated_joint_anchor = vec![0u32; local_anchor_entries];
+        let mut predecessor_consequence = vec![0u32; cells];
+        let mut successor_consequence = vec![0u32; cells];
+        let mut shared_ablated_consequence = vec![0u32; cells];
+        let mut local_ablated_consequence = vec![0u32; local_entries];
+        joint_device.read(&mut joint_anchor)?;
+        shared_joint_device.read(&mut shared_ablated_joint_anchor)?;
+        local_joint_device.read(&mut local_ablated_joint_anchor)?;
+        predecessor_device.read(&mut predecessor_consequence)?;
+        successor_device.read(&mut successor_consequence)?;
+        shared_device.read(&mut shared_ablated_consequence)?;
+        local_device.read(&mut local_ablated_consequence)?;
+
+        let count_octets = std::mem::size_of_val(candidate_counts) as u64;
+        let action_octets = std::mem::size_of_val(successor_action) as u64;
+        let decoder_octets = std::mem::size_of_val(decoder) as u64;
+        let start_octets = std::mem::size_of_val(native_start) as u64;
+        let scalar_octets = 4 * std::mem::size_of::<u32>() as u64;
+        let returned_octets =
+            (anchor_octets * 2 + local_anchor_octets + cell_octets * 3 + local_octets) as u64;
+        Ok(DeviceJointMediaTransport {
+            joint_anchor,
+            shared_ablated_joint_anchor,
+            local_ablated_joint_anchor,
+            predecessor_consequence,
+            successor_consequence,
+            shared_ablated_consequence,
+            local_ablated_consequence,
+            anchors,
+            families,
+            ports,
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: work as u32,
+            host_ingress_octets: count_octets
+                + action_octets
+                + decoder_octets
+                + start_octets
+                + scalar_octets,
+            host_egress_octets: returned_octets,
+            resident_octets: count_octets
+                + action_octets
+                + decoder_octets
+                + start_octets
+                + returned_octets,
+        })
+    }
+
     /// Conduct the recurrent passage and every admitted heterogeneous face in one resident front.
     /// The decision is data crossing the front, not a host-selected semantic branch between I3 and
     /// I4. Both alternative routes and all withdrawals return as dissection testimony.
@@ -3419,6 +3740,47 @@ mod tests {
             returned.local_ablated_consequence,
             vec![0, 1, 3, 2, 4, 5, 7, 6]
         );
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
+    }
+
+    /// R5's joint-media law: the source candidate population is counted without a winner and the
+    /// compact triadic subcomplex returns every shared/local withdrawal in one later front.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_derives_and_enacts_the_joint_media_subcomplex() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let source = card
+            .derive_media_candidate_counts_on_device(
+                &[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2],
+                &[0, 1, 1, 2, 0, 1, 2, 2, 0, 1, 2],
+                3,
+                3,
+            )
+            .expect("the complete source candidates return");
+        assert_eq!(source.candidate_counts, vec![1, 2, 1, 1, 1, 2, 1, 1, 1]);
+        assert_eq!(source.semantic_pair_visits, 99);
+
+        let returned = card
+            .conduct_joint_media_transport_on_device(
+                &source.candidate_counts,
+                3,
+                &[1, 1],
+                &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                &[0, 0, 0, 0, 0, 0],
+                2,
+                3,
+            )
+            .expect("the compact joint-media passage returns");
+        assert_eq!(returned.joint_anchor, vec![1, 1, 1]);
+        assert_eq!(returned.shared_ablated_joint_anchor, vec![0, 0, 0]);
+        assert!(returned
+            .local_ablated_joint_anchor
+            .iter()
+            .all(|value| *value == 0));
+        assert_eq!(returned.predecessor_consequence, vec![0, 2, 4, 6, 8, 10]);
+        assert_eq!(returned.successor_consequence, vec![1, 3, 5, 7, 9, 11]);
+        assert_eq!(returned.shared_ablated_consequence, vec![0, 2, 4, 6, 8, 10]);
         assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
     }

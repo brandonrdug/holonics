@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R4 release admission and entry into R5 of the R0--R6
+**Currency:** 2026-08-22 after Deed R5 release admission and entry into R6 of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RETAINED CAUSAL BOUNDARY CARRIED THE REMOTE INTERIOR, R4 PASSED, AND R5
-IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE MATHEMATICAL, VECTOR, AND RASTER FACES MET AT ONE NATIVE BOUNDARY, R5
+PASSED, AND R6 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -376,17 +376,33 @@ admission:
 and
 [`research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md`](research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md).
 
-**NEXT DEED: R5 — MATHEMATICAL AND PHYSICAL FACES SHARE NATIVE MULTIMODAL TRANSPORT.**
+**R5 PASSED — THE MATHEMATICAL, VECTOR, AND RASTER FACES SHARE NATIVE TRANSPORT.**
+[established-bounded; implemented-exact; measured] The held-out natural page-10 occurrence returns
+455 notation anchors through separately typed notation, vector, and raster/vision ports. Their
+complete 1,232 vector, 1,195 four-connected raster, and 1,114 eight-connected raster candidate
+fibres meet through one common-world pullback without caption equality or winner selection. The
+card enacted the source and compact passages, shared and port-local withdrawals, and returned an
+exact mesh/SVG/PNG correspondence field. Fresh-process remount reopened every exact interior with
+no forbidden source descriptor, and all seven coordinates of the complete matched product fell
+strictly. The 17-file product has 6,891,546 octets and rolled SHA-256
+`1077fdb9e5c6ff9f6c7c5254fb0db10f4eeb69519e2335243b375b0af18c68be`.
+The sole release receiver passed all thirteen scopes in 297 seconds: 2,844 tests passed, none
+failed, 30 were explicitly ignored, and every example target type-checked. Candidate and
+admission:
+[`research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
+
+**NEXT DEED: R6 — ATHENA FREEZES AT ITS FIRST PRODUCTION MATHEMATICS/PHYSICS APERTURE.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R5 must return real text/notation and vector/raster/vision occurrences at separate typed ports;
-native spatial incidence, orientation, chart, scale, uncertainty, and lineage before text
-mediation; a common-world pullback with generator-wise naturality; one shared subcomplex enacted
-once; complete modality fibres and decoder; a held-out consequence which requires the joint
-ecology; certified vector/raster/mesh agreement; shared and port-local ablation; detached strict
-descent; and an exact selectable dissection atlas.
+R6 must freeze one canonical source-detached generator-native ecology over the exact R0--R5
+receiver/history family; accept a new outside-development inquiry; conduct the complete productive
+cycle; return every licensed mathematical, language, proof, exact-value/unit and visual face;
+survive source absence and targeted withdrawals; return complete dissection and independent card
+fronts; exclude host semantic replay, fallback, float governance and ecology cloning; strictly
+descend in the complete product; and return calibrated apparatus and capability testimony.
 
-[open] R6 remains ordered behind R5: the first bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
 GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new
 audio/video or production modalities, all Gemma behavior and conventional tensor-container

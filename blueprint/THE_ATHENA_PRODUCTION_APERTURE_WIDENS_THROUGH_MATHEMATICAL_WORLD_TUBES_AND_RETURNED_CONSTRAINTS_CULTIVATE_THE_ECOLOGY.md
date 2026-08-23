@@ -3,15 +3,15 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0--I5 and R0--R4 passed their release receivers. R5 is the active deed.
+**Current boundary:** I0--I5 and R0--R5 passed their release receivers. R6 is the active deed.
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
 
 **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry,
 dynamic delta, retained-context, and product-grade contracts; `project-postulate` for construction
-and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R4
-returns; and `open` for R5--R6 and every later heterogeneous-source deed.
+and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R5
+returns; and `open` for R6 and every later heterogeneous-source deed.
 
 **Milestone derivation:**
 [`2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -407,8 +407,8 @@ and
 
 ### R5 — mathematical and physical faces share native multimodal transport
 
-[open] R5 is the active deed. It widens I4 from a bounded shared text/vision action to an inquiry whose mathematical or
-physical consequence genuinely requires several media faces.
+[established-bounded; implemented-exact; measured] R5 widened I4 from a bounded shared text/vision
+action to one held-out mathematical-media consequence requiring notation, vector, and raster faces.
 
 R5 must return:
 
@@ -430,9 +430,19 @@ R5 must return:
 Caption equality, OCR text equality, concatenated embeddings, a synthetic patch, or an attractive
 but uncertified image does not pass.
 
+[established-bounded] All ten requirements passed. The held-out M0 page-10 family returned 455
+common-world notation anchors with complete 1,232 vector, 1,195 four-connected raster, and 1,114
+eight-connected raster candidate fibres. One RTX front returned the compact joint passage and all
+shared/local withdrawals; a fresh process reopened all three exact interiors; the exact
+mesh/SVG/PNG incidence agreed after raster decode; and every coordinate of the complete product
+fell strictly. Candidate and admission:
+[`../research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md)
+and
+[`../research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](../research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
+
 ### R6 — Athena freezes at its first production mathematics/physics aperture
 
-[open] R6 freezes
+[open] R6 is the active deed. It freezes
 
 ```text
 Athena^[Gemma]_(B_mp, H_prod)

@@ -34,6 +34,7 @@ mod intake;
 mod lineage;
 mod methods;
 mod morphology;
+mod multimodal_transport;
 mod recurrence;
 mod retained_boundary;
 mod sameness;
@@ -70,6 +71,15 @@ pub use morphology::{
     ExactSupportSubcomplex, ExactWithdrawal, LocalMorphologyDelta, MorphologyCompatibilityReceipt,
     MorphologyDecision, ReconstructionFibreChange, ReturnedConstraintOccurrence,
     ReturnedReceiverAdjoint, WithdrawalReceipt, DYNAMIC_MORPHOLOGY_SCHEMA,
+};
+pub use multimodal_transport::{
+    AnchorSection, ExactMediaAxis, ExactSpatialDeclaration, FamilyCorrespondenceFibre,
+    JointMediaDecoder, JointMediaFibres, JointMediaStanding, MathematicalMediaPort,
+    MediaCandidatePair, MediaNaturalitySquare, MediaPortDeclaration, MediaSourceFamily,
+    MediaSourceInterior, MultimodalTransportRefusal, MultimodalTransportRest,
+    NativeMediaConsequence, NativeMediaFibre, ProductLineage, SharedMediaContact,
+    SharedMediaHigherCell, SharedMediaSubcomplex, SharedMediaVertex, UnmatchedMediaMember,
+    JOINT_MEDIA_DECODER_SCHEMA, JOINT_MEDIA_FIBRES_SCHEMA, JOINT_MEDIA_STANDING_SCHEMA,
 };
 pub use recurrence::{
     DerivationDecoderFibre, DerivationFibreMember, DerivationHigherCell, DerivationRecurrenceError,

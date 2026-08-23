@@ -33,7 +33,7 @@ crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
 crates/holonic-engine/src/cross_chart.rs	.clone()=32	.collect()=1	Vec=24
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=21	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
-crates/holonic-engine/src/cuda_refine.rs	.collect()=8	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=83
+crates/holonic-engine/src/cuda_refine.rs	.collect()=8	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=91
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10
 crates/holonic-engine/src/cultivated_rest/directory.rs	.clone()=7	.collect()=1	BTreeSet=2	Vec=5
 crates/holonic-engine/src/cultivated_rest/mod.rs	Vec=4
@@ -267,6 +267,11 @@ soma/life/src/mathematical_particle/morphology/candidate.rs	.clone()=6	.collect(
 soma/life/src/mathematical_particle/morphology/rest.rs	.clone()=2	.collect()=2	.flat_map()=1	Vec=3
 soma/life/src/mathematical_particle/morphology/tests.rs	.collect()=1	.into_iter()=1	Vec=1
 soma/life/src/mathematical_particle/morphology/types.rs	Vec=14
+soma/life/src/mathematical_particle/multimodal_transport/rest.rs	.clone()=6	.collect()=11	.flat_map()=2	.into_iter()=1	Vec=25
+soma/life/src/mathematical_particle/multimodal_transport/tests.rs	.clone()=3	.collect()=1	Vec=1
+soma/life/src/mathematical_particle/multimodal_transport/types.rs	Vec=22
+soma/life/src/mathematical_particle/multimodal_transport/validation.rs	.collect()=1	.into_iter()=1	BTreeSet=2
+soma/life/src/mathematical_particle/multimodal_transport/wire.rs	.clone()=7	.collect()=1	Vec=5
 soma/life/src/mathematical_particle/recurrence.rs	.clone()=2	.collect()=8	.flat_map()=1	BTreeSet=5	Vec=28
 soma/life/src/mathematical_particle/retained_boundary/rest.rs	.clone()=5	.collect()=10	.into_iter()=1	BTreeMap=6	BTreeSet=2	Vec=21
 soma/life/src/mathematical_particle/retained_boundary/system.rs	.collect()=5	.into_iter()=1	Vec=13
