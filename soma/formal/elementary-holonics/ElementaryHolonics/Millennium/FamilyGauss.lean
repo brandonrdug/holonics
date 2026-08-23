@@ -36,7 +36,7 @@ open AddChar MulChar
 
 /-- A multiplicative character squares to one on every nonzero argument once it is
 quadratic. -/
-private lemma quad_sq_one {F : Type} [Field F] [Fintype F] {R' : Type} [CommRing R']
+lemma quad_sq_one {F : Type} [Field F] [Fintype F] {R' : Type} [CommRing R']
     [IsDomain R'] {χ : MulChar F R'} (hχ₂ : χ.IsQuadratic) {a : F} (ha : a ≠ 0) :
     χ a * χ a = 1 := by
   rcases hχ₂ a with h | h | h
@@ -50,7 +50,7 @@ private lemma quad_sq_one {F : Type} [Field F] [Fintype F] {R' : Type} [CommRing
 
 /-- **The twisted Gauss sum**: shifting the additive character by `a` costs exactly
 `χ(a)` when `χ` is quadratic — and the shift by zero annihilates the sum. -/
-private lemma twisted_sum {F : Type} [Field F] [Fintype F] {R' : Type} [CommRing R']
+lemma twisted_sum {F : Type} [Field F] [Fintype F] {R' : Type} [CommRing R']
     [IsDomain R'] {χ : MulChar F R'} (hχ₁ : χ ≠ 1) (hχ₂ : χ.IsQuadratic)
     (ψ : AddChar F R') (a : F) :
     (∑ u : F, χ u * ψ (a * u)) = χ a * gaussSum χ ψ := by
