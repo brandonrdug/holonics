@@ -80,6 +80,7 @@ import ElementaryHolonics.Millennium.FamilyGauss
 import ElementaryHolonics.Millennium.FamilyHeight
 import ElementaryHolonics.Millennium.FamilyHalving
 import ElementaryHolonics.Millennium.FamilyKernel
+import ElementaryHolonics.Millennium.FamilySupport
 import ElementaryHolonics.Millennium.FamilyImage
 import ElementaryHolonics.Millennium.FamilyHom
 import ElementaryHolonics.Millennium.LandenLattice
