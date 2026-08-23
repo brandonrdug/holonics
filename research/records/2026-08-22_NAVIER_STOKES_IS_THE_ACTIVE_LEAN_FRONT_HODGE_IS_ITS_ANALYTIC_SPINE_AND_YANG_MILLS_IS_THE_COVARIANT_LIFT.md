@@ -12,9 +12,12 @@ Rust/CUDA construction frontier, or authorize an update to `CONSTRUCTION_STATE.m
    carrier.** `NavierStokesVorticity.lean` now constructs the velocity Jacobian, curl, cross/Lamb
    interaction, differentiable addressed velocity-to-jet-to-vorticity passage, exact local curl
    kernel, `C²` pressure-annihilation square, divergence-of-vorticity identity, nonlinear
-   transport/stretching identity, and a jet-level differentiated momentum/vorticity balance.
-   `[open]` Identifying its time and viscous jet ports with the time derivative and Laplacian of
-   vorticity for `SmoothSolution` remains the next N1 analytic seam.
+   transport/stretching identity, and a jet-level differentiated momentum/vorticity balance. At
+   every strictly positive time, the repository's `SmoothSolution` carrier now supplies the
+   differentiable addressed occurrence, the Lamb identity, and the pressure-annihilation square.
+   `[open]` Constructing the solution's actual second and force jets and identifying the time and
+   viscous jet ports with the time derivative and Laplacian of vorticity remain the next N1
+   analytic seams.
 2. `[open]` **N2 — periodic energy and Hodge–Leray transport.** Introduce an actual three-torus or
    fundamental-domain integration owner, prove pressure and advection cancellation, construct the
    divergence-free/gradient splitting, and retain the harmonic and boundary alternatives rather
@@ -101,9 +104,10 @@ matrix population with symmetric Jacobians, an exact Lamb decomposition, a diffe
 admitted lineage witness from an `R³` velocity occurrence to its vorticity, and the local
 transport/stretching balance at a mixed-symmetric second jet.
 
-`[open]` **Alternatives retained:** deriving Hessian symmetry from the existing smoothness fields,
-commuting curl with time/Laplacian derivatives, the global incompressibility projection, periodic
-integration, critical continuation, and all four official Navier–Stokes conclusions.
+`[open]` **Alternatives retained:** constructing the product-rule second jet and force jet from the
+existing smoothness fields, commuting curl with time/Laplacian derivatives, treating the `t = 0`
+boundary by within-derivatives, the global incompressibility projection, periodic integration,
+critical continuation, and all four official Navier–Stokes conclusions.
 
 `[project-postulate]` **Grade bar:** the deed closes only if Lean checks the exact identities on the
 actual three-dimensional carrier with no `sorryAx`. A finite grid, numerical trajectory, imported
@@ -135,6 +139,16 @@ This does not assert a global curl-free field is a gradient.
 Jacobian by Mathlib's symmetric-second-derivative theorem transported through the Riesz map;
 therefore `vorticityAt (gradient p) x = 0` is proved without leaving Hessian symmetry as an axiom.
 
+`[proved-derived; formal-checked]` Smoothness on the nonnegative space-time half-cylinder descends
+to a smooth spatial slice at every `t > 0`. Consequently, a `SmoothSolution` supplies the admitted
+velocity-to-Jacobian-to-vorticity occurrence and its pointwise Lamb identity at each positive-time
+event. The strict inequality is essential to this theorem; the initial-time boundary remains an
+open within-derivative face.
+
+`[proved-derived; formal-checked]` The same positive-time slice passage downgrades the solution's
+pressure smoothness to `C²`, so the abstract pressure-Hessian chain now returns
+`vorticityAt (gradient (pressure · t)) x = 0` on the actual `SmoothSolution` carrier.
+
 `[proved-derived; formal-checked]` With `J i j = partial_j u_i` and
 `H i j k = partial_k partial_j u_i`, the module proves
 
@@ -148,25 +162,33 @@ div omega = 0.
 to a differentiated momentum balance removes the symmetric pressure jet and returns the local
 vorticity balance with transport and stretching as distinct ordered terms.
 
-`[open]` The last attachment to `SmoothSolution` owes explicit commutation of the spatial curl with
-the time derivative and Laplacian, plus construction of the actual product-rule second jet from the
-solution's smoothness testimony. The jet theorem exposes these ports and does not claim them.
+`[open]` The remaining attachment to `SmoothSolution` owes explicit construction of the actual
+product-rule second jet and force jet, compatibility between that second jet and the derivative of
+the first-jet chart, and commutation of spatial curl with the time derivative and Laplacian. The jet
+theorem exposes these ports and does not claim them.
 
 ## Validation receipt
 
 `[established-bounded; measured]` Focused checks from
 `soma/formal/elementary-holonics` returned:
 
+Both final invocations addressed source closure
+`sha256:16a6de727811723534c59f4279827635243170942b0bcc0cfbedfd4e36a89ee7`.
+
 | Command | Elapsed | Exit | Purpose |
 |---|---:|---:|---|
-| `lake env lean ElementaryHolonics/Millennium/NavierStokesVorticity.lean` | 9.6 s final run | 0 | complete N1 owner and inline axiom audit |
-| `lake build ElementaryHolonics.Millennium.NavierStokesVorticity` | 29.1 s | 0 | named owner closure from the Lake build graph |
+| `lake env lean ElementaryHolonics/Millennium/NavierStokesVorticity.lean` | 22.1 s | 0 | complete N1 owner and inline axiom audit after solution attachment |
+| `lake build ElementaryHolonics.Millennium.NavierStokesVorticity` | 30.0 s | 0 | named owner closure from the Lake build graph |
 
 `[proved-derived; formal-checked]` Every printed theorem depends only on `propext`,
 `Classical.choice`, and `Quot.sound`; none depends on `sorryAx` or a custom mathematical axiom.
+An exact declaration scan also returned no `sorry`, `admit`, `axiom`, or `sorryAx` occurrence.
 
 `[established-bounded; measured]` An independent read-only N1 audit checked the row/column and
 second-jet conventions, Lamb orientation, product-rule advection jet, divergence cancellation, and
 the sign of the stretching term. A final delta audit separately checked the differentiated momentum
-and rearranged local vorticity balance. It found no remaining theorem or sign correction after the
-differentiable-occurrence and local-kernel repairs.
+and rearranged local vorticity balance. A solution-attachment audit then checked the positive-time
+neighbourhood argument, the infinite-to-`C²` regularity downgrade, and both totalized-derivative
+layers in the pressure theorem. It found no remaining theorem or sign correction after the
+differentiable-occurrence and local-kernel repairs; `t = 0`, realized solution second jets, and the
+time/Laplacian commutation squares remain explicitly open.

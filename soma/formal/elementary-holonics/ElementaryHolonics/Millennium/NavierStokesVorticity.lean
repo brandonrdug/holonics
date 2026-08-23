@@ -325,6 +325,84 @@ theorem curl_gradient_eq_zero (p : Space → ℝ) (x : Space) (hp : ContDiffAt �
   curl_gradient_eq_zero_of_symmetricDerivative p x
     (gradientJacobian_symmetric_of_contDiffAtTwo p x hp)
 
+/-! ## Attachment to the official smooth-solution carrier -/
+
+/-- A field smooth on the nonnegative space-time half-cylinder has a smooth spatial slice at every
+strictly positive time.  The strict inequality keeps this theorem inside the set's neighbourhood;
+the boundary time `t = 0` remains a separate within-derivative face. -/
+theorem spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {n : WithTop ℕ∞}
+    (field : Space → ℝ → F) (x : Space) (t : ℝ)
+    (hfield : ContDiffOn ℝ n (Function.uncurry field) (Set.univ ×ˢ Set.Ici 0))
+    (ht : 0 < t) : ContDiffAt ℝ n (fun y => field y t) x := by
+  have hdomain : Set.univ ×ˢ Set.Ici (0 : ℝ) ∈ nhds (x, t) := by
+    apply Filter.mem_of_superset (prod_mem_nhds Filter.univ_mem (Ioi_mem_nhds ht))
+    rintro z ⟨_hzuniv, hztime⟩
+    exact ⟨Set.mem_univ z.1, le_of_lt (show 0 < z.2 from hztime)⟩
+  have huncurry := hfield.contDiffAt hdomain
+  have hpair : ContDiffAt ℝ n (fun y : Space => (y, t)) x :=
+    contDiffAt_id.prodMk contDiffAt_const
+  simpa [Function.comp_def] using huncurry.comp x hpair
+
+/-- The velocity slice of an official smooth solution is genuinely differentiable at every
+positive-time event. -/
+theorem smoothSolution_velocitySlice_differentiableAt
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    DifferentiableAt ℝ (fun y => velocity y t) x :=
+  (spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x t
+    solution.velocitySmooth ht).differentiableAt (by simp)
+
+/-- An official smooth solution therefore supplies an admitted addressed
+velocity-to-Jacobian-to-vorticity occurrence at every positive-time event. -/
+def smoothSolution_velocityToVorticityOccurrence
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) : velocityToVorticityPassage.Occurrence :=
+  velocityToVorticityOccurrence (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_differentiableAt solution x t ht)
+
+/-- The admitted smooth-solution occurrence returns the solution's actual positive-time vorticity
+face while retaining the velocity slice and point in its predecessor address. -/
+theorem smoothSolution_velocityToVorticityOccurrence_target
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    velocityToVorticityPassage.target
+        (smoothSolution_velocityToVorticityOccurrence solution x t ht) =
+      vorticityAt (fun y => velocity y t) x := rfl
+
+/-- The local Lamb decomposition holds on every positive-time velocity occurrence of an official
+smooth solution. -/
+theorem smoothSolution_pointwiseLambIdentity
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    fderiv ℝ (fun y => velocity y t) x (velocity x t) =
+      transposeAction (velocityJacobianAt (fun y => velocity y t) x) (velocity x t) +
+        lambVectorFromJacobian (velocityJacobianAt (fun y => velocity y t) x)
+          (velocity x t) :=
+  pointwiseLambIdentity (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_differentiableAt solution x t ht)
+
+/-- The pressure term of an official smooth solution has zero local curl at every positive-time
+event.  This attaches the abstract `C²` pressure theorem to the actual `SmoothSolution` port. -/
+theorem smoothSolution_pressureCurl_eq_zero
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    vorticityAt (gradient (fun y => pressure y t)) x = 0 := by
+  apply curl_gradient_eq_zero
+  exact (spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime pressure x t
+    solution.pressureSmooth ht).of_le (WithTop.coe_le_coe.mpr le_top)
+
 /-! ## The nonlinear vorticity transport at one second-order jet -/
 
 /-- A coordinate chart for the second spatial jet, with convention
@@ -447,6 +525,11 @@ open Soma.Holonics.Millennium.NavierStokesVorticity
 #print axioms gradientJacobian_symmetric_of_contDiffAtTwo
 #print axioms curl_gradient_eq_zero_of_symmetricDerivative
 #print axioms curl_gradient_eq_zero
+#print axioms spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime
+#print axioms smoothSolution_velocitySlice_differentiableAt
+#print axioms smoothSolution_velocityToVorticityOccurrence_target
+#print axioms smoothSolution_pointwiseLambIdentity
+#print axioms smoothSolution_pressureCurl_eq_zero
 #print axioms divergence_vorticityJacobian_eq_zero
 #print axioms curl_advectionJacobian
 #print axioms curl_advectionJacobian_of_incompressible
