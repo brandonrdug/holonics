@@ -538,4 +538,211 @@ theorem theChordRootSatisfiesTheQuadratic {a b x y xR yR : ℚ}
   · exact h
   · exact absurd h (pow_ne_zero 2 hD)
 
+
+/-! ## 7. Clearing the chord quadratic to integers -/
+
+private lemma nab_mul {u v : ℤ} {m n : ℕ} (hu : u.natAbs ≤ m) (hv : v.natAbs ≤ n) :
+    (u * v).natAbs ≤ m * n := by
+  rw [Int.natAbs_mul]
+  exact Nat.mul_le_mul hu hv
+
+private lemma nab_add {u v : ℤ} {m n : ℕ} (hu : u.natAbs ≤ m) (hv : v.natAbs ≤ n) :
+    (u + v).natAbs ≤ m + n :=
+  le_trans (Int.natAbs_add_le u v) (Nat.add_le_add hu hv)
+
+private lemma nab_sub {u v : ℤ} {m n : ℕ} (hu : u.natAbs ≤ m) (hv : v.natAbs ≤ n) :
+    (u - v).natAbs ≤ m + n := by
+  rw [sub_eq_add_neg]
+  exact nab_add hu (by rwa [Int.natAbs_neg])
+
+private lemma nab_sq {u : ℤ} {m : ℕ} (hu : u.natAbs ≤ m) : (u ^ 2).natAbs ≤ m ^ 2 := by
+  rw [Int.natAbs_pow]
+  exact Nat.pow_le_pow_left hu 2
+
+/-- The integer leading coefficient of the cleared chord quadratic. -/
+def chordM (A B al be : ℤ) : ℤ := (A * be - al * B) ^ 2
+
+/-- Its middle coefficient. -/
+def chordS1 (a b A B al be : ℤ) : ℤ :=
+  2 * (A * al * (A * be + al * B - 2 * (a + b) * B * be)
+    + a * b * (B * be) * (A * be + al * B))
+
+/-- Its constant coefficient. -/
+def chordS2 (a b A B al be : ℤ) : ℤ := (A * al - a * b * (B * be)) ^ 2
+
+/-- **THE CLEARED CHORD QUADRATIC**: multiplying by `(Bβ)²` turns the chord quadratic
+into an integer one, with coefficients quadratic in the moving point's numerator and
+denominator. -/
+theorem theClearedChordQuadratic (a b : ℤ) {x y xR yR : ℚ} {A B al be : ℤ}
+    (hA : x = (A : ℚ) / (B : ℚ)) (hB : (B : ℚ) ≠ 0)
+    (hR : xR = (al : ℚ) / (be : ℚ)) (hbe : (be : ℚ) ≠ 0)
+    (hcx : y ^ 2 = x * (x - (a : ℚ)) * (x - (b : ℚ)))
+    (hcr : yR ^ 2 = xR * (xR - (a : ℚ)) * (xR - (b : ℚ))) (hne : x ≠ xR) :
+    ((chordM A B al be : ℤ) : ℚ)
+        * (((y + yR) / (x - xR)) ^ 2 + ((a : ℚ) + (b : ℚ)) - x - xR) ^ 2
+      - ((chordS1 a b A B al be : ℤ) : ℚ)
+        * (((y + yR) / (x - xR)) ^ 2 + ((a : ℚ) + (b : ℚ)) - x - xR)
+      + ((chordS2 a b A B al be : ℤ) : ℚ) = 0 := by
+  have hquad := theChordRootSatisfiesTheQuadratic hcx hcr hne
+  set z : ℚ := ((y + yR) / (x - xR)) ^ 2 + ((a : ℚ) + (b : ℚ)) - x - xR with hz
+  have hscale : ((chordM A B al be : ℤ) : ℚ) * z ^ 2
+      - ((chordS1 a b A B al be : ℤ) : ℚ) * z
+      + ((chordS2 a b A B al be : ℤ) : ℚ)
+      = ((x - xR) ^ 2 * z ^ 2 - 2 * chordW (a : ℚ) (b : ℚ) x xR * z
+          + chordK (a : ℚ) (b : ℚ) x xR) * ((B : ℚ) * (be : ℚ)) ^ 2 := by
+    unfold chordM chordS1 chordS2 chordW chordK
+    rw [hA, hR]
+    push_cast
+    field_simp
+  rw [hscale, hquad, zero_mul]
+
+
+/-! ## 8. The chord bound -/
+
+/-- The size of the fixed point together with the curve's coefficients. -/
+def pointSize (a b al be : ℤ) : ℕ :=
+  al.natAbs + be.natAbs + a.natAbs + b.natAbs + 1
+
+lemma one_le_pointSize (a b al be : ℤ) : 1 ≤ pointSize a b al be := by
+  unfold pointSize; omega
+
+set_option maxHeartbeats 1000000 in
+/-- **THE CHORD ROOT IS BOUNDED ON EVERY FULL-TWO-TORSION CURVE**: translating by a
+fixed point grows the height only **quadratically**,
+
+```text
+hgt(z)  ≤  2⁴ · R⁶ · hgt(x)²,        R = |α| + |β| + |a| + |b| + 1,
+```
+
+against the duplication's quartic.  That gap is the descent. -/
+theorem theChordRootIsBoundedOnEveryFullTwoTorsionCurve (a b : ℤ) {x y xR yR : ℚ}
+    {al be : ℤ} (hbe : 0 < be) (hR : xR = (al : ℚ) / (be : ℚ))
+    (hcx : y ^ 2 = x * (x - (a : ℚ)) * (x - (b : ℚ)))
+    (hcr : yR ^ 2 = xR * (xR - (a : ℚ)) * (xR - (b : ℚ))) (hne : x ≠ xR) :
+    hgt (((y + yR) / (x - xR)) ^ 2 + ((a : ℚ) + (b : ℚ)) - x - xR)
+      ≤ 2 ^ 4 * pointSize a b al be ^ 6 * hgt x ^ 2 := by
+  set A : ℤ := x.num with hAdef
+  set B : ℤ := (x.den : ℤ) with hBdef
+  set R : ℕ := pointSize a b al be with hRdef
+  set H : ℕ := hgt x with hHdef
+  have hB0 : (0 : ℤ) < B := by rw [hBdef]; exact_mod_cast x.den_pos
+  have hBQ : ((B : ℤ) : ℚ) ≠ 0 := by exact_mod_cast hB0.ne'
+  have hbeQ : ((be : ℤ) : ℚ) ≠ 0 := by exact_mod_cast hbe.ne'
+  have hAx : x = ((A : ℤ) : ℚ) / ((B : ℤ) : ℚ) := by
+    rw [hAdef, hBdef]
+    exact_mod_cast (Rat.num_div_den x).symm
+  have hquad := theClearedChordQuadratic a b hAx hBQ hR hbeQ hcx hcr hne
+  have hM0 : chordM A B al be ≠ 0 := by
+    unfold chordM
+    refine pow_ne_zero 2 ?_
+    intro hc
+    refine hne ?_
+    rw [hAx, hR, div_eq_div_iff hBQ hbeQ]
+    have : A * be = al * B := by linarith
+    exact_mod_cast this
+  have hroot := FiveTranslation.root_bound hM0 hquad
+  -- the three coefficients are bounded by `2⁴·R⁶·H²`
+  have hAle : A.natAbs ≤ H := by rw [hAdef, hHdef]; exact num_natAbs_le_hgt x
+  have hBle : B.natAbs ≤ H := by
+    rw [hBdef, hHdef, Int.natAbs_natCast]
+    exact den_le_hgt x
+  have hal : al.natAbs ≤ R := by rw [hRdef]; unfold pointSize; omega
+  have hbeR : be.natAbs ≤ R := by rw [hRdef]; unfold pointSize; omega
+  have haR : a.natAbs ≤ R := by rw [hRdef]; unfold pointSize; omega
+  have hbR : b.natAbs ≤ R := by rw [hRdef]; unfold pointSize; omega
+  have hR1 : 1 ≤ R := by rw [hRdef]; exact one_le_pointSize a b al be
+  have habR : (a * b).natAbs ≤ R ^ 2 := by
+    rw [Int.natAbs_mul, sq]
+    exact Nat.mul_le_mul haR hbR
+  have hsR : (a + b).natAbs ≤ 2 * R := by
+    have := nab_add haR hbR
+    omega
+  have hBbe : (B * be).natAbs ≤ H * R := nab_mul hBle hbeR
+  have hcross : (A * be + al * B).natAbs ≤ 2 * (H * R) := by
+    have h1 : (A * be).natAbs ≤ H * R := nab_mul hAle hbeR
+    have h2 : (al * B).natAbs ≤ H * R := by
+      have h := nab_mul hal hBle
+      rwa [mul_comm R H] at h
+    have := nab_add h1 h2
+    omega
+  -- the leading coefficient
+  have hMb : (chordM A B al be).natAbs ≤ 2 ^ 4 * R ^ 6 * H ^ 2 := by
+    unfold chordM
+    have h1 : (A * be - al * B).natAbs ≤ H * R + H * R := by
+      have hb2 : (al * B).natAbs ≤ H * R := by
+        have h := nab_mul hal hBle
+        rwa [mul_comm R H] at h
+      exact nab_sub (nab_mul hAle hbeR) hb2
+    have h2 := nab_sq h1
+    have h3 : (H * R + H * R) ^ 2 = 2 ^ 2 * H ^ 2 * R ^ 2 := by ring
+    rw [h3] at h2
+    refine le_trans h2 ?_
+    have h4 : R ^ 2 ≤ R ^ 6 := Nat.pow_le_pow_right hR1 (by omega)
+    calc 2 ^ 2 * H ^ 2 * R ^ 2 ≤ 2 ^ 2 * H ^ 2 * R ^ 6 := Nat.mul_le_mul_left _ h4
+      _ ≤ 2 ^ 4 * R ^ 6 * H ^ 2 := by nlinarith [Nat.zero_le (H ^ 2), Nat.zero_le (R ^ 6)]
+  -- the constant coefficient
+  have hS2b : (chordS2 a b A B al be).natAbs ≤ 2 ^ 4 * R ^ 6 * H ^ 2 := by
+    unfold chordS2
+    have h1 : (A * al).natAbs ≤ H * R := nab_mul hAle hal
+    have h2 : (a * b * (B * be)).natAbs ≤ R ^ 2 * (H * R) := nab_mul habR hBbe
+    have h3 : (A * al - a * b * (B * be)).natAbs ≤ H * R + R ^ 2 * (H * R) :=
+      nab_sub h1 h2
+    have h4 := nab_sq h3
+    refine le_trans h4 ?_
+    have h5 : H * R + R ^ 2 * (H * R) ≤ 2 * (R ^ 3 * H) := by
+      have hRR : R ≤ R ^ 3 := by
+        calc R = R ^ 1 := (pow_one R).symm
+          _ ≤ R ^ 3 := Nat.pow_le_pow_right hR1 (by omega)
+      have : R ^ 2 * (H * R) = R ^ 3 * H := by ring
+      nlinarith [Nat.zero_le H]
+    calc (H * R + R ^ 2 * (H * R)) ^ 2 ≤ (2 * (R ^ 3 * H)) ^ 2 :=
+          Nat.pow_le_pow_left h5 2
+      _ = 2 ^ 2 * R ^ 6 * H ^ 2 := by ring
+      _ ≤ 2 ^ 4 * R ^ 6 * H ^ 2 := by nlinarith [Nat.zero_le (R ^ 6 * H ^ 2)]
+  -- the middle coefficient
+  have hS1b : (chordS1 a b A B al be).natAbs ≤ 2 ^ 4 * R ^ 6 * H ^ 2 := by
+    unfold chordS1
+    have hin : (A * be + al * B - 2 * (a + b) * B * be).natAbs
+        ≤ 2 * (H * R) + 2 * (2 * R) * (H * R) := by
+      have h1 : (2 * (a + b) * B * be).natAbs ≤ 2 * (2 * R) * (H * R) := by
+        have e1 : (2 * (a + b) * B * be) = (2 * (a + b)) * (B * be) := by ring
+        rw [e1]
+        refine nab_mul ?_ hBbe
+        have : ((2 : ℤ) * (a + b)).natAbs = 2 * (a + b).natAbs := by
+          rw [Int.natAbs_mul]; norm_num
+        omega
+      exact nab_sub hcross h1
+    have h2 : (A * al).natAbs ≤ H * R := nab_mul hAle hal
+    have h3 : (A * al * (A * be + al * B - 2 * (a + b) * B * be)).natAbs
+        ≤ (H * R) * (2 * (H * R) + 2 * (2 * R) * (H * R)) := nab_mul h2 hin
+    have h4 : (a * b * (B * be) * (A * be + al * B)).natAbs
+        ≤ (R ^ 2 * (H * R)) * (2 * (H * R)) :=
+      nab_mul (nab_mul habR hBbe) hcross
+    have h5 := nab_add h3 h4
+    have h6 : (2 * (A * al * (A * be + al * B - 2 * (a + b) * B * be)
+        + a * b * (B * be) * (A * be + al * B))).natAbs
+        ≤ 2 * ((H * R) * (2 * (H * R) + 2 * (2 * R) * (H * R))
+          + (R ^ 2 * (H * R)) * (2 * (H * R))) := by
+      rw [Int.natAbs_mul]
+      have : ((2 : ℤ)).natAbs = 2 := by decide
+      rw [this]
+      exact Nat.mul_le_mul_left _ h5
+    refine le_trans h6 ?_
+    have hRR : R ^ 2 ≤ R ^ 6 := Nat.pow_le_pow_right hR1 (by omega)
+    have hRR3 : R ^ 3 ≤ R ^ 6 := Nat.pow_le_pow_right hR1 (by omega)
+    have hRR4 : R ^ 4 ≤ R ^ 6 := Nat.pow_le_pow_right hR1 (by omega)
+    have e : 2 * ((H * R) * (2 * (H * R) + 2 * (2 * R) * (H * R))
+        + (R ^ 2 * (H * R)) * (2 * (H * R)))
+        = 2 ^ 2 * (H ^ 2 * R ^ 2) + 2 ^ 3 * (H ^ 2 * R ^ 3)
+          + 2 ^ 2 * (H ^ 2 * R ^ 4) := by ring
+    rw [e]
+    have t1 : H ^ 2 * R ^ 2 ≤ H ^ 2 * R ^ 6 := Nat.mul_le_mul_left _ hRR
+    have t2 : H ^ 2 * R ^ 3 ≤ H ^ 2 * R ^ 6 := Nat.mul_le_mul_left _ hRR3
+    have t3 : H ^ 2 * R ^ 4 ≤ H ^ 2 * R ^ 6 := Nat.mul_le_mul_left _ hRR4
+    have e2 : 2 ^ 4 * R ^ 6 * H ^ 2 = 2 ^ 4 * (H ^ 2 * R ^ 6) := by ring
+    rw [e2]
+    omega
+  refine le_trans hroot ?_
+  omega
+
 end Soma.Holonics.Millennium.GeneralHeight
