@@ -373,7 +373,7 @@ theorem theFamilyThetaIsItsDirichletSeries (p : ℕ) [Fact p.Prime] (hp1 : p % 4
       ((thetaP p x : ℝ) : ℂ) := by
   have hcls : HasSum (clsTermP p (Real.sqrt 2 * x / (8 * p)))
       ((thetaP p x : ℝ) : ℂ) :=
-    theFamilyThetaIsTheTwistedClassSum p hp1 hx
+    theFamilyThetaIsTheTwistedClassSum p (by omega) hx
   have hσ : HasSum (fun q : Σ m : ℕ, {r : ℤ × ℤ // latticeNorm r = m} =>
       clsTermP p (Real.sqrt 2 * x / (8 * p)) ((Equiv.sigmaFiberEquiv latticeNorm) q))
       ((thetaP p x : ℝ) : ℂ) :=
@@ -637,6 +637,326 @@ theorem theAnalyticRankIsPositiveOnTheFiveModEightBranch (p : ℕ) [Fact p.Prime
   rcases h0 with h | h
   · exact h ((theLFunctionIsEntireAtEverySplitPrime p (by omega)).analyticAt 1)
   · exact h (theCentralValueVanishesOnTheFiveModEightBranch p hp8)
+
+
+
+/-! ## 8. The witness at every odd prime -/
+
+/-- **The coefficient identification at every good prime, for every odd modulus**:
+on the blind frames both sides vanish; on the split frames reciprocity turns the
+character around. -/
+theorem pCoeff_prime_odd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2)
+    (q : ℕ) [Fact q.Prime] (hq2 : q ≠ 2) (hqp : q ≠ p) :
+    pCoeff p q = traceOfFrobenius p q := by
+  have hq : q.Prime := Fact.out
+  have hqodd : q % 2 = 1 := by
+    rcases hq.eq_two_or_odd with h | h
+    · exact absurd h hq2
+    · exact h
+  have hqnd : ¬ q ∣ p := by
+    intro h
+    exact hqp ((Nat.prime_dvd_prime_iff_eq Fact.out Fact.out).mp h)
+  have htwist := theTraceTwistLawAtEveryModulus p (q := q) hq2 hqnd
+  rcases (show q % 4 = 1 ∨ q % 4 = 3 from by omega) with hq4 | hq4
+  · -- the split frame: reciprocity with `q` on the one-mod-four side
+    have hone : (heckeCoeff q : ℤ) = traceOfFrobenius 1 q :=
+      theCoefficientsAgreeAtEveryOddPrime (p := q) hq2
+    have hrec : legendreSym p (q : ℤ) = legendreSym q (p : ℤ) :=
+      legendreSym.quadratic_reciprocity_one_mod_four hq4 hp2
+    have hXleg : XP p ((q : ℕ) : ℤ) = legendreSym p (q : ℤ) := rfl
+    have hlegq : legendreSym q (p : ℤ) = quadraticChar (ZMod q) ((p : ℕ) : ZMod q) := by
+      show quadraticChar (ZMod q) (((p : ℤ) : ZMod q)) = _
+      norm_num
+    unfold pCoeff
+    rw [hone, hXleg, hrec, hlegq, htwist]
+  · -- the blind frame: both sides vanish
+    have hzero : heckeCoeff q = 0 :=
+      Soma.Holonics.Millennium.HeckeTheta.heckeCoeff_three_mod_four hq4
+    have htr : traceOfFrobenius 1 q = 0 :=
+      theCoefficientVanishesOnTheBlindFrames 1 q hq4
+    unfold pCoeff
+    rw [hzero, htwist, htr]
+    ring
+
+/-- The L-function at every odd prime: the completed function with its archimedean
+factor removed. -/
+def pLOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) (s : ℂ) : ℂ :=
+  ((Real.sqrt (32 * p ^ 2) : ℂ) / (2 * Real.pi)) ^ (-s) * (Complex.Gamma s)⁻¹ *
+    FamilyThetaFE.lambdaPOdd p hp2 s
+
+/-- **The L-function is entire at every odd prime.** -/
+theorem theLFunctionIsEntireAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) : Differentiable ℂ (pLOdd p hp2) := by
+  apply Differentiable.mul
+  · apply Differentiable.mul
+    · exact fun s => (differentiableAt_id.neg.const_cpow (Or.inl (base_ne_zero p)))
+    · exact Complex.differentiable_one_div_Gamma
+  · exact FamilyThetaFE.theCompletedLFunctionIsEntireAtEveryOddPrime p hp2
+
+/-- The product chart agrees with the completed function away from the `Γ` poles. -/
+theorem theCompletedProductFormulaHoldsAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) (s : ℂ) (hs : ∀ m : ℕ, s ≠ -(m : ℂ)) :
+    completed (32 * p ^ 2) (pLOdd p hp2) s = FamilyThetaFE.lambdaPOdd p hp2 s := by
+  unfold completed pLOdd
+  have hG : Complex.Gamma s ≠ 0 := Complex.Gamma_ne_zero (by exact_mod_cast hs)
+  have hb : ((Real.sqrt ((32 * p ^ 2 : ℕ) : ℝ) : ℂ) / (2 * Real.pi)) ≠ 0 := by
+    have := base_ne_zero p
+    push_cast at this ⊢
+    exact this
+  have hpow : ((Real.sqrt ((32 * p ^ 2 : ℕ) : ℝ) : ℂ) / (2 * Real.pi)) ^ s ≠ 0 := by
+    rw [Complex.cpow_def_of_ne_zero hb]
+    exact Complex.exp_ne_zero _
+  have hcast : ((Real.sqrt ((32 * p ^ 2 : ℕ) : ℝ) : ℂ) / (2 * Real.pi))
+      = ((Real.sqrt (32 * p ^ 2) : ℂ) / (2 * Real.pi)) := by
+    push_cast
+    rfl
+  rw [hcast] at hpow hb ⊢
+  rw [Complex.cpow_neg]
+  field_simp
+
+set_option maxHeartbeats 1000000 in
+/-- **The family theta is its Dirichlet series at every odd prime.** -/
+theorem theFamilyThetaIsItsDirichletSeriesAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) {x : ℝ} (hx : 0 < x) :
+    HasSum (fun m : ℕ => ((pCoeff p m : ℤ) : ℂ) *
+      ((rexp (-2 * π * (Real.sqrt 2 * x / (8 * p)) * (m : ℝ)) : ℝ) : ℂ))
+      ((thetaP p x : ℝ) : ℂ) := by
+  have hcls : HasSum (clsTermP p (Real.sqrt 2 * x / (8 * p)))
+      ((thetaP p x : ℝ) : ℂ) :=
+    theFamilyThetaIsTheTwistedClassSum p hp2 hx
+  have hσ : HasSum (fun q : Σ m : ℕ, {r : ℤ × ℤ // latticeNorm r = m} =>
+      clsTermP p (Real.sqrt 2 * x / (8 * p)) ((Equiv.sigmaFiberEquiv latticeNorm) q))
+      ((thetaP p x : ℝ) : ℂ) :=
+    ((Equiv.sigmaFiberEquiv latticeNorm).hasSum_iff).mpr hcls
+  exact hσ.sigma fun m => fiber_hasSumP p (Real.sqrt 2 * x / (8 * p)) m
+
+/-- The theta's exponential Dirichlet expansion, at every odd prime. -/
+private lemma thetaP_hasSum_exp_odd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2)
+    {t : ℝ} (ht : t ∈ Set.Ioi (0 : ℝ)) :
+    HasSum (fun m : ℕ => ((pCoeff p m : ℤ) : ℂ) * rexp (-(alP p * m) * t))
+      ((thetaP p t : ℝ) : ℂ) := by
+  have h := theFamilyThetaIsItsDirichletSeriesAtEveryOddPrime p hp2
+    (Set.mem_Ioi.mp ht)
+  have hfun : (fun m : ℕ => ((pCoeff p m : ℤ) : ℂ) *
+      ((rexp (-2 * π * (Real.sqrt 2 * t / (8 * p)) * (m : ℝ)) : ℝ) : ℂ))
+      = fun m : ℕ => ((pCoeff p m : ℤ) : ℂ) * rexp (-(alP p * m) * t) := by
+    funext m
+    congr 2
+    unfold alP
+    push_cast
+    ring
+  rwa [hfun] at h
+
+set_option maxHeartbeats 1000000 in
+/-- **The L-function agrees with the Dirichlet series at every odd prime** on the
+half-plane `re s > 3`. -/
+theorem theLFunctionAgreesWithItsDirichletSeriesAtEveryOddPrime
+    (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) {s : ℂ} (hs : 3 < s.re) :
+    pLOdd p hp2 s = LSeries (fun m => ((pCoeff p m : ℤ) : ℂ)) s := by
+  have hp : p.Prime := Fact.out
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp.pos
+  have hs0 : 0 < s.re := by linarith
+  have hC := alP_pos p hp.pos
+  set C : ℝ := alP p with hC_def
+  have hmel : HasSum (fun m : ℕ => Complex.Gamma s * ((pCoeff p m : ℤ) : ℂ) /
+      ((C * m : ℝ) : ℂ) ^ s)
+      (mellin (Complex.ofReal ∘ thetaP p) s) := by
+    refine hasSum_mellin (fun m => ?_) hs0
+      (fun t ht => thetaP_hasSum_exp_odd p hp2 ht) (dirichlet_summableP p hs)
+    rcases Nat.eq_zero_or_pos m with rfl | hm
+    · left
+      rw [pCoeff_zero]
+      norm_num
+    · right
+      have hm0 : (0 : ℝ) < (m : ℝ) := by exact_mod_cast hm
+      positivity
+  have hΛ : mellin (Complex.ofReal ∘ thetaP p) s = FamilyThetaFE.lambdaPOdd p hp2 s :=
+    (FamilyThetaFE.theCompletedLFunctionHasMellinAtEveryOddPrime p hp2 s).2
+  rw [hΛ] at hmel
+  have hG : Complex.Gamma s ≠ 0 := by
+    apply Complex.Gamma_ne_zero
+    intro m hm
+    have hre := congrArg Complex.re hm
+    simp only [Complex.neg_re, Complex.natCast_re] at hre
+    have h0 : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
+    linarith
+  have htsum : FamilyThetaFE.lambdaPOdd p hp2 s = Complex.Gamma s *
+      ∑' m : ℕ, ((pCoeff p m : ℤ) : ℂ) / ((C * m : ℝ) : ℂ) ^ s := by
+    rw [← tsum_mul_left, ← hmel.tsum_eq]
+    exact tsum_congr fun m => by ring
+  have hterm : ∀ m : ℕ, ((pCoeff p m : ℤ) : ℂ) / ((C * m : ℝ) : ℂ) ^ s
+      = ((((C : ℝ)) : ℂ) ^ s)⁻¹ *
+          LSeries.term (fun m => ((pCoeff p m : ℤ) : ℂ)) s m := by
+    intro m
+    rcases Nat.eq_zero_or_pos m with rfl | hm
+    · rw [LSeries.term_zero, show ((pCoeff p 0 : ℤ) : ℂ) = 0 from by
+        rw [pCoeff_zero]; norm_num]
+      norm_num
+    · rw [LSeries.term_of_ne_zero (by omega : m ≠ 0)]
+      have hm0 : (0 : ℝ) < (m : ℝ) := by exact_mod_cast hm
+      have hsplit : ((C * m : ℝ) : ℂ) ^ s
+          = ((C : ℝ) : ℂ) ^ s * ((m : ℝ) : ℂ) ^ s := by
+        rw [Complex.ofReal_mul]
+        exact Complex.mul_cpow_ofReal_nonneg hC.le hm0.le s
+      rw [hsplit]
+      have hCs : ((C : ℝ) : ℂ) ^ s ≠ 0 := by
+        rw [Complex.cpow_def_of_ne_zero (by exact_mod_cast hC.ne')]
+        exact Complex.exp_ne_zero _
+      have hms : ((m : ℝ) : ℂ) ^ s ≠ 0 := by
+        rw [Complex.cpow_def_of_ne_zero (by exact_mod_cast hm0.ne')]
+        exact Complex.exp_ne_zero _
+      rw [show (((m : ℝ) : ℂ)) = ((m : ℕ) : ℂ) from by push_cast; rfl] at hsplit hms ⊢
+      field_simp
+  have hfinal : FamilyThetaFE.lambdaPOdd p hp2 s = Complex.Gamma s *
+      (((((C : ℝ)) : ℂ) ^ s)⁻¹ *
+        LSeries (fun m => ((pCoeff p m : ℤ) : ℂ)) s) := by
+    rw [htsum, tsum_congr hterm, tsum_mul_left]
+    rfl
+  have hb0 : (0 : ℝ) < Real.sqrt (32 * p ^ 2) / (2 * π) := by
+    have h1 := Real.pi_pos
+    have h2 : (0 : ℝ) < Real.sqrt (32 * p ^ 2) := by
+      refine Real.sqrt_pos.mpr ?_
+      positivity
+    positivity
+  have hbase : ((Real.sqrt (32 * p ^ 2) : ℂ) / (2 * Real.pi))
+      = (((Real.sqrt (32 * p ^ 2) / (2 * π) : ℝ)) : ℂ) := by
+    push_cast
+    rfl
+  have hcancel : (Real.sqrt (32 * p ^ 2) / (2 * π) : ℝ) * C = 1 := by
+    rw [show Real.sqrt (32 * (p : ℝ) ^ 2) = 4 * p * Real.sqrt 2 from
+      sqrt_conductor p hp.pos, hC_def]
+    unfold alP
+    have h1 := Real.pi_pos
+    have h2 : (0 : ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+    have hss : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+    field_simp
+    linear_combination hss
+  have hkey : ((Real.sqrt (32 * p ^ 2) : ℂ) / (2 * Real.pi)) ^ (-s) *
+      ((((C : ℝ)) : ℂ) ^ s)⁻¹ = 1 := by
+    rw [hbase, Complex.cpow_neg, ← mul_inv,
+      ← Complex.mul_cpow_ofReal_nonneg hb0.le hC.le, ← Complex.ofReal_mul, hcancel]
+    simp
+  have hGinv : (Complex.Gamma s)⁻¹ * Complex.Gamma s = 1 := inv_mul_cancel₀ hG
+  unfold pLOdd
+  rw [hfinal]
+  linear_combination (LSeries (fun m => ((pCoeff p m : ℤ) : ℂ)) s *
+      ((Complex.Gamma s)⁻¹ * Complex.Gamma s)) * hkey
+    + LSeries (fun m => ((pCoeff p m : ℤ) : ℂ)) s * hGinv
+
+/-- The root number of the odd-prime witness, as an integer. -/
+def rootNumber (p : ℕ) [Fact p.Prime] : ℤ := ((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2
+
+private lemma rootNumber_pm (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
+    rootNumber p = 1 ∨ rootNumber p = -1 := by
+  have hp : p.Prime := Fact.out
+  have h20 : ((2 : ℤ) : ZMod p) ≠ 0 := by
+    rw [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
+    intro h
+    have h1 := Int.le_of_dvd (by norm_num) h
+    have h2 := hp.two_le
+    have h3 : p = 2 := by omega
+    exact hp2 h3
+  have hX : XP p 2 = 1 ∨ XP p 2 = -1 := by
+    rcases (quadraticChar_isQuadratic (ZMod p)) (((2 : ℤ) : ZMod p)) with h | h | h
+    · exact absurd (quadraticChar_eq_zero_iff.mp h) h20
+    · exact Or.inl h
+    · exact Or.inr h
+  unfold rootNumber
+  rcases Int.even_or_odd (((p - 1) / 2 : ℕ) : ℤ) with he | ho
+  · have h1 : ((-1 : ℤ)) ^ ((p - 1) / 2) = 1 := by
+      refine Even.neg_one_pow ?_
+      obtain ⟨r, hr⟩ := he
+      exact ⟨r.toNat, by omega⟩
+    rcases hX with h | h <;> rw [h1, h] <;> norm_num
+  · have h1 : ((-1 : ℤ)) ^ ((p - 1) / 2) = -1 := by
+      refine Odd.neg_one_pow ?_
+      obtain ⟨r, hr⟩ := ho
+      exact ⟨r.toNat, by omega⟩
+    rcases hX with h | h <;> rw [h1, h] <;> norm_num
+
+set_option maxHeartbeats 1000000 in
+/-- **THE WITNESS AT EVERY ODD PRIME**: the analytic datum of the congruent-number
+curve at every odd prime at once — both residue branches.  The coefficients are the
+twisted shell sums (with the blind frames killing the reciprocity discrepancy), the
+L-function is the Mellin transform of the family theta, and the functional equation
+carries the classical root number `(−1)^{(p−1)/2}·χ_p(2)`. -/
+noncomputable def theWitnessAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) : LDatum p where
+  coeff := fun m => ((pCoeff p m : ℤ) : ℂ)
+  coeff_one := by
+    rw [pCoeff_one]
+    norm_num
+  coeff_prime := fun q hq hqd => by
+    haveI : Fact q.Prime := ⟨hq⟩
+    have hq2 : q ≠ 2 := by
+      intro h
+      exact hqd ⟨p, by rw [h]⟩
+    have hqp : q ≠ p := by
+      intro h
+      exact hqd ⟨2, by rw [h]; ring⟩
+    have h := pCoeff_prime_odd p hp2 q hq2 hqp
+    exact_mod_cast h
+  coeff_mul := fun a b hab => by
+    have h := pCoeff_mul p hab
+    exact_mod_cast h
+  coeff_prime_pow := fun q k hq hqd => by
+    haveI : Fact q.Prime := ⟨hq⟩
+    have hq2 : q ≠ 2 := by
+      intro h
+      exact hqd ⟨p, by rw [h]⟩
+    have hqp : q ≠ p := by
+      intro h
+      exact hqd ⟨2, by rw [h]; ring⟩
+    have h := pCoeff_prime_pow p (q := q) hq2 hqp k
+    exact_mod_cast h
+  coeff_bad := fun q k hq hqd => by
+    have h := pCoeff_bad p hp2 hq hqd k
+    exact_mod_cast h
+  L := pLOdd p hp2
+  analytic := theLFunctionIsEntireAtEveryOddPrime p hp2
+  agrees := fun s hs =>
+    theLFunctionAgreesWithItsDirichletSeriesAtEveryOddPrime p hp2 hs
+  conductor := 32 * p ^ 2
+  conductor_pos := by
+    have hp : p.Prime := Fact.out
+    have := hp.pos
+    positivity
+  sign := rootNumber p
+  sign_pm := rootNumber_pm p hp2
+  Lambda := FamilyThetaFE.lambdaPOdd p hp2
+  Lambda_analytic := FamilyThetaFE.theCompletedLFunctionIsEntireAtEveryOddPrime p hp2
+  Lambda_eq := fun s hs =>
+    (theCompletedProductFormulaHoldsAtEveryOddPrime p hp2 s hs).symm
+  functional_equation := fun s => by
+    rw [FamilyThetaFE.theCompletedFunctionalEquationAtEveryOddPrime p hp2 s]
+    unfold rootNumber
+    push_cast
+    ring
+
+/-- **The pose is inhabited at every odd prime.** -/
+theorem theWitnessExistsAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) : Nonempty (LDatum p) :=
+  ⟨theWitnessAtEveryOddPrime p hp2⟩
+
+/-- **The central value vanishes and the analytic rank is positive on the whole
+odd-sign locus `p ≡ 5, 7 (mod 8)`** — the analytic half of the conjecture's rank
+clause predicting, family-wise, that every such prime is a congruent number. -/
+theorem theAnalyticRankIsPositiveOnTheOddSignBranches
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5 ∨ p % 8 = 7) :
+    analyticRank (theWitnessAtEveryOddPrime p
+      (by rcases hp8 with h | h <;> omega)) ≠ 0 := by
+  have hp2 : p ≠ 2 := by rcases hp8 with h | h <;> omega
+  have hL0 : pLOdd p hp2 1 = 0 := by
+    unfold pLOdd
+    rw [FamilyThetaFE.theOddHandForcesTheCentralVanishingOnTheOddSignBranches p hp8]
+    ring
+  unfold analyticRank
+  show analyticOrderAt (pLOdd p hp2) 1 ≠ 0
+  intro h0
+  rw [analyticOrderAt_eq_zero] at h0
+  rcases h0 with h | h
+  · exact h ((theLFunctionIsEntireAtEveryOddPrime p hp2).analyticAt 1)
+  · exact h hL0
 
 end Soma.Holonics.Millennium.FamilyWitness
 

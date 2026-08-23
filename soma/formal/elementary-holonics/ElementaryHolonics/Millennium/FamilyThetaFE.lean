@@ -369,10 +369,10 @@ theorem theOddHandForcesTheCentralVanishingOnTheFiveModEightFamily
 
 /-! ## 6. The theta as its lattice class sum -/
 
-private lemma XP_two_sq (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) :
+private lemma XP_two_sq (p : ℕ) [Fact p.Prime] (hp2' : p ≠ 2) :
     ((XP p 2 : ℤ) : ℂ) * ((XP p 2 : ℤ) : ℂ) = 1 := by
   have hp : p.Prime := Fact.out
-  have hp5 : 5 ≤ p := by have := hp.two_le; omega
+  have hp5 : 3 ≤ p := by have := hp.two_le; omega
   have h20 : ((2 : ℤ) : ZMod p) ≠ 0 := by
     rw [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
     intro h
@@ -389,7 +389,7 @@ set_option maxHeartbeats 1000000 in
 — the `χ_p`-weighted Gaussian class sum at every split prime, returned as a `HasSum`
 so the receiver can integrate against it term by term.  The functional-equation sign
 `χ_p(2)` cancels out of the lattice presentation, as it must. -/
-theorem theFamilyThetaIsItsLatticeSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+theorem theFamilyThetaIsItsLatticeSum (p : ℕ) [Fact p.Prime] (hp2' : p ≠ 2)
     {t : ℝ} (ht : 0 < t) :
     HasSum (fun q : ℤ × ℤ =>
       ((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
@@ -407,7 +407,7 @@ theorem theFamilyThetaIsItsLatticeSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
     rw [hy_def]
     field_simp
     ring
-  have hχ := XP_two_sq p hp1
+  have hχ := XP_two_sq p hp2'
   set χ : ℂ := ((XP p 2 : ℤ) : ℂ) with hχdef
   have hpc : ((p : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hp0.ne'
   have hCdef : ((thetaP p t : ℝ) : ℂ)
@@ -493,7 +493,7 @@ set_option maxHeartbeats 1000000 in
 class `(a+b) ≡ 1 (mod 4)`, `b` even, with weight `a·χ_p(a²+b²)` — the Hecke sum of the
 twisted character in its folded real form, at scale `√2·x/(8p)`, at every split
 prime. -/
-theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp2' : p ≠ 2)
     {x : ℝ} (hx : 0 < x) :
     HasSum (fun q : ℤ × ℤ =>
       if (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0 then
@@ -511,7 +511,7 @@ theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4
     rw [hy_def]
     field_simp
     ring
-  have hχ := XP_two_sq p hp1
+  have hχ := XP_two_sq p hp2'
   set χ : ℂ := ((XP p 2 : ℤ) : ℂ) with hχdef
   have hpc : ((p : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hp0.ne'
   have hCdef : ((thetaP p x : ℝ) : ℂ)
