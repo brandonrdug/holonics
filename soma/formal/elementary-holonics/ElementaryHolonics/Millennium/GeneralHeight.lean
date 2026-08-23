@@ -745,4 +745,67 @@ theorem theChordRootIsBoundedOnEveryFullTwoTorsionCurve (a b : ℤ) {x y xR yR :
   refine le_trans hroot ?_
   omega
 
+
+/-! ## 9. The duplication law against the actual rational height -/
+
+/-- The height of a reduced fraction is the larger of its two parts. -/
+lemma hgt_of_coprime {A B : ℤ} (hB : B ≠ 0) (hcop : Nat.Coprime A.natAbs B.natAbs) :
+    hgt ((A : ℚ) / (B : ℚ)) = max A.natAbs B.natAbs := by
+  rcases lt_trichotomy B 0 with hneg | hzero | hpos
+  · have hval : ((A : ℚ) / (B : ℚ)) = ((-A : ℤ) : ℚ) / ((-B : ℤ) : ℚ) := by
+      push_cast
+      rw [neg_div_neg_eq]
+    have hcop' : Nat.Coprime (-A).natAbs (-B).natAbs := by
+      rwa [Int.natAbs_neg, Int.natAbs_neg]
+    have hden := Rat.den_div_eq_of_coprime (by omega : (0 : ℤ) < -B) hcop'
+    have hden' : (((-A : ℤ) : ℚ) / ((-B : ℤ) : ℚ)).den = (-B).natAbs := by
+      have : (((((-A : ℤ) : ℚ) / ((-B : ℤ) : ℚ)).den : ℤ)) = -B := hden
+      omega
+    rw [hval, hgt, Rat.num_div_eq_of_coprime (by omega : (0 : ℤ) < -B) hcop', hden',
+      Int.natAbs_neg, Int.natAbs_neg]
+  · exact absurd hzero hB
+  · have hden := Rat.den_div_eq_of_coprime hpos hcop
+    have hden' : (((A : ℤ) : ℚ) / ((B : ℤ) : ℚ)).den = B.natAbs := by
+      have : ((((A : ℤ) : ℚ) / ((B : ℤ) : ℚ)).den : ℤ) = B := hden
+      omega
+    rw [hgt, Rat.num_div_eq_of_coprime hpos hcop, hden']
+
+set_option maxHeartbeats 1000000 in
+/-- **THE DUPLICATION LAW, READ ON THE ABSCISSA**: on every full-2-torsion curve,
+
+```text
+hgt(u)⁴  ≤  2⁷ · D¹⁰ · hgt( (u² − ab)² / (2²·u(u−a)(u−b)) ).
+```
+-/
+theorem theDuplicationGrowsTheAbscissaHeight (a b : ℤ) (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) (u : ℚ)
+    (hA : numA a b u.num (u.den : ℤ) ≠ 0) (hB : denB a b u.num (u.den : ℤ) ≠ 0) :
+    hgt u ^ 4 ≤ 2 ^ 7 * sizeOf a b ^ 10
+      * hgt ((numA a b u.num (u.den : ℤ) : ℚ) / (denB a b u.num (u.den : ℤ) : ℚ)) := by
+  set p : ℤ := u.num with hp
+  set q : ℤ := (u.den : ℤ) with hq
+  set N : ℤ := numA a b p q with hN
+  set Dn : ℤ := denB a b p q with hDn
+  set d : ℕ := Int.gcd N Dn with hd
+  have hd0 : 0 < d := Int.gcd_pos_of_ne_zero_left Dn hA
+  have hdZ : ((d : ℤ)) ≠ 0 := by exact_mod_cast hd0.ne'
+  have hdN : (d : ℤ) ∣ N := Int.gcd_dvd_left N Dn
+  have hdD : (d : ℤ) ∣ Dn := Int.gcd_dvd_right N Dn
+  set N₁ : ℤ := N / (d : ℤ) with hN1
+  set D₁ : ℤ := Dn / (d : ℤ) with hD1
+  have hNs : N = (d : ℤ) * N₁ := (Int.ediv_mul_cancel hdN).symm.trans (mul_comm _ _)
+  have hDs : Dn = (d : ℤ) * D₁ := (Int.ediv_mul_cancel hdD).symm.trans (mul_comm _ _)
+  have hD10 : D₁ ≠ 0 := by
+    intro hc
+    exact hB (by rw [hDs, hc, mul_zero])
+  have hcop : Nat.Coprime N₁.natAbs D₁.natAbs := by
+    rw [hN1, hD1, hd]
+    exact Int.gcd_div_gcd_div_gcd (Int.gcd_pos_of_ne_zero_left Dn hA)
+  have hfrac : ((N : ℤ) : ℚ) / ((Dn : ℤ) : ℚ) = ((N₁ : ℤ) : ℚ) / ((D₁ : ℤ) : ℚ) := by
+    conv_lhs => rw [hNs, hDs]
+    push_cast
+    rw [mul_div_mul_left _ _ (show ((d : ℕ) : ℚ) ≠ 0 from by exact_mod_cast hd0.ne')]
+  rw [hfrac, hgt_of_coprime hD10 hcop]
+  exact theDuplicationGrowsTheHeightOnEveryFullTwoTorsionCurve a b ha hb hab u hA hB
+
 end Soma.Holonics.Millennium.GeneralHeight
