@@ -442,6 +442,84 @@ extern "C" __global__ void conduct_heterogeneous_fusion(
     }
 }
 
+/// **The recurrent passage and every conserved modality face cross one inference front.**
+///
+/// I3 and I4 retain different state spaces. Their only identification is the explicit binary
+/// cultivation decision. Distinct ports, traces, and reconstruction addresses remain distinct.
+extern "C" __global__ void conduct_inference_ecology(
+    const uint32_t *recurrent_action,
+    const uint32_t *recurrent_start,
+    uint32_t *recurrent_predecessor_trace,
+    uint32_t *recurrent_successor_trace,
+    uint32_t *recurrent_withdrawn_trace,
+    uint32_t *recurrent_selected_trace,
+    uint32_t *recurrent_predecessor_length,
+    uint32_t *recurrent_successor_length,
+    uint32_t *recurrent_withdrawn_length,
+    uint32_t *recurrent_selected_length,
+    uint32_t *recurrent_seen,
+    uint32_t recurrent_cells,
+    uint32_t recurrent_states,
+    uint32_t recurrent_seen_words,
+    uint32_t recurrent_predecessor_from,
+    uint32_t recurrent_predecessor_to,
+    const uint32_t *world_action,
+    const uint32_t *world_decoder,
+    const uint32_t *world_start,
+    uint32_t *world_predecessor_consequence,
+    uint32_t *world_successor_consequence,
+    uint32_t *world_selected_consequence,
+    uint32_t *world_shared_ablated_consequence,
+    uint32_t *world_local_ablated_consequence,
+    uint32_t world_cells,
+    uint32_t world_states,
+    uint32_t world_ports,
+    uint32_t committed)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at < recurrent_cells) {
+        const uint32_t stride = recurrent_states + 1U;
+        const uint64_t trace_at = (uint64_t)at * (uint64_t)stride;
+        const uint64_t seen_stride = (uint64_t)recurrent_cells * recurrent_seen_words;
+        const uint64_t seen_at = (uint64_t)at * recurrent_seen_words;
+        recurrent_predecessor_length[at] = condensed_recurrent_trace(
+            recurrent_action, recurrent_start[at], recurrent_states, true, false,
+            recurrent_predecessor_from, recurrent_predecessor_to,
+            recurrent_seen + seen_at, recurrent_predecessor_trace + trace_at);
+        recurrent_successor_length[at] = condensed_recurrent_trace(
+            recurrent_action, recurrent_start[at], recurrent_states, false, false,
+            recurrent_predecessor_from, recurrent_predecessor_to,
+            recurrent_seen + seen_stride + seen_at, recurrent_successor_trace + trace_at);
+        recurrent_withdrawn_length[at] = condensed_recurrent_trace(
+            recurrent_action, recurrent_start[at], recurrent_states, false, true,
+            recurrent_predecessor_from, recurrent_predecessor_to,
+            recurrent_seen + 2ULL * seen_stride + seen_at,
+            recurrent_withdrawn_trace + trace_at);
+        recurrent_selected_length[at] = condensed_recurrent_trace(
+            recurrent_action, recurrent_start[at], recurrent_states, committed == 0U, false,
+            recurrent_predecessor_from, recurrent_predecessor_to,
+            recurrent_seen + 3ULL * seen_stride + seen_at,
+            recurrent_selected_trace + trace_at);
+    }
+    if (at < world_cells) {
+        const uint32_t start = world_start[at];
+        const uint32_t next = world_action[start];
+        const uint64_t decoder_at = (uint64_t)at * (uint64_t)world_states;
+        const uint32_t before = world_decoder[decoder_at + start];
+        const uint32_t after = world_decoder[decoder_at + next];
+        world_predecessor_consequence[at] = before;
+        world_successor_consequence[at] = after;
+        world_selected_consequence[at] = committed == 0U ? before : after;
+        world_shared_ablated_consequence[at] = before;
+        const uint32_t local_port = at % world_ports;
+        const uint64_t local_at = (uint64_t)at * (uint64_t)world_ports;
+        for (uint32_t withdrawn_port = 0; withdrawn_port < world_ports; ++withdrawn_port) {
+            world_local_ablated_consequence[local_at + withdrawn_port] =
+                local_port == withdrawn_port ? before : after;
+        }
+    }
+}
+
 __device__ __forceinline__ uint64_t contact_abs_i64(int64_t value) {
     // Avoid negating INT64_MIN. The host admission proves the declared differences fit the square
     // aperture; this expression is nevertheless total over the full wire.

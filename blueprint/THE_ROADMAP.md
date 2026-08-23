@@ -221,12 +221,23 @@ The complete invocation returned 2,835 passing tests, zero failures, 25 explicit
 thirteen green release scopes in 347.202 seconds. Release admission:
 [`research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md`](../research/records/2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md).
 
-**CURRENT DEED: I5 ATHENA-GEMMA FREEZES AS AN INFERENCE ECOLOGY.** I5 must return the
-source-detached canonical rest and executable recurrent inference entry, full-passage emission,
-optional committed/declined cultivation, enacted world return and changed later conduct, every
-admitted real modality, generator-native condensation and complete cost, dissection atlas, exact
-work/telemetry separation, fresh-process restoration, and targeted source/native/shared-route
-ablations. A source-shaped tensor face or entry-port result does not substitute for this product.
+**I5 PASSED — ATHENA-GEMMA FROZE AS AN INFERENCE ECOLOGY.** One seven-component
+source-detached rest now composes recurrent conduct, conserved text/vision faces and an addressed
+commit/decline junction without cloning the ecology. An actual world return changed later complete
+passages and every admitted modality consequence; one resident RTX front returns selected,
+alternative, shared-withdrawn and local-withdrawn conduct. All seven complete-product coordinates
+fall strictly, and the dissection atlas returns routes, fibres, defects, basins, caustics, holonomy,
+ablations and open exterior. The complete invocation returned 2,837 passing tests, zero failures,
+26 explicit ignores and all thirteen green scopes in approximately 276.4 seconds. Candidate record:
+[`research/records/2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
+
+**NEXT DEED: RECEIVER SELECTION AFTER I5 IS NOT YET RATIFIED.** I0--I5 complete the user's
+ratified construction order for the declared Athena-Gemma recurrent/world/text/vision family.
+Optional X0--X2 heterogeneous fusion remains unscheduled until Brandon selects a source which
+separates one explicit I5 open transport family. Completion does not silently schedule Qwen or any
+other model.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

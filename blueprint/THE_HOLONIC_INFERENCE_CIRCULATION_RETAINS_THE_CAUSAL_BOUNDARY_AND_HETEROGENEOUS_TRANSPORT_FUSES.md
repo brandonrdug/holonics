@@ -439,9 +439,18 @@ native contact law, or shared-route ablation has no cross-port consequence.
 
 ## 12. Deed I5 — Athena-Gemma freezes as an inference ecology
 
-[open; active] I5 emits the first complete Athena-Gemma product under the admitted language/world/modal
-receiver family. Its canonical object is the generator-native rest and retained-continuation law,
-not a source-shaped tensor container.
+[established-bounded; implemented-exact; measured] I5 passed release on 2026-08-22. One canonical
+seven-component rest composes I3 recurrence, I4 heterogeneous text/vision transport, and a thin
+addressed junction. A declined fresh process, actual `/usr/bin/tee` world consequence, consuming
+commit, and committed fresh process returned changed complete passages and every admitted modality
+face. One RTX launch/synchronization returned selected, alternative, shared-withdrawn and every
+local-withdrawn route; the complete cost fell strictly in all seven coordinates. Candidate record:
+[`2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md`](../research/records/2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md).
+Release admission:
+[`2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
+
+[definition] Its canonical object is the generator-native rest and retained-continuation law, not
+a source-shaped tensor container.
 
 I5 returns:
 
@@ -461,7 +470,7 @@ I5 returns:
 The I5 grade is bounded by its declared receiver/history/modal family. It makes no unrestricted
 intelligence claim and does not erase unexcited Gemma fibres.
 
-## 13. Later heterogeneous architecture fusion — unscheduled until I5
+## 13. Later heterogeneous architecture fusion — unscheduled after I5 pending receiver selection
 
 [open] After I5, the next source is selected by a complementary open transport family, not model
 popularity, parameter count, or availability alone. Primary source species include:
@@ -530,7 +539,10 @@ receiver consequence is shown absent.
 
 ## 16. Complete Holonic Inference grade
 
-[open] The trajectory completes only when all of the following stand together:
+[established-bounded; implemented-exact; measured] I0--I5 passed together for the declared
+recurrent/world/text/vision receiver family. The release receipt is
+[`2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
+The admitted trajectory returns all of the following together:
 
 1. exact physical-realization and realization-passage calculus;
 2. generator-local naturality extending through every admitted ordered successor word;

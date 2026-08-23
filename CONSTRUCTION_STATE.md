@@ -4,11 +4,11 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I3. **Body:** the root Rust workspace with the resident CUDA
+**Currency:** 2026-08-22 after Deed I5. **Body:** the root Rust workspace with the resident CUDA
 apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RECURRENT REALIZATIONS CONDENSED, THE COMPLETE FIBRES REMAINED, AND I3
-PASSED ITS RELEASE RECEIVER.**
+**CURRENT FRONTIER — ATHENA-GEMMA INFERRED, RETURNED, REMOUNTED, AND I5 PASSED ITS RELEASE
+RECEIVER.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -278,26 +278,33 @@ grade:
 seconds: 2,835 tests passed, none failed, 25 were explicitly ignored, every example target
 type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: I5 ATHENA-GEMMA FREEZES AS AN INFERENCE ECOLOGY.**
-[open] I5 owes a source-detached canonical generator-native rest and executable inference entry;
-recurrent full-passage emission; explicit optional cultivation commit/decline; enacted world return
-and changed later conduct; text plus every admitted real modality; strict complete-product descent;
-a dissection atlas of source/native/shared routes, defects, fibres, basins, caustics, holonomy,
-ablations and open exterior; exact semantic work and separate telemetry; fresh-process restoration;
-and targeted source/native/shared-route withdrawal. A source-shaped tensor container, one output,
-or an entry-port demonstration does not pass.
+**I5 PASSED — Athena-Gemma froze as one Holonic Inference ecology.**
+[established-bounded; implemented-exact; measured] One seven-component source-detached rest now
+composes I3 recurrence, I4 heterogeneous text/vision conduct and an addressed commit/decline
+junction without copying the continuing ecology. A fresh declined process emitted
+`" France is France"` / `" is France"`; an actual 17-octet `/usr/bin/tee` world consequence
+returned and committed the junction; a fresh committed process emitted `" France is is"` /
+`" is is"` and moved all admitted text/vision consequences from `[0,2,4,6]` to `[1,3,5,7]`.
+One RTX 4080 SUPER launch/synchronization returned both recurrent alternatives, selected conduct,
+global withdrawal and every local port withdrawal with no source access or CPU semantic callback.
+All seven complete-product coordinates fell strictly. The exact atlas returns source/native/shared
+routes, fibres, separators, defects, basins, caustics, holonomy, ablations and open exterior.
+Authoritative grade:
+[`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
+[established-bounded; measured] The sole complete receiver passed all thirteen scopes in
+approximately 276.4 seconds: 2,837 tests passed, none failed, 26 were explicitly ignored, every
+example target type-checked, and all twelve non-test scopes were green.
 
-[open] The former A4--A6 schedule is superseded. Recurrent language production, enacted exterior
-return, durable cultivation, generator-native compression, complete answers, and multimodality are
-receiver grades of one Holonic Inference circulation. I0--I5 now close the realization calculus,
-retain the causal boundary, enact recurrent return, condense physical realizations, fuse Gemma's
-own heterogeneous ports, and freeze the resulting Athena-Gemma ecology. The active contract is
-[`blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
+**NEXT DEED: RECEIVER SELECTION AFTER I5 IS NOT YET RATIFIED.**
+[open] I0--I5 close the ratified Athena-Gemma Holonic Inference trajectory for the declared
+recurrent/world/text/vision family. No optional heterogeneous source is promoted into active work
+by completion alone. Brandon must select the next receiver question before X0--X2 can become an
+active construction order.
 
-[open] The parked Qwen GGUF remains an exterior occurrence with no scheduling status. Another
-similarly purposed language model is an optional later close control, not an Athena completion
-requirement. Heterogeneous SSM, diffusion, perception, or production organs may be considered only
-after I5 and only when they separate a declared open transport family.
+[open] The parked Qwen GGUF remains an unscheduled close control. An SSM, diffusion, perception,
+acoustic or production source becomes eligible only when it separates a declared I5 open transport
+family. Unrestricted conversation, arbitrary prompt intake, audio/video, image or voice production,
+all Gemma behavior and conventional tensor-container expansion remain explicit open fibres.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

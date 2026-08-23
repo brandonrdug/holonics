@@ -132,7 +132,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (264 deposits of 556)
+## 4 · The 2026-08 record line (265 deposits of 557)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -380,6 +380,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_I2_RELEASE_RECEIVER_PASSED_THE_EXTERIOR_RETURN_CULTIVATED_THE_RECURRENCE_AND_I3_BEGINS.md` | I2 release receiver passed, the exterior return cultivated the recurrence, and I3 begins |
 | `2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md` | I3 release receiver passed, the recurrent realizations condensed, and I4 begins |
 | `2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md` | I4 release receiver passed, the heterogeneous faces were conserved, and I5 begins |
+| `2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md` | I5 release receiver passed: Athena-Gemma inferred, returned and remounted |
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
 | `2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md` | The Athena-Gemma ecology inferred, returned and remounted, and I5 awaits release admission |
 | `2026-08-22_THE_COMPOSITION_IS_ACQUIRED_AND_THE_PIVOTS_ARE_FOUNDED_THE_POSITIVITY_SEAM_IS_THE_TRANSPLANT_INTO_RIEMANN.md` | The composition is acquired and the pivots are founded: the positivity seam is the transplant into Riemann |

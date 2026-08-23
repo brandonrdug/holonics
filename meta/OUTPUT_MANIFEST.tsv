@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 104 drivers, 19150 returns, 56291275108 bytes.
+# 105 drivers, 19180 returns, 56291345523 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -55,6 +55,7 @@ ac2db061771351762738a74fe2e3a21095d452838475314090b023d348673951	1	383027	output
 c685ad4636b28fc7e8f8190933aaa4fcf57d5a7ff89139796559b1ce8158a138	7	13930175	output/the_active_cover_condenses_into_a_generator_native_codec
 058603759b3439b0bc9979ee5a21475e56f00ecb59f3adb1bee578e850838394	5	5677013	output/the_application_infers
 9f73a004d25a3f32338fba49ae2f415582129c415c4232e709075b52aa7e7c34	1	209926	output/the_application_infers_from_the_cultivated_phoenix_rest_on_the_card
+a95bb8b6004542245a58c3bbb86f9b2249098d9499215d7080b71d7585c3ac98	30	70415	output/the_athena_gemma_ecology_infers_returns_and_remounts
 4d20fe96b9fcd6039b03fdf059911caea2b2321ab6214ad3f0718f4ff3d10359	4	4890211	output/the_atlas_condenses
 c2b103d4e0827cf01d8f1598fd24c635277a58f89d44945e6991dbf86ba2ddb0	2	162371	output/the_code_material_returns_its_world_line
 f5334896fa342e21b7f669d011fab545c6fd4a7299cd358472a1594e2a944cc8	2	363732	output/the_conditioned_section_returns_after_detachment
