@@ -32,7 +32,7 @@ variable {p : ℕ} [Fact p.Prime]
 def chiRead (p : ℕ) [Fact p.Prime] (z : ℚ) : ℤ :=
   quadraticChar (ZMod p) (((z.num * (z.den : ℤ) : ℤ) : ZMod p))
 
-private lemma int_dvd_natAbs {m : ℤ} : (p : ℤ) ∣ m ↔ p ∣ m.natAbs := by
+lemma int_dvd_natAbs {m : ℤ} : (p : ℤ) ∣ m ↔ p ∣ m.natAbs := by
   rw [← Int.natAbs_dvd_natAbs, Int.natAbs_natCast]
 
 private lemma val_zero_parts {z : ℚ} (hz : z ≠ 0) (hv : padicValRat p z = 0) :
@@ -97,12 +97,12 @@ lemma chiRead_intCast (m : ℤ) :
   push_cast
   rw [mul_one]
 
-private lemma int_val_zero {m : ℤ} (hm : ¬ (p : ℤ) ∣ m) :
+lemma int_val_zero {m : ℤ} (hm : ¬ (p : ℤ) ∣ m) :
     padicValRat p ((m : ℤ) : ℚ) = 0 := by
   rw [padicValRat.of_int, padicValInt.eq_zero_iff.mpr (Or.inr (Or.inr hm))]
   simp
 
-private lemma nat_den_val_zero {z : ℚ} (h : ¬ p ∣ z.den) :
+lemma nat_den_val_zero {z : ℚ} (h : ¬ p ∣ z.den) :
     padicValRat p ((z.den : ℕ) : ℚ) = 0 := by
   have h' : ¬ (p : ℤ) ∣ ((z.den : ℕ) : ℤ) := by
     rw [Int.natCast_dvd_natCast]
@@ -386,10 +386,10 @@ lemma rung_char_neg_one (hp8 : p % 8 = 3) {d : ℤ} (hd0 : d ≠ 0)
 
 /-! ## 4. The mod-`p` collapse of the slot classes -/
 
-private lemma val_p (hp : p.Prime) : padicValRat p (((p : ℕ) : ℚ)) = 1 :=
+lemma val_p (hp : p.Prime) : padicValRat p (((p : ℕ) : ℚ)) = 1 :=
   padicValRat.self hp.one_lt
 
-private lemma rung_split (hp3 : 2 < p) {d : ℤ} (hd0 : d ≠ 0) (hdvd : d.natAbs ∣ 2 * p) :
+lemma rung_split (hp3 : 2 < p) {d : ℤ} (hd0 : d ≠ 0) (hdvd : d.natAbs ∣ 2 * p) :
     ((¬ (p : ℤ) ∣ d) ∧ padicValRat p ((d : ℤ) : ℚ) = 0) ∨
     ((p : ℤ) ∣ d ∧ ∃ d' : ℤ, d = (p : ℤ) * d' ∧ ¬ (p : ℤ) ∣ d' ∧
       d'.natAbs ∣ 2 * p ∧ d' ≠ 0 ∧ padicValRat p ((d : ℤ) : ℚ) = 1) := by

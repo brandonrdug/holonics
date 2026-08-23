@@ -207,6 +207,33 @@ theorem matrixAction_jacobianMatrix (D : Space →L[ℝ] Space) (u : Space) :
     (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis D.toLinearMap u
   simpa [matrixAction, jacobianMatrix] using congrFun h i
 
+/-- Coordinate expansion of a continuous-linear action in the Euclidean basis. -/
+theorem continuousLinearMap_apply_coordinate (D : Space →L[ℝ] Space) (u : Space)
+    (i : Fin 3) :
+    D u i = ∑ j : Fin 3, jacobianMatrix D i j * u j := by
+  symm
+  exact congrArg (fun v : Space => v i) (matrixAction_jacobianMatrix D u)
+
+/-- Curl transported directly from a continuous-linear velocity derivative.  Finite-dimensionality
+turns this linear receiver into a continuous-linear map, so it may be composed through `fderiv`
+without an untyped coordinate detour. -/
+def derivativeCurlLinearMap : (Space →L[ℝ] Space) →L[ℝ] Space :=
+  LinearMap.toContinuousLinearMap ({
+    toFun := fun D => curlFromJacobian (jacobianMatrix D)
+    map_add' := by
+      intro D E
+      ext i
+      fin_cases i <;> simp [curlFromJacobian, jacobianMatrix_apply] <;> ring
+    map_smul' := by
+      intro c D
+      ext i
+      fin_cases i <;> simp [curlFromJacobian, jacobianMatrix_apply] <;> ring
+  } : (Space →L[ℝ] Space) →ₗ[ℝ] Space)
+
+@[simp]
+theorem derivativeCurlLinearMap_apply (D : Space →L[ℝ] Space) :
+    derivativeCurlLinearMap D = curlFromJacobian (jacobianMatrix D) := rfl
+
 /-- The totalized spatial-Jacobian chart of a velocity field at a point.  It denotes an actual
 derivative occurrence only when accompanied by differentiability testimony. -/
 def velocityJacobianAt (u : InitialVelocity) (x : Space) : Matrix3 :=
@@ -409,13 +436,99 @@ theorem smoothSolution_pressureCurl_eq_zero
 `H i j k = ∂ₖ ∂ⱼ uᵢ`. -/
 abbrev SecondJet := Fin 3 → Fin 3 → Fin 3 → ℝ
 
+/-- The totalized second spatial jet of a velocity field.  As for `velocityJacobianAt`, this chart
+denotes an actual second derivative only when accompanied by `C²` testimony. -/
+def secondJetAt (u : InitialVelocity) (x : Space) : SecondJet :=
+  fun i j k =>
+    fderiv ℝ (fderiv ℝ u) x
+      (EuclideanSpace.basisFun (Fin 3) ℝ k)
+      (EuclideanSpace.basisFun (Fin 3) ℝ j) i
+
 /-- The derivative directions of a genuine second jet commute. -/
 def HasMixedSpatialSymmetry (H : SecondJet) : Prop :=
   ∀ i j k, H i j k = H i k j
 
+/-- The totalized chart `secondJetAt` has its intended mixed symmetry whenever its source field is
+genuinely `C²` at the addressed point. -/
+theorem secondJetAt_hasMixedSpatialSymmetry (u : InitialVelocity) (x : Space)
+    (hu : ContDiffAt ℝ 2 u x) : HasMixedSpatialSymmetry (secondJetAt u x) := by
+  have hsecond : IsSymmSndFDerivAt ℝ u x :=
+    hu.isSymmSndFDerivAt (by simp)
+  intro i j k
+  exact congrArg (fun v : Space => v i)
+    (hsecond (EuclideanSpace.basisFun (Fin 3) ℝ k)
+      (EuclideanSpace.basisFun (Fin 3) ℝ j))
+
+/-- A twice-differentiable velocity occurrence.  This is the admission witness for the totalized
+second-jet chart. -/
+structure TwiceDifferentiableVelocityOccurrence where
+  velocity : InitialVelocity
+  point : Space
+  contDiffAtTwo : ContDiffAt ℝ 2 velocity point
+
+/-- The addressed passage from a velocity occurrence to its admitted second spatial jet. -/
+def velocityToSecondJetPassage :
+    AddressedPassage (InitialVelocity × Space) SecondJet where
+  Occurrence := TwiceDifferentiableVelocityOccurrence
+  source occurrence := (occurrence.velocity, occurrence.point)
+  target occurrence := secondJetAt occurrence.velocity occurrence.point
+
+/-- The canonical admitted second-jet occurrence. -/
+def velocityToSecondJetOccurrence (u : InitialVelocity) (x : Space)
+    (hu : ContDiffAt ℝ 2 u x) : velocityToSecondJetPassage.Occurrence :=
+  ⟨u, x, hu⟩
+
+/-- A positive-time velocity slice of a smooth solution is genuinely `C²`. -/
+theorem smoothSolution_velocitySlice_contDiffAtTwo
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    ContDiffAt ℝ 2 (fun y => velocity y t) x :=
+  (spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x t
+    solution.velocitySmooth ht).of_le (WithTop.coe_le_coe.mpr le_top)
+
+/-- A smooth solution supplies an admitted second-jet occurrence at every positive-time event. -/
+def smoothSolution_velocityToSecondJetOccurrence
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) : velocityToSecondJetPassage.Occurrence :=
+  velocityToSecondJetOccurrence (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_contDiffAtTwo solution x t ht)
+
+/-- The admitted second jet of a positive-time smooth-solution occurrence has the required mixed
+spatial symmetry. -/
+theorem smoothSolution_secondJet_hasMixedSpatialSymmetry
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    HasMixedSpatialSymmetry (secondJetAt (fun y => velocity y t) x) :=
+  secondJetAt_hasMixedSpatialSymmetry (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_contDiffAtTwo solution x t ht)
+
 /-- The trace/divergence face of one Jacobian chart. -/
 def divergenceFromJacobian (J : Matrix3) : ℝ :=
   ∑ i : Fin 3, J i i
+
+/-- The coordinate trace of the admitted Jacobian is the basis-independent divergence owner. -/
+theorem divergenceFromJacobian_velocityJacobianAt (u : InitialVelocity) (x : Space) :
+    divergenceFromJacobian (velocityJacobianAt u x) = divergence u x := by
+  rw [divergence, LinearMap.trace_eq_matrix_trace ℝ
+    (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis]
+  rfl
+
+/-- The first jet of a smooth solution lies in the incompressible fibre at every nonnegative-time
+event. -/
+theorem smoothSolution_divergenceFromJacobian_eq_zero
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 ≤ t) :
+    divergenceFromJacobian (velocityJacobianAt (fun y => velocity y t) x) = 0 := by
+  rw [divergenceFromJacobian_velocityJacobianAt]
+  exact solution.incompressible x t ht
 
 /-- The Jacobian of vorticity induced by a second velocity jet. -/
 def vorticityJacobianFromSecondJet (H : SecondJet) : Matrix3 := ![
@@ -423,10 +536,115 @@ def vorticityJacobianFromSecondJet (H : SecondJet) : Matrix3 := ![
   fun k => H 0 2 k - H 2 0 k,
   fun k => H 1 0 k - H 0 1 k]
 
+/-- The passage from a second velocity jet to its induced vorticity Jacobian. -/
+def secondJetToVorticityJacobianPassage : AddressedPassage SecondJet Matrix3 where
+  Occurrence := SecondJet
+  source := id
+  target := vorticityJacobianFromSecondJet
+
+/-- The ordered velocity-to-second-jet-to-vorticity-Jacobian passage retains the admitted source
+occurrence, the second jet, and their joining equality. -/
+def velocityToVorticityJacobianPassage :
+    AddressedPassage (InitialVelocity × Space) Matrix3 :=
+  AddressedPassage.comp secondJetToVorticityJacobianPassage velocityToSecondJetPassage
+
+/-- The canonical composite occurrence from a `C²` velocity event to the vorticity Jacobian
+induced by its second jet. -/
+def velocityToVorticityJacobianOccurrence (u : InitialVelocity) (x : Space)
+    (hu : ContDiffAt ℝ 2 u x) : velocityToVorticityJacobianPassage.Occurrence :=
+  ⟨velocityToSecondJetOccurrence u x hu, secondJetAt u x, rfl⟩
+
+/-- A smooth solution supplies the complete ordered second-jet occurrence at positive time. -/
+def smoothSolution_velocityToVorticityJacobianOccurrence
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) : velocityToVorticityJacobianPassage.Occurrence :=
+  velocityToVorticityJacobianOccurrence (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_contDiffAtTwo solution x t ht)
+
+/-- The positive-time composite returns the vorticity Jacobian induced by the solution's admitted
+second spatial jet. -/
+theorem smoothSolution_velocityToVorticityJacobianOccurrence_target
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    velocityToVorticityJacobianPassage.target
+        (smoothSolution_velocityToVorticityJacobianOccurrence solution x t ht) =
+      vorticityJacobianFromSecondJet (secondJetAt (fun y => velocity y t) x) := rfl
+
+/-- The second-jet vorticity Jacobian is exactly the derivative chart of the actual vorticity
+field for a genuine `C²` velocity occurrence. -/
+theorem velocityJacobianAt_vorticity_eq_vorticityJacobianFromSecondJet
+    (u : InitialVelocity) (x : Space) (hu : ContDiffAt ℝ 2 u x) :
+    velocityJacobianAt (fun y => vorticityAt u y) x =
+      vorticityJacobianFromSecondJet (secondJetAt u x) := by
+  have hDu : DifferentiableAt ℝ (fderiv ℝ u) x :=
+    (hu.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
+  have hvorticityDerivative :
+      fderiv ℝ (fun y => vorticityAt u y) x =
+        derivativeCurlLinearMap.comp (fderiv ℝ (fderiv ℝ u) x) := by
+    change fderiv ℝ (derivativeCurlLinearMap ∘ fun y => fderiv ℝ u y) x = _
+    rw [fderiv_comp x derivativeCurlLinearMap.differentiableAt hDu,
+      ContinuousLinearMap.fderiv]
+  rw [velocityJacobianAt, hvorticityDerivative]
+  ext i k
+  rw [jacobianMatrix_apply]
+  fin_cases i <;>
+    simp [derivativeCurlLinearMap, curlFromJacobian, vorticityJacobianFromSecondJet,
+      secondJetAt, jacobianMatrix_apply]
+
+/-- The vorticity-Jacobian compatibility square attached to a positive-time smooth-solution
+occurrence. -/
+theorem smoothSolution_velocityJacobianAt_vorticity
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    velocityJacobianAt
+        (fun y => vorticityAt (fun z => velocity z t) y) x =
+      vorticityJacobianFromSecondJet (secondJetAt (fun y => velocity y t) x) :=
+  velocityJacobianAt_vorticity_eq_vorticityJacobianFromSecondJet
+    (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_contDiffAtTwo solution x t ht)
+
 /-- The product-rule Jacobian of the advective field `(u · ∇)u`, expressed entirely in the local
 velocity value, first jet, and second jet. -/
 def advectionJacobianFromJets (H : SecondJet) (J : Matrix3) (u : Space) : Matrix3 :=
   fun i k => ∑ j : Fin 3, (J j k * J i j + u j * H i j k)
+
+/-- The algebraic advection jet is exactly the derivative of the actual advective field for a
+genuine `C²` velocity occurrence.  This closes the product-rule compatibility square without
+identifying any time or Laplacian port. -/
+theorem velocityJacobianAt_advection_eq_advectionJacobianFromJets
+    (u : InitialVelocity) (x : Space) (hu : ContDiffAt ℝ 2 u x) :
+    velocityJacobianAt (fun y => fderiv ℝ u y (u y)) x =
+      advectionJacobianFromJets (secondJetAt u x) (velocityJacobianAt u x) (u x) := by
+  have hDu : DifferentiableAt ℝ (fderiv ℝ u) x :=
+    (hu.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
+  rw [velocityJacobianAt, fderiv_clm_apply hDu (hu.differentiableAt (by norm_num))]
+  ext i k
+  rw [jacobianMatrix_apply]
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply,
+    ContinuousLinearMap.flip_apply]
+  change
+    (fderiv ℝ u x
+        (fderiv ℝ u x (EuclideanSpace.basisFun (Fin 3) ℝ k))) i +
+      (fderiv ℝ (fderiv ℝ u) x
+        (EuclideanSpace.basisFun (Fin 3) ℝ k) (u x)) i =
+      advectionJacobianFromJets (secondJetAt u x)
+        (velocityJacobianAt u x) (u x) i k
+  rw [continuousLinearMap_apply_coordinate, continuousLinearMap_apply_coordinate]
+  simp only [advectionJacobianFromJets, secondJetAt, velocityJacobianAt,
+    jacobianMatrix_apply, Finset.sum_add_distrib]
+  apply congrArg₂ (· + ·)
+  · apply Finset.sum_congr rfl
+    intro j _
+    ring
+  · apply Finset.sum_congr rfl
+    intro j _
+    ring
 
 /-- Vorticity constructed from a mixed-symmetric second jet is divergence-free. -/
 theorem divergence_vorticityJacobian_eq_zero (H : SecondJet)
@@ -435,6 +653,19 @@ theorem divergence_vorticityJacobian_eq_zero (H : SecondJet)
   simp [divergenceFromJacobian, vorticityJacobianFromSecondJet, Fin.sum_univ_succ]
   rw [hH 2 1 0, hH 1 2 0, hH 0 2 1]
   ring
+
+/-- The actual positive-time vorticity field of a smooth solution is divergence-free.  The result
+passes through the admitted second jet and the derivative/vorticity compatibility square. -/
+theorem smoothSolution_divergence_vorticityAt_eq_zero
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    divergence (fun y => vorticityAt (fun z => velocity z t) y) x = 0 := by
+  rw [← divergenceFromJacobian_velocityJacobianAt,
+    smoothSolution_velocityJacobianAt_vorticity solution x t ht]
+  exact divergence_vorticityJacobian_eq_zero _
+    (smoothSolution_secondJet_hasMixedSpatialSymmetry solution x t ht)
 
 /-- **The nonlinear vorticity transport identity at one second-order jet.**
 
@@ -471,6 +702,66 @@ theorem curl_advectionJacobian_of_incompressible (H : SecondJet) (J : Matrix3) (
       matrixAction (vorticityJacobianFromSecondJet H) u -
         matrixAction J (curlFromJacobian J) := by
   rw [curl_advectionJacobian H J u hH, hdiv, zero_smul, add_zero]
+
+/-- The nonlinear curl identity instantiated on the admitted first and second spatial jets of an
+actual smooth solution at positive time.  The following product-rule theorem identifies its
+advection chart with the derivative of the actual advective field. -/
+theorem smoothSolution_curl_advectionJacobian
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    curlFromJacobian
+        (advectionJacobianFromJets
+          (secondJetAt (fun y => velocity y t) x)
+          (velocityJacobianAt (fun y => velocity y t) x)
+          (velocity x t)) =
+      matrixAction
+          (vorticityJacobianFromSecondJet (secondJetAt (fun y => velocity y t) x))
+          (velocity x t) -
+        matrixAction (velocityJacobianAt (fun y => velocity y t) x)
+          (vorticityAt (fun y => velocity y t) x) := by
+  apply curl_advectionJacobian_of_incompressible
+  · exact smoothSolution_secondJet_hasMixedSpatialSymmetry solution x t ht
+  · exact smoothSolution_divergenceFromJacobian_eq_zero solution x t (le_of_lt ht)
+
+/-- The product-rule compatibility square for the positive-time velocity slice of a smooth
+solution. -/
+theorem smoothSolution_velocityJacobianAt_advection
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    velocityJacobianAt
+        (fun y => fderiv ℝ (fun z => velocity z t) y (velocity y t)) x =
+      advectionJacobianFromJets
+        (secondJetAt (fun y => velocity y t) x)
+        (velocityJacobianAt (fun y => velocity y t) x)
+        (velocity x t) :=
+  velocityJacobianAt_advection_eq_advectionJacobianFromJets
+    (fun y => velocity y t) x
+    (smoothSolution_velocitySlice_contDiffAtTwo solution x t ht)
+
+/-- **The actual positive-time nonlinear vorticity transport identity.**
+
+Curl of the solution's advective field is transport of vorticity by velocity minus stretching of
+velocity by vorticity.  Every totalized derivative in the statement is admitted by the solution's
+positive-time smoothness; no time or viscous commutation is asserted here. -/
+theorem smoothSolution_vorticityAt_advection
+    {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution ν u₀ force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    vorticityAt
+        (fun y => fderiv ℝ (fun z => velocity z t) y (velocity y t)) x =
+      fderiv ℝ (fun y => vorticityAt (fun z => velocity z t) y) x (velocity x t) -
+        fderiv ℝ (fun y => velocity y t) x
+          (vorticityAt (fun y => velocity y t) x) := by
+  rw [vorticityAt, smoothSolution_velocityJacobianAt_advection solution x t ht,
+    smoothSolution_curl_advectionJacobian solution x t ht,
+    ← smoothSolution_velocityJacobianAt_vorticity solution x t ht,
+    velocityJacobianAt, matrixAction_jacobianMatrix,
+    velocityJacobianAt, matrixAction_jacobianMatrix]
 
 /-- Applying curl to a differentiated momentum balance removes exactly the symmetric pressure
 Jacobian.  The five matrix ports are respectively the time, advection, viscous, pressure, and force
@@ -530,9 +821,22 @@ open Soma.Holonics.Millennium.NavierStokesVorticity
 #print axioms smoothSolution_velocityToVorticityOccurrence_target
 #print axioms smoothSolution_pointwiseLambIdentity
 #print axioms smoothSolution_pressureCurl_eq_zero
+#print axioms secondJetAt_hasMixedSpatialSymmetry
+#print axioms smoothSolution_velocitySlice_contDiffAtTwo
+#print axioms smoothSolution_secondJet_hasMixedSpatialSymmetry
+#print axioms divergenceFromJacobian_velocityJacobianAt
+#print axioms smoothSolution_divergenceFromJacobian_eq_zero
+#print axioms smoothSolution_velocityToVorticityJacobianOccurrence_target
+#print axioms velocityJacobianAt_vorticity_eq_vorticityJacobianFromSecondJet
+#print axioms smoothSolution_velocityJacobianAt_vorticity
 #print axioms divergence_vorticityJacobian_eq_zero
+#print axioms smoothSolution_divergence_vorticityAt_eq_zero
 #print axioms curl_advectionJacobian
 #print axioms curl_advectionJacobian_of_incompressible
+#print axioms velocityJacobianAt_advection_eq_advectionJacobianFromJets
+#print axioms smoothSolution_curl_advectionJacobian
+#print axioms smoothSolution_velocityJacobianAt_advection
+#print axioms smoothSolution_vorticityAt_advection
 #print axioms curl_differentiatedMomentum
 #print axioms localVorticityBalance
 end Audit
