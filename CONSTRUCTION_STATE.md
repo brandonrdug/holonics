@@ -4,13 +4,37 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R6 release admission, completion of the R0--R6
-production-aperture continuation, and activation of the L0--L4 laboratory-cultivation campaign.
+**Currency:** 2026-08-23 after L0 release admission and activation of L1 familywise theorem
+cultivation within the L0--L4 laboratory campaign.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE FIRST BOUNDED ATHENA MATHEMATICS/PHYSICS PRODUCTION ECOLOGY FROZE, R6
-PASSED, AND L0 NOW CIRCULATES THE LABORATORY THROUGH THAT ECOLOGY.**
+**CURRENT FRONTIER — THE LABORATORY CHRONOLOGY CROSSED ATHENA, THE RETURNED FIXED-LOCUS LAW
+RESTED, L0 PASSED, AND L1 NOW CIRCULATES DISTINCT THEOREM FAMILIES.**
+
+[established-bounded; implemented-exact; proved-derived; measured] L0 froze the seven-commit
+prefix `980cb86..4ba0cb0` and mounted 813,209 changed-blob octets through seven complete causal
+partitions without whole-repository semantic materialization. One non-`Clone`
+`LaboratoryAthenaRest` now owns the R6 production ecology, M3 generator-native rest, M4 cultivated
+history, addressed chronology, route decoder, standing junction and complete fibres. A generated
+general homogeneous-quadratic central-inversion theorem received Lean exit status zero. The same
+source-detached held-out section `[2,3,5]` changed from route `[0,1,2]`, 28 exact arithmetic
+operations and span 5 to route `[3]`, zero arithmetic operations and span 1. The mixed section under
+single-axis reflection returned `[0,-1,0]` and obstruction `[4]`; targeted ablation returned the
+expanded route and exact withdrawal restored the immediate predecessor. The 67-file,
+15,206,503-octet candidate returned a 12/12 grade, complete dissection and inspected exact visual
+faces. Its output, internal-manifest and closure identities are respectively
+`8b1104925b2cf155d3de9dd52f995dd617d916943bd91a35a9c465ed59905124`,
+`f1aa9efee0b171e72a15415c58f39b2fe186277418c9ef46586aa8fcdd993102`, and
+`b67c056a99a3f7174f94dc3ad08ad0518a8240c98a8b7afaebdefc08f06fbe0e`. The sole complete release
+receiver returned 2,846 passing tests, zero failures, 32 explicit ignores and every example target
+type-checked. Twelve scopes were immediately green; the cheap driver ledger reported zero missing
+or extra drivers and only a changed `named_in` measurement. Its named retake returned 393 catalogued
+drivers and zero uncatalogued without replaying the complete suite. Candidate and admission:
+[`research/records/2026-08-22_THE_LABORATORY_CHRONOLOGY_CROSSED_ATHENA_THE_LEAN_RETURN_CULTIVATED_THE_FIXED_LOCUS_AND_L0_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-22_THE_LABORATORY_CHRONOLOGY_CROSSED_ATHENA_THE_LEAN_RETURN_CULTIVATED_THE_FIXED_LOCUS_AND_L0_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md`](research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md).
+
 [established-bounded; implemented-exact; measured] `Athena^[Gemma]_(B_mp, H_prod)` now rests as
 one canonical source-detached ecology over the exact R0--R5 receiver/history family. New inquiry
 `r6/inquiry/04da0a124da950a9037bd730840ad5ca8117c9d46b0753283e91b7d8869c0f05` returned language,
@@ -31,7 +55,8 @@ and
 It cultivates `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
 occurrences through the admitted Phoenix, mathematics-codec, Holonic Inference, retained-history,
 multimodal, returned-morphology, dissection, compression, and resident-card owners. L0 is the sole
-active deed. X0--X2 and Qwen remain outside this campaign and schedule nothing.
+admitted predecessor and L1 is the sole active deed. X0--X2 and Qwen remain outside this campaign
+and schedule nothing.
 
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete

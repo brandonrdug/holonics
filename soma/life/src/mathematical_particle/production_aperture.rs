@@ -8,6 +8,8 @@
 
 mod components;
 mod inquiry;
+mod laboratory;
+mod laboratory_types;
 mod rest;
 mod types;
 mod wire;
@@ -17,6 +19,17 @@ pub use types::{
     ProductionFibreBinding, ProductionInquiry, ProductionInquiryFace,
     ProductionInquiryPresentation, ProductionReceiver, ProductionReconstructionBoundary,
     ProductionStandingJunction, ProductionWithdrawalReceipt, ProductionWorldReturn,
+};
+pub use laboratory::{
+    LABORATORY_CHRONOLOGY_SCHEMA, LABORATORY_DECODER_SCHEMA, LABORATORY_FIBRES_SCHEMA,
+    LABORATORY_INQUIRY_SCHEMA, LABORATORY_JUNCTION_SCHEMA,
+};
+pub use laboratory_types::{
+    LaboratoryAthenaError, LaboratoryAthenaRest, LaboratoryChronology,
+    LaboratoryCommitOccurrence, LaboratoryComponentIdentity, LaboratoryDecision,
+    LaboratoryInquiry, LaboratoryMorphologyDelta, LaboratoryPartition, LaboratoryPartitionKind,
+    LaboratoryReconstructionBoundary, LaboratoryRouteDecoder, LaboratorySourceChange,
+    LaboratoryStandingJunction, LaboratoryWithdrawalReceipt, LaboratoryWorldReturn,
 };
 
 pub const PRODUCTION_JUNCTION_SCHEMA: &str = "holonics.r6.production-junction.v1";

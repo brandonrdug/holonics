@@ -22,14 +22,14 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-22; prior revision 2026-08-21
+## WHERE THIS STANDS — revised 2026-08-23; prior revision 2026-08-22
 
 **Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
 STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
-## THE LABORATORY CIRCULATES THROUGH ATHENA — 2026-08-22
+## THE LABORATORY CIRCULATES THROUGH ATHENA — 2026-08-23
 
 **The sole active construction campaign is
 [`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).**
@@ -46,12 +46,21 @@ mathematical, geometric, physical, proof, diagram, unit, dimension, intervention
 receiver family. `H_lab` is the addressed successor-history family carried by the committed
 laboratory chronology.
 
-**L0 is the sole next deed.** The first committed laboratory prefix crosses the existing rich
-intake, mathematical operation complex, active transport cover, generator-native rest, retained
-causal boundary, returned morphology, multimodal boundary, and R6 production ecology. L0 returns
-one new outside-development laboratory inquiry, a complete emitted mathematical product, a genuine
-Lean/world return, an attributable committed delta, changed later conduct, source-detached remount,
-withdrawal, ablation, dissection, resident-card testimony, and complete-product cost receipt.
+**L0 passed.** [established-bounded; implemented-exact; proved-derived; measured] One frozen
+seven-commit laboratory prefix crossed the existing R6/M3/M4 ecology. A generated general theorem
+for homogeneous quadratic sections under central inversion received a genuine Lean return. Its
+supported morphology changed the same source-detached held-out passage from the expanded
+three-edge/28-operation/span-5 route to a one-edge/zero-arithmetic/span-1 fixed-locus route, while a
+single-axis reflection retained its mixed-coefficient obstruction. Exact ablation and withdrawal,
+all seven causal partitions, complete dissection, licensed product faces and the twelve-part grade
+returned together. The authoritative release admission is
+[`research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md`](../research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md).
+
+**L1 is the sole next deed.** Multiple causally distinct theorem families now circulate through the
+continuing L0 rest. Their returned morphology must retain exact local support; only independent
+deltas may commute; retained history must enable revisitation; at least one later theorem route must
+become newly reachable; source-detached remount must preserve the familywise conduct; and targeted
+family ablation must remove only its attributable consequence.
 
 **L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached

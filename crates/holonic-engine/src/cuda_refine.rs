@@ -169,6 +169,8 @@ pub enum CudaRefineError {
     JointMediaPassageShape,
     #[error("the retained context, derivation, media sections, and receiver reduction do not form one production aperture")]
     ProductionApertureShape,
+    #[error("the quadratic sections and chart maps do not form one exact resident transport")]
+    QuadraticTransportShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -349,6 +351,7 @@ pub struct CudaRefineExecutor {
     joint_media_transport: CuFunction,
     production_aperture_fronts: CuFunction,
     production_aperture_reduction: CuFunction,
+    quadratic_section_transport: CuFunction,
     inference_ecology: CuFunction,
     material_operation_world_tube: CuFunction,
     contact_pairs: CuFunction,
@@ -426,6 +429,7 @@ impl CudaRefineExecutor {
             let mut joint_media_transport = ptr::null_mut();
             let mut production_aperture_fronts = ptr::null_mut();
             let mut production_aperture_reduction = ptr::null_mut();
+            let mut quadratic_section_transport = ptr::null_mut();
             let mut inference_ecology = ptr::null_mut();
             let mut material_operation_world_tube = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
@@ -502,6 +506,11 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(reduce_production_aperture_fronts)",
                 ),
                 (
+                    &mut quadratic_section_transport as *mut CuFunction,
+                    c"conduct_quadratic_section_transport",
+                    "cuModuleGetFunction(conduct_quadratic_section_transport)",
+                ),
+                (
                     &mut inference_ecology as *mut CuFunction,
                     c"conduct_inference_ecology",
                     "cuModuleGetFunction(conduct_inference_ecology)",
@@ -550,6 +559,7 @@ impl CudaRefineExecutor {
                 joint_media_transport,
                 production_aperture_fronts,
                 production_aperture_reduction,
+                quadratic_section_transport,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -581,6 +591,7 @@ impl CudaRefineExecutor {
                 joint_media_transport,
                 production_aperture_fronts,
                 production_aperture_reduction,
+                quadratic_section_transport,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -981,6 +992,27 @@ pub struct DeviceProductionAperture {
     pub launches: u64,
     pub synchronizations: u64,
     pub typed_reductions: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub semantic_work: u128,
+    pub semantic_span: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// Homogeneous quadratic sections transported through complete integer chart maps on the card.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceQuadraticSectionTransport {
+    /// Section-major `(x^2, xy, y^2)` coefficient faces after substitution.
+    pub transported_coefficients: Vec<i64>,
+    pub invariant: Vec<u32>,
+    /// `0` expanded coefficient route, `1` cultivated condensed route, `2` obstruction.
+    pub selected_route: Vec<u32>,
+    pub ablated_route: Vec<u32>,
+    pub sections: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
     pub block_threads: u32,
     pub active_lanes: u32,
     pub semantic_work: u128,
@@ -3028,6 +3060,181 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Transport complete homogeneous quadratic sections through their integer chart maps on the
+    /// card.  The host performs only an overflow/admission audit and verifies the returned device
+    /// testimony; it does not select the semantic route.  `cultivated` is one caused standing bit
+    /// crossing the front.  The card returns the expanded, condensed, and obstructed alternatives
+    /// together so withdrawal does not require a replay.
+    pub fn conduct_quadratic_sections_on_device(
+        &mut self,
+        coefficients: &[i64],
+        transforms: &[i64],
+        cultivated: bool,
+    ) -> Result<DeviceQuadraticSectionTransport, CudaRefineError> {
+        let sections = coefficients.len() / 3;
+        if sections == 0
+            || coefficients.len() != sections * 3
+            || transforms.len() != sections * 4
+            || sections > u32::MAX as usize
+        {
+            return Err(CudaRefineError::QuadraticTransportShape);
+        }
+
+        // The device law uses signed 64-bit integer arithmetic.  Establish that every
+        // intermediate of the exact declared association fits before launch; this is an apparatus
+        // admission audit, not a host implementation of the route decision.
+        let product = |factors: &[i64]| -> Option<i64> {
+            factors
+                .iter()
+                .try_fold(1_i64, |value, factor| value.checked_mul(*factor))
+        };
+        let mut expected = Vec::with_capacity(coefficients.len());
+        for at in 0..sections {
+            let coefficient_at = at * 3;
+            let transform_at = at * 4;
+            let a = coefficients[coefficient_at];
+            let b = coefficients[coefficient_at + 1];
+            let c = coefficients[coefficient_at + 2];
+            let p = transforms[transform_at];
+            let q = transforms[transform_at + 1];
+            let r = transforms[transform_at + 2];
+            let s = transforms[transform_at + 3];
+            let returned_a = product(&[a, p, p])
+                .and_then(|value| value.checked_add(product(&[b, p, r])?))
+                .and_then(|value| value.checked_add(product(&[c, r, r])?));
+            let returned_b = product(&[2, a, p, q])
+                .and_then(|value| {
+                    let mixed = product(&[p, s])?.checked_add(product(&[q, r])?)?;
+                    value.checked_add(b.checked_mul(mixed)?)
+                })
+                .and_then(|value| value.checked_add(product(&[2, c, r, s])?));
+            let returned_c = product(&[a, q, q])
+                .and_then(|value| value.checked_add(product(&[b, q, s])?))
+                .and_then(|value| value.checked_add(product(&[c, s, s])?));
+            expected.extend([
+                returned_a.ok_or(CudaRefineError::QuadraticTransportShape)?,
+                returned_b.ok_or(CudaRefineError::QuadraticTransportShape)?,
+                returned_c.ok_or(CudaRefineError::QuadraticTransportShape)?,
+            ]);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let coefficient_device = Buffer::of(coefficients)?;
+        let transform_device = Buffer::of(transforms)?;
+        let coefficient_octets = std::mem::size_of_val(coefficients);
+        let section_octets = sections * std::mem::size_of::<u32>();
+        let transported_device = Buffer::alloc(coefficient_octets)?;
+        let invariant_device = Buffer::alloc(section_octets)?;
+        let selected_route_device = Buffer::alloc(section_octets)?;
+        let ablated_route_device = Buffer::alloc(section_octets)?;
+        let mut coefficient_pointer = coefficient_device.pointer;
+        let mut transform_pointer = transform_device.pointer;
+        let mut transported_pointer = transported_device.pointer;
+        let mut invariant_pointer = invariant_device.pointer;
+        let mut selected_route_pointer = selected_route_device.pointer;
+        let mut ablated_route_pointer = ablated_route_device.pointer;
+        let mut section_count = sections as u32;
+        let mut cultivation = u32::from(cultivated);
+        let mut arguments: [*mut c_void; 8] = [
+            &mut coefficient_pointer as *mut u64 as *mut c_void,
+            &mut transform_pointer as *mut u64 as *mut c_void,
+            &mut transported_pointer as *mut u64 as *mut c_void,
+            &mut invariant_pointer as *mut u64 as *mut c_void,
+            &mut selected_route_pointer as *mut u64 as *mut c_void,
+            &mut ablated_route_pointer as *mut u64 as *mut c_void,
+            &mut section_count as *mut u32 as *mut c_void,
+            &mut cultivation as *mut u32 as *mut c_void,
+        ];
+        let grid = self.grid_for(sections as u64)?;
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.quadratic_section_transport,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_quadratic_section_transport)",
+        )?;
+        self.launches += 1;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+
+        let mut transported_coefficients = vec![0_i64; coefficients.len()];
+        let mut invariant = vec![0_u32; sections];
+        let mut selected_route = vec![0_u32; sections];
+        let mut ablated_route = vec![0_u32; sections];
+        transported_device.read(&mut transported_coefficients)?;
+        invariant_device.read(&mut invariant)?;
+        selected_route_device.read(&mut selected_route)?;
+        ablated_route_device.read(&mut ablated_route)?;
+        let expected_invariant = expected
+            .chunks_exact(3)
+            .zip(coefficients.chunks_exact(3))
+            .map(|(returned, entered)| u32::from(returned == entered))
+            .collect::<Vec<_>>();
+        let expected_selected = expected_invariant
+            .iter()
+            .enumerate()
+            .map(|(at, held)| {
+                let chart = &transforms[at * 4..at * 4 + 4];
+                if cultivated && chart == [-1, 0, 0, -1] {
+                    1
+                } else if *held == 0 {
+                    2
+                } else {
+                    0
+                }
+            })
+            .collect::<Vec<_>>();
+        let expected_ablated = expected_invariant
+            .iter()
+            .map(|held| if *held == 0 { 2 } else { 0 })
+            .collect::<Vec<_>>();
+        if transported_coefficients != expected
+            || invariant != expected_invariant
+            || selected_route != expected_selected
+            || ablated_route != expected_ablated
+        {
+            return Err(CudaRefineError::QuadraticTransportShape);
+        }
+
+        let transform_octets = std::mem::size_of_val(transforms);
+        let ingress = coefficient_octets + transform_octets + std::mem::size_of::<u32>();
+        let egress = coefficient_octets + 3 * section_octets;
+        let expanded_sections = expected_selected
+            .iter()
+            .filter(|route| **route != 1)
+            .count();
+        Ok(DeviceQuadraticSectionTransport {
+            transported_coefficients,
+            invariant,
+            selected_route,
+            ablated_route,
+            sections,
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: sections as u32,
+            // Per expanded section: twenty-one exact products and seven exact sums.  The rested
+            // central-inversion route transports its coefficient face without arithmetic.
+            semantic_work: (expanded_sections as u128) * 28,
+            // The condensed fixed-locus passage is one transport front; an expanded member keeps
+            // the five-front coefficient dependency chain.
+            semantic_span: if expanded_sections == 0 { 1 } else { 5 },
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: (ingress + egress) as u64,
+        })
+    }
+
     /// Conduct the recurrent passage and every admitted heterogeneous face in one resident front.
     /// The decision is data crossing the front, not a host-selected semantic branch between I3 and
     /// I4. Both alternative routes and all withdrawals return as dissection testimony.
@@ -4294,6 +4501,34 @@ mod tests {
         assert_eq!(returned.launches, 2);
         assert_eq!(returned.synchronizations, 1);
         assert_eq!(returned.typed_reductions, 1);
+    }
+
+    /// L0's first cross-family cultivation: two distinct homogeneous quadratic sections retain
+    /// their face under central inversion, while the mixed section under a single-axis reflection
+    /// returns the shortest separating obstruction.  Withdrawal selects the expanded route without
+    /// relaunching the law.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_cultivates_and_dissects_quadratic_section_transport() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let returned = card
+            .conduct_quadratic_sections_on_device(
+                &[1, 0, -1, 1, 0, 1, 0, 1, 0],
+                &[-1, 0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 1],
+                true,
+            )
+            .expect("the quadratic sections return");
+        assert_eq!(
+            returned.transported_coefficients,
+            vec![1, 0, -1, 1, 0, 1, 0, -1, 0]
+        );
+        assert_eq!(returned.invariant, vec![1, 1, 0]);
+        assert_eq!(returned.selected_route, vec![1, 1, 2]);
+        assert_eq!(returned.ablated_route, vec![0, 0, 2]);
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
+        assert_eq!(returned.semantic_work, 28);
+        assert_eq!(returned.semantic_span, 5);
     }
 
     /// I5's composed front: recurrence and conserved text/vision faces are selected by one

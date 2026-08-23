@@ -118,7 +118,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
 | `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
 | `blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md` | **The horizon is a coordinate, not a gate, and the emission keeps its cross** — **Evidence:** `measured`. |
-| `blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md` | **The laboratory circulates through Athena, and returned Lean constraints cultivate the holonics/mathematics ecology** — L0 is the sole active deed. |
+| `blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md` | **The laboratory circulates through Athena, and returned Lean constraints cultivate the holonics/mathematics ecology** — L1 is the sole active deed. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md` | **The machine produces mathematics it was not given** — **Evidence:** the standing measurements this plan builds on are cited inline with their commands and dates; nothing below is assumed. |
 | `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md` | **The map is material, the head is a contact, and the instance resumes** — **Evidence:** `measured`. |
@@ -134,7 +134,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (286 deposits of 578)
+## 4 · The 2026-08 record line (289 deposits of 581)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -385,6 +385,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md` | I3 release receiver passed, the recurrent realizations condensed, and I4 begins |
 | `2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md` | I4 release receiver passed, the heterogeneous faces were conserved, and I5 begins |
 | `2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md` | I5 release receiver passed: Athena-Gemma inferred, returned and remounted |
+| `2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md` | L0 release receiver passed, the laboratory fixed locus rested, and L1 begins |
 | `2026-08-22_NAVIER_STOKES_IS_THE_ACTIVE_LEAN_FRONT_HODGE_IS_ITS_ANALYTIC_SPINE_AND_YANG_MILLS_IS_THE_COVARIANT_LIFT.md` | NAVIER–STOKES IS THE ACTIVE LEAN FRONT, HODGE IS ITS ANALYTIC SPINE, AND YANG–MILLS IS THE COVARIANT LIFT |
 | `2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md` | R0 release receiver passed: the rich inquiry returned the complete I5 baseline boundary, and R1 begins |
 | `2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md` | R1 release receiver passed: the operation world-tube returned, and R2 begins |
@@ -397,6 +398,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
 | `2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md` | The Athena-Gemma ecology inferred, returned and remounted, and I5 awaits release admission |
 | `2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md` | The bounded Athena mathematics/physics ecology returned its first production inquiry, and R6 awaits admission |
+| `2026-08-22_THE_BSD_FRONT_IS_NOW_ASSEMBLY_AND_THE_MILLENNIUM_SQUEEZE_HAS_TYPED_SUCCESSORS.md` | The BSD front is now assembly, and the Millennium squeeze has typed successors |
 | `2026-08-22_THE_COMPOSITION_IS_ACQUIRED_AND_THE_PIVOTS_ARE_FOUNDED_THE_POSITIVITY_SEAM_IS_THE_TRANSPLANT_INTO_RIEMANN.md` | The composition is acquired and the pivots are founded: the positivity seam is the transplant into Riemann |
 | `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_DESCENT_IS_COMPLETE_THE_MORDELL_WEIL_GROUP_IS_FORMALLY_GENERATED_AND_THE_RANK_CLAUSE_HOLDS_WHOLE_AT_THE_RANK_ONE_INSTANCE.md` | The descent is complete, the Mordell–Weil group is formally generated, and the rank clause holds whole at the rank-one instance |
@@ -407,6 +409,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_GLOBAL_IS_BUILT_BY_EXACT_COARSE_GRAINING_THE_MODULUS_WAS_NEVER_A_WALL_AND_THE_TOWER_IS_THE_ORGAN_THAT_SCALES.md` | The global is built by exact coarse graining, the modulus was never a wall, and the tower is the organ that scales |
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
 | `2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md` | The heterogeneous ports conserved their faces, one shared generator crossed, and I4 awaits release admission |
+| `2026-08-22_THE_LABORATORY_CHRONOLOGY_CROSSED_ATHENA_THE_LEAN_RETURN_CULTIVATED_THE_FIXED_LOCUS_AND_L0_AWAITS_RELEASE_ADMISSION.md` | The laboratory chronology crossed Athena, the Lean return cultivated the fixed locus, and L0 awaits release admission |
 | `2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md` | The material derivation recurred to its exact frontier, the world returned constraints, and R2 awaits admission |
 | `2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md` | The mathematical, vector, and raster faces met at one native boundary, and R5 awaits admission |
 | `2026-08-22_THE_MORDELL_WEIL_THEOREM_HOLDS_AT_EVERY_MODULUS_AND_THE_ALGEBRAIC_SIDE_OF_THE_FAMILY_CHART_IS_CLOSED.md` | The Mordell–Weil theorem holds at every modulus, and the algebraic side of the family chart is closed |
@@ -446,7 +449,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 49 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 50 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

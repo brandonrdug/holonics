@@ -3,8 +3,8 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, and R0--R6 have passed. L0 is the sole active
-deed.
+**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0 have passed. L1 is the sole
+active deed.
 **Product:**
 
 ```text
@@ -17,8 +17,8 @@ geometric, physical, proof, diagram, unit, dimension, intervention, and world-re
 
 **Truth statuses:** `definition` for the product, source occurrence, circulation, cultivation,
 condensation, and grade contracts; `project-postulate` for construction, apparatus, and validation
-discipline; `established-bounded` for the cited admitted owners and returns; and `open` for L0--L4
-until each deed passes its release receiver.
+discipline; `established-bounded` for the cited admitted owners, returns, and L0; and `open` for
+L1--L4 until each deed passes its release receiver.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
@@ -205,9 +205,14 @@ training order.
 
 ### L0 — The addressed laboratory chronology crosses the admitted Athena ecology
 
-[open] L0 is the sole active deed. It freezes the first campaign source prefix, mounts it
-incrementally through the existing M/R intake, conducts it through the existing M1--M4 and I/R
-ecology, and returns the first laboratory-cultivated Athena rest.
+[established-bounded] L0 passed. It froze the seven-commit prefix
+`980cb86f937b87ca7b50232dd0bbfdcfb249b5fd..4ba0cb0af51bcad9f5e45c7ef3f7c7ac6f7db0e3`,
+mounted its changed blobs incrementally, composed R6/M3/M4 in one rest, returned the general
+homogeneous-quadratic central-inversion law, received genuine Lean acceptance, committed its
+supported local morphology, changed the same held-out later passage from the expanded route to the
+one-edge fixed-locus route, preserved the single-axis separator, remounted source-detached, ablated
+the route and withdrew exactly. The twelve-part grade passed; authoritative admission is
+[`../research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md`](../research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md).
 
 L0 passes only when all of the following return together:
 
@@ -232,9 +237,9 @@ L0 passes only when all of the following return together:
 
 ### L1 — Returned theorem families cultivate the continuing laboratory rest
 
-[open] L1 repeatedly circulates the admitted chronology through the L0 rest. It does not add a
-learning subsystem. Each iteration is another instance of the same mount/conduct/return/reflect/
-later-current law.
+[open] L1 is the sole active deed. It repeatedly circulates the admitted chronology through the L0
+rest. It does not add a learning subsystem. Each iteration is another instance of the same
+mount/conduct/return/reflect/later-current law.
 
 L1 passes only when:
 

@@ -822,6 +822,62 @@ extern "C" __global__ void reduce_production_aperture_fronts(
     selected_cultivation_state[0] = committed;
 }
 
+/// Transport homogeneous binary quadratic sections through their declared integer chart maps.
+///
+/// Each section carries the coefficient face `a*x^2 + b*x*y + c*y^2` and one complete two-axis
+/// map. The card returns the exact coefficient face after substitution. Equality is a receiver
+/// face of that transport; it does not identify the entering and returned occurrences.
+extern "C" __global__ void conduct_quadratic_section_transport(
+    const int64_t *coefficients,
+    const int64_t *transforms,
+    int64_t *transported_coefficients,
+    uint32_t *invariant,
+    uint32_t *selected_route,
+    uint32_t *ablated_route,
+    uint32_t sections,
+    uint32_t cultivated)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= sections) {
+        return;
+    }
+    const uint64_t coefficient_at = (uint64_t)at * 3ULL;
+    const uint64_t transform_at = (uint64_t)at * 4ULL;
+    const int64_t a = coefficients[coefficient_at];
+    const int64_t b = coefficients[coefficient_at + 1ULL];
+    const int64_t c = coefficients[coefficient_at + 2ULL];
+    const int64_t p = transforms[transform_at];
+    const int64_t q = transforms[transform_at + 1ULL];
+    const int64_t r = transforms[transform_at + 2ULL];
+    const int64_t s = transforms[transform_at + 3ULL];
+
+    // The returned L0 morphology is the central-inversion fixed-locus route.  Once rested, this
+    // exact chart family carries the entering degree-two coefficient face directly.  Withdrawal
+    // leaves the expanded substitution below intact; no host branch or relaunch reconstructs it.
+    if (cultivated != 0U && p == -1LL && q == 0LL && r == 0LL && s == -1LL) {
+        transported_coefficients[coefficient_at] = a;
+        transported_coefficients[coefficient_at + 1ULL] = b;
+        transported_coefficients[coefficient_at + 2ULL] = c;
+        invariant[at] = 1U;
+        selected_route[at] = 1U;
+        ablated_route[at] = 0U;
+        return;
+    }
+
+    const int64_t returned_a = a * p * p + b * p * r + c * r * r;
+    const int64_t returned_b =
+        2LL * a * p * q + b * (p * s + q * r) + 2LL * c * r * s;
+    const int64_t returned_c = a * q * q + b * q * s + c * s * s;
+    transported_coefficients[coefficient_at] = returned_a;
+    transported_coefficients[coefficient_at + 1ULL] = returned_b;
+    transported_coefficients[coefficient_at + 2ULL] = returned_c;
+    const uint32_t held =
+        returned_a == a && returned_b == b && returned_c == c ? 1U : 0U;
+    invariant[at] = held;
+    selected_route[at] = held == 0U ? 2U : 0U;
+    ablated_route[at] = held == 0U ? 2U : 0U;
+}
+
 /// **The recurrent passage and every conserved modality face cross one inference front.**
 ///
 /// I3 and I4 retain different state spaces. Their only identification is the explicit binary
