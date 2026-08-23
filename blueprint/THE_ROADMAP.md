@@ -29,22 +29,86 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
-## THE LABORATORY CIRCULATES THROUGH ATHENA — 2026-08-23
+## NATIVE MATHEMATICAL INFERENCE PRECEDES EVERY CODEC — 2026-08-23
 
-**The completed construction campaign is
+**The binding correction is
+[`THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md).**
+**The completed bounded construction campaign is
+[`THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md).**
+
+**Direct correction.** [project-postulate] Athena inference returns a native
+operation/constraint/geometry complex, derivational transport, complete reconstruction fibres,
+lineage, obstruction, and open exterior before any English, notation, Lean, Rust, vector, raster,
+mesh, or acoustic projection. Lean is an optional later codec/checker apparatus. Its executable,
+sources, proof terms, theorem names, tactics, and kernel status may not be mandatory receivers,
+select native conduct, commit morphology inside inference, or define the product.
+
+**Evidence disposition.** [established-bounded] The executed M6, R6, and L0--L4 passages retain
+their exact evidence for optional exterior projection, world return, local morphology,
+condensation, ablation, withdrawal, residency, compression, and source-detached remount in their
+declared fixtures. [historical] Their Lean-mediated inference/product interpretation is
+superseded and schedules nothing. R5's 455 predeclared notation anchors remain correspondence
+evidence and explicitly are not OCR.
+
+**Returned product.** [established-bounded] The campaign constructed
+
+```text
+Athena^[Gemma]_(B_native-math, H_lab, P_text+vision+audio),
+```
+
+by composing the already admitted Phoenix, mathematics-codec, recurrent inference, heterogeneous
+transport, cultivation, compression, dissection, and resident-card owners.
+
+**CURRENT FRONTIER — N0--N4 PASSED; NO NEXT DEED IS AUTHORIZED.** [established-bounded] The
+1,444,969-octet canonical N4 rest owns cultivated native mathematics, one completed real-page OCR
+rest, the bounded three-port text/vision/audio entry ecology, and a second returned world
+occurrence as continuing history morphology. Three native application inquiries and every
+three-port shared/local withdrawal ran on the resident RTX card in a fresh source-detached process
+with no Lean/checker access. The product identity is
+`def229522bcfaabea9e8f68df060a8fc9a8671ab117d27f043ab7041f334c8c2`.
+
+[established-bounded; measured] Release admission is complete. The sole complete receiver ran
+once for 303 seconds and returned 2,853 passing tests, zero failures, 34 explicit ignores, every
+example checked, and ten immediately green gate scopes. Its three cheap defects were repaired at
+their exact boundaries; named retakes returned zero unresolved paths, 427 catalogued drivers with
+zero uncatalogued, and a clean 351-file architecture census. No workspace test or real deed was
+replayed.
+
+**Ordered continuation.** [definition]
+
+1. **N0:** native mathematical consequence replaces the Lean-mediated application boundary.
+2. **N1:** a raw untranscribed page/PDF raster returns real mathematical OCR as recovered visual
+   incidence and a native operation/constraint/geometry complex.
+3. **N2:** Gemma's actual text, vision, and audio paths cross one common mathematical ecology with
+   complete local/shared withdrawals and no media-label routing.
+4. **N3:** the addressed laboratory chronology cultivates native mathematical hexis without a
+   checker in the inference lifecycle.
+5. **N4:** the source-detached laboratory mathematics Athena freezes with native inference, real
+   OCR, enacted multimodality, continued cultivation, complete dissection, and strict
+   complete-product compression.
+
+[established-bounded] N0--N4 passed in that order. [open] Full foreign text/vision/audio tower
+inference, native nonlinear/analytic/unit families, and general conversational generation remain
+named exterior. X0--X2, Qwen, external-model fusion, and unrelated roadmap lines remain
+unscheduled; this completion does not silently schedule them.
+
+## THE LEAN-MEDIATED LABORATORY CAMPAIGN IS REGRESSION EVIDENCE — corrected 2026-08-23
+
+**The completed historical campaign is
 [`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).**
 
-**Campaign stance.** [definition] The admitted Phoenix, M0--M6, A1--A3, I0--I5, and R0--R6
-owners cultivated
+**Corrected campaign stance.** [historical] The campaign named its fixture
 
 ```text
 Athena^[Gemma]_(B_HM, H_lab),
 ```
 
-the laboratory's production holonics/mathematics Athena variant. `B_HM` is the admitted
+as the laboratory's production holonics/mathematics Athena variant. `B_HM` was the admitted
 mathematical, geometric, physical, proof, diagram, unit, dimension, intervention, and world-return
 receiver family. `H_lab` is the addressed successor-history family carried by the committed
-laboratory chronology.
+laboratory chronology. [established-bounded] The exact fixture passages and receipts remain valid
+inside those declared receivers. [historical] The production designation and any inference
+boundary requiring a Lean proof face are superseded by N0--N4.
 
 **L0 passed.** [established-bounded; implemented-exact; proved-derived; measured] One frozen
 seven-commit laboratory prefix crossed the existing R6/M3/M4 ecology. A generated general theorem
@@ -83,22 +147,25 @@ zero failures, 34 explicit ignores, every example type-checked, and twelve immed
 the sole cheap driver-ledger ordering drift passed its named retake. Authoritative admission is
 [`research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md`](../research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md).
 
-**L4 passed, and the campaign is complete.** [established-bounded] The admitted L0--L3 circulation
-froze as canonical `Athena^[Gemma]_(B_HM,H_lab)` with its application entry, complete anatomy,
+**L4 passed its historical fixture grade, and that campaign is complete.** [established-bounded]
+The admitted L0--L3 circulation froze its declared `Athena^[Gemma]_(B_HM,H_lab)` fixture with its
+application entry, complete anatomy,
 capability atlas, exact controls, strict seven-coordinate compression, resident-card testimony,
 and frozen manifest. The sole release receiver returned all thirteen green scopes in 137.31
 seconds: 2,848 tests passed, zero failed, 34 were explicitly ignored, and every example
 type-checked. Authoritative admission is
 [`research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md`](../research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md).
 
-**No next deed is scheduled.** X0--X2, Qwen, wider receiver histories, additional carrier returns,
-and nonlinear fixed varieties remain explicit alternatives until a later direct ruling selects one.
+**That file schedules no next deed.** [established-bounded] The corrective N0--N4 campaign above
+has also completed its bounded aperture. X0--X2, Qwen, wider external-source fusion, and unrelated
+alternatives remain unscheduled.
 
-**L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
+**L1--L4 remain ordered regression enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
 ecology works from its own rested terrain; and the specialized production variant freezes with its
-complete anatomy and inference entry. No new cross-codec, theorem-cartography, learning,
-inference, navigation, context, or scheduling subsystem is authorized.
+complete anatomy and historical inference entry. They do not establish the corrected native
+application boundary. No new cross-codec, theorem-cartography, learning, inference, navigation,
+context, or scheduling subsystem is authorized; N0--N4 composed and repaired existing owners.
 
 **X0--X2 and Qwen remain outside the campaign.** The laboratory cultivation line completes before
 any external heterogeneous-source fusion is scheduled.
@@ -138,8 +205,9 @@ development closure; returned language, Lean proof, exact value/unit/dimension, 
 complete dissection faces; committed an exterior world return into changed later conduct; withdrew
 exactly; conducted independent context, derivation and media fronts on the single card; and fell
 strictly in all seven complete-product coordinates. Its sole complete receiver passed all thirteen
-scopes. Its canonical production ecology is the predecessor cultivated by the active L0--L4
-laboratory campaign.
+scopes. [historical] Its Lean-bearing product interpretation and the later L0--L4 product
+designation are regression provenance. [established-bounded] Its non-checker operation, media,
+return, morphology, dissection, and compression owners were composed by the completed N campaign.
 
 **X0--X2 are parked, not revoked.** Heterogeneous SSM/diffusion/acoustic/perception/production
 fusion can follow only when one explicit open transport family selects a complementary source
@@ -156,8 +224,11 @@ its completed inference lifecycle is governed by
 [`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md),
 its completed production continuation is governed by
 [`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).**
-The active laboratory cultivation campaign is governed by
-[`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
+The active laboratory Athena campaign is governed by
+[`THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md),
+under
+[`THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md).
+The completed L0--L4 file is retained only as regression provenance.
 The Athena evidence contract folds M6 into the first explicitly graded Athena mathematics variant
 and retains the returned exchange, sibling-spectrum and cultivation deeds. Together these files
 supersede the scheduling/station order of the earlier Phoenix master, Gemma instance and

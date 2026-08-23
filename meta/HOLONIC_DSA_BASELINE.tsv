@@ -278,6 +278,8 @@ soma/life/src/mathematical_particle/production_aperture/family.rs	.clone()=3	.co
 soma/life/src/mathematical_particle/production_aperture/family_types.rs	Vec=19
 soma/life/src/mathematical_particle/production_aperture/laboratory.rs	.clone()=7	.collect()=3	.flat_map()=1	.into_iter()=1	BTreeSet=4	Vec=8
 soma/life/src/mathematical_particle/production_aperture/laboratory_types.rs	Vec=19
+soma/life/src/mathematical_particle/production_aperture/native_consequence.rs	.clone()=40	.collect()=8	BTreeSet=3	Vec=21
+soma/life/src/mathematical_particle/production_aperture/native_consequence_types.rs	Vec=37
 soma/life/src/mathematical_particle/production_aperture/native_family.rs	.clone()=20	.collect()=12	.flat_map()=1	BTreeSet=4	Vec=24
 soma/life/src/mathematical_particle/production_aperture/native_family_types.rs	Vec=35
 soma/life/src/mathematical_particle/production_aperture/native_terrain.rs	.clone()=16	.collect()=11	.flat_map()=3	.into_iter()=1	BTreeSet=4	Vec=22
@@ -301,7 +303,9 @@ soma/life/src/mathematical_particle/tests/attacks.rs	.clone()=43	.collect()=26	.
 soma/life/src/mathematical_particle/validation.rs	.clone()=27	.collect()=18	.flat_map()=7	BTreeMap=4	BTreeSet=14
 soma/life/src/mathematical_particle/validation/typing.rs	.clone()=3	.collect()=6	.flat_map()=4	BTreeMap=1	BTreeSet=17
 soma/life/src/mathematical_source.rs	.clone()=10	.collect()=8	.into_iter()=1	BTreeMap=2	BTreeSet=7	Vec=16
+soma/life/src/mathematical_source/acoustic.rs	.collect()=2	Vec=8
 soma/life/src/mathematical_source/correspondence.rs	.clone()=21	.collect()=8	BTreeMap=5	BTreeSet=10	Vec=12
+soma/life/src/mathematical_source/optical_recovery.rs	.clone()=9	.collect()=28	.flat_map()=1	.into_iter()=7	BTreeMap=5	BTreeSet=12	Vec=54
 soma/life/src/mathematical_source/raster.rs	.clone()=6	Vec=5	VecDeque=2
 soma/life/src/mathematical_source/tests.rs	.clone()=8	BTreeSet=1
 soma/life/src/morphological_language.rs	BTreeMap=1	BTreeSet=1

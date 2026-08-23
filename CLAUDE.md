@@ -752,7 +752,20 @@ means hiding an authored interpreter inside the body. Lean is the later cartogra
 recover theorem-construction transport and reusable proof relations, not merely imports, syntax, or
 kernel verdicts. The checker remains an exterior returning port.
 
-This ruling schedules no source change. The roadmap and position record remain the only construction
+**Corrected 2026-08-23 after the L-series lifecycle reintroduced the same contamination.** Native
+mathematical inference returns the operation/constraint/geometry complex, derivational transport,
+complete fibres, lineage, obstruction, and open exterior before any English, notation, Lean, Rust,
+SVG, mesh, raster, or acoustic projection. `LeanProof` may not be a mandatory productive receiver;
+a fixed Lean declaration may not stand in for generated conduct; and kernel status may not select,
+commit, or grade the native consequence inside the same inference occurrence. Lean acceptance or
+rejection is an optional genuinely later world event over one already-projected passage. The
+binding contract and active construction order are
+[`blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md)
+and
+[`blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md).
+
+The earlier ruling by itself scheduled no source change. The 2026-08-23 roadmap subsequently
+scheduled and completed N0--N4; the roadmap and position record remain the only construction
 authorities.
 
 ---

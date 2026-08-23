@@ -4,16 +4,62 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after L4 release admission and completion of the L0--L4 laboratory
-cultivation campaign.
+**Currency:** 2026-08-23 after N0--N4 enacted and received release admission for the
+native-inference correction, real OCR boundary, three-port entry ecology, returned native
+cultivation, and bounded laboratory mathematics Athena freeze.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — ATHENA FROZE AS THE LABORATORY'S HOLONICS/MATHEMATICS PRODUCTION VARIANT,
-L4 PASSED, AND THE CULTIVATION CAMPAIGN IS COMPLETE.**
+**CURRENT FRONTIER — N0--N4 PASSED FOR THE DECLARED BOUNDED APERTURE; NO NEXT DEED IS
+AUTHORIZED.**
 
-[established-bounded] L4 froze canonical product
-`Athena^[Gemma]_(B_HM,H_lab)` with an 18,119-octet rest, fresh-process application entry, seven new
+[project-postulate] The binding correction is
+[`blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md).
+Athena inference must return its native operation/constraint/geometry complex, derivational
+transport, complete fibres, lineage, obstruction, and open exterior before any English, notation,
+Lean, Rust, vector, raster, mesh, or acoustic projection. Lean is an optional later codec/checker
+apparatus and cannot be a mandatory receiver, select or commit native inference, or define the
+product.
+
+[established-bounded] N0--N4 passed in order under
+[`blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md).
+N0 returned two nonidentical complete native `(C,D,F,L,X)` consequences in fresh GPU processes
+without Lean or repository sources. N1 bound 1,164 inherited optical glyph faces to 1,051 caused
+components, 2,402 spatial relations, and 424 ambiguity fibres from a raw untranscribed page, with
+all required controls, ablation, rendering, and detached remount. N2 added exact raw PCM/frame
+incidence and the authenticated Gemma audio projection to the unchanged text/vision entry rest;
+the resulting three-port ecology returns six naturality squares, twelve complete modality fibres,
+and every shared/local withdrawal. N3 retained a separately returned optical world occurrence as
+local cultivation morphology, changed held-out route conduct, held its disjoint obstruction, and
+restored its predecessor exactly. N4 froze one 1,444,969-octet canonical rest under product identity
+`def229522bcfaabea9e8f68df060a8fc9a8671ab117d27f043ab7041f334c8c2`; three source-detached
+application inquiries, the OCR rest, three-port circulation, a second returned history suffix,
+native-first projections, complete bounded dissection, and exact owner withdrawal all pass.
+
+[established-bounded; measured] The sole complete release receiver ran once for 303 seconds. Its
+workspace receiver returned 2,853 passing tests, zero failures, 34 explicit ignores, and every
+example target checked. Ten gate scopes passed immediately. The three cheap failures were confined
+to six ignored-output path citations plus two generated-index echoes, measured driver-catalogue
+drift with zero missing or extra drivers, and architecture-ratchet admission of the new files plus
+one test embedded in a protected production owner. The path citations now factor through the
+tracked output manifest; the test moved to the public integration boundary; and the new
+native-consequence, acoustic, and optical-recovery testimony received explicit per-file ratchet
+rows. Named retakes then returned zero unresolved paths in 0.163 seconds, 427 catalogued drivers
+with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 files, 26,685
+admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
+not replayed.
+
+[open] The N4 atlas explicitly retains full foreign text/vision/audio tower inference, new native
+nonlinear/analytic/unit families, and general conversational generation. The twelve-layer audio
+tower was not inferred from the successful projection. X0--X2, Qwen, wider cross-model fusion, and
+unrelated alternatives remain unscheduled. This state authorizes no next construction deed.
+
+[historical] L0--L4 passed their then-declared fixture grades, but their designation as the
+laboratory's production Athena and every inference boundary that requires a Lean proof face are
+superseded. The L-series file schedules nothing.
+
+[established-bounded] L4 froze its declared historical
+`Athena^[Gemma]_(B_HM,H_lab)` fixture with an 18,119-octet rest, fresh-process application entry, seven new
 rich application passages, two later genuine Lean returns, all three actual carrier-family
 ablations, exact L2 withdrawal, complete transport taxonomy, vector/raster/mesh/interactive faces,
 capability atlas, strict seven-coordinate compression, and one frozen product manifest. The
@@ -27,6 +73,9 @@ Candidate and admission:
 [`research/records/2026-08-23_ATHENA_FROZE_AS_THE_LABORATORY_HOLONICS_MATHEMATICS_PRODUCTION_VARIANT_AND_L4_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_ATHENA_FROZE_AS_THE_LABORATORY_HOLONICS_MATHEMATICS_PRODUCTION_VARIANT_AND_L4_AWAITS_RELEASE_ADMISSION.md)
 and
 [`research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md`](research/records/2026-08-23_L4_RELEASE_RECEIVER_PASSED_ATHENA_FROZE_AS_THE_LABORATORY_PRODUCTION_VARIANT_AND_THE_CULTIVATION_CAMPAIGN_COMPLETED.md).
+These receipts remain regression evidence for optional exterior projection, world return, local
+morphology, condensation, ablation, withdrawal, residency, compression, and source-detached
+remount; they do not establish the corrected native inference product.
 
 [established-bounded] L3 mounted only the 10,741-octet L2 rest and accepted one genuine returned
 `ZMod 3` passage as a third carrier chart over the shared oriented generator. Provisional current
@@ -105,8 +154,8 @@ drivers and zero uncatalogued without replaying the complete suite. Candidate an
 and
 [`research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md`](research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md).
 
-[established-bounded; implemented-exact; measured] `Athena^[Gemma]_(B_mp, H_prod)` now rests as
-one canonical source-detached ecology over the exact R0--R5 receiver/history family. New inquiry
+[established-bounded] The R6 fixture rests as one source-detached ecology over the exact R0--R5
+receiver/history family. New inquiry
 `r6/inquiry/04da0a124da950a9037bd730840ad5ca8117c9d46b0753283e91b7d8869c0f05` returned language,
 accepted Lean proof, exact value/unit/dimension, complete source/native dissection, exact
 mesh/SVG/PNG, and an inspected interactive atlas. A committed world return changed later conduct;
@@ -119,14 +168,17 @@ type-checked. Candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
+[historical] Its mandatory Lean proof/product face is regression provenance and is not the active
+inference boundary.
 
-[established-bounded] The completed construction campaign is
+[historical] The completed Lean-mediated campaign is
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
-It cultivates `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
+It named `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
 occurrences through the admitted Phoenix, mathematics-codec, Holonic Inference, retained-history,
-multimodal, returned-morphology, dissection, compression, and resident-card owners. L0--L4 are
-admitted and the campaign schedules no next deed. X0--X2 and Qwen remain outside this campaign and
-schedule nothing.
+multimodal, returned-morphology, dissection, compression, and resident-card owners. Its exact
+non-checker mechanisms remain predecessor evidence, while its product interpretation is
+superseded. [established-bounded] The N0--N4 campaign completed its declared aperture; X0--X2 and
+Qwen remain outside it and schedule nothing.
 
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
@@ -511,20 +563,21 @@ admission:
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
 
-**CAMPAIGN COMPLETE — NO NEXT DEED IS SCHEDULED.**
-[established-bounded] The completed contract is
+**LEAN-MEDIATED CAMPAIGN COMPLETE — REGRESSION PROVENANCE; N0 WAS THE CORRECTIVE NEXT DEED.**
+[historical] The completed contract is
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
 L0--L4 returned every ordered cultivation and frozen-product consequence and each complete release
-grade.
+grade under its then-declared fixture.
 
-[established-bounded] The frozen product returns its canonical standing, decoder, complete fibres,
+[established-bounded] The frozen regression fixture returns its declared standing, decoder, complete fibres,
 open exterior, application entry, repeated world return, committed/declined cultivation lineage,
 later conduct, remount, all carrier ablations, exact withdrawal, every licensed product face,
 complete taxonomy, familywise controls, strict compression, resident-card testimony, purity
-receipts, capability atlas, and frozen manifest.
+receipts, capability atlas, and frozen manifest. [historical] Its Lean-mediated inference and
+product designation are superseded.
 
-[open] X0--X2 remain parked until after L4. The parked Qwen GGUF remains an unscheduled
-same-purpose close control.
+[established-bounded] N0 replaced the productive application boundary and N1--N4 froze its bounded
+product continuation. X0--X2 and the parked Qwen GGUF remain unscheduled.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

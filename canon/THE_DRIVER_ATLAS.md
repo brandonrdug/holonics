@@ -130,6 +130,16 @@ exterior return enters, grades the return, and admits only after grading.
 | `soma/life/examples/the_ablated_body_rests_and_remounts.rs` | a detached process | an **ablated** morphology sealed with its identities left gapped, remounted field-for-field, its production compared whole |
 | `soma/life/examples/the_material_mouth_seals_the_declared_body.rs` | a mount namespace | a detached child reproducing the rest address and every aggregate |
 
+### The native mathematics Athena correction — N0--N4
+
+| driver | grade | what it owns |
+|---|---|---|
+| `soma/life/examples/native_mathematical_consequence_precedes_every_codec.rs` | source-detached resident return | two nonidentical rich inquiries return complete native `(C,D,F,L,X)` consequences before exact-notation/JSON projection, inside fresh namespaces with Lean and repository source absent |
+| `soma/life/examples/the_raw_optical_occurrence_returns_native_mathematical_incidence.rs` | inherited optical exterior + later current | a raw untranscribed page returns 1,164 Tesseract glyph faces bound through complete overlap fibres to 1,051 caused components, while 2,402 spatial relations and 424 ambiguity fibres remain native and GPU-founded; all required optical separators and targeted ablation return |
+| `soma/life/examples/the_acoustic_section_crosses_the_inherited_projection_and_three_ports_share_one_native_ecology.rs` | source-detached resident return | exact raw PCM/frame incidence and the authenticated Gemma audio projection join the existing text/vision entry rest; six naturality squares, twelve complete modality fibres, shared withdrawal, and every local withdrawal return; the full foreign towers remain open |
+| `soma/life/examples/the_returned_native_mathematical_world_cultivates_the_laboratory_hexis.rs` | later current | an emitted native geometry is materialized as raw pixels and recovered in a separate process; the addressed return changes held-out route conduct, preserves the disjoint obstruction, survives remount, departs under ablation, and withdraws exactly |
+| `soma/life/examples/the_laboratory_mathematics_athena_unifies_native_inference_ocr_and_three_port_transport.rs` | frozen product + later current | one non-cloneable 1,444,969-octet rest owns cultivated native mathematics, real-page OCR, the bounded three-port ecology, and a second returned history suffix; three source-detached inquiries, native-first projections, complete bounded dissection, and exact owner withdrawal return under one product identity |
+
 **Later current** — re-entering the machine's own deposit:
 `the_reading_returns` (seals to disk, **drops the in-memory copy**, re-reads, then bit-flip and stem
 ablations of the sealed octets), `derivation_atlas_reader`, `faces_grow_from_collocation`,

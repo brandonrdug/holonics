@@ -698,14 +698,25 @@ fn found_complex(
     Ok(complex)
 }
 
+mod acoustic;
 mod correspondence;
+mod optical_recovery;
 mod raster;
 #[cfg(test)]
 mod tests;
 
+pub use acoustic::{AcousticFrame, ExactAcousticOccurrence, ExactAcousticRefusal};
 pub use correspondence::{
     compare_presentations, correspond, correspondence_demand, CoTestimonyFiber, ComparedContact,
     CorrespondenceCandidate, PresentationComparison,
+};
+pub use optical_recovery::{
+    ablate_optical_relation, bind_optical_glyph_testimony, compare_optical_controls,
+    recover_optical_passage, AmbiguityAlternative, AmbiguityFibre, DeviceOpticalReceipt,
+    ExteriorOpticalGlyph, NativeOpticalConsequence, OpticalAblationReturn, OpticalBounds,
+    OpticalComponent, OpticalControlComparison, OpticalGlyphBinding, OpticalGlyphTestimony,
+    OpticalPassage, OpticalReceiverSignature, OpticalRecoveryDemand, OpticalRegion,
+    OpticalRelation, OpticalRelationKind, OpticalWorkReceipt,
 };
 pub use raster::{
     admit_raster_components, derive_raster_fiber, raster_component_admission_demand, raster_demand,
@@ -735,6 +746,11 @@ pub enum SourceLayoutError {
     InvertedBox,
     MalformedDecimal(String),
     Extent,
+    Device(String),
+    OpticalDeviceShape,
+    OpticalCoordinateNotIntegral,
+    OpticalGlyphTestimonyAlreadyBound,
+    OpticalGlyphOutsideExtent(u32),
     Image(holonic_engine::image::ImageCarrierError),
     Incidence(IncidenceProductionError),
 }

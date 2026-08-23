@@ -49,6 +49,9 @@ pub fn tokenize_exterior_occurrence(
 pub enum ModalityPort {
     TextCodeword,
     VisionPatch,
+    /// One exact time-ordered acoustic section crossing the inherited audio boundary. Sample and
+    /// frame chronology remain in the source incidence fibre; this tag only types the port.
+    AudioFrame,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

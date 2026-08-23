@@ -308,8 +308,15 @@ construction merely because its current implementation is being replaced.
   must perform mathematical navigation, constraint transport, proof/declaration formation, and
   reusable conditioning on the resident GPU. Lean must never schedule the body or become its
   internal ontology.
-- Kernel acceptance/rejection is a returned occurrence attached to one generated passage, not an
-  accepted-count gate. Rejection remains useful obstruction.
+- Native mathematical inference ends before every surface-language projection. English, notation,
+  Lean, Rust, SVG, mesh, raster, and acoustic products may be projected only from an already-returned
+  native operation/constraint/geometry complex with its derivational transport, fibres, lineage,
+  obstruction, and open exterior. No such codec is a mandatory productive receiver.
+- Kernel acceptance/rejection is an optional later world occurrence attached to one projected
+  passage, not an inference phase, product identity, native commit gate, loss function, or
+  accepted-count gate. Rejection remains useful exterior obstruction. Removing the Lean executable,
+  Lean sources, and historical proof plates from the productive namespace must not prevent native
+  inference or change its consequence.
 - Mathematical production is scheduled only where the live roadmap and root construction state
   place it. Historical C++ labels such as R16 are regression evidence, not present phase names.
   Counts, topology, hashes, diagnostics, or a single familiar fixture cannot substitute for a live

@@ -1,10 +1,22 @@
 # The laboratory circulates through Athena, and returned Lean constraints cultivate the holonics/mathematics ecology
 
+> **CORRECTIVE DISPOSITION — 2026-08-23.** [historical] This file is superseded as product and
+> inference authority by
+> [`THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md`](THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md)
+> and
+> [`THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md).
+> [established-bounded] Its L0--L4 executions remain regression evidence for optional exterior
+> projection, returned-world cultivation, local morphology, carrier condensation, ablation,
+> withdrawal, residency, and source-detached remount in their declared fixtures. [historical] Every
+> clause below that makes Lean proof membership, Lean acceptance, or a generated Lean artifact part
+> of Athena's inference lifecycle or frozen product identity is a superseded interpretation and
+> schedules nothing.
+
 **Date:** 2026-08-22
-**Kind:** live construction contract composed by
-[`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L4 have passed. This
-campaign is complete and schedules no next deed.
+**Kind:** superseded construction contract retained as bounded regression provenance
+**Current boundary:** L0--L4 passed their then-declared fixture grades. This file schedules no next
+deed; N0--N4 were subsequently scheduled and completed only by the live roadmap and its corrective
+campaign.
 **Product:**
 
 ```text

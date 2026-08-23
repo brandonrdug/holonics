@@ -12,6 +12,8 @@ mod family_types;
 mod inquiry;
 mod laboratory;
 mod laboratory_types;
+mod native_consequence;
+mod native_consequence_types;
 mod native_family;
 mod native_family_types;
 mod native_terrain;
@@ -39,6 +41,18 @@ pub use laboratory_types::{
     LaboratoryPartition, LaboratoryPartitionKind, LaboratoryReconstructionBoundary,
     LaboratoryRouteDecoder, LaboratorySourceChange, LaboratoryStandingJunction,
     LaboratoryWithdrawalReceipt, LaboratoryWorldReturn,
+};
+pub use native_consequence::{
+    NATIVE_MATHEMATICAL_CONSEQUENCE_SCHEMA, NATIVE_MATHEMATICAL_INQUIRY_SCHEMA,
+};
+pub use native_consequence_types::{
+    NativeAddressedConsequenceSpan, NativeApparatusReceipt, NativeCodec, NativeCodecProjection,
+    NativeConsequenceExterior, NativeConsequenceLineage, NativeConsequenceReconstruction,
+    NativeConstraintCell, NativeDerivationTransport, NativeDeviceRouteFibre,
+    NativeExactConsequenceFace, NativeGeometryCell, NativeGeometryVertex,
+    NativeMathematicalComplex, NativeMathematicalConsequence, NativeMathematicalConsequenceError,
+    NativeMathematicalInquiry, NativeMathematicalPort, NativeMathematicalReceiver,
+    NativeOperationCell, NativeReturnedObstruction,
 };
 pub use native_family::{
     NATIVE_HEXIS_DECODER_SCHEMA, NATIVE_HEXIS_FIBRES_SCHEMA, NATIVE_HEXIS_INQUIRY_SCHEMA,
