@@ -4,23 +4,38 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after E4 enacted and received release admission for the source-detached
-native inference membrane.
+**Currency:** 2026-08-23 after E5 enacted, received release admission, froze the agentic laboratory
+Athena, and completed the ordered E0--E5 campaign.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — E4 PASSED; E5 THE AGENTIC LABORATORY ATHENA FREEZE IS THE SOLE AUTHORIZED NEXT
-DEED.**
+**CURRENT FRONTIER — E0--E5 PASSED; THE AGENTIC ATHENA CAMPAIGN IS COMPLETE AND NO SUCCESSOR DEED
+IS AUTHORIZED.**
 
-[project-postulate] The active construction contract is
+[established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
-E5 now cultivates the completed E0--E4 ecology on the addressed laboratory chronology and held-out
-mathematics/physics inquiries, freezes one source-detached product, and returns unrestricted
-generation over its declared aperture, hierarchical page intake, inherited/implemented/cultivated
-organ interaction, inbound optical/acoustic conduct, native mathematical consequence, continued
-world return, directional ablation, complete dissection, reconstruction fibres, saturation and
-marginal-excitation frontiers, and complete-product cost. Condensation is claimed only for measured
-receiver/history families; source names do not become faculties.
+E5 cultivated the completed E0--E4 ecology on held-out mathematics/physics current and froze one
+38-member source-detached product. Its native rest owns an eight-front addressed language
+continuation, hierarchical page intake, inherited/implemented/cultivated organ interaction, native
+mathematical consequences, returned world morphology, complete dissection and fibres, saturation,
+marginal excitation, directional withdrawal and complete-product cost under identity
+`bececf079d04a8289059456637d294ab5e86beb01d066d30cde6a08b86e6f6af`.
+
+[established-bounded; measured] The eight complete Phoenix frontiers retained one exact maximizer
+and 262,143 separated alternatives each. Their measured tower wall times sum to 1,011.393410638
+seconds. The inspected language face is grammatical but repetitive and is not graded as
+competitive conversation. Held-out exact fixed sections returned zero residuals over integer and
+modulus-two charts; a one-cell separating family retained its residual obstruction.
+
+[established-bounded; measured] E5's sole complete release receiver began at
+2026-08-23T16:10:20-07:00 and returned 2,862 passing tests, zero failures, 34 ignores, every example
+target type-checked and twelve immediately green scopes. Its only cheap refusal was driver-ledger
+generation order with zero missing or extra drivers. Regeneration after the output/closure ledgers
+and the named retake at 2026-08-23T16:17:41-07:00 returned 436 catalogued drivers and zero
+uncatalogued without replaying tests or real deeds. Candidate and admission:
+[`research/records/2026-08-23_THE_AGENTIC_LABORATORY_ATHENA_FROZE_WITH_ITS_EMANATIVE_AND_RETURNED_CONTINUATIONS_AND_E5_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_AGENTIC_LABORATORY_ATHENA_FROZE_WITH_ITS_EMANATIVE_AND_RETURNED_CONTINUATIONS_AND_E5_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_E5_RELEASE_RECEIVER_PASSED_THE_AGENTIC_LABORATORY_ATHENA_FROZE_AND_THE_CAMPAIGN_COMPLETED.md`](research/records/2026-08-23_E5_RELEASE_RECEIVER_PASSED_THE_AGENTIC_LABORATORY_ATHENA_FROZE_AND_THE_CAMPAIGN_COMPLETED.md).
 
 [established-bounded; measured] E4 mounted the E3 native rest once in a non-clone
 `NativeInferenceMembrane` and served a fresh client through an exterior Unix stream. Two independent
@@ -159,10 +174,10 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] E5 retains the frozen agentic product. Unknown-carrier codec induction and
-touch/chemical/smell/taste apparatus remain open future apertures rather than modality subsystems.
-Receiver-exact native re-expression of every foreign BF16 coefficient remains an open lift fibre.
-X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain unscheduled.
+[open] Unknown-carrier codec induction, touch/chemical/smell/taste apparatus, outbound voice/image
+production and wider nonlinear mathematics remain future apertures rather than modality
+subsystems. Receiver-exact native re-expression of every foreign BF16 coefficient remains an open
+lift fibre. X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain unscheduled.
 
 [historical] L0--L4 passed their then-declared fixture grades, but their designation as the
 laboratory's production Athena and every inference boundary that requires a Lean proof face are

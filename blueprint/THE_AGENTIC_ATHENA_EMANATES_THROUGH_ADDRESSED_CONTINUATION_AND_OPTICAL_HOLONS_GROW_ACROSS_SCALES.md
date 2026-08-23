@@ -1,11 +1,10 @@
 # Agentic Athena emanates through addressed continuation and arbitrary organ potentials cross typed apertures
 
 **Date:** 2026-08-23
-**Status:** live construction contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Truth status:** `project-postulate` for the ordered campaign and its production target;
+**Status:** completed construction contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
+**Truth status:** `established-bounded` for the completed ordered campaign and its bounded product;
 `definition` for the typed boundaries and grades below; `established-bounded` for the named N0--N4,
-W1--W5, I0--I5, A0--A3 and now-passed E0--E4 predecessors; `open` for E5 until its real return
-passes.
+W1--W5, I0--I5, A0--A3 and passed E0--E5 deeds; `open` for the explicitly retained exterior.
 
 This blueprint supersedes the N4 statement that no next deed is authorized. It does not supersede
 N0--N4's artifacts or weaken their grades. Its 2026-08-23 arbitrary-organ revision recognizes E1
@@ -435,7 +434,7 @@ an interchange receipt, no host semantic foreman, no compatibility schema inside
 dependency cone, no media enum inside the native request, and deterministic/application error
 separation.
 
-### E5 — The agentic laboratory Athena freezes
+### E5 — The agentic laboratory Athena freezes — PASSED
 
 Cultivate the completed E0--E4 ecology on the addressed laboratory chronology and held-out
 mathematics/physics inquiries. Freeze one source-detached product, capability atlas, complete
@@ -493,5 +492,6 @@ Read, in order:
 13. `canon/TABLET_THE_CAUSAL_PROFILE.md`; and
 14. only the source owners and evidence closure of the current E-deed.
 
-Do not reread the research archive by default. E0--E4 have passed; E5 is the sole next deed until
-its frozen product, complete atlas, dissection, saturation and marginal-excitation return passes.
+Do not reread the research archive by default. E0--E5 have passed and this ordered campaign is
+complete. No successor deed is authorized; the open exterior in §§10 and 12 remains unscheduled
+until the roadmap explicitly composes a new campaign.
