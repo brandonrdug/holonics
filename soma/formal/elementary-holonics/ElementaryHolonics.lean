@@ -20,6 +20,7 @@ import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling
+import ElementaryHolonics.Millennium.HilbertTransportChain
 import ElementaryHolonics.Millennium.Instance
 import ElementaryHolonics.Millennium.Triangle
 import ElementaryHolonics.Millennium.Theta
@@ -28,6 +29,7 @@ import ElementaryHolonics.Millennium.Rebase
 import ElementaryHolonics.Millennium.FormRebase
 import ElementaryHolonics.Millennium.Lines
 import ElementaryHolonics.Millennium.OfficialProblems
+import ElementaryHolonics.Millennium.NavierStokesFiniteTime
 import ElementaryHolonics.Millennium.NavierStokesVorticity
 import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
 import ElementaryHolonics.Millennium.NavierStokesMaterialDerivative
@@ -35,6 +37,7 @@ import ElementaryHolonics.Millennium.NavierStokesCurvedTransport
 import ElementaryHolonics.Millennium.NavierStokesKelvin
 import ElementaryHolonics.Millennium.NavierStokesHodge
 import ElementaryHolonics.Millennium.NavierStokesPotential
+import ElementaryHolonics.Millennium.NavierStokesMovingLoop
 import ElementaryHolonics.Millennium.YangMillsLimit
 import ElementaryHolonics.Millennium.ReflectedPositivity
 import ElementaryHolonics.Millennium.AlgebraicGNS
