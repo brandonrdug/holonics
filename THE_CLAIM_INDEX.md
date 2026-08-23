@@ -106,7 +106,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/CONTAMINATION_BANS.md` | **Contamination bans** — These are hard reconstruction invariants derived from repeated laboratory failures. |
 | `blueprint/PURE_HOLONIC_ENGINE.md` | **Pure holonic engine** — This is the normative, language- and hardware-agnostic engine contract. |
 | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md` | **The admission is a quotient and the breadth is a group** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
-| `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md` | **Agentic Athena emanates through addressed continuation and optical holons grow across scales** — This blueprint supersedes the N4 statement that no next deed is authorized. |
+| `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md` | **Agentic Athena emanates through addressed continuation and arbitrary organ potentials cross typed apertures** — This blueprint supersedes the N4 statement that no next deed is authorized. |
 | `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` | **The arrow is the division and attention keeps only its aim** — **Evidence:** `measured` where stated; the arrow's own source is `soma/body/src/arrow.rs:17-26` and `:114-125`, read today. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
 | `blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md` | **The Athena production aperture widens through mathematical world-tubes, and returned constraints cultivate the ecology** — **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry, dynamic delta, retained-context, and product-grade contracts; `project-postulate` for… |
@@ -137,7 +137,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (303 deposits of 595)
+## 4 · The 2026-08 record line (304 deposits of 596)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -447,6 +447,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-23_THE_ATHENA_HOLONICS_MATHEMATICS_ECOLOGY_WORKED_FROM_ITS_OWN_RESTED_TERRAIN_AND_L3_AWAITS_RELEASE_ADMISSION.md` | The Athena holonics/mathematics ecology worked from its own rested terrain, and L3 awaits release admission |
 | `2026-08-23_THE_FULL_TOWER_EMANATED_THROUGH_ONE_ADDRESSED_CONTINUATION_AND_E0_AWAITS_RELEASE_ADMISSION.md` | The full tower emanated through one addressed continuation and E0 awaits release admission |
 | `2026-08-23_THE_OPTICAL_FIELD_GREW_FROM_COMPONENTS_INTO_NATIVE_CONSTRAINT_SECTIONS_AND_E1_AWAITS_RELEASE_ADMISSION.md` | The optical field grew from components into native constraint sections and E1 awaits release admission |
+| `2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md` | The potential complex crosses arbitrary organ apertures and codec lineages meet only through returned consequence |
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
 
 ---

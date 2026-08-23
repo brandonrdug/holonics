@@ -1,7 +1,8 @@
 # Prominent external resources
 
 These sources inform the research but do not govern the internal ontology. Each bridge into
-holonics must state its typed translation and evidence grade. Accessed 2026-08-03.
+holonics must state its typed translation and evidence grade. Initial atlas accessed 2026-08-03;
+current through the multisensory additions accessed 2026-08-23.
 
 The complete authored bibliographies remain scoped in `papers/source/**/references.bib` (seven
 files, roughly 180 entries, 121 URL-field occurrences, and 120 normalized distinct URLs).
@@ -53,6 +54,21 @@ Duplicate keys are intentionally not merged without namespacing.
 - An accelerometer returns proper acceleration through a local proof-mass/housing interaction.
   Trajectory, orientation, gravity separation, and drift require additional receiver charts; this
   is the relevant holonic lesson, not a claim that computation literally is a MEMS device.
+
+## Multisensory organ coupling
+
+- Yuya Kakutani et al., “Taste of breath: the temporal order of taste and smell synchronized with
+  breathing as a determinant for taste and olfactory integration,” *Scientific Reports* (2017) —
+  retronasal odour, taste and respiratory chronology as a joined consequence:
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC5566545/>.
+- Joel James et al., “Beyond aroma: A scoping review on the impact of chronic rhinosinusitis on
+  retronasal olfaction,” *Frontiers in Allergy* (2022) — the retronasal route and the effect of a
+  changed sinonasal aperture on flavour experience:
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC9470759/>.
+- Barry G. Green et al., “Enhancement of Retronasal Odors by Taste,” *Chemical Senses* (2011) — an
+  experimentally asymmetric taste/odour interaction, used here to reject symmetric modality-sum
+  construction rather than to identify Athena with sensory biology:
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC3243899/>.
 
 ## Cellular automata and life-like ecologies
 

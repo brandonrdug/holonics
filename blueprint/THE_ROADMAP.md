@@ -24,12 +24,12 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 
 ## WHERE THIS STANDS — revised 2026-08-23; prior revision 2026-08-22
 
-**Read this section, §"THE DELEGATED CONSTRUCTION PLANS" directly below it, and §"THE OPEN WORK, BY
-STATION". Everything between them is the returned ledger and its provenance.** Brandon authorised
-the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
-once you have sufficient context post-analysis campaign."*
+**Read this section and the linked active blueprint. The former delegated-plan and open-work
+station ledgers lower in this file are historical provenance and schedule nothing.** Brandon
+authorised the standing revision directly: *"Regarding the roadmap document, you can
+authoritatively revise it once you have sufficient context post-analysis campaign."*
 
-## AGENTIC ATHENA EMANATES AND OPTICAL HOLONS GROW ACROSS SCALES — 2026-08-23
+## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 
 **The active campaign is
 [`THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).**
@@ -46,17 +46,33 @@ GeForce RTX 4080 SUPER. Its sole release receiver completed in 318.09 seconds wi
 tests, zero failures, 34 explicit ignores, every example target checked and all thirteen scopes
 green.
 
-[project-postulate] E2 must now conduct the complete inherited vision and twelve-layer audio towers,
-separately and jointly, through the existing native ecology. It must return complete local/shared
-withdrawals, naturality squares, interventions, ablations, apparatus residency and reconstruction
-fibres. Projection-only output, transcript substitution, precomputed feature material, media-label
-routing and CPU semantic replay cannot satisfy E2. E2 is followed, only after its grade passes, by
-returned agentic cultivation E3, the native inference membrane E4, and the frozen agentic
-laboratory Athena E5.
+[definition] E1 is the first inspected optical instance of a carrier-neutral potential complex,
+not a vision-specific ontology. An organ is a returning local operation complex crossing nominal
+typed apertures; lifted, implemented and cultivated codecs are provenance classes which meet only
+through compatible native consequence. The normative law is
+[`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md) §8c and its complete
+derivation/source audit is
+[`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`](../research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md).
 
-[open] E2--E5 remain open until their own real returns pass. Qwen and same-purpose external LLM
-recombination remain unscheduled. The active widening uses Gemma's existing text, vision and audio
-organs before any heavier same-purpose lift.
+[project-postulate] E2 begins by replacing the active three-name `ModalityPort` dependency with the
+existing nominal `BoundaryId`/operation-complex contract; numerical widths remain apparatus/source
+testimony. It then conducts the complete inherited vision and twelve-layer audio towers separately
+and through a founded shared interaction, crosses the implemented mathematics codec and one
+already-established cultivated codec morphology through the same native contract, retains one
+provisional codec candidate for E3, and returns directional withdrawals, chronology controls,
+naturality, defects, interventions, ablations, source-detached
+continuation, apparatus residency and reconstruction fibres. Projection-only output, transcript
+substitution, precomputed feature material, media-label routing, coordinate concatenation offered
+as fusion and CPU semantic replay cannot satisfy E2. The six internal stations in the active
+blueprint do not advance construction state independently. E2 is followed, only after its complete
+grade passes, by returned arbitrary-organ cultivation E3, the generic native inference membrane
+E4, and the frozen agentic laboratory Athena E5.
+
+[open] E2--E5 remain open until their own real returns pass. Unknown-carrier codec induction,
+touch/chemical/smell/taste apparatus and exterior source-model recombination remain later open
+apertures, not new modality subsystems. Qwen and same-purpose external LLM recombination remain
+unscheduled. The active widening uses Gemma's existing inherited organs, the exact mathematics
+codec and bounded cultivated-codec morphology before any heavier same-purpose lift.
 
 ## NATIVE MATHEMATICAL INFERENCE PRECEDES EVERY CODEC — 2026-08-23
 
@@ -3725,11 +3741,12 @@ top of this file; the list is retained below as provenance and struck item by it
 
 ---
 
-## THE OPEN WORK, BY STATION
+## THE FORMER OPEN WORK, BY STATION — HISTORICAL PROVENANCE
 
-**This is the live statement of what is open.** Everything below this section is the returned ledger
-and its provenance — read it for what was built and what an adversarial reader cut down, not for
-direction.
+**This section schedules nothing.** It is the 2026-08-08 measured station ledger retained as
+provenance: read it for what the older body measured and what an adversarial reader cut down, not
+for direction. The sole live open-work statement is §"WHERE THIS STANDS" and its linked active
+blueprint.
 
 Each item names the **cut** it closes (circulation, rest, accumulation, leak, short circuit), the gap
 **as measured**, what replaces it, and a falsifier that can fire. Ordered by what unblocks the loop.

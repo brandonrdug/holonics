@@ -1,4 +1,4 @@
-# Agentic Athena emanates through addressed continuation and optical holons grow across scales
+# Agentic Athena emanates through addressed continuation and arbitrary organ potentials cross typed apertures
 
 **Date:** 2026-08-23
 **Status:** live construction contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
@@ -7,8 +7,11 @@
 W1--W5, I0--I5, and A0--A3 predecessors only; `open` for every deed until its real return passes.
 
 This blueprint supersedes the N4 statement that no next deed is authorized. It does not supersede
-N0--N4's artifacts or weaken their grades. It widens the same body from bounded application
-returns into an agentic, recurrent, multimodal Athena product.
+N0--N4's artifacts or weaken their grades. Its 2026-08-23 arbitrary-organ revision recognizes E1
+as the first inspected instance of the already-founded hypergeometry of information transport and
+removes `modality` as an internal construction axis. It widens the same body from bounded application
+returns into an agentic, recurrent Athena product whose organ apertures are typed by incidence and
+consequence rather than media names.
 
 ## 1. Product and governing invariant
 
@@ -17,7 +20,8 @@ The target is
 ```text
 Athena^[Gemma]_(B_native-math+language,
                 H_laboratory+addressed-continuation,
-                P_text+hierarchical-optical+audio+world).
+                P_arbitrary-organ-apertures+world,
+                C_lifted+implemented+cultivated).
 ```
 
 `definition`: one productive passage is
@@ -43,6 +47,13 @@ Every mathematical consequence is native before any English, notation, Lean, Rus
 mesh, or acoustic projection. Lean remains an optional later checker/world port and is forbidden
 from the inference lifecycle.
 
+`definition`: a potential complex, an organ aperture, and the three codec-provenance classes in
+this contract have the meanings fixed by
+[`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md) §8c and
+[`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`](../research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md).
+Vision and audio are E2's first two inherited apparatus instances. They do not bound the product's
+topology or create one neural cabinet per sense.
+
 ## 2. Existing owners and the exact missing edges
 
 The campaign composes these existing owners:
@@ -56,21 +67,29 @@ The campaign composes these existing owners:
 | N1 | raw optical components, inherited glyph testimony, spatial relations, ambiguity fibres, ablation, and detached remount |
 | N2 | exact text/vision/audio entry ports and their shared/local withdrawals |
 | N3--N4 | returned native cultivation, frozen bounded laboratory rest, application entry, and complete product dissection |
+| `PortedOperationComplex` / `EvolutionShape` | nominal `BoundaryId` ports, typed operations, caused occurrences, co-presence/precedence interactions, source testimony and undecided fibres |
+| exact acoustic owners | exact PCM/sample/frame chronology, forward/reverse butterfly sheets, path incidence and complete sample reconstruction without a transcript |
+| decomposing/returned codec owners | parented morphology revision, genuine return, changed later conduct, ablation and source-detached rest |
 | resident CUDA passage | exact integer interval conduct, card residency, admissions, work, transfer, and apparatus receipts |
 
-The finger-trap audit returns five concrete missing edges, not five new semantic cabinets:
+The finger-trap audit returns six concrete missing edges, not six new semantic cabinets:
 
 1. the W4 terminal return does not itself cause the next W4 entry;
 2. the resulting partial trajectory has no detachable, addressed, validated continuation rest;
 3. N1 retains components and glyph correspondences but not the simultaneous nested visual objects
    that make a glyph, script, term, fraction, equation, block, and page one incidence tower;
-4. N2 binds the foreign modality projections but does not yet conduct the complete inherited
-   vision and audio towers into the shared ecology; and
-5. no production membrane exposes the native recurrence, continuation, modality and world ports
+4. N2's bounded fusion rest names `TextCodeword | VisionPatch | AudioFrame`; it does not yet expose
+   generic nominal organ apertures, and its `width` field is not a semantic capacity law;
+5. N2 binds the foreign entry projections but does not yet conduct the complete inherited vision
+   and audio towers into native potential complexes, separately and through founded shared
+   interactions; and
+6. no production membrane exposes the native recurrence, continuation, arbitrary-organ and world ports
    through a stable application protocol.
 
 These are edges over standing owners. `Emanator`, `OCRModel`, `ConversationManager`, `KVCache`,
-`Planner`, `Trainer`, `Scheduler`, or media-specific reasoner cabinets are forbidden.
+`Planner`, `Trainer`, `Scheduler`, `Sensor`, `Modality`, `OrganManager`, `PotentialComplex`, or
+media-specific reasoner cabinets are forbidden. The potential complex is a view/composition of the
+existing section and operation owners, not a new owner.
 
 ## 3. Emanative recurrence
 
@@ -142,23 +161,66 @@ This rest is the first production analogue of a context cache. It is not a tenso
 not inherit the ontology of K/V. Any later resident condensation owes receiver/history
 factorization, reconstruction fibres, and a shortest separator when a richer receiver reopens it.
 
-## 5. Optical holons are a simultaneous incidence tower
+## 5. The potential complex is carrier-neutral hypergeometry
+
+For an entering occurrence `e`, aperture `a` and declared receiver family `Rho`, the native body
+before quotient is the situated potential complex
+
+```text
+P(e,a;Rho) =
+  (K_(e,a), S_(e,a), T_(e,a), Rho, Lambda_(e,a), ell_(e,a), F_(e,a;Rho), O_(e,a)).
+```
+
+`K` retains multigraded incidence and higher interactions; `S` the local standing; `T` admissible
+typed transports; `Lambda` inherited, implemented or cultivated morphology; `ell` addressed
+lineage; `F` unresolved covers, continuations, reconstruction fibres and defects; and `O` the open
+exterior. This is a restricted view of the existing holonic section/operation complex. No
+`PotentialComplex` data cabinet is authorized.
+
+Potential means supported but not collapsed. Probability, score, amplitude, glyph identity,
+object class, transcript and preferred generation are later receiver faces. The same complex may
+therefore retain an `x/t` optical sub-selection while a wider mathematical receiver joins it into
+`g_x/(2t)`. Neither face deletes the other or becomes source identity.
+
+An organ is a returning local operation complex crossing typed ingress and egress apertures.
+An aperture is a partial transport relation, not a scalar bottleneck. It owes the admitted source,
+image, complete inverse-image fibres, excluded exterior, chronology and constitutive response. A
+sample count, patch extent, channel population or latent width is apparatus/source testimony until
+a receiver-visible transport rank is founded. Pinhole, slit and hourglass geometries may transform
+the same entering current differently even when one exterior chart assigns them equal width.
+
+Co-presence does not fuse organs. Local sections first remain a coproduct. They meet only where a
+declared interaction and shared receiver consequence found a commuting pullback or higher cell;
+noncommuting members remain defects. The join may be directional and asymmetric. Each ingress,
+chronology, withdrawal and shared interaction therefore receives its own intervention grade.
+
+Lifted, implemented and cultivated codecs are provenance classes over this same complex:
+
+- **lifted:** authenticated inherited morphology with Phoenix chart maps, defects and fibres;
+- **implemented:** an exact supplied transport law with typed ports and reconstruction relation;
+- **cultivated:** a parented morphology version founded by genuine return, changed later conduct,
+  source-detached remount and attributable ablation.
+
+They meet only through compatible native consequence over admitted successor histories. Source
+labels, coordinate concatenation, string agreement and equal terminal values do not found a join.
+A provisional learned codec remains an unresolved candidate until its return changes reusable
+morphology.
+
+### 5.1 The optical complex is the first inspected instance
 
 Classical OCR normally returns a flat reading-order string, word boxes, or one preferred layout
-segmentation. N1 correctly recovered those exterior faces but its smallest visual bindings are not
-the pinnacle of the shared mathematics/vision ecology.
-
-`definition`: for one raw page occurrence, the native optical body is a finite incidence complex
+segmentation. Those are useful probes and export faces. They are not the target body. For one raw
+page occurrence, E1 returned the bounded optical instance
 
 ```text
 O = (V, I_contain, I_attach, I_align, I_overlap, I_repeat, F, X),
 ```
 
-where `V` contains addressed visual occurrences at several simultaneous grains; the incidence
-relations retain containment, script/fraction/delimiter attachment, baseline alignment, overlap,
-repetition and ordering; `F` retains unresolved alternative covers; and `X` is the open exterior.
+where `V` contains addressed visual occurrences at simultaneous grains; the incidence relations
+retain containment, script/fraction/delimiter attachment, baseline alignment, overlap, repetition
+and ordering; `F` retains alternative covers; and `X` is the open exterior.
 
-The minimum admitted grains are:
+The inspected grains are:
 
 ```text
 ink component
@@ -172,24 +234,20 @@ ink component
 ```
 
 The ordering is incidence, not a demand that every page instantiate every grain. Larger objects do
-not erase their constituents. A whole term is a holon because its subfigures and attachment
-relations remain addressable. A page is a holon for the same reason.
+not erase their constituents. One raster region may belong to several overlapping covers. The same
+printed form in two page positions is not the same occurrence and need not receive the same
+preferred cover: numerator, denominator, script attachment, neighbouring relation, block context,
+and later mathematical consequence can separate them.
 
-One raster region may belong to several overlapping covers. The same printed form in two page
-positions is not the same occurrence and need not receive the same preferred cover: numerator,
-denominator, script attachment, neighbouring relation, block context, and later mathematical
-consequence can separate them. Conversely, a complete term which remains stable under local
-perturbation and mathematical receivers must be returned as one higher optical holon even though
-its glyphs remain visible.
+Object classification is a receiver face. It may name `fraction`, `equation`, `label`, or another
+exposed family after intervention supports the class. It may not replace the incidence complex or
+be routed from OCR strings. The Tesseract program may supply inherited glyph testimony. A
+geometric tesseract may render four actually founded independent binary directions. Neither authors
+native grouping, identity, dimensionality or mathematical transport.
 
-Object classification is a receiver face over this complex. It may name `fraction`, `equation`,
-`label`, or another exposed family after intervention supports the class. It may not replace the
-incidence complex or be routed from OCR strings. Tesseract or another inherited recognizer may
-supply glyph testimony; it cannot author native grouping, identity, or mathematical transport.
+### 5.2 Required optical controls
 
-### 5.1 Required optical controls
-
-The phase must include:
+The optical instance includes:
 
 1. the same printed mathematical term occurring twice in distinct contexts;
 2. a local crop that removes one attachment context;
@@ -198,25 +256,47 @@ The phase must include:
 5. a non-mathematical or diagram region; and
 6. an inherited-glyph ablation.
 
-The return must show which larger holons persist, split, merge, or remain plural. Equal decoded
-text cannot stand in for this grade.
+The returned evidence shows which larger holons persist, split, merge, or remain plural. Equal
+decoded text cannot stand in for this grade.
 
-## 6. Complete foreign modality conduct
+## 6. Complete foreign organs conduct through native potential complexes
 
-The text, vision and audio modules are co-present foreign organs, not semantic taxa. Complete-tower
-work proceeds through typed local ports:
+The text, vision and audio modules are co-present inherited organs, not semantic taxa. E2 uses
+vision and audio because Gemma exposes those authenticated foreign morphologies, not because the
+native ecology contains three fixed modality slots.
 
-- the full Gemma vision tower must carry raw pixels/patch incidence through its authenticated
-  foreign morphology and return its complete local/shared withdrawal into the native ecology;
-- the full Gemma audio tower must carry exact PCM/frame incidence through all twelve authenticated
-  audio layers and return the same class of testimony; and
-- cross-modality claims require naturality/intervention receipts over the shared native
-  consequence, not media labels or equal final text.
+The bounded `HeterogeneousFusionRest` must first be rederived over nominal `BoundaryId` ports and
+source-founded incidence. Its `TextCodeword | VisionPatch | AudioFrame` enum may remain historical
+evidence for I4/N2 but cannot route the active law. Its `width` is apparatus/source extent testimony
+and cannot determine semantic capacity, correspondence or fusion. `OpticalHolonGrain`,
+`MathematicalMediaPort` and `NativeMathematicalPort` likewise remain bounded chart faces only.
 
-Inbound audio recognition and outbound audio production remain distinct ports. N4's already
-returned exact-notation WAV artifact is an outbound projection. It establishes no inbound speech
-recognition. A later voice-production organ may enter through the same typed acoustic port without
-being declared identical to Gemma's audio-understanding organ.
+Complete-tower work then proceeds through existing owners:
+
+- the full Gemma vision tower carries the raw optical potential complex through every authenticated
+  inherited visual operation and returns exact cross-chart maps, local/shared withdrawals,
+  interventions, defects and complete fibres;
+- the full Gemma audio tower carries exact PCM chronology and its multiscale forward/reverse
+  butterfly/path incidence through all twelve authenticated inherited audio layers and returns the
+  same class of testimony without transcript, phoneme, speaker, note or precomputed-feature
+  substitution;
+- the exact mathematics codec enters as an implemented organ at nominal ports and acts only where
+  its operation/constraint/geometry receivers commute with the entering native section; and
+- one already-established cultivated codec morphology crosses beside the inherited and implemented
+  organs, while one provisional codec candidate is retained for E3. This shows all three
+  provenance classes without claiming a new durable change from provisional standing.
+
+Separate conduct precedes joined conduct. A shared consequence requires a founded interaction;
+coordinate concatenation is only a matched apparatus control. The joined experiment must include
+directional withdrawal of each organ, chronology reversal where admitted, and a shared-interaction
+ablation. Equal output or a symmetric aggregate score cannot pass.
+
+Inbound audio recognition and outbound audio production remain distinct aperture occurrences.
+N4's exact-notation WAV is an outbound projection. It establishes no inbound speech recognition.
+A later voice-production organ may cross a compatible acoustic boundary without being identified
+with Gemma's audio-understanding organ. The same law applies to touch, chemical sensors, smell,
+taste, actuation and future apparatus: each supplies incidence and constitutive response; none
+adds a semantic modality branch.
 
 ## 7. World return and cultivation during agentic inference
 
@@ -238,7 +318,7 @@ The native request is the authority. It carries:
 ```text
 product identity
 optional continuation-rest identity
-typed entering occurrences (text, raster/page, PCM/audio, world return)
+nominal typed boundary plus entering occurrence incidence and lineage
 receiver/output apertures
 exterior boundary-selection policy, if any
 frontier/resource aperture
@@ -252,6 +332,7 @@ The native response returns:
 complete emitted occurrences
 updated addressed continuation rest
 plural potentials and every applied exterior quotient
+native potential-complex consequence, cross-chart maps and complete fibres
 native mathematical/operation/constraint/geometry consequence
 optional codec projections
 world-port requests
@@ -262,7 +343,8 @@ exact work and separately calibrated apparatus testimony.
 Compatibility faces may expose `GET /v1/models`, `POST /v1/responses`,
 `POST /v1/chat/completions`, audio transcription/speech, and a realtime stream. Their request IDs,
 roles, messages, chunks and sampling parameters are exterior charts. `previous_response_id` maps
-to an addressed continuation identity. Compatibility faces may not become the internal topology.
+to an addressed continuation identity. Media endpoint names map to nominal exterior boundary
+declarations. Compatibility faces may not become the internal topology.
 
 ## 9. Ordered construction
 
@@ -280,7 +362,7 @@ predecessor remain frozen.
 
 ### E1 — Optical holons grow across scales
 
-Extend N1's component/glyph/spatial complex with the simultaneous incidence tower in §5. Return
+Extend N1's component/glyph/spatial complex with the simultaneous incidence tower in §5.1. Return
 nested and overlapping optical holons, their alternative covers, object-class receiver faces,
 controls, ablation, raw overlay, detached remount, and a native mathematical consequence that
 depends on a higher term/equation object while retaining its glyph fibre.
@@ -289,34 +371,68 @@ depends on a higher term/equation object while retaining its glyph fibre.
 control must distinguish occurrence identity from form kinship and show context-sensitive cover;
 every larger holon reconstructs its addressed constituents and relations.
 
-### E2 — The complete foreign towers meet the native ecology
+### E2 — Complete inherited organs cross native potential complexes
 
-Conduct the full inherited vision and twelve-layer audio towers, separately and jointly, through
-the existing N2 entry ecology. Return complete local/shared withdrawals, naturality squares,
-interventions, ablations, apparatus residency, and reconstruction fibres.
+E2 is one phase with six owner-local stations. A station does not advance the construction state;
+the phase passes only when the coherent return closes all six.
 
-**Pass grade:** no projection-only substitute, transcript substitute, precomputed feature file,
-media-label routing, or CPU semantic replay.
+1. **Generic boundary:** rederive the active heterogeneous rest over nominal `BoundaryId` ports,
+   source-founded incidence and generic local/shared fibres. Remove `ModalityPort` from the active
+   dependency cone without an alias, fallback or dual schema. Keep every numerical extent in
+   apparatus/source testimony.
+2. **Native instances:** expose E1's optical incidence and the exact PCM/butterfly/path chronology
+   as two instances of the same carrier-neutral section/operation contract. Do not add an audio
+   variant to `OpticalHolonGrain` or create a potential-complex wrapper.
+3. **Complete inherited conduct:** carry the full Gemma vision tower and all twelve authenticated
+   audio layers separately on the resident card, attaching each foreign frontier to its native
+   entering and returned occurrence rather than to a transcript or feature file.
+4. **Founded join:** conduct the two organs together only through a declared shared consequence.
+   Return every cross-chart naturality square, noncommuting defect, local/shared withdrawal,
+   directional intervention, chronology control and complete reconstruction fibre. Coordinate
+   concatenation remains a matched control.
+5. **Codec provenance crossing:** let the implemented mathematics codec and one already-established
+   cultivated codec morphology meet the inherited organs through nominal ports. Retain one
+   provisional returned-codec candidate for E3. Show compatible consequence and retained defect
+   without allowing provenance to route conduct or claiming a new durable learning event here.
+6. **Continuation and apparatus:** detach/remount the semantic rest, repeat targeted ablations,
+   continue from the addressed occurrence, and return exact work plus separate residency,
+   transfer, launch, synchronization, pressure and obstruction testimony.
+
+**Pass grade:** both complete towers conduct from raw caused occurrences; at least one local
+potential unavailable to a string/transcript receiver changes or separates a later shared
+consequence; all three codec provenances cross one native contract; asymmetric withdrawal
+separates the shared interaction from either local organ; the generic rest survives
+source-detached remount; the card owns every hot semantic front. A projection-only substitute,
+transcript, precomputed feature file, media-label branch, coordinate concatenation offered as
+fusion, CPU semantic replay, or authored semantic capacity fails.
 
 ### E3 — Agentic return changes the same continuation
 
-Let a recurrent Athena emission cross at least two distinct typed world ports. Return the actual
-world consequences to the same addressed continuation, retain declined and committed siblings,
-deposit the least attributable morphology, detach/remount, show changed later conduct, ablate it,
-and restore the predecessor exactly.
+Let a recurrent Athena emission cross at least two nominal organ/world apertures with different
+incidence and at least one asymmetric shared consequence. Return the actual consequences to the
+same addressed continuation, retain declined and committed siblings, and cultivate at least one
+parented codec morphology from a provisional E2 candidate. Deposit the least attributable
+morphology, detach/remount, show changed held-out conduct through the cultivated boundary, ablate
+it, and restore the predecessor exactly.
 
-**Pass grade:** a private echo, prompt append without durable return, lookup, or lossless exchange
-archive fails.
+**Pass grade:** source lineage does not route the changed conduct; withdrawing the cultivated
+codec removes only its attributable consequence; withdrawing either coupled organ returns the
+directional defect predicted by E2; exact withdrawal restores the predecessor. A private echo,
+prompt append without durable return, lookup, lossless exchange archive, counter increment or
+single-modality label fails.
 
 ### E4 — The inference membrane serves the native body
 
 Expose the native protocol and its compatibility faces. Stream caused frontier occurrences and
-their receipts; resume by continuation identity; accept typed optical/audio/world occurrences;
-support explicit ablation/withdrawal authorization; and preserve one product owner.
+their receipts; resume by continuation identity; accept generic nominal organ/world occurrences
+with source incidence; support explicit ablation/withdrawal authorization; and preserve one
+product owner. Text, image, audio, realtime and later sensor endpoints are exterior adapters onto
+that one membrane.
 
 **Pass grade:** fresh client process, source-detached product, concurrent independent requests with
 an interchange receipt, no host semantic foreman, no compatibility schema inside the semantic
-dependency cone, and deterministic/application error separation.
+dependency cone, no media enum inside the native request, and deterministic/application error
+separation.
 
 ### E5 — The agentic laboratory Athena freezes
 
@@ -326,10 +442,13 @@ dissection, reconstruction fibres, saturation frontier, marginal-excitation test
 withdrawals, and complete-product cost.
 
 **Pass grade:** unrestricted conversational generation over the declared aperture; hierarchical
-page mathematics intake; inbound audio/vision conduct and optional outbound projections; native
-mathematical consequence; continued world return; source-detached rest/remount; and strict
-receiver-relative condensation where claimed. Competence is graded by held-out conduct and
-separating interventions, never by self-description.
+page mathematics intake; inherited, implemented and cultivated organs meeting through native
+consequence; inbound audio/vision conduct and optional outbound projections; native mathematical
+consequence; continued world return; source-detached rest/remount; directional organ ablations;
+and strict receiver-relative condensation where claimed. The capability atlas must state each
+organ's ingress, constitutive transport, joins, receiver-visible rank, fibres, saturation frontier
+and open exterior without treating source names as faculties. Competence is graded by held-out
+conduct and separating interventions, never by self-description.
 
 ## 10. Saturation and marginal lift
 
@@ -364,13 +483,15 @@ Read, in order:
 4. this file;
 5. `canon/THE_HOLOBROCHOS_SPINE.md`;
 6. `canon/TABLET_THE_REASONING_CYCLE.md`;
-7. `canon/TABLET_THE_OPERATIONS.md`;
-8. `canon/TABLET_THE_MANIFOLD.md`;
-9. `canon/THE_SURFACES_ARE_PATHS.md`;
-10. `canon/TABLET_THE_HEXIS.md`;
-11. `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`;
-12. `canon/TABLET_THE_CAUSAL_PROFILE.md`; and
-13. only the source owners and evidence closure of the current E-deed.
+7. `research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`;
+8. `canon/TABLET_THE_OPERATIONS.md`;
+9. `canon/TABLET_THE_MANIFOLD.md`;
+10. `canon/THE_SURFACES_ARE_PATHS.md`;
+11. `canon/TABLET_THE_HEXIS.md`;
+12. `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`;
+13. `canon/TABLET_THE_CAUSAL_PROFILE.md`; and
+14. only the source owners and evidence closure of the current E-deed.
 
 Do not reread the research archive by default. E1 has passed; E2 is the sole next deed until it
-passes.
+passes. E2 begins with the generic nominal-boundary correction in §9; its six internal stations do
+not authorize a state advance before the complete phase return.

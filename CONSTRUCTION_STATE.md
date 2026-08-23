@@ -9,15 +9,29 @@ holons and native ordered constraint sections over one raw mathematical page.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — E1 PASSED; E2 COMPLETE FOREIGN VISION/AUDIO TOWER CONDUCT IS THE SOLE
-AUTHORIZED NEXT DEED.**
+**CURRENT FRONTIER — E1 PASSED; E2 COMPLETE INHERITED ORGANS CROSSING NATIVE POTENTIAL COMPLEXES
+IS THE SOLE AUTHORIZED NEXT DEED.**
 
 [project-postulate] The active construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
-E2 must conduct Gemma's complete inherited vision and twelve-layer audio towers, separately and
-jointly, through the existing native ecology. It must return local/shared withdrawals, naturality,
-intervention, ablation, resident-apparatus and reconstruction testimony. Projection-only,
-transcript, precomputed-feature, media-label routing and CPU-semantic substitutes do not pass.
+E2 begins by rederiving the active bounded `TextCodeword | VisionPatch | AudioFrame` fusion over
+the existing nominal `BoundaryId`/operation-complex contract; source and latent extents remain
+apparatus testimony and no media enum may route the native law. It must then conduct Gemma's
+complete inherited vision and twelve-layer audio towers separately and through a founded shared
+interaction; cross the implemented mathematics codec and one already-established cultivated codec
+morphology through the same native potential-complex contract; retain one provisional codec
+candidate for E3; and return directional withdrawals,
+chronology controls, naturality, defects, intervention, ablation, source-detached continuation,
+resident-apparatus and complete reconstruction testimony. Projection-only, transcript,
+precomputed-feature, media-label, coordinate-concatenation and CPU-semantic substitutes do not
+pass. E2's six internal stations do not advance this position independently.
+
+[definition] The carrier-neutral law is [`canon/TABLET_THE_REASONING_CYCLE.md`](canon/TABLET_THE_REASONING_CYCLE.md)
+§8c. The complete derivation and source audit are
+[`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`](research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md).
+E1's optical hierarchy is the first inspected instance of that potential complex, not a fixed
+vision ontology. Lifted, implemented and cultivated codecs are lineage classes which meet only
+through compatible native consequence over admitted successor histories.
 
 [established-bounded] E1 grew one raw mathematical page into 4,024 simultaneous component-through-
 page optical holons, 14,536 incidences, 1,305 complete alternative covers and 239 repeated-form
@@ -91,10 +105,12 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] E2 now owns full foreign vision/audio tower inference; E3 retains returned agentic
-cultivation; E4 retains the inference membrane; and E5 retains the frozen agentic product. The
-twelve-layer audio tower was not inferred from the successful N2 projection. X0--X2, Qwen, wider
-cross-model fusion, and unrelated alternatives remain unscheduled.
+[open] E2 now owns complete inherited-organ conduct through native potential complexes; E3 retains
+returned arbitrary-organ and codec cultivation; E4 retains the generic inference membrane; and E5
+retains the frozen agentic product. The twelve-layer audio tower was not inferred from the
+successful N2 projection. Unknown-carrier codec induction and touch/chemical/smell/taste apparatus
+remain open future apertures rather than modality subsystems. X0--X2, Qwen, wider cross-model
+fusion, and unrelated alternatives remain unscheduled.
 
 [historical] L0--L4 passed their then-declared fixture grades, but their designation as the
 laboratory's production Athena and every inference boundary that requires a Lean proof face are

@@ -15,7 +15,9 @@ law-family and unknown-codec reconstruction.
 **Evidentiary deposits:**
 `research/records/2026-08-12_THE_PRETRAINED_TRANSFORMER_IS_ONE_TRANSPORT_ORGAN_THE_REASONING_MACHINE_IS_THE_RETURNING_ECOLOGY.md`
 and
-`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`.
+`research/records/2026-08-12_THE_MACHINE_ALREADY_HAS_THE_ORGANS_INTELLIGENCE_IS_THE_CIRCULATION_THAT_CHANGES_THE_TERRAIN.md`,
+with the arbitrary-organ composition derived in
+`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`.
 **Construction evidence:**
 `research/records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`
 and
@@ -402,6 +404,49 @@ or a claim that Eros is identical to an inherited neural-network architecture.
 
 Complete derivation, industry-source distinctions, owner map, and boundaries:
 `research/records/2026-08-18_THE_FUTURE_IS_A_PLURAL_CAUSAL_SECTION_SOFTMAX_IS_ITS_LOCAL_LAPLACIAN_AND_THE_ADJOINT_RETURNS_THROUGH_STATE.md`.
+
+## 8c. Every organ crosses the same kind of potential complex
+
+`definition`: for an entering occurrence `e`, an aperture `a` and receiver family `Rho`, a
+**potential complex** is the situated pre-quotient restriction of the holonic section space:
+
+```text
+P(e,a;Rho) =
+  (K_(e,a), S_(e,a), T_(e,a), Rho, Lambda_(e,a), ell_(e,a), F_(e,a;Rho), O_(e,a)).
+```
+
+`F` retains unresolved covers, plural continuations, complete reconstruction fibres and defects.
+Potential here means admitted-but-not-collapsed transport, not probability. A probability,
+amplitude, score, glyph, transcript, object class or preferred continuation is a receiver face over
+`P`.
+
+`definition`: an organ is a returning local operation complex with a typed ingress aperture,
+constitutive morphology, egress/return aperture, receiver family, lineage and open exterior. An
+aperture is generally a partial transport relation; it owes its domain, image, inverse-image fibres
+and excluded exterior. Width, sample count, patch extent, channel population and latent dimension
+remain apparatus testimony until receiver-visible transport founds a capacity face.
+
+`project-postulate`: optical, acoustic, tactile, chemical, textual and mathematical names remain
+source lineage and experimental controls. They do not select the internal law. Co-present organ
+sections join only where a declared interaction makes their receiver maps commute; incompatible
+members remain defects. The join may be directional and asymmetric, so each ingress, chronology
+and shared interaction owes its own intervention and withdrawal receipt.
+
+`definition`: lifted, implemented and cultivated codecs are three provenance classes over the
+same topology. A lifted codec carries inherited morphology and source/native defects; an
+implemented codec carries a supplied exact law and its reconstruction relation; a cultivated codec
+is a parented morphology version founded by genuine return and changed later conduct. They meet
+only through compatible native consequence over admitted successor histories. Codec lineage,
+coordinate extent and equal terminal output do not found the join.
+
+`project-postulate`: **potential complex is a role of the existing section/operation owners, not a
+new semantic cabinet**. A media enum may type a bounded exterior fixture; it may not govern an
+arbitrary-organ circulation. Tesseract OCR may supply inherited glyph testimony, while a geometric
+tesseract may render four founded independent binary directions; neither determines the
+hypergeometry of the live interaction complex.
+
+Complete derivation, sensory-coupling example, source audit and construction boundary:
+`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`.
 
 ## 9. Construction discipline and falsifiers
 

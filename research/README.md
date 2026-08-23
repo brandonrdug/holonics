@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 595 research deposits current through 23 August 2026, including all 307
+`records/` contains 596 research deposits current through 23 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -80,6 +80,13 @@ governs the rebuild.
   residual standing, training as adjoint return, the complete model-world recurrence, cross-codec
   operation equivalence under interventions, self-similarity and section modulus, and the minimal
   recurrent-section machine. Compressed into `../canon/TABLET_THE_REASONING_CYCLE.md`.
+- **Carrier-neutral potential complexes and arbitrary organ apertures:**
+  `records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`
+  — E1's optical hierarchy as the first inspected instance of the existing hypergeometry;
+  potential as the pre-quotient section rather than probability; apertures as partial transports;
+  asymmetric cross-organ joins; lifted, implemented and cultivated codec provenance; and the
+  exact correction from a fixed media enum to existing nominal boundaries. Compressed into
+  `../canon/TABLET_THE_REASONING_CYCLE.md` §8c and scheduled by the active E blueprint.
 - **Contact-preserving causal sections and cross-codec operation conduct:**
   `records/2026-08-12_THE_CONTACT_FACE_CROSSES_THE_BOND_CONDUCT_NOT_THE_CODEC_FOUNDS_THE_SECTION_CLASS.md`
   — declared contact faces retained through bonds without governing classification; a finite
