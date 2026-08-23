@@ -135,6 +135,7 @@ import ElementaryHolonics.Millennium.GeneralMordell
 import ElementaryHolonics.Millennium.GeneralTwoTorsion
 import ElementaryHolonics.Millennium.GeneralRealPlace
 import ElementaryHolonics.Millennium.GeneralTwoAdic
+import ElementaryHolonics.Millennium.GeneralOddPlace
 import ElementaryHolonics.Millennium.MillenniumInstance
 import ElementaryHolonics.Millennium.FamilyPeriod
 import ElementaryHolonics.Millennium.FamilyImage
