@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.BilinearMap
 import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
 
 /-!
@@ -8,11 +9,12 @@ This module turns three adjacent subjects into explicit interfaces over the mate
 
 * `MaterialCirculationBalance` retains pressure, viscous, and forcing returns separately.  Pressure
   cancels around the closed boundary, and zero viscous/forcing return gives the Kelvin conclusion.
-* `PolygonGaussBonnet` retains a bulk curvature population and every boundary turn.  The
-  bulk-plus-boundary law makes total angle excess equal total curvature.
-* `EinsteinFluidDynamics` couples a curvature occurrence to a stress-energy occurrence only after
-  a receiver selects comparable scalar faces.  The source is constituted from the actual velocity
-  and pressure, and its divergence return is required to vanish.
+* `PolygonGaussBonnet` retains a bulk curvature population and every boundary turn;
+  `TriangulatedGaussBonnetLedger` derives the bulk-plus-boundary theorem from local triangle budgets
+  and an Euler incidence return.
+* `EinsteinFluidDynamics` constitutes a covariant stress-energy tensor field from the actual
+  velocity and pressure.  The field equation, Bianchi return, and metric compatibility derive
+  source conservation, and declared receivers read both the field equation and conservation.
 
 The interfaces make the named laws available for subsequent analytic and geometric construction:
 later modules can derive the circulation balance from the PDE, realize the curvature ledger from a
@@ -41,7 +43,7 @@ structure MaterialCirculationBalance
   viscousReturn : ℝ → ℝ → ℝ
   forcingReturn : ℝ → ℝ → ℝ
   balance : ∀ s t, 0 ≤ s → 0 ≤ t →
-    body.polygon.velocityCirculation t - body.polygon.velocityCirculation s =
+    body.polygon.symmetricVelocityCirculation t - body.polygon.symmetricVelocityCirculation s =
       (∑ i, body.polygon.pressureIncrementAt pressure t i) +
         viscousReturn s t + forcingReturn s t
 
@@ -52,7 +54,7 @@ theorem MaterialCirculationBalance.change_eq_viscous_add_forcing
     {pressure : PressureField}
     {body : SolutionMaterialPolygon extra nu initial force velocity pressure}
     (law : MaterialCirculationBalance body) {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
-    body.polygon.velocityCirculation t - body.polygon.velocityCirculation s =
+    body.polygon.symmetricVelocityCirculation t - body.polygon.symmetricVelocityCirculation s =
       law.viscousReturn s t + law.forcingReturn s t := by
   rw [law.balance s t hs ht, body.polygon.sum_pressureIncrementAt_eq_zero]
   simp
@@ -67,10 +69,11 @@ theorem MaterialCirculationBalance.kelvin
     (hviscous : ∀ s t, 0 ≤ s → 0 ≤ t → law.viscousReturn s t = 0)
     (hforcing : ∀ s t, 0 ≤ s → 0 ≤ t → law.forcingReturn s t = 0)
     {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
-    body.polygon.velocityCirculation t = body.polygon.velocityCirculation s := by
+    body.polygon.symmetricVelocityCirculation t = body.polygon.symmetricVelocityCirculation s := by
   have hchange := law.change_eq_viscous_add_forcing hs ht
   rw [hviscous s t hs ht, hforcing s t hs ht] at hchange
-  have hzero : body.polygon.velocityCirculation t - body.polygon.velocityCirculation s = 0 := by
+  have hzero : body.polygon.symmetricVelocityCirculation t -
+      body.polygon.symmetricVelocityCirculation s = 0 := by
     simpa using hchange
   exact sub_eq_zero.mp hzero
 
@@ -138,63 +141,147 @@ theorem PolygonTurnLedger.toGaussBonnetZero_angleExcess
   rw [PolygonGaussBonnet.angleExcess_eq_sum_curvature]
   simp
 
-/-! ## 3. Einstein dynamics as a fluid-constituted, receiver-indexed field equation -/
+/-- A triangulated bulk/boundary ledger from which Gauss--Bonnet is derived.  Each triangular face
+supplies its angle budget, while `combinatorialCount` is the Euler incidence return of the chosen
+triangulation. -/
+structure TriangulatedGaussBonnetLedger
+    (Interior Boundary Face : Type*) [Fintype Interior] [Fintype Boundary] [Fintype Face] where
+  cornerAngle : Sum Interior Boundary → Face → ℝ
+  eulerCharacteristic : ℤ
+  faceAngleBudget : ∀ face, ∑ vertex, cornerAngle vertex face = Real.pi
+  combinatorialCount :
+    (2 : ℝ) * (eulerCharacteristic : ℝ) =
+      2 * (Fintype.card Interior : ℝ) + (Fintype.card Boundary : ℝ) -
+        (Fintype.card Face : ℝ)
 
-/-- A receiver-indexed Einstein/fluid dynamics interface.  `stressLaw` constructs the source from
-the actual local velocity and pressure.  Curvature and stress-energy may have different internal
-carriers; a receiver supplies the two comparable faces. -/
+/-- Curvature retained at one interior vertex. -/
+def TriangulatedGaussBonnetLedger.bulkCurvature
+    {Interior Boundary Face : Type*} [Fintype Interior] [Fintype Boundary] [Fintype Face]
+    (ledger : TriangulatedGaussBonnetLedger Interior Boundary Face) (i : Interior) : ℝ :=
+  2 * Real.pi - ∑ face, ledger.cornerAngle (.inl i) face
+
+/-- Turning retained at one boundary vertex. -/
+def TriangulatedGaussBonnetLedger.boundaryTurn
+    {Interior Boundary Face : Type*} [Fintype Interior] [Fintype Boundary] [Fintype Face]
+    (ledger : TriangulatedGaussBonnetLedger Interior Boundary Face) (b : Boundary) : ℝ :=
+  Real.pi - ∑ face, ledger.cornerAngle (.inr b) face
+
+/-- **Discrete Gauss--Bonnet from local face budgets and Euler incidence.** -/
+theorem TriangulatedGaussBonnetLedger.gaussBonnet
+    {Interior Boundary Face : Type*} [Fintype Interior] [Fintype Boundary] [Fintype Face]
+    (ledger : TriangulatedGaussBonnetLedger Interior Boundary Face) :
+    (∑ i, ledger.bulkCurvature i) + ∑ b, ledger.boundaryTurn b =
+      2 * Real.pi * (ledger.eulerCharacteristic : ℝ) := by
+  have hcorner :
+      (∑ vertex : Sum Interior Boundary, ∑ face, ledger.cornerAngle vertex face) =
+        (Fintype.card Face : ℝ) * Real.pi := by
+    rw [Finset.sum_comm]
+    calc
+      (∑ face, ∑ vertex, ledger.cornerAngle vertex face) =
+          ∑ _face : Face, Real.pi := by
+        apply Finset.sum_congr rfl
+        intro face _
+        exact ledger.faceAngleBudget face
+      _ = (Fintype.card Face : ℝ) * Real.pi := by simp
+  simp only [TriangulatedGaussBonnetLedger.bulkCurvature,
+    TriangulatedGaussBonnetLedger.boundaryTurn, Finset.sum_sub_distrib,
+    Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+  simp only [Fintype.sum_sum_type] at hcorner
+  linear_combination - hcorner - Real.pi * ledger.combinatorialCount
+
+/-! ## 3. Einstein dynamics as curvature-to-fluid conservation transport -/
+
+/-- A space-time event on the current fluid chart. -/
+abbrev FluidEvent := Space × ℝ
+
+/-- A bilinear tensor field over fluid events, with an abstract space-time tangent fibre `V`. -/
+abbrev TensorField (V : Type*) [AddCommGroup V] [Module ℝ V] :=
+  FluidEvent → LinearMap.BilinForm ℝ V
+
+/-- A covector field over the same events, the natural target of divergence for covariant
+bilinear tensor fields before any metric musical isomorphism raises the remaining index. -/
+abbrev CovectorField (V : Type*) [AddCommGroup V] [Module ℝ V] :=
+  FluidEvent → Module.Dual ℝ V
+
+/-- A receiver-indexed Einstein/fluid dynamics interface.  `stressLaw` constitutes stress-energy
+from the actual local velocity and pressure.  The field equation, contracted Bianchi return, and
+metric compatibility are retained separately; conservation of the fluid source is derived below. -/
 structure EinsteinFluidDynamics
     (velocity : VelocityField) (pressure : PressureField)
-    (Curvature Stress Receiver Flux : Type*) [Zero Flux] where
-  curvatureAt : Space → ℝ → Curvature
-  stressLaw : Space → ℝ → Space → ℝ → Stress
-  curvatureFace : Receiver → Curvature → ℝ
-  stressFace : Receiver → Stress → ℝ
-  stressDivergence : (Space → ℝ → Stress) → Space → ℝ → Flux
+    (V Receiver : Type*) [AddCommGroup V] [Module ℝ V] where
+  metric : TensorField V
+  einstein : TensorField V
+  stressLaw : Space → ℝ → Space → ℝ → LinearMap.BilinForm ℝ V
+  covDiv : TensorField V →ₗ[ℝ] CovectorField V
+  tensorReceiver : Receiver → TensorField V →ₗ[ℝ] ℝ
+  conservationReceiver : Receiver → CovectorField V →ₗ[ℝ] ℝ
+  cosmologicalConstant : ℝ
   coupling : ℝ
-  fieldEquation : ∀ receiver x t,
-    curvatureFace receiver (curvatureAt x t) =
-      coupling * stressFace receiver (stressLaw x t (velocity x t) (pressure x t))
-  sourceConserved : ∀ x t,
-    stressDivergence (fun y τ ↦ stressLaw y τ (velocity y τ) (pressure y τ)) x t = 0
+  coupling_ne_zero : coupling ≠ 0
+  fieldEquation :
+    einstein + cosmologicalConstant • metric =
+      coupling • (fun event ↦
+        stressLaw event.1 event.2 (velocity event.1 event.2) (pressure event.1 event.2))
+  contractedBianchi : covDiv einstein = 0
+  metricCompatible : covDiv metric = 0
 
-/-- The stress-energy occurrence constituted by the fluid fields. -/
-def EinsteinFluidDynamics.stressAt
+/-- The tensor-field stress-energy occurrence constituted by the fluid fields. -/
+def EinsteinFluidDynamics.stressEnergy
     {velocity : VelocityField} {pressure : PressureField}
-    {Curvature Stress Receiver Flux : Type*} [Zero Flux]
-    (dynamics : EinsteinFluidDynamics velocity pressure Curvature Stress Receiver Flux)
-    (x : Space) (t : ℝ) : Stress :=
-  dynamics.stressLaw x t (velocity x t) (pressure x t)
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver) : TensorField V :=
+  fun event ↦ dynamics.stressLaw event.1 event.2
+    (velocity event.1 event.2) (pressure event.1 event.2)
 
-/-- The fluid-constituted stress-energy occurrence satisfies the declared conservation return. -/
-theorem EinsteinFluidDynamics.stressAt_conserved
+/-- **Einstein-to-fluid conservation transport.**  The field equation, contracted Bianchi return,
+metric compatibility, and nonzero coupling force covariant conservation of the constituted
+stress-energy field. -/
+theorem EinsteinFluidDynamics.stressEnergy_conserved
     {velocity : VelocityField} {pressure : PressureField}
-    {Curvature Stress Receiver Flux : Type*} [Zero Flux]
-    (dynamics : EinsteinFluidDynamics velocity pressure Curvature Stress Receiver Flux)
-    (x : Space) (t : ℝ) :
-    dynamics.stressDivergence dynamics.stressAt x t = 0 := by
-  exact dynamics.sourceConserved x t
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver) :
+    dynamics.covDiv dynamics.stressEnergy = 0 := by
+  have h := congrArg (fun tensor ↦ dynamics.covDiv tensor) dynamics.fieldEquation
+  change dynamics.covDiv
+      (dynamics.einstein + dynamics.cosmologicalConstant • dynamics.metric) =
+    dynamics.covDiv (dynamics.coupling • dynamics.stressEnergy) at h
+  simp only [map_add, LinearMap.map_smul_of_tower, dynamics.contractedBianchi,
+    dynamics.metricCompatible, smul_zero, add_zero] at h
+  rw [← inv_smul_smul₀ dynamics.coupling_ne_zero
+    (dynamics.covDiv dynamics.stressEnergy)]
+  rw [← h, smul_zero]
 
-/-- Select the project's depth-two arc/differential coupling for the field equation. -/
+/-- Every declared current receiver reads the derived conservation return as zero. -/
+theorem EinsteinFluidDynamics.everyReceiver_reads_conservation
+    {velocity : VelocityField} {pressure : PressureField}
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver) (receiver : Receiver) :
+    dynamics.conservationReceiver receiver (dynamics.covDiv dynamics.stressEnergy) = 0 := by
+  rw [dynamics.stressEnergy_conserved]
+  exact map_zero (dynamics.conservationReceiver receiver)
+
+/-- Select the project's depth-two arc/differential coupling for the tensor field equation. -/
 def EinsteinFluidDynamics.UsesRefineForkCoupling
     {velocity : VelocityField} {pressure : PressureField}
-    {Curvature Stress Receiver Flux : Type*} [Zero Flux]
-    (dynamics : EinsteinFluidDynamics velocity pressure Curvature Stress Receiver Flux)
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver)
     (arc differential : ℝ) : Prop :=
   dynamics.coupling = refineForkCoupling 2 0 arc differential
 
-/-- **Receiver equation at the holonic depth-two coupling.**  Every receiver reads curvature as
-`4 * (C / r)` times its fluid stress-energy face. -/
+/-- **Receiver equation at the holonic depth-two coupling.**  Every linear tensor receiver reads
+the Einstein side as `4 * (C / r)` times its fluid stress-energy face. -/
 theorem EinsteinFluidDynamics.receiverEquation_fourArcOverDifferential
     {velocity : VelocityField} {pressure : PressureField}
-    {Curvature Stress Receiver Flux : Type*} [Zero Flux]
-    (dynamics : EinsteinFluidDynamics velocity pressure Curvature Stress Receiver Flux)
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver)
     {arc differential : ℝ} (hdifferential : differential ≠ 0)
     (hcoupling : dynamics.UsesRefineForkCoupling arc differential)
-    (receiver : Receiver) (x : Space) (t : ℝ) :
-    dynamics.curvatureFace receiver (dynamics.curvatureAt x t) =
-      (4 * (arc / differential)) * dynamics.stressFace receiver (dynamics.stressAt x t) := by
-  rw [dynamics.fieldEquation receiver x t, hcoupling,
+    (receiver : Receiver) :
+    dynamics.tensorReceiver receiver
+        (dynamics.einstein + dynamics.cosmologicalConstant • dynamics.metric) =
+      (4 * (arc / differential)) *
+        dynamics.tensorReceiver receiver dynamics.stressEnergy := by
+  rw [dynamics.fieldEquation, map_smul, hcoupling,
     refineForkCoupling_two_zero arc differential hdifferential]
   rfl
 
@@ -204,7 +291,9 @@ section Audit
 #print axioms MaterialCirculationBalance.kelvin
 #print axioms PolygonGaussBonnet.angleExcess_eq_sum_curvature
 #print axioms PolygonTurnLedger.toGaussBonnetZero_angleExcess
-#print axioms EinsteinFluidDynamics.stressAt_conserved
+#print axioms TriangulatedGaussBonnetLedger.gaussBonnet
+#print axioms EinsteinFluidDynamics.stressEnergy_conserved
+#print axioms EinsteinFluidDynamics.everyReceiver_reads_conservation
 #print axioms EinsteinFluidDynamics.receiverEquation_fourArcOverDifferential
 
 end Audit

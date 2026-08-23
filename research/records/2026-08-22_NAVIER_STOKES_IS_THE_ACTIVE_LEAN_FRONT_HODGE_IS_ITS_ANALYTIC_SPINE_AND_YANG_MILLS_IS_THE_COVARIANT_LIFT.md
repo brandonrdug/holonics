@@ -124,6 +124,119 @@ ordered transports, scale families, and the population collapsed by a receiver. 
 lemma must be earned as an actual shared type or commuting passage; the word “holonic” alone is not
 the bridge.
 
+## The material-polygon insertion belongs to Navier--Stokes
+
+`[definition]` Brandon's n-gon, unicursal-stroke, angle, gyroparallelogram, time-orientation,
+heat/entropy, and gravity prompt is attached to the Navier--Stokes worktrack. The immediate order is
+therefore `local vorticity -> material polygon -> circulation evolution -> periodic/Hodge
+decomposition -> scale-local flux`; it is not a separate general-relativity schedule.
+
+`[established-bounded; measured]` The available Claude transcript contains the late n-gon and
+gyroparallelogram prompts but no direct prose response after them. Claude continued the BSD family
+descent. His six “pins” are six arithmetic placement lemmas using sign, `p`-adic valuation parity,
+and `2`-adic valuation parity; the three binary readings produce eight cells. They are not six
+geometric vertices, and no `2^6 -> hexagon` theorem is present.
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesMaterialPolygon.lean` now defines an
+`extra + 3`-vertex Lagrangian polygon on the actual `NavierStokes.Space` carrier. Every addressed
+vertex has a genuine within-derivative and obeys the velocity field through `derivWithin` on the
+oriented half-line `Ici 0`; every time-slice retains its full cyclic edge population; and Lean
+proves that the oriented boundary sum is zero at every time. `SolutionMaterialPolygon` binds this
+carrier to the velocity and pressure of one admitted `SmoothSolution`.
+
+`[proved-derived; formal-checked]` At every receiver time, the complete cyclic population of
+pressure differences telescopes to zero. The module also defines a left-endpoint polygonal
+circulation receiver and proves that a spatially constant current has zero circulation because the
+retained edge population closes.
+
+`[proved-derived; formal-checked]` The stronger material face is the symmetric/trapezoidal edge
+pairing, which retains the current at both endpoints. Lean proves that the contribution caused by
+motion of the material edges is half a cyclic kinetic-energy difference on each edge and therefore
+cancels exactly around the closed polygon.
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesCurvedTransport.lean` installs the Kelvin
+interface on an admitted `SmoothSolution`: `MaterialCirculationBalance` retains pressure-edge,
+viscous, and forcing returns separately; cyclic cancellation removes pressure; and Lean proves the
+finite material Kelvin theorem for the symmetric circulation on the zero-viscous-return and
+zero-forcing-return fibre.
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesKelvin.lean` now owns the genuine closed
+path receiver: velocity is lowered to a spatial one-form by the Euclidean inner product and
+integrated with Mathlib's `curveIntegral`. `KelvinCertificate` proves that a differentiable
+curve-circulation with zero derivative on `Ici 0` is constant between every two nonnegative times;
+`CurveCirculationBalance` reaches the same result by setting its retained source to zero.
+
+`[open]` The next Kelvin deed differentiates the time-dependent curve integral, derives its source
+from `SmoothSolution.momentum`, realizes viscosity and force as boundary/area fluxes, and proves the
+polygon-to-smooth-loop passage. The finite and curve-integral receivers now expose both ends of that
+analytic construction.
+
+`[proved-derived; formal-checked]` `PolygonTurnLedger` retains every interior and exterior angle,
+a declared half-turn, the local supplementary law, and the winding-one exterior return. From those
+explicit hypotheses Lean derives the interior sum `(extra + 1) * halfTurn`, hence
+`(extra + 1) * pi` for an `extra + 3`-gon. `TurnPresentation` separately proves that the
+actual-minus-reference defect is additive under componentwise pairing and invariant under a common
+additive coordinate shift.
+
+`[proved-derived; formal-checked]` `PolygonGaussBonnet` now retains an addressed bulk-curvature
+population beside all boundary angles, assumes the bulk-plus-boundary full-turn law, and proves
+that total angle excess is exactly total bulk curvature. The previous flat turn ledger embeds as
+its zero-curvature fibre.
+
+`[proved-derived; formal-checked]` `TriangulatedGaussBonnetLedger` reaches below that interface: it
+retains every face/corner angle, assumes only the triangular face-angle budget and the Euler
+incidence count of the chosen triangulation, defines interior curvature and boundary turning
+locally, and derives the discrete Gauss--Bonnet sum
+`sum bulkCurvature + sum boundaryTurn = 2 * pi * eulerCharacteristic`.
+
+`[open]` The Gauss--Bonnet realization deed now has exact ports: construct principal boundary turns
+and bulk curvature from a metric connection, derive the retained bulk-plus-boundary law, and bridge
+the existing crossing ledger's winding to that realized geometry.
+
+`[proved-derived; formal-checked]` `ReturnedQuadrilateral` retains source, two transported arms,
+and the actual returned point. Its flat fourth point is proved equal to a frozen-board Swing through
+the left anchor followed by transport of the right edge; subtracting that completion gives a
+translation-invariant return defect. On a scalar field, its undivided four-point face is the
+existing `swingPair`, and the existing affine rebase theorem transports its two coordinates by one
+common square. A nonzero affine scale and an admissible starting pair preserve both admissibility
+and projective equivalence.
+
+`[proved-derived; formal-checked]` `Geometry/Gyrogroup.lean` now owns the gyrogroup operation, zero,
+inverse, gyration equivalences, gyroassociativity, gyration automorphism, loop law,
+gyrocommutativity predicate, coaddition, and based gyroparallelogram. Its exact additive instance
+proves that the gyroparallelogram reduces to `left + right - source`; the material-quadrilateral
+module proves this is the same completion obtained by Swing followed by edge transport.
+
+`[proved-standard; cited]` The implemented gyrocommutative completion uses Ungar's standard
+condition `D = (B boxplus C) minus A`, equivalently the gyrovector law relating the two based arms
+to the returned diagonal; see [Ungar, *Hyperbolic Barycentric Coordinates*](https://ajmaa.org/searchroot/files/pdf/v6n1/v6i1p18.pdf).
+
+`[open]` The next gyrogeometric deed is the nontrivial Möbius or Einstein-ball instance, after which
+the repository's measured finite `Gyration` can be compared to its path-return automorphisms and
+Thomas-precession face through an explicit homomorphism.
+
+`[proved-derived; formal-checked]` The exact coupling now formalized is
+`Lambda(n,s) = 2^n C / (2^s r)`. Advancing both binary fork depth and dyadic denominator depth by
+one leaves it fixed, and the depth-two settled-scale face is `2^2 (C/r) = 4 C/r`.
+
+`[proved-derived; formal-checked]` `EinsteinFluidDynamics` now constitutes a covariant bilinear
+stress-energy field from the actual local velocity and pressure. From the tensor field equation,
+contracted Bianchi return, metric compatibility, and nonzero coupling, Lean derives covariant
+source conservation and proves that every declared linear conservation receiver reads zero. Under
+`UsesRefineForkCoupling`, every tensor receiver reads the field equation with coefficient
+`4 * (C/r)`.
+
+`[interpretation]` In the full-turn calibration, `Theta = C/r` turns the checked receiver equation's
+coefficient into `4 Theta`. If the intended curvature target instead uses `4 theta/r`, the second
+inverse-length factor belongs in the typed curvature realization rather than being erased inside
+the scalar receiver.
+
+`[open]` The Einstein realization deed is now concrete: instantiate the abstract tangent fibre and
+tensor-field ports with a symmetric nondegenerate Lorentzian metric, compatible connection,
+derived Einstein tensor, causal cone, calibrated units, and fluid stress-energy; then prove the
+receiver family separates the tensor equality. That realized background is the curved manifold on
+which the Kelvin and Gauss--Bonnet passages will be transported.
+
 ## First returned construction
 
 `[proved-derived; formal-checked]` `Millennium/NavierStokesVorticity.lean` lifts Mathlib's
@@ -215,3 +328,37 @@ derivative order, addressed join, trace orientation, vorticity-derivative square
 final nonlinear sign. Its only requested repair was to stop presenting the totalized trace bridge
 as admitted at `t = 0`; the solution theorem is now restricted to the positive-time occurrence.
 The `t = 0` boundary and time/Laplacian commutation squares remain explicitly open.
+
+## Material, Kelvin, curvature, and gyro validation receipt
+
+`[established-bounded; measured]` The final source closures are:
+
+| Owner | SHA-256 |
+|---|---|
+| `Geometry/Gyrogroup.lean` | `745584b6cdd1453b53d8f4708dc252da79a90a4a0c88b51641ef8e09429ecae0` |
+| `Millennium/NavierStokesMaterialPolygon.lean` | `971a22468740e10c976fbbe578e9fbe0c03291d540424b575523bf5dbbd8fb77` |
+| `Millennium/NavierStokesCurvedTransport.lean` | `796e604f817892a211a764c82c7dd9f4a0bc6418761bbb2f2ba7f9ecd3b9d8f2` |
+| `Millennium/NavierStokesKelvin.lean` | `b9faf7002e9b448c7503b4d1a3d2d8757e95558f72aed4489fa2008ee81c2ad1` |
+| `ElementaryHolonics.lean` import surface | `3fc83ad361b502675b7f68266fed140d2ca0d4a269c9f459af700e768293fa86` |
+
+`[established-bounded; measured]` Focused final builds from
+`soma/formal/elementary-holonics` returned:
+
+| Command | Reported owner time | Exit | Purpose |
+|---|---:|---:|---|
+| `lake build ElementaryHolonics.Geometry.Gyrogroup` | 1.0 s | 0 | gyrogroup, coaddition, and gyroparallelogram closure |
+| `lake build ElementaryHolonics.Millennium.NavierStokesMaterialPolygon` | 3.9 s | 0 | material polygon, symmetric circulation, Swing/cross-ratio bridge, scale/fork law |
+| `lake build ElementaryHolonics.Millennium.NavierStokesCurvedTransport` | 4.9 s | 0 | finite Kelvin, triangulated Gauss--Bonnet, Einstein conservation transport |
+| `lake build ElementaryHolonics.Millennium.NavierStokesKelvin` | 2.9 s | 0 | genuine curve-integral receiver and Kelvin constancy |
+| `lake build ElementaryHolonics` | 2.5 s | 0 | public aggregate import closure |
+
+`[proved-derived; formal-checked]` Every printed theorem in the four-owner cone depends only on
+`propext`, `Classical.choice`, and `Quot.sound`; the gyrogroup flat theorems need only a subset.
+The final exact scan found no declaration of `axiom` and no occurrence of `sorry`, `admit`, or
+`sorryAx`; `git diff --check` returned clean.
+
+`[established-bounded; measured]` Independent read-only audits checked cyclic indexing, derivative
+totalization, Swing orientation, boundary-order cross ratio and admissibility, the standard
+gyroparallelogram formula and gyrocommutative port, the symmetric moving-edge cancellation, the
+Euler/angle algebra of discrete Gauss--Bonnet, and the covector-valued divergence in Einstein
+conservation. Their requested type repairs were incorporated before the final receipts.

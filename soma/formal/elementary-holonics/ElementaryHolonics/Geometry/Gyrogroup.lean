@@ -54,10 +54,11 @@ def coadd (a b : G) : G :=
 
 /--
 The fourth vertex of the gyroparallelogram based at `source`, with adjacent
-vertices `left` and `right`.
+vertices `left` and `right`, under the gyrocommutative law.  This is the
+standard condition `D = (left ⊞ right) ⊖ source`.
 -/
-def gyroparallelogram (source left right : G) : G :=
-  op source (coadd (op (inv source) left) (op (inv source) right))
+def gyroparallelogram (_hcomm : Gyrocommutative (G := G)) (source left right : G) : G :=
+  op (coadd left right) (inv source)
 
 /-- Every additive commutative group is a gyrogroup with identity gyrations. -/
 instance ofAddCommGroup (G : Type*) [AddCommGroup G] : Gyrogroup G where
@@ -110,7 +111,8 @@ ordinary based parallelogram completion.
 -/
 theorem additive_gyroparallelogram
     {A : Type*} [AddCommGroup A] (source left right : A) :
-    gyroparallelogram source left right = left + right - source := by
+    gyroparallelogram (additive_gyrocommutative A) source left right =
+      left + right - source := by
   simp only [gyroparallelogram, additive_coadd, additive_op, additive_inv]
   abel
 

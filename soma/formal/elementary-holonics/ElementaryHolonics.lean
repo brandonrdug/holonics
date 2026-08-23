@@ -107,6 +107,7 @@ import ElementaryHolonics.Millennium.FamilyOddDescent
 import ElementaryHolonics.Millennium.FamilyPairing
 import ElementaryHolonics.Millennium.UniversalBSD
 import ElementaryHolonics.Millennium.UniversalBSDLedger
+import ElementaryHolonics.Millennium.AnalyticParity
 import ElementaryHolonics.Millennium.FamilyPeriod
 import ElementaryHolonics.Millennium.FamilyImage
 import ElementaryHolonics.Millennium.FamilyHom

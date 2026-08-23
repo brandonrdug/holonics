@@ -24,9 +24,9 @@ The exact results are deliberately local and finite:
   and a winding-one exterior return;
 * angle defect is additive under pairing and invariant when actual and reference readings receive
   the same coordinate shift;
-* a returned quadrilateral retains the failure of a transported path to close.  Its flat fourth
-  vertex is exactly a Swing followed by edge transport, while its four-point projective face is the
-  existing undivided cross-ratio presentation;
+* a returned quadrilateral retains the additive failure of four addressed vertices to close.  Its
+  flat fourth vertex is exactly a Swing followed by edge transport, while its four-point projective
+  face is the existing undivided cross-ratio presentation;
 * the repository's scale-and-fork coupling `2^forks C / (2^scale r)` is invariant when both integer
   depths advance together.
 
@@ -149,8 +149,8 @@ theorem MaterialPolygon.sum_pressureIncrementAt_eq_zero
     ∑ i, polygon.pressureIncrementAt pressure t i = 0 := by
   exact sum_cyclicIncrement_eq_zero (fun i ↦ pressure (polygon.vertex t i) t)
 
-/-- A finite polygonal circulation face.  This is a left-endpoint edge pairing, not a line integral
-and not yet a Kelvin invariant. -/
+/-- A finite left-endpoint polygonal circulation face.  The genuine line-integral receiver and its
+Kelvin constancy theorem are owned by `NavierStokesKelvin.lean`. -/
 def polygonalCirculation {extra : ℕ}
     (current vertex : PolygonIndex extra → Space) : ℝ :=
   ∑ i, inner ℝ (current i) (edge vertex i)
@@ -211,9 +211,11 @@ theorem symmetricEdgeMotionReturn_eq_zero {extra : ℕ}
   rw [symmetricEdgeMotionReturn]
   simp_rw [hedge]
   rw [← Finset.mul_sum]
-  rw [show (∑ i, inner ℝ (current (cyclicSuccessor extra i))
-        (current (cyclicSuccessor extra i)) - inner ℝ (current i) (current i)) = 0 by
-      exact sum_cyclicIncrement_eq_zero (fun i ↦ inner ℝ (current i) (current i))]
+  have hsum : (∑ i : PolygonIndex extra,
+      (inner ℝ (current (cyclicSuccessor extra i))
+        (current (cyclicSuccessor extra i)) - inner ℝ (current i) (current i))) = 0 :=
+    sum_cyclicIncrement_eq_zero (fun i ↦ inner ℝ (current i) (current i))
+  rw [hsum]
   simp
 
 /-! ## 3. Angle conservation and receiver-visible defect -/
@@ -271,8 +273,8 @@ theorem PolygonTurnLedger.sum_interior (ledger : PolygonTurnLedger extra) :
   linarith
 
 /-- The familiar `(n - 2) * pi` face for an `n = extra + 3` polygon.  The theorem consumes the
-supplementary and winding-one consequences recorded by the ledger; it does not infer the separate
-geometric realization conditions from an arbitrary vertex list. -/
+supplementary and winding-one consequences recorded by the ledger; a geometric realization
+supplies simplicity, nondegeneracy, and principal-angle conditions. -/
 theorem PolygonTurnLedger.sum_interior_pi (ledger : PolygonTurnLedger extra)
     (hpi : ledger.halfTurn = Real.pi) :
     ∑ i, ledger.interior i = (extra + 1 : ℕ) * Real.pi := by
@@ -310,7 +312,8 @@ theorem ReturnedQuadrilateral.swingThenTransport_eq_flatFourth
 instance, joining the Swing completion to the gyroparallelogram owner. -/
 theorem ReturnedQuadrilateral.additiveGyroparallelogram_eq_swingThenTransport
     (q : ReturnedQuadrilateral G) :
-    Gyrogroup.gyroparallelogram q.source q.left q.right = q.swingThenTransport := by
+    Gyrogroup.gyroparallelogram (Gyrogroup.additive_gyrocommutative G)
+      q.source q.left q.right = q.swingThenTransport := by
   rw [Gyrogroup.additive_gyroparallelogram,
     q.swingThenTransport_eq_flatFourth]
   rfl
@@ -424,6 +427,7 @@ section Audit
 #print axioms MaterialPolygon.sum_pressureIncrementAt_eq_zero
 #print axioms MaterialPolygon.differentiableWithinAt_vertex
 #print axioms polygonalCirculation_constant_eq_zero
+#print axioms symmetricEdgeMotionReturn_eq_zero
 #print axioms PolygonTurnLedger.sum_interior_pi
 #print axioms ReturnedQuadrilateral.swingThenTransport_eq_flatFourth
 #print axioms ReturnedQuadrilateral.additiveGyroparallelogram_eq_swingThenTransport
