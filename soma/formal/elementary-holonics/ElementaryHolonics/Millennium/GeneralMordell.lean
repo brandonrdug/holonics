@@ -303,4 +303,68 @@ theorem theContraction (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
           exact Nat.mul_le_mul_left _ hdouble
         omega
 
+
+/-! ## 6. The translate bound: the chord law applied to `X − R`
+
+The shared-abscissa case is **excluded by the height threshold** rather than handled:
+if `X` is longer than the representative then their abscissae differ, because equal
+abscissae would give equal heights. -/
+
+lemma neg_some_point {x y : ℚ} (h : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x y)
+    (h' : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x (-y)) :
+    -(Point.some h : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some h' := by
+  rw [Point.neg_some]
+  congr 1
+  simp only [negY, E]
+  ring
+
+set_option maxHeartbeats 1000000 in
+/-- **THE TRANSLATE IS BOUNDED QUADRATICALLY**: subtracting a fixed point grows the
+height at most quadratically, with a constant depending only on that point and the
+curve. -/
+theorem theTranslateIsBoundedQuadratically (a b : ℤ) {xR yR : ℚ}
+    (hR : (E ((a : ℚ)) ((b : ℚ))).Nonsingular xR yR)
+    (X : (E ((a : ℚ)) ((b : ℚ))).Point) (hbig : hgt xR < pheight a b X) :
+    pheight a b (X - Point.some hR)
+      ≤ 2 ^ 4 * GeneralHeight.pointSize a b xR.num (xR.den : ℤ) ^ 6
+          * pheight a b X ^ 2 := by
+  rcases X with _ | @⟨x, y, hX⟩
+  · exfalso
+    have : pheight a b (0 : (E ((a : ℚ)) ((b : ℚ))).Point) = 0 := rfl
+    have hpos := hgt_pos xR
+    rw [← Point.zero_def] at hbig
+    omega
+  · have hpx : pheight a b (Point.some hX) = hgt x := rfl
+    have hxne : x ≠ xR := by
+      intro hc
+      rw [hpx] at hbig
+      rw [hc] at hbig
+      omega
+    -- the negated representative
+    have hNk : (E ((a : ℚ)) ((b : ℚ))).Nonsingular xR (-yR) := by
+      have h := (nonsingular_neg (W' := E ((a : ℚ)) ((b : ℚ))) (x := xR) (y := yR)).mpr hR
+      have he : (E ((a : ℚ)) ((b : ℚ))).negY xR yR = -yR := by
+        simp only [negY, E]; ring
+      rwa [he] at h
+    have hsub : (Point.some hX : (E ((a : ℚ)) ((b : ℚ))).Point) - Point.some hR
+        = Point.some hX + Point.some hNk := by
+      rw [sub_eq_add_neg, neg_some_point hR hNk]
+    rw [hsub, Point.add_of_X_ne hxne]
+    show hgt ((E ((a : ℚ)) ((b : ℚ))).addX x xR
+      ((E ((a : ℚ)) ((b : ℚ))).slope x xR y (-yR))) ≤ _
+    have harg : (E ((a : ℚ)) ((b : ℚ))).addX x xR
+        ((E ((a : ℚ)) ((b : ℚ))).slope x xR y (-yR))
+        = ((y + yR) / (x - xR)) ^ 2 + ((a : ℚ) + (b : ℚ)) - x - xR := by
+      rw [slope_of_X_ne hxne]
+      simp only [addX, E]
+      have hd : x - xR ≠ 0 := sub_ne_zero.mpr hxne
+      field_simp
+      ring
+    rw [harg, hpx]
+    have hbe : (0 : ℤ) < (xR.den : ℤ) := by exact_mod_cast xR.den_pos
+    have hxRv : xR = ((xR.num : ℤ) : ℚ) / (((xR.den : ℤ)) : ℚ) := by
+      exact_mod_cast (Rat.num_div_den xR).symm
+    exact GeneralHeight.theChordRootIsBoundedOnEveryFullTwoTorsionCurve a b hbe hxRv
+      (onCurve hX) (onCurve hR) hxne
+
 end Soma.Holonics.Millennium.GeneralMordell
