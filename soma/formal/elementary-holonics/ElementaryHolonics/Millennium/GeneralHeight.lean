@@ -470,4 +470,72 @@ theorem theDuplicationGrowsTheHeightOnEveryFullTwoTorsionCurve
         exact Nat.mul_le_mul_right _ hcoef
     _ = 2 ^ 7 * D ^ 10 * H := by ring
 
+
+/-! ## 6. The chord bound
+
+The chord through a point and a fixed point meets the curve again at an abscissa
+satisfying a quadratic whose coefficients are **degree two** in the moving abscissa:
+
+```text
+(x − x_R)²·Z² − 2[x·x_R·(x + x_R − 2(a+b)) + ab·(x + x_R)]·Z + (x·x_R − ab)² = 0.
+```
+
+At `b = −a` this is the congruent slice's `(x+x_R)(x·x_R − n²)` and `(x·x_R + n²)²`
+on the nose.  Degree two is what makes the growth quadratic against the duplication's
+quartic, and that gap is the descent. -/
+
+/-- The middle coefficient of the chord quadratic. -/
+def chordW (a b x xR : ℚ) : ℚ := x * xR * (x + xR - 2 * (a + b)) + a * b * (x + xR)
+
+/-- The constant coefficient of the chord quadratic. -/
+def chordK (a b x xR : ℚ) : ℚ := (x * xR - a * b) ^ 2
+
+lemma chordW_eq (a b x xR : ℚ) :
+    chordW a b x xR
+      = x * (x - a) * (x - b) + xR * (xR - a) * (xR - b)
+        + ((a + b) - x - xR) * (x - xR) ^ 2 := by
+  unfold chordW; ring
+
+lemma chordK_eq (a b x xR : ℚ) :
+    chordK a b x xR * (x - xR) ^ 2
+      = chordW a b x xR ^ 2
+        - 2 ^ 2 * (x * (x - a) * (x - b)) * (xR * (xR - a) * (xR - b)) := by
+  unfold chordK chordW; ring
+
+/-- **THE CHORD ROOT SATISFIES THE QUADRATIC**, on every full-2-torsion curve.  The
+whole content is that `P − W = 2·y·y_R` once both points are on the curve, so the
+expression collapses to `(2·y·y_R)² − 2²·f(x)·f(x_R) = 0`. -/
+theorem theChordRootSatisfiesTheQuadratic {a b x y xR yR : ℚ}
+    (hcx : y ^ 2 = x * (x - a) * (x - b))
+    (hcr : yR ^ 2 = xR * (xR - a) * (xR - b)) (hne : x ≠ xR) :
+    (x - xR) ^ 2 * (((y + yR) / (x - xR)) ^ 2 + (a + b) - x - xR) ^ 2
+      - 2 * chordW a b x xR * (((y + yR) / (x - xR)) ^ 2 + (a + b) - x - xR)
+      + chordK a b x xR = 0 := by
+  have hD : x - xR ≠ 0 := sub_ne_zero.mpr hne
+  set z : ℚ := ((y + yR) / (x - xR)) ^ 2 + (a + b) - x - xR with hz
+  have hzD : z * (x - xR) ^ 2
+      = (y + yR) ^ 2 + ((a + b) - x - xR) * (x - xR) ^ 2 := by
+    have h1 : ((y + yR) / (x - xR)) ^ 2 * (x - xR) ^ 2 = (y + yR) ^ 2 := by
+      rw [div_pow, div_mul_cancel₀ _ (pow_ne_zero 2 hD)]
+    calc z * (x - xR) ^ 2
+        = ((y + yR) / (x - xR)) ^ 2 * (x - xR) ^ 2
+          + ((a + b) - x - xR) * (x - xR) ^ 2 := by rw [hz]; ring
+      _ = (y + yR) ^ 2 + ((a + b) - x - xR) * (x - xR) ^ 2 := by rw [h1]
+  have hmain : (((x - xR) ^ 2 * z ^ 2 - 2 * chordW a b x xR * z + chordK a b x xR)
+      * (x - xR) ^ 2) = 0 := by
+    have hexp : ((x - xR) ^ 2 * z ^ 2 - 2 * chordW a b x xR * z + chordK a b x xR)
+        * (x - xR) ^ 2
+        = (z * (x - xR) ^ 2) ^ 2 - 2 * chordW a b x xR * (z * (x - xR) ^ 2)
+          + chordK a b x xR * (x - xR) ^ 2 := by ring
+    rw [hexp, hzD]
+    unfold chordW chordK
+    linear_combination
+      ((y ^ 2 - x * (x - a) * (x - b))
+        - 2 * (yR ^ 2 - xR * (xR - a) * (xR - b))
+        + 2 ^ 2 * y * yR + 2 ^ 2 * yR ^ 2) * hcx
+      + ((yR ^ 2 - xR * (xR - a) * (xR - b)) + 2 ^ 2 * y * yR + 2 ^ 2 * y ^ 2) * hcr
+  rcases mul_eq_zero.mp hmain with h | h
+  · exact h
+  · exact absurd h (pow_ne_zero 2 hD)
+
 end Soma.Holonics.Millennium.GeneralHeight
