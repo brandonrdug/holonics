@@ -114,10 +114,10 @@ private lemma summable_master {c : ℝ} (hc : 0 < c) :
 private def envP (y : ℝ) (u v : ℤ) : ℝ := rexp (-π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
 
 /-- The post-fold Gaussian envelope. -/
-private def envF (y : ℝ) (u v : ℤ) : ℝ := rexp (-2 * π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
+def envF (y : ℝ) (u v : ℤ) : ℝ := rexp (-2 * π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
 
 private lemma envP_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envP y u v := Real.exp_nonneg _
-private lemma envF_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envF y u v := Real.exp_nonneg _
+lemma envF_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envF y u v := Real.exp_nonneg _
 
 private lemma summable_envP {y : ℝ} (hy : 0 < y) :
     Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envP y p.1 p.2 :=
@@ -320,7 +320,7 @@ private lemma dual_side_eq (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) {y : ℝ}
 private def sgn4 (w : ℤ) : ℂ := if w % 4 = 1 then 1 else if w % 4 = 3 then -1 else 0
 
 /-- The doubled cosine sign. -/
-private def cs4 (v : ℤ) : ℂ := if v % 4 = 0 then 1 else if v % 4 = 2 then -1 else 0
+def cs4 (v : ℤ) : ℂ := if v % 4 = 0 then 1 else if v % 4 = 2 then -1 else 0
 
 private lemma norm_sgn4_le (w : ℤ) : ‖sgn4 w‖ ≤ 1 := by
   unfold sgn4; split_ifs <;> simp
@@ -351,7 +351,7 @@ private def hHalfP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
       ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) * ((envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
-private def hPlusP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
+def hPlusP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
       ((envF y q.1 q.2 : ℝ) : ℂ)
@@ -363,7 +363,7 @@ private def hMinusP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
       ((envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
-private def hFinalP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
+def hFinalP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.1 % 4 = 1 then
     8 * (p : ℂ) * (q.1 : ℂ) * cs4 q.2 * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
       ((envF y q.1 q.2 : ℝ) : ℂ)
@@ -393,7 +393,7 @@ private def bothOddEmb (q : ℤ × ℤ) : ℤ × ℤ := (2 * q.1 + 1, 2 * q.2 + 
 
 private def foldMap (q : ℤ × ℤ) : ℤ × ℤ := (q.1 + q.2 + 1, q.1 - q.2)
 
-private def gridEmb (q : ℤ × ℤ) : ℤ × ℤ := (4 * q.1 + 1, 2 * q.2)
+def gridEmb (q : ℤ × ℤ) : ℤ × ℤ := (4 * q.1 + 1, 2 * q.2)
 
 private lemma bothOddEmb_injective : Function.Injective bothOddEmb := by
   rintro ⟨a, b⟩ ⟨c, e⟩ h
@@ -405,7 +405,7 @@ private lemma foldMap_injective : Function.Injective foldMap := by
   simp only [foldMap, Prod.mk.injEq] at h
   exact Prod.ext_iff.mpr ⟨by omega, by omega⟩
 
-private lemma gridEmb_injective : Function.Injective gridEmb := by
+lemma gridEmb_injective : Function.Injective gridEmb := by
   rintro ⟨a, b⟩ ⟨c, e⟩ h
   simp only [gridEmb, Prod.mk.injEq] at h
   exact Prod.ext_iff.mpr ⟨by omega, by omega⟩
@@ -533,7 +533,7 @@ private lemma summable_gOddVP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
   · simp
   · exact le_rfl
 
-private lemma summable_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
+lemma summable_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
     Summable (hPlusP p y) := by
   have h := summable_piece p hy (2 * p) (by positivity) (two_p_le p)
     (fun q : ℤ × ℤ => (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0)
@@ -846,7 +846,7 @@ private lemma tsum_hHalfP_eq_two_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy :
   ring
 
 /-- The gather onto the cosine-signed target. -/
-private lemma tsum_hFinalP_eq_four_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
+lemma tsum_hFinalP_eq_four_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
     ∑' q : ℤ × ℤ, hFinalP p y q = 4 * ∑' q : ℤ × ℤ, hPlusP p y q := by
   have hsplit : ∀ q : ℤ × ℤ, hPlusP p y q = aPieceP p y q + bPieceP p y q := by
     rintro ⟨u, v⟩
@@ -901,7 +901,7 @@ private lemma tsum_dualP_eq_hFinalP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 <
 
 /-! ## 8. The grid landing and the primal reassembly -/
 
-private lemma summable_hFinalP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
+lemma summable_hFinalP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
     Summable (hFinalP p y) := by
   have h := summable_piece p hy (8 * p) (by positivity) le_rfl
     (fun q : ℤ × ℤ => q.1 % 4 = 1)
@@ -911,7 +911,7 @@ private lemma summable_hFinalP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
   unfold hFinalP
   split_ifs <;> push_cast <;> ring
 
-private lemma hFinalP_support (p : ℕ) [Fact p.Prime] (y : ℝ) :
+lemma hFinalP_support (p : ℕ) [Fact p.Prime] (y : ℝ) :
     ∀ q ∉ Set.range gridEmb, hFinalP p y q = 0 := by
   rintro ⟨u, v⟩ hq
   have hcond : ¬(u % 4 = 1 ∧ v % 2 = 0) := by
@@ -1138,7 +1138,7 @@ private lemma fin_grid_to_range (p : ℕ) (F : ℕ → ℕ → ℂ) :
 
 /-- The primal side: the gathered target equals `32p²·χ_p(2)` times the grid-weighted
 `oddKernel`–`evenKernel` products at scale `32p²y`. -/
-private lemma primal_side_eq (p : ℕ) [Fact p.Prime] (hp : 0 < p) {y : ℝ} (hy : 0 < y) :
+lemma primal_side_eq (p : ℕ) [Fact p.Prime] (hp : 0 < p) {y : ℝ} (hy : 0 < y) :
     ∑' q : ℤ × ℤ, hFinalP p y q
       = 32 * (p : ℂ) ^ 2 * ((XP p 2 : ℤ) : ℂ) *
           ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),

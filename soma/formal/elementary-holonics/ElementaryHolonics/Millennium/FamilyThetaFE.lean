@@ -363,3 +363,197 @@ theorem theOddHandForcesTheCentralVanishingOnTheFiveModEightFamily
   push_cast at h
   linear_combination h / 2
 
+
+/-! ## 6. The theta as its lattice class sum -/
+
+private lemma XP_two_sq (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) :
+    ((XP p 2 : ℤ) : ℂ) * ((XP p 2 : ℤ) : ℂ) = 1 := by
+  have hp : p.Prime := Fact.out
+  have hp5 : 5 ≤ p := by have := hp.two_le; omega
+  have h20 : ((2 : ℤ) : ZMod p) ≠ 0 := by
+    rw [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
+    intro h
+    have := Int.le_of_dvd (by norm_num) h
+    omega
+  have h := quadraticChar_sq_one h20
+  rw [pow_two] at h
+  have h2 : XP p 2 * XP p 2 = 1 := h
+  exact_mod_cast h2
+
+set_option maxHeartbeats 1000000 in
+/-- **The family theta is its own lattice class sum**: for `t > 0`,
+`θ_p(t) = Σ_{(k,l)∈ℤ²} (4k+1)·(−1)^l·χ_p((4k+1)²+4l²)·exp(−(π√2/(4p))·((4k+1)²+4l²)·t)`
+— the `χ_p`-weighted Gaussian class sum at every split prime, returned as a `HasSum`
+so the receiver can integrate against it term by term.  The functional-equation sign
+`χ_p(2)` cancels out of the lattice presentation, as it must. -/
+theorem theFamilyThetaIsItsLatticeSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+    {t : ℝ} (ht : 0 < t) :
+    HasSum (fun q : ℤ × ℤ =>
+      ((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
+        (XP p ((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2) : ℝ) *
+        rexp (-(π * Real.sqrt 2 / (4 * p)) *
+          (((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2 : ℤ) : ℝ) * t))
+      (thetaP p t) := by
+  have hp : p.Prime := Fact.out
+  have hp0 : 0 < p := hp.pos
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp0
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  set y : ℝ := Real.sqrt 2 * t / (8 * p) with hy_def
+  have hy : 0 < y := by positivity
+  have h32 : 32 * (p : ℝ) ^ 2 * y = 4 * p * Real.sqrt 2 * t := by
+    rw [hy_def]
+    field_simp
+    ring
+  have hχ := XP_two_sq p hp1
+  set χ : ℂ := ((XP p 2 : ℤ) : ℂ) with hχdef
+  have hpc : ((p : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hp0.ne'
+  have hCdef : ((thetaP p t : ℝ) : ℂ)
+      = 4 * (p : ℂ) * ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+          ((wP p e d : ℤ) : ℂ) *
+            (((oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+                (32 * p ^ 2 * y) : ℝ) : ℂ) *
+             ((evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+                (32 * p ^ 2 * y) : ℝ) : ℂ)) := by
+    rw [h32]
+    unfold thetaP
+    push_cast
+    rfl
+  set S : ℂ := ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+      ((wP p e d : ℤ) : ℂ) *
+        (((oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+            (32 * p ^ 2 * y) : ℝ) : ℂ) *
+         ((evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+            (32 * p ^ 2 * y) : ℝ) : ℂ)) with hSdef
+  have hC : ((thetaP p t : ℝ) : ℂ) = χ / (8 * p) * ∑' q : ℤ × ℤ, hFinalP p y q := by
+    rw [hCdef]
+    have hps := primal_side_eq p hp0 hy
+    rw [← hSdef] at hps
+    field_simp
+    linear_combination (-χ) * hps + (-(32 * (p : ℂ) ^ 2 * S)) * hχ
+  have hSum : HasSum (fun q : ℤ × ℤ => χ / (8 * p) * hFinalP p y (gridEmb q))
+      (((thetaP p t : ℝ) : ℂ)) := by
+    have h1 : HasSum (hFinalP p y) (∑' q : ℤ × ℤ, hFinalP p y q) :=
+      (summable_hFinalP p hy).hasSum
+    have h2 : HasSum (fun q : ℤ × ℤ => hFinalP p y (gridEmb q))
+        (∑' q : ℤ × ℤ, hFinalP p y q) :=
+      (gridEmb_injective.hasSum_iff (hFinalP_support p y)).mpr h1
+    have h3 := h2.mul_left (χ / (8 * p))
+    rwa [← hC] at h3
+  have hpt : ∀ q : ℤ × ℤ, χ / (8 * p) * hFinalP p y (gridEmb q)
+      = ((((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
+          (XP p ((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2) : ℝ) *
+          rexp (-(π * Real.sqrt 2 / (4 * p)) *
+            (((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2 : ℤ) : ℝ) * t) : ℝ) : ℂ) := by
+    rintro ⟨k, l⟩
+    show χ / (8 * p) * hFinalP p y (4 * k + 1, 2 * l) = _
+    unfold hFinalP
+    rw [if_pos (show (4 * k + 1) % 4 = 1 by omega)]
+    have hcs : cs4 (2 * l) = ((if l % 2 = 0 then (1 : ℝ) else -1 : ℝ) : ℂ) := by
+      unfold cs4
+      rcases Int.even_or_odd l with ⟨u, hu⟩ | ⟨u, hu⟩
+      · rw [if_pos (by omega), if_pos (by omega)]
+        norm_num
+      · rw [if_neg (by omega), if_pos (by omega), if_neg (by omega)]
+        norm_num
+    have hchi : XP p (2 * ((4 * k + 1) ^ 2 + (2 * l) ^ 2))
+        = XP p 2 * XP p ((4 * k + 1) ^ 2 + 4 * l ^ 2) := by
+      rw [XP_mul p, show (4 * k + 1) ^ 2 + (2 * l) ^ 2
+        = (4 * k + 1) ^ 2 + 4 * l ^ 2 from by ring]
+    have henv : envF y (4 * k + 1) (2 * l)
+        = rexp (-(π * Real.sqrt 2 / (4 * p)) *
+            (((4 * k + 1) ^ 2 + 4 * l ^ 2 : ℤ) : ℝ) * t) := by
+      unfold envF
+      rw [hy_def]
+      congr 1
+      push_cast
+      field_simp
+      ring
+    rw [hcs, hchi, henv]
+    push_cast
+    field_simp
+    linear_combination ((4 * (k : ℂ) + 1) *
+      ((if l % 2 = 0 then (1 : ℝ) else -1 : ℝ) : ℂ) *
+      ((XP p ((4 * k + 1) ^ 2 + 4 * l ^ 2) : ℤ) : ℂ)) * hχ
+  have hSum2 : HasSum (fun q : ℤ × ℤ =>
+      ((((4 * q.1 + 1 : ℤ) : ℝ) * (if q.2 % 2 = 0 then (1 : ℝ) else -1) *
+        (XP p ((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2) : ℝ) *
+        rexp (-(π * Real.sqrt 2 / (4 * p)) *
+          (((4 * q.1 + 1) ^ 2 + 4 * q.2 ^ 2 : ℤ) : ℝ) * t) : ℝ) : ℂ))
+      (((thetaP p t : ℝ) : ℂ)) := by
+    refine hSum.congr_fun ?_
+    intro q
+    exact (hpt q).symm
+  exact Complex.hasSum_ofReal.mp hSum2
+
+set_option maxHeartbeats 1000000 in
+/-- **The family theta is the twisted Gaussian class sum**: over the positive quartic
+class `(a+b) ≡ 1 (mod 4)`, `b` even, with weight `a·χ_p(a²+b²)` — the Hecke sum of the
+twisted character in its folded real form, at scale `√2·x/(8p)`, at every split
+prime. -/
+theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+    {x : ℝ} (hx : 0 < x) :
+    HasSum (fun q : ℤ × ℤ =>
+      if (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0 then
+        ((q.1 : ℤ) : ℂ) * ((XP p (q.1 ^ 2 + q.2 ^ 2) : ℤ) : ℂ) *
+          ((rexp (-2 * π * (Real.sqrt 2 * x / (8 * p)) *
+            ((q.1 : ℝ) ^ 2 + (q.2 : ℝ) ^ 2)) : ℝ) : ℂ)
+      else 0) ((thetaP p x : ℝ) : ℂ) := by
+  have hp : p.Prime := Fact.out
+  have hp0 : 0 < p := hp.pos
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp0
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  set y : ℝ := Real.sqrt 2 * x / (8 * p) with hy_def
+  have hy : 0 < y := by positivity
+  have h32 : 32 * (p : ℝ) ^ 2 * y = 4 * p * Real.sqrt 2 * x := by
+    rw [hy_def]
+    field_simp
+    ring
+  have hχ := XP_two_sq p hp1
+  set χ : ℂ := ((XP p 2 : ℤ) : ℂ) with hχdef
+  have hpc : ((p : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hp0.ne'
+  have hCdef : ((thetaP p x : ℝ) : ℂ)
+      = 4 * (p : ℂ) * ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+          ((wP p e d : ℤ) : ℂ) *
+            (((oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+                (32 * p ^ 2 * y) : ℝ) : ℂ) *
+             ((evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+                (32 * p ^ 2 * y) : ℝ) : ℂ)) := by
+    rw [h32]
+    unfold thetaP
+    push_cast
+    rfl
+  set S : ℂ := ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+      ((wP p e d : ℤ) : ℂ) *
+        (((oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+            (32 * p ^ 2 * y) : ℝ) : ℂ) *
+         ((evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+            (32 * p ^ 2 * y) : ℝ) : ℂ)) with hSdef
+  have hC : ((thetaP p x : ℝ) : ℂ) = χ / (2 * p) * ∑' q : ℤ × ℤ, hPlusP p y q := by
+    rw [hCdef]
+    have hps := primal_side_eq p hp0 hy
+    rw [← hSdef] at hps
+    have h4 := tsum_hFinalP_eq_four_hPlusP p hy
+    rw [h4] at hps
+    field_simp
+    linear_combination (-(1 / 4) * χ) * hps + (-(8 * (p : ℂ) ^ 2 * S)) * hχ
+  have hSum : HasSum (fun q : ℤ × ℤ => χ / (2 * p) * hPlusP p y q)
+      ((thetaP p x : ℝ) : ℂ) := by
+    have h1 := (summable_hPlusP p hy).hasSum.mul_left (χ / (2 * p))
+    rwa [← hC] at h1
+  refine hSum.congr_fun fun q => ?_
+  obtain ⟨a, b⟩ := q
+  show (if (a + b) % 4 = 1 ∧ b % 2 = 0 then
+      ((a : ℤ) : ℂ) * ((XP p (a ^ 2 + b ^ 2) : ℤ) : ℂ) *
+        ((rexp (-2 * π * y * ((a : ℝ) ^ 2 + (b : ℝ) ^ 2)) : ℝ) : ℂ)
+    else 0) = χ / (2 * p) * hPlusP p y (a, b)
+  unfold hPlusP
+  split_ifs with h
+  · have hchi : XP p (2 * (a ^ 2 + b ^ 2)) = XP p 2 * XP p (a ^ 2 + b ^ 2) :=
+      XP_mul p 2 (a ^ 2 + b ^ 2)
+    rw [hchi]
+    unfold envF
+    push_cast
+    field_simp
+    linear_combination (-((a : ℂ) * ((XP p (a ^ 2 + b ^ 2) : ℤ) : ℂ))) * hχ
+  · ring
+
