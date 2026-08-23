@@ -138,5 +138,69 @@ theorem theUnconditionalRankDial (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
    fun h => FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime h,
    fun h => FamilySevenDescent.theRankIsAtMostOneAtEverySevenModEightPrime h⟩
 
+
+
+/-! ## The parity conjecture, proved on the three-mod-eight branch -/
+
+/-- **THE ROOT NUMBER IS `+1` AT EVERY PRIME `p ≡ 3 (mod 8)`**: the hand
+`(−1)^((p−1)/2) = −1` and the second supplement `χ_p(2) = −1` multiply to `+1`. -/
+theorem theRootNumberIsPlusOneOnTheThreeModEightBranch
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 3) :
+    FamilyWitness.rootNumber p = 1 := by
+  have hp : p.Prime := Fact.out
+  have hp2 : p ≠ 2 := by omega
+  have hhalf : (p - 1) / 2 = 2 * ((p - 3) / 8) * 2 + 1 := by omega
+  have hchi : FamilyDuplication.XP p 2 = -1 := by
+    rw [FamilyThetaFE.theFamilySignIsTheSecondSupplement p hp2, if_neg (by omega)]
+  unfold FamilyWitness.rootNumber
+  rw [hchi, hhalf, pow_succ, pow_mul, pow_mul]
+  norm_num
+
+/-- **THE PARITY CONJECTURE HOLDS ON THE THREE-MOD-EIGHT BRANCH**: at every prime
+`p ≡ 3 (mod 8)`, `(−1)^(rank) = w`, with **both sides theorems** — Genocchi's law
+supplies `rank = 0` by descent, the theta functional equation supplies `w = +1` by
+the second supplement, and neither consumes the conjecture.  This is a complete,
+unconditional instance of the parity prediction on an infinite family of curves. -/
+theorem theParityConjectureHoldsOnTheThreeModEightBranch
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 3) :
+    AlgebraicRankIs p 0 ∧
+      ((-1 : ℤ)) ^ (0 : ℕ) =
+        (FamilyWitness.theWitnessAtEveryOddPrime p (by omega)).sign := by
+  refine ⟨FamilyGenocchi.theGenocchiLawHoldsOnTheThreeModEightBranch hp8, ?_⟩
+  show ((-1 : ℤ)) ^ (0 : ℕ) = FamilyWitness.rootNumber p
+  rw [theRootNumberIsPlusOneOnTheThreeModEightBranch p hp8]
+  norm_num
+
+/-- **THE ODD-SIGN BRANCHES ARE EXACTLY THE CONGRUENT-NUMBER QUESTION**: at every
+prime `p ≡ 5, 7 (mod 8)` the sign is `−1` and the rank is at most one, so parity —
+`(−1)^rank = w` — holds **if and only if** the rank is exactly one, which is
+exactly the assertion that `p` is a congruent number.  The descent has closed every
+other possibility. -/
+theorem theOddSignBranchesReduceToASinglePoint
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5 ∨ p % 8 = 7) :
+    (FamilyWitness.theWitnessAtEveryOddPrime p
+        (by rcases hp8 with h | h <;> omega)).sign = -1 ∧
+      ¬ AlgebraicRankAtLeast p 2 ∧
+      (AlgebraicRankIs p 1 ↔ AlgebraicRankAtLeast p 1) := by
+  have hp2 : p ≠ 2 := by rcases hp8 with h | h <;> omega
+  have hsign : FamilyWitness.rootNumber p = -1 := by
+    have hchi : FamilyDuplication.XP p 2 =
+        if p % 8 = 1 ∨ p % 8 = 7 then 1 else -1 :=
+      FamilyThetaFE.theFamilySignIsTheSecondSupplement p hp2
+    unfold FamilyWitness.rootNumber
+    rcases hp8 with h | h
+    · have hhalf : (p - 1) / 2 = 2 * ((p - 5) / 8) * 2 + 2 := by omega
+      rw [hchi, if_neg (by omega), hhalf, pow_succ, pow_succ, pow_mul, pow_mul]
+      norm_num
+    · have hhalf : (p - 1) / 2 = 2 * ((p - 7) / 8) * 2 + 3 := by omega
+      rw [hchi, if_pos (by omega), hhalf, pow_succ, pow_succ, pow_succ,
+        pow_mul, pow_mul]
+      norm_num
+  have hbound : ¬ AlgebraicRankAtLeast p 2 := by
+    rcases hp8 with h | h
+    · exact FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime h
+    · exact FamilySevenDescent.theRankIsAtMostOneAtEverySevenModEightPrime h
+  exact ⟨hsign, hbound, ⟨fun h => h.1, fun h => ⟨h, hbound⟩⟩⟩
+
 end Soma.Holonics.Millennium.FamilyPairing
 

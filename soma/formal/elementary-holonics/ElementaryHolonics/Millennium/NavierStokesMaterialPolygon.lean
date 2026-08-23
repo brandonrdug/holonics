@@ -1,15 +1,17 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import ElementaryHolonics.Geometry.CrossRatio
+import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.Millennium.NavierStokes
 import ElementaryHolonics.Millennium.Swing
 
 /-!
 # Material polygons: exact finite receivers carried by a Navier--Stokes velocity field
 
-This module adds the finite geometric carrier needed to ask polygonal questions of the actual
-three-dimensional Navier--Stokes object.  A material polygon has at least three addressed vertices;
-each vertex follows the velocity field on the oriented time half-line.  Its cyclic edge population
+This module adds the finite geometric carrier needed to ask polygonal questions on the actual
+three-dimensional Navier--Stokes space.  A material polygon has at least three addressed vertices;
+each vertex follows a declared time-dependent vector field on the oriented time half-line.  A
+separate wrapper below binds that field to an admitted `SmoothSolution`.  The cyclic edge population
 is retained before any receiver takes a sum.
 
 The exact results are deliberately local and finite:
@@ -20,19 +22,18 @@ The exact results are deliberately local and finite:
   circulation;
 * a turn ledger derives the `(n - 2) * pi` interior-angle budget from local supplementary angles
   and a winding-one exterior return;
-* angle defect is additive under gluing and invariant when actual and reference angles undergo the
-  same chart rebase;
+* angle defect is additive under pairing and invariant when actual and reference readings receive
+  the same coordinate shift;
 * a returned quadrilateral retains the failure of a transported path to close.  Its flat fourth
   vertex is exactly a Swing followed by edge transport, while its four-point projective face is the
   existing undivided cross-ratio presentation;
-* the repository's refine-and-fork coupling `2^forks C / (2^scale r)` is invariant when refinement
-  and binary branching advance together.
+* the repository's scale-and-fork coupling `2^forks C / (2^scale r)` is invariant when both integer
+  depths advance together.
 
-These are not a Kelvin theorem, a Gauss--Bonnet theorem, a gyrogroup construction, or an Einstein
-field equation.  In particular, the returned quadrilateral is a typed precursor carrying a
-holonomy defect; calling it a gyroparallelogram would additionally require an owned gyrogroup law.
-The coupling uses the typed arc `C` and differential scale `r`; it does not silently identify the
-result with a curvature tensor.
+The adjacent Kelvin, Gauss--Bonnet, gyrogroup, and receiver-indexed Einstein laws are developed by
+the modules built on this carrier.  Here the returned quadrilateral supplies their additive closure
+datum, while the coupling retains scalar arc and nonzero differential-scale ports needed by the
+curved receiver.
 -/
 
 noncomputable section
@@ -83,12 +84,23 @@ theorem sum_cyclicIncrement_eq_zero {K : Type*} [AddCommGroup K] {extra : ℕ}
     ∑ i, cyclicIncrement potential i = 0 :=
   sum_edges_eq_zero potential
 
-/-- A finite Lagrangian polygon carried by the actual Navier--Stokes velocity field.  `carried`
-orients time through `Ici 0` and says that every addressed vertex is a tracer trajectory. -/
+/-- A finite Lagrangian polygon carried by a declared time-dependent vector field.  `carried`
+orients time through `Ici 0`; `differentiable` prevents totalized derivatives from admitting a
+nondifferentiable zero-velocity path. -/
 structure MaterialPolygon (extra : ℕ) (velocity : VelocityField) where
   vertex : ℝ → PolygonIndex extra → Space
+  differentiable : ∀ i t, 0 ≤ t →
+    DifferentiableWithinAt ℝ (fun τ ↦ vertex τ i) (Ici 0) t
   carried : ∀ i t, 0 ≤ t →
     derivWithin (fun τ ↦ vertex τ i) (Ici 0) t = velocity (vertex t i) t
+
+/-- A material polygon whose vector field and pressure are tied to an admitted smooth
+Navier--Stokes solution rather than merely sharing their function types. -/
+structure SolutionMaterialPolygon
+    (extra : ℕ) (nu : ℝ) (initial : InitialVelocity) (force velocity : VelocityField)
+    (pressure : PressureField) where
+  solution : SmoothSolution nu initial force velocity pressure
+  polygon : MaterialPolygon extra velocity
 
 /-- The complete vertex population at one receiver time. -/
 def MaterialPolygon.snapshot {extra : ℕ} {velocity : VelocityField}
@@ -112,6 +124,13 @@ theorem MaterialPolygon.deriv_vertex_eq_velocity {extra : ℕ} {velocity : Veloc
     (polygon : MaterialPolygon extra velocity) (i : PolygonIndex extra) {t : ℝ} (ht : 0 ≤ t) :
     derivWithin (fun τ ↦ polygon.vertex τ i) (Ici 0) t = velocity (polygon.vertex t i) t :=
   polygon.carried i t ht
+
+/-- Every admitted material trajectory has a genuine within-derivative on oriented time. -/
+theorem MaterialPolygon.differentiableWithinAt_vertex
+    {extra : ℕ} {velocity : VelocityField}
+    (polygon : MaterialPolygon extra velocity) (i : PolygonIndex extra) {t : ℝ} (ht : 0 ≤ t) :
+    DifferentiableWithinAt ℝ (fun τ ↦ polygon.vertex τ i) (Ici 0) t :=
+  polygon.differentiable i t ht
 
 /-! ## 2. Pressure increments and the circulation receiver -/
 
@@ -161,22 +180,24 @@ structure TurnPresentation where
 def TurnPresentation.defect (turn : TurnPresentation) : ℝ :=
   turn.actual - turn.reference
 
-/-- A common chart rebase changes both readings but not their returned difference. -/
+/-- A common additive coordinate shift changes both readings but not their returned difference. -/
 theorem TurnPresentation.defect_commonRebase (turn : TurnPresentation) (shift : ℝ) :
     ({ actual := turn.actual + shift
        reference := turn.reference + shift } : TurnPresentation).defect = turn.defect := by
   simp [TurnPresentation.defect]
 
-/-- Defect is additive when two presented faces are glued. -/
-theorem TurnPresentation.defect_glue (left right : TurnPresentation) :
+/-- Defect is additive under componentwise pairing of two presentations. -/
+theorem TurnPresentation.defect_add (left right : TurnPresentation) :
     ({ actual := left.actual + right.actual
        reference := left.reference + right.reference } : TurnPresentation).defect =
       left.defect + right.defect := by
   simp [TurnPresentation.defect]
   ring
 
-/-- The turn ledger for an `extra + 3`-gon.  The geometric obligations are explicit hypotheses:
-each interior/exterior pair is supplementary, and the exterior turns make one full return. -/
+/-- The turn ledger for an `extra + 3`-gon.  Its two numerical geometric consequences are explicit
+hypotheses: each interior/exterior pair is supplementary, and the exterior turns make one full
+return.  Simplicity, nondegeneracy, and principal-angle bounds are supplied by a later geometric
+realizer rather than inferred here. -/
 structure PolygonTurnLedger (extra : ℕ) where
   interior : PolygonIndex extra → ℝ
   exterior : PolygonIndex extra → ℝ
@@ -201,9 +222,9 @@ theorem PolygonTurnLedger.sum_interior (ledger : PolygonTurnLedger extra) :
   norm_num at hsupp ⊢
   linarith
 
-/-- The familiar `(n - 2) * pi` face for an `n = extra + 3` polygon.  Simplicity,
-nondegeneracy, principal-angle choice, and winding one are represented by the ledger hypotheses;
-they are not inferred from an arbitrary vertex list. -/
+/-- The familiar `(n - 2) * pi` face for an `n = extra + 3` polygon.  The theorem consumes the
+supplementary and winding-one consequences recorded by the ledger; it does not infer the separate
+geometric realization conditions from an arbitrary vertex list. -/
 theorem PolygonTurnLedger.sum_interior_pi (ledger : PolygonTurnLedger extra)
     (hpi : ledger.halfTurn = Real.pi) :
     ∑ i, ledger.interior i = (extra + 1 : ℕ) * Real.pi := by
@@ -237,7 +258,16 @@ theorem ReturnedQuadrilateral.swingThenTransport_eq_flatFourth
   simp [ReturnedQuadrilateral.swingThenTransport, ReturnedQuadrilateral.flatFourth, Swing.swing]
   abel
 
-/-- The returned holonomy defect: what remains after the flat completion is removed. -/
+/-- The genuine gyrogroup construction specializes to the same fourth point in the flat additive
+instance, joining the Swing completion to the gyroparallelogram owner. -/
+theorem ReturnedQuadrilateral.additiveGyroparallelogram_eq_swingThenTransport
+    (q : ReturnedQuadrilateral G) :
+    Gyrogroup.gyroparallelogram q.source q.left q.right = q.swingThenTransport := by
+  rw [Gyrogroup.additive_gyroparallelogram,
+    q.swingThenTransport_eq_flatFourth]
+  rfl
+
+/-- The returned additive closure defect: what remains after the flat completion is removed. -/
 def ReturnedQuadrilateral.returnDefect (q : ReturnedQuadrilateral G) : G :=
   q.returned - q.flatFourth
 
@@ -260,9 +290,14 @@ section ProjectiveFace
 
 variable {K : Type*} [Field K]
 
-/-- The exact undivided four-point receiver of a returned scalar quadrilateral. -/
+/-- The exact undivided four-point receiver in quadrilateral boundary order
+`source -> left -> returned -> right -> source`. -/
 def ReturnedQuadrilateral.projectiveFace (q : ReturnedQuadrilateral K) : RatioPresentation K :=
-  swingPair q.source q.left q.right q.returned
+  swingPair q.source q.left q.returned q.right
+
+/-- The exact pair is an admissible projective point when at least one coordinate is nonzero. -/
+def ReturnedQuadrilateral.ProjectiveFaceAdmissible (q : ReturnedQuadrilateral K) : Prop :=
+  q.projectiveFace.num ≠ 0 ∨ q.projectiveFace.den ≠ 0
 
 /-- Affine chart transport scales both coordinates of the exact projective face together. -/
 theorem ReturnedQuadrilateral.projectiveFace_affine
@@ -272,29 +307,54 @@ theorem ReturnedQuadrilateral.projectiveFace_affine
        right := u * q.right + v
        returned := u * q.returned + v } : ReturnedQuadrilateral K).projectiveFace =
       q.projectiveFace.scale (u * u) := by
-  exact swingPair_affine_coordinates q.source q.left q.right q.returned u v
+  exact swingPair_affine_coordinates q.source q.left q.returned q.right u v
 
-/-- Consequently the translated/scaled quadrilateral has the same projective ratio class. -/
+/-- A nonzero affine scale preserves admissibility of the exact projective pair. -/
+theorem ReturnedQuadrilateral.projectiveFace_affine_admissible
+    (q : ReturnedQuadrilateral K) (u v : K) (hu : u ≠ 0)
+    (hq : q.ProjectiveFaceAdmissible) :
+    ({ source := u * q.source + v
+       left := u * q.left + v
+       right := u * q.right + v
+       returned := u * q.returned + v } : ReturnedQuadrilateral K).ProjectiveFaceAdmissible := by
+  rw [ReturnedQuadrilateral.ProjectiveFaceAdmissible,
+    ReturnedQuadrilateral.projectiveFace_affine]
+  change (u * u) * q.projectiveFace.num ≠ 0 ∨ (u * u) * q.projectiveFace.den ≠ 0
+  rcases hq with hnum | hden
+  · exact Or.inl (mul_ne_zero (mul_ne_zero hu hu) hnum)
+  · exact Or.inr (mul_ne_zero (mul_ne_zero hu hu) hden)
+
+/-- Consequently a nondegenerate affine rebase preserves projective equivalence of the exact
+ratio presentations. -/
 theorem ReturnedQuadrilateral.projectiveFace_affine_projectively
-    (q : ReturnedQuadrilateral K) (u v : K) :
+    (q : ReturnedQuadrilateral K) (u v : K) (hu : u ≠ 0)
+    (hq : q.ProjectiveFaceAdmissible) :
     RatioPresentation.ProjectivelyEq
+        ({ source := u * q.source + v
+           left := u * q.left + v
+           right := u * q.right + v
+           returned := u * q.returned + v } : ReturnedQuadrilateral K).projectiveFace
+        q.projectiveFace ∧
       ({ source := u * q.source + v
          left := u * q.left + v
          right := u * q.right + v
-         returned := u * q.returned + v } : ReturnedQuadrilateral K).projectiveFace
-      q.projectiveFace := by
-  exact swingPair_affine_projectively q.source q.left q.right q.returned u v
+         returned := u * q.returned + v } : ReturnedQuadrilateral K).ProjectiveFaceAdmissible := by
+  constructor
+  · exact swingPair_affine_projectively q.source q.left q.returned q.right u v
+  · exact q.projectiveFace_affine_admissible u v hu hq
 
 end ProjectiveFace
 
-/-! ## 5. The exact refine-and-fork scale law -/
+/-! ## 5. The exact scale-and-fork law -/
 
-/-- The boundary coupling at binary fork depth `forks` and dyadic scale depth `scale`.
-`arc` is the retained integral/arc quantity `C`; `differential` is the local scale `r`. -/
+/-- The scalar boundary coupling at binary fork depth `forks` and dyadic denominator depth `scale`.
+`arc` presents `C` and `differential` presents `r`; geometric dimension and units are supplied by a
+later realization.  Increasing `scale` multiplies the displayed denominator by two. -/
 def refineForkCoupling (forks scale : ℕ) (arc differential : ℝ) : ℝ :=
   (2 : ℝ) ^ forks * arc / ((2 : ℝ) ^ scale * differential)
 
-/-- Refining the scale by one octave while adding one binary fork leaves the coupling fixed. -/
+/-- Advancing the dyadic denominator depth and binary fork depth together leaves the coupling
+fixed. -/
 theorem refineForkCoupling_succ_succ (forks scale : ℕ) (arc differential : ℝ)
     (hdifferential : differential ≠ 0) :
     refineForkCoupling (forks + 1) (scale + 1) arc differential =
@@ -305,7 +365,7 @@ theorem refineForkCoupling_succ_succ (forks scale : ℕ) (arc differential : ℝ
 /-- At fork depth two and the settled scale, the coupling is `2^2 (C / r) = 4 C / r`.
 This is the exact formula available here; any identification with a gravity tensor is additional
 physics, not part of this theorem. -/
-theorem refineForkCoupling_two_zero (arc differential : ℝ) :
+theorem refineForkCoupling_two_zero (arc differential : ℝ) (_hdifferential : differential ≠ 0) :
     refineForkCoupling 2 0 arc differential = 4 * (arc / differential) := by
   norm_num [refineForkCoupling, div_eq_mul_inv]
   ring
@@ -314,9 +374,11 @@ section Audit
 
 #print axioms sum_edges_eq_zero
 #print axioms MaterialPolygon.sum_pressureIncrementAt_eq_zero
+#print axioms MaterialPolygon.differentiableWithinAt_vertex
 #print axioms polygonalCirculation_constant_eq_zero
 #print axioms PolygonTurnLedger.sum_interior_pi
 #print axioms ReturnedQuadrilateral.swingThenTransport_eq_flatFourth
+#print axioms ReturnedQuadrilateral.additiveGyroparallelogram_eq_swingThenTransport
 #print axioms ReturnedQuadrilateral.projectiveFace_affine_projectively
 #print axioms refineForkCoupling_succ_succ
 
