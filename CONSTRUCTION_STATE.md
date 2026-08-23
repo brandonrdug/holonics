@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R0 release admission and entry into R1 of the R0--R6
+**Currency:** 2026-08-22 after Deed R1 release admission and entry into R2 of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RICH INQUIRY RETURNED THE COMPLETE I5 BASELINE BOUNDARY, R0 PASSED, AND R1
-IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE RICH INTAKE RETURNED ONE CODEC-NEUTRAL OPERATION WORLD-TUBE, R1 PASSED,
+AND R2 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -309,23 +309,35 @@ drivers and zero uncatalogued. Candidate and admission:
 and
 [`research/records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md`](research/records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md).
 
-**NEXT DEED: R1 — RICH INTAKE RETURNS ONE CODEC-NEUTRAL OPERATION WORLD-TUBE.**
+**R1 PASSED — THE RICH INTAKE RETURNED ONE CODEC-NEUTRAL OPERATION WORLD-TUBE.**
+[established-bounded; implemented-exact; measured] Seven A1 record occurrences returned exact
+payload squares to seven distinct M0 raw-carrier occurrences. Thirty situated faces remain in five
+unmerged presentation branches with complete cross-codec fibres and shortest separators. The M1
+boundary returns ten ports, laws, and events; five pullback joins; complete typing; and retained
+plural first futures. Every branch crossed both I5 recurrent starts and both world families in one
+RTX 4080 SUPER launch and synchronization with no CPU semantic callback or host branch selection.
+Exactly the five R1 minima close. The product contains eleven files and 50,988 octets; its internal
+rolled SHA-256 is `0e72538c0668c4d71a547c2f0ad9ac97d25b6c3f42542481ba2027ff5ebd692b`.
+The candidate grade is 8/8. The sole complete release receiver passed all thirteen scopes in
+286.913 seconds: 2,837 tests passed, none failed, 27 were explicitly ignored, and every example
+target type-checked. Candidate and admission:
+[`research/records/2026-08-22_THE_RICH_INTAKE_RETURNED_ONE_CODEC_NEUTRAL_OPERATION_WORLD_TUBE_AND_THE_CARD_CARRIED_EVERY_BRANCH.md`](research/records/2026-08-22_THE_RICH_INTAKE_RETURNED_ONE_CODEC_NEUTRAL_OPERATION_WORLD_TUBE_AND_THE_CARD_CARRIED_EVERY_BRANCH.md)
+and
+[`research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md`](research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md).
+
+**NEXT DEED: R2 — DERIVATION-SCALE RECURRENCE CLOSES WITHOUT AN AUTHORED RESPONSE EXTENT.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R1 repairs exactly five R0 minima and no others: the A1-to-M0 addressed cross-chart face passage,
-M0-to-M1 material-founded operation passage, M1-to-I5 typed generator-native entry passage,
-inquiry-and-receiver-to-I5 addressed recurrence entry, and the rich-composition resident card
-front. It accepts separately addressed language, notation, vector/raster, prior-history, and
-requested-receiver faces; recovers plural-grain incidence without a parser or authored OCR grammar;
-elaborates binders, variance, carriers, dimensions, units, boundaries, and hypotheses through M1;
-returns one richer operation world-tube without identifying presentations; returns exact
-cross-codec squares, disagreements, fibres, and shortest separators; mounts that boundary into
-unchanged I5; returns a retained continuation with plural first future; and keeps hot quotient,
-contact, join, and section conduct on the card without CPU semantic selection. Receiver/world
-factorization remains R2 and dynamic morphology remains R3.
+R2 derives recurrence extent from open receiver obligations, generator closure, reconvergence, and
+exterior completion. It must return a complete compatible section/product, plural irreducible
+alternatives with separators, or an explicit obstruction and unfinished frontier; dynamically
+addressed states/generators/relations/junctions/higher cells; plural futures; requested exact
+derivation/proof/value/diagram faces; matched source/native passages; route reopenings; complete
+compactification fibres/decoder; exact work/apparatus; and one resident causal-graph return without
+CPU semantic choreography. Receiver/world factorization closes here; dynamic morphology remains
+R3.
 
-[open] R2--R6 remain ordered behind R1: material-founded
-derivation-scale recurrence, dynamic local cultivation, long-horizon retained context,
+[open] R3--R6 remain ordered behind R2: dynamic local cultivation, long-horizon retained context,
 mathematical/physical multimodal transport, and the first bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
 GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new

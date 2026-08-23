@@ -245,7 +245,7 @@ and inspect the terminal receipt only.
 
 ### R1 — rich intake returns one codec-neutral operation world-tube
 
-[open] R1 is the active deed and repairs only the exact R1 composition absences returned by R0:
+[established-bounded; implemented-exact; measured] R1 repaired only the exact R1 composition absences returned by R0:
 the A1-to-M0 addressed face passage, M0-to-M1 material-founded operation passage, M1-to-I5 typed
 entry passage, inquiry-to-I5 addressed recurrence entry, and rich-composition resident card front.
 The receiver/world-return and dynamic-morphology absences remain R2 and R3 obligations.
@@ -269,9 +269,19 @@ R1 fails if a token, syntax tree, filename, theorem name, provider, media label,
 or embedding distance becomes operation identity; if a diagram is converted into authored prose
 before contact; or if an arbitrary latent width becomes topology.
 
+The admitted return carries seven exact A1/M0 record-face squares, 30 situated faces in five
+unmerged presentation branches, ten typed ports/laws/events, complete cross-codec fibres and
+separators, and every branch across both recurrent starts and both world families. One RTX 4080
+SUPER launch and synchronization returned the complete pullback with no CPU semantic callback or
+host branch selection. Its grade is 8/8; the sole complete receiver passed 2,837 tests and all
+thirteen scopes. Candidate and admission:
+[`../research/records/2026-08-22_THE_RICH_INTAKE_RETURNED_ONE_CODEC_NEUTRAL_OPERATION_WORLD_TUBE_AND_THE_CARD_CARRIED_EVERY_BRANCH.md`](../research/records/2026-08-22_THE_RICH_INTAKE_RETURNED_ONE_CODEC_NEUTRAL_OPERATION_WORLD_TUBE_AND_THE_CARD_CARRIED_EVERY_BRANCH.md)
+and
+[`../research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md`](../research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md).
+
 ### R2 — derivation-scale recurrence closes without an authored response extent
 
-[open] R2 widens I1's fixed three-state recurrence into a material-founded operation/derivation
+[open] R2 is the active deed. It widens I1's fixed three-state recurrence into a material-founded operation/derivation
 complex.
 
 The continuing front derives its extent from open receiver obligations, generator closure,

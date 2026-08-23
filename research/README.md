@@ -179,6 +179,17 @@ governs the rebuild.
   separators, work/apparatus testimony and eight minimal absences after the sole complete receiver
   and one cheap derived-catalog retake; advances only the five R1-labelled face, operation, entry,
   recurrence and resident-join absences while retaining R2 and R3 boundaries.
+- **R1 codec-neutral operation world-tube candidate:**
+  `records/2026-08-22_THE_RICH_INTAKE_RETURNED_ONE_CODEC_NEUTRAL_OPERATION_WORLD_TUBE_AND_THE_CARD_CARRIED_EVERY_BRANCH.md`
+  — returns seven exact A1/M0 record-face squares, 30 situated faces across five unmerged M1
+  presentation branches, complete cross-codec fibres and separators, and the full branch/start
+  pullback through unchanged I5 in one RTX 4080 SUPER launch; closes only the five R1 minima while
+  retaining R2 receiver/world return and R3 dynamic morphology.
+- **R1 release admission and R2 frontier:**
+  `records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md`
+  — admits the five repaired R1 minima, complete unmerged material pullback and one-front resident
+  card return after 2,837 passing tests and thirteen green scopes; makes material-founded
+  derivation-scale recurrence and receiver/world-return factorization the sole active R2 deed.
 - **A3 release admission:**
   `records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`
   — binds the owner-local continuation test, affected `life` package return, coherent ledgers and

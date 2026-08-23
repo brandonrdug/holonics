@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 106 drivers, 19191 returns, 56291405591 bytes.
+# 107 drivers, 19202 returns, 56291456579 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -87,6 +87,7 @@ ca2a00f84ab17968bb4b824f4539bb0801e95e7b05b7e43671bcd49fd9efbd6b	14	5079120	outp
 687c423b0d227473667411a44fb2d8795e456bd6935b689ab2158504fc145c90	13	33687	output/the_recurrent_realizations_condense_into_a_phoenix_ecology
 419611f68dc2c84af26a2d4ef3070dd3fbd09569342d098bce9cd696594e7d3d	3	45890	output/the_reductions_expose_their_words
 065a9a81c9e0de8b9448014737521925a1341b68f371411bd77a3923049fce48	3	4135592	output/the_rest_is_cultivated
+5d16770dbf5d45979204edec5a77f8b678e3ceae9ebbcb9d01f216f9a2784fc5	11	50988	output/the_rich_intake_returns_one_codec_neutral_operation_world_tube
 d4576f9cef2a25530e4e3e625da417ce54e982ace46d3b12a51c1fb29f425fd6	11	60068	output/the_rich_mathematical_inquiry_returns_the_i5_baseline_boundary
 db968af0fb8f4faf8c1156a19bf2d16600764aa7df94853f77f5a479736cb916	14	6155706	output/the_scalar_path_returns_its_pressure_and_utility
 c6f8e03ab043136c0aa4117d7d5aa37c883998175fdfd6e4d64b193ec9953a43	49	31141068	output/the_sibling_continuations_return_their_defect_complex

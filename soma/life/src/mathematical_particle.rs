@@ -30,6 +30,7 @@ use crate::mathematical_source::{ArtifactIdentity, CoTestimonyFiber, SourceLayou
 
 mod active_transport;
 mod admission;
+mod intake;
 mod lineage;
 mod methods;
 mod sameness;
@@ -50,6 +51,7 @@ pub use admission::{
     OpenParticleFiber, ParticleAdmission, ParticleAdmissionInput, ParticleProposal,
     ParticleRefusal, PresentationFiberOccurrence, ProposalRefusal,
 };
+pub use intake::{MaterialOperationWorldTube, MaterialOperationWorldTubeInput, RecordFacePassage};
 pub use lineage::{
     AddressedPassage, AddressedPassageOccurrence, PassageCompositeOccurrence, PassageEndpoint,
     PassageEquivalence, PassageRelationalShadow, PullbackJoinOccurrence,
@@ -548,6 +550,12 @@ pub enum MathematicalParticleError {
     AdmissionNotCausallyLinked,
     MissingExactOwnerLicense,
     MissingResidentPassageReceipt,
+    RecordFacePopulationDisagrees,
+    RecordFaceOccurrenceDisagrees,
+    RecordFaceCarrierAbsent,
+    RecordFaceContentDisagrees,
+    ReceiverOccurrenceUnknown(String),
+    MaterialOperationBoundaryIncomplete,
     AddressedPassageEmpty,
     AddressedOccurrenceKeyDisagrees,
     AddressedBoundaryOutsideLaw(EventId),

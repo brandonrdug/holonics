@@ -1,6 +1,6 @@
 //! Cross-owner validation for one proposed mathematical particle.
 
-mod typing;
+pub(super) mod typing;
 use super::admission::ProposalOwnerAttempt;
 use super::*;
 use holonic_engine::exact_owner_testimony::ExactOwnerKind;

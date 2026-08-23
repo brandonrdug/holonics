@@ -271,17 +271,18 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**R0 PASSED; NEXT DEED: R1 — RICH INTAKE RETURNS ONE CODEC-NEUTRAL OPERATION WORLD-TUBE.** R0
-returned the frozen source/input/rest closure, complete entering occurrence and controls, actual
-unchanged I5 emission, phase defects, fibres, separators, exact work/apparatus testimony, and eight
-dependency-minimal absences. Its sole complete release receiver passed after one cheap derived
-driver-catalog retake. R1 repairs only the five R1-labelled minima: the A1-to-M0 addressed face
-passage, M0-to-M1 material-founded operation passage, M1-to-I5 typed entry passage,
-inquiry-to-I5 addressed recurrence entry, and rich-composition resident card front. It must return
-one exact cross-codec operation world-tube and retained plural first future with hot quotient,
-contact, joining, and section conduct resident on the card. It may not found a parser, OCR grammar,
-semantic router, host foreman, or operation identity from a surface name. R2--R6 remain ordered and
-open. X0--X2 and Qwen remain unscheduled.
+**R1 PASSED; NEXT DEED: R2 — DERIVATION-SCALE RECURRENCE CLOSES WITHOUT AN AUTHORED RESPONSE
+EXTENT.** R1 returned seven exact A1/M0 face squares, 30 situated faces across five unmerged M1
+presentation branches, complete cross-codec fibres/separators, and the full branch/start/world
+pullback through unchanged I5. One resident RTX 4080 SUPER launch and synchronization returned ten
+recurrence sections and ten world families without a CPU semantic callback or host branch
+selection. Exactly the five R1 minima closed; receiver factorization/world return remain R2 and
+dynamic morphology remains R3. The candidate grade is 8/8 and the sole complete receiver passed
+2,837 tests and all thirteen scopes. R2 must now return a material-founded derivation extent,
+plural future sections, complete receiver products or explicit obstruction, source/native matched
+passages, reopenings, compactification fibres/decoder, and one resident causal-graph return. A
+fixed depth, token cap, argmax/top-k, host stop case, or theorem-text lookup cannot close it. R3--R6
+remain ordered and open. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

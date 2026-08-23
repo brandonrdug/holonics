@@ -2,7 +2,9 @@
 
 use super::*;
 
-pub(super) fn source_addresses(testimonies: &[SourceLayoutTestimony]) -> BTreeSet<String> {
+pub(in crate::mathematical_particle) fn source_addresses(
+    testimonies: &[SourceLayoutTestimony],
+) -> BTreeSet<String> {
     testimonies
         .iter()
         .flat_map(|testimony| {
@@ -14,7 +16,7 @@ pub(super) fn source_addresses(testimonies: &[SourceLayoutTestimony]) -> BTreeSe
         .collect()
 }
 
-pub(super) fn require_sources(
+pub(in crate::mathematical_particle) fn require_sources(
     held: &BTreeSet<String>,
     admitted: &BTreeSet<String>,
 ) -> Result<(), MathematicalParticleError> {
@@ -30,7 +32,7 @@ pub(super) fn require_sources(
         })
 }
 
-pub(super) fn require_unique<T: Ord>(
+pub(in crate::mathematical_particle) fn require_unique<T: Ord>(
     items: impl IntoIterator<Item = T>,
     error: MathematicalParticleError,
 ) -> Result<(), MathematicalParticleError> {
@@ -43,7 +45,7 @@ pub(super) fn require_unique<T: Ord>(
     Ok(())
 }
 
-pub(super) fn require_subset<T: Copy + Ord>(
+pub(in crate::mathematical_particle) fn require_subset<T: Copy + Ord>(
     held: &BTreeSet<T>,
     admitted: &BTreeSet<T>,
     error: impl Fn(T) -> MathematicalParticleError,
@@ -109,7 +111,7 @@ pub(super) fn inspect_selection(
     Ok(laws)
 }
 
-pub(super) fn validate_ports(
+pub(in crate::mathematical_particle) fn validate_ports(
     typed: &[TypedPort],
     ports: &BTreeSet<BoundaryId>,
     carriers: &[CarrierOccurrence],
@@ -165,7 +167,7 @@ pub(super) fn validate_ports(
     Ok(())
 }
 
-pub(super) fn validate_operation_typing(
+pub(in crate::mathematical_particle) fn validate_operation_typing(
     typed: &[TypedOperation],
     operation: &PortedOperationComplex,
     hypotheses: &BTreeSet<HypothesisId>,
