@@ -127,4 +127,55 @@ theorem theArchimedeanReceiverAdmitsTheDescentImage {a b : ℤ}
   · exact absurd h hd0
   · exact h
 
+
+/-! ## 3. The good finite places, already constructed
+
+The support theorem is not only a finiteness statement — it **is** the collection of
+local conditions at the good primes.  A prime missing the discriminant admits only
+`p`-free classes, and that is exactly what `GeneralSupport` proves. -/
+
+/-- **THE GOOD-PLACE RECEIVERS ADMIT THE DESCENT IMAGE**: at every prime missing
+`a·b·(a−b)`, a realized class is a unit.  The support bound restated as a receiver. -/
+theorem theGoodPlaceReceiverAdmitsTheDescentImage {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) (P : (E ((a : ℚ)) ((b : ℚ))).Point) {l : ℕ} (hl : l.Prime)
+    (hgood : ¬ (l : ℤ) ∣ a * b * (a - b)) :
+    ∃ d₁ d₂ : ℤ, d₁ ≠ 0 ∧ d₂ ≠ 0 ∧
+      ¬ (l : ℤ) ∣ d₁ ∧ ¬ (l : ℤ) ∣ d₂ ∧
+      Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) P) (d₁ : ℚ) ∧
+      Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) P) (d₂ : ℚ) := by
+  haveI : Fact l.Prime := ⟨hl⟩
+  obtain ⟨d₁, d₂, h10, h20, h1d, h2d, hs1, hs2⟩ :=
+    theSlotClassesAreSupportedOnEveryFullTwoTorsionCurve ha hb hab P
+  refine ⟨d₁, d₂, h10, h20, ?_, ?_, hs1, hs2⟩
+  · intro hc
+    refine hgood ?_
+    have hnat : l ∣ d₁.natAbs := by
+      rwa [FamilyGenocchi.int_dvd_natAbs] at hc
+    exact FamilyGenocchi.int_dvd_natAbs.mpr (Nat.dvd_trans hnat h1d)
+  · intro hc
+    refine hgood ?_
+    have hnat : l ∣ d₂.natAbs := by
+      rwa [FamilyGenocchi.int_dvd_natAbs] at hc
+    exact FamilyGenocchi.int_dvd_natAbs.mpr (Nat.dvd_trans hnat h2d)
+
+/-- **THE RECEIVER FAMILY IS COMPLETE AWAY FROM THE DISCRIMINANT**: the real place is
+constructed, every prime missing `a·b·(a−b)` is constructed, and what remains is the
+**finitely many** primes dividing it.  That is the exact shape of the open work: not a
+family of conditions but a finite list of them. -/
+theorem theReceiverFamilyIsCompleteAwayFromTheDiscriminant {a b : ℤ} (ha : a ≠ 0)
+    (hb : b ≠ 0) (hab : a - b ≠ 0)
+    (h0a : (0 : ℚ) < (a : ℚ)) (hlt : ((a : ℚ)) < ((b : ℚ)))
+    (P : (E ((a : ℚ)) ((b : ℚ))).Point) :
+    (∀ d : ℤ, d ≠ 0 → Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) P) ((d : ℤ) : ℚ) →
+      0 < d) ∧
+    (∀ l : ℕ, l.Prime → ¬ (l : ℤ) ∣ a * b * (a - b) →
+      ∃ d₁ d₂ : ℤ, ¬ (l : ℤ) ∣ d₁ ∧ ¬ (l : ℤ) ∣ d₂ ∧
+        Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) P) (d₁ : ℚ) ∧
+        Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) P) (d₂ : ℚ)) := by
+  refine ⟨fun d hd0 hcls =>
+    theArchimedeanReceiverAdmitsTheDescentImage h0a hlt P hcls hd0, fun l hl hgood => ?_⟩
+  obtain ⟨d₁, d₂, -, -, hn1, hn2, hs1, hs2⟩ :=
+    theGoodPlaceReceiverAdmitsTheDescentImage ha hb hab P hl hgood
+  exact ⟨d₁, d₂, hn1, hn2, hs1, hs2⟩
+
 end Soma.Holonics.Millennium.GeneralRealPlace
