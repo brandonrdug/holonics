@@ -52,4 +52,23 @@ theorem theConjectureForcesAPointOfInfiniteOrderOnTheFiveModEightBranch
   exact FamilyWitness.theAnalyticRankIsPositiveOnTheFiveModEightBranch p hp8
     (by simpa using hzero)
 
+
+/-- **Under the rank clause for the odd-prime witness, every prime
+`p ≡ 5, 7 (mod 8)` carries a rational point of infinite order** — conditionally on
+the posed conjecture, every such prime is a congruent number.  With Genocchi's
+unconditional rank zero at `p ≡ 3 (mod 8)`, the conjecture's dial across the odd
+residues is now fully posed and half-discharged. -/
+theorem theConjectureForcesAPointOfInfiniteOrderOnTheOddSignBranches
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5 ∨ p % 8 = 7)
+    (hclause : TheRankClause p
+      (FamilyWitness.theWitnessAtEveryOddPrime p
+        (by rcases hp8 with h | h <;> omega))) :
+    AlgebraicRankAtLeast p 1 := by
+  by_contra hno
+  have h0 : AlgebraicRankIs p 0 :=
+    ⟨⟨fun i => i.elim0, fun c _ i => i.elim0⟩, by simpa using hno⟩
+  have hzero := (hclause 0).mpr h0
+  exact FamilyWitness.theAnalyticRankIsPositiveOnTheOddSignBranches p hp8
+    (by simpa using hzero)
+
 end Soma.Holonics.Millennium.FamilyPairing

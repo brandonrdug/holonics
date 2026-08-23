@@ -50,7 +50,7 @@ def matrixAction (J : Matrix3) (u : Space) : Space :=
 @[simp]
 theorem matrixAction_apply (J : Matrix3) (u : Space) (i : Fin 3) :
     matrixAction J u i = ∑ j : Fin 3, J i j * u j := by
-  simp [matrixAction, Matrix.mulVec]
+  simp [matrixAction, Matrix.mulVec, dotProduct]
 
 /-- The oriented three-dimensional cross interaction. -/
 def cross (u v : Space) : Space :=
@@ -92,7 +92,7 @@ theorem lambIdentity (J : Matrix3) (u : Space) :
   ext i
   fin_cases i <;>
     simp [matrixAction, kineticGradientFromJacobian, cross, curlFromJacobian, Matrix.mulVec,
-      Fin.sum_univ_succ] <;>
+      dotProduct, Fin.sum_univ_succ] <;>
     ring
 
 /-- A Jacobian chart is symmetric when its two derivative directions commute. -/
