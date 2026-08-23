@@ -138,6 +138,23 @@ def is_ignored(rel: str) -> bool:
     `git check-ignore` exits 0 when the path IS ignored, 1 when it is not, and 128 on error;
     an error is read as not-ignored so a broken git never suppresses a resolution.
     """
+    # `git check-ignore` refuses to descend through a symbolic link.  Release worktrees use an
+    # `output -> <main-worktree>/output` link so an expensive, already-addressed deed can be
+    # inspected without replay.  Without this lexical check the same commit consequently sees an
+    # ignored runtime path as MISSING in the main tree and LIVE in the release worktree.  Anchored
+    # ignored directory roots are repository policy, not a statement about the current inode kind;
+    # honour them before asking git about the concrete path.  A tracked exception remains live
+    # because Resolver._here checks the index before consulting this predicate.
+    head = rel.strip("/").split("/", 1)[0]
+    try:
+        with open(os.path.join(ROOT, ".gitignore"), encoding="utf-8") as ignored:
+            for line in ignored:
+                match = re.fullmatch(r"/([A-Za-z0-9_.-]+)/", line.strip())
+                if match and match.group(1) == head:
+                    return True
+    except OSError:
+        pass
+
     return (
         subprocess.run(
             ["git", "-C", ROOT, "check-ignore", "-q", "--", rel],

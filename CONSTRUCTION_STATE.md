@@ -4,22 +4,40 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after E2 enacted and received release admission for complete inherited
-vision/audio conduct through carrier-neutral native potential complexes.
+**Currency:** 2026-08-23 after E3 enacted and received release admission for returned
+nominal-boundary cultivation of the same addressed Athena continuation.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — E2 PASSED; E3 AGENTIC RETURN CHANGING THE SAME CONTINUATION IS THE SOLE
-AUTHORIZED NEXT DEED.**
+**CURRENT FRONTIER — E3 PASSED; E4 THE NATIVE INFERENCE MEMBRANE IS THE SOLE AUTHORIZED NEXT DEED.**
 
 [project-postulate] The active construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
-E3 now returns one recurrent Athena emission through at least two nominal organ/world apertures,
-retains declined and committed siblings, cultivates a parented codec morphology from E2's
-provisional candidate, detaches/remounts it, changes held-out conduct, attributes the least
-morphology, returns the directional defects predicted by E2, ablates the cultivated consequence,
-and restores the predecessor exactly. Source labels, prompt append, lookup, lossless exchange
-archive, counter increments and media-label routing do not pass.
+E4 now exposes the native request/return membrane over the E0--E3 ecology: stream caused frontier
+occurrences and receipts, resume by addressed continuation identity, accept generic nominal
+organ/world occurrences with source incidence, authorize explicit ablation/withdrawal, preserve
+one product owner, serve a fresh client process, and return a certified interchange for concurrent
+independent requests. Text/image/audio/realtime conventions remain exterior adapters; no media enum,
+compatibility schema, host semantic foreman or conflation of deterministic and application errors
+may enter the semantic dependency cone.
+
+[established-bounded; measured] E3 crossed E0's final recurrent emission through three distinct E2
+incidences—optical, acoustic and parent codec—in a separate world-return process. The exact return
+cultivated E2's provisional candidate as a parented rank-one state pivot, retained committed and
+declined siblings, changed source-detached held-out GPU conduct, reproduced E2's directional
+optical/acoustic defects, ablated locally and consumed its delta to restore exact E2 predecessor
+identity. The 20,380-octet native rest and cultivated identity
+`ca22a3c8ce375e878baaf065d17cba217b8167405d2dc1eb99399627345ac4d4` retain no prompt, lookup,
+lossless exchange archive, source payload or counter.
+
+[established-bounded; measured] E3's sole complete release receiver began at
+2026-08-23T14:35:06-07:00 and returned 2,860 passing tests, zero failures, 34 ignores, every example
+target type-checked and twelve green scopes. Its sole cheap refusal was the ownership ratchet's
+expected six construct classes in the new owner; an explicit per-file baseline row was added and
+the named architecture retake returned a clean 355-file census. The candidate and admission are
+[`research/records/2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_E3_RELEASE_RECEIVER_PASSED_RETURNED_CULTIVATION_AND_E4_BEGINS.md`](research/records/2026-08-23_E3_RELEASE_RECEIVER_PASSED_RETURNED_CULTIVATION_AND_E4_BEGINS.md).
 
 [established-bounded; measured] E2 removed the active `ModalityPort` schema and crossed optical,
 acoustic, implemented-mathematics and cultivated-codec boundaries through nominal `BoundaryId`
@@ -121,8 +139,8 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] E3 retains returned arbitrary-organ and codec cultivation; E4 retains the generic inference
-membrane; and E5 retains the frozen agentic product. Unknown-carrier codec induction and
+[open] E4 retains the generic inference membrane and E5 retains the frozen agentic product.
+Unknown-carrier codec induction and
 touch/chemical/smell/taste apparatus remain open future apertures rather than modality subsystems.
 Receiver-exact native re-expression of every foreign BF16 coefficient remains an open lift fibre.
 X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain unscheduled.

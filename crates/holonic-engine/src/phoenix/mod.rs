@@ -6,6 +6,8 @@
 
 /// Resident shared-prefix circulation over a plural intervention cohort.
 pub mod cohort;
+/// A genuine returned nominal-boundary consequence cultivating one parented codec continuation.
+pub mod boundary_cultivation;
 /// One addressed local cultivation over an already-cultivated Phoenix product.
 pub mod continuation;
 /// Emanative full-tower recurrence and its addressed detachable continuation boundary.
