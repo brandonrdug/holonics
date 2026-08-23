@@ -33,6 +33,7 @@ mod admission;
 mod intake;
 mod lineage;
 mod methods;
+mod recurrence;
 mod sameness;
 #[cfg(test)]
 mod tests;
@@ -60,6 +61,11 @@ pub use methods::{
     conduct_exact_linear, conduct_exact_linear_population, conduct_exact_quantity,
     ExactLinearOwnerReturn, ExactLinearStepReceipt, ExactQuantityOwnerReturn, PassageBranchId,
     TypedConstructionStep, TypedPassage, TypedPassageRef,
+};
+pub use recurrence::{
+    DerivationDecoderFibre, DerivationFibreMember, DerivationHigherCell, DerivationRecurrenceError,
+    DerivationRecurrenceRest, DerivationSeparator, DerivationSourceEdge, DerivationSourceState,
+    MaterialDerivationPassage, RequestedReceiverFactor, DERIVATION_RECURRENCE_SCHEMA,
 };
 pub use sameness::{
     ByteRelation, ByteRelationReceipt, CarrierEqualityRelation, ClassificationReceiverReturn,

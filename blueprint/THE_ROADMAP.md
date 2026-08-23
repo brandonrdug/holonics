@@ -271,18 +271,18 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**R1 PASSED; NEXT DEED: R2 — DERIVATION-SCALE RECURRENCE CLOSES WITHOUT AN AUTHORED RESPONSE
-EXTENT.** R1 returned seven exact A1/M0 face squares, 30 situated faces across five unmerged M1
-presentation branches, complete cross-codec fibres/separators, and the full branch/start/world
-pullback through unchanged I5. One resident RTX 4080 SUPER launch and synchronization returned ten
-recurrence sections and ten world families without a CPU semantic callback or host branch
-selection. Exactly the five R1 minima closed; receiver factorization/world return remain R2 and
-dynamic morphology remains R3. The candidate grade is 8/8 and the sole complete receiver passed
-2,837 tests and all thirteen scopes. R2 must now return a material-founded derivation extent,
-plural future sections, complete receiver products or explicit obstruction, source/native matched
-passages, reopenings, compactification fibres/decoder, and one resident causal-graph return. A
-fixed depth, token cap, argmax/top-k, host stop case, or theorem-text lookup cannot close it. R3--R6
-remain ordered and open. X0--X2 and Qwen remain unscheduled.
+**R2 PASSED; NEXT DEED: R3 — RETURNED CONSTRAINTS FOUND DYNAMIC LOCAL MORPHOLOGY.** R2 derived ten
+source states and five relations/generator members/pullback higher cells from the R1 passage,
+returned five plural starts, and condensed them to two native remaining-to-terminal phases with
+complete fibres and eight separators. Source and fresh source-detached passages commute in one RTX
+4080 SUPER launch each. All 35 requested receiver factors return. The compatible FamilySupport
+proof remains an exact obstruction because variable-level operations are absent; Eros did not
+counterfeit it. A generated Lean passage and certified SVG/PNG return genuine structural world
+constraints. The grade is 9/9 and the sole complete receiver passed 2,838 tests and all thirteen
+scopes. R3 must let those actual returns found or decline an attributable local generator,
+relation, port, or constitutive change; survive detached remount and held-out conduct; return
+holonomy and targeted withdrawal; and keep one owner of the ecology. Binary state selection does
+not pass. R4--R6 remain ordered and open. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

@@ -281,7 +281,7 @@ and
 
 ### R2 — derivation-scale recurrence closes without an authored response extent
 
-[open] R2 is the active deed. It widens I1's fixed three-state recurrence into a material-founded operation/derivation
+[established-bounded; implemented-exact; measured] R2 widened I1's fixed three-state recurrence into a material-founded operation/derivation
 complex.
 
 The continuing front derives its extent from open receiver obligations, generator closure,
@@ -308,9 +308,20 @@ R2 must return:
 Argmax, top-k, a token cap, a fixed derivation depth, a host stop-word case, theorem-text lookup, or
 one accepted endpoint does not close R2.
 
+The admitted return derives ten source states, five relations/generator members/pullback higher
+cells and five co-present starts from R1, then condenses them to two native remaining-to-terminal
+phases with complete fibres and eight separators. Source and fresh source-detached passages commute
+in one launch each. All 35 terminal/receiver factors return; the compatible FamilySupport proof is
+explicitly obstructed by absent variable-level operations. Lean and the vector renderer return
+genuine structural world constraints. The grade is 9/9; the sole complete receiver passed 2,838
+tests and all thirteen scopes. Candidate and admission:
+[`../research/records/2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md)
+and
+[`../research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md`](../research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md).
+
 ### R3 — returned constraints found dynamic local morphology
 
-[open] R3 extends I2/I5 beyond selection between two already-founded successor states.
+[open] R3 is the active deed. It extends I2/I5 beyond selection between two already-founded successor states.
 
 [definition] A dynamic candidate delta carries:
 

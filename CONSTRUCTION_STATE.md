@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R1 release admission and entry into R2 of the R0--R6
+**Currency:** 2026-08-22 after Deed R2 release admission and entry into R3 of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RICH INTAKE RETURNED ONE CODEC-NEUTRAL OPERATION WORLD-TUBE, R1 PASSED,
-AND R2 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE MATERIAL DERIVATION RETURNED ITS COMPLETE FRONTIER AND WORLD CONSTRAINTS,
+R2 PASSED, AND R3 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -325,19 +325,35 @@ target type-checked. Candidate and admission:
 and
 [`research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md`](research/records/2026-08-22_R1_RELEASE_RECEIVER_PASSED_THE_OPERATION_WORLD_TUBE_RETURNED_AND_R2_BEGINS.md).
 
-**NEXT DEED: R2 — DERIVATION-SCALE RECURRENCE CLOSES WITHOUT AN AUTHORED RESPONSE EXTENT.**
+**R2 PASSED — THE MATERIAL DERIVATION RECURRENTLY CLOSED AT ITS EXACT FRONTIER.**
+[established-bounded; implemented-exact; measured] The R1 operation passage derives ten source
+states, five transport relations, five generator-law members, five pullback higher cells, and five
+co-present starts. The remaining-to-terminal quotient condenses them to two native phases while
+complete fibres retain all ten members and eight shortest separators. Source and fresh
+source-detached card passages commute. All 35 terminal/receiver factors return. The compatible
+FamilySupport proof is not claimed: absent variable-level operation transport returns as the exact
+unfinished frontier. Lean accepted four generated structural constraints, and a visually inspected
+SVG/PNG returns exactly ten nodes and five edges. The 18-file, 102,538-octet product has internal
+rolled SHA-256 `ca4abc33bafb138b7b53b4f0af1434531a8ae44a48b905f43f228907249ce6ae`.
+The candidate grade is 9/9. The sole complete release receiver passed all thirteen scopes in
+160.762 seconds: 2,838 tests passed, none failed, 27 were explicitly ignored, and every example
+target type-checked. Candidate and admission:
+[`research/records/2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md`](research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md).
+
+**NEXT DEED: R3 — RETURNED CONSTRAINTS FOUND DYNAMIC LOCAL MORPHOLOGY.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R2 derives recurrence extent from open receiver obligations, generator closure, reconvergence, and
-exterior completion. It must return a complete compatible section/product, plural irreducible
-alternatives with separators, or an explicit obstruction and unfinished frontier; dynamically
-addressed states/generators/relations/junctions/higher cells; plural futures; requested exact
-derivation/proof/value/diagram faces; matched source/native passages; route reopenings; complete
-compactification fibres/decoder; exact work/apparatus; and one resident causal-graph return without
-CPU semantic choreography. Receiver/world factorization closes here; dynamic morphology remains
-R3.
+R3 conducts a lineage-separated development inquiry, returns exact proof/checker, exact-owner,
+rendering, boundary, and later-operator consequences as distinct world occurrences, and lets their
+actual covectors/noncommuting squares found only attributable local change. Commit consumes the
+predecessor and returns one successor; decline returns it unchanged. Changed conduct must survive
+source-detached remount on a structurally related held-out inquiry, a disjoint control must stand,
+revisit holonomy must be nonzero, targeted withdrawal must restore the predecessor, and a real
+generator/relation/port/constitutive action—not selection between prewritten states—must change.
 
-[open] R3--R6 remain ordered behind R2: dynamic local cultivation, long-horizon retained context,
+[open] R4--R6 remain ordered behind R3: long-horizon retained context,
 mathematical/physical multimodal transport, and the first bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
 GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new

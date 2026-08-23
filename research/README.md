@@ -190,6 +190,18 @@ governs the rebuild.
   — admits the five repaired R1 minima, complete unmerged material pullback and one-front resident
   card return after 2,837 passing tests and thirteen green scopes; makes material-founded
   derivation-scale recurrence and receiver/world-return factorization the sole active R2 deed.
+- **R2 material-founded recurrence and returned-world candidate:**
+  `records/2026-08-22_THE_MATERIAL_DERIVATION_RECURRED_TO_ITS_EXACT_FRONTIER_THE_WORLD_RETURNED_CONSTRAINTS_AND_R2_AWAITS_ADMISSION.md`
+  — derives ten source states and five relations from the R1 passage, condenses them to two native
+  phases with complete fibres and separators, returns all 35 requested receiver factors and the
+  exact variable-operation obstruction, and closes real Lean/renderer world consequences in
+  source and source-detached one-launch RTX 4080 SUPER passages without claiming the FamilySupport
+  proof.
+- **R2 release admission and R3 frontier:**
+  `records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md`
+  — admits the dynamic source/native recurrence, complete factorization and actual Lean/rendering
+  world constraints after 2,838 passing tests and thirteen green scopes; retains the exact
+  variable-operation obstruction and makes attributable dynamic local morphology the active deed.
 - **A3 release admission:**
   `records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`
   — binds the owner-local continuation test, affected `life` package return, coherent ledgers and

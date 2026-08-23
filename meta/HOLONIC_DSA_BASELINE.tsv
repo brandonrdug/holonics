@@ -262,6 +262,7 @@ soma/life/src/mathematical_particle/admission.rs	.clone()=2	.collect()=1	.into_i
 soma/life/src/mathematical_particle/intake.rs	.clone()=6	.collect()=5	.flat_map()=1	BTreeSet=9	Vec=10
 soma/life/src/mathematical_particle/lineage.rs	.clone()=5	.collect()=7	BTreeMap=11	BTreeSet=18	Vec=4
 soma/life/src/mathematical_particle/methods.rs	.clone()=14	.collect()=15	.flat_map()=4	.into_iter()=1	BTreeMap=29	BTreeSet=16	Vec=25
+soma/life/src/mathematical_particle/recurrence.rs	.clone()=2	.collect()=8	.flat_map()=1	BTreeSet=5	Vec=28
 soma/life/src/mathematical_particle/sameness.rs	.clone()=4	.collect()=2	.flat_map()=1	BTreeMap=1	BTreeSet=16	Vec=6
 soma/life/src/mathematical_particle/sameness/diagram.rs	.clone()=8	.collect()=31	.flat_map()=2	BTreeMap=18	BTreeSet=29	Vec=5
 soma/life/src/mathematical_particle/sameness/history.rs	.clone()=15	.collect()=2	.flat_map()=1	BTreeSet=11	Vec=9
