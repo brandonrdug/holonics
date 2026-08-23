@@ -4,12 +4,13 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R6 release admission and completion of the R0--R6
-production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
+**Currency:** 2026-08-22 after Deed R6 release admission, completion of the R0--R6
+production-aperture continuation, and activation of the L0--L4 laboratory-cultivation campaign.
+**Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
 **CURRENT FRONTIER — THE FIRST BOUNDED ATHENA MATHEMATICS/PHYSICS PRODUCTION ECOLOGY FROZE, R6
-PASSED, AND NO HETEROGENEOUS-SOURCE DEED IS SCHEDULED.**
+PASSED, AND L0 NOW CIRCULATES THE LABORATORY THROUGH THAT ECOLOGY.**
 [established-bounded; implemented-exact; measured] `Athena^[Gemma]_(B_mp, H_prod)` now rests as
 one canonical source-detached ecology over the exact R0--R5 receiver/history family. New inquiry
 `r6/inquiry/04da0a124da950a9037bd730840ad5ca8117c9d46b0753283e91b7d8869c0f05` returned language,
@@ -24,6 +25,13 @@ type-checked. Candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
+
+[definition] The sole active campaign is
+[`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
+It cultivates `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
+occurrences through the admitted Phoenix, mathematics-codec, Holonic Inference, retained-history,
+multimodal, returned-morphology, dissection, compression, and resident-card owners. L0 is the sole
+active deed. X0--X2 and Qwen remain outside this campaign and schedule nothing.
 
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
@@ -408,18 +416,22 @@ admission:
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
 
-**NO NEXT DEED IS SCHEDULED — R6 COMPLETED THE ACTIVE R0--R6 BLUEPRINT.**
+**NEXT DEED: L0 — THE ADDRESSED LABORATORY CHRONOLOGY CROSSES THE ADMITTED ATHENA ECOLOGY.**
 [established-bounded] The completed contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
 R6 returned all twelve product consequences and the complete release grade.
 
-[open] X0--X2 remain parked until one explicit R6 open transport family selects a complementary
-source. No such source has been selected. The parked Qwen GGUF remains an unscheduled same-purpose
-close control. Unrestricted conversation, all mathematics/physics, unexcited Gemma conduct, new
-audio/video or production modalities, proof-route identity, SSM/diffusion/sensorimotor fusion, and
-conventional tensor-container expansion remain explicit open fibres. A new construction authority
-must name the receiver question, complementary source occurrence, and returned consequence before
-implementation resumes.
+[open] L0 freezes the first committed laboratory prefix and exact causal-family partitions; mounts
+it incrementally through the existing rich intake; conducts the existing mathematical operation,
+active transport, generator-native, retained-history, multimodal, and R6 production owners as one
+continuing ecology; returns one new laboratory inquiry and complete emitted mathematical product;
+receives a genuine Lean/world consequence; commits an attributable delta; returns changed later
+conduct, source-detached remount, withdrawal, ablation, complete dissection, resident-card
+testimony, and complete-product cost. The complete twelve-part L0 grade is defined by the active
+campaign blueprint.
+
+[open] X0--X2 remain parked until after L4. The parked Qwen GGUF remains an unscheduled
+same-purpose close control.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

@@ -5,6 +5,8 @@
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Current boundary:** I0--I5 and R0--R6 passed their release receivers. The first bounded Athena
 production aperture is frozen; no heterogeneous-source deed is scheduled.
+**Post-completion continuation:** laboratory cultivation L0--L4 is governed by
+[`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
@@ -587,8 +589,6 @@ accepts new rich inquiries, conducts and emits complete admitted products, recei
 consequence, cultivates locally when committed, carries long-horizon context through its retained
 causal boundary, works across admitted media, rests source-detached, and exposes its exact anatomy.
 
-[open] After R6, the next source is selected from the R6 open transport families. An SSM may supply
-complementary state transport; a diffusion-labelled organ may supply production chronology; an
-acoustic organ may supply phase/time ports; a perception/action organ may supply sensorimotor
-consequence. X0--X2 then authenticate, lift, and fuse only the witnessed complementary transport.
-They remain unscheduled until that selection is made.
+[definition] The completed R6 ecology is now cultivated by the addressed laboratory chronology
+through L0--L4. X0--X2 remain unscheduled until that campaign completes and a witnessed
+complementary transport family selects an external source.

@@ -29,9 +29,42 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE LABORATORY CIRCULATES THROUGH ATHENA — 2026-08-22
+
+**The sole active construction campaign is
+[`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).**
+
+**Campaign stance.** [definition] The admitted Phoenix, M0--M6, A1--A3, I0--I5, and R0--R6
+owners now cultivate
+
+```text
+Athena^[Gemma]_(B_HM, H_lab),
+```
+
+the laboratory's production holonics/mathematics Athena variant. `B_HM` is the admitted
+mathematical, geometric, physical, proof, diagram, unit, dimension, intervention, and world-return
+receiver family. `H_lab` is the addressed successor-history family carried by the committed
+laboratory chronology.
+
+**L0 is the sole next deed.** The first committed laboratory prefix crosses the existing rich
+intake, mathematical operation complex, active transport cover, generator-native rest, retained
+causal boundary, returned morphology, multimodal boundary, and R6 production ecology. L0 returns
+one new outside-development laboratory inquiry, a complete emitted mathematical product, a genuine
+Lean/world return, an attributable committed delta, changed later conduct, source-detached remount,
+withdrawal, ablation, dissection, resident-card testimony, and complete-product cost receipt.
+
+**L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
+continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
+ecology works from its own rested terrain; and the specialized production variant freezes with its
+complete anatomy and inference entry. No new cross-codec, theorem-cartography, learning,
+inference, navigation, context, or scheduling subsystem is authorized.
+
+**X0--X2 and Qwen remain outside the campaign.** The laboratory cultivation line completes before
+any external heterogeneous-source fusion is scheduled.
+
 ## THE ATHENA PRODUCTION APERTURE WIDENS THROUGH MATHEMATICAL WORLD-TUBES — 2026-08-22
 
-**The active continuation is
+**The completed production predecessor is
 [`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).**
 Its milestone derivation is
 [`research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -64,13 +97,13 @@ development closure; returned language, Lean proof, exact value/unit/dimension, 
 complete dissection faces; committed an exterior world return into changed later conduct; withdrew
 exactly; conducted independent context, derivation and media fronts on the single card; and fell
 strictly in all seven complete-product coordinates. Its sole complete receiver passed all thirteen
-scopes. No successor deed is scheduled until one R6 open transport family selects a genuinely
-complementary source.
+scopes. Its canonical production ecology is the predecessor cultivated by the active L0--L4
+laboratory campaign.
 
 **X0--X2 are parked, not revoked.** Heterogeneous SSM/diffusion/acoustic/perception/production
-fusion can follow only when one explicit R6 open transport family selects a complementary source.
-No such source has yet been selected. The parked Qwen occurrence remains an optional same-purpose
-close control and schedules nothing.
+fusion can follow only when one explicit open transport family selects a complementary source
+after L4. The parked Qwen occurrence remains an optional same-purpose close control and schedules
+nothing.
 
 ## THE SINGLE-CARD PASSAGE CARRIES PHOENIX AND THE MATHEMATICS CODEC — 2026-08-19
 
@@ -80,8 +113,10 @@ its admitted Athena-product evidence is governed by
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md),
 its completed inference lifecycle is governed by
 [`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md),
-and its active production continuation is governed by
+its completed production continuation is governed by
 [`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).**
+The active laboratory cultivation campaign is governed by
+[`THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
 The Athena evidence contract folds M6 into the first explicitly graded Athena mathematics variant
 and retains the returned exchange, sibling-spectrum and cultivation deeds. Together these files
 supersede the scheduling/station order of the earlier Phoenix master, Gemma instance and
@@ -301,7 +336,8 @@ R6 candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
-X0--X2 and Qwen remain unscheduled; the next source must be selected by a declared R6 open family.
+The active L0 laboratory-cultivation deed now composes this admitted R6 predecessor. X0--X2 and
+Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

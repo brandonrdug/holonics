@@ -558,9 +558,9 @@ I4  intra-Gemma heterogeneous modality fusion
 I5  frozen Athena-Gemma inference ecology and dissection atlas.
 ```
 
-I5 satisfied the predecessor condition under which X0--X2 could be posed. The active
-production-aperture blueprint now parks them until R6 returns one explicit complementary open
-transport family.
+I5 satisfied the predecessor condition under which X0--X2 could be posed. R0--R6 then froze the
+bounded production ecology. The active laboratory-cultivation blueprint now composes that ecology
+through L0--L4 while X0--X2 remain parked.
 
 ---
 
