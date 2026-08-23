@@ -116,4 +116,74 @@ theorem theDoubledAbscissaIsTheCertifiedQuotient {a b x y : ℚ}
     _ = N ^ 2 + ((a + b) - 2 * x) * (2 * y) ^ 2 := by rw [hexp]
     _ = (x ^ 2 - a * b) ^ 2 := by rw [hNeq]; linear_combination key
 
+
+/-! ## 4. The two homogeneous certificates and the exact cancellation bound
+
+Writing `x = p/q` in lowest terms, the doubled abscissa is `A/B` with
+
+```text
+A = (p² − ab·q²)²,      B = 2²·q·p·(p − a·q)·(p − b·q),
+```
+
+two binary quartics.  They have **two** Bézout relations, one killing `q` and one
+killing `p`, and together those pin the cancellation exactly.  Constants are kept in
+factored form so the composition stays visible: `2²·(ab)²·(a−b)²` is the discriminant
+square times the denominator's `2²`, not an opaque integer. -/
+
+/-- **THE `q`-SIDE CERTIFICATE**. -/
+theorem theCertificateKillingTheDenominator (a b p q : ℤ) :
+    (2 ^ 2 * q * ((a - b) ^ 2 * q ^ 2 + 2 * (a + b) * p * q - 3 * p ^ 2))
+        * ((p ^ 2 - a * b * q ^ 2) ^ 2)
+      + (3 * p ^ 3 + (a + b) * p ^ 2 * q - 5 * (a * b) * p * q ^ 2
+          - 2 * (a * b) * (a + b) * q ^ 3)
+        * (2 ^ 2 * q * p * (p - a * q) * (p - b * q))
+      = 2 ^ 2 * (a * b) ^ 2 * (a - b) ^ 2 * q ^ 7 := by
+  ring
+
+/-- **THE `p`-SIDE CERTIFICATE**. -/
+theorem theCertificateKillingTheNumerator (a b p q : ℤ) :
+    (2 ^ 2 * p * ((a - b) ^ 2 * p ^ 2 + 2 * (a * b) * (a + b) * p * q
+        - 3 * (a * b) ^ 2 * q ^ 2))
+        * ((p ^ 2 - a * b * q ^ 2) ^ 2)
+      + (-2 * (a * b) * (a + b) * p ^ 3 - 5 * (a * b) ^ 2 * p ^ 2 * q
+          + (a + b) * (a * b) ^ 2 * p * q ^ 2 + 3 * (a * b) ^ 3 * q ^ 3)
+        * (2 ^ 2 * q * p * (p - a * q) * (p - b * q))
+      = 2 ^ 2 * (a - b) ^ 2 * p ^ 7 := by
+  ring
+
+/-- **THE CANCELLATION DIVIDES `2²·(ab)²·(a−b)²` EXACTLY**: for `x = p/q` in lowest
+terms, any common divisor of the doubled abscissa's numerator and denominator divides
+`2²·(ab)²·(a−b)²`.  The two certificates give divisibility of `K·q⁷` and `K·p⁷`; since
+`p` and `q` are coprime so are their seventh powers, and the common divisor drops onto
+`K` alone.  This is the height descent's exact input, on every full-2-torsion curve. -/
+theorem theCancellationIsExactlyBounded (a b p q : ℤ) (hcop : IsCoprime p q) (d : ℤ)
+    (h₁ : d ∣ (p ^ 2 - a * b * q ^ 2) ^ 2)
+    (h₂ : d ∣ 2 ^ 2 * q * p * (p - a * q) * (p - b * q)) :
+    d ∣ 2 ^ 2 * (a * b) ^ 2 * (a - b) ^ 2 := by
+  set K : ℤ := 2 ^ 2 * (a * b) ^ 2 * (a - b) ^ 2 with hK
+  have hq : d ∣ K * q ^ 7 := by
+    rw [hK, ← theCertificateKillingTheDenominator a b p q]
+    exact dvd_add (Dvd.dvd.mul_left h₁ _) (Dvd.dvd.mul_left h₂ _)
+  have hp : d ∣ K * p ^ 7 := by
+    have hsub : (2 : ℤ) ^ 2 * (a - b) ^ 2 * p ^ 7 ∣ K * p ^ 7 :=
+      mul_dvd_mul_right ⟨(a * b) ^ 2, by rw [hK]; ring⟩ _
+    refine dvd_trans ?_ hsub
+    rw [← theCertificateKillingTheNumerator a b p q]
+    exact dvd_add (Dvd.dvd.mul_left h₁ _) (Dvd.dvd.mul_left h₂ _)
+  have hcop7 : IsCoprime (q ^ 7) (p ^ 7) := (hcop.symm).pow
+  obtain ⟨u, v, huv⟩ := hcop7
+  have hsum : d ∣ K * (u * q ^ 7 + v * p ^ 7) := by
+    have e1 : d ∣ K * (u * q ^ 7) := by
+      have : K * (u * q ^ 7) = u * (K * q ^ 7) := by ring
+      rw [this]
+      exact Dvd.dvd.mul_left hq _
+    have e2 : d ∣ K * (v * p ^ 7) := by
+      have : K * (v * p ^ 7) = v * (K * p ^ 7) := by ring
+      rw [this]
+      exact Dvd.dvd.mul_left hp _
+    have : K * (u * q ^ 7 + v * p ^ 7) = K * (u * q ^ 7) + K * (v * p ^ 7) := by ring
+    rw [this]
+    exact dvd_add e1 e2
+  rwa [huv, mul_one] at hsum
+
 end Soma.Holonics.Millennium.GeneralCertificate
