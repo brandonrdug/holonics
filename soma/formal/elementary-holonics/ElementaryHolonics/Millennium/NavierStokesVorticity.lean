@@ -512,23 +512,24 @@ theorem smoothSolution_secondJet_hasMixedSpatialSymmetry
 def divergenceFromJacobian (J : Matrix3) : ℝ :=
   ∑ i : Fin 3, J i i
 
-/-- The coordinate trace of the admitted Jacobian is the basis-independent divergence owner. -/
+/-- The coordinate trace of the totalized Jacobian chart is the basis-independent totalized
+divergence owner.  Admission as an actual derivative is supplied separately. -/
 theorem divergenceFromJacobian_velocityJacobianAt (u : InitialVelocity) (x : Space) :
     divergenceFromJacobian (velocityJacobianAt u x) = divergence u x := by
   rw [divergence, LinearMap.trace_eq_matrix_trace ℝ
     (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis]
   rfl
 
-/-- The first jet of a smooth solution lies in the incompressible fibre at every nonnegative-time
-event. -/
+/-- The admitted first jet of a smooth solution lies in the incompressible fibre at every
+strictly positive-time event.  The initial boundary retains its separate within-derivative face. -/
 theorem smoothSolution_divergenceFromJacobian_eq_zero
     {ν : ℝ} {u₀ : InitialVelocity} {force velocity : VelocityField}
     {pressure : PressureField}
     (solution : SmoothSolution ν u₀ force velocity pressure)
-    (x : Space) (t : ℝ) (ht : 0 ≤ t) :
+    (x : Space) (t : ℝ) (ht : 0 < t) :
     divergenceFromJacobian (velocityJacobianAt (fun y => velocity y t) x) = 0 := by
   rw [divergenceFromJacobian_velocityJacobianAt]
-  exact solution.incompressible x t ht
+  exact solution.incompressible x t (le_of_lt ht)
 
 /-- The Jacobian of vorticity induced by a second velocity jet. -/
 def vorticityJacobianFromSecondJet (H : SecondJet) : Matrix3 := ![
@@ -723,7 +724,7 @@ theorem smoothSolution_curl_advectionJacobian
           (vorticityAt (fun y => velocity y t) x) := by
   apply curl_advectionJacobian_of_incompressible
   · exact smoothSolution_secondJet_hasMixedSpatialSymmetry solution x t ht
-  · exact smoothSolution_divergenceFromJacobian_eq_zero solution x t (le_of_lt ht)
+  · exact smoothSolution_divergenceFromJacobian_eq_zero solution x t ht
 
 /-- The product-rule compatibility square for the positive-time velocity slice of a smooth
 solution. -/
