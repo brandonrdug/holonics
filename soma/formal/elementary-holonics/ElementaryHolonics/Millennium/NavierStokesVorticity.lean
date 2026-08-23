@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.LinearAlgebra.CrossProduct
 import Mathlib.LinearAlgebra.Matrix.ToLin
 import ElementaryHolonics.Foundation.Lineage
 import ElementaryHolonics.Millennium.Coupling
@@ -56,10 +57,7 @@ theorem matrixAction_apply (J : Matrix3) (u : Space) (i : Fin 3) :
 
 /-- The oriented three-dimensional cross interaction. -/
 def cross (u v : Space) : Space :=
-  vectorOfCoordinates ![
-    u 1 * v 2 - u 2 * v 1,
-    u 2 * v 0 - u 0 * v 2,
-    u 0 * v 1 - u 1 * v 0]
+  vectorOfCoordinates (crossProduct (fun i => u i) (fun i => v i))
 
 /-- The curl face of one local Jacobian chart. -/
 def curlFromJacobian (J : Matrix3) : Space :=
@@ -68,8 +66,9 @@ def curlFromJacobian (J : Matrix3) : Space :=
     J 0 2 - J 2 0,
     J 1 0 - J 0 1]
 
-/-- The transpose action which becomes the gradient of kinetic energy for an actual velocity jet. -/
-def kineticGradientFromJacobian (J : Matrix3) (u : Space) : Space :=
+/-- The transpose action `Jᵀu`.  A later calculus theorem may identify it with the gradient of
+kinetic energy for an actual differentiable velocity field. -/
+def transposeAction (J : Matrix3) (u : Space) : Space :=
   matrixAction J.transpose u
 
 /-- The conventionally oriented Lamb vector `ω × u`. -/
@@ -79,7 +78,7 @@ def lambVectorFromJacobian (J : Matrix3) (u : Space) : Space :=
 /-- Exchanging the two incoming rays reverses the cross interaction. -/
 theorem cross_swap (u v : Space) : cross v u = -cross u v := by
   ext i
-  fin_cases i <;> simp [cross] <;> ring
+  fin_cases i <;> simp [cross, crossProduct] <;> ring
 
 /-- The exchange of the cross interaction is exactly the frozen-board swing about zero. -/
 theorem cross_swap_is_zeroAnchoredSwing (u v : Space) :
@@ -90,24 +89,25 @@ theorem cross_swap_is_zeroAnchoredSwing (u v : Space) :
 
 /-- **The pointwise Lamb identity in a Jacobian chart.**
 
-The advective action is the transpose/kinetic-gradient action plus the conventionally oriented
-Lamb vector `ω × u`.  This is a polynomial identity in the nine entries of `J` and three entries of
-`u`; it requires no regularity hypothesis. -/
+The advective action is the transpose action plus the conventionally oriented Lamb vector `ω × u`.
+This is a polynomial identity in the nine entries of `J` and three entries of `u`; it requires no
+regularity hypothesis. -/
 theorem lambIdentity (J : Matrix3) (u : Space) :
-    matrixAction J u = kineticGradientFromJacobian J u + lambVectorFromJacobian J u := by
+    matrixAction J u = transposeAction J u + lambVectorFromJacobian J u := by
   ext i
   fin_cases i <;>
-    simp [matrixAction, kineticGradientFromJacobian, lambVectorFromJacobian, cross,
+    simp [matrixAction, transposeAction, lambVectorFromJacobian, cross, crossProduct,
       curlFromJacobian, Matrix.mulVec, dotProduct, Fin.sum_univ_succ] <;>
     ring
 
 /-- The same Lamb identity in the equivalent `-u × ω` convention. -/
 theorem lambIdentity_velocityCrossVorticity (J : Matrix3) (u : Space) :
-    matrixAction J u = kineticGradientFromJacobian J u - cross u (curlFromJacobian J) := by
+    matrixAction J u = transposeAction J u - cross u (curlFromJacobian J) := by
   rw [lambIdentity, lambVectorFromJacobian, cross_swap]
   abel
 
-/-- A Jacobian chart is symmetric when its two derivative directions commute. -/
+/-- A Jacobian chart is symmetric under transpose; equivalently, its antisymmetric matrix face
+vanishes.  This is not by itself a statement about commuting mixed derivatives. -/
 def IsSymmetricJacobian (J : Matrix3) : Prop :=
   ∀ i j, J i j = J j i
 
@@ -136,7 +136,7 @@ theorem curlFromJacobian_eq_zero_iff (J : Matrix3) :
     curlFromJacobian J = 0 ↔ IsSymmetricJacobian J :=
   ⟨symmetric_of_curlFromJacobian_eq_zero, curlFromJacobian_eq_zero_of_symmetric⟩
 
-/-- Symmetric Jacobians as the exact incoming population of the pressure-curl chain. -/
+/-- Symmetric Jacobians as the exact incoming population of the local symmetric-curl chain. -/
 def symmetricJacobians : AddSubgroup Matrix3 where
   carrier := {J | IsSymmetricJacobian J}
   zero_mem' := by intro i j; rfl
@@ -149,13 +149,25 @@ def symmetricJacobians : AddSubgroup Matrix3 where
     simp only [Matrix.neg_apply]
     rw [hJ i j]
 
-/-- Curl as an additive transport from Jacobian charts to vorticity vectors. -/
-def curlAddHom : Matrix3 →+ Space where
+/-- Curl as a linear transport from Jacobian charts to vorticity vectors. -/
+def curlLinearMap : Matrix3 →ₗ[ℝ] Space where
   toFun := curlFromJacobian
-  map_zero' := by ext i; fin_cases i <;> simp [curlFromJacobian]
   map_add' J K := by
     ext i
     fin_cases i <;> simp [curlFromJacobian] <;> ring
+  map_smul' c J := by
+    ext i
+    fin_cases i <;> simp [curlFromJacobian] <;> ring
+
+/-- The additive face of `curlLinearMap`, used by the existing `TransportChain` owner. -/
+def curlAddHom : Matrix3 →+ Space :=
+  curlLinearMap.toAddMonoidHom
+
+/-- The named kernel artifact: the local matrix curl forgets exactly the symmetric-matrix
+population. -/
+theorem curlAddHom_ker : curlAddHom.ker = symmetricJacobians := by
+  ext J
+  exact curlFromJacobian_eq_zero_iff J
 
 /-- The local symmetric-curl chain: symmetric charts enter the full matrix population, then curl
 carries them to zero.  The source contains all symmetric matrices, not only realized Hessians. -/
@@ -195,11 +207,13 @@ theorem matrixAction_jacobianMatrix (D : Space →L[ℝ] Space) (u : Space) :
     (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis D.toLinearMap u
   simpa [matrixAction, jacobianMatrix] using congrFun h i
 
-/-- The actual spatial Jacobian of a velocity field at an addressed point. -/
+/-- The totalized spatial-Jacobian chart of a velocity field at a point.  It denotes an actual
+derivative occurrence only when accompanied by differentiability testimony. -/
 def velocityJacobianAt (u : InitialVelocity) (x : Space) : Matrix3 :=
   jacobianMatrix (fderiv ℝ u x)
 
-/-- The actual vorticity face of a velocity field at an addressed point. -/
+/-- The totalized vorticity chart at a field/point pair.  `DifferentiableVelocityOccurrence`
+supplies the admission proof for its use as an actual derivative face. -/
 def vorticityAt (u : InitialVelocity) (x : Space) : Space :=
   curlFromJacobian (velocityJacobianAt u x)
 
@@ -208,7 +222,7 @@ object. -/
 theorem pointwiseLambIdentity (u : InitialVelocity) (x : Space)
     (_hu : DifferentiableAt ℝ u x) :
     fderiv ℝ u x (u x) =
-      kineticGradientFromJacobian (velocityJacobianAt u x) (u x) +
+      transposeAction (velocityJacobianAt u x) (u x) +
         lambVectorFromJacobian (velocityJacobianAt u x) (u x) := by
   rw [← matrixAction_jacobianMatrix]
   exact lambIdentity (velocityJacobianAt u x) (u x)
@@ -347,8 +361,9 @@ theorem divergence_vorticityJacobian_eq_zero (H : SecondJet)
 /-- **The nonlinear vorticity transport identity at one second-order jet.**
 
 Taking curl of the advective Jacobian returns transport of vorticity by velocity, minus stretching
-of velocity by vorticity, plus the divergence residue.  This is the exact three-dimensional
-interaction which disappears in two dimensions and which an energy-only receiver does not close. -/
+of velocity by vorticity, plus the divergence residue.  This exposes the stretching term; its
+vanishing under a planar reduction and the insufficiency of energy control remain separate receiver
+statements. -/
 theorem curl_advectionJacobian (H : SecondJet) (J : Matrix3) (u : Space)
     (hH : HasMixedSpatialSymmetry H) :
     curlFromJacobian (advectionJacobianFromJets H J u) =
@@ -356,9 +371,18 @@ theorem curl_advectionJacobian (H : SecondJet) (J : Matrix3) (u : Space)
         matrixAction J (curlFromJacobian J) +
           divergenceFromJacobian J • curlFromJacobian J := by
   ext i
-  fin_cases i <;>
-    simp [curlFromJacobian, advectionJacobianFromJets, vorticityJacobianFromSecondJet,
-      matrixAction, divergenceFromJacobian, Matrix.mulVec, dotProduct, Fin.sum_univ_succ] <;>
+  fin_cases i
+  · simp [curlFromJacobian, advectionJacobianFromJets, vorticityJacobianFromSecondJet,
+      matrixAction, divergenceFromJacobian, Matrix.mulVec, dotProduct, Fin.sum_univ_succ]
+    rw [hH 2 0 1, hH 1 0 2, hH 1 1 2, hH 2 2 1]
+    ring
+  · simp [curlFromJacobian, advectionJacobianFromJets, vorticityJacobianFromSecondJet,
+      matrixAction, divergenceFromJacobian, Matrix.mulVec, dotProduct, Fin.sum_univ_succ]
+    rw [hH 0 0 2, hH 0 1 2, hH 2 1 0, hH 2 2 0]
+    ring
+  · simp [curlFromJacobian, advectionJacobianFromJets, vorticityJacobianFromSecondJet,
+      matrixAction, divergenceFromJacobian, Matrix.mulVec, dotProduct, Fin.sum_univ_succ]
+    rw [hH 0 0 1, hH 1 1 0, hH 1 2 0, hH 0 2 1]
     ring
 
 /-- On the incompressible fibre, the divergence residue vanishes and the true three-dimensional
@@ -370,6 +394,44 @@ theorem curl_advectionJacobian_of_incompressible (H : SecondJet) (J : Matrix3) (
         matrixAction J (curlFromJacobian J) := by
   rw [curl_advectionJacobian H J u hH, hdiv, zero_smul, add_zero]
 
+/-- Applying curl to a differentiated momentum balance removes exactly the symmetric pressure
+Jacobian.  The five matrix ports are respectively the time, advection, viscous, pressure, and force
+jets; attaching them to an actual solution still owes the corresponding derivative-commutation
+receipts. -/
+theorem curl_differentiatedMomentum
+    (timeJet advectionJet viscousJet pressureJet forceJet : Matrix3) (ν : ℝ)
+    (hpressure : IsSymmetricJacobian pressureJet)
+    (hmomentum : timeJet + advectionJet = ν • viscousJet - pressureJet + forceJet) :
+    curlFromJacobian timeJet + curlFromJacobian advectionJet =
+      ν • curlFromJacobian viscousJet + curlFromJacobian forceJet := by
+  change curlLinearMap timeJet + curlLinearMap advectionJet =
+    ν • curlLinearMap viscousJet + curlLinearMap forceJet
+  rw [← curlLinearMap.map_add, hmomentum, curlLinearMap.map_add, curlLinearMap.map_sub,
+    curlLinearMap.map_smul, show curlLinearMap pressureJet = 0 from
+      curlFromJacobian_eq_zero_of_symmetric hpressure, sub_zero]
+
+/-- **The local incompressible vorticity balance at the second-jet grain.**
+
+Pressure has departed through the symmetric-curl chain.  Vorticity transport and stretching remain
+as distinct ordered terms.  An actual PDE theorem must additionally identify `timeJet` with the
+time derivative of vorticity and `viscousJet` with its Laplacian jet. -/
+theorem localVorticityBalance
+    (H : SecondJet) (J timeJet viscousJet pressureJet forceJet : Matrix3)
+    (u : Space) (ν : ℝ) (hH : HasMixedSpatialSymmetry H)
+    (hdiv : divergenceFromJacobian J = 0)
+    (hpressure : IsSymmetricJacobian pressureJet)
+    (hmomentum :
+      timeJet + advectionJacobianFromJets H J u =
+        ν • viscousJet - pressureJet + forceJet) :
+    curlFromJacobian timeJet + matrixAction (vorticityJacobianFromSecondJet H) u =
+      matrixAction J (curlFromJacobian J) +
+        ν • curlFromJacobian viscousJet + curlFromJacobian forceJet := by
+  have hcurl := curl_differentiatedMomentum timeJet (advectionJacobianFromJets H J u)
+    viscousJet pressureJet forceJet ν hpressure hmomentum
+  rw [curl_advectionJacobian_of_incompressible H J u hH hdiv] at hcurl
+  have hadd := congrArg (fun z : Space => z + matrixAction J (curlFromJacobian J)) hcurl
+  simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using hadd
+
 end Soma.Holonics.Millennium.NavierStokesVorticity
 
 section Audit
@@ -377,6 +439,7 @@ open Soma.Holonics.Millennium.NavierStokesVorticity
 #print axioms cross_swap_is_zeroAnchoredSwing
 #print axioms lambIdentity
 #print axioms curlFromJacobian_eq_zero_iff
+#print axioms curlAddHom_ker
 #print axioms symmetricCurlChain_glues
 #print axioms matrixAction_jacobianMatrix
 #print axioms pointwiseLambIdentity
@@ -387,4 +450,6 @@ open Soma.Holonics.Millennium.NavierStokesVorticity
 #print axioms divergence_vorticityJacobian_eq_zero
 #print axioms curl_advectionJacobian
 #print axioms curl_advectionJacobian_of_incompressible
+#print axioms curl_differentiatedMomentum
+#print axioms localVorticityBalance
 end Audit
