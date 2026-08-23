@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.GeneralHeight
 import ElementaryHolonics.Millennium.GeneralCollision
+import ElementaryHolonics.Millennium.UniversalBSD
 
 /-!
 # GeneralMordell: the descent assembled on every full-2-torsion curve
@@ -653,5 +654,149 @@ theorem theMordellWeilTheoremOnEveryFullTwoTorsionCurve
         rw [hEq]
         exact AddSubgroup.add_mem _ (AddSubgroup.add_mem _ hQmem hQmem) hRmem
   exact key (pheight a b X) X le_rfl
+
+
+/-! ## 11. The rank is bounded by the divisor count -/
+
+open DirectSum
+
+set_option maxHeartbeats 2000000 in
+/-- **THE RANK IS BOUNDED ON EVERY FULL-TWO-TORSION CURVE**: with Mordell–Weil in
+hand the rank is a finite invariant, and the descent bounds it — whenever
+`4·τ(|ab(a−b)|)² < 2^r`, no `r` points are independent modulo torsion.
+
+The `2^r` sign vectors built from the free basis are pairwise incongruent modulo
+doubles, because at a coordinate where two sign vectors differ their difference is
+odd while a double is even everywhere.  They must therefore collide in the finite
+class atlas, which bounds `2^r`.
+
+The congruent slice gets a further factor of three from its two-torsion trio; that
+factor does **not** survive to two parameters, because `(0,0)` can itself be a double
+when `ab` and `−a` are both squares.  The bound here is stated without it. -/
+theorem theRankIsBoundedOnEveryFullTwoTorsionCurve (r : ℕ)
+    (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
+    (hr : 4 * (a * b * (a - b)).natAbs.divisors.card
+      * (a * b * (a - b)).natAbs.divisors.card < 2 ^ r) :
+    ¬ Soma.Holonics.Millennium.UniversalBSD.RankAtLeastOn
+        (E ((a : ℚ)) ((b : ℚ))) r := by
+  intro hR
+  unfold Soma.Holonics.Millennium.UniversalBSD.RankAtLeastOn
+    Soma.Holonics.Millennium.UniversalBSD.IndependentModTorsionOn
+    Soma.Holonics.Millennium.UniversalBSD.IsTorsionOn at hR
+  obtain ⟨Pts, hind⟩ := hR
+  haveI : AddGroup.FG ((E ((a : ℚ)) ((b : ℚ))).Point) :=
+    theMordellWeilTheoremOnEveryFullTwoTorsionCurve ha hb hab
+  obtain ⟨m, ι, hι, qq, hqq, e, ⟨F⟩⟩ :=
+    AddCommGroup.equiv_free_prod_directSum_zmod ((E ((a : ℚ)) ((b : ℚ))).Point)
+  haveI := hι
+  haveI : ∀ i, NeZero (qq i ^ e i) := fun i => ⟨pow_ne_zero _ (hqq i).pos.ne'⟩
+  haveI : Finite (⨁ i, ZMod (qq i ^ e i)) :=
+    Finite.of_equiv _ DFinsupp.equivFunOnFintype.symm
+  have htor : ∀ X : (E ((a : ℚ)) ((b : ℚ))).Point, (F X).1 = 0 →
+      ∃ k : ℕ, 0 < k ∧ k • X = 0 := by
+    intro X hX
+    refine ⟨Nat.card (⨁ i, ZMod (qq i ^ e i)), Nat.card_pos, ?_⟩
+    apply F.injective
+    rw [map_nsmul, map_zero]
+    have h2 : (Nat.card (⨁ i, ZMod (qq i ^ e i))) • F X
+        = ((Nat.card (⨁ i, ZMod (qq i ^ e i))) • (F X).1,
+           (Nat.card (⨁ i, ZMod (qq i ^ e i))) • (F X).2) := rfl
+    rw [h2, hX, smul_zero, card_nsmul_eq_zero']
+    rfl
+  -- the free parts are independent, so the free rank dominates `r`
+  set v : Fin r → (Fin m →₀ ℤ) := fun i => (F (Pts i)).1 with hv
+  have hindZ : ∀ c : Fin r → ℤ, (∑ i, c i • v i) = 0 → ∀ i, c i = 0 := by
+    intro c hczero i
+    refine hind c ?_ i
+    apply htor
+    have hmap : F (∑ i, c i • Pts i) = ∑ i, c i • F (Pts i) := by
+      rw [map_sum]
+      exact Finset.sum_congr rfl fun i _ => by rw [map_zsmul]
+    have h1 : (F (∑ i, c i • Pts i)).1 = ∑ i, c i • v i := by
+      rw [hmap]
+      have h2 := map_sum (AddMonoidHom.fst (Fin m →₀ ℤ) (⨁ i, ZMod (qq i ^ e i)))
+        (fun i => c i • F (Pts i)) Finset.univ
+      calc (∑ i, c i • F (Pts i)).1
+          = ∑ i, (c i • F (Pts i)).1 := h2
+        _ = ∑ i, c i • v i :=
+            Finset.sum_congr rfl fun j _ => by rw [Prod.smul_fst]
+    rw [h1, hczero]
+  set castHom : (Fin m →₀ ℤ) →+ (Fin m →₀ ℚ) :=
+    Finsupp.mapRange.addMonoidHom (Int.castAddHom ℚ) with hcastHom
+  have hcastInj : Function.Injective castHom := by
+    intro g h hgh
+    ext j
+    have h1 := DFunLike.congr_fun hgh j
+    rw [hcastHom] at h1
+    simp only [Finsupp.mapRange.addMonoidHom_apply, Finsupp.mapRange_apply,
+      Int.coe_castAddHom] at h1
+    exact_mod_cast h1
+  set w : Fin r → (Fin m →₀ ℚ) := fun i => castHom (v i) with hw
+  have hindW : LinearIndependent ℚ w := by
+    rw [← LinearIndependent.iff_fractionRing (R := ℤ) (K := ℚ)]
+    rw [Fintype.linearIndependent_iff]
+    intro c hc i
+    refine hindZ c ?_ i
+    apply hcastInj
+    rw [map_sum, map_zero]
+    have hterm : ∀ j : Fin r, castHom (c j • v j) = c j • w j := by
+      intro j
+      rw [map_zsmul, hw]
+    rw [Finset.sum_congr rfl fun j _ => hterm j]
+    exact hc
+  have hrm : r ≤ m := by
+    have h1 := hindW.fintype_card_le_finrank
+    rw [Module.finrank_finsupp_self] at h1
+    simpa using h1
+  -- the sign-vector free parts
+  set wv : (Fin r → Bool) → (Fin m →₀ ℤ) := fun ε =>
+    ∑ i : Fin r, if ε i then Finsupp.single (Fin.castLE hrm i) (1 : ℤ) else 0
+    with hwv
+  have hwv_apply : ∀ (ε : Fin r → Bool) (i : Fin r),
+      wv ε (Fin.castLE hrm i) = if ε i then 1 else 0 := by
+    intro ε i
+    rw [hwv]
+    simp only
+    rw [Finsupp.finset_sum_apply]
+    rw [Finset.sum_eq_single i]
+    · by_cases hbb : ε i
+      · rw [if_pos hbb, if_pos hbb, Finsupp.single_eq_same]
+      · rw [if_neg hbb, if_neg hbb, Finsupp.coe_zero, Pi.zero_apply]
+    · intro j _ hji
+      by_cases hbb : ε j
+      · rw [if_pos hbb]
+        exact Finsupp.single_eq_of_ne
+          (fun hc => hji (Fin.castLE_injective hrm hc).symm)
+      · rw [if_neg hbb, Finsupp.coe_zero, Pi.zero_apply]
+    · intro habs
+      exact absurd (Finset.mem_univ i) habs
+  -- the colliding family of `2^r` points
+  obtain ⟨ε, δ, hne, Q, hQ⟩ :=
+    theClassesCollideOnEveryFullTwoTorsionCurve ha hb hab
+      (α := Fin r → Bool)
+      (by
+        simp only [Fintype.card_fun, Fintype.card_bool, Fintype.card_fin]
+        omega)
+      (fun ε => F.symm (wv ε, 0))
+  -- the difference of two sign vectors is even at every coordinate
+  have hfree : wv ε - wv δ = (2 : ℤ) • (F Q).1 := by
+    have h1 : F (F.symm (wv ε, 0) - F.symm (wv δ, 0)) = F (Q + Q) := by rw [hQ]
+    rw [map_sub, AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply, map_add] at h1
+    have h2 := congrArg Prod.fst h1
+    simp only [Prod.fst_sub, Prod.fst_add] at h2
+    rw [h2]
+    module
+  -- but it is odd at a coordinate where the signs differ
+  obtain ⟨i, hi⟩ : ∃ i : Fin r, ε i ≠ δ i := by
+    by_contra hall
+    push_neg at hall
+    exact hne (funext hall)
+  have hodd := congrArg (fun g => g (Fin.castLE hrm i)) hfree
+  simp only [Finsupp.coe_sub, Pi.sub_apply, Finsupp.coe_smul, Pi.smul_apply,
+    smul_eq_mul] at hodd
+  rw [hwv_apply, hwv_apply] at hodd
+  rcases Bool.eq_false_or_eq_true (ε i) with hε | hε <;>
+    rcases Bool.eq_false_or_eq_true (δ i) with hδ | hδ <;>
+      rw [hε, hδ] at hodd hi <;> simp at hodd hi <;> omega
 
 end Soma.Holonics.Millennium.GeneralMordell
