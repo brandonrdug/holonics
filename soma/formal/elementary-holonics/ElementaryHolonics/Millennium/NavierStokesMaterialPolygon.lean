@@ -168,6 +168,54 @@ def MaterialPolygon.velocityCirculation {extra : ℕ} {velocity : VelocityField}
     (polygon : MaterialPolygon extra velocity) (t : ℝ) : ℝ :=
   polygonalCirculation (fun i ↦ velocity (polygon.vertex t i) t) (polygon.snapshot t)
 
+/-- The symmetric current on an edge, pairing both endpoint occurrences before the receiver takes
+the inner product. -/
+def symmetricEdgeCurrent {extra : ℕ}
+    (current : PolygonIndex extra → Space) (i : PolygonIndex extra) : Space :=
+  (2 : ℝ)⁻¹ • (current i + current (cyclicSuccessor extra i))
+
+/-- The symmetric/trapezoidal polygonal circulation receiver. -/
+def symmetricPolygonalCirculation {extra : ℕ}
+    (current vertex : PolygonIndex extra → Space) : ℝ :=
+  ∑ i, inner ℝ (symmetricEdgeCurrent current i) (edge vertex i)
+
+/-- The symmetric velocity circulation of one material snapshot. -/
+def MaterialPolygon.symmetricVelocityCirculation {extra : ℕ} {velocity : VelocityField}
+    (polygon : MaterialPolygon extra velocity) (t : ℝ) : ℝ :=
+  symmetricPolygonalCirculation
+    (fun i ↦ velocity (polygon.vertex t i) t) (polygon.snapshot t)
+
+/-- The geometric contribution produced when each material edge moves with its two endpoint
+velocities. -/
+def symmetricEdgeMotionReturn {extra : ℕ}
+    (current : PolygonIndex extra → Space) : ℝ :=
+  ∑ i, inner ℝ (symmetricEdgeCurrent current i)
+    (current (cyclicSuccessor extra i) - current i)
+
+/-- **Exact moving-edge cancellation.**  The symmetric edge-current pairing turns each material
+edge contribution into half a cyclic kinetic-energy difference, so the whole closed population
+telescopes to zero. -/
+theorem symmetricEdgeMotionReturn_eq_zero {extra : ℕ}
+    (current : PolygonIndex extra → Space) :
+    symmetricEdgeMotionReturn current = 0 := by
+  have hedge : ∀ i : PolygonIndex extra,
+      inner ℝ (symmetricEdgeCurrent current i)
+          (current (cyclicSuccessor extra i) - current i) =
+        (2 : ℝ)⁻¹ *
+          (inner ℝ (current (cyclicSuccessor extra i))
+              (current (cyclicSuccessor extra i)) - inner ℝ (current i) (current i)) := by
+    intro i
+    simp only [symmetricEdgeCurrent, real_inner_smul_left, inner_add_left, inner_sub_right]
+    rw [real_inner_comm (current i) (current (cyclicSuccessor extra i))]
+    ring
+  rw [symmetricEdgeMotionReturn]
+  simp_rw [hedge]
+  rw [← Finset.mul_sum]
+  rw [show (∑ i, inner ℝ (current (cyclicSuccessor extra i))
+        (current (cyclicSuccessor extra i)) - inner ℝ (current i) (current i)) = 0 by
+      exact sum_cyclicIncrement_eq_zero (fun i ↦ inner ℝ (current i) (current i))]
+  simp
+
 /-! ## 3. Angle conservation and receiver-visible defect -/
 
 /-- A retained turn presentation.  `actual` is what a receiver reads; `reference` is the flat or

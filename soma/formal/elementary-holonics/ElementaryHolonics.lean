@@ -5,6 +5,7 @@ import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
 import ElementaryHolonics.Geometry.Telescoping
 import ElementaryHolonics.Geometry.CrossRatio
+import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.RH.Statement
 import ElementaryHolonics.RH.Route
 import ElementaryHolonics.Millennium.Gluing
@@ -26,6 +27,9 @@ import ElementaryHolonics.Millennium.Rebase
 import ElementaryHolonics.Millennium.FormRebase
 import ElementaryHolonics.Millennium.Lines
 import ElementaryHolonics.Millennium.OfficialProblems
+import ElementaryHolonics.Millennium.NavierStokesVorticity
+import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
+import ElementaryHolonics.Millennium.NavierStokesCurvedTransport
 import ElementaryHolonics.Millennium.YangMillsLimit
 import ElementaryHolonics.Millennium.ReflectedPositivity
 import ElementaryHolonics.Millennium.AlgebraicGNS
@@ -94,6 +98,7 @@ import ElementaryHolonics.Millennium.FamilyCollision
 import ElementaryHolonics.Millennium.FamilyRank
 import ElementaryHolonics.Millennium.FamilyLogRank
 import ElementaryHolonics.Millennium.FamilyPrimeRank
+import ElementaryHolonics.Millennium.FamilyDivisorRank
 import ElementaryHolonics.Millennium.FamilyGenocchi
 import ElementaryHolonics.Millennium.FamilyFiveDescent
 import ElementaryHolonics.Millennium.FamilySevenDescent

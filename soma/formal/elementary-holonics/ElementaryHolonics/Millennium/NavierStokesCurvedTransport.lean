@@ -31,40 +31,46 @@ open Soma.Holonics.Millennium.NavierStokesMaterialPolygon
 
 /-! ## 1. Kelvin as the zero-return fibre of the material circulation balance -/
 
-/-- The complete finite circulation balance between two material snapshots.  Pressure is retained
-as an edge population; viscosity and forcing are separate returned faces. -/
-structure MaterialCirculationBalance {extra : ℕ} {velocity : VelocityField}
-    (polygon : MaterialPolygon extra velocity) where
-  pressure : PressureField
+/-- The complete finite circulation balance between two material snapshots of one admitted smooth
+Navier--Stokes solution.  Its own pressure is retained as an edge population; viscosity and forcing
+are separate returned faces. -/
+structure MaterialCirculationBalance
+    {extra : ℕ} {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (body : SolutionMaterialPolygon extra nu initial force velocity pressure) where
   viscousReturn : ℝ → ℝ → ℝ
   forcingReturn : ℝ → ℝ → ℝ
   balance : ∀ s t, 0 ≤ s → 0 ≤ t →
-    polygon.velocityCirculation t - polygon.velocityCirculation s =
-      (∑ i, polygon.pressureIncrementAt pressure t i) +
+    body.polygon.velocityCirculation t - body.polygon.velocityCirculation s =
+      (∑ i, body.polygon.pressureIncrementAt pressure t i) +
         viscousReturn s t + forcingReturn s t
 
 /-- The pressure population disappears from the circulation balance by exact cyclic cancellation;
 the viscous and forcing ports remain visible. -/
 theorem MaterialCirculationBalance.change_eq_viscous_add_forcing
-    {extra : ℕ} {velocity : VelocityField} {polygon : MaterialPolygon extra velocity}
-    (law : MaterialCirculationBalance polygon) {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
-    polygon.velocityCirculation t - polygon.velocityCirculation s =
+    {extra : ℕ} {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    {body : SolutionMaterialPolygon extra nu initial force velocity pressure}
+    (law : MaterialCirculationBalance body) {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
+    body.polygon.velocityCirculation t - body.polygon.velocityCirculation s =
       law.viscousReturn s t + law.forcingReturn s t := by
-  rw [law.balance s t hs ht, polygon.sum_pressureIncrementAt_eq_zero]
+  rw [law.balance s t hs ht, body.polygon.sum_pressureIncrementAt_eq_zero]
   simp
 
 /-- **Finite material Kelvin theorem.**  On the zero-viscous-return and zero-forcing-return fibre,
 the polygonal circulation is conserved between every two nonnegative receiver times. -/
 theorem MaterialCirculationBalance.kelvin
-    {extra : ℕ} {velocity : VelocityField} {polygon : MaterialPolygon extra velocity}
-    (law : MaterialCirculationBalance polygon)
+    {extra : ℕ} {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    {body : SolutionMaterialPolygon extra nu initial force velocity pressure}
+    (law : MaterialCirculationBalance body)
     (hviscous : ∀ s t, 0 ≤ s → 0 ≤ t → law.viscousReturn s t = 0)
     (hforcing : ∀ s t, 0 ≤ s → 0 ≤ t → law.forcingReturn s t = 0)
     {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
-    polygon.velocityCirculation t = polygon.velocityCirculation s := by
+    body.polygon.velocityCirculation t = body.polygon.velocityCirculation s := by
   have hchange := law.change_eq_viscous_add_forcing hs ht
   rw [hviscous s t hs ht, hforcing s t hs ht] at hchange
-  have hzero : polygon.velocityCirculation t - polygon.velocityCirculation s = 0 := by
+  have hzero : body.polygon.velocityCirculation t - body.polygon.velocityCirculation s = 0 := by
     simpa using hchange
   exact sub_eq_zero.mp hzero
 
@@ -183,12 +189,13 @@ theorem EinsteinFluidDynamics.receiverEquation_fourArcOverDifferential
     {velocity : VelocityField} {pressure : PressureField}
     {Curvature Stress Receiver Flux : Type*} [Zero Flux]
     (dynamics : EinsteinFluidDynamics velocity pressure Curvature Stress Receiver Flux)
-    {arc differential : ℝ} (hcoupling : dynamics.UsesRefineForkCoupling arc differential)
+    {arc differential : ℝ} (hdifferential : differential ≠ 0)
+    (hcoupling : dynamics.UsesRefineForkCoupling arc differential)
     (receiver : Receiver) (x : Space) (t : ℝ) :
     dynamics.curvatureFace receiver (dynamics.curvatureAt x t) =
       (4 * (arc / differential)) * dynamics.stressFace receiver (dynamics.stressAt x t) := by
   rw [dynamics.fieldEquation receiver x t, hcoupling,
-    refineForkCoupling_two_zero]
+    refineForkCoupling_two_zero arc differential hdifferential]
   rfl
 
 section Audit
