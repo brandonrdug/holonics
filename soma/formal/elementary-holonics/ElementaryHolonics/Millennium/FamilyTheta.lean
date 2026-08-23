@@ -34,23 +34,23 @@ open Real Complex AddChar MulChar
 def oddInd (m : ℤ) : ℂ := if m % 2 = 0 then 0 else 1
 
 /-- Integer powers of `−1` through `cexp`. -/
-private lemma neg_one_zpow_exp (k : ℤ) : cexp (π * I * k) = (-1 : ℂ) ^ k := by
+lemma neg_one_zpow_exp (k : ℤ) : cexp (π * I * k) = (-1 : ℂ) ^ k := by
   rw [show (π : ℂ) * I * k = (k : ℂ) * (π * I) from by ring, Complex.exp_int_mul,
     Complex.exp_pi_mul_I]
 
 /-- The primitive `p`-th root of unity. -/
 def zetaP (p : ℕ) : ℂ := cexp (2 * π * I / p)
 
-private lemma zetaP_ne_zero (p : ℕ) : zetaP p ≠ 0 := Complex.exp_ne_zero _
+lemma zetaP_ne_zero (p : ℕ) : zetaP p ≠ 0 := Complex.exp_ne_zero _
 
 /-- Integer-exponent powers of `ζ_p` through `cexp`. -/
-private lemma zetaP_zpow_exp (p : ℕ) (K : ℤ) :
+lemma zetaP_zpow_exp (p : ℕ) (K : ℤ) :
     cexp (2 * π * I * K / p) = zetaP p ^ K := by
   rw [show 2 * (π : ℂ) * I * K / p = (K : ℂ) * (2 * π * I / p) from by ring, zetaP,
     ← Complex.exp_int_mul]
 
 /-- Powers of `ζ_p` reduce mod `p`. -/
-private lemma zetaP_zpow_congr (p : ℕ) (hp : p ≠ 0) {a b : ℤ}
+lemma zetaP_zpow_congr (p : ℕ) (hp : p ≠ 0) {a b : ℤ}
     (hab : a % (p : ℤ) = b % (p : ℤ)) : zetaP p ^ a = zetaP p ^ b := by
   have hprim : IsPrimitiveRoot (zetaP p) p := Complex.isPrimitiveRoot_exp p hp
   obtain ⟨c, hc⟩ := Int.ModEq.dvd (show a ≡ b [ZMOD (p : ℤ)] from hab)
@@ -59,7 +59,7 @@ private lemma zetaP_zpow_congr (p : ℕ) (hp : p ≠ 0) {a b : ℤ}
     one_zpow, mul_one]
 
 /-- The standard additive character returns `ζ_p` to an integer power. -/
-private lemma psi_intCast (p : ℕ) [NeZero p] (hp : p ≠ 0)
+lemma psi_intCast (p : ℕ) [NeZero p] (hp : p ≠ 0)
     (hζ : zetaP p ^ p = 1) (K : ℤ) :
     AddChar.zmodChar p hζ ((K : ZMod p)) = zetaP p ^ K := by
   rw [AddChar.zmodChar_apply, ← zpow_natCast]
@@ -117,7 +117,7 @@ def phaseTerm (p : ℕ) [Fact p.Prime] (n m : ℤ) (e d : ℕ) : ℂ :=
     * cexp (2 * π * I * ((d : ℤ) * m) / (2 * p))
 
 /-- A range-`p` sum of residue data is the residue sum. -/
-private lemma sum_range_zmod (p : ℕ) [NeZero p] (F : ZMod p → ℂ) :
+lemma sum_range_zmod (p : ℕ) [NeZero p] (F : ZMod p → ℂ) :
     ∑ e ∈ Finset.range p, F ((e : ℕ) : ZMod p) = ∑ a : ZMod p, F a := by
   refine Finset.sum_nbij' (fun e => ((e : ℕ) : ZMod p)) (fun a => a.val)
     ?_ ?_ ?_ ?_ ?_
