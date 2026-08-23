@@ -42,18 +42,18 @@ pub fn atlas(
                 .find(|response| {
                     response.family == native.family
                         && response.state == native.state
-                        && response.port == native.port
+                        && response.boundary == native.boundary
                 })
                 .ok_or_else(|| {
                     format!(
                         "source response for family {} port {:?} state {} is absent",
-                        native.family, native.port, native.state
+                        native.family, native.boundary, native.state
                     )
                 })?;
             Ok(json!({
                 "family": response.family,
                 "state": response.state,
-                "port": response.port,
+                "boundary": response.boundary,
                 "occurrence": response.occurrence,
                 "occurrence_sha256": response.occurrence_sha256,
                 "source_consequence_sha256": response.consequence_sha256,
@@ -72,7 +72,7 @@ pub fn atlas(
                 "address": consequence.address,
                 "family": consequence.family,
                 "state": consequence.state,
-                "port": consequence.port,
+                "boundary": consequence.boundary,
                 "source_consequence_sha256": consequence.source_consequence_sha256,
                 "source_incidence_sha256": consequence.source_incidence_sha256,
                 "truth_status": "established-bounded"

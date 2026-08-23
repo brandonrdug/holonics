@@ -1,7 +1,11 @@
 use std::fs;
 use std::path::PathBuf;
 
-use holonic_engine::phoenix::inference_ecology::InferenceEcologyRest;
+use holonic_engine::phoenix::{
+    heterogeneous_fusion::HeterogeneousFusionRest,
+    inference_ecology::InferenceEcologyRest,
+    recurrent_condensation::CondensedRecurrentRest,
+};
 
 use super::*;
 use crate::mathematical_particle::{
@@ -18,16 +22,27 @@ fn root() -> PathBuf {
 fn component_rest() -> ProductionAthenaRest {
     let root = root();
     let i5 = root.join("output/the_athena_gemma_ecology_infers_returns_and_remounts/native-rest");
-    let inference = InferenceEcologyRest::read(
+    let recurrent = CondensedRecurrentRest::read(
         &fs::read(i5.join("recurrent-standing.json")).expect("I5 recurrent standing"),
         &fs::read(i5.join("recurrent-decoder.json")).expect("I5 recurrent decoder"),
         &fs::read(i5.join("recurrent-fibres.json")).expect("I5 recurrent fibres"),
-        &fs::read(i5.join("heterogeneous-standing.json")).expect("I5 heterogeneous standing"),
-        &fs::read(i5.join("heterogeneous-decoder.json")).expect("I5 heterogeneous decoder"),
-        &fs::read(i5.join("heterogeneous-fibres.json")).expect("I5 heterogeneous fibres"),
-        &fs::read(i5.join("inference-junction.json")).expect("I5 junction"),
     )
-    .expect("I5 rest");
+    .expect("I5 recurrent rest");
+    let e2 = root.join(
+        "output/the_complete_inherited_organs_cross_native_potential_complexes/native-rest",
+    );
+    let heterogeneous = HeterogeneousFusionRest::read(
+        &fs::read(e2.join("standing.json")).expect("E2 heterogeneous standing"),
+        &fs::read(e2.join("decoder.json")).expect("E2 heterogeneous decoder"),
+        &fs::read(e2.join("fibres.json")).expect("E2 heterogeneous fibres"),
+    )
+    .expect("E2 heterogeneous rest");
+    let inference = InferenceEcologyRest::bind_declined(
+        recurrent,
+        heterogeneous,
+        "r6/decision/declined".to_owned(),
+    )
+    .expect("current inference rest");
     let morphology = DynamicMorphologyRest::read(
         &fs::read(root.join("output/the_returned_constraints_found_dynamic_local_morphology/04-source-detached-dynamic-morphology-rest.json"))
             .expect("R3 rest"),

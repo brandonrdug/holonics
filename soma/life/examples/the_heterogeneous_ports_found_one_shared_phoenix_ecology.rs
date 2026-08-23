@@ -20,7 +20,7 @@ use std::time::Instant;
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
 use holonic_engine::phoenix::heterogeneous_fusion::{
-    HeterogeneousFusionRest, ModalityPort, PortDeclaration, SharedWorldGenerator,
+    HeterogeneousFusionRest, PortDeclaration, SharedWorldGenerator,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -262,23 +262,23 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         source_model_sha256,
         vec![
             PortDeclaration {
-                port: ModalityPort::TextCodeword,
-                boundary: format!(
+                boundary: source::CODEWORD_BOUNDARY,
+                source_boundary: format!(
                     "ordered tokenizer codewords → source embedding rows → positive algebraic scale, width {text_width}"
                 ),
                 source_population: "model.language_model.embed_tokens.weight".to_owned(),
-                width: text_width,
+                source_extent: text_width,
                 incidence: "UTF-8 byte spans and serial token adjacency".to_owned(),
             },
             PortDeclaration {
-                port: ModalityPort::VisionPatch,
-                boundary: format!(
+                boundary: source::OPTICAL_BOUNDARY,
+                source_boundary: format!(
                     "exact RGB patch numerators over 255 → input projection + x/y position rows, width {vision_width}"
                 ),
                 source_population:
                     "model.vision_tower.patch_embedder.{input_proj,position_embedding_table}"
                         .to_owned(),
-                width: vision_width,
+                source_extent: vision_width,
                 incidence: "two-dimensional patch grid and within-patch channel order".to_owned(),
             },
         ],
@@ -632,7 +632,7 @@ fn grade(
         && source
             .responses
             .iter()
-            .map(|response| response.port)
+            .map(|response| response.boundary)
             .collect::<std::collections::BTreeSet<_>>()
             .len()
             == 2;

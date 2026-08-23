@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 125 drivers, 19759 returns, 56390622926 bytes.
+# 126 drivers, 19781 returns, 56391799724 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -66,6 +66,7 @@ f1a0364747dbd47da0d18db71b523b39d3f1b5ed0e9fbf2f90500fcb56b90da4	59	121798	outpu
 4d20fe96b9fcd6039b03fdf059911caea2b2321ab6214ad3f0718f4ff3d10359	4	4890211	output/the_atlas_condenses
 44163064d2d92c76a5ede63fcb4a660d982e356e5d011c3e5a8e43e1b8dda00f	36	12620959	output/the_bounded_athena_mathematics_physics_ecology_freezes
 c2b103d4e0827cf01d8f1598fd24c635277a58f89d44945e6991dbf86ba2ddb0	2	162371	output/the_code_material_returns_its_world_line
+6205a664eb409b14f98121081cddbec7add8512c747b6abd715470cbdfedbfa3	22	1176798	output/the_complete_inherited_organs_cross_native_potential_complexes
 f5334896fa342e21b7f669d011fab545c6fd4a7299cd358472a1594e2a944cc8	2	363732	output/the_conditioned_section_returns_after_detachment
 949fdbf07010903074dbfb914a9e08c66717076290565ec53eb6ab45add0ccf9	21	4950388929	output/the_conditioning_return_crosses_the_seal
 b58302651bd37e48ae76def9e952f8c98fdd6bd483e3dbb5c5b442ec383d9d30	7	255768	output/the_contraction_is_tiled

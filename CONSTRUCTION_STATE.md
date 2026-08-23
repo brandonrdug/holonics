@@ -4,27 +4,43 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after E1 enacted and received release admission for hierarchical optical
-holons and native ordered constraint sections over one raw mathematical page.
+**Currency:** 2026-08-23 after E2 enacted and received release admission for complete inherited
+vision/audio conduct through carrier-neutral native potential complexes.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — E1 PASSED; E2 COMPLETE INHERITED ORGANS CROSSING NATIVE POTENTIAL COMPLEXES
-IS THE SOLE AUTHORIZED NEXT DEED.**
+**CURRENT FRONTIER — E2 PASSED; E3 AGENTIC RETURN CHANGING THE SAME CONTINUATION IS THE SOLE
+AUTHORIZED NEXT DEED.**
 
 [project-postulate] The active construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
-E2 begins by rederiving the active bounded `TextCodeword | VisionPatch | AudioFrame` fusion over
-the existing nominal `BoundaryId`/operation-complex contract; source and latent extents remain
-apparatus testimony and no media enum may route the native law. It must then conduct Gemma's
-complete inherited vision and twelve-layer audio towers separately and through a founded shared
-interaction; cross the implemented mathematics codec and one already-established cultivated codec
-morphology through the same native potential-complex contract; retain one provisional codec
-candidate for E3; and return directional withdrawals,
-chronology controls, naturality, defects, intervention, ablation, source-detached continuation,
-resident-apparatus and complete reconstruction testimony. Projection-only, transcript,
-precomputed-feature, media-label, coordinate-concatenation and CPU-semantic substitutes do not
-pass. E2's six internal stations do not advance this position independently.
+E3 now returns one recurrent Athena emission through at least two nominal organ/world apertures,
+retains declined and committed siblings, cultivates a parented codec morphology from E2's
+provisional candidate, detaches/remounts it, changes held-out conduct, attributes the least
+morphology, returns the directional defects predicted by E2, ablates the cultivated consequence,
+and restores the predecessor exactly. Source labels, prompt append, lookup, lossless exchange
+archive, counter increments and media-label routing do not pass.
+
+[established-bounded; measured] E2 removed the active `ModalityPort` schema and crossed optical,
+acoustic, implemented-mathematics and cultivated-codec boundaries through nominal `BoundaryId`
+incidence. The authenticated 658-tensor/16-layer vision organ and 751-tensor/12-layer audio organ
+conducted four raw page restrictions and four raw PCM occurrences on the RTX 4080 SUPER, returning
+all eight complete layer words and 15,750 measured CUDA kernel events. Exact E1 optical overlap,
+PCM butterfly/path incidence, sixteen reconstruction fibres, eight naturality squares, ordered-word
+separators, a noncommuting organ-order defect, rejected coordinate concatenation, shared/local
+withdrawals, all three codec provenance classes, one provisional codec candidate and a 19,338-octet
+source-detached continuation rest returned together.
+
+[established-bounded; measured] E2's initial complete release receiver returned twelve green scopes
+and one exact refusal: two production-aperture tests still remounted the superseded I5 heterogeneous
+wire. The fixture was rederived as the existing I5 recurrent owner composed with E2's current
+nominal-boundary rest, with no adapter or old-schema decoder. Its focused two-test falsifier passed;
+the named complete `tests` retake returned 2,858 passes, zero failures, 34 ignores and every example
+target type-checked; the moved closure, driver-catalogue and architecture scopes also passed. The
+candidate and admission records are
+[`research/records/2026-08-23_THE_COMPLETE_INHERITED_ORGANS_CROSSED_NATIVE_POTENTIAL_COMPLEXES_AND_E2_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_COMPLETE_INHERITED_ORGANS_CROSSED_NATIVE_POTENTIAL_COMPLEXES_AND_E2_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_E2_RELEASE_RECEIVER_PASSED_COMPLETE_INHERITED_ORGANS_CROSSED_AND_E3_BEGINS.md`](research/records/2026-08-23_E2_RELEASE_RECEIVER_PASSED_COMPLETE_INHERITED_ORGANS_CROSSED_AND_E3_BEGINS.md).
 
 [definition] The carrier-neutral law is [`canon/TABLET_THE_REASONING_CYCLE.md`](canon/TABLET_THE_REASONING_CYCLE.md)
 §8c. The complete derivation and source audit are
@@ -105,12 +121,11 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] E2 now owns complete inherited-organ conduct through native potential complexes; E3 retains
-returned arbitrary-organ and codec cultivation; E4 retains the generic inference membrane; and E5
-retains the frozen agentic product. The twelve-layer audio tower was not inferred from the
-successful N2 projection. Unknown-carrier codec induction and touch/chemical/smell/taste apparatus
-remain open future apertures rather than modality subsystems. X0--X2, Qwen, wider cross-model
-fusion, and unrelated alternatives remain unscheduled.
+[open] E3 retains returned arbitrary-organ and codec cultivation; E4 retains the generic inference
+membrane; and E5 retains the frozen agentic product. Unknown-carrier codec induction and
+touch/chemical/smell/taste apparatus remain open future apertures rather than modality subsystems.
+Receiver-exact native re-expression of every foreign BF16 coefficient remains an open lift fibre.
+X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain unscheduled.
 
 [historical] L0--L4 passed their then-declared fixture grades, but their designation as the
 laboratory's production Athena and every inference boundary that requires a Lean proof face are
@@ -1487,10 +1502,12 @@ means the live body does not own it and a movement must build it.
 nothing in the laboratory at any commit; the machine's kernel-accepted theorem
 `semantics_invariant_under_exact_chart` survives only as a name, the proof term
 `by exact semantics_rebase_iff A e θ input output`, the axiom surface `[Quot.sound]`, and SHA-256
-`10eeb3fd789972d071498e590e836a5ac036dc4b4261bef29102366c28e00be1`. The residue-stratum atlas the
-archived record cites as `output/arithmetic-dimensional-receiver/` is a **third** loss of the same
-kind: it resolves in neither repository, at no commit, because it was written to an untracked output
-directory.
+`10eeb3fd789972d071498e590e836a5ac036dc4b4261bef29102366c28e00be1`. The residue-stratum morphology
+atlas the archived record cites as `output/arithmetic-dimensional-receiver/morphology-atlas/`
+remains a **third** loss of the same kind: that subdirectory resolves in neither repository, at no
+commit, because it was written to an untracked output directory. A later, distinct
+`output/arithmetic-dimensional-receiver/` return now exists and does not reconstruct the departed
+morphology-atlas fibre.
 
 ### The certified exact enclosure carrier exists, in Rust
 

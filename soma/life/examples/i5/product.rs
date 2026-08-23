@@ -5,9 +5,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
-use holonic_engine::phoenix::{
-    heterogeneous_fusion::ModalityPort, inference_ecology::InferenceEcologyRest,
-};
+use holonic_engine::{category::BoundaryId, phoenix::inference_ecology::InferenceEcologyRest};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -181,7 +179,7 @@ pub(super) fn finish(
         .standing
         .ports
         .iter()
-        .map(|port| format!("{:?}", port.port))
+        .map(|port| format!("{:?}", port.boundary))
         .collect::<Vec<_>>();
     let capability = format!(
         "# Athena-Gemma I5 capability report\n\n\
@@ -441,7 +439,7 @@ fn exact_mesh(rest: &InferenceEcologyRest, returned: &DetachedReturn) -> Value {
         vertices.push(json!({
             "id": id,
             "kind": "modality-port",
-            "label": format!("{:?}", port.port),
+            "label": format!("{:?}", port.boundary),
             "x": 790,
             "y": y
         }));
@@ -572,16 +570,16 @@ fn grade(
         .standing
         .ports
         .iter()
-        .map(|port| port.port)
+        .map(|port| port.boundary)
         .collect::<BTreeSet<_>>();
     let returned = committed_return
         .port_consequences
         .iter()
-        .map(|consequence| consequence.port)
+        .map(|consequence| consequence.boundary)
         .collect::<BTreeSet<_>>();
     let text_and_every_admitted_real_modality_port_return = admitted == returned
-        && admitted.contains(&ModalityPort::TextCodeword)
-        && admitted.contains(&ModalityPort::VisionPatch)
+        && admitted.contains(&BoundaryId(11))
+        && admitted.contains(&BoundaryId(29))
         && committed_return.port_consequences.len()
             == committed.heterogeneous.standing.family_count as usize * admitted.len();
     let generator_native_condensation_and_complete_cost_descent =

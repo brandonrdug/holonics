@@ -334,9 +334,10 @@ pub enum InferenceEcologyRefusal {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::category::BoundaryId;
     use crate::phoenix::{
         heterogeneous_fusion::{
-            ModalityPort, PortDeclaration, SharedWorldGenerator, SourcePortResponse,
+            PortDeclaration, SharedWorldGenerator, SourcePortResponse,
         },
         recurrent_condensation::{
             CompactBoundaryFace, CondensedDecoder, CondensedFibre, CondensedFibreMember,
@@ -439,34 +440,37 @@ mod tests {
     }
 
     fn heterogeneous() -> HeterogeneousFusionRest {
+        const CODEWORD: BoundaryId = BoundaryId(11);
+        const OPTICAL: BoundaryId = BoundaryId(29);
         let ports = vec![
             PortDeclaration {
-                port: ModalityPort::TextCodeword,
-                boundary: "codeword".to_owned(),
+                boundary: CODEWORD,
+                source_boundary: "codeword".to_owned(),
                 source_population: "text".to_owned(),
-                width: 8,
+                source_extent: 8,
                 incidence: "serial".to_owned(),
             },
             PortDeclaration {
-                port: ModalityPort::VisionPatch,
-                boundary: "patch".to_owned(),
+                boundary: OPTICAL,
+                source_boundary: "patch".to_owned(),
                 source_population: "vision".to_owned(),
-                width: 3,
+                source_extent: 3,
                 incidence: "planar".to_owned(),
             },
         ];
         let responses = (0..2)
             .flat_map(|family| {
-                [ModalityPort::TextCodeword, ModalityPort::VisionPatch]
+                [CODEWORD, OPTICAL]
                     .into_iter()
-                    .flat_map(move |port| {
+                    .enumerate()
+                    .flat_map(move |(boundary_at, boundary)| {
                         (0..2).map(move |state| {
-                            let mark = 30 + family * 8 + state * 2 + port as u32;
+                            let mark = 30 + family * 8 + state * 2 + boundary_at as u32;
                             SourcePortResponse {
                                 family,
                                 state,
-                                port,
-                                occurrence: format!("{family}/{port:?}/{state}"),
+                                boundary,
+                                occurrence: format!("{family}/{boundary:?}/{state}"),
                                 occurrence_sha256: digest(mark),
                                 consequence_sha256: digest(mark + 40),
                                 incidence_sha256: digest(mark + 80),

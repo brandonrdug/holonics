@@ -9,11 +9,10 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use holonic_engine::category::BoundaryId;
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
 use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
-use holonic_engine::phoenix::heterogeneous_fusion::{
-    ModalityPort, SourcePortResponse, tokenize_exterior_occurrence,
-};
+use holonic_engine::phoenix::heterogeneous_fusion::{SourcePortResponse, tokenize_exterior_occurrence};
 use image::RgbImage;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -21,6 +20,8 @@ use sha2::{Digest, Sha256};
 const TEXT_EMBED: &str = "model.language_model.embed_tokens.weight";
 const VISION_INPUT: &str = "model.vision_tower.patch_embedder.input_proj.weight";
 const VISION_POSITION: &str = "model.vision_tower.patch_embedder.position_embedding_table";
+pub const CODEWORD_BOUNDARY: BoundaryId = BoundaryId(11);
+pub const OPTICAL_BOUNDARY: BoundaryId = BoundaryId(29);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Crop {
@@ -398,7 +399,7 @@ pub fn conduct(inputs: SourceInputs<'_>) -> Result<SourceConduct, String> {
     responses.extend(text.iter().map(|conduct| SourcePortResponse {
         family: conduct.family,
         state: conduct.state,
-        port: ModalityPort::TextCodeword,
+        boundary: CODEWORD_BOUNDARY,
         occurrence: conduct.occurrence.clone(),
         occurrence_sha256: conduct.occurrence_sha256.clone(),
         consequence_sha256: conduct.consequence_sha256.clone(),
@@ -408,7 +409,7 @@ pub fn conduct(inputs: SourceInputs<'_>) -> Result<SourceConduct, String> {
     responses.extend(vision.iter().map(|conduct| SourcePortResponse {
         family: conduct.family,
         state: conduct.state,
-        port: ModalityPort::VisionPatch,
+        boundary: OPTICAL_BOUNDARY,
         occurrence: conduct.occurrence.clone(),
         occurrence_sha256: conduct.occurrence_sha256.clone(),
         consequence_sha256: conduct.consequence_sha256.clone(),

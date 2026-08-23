@@ -8,14 +8,16 @@
 
 use std::path::{Path, PathBuf};
 
+use holonic_engine::category::BoundaryId;
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
 use holonic_engine::foreign_map::manifest_safetensors;
-use holonic_engine::phoenix::heterogeneous_fusion::{ModalityPort, SourcePortResponse};
+use holonic_engine::phoenix::heterogeneous_fusion::SourcePortResponse;
 use life::mathematical_source::ExactAcousticOccurrence;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 const AUDIO_PROJECTION: &str = "model.embed_audio.embedding_projection.weight";
+pub const ACOUSTIC_BOUNDARY: BoundaryId = BoundaryId(47);
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -158,7 +160,7 @@ pub fn conduct(
         .map(|returning| SourcePortResponse {
             family: returning.family,
             state: returning.state,
-            port: ModalityPort::AudioFrame,
+            boundary: ACOUSTIC_BOUNDARY,
             occurrence: returning.source.occurrence.clone(),
             occurrence_sha256: returning.source.source_sha256.clone(),
             consequence_sha256: returning.consequence_sha256.clone(),

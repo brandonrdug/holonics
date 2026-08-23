@@ -1,0 +1,309 @@
+#!/usr/bin/env python3
+"""Authenticated Gemma-4 vision/audio organ conduct for E2.
+
+The script is an exterior foreign-apparatus mouth.  It reads raw RGB/PCM occurrences, mounts only
+one authenticated inherited organ at a time, keeps every tower operation on CUDA, and returns the
+foreign BF16 section plus frontier and apparatus testimony.  It does not found the native join;
+the Rust E2 driver does that from the returned occurrences through nominal BoundaryId incidence.
+"""
+
+from __future__ import annotations
+
+import argparse
+import gc
+import hashlib
+import importlib.util
+import json
+import time
+import wave
+from pathlib import Path
+
+import numpy as np
+import torch
+from PIL import Image
+from safetensors import safe_open
+from torch.profiler import ProfilerActivity, profile
+from transformers import (
+    Gemma4AudioFeatureExtractor,
+    Gemma4AudioModel,
+    Gemma4Config,
+    Gemma4VisionModel,
+)
+
+
+VISION_PREFIX = "model.vision_tower."
+AUDIO_PREFIX = "model.audio_tower."
+VISION_PROJECTION = "model.embed_vision.embedding_projection.weight"
+AUDIO_PROJECTION = "model.embed_audio.embedding_projection.weight"
+
+
+def sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def file_sha(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for block in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def module_source(module: str) -> dict[str, str]:
+    """Return the installed source path and identity without importing optional apparatus."""
+    specification = importlib.util.find_spec(module)
+    if specification is None or specification.origin is None:
+        raise RuntimeError(f"cannot bind installed source for {module}")
+    path = Path(specification.origin)
+    return {"path": path.as_posix(), "sha256": file_sha(path)}
+
+
+def bf16_bytes(value: torch.Tensor) -> bytes:
+    return value.detach().contiguous().view(torch.uint16).cpu().numpy().astype("<u2", copy=False).tobytes()
+
+
+def load_prefixed(model: torch.nn.Module, container: safe_open, prefix: str) -> int:
+    state = {name[len(prefix) :]: container.get_tensor(name) for name in container.keys() if name.startswith(prefix)}
+    incompatibility = model.load_state_dict(state)
+    if incompatibility.missing_keys or incompatibility.unexpected_keys:
+        raise RuntimeError(f"{prefix} did not bind completely: {incompatibility}")
+    return len(state)
+
+
+def project_without_gain(hidden: torch.Tensor, weight: torch.Tensor, eps: float) -> torch.Tensor:
+    normalized = hidden.float() * torch.pow(hidden.float().pow(2).mean(-1, keepdim=True) + eps, -0.5)
+    return torch.nn.functional.linear(normalized.to(hidden.dtype), weight)
+
+
+def profiler_events(session: profile) -> int:
+    return sum(1 for event in session.events() if str(event.device_type).endswith("CUDA"))
+
+
+def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config, container: safe_open) -> dict:
+    model = Gemma4VisionModel(config.vision_config)
+    tensor_count = load_prefixed(model, container, VISION_PREFIX)
+    projection = container.get_tensor(VISION_PROJECTION).to(device="cuda", dtype=torch.bfloat16)
+    model.to(device="cuda", dtype=torch.bfloat16).eval()
+
+    raw = np.asarray(Image.open(image_path).convert("RGB"), dtype=np.uint8)
+    # Four exact 144x144 restrictions across the first complete equation band. No interpolation,
+    # resize, OCR or transcript enters; the complement remains the crop reconstruction fibre.
+    crops = [(240, 224), (384, 224), (528, 224), (672, 224)]
+    returns = []
+    torch.cuda.reset_peak_memory_stats()
+    began = time.perf_counter_ns()
+    for occurrence_at, (left, top) in enumerate(crops):
+        crop = raw[top : top + 144, left : left + 144]
+        if crop.shape != (144, 144, 3):
+            raise RuntimeError(f"vision restriction {occurrence_at} left the raw page")
+        raw_crop = torch.from_numpy(crop.copy()).to(device="cuda")
+        channels = raw_crop.permute(2, 0, 1)
+        patches = (
+            channels.reshape(3, 9, 16, 9, 16)
+            .permute(1, 3, 2, 4, 0)
+            .reshape(1, 81, 768)
+            .to(torch.bfloat16)
+            / 255
+        )
+        positions = torch.stack(
+            torch.meshgrid(torch.arange(9, device="cuda"), torch.arange(9, device="cuda"), indexing="xy"),
+            dim=-1,
+        ).reshape(1, 81, 2)
+        layers: list[torch.Tensor] = []
+        hooks = [layer.register_forward_hook(lambda _m, _i, value, sink=layers: sink.append(value)) for layer in model.encoder.layers]
+        with torch.inference_mode(), profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+            tower = model(pixel_values=patches, pixel_position_ids=positions).last_hidden_state
+            projected = project_without_gain(tower, projection, config.vision_config.rms_norm_eps)
+        for hook in hooks:
+            hook.remove()
+        torch.cuda.synchronize()
+        layer_hashes = [sha(bf16_bytes(value)) for value in layers]
+        final = bf16_bytes(projected)
+        final_name = f"vision-{occurrence_at}-text-space.bf16"
+        (output / final_name).write_bytes(final)
+        crop_bytes = crop.tobytes()
+        returns.append(
+            {
+                "family": occurrence_at // 2,
+                "state": occurrence_at % 2,
+                "occurrence": f"{image_path}#restriction({left},{top},144,144)",
+                "source_sha256": sha(crop_bytes),
+                "source_incidence_sha256": sha(
+                    image_path.as_posix().encode()
+                    + left.to_bytes(4, "little")
+                    + top.to_bytes(4, "little")
+                    + crop_bytes
+                ),
+                "crop": [left, top, 144, 144],
+                "patch_shape": [81, 768],
+                "tower_shape": list(tower.shape),
+                "text_space_shape": list(projected.shape),
+                "layer_frontier_sha256": layer_hashes,
+                "complete_layer_count": len(layer_hashes),
+                "returned_bf16": final_name,
+                "returned_sha256": sha(final),
+                "cuda_kernel_events": profiler_events(prof),
+            }
+        )
+    elapsed = time.perf_counter_ns() - began
+    receipt = {
+        "organ": "inherited-organ-at-nominal-boundary",
+        "source_lineage": "Gemma4VisionModel",
+        "tensor_count": tensor_count,
+        "complete_layer_count": len(model.encoder.layers),
+        "resident_weight_parameters": sum(parameter.numel() for parameter in model.parameters()) + projection.numel(),
+        "peak_cuda_allocated_octets": torch.cuda.max_memory_allocated(),
+        "elapsed_nanoseconds": elapsed,
+        "returns": returns,
+    }
+    del model, projection
+    gc.collect()
+    torch.cuda.empty_cache()
+    return receipt
+
+
+def raw_pcm(path: Path) -> tuple[np.ndarray, int]:
+    with wave.open(str(path), "rb") as source:
+        if source.getnchannels() != 1 or source.getsampwidth() != 2:
+            raise RuntimeError(f"{path} is not mono signed 16-bit PCM")
+        rate = source.getframerate()
+        samples = np.frombuffer(source.readframes(source.getnframes()), dtype="<i2").copy()
+    if rate != 16_000:
+        raise RuntimeError(f"{path} is {rate} Hz, not the inherited 16 kHz boundary")
+    return samples, rate
+
+
+def gpu_log_mel(samples: np.ndarray, extractor: Gemma4AudioFeatureExtractor) -> torch.Tensor:
+    waveform = torch.from_numpy(samples).to(device="cuda", dtype=torch.float32) / 32768
+    waveform = torch.nn.functional.pad(waveform, (extractor.frame_length // 2, 0))
+    frames = waveform.unfold(0, extractor.frame_length + 1, extractor.hop_length)[..., :-1]
+    window = torch.from_numpy(extractor.window).to(device="cuda", dtype=torch.float32)
+    spectrum = torch.fft.rfft(frames * window, n=extractor.fft_length, dim=-1).abs()
+    mel = torch.from_numpy(extractor.mel_filters.astype(np.float32)).to(device="cuda")
+    return torch.log(spectrum @ mel + float(extractor.mel_floor))
+
+
+def run_audio(root: Path, audio_paths: list[Path], output: Path, config: Gemma4Config, container: safe_open) -> dict:
+    model = Gemma4AudioModel(config.audio_config)
+    tensor_count = load_prefixed(model, container, AUDIO_PREFIX)
+    projection = container.get_tensor(AUDIO_PROJECTION).to(device="cuda", dtype=torch.bfloat16)
+    model.to(device="cuda", dtype=torch.bfloat16).eval()
+    extractor = Gemma4AudioFeatureExtractor.from_pretrained(root)
+    returns = []
+    torch.cuda.reset_peak_memory_stats()
+    began = time.perf_counter_ns()
+    for occurrence_at, path in enumerate(audio_paths):
+        samples, rate = raw_pcm(path)
+        features = gpu_log_mel(samples, extractor)
+        mask = torch.ones((1, features.shape[0]), device="cuda", dtype=torch.bool)
+        layers: list[torch.Tensor] = []
+        hooks = [layer.register_forward_hook(lambda _m, _i, value, sink=layers: sink.append(value)) for layer in model.layers]
+        with torch.inference_mode(), profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+            tower = model(input_features=features.unsqueeze(0), attention_mask=mask).last_hidden_state
+            projected = project_without_gain(tower, projection, config.audio_config.rms_norm_eps)
+        for hook in hooks:
+            hook.remove()
+        torch.cuda.synchronize()
+        layer_hashes = [sha(bf16_bytes(value)) for value in layers]
+        final = bf16_bytes(projected)
+        final_name = f"audio-{occurrence_at}-text-space.bf16"
+        (output / final_name).write_bytes(final)
+        pcm_bytes = samples.astype("<i2", copy=False).tobytes()
+        returns.append(
+            {
+                "family": occurrence_at // 2,
+                "state": occurrence_at % 2,
+                "occurrence": path.as_posix(),
+                "source_sha256": file_sha(path),
+                "source_incidence_sha256": sha(rate.to_bytes(4, "little") + pcm_bytes),
+                "sample_rate": rate,
+                "sample_count": len(samples),
+                "feature_shape": list(features.shape),
+                "tower_shape": list(tower.shape),
+                "text_space_shape": list(projected.shape),
+                "layer_frontier_sha256": layer_hashes,
+                "complete_layer_count": len(layer_hashes),
+                "returned_bf16": final_name,
+                "returned_sha256": sha(final),
+                "cuda_kernel_events": profiler_events(prof),
+            }
+        )
+    elapsed = time.perf_counter_ns() - began
+    receipt = {
+        "organ": "inherited-organ-at-nominal-boundary",
+        "source_lineage": "Gemma4AudioModel",
+        "tensor_count": tensor_count,
+        "complete_layer_count": len(model.layers),
+        "resident_weight_parameters": sum(parameter.numel() for parameter in model.parameters()) + projection.numel(),
+        "peak_cuda_allocated_octets": torch.cuda.max_memory_allocated(),
+        "elapsed_nanoseconds": elapsed,
+        "raw_pcm_to_feature_transport": [
+            "semicausal zero incidence",
+            "320-sample periodic-Hann fronts at 160-sample chronology",
+            "512-point resident RFFT magnitude",
+            "128-bin HTK mel transport",
+            "log passage with source-founded mel floor",
+        ],
+        "returns": returns,
+    }
+    del model, projection
+    gc.collect()
+    torch.cuda.empty_cache()
+    return receipt
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--image", type=Path, required=True)
+    parser.add_argument("--audio", type=Path, nargs=4, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=False)
+    if not torch.cuda.is_available():
+        raise RuntimeError("E2 complete inherited conduct requires CUDA")
+    torch.manual_seed(0)
+    torch.set_grad_enabled(False)
+    config = Gemma4Config.from_pretrained(args.model)
+    container = safe_open(args.model / "model.safetensors", framework="pt", device="cpu")
+    vision = run_vision(args.model, args.image, args.output, config, container)
+    audio = run_audio(args.model, args.audio, args.output, config, container)
+    receipt = {
+        "schema": "holonics.e2.complete-foreign-organ-conduct.v1",
+        "truth_status": "implemented-exact-source-binding; measured-foreign-bfloat16-conduct",
+        "model": {
+            "container": (args.model / "model.safetensors").as_posix(),
+            "container_sha256": file_sha(args.model / "model.safetensors"),
+            "config_sha256": file_sha(args.model / "config.json"),
+            "source_implementations": {
+                "modeling": module_source("transformers.models.gemma4.modeling_gemma4"),
+                "audio_feature_extraction": module_source(
+                    "transformers.models.gemma4.feature_extraction_gemma4"
+                ),
+                "image_processing_reference": module_source(
+                    "transformers.models.gemma4.image_processing_gemma4"
+                ),
+                "combined_processing_reference": module_source(
+                    "transformers.models.gemma4.processing_gemma4"
+                ),
+                "e2_foreign_mouth": {
+                    "path": Path(__file__).resolve().as_posix(),
+                    "sha256": file_sha(Path(__file__).resolve()),
+                },
+            },
+        },
+        "apparatus": {
+            "device": torch.cuda.get_device_name(0),
+            "compute_capability": list(torch.cuda.get_device_capability(0)),
+            "cpu_semantic_replay": False,
+            "precomputed_feature_file": False,
+            "organs_resident_sequentially_under_one_product_owner": True,
+        },
+        "vision": vision,
+        "audio": audio,
+    }
+    (args.output / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+
+
+if __name__ == "__main__":
+    main()

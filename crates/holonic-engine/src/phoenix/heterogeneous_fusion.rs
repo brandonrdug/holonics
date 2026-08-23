@@ -1,7 +1,7 @@
-//! Receiver-exact fusion of heterogeneous source-port realizations.
+//! Receiver-exact interaction of heterogeneous nominal-boundary realizations.
 //!
 //! A common world passage does not identify the occurrences which present it.  Text and vision
-//! keep distinct boundary ports, incidence, source consequences, and reconstruction fibres.  The
+//! keep distinct nominal boundaries, incidence, source consequences, and reconstruction fibres. The
 //! only shared native object is the generator acting on the declared world-state face.  This is
 //! the computational form of conservation of faces: condensation preserves the complete inverse
 //! image of every native consequence instead of declaring fibre members equal.
@@ -11,9 +11,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-pub const HETEROGENEOUS_STANDING_SCHEMA: &str = "holonics.i4.heterogeneous-standing.v1";
-pub const HETEROGENEOUS_DECODER_SCHEMA: &str = "holonics.i4.heterogeneous-decoder.v1";
-pub const HETEROGENEOUS_FIBRES_SCHEMA: &str = "holonics.i4.heterogeneous-fibres.v1";
+use crate::category::BoundaryId;
+
+pub const HETEROGENEOUS_STANDING_SCHEMA: &str = "holonics.e2.nominal-boundary-standing.v2";
+pub const HETEROGENEOUS_DECODER_SCHEMA: &str = "holonics.e2.nominal-boundary-decoder.v2";
+pub const HETEROGENEOUS_FIBRES_SCHEMA: &str = "holonics.e2.nominal-boundary-fibres.v2";
 
 /// One exterior tokenizer crossing. Offsets remain apparatus/codec incidence; they never become
 /// native semantic taxa or a fusion key.
@@ -44,23 +46,16 @@ pub fn tokenize_exterior_occurrence(
     })
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum ModalityPort {
-    TextCodeword,
-    VisionPatch,
-    /// One exact time-ordered acoustic section crossing the inherited audio boundary. Sample and
-    /// frame chronology remain in the source incidence fibre; this tag only types the port.
-    AudioFrame,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PortDeclaration {
-    pub port: ModalityPort,
-    pub boundary: String,
+    /// Nominal identity only. No media, codec, organ, or source class is encoded here.
+    pub boundary: BoundaryId,
+    /// Exterior source testimony retained as lineage, never used to route conduct.
+    pub source_boundary: String,
     pub source_population: String,
-    pub width: u32,
+    /// A source/apparatus extent, not native semantic capacity.
+    pub source_extent: u32,
     pub incidence: String,
 }
 
@@ -69,7 +64,7 @@ pub struct PortDeclaration {
 pub struct SourcePortResponse {
     pub family: u32,
     pub state: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub occurrence: String,
     pub occurrence_sha256: String,
     pub consequence_sha256: String,
@@ -102,11 +97,11 @@ pub struct HeterogeneousStanding {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NativePortConsequence {
+pub struct NativeBoundaryConsequence {
     pub address: u32,
     pub family: u32,
     pub state: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub source_consequence_sha256: String,
     pub source_incidence_sha256: String,
 }
@@ -116,7 +111,7 @@ pub struct NativePortConsequence {
 pub struct HeterogeneousDecoder {
     pub schema: String,
     /// Family-major, port-major, state-minor. The wire order is validated, never inferred.
-    pub consequences: Vec<NativePortConsequence>,
+    pub consequences: Vec<NativeBoundaryConsequence>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -130,11 +125,11 @@ pub struct FibreMember {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct ModalityReconstructionFibre {
+pub struct BoundaryReconstructionFibre {
     pub native_address: u32,
     pub family: u32,
     pub state: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub members: Vec<FibreMember>,
 }
 
@@ -142,7 +137,7 @@ pub struct ModalityReconstructionFibre {
 #[serde(deny_unknown_fields)]
 pub struct NaturalitySquare {
     pub family: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub source_predecessor: String,
     pub source_successor: String,
     pub native_predecessor: u32,
@@ -155,7 +150,7 @@ pub struct NaturalitySquare {
 #[serde(deny_unknown_fields)]
 pub struct HeterogeneousFibres {
     pub schema: String,
-    pub fibres: Vec<ModalityReconstructionFibre>,
+    pub fibres: Vec<BoundaryReconstructionFibre>,
     pub naturality_squares: Vec<NaturalitySquare>,
     pub unavailable_ports: Vec<String>,
 }
@@ -192,11 +187,14 @@ impl HeterogeneousFusionRest {
         if ports.len() < 2 || responses.is_empty() {
             return Err(HeterogeneousFusionRefusal::Boundary);
         }
-        let port_set = ports.iter().map(|port| port.port).collect::<BTreeSet<_>>();
+        let port_set = ports
+            .iter()
+            .map(|port| port.boundary)
+            .collect::<BTreeSet<_>>();
         if port_set.len() != ports.len()
             || ports
                 .iter()
-                .any(|port| port.width == 0 || port.boundary.is_empty())
+                .any(|port| port.source_extent == 0 || port.source_boundary.is_empty())
         {
             return Err(HeterogeneousFusionRefusal::Boundary);
         }
@@ -227,7 +225,7 @@ impl HeterogeneousFusionRest {
 
         let mut by_face = BTreeMap::new();
         for response in responses {
-            if !port_set.contains(&response.port)
+            if !port_set.contains(&response.boundary)
                 || response.state >= state_count
                 || response.family >= family_count
                 || response.semantic_units == 0
@@ -238,7 +236,7 @@ impl HeterogeneousFusionRest {
             {
                 return Err(HeterogeneousFusionRefusal::Response);
             }
-            let key = (response.family, response.port, response.state);
+            let key = (response.family, response.boundary, response.state);
             if by_face.insert(key, response).is_some() {
                 return Err(HeterogeneousFusionRefusal::DuplicateFace);
             }
@@ -246,12 +244,12 @@ impl HeterogeneousFusionRest {
         for family in 0..family_count {
             for port in &ports {
                 for state in 0..state_count {
-                    if !by_face.contains_key(&(family, port.port, state)) {
+                    if !by_face.contains_key(&(family, port.boundary, state)) {
                         return Err(HeterogeneousFusionRefusal::IncompleteFibre);
                     }
                 }
-                let before = &by_face[&(family, port.port, generator.predecessor)];
-                let after = &by_face[&(family, port.port, generator.successor)];
+                let before = &by_face[&(family, port.boundary, generator.predecessor)];
+                let after = &by_face[&(family, port.boundary, generator.successor)];
                 if before.consequence_sha256 == after.consequence_sha256
                     || before.occurrence_sha256 == after.occurrence_sha256
                 {
@@ -267,21 +265,21 @@ impl HeterogeneousFusionRest {
             for port in &ports {
                 let predecessor_address = consequences.len() as u32;
                 for state in 0..state_count {
-                    let response = &by_face[&(family, port.port, state)];
+                    let response = &by_face[&(family, port.boundary, state)];
                     let address = consequences.len() as u32;
-                    consequences.push(NativePortConsequence {
+                    consequences.push(NativeBoundaryConsequence {
                         address,
                         family,
                         state,
-                        port: port.port,
+                        boundary: port.boundary,
                         source_consequence_sha256: response.consequence_sha256.clone(),
                         source_incidence_sha256: response.incidence_sha256.clone(),
                     });
-                    fibres.push(ModalityReconstructionFibre {
+                    fibres.push(BoundaryReconstructionFibre {
                         native_address: address,
                         family,
                         state,
-                        port: port.port,
+                        boundary: port.boundary,
                         members: vec![FibreMember {
                             occurrence: response.occurrence.clone(),
                             occurrence_sha256: response.occurrence_sha256.clone(),
@@ -292,11 +290,11 @@ impl HeterogeneousFusionRest {
                 }
                 squares.push(NaturalitySquare {
                     family,
-                    port: port.port,
-                    source_predecessor: by_face[&(family, port.port, generator.predecessor)]
+                    boundary: port.boundary,
+                    source_predecessor: by_face[&(family, port.boundary, generator.predecessor)]
                         .occurrence
                         .clone(),
-                    source_successor: by_face[&(family, port.port, generator.successor)]
+                    source_successor: by_face[&(family, port.boundary, generator.successor)]
                         .occurrence
                         .clone(),
                     native_predecessor: predecessor_address,
@@ -407,12 +405,12 @@ impl HeterogeneousFusionRest {
             .standing
             .ports
             .iter()
-            .map(|port| port.port)
+            .map(|port| port.boundary)
             .collect::<BTreeSet<_>>();
         if port_set.len() != self.standing.ports.len()
             || self.standing.ports.iter().any(|port| {
-                port.width == 0
-                    || port.boundary.is_empty()
+                port.source_extent == 0
+                    || port.source_boundary.is_empty()
                     || port.source_population.is_empty()
                     || port.incidence.is_empty()
             })
@@ -439,15 +437,15 @@ impl HeterogeneousFusionRest {
             let state = at as u32 % self.standing.state_count;
             let cell = at as u32 / self.standing.state_count;
             let family = cell / self.standing.ports.len() as u32;
-            let port = self.standing.ports[cell as usize % self.standing.ports.len()].port;
+            let boundary = self.standing.ports[cell as usize % self.standing.ports.len()].boundary;
             if consequence.address != at as u32
                 || consequence.family != family
                 || consequence.state != state
-                || consequence.port != port
+                || consequence.boundary != boundary
                 || self.fibres.fibres[at].native_address != at as u32
                 || self.fibres.fibres[at].family != family
                 || self.fibres.fibres[at].state != state
-                || self.fibres.fibres[at].port != port
+                || self.fibres.fibres[at].boundary != boundary
                 || self.fibres.fibres[at].members.len() != 1
                 || !valid_sha(&consequence.source_consequence_sha256)
                 || !valid_sha(&consequence.source_incidence_sha256)
@@ -478,7 +476,7 @@ impl HeterogeneousFusionRest {
                 }
                 if !square.commutes
                     || square.family != family
-                    || square.port != port.port
+                    || square.boundary != port.boundary
                     || square.generator != self.standing.shared_generator.name
                     || square.native_predecessor != before.address
                     || square.native_successor != after.address
@@ -533,26 +531,29 @@ pub enum HeterogeneousFusionRefusal {
 mod tests {
     use super::*;
 
+    const CODEWORD_BOUNDARY: BoundaryId = BoundaryId(11);
+    const OPTICAL_BOUNDARY: BoundaryId = BoundaryId(29);
+
     fn sha(value: u32) -> String {
         format!("{value:064x}")
     }
 
-    fn response(family: u32, state: u32, port: ModalityPort) -> SourcePortResponse {
-        let mark = match (family, state, port) {
-            (0, 0, ModalityPort::TextCodeword) => 1,
-            (0, 1, ModalityPort::TextCodeword) => 2,
-            (0, 0, ModalityPort::VisionPatch) => 3,
-            (0, 1, ModalityPort::VisionPatch) => 4,
-            (1, 0, ModalityPort::TextCodeword) => 5,
-            (1, 1, ModalityPort::TextCodeword) => 6,
-            (1, 0, ModalityPort::VisionPatch) => 7,
+    fn response(family: u32, state: u32, boundary: BoundaryId) -> SourcePortResponse {
+        let mark = match (family, state, boundary) {
+            (0, 0, CODEWORD_BOUNDARY) => 1,
+            (0, 1, CODEWORD_BOUNDARY) => 2,
+            (0, 0, OPTICAL_BOUNDARY) => 3,
+            (0, 1, OPTICAL_BOUNDARY) => 4,
+            (1, 0, CODEWORD_BOUNDARY) => 5,
+            (1, 1, CODEWORD_BOUNDARY) => 6,
+            (1, 0, OPTICAL_BOUNDARY) => 7,
             _ => 8,
         };
         SourcePortResponse {
             family,
             state,
-            port,
-            occurrence: format!("family-{family}/state-{state}/{port:?}"),
+            boundary,
+            occurrence: format!("family-{family}/state-{state}/{boundary:?}"),
             occurrence_sha256: sha(mark),
             consequence_sha256: sha(mark + 8),
             incidence_sha256: sha(mark + 16),
@@ -563,25 +564,27 @@ mod tests {
     fn fixture() -> Result<HeterogeneousFusionRest, HeterogeneousFusionRefusal> {
         let ports = vec![
             PortDeclaration {
-                port: ModalityPort::TextCodeword,
-                boundary: "ordered codewords".to_owned(),
+                boundary: CODEWORD_BOUNDARY,
+                source_boundary: "ordered codewords".to_owned(),
                 source_population: "text".to_owned(),
-                width: 8,
+                source_extent: 8,
                 incidence: "serial".to_owned(),
             },
             PortDeclaration {
-                port: ModalityPort::VisionPatch,
-                boundary: "patches".to_owned(),
+                boundary: OPTICAL_BOUNDARY,
+                source_boundary: "patches".to_owned(),
                 source_population: "vision".to_owned(),
-                width: 3,
+                source_extent: 3,
                 incidence: "planar".to_owned(),
             },
         ];
         let responses = (0..2)
             .flat_map(|family| {
-                [ModalityPort::TextCodeword, ModalityPort::VisionPatch]
+                [CODEWORD_BOUNDARY, OPTICAL_BOUNDARY]
                     .into_iter()
-                    .flat_map(move |port| (0..2).map(move |state| response(family, state, port)))
+                    .flat_map(move |boundary| {
+                        (0..2).map(move |state| response(family, state, boundary))
+                    })
             })
             .collect();
         HeterogeneousFusionRest::found(

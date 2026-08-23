@@ -21,7 +21,7 @@ canon/THE_DOCUMENT_LAW.md :: evidence/observations/ :: named as the archived loc
 # is not a claim about this tree.
 
 # --- Named permanent losses. These resolve at no commit in either repository. ---
-CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/ :: same loss, recorded in the verified-position section as the third of its kind
+CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/morphology-atlas/ :: same loss, recorded in the verified-position section as the third of its kind; the parent now holds a distinct later return
 canon/THE_RECOVERED_LAW.md :: src/soma/runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem with it; the citation is the point
 
 # --- The roadmap's own diagnosis of this movement's defect ---
@@ -51,7 +51,6 @@ blueprint/THE_ROADMAP.md :: causal_layers.tsv :: same driver
 blueprint/THE_ROADMAP.md :: grain_cells.tsv :: same driver
 blueprint/THE_ROADMAP.md :: quotients.tsv :: same driver
 blueprint/THE_ROADMAP.md :: overlap_nerve.tsv :: same driver
-CONSTRUCTION_STATE.md :: output/the_deposit_licenses_the_re_emission :: gitignored runtime grade directory named as measured provenance, not a repository-owned source path
 
 # --- A path a movement proposes to create ---
 blueprint/THE_ROADMAP.md :: crates/holonic-engine/src/homology.rs :: the integer-homology movement's target; absent by design until it is built

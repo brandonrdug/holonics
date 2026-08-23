@@ -17,9 +17,10 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
+use holonic_engine::category::BoundaryId;
 use holonic_engine::phoenix::heterogeneous_fusion::{
-    HeterogeneousFusionRest, ModalityPort, PortDeclaration, SharedWorldGenerator,
-    SourcePortResponse,
+    BoundaryReconstructionFibre, HeterogeneousFusionRest, PortDeclaration,
+    SharedWorldGenerator, SourcePortResponse,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -33,6 +34,8 @@ const I4_SOURCE: &str =
 const I4_MANIFEST: &str =
     "output/the_heterogeneous_ports_found_one_shared_phoenix_ecology/MANIFEST.json";
 const REST_SCHEMA: &str = "holonics.n2.rest-directory.v1";
+const CODEWORD_BOUNDARY: BoundaryId = BoundaryId(11);
+const OPTICAL_BOUNDARY: BoundaryId = BoundaryId(29);
 
 #[derive(Clone, Debug, Deserialize)]
 struct PriorSourceConduct {
@@ -108,8 +111,7 @@ struct N2Dissection<'a> {
     modality_entry_paths: Vec<Value>,
     shared_junction: &'a SharedWorldGenerator,
     naturality_squares: &'a [holonic_engine::phoenix::heterogeneous_fusion::NaturalitySquare],
-    reconstruction_fibres:
-        &'a [holonic_engine::phoenix::heterogeneous_fusion::ModalityReconstructionFibre],
+    reconstruction_fibres: &'a [BoundaryReconstructionFibre],
     shared_and_local_withdrawals: &'a DetachedReturn,
     open_exterior: &'a [String],
 }
@@ -171,11 +173,11 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
     let prior_ports = prior
         .responses
         .iter()
-        .map(|response| response.port)
+        .map(|response| response.boundary)
         .collect::<BTreeSet<_>>();
     if prior.responses.len() != 8
         || prior_ports
-            != [ModalityPort::TextCodeword, ModalityPort::VisionPatch]
+            != [CODEWORD_BOUNDARY, OPTICAL_BOUNDARY]
                 .into_iter()
                 .collect()
     {
@@ -229,24 +231,24 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         prior.source_model_sha256.clone(),
         vec![
             PortDeclaration {
-                port: ModalityPort::TextCodeword,
-                boundary: format!("admitted I4 tokenizer/codeword source boundary, width {text_width}"),
+                boundary: CODEWORD_BOUNDARY,
+                source_boundary: format!("admitted I4 tokenizer/codeword source boundary, width {text_width}"),
                 source_population: "model.language_model.embed_tokens.weight".to_owned(),
-                width: text_width,
+                source_extent: text_width,
                 incidence: "UTF-8 byte spans and serial codeword adjacency".to_owned(),
             },
             PortDeclaration {
-                port: ModalityPort::VisionPatch,
-                boundary: format!("admitted I4 exact RGB patch source boundary, width {vision_width}"),
+                boundary: OPTICAL_BOUNDARY,
+                source_boundary: format!("admitted I4 exact RGB patch source boundary, width {vision_width}"),
                 source_population: "model.vision_tower.patch_embedder.{input_proj,position_embedding_table}".to_owned(),
-                width: vision_width,
+                source_extent: vision_width,
                 incidence: "two-dimensional patch grid and within-patch channel order".to_owned(),
             },
             PortDeclaration {
-                port: ModalityPort::AudioFrame,
-                boundary: format!("exact mono PCM chronology → inherited Gemma audio projection, width {audio_width}"),
+                boundary: audio::ACOUSTIC_BOUNDARY,
+                source_boundary: format!("exact mono PCM chronology → inherited Gemma audio projection, width {audio_width}"),
                 source_population: "model.embed_audio.embedding_projection.weight".to_owned(),
-                width: audio_width,
+                source_extent: audio_width,
                 incidence: "sample order, overlapping frame support, frame chronology, and complete PCM reconstruction fibre".to_owned(),
             },
         ],
@@ -309,10 +311,10 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
             .iter()
             .map(|port| {
                 serde_json::json!({
-                    "port": port.port,
+                    "boundary": port.boundary,
                     "boundary": port.boundary,
                     "source_population": port.source_population,
-                    "width": port.width,
+                    "source_extent": port.source_extent,
                     "incidence": port.incidence,
                 })
             })
@@ -458,7 +460,7 @@ fn detached(rest_root: &Path, output: &Path) -> Result<(), String> {
     let mut modality_only_controls = BTreeMap::new();
     for (kept, port) in rest.standing.ports.iter().enumerate() {
         modality_only_controls.insert(
-            format!("{:?}", port.port),
+            format!("{:?}", port.boundary),
             (0..before.len())
                 .map(|cell| {
                     if cell % ports == kept {

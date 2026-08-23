@@ -4,8 +4,9 @@ use std::path::Path;
 use std::time::Instant;
 
 use holonic_engine::{
+    category::BoundaryId,
     cuda_refine::CudaRefineExecutor,
-    phoenix::{heterogeneous_fusion::ModalityPort, inference_ecology::InferenceEcologyRest},
+    phoenix::inference_ecology::InferenceEcologyRest,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -32,7 +33,7 @@ struct RestDirectory {
 #[derive(Debug, Serialize)]
 pub struct PortConsequence {
     pub family: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub selected_address: u32,
     pub shared_withdrawn_address: u32,
 }
@@ -197,7 +198,7 @@ pub fn conduct(root: &Path) -> Result<I5BaselineReturn, String> {
         .map(
             |(cell, (selected_address, shared_withdrawn_address))| PortConsequence {
                 family: (cell / ports) as u32,
-                port: rest.heterogeneous.standing.ports[cell % ports].port,
+                boundary: rest.heterogeneous.standing.ports[cell % ports].boundary,
                 selected_address,
                 shared_withdrawn_address,
             },

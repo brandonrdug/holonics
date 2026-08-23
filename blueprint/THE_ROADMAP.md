@@ -34,17 +34,20 @@ authoritatively revise it once you have sufficient context post-analysis campaig
 **The active campaign is
 [`THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).**
 
-**CURRENT FRONTIER — E1 PASSED; E2 IS THE SOLE AUTHORIZED NEXT DEED.** [established-bounded] E1 grew
-one raw mathematical page into 4,024 simultaneous component-through-page holons, 14,536 incidences,
-1,305 alternative covers and 239 repeated-form fibres. Seventeen equation occurrences returned
-eighteen native ordered constraint sections with complete glyph reconstruction. Six controls,
-targeted ablation, inspected overlays and source-detached remount separate form, occurrence,
-context and inherited testimony. The semantic rest contains neither raw raster nor card telemetry.
+**CURRENT FRONTIER — E2 PASSED; E3 IS THE SOLE AUTHORIZED NEXT DEED.** [established-bounded] E2
+replaced the active media enum with nominal `BoundaryId` incidence and crossed the complete inherited
+vision/audio organs, exact optical/PCM incidence, implemented mathematics and cultivated codec
+morphology through one carrier-neutral contract. All layer words, naturality squares,
+reconstruction fibres, chronology controls, noncommuting defects, local/shared withdrawals, one
+provisional codec candidate and source-detached continuation returned together.
 
-[established-bounded; measured] E1's complete 692,076-pair visual relation front ran on the NVIDIA
-GeForce RTX 4080 SUPER. Its sole release receiver completed in 318.09 seconds with 2,858 passing
-tests, zero failures, 34 explicit ignores, every example target checked and all thirteen scopes
-green.
+[established-bounded; measured] Four raw optical restrictions crossed all 658 authenticated vision
+tensors and 16 layers; four raw PCM occurrences crossed all 751 authenticated audio tensors and 12
+layers on the NVIDIA GeForce RTX 4080 SUPER. Eight complete returned words carried 15,750 measured
+CUDA kernel events. The exact native join derived 214 candidates through 3,424 pair visits. After
+the complete receiver exposed and the implementation repaired one stale historical-wire test
+fixture, its named retake returned 2,858 passing tests, zero failures, 34 explicit ignores, every
+example checked, and the closure/catalogue/architecture retakes green.
 
 [definition] E1 is the first inspected optical instance of a carrier-neutral potential complex,
 not a vision-specific ontology. An organ is a returning local operation complex crossing nominal
@@ -54,21 +57,14 @@ through compatible native consequence. The normative law is
 derivation/source audit is
 [`research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`](../research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md).
 
-[project-postulate] E2 begins by replacing the active three-name `ModalityPort` dependency with the
-existing nominal `BoundaryId`/operation-complex contract; numerical widths remain apparatus/source
-testimony. It then conducts the complete inherited vision and twelve-layer audio towers separately
-and through a founded shared interaction, crosses the implemented mathematics codec and one
-already-established cultivated codec morphology through the same native contract, retains one
-provisional codec candidate for E3, and returns directional withdrawals, chronology controls,
-naturality, defects, interventions, ablations, source-detached
-continuation, apparatus residency and reconstruction fibres. Projection-only output, transcript
-substitution, precomputed feature material, media-label routing, coordinate concatenation offered
-as fusion and CPU semantic replay cannot satisfy E2. The six internal stations in the active
-blueprint do not advance construction state independently. E2 is followed, only after its complete
-grade passes, by returned arbitrary-organ cultivation E3, the generic native inference membrane
-E4, and the frozen agentic laboratory Athena E5.
+[project-postulate] E3 returns the actual consequences of recurrent Athena emission through at least
+two nominal apertures to the same addressed continuation. It retains declined and committed
+siblings, cultivates E2's provisional codec candidate as a parented morphology, changes held-out
+conduct after source-detached remount, isolates the least attributable delta, returns E2's
+directional defects under organ withdrawal, ablates only the cultivated consequence and restores
+the exact predecessor. E4 and E5 follow only after this complete grade passes.
 
-[open] E2--E5 remain open until their own real returns pass. Unknown-carrier codec induction,
+[open] E3--E5 remain open until their own real returns pass. Unknown-carrier codec induction,
 touch/chemical/smell/taste apparatus and exterior source-model recombination remain later open
 apertures, not new modality subsystems. Qwen and same-purpose external LLM recombination remain
 unscheduled. The active widening uses Gemma's existing inherited organs, the exact mathematics

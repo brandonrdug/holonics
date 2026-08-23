@@ -18,9 +18,10 @@ use std::process::{Command, Stdio};
 use std::time::Instant;
 
 use holonic_engine::{
+    category::BoundaryId,
     cuda_refine::CudaRefineExecutor,
     phoenix::{
-        heterogeneous_fusion::{HeterogeneousFusionRest, ModalityPort},
+        heterogeneous_fusion::HeterogeneousFusionRest,
         inference_ecology::InferenceEcologyRest,
         recurrent_condensation::{CondensedRecurrentRest, CondensedRoute},
         recurrent_return::ExteriorToolReturn,
@@ -96,7 +97,7 @@ pub(crate) struct DetachedApparatus {
 #[serde(deny_unknown_fields)]
 pub(crate) struct PortConsequence {
     pub family: u32,
-    pub port: ModalityPort,
+    pub boundary: BoundaryId,
     pub predecessor_address: u32,
     pub successor_address: u32,
     pub selected_address: u32,
@@ -352,12 +353,12 @@ fn detached_infer(rest_directory: &Path, output: &Path) -> Result<(), String> {
     let mut port_consequences = Vec::with_capacity(returned.predecessor_consequence.len());
     for (cell, selected_address) in returned.selected_consequence.iter().copied().enumerate() {
         let family = (cell / ports) as u32;
-        let port = rest.heterogeneous.standing.ports[cell % ports].port;
+        let boundary = rest.heterogeneous.standing.ports[cell % ports].boundary;
         let before_at = cell * states;
         let after_at = before_at + 1;
         port_consequences.push(PortConsequence {
             family,
-            port,
+            boundary,
             predecessor_address: returned.predecessor_consequence[cell],
             successor_address: returned.successor_consequence[cell],
             selected_address,
