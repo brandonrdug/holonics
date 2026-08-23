@@ -192,4 +192,62 @@ theorem theClassesCollideOnEveryFullTwoTorsionCurve
       (sqcls_trans' hs1 (sqcls_symm' ht1 hq1))
       (sqcls_trans' hs2 (sqcls_symm' ht2 hq2))⟩
 
+
+/-! ## 3. Weak Mordell–Weil on every full-2-torsion curve -/
+
+/-- The doubling endomorphism. -/
+def doubling (a b : ℚ) : (E a b).Point →+ (E a b).Point :=
+  AddMonoidHom.mk' (fun P => P + P) (fun x y => by abel_nf)
+
+/-- The subgroup of doubles, `2·E(ℚ)`. -/
+def twoE (a b : ℚ) : AddSubgroup ((E a b).Point) := (doubling a b).range
+
+lemma mem_twoE {a b : ℚ} {P : (E a b).Point} :
+    P ∈ twoE a b ↔ ∃ Q, Q + Q = P := Iff.rfl
+
+/-- **WEAK MORDELL–WEIL ON EVERY FULL-TWO-TORSION CURVE**: for every elliptic curve
+over `ℚ` with full rational two-torsion, the quotient `E(ℚ)/2E(ℚ)` is **finite**, with
+the explicit bound `(2·τ(|ab(a−b)|))²`.
+
+Mathlib carries no Mordell–Weil theorem of any kind; this is its weak form for a
+two-parameter family of unbounded rank, and it is exactly the descent bound read as a
+statement about the quotient rather than about families of points. -/
+theorem theWeakMordellWeilTheoremOnEveryFullTwoTorsionCurve
+    (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) :
+    Finite ((E ((a : ℚ)) ((b : ℚ))).Point ⧸ twoE ((a : ℚ)) ((b : ℚ))) := by
+  set N : ℕ := 4 * (a * b * (a - b)).natAbs.divisors.card
+    * (a * b * (a - b)).natAbs.divisors.card with hN
+  by_contra hinf
+  rw [not_finite_iff_infinite] at hinf
+  -- an infinite quotient supplies `N+1` points pairwise incongruent modulo the doubles
+  obtain ⟨g, hg⟩ : ∃ g : Fin (N + 1) → ((E ((a : ℚ)) ((b : ℚ))).Point ⧸
+      twoE ((a : ℚ)) ((b : ℚ))), Function.Injective g :=
+    ⟨fun i => (Infinite.natEmbedding _) (i : ℕ), fun i j hij => by
+      have := (Infinite.natEmbedding _).injective hij
+      exact Fin.ext (by exact_mod_cast this)⟩
+  set f : Fin (N + 1) → (E ((a : ℚ)) ((b : ℚ))).Point := fun i => Quotient.out (g i)
+    with hf
+  obtain ⟨p, q, hpq, Q, hQ⟩ :=
+    theClassesCollideOnEveryFullTwoTorsionCurve ha hb hab
+      (α := Fin (N + 1)) (by rw [Fintype.card_fin]; omega) f
+  refine hpq (hg ?_)
+  have hmem : f p - f q ∈ twoE ((a : ℚ)) ((b : ℚ)) := ⟨Q, hQ.symm⟩
+  have h1 : (Quotient.mk'' (f p) : (E ((a : ℚ)) ((b : ℚ))).Point ⧸
+      twoE ((a : ℚ)) ((b : ℚ))) = Quotient.mk'' (f q) :=
+    (QuotientAddGroup.eq).mpr (by
+      rw [neg_add_eq_sub]
+      have : f q - f p = -(f p - f q) := by abel
+      rw [this]
+      exact AddSubgroup.neg_mem _ hmem)
+  have hp' : (Quotient.mk'' (f p) : (E ((a : ℚ)) ((b : ℚ))).Point ⧸
+      twoE ((a : ℚ)) ((b : ℚ))) = g p := by
+    rw [hf]
+    exact Quotient.out_eq' _
+  have hq' : (Quotient.mk'' (f q) : (E ((a : ℚ)) ((b : ℚ))).Point ⧸
+      twoE ((a : ℚ)) ((b : ℚ))) = g q := by
+    rw [hf]
+    exact Quotient.out_eq' _
+  rw [hp', hq'] at h1
+  exact h1
+
 end Soma.Holonics.Millennium.GeneralCollision
