@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 537 research deposits current through 22 August 2026, including all 307
+`records/` contains 559 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -159,6 +159,13 @@ governs the rebuild.
   KV-cache ontology; audits the exact missing join among the existing passage, compression,
   cross-chart, section, cultivation, and apparatus owners; and makes intra-Gemma modality fusion the
   first fusion grade before later SSM/diffusion/perception/production sources.
+- **Athena-Gemma's complete bounded lifecycle and the mathematics/physics production aperture:**
+  `records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`
+  — reads I5 as a complete productive lifecycle at limited aperture; distinguishes Eros's compiler,
+  cultivator and anatomist roles from the source-detached Athena product; derives production scale
+  as the product of material, receiver, successor, generator, port, world, morphology, front and
+  apparatus apertures; and selects exact mathematics/physics constraints as the first basin for
+  widening rich intake, recurrence, cultivation, retained context and multimodal conduct.
 - **A3 release admission:**
   `records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`
   — binds the owner-local continuation test, affected `life` package return, coherent ledgers and

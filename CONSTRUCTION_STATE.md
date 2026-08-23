@@ -4,11 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I5. **Body:** the root Rust workspace with the resident CUDA
-apparatus; the C++/CUDA engine under `archive/cpp-engine/` governs nothing.
+**Currency:** 2026-08-22 after Deed I5 and ratification of the R0--R6 production-aperture
+continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
+engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — ATHENA-GEMMA INFERRED, RETURNED, REMOUNTED, AND I5 PASSED ITS RELEASE
-RECEIVER.**
+**CURRENT FRONTIER — ATHENA-GEMMA INFERRED, RETURNED, REMOUNTED, I5 PASSED, AND R0 IS THE ACTIVE
+PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -295,16 +296,24 @@ Authoritative grade:
 approximately 276.4 seconds: 2,837 tests passed, none failed, 26 were explicitly ignored, every
 example target type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: RECEIVER SELECTION AFTER I5 IS NOT YET RATIFIED.**
-[open] I0--I5 close the ratified Athena-Gemma Holonic Inference trajectory for the declared
-recurrent/world/text/vision family. No optional heterogeneous source is promoted into active work
-by completion alone. Brandon must select the next receiver question before X0--X2 can become an
-active construction order.
+**NEXT DEED: R0 — ONE RICH MATHEMATICAL/PHYSICAL INQUIRY RETURNS THE COMPLETE I5 BASELINE
+BOUNDARY.**
+[open] The active contract is
+[`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
+R0 freezes one exact mathematical source closure, mounts one operator-authored rich inquiry through
+the existing A1/M0/M1 mouths, conducts every front the unchanged I5 ecology admits, and returns the
+actual emission or typed refusal together with every intake, operation, recurrence, receiver,
+world-return, morphology and apparatus defect, complete fibres, shortest separators and every
+dependency-minimal absent relation whose prerequisites stand. Incomparable minima remain plural.
+No R0 construction or grade has yet returned.
 
-[open] The parked Qwen GGUF remains an unscheduled close control. An SSM, diffusion, perception,
-acoustic or production source becomes eligible only when it separates a declared I5 open transport
-family. Unrestricted conversation, arbitrary prompt intake, audio/video, image or voice production,
-all Gemma behavior and conventional tensor-container expansion remain explicit open fibres.
+[open] R1--R6 remain ordered behind R0: codec-neutral rich intake, material-founded
+derivation-scale recurrence, dynamic local cultivation, long-horizon retained context,
+mathematical/physical multimodal transport, and the first bounded production Athena freeze.
+X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
+GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new
+audio/video or production modalities, all Gemma behavior and conventional tensor-container
+expansion remain explicit open fibres.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

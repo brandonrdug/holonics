@@ -108,14 +108,15 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md` | **The admission is a quotient and the breadth is a group** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` | **The arrow is the division and attention keeps only its aim** — **Evidence:** `measured` where stated; the arrow's own source is `soma/body/src/arrow.rs:17-26` and `:114-125`, read today. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
-| `blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md` | **The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses** — **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts; `established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived`… |
+| `blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md` | **The Athena production aperture widens through mathematical world-tubes, and returned constraints cultivate the ecology** — **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry, dynamic delta, retained-context, and product-grade contracts; `established-bounded` for the… |
+| `blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md` | **The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses** — **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts; `established-bounded` for the admitted H0--H5, W1--W5, M0--M6, A1--A3 and I0--I5 returns;… |
 | `blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md` | **The Clifford lift, the phase wire, and the four untaken readings** — Every citation below was verified at the line given on the day of writing. |
 | `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md` | **The codec is recovered at every scale, and the faces are a return** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — This one covers instantiation. |
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
-| `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6 and A1--I2 evidence;… |
+| `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
 | `blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md` | **The horizon is a coordinate, not a gate, and the emission keeps its cross** — **Evidence:** `measured`. |
 | `blueprint/THE_MACHINE.md` | **The machine, whole — what conducts, what it returns, and where the seams are open** — **Evidence:** `measured` — `cargo test --workspace --no-fail-fast`, **1325 passed / 0 failed / 14 ignored**, summed across 42 `test result:` lines on a quiet tree. 80 drivers. 88 engine… |
 | `blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md` | **The machine produces mathematics it was not given** — **Evidence:** the standing measurements this plan builds on are cited inline with their commands and dates; nothing below is assumed. |
@@ -132,7 +133,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (266 deposits of 558)
+## 4 · The 2026-08 record line (267 deposits of 559)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -374,6 +375,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-21_THE_UNIT_IS_A_DECLARED_WINDING_THE_CERTIFICATE_IS_A_REALIZER_AND_THE_RADIX_IS_RESONANT.md` | The unit is a declared winding, the certificate is a realizer, and the radix is resonant |
 | `2026-08-21_THE_ZETA_FIVE_SERIES_IS_DEPOSITED_ITS_TAIL_IS_MODELLED_AND_THE_ODD_ZETA_LINE_IS_A_REALIZER_SUPPLY_QUESTION.md` | The zeta-five series is deposited, its tail is modelled, and the odd-zeta line is a realizer-supply question |
 | `2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md` | A3 release receiver passed, the continuation rested, and Holonic Inference begins |
+| `2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md` | Athena-Gemma now returns the complete inference lifecycle, and production scale is the widening of its receiver aperture |
 | `2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md` | Holonic inference recombines, extrapolates, returns, and reincarnates; heterogeneous transport is the fusion target |
 | `2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md` | I0 release receiver passed, the realization calculus closed, and I1 begins |
 | `2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md` | I1 release receiver passed, the recurrent boundary returned, and I2 begins |

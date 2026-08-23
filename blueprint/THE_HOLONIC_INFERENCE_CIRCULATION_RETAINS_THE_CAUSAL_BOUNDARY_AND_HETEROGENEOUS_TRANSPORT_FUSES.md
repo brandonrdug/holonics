@@ -3,17 +3,18 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I3 passed its complete release boundary. I4 is the active deed.
-I0--I5 replace the former
-second-LLM-first A4--A6 schedule.
+**Current boundary:** I0--I5 passed their release receivers. This file is their completed component
+contract. The active continuation is
+[`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
+I0--I5 replace the former second-LLM-first A4--A6 schedule.
 **Scheduling boundary:** this file does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md). Only a returned deed and passing grade move the
 position record.
 
 **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and
-fusion contracts; `established-bounded` for the cited M3--M6 and A1--I2 evidence; `proved-derived`
-for the named Lean theorems; `project-postulate` for placement and operator discipline; `open` for
-I3--I5 and every later heterogeneous-source deed.
+fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;
+`proved-derived` for the named Lean theorems; `project-postulate` for placement and operator
+discipline; and `open` for every later heterogeneous-source deed.
 
 **Derivation:**
 [`2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md`](../research/records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_EXTRAPOLATES_RETURNS_AND_REINCARNATES_AND_HETEROGENEOUS_TRANSPORT_IS_THE_FUSION_TARGET.md).
@@ -470,10 +471,11 @@ I5 returns:
 The I5 grade is bounded by its declared receiver/history/modal family. It makes no unrestricted
 intelligence claim and does not erase unexcited Gemma fibres.
 
-## 13. Later heterogeneous architecture fusion — unscheduled after I5 pending receiver selection
+## 13. Later heterogeneous architecture fusion — parked behind the production-aperture continuation
 
-[open] After I5, the next source is selected by a complementary open transport family, not model
-popularity, parameter count, or availability alone. Primary source species include:
+[open] The R0--R6 production-aperture contract now precedes heterogeneous-source selection. After
+R6, the next source is selected by a complementary open transport family, not model popularity,
+parameter count, or availability alone. Primary source species include:
 
 - a state-space/recurrent model whose transition transport differs from transformer contact;
 - a diffusion-labelled image or acoustic production model with a genuine denoising chronology;
@@ -489,8 +491,9 @@ X2  form the correspondence pullback, found the maximal shared subcomplex,
     push out only natural transport, and grade a fused Athena product.
 ```
 
-Every X deed inherits I0--I5's recurrence, return, compression, visualization, apparatus, and
-ablation laws. It does not revive the former A4--A6 schedule.
+Every X deed inherits I0--I5 and R0--R6's recurrence, return, compression, visualization,
+apparatus, and ablation laws. It does not revive the former A4--A6 schedule. X0--X2 are not active
+until the roadmap names the separating R6 open family.
 
 [open] The parked Qwen GGUF is not an X source merely because it exists. A same-purpose LLM may be
 used later as a close-control gamble: its shared transport, unique beneficial routes, complete

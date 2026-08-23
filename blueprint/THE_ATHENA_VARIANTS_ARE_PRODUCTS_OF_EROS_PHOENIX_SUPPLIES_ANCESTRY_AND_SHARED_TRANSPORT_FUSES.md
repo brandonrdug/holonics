@@ -3,17 +3,16 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** A3 release admission. A3 returned a nine-consequence candidate on 2026-08-22,
-but the affected-package and complete release receivers remain open after direct operator pause.
-After admission, I0 begins the Holonic Inference construction. The former A4--A6 schedule is
-superseded.
+**Current boundary:** M6, A1--A3, and I0--I5 passed their release receivers. This file remains the
+Athena-product and fusion-definition contract; the former A4--A6 schedule is superseded. The active
+construction is R0 in the production-aperture blueprint named below.
 **Scheduling boundary:** this file orders the Athena-product continuation. It does not move
 [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md); only a returned deed and passing grade do that.
 
 **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts;
-`established-bounded` for the admitted H0--H5, W1--W5 and M0--M6 returns; `proved-derived` for the
-named local Lean theorems; `interpretation` for their transfer into the construction geometry; and
-`open` for I0--I5 and every later heterogeneous-source deed.
+`established-bounded` for the admitted H0--H5, W1--W5, M0--M6, A1--A3 and I0--I5 returns;
+`proved-derived` for the named local Lean theorems; `interpretation` for their transfer into the
+construction geometry; and `open` for R0--R6 and every later heterogeneous-source deed.
 
 **Governing doctrine:**
 [`TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -30,9 +29,11 @@ This file does not replace its H/W/M evidence or hardware laws. It gives M6 its 
 role and carries the resulting Athena family beyond the first mathematics return.
 
 **Active continuation:**
+[`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
+The completed I0--I5 lifecycle contract is
 [`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).
-That contract supersedes this file's former A4 second-LLM lift, A5 two-model pushout, and A6 freeze
-schedule. The definitions and bounded A1--A3 evidence below remain in force.
+It superseded this file's former A4 second-LLM lift, A5 two-model pushout, and A6 freeze schedule.
+The definitions and bounded A1--A3 evidence below remain in force.
 
 ---
 
@@ -545,7 +546,7 @@ cost laws remain the fusion contract and are now composed inside I4 and the late
 similarly purposed language model is an optional later close control whose behavioral gain may be
 marginal or negative. It is not an Athena completion requirement.
 
-[open] The active continuation is I0--I5 in
+[established-bounded] I0--I5 completed the inference continuation in
 [`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md):
 
 ```text
@@ -557,15 +558,16 @@ I4  intra-Gemma heterogeneous modality fusion
 I5  frozen Athena-Gemma inference ecology and dissection atlas.
 ```
 
-Only after I5 may X0--X2 mount a genuinely complementary architecture such as an SSM,
-diffusion-labelled production model, or another perception/action organ and attempt a shared native
-subcomplex.
+I5 satisfied the predecessor condition under which X0--X2 could be posed. The active
+production-aperture blueprint now parks them until R6 returns one explicit complementary open
+transport family.
 
 ---
 
 ## 12. Revised Athena-product grade
 
-[open] The Athena-Gemma product is complete only when all of the following stand together:
+[established-bounded] The admitted Athena-Gemma product returns all of the following together for
+its declared recurrent/world/text/vision receiver family:
 
 1. the admitted M6 mathematics route and A1--A3 exchange/cultivation evidence;
 2. exact realization passages and receiver-history functional-affect classes;
@@ -578,6 +580,9 @@ subcomplex.
 8. exact semantic work beside separate residency, transfer, and calibrated apparatus testimony;
 9. canonical frozen inference from the native rest; and
 10. optional conventional compiled faces whose expansion and defects are explicit.
+
+The authoritative release admission is
+[`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
 A copied checkpoint, KV-cache rename, averaged weights, adapter stack, concatenated embedding,
 transcript pair, accepted proof, lower byte count, second language model, one prompt, one modality

@@ -29,14 +29,50 @@ STATION". Everything between them is the returned ledger and its provenance.** B
 the standing revision directly: *"Regarding the roadmap document, you can authoritatively revise it
 once you have sufficient context post-analysis campaign."*
 
+## THE ATHENA PRODUCTION APERTURE WIDENS THROUGH MATHEMATICAL WORLD-TUBES — 2026-08-22
+
+**The active continuation is
+[`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).**
+Its milestone derivation is
+[`research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
+
+**Milestone stance.** [established-bounded] I0--I5 returned the complete productive lifecycle for
+one declared recurrent/world/text/vision family: realization, retained boundary, complete passage,
+exterior consequence, causal-adjoint return, commit/decline, changed detached continuation,
+generator-native condensation, heterogeneous conduct, dissection, withdrawal, rest and remount.
+[interpretation] Production is now the controlled widening of that lifecycle's material,
+receiver, successor, generator, port, world, morphology, concurrent-front and apparatus apertures;
+it is not a new inference, cache, trainer, conversation, mathematics or scheduling subsystem.
+
+**Receiver selection is ratified.** Mathematics and physics are the first production basin because
+their presentations can be separated by exact operation, binder, unit, dimension, intervention,
+proof, analytic, diagram, boundary, conservation and world-return receivers. The source labels do
+not route the body. The compatible receiver pullback and its noncommuting defects do.
+
+**R0 is the sole next deed.** One content-addressed rich mathematical/physical inquiry crosses the
+unchanged I5 product and returns the complete intake, operation, continuation, receiver, world,
+morphology and apparatus boundary before any repair. R1 then closes only the absent rich-intake
+relation; R2 widens recurrence to a material-founded complete derivation; R3 lets returned
+constraints found dynamic local morphology; R4 makes the retained causal boundary load-bearing
+over long-horizon inquiry; R5 returns genuinely shared multimodal mathematical/physical transport;
+and R6 freezes the first bounded production Athena mathematics/physics ecology. No later deed
+begins while its predecessor is open.
+
+**X0--X2 are parked, not revoked.** Heterogeneous SSM/diffusion/acoustic/perception/production
+fusion follows only after R6, unless Brandon explicitly supersedes this order, and the source is
+then selected by one explicit R6 open transport family. The parked Qwen occurrence remains an
+optional same-purpose close control and schedules nothing.
+
 ## THE SINGLE-CARD PASSAGE CARRIES PHOENIX AND THE MATHEMATICS CODEC — 2026-08-19
 
 **The returned H/W/M construction is governed by
 [`THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md),
 its admitted Athena-product evidence is governed by
 [`THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md`](THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md),
-and its active continuation is governed by
-[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md).**
+its completed inference lifecycle is governed by
+[`THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md`](THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md),
+and its active production continuation is governed by
+[`THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).**
 The Athena evidence contract folds M6 into the first explicitly graded Athena mathematics variant
 and retains the returned exchange, sibling-spectrum and cultivation deeds. Together these files
 supersede the scheduling/station order of the earlier Phoenix master, Gemma instance and
@@ -50,9 +86,10 @@ pushout and A6 freeze order is superseded. Recurrent generation, world return, d
 language-family compression, complete answers and multimodality are receiver grades of one Holonic
 Inference circulation. I0--I5 now recover physical-realization classes, retain a compactified causal
 boundary, close the return, condense recurrently, fuse Gemma's own heterogeneous ports, and freeze
-the resulting Athena-Gemma ecology. A same-purpose LLM is an optional later control. Heterogeneous
-SSM/diffusion/perception/production sources are considered only after I5 and only when they separate
-a declared open transport family.
+the resulting Athena-Gemma ecology. A same-purpose LLM is an optional later control. The R0--R6
+production-aperture order now precedes heterogeneous-source work; SSM/diffusion/perception/
+production sources are considered only after R6 and only when they separate a declared open
+transport family.
 
 **Why the schedule changes before Station E.** The Station A source-layer graph is semantically
 resident, but the Station C tower returns to CPU construction/mount/bind/synchronize at every source
@@ -233,11 +270,13 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**NEXT DEED: RECEIVER SELECTION AFTER I5 IS NOT YET RATIFIED.** I0--I5 complete the user's
-ratified construction order for the declared Athena-Gemma recurrent/world/text/vision family.
-Optional X0--X2 heterogeneous fusion remains unscheduled until Brandon selects a source which
-separates one explicit I5 open transport family. Completion does not silently schedule Qwen or any
-other model.
+**NEXT DEED: R0 — ONE RICH MATHEMATICAL/PHYSICAL INQUIRY RETURNS THE COMPLETE I5 BASELINE
+BOUNDARY.** The receiver question is now ratified by the production-aperture blueprint named above.
+R0 conducts the unchanged frozen ecology before repair and must return the exact source/input/rest
+closure, entering faces, receiver basis, actual emission or typed refusal, complete defect/fibre
+population, exact work/apparatus testimony and the dependency-minimal absent relation population
+preventing the rich inquiry from closing. Incomparable minima remain plural. R1--R6 remain ordered
+and open. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
