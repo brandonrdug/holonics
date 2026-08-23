@@ -29,7 +29,7 @@ open Soma.Holonics.Millennium
 open Soma.Holonics.Millennium.FamilyKernel
 
 /-- A divisor of twice a prime is one of the four rungs. -/
-private lemma dvd_two_mul_prime {n k : ℕ} (hnp : n.Prime) (h : k ∣ 2 * n) :
+lemma dvd_two_mul_prime {n k : ℕ} (hnp : n.Prime) (h : k ∣ 2 * n) :
     k = 1 ∨ k = 2 ∨ k = n ∨ k = 2 * n := by
   by_cases hnk : n ∣ k
   · obtain ⟨j, hj⟩ := hnk

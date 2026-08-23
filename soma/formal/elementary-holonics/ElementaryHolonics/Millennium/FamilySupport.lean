@@ -34,7 +34,7 @@ private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Desce
   obtain ⟨m, hm, hmv⟩ := h₂
   exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
 
-private lemma val_add_left {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
+lemma val_add_left {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
     (hab : a + b ≠ 0) (h : padicValRat ℓ a < padicValRat ℓ b) :
     padicValRat ℓ (a + b) = padicValRat ℓ a := by
   have h1 : padicValRat ℓ a ≤ padicValRat ℓ (a + b) := by
