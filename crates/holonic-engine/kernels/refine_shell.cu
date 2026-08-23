@@ -878,6 +878,139 @@ extern "C" __global__ void conduct_quadratic_section_transport(
     ablated_route[at] = held == 0U ? 2U : 0U;
 }
 
+__device__ __forceinline__ int64_t canonical_mod(int64_t value, int64_t modulus)
+{
+    if (modulus == 0LL) {
+        return value;
+    }
+    const int64_t residue = value % modulus;
+    return residue < 0LL ? residue + modulus : residue;
+}
+
+/// Conduct a family of exact fixed-section passages under complete linear actions.
+///
+/// Each family carries one section, one square action, a row population of receiver constraints,
+/// a modulus (`0` means the integer carrier), and one returned-cultivation bit.  A cultivated
+/// current may take the direct fixed-section route only when every constraint vanishes.  The
+/// exterior owner separately authenticates the universal factorization `A-I = L*C`; this front
+/// evaluates the current and returns all expanded/condensed/obstructed alternatives.
+extern "C" __global__ void conduct_fixed_section_families(
+    const int64_t *sections,
+    const int64_t *actions,
+    const int64_t *constraints,
+    const uint32_t *constraint_rows,
+    const int64_t *moduli,
+    const uint32_t *cultivated,
+    int64_t *transported,
+    uint32_t *constraint_held,
+    uint32_t *invariant,
+    uint32_t *selected_route,
+    uint32_t *ablated_route,
+    uint64_t *local_semantic_work,
+    uint64_t *local_semantic_span,
+    uint32_t families,
+    uint32_t dimension)
+{
+    const uint32_t family = blockIdx.x * blockDim.x + threadIdx.x;
+    if (family >= families) {
+        return;
+    }
+    const uint64_t vector_at = (uint64_t)family * (uint64_t)dimension;
+    const uint64_t matrix_at = vector_at * (uint64_t)dimension;
+    const int64_t modulus = moduli[family];
+    uint32_t constraints_hold = 1U;
+    for (uint32_t row = 0U; row < constraint_rows[family]; ++row) {
+        int64_t reading = 0LL;
+        for (uint32_t column = 0U; column < dimension; ++column) {
+            reading += constraints[matrix_at + (uint64_t)row * dimension + column]
+                * sections[vector_at + column];
+        }
+        if (canonical_mod(reading, modulus) != 0LL) {
+            constraints_hold = 0U;
+        }
+    }
+    constraint_held[family] = constraints_hold;
+    const uint64_t dot_work = (uint64_t)dimension * 2ULL - 1ULL;
+    const uint64_t constraint_work = (uint64_t)constraint_rows[family] * dot_work;
+    const uint64_t constraint_span =
+        (uint64_t)constraint_rows[family] * (uint64_t)dimension;
+    if (cultivated[family] != 0U && constraints_hold != 0U) {
+        for (uint32_t coordinate = 0U; coordinate < dimension; ++coordinate) {
+            transported[vector_at + coordinate] =
+                canonical_mod(sections[vector_at + coordinate], modulus);
+        }
+        invariant[family] = 1U;
+        selected_route[family] = 1U;
+        ablated_route[family] = 0U;
+        local_semantic_work[family] = constraint_work;
+        local_semantic_span[family] = constraint_span;
+        return;
+    }
+    uint32_t held = 1U;
+    for (uint32_t row = 0U; row < dimension; ++row) {
+        int64_t reading = 0LL;
+        for (uint32_t column = 0U; column < dimension; ++column) {
+            reading += actions[matrix_at + (uint64_t)row * dimension + column]
+                * sections[vector_at + column];
+        }
+        const int64_t returned = canonical_mod(reading, modulus);
+        transported[vector_at + row] = returned;
+        if (returned != canonical_mod(sections[vector_at + row], modulus)) {
+            held = 0U;
+        }
+    }
+    invariant[family] = held;
+    selected_route[family] = held == 0U ? 2U : 0U;
+    ablated_route[family] = held == 0U ? 2U : 0U;
+    local_semantic_work[family] = constraint_work + (uint64_t)dimension * dot_work;
+    local_semantic_span[family] = constraint_span + (uint64_t)dimension;
+}
+
+/// Join the independently returned fixed-section families only after their complete routes stand.
+extern "C" __global__ void reduce_fixed_section_families(
+    const uint32_t *selected_route,
+    const uint32_t *ablated_route,
+    const uint64_t *local_semantic_work,
+    const uint64_t *local_semantic_span,
+    uint32_t *joint_cultivated,
+    uint32_t *local_ablated_joint,
+    uint64_t *semantic_work,
+    uint64_t *semantic_span,
+    uint32_t families)
+{
+    if (blockIdx.x != 0U || threadIdx.x != 0U) {
+        return;
+    }
+    uint32_t joint = 1U;
+    uint64_t work = (uint64_t)families
+        + (uint64_t)families * (uint64_t)families;
+    uint64_t span = 0ULL;
+    for (uint32_t family = 0U; family < families; ++family) {
+        if (selected_route[family] != 1U) {
+            joint = 0U;
+        }
+        work += local_semantic_work[family];
+        if (local_semantic_span[family] > span) {
+            span = local_semantic_span[family];
+        }
+    }
+    joint_cultivated[0] = joint;
+    for (uint32_t withdrawn = 0U; withdrawn < families; ++withdrawn) {
+        uint32_t local_joint = 1U;
+        for (uint32_t family = 0U; family < families; ++family) {
+            const uint32_t route = family == withdrawn
+                ? ablated_route[family]
+                : selected_route[family];
+            if (route != 1U) {
+                local_joint = 0U;
+            }
+        }
+        local_ablated_joint[withdrawn] = local_joint;
+    }
+    semantic_work[0] = work;
+    semantic_span[0] = span + (uint64_t)families;
+}
+
 /// **The recurrent passage and every conserved modality face cross one inference front.**
 ///
 /// I3 and I4 retain different state spaces. Their only identification is the explicit binary

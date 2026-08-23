@@ -83,6 +83,9 @@ pub use multimodal_transport::{
     JOINT_MEDIA_DECODER_SCHEMA, JOINT_MEDIA_FIBRES_SCHEMA, JOINT_MEDIA_STANDING_SCHEMA,
 };
 pub use production_aperture::{
+    FamilyCultivatedAthenaRest, FamilyCultivationDecoder, FamilyCultivationError,
+    FamilyCultivationOccurrence, FamilyCultivationReconstruction, FamilyCultivationStanding,
+    FamilyInquiry, FamilyWithdrawalReceipt, FamilyWorldReturn, FixedSectionPlate,
     LaboratoryAthenaError, LaboratoryAthenaRest, LaboratoryChronology,
     LaboratoryCommitOccurrence, LaboratoryComponentIdentity, LaboratoryDecision,
     LaboratoryInquiry, LaboratoryMorphologyDelta, LaboratoryPartition, LaboratoryPartitionKind,
@@ -94,7 +97,8 @@ pub use production_aperture::{
     ProductionStandingJunction, ProductionWithdrawalReceipt, ProductionWorldReturn,
     LABORATORY_CHRONOLOGY_SCHEMA, LABORATORY_DECODER_SCHEMA, LABORATORY_FIBRES_SCHEMA,
     LABORATORY_INQUIRY_SCHEMA, LABORATORY_JUNCTION_SCHEMA, PRODUCTION_FIBRES_SCHEMA,
-    PRODUCTION_INQUIRY_SCHEMA, PRODUCTION_JUNCTION_SCHEMA,
+    PRODUCTION_INQUIRY_SCHEMA, PRODUCTION_JUNCTION_SCHEMA, FAMILY_CULTIVATION_DECODER_SCHEMA,
+    FAMILY_CULTIVATION_FIBRES_SCHEMA, FAMILY_CULTIVATION_STANDING_SCHEMA, FAMILY_INQUIRY_SCHEMA,
 };
 pub use recurrence::{
     DerivationDecoderFibre, DerivationFibreMember, DerivationHigherCell, DerivationRecurrenceError,

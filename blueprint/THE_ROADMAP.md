@@ -56,11 +56,21 @@ all seven causal partitions, complete dissection, licensed product faces and the
 returned together. The authoritative release admission is
 [`research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md`](../research/records/2026-08-22_L0_RELEASE_RECEIVER_PASSED_THE_LABORATORY_FIXED_LOCUS_RESTED_AND_L1_BEGINS.md).
 
-**L1 is the sole next deed.** Multiple causally distinct theorem families now circulate through the
-continuing L0 rest. Their returned morphology must retain exact local support; only independent
-deltas may commute; retained history must enable revisitation; at least one later theorem route must
-become newly reachable; source-detached remount must preserve the familywise conduct; and targeted
-family ablation must remove only its attributable consequence.
+**L1 passed.** [established-bounded] Two causally distinct Lean theorem families cultivated one
+continuing laboratory rest through the exact fixed-section law `A-I=LC`. Their local supports
+commuted only through an exact interchange; held-out source-detached current newly reached the
+composed route; the residual and equal-present/different-future controls stayed separated; targeted
+ablations retained only the independent local consequence; and exact prefix withdrawal restored
+both predecessors. The final complete receiver returned 2,846 passing tests, zero failures, and all
+thirteen green scopes in 243 seconds. Authoritative
+admission is
+[`research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md`](../research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md).
+
+**L2 is the sole next deed.** The admitted generator and receiver-history owners now condense the
+cultivated L1 ecology into native hexis. The deed owes generators, relations, complete factorization
+or defects for every declared receiver/history, naturality and intervention receipts across the
+two families, complete fibres and shortest separators, source-detached agreement, richer-receiver
+reopening, and strict descent of artifact, decoder, fibres, work, span, residency, and transfer.
 
 **L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
@@ -345,8 +355,8 @@ R6 candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
-The active L0 laboratory-cultivation deed now composes this admitted R6 predecessor. X0--X2 and
-Qwen remain unscheduled.
+The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L1 have
+passed and L2 is the sole current deed. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

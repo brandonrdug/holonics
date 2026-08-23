@@ -3,8 +3,8 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0 have passed. L1 is the sole
-active deed.
+**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L1 have passed. L2 is the
+sole active deed.
 **Product:**
 
 ```text
@@ -17,8 +17,8 @@ geometric, physical, proof, diagram, unit, dimension, intervention, and world-re
 
 **Truth statuses:** `definition` for the product, source occurrence, circulation, cultivation,
 condensation, and grade contracts; `project-postulate` for construction, apparatus, and validation
-discipline; `established-bounded` for the cited admitted owners, returns, and L0; and `open` for
-L1--L4 until each deed passes its release receiver.
+discipline; `established-bounded` for the cited admitted owners, returns, and L0--L1; and `open` for
+L2--L4 until each deed passes its release receiver.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
@@ -237,9 +237,14 @@ L0 passes only when all of the following return together:
 
 ### L1 — Returned theorem families cultivate the continuing laboratory rest
 
-[open] L1 is the sole active deed. It repeatedly circulates the admitted chronology through the L0
-rest. It does not add a learning subsystem. Each iteration is another instance of the same
-mount/conduct/return/reflect/later-current law.
+[established-bounded] L1 passed. The integer oriented-face and `ZMod 2` additive-coordinate
+families returned genuine Lean passages and cultivated the same continuing rest through one
+label-free fixed-section law `A-I=LC`. Their disjoint supports founded an exact interchange; a
+held-out source-detached inquiry newly reached the joint route; the residual control kept both
+obstructions; each targeted ablation removed only its local consequence; and exact prefix
+withdrawals restored both predecessors. The final complete release returned 2,846 passing tests,
+zero failures, and all thirteen green scopes in 243 seconds. Authoritative admission is
+[`../research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md`](../research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md).
 
 L1 passes only when:
 
@@ -254,7 +259,7 @@ L1 passes only when:
 
 ### L2 — Recurring laboratory transport condenses into native hexis
 
-[open] L2 applies the admitted generator and receiver-history condensation to the cultivated L1
+[open] L2 is the sole active deed. It applies the admitted generator and receiver-history condensation to the cultivated L1
 ecology. Recurring holonics, mathematical, proof, geometric, and physical transport laws become
 native morphology; complete reconstruction fibres retain every distinction visible to an admitted
 future receiver.
