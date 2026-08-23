@@ -2,6 +2,7 @@ import ElementaryHolonics.Millennium.FamilyGenocchi
 import ElementaryHolonics.Millennium.FamilyWitness
 import ElementaryHolonics.Millennium.FamilyFiveDescent
 import ElementaryHolonics.Millennium.FamilySevenDescent
+import ElementaryHolonics.Millennium.FamilyOddDescent
 
 /-!
 # FamilyPairing: what the posed conjecture forces on each branch
@@ -121,6 +122,21 @@ theorem theConjectureIsSqueezedToASinglePointOnTheOddSignLocus
     · exact FamilySevenDescent.theRankIsAtMostOneAtEverySevenModEightPrime h
   have hIs : AlgebraicRankIs p 1 := ⟨h1, h2⟩
   exact ⟨hIs, (hclause 1).mpr hIs⟩
+
+
+
+/-- **THE UNCONDITIONAL RANK DIAL**: at every odd prime, in one statement — rank
+zero at `p ≡ 3`, at most one at `p ≡ 5, 7`, at most two at `p ≡ 1 (mod 8)` — the
+complete two-descent reading of the family, with no conjecture consumed. -/
+theorem theUnconditionalRankDial (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
+    (p % 8 = 1 → ¬ AlgebraicRankAtLeast p 3) ∧
+    (p % 8 = 3 → AlgebraicRankIs p 0) ∧
+    (p % 8 = 5 → ¬ AlgebraicRankAtLeast p 2) ∧
+    (p % 8 = 7 → ¬ AlgebraicRankAtLeast p 2) :=
+  ⟨fun _ => FamilyOddDescent.theRankIsAtMostTwoAtEveryOddPrime hp2,
+   fun h => FamilyGenocchi.theGenocchiLawHoldsOnTheThreeModEightBranch h,
+   fun h => FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime h,
+   fun h => FamilySevenDescent.theRankIsAtMostOneAtEverySevenModEightPrime h⟩
 
 end Soma.Holonics.Millennium.FamilyPairing
 
