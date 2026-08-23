@@ -26,6 +26,7 @@ open Soma.Holonics.Millennium
 open Soma.Holonics.Millennium.GeneralFace
 open Soma.Holonics.Millennium.GeneralHeight
 open Soma.Holonics.Millennium.FiveHeight
+open Soma.Holonics.Millennium.GeneralCollision
 
 variable {a b : ℤ}
 
@@ -215,7 +216,7 @@ set_option maxHeartbeats 2000000 in
 long, the quartic law forces a contradiction — so a long point's half is short.  The
 constant is explicit: `2⁷·D¹⁰·C` against the coefficient size. -/
 theorem theContraction (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
-    {C : ℕ} (Q : (E ((a : ℚ)) ((b : ℚ))).Point) {B : ℕ}
+    (Q : (E ((a : ℚ)) ((b : ℚ))).Point) {B : ℕ}
     (hdouble : pheight a b (Q + Q) ≤ B) :
     pheight a b Q ^ 4
       ≤ 2 ^ 7 * GeneralHeight.sizeOf a b ^ 10 * B
@@ -366,5 +367,291 @@ theorem theTranslateIsBoundedQuadratically (a b : ℤ) {xR yR : ℚ}
       exact_mod_cast (Rat.num_div_den xR).symm
     exact GeneralHeight.theChordRootIsBoundedOnEveryFullTwoTorsionCurve a b hbe hxRv
       (onCurve hX) (onCurve hR) hxne
+
+
+/-! ## 7. The finite class atlas and its representatives -/
+
+variable (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
+
+lemma range_classOf_finite (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) :
+    (Set.range (classOf ha hb hab)).Finite := by
+  set K : ℕ := (a * b * (a - b)).natAbs with hK
+  have hK0 : 0 < K := by
+    rw [hK, Int.natAbs_pos]
+    exact mul_ne_zero (mul_ne_zero ha hb) hab
+  refine Set.Finite.subset
+    (Set.Finite.prod (Set.finite_Icc (-(K : ℤ)) (K : ℤ))
+      (Set.finite_Icc (-(K : ℤ)) (K : ℤ))) ?_
+  rintro c ⟨P, rfl⟩
+  obtain ⟨h10, h20, h1d, h2d, -, -⟩ := classOf_spec ha hb hab P
+  have hb1 : (classOf ha hb hab P).1.natAbs ≤ K := Nat.le_of_dvd hK0 h1d
+  have hb2 : (classOf ha hb hab P).2.natAbs ≤ K := Nat.le_of_dvd hK0 h2d
+  constructor
+  · simp only [Set.mem_Icc]; omega
+  · simp only [Set.mem_Icc]; omega
+
+open Classical in
+/-- One chosen representative per realized class. -/
+def repOfClass (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) (c : ℤ × ℤ) :
+    (E ((a : ℚ)) ((b : ℚ))).Point :=
+  if hc : ∃ Y, classOf ha hb hab Y = c then hc.choose else 0
+
+lemma repOfClass_spec (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) {c : ℤ × ℤ}
+    (hc : ∃ Y, classOf ha hb hab Y = c) :
+    classOf ha hb hab (repOfClass ha hb hab c) = c := by
+  classical
+  rw [repOfClass, dif_pos hc]
+  exact hc.choose_spec
+
+/-- The height ceiling of the chosen representatives. -/
+def H0 (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) : ℕ :=
+  (range_classOf_finite ha hb hab).toFinset.sup
+    fun c => pheight a b (repOfClass ha hb hab c)
+
+lemma rep_height_le (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) {c : ℤ × ℤ}
+    (hc : c ∈ Set.range (classOf ha hb hab)) :
+    pheight a b (repOfClass ha hb hab c) ≤ H0 ha hb hab := by
+  unfold H0
+  exact Finset.le_sup (f := fun c => pheight a b (repOfClass ha hb hab c))
+    ((range_classOf_finite ha hb hab).mem_toFinset.mpr hc)
+
+/-- The chord constant of the curve and its chosen representatives. -/
+def chordConst (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) : ℕ :=
+  2 ^ 4 * (2 * H0 ha hb hab + GeneralHeight.sizeOf a b) ^ 6
+
+/-- The descent threshold: above it the contraction bites. -/
+def threshold (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) : ℕ :=
+  2 ^ 7 * GeneralHeight.sizeOf a b ^ 10 * chordConst ha hb hab
+    + (GeneralHeight.sizeOf a b + (a * b).natAbs + 1) ^ 4 + H0 ha hb hab
+
+
+/-! ## 8. The descent step -/
+
+private lemma sqT {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
+    Descent.SqCls u w := by
+  obtain ⟨c, hc, hv⟩ := h₁
+  obtain ⟨d, hd, hw⟩ := h₂
+  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
+
+private lemma sqS {u v : ℚ} (h : Descent.SqCls u v) (hu : u ≠ 0) :
+    Descent.SqCls v u := by
+  obtain ⟨c, hc, hv⟩ := h
+  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
+  rw [hv]
+  field_simp
+
+
+set_option maxHeartbeats 2000000 in
+/-- **THE DESCENT STEP**: above the threshold, a point is twice a strictly shorter
+point plus a bounded representative.  This is where quartic beats quadratic. -/
+theorem theDescentStep (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
+    (X : (E ((a : ℚ)) ((b : ℚ))).Point)
+    (hbig : threshold ha hb hab < pheight a b X) :
+    ∃ Q R, pheight a b R ≤ H0 ha hb hab ∧ X = Q + Q + R ∧
+      pheight a b Q < pheight a b X := by
+  have haq : ((a : ℚ)) ≠ 0 := by exact_mod_cast ha
+  have hbq : ((b : ℚ)) ≠ 0 := by exact_mod_cast hb
+  have habq : ((a : ℚ)) - ((b : ℚ)) ≠ 0 := by
+    intro hc
+    refine hab ?_
+    have h1 : ((a : ℚ)) = ((b : ℚ)) := by linarith
+    have h2 : (a : ℤ) = b := by exact_mod_cast h1
+    exact sub_eq_zero_of_eq h2
+  set R : (E ((a : ℚ)) ((b : ℚ))).Point :=
+    repOfClass ha hb hab (classOf ha hb hab X) with hRdef
+  have hcR : classOf ha hb hab R = classOf ha hb hab X :=
+    repOfClass_spec ha hb hab ⟨X, rfl⟩
+  have hRh : pheight a b R ≤ H0 ha hb hab := rep_height_le ha hb hab ⟨X, rfl⟩
+  obtain ⟨-, -, -, -, hX1, hX2⟩ := classOf_spec ha hb hab X
+  obtain ⟨-, -, -, -, hR1, hR2⟩ := classOf_spec ha hb hab R
+  rw [hcR] at hR1 hR2
+  -- the difference is a double
+  have hs1 : Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) X)
+      (slotOne ((a : ℚ)) ((b : ℚ)) R) := by
+    exact sqT hX1 (sqS hR1 (GeneralHom.slotOne_ne haq hbq R))
+  have hs2 : Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) X)
+      (slotTwo ((a : ℚ)) ((b : ℚ)) R) := by
+    exact sqT hX2 (sqS hR2 (GeneralHom.slotTwo_ne haq habq R))
+  obtain ⟨Q, hQ⟩ := sameClassDouble haq hbq habq X R hs1 hs2
+  refine ⟨Q, R, hRh, by rw [← hQ]; abel, ?_⟩
+  -- the translate is bounded quadratically, in both fibres of `R`
+  have hchord1 : 1 ≤ chordConst ha hb hab := by
+    unfold chordConst
+    have h1 : 1 ≤ (2 * H0 ha hb hab + GeneralHeight.sizeOf a b) ^ 6 := by
+      refine Nat.one_le_pow _ _ ?_
+      have := GeneralHeight.one_le_sizeOf a b
+      omega
+    have h2 : 1 ≤ (2 : ℕ) ^ 4 := by norm_num
+    nlinarith
+  have hX1 : 1 ≤ pheight a b X := by
+    unfold threshold at hbig
+    omega
+  have htrans : pheight a b (X - R)
+      ≤ chordConst ha hb hab * pheight a b X ^ 2 := by
+    rcases hRz : R with _ | @⟨xR, yR, hRns⟩
+    · -- the identity representative: the translate is `X` itself
+      rw [← Point.zero_def, sub_zero]
+      have h1 : pheight a b X ≤ pheight a b X ^ 2 :=
+        Nat.le_self_pow two_ne_zero _
+      have h2 : pheight a b X ^ 2 ≤ chordConst ha hb hab * pheight a b X ^ 2 :=
+        Nat.le_mul_of_pos_left _ (by omega)
+      omega
+    · have hRval : pheight a b R = hgt xR := by rw [hRz]; rfl
+      have hbigR : hgt xR < pheight a b X := by
+        unfold threshold at hbig
+        omega
+      refine le_trans (theTranslateIsBoundedQuadratically a b hRns X hbigR) ?_
+      refine Nat.mul_le_mul_right _ ?_
+      unfold chordConst
+      refine Nat.mul_le_mul_left _ (Nat.pow_le_pow_left ?_ 6)
+      unfold GeneralHeight.pointSize
+      have h1 : xR.num.natAbs ≤ hgt xR := num_natAbs_le_hgt xR
+      have h2 : ((xR.den : ℤ)).natAbs ≤ hgt xR := by
+        rw [Int.natAbs_natCast]
+        exact den_le_hgt xR
+      have h3 : hgt xR ≤ H0 ha hb hab := by omega
+      unfold GeneralHeight.sizeOf
+      omega
+  -- the contraction
+  have hdouble : pheight a b (Q + Q) ≤ chordConst ha hb hab * pheight a b X ^ 2 := by
+    rw [← hQ]
+    exact htrans
+  have hcon := theContraction ha hb hab Q hdouble
+  -- quartic beats quadratic above the threshold
+  set H : ℕ := pheight a b X with hH
+  set D : ℕ := GeneralHeight.sizeOf a b with hD
+  set T : ℕ := 2 ^ 7 * D ^ 10 * chordConst ha hb hab with hT
+  set S : ℕ := (D + (a * b).natAbs + 1) ^ 4 with hS
+  have hHbig : T + S + H0 ha hb hab < H := by
+    unfold threshold at hbig
+    exact hbig
+  have hH1 : 1 ≤ H := by omega
+  have hH2 : 1 ≤ H ^ 2 := Nat.one_le_pow _ _ (by omega)
+  have hstep : pheight a b Q ^ 4 ≤ T * H ^ 2 + S := by
+    rw [hT, hS]
+    calc pheight a b Q ^ 4
+        ≤ 2 ^ 7 * D ^ 10 * (chordConst ha hb hab * H ^ 2)
+          + (D + (a * b).natAbs + 1) ^ 4 := hcon
+      _ = 2 ^ 7 * D ^ 10 * chordConst ha hb hab * H ^ 2
+          + (D + (a * b).natAbs + 1) ^ 4 := by ring
+  have hlt : T * H ^ 2 + S < H ^ 4 := by
+    have h1 : S ≤ S * H ^ 2 := Nat.le_mul_of_pos_right _ (by omega)
+    have h2 : T * H ^ 2 + S * H ^ 2 = (T + S) * H ^ 2 := by ring
+    have h3 : (T + S) * H ^ 2 < H * H ^ 2 :=
+      Nat.mul_lt_mul_of_lt_of_le (by omega) (le_refl _) (by omega)
+    have h4 : H * H ^ 2 ≤ H ^ 4 := by
+      have : H ^ 3 ≤ H ^ 4 := Nat.pow_le_pow_right (by omega) (by omega)
+      calc H * H ^ 2 = H ^ 3 := by ring
+        _ ≤ H ^ 4 := this
+    omega
+  have hfour : pheight a b Q ^ 4 < H ^ 4 := by omega
+  by_contra hge
+  push_neg at hge
+  have : H ^ 4 ≤ pheight a b Q ^ 4 := Nat.pow_le_pow_left hge 4
+  omega
+
+
+/-! ## 9. The bounded-height points are finite -/
+
+private def coords : (E ((a : ℚ)) ((b : ℚ))).Point → Option (ℚ × ℚ)
+  | .zero => none
+  | .some (x := x) (y := y) _ => some (x, y)
+
+private lemma someEqPt {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
+    {h₁ : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x₁ y₁}
+    {h₂ : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x₂ y₂} :
+    (Point.some h₁ : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some h₂ := by
+  subst hx; subst hy; rfl
+
+private lemma coords_injective : Function.Injective (coords (a := a) (b := b)) := by
+  intro P Q h
+  rcases P with _ | @⟨x₁, y₁, h₁⟩ <;> rcases Q with _ | @⟨x₂, y₂, h₂⟩
+  · rfl
+  · exact absurd h (by simp [coords])
+  · exact absurd h (by simp [coords])
+  · simp only [coords, Option.some.injEq, Prod.mk.injEq] at h
+    exact someEqPt h.1 h.2
+
+lemma bounded_heights_finite (a b : ℤ) (N : ℕ) :
+    {X : (E ((a : ℚ)) ((b : ℚ))).Point | pheight a b X ≤ N}.Finite := by
+  have hpair : {p : ℚ × ℚ | hgt p.1 ≤ N ∧
+      p.2 ^ 2 = p.1 * (p.1 - (a : ℚ)) * (p.1 - (b : ℚ))}.Finite := by
+    have hsub : {p : ℚ × ℚ | hgt p.1 ≤ N ∧
+        p.2 ^ 2 = p.1 * (p.1 - (a : ℚ)) * (p.1 - (b : ℚ))} ⊆
+        ⋃ x ∈ {q : ℚ | hgt q ≤ N},
+          {x} ×ˢ {y : ℚ | y ^ 2 = x * (x - (a : ℚ)) * (x - (b : ℚ))} := by
+      rintro ⟨u, v⟩ ⟨h1, h2⟩
+      simp only [Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff, Set.mem_setOf_eq]
+      exact ⟨u, h1, rfl, h2⟩
+    refine Set.Finite.subset (Set.Finite.biUnion
+      (FiveDescent.theBoundedRationalsAreFinite N) fun x _ =>
+        Set.Finite.prod (Set.finite_singleton x) ?_) hsub
+    by_cases hex : ∃ y₀ : ℚ, y₀ ^ 2 = x * (x - (a : ℚ)) * (x - (b : ℚ))
+    · obtain ⟨y₀, hy₀⟩ := hex
+      refine Set.Finite.subset ((Set.finite_singleton (-y₀)).insert y₀) ?_
+      intro w hw
+      simp only [Set.mem_setOf_eq] at hw
+      have h0 : (w - y₀) * (w + y₀) = 0 := by linear_combination hw - hy₀
+      rcases mul_eq_zero.mp h0 with h' | h'
+      · left; linarith
+      · right
+        simp only [Set.mem_singleton_iff]
+        linarith
+    · refine Set.Finite.subset Set.finite_empty ?_
+      intro w hw
+      exact absurd ⟨w, hw⟩ hex
+  have himg : coords '' {X : (E ((a : ℚ)) ((b : ℚ))).Point | pheight a b X ≤ N} ⊆
+      insert none (Option.some ''
+        {p : ℚ × ℚ | hgt p.1 ≤ N ∧
+          p.2 ^ 2 = p.1 * (p.1 - (a : ℚ)) * (p.1 - (b : ℚ))}) := by
+    rintro w ⟨P, hP, rfl⟩
+    rcases P with _ | @⟨x, y, h⟩
+    · exact Set.mem_insert _ _
+    · exact Set.mem_insert_of_mem _ ⟨(x, y), ⟨hP, onCurve h⟩, rfl⟩
+  exact Set.Finite.of_finite_image
+    (Set.Finite.subset ((Set.Finite.image _ hpair).insert none) himg)
+    coords_injective.injOn
+
+/-! ## 10. The Mordell–Weil theorem on every full-2-torsion curve -/
+
+/-- **THE MORDELL–WEIL THEOREM ON EVERY FULL-TWO-TORSION CURVE**: for every elliptic
+curve over `ℚ` whose two-torsion is entirely rational, the group of rational points is
+**finitely generated**.
+
+Mathlib carries no Mordell–Weil theorem of any kind.  This is the strong form on a
+two-parameter family of unbounded rank, assembled from the exact two-descent, the
+quartic duplication law, and the quadratic chord law. -/
+theorem theMordellWeilTheoremOnEveryFullTwoTorsionCurve
+    (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) :
+    AddGroup.FG ((E ((a : ℚ)) ((b : ℚ))).Point) := by
+  set N₀ : ℕ := threshold ha hb hab with hN₀
+  rw [AddGroup.fg_iff]
+  refine ⟨{X : (E ((a : ℚ)) ((b : ℚ))).Point | pheight a b X ≤ N₀}, ?_,
+    bounded_heights_finite a b N₀⟩
+  rw [eq_top_iff]
+  intro X _
+  have key : ∀ m (Y : (E ((a : ℚ)) ((b : ℚ))).Point), pheight a b Y ≤ m →
+      Y ∈ AddSubgroup.closure
+        {Z : (E ((a : ℚ)) ((b : ℚ))).Point | pheight a b Z ≤ N₀} := by
+    intro m
+    induction m with
+    | zero =>
+      intro Y hY
+      exact AddSubgroup.subset_closure (by simp only [Set.mem_setOf_eq]; omega)
+    | succ m ih =>
+      intro Y hY
+      by_cases hle : pheight a b Y ≤ N₀
+      · exact AddSubgroup.subset_closure hle
+      · obtain ⟨Q, R, hRh, hEq, hlt⟩ := theDescentStep ha hb hab Y (by omega)
+        have hQmem := ih Q (by omega)
+        have hRmem : R ∈ AddSubgroup.closure
+            {Z : (E ((a : ℚ)) ((b : ℚ))).Point | pheight a b Z ≤ N₀} := by
+          refine AddSubgroup.subset_closure ?_
+          simp only [Set.mem_setOf_eq]
+          unfold threshold at hN₀
+          omega
+        rw [hEq]
+        exact AddSubgroup.add_mem _ (AddSubgroup.add_mem _ hQmem hQmem) hRmem
+  exact key (pheight a b X) X le_rfl
 
 end Soma.Holonics.Millennium.GeneralMordell
