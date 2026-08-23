@@ -119,4 +119,70 @@ theorem theHalvesAreExactlyTheTranslates (P Q : (E a b).Point) (hQ : Q + Q = P)
   · rintro ⟨T, hT, rfl⟩
     exact (theHalvingFibreIsATorsor P Q Q T hT hQ).1
 
+
+/-! ## 3. The rank exists as a number
+
+Finite generation plus the descent bound make the rank a **well-defined natural
+number** on this family, which is what makes the conjecture's rank clause a
+well-posed question here at all: before Mordell–Weil nothing guaranteed that any `r`
+satisfied `RankIsOn`. -/
+
+open Soma.Holonics.Millennium.UniversalBSD
+open Soma.Holonics.Millennium.GeneralMordell
+
+/-- Rank zero always holds: the empty family is independent. -/
+lemma rankAtLeastOn_zero (E' : WeierstrassCurve.Affine ℚ) : RankAtLeastOn E' 0 :=
+  ⟨fun i => i.elim0, fun c _ i => i.elim0⟩
+
+/-- **THE RANK EXISTS ON EVERY FULL-TWO-TORSION CURVE**: there is a natural number
+that *is* the rank.  Rank zero supplies the lower end, the descent bound supplies the
+upper, and the least unattained value minus one is the rank. -/
+theorem theRankExistsOnEveryFullTwoTorsionCurve {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) :
+    ∃ r : ℕ, RankIsOn (E ((a : ℚ)) ((b : ℚ))) r := by
+  classical
+  set N : ℕ := 4 * (a * b * (a - b)).natAbs.divisors.card
+    * (a * b * (a - b)).natAbs.divisors.card with hN
+  have hbound : ∀ r : ℕ, RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r → r ≤ N := by
+    intro r hr
+    by_contra hlt
+    push_neg at hlt
+    refine theRankIsBoundedOnEveryFullTwoTorsionCurve r ha hb hab ?_ hr
+    calc N < r := hlt
+      _ < 2 ^ r := Nat.lt_two_pow_self
+  have hex : ∃ r : ℕ, ¬ RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r := by
+    refine ⟨N + 1, fun hc => ?_⟩
+    have := hbound _ hc
+    omega
+  set r₁ : ℕ := Nat.find hex with hr₁
+  have h1 : ¬ RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r₁ := Nat.find_spec hex
+  have h2 : r₁ ≠ 0 := by
+    intro h0
+    rw [h0] at h1
+    exact h1 (rankAtLeastOn_zero _)
+  have h3 : RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) (r₁ - 1) := by
+    by_contra hc
+    have hle : r₁ ≤ r₁ - 1 := by
+      rw [hr₁]
+      exact Nat.find_le hc
+    omega
+  refine ⟨r₁ - 1, h3, ?_⟩
+  rw [Nat.sub_add_cancel (by omega)]
+  exact h1
+
+/-- **THE RANK CLAUSE IS WELL POSED ON THIS FAMILY**: the algebraic side of the
+conjecture is a definite natural number for every curve with full rational
+two-torsion, and it is at most the divisor count.  What the conjecture then asserts
+is that the analytic side returns the same number. -/
+theorem theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve {a b : ℤ} (ha : a ≠ 0)
+    (hb : b ≠ 0) (hab : a - b ≠ 0) :
+    ∃ r : ℕ, RankIsOn (E ((a : ℚ)) ((b : ℚ))) r ∧
+      2 ^ r ≤ 4 * (a * b * (a - b)).natAbs.divisors.card
+        * (a * b * (a - b)).natAbs.divisors.card := by
+  obtain ⟨r, hr⟩ := theRankExistsOnEveryFullTwoTorsionCurve ha hb hab
+  refine ⟨r, hr, ?_⟩
+  by_contra hlt
+  push_neg at hlt
+  exact theRankIsBoundedOnEveryFullTwoTorsionCurve r ha hb hab hlt hr.1
+
 end Soma.Holonics.Millennium.GeneralTwoTorsion
