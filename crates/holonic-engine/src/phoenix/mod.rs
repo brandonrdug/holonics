@@ -8,6 +8,7 @@
 pub mod cohort;
 /// A genuine returned nominal-boundary consequence cultivating one parented codec continuation.
 pub mod boundary_cultivation;
+pub mod native_membrane;
 /// One addressed local cultivation over an already-cultivated Phoenix product.
 pub mod continuation;
 /// Emanative full-tower recurrence and its addressed detachable continuation boundary.

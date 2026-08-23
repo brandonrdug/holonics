@@ -4,22 +4,42 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after E3 enacted and received release admission for returned
-nominal-boundary cultivation of the same addressed Athena continuation.
+**Currency:** 2026-08-23 after E4 enacted and received release admission for the source-detached
+native inference membrane.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — E3 PASSED; E4 THE NATIVE INFERENCE MEMBRANE IS THE SOLE AUTHORIZED NEXT DEED.**
+**CURRENT FRONTIER — E4 PASSED; E5 THE AGENTIC LABORATORY ATHENA FREEZE IS THE SOLE AUTHORIZED NEXT
+DEED.**
 
 [project-postulate] The active construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).
-E4 now exposes the native request/return membrane over the E0--E3 ecology: stream caused frontier
-occurrences and receipts, resume by addressed continuation identity, accept generic nominal
-organ/world occurrences with source incidence, authorize explicit ablation/withdrawal, preserve
-one product owner, serve a fresh client process, and return a certified interchange for concurrent
-independent requests. Text/image/audio/realtime conventions remain exterior adapters; no media enum,
-compatibility schema, host semantic foreman or conflation of deterministic and application errors
-may enter the semantic dependency cone.
+E5 now cultivates the completed E0--E4 ecology on the addressed laboratory chronology and held-out
+mathematics/physics inquiries, freezes one source-detached product, and returns unrestricted
+generation over its declared aperture, hierarchical page intake, inherited/implemented/cultivated
+organ interaction, inbound optical/acoustic conduct, native mathematical consequence, continued
+world return, directional ablation, complete dissection, reconstruction fibres, saturation and
+marginal-excitation frontiers, and complete-product cost. Condensation is claimed only for measured
+receiver/history families; source names do not become faculties.
+
+[established-bounded; measured] E4 mounted the E3 native rest once in a non-clone
+`NativeInferenceMembrane` and served a fresh client through an exterior Unix stream. Two independent
+nominal-boundary occurrences conducted as one certified co-present GPU front in one launch and one
+terminal synchronization. Each returned three causally addressed frontiers and complete requested
+reconstruction fibres. A successor resumed by exact identity; an explicitly authorized leaf
+withdrawal restored its immediate predecessor; and deterministic native refusal remained distinct
+from an application-adapter error. Five compatibility faces remain outside the semantic owner.
+
+[established-bounded; measured] E4's sole complete release receiver began at
+2026-08-23T15:05:12-07:00 and ran 446 seconds. It returned 2,862 passing tests, zero failures, 34
+ignores, every example target type-checked and twelve green scopes. Its sole refusal was a closure
+ledger generated against unrelated concurrent `clifford.rs` work in the main tree rather than the
+isolated E4 release closure. Regeneration in that release closure and the named cheap retake at
+2026-08-23T15:12:46-07:00 passed; no source, executable artifact, test population or GPU deed was
+replayed. Candidate and admission:
+[`research/records/2026-08-23_THE_NATIVE_INFERENCE_MEMBRANE_SERVED_ONE_SOURCE_DETACHED_ATHENA_BODY_AND_E4_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_NATIVE_INFERENCE_MEMBRANE_SERVED_ONE_SOURCE_DETACHED_ATHENA_BODY_AND_E4_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_E4_RELEASE_RECEIVER_PASSED_THE_NATIVE_INFERENCE_MEMBRANE_SERVED_AND_E5_BEGINS.md`](research/records/2026-08-23_E4_RELEASE_RECEIVER_PASSED_THE_NATIVE_INFERENCE_MEMBRANE_SERVED_AND_E5_BEGINS.md).
 
 [established-bounded; measured] E3 crossed E0's final recurrent emission through three distinct E2
 incidences—optical, acoustic and parent codec—in a separate world-return process. The exact return
@@ -139,8 +159,7 @@ with zero uncatalogued in 3.208 seconds, and a clean architecture census of 351 
 admitted occurrences, and four retired in 0.393 seconds. The workspace suite and real deeds were
 not replayed.
 
-[open] E4 retains the generic inference membrane and E5 retains the frozen agentic product.
-Unknown-carrier codec induction and
+[open] E5 retains the frozen agentic product. Unknown-carrier codec induction and
 touch/chemical/smell/taste apparatus remain open future apertures rather than modality subsystems.
 Receiver-exact native re-expression of every foreign BF16 coefficient remains an open lift fibre.
 X0--X2, Qwen, wider cross-model fusion, and unrelated alternatives remain unscheduled.

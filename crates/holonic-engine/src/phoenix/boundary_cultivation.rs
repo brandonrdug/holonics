@@ -316,6 +316,50 @@ impl ReturnedBoundaryCultivationRest {
         self.conduct(candidate_counts, self.standing.delta.successor_state, card)
     }
 
+    /// Conduct a co-present front of independent boundary occurrences in one card launch.
+    ///
+    /// Each member contributes one complete anchor/port population. The immutable decoder,
+    /// starting section and cultivated state are shared reads; the card writes disjoint anchor
+    /// regions. Independence of the caller's complete continuation returns remains the membrane
+    /// owner's obligation and is certified there before this batched realization is admitted.
+    pub fn conduct_cultivated_front(
+        &self,
+        candidate_counts: &[u32],
+        members: usize,
+        card: &mut CudaRefineExecutor,
+    ) -> Result<DeviceJointMediaTransport, BoundaryCultivationRefusal> {
+        self.validate()?;
+        let member_anchors = self.standing.delta.least_attributable_morphology.len();
+        let anchors = member_anchors
+            .checked_mul(members)
+            .ok_or(BoundaryCultivationRefusal::Candidate)?;
+        if members == 0
+            || candidate_counts.len()
+                != anchors
+                    .checked_mul(self.predecessor.standing.ports.len())
+                    .ok_or(BoundaryCultivationRefusal::Candidate)?
+            || candidate_counts.contains(&0)
+        {
+            return Err(BoundaryCultivationRefusal::Candidate);
+        }
+        card.conduct_joint_media_transport_on_device(
+            candidate_counts,
+            anchors,
+            &[self.standing.delta.successor_state, self.standing.delta.successor_state],
+            &self.predecessor.decoder_addresses(),
+            &self.predecessor.starts(),
+            self.predecessor.standing.family_count as usize,
+            self.predecessor.standing.ports.len(),
+        )
+        .map_err(|error| BoundaryCultivationRefusal::Apparatus(error.to_string()))
+    }
+
+    /// Borrow the complete E2 nominal-boundary predecessor. The cultivation rest remains its sole
+    /// owner; the membrane uses this view only to validate ports and return reconstruction fibres.
+    pub fn boundary_predecessor(&self) -> &HeterogeneousFusionRest {
+        &self.predecessor
+    }
+
     pub fn withdraw(
         self,
     ) -> Result<(HeterogeneousFusionRest, BoundaryCultivationWithdrawal), BoundaryCultivationRefusal>

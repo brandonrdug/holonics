@@ -127,6 +127,7 @@ crates/holonic-engine/src/parameter.rs	.clone()=1	.collect()=1	BTreeMap=3	Vec=2
 crates/holonic-engine/src/parcel.rs	.clone()=21	.collect()=16	.into_iter()=1	BTreeMap=41	Vec=35
 crates/holonic-engine/src/phase_current.rs	.clone()=8	.collect()=9	.into_iter()=2	Vec=15
 crates/holonic-engine/src/phoenix/boundary_cultivation.rs	.clone()=10	.collect()=11	.flat_map()=1	.into_iter()=3	BTreeSet=8	Vec=10
+crates/holonic-engine/src/phoenix/native_membrane.rs	.clone()=22	.collect()=7	.flat_map()=2	.into_iter()=1	BTreeMap=4	BTreeSet=7	Vec=27
 crates/holonic-engine/src/phoenix/cohort.rs	.clone()=34	.collect()=9	.into_iter()=3	BTreeMap=18	BTreeSet=3	Vec=67
 crates/holonic-engine/src/phoenix/continuation.rs	.clone()=34	.collect()=6	Vec=14
 crates/holonic-engine/src/phoenix/cultivation_overlay.rs	.clone()=13	.collect()=3	.into_iter()=1	Vec=16

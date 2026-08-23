@@ -4,7 +4,8 @@
 **Status:** live construction contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Truth status:** `project-postulate` for the ordered campaign and its production target;
 `definition` for the typed boundaries and grades below; `established-bounded` for the named N0--N4,
-W1--W5, I0--I5, and A0--A3 predecessors only; `open` for every deed until its real return passes.
+W1--W5, I0--I5, A0--A3 and now-passed E0--E4 predecessors; `open` for E5 until its real return
+passes.
 
 This blueprint supersedes the N4 statement that no next deed is authorized. It does not supersede
 N0--N4's artifacts or weaken their grades. Its 2026-08-23 arbitrary-organ revision recognizes E1
@@ -492,6 +493,5 @@ Read, in order:
 13. `canon/TABLET_THE_CAUSAL_PROFILE.md`; and
 14. only the source owners and evidence closure of the current E-deed.
 
-Do not reread the research archive by default. E1 has passed; E2 is the sole next deed until it
-passes. E2 begins with the generic nominal-boundary correction in §9; its six internal stations do
-not authorize a state advance before the complete phase return.
+Do not reread the research archive by default. E0--E4 have passed; E5 is the sole next deed until
+its frozen product, complete atlas, dissection, saturation and marginal-excitation return passes.
