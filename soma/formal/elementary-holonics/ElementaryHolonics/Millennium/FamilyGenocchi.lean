@@ -956,5 +956,247 @@ theorem theSlotClassesCollapseOnTheThreeModEightBranch
           rw [hd₁', hd₂'] at h₁₂pos
           nlinarith [h₁₂pos]
 
+
+
+/-! ## 5. The two-adic refusal of the coset cell -/
+
+private lemma odd_sq_mod_eight {A : ℤ} (h : A % 2 = 1) : A ^ 2 % 8 = 1 := by
+  have h8 : A % 8 = 1 ∨ A % 8 = 3 ∨ A % 8 = 5 ∨ A % 8 = 7 := by omega
+  conv_lhs => rw [pow_two, Int.mul_emod]
+  rcases h8 with h | h | h | h <;> rw [h] <;> norm_num
+
+private lemma odd_mul {A B : ℤ} (hA : A % 2 = 1) (hB : B % 2 = 1) :
+    (A * B) % 2 = 1 := by
+  rw [Int.mul_emod, hA, hB]
+  norm_num
+
+/-- The two-adic valuation of a difference of two-adic-unit squares is at least
+three: odd squares agree mod eight. -/
+private lemma unit_sq_diff_val {τ σ : ℚ} (hτ : τ ≠ 0) (hσ : σ ≠ 0)
+    (hvτ : padicValRat 2 τ = 0) (hvσ : padicValRat 2 σ = 0)
+    (hne : τ ^ 2 - σ ^ 2 ≠ 0) :
+    3 ≤ padicValRat 2 (τ ^ 2 - σ ^ 2) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨hτn, hτd⟩ := val_zero_parts (p := 2) hτ hvτ
+  obtain ⟨hσn, hσd⟩ := val_zero_parts (p := 2) hσ hvσ
+  have hA : τ.num % 2 = 1 := by omega
+  have hC : σ.num % 2 = 1 := by omega
+  have hB : (τ.den : ℤ) % 2 = 1 := by
+    have h1 : ¬ (2 : ℤ) ∣ (τ.den : ℤ) := by
+      rw [show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, Int.natCast_dvd_natCast]
+      exact hτd
+    omega
+  have hD : (σ.den : ℤ) % 2 = 1 := by
+    have h1 : ¬ (2 : ℤ) ∣ (σ.den : ℤ) := by
+      rw [show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, Int.natCast_dvd_natCast]
+      exact hσd
+    omega
+  set M : ℤ := τ.num ^ 2 * (σ.den : ℤ) ^ 2 - σ.num ^ 2 * (τ.den : ℤ) ^ 2 with hM
+  have hτnum : (τ.num : ℚ) = τ * τ.den := (Rat.mul_den_eq_num τ).symm
+  have hσnum : (σ.num : ℚ) = σ * σ.den := (Rat.mul_den_eq_num σ).symm
+  have hMq : ((M : ℤ) : ℚ)
+      = (τ ^ 2 - σ ^ 2) * ((τ.den : ℚ) ^ 2 * (σ.den : ℚ) ^ 2) := by
+    rw [hM]
+    push_cast
+    rw [hτnum, hσnum]
+    ring
+  have hden1 : ((τ.den : ℚ)) ≠ 0 := by exact_mod_cast τ.den_nz
+  have hden2 : ((σ.den : ℚ)) ≠ 0 := by exact_mod_cast σ.den_nz
+  have hM0 : M ≠ 0 := by
+    intro h0
+    rw [h0] at hMq
+    have h1 : (τ ^ 2 - σ ^ 2) * ((τ.den : ℚ) ^ 2 * (σ.den : ℚ) ^ 2) = 0 := by
+      exact_mod_cast hMq.symm
+    rcases mul_eq_zero.mp h1 with h | h
+    · exact hne h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · exact hden1 (pow_eq_zero_iff two_ne_zero |>.mp h')
+      · exact hden2 (pow_eq_zero_iff two_ne_zero |>.mp h')
+  have hMsq : M = (τ.num * (σ.den : ℤ)) ^ 2 - (σ.num * (τ.den : ℤ)) ^ 2 := by
+    rw [hM]
+    ring
+  have h1 := odd_sq_mod_eight (odd_mul hA hD)
+  have h2 := odd_sq_mod_eight (odd_mul hC hB)
+  have hdvd : (8 : ℤ) ∣ M := by
+    rw [hMsq]
+    omega
+  have hvM : 3 ≤ padicValInt 2 M := by
+    have h3 := (padicValInt_dvd_iff (p := 2) 3 M).mp (by
+      norm_num
+      exact hdvd)
+    rcases h3 with h | h
+    · exact absurd h hM0
+    · exact h
+  have hvden : padicValRat 2 (((τ.den : ℚ)) ^ 2 * ((σ.den : ℚ)) ^ 2) = 0 := by
+    rw [padicValRat.mul (pow_ne_zero 2 hden1) (pow_ne_zero 2 hden2),
+      padicValRat.pow hden1, padicValRat.pow hden2,
+      nat_den_val_zero (p := 2) hτd, nat_den_val_zero (p := 2) hσd]
+    ring
+  have heq : τ ^ 2 - σ ^ 2
+      = ((M : ℤ) : ℚ) / (((τ.den : ℚ)) ^ 2 * ((σ.den : ℚ)) ^ 2) := by
+    rw [eq_div_iff (by positivity)]
+    linear_combination -hMq
+  rw [heq, padicValRat.div (by exact_mod_cast hM0) (by positivity), hvden,
+    padicValRat.of_int]
+  omega
+
+set_option maxHeartbeats 1000000 in
+/-- **THE COSET CELL IS REFUSED AT TWO**: no point of `y² = x³ − p²x` with `y ≠ 0`
+carries the slot classes `(−2, −2)`, at any odd `p` — the two equations
+`w² + 2s² = p` and `2t² − 2s² = p` are two-adically incompatible.  Since the descent
+image is a group and the four non-torsion cells form one coset of the torsion image,
+this single refusal empties the coset. -/
+theorem theCosetCellIsRefusedAtTwo (hpodd : p % 2 = 1) {x y : ℚ}
+    (hcurve : y ^ 2 = x ^ 3 - ((p : ℕ) : ℚ) ^ 2 * x) (hy : y ≠ 0)
+    (h₁ : Descent.SqCls x ((-2 : ℤ) : ℚ))
+    (h₂ : Descent.SqCls (x - ((p : ℕ) : ℚ)) ((-2 : ℤ) : ℚ)) :
+    False := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hp : p.Prime := Fact.out
+  have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
+  obtain ⟨hx0, hxn, hxmn⟩ :=
+    FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots hcurve hy
+  have hxm0 : x - ((p : ℕ) : ℚ) ≠ 0 := sub_ne_zero.mpr hxn
+  have hxp0 : x + ((p : ℕ) : ℚ) ≠ 0 := fun hc => hxmn (by linarith)
+  have h₃ : Descent.SqCls (x + ((p : ℕ) : ℚ)) (((-2 * -2 : ℤ)) : ℚ) :=
+    sqcls_third hcurve hy hx0 hxm0 h₁ h₂
+  obtain ⟨s, hs, hsv⟩ := h₁
+  obtain ⟨t, ht, htv⟩ := h₂
+  obtain ⟨c, hc, hcv⟩ := h₃
+  set w : ℚ := 2 * c with hw
+  have hw0 : w ≠ 0 := by
+    rw [hw]
+    exact mul_ne_zero two_ne_zero hc
+  have hwv : x + ((p : ℕ) : ℚ) = w ^ 2 := by
+    rw [hw]
+    push_cast at hcv
+    linarith [hcv]
+  have hxs : x = -2 * s ^ 2 := by
+    push_cast at hsv
+    linarith [hsv]
+  have hxt : x - ((p : ℕ) : ℚ) = -2 * t ^ 2 := by
+    push_cast at htv
+    linarith [htv]
+  have heq2 : w ^ 2 + 2 * s ^ 2 = ((p : ℕ) : ℚ) := by
+    linarith [hwv, hxs]
+  have heq1 : t ^ 2 - s ^ 2 = ((p : ℕ) : ℚ) / 2 := by
+    field_simp
+    linarith [hxt, hxs]
+  -- valuations at two
+  have hvp2 : padicValRat 2 (((p : ℕ) : ℚ)) = 0 := by
+    have hnd : ¬ (2 : ℤ) ∣ ((p : ℕ) : ℤ) := by
+      rw [show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, Int.natCast_dvd_natCast]
+      omega
+    have := int_val_zero (p := 2) hnd
+    push_cast at this ⊢
+    exact this
+  have hs0 : s ≠ 0 := by
+    intro h0
+    rw [h0] at hxs
+    norm_num at hxs
+    exact hx0 hxs
+  have ht0 : t ≠ 0 := by
+    intro h0
+    rw [h0] at hxt
+    norm_num at hxt
+    exact hxm0 hxt
+  have hv2 : padicValRat 2 ((2 : ℚ)) = 1 := by
+    have := padicValRat.self (p := 2) (by norm_num)
+    push_cast at this ⊢
+    exact this
+  set a : ℤ := padicValRat 2 s with ha
+  set b : ℤ := padicValRat 2 t with hb
+  set cw : ℤ := padicValRat 2 w with hcw
+  have hv2s : padicValRat 2 (2 * s ^ 2) = 1 + 2 * a := by
+    rw [padicValRat.mul two_ne_zero (pow_ne_zero 2 hs0), hv2,
+      padicValRat.pow hs0]
+    ring
+  have hvw2 : padicValRat 2 (w ^ 2) = 2 * cw := by
+    rw [padicValRat.pow hw0]
+    ring
+  -- the second equation forces `w` a unit and `s` integral
+  have h2s0 : (2 : ℚ) * s ^ 2 ≠ 0 := mul_ne_zero two_ne_zero (pow_ne_zero 2 hs0)
+  have hcwa : cw = 0 ∧ 0 ≤ a := by
+    rcases lt_trichotomy (2 * cw) (1 + 2 * a) with h | h | h
+    · have hval := FamilySupport.val_add_left (ℓ := 2) (pow_ne_zero 2 hw0)
+        (by rw [heq2]; exact hpq0) (by rw [hvw2, hv2s]; omega)
+      rw [heq2, hvp2, hvw2] at hval
+      omega
+    · omega
+    · have hval := FamilySupport.val_add_left (ℓ := 2) h2s0
+        (by rw [show 2 * s ^ 2 + w ^ 2 = w ^ 2 + 2 * s ^ 2 from by ring, heq2]
+            exact hpq0)
+        (by rw [hvw2, hv2s]; omega)
+      rw [show 2 * s ^ 2 + w ^ 2 = w ^ 2 + 2 * s ^ 2 from by ring, heq2, hvp2,
+        hv2s] at hval
+      omega
+  obtain ⟨hcw0, ha0⟩ := hcwa
+  -- the first equation forces valuation `−1` on the square difference
+  have hdiff0 : t ^ 2 - s ^ 2 ≠ 0 := by
+    rw [heq1]
+    intro h0
+    rcases div_eq_zero_iff.mp h0 with h | h
+    · exact hpq0 h
+    · norm_num at h
+  have hvdiff : padicValRat 2 (t ^ 2 - s ^ 2) = -1 := by
+    rw [heq1, padicValRat.div hpq0 two_ne_zero, hvp2, hv2]
+    ring
+  rcases eq_or_ne a b with hab | hab
+  · -- equal valuations: the odd-square gap refuses
+    set k : ℕ := a.toNat with hk
+    have hka : (k : ℤ) = a := Int.toNat_of_nonneg ha0
+    have h2k : ((2 : ℚ)) ^ k ≠ 0 := pow_ne_zero _ two_ne_zero
+    set τ : ℚ := t / 2 ^ k with hτ
+    set σ : ℚ := s / 2 ^ k with hσ
+    have hτ0 : τ ≠ 0 := div_ne_zero ht0 h2k
+    have hσ0 : σ ≠ 0 := div_ne_zero hs0 h2k
+    have hv2k : padicValRat 2 (((2 : ℚ)) ^ k) = k := by
+      rw [padicValRat.pow two_ne_zero, hv2]
+      ring
+    have hvτ : padicValRat 2 τ = 0 := by
+      rw [hτ, padicValRat.div ht0 h2k, hv2k]
+      omega
+    have hvσ : padicValRat 2 σ = 0 := by
+      rw [hσ, padicValRat.div hs0 h2k, hv2k]
+      omega
+    have hsplit : t ^ 2 - s ^ 2 = ((2 : ℚ)) ^ (2 * k) * (τ ^ 2 - σ ^ 2) := by
+      rw [hτ, hσ]
+      field_simp
+      ring
+    have hτσ0 : τ ^ 2 - σ ^ 2 ≠ 0 := by
+      intro h0
+      rw [hsplit, h0, mul_zero] at hdiff0
+      exact hdiff0 rfl
+    have hge := unit_sq_diff_val hτ0 hσ0 hvτ hvσ hτσ0
+    have hvsplit : padicValRat 2 (t ^ 2 - s ^ 2)
+        = 2 * k + padicValRat 2 (τ ^ 2 - σ ^ 2) := by
+      rw [hsplit, padicValRat.mul (pow_ne_zero _ two_ne_zero) hτσ0,
+        padicValRat.pow two_ne_zero, hv2]
+      push_cast
+      ring
+    rw [hvdiff] at hvsplit
+    omega
+  · -- distinct valuations: the parity of the minimum refuses
+    have hvt2 : padicValRat 2 (t ^ 2) = 2 * b := by
+      rw [padicValRat.pow ht0]
+      ring
+    have hvs2 : padicValRat 2 (-(s ^ 2)) = 2 * a := by
+      rw [padicValRat.neg, padicValRat.pow hs0]
+      ring
+    have hns0 : -(s ^ 2) ≠ 0 := neg_ne_zero.mpr (pow_ne_zero 2 hs0)
+    rcases lt_or_gt_of_ne (show 2 * b ≠ 2 * a from by omega) with h | h
+    · have hval := FamilySupport.val_add_left (ℓ := 2) (pow_ne_zero 2 ht0)
+        (by rw [show t ^ 2 + -(s ^ 2) = t ^ 2 - s ^ 2 from by ring]
+            exact hdiff0)
+        (by rw [hvt2, hvs2]; omega)
+      rw [show t ^ 2 + -(s ^ 2) = t ^ 2 - s ^ 2 from by ring, hvdiff, hvt2] at hval
+      omega
+    · have hval := FamilySupport.val_add_left (ℓ := 2) hns0
+        (by rw [show -(s ^ 2) + t ^ 2 = t ^ 2 - s ^ 2 from by ring]
+            exact hdiff0)
+        (by rw [hvt2, hvs2]; omega)
+      rw [show -(s ^ 2) + t ^ 2 = t ^ 2 - s ^ 2 from by ring, hvdiff, hvs2] at hval
+      omega
+
 end Soma.Holonics.Millennium.FamilyGenocchi
 
