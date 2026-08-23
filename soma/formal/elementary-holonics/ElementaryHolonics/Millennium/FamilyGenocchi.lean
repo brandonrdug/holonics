@@ -35,7 +35,7 @@ def chiRead (p : ℕ) [Fact p.Prime] (z : ℚ) : ℤ :=
 lemma int_dvd_natAbs {m : ℤ} : (p : ℤ) ∣ m ↔ p ∣ m.natAbs := by
   rw [← Int.natAbs_dvd_natAbs, Int.natAbs_natCast]
 
-private lemma val_zero_parts {z : ℚ} (hz : z ≠ 0) (hv : padicValRat p z = 0) :
+lemma val_zero_parts {z : ℚ} (hz : z ≠ 0) (hv : padicValRat p z = 0) :
     ¬ (p : ℤ) ∣ z.num ∧ ¬ p ∣ z.den := by
   have hp : p.Prime := Fact.out
   have hnum0 : z.num ≠ 0 := Rat.num_ne_zero.mpr hz
@@ -960,7 +960,7 @@ theorem theSlotClassesCollapseOnTheThreeModEightBranch
 
 /-! ## 5. The two-adic refusal of the coset cell -/
 
-private lemma odd_sq_mod_eight {A : ℤ} (h : A % 2 = 1) : A ^ 2 % 8 = 1 := by
+lemma odd_sq_mod_eight {A : ℤ} (h : A % 2 = 1) : A ^ 2 % 8 = 1 := by
   have h8 : A % 8 = 1 ∨ A % 8 = 3 ∨ A % 8 = 5 ∨ A % 8 = 7 := by omega
   conv_lhs => rw [pow_two, Int.mul_emod]
   rcases h8 with h | h | h | h <;> rw [h] <;> norm_num
@@ -972,7 +972,7 @@ private lemma odd_mul {A B : ℤ} (hA : A % 2 = 1) (hB : B % 2 = 1) :
 
 /-- The two-adic valuation of a difference of two-adic-unit squares is at least
 three: odd squares agree mod eight. -/
-private lemma unit_sq_diff_val {τ σ : ℚ} (hτ : τ ≠ 0) (hσ : σ ≠ 0)
+lemma unit_sq_diff_val {τ σ : ℚ} (hτ : τ ≠ 0) (hσ : σ ≠ 0)
     (hvτ : padicValRat 2 τ = 0) (hvσ : padicValRat 2 σ = 0)
     (hne : τ ^ 2 - σ ^ 2 ≠ 0) :
     3 ≤ padicValRat 2 (τ ^ 2 - σ ^ 2) := by
