@@ -133,7 +133,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (267 deposits of 559)
+## 4 · The 2026-08 record line (268 deposits of 560)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -395,6 +395,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_GLOBAL_IS_BUILT_BY_EXACT_COARSE_GRAINING_THE_MODULUS_WAS_NEVER_A_WALL_AND_THE_TOWER_IS_THE_ORGAN_THAT_SCALES.md` | The global is built by exact coarse graining, the modulus was never a wall, and the tower is the organ that scales |
 | `2026-08-22_THE_GOVERNANCE_LAW_HOLDS_ON_THE_THREE_MOD_EIGHT_STRATUM_AND_THE_CERTIFICATES_ARE_INFINITE.md` | The governance law holds on the three-mod-eight stratum, and the certificates are infinite |
 | `2026-08-22_THE_HETEROGENEOUS_PORTS_CONSERVED_THEIR_FACES_ONE_SHARED_GENERATOR_CROSSED_AND_I4_AWAITS_RELEASE_ADMISSION.md` | The heterogeneous ports conserved their faces, one shared generator crossed, and I4 awaits release admission |
+| `2026-08-22_THE_MORDELL_WEIL_THEOREM_HOLDS_AT_EVERY_MODULUS_AND_THE_ALGEBRAIC_SIDE_OF_THE_FAMILY_CHART_IS_CLOSED.md` | The Mordell–Weil theorem holds at every modulus, and the algebraic side of the family chart is closed |
 | `2026-08-22_THE_OBSTRUCTION_IS_EXHIBITED_AT_SEVENTEEN_AND_THE_INVISIBLE_COSETS_PASS_EVERY_FRAME.md` | The obstruction is exhibited at seventeen, and the invisible cosets pass every frame |
 | `2026-08-22_THE_PYRAMID_IS_A_DISCRETE_VOLUME_THE_TRIVIAL_ZEROS_ARE_ITS_REGULARIZED_VANISHING_AND_THE_SQUARE_ROOT_BOUNDARY_IS_THE_FOLD_AXIS.md` | The pyramid is a discrete volume, the trivial zeros are its regularized vanishing, and the square-root boundary is the fold axis |
 | `2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md` | The realization passage retained lineage, every successor word closed, and I0 awaits release admission |
@@ -426,7 +427,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 41 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 42 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
