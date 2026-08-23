@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0--I5 passed their release receivers. R0 is the active deed.
+**Current boundary:** I0--I5 and R0 passed their release receivers. R1 is the active deed.
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
@@ -11,7 +11,8 @@ replace the admitted H/W/M/A/I evidence.
 **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry,
 dynamic delta, retained-context, and product-grade contracts; `established-bounded` for the cited
 M0--M6, A1--A3, and I0--I5 returns; `project-postulate` for construction and placement discipline;
-and `open` for R0--R6 and every later heterogeneous-source deed.
+`established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0 returns; and `open` for R1--R6
+and every later heterogeneous-source deed.
 
 **Milestone derivation:**
 [`2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -193,7 +194,13 @@ inquiry/product artifact; topology or diagnostics alone do not pass.
 
 ### R0 — one rich mathematical/physical inquiry returns the complete I5 baseline boundary
 
-[open] R0 is the active deed.
+[established-bounded; implemented-exact; measured] R0 passed its release receiver. The frozen
+FamilySupport inquiry closure, seven-record A1 occurrence, 23 M0 carriers, receiver controls,
+unchanged I5 card conduct, actual selected passages, complete defects, fibres, separators,
+front/pressure/work testimony, and eight dependency-minimal absences returned in
+[`2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md`](../research/records/2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md).
+The sole complete release receiver passed after one permitted cheap metadata retake, as admitted by
+[`2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md`](../research/records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md).
 
 **Source owners.** The unchanged canonical I5 rest; A1's addressed exchange mouth; M0 source/layout
 faces; M1 operation passages; M6 route testimony; the exterior equation atlas; and one formal
@@ -238,7 +245,10 @@ and inspect the terminal receipt only.
 
 ### R1 — rich intake returns one codec-neutral operation world-tube
 
-[open] R1 repairs only the exact composition absence returned by R0.
+[open] R1 is the active deed and repairs only the exact R1 composition absences returned by R0:
+the A1-to-M0 addressed face passage, M0-to-M1 material-founded operation passage, M1-to-I5 typed
+entry passage, inquiry-to-I5 addressed recurrence entry, and rich-composition resident card front.
+The receiver/world-return and dynamic-morphology absences remain R2 and R3 obligations.
 
 R1 must:
 

@@ -49,10 +49,11 @@ their presentations can be separated by exact operation, binder, unit, dimension
 proof, analytic, diagram, boundary, conservation and world-return receivers. The source labels do
 not route the body. The compatible receiver pullback and its noncommuting defects do.
 
-**R0 is the sole next deed.** One content-addressed rich mathematical/physical inquiry crosses the
-unchanged I5 product and returns the complete intake, operation, continuation, receiver, world,
-morphology and apparatus boundary before any repair. R1 then closes only the absent rich-intake
-relation; R2 widens recurrence to a material-founded complete derivation; R3 lets returned
+**R0 passed; R1 is the sole next deed.** One content-addressed FamilySupport inquiry crossed the
+unchanged I5 product and returned the complete intake, operation, continuation, receiver, world,
+morphology and apparatus boundary before repair. R1 now closes only its five minimal rich-intake,
+typed-entry, and resident-join absences; R2 widens recurrence to a material-founded complete
+derivation; R3 lets returned
 constraints found dynamic local morphology; R4 makes the retained causal boundary load-bearing
 over long-horizon inquiry; R5 returns genuinely shared multimodal mathematical/physical transport;
 and R6 freezes the first bounded production Athena mathematics/physics ecology. No later deed
@@ -270,13 +271,17 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**NEXT DEED: R0 — ONE RICH MATHEMATICAL/PHYSICAL INQUIRY RETURNS THE COMPLETE I5 BASELINE
-BOUNDARY.** The receiver question is now ratified by the production-aperture blueprint named above.
-R0 conducts the unchanged frozen ecology before repair and must return the exact source/input/rest
-closure, entering faces, receiver basis, actual emission or typed refusal, complete defect/fibre
-population, exact work/apparatus testimony and the dependency-minimal absent relation population
-preventing the rich inquiry from closing. Incomparable minima remain plural. R1--R6 remain ordered
-and open. X0--X2 and Qwen remain unscheduled.
+**R0 PASSED; NEXT DEED: R1 — RICH INTAKE RETURNS ONE CODEC-NEUTRAL OPERATION WORLD-TUBE.** R0
+returned the frozen source/input/rest closure, complete entering occurrence and controls, actual
+unchanged I5 emission, phase defects, fibres, separators, exact work/apparatus testimony, and eight
+dependency-minimal absences. Its sole complete release receiver passed after one cheap derived
+driver-catalog retake. R1 repairs only the five R1-labelled minima: the A1-to-M0 addressed face
+passage, M0-to-M1 material-founded operation passage, M1-to-I5 typed entry passage,
+inquiry-to-I5 addressed recurrence entry, and rich-composition resident card front. It must return
+one exact cross-codec operation world-tube and retained plural first future with hot quotient,
+contact, joining, and section conduct resident on the card. It may not found a parser, OCR grammar,
+semantic router, host foreman, or operation identity from a surface name. R2--R6 remain ordered and
+open. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

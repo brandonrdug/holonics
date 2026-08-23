@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="240" viewBox="0 0 1000 240">
+  <g fill="none" stroke="#2d4f73" stroke-width="4">
+    <path d="M160 120 H240"/><path d="M360 120 H440"/>
+    <path d="M560 120 H640"/><path d="M760 120 H840"/>
+  </g>
+  <g fill="#eef5fb" stroke="#16324f" stroke-width="3" font-family="monospace" font-size="22" text-anchor="middle">
+    <rect x="20" y="70" width="140" height="100"/><text x="90" y="128">E_n(Q)</text>
+    <rect x="240" y="70" width="120" height="100"/><text x="300" y="128">slots</text>
+    <rect x="440" y="70" width="120" height="100"/><text x="500" y="128">valuations</text>
+    <rect x="640" y="70" width="120" height="100"/><text x="700" y="128">squarefree</text>
+    <rect x="840" y="70" width="140" height="100"/><text x="910" y="128">support 2n</text>
+  </g>
+</svg>

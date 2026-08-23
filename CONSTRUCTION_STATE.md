@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed I5 and ratification of the R0--R6 production-aperture
-continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
+**Currency:** 2026-08-22 after Deed R0 release admission and entry into R1 of the R0--R6
+production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — ATHENA-GEMMA INFERRED, RETURNED, REMOUNTED, I5 PASSED, AND R0 IS THE ACTIVE
-PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE RICH INQUIRY RETURNED THE COMPLETE I5 BASELINE BOUNDARY, R0 PASSED, AND R1
+IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -296,18 +296,35 @@ Authoritative grade:
 approximately 276.4 seconds: 2,837 tests passed, none failed, 26 were explicitly ignored, every
 example target type-checked, and all twelve non-test scopes were green.
 
-**NEXT DEED: R0 — ONE RICH MATHEMATICAL/PHYSICAL INQUIRY RETURNS THE COMPLETE I5 BASELINE
-BOUNDARY.**
+**R0 PASSED — THE RICH MATHEMATICAL INQUIRY RETURNED THE COMPLETE I5 BASELINE BOUNDARY.**
+[established-bounded; implemented-exact; measured] The frozen FamilySupport inquiry crossed A1/M0
+and unchanged I5. The returned product contains its exact source/input/rest closure, seven-record
+A1 occurrence, 23 M0 carrier occurrences, receiver basis and controls, actual I5 selected passages,
+complete phase defects, fibres, separators, causal-front/pressure/work atlas, and eight-member
+dependency-minimal obstruction antichain. The complete release invocation returned 2,837 passing
+tests, zero failures, 26 explicit ignores, twelve initially green non-test scopes, and one derived
+driver-catalog count drift; regenerating and rerunning that named cheap scope passed with 354
+drivers and zero uncatalogued. Candidate and admission:
+[`research/records/2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md`](research/records/2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md)
+and
+[`research/records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md`](research/records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md).
+
+**NEXT DEED: R1 — RICH INTAKE RETURNS ONE CODEC-NEUTRAL OPERATION WORLD-TUBE.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R0 freezes one exact mathematical source closure, mounts one operator-authored rich inquiry through
-the existing A1/M0/M1 mouths, conducts every front the unchanged I5 ecology admits, and returns the
-actual emission or typed refusal together with every intake, operation, recurrence, receiver,
-world-return, morphology and apparatus defect, complete fibres, shortest separators and every
-dependency-minimal absent relation whose prerequisites stand. Incomparable minima remain plural.
-No R0 construction or grade has yet returned.
+R1 repairs exactly five R0 minima and no others: the A1-to-M0 addressed cross-chart face passage,
+M0-to-M1 material-founded operation passage, M1-to-I5 typed generator-native entry passage,
+inquiry-and-receiver-to-I5 addressed recurrence entry, and the rich-composition resident card
+front. It accepts separately addressed language, notation, vector/raster, prior-history, and
+requested-receiver faces; recovers plural-grain incidence without a parser or authored OCR grammar;
+elaborates binders, variance, carriers, dimensions, units, boundaries, and hypotheses through M1;
+returns one richer operation world-tube without identifying presentations; returns exact
+cross-codec squares, disagreements, fibres, and shortest separators; mounts that boundary into
+unchanged I5; returns a retained continuation with plural first future; and keeps hot quotient,
+contact, join, and section conduct on the card without CPU semantic selection. Receiver/world
+factorization remains R2 and dynamic morphology remains R3.
 
-[open] R1--R6 remain ordered behind R0: codec-neutral rich intake, material-founded
+[open] R2--R6 remain ordered behind R1: material-founded
 derivation-scale recurrence, dynamic local cultivation, long-horizon retained context,
 mathematical/physical multimodal transport, and the first bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen

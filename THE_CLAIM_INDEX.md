@@ -133,7 +133,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (269 deposits of 561)
+## 4 · The 2026-08 record line (271 deposits of 563)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -383,6 +383,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_I3_RELEASE_RECEIVER_PASSED_THE_RECURRENT_REALIZATIONS_CONDENSED_AND_I4_BEGINS.md` | I3 release receiver passed, the recurrent realizations condensed, and I4 begins |
 | `2026-08-22_I4_RELEASE_RECEIVER_PASSED_THE_HETEROGENEOUS_FACES_WERE_CONSERVED_AND_I5_BEGINS.md` | I4 release receiver passed, the heterogeneous faces were conserved, and I5 begins |
 | `2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md` | I5 release receiver passed: Athena-Gemma inferred, returned and remounted |
+| `2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md` | R0 release receiver passed: the rich inquiry returned the complete I5 baseline boundary, and R1 begins |
 | `2026-08-22_THE_ALGEBRAIC_RANK_IS_EFFECTIVELY_BOUNDED_AT_EVERY_MODULUS_AND_THE_RANK_SIDE_IS_A_FINITE_QUANTITY_FAMILY_WISE.md` | The algebraic rank is effectively bounded at every modulus, and the rank side is a finite quantity family-wise |
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
 | `2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md` | The Athena-Gemma ecology inferred, returned and remounted, and I5 awaits release admission |
@@ -402,6 +403,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_REALIZATION_PASSAGE_RETAINED_LINEAGE_EVERY_SUCCESSOR_WORD_CLOSED_AND_I0_AWAITS_RELEASE_ADMISSION.md` | The realization passage retained lineage, every successor word closed, and I0 awaits release admission |
 | `2026-08-22_THE_RECURRENT_BOUNDARY_RETURNED_THE_COMPLETE_PASSAGE_THE_LONGER_HISTORY_REOPENED_AND_I1_AWAITS_RELEASE_ADMISSION.md` | The recurrent boundary returned the complete passage, the longer history reopened, and I1 awaits release admission |
 | `2026-08-22_THE_RECURRENT_REALIZATIONS_CONDENSED_THE_COMPLETE_FIBRES_REMAINED_AND_I3_AWAITS_RELEASE_ADMISSION.md` | The recurrent realizations condensed, the complete fibres remained, and I3 awaits release admission |
+| `2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md` | The rich inquiry crossed the unchanged Athena ecology, and the complete baseline boundary returned |
 | `2026-08-22_THE_SIBLING_CONTINUATIONS_RETURNED_THEIR_DEFECT_COMPLEX_THE_MESSAGE_PARTITION_RETAINED_ITS_SOURCE_FIBRE_AND_A2_PASSED.md` | The sibling continuations returned their defect complex, the message partition retained its source fibre, and A2 passed |
 | `2026-08-22_THE_SIGN_IS_THE_HAND_OF_THE_REFLECTION_AND_THE_EVEN_SECTOR_NEEDS_A_SECOND_CHART.md` | The sign is the hand of the reflection, and the even sector needs a second chart |
 | `2026-08-22_THE_THETA_LAW_IS_PROVED_THE_DUPLICATION_IS_A_LATTICE_REARRANGEMENT_AND_THE_KERNEL_ADMITS_WEIGHT_TWO.md` | The theta law is proved: the duplication is a lattice rearrangement, and the kernel admits weight two |

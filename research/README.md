@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 559 research deposits current through 22 August 2026, including all 307
+`records/` contains 563 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -166,6 +166,19 @@ governs the rebuild.
   as the product of material, receiver, successor, generator, port, world, morphology, front and
   apparatus apertures; and selects exact mathematics/physics constraints as the first basin for
   widening rich intake, recurrence, cultivation, retained context and multimodal conduct.
+- **R0 rich-inquiry baseline-boundary candidate:**
+  `records/2026-08-22_THE_RICH_INQUIRY_CROSSED_THE_UNCHANGED_ATHENA_ECOLOGY_AND_THE_COMPLETE_BASELINE_BOUNDARY_RETURNED.md`
+  — freezes the FamilySupport inquiry closure before later Lean commits; mounts exact language,
+  Lean-presentation, operation, boundary, diagram and port controls through A1/M0; conducts
+  unchanged I5 on the card; preserves its actual France/is emission as evidence rather than an
+  answer; and returns the complete eight-member dependency-minimal obstruction antichain spanning
+  R1 intake/entry/residency, R2 receiver/world return, and R3 dynamic morphology.
+- **R0 release admission and exact R1 frontier:**
+  `records/2026-08-22_R0_RELEASE_RECEIVER_PASSED_THE_RICH_INQUIRY_RETURNED_THE_COMPLETE_I5_BASELINE_BOUNDARY_AND_R1_BEGINS.md`
+  — admits the addressed rich inquiry, actual unchanged I5 emission, complete defects, fibres,
+  separators, work/apparatus testimony and eight minimal absences after the sole complete receiver
+  and one cheap derived-catalog retake; advances only the five R1-labelled face, operation, entry,
+  recurrence and resident-join absences while retaining R2 and R3 boundaries.
 - **A3 release admission:**
   `records/2026-08-22_A3_RELEASE_RECEIVER_PASSED_THE_CONTINUATION_RESTED_AND_HOLONIC_INFERENCE_BEGINS.md`
   — binds the owner-local continuation test, affected `life` package return, coherent ledgers and

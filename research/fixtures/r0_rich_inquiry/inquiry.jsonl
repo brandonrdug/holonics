@@ -1,0 +1,7 @@
+{"occurrence":"r0-primary-inquiry","face":"operator-authored-language","text":"For E_n/Q: y^2 = x^3 - n^2 x with n > 0, derive why the square classes of x and x-n are supported at primes dividing 2n. Return the exact hypotheses, a dependency-minimal argument, a Lean-checkable proof passage or typed obstruction, the n=0 boundary separator, and an exact vector route diagram."}
+{"occurrence":"r0-cross-codec-rebase","face":"lean-presentation","text":"#check Soma.Holonics.Millennium.FamilySupport.theSlotClassesAreSupportedAtEveryModulus"}
+{"occurrence":"r0-same-answer-addition","face":"operation-control","text":"2 + 2 = 4"}
+{"occurrence":"r0-same-answer-multiplication","face":"operation-control","text":"2 * 2 = 4"}
+{"occurrence":"r0-boundary-perturbation","face":"boundary-control","text":"replace the hypothesis 0 < n by n = 0"}
+{"occurrence":"r0-layout-control","face":"diagram-control","text":"the same five diagram carriers occur at changed positions"}
+{"occurrence":"r0-port-disjoint-control","face":"audio-waveform-port","text":"return one addressed acoustic waveform occurrence"}
