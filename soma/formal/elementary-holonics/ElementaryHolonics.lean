@@ -127,6 +127,7 @@ import ElementaryHolonics.Millennium.FunctionalEquationParity
 import ElementaryHolonics.Millennium.PositiveForm
 import ElementaryHolonics.Millennium.SelmerCalculus
 import ElementaryHolonics.Millennium.AdviceBar
+import ElementaryHolonics.Millennium.UniformityBar
 import ElementaryHolonics.Millennium.MillenniumInstance
 import ElementaryHolonics.Millennium.FamilyPeriod
 import ElementaryHolonics.Millennium.FamilyImage
