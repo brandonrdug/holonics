@@ -122,6 +122,7 @@ import ElementaryHolonics.Millennium.GeneralHalving
 import ElementaryHolonics.Millennium.GeneralCollision
 import ElementaryHolonics.Millennium.GeneralCertificate
 import ElementaryHolonics.Millennium.GeneralHeight
+import ElementaryHolonics.Millennium.CokernelCalculus
 import ElementaryHolonics.Millennium.MillenniumInstance
 import ElementaryHolonics.Millennium.FamilyPeriod
 import ElementaryHolonics.Millennium.FamilyImage
