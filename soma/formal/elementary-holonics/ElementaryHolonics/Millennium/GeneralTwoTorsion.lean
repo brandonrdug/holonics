@@ -185,4 +185,43 @@ theorem theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve {a b : ℤ} (ha : a �
   push_neg at hlt
   exact theRankIsBoundedOnEveryFullTwoTorsionCurve r ha hb hab hlt hr.1
 
+
+/-! ## 4. The family inside the universal pose
+
+The two-parameter family has an integral model over `ℤ`, so everything proved about
+its rank is a statement about the universally quantified conjecture rather than about
+a private object. -/
+
+/-- The integral model of the full-2-torsion curve. -/
+def abModel (a b : ℤ) : WeierstrassCurve ℤ := ⟨0, -(a + b), 0, a * b, 0⟩
+
+lemma rationalModel_abModel (a b : ℤ) :
+    rationalModel (abModel a b) = E ((a : ℚ)) ((b : ℚ)) := by
+  unfold rationalModel abModel E WeierstrassCurve.map
+  norm_num
+
+lemma rankIsOn_abModel (a b : ℤ) (r : ℕ) :
+    RankIsOn (rationalModel (abModel a b)) r ↔ RankIsOn (E ((a : ℚ)) ((b : ℚ))) r := by
+  rw [rationalModel_abModel]
+
+/-- **THE CONJECTURE BOUNDS THE ANALYTIC RANK BY THE DIVISOR COUNT**: under the
+universal rank clause, the order of vanishing at the center of **any** analytic datum
+carried by a full-2-torsion curve is the curve's algebraic rank, and the descent
+bounds it — `2^(analytic rank) ≤ 4·τ(|ab(a−b)|)²`.
+
+This is an **effective** consequence of the conjecture on this family: the analytic
+side, about which the descent knows nothing directly, inherits a bound computed from
+the coefficients alone. -/
+theorem theConjectureBoundsTheAnalyticRankByTheDivisorCount
+    (hBSD : TheBirchSwinnertonDyerRankConjecture) {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) (M : ℕ) (D : LDatumOn (abModel a b) M) :
+    ∃ r : ℕ, analyticOrderAt D.L 1 = (r : ℕ∞) ∧
+      RankIsOn (E ((a : ℚ)) ((b : ℚ))) r ∧
+      2 ^ r ≤ 4 * (a * b * (a - b)).natAbs.divisors.card
+        * (a * b * (a - b)).natAbs.divisors.card := by
+  obtain ⟨r, hrank, hbound⟩ :=
+    theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve ha hb hab
+  refine ⟨r, ?_, hrank, hbound⟩
+  exact (hBSD (abModel a b) M D r).mpr ((rankIsOn_abModel a b r).mpr hrank)
+
 end Soma.Holonics.Millennium.GeneralTwoTorsion
