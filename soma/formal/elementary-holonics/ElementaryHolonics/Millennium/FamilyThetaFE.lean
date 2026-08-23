@@ -560,3 +560,191 @@ theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp1 : p % 4
     linear_combination (-((a : ℂ) * ((XP p (a ^ 2 + b ^ 2) : ℤ) : ℂ))) * hχ
   · ring
 
+
+/-! ## 7. The functional equation and completed function at every odd prime -/
+
+set_option maxHeartbeats 1000000 in
+/-- **THE FAMILY THETA FUNCTIONAL EQUATION AT EVERY ODD PRIME**:
+`θ_p(1/x) = w_p·x²·θ_p(x)` with the classical root number
+`w_p = (−1)^{(p−1)/2}·χ_p(2)` — `+1` at `p ≡ 1, 3 (mod 8)`, `−1` at
+`p ≡ 5, 7 (mod 8)`. -/
+theorem theFamilyThetaFunctionalEquationAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) {x : ℝ} (hx : 0 < x) :
+    thetaP p (1 / x)
+      = ((-1 : ℝ)) ^ ((p - 1) / 2) * ((XP p 2 : ℤ) : ℝ) * x ^ 2 * thetaP p x := by
+  have hp : p.Prime := Fact.out
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp.pos
+  have hs : (0 : ℝ) < Real.sqrt 2 := sqrt2_pos
+  have h4p : (0 : ℝ) < 4 * p * Real.sqrt 2 := by positivity
+  have hy : (0 : ℝ) < x / (4 * p * Real.sqrt 2) := by positivity
+  have hss : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hne : (4 : ℝ) * p * Real.sqrt 2 ≠ 0 := h4p.ne'
+  unfold thetaP
+  rw [show 4 * (p : ℝ) * Real.sqrt 2 * (1 / x) = 1 / (x / (4 * p * Real.sqrt 2)) from by
+    rw [one_div_div]; ring]
+  have hterm : ∀ e ∈ Finset.range p, ∀ d ∈ Finset.range (2 * p),
+      (wP p e d : ℝ) *
+        (oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+            (1 / (x / (4 * p * Real.sqrt 2))) *
+         evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+            (1 / (x / (4 * p * Real.sqrt 2))))
+      = (x ^ 2 / (32 * p ^ 2)) * ((wP p e d : ℝ) *
+          (sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2)) *
+           cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2)))) := by
+    intro e _ d _
+    rw [oddKernel_functional_equation _ (1 / (x / (4 * p * Real.sqrt 2))),
+      evenKernel_functional_equation _ (1 / (x / (4 * p * Real.sqrt 2))),
+      one_div_one_div,
+      show (1 / (x / (4 * p * Real.sqrt 2))) = (x / (4 * p * Real.sqrt 2))⁻¹ from
+        one_div _,
+      Real.inv_rpow hy.le, Real.inv_rpow hy.le, one_div, one_div, inv_inv, inv_inv]
+    have hpow : (x / (4 * p * Real.sqrt 2)) ^ ((3 : ℝ) / 2) *
+        (x / (4 * p * Real.sqrt 2)) ^ ((1 : ℝ) / 2) = x ^ 2 / (32 * p ^ 2) := by
+      rw [rpow_two_of_pos hy, div_pow]
+      congr 1
+      rw [mul_pow, mul_pow]
+      linear_combination (16 * (p : ℝ) ^ 2) * hss
+    calc (wP p e d : ℝ) *
+          ((x / (4 * p * Real.sqrt 2)) ^ ((3 : ℝ) / 2) *
+            sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2)) *
+           ((x / (4 * p * Real.sqrt 2)) ^ ((1 : ℝ) / 2) *
+            cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2))))
+        = ((x / (4 * p * Real.sqrt 2)) ^ ((3 : ℝ) / 2) *
+            (x / (4 * p * Real.sqrt 2)) ^ ((1 : ℝ) / 2)) * ((wP p e d : ℝ) *
+            (sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2)) *
+             cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+              (x / (4 * p * Real.sqrt 2)))) := by
+          ring
+      _ = _ := by rw [hpow]
+  rw [Finset.sum_congr rfl fun e he => Finset.sum_congr rfl fun d hd => hterm e he d hd]
+  have hpull : ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+      (x ^ 2 / (32 * p ^ 2)) * ((wP p e d : ℝ) *
+        (sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+            (x / (4 * p * Real.sqrt 2)) *
+         cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+            (x / (4 * p * Real.sqrt 2))))
+      = (x ^ 2 / (32 * p ^ 2)) * ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
+          (wP p e d : ℝ) *
+            (sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
+                (x / (4 * p * Real.sqrt 2)) *
+             cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
+                (x / (4 * p * Real.sqrt 2))) := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun e _ => by rw [Finset.mul_sum]
+  rw [hpull, theFamilyDuplicationIdentity p hp2 hy]
+  have h32 : 32 * (p : ℝ) ^ 2 * (x / (4 * p * Real.sqrt 2)) = 4 * p * Real.sqrt 2 * x := by
+    rw [show 32 * (p : ℝ) ^ 2 * (x / (4 * p * Real.sqrt 2))
+        = 32 * (p : ℝ) ^ 2 * x / (4 * p * Real.sqrt 2) from by ring,
+      div_eq_iff hne]
+    linear_combination (-16 * (p : ℝ) ^ 2 * x) * hss
+  rw [h32]
+  have hpne : (p : ℝ) ≠ 0 := hp'.ne'
+  field_simp
+
+/-- The root number is nonzero at every odd prime. -/
+private lemma sign_ne_zero (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
+    ((((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) : ℂ) ≠ 0 := by
+  have hp : p.Prime := Fact.out
+  intro h
+  have h1 : ((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 = 0 := by exact_mod_cast h
+  rcases mul_eq_zero.mp h1 with h2 | h2
+  · have := pow_ne_zero ((p - 1) / 2) (by norm_num : (-1 : ℤ) ≠ 0)
+    exact this h2
+  · unfold XP at h2
+    rw [show ((2 : ℤ) : ZMod p) = (2 : ZMod p) from by norm_num] at h2
+    rw [quadraticChar_eq_zero_iff] at h2
+    have h3 : ((2 : ℤ) : ZMod p) = 0 := by exact_mod_cast h2
+    rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at h3
+    have h4 := Int.le_of_dvd (by norm_num) h3
+    have h5 := hp.two_le
+    have h6 : p = 2 := by omega
+    exact hp2 h6
+
+/-- The strong FE-pair at every odd prime: `f = g = θ_p`, weight `2`, sign the
+classical root number `(−1)^{(p−1)/2}·χ_p(2)`. -/
+def familyFEPairOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : StrongFEPair ℂ where
+  f := Complex.ofReal ∘ thetaP p
+  g := Complex.ofReal ∘ thetaP p
+  k := 2
+  hk := two_pos
+  ε := ((((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) : ℂ)
+  hε := sign_ne_zero p hp2
+  f₀ := 0
+  g₀ := 0
+  hf₀ := rfl
+  hg₀ := rfl
+  hf_int := (Complex.continuous_ofReal.comp_continuousOn
+    (continuousOn_thetaP p)).locallyIntegrableOn measurableSet_Ioi
+  hg_int := (Complex.continuous_ofReal.comp_continuousOn
+    (continuousOn_thetaP p)).locallyIntegrableOn measurableSet_Ioi
+  h_feq x hx := by
+    have hfe := theFamilyThetaFunctionalEquationAtEveryOddPrime p hp2
+      (Set.mem_Ioi.mp hx)
+    simp only [Function.comp_apply, smul_eq_mul, hfe]
+    rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) from by norm_num, Real.rpow_natCast]
+    push_cast
+    ring
+  hf_top r := by
+    simpa using isBigO_ofReal_left.mpr (isBigO_atTop_thetaP p r)
+  hg_top r := by
+    simpa using isBigO_ofReal_left.mpr (isBigO_atTop_thetaP p r)
+
+/-- **The completed L-function at every odd prime**: the Mellin transform of `θ_p`. -/
+def lambdaPOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : ℂ → ℂ :=
+  (familyFEPairOdd p hp2).Λ
+
+/-- **`Λ_p` is entire at every odd prime.** -/
+theorem theCompletedLFunctionIsEntireAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) : Differentiable ℂ (lambdaPOdd p hp2) :=
+  (familyFEPairOdd p hp2).differentiable_Λ
+
+/-- The Mellin representation at every odd prime. -/
+theorem theCompletedLFunctionHasMellinAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) (s : ℂ) :
+    HasMellin (Complex.ofReal ∘ thetaP p) s (lambdaPOdd p hp2 s) :=
+  (familyFEPairOdd p hp2).hasMellin s
+
+/-- **THE COMPLETED FUNCTIONAL EQUATION AT EVERY ODD PRIME**:
+`Λ_p(2−s) = (−1)^{(p−1)/2}·χ_p(2)·Λ_p(s)` — the classical root number, at both
+residue branches of the congruent-number family at once. -/
+theorem theCompletedFunctionalEquationAtEveryOddPrime (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2) (s : ℂ) :
+    lambdaPOdd p hp2 (2 - s)
+      = ((((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) : ℂ) * lambdaPOdd p hp2 s := by
+  have h := (familyFEPairOdd p hp2).functional_equation s
+  rw [show (familyFEPairOdd p hp2).k = (2 : ℝ) from rfl,
+    show (familyFEPairOdd p hp2).ε
+      = ((((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) : ℂ) from rfl] at h
+  have hsymm : (familyFEPairOdd p hp2).symm.Λ = (familyFEPairOdd p hp2).Λ := rfl
+  rw [hsymm] at h
+  simpa [lambdaPOdd, smul_eq_mul] using h
+
+/-- **The central value vanishes on the whole odd-sign locus `p ≡ 5, 7 (mod 8)`**:
+the root number is `−1` there, and the fixed point of an odd reflection dies. -/
+theorem theOddHandForcesTheCentralVanishingOnTheOddSignBranches
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5 ∨ p % 8 = 7) :
+    lambdaPOdd p (by rcases hp8 with h | h <;> omega) 1 = 0 := by
+  have hp2 : p ≠ 2 := by rcases hp8 with h | h <;> omega
+  have hsign : (((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) = -1 := by
+    have hXP := theFamilySignIsTheSecondSupplement p hp2
+    rcases hp8 with h | h
+    · rw [hXP, if_neg (by omega)]
+      have heven : Even ((p - 1) / 2) := ⟨(p - 1) / 4, by omega⟩
+      rw [heven.neg_one_pow]
+      ring
+    · rw [hXP, if_pos (Or.inr (by omega))]
+      have hodd : Odd ((p - 1) / 2) := ⟨(p - 3) / 4, by omega⟩
+      rw [hodd.neg_one_pow]
+      ring
+  have h := theCompletedFunctionalEquationAtEveryOddPrime p hp2 1
+  rw [show (2 : ℂ) - 1 = 1 from by norm_num, hsign] at h
+  push_cast at h
+  linear_combination h / 2
+
+end Soma.Holonics.Millennium.FamilyThetaFE
+
