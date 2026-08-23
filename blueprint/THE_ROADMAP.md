@@ -75,10 +75,17 @@ scopes in 313 seconds with 2,847 tests, zero failures, 34 explicit ignores, and 
 type-checked. Authoritative admission is
 [`research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md`](../research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md).
 
-**L3 is the sole next deed.** It mounts only the L2 rest, decoder, complete fibres, and new rich
-inquiries; works from that terrain without developmental-source access; accepts genuine returned
-passages which can cultivate the continuing ecology; revisits retained history; and returns the
-complete predecessor/cultivated/condensed/ablated/withdrawn anatomy.
+**L3 passed.** [established-bounded] The source-detached L2 terrain accepted one genuine returned
+modulus-three passage, changed later three-carrier conduct, revisited retained history, returned
+every licensed rich face and exact obstruction, changed under targeted local ablation, and restored
+the identical L2 predecessor under withdrawal. Its complete receiver returned 2,848 passing tests,
+zero failures, 34 explicit ignores, every example type-checked, and twelve immediately green scopes;
+the sole cheap driver-ledger ordering drift passed its named retake. Authoritative admission is
+[`research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md`](../research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md).
+
+**L4 is the sole next deed.** It freezes the admitted L0--L3 circulation as the canonical
+`Athena^[Gemma]_(B_HM, H_lab)` production rest, application entry, complete anatomy, capability
+atlas, exact controls, and frozen manifest.
 
 **L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
@@ -363,8 +370,8 @@ R6 candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
-The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L2 have
-passed and L3 is the sole current deed. X0--X2 and Qwen remain unscheduled.
+The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L3 have
+passed and L4 is the sole current deed. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

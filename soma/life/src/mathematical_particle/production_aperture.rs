@@ -14,6 +14,8 @@ mod laboratory;
 mod laboratory_types;
 mod native_family;
 mod native_family_types;
+mod native_terrain;
+mod native_terrain_types;
 mod rest;
 mod types;
 mod wire;
@@ -48,6 +50,15 @@ pub use native_family_types::{
     NativeHexisReconstruction, NativeHexisStanding, NativeNaturalityReceipt,
     NativeOrientedGenerator, NativeShortestSeparator, NativeSuccessorHistory,
     ReceiverHistoryFactorization,
+};
+pub use native_terrain::{
+    NATIVE_TERRAIN_DECODER_SCHEMA, NATIVE_TERRAIN_FIBRES_SCHEMA, NATIVE_TERRAIN_INQUIRY_SCHEMA,
+    NATIVE_TERRAIN_STANDING_SCHEMA,
+};
+pub use native_terrain_types::{
+    NativeTerrainAthenaRest, NativeTerrainCultivation, NativeTerrainDecoder, NativeTerrainError,
+    NativeTerrainInquiry, NativeTerrainReconstruction, NativeTerrainStanding,
+    NativeTerrainWithdrawalReceipt, NativeTerrainWorldReturn,
 };
 pub use types::{
     ProductionAthenaError, ProductionAthenaRest, ProductionComponentIdentity, ProductionDecision,

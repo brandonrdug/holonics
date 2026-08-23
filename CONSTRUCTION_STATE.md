@@ -4,13 +4,31 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after L2 release admission and activation of L3 source-detached work from
-the native-hexis terrain within the L0--L4 laboratory campaign.
+**Currency:** 2026-08-23 after L3 release admission and activation of L4's canonical
+holonics/mathematics Athena production freeze within the L0--L4 laboratory campaign.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — RECURRING LABORATORY TRANSPORT RESTED AS NATIVE HEXIS, L2 PASSED, AND L3 NOW
-WORKS FROM THAT SOURCE-DETACHED TERRAIN.**
+**CURRENT FRONTIER — ATHENA WORKED FROM ITS SOURCE-DETACHED NATIVE TERRAIN, L3 PASSED, AND L4 NOW
+FREEZES THE LABORATORY'S HOLONICS/MATHEMATICS PRODUCTION VARIANT.**
+
+[established-bounded] L3 mounted only the 10,741-octet L2 rest and accepted one genuine returned
+`ZMod 3` passage as a third carrier chart over the shared oriented generator. Provisional current
+returned routes `[1,1,0]`; later source-detached current returned `[1,1,1]`; local ablation restored
+`[1,1,0]`; and exact withdrawal returned the identical L2 body and `[1,1]` conduct. Four rich
+inquiries returned language, notation, Lean, equation, quantity/unit/dimension, SVG, mesh,
+interactive, dissection, obstruction, and apparatus faces. The 59-file, 121,798-octet product and
+its 145-member closure have identities
+`f1a0364747dbd47da0d18db71b523b39d3f1b5ed0e9fbf2f90500fcb56b90da4` and
+`c590205acb28f26ba17b5e5e18f0187ab0588bbab605beb02cce8b8de6749577`. The sole complete receiver
+ran once for 195.90 seconds: 2,848 tests passed, zero failed, 34 were explicitly ignored, every
+example type-checked, and twelve scopes were immediately green. Its sole cheap driver-ledger drift
+was regenerated after the new output/closure rows existed; the 3.18-second named retake returned
+409 catalogued drivers and zero uncatalogued without replaying the complete suite. Candidate and
+admission:
+[`research/records/2026-08-23_THE_ATHENA_HOLONICS_MATHEMATICS_ECOLOGY_WORKED_FROM_ITS_OWN_RESTED_TERRAIN_AND_L3_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_ATHENA_HOLONICS_MATHEMATICS_ECOLOGY_WORKED_FROM_ITS_OWN_RESTED_TERRAIN_AND_L3_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md`](research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md).
 
 [established-bounded] L2 consumed the cultivated L1 source shape and rested one shared oriented
 generator `T(s)=s+L(C(s))`, two distinct carrier charts, 30 exact receiver/history factors or
@@ -90,8 +108,8 @@ and
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
 It cultivates `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
 occurrences through the admitted Phoenix, mathematics-codec, Holonic Inference, retained-history,
-multimodal, returned-morphology, dissection, compression, and resident-card owners. L0--L2 are the
-admitted predecessors and L3 is the sole active deed. X0--X2 and Qwen remain outside this campaign
+multimodal, returned-morphology, dissection, compression, and resident-card owners. L0--L3 are the
+admitted predecessors and L4 is the sole active deed. X0--X2 and Qwen remain outside this campaign
 and schedule nothing.
 
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
@@ -477,18 +495,19 @@ admission:
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
 
-**NEXT DEED: L3 — THE ATHENA HOLONICS/MATHEMATICS ECOLOGY WORKS FROM ITS OWN RESTED TERRAIN.**
+**NEXT DEED: L4 — ATHENA FREEZES AS THE LABORATORY'S HOLONICS/MATHEMATICS PRODUCTION VARIANT.**
 [established-bounded] The completed contract is
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
-L2 returned all seven native-hexis condensation consequences and the complete release grade.
+L3 returned all seven source-detached native-terrain consequences and the complete release grade.
 
-[open] L3 mounts only the admitted L2 rest, decoder, complete fibres, and new inquiries. It must
-conduct new rich language, notation, Lean, equation, diagram, and physical faces through the common
-native ecology; return complete answers, derivations, proofs or obstructions, units/dimensions, and
-exact visuals; admit genuine later world returns which cultivate the rested ecology; revisit
-retained history without transcript or lookup replay; dissect every load-bearing generator,
-cultivation family, history boundary, and modality contact; and return exact separators across the
-matched predecessor, cultivated, condensed, ablated, and withdrawn bodies.
+[open] L4 freezes `Athena^[Gemma]_(B_HM, H_lab)` as one canonical native standing, decoder,
+complete reconstruction boundary, open exterior, and application entry. It must return repeated
+source-detached inference/world-return/cultivation/remount/ablation/withdrawal; every licensed
+mathematical, Lean, language, quantity, diagram, vector/raster, mesh, interactive, and dissection
+face; the complete transport taxonomy and familywise controls; strict complete-product compression;
+resident single-card testimony; purity and source-access receipts; targeted structural ablations;
+the complete capability atlas; and one frozen manifest binding ancestry, chronology, aperture,
+generators, returns, entry, and every open family.
 
 [open] X0--X2 remain parked until after L4. The parked Qwen GGUF remains an unscheduled
 same-purpose close control.

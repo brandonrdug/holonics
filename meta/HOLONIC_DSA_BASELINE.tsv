@@ -280,6 +280,8 @@ soma/life/src/mathematical_particle/production_aperture/laboratory.rs	.clone()=7
 soma/life/src/mathematical_particle/production_aperture/laboratory_types.rs	Vec=19
 soma/life/src/mathematical_particle/production_aperture/native_family.rs	.clone()=20	.collect()=12	.flat_map()=1	BTreeSet=4	Vec=24
 soma/life/src/mathematical_particle/production_aperture/native_family_types.rs	Vec=35
+soma/life/src/mathematical_particle/production_aperture/native_terrain.rs	.clone()=16	.collect()=11	.flat_map()=3	.into_iter()=1	BTreeSet=4	Vec=22
+soma/life/src/mathematical_particle/production_aperture/native_terrain_types.rs	Vec=13
 soma/life/src/mathematical_particle/production_aperture/rest.rs	.clone()=5	.collect()=4	.flat_map()=1	.into_iter()=1	Vec=8
 soma/life/src/mathematical_particle/production_aperture/types.rs	Vec=11
 soma/life/src/mathematical_particle/production_aperture/wire.rs	.collect()=1	Vec=6

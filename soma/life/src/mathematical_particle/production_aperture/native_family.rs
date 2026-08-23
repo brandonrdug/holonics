@@ -94,7 +94,7 @@ fn oriented(values: &[i64]) -> Result<Vec<i8>, NativeHexisError> {
         })
 }
 
-fn returned_section(
+pub(super) fn returned_section(
     section: &[i64],
     constraint: &[i8],
     factor: &[i8],

@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L2 have passed. L3 is the
+**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L3 have passed. L4 is the
 sole active deed.
 **Product:**
 
@@ -17,8 +17,8 @@ geometric, physical, proof, diagram, unit, dimension, intervention, and world-re
 
 **Truth statuses:** `definition` for the product, source occurrence, circulation, cultivation,
 condensation, and grade contracts; `project-postulate` for construction, apparatus, and validation
-discipline; `established-bounded` for the cited admitted owners, returns, and L0--L2; and `open` for
-L3--L4 until each deed passes its release receiver.
+discipline; `established-bounded` for the cited admitted owners, returns, and L0--L3; and `open` for
+L4 until its release receiver passes.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
@@ -280,9 +280,12 @@ L2 passes only when:
 
 ### L3 — The Athena holonics/mathematics ecology works from its own rested terrain
 
-[open] L3 is the sole active deed. It mounts only the L2 rest, decoder, complete fibres, and new inquiries. It conducts the
-laboratory's holonics and mathematical relations as contemporary native terrain and continues to
-accept genuine returned passages.
+[established-bounded] L3 passed. It mounted only the L2 rest, decoder, complete fibres, and new
+inquiries; received one genuine modulus-three Lean/world passage; changed later source-detached
+conduct from provisional `[1,1,0]` to `[1,1,1]`; revisited retained history; returned every
+licensed rich face, exact carrier defect, dissection, local ablation, remount, and exact predecessor
+withdrawal. Authoritative admission is
+[`../research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md`](../research/records/2026-08-23_L3_RELEASE_RECEIVER_PASSED_THE_ATHENA_ECOLOGY_WORKED_FROM_NATIVE_TERRAIN_AND_L4_BEGINS.md).
 
 L3 passes only when:
 
@@ -300,7 +303,7 @@ L3 passes only when:
 
 ### L4 — Athena freezes as the laboratory's holonics/mathematics production variant
 
-[open] L4 freezes
+[open] L4 is the sole active deed. It freezes
 
 ```text
 Athena^[Gemma]_(B_HM, H_lab)
