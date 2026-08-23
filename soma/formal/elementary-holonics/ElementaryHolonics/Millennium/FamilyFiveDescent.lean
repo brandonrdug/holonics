@@ -1353,4 +1353,13 @@ theorem theRankIsAtMostOneAtEveryFiveModEightPrime (hp8 : p % 8 = 5) :
     ¬ BirchSwinnertonDyer.AlgebraicRankAtLeast p 2 :=
   theAlgebraicRankIsBoundedOnTheFiveModEightBranch 2 hp8 (by norm_num)
 
+
+/-- **THE RANK IS ZERO OR ONE AT EVERY PRIME `p ≡ 5 (mod 8)`**, unconditionally:
+the eight cells leave no room for a second independent point. -/
+theorem theRankIsZeroOrOneAtEveryFiveModEightPrime (hp8 : p % 8 = 5) :
+    BirchSwinnertonDyer.AlgebraicRankIs p 0 ∨ BirchSwinnertonDyer.AlgebraicRankIs p 1 := by
+  by_cases h1 : BirchSwinnertonDyer.AlgebraicRankAtLeast p 1
+  · exact Or.inr ⟨h1, theRankIsAtMostOneAtEveryFiveModEightPrime hp8⟩
+  · exact Or.inl ⟨⟨fun i => i.elim0, fun c _ i => i.elim0⟩, h1⟩
+
 end Soma.Holonics.Millennium.FamilyFiveDescent

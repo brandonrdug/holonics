@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.FamilyGenocchi
 import ElementaryHolonics.Millennium.FamilyWitness
+import ElementaryHolonics.Millennium.FamilyFiveDescent
 
 /-!
 # FamilyPairing: what the posed conjecture forces on each branch
@@ -71,4 +72,27 @@ theorem theConjectureForcesAPointOfInfiniteOrderOnTheOddSignBranches
   exact FamilyWitness.theAnalyticRankIsPositiveOnTheOddSignBranches p hp8
     (by simpa using hzero)
 
+
+/-- **THE CONJECTURE IS SQUEEZED TO A SINGLE POINT ON THE FIVE-MOD-EIGHT BRANCH**:
+under the rank clause for the family witness at a prime `p ≡ 5 (mod 8)`, the
+algebraic rank is **exactly one** and the analytic rank is **exactly one** — the
+central vanishing supplies the lower bound as a theorem, the eight-cell descent
+supplies the upper bound as a theorem, and the clause carries both onto the
+analytic side.  All that separates the branch from an unconditional proof of the
+conjecture\'s rank clause here is the single point of infinite order itself. -/
+theorem theConjectureIsSqueezedToASinglePointOnTheFiveModEightBranch
+    (p : ℕ) [Fact p.Prime] (hp8 : p % 8 = 5)
+    (hclause : TheRankClause p
+      (FamilyWitness.theWitnessAtEverySplitPrime p (by omega))) :
+    AlgebraicRankIs p 1 ∧
+      analyticRank (FamilyWitness.theWitnessAtEverySplitPrime p (by omega)) =
+        (1 : ℕ∞) := by
+  have h1 : AlgebraicRankAtLeast p 1 :=
+    theConjectureForcesAPointOfInfiniteOrderOnTheFiveModEightBranch p hp8 hclause
+  have h2 : ¬ AlgebraicRankAtLeast p 2 :=
+    FamilyFiveDescent.theRankIsAtMostOneAtEveryFiveModEightPrime hp8
+  have hIs : AlgebraicRankIs p 1 := ⟨h1, h2⟩
+  exact ⟨hIs, (hclause 1).mpr hIs⟩
+
 end Soma.Holonics.Millennium.FamilyPairing
+
