@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.FamilyTheta
+import ElementaryHolonics.Millennium.FamilyThetaOdd
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
 import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
 import Mathlib.Tactic
@@ -65,9 +66,10 @@ private lemma norm_oddInd_le (m : ℤ) : ‖oddInd m‖ ≤ 1 := by
   unfold oddInd
   split_ifs <;> simp
 
-private lemma norm_quarter_phase (n : ℤ) : ‖cexp (π * I * n / 2)‖ = 1 := by
-  rw [show (π : ℂ) * I * n / 2 = ((π * n / 2 : ℝ) : ℂ) * I from by push_cast; ring,
-    Complex.norm_exp_ofReal_mul_I]
+private lemma norm_quarter_phase (p : ℕ) (n : ℤ) :
+    ‖cexp (π * I * (p * n) / 2)‖ = 1 := by
+  rw [show (π : ℂ) * I * ((p : ℂ) * n) / 2 = ((π * p * n / 2 : ℝ) : ℂ) * I from by
+    push_cast; ring, Complex.norm_exp_ofReal_mul_I]
 
 /-! ## 2. Summability spine (modulus-free) -/
 
@@ -154,7 +156,7 @@ private def cosT (p : ℕ) (y : ℝ) (d : ℕ) (m : ℤ) : ℂ :=
 /-- The collapsed dual family: weight `n`, quarter-turn phase, odd indicator in `m`,
 the twist character, and the pre-fold envelope. -/
 private def dualP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
-  -I * q.1 * (2 * (p : ℂ) * cexp (π * I * q.1 / 2) * oddInd q.2 *
+  -I * q.1 * (2 * (p : ℂ) * cexp (π * I * (p * q.1) / 2) * oddInd q.2 *
       ((XP p (q.1 ^ 2 + q.2 ^ 2) : ℤ) : ℂ)) *
     ((envP y q.1 q.2 : ℝ) : ℂ)
 
@@ -232,7 +234,7 @@ private lemma kernel_product_eq (p : ℕ) (y : ℝ) (hy : 0 < y) (e d : ℕ) :
 
 /-- The pointwise collapse: the grid-weighted lattice terms at one `(n, m)` return the
 single `dualP` term. -/
-private lemma pointwise_collapse (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+private lemma pointwise_collapse (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2)
     (y : ℝ) (q : ℤ × ℤ) :
     ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
         ((wP p e d : ℤ) : ℂ) * (sinT p y e q.1 * cosT p y d q.2)
@@ -267,7 +269,7 @@ private lemma pointwise_collapse (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
           ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p), phaseTerm p n m e d := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun e _ => by rw [Finset.mul_sum]
-  rw [hsum, theFamilyPhaseCollapseAtEverySplitPrime p hp1 n m]
+  rw [hsum, FamilyThetaOdd.theFamilyPhaseCollapseAtEveryOddPrime hp2 n m]
   show _ = dualP p y (n, m)
   unfold dualP
   have henv : ((rexp (-π * n ^ 2 * y) : ℝ) : ℂ) * ((rexp (-π * m ^ 2 * y) : ℝ) : ℂ)
@@ -283,12 +285,12 @@ private lemma pointwise_collapse (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
     unfold XP
     norm_num
   rw [hXcast] at *
-  linear_combination (-I * (n : ℂ) * (2 * (p : ℂ) * cexp (π * I * n / 2) * oddInd m *
-    ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ))) * henv
+  linear_combination (-I * (n : ℂ) * (2 * (p : ℂ) * cexp (π * I * (p * n) / 2) *
+    oddInd m * ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ))) * henv
 
 /-- The dual side of the duplication: the grid-weighted `sinKernel`–`cosKernel`
 products equal the sum of the collapsed lattice family. -/
-private lemma dual_side_eq (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) {y : ℝ}
+private lemma dual_side_eq (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) {y : ℝ}
     (hy : 0 < y) :
     ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
         ((wP p e d : ℤ) : ℂ) *
@@ -312,7 +314,7 @@ private lemma dual_side_eq (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) {y : ℝ}
     refine Finset.sum_congr rfl fun e _ => ?_
     rw [Summable.tsum_finsetSum fun d _ => (summable_sinT_cosT p hy e d).mul_left _]
   rw [hswap]
-  exact tsum_congr fun q => pointwise_collapse p hp1 y q
+  exact tsum_congr fun q => pointwise_collapse p hp2 y q
 
 /-! ## 4. The ladder: from the collapsed dual family to the folded classes -/
 
@@ -610,34 +612,47 @@ private lemma envF_neg_both (y : ℝ) (u v : ℤ) : envF y (-u) (-v) = envF y u 
 private lemma envF_swap (y : ℝ) (u v : ℤ) : envF y v u = envF y u v := by
   unfold envF; congr 1; push_cast; ring
 
-private lemma quarter_phase_odd (t : ℤ) :
-    -I * cexp (π * I * ((2 * t + 1 : ℤ) : ℂ) / 2) = sgn4 (2 * t + 1) := by
-  rcases Int.even_or_odd t with ⟨r, rfl⟩ | ⟨r, rfl⟩
-  · have h1 : sgn4 (2 * (r + r) + 1) = 1 := by
-      unfold sgn4; rw [if_pos (by omega)]
-    have h2 : cexp (π * I * ((2 * (r + r) + 1 : ℤ) : ℂ) / 2) = I := by
-      rw [show (π : ℂ) * I * ((2 * (r + r) + 1 : ℤ) : ℂ) / 2
-            = (r : ℤ) * (2 * π * I) + π / 2 * I from by push_cast; ring,
-        Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, one_mul,
-        Complex.exp_pi_div_two_mul_I]
-    rw [h1, h2]
-    linear_combination -Complex.I_mul_I
-  · have h1 : sgn4 (2 * (2 * r + 1) + 1) = -1 := by
-      unfold sgn4; rw [if_neg (by omega), if_pos (by omega)]
-    have h2 : cexp (π * I * ((2 * (2 * r + 1) + 1 : ℤ) : ℂ) / 2) = -I := by
-      rw [show (π : ℂ) * I * ((2 * (2 * r + 1) + 1 : ℤ) : ℂ) / 2
-            = (r : ℤ) * (2 * π * I) + (π * I + π / 2 * I) from by push_cast; ring,
-        Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, one_mul, Complex.exp_add,
-        Complex.exp_pi_mul_I, Complex.exp_pi_div_two_mul_I]
-      ring
-    rw [h1, h2]
-    linear_combination Complex.I_mul_I
+private lemma quarter_phase_odd {p k : ℕ} (hpk : p = 2 * k + 1) (t : ℤ) :
+    -I * cexp (π * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2)
+      = ((-1 : ℂ)) ^ k * sgn4 (2 * t + 1) := by
+  have hpc : (p : ℂ) = 2 * (k : ℂ) + 1 := by exact_mod_cast hpk
+  have hexp : cexp (π * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2)
+      = (-1 : ℂ) ^ k * ((-1 : ℂ) ^ t * I) := by
+    rw [show (π : ℂ) * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2
+        = (((k : ℤ) * t) : ℂ) * (2 * π * I) + (π * I * ((k : ℕ) : ℂ)
+            + (π * I * ((t : ℤ) : ℂ) + π / 2 * I)) from by
+      rw [hpc]
+      push_cast
+      ring]
+    rw [Complex.exp_add, show ((((k : ℤ) * t) : ℂ)) = (((k : ℤ) * t : ℤ) : ℂ) from by
+      push_cast; ring, Complex.exp_int_mul_two_pi_mul_I, one_mul, Complex.exp_add,
+      Complex.exp_add, Complex.exp_pi_div_two_mul_I]
+    have hk : cexp (π * I * ((k : ℕ) : ℂ)) = (-1 : ℂ) ^ (k : ℕ) := by
+      have h := neg_one_zpow_exp ((k : ℕ) : ℤ)
+      rw [show (π : ℂ) * I * ((k : ℕ) : ℂ) = π * I * (((k : ℕ) : ℤ) : ℂ) from by
+        push_cast; ring, h, zpow_natCast]
+    have ht : cexp (π * I * ((t : ℤ) : ℂ)) = (-1 : ℂ) ^ t := neg_one_zpow_exp t
+    rw [hk, ht]
+  rw [hexp]
+  have hsgn : sgn4 (2 * t + 1) = (-1 : ℂ) ^ t := by
+    rcases Int.even_or_odd t with ⟨r, rfl⟩ | ⟨r, rfl⟩
+    · rw [show sgn4 (2 * (r + r) + 1) = 1 from by unfold sgn4; rw [if_pos (by omega)],
+        show (r : ℤ) + r = 2 * r from by ring, zpow_mul]
+      norm_num
+    · rw [show sgn4 (2 * (2 * r + 1) + 1) = -1 from by
+        unfold sgn4; rw [if_neg (by omega), if_pos (by omega)],
+        zpow_add₀ (by norm_num : (-1 : ℂ) ≠ 0), zpow_mul]
+      norm_num
+  rw [hsgn]
+  linear_combination (-(((-1 : ℂ)) ^ k * ((-1 : ℂ)) ^ t)) * Complex.I_mul_I
 
-private lemma quarter_phase_neg_even {n : ℤ} (hn : n % 2 = 0) :
-    cexp (π * I * ((-n : ℤ) : ℂ) / 2) = cexp (π * I * (n : ℂ) / 2) := by
+private lemma quarter_phase_neg_even {p : ℕ} {n : ℤ} (hn : n % 2 = 0) :
+    cexp (π * I * ((p : ℂ) * ((-n : ℤ) : ℂ)) / 2)
+      = cexp (π * I * ((p : ℂ) * ((n : ℤ) : ℂ)) / 2) := by
   obtain ⟨r, rfl⟩ : ∃ r, n = 2 * r := ⟨n / 2, by omega⟩
-  rw [show (π : ℂ) * I * ((-(2 * r) : ℤ) : ℂ) / 2
-        = π * I * ((2 * r : ℤ) : ℂ) / 2 + (-r : ℤ) * (2 * π * I) from by push_cast; ring,
+  rw [show (π : ℂ) * I * ((p : ℂ) * ((-(2 * r) : ℤ) : ℂ)) / 2
+        = π * I * ((p : ℂ) * ((2 * r : ℤ) : ℂ)) / 2
+          + ((-(p : ℤ) * r : ℤ) : ℂ) * (2 * π * I) from by push_cast; ring,
     Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
 
 /-- The even part of the dual family dies under the involution `n ↦ −n`. -/
@@ -655,7 +670,8 @@ private lemma tsum_dualPEven_eq_zero (p : ℕ) [Fact p.Prime] (y : ℝ) :
       rw [if_pos (show (-n) % 2 = 0 by omega), if_pos hn]
       show dualP p y (-n, m) = -dualP p y (n, m)
       unfold dualP
-      show -I * ((-n : ℤ) : ℂ) * (2 * (p : ℂ) * cexp (π * I * ((-n : ℤ) : ℂ) / 2) *
+      show -I * ((-n : ℤ) : ℂ) *
+          (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * ((-n : ℤ) : ℂ)) / 2) *
           oddInd m * ((XP p ((-n) ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((envP y (-n) m : ℝ) : ℂ) = _
       rw [quarter_phase_neg_even hn,
         show ((-n : ℤ) : ℂ) = -((n : ℤ) : ℂ) from by push_cast; ring,
@@ -670,15 +686,18 @@ private lemma tsum_dualPEven_eq_zero (p : ℕ) [Fact p.Prime] (y : ℝ) :
   linear_combination h3 / 2
 
 /-- The odd part transports through `(t, s) ↦ (2t+1, 2s+1)` and the fold. -/
-private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) :
-    dualPOdd p y (bothOddEmb q) = gLadderP p y (foldMap q) := by
+private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] {k : ℕ}
+    (hpk : p = 2 * k + 1) (y : ℝ) (q : ℤ × ℤ) :
+    dualPOdd p y (bothOddEmb q) = ((-1 : ℂ)) ^ k * gLadderP p y (foldMap q) := by
   obtain ⟨t, s⟩ := q
-  show dualPOdd p y (2 * t + 1, 2 * s + 1) = gLadderP p y (t + s + 1, t - s)
+  show dualPOdd p y (2 * t + 1, 2 * s + 1)
+    = ((-1 : ℂ)) ^ k * gLadderP p y (t + s + 1, t - s)
   simp only [dualPOdd]
   rw [if_neg (show ¬((2 * t + 1) % 2 = 0) by omega)]
   show dualP p y (2 * t + 1, 2 * s + 1) = _
   unfold dualP gLadderP
-  show -I * ((2 * t + 1 : ℤ) : ℂ) * (2 * (p : ℂ) * cexp (π * I * ((2 * t + 1 : ℤ) : ℂ) / 2) *
+  show -I * ((2 * t + 1 : ℤ) : ℂ) *
+      (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2) *
       oddInd (2 * s + 1) * ((XP p ((2 * t + 1) ^ 2 + (2 * s + 1) ^ 2) : ℤ) : ℂ)) *
       ((envP y (2 * t + 1) (2 * s + 1) : ℝ) : ℂ) = _
   have hoi : oddInd (2 * s + 1) = 1 := by
@@ -694,13 +713,15 @@ private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ 
     push_cast
     ring
   rw [hoi, hchi, henv, show (t + s + 1) + (t - s) = 2 * t + 1 from by ring]
-  have hq := quarter_phase_odd t
+  have hq := quarter_phase_odd hpk t
   linear_combination (2 * (p : ℂ) * ((2 * t + 1 : ℤ) : ℂ) *
     ((XP p (2 * ((t + s + 1) ^ 2 + (t - s) ^ 2)) : ℤ) : ℂ) *
     ((envF y (t + s + 1) (t - s) : ℝ) : ℂ)) * hq
 
-private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] (y : ℝ) :
-    ∑' q : ℤ × ℤ, dualPOdd p y q = ∑' q : ℤ × ℤ, gLadderP p y q := by
+private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] {k : ℕ}
+    (hpk : p = 2 * k + 1) (y : ℝ) :
+    ∑' q : ℤ × ℤ, dualPOdd p y q
+      = ((-1 : ℂ)) ^ k * ∑' q : ℤ × ℤ, gLadderP p y q := by
   have h1 : ∑' q : ℤ × ℤ, dualPOdd p y (bothOddEmb q) = ∑' q : ℤ × ℤ, dualPOdd p y q := by
     refine bothOddEmb_injective.tsum_eq ?_
     rw [Function.support_subset_iff]
@@ -716,8 +737,8 @@ private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] (y : ℝ) :
       simp only [dualPOdd]
       rw [if_neg hn]
       unfold dualP
-      show -I * (n : ℂ) * (2 * (p : ℂ) * cexp (π * I * (n : ℂ) / 2) * oddInd m *
-          ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((envP y n m : ℝ) : ℂ) = 0
+      show -I * (n : ℂ) * (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * (n : ℂ)) / 2) *
+          oddInd m * ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((envP y n m : ℝ) : ℂ) = 0
       rw [show oddInd m = 0 from by unfold oddInd; rw [if_pos h]]
       ring
     exact ⟨((n - 1) / 2, (m - 1) / 2), by
@@ -737,8 +758,8 @@ private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] (y : ℝ) :
     exact ⟨((u + v - 1) / 2, (u - v - 1) / 2), by
       simp only [foldMap, Prod.mk.injEq]
       exact ⟨by omega, by omega⟩⟩
-  rw [← h1, ← h2]
-  exact tsum_congr fun q => dualPOdd_comp_bothOdd p y q
+  rw [← h1, ← h2, ← tsum_mul_left]
+  exact tsum_congr fun q => dualPOdd_comp_bothOdd p hpk y q
 
 /-- The swap fold. -/
 private lemma gOddVP_comp_swap (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) :
@@ -887,14 +908,16 @@ lemma tsum_hFinalP_eq_four_hPlusP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y
         rw [tsum_congr hsplit]
 
 /-- The complete dual chain: the collapsed dual family equals the gathered target. -/
-private lemma tsum_dualP_eq_hFinalP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
-    ∑' q : ℤ × ℤ, dualP p y q = ∑' q : ℤ × ℤ, hFinalP p y q := by
+private lemma tsum_dualP_eq_hFinalP (p : ℕ) [Fact p.Prime] {k : ℕ}
+    (hpk : p = 2 * k + 1) {y : ℝ} (hy : 0 < y) :
+    ∑' q : ℤ × ℤ, dualP p y q
+      = ((-1 : ℂ)) ^ k * ∑' q : ℤ × ℤ, hFinalP p y q := by
   have hsplit : ∀ q : ℤ × ℤ, dualP p y q = dualPEven p y q + dualPOdd p y q := by
     intro q
     simp only [dualPEven, dualPOdd]
     split_ifs <;> ring
   rw [tsum_congr hsplit, (summable_dualPEven p hy).tsum_add (summable_dualPOdd p hy),
-    tsum_dualPEven_eq_zero p y, zero_add, tsum_dualPOdd_eq_gLadderP p y,
+    tsum_dualPEven_eq_zero p y, zero_add, tsum_dualPOdd_eq_gLadderP p hpk y,
     tsum_gLadderP_eq_two_gEvenP p hy, tsum_gEvenP_eq_hHalfP p hy,
     tsum_hHalfP_eq_two_hPlusP p hy, tsum_hFinalP_eq_four_hPlusP p hy]
   ring
@@ -1203,13 +1226,13 @@ weighted `sinKernel`–`cosKernel` products at scale `y` equal `32p²·χ_p(2)` 
 collapse through the family eigen-identity, the lattice folds exactly as at level one,
 and the fold deposits the **family sign `χ_p(2)`** — the root number dial of the
 congruent-number family, with the modulus a parameter. -/
-theorem theFamilyDuplicationIdentity (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
+theorem theFamilyDuplicationIdentity (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2)
     {y : ℝ} (hy : 0 < y) :
     ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
         (wP p e d : ℝ) *
           (sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle) y *
            cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle) y)
-      = 32 * (p : ℝ) ^ 2 * ((XP p 2 : ℤ) : ℝ) *
+      = ((-1 : ℝ)) ^ ((p - 1) / 2) * (32 * (p : ℝ) ^ 2 * ((XP p 2 : ℤ) : ℝ)) *
           ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
             (wP p e d : ℝ) *
               (oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
@@ -1217,16 +1240,24 @@ theorem theFamilyDuplicationIdentity (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1)
                evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle) (32 * p ^ 2 * y)) := by
   have hp : p.Prime := Fact.out
   have hp0 : 0 < p := hp.pos
+  have hpodd : p % 2 = 1 := by
+    rcases hp.eq_two_or_odd with h | h
+    · exact absurd h hp2
+    · exact h
+  obtain ⟨k, hpk⟩ : ∃ k : ℕ, p = 2 * k + 1 := ⟨p / 2, by omega⟩
+  have hk2 : (p - 1) / 2 = k := by omega
   have hC : ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
         ((wP p e d : ℤ) : ℂ) *
           (((sinKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle) y : ℝ) : ℂ) *
            ((cosKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle) y : ℝ) : ℂ))
-      = 32 * (p : ℂ) ^ 2 * ((XP p 2 : ℤ) : ℂ) *
+      = ((-1 : ℂ)) ^ k * (32 * (p : ℂ) ^ 2 * ((XP p 2 : ℤ) : ℂ)) *
           ∑ e ∈ Finset.range p, ∑ d ∈ Finset.range (2 * p),
             ((wP p e d : ℤ) : ℂ) *
               (((oddKernel (((4 * (e : ℝ) + 1) / (4 * p) : ℝ) : UnitAddCircle)
                   (32 * p ^ 2 * y) : ℝ) : ℂ) *
                ((evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
                   (32 * p ^ 2 * y) : ℝ) : ℂ)) := by
-    rw [dual_side_eq p hp1 hy, tsum_dualP_eq_hFinalP p hy, primal_side_eq p hp0 hy]
+    rw [dual_side_eq p hp2 hy, tsum_dualP_eq_hFinalP p hpk hy, primal_side_eq p hp0 hy]
+    ring
+  rw [hk2]
   exact_mod_cast hC

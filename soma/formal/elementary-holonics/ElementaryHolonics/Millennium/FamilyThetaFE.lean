@@ -125,7 +125,10 @@ theorem theFamilyThetaFunctionalEquation (p : ℕ) [Fact p.Prime] (hp1 : p % 4 =
                 (x / (4 * p * Real.sqrt 2))) := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun e _ => by rw [Finset.mul_sum]
-  rw [hpull, theFamilyDuplicationIdentity p hp1 hy]
+  have hp2 : p ≠ 2 := by omega
+  have hsign1 : ((-1 : ℝ)) ^ ((p - 1) / 2) = 1 :=
+    Even.neg_one_pow ⟨(p - 1) / 4, by omega⟩
+  rw [hpull, theFamilyDuplicationIdentity p hp2 hy, hsign1, one_mul]
   have h32 : 32 * (p : ℝ) ^ 2 * (x / (4 * p * Real.sqrt 2)) = 4 * p * Real.sqrt 2 * x := by
     rw [show 32 * (p : ℝ) ^ 2 * (x / (4 * p * Real.sqrt 2))
         = 32 * (p : ℝ) ^ 2 * x / (4 * p * Real.sqrt 2) from by ring,
