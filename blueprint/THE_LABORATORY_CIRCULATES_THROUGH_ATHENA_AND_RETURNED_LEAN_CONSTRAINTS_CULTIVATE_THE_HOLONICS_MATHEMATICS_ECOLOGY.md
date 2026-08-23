@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md)
-**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L1 have passed. L2 is the
+**Current boundary:** Phoenix, M0--M6, A1--A3, I0--I5, R0--R6, and L0--L2 have passed. L3 is the
 sole active deed.
 **Product:**
 
@@ -17,8 +17,8 @@ geometric, physical, proof, diagram, unit, dimension, intervention, and world-re
 
 **Truth statuses:** `definition` for the product, source occurrence, circulation, cultivation,
 condensation, and grade contracts; `project-postulate` for construction, apparatus, and validation
-discipline; `established-bounded` for the cited admitted owners, returns, and L0--L1; and `open` for
-L2--L4 until each deed passes its release receiver.
+discipline; `established-bounded` for the cited admitted owners, returns, and L0--L2; and `open` for
+L3--L4 until each deed passes its release receiver.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
@@ -259,10 +259,12 @@ L1 passes only when:
 
 ### L2 — Recurring laboratory transport condenses into native hexis
 
-[open] L2 is the sole active deed. It applies the admitted generator and receiver-history condensation to the cultivated L1
-ecology. Recurring holonics, mathematical, proof, geometric, and physical transport laws become
-native morphology; complete reconstruction fibres retain every distinction visible to an admitted
-future receiver.
+[established-bounded] L2 passed. It applied the admitted generator and receiver-history condensation
+to the cultivated L1 ecology. Two repeated dense actions became one shared oriented generator;
+distinct carrier charts, exact factors and defects, complete fibres, shortest separators,
+source-detached agreement, richer-receiver reopening, and strict seven-coordinate descent returned
+together. Authoritative admission is
+[`../research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md`](../research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md).
 
 L2 passes only when:
 
@@ -278,7 +280,7 @@ L2 passes only when:
 
 ### L3 — The Athena holonics/mathematics ecology works from its own rested terrain
 
-[open] L3 mounts only the L2 rest, decoder, complete fibres, and new inquiries. It conducts the
+[open] L3 is the sole active deed. It mounts only the L2 rest, decoder, complete fibres, and new inquiries. It conducts the
 laboratory's holonics and mathematical relations as contemporary native terrain and continues to
 accept genuine returned passages.
 

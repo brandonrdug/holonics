@@ -173,6 +173,8 @@ pub enum CudaRefineError {
     QuadraticTransportShape,
     #[error("the exact section families, actions, constraints, moduli, and cultivation standing do not form one resident passage")]
     FixedSectionFamilyShape,
+    #[error("the native oriented constraint, factor, carrier charts, and sections do not form one resident passage")]
+    NativeFixedSectionFamilyShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -355,6 +357,7 @@ pub struct CudaRefineExecutor {
     production_aperture_reduction: CuFunction,
     quadratic_section_transport: CuFunction,
     fixed_section_families: CuFunction,
+    native_fixed_section_families: CuFunction,
     fixed_section_family_reduction: CuFunction,
     inference_ecology: CuFunction,
     material_operation_world_tube: CuFunction,
@@ -435,6 +438,7 @@ impl CudaRefineExecutor {
             let mut production_aperture_reduction = ptr::null_mut();
             let mut quadratic_section_transport = ptr::null_mut();
             let mut fixed_section_families = ptr::null_mut();
+            let mut native_fixed_section_families = ptr::null_mut();
             let mut fixed_section_family_reduction = ptr::null_mut();
             let mut inference_ecology = ptr::null_mut();
             let mut material_operation_world_tube = ptr::null_mut();
@@ -522,6 +526,11 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(conduct_fixed_section_families)",
                 ),
                 (
+                    &mut native_fixed_section_families as *mut CuFunction,
+                    c"conduct_native_fixed_section_families",
+                    "cuModuleGetFunction(conduct_native_fixed_section_families)",
+                ),
+                (
                     &mut fixed_section_family_reduction as *mut CuFunction,
                     c"reduce_fixed_section_families",
                     "cuModuleGetFunction(reduce_fixed_section_families)",
@@ -577,6 +586,7 @@ impl CudaRefineExecutor {
                 production_aperture_reduction,
                 quadratic_section_transport,
                 fixed_section_families,
+                native_fixed_section_families,
                 fixed_section_family_reduction,
                 inference_ecology,
                 material_operation_world_tube,
@@ -611,6 +621,7 @@ impl CudaRefineExecutor {
                 production_aperture_reduction,
                 quadratic_section_transport,
                 fixed_section_families,
+                native_fixed_section_families,
                 fixed_section_family_reduction,
                 inference_ecology,
                 material_operation_world_tube,
@@ -1065,6 +1076,38 @@ pub struct DeviceFixedSectionFamilies {
     pub active_lanes: u32,
     /// Family-major `[fixed-section, expanded-action]` work predictions derived only from the
     /// declared extents before dispatch. The card returns which alternative occurred.
+    pub predicted_local_semantic_work: Vec<u64>,
+    pub predicted_local_semantic_span: Vec<u64>,
+    pub semantic_work: u128,
+    pub semantic_span: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// The fixed-section family after `A-I=L*C` has condensed its repeated dense actions into one
+/// shared oriented generator relation. Carrier charts and returned-cultivation occurrences remain
+/// plural; only the causally identical transport law is shared.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceNativeFixedSectionFamilies {
+    pub transported_sections: Vec<i64>,
+    pub constraint_residuals: Vec<i64>,
+    pub constraint_held: Vec<u32>,
+    pub invariant: Vec<u32>,
+    /// `0` expanded native generator, `1` cultivated fixed-section route, `2` obstruction.
+    pub selected_route: Vec<u32>,
+    pub ablated_route: Vec<u32>,
+    pub joint_cultivated: bool,
+    pub local_ablated_joint: Vec<u32>,
+    pub families: usize,
+    pub dimension: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub typed_reductions: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    /// Family-major `[fixed-section, expanded-native-generator]` alternatives derived from the
+    /// compact incidence extents before dispatch.
     pub predicted_local_semantic_work: Vec<u64>,
     pub predicted_local_semantic_span: Vec<u64>,
     pub semantic_work: u128,
@@ -3596,6 +3639,313 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Conduct fixed-section families through one shared oriented relation `T = I + L*C`.
+    ///
+    /// The incidence orientations are mounted once for the complete family front. The card owns
+    /// residual evaluation, native transport, cultivation/obstruction selection, joint return and
+    /// every local ablation; the host validates the exact receipt after one synchronization.
+    pub fn conduct_native_fixed_section_families_on_device(
+        &mut self,
+        sections: &[i64],
+        constraint_orientation: &[i8],
+        factor_orientation: &[i8],
+        moduli: &[i64],
+        cultivated: &[u32],
+    ) -> Result<DeviceNativeFixedSectionFamilies, CudaRefineError> {
+        let families = moduli.len();
+        let dimension = sections.len().checked_div(families.max(1)).unwrap_or(0);
+        if families < 2
+            || dimension == 0
+            || sections.len() != families * dimension
+            || constraint_orientation.len() != dimension
+            || factor_orientation.len() != dimension
+            || constraint_orientation
+                .iter()
+                .chain(factor_orientation)
+                .any(|orientation| !(-1..=1).contains(orientation))
+            || !constraint_orientation
+                .iter()
+                .any(|orientation| *orientation != 0)
+            || !factor_orientation
+                .iter()
+                .any(|orientation| *orientation != 0)
+            || families > u32::MAX as usize
+            || dimension > u32::MAX as usize
+            || moduli.iter().any(|modulus| *modulus < 0 || *modulus == 1)
+            || cultivated.iter().any(|value| *value > 1)
+            || cultivated.len() != families
+        {
+            return Err(CudaRefineError::NativeFixedSectionFamilyShape);
+        }
+        let constraint_terms = constraint_orientation
+            .iter()
+            .filter(|orientation| **orientation != 0)
+            .count() as u64;
+        let factor_terms = factor_orientation
+            .iter()
+            .filter(|orientation| **orientation != 0)
+            .count() as u64;
+        let constraint_work = constraint_terms.saturating_sub(1);
+        let constraint_span = constraint_work;
+        let expanded_work = constraint_work
+            .checked_add(factor_terms)
+            .ok_or(CudaRefineError::NativeFixedSectionFamilyShape)?;
+        let expanded_span = constraint_span
+            .checked_add(u64::from(factor_terms != 0))
+            .ok_or(CudaRefineError::NativeFixedSectionFamilyShape)?;
+        let mut predicted_local_semantic_work = Vec::with_capacity(families * 2);
+        let mut predicted_local_semantic_span = Vec::with_capacity(families * 2);
+        for _ in 0..families {
+            predicted_local_semantic_work.extend([constraint_work, expanded_work]);
+            predicted_local_semantic_span.extend([constraint_span, expanded_span]);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let sections_device = Buffer::of(sections)?;
+        let constraint_device = Buffer::of(constraint_orientation)?;
+        let factor_device = Buffer::of(factor_orientation)?;
+        let moduli_device = Buffer::of(moduli)?;
+        let cultivated_device = Buffer::of(cultivated)?;
+        let section_octets = std::mem::size_of_val(sections);
+        let family_octets = families * std::mem::size_of::<u32>();
+        let family_i64_octets = families * std::mem::size_of::<i64>();
+        let local_measure_octets = families * std::mem::size_of::<u64>();
+        let transported_device = Buffer::alloc(section_octets)?;
+        let residual_device = Buffer::alloc(family_i64_octets)?;
+        let constraint_held_device = Buffer::alloc(family_octets)?;
+        let invariant_device = Buffer::alloc(family_octets)?;
+        let selected_route_device = Buffer::alloc(family_octets)?;
+        let ablated_route_device = Buffer::alloc(family_octets)?;
+        let local_work_device = Buffer::alloc(local_measure_octets)?;
+        let local_span_device = Buffer::alloc(local_measure_octets)?;
+        let joint_device = Buffer::alloc(std::mem::size_of::<u32>())?;
+        let local_joint_device = Buffer::alloc(family_octets)?;
+        let work_device = Buffer::alloc(std::mem::size_of::<u64>())?;
+        let span_device = Buffer::alloc(std::mem::size_of::<u64>())?;
+        let mut sections_pointer = sections_device.pointer;
+        let mut constraint_pointer = constraint_device.pointer;
+        let mut factor_pointer = factor_device.pointer;
+        let mut moduli_pointer = moduli_device.pointer;
+        let mut cultivated_pointer = cultivated_device.pointer;
+        let mut transported_pointer = transported_device.pointer;
+        let mut residual_pointer = residual_device.pointer;
+        let mut constraint_held_pointer = constraint_held_device.pointer;
+        let mut invariant_pointer = invariant_device.pointer;
+        let mut selected_route_pointer = selected_route_device.pointer;
+        let mut ablated_route_pointer = ablated_route_device.pointer;
+        let mut local_work_pointer = local_work_device.pointer;
+        let mut local_span_pointer = local_span_device.pointer;
+        let mut family_count = families as u32;
+        let mut dimension_wire = dimension as u32;
+        let mut arguments: [*mut c_void; 15] = [
+            &mut sections_pointer as *mut u64 as *mut c_void,
+            &mut constraint_pointer as *mut u64 as *mut c_void,
+            &mut factor_pointer as *mut u64 as *mut c_void,
+            &mut moduli_pointer as *mut u64 as *mut c_void,
+            &mut cultivated_pointer as *mut u64 as *mut c_void,
+            &mut transported_pointer as *mut u64 as *mut c_void,
+            &mut residual_pointer as *mut u64 as *mut c_void,
+            &mut constraint_held_pointer as *mut u64 as *mut c_void,
+            &mut invariant_pointer as *mut u64 as *mut c_void,
+            &mut selected_route_pointer as *mut u64 as *mut c_void,
+            &mut ablated_route_pointer as *mut u64 as *mut c_void,
+            &mut local_work_pointer as *mut u64 as *mut c_void,
+            &mut local_span_pointer as *mut u64 as *mut c_void,
+            &mut family_count as *mut u32 as *mut c_void,
+            &mut dimension_wire as *mut u32 as *mut c_void,
+        ];
+        let grid = self.grid_for(families as u64)?;
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.native_fixed_section_families,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_native_fixed_section_families)",
+        )?;
+        self.launches += 1;
+
+        let mut joint_pointer = joint_device.pointer;
+        let mut local_joint_pointer = local_joint_device.pointer;
+        let mut work_pointer = work_device.pointer;
+        let mut span_pointer = span_device.pointer;
+        let mut reduction_arguments: [*mut c_void; 9] = [
+            &mut selected_route_pointer as *mut u64 as *mut c_void,
+            &mut ablated_route_pointer as *mut u64 as *mut c_void,
+            &mut local_work_pointer as *mut u64 as *mut c_void,
+            &mut local_span_pointer as *mut u64 as *mut c_void,
+            &mut joint_pointer as *mut u64 as *mut c_void,
+            &mut local_joint_pointer as *mut u64 as *mut c_void,
+            &mut work_pointer as *mut u64 as *mut c_void,
+            &mut span_pointer as *mut u64 as *mut c_void,
+            &mut family_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.fixed_section_family_reduction,
+                    1,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    reduction_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(reduce_fixed_section_families)",
+        )?;
+        self.launches += 1;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+
+        let mut transported_sections = vec![0_i64; sections.len()];
+        let mut constraint_residuals = vec![0_i64; families];
+        let mut constraint_held = vec![0_u32; families];
+        let mut invariant = vec![0_u32; families];
+        let mut selected_route = vec![0_u32; families];
+        let mut ablated_route = vec![0_u32; families];
+        let mut local_semantic_work = vec![0_u64; families];
+        let mut local_semantic_span = vec![0_u64; families];
+        let mut joint_cultivated = [0_u32];
+        let mut local_ablated_joint = vec![0_u32; families];
+        let mut semantic_work = [0_u64];
+        let mut semantic_span = [0_u64];
+        transported_device.read(&mut transported_sections)?;
+        residual_device.read(&mut constraint_residuals)?;
+        constraint_held_device.read(&mut constraint_held)?;
+        invariant_device.read(&mut invariant)?;
+        selected_route_device.read(&mut selected_route)?;
+        ablated_route_device.read(&mut ablated_route)?;
+        local_work_device.read(&mut local_semantic_work)?;
+        local_span_device.read(&mut local_semantic_span)?;
+        joint_device.read(&mut joint_cultivated)?;
+        local_joint_device.read(&mut local_ablated_joint)?;
+        work_device.read(&mut semantic_work)?;
+        span_device.read(&mut semantic_span)?;
+
+        let reduction_work = u64::try_from(families)
+            .ok()
+            .and_then(|count| count.checked_add(count.checked_mul(count)?))
+            .ok_or(CudaRefineError::NativeFixedSectionFamilyShape)?;
+        let predicted_returned_work = selected_route
+            .iter()
+            .enumerate()
+            .try_fold(reduction_work, |work, (family, route)| {
+                work.checked_add(
+                    predicted_local_semantic_work[family * 2 + usize::from(*route != 1)],
+                )
+            })
+            .ok_or(CudaRefineError::NativeFixedSectionFamilyShape)?;
+        let predicted_returned_span = selected_route
+            .iter()
+            .enumerate()
+            .map(|(family, route)| {
+                predicted_local_semantic_span[family * 2 + usize::from(*route != 1)]
+            })
+            .max()
+            .and_then(|span| span.checked_add(families as u64))
+            .ok_or(CudaRefineError::NativeFixedSectionFamilyShape)?;
+        if constraint_held.iter().any(|value| *value > 1)
+            || invariant != constraint_held
+            || selected_route.iter().any(|value| *value > 2)
+            || ablated_route.iter().any(|value| *value != 0 && *value != 2)
+            || selected_route
+                .iter()
+                .enumerate()
+                .any(|(family, route)| match *route {
+                    0 => invariant[family] != 1,
+                    1 => cultivated[family] != 1 || invariant[family] != 1,
+                    2 => invariant[family] != 0,
+                    _ => true,
+                })
+            || ablated_route
+                .iter()
+                .enumerate()
+                .any(|(family, route)| *route != if invariant[family] == 1 { 0 } else { 2 })
+            || joint_cultivated[0] > 1
+            || local_ablated_joint.iter().any(|value| *value > 1)
+            || (joint_cultivated[0] == 1) != selected_route.iter().all(|route| *route == 1)
+            || local_ablated_joint
+                .iter()
+                .enumerate()
+                .any(|(withdrawn, joint)| {
+                    (*joint == 1)
+                        != selected_route.iter().enumerate().all(|(family, route)| {
+                            if family == withdrawn {
+                                ablated_route[family] == 1
+                            } else {
+                                *route == 1
+                            }
+                        })
+                })
+            || local_semantic_work
+                .iter()
+                .zip(selected_route.iter().enumerate())
+                .any(|(actual, (family, route))| {
+                    *actual != predicted_local_semantic_work[family * 2 + usize::from(*route != 1)]
+                })
+            || local_semantic_span
+                .iter()
+                .zip(selected_route.iter().enumerate())
+                .any(|(actual, (family, route))| {
+                    *actual != predicted_local_semantic_span[family * 2 + usize::from(*route != 1)]
+                })
+            || semantic_work[0] != predicted_returned_work
+            || semantic_span[0] != predicted_returned_span
+        {
+            return Err(CudaRefineError::NativeFixedSectionFamilyShape);
+        }
+        let ingress = std::mem::size_of_val(sections)
+            + std::mem::size_of_val(constraint_orientation)
+            + std::mem::size_of_val(factor_orientation)
+            + std::mem::size_of_val(moduli)
+            + std::mem::size_of_val(cultivated);
+        let egress = section_octets
+            + family_i64_octets
+            + 5 * family_octets
+            + 2 * local_measure_octets
+            + std::mem::size_of::<u32>()
+            + 2 * std::mem::size_of::<u64>();
+        Ok(DeviceNativeFixedSectionFamilies {
+            transported_sections,
+            constraint_residuals,
+            constraint_held,
+            invariant,
+            selected_route,
+            ablated_route,
+            joint_cultivated: joint_cultivated[0] == 1,
+            local_ablated_joint,
+            families,
+            dimension,
+            launches: 2,
+            synchronizations: 1,
+            typed_reductions: 1,
+            block_threads: self.block_x,
+            active_lanes: families as u32,
+            predicted_local_semantic_work,
+            predicted_local_semantic_span,
+            semantic_work: u128::from(semantic_work[0]),
+            semantic_span: semantic_span[0],
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: (ingress + egress) as u64,
+        })
+    }
+
+
     /// Conduct the recurrent passage and every admitted heterogeneous face in one resident front.
     /// The decision is data crossing the front, not a host-selected semantic branch between I3 and
     /// I4. Both alternative routes and all withdrawals return as dissection testimony.
@@ -4941,6 +5291,53 @@ mod tests {
         assert_eq!(cultivated.synchronizations, 1);
         assert_eq!(cultivated.typed_reductions, 1);
     }
+
+    /// L2 rests the repeated dense action as one oriented relation `T=I+L*C`.  The equal present
+    /// zero sections remain in distinct carrier charts, and `[1,1,0]` is their first admitted
+    /// future separator: its integer residual is two while its F2 residual vanishes.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_conducts_the_native_fixed_section_relation_and_reopens_the_carrier_fibre() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let cultivated = card
+            .conduct_native_fixed_section_families_on_device(
+                &[11, -11, 0, 1, 1, 0],
+                &[1, 1, -1],
+                &[-1, -1, 1],
+                &[0, 2],
+                &[1, 1],
+            )
+            .expect("the native family returns");
+        assert_eq!(cultivated.constraint_residuals, vec![0, 0]);
+        assert_eq!(cultivated.selected_route, vec![1, 1]);
+        assert!(cultivated.joint_cultivated);
+        assert_eq!(cultivated.local_ablated_joint, vec![0, 0]);
+        assert_eq!(cultivated.semantic_work, 10);
+        assert_eq!(cultivated.semantic_span, 4);
+        assert_eq!(cultivated.predicted_local_semantic_work, vec![2, 5, 2, 5]);
+        assert_eq!(cultivated.predicted_local_semantic_span, vec![2, 3, 2, 3]);
+        assert_eq!(
+            cultivated.host_ingress_octets + cultivated.host_egress_octets,
+            234
+        );
+
+        let reopened = card
+            .conduct_native_fixed_section_families_on_device(
+                &[1, 1, 0, 1, 1, 0],
+                &[1, 1, -1],
+                &[-1, -1, 1],
+                &[0, 2],
+                &[1, 1],
+            )
+            .expect("the carrier separator returns");
+        assert_eq!(reopened.constraint_residuals, vec![2, 0]);
+        assert_eq!(reopened.transported_sections, vec![-1, -1, 2, 1, 1, 0]);
+        assert_eq!(reopened.selected_route, vec![2, 1]);
+        assert!(!reopened.joint_cultivated);
+        assert_eq!(reopened.semantic_work, 13);
+        assert_eq!(reopened.semantic_span, 5);
+    }
+
 
     /// I5's composed front: recurrence and conserved text/vision faces are selected by one
     /// resident decision without a host semantic bridge.

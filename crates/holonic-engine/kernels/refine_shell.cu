@@ -966,6 +966,82 @@ extern "C" __global__ void conduct_fixed_section_families(
     local_semantic_span[family] = constraint_span + (uint64_t)dimension;
 }
 
+/// Conduct the same fixed-section ecology after its dense action and repeated constraints have
+/// condensed into one shared oriented generator relation `T = I + L*C`.
+///
+/// `constraint_orientation` and `factor_orientation` are incidences in {-1, 0, 1}.  The former
+/// evaluates the shared covector `C`; the latter carries its returned residual through `L`.
+/// Carrier moduli and cultivation occurrences remain family-local, so equal present sections do
+/// not identify integer and finite-carrier successor histories.
+extern "C" __global__ void conduct_native_fixed_section_families(
+    const int64_t *sections,
+    const int8_t *constraint_orientation,
+    const int8_t *factor_orientation,
+    const int64_t *moduli,
+    const uint32_t *cultivated,
+    int64_t *transported,
+    int64_t *constraint_residual,
+    uint32_t *constraint_held,
+    uint32_t *invariant,
+    uint32_t *selected_route,
+    uint32_t *ablated_route,
+    uint64_t *local_semantic_work,
+    uint64_t *local_semantic_span,
+    uint32_t families,
+    uint32_t dimension)
+{
+    const uint32_t family = blockIdx.x * blockDim.x + threadIdx.x;
+    if (family >= families) {
+        return;
+    }
+    const uint64_t vector_at = (uint64_t)family * (uint64_t)dimension;
+    const int64_t modulus = moduli[family];
+    int64_t residual = 0LL;
+    uint64_t constraint_terms = 0ULL;
+    for (uint32_t coordinate = 0U; coordinate < dimension; ++coordinate) {
+        const int8_t orientation = constraint_orientation[coordinate];
+        if (orientation == 0) {
+            continue;
+        }
+        const int64_t coordinate_value = sections[vector_at + coordinate];
+        residual += orientation > 0 ? coordinate_value : -coordinate_value;
+        ++constraint_terms;
+    }
+    residual = canonical_mod(residual, modulus);
+    constraint_residual[family] = residual;
+    const uint32_t held = residual == 0LL ? 1U : 0U;
+    constraint_held[family] = held;
+    invariant[family] = held;
+    const uint64_t constraint_work = constraint_terms == 0ULL ? 0ULL : constraint_terms - 1ULL;
+    const uint64_t constraint_span = constraint_work;
+    if (cultivated[family] != 0U && held != 0U) {
+        for (uint32_t coordinate = 0U; coordinate < dimension; ++coordinate) {
+            transported[vector_at + coordinate] =
+                canonical_mod(sections[vector_at + coordinate], modulus);
+        }
+        selected_route[family] = 1U;
+        ablated_route[family] = 0U;
+        local_semantic_work[family] = constraint_work;
+        local_semantic_span[family] = constraint_span;
+        return;
+    }
+
+    uint64_t factor_work = 0ULL;
+    for (uint32_t coordinate = 0U; coordinate < dimension; ++coordinate) {
+        const int8_t orientation = factor_orientation[coordinate];
+        int64_t returned = sections[vector_at + coordinate];
+        if (orientation != 0) {
+            returned += orientation > 0 ? residual : -residual;
+            ++factor_work;
+        }
+        transported[vector_at + coordinate] = canonical_mod(returned, modulus);
+    }
+    selected_route[family] = held != 0U ? 0U : 2U;
+    ablated_route[family] = selected_route[family];
+    local_semantic_work[family] = constraint_work + factor_work;
+    local_semantic_span[family] = constraint_span + (factor_work == 0ULL ? 0ULL : 1ULL);
+}
+
 /// Join the independently returned fixed-section families only after their complete routes stand.
 extern "C" __global__ void reduce_fixed_section_families(
     const uint32_t *selected_route,

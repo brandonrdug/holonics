@@ -66,11 +66,19 @@ thirteen green scopes in 243 seconds. Authoritative
 admission is
 [`research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md`](../research/records/2026-08-23_L1_RELEASE_RECEIVER_PASSED_RETURNED_THEOREM_FAMILIES_RESTED_AND_L2_BEGINS.md).
 
-**L2 is the sole next deed.** The admitted generator and receiver-history owners now condense the
-cultivated L1 ecology into native hexis. The deed owes generators, relations, complete factorization
-or defects for every declared receiver/history, naturality and intervention receipts across the
-two families, complete fibres and shortest separators, source-detached agreement, richer-receiver
-reopening, and strict descent of artifact, decoder, fibres, work, span, residency, and transfer.
+**L2 passed.** [established-bounded] The two repeated dense fixed-section actions condensed into one
+shared oriented generator with distinct integer and modulus-two charts. All 30 receiver/history
+pairs factor or return their exact defect; complete fibres and the shortest future separator remain
+addressed; source-detached conduct agrees with cultivated L1; and artifact, decoder, fibres, work,
+span, residency, and transfer all fall strictly. The sole release receiver passed all thirteen
+scopes in 313 seconds with 2,847 tests, zero failures, 34 explicit ignores, and every example
+type-checked. Authoritative admission is
+[`research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md`](../research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md).
+
+**L3 is the sole next deed.** It mounts only the L2 rest, decoder, complete fibres, and new rich
+inquiries; works from that terrain without developmental-source access; accepts genuine returned
+passages which can cultivate the continuing ecology; revisits retained history; and returns the
+complete predecessor/cultivated/condensed/ablated/withdrawn anatomy.
 
 **L1--L4 are ordered enactments of the same circulation.** Returned theorem families cultivate the
 continuing rest; recurring laboratory transport condenses into native hexis; the source-detached
@@ -355,8 +363,8 @@ R6 candidate and admission:
 [`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
-The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L1 have
-passed and L2 is the sole current deed. X0--X2 and Qwen remain unscheduled.
+The active laboratory-cultivation campaign composes this admitted R6 predecessor; L0--L2 have
+passed and L3 is the sole current deed. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

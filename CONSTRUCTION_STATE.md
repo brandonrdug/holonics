@@ -4,13 +4,29 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-23 after L1 release admission and activation of L2 native-hexis condensation
-within the L0--L4 laboratory campaign.
+**Currency:** 2026-08-23 after L2 release admission and activation of L3 source-detached work from
+the native-hexis terrain within the L0--L4 laboratory campaign.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — RETURNED THEOREM FAMILIES CULTIVATED THE CONTINUING REST, L1 PASSED, AND L2
-NOW CONDENSES THE RECURRING LABORATORY TRANSPORT INTO NATIVE HEXIS.**
+**CURRENT FRONTIER — RECURRING LABORATORY TRANSPORT RESTED AS NATIVE HEXIS, L2 PASSED, AND L3 NOW
+WORKS FROM THAT SOURCE-DETACHED TERRAIN.**
+
+[established-bounded] L2 consumed the cultivated L1 source shape and rested one shared oriented
+generator `T(s)=s+L(C(s))`, two distinct carrier charts, 30 exact receiver/history factors or
+defects, three complete collapsed populations, six reconstruction fibres, and the shortest
+carrier-future separator. The 7,301,588-octet cultivated rest fell to 10,741 octets. Across the
+complete three-inquiry family, semantic work fell `93→39`, span `21→14`, and resident/transfer
+extent `1,524→702`. Three fresh-process RTX passages agreed with cultivated L1; the richer receiver
+reopened equal-present carrier sections as residuals `[2,0]` and routes `[2,1]`. The 48-file,
+106,054-octet return and its 143-member closure have identities
+`55d96884afd758b07831268a6e6c9b370284d22843164ad3287b37128908e764` and
+`9bbd66ad42a4bd20db5050764ff0db68e61255c658825060fcb6e51282ea305d`. The sole complete receiver
+ran once for 313 seconds and returned 2,847 passing tests, zero failures, 34 explicit ignores,
+every example target type-checked, and all thirteen green scopes. Candidate and admission:
+[`research/records/2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md`](research/records/2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md)
+and
+[`research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md`](research/records/2026-08-23_L2_RELEASE_RECEIVER_PASSED_RECURRING_TRANSPORT_RESTED_AS_NATIVE_HEXIS_AND_L3_BEGINS.md).
 
 [established-bounded] L1 circulated the fourteen-commit successor chronology
 `4ba0cb0..443cd61` through the L0 rest and returned two causally distinct Lean theorem families
@@ -74,8 +90,8 @@ and
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
 It cultivates `Athena^[Gemma]_(B_HM, H_lab)` by circulating immutable committed laboratory
 occurrences through the admitted Phoenix, mathematics-codec, Holonic Inference, retained-history,
-multimodal, returned-morphology, dissection, compression, and resident-card owners. L0--L1 are the
-admitted predecessors and L2 is the sole active deed. X0--X2 and Qwen remain outside this campaign
+multimodal, returned-morphology, dissection, compression, and resident-card owners. L0--L2 are the
+admitted predecessors and L3 is the sole active deed. X0--X2 and Qwen remain outside this campaign
 and schedule nothing.
 
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
@@ -461,18 +477,18 @@ admission:
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
 
-**NEXT DEED: L2 — RECURRING LABORATORY TRANSPORT CONDENSES INTO NATIVE HEXIS.**
+**NEXT DEED: L3 — THE ATHENA HOLONICS/MATHEMATICS ECOLOGY WORKS FROM ITS OWN RESTED TERRAIN.**
 [established-bounded] The completed contract is
 [`blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md`](blueprint/THE_LABORATORY_CIRCULATES_THROUGH_ATHENA_AND_RETURNED_LEAN_CONSTRAINTS_CULTIVATE_THE_HOLONICS_MATHEMATICS_ECOLOGY.md).
-L1 returned all eight familywise cultivation consequences and the complete release grade.
+L2 returned all seven native-hexis condensation consequences and the complete release grade.
 
-[open] L2 applies the admitted generator and receiver-history condensation to the cultivated L1
-ecology. It derives native generators and relations from the returned passages; returns exact
-factorization or defects for every declared receiver and successor history; carries cross-family
-naturality and intervention receipts; retains every collapsed population, complete reconstruction
-fibre, and shortest separator; matches cultivated conduct from a source-detached rest; reopens
-every unlawful quotient under a richer receiver; and strictly lowers artifact, decoder, fibres,
-semantic work, span, residency, and transfer over the complete declared laboratory family.
+[open] L3 mounts only the admitted L2 rest, decoder, complete fibres, and new inquiries. It must
+conduct new rich language, notation, Lean, equation, diagram, and physical faces through the common
+native ecology; return complete answers, derivations, proofs or obstructions, units/dimensions, and
+exact visuals; admit genuine later world returns which cultivate the rested ecology; revisit
+retained history without transcript or lookup replay; dissect every load-bearing generator,
+cultivation family, history boundary, and modality contact; and return exact separators across the
+matched predecessor, cultivated, condensed, ablated, and withdrawn bodies.
 
 [open] X0--X2 remain parked until after L4. The parked Qwen GGUF remains an unscheduled
 same-purpose close control.

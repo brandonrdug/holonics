@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 114 drivers, 19422 returns, 56338112807 bytes.
+# 115 drivers, 19470 returns, 56338218861 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -42,6 +42,7 @@ a7343ab3715a891e31bb757e414553c5cf0be9d5a28ce5dc9ae66ebe37903759	213	135074	outp
 9106dd62993897b2c17c6046780cff113011cbd00753431bfe772ba3423336dc	87	27768	output/lean-proof-production-swing
 ee8dfd49928cdadaa098395062a5b19d22a9fb2ea8e72c5b7ee7c87eb5e59eaa	23	35981568	output/m0_mathematical_source_circulation
 2cf48a782f44765e4e839d88f64993c08925b3fe4f9335027cd10d84d7c76432	1	3217087	output/m1_mathematical_operation_complex
+55d96884afd758b07831268a6e6c9b370284d22843164ad3287b37128908e764	48	106054	output/recurring_laboratory_transport_condenses_into_native_hexis
 cf87fcb7ccdb9cd3649275a1731c3c011ab2fe8db8fd5ca161fd8c82d9331c55	3	5239843	output/reintegrating-elaboration
 ce6b53c574d876be5c1ddac133bd90ea42293afd3bd0646110d9621b312d43d7	42	7380189	output/returned_theorem_families_cultivate_the_continuing_laboratory_rest
 d5d4be0ce4e0da0f152d1bc1008f91006fba3e355d75dde239af483f33487e88	58	1443881689	output/source-revival
