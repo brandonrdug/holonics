@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 563 research deposits current through 22 August 2026, including all 307
+`records/` contains 573 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -269,6 +269,19 @@ governs the rebuild.
   development and lineage-new held-out passages, source-detached remount, disjoint control,
   nonzero holonomy and exact withdrawal; records 2,839 passing tests plus the permitted cheap
   ledger retake; and places R4 at the retained long-horizon causal-boundary frontier.
+- **The retained causal boundary carried the remote interior, and R4 awaits admission:**
+  `records/2026-08-22_THE_RETAINED_CAUSAL_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_THE_RICHER_RECEIVER_REOPENED_IT_AND_R4_AWAITS_ADMISSION.md`
+  — condenses ten exact remote historical interiors into three future-stable native boundary
+  states while retaining one decoder and complete reconstruction fibres; returns source,
+  uncondensed and compact card passages, lawful richer-receiver reopening, exact recurrence,
+  separators, ordered holonomy, detached reconstruction, independent-front interchange and
+  strict complete-product descent while retaining the release-admission boundary.
+- **R4 release admission:**
+  `records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md`
+  — admits the load-bearing retained causal boundary, exact remote-interior reconstruction,
+  richer-receiver reopening, detached one-launch card revisit, independent interchange,
+  noncommuting order and strict complete-product descent; records 2,841 passing tests and all
+  thirteen green scopes; and places R5 at the native multimodal mathematics/physics frontier.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.

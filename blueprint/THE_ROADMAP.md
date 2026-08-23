@@ -49,15 +49,16 @@ their presentations can be separated by exact operation, binder, unit, dimension
 proof, analytic, diagram, boundary, conservation and world-return receivers. The source labels do
 not route the body. The compatible receiver pullback and its noncommuting defects do.
 
-**R0 passed; R1 is the sole next deed.** One content-addressed FamilySupport inquiry crossed the
-unchanged I5 product and returned the complete intake, operation, continuation, receiver, world,
-morphology and apparatus boundary before repair. R1 now closes only its five minimal rich-intake,
-typed-entry, and resident-join absences; R2 widens recurrence to a material-founded complete
-derivation; R3 lets returned
-constraints found dynamic local morphology; R4 makes the retained causal boundary load-bearing
-over long-horizon inquiry; R5 returns genuinely shared multimodal mathematical/physical transport;
-and R6 freezes the first bounded production Athena mathematics/physics ecology. No later deed
-begins while its predecessor is open.
+**R4 passed; R5 is the sole next deed.** R0 returned the complete rich-inquiry boundary; R1 closed
+the rich-intake, typed-entry, and resident-join absences; R2 returned a material-founded complete
+derivation to its exact obstruction; R3 let actual returned constraints found one attributable
+local morphology; and R4 made a three-state retained causal boundary carry ten exact remote
+interiors over long-horizon inquiry. Its richer receiver reopens the retained fibre, detached
+revisit reconstructs 24,100 historical octets without source access, noncommuting words preserve
+order, and every coordinate of the complete product falls against matched source replay. R5 now
+returns genuinely shared multimodal mathematical/physical transport; R6 then freezes the first
+bounded production Athena mathematics/physics ecology. No later deed begins while its predecessor
+is open.
 
 **X0--X2 are parked, not revoked.** Heterogeneous SSM/diffusion/acoustic/perception/production
 fusion follows only after R6, unless Brandon explicitly supersedes this order, and the source is

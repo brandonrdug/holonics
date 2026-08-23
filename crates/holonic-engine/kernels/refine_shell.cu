@@ -200,6 +200,37 @@ extern "C" __global__ void conduct_native_trace(
     }
 }
 
+/// **Plural addressed words cross one resident front without padding or a host phase loop.**
+///
+/// `word_offset` and `trace_offset` are exact prefix sums derived from the admitted word family.
+/// One lane owns one complete ordered word.  Shared immutable action is mounted once; disjoint
+/// trace intervals are the apparatus footprint which licenses the co-present front.  Different
+/// words are never reordered or padded into an authored context extent.
+extern "C" __global__ void conduct_native_ragged_trace(
+    const uint32_t *generator_table,
+    const uint32_t *words,
+    const uint32_t *word_offset,
+    const uint32_t *native_start,
+    const uint32_t *trace_offset,
+    uint32_t *native_trace,
+    uint32_t front_count,
+    uint32_t state_count)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= front_count) {
+        return;
+    }
+    const uint32_t word_begin = word_offset[at];
+    const uint32_t word_end = word_offset[at + 1U];
+    const uint32_t trace_begin = trace_offset[at];
+    uint32_t state = native_start[at];
+    native_trace[trace_begin] = state;
+    for (uint32_t step = word_begin; step < word_end; ++step) {
+        state = generator_table[words[step] * state_count + state];
+        native_trace[trace_begin + (step - word_begin) + 1U] = state;
+    }
+}
+
 __device__ __forceinline__ uint32_t recurrent_native_trace(
     const uint32_t *generator_table,
     uint32_t generator,

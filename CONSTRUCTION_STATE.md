@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R3 release admission and entry into R4 of the R0--R6
+**Currency:** 2026-08-22 after Deed R4 release admission and entry into R5 of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — RETURNED WORLD CONSTRAINTS CULTIVATED ONE ATTRIBUTABLE LOCAL RELATION,
-R3 PASSED, AND R4 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE RETAINED CAUSAL BOUNDARY CARRIED THE REMOTE INTERIOR, R4 PASSED, AND R5
+IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -357,19 +357,36 @@ under concurrent formal commits and passed their permitted named retake. Candida
 and
 [`research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md`](research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md).
 
-**NEXT DEED: R4 — THE RETAINED CAUSAL BOUNDARY CARRIES LONG-HORIZON INQUIRY AND REOPENS
+**R4 PASSED — THE RETAINED CAUSAL BOUNDARY CARRIED THE REMOTE INTERIOR AND REOPENED
 LAWFULLY.**
+[established-bounded; implemented-exact; measured] Ten exact historical occurrences departed from
+the hot standing into one decoder and three complete reconstruction fibres. Every declared future
+receiver and generator word factors through three native boundary states, while a richer
+exact-interior receiver reopens a prior fibre. Source replay, uncondensed history, and compact
+boundary each crossed the RTX 4080 SUPER; detached remount reconstructed 24,100 historical octets
+and returned four ragged fronts in one launch/synchronization without forbidden source access.
+Three independent fronts carry exact interchange, noncommuting words preserve distinct endpoints
+and rank-one holonomy, and all seven coordinates of the complete product fall strictly. The
+26-file product has 4,405,635 octets and rolled SHA-256
+`07abbd8ad5bc5dfed954ca5be2439ce416993ef1d58d67cf15e85d18f7ac1fbb`.
+The sole release receiver passed all thirteen scopes in 296 seconds: 2,841 tests passed, none
+failed, 29 were explicitly ignored, and every example target type-checked. Candidate and
+admission:
+[`research/records/2026-08-22_THE_RETAINED_CAUSAL_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_THE_RICHER_RECEIVER_REOPENED_IT_AND_R4_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_RETAINED_CAUSAL_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_THE_RICHER_RECEIVER_REOPENED_IT_AND_R4_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md`](research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md).
+
+**NEXT DEED: R5 — MATHEMATICAL AND PHYSICAL FACES SHARE NATIVE MULTIMODAL TRANSPORT.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R4 must make the retained causal boundary carry a remote earlier construction into a later proof,
-physical consequence, correction, or diagram; compare source replay, uncondensed history and
-compactified boundary; return every factoring response, departed interior, decoder fibre,
-separator and holonomy; reopen lawfully under a richer receiver; survive detached revisit; descend
-strictly in the complete product; and cover independent card fronts only through proved
-interchange or typed reduction.
+R5 must return real text/notation and vector/raster/vision occurrences at separate typed ports;
+native spatial incidence, orientation, chart, scale, uncertainty, and lineage before text
+mediation; a common-world pullback with generator-wise naturality; one shared subcomplex enacted
+once; complete modality fibres and decoder; a held-out consequence which requires the joint
+ecology; certified vector/raster/mesh agreement; shared and port-local ablation; detached strict
+descent; and an exact selectable dissection atlas.
 
-[open] R5--R6 remain ordered behind R4: mathematical/physical multimodal transport and the first
-bounded production Athena freeze.
+[open] R6 remains ordered behind R5: the first bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
 GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new
 audio/video or production modalities, all Gemma behavior and conventional tensor-container

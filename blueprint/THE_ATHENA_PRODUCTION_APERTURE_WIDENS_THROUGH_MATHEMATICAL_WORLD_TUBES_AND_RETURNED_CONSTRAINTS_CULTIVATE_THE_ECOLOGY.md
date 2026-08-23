@@ -3,15 +3,15 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0--I5 and R0--R3 passed their release receivers. R4 is the active deed.
+**Current boundary:** I0--I5 and R0--R4 passed their release receivers. R5 is the active deed.
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
 
 **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry,
 dynamic delta, retained-context, and product-grade contracts; `project-postulate` for construction
-and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R3
-returns; and `open` for R4--R6 and every later heterogeneous-source deed.
+and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R4
+returns; and `open` for R5--R6 and every later heterogeneous-source deed.
 
 **Milestone derivation:**
 [`2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -365,7 +365,7 @@ and
 
 ### R4 — the retained causal boundary carries long-horizon inquiry and reopens lawfully
 
-[open] R4 is the active deed. It makes the Retained Continuation Section the load-bearing context object.
+[established-bounded; implemented-exact; measured] R4 makes the Retained Continuation Section the load-bearing context object for its declared long-horizon inquiry.
 
 R4 declares an addressed multi-passage inquiry in which a remote earlier construction is necessary
 for a later proof, physical consequence, correction, or diagram. It compares:
@@ -389,9 +389,25 @@ R4 must return:
 No fixed context length, summary string, vector database, copied KV array, lossy conversation
 digest, or hidden lookup passes as the retained boundary.
 
+[established-bounded; implemented-exact; measured] The admitted return carries ten exact remote
+historical interiors through a three-state future-stable boundary, one exact decoder, and three
+complete reconstruction fibres. Every declared receiver and generator word factors through the
+boundary; a richer exact-interior receiver reopens a prior fibre. Source complete replay,
+uncondensed native history, and compact boundary each crossed the RTX 4080 SUPER. Fresh-process
+remount reconstructed 24,100 historical octets and returned four ragged inquiry fronts in one
+launch/synchronization without a forbidden source descriptor or intermediate host semantic
+callback. Three independent fronts carry exact interchange; `[0,1]` and `[1,0]` retain different
+endpoints and rank-one holonomy. Every coordinate of the matched
+artifact/decoder/fibre/work/span/residency/transfer product fell strictly. The 26-file product's
+rolled identity is `07abbd8ad5bc5dfed954ca5be2439ce416993ef1d58d67cf15e85d18f7ac1fbb`.
+Candidate and admission:
+[`../research/records/2026-08-22_THE_RETAINED_CAUSAL_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_THE_RICHER_RECEIVER_REOPENED_IT_AND_R4_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_RETAINED_CAUSAL_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_THE_RICHER_RECEIVER_REOPENED_IT_AND_R4_AWAITS_ADMISSION.md)
+and
+[`../research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md`](../research/records/2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md).
+
 ### R5 — mathematical and physical faces share native multimodal transport
 
-[open] R5 widens I4 from a bounded shared text/vision action to an inquiry whose mathematical or
+[open] R5 is the active deed. It widens I4 from a bounded shared text/vision action to an inquiry whose mathematical or
 physical consequence genuinely requires several media faces.
 
 R5 must return:

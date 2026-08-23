@@ -35,6 +35,7 @@ mod lineage;
 mod methods;
 mod morphology;
 mod recurrence;
+mod retained_boundary;
 mod sameness;
 #[cfg(test)]
 mod tests;
@@ -74,6 +75,13 @@ pub use recurrence::{
     DerivationDecoderFibre, DerivationFibreMember, DerivationHigherCell, DerivationRecurrenceError,
     DerivationRecurrenceRest, DerivationSeparator, DerivationSourceEdge, DerivationSourceState,
     MaterialDerivationPassage, RequestedReceiverFactor, DERIVATION_RECURRENCE_SCHEMA,
+};
+pub use retained_boundary::{
+    AddressedHistorySystem, BoundaryRecurrence, CultivatedActionLineage, HistoricalInterior,
+    HistoricalSourceMember, LongHorizonBoundaryError, LongHorizonRetainedBoundary,
+    OrderedBoundaryHolonomy, RetainedBoundaryDecoder, RetainedBoundaryFibres,
+    RetainedBoundaryStanding, RicherReceiverReopening, LONG_HORIZON_DECODER_SCHEMA,
+    LONG_HORIZON_FIBRES_SCHEMA, LONG_HORIZON_STANDING_SCHEMA,
 };
 pub use sameness::{
     ByteRelation, ByteRelationReceipt, CarrierEqualityRelation, ClassificationReceiverReturn,

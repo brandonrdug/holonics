@@ -163,6 +163,8 @@ pub enum CudaRefineError {
     MaterialOperationPassageShape,
     #[error("the returned-constraint incidence, covector, and native action do not form one dynamic morphology passage")]
     DynamicMorphologyShape,
+    #[error("the ragged native words, offsets, and starting occurrences do not form one addressed front")]
+    RaggedNativePassageShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -334,6 +336,7 @@ pub struct CudaRefineExecutor {
     claim: CuFunction,
     native_word: CuFunction,
     native_trace: CuFunction,
+    native_ragged_trace: CuFunction,
     returned_recurrence: CuFunction,
     dynamic_morphology: CuFunction,
     condensed_recurrence: CuFunction,
@@ -406,6 +409,7 @@ impl CudaRefineExecutor {
             let mut claim = ptr::null_mut();
             let mut native_word = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
+            let mut native_ragged_trace = ptr::null_mut();
             let mut returned_recurrence = ptr::null_mut();
             let mut dynamic_morphology = ptr::null_mut();
             let mut condensed_recurrence = ptr::null_mut();
@@ -439,6 +443,11 @@ impl CudaRefineExecutor {
                     &mut native_trace as *mut CuFunction,
                     c"conduct_native_trace",
                     "cuModuleGetFunction(conduct_native_trace)",
+                ),
+                (
+                    &mut native_ragged_trace as *mut CuFunction,
+                    c"conduct_native_ragged_trace",
+                    "cuModuleGetFunction(conduct_native_ragged_trace)",
                 ),
                 (
                     &mut returned_recurrence as *mut CuFunction,
@@ -500,6 +509,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 native_trace,
+                native_ragged_trace,
                 returned_recurrence,
                 dynamic_morphology,
                 condensed_recurrence,
@@ -526,6 +536,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 native_trace,
+                native_ragged_trace,
                 returned_recurrence,
                 dynamic_morphology,
                 condensed_recurrence,
@@ -734,6 +745,22 @@ pub struct DeviceNativeTrace {
     pub native_trace: Vec<u32>,
     pub trace_stride: usize,
     pub starting_occurrences: usize,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// Plural ordered words and their exact ragged traces returned by one resident card front.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceRaggedNativeTrace {
+    /// Concatenated traces.  Each interval is selected by `trace_offsets[i..=i + 1]`.
+    pub native_trace: Vec<u32>,
+    pub trace_offsets: Vec<u32>,
+    pub front_count: usize,
     pub launches: u64,
     pub synchronizations: u64,
     pub block_threads: u32,
@@ -1323,6 +1350,166 @@ impl CudaRefineExecutor {
             host_ingress_octets: table_octets + word_octets + state_octets,
             host_egress_octets: trace_octets,
             resident_octets: table_octets + word_octets + state_octets + trace_octets,
+        })
+    }
+
+    /// Carry plural addressed words through one shared native action and return their exact
+    /// ragged traces after one terminal synchronization.
+    ///
+    /// `word_offsets` is the canonical prefix-sum boundary of `words`, with one interval per
+    /// starting occurrence.  Trace extents are therefore derived from the material word family;
+    /// there is no padded context capacity and no host callback between steps.
+    pub fn conduct_native_ragged_traces_on_device(
+        &mut self,
+        states: usize,
+        generators: usize,
+        generator_table: &[u32],
+        words: &[u32],
+        word_offsets: &[u32],
+        native_start: &[u32],
+    ) -> Result<DeviceRaggedNativeTrace, CudaRefineError> {
+        let expected = states
+            .checked_mul(generators)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let expected_offsets = native_start
+            .len()
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if generator_table.len() != expected {
+            return Err(CudaRefineError::NativeTableExtentDisagrees {
+                table_entries: generator_table.len(),
+                generators,
+                states,
+            });
+        }
+        if states == 0
+            || generators == 0
+            || native_start.is_empty()
+            || word_offsets.len() != expected_offsets
+            || word_offsets.first() != Some(&0)
+            || word_offsets.last().copied() != u32::try_from(words.len()).ok()
+            || word_offsets.windows(2).any(|pair| pair[0] > pair[1])
+        {
+            return Err(CudaRefineError::RaggedNativePassageShape);
+        }
+        if states > u32::MAX as usize
+            || generators > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = generator_table
+            .iter()
+            .chain(native_start)
+            .copied()
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+        if let Some(generator) = words
+            .iter()
+            .copied()
+            .find(|generator| *generator as usize >= generators)
+        {
+            return Err(CudaRefineError::NativeGeneratorOutsideFamily {
+                generator,
+                generators,
+            });
+        }
+
+        let mut trace_offsets = Vec::with_capacity(expected_offsets);
+        trace_offsets.push(0u32);
+        for pair in word_offsets.windows(2) {
+            let word_length = pair[1]
+                .checked_sub(pair[0])
+                .ok_or(CudaRefineError::RaggedNativePassageShape)?;
+            let next = trace_offsets
+                .last()
+                .copied()
+                .and_then(|offset| offset.checked_add(word_length)?.checked_add(1))
+                .ok_or(CudaRefineError::NativeActionTooWide)?;
+            trace_offsets.push(next);
+        }
+        let trace_entries = trace_offsets
+            .last()
+            .copied()
+            .ok_or(CudaRefineError::RaggedNativePassageShape)? as usize;
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let table = Buffer::of(generator_table)?;
+        let device_words = Buffer::of(words)?;
+        let device_word_offsets = Buffer::of(word_offsets)?;
+        let starts = Buffer::of(native_start)?;
+        let device_trace_offsets = Buffer::of(&trace_offsets)?;
+        let trace = Buffer::alloc(trace_entries * std::mem::size_of::<u32>())?;
+        let grid = self.grid_for(native_start.len() as u64)?;
+        let mut table_pointer = table.pointer;
+        let mut words_pointer = device_words.pointer;
+        let mut word_offsets_pointer = device_word_offsets.pointer;
+        let mut starts_pointer = starts.pointer;
+        let mut trace_offsets_pointer = device_trace_offsets.pointer;
+        let mut trace_pointer = trace.pointer;
+        let mut front_count = native_start.len() as u32;
+        let mut state_count = states as u32;
+        let mut arguments: [*mut c_void; 8] = [
+            &mut table_pointer as *mut u64 as *mut c_void,
+            &mut words_pointer as *mut u64 as *mut c_void,
+            &mut word_offsets_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut trace_offsets_pointer as *mut u64 as *mut c_void,
+            &mut trace_pointer as *mut u64 as *mut c_void,
+            &mut front_count as *mut u32 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.native_ragged_trace,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_native_ragged_trace)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut native_trace = vec![0u32; trace_entries];
+        trace.read(&mut native_trace)?;
+        let table_octets = std::mem::size_of_val(generator_table) as u64;
+        let word_octets = std::mem::size_of_val(words) as u64;
+        let offset_octets = std::mem::size_of_val(word_offsets) as u64;
+        let start_octets = std::mem::size_of_val(native_start) as u64;
+        let trace_offset_octets = std::mem::size_of_val(trace_offsets.as_slice()) as u64;
+        let trace_octets = std::mem::size_of_val(native_trace.as_slice()) as u64;
+        Ok(DeviceRaggedNativeTrace {
+            native_trace,
+            trace_offsets,
+            front_count: native_start.len(),
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: native_start.len() as u32,
+            host_ingress_octets: table_octets
+                + word_octets
+                + offset_octets
+                + start_octets
+                + trace_offset_octets,
+            host_egress_octets: trace_octets,
+            resident_octets: table_octets
+                + word_octets
+                + offset_octets
+                + start_octets
+                + trace_offset_octets
+                + trace_octets,
         })
     }
 
@@ -3159,6 +3346,33 @@ mod tests {
         assert!(!declined.committed);
         assert_eq!(declined.successor_action, declined.predecessor_action);
         assert_eq!(declined.successor_trace, declined.predecessor_trace);
+    }
+
+    /// R4's resident context passage: distinct causal words retain their own extents and order
+    /// while the shared action crosses only once.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_plural_ragged_words_without_reordering_them() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        // Generator 0 is the R3 predecessor action; generator 1 is its cultivated successor.
+        let returned = card
+            .conduct_native_ragged_traces_on_device(
+                3,
+                2,
+                &[0, 0, 2, 2, 0, 2],
+                &[0, 1, 1, 0, 1],
+                &[0, 2, 4, 5],
+                &[1, 1, 0],
+            )
+            .expect("the plural addressed words return");
+        assert_eq!(returned.trace_offsets, vec![0, 3, 6, 8]);
+        assert_eq!(&returned.native_trace[0..3], &[1, 0, 2]);
+        assert_eq!(&returned.native_trace[3..6], &[1, 0, 0]);
+        assert_eq!(&returned.native_trace[6..8], &[0, 2]);
+        assert_ne!(returned.native_trace[2], returned.native_trace[5]);
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
+        assert_eq!(returned.active_lanes, 3);
     }
 
     /// I3's recurrent condensation: a visited-incidence front returns both physical routes and
