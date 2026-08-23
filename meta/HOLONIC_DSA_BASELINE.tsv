@@ -33,7 +33,7 @@ crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
 crates/holonic-engine/src/cross_chart.rs	.clone()=32	.collect()=1	Vec=24
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=21	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
-crates/holonic-engine/src/cuda_refine.rs	.collect()=13	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=133
+crates/holonic-engine/src/cuda_refine.rs	.collect()=13	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=139
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10
 crates/holonic-engine/src/cultivated_rest/directory.rs	.clone()=7	.collect()=1	BTreeSet=2	Vec=5
 crates/holonic-engine/src/cultivated_rest/mod.rs	Vec=4
@@ -307,6 +307,8 @@ soma/life/src/mathematical_source.rs	.clone()=10	.collect()=8	.into_iter()=1	BTr
 soma/life/src/mathematical_source/acoustic.rs	.collect()=2	Vec=8
 soma/life/src/mathematical_source/correspondence.rs	.clone()=21	.collect()=8	BTreeMap=5	BTreeSet=10	Vec=12
 soma/life/src/mathematical_source/optical_recovery.rs	.clone()=9	.collect()=28	.flat_map()=1	.into_iter()=7	BTreeMap=5	BTreeSet=12	Vec=54
+soma/life/src/mathematical_source/optical_holons.rs	.clone()=1	.collect()=3	BTreeMap=2	BTreeSet=3	Vec=31
+soma/life/src/mathematical_source/optical_holons/growth.rs	.clone()=43	.collect()=53	.flat_map()=6	.into_iter()=11	BTreeMap=10	BTreeSet=18	Vec=83
 soma/life/src/mathematical_source/raster.rs	.clone()=6	Vec=5	VecDeque=2
 soma/life/src/mathematical_source/tests.rs	.clone()=8	BTreeSet=1
 soma/life/src/morphological_language.rs	BTreeMap=1	BTreeSet=1

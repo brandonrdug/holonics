@@ -700,6 +700,7 @@ fn found_complex(
 
 mod acoustic;
 mod correspondence;
+mod optical_holons;
 mod optical_recovery;
 mod raster;
 #[cfg(test)]
@@ -709,6 +710,14 @@ pub use acoustic::{AcousticFrame, ExactAcousticOccurrence, ExactAcousticRefusal}
 pub use correspondence::{
     compare_presentations, correspond, correspondence_demand, CoTestimonyFiber, ComparedContact,
     CorrespondenceCandidate, PresentationComparison,
+};
+pub use optical_holons::{
+    grow_optical_holons, DeviceOpticalHolonReceipt, EquationGlyphFibre,
+    ExactOpticalIncidenceReceipt, ExactOpticalScale, HierarchicalOpticalPassage,
+    NativeEquationConstraintSection, NativeHierarchicalOpticalConsequence, OpticalAlternativeCover,
+    OpticalFormMember, OpticalHolon, OpticalHolonGrain, OpticalHolonIncidence,
+    OpticalHolonIncidenceKind, OpticalHolonIntervention, OpticalLocalRelation, OpticalObjectClass,
+    OpticalObjectClassFace, RepeatedOpticalFormFibre, OPTICAL_HOLON_SCHEMA,
 };
 pub use optical_recovery::{
     ablate_optical_relation, bind_optical_glyph_testimony, compare_optical_controls,
@@ -751,6 +760,7 @@ pub enum SourceLayoutError {
     OpticalCoordinateNotIntegral,
     OpticalGlyphTestimonyAlreadyBound,
     OpticalGlyphOutsideExtent(u32),
+    OpticalHolon(String),
     Image(holonic_engine::image::ImageCarrierError),
     Incidence(IncidenceProductionError),
 }

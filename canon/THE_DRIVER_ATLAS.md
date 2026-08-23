@@ -144,7 +144,8 @@ exterior return enters, grades the return, and admits only after grading.
 
 | driver | grade | what it owns |
 |---|---|---|
-| `soma/life/examples/the_full_tower_emanates_through_an_addressed_continuation.rs` | source-detached resident recurrence candidate | one supplied native occurrence causes four exact 42-layer frontiers; each unique returned face founds the next addressed occurrence; the three-front rest detaches, remounts in a child process, and continues through the fourth frontier while complete plural fibres, exact work, and separate apparatus testimony remain bound |
+| `soma/life/examples/the_full_tower_emanates_through_an_addressed_continuation.rs` | release-admitted source-detached resident recurrence | one supplied native occurrence causes four exact 42-layer frontiers; each unique returned face founds the next addressed occurrence; the three-front rest detaches, remounts in a child process, and continues through the fourth frontier while complete plural fibres, exact work, and separate apparatus testimony remain bound |
+| `soma/life/examples/the_optical_holons_grow_across_scales.rs` | release-admitted hierarchical optical incidence | one raw untranscribed page grows into simultaneous component, glyph/subfigure, decorated-symbol, term, assembly, equation, block and page occurrences; complete alternative covers and repeated-form fibres remain open, eighteen native ordered constraint sections retain their full glyph reconstruction, controls and ablation separate form from occurrence, and the semantic rest detaches from both raw source and card telemetry |
 
 **Later current** — re-entering the machine's own deposit:
 `the_reading_returns` (seals to disk, **drops the in-memory copy**, re-reads, then bit-flip and stem

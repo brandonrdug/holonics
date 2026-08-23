@@ -1391,6 +1391,162 @@ extern "C" __global__ void compare_contact_presentations(
     paired_class_out[at] = (uint8_t)(3u * left + right);
 }
 
+// One local optical incidence word. The low half is left->right and the high half is
+// right->left. The word retains simultaneous roles; it is not a preferred segmentation.
+static constexpr uint32_t OPTICAL_PROXIMITY = 1u << 0;
+static constexpr uint32_t OPTICAL_BASELINE = 1u << 1;
+static constexpr uint32_t OPTICAL_READING = 1u << 2;
+static constexpr uint32_t OPTICAL_SUPERSCRIPT = 1u << 3;
+static constexpr uint32_t OPTICAL_SUBSCRIPT = 1u << 4;
+static constexpr uint32_t OPTICAL_FRACTION_NUMERATOR = 1u << 5;
+static constexpr uint32_t OPTICAL_FRACTION_DENOMINATOR = 1u << 6;
+static constexpr uint32_t OPTICAL_RADICAL = 1u << 7;
+static constexpr uint32_t OPTICAL_DELIMITER = 1u << 8;
+static constexpr uint32_t OPTICAL_MATRIX_ROW = 1u << 9;
+static constexpr uint32_t OPTICAL_MATRIX_COLUMN = 1u << 10;
+static constexpr uint32_t OPTICAL_ALIGNMENT = 1u << 11;
+static constexpr uint32_t OPTICAL_DIAGRAM = 1u << 12;
+static constexpr uint32_t OPTICAL_TERM_CONTACT = 1u << 13;
+static constexpr uint32_t OPTICAL_LINE_CONTACT = 1u << 14;
+
+__device__ __forceinline__ uint64_t optical_gap(
+    int64_t left_lower,
+    int64_t left_upper,
+    int64_t right_lower,
+    int64_t right_upper)
+{
+    if (left_upper < right_lower) {
+        return (uint64_t)(right_lower - left_upper);
+    }
+    if (right_upper < left_lower) {
+        return (uint64_t)(left_lower - right_upper);
+    }
+    return 0ULL;
+}
+
+__device__ __forceinline__ uint32_t optical_directed(
+    uint32_t from,
+    uint32_t left,
+    uint32_t relation)
+{
+    return from == left ? relation : (relation << 16);
+}
+
+/// Classify the complete local optical-role word while the exact contact population remains on
+/// the card. Scale apertures are order statistics read from the presented glyph/subfigure body;
+/// the kernel owns no authored capacity or font constant.
+extern "C" __global__ void classify_optical_incidence(
+    const int64_t *lower_xyz,
+    const int64_t *upper_xyz,
+    const uint32_t *left_vertex,
+    const uint32_t *right_vertex,
+    const uint8_t *contact_class,
+    uint32_t *incidence_out,
+    uint32_t pair_count,
+    uint64_t term_gap,
+    uint64_t line_gap)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= pair_count) {
+        return;
+    }
+    if (contact_class[at] == 0u) {
+        incidence_out[at] = 0u;
+        return;
+    }
+
+    const uint32_t left = left_vertex[at];
+    const uint32_t right = right_vertex[at];
+    const uint64_t la = (uint64_t)left * 3ULL;
+    const uint64_t ra = (uint64_t)right * 3ULL;
+    const int64_t ll = lower_xyz[la];
+    const int64_t lt = lower_xyz[la + 1ULL];
+    const int64_t lr = upper_xyz[la];
+    const int64_t lb = upper_xyz[la + 1ULL];
+    const int64_t rl = lower_xyz[ra];
+    const int64_t rt = lower_xyz[ra + 1ULL];
+    const int64_t rr = upper_xyz[ra];
+    const int64_t rb = upper_xyz[ra + 1ULL];
+
+    const int64_t lw = lr - ll;
+    const int64_t lh = lb - lt;
+    const int64_t rw = rr - rl;
+    const int64_t rh = rb - rt;
+    const int64_t lcx = ll + lr;
+    const int64_t lcy = lt + lb;
+    const int64_t rcx = rl + rr;
+    const int64_t rcy = rt + rb;
+    const bool horizontal_overlap = ll < rr && rl < lr;
+    const bool vertical_overlap = lt < rb && rt < lb;
+    const uint64_t horizontal_gap = optical_gap(ll, lr, rl, rr);
+
+    uint32_t word = OPTICAL_PROXIMITY | (OPTICAL_PROXIMITY << 16);
+    const uint32_t earlier = lcx <= rcx ? left : right;
+    const uint32_t later = earlier == left ? right : left;
+    if (vertical_overlap) {
+        word |= optical_directed(earlier, left,
+                                 OPTICAL_BASELINE | OPTICAL_READING | OPTICAL_MATRIX_ROW);
+        if (horizontal_gap <= term_gap) {
+            word |= optical_directed(earlier, left, OPTICAL_TERM_CONTACT);
+        }
+        if (horizontal_gap <= line_gap) {
+            word |= optical_directed(earlier, left, OPTICAL_LINE_CONTACT);
+        }
+    }
+    if (horizontal_overlap) {
+        const uint32_t above = lcy <= rcy ? left : right;
+        const uint32_t below = above == left ? right : left;
+        word |= optical_directed(above, left, OPTICAL_MATRIX_COLUMN | OPTICAL_ALIGNMENT);
+        (void)below;
+    }
+
+    const int64_t earlier_height = earlier == left ? lh : rh;
+    const int64_t later_height = later == left ? lh : rh;
+    const int64_t earlier_y = earlier == left ? lcy : rcy;
+    const int64_t later_y = later == left ? lcy : rcy;
+    if (later_height < earlier_height) {
+        if (later_y < earlier_y) {
+            word |= optical_directed(earlier, left, OPTICAL_SUPERSCRIPT);
+        } else if (later_y > earlier_y) {
+            word |= optical_directed(earlier, left, OPTICAL_SUBSCRIPT);
+        }
+    }
+
+    for (uint32_t orientation = 0; orientation < 2; ++orientation) {
+        const uint32_t frame = orientation == 0 ? left : right;
+        const uint32_t member = orientation == 0 ? right : left;
+        const int64_t fw = orientation == 0 ? lw : rw;
+        const int64_t fh = orientation == 0 ? lh : rh;
+        const int64_t mw = orientation == 0 ? rw : lw;
+        const int64_t mh = orientation == 0 ? rh : lh;
+        const int64_t fcx = orientation == 0 ? lcx : rcx;
+        const int64_t fcy = orientation == 0 ? lcy : rcy;
+        const int64_t mcx = orientation == 0 ? rcx : lcx;
+        const int64_t mcy = orientation == 0 ? rcy : lcy;
+        const int64_t fl = orientation == 0 ? ll : rl;
+        const int64_t ml = orientation == 0 ? rl : ll;
+        if (fw > fh && horizontal_overlap) {
+            word |= optical_directed(
+                frame,
+                left,
+                mcy < fcy ? OPTICAL_FRACTION_NUMERATOR : OPTICAL_FRACTION_DENOMINATOR);
+        }
+        if (fh > fw && vertical_overlap) {
+            word |= optical_directed(frame, left, OPTICAL_DELIMITER);
+            if (fl <= ml) {
+                word |= optical_directed(frame, left, OPTICAL_RADICAL);
+            }
+        }
+        if (fw >= mw + mw || fh >= mh + mh) {
+            word |= optical_directed(frame, left, OPTICAL_DIAGRAM);
+        }
+        (void)fcx;
+        (void)mcx;
+        (void)member;
+    }
+    incidence_out[at] = word;
+}
+
 /// Retained: the fused material-and-law entry, kept because the separation front already conducts
 /// through it and a working carrier is not withdrawn to make a point about factoring.
 extern "C" __global__ void refine_shell(

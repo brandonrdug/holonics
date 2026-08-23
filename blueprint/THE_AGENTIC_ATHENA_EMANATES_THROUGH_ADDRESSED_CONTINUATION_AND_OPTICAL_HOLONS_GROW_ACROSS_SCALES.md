@@ -372,4 +372,5 @@ Read, in order:
 12. `canon/TABLET_THE_CAUSAL_PROFILE.md`; and
 13. only the source owners and evidence closure of the current E-deed.
 
-Do not reread the research archive by default. E0 is the sole next deed until it passes.
+Do not reread the research archive by default. E1 has passed; E2 is the sole next deed until it
+passes.

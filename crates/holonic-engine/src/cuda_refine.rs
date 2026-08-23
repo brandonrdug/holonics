@@ -159,6 +159,8 @@ pub enum CudaRefineError {
     ContactDistanceOverflow { task: usize },
     #[error("the contact passage extent cannot cross the exact 32-bit device wire")]
     ContactPassageTooWide,
+    #[error("the optical term gap {term_gap} exceeds its line gap {line_gap}")]
+    OpticalIncidenceAperture { term_gap: u64, line_gap: u64 },
     #[error("the material-operation world-tube arrays do not form one exact addressed passage")]
     MaterialOperationPassageShape,
     #[error("the returned-constraint incidence, covector, and native action do not form one dynamic morphology passage")]
@@ -363,6 +365,7 @@ pub struct CudaRefineExecutor {
     material_operation_world_tube: CuFunction,
     contact_pairs: CuFunction,
     contact_compare: CuFunction,
+    optical_incidence: CuFunction,
     device_name: String,
     block_x: u32,
     max_grid_x: u32,
@@ -444,6 +447,7 @@ impl CudaRefineExecutor {
             let mut material_operation_world_tube = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
             let mut contact_compare = ptr::null_mut();
+            let mut optical_incidence = ptr::null_mut();
             for (slot, symbol, operation) in [
                 (
                     &mut refine as *mut CuFunction,
@@ -555,6 +559,11 @@ impl CudaRefineExecutor {
                     c"compare_contact_presentations",
                     "cuModuleGetFunction(compare_contact_presentations)",
                 ),
+                (
+                    &mut optical_incidence as *mut CuFunction,
+                    c"classify_optical_incidence",
+                    "cuModuleGetFunction(classify_optical_incidence)",
+                ),
             ] {
                 if let Err(error) = driver(
                     cuModuleGetFunction(slot, module, symbol.as_ptr()),
@@ -592,6 +601,7 @@ impl CudaRefineExecutor {
                 material_operation_world_tube,
                 contact_pairs,
                 contact_compare,
+                optical_incidence,
             ] {
                 let mut value = 0i32;
                 driver(
@@ -627,6 +637,7 @@ impl CudaRefineExecutor {
                 material_operation_world_tube,
                 contact_pairs,
                 contact_compare,
+                optical_incidence,
                 device_name,
                 block_x,
                 max_grid_x,
@@ -1177,6 +1188,20 @@ pub struct DeviceMaterialOperationWorldTube {
 pub struct DeviceContactPassage {
     pub contact_classes: Vec<u8>,
     pub paired_classes: Vec<u8>,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One complete pair population whose contact and simultaneous optical-role words were enacted
+/// without a host boundary between the two resident laws. Each incidence word carries the
+/// low-half left-to-right and high-half right-to-left relation masks.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceOpticalIncidencePassage {
+    pub contact_classes: Vec<u8>,
+    pub incidence_words: Vec<u32>,
     pub launches: u64,
     pub synchronizations: u64,
     pub host_ingress_octets: u64,
@@ -2809,8 +2834,12 @@ impl CudaRefineExecutor {
             || context_states > u32::MAX as usize
             || context_word.len() > u32::MAX as usize
             || context_start.len() > u32::MAX as usize
-            || context_table.iter().any(|state| *state as usize >= context_states)
-            || context_start.iter().any(|state| *state as usize >= context_states)
+            || context_table
+                .iter()
+                .any(|state| *state as usize >= context_states)
+            || context_start
+                .iter()
+                .any(|state| *state as usize >= context_states)
             || context_word
                 .iter()
                 .any(|generator| *generator as usize >= context_generators)
@@ -2866,8 +2895,7 @@ impl CudaRefineExecutor {
         let derivation_predecessor_length_device = Buffer::alloc(derivation_length_octets)?;
         let derivation_successor_length_device = Buffer::alloc(derivation_length_octets)?;
         let derivation_selected_length_device = Buffer::alloc(derivation_length_octets)?;
-        let derivation_generator_withdrawn_length_device =
-            Buffer::alloc(derivation_length_octets)?;
+        let derivation_generator_withdrawn_length_device = Buffer::alloc(derivation_length_octets)?;
 
         let media_candidate_device = Buffer::of(media_candidate_species)?;
         let media_species_port_device = Buffer::of(media_species_port)?;
@@ -2896,8 +2924,7 @@ impl CudaRefineExecutor {
         let mut derivation_predecessor_pointer = derivation_predecessor_device.pointer;
         let mut derivation_successor_pointer = derivation_successor_device.pointer;
         let mut derivation_start_pointer = derivation_start_device.pointer;
-        let mut derivation_predecessor_trace_pointer =
-            derivation_predecessor_trace_device.pointer;
+        let mut derivation_predecessor_trace_pointer = derivation_predecessor_trace_device.pointer;
         let mut derivation_successor_trace_pointer = derivation_successor_trace_device.pointer;
         let mut derivation_selected_trace_pointer = derivation_selected_trace_device.pointer;
         let mut derivation_generator_withdrawn_trace_pointer =
@@ -3048,7 +3075,10 @@ impl CudaRefineExecutor {
         let selected_expected = if committed {
             (&derivation_successor_trace, &derivation_successor_lengths)
         } else {
-            (&derivation_predecessor_trace, &derivation_predecessor_lengths)
+            (
+                &derivation_predecessor_trace,
+                &derivation_predecessor_lengths,
+            )
         };
         if &derivation_selected_trace != selected_expected.0
             || &derivation_selected_lengths != selected_expected.1
@@ -3076,7 +3106,9 @@ impl CudaRefineExecutor {
         selected_cultivation_device.read(&mut selected_cultivation_state)?;
         if media_joint_anchors[0] != media_anchors as u64
             || selected_cultivation_state[0] != u32::from(committed)
-            || media_shared_withdrawn_totals.iter().any(|value| *value != 0)
+            || media_shared_withdrawn_totals
+                .iter()
+                .any(|value| *value != 0)
             || oriented_difference[0].unsigned_abs() != difference_magnitude[0]
             || oriented_difference[0].signum() != i64::from(difference_hand[0])
         {
@@ -3084,9 +3116,8 @@ impl CudaRefineExecutor {
         }
 
         let context_work = (context_start.len() as u128) * (context_word.len() as u128);
-        let derivation_work = (derivation_start.len() as u128)
-            * (derivation_states as u128)
-            * 4_u128;
+        let derivation_work =
+            (derivation_start.len() as u128) * (derivation_states as u128) * 4_u128;
         let media_work = (media_anchors as u128) * (media_species as u128);
         let reduction_work = (media_species as u128) * (media_ports as u128 + 2_u128) + 5_u128;
         let semantic_work = context_work + derivation_work + media_work + reduction_work;
@@ -3359,14 +3390,16 @@ impl CudaRefineExecutor {
             || cultivated.len() != families
             || families > u32::MAX as usize
             || dimension > u32::MAX as usize
-            || constraint_rows.iter().any(|rows| *rows as usize > dimension)
+            || constraint_rows
+                .iter()
+                .any(|rows| *rows as usize > dimension)
             || moduli.iter().any(|modulus| *modulus < 0 || *modulus == 1)
             || cultivated.iter().any(|value| *value > 1)
         {
             return Err(CudaRefineError::FixedSectionFamilyShape);
         }
-        let dimension_u64 = u64::try_from(dimension)
-            .map_err(|_| CudaRefineError::FixedSectionFamilyShape)?;
+        let dimension_u64 =
+            u64::try_from(dimension).map_err(|_| CudaRefineError::FixedSectionFamilyShape)?;
         let dot_work = dimension_u64
             .checked_mul(2)
             .and_then(|work| work.checked_sub(1))
@@ -3555,16 +3588,19 @@ impl CudaRefineExecutor {
             || invariant.iter().any(|value| *value > 1)
             || selected_route.iter().any(|value| *value > 2)
             || ablated_route.iter().any(|value| *value != 0 && *value != 2)
-            || selected_route.iter().enumerate().any(|(family, route)| match *route {
-                0 => invariant[family] != 1,
-                1 => {
-                    cultivated[family] != 1
-                        || constraint_held[family] != 1
-                        || invariant[family] != 1
-                }
-                2 => invariant[family] != 0,
-                _ => true,
-            })
+            || selected_route
+                .iter()
+                .enumerate()
+                .any(|(family, route)| match *route {
+                    0 => invariant[family] != 1,
+                    1 => {
+                        cultivated[family] != 1
+                            || constraint_held[family] != 1
+                            || invariant[family] != 1
+                    }
+                    2 => invariant[family] != 0,
+                    _ => true,
+                })
             || ablated_route
                 .iter()
                 .enumerate()
@@ -3572,31 +3608,30 @@ impl CudaRefineExecutor {
             || joint_cultivated[0] > 1
             || local_ablated_joint.iter().any(|value| *value > 1)
             || (joint_cultivated[0] == 1) != selected_route.iter().all(|route| *route == 1)
-            || local_ablated_joint.iter().enumerate().any(|(withdrawn, joint)| {
-                (*joint == 1)
-                    != selected_route.iter().enumerate().all(|(family, route)| {
-                        if family == withdrawn {
-                            ablated_route[family] == 1
-                        } else {
-                            *route == 1
-                        }
-                    })
-            })
+            || local_ablated_joint
+                .iter()
+                .enumerate()
+                .any(|(withdrawn, joint)| {
+                    (*joint == 1)
+                        != selected_route.iter().enumerate().all(|(family, route)| {
+                            if family == withdrawn {
+                                ablated_route[family] == 1
+                            } else {
+                                *route == 1
+                            }
+                        })
+                })
             || local_semantic_work
                 .iter()
                 .zip(selected_route.iter().enumerate())
                 .any(|(actual, (family, route))| {
-                    *actual
-                        != predicted_local_semantic_work
-                            [family * 2 + usize::from(*route != 1)]
+                    *actual != predicted_local_semantic_work[family * 2 + usize::from(*route != 1)]
                 })
             || local_semantic_span
                 .iter()
                 .zip(selected_route.iter().enumerate())
                 .any(|(actual, (family, route))| {
-                    *actual
-                        != predicted_local_semantic_span
-                            [family * 2 + usize::from(*route != 1)]
+                    *actual != predicted_local_semantic_span[family * 2 + usize::from(*route != 1)]
                 })
             || semantic_work[0] != predicted_returned_work
             || semantic_span[0] != predicted_returned_span
@@ -3944,7 +3979,6 @@ impl CudaRefineExecutor {
             resident_octets: (ingress + egress) as u64,
         })
     }
-
 
     /// Conduct the recurrent passage and every admitted heterogeneous face in one resident front.
     /// The decision is data crossing the front, not a host-selected semantic branch between I3 and
@@ -4906,6 +4940,193 @@ impl CudaRefineExecutor {
             resident_octets: (ingress + egress) as u64,
         })
     }
+
+    /// Return exact contact and every simultaneous local optical role without crossing a host
+    /// boundary between the two laws. The caller supplies scale apertures read from the material;
+    /// they are geometry receivers, not authored capacity bounds.
+    pub fn optical_incidence_on_device(
+        &mut self,
+        lower_xyz: &[i64],
+        upper_xyz: &[i64],
+        task_left: &[u32],
+        task_right: &[u32],
+        aperture_squared: u64,
+        term_gap: u64,
+        line_gap: u64,
+    ) -> Result<DeviceOpticalIncidencePassage, CudaRefineError> {
+        if lower_xyz.len() != upper_xyz.len() || lower_xyz.len() % 3 != 0 {
+            return Err(CudaRefineError::ContactCoordinateShape {
+                lower: lower_xyz.len(),
+                upper: upper_xyz.len(),
+            });
+        }
+        if task_left.len() != task_right.len() {
+            return Err(CudaRefineError::ContactIndexShape);
+        }
+        if term_gap > line_gap {
+            return Err(CudaRefineError::OpticalIncidenceAperture { term_gap, line_gap });
+        }
+        let vertices = lower_xyz.len() / 3;
+        if task_left.len() > u32::MAX as usize || vertices > u32::MAX as usize {
+            return Err(CudaRefineError::ContactPassageTooWide);
+        }
+        for (at, (lower, upper)) in lower_xyz.iter().zip(upper_xyz).enumerate() {
+            if lower > upper {
+                return Err(CudaRefineError::ReversedContactCoordinate {
+                    at,
+                    lower: *lower,
+                    upper: *upper,
+                });
+            }
+        }
+        for (task, (left, right)) in task_left.iter().zip(task_right).enumerate() {
+            for vertex in [*left, *right] {
+                if vertex as usize >= vertices {
+                    return Err(CudaRefineError::ContactVertexOutsidePopulation {
+                        task,
+                        vertex,
+                        vertices,
+                    });
+                }
+            }
+            let mut greatest_squared = 0_u128;
+            for axis in 0..3 {
+                let left_at = *left as usize * 3 + axis;
+                let right_at = *right as usize * 3 + axis;
+                let low = i128::from(lower_xyz[left_at]) - i128::from(upper_xyz[right_at]);
+                let high = i128::from(upper_xyz[left_at]) - i128::from(lower_xyz[right_at]);
+                if low < i128::from(i64::MIN)
+                    || low > i128::from(i64::MAX)
+                    || high < i128::from(i64::MIN)
+                    || high > i128::from(i64::MAX)
+                {
+                    return Err(CudaRefineError::ContactDistanceOverflow { task });
+                }
+                let far = low.unsigned_abs().max(high.unsigned_abs());
+                greatest_squared = greatest_squared
+                    .checked_add(
+                        far.checked_mul(far)
+                            .ok_or(CudaRefineError::ContactDistanceOverflow { task })?,
+                    )
+                    .ok_or(CudaRefineError::ContactDistanceOverflow { task })?;
+            }
+            if greatest_squared > u128::from(u64::MAX) {
+                return Err(CudaRefineError::ContactDistanceOverflow { task });
+            }
+        }
+
+        let pair_count = task_left.len();
+        if pair_count == 0 {
+            return Ok(DeviceOpticalIncidencePassage {
+                contact_classes: Vec::new(),
+                incidence_words: Vec::new(),
+                launches: 0,
+                synchronizations: 0,
+                host_ingress_octets: 0,
+                host_egress_octets: 0,
+                resident_octets: 0,
+            });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let lower = Buffer::of(lower_xyz)?;
+        let upper = Buffer::of(upper_xyz)?;
+        let left = Buffer::of(task_left)?;
+        let right = Buffer::of(task_right)?;
+        let classes = Buffer::alloc(pair_count * std::mem::size_of::<u8>())?;
+        let incidences = Buffer::alloc(pair_count * std::mem::size_of::<u32>())?;
+
+        let mut lower_pointer = lower.pointer;
+        let mut upper_pointer = upper.pointer;
+        let mut left_pointer = left.pointer;
+        let mut right_pointer = right.pointer;
+        let mut class_pointer = classes.pointer;
+        let mut pair_count_wire = pair_count as u32;
+        let mut aperture_wire = aperture_squared;
+        let mut classify_arguments: Vec<*mut c_void> = vec![
+            &mut lower_pointer as *mut u64 as *mut c_void,
+            &mut upper_pointer as *mut u64 as *mut c_void,
+            &mut left_pointer as *mut u64 as *mut c_void,
+            &mut right_pointer as *mut u64 as *mut c_void,
+            &mut class_pointer as *mut u64 as *mut c_void,
+            &mut pair_count_wire as *mut u32 as *mut c_void,
+            &mut aperture_wire as *mut u64 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.contact_pairs,
+                    self.grid_for(pair_count as u64)?,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    classify_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(classify_contact_pairs)",
+        )?;
+
+        let mut incidence_pointer = incidences.pointer;
+        let mut term_gap_wire = term_gap;
+        let mut line_gap_wire = line_gap;
+        let mut incidence_arguments: Vec<*mut c_void> = vec![
+            &mut lower_pointer as *mut u64 as *mut c_void,
+            &mut upper_pointer as *mut u64 as *mut c_void,
+            &mut left_pointer as *mut u64 as *mut c_void,
+            &mut right_pointer as *mut u64 as *mut c_void,
+            &mut class_pointer as *mut u64 as *mut c_void,
+            &mut incidence_pointer as *mut u64 as *mut c_void,
+            &mut pair_count_wire as *mut u32 as *mut c_void,
+            &mut term_gap_wire as *mut u64 as *mut c_void,
+            &mut line_gap_wire as *mut u64 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.optical_incidence,
+                    self.grid_for(pair_count as u64)?,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    incidence_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(classify_optical_incidence)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 2;
+
+        let mut contact_classes = vec![0_u8; pair_count];
+        classes.read(&mut contact_classes)?;
+        let mut incidence_words = vec![0_u32; pair_count];
+        incidences.read(&mut incidence_words)?;
+        let ingress = std::mem::size_of_val(lower_xyz)
+            + std::mem::size_of_val(upper_xyz)
+            + std::mem::size_of_val(task_left)
+            + std::mem::size_of_val(task_right)
+            + std::mem::size_of::<u64>() * 3;
+        let egress = std::mem::size_of_val(contact_classes.as_slice())
+            + std::mem::size_of_val(incidence_words.as_slice());
+        Ok(DeviceOpticalIncidencePassage {
+            contact_classes,
+            incidence_words,
+            launches: 2,
+            synchronizations: 1,
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: (ingress + egress) as u64,
+        })
+    }
 }
 
 #[cfg(test)]
@@ -5208,7 +5429,10 @@ mod tests {
         assert_eq!(returned.difference_magnitude, 2);
         assert_eq!(returned.difference_hand, 1);
         assert_eq!(returned.selected_cultivation_state, 1);
-        assert_eq!(returned.derivation_selected_trace, returned.derivation_successor_trace);
+        assert_eq!(
+            returned.derivation_selected_trace,
+            returned.derivation_successor_trace
+        );
         assert_eq!(returned.launches, 2);
         assert_eq!(returned.synchronizations, 1);
         assert_eq!(returned.typed_reductions, 1);
@@ -5286,7 +5510,10 @@ mod tests {
         assert_eq!(cultivated.semantic_span, 5);
         assert_eq!(cultivated.predicted_local_semantic_work, vec![5, 20, 5, 20]);
         assert_eq!(cultivated.predicted_local_semantic_span, vec![3, 6, 3, 6]);
-        assert_eq!(cultivated.host_ingress_octets + cultivated.host_egress_octets, 508);
+        assert_eq!(
+            cultivated.host_ingress_octets + cultivated.host_egress_octets,
+            508
+        );
         assert_eq!(cultivated.launches, 2);
         assert_eq!(cultivated.synchronizations, 1);
         assert_eq!(cultivated.typed_reductions, 1);
@@ -5337,7 +5564,6 @@ mod tests {
         assert_eq!(reopened.semantic_work, 13);
         assert_eq!(reopened.semantic_span, 5);
     }
-
 
     /// I5's composed front: recurrence and conserved text/vision faces are selected by one
     /// resident decision without a host semantic bridge.

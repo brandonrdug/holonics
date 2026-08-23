@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 593 research deposits current through 23 August 2026, including all 307
+`records/` contains 595 research deposits current through 23 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.
@@ -307,6 +307,19 @@ governs the rebuild.
   byte-identical same-closure rests, detached resumption, complete future fibres, and separated
   semantic/apparatus testimony; records 2,855 passing tests and all thirteen green release scopes,
   and places E1 at the hierarchical optical-holon frontier.
+- **E1 hierarchical optical-holon candidate:**
+  `records/2026-08-23_THE_OPTICAL_FIELD_GREW_FROM_COMPONENTS_INTO_NATIVE_CONSTRAINT_SECTIONS_AND_E1_AWAITS_RELEASE_ADMISSION.md`
+  — grows one raw mathematical page into simultaneous component-through-page occurrences,
+  complete alternative covers, repeated-form fibres and eighteen native ordered constraint
+  sections; separates object classification from geometry and semantic rest from card telemetry;
+  returns all six interventions, inspected overlays and source-detached remount while retaining the
+  release-admission boundary.
+- **E1 release admission:**
+  `records/2026-08-23_E1_RELEASE_RECEIVER_PASSED_THE_OPTICAL_FIELD_GREW_AND_E2_BEGINS.md`
+  — admits the simultaneous component-through-page incidence complex, eighteen native ordered
+  constraint sections, complete alternative and repeated-form fibres, controls, ablation,
+  inspected overlays and source-detached semantic remount; records 2,858 passing tests and all
+  thirteen green release scopes; and places E2 at complete foreign vision/audio tower conduct.
 
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.
