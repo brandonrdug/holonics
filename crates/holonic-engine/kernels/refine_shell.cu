@@ -681,6 +681,147 @@ extern "C" __global__ void conduct_joint_media_transport(
     }
 }
 
+/// **R6's plural production fronts remain disjoint until one typed reduction.**
+///
+/// Retained-context words, returned-constraint morphology, and held-out mathematical-media
+/// sections occupy disjoint output footprints.  The only shared writes are exact commutative
+/// additions inside the media population itself.  Extents come from the mounted rests and the
+/// entering inquiry; no response, context, or derivation capacity is supplied.
+extern "C" __global__ void conduct_production_aperture_fronts(
+    const uint32_t *context_table,
+    const uint32_t *context_word,
+    const uint32_t *context_start,
+    uint32_t *context_trace,
+    uint32_t *context_boundary_withdrawn_trace,
+    uint32_t context_cells,
+    uint32_t context_states,
+    uint32_t context_word_length,
+    const uint32_t *derivation_predecessor_action,
+    const uint32_t *derivation_successor_action,
+    const uint32_t *derivation_start,
+    uint32_t *derivation_predecessor_trace,
+    uint32_t *derivation_successor_trace,
+    uint32_t *derivation_selected_trace,
+    uint32_t *derivation_generator_withdrawn_trace,
+    uint32_t *derivation_predecessor_length,
+    uint32_t *derivation_successor_length,
+    uint32_t *derivation_selected_length,
+    uint32_t *derivation_generator_withdrawn_length,
+    uint32_t derivation_cells,
+    uint32_t derivation_states,
+    const uint32_t *media_candidate_species,
+    uint64_t *media_species_totals,
+    uint64_t *media_joint_anchors,
+    uint32_t media_anchors,
+    uint32_t media_species,
+    uint32_t committed)
+{
+    const uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at < context_cells) {
+        const uint32_t stride = context_word_length + 1U;
+        const uint64_t trace_at = (uint64_t)at * (uint64_t)stride;
+        uint32_t state = context_start[at];
+        context_trace[trace_at] = state;
+        context_boundary_withdrawn_trace[trace_at] = state;
+        for (uint32_t step = 0; step < context_word_length; ++step) {
+            state = context_table[context_word[step] * context_states + state];
+            context_trace[trace_at + (uint64_t)step + 1ULL] = state;
+            context_boundary_withdrawn_trace[trace_at + (uint64_t)step + 1ULL] =
+                context_start[at];
+        }
+    }
+    if (at < derivation_cells) {
+        const uint32_t stride = derivation_states + 1U;
+        const uint64_t trace_at = (uint64_t)at * (uint64_t)stride;
+        const uint32_t start = derivation_start[at];
+        derivation_predecessor_length[at] = dynamic_morphology_trace(
+            derivation_predecessor_action,
+            start,
+            derivation_states,
+            derivation_predecessor_trace + trace_at);
+        derivation_successor_length[at] = dynamic_morphology_trace(
+            derivation_successor_action,
+            start,
+            derivation_states,
+            derivation_successor_trace + trace_at);
+        derivation_selected_length[at] = dynamic_morphology_trace(
+            committed == 0U ? derivation_predecessor_action : derivation_successor_action,
+            start,
+            derivation_states,
+            derivation_selected_trace + trace_at);
+        // Withdrawing the generator is the identity endomap.  It is distinct from withdrawing
+        // cultivation, which restores the predecessor action above.
+        uint32_t *withdrawn = derivation_generator_withdrawn_trace + trace_at;
+        withdrawn[0] = start;
+        withdrawn[1] = start;
+        for (uint32_t fill = 2U; fill <= derivation_states; ++fill) {
+            withdrawn[fill] = start;
+        }
+        derivation_generator_withdrawn_length[at] = 2U;
+    }
+    if (at < media_anchors) {
+        bool joint = true;
+        const uint64_t base = (uint64_t)at * (uint64_t)media_species;
+        for (uint32_t species = 0; species < media_species; ++species) {
+            const uint32_t count = media_candidate_species[base + species];
+            joint = joint && count != 0U;
+            atomicAdd(
+                (unsigned long long *)&media_species_totals[species],
+                (unsigned long long)count);
+        }
+        if (joint) {
+            atomicAdd((unsigned long long *)media_joint_anchors, 1ULL);
+        }
+    }
+}
+
+/// **One typed junction joins the independent R6 fronts after their complete resident return.**
+///
+/// The reduction keeps each media species, their shared and local withdrawals, the oriented
+/// raster difference, and its hand.  It never selects a candidate or collapses the reconstruction
+/// fibres.  Default-stream order is the exact predecessor relation from the front launch.
+extern "C" __global__ void reduce_production_aperture_fronts(
+    const uint64_t *media_species_totals,
+    const uint32_t *media_species_port,
+    uint64_t *media_shared_withdrawn_totals,
+    uint64_t *media_local_withdrawn_totals,
+    uint64_t *total_joint_incidence,
+    int64_t *oriented_difference,
+    uint64_t *difference_magnitude,
+    int32_t *difference_hand,
+    uint32_t *selected_cultivation_state,
+    uint32_t media_species,
+    uint32_t media_ports,
+    uint32_t left_species,
+    uint32_t right_species,
+    uint32_t committed)
+{
+    if (blockIdx.x != 0U || threadIdx.x != 0U) {
+        return;
+    }
+    uint64_t total = 0ULL;
+    for (uint32_t species = 0; species < media_species; ++species) {
+        const uint64_t count = media_species_totals[species];
+        total += count;
+        media_shared_withdrawn_totals[species] = 0ULL;
+        for (uint32_t withdrawn_port = 0; withdrawn_port < media_ports; ++withdrawn_port) {
+            const uint64_t at = (uint64_t)species * (uint64_t)media_ports + withdrawn_port;
+            media_local_withdrawn_totals[at] =
+                media_species_port[species] == withdrawn_port ? 0ULL : count;
+        }
+    }
+    const uint64_t left = media_species_totals[left_species];
+    const uint64_t right = media_species_totals[right_species];
+    const bool positive = left >= right;
+    total_joint_incidence[0] = total;
+    difference_magnitude[0] = positive ? left - right : right - left;
+    difference_hand[0] = left == right ? 0 : (positive ? 1 : -1);
+    oriented_difference[0] = positive
+        ? (int64_t)(left - right)
+        : -(int64_t)(right - left);
+    selected_cultivation_state[0] = committed;
+}
+
 /// **The recurrent passage and every conserved modality face cross one inference front.**
 ///
 /// I3 and I4 retain different state spaces. Their only identification is the explicit binary

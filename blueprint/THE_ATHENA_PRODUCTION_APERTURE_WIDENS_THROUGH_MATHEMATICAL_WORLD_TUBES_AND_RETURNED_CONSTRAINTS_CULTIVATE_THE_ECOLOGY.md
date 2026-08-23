@@ -3,15 +3,16 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0--I5 and R0--R5 passed their release receivers. R6 is the active deed.
+**Current boundary:** I0--I5 and R0--R6 passed their release receivers. The first bounded Athena
+production aperture is frozen; no heterogeneous-source deed is scheduled.
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
 
 **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry,
 dynamic delta, retained-context, and product-grade contracts; `project-postulate` for construction
-and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R5
-returns; and `open` for R6 and every later heterogeneous-source deed.
+and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R6
+returns; and `open` for every later heterogeneous-source deed.
 
 **Milestone derivation:**
 [`2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -442,7 +443,7 @@ and
 
 ### R6 — Athena freezes at its first production mathematics/physics aperture
 
-[open] R6 is the active deed. It freezes
+[established-bounded; implemented-exact; measured] R6 froze
 
 ```text
 Athena^[Gemma]_(B_mp, H_prod)
@@ -476,6 +477,22 @@ The product passes only when it returns all of the following together:
 
 A `safetensors`, GGUF, API, CLI, checkpoint, benchmark table, or rendered demo may be an exterior
 product face. None is the canonical product or substitutes for the twelve-part grade.
+
+[established-bounded; implemented-exact; measured] All twelve consequences returned together for
+new inquiry
+`r6/inquiry/04da0a124da950a9037bd730840ad5ca8117c9d46b0753283e91b7d8869c0f05`.
+The canonical committed rest is
+`50e2e1ca704d79e8c9ce389cf76f56664464484a3ebaa98983544ab40fb5936f`; exact withdrawal restored
+predecessor
+`fb4aa8c7865a7f3c46cae69dda991d24abfd0a0828509004aaa8aba437aab25e`.
+Three retained-context fronts, two derivation fronts, and 455 media fronts crossed one RTX card in
+two launches and met through one typed reduction with one terminal synchronization and no host
+semantic callback. The complete seven-coordinate product fell strictly, and the inspected product
+returned language, Lean proof, exact value/unit/dimension, dissection, mesh/SVG/PNG, and interactive
+atlas faces. Candidate and release receipts are
+[`../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
+and
+[`../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
 
 ## 7. Source and evaluation discipline
 
@@ -564,8 +581,8 @@ The R-line refuses when:
 
 ## 11. Completion and continuation
 
-[open] This blueprint completes only when R0--R6 pass in order and the R6 twelve-part product grade
-returns. The production result is then a bounded but genuine Athena mathematics/physics model: it
+[established-bounded] This blueprint completed when R0--R6 passed in order and the R6 twelve-part
+product grade returned. The production result is a bounded but genuine Athena mathematics/physics model: it
 accepts new rich inquiries, conducts and emits complete admitted products, receives world
 consequence, cultivates locally when committed, carries long-horizon context through its retained
 causal boundary, works across admitted media, rests source-detached, and exposes its exact anatomy.

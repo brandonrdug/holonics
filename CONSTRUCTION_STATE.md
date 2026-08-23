@@ -4,12 +4,27 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R5 release admission and entry into R6 of the R0--R6
+**Currency:** 2026-08-22 after Deed R6 release admission and completion of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE MATHEMATICAL, VECTOR, AND RASTER FACES MET AT ONE NATIVE BOUNDARY, R5
-PASSED, AND R6 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — THE FIRST BOUNDED ATHENA MATHEMATICS/PHYSICS PRODUCTION ECOLOGY FROZE, R6
+PASSED, AND NO HETEROGENEOUS-SOURCE DEED IS SCHEDULED.**
+[established-bounded; implemented-exact; measured] `Athena^[Gemma]_(B_mp, H_prod)` now rests as
+one canonical source-detached ecology over the exact R0--R5 receiver/history family. New inquiry
+`r6/inquiry/04da0a124da950a9037bd730840ad5ca8117c9d46b0753283e91b7d8869c0f05` returned language,
+accepted Lean proof, exact value/unit/dimension, complete source/native dissection, exact
+mesh/SVG/PNG, and an inspected interactive atlas. A committed world return changed later conduct;
+targeted withdrawal restored the exact predecessor. Three context fronts, two derivation fronts,
+and 455 media fronts crossed the RTX card in two launches and met through one typed reduction with
+one terminal synchronization and no host semantic callback. All seven complete-product
+coordinates fell strictly. The sole complete release receiver passed all thirteen scopes in 316
+seconds: 2,846 tests passed, none failed, 31 were explicitly ignored, and every example target
+type-checked. Candidate and admission:
+[`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
+
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -393,20 +408,18 @@ admission:
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
 
-**NEXT DEED: R6 — ATHENA FREEZES AT ITS FIRST PRODUCTION MATHEMATICS/PHYSICS APERTURE.**
-[open] The active contract is
+**NO NEXT DEED IS SCHEDULED — R6 COMPLETED THE ACTIVE R0--R6 BLUEPRINT.**
+[established-bounded] The completed contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R6 must freeze one canonical source-detached generator-native ecology over the exact R0--R5
-receiver/history family; accept a new outside-development inquiry; conduct the complete productive
-cycle; return every licensed mathematical, language, proof, exact-value/unit and visual face;
-survive source absence and targeted withdrawals; return complete dissection and independent card
-fronts; exclude host semantic replay, fallback, float governance and ecology cloning; strictly
-descend in the complete product; and return calibrated apparatus and capability testimony.
+R6 returned all twelve product consequences and the complete release grade.
 
-X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
-GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new
-audio/video or production modalities, all Gemma behavior and conventional tensor-container
-expansion remain explicit open fibres.
+[open] X0--X2 remain parked until one explicit R6 open transport family selects a complementary
+source. No such source has been selected. The parked Qwen GGUF remains an unscheduled same-purpose
+close control. Unrestricted conversation, all mathematics/physics, unexcited Gemma conduct, new
+audio/video or production modalities, proof-route identity, SSM/diffusion/sensorimotor fusion, and
+conventional tensor-container expansion remain explicit open fibres. A new construction authority
+must name the receiver question, complementary source occurrence, and returned consequence before
+implementation resumes.
 
 **Everything below is dated provenance and does not override this frontier or schedule work.**
 

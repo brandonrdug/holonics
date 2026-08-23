@@ -167,6 +167,8 @@ pub enum CudaRefineError {
     RaggedNativePassageShape,
     #[error("the media candidates, anchors, typed ports, action, and decoder do not form one joint passage")]
     JointMediaPassageShape,
+    #[error("the retained context, derivation, media sections, and receiver reduction do not form one production aperture")]
+    ProductionApertureShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -345,6 +347,8 @@ pub struct CudaRefineExecutor {
     heterogeneous_fusion: CuFunction,
     media_candidate_counts: CuFunction,
     joint_media_transport: CuFunction,
+    production_aperture_fronts: CuFunction,
+    production_aperture_reduction: CuFunction,
     inference_ecology: CuFunction,
     material_operation_world_tube: CuFunction,
     contact_pairs: CuFunction,
@@ -420,6 +424,8 @@ impl CudaRefineExecutor {
             let mut heterogeneous_fusion = ptr::null_mut();
             let mut media_candidate_counts = ptr::null_mut();
             let mut joint_media_transport = ptr::null_mut();
+            let mut production_aperture_fronts = ptr::null_mut();
+            let mut production_aperture_reduction = ptr::null_mut();
             let mut inference_ecology = ptr::null_mut();
             let mut material_operation_world_tube = ptr::null_mut();
             let mut contact_pairs = ptr::null_mut();
@@ -486,6 +492,16 @@ impl CudaRefineExecutor {
                     "cuModuleGetFunction(conduct_joint_media_transport)",
                 ),
                 (
+                    &mut production_aperture_fronts as *mut CuFunction,
+                    c"conduct_production_aperture_fronts",
+                    "cuModuleGetFunction(conduct_production_aperture_fronts)",
+                ),
+                (
+                    &mut production_aperture_reduction as *mut CuFunction,
+                    c"reduce_production_aperture_fronts",
+                    "cuModuleGetFunction(reduce_production_aperture_fronts)",
+                ),
+                (
                     &mut inference_ecology as *mut CuFunction,
                     c"conduct_inference_ecology",
                     "cuModuleGetFunction(conduct_inference_ecology)",
@@ -532,6 +548,8 @@ impl CudaRefineExecutor {
                 heterogeneous_fusion,
                 media_candidate_counts,
                 joint_media_transport,
+                production_aperture_fronts,
+                production_aperture_reduction,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -561,6 +579,8 @@ impl CudaRefineExecutor {
                 heterogeneous_fusion,
                 media_candidate_counts,
                 joint_media_transport,
+                production_aperture_fronts,
+                production_aperture_reduction,
                 inference_ecology,
                 material_operation_world_tube,
                 contact_pairs,
@@ -920,6 +940,51 @@ pub struct DeviceJointMediaTransport {
     pub synchronizations: u64,
     pub block_threads: u32,
     pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// R6's retained-context, derivation, and mathematical-media fronts after one resident typed
+/// reduction.  Every alternative and withdrawal remains explicit; `selected_*` alone follows the
+/// returned cultivation state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceProductionAperture {
+    pub context_trace: Vec<u32>,
+    pub context_boundary_withdrawn_trace: Vec<u32>,
+    pub context_trace_stride: usize,
+    pub derivation_predecessor_trace: Vec<u32>,
+    pub derivation_successor_trace: Vec<u32>,
+    pub derivation_selected_trace: Vec<u32>,
+    pub derivation_generator_withdrawn_trace: Vec<u32>,
+    pub derivation_predecessor_lengths: Vec<u32>,
+    pub derivation_successor_lengths: Vec<u32>,
+    pub derivation_selected_lengths: Vec<u32>,
+    pub derivation_generator_withdrawn_lengths: Vec<u32>,
+    pub derivation_trace_stride: usize,
+    pub media_species_totals: Vec<u64>,
+    pub media_shared_withdrawn_totals: Vec<u64>,
+    /// Species-major, withdrawn-port-minor.
+    pub media_local_withdrawn_totals: Vec<u64>,
+    pub media_joint_anchors: u64,
+    pub total_joint_incidence: u64,
+    pub oriented_difference: i64,
+    pub difference_magnitude: u64,
+    pub difference_hand: i32,
+    pub selected_cultivation_state: u32,
+    pub context_fronts: usize,
+    pub derivation_fronts: usize,
+    pub media_anchors: usize,
+    pub media_species: usize,
+    pub media_ports: usize,
+    pub committed: bool,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub typed_reductions: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub semantic_work: u128,
+    pub semantic_span: u64,
     pub host_ingress_octets: u64,
     pub host_egress_octets: u64,
     pub resident_octets: u64,
@@ -2553,6 +2618,416 @@ impl CudaRefineExecutor {
         })
     }
 
+    /// Conduct R6's context, derivation, and mathematical-media fronts independently, then join
+    /// only their complete exact returns through one typed reduction on the same CUDA stream.
+    /// There is one synchronization after both launches and no host semantic callback between.
+    #[allow(clippy::too_many_arguments)]
+    pub fn conduct_production_aperture_on_device(
+        &mut self,
+        context_table: &[u32],
+        context_states: usize,
+        context_word: &[u32],
+        context_start: &[u32],
+        derivation_predecessor_action: &[u32],
+        derivation_successor_action: &[u32],
+        derivation_start: &[u32],
+        media_candidate_species: &[u32],
+        media_anchors: usize,
+        media_species_port: &[u32],
+        media_ports: usize,
+        left_species: usize,
+        right_species: usize,
+        committed: bool,
+    ) -> Result<DeviceProductionAperture, CudaRefineError> {
+        let context_generators = context_table
+            .len()
+            .checked_div(context_states.max(1))
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let context_trace_stride = context_word
+            .len()
+            .checked_add(1)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let context_trace_entries = context_start
+            .len()
+            .checked_mul(context_trace_stride)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let derivation_states = derivation_predecessor_action.len();
+        let derivation_trace_stride = derivation_states
+            .checked_add(1)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let derivation_trace_entries = derivation_start
+            .len()
+            .checked_mul(derivation_trace_stride)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let media_species = media_species_port.len();
+        let media_entries = media_anchors
+            .checked_mul(media_species)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let local_entries = media_species
+            .checked_mul(media_ports)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        let active_lanes = context_start
+            .len()
+            .max(derivation_start.len())
+            .max(media_anchors);
+        let maximum_media_total = media_candidate_species
+            .iter()
+            .try_fold(0_u128, |total, value| total.checked_add(u128::from(*value)))
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        if context_states == 0
+            || context_table.len() != context_generators * context_states
+            || context_generators < 2
+            || context_word.is_empty()
+            || context_start.len() < 2
+            || context_states > u32::MAX as usize
+            || context_word.len() > u32::MAX as usize
+            || context_start.len() > u32::MAX as usize
+            || context_table.iter().any(|state| *state as usize >= context_states)
+            || context_start.iter().any(|state| *state as usize >= context_states)
+            || context_word
+                .iter()
+                .any(|generator| *generator as usize >= context_generators)
+            || derivation_states < 2
+            || derivation_successor_action.len() != derivation_states
+            || derivation_start.len() < 2
+            || derivation_states > u32::MAX as usize
+            || derivation_start.len() > u32::MAX as usize
+            || derivation_predecessor_action
+                .iter()
+                .chain(derivation_successor_action)
+                .chain(derivation_start)
+                .any(|state| *state as usize >= derivation_states)
+            || media_anchors == 0
+            || media_species < 3
+            || media_ports < 2
+            || media_entries != media_candidate_species.len()
+            || media_entries > u32::MAX as usize
+            || media_candidate_species.iter().any(|count| *count == 0)
+            || media_species_port
+                .iter()
+                .any(|port| *port as usize >= media_ports)
+            || left_species >= media_species
+            || right_species >= media_species
+            || left_species == right_species
+            || media_anchors > u32::MAX as usize
+            || media_species > u32::MAX as usize
+            || media_ports > u32::MAX as usize
+            || active_lanes == 0
+            || active_lanes > u32::MAX as usize
+            || maximum_media_total > i64::MAX as u128
+        {
+            return Err(CudaRefineError::ProductionApertureShape);
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let context_table_device = Buffer::of(context_table)?;
+        let context_word_device = Buffer::of(context_word)?;
+        let context_start_device = Buffer::of(context_start)?;
+        let context_trace_octets = context_trace_entries * std::mem::size_of::<u32>();
+        let context_trace_device = Buffer::alloc(context_trace_octets)?;
+        let context_withdrawn_device = Buffer::alloc(context_trace_octets)?;
+
+        let derivation_predecessor_device = Buffer::of(derivation_predecessor_action)?;
+        let derivation_successor_device = Buffer::of(derivation_successor_action)?;
+        let derivation_start_device = Buffer::of(derivation_start)?;
+        let derivation_trace_octets = derivation_trace_entries * std::mem::size_of::<u32>();
+        let derivation_predecessor_trace_device = Buffer::alloc(derivation_trace_octets)?;
+        let derivation_successor_trace_device = Buffer::alloc(derivation_trace_octets)?;
+        let derivation_selected_trace_device = Buffer::alloc(derivation_trace_octets)?;
+        let derivation_generator_withdrawn_trace_device = Buffer::alloc(derivation_trace_octets)?;
+        let derivation_length_octets = derivation_start.len() * std::mem::size_of::<u32>();
+        let derivation_predecessor_length_device = Buffer::alloc(derivation_length_octets)?;
+        let derivation_successor_length_device = Buffer::alloc(derivation_length_octets)?;
+        let derivation_selected_length_device = Buffer::alloc(derivation_length_octets)?;
+        let derivation_generator_withdrawn_length_device =
+            Buffer::alloc(derivation_length_octets)?;
+
+        let media_candidate_device = Buffer::of(media_candidate_species)?;
+        let media_species_port_device = Buffer::of(media_species_port)?;
+        let media_totals_octets = media_species * std::mem::size_of::<u64>();
+        let media_totals_device = Buffer::alloc(media_totals_octets)?;
+        media_totals_device.fill(0, media_totals_octets)?;
+        let media_joint_device = Buffer::alloc(std::mem::size_of::<u64>())?;
+        media_joint_device.fill(0, std::mem::size_of::<u64>())?;
+        let media_shared_device = Buffer::alloc(media_totals_octets)?;
+        let media_local_octets = local_entries * std::mem::size_of::<u64>();
+        let media_local_device = Buffer::alloc(media_local_octets)?;
+        let total_joint_device = Buffer::alloc(std::mem::size_of::<u64>())?;
+        let oriented_difference_device = Buffer::alloc(std::mem::size_of::<i64>())?;
+        let difference_magnitude_device = Buffer::alloc(std::mem::size_of::<u64>())?;
+        let difference_hand_device = Buffer::alloc(std::mem::size_of::<i32>())?;
+        let selected_cultivation_device = Buffer::alloc(std::mem::size_of::<u32>())?;
+
+        let mut context_table_pointer = context_table_device.pointer;
+        let mut context_word_pointer = context_word_device.pointer;
+        let mut context_start_pointer = context_start_device.pointer;
+        let mut context_trace_pointer = context_trace_device.pointer;
+        let mut context_withdrawn_pointer = context_withdrawn_device.pointer;
+        let mut context_cell_count = context_start.len() as u32;
+        let mut context_state_count = context_states as u32;
+        let mut context_word_length = context_word.len() as u32;
+        let mut derivation_predecessor_pointer = derivation_predecessor_device.pointer;
+        let mut derivation_successor_pointer = derivation_successor_device.pointer;
+        let mut derivation_start_pointer = derivation_start_device.pointer;
+        let mut derivation_predecessor_trace_pointer =
+            derivation_predecessor_trace_device.pointer;
+        let mut derivation_successor_trace_pointer = derivation_successor_trace_device.pointer;
+        let mut derivation_selected_trace_pointer = derivation_selected_trace_device.pointer;
+        let mut derivation_generator_withdrawn_trace_pointer =
+            derivation_generator_withdrawn_trace_device.pointer;
+        let mut derivation_predecessor_length_pointer =
+            derivation_predecessor_length_device.pointer;
+        let mut derivation_successor_length_pointer = derivation_successor_length_device.pointer;
+        let mut derivation_selected_length_pointer = derivation_selected_length_device.pointer;
+        let mut derivation_generator_withdrawn_length_pointer =
+            derivation_generator_withdrawn_length_device.pointer;
+        let mut derivation_cell_count = derivation_start.len() as u32;
+        let mut derivation_state_count = derivation_states as u32;
+        let mut media_candidate_pointer = media_candidate_device.pointer;
+        let mut media_totals_pointer = media_totals_device.pointer;
+        let mut media_joint_pointer = media_joint_device.pointer;
+        let mut media_anchor_count = media_anchors as u32;
+        let mut media_species_count = media_species as u32;
+        let mut decision = u32::from(committed);
+        let mut front_arguments: [*mut c_void; 27] = [
+            &mut context_table_pointer as *mut u64 as *mut c_void,
+            &mut context_word_pointer as *mut u64 as *mut c_void,
+            &mut context_start_pointer as *mut u64 as *mut c_void,
+            &mut context_trace_pointer as *mut u64 as *mut c_void,
+            &mut context_withdrawn_pointer as *mut u64 as *mut c_void,
+            &mut context_cell_count as *mut u32 as *mut c_void,
+            &mut context_state_count as *mut u32 as *mut c_void,
+            &mut context_word_length as *mut u32 as *mut c_void,
+            &mut derivation_predecessor_pointer as *mut u64 as *mut c_void,
+            &mut derivation_successor_pointer as *mut u64 as *mut c_void,
+            &mut derivation_start_pointer as *mut u64 as *mut c_void,
+            &mut derivation_predecessor_trace_pointer as *mut u64 as *mut c_void,
+            &mut derivation_successor_trace_pointer as *mut u64 as *mut c_void,
+            &mut derivation_selected_trace_pointer as *mut u64 as *mut c_void,
+            &mut derivation_generator_withdrawn_trace_pointer as *mut u64 as *mut c_void,
+            &mut derivation_predecessor_length_pointer as *mut u64 as *mut c_void,
+            &mut derivation_successor_length_pointer as *mut u64 as *mut c_void,
+            &mut derivation_selected_length_pointer as *mut u64 as *mut c_void,
+            &mut derivation_generator_withdrawn_length_pointer as *mut u64 as *mut c_void,
+            &mut derivation_cell_count as *mut u32 as *mut c_void,
+            &mut derivation_state_count as *mut u32 as *mut c_void,
+            &mut media_candidate_pointer as *mut u64 as *mut c_void,
+            &mut media_totals_pointer as *mut u64 as *mut c_void,
+            &mut media_joint_pointer as *mut u64 as *mut c_void,
+            &mut media_anchor_count as *mut u32 as *mut c_void,
+            &mut media_species_count as *mut u32 as *mut c_void,
+            &mut decision as *mut u32 as *mut c_void,
+        ];
+        let grid = self.grid_for(active_lanes as u64)?;
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.production_aperture_fronts,
+                    grid,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    front_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(conduct_production_aperture_fronts)",
+        )?;
+        self.launches += 1;
+
+        let mut media_species_port_pointer = media_species_port_device.pointer;
+        let mut media_shared_pointer = media_shared_device.pointer;
+        let mut media_local_pointer = media_local_device.pointer;
+        let mut total_joint_pointer = total_joint_device.pointer;
+        let mut oriented_difference_pointer = oriented_difference_device.pointer;
+        let mut difference_magnitude_pointer = difference_magnitude_device.pointer;
+        let mut difference_hand_pointer = difference_hand_device.pointer;
+        let mut selected_cultivation_pointer = selected_cultivation_device.pointer;
+        let mut media_port_count = media_ports as u32;
+        let mut left = left_species as u32;
+        let mut right = right_species as u32;
+        let mut reduction_arguments: [*mut c_void; 14] = [
+            &mut media_totals_pointer as *mut u64 as *mut c_void,
+            &mut media_species_port_pointer as *mut u64 as *mut c_void,
+            &mut media_shared_pointer as *mut u64 as *mut c_void,
+            &mut media_local_pointer as *mut u64 as *mut c_void,
+            &mut total_joint_pointer as *mut u64 as *mut c_void,
+            &mut oriented_difference_pointer as *mut u64 as *mut c_void,
+            &mut difference_magnitude_pointer as *mut u64 as *mut c_void,
+            &mut difference_hand_pointer as *mut u64 as *mut c_void,
+            &mut selected_cultivation_pointer as *mut u64 as *mut c_void,
+            &mut media_species_count as *mut u32 as *mut c_void,
+            &mut media_port_count as *mut u32 as *mut c_void,
+            &mut left as *mut u32 as *mut c_void,
+            &mut right as *mut u32 as *mut c_void,
+            &mut decision as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.production_aperture_reduction,
+                    1,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    reduction_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(reduce_production_aperture_fronts)",
+        )?;
+        self.launches += 1;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+
+        let mut context_trace = vec![0_u32; context_trace_entries];
+        let mut context_boundary_withdrawn_trace = vec![0_u32; context_trace_entries];
+        context_trace_device.read(&mut context_trace)?;
+        context_withdrawn_device.read(&mut context_boundary_withdrawn_trace)?;
+        let mut derivation_predecessor_trace = vec![0_u32; derivation_trace_entries];
+        let mut derivation_successor_trace = vec![0_u32; derivation_trace_entries];
+        let mut derivation_selected_trace = vec![0_u32; derivation_trace_entries];
+        let mut derivation_generator_withdrawn_trace = vec![0_u32; derivation_trace_entries];
+        derivation_predecessor_trace_device.read(&mut derivation_predecessor_trace)?;
+        derivation_successor_trace_device.read(&mut derivation_successor_trace)?;
+        derivation_selected_trace_device.read(&mut derivation_selected_trace)?;
+        derivation_generator_withdrawn_trace_device
+            .read(&mut derivation_generator_withdrawn_trace)?;
+        let mut derivation_predecessor_lengths = vec![0_u32; derivation_start.len()];
+        let mut derivation_successor_lengths = vec![0_u32; derivation_start.len()];
+        let mut derivation_selected_lengths = vec![0_u32; derivation_start.len()];
+        let mut derivation_generator_withdrawn_lengths = vec![0_u32; derivation_start.len()];
+        derivation_predecessor_length_device.read(&mut derivation_predecessor_lengths)?;
+        derivation_successor_length_device.read(&mut derivation_successor_lengths)?;
+        derivation_selected_length_device.read(&mut derivation_selected_lengths)?;
+        derivation_generator_withdrawn_length_device
+            .read(&mut derivation_generator_withdrawn_lengths)?;
+        if derivation_predecessor_lengths
+            .iter()
+            .chain(&derivation_successor_lengths)
+            .chain(&derivation_selected_lengths)
+            .chain(&derivation_generator_withdrawn_lengths)
+            .any(|length| *length < 2 || *length as usize > derivation_trace_stride)
+        {
+            return Err(CudaRefineError::ProductionApertureShape);
+        }
+        let selected_expected = if committed {
+            (&derivation_successor_trace, &derivation_successor_lengths)
+        } else {
+            (&derivation_predecessor_trace, &derivation_predecessor_lengths)
+        };
+        if &derivation_selected_trace != selected_expected.0
+            || &derivation_selected_lengths != selected_expected.1
+        {
+            return Err(CudaRefineError::ProductionApertureShape);
+        }
+
+        let mut media_species_totals = vec![0_u64; media_species];
+        let mut media_shared_withdrawn_totals = vec![0_u64; media_species];
+        let mut media_local_withdrawn_totals = vec![0_u64; local_entries];
+        let mut media_joint_anchors = [0_u64];
+        let mut total_joint_incidence = [0_u64];
+        let mut oriented_difference = [0_i64];
+        let mut difference_magnitude = [0_u64];
+        let mut difference_hand = [0_i32];
+        let mut selected_cultivation_state = [0_u32];
+        media_totals_device.read(&mut media_species_totals)?;
+        media_shared_device.read(&mut media_shared_withdrawn_totals)?;
+        media_local_device.read(&mut media_local_withdrawn_totals)?;
+        media_joint_device.read(&mut media_joint_anchors)?;
+        total_joint_device.read(&mut total_joint_incidence)?;
+        oriented_difference_device.read(&mut oriented_difference)?;
+        difference_magnitude_device.read(&mut difference_magnitude)?;
+        difference_hand_device.read(&mut difference_hand)?;
+        selected_cultivation_device.read(&mut selected_cultivation_state)?;
+        if media_joint_anchors[0] != media_anchors as u64
+            || selected_cultivation_state[0] != u32::from(committed)
+            || media_shared_withdrawn_totals.iter().any(|value| *value != 0)
+            || oriented_difference[0].unsigned_abs() != difference_magnitude[0]
+            || oriented_difference[0].signum() != i64::from(difference_hand[0])
+        {
+            return Err(CudaRefineError::ProductionApertureShape);
+        }
+
+        let context_work = (context_start.len() as u128) * (context_word.len() as u128);
+        let derivation_work = (derivation_start.len() as u128)
+            * (derivation_states as u128)
+            * 4_u128;
+        let media_work = (media_anchors as u128) * (media_species as u128);
+        let reduction_work = (media_species as u128) * (media_ports as u128 + 2_u128) + 5_u128;
+        let semantic_work = context_work + derivation_work + media_work + reduction_work;
+        let semantic_span = (context_word.len() as u64)
+            .max(derivation_states as u64)
+            .max((media_species * (media_ports + 2) + 5) as u64);
+        let ingress = std::mem::size_of_val(context_table)
+            + std::mem::size_of_val(context_word)
+            + std::mem::size_of_val(context_start)
+            + std::mem::size_of_val(derivation_predecessor_action)
+            + std::mem::size_of_val(derivation_successor_action)
+            + std::mem::size_of_val(derivation_start)
+            + std::mem::size_of_val(media_candidate_species)
+            + std::mem::size_of_val(media_species_port)
+            + 12 * std::mem::size_of::<u32>();
+        let egress = context_trace_octets * 2
+            + derivation_trace_octets * 4
+            + derivation_length_octets * 4
+            + media_totals_octets * 2
+            + media_local_octets
+            + 3 * std::mem::size_of::<u64>()
+            + std::mem::size_of::<i64>()
+            + std::mem::size_of::<i32>()
+            + std::mem::size_of::<u32>();
+        let resident = ingress
+            .checked_add(egress)
+            .ok_or(CudaRefineError::ProductionApertureShape)?;
+        Ok(DeviceProductionAperture {
+            context_trace,
+            context_boundary_withdrawn_trace,
+            context_trace_stride,
+            derivation_predecessor_trace,
+            derivation_successor_trace,
+            derivation_selected_trace,
+            derivation_generator_withdrawn_trace,
+            derivation_predecessor_lengths,
+            derivation_successor_lengths,
+            derivation_selected_lengths,
+            derivation_generator_withdrawn_lengths,
+            derivation_trace_stride,
+            media_species_totals,
+            media_shared_withdrawn_totals,
+            media_local_withdrawn_totals,
+            media_joint_anchors: media_joint_anchors[0],
+            total_joint_incidence: total_joint_incidence[0],
+            oriented_difference: oriented_difference[0],
+            difference_magnitude: difference_magnitude[0],
+            difference_hand: difference_hand[0],
+            selected_cultivation_state: selected_cultivation_state[0],
+            context_fronts: context_start.len(),
+            derivation_fronts: derivation_start.len(),
+            media_anchors,
+            media_species,
+            media_ports,
+            committed,
+            launches: 2,
+            synchronizations: 1,
+            typed_reductions: 1,
+            block_threads: self.block_x,
+            active_lanes: active_lanes as u32,
+            semantic_work,
+            semantic_span,
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: resident as u64,
+        })
+    }
+
     /// Conduct the recurrent passage and every admitted heterogeneous face in one resident front.
     /// The decision is data crossing the front, not a host-selected semantic branch between I3 and
     /// I4. Both alternative routes and all withdrawals return as dissection testimony.
@@ -3783,6 +4258,42 @@ mod tests {
         assert_eq!(returned.shared_ablated_consequence, vec![0, 2, 4, 6, 8, 10]);
         assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
+    }
+
+    /// R6's fronts share no mutable standing and meet only after the exact card reduction.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_the_bounded_production_aperture_without_a_host_semantic_bridge() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let returned = card
+            .conduct_production_aperture_on_device(
+                &[0, 0, 2, 2, 0, 2],
+                3,
+                &[0, 1, 0, 1],
+                &[0, 1, 2],
+                &[0, 0, 2],
+                &[2, 0, 2],
+                &[0, 1],
+                &[1, 2, 3, 2, 1, 4, 2, 1],
+                2,
+                &[0, 1, 2, 2],
+                3,
+                2,
+                3,
+                true,
+            )
+            .expect("the production passage returns");
+        assert_eq!(returned.context_trace_stride, 5);
+        assert_eq!(returned.media_species_totals, vec![2, 6, 5, 3]);
+        assert_eq!(returned.total_joint_incidence, 16);
+        assert_eq!(returned.oriented_difference, 2);
+        assert_eq!(returned.difference_magnitude, 2);
+        assert_eq!(returned.difference_hand, 1);
+        assert_eq!(returned.selected_cultivation_state, 1);
+        assert_eq!(returned.derivation_selected_trace, returned.derivation_successor_trace);
+        assert_eq!(returned.launches, 2);
+        assert_eq!(returned.synchronizations, 1);
+        assert_eq!(returned.typed_reductions, 1);
     }
 
     /// I5's composed front: recurrence and conserved text/vision faces are selected by one

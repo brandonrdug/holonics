@@ -35,6 +35,7 @@ mod lineage;
 mod methods;
 mod morphology;
 mod multimodal_transport;
+mod production_aperture;
 mod recurrence;
 mod retained_boundary;
 mod sameness;
@@ -80,6 +81,13 @@ pub use multimodal_transport::{
     NativeMediaConsequence, NativeMediaFibre, ProductLineage, SharedMediaContact,
     SharedMediaHigherCell, SharedMediaSubcomplex, SharedMediaVertex, UnmatchedMediaMember,
     JOINT_MEDIA_DECODER_SCHEMA, JOINT_MEDIA_FIBRES_SCHEMA, JOINT_MEDIA_STANDING_SCHEMA,
+};
+pub use production_aperture::{
+    ProductionAthenaError, ProductionAthenaRest, ProductionComponentIdentity,
+    ProductionDecision, ProductionFibreBinding, ProductionInquiry, ProductionInquiryFace,
+    ProductionInquiryPresentation, ProductionReceiver, ProductionReconstructionBoundary,
+    ProductionStandingJunction, ProductionWithdrawalReceipt, ProductionWorldReturn,
+    PRODUCTION_FIBRES_SCHEMA, PRODUCTION_INQUIRY_SCHEMA, PRODUCTION_JUNCTION_SCHEMA,
 };
 pub use recurrence::{
     DerivationDecoderFibre, DerivationFibreMember, DerivationHigherCell, DerivationRecurrenceError,

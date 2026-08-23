@@ -133,7 +133,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (283 deposits of 575)
+## 4 · The 2026-08 record line (285 deposits of 577)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -390,9 +390,11 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md` | R3 release receiver passed: returned constraints cultivated one local relation, and R4 begins |
 | `2026-08-22_R4_RELEASE_RECEIVER_PASSED_THE_RETAINED_BOUNDARY_CARRIED_THE_REMOTE_INTERIOR_AND_R5_BEGINS.md` | R4 release receiver passed: the retained boundary carried the remote interior, and R5 begins |
 | `2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md` | R5 release receiver passed: the media faces met natively, and R6 begins |
+| `2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md` | R6 release receiver passed: the bounded Athena production ecology froze, and the R0--R6 blueprint completed |
 | `2026-08-22_THE_ALGEBRAIC_RANK_IS_EFFECTIVELY_BOUNDED_AT_EVERY_MODULUS_AND_THE_RANK_SIDE_IS_A_FINITE_QUANTITY_FAMILY_WISE.md` | The algebraic rank is effectively bounded at every modulus, and the rank side is a finite quantity family-wise |
 | `2026-08-22_THE_ANALYTIC_ORDER_AT_FIVE_IS_EXACTLY_ONE_AND_THE_GROSS_ZAGIER_LANDMARK_IS_PASSED_BY_THE_INSTANCE_ROUTE.md` | The analytic order at five is exactly one, and the Gross–Zagier landmark is passed by the instance route |
 | `2026-08-22_THE_ATHENA_GEMMA_ECOLOGY_INFERRED_RETURNED_AND_REMOUNTED_AND_I5_AWAITS_RELEASE_ADMISSION.md` | The Athena-Gemma ecology inferred, returned and remounted, and I5 awaits release admission |
+| `2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md` | The bounded Athena mathematics/physics ecology returned its first production inquiry, and R6 awaits admission |
 | `2026-08-22_THE_COMPOSITION_IS_ACQUIRED_AND_THE_PIVOTS_ARE_FOUNDED_THE_POSITIVITY_SEAM_IS_THE_TRANSPLANT_INTO_RIEMANN.md` | The composition is acquired and the pivots are founded: the positivity seam is the transplant into Riemann |
 | `2026-08-22_THE_CONJECTURE_IS_POSED_DIRECTLY_AND_THE_ODD_SIGN_ALREADY_FORCES_THE_CENTRAL_VANISHING.md` | The conjecture is posed directly, and the odd sign already forces the central vanishing |
 | `2026-08-22_THE_DESCENT_IS_COMPLETE_THE_MORDELL_WEIL_GROUP_IS_FORMALLY_GENERATED_AND_THE_RANK_CLAUSE_HOLDS_WHOLE_AT_THE_RANK_ONE_INSTANCE.md` | The descent is complete, the Mordell–Weil group is formally generated, and the rank clause holds whole at the rank-one instance |
@@ -442,7 +444,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 47 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 48 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

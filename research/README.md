@@ -1,6 +1,6 @@
 # Research record
 
-`records/` contains 575 research deposits current through 22 August 2026, including all 307
+`records/` contains 577 research deposits current through 22 August 2026, including all 307
 laboratory deposits present at extraction on 3 August. They are chronological evidence, not an
 executable plan. Later records may correct earlier ones; the normalized canon in `../canon/`
 governs the rebuild.

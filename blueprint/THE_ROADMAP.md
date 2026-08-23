@@ -49,7 +49,7 @@ their presentations can be separated by exact operation, binder, unit, dimension
 proof, analytic, diagram, boundary, conservation and world-return receivers. The source labels do
 not route the body. The compatible receiver pullback and its noncommuting defects do.
 
-**R5 passed; R6 is the sole next deed.** R0 returned the complete rich-inquiry boundary; R1 closed
+**R6 passed; the R0--R6 production-aperture continuation is complete.** R0 returned the complete rich-inquiry boundary; R1 closed
 the rich-intake, typed-entry, and resident-join absences; R2 returned a material-founded complete
 derivation to its exact obstruction; R3 let actual returned constraints found one attributable
 local morphology; and R4 made a three-state retained causal boundary carry ten exact remote
@@ -58,14 +58,19 @@ revisit reconstructs 24,100 historical octets without source access, noncommutin
 order, and every coordinate of the complete product falls against matched source replay. R5 then
 returned 455 held-out notation anchors through separately typed notation, vector and raster ports,
 complete correspondence/reconstruction fibres, exact shared/local withdrawals, a certified
-mesh/SVG/PNG field, detached remount and strict seven-coordinate descent. R6 now freezes the first
-bounded production Athena mathematics/physics ecology. No later deed begins while its predecessor
-is open.
+mesh/SVG/PNG field, detached remount and strict seven-coordinate descent. R6 froze one canonical
+source-detached Athena mathematics/physics ecology; accepted a new rich inquiry outside its
+development closure; returned language, Lean proof, exact value/unit/dimension, exact visual and
+complete dissection faces; committed an exterior world return into changed later conduct; withdrew
+exactly; conducted independent context, derivation and media fronts on the single card; and fell
+strictly in all seven complete-product coordinates. Its sole complete receiver passed all thirteen
+scopes. No successor deed is scheduled until one R6 open transport family selects a genuinely
+complementary source.
 
 **X0--X2 are parked, not revoked.** Heterogeneous SSM/diffusion/acoustic/perception/production
-fusion follows only after R6, unless Brandon explicitly supersedes this order, and the source is
-then selected by one explicit R6 open transport family. The parked Qwen occurrence remains an
-optional same-purpose close control and schedules nothing.
+fusion can follow only when one explicit R6 open transport family selects a complementary source.
+No such source has yet been selected. The parked Qwen occurrence remains an optional same-purpose
+close control and schedules nothing.
 
 ## THE SINGLE-CARD PASSAGE CARRIES PHOENIX AND THE MATHEMATICS CODEC — 2026-08-19
 
@@ -274,20 +279,29 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**R5 PASSED; NEXT DEED: R6 — ATHENA FREEZES AT ITS FIRST PRODUCTION MATHEMATICS/PHYSICS
-APERTURE.** R5 retained the real page-10 notation, vector, four-connected raster and
+**R6 PASSED — THE FIRST BOUNDED ATHENA PRODUCTION MATHEMATICS/PHYSICS APERTURE IS FROZEN.**
+R5 retained the real page-10 notation, vector, four-connected raster and
 eight-connected raster faces at separate typed ports. All 455 notation anchors meet nonempty
 complete candidate fibres through one common-world pullback, while the undeclared direct
 vector/raster relation stays open. One shared card front returned every successor and shared/local
 withdrawal; the exact mesh/SVG/PNG field survived decode and incidence recount; fresh-process
 remount reopened each exact media interior without source access; and every complete-product
-coordinate fell strictly. The sole complete release command returned 2,844 passing tests, zero
-failures, 30 explicit ignores, every example target, and all thirteen green scopes in 297 seconds.
-Candidate and admission:
+coordinate fell strictly. R6 then composed I5 and R2--R5 into one non-cloneable production rest,
+accepted a new content-addressed inquiry, returned every licensed product through source-detached
+decline/commit passages, let a Lean world return change later conduct, restored its exact
+predecessor on withdrawal, and returned complete source/native anatomy and strict seven-coordinate
+descent. Three context fronts, two derivation fronts and 455 media fronts met through one resident
+typed reduction. The sole complete R6 release command returned 2,846 passing tests, zero failures,
+31 explicit ignores, every example target, and all thirteen green scopes in 316 seconds. R5
+candidate and admission:
 [`research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_MATHEMATICAL_VECTOR_AND_RASTER_FACES_MET_AT_ONE_NATIVE_BOUNDARY_AND_R5_AWAITS_ADMISSION.md)
 and
 [`research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md`](../research/records/2026-08-22_R5_RELEASE_RECEIVER_PASSED_THE_MEDIA_FACES_MET_NATIVELY_AND_R6_BEGINS.md).
-X0--X2 and Qwen remain unscheduled.
+R6 candidate and admission:
+[`research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_BOUNDED_ATHENA_MATHEMATICS_PHYSICS_ECOLOGY_RETURNED_ITS_FIRST_PRODUCTION_INQUIRY_AND_R6_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md`](../research/records/2026-08-22_R6_RELEASE_RECEIVER_PASSED_THE_BOUNDED_ATHENA_PRODUCTION_ECOLOGY_FROZE_AND_THE_R0_R6_BLUEPRINT_COMPLETED.md).
+X0--X2 and Qwen remain unscheduled; the next source must be selected by a declared R6 open family.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete
