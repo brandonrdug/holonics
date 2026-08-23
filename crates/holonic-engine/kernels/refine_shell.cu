@@ -301,6 +301,127 @@ extern "C" __global__ void return_and_recur_native(
     }
 }
 
+__device__ __forceinline__ uint32_t dynamic_morphology_trace(
+    const uint32_t *action,
+    uint32_t start,
+    uint32_t state_count,
+    uint32_t *trace)
+{
+    uint32_t state = start;
+    trace[0] = state;
+    for (uint32_t step = 0; step < state_count; ++step) {
+        const uint32_t next = action[state];
+        trace[step + 1U] = next;
+        bool repeated = false;
+        for (uint32_t prior = 0; prior <= step; ++prior) {
+            repeated = repeated || trace[prior] == next;
+        }
+        if (repeated) {
+            for (uint32_t fill = step + 2U; fill <= state_count; ++fill) {
+                trace[fill] = next;
+            }
+            return step + 2U;
+        }
+        state = next;
+    }
+    return 0U;
+}
+
+/// **Returned receiver current founds one local morphology on the card.**
+///
+/// `support_incidence` is the complete receiver-by-native-state incidence of the returned world
+/// occurrences and `receiver_covector` is their oriented exact current. Lane zero forms the
+/// integer adjoint `A^T r`, admits a commit only when every declared return is positive and its
+/// support is one local face, extends the finite action by the returned-constraint boundary, and
+/// changes only that supported relation. The remaining lanes then carry development and held-out
+/// starts through predecessor, successor, and exact withdrawal. Extent is the supplied incidence
+/// and finite state population; there is no authored trace depth or host phase callback.
+extern "C" __global__ void cultivate_dynamic_morphology(
+    const uint32_t *predecessor_action,
+    const int32_t *support_incidence,
+    const int32_t *receiver_covector,
+    const uint32_t *native_start,
+    int64_t *returned_adjoint,
+    uint32_t *predecessor_extended,
+    uint32_t *successor_action,
+    uint32_t *withdrawn_action,
+    uint32_t *predecessor_trace,
+    uint32_t *successor_trace,
+    uint32_t *withdrawn_trace,
+    uint32_t *predecessor_lengths,
+    uint32_t *successor_lengths,
+    uint32_t *withdrawn_lengths,
+    uint32_t *decision,
+    uint32_t *support_state,
+    uint32_t predecessor_state_count,
+    uint32_t return_count,
+    uint32_t start_count)
+{
+    if (blockIdx.x != 0U) {
+        return;
+    }
+    const uint32_t lane = threadIdx.x;
+    const uint32_t successor_state_count = predecessor_state_count + 1U;
+    if (lane == 0U) {
+        bool all_positive = return_count > 0U && predecessor_state_count > 0U;
+        uint32_t nonzero_support = 0U;
+        uint32_t supported = 0xffffffffU;
+        for (uint32_t receiver = 0; receiver < return_count; ++receiver) {
+            all_positive = all_positive && receiver_covector[receiver] > 0;
+        }
+        for (uint32_t state = 0; state < predecessor_state_count; ++state) {
+            int64_t current = 0;
+            for (uint32_t receiver = 0; receiver < return_count; ++receiver) {
+                const uint64_t at = (uint64_t)receiver * (uint64_t)predecessor_state_count
+                                  + (uint64_t)state;
+                current += (int64_t)support_incidence[at]
+                         * (int64_t)receiver_covector[receiver];
+            }
+            returned_adjoint[state] = current;
+            if (current != 0) {
+                ++nonzero_support;
+                supported = state;
+                all_positive = all_positive && current > 0;
+            }
+        }
+        const bool committed = all_positive && nonzero_support == 1U;
+        decision[0] = committed ? 1U : 0U;
+        support_state[0] = supported;
+        for (uint32_t state = 0; state < predecessor_state_count; ++state) {
+            predecessor_extended[state] = predecessor_action[state];
+            successor_action[state] = predecessor_action[state];
+            withdrawn_action[state] = predecessor_action[state];
+        }
+        const uint32_t returned_state = predecessor_state_count;
+        predecessor_extended[returned_state] = returned_state;
+        successor_action[returned_state] = returned_state;
+        withdrawn_action[returned_state] = returned_state;
+        if (committed) {
+            successor_action[supported] = returned_state;
+        }
+    }
+    __syncthreads();
+
+    for (uint32_t at = lane; at < start_count; at += blockDim.x) {
+        const uint64_t trace_at = (uint64_t)at * (uint64_t)(successor_state_count + 1U);
+        predecessor_lengths[at] = dynamic_morphology_trace(
+            predecessor_extended,
+            native_start[at],
+            successor_state_count,
+            predecessor_trace + trace_at);
+        successor_lengths[at] = dynamic_morphology_trace(
+            successor_action,
+            native_start[at],
+            successor_state_count,
+            successor_trace + trace_at);
+        withdrawn_lengths[at] = dynamic_morphology_trace(
+            withdrawn_action,
+            native_start[at],
+            successor_state_count,
+            withdrawn_trace + trace_at);
+    }
+}
+
 __device__ __forceinline__ uint32_t condensed_recurrent_trace(
     const uint32_t *successor_table,
     uint32_t start,

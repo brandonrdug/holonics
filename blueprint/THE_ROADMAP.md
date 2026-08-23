@@ -271,18 +271,20 @@ ablations and open exterior. The complete invocation returned 2,837 passing test
 Release admission:
 [`research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md`](../research/records/2026-08-22_I5_RELEASE_RECEIVER_PASSED_ATHENA_GEMMA_INFERRED_RETURNED_AND_REMOUNTED.md).
 
-**R2 PASSED; NEXT DEED: R3 — RETURNED CONSTRAINTS FOUND DYNAMIC LOCAL MORPHOLOGY.** R2 derived ten
-source states and five relations/generator members/pullback higher cells from the R1 passage,
-returned five plural starts, and condensed them to two native remaining-to-terminal phases with
-complete fibres and eight separators. Source and fresh source-detached passages commute in one RTX
-4080 SUPER launch each. All 35 requested receiver factors return. The compatible FamilySupport
-proof remains an exact obstruction because variable-level operations are absent; Eros did not
-counterfeit it. A generated Lean passage and certified SVG/PNG return genuine structural world
-constraints. The grade is 9/9 and the sole complete receiver passed 2,838 tests and all thirteen
-scopes. R3 must let those actual returns found or decline an attributable local generator,
-relation, port, or constitutive change; survive detached remount and held-out conduct; return
-holonomy and targeted withdrawal; and keep one owner of the ecology. Binary state selection does
-not pass. R4--R6 remain ordered and open. X0--X2 and Qwen remain unscheduled.
+**R3 PASSED; NEXT DEED: R4 — THE RETAINED CAUSAL BOUNDARY CARRIES LONG-HORIZON INQUIRY AND
+REOPENS LAWFULLY.** Five distinct R2 world returns formed exact incidence
+`A = [[1,0],[1,0],[1,0],[1,0],[1,0]]` and receiver covector `r = [1,1,1,1,1]^T`. One RTX 4080
+SUPER front returned `A^†r = [5,0]^T` and changed the actual terminal constitutive relation from
+action `[0,0,2]` to `[2,0,2]`; this is not binary response selection. Development and a
+lineage-new held-out recurrence changed, fresh-process remount retained the change, the disjoint
+port control stood, revisit commutator rank is one, and targeted withdrawal returned exact R2
+bytes. The grade is 8/8. The sole complete release command returned 2,839 passing tests, zero
+failures, 28 explicit ignores and eleven green non-ledger scopes; the two generated ledgers moved
+under concurrent formal commits and passed their permitted named cheap retake. R4 must now make
+the retained boundary carry a remote earlier construction into a later demanded consequence,
+return every factor/reopening/fibre/holonomy, survive detached revisit, strictly descend in the
+complete product, and cover independent card fronts only through proved interchange or typed
+reduction. R5--R6 remain ordered and open. X0--X2 and Qwen remain unscheduled.
 
 **I0--I5 supersede A4--A6.** I0 closed the physical-realization and
 functional-affect calculus; I1 retains a compactified causal boundary through recurrent complete

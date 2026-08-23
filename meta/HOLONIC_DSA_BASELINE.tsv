@@ -33,7 +33,7 @@ crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
 crates/holonic-engine/src/cross_chart.rs	.clone()=32	.collect()=1	Vec=24
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=21	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
-crates/holonic-engine/src/cuda_refine.rs	.collect()=8	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=70
+crates/holonic-engine/src/cuda_refine.rs	.collect()=8	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=80
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10
 crates/holonic-engine/src/cultivated_rest/directory.rs	.clone()=7	.collect()=1	BTreeSet=2	Vec=5
 crates/holonic-engine/src/cultivated_rest/mod.rs	Vec=4
@@ -262,6 +262,11 @@ soma/life/src/mathematical_particle/admission.rs	.clone()=2	.collect()=1	.into_i
 soma/life/src/mathematical_particle/intake.rs	.clone()=6	.collect()=5	.flat_map()=1	BTreeSet=9	Vec=10
 soma/life/src/mathematical_particle/lineage.rs	.clone()=5	.collect()=7	BTreeMap=11	BTreeSet=18	Vec=4
 soma/life/src/mathematical_particle/methods.rs	.clone()=14	.collect()=15	.flat_map()=4	.into_iter()=1	BTreeMap=29	BTreeSet=16	Vec=25
+soma/life/src/mathematical_particle/morphology/algebra.rs	.clone()=3	.collect()=12	.flat_map()=1	.into_iter()=2	BTreeSet=4	Vec=4
+soma/life/src/mathematical_particle/morphology/candidate.rs	.clone()=6	.collect()=4	.flat_map()=1	BTreeSet=2	Vec=5
+soma/life/src/mathematical_particle/morphology/rest.rs	.clone()=2	.collect()=2	.flat_map()=1	Vec=3
+soma/life/src/mathematical_particle/morphology/tests.rs	.collect()=1	.into_iter()=1	Vec=1
+soma/life/src/mathematical_particle/morphology/types.rs	Vec=14
 soma/life/src/mathematical_particle/recurrence.rs	.clone()=2	.collect()=8	.flat_map()=1	BTreeSet=5	Vec=28
 soma/life/src/mathematical_particle/sameness.rs	.clone()=4	.collect()=2	.flat_map()=1	BTreeMap=1	BTreeSet=16	Vec=6
 soma/life/src/mathematical_particle/sameness/diagram.rs	.clone()=8	.collect()=31	.flat_map()=2	BTreeMap=18	BTreeSet=29	Vec=5

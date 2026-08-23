@@ -3,16 +3,15 @@
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current boundary:** I0--I5 and R0 passed their release receivers. R1 is the active deed.
+**Current boundary:** I0--I5 and R0--R3 passed their release receivers. R4 is the active deed.
 **Scheduling boundary:** this blueprint supersedes the unratified post-I5 receiver-selection pause
 and parks X0--X2 while R0--R6 widen the first production receiver basin. It does not reopen or
 replace the admitted H/W/M/A/I evidence.
 
 **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry,
-dynamic delta, retained-context, and product-grade contracts; `established-bounded` for the cited
-M0--M6, A1--A3, and I0--I5 returns; `project-postulate` for construction and placement discipline;
-`established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0 returns; and `open` for R1--R6
-and every later heterogeneous-source deed.
+dynamic delta, retained-context, and product-grade contracts; `project-postulate` for construction
+and placement discipline; `established-bounded` for the cited M0--M6, A1--A3, I0--I5, and R0--R3
+returns; and `open` for R4--R6 and every later heterogeneous-source deed.
 
 **Milestone derivation:**
 [`2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md`](../research/records/2026-08-22_ATHENA_GEMMA_NOW_RETURNS_THE_COMPLETE_INFERENCE_LIFECYCLE_AND_PRODUCTION_SCALE_IS_THE_WIDENING_OF_ITS_RECEIVER_APERTURE.md).
@@ -321,7 +320,7 @@ and
 
 ### R3 — returned constraints found dynamic local morphology
 
-[open] R3 is the active deed. It extends I2/I5 beyond selection between two already-founded successor states.
+[established-bounded; implemented-exact; measured] R3 extends I2/I5 beyond selection between two already-founded successor states.
 
 [definition] A dynamic candidate delta carries:
 
@@ -352,9 +351,21 @@ holonomy, targeted withdrawal restores the immediate predecessor, and at least o
 change adds or modifies a material-founded generator/relation/port/constitutive action rather than
 selecting a prewritten binary state. Lean is an exterior return and may not schedule the route.
 
+The admitted return composes five actual world occurrences through exact incidence
+`A = [[1,0],[1,0],[1,0],[1,0],[1,0]]` and covector `r = [1,1,1,1,1]^T`. The card returned
+`A^†r = [5,0]^T`, changed the terminal action from `[0,0,2]` to `[2,0,2]`, and returned changed
+development and held-out passages. Fresh remount retained the change, the disjoint port control
+stood, commutator rank is one, and withdrawal restored the exact R2 rest. The grade is 8/8; the
+sole complete receiver returned 2,839 passing tests and eleven green non-ledger scopes, while the
+two concurrently drifted generated ledgers passed their permitted named retake. Candidate and
+admission:
+[`../research/records/2026-08-22_THE_RETURNED_RECEIVER_ADJOINT_FOUNDED_ONE_LOCAL_RELATION_THE_SUCCESSOR_SURVIVED_REMOUNT_AND_R3_AWAITS_ADMISSION.md`](../research/records/2026-08-22_THE_RETURNED_RECEIVER_ADJOINT_FOUNDED_ONE_LOCAL_RELATION_THE_SUCCESSOR_SURVIVED_REMOUNT_AND_R3_AWAITS_ADMISSION.md)
+and
+[`../research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md`](../research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md).
+
 ### R4 — the retained causal boundary carries long-horizon inquiry and reopens lawfully
 
-[open] R4 makes the Retained Continuation Section the load-bearing context object.
+[open] R4 is the active deed. It makes the Retained Continuation Section the load-bearing context object.
 
 R4 declares an addressed multi-passage inquiry in which a remote earlier construction is necessary
 for a later proof, physical consequence, correction, or diagram. It compares:

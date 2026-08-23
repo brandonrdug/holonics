@@ -161,6 +161,8 @@ pub enum CudaRefineError {
     ContactPassageTooWide,
     #[error("the material-operation world-tube arrays do not form one exact addressed passage")]
     MaterialOperationPassageShape,
+    #[error("the returned-constraint incidence, covector, and native action do not form one dynamic morphology passage")]
+    DynamicMorphologyShape,
 }
 
 fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) -> String {
@@ -333,6 +335,7 @@ pub struct CudaRefineExecutor {
     native_word: CuFunction,
     native_trace: CuFunction,
     returned_recurrence: CuFunction,
+    dynamic_morphology: CuFunction,
     condensed_recurrence: CuFunction,
     heterogeneous_fusion: CuFunction,
     inference_ecology: CuFunction,
@@ -404,6 +407,7 @@ impl CudaRefineExecutor {
             let mut native_word = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
             let mut returned_recurrence = ptr::null_mut();
+            let mut dynamic_morphology = ptr::null_mut();
             let mut condensed_recurrence = ptr::null_mut();
             let mut heterogeneous_fusion = ptr::null_mut();
             let mut inference_ecology = ptr::null_mut();
@@ -440,6 +444,11 @@ impl CudaRefineExecutor {
                     &mut returned_recurrence as *mut CuFunction,
                     c"return_and_recur_native",
                     "cuModuleGetFunction(return_and_recur_native)",
+                ),
+                (
+                    &mut dynamic_morphology as *mut CuFunction,
+                    c"cultivate_dynamic_morphology",
+                    "cuModuleGetFunction(cultivate_dynamic_morphology)",
                 ),
                 (
                     &mut condensed_recurrence as *mut CuFunction,
@@ -492,6 +501,7 @@ impl CudaRefineExecutor {
                 native_word,
                 native_trace,
                 returned_recurrence,
+                dynamic_morphology,
                 condensed_recurrence,
                 heterogeneous_fusion,
                 inference_ecology,
@@ -517,6 +527,7 @@ impl CudaRefineExecutor {
                 native_word,
                 native_trace,
                 returned_recurrence,
+                dynamic_morphology,
                 condensed_recurrence,
                 heterogeneous_fusion,
                 inference_ecology,
@@ -746,6 +757,32 @@ pub struct DeviceReturnedRecurrences {
     pub committed: bool,
     pub control_predecessor: u32,
     pub control_successor: u32,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub active_lanes: u32,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_octets: u64,
+}
+
+/// One returned receiver covector, its exact adjoint support, committed/declined local action,
+/// development and held-out passages, and targeted withdrawal returned by one card front.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviceDynamicMorphology {
+    pub returned_adjoint: Vec<i64>,
+    pub predecessor_action: Vec<u32>,
+    pub successor_action: Vec<u32>,
+    pub withdrawn_action: Vec<u32>,
+    pub predecessor_trace: Vec<u32>,
+    pub successor_trace: Vec<u32>,
+    pub withdrawn_trace: Vec<u32>,
+    pub predecessor_lengths: Vec<u32>,
+    pub successor_lengths: Vec<u32>,
+    pub withdrawn_lengths: Vec<u32>,
+    pub trace_stride: usize,
+    pub committed: bool,
+    pub supported_state: Option<u32>,
     pub launches: u64,
     pub synchronizations: u64,
     pub block_threads: u32,
@@ -1480,6 +1517,220 @@ impl CudaRefineExecutor {
                 + trace_octets * 3
                 + length_octets * 3
                 + scalar_egress_octets,
+        })
+    }
+
+    /// Form the exact returned receiver adjoint, decide one local commit, extend its supported
+    /// finite action, and return predecessor/successor/withdrawal recurrences in one resident
+    /// front. The card derives the added state from the predecessor population and closure from
+    /// first recurrence; the host supplies neither a response extent nor a semantic phase choice.
+    pub fn conduct_dynamic_morphology_on_device(
+        &mut self,
+        predecessor_action: &[u32],
+        support_incidence: &[i32],
+        returned_covector: &[i32],
+        native_start: &[u32],
+    ) -> Result<DeviceDynamicMorphology, CudaRefineError> {
+        let predecessor_states = predecessor_action.len();
+        let returns = returned_covector.len();
+        let expected_incidence = predecessor_states
+            .checked_mul(returns)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let successor_states = predecessor_states
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_stride = successor_states
+            .checked_add(1)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        let trace_entries = native_start
+            .len()
+            .checked_mul(trace_stride)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if predecessor_states == 0
+            || returns == 0
+            || native_start.is_empty()
+            || support_incidence.len() != expected_incidence
+            || predecessor_states >= u32::MAX as usize
+            || returns > u32::MAX as usize
+            || native_start.len() > u32::MAX as usize
+            || support_incidence
+                .iter()
+                .any(|entry| !matches!(*entry, 0 | 1))
+            || returned_covector
+                .iter()
+                .any(|entry| !matches!(*entry, -1 | 0 | 1))
+        {
+            return Err(CudaRefineError::DynamicMorphologyShape);
+        }
+        if let Some(state) = predecessor_action
+            .iter()
+            .chain(native_start)
+            .copied()
+            .find(|state| *state as usize >= predecessor_states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation {
+                state,
+                states: predecessor_states,
+            });
+        }
+
+        driver(unsafe { cuCtxSetCurrent(self.context) }, "cuCtxSetCurrent")?;
+        let action = Buffer::of(predecessor_action)?;
+        let incidence = Buffer::of(support_incidence)?;
+        let covector = Buffer::of(returned_covector)?;
+        let starts = Buffer::of(native_start)?;
+        let adjoint_octets = predecessor_states * std::mem::size_of::<i64>();
+        let adjoint = Buffer::alloc(adjoint_octets)?;
+        let action_octets = successor_states * std::mem::size_of::<u32>();
+        let predecessor_extended = Buffer::alloc(action_octets)?;
+        let successor_action = Buffer::alloc(action_octets)?;
+        let withdrawn_action = Buffer::alloc(action_octets)?;
+        let trace_octets = trace_entries * std::mem::size_of::<u32>();
+        let predecessor_trace_device = Buffer::alloc(trace_octets)?;
+        let successor_trace_device = Buffer::alloc(trace_octets)?;
+        let withdrawn_trace_device = Buffer::alloc(trace_octets)?;
+        let length_octets = native_start.len() * std::mem::size_of::<u32>();
+        let predecessor_lengths_device = Buffer::alloc(length_octets)?;
+        let successor_lengths_device = Buffer::alloc(length_octets)?;
+        let withdrawn_lengths_device = Buffer::alloc(length_octets)?;
+        let decision_device = Buffer::alloc(std::mem::size_of::<u32>())?;
+        let support_state_device = Buffer::alloc(std::mem::size_of::<u32>())?;
+
+        let mut action_pointer = action.pointer;
+        let mut incidence_pointer = incidence.pointer;
+        let mut covector_pointer = covector.pointer;
+        let mut starts_pointer = starts.pointer;
+        let mut adjoint_pointer = adjoint.pointer;
+        let mut predecessor_extended_pointer = predecessor_extended.pointer;
+        let mut successor_action_pointer = successor_action.pointer;
+        let mut withdrawn_action_pointer = withdrawn_action.pointer;
+        let mut predecessor_trace_pointer = predecessor_trace_device.pointer;
+        let mut successor_trace_pointer = successor_trace_device.pointer;
+        let mut withdrawn_trace_pointer = withdrawn_trace_device.pointer;
+        let mut predecessor_lengths_pointer = predecessor_lengths_device.pointer;
+        let mut successor_lengths_pointer = successor_lengths_device.pointer;
+        let mut withdrawn_lengths_pointer = withdrawn_lengths_device.pointer;
+        let mut decision_pointer = decision_device.pointer;
+        let mut support_state_pointer = support_state_device.pointer;
+        let mut state_count = predecessor_states as u32;
+        let mut return_count = returns as u32;
+        let mut start_count = native_start.len() as u32;
+        let mut arguments: [*mut c_void; 19] = [
+            &mut action_pointer as *mut u64 as *mut c_void,
+            &mut incidence_pointer as *mut u64 as *mut c_void,
+            &mut covector_pointer as *mut u64 as *mut c_void,
+            &mut starts_pointer as *mut u64 as *mut c_void,
+            &mut adjoint_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_extended_pointer as *mut u64 as *mut c_void,
+            &mut successor_action_pointer as *mut u64 as *mut c_void,
+            &mut withdrawn_action_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_trace_pointer as *mut u64 as *mut c_void,
+            &mut successor_trace_pointer as *mut u64 as *mut c_void,
+            &mut withdrawn_trace_pointer as *mut u64 as *mut c_void,
+            &mut predecessor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut successor_lengths_pointer as *mut u64 as *mut c_void,
+            &mut withdrawn_lengths_pointer as *mut u64 as *mut c_void,
+            &mut decision_pointer as *mut u64 as *mut c_void,
+            &mut support_state_pointer as *mut u64 as *mut c_void,
+            &mut state_count as *mut u32 as *mut c_void,
+            &mut return_count as *mut u32 as *mut c_void,
+            &mut start_count as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.dynamic_morphology,
+                    1,
+                    1,
+                    1,
+                    self.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(cultivate_dynamic_morphology)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.launches += 1;
+
+        let mut returned_adjoint = vec![0i64; predecessor_states];
+        let mut predecessor_action_returned = vec![0u32; successor_states];
+        let mut successor_action_returned = vec![0u32; successor_states];
+        let mut withdrawn_action_returned = vec![0u32; successor_states];
+        let mut predecessor_trace = vec![0u32; trace_entries];
+        let mut successor_trace = vec![0u32; trace_entries];
+        let mut withdrawn_trace = vec![0u32; trace_entries];
+        let mut predecessor_lengths = vec![0u32; native_start.len()];
+        let mut successor_lengths = vec![0u32; native_start.len()];
+        let mut withdrawn_lengths = vec![0u32; native_start.len()];
+        let mut decision = [0u32; 1];
+        let mut support_state = [u32::MAX; 1];
+        adjoint.read(&mut returned_adjoint)?;
+        predecessor_extended.read(&mut predecessor_action_returned)?;
+        successor_action.read(&mut successor_action_returned)?;
+        withdrawn_action.read(&mut withdrawn_action_returned)?;
+        predecessor_trace_device.read(&mut predecessor_trace)?;
+        successor_trace_device.read(&mut successor_trace)?;
+        withdrawn_trace_device.read(&mut withdrawn_trace)?;
+        predecessor_lengths_device.read(&mut predecessor_lengths)?;
+        successor_lengths_device.read(&mut successor_lengths)?;
+        withdrawn_lengths_device.read(&mut withdrawn_lengths)?;
+        decision_device.read(&mut decision)?;
+        support_state_device.read(&mut support_state)?;
+        if decision[0] > 1
+            || support_state[0] != u32::MAX && support_state[0] as usize >= predecessor_states
+        {
+            return Err(CudaRefineError::DynamicMorphologyShape);
+        }
+        for (at, length) in predecessor_lengths
+            .iter()
+            .chain(&successor_lengths)
+            .chain(&withdrawn_lengths)
+            .copied()
+            .enumerate()
+        {
+            if length < 2 || length as usize > trace_stride {
+                return Err(CudaRefineError::NativeRecurrenceDidNotClose {
+                    at: at % native_start.len(),
+                });
+            }
+        }
+
+        let ingress = std::mem::size_of_val(predecessor_action)
+            + std::mem::size_of_val(support_incidence)
+            + std::mem::size_of_val(returned_covector)
+            + std::mem::size_of_val(native_start)
+            + 3 * std::mem::size_of::<u32>();
+        let egress = adjoint_octets
+            + action_octets * 3
+            + trace_octets * 3
+            + length_octets * 3
+            + 2 * std::mem::size_of::<u32>();
+        Ok(DeviceDynamicMorphology {
+            returned_adjoint,
+            predecessor_action: predecessor_action_returned,
+            successor_action: successor_action_returned,
+            withdrawn_action: withdrawn_action_returned,
+            predecessor_trace,
+            successor_trace,
+            withdrawn_trace,
+            predecessor_lengths,
+            successor_lengths,
+            withdrawn_lengths,
+            trace_stride,
+            committed: decision[0] == 1,
+            supported_state: (support_state[0] != u32::MAX).then_some(support_state[0]),
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.block_x,
+            active_lanes: native_start.len() as u32,
+            host_ingress_octets: ingress as u64,
+            host_egress_octets: egress as u64,
+            resident_octets: (ingress + egress) as u64,
         })
     }
 
@@ -2859,6 +3110,55 @@ mod tests {
         assert_eq!(returned.control_successor, 1);
         assert_eq!(returned.launches, 1);
         assert_eq!(returned.synchronizations, 1);
+    }
+
+    /// R3's returned receiver incidence: the card forms `A^T r`, commits the supported terminal
+    /// relation, changes a later start, and returns exact withdrawal in one launch.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_card_returns_dynamic_morphology_from_the_receiver_adjoint() {
+        let mut card = CudaRefineExecutor::new().expect("the card mounts");
+        let returned = card
+            .conduct_dynamic_morphology_on_device(
+                &[0, 0],
+                &[
+                    1, 0, // proof/checker
+                    1, 0, // exact owner
+                    1, 0, // rendering
+                    1, 0, // physical boundary
+                    1, 0, // later operator
+                ],
+                &[1, 1, 1, 1, 1],
+                &[0, 1],
+            )
+            .expect("the dynamic morphology closes");
+        assert_eq!(returned.returned_adjoint, vec![5, 0]);
+        assert!(returned.committed);
+        assert_eq!(returned.supported_state, Some(0));
+        assert_eq!(returned.predecessor_action, vec![0, 0, 2]);
+        assert_eq!(returned.successor_action, vec![2, 0, 2]);
+        assert_eq!(returned.withdrawn_action, returned.predecessor_action);
+        assert_eq!(returned.predecessor_lengths, vec![2, 3]);
+        assert_eq!(returned.successor_lengths, vec![3, 4]);
+        assert_eq!(returned.withdrawn_lengths, returned.predecessor_lengths);
+        assert_eq!(&returned.predecessor_trace[..4], &[0, 0, 0, 0]);
+        assert_eq!(&returned.successor_trace[..4], &[0, 2, 2, 2]);
+        assert_eq!(returned.withdrawn_trace, returned.predecessor_trace);
+        assert_eq!(returned.launches, 1);
+        assert_eq!(returned.synchronizations, 1);
+
+        let declined = card
+            .conduct_dynamic_morphology_on_device(
+                &[0, 0],
+                &[1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                &[1, 1, 1, 1, 0],
+                &[0, 1],
+            )
+            .expect("the incomplete returned family declines");
+        assert_eq!(declined.returned_adjoint, vec![4, 0]);
+        assert!(!declined.committed);
+        assert_eq!(declined.successor_action, declined.predecessor_action);
+        assert_eq!(declined.successor_trace, declined.predecessor_trace);
     }
 
     /// I3's recurrent condensation: a visited-incidence front returns both physical routes and

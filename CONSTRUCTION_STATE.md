@@ -4,12 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-22 after Deed R2 release admission and entry into R3 of the R0--R6
+**Currency:** 2026-08-22 after Deed R3 release admission and entry into R4 of the R0--R6
 production-aperture continuation. **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE MATERIAL DERIVATION RETURNED ITS COMPLETE FRONTIER AND WORLD CONSTRAINTS,
-R2 PASSED, AND R3 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
+**CURRENT FRONTIER — RETURNED WORLD CONSTRAINTS CULTIVATED ONE ATTRIBUTABLE LOCAL RELATION,
+R3 PASSED, AND R4 IS THE ACTIVE PRODUCTION-APERTURE DEED.**
 [established-bounded] H0–H5 are the admitted single-card foundation; P0 is the independent ARM N
 control; W1–W5 return the whole source/native lift, source-detached source-shaped rest, complete
 resident tower, attributable rank-one cultivation, application inference, matched dissection,
@@ -342,19 +342,34 @@ target type-checked. Candidate and admission:
 and
 [`research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md`](research/records/2026-08-22_R2_RELEASE_RECEIVER_PASSED_THE_DERIVATION_FRONTIER_RETURNED_AND_R3_BEGINS.md).
 
-**NEXT DEED: R3 — RETURNED CONSTRAINTS FOUND DYNAMIC LOCAL MORPHOLOGY.**
+**R3 PASSED — RETURNED CONSTRAINTS FOUNDED ONE DYNAMIC LOCAL MORPHOLOGY.**
+[established-bounded; implemented-exact; measured] Five distinct actual R2 world returns formed
+one exact incidence and receiver covector. The card returned adjoint `[5,0]` and changed the
+terminal constitutive action from `[0,0,2]` to `[2,0,2]`; development and a lineage-new held-out
+passage changed, fresh-process remount retained the change, the port-disjoint control stood,
+commutator rank is one, and targeted withdrawal restored exact R2 bytes. The 14-file product has
+48,858 octets and internal rolled SHA-256
+`177261df500cbada74406610f1a346d189c76e6e76143d5e3d7a47e3ff816691`. The candidate grade is
+8/8. The sole complete receiver returned 2,839 tests passing, zero failing, 28 explicitly ignored,
+every example target, and eleven green non-ledger scopes; the claim and driver ledgers drifted
+under concurrent formal commits and passed their permitted named retake. Candidate and admission:
+[`research/records/2026-08-22_THE_RETURNED_RECEIVER_ADJOINT_FOUNDED_ONE_LOCAL_RELATION_THE_SUCCESSOR_SURVIVED_REMOUNT_AND_R3_AWAITS_ADMISSION.md`](research/records/2026-08-22_THE_RETURNED_RECEIVER_ADJOINT_FOUNDED_ONE_LOCAL_RELATION_THE_SUCCESSOR_SURVIVED_REMOUNT_AND_R3_AWAITS_ADMISSION.md)
+and
+[`research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md`](research/records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md).
+
+**NEXT DEED: R4 — THE RETAINED CAUSAL BOUNDARY CARRIES LONG-HORIZON INQUIRY AND REOPENS
+LAWFULLY.**
 [open] The active contract is
 [`blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
-R3 conducts a lineage-separated development inquiry, returns exact proof/checker, exact-owner,
-rendering, boundary, and later-operator consequences as distinct world occurrences, and lets their
-actual covectors/noncommuting squares found only attributable local change. Commit consumes the
-predecessor and returns one successor; decline returns it unchanged. Changed conduct must survive
-source-detached remount on a structurally related held-out inquiry, a disjoint control must stand,
-revisit holonomy must be nonzero, targeted withdrawal must restore the predecessor, and a real
-generator/relation/port/constitutive action—not selection between prewritten states—must change.
+R4 must make the retained causal boundary carry a remote earlier construction into a later proof,
+physical consequence, correction, or diagram; compare source replay, uncondensed history and
+compactified boundary; return every factoring response, departed interior, decoder fibre,
+separator and holonomy; reopen lawfully under a richer receiver; survive detached revisit; descend
+strictly in the complete product; and cover independent card fronts only through proved
+interchange or typed reduction.
 
-[open] R4--R6 remain ordered behind R3: long-horizon retained context,
-mathematical/physical multimodal transport, and the first bounded production Athena freeze.
+[open] R5--R6 remain ordered behind R4: mathematical/physical multimodal transport and the first
+bounded production Athena freeze.
 X0--X2 are parked until that product returns an explicit complementary open family. The parked Qwen
 GGUF remains an unscheduled close control. Unrestricted conversation, all mathematics/physics, new
 audio/video or production modalities, all Gemma behavior and conventional tensor-container

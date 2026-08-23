@@ -256,5 +256,19 @@ governs the rebuild.
   four nontrivial one-shot layer fibres all reopened by complete successor conduct; and no false
   structural or byte compression factor quoted.
 
+- **The returned receiver adjoint founded one local relation, the successor survived remount, and R3 awaits admission:**
+  `records/2026-08-22_THE_RETURNED_RECEIVER_ADJOINT_FOUNDED_ONE_LOCAL_RELATION_THE_SUCCESSOR_SURVIVED_REMOUNT_AND_R3_AWAITS_ADMISSION.md`
+  — composes five distinct R2 world returns into the exact receiver adjoint `[5,0]`, lets one RTX
+  front change the terminal constitutive relation from `[0,0,2]` to `[2,0,2]`, returns changed
+  development and lineage-new held-out conduct after detached remount, preserves a disjoint port
+  control, exhibits rank-one cultivation holonomy, and consumes the successor back to its exact
+  predecessor while retaining the release-admission boundary.
+- **R3 release admission:**
+  `records/2026-08-22_R3_RELEASE_RECEIVER_PASSED_THE_RETURNED_CONSTRAINTS_CULTIVATED_ONE_LOCAL_RELATION_AND_R4_BEGINS.md`
+  — admits the exact returned receiver adjoint, actual terminal relation change, changed
+  development and lineage-new held-out passages, source-detached remount, disjoint control,
+  nonzero holonomy and exact withdrawal; records 2,839 passing tests plus the permitted cheap
+  ledger retake; and places R4 at the retained long-horizon causal-boundary frontier.
+
 The filenames form a stable chronological atlas. Search their titles before reading entire bodies;
 follow each record's explicit supersession and open-boundary statements.
