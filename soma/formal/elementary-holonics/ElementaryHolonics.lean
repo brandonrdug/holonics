@@ -21,6 +21,7 @@ import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling
 import ElementaryHolonics.Millennium.HilbertTransportChain
+import ElementaryHolonics.Millennium.HilbertTransportSpectrum
 import ElementaryHolonics.Millennium.Instance
 import ElementaryHolonics.Millennium.Triangle
 import ElementaryHolonics.Millennium.Theta
@@ -38,6 +39,7 @@ import ElementaryHolonics.Millennium.NavierStokesKelvin
 import ElementaryHolonics.Millennium.NavierStokesHodge
 import ElementaryHolonics.Millennium.NavierStokesPotential
 import ElementaryHolonics.Millennium.NavierStokesMovingLoop
+import ElementaryHolonics.Millennium.NavierStokesPeriodicFlux
 import ElementaryHolonics.Millennium.YangMillsLimit
 import ElementaryHolonics.Millennium.ReflectedPositivity
 import ElementaryHolonics.Millennium.AlgebraicGNS
@@ -120,6 +122,7 @@ import ElementaryHolonics.Millennium.GeneralHom
 import ElementaryHolonics.Millennium.GeneralSupport
 import ElementaryHolonics.Millennium.GeneralHalving
 import ElementaryHolonics.Millennium.GeneralCollision
+import ElementaryHolonics.Millennium.GeneralQuotientCardinality
 import ElementaryHolonics.Millennium.GeneralCertificate
 import ElementaryHolonics.Millennium.GeneralHeight
 import ElementaryHolonics.Millennium.CokernelCalculus
@@ -129,6 +132,7 @@ import ElementaryHolonics.Millennium.SelmerCalculus
 import ElementaryHolonics.Millennium.AdviceBar
 import ElementaryHolonics.Millennium.UniformityBar
 import ElementaryHolonics.Millennium.GeneralMordell
+import ElementaryHolonics.Millennium.GeneralTwoTorsion
 import ElementaryHolonics.Millennium.MillenniumInstance
 import ElementaryHolonics.Millennium.FamilyPeriod
 import ElementaryHolonics.Millennium.FamilyImage
