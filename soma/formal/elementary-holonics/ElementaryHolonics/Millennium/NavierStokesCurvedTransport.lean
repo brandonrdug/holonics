@@ -7,18 +7,20 @@ import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
 
 This module turns three adjacent subjects into explicit interfaces over the material-polygon owner.
 
-* `MaterialCirculationBalance` retains pressure, viscous, and forcing returns separately.  Pressure
-  cancels around the closed boundary, and zero viscous/forcing return gives the Kelvin conclusion.
+* `MaterialCirculationBalance` is a finite balance certificate retaining pressure, viscous, and
+  forcing returns separately.  Pressure cancels around the closed boundary, and zero
+  viscous/forcing return gives conditional polygonal Kelvin constancy.
 * `PolygonGaussBonnet` retains a bulk curvature population and every boundary turn;
   `TriangulatedGaussBonnetLedger` derives the bulk-plus-boundary theorem from local triangle budgets
   and an Euler incidence return.
-* `EinsteinFluidDynamics` constitutes a covariant stress-energy tensor field from the actual
-  velocity and pressure.  The field equation, Bianchi return, and metric compatibility derive
-  source conservation, and declared receivers read both the field equation and conservation.
+* `EinsteinFluidDynamics` is the coupling interface through which the actual velocity and pressure
+  constitute a covariant bilinear source field.  Its supplied Einstein tensor, covariant
+  divergence, field equation, Bianchi return, and metric compatibility derive source conservation;
+  declared receivers read both the field equation and conservation.
 
-The interfaces make the named laws available for subsequent analytic and geometric construction:
-later modules can derive the circulation balance from the PDE, realize the curvature ledger from a
-metric connection, and instantiate the receiver equation on a Lorentzian tensor carrier.
+The interfaces make the named laws available for subsequent analytic and geometric construction.
+The next construction derives the circulation balance from the PDE, realizes the curvature ledger
+from a metric connection, and instantiates the Einstein coupling on a Lorentzian tensor carrier.
 -/
 
 noncomputable section
@@ -33,9 +35,9 @@ open Soma.Holonics.Millennium.NavierStokesMaterialPolygon
 
 /-! ## 1. Kelvin as the zero-return fibre of the material circulation balance -/
 
-/-- The complete finite circulation balance between two material snapshots of one admitted smooth
-Navier--Stokes solution.  Its own pressure is retained as an edge population; viscosity and forcing
-are separate returned faces. -/
+/-- A finite circulation-balance certificate between two material snapshots of one admitted smooth
+Navier--Stokes solution.  Its pressure is retained as an edge population; viscosity and forcing
+are separate returned faces.  The analytic PDE-to-balance construction is the next owner. -/
 structure MaterialCirculationBalance
     {extra : ℕ} {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
     {pressure : PressureField}
@@ -59,8 +61,9 @@ theorem MaterialCirculationBalance.change_eq_viscous_add_forcing
   rw [law.balance s t hs ht, body.polygon.sum_pressureIncrementAt_eq_zero]
   simp
 
-/-- **Finite material Kelvin theorem.**  On the zero-viscous-return and zero-forcing-return fibre,
-the polygonal circulation is conserved between every two nonnegative receiver times. -/
+/-- **Conditional polygonal Kelvin constancy.**  On the zero-viscous-return and
+zero-forcing-return fibre of the certified balance, polygonal circulation is conserved between
+every two nonnegative receiver times. -/
 theorem MaterialCirculationBalance.kelvin
     {extra : ℕ} {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
     {pressure : PressureField}
@@ -203,9 +206,12 @@ bilinear tensor fields before any metric musical isomorphism raises the remainin
 abbrev CovectorField (V : Type*) [AddCommGroup V] [Module ℝ V] :=
   FluidEvent → Module.Dual ℝ V
 
-/-- A receiver-indexed Einstein/fluid dynamics interface.  `stressLaw` constitutes stress-energy
-from the actual local velocity and pressure.  The field equation, contracted Bianchi return, and
-metric compatibility are retained separately; conservation of the fluid source is derived below. -/
+/-- A receiver-indexed Einstein/fluid dynamics interface.  `stressLaw` constitutes a covariant
+bilinear source field from the actual local velocity and pressure.  The metric, Einstein tensor,
+covariant divergence, field equation, contracted Bianchi return, and metric compatibility are
+supplied ports; conservation of the fluid source is derived from their interaction below.  A
+Lorentzian metric/connection/curvature realization can instantiate those ports without changing
+the conservation transport. -/
 structure EinsteinFluidDynamics
     (velocity : VelocityField) (pressure : PressureField)
     (V Receiver : Type*) [AddCommGroup V] [Module ℝ V] where
@@ -225,7 +231,8 @@ structure EinsteinFluidDynamics
   contractedBianchi : covDiv einstein = 0
   metricCompatible : covDiv metric = 0
 
-/-- The tensor-field stress-energy occurrence constituted by the fluid fields. -/
+/-- The tensor-field source occurrence constituted by the fluid fields.  In a Lorentzian fluid
+realization this is the stress-energy field. -/
 def EinsteinFluidDynamics.stressEnergy
     {velocity : VelocityField} {pressure : PressureField}
     {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
@@ -234,8 +241,8 @@ def EinsteinFluidDynamics.stressEnergy
     (velocity event.1 event.2) (pressure event.1 event.2)
 
 /-- **Einstein-to-fluid conservation transport.**  The field equation, contracted Bianchi return,
-metric compatibility, and nonzero coupling force covariant conservation of the constituted
-stress-energy field. -/
+metric compatibility, and nonzero coupling force covariant conservation of the constituted source
+field. -/
 theorem EinsteinFluidDynamics.stressEnergy_conserved
     {velocity : VelocityField} {pressure : PressureField}
     {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
@@ -268,8 +275,9 @@ def EinsteinFluidDynamics.UsesRefineForkCoupling
     (arc differential : ℝ) : Prop :=
   dynamics.coupling = refineForkCoupling 2 0 arc differential
 
-/-- **Receiver equation at the holonic depth-two coupling.**  Every linear tensor receiver reads
-the Einstein side as `4 * (C / r)` times its fluid stress-energy face. -/
+/-- **Conditional receiver equation at the holonic depth-two coupling.**  Once `hcoupling`
+identifies the coupling with `refineForkCoupling 2 0 C r`, every linear tensor receiver reads the
+Einstein side as `4 * (C / r)` times its fluid source face. -/
 theorem EinsteinFluidDynamics.receiverEquation_fourArcOverDifferential
     {velocity : VelocityField} {pressure : PressureField}
     {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]

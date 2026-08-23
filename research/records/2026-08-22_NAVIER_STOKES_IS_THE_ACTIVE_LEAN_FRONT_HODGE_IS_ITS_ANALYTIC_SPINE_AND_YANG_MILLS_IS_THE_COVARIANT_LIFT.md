@@ -154,16 +154,18 @@ pairing, which retains the current at both endpoints. Lean proves that the contr
 motion of the material edges is half a cyclic kinetic-energy difference on each edge and therefore
 cancels exactly around the closed polygon.
 
-`[proved-derived; formal-checked]` `Millennium/NavierStokesCurvedTransport.lean` installs the Kelvin
-interface on an admitted `SmoothSolution`: `MaterialCirculationBalance` retains pressure-edge,
-viscous, and forcing returns separately; cyclic cancellation removes pressure; and Lean proves the
-finite material Kelvin theorem for the symmetric circulation on the zero-viscous-return and
+`[proved-derived; formal-checked]` `Millennium/NavierStokesCurvedTransport.lean` installs a finite
+Kelvin balance certificate on an admitted `SmoothSolution`: `MaterialCirculationBalance` retains
+pressure-edge, viscous, and forcing returns separately; cyclic cancellation removes pressure; and
+Lean proves conditional constancy of the symmetric circulation on the zero-viscous-return and
 zero-forcing-return fibre.
 
 `[proved-derived; formal-checked]` `Millennium/NavierStokesKelvin.lean` now owns the genuine closed
 path receiver: velocity is lowered to a spatial one-form by the Euclidean inner product and
-integrated with Mathlib's `curveIntegral`. `KelvinCertificate` proves that a differentiable
-curve-circulation with zero derivative on `Ici 0` is constant between every two nonnegative times;
+integrated with Mathlib's `curveIntegral`. `VelocityKelvinCertificate` retains curve integrability
+at every nonnegative receiver time, so the admitted occurrence cannot enter through the integral's
+totalized non-integrable value. `KelvinCertificate` proves that a differentiable curve-circulation
+with zero derivative on `Ici 0` is constant between every two nonnegative times;
 `CurveCirculationBalance` reaches the same result by setting its retained source to zero.
 
 `[open]` The next Kelvin deed differentiates the time-dependent curve integral, derives its source
@@ -220,11 +222,12 @@ Thomas-precession face through an explicit homomorphism.
 one leaves it fixed, and the depth-two settled-scale face is `2^2 (C/r) = 4 C/r`.
 
 `[proved-derived; formal-checked]` `EinsteinFluidDynamics` now constitutes a covariant bilinear
-stress-energy field from the actual local velocity and pressure. From the tensor field equation,
-contracted Bianchi return, metric compatibility, and nonzero coupling, Lean derives covariant
-source conservation and proves that every declared linear conservation receiver reads zero. Under
-`UsesRefineForkCoupling`, every tensor receiver reads the field equation with coefficient
-`4 * (C/r)`.
+source field from the actual local velocity and pressure through an explicit coupling interface.
+The interface retains the supplied metric, Einstein tensor, covariant divergence, tensor field
+equation, contracted Bianchi return, and metric compatibility as distinct ports. Their composition
+with nonzero coupling derives covariant source conservation, and every declared linear
+conservation receiver reads zero. Under `UsesRefineForkCoupling`, every tensor receiver reads the
+field equation with coefficient `4 * (C/r)`.
 
 `[interpretation]` In the full-turn calibration, `Theta = C/r` turns the checked receiver equation's
 coefficient into `4 Theta`. If the intended curvature target instead uses `4 theta/r`, the second
@@ -337,9 +340,9 @@ The `t = 0` boundary and time/Laplacian commutation squares remain explicitly op
 |---|---|
 | `Geometry/Gyrogroup.lean` | `745584b6cdd1453b53d8f4708dc252da79a90a4a0c88b51641ef8e09429ecae0` |
 | `Millennium/NavierStokesMaterialPolygon.lean` | `971a22468740e10c976fbbe578e9fbe0c03291d540424b575523bf5dbbd8fb77` |
-| `Millennium/NavierStokesCurvedTransport.lean` | `796e604f817892a211a764c82c7dd9f4a0bc6418761bbb2f2ba7f9ecd3b9d8f2` |
-| `Millennium/NavierStokesKelvin.lean` | `b9faf7002e9b448c7503b4d1a3d2d8757e95558f72aed4489fa2008ee81c2ad1` |
-| `ElementaryHolonics.lean` import surface | `3fc83ad361b502675b7f68266fed140d2ca0d4a269c9f459af700e768293fa86` |
+| `Millennium/NavierStokesCurvedTransport.lean` | `d710b600c07431f2a615bbc64f3dd1fed786822356a341bb642e72f3d4f4d48d` |
+| `Millennium/NavierStokesKelvin.lean` | `f565bd61d453703ff2f7fcd392b04e02de1c203b7385216768eafde5cbbed6d1` |
+| `ElementaryHolonics.lean` import surface | `3631ec11252e13bcc8ddb42a16ea957b060ec18cc75cc2d3db9fc54e2a2c3ed6` |
 
 `[established-bounded; measured]` Focused final builds from
 `soma/formal/elementary-holonics` returned:
@@ -348,9 +351,9 @@ The `t = 0` boundary and time/Laplacian commutation squares remain explicitly op
 |---|---:|---:|---|
 | `lake build ElementaryHolonics.Geometry.Gyrogroup` | 1.0 s | 0 | gyrogroup, coaddition, and gyroparallelogram closure |
 | `lake build ElementaryHolonics.Millennium.NavierStokesMaterialPolygon` | 3.9 s | 0 | material polygon, symmetric circulation, Swing/cross-ratio bridge, scale/fork law |
-| `lake build ElementaryHolonics.Millennium.NavierStokesCurvedTransport` | 4.9 s | 0 | finite Kelvin, triangulated Gauss--Bonnet, Einstein conservation transport |
-| `lake build ElementaryHolonics.Millennium.NavierStokesKelvin` | 2.9 s | 0 | genuine curve-integral receiver and Kelvin constancy |
-| `lake build ElementaryHolonics` | 2.5 s | 0 | public aggregate import closure |
+| `lake build ElementaryHolonics.Millennium.NavierStokesCurvedTransport` | 4.9 s | 0 | conditional finite Kelvin, triangulated Gauss--Bonnet, Einstein conservation transport |
+| `lake build ElementaryHolonics.Millennium.NavierStokesKelvin` | 3.4 s | 0 | integrable curve receiver and Kelvin constancy |
+| `lake build ElementaryHolonics` | 2.4 s | 0 | public aggregate import closure |
 
 `[proved-derived; formal-checked]` Every printed theorem in the four-owner cone depends only on
 `propext`, `Classical.choice`, and `Quot.sound`; the gyrogroup flat theorems need only a subset.
@@ -361,4 +364,5 @@ The final exact scan found no declaration of `axiom` and no occurrence of `sorry
 totalization, Swing orientation, boundary-order cross ratio and admissibility, the standard
 gyroparallelogram formula and gyrocommutative port, the symmetric moving-edge cancellation, the
 Euler/angle algebra of discrete Gauss--Bonnet, and the covector-valued divergence in Einstein
-conservation. Their requested type repairs were incorporated before the final receipts.
+conservation. Their requested type repairs were incorporated before the final receipts, including
+the explicit `CurveIntegrable` witness on every admitted velocity-loop circulation.

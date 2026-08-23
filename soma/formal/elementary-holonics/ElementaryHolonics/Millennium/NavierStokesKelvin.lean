@@ -29,7 +29,9 @@ inner product. -/
 def velocityOneForm (velocity : VelocityField) (t : ℝ) : Space → Space →L[ℝ] ℝ :=
   fun x ↦ innerSL ℝ (velocity x t)
 
-/-- The genuine curve-integral circulation of a time-indexed closed path. -/
+/-- The curve-integral circulation of a time-indexed closed path.  A corresponding
+`VelocityKelvinCertificate` retains the `CurveIntegrable` witness which makes this totalized
+integral an admitted circulation at every receiver time. -/
 def curveCirculation (velocity : VelocityField) (base : ℝ → Space)
     (loop : ∀ t, Path (base t) (base t)) (t : ℝ) : ℝ :=
   ∫ᶜ x in loop t, velocityOneForm velocity t x
@@ -74,10 +76,14 @@ theorem CurveCirculationBalance.kelvin
     circulation s = circulation t :=
   (balance.kelvinCertificate hsource).eq_of_nonnegative hs ht
 
-/-- A Kelvin certificate specialized to the actual curve-integral receiver of a velocity field. -/
-abbrev VelocityKelvinCertificate (velocity : VelocityField) (base : ℝ → Space)
-    (loop : ∀ t, Path (base t) (base t)) : Prop :=
-  KelvinCertificate (curveCirculation velocity base loop)
+/-- A Kelvin certificate specialized to an admitted curve-integral receiver of a velocity field.
+The integrability field prevents Mathlib's totalized curve integral from silently reading a
+non-integrable occurrence as zero. -/
+structure VelocityKelvinCertificate (velocity : VelocityField) (base : ℝ → Space)
+    (loop : ∀ t, Path (base t) (base t)) : Prop where
+  certificate : KelvinCertificate (curveCirculation velocity base loop)
+  curveIntegrable : ∀ t ∈ Ici (0 : ℝ),
+    CurveIntegrable (velocityOneForm velocity t) (loop t)
 
 /-- The specialized curve-integral conclusion. -/
 theorem VelocityKelvinCertificate.curveCirculation_eq
@@ -86,7 +92,7 @@ theorem VelocityKelvinCertificate.curveCirculation_eq
     (certificate : VelocityKelvinCertificate velocity base loop)
     {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
     curveCirculation velocity base loop s = curveCirculation velocity base loop t :=
-  certificate.eq_of_nonnegative hs ht
+  certificate.certificate.eq_of_nonnegative hs ht
 
 section Audit
 
@@ -97,4 +103,3 @@ section Audit
 end Audit
 
 end Soma.Holonics.Millennium.NavierStokesKelvin
-
