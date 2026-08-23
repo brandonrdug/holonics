@@ -303,6 +303,77 @@ vorticity balance with transport and stretching as distinct ordered terms.
 curl with the time derivative and Laplacian. The differentiated-momentum theorem exposes these
 ports and does not claim them.
 
+## Second squeeze: material differentiation, de Rham pressure, Poincare, and completed zeta
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesMaterialDerivative.lean` now derives the
+positive-time material chain rule directly from `SmoothSolution.momentum`. For every carried
+polygon vertex, the ordinary derivative of the observed velocity is the Eulerian time derivative
+plus the spatial derivative applied to velocity, and therefore equals
+
+```text
+nu * Delta u - grad p + f.
+```
+
+The strict `t > 0` hypothesis supplies the neighbourhood on which the official half-cylinder
+smoothness becomes an ordinary derivative statement; no totalized derivative is admitted at the
+initial boundary.
+
+`[proved-derived; formal-checked]` Differentiating the symmetric finite circulation now closes the
+actual PDE-to-material-receiver square. The Leibniz term caused by motion of the edges cancels by
+the existing cyclic kinetic-energy identity. The remaining derivative is the symmetric edge
+pairing of the material acceleration, and a second theorem preserves its three signed populations
+as viscous transport minus sampled pressure-gradient edge quadrature plus forcing. The sampled
+pressure face is not an exact curve integral and is not claimed to telescope. This supersedes the
+earlier conditional finite balance as the local positive-time derivative law; the earlier
+certificate still owns constancy after the retained returns are separately shown to vanish.
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesHodge.lean` first splits every local
+velocity jet exactly into transpose-symmetric and transpose-skew faces. The symmetric face lies in
+the complete local kernel population of curl; the skew face carries the entire curl and is exactly
+the canonical matrix reconstructed from the vorticity vector. The same module constructs pressure
+as the actual spatial zero-form and its exact one-form `d p`. At every differentiable occurrence,
+`d p` is definitionally joined to the Euclidean lowering of `grad p`. At every `C^2` occurrence,
+Mathlib's exterior-calculus theorem gives `d(d p) = 0`; the official `SmoothSolution` supplies both
+facts at every positive time. Pressure has therefore entered the de Rham exact population rather
+than remaining a scalar label.
+
+`[proved-derived; formal-checked]` `Millennium/NavierStokesPotential.lean` composes the existing
+curl-kernel theorem, Kelvin's lowered velocity one-form, and the convex Poincare lemma. A globally
+differentiable spatial velocity slice with pointwise zero vorticity returns a global scalar
+potential whose Frechet derivative is exactly the lowered velocity one-form. The same module uses
+the contractibility of the actual carrier `Space = R^3` to prove that every based material loop is
+homotopic to the constant loop. This is the precise Poincare-topology pivot used by the fluid line;
+it is independent of, and does not re-prove, the closed three-manifold Poincare conjecture.
+
+`[proved-derived; formal-checked]` `RH/ThetaMellin.lean` makes the scale pivot land on the actual RH
+object. For positive scale, Landen's `T3` current is exactly Mathlib's zero-character even theta
+kernel. For `1 < re(s)`, its normalized Mellin transform at `s / 2` is exactly
+`completedRiemannZeta s`. The theorem reaches the completed zeta function, not a separately named
+analogue; it does not prove the zero-location assertion outside the convergence half-plane.
+
+`[interpretation]` These constructions form a useful four-face squeeze. Material differentiation
+keeps chronology and the moving receiver; de Rham exactness classifies the pressure return; the
+Poincare lemma closes the irrotational reconstruction fibre on the Euclidean carrier; and the
+theta--Mellin theorem attaches the repository's exact scale current to completed zeta. The common
+invariant is a transported current together with the population erased by its receiver, not a
+claim that fluid regularity, algebraic Hodge classes, and zeta zeros are already equivalent.
+
+`[open]` The next fluid deed is to differentiate the genuine time-dependent curve integral and
+derive its source from the same material chain rule. Exact pressure should then be transported
+through a differentiable primitive or a sufficiently smooth null-homotopy so its closed-loop
+period vanishes. The topological null-homotopy alone is not yet the `C^2` homotopy required by the
+available curve-integral invariance theorem.
+
+`[open]` The next Hodge--Navier--Stokes deed joins the global potential theorem to incompressibility
+and a realized codifferential/Laplacian, exposing the harmonic reconstruction fibre under explicit
+periodic, boundary, or decay conditions. The algebraic Hodge conjecture remains downstream of the
+separately scheduled Chern--Weil passage.
+
+`[open]` The next RH--fluid deed constructs the Navier--Stokes parabolic rebase and its critical
+receiver family, then tests whether its founded heat/scale current factors through the exact theta
+kernel used by the completed-zeta Mellin theorem. Sharing a dyadic parameter is not yet that
+factorization.
+
 ## Validation receipt
 
 `[established-bounded; measured]` Focused checks from
@@ -366,3 +437,41 @@ gyroparallelogram formula and gyrocommutative port, the symmetric moving-edge ca
 Euler/angle algebra of discrete Gauss--Bonnet, and the covector-valued divergence in Einstein
 conservation. Their requested type repairs were incorporated before the final receipts, including
 the explicit `CurveIntegrable` witness on every admitted velocity-loop circulation.
+
+## Second squeeze validation receipt
+
+`[established-bounded; measured]` The final public source closure is
+`sha256:297d1ee51d4ca5f74b10644c64b648601c22659512723f9035b57bef36053aa8`;
+its owner hashes are:
+
+| Owner | SHA-256 |
+|---|---|
+| `Millennium/NavierStokesMaterialDerivative.lean` | `feddd78cddc394743568be5917112013600f6c810ae39da1e423fa4bb9b53cfc` |
+| `Millennium/NavierStokesHodge.lean` | `4eeffebb9066ffdd5827f31e6cbc97085c1a7927f6ef5eb6bfb47cc2c2ac32c2` |
+| `Millennium/NavierStokesPotential.lean` | `57daef35ef679e7b5640e4df65608d4b05c43fc8ce789039a2494d23acb5dc96` |
+| `RH/ThetaMellin.lean` | `e556030bcd1b4273eb5a4686c0ea8f55f726cbd6c2846c079dae7da5d16de043` |
+| `ElementaryHolonics.lean` import surface | `fec6124ee61b153eb63f4930e21e8ad4349f02b781d5a037a5667d2300da7bd5` |
+
+`[established-bounded; measured]` Focused build receipts from
+`soma/formal/elementary-holonics` returned:
+
+| Command | Elapsed | Exit | Purpose |
+|---|---:|---:|---|
+| `lake build ElementaryHolonics.Millennium.NavierStokesMaterialDerivative ElementaryHolonics.Millennium.NavierStokesHodge ElementaryHolonics.Millennium.NavierStokesPotential ElementaryHolonics.RH.ThetaMellin ElementaryHolonics` | 26.47 s | 0 | initial five-owner and public-import closure; two prose-only audit corrections followed |
+| `lake build ElementaryHolonics.Millennium.NavierStokesMaterialDerivative ElementaryHolonics.Millennium.NavierStokesHodge ElementaryHolonics` | 7.73 s | 0 | final affected closure after the prose audit; owner times 4.8 s, 4.5 s, and 1.8 s |
+
+`[proved-derived; formal-checked]` Every printed theorem in the new four-owner cone depends only on
+`propext`, `Classical.choice`, and `Quot.sound`. An exact scan returned no declaration of `axiom`,
+no `sorry`, `admit`, or `sorryAx`, and `git diff --check` returned clean.
+
+`[established-bounded; measured]` Independent audits rechecked the material direction `(u,1)`,
+ordinary-versus-within derivative boundary, edge orientation, inner-product Leibniz order, cyclic
+kinetic-energy cancellation, all three momentum signs, the exterior-form types, `C^2` hypothesis
+for `d^2 = 0`, the symmetric/skew factors, curl orientation, vorticity reconstruction, Poincare
+potential hypotheses, and the completed-zeta target. The audit also separated sampled gradient
+quadrature from exact pressure integration and the finite receiver from genuine Kelvin
+circulation; both distinctions are now explicit in source and this record.
+
+`[definition]` These checks are the proportionate focused validation for the user-directed Lean
+research line. They do not claim the Rust/CUDA release receiver, do not run its complete gates, and
+do not update `CONSTRUCTION_STATE.md`.

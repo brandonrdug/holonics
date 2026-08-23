@@ -8,6 +8,7 @@ import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.RH.Statement
 import ElementaryHolonics.RH.Route
+import ElementaryHolonics.RH.ThetaMellin
 import ElementaryHolonics.Millennium.Gluing
 import ElementaryHolonics.Millennium.Turn
 import ElementaryHolonics.Millennium.Hand
@@ -29,8 +30,11 @@ import ElementaryHolonics.Millennium.Lines
 import ElementaryHolonics.Millennium.OfficialProblems
 import ElementaryHolonics.Millennium.NavierStokesVorticity
 import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
+import ElementaryHolonics.Millennium.NavierStokesMaterialDerivative
 import ElementaryHolonics.Millennium.NavierStokesCurvedTransport
 import ElementaryHolonics.Millennium.NavierStokesKelvin
+import ElementaryHolonics.Millennium.NavierStokesHodge
+import ElementaryHolonics.Millennium.NavierStokesPotential
 import ElementaryHolonics.Millennium.YangMillsLimit
 import ElementaryHolonics.Millennium.ReflectedPositivity
 import ElementaryHolonics.Millennium.AlgebraicGNS
