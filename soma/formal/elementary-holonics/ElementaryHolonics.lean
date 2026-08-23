@@ -81,6 +81,7 @@ import ElementaryHolonics.Millennium.FamilyHeight
 import ElementaryHolonics.Millennium.FamilyHalving
 import ElementaryHolonics.Millennium.FamilyKernel
 import ElementaryHolonics.Millennium.FamilyImage
+import ElementaryHolonics.Millennium.FamilyHom
 import ElementaryHolonics.Millennium.LandenLattice
 import ElementaryHolonics.Millennium.FamilyFace
 import ElementaryHolonics.Millennium.FaceImage
