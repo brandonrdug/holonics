@@ -3,6 +3,7 @@ import ElementaryHolonics.Foundation.Lineage
 import ElementaryHolonics.Foundation.AddressedBoundary
 import ElementaryHolonics.Foundation.ComparisonCell
 import ElementaryHolonics.Foundation.Presentation
+import ElementaryHolonics.Foundation.HigherDifferenceTransport
 import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
 import ElementaryHolonics.Geometry.Telescoping

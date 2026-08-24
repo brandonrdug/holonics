@@ -677,15 +677,35 @@ collapsed histories.
    specialization rather than as the generic ontology; and
 10. every promoted theorem prints without `sorryAx`.
 
-[proved-derived; formal-checked] The bounded one-generator part of HD0 currently lives in the
-historically named `NavierStokesReciprocalDifferenceRecurrence.lean`.  For every addressed window
-of length at most six it proves the shifted binomial Leibniz law and local reciprocal recurrence.
-A zero third denominator difference removes every denominator face above order two, leaving the
-exact sixth-order `6/15` recurrence.  The genuine quadratic frequency specialization proves that
-distinct-coordinate denominator differences vanish, same-coordinate second differences equal two,
-third differences vanish, and the three-axis candidate denominator type has cardinality seven.
-HD0 extracts those generic theorems into their proper owner and then adds the ordered
-multi-generator ledger; the fluid file becomes a specialization only.
+[proved-derived; formal-checked] **HD0 PASSED 2026-08-24.**
+`Foundation/HigherDifferenceTransport.lean` now owns arbitrary addressed difference words, their
+exact `2^n` occurrence-level shifted-Leibniz ledger, the unique all-right reciprocal face and the
+complete nonempty-left remainder, and a local reciprocal recurrence whose inverse hypothesis is
+restricted to the recursively returned successor population.  Exact pairwise interchange proves
+permutation invariance of both the word and total ledger; the finite flip/erase control returns
+`-1` versus `0` and therefore refuses an interchange receipt.  Chart conjugacy transports every
+word naturally.  A declared compression retains the complete subtype fibre, while one separating
+difference word reopens a proposed quotient.  The bounded one-generator binomial and reciprocal
+laws through order six moved out of the historically fluid-named file.  The same owner defines the
+explicit six-occurrence-to-`(2,2,2)` allocation receiver and proves its codomain has twenty-seven
+faces.  No promoted theorem contains `sorryAx`.
+
+[proved-derived; formal-checked] The fluid client now owns only its actual specialization.
+`NavierStokesReciprocalDifferenceRecurrence.lean` supplies commuting coordinate translations, the
+word `[0,0,1,1,2,2]`, sixty-four raw occurrence faces transported into the twenty-seven allocation
+receiver, the genuine local `|k|^2 * (1/|k|^2)=1` hypothesis on the complete three-axis window, and
+the resulting reciprocal recurrence.  Its earlier annihilator facts still return exactly seven
+quadratic denominator candidates: value, three first differences, and three same-axis second
+differences.
+
+[definition] **HD1 -- the annihilator quotient returns its active face support and norm ledger --
+is next.**  It adds a proof-bearing face predicate, removes a leaf only from a theorem that its
+receiver value is zero, proves the pruned ledger has the same sum, and returns the triangle/norm
+bound with active multiplicity retained.  Quadratic Hodge sparsity, `d^2=0`, nilpotent cusp
+monodromy, polynomial local-height corrections, and any later finite-order arithmetic action enter
+as separate annihilator certificates.  The first fluid specialization applies the seven
+denominator certificates to the twenty-seven allocation faces and derives the inverse-cube mixed
+mass.
 
 [definition] The HD0 specialization atlas is the reason the deed is mathematical rather than
 fluid-specific:
@@ -887,11 +907,11 @@ locked cosine coupling. `NavierStokesReciprocalDifferenceRecurrence.lean` proves
 Leibniz and local reciprocal recurrence through order six, its quadratic two-face reduction, and
 the actual one-coordinate Hodge-reciprocal specialization.
 
-[open] The exact next I9 return is HD0: extract the generic one-generator recurrence and construct
-the addressed multi-generator product/reciprocal word with its interchange quotient,
-noncommuting control, rebase, and reconstruction fibre.  Its first analytic specialization is the
-uniform physical Navier--Stokes Hodge-kernel witness through the three-axis quadratic lift, all
-twenty-seven product faces, and eight subset Haar receivers at scales at least three.  The other
+[open] The exact next I9 return is HD1: a proof-bearing annihilator quotient of the complete HD0
+ledger, its active-support norm return, and the quadratic Hodge specialization deriving the
+inverse-cube mixed mass from seven denominator certificates acting on twenty-seven allocation
+faces.  The later fluid receiver remains the uniform physical Navier--Stokes Hodge-kernel witness
+through all eight subset Haar receivers at scales at least three.  The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
 optical and dynamical-metric constitutive specializations.  These are receiver families of the

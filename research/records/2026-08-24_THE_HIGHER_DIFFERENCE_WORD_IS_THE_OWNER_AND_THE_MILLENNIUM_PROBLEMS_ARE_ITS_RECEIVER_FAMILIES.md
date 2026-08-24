@@ -75,17 +75,14 @@ unproved faces remain in the ledger.
 9. recovery of the `(2,2,2)` twenty-seven product allocation as a specialization; and
 10. no `sorryAx` in any promoted theorem.
 
-[proved-derived; formal-checked] The present bounded source already supplies item 7 and the
-denominator part of item 8.  It proves the one-generator shifted binomial law and reciprocal
-recurrence through order six, the exact `6/15` reduction for a quadratic denominator, local
-specialization to `|k|^2`, vanishing cross-coordinate differences, same-axis second difference
-equal to two, vanishing third differences, and cardinality seven of the surviving denominator
-candidate type.
-
-[open] Items 1--6, the ordered multi-generator portion of item 8, and item 9 remain to be
-constructed in the new owner.  The recursive tree must be proved before a closed multinomial
-formula is introduced, because the tree is the chronology-preserving theorem and the multinomial
-formula is its commuting receiver.
+[proved-derived; formal-checked] HD0 returned all ten acceptance faces in
+`Foundation/HigherDifferenceTransport.lean` and its fluid client.  The generic owner proves the
+arbitrary-word recursive ledger, local reciprocal recurrence, interchange quotient,
+noncommuting control, rebase, reconstruction fibre and separating word, and owns the bounded
+one-generator laws through order six.  The fluid client supplies the genuine three-axis word,
+quadratic seven-face sparsity, and local Hodge reciprocal specialization.  Sixty-four raw leaves
+map through an explicit allocation receiver to a codomain of exactly twenty-seven faces.  Printed
+axiom receipts contain no `sorryAx`.
 
 ## 4. The specialization atlas
 
@@ -111,16 +108,17 @@ is composed once and then specialized without renaming the owner after the first
 
 ## 5. The first analytic consumer
 
-[definition] After HD0 returns, the periodic-fluid path resumes with the specialization
+[proved-derived; formal-checked] The periodic-fluid path now has the specialization
 `q(k)=|k|^2`, `r(k)=q(k)^{-1}` off the zero mode, and word `(0,0,1,1,2,2)`.  The seven possible
-denominator faces act on the twenty-seven Hodge numerator/reciprocal faces.  Their exact shifts feed
-the inverse-cube mixed mass, the eight coordinate-subset receivers, the one-circle near/far Haar
-estimate, and its three-axis tensorization.
+denominator face types and the twenty-seven Hodge numerator/reciprocal allocation types are
+formally returned, together with the complete local reciprocal ledger and all shifts.
 
-[open] The uniform dyadic kernel return remains the first hard analytic consumer, but it no longer
-defines the abstraction.  Hodge and Yang--Mills may use HD0 immediately through their annihilator
-and noncommuting branches; the arithmetic lines may use it once their dilation, prime-local,
-height, and valuation actions are supplied as addressed transports.
+[open] HD1 must construct the proof-bearing annihilator quotient, use the seven quadratic
+certificates to prune the complete recurrence, and derive the inverse-cube mixed mass.  The eight
+coordinate-subset receivers, one-circle near/far Haar estimate, and three-axis tensorization follow
+after that.  Hodge and Yang--Mills may use HD0 immediately through their annihilator and
+noncommuting branches; the arithmetic lines may use it once their dilation, prime-local, height,
+and valuation actions are supplied as addressed transports.
 
 ## 6. Construction boundary
 
