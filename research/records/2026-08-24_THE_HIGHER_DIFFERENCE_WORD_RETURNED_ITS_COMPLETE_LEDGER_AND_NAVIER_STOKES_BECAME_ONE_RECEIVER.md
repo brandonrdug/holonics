@@ -92,9 +92,8 @@ and the seven candidate denominator face type.
 `ElementaryHolonics` library build passed.  The full build returned 4,135 jobs.  Printed axiom
 receipts for the promoted HD0 and fluid theorems contain no `sorryAx`.
 
-[open] HD1 is the proof-bearing annihilator quotient.  It must retain an active-face predicate and
-zero proof for every removed leaf, prove equality of complete and pruned ledger sums, and return a
-norm bound with the active multiplicity.  Its first fluid client applies the seven quadratic
-denominator certificates across the twenty-seven `(2,2,2)` allocations to derive the inverse-cube
-mixed mass; `d^2=0`, nonabelian curvature, cusp nilpotence, and arithmetic finite-order corrections
-remain other receiver-specific certificates of the same owner.
+[proved-derived; formal-checked] HD1 subsequently returned the proof-bearing annihilator quotient,
+complete/pruned sum equality, active-support norm ledger, and the exact quadratic Hodge split of
+sixty-three remainder occurrences into nine active and fifty-four proved-zero faces.  Its complete
+receipt is deposited in
+`2026-08-24_THE_ANNIHILATOR_CERTIFICATE_PRUNED_SIXTY_THREE_FACES_TO_NINE_AND_RETAINED_EVERY_ZERO.md`.

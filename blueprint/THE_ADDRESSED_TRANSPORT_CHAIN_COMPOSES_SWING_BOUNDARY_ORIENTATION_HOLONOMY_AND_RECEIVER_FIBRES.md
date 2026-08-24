@@ -698,14 +698,28 @@ the resulting reciprocal recurrence.  Its earlier annihilator facts still return
 quadratic denominator candidates: value, three first differences, and three same-axis second
 differences.
 
-[definition] **HD1 -- the annihilator quotient returns its active face support and norm ledger --
-is next.**  It adds a proof-bearing face predicate, removes a leaf only from a theorem that its
-receiver value is zero, proves the pruned ledger has the same sum, and returns the triangle/norm
-bound with active multiplicity retained.  Quadratic Hodge sparsity, `d^2=0`, nilpotent cusp
-monodromy, polynomial local-height corrections, and any later finite-order arithmetic action enter
-as separate annihilator certificates.  The first fluid specialization applies the seven
-denominator certificates to the twenty-seven allocation faces and derives the inverse-cube mixed
-mass.
+[proved-derived; formal-checked] **HD1 PASSED 2026-08-24.**
+`Foundation/HigherDifferenceAnnihilator.lean` defines a decidable active-face receiver whose every
+rejection carries an exact zero proof.  It retains both active and annihilated occurrence lists,
+proves the pruned ledger sum equals the complete sum, returns the triangle inequality and exact
+active-length-times-face-bound estimate, and intersects independent certificates without enlarging
+support.  `NavierStokesQuadraticAnnihilatorLedger.lean` instantiates the certificate on the actual
+six-occurrence reciprocal remainder: sixty-three raw faces split into nine active occurrences and
+fifty-four proved-zero occurrences.  The active population is exactly six first-denominator
+occurrences and three same-axis second-denominator occurrences; cross-axis and order-at-least-three
+denominator differences are eliminated by checked polynomial identities.  The local reciprocal
+recurrence and its norm ledger now factor through only those nine faces.  The earlier seven-face
+denominator type is their commuting quotient after adjoining the principal value face.  No
+promoted theorem contains `sorryAx`.
+
+[definition] **HD2 -- the annihilator-pruned recurrence descends its scale envelope -- is next.**
+It turns the active recurrence into a well-founded order ledger: every reciprocal derivative is
+bounded from strictly lower reciprocal orders, denominator degrees, and the local inverse aperture;
+the returned certificate records the accumulated power of the lower quadratic scale and every
+shifted successor window.  Polynomial actions, nilpotent monodromy, exterior `d^2=0`, local-height
+corrections, and covariant commutator filtrations can supply different degree ledgers to the same
+descent owner.  The first fluid specialization must derive the inverse-cube full mixed mass rather
+than accept a bound for each of the nine active faces as an input.
 
 [definition] The HD0 specialization atlas is the reason the deed is mathematical rather than
 fluid-specific:
@@ -907,10 +921,9 @@ locked cosine coupling. `NavierStokesReciprocalDifferenceRecurrence.lean` proves
 Leibniz and local reciprocal recurrence through order six, its quadratic two-face reduction, and
 the actual one-coordinate Hodge-reciprocal specialization.
 
-[open] The exact next I9 return is HD1: a proof-bearing annihilator quotient of the complete HD0
-ledger, its active-support norm return, and the quadratic Hodge specialization deriving the
-inverse-cube mixed mass from seven denominator certificates acting on twenty-seven allocation
-faces.  The later fluid receiver remains the uniform physical Navier--Stokes Hodge-kernel witness
+[open] The exact next I9 return is HD2: the well-founded scale-envelope descent of the pruned HD1
+recurrence and its quadratic Hodge specialization deriving the inverse-cube mixed mass rather than
+assuming nine independent face bounds.  The later fluid receiver remains the uniform physical Navier--Stokes Hodge-kernel witness
 through all eight subset Haar receivers at scales at least three.  The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
