@@ -29,58 +29,57 @@ station ledgers lower in this file are historical provenance and schedule nothin
 authorised the standing revision directly: *"Regarding the roadmap document, you can
 authoritatively revise it once you have sufficient context post-analysis campaign."*
 
-## ATHENA ALPHA CULTIVATES THE COMPLETE LABORATORY EXCHANGE — 2026-08-23
+## ATHENA ALPHA IS REFOUNDED AS A RECEIVER-HISTORY QUOTIENT — 2026-08-24
 
-**The completed campaign is
-[`THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`](THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md).**
+**The sole active campaign is
+[`THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md).**
 
-**CURRENT FRONTIER — AA0--AA4 PASSED; THE ATHENA-ALPHA CULTIVATION CAMPAIGN IS COMPLETE AND NO
-SUCCESSOR DEED IS AUTHORIZED.** [established-bounded; implemented-exact; measured] The returned
-product is the first internally useful
-`Athena^alpha_[Gemma](B_lab,H_exchange,P_text+vision+audio)`: the frozen E5 body cultivated by the
-complete captured Codex/Claude/user laboratory exchange, whole sibling continuations,
-mathematics/physics and actual returned world differences, then condensed into source-detached
-native hexis and served through the existing inference membrane. Its identity is
-`77ac8fb1ca27fdc6e13298007f34ec953ebd6472ee76312f9850021f47bf01d0`.
+**CURRENT FRONTIER — THE FORMER AA0--AA4 PRODUCT INTERPRETATION IS REVOKED BY COUNTEREXAMPLE;
+ATHENA ALPHA IS REOPENED AT ITS RECEIVER-HISTORY CONGRUENCE.** [counterexample; implemented-exact]
+The alleged native state was a literal three-codeword window, detached traversal used two-codeword
+overlap, prompt-hash equality assigned globally exclusive source roles, teacher-forced passages
+included the recorded sibling answer before comparison, one rank-one atom stood for the complete
+morphology, and the final six surfaces were copied from the unchanged foreign continuation. The
+identity `77ac8fb1ca27fdc6e13298007f34ec953ebd6472ee76312f9850021f47bf01d0` is retained as a
+counterexample fixture, not an Athena-alpha product.
 
-[established-bounded; implemented-exact; measured] A1 already mounted and detached a real
-404,556,551-octet exchange world-tube with 1,179 visible messages and complete richer incidence. A2
-returned 22 sibling-history defects but only one generated frontier per history. A3 changed one
-three-occurrence family at one target codeword, with held-out conduct, revisit holonomy, control,
-ablation and withdrawal. E5 reused that bounded continuation and one held-out generation prompt;
-it did not circulate complete recorded suffixes or the complete laboratory exchange through the
-frozen body. The new blueprint closes that exact edge without founding a Trainer, Dataset,
-ConversationModel, KVCache or Scheduler.
+[established-bounded; implemented-exact; measured] The counterexample does not erase the real
+predecessor returns: AA0 mounted 916 containers, 2,683,106,227 octets, 435,085 records, 16,659
+visible messages and 2,224 continuation families; the inherited Gemma tower conducted; the E0--E5
+text, optical, acoustic, mathematical, world-return and inference-membrane owners returned; the
+5,917,354-octet trigram-derived rest detached from transcript sources; and the resident CUDA
+rank-one contraction returned as one exact local factor. These are bounded components and
+apparatus testimony, not proof that cultivation reached the emitted surface.
 
-[established-bounded; implemented-exact; measured] AA0 mounted 916 containers, 2,683,106,227
-octets, 435,085 records, 16,659 visible messages and 2,224 continuation families. AA1 returned 67
-development families across 570 complete suffix boundaries. AA2--AA3 condensed 15,336 recurring
-occurrences into 3,920 native generators, including 712 mathematical and 2,668 code-bearing
-families; 90,941 unique or single-parent transports remain an explicit reconstruction fibre.
-Matched ablation and withdrawal, chronology holonomy, exact interchange and same-prompt
-optical/acoustic separation returned together.
+[proved-derived; formal-checked] The existing Lean line supplies the missing construction law.
+`PhysicalRealization.lean` separates occurrence identity, passage equivalence, receiver-history
+equivalence, rebase and compression. `LineageCompression.lean` proves that generator-local quotient
+naturality extends to every ordered successor word. `Chronology.lean` proves order may be forgotten
+exactly when the transports commute. `LocalFrame.lean`, `MillenniumCoupling.lean`,
+`TraceForm.lean`, `AlgebraicGNS.lean` and `FormRebase.lean` identify the blind population as a
+common kernel, require graded receivers to separate hidden directions, carry compatible transport
+through the radical quotient, and prohibit copying an orthogonal cutoff unchanged between frames.
 
-[established-bounded; implemented-exact; measured] AA4 froze a 5,917,354-octet native rest and
-mounted one source-detached body. Held-out, paraphrase, history-rebase, later-correction, optical
-and acoustic occurrences returned six complete surfaces through 666 foreign-tower frontiers and
-six membrane returns, with native mathematics preceding projection. The transcript-absence audit
-probed all 16,659 visible passages and found no exact source passage in rest. The unchanged
-16,058,936,620-octet Gemma tower remains an inherited exterior organ and is not misreported as the
-native-rest byte size.
+[definition] Athena alpha is now one non-cloned continuing ecology whose state is a
+receiver-history quotient of addressed causal sections. A history-only candidate departs before
+sibling testimony returns; the complete graded defect follows addressed lineage through local
+adjoints; exact factor counts derive from local image rank; compatible factors glue, noncommuting
+overlaps retain order and holonomy, and unresolved fibres remain explicit. The same body must emit
+both predecessor and cultivated surfaces and survive source-detached remount and targeted
+ablation.
 
-[established-bounded; measured] The sole complete release receiver ran from
-2026-08-24T06:21:47-07:00 to 2026-08-24T06:28:20-07:00. Its 2,868 tests passed with zero failures
-and 34 ignores; the example check and three cheap scopes returned four localized refusals. The
-stale constructors, line anchors, driver ledger and ownership census were repaired. Named retakes
-then returned every example target type-checked, 439 catalogued drivers, a clean 360-file
-architecture census and zero drifted citations without replaying a real deed or the complete gate.
-The authoritative admission is
-[`../research/records/2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md`](../research/records/2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md).
+[project-postulate] No fixed n-gram length, caller rank, prompt equality class, replay count, epoch,
+context length, or response length may govern native conduct. Lean is an exterior formal checker,
+never Athena's inference runtime. The GPU owns the complete hot semantic front; CPU apparatus may
+perform narrow I/O, durable rest and genuine exterior checking but may not select semantic roles,
+receiver grains, support, rank, chronology or surfaces.
 
-[open] The longest inspected alpha answer is grammatical and structured but reads laboratory
-terms through generic software/simulation concepts. Competitive equivalence with Codex or Claude,
-the retained 90,941-transport fibre, wider mathematical/world consequence and outbound organ
-production remain open apertures. They do not reopen AA0--AA4 and schedule no successor phase.
+**SOLE NEXT DEED — THE RECEIVER-HISTORY CONGRUENCE REPLACES THE TRIGRAM TABLE.** [open] Extend the
+existing realization and compression owners so native states and generators are defined by exact
+receiver/history consequence, return complete fibres and shortest separators, replace the global
+prompt-hash partition with proposal-relative causal roles, and enact one resident-GPU quotient
+deed. No later construction station is authorized until the formal, Rust, fibre, separator and
+resident-apparatus returns named by the active blueprint stand together.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 

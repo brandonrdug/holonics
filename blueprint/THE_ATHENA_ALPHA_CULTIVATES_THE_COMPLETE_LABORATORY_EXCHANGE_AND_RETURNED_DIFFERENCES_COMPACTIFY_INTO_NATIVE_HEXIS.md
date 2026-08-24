@@ -1,5 +1,12 @@
 # The Athena alpha cultivates the complete laboratory exchange, and returned differences compactify into native hexis
 
+> **SUPERSEDED 2026-08-24.** Post-admission source inspection found that this construction's
+> semantic partition is prompt-hash equality, its native state is a three-codeword window, and its
+> final surfaces are copied from the unchanged foreign continuation. The artifacts remain bounded
+> evidence; the Athena-alpha interpretation is withdrawn. The sole active contract is
+> [`THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md).
+> This file is historical construction evidence and schedules nothing.
+
 **Authority:** this is the completed AA0--AA4 construction contract admitted by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 

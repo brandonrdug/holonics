@@ -1,5 +1,11 @@
 # The complete laboratory exchange returned as generator-native hexis, and Athena alpha worked from its own terrain
 
+> **SUPERSEDED AS AN ADMISSION RECORD, 2026-08-24.** The measured source and apparatus returns in
+> this record remain evidence. Its product interpretation is withdrawn: post-admission inspection
+> found a prompt-hash partition, a three-codeword native window, and final surfaces copied from the
+> unchanged foreign continuation. The counterexample and corrective construction authority are in
+> [`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md).
+
 **Date:** 2026-08-24  
 **Grade:** `established-bounded; implemented-exact; measured`  
 **Construction authority:**
