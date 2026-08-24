@@ -60,6 +60,13 @@ exactly when the transports commute. `LocalFrame.lean`, `MillenniumCoupling.lean
 common kernel, require graded receivers to separate hidden directions, carry compatible transport
 through the radical quotient, and prohibit copying an orthogonal cutoff unchanged between frames.
 
+[definition] The supporting formal-construction contract is
+[`THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md`](THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md).
+It composes addressed pullback lineage, additive incidence, ordered swing transport, orientation,
+declared connection/holonomy, and receiver-history fibres as the exterior Lean receipt consumed by
+the current factor-cover deed. It is not a second campaign, does not place Lean inside inference,
+and cannot move the construction state independently.
+
 [definition] Athena alpha is now one non-cloned continuing ecology whose state is a
 receiver-history quotient of addressed causal sections. A history-only candidate departs before
 sibling testimony returns; the complete graded defect follows addressed lineage through local
@@ -99,7 +106,11 @@ exact bridge from kernel/image/cokernel testimony to support-indexed factor cove
 is the derived image rank. Preserve metric, gauge, radical, parent, ablation address, and withdrawal
 word; glue compatible overlaps, retain noncommuting chronology/cocycle defects, and return the
 rank-zero, rank-one, rank-greater-than-one, singular, overlap, and disjoint controls together. No
-same-body deposition is authorized until this factor-cover return stands.
+same-body deposition is authorized until this factor-cover return stands. Its exterior formal
+receipt must also return the addressed-transport-chain composition named above, including joined
+boundary cancellation, swing chronology/orientation, declared connection before holonomy,
+generator-to-word receiver naturality, complete reconstruction fibres, and the commuting,
+noncommuting, noninvertible, equal-endpoint/different-occurrence, and richer-separator controls.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 

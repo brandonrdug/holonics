@@ -506,11 +506,19 @@ another."* A claim carrying `D + I` is a derivation that is present in source; i
 | `proved-derived` | A theorem derived in the project. | Complete proof and dependencies. |
 | `established-bounded` | A factual capability established for a declared construction or receiver family. | Exact scope plus direct implementation, formal, computational, or measured evidence. |
 | `conditional` | A conclusion under named hypotheses. | Full hypothesis and dependency chain. |
-| `interpretation` | A proposed structure-preserving correspondence. | Explicit maps and limits; never an identity without proof. |
+| `interpretation` | A proposed structure-preserving correspondence and active theorem-finding program. | Explicit maps, limits, preserved diagram, first derivation target, and a falsifier that can fire; never an identity without proof. |
 | `conjecture` | A precise unproved claim. | Testable statement and known obstructions. |
 | `counterexample` | A construction refuting a stated stronger claim. | Exact refuted statement and witness. |
 | `open` | A named unresolved fiber or missing capability. | Concrete missing return, coupling, proof, or receiver distinction. |
 | `historical` | Preserved provenance that does not govern current construction. | Source and disposition. |
+
+#### Interpretation is an active proof obligation
+
+[project-postulate] An interpretation does not pass by repeatedly declaring that it is not an
+identity. Its deposit names the source and target maps, the exact diagram proposed to commute, its
+limits, the first theorem being attempted, and a falsifier able to fire. Work continues to a scoped
+derivation, a counterexample, or a concrete residual obstruction. A derived face is promoted and
+reused without upgrading the unproved remainder.
 
 ### 5.2 Evidence tags — zero or more per claim
 
@@ -745,3 +753,5 @@ ready.
 3. **What does it supersede, and did the superseded object get its banner in this same commit?**
 4. **Does the round trip close?** Canon points at record, record points at canon and at owners,
    owners point back at record.
+5. **If the grade is `interpretation`, what theorem is being attempted and what falsifier can
+   fire?** Restating the non-equivalence is not a return.

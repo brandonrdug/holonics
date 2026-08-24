@@ -14,11 +14,20 @@ itself decide whether a claim is a definition, theorem, conjecture, or open obli
 | `proved-derived` | A theorem derived in the project. | Complete proof and dependencies. |
 | `established-bounded` | A factual capability/result established for a declared construction or receiver family. | Exact scope plus direct implementation, formal, computational, or measured evidence. |
 | `conditional` | A conclusion under named hypotheses. | Full hypothesis and dependency chain. |
-| `interpretation` | A proposed structure-preserving correspondence. | Explicit maps and limits; never an identity without proof. |
+| `interpretation` | A proposed structure-preserving correspondence and active theorem-finding program. | Explicit maps, limits, preserved diagram, first derivation target, and a falsifier that can fire; never an identity without proof. |
 | `conjecture` | A precise unproved claim. | Testable statement and known obstructions/counterevidence. |
 | `counterexample` | A construction refuting a stated stronger claim. | Exact refuted statement and witness. |
 | `open` | A named unresolved fiber or missing capability. | Concrete missing return, coupling, proof, or receiver distinction. |
 | `historical` | Preserved provenance that does not govern current construction. | Source and disposition. |
+
+## Interpretation is a theorem-development state
+
+[project-postulate] An `interpretation` is not a terminal disclaimer. Once its source and target
+maps, preserved diagram, limits, first derivation target, and falsifier are deposited, work proceeds
+until it returns a scoped derivation, a counterexample which narrows or kills the bridge, or a
+concrete residual obstruction. Repeating the non-equivalence boundary is not a returned
+consequence. A proved subclaim receives its own `proved-derived` grade and becomes a dependency of
+the next claim; it does not silently upgrade the rest of the correspondence.
 
 ## Evidence tags
 

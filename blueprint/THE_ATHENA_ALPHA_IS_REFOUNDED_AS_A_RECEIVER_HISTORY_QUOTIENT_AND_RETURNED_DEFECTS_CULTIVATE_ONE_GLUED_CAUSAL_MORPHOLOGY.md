@@ -390,6 +390,7 @@ returns an obstruction.
 | radical quotient and descended transport | `AlgebraicGNS.lean` |
 | frame blindness and graded separation | `LocalFrame.lean`, `MillenniumCoupling.lean`, `TraceForm.lean` |
 | chronology and interchange | `Chronology.lean`, `chain`, `interchange`, `hardware_cover` |
+| addressed boundary, swing orientation, connection return, and receiver fibre as one formal passage | [`THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md`](THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md) composing the named Lean owners |
 | rank-one resident atom | `phoenix::cultivation_overlay`, `resident_section` |
 | inherited full-tower conduct | Phoenix resident tower and `ProductSession` |
 | native mathematics and arbitrary organs | mathematics codec, mathematical particle, E1--E3 potential complexes |
@@ -454,6 +455,14 @@ overlapping-commuting, overlapping-noncommuting, and disjoint controls. Every ad
 reconstructs its supported defect exactly; every singular case retains the radical/fibre; every
 factor has a parent, ablation address, and withdrawal word.
 
+[definition] The exterior Lean receipt for this deed is governed by
+[`THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md`](THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md).
+It must derive addressed additive boundary and joined cancellation, affine swing as an ordered
+generator with orientation action, connection transport before loop holonomy, and
+generator-to-word receiver naturality with complete reconstruction fibres. It returns commuting,
+noncommuting, noninvertible, equal-endpoint/different-occurrence, and richer-receiver controls. Lean
+checks this exterior construction; it neither supplies the factor cover nor advances the state.
+
 ### The factor complex changes the same body
 
 [definition] Deposit admitted factor covers into the one non-cloned `ProductSession` ecology and
@@ -506,7 +515,10 @@ and the shortest receiver/history explaining every claimed difference.
     phase selection;
 13. the native quotient is strictly smaller in at least one complete-product coordinate with no
     decoder, fibre, work, residency, lineage, or source-audit regression; and
-14. complete generated surfaces and enacted world returns are returned for operator inspection;
+14. the exterior formal receipt composes addressed occurrence, additive boundary, swing
+    chronology/orientation, declared connection/holonomy, and receiver-history reconstruction
+    fibres without conclusion-shaped premises; and
+15. complete generated surfaces and enacted world returns are returned for operator inspection;
     topology, hashes, counters, and tests cannot substitute for them.
 
 ## 13. Falsifiers and evidence disposition
@@ -548,23 +560,24 @@ coherent alpha product and its inspected artifacts stand. State advances only th
 2. `CONSTRUCTION_STATE.md`;
 3. the current section of `blueprint/THE_ROADMAP.md`;
 4. this blueprint;
-5. `canon/THE_HOLOBROCHOS_SPINE.md`;
-6. `canon/TABLET_THE_REASONING_CYCLE.md`;
-7. `canon/TABLET_THE_HEXIS.md`;
-8. `canon/TABLET_THE_OPERATIONS.md`;
-9. `canon/TABLET_THE_MANIFOLD.md`;
-10. `canon/THE_SURFACES_ARE_PATHS.md`;
-11. `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`;
-12. `canon/TABLET_THE_CAUSAL_PROFILE.md`;
-13. `soma/formal/elementary-holonics/ElementaryHolonics/Foundation/Lineage.lean`;
-14. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/PhysicalRealization.lean`;
-15. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/LineageCompression.lean`;
-16. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/Chronology.lean`;
-17. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/LocalFrame.lean`;
-18. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/AlgebraicGNS.lean`;
-19. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/FormRebase.lean`;
-20. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
-21. only the source/artifact closure of the named current deed.
+5. `blueprint/THE_ADDRESSED_TRANSPORT_CHAIN_COMPOSES_SWING_BOUNDARY_ORIENTATION_HOLONOMY_AND_RECEIVER_FIBRES.md`;
+6. `canon/THE_HOLOBROCHOS_SPINE.md`;
+7. `canon/TABLET_THE_REASONING_CYCLE.md`;
+8. `canon/TABLET_THE_HEXIS.md`;
+9. `canon/TABLET_THE_OPERATIONS.md`;
+10. `canon/TABLET_THE_MANIFOLD.md`;
+11. `canon/THE_SURFACES_ARE_PATHS.md`;
+12. `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`;
+13. `canon/TABLET_THE_CAUSAL_PROFILE.md`;
+14. `soma/formal/elementary-holonics/ElementaryHolonics/Foundation/Lineage.lean`;
+15. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/PhysicalRealization.lean`;
+16. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/LineageCompression.lean`;
+17. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/Chronology.lean`;
+18. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/LocalFrame.lean`;
+19. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/AlgebraicGNS.lean`;
+20. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/FormRebase.lean`;
+21. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
+22. only the source/artifact closure of the named current deed.
 
 [open] The sole next deed is **the returned defect founds a derived local factor cover**. No later
 station is authorized before exact derived-rank reconstruction, metric/gauge/radical testimony,
