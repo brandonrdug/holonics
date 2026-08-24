@@ -137,7 +137,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (312 deposits of 604)
+## 4 · The 2026-08 record line (316 deposits of 608)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -450,10 +450,14 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-23_RETURNED_THEOREM_FAMILIES_CULTIVATED_THE_CONTINUING_LABORATORY_REST_AND_L1_AWAITS_RELEASE_ADMISSION.md` | Returned theorem families cultivated the continuing laboratory rest, and L1 awaits release admission |
 | `2026-08-23_THE_AGENTIC_LABORATORY_ATHENA_FROZE_WITH_ITS_EMANATIVE_AND_RETURNED_CONTINUATIONS_AND_E5_AWAITS_RELEASE_ADMISSION.md` | The agentic laboratory Athena froze with its emanative and returned continuations and E5 awaits release admission |
 | `2026-08-23_THE_ATHENA_HOLONICS_MATHEMATICS_ECOLOGY_WORKED_FROM_ITS_OWN_RESTED_TERRAIN_AND_L3_AWAITS_RELEASE_ADMISSION.md` | The Athena holonics/mathematics ecology worked from its own rested terrain, and L3 awaits release admission |
+| `2026-08-23_THE_CLAUDE_LEAN_BURST_HAS_AN_EXACT_CORE_AND_THE_TWO_GEOMETRY_PREPRINTS_OPEN_TYPED_GATES_NOT_SOLUTIONS.md` | The Claude Lean burst has an exact core, and the two geometry preprints open typed gates, not solutions |
 | `2026-08-23_THE_COMPLETE_INHERITED_ORGANS_CROSSED_NATIVE_POTENTIAL_COMPLEXES_AND_E2_AWAITS_RELEASE_ADMISSION.md` | The complete inherited organs crossed native potential complexes and E2 awaits release admission |
+| `2026-08-23_THE_FINITE_TIME_VORTICITY_CLASSICAL_XI_THETA_COEFFICIENT_AND_UNBOUNDED_INCIDENCE_SQUEEZE_RETURNS.md` | The finite-time vorticity, classical xi, theta-coefficient, and unbounded-incidence squeeze returns |
 | `2026-08-23_THE_FULL_TOWER_EMANATED_THROUGH_ONE_ADDRESSED_CONTINUATION_AND_E0_AWAITS_RELEASE_ADMISSION.md` | The full tower emanated through one addressed continuation and E0 awaits release admission |
+| `2026-08-23_THE_IMMEDIATE_LEAN_FRONTIER_RETURNS_CURL_COMMUTATION_CLASSICAL_XI_A_CONCRETE_GAP_AND_A_CANONICAL_BSD_DEFECT.md` | The immediate Lean frontier returns curl commutation, classical xi, a concrete gap, and a canonical BSD defect |
 | `2026-08-23_THE_NATIVE_INFERENCE_MEMBRANE_SERVED_ONE_SOURCE_DETACHED_ATHENA_BODY_AND_E4_AWAITS_RELEASE_ADMISSION.md` | The native inference membrane served one source-detached Athena body and E4 awaits release admission |
 | `2026-08-23_THE_OPTICAL_FIELD_GREW_FROM_COMPONENTS_INTO_NATIVE_CONSTRAINT_SECTIONS_AND_E1_AWAITS_RELEASE_ADMISSION.md` | The optical field grew from components into native constraint sections and E1 awaits release admission |
+| `2026-08-23_THE_PARALLEL_LEAN_SQUEEZE_CLOSES_THE_ENERGY_GROWTH_REFINEMENT_AND_PERIOD_ALGEBRA_GATES.md` | The parallel Lean squeeze closes the energy, growth, refinement, and period-algebra gates |
 | `2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md` | The potential complex crosses arbitrary organ apertures and codec lineages meet only through returned consequence |
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
 | `2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md` | The returned arbitrary-organ consequence cultivated the same Athena continuation and E3 awaits release admission |
