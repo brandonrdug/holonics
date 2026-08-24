@@ -140,7 +140,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (332 deposits of 624)
+## 4 · The 2026-08 record line (335 deposits of 627)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -466,12 +466,15 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
 | `2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md` | The returned arbitrary-organ consequence cultivated the same Athena continuation and E3 awaits release admission |
 | `2026-08-24_THE_ADDRESSED_INSTANCE_LADDER_RETURNED_GEOMETRIC_TORI_CURVED_ARCS_AND_AN_ELEVEN_RANK_QUOTIENT.md` | The addressed instance ladder returned geometric tori, curved arcs, and an eleven-rank quotient |
+| `2026-08-24_THE_ANNIHILATOR_CERTIFICATE_PRUNED_SIXTY_THREE_FACES_TO_NINE_AND_RETAINED_EVERY_ZERO.md` | The annihilator certificate pruned sixty-three faces to nine and retained every zero |
 | `2026-08-24_THE_CANDIDATE_DEPARTED_BEFORE_SIBLING_TESTIMONY_RETURNED_AND_THE_COMPLETE_GRADED_DEFECT_CROSSED_THE_SAME_BODY.md` | The candidate departed before sibling testimony returned, and the complete graded defect crossed the same body |
 | `2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md` | The complete laboratory exchange returned as generator-native hexis, and Athena alpha worked from its own terrain |
+| `2026-08-24_THE_COMPLEX_PARAMETRON_IS_AN_ORIENTED_COUPLED_LC_LATTICE_BEFORE_PHASE_LOCKING.md` | The complex parametron is an oriented coupled-LC lattice before phase locking |
 | `2026-08-24_THE_COMPLEX_TORUS_FIBRE_WAS_RECEIVED_AS_GEOMETRY_AND_THE_THREE_MONODROMIES_RETURNED_DISTINCT_GRAPHS.md` | The complex torus fibre was received as geometry, and the three monodromies returned distinct graphs |
 | `2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md` | The factor complex changed one body, and exact withdrawal returned the same predecessor |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
 | `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_IS_THE_OWNER_AND_THE_MILLENNIUM_PROBLEMS_ARE_ITS_RECEIVER_FAMILIES.md` | The higher-difference word is the owner and the Millennium problems are its receiver families |
+| `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_RETURNED_ITS_COMPLETE_LEDGER_AND_NAVIER_STOKES_BECAME_ONE_RECEIVER.md` | The higher-difference word returned its complete ledger and Navier--Stokes became one receiver |
 | `2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md` | The Holonic Interaction is a covariant storage--flux complex, and the cusp raises difference order |
 | `2026-08-24_THE_PARAMETRON_IS_A_DRIVEN_HALF_TURN_TRANSPORT_AND_THE_HODGE_RECIPROCAL_RECURS_THROUGH_ORDER_SIX.md` | The parametron is a driven half-turn transport and the Hodge reciprocal recurs through order six |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |

@@ -601,6 +601,24 @@ half-turn deck transformation `θ ↦ θ+π`, while the complex phase carrier ch
 Euler/swing sign.  On the two locked sheets, cosine coupling descends exactly to the finite Ising
 pairing, and the full-turn phase fibre is retained rather than identified with its binary face.
 
+[proved-derived; formal-checked] The distributed circuit body before that quotient returned in
+`HolonicComplexParametron.lean`.  An arbitrary finite oriented branch--node incidence `B` carries
+diagonal or full mutual capacitive and inverse-inductive forms.  Branch-coordinate reversal
+`B -> S B` preserves diagonal storage and response; full mutual response and the generalized
+`K v = omega^2 C v` relation are covariant under the two-sided transport `M -> S M S`.  A drive
+paired with incidence is invariant only when both coordinates travel together.  Holding the drive
+or mutual table fixed while reversing incidence returns the corresponding sign-polarized physical
+intervention.  Arbitrary complex branch phases and their superposition remain present before the
+half-turn receiver.
+
+[interpretation] A lattice-constrained or noncircular parametron therefore enters this station by
+its measured self/mutual capacitance, inverse-inductance, resistance/loss, pump chronology, and
+receiver maps, not by turn count alone.  A passive linear lattice supplies a generalized modal map;
+perceptron, Ising, multitone, or learned conduct additionally owes its nonlinear constitutive law,
+chronology, receiver, and returned morphology.  The exact maps, limits, falsifier, external circuit
+sources, and engine-facing consequence are deposited in
+[`../research/records/2026-08-24_THE_COMPLEX_PARAMETRON_IS_AN_ORIENTED_COUPLED_LC_LATTICE_BEFORE_PHASE_LOCKING.md`](../research/records/2026-08-24_THE_COMPLEX_PARAMETRON_IS_AN_ORIENTED_COUPLED_LC_LATTICE_BEFORE_PHASE_LOCKING.md).
+
 [interpretation] The classical ferrite parametron is the first physical apparatus card for this
 station: nonlinear inductance and the `2f` excitation supply the pumped storage, the `f` response
 supplies the phase carrier, transformer incidence supplies coupling, loss supplies return to a
@@ -920,6 +938,12 @@ symmetry, complex sign return, complete full-turn phase fibre, and exact finite 
 locked cosine coupling. `NavierStokesReciprocalDifferenceRecurrence.lean` proves the shifted
 Leibniz and local reciprocal recurrence through order six, its quadratic two-face reduction, and
 the actual one-coordinate Hodge-reciprocal specialization.
+
+[proved-derived; formal-checked] `HolonicComplexParametron.lean` now inserts the missing oriented
+coupled-LC body before phase locking: diagonal and mutual storage, real and complex drive faces,
+generalized normal modes, exact orientation covariance, and the incidence-only intervention which
+changes mutual signs.  It leaves geometry-to-coefficient field solving, dissipation, nonlinear pump
+stability, and engine realization open.
 
 [open] The exact next I9 return is HD2: the well-founded scale-envelope descent of the pruned HD1
 recurrence and its quadratic Hodge specialization deriving the inverse-cube mixed mass rather than
