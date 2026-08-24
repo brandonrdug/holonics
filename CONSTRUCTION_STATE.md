@@ -4,13 +4,12 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-24 after post-admission source inspection falsified the former Athena-alpha
-product interpretation and the Lean line supplied the receiver-history correction.
+**Currency:** 2026-08-24 after the receiver-history congruence and sealed-candidate/later-return
+stations passed; the derived-rank local factor cover is now the sole construction frontier.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE FORMER AA0--AA4 PRODUCT INTERPRETATION IS REVOKED; ATHENA ALPHA IS
-REOPENED AT THE RECEIVER-HISTORY CONGRUENCE.**
+**CURRENT FRONTIER — THE RETURNED DEFECT MUST FOUND ITS DERIVED-RANK LOCAL FACTOR COVER.**
 
 [counterexample; implemented-exact] The former alpha path assigns semantic roles from prompt-hash
 equality, uses a three-codeword state and two-codeword-overlap traversal, exposes recorded sibling
@@ -51,11 +50,20 @@ proposal-relative role incidences and 1,218 overlapping proposal/target roles. T
 replay. The Lean contract proved native equality equivalent to complete causal-signature equality
 and native inequality sufficient to return a separating receiver/history.
 
-[open] The sole next deed is **the candidate departs before sibling testimony returns**. It must
-seal a history-only candidate before sibling bytes are accessible, mount the response and
-world/operator testimony only afterward, and return the complete graded defect, fibres, source
-audit, equal-surface richer separator and different-surface common-operation pair. No later station
-is authorized until those returns stand together.
+[established-bounded; implemented-exact; measured] The candidate-return station passed under
+artifact identity `bf202d8c45e5ed1a300ea1ebc5290c1edc0a2db8e9f1e8b51e12e62e38d35709`.
+Four derived witnesses crossed one source-isolated, non-cloned `ProductSession`. Each history-only
+candidate sealed before any sibling bytes crossed, retained all 262,144 exact terminal intervals
+and complete resident execution/work testimony, and used 43 tower plus one overlay launch on the
+RTX 4080 SUPER. The later channel then carried complete sibling, world, and addressed operator
+occurrences; four five-grain defects returned in 84 resident exact-quotient launches each with no
+additive residual assumption or CPU semantic replay. Both required qualitative pairs returned.
+
+[open] The sole next deed is **the returned defect founds a derived local factor cover**. It must
+derive factor population from exact image rank, retain metric/gauge/radical and complete
+reconstruction testimony, and return rank-zero, rank-one, rank-greater-than-one, singular,
+compatible-overlap, noncommuting-overlap and disjoint controls together. No later station is
+authorized until that factor-cover return stands.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

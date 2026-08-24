@@ -425,7 +425,12 @@ development/sibling/held-out/revisit/rebase/control incidences; and one GPU resi
 `tokens.len() == 3`, two-token-overlap traversal, exact-prompt equality as semantic eligibility, or
 a globally exclusive `ContinuationPartition` deciding cultivation.
 
-### The candidate departs before sibling testimony returns — **sole next deed**
+### The candidate departs before sibling testimony returns — **completed 2026-08-24**
+
+[established-bounded; implemented-exact; measured] The completed station, its source-isolated
+same-session return channel, complete future fibres, apparatus testimony, and three refused
+intermediate cuts are recorded in
+[`../research/records/2026-08-24_THE_CANDIDATE_DEPARTED_BEFORE_SIBLING_TESTIMONY_RETURNED_AND_THE_COMPLETE_GRADED_DEFECT_CROSSED_THE_SAME_BODY.md`](../research/records/2026-08-24_THE_CANDIDATE_DEPARTED_BEFORE_SIBLING_TESTIMONY_RETURNED_AND_THE_COMPLETE_GRADED_DEFECT_CROSSED_THE_SAME_BODY.md).
 
 [definition] Conduct the predecessor from history alone, seal the candidate occurrence and its
 complete plural future section, then mount the recorded sibling and world/operator returns as later
@@ -437,7 +442,7 @@ receiver/history separates it, and one pair whose surface differs while a lawful
 class agrees. It includes a source-access audit proving sibling bytes were unavailable before the
 candidate seal.
 
-### The returned defect founds a derived local factor cover
+### The returned defect founds a derived local factor cover — **sole next deed**
 
 [definition] Complete the exact rank-factorization bridge missing between `ExactRatMatrix`'s
 kernel/image/cokernel testimony and the resident rank-one atom. Derive every local factor count from
@@ -561,7 +566,7 @@ coherent alpha product and its inspected artifacts stand. State advances only th
 20. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
 21. only the source/artifact closure of the named current deed.
 
-[open] The sole next deed is **the candidate departs before sibling testimony returns**. No later
-station is authorized before its sealed history-only candidate, source-access audit, genuinely
-later return, graded defect, equal-surface/richer-separator and different-surface/common-operation
-returns stand together.
+[open] The sole next deed is **the returned defect founds a derived local factor cover**. No later
+station is authorized before exact derived-rank reconstruction, metric/gauge/radical testimony,
+rank-zero/one/higher and singular controls, compatible and noncommuting overlap returns, disjoint
+interchange, parent addresses, ablation addresses, and withdrawal words stand together.

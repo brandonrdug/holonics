@@ -84,12 +84,22 @@ section owner also corrected 58 predecessor family-address collisions by restori
 container/record/message lineage. Evidence identity:
 `8e8944fef39069943a40f66d056027e3e6e78ca10a18093c7471becd6c9cca8f`.
 
-**SOLE NEXT DEED — THE CANDIDATE DEPARTS BEFORE SIBLING TESTIMONY RETURNS.** [open] Conduct the
-predecessor from history alone, content-address and seal its complete candidate section before the
-recorded response is accessible, mount sibling/world/operator testimony only afterward, and return
-the complete graded defect and fibres. The deed must exhibit both equal terminal surfaces separated
-by a richer receiver/history and differing surfaces belonging to one lawful native operation
-class. No later station is authorized until those returns stand together.
+[established-bounded; implemented-exact; measured] The candidate-return station passed under
+artifact identity `bf202d8c45e5ed1a300ea1ebc5290c1edc0a2db8e9f1e8b51e12e62e38d35709`.
+Four derived witnesses crossed one source-isolated `ProductSession`; every history-only candidate
+sealed before the later pipe received sibling bytes, retained all 262,144 exact terminal intervals,
+and returned complete resident execution/work testimony. Full sibling responses, world windows,
+and addressed operator text then crossed the same live body. Four five-grain defects returned on
+the RTX 4080 SUPER in 84 launches each, with complete fibres, no additive-loss assumption, and no
+CPU semantic replay. The equal-surface/richer-separator and different-surface/common-operation
+controls both returned.
+
+**SOLE NEXT DEED — THE RETURNED DEFECT FOUNDS A DERIVED LOCAL FACTOR COVER.** [open] Complete the
+exact bridge from kernel/image/cokernel testimony to support-indexed factor covers whose population
+is the derived image rank. Preserve metric, gauge, radical, parent, ablation address, and withdrawal
+word; glue compatible overlaps, retain noncommuting chronology/cocycle defects, and return the
+rank-zero, rank-one, rank-greater-than-one, singular, overlap, and disjoint controls together. No
+same-body deposition is authorized until this factor-cover return stands.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 
