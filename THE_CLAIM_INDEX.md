@@ -137,7 +137,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (316 deposits of 608)
+## 4 · The 2026-08 record line (317 deposits of 609)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -435,6 +435,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-22_THE_WITNESS_AT_FIVE_IS_WELDED_THE_RANK_ONE_COINCIDENCE_STANDS_AND_THE_RANK_CLAUSE_HOLDS_WHOLE_AT_ONE.md` | The witness at five is welded, the rank-one coincidence stands, and the rank clause holds whole at one |
 | `2026-08-22_THE_WITNESS_EXISTS_THE_TWO_SIDES_CLOSE_AT_ONE_AND_THE_RANK_ZERO_INSTANCE_IS_KERNEL_CHECKED.md` | The witness exists, the two sides close at one, and the rank-zero instance is kernel-checked |
 | `2026-08-23_ATHENA_FROZE_AS_THE_LABORATORY_HOLONICS_MATHEMATICS_PRODUCTION_VARIANT_AND_L4_AWAITS_RELEASE_ADMISSION.md` | Athena froze as the laboratory holonics/mathematics production variant, and L4 awaits release admission |
+| `2026-08-23_BRANDONS_CLAUDE_MESSAGES_EXPOSE_THE_NAVIER_STOKES_COMPOSITE_THAT_THE_FINITE_CARRIERS_DID_NOT_YET_JOIN.md` | Brandon's Claude messages expose the Navier--Stokes composite that the finite carriers did not yet join |
 | `2026-08-23_E0_RELEASE_RECEIVER_PASSED_THE_FULL_TOWER_EMANATED_AND_E1_BEGINS.md` | E0 release receiver passed, the full tower emanated, and E1 begins |
 | `2026-08-23_E1_RELEASE_RECEIVER_PASSED_THE_OPTICAL_FIELD_GREW_AND_E2_BEGINS.md` | E1 release receiver passed, the optical field grew, and E2 begins |
 | `2026-08-23_E2_RELEASE_RECEIVER_PASSED_COMPLETE_INHERITED_ORGANS_CROSSED_AND_E3_BEGINS.md` | E2's release receiver passed, complete inherited organs crossed, and E3 begins |
@@ -479,7 +480,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 66 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 67 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
