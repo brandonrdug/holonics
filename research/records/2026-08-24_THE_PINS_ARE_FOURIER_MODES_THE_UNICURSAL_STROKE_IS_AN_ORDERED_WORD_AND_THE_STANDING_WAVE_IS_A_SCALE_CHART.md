@@ -738,12 +738,19 @@ required powers of the dyadic radius; the rational Hodge factor has a genuine in
 pin, a controlled stencil, and the complementary mixed envelopes needed by the product rule.  No
 uniform physical `L1` conclusion is inferred from those local returns alone.
 
-**[open]** The remaining kernel deed is sharply bounded: reindex the actual zero-padded
-`Delta_i^2 Delta_j^2` Hodge coefficient into its nine-term mixed Leibniz expansion, sum it to an
-explicit `C/N` two-axis mass, discharge the finitely many scales `0`, `1`, and `2`, derive the
-order-six three-axis mass, and pass the resulting bounds through the already checked triple
-Abel/Haar--Fubini receiver.  That composition, rather than another pointwise envelope, is what
-inhabits the uniform dyadic physical-kernel witness.
+**[proved-derived; formal-checked]**
+`NavierStokesDyadicHodgeTwoAxisMass.lean` now reindexes the actual zero-padded
+`Delta_i^2 Delta_j^2` Hodge coefficient into its nine-term mixed Leibniz population, retaining the
+two left aperture residues, two right aperture residues, and zero-crossing stencils.  For every
+dyadic scale at least three, the complete finite mass is at most
+`34000000000000 / dyadicRadius scale`.  This is the requested explicit `C/N` two-axis return; it
+does not hide a mode-count factor or replace the actual rational Hodge coefficient by an arbitrary
+comb.
+
+**[open]** The kernel deed is consequently narrower: discharge the finite scales `0`, `1`, and
+`2`, derive the order-six three-axis mass, and pass both mixed bounds through the already checked
+triple Abel/Haar--Fubini receiver.  That composition is what inhabits the uniform dyadic physical
+kernel witness.
 
 **[proved-derived; formal-checked]** The restart branch also moved past the earlier
 common-aperture and momentum gaps.  Common-aperture uniqueness and finite-aperture persistence now
@@ -759,22 +766,23 @@ reconstruction, is continuous, and has the exact modewise first derivative with 
 weighted majorant.  This is a genuine joint-smoothness bridge, not yet the complete joint `C^infty`
 upgrade.
 
-**[open]** The remaining restart deed is to aggregate the nested operator-derivative series,
-iterate the finite `C^r` argument, and compose it with the established time-smooth lift and
-pressure towers.  That supplies `JointSpacetimeSmoothnessUpgrade`, after which the already
-constructed carrier can inhabit the official `OpenPeriodicSolutionOn`, `InteriorPeriodicRestart`,
-and `RestartSupplyFromUniformHighOrderBound` interfaces.
+**[proved-derived; formal-checked]** The restart deed is closed.
+`NavierStokesWeightedClassicalRestartSupply.lean` composes the nested operator-series finite-order
+joint smoothness theorem with the established velocity and pressure time-smooth towers, returns the
+official `JointSpacetimeSmoothnessUpgrade`, transports the existing carrier into
+`InteriorPeriodicRestart`, and supplies one common positive radius through
+`RestartSupplyFromUniformHighOrderBound`.  The aggregate `ElementaryHolonics` build checks all of
+these interfaces together; the reported axiom dependencies are only `propext`,
+`Classical.choice`, and `Quot.sound`.
 
 ## Ordered next squeeze
 
-1. **[open]** Close the finite nine-face mixed-variation sum, the order-six three-axis mass, and
-   the triple Abel passage.  This is the sole remaining construction behind the uniform dyadic
-   Hodge kernel premise.
-2. **[open]** Close the nested operator-series `C^r` induction and its pressure analogue.  Compose
-   those returns with the existing time-smooth towers to construct the official joint smoothness
-   upgrade and restart supply.
-3. **[open]** Substitute both constructed witnesses into the checked terminal-half continuation
-   theorem.  Only this final composition may remove the two interfaces from its hypotheses.
+1. **[open]** Close the finite scales `0`, `1`, and `2`, the order-six three-axis mass, and the
+   triple Abel passage.  This is the sole remaining construction behind the uniform dyadic Hodge
+   kernel premise.
+2. **[open]** Substitute that constructed kernel witness together with the now-constructed restart
+   supply into the checked terminal-half continuation theorem.  Only this composition may remove
+   the remaining interface from its hypotheses.
 
 **[open]** None of these returns is a proof of global Navier--Stokes regularity, BSD, RH, Hodge, or
 Yang--Mills.  The shared holonic diagrams identify reusable transport questions; each constitutive
