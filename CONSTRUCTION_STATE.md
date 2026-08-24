@@ -5,12 +5,14 @@ admitted right now. It is not a log, not a plan, and not a history; git is the l
 `blueprint/THE_ROADMAP.md` is the plan.
 
 **Currency:** 2026-08-24 after the receiver-history congruence, sealed-candidate/later-return,
-derived-rank local-factor-cover and same-body factor-complex stations passed; receiver-history
-condensation and the source-detached Athena-alpha return are now the sole construction frontier.
+derived-rank local-factor-cover and same-body factor-complex stations passed and the first final-rest
+candidate returned a decisive residency/quality counterexample; receiver-exact foreign-transport
+restriction inside that same final station is now the sole construction frontier.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RECEIVER-HISTORY QUOTIENT MUST CONDENSE AND ATHENA ALPHA MUST SPEAK.**
+**CURRENT FRONTIER — THE FOREIGN TRANSPORT MUST DESCEND THROUGH THE RECEIVER-HISTORY QUOTIENT
+BEFORE ATHENA ALPHA CAN SPEAK FROM RESIDENT TERRAIN.**
 
 [counterexample; implemented-exact] The former alpha path assigns semantic roles from prompt-hash
 equality, uses a three-codeword state and two-codeword-overlap traversal, exposes recorded sibling
@@ -95,12 +97,28 @@ contract only with trivial holonomy and no escaping requested consequence. Nontr
 remains curvature and transports under rebase. The final condensation must apply this qualified
 unknotting law through existing owners rather than found a graph optimizer.
 
+[counterexample; implemented-exact; measured] The first final candidate returned canonical rest
+identity `a1f49175fdc8ac4e80608730db50f88d84a294aecfd77084fe0f4643abd086fd` and
+product identity `d906a64451818423274b7c2e868ec5359e804eee669547be04e794310dabff9a`, but
+its complete grade is false. The 985,564-octet rest remounted without forbidden source access and
+retained the quotient, 2,221 fibres, 83 separators, rank-three factor/overlap atlas, decoder,
+modal currents, ablation and withdrawal. Its matched surface ended
+`holYouYouYouYouYouYou`, its mathematical successor added only whitespace, and each of eight
+successors again staged 9,288,903,168 octets of the foreign tower.
+
+[established-bounded; implemented-exact; measured] The physical receipt separates resident-history
+growth from the missing compression. Resident peak grew from 6,733,494,016 to 6,734,354,204 octets,
+122,884 octets per successor, while the 9.29-gigabyte foreign transport recurred unchanged. The
+factor rest is only 205,892 octets; qualified unknotting correctly retained nontrivial holonomy and
+cannot cancel foreign maps whose receiver-exact restriction has not been compiled.
+
 [open] The sole next deed is **the receiver-history quotient condenses and Athena alpha speaks**.
-Freeze one canonical native rest from this cultivated ecology through exact receiver-history
-factorization, remount without source material, and return inspected conversation,
-holonics/mathematics, optical mathematical and raw acoustic currents through the existing
-inference membrane with the complete quotient, fibres, separators, factor atlas, overlap nerve,
-holonomy, ablations, withdrawal, source audit, exact work and separate apparatus telemetry.
+For every foreign local map, compile its exact descent on the cultivated reachable section modulo
+the complete future receiver/history blind population, retain the complete fibre and shortest
+reopening separator, and gate every factor through its founding native-history support. The
+remounted body must return a nontrivial mathematical consequence and later successors without
+recurring full-tower staging; out-of-section current returns an obstruction rather than falling
+back to the foreign tower.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

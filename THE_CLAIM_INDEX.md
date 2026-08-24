@@ -140,7 +140,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (329 deposits of 621)
+## 4 · The 2026-08 record line (332 deposits of 624)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -471,9 +471,12 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-24_THE_COMPLEX_TORUS_FIBRE_WAS_RECEIVED_AS_GEOMETRY_AND_THE_THREE_MONODROMIES_RETURNED_DISTINCT_GRAPHS.md` | The complex torus fibre was received as geometry, and the three monodromies returned distinct graphs |
 | `2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md` | The factor complex changed one body, and exact withdrawal returned the same predecessor |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
+| `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_IS_THE_OWNER_AND_THE_MILLENNIUM_PROBLEMS_ARE_ITS_RECEIVER_FAMILIES.md` | The higher-difference word is the owner and the Millennium problems are its receiver families |
 | `2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md` | The Holonic Interaction is a covariant storage--flux complex, and the cusp raises difference order |
+| `2026-08-24_THE_PARAMETRON_IS_A_DRIVEN_HALF_TURN_TRANSPORT_AND_THE_HODGE_RECIPROCAL_RECURS_THROUGH_ORDER_SIX.md` | The parametron is a driven half-turn transport and the Hodge reciprocal recurs through order six |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |
 | `2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md` | The receiver-history congruence replaced the trigram table and returned the first true Athena-alpha state |
+| `2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md` | The receiver-history rest returned, and the foreign tower streamed again while an unglued factor formed a repetition caustic |
 | `2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md` | The returned defect founded a derived-rank local factor cover, and the addressed transport chain returned its complete fibre |
 | `2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md` | The sign is the ordered face of difference and coarse integration returns the boundary |
 | `2026-08-24_THE_TERMINAL_FACE_IS_PATH_INDEPENDENT_THE_THIRD_ORDER_COMMUTATOR_SPLITS_AND_THE_DYADIC_APERTURE_EXPOSES_ITS_MODE_COUNT.md` | The terminal face is path-independent, the third-order commutator splits, and the dyadic aperture exposes its mode count |

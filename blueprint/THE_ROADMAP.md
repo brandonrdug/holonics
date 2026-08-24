@@ -34,7 +34,8 @@ authoritatively revise it once you have sufficient context post-analysis campaig
 **The sole active campaign is
 [`THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md).**
 
-**CURRENT FRONTIER — THE RECEIVER-HISTORY QUOTIENT MUST CONDENSE AND ATHENA ALPHA MUST SPEAK.** The former AA0--AA4 product
+**CURRENT FRONTIER — THE FOREIGN TRANSPORT MUST DESCEND THROUGH THE RECEIVER-HISTORY QUOTIENT
+BEFORE ATHENA ALPHA CAN SPEAK FROM RESIDENT TERRAIN.** The former AA0--AA4 product
 interpretation remains revoked by the following counterexample. [counterexample; implemented-exact]
 The alleged native state was a literal three-codeword window, detached traversal used two-codeword
 overlap, prompt-hash equality assigned globally exclusive source roles, teacher-forced passages
@@ -129,13 +130,25 @@ ordered suffix withdrawal, path-ordered holonomy and disjoint interchange return
 recovered the exact predecessor factor object and a fresh complete potential. The ruling is
 [`../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md`](../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md).
 
+[counterexample; implemented-exact; measured] The first final-rest candidate returned product
+identity `d906a64451818423274b7c2e868ec5359e804eee669547be04e794310dabff9a` and a
+985,564-octet source-detached rest, but its final grade is false. The receiver/history coordinate
+condensed from 14,362,405 to 777,626 octets, the factor coordinate from 2,484,543 to 205,892 octets,
+and all fibres, separators, overlap, modal-current, ablation, withdrawal, work and telemetry
+receipts returned. Yet the language surface ended `holYouYouYouYouYouYou`, the mathematics
+successor added only whitespace, and every successor frontier restaged 9,288,903,168 octets through
+the foreign tower. Record:
+[`../research/records/2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md`](../research/records/2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md).
+
 **SOLE NEXT DEED — THE RECEIVER-HISTORY QUOTIENT CONDENSES AND ATHENA ALPHA SPEAKS.** [open]
-Condense the cultivated ecology only through exact receiver-history factorization, including
-qualified inverse cancellation/interchange/trivial-holonomy unknotting, freeze one canonical native
-rest, remount without source material, and serve it through the existing inference membrane.
-Inspect bounded conversation, holonics/mathematics, optical mathematical and raw acoustic material
-through the same body and return the complete quotient, fibres, separators, factor atlas, overlap
-nerve, holonomy, ablations, withdrawal, source audit, exact work and separate apparatus telemetry.
+The canonical rest and inspection apparatus now stand. Complete the missing receiver-exact
+foreign-transport restriction: for each foreign map, descend its action on the cultivated reachable
+section modulo the blind population of the complete future receiver/history family; retain the
+complete fibre/separator; and gate the deposited factor through its founding native-history
+section. The remounted body must emit a nontrivial mathematical consequence, remove the measured
+repetition caustic under matched controls, and conduct later successors without recurring
+full-tower staging. Unknown sections obstruct or reopen their retained fibres; they never fall back
+to the streamed tower.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 

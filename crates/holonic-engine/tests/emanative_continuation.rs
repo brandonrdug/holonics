@@ -55,6 +55,7 @@ fn valid_rest() -> EmanativeContinuationRest {
         schema: EMANATIVE_REST_SCHEMA.to_owned(),
         body: body(),
         cultivation_continuation: None,
+        factor_complex: None,
         predecessor_rest_sha256: None,
         entering,
         fronts: vec![EmanativeFront {

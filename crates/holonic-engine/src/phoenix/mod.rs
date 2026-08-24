@@ -8,6 +8,8 @@
 pub mod cohort;
 /// A genuine returned nominal-boundary consequence cultivating one parented codec continuation.
 pub mod boundary_cultivation;
+/// Canonical source-detached standing for receiver-history cultivated Athena alpha.
+pub mod alpha_rest;
 pub mod native_membrane;
 /// One addressed local cultivation over an already-cultivated Phoenix product.
 pub mod continuation;

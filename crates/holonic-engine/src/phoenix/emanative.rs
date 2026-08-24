@@ -14,6 +14,7 @@ use sha2::{Digest, Sha256};
 use crate::exact_work::ExactWork;
 use crate::phoenix::continuation::{ContinuationRuntimeIdentity, CultivatedBodyIdentity};
 use crate::phoenix::runtime::{ProductSession, RuntimeReturn};
+use crate::phoenix::session_factor_complex::SessionFactorComplexIdentity;
 use crate::phoenix::streamed::{InterventionSite, ReceiverOption};
 use crate::phoenix::tower::Intervention;
 
@@ -216,6 +217,7 @@ pub struct EmanativeContinuationRest {
     pub schema: String,
     pub body: CultivatedBodyIdentity,
     pub cultivation_continuation: Option<ContinuationRuntimeIdentity>,
+    pub factor_complex: Option<SessionFactorComplexIdentity>,
     pub predecessor_rest_sha256: Option<String>,
     pub entering: EmanativeOccurrence,
     pub fronts: Vec<EmanativeFront>,
@@ -344,6 +346,7 @@ impl EmanativeSession {
             schema: EMANATIVE_REST_SCHEMA.to_owned(),
             body: product.body_identity()?,
             cultivation_continuation: product.continuation_identity()?,
+            factor_complex: product.factor_complex_identity()?,
             predecessor_rest_sha256: None,
             entering,
             fronts: Vec::new(),
@@ -364,10 +367,51 @@ impl EmanativeSession {
         continuation_directory: Option<&Path>,
         rested_bytes: &[u8],
     ) -> Result<Self, String> {
-        let mut rest = EmanativeContinuationRest::read(rested_bytes)?;
         let product = open_product(product_directory, continuation_directory)?;
+        Self::resume_mounted(product, rested_bytes)
+    }
+
+    /// Begin emanation from an already mounted product owner. This is the factor-complex seam:
+    /// callers may remount the canonical cultivated rest into `ProductSession`, then move that
+    /// same non-cloned owner here without opening another inference body.
+    pub fn begin_mounted(product: ProductSession, entering_text: &str) -> Result<Self, String> {
+        let native_ids = product.encode(entering_text)?;
+        let decoded = product.decode_native_ids(&native_ids)?;
+        if product.encode(&decoded)? != native_ids {
+            return Err(
+                "the entering occurrence is not stable under its authenticated codec".into(),
+            );
+        }
+        let entering = EmanativeOccurrence::found(None, native_ids, decoded)?;
+        let rest = EmanativeContinuationRest {
+            schema: EMANATIVE_REST_SCHEMA.to_owned(),
+            body: product.body_identity()?,
+            cultivation_continuation: product.continuation_identity()?,
+            factor_complex: product.factor_complex_identity()?,
+            predecessor_rest_sha256: None,
+            entering,
+            fronts: Vec::new(),
+            codec_identity: product.source_codec_identity().to_owned(),
+            status: EmanativeStatus::Open,
+            open_exterior: vec![
+                "world return has not crossed this continuation".to_owned(),
+                "plural maximizer fibres require a declared exterior quotient".to_owned(),
+                "the inherited prefix trajectory is not yet receiver-exactly condensed".to_owned(),
+            ],
+        };
+        rest.validate()?;
+        Ok(Self { product, rest })
+    }
+
+    /// Resume one addressed emanative continuation through the exact already-mounted morphology.
+    pub fn resume_mounted(
+        product: ProductSession,
+        rested_bytes: &[u8],
+    ) -> Result<Self, String> {
+        let mut rest = EmanativeContinuationRest::read(rested_bytes)?;
         if rest.body != product.body_identity()?
             || rest.cultivation_continuation != product.continuation_identity()?
+            || rest.factor_complex != product.factor_complex_identity()?
             || rest.codec_identity != product.source_codec_identity()
             || product.encode(&rest.current().text)? != rest.current().native_ids
         {
@@ -381,6 +425,13 @@ impl EmanativeSession {
 
     pub fn rest(&self) -> &EmanativeContinuationRest {
         &self.rest
+    }
+
+    /// Return the same mounted product owner after the addressed emanative passage closes. This
+    /// is an ownership transfer, not a clone or rollback, and permits later ablation/withdrawal to
+    /// act on the exact body which emitted the inspected surface.
+    pub fn into_product(self) -> ProductSession {
+        self.product
     }
 
     /// Conduct one full tower and emit only when the returned maximizer fibre is exact.

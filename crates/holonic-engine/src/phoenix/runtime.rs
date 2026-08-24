@@ -28,7 +28,7 @@ use crate::resident_section::{ResidentGrain, ResidentSurface, SeriesAperture};
 use crate::streamed_standing::StreamedCensus;
 use crate::phoenix::session_factor_complex::{
     FactorMutationReceipt, ResidentFactorCurrentReturn, SessionFactorComplex,
-    SessionFactorComplexIdentity, TowerFactorRealization,
+    SessionFactorComplexIdentity, SessionFactorComplexRest, TowerFactorRealization,
 };
 
 /// The source-detached runtime's returned semantic face and its complete resident receipt.
@@ -332,6 +332,49 @@ impl ProductSession {
             .map(SessionFactorComplex::identity)
             .transpose()
             .map_err(|error| error.to_string())
+    }
+
+    pub fn factor_complex_rest_bytes(&self) -> Result<Vec<u8>, String> {
+        self.factor_complex
+            .as_ref()
+            .ok_or_else(|| "the product session carries no factor complex to rest".to_owned())?
+            .canonical_rest_bytes()
+            .map_err(|error| error.to_string())
+    }
+
+    pub fn factor_complex_rest(&self) -> Result<SessionFactorComplexRest, String> {
+        self.factor_complex
+            .as_ref()
+            .ok_or_else(|| "the product session carries no factor complex to rest".to_owned())?
+            .canonical_rest()
+            .map_err(|error| error.to_string())
+    }
+
+    /// Remount one rested factor complex over the exact authenticated continuation morphology.
+    /// The rest itself carries no product tensors, transcript, sibling response or source payload.
+    pub fn mount_factor_complex_rest(&mut self, bytes: &[u8]) -> Result<(), String> {
+        if self.factor_complex.is_some() {
+            return Err("the product session already carries a deposited factor complex".to_owned());
+        }
+        self.factor_complex = Some(
+            SessionFactorComplex::remount(bytes, self.factor.clone())
+                .map_err(|error| error.to_string())?,
+        );
+        self.synchronize_factor_complex()
+    }
+
+    pub fn mount_factor_complex_standing(
+        &mut self,
+        rest: SessionFactorComplexRest,
+    ) -> Result<(), String> {
+        if self.factor_complex.is_some() {
+            return Err("the product session already carries a deposited factor complex".to_owned());
+        }
+        self.factor_complex = Some(
+            SessionFactorComplex::remount_rest(rest, self.factor.clone())
+                .map_err(|error| error.to_string())?,
+        );
+        self.synchronize_factor_complex()
     }
 
     pub fn factor_cover(&self) -> Option<&crate::derived_factor_cover::DerivedFactorCover> {

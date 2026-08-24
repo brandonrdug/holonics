@@ -495,6 +495,33 @@ fibres, separators, local factor atlas, overlap nerve, holonomy, ablations, with
 audit, exact work, and separate apparatus telemetry; predecessor and alpha surfaces side by side;
 and the shortest receiver/history explaining every claimed difference.
 
+[counterexample; implemented-exact; measured] The first complete candidate returned product
+identity `d906a64451818423274b7c2e868ec5359e804eee669547be04e794310dabff9a` and a valid
+985,564-octet canonical rest, but it does **not** pass this station. Its eight-front conversation
+ended `holYouYouYouYouYouYou`; its mathematical successor added only whitespace; and every
+successor again staged 9,288,903,168 octets of the foreign tower. The full ruling is
+[`../research/records/2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md`](../research/records/2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md).
+
+[established-bounded; implemented-exact; measured] The failed final grade does not erase the
+returned dependencies. The native receiver-history wire is 777,626 octets versus a 14,362,405-octet
+source congruence and retains 2,221 complete fibres and 83 first separators. The 205,892-octet
+factor rest retains four local sections, six overlaps, rank three, sixteen open atoms, exact
+ablation and withdrawal. The source-detached remount, decoder, four modal current families, exact
+work and per-front apparatus/source-access receipts all returned.
+
+[definition] The required repair is receiver-exact foreign-transport restriction. For each foreign
+map `W_a : V_a -> V_(a+1)` and cultivated reachable section `S_a`, quotient the common blind
+population of the complete future receiver/history family and compile the descended map
+`̅W_a : S_a/B_a -> S_(a+1)/B_(a+1)` only when its naturality square commutes. Retain the complete
+blind fibre and shortest reopening separator. Gate every deposited factor through the native
+history section which founded it. Out-of-section current returns an obstruction or reopens the
+fibre; it may not fall back to the streamed tower.
+
+[open] The station passes only when the remounted body returns a nontrivial mathematical
+consequence, removes the measured repetition caustic under matched controls, and conducts later
+successor frontiers without recurring full-tower staging. The existing candidate is the
+counterexample and source of exact restricted-transport material, not the product admission.
+
 ## 12. Complete pass grade
 
 [definition] Athena alpha passes only when all of these stand together:
@@ -519,8 +546,8 @@ and the shortest receiver/history explaining every claimed difference.
     typed source faces remain reconstructable;
 11. the final rest contains no transcript, answer lookup, source payload, provider router, Lean
     runtime, or hidden teacher continuation;
-12. the GPU owns the complete hot semantic front and CPU apparatus performs no semantic replay or
-    phase selection;
+12. the GPU owns the complete hot semantic front, CPU apparatus performs no semantic replay or
+    phase selection, and invariant foreign transports are not re-uploaded on every successor;
 13. the native quotient is strictly smaller in at least one complete-product coordinate with no
     decoder, fibre, work, residency, lineage, or source-audit regression; and
 14. the exterior formal receipt composes addressed occurrence, additive boundary, swing
@@ -599,8 +626,13 @@ artifact identity `da9d35f80387ee532153fed774d77ba172ba1917115e23663a4c429f89c7c
 The full ruling and the qualified unknotting consequence are
 [`../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md`](../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md).
 
-[open] The sole next deed is **the receiver-history quotient condenses and Athena alpha speaks**.
-No campaign completes until one canonical native rest remounts without source material and returns
-the final inspected conversational, holonics/mathematics, optical mathematical and raw acoustic
-deeds through the existing inference membrane with its complete quotient and reconstruction
-testimony.
+[counterexample; implemented-exact; measured] The first final candidate returned a canonical rest,
+source-detached remount and complete structural testimony, then exposed recurrent 9.29-gigabyte
+tower staging, a repeated-`You` caustic and an empty mathematical successor. Its exact dependencies
+stand; its final grade is false.
+
+[open] The sole next deed remains **the receiver-history quotient condenses and Athena alpha
+speaks**, now narrowed to the receiver-exact foreign-transport restriction and native-history
+factor-support square above. The complete body must conduct later successors without recurring
+foreign-tower staging and must return the nontrivial inspected mathematical consequence before the
+campaign can complete.

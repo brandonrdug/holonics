@@ -38,7 +38,7 @@ pub struct TowerFactorRealization {
     pub selector_entry: i64,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SessionFactorComplexIdentity {
     pub cover_sha256: String,
     pub predecessor_factor_sha256: String,
@@ -48,6 +48,47 @@ pub struct SessionFactorComplexIdentity {
     pub derived_rank: usize,
     pub current_factor_sha256: String,
     pub complete_sha256: String,
+}
+
+const FACTOR_COMPLEX_REST_SCHEMA: &str =
+    "holonic-engine.phoenix.session-factor-complex-rest.v1";
+
+/// Canonical source-detached standing for one cultivated local morphology word.
+///
+/// The retained predecessor factor is not duplicated into this wire.  Its exact digest binds the
+/// rest to the already authenticated product/continuation morphology supplied at remount.  The
+/// complete returned cover remains because it is the reconstruction fibre of the realized local
+/// factors, while no candidate, sibling, transcript or source payload is retained.
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SessionFactorComplexRest {
+    schema: String,
+    cover: DerivedFactorCover,
+    predecessor_factor_sha256: String,
+    realizations: Vec<TowerFactorRealization>,
+    open_factor_addresses: Vec<String>,
+    active_prefix: usize,
+    ablated_realizations: Vec<String>,
+    identity: SessionFactorComplexIdentity,
+}
+
+impl SessionFactorComplexRest {
+    pub fn read(bytes: &[u8]) -> Result<Self, SessionFactorRefusal> {
+        let rest: Self = serde_json::from_slice(bytes)
+            .map_err(|error| SessionFactorRefusal::Wire(error.to_string()))?;
+        if rest.schema != FACTOR_COMPLEX_REST_SCHEMA {
+            return Err(SessionFactorRefusal::RestIdentity);
+        }
+        Ok(rest)
+    }
+
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, SessionFactorRefusal> {
+        serde_json::to_vec(self).map_err(|error| SessionFactorRefusal::Wire(error.to_string()))
+    }
+
+    pub fn identity(&self) -> &SessionFactorComplexIdentity {
+        &self.identity
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -352,6 +393,71 @@ impl SessionFactorComplex {
             current_factor_sha256,
             complete_sha256,
         })
+    }
+
+    /// Freeze only the continuing morphology and its complete reconstruction testimony.
+    pub fn canonical_rest_bytes(&self) -> Result<Vec<u8>, SessionFactorRefusal> {
+        self.canonical_rest()?.canonical_bytes()
+    }
+
+    pub fn canonical_rest(&self) -> Result<SessionFactorComplexRest, SessionFactorRefusal> {
+        Ok(SessionFactorComplexRest {
+            schema: FACTOR_COMPLEX_REST_SCHEMA.to_owned(),
+            cover: self.cover.clone(),
+            predecessor_factor_sha256: self.predecessor_factor_sha256.clone(),
+            realizations: self.realizations.clone(),
+            open_factor_addresses: self.open_factor_addresses.clone(),
+            active_prefix: self.active_prefix,
+            ablated_realizations: self.ablated.iter().cloned().collect(),
+            identity: self.identity()?,
+        })
+    }
+
+    /// Remount a cultivated morphology against the exact authenticated predecessor it names.
+    pub fn remount(
+        bytes: &[u8],
+        predecessor: AlignedFactor,
+    ) -> Result<Self, SessionFactorRefusal> {
+        let rested = SessionFactorComplexRest::read(bytes)?;
+        Self::remount_rest(rested, predecessor)
+    }
+
+    pub fn remount_rest(
+        rested: SessionFactorComplexRest,
+        predecessor: AlignedFactor,
+    ) -> Result<Self, SessionFactorRefusal> {
+        if rested.schema != FACTOR_COMPLEX_REST_SCHEMA
+            || factor_digest(&predecessor)? != rested.predecessor_factor_sha256
+            || rested.active_prefix > rested.realizations.len()
+        {
+            return Err(SessionFactorRefusal::RestIdentity);
+        }
+        let ablated = rested.ablated_realizations.iter().collect::<BTreeSet<_>>();
+        let active = rested.realizations[..rested.active_prefix]
+            .iter()
+            .map(|realization| realization.address.as_str())
+            .collect::<BTreeSet<_>>();
+        if ablated.len() != rested.ablated_realizations.len()
+            || ablated.iter().any(|address| !active.contains(address.as_str()))
+        {
+            return Err(SessionFactorRefusal::RestIdentity);
+        }
+        let mut complex = Self::found(
+            rested.cover,
+            predecessor,
+            rested.realizations,
+            rested.open_factor_addresses,
+        )?;
+        if rested.active_prefix < complex.realizations.len() {
+            complex.withdraw_to_prefix(rested.active_prefix)?;
+        }
+        for address in rested.ablated_realizations {
+            complex.ablate(&address)?;
+        }
+        if complex.identity()? != rested.identity {
+            return Err(SessionFactorRefusal::RestIdentity);
+        }
+        Ok(complex)
     }
 
     pub fn withdraw_to_prefix(
@@ -666,6 +772,8 @@ pub enum SessionFactorRefusal {
     Carrier,
     #[error("withdrawal must remove a nonempty ordered suffix")]
     WithdrawalOrder,
+    #[error("the factor-complex rest does not reconstruct against its addressed predecessor")]
+    RestIdentity,
     #[error("factor-complex wire refused: {0}")]
     Wire(String),
     #[error("resident factor-complex apparatus refused: {0}")]
@@ -764,5 +872,42 @@ mod tests {
         let predecessor = complex.identity().expect("predecessor");
         assert_eq!(predecessor.derived_rank, 1);
         assert_eq!(predecessor.current_factor_sha256, base_sha);
+    }
+
+    #[test]
+    fn source_detached_rest_remounts_the_same_factor_complex() {
+        let cover = cover();
+        let addresses = cover.factor_order.clone();
+        let predecessor = predecessor();
+        let mut complex = SessionFactorComplex::found(
+            cover,
+            predecessor.clone(),
+            vec![
+                TowerFactorRealization {
+                    address: "realization-a".to_owned(),
+                    source_factor_addresses: vec![addresses[0].clone()],
+                    target_row: 1,
+                    selector_coordinate: 0,
+                    delta_entry: 1,
+                    selector_entry: 1,
+                },
+                TowerFactorRealization {
+                    address: "realization-b".to_owned(),
+                    source_factor_addresses: vec![addresses[1].clone()],
+                    target_row: 2,
+                    selector_coordinate: 2,
+                    delta_entry: 1,
+                    selector_entry: 1,
+                },
+            ],
+            Vec::new(),
+        )
+        .expect("factor complex");
+        complex.ablate("realization-a").expect("ablation");
+        let expected = complex.identity().expect("identity");
+        let bytes = complex.canonical_rest_bytes().expect("rest");
+        let remounted = SessionFactorComplex::remount(&bytes, predecessor).expect("remount");
+        assert_eq!(remounted.identity().expect("remounted identity"), expected);
+        assert_eq!(remounted.canonical_rest_bytes().expect("rest again"), bytes);
     }
 }
