@@ -10,6 +10,8 @@ import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.Geometry.SixSphereMonodromy
 import ElementaryHolonics.Geometry.SixSpherePeriods
+import ElementaryHolonics.Geometry.SixSphereTorusFibre
+import ElementaryHolonics.Geometry.SixSphereExceptionalData
 import ElementaryHolonics.RH.Statement
 import ElementaryHolonics.RH.Route
 import ElementaryHolonics.RH.ThetaMellin
@@ -41,6 +43,13 @@ import ElementaryHolonics.Millennium.LineageCompression
 import ElementaryHolonics.Millennium.AthenaReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.HolonicComposition
+import ElementaryHolonics.Millennium.HolonicAlternatingGeometry
+import ElementaryHolonics.Millennium.HolonicPolygonGyroWinding
+import ElementaryHolonics.Millennium.HolonicTorusFlow
+import ElementaryHolonics.Millennium.HolonicTorusKnots
+import ElementaryHolonics.Millennium.HolonicCurvedArcEinstein
+import ElementaryHolonics.Millennium.HolonicDimensionObstruction
+import ElementaryHolonics.Millennium.HolonicUnknotting
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling

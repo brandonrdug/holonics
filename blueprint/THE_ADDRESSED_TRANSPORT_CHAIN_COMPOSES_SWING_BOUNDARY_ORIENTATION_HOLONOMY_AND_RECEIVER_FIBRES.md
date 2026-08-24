@@ -379,6 +379,54 @@ reparameterization directions, declare the successor receiver family, and comput
 rank. Eleven is returned only if a twelfth direction produces a proved obstruction under those
 hypotheses.
 
+### I7 — Reidemeister lineage, unknotting, prime factors, and null receivers
+
+[definition] Begin with mathlib's actual `Rack` and `Quandle` owners rather than a crossing-count
+analogy. A pivot acts by the equivalence `Rack.act'`; action/inverse-action cancellation is the local
+R-II coloring law; `Shelf.self_distrib` is the R-III coloring law; `Quandle.fix` closes the R-I
+coloring face; and `Rack.ad_conj` transports the complete pivot action by conjugation. Bind these
+local laws to the swing only through the proved invertible action and conjugation squares.
+
+[definition] Then construct the smallest oriented tangle-diagram owner carrying boundary ports,
+component lineage, crossing hand, over/under branch, local disc, and unchanged exterior context. A
+Reidemeister occurrence is an addressed passage on this owner. Serial move composition retains the
+pullback population of move sites and its joining diagram. An inserted cancelling signed pair in a
+bare crossing table is not R-II until the local-disc, adjacency, strand, and orientation hypotheses
+are returned.
+
+[definition] Generate `ReidemeisterEq` as the equivalence closure of elementary move passages and
+form its quotient only after the concrete step relation exists. The unknot fibre is the complete
+population of diagrams in the orbit of a declared unknot diagram. Prove that a receiver invariant
+on every generator descends through every ordered move word. Receiver equality characterizes that
+unknot fibre only after a separate completeness theorem; constant, winding-net, finite-phase, and
+pairwise-linking receivers are required collapsed-fibre controls.
+
+[definition] Separate representation-preserving Reidemeister moves from topology-changing crossing
+changes. Unknotting distance is a minimum over crossing-change passages separated by arbitrary
+Reidemeister histories; it is not the length of a Reidemeister word. Define connected sum only on
+knot classes. A prime knot is a nonunit irreducible: every factorization contains the unit unknot.
+The prime-factor multiplicity vector is an object coordinate, not an additive unknotting-cost law.
+
+[definition] Define writhe and framing deltas on the diagram owner. R-I changes writhe by one signed
+unit; R-II and R-III preserve it, so writhe descends to regular/framed isotopy but not ordinary
+Reidemeister equivalence. An Euler-character receiver is an explicit compression: the full-turn
+phase `exp(2*pi*i*w)` collapses every integer writhe to one, while an `n`th-root character retains
+only writhe modulo `n`. A richer Laurent-polynomial or state-sum receiver must retain the reopened
+fibre rather than erase it.
+
+[definition] For a move-invariant feature `Phi`, unknot `U`, and declared receiver form `B`, set
+`deltaPhi(D) = Phi(D) - Phi(U)` and `E_U(D) = B(deltaPhi(D), deltaPhi(D))`. Under positive
+semidefiniteness, zero energy places the defect in the radical. Under definiteness it gives feature
+equality. Only receiver completeness identifies feature equality with the unknot orbit. A
+Lorentzian null vector is not automatically receiver-invisible: an indefinite null cone is
+generally not the radical and may carry nontrivial transport.
+
+[definition] The engine compression consequence is word-local. Adjacent inverse moves annihilate
+only when both contextual compositions return the declared identities. Independent moves exchange
+only through an exact interchange/comparison cell. R-III is an exchange law, not a deletion.
+Dynamic condensation then consumes the existing generator law so all future move words factor,
+while the complete reconstruction fibre retains every diagram collapsed by the receiver.
+
 ## 6. Core pass grade
 
 [definition] The formal gap is closed only when:
@@ -450,5 +498,50 @@ reopening and associator preservation. No promoted theorem depends on `sorryAx`;
 admission is recorded in
 [`../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md`](../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md).
 
-[open] I0--I6 remain the ordered later mathematical-instance ladder. They do not schedule the
-engine body and do not displace the active same-body factor-deposition deed in the root roadmap.
+[proved-derived; formal-checked] I0--I3 returned in
+`HolonicAlternatingGeometry.lean`, `HolonicPolygonGyroWinding.lean`, `HolonicTorusFlow.lean`, and
+`HolonicTorusKnots.lean`. The instances derive the exterior/Hodge cross face, addressed polygon and
+gyro/winding defects, spatial-three-torus Fourier route comparisons, and embedded coprime slope
+circles on the geometric two-torus. Their finite modulo-four probes retain formal counterexamples
+to integral identification.
+
+[proved-derived; formal-checked] The algebraic and topological quotient-fibre portion of I4 returned
+in `SixSphereTorusFibre.lean`: the rank-four period lattice is discrete and closed under the proved
+determinant hypotheses, `C^2 / periodLattice(p)` is constructed, and all three monodromies descend
+to continuous additive equivalences. `SixSphereExceptionalData.lean` returns the exact finite A2
+fan and logarithmic-twist inputs.
+
+[open] The remaining I4 ladder is the analytic source construction: global holomorphic period
+functions, the infinite toric cusp model and free/proper lattice action, logarithmic-transform
+threefolds, collar biholomorphisms, global gluing, topology computations, and smooth recognition as
+`S^6`. Pointwise quotient fibres and finite exceptional data do not discharge those returns.
+
+[proved-derived; formal-checked] I5 returned in `HolonicCurvedArcEinstein.lean`. It types the arc
+data separately, constructs addressed connection transport and route curvature, derives the
+Gauss--Bonnet phase holonomy, constructs a flat Lorentz vacuum receiver, and formally falsifies a
+nonzero universal `4 * arc / differential` coupling.
+
+[proved-derived; formal-checked] I6 returned in `HolonicDimensionObstruction.lean`. Fifteen raw
+modes are condensed by a declared successor receiver; fixed-board, gauge, closure, and
+reparameterization unit modes lie in its complete kernel; the quotient has rational finrank eleven;
+and every twelve-vector family in the successor face is linearly dependent.
+
+[proved-derived; formal-checked] The I7 algebraic entrance returned in `HolonicUnknotting.lean`.
+Rack/quandle action is an invertible swing; inverse actions cancel; quandle pivots fix themselves;
+self-distributivity returns the R-III coloring interchange; and transported pivots act by
+conjugation. A faithful zero-preserving receiver pairing makes source inequality equivalent to a
+non-null self-reading of the additive difference. Generic irreducibility returns the prime
+factorization law, and the full-turn Euler phase is formally shown to collapse every integer
+writhe.
+
+[open] The remaining I7 construction is geometric rather than algebraic: an oriented tangle-diagram
+owner, addressed local Reidemeister occurrences, their equivalence closure and quotient, the actual
+unknot fibre, receiver descent/completeness, framing and linking laws, crossing-change passages,
+connected sum on knot classes, and a proof-grade bridge from that combinatorial quotient to ambient
+isotopy. The current abstract torus slope is not yet an ambient torus knot, and the current signed
+crossing tables are not diagrams.
+
+[definition] These I-stations remain exterior Lean returns. They do not schedule the engine body,
+advance `CONSTRUCTION_STATE.md`, or displace the active same-body factor-deposition deed. Their
+source-ordered receipts and exact residuals are deposited in
+[`../research/records/2026-08-24_THE_ADDRESSED_INSTANCE_LADDER_RETURNED_GEOMETRIC_TORI_CURVED_ARCS_AND_AN_ELEVEN_RANK_QUOTIENT.md`](../research/records/2026-08-24_THE_ADDRESSED_INSTANCE_LADDER_RETURNED_GEOMETRIC_TORI_CURVED_ARCS_AND_AN_ELEVEN_RANK_QUOTIENT.md).
