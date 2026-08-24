@@ -149,7 +149,7 @@ pub trait ResidentLaw: std::fmt::Debug {
         surface: &ResidentSurface<'chart>,
         grain: ResidentGrain,
         inputs: &[(usize, usize, u32)],
-        material: &ResidentMaterial<'chart>,
+        _material: &ResidentMaterial<'chart>,
     ) -> Result<LawShape, ResidentRefusal>;
     /// The entering population this law stages on the card before the deed, if it enters one.
     fn stages(&self) -> Option<&str> {
@@ -179,7 +179,7 @@ pub trait ResidentLaw: std::fmt::Debug {
     /// gains, bands, positions, staged words. For the footprint certificate.
     fn reads<'chart>(
         &self,
-        material: &ResidentMaterial<'chart>,
+        _material: &ResidentMaterial<'chart>,
         staged: &BTreeMap<String, StagedWords<'chart>>,
     ) -> Vec<(u64, u64)>;
     /// **The entailment of this law's parameters by the validated testimony of its occurrence** —
@@ -722,6 +722,120 @@ impl ResidentLaw for TerminalRow {
         out: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         surface.record_terminal_row(lane, inputs[0], out)
+    }
+}
+
+/// **A receiver factorization:** retain the terminal row of every non-empty addressed partition
+/// and leave every earlier row in the complete reconstruction fibre.  Unlike a partition mean,
+/// this quotient preserves the causal terminal standing of each independently conducted section.
+/// Species: quotient.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PartitionTerminalRows {
+    pub boundaries: Vec<u32>,
+    pub mounted: String,
+}
+
+impl ResidentLaw for PartitionTerminalRows {
+    fn entailment(
+        &self,
+        validation: &BindingValidation,
+    ) -> Result<LawEntailment, EntailmentRefusal> {
+        if !validation
+            .interventions
+            .iter()
+            .any(|declaration| declaration.contains("partition terminal"))
+        {
+            return Err(unentailed(
+                "partition-terminal-rows",
+                "receiver declaration",
+                "a declared addressed partition-terminal receiver quotient",
+                validation,
+            ));
+        }
+        Ok(LawEntailment {
+            law: "partition-terminal-rows",
+            parameters: vec![
+                (
+                    "boundaries".to_owned(),
+                    format!("{:?}", self.boundaries),
+                    "the addressed independent-section boundaries mounted for this occurrence"
+                        .to_owned(),
+                ),
+                (
+                    "reconstruction".to_owned(),
+                    "every nonterminal predecessor row".to_owned(),
+                    validation.interventions.join(" | "),
+                ),
+            ],
+            naming_slices: Vec::new(),
+        })
+    }
+    fn name(&self) -> &'static str {
+        "partition-terminal-rows"
+    }
+    fn species(&self) -> OperationSpecies {
+        OperationSpecies::Quotient
+    }
+    fn arity(&self) -> (usize, usize) {
+        (1, 1)
+    }
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        match material.arrays.get(&self.mounted) {
+            Some(array) if array.rows() == self.boundaries.len() => Ok(()),
+            Some(array) => Err(format!(
+                "{} carries {} boundaries; the occurrence declares {}",
+                self.mounted,
+                array.rows(),
+                self.boundaries.len()
+            )),
+            None => Err(self.mounted.clone()),
+        }
+    }
+    fn bound_octaves(
+        &self,
+        _grain: ResidentGrain,
+        inputs: &[u32],
+        _material: &ResidentMaterial<'_>,
+    ) -> i64 {
+        first(inputs, 0)
+    }
+    fn shape<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        _grain: ResidentGrain,
+        inputs: &[(usize, usize, u32)],
+        _material: &ResidentMaterial<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
+        let (rows, width, octaves) = shape_at(inputs, 0);
+        surface.shape_partition_terminal_rows(rows, width, octaves, &self.boundaries)
+    }
+    fn reads<'chart>(
+        &self,
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+    ) -> Vec<(u64, u64)> {
+        material
+            .arrays
+            .get(&self.mounted)
+            .map(|array| vec![array.range()])
+            .unwrap_or_default()
+    }
+    fn record<'chart>(
+        &self,
+        surface: &ResidentSurface<'chart>,
+        lane: &Lane<'_, 'chart>,
+        inputs: &[&ResidentSection<'chart>],
+        material: &ResidentMaterial<'chart>,
+        _staged: &BTreeMap<String, StagedWords<'chart>>,
+        _shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        surface.record_partition_terminal_rows(
+            lane,
+            inputs[0],
+            &material.arrays[&self.mounted],
+            out,
+        )
     }
 }
 
@@ -1741,6 +1855,9 @@ pub struct Contact {
     pub head_width: usize,
     pub window: usize,
     pub terms: SeriesAperture,
+    /// Addressed independent-section boundaries.  When present, contact cannot cross from one
+    /// partition into another even though the apparatus carries the rows in one flat allocation.
+    pub partition: Option<String>,
 }
 
 impl ResidentLaw for Contact {
@@ -1759,8 +1876,15 @@ impl ResidentLaw for Contact {
     fn arity(&self) -> (usize, usize) {
         (3, 1)
     }
-    fn material(&self, _material: &ResidentMaterial<'_>) -> Result<(), String> {
-        Ok(())
+    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+        match &self.partition {
+            Some(name) => match material.arrays.get(name) {
+                Some(boundaries) if boundaries.rows() >= 2 => Ok(()),
+                Some(_) => Err(format!("{name} has fewer than two partition boundaries")),
+                None => Err(name.clone()),
+            },
+            None => Ok(()),
+        }
     }
     fn bound_octaves(
         &self,
@@ -1798,17 +1922,21 @@ impl ResidentLaw for Contact {
     }
     fn reads<'chart>(
         &self,
-        _material: &ResidentMaterial<'chart>,
+        material: &ResidentMaterial<'chart>,
         _staged: &BTreeMap<String, StagedWords<'chart>>,
     ) -> Vec<(u64, u64)> {
-        Vec::new()
+        self.partition
+            .as_ref()
+            .and_then(|name| material.arrays.get(name))
+            .map(|boundaries| vec![boundaries.range()])
+            .unwrap_or_default()
     }
     fn record<'chart>(
         &self,
         surface: &ResidentSurface<'chart>,
         lane: &Lane<'_, 'chart>,
         inputs: &[&ResidentSection<'chart>],
-        _material: &ResidentMaterial<'chart>,
+        material: &ResidentMaterial<'chart>,
         _staged: &BTreeMap<String, StagedWords<'chart>>,
         shape: &LawShape,
         out: &ResidentSection<'chart>,
@@ -1823,6 +1951,9 @@ impl ResidentLaw for Contact {
             self.head_width,
             self.window,
             self.terms,
+            self.partition
+                .as_ref()
+                .and_then(|name| material.arrays.get(name)),
             shape,
             out,
         )

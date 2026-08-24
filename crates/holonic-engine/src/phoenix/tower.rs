@@ -44,8 +44,8 @@ use crate::causal::EventId;
 use crate::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use crate::front_passage::{
     Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MidpointQuotient, PartitionMean,
-    PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale, Standing, TerminalRow,
-    WithdrawColumns, WithdrawRows,
+    PartitionTerminalRows, PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale, Standing,
+    TerminalRow, WithdrawColumns, WithdrawRows,
 };
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex};
 use crate::resident_section::{Dyadic, DyadicEnclosure, SeriesAperture};
@@ -339,6 +339,7 @@ fn receive_entering_partition(
 ) -> Result<EventId, String> {
     match receiver {
         InputSectionReceiver::SourceRows => Ok(event),
+        InputSectionReceiver::IndependentPartitions(_) => Ok(event),
         InputSectionReceiver::PartitionMeans(boundaries) => {
             let quotient = law(
                 complex,
@@ -385,6 +386,9 @@ pub enum Entry {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum InputSectionReceiver<'a> {
     SourceRows,
+    /// Preserve every source row while declaring independent causal sections. Chronology and
+    /// contact use the same boundaries; no mean or other cross-row quotient enters the tower.
+    IndependentPartitions(&'a [u32]),
     PartitionMeans(&'a [u32]),
 }
 
@@ -1493,6 +1497,8 @@ pub fn found_layer(
             head_width: head,
             window,
             terms,
+            partition: matches!(input_receiver, InputSectionReceiver::IndependentPartitions(_))
+                .then(|| INPUT_PARTITION.to_owned()),
         },
     );
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;
@@ -2005,19 +2011,21 @@ pub fn found_layer(
 /// `final_logit_softcapping = 30` is a strictly monotone transformation of every coordinate, so the
 /// order faces of this section are its order faces; it is reported, not enacted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum OutputSectionReceiver {
+pub enum OutputSectionReceiver<'a> {
     /// Preserve the whole normalized section and its whole potential field.
     Whole,
     /// Preserve the exact terminal normalized row and leave earlier rows in the reconstruction
     /// fibre before the tied output contraction.
     TerminalRow,
+    /// Preserve the exact terminal normalized row of every independently addressed section.
+    PartitionTerminalRows(&'a [u32]),
 }
 
 pub fn found_final(
     chart: Chart,
     sibling: &Intervention,
     scales_unused: &(DyadicEnclosure, DyadicEnclosure),
-    output_receiver: OutputSectionReceiver,
+    output_receiver: OutputSectionReceiver<'_>,
 ) -> Result<Founded, String> {
     let _ = scales_unused;
     let eps = Dyadic::of_binary64_bits(EPS_BITS).map_err(|e| e.to_string())?;
@@ -2078,31 +2086,62 @@ pub fn found_final(
         standing,
         "final normed",
     )?;
-    let normed = if output_receiver == OutputSectionReceiver::TerminalRow {
-        let received = law(
-            &mut complex,
-            "terminal normalized row received",
-            OperationSpecies::Quotient,
-            vec![standing],
-            vec![standing],
-            None,
-            vec![intervention(&intervention_statement(
-                "terminal output receiver",
-                "the declared next-continuation receiver reads the complete final normalized row and leaves earlier rows in its reconstruction fibre",
-            ))],
-        )?;
-        realization.bind(received, TerminalRow);
-        bond(
-            &mut complex,
-            "terminal receiver factors the normalized section",
-            standing,
-            normed,
-            received,
-            0,
-        )?;
-        received
-    } else {
-        normed
+    let normed = match output_receiver {
+        OutputSectionReceiver::Whole => normed,
+        OutputSectionReceiver::TerminalRow => {
+            let received = law(
+                &mut complex,
+                "terminal normalized row received",
+                OperationSpecies::Quotient,
+                vec![standing],
+                vec![standing],
+                None,
+                vec![intervention(&intervention_statement(
+                    "terminal output receiver",
+                    "the declared next-continuation receiver reads the complete final normalized row and leaves earlier rows in its reconstruction fibre",
+                ))],
+            )?;
+            realization.bind(received, TerminalRow);
+            bond(
+                &mut complex,
+                "terminal receiver factors the normalized section",
+                standing,
+                normed,
+                received,
+                0,
+            )?;
+            received
+        }
+        OutputSectionReceiver::PartitionTerminalRows(boundaries) => {
+            let received = law(
+                &mut complex,
+                "addressed partition terminal rows received",
+                OperationSpecies::Quotient,
+                vec![standing],
+                vec![standing],
+                None,
+                vec![intervention(&intervention_statement(
+                    "partition terminal output receiver",
+                    "each independently conducted section returns its complete terminal normalized row while every earlier row remains in the reconstruction fibre",
+                ))],
+            )?;
+            realization.bind(
+                received,
+                PartitionTerminalRows {
+                    boundaries: boundaries.to_vec(),
+                    mounted: INPUT_PARTITION.to_owned(),
+                },
+            );
+            bond(
+                &mut complex,
+                "partition receiver factors the normalized sections",
+                standing,
+                normed,
+                received,
+                0,
+            )?;
+            received
+        }
     };
     returns.insert(FINAL_NORMED, normed);
     let normed = if let Intervention::WithdrawFinalSpan { from, span } = sibling {

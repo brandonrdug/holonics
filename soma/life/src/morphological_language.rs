@@ -117,6 +117,10 @@ pub struct MorphologicalLanguagePassage {
     /// only within `source`; unrelated sources remain incomparable.
     pub source_order: u128,
     pub source_order_declared: bool,
+    /// Receiver-visible faces which caused this section to be reachable but are not themselves
+    /// text inside it. A cultivated generator can therefore retain prompt-to-consequence
+    /// incidence without prefixing prompt words onto the generated surface.
+    pub routing_features: BTreeSet<String>,
     pub text: String,
 }
 
@@ -133,6 +137,7 @@ impl MorphologicalLanguagePassage {
             receiver,
             source_order: 0,
             source_order_declared: false,
+            routing_features: BTreeSet::new(),
             text: text.into(),
         }
     }
@@ -140,6 +145,14 @@ impl MorphologicalLanguagePassage {
     pub const fn with_source_order(mut self, source_order: u128) -> Self {
         self.source_order = source_order;
         self.source_order_declared = true;
+        self
+    }
+
+    pub fn with_routing_features(
+        mut self,
+        features: impl IntoIterator<Item = String>,
+    ) -> Self {
+        self.routing_features.extend(features);
         self
     }
 }
@@ -252,6 +265,9 @@ pub use conduct_cuda::*;
 
 mod condition_cuda;
 pub use condition_cuda::*;
+
+mod generator_rest;
+pub use generator_rest::*;
 
 #[cfg(test)]
 mod tests;

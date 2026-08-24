@@ -8,6 +8,252 @@ fn action() -> ActionCurrent {
 }
 
 #[test]
+fn generator_native_rest_preserves_causal_order_and_rejects_source_passages() {
+    let parents = BTreeSet::from(["1".repeat(64), "5".repeat(64)]);
+    let late = MorphologicalGenerator::found(
+        9,
+        parents.clone(),
+        BTreeSet::new(),
+        0,
+        BTreeSet::from(["returned".to_owned()]),
+        vec!["A".to_owned(), "return".to_owned(), ".".to_owned()],
+        2,
+        3,
+        true,
+    )
+    .unwrap();
+    let early = MorphologicalGenerator::found(
+        3,
+        parents.clone(),
+        parents.clone(),
+        2,
+        BTreeSet::from(["boundary".to_owned()]),
+        vec![
+            "The".to_owned(),
+            "boundary".to_owned(),
+            "returns".to_owned(),
+        ],
+        2,
+        2,
+        true,
+    )
+    .unwrap();
+    let rest =
+        MorphologicalGeneratorRest::seal("2".repeat(64), vec![late, early], Vec::new()).unwrap();
+    assert_eq!(rest.generators[0].causal_ordinal, 3);
+    assert_eq!(rest.generators[1].causal_ordinal, 9);
+    let bytes = rest.canonical_bytes().unwrap();
+    assert!(!String::from_utf8_lossy(&bytes).contains("prompt"));
+    assert_eq!(MorphologicalGeneratorRest::read(&bytes).unwrap(), rest);
+
+    let source_shaped = MorphologicalGenerator::found(
+        10,
+        parents,
+        BTreeSet::new(),
+        0,
+        BTreeSet::from(["sentence".to_owned()]),
+        vec![
+            "A".to_owned(),
+            "source".to_owned(),
+            "sentence".to_owned(),
+            ".".to_owned(),
+        ],
+        2,
+        2,
+        true,
+    );
+    assert!(source_shaped.is_err());
+}
+
+#[test]
+fn receiver_restriction_keeps_the_maximal_earliest_closure_and_its_inherited_route() {
+    let parents = BTreeSet::from(["3".repeat(64), "5".repeat(64)]);
+    let broad_early = MorphologicalGenerator::found(
+        1,
+        parents.clone(),
+        parents.clone(),
+        2,
+        BTreeSet::from(["alpha".to_owned(), "geometry".to_owned(), "how".to_owned()]),
+        vec!["Returned".to_owned(), "section".to_owned(), ".".to_owned()],
+        2,
+        2,
+        true,
+    )
+    .unwrap();
+    let broad_late = MorphologicalGenerator::found(
+        2,
+        parents.clone(),
+        BTreeSet::new(),
+        0,
+        BTreeSet::from(["alpha".to_owned(), "geometry".to_owned()]),
+        vec!["geometry".to_owned(), "returns".to_owned(), ".".to_owned()],
+        2,
+        2,
+        true,
+    )
+    .unwrap();
+    let narrow = MorphologicalGenerator::found(
+        3,
+        parents,
+        BTreeSet::new(),
+        0,
+        BTreeSet::from(["alpha".to_owned()]),
+        vec!["Narrow".to_owned(), "closes".to_owned(), ".".to_owned()],
+        2,
+        2,
+        true,
+    )
+    .unwrap();
+    let rest = MorphologicalGeneratorRest::seal(
+        "4".repeat(64),
+        vec![broad_late, narrow, broad_early.clone()],
+        Vec::new(),
+    )
+    .unwrap();
+    let restricted = rest
+        .restrict_to_receiver("How does alpha geometry return?", &BTreeSet::new())
+        .unwrap();
+    assert_eq!(restricted.generators, vec![broad_early]);
+    assert_eq!(restricted.derived_generation_aperture(), 3);
+    let passages = restricted
+        .generators
+        .iter()
+        .flat_map(|generator| {
+            generator.parent_defect_fibres.iter().map(|parent| {
+                MorphologicalLanguagePassage::new(
+                    format!("{}::{parent}", generator.identity_sha256),
+                    format!(
+                        "native-generator/{}/parent/{parent}",
+                        generator.identity_sha256
+                    ),
+                    1,
+                    render_tokens(generator.tokens.iter().map(String::as_str)),
+                )
+                .with_routing_features(generator.routing_features.iter().cloned())
+            })
+        })
+        .collect::<Vec<_>>();
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 1).unwrap();
+    let charge = ecology.charge("Does geometry return?").unwrap();
+    assert!(charge.obligations.iter().any(|obligation| {
+        obligation.features.contains("geometry")
+            && obligation
+                .reached_passages
+                .iter()
+                .any(|passage| passage.starts_with(&restricted.generators[0].identity_sha256))
+    }));
+}
+
+#[test]
+fn recurring_local_transports_recompose_a_closed_surface_without_a_stored_sentence() {
+    let parents = BTreeSet::from(["6".repeat(64), "7".repeat(64)]);
+    let words = [
+        (1, ["The", "field", "returns"], "alpha"),
+        (2, ["field", "returns", "."], "returns"),
+    ]
+    .into_iter()
+    .map(|(causal_ordinal, tokens, route)| {
+        MorphologicalGenerator::found(
+            causal_ordinal,
+            parents.clone(),
+            if causal_ordinal == 1 {
+                parents.clone()
+            } else {
+                BTreeSet::new()
+            },
+            if causal_ordinal == 1 { 2 } else { 0 },
+            BTreeSet::from([route.to_owned()]),
+            tokens.into_iter().map(str::to_owned).collect(),
+            2,
+            3,
+            true,
+        )
+        .unwrap()
+    })
+    .collect::<Vec<_>>();
+    let rest = MorphologicalGeneratorRest::seal("8".repeat(64), words, Vec::new()).unwrap();
+    let (restricted, section_features) = rest
+        .restrict_to_receiver_with_contact("Alpha?", &BTreeSet::new())
+        .unwrap();
+    assert_eq!(restricted.generators.len(), 2);
+    assert_eq!(restricted.derived_generation_aperture(), 4);
+    assert_eq!(section_features, BTreeSet::from(["alpha".to_owned()]));
+    let passages = restricted
+        .generators
+        .iter()
+        .map(|generator| {
+            MorphologicalLanguagePassage::new(
+                generator.identity_sha256.clone(),
+                format!("native-generator/{}", generator.identity_sha256),
+                1,
+                render_tokens(generator.tokens.iter().map(String::as_str)),
+            )
+            .with_routing_features(section_features.iter().cloned())
+        })
+        .collect::<Vec<_>>();
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 1).unwrap();
+    let generation = ecology
+        .generate(
+            "Alpha?",
+            MorphologicalGenerationSpec {
+                maximum_observed_tokens: 4,
+            },
+            action(),
+            1,
+        )
+        .unwrap();
+    assert!(
+        generation.outputs.iter().any(|output| {
+            output.text == "The field returns." && output.rest == MorphologicalResponseRest::Closed
+        }),
+        "local transport outputs: {:?}",
+        generation
+            .outputs
+            .iter()
+            .map(|output| (&output.text, &output.rest))
+            .collect::<Vec<_>>()
+    );
+}
+
+#[test]
+fn a_native_organ_face_opens_an_obligation_without_transcription() {
+    let passages = [
+        MorphologicalLanguagePassage::new(
+            "native-a",
+            "generator-a",
+            1,
+            "The exact section returns.",
+        )
+        .with_routing_features(["native-face-a".to_owned()]),
+        MorphologicalLanguagePassage::new(
+            "native-b",
+            "generator-b",
+            1,
+            "The returned section closes.",
+        )
+        .with_routing_features(["native-face-a".to_owned()]),
+        MorphologicalLanguagePassage::new(
+            "native-control",
+            "generator-control",
+            1,
+            "A disjoint current remains open.",
+        ),
+    ];
+    let ecology = MorphologicalLanguageEcology::condition(&passages, action(), 2).unwrap();
+    let face = BTreeSet::from(["native-face-a".to_owned()]);
+    let charge = ecology
+        .charge_with_native_features("What changes?", &face)
+        .unwrap();
+    assert!(
+        charge
+            .obligations
+            .iter()
+            .any(|obligation| obligation.features.contains("native-face-a"))
+    );
+    assert!(!charge.prompt.contains("native-face-a"));
+}
+
+#[test]
 #[ignore = "requires a CUDA device and the committed morphological conditioning entries"]
 fn cuda_conditioner_returns_the_exact_cpu_ecology_without_a_production_replay() {
     let passages = vec![
@@ -77,9 +323,11 @@ fn exact_recurrent_edges_deposit_only_across_distinct_exterior_sources() {
         panic!("the same exact transport across two sources must deposit");
     };
     assert!(conducting.deposit_count() > 0);
-    assert!(conducting
-        .deposits()
-        .all(|deposit| deposit.exterior_sources().len() >= 2));
+    assert!(
+        conducting
+            .deposits()
+            .all(|deposit| deposit.exterior_sources().len() >= 2)
+    );
 
     let one_source = MorphologicalLanguageEcology::condition(
         &[
@@ -263,10 +511,12 @@ fn plural_terminal_witnesses_return_without_semantic_truncation() {
         generation.reflection.terminal_return_materializations,
         generation.outputs.len()
     );
-    assert!(generation
-        .outputs
-        .iter()
-        .all(|output| !output.tokens.is_empty()));
+    assert!(
+        generation
+            .outputs
+            .iter()
+            .all(|output| !output.tokens.is_empty())
+    );
 }
 
 #[test]
@@ -402,9 +652,11 @@ fn recurring_question_initial_phase_is_conditioned_as_operator_morphology() {
         .collect::<BTreeSet<_>>();
     assert!(!obligated.contains("how"));
     assert!(!obligated.contains("does"));
-    assert!(["training", "morphology", "uncertainty"]
-        .into_iter()
-        .all(|feature| obligated.contains(feature)));
+    assert!(
+        ["training", "morphology", "uncertainty"]
+            .into_iter()
+            .all(|feature| obligated.contains(feature))
+    );
 }
 
 #[test]
@@ -431,9 +683,11 @@ fn question_operator_recurrence_is_not_forced_to_the_source_file_scale() {
         charge.operator_features,
         ["does", "how"].into_iter().map(str::to_owned).collect()
     );
-    assert!(ecology
-        .question_operator_regions()
-        .contains(&vec!["how".to_owned(), "does".to_owned()]));
+    assert!(
+        ecology
+            .question_operator_regions()
+            .contains(&vec!["how".to_owned(), "does".to_owned()])
+    );
 
     let (anchored, legacy, legacy_cloned_tokens) = ecology.question_prefix_audit();
     assert_eq!(

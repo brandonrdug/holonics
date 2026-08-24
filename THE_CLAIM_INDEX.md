@@ -109,6 +109,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md` | **Agentic Athena emanates through addressed continuation and arbitrary organ potentials cross typed apertures** — This blueprint supersedes the N4 statement that no next deed is authorized. |
 | `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` | **The arrow is the division and attention keeps only its aim** — **Evidence:** `measured` where stated; the arrow's own source is `soma/body/src/arrow.rs:17-26` and `:114-125`, read today. |
 | `blueprint/THE_ASSEMBLY.md` | **THE ASSEMBLY** — The parts exist. 28% of the library body — 51 modules, 59,914 lines — has no inbound edge. |
+| `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md` | **The Athena alpha cultivates the complete laboratory exchange, and returned differences compactify into native hexis** — **Authority:** this is the completed AA0--AA4 construction contract admitted by `THE_ROADMAP.md`. |
 | `blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md` | **The Athena production aperture widens through mathematical world-tubes, and returned constraints cultivate the ecology** — **Truth statuses:** `definition` for the production aperture, constraint basin, rich inquiry, dynamic delta, retained-context, and product-grade contracts; `project-postulate` for… |
 | `blueprint/THE_ATHENA_VARIANTS_ARE_PRODUCTS_OF_EROS_PHOENIX_SUPPLIES_ANCESTRY_AND_SHARED_TRANSPORT_FUSES.md` | **The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses** — **Truth statuses:** `definition` for the product, fusion, exchange-passage and defect contracts; `established-bounded` for the admitted H0--H5, W1--W5, M0--M6, A1--A3 and I0--I5 returns;… |
 | `blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md` | **The Clifford lift, the phase wire, and the four untaken readings** — Every citation below was verified at the line given on the day of writing. |
@@ -137,7 +138,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (320 deposits of 612)
+## 4 · The 2026-08 record line (321 deposits of 613)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -462,6 +463,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md` | The potential complex crosses arbitrary organ apertures and codec lineages meet only through returned consequence |
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
 | `2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md` | The returned arbitrary-organ consequence cultivated the same Athena continuation and E3 awaits release admission |
+| `2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md` | The complete laboratory exchange returned as generator-native hexis, and Athena alpha worked from its own terrain |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |
 | `2026-08-24_THE_TERMINAL_FACE_IS_PATH_INDEPENDENT_THE_THIRD_ORDER_COMMUTATOR_SPLITS_AND_THE_DYADIC_APERTURE_EXPOSES_ITS_MODE_COUNT.md` | The terminal face is path-independent, the third-order commutator splits, and the dyadic aperture exposes its mode count |

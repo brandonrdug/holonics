@@ -5,16 +5,23 @@
 //! unresolved fibres and chronology receivers. Equal content founds a contact class; it never
 //! identifies the situated occurrences which inhabit that class.
 
+mod continuation;
 mod json_record;
 mod mount;
 mod receiver;
 mod rest;
+mod source;
 
 use std::{collections::BTreeMap, ops::Range, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+pub use continuation::{
+    derive_continuation_aperture, ContinuationAperture, ContinuationExclusion,
+    ContinuationFamily, ContinuationPartition, ContinuationWorldWindow, MessageAddress,
+    ShortestHistorySeparator,
+};
 pub use mount::{mount_exchange_world_tube_on_device, ExchangeContainerSpec, ExchangeMountError};
 pub use receiver::{
     BranchPermutationReceipt, ExactJoinPopulation, LineageAblationReceipt, ScalarJoinWitness,
@@ -22,6 +29,10 @@ pub use receiver::{
 pub use rest::{
     exchange_world_tube_rest_digest, remount_exchange_world_tube, write_exchange_world_tube_rest,
     EXCHANGE_REST_PREFIX,
+};
+pub use source::{
+    attach_visible_exchange_faces, discover_complete_exchange_aperture,
+    CompleteExchangeSource, VisibleProjectionReceipt,
 };
 
 /// One exact SHA-256 content address. It is not an occurrence identity.
@@ -161,7 +172,7 @@ pub struct ScalarContactSite {
     pub class: u32,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeviceContactReceipt {
     pub schema: String,
     pub device: String,

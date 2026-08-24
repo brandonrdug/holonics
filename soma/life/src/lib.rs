@@ -7,6 +7,10 @@
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod algorithmic_material;
+/// Athena-alpha's receiver-relative condensation of complete exchange returns into recurring
+/// proper continuation generators. The developmental world owns the source passages; this owner
+/// returns only parented local morphology and its open reconstruction fibres.
+pub mod athena_alpha;
 pub mod atlas_cultivation;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read

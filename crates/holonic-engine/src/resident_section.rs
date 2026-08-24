@@ -112,10 +112,11 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 32] = [
+pub const KERNELS: [&str; 33] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
+    "section_partition_terminal_rows",
     "section_partition_mean",
     "section_withdraw_rows",
     "section_permute_columns",
@@ -1964,6 +1965,38 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, 1, width, input_octaves, work, vec![])
     }
 
+    /// The exact terminal row of every non-empty addressed block. The predecessor section is
+    /// retained as the reconstruction fibre; only the receiver-visible causal endpoints are
+    /// allocated.
+    pub fn shape_partition_terminal_rows(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        boundaries: &[u32],
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "partition-terminal-rows";
+        if boundaries.len() < 2
+            || boundaries[0] != 0
+            || boundaries.last().copied() != Some(rows as u32)
+            || boundaries.windows(2).any(|pair| pair[0] >= pair[1])
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("{rows} source rows with boundaries {boundaries:?}"),
+            });
+        }
+        let groups = boundaries.len() - 1;
+        let count = (groups * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves));
+        work.stepped();
+        self.flat_shape(OPERATION, groups, width, input_octaves, work, vec![])
+    }
+
     /// The exact directed mean of every non-empty row block declared by `boundaries`.  The
     /// predecessor remains the complete reconstruction fibre; this shape allocates only the
     /// receiver's block means.
@@ -2493,6 +2526,7 @@ impl<'chart> ResidentSurface<'chart> {
         head_width: usize,
         window: usize,
         terms: SeriesAperture,
+        partition_boundaries: Option<&Positions<'chart>>,
         shape: &LawShape,
         out: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
@@ -2509,6 +2543,16 @@ impl<'chart> ResidentSurface<'chart> {
             .u32(kv_heads as u32)
             .u32(head_width as u32)
             .u32(window.max(1) as u32)
+            .ptr(
+                partition_boundaries
+                    .map(Positions::device_ptr)
+                    .unwrap_or(q.lo.device_ptr()),
+            )
+            .u32(
+                partition_boundaries
+                    .map(|boundaries| boundaries.rows() as u32)
+                    .unwrap_or(0),
+            )
             .i32(out.grain.0 as i32)
             .u32(terms.0)
             .ptr(out.lo.device_ptr())
@@ -2731,6 +2775,50 @@ impl<'chart> ResidentSurface<'chart> {
             input.width,
             &mut params,
             "terminal-row",
+        )
+    }
+
+    /// Record the exact terminal row of every addressed partition already mounted on the card.
+    pub fn record_partition_terminal_rows(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        boundaries: &Positions<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if boundaries.rows() != out.rows + 1 || out.width != input.width {
+            return Err(ResidentRefusal::Declaration {
+                operation: "partition-terminal-rows",
+                what: format!(
+                    "input={}x{}, boundary population={}, output={}x{}",
+                    input.rows,
+                    input.width,
+                    boundaries.rows(),
+                    out.rows,
+                    out.width
+                ),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(boundaries.device_ptr())
+            .u32(out.rows as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_partition_terminal_rows",
+            out.count(),
+            &mut params,
+            "partition-terminal-rows",
         )
     }
 
@@ -6764,6 +6852,7 @@ mod tests {
                 2,
                 512,
                 SeriesAperture(12),
+                None,
                 &contact,
                 &out,
             )
@@ -6791,6 +6880,127 @@ mod tests {
             "{:?} {:?}",
             words[2],
             words[3]
+        );
+    }
+
+    #[test]
+    fn partition_terminals_return_each_addressed_causal_endpoint_exactly() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let grain = ResidentGrain(20);
+        let words = [ONE, TWO, THREE, FOUR];
+        let staged = surface.stage_words(&words, 4, 1).expect("stage");
+        let boundaries = surface.mount_positions(&[0, 2, 4]).expect("boundaries");
+        let enter = surface
+            .shape_enter(4, 1, Dyadic::ONE, grain, &words)
+            .expect("enter shape");
+        let terminals = surface
+            .shape_partition_terminal_rows(4, 1, enter.needed, &[0, 2, 4])
+            .expect("terminal shape");
+        let entered = surface.fresh_section(4, 1, grain).expect("entered");
+        let returned = surface.fresh_section(2, 1, grain).expect("returned");
+        let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("enter lane");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &entered)
+            .expect("enter");
+        builder.close(0, &entered, enter.needed).expect("close enter");
+        let lane = builder.open(1, &[0]).expect("terminal lane");
+        surface
+            .record_partition_terminal_rows(&lane, &entered, &boundaries, &returned)
+            .expect("terminals");
+        builder
+            .close(1, &returned, terminals.needed)
+            .expect("close terminals");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        let unit = 1i64 << grain.0;
+        assert_eq!(
+            surface.read_out(&returned).expect("read"),
+            vec![(2 * unit, 2 * unit), (4 * unit, 4 * unit)]
+        );
+    }
+
+    #[test]
+    fn partitioned_contact_cannot_cross_an_adjacent_section_boundary() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let grain = ResidentGrain(20);
+        let unit_words = [ONE, ONE];
+        let carried_words = [ONE, FOUR];
+        let staged_q = surface.stage_words(&unit_words, 2, 1).expect("stage q");
+        let staged_k = surface.stage_words(&unit_words, 2, 1).expect("stage k");
+        let staged_v = surface
+            .stage_words(&carried_words, 2, 1)
+            .expect("stage v");
+        let boundaries = surface.mount_positions(&[0, 1, 2]).expect("boundaries");
+        let enter = surface
+            .shape_enter(2, 1, Dyadic::ONE, grain, &unit_words)
+            .expect("enter shape");
+        let contact = surface
+            .shape_contact(
+                2,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                2,
+                SeriesAperture(2),
+                grain,
+                enter.needed,
+                enter.needed,
+                enter.needed,
+            )
+            .expect("contact shape");
+        let q = surface.fresh_section(2, 1, grain).expect("q");
+        let k = surface.fresh_section(2, 1, grain).expect("k");
+        let v = surface.fresh_section(2, 1, grain).expect("v");
+        let out = surface.fresh_section(2, 1, grain).expect("out");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![], vec![], vec![0, 1, 2]])
+            .expect("begin");
+        for (index, (staged, section)) in
+            [(&staged_q, &q), (&staged_k, &k), (&staged_v, &v)]
+                .into_iter()
+                .enumerate()
+        {
+            let lane = builder.open(index, &[]).expect("enter lane");
+            surface
+                .record_enter(&lane, staged, Dyadic::ONE, section)
+                .expect("enter");
+            builder
+                .close(index, section, enter.needed)
+                .expect("close enter");
+        }
+        let lane = builder.open(3, &[0, 1, 2]).expect("contact lane");
+        surface
+            .record_contact(
+                &lane,
+                &q,
+                &k,
+                &v,
+                1,
+                1,
+                1,
+                2,
+                SeriesAperture(2),
+                Some(&boundaries),
+                &contact,
+                &out,
+            )
+            .expect("contact");
+        builder.close(3, &out, contact.needed).expect("close contact");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        assert_eq!(reading.slots[3].reach, 1);
+        let unit = 1i64 << grain.0;
+        assert_eq!(
+            surface.read_out(&out).expect("read"),
+            vec![(unit, unit), (4 * unit, 4 * unit)]
         );
     }
 
@@ -6860,6 +7070,7 @@ mod tests {
                 1,
                 rows,
                 SeriesAperture(2),
+                None,
                 &contact,
                 &out,
             )

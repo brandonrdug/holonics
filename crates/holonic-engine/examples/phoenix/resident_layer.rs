@@ -1159,6 +1159,7 @@ pub fn found_deed(
             head_width: HEAD_WIDTH,
             window: SLIDING_WINDOW,
             terms,
+            partition: None,
         },
     );
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;

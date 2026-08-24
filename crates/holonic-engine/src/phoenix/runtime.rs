@@ -44,6 +44,11 @@ pub struct ProductSession {
     product_root: std::path::PathBuf,
     mounted: crate::cultivated_rest::MountedCultivatedRest,
     artifact: crate::foreign_codec_rest::ExteriorCodecArtifact,
+    tokenizer: tokenizers::Tokenizer,
+    /// One continuing resident apparatus owner across every successor frontier. Recreating a CUDA
+    /// context per frontier leaks the physical recurrence into process churn and eventually
+    /// refuses stream creation under pressure even though semantic standing is unchanged.
+    readout: ResidentReadout,
     source_codec_identity: String,
     runtime_law: RuntimeLawReceipt,
     u: AlignedMaterial,
@@ -75,6 +80,19 @@ pub struct SourceTokenSequence {
     pub source_ids: Vec<u32>,
     pub native_ids: Vec<u32>,
     pub surface: String,
+}
+
+/// One exterior exchange face constructed from the authenticated tokenizer companion.
+///
+/// Roles and delimiters remain codec material.  The returned text is suitable for the existing
+/// native crossing, but it does not add a conversation, role or language owner to the engine.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ExteriorTurnPresentation {
+    pub text: String,
+    pub text_sha256: String,
+    pub entering_role: String,
+    pub successor_anchor_sha256: String,
+    pub codec_identity: String,
 }
 
 /// The overlay operation complex founded from the authenticated W3 rank receipt and factor
@@ -109,7 +127,8 @@ pub struct W1SourceClosureIdentity {
 
 impl ProductSession {
     /// Mount and authenticate the product directory once, including its W1 predecessor and
-    /// source-detached codec.  No resident allocation or semantic deed occurs here.
+    /// source-detached codec. One resident readout/context is mounted here and held for the
+    /// complete session; no semantic deed occurs until current crosses an inference method.
     pub fn open(product_directory: impl AsRef<Path>) -> Result<Self, String> {
         let product_root = std::fs::canonicalize(product_directory.as_ref()).map_err(|error| {
             format!(
@@ -122,6 +141,13 @@ impl ProductSession {
         mounted.verify_still().map_err(|error| error.to_string())?;
         let artifact = mounted
             .exterior_codec_artifact()
+            .map_err(|error| error.to_string())?;
+        mounted
+            .predecessor()
+            .codebook()
+            .validate_with_codec(&artifact)
+            .map_err(|error| error.to_string())?;
+        let tokenizer = tokenizers::Tokenizer::from_bytes(&artifact.tokenizer_json)
             .map_err(|error| error.to_string())?;
         let source_codec_identity = artifact.descriptor().tokenizer_json_sha256;
         let runtime_law = mounted.product.runtime_law().clone();
@@ -153,10 +179,13 @@ impl ProductSession {
             );
         }
         let (u, v, derivation, _) = factor_runtime(&mounted.product, &runtime_law)?;
+        let readout = ResidentReadout::new().map_err(|error| error.to_string())?;
         Ok(Self {
             product_root,
             mounted,
             artifact,
+            tokenizer,
+            readout,
             source_codec_identity,
             runtime_law,
             u,
@@ -241,11 +270,110 @@ impl ProductSession {
     /// Encode through the authenticated product codec and cross the source address into the
     /// native W1 space.  The returned IDs are suitable for the resident tower.
     pub fn encode(&self, text: &str) -> Result<Vec<u32>, String> {
-        self.mounted
-            .predecessor()
-            .codebook()
-            .encode_text(&self.artifact, text, self.runtime_law.add_special_tokens)
-            .map_err(|error| error.to_string())
+        let encoded = self
+            .tokenizer
+            .encode(text, self.runtime_law.add_special_tokens)
+            .map_err(|error| error.to_string())?;
+        encoded
+            .get_ids()
+            .iter()
+            .map(|source| {
+                self.mounted
+                    .predecessor()
+                    .codebook()
+                    .native_id(*source)
+                    .map_err(|error| error.to_string())
+            })
+            .collect()
+    }
+
+    /// Present one addressed application turn through delimiters declared by the authenticated
+    /// tokenizer companion.  This is an exterior codec operation, not a semantic routing law.
+    pub fn present_exterior_turn(
+        &self,
+        entering_role: &str,
+        content: &str,
+    ) -> Result<ExteriorTurnPresentation, String> {
+        if entering_role.is_empty()
+            || entering_role.contains(['\n', '\r'])
+            || content.is_empty()
+        {
+            return Err("the exterior turn face is empty or malformed".to_owned());
+        }
+        self.present_exterior_exchange(&[(entering_role, content)])
+    }
+
+    /// Present an addressed plural exchange through the same authenticated codec face. The
+    /// application role labels remain exterior material; the codec's own successor anchor names
+    /// the model-facing role used for assistant occurrences.
+    pub fn present_exterior_exchange(
+        &self,
+        faces: &[(&str, &str)],
+    ) -> Result<ExteriorTurnPresentation, String> {
+        if faces.is_empty()
+            || faces.iter().any(|(role, content)| {
+                role.is_empty()
+                    || role.contains(['\n', '\r'])
+                    || content.is_empty()
+                    || !matches!(*role, "user" | "assistant")
+            })
+            || faces.last().is_none_or(|(role, _)| *role != "user")
+        {
+            return Err("the exterior exchange face is empty or malformed".to_owned());
+        }
+        let config = self
+            .artifact
+            .tokenizer_config_json
+            .as_deref()
+            .ok_or_else(|| "the authenticated codec carries no turn companion".to_owned())?;
+        let config: serde_json::Value =
+            serde_json::from_slice(config).map_err(|error| error.to_string())?;
+        let token = |name: &str| {
+            config
+                .get(name)
+                .and_then(serde_json::Value::as_str)
+                .ok_or_else(|| format!("authenticated codec turn token {name} is absent"))
+        };
+        let open = token("sot_token")?;
+        let close = token("eot_token")?;
+        let successor = config
+            .pointer("/response_template/start_anchor")
+            .and_then(|value| {
+                value.as_str().or_else(|| {
+                    value
+                        .as_array()
+                        .and_then(|values| values.first())
+                        .and_then(serde_json::Value::as_str)
+                })
+            })
+            .ok_or_else(|| "authenticated codec successor anchor is absent".to_owned())?;
+        let model_role = successor
+            .strip_prefix(open)
+            .and_then(|tail| tail.split_once('\n').map(|(role, _)| role))
+            .filter(|role| !role.is_empty())
+            .ok_or_else(|| "authenticated codec successor role is absent".to_owned())?;
+        let mut text = String::new();
+        for (role, content) in faces {
+            let codec_role = if *role == "assistant" {
+                model_role
+            } else {
+                *role
+            };
+            text.push_str(open);
+            text.push_str(codec_role);
+            text.push('\n');
+            text.push_str(content);
+            text.push_str(close);
+        }
+        text.push_str(successor);
+        let text_sha256 = format!("{:x}", Sha256::digest(text.as_bytes()));
+        Ok(ExteriorTurnPresentation {
+            text,
+            text_sha256,
+            entering_role: "addressed-plural-exchange".to_owned(),
+            successor_anchor_sha256: format!("{:x}", Sha256::digest(successor.as_bytes())),
+            codec_identity: self.source_codec_identity.clone(),
+        })
     }
 
     /// Return one exterior text face from authenticated native codebook addresses.
@@ -257,9 +385,7 @@ impl ProductSession {
             return Err("the native decoder received no addressed occurrence".to_owned());
         }
         let source_ids = self.source_ids(native_ids)?;
-        let tokenizer = tokenizers::Tokenizer::from_bytes(&self.artifact.tokenizer_json)
-            .map_err(|error| error.to_string())?;
-        tokenizer
+        self.tokenizer
             .decode(&source_ids, false)
             .map_err(|error| error.to_string())
     }
@@ -282,14 +408,8 @@ impl ProductSession {
                 text.len()
             ));
         }
-        self.mounted
-            .predecessor()
-            .codebook()
-            .validate_with_codec(&self.artifact)
-            .map_err(|error| error.to_string())?;
-        let tokenizer = tokenizers::Tokenizer::from_bytes(&self.artifact.tokenizer_json)
-            .map_err(|error| error.to_string())?;
-        let encoding = tokenizer
+        let encoding = self
+            .tokenizer
             .encode(text, self.runtime_law.add_special_tokens)
             .map_err(|error| error.to_string())?;
         let source_ids = encoding.get_ids();
@@ -365,7 +485,7 @@ impl ProductSession {
         }
         let law_identity = format!(
             "{:x}",
-            Sha256::digest(b"athena/input-presentation/partition-directed-mean/v1: each strict addressed source-row block maps to its exact directed coordinate mean; all native rows, byte boundaries, cross-boundary tokens and the source text remain its reconstruction fibre")
+            Sha256::digest(b"athena/input-presentation/addressed-causal-partition/v1: every strict addressed source-row block remains a complete independently conducted causal section; chronology resets, contact cannot cross its boundaries, and earlier rows remain the reconstruction fibre of its terminal receiver")
         );
         let reconstruction_sha256 = digest_input_reconstruction(
             text,
@@ -379,7 +499,7 @@ impl ProductSession {
             native_ids,
             RuntimeInputPresentation {
                 schema: "holonic-engine.athena.input-presentation.v1".to_owned(),
-                kind: "addressed-partition-directed-mean".to_owned(),
+                kind: "addressed-causal-partition".to_owned(),
                 law_sha256: law_identity,
                 source_rows: source_ids.len(),
                 received_rows: groups,
@@ -675,6 +795,77 @@ impl ProductSession {
         )
     }
 
+    /// Conduct plural independently encoded occurrences as one addressed resident partition.
+    ///
+    /// Each row is already an addressed native word. It is decoded only for exterior receipt
+    /// testimony before the native words are flattened. Consequently tokenizer adjacency cannot
+    /// leak between requests, while a card-emitted successor remains authoritative even when its
+    /// displayed surface has a different canonical re-tokenization. The partition is apparatus
+    /// factorization over one mounted body, not a batch-size semantic constant.
+    pub fn infer_native_partitioned_with_intervention(
+        &self,
+        rows: &[Vec<u32>],
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+    ) -> Result<RuntimeReturn, String> {
+        if rows.is_empty() || rows.iter().any(Vec::is_empty) {
+            return Err("the native occurrence partition is empty".to_owned());
+        }
+        let mut text = String::new();
+        let mut byte_boundaries = Vec::with_capacity(rows.len() + 1);
+        let mut partition_boundaries = Vec::with_capacity(rows.len() + 1);
+        let mut native_ids = Vec::new();
+        byte_boundaries.push(0u64);
+        partition_boundaries.push(0u32);
+        for row in rows {
+            let decoded = self.decode_native_ids(row)?;
+            text.push_str(&decoded);
+            byte_boundaries.push(text.len() as u64);
+            native_ids.extend_from_slice(row);
+            partition_boundaries.push(
+                u32::try_from(native_ids.len())
+                    .map_err(|_| "native partition extent left the u32 carrier".to_owned())?,
+            );
+        }
+        let law_sha256 = format!(
+            "{:x}",
+            Sha256::digest(b"athena/input-presentation/independent-native-causal-partition/v1: independently addressed native words remain complete causal sections while one resident card conducts the family; chronology resets at each boundary, contact is block-diagonal, terminal rows return independently, and exterior re-tokenization remains a separate codec fibre")
+        );
+        let byte_boundaries_usize = byte_boundaries
+            .iter()
+            .map(|boundary| usize::try_from(*boundary))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| "native partition byte boundary left usize".to_owned())?;
+        let reconstruction_sha256 = digest_input_reconstruction(
+            &text,
+            &native_ids,
+            &byte_boundaries_usize,
+            partition_boundaries.len(),
+            partition_boundaries.iter().copied(),
+            &[],
+        );
+        let presentation = RuntimeInputPresentation {
+            schema: "holonic-engine.athena.input-presentation.v1".to_owned(),
+            kind: "independent-native-causal-partition".to_owned(),
+            law_sha256,
+            source_rows: native_ids.len(),
+            received_rows: rows.len(),
+            byte_boundaries,
+            partition_boundaries,
+            boundary_crossings: Vec::new(),
+            reconstruction_sha256,
+            source_rows_retained: true,
+        };
+        self.infer_encoded_with_intervention(
+            &text,
+            native_ids,
+            presentation,
+            site,
+            intervention,
+            streamed::ReceiverOption::Complete,
+        )
+    }
+
     /// Conduct one addressed exterior partition through the authenticated product. Every source
     /// token remains in the input receipt; the resident card integrates the strict token blocks
     /// into the receiver rows which enter the inherited tower.
@@ -728,19 +919,21 @@ impl ProductSession {
         let prepared = self.prepare_with_rows(&native_ids, receiver_rows)?;
         let request = prepared.request()?;
         let mut source = prepared.source();
-        let readout = ResidentReadout::new().map_err(|e| format!("resident card: {e:?}"))?;
-        let surface =
-            ResidentSurface::on(&readout).map_err(|e| format!("resident surface: {e:?}"))?;
+        let surface = ResidentSurface::on(&self.readout)
+            .map_err(|e| format!("resident surface: {e:?}"))?;
         let runtime_law = self.runtime_law.clone();
         let chart = match runtime_law.chart {
             RuntimeChart::Midpoint => tower::Chart::Midpoint,
             RuntimeChart::Interval => tower::Chart::Interval,
         };
         let token_rows = native_ids.iter().map(|id| *id as usize).collect::<Vec<_>>();
-        let cultivated = if presentation.kind == "addressed-partition-directed-mean" {
+        let cultivated = if matches!(
+            presentation.kind.as_str(),
+            "addressed-causal-partition" | "independent-native-causal-partition"
+        ) {
             streamed::circulate_cultivated_with_partitioned_intervention(
                 &surface,
-                &readout,
+                &self.readout,
                 &mut source,
                 &token_rows,
                 &presentation.partition_boundaries,
@@ -756,7 +949,7 @@ impl ProductSession {
         } else {
             streamed::circulate_cultivated_with_intervention(
                 &surface,
-                &readout,
+                &self.readout,
                 &mut source,
                 &token_rows,
                 ResidentGrain(runtime_law.grain),

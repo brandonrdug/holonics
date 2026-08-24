@@ -519,6 +519,7 @@ fn discharge_window<'chart>(
     deeds: &mut Vec<BoundDeed<'chart>>,
     receipts: &mut [SegmentReceipt],
     receiver_option: ReceiverOption,
+    read_complete_layer_faces: bool,
     cultivation_present: bool,
     obstructions: &mut Vec<(usize, String, usize, usize)>,
     receiver_layers: &mut Vec<LayerReceiverFaces>,
@@ -558,7 +559,7 @@ fn discharge_window<'chart>(
                 }
             }
         }
-        if receiver_option == ReceiverOption::Complete {
+        if receiver_option == ReceiverOption::Complete && read_complete_layer_faces {
             if let Some(layer) = receipt.layer {
                 let ple = bound
                     .read_section(&returned, named[tower::PLE_SECTION])
@@ -966,14 +967,14 @@ fn circulate_inner<'chart, 'request>(
     if tokens.is_empty() {
         return Err("the tower received no entering rows".to_owned());
     }
-    let model_rows = match partition_boundaries {
+    let partition_groups = match partition_boundaries {
         Some(boundaries)
             if boundaries.len() >= 2
                 && boundaries[0] == 0
                 && boundaries.last().copied() == Some(tokens.len() as u32)
                 && boundaries.windows(2).all(|pair| pair[0] < pair[1]) =>
         {
-            boundaries.len() - 1
+            Some(boundaries.len() - 1)
         }
         Some(boundaries) => {
             return Err(format!(
@@ -981,8 +982,12 @@ fn circulate_inner<'chart, 'request>(
                 tokens.len()
             ));
         }
-        None => tokens.len(),
+        None => None,
     };
+    // Independent partitions share one apparatus allocation, not one semantic row. Every source
+    // token continues through the complete inherited tower; only contact is block-diagonal and
+    // the declared final receiver condenses each section to its causal terminal.
+    let model_rows = tokens.len();
 
     // ---------------------------------------------------------------------------------------
     // before the deed: the segments, the admission, the standing, and the one native-rest occurrence
@@ -1071,13 +1076,21 @@ fn circulate_inner<'chart, 'request>(
     }
     let sliding_bands = tower::found_bands(Species::Sliding, band_terms)?;
     let full_bands = tower::found_bands(Species::Full, band_terms)?;
+    let positions: Vec<u32> = match partition_boundaries {
+        Some(boundaries) => boundaries
+            .windows(2)
+            .flat_map(|pair| 0..(pair[1] - pair[0]))
+            .collect(),
+        None => (0..model_rows as u32).collect(),
+    };
+    let greatest_position = positions.iter().copied().max().unwrap_or(0);
     material.bands.insert(
         tower::SLIDING_BANDS.to_owned(),
         (
             surface
                 .mount_bands(&sliding_bands, tower::BAND_GRAIN)
                 .map_err(|e| e.to_string())?,
-            (model_rows - 1) as u32,
+            greatest_position,
         ),
     );
     material.bands.insert(
@@ -1086,10 +1099,9 @@ fn circulate_inner<'chart, 'request>(
             surface
                 .mount_bands(&full_bands, tower::BAND_GRAIN)
                 .map_err(|e| e.to_string())?,
-            (model_rows - 1) as u32,
+            greatest_position,
         ),
     );
-    let positions: Vec<u32> = (0..model_rows as u32).collect();
     let reversed_positions: Vec<u32> = positions.iter().copied().rev().collect();
     material.positions = Some(
         surface
@@ -1165,9 +1177,10 @@ fn circulate_inner<'chart, 'request>(
     // The W3 candidate, exact factor residency, and pure overlay work are admitted before the
     // first W2 launch; the final bind must agree with this receipt after h and y0 are released.
     let (mut overlay_material, pre_admission) = if let Some(request) = cultivation {
-        let receiver_rows = match receiver_option {
-            ReceiverOption::Terminal => 1,
-            ReceiverOption::Complete => model_rows,
+        let receiver_rows = match (partition_groups, receiver_option) {
+            (Some(groups), _) => groups,
+            (None, ReceiverOption::Terminal) => 1,
+            (None, ReceiverOption::Complete) => model_rows,
         };
         let (material, receipt) = streamed_cultivation::prepare(
             surface,
@@ -1383,13 +1396,15 @@ fn circulate_inner<'chart, 'request>(
             applied,
             model_rows,
             match partition_boundaries {
-                Some(boundaries) => tower::InputSectionReceiver::PartitionMeans(boundaries),
+                Some(boundaries) => {
+                    tower::InputSectionReceiver::IndependentPartitions(boundaries)
+                }
                 None => tower::InputSectionReceiver::SourceRows,
             },
         )?;
         let terminal = founded.returns[tower::LAYER_RETURN];
         let mut declared = BTreeSet::new();
-        if receiver_option == ReceiverOption::Complete {
+        if receiver_option == ReceiverOption::Complete && partition_boundaries.is_none() {
             declared.insert(founded.returns[tower::PLE_SECTION]);
             declared.insert(founded.returns[tower::CONTACT]);
             // The enclosure is the receiver-visible layer-return face.  The later
@@ -1426,6 +1441,7 @@ fn circulate_inner<'chart, 'request>(
                     &mut bound_deeds,
                     &mut receipts,
                     receiver_option,
+                    partition_boundaries.is_none(),
                     cultivation.is_some(),
                     &mut obstructions,
                     &mut receiver_layers,
@@ -1568,6 +1584,7 @@ fn circulate_inner<'chart, 'request>(
         &mut bound_deeds,
         &mut receipts,
         receiver_option,
+        partition_boundaries.is_none(),
         cultivation.is_some(),
         &mut obstructions,
         &mut receiver_layers,
@@ -1619,9 +1636,12 @@ fn circulate_inner<'chart, 'request>(
     } else {
         &no_intervention
     };
-    let output_receiver = match receiver_option {
-        ReceiverOption::Terminal => tower::OutputSectionReceiver::TerminalRow,
-        ReceiverOption::Complete => tower::OutputSectionReceiver::Whole,
+    let output_receiver = match (partition_boundaries, receiver_option) {
+        (Some(boundaries), _) => {
+            tower::OutputSectionReceiver::PartitionTerminalRows(boundaries)
+        }
+        (None, ReceiverOption::Terminal) => tower::OutputSectionReceiver::TerminalRow,
+        (None, ReceiverOption::Complete) => tower::OutputSectionReceiver::Whole,
     };
     let mut founded = tower::found_final(chart, applied_final, &scales, output_receiver)?;
     let terminal = founded.returns[tower::POTENTIAL];
@@ -1663,6 +1683,7 @@ fn circulate_inner<'chart, 'request>(
                 &mut bound_deeds,
                 &mut receipts,
                 receiver_option,
+                partition_boundaries.is_none(),
                 cultivation.is_some(),
                 &mut obstructions,
                 &mut receiver_layers,
@@ -1852,6 +1873,7 @@ fn circulate_inner<'chart, 'request>(
         &mut bound_deeds,
         &mut receipts,
         receiver_option,
+        partition_boundaries.is_none(),
         cultivation.is_some(),
         &mut obstructions,
         &mut receiver_layers,
@@ -1928,9 +1950,10 @@ fn circulate_inner<'chart, 'request>(
             ("gated passage chart".to_owned(), model_rows, tower::FFN),
             (
                 "potential section".to_owned(),
-                match receiver_option {
-                    ReceiverOption::Terminal => 1,
-                    ReceiverOption::Complete => model_rows,
+                match (partition_groups, receiver_option) {
+                    (Some(groups), _) => groups,
+                    (None, ReceiverOption::Terminal) => 1,
+                    (None, ReceiverOption::Complete) => model_rows,
                 },
                 tower::VOCABULARY,
             ),
@@ -1938,12 +1961,15 @@ fn circulate_inner<'chart, 'request>(
         grain: grain.0,
         series_terms: terms.0,
         reductions,
-        receiver_boundary: match receiver_option {
-            ReceiverOption::Terminal => format!(
+        receiver_boundary: match (partition_groups, receiver_option) {
+            (Some(groups), _) => format!(
+                "the addressed independent-section receiver: {groups} terminal causal rows after block-diagonal contact; every earlier row remains in the reconstruction fibre"
+            ),
+            (None, ReceiverOption::Terminal) => format!(
                 "the declared terminal of each segment ({} layer returns and one potential section); no other face was declared, which is why every seal factored",
                 receipts.len() - 1
             ),
-            ReceiverOption::Complete => format!(
+            (None, ReceiverOption::Complete) => format!(
                 "the complete receiver: per-layer PLE/contact/enclosure, final normed standing, and potential ({} layer returns)",
                 receipts.len() - 1
             ),

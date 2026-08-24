@@ -493,5 +493,7 @@ Read, in order:
 14. only the source owners and evidence closure of the current E-deed.
 
 Do not reread the research archive by default. E0--E5 have passed and this ordered campaign is
-complete. No successor deed is authorized; the open exterior in §§10 and 12 remains unscheduled
-until the roadmap explicitly composes a new campaign.
+complete. [historical] At its completion no successor deed was authorized. [definition] The roadmap
+now composes the Athena-alpha cultivation campaign; only that roadmap and its named active
+blueprint schedule the successor, while every unrelated open exterior in §§10 and 12 remains
+unscheduled.

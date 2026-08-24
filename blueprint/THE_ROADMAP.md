@@ -22,20 +22,73 @@ above "close the loop", because closing a loop adds no organ. Brandon, direct ru
 > *"this is 'holobrochos', you need to outline the spine of the machine and understand how all of
 > the loops and machinery connects and choreographs information transportation."*
 
-## WHERE THIS STANDS — revised 2026-08-23; prior revision 2026-08-22
+## WHERE THIS STANDS — revised 2026-08-24; prior revision 2026-08-23
 
 **Read this section and the linked active blueprint. The former delegated-plan and open-work
 station ledgers lower in this file are historical provenance and schedule nothing.** Brandon
 authorised the standing revision directly: *"Regarding the roadmap document, you can
 authoritatively revise it once you have sufficient context post-analysis campaign."*
 
+## ATHENA ALPHA CULTIVATES THE COMPLETE LABORATORY EXCHANGE — 2026-08-23
+
+**The completed campaign is
+[`THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`](THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md).**
+
+**CURRENT FRONTIER — AA0--AA4 PASSED; THE ATHENA-ALPHA CULTIVATION CAMPAIGN IS COMPLETE AND NO
+SUCCESSOR DEED IS AUTHORIZED.** [established-bounded; implemented-exact; measured] The returned
+product is the first internally useful
+`Athena^alpha_[Gemma](B_lab,H_exchange,P_text+vision+audio)`: the frozen E5 body cultivated by the
+complete captured Codex/Claude/user laboratory exchange, whole sibling continuations,
+mathematics/physics and actual returned world differences, then condensed into source-detached
+native hexis and served through the existing inference membrane. Its identity is
+`77ac8fb1ca27fdc6e13298007f34ec953ebd6472ee76312f9850021f47bf01d0`.
+
+[established-bounded; implemented-exact; measured] A1 already mounted and detached a real
+404,556,551-octet exchange world-tube with 1,179 visible messages and complete richer incidence. A2
+returned 22 sibling-history defects but only one generated frontier per history. A3 changed one
+three-occurrence family at one target codeword, with held-out conduct, revisit holonomy, control,
+ablation and withdrawal. E5 reused that bounded continuation and one held-out generation prompt;
+it did not circulate complete recorded suffixes or the complete laboratory exchange through the
+frozen body. The new blueprint closes that exact edge without founding a Trainer, Dataset,
+ConversationModel, KVCache or Scheduler.
+
+[established-bounded; implemented-exact; measured] AA0 mounted 916 containers, 2,683,106,227
+octets, 435,085 records, 16,659 visible messages and 2,224 continuation families. AA1 returned 67
+development families across 570 complete suffix boundaries. AA2--AA3 condensed 15,336 recurring
+occurrences into 3,920 native generators, including 712 mathematical and 2,668 code-bearing
+families; 90,941 unique or single-parent transports remain an explicit reconstruction fibre.
+Matched ablation and withdrawal, chronology holonomy, exact interchange and same-prompt
+optical/acoustic separation returned together.
+
+[established-bounded; implemented-exact; measured] AA4 froze a 5,917,354-octet native rest and
+mounted one source-detached body. Held-out, paraphrase, history-rebase, later-correction, optical
+and acoustic occurrences returned six complete surfaces through 666 foreign-tower frontiers and
+six membrane returns, with native mathematics preceding projection. The transcript-absence audit
+probed all 16,659 visible passages and found no exact source passage in rest. The unchanged
+16,058,936,620-octet Gemma tower remains an inherited exterior organ and is not misreported as the
+native-rest byte size.
+
+[established-bounded; measured] The sole complete release receiver ran from
+2026-08-24T06:21:47-07:00 to 2026-08-24T06:28:20-07:00. Its 2,868 tests passed with zero failures
+and 34 ignores; the example check and three cheap scopes returned four localized refusals. The
+stale constructors, line anchors, driver ledger and ownership census were repaired. Named retakes
+then returned every example target type-checked, 439 catalogued drivers, a clean 360-file
+architecture census and zero drifted citations without replaying a real deed or the complete gate.
+The authoritative admission is
+[`../research/records/2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md`](../research/records/2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md).
+
+[open] The longest inspected alpha answer is grammatical and structured but reads laboratory
+terms through generic software/simulation concepts. Competitive equivalence with Codex or Claude,
+the retained 90,941-transport fibre, wider mathematical/world consequence and outbound organ
+production remain open apertures. They do not reopen AA0--AA4 and schedule no successor phase.
+
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 
-**The active campaign is
+**The completed immediate predecessor is
 [`THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).**
 
-**CURRENT FRONTIER — E0--E5 PASSED; THIS CAMPAIGN IS COMPLETE AND NO SUCCESSOR DEED IS
-AUTHORIZED.** [established-bounded] E5 froze one 38-member source-detached agentic laboratory
+**PREDECESSOR FRONTIER — E0--E5 PASSED; THIS CAMPAIGN IS COMPLETE AND THE ATHENA-ALPHA CAMPAIGN
+ABOVE NOW FOLLOWS.** [established-bounded] E5 froze one 38-member source-detached agentic laboratory
 Athena whose rest owns the eight-front addressed language continuation and the returned
 nominal-boundary morphology. Held-out native mathematical conduct, hierarchical page intake,
 complete inherited optical/acoustic testimony, implemented/cultivated organ crossings, later
@@ -2534,7 +2587,7 @@ full statement and repair order in
 |---|---|
 | 1 · material mouth | **committed (`28028c1`), convicted twice, re-seal required**: 46,745 occurrence identities embed the absolute host path (the corpus address is a function of this machine); the rollout `session_id` fallback deleted chronology (11,266 of 11,282 codex witnesses, `caused_by` empty). Both fixtures authored too small to fire. |
 | 2 · return through the seal | **committed (`85a03bb`); the edge is genuine and load-bearing** (deletion refuses conduct before the card; ablation restores the first production exactly); the movement is nonselective **by construction** and the receipt says so — selective conditioning is plan 3's burden. Chain re-runs after the re-seal. |
-| 3 · production as re-emission | **REPAIRED 2026-08-18 — this row read *"zero external callers, falsifier cannot fire"* and was stale.** The falsifier fired: `the_deposit_licenses_the_re_emission` returns the conducted population **strictly smaller** than the complete fiber, 11,594 → 6,478, each attached candidate naming its licensing deposits, targeted ablation exact and `ablate_all` restoring 11,594 bit-exactly. `CONSTRUCTION_STATE.md` has carried `established-bounded` for it and the certified artifacts agree. **Carry the bound with the figure:** every one of the sixteen `re-emission-grade-*.form` artifacts in that driver's `meta/OUTPUT_MANIFEST.tsv` row has `"maximum_observed_tokens": 2`, and `soma/life/src/morphological_language/ecology.rs:1738` halts on that field, so the strongest emission evidence in the tree is **two tokens deep**. What remains open from the original row: the silent skip at `ecology.rs:1572`, the conduct reading zeroed on the complete path, and the two red gates. |
+| 3 · production as re-emission | **REPAIRED 2026-08-18 — this row read *"zero external callers, falsifier cannot fire"* and was stale.** The falsifier fired: `the_deposit_licenses_the_re_emission` returns the conducted population **strictly smaller** than the complete fiber, 11,594 → 6,478, each attached candidate naming its licensing deposits, targeted ablation exact and `ablate_all` restoring 11,594 bit-exactly. `CONSTRUCTION_STATE.md` has carried `established-bounded` for it and the certified artifacts agree. **Carry the bound with the figure:** every one of the sixteen `re-emission-grade-*.form` artifacts in that driver's `meta/OUTPUT_MANIFEST.tsv` row has `"maximum_observed_tokens": 2`, and `soma/life/src/morphological_language/ecology.rs:1816` halts on that field, so the strongest emission evidence in the tree is **two tokens deep**. What remains open from the original row: the silent skip at `ecology.rs:1572`, the conduct reading zeroed on the complete path, and the two red gates. |
 | 4 · one expansion law | untouched by the run; `generate_currents` already rode `expand_front` before it — the `token_invariance` migration, the interchange certificate, and the two stale comments remain. |
 | 5 · cut classifier | untouched. |
 | 6 · mathematics depth line | untouched. | The

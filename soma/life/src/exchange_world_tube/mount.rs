@@ -18,7 +18,7 @@ use super::{
     GlobalFieldFace, GlobalNode, ScalarContactSite,
 };
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ExchangeContainerSpec {
     pub locator: PathBuf,
     pub provider_face: String,

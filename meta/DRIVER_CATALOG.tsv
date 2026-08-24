@@ -1,6 +1,6 @@
 driver	crate	lines	owners	declared_source	exterior	output_manifest	closure_manifest	named_in	subject
 crates/holonic-engine/examples/a_float_is_a_dyadic_and_a_deleted_tail.rs	crates/holonic-engine	1226	holonic_engine::exact_value;holonic_engine::reopening;relational_geometry::exact;relational_geometry::exact_analysis	no	none	no	no	5	A float is a dyadic and a deleted tail: the mouth on `reopening.rs`
-crates/holonic-engine/examples/analytic_field_transport.rs	crates/holonic-engine	973	relational_geometry::integer	yes	deposit	no	yes	6	-
+crates/holonic-engine/examples/analytic_field_transport.rs	crates/holonic-engine	973	relational_geometry::integer	yes	deposit	no	yes	7	-
 crates/holonic-engine/examples/arithmetic_dimensional_receiver.rs	crates/holonic-engine	1703	holonic_engine::encode_ppm;holonic_engine::exact_residue_conic_phase	yes	deposit	no	yes	7	Interactive exact dimensional receiver over the production counting ecology
 crates/holonic-engine/examples/arithmetic_monodromy_ecology.rs	crates/holonic-engine	278	-	yes	none	no	no	3	Exact arithmetic-monodromy experiment over one growing quintic ecology
 crates/holonic-engine/examples/bit_black_box_reconstruction.rs	crates/holonic-engine	286	holonic_engine::bit_cubical_geometry;holonic_engine::compile_x86_64_bit_program	no	none	no	no	8	Exact reconstruction of an opaque recurrent bit transducer
@@ -30,27 +30,27 @@ crates/holonic-engine/examples/leader_quadrature_figure.rs	crates/holonic-engine
 crates/holonic-engine/examples/matroid_hodge_riemann.rs	crates/holonic-engine	901	holonic_engine::inertia;holonic_engine::matroid_chow	no	none	no	no	9	The Chow ring of a matroid, its Hodge–Riemann form, and the split that form returns
 crates/holonic-engine/examples/mms_reconnection_traversal.rs	crates/holonic-engine	1589	-	yes	deposit	no	no	5	Real four-receiver magnetopause traversal over the 16 October 2015 MMS event
 crates/holonic-engine/examples/native_conic_hinge.rs	crates/holonic-engine	94	holonic_engine::receive_face_with_conics;relational_geometry::integer	no	none	no	no	3	-
-crates/holonic-engine/examples/phoenix/cohort.rs	crates/holonic-engine	2	holonic_engine::phoenix	no	none	no	no	43	Thin example consumer of the owner-local shared-prefix Phoenix circulation
-crates/holonic-engine/examples/phoenix/conduct.rs	crates/holonic-engine	502	holonic_engine::embedding_fiber;holonic_engine::exact_work;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	440	# SUPERSEDED 2026-08-20 BY DEED H5. COMMITTED EVIDENCE, NOT A SITE FOR NEW CONSTRUCTION
-crates/holonic-engine/examples/phoenix/cultivation_material/admission.rs	crates/holonic-engine	405	holonic_engine::foreign_codec_rest	no	none	no	no	213	-
-crates/holonic-engine/examples/phoenix/cultivation_material/codec.rs	crates/holonic-engine	231	holonic_engine::foreign_codec_rest	no	none	no	no	209	Recovered W3 codec paths over the authenticated W1 exterior companions
+crates/holonic-engine/examples/phoenix/cohort.rs	crates/holonic-engine	2	holonic_engine::phoenix	no	none	no	no	44	Thin example consumer of the owner-local shared-prefix Phoenix circulation
+crates/holonic-engine/examples/phoenix/conduct.rs	crates/holonic-engine	502	holonic_engine::embedding_fiber;holonic_engine::exact_work;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	442	# SUPERSEDED 2026-08-20 BY DEED H5. COMMITTED EVIDENCE, NOT A SITE FOR NEW CONSTRUCTION
+crates/holonic-engine/examples/phoenix/cultivation_material/admission.rs	crates/holonic-engine	405	holonic_engine::foreign_codec_rest	no	none	no	no	215	-
+crates/holonic-engine/examples/phoenix/cultivation_material/codec.rs	crates/holonic-engine	231	holonic_engine::foreign_codec_rest	no	none	no	no	210	Recovered W3 codec paths over the authenticated W1 exterior companions
 crates/holonic-engine/examples/phoenix/cultivation_material/hashing.rs	crates/holonic-engine	242	-	no	none	no	no	4	-
-crates/holonic-engine/examples/phoenix/cultivation_material/types.rs	crates/holonic-engine	286	-	no	none	no	no	127	-
+crates/holonic-engine/examples/phoenix/cultivation_material/types.rs	crates/holonic-engine	286	-	no	none	no	no	132	-
 crates/holonic-engine/examples/phoenix/cultivation_material.rs	crates/holonic-engine	31	-	no	none	no	no	0	W3 material admission at the W1 exterior-codec boundary
 crates/holonic-engine/examples/phoenix/cultivation_material_tests.rs	crates/holonic-engine	315	holonic_engine::foreign_codec_rest	no	none	no	no	0	-
 crates/holonic-engine/examples/phoenix/cultivation_overlay.rs	crates/holonic-engine	2	holonic_engine::phoenix	no	none	no	no	1	Thin example consumer of the owner-local Phoenix circulation
 crates/holonic-engine/examples/phoenix/foreign_material.rs	crates/holonic-engine	156	holonic_engine::foreign_map;holonic_engine::ported_operation;holonic_engine::source_occurrence;holonic_engine::streamed_standing	no	none	no	no	0	Example-only foreign source adapter. It is intentionally absent from production Phoenix
 crates/holonic-engine/examples/phoenix/lifted_condensation.rs	crates/holonic-engine	836	holonic_engine::operation_correspondence;holonic_engine::receiver_exact_compression	no	none	no	no	0	W2's pure structural condensation owner
 crates/holonic-engine/examples/phoenix/lifted_condensation_tests.rs	crates/holonic-engine	267	holonic_engine::causal;holonic_engine::evolution;holonic_engine::operation_correspondence;holonic_engine::ported_operation	no	none	no	no	0	-
-crates/holonic-engine/examples/phoenix/modality.rs	crates/holonic-engine	130	holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section	no	none	no	no	63	Exact Station-B modality projection deed constructors
+crates/holonic-engine/examples/phoenix/modality.rs	crates/holonic-engine	130	holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section	no	none	no	no	65	Exact Station-B modality projection deed constructors
 crates/holonic-engine/examples/phoenix/native_streamed.rs	crates/holonic-engine	2	holonic_engine::phoenix	no	none	no	no	1	Thin example consumer of the owner-local Phoenix circulation
 crates/holonic-engine/examples/phoenix/profile.rs	crates/holonic-engine	994	-	no	none	no	no	64	**The exterior-telemetry join of Deed H0** — a site, not a library owner. It reads the `.tsv`
-crates/holonic-engine/examples/phoenix/resident_layer.rs	crates/holonic-engine	1542	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::front_passage;holonic_engine::interaction;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	6	**The layer-zero source diagram of Gemma-4-E4B, bound as one deed** — the per-layer input
+crates/holonic-engine/examples/phoenix/resident_layer.rs	crates/holonic-engine	1543	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::front_passage;holonic_engine::interaction;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	6	**The layer-zero source diagram of Gemma-4-E4B, bound as one deed** — the per-layer input
 crates/holonic-engine/examples/phoenix/serial_reference.rs	crates/holonic-engine	503	holonic_engine::exact_value;holonic_engine::resident_section	no	none	no	no	2	**The serial reference of layer zero: an independent enclosure of the same source law on the
-crates/holonic-engine/examples/phoenix/site.rs	crates/holonic-engine	1389	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::evolution;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::interaction;holonic_engine::ported_operation;holonic_engine::ported_reference	no	deposit	no	no	419	**The Phoenix site: one founding of the bound diagram, shared by every station that conducts it.**
+crates/holonic-engine/examples/phoenix/site.rs	crates/holonic-engine	1389	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::evolution;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::interaction;holonic_engine::ported_operation;holonic_engine::ported_reference	no	deposit	no	no	426	**The Phoenix site: one founding of the bound diagram, shared by every station that conducts it.**
 crates/holonic-engine/examples/phoenix/streamed.rs	crates/holonic-engine	8	holonic_engine::phoenix	no	none	no	no	41	Thin example consumer of the source-detached resident circulation
 crates/holonic-engine/examples/phoenix/streamed_cultivation.rs	crates/holonic-engine	2	holonic_engine::phoenix	no	none	no	no	1	Thin example consumer of the owner-local Phoenix circulation
-crates/holonic-engine/examples/phoenix/tower.rs	crates/holonic-engine	2313	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::front_passage;holonic_engine::phoenix;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	112	**The whole text tower of Gemma-4-E4B, founded layer by layer as bound deeds** — every layer a
+crates/holonic-engine/examples/phoenix/tower.rs	crates/holonic-engine	2314	holonic_engine::category;holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::front_passage;holonic_engine::phoenix;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	117	**The whole text tower of Gemma-4-E4B, founded layer by layer as bound deeds** — every layer a
 crates/holonic-engine/examples/phoenix/tower_receiver.rs	crates/holonic-engine	253	holonic_engine::foreign_codec_rest;holonic_engine::resident_section	no	none	no	no	0	Shared receiver and Station-C artifact owner for the Phoenix tower
 crates/holonic-engine/examples/phoenix/w1_admission.rs	crates/holonic-engine	483	holonic_engine::foreign_codec_rest;holonic_engine::native_rest;holonic_engine::source_occurrence	no	none	no	no	1	Station-B admission for Phoenix W1
 crates/holonic-engine/examples/phoenix/w1_correspondence.rs	crates/holonic-engine	329	holonic_engine::front_passage;holonic_engine::native_rest;holonic_engine::operation_correspondence;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	no	none	no	no	1	Reusable W1 topology construction for the Gemma lift
@@ -168,7 +168,7 @@ crates/holonic-engine/examples/the_shorthand_is_one_angle.rs	crates/holonic-engi
 crates/holonic-engine/examples/the_solution_closes_when_the_marks_take_turns.rs	crates/holonic-engine	333	holonic_engine::hypergeometric_closure	no	none	no	no	4	Whether a three-site turning equation's solution **closes**, decided by
 crates/holonic-engine/examples/the_source_diagram_is_bound_or_its_candidates_are_retained.rs	crates/holonic-engine	852	holonic_engine::category;holonic_engine::exact_json;holonic_engine::foreign_map;holonic_engine::interaction;holonic_engine::ported_operation	yes	kernel	no	no	1	**Phoenix station one: the source's own testimony is bound, and what it does not decide is
 crates/holonic-engine/examples/the_source_is_admitted_whole_and_the_potential_atlas_covers_the_tower.rs	crates/holonic-engine	1094	holonic_engine::exact_json;holonic_engine::foreign_map;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_law;holonic_engine::resident_section;holonic_engine::source_occurrence	yes	kernel+deposit	no	no	2	**Station B of the complete Phoenix sequence: the foreign source is admitted whole and the
-crates/holonic-engine/examples/the_source_is_dissected_by_intervention.rs	crates/holonic-engine	1570	holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	yes	kernel+deposit	no	no	2	**Station D of the complete Phoenix sequence: the source dissected by intervention — every taxon
+crates/holonic-engine/examples/the_source_is_dissected_by_intervention.rs	crates/holonic-engine	1570	holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_value;holonic_engine::foreign_map;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section;holonic_engine::source_occurrence	yes	kernel+deposit	no	no	3	**Station D of the complete Phoenix sequence: the source dissected by intervention — every taxon
 crates/holonic-engine/examples/the_statement_is_founded.rs	crates/holonic-engine	1488	holonic_engine::conditioned_derivation;holonic_engine::derivation_atlas;holonic_engine::derivation_skein;holonic_engine::lean_development;holonic_engine::statement_composition;holonic_engine::statement_grammar	yes	none	no	no	8	**The statement is founded.** A conditioned instance reaches a statement absent from the deposit
 crates/holonic-engine/examples/the_swing_is_the_invariant.rs	crates/holonic-engine	945	holonic_engine::simplicial;relational_geometry::analyze_receiver_atlas;relational_geometry::cross_ratio;relational_geometry::format_rat;relational_geometry::integer;relational_geometry::rat	no	none	no	no	5	The swing is the invariant
 crates/holonic-engine/examples/the_taper_transmits_and_the_step_reflects.rs	crates/holonic-engine	231	holonic_engine::analytic_field;holonic_engine::dimensional_wave	no	none	no	no	1	**The whip, made computable: an adiabatic taper is a chain of zero-remainder rebases.**
@@ -188,15 +188,15 @@ crates/relational-geometry/examples/holonic_zero_transport_complex.rs	crates/rel
 crates/relational-geometry/examples/ihara_two_route_cross_check.rs	crates/relational-geometry	655	relational_geometry::analyze_receiver_topology;relational_geometry::cross_check_ihara;relational_geometry::cross_check_ihara_perturbed;relational_geometry::diagram_graph;relational_geometry::ihara_euler_product_window;relational_geometry::ihara_signature;relational_geometry::integer;relational_geometry::rat	no	none	no	no	1	Assert Ihara's theorem against the signature the receiver topology already
 crates/relational-geometry/examples/joint_decorated_path_atlas.rs	crates/relational-geometry	415	relational_geometry::build_joint_decorated_path_operator;relational_geometry::format_rat;relational_geometry::integer;relational_geometry::rat	no	none	no	no	3	-
 crates/relational-geometry/examples/receiver_topology_atlas.rs	crates/relational-geometry	310	relational_geometry::analyze_receiver_topology;relational_geometry::format_rat;relational_geometry::integer;relational_geometry::rat	no	none	no	no	4	-
-soma/life/examples/a2/cohort.rs	soma/life	392	life::exchange_world_tube	no	none	no	no	43	Provider-neutral sibling histories derived from A1's repeated visible-content fibres
-soma/life/examples/a2/defect.rs	soma/life	332	holonic_engine::phoenix	no	none	no	no	315	Receiver-indexed next-front defects without a scalar winner
+soma/life/examples/a2/cohort.rs	soma/life	392	life::exchange_world_tube	no	none	no	no	44	Provider-neutral sibling histories derived from A1's repeated visible-content fibres
+soma/life/examples/a2/defect.rs	soma/life	332	holonic_engine::phoenix	no	none	no	no	324	Receiver-indexed next-front defects without a scalar winner
 soma/life/examples/athena_001_the_transport_crosses_as_integers.rs	soma/life	249	body::num;holonic_engine::athena;life::causal_language;life::suffix_ecology;soma_abi::active	no	deposit	no	no	1	**ATHENA-001 — the transport half, as integers, after station one refuted the dense one.**
 soma/life/examples/athena_002_the_container_generates_from_itself.rs	soma/life	426	body::num;holonic_engine::athena;life::causal_language;soma_abi::active	no	deposit	no	no	1	**ATHENA-002 — one container, both halves, and it produces with nothing else present.**
 soma/life/examples/athena_is_emitted_from_the_atlas_and_read_back.rs	soma/life	282	body::num;holonic_engine::athena;holonic_engine::embedding_fiber;life::causal_language;soma_abi::active	no	deposit	no	no	1	**ATHENA-000 — the first tensor container emitted by this engine.**
 soma/life/examples/audio_inscription/exact_pcm.rs	soma/life	273	body::incidence;body::num	no	none	no	no	1	-
-soma/life/examples/e1/artifact.rs	soma/life	22	-	no	deposit	no	no	309	-
-soma/life/examples/e1/product.rs	soma/life	542	holonic_engine::cuda_refine;life::mathematical_source	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/e1/render.rs	soma/life	236	life::mathematical_source	no	none	no	no	210	-
+soma/life/examples/e1/artifact.rs	soma/life	22	-	no	deposit	no	no	314	-
+soma/life/examples/e1/product.rs	soma/life	542	holonic_engine::cuda_refine;life::mathematical_source	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/e1/render.rs	soma/life	236	life::mathematical_source	no	none	no	no	211	-
 soma/life/examples/eros_agentic_research_conversation.rs	soma/life	854	body::num;life::agentic_language;soma_abi::active	yes	none	no	no	5	EROS AGENTIC RESEARCH CONVERSATION — the agentic loop, end to end, on real material
 soma/life/examples/eros_audio_contextual_ecology.rs	soma/life	1518	body::incidence;body::manifold;body::num;life::current_world;life::form_mouth;soma_abi::active	yes	deposit	no	no	2	-
 soma/life/examples/eros_audio_ctc_path_fiber.rs	soma/life	1942	body::incidence;body::manifold;body::num;life::current_world;life::form_mouth;soma_abi::active	yes	deposit	no	no	2	-
@@ -244,103 +244,103 @@ soma/life/examples/eros_transformer_contextual_hexis.rs	soma/life	1444	body::inc
 soma/life/examples/eros_transformer_seeded_ecology.rs	soma/life	994	body::incidence;body::manifold;body::num;soma_abi::active	yes	none	no	no	1	-
 soma/life/examples/eros_transformer_translation_atlas.rs	soma/life	1556	body::incidence;body::num;life::form_mouth;soma_abi::active	yes	deposit	yes	yes	3	-
 soma/life/examples/exact_algorithm_ecology/algorithm_organ.rs	soma/life	950	-	no	none	no	no	1	-
-soma/life/examples/i4/product.rs	soma/life	265	holonic_engine::phoenix	no	none	no	no	526	I4 inspection products. The JSON mesh is authoritative; SVG coordinates are a receiver chart
-soma/life/examples/i4/source.rs	soma/life	631	holonic_engine::category;holonic_engine::embedding_fiber;holonic_engine::foreign_map;holonic_engine::phoenix	no	none	no	no	696	I4 exterior source conduct: exact text-codeword and vision-patch entry passages
-soma/life/examples/i5/product.rs	soma/life	702	holonic_engine::category;holonic_engine::phoenix	no	deposit	no	no	526	I5 inspection products: complete cost, dissection atlas, exact mesh, ablations, capability,
-soma/life/examples/l0/artifact.rs	soma/life	82	-	no	deposit	no	no	309	-
-soma/life/examples/l0/detached.rs	soma/life	359	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	172	-
-soma/life/examples/l0/product.rs	soma/life	521	life::mathematical_particle	no	kernel+deposit	no	no	526	-
-soma/life/examples/l0/render.rs	soma/life	129	-	no	deposit	no	no	210	-
-soma/life/examples/l0/rest.rs	soma/life	83	holonic_engine::generator_native_rest;holonic_engine::receiver_history_cultivation;life::mathematical_particle	no	deposit	no	no	556	-
-soma/life/examples/l0/source.rs	soma/life	152	life::mathematical_particle	no	kernel	no	no	696	-
-soma/life/examples/l1/artifact.rs	soma/life	82	-	no	deposit	no	no	309	-
-soma/life/examples/l1/detached.rs	soma/life	281	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	172	-
-soma/life/examples/l1/product.rs	soma/life	483	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/l1/rest.rs	soma/life	72	life::mathematical_particle	no	deposit	no	no	556	-
-soma/life/examples/l1/source.rs	soma/life	148	life::mathematical_particle	no	kernel	no	no	696	-
-soma/life/examples/l2/artifact.rs	soma/life	82	-	no	deposit	no	no	309	-
-soma/life/examples/l2/detached.rs	soma/life	269	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	172	-
-soma/life/examples/l2/product.rs	soma/life	544	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/l2/rest.rs	soma/life	61	life::mathematical_particle	no	deposit	no	no	556	-
-soma/life/examples/l3/artifact.rs	soma/life	81	-	no	deposit	no	no	309	-
-soma/life/examples/l3/detached.rs	soma/life	267	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	172	-
-soma/life/examples/l3/product.rs	soma/life	497	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/l3/rest.rs	soma/life	64	life::mathematical_particle	no	deposit	no	no	556	-
-soma/life/examples/l4/product.rs	soma/life	801	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/l4/rest.rs	soma/life	50	life::mathematical_particle	no	deposit	no	no	556	-
-soma/life/examples/m1/artifact.rs	soma/life	1049	holonic_engine::exact_value;life::causal_section;life::mathematical_particle;life::mathematical_source	yes	deposit	no	no	309	Compact M1 semantic receipt and executable/source closure
+soma/life/examples/i4/product.rs	soma/life	265	holonic_engine::phoenix	no	none	no	no	533	I4 inspection products. The JSON mesh is authoritative; SVG coordinates are a receiver chart
+soma/life/examples/i4/source.rs	soma/life	631	holonic_engine::category;holonic_engine::embedding_fiber;holonic_engine::foreign_map;holonic_engine::phoenix	no	none	no	no	706	I4 exterior source conduct: exact text-codeword and vision-patch entry passages
+soma/life/examples/i5/product.rs	soma/life	702	holonic_engine::category;holonic_engine::phoenix	no	deposit	no	no	533	I5 inspection products: complete cost, dissection atlas, exact mesh, ablations, capability,
+soma/life/examples/l0/artifact.rs	soma/life	82	-	no	deposit	no	no	314	-
+soma/life/examples/l0/detached.rs	soma/life	359	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	174	-
+soma/life/examples/l0/product.rs	soma/life	521	life::mathematical_particle	no	kernel+deposit	no	no	533	-
+soma/life/examples/l0/render.rs	soma/life	129	-	no	deposit	no	no	211	-
+soma/life/examples/l0/rest.rs	soma/life	83	holonic_engine::generator_native_rest;holonic_engine::receiver_history_cultivation;life::mathematical_particle	no	deposit	no	no	565	-
+soma/life/examples/l0/source.rs	soma/life	152	life::mathematical_particle	no	kernel	no	no	706	-
+soma/life/examples/l1/artifact.rs	soma/life	82	-	no	deposit	no	no	314	-
+soma/life/examples/l1/detached.rs	soma/life	281	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	174	-
+soma/life/examples/l1/product.rs	soma/life	483	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/l1/rest.rs	soma/life	72	life::mathematical_particle	no	deposit	no	no	565	-
+soma/life/examples/l1/source.rs	soma/life	148	life::mathematical_particle	no	kernel	no	no	706	-
+soma/life/examples/l2/artifact.rs	soma/life	82	-	no	deposit	no	no	314	-
+soma/life/examples/l2/detached.rs	soma/life	269	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	174	-
+soma/life/examples/l2/product.rs	soma/life	544	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/l2/rest.rs	soma/life	61	life::mathematical_particle	no	deposit	no	no	565	-
+soma/life/examples/l3/artifact.rs	soma/life	81	-	no	deposit	no	no	314	-
+soma/life/examples/l3/detached.rs	soma/life	267	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	174	-
+soma/life/examples/l3/product.rs	soma/life	497	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/l3/rest.rs	soma/life	64	life::mathematical_particle	no	deposit	no	no	565	-
+soma/life/examples/l4/product.rs	soma/life	801	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/l4/rest.rs	soma/life	50	life::mathematical_particle	no	deposit	no	no	565	-
+soma/life/examples/m1/artifact.rs	soma/life	1049	holonic_engine::exact_value;life::causal_section;life::mathematical_particle;life::mathematical_source	yes	deposit	no	no	314	Compact M1 semantic receipt and executable/source closure
 soma/life/examples/m1/particle.rs	soma/life	392	holonic_engine::exact_linear;holonic_engine::exact_owner_testimony;life::mathematical_particle;life::mathematical_source	no	none	no	no	58	M1 particle construction — one addressed body, three co-present exact branches, and seven separate
 soma/life/examples/m1/particle_operation.rs	soma/life	185	holonic_engine::category;holonic_engine::causal;holonic_engine::evolution;holonic_engine::interaction;holonic_engine::ported_operation	no	none	no	no	0	The one six-event ported operation topology used by M1
 soma/life/examples/m1/particle_relations.rs	soma/life	471	holonic_engine::exact_linear;holonic_engine::exact_value;holonic_engine::ported_operation;life::mathematical_particle	no	none	no	no	0	Proposal adjudication and the fixed, non-vacuous M1 sameness family
 soma/life/examples/m1/particle_typing.rs	soma/life	499	holonic_engine::category;holonic_engine::exact_linear;holonic_engine::exact_owner_testimony;holonic_engine::ported_operation;holonic_engine::quantity;life::mathematical_particle	no	none	no	no	0	Typed operation complex, exact-owner licensing, and the one resident passage
 soma/life/examples/m1/resident_affine.rs	soma/life	565	holonic_engine::causal;holonic_engine::embedding_fiber;holonic_engine::exact_linear;holonic_engine::exact_owner_testimony;holonic_engine::exact_work;holonic_engine::front_passage;holonic_engine::ported_operation;holonic_engine::resident_section	no	none	no	no	1	-
 soma/life/examples/m1/source_material.rs	soma/life	310	life::mathematical_source	no	none	no	no	0	-
-soma/life/examples/m2/artifact.rs	soma/life	132	holonic_engine::phoenix	no	deposit	no	no	309	Compact M2 artifact and executable grade
-soma/life/examples/m2/deed.rs	soma/life	201	holonic_engine::embedding_fiber;holonic_engine::foreign_codec_rest;holonic_engine::native_rest;holonic_engine::phoenix;holonic_engine::resident_section;life::mathematical_particle	no	none	no	no	441	The real M2 circulation over the source-detached W1 Gemma rest
-soma/life/examples/m2/excitation.rs	soma/life	59	holonic_engine::foreign_codec_rest;holonic_engine::native_rest;life::mathematical_particle	no	none	no	no	26	M1 presentation occurrences crossing the authenticated W1 exterior codec
+soma/life/examples/m2/artifact.rs	soma/life	132	holonic_engine::phoenix	no	deposit	no	no	314	Compact M2 artifact and executable grade
+soma/life/examples/m2/deed.rs	soma/life	201	holonic_engine::embedding_fiber;holonic_engine::foreign_codec_rest;holonic_engine::native_rest;holonic_engine::phoenix;holonic_engine::resident_section;life::mathematical_particle	no	none	no	no	447	The real M2 circulation over the source-detached W1 Gemma rest
+soma/life/examples/m2/excitation.rs	soma/life	59	holonic_engine::foreign_codec_rest;holonic_engine::native_rest;life::mathematical_particle	no	none	no	no	28	M1 presentation occurrences crossing the authenticated W1 exterior codec
 soma/life/examples/m2/panel.rs	soma/life	123	holonic_engine::phoenix	no	none	no	no	26	The finite M2 boundary-perturbation family
 soma/life/examples/m3/active_cover.rs	soma/life	477	holonic_engine::exact_work;holonic_engine::receiver_exact_compression	no	none	no	no	3	Mount M2's exterior chart as a finite caused action without using foreign architecture names as
-soma/life/examples/m3/artifact.rs	soma/life	395	holonic_engine::exact_work;holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	deposit	no	no	309	M3 rest, evidence, complete cost vector and source-detached remount grade
-soma/life/examples/m3/native.rs	soma/life	367	holonic_engine::cuda_refine;holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	card	no	no	371	Found the M3 native action on the card and recover its complete finite transition monoid
-soma/life/examples/m3/swing.rs	soma/life	174	holonic_engine::receiver_exact_compression	no	none	no	no	99	M3 anti-vacuity: recover the finite swing action, then let lineage reopen a geometric quotient
-soma/life/examples/m4/artifact.rs	soma/life	355	holonic_engine::receiver_history_cultivation	no	kernel+deposit	no	no	309	Seal the M4 artifact family, execute Lean as an exterior checker, and inspect remount/ablation
-soma/life/examples/m4/native.rs	soma/life	161	holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	none	no	no	371	Recover one nontrivial M3 leader from the addressed reconstruction evidence
-soma/life/examples/m4/quadric.rs	soma/life	256	holonic_engine::exact_linear;holonic_engine::receiver_history_cultivation	no	none	no	no	17	The cultivated mathematical carrier: a compressed coordinate orbit of rank-one metric
-soma/life/examples/m4/resident.rs	soma/life	350	holonic_engine::embedding_fiber;holonic_engine::exact_work;holonic_engine::receiver_history_cultivation;holonic_engine::resident_section	no	none	no	no	188	Carry the held-out reflection word as one exact resident GPU graph
-soma/life/examples/m4/visual.rs	soma/life	284	holonic_engine::causal;holonic_engine::certified_face;holonic_engine::exact_value;holonic_engine::image;holonic_engine::presentation_gauge;holonic_engine::simplicial	no	none	no	no	161	Exact analytic, vector, raster and oriented-mesh faces of the held-out reflection return
-soma/life/examples/m5/artifact.rs	soma/life	454	holonic_engine::physical_constraint_complex	no	kernel+deposit	no	no	309	Persist and grade the complete M5 return as inspectable exterior artifacts
-soma/life/examples/m5/cif.rs	soma/life	382	holonic_engine::exact_value;holonic_engine::physical_constraint_complex	no	none	no	no	265	Narrow mmCIF atom-site face for the one M5 coordinate family
-soma/life/examples/m5/fold.rs	soma/life	686	holonic_engine::cuda_refine;holonic_engine::physical_constraint_complex	no	card	no	no	319	One lineaged physical-fold family composed through the exact complex and resident carrier
-soma/life/examples/m5/input.rs	soma/life	386	-	no	none	no	no	264	Narrow exterior admission for the M5 physical-fold occurrence
+soma/life/examples/m3/artifact.rs	soma/life	395	holonic_engine::exact_work;holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	deposit	no	no	314	M3 rest, evidence, complete cost vector and source-detached remount grade
+soma/life/examples/m3/native.rs	soma/life	367	holonic_engine::cuda_refine;holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	card	no	no	379	Found the M3 native action on the card and recover its complete finite transition monoid
+soma/life/examples/m3/swing.rs	soma/life	174	holonic_engine::receiver_exact_compression	no	none	no	no	102	M3 anti-vacuity: recover the finite swing action, then let lineage reopen a geometric quotient
+soma/life/examples/m4/artifact.rs	soma/life	355	holonic_engine::receiver_history_cultivation	no	kernel+deposit	no	no	314	Seal the M4 artifact family, execute Lean as an exterior checker, and inspect remount/ablation
+soma/life/examples/m4/native.rs	soma/life	161	holonic_engine::generator_native_rest;holonic_engine::receiver_exact_compression;holonic_engine::receiver_history_compression	no	none	no	no	379	Recover one nontrivial M3 leader from the addressed reconstruction evidence
+soma/life/examples/m4/quadric.rs	soma/life	256	holonic_engine::exact_linear;holonic_engine::receiver_history_cultivation	no	none	no	no	18	The cultivated mathematical carrier: a compressed coordinate orbit of rank-one metric
+soma/life/examples/m4/resident.rs	soma/life	350	holonic_engine::embedding_fiber;holonic_engine::exact_work;holonic_engine::receiver_history_cultivation;holonic_engine::resident_section	no	none	no	no	190	Carry the held-out reflection word as one exact resident GPU graph
+soma/life/examples/m4/visual.rs	soma/life	284	holonic_engine::causal;holonic_engine::certified_face;holonic_engine::exact_value;holonic_engine::image;holonic_engine::presentation_gauge;holonic_engine::simplicial	no	none	no	no	163	Exact analytic, vector, raster and oriented-mesh faces of the held-out reflection return
+soma/life/examples/m5/artifact.rs	soma/life	454	holonic_engine::physical_constraint_complex	no	kernel+deposit	no	no	314	Persist and grade the complete M5 return as inspectable exterior artifacts
+soma/life/examples/m5/cif.rs	soma/life	382	holonic_engine::exact_value;holonic_engine::physical_constraint_complex	no	none	no	no	268	Narrow mmCIF atom-site face for the one M5 coordinate family
+soma/life/examples/m5/fold.rs	soma/life	686	holonic_engine::cuda_refine;holonic_engine::physical_constraint_complex	no	card	no	no	322	One lineaged physical-fold family composed through the exact complex and resident carrier
+soma/life/examples/m5/input.rs	soma/life	386	-	no	none	no	no	267	Narrow exterior admission for the M5 physical-fold occurrence
 soma/life/examples/m5/npy.rs	soma/life	347	holonic_engine::exact_value;holonic_engine::physical_constraint_complex	no	none	no	no	0	Exact NumPy faces for the admitted Protenix PAE occurrence
-soma/life/examples/m5/visual.rs	soma/life	353	holonic_engine::exact_value;holonic_engine::physical_constraint_complex	no	none	no	no	161	Vector and mesh apparatus faces derived from one exact complex without changing incidence
-soma/life/examples/m6/athena.rs	soma/life	494	-	no	none	no	no	29	Generator-native Athena-A0 route rest and exterior Lean projection
-soma/life/examples/m6/case.rs	soma/life	600	-	no	none	no	no	232	Total receiver-case refinement for the descent-face theorem
-soma/life/examples/m6/causal.rs	soma/life	1361	-	no	kernel+deposit	no	no	464	Exact exterior Lean return for the M6 source occurrence
-soma/life/examples/m6/incidence.rs	soma/life	544	life::returned_contact_cuda	no	card	no	no	441	The exact declaration/operation/state incidence returned from S0
-soma/life/examples/m6/route.rs	soma/life	454	-	no	none	no	no	340	Receiver-addressed operation/state transport substrate for M6
-soma/life/examples/m6/source.rs	soma/life	365	-	no	kernel+deposit	no	no	696	The content-addressed development occurrence for M6 / Athena-A0
-soma/life/examples/m6/visual.rs	soma/life	306	-	no	none	no	no	161	Gauge-safe line-mesh and exact work/fibre faces of the Athena-A0 route
-soma/life/examples/n1/artifact.rs	soma/life	22	-	no	deposit	no	no	309	-
-soma/life/examples/n1/product.rs	soma/life	479	holonic_engine::cuda_refine;holonic_engine::image;life::mathematical_source	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/n1/render.rs	soma/life	99	life::mathematical_source	no	none	no	no	210	-
-soma/life/examples/n2/audio.rs	soma/life	206	holonic_engine::category;holonic_engine::embedding_fiber;holonic_engine::foreign_map;holonic_engine::phoenix;life::mathematical_source	no	none	no	no	58	N2's raw-waveform crossing and inherited Gemma audio projection
-soma/life/examples/n3/artifact.rs	soma/life	33	-	no	deposit	no	no	309	-
-soma/life/examples/n3/cultivation.rs	soma/life	366	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	112	Native mathematical cultivation after a separately addressed world return
-soma/life/examples/n3/product.rs	soma/life	614	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card	no	no	526	-
+soma/life/examples/m5/visual.rs	soma/life	353	holonic_engine::exact_value;holonic_engine::physical_constraint_complex	no	none	no	no	163	Vector and mesh apparatus faces derived from one exact complex without changing incidence
+soma/life/examples/m6/athena.rs	soma/life	494	-	no	none	no	no	30	Generator-native Athena-A0 route rest and exterior Lean projection
+soma/life/examples/m6/case.rs	soma/life	600	-	no	none	no	no	234	Total receiver-case refinement for the descent-face theorem
+soma/life/examples/m6/causal.rs	soma/life	1361	-	no	kernel+deposit	no	no	467	Exact exterior Lean return for the M6 source occurrence
+soma/life/examples/m6/incidence.rs	soma/life	544	life::returned_contact_cuda	no	card	no	no	449	The exact declaration/operation/state incidence returned from S0
+soma/life/examples/m6/route.rs	soma/life	454	-	no	none	no	no	346	Receiver-addressed operation/state transport substrate for M6
+soma/life/examples/m6/source.rs	soma/life	365	-	no	kernel+deposit	no	no	706	The content-addressed development occurrence for M6 / Athena-A0
+soma/life/examples/m6/visual.rs	soma/life	306	-	no	none	no	no	163	Gauge-safe line-mesh and exact work/fibre faces of the Athena-A0 route
+soma/life/examples/n1/artifact.rs	soma/life	22	-	no	deposit	no	no	314	-
+soma/life/examples/n1/product.rs	soma/life	479	holonic_engine::cuda_refine;holonic_engine::image;life::mathematical_source	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/n1/render.rs	soma/life	99	life::mathematical_source	no	none	no	no	211	-
+soma/life/examples/n2/audio.rs	soma/life	206	holonic_engine::category;holonic_engine::embedding_fiber;holonic_engine::foreign_map;holonic_engine::phoenix;life::mathematical_source	no	none	no	no	59	N2's raw-waveform crossing and inherited Gemma audio projection
+soma/life/examples/n3/artifact.rs	soma/life	33	-	no	deposit	no	no	314	-
+soma/life/examples/n3/cultivation.rs	soma/life	366	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	114	Native mathematical cultivation after a separately addressed world return
+soma/life/examples/n3/product.rs	soma/life	614	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card	no	no	533	-
 soma/life/examples/n3/world_return.rs	soma/life	142	holonic_engine::cuda_refine;holonic_engine::image;life::mathematical_particle;life::mathematical_source;life::recover_optical_passage	no	card	no	no	3	The emitted native geometry crosses a later raw optical boundary before cultivation
-soma/life/examples/n4/product.rs	soma/life	796	holonic_engine::cuda_refine;holonic_engine::phoenix;life::mathematical_particle	no	kernel+card	no	no	526	-
-soma/life/examples/n4/rest.rs	soma/life	351	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	556	The N4 product owns one native mathematical continuation, one optical rest, and one
+soma/life/examples/n4/product.rs	soma/life	796	holonic_engine::cuda_refine;holonic_engine::phoenix;life::mathematical_particle	no	kernel+card	no	no	533	-
+soma/life/examples/n4/rest.rs	soma/life	351	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	565	The N4 product owns one native mathematical continuation, one optical rest, and one
 soma/life/examples/native_mathematical_consequence_precedes_every_codec.rs	soma/life	427	holonic_engine::cuda_refine;life::mathematical_particle	yes	kernel+card+deposit	yes	yes	6	N0 — return the native mathematical consequence before any optional codec projection
 soma/life/examples/r0/i5.rs	soma/life	310	holonic_engine::category;holonic_engine::cuda_refine;holonic_engine::phoenix	no	card	no	no	6	-
-soma/life/examples/r0/product.rs	soma/life	817	-	no	deposit	no	no	526	-
-soma/life/examples/r0/source.rs	soma/life	564	life::exchange_world_tube;life::mathematical_source	no	none	no	no	696	-
+soma/life/examples/r0/product.rs	soma/life	817	-	no	deposit	no	no	533	-
+soma/life/examples/r0/source.rs	soma/life	564	life::exchange_world_tube;life::mathematical_source	no	none	no	no	706	-
 soma/life/examples/r1/i5.rs	soma/life	84	holonic_engine::phoenix	no	none	no	no	6	-
 soma/life/examples/r1/intake.rs	soma/life	521	holonic_engine::interaction;holonic_engine::ported_operation;holonic_engine::quantity;life::exchange_world_tube;life::mathematical_particle;life::mathematical_source	no	none	no	no	52	-
-soma/life/examples/r1/product.rs	soma/life	646	holonic_engine::cuda_refine;holonic_engine::phoenix;life::mathematical_particle;life::mathematical_source	no	card+deposit	no	no	526	-
-soma/life/examples/r2/artifact.rs	soma/life	189	life::mathematical_particle	no	kernel	no	no	309	-
-soma/life/examples/r2/detached.rs	soma/life	135	holonic_engine::cuda_refine;life::mathematical_particle	no	card+deposit	no	no	172	-
-soma/life/examples/r2/product.rs	soma/life	581	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/r3/artifact.rs	soma/life	91	-	no	deposit	no	no	309	-
-soma/life/examples/r3/detached.rs	soma/life	160	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	172	-
-soma/life/examples/r3/product.rs	soma/life	475	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/r4/artifact.rs	soma/life	87	-	no	deposit	no	no	309	-
-soma/life/examples/r4/detached.rs	soma/life	208	holonic_engine::cuda_refine;holonic_engine::receiver_history_compression;life::mathematical_particle	no	card	no	no	172	-
-soma/life/examples/r4/grade.rs	soma/life	212	holonic_engine::cuda_refine;holonic_engine::interchange;holonic_engine::receiver_exact_compression;life::mathematical_particle	no	deposit	no	no	495	-
-soma/life/examples/r4/product.rs	soma/life	389	holonic_engine::cuda_refine;holonic_engine::receiver_exact_compression;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/r4/render.rs	soma/life	99	life::mathematical_particle	no	kernel+deposit	no	no	210	-
-soma/life/examples/r4/source.rs	soma/life	296	holonic_engine::receiver_exact_compression;life::mathematical_particle	no	none	no	no	696	-
-soma/life/examples/r5/artifact.rs	soma/life	103	-	no	deposit	no	no	309	-
-soma/life/examples/r5/detached.rs	soma/life	199	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	172	-
-soma/life/examples/r5/grade.rs	soma/life	211	holonic_engine::cuda_refine;life::mathematical_particle	no	none	no	no	495	-
-soma/life/examples/r5/product.rs	soma/life	344	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	526	-
-soma/life/examples/r5/render.rs	soma/life	209	life::mathematical_particle	no	deposit	no	no	210	-
-soma/life/examples/r5/source.rs	soma/life	341	life::mathematical_particle	no	none	no	no	696	-
-soma/life/examples/r6/artifact.rs	soma/life	82	-	no	deposit	no	no	309	-
-soma/life/examples/r6/detached.rs	soma/life	324	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	172	-
-soma/life/examples/r6/product.rs	soma/life	551	life::mathematical_particle	no	kernel+deposit	no	no	526	-
-soma/life/examples/r6/render.rs	soma/life	119	life::mathematical_particle	no	deposit	no	no	210	-
-soma/life/examples/r6/rest.rs	soma/life	126	holonic_engine::phoenix;life::mathematical_particle	no	deposit	no	no	556	-
+soma/life/examples/r1/product.rs	soma/life	646	holonic_engine::cuda_refine;holonic_engine::phoenix;life::mathematical_particle;life::mathematical_source	no	card+deposit	no	no	533	-
+soma/life/examples/r2/artifact.rs	soma/life	189	life::mathematical_particle	no	kernel	no	no	314	-
+soma/life/examples/r2/detached.rs	soma/life	135	holonic_engine::cuda_refine;life::mathematical_particle	no	card+deposit	no	no	174	-
+soma/life/examples/r2/product.rs	soma/life	581	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/r3/artifact.rs	soma/life	91	-	no	deposit	no	no	314	-
+soma/life/examples/r3/detached.rs	soma/life	160	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	174	-
+soma/life/examples/r3/product.rs	soma/life	475	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/r4/artifact.rs	soma/life	87	-	no	deposit	no	no	314	-
+soma/life/examples/r4/detached.rs	soma/life	208	holonic_engine::cuda_refine;holonic_engine::receiver_history_compression;life::mathematical_particle	no	card	no	no	174	-
+soma/life/examples/r4/grade.rs	soma/life	212	holonic_engine::cuda_refine;holonic_engine::interchange;holonic_engine::receiver_exact_compression;life::mathematical_particle	no	deposit	no	no	500	-
+soma/life/examples/r4/product.rs	soma/life	389	holonic_engine::cuda_refine;holonic_engine::receiver_exact_compression;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/r4/render.rs	soma/life	99	life::mathematical_particle	no	kernel+deposit	no	no	211	-
+soma/life/examples/r4/source.rs	soma/life	296	holonic_engine::receiver_exact_compression;life::mathematical_particle	no	none	no	no	706	-
+soma/life/examples/r5/artifact.rs	soma/life	103	-	no	deposit	no	no	314	-
+soma/life/examples/r5/detached.rs	soma/life	199	holonic_engine::cuda_refine;life::mathematical_particle	no	card	no	no	174	-
+soma/life/examples/r5/grade.rs	soma/life	211	holonic_engine::cuda_refine;life::mathematical_particle	no	none	no	no	500	-
+soma/life/examples/r5/product.rs	soma/life	344	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	533	-
+soma/life/examples/r5/render.rs	soma/life	209	life::mathematical_particle	no	deposit	no	no	211	-
+soma/life/examples/r5/source.rs	soma/life	341	life::mathematical_particle	no	none	no	no	706	-
+soma/life/examples/r6/artifact.rs	soma/life	82	-	no	deposit	no	no	314	-
+soma/life/examples/r6/detached.rs	soma/life	324	holonic_engine::cuda_refine;life::mathematical_particle	no	kernel+card+deposit	no	no	174	-
+soma/life/examples/r6/product.rs	soma/life	551	life::mathematical_particle	no	kernel+deposit	no	no	533	-
+soma/life/examples/r6/render.rs	soma/life	119	life::mathematical_particle	no	deposit	no	no	211	-
+soma/life/examples/r6/rest.rs	soma/life	126	holonic_engine::phoenix;life::mathematical_particle	no	deposit	no	no	565	-
 soma/life/examples/radix_residue_character_transport.rs	soma/life	735	-	yes	none	no	no	3	-
 soma/life/examples/recurring_laboratory_transport_condenses_into_native_hexis.rs	soma/life	46	-	yes	none	yes	yes	3	L2 — condense the recurring L1 fixed-section families into one generator-native hexis while
 soma/life/examples/returned_theorem_families_cultivate_the_continuing_laboratory_rest.rs	soma/life	48	-	yes	none	yes	yes	4	L1 — circulate distinct oriented-face and F₂ coordinate theorem families through the L0 rest,
@@ -360,7 +360,9 @@ soma/life/examples/the_bounded_athena_mathematics_physics_ecology_freezes.rs	som
 soma/life/examples/the_chain_is_markov_and_the_softmax_is_a_ratio.rs	soma/life	815	holonic_engine::exponentiated_ratio;holonic_engine::landauer;holonic_engine::receiver_exact_compression;holonic_engine::surprisal;life::decomposing_codec;life::material_incidence	yes	kernel	no	no	2	Our chains **are** Markov chains, and softmax is the exponentiated difference
 soma/life/examples/the_code_material_returns_its_world_line.rs	soma/life	987	body::num;holonic_engine::cuda_refine;life::algorithmic_material;life::causal_section;life::morphological_language;soma_abi::active	yes	card+deposit	yes	yes	9	Record: research/records/2026-08-12_THE_CODE_MATERIAL_RETURNS_ITS_WORLD_LINE_WITHOUT_AN_INTERPRETER.md
 soma/life/examples/the_codec_is_recovered_from_exposure.rs	soma/life	1580	holonic_engine::codec_recovery;holonic_engine::codec_system;holonic_engine::derivation_atlas;holonic_engine::lean_development;life::exposure_codec;life::founded_mouth;life::text_material	yes	none	no	no	2	Point the exposure recovery at real sealed material and return the codec it recovers, the
+soma/life/examples/the_complete_continuations_return_their_multiscale_defects.rs	soma/life	526	holonic_engine::phoenix;life::exchange_world_tube	yes	deposit	yes	yes	2	AA1: every development continuation crosses the fixed E5 predecessor as one whole known suffix
 soma/life/examples/the_complete_inherited_organs_cross_native_potential_complexes.rs	soma/life	995	holonic_engine::category;holonic_engine::cuda_refine;holonic_engine::phoenix	yes	kernel+card+deposit	yes	yes	4	E2: complete inherited organs cross carrier-neutral potential complexes
+soma/life/examples/the_complete_laboratory_exchange_returns_for_athena_alpha.rs	soma/life	545	life::exchange_world_tube	yes	kernel+deposit	yes	yes	3	AA0: freeze the complete authorized laboratory exchange and return every addressed response
 soma/life/examples/the_composition_joins_spans_at_forks.rs	soma/life	230	body::num;life::causal_language;life::suffix_ecology;soma_abi::active	no	none	no	no	1	**Composition as it actually reads: forced spans, joined where the material forks.**
 soma/life/examples/the_conclusion_carries_its_relation.rs	soma/life	272	life::lean_mathematics	no	kernel+deposit	no	yes	2	`v`, the denoted invariant — and the kernel adjudicates it
 soma/life/examples/the_conditioned_language_body_seals_and_a_later_process_produces.rs	soma/life	722	body::channel;body::num;life::causal_language;life::eros_rest;life::presentation_quotient;soma_abi::active	yes	kernel+deposit	no	no	2	**★ THE MODEL AND THE PRODUCTION MEET.**
@@ -420,6 +422,7 @@ soma/life/examples/the_retained_causal_boundary_carries_the_long_horizon_inquiry
 soma/life/examples/the_returned_arbitrary_organ_consequence_cultivates_the_same_athena_continuation.rs	soma/life	556	holonic_engine::category;holonic_engine::cuda_refine	yes	kernel+card+deposit	yes	yes	4	E3: an addressed recurrent emission returns through nominal apertures and cultivates its codec
 soma/life/examples/the_returned_constraints_found_dynamic_local_morphology.rs	soma/life	29	-	yes	none	yes	yes	3	R3 — return distinct world constraints through their exact receiver adjoint, let the card
 soma/life/examples/the_returned_difference_is_a_ratio_and_the_later_theorem_rides_it.rs	soma/life	673	holonic_engine::exact_value;holonic_engine::exponentiated_ratio;holonic_engine::surprisal;life::lean_mathematics	no	kernel	no	no	3	The full cycle on real mathematics: emit, let a kernel return a difference, read that difference
+soma/life/examples/the_returned_differences_cultivate_and_freeze_athena_alpha.rs	soma/life	2759	body::num;holonic_engine::category;holonic_engine::cuda_refine;holonic_engine::emanative;holonic_engine::phoenix;life::athena_alpha;life::causal_language;life::exchange_world_tube;life::remount_exchange_world_tube;soma_abi::active	yes	kernel+card+deposit	no	no	0	AA2--AA4: returned exchange defects condense into generator-native hexis and Athena alpha rests
 soma/life/examples/the_returned_native_mathematical_world_cultivates_the_laboratory_hexis.rs	soma/life	31	-	yes	none	yes	yes	5	N3 — a separately addressed world return cultivates the native mathematical ecology
 soma/life/examples/the_rich_intake_returns_one_codec_neutral_operation_world_tube.rs	soma/life	19	-	no	none	yes	yes	3	R1 — bind the rich inquiry's separately situated faces into one M1 operation boundary and
 soma/life/examples/the_rich_mathematical_inquiry_returns_the_i5_baseline_boundary.rs	soma/life	35	-	no	none	yes	yes	3	R0: one rich mathematical inquiry crosses every boundary the unchanged I5 ecology admits

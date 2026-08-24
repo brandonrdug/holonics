@@ -370,6 +370,7 @@ impl MorphologicalLanguageEcology {
         let mut lexical_paths = Vec::new();
         let mut lexical_labels = Vec::new();
         let mut passage_feature_sections = BTreeMap::<String, Vec<RouteTrainingSection>>::new();
+        let mut inherited_route_features = BTreeSet::new();
         let mut mark_sources = BTreeMap::<String, BTreeSet<ReceiverFiberIdentity>>::new();
         let mut lexical_occurrences = 0usize;
 
@@ -408,7 +409,9 @@ impl MorphologicalLanguageEcology {
                 );
             }
             let passage_fiber = passage_fiber(&passage.identity, passage.receiver)?;
-            let features = surface_features(&tokens);
+            let mut features = surface_features(&tokens);
+            features.extend(passage.routing_features.iter().cloned());
+            inherited_route_features.extend(passage.routing_features.iter().cloned());
             let source_order = u64::try_from(source_order)
                 .map_err(|_| MorphologicalLanguageError::CarrierExtent)?;
             for feature in &features {
@@ -437,13 +440,15 @@ impl MorphologicalLanguageEcology {
             for (clause_at, (clause_tokens, boundary)) in clause_rows.into_iter().enumerate() {
                 let identity = format!("{}::clause::{clause_at}", passage.identity);
                 let fiber = clause_fiber(&identity, passage.receiver)?;
+                let mut clause_features = surface_features(&clause_tokens);
+                clause_features.extend(passage.routing_features.iter().cloned());
                 clauses.push(ClauseStanding {
                     fiber,
                     identity,
                     passage: passage_fiber.clone(),
                     source: source.clone(),
                     receiver: passage.receiver,
-                    features: surface_features(&clause_tokens),
+                    features: clause_features,
                     tokens: clause_tokens,
                     boundary,
                 });
@@ -468,10 +473,15 @@ impl MorphologicalLanguageEcology {
             }
         }
 
-        // A feature which occurs in every delivered section supplies no distinction in this
-        // conditioned world. This exact incidence restriction replaces a hard word-length rule:
-        // short specialized faces remain, while long universal faces do not become routers.
-        passage_feature_sections.retain(|_, sections| sections.len() < passages_standing.len());
+        // A surface feature which occurs in every delivered section supplies no distinction in
+        // this conditioned world. An inherited routing feature is different: it is a returned
+        // relation carried into this restriction from the canonical rest, so local condensation
+        // cannot erase it merely because every surviving section carries it. This exact incidence
+        // restriction replaces a hard word-length rule without mistaking receiver restriction for
+        // new training.
+        passage_feature_sections.retain(|feature, sections| {
+            inherited_route_features.contains(feature) || sections.len() < passages_standing.len()
+        });
         let mut route_groups = BTreeMap::<ReceiverFiberIdentity, Vec<RouteTrainingSection>>::new();
         let mut feature_names = BTreeMap::<ReceiverFiberIdentity, String>::new();
         let mut returned_route_relations = 0usize;
@@ -990,11 +1000,23 @@ impl MorphologicalLanguageEcology {
         &self,
         prompt: &str,
     ) -> Result<MorphologicalQuestionCharge, MorphologicalLanguageError> {
+        self.charge_with_native_features(prompt, &BTreeSet::new())
+    }
+
+    /// Charge one continuation with co-present native organ faces. These faces are already
+    /// returned consequences of optical, acoustic, mathematical or other organs; they do not
+    /// enter through a transcript prefix and are not rendered into the generated surface.
+    pub fn charge_with_native_features(
+        &self,
+        prompt: &str,
+        native_features: &BTreeSet<String>,
+    ) -> Result<MorphologicalQuestionCharge, MorphologicalLanguageError> {
         let prompt_tokens = lexical_tokens(prompt);
         if prompt_tokens.is_empty() {
             return Err(MorphologicalLanguageError::EmptyPrompt);
         }
-        let prompt_features = surface_features(&prompt_tokens);
+        let mut prompt_features = surface_features(&prompt_tokens);
+        prompt_features.extend(native_features.iter().cloned());
         let mut mark_faces = Vec::new();
         for surface in prompt_tokens
             .iter()
@@ -1157,6 +1179,23 @@ impl MorphologicalLanguageEcology {
             });
             grouped.push(QueryRegionGroup { regions: intervals });
         }
+        // A native organ face is already one returned receiver feature. It therefore opens a
+        // local query region directly when conditioned standing carries that exact face; forcing
+        // it through `feature_segments` would first spell it as prompt text and collapse the
+        // modality crossing into transcription.
+        for feature in native_features {
+            if let Some(clauses) = self.clause_routes.get(feature) {
+                grouped.push(QueryRegionGroup {
+                    regions: vec![QueryInterval {
+                        start: 0,
+                        end: 1,
+                        features: BTreeSet::from([feature.clone()]),
+                        ordered_surface: vec![feature.clone()],
+                        clause_ids: clauses.clone(),
+                    }],
+                });
+            }
+        }
         let obligated_features = grouped
             .iter()
             .flat_map(|group| {
@@ -1275,6 +1314,37 @@ impl MorphologicalLanguageEcology {
         })
     }
 
+    /// Generate while native organ consequences remain co-present with the textual aperture.
+    /// The executor materializes only returned currents; no host transcriber or modality router
+    /// chooses the continuation.
+    pub fn generate_with_native_features_and_executor(
+        &self,
+        prompt: &str,
+        native_features: &BTreeSet<String>,
+        spec: MorphologicalGenerationSpec,
+        action: ActionCurrent,
+        executor: &mut dyn LiveCurrentExecutor,
+    ) -> Result<MorphologicalLanguageGeneration, MorphologicalLanguageError> {
+        let generation = self
+            .generate_currents_over_inner(
+                prompt,
+                native_features,
+                spec,
+                &holonic_engine::hardware_cover::HardwareCover::cpu_only(),
+                GenerationConduct::Complete,
+            )?
+            .generation;
+        let mut outputs = Vec::with_capacity(generation.outputs.len());
+        for current in generation.outputs {
+            outputs.push(current.into_materialized_return_with_executor(prompt, action, executor)?);
+        }
+        Ok(MorphologicalLanguageGeneration {
+            charge: generation.charge,
+            outputs,
+            reflection: generation.reflection,
+        })
+    }
+
     pub fn generate_currents(
         &self,
         prompt: &str,
@@ -1301,7 +1371,13 @@ impl MorphologicalLanguageEcology {
         cover: &holonic_engine::hardware_cover::HardwareCover,
     ) -> Result<MorphologicalLanguageCurrentGeneration, MorphologicalLanguageError> {
         Ok(self
-            .generate_currents_over_inner(prompt, spec, cover, GenerationConduct::Complete)?
+            .generate_currents_over_inner(
+                prompt,
+                &BTreeSet::new(),
+                spec,
+                cover,
+                GenerationConduct::Complete,
+            )?
             .generation)
     }
 
@@ -1315,6 +1391,7 @@ impl MorphologicalLanguageEcology {
     ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
         self.generate_currents_over_inner(
             prompt,
+            &BTreeSet::new(),
             spec,
             cover,
             GenerationConduct::Deposited(DepositedGenerationRuntime {
@@ -1331,6 +1408,7 @@ impl MorphologicalLanguageEcology {
     fn generate_currents_over_inner(
         &self,
         prompt: &str,
+        native_features: &BTreeSet<String>,
         spec: MorphologicalGenerationSpec,
         cover: &holonic_engine::hardware_cover::HardwareCover,
         mut conduct: GenerationConduct<'_>,
@@ -1338,7 +1416,7 @@ impl MorphologicalLanguageEcology {
         if spec.maximum_observed_tokens == 0 {
             return Err(MorphologicalLanguageError::EmptyObservationAperture);
         }
-        let charge = self.charge(prompt)?;
+        let charge = self.charge_with_native_features(prompt, native_features)?;
         let prompt_path = token_germs(&charge.prompt_tokens)?;
         let reflection = ReflectiveCurrentFront {
             clause_lexical: self.clause_lexical_suffix.receive_path(&prompt_path)?,
@@ -1950,12 +2028,11 @@ impl MorphologicalLanguageEcology {
                     let mut opened = Vec::with_capacity(candidates.len());
                     let mut withheld_candidates = LocalSequence::new();
                     for mut event in candidates {
-                        let returned =
-                            returned_candidates
-                                .get(returned_at)
-                                .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn {
+                        let returned = returned_candidates.get(returned_at).ok_or(
+                            MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "the card returned fewer candidate rows than the front shipped",
-                            })?;
+                            },
+                        )?;
                         if returned.candidate as usize != returned_at {
                             return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "a returned candidate ordinal is out of order",
@@ -1993,8 +2070,7 @@ impl MorphologicalLanguageEcology {
                                 || !attached_set.insert(edge.clone())
                             {
                                 return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-                                    at:
-                                        "the card attached a deposit this candidate did not carry, \
+                                    at: "the card attached a deposit this candidate did not carry, \
                                          or attached one twice",
                                 }
                                 .into());

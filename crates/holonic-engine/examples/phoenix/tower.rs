@@ -1669,6 +1669,7 @@ pub fn found_layer(
             head_width: head,
             window,
             terms,
+            partition: None,
         },
     );
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;

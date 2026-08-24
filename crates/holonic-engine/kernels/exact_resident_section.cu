@@ -724,6 +724,7 @@ extern "C" __global__ void section_contact(
     const int64_t *q_lo, const int64_t *q_hi, const int64_t *k_lo, const int64_t *k_hi,
     const int64_t *v_lo, const int64_t *v_hi,
     uint32_t rows, uint32_t heads, uint32_t kv_heads, uint32_t head_width, uint32_t window,
+    const uint32_t *partition_boundaries, uint32_t partition_boundary_count,
     int32_t grain, uint32_t terms,
     int64_t *out_lo, int64_t *out_hi, uint32_t *refused, uint32_t *reach_census, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
 ) {
@@ -737,7 +738,29 @@ extern "C" __global__ void section_contact(
     if (stopped) return;
     uint32_t group = heads / kv_heads;
     uint32_t g = h / group;
+    uint32_t section_start = 0;
+    if (partition_boundary_count != 0) {
+        bool found = false;
+        for (uint32_t section = 0; section + 1 < partition_boundary_count; ++section) {
+            uint32_t first = partition_boundaries[section];
+            uint32_t after = partition_boundaries[section + 1];
+            if (first >= after || after > rows) {
+                if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED);
+                return;
+            }
+            if (t >= first && t < after) {
+                section_start = first;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED);
+            return;
+        }
+    }
     uint32_t start = (t + 1 > window) ? (t + 1 - window) : 0;
+    if (start < section_start) start = section_start;
     uint32_t reach = t - start + 1;
     wide *scratch_lo = (wide *)shared_raw;
     wide *scratch_hi = scratch_lo + blockDim.x;
@@ -1025,6 +1048,33 @@ extern "C" __global__ void section_terminal_row(
     size_t source = (size_t)(rows - 1) * width + column;
     out_lo[column] = lo[source];
     out_hi[column] = hi[source];
+}
+
+// The receiver-directed terminal of every independent causal section. `boundaries[0] = 0`, the
+// final boundary is `rows`, and strict increase is established before launch. No source row is
+// averaged or discarded from the reconstruction fibre.
+extern "C" __global__ void section_partition_terminal_rows(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width,
+    const uint32_t *boundaries, uint32_t groups,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused,
+    const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= groups * width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t group = flat / width;
+    uint32_t coordinate = flat % width;
+    uint32_t first = boundaries[group];
+    uint32_t after = boundaries[group + 1];
+    if (first >= after || after > rows) {
+        atomicOr(refused, REFUSED_MALFORMED);
+        out_lo[flat] = 0;
+        out_hi[flat] = 0;
+        return;
+    }
+    size_t source = (size_t)(after - 1) * width + coordinate;
+    out_lo[flat] = lo[source];
+    out_hi[flat] = hi[source];
 }
 
 // The receiver-directed integral of each non-empty row block. `boundaries[0] = 0`, the last
