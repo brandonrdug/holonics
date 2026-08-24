@@ -16,6 +16,27 @@ that some of this had been integrated, but the immediate turns did not return a 
 for those prompts.  Brandon's description of that episode as waving past the statements is
 accurate.
 
+**[historical]** The exact evidence is preserved in Claude session
+`32fb276f-7b88-4788-b19b-1ffb2fe39b70`: transcript line 8396 is Brandon's queued
+`r,s,t`/gyration/precession/unicursal-stroke message, while line 8398 immediately resumes the
+height descent; lines 11952--11953 ask whether `2^6` and the six pins carry a hexagonal geometric
+face; and lines 11976--11979 ask for conservation of angles, warped n-gons, torsion, and a
+gyroparallelogram.  The first developed reply is delayed until line 12371.  It identifies an
+`F2` cube but answers “cube, not hexagon” and calls the square-class product relation literally an
+angle-sum.  That reply does not address a six-edge traversal inside the cube and supplies none of
+the metric, boundary-turning, connection, or curvature data required by an angle theorem.
+
+**[historical]** One important chronology correction keeps the audit fair.  Claude had already
+found and narrated the halving formula `u=(r+s)(r-t)`, `v=(r+s)(r-t)(s-t)` at transcript line 8250,
+before Brandon's gyration message at line 8396.  Line 8526 later says the construction was what the
+note “anticipated” and accurately records the halving fibre as three square roots with one degree
+of freedom, two relations, a selected sign sheet, and a tangent-group-law return.  The evidence
+therefore supports a genuine retrospective recognition of Brandon's constrained-parameter
+reading, not a claim that the message caused the already-found formula.  What remained undeveloped
+was the proposed path lifting, partial-stroke, precession, and monodromy geometry.  “Waved past” is
+exact for the immediate response and those uncomposed consequences, not for every algebraic
+structure later acknowledged in the reply.
+
 **[historical]** In the later 2026-08-23 transcript Claude did respond to several repeated named
 intuitions.  The direct-message sequence about a tesseract and unicursal shapes was followed by
 `Tesseract.lean`; the gyroparallelogram and parallel-torque message was followed by generic
@@ -24,6 +45,38 @@ group-commutator and rational couple-moment theorems; the three-strand pinch was
 second episode the wave-past occurred at composition: each response closed a small namesake
 fixture and then returned to the frontier count without transporting the fixtures through one
 constitutive fluid calculus.
+
+**[historical]** The exact later-session evidence is in Claude session
+`3a04e17f-5fdb-4e08-8a6a-6f3c061e40ba`: lines 5081--5098 carry Brandon's
+hypercube/tesseract/unicursal-chain message and line 5102 begins `Tesseract.lean`; lines
+5103--5110 carry the gyroparallelogram/parallel-torque prompt and its appended generic square and
+couple laws; line 5204 begins `Comb.lean`; and lines 5547--5558 carry the standing-wave chart
+prompt and the beginning of `StandingWave.lean`.  These are genuine responses, not silence.  The
+measured omission is that none was composed into the actual Navier--Stokes derivative, Fourier,
+Hodge, terminal, or restart carriers in that workflow.
+
+**[historical]** The same composition failure appears in the explicitly dynamical prompts.  In
+the later transcript line 4574 Brandon asks for causal time, the three ascent/descent/traversal
+passages, a joint parametric limit, and the Navier--Stokes consequence; line 4577 instead resumes a
+von Mangoldt search and line 4587 begins `WeilVector.lean`.  Line 5016 asks for inside/outside,
+divergence, and orientation; `Polarisation.lean` later returns valid finite-chain adjointness and
+orientation-flip identities, but no manifold divergence theorem or moving-face flux.  These are
+clear cases where a dynamic transport request was projected to a static or finite receiver shadow.
+
+**[historical]** The geometry/physics prompts received the same narrower treatment.  Transcript
+line 2896 asks about the Einstein constant and an elliptical swing; `Ellipse.lean` returns scalar
+dimensional bookkeeping and the focal-sum identity, not an Einstein tensor, connection, curvature,
+or orbital flow.  Line 4191 asks for receiver-indexed faces, entropy/diffusion, and `3+1` time;
+Claude first resumes `GammaBound`, then `Horizon.lean` constructs one Cayley map from a half-plane
+to a disc.  That Möbius chart is a genuine local theorem, but it is not a spacetime metric or an
+evolution law.
+
+**[historical]** At transcript line 5497 Brandon asks that the cross-ratio swing carry
+coarse-grained curved area.  Lines 5520--5528 return correct translation, dilation, and inversion
+invariance of a four-point ratio.  No partition-refinement system, curved area measure, convergence
+theorem, or transport through a receiver atlas follows.  Thus the missing edge was repeatedly the
+same one: local invariant or namesake fixture to the ordered path/connection/flow composition in
+which Brandon had placed it.
 
 **[historical]** The checked material-polygon, angle-ledger, discrete Gauss--Bonnet, abstract
 gyrogroup, Navier--Stokes/Hodge, and Einstein-fluid interface work was produced in the concurrent
@@ -82,6 +135,15 @@ halves form a torsor under the rational two-torsion square.  The checked files p
 the halves but do not yet prove that sign changes act as the four two-torsion translations, so
 that torsor/action identification remains open in this tree.
 
+**[interpretation]** The mathematically typed time reading is a path
+`tau |-> (r(tau),s(tau),t(tau))` in that constrained quadric fibre, not three independent time
+coordinates.  Its tangent must remain in the kernel of the differentials of
+`r^2-s^2=n` and `t^2-r^2=n`.  Lifting a closed base path through the sign-sheet covering can return
+on a different sheet; that deck return is the available algebraic monodromy.  Calling the return
+precession or holonomy requires a chosen transported frame or connection, but Brandon's proposed
+relation between orientation in time, constrained degrees of freedom, winding, and the sign cube
+was aimed at this genuine path-lifting structure and was not answered by a rank count.
+
 **[interpretation]** A cube and a hexagonal stroke are not mutually exclusive receiver faces.
 The cube graph contains six-edge closed strokes, for example the coordinate-flip word
 `1,2,3,1,2,3`; a six-cube likewise contains many such addressed cycles.  `2^6 = 64` counts the
@@ -107,12 +169,55 @@ belong to one returned face; changing charts redistributes their local readings 
 the correctly typed total.  None of that follows merely from multiplication of three square
 classes.
 
+**[interpretation]** There is a precise intermediate phase reading, but it makes the missing type
+visible rather than erasing it.  After choosing a quadratic character from the square-class group
+to `{+1,-1}` and embedding those values in `U(1)`, each class receives phase `0` or `pi`; then
+`d1*d2*d3 = 1` says that the three selected phases sum to zero modulo `2*pi`.  This is character
+holonomy around an algebraic three-face.  It becomes an interior-angle statement only after an
+additional representation identifies those phases with transported boundary tangents in a
+metric connection.  Claude's reply silently performed that unidentified representation step.
+
 **[interpretation]** On the fluid line the infinitesimal gyroparallelogram compares “differentiate
 then materially transport” with “materially transport then differentiate.”  Its defect is a
 commutator populated by the lower Leibniz faces.  In flat space this already carries velocity
 strain and vorticity stretching; with a covariant connection it is also where curvature and
 holonomy enter.  This is the nondecorative bridge between parallel torque, transported polygon
 angles, and the high-order Navier--Stokes energy calculation.
+
+**[interpretation]** The seven-stroke cubic polarization is the higher-dimensional version of
+that square.  Its addresses are the seven nonzero vertices of the Boolean three-cube generated by
+directions `a,b,c`; alternating the vertices is Möbius inversion, or the third finite difference
+`Delta_a Delta_b Delta_c` at the origin.  The eighth vertex contributes zero for the homogeneous
+cubic diagonal.  In the checked flat additive calculus this cube closes to `6 D^3 f(a,b,c)`.
+Replacing its commuting edge transports by material or covariant transports makes the failures
+of its square faces the natural locations for commutator, torsion, and curvature testimony.  This
+is a precise sense in which a partial unicursal stroke belongs to a larger geometric face.
+
+**[proved-standard]** The seven nonzero vertices of the Boolean three-cube are exactly the union
+of the three square faces incident at `(1,1,1)`.  Glue those three oriented squares.  Their three
+shared edges incident at `(1,1,1)` occur twice with opposite orientations and cancel, leaving the
+six-edge boundary
+`{1} -> {1,2} -> {2} -> {2,3} -> {3} -> {1,3} -> {1}`.
+Thus a cube, three glued parallelogram faces, seven retained vertices, and a hexagonal outer stroke
+are compatible receiver faces of one incidence object.  “Cube, not hexagon” misses this standard
+boundary-of-a-face-population construction.
+
+**[proved-derived; formal-checked]** The seven terms of
+`thirdCoordinateLowerCommutator` carry exactly that Boolean population.  Distribute three ordered
+coordinate differentiations between the Jacobian factor `Du` and the carried factor `u` in
+`Du(u)`.  There are `2^3` assignments.  The assignment sending all three differentiations to
+`Du` is the separated fourth-derivative top-transport face; the other seven assignments are the
+checked lower commutator.  Four have derivative orders `D3-D1` or `D1-D3` and are directly
+controlled by the Jacobian envelope after finite summation.  The three vertices with a two-one
+split carry `D2-D2-D3` after energy pairing; these form the genuine interpolation obstruction.
+
+**[interpretation]** In the flat coordinate calculus each of the three square boundaries commutes,
+so only the exterior hexagonal incidence remains after gluing.  With ordered material or covariant
+transport, a square need not close: its gyroparallelogram defect is a commutator, and the sum of
+the three defects is the interior testimony accompanying the same outer hexagon.  This is the
+typed version of Brandon's proposed conservation of emergent faces.  Torsion or curvature enters
+only after the corresponding connection is supplied; the cubical incidence itself does not
+manufacture either law.
 
 **[interpretation]** A fluid **pin** is naturally an addressed integer character
 `k : Fin 3 -> Z` of the genuine periodic torus.  It carries orientation and lineage before a norm,
@@ -190,6 +295,42 @@ the complete Fourier `ell2` and actual torus `L2` carriers by dominated converge
 integer frequency.  It does not assert strong continuity in a bundled `H3` topology or construct
 the nonlinear mild solution.
 
+**[proved-derived; formal-checked]** `NavierStokesMildFourierNonlinearity.lean` constructs exact
+translation isometries of the complete Fourier `ell2` carrier and the infinite discrete Young
+passage `ell1 * ell2 -> ell2` with coefficient law and constant one.  It then constructs the exact
+`2*pi*i*k_j` derivative passage from the weighted `H3` carrier, the complete vector advective
+convolution on an explicit Wiener aperture, and the algebraic Fourier Leray face with modewise
+divergence annihilation.  It claims neither that `H3` has already discharged every weighted
+Wiener aperture nor that a Duhamel fixed point exists.
+
+**[proved-derived; formal-checked]** `NavierStokesH3Bilinear.lean` now discharges that qualitative
+Wiener aperture on the complete integer lattice.  It proves summability of the true reciprocal
+periodic `H3` weight, uses the resulting Fourier Cauchy--Schwarz passage to show that every `H3`
+coefficient population is absolutely summable, proves a real `ell1 * ell2 -> ell2` Young envelope,
+and closes scalar Fourier convolution on the weighted `H3` coefficient carrier.  The weight
+interaction uses the explicit constant eight.  This is membership and exact coefficient closure:
+the file does not state a numerical `H3` embedding constant, a bounded-bilinear norm theorem, an
+identification with a physical pointwise torus product, or a bundled topological algebra.
+
+**[proved-derived; formal-checked]** `NavierStokesH3DivergenceBilinear.lean` spends one exact
+receiver derivative.  The pointwise weight law
+`weight_2(k) * (2*pi*k_j)^2 <= weight_3(k)` sends every scalar `H3` population into `H2`; finite
+component assembly then returns the complete vector coefficient population
+`sum_j partial_j (u_j v_a)` in `H2`, with its exact infinite convolution law.  This is the honest
+divergence-form `H3 x H3 -> H2` membership result.  That owner by itself does not identify the
+formula with `(u dot grad)v` under divergence-free input, apply or bound the Leray projection on
+`H2`, or return an explicit bilinear norm constant.
+
+**[proved-derived; formal-checked]** `NavierStokesH3LerayBilinear.lean` applies the exact modewise
+Leray face to the complete vector `H2` carrier.  Direct frequency-coordinate estimates give
+`||P_k z||_a <= 2 * sum_i ||z_i||` and the squared component bound
+`||P_k z||_a^2 <= 12 * sum_i ||z_i||^2`, uniformly at zero and nonzero modes.  These bounds prove
+weighted `H2` preservation; the projected divergence-form `H3 x H3 -> H2` population then has its
+exact modewise coefficient law and exact Fourier-divergence annihilation.  The constant twelve is
+a valid finite-dimensional carrier bound, not a sharp projection norm, and the file still does
+not provide a quantitative norm bound in terms of two named input `H3` norms or identify
+divergence form with the advective formula.
+
 **[proved-derived; formal-checked]** `NavierStokesFejerMultiplier.lean` replaces sharp cube weights
 by an explicit tensor Fejer hat, proves exact finite Fourier-coefficient action, mean
 normalization, zero-mode preservation, off-cube cancellation, and a radius-independent
@@ -234,6 +375,23 @@ diagonal unforced momentum equations.  It returns the exact mixed third-order po
 arbitrary directions and hence all 27 ordered coordinate triples.  This is the checked
 gyroparallelogram/unicursal-stroke bridge suggested by the message history.
 
+**[proved-derived; formal-checked]** `NavierStokesCoordinateH3Production.lean` now transports those
+27 ordered triples into the existing joint coordinate-jet carrier.  It proves the nested spatial
+and time seams, differentiated incompressibility, the explicit seven-face lower commutator,
+pressure and top-transport cancellation, viscous cube integration by parts, integrability, and
+the exact summed law
+`W_3 = -nu D_3 - L_3`.  It also reindexes the original dependent order-at-most-three population
+into the exact `1 + 3 + 9 + 27 = 40` time-work slices.  An independent line-by-line audit checked
+the seven Leibniz multiplicities and every sign; no nonlinear norm estimate is included.
+
+**[proved-derived; formal-checked]** `NavierStokesCoordinateH3Estimate.lean` founds the actual
+supremum of the Jacobian operator norm on the compact periodic cube and splits the lower
+commutator into four direct and three middle faces.  For every ordered word and point it bounds
+the direct pairing by the Jacobian supremum times the `3 + 3 + 3 + 1` third-jet population, bounds
+the middle pairing by the explicit three-route `D2-D2-D3` population, and recombines them into one
+seven-face pointwise reduction.  It does not assume the periodic Gagliardo--Nirenberg estimate
+needed to integrate and close the three middle routes.
+
 **[proved-derived; formal-checked]** `NavierStokesHodgeBandReconstruction.lean` composes the
 existing curl descent, nonzero-mode Hodge ascent, zero derivative mode, and finite Fourier
 synthesis.  Every actual Jacobian coefficient, including frequency zero, is exactly the Hodge
@@ -241,27 +399,39 @@ reconstruction of the corresponding actual vorticity pin, and every declared fin
 band is exactly the synthesis of those reconstructed pins.  This closes the finite curl/Hodge
 strand without asserting the still-owed radius-independent Calderon--Zygmund kernel estimate.
 
-**[open]** The order-three result is still pointwise and its nonlinear population remains in
-polarized directional form.  It has not yet been identified with the existing joint
-`coordinateJet` time-work carrier, paired and integrated across all 27 words, or bounded by the
-Jacobian receiver times the complete quadratic energy.  Those are the remaining quadratic
-production obligations; the seven-face theorem alone is not an `H3` energy inequality.
+**[proved-derived; formal-checked]** `NavierStokesSmoothHodgeJacobianBand.lean` inserts that Hodge
+ascent into the smooth adjacent de la Vallee Poussin chart.  It constructs all 27 physical matrix
+kernel entries, proves their Fourier coefficients at every lattice frequency and zero mean,
+proves exact physical convolution equals finite multiplier action, and identifies the result with
+the adjacent multiplier of the actual Jacobian coefficients of an admitted solution.  The actual
+band is bounded by the critical-vorticity receiver times the kernel's exact total physical `L1`
+mass.  No radius-independent bound for that mass is assumed or claimed.
+
+**[open]** The order-three population is now exact, paired, integrated, and summed across all 27
+words.  What remains is analytic rather than combinatorial: bound its four direct vertices and
+three `D2-D2-D3` middle vertices by the actual Jacobian receiver times the complete quadratic
+energy.  The middle triad is the genuine Gagliardo--Nirenberg/commutator obligation; the exact
+production identity alone is not an `H3` energy inequality.
 
 ## Ordered next squeeze
 
-1. **[open]** Insert the exact nonzero-mode Hodge matrix multiplier into the de la Vallee Poussin
-   adjacent bands and prove a radius-independent physical `L1` bound for that matrix kernel.  The
-   scalar low-pass bound alone does not establish the Calderon--Zygmund step.
-2. **[open]** Carry the remaining 27 order-three coordinate words through periodic pairing and
-   summation, then bound the complete lower commutator population by the actual Jacobian receiver
-   times the forty-word quadratic energy.  Orders one and two are already closed exactly.
-3. **[open]** Construct the divergence-free bilinear Duhamel passage on the complete weighted
-   order-three Fourier carrier with its time singularity and contraction aperture.  Linear heat
-   smoothing, semigroup composition, zero-mode preservation, and `L2` strong continuity already
-   stand.
-4. **[open]** Use that bilinear return to construct the periodic Sobolev mild local solution and a
-   lifespan depending only on the admitted high-order receiver; feed it into the checked restart
-   seam and identify the terminal trace in the restart topology.
+1. **[open]** Prove the periodic-cube Gagliardo--Nirenberg/commutator inequality for the three
+   `D2-D2-D3` vertices.  This is now the single missing edge between the exact seven-face Boolean
+   population and the closed estimate
+   `|L_3| <= C * ||grad u||_infinity * E_3`; the other four vertices already have their direct
+   Jacobian bound.
+2. **[open]** Upgrade the qualitative scalar `H3` convolution closure and projected
+   divergence-form `H2` membership to an explicit bounded-bilinear norm return, and identify
+   divergence form with `(u dot grad)v` under the addressed modewise incompressibility hypothesis.
+   The `H2` Leray carrier bound and divergence annihilation now stand; no cutoff or finite Fourier
+   surrogate is needed.
+3. **[open]** Prove a radius-independent physical `L1` bound for the exact smooth annular Hodge
+   matrix kernel already constructed in `NavierStokesSmoothHodgeJacobianBand.lean`.  That is the
+   Calderon--Zygmund edge needed to sum the scale chart into the logarithmic Jacobian receiver.
+4. **[open]** Compose the bounded bilinear return with heat smoothing into the divergence-free
+   Duhamel passage, construct the periodic `H3` mild local solution, and return a lifespan depending
+   only on the admitted high-order receiver.  Then bind its terminal trace to the checked restart
+   seam and overlap uniqueness.
 5. **[open]** Compose the logarithmic Hodge estimate, accumulated critical-vorticity budget,
    quadratic energy bound, terminal trace, local restart, seam, and overlap uniqueness into the
    requested finite-time continuation theorem.
@@ -284,3 +454,16 @@ zero.  An exact-source scan found no `sorry`, `admit`, custom `axiom`, `opaque`,
 `partial`, `extern`, `implemented_by`, or tracing declaration in the ten new owners.  The phase
 closure also passed the staged whitespace check and the named document/index gates recorded by
 the release commit.
+
+**[established-bounded; formal-checked]** The present seven-owner successor consists of
+`NavierStokesMildFourierNonlinearity.lean`, `NavierStokesH3Bilinear.lean`,
+`NavierStokesH3DivergenceBilinear.lean`, `NavierStokesH3LerayBilinear.lean`,
+`NavierStokesCoordinateH3Production.lean`, `NavierStokesCoordinateH3Estimate.lean`, and
+`NavierStokesSmoothHodgeJacobianBand.lean`.  Every owner passed a direct kernel check and an
+independent source/axiom audit.  The exact-source and whitespace scans were empty; all printed
+dependencies were confined to `propext`, `Classical.choice`, and `Quot.sound`.
+
+**[established-bounded; formal-checked]** The present coherent aggregate command
+`lake build ElementaryHolonics` completed 4,009 jobs in 19.77 seconds with exit status zero.  Its
+pre-existing linter warnings are outside these seven owners; the newly built owners returned no
+warning or error.
