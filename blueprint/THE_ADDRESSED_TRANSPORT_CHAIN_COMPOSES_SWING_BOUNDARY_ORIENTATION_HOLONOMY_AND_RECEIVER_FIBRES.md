@@ -491,6 +491,153 @@ boundary, bad-place, commutator, null, or reconstruction fibre survives globally
 fibre is the next object to transport, not permission to replace the analytic or geometric theorem
 by its incidence skeleton.
 
+### I9 — the Holonic Interaction as one covariant storage--flux complex
+
+[definition] The unification target is one typed constitutive closure rather than a list of
+analogies. Reuse the addressed chain, connection, boundary, comparison-cell, receiver, and
+reconstruction-fibre owners already returned by HC0--HC5. For a connection-valued local difference
+`d_A`, its metric adjoint/boundary `partial_A`, a storage/capacity response `C`, a conductive response
+`W`, a situated section `phi`, a stored quantity `rho`, current `J`, and source `s`, construct the
+diagram
+
+```text
+phi --d_A--> effort --W--> J --partial_A--> returned flux
+ |                                       |
+ C                                       + source s
+ |                                       |
+rho ------------------d/dt--------------> local balance
+```
+
+with constitutive and balance laws
+
+```text
+rho = C phi,
+J = -W d_A phi,
+d/dt rho + partial_A J = s,
+L_A = d_A^dagger W d_A + C.
+```
+
+Advective current is an additional typed bilinear transport. It may not be hidden inside the
+passive operator `L_A`. The receiver owns a projection of this complex together with the complete
+reconstruction fibre; equal projected crossings do not erase source depth, lineage, or constitutive
+coupling.
+
+[definition] Carry the same interaction through the exterior tower. On a rank-four torus fibre,
+`Λ¹` carries oriented effort/current directions, `Λ²` carries flux planes, curl and mutual
+interaction, `Λ³` carries oriented boundary-flux faces, and `Λ⁴` carries transported volume. Every
+connection or monodromy `M` acts functorially through `Λᵏ M`; the boundary/exterior maps, constitutive
+forms, holonomy, and receiver rebase must commute in one diagram.
+
+[proved-derived; formal-checked] The first exterior station returned in
+`HolonicInteractionExterior.lean`. In the blade basis `01,02,03,12,13,23`, the exact cusp action is
+`Λ²M₀`. Its defect `D = Λ²M₀ - I` satisfies `D³ = 0` and `D² ≠ 0`; the initial plane
+`e₀∧e₁` follows the exact orbit
+
+```text
+e01 + n e02 + n e13 + n² e23.
+```
+
+Its second chronological difference is the constant flux plane `2 e23`, and its third difference
+vanishes. The order-three and order-four exterior actions return after their declared orders, while
+all three dual monodromies conserve oriented four-volume.
+
+[proved-derived; formal-checked] The same station constructs the exact cyclic storage
+
+```text
+E_M(v) = sum_(j=0)^(m-1) sum_i ((M^j v)_i)²
+```
+
+for a finite-order return `M^m=I`, proves it positive away from zero, and proves it invariant under
+`M`. It also proves that a nontrivial square-zero shear cannot preserve a definite fixed bilinear
+storage form: invariance forces every shear direction to be null. Thus the elliptic returns admit
+stationary positive capacitance, whereas the cusp must transport its metric with the shear or return
+accumulated deformation to a separately declared relaxation law.
+
+[definition] Complete the transported capacitance theorem. At a seam `x --U--> y`, retain
+`delta_U(x,y)=y-Ux` and the complete positive energy
+
+```text
+E_(U,C)(x,y) = <C delta_U(x,y), delta_U(x,y)>,
+
+          [ U* C U   -U* C ]
+K_(U,C) = [ -C U        C  ].
+```
+
+Prove positivity, reciprocal symmetry under the declared form, kernel equal to the transported
+graph, serial seam composition, closed-word/fixed-holonomy return, and positive Schur/Kron boundary
+condensation with its full interior reconstruction fibre. The off-diagonal mutual term alone is not
+a passive capacitor; endpoint storage is part of the interaction.
+
+[definition] Construct a transported cubical torus complex with oriented vertices, edges, squares,
+cubes, and four-cells. Prove `B₁B₂=0`, covariant Stokes and Gauss, monodromy naturality, and the
+Hodge split into exact/gradient, coexact/curl, and harmonic winding populations. Then compose the
+existing exact receiver-crossing owner with the exterior transport. Classify each convergence by its
+source lift as source contact, receiver caustic/equal face, or an actual off-diagonal constitutive
+coupling which changes later current. Capacitance, mutual induction, lensing, and interference may
+couple depth-separated carriers without converting receiver incidence into galvanic contact.
+
+[definition] The cross-domain specializations are literal instances of the typed closure:
+
+1. circuit: `C` is charge storage, `W` is conductance/admittance, and `partial_A J` is Kirchhoff
+   balance;
+2. heat: `C` is heat capacity and `W` is conductivity, so positive response gives diffusion and
+   energy decay; entropy production is derived only after the thermal receiver and irreversible
+   relaxation law are declared;
+3. optics/electromagnetism: `A` carries phase and polarization transport, `W` carries impedance or
+   constitutive response, exterior degree two carries electromagnetic flux, and Poynting balance
+   returns boundary radiation and `J·E` work;
+4. fluid: incompressibility is the codifferential constraint, vorticity is the exterior derivative,
+   viscosity is the positive Hodge/Stokes response, and advection is the separately typed nonlinear
+   current;
+5. Yang--Mills: `F_A=dA+A∧A` is the nonabelian route defect and Wilson return is its loop receiver;
+6. gravity: the Lorentz metric and compatible connection determine the adjoint, Hodge stars,
+   capacitance, Green response, null cones, and volume; the complete fluid, electromagnetic, thermal,
+   and dissipative stress-energy sources the metric through the Einstein equation, while contracted
+   Bianchi returns the coupled conservation law.
+
+[definition] The gravity coupling is a feedback closure, not a scalar analogy:
+
+```text
+metric/connection
+  -> adjoints, Hodge stars, cones, Green/capacitance and transport
+  -> currents, flux, dissipation and complete stress-energy
+  -> Einstein/Bianchi return
+  -> changed metric/connection.
+```
+
+The formal target must derive the commutation/covariance laws and exhibit where positive relaxation
+produces heat and entropy. A conservative monodromy shear, a receiver collision, or a null direction
+alone does not supply dissipation.
+
+[definition] The immediate Navier--Stokes consequence is the analytic receiver of this complex.
+The Fourier Hodge multiplier is the already-constructed
+`gradient -- inverse Laplacian -- curl/Leray` transport. Its three coordinate character differences
+form the exterior tensor stencil. Proceed in this order:
+
+1. prove the low-scale `s=0,1,2` physical-kernel bound;
+2. construct reusable reciprocal finite-difference recurrence through total order six;
+3. prove all twenty-seven three-axis Leibniz faces and the inverse-cube full mixed mass;
+4. return all eight subset receivers: empty, three single axes, three axis pairs, and all three;
+5. prove the one-circle near/far Haar estimate and tensorize the coordinate-face partition around
+   `z_i=1`;
+6. construct an explicit `UniformDyadicHodgeJacobianKernelBound`; and
+7. compose it with the returned restart supply and terminal-half continuation theorem.
+
+[open] Triple finite Abel/Fubini is already checked, but Haar integration is not yet formalized.
+The top mixed difference alone cannot be divided globally by
+`∏_i |1-exp(2πix_i)|²`, because the reciprocal factors are singular. The eight subset bounds and
+near/far coordinate partition are therefore part of the theorem, not a technical afterthought. Once
+the uniform kernel witness returns, the remaining official Navier--Stokes obstruction is finiteness
+of the critical-vorticity time integral for arbitrary smooth periodic data.
+
+[definition] The same positive-form obstruction becomes the next squeeze into the other Millennium
+lines. Hodge requires chart-glued `d/partial` and positive primitive storage; Yang--Mills requires a
+scale-uniform coercive form on connection curvature; RH requires a complete Weil receiver whose
+positive storage has no nonzero reflection defect in its null fibre; BSD requires local height and
+valuation currents to telescope with every bad-place storage remainder retained. In each line the
+target is the missing positive global constitutive return, not another fixed-locus or local
+conservation theorem already owned.
+
 ## 6. Core pass grade
 
 [definition] The formal gap is closed only when:
@@ -618,6 +765,27 @@ and second differences are re-expressed as addressed edges, and two-pass Abel sy
 to integrate their character-weighted second-difference population. No promoted theorem depends on
 `sorryAx`. The theorem map and its exact Millennium successor fibres are deposited in
 [`../research/records/2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md`](../research/records/2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md).
+
+[proved-derived; formal-checked] The first I9 exterior/capacitance station returned in
+`HolonicInteractionExterior.lean`. It constructs the exact second exterior power of the cusp
+monodromy, proves the cubic-zero/non-square-zero flux defect, derives its quadratic plane orbit and
+constant second difference, proves finite exterior return and oriented-volume conservation, builds
+positive invariant cyclic storage for the elliptic monodromies, and proves that no definite fixed
+bilinear storage can absorb the nontrivial square-zero cusp shear. The complete cross-domain
+constitutive blueprint and the exact remaining Navier--Stokes receiver are deposited in
+[`../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md`](../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md).
+
+[proved-derived; formal-checked] The first Navier--Stokes deed named by I9 returned in
+`NavierStokesDyadicHodgeLowScale.lean`. Every scalar physical kernel entry is bounded pointwise and
+in normalized Haar `L¹` by the exact coefficient population `N_s³`; summing the twenty-seven entries
+gives `dyadicHodgeJacobianKernelL1 s ≤ 27 N_s³`. The aperture counts at scales zero, one and
+two are exactly `7,15,31`, so one checked constant `804357` closes all three exceptional scales.
+
+[open] The remaining I9 returns are the transported-capacitance block/Kron theorem, the complete
+cubical torus exterior complex, exact source-lifted receiver interaction populations, the
+thermo-electro-optical and dynamical-metric constitutive specializations, and the uniform physical
+Navier--Stokes Hodge-kernel witness through the order-six reciprocal recurrence and eight subset
+Haar receivers at scales at least three.
 
 [definition] These I-stations remain exterior Lean returns. They do not schedule the engine body,
 advance `CONSTRUCTION_STATE.md`, or displace the active same-body factor-deposition deed. Their
