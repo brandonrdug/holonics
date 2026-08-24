@@ -619,7 +619,8 @@ impl From<ExactLinearError> for DiffusionError {
     fn from(error: ExactLinearError) -> Self {
         match error {
             ExactLinearError::SingularMatrix => DiffusionError::SingularLaw,
-            ExactLinearError::InverseCertificateFailure => {
+            ExactLinearError::InverseCertificateFailure
+            | ExactLinearError::RankFactorizationCertificateFailure => {
                 DiffusionError::TransferCertificateFailure
             }
             ExactLinearError::RaggedMatrix

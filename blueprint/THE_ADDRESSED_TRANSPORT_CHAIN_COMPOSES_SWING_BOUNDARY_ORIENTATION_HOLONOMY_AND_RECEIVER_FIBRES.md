@@ -442,7 +442,13 @@ station rather than occasion for another general disclaimer.
 7. the one owner required by the current HC/I station; and
 8. the smallest standard-library source needed by that theorem.
 
-[open] The sole next formal return inside the current deed is **HC0 followed by HC1**: close the
-primitive bridge statements by proof or counterexample, then make an addressed passage return its
-additive incidence chain and joined middle-boundary cancellation. HC2 may not begin by declaring a
-combined structure whose fields assume HC1's conclusions.
+[proved-derived; formal-checked] HC0--HC5 returned as the exterior receipt consumed by the
+derived-factor-cover deed. The construction proves or formally falsifies every HC0 bridge, derives
+HC1 boundary cancellation before composition, then composes addressed Swing words, orientation,
+comparison cells, connection transport/holonomy, receiver naturality, complete fibres, richer
+reopening and associator preservation. No promoted theorem depends on `sorryAx`; the complete
+admission is recorded in
+[`../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md`](../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md).
+
+[open] I0--I6 remain the ordered later mathematical-instance ladder. They do not schedule the
+engine body and do not displace the active same-body factor-deposition deed in the root roadmap.

@@ -1129,13 +1129,14 @@ pub struct Contract {
     pub population: String,
 }
 
-/// A rank-one contraction through two resident factors, enacted as one resident front.
+/// A derived-rank contraction through two resident factors, enacted as one resident front.
 ///
 /// The device computes the same rounded interval as `Contract(v)` followed by `Contract(u)` on
 /// their common i64-section aperture, but never exposes an intermediate section.  Its v reduction
 /// is shared-wide; a scalar wider than i64 may lawfully be brought back into the final i64 output
-/// by the u exponent. `rank` is testimony, not a width hint: this owner admits exactly the declared
-/// rank-one shape and refuses any other factor geometry.
+/// by the u exponent. `rank` is testimony, not a width hint: the resident shape derives the same
+/// junction extent independently from `[V,R]` and `[R,H]` and refuses disagreement. Rank one is the
+/// local atom; higher rank is its exact factor population.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FactorizedContract {
     pub u_population: String,
@@ -1253,7 +1254,7 @@ impl FactorizedContract {
         &self,
         validation: &BindingValidation,
     ) -> Result<LawEntailment, EntailmentRefusal> {
-        if self.rank != 1 {
+        if self.rank == 0 {
             return Err(unentailed(
                 "factorized-contract",
                 "rank",
@@ -1282,17 +1283,17 @@ impl FactorizedContract {
                 (
                     "u_population".to_owned(),
                     self.u_population.clone(),
-                    "declared native shape [V, 1]".to_owned(),
+                    format!("declared native shape [V, {}]", self.rank),
                 ),
                 (
                     "v_population".to_owned(),
                     self.v_population.clone(),
-                    "declared native shape [1, H]".to_owned(),
+                    format!("declared native shape [{}, H]", self.rank),
                 ),
                 (
                     "rank".to_owned(),
-                    "1".to_owned(),
-                    "the exact rank certificate carried by the W3 derivation".to_owned(),
+                    self.rank.to_string(),
+                    "the image rank carried by the exact local factor-cover derivation and checked against both mounted junction extents".to_owned(),
                 ),
             ],
             naming_slices,

@@ -4,12 +4,13 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-24 after the receiver-history congruence and sealed-candidate/later-return
-stations passed; the derived-rank local factor cover is now the sole construction frontier.
+**Currency:** 2026-08-24 after the receiver-history congruence, sealed-candidate/later-return, and
+derived-rank local-factor-cover stations passed; same-body factor deposition is now the sole
+construction frontier.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE RETURNED DEFECT MUST FOUND ITS DERIVED-RANK LOCAL FACTOR COVER.**
+**CURRENT FRONTIER — THE FACTOR COMPLEX MUST CHANGE THE SAME BODY.**
 
 [counterexample; implemented-exact] The former alpha path assigns semantic roles from prompt-hash
 equality, uses a three-codeword state and two-codeword-overlap traversal, exposes recorded sibling
@@ -59,11 +60,28 @@ RTX 4080 SUPER. The later channel then carried complete sibling, world, and addr
 occurrences; four five-grain defects returned in 84 resident exact-quotient launches each with no
 additive residual assumption or CPU semantic replay. Both required qualitative pairs returned.
 
-[open] The sole next deed is **the returned defect founds a derived local factor cover**. It must
-derive factor population from exact image rank, retain metric/gauge/radical and complete
-reconstruction testimony, and return rank-zero, rank-one, rank-greater-than-one, singular,
-compatible-overlap, noncommuting-overlap and disjoint controls together. No later station is
-authorized until that factor-cover return stands.
+[established-bounded; implemented-exact; measured] The returned-defect factor-cover station passed
+under artifact identity `cb8455d28154ebca6e47d77f01e5b781aade49015ad0c9d3b44b4da3fc4e7b3d`.
+Four categorical defect sections were embedded as exact free-module boundaries without subtracting
+class ordinals; their derived rank-five factorizations returned 20 addressed atoms and exact
+reconstruction. Rank-zero/one/higher, singular radical/open exterior, metric adjoint, compatible
+glue, commuting cocycle, noncommuting holonomy and disjoint-interchange controls returned. One
+rank-five front enacted on the RTX 4080 SUPER in one resident deed and matched exact reconstruction
+without host semantic replay.
+
+[proved-derived; formal-checked] The exterior HC0--HC5 receipt passed. Harmonic/projective/affine
+Swing bridges, the alternating-span identities, and inversion transport were proved; a
+parity-matched area-nine configuration formally refuted parity as sufficient for reachability.
+Addressed additive boundary, pullback cancellation, graph-word fibres, comparison cells, Swing
+chronology/orientation, declared connection transport and holonomy laws, generator-to-word
+naturality, complete reconstruction fibre, richer-receiver reopening, and associator preservation
+now compose without `sorryAx`.
+
+[open] The sole next deed is **the factor complex changes the same body**. Deposit admitted factors
+into the one non-cloned `ProductSession`, remove the separate copied generator surface, and return
+multiple later language/mathematical/optical/acoustic consequences with matched siblings, targeted
+ablation, exact ordered withdrawal, revisit holonomy and lawful interchange. No condensation or
+alpha rest is authorized until same-body causal change stands.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

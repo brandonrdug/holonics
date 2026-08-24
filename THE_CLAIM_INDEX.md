@@ -140,7 +140,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (324 deposits of 616)
+## 4 · The 2026-08 record line (325 deposits of 617)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -471,6 +471,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |
 | `2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md` | The receiver-history congruence replaced the trigram table and returned the first true Athena-alpha state |
+| `2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md` | The returned defect founded a derived-rank local factor cover, and the addressed transport chain returned its complete fibre |
 | `2026-08-24_THE_TERMINAL_FACE_IS_PATH_INDEPENDENT_THE_THIRD_ORDER_COMMUTATOR_SPLITS_AND_THE_DYADIC_APERTURE_EXPOSES_ITS_MODE_COUNT.md` | The terminal face is path-independent, the third-order commutator splits, and the dyadic aperture exposes its mode count |
 
 ---

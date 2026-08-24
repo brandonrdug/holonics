@@ -376,24 +376,25 @@ extern "C" __global__ void section_contract(
 }
 
 // ---------------------------------------------------------------------------------------------
-// rank-one factorized contraction: a shared-wide v reduction and final i64 front
+// derived-rank factorized contraction: shared-wide v reductions and one final i64 front
 // ---------------------------------------------------------------------------------------------
 
-// `out[t,o] = u[o] · (v · section[t])`.  The scalar interval is rounded at `v_e` exactly as
-// `section_contract` would, but remains wide in shared storage rather than being committed to an
-// i64 section.  It is then multiplied by `u[o]` and placed at `u_e`; sequential bit equality is
-// owed only where that intermediate scalar also fits i64.  No semantic rank padding or scalar
-// section is allocated; the output extent is the complete rows×u_rows front.
+// `out[t,o] = sum_j u[o,j] · (v[j] · section[t])`.  Each scalar interval is rounded at `v_e`
+// exactly as `section_contract` would and kept wide in shared storage.  Each rank-one atom is then
+// placed at `u_e` before the exact atom population is added.  Rank one therefore retains bit
+// equality with the original fused law; higher rank is exactly a family of those atoms.  `rank`
+// is the mounted junction extent checked by the host shape law, never padding or a tuning bound.
 extern "C" __global__ void section_factorized_contract(
     const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t inner,
     const int64_t *u, int32_t u_e, uint32_t out_width,
-    const int64_t *v, int32_t v_e, uint32_t v_width, int32_t grain,
+    const int64_t *v, int32_t v_e, uint32_t rank, uint32_t v_width, int32_t grain,
     int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
 ) {
     extern __shared__ unsigned char shared_raw[];
     wide *sum_lo = (wide *)shared_raw;
     wide *sum_hi = sum_lo + blockDim.x;
-    __shared__ wide scalar_lo_s, scalar_hi_s;
+    wide *scalar_lo = sum_hi + blockDim.x;
+    wide *scalar_hi = scalar_lo + rank;
     __shared__ uint32_t stop_s;
     uint32_t row = blockIdx.x;
     if (row >= rows) return;
@@ -401,58 +402,58 @@ extern "C" __global__ void section_factorized_contract(
     __syncthreads();
     if (stop_s != 0u) return;
 
-    // One block owns one input row.  The v·h interval is reduced once, then all lanes emit the
-    // complete u front.  Grouping changes no exact integer result: the admitted carrier bound
-    // keeps every partial inside the same wide signed domain.
+    // One block owns one input row.  Every v_j·h interval is reduced once, then all lanes emit the
+    // complete u front.  The admitted carrier bound keeps every partial in the same wide domain.
     const int64_t *slo = lo + (size_t)row * (size_t)inner;
     const int64_t *shi = hi + (size_t)row * (size_t)inner;
-    wide part_lo = 0, part_hi = 0;
-    for (uint32_t i = threadIdx.x; i < inner; i += blockDim.x) {
-        wide w = (wide)v[i];
-        if (w >= 0) { part_lo += w * (wide)slo[i]; part_hi += w * (wide)shi[i]; }
-        else        { part_lo += w * (wide)shi[i]; part_hi += w * (wide)slo[i]; }
-    }
-    sum_lo[threadIdx.x] = part_lo;
-    sum_hi[threadIdx.x] = part_hi;
-    __syncthreads();
-    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
-        if (threadIdx.x < stride) {
-            sum_lo[threadIdx.x] += sum_lo[threadIdx.x + stride];
-            sum_hi[threadIdx.x] += sum_hi[threadIdx.x + stride];
+    for (uint32_t j = 0; j < rank; ++j) {
+        wide part_lo = 0, part_hi = 0;
+        const int64_t *factor = v + (size_t)j * (size_t)v_width;
+        for (uint32_t i = threadIdx.x; i < inner; i += blockDim.x) {
+            wide w = (wide)factor[i];
+            if (w >= 0) { part_lo += w * (wide)slo[i]; part_hi += w * (wide)shi[i]; }
+            else        { part_lo += w * (wide)shi[i]; part_hi += w * (wide)slo[i]; }
+        }
+        sum_lo[threadIdx.x] = part_lo;
+        sum_hi[threadIdx.x] = part_hi;
+        __syncthreads();
+        for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+            if (threadIdx.x < stride) {
+                sum_lo[threadIdx.x] += sum_lo[threadIdx.x + stride];
+                sum_hi[threadIdx.x] += sum_hi[threadIdx.x + stride];
+            }
+            __syncthreads();
+        }
+        if (threadIdx.x == 0) {
+            scalar_lo[j] = shift_floor(sum_lo[0], v_e, refused);
+            scalar_hi[j] = shift_ceil(sum_hi[0], v_e, refused);
+            stop_s = *refused != 0u ? 1u : 0u;
         }
         __syncthreads();
+        if (stop_s != 0u) return;
     }
-    if (threadIdx.x == 0) {
-        scalar_lo_s = shift_floor(sum_lo[0], v_e, refused);
-        scalar_hi_s = shift_ceil(sum_hi[0], v_e, refused);
-        stop_s = *refused != 0u ? 1u : 0u;
-    }
-    __syncthreads();
-    if (stop_s != 0u) return;
 
     for (uint32_t o = threadIdx.x; o < out_width; o += blockDim.x) {
         uint32_t flat = row * out_width + o;
-        wide factor = (wide)u[o];
-        // A zero row factor is a certified zero front coordinate.  It need not read the scalar,
-        // and this branch is exact rather than a semantic-rank padding shortcut.
-        if (factor == 0) {
-            out_lo[flat] = 0;
-            out_hi[flat] = 0;
-            continue;
+        wide acc_lo = 0, acc_hi = 0;
+        for (uint32_t j = 0; j < rank; ++j) {
+            wide factor = (wide)u[(size_t)o * (size_t)rank + j];
+            if (factor == 0) continue;
+            wide product_lo, product_hi;
+            if (factor >= 0) {
+                product_lo = product_checked(factor, scalar_lo[j], refused);
+                product_hi = product_checked(factor, scalar_hi[j], refused);
+            } else {
+                product_lo = product_checked(factor, scalar_hi[j], refused);
+                product_hi = product_checked(factor, scalar_lo[j], refused);
+            }
+            acc_lo += shift_floor(product_lo, u_e, refused);
+            acc_hi += shift_ceil(product_hi, u_e, refused);
         }
-        wide product_lo, product_hi;
-        if (factor >= 0) {
-            product_lo = product_checked(factor, scalar_lo_s, refused);
-            product_hi = product_checked(factor, scalar_hi_s, refused);
-        } else {
-            product_lo = product_checked(factor, scalar_hi_s, refused);
-            product_hi = product_checked(factor, scalar_lo_s, refused);
-        }
-        out_lo[flat] = to_word(shift_floor(product_lo, u_e, refused), refused);
-        out_hi[flat] = to_word(shift_ceil(product_hi, u_e, refused), refused);
+        out_lo[flat] = to_word(acc_lo, refused);
+        out_hi[flat] = to_word(acc_hi, refused);
     }
     (void)grain;
-    (void)v_width;
 }
 
 // ---------------------------------------------------------------------------------------------

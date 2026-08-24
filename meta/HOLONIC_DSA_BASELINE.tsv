@@ -58,12 +58,14 @@ crates/holonic-engine/src/dimensional_wave.rs	.clone()=34	.collect()=8	.into_ite
 crates/holonic-engine/src/discrete_curvature.rs	.clone()=16	.collect()=24	.flat_map()=2	.into_iter()=11	BTreeMap=40	BTreeSet=17	Vec=15	VecDeque=2
 crates/holonic-engine/src/display.rs	.collect()=1	Vec=6
 crates/holonic-engine/src/divisor_reconstruction.rs	.clone()=39	.collect()=39	.into_iter()=4	BTreeMap=26	BTreeSet=44	Vec=82
+crates/holonic-engine/src/derived_factor_cover.rs	.clone()=38	.collect()=13	.flat_map()=2	.into_iter()=1	BTreeSet=3	Vec=35
+crates/holonic-engine/src/derived_factor_cover/tests.rs	.clone()=2	.collect()=2	Vec=1
 crates/holonic-engine/src/elementary_chart.rs	.clone()=1	.collect()=1	BTreeMap=2	Vec=1
 crates/holonic-engine/src/embedding_fiber.rs	.clone()=5	.collect()=15	.into_iter()=1	BTreeMap=7	Vec=33
 crates/holonic-engine/src/evolution.rs	.clone()=2	BTreeMap=7	Vec=8
 crates/holonic-engine/src/exact_contact.rs	.clone()=4	.collect()=1	Vec=1
 crates/holonic-engine/src/exact_json.rs	.collect()=1	.into_iter()=2	Vec=10
-crates/holonic-engine/src/exact_linear.rs	.clone()=12	.collect()=13	.into_iter()=3	Vec=39
+crates/holonic-engine/src/exact_linear.rs	.clone()=12	.collect()=16	.into_iter()=3	Vec=43
 crates/holonic-engine/src/exact_owner_testimony.rs	.clone()=7	.collect()=10	BTreeMap=10	BTreeSet=7	Vec=35
 crates/holonic-engine/src/exact_owner_testimony/population.rs	.collect()=1	.flat_map()=2	BTreeMap=3	Vec=6
 crates/holonic-engine/src/exact_owner_testimony/tests.rs	.clone()=21	.into_iter()=1	BTreeMap=14	Vec=18

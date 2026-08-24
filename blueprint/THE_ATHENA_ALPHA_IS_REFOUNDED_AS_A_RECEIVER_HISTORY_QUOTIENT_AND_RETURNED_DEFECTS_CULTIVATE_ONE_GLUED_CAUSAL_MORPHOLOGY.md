@@ -443,7 +443,7 @@ receiver/history separates it, and one pair whose surface differs while a lawful
 class agrees. It includes a source-access audit proving sibling bytes were unavailable before the
 candidate seal.
 
-### The returned defect founds a derived local factor cover — **sole next deed**
+### The returned defect founds a derived local factor cover — **passed**
 
 [definition] Complete the exact rank-factorization bridge missing between `ExactRatMatrix`'s
 kernel/image/cokernel testimony and the resident rank-one atom. Derive every local factor count from
@@ -579,7 +579,14 @@ coherent alpha product and its inspected artifacts stand. State advances only th
 21. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
 22. only the source/artifact closure of the named current deed.
 
-[open] The sole next deed is **the returned defect founds a derived local factor cover**. No later
-station is authorized before exact derived-rank reconstruction, metric/gauge/radical testimony,
-rank-zero/one/higher and singular controls, compatible and noncommuting overlap returns, disjoint
-interchange, parent addresses, ablation addresses, and withdrawal words stand together.
+[established-bounded; implemented-exact; measured] The returned defect founded its derived local
+factor cover under artifact identity
+`cb8455d28154ebca6e47d77f01e5b781aade49015ad0c9d3b44b4da3fc4e7b3d`; exact derived-rank
+reconstruction, metric/gauge/radical testimony, all required rank and overlap controls, resident
+higher-rank enactment, and the exterior HC0--HC5 Lean receipt stand together. The complete ruling is
+[`../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md`](../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md).
+
+[open] The sole next deed is **the factor complex changes the same body**. No quotient condensation
+or alpha rest is authorized before multiple independently caused later consequences, matched
+predecessor/successor bodies, targeted ablation, exact ordered withdrawal, revisit holonomy and
+lawful interchange return from one non-cloned cultivated `ProductSession`.

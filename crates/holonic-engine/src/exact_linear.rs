@@ -507,6 +507,52 @@ impl ExactRatMatrix {
         })
     }
 
+    /// The canonical pivot-column rank factorization `T = U V`.
+    ///
+    /// `U` is formed from the pivot columns of the unreduced operator and `V` is formed from the
+    /// nonzero rows of its reduced row-echelon form.  Consequently the factor population is the
+    /// exact image rank; no caller supplies a width.  The pivot columns are retained as the gauge
+    /// which made this representative canonical.  Rank zero is a lawful `m x 0` followed by
+    /// `0 x n` passage, not a fabricated rank-one zero factor.
+    pub fn rank_factorization(&self) -> Result<ExactRankFactorization, ExactLinearError> {
+        let (reduced, pivot_columns, reduction_work) = self.reduced_row_echelon()?;
+        let derived_rank = pivot_columns.len();
+        let left = ExactRatMatrix::shaped(
+            self.rows,
+            derived_rank,
+            (0..self.rows)
+                .map(|row| {
+                    pivot_columns
+                        .iter()
+                        .map(|column| self.get(row, *column).cloned())
+                        .collect::<Result<Vec<_>, _>>()
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        )?;
+        let right = ExactRatMatrix::shaped(
+            derived_rank,
+            self.columns,
+            (0..derived_rank)
+                .map(|row| reduced.row(row).map(<[Rat]>::to_vec))
+                .collect::<Result<Vec<_>, _>>()?,
+        )?;
+        let (reconstruction, reconstruction_work) = left.multiply_with_work(&right)?;
+        if reconstruction != *self {
+            return Err(ExactLinearError::RankFactorizationCertificateFailure);
+        }
+        Ok(ExactRankFactorization {
+            rows: self.rows,
+            columns: self.columns,
+            derived_rank,
+            pivot_columns,
+            left,
+            right,
+            reconstruction,
+            linear: self.factorization()?,
+            work: reduction_work.then(&reconstruction_work),
+        })
+    }
+
     /// **A rebase receipt, which requires BOTH identity compositions.**
     ///
     /// `TABLET_THE_OPERATIONS`: an inverse exists only for a rebase. A map that is not one refuses
@@ -643,6 +689,26 @@ pub struct LinearFactorization {
     pub work: crate::exact_work::ExactWork,
 }
 
+/// One exact rank factorization and the gauge and fibres which keep it interpretable.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExactRankFactorization {
+    pub rows: usize,
+    pub columns: usize,
+    /// The cardinality of the image basis; never a caller aperture.
+    pub derived_rank: usize,
+    /// The unreduced source columns chosen by deterministic RREF pivot order.
+    pub pivot_columns: Vec<usize>,
+    /// `rows x derived_rank` image-basis map.
+    pub left: ExactRatMatrix,
+    /// `derived_rank x columns` coordinate-functional map.
+    pub right: ExactRatMatrix,
+    /// The returned exact product, retained rather than summarized by a boolean.
+    pub reconstruction: ExactRatMatrix,
+    /// Kernel, image, cokernel and their exact dimensions remain attached.
+    pub linear: LinearFactorization,
+    pub work: crate::exact_work::ExactWork,
+}
+
 impl LinearFactorization {
     /// A rebase collapses nothing and leaves nothing unreached.
     pub fn is_rebase(&self) -> bool {
@@ -690,6 +756,8 @@ pub enum ExactLinearError {
     SingularMatrix,
     #[error("the exact inverse failed its multiplication certificate")]
     InverseCertificateFailure,
+    #[error("the exact pivot-column rank factorization failed its multiplication certificate")]
+    RankFactorizationCertificateFailure,
 }
 
 #[cfg(test)]
@@ -806,6 +874,44 @@ mod tests {
         assert_eq!(rebase.multiply(&inverse).expect("product"), identity);
         assert_eq!(inverse.multiply(&rebase).expect("product"), identity);
         assert!(rebase.factorization().expect("factored").is_rebase());
+    }
+
+    #[test]
+    fn pivot_columns_derive_zero_one_and_higher_rank_factor_populations() {
+        let zero = ExactRatMatrix::zero(2, 3).expect("zero");
+        let zero_factor = zero.rank_factorization().expect("rank-zero return");
+        assert_eq!(zero_factor.derived_rank, 0);
+        assert_eq!(
+            (zero_factor.left.rows(), zero_factor.left.columns()),
+            (2, 0)
+        );
+        assert_eq!(
+            (zero_factor.right.rows(), zero_factor.right.columns()),
+            (0, 3)
+        );
+        assert_eq!(zero_factor.reconstruction, zero);
+
+        let rank_one = matrix(&[&[2, 4, 6], &[3, 6, 9]]);
+        let one_factor = rank_one.rank_factorization().expect("rank-one return");
+        assert_eq!(one_factor.derived_rank, 1);
+        assert_eq!(one_factor.pivot_columns, vec![0]);
+        assert_eq!(
+            one_factor
+                .left
+                .multiply(&one_factor.right)
+                .expect("product"),
+            rank_one
+        );
+
+        let singular_rank_two = matrix(&[&[1, 0, 1], &[0, 1, 1], &[1, 1, 2]]);
+        let two_factor = singular_rank_two
+            .rank_factorization()
+            .expect("rank-two singular return");
+        assert_eq!(two_factor.derived_rank, 2);
+        assert_eq!(two_factor.pivot_columns, vec![0, 1]);
+        assert_eq!(two_factor.reconstruction, singular_rank_two);
+        assert_eq!(two_factor.linear.kernel.len(), 1);
+        assert_eq!(two_factor.linear.cokernel_annihilator.len(), 1);
     }
 
     /// **A bare transpose is the adjoint only under undeclared orthonormal charts.**

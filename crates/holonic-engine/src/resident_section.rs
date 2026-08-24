@@ -1348,11 +1348,10 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, out_width, needed, work, Vec::new())
     }
 
-    /// The resident rank-one contraction `h ↦ u(vᵀh)`.  The intermediate `rows × 1` carrier is
-    /// deliberately absent from the shape: this method admits one wide shared reduction and the
-    /// complete device-sized output front.  It is equivalent to sequential `Contract(v)` then
-    /// `Contract(u)` only on their common i64-section aperture; the internal scalar here remains
-    /// wide and may exceed i64 when the final u placement brings it back into the output carrier.
+    /// The resident derived-rank contraction `h ↦ U(Vh)`.  Its rank is witnessed against the
+    /// mounted junction extent, never used as padding or accepted as a caller aperture.  Rank one
+    /// remains the original atom.  Higher rank is enacted as that exact atom population inside one
+    /// resident front; no `rows × rank` i64 section is exposed between the two factors.
     pub fn shape_factorized_contract(
         &self,
         rows: usize,
@@ -1363,17 +1362,17 @@ impl<'chart> ResidentSurface<'chart> {
         rank: usize,
     ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "factorized-contract";
-        if rank != 1 {
+        if rank == 0 {
             return Err(ResidentRefusal::Declaration {
                 operation: OPERATION,
-                what: format!("rank {rank} is not the exact rank-one law"),
+                what: "rank zero is a no-change return and has no resident contraction".to_owned(),
             });
         }
-        if u.dim() != 1 || v.rows() != 1 || v.dim() != inner {
+        if u.dim() != rank || v.rows() != rank || v.dim() != inner {
             return Err(ResidentRefusal::Declaration {
                 operation: OPERATION,
                 what: format!(
-                    "native factors require u=[V,1], v=[1,H], got u=[{},{}], v=[{},{}]",
+                    "native factors require u=[V,R], v=[R,H] with derived R={rank}, got u=[{},{}], v=[{},{}]",
                     u.rows(),
                     u.dim(),
                     v.rows(),
@@ -1401,8 +1400,9 @@ impl<'chart> ResidentSurface<'chart> {
         )?;
         let scalar_v = add(raw_v, v.exponent().max(0) as u32)?;
         let product_u = add(add(scalar_v, u.entry_octaves())?, 1)?;
-        let final_u = add(product_u, u.exponent().max(0) as u32)?;
-        for stage in [raw_v, scalar_v, product_u, final_u] {
+        let final_atom = add(product_u, u.exponent().max(0) as u32)?;
+        let final_u = add(final_atom, ceil_log2(rank))?;
+        for stage in [raw_v, scalar_v, product_u, final_atom, final_u] {
             Self::admit_octaves(OPERATION, stage)?;
         }
         let needed = final_u;
@@ -1413,7 +1413,9 @@ impl<'chart> ResidentSurface<'chart> {
             .reduction_block
             .min(inner_power_u32)
             .max(self.launch.warp);
-        let shared_u64 = 2u64 * u64::from(block) * 16;
+        let shared_u64 = 2u64
+            .saturating_mul(u64::from(block).saturating_add(rank as u64))
+            .saturating_mul(16);
         let shared = u32::try_from(shared_u64).map_err(|_| ResidentRefusal::Declaration {
             operation: OPERATION,
             what: format!("the reduction block {block} has no representable shared extent"),
@@ -1440,16 +1442,17 @@ impl<'chart> ResidentSurface<'chart> {
         let mut first_work = ExactWork::predicted_product(
             rows,
             inner,
-            1,
+            rank,
             u64::from(input_octaves.max(v.entry_octaves())),
         );
-        first_work.entries_written = BigUint::from(2 * rows as u64);
-        first_work.resident(2 * rows as u64);
+        first_work.entries_written = BigUint::from(2 * rows as u64 * rank as u64);
+        first_work.resident(2 * rows as u64 * rank as u64);
         first_work.peak_bits = BigUint::from(u64::from(scalar_v));
-        first_work.cumulative_bits = BigUint::from(2 * rows as u64 * u64::from(scalar_v));
+        first_work.cumulative_bits =
+            BigUint::from(2 * rows as u64 * rank as u64 * u64::from(scalar_v));
         let mut second_work = ExactWork::predicted_product(
             rows,
-            1,
+            rank,
             out_width,
             u64::from(scalar_v.max(u.entry_octaves())),
         );
@@ -1464,9 +1467,9 @@ impl<'chart> ResidentSurface<'chart> {
             .dependency_span
             .max(BigUint::from(u64::from(ceil_log2(block as usize) + 1)));
         let coupling = CouplingPlan {
-            coupling: "rank-one junction: one shared-wide v reduction then u placement, one i64 output front",
+            coupling: "derived-rank junction: exact shared-wide rank-one atoms, then one i64 output front",
             kernel: "section_factorized_contract",
-            extent: inner as u64,
+            extent: (inner as u64).saturating_mul(rank as u64),
             block,
             predicted: work.clone(),
         };
@@ -2414,6 +2417,7 @@ impl<'chart> ResidentSurface<'chart> {
             .u32(u.rows() as u32)
             .ptr(v.raw_resident())
             .i32(v.exponent())
+            .u32(v.rows() as u32)
             .u32(v.dim() as u32)
             .i32(out.grain.0 as i32)
             .ptr(out.lo.device_ptr())
@@ -6465,6 +6469,81 @@ mod tests {
     }
 
     #[test]
+    fn derived_rank_front_is_the_exact_sum_of_its_rank_one_atoms() {
+        let Some((readout, surface)) = surface() else {
+            return;
+        };
+        // U=[[1,0],[0,1],[1,1]], V=[[2,0],[0,3]], h=[4,1].  The image rank is two and
+        // U(Vh)=[8,3,11].  The sequential control materializes the junction while the derived
+        // front keeps both atoms inside one semantic kernel.
+        let u = readout
+            .mount_bfloat16(&[ONE, 0, 0, ONE, ONE, ONE], 2)
+            .expect("u=[3,2]");
+        let v = readout
+            .mount_bfloat16(&[TWO, 0, 0, THREE], 2)
+            .expect("v=[2,2]");
+        let grain = ResidentGrain(0);
+        let staged = surface.stage_words(&[FOUR, ONE], 1, 2).expect("stage h");
+        let enter = surface
+            .shape_enter(1, 2, Dyadic::ONE, grain, &[FOUR, ONE])
+            .expect("enter shape");
+        let junction = surface
+            .shape_contract(1, 2, enter.needed, &v)
+            .expect("junction shape");
+        let sequential = surface
+            .shape_contract(1, 2, junction.needed, &u)
+            .expect("sequential shape");
+        let derived = surface
+            .shape_factorized_contract(1, 2, enter.needed, &u, &v, 2)
+            .expect("derived-rank shape");
+        assert_eq!((derived.rows, derived.width), (1, 3));
+
+        let x = surface.fresh_section(1, 2, grain).expect("x");
+        let junction_out = surface.fresh_section(1, 2, grain).expect("junction");
+        let sequential_out = surface.fresh_section(1, 3, grain).expect("sequential");
+        let derived_out = surface.fresh_section(1, 3, grain).expect("derived");
+        let mut builder = surface
+            .begin_passage(&[vec![], vec![0], vec![1], vec![0]])
+            .expect("begin");
+        let lane = builder.open(0, &[]).expect("enter lane");
+        surface
+            .record_enter(&lane, &staged, Dyadic::ONE, &x)
+            .expect("record enter");
+        builder.close(0, &x, enter.needed).expect("close enter");
+        let lane = builder.open(1, &[0]).expect("v lane");
+        surface
+            .record_contract(&lane, &x, &v, &junction_out)
+            .expect("record v");
+        builder
+            .close(1, &junction_out, junction.needed)
+            .expect("close v");
+        let lane = builder.open(2, &[1]).expect("u lane");
+        surface
+            .record_contract(&lane, &junction_out, &u, &sequential_out)
+            .expect("record u");
+        builder
+            .close(2, &sequential_out, sequential.needed)
+            .expect("close u");
+        let lane = builder.open(3, &[0]).expect("derived lane");
+        surface
+            .record_factorized_contract(&lane, &x, &u, &v, &derived, &derived_out)
+            .expect("record derived");
+        builder
+            .close(3, &derived_out, derived.needed)
+            .expect("close derived");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.obstruction);
+        assert_eq!(
+            surface.read_out(&derived_out).expect("read derived"),
+            surface.read_out(&sequential_out).expect("read sequential")
+        );
+        assert_eq!(
+            surface.read_out(&derived_out).expect("read derived"),
+            vec![(8, 8), (3, 3), (11, 11)]
+        );
+    }
+
+    #[test]
     fn rank_one_factorized_front_keeps_a_wide_internal_scalar_that_sequential_i64_cannot() {
         let Some((readout, surface)) = surface() else {
             return;
@@ -6905,7 +6984,9 @@ mod tests {
         surface
             .record_enter(&lane, &staged, Dyadic::ONE, &entered)
             .expect("enter");
-        builder.close(0, &entered, enter.needed).expect("close enter");
+        builder
+            .close(0, &entered, enter.needed)
+            .expect("close enter");
         let lane = builder.open(1, &[0]).expect("terminal lane");
         surface
             .record_partition_terminal_rows(&lane, &entered, &boundaries, &returned)
@@ -6932,9 +7013,7 @@ mod tests {
         let carried_words = [ONE, FOUR];
         let staged_q = surface.stage_words(&unit_words, 2, 1).expect("stage q");
         let staged_k = surface.stage_words(&unit_words, 2, 1).expect("stage k");
-        let staged_v = surface
-            .stage_words(&carried_words, 2, 1)
-            .expect("stage v");
+        let staged_v = surface.stage_words(&carried_words, 2, 1).expect("stage v");
         let boundaries = surface.mount_positions(&[0, 1, 2]).expect("boundaries");
         let enter = surface
             .shape_enter(2, 1, Dyadic::ONE, grain, &unit_words)
@@ -6963,10 +7042,9 @@ mod tests {
         let mut builder = surface
             .begin_passage(&[vec![], vec![], vec![], vec![0, 1, 2]])
             .expect("begin");
-        for (index, (staged, section)) in
-            [(&staged_q, &q), (&staged_k, &k), (&staged_v, &v)]
-                .into_iter()
-                .enumerate()
+        for (index, (staged, section)) in [(&staged_q, &q), (&staged_k, &k), (&staged_v, &v)]
+            .into_iter()
+            .enumerate()
         {
             let lane = builder.open(index, &[]).expect("enter lane");
             surface
@@ -6993,7 +7071,9 @@ mod tests {
                 &out,
             )
             .expect("contact");
-        builder.close(3, &out, contact.needed).expect("close contact");
+        builder
+            .close(3, &out, contact.needed)
+            .expect("close contact");
         let reading = builder.finish().expect("finish").launch().expect("launch");
         assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
         assert_eq!(reading.slots[3].reach, 1);

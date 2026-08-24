@@ -34,8 +34,8 @@ authoritatively revise it once you have sufficient context post-analysis campaig
 **The sole active campaign is
 [`THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md).**
 
-**CURRENT FRONTIER — THE FORMER AA0--AA4 PRODUCT INTERPRETATION IS REVOKED BY COUNTEREXAMPLE;
-ATHENA ALPHA IS REOPENED AT ITS RECEIVER-HISTORY CONGRUENCE.** [counterexample; implemented-exact]
+**CURRENT FRONTIER — THE FACTOR COMPLEX MUST CHANGE THE SAME BODY.** The former AA0--AA4 product
+interpretation remains revoked by the following counterexample. [counterexample; implemented-exact]
 The alleged native state was a literal three-codeword window, detached traversal used two-codeword
 overlap, prompt-hash equality assigned globally exclusive source roles, teacher-forced passages
 included the recorded sibling answer before comparison, one rank-one atom stood for the complete
@@ -101,16 +101,29 @@ the RTX 4080 SUPER in 84 launches each, with complete fibres, no additive-loss a
 CPU semantic replay. The equal-surface/richer-separator and different-surface/common-operation
 controls both returned.
 
-**SOLE NEXT DEED — THE RETURNED DEFECT FOUNDS A DERIVED LOCAL FACTOR COVER.** [open] Complete the
-exact bridge from kernel/image/cokernel testimony to support-indexed factor covers whose population
-is the derived image rank. Preserve metric, gauge, radical, parent, ablation address, and withdrawal
-word; glue compatible overlaps, retain noncommuting chronology/cocycle defects, and return the
-rank-zero, rank-one, rank-greater-than-one, singular, overlap, and disjoint controls together. No
-same-body deposition is authorized until this factor-cover return stands. Its exterior formal
-receipt must also return the addressed-transport-chain composition named above, including joined
-boundary cancellation, swing chronology/orientation, declared connection before holonomy,
-generator-to-word receiver naturality, complete reconstruction fibres, and the commuting,
-noncommuting, noninvertible, equal-endpoint/different-occurrence, and richer-separator controls.
+[established-bounded; implemented-exact; measured] The returned defect founded its derived-rank
+local factor cover under artifact identity
+`cb8455d28154ebca6e47d77f01e5b781aade49015ad0c9d3b44b4da3fc4e7b3d`. Four categorical defect
+sections returned four rank-five exact free-module boundary maps and 20 addressed atoms without
+subtracting class ordinals. Rank zero/one/higher, singular radical/open exterior, metric adjoint,
+compatible glue, commuting cocycle, noncommuting holonomy and disjoint interchange all returned;
+one actual rank-five cover enacted as one resident RTX 4080 SUPER front and matched exact
+reconstruction without CPU semantic replay.
+
+[proved-derived; formal-checked] The supporting HC0--HC5 receipt also returned: projective and
+affine Swing bridges; a formal counterexample separating parity from whole-configuration
+reachability; additive addressed boundary and joined cancellation; complete graph-word fibres;
+comparison cells; Swing chronology and orientation; declared connection transport before loop
+return; commuting, noncommuting and noninvertible controls; generator-to-word receiver naturality;
+complete reconstruction fibre with richer reopening; and associator preservation. No promoted
+theorem depends on `sorryAx`.
+
+**SOLE NEXT DEED — THE FACTOR COMPLEX CHANGES THE SAME BODY.** [open] Deposit the admitted factor
+cover into the one non-cloned `ProductSession`, remove the separate generator-surface body and every
+direct copy from an unchanged foreign continuation, and return multiple independently caused later
+language, mathematical, optical and acoustic consequences. Matched predecessor/successor bodies,
+proposal-local controls, targeted ablations, exact ordered-prefix withdrawal, revisit holonomy and
+exact interchange must stand before receiver-history condensation or an Athena-alpha rest begins.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 

@@ -1,5 +1,7 @@
 import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.Lineage
+import ElementaryHolonics.Foundation.AddressedBoundary
+import ElementaryHolonics.Foundation.ComparisonCell
 import ElementaryHolonics.Foundation.Presentation
 import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
@@ -33,10 +35,12 @@ import ElementaryHolonics.Millennium.Turn
 import ElementaryHolonics.Millennium.Hand
 import ElementaryHolonics.Millennium.Seam
 import ElementaryHolonics.Millennium.Swing
+import ElementaryHolonics.Millennium.SwingBridges
 import ElementaryHolonics.Millennium.Chronology
 import ElementaryHolonics.Millennium.LineageCompression
 import ElementaryHolonics.Millennium.AthenaReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization
+import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling

@@ -1349,7 +1349,8 @@ impl From<ExactLinearError> for GenerativeTransportError {
     fn from(error: ExactLinearError) -> Self {
         match error {
             ExactLinearError::SingularMatrix => GenerativeTransportError::SingularGeneratedOperator,
-            ExactLinearError::InverseCertificateFailure => {
+            ExactLinearError::InverseCertificateFailure
+            | ExactLinearError::RankFactorizationCertificateFailure => {
                 GenerativeTransportError::InverseResidualNonzero
             }
             ExactLinearError::ExtentOverflow => GenerativeTransportError::CarrierOverflow,

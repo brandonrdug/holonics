@@ -959,7 +959,8 @@ impl From<ExactLinearError> for SheafDiffusionError {
     fn from(error: ExactLinearError) -> Self {
         match error {
             ExactLinearError::SingularMatrix => SheafDiffusionError::SingularLaw,
-            ExactLinearError::InverseCertificateFailure => {
+            ExactLinearError::InverseCertificateFailure
+            | ExactLinearError::RankFactorizationCertificateFailure => {
                 SheafDiffusionError::TransferCertificateFailure
             }
             ExactLinearError::RaggedMatrix

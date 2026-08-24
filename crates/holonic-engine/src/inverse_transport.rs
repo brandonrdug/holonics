@@ -1319,7 +1319,8 @@ impl From<ExactLinearError> for InverseTransportError {
             ExactLinearError::SingularMatrix => {
                 InverseTransportError::SingularReconstructedOperator
             }
-            ExactLinearError::InverseCertificateFailure => {
+            ExactLinearError::InverseCertificateFailure
+            | ExactLinearError::RankFactorizationCertificateFailure => {
                 InverseTransportError::InverseCertificateFailure
             }
             ExactLinearError::RaggedMatrix
