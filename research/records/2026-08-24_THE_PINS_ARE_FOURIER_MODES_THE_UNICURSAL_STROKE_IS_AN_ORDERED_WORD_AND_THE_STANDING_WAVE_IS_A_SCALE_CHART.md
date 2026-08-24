@@ -63,6 +63,57 @@ Levi-Civita connection, or curvature of a transported material face.
 
 ## The stronger typed readings
 
+### The `r,s,t` fibre which the immediate BSD narration flattened
+
+**[proved-derived; formal-checked]** The `r,s,t` named in Brandon's queued precession message were
+the three simultaneous square roots used by the family halving construction:
+`r^2 = x`, `s^2 = x - n`, and `t^2 = x + n`.  Thus they obey the two quadric relations
+`r^2 - s^2 = n` and `t^2 - r^2 = n`; at fixed nonzero `n` their compatible population is a
+one-dimensional covering curve, not three unrelated scalar parameters.  `FamilyHalving.lean`
+proves that the partial assembly
+`u = (r+s)(r-t)`, `v = u(s-t)` lies on the congruent-number curve and that its tangent double
+returns `(r^2,-rst)`.  `FamilyKernel.lean` carries this through Mathlib's point group law to an
+actual half point.
+
+**[interpretation]** This is the precise geometric object at which the unicursal-stroke and
+precession message was aimed.  The three signs form a cube of sheets.  Fixing the returned point,
+including the sign of `y = -rst`, leaves the four even sign changes.  Classically those four
+halves form a torsor under the rational two-torsion square.  The checked files prove existence of
+the halves but do not yet prove that sign changes act as the four two-torsion translations, so
+that torsor/action identification remains open in this tree.
+
+**[interpretation]** A cube and a hexagonal stroke are not mutually exclusive receiver faces.
+The cube graph contains six-edge closed strokes, for example the coordinate-flip word
+`1,2,3,1,2,3`; a six-cube likewise contains many such addressed cycles.  `2^6 = 64` counts the
+vertices of a six-cube, whereas “six pins” may address six incidences or one six-edge traversal.
+Claude's reply “it is a cube, not a hexagon” selected one receiver and discarded the lineage
+question Brandon was asking.  No canonical correspondence from the BSD six slot occurrences to
+one such hexagonal stroke has been proved.
+
+**[interpretation]** The natural gyroparallelogram in the halving fibre is the commuting square
+of two independent even sign changes, read after transport to the four halves.  Its closure would
+say that the two sign-change routes differ by the same two-torsion translation.  This is stronger
+than the generic group-commutator theorem in `Tesseract.lean` because it must identify the actual
+covering fibre, its map to the elliptic curve, and the transported torsion action.
+
+### What the face-and-angle message was distinguishing
+
+**[interpretation]** The square-class identity `d1*d2*d3 = 1` is a useful closed three-face
+ledger, but it is not literally an angle theorem.  A curved material polygon needs a receiver
+metric, geodesic or declared boundary arcs, an induced connection, oriented area, and the
+Gauss--Bonnet angle-defect relation.  Under a flow it additionally needs the material transport
+of those data.  The interior-angle sum, the integrated curvature, and the boundary turning then
+belong to one returned face; changing charts redistributes their local readings without changing
+the correctly typed total.  None of that follows merely from multiplication of three square
+classes.
+
+**[interpretation]** On the fluid line the infinitesimal gyroparallelogram compares “differentiate
+then materially transport” with “materially transport then differentiate.”  Its defect is a
+commutator populated by the lower Leibniz faces.  In flat space this already carries velocity
+strain and vorticity stretching; with a covariant connection it is also where curvature and
+holonomy enter.  This is the nondecorative bridge between parallel torque, transported polygon
+angles, and the high-order Navier--Stokes energy calculation.
+
 **[interpretation]** A fluid **pin** is naturally an addressed integer character
 `k : Fin 3 -> Z` of the genuine periodic torus.  It carries orientation and lineage before a norm,
 shell, or energy receiver is applied.  A pin is therefore not merely a vertex drawn in Euclidean
@@ -126,14 +177,39 @@ semigroup, proves `L2` nonexpansion, and proves positive-time entry into the fir
 Sobolev carrier with the explicit squared estimate
 `sum_k (1 + lambda_k) |S_t a_k|^2 <= (1 + (2 nu t)^(-1)) ||a||_2^2`.
 
+**[proved-derived; formal-checked]** `NavierStokesInfiniteFourierHeatH3.lean` composes three equal
+heat passages and proves positive-time entry from the complete Fourier `L2` carrier into the
+weighted order-three carrier with squared bound
+`(1 + (2 nu (t/3))^(-1))^3 ||a||_2^2`.  Its three-component action preserves the complete zero
+mode, every modewise divergence constraint, and the exact semigroup law.
+
+**[proved-derived; formal-checked]** `NavierStokesInfiniteFourierHeatRestart.lean` restricts that
+same action to weighted order-three data, proves contraction of the complete weighted squared
+energy, zero-time identity, and semigroup composition, and proves strong continuity at zero on
+the complete Fourier `ell2` and actual torus `L2` carriers by dominated convergence over every
+integer frequency.  It does not assert strong continuity in a bundled `H3` topology or construct
+the nonlinear mild solution.
+
 **[proved-derived; formal-checked]** `NavierStokesFejerMultiplier.lean` replaces sharp cube weights
 by an explicit tensor Fejer hat, proves exact finite Fourier-coefficient action, mean
 normalization, zero-mode preservation, off-cube cancellation, and a radius-independent
 coefficient-`l1` contraction.
 
-**[open]** The Fejer file has not yet proved that its physical-space kernel is nonnegative or has
-normalized `L1` norm.  Consequently it does not yet supply the scale-uniform `L-infinity`
-convolution estimate needed by the logarithmic Hodge comb.
+**[proved-derived; formal-checked]** `NavierStokesFejerKernelConvolution.lean` and
+`NavierStokesFejerDifferenceBridge.lean` identify that closed tensor hat with the normalized
+complex norm-square of an actual rectangular Dirichlet population.  Character orthogonality then
+gives pointwise real nonnegativity, exact physical `L1` mass one, and the radius-independent
+pointwise convolution bound `||F_N * f|| <= ||f||`.  The difference bridge also proves the exact
+one- and three-dimensional ordered-difference multiplicities instead of merely matching two
+closed formulas.
+
+**[proved-derived; formal-checked]** `NavierStokesDeLaValleePoussin.lean` forms the exact tensor
+low-pass `V_N` from `2 F_(2N+1) - F_N`.  With the repository's inclusive Fejer convention its
+multiplier is exactly one on `frequencyCube (N+1)`, vanishes outside
+`frequencyCube (2N+1)`, and its physical kernel has `L1` norm at most `27`, uniformly in `N`.
+The adjacent band `V_(N+1)-V_N` cancels on `frequencyCube (N+1)`, is supported inside radius
+`2N+3`, and has pointwise convolution bound `54 ||f||`.  All statements include `N=0`; one generic
+torus-kernel convolution owner carries the common physical operation.
 
 **[proved-derived; formal-checked]** `NavierStokesQuadraticH3Energy.lean` retains all
 `1 + 3 + 9 + 27 = 40` ordered spatial derivative words through order three and all velocity
@@ -141,27 +217,51 @@ components.  On every interior time of an actual open periodic solution it prove
 smoothness, integrability, nonnegativity, a genuine time derivative of the complete quadratic
 energy, periodicity of every coordinate jet, and exact cancellation of every top transport face.
 
-**[open]** The remaining quadratic passage is not another definition of `H3`.  It is the full
-mixed-word differentiation of the unforced equation, periodic pressure cancellation, viscous
-integration by parts, and a commutator estimate that bounds the surviving lower faces by the
-Jacobian receiver times the complete quadratic energy.
+**[proved-derived; formal-checked]** `NavierStokesCoordinateH1Production.lean` and
+`NavierStokesCoordinateH2Production.lean` carry the actual unforced equation through all three
+order-one and all nine order-two words.  At each layer they identify the joint coordinate jet
+with the ordered fixed-time spatial derivative, commute the time and Laplacian passages, preserve
+differentiated incompressibility, cancel pressure and top transport on the periodic cube,
+integrate viscosity by parts, retain every lower product face, and sum the complete finite word
+population.  The order-two result is exactly
+`W_2 = -nu D_2 - L_2`, with `L_2` containing the three genuine lower Leibniz faces.
 
-**[open]** The checked diagonal third-directional pairing is not yet connected to the forty-word
-energy or its time-work sum: it rescales one pointwise directional identity.  An identification
-with coordinate jets followed by integration and summation is still owed before it can be called
-a quadratic `H3` production law.
+**[proved-derived; formal-checked]** `NavierStokesCubicPolarization.lean` proves the generic
+seven-face cubic polarization identity, genuine symmetry of the third Frechet derivative, and
+the equality between each diagonal Frechet face and the actual third derivative along an affine
+line.  `NavierStokesMixedH3Production.lean` applies that same seven-face receiver to seven actual
+diagonal unforced momentum equations.  It returns the exact mixed third-order pointwise PDE for
+arbitrary directions and hence all 27 ordered coordinate triples.  This is the checked
+gyroparallelogram/unicursal-stroke bridge suggested by the message history.
+
+**[proved-derived; formal-checked]** `NavierStokesHodgeBandReconstruction.lean` composes the
+existing curl descent, nonzero-mode Hodge ascent, zero derivative mode, and finite Fourier
+synthesis.  Every actual Jacobian coefficient, including frequency zero, is exactly the Hodge
+reconstruction of the corresponding actual vorticity pin, and every declared finite Jacobian
+band is exactly the synthesis of those reconstructed pins.  This closes the finite curl/Hodge
+strand without asserting the still-owed radius-independent Calderon--Zygmund kernel estimate.
+
+**[open]** The order-three result is still pointwise and its nonlinear population remains in
+polarized directional form.  It has not yet been identified with the existing joint
+`coordinateJet` time-work carrier, paired and integrated across all 27 words, or bounded by the
+Jacobian receiver times the complete quadratic energy.  Those are the remaining quadratic
+production obligations; the seven-face theorem alone is not an `H3` energy inequality.
 
 ## Ordered next squeeze
 
-1. **[open]** Factor the tensor Fejer kernel as a normalized square, derive nonnegativity and exact
-   `L1` mass one, and build de la Vallee Poussin shell differences with radius-uniform operator
-   bounds.
-2. **[open]** Carry every one of the forty ordered jet words through the unforced momentum law;
-   cancel top transport and pressure, expose viscous dissipation, and sum the commutator faces.
-3. **[open]** Extend the infinite heat estimate to the Sobolev orders and time singularities needed
-   by the bilinear Duhamel map, retaining divergence-free and zero-mode alternatives.
-4. **[open]** Construct the periodic Sobolev mild local solution and a lifespan depending only on
-   the admitted high-order receiver; feed that return into the already checked restart seam.
+1. **[open]** Insert the exact nonzero-mode Hodge matrix multiplier into the de la Vallee Poussin
+   adjacent bands and prove a radius-independent physical `L1` bound for that matrix kernel.  The
+   scalar low-pass bound alone does not establish the Calderon--Zygmund step.
+2. **[open]** Carry the remaining 27 order-three coordinate words through periodic pairing and
+   summation, then bound the complete lower commutator population by the actual Jacobian receiver
+   times the forty-word quadratic energy.  Orders one and two are already closed exactly.
+3. **[open]** Construct the divergence-free bilinear Duhamel passage on the complete weighted
+   order-three Fourier carrier with its time singularity and contraction aperture.  Linear heat
+   smoothing, semigroup composition, zero-mode preservation, and `L2` strong continuity already
+   stand.
+4. **[open]** Use that bilinear return to construct the periodic Sobolev mild local solution and a
+   lifespan depending only on the admitted high-order receiver; feed it into the checked restart
+   seam and identify the terminal trace in the restart topology.
 5. **[open]** Compose the logarithmic Hodge estimate, accumulated critical-vorticity budget,
    quadratic energy bound, terminal trace, local restart, seam, and overlap uniqueness into the
    requested finite-time continuation theorem.
@@ -172,13 +272,15 @@ theorem remains independently owed.
 
 ## Validation receipt
 
-**[established-bounded; formal-checked]** Each of the four new Lean owners passed a direct
-`lake env lean` check.  After the independent audit repairs, the two changed owners rechecked in
-10.7 and 12.2 seconds with exit status zero.  Printed dependencies contain only `propext`,
-`Classical.choice`, and `Quot.sound`.
+**[established-bounded; formal-checked]** Each of the ten new Lean owners in this successor set
+passed a direct `lake env lean` check.  An independent line-by-line audit recompiled every owner,
+verified the analytic constants and signs, repaired the inclusive de la Vallee Poussin plateau
+and three duplicate ownership surfaces, and found no false or tautological theorem.  Every
+printed dependency contains only `propext`, `Classical.choice`, and `Quot.sound`.
 
 **[established-bounded; formal-checked]** The coherent aggregate command
-`lake build ElementaryHolonics` completed 3,989 jobs in 18.3 seconds with exit status zero.  An
-exact-source scan found no `sorry`, `admit`, custom `axiom`, `opaque`, `unsafe`, `partial`, `extern`,
-or `implemented_by` declaration in the four new owners, and `git diff --check` was clean on the
-phase closure.
+`lake build ElementaryHolonics` completed 4,000 jobs in approximately 30 seconds with exit status
+zero.  An exact-source scan found no `sorry`, `admit`, custom `axiom`, `opaque`, `unsafe`,
+`partial`, `extern`, `implemented_by`, or tracing declaration in the ten new owners.  The phase
+closure also passed the staged whitespace check and the named document/index gates recorded by
+the release commit.
