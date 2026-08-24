@@ -595,6 +595,19 @@ couple depth-separated carriers without converting receiver incidence into galva
    and dissipative stress-energy sources the metric through the Einstein equation, while contracted
    Bianchi returns the coupled conservation law.
 
+[proved-derived; formal-checked] The driven-phase circuit entrance returned in
+`HolonicParametron.lean`.  The averaged pump storage `-κ cos(2θ-ψ)` is invariant under the
+half-turn deck transformation `θ ↦ θ+π`, while the complex phase carrier changes by the exact
+Euler/swing sign.  On the two locked sheets, cosine coupling descends exactly to the finite Ising
+pairing, and the full-turn phase fibre is retained rather than identified with its binary face.
+
+[interpretation] The classical ferrite parametron is the first physical apparatus card for this
+station: nonlinear inductance and the `2f` excitation supply the pumped storage, the `f` response
+supplies the phase carrier, transformer incidence supplies coupling, loss supplies return to a
+stable basin, and readout supplies the binary receiver.  The AQFP/QFP specialization must enter by
+its own Josephson/flux constitutive law and time-dependent potential; it shares the bifurcation and
+transport diagram but is not licensed merely by the inherited name.
+
 [definition] The gravity coupling is a feedback closure, not a scalar analogy:
 
 ```text
@@ -622,6 +635,18 @@ form the exterior tensor stencil. Proceed in this order:
    `z_i=1`;
 6. construct an explicit `UniformDyadicHodgeJacobianKernelBound`; and
 7. compose it with the returned restart supply and terminal-half continuation theorem.
+
+[proved-derived; formal-checked] The first order-six recurrence station returned in
+`NavierStokesReciprocalDifferenceRecurrence.lean`.  For every addressed window of length at most
+six, the exact shifted binomial Leibniz law is proved; local inverse sections therefore force a
+reciprocal-difference recurrence.  A zero third denominator difference removes every denominator
+face above order two, leaving the exact sixth-order `6/15` recurrence.  The theorem is instantiated
+on the genuine quadratic frequency denominator and totalized Hodge reciprocal along any
+seven-point coordinate window which remains away from zero.  It also proves that distinct-coordinate
+denominator differences vanish, same-coordinate second differences equal two, third differences
+vanish, and the resulting three-axis denominator allocation type has exactly seven faces.  The
+remaining part of step 2 is the sparse three-axis product/reciprocal word identity; it must retain
+the distinct coordinate shifts before the twenty-seven numerator/reciprocal faces are bounded.
 
 [open] Triple finite Abel/Fubini is already checked, but Haar integration is not yet formalized.
 The top mixed difference alone cannot be divided globally by
@@ -781,11 +806,18 @@ in normalized Haar `L¹` by the exact coefficient population `N_s³`; summing th
 gives `dyadicHodgeJacobianKernelL1 s ≤ 27 N_s³`. The aperture counts at scales zero, one and
 two are exactly `7,15,31`, so one checked constant `804357` closes all three exceptional scales.
 
+[proved-derived; formal-checked] `HolonicParametron.lean` now proves the pumped half-turn storage
+symmetry, complex sign return, complete full-turn phase fibre, and exact finite Ising quotient of
+locked cosine coupling. `NavierStokesReciprocalDifferenceRecurrence.lean` proves the shifted
+Leibniz and local reciprocal recurrence through order six, its quadratic two-face reduction, and
+the actual one-coordinate Hodge-reciprocal specialization.
+
 [open] The remaining I9 returns are the transported-capacitance block/Kron theorem, the complete
 cubical torus exterior complex, exact source-lifted receiver interaction populations, the
 thermo-electro-optical and dynamical-metric constitutive specializations, and the uniform physical
-Navier--Stokes Hodge-kernel witness through the order-six reciprocal recurrence and eight subset
-Haar receivers at scales at least three.
+Navier--Stokes Hodge-kernel witness through the three-axis lift of the order-six reciprocal
+recurrence, all twenty-seven product faces, and eight subset Haar receivers at scales at least
+three.
 
 [definition] These I-stations remain exterior Lean returns. They do not schedule the engine body,
 advance `CONSTRUCTION_STATE.md`, or displace the active same-body factor-deposition deed. Their
