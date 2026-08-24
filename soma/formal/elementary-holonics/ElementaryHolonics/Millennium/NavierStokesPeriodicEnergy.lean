@@ -1,17 +1,27 @@
 import ElementaryHolonics.Millennium.NavierStokesPeriodicFlux
 import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.Calculus.ParametricIntegral
 
 /-!
-# Periodic pressure work on the Navier--Stokes carrier
+# Periodic kinetic-energy equality on the Navier--Stokes carrier
 
-This module closes the pressure face of the periodic kinetic-energy receiver on the actual
-three-dimensional `NavierStokes.Space`.  The local product rule identifies pressure work with the
-divergence of the flux `p u` when `u` is incompressible.  The existing paired-face theorem then
-annihilates its integral over one period.
+This module closes the positive-time periodic kinetic-energy receiver on the actual
+three-dimensional `NavierStokes.Space`.  Local product rules identify pressure and advective work
+with divergences, the paired-face theorem annihilates their integrals over one period, and scalar
+Green identities assemble the vector viscous work.  It is dissipative when `0 ≤ ν`; the exact
+equality itself is valid for every real coefficient admitted by `PeriodicSolution`.  The joint
+space--time derivative then supplies the Eulerian time jet.  Smoothness on a compact positive-time
+cylinder provides the
+domination needed to differentiate the unit-cube integral, returning the full forced equality
+
+`d/dt (1/2 ∫ |u|²) = -ν ∫ ∑ᵢ |∇uᵢ|² + ∫ f·u`
+
+for every strictly positive time admitted by `PeriodicSolution`.
 
 No integration-by-parts surrogate or coordinate-only divergence is introduced: the pointwise law
 uses the repository's trace definition of `divergence`, and the global law uses
-`NavierStokesPeriodicFlux.integral_divergence_unitCube_eq_zero_of_onePeriodic`.
+`NavierStokesPeriodicFlux.integral_divergence_unitCube_eq_zero_of_onePeriodic`.  The boundary time
+`t = 0`, enstrophy evolution, and any global regularity estimate remain separate open faces.
 -/
 
 noncomputable section
@@ -459,6 +469,406 @@ theorem periodicSolution_integral_inner_laplacian_eq_neg_component_gradient_sq
     exact hslice.of_le (WithTop.coe_le_coe.mpr le_top)
   · exact solution.velocityPeriodic t ht.le
 
+/-! ## The positive-time kinetic-energy balance -/
+
+/-- The Eulerian time jet read from the derivative of the joint space--time velocity field.
+
+Using the joint derivative makes continuity in both variables available before any integration.
+At a positive-time solution occurrence it agrees with the `derivWithin` appearing in the official
+momentum equation; that attachment is proved immediately below. -/
+def eulerianTimeJet (velocity : VelocityField) (x : Space) (t : ℝ) : Space :=
+  fderiv ℝ (Function.uncurry velocity) (x, t) (0, 1)
+
+/-- At positive time the joint Eulerian jet is exactly the within-time derivative used by the
+official Navier--Stokes momentum equation. -/
+theorem periodicSolution_eulerianTimeJet_eq_derivWithin
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    eulerianTimeJet velocity x t = derivWithin (velocity x) (Ici 0) t := by
+  have hdomain : Set.univ ×ˢ Set.Ici (0 : ℝ) ∈ nhds (x, t) := by
+    apply Filter.mem_of_superset (prod_mem_nhds Filter.univ_mem (Ioi_mem_nhds ht))
+    rintro z ⟨_hzspace, hztime⟩
+    exact ⟨Set.mem_univ z.1, show 0 ≤ z.2 from le_of_lt hztime⟩
+  have hjoint : DifferentiableAt ℝ (Function.uncurry velocity) (x, t) :=
+    (solution.velocitySmooth.contDiffAt hdomain).differentiableAt (by simp)
+  have htime := hjoint.hasFDerivAt.comp t
+    (hasFDerivAt_prodMk_right (𝕜 := ℝ) x t)
+  have htimeApply := congrArg (fun L : ℝ →L[ℝ] Space ↦ L 1) htime.fderiv
+  have hhalf : Set.Ici (0 : ℝ) ∈ nhds t :=
+    Filter.mem_of_superset (Ioi_mem_nhds ht) Set.Ioi_subset_Ici_self
+  rw [derivWithin_of_mem_nhds hhalf]
+  simpa [eulerianTimeJet, Function.comp_def, fderiv_apply_one_eq_deriv] using htimeApply.symm
+
+/-- Pointwise differentiation of half the squared speed in the positive-time direction. -/
+theorem periodicSolution_hasDerivAt_kineticEnergyDensity_time
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    HasDerivAt
+      (fun τ ↦ kineticEnergyDensity (fun y ↦ velocity y τ) x)
+      (inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) t := by
+  have hdomain : Set.univ ×ˢ Set.Ici (0 : ℝ) ∈ nhds (x, t) := by
+    apply Filter.mem_of_superset (prod_mem_nhds Filter.univ_mem (Ioi_mem_nhds ht))
+    rintro z ⟨_hzspace, hztime⟩
+    exact ⟨Set.mem_univ z.1, show 0 ≤ z.2 from le_of_lt hztime⟩
+  have hjoint : DifferentiableAt ℝ (Function.uncurry velocity) (x, t) :=
+    (solution.velocitySmooth.contDiffAt hdomain).differentiableAt (by simp)
+  have htime := hjoint.hasFDerivAt.comp t
+    (hasFDerivAt_prodMk_right (𝕜 := ℝ) x t)
+  have hvelocity : HasDerivAt (velocity x) (eulerianTimeJet velocity x t) t := by
+    simpa [eulerianTimeJet, Function.comp_def] using htime.hasDerivAt
+  have hnorm := hvelocity.norm_sq.const_mul (1 / 2 : ℝ)
+  simpa [kineticEnergyDensity, real_inner_comm] using hnorm
+
+/-- The pointwise momentum equation read against the velocity itself. -/
+theorem periodicSolution_pointwise_momentumWork
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (x : Space) (t : ℝ) (ht : 0 < t) :
+    inner ℝ (eulerianTimeJet velocity x t) (velocity x t) +
+        inner ℝ
+          (fderiv ℝ (fun y ↦ velocity y t) x (velocity x t))
+          (velocity x t) =
+      ν * inner ℝ (Δ (fun y ↦ velocity y t) x) (velocity x t) -
+        inner ℝ (gradient (fun y ↦ pressure y t) x) (velocity x t) +
+        inner ℝ (force x t) (velocity x t) := by
+  have hmomentum := solution.momentum x t ht.le
+  rw [periodicSolution_eulerianTimeJet_eq_derivWithin solution x t ht]
+  have hread := congrArg (fun v : Space ↦ inner ℝ v (velocity x t)) hmomentum
+  simpa [inner_add_left, inner_sub_left, real_inner_smul_left] using hread
+
+/-- The Eulerian time jet of an admitted solution varies continuously across every positive-time
+spatial slice. -/
+theorem periodicSolution_eulerianTimeJet_continuous
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (t : ℝ) (ht : 0 < t) :
+    Continuous (fun x ↦ eulerianTimeJet velocity x t) := by
+  rw [continuous_iff_continuousAt]
+  intro x
+  have hdomain : Set.univ ×ˢ Set.Ici (0 : ℝ) ∈ nhds (x, t) := by
+    apply Filter.mem_of_superset (prod_mem_nhds Filter.univ_mem (Ioi_mem_nhds ht))
+    rintro z ⟨_hzspace, hztime⟩
+    exact ⟨Set.mem_univ z.1, show 0 ≤ z.2 from le_of_lt hztime⟩
+  have hjoint : ContDiffAt ℝ ∞ (Function.uncurry velocity) (x, t) :=
+    solution.velocitySmooth.contDiffAt hdomain
+  have hjetAt : ContinuousAt
+      (fun z ↦ fderiv ℝ (Function.uncurry velocity) z (0, 1)) (x, t) :=
+    (hjoint.continuousAt_fderiv (by simp)).clm_apply continuousAt_const
+  have hpair : ContinuousAt (fun y : Space ↦ (y, t)) x :=
+    continuousAt_id.prodMk continuousAt_const
+  simpa [eulerianTimeJet, Function.comp_def] using hjetAt.comp_of_eq hpair rfl
+
+/-- The vector-Laplacian work is integrable on the compact unit cube for every globally `C²`
+velocity slice. -/
+theorem integrableOn_inner_laplacian_unitCube
+    (u : InitialVelocity) (hu : ContDiff ℝ 2 u) :
+    IntegrableOn (fun x ↦ inner ℝ (Δ u x) (u x)) unitCube := by
+  have hcubeCompact : IsCompact unitCube := by
+    unfold unitCube
+    exact (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isCompact_preimage.mpr isCompact_Icc
+  have hcubeMeasurable : MeasurableSet unitCube := hcubeCompact.measurableSet
+  have hcomponentSmooth : ∀ i : Fin 3, ContDiff ℝ 2 (fun x ↦ u x i) := by
+    intro i
+    simpa [Function.comp_def] using (EuclideanSpace.proj i).contDiff.comp hu
+  have hlaplacian : ∀ (i : Fin 3) (x : Space),
+      Δ (fun y ↦ u y i) x = (Δ u x) i := by
+    intro i x
+    have h := (hu.contDiffAt (x := x)).laplacian_CLM_comp_left
+      (l := EuclideanSpace.proj i)
+    simpa [Function.comp_def] using h
+  have hcomponentWork : ∀ i : Fin 3,
+      IntegrableOn (fun x ↦ (Δ u x) i * u x i) unitCube := by
+    intro i
+    have hgradSmooth := gradient_contDiff_one (fun x ↦ u x i) (hcomponentSmooth i)
+    have hdivGradContinuous := divergence_continuous_of_contDiff_one
+      (gradient (fun x ↦ u x i)) hgradSmooth
+    have hlapContinuous : Continuous (fun x ↦ Δ (fun y ↦ u y i) x) :=
+      hdivGradContinuous.congr (fun x ↦
+        divergence_gradient_eq_laplacian (fun y ↦ u y i) (hcomponentSmooth i) x)
+    have hlapComponentContinuous : Continuous (fun x ↦ (Δ u x) i) :=
+      hlapContinuous.congr (fun x ↦ hlaplacian i x)
+    exact (hlapComponentContinuous.mul (hcomponentSmooth i).continuous).continuousOn
+      |>.integrableOn_compact hcubeCompact
+  have hsum : IntegrableOn (fun x ↦ ∑ i : Fin 3, (Δ u x) i * u x i) unitCube :=
+    integrable_finset_sum Finset.univ (fun i _hi ↦ hcomponentWork i)
+  exact hsum.congr_fun (fun x _hx ↦ by simp [PiLp.inner_apply, mul_comm]) hcubeMeasurable
+
+/-- **The integrated positive-time momentum receiver.**  After the exact periodic pressure and
+advection cancellations and the viscous Green identity are composed, the Eulerian time work is
+forcing work minus `ν` times the full component-gradient population.  The latter is dissipative
+under the separate physical sign condition `0 ≤ ν`; this equality does not need that condition.
+This theorem does not yet interchange time differentiation with spatial integration. -/
+theorem periodicSolution_integral_eulerianTimeWork_eq_forcing_sub_dissipation
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (t : ℝ) (ht : 0 < t) :
+    ∫ x in unitCube,
+        inner ℝ (eulerianTimeJet velocity x t) (velocity x t) =
+      -ν * (∫ x in unitCube, ∑ i : Fin 3,
+        ‖gradient (fun y ↦ velocity y t i) x‖ ^ 2) +
+        ∫ x in unitCube, inner ℝ (force x t) (velocity x t) := by
+  let u : InitialVelocity := fun x ↦ velocity x t
+  let p : Space → ℝ := fun x ↦ pressure x t
+  have hcubeCompact : IsCompact unitCube := by
+    unfold unitCube
+    exact (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isCompact_preimage.mpr isCompact_Icc
+  have hcubeMeasurable : MeasurableSet unitCube := hcubeCompact.measurableSet
+  have hu : ContDiff ℝ ∞ u := by
+    rw [contDiff_iff_contDiffAt]
+    intro x
+    exact spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x t
+      solution.velocitySmooth ht
+  have hp : ContDiff ℝ ∞ p := by
+    rw [contDiff_iff_contDiffAt]
+    intro x
+    exact spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime pressure x t
+      solution.pressureSmooth ht
+  have htimeContinuous : Continuous
+      (fun x ↦ inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) :=
+    (periodicSolution_eulerianTimeJet_continuous solution t ht).inner hu.continuous
+  have hadvectionContinuous : Continuous (fun x ↦
+      inner ℝ (fderiv ℝ u x (u x)) (u x)) := by
+    have hfield : Continuous (fun x ↦ fderiv ℝ u x (u x)) :=
+      (hu.continuous_fderiv_apply (by simp)).comp (continuous_id.prodMk hu.continuous)
+    exact hfield.inner hu.continuous
+  have hpressureContinuous : Continuous (fun x ↦
+      inner ℝ (gradient p x) (u x)) :=
+    (gradient_contDiff_one p (hp.of_le (WithTop.coe_le_coe.mpr le_top))).continuous.inner
+      hu.continuous
+  have htimeInt : IntegrableOn
+      (fun x ↦ inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) unitCube :=
+    htimeContinuous.continuousOn.integrableOn_compact hcubeCompact
+  have hadvectionInt : IntegrableOn
+      (fun x ↦ inner ℝ (fderiv ℝ u x (u x)) (u x)) unitCube :=
+    hadvectionContinuous.continuousOn.integrableOn_compact hcubeCompact
+  have hviscousInt : IntegrableOn (fun x ↦ inner ℝ (Δ u x) (u x)) unitCube :=
+    integrableOn_inner_laplacian_unitCube u
+      (hu.of_le (WithTop.coe_le_coe.mpr le_top))
+  have hpressureInt : IntegrableOn
+      (fun x ↦ inner ℝ (gradient p x) (u x)) unitCube :=
+    hpressureContinuous.continuousOn.integrableOn_compact hcubeCompact
+  have hforceInt : IntegrableOn
+      (fun x ↦ inner ℝ (force x t) (u x)) unitCube := by
+    have hrest : IntegrableOn (fun x ↦
+        (inner ℝ (eulerianTimeJet velocity x t) (u x) +
+          inner ℝ (fderiv ℝ u x (u x)) (u x) -
+            ν * inner ℝ (Δ u x) (u x)) + inner ℝ (gradient p x) (u x)) unitCube :=
+      ((htimeInt.add hadvectionInt).sub (hviscousInt.const_mul ν)).add hpressureInt
+    apply hrest.congr_fun _ hcubeMeasurable
+    intro x _hx
+    have hpoint := periodicSolution_pointwise_momentumWork solution x t ht
+    change (inner ℝ (eulerianTimeJet velocity x t) (u x) +
+        inner ℝ (fderiv ℝ u x (u x)) (u x) -
+          ν * inner ℝ (Δ u x) (u x)) + inner ℝ (gradient p x) (u x) =
+      inner ℝ (force x t) (u x)
+    change inner ℝ (eulerianTimeJet velocity x t) (u x) +
+        inner ℝ (fderiv ℝ u x (u x)) (u x) =
+      ν * inner ℝ (Δ u x) (u x) - inner ℝ (gradient p x) (u x) +
+        inner ℝ (force x t) (u x) at hpoint
+    linarith
+  have hintegrated :
+      (∫ x in unitCube,
+          inner ℝ (eulerianTimeJet velocity x t) (u x)) +
+          ∫ x in unitCube, inner ℝ (fderiv ℝ u x (u x)) (u x) =
+        ν * (∫ x in unitCube, inner ℝ (Δ u x) (u x)) -
+          (∫ x in unitCube, inner ℝ (gradient p x) (u x)) +
+          ∫ x in unitCube, inner ℝ (force x t) (u x) := by
+    calc
+      (∫ x in unitCube,
+          inner ℝ (eulerianTimeJet velocity x t) (u x)) +
+          ∫ x in unitCube, inner ℝ (fderiv ℝ u x (u x)) (u x) =
+        ∫ x in unitCube,
+          (inner ℝ (eulerianTimeJet velocity x t) (u x) +
+            inner ℝ (fderiv ℝ u x (u x)) (u x)) :=
+          (integral_add htimeInt hadvectionInt).symm
+      _ = ∫ x in unitCube,
+          ((ν * inner ℝ (Δ u x) (u x) - inner ℝ (gradient p x) (u x)) +
+            inner ℝ (force x t) (u x)) := by
+        apply setIntegral_congr_fun hcubeMeasurable
+        intro x _hx
+        exact periodicSolution_pointwise_momentumWork solution x t ht
+      _ = (∫ x in unitCube,
+            (ν * inner ℝ (Δ u x) (u x) - inner ℝ (gradient p x) (u x))) +
+            ∫ x in unitCube, inner ℝ (force x t) (u x) :=
+        integral_add ((hviscousInt.const_mul ν).sub hpressureInt) hforceInt
+      _ = ((∫ x in unitCube, ν * inner ℝ (Δ u x) (u x)) -
+            ∫ x in unitCube, inner ℝ (gradient p x) (u x)) +
+            ∫ x in unitCube, inner ℝ (force x t) (u x) := by
+        rw [integral_sub (hviscousInt.const_mul ν) hpressureInt]
+      _ = ν * (∫ x in unitCube, inner ℝ (Δ u x) (u x)) -
+            (∫ x in unitCube, inner ℝ (gradient p x) (u x)) +
+            ∫ x in unitCube, inner ℝ (force x t) (u x) := by
+        rw [integral_const_mul]
+  have hadvectionZero := periodicSolution_integral_advectionWork_eq_zero solution t ht
+  have hpressureZero := periodicSolution_integral_pressureWork_eq_zero solution t ht
+  have hviscous :=
+    periodicSolution_integral_inner_laplacian_eq_neg_component_gradient_sq solution t ht
+  change (∫ x in unitCube,
+      inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) = _
+  change (∫ x in unitCube,
+      inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) +
+        (∫ x in unitCube,
+          inner ℝ (fderiv ℝ (fun y ↦ velocity y t) x (velocity x t)) (velocity x t)) =
+      ν * (∫ x in unitCube, inner ℝ (Δ (fun y ↦ velocity y t) x) (velocity x t)) -
+        (∫ x in unitCube,
+          inner ℝ (gradient (fun y ↦ pressure y t) x) (velocity x t)) +
+        ∫ x in unitCube, inner ℝ (force x t) (velocity x t) at hintegrated
+  rw [hadvectionZero, hpressureZero, hviscous] at hintegrated
+  linarith
+
+/-- Under declared integrability and the physical sign condition `0 ≤ ν`, the viscous
+contribution in the energy equality is nonpositive.  This is the exact point at which the algebraic
+work term earns the name "dissipation". -/
+theorem viscousEnergyContribution_nonpositive
+    {velocity : VelocityField} {t ν : ℝ} (hν : 0 ≤ ν)
+    (hintegrable : IntegrableOn (fun x ↦ ∑ i : Fin 3,
+      ‖gradient (fun y ↦ velocity y t i) x‖ ^ 2) unitCube) :
+    -ν * (∫ x in unitCube, ∑ i : Fin 3,
+      ‖gradient (fun y ↦ velocity y t i) x‖ ^ 2) ≤ 0 := by
+  have _hfiniteReceiver := hintegrable
+  have hcubeMeasurable : MeasurableSet unitCube := by
+    unfold unitCube
+    exact (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isCompact_preimage.mpr
+      isCompact_Icc |>.measurableSet
+  have hpopulation : 0 ≤ ∫ x in unitCube, ∑ i : Fin 3,
+      ‖gradient (fun y ↦ velocity y t i) x‖ ^ 2 :=
+    setIntegral_nonneg hcubeMeasurable (fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦ sq_nonneg _)
+  exact mul_nonpos_of_nonpos_of_nonneg (neg_nonpos.mpr hν) hpopulation
+
+/-- Half the squared-speed population integrated over one spatial period. -/
+def periodicKineticEnergy (velocity : VelocityField) (t : ℝ) : ℝ :=
+  ∫ x in unitCube, kineticEnergyDensity (fun y ↦ velocity y t) x
+
+/-- **Differentiation of the periodic kinetic-energy population.**
+
+The domination needed to interchange the positive-time derivative with the spatial integral is
+not assumed.  It is obtained from joint smoothness on a compact product of the unit cube with a
+closed time interval strictly inside `(0, ∞)`. -/
+theorem periodicSolution_hasDerivAt_periodicKineticEnergy_eq_timeWork
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (t : ℝ) (ht : 0 < t) :
+    HasDerivAt (periodicKineticEnergy velocity)
+      (∫ x in unitCube,
+        inner ℝ (eulerianTimeJet velocity x t) (velocity x t)) t := by
+  let timeSet : Set ℝ := Ioo (t / 2) (3 * t / 2)
+  let timeCompact : Set ℝ := Icc (t / 2) (3 * t / 2)
+  let positiveCylinder : Set (Space × ℝ) := Set.univ ×ˢ Ioi (0 : ℝ)
+  let compactCylinder : Set (Space × ℝ) := unitCube ×ˢ timeCompact
+  have htimeSet : timeSet ∈ nhds t := by
+    apply Ioo_mem_nhds <;> dsimp [timeSet] <;> linarith
+  have hpositiveOpen : IsOpen positiveCylinder := by
+    exact isOpen_univ.prod isOpen_Ioi
+  have hpositiveSmooth : ContDiffOn ℝ ∞ (Function.uncurry velocity) positiveCylinder := by
+    apply solution.velocitySmooth.mono
+    rintro ⟨x, τ⟩ ⟨_hx, hτ⟩
+    exact ⟨Set.mem_univ x, show 0 ≤ τ from hτ.le⟩
+  have hjointJetContinuous : ContinuousOn
+      (fun z : Space × ℝ ↦
+        fderiv ℝ (Function.uncurry velocity) z (0, 1)) positiveCylinder := by
+    have hfd : ContinuousOn (fderiv ℝ (Function.uncurry velocity)) positiveCylinder :=
+      hpositiveSmooth.continuousOn_fderiv_of_isOpen hpositiveOpen
+        (WithTop.coe_le_coe.mpr le_top)
+    exact hfd.clm_apply continuousOn_const
+  have hjointWorkContinuous : ContinuousOn
+      (fun z : Space × ℝ ↦
+        inner ℝ (eulerianTimeJet velocity z.1 z.2) (velocity z.1 z.2))
+      positiveCylinder := by
+    exact hjointJetContinuous.inner hpositiveSmooth.continuousOn
+  have hcubeCompact : IsCompact unitCube := by
+    unfold unitCube
+    exact (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isCompact_preimage.mpr isCompact_Icc
+  have hcubeMeasurable : MeasurableSet unitCube := hcubeCompact.measurableSet
+  have hcompactCylinder : IsCompact compactCylinder := hcubeCompact.prod isCompact_Icc
+  have hcompactSubset : compactCylinder ⊆ positiveCylinder := by
+    rintro ⟨x, τ⟩ ⟨hx, hτ⟩
+    exact ⟨Set.mem_univ x, lt_of_lt_of_le (half_pos ht) hτ.1⟩
+  have hworkNormContinuous : ContinuousOn
+      (fun z : Space × ℝ ↦
+        ‖inner ℝ (eulerianTimeJet velocity z.1 z.2) (velocity z.1 z.2)‖)
+      compactCylinder :=
+    (hjointWorkContinuous.mono hcompactSubset).norm
+  obtain ⟨C, hC⟩ := bddAbove_def.mp
+    (hcompactCylinder.bddAbove_image hworkNormContinuous)
+  have hFmeas : ∀ᶠ τ in nhds t, AEStronglyMeasurable
+      (fun x ↦ kineticEnergyDensity (fun y ↦ velocity y τ) x)
+      (volume.restrict unitCube) := by
+    filter_upwards [Ioi_mem_nhds ht] with τ hτ
+    have huτ : ContDiff ℝ ∞ (fun x ↦ velocity x τ) := by
+      rw [contDiff_iff_contDiffAt]
+      intro x
+      exact spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x τ
+        solution.velocitySmooth hτ
+    exact (contDiff_const.mul (huτ.norm_sq ℝ)).continuous.aestronglyMeasurable
+  have hFint : Integrable
+      (fun x ↦ kineticEnergyDensity (fun y ↦ velocity y t) x)
+      (volume.restrict unitCube) := by
+    have hut : ContDiff ℝ ∞ (fun x ↦ velocity x t) := by
+      rw [contDiff_iff_contDiffAt]
+      intro x
+      exact spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x t
+        solution.velocitySmooth ht
+    exact (contDiff_const.mul (hut.norm_sq ℝ)).continuous.continuousOn
+      |>.integrableOn_compact hcubeCompact
+  have hF'meas : AEStronglyMeasurable
+      (fun x ↦ inner ℝ (eulerianTimeJet velocity x t) (velocity x t))
+      (volume.restrict unitCube) :=
+    ((periodicSolution_eulerianTimeJet_continuous solution t ht).inner
+      ((by
+        rw [contDiff_iff_contDiffAt]
+        intro x
+        exact spatialSlice_contDiffAt_of_contDiffOn_nonnegativeTime velocity x t
+          solution.velocitySmooth ht) : ContDiff ℝ ∞ (fun x ↦ velocity x t)).continuous)
+      |>.aestronglyMeasurable
+  have hbound : ∀ᵐ x ∂(volume.restrict unitCube), ∀ τ ∈ timeSet,
+      ‖inner ℝ (eulerianTimeJet velocity x τ) (velocity x τ)‖ ≤ C := by
+    filter_upwards [ae_restrict_mem hcubeMeasurable] with x hx
+    intro τ hτ
+    apply hC
+    refine ⟨(x, τ), ?_, rfl⟩
+    exact ⟨hx, hτ.1.le, hτ.2.le⟩
+  have hboundIntegrable : Integrable (fun _ : Space ↦ C) (volume.restrict unitCube) :=
+    integrableOn_const hcubeCompact.measure_lt_top.ne
+  have hdiff : ∀ᵐ x ∂(volume.restrict unitCube), ∀ τ ∈ timeSet,
+      HasDerivAt
+        (fun σ ↦ kineticEnergyDensity (fun y ↦ velocity y σ) x)
+        (inner ℝ (eulerianTimeJet velocity x τ) (velocity x τ)) τ := by
+    filter_upwards with x
+    intro τ hτ
+    apply periodicSolution_hasDerivAt_kineticEnergyDensity_time solution x τ
+    exact lt_trans (half_pos ht) hτ.1
+  simpa [periodicKineticEnergy] using
+    (hasDerivAt_integral_of_dominated_loc_of_deriv_le
+      (F := fun τ x ↦ kineticEnergyDensity (fun y ↦ velocity y τ) x)
+      (F' := fun τ x ↦ inner ℝ (eulerianTimeJet velocity x τ) (velocity x τ))
+      (bound := fun _ : Space ↦ C) (x₀ := t) (s := timeSet)
+      (μ := volume.restrict unitCube)
+      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2
+
+/-- **The complete forced periodic kinetic-energy equality at positive time.** -/
+theorem periodicSolution_hasDerivAt_periodicKineticEnergy
+    {ν : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution ν initial force velocity pressure)
+    (t : ℝ) (ht : 0 < t) :
+    HasDerivAt (periodicKineticEnergy velocity)
+      (-ν * (∫ x in unitCube, ∑ i : Fin 3,
+        ‖gradient (fun y ↦ velocity y t i) x‖ ^ 2) +
+        ∫ x in unitCube, inner ℝ (force x t) (velocity x t)) t := by
+  have hderivative :=
+    periodicSolution_hasDerivAt_periodicKineticEnergy_eq_timeWork solution t ht
+  rw [periodicSolution_integral_eulerianTimeWork_eq_forcing_sub_dissipation
+    solution t ht] at hderivative
+  exact hderivative
+
 section Audit
 
 #print axioms divergence_pressureFlux
@@ -480,6 +890,14 @@ section Audit
 #print axioms integral_inner_laplacian_eq_neg_integral_component_gradient_sq
 #print axioms periodicSolution_integral_laplacian_component_mul_eq_neg_gradient_sq
 #print axioms periodicSolution_integral_inner_laplacian_eq_neg_component_gradient_sq
+#print axioms periodicSolution_eulerianTimeJet_eq_derivWithin
+#print axioms periodicSolution_hasDerivAt_kineticEnergyDensity_time
+#print axioms periodicSolution_pointwise_momentumWork
+#print axioms periodicSolution_eulerianTimeJet_continuous
+#print axioms integrableOn_inner_laplacian_unitCube
+#print axioms periodicSolution_integral_eulerianTimeWork_eq_forcing_sub_dissipation
+#print axioms periodicSolution_hasDerivAt_periodicKineticEnergy_eq_timeWork
+#print axioms periodicSolution_hasDerivAt_periodicKineticEnergy
 
 end Audit
 

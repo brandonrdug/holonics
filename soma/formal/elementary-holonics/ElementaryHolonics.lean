@@ -7,6 +7,7 @@ import ElementaryHolonics.Geometry.Telescoping
 import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.Geometry.SixSphereMonodromy
+import ElementaryHolonics.Geometry.SixSpherePeriods
 import ElementaryHolonics.RH.Statement
 import ElementaryHolonics.RH.Route
 import ElementaryHolonics.RH.ThetaMellin
@@ -19,6 +20,8 @@ import ElementaryHolonics.RH.MellinHorizon
 import ElementaryHolonics.RH.WeightSymmetry
 import ElementaryHolonics.RH.Growth
 import ElementaryHolonics.RH.GrowthDefect
+import ElementaryHolonics.RH.AbscissaGrowth
+import ElementaryHolonics.RH.ZeroCounting
 import ElementaryHolonics.RH.WeilVector
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
@@ -43,6 +46,7 @@ import ElementaryHolonics.Millennium.TwoRegionPositivity
 import ElementaryHolonics.Millennium.HilbertTransportChain
 import ElementaryHolonics.Millennium.HilbertTransportSpectrum
 import ElementaryHolonics.Millennium.HilbertReceiverForm
+import ElementaryHolonics.Millennium.HilbertTransportRefinement
 import ElementaryHolonics.Millennium.Instance
 import ElementaryHolonics.Millennium.Triangle
 import ElementaryHolonics.Millennium.Theta
@@ -62,6 +66,8 @@ import ElementaryHolonics.Millennium.NavierStokesPotential
 import ElementaryHolonics.Millennium.NavierStokesMovingLoop
 import ElementaryHolonics.Millennium.NavierStokesPeriodicFlux
 import ElementaryHolonics.Millennium.NavierStokesPeriodicEnergy
+import ElementaryHolonics.Millennium.NavierStokesPeriodicEnstrophy
+import ElementaryHolonics.Millennium.DissipationGapBridge
 import ElementaryHolonics.Millennium.YangMillsLimit
 import ElementaryHolonics.Millennium.ReflectedPositivity
 import ElementaryHolonics.Millennium.AlgebraicGNS
@@ -88,6 +94,7 @@ import ElementaryHolonics.Millennium.Sail
 import ElementaryHolonics.Millennium.PlaceLedger
 import ElementaryHolonics.Millennium.Border
 import ElementaryHolonics.Millennium.Hinge
+import ElementaryHolonics.Millennium.BrendleHungHinge
 import ElementaryHolonics.Millennium.Reflection
 import ElementaryHolonics.Millennium.SpherePacking
 import ElementaryHolonics.Millennium.PartitionWheel
@@ -162,6 +169,7 @@ import ElementaryHolonics.Millennium.GeneralClassCoordinates
 import ElementaryHolonics.Millennium.GeneralSelmer
 import ElementaryHolonics.Millennium.PrimeAxes
 import ElementaryHolonics.Millennium.FamilyRatio
+import ElementaryHolonics.Millennium.FamilyCentralRatio
 import ElementaryHolonics.Millennium.Separation
 import ElementaryHolonics.Millennium.NavierStokesDirection
 import ElementaryHolonics.Millennium.SeventeenSeparator
