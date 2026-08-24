@@ -685,26 +685,96 @@ word, makes the parallelogram an exchanged-route or commutator defect, and makes
 bounded family of actual torus multipliers.  What remains difficult is now visible as two exact
 analytic ports rather than hidden by a vocabulary match.
 
+### The direct dyadic correction keeps the dilation lineage
+
+**[proved-derived; formal-checked]** The first adjacent-radius scale chain was an exact
+telescoping construction, but it could not return the logarithm requested by the continuation
+law.  A uniform physical `L1` bound on every passage from radius `R` to `R+1`, summed until a
+terminal radius comparable to the high-order receiver, pays one unit for every integer radius and
+therefore gives linear rather than logarithmic growth.  No scale-free estimate for one adjacent
+band repairs that lost count.  The failure exposed a receiver mismatch rather than a missing
+constant.
+
+**[proved-derived; formal-checked]** `NavierStokesDyadicHodgeScaleChain.lean` now retains the
+actual dilation cells.  Its scale-`s` low pass is exactly one on the cube of radius `2^s`, its
+direct band is the difference of consecutive dyadic low passes before any norm is taken, and the
+complete Jacobian is exactly the base face plus the ordered dyadic word plus its addressed
+reconstruction fibre.  The companion tail owners choose depth
+`6 * ceil(log_2 H)` and literal radius `2^(6 * ceil(log_2 H))`; the complete `H3` Fourier tail at
+that aperture is bounded by a fixed lattice constant.  Thus the number of middle faces is
+logarithmic while the unresolved outer face remains explicit.
+
+**[proved-derived; formal-checked]** Conditional only on one named scale-uniform physical kernel
+receipt, `NavierStokesDyadicHodgeLogarithmicEstimate.lean` now proves the actual periodic estimate
+`JacobianReceiver <= C * (1 + criticalVorticityRate) * log(H)` and composes it with the exact
+forty-face coefficient `10986` into the `LifespanLogarithmicHighOrderLaw` consumed by the restart
+factorization.  It accepts neither an arbitrary comb nor an assumed high-order differential law.
+
+**[proved-derived; formal-checked]** `NavierStokesDyadicHodgeContinuation.lean` removes the
+caller-chosen positive base time.  It consumes interval integrability of the actual critical
+vorticity receiver on `[0,T]`, restricts it to the canonical positive terminal half-tail
+`[T/2,T]`, installs the direct dyadic logarithmic law there, and returns the complete compatible
+extension through the already checked seam and overlap uniqueness.  Its only visible premises
+beyond positive viscosity and the finite integral are the uniform dyadic kernel witness and the
+concrete restart supply from the derived uniform coordinate `H3` bound.
+
+**[interpretation]** This correction is the exact scale-theoretic content of Brandon's repeated
+localized-solution and standing-wave-chart messages.  A dyadic passage retains the dilation ratio
+between consecutive faces, and its word length is a discrete logarithmic modulus between the base
+and terminal apertures.  Relating that scale modulus to a four-point cross ratio or conformal
+quadrilateral modulus would require a separate chart theorem; it is not silently identified here.
+
+**[proved-derived; formal-checked]** `NavierStokesDyadicFlowCommutator.lean` now constructs the
+finite scale/flow gyroparallelogram which the namesake fixtures omitted.  At output pin `k`, every
+advecting pin `p` retains the transported pin `q = k-p` and the joining equality `p+q=k`.  The
+difference between “interact then apply the scale multiplier” and “apply the multiplier to the
+transported pin then interact” is exactly the addressed sum with coefficient
+`m_s(k)-m_s(q)`.  Norms and infinite convergence are deliberately absent.  This is a
+cancellation-bearing alternate edge if a raw physical-kernel estimate loses too much lineage.
+
+**[proved-derived; formal-checked]** The direct dyadic kernel reduction now reaches all nine
+complementary Hodge product faces.  The scalar annular factors have exact subset masses with the
+required powers of the dyadic radius; the rational Hodge factor has a genuine inner/outer support
+pin, a controlled stencil, and the complementary mixed envelopes needed by the product rule.  No
+uniform physical `L1` conclusion is inferred from those local returns alone.
+
+**[open]** The remaining kernel deed is sharply bounded: reindex the actual zero-padded
+`Delta_i^2 Delta_j^2` Hodge coefficient into its nine-term mixed Leibniz expansion, sum it to an
+explicit `C/N` two-axis mass, discharge the finitely many scales `0`, `1`, and `2`, derive the
+order-six three-axis mass, and pass the resulting bounds through the already checked triple
+Abel/Haar--Fubini receiver.  That composition, rather than another pointwise envelope, is what
+inhabits the uniform dyadic physical-kernel witness.
+
+**[proved-derived; formal-checked]** The restart branch also moved past the earlier
+common-aperture and momentum gaps.  Common-aperture uniqueness and finite-aperture persistence now
+identify all finite higher-order returns; the unprojected quadratic momentum and pressure paths
+are continuous and coherent across scale; every coherent lift and its pressure extension are
+time-smooth on `Ico 0 T`; and diagonal smooth towers recover the actual velocity slice and
+pressure coefficients.  The resulting classical restart carrier has initial field exactly equal
+to the existing velocity trace at every admitted tail face.
+
+**[proved-derived; formal-checked]** The first spatial/temporal joining square is now explicit.
+The high-order Fourier reconstruction is an operator-valued map, equals the actual higher-order
+reconstruction, is continuous, and has the exact modewise first derivative with a summable
+weighted majorant.  This is a genuine joint-smoothness bridge, not yet the complete joint `C^infty`
+upgrade.
+
+**[open]** The remaining restart deed is to aggregate the nested operator-derivative series,
+iterate the finite `C^r` argument, and compose it with the established time-smooth lift and
+pressure towers.  That supplies `JointSpacetimeSmoothnessUpgrade`, after which the already
+constructed carrier can inhabit the official `OpenPeriodicSolutionOn`, `InteriorPeriodicRestart`,
+and `RestartSupplyFromUniformHighOrderBound` interfaces.
+
 ## Ordered next squeeze
 
-1. **[open]** Finish the radius-independent physical `L1` bound for the exact smooth annular Hodge
-   matrix kernel.  The actual scalar/tensor cutoff differences and localized zero stencils now
-   stand, including the unconditional outer-cube one-axis second-difference estimate, and the
-   exact generic three-coordinate zero-padded Abel/Fubini identity is checked.  The remaining deed
-   is to reindex the actual Hodge cube into that receiver and prove the distinct-axis mixed
-   variation masses.  This closes the
-   logarithmic Jacobian comb without an arbitrary shell premise.
-2. **[open]** Prove common-aperture `H3` fixed-point uniqueness or an exact retiming/restriction
-   law, then identify every constructed finite-order fixed point with one base path on its overlap.
-   This converts the actual per-order returns into the coherent smooth path tower already consumed
-   by the reconstruction theorem.
-3. **[open]** Identify the differentiated viscous Fourier sum with `nu * Laplacian u` and the
-   projected nonlinear sum with physical divergence plus pressure gradient.  Rebase the resulting
-   jointly classical periodic patch inside the old overlap and return the concrete
-   `TailUniformInteriorRestartSupply` consumed by the checked seam.
-4. **[open]** Compose that constructed restart supply with the completed logarithmic Hodge comb,
-   actual finite critical-vorticity integral, coordinate energy law, seam, and overlap uniqueness.
-   The resulting theorem must take no comb or restart interface as an input.
+1. **[open]** Close the finite nine-face mixed-variation sum, the order-six three-axis mass, and
+   the triple Abel passage.  This is the sole remaining construction behind the uniform dyadic
+   Hodge kernel premise.
+2. **[open]** Close the nested operator-series `C^r` induction and its pressure analogue.  Compose
+   those returns with the existing time-smooth towers to construct the official joint smoothness
+   upgrade and restart supply.
+3. **[open]** Substitute both constructed witnesses into the checked terminal-half continuation
+   theorem.  Only this final composition may remove the two interfaces from its hypotheses.
 
 **[open]** None of these returns is a proof of global Navier--Stokes regularity, BSD, RH, Hodge, or
 Yang--Mills.  The shared holonic diagrams identify reusable transport questions; each constitutive
@@ -751,3 +821,14 @@ dependencies were confined to `propext`, `Classical.choice`, and `Quot.sound`.
 `lake build ElementaryHolonics` completed 4,009 jobs in 19.77 seconds with exit status zero.  Its
 pre-existing linter warnings are outside these seven owners; the newly built owners returned no
 warning or error.
+
+**[established-bounded; formal-checked]** The frozen successor adds 35 owner-local Lean files and
+their aggregate imports.  `lake build ElementaryHolonics` completed 4,112 jobs in 9.14 seconds
+with exit status zero.  The one new unused-variable lint was repaired and its owner rechecked;
+the remaining emitted warnings predate this successor.
+
+**[established-bounded; formal-checked]** An exact-source scan of the 35 new owners found no
+`sorry`, `admit`, custom `axiom`, `opaque`, `unsafe`, `extern`, `implemented_by`, `#check`, or
+heartbeat override; its only `partial` match was ordinary English prose.  The phase whitespace
+check is clean, and printed theorem dependencies are confined to `propext`, `Classical.choice`,
+and `Quot.sound`.
