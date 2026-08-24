@@ -16,7 +16,8 @@ use life::{
     athena_receiver_history::{AthenaReceiverHistoryCongruence, TransportSpecies},
     athena_returned_defect::{
         conduct_history_only_candidate, return_sibling_defect, CandidateHistoryFace,
-        CandidateRequest, ReturnedSiblingDefect, SealedCandidate, SiblingTestimony,
+        CandidateRequest, OperatorReturnTestimony, ReturnedSiblingDefect, SealedCandidate,
+        SiblingTestimony,
     },
     exchange_world_tube::{
         remount_exchange_world_tube, ContinuationAperture, ContinuationFamily, ExchangeWorldTube,
@@ -151,7 +152,10 @@ fn parent_mode(first: Option<PathBuf>, mut trailing: Vec<PathBuf>) -> Result<(),
         || candidates.iter().any(|candidate| {
             candidate.sibling_material_mounted
                 || !candidate.source_access_forbidden.is_empty()
-                || !candidate.gpu_resident_tower
+                || !candidate.resident.device.contains("NVIDIA")
+                || candidate.resident.tower_deed_launches == 0
+                || candidate.resident.terminal_synchronizations == 0
+                || candidate.resident.cpu_semantic_replay_after_device
         })
     {
         return Err("sealed candidate process returned an incomplete source audit".to_owned());
@@ -229,7 +233,7 @@ fn parent_mode(first: Option<PathBuf>, mut trailing: Vec<PathBuf>) -> Result<(),
         "candidate_source_access_forbidden_population":sealed.iter().map(|candidate| candidate.source_access_forbidden.len()).sum::<usize>(),
         "candidate_sealed_before_return_input_was_written":true,
         "every_candidate_returned_complete_plural_future":sealed.iter().all(|candidate| !candidate.alternatives.is_empty() && candidate.terminal_potential.len() == candidate.alternatives.len() + candidate.separated_alternative_population),
-        "every_candidate_used_resident_gpu_tower":sealed.iter().all(|candidate| candidate.gpu_resident_tower),
+        "every_candidate_used_resident_gpu_tower":sealed.iter().all(|candidate| candidate.resident.device.contains("NVIDIA") && candidate.resident.tower_deed_launches > 0 && candidate.resident.terminal_synchronizations > 0 && !candidate.resident.cpu_semantic_replay_after_device),
         "every_defect_has_five_receiver_grains":defects.iter().all(|defect| defect.graded_faces.len() == 5),
         "every_defect_formed_on_resident_gpu":defects.iter().all(|defect| defect.resident.device.contains("NVIDIA") && defect.resident.launches > 0 && !defect.resident.cpu_semantic_replay_after_device),
         "every_defect_retains_plural_fibre":defects.iter().all(|defect| defect.candidate_alternative_population > 0),
@@ -240,7 +244,7 @@ fn parent_mode(first: Option<PathBuf>, mut trailing: Vec<PathBuf>) -> Result<(),
         "passed": !candidate_contains_sibling
             && sealed.len() == selected.len()
             && defects.len() == selected.len()
-            && sealed.iter().all(|candidate| !candidate.sibling_material_mounted && candidate.source_access_forbidden.is_empty() && candidate.gpu_resident_tower && !candidate.alternatives.is_empty() && candidate.terminal_potential.len() == candidate.alternatives.len() + candidate.separated_alternative_population)
+            && sealed.iter().all(|candidate| !candidate.sibling_material_mounted && candidate.source_access_forbidden.is_empty() && candidate.resident.device.contains("NVIDIA") && candidate.resident.tower_deed_launches > 0 && candidate.resident.terminal_synchronizations > 0 && !candidate.resident.cpu_semantic_replay_after_device && !candidate.alternatives.is_empty() && candidate.terminal_potential.len() == candidate.alternatives.len() + candidate.separated_alternative_population)
             && defects.iter().all(|defect| defect.sibling_revealed_after_candidate_seal && !defect.additive_residual_assumed && defect.graded_faces.len() == 5 && defect.candidate_alternative_population > 0 && defect.resident.device.contains("NVIDIA") && defect.resident.launches > 0 && !defect.resident.cpu_semantic_replay_after_device)
     });
     write_json(
@@ -431,20 +435,24 @@ fn sibling_testimony(
         response_text.push('\n');
         response_occurrences.push(situated(address));
     }
-    let world_consequence_sha256 =
-        sha(&serde_json::to_vec(&family.world).map_err(|error| error.to_string())?);
-    let later_operator_return_sha256 = family
+    let later_operator_return = family
         .later_operator_return
         .as_ref()
-        .map(|address| visible(world, address).map(|face| sha(face.text.as_bytes())))
+        .map(|address| {
+            visible(world, address).map(|face| OperatorReturnTestimony {
+                occurrence: situated(address),
+                text: face.text.clone(),
+                text_sha256: sha(face.text.as_bytes()),
+            })
+        })
         .transpose()?;
     Ok(SiblingTestimony {
         proposal: proposal.to_owned(),
         response_sha256: sha(response_text.as_bytes()),
         response_text,
         response_occurrences,
-        world_consequence_sha256,
-        later_operator_return_sha256,
+        world_consequence: family.world.clone(),
+        later_operator_return,
     })
 }
 

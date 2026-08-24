@@ -6,6 +6,7 @@
 
 use holonic_engine::{
     cuda_refine::CudaRefineExecutor,
+    exact_work::ExactWork,
     phoenix::{
         runtime::{ProductSession, RuntimeReturn},
         streamed::{InterventionSite, ReceiverOption},
@@ -14,6 +15,8 @@ use holonic_engine::{
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+
+use crate::exchange_world_tube::ContinuationWorldWindow;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CandidateHistoryFace {
@@ -58,7 +61,31 @@ pub struct SealedCandidate {
     pub separated_alternative_population: usize,
     pub sibling_material_mounted: bool,
     pub source_access_forbidden: Vec<String>,
-    pub gpu_resident_tower: bool,
+    pub resident: CandidateResidentReceipt,
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CandidateResidentReceipt {
+    pub schema: String,
+    pub device: String,
+    pub mode: String,
+    pub kernel_sha256: String,
+    pub tower_deed_launches: u64,
+    pub total_deed_launches: u64,
+    pub terminal_synchronizations: u64,
+    pub memory_at_mount_free: u64,
+    pub memory_at_mount_total: u64,
+    pub memory_at_return_free: u64,
+    pub memory_at_return_total: u64,
+    pub exact_work: ExactWork,
+    pub cpu_semantic_replay_after_device: bool,
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OperatorReturnTestimony {
+    pub occurrence: String,
+    pub text: String,
+    pub text_sha256: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -67,8 +94,8 @@ pub struct SiblingTestimony {
     pub response_occurrences: Vec<String>,
     pub response_text: String,
     pub response_sha256: String,
-    pub world_consequence_sha256: String,
-    pub later_operator_return_sha256: Option<String>,
+    pub world_consequence: ContinuationWorldWindow,
+    pub later_operator_return: Option<OperatorReturnTestimony>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -183,6 +210,9 @@ fn seal(
             != returned.receipt.generated.vocabulary_extent
         || returned.receipt.generated.plural.len() + returned.receipt.generated.separated
             != returned.receipt.generated.vocabulary_extent
+        || !returned.receipt.execution.device_name.contains("NVIDIA")
+        || returned.receipt.execution.terminal_synchronizations == 0
+        || returned.receipt.apparatus_census.tower_deed_launches == 0
     {
         return Err(
             "history-only candidate return failed its source or plural-future audit".to_owned(),
@@ -249,8 +279,21 @@ fn seal(
         separated_alternative_population: returned.receipt.generated.separated,
         sibling_material_mounted: false,
         source_access_forbidden: returned.receipt.source_access.forbidden.clone(),
-        gpu_resident_tower: returned.receipt.execution.device_name.contains("NVIDIA")
-            && returned.receipt.execution.terminal_synchronizations > 0,
+        resident: CandidateResidentReceipt {
+            schema: "holonic-engine.athena-candidate-resident-return.v1".to_owned(),
+            device: returned.receipt.execution.device_name.clone(),
+            mode: returned.receipt.execution.mode.clone(),
+            kernel_sha256: returned.receipt.execution.kernel_sha256.clone(),
+            tower_deed_launches: returned.receipt.apparatus_census.tower_deed_launches,
+            total_deed_launches: returned.receipt.apparatus_census.total_deed_launches,
+            terminal_synchronizations: returned.receipt.execution.terminal_synchronizations,
+            memory_at_mount_free: returned.receipt.execution.memory_at_mount_free,
+            memory_at_mount_total: returned.receipt.execution.memory_at_mount_total,
+            memory_at_return_free: returned.receipt.execution.memory_at_return_free,
+            memory_at_return_total: returned.receipt.execution.memory_at_return_total,
+            exact_work: returned.receipt.total_work.clone(),
+            cpu_semantic_replay_after_device: false,
+        },
     })
 }
 
@@ -264,6 +307,10 @@ pub fn return_sibling_defect(
         || candidate.sibling_material_mounted
         || sibling.response_text.is_empty()
         || sha(sibling.response_text.as_bytes()) != sibling.response_sha256
+        || sibling
+            .later_operator_return
+            .as_ref()
+            .is_some_and(|returned| sha(returned.text.as_bytes()) != returned.text_sha256)
     {
         return Err("the candidate and later sibling do not share one sealed boundary".to_owned());
     }
@@ -306,10 +353,14 @@ pub fn return_sibling_defect(
         .iter()
         .flat_map(|alternative| alternative.native_id.to_le_bytes())
         .collect::<Vec<_>>());
+    let world_consequence_sha256 =
+        sha(&serde_json::to_vec(&sibling.world_consequence).map_err(|error| error.to_string())?);
     let sibling_occurrence = sha(&serde_json::to_vec(&(
         &sibling.proposal,
         &sibling.response_occurrences,
         &sibling.response_sha256,
+        &sibling.world_consequence,
+        &sibling.later_operator_return,
     ))
     .map_err(|error| error.to_string())?);
     let face_material = [
@@ -334,15 +385,16 @@ pub fn return_sibling_defect(
         (
             DefectGrain::WorldConsequence,
             "not-yet-enacted".to_owned(),
-            sibling.world_consequence_sha256.clone(),
+            world_consequence_sha256,
             DefectRelation::OpenCandidateExterior,
         ),
         (
             DefectGrain::OperatorReturn,
             "not-yet-returned".to_owned(),
             sibling
-                .later_operator_return_sha256
-                .clone()
+                .later_operator_return
+                .as_ref()
+                .map(|returned| returned.text_sha256.clone())
                 .unwrap_or_else(|| "open-exterior".to_owned()),
             DefectRelation::OpenCandidateExterior,
         ),
