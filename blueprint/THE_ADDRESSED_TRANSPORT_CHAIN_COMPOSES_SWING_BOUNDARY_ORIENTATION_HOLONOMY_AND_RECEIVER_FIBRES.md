@@ -622,33 +622,108 @@ The formal target must derive the commutation/covariance laws and exhibit where 
 produces heat and entropy. A conservative monodromy shear, a receiver collision, or a null direction
 alone does not supply dissipation.
 
-[definition] The immediate Navier--Stokes consequence is the analytic receiver of this complex.
-The Fourier Hodge multiplier is the already-constructed
-`gradient -- inverse Laplacian -- curl/Leray` transport. Its three coordinate character differences
-form the exterior tensor stencil. Proceed in this order:
+[definition] **HD0 -- the addressed higher-difference word returns its complete product-face and
+reciprocal ledger -- is the next exterior theorem deed.**  Navier--Stokes is its first demanding
+analytic receiver; it does not own or name the construction.  The owner is
+`Foundation/HigherDifferenceTransport.lean`, with:
 
-1. prove the low-scale `s=0,1,2` physical-kernel bound;
-2. construct reusable reciprocal finite-difference recurrence through total order six;
-3. prove all twenty-seven three-axis Leibniz faces and the inverse-cube full mixed mass;
-4. return all eight subset receivers: empty, three single axes, three axis pairs, and all three;
-5. prove the one-circle near/far Haar estimate and tensorize the coordinate-face partition around
-   `z_i=1`;
-6. construct an explicit `UniformDyadicHodgeJacobianKernelBound`; and
-7. compose it with the returned restart supply and terminal-half continuation theorem.
+```text
+state                    X
+addressed generators     T_i : X -> X
+shift                    S_i f = f after T_i
+returned difference      Delta_i f = S_i f - f
+chronological word       w = [i_1,...,i_n]
+receiver section         f : X -> R
+```
 
-[proved-derived; formal-checked] The first order-six recurrence station returned in
-`NavierStokesReciprocalDifferenceRecurrence.lean`.  For every addressed window of length at most
-six, the exact shifted binomial Leibniz law is proved; local inverse sections therefore force a
-reciprocal-difference recurrence.  A zero third denominator difference removes every denominator
-face above order two, leaving the exact sixth-order `6/15` recurrence.  The theorem is instantiated
-on the genuine quadratic frequency denominator and totalized Hodge reciprocal along any
-seven-point coordinate window which remains away from zero.  It also proves that distinct-coordinate
-denominator differences vanish, same-coordinate second differences equal two, third differences
-vanish, and the resulting three-axis denominator allocation type has exactly seven faces.  The
-remaining part of step 2 is the sparse three-axis product/reciprocal word identity; it must retain
-the distinct coordinate shifts before the twenty-seven numerator/reciprocal faces are bounded.
+For one occurrence the constitutive law is the exact shifted Leibniz return
 
-[open] Triple finite Abel/Fubini is already checked, but Haar integration is not yet formalized.
+```text
+Delta_i(fg) = Delta_i(f) * S_i(g) + f * Delta_i(g).
+```
+
+For a word, the owner iterates that law without sorting the addresses.  Its primary result is an
+occurrence-level binary face tree: every leaf records, in order, which difference or shift met each
+factor.  Only a supplied interchange receipt may quotient that tree to subset, multi-index, or
+binomial faces.  Failure of interchange remains the ordered route defect and is the curvature or
+holonomy input of a later receiver, not an error erased by notation.
+
+[definition] HD0 has one reciprocal consequence.  On a declared complete successor window where
+`q * r = 1`, applying the word ledger to `q*r` isolates the unique face with no difference on `q`:
+
+```text
+q(x) * Delta_w(r)(x)
+  = - sum(nonempty addressed q-faces, with every inherited shift retained).
+```
+
+An annihilator may remove a face only after the corresponding addressed difference of `q` is
+proved zero.  A chart rebase must transport the whole tree naturally.  A receiver quotient must
+return its complete reconstruction fibre, including the shortest richer word which separates two
+collapsed histories.
+
+[definition] HD0 passes only when all of the following return together:
+
+1. the generic owner imports no fluid-specific file or frequency lattice;
+2. the ordered shifted-Leibniz tree is proved for arbitrary finite addressed words;
+3. the local reciprocal recurrence is proved from a successor-window inverse, without assuming a
+   global inverse at a removed or singular point;
+4. exact interchange cells descend the occurrence tree to the commuting subset/multi-index law;
+5. a finite noncommuting control proves that chronology-free multi-index collapse can fail;
+6. rebase naturality and the reconstruction fibre are preserved;
+7. the present one-generator recurrences through order six are recovered as corollaries;
+8. the quadratic three-axis specialization returns exactly seven possible denominator faces: the
+   value, three first differences, and three same-axis second differences;
+9. the `(2,2,2)` product allocation returns twenty-seven numerator/reciprocal faces as a Hodge
+   specialization rather than as the generic ontology; and
+10. every promoted theorem prints without `sorryAx`.
+
+[proved-derived; formal-checked] The bounded one-generator part of HD0 currently lives in the
+historically named `NavierStokesReciprocalDifferenceRecurrence.lean`.  For every addressed window
+of length at most six it proves the shifted binomial Leibniz law and local reciprocal recurrence.
+A zero third denominator difference removes every denominator face above order two, leaving the
+exact sixth-order `6/15` recurrence.  The genuine quadratic frequency specialization proves that
+distinct-coordinate denominator differences vanish, same-coordinate second differences equal two,
+third differences vanish, and the three-axis candidate denominator type has cardinality seven.
+HD0 extracts those generic theorems into their proper owner and then adds the ordered
+multi-generator ledger; the fluid file becomes a specialization only.
+
+[definition] The HD0 specialization atlas is the reason the deed is mathematical rather than
+fluid-specific:
+
+1. **Navier--Stokes:** commuting coordinate translations, `q(k)=|k|^2`, the Hodge/Leray numerator,
+   twenty-seven product faces, inverse-cube mixed mass, eight subset receivers, and the near/far
+   Haar return;
+2. **Hodge:** chart and cell transports, `d^2=0` annihilator faces, primitive/coexact splitting,
+   and the positive chart-glued storage receiver;
+3. **Yang--Mills:** generally noncommuting covariant transports, with the word-comparison defect
+   retained as curvature and its closed return read by Wilson receivers;
+4. **Riemann hypothesis:** founded dilation and prime-local transports, reciprocal Euler/Mellin
+   ledgers, reflection rebase, and the still-required positive Weil receiver with no nonzero null
+   difference;
+5. **Birch--Swinnerton--Dyer:** addressed local-height and valuation differences, telescoping over
+   good places, retained bad-place residues, and the still-required canonical-height/rank bridge;
+6. **Poincare:** a completed regression receiver in which local moves, word comparison, fillings,
+   and vanishing obstruction must agree with the known global topological conclusion;
+7. **P versus NP:** a deferred complexity receiver in which equal endpoint answers do not identify
+   histories, and separation concerns whether a claimed condensation preserves all admitted
+   successor/intervention consequences; and
+8. **the complex `S^6`, phase tori, and parametrons:** finite or unipotent monodromy words,
+   higher-difference orbit order, coupled phase transport, half-turn deck action, and the binary
+   receiver with its winding fibre retained.
+
+[definition] Navier--Stokes is therefore the first analytic specialization after HD0.  Its ordered
+receiver remains:
+
+1. the already returned low-scale `s=0,1,2` physical-kernel bound;
+2. HD0 and its sparse three-axis quadratic reciprocal specialization;
+3. all twenty-seven three-axis Leibniz faces and the inverse-cube full mixed mass;
+4. all eight subset receivers: empty, three single axes, three axis pairs, and all three;
+5. the one-circle near/far Haar estimate and its coordinate-face tensorization around `z_i=1`;
+6. an explicit `UniformDyadicHodgeJacobianKernelBound`; and
+7. composition with the returned restart supply and terminal-half continuation theorem.
+
+[open] After HD0, triple finite Abel/Fubini is already checked, but Haar integration is not yet
+formalized.
 The top mixed difference alone cannot be divided globally by
 `∏_i |1-exp(2πix_i)|²`, because the reciprocal factors are singular. The eight subset bounds and
 near/far coordinate partition are therefore part of the theorem, not a technical afterthought. Once
@@ -800,7 +875,7 @@ bilinear storage can absorb the nontrivial square-zero cusp shear. The complete 
 constitutive blueprint and the exact remaining Navier--Stokes receiver are deposited in
 [`../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md`](../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md).
 
-[proved-derived; formal-checked] The first Navier--Stokes deed named by I9 returned in
+[proved-derived; formal-checked] The first periodic-fluid specialization named by I9 returned in
 `NavierStokesDyadicHodgeLowScale.lean`. Every scalar physical kernel entry is bounded pointwise and
 in normalized Haar `L¹` by the exact coefficient population `N_s³`; summing the twenty-seven entries
 gives `dyadicHodgeJacobianKernelL1 s ≤ 27 N_s³`. The aperture counts at scales zero, one and
@@ -812,12 +887,15 @@ locked cosine coupling. `NavierStokesReciprocalDifferenceRecurrence.lean` proves
 Leibniz and local reciprocal recurrence through order six, its quadratic two-face reduction, and
 the actual one-coordinate Hodge-reciprocal specialization.
 
-[open] The remaining I9 returns are the transported-capacitance block/Kron theorem, the complete
-cubical torus exterior complex, exact source-lifted receiver interaction populations, the
-thermo-electro-optical and dynamical-metric constitutive specializations, and the uniform physical
-Navier--Stokes Hodge-kernel witness through the three-axis lift of the order-six reciprocal
-recurrence, all twenty-seven product faces, and eight subset Haar receivers at scales at least
-three.
+[open] The exact next I9 return is HD0: extract the generic one-generator recurrence and construct
+the addressed multi-generator product/reciprocal word with its interchange quotient,
+noncommuting control, rebase, and reconstruction fibre.  Its first analytic specialization is the
+uniform physical Navier--Stokes Hodge-kernel witness through the three-axis quadratic lift, all
+twenty-seven product faces, and eight subset Haar receivers at scales at least three.  The other
+remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
+exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
+optical and dynamical-metric constitutive specializations.  These are receiver families of the
+shared calculus; each still owes its own constitutive and global return.
 
 [definition] These I-stations remain exterior Lean returns. They do not schedule the engine body,
 advance `CONSTRUCTION_STATE.md`, or displace the active same-body factor-deposition deed. Their

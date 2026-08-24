@@ -109,13 +109,14 @@ current receiver, and dissipative/adiabatic hypotheses.  `HolonicParametron.lean
 classical/JPO locked-phase quotient; it does not silently substitute that phase model for the AQFP
 flux-state dynamics.
 
-## 4. Consequence for the Navier--Stokes frontier
+## 4. Consequence for the higher-difference transport frontier
 
-[interpretation] The useful import into the Navier--Stokes line is the phase-torus transport before
-binary collapse.  Linearizing coupled phase current near a locked section produces a weighted
-graph-Laplacian response; damping conducts phase differences diffusively; the remaining winding
-population is the harmonic part.  This is a finite storage--gradient--divergence apparatus for the
-same Hodge transport, not a replacement for the continuum estimate.
+[interpretation] The useful import is the phase-torus transport before binary collapse.  Linearizing
+coupled phase current near a locked section produces a weighted graph-Laplacian response; damping
+conducts phase differences diffusively; the remaining winding population is the harmonic part.
+This is one finite storage--gradient--divergence instance of a higher-difference transport owner
+whose other receivers include fluid Hodge transport, covariant curvature, monodromy, local/global
+arithmetic transport, and successor-sensitive computation.
 
 [proved-derived; formal-checked] `NavierStokesReciprocalDifferenceRecurrence.lean` now proves the
 exact shifted binomial product law on every addressed path window through order six.  When a local
@@ -138,11 +139,13 @@ difference is `2`, every same-coordinate third difference vanishes, and the cand
 face type has cardinality seven--one value face, three first-difference faces, and three
 second-difference faces.
 
-[open] The exact next deed is the sparse product/reciprocal word identity for
-`Δ₀²Δ₁²Δ₂²`, retaining the shifts of those seven denominator faces.  After that
-recurrence returns, it feeds the twenty-seven
-numerator/reciprocal Leibniz faces, the inverse-cube mass, the eight subset receivers, and finally
-the near/far Haar partition required for the uniform physical-kernel witness.
+[open] The exact next deed is now HD0, not a Navier--Stokes-named lemma: extract the generic bounded
+recurrence into `Foundation/HigherDifferenceTransport.lean`, construct its ordered multi-generator
+product/reciprocal face tree, prove the commuting interchange quotient and a noncommuting
+falsifier, and retain rebase and receiver fibres.  The sparse `Δ₀²Δ₁²Δ₂²` quadratic identity is
+then the first analytic specialization.  It feeds the twenty-seven numerator/reciprocal Leibniz
+faces, inverse-cube mass, eight subset receivers, and near/far Haar partition required by the
+uniform fluid physical-kernel witness.
 
 ## 5. Grade and construction boundary
 
@@ -152,5 +155,6 @@ half-turn/Ising quotient and the one-path order-six Hodge reciprocal recurrence 
 scopes.
 
 [open] No uniform Navier--Stokes physical-kernel witness, critical-vorticity integrability theorem,
-or Millennium solution is claimed by this station.  The next proof obligation is the named sparse
-three-axis recurrence, not another physical analogy or a binary Ising simulation.
+or Millennium solution is claimed by this station.  The next proof obligation is the universal
+HD0 owner and its ordered word theorem; the sparse three-axis recurrence is its first fluid
+receiver.
