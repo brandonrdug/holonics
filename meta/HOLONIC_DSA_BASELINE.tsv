@@ -221,6 +221,7 @@ soma/life/src/athena_receiver_history.rs	.clone()=3	.collect()=4	.flat_map()=1	.
 soma/life/src/athena_receiver_history/roles.rs	.collect()=1	BTreeSet=4	Vec=3
 soma/life/src/athena_receiver_history/system.rs	.clone()=8	.collect()=15	.into_iter()=1	BTreeMap=23	BTreeSet=3	Vec=16
 soma/life/src/athena_receiver_history/types.rs	Vec=10
+soma/life/src/athena_returned_defect.rs	.clone()=16	.collect()=7	.flat_map()=1	Vec=16
 soma/life/src/agentic_language/answer_continuation.rs	.clone()=78	.collect()=25	.flat_map()=6	.into_iter()=6	BTreeMap=3	BTreeSet=39	Vec=20
 soma/life/src/agentic_language/candidate.rs	.clone()=58	.collect()=73	.flat_map()=15	.into_iter()=11	BTreeMap=3	BTreeSet=67	Vec=66
 soma/life/src/agentic_language/ecology.rs	.clone()=99	.collect()=21	.flat_map()=3	.into_iter()=4	BTreeMap=5	BTreeSet=48	Vec=24

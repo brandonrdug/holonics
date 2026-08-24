@@ -15,6 +15,10 @@ pub mod athena_alpha;
 // sections. The superseded trigram condensation remains isolated in `athena_alpha` as a measured
 // counterexample fixture; this owner never imports its global partition or token-window law.
 pub mod athena_receiver_history;
+// The next causal cut: a history-only Phoenix passage is sealed before later sibling material is
+// mounted, then the returned testimony forms a graded defect without treating a scalar delta as
+// the object.
+pub mod athena_returned_defect;
 pub mod atlas_cultivation;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
