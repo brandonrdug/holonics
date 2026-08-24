@@ -34,11 +34,12 @@ fn testimony() -> OverlayTestimony {
     }
 }
 
-fn candidate(shape: OverlayShape, terminal_rows: usize) -> RankOneCandidate {
-    RankOneCandidate::new(
+fn candidate(shape: OverlayShape, terminal_rows: usize) -> FactorizedCandidate {
+    FactorizedCandidate::new(
         "delta.u.weight",
         "delta.v.weight",
         shape,
+        1,
         terminal_rows,
         testimony(),
     )
@@ -102,8 +103,9 @@ fn valid_sparse_rank_one_defect_is_admitted_and_terminal_quotient_precedes_contr
         4,
     );
     let return_receipt = valid_receipt();
+    let derivation = FactorDerivationReceipt::RankOne(return_receipt);
     let (complex, events) = factors
-        .complex(Some(&return_receipt))
+        .complex(Some(&derivation))
         .expect("valid candidate");
     assert_eq!(complex.dependency_span().expect("fronts"), 4);
     let fronts = complex.fronts().expect("fronts");
@@ -153,6 +155,7 @@ fn false_supported_rank_refuses_without_dense_ambient_allocation() {
             values: vec![rat(1), rat(1)],
         },
     );
+    let receipt = FactorDerivationReceipt::RankOne(receipt);
     assert!(matches!(
         factors.complex(Some(&receipt)),
         Err(CandidateRefusal::DefectRank { rank: 2 })
@@ -170,6 +173,7 @@ fn wrong_supported_outer_product_refuses_exactly() {
     );
     let mut receipt = valid_receipt();
     receipt.right.values[1] = rat(4);
+    let receipt = FactorDerivationReceipt::RankOne(receipt);
     assert!(matches!(
         factors.complex(Some(&receipt)),
         Err(CandidateRefusal::ReconstructionMismatch)
@@ -187,6 +191,7 @@ fn zero_supported_defect_refuses_as_zero_rank() {
     );
     let mut receipt = valid_receipt();
     receipt.defect.supported = ExactRatMatrix::zero(1, 2).expect("zero supported defect");
+    let receipt = FactorDerivationReceipt::RankOne(receipt);
     assert!(matches!(
         factors.complex(Some(&receipt)),
         Err(CandidateRefusal::DefectRank { rank: 0 })
@@ -203,7 +208,7 @@ fn row_zero_refuses_before_terminal_quotient_construction() {
         0,
     );
     assert!(matches!(
-        factors.complex(Some(&valid_receipt())),
+        factors.complex(Some(&FactorDerivationReceipt::RankOne(valid_receipt()))),
         Err(CandidateRefusal::FactorShape)
     ));
 }
@@ -219,6 +224,7 @@ fn structured_separator_must_match_exact_candidate_coordinate() {
     );
     let mut receipt = valid_receipt();
     receipt.separator.candidate = rat(7);
+    let receipt = FactorDerivationReceipt::RankOne(receipt);
     assert!(matches!(
         factors.complex(Some(&receipt)),
         Err(CandidateRefusal::ZeroRankFoilNotSeparated)

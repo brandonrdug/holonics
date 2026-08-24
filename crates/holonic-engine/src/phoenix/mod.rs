@@ -22,6 +22,8 @@ pub mod recurrent;
 pub mod recurrent_condensation;
 pub mod recurrent_return;
 pub mod runtime;
+/// Returned factor covers deposited into one non-cloned product session morphology.
+pub mod session_factor_complex;
 pub mod site;
 pub mod streamed;
 pub mod tower;

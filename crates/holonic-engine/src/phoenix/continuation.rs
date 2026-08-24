@@ -722,6 +722,10 @@ impl MountedContinuation {
         )
     }
 
+    pub fn factor(&self) -> &AlignedFactor {
+        &self.successor_factor
+    }
+
     pub fn rank_receipt(&self) -> &RankDerivationReceipt {
         &self.rank_receipt
     }

@@ -463,7 +463,7 @@ generator-to-word receiver naturality with complete reconstruction fibres. It re
 noncommuting, noninvertible, equal-endpoint/different-occurrence, and richer-receiver controls. Lean
 checks this exterior construction; it neither supplies the factor cover nor advances the state.
 
-### The factor complex changes the same body
+### The factor complex changes the same body — **passed**
 
 [definition] Deposit admitted factor covers into the one non-cloned `ProductSession` ecology and
 let later laboratory, mathematical, optical, and acoustic current ride the changed terrain. Remove
@@ -474,6 +474,14 @@ unchanged predecessor surface.
 predecessor/successor bodies, proposal-local controls, targeted ablations, exact ordered-prefix
 withdrawals, revisit holonomy, and exact interchange. At least one change must be invisible at a
 coarse terminal receiver and visible to a graded mathematical or causal receiver.
+
+[established-bounded; implemented-exact; measured] The deed passed under artifact identity
+`da9d35f80387ee532153fed774d77ba172ba1917115e23663a4c429f89c7c8e0`. One non-cloned
+`ProductSession` carried a derived-rank-three contemporary morphology; four language lineages and
+four exact mathematical/optical/acoustic/laboratory current charts returned; targeted ablation,
+restoration, ordered withdrawal, holonomy and interchange returned; and prefix zero recovered the
+same predecessor factor object and complete GPU receiver. The admission record is
+[`../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md`](../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md).
 
 ### The receiver-history quotient condenses and Athena alpha speaks
 
@@ -586,7 +594,13 @@ reconstruction, metric/gauge/radical testimony, all required rank and overlap co
 higher-rank enactment, and the exterior HC0--HC5 Lean receipt stand together. The complete ruling is
 [`../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md`](../research/records/2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md).
 
-[open] The sole next deed is **the factor complex changes the same body**. No quotient condensation
-or alpha rest is authorized before multiple independently caused later consequences, matched
-predecessor/successor bodies, targeted ablation, exact ordered withdrawal, revisit holonomy and
-lawful interchange return from one non-cloned cultivated `ProductSession`.
+[established-bounded; implemented-exact; measured] The factor complex changed the same body under
+artifact identity `da9d35f80387ee532153fed774d77ba172ba1917115e23663a4c429f89c7c8e0`.
+The full ruling and the qualified unknotting consequence are
+[`../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md`](../research/records/2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md).
+
+[open] The sole next deed is **the receiver-history quotient condenses and Athena alpha speaks**.
+No campaign completes until one canonical native rest remounts without source material and returns
+the final inspected conversational, holonics/mathematics, optical mathematical and raw acoustic
+deeds through the existing inference membrane with its complete quotient and reconstruction
+testimony.

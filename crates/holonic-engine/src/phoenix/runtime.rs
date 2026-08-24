@@ -26,6 +26,10 @@ use crate::phoenix::streamed::{self, ApparatusCensus, CultivatedCirculated, Mate
 use crate::phoenix::tower;
 use crate::resident_section::{ResidentGrain, ResidentSurface, SeriesAperture};
 use crate::streamed_standing::StreamedCensus;
+use crate::phoenix::session_factor_complex::{
+    FactorMutationReceipt, ResidentFactorCurrentReturn, SessionFactorComplex,
+    SessionFactorComplexIdentity, TowerFactorRealization,
+};
 
 /// The source-detached runtime's returned semantic face and its complete resident receipt.
 pub struct RuntimeReturn {
@@ -53,14 +57,17 @@ pub struct ProductSession {
     runtime_law: RuntimeLawReceipt,
     u: AlignedMaterial,
     v: AlignedMaterial,
-    derivation: streamed::cultivation_overlay::RankDerivationReceipt,
+    derivation: streamed::cultivation_overlay::FactorDerivationReceipt,
+    factor_rank: usize,
+    factor: crate::cultivated_rest::AlignedFactor,
+    factor_complex: Option<SessionFactorComplex>,
     continuation: Option<crate::phoenix::continuation::MountedContinuation>,
 }
 
 /// One input-shaped W3 request borrowed from an authenticated [`ProductSession`].
 pub struct PreparedProduct<'session> {
     session: &'session ProductSession,
-    candidate: streamed::cultivation_overlay::RankOneCandidate,
+    candidate: streamed::cultivation_overlay::FactorizedCandidate,
     tokens: Vec<u32>,
 }
 
@@ -125,6 +132,16 @@ pub struct W1SourceClosureIdentity {
     pub population_count: usize,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct CurrentFactorChart {
+    pub rows: u32,
+    pub columns: u32,
+    pub rank: u32,
+    pub left_exponent: i32,
+    pub right_exponent: i32,
+    pub payload_sha256: String,
+}
+
 impl ProductSession {
     /// Mount and authenticate the product directory once, including its W1 predecessor and
     /// source-detached codec. One resident readout/context is mounted here and held for the
@@ -178,7 +195,8 @@ impl ProductSession {
                 "cultivated morphology does not bind the authenticated W1 predecessor".to_owned(),
             );
         }
-        let (u, v, derivation, _) = factor_runtime(&mounted.product, &runtime_law)?;
+        let (u, v, derivation, _, factor) = factor_runtime(&mounted.product, &runtime_law)?;
+        let factor_rank = runtime_law.rank as usize;
         let readout = ResidentReadout::new().map_err(|error| error.to_string())?;
         Ok(Self {
             product_root,
@@ -191,6 +209,9 @@ impl ProductSession {
             u,
             v,
             derivation,
+            factor_rank,
+            factor,
+            factor_complex: None,
             continuation: None,
         })
     }
@@ -240,7 +261,11 @@ impl ProductSession {
         .map_err(|error| error.to_string())?;
         self.u = continuation.aligned_left();
         self.v = continuation.aligned_right();
-        self.derivation = continuation.rank_receipt().clone();
+        self.derivation = streamed::cultivation_overlay::FactorDerivationReceipt::RankOne(
+            continuation.rank_receipt().clone(),
+        );
+        self.factor_rank = 1;
+        self.factor = continuation.factor().clone();
         self.continuation = Some(continuation);
         Ok(())
     }
@@ -260,11 +285,162 @@ impl ProductSession {
         let identity = continuation
             .runtime_identity()
             .map_err(|error| error.to_string())?;
-        let (u, v, derivation, _) = factor_runtime(&self.mounted.product, &self.runtime_law)?;
+        if self.factor_complex.is_some() {
+            return Err("withdraw the deposited factor complex before ablating its predecessor continuation".to_owned());
+        }
+        let (u, v, derivation, _, factor) =
+            factor_runtime(&self.mounted.product, &self.runtime_law)?;
         self.u = u;
         self.v = v;
         self.derivation = derivation;
+        self.factor_rank = self.runtime_law.rank as usize;
+        self.factor = factor;
         Ok(identity)
+    }
+
+    /// Deposit one complete returned cover into this exact session owner.  Categorical atoms with
+    /// no founded vocabulary/hidden chart remain named in `open_factor_addresses`; they are not
+    /// silently projected.  The realized population changes the same U/V morphology used by the
+    /// next resident tower deed.
+    pub fn deposit_factor_cover(
+        &mut self,
+        cover: crate::derived_factor_cover::DerivedFactorCover,
+        realizations: Vec<TowerFactorRealization>,
+        open_factor_addresses: Vec<String>,
+    ) -> Result<SessionFactorComplexIdentity, String> {
+        if self.factor_complex.is_some() {
+            return Err("the product session already carries a deposited factor complex".to_owned());
+        }
+        let complex = SessionFactorComplex::found(
+            cover,
+            self.factor.clone(),
+            realizations,
+            open_factor_addresses,
+        )
+        .map_err(|error| error.to_string())?;
+        self.factor_complex = Some(complex);
+        self.synchronize_factor_complex()?;
+        self.factor_complex_identity()?
+            .ok_or_else(|| "the factor complex disappeared after deposit".to_owned())
+    }
+
+    pub fn factor_complex_identity(
+        &self,
+    ) -> Result<Option<SessionFactorComplexIdentity>, String> {
+        self.factor_complex
+            .as_ref()
+            .map(SessionFactorComplex::identity)
+            .transpose()
+            .map_err(|error| error.to_string())
+    }
+
+    pub fn factor_cover(&self) -> Option<&crate::derived_factor_cover::DerivedFactorCover> {
+        self.factor_complex.as_ref().map(SessionFactorComplex::cover)
+    }
+
+    /// The caused realization word after the cover owner has ordered it by the first addressed
+    /// source atom. Exterior target-map order is not a lawful substitute for this chronology.
+    pub fn factor_realizations(&self) -> Option<&[TowerFactorRealization]> {
+        self.factor_complex
+            .as_ref()
+            .map(SessionFactorComplex::realizations)
+    }
+
+    pub fn conduct_deposited_factor_current(
+        &self,
+        local_address: &str,
+        input_words: &[u16],
+    ) -> Result<ResidentFactorCurrentReturn, String> {
+        let complex = self
+            .factor_complex
+            .as_ref()
+            .ok_or_else(|| "the product session carries no factor complex".to_owned())?;
+        let local = complex
+            .cover()
+            .locals
+            .iter()
+            .find(|local| local.section.address == local_address)
+            .ok_or_else(|| format!("factor-cover local {local_address} is absent"))?;
+        crate::phoenix::session_factor_complex::conduct_factor_current(
+            &self.readout,
+            local,
+            input_words,
+        )
+        .map_err(|error| error.to_string())
+    }
+
+    /// Enact an exact overlap/holonomy control through this session's resident apparatus without
+    /// depositing the control into the continuing morphology. The distinction keeps experimental
+    /// controls outside the factor cover while proving that both use the same physical owner.
+    pub fn conduct_factor_control(
+        &self,
+        local: &crate::derived_factor_cover::LocalFactorReceipt,
+        input_words: &[u16],
+    ) -> Result<ResidentFactorCurrentReturn, String> {
+        crate::phoenix::session_factor_complex::conduct_factor_current(
+            &self.readout,
+            local,
+            input_words,
+        )
+        .map_err(|error| error.to_string())
+    }
+
+    pub fn ablate_factor_realization(
+        &mut self,
+        address: &str,
+    ) -> Result<FactorMutationReceipt, String> {
+        let receipt = self
+            .factor_complex
+            .as_mut()
+            .ok_or_else(|| "the product session carries no factor complex".to_owned())?
+            .ablate(address)
+            .map_err(|error| error.to_string())?;
+        self.synchronize_factor_complex()?;
+        Ok(receipt)
+    }
+
+    pub fn restore_factor_realization(
+        &mut self,
+        address: &str,
+    ) -> Result<FactorMutationReceipt, String> {
+        let receipt = self
+            .factor_complex
+            .as_mut()
+            .ok_or_else(|| "the product session carries no factor complex".to_owned())?
+            .restore_ablation(address)
+            .map_err(|error| error.to_string())?;
+        self.synchronize_factor_complex()?;
+        Ok(receipt)
+    }
+
+    pub fn withdraw_factor_prefix(
+        &mut self,
+        prefix: usize,
+    ) -> Result<FactorMutationReceipt, String> {
+        let receipt = self
+            .factor_complex
+            .as_mut()
+            .ok_or_else(|| "the product session carries no factor complex".to_owned())?
+            .withdraw_to_prefix(prefix)
+            .map_err(|error| error.to_string())?;
+        self.synchronize_factor_complex()?;
+        Ok(receipt)
+    }
+
+    fn synchronize_factor_complex(&mut self) -> Result<(), String> {
+        let (factor, derivation) = self
+            .factor_complex
+            .as_ref()
+            .ok_or_else(|| "the product session carries no factor complex".to_owned())?
+            .current_factor()
+            .map_err(|error| error.to_string())?;
+        let (u, v) = factor_materials(&factor);
+        self.factor_rank = factor.rank as usize;
+        self.factor = factor;
+        self.u = u;
+        self.v = v;
+        self.derivation = derivation;
+        Ok(())
     }
 
     /// Encode through the authenticated product codec and cross the source address into the
@@ -532,6 +708,18 @@ impl ProductSession {
     pub fn runtime_law(&self) -> &RuntimeLawReceipt {
         &self.runtime_law
     }
+    pub fn current_factor_chart(&self) -> Result<CurrentFactorChart, String> {
+        Ok(CurrentFactorChart {
+            rows: self.factor.rows,
+            columns: self.factor.columns,
+            rank: self.factor.rank,
+            left_exponent: self.factor.left_exponent,
+            right_exponent: self.factor.right_exponent,
+            payload_sha256: MorphologyPayload::AlignedFactor(self.factor.clone())
+                .canonical_digest()
+                .map_err(|error| error.to_string())?,
+        })
+    }
     pub fn body_identity(
         &self,
     ) -> Result<crate::phoenix::continuation::CultivatedBodyIdentity, String> {
@@ -717,13 +905,14 @@ impl ProductSession {
             .product
             .native_morphology()
             .ok_or("native morphology")?;
-        let candidate = streamed::cultivation_overlay::RankOneCandidate::new(
+        let candidate = streamed::cultivation_overlay::FactorizedCandidate::new(
             morphology.left_population.clone(),
             morphology.right_population.clone(),
             streamed::cultivation_overlay::OverlayShape {
                 rows: self.runtime_law.vocabulary_extent as usize,
                 input_width: self.runtime_law.hidden_extent as usize,
             },
+            self.factor_rank,
             receiver_rows,
             testimony(
                 &morphology.left_population,
@@ -912,6 +1101,7 @@ impl ProductSession {
                     .map_err(|error| error.to_string())
             })
             .transpose()?;
+        let factor_complex_identity = self.factor_complex_identity()?;
         let receiver_rows = match receiver {
             streamed::ReceiverOption::Terminal => 1,
             streamed::ReceiverOption::Complete => presentation.received_rows,
@@ -982,7 +1172,8 @@ impl ProductSession {
                         .map(|identity| Some(identity) == continuation_identity)
                         .unwrap_or(false)
                 })
-                .unwrap_or(continuation_identity.is_none());
+                .unwrap_or(continuation_identity.is_none())
+            && self.factor_complex_identity()? == factor_complex_identity;
         let source_access = source_access_audit(&self.product_root);
         let vocabulary_extent = runtime_law.vocabulary_extent as usize;
         let (terminal_rows, top_lower, selected) =
@@ -1016,7 +1207,7 @@ impl ProductSession {
             ));
         }
         let reconstruction_identity =
-            streamed::cultivation_overlay::canonical_rank_derivation_digest(&self.derivation);
+            streamed::cultivation_overlay::canonical_factor_derivation_digest(&self.derivation);
         let codec_identity = self.artifact.descriptor().tokenizer_json_sha256;
         let terminal_position = presentation.received_rows - 1;
         let receipt = RuntimeReceipt {
@@ -1026,6 +1217,8 @@ impl ProductSession {
             morphology_identity,
             codec_companion_identities,
             continuation_identity,
+            factor_complex_identity,
+            factor_rank: self.factor_rank,
             runtime_law: runtime_law.clone(),
             frozen_members_verified: frozen_identity_equal,
             source_access,
@@ -1076,9 +1269,10 @@ impl PreparedProduct<'_> {
             .complex(Some(&self.session.derivation))
             .map_err(|error| format!("authenticated overlay topology: {error}"))?;
         let topology_identity = crate::operation_correspondence::topology_identity(&complex);
-        let rank_receipt_identity = streamed::cultivation_overlay::canonical_rank_derivation_digest(
-            &self.session.derivation,
-        );
+        let rank_receipt_identity =
+            streamed::cultivation_overlay::canonical_factor_derivation_digest(
+                &self.session.derivation,
+            );
         Ok(PreparedOverlayTopology {
             complex,
             topology_identity,
@@ -1274,6 +1468,8 @@ pub struct RuntimeReceipt {
     pub morphology_identity: PredecessorProductIdentity,
     pub codec_companion_identities: Vec<DirectoryCompanion>,
     pub continuation_identity: Option<crate::phoenix::continuation::ContinuationRuntimeIdentity>,
+    pub factor_complex_identity: Option<SessionFactorComplexIdentity>,
+    pub factor_rank: usize,
     pub runtime_law: RuntimeLawReceipt,
     pub frozen_members_verified: bool,
     pub source_access: SourceAccessAudit,
@@ -1347,8 +1543,9 @@ fn factor_runtime(
     (
         AlignedMaterial,
         AlignedMaterial,
-        streamed::cultivation_overlay::RankDerivationReceipt,
+        streamed::cultivation_overlay::FactorDerivationReceipt,
         CultivationDerivation,
+        crate::cultivated_rest::AlignedFactor,
     ),
     String,
 > {
@@ -1478,28 +1675,40 @@ fn factor_runtime(
     {
         return Err("authenticated rank/reconstruction identity does not reconstruct".to_owned());
     }
+    let (u, v) = factor_materials(&factor);
+    Ok((
+        u,
+        v,
+        streamed::cultivation_overlay::FactorDerivationReceipt::RankOne(receipt),
+        derivation,
+        factor,
+    ))
+}
+
+fn factor_materials(
+    factor: &crate::cultivated_rest::AlignedFactor,
+) -> (AlignedMaterial, AlignedMaterial) {
     let octaves = |entries: &[i64]| {
         entries
             .iter()
-            .map(|v| v.unsigned_abs().max(1).ilog2() + 1)
+            .map(|value| value.unsigned_abs().max(1).ilog2() + 1)
             .max()
             .unwrap_or(0)
     };
-    let left = factor.left;
-    let right = factor.right;
-    let u = AlignedMaterial {
-        entries: left.clone(),
-        exponent: factor.left_exponent,
-        entry_octaves: octaves(&left),
-        negatives: left.iter().filter(|v| **v < 0).count() as u64,
-    };
-    let v = AlignedMaterial {
-        entries: right.clone(),
-        exponent: factor.right_exponent,
-        entry_octaves: octaves(&right),
-        negatives: right.iter().filter(|v| **v < 0).count() as u64,
-    };
-    Ok((u, v, receipt, derivation))
+    (
+        AlignedMaterial {
+            entries: factor.left.clone(),
+            exponent: factor.left_exponent,
+            entry_octaves: octaves(&factor.left),
+            negatives: factor.left.iter().filter(|value| **value < 0).count() as u64,
+        },
+        AlignedMaterial {
+            entries: factor.right.clone(),
+            exponent: factor.right_exponent,
+            entry_octaves: octaves(&factor.right),
+            negatives: factor.right.iter().filter(|value| **value < 0).count() as u64,
+        },
+    )
 }
 
 fn rested_bound(product: &CultivatedRest, name: &str) -> Result<u32, String> {

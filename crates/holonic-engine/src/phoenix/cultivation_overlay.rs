@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use crate::causal::EventId;
 use crate::embedding_fiber::{AlignedMaterial, ResidentReadout};
-use crate::exact_linear::ExactRatMatrix;
+use crate::exact_linear::{ExactRankFactorization, ExactRatMatrix};
 use crate::front_passage::{
     AlignedMaterialPlan, CompiledPassage, DeedReceiver, FactorizedContract, FrontPassage,
     FrontPassageObstruction, MaterialAdmission, ReEntry, ResidentMaterial, ResidentRealization,
@@ -33,6 +33,7 @@ use crate::resident_section::{ResidentGrain, ResidentSection, ResidentSurface};
 use crate::source_occurrence::OccurrenceWitness;
 use num_traits::Zero;
 use relational_geometry::Rat;
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 const FACTORIZED_LAW: &str = "phoenix.overlay.factorized-contract";
@@ -57,8 +58,8 @@ pub struct OverlayShape {
 }
 
 impl OverlayShape {
-    pub fn factor_shapes(self) -> ([usize; 2], [usize; 2]) {
-        ([self.rows, 1], [1, self.input_width])
+    pub fn factor_shapes(self, rank: usize) -> ([usize; 2], [usize; 2]) {
+        ([self.rows, rank], [rank, self.input_width])
     }
 }
 
@@ -90,7 +91,7 @@ impl OverlayTestimony {
 }
 
 /// A sparse exact factor. Entries outside `support` do not exist and are therefore exact zero.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SupportedFactor {
     pub ambient: usize,
     pub support: Vec<usize>,
@@ -98,7 +99,7 @@ pub struct SupportedFactor {
 }
 
 /// A sparse exact defect chart. Only the supported row/column rectangle is materialized.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SparseDefect {
     pub ambient_rows: usize,
     pub ambient_columns: usize,
@@ -108,7 +109,7 @@ pub struct SparseDefect {
 }
 
 /// The structured receiver which separates the lower-rank foil from the candidate.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SeparatingReceiver {
     pub target: (usize, usize),
     pub predecessor: Rat,
@@ -125,6 +126,24 @@ pub struct RankDerivationReceipt {
     pub right: SupportedFactor,
     pub zero_rank_foil: SparseDefect,
     pub separator: SeparatingReceiver,
+}
+
+/// A higher-rank exact factorization returned by the defect itself.  The image cardinality in
+/// `factorization` is the only admitted junction extent; no caller rank is stored beside it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DerivedRankDerivationReceipt {
+    pub defect: SparseDefect,
+    pub factorization: ExactRankFactorization,
+    pub zero_rank_foil: SparseDefect,
+    pub separator: SeparatingReceiver,
+}
+
+/// One derivation face for the same factorized law.  The rank-one arm preserves the authenticated
+/// W3 product receipt byte-for-byte; the derived arm carries the complete exact image basis.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum FactorDerivationReceipt {
+    RankOne(RankDerivationReceipt),
+    Derived(DerivedRankDerivationReceipt),
 }
 
 /// Canonical bytes for the complete sparse rank return. This is the one representation shared by
@@ -183,6 +202,25 @@ pub fn canonical_rank_derivation_digest(receipt: &RankDerivationReceipt) -> Stri
         "{:x}",
         Sha256::digest(canonical_rank_derivation_bytes(receipt))
     )
+}
+
+pub fn canonical_factor_derivation_digest(receipt: &FactorDerivationReceipt) -> String {
+    match receipt {
+        FactorDerivationReceipt::RankOne(receipt) => canonical_rank_derivation_digest(receipt),
+        FactorDerivationReceipt::Derived(receipt) => {
+            let bytes = serde_json::to_vec(&(
+                "holonic-engine.phoenix.derived-rank-derivation.v1",
+                &receipt.defect,
+                &receipt.factorization,
+                &receipt.zero_rank_foil,
+                &receipt.separator.target,
+                receipt.separator.predecessor.to_string(),
+                receipt.separator.candidate.to_string(),
+            ))
+            .expect("exact derived-rank receipt is serializable");
+            format!("{:x}", Sha256::digest(bytes))
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -300,6 +338,82 @@ impl RankDerivationReceipt {
     }
 }
 
+impl DerivedRankDerivationReceipt {
+    fn validate(&self, shape: OverlayShape, rank: usize) -> Result<(), CandidateRefusal> {
+        if rank == 0
+            || self.defect.ambient_rows != shape.rows
+            || self.defect.ambient_columns != shape.input_width
+            || !valid_support(self.defect.ambient_rows, &self.defect.support_rows)
+            || !valid_support(self.defect.ambient_columns, &self.defect.support_columns)
+            || self.defect.supported.rows() != self.defect.support_rows.len()
+            || self.defect.supported.columns() != self.defect.support_columns.len()
+        {
+            return Err(CandidateRefusal::DefectShape);
+        }
+        if self.factorization.rows != self.defect.supported.rows()
+            || self.factorization.columns != self.defect.supported.columns()
+            || self.factorization.derived_rank != rank
+            || self.factorization.reconstruction != self.defect.supported
+            || self
+                .factorization
+                .left
+                .multiply(&self.factorization.right)
+                .map_err(|error| CandidateRefusal::ExactLinear(error.to_string()))?
+                != self.defect.supported
+        {
+            return Err(CandidateRefusal::ReconstructionMismatch);
+        }
+        if self.zero_rank_foil.ambient_rows != self.defect.ambient_rows
+            || self.zero_rank_foil.ambient_columns != self.defect.ambient_columns
+            || self.zero_rank_foil.support_rows != self.defect.support_rows
+            || self.zero_rank_foil.support_columns != self.defect.support_columns
+            || self
+                .zero_rank_foil
+                .supported
+                .entries()
+                .iter()
+                .any(|entry| !entry.is_zero())
+        {
+            return Err(CandidateRefusal::ZeroRankFoilNotZero);
+        }
+        let (target_row, target_column) = self.separator.target;
+        let row = self
+            .defect
+            .support_rows
+            .iter()
+            .position(|row| *row == target_row)
+            .ok_or(CandidateRefusal::ZeroRankFoilNotSeparated)?;
+        let column = self
+            .defect
+            .support_columns
+            .iter()
+            .position(|column| *column == target_column)
+            .ok_or(CandidateRefusal::ZeroRankFoilNotSeparated)?;
+        let candidate = self
+            .defect
+            .supported
+            .get(row, column)
+            .map_err(|error| CandidateRefusal::ExactLinear(error.to_string()))?;
+        if !self.separator.predecessor.is_zero()
+            || self.separator.candidate != *candidate
+            || candidate.is_zero()
+        {
+            return Err(CandidateRefusal::ZeroRankFoilNotSeparated);
+        }
+        Ok(())
+    }
+}
+
+impl FactorDerivationReceipt {
+    fn validate(&self, shape: OverlayShape, rank: usize) -> Result<(), CandidateRefusal> {
+        match self {
+            Self::RankOne(receipt) if rank == 1 => receipt.validate(shape),
+            Self::RankOne(_) => Err(CandidateRefusal::DefectRank { rank: 1 }),
+            Self::Derived(receipt) => receipt.validate(shape, rank),
+        }
+    }
+}
+
 fn valid_support(ambient: usize, support: &[usize]) -> bool {
     support.iter().all(|index| *index < ambient) && support.windows(2).all(|pair| pair[0] < pair[1])
 }
@@ -313,23 +427,25 @@ impl SupportedFactor {
     }
 }
 
-/// A rank-one candidate morphology. It is not cultivation until a valid derivation receipt,
+/// A factorized candidate morphology. It is not cultivation until a valid derivation receipt,
 /// authenticated witness, detached remount, changed successor conduct, and ablation return exist.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RankOneCandidate {
+pub struct FactorizedCandidate {
     pub u_population: String,
     pub v_population: String,
     pub shape: OverlayShape,
+    pub rank: usize,
     pub terminal_rows: usize,
     pub ports: OverlayPorts,
     pub testimony: OverlayTestimony,
 }
 
-impl RankOneCandidate {
+impl FactorizedCandidate {
     pub fn new(
         u_population: impl Into<String>,
         v_population: impl Into<String>,
         shape: OverlayShape,
+        rank: usize,
         terminal_rows: usize,
         testimony: OverlayTestimony,
     ) -> Self {
@@ -337,6 +453,7 @@ impl RankOneCandidate {
             u_population: u_population.into(),
             v_population: v_population.into(),
             shape,
+            rank,
             terminal_rows,
             testimony,
             ports: OverlayPorts {
@@ -353,8 +470,8 @@ impl RankOneCandidate {
     /// before either `ResidentReadout::mount` call.
     pub fn aligned_material_plan(&self) -> AlignedMaterialPlan {
         AlignedMaterialPlan::maps(vec![
-            (self.u_population.clone(), self.shape.rows, 1),
-            (self.v_population.clone(), 1, self.shape.input_width),
+            (self.u_population.clone(), self.shape.rows, self.rank),
+            (self.v_population.clone(), self.rank, self.shape.input_width),
         ])
     }
 
@@ -371,19 +488,23 @@ impl RankOneCandidate {
     /// Build the typed operation complex. No realization or launch is performed here.
     pub fn complex(
         &self,
-        receipt: Option<&RankDerivationReceipt>,
+        receipt: Option<&FactorDerivationReceipt>,
     ) -> Result<(PortedOperationComplex, OverlayEvents), CandidateRefusal> {
         let Some(receipt) = receipt else {
             return Err(CandidateRefusal::MissingRankReceipt);
         };
-        receipt.validate(self.shape)?;
+        receipt.validate(self.shape, self.rank)?;
         if let Some(operation) = self.testimony.missing_operation() {
             return Err(CandidateRefusal::MissingTestimony { operation });
         }
-        if self.shape.rows == 0 || self.shape.input_width == 0 || self.terminal_rows == 0 {
+        if self.shape.rows == 0
+            || self.shape.input_width == 0
+            || self.rank == 0
+            || self.terminal_rows == 0
+        {
             return Err(CandidateRefusal::FactorShape);
         }
-        let mut complex = PortedOperationComplex::new("phoenix.rank-one-cultivation-overlay");
+        let mut complex = PortedOperationComplex::new("phoenix.factorized-cultivation-overlay");
         let input = complex.port(self.ports.input.clone());
         let predecessor_output = complex.port(self.ports.predecessor_output.clone());
         let terminal_input = complex.port("phoenix.overlay/terminal-input");
@@ -516,7 +637,7 @@ impl RankOneCandidate {
         predecessor_name: &str,
         input_bound: u32,
         grain: ResidentGrain,
-        receipt: Option<&RankDerivationReceipt>,
+        receipt: Option<&FactorDerivationReceipt>,
     ) -> Result<OverlayPassage<'chart>, FrontPassageObstruction> {
         let (complex, events) = self.complex(receipt).map_err(|reason| {
             FrontPassageObstruction::Compile(crate::front_passage::CompileRefusal::Shape(
@@ -548,7 +669,7 @@ impl RankOneCandidate {
             FactorizedContract {
                 u_population: self.u_population.clone(),
                 v_population: self.v_population.clone(),
-                rank: 1,
+                rank: self.rank,
             },
         );
         realization.bind(events.re_entry, ReEntry);
@@ -643,7 +764,7 @@ pub fn carry_standing<'chart>(
         .insert(name.into(), (Rc::new(section), bound_octaves));
 }
 
-/// Extent receipt used before binding: it proves the rank-one factors match the declared defect.
+/// Extent receipt used before binding: it proves the factors match the declared defect.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OverlayExtentReceipt {
     pub u_rows: usize,
@@ -658,7 +779,7 @@ pub struct OverlayExtentReceipt {
 }
 
 pub fn inspect_extents(
-    factors: &RankOneCandidate,
+    factors: &FactorizedCandidate,
     material: &ResidentMaterial<'_>,
 ) -> Result<OverlayExtentReceipt, String> {
     let u = material
@@ -679,10 +800,10 @@ pub fn inspect_extents(
                 factors.v_population
             )
         })?;
-    if (u.readout.rows(), u.readout.width()) != (factors.shape.rows, 1)
-        || (v.readout.rows(), v.readout.width()) != (1, factors.shape.input_width)
+    if (u.readout.rows(), u.readout.width()) != (factors.shape.rows, factors.rank)
+        || (v.readout.rows(), v.readout.width()) != (factors.rank, factors.shape.input_width)
     {
-        return Err("rank-one factors have incompatible extents".to_owned());
+        return Err("derived-rank factors have incompatible extents".to_owned());
     }
     Ok(OverlayExtentReceipt {
         u_rows: u.readout.rows(),
@@ -692,7 +813,7 @@ pub fn inspect_extents(
         predecessor_is_read_only: true,
         delta_rows: factors.terminal_rows,
         delta_width: factors.shape.rows,
-        rank: 1,
+        rank: factors.rank,
     })
 }
 

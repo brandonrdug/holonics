@@ -21,8 +21,8 @@ use num_bigint::BigUint;
 use super::{Circulated, cultivation_overlay};
 
 pub struct CultivationRequest<'a> {
-    pub candidate: &'a cultivation_overlay::RankOneCandidate,
-    pub derivation: &'a cultivation_overlay::RankDerivationReceipt,
+    pub candidate: &'a cultivation_overlay::FactorizedCandidate,
+    pub derivation: &'a cultivation_overlay::FactorDerivationReceipt,
     pub u: &'a AlignedMaterial,
     pub v: &'a AlignedMaterial,
     pub witness: &'a dyn OccurrenceWitness,
@@ -166,11 +166,11 @@ pub(crate) fn prepare<'chart>(
             (
                 request.candidate.u_population.clone(),
                 request.candidate.shape.rows,
-                1,
+                request.candidate.rank,
             ),
             (
                 request.candidate.v_population.clone(),
-                1,
+                request.candidate.rank,
                 request.candidate.shape.input_width,
             ),
         ]));
@@ -189,14 +189,14 @@ pub(crate) fn prepare<'chart>(
         request.candidate.u_population.clone(),
         request.u,
         request.candidate.shape.rows,
-        1,
+        request.candidate.rank,
     )?;
     cultivation_overlay::mount_factor(
         readout,
         &mut candidate_material,
         request.candidate.v_population.clone(),
         request.v,
-        1,
+        request.candidate.rank,
         request.candidate.shape.input_width,
     )?;
     cultivation_overlay::inspect_extents(request.candidate, &candidate_material)?;
@@ -305,13 +305,13 @@ pub(crate) fn predict_overlay<'chart>(
             withdrawn.needed,
             &u.readout,
             &v.readout,
-            1,
+            request.candidate.rank,
         )
         .map_err(|error| format!("overlay factorized prediction: {error}"))?;
     let factorized_output_bound = FactorizedContract {
         u_population: request.candidate.u_population.clone(),
         v_population: request.candidate.v_population.clone(),
-        rank: 1,
+        rank: request.candidate.rank,
     }
     .output_word_octaves(request.input_bound, material);
     let re_entry = surface
@@ -368,8 +368,8 @@ pub(crate) fn digest_complex(
     Ok(format!("{:x}", hasher.finalize()))
 }
 
-pub(crate) fn digest_derivation(receipt: &cultivation_overlay::RankDerivationReceipt) -> String {
-    cultivation_overlay::canonical_rank_derivation_digest(receipt)
+pub(crate) fn digest_derivation(receipt: &cultivation_overlay::FactorDerivationReceipt) -> String {
+    cultivation_overlay::canonical_factor_derivation_digest(receipt)
 }
 
 pub(crate) fn digest_face(

@@ -23,8 +23,8 @@ use relational_geometry::Rat;
 use sha2::{Digest, Sha256};
 
 use super::streamed::cultivation_overlay::{
-    OverlayShape, OverlayTestimony, RankDerivationReceipt, RankOneCandidate, SeparatingReceiver,
-    SparseDefect, SupportedFactor,
+    FactorizedCandidate, OverlayShape, OverlayTestimony, RankDerivationReceipt,
+    SeparatingReceiver, SparseDefect, SupportedFactor,
 };
 use super::{streamed, tower, w3_fixture};
 
@@ -341,11 +341,12 @@ fn overlay_receipt(derivation: &CultivationDerivation) -> Result<RankDerivationR
     })
 }
 
-pub fn candidate(shape: OverlayShape, terminal_rows: usize) -> RankOneCandidate {
-    RankOneCandidate::new(
+pub fn candidate(shape: OverlayShape, terminal_rows: usize) -> FactorizedCandidate {
+    FactorizedCandidate::new(
         LEFT_POPULATION,
         RIGHT_POPULATION,
         shape,
+        1,
         terminal_rows,
         testimony(),
     )

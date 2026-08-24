@@ -42,7 +42,8 @@ use cultivation_material::{
 };
 use native_streamed::NativeMaterialSource;
 use streamed::cultivation_overlay::{
-    RankDerivationReceipt, SeparatingReceiver, SparseDefect, SupportedFactor,
+    FactorDerivationReceipt, RankDerivationReceipt, SeparatingReceiver, SparseDefect,
+    SupportedFactor,
 };
 
 const W1: &str = "output/the_whole_foreign_map_crosses_into_native_rest/gemma_native_rest.bin";
@@ -358,6 +359,7 @@ fn child(
         return Err("no-op address does not equal development address".to_owned());
     }
     let witness = &mounted.morphology;
+    let factor_receipt = FactorDerivationReceipt::RankOne(receipt.clone());
     let mut cultivated_runs = Vec::new();
     for arm in [
         MaterialArm::Development,
@@ -375,7 +377,7 @@ fn child(
         );
         let request = streamed::CultivationRequest {
             candidate: &candidate,
-            derivation: &receipt,
+            derivation: &factor_receipt,
             u: &u,
             v: &v,
             witness,

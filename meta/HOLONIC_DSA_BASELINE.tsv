@@ -141,7 +141,8 @@ crates/holonic-engine/src/phoenix/native_streamed.rs	.clone()=1	.collect()=2	Vec
 crates/holonic-engine/src/phoenix/recurrent.rs	.clone()=21	.collect()=13	.flat_map()=1	BTreeMap=5	BTreeSet=4	Vec=28
 crates/holonic-engine/src/phoenix/recurrent_condensation.rs	.clone()=8	.collect()=5	BTreeSet=2	Vec=16
 crates/holonic-engine/src/phoenix/recurrent_return.rs	.clone()=9	.collect()=7	Vec=19
-crates/holonic-engine/src/phoenix/runtime.rs	.clone()=35	.collect()=28	.flat_map()=2	.into_iter()=2	BTreeSet=3	Vec=46
+crates/holonic-engine/src/phoenix/runtime.rs	.clone()=38	.collect()=28	.flat_map()=2	.into_iter()=2	BTreeSet=3	Vec=48
+crates/holonic-engine/src/phoenix/session_factor_complex.rs	.clone()=14	.collect()=13	.into_iter()=2	BTreeMap=3	BTreeSet=8	Vec=18
 crates/holonic-engine/src/phoenix/site.rs	.clone()=8	BTreeMap=2	Vec=6
 crates/holonic-engine/src/phoenix/streamed.rs	.clone()=38	.collect()=7	.flat_map()=2	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=66
 crates/holonic-engine/src/phoenix/streamed_cultivation.rs	.clone()=9	BTreeMap=2	Vec=4

@@ -4,13 +4,13 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-24 after the receiver-history congruence, sealed-candidate/later-return, and
-derived-rank local-factor-cover stations passed; same-body factor deposition is now the sole
-construction frontier.
+**Currency:** 2026-08-24 after the receiver-history congruence, sealed-candidate/later-return,
+derived-rank local-factor-cover and same-body factor-complex stations passed; receiver-history
+condensation and the source-detached Athena-alpha return are now the sole construction frontier.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE FACTOR COMPLEX MUST CHANGE THE SAME BODY.**
+**CURRENT FRONTIER — THE RECEIVER-HISTORY QUOTIENT MUST CONDENSE AND ATHENA ALPHA MUST SPEAK.**
 
 [counterexample; implemented-exact] The former alpha path assigns semantic roles from prompt-hash
 equality, uses a three-codeword state and two-codeword-overlap traversal, exposes recorded sibling
@@ -77,11 +77,30 @@ chronology/orientation, declared connection transport and holonomy laws, generat
 naturality, complete reconstruction fibre, richer-receiver reopening, and associator preservation
 now compose without `sorryAx`.
 
-[open] The sole next deed is **the factor complex changes the same body**. Deposit admitted factors
-into the one non-cloned `ProductSession`, remove the separate copied generator surface, and return
-multiple later language/mathematical/optical/acoustic consequences with matched siblings, targeted
-ablation, exact ordered withdrawal, revisit holonomy and lawful interchange. No condensation or
-alpha rest is authorized until same-body causal change stands.
+[established-bounded; implemented-exact; measured] The same-body factor-complex station passed
+under artifact identity `da9d35f80387ee532153fed774d77ba172ba1917115e23663a4c429f89c7c8e0`.
+One non-cloned `ProductSession` retained the twenty-atom returned cover, realized four atoms as two
+strictly separated target families, retained sixteen open atoms, and derived contemporary rank
+three without a caller rank. Four matched lineages changed only the two realized vocabulary rows;
+laboratory, mathematical, optical and acoustic currents crossed all four local sections exactly on
+the RTX 4080 SUPER and were coarse-invisible but graded-visible. Targeted ablation, restoration,
+ordered suffix withdrawal, path-ordered holonomy and disjoint interchange returned. Complete
+withdrawal recovered the same predecessor factor object and a fresh GPU receiver recovered the
+identical hidden section and complete terminal potential.
+
+[proved-derived] The returned word controls expose the next compression law: inverse adjacent
+passages may annihilate only with both identity compositions and complete receiver-history
+factorization; independent crossings may exchange only through exact interchange; and a loop may
+contract only with trivial holonomy and no escaping requested consequence. Nontrivial loop return
+remains curvature and transports under rebase. The final condensation must apply this qualified
+unknotting law through existing owners rather than found a graph optimizer.
+
+[open] The sole next deed is **the receiver-history quotient condenses and Athena alpha speaks**.
+Freeze one canonical native rest from this cultivated ecology through exact receiver-history
+factorization, remount without source material, and return inspected conversation,
+holonics/mathematics, optical mathematical and raw acoustic currents through the existing
+inference membrane with the complete quotient, fibres, separators, factor atlas, overlap nerve,
+holonomy, ablations, withdrawal, source audit, exact work and separate apparatus telemetry.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

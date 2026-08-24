@@ -4,7 +4,7 @@
 # Regenerate: python3 tools/output_manifest.py
 # Verify:     python3 tools/output_manifest.py --check
 # Listing:    python3 tools/output_manifest.py --files
-# 164 drivers, 22364 returns, 61104633710 bytes.
+# 165 drivers, 22376 returns, 61104703605 bytes.
 sha256	returns	bytes	driver
 855279871852bffe08c83a0e50006b769da3b296934115faa809561b7cbdd304	7	1274	output/agentic-research-kernel
 b90b799580f0c51bd6ffe0009fc0fcd9eb9f20feb54972ca44ad4297b6252430	8	46304	output/analytic-field-transport
@@ -109,6 +109,7 @@ d46dddb154161da4af8888244372afb3e425ecb9b1c465850158cd4d6a338f8e	4	166577	output
 13ef0c87f4a987e48a1e74cbbbb93af54375993d7ddb73b871262c11f1903e78	20	12542680	output/the_exchange_return_cultivates_athena_gemma
 af047f8dfe53dfb595ad28c32576aa8c9ff779d6bc7a473dd7742904826466f4	6	265137360	output/the_exchange_world_tube_retains_its_branches
 81e79e7357e85ca164d1739c579a3acf2460f758f152408aa52f539c6e0298a9	16	36104	output/the_exterior_return_changes_the_later_current
+b3e112fecc43986932c3b649ae00d7e46c1bc30b59f2259c8e8caedfa1a69f7e	12	69895	output/the_factor_complex_changes_the_same_body
 d486cc1b6bd951dda0215916a6585ed8088d71930a6a8f15a3df6aae4d386edb	15	5090994	output/the_full_tower_emanates_through_an_addressed_continuation
 52bbb5ba39bc33b6143a0cd54eea3d5806c692634e6638327598d298ca89e8dd	16	1172626	output/the_heterogeneous_ports_found_one_shared_phoenix_ecology
 e0d3095e9ba5e7d285768a767995c7a6d2d5845286c3607fafe7adcdb6c49ca2	12	36999	output/the_inference_membrane_serves_the_native_body
