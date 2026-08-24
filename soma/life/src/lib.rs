@@ -11,6 +11,10 @@ pub mod algorithmic_material;
 /// proper continuation generators. The developmental world owns the source passages; this owner
 /// returns only parented local morphology and its open reconstruction fibres.
 pub mod athena_alpha;
+// Athena alpha's corrected native state: a receiver/history quotient of addressed causal
+// sections. The superseded trigram condensation remains isolated in `athena_alpha` as a measured
+// counterexample fixture; this owner never imports its global partition or token-window law.
+pub mod athena_receiver_history;
 pub mod atlas_cultivation;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
