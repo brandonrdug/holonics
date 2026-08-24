@@ -9,13 +9,14 @@ actual vorticity field, proves cancellation of vorticity transport by an incompr
 velocity, and returns the forced enstrophy equality from an explicitly typed pointwise vorticity
 balance.
 
-The pointwise balance is kept as a visible port rather than silently inferred from the momentum
-equation: completing that attachment requires the mixed space--time curl commutation and the
-spatial curl--Laplacian commutation.  Once that port is supplied, all remaining analytic work in
-the periodic enstrophy identity is discharged here from compact positive-time smoothness.  The
-three-dimensional stretching integral remains in the equality.  Under nonnegative viscosity, an
-exact final equivalence says that nonincrease occurs precisely when the `nu D` term absorbs
-stretching plus curl-forcing work; no estimate asserting that absorption is introduced.
+The pointwise balance is kept here as a visible typed port.  The successor module
+`NavierStokesCurlCommutation` fills it directly from the official momentum equation by proving the
+mixed space--time curl and spatial curl--Laplacian commutation squares.  Once that port is supplied,
+all remaining analytic work in the periodic enstrophy identity is discharged here from compact
+positive-time smoothness.  The three-dimensional stretching integral remains in the equality.
+Under nonnegative viscosity, an exact final equivalence says that nonincrease occurs precisely when
+the `nu D` term absorbs stretching plus curl-forcing work; no estimate asserting that absorption is
+introduced.
 -/
 
 noncomputable section
@@ -465,11 +466,12 @@ theorem periodicSolution_hasDerivAt_periodicEnstrophy_eq_timeWork
 
 /-! ## The vorticity equation port and its integrated consequence -/
 
-/-- The exact curled-momentum receipt at a fixed time, before expanding the nonlinear curl.  This
-is the missing linear attachment from the official momentum equation: its left time-curl square
-requires mixed space--time derivative symmetry, and its viscous square requires curl to commute
-with the vector Laplacian.  The nonlinear square is *not* assumed here; it is composed from the
-existing `smoothSolution_vorticityAt_advection` theorem below, where stretching is derived. -/
+/-- The exact curled-momentum receipt at a fixed time, before expanding the nonlinear curl.  Its
+left time-curl square requires mixed space--time derivative symmetry, and its viscous square
+requires curl to commute with the vector Laplacian.  `NavierStokesCurlCommutation` derives both and
+constructs this receipt from `SmoothSolution`.  The nonlinear square is *not* assumed here; it is
+composed from the existing `smoothSolution_vorticityAt_advection` theorem below, where stretching
+is derived. -/
 structure HasPointwiseVorticityBalanceAt
     (nu : ℝ) (force velocity : VelocityField) (t : ℝ) : Prop where
   /-- `C²` admission makes the totalized force curl an actual continuous spatial derivative and

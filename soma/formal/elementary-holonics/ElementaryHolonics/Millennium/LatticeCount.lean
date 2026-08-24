@@ -13,7 +13,7 @@ import Mathlib.NumberTheory.LegendreSymbol.QuadraticReciprocity
 
 ```text
 Λ_p(1)/√p  =  (Ω√2/π) · c_p²          c_p ∈ {1, 3, 5, 7}, always ODD
-2·(b/2 − a) = Σ (−1)^z  over  2x² + y² + 2³z² = p      = ±2²·c_p
+2·(a − b/2) = Σ (−1)^z  over  2x² + y² + 2³z² = p      = ±2²·c_p
 ```
 
 where `a`, `b` are the two Tunnell ternary counts and `a` is exactly the `b`-population
