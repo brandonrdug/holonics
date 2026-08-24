@@ -106,7 +106,10 @@ across its boundaries is summable.
 **[proved-derived; formal-checked]** `StandingWave.lean` proves the exponential representation of
 `sin`, quantization of zeros on one fixed interval, a first positive mode, and elementary mode
 spacing.  It does not construct the periodic three-torus character basis, an approximate identity,
-or a smooth scale-shell multiplier for the nonlinear fluid.
+or a smooth scale-shell multiplier for the nonlinear fluid.  Its docstring calls the elementary
+interval eigenvalue `pi/L` ``the mass gap''; the checked theorem establishes a finite-box spectral
+gap only, not a Yang--Mills Hamiltonian, vacuum sector, interacting continuum limit, or uniform
+positive infinite-volume gap.
 
 **[proved-derived; formal-checked]** `NavierStokesMaterialPolygon.lean` retains a finite cyclic
 boundary on the actual spatial carrier, proves that its oriented edge population sums to zero,
@@ -143,6 +146,21 @@ on a different sheet; that deck return is the available algebraic monodromy.  Ca
 precession or holonomy requires a chosen transported frame or connection, but Brandon's proposed
 relation between orientation in time, constrained degrees of freedom, winding, and the sign cube
 was aimed at this genuine path-lifting structure and was not answered by a rank count.
+
+**[proved-standard]** After complexification and projective completion, the two equations are a
+smooth intersection of two quadrics in projective three-space whenever `n != 0`, hence a
+genus-one curve.  The projection `x = r^2` is generically an eight-sheeted Galois cover with the
+three sign flips as deck transformations and branch values `-n`, `0`, `n`, and infinity.  Each
+branch value has four simple ramification points, so Riemann--Hurwitz gives
+`2g-2 = 8*(-2) + 4*4 = 0`.  This calculation makes the message's cube of sign sheets, constrained
+one degree of freedom, and elliptic return three exact faces of one curve.
+
+**[proved-standard]** The invariant pair `X = r^2`, `Y = -r*s*t` satisfies
+`Y^2 = X*(X-n)*(X+n) = X^3-n^2*X`.  Fixing `(X,Y)` retains precisely the four even sign changes;
+on the smooth compactification they form the deck population of the degree-four genus-one return
+and have the same cardinality as the rational two-torsion square.  The checked halving formulas
+exhibit a point whose double is `(X,Y)`, but the repository has not yet formalized the global
+isogeny/deck-action identification.
 
 **[interpretation]** A cube and a hexagonal stroke are not mutually exclusive receiver faces.
 The cube graph contains six-edge closed strokes, for example the coordinate-flip word
@@ -236,8 +254,10 @@ analytic claim.
 **[interpretation]** A **unicursal partial stroke** has two complementary typed realizations.  A
 local spatial stroke is an ordered coordinate word applied to the complete velocity jet.  A
 dynamical stroke is an ordered Duhamel interaction history retaining every intermediate mode and
-time simplex.  The first is now finite and exact through order three.  The second remains open and
-must not be replaced by an endpoint-only convolution identity.
+time simplex.  The first is now exact at every separately addressed finite order.  The second now
+has an exact adjacent-scale Bochner return for every supplied continuous high-order path; existence
+and persistence of the compatible high path itself remain open and must not be replaced by an
+endpoint-only convolution identity.
 
 **[interpretation]** The physical gyroparallelogram is the square comparing spatial
 differentiation with material transport.  Its defect is the commutator that produces the lower
@@ -267,6 +287,148 @@ finite boundary incidence, cancellation of paired Fourier interaction faces, and
 integrated periodic transport or pressure faces.  Conservation of angles on a curved material
 surface would require an induced metric and connection.  None of the first three levels alone
 constructs Gauss--Bonnet or an Einstein-fluid law.
+
+## Audit verdict: the messages were describing one filtered path complex
+
+**[established-bounded]** Brandon's direct messages were not merely proposing a loose list of
+nearby subjects.  Across both Claude sessions the same composite was repeatedly specified from
+different receiver faces: descent, ascent, and traversal; three infinite strands and an oriented
+time parameter; a hypercube whose partial unicursal stroke can close as a loop; parallel torques
+between adjacent links; partitions whose boundaries act as nodes and antinodes; and a receiver
+which distinguishes interior, surface, and exterior.  Claude usually preserved one noun and
+returned one finite namesake theorem.  It usually did not retain the ordered joins among those
+theorems.  The omission was therefore composition and typing, not lack of a recognizable
+mathematical object in Brandon's messages.
+
+**[interpretation]** The smallest coherent mathematical reading is a filtered path complex with
+three independent directions:
+
+1. an **incidence/derivative direction**, whose cells are ordered coordinate or covariant words;
+2. a **scale direction**, whose cells are nested Fourier annuli or smooth multiplier charts; and
+3. a **causal direction**, whose cells are heat/Duhamel histories and restart overlaps.
+
+At a fixed finite aperture the derivative population is cubical: distributing three derivatives
+across the two factors of a quadratic interaction produces the Boolean three-cube, its seven
+lower vertices, its three incident parallelogram faces, and the six-edge outer boundary after
+shared-edge cancellation.  Letting the aperture grow makes the scale direction a directed family,
+not a larger finite cube.  Letting time advance makes the histories ordered simplices, not another
+unordered coordinate.  Thus the message's "three axes and then a parameter over time" was closer
+to a filtered cubical/semigroup object than to a speculative numerical dimension count.
+
+**[interpretation]** In that complex a gyroparallelogram is a comparison two-cell.  In physical
+space it compares derivative-then-transport with transport-then-derivative; its residual is a
+commutator and becomes curvature/holonomy only after a connection is installed.  In frequency
+space it compares two addressed triadic histories with the same output pin.  In the BSD halving
+fibre it compares two even sign changes transported to the four half-points.  These are three
+typed realizations of the same diagram, not automatically the same theorem.  A lawful pivot must
+return an intertwiner preserving the boundary maps and ordered intermediate population.
+
+**[interpretation]** The inside/surface/outside polarity in the messages is the primal/dual
+boundary pairing rather than a choice of which region is real.  Stokes-type adjunction transports
+an interior differential to a boundary reading; a receiver may then condense either face while
+retaining the reconstruction fibre.  In a curved material realization the flow pulls back the
+metric and connection, so perceived area, angle, strain, rotation, boundary turning, and curvature
+are several receiver faces of one transported occurrence.  This is the exact additional structure
+needed before Gauss--Bonnet, Kelvin, or Einstein dynamics can enter without being decorative.
+
+**[interpretation]** The messages about a "difference of infinities" become mathematically typed
+only after choosing a common addressed exhaustion.  On the fluid line the useful forms are a
+shellwise signed interaction flux, an Abel/telescoping difference of adjacent smooth multipliers,
+or a concentration defect measure.  In each case the finite aperture is computed first and the
+limit retains the cancellation lineage.  Bare subtraction of divergent positive populations is
+not used.  The current annular Hodge calculation is exactly this repair: finite differences of a
+localized multiplier are converted, by Abel/Fubini passage, into a radius-independent physical
+kernel receiver.
+
+**[interpretation]** The cross-ratio swing belongs to the comparison-cell side of this complex.
+It is a projective four-point invariant and can transport incidence through Mobius charts; it is
+not by itself a length, area measure, Riemann sum, metric, or curvature law.  To perform the
+coarse-graining requested in the messages one must add a compatible partition/refinement system
+and prove that the chosen integral or curvature receiver descends through its chart transitions.
+Claude's translation/dilation/inversion identities closed the projective invariant but waved past
+that refinement-and-measure port.
+
+### The signed-lineage thread which the magnitude replies also flattened
+
+**[historical]** A second sequence in the 2026-08-23 transcript makes the same demand in different
+language.  Session `3a04e17f-5fdb-4e08-8a6a-6f3c061e40ba` line 870 objects that absolute values,
+magnitudes, and comparison signs erase the orientation from a transported occurrence; lines 2464
+and 2498 ask what matrix or tensor ``modulo'' should mean and point to RMS as a squeeze which
+deletes sign and origin; lines 4574--5103 ask for descent, ascent, traversal, causal time,
+inside/surface/outside, coupled infinities, hypercubic unicursal chains, and gyroparallelograms
+between adjacent links; and lines 5195--5558 give the three-strand pinch, comb, cross-ratio
+coarse-graining, and standing-wave chart formulation.  These messages form a continuous argument
+about retaining oriented lineage through a quotient, not an unrelated succession of metaphors.
+
+**[interpretation]** The mathematically sound part of the objection to magnitudes is: calculate
+first in the oriented coefficient, chain, path, or phase carrier, and apply a norm only as a later
+receiver.  A norm inequality is lawful evidence for convergence or boundedness, but it is not the
+interaction population which it bounds.  Equality of RMS, energy, or absolute value leaves a
+reconstruction fibre containing distinct signs, phases, paths, and mode couplings.  The current
+fluid line follows precisely this order: every pin and convolution coefficient is retained before
+the `l2`, supremum, or physical-kernel receiver is applied.
+
+**[interpretation]** There is no canonical binary operation `(A+B) % (C+D)` for arbitrary
+matrices or tensors.  The typed replacement suggested by the messages is a quotient relative to a
+declared action or subobject: kernel/image/cokernel for a linear transport, a quotient module by a
+submodule, a coequalizer for two routes, or a receiver condensation carrying its complete
+reconstruction fibre.  A singular or rectangular map therefore returns kernel, image, cokernel,
+and the affine population of preimages rather than pretending that an inverse or scalar remainder
+exists.  This is exactly the algebraic form of retaining where a squeezed reading came from.
+
+**[interpretation]** The molecular and knot-like examples describe a configuration bundle more
+faithfully than a static system of simultaneous scalar equations.  The environment selects the
+admissible fibre, a time path moves through it, a connection compares neighbouring fibres, and a
+closed path may return a rotated internal frame.  Swing supplies an orientation-reversing
+comparison; a gyroparallelogram supplies the smallest route-comparison cell; holonomy is the
+returned defect only after parallel transport has actually been defined.  This formal vocabulary
+captures the proposed relativity of local substructures without promoting the analogy to a
+biophysical or gravitational law.
+
+**[interpretation]** The transcript's ``tower'' is most cleanly a filtered or inverse/direct
+system `... -> X_(m+1) -> X_m -> ...` whose transition maps retain a common occurrence at changing
+resolution; it becomes a winding lattice only when loops and their monodromy are also supplied.
+Such a tower has no intrinsic mass.  A mass receiver enters after a metric or energy/Hamiltonian
+operator is founded, typically as a spectral value or a positive gap above a vacuum fibre.  This
+is why Yang--Mills mass gap, Stokes dissipation, elliptic height, and a combinatorial level count
+can occupy analogous tower diagrams without being the same invariant.
+
+**[interpretation]** Likewise, positive/negative curvature, concavity/convexity, and
+divergence/convergence are not synonyms.  They become related receiver faces only after a
+connection or second-variation operator and an orientation convention are fixed.  The sign of a
+Hessian, sectional curvature, divergence of a vector field, and convergence of a series live in
+different typed carriers; an intertwiner may compare them, while a shared plus/minus glyph cannot.
+
+**[interpretation]** The three-strand pinch has a direct harmonic-analysis realization.  Low,
+middle, and high frequency populations cannot be estimated independently with arbitrary cutoffs;
+their common scale must be selected so that the low physical-kernel cost and high Sobolev tail are
+balanced while the middle annuli accumulate only logarithmically.  Pulling one strand alone leaves
+an aperture loss in another.  The Fejer/de la Vallee Poussin and annular Hodge owners are the
+finite-addressed implementation of the proposed comb, and the continuation theorem consumes only
+the result after all three scale faces close together.
+
+**[interpretation]** The ``difference of infinities'' proposal becomes lawful as a difference of
+two compatible finite exhaustions before passage to a limit.  Adjacent smooth multipliers produce
+a telescoping or Abel difference; paired interaction faces produce a signed shell flux; weak limits
+may retain a defect measure.  In every case the shared finite address is what licenses
+cancellation.  A bare expression `infinity - infinity` has no such lineage and therefore no
+mathematical return.
+
+**[established-bounded]** No checked argument in the transcript or repository derives a universal
+maximum of eleven degrees of freedom, a string-theoretic dimension bound, or irreversible
+observer dynamics from the three-axis incidence calculation.  What is established is narrower
+and useful: receiver rank can be smaller than source dimension, enlargement of the receiver
+family can reopen a collapsed fibre, and a finite receiver can represent an infinite source only
+relative to the future consequences which factor through it.  The dimension-eleven suggestion
+remains a heuristic until a source population, receiver family, and rank/obstruction theorem are
+specified.
+
+**[interpretation]** The ``face as perceived by a receiver'' is therefore not a claim that the
+source has become two-dimensional.  It is a condensation map together with the unresolved fibre
+of source occurrences having that face.  Adding depth, a chart transition, a later intervention,
+or a more discriminating receiver can separate that fibre again.  This is the common rigorous
+core of the horizon, optics, curved-surface, holographic-network, and microscopy-to-macroscopy
+messages.
 
 ## What now stands on the analytic line
 
@@ -413,34 +575,156 @@ three `D2-D2-D3` middle vertices by the actual Jacobian receiver times the compl
 energy.  The middle triad is the genuine Gagliardo--Nirenberg/commutator obligation; the exact
 production identity alone is not an `H3` energy inequality.
 
+## Successor disposition: the names now participate in one restart circulation
+
+**[proved-derived; formal-checked]** The coordinate production line has since closed the complete
+forty-face inequality.  The order-zero, order-one, order-two, direct order-three, and redistributed
+middle order-three populations compose with total coefficient `10986`.  Thus the seven-vertex
+Boolean face is no longer an unbounded formal expansion: every one of its lower faces enters the
+same quadratic coordinate receiver.  The remaining logarithmic-Hodge question is a scale-kernel
+estimate, not a missing Leibniz or Gagliardo--Nirenberg placeholder.
+
+**[proved-derived; formal-checked]** The complete native `H3` carrier now owns the actual nonlinear
+restart map.  Heat transport, the exact Leray divergence convolution, Bochner--Duhamel return,
+continuity in the terminal face, a contraction aperture, and Banach's fixed point theorem return a
+common positive-time mild path from every uniformly capped interior slice.  Fourier reality and
+modewise divergence freedom are invariant fibres of that fixed point.  This is a constructed local
+coefficient circulation, not the former `RestartSupplyFromUniformHighOrderBound` interface.
+
+**[proved-derived; formal-checked]** Full inverse Fourier reconstruction now retains every lattice
+pin and returns its exact coefficient.  A native `H3` state gives an actual real, one-periodic,
+spatially `C1` velocity.  Exact termwise derivative formulas carry modewise divergence freedom to
+pointwise divergence freedom.  A continuous native time path reconstructs as one jointly
+continuous map on the product of time and the genuine spatial torus; evaluation is therefore a
+single spacetime receiver rather than two unrelated continuity assertions.
+
+**[proved-derived; formal-checked]** The fixed mild equation now differentiates at every interior
+time and every addressed mode.  The returned ordered time stroke is the exact scalar modal law
+`u_hat'(k) = -nu*lambda_k*u_hat(k) - P_k N_hat(k)`.  The complementary pressure pin is constructed
+with zero gauge, reweighted from vector `H2` to scalar `H3` with norm bound `6`, and reconstructed
+as an actual real, `C1`, one-periodic pressure.  Its gradient coefficient is exactly
+`P_k N_hat(k) - N_hat(k)`, so the projected time law and pressure face recombine to the full
+unprojected momentum equation coefficient by coefficient.  Pointwise Laplacian and classical
+spacetime smoothness are not inferred from this modal equality.
+
+**[proved-derived; formal-checked]** The standing-wave scale chart now extends beyond the formerly
+hard-coded `H2 -> H3` step.  Positive viscous heat transport crosses every adjacent native Sobolev
+scale `Hn -> H(n+1)` with squared constant `1 + (2*nu*t)^(-1)`.  Higher-to-lower receiver
+restriction preserves the raw coefficient occurrence exactly and is norm nonexpanding.  A finite
+ordered heat word retains every intermediate order, returns at `start + steps`, exposes the exact
+multiplier power at each mode, and carries the corresponding product norm receipt.  This is the
+checked finite analytic realization of a unicursal scale stroke.
+
+**[proved-derived; formal-checked]** Every actual smooth periodic slice now enters every finite
+native Sobolev order.  An arbitrary ordered coordinate word has its exact product Fourier
+multiplier; summing all words of length `m` returns the exact `m`th Stokes power; Parseval proves
+the full weighted population summable.  Exact restriction makes all of these states one
+`CompatibleNativeWeightedSobolevTower` whose base is literally the established `H3` slice used by
+the restart line.  Thus smooth initial material, not the later mild path, already carries one
+coherent all-orders stroke.
+
+**[proved-derived; formal-checked]** The nonlinear scale face now has a genuine bundled bilinear
+map `H^m ->L (H^m ->L H^(m-1))` for every `m >= 3`, with explicit norm bound
+`36 * 2^m * periodicH3EmbeddingConstant`.  The corresponding adjacent heat word returns an honest
+Bochner Duhamel integral in `H^m`, with exact modal scalar-Volterra identity and budget
+`C_m R3 Rm * (t + 2*sqrt(t/(2*nu)))`.  Source continuity, measurability, and integrability follow
+automatically from a continuous high path.  `NavierStokesWeightedHigherOrderMildRestart.lean` now
+selects a positive data-dependent aperture at every finite order and returns an actual high-order
+mild fixed point.  Restriction commutes coefficient-exactly with same-order heat, the complete
+Leray source, the adjacent heat lift, the Bochner return, the Duhamel path, and the mild map; hence
+every high fixed point restricts to an actual `H3` fixed point on that identical per-order
+aperture.  Equality with the separately named `H3` Banach return, and therefore one coherent path
+tower on a common aperture, still requires common-aperture uniqueness or an exact retiming law.
+A literal arbitrary `H^m x H3 -> H^(m-1)` map would be false and is not claimed.
+
+**[proved-derived; formal-checked]** Fourier convolution is no longer merely an endpoint shadow of
+the physical product.  `NavierStokesWeightedProductReconstruction.lean` reindexes the complete
+pair population `(p,q)` by `(p+q,p)` and proves that scalar convolution reconstructs exactly as
+pointwise torus multiplication.  It transports the full Frechet product rule through the sum.
+`NavierStokesWeightedMildPhysicalSource.lean` then proves that the native `H2` source used by the
+mild equation is the Fourier population of the actual physical divergence field and, on the
+modewise incompressible fibre, of the advective derivative.  This is the previously missing
+frequency/material gyroparallelogram intertwiner.
+
+**[proved-derived; formal-checked]** Native `H^(m+3)` now reconstructs to an actual real periodic
+`C^(m+1)` velocity.  Every finite derivative receiver has the exact ordered multiplier and
+prepend-coordinate Frechet compatibility, while coherent lifts at all finite orders return an
+actual spatial `C-infinity` field.  No assumed smoothness interface remains after a tower is
+supplied.  For a Fourier-real fixed mild path carrying such a coherent tower, the complete modal
+time-derivative population is now summably dominated from explicit `H8` viscous and `H7 -> H6`
+quadratic bounds.  Termwise differentiation therefore proves that every reconstructed velocity
+component has the strong interior-time derivative given by the full projected momentum Fourier
+sum.  The theorem does not manufacture the coherent path tower from the separately constructed
+finite-order fixed points.  The remaining classical equation step is to identify the viscous sum
+with `nu * Laplacian u` and the projected-source sum with the already reconstructed physical
+divergence plus pressure gradient.
+
+**[proved-derived; formal-checked]** The annular scale owner has replaced an arbitrary comb premise
+by actual adjacent de la Vallee Poussin coefficients far enough to expose the true remaining
+kernel calculation.  The scalar trapezoid has exact second-difference mass `4/(r+1)`; its tensor
+cube has exact Fubini factorizations and coordinate-subset second-difference bounds with the
+expected inverse powers of `r+1`.  Localized Hodge stencils vanish inside the inner plateau,
+including the zero-crossing stencil, while off-plateau denominators have a quadratic lower bound.
+Zero-padded product summation now preserves the exact boundary loss, and every transverse-annular
+one-axis Hodge slice has total second-difference mass at most `1917/(r+1)`.  Exhausting the four
+transverse-inner stencils and two aperture residues upgrades this to the unconditional outer-cube
+line bound `1937/(r+1)`, with no mode-count charge.  The still-open edge is distinct-axis mixed
+differences for the actual localized rational Hodge ratio.  The generic boundary algebra is no
+longer open: `NavierStokesAnnularHodgeMixedFubini.lean` proves that three ordered zero-padded
+second differences synthesize exactly as the original finite three-character sum multiplied by
+all three squared Abel factors, retaining every boundary residue.  What remains is to reindex the
+actual annular Hodge cube into that receiver and prove its sharp two-axis and three-axis mixed
+variation masses, including zero-crossing and aperture stencils.  No completed
+Calderon--Zygmund bound is claimed here.
+
+**[established-bounded]** This successor disposition answers the audit question.  Brandon's pins,
+partial strokes, gyroparallelograms, scale comb, and time orientation were pointing at real
+objects.  Claude's small fixtures were usually correct but stopped before composition.  The
+current line makes pins the coefficient population, makes the stroke a derivative/Duhamel/heat
+word, makes the parallelogram an exchanged-route or commutator defect, and makes the scale chart a
+bounded family of actual torus multipliers.  What remains difficult is now visible as two exact
+analytic ports rather than hidden by a vocabulary match.
+
 ## Ordered next squeeze
 
-1. **[open]** Prove the periodic-cube Gagliardo--Nirenberg/commutator inequality for the three
-   `D2-D2-D3` vertices.  This is now the single missing edge between the exact seven-face Boolean
-   population and the closed estimate
-   `|L_3| <= C * ||grad u||_infinity * E_3`; the other four vertices already have their direct
-   Jacobian bound.
-2. **[open]** Upgrade the qualitative scalar `H3` convolution closure and projected
-   divergence-form `H2` membership to an explicit bounded-bilinear norm return, and identify
-   divergence form with `(u dot grad)v` under the addressed modewise incompressibility hypothesis.
-   The `H2` Leray carrier bound and divergence annihilation now stand; no cutoff or finite Fourier
-   surrogate is needed.
-3. **[open]** Prove a radius-independent physical `L1` bound for the exact smooth annular Hodge
-   matrix kernel already constructed in `NavierStokesSmoothHodgeJacobianBand.lean`.  That is the
-   Calderon--Zygmund edge needed to sum the scale chart into the logarithmic Jacobian receiver.
-4. **[open]** Compose the bounded bilinear return with heat smoothing into the divergence-free
-   Duhamel passage, construct the periodic `H3` mild local solution, and return a lifespan depending
-   only on the admitted high-order receiver.  Then bind its terminal trace to the checked restart
-   seam and overlap uniqueness.
-5. **[open]** Compose the logarithmic Hodge estimate, accumulated critical-vorticity budget,
-   quadratic energy bound, terminal trace, local restart, seam, and overlap uniqueness into the
-   requested finite-time continuation theorem.
+1. **[open]** Finish the radius-independent physical `L1` bound for the exact smooth annular Hodge
+   matrix kernel.  The actual scalar/tensor cutoff differences and localized zero stencils now
+   stand, including the unconditional outer-cube one-axis second-difference estimate, and the
+   exact generic three-coordinate zero-padded Abel/Fubini identity is checked.  The remaining deed
+   is to reindex the actual Hodge cube into that receiver and prove the distinct-axis mixed
+   variation masses.  This closes the
+   logarithmic Jacobian comb without an arbitrary shell premise.
+2. **[open]** Prove common-aperture `H3` fixed-point uniqueness or an exact retiming/restriction
+   law, then identify every constructed finite-order fixed point with one base path on its overlap.
+   This converts the actual per-order returns into the coherent smooth path tower already consumed
+   by the reconstruction theorem.
+3. **[open]** Identify the differentiated viscous Fourier sum with `nu * Laplacian u` and the
+   projected nonlinear sum with physical divergence plus pressure gradient.  Rebase the resulting
+   jointly classical periodic patch inside the old overlap and return the concrete
+   `TailUniformInteriorRestartSupply` consumed by the checked seam.
+4. **[open]** Compose that constructed restart supply with the completed logarithmic Hodge comb,
+   actual finite critical-vorticity integral, coordinate energy law, seam, and overlap uniqueness.
+   The resulting theorem must take no comb or restart interface as an input.
 
 **[open]** None of these returns is a proof of global Navier--Stokes regularity, BSD, RH, Hodge, or
 Yang--Mills.  The shared holonic diagrams identify reusable transport questions; each constitutive
 theorem remains independently owed.
 
 ## Validation receipt
+
+**[established-bounded; formal-checked]** The present coherent release command
+`lake build ElementaryHolonics` completed 4,074 jobs in 21.23 seconds with exit status zero after
+all 62 new Navier--Stokes owners were imported.  The newest higher-order restart, smooth-path,
+inner-stencil, and mixed-Fubini owners also passed their direct checks and focused module builds.
+Their printed dependencies are confined to `propext`, `Classical.choice`, and `Quot.sound`.
+
+**[established-bounded; measured]** An independent read-only audit recomputed the 62-file phase,
+found no missing aggregate import, and found no `sorry`, `admit`, custom `axiom`, `opaque`,
+`unsafe`, `partial` declaration, `extern`, or `implemented_by`.  Its sole raw word match was the
+English phrase ``partial derivative'' in a docstring.  The audit found and this phase repaired two
+doc/type mismatches: a generic contraction theorem no longer calls its arbitrary map the complete
+mild map, and an aggregate Hodge inequality no longer asserts an untyped exclusive stencil
+decomposition.  The phase whitespace check is clean.
 
 **[established-bounded; formal-checked]** Each of the ten new Lean owners in this successor set
 passed a direct `lake env lean` check.  An independent line-by-line audit recompiled every owner,
