@@ -41,11 +41,21 @@ history-only candidates, graded returned defects, derived-rank exact local facto
 chronology/holonomy, source-detached later conduct, ablation and withdrawal. Lean remains an
 exterior checker and the GPU owns the hot semantic front.
 
-[open] The sole next deed is **the receiver-history congruence replaces the trigram table**. It must
-return the formal congruence, one exact Rust owner, complete source-to-native fibres, shortest
-separators and derived memory order, generator naturality squares, proposal-relative causal roles,
-surface-only counterexamples and one resident-GPU quotient deed. No later station is authorized
-until those returns stand together.
+[established-bounded; implemented-exact; measured] The receiver-history congruence station passed
+under artifact identity
+`8e8944fef39069943a40f66d056027e3e6e78ca10a18093c7471becd6c9cca8f`. The complete 2,224 situated
+causal sections returned 2,221 native states and complete fibres, 83 shortest separators, derived
+memory order five, 105 surface-only counterexamples, two generator naturality squares, 20,846
+proposal-relative role incidences and 1,218 overlapping proposal/target roles. The resident RTX
+4080 SUPER quotient returned in 32 launches and equalled the exact reference without host semantic
+replay. The Lean contract proved native equality equivalent to complete causal-signature equality
+and native inequality sufficient to return a separating receiver/history.
+
+[open] The sole next deed is **the candidate departs before sibling testimony returns**. It must
+seal a history-only candidate before sibling bytes are accessible, mount the response and
+world/operator testimony only afterward, and return the complete graded defect, fibres, source
+audit, equal-surface richer separator and different-surface common-operation pair. No later station
+is authorized until those returns stand together.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

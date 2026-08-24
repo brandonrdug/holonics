@@ -404,7 +404,11 @@ ModalityRouter, or Lean reasoner is authorized.
 
 ## 11. Ordered construction
 
-### The receiver-history congruence replaces the trigram table — **sole next deed**
+### The receiver-history congruence replaces the trigram table — **completed 2026-08-24**
+
+[established-bounded; implemented-exact; measured] The completed station and its first failed
+lineage-address attempt are recorded in
+[`../research/records/2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md`](../research/records/2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md).
 
 [definition] Extend the existing realization/compression owners so the alpha state is the quotient
 of addressed causal sections under the complete declared receiver/history family. Replace the
@@ -421,7 +425,7 @@ development/sibling/held-out/revisit/rebase/control incidences; and one GPU resi
 `tokens.len() == 3`, two-token-overlap traversal, exact-prompt equality as semantic eligibility, or
 a globally exclusive `ContinuationPartition` deciding cultivation.
 
-### The candidate departs before sibling testimony returns
+### The candidate departs before sibling testimony returns — **sole next deed**
 
 [definition] Conduct the predecessor from history alone, seal the candidate occurrence and its
 complete plural future section, then mount the recorded sibling and world/operator returns as later
@@ -557,6 +561,7 @@ coherent alpha product and its inspected artifacts stand. State advances only th
 20. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
 21. only the source/artifact closure of the named current deed.
 
-[open] The sole next deed is **the receiver-history congruence replaces the trigram table**. No
-later station is authorized before its exact formal, Rust, fibre, separator, and resident-GPU
+[open] The sole next deed is **the candidate departs before sibling testimony returns**. No later
+station is authorized before its sealed history-only candidate, source-access audit, genuinely
+later return, graded defect, equal-surface/richer-separator and different-surface/common-operation
 returns stand together.

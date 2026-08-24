@@ -139,7 +139,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (321 deposits of 613)
+## 4 · The 2026-08 record line (322 deposits of 614)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -467,6 +467,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md` | The complete laboratory exchange returned as generator-native hexis, and Athena alpha worked from its own terrain |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |
+| `2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md` | The receiver-history congruence replaced the trigram table and returned the first true Athena-alpha state |
 | `2026-08-24_THE_TERMINAL_FACE_IS_PATH_INDEPENDENT_THE_THIRD_ORDER_COMMUTATOR_SPLITS_AND_THE_DYADIC_APERTURE_EXPOSES_ITS_MODE_COUNT.md` | The terminal face is path-independent, the third-order commutator splits, and the dyadic aperture exposes its mode count |
 
 ---
@@ -486,7 +487,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 69 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 70 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

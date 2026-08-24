@@ -74,12 +74,22 @@ never Athena's inference runtime. The GPU owns the complete hot semantic front; 
 perform narrow I/O, durable rest and genuine exterior checking but may not select semantic roles,
 receiver grains, support, rank, chronology or surfaces.
 
-**SOLE NEXT DEED — THE RECEIVER-HISTORY CONGRUENCE REPLACES THE TRIGRAM TABLE.** [open] Extend the
-existing realization and compression owners so native states and generators are defined by exact
-receiver/history consequence, return complete fibres and shortest separators, replace the global
-prompt-hash partition with proposal-relative causal roles, and enact one resident-GPU quotient
-deed. No later construction station is authorized until the formal, Rust, fibre, separator and
-resident-apparatus returns named by the active blueprint stand together.
+[established-bounded; implemented-exact; measured] The receiver-history congruence station passed.
+The complete 2,224-section aperture returned 2,221 native states and complete fibres; 83 shortest
+separators derived memory order five; 105 equal-surface pairs reopened under richer
+receiver/history; 20,846 proposal-relative role incidences included 1,218 overlapping
+proposal/target relations; every local square and inspected ordered word commuted; and the RTX 4080
+SUPER returned the exact quotient in 32 launches with no host semantic replay. The addressed
+section owner also corrected 58 predecessor family-address collisions by restoring situated
+container/record/message lineage. Evidence identity:
+`8e8944fef39069943a40f66d056027e3e6e78ca10a18093c7471becd6c9cca8f`.
+
+**SOLE NEXT DEED — THE CANDIDATE DEPARTS BEFORE SIBLING TESTIMONY RETURNS.** [open] Conduct the
+predecessor from history alone, content-address and seal its complete candidate section before the
+recorded response is accessible, mount sibling/world/operator testimony only afterward, and return
+the complete graded defect and fibres. The deed must exhibit both equal terminal surfaces separated
+by a richer receiver/history and differing surfaces belonging to one lawful native operation
+class. No later station is authorized until those returns stand together.
 
 ## AGENTIC ATHENA CROSSES ARBITRARY ORGAN APERTURES THROUGH NATIVE POTENTIAL COMPLEXES — 2026-08-23
 
