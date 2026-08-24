@@ -427,6 +427,70 @@ only through an exact interchange/comparison cell. R-III is an exchange law, not
 Dynamic condensation then consumes the existing generator law so all future move words factor,
 while the complete reconstruction fibre retains every diagram collapsed by the receiver.
 
+### I8 — difference calculus across receivers and scales
+
+[definition] Begin before sign. An oriented edge carries `target - source`; reversal exchanges its
+addressed faces and negates the difference. A sign appears only after an additive receiver maps that
+difference into an ordered chart. Prove that every nonzero receiver difference is polarized: one
+orientation is positive exactly when its reverse is negative, without privileging either
+orientation in the source geometry.
+
+[definition] Bind the swing to this edge calculus. The anchored affine swing negates the
+displacement while fixing the pivot. In the complex receiver, prove that this is exactly the Euler
+half-turn action `exp(pi*i) = -1`. Two swings and noncommuting swing words retain their translation
+and route defects from `Swing.lean` and HC4 rather than reducing the turn to a scalar sign.
+
+[definition] Define chronological first differences, differences of differences, and arbitrary
+iterated differences. Prove that every additive receiver commutes with every order. An affine path
+has constant first difference and zero second difference; curvature, acceleration, and production
+therefore enter as nonzero higher returned differences under their typed constitutive laws.
+
+[definition] Give Galois, monodromy, gyration, and precession actions the same exact entrance through
+their underlying additive equivalences. The returned transport difference `sigma(x) - x` vanishes
+exactly on the fixed population. Under a chart equivalence, conjugate `sigma` and prove that the
+chart transports the complete difference. An iterated action is an oriented orbit, and every local
+edge in that orbit returns the transport difference at its source occurrence.
+
+[definition] Derive exact discrete integration by telescoping. For every finite window, the sum of
+the microscopic differences equals the one exterior endpoint difference. Sampling block endpoints
+is a coarse receiver, and its one difference must equal the integrated microscopic population;
+internal faces cancel while the reconstruction lineage remains available. This algebraic
+cancellation licenses no physical conservation claim until an evolution law transports the same
+boundary or flux.
+
+[definition] Treat modulo as a chart quotient of oriented integer difference. Prove that modular
+difference is zero exactly when the endpoints are congruent, equivalently when the integral
+difference lies in the modulus-multiple fibre. Exhibit zero and one full modulus winding as equal
+receiver faces with unequal integral endpoints. Floor, ceiling, least-residue, and signed-residue
+charts are sections of this quotient and may not replace its complete fibre.
+
+[definition] Compose the same local/global bridge with the existing Stokes adjointness and Euler
+cell-pair law. `d` reads local differences, `partial` reads the boundary, and their pairing agrees;
+adding one local edge/face pair changes the presentation while leaving the Euler return invariant.
+The local-to-global Millennium routes must consume these exact maps:
+
+1. Navier--Stokes: close dyadic scales zero through two, derive the order-six three-axis mass, and
+   transport the actual zero-padded annular Hodge differences through the checked triple
+   Abel/Haar--Fubini receiver to construct the uniform dyadic physical-kernel witness; then compose
+   that witness with the already returned classical restart supply in the checked terminal-half
+   continuation theorem, leaving finiteness of the critical-vorticity time integral as the
+   explicit global-regularity obstruction rather than identifying the criterion with a solution;
+2. BSD: express local height corrections and valuation ledgers as a telescoping global canonical
+   height with every bad-place remainder retained;
+3. Hodge: make the local `d/partial` adjunction commute with chart gluing and prove the required
+   positive global pairing on the primitive remainder;
+4. Yang--Mills: compare alternate connection words so `dA + A wedge A` and Wilson-loop holonomy are
+   two receiver faces of the same route defect, then derive a scale-uniform coercive gap;
+5. RH: transport prime-local Euler/Mellin differences to the complete Weil receiver and prove that
+   the global positive form has no nonzero null difference; and
+6. Poincare/S6: carry local curvature or monodromy differences through surgery/gluing without
+   identifying equal coarse faces with equal geometric sources.
+
+[definition] Every route above has the same falsifier: local cancellation whose unresolved overlap,
+boundary, bad-place, commutator, null, or reconstruction fibre survives globally. The surviving
+fibre is the next object to transport, not permission to replace the analytic or geometric theorem
+by its incidence skeleton.
+
 ## 6. Core pass grade
 
 [definition] The formal gap is closed only when:
@@ -540,6 +604,20 @@ unknot fibre, receiver descent/completeness, framing and linking laws, crossing-
 connected sum on knot classes, and a proof-grade bridge from that combinatorial quotient to ambient
 isotopy. The current abstract torus slope is not yet an ambient torus knot, and the current signed
 crossing tables are not diagrams.
+
+[proved-derived; formal-checked] I8 returned in `HolonicDifferenceCalculus.lean`. Oriented source
+and target faces determine a difference before any sign; reversal negates it; and every nonzero
+real receiver polarizes the two orientations. The swing reverses its anchored displacement and the
+complex receiver identifies that action with Euler's half-turn. Additive receivers commute with
+arbitrary iterated differences. Automorphism difference vanishes exactly on the fixed population,
+is transported by conjugate chart rebase, and supplies every first difference along its orbit.
+Microscopic windows telescope to their exterior boundary, each coarse difference is the integrated
+microscopic window, modular zero retains the complete congruence fibre, and the existing finite
+Stokes and Euler returns compose with the same calculus. The actual zero-padded annular Hodge first
+and second differences are re-expressed as addressed edges, and two-pass Abel synthesis is proved
+to integrate their character-weighted second-difference population. No promoted theorem depends on
+`sorryAx`. The theorem map and its exact Millennium successor fibres are deposited in
+[`../research/records/2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md`](../research/records/2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md).
 
 [definition] These I-stations remain exterior Lean returns. They do not schedule the engine body,
 advance `CONSTRUCTION_STATE.md`, or displace the active same-body factor-deposition deed. Their

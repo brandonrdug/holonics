@@ -50,6 +50,7 @@ import ElementaryHolonics.Millennium.HolonicTorusKnots
 import ElementaryHolonics.Millennium.HolonicCurvedArcEinstein
 import ElementaryHolonics.Millennium.HolonicDimensionObstruction
 import ElementaryHolonics.Millennium.HolonicUnknotting
+import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
 import ElementaryHolonics.Millennium.Navigation
 import ElementaryHolonics.Millennium.Paying
 import ElementaryHolonics.Millennium.Coupling
