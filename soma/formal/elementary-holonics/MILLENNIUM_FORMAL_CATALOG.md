@@ -142,12 +142,16 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | exact fluid calculus | periodic energy/enstrophy/flux, curl and vorticity, Kelvin/moving-loop/material-polygon laws, Hodge/Leray projectors, Fourier triads, heat transport, Duhamel returns, scaling, and overlap uniqueness across the `NavierStokes*` family | project-specific composition of Mathlib analysis, measure, Fourier, and finite combinatorics | each theorem retains its declared regularity, periodic, finite-frequency, or conditional aperture |
 | `conditional; formal-checked` | continuation | `NavierStokesCriticalContinuation.lean` and the weighted path/reconstruction tower return compatible continuation from named high-order, integrability, restart, and reconstruction hypotheses | local conditional derivation | the hypotheses are not hidden global-regularity proofs |
 | `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from a uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | `UniformLargeScaleDyadicHodgeSubsetMassReturn constant` is uninhabited |
+| `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |
 
 [open] The immediate Navier--Stokes theorem target is now sharply exposed: inhabit
 `UniformLargeScaleDyadicHodgeSubsetMassReturn C`.  Existing checked faces include the exact direct
-subset identities and partial scale estimates, but the common three-dimensional padded/reindexed
-coefficient comparison and the remaining face assembly have not returned.  Even after this
+subset identities, partial scale estimates, and the complete `(1,1,2)`/`(1,2,2)` chronological
+product populations together with their exact scalar-preserving 12/18-face binomial groupings.
+The common three-dimensional padded/reindexed coefficient comparison, the pointwise norm bounds
+by the declared anisotropic Hodge envelopes, and the remaining finite face assembly have not
+returned.  Even after this
 coefficient port closes, the continuation theorem visibly retains its critical-vorticity
 integrability and terminal restart hypotheses.
 

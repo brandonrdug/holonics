@@ -825,10 +825,13 @@ three-axis populations must be joined in one zero-padded finite theorem with sca
 the addressed pair `{0,1}` already has checked mass `(34 * 10^12)/R`; their six companion faces
 still require a common three-coordinate padded/reindex owner rather than an unproved coordinate
 permutation. The checked `(1,1,1)` Hodge envelope supplies the first genuinely three-axis face;
-exact `(1,1,2)` and `(1,2,2)` allocation ledgers now scale as
-`(46 * 10^9)/R^4` and `(12 * 10^12)/R^5`, while their pointwise Hodge identities and finite Fubini
-assembly remain to be returned. Their current arithmetic gives `42 * 10^17` as a coarse candidate
-common magnitude, not yet as a theorem. No singular character factor may be divided. After this
+the exact `(1,1,2)` and `(1,2,2)` product differences now return their complete 16- and
+32-occurrence ledgers and their exact scalar-preserving 12- and 18-face binomial returns. Genuine
+Hodge entries instantiate both allocation identities. Their candidate Hodge envelopes scale as
+`(46 * 10^9)/R^4` and `(12 * 10^12)/R^5`, while the pointwise norm bounds by those envelopes and
+finite Fubini assembly remain to be returned. Their current arithmetic gives `42 * 10^17` as a
+coarse candidate common magnitude, not
+yet as a theorem. No singular character factor may be divided. After this
 coefficient witness and the already named restart passage are supplied, finiteness of the
 critical-vorticity time integral for arbitrary smooth periodic data remains the official
 global-regularity obstruction.

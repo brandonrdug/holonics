@@ -65,6 +65,374 @@ theorem threeAxisMixedForwardDifference_one_one_one_mul_eq_allocationReturn
     (differenceWord_mul_eq_ledgerSum coordinateTransport [0, 1, 2] left right)
     frequency
 
+/-! ## The two remaining all-positive occurrence ledgers -/
+
+/-- The complete chronological population for the `(1,1,2)` product difference.  The repeated
+third-axis occurrences remain distinct until an explicit interchange quotient is applied. -/
+def hodge112OccurrenceLedger
+    (left right : SpatialFrequency → ℂ) :
+    List (ProductFace (Fin 3) SpatialFrequency ℂ) :=
+  productLedger coordinateTransport [0, 1, 2, 2] left right
+
+/-- Sum the complete sixteen-occurrence `(1,1,2)` ledger without condensing the two third-axis
+histories into binomial weights. -/
+def hodge112OccurrenceReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  ledgerSum (hodge112OccurrenceLedger left right) frequency
+
+/-- The complete chronological population for the `(1,2,2)` product difference. -/
+def hodge122OccurrenceLedger
+    (left right : SpatialFrequency → ℂ) :
+    List (ProductFace (Fin 3) SpatialFrequency ℂ) :=
+  productLedger coordinateTransport [0, 1, 1, 2, 2] left right
+
+/-- Sum the complete thirty-two-occurrence `(1,2,2)` ledger before any commuting quotient. -/
+def hodge122OccurrenceReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  ledgerSum (hodge122OccurrenceLedger left right) frequency
+
+/-- Four addressed differences return all sixteen binary shifted-Leibniz histories. -/
+theorem hodge112OccurrenceLedger_length
+    (left right : SpatialFrequency → ℂ) :
+    (hodge112OccurrenceLedger left right).length = 16 := by
+  simpa [hodge112OccurrenceLedger] using
+    (productLedger_length coordinateTransport [0, 1, 2, 2] left right)
+
+/-- Five addressed differences return all thirty-two binary shifted-Leibniz histories. -/
+theorem hodge122OccurrenceLedger_length
+    (left right : SpatialFrequency → ℂ) :
+    (hodge122OccurrenceLedger left right).length = 32 := by
+  simpa [hodge122OccurrenceLedger] using
+    (productLedger_length coordinateTransport [0, 1, 1, 2, 2] left right)
+
+/-- Exact `(1,1,2)` shifted-Leibniz law with every occurrence lineage retained. -/
+theorem threeAxisMixedForwardDifference_one_one_two_mul_eq_occurrenceReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    threeAxisMixedForwardDifference 0 1 2 1 1 2
+        (fun current ↦ left current * right current) frequency =
+      hodge112OccurrenceReturn left right frequency := by
+  rw [← differenceWord_eq_threeAxisMixedForwardDifference 0 1 2 1 1 2]
+  change differenceWord coordinateTransport [0, 1, 2, 2]
+      (fun current ↦ left current * right current) frequency = _
+  exact congrFun
+    (differenceWord_mul_eq_ledgerSum coordinateTransport [0, 1, 2, 2] left right)
+    frequency
+
+/-- Exact `(1,2,2)` shifted-Leibniz law with every occurrence lineage retained. -/
+theorem threeAxisMixedForwardDifference_one_two_two_mul_eq_occurrenceReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    threeAxisMixedForwardDifference 0 1 2 1 2 2
+        (fun current ↦ left current * right current) frequency =
+      hodge122OccurrenceReturn left right frequency := by
+  rw [← differenceWord_eq_threeAxisMixedForwardDifference 0 1 2 1 2 2]
+  change differenceWord coordinateTransport [0, 1, 1, 2, 2]
+      (fun current ↦ left current * right current) frequency = _
+  exact congrFun
+    (differenceWord_mul_eq_ledgerSum coordinateTransport [0, 1, 1, 2, 2] left right)
+    frequency
+
+/-! ## The anisotropic commuting receivers -/
+
+/-- The commuting allocation addresses for the `(1,1,2)` word.  The first two axes remember
+order zero or one and the repeated third axis remembers order zero, one, or two. -/
+abbrev Hodge112Allocation := Fin 2 × Fin 2 × Fin 3
+
+/-- The commuting allocation addresses for the `(1,2,2)` word. -/
+abbrev Hodge122Allocation := Fin 2 × Fin 3 × Fin 3
+
+/-- A single product hand, read as left-factor order zero or one. -/
+def firstOrderLeftAllocation (hand : ProductHand) : Fin 2 := by
+  refine ⟨hand.leftOrder, ?_⟩
+  cases hand <;> decide
+
+/-- Quotient a chronological `(1,1,2)` face only by the exact commuting order seen on each
+axis.  The source face itself remains in `hodge112OccurrenceLedger`; this is its receiver shadow. -/
+def hodge112AllocationReceiver
+    (face : ProductFace (Fin 3) SpatialFrequency ℂ) : Hodge112Allocation :=
+  (firstOrderLeftAllocation (face.handAt 0),
+    firstOrderLeftAllocation (face.handAt 1),
+    pairedLeftOrder (face.handAt 2) (face.handAt 3))
+
+/-- Quotient a chronological `(1,2,2)` face by the corresponding three-axis left orders. -/
+def hodge122AllocationReceiver
+    (face : ProductFace (Fin 3) SpatialFrequency ℂ) : Hodge122Allocation :=
+  (firstOrderLeftAllocation (face.handAt 0),
+    pairedLeftOrder (face.handAt 1) (face.handAt 2),
+    pairedLeftOrder (face.handAt 3) (face.handAt 4))
+
+/-- The receiver-address ledger for all sixteen `(1,1,2)` occurrences.  Repeated addresses retain
+their multiplicity in this list. -/
+def hodge112AllocationAddressLedger
+    (left right : SpatialFrequency → ℂ) : List Hodge112Allocation :=
+  (hodge112OccurrenceLedger left right).map hodge112AllocationReceiver
+
+/-- The receiver-address ledger for all thirty-two `(1,2,2)` occurrences. -/
+def hodge122AllocationAddressLedger
+    (left right : SpatialFrequency → ℂ) : List Hodge122Allocation :=
+  (hodge122OccurrenceLedger left right).map hodge122AllocationReceiver
+
+/-- The anisotropic `(1,1,2)` commuting receiver has exactly twelve possible faces. -/
+theorem hodge112Allocation_card : Fintype.card Hodge112Allocation = 12 := by
+  decide
+
+/-- The anisotropic `(1,2,2)` commuting receiver has exactly eighteen possible faces. -/
+theorem hodge122Allocation_card : Fintype.card Hodge122Allocation = 18 := by
+  decide
+
+/-- Condensation changes addresses, not the sixteen-source occurrence population. -/
+theorem hodge112AllocationAddressLedger_length
+    (left right : SpatialFrequency → ℂ) :
+    (hodge112AllocationAddressLedger left right).length = 16 := by
+  simp [hodge112AllocationAddressLedger, hodge112OccurrenceLedger_length]
+
+/-- Condensation changes addresses, not the thirty-two-source occurrence population. -/
+theorem hodge122AllocationAddressLedger_length
+    (left right : SpatialFrequency → ℂ) :
+    (hodge122AllocationAddressLedger left right).length = 32 := by
+  simp [hodge122AllocationAddressLedger, hodge122OccurrenceLedger_length]
+
+/-! ## Exact receiver-preserving binomial grouping -/
+
+/-- One third-axis allocation slice before the remaining first/second-axis product faces are
+expanded. -/
+def stagedThirdSecondOrderSlice
+    (firstOrder secondOrder : ℕ) (thirdAllocation : Fin 3)
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  (secondOrderBinomialWeight thirdAllocation : ℂ) *
+    mixedForwardDifference 0 1 firstOrder secondOrder
+      (fun current ↦
+        (fwdDiff (coordinateStep 2))^[thirdAllocation.val] left current *
+          (fwdDiff (coordinateStep 2))^[2 - thirdAllocation.val] right
+            (current + thirdAllocation.val • coordinateStep 2)) frequency
+
+/-- The three exact binomial slices returned by the repeated third-axis difference. -/
+def stagedThirdSecondOrderReturn
+    (firstOrder secondOrder : ℕ)
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  stagedThirdSecondOrderSlice firstOrder secondOrder 2 left right frequency +
+    stagedThirdSecondOrderSlice firstOrder secondOrder 1 left right frequency +
+      stagedThirdSecondOrderSlice firstOrder secondOrder 0 left right frequency
+
+/-- A second difference on the third axis groups its four occurrence histories into the exact
+binomial multiplicities `1,2,1`, after which arbitrary first/second-axis differences distribute
+over the three returned slices. -/
+theorem threeAxisMixedForwardDifference_mul_eq_stagedThirdSecondOrderReturn
+    (firstOrder secondOrder : ℕ)
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    threeAxisMixedForwardDifference 0 1 2 firstOrder secondOrder 2
+        (fun current ↦ left current * right current) frequency =
+      stagedThirdSecondOrderReturn firstOrder secondOrder left right frequency := by
+  let thirdStep := coordinateStep 2
+  let firstTerm : SpatialFrequency → ℂ := fun current ↦
+    (fwdDiff thirdStep)^[2] left current * right (current + thirdStep + thirdStep)
+  let middleTerm : SpatialFrequency → ℂ := fun current ↦
+    fwdDiff thirdStep left current * fwdDiff thirdStep right (current + thirdStep)
+  let lastTerm : SpatialFrequency → ℂ := fun current ↦
+    left current * (fwdDiff thirdStep)^[2] right current
+  have hthirdProduct :
+      (fwdDiff thirdStep)^[2] (fun current ↦ left current * right current) =
+        firstTerm + (2 : ℂ) • middleTerm + lastTerm := by
+    funext current
+    simpa [firstTerm, middleTerm, lastTerm, Pi.add_apply, Pi.smul_apply,
+      smul_eq_mul, mul_assoc] using
+        fwdDiff_iter_two_mul_eq thirdStep left right current
+  unfold threeAxisMixedForwardDifference
+  rw [hthirdProduct, fwdDiff_iter_add, fwdDiff_iter_add,
+    fwdDiff_iter_add, fwdDiff_iter_const_smul, fwdDiff_iter_add,
+    fwdDiff_iter_const_smul]
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+  change
+    mixedForwardDifference 0 1 firstOrder secondOrder firstTerm frequency +
+        2 * mixedForwardDifference 0 1 firstOrder secondOrder middleTerm frequency +
+      mixedForwardDifference 0 1 firstOrder secondOrder lastTerm frequency = _
+  unfold stagedThirdSecondOrderReturn stagedThirdSecondOrderSlice
+  simp [secondOrderBinomialWeight, firstTerm, middleTerm, lastTerm, thirdStep,
+    Function.iterate_zero_apply, two_smul, add_assoc]
+
+/-- The four commuting product faces for one first difference on each of two axes. -/
+def twoAxisFourFaceReturn
+    (first second : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) : ℂ :=
+  mixedForwardDifference first second 1 1 left frequency *
+        right (frequency + coordinateStep second + coordinateStep first) +
+    mixedForwardDifference first second 0 1 left frequency *
+        mixedForwardDifference first second 1 0 right
+          (frequency + coordinateStep second) +
+    mixedForwardDifference first second 1 0 left frequency *
+        mixedForwardDifference first second 0 1 right
+          (frequency + coordinateStep first) +
+    left frequency * mixedForwardDifference first second 1 1 right frequency
+
+theorem mixedForwardDifference_one_one_mul_eq_fourFaceReturn
+    (first second : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) :
+    mixedForwardDifference first second 1 1
+        (fun current ↦ left current * right current) frequency =
+      twoAxisFourFaceReturn first second left right frequency := by
+  simpa [twoAxisFourFaceReturn] using
+    mixedForwardDifference_one_one_mul_eq first second left right frequency
+
+/-- The six commuting product faces for first-axis order one and second-axis order two. -/
+def twoAxisSixFaceReturn
+    (first second : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) : ℂ :=
+  mixedForwardDifference first second 1 2 left frequency *
+        right (frequency + coordinateStep second + coordinateStep second +
+          coordinateStep first) +
+    2 * mixedForwardDifference first second 1 1 left frequency *
+        mixedForwardDifference first second 0 1 right
+          (frequency + coordinateStep second + coordinateStep first) +
+    mixedForwardDifference first second 1 0 left frequency *
+        mixedForwardDifference first second 0 2 right
+          (frequency + coordinateStep first) +
+    mixedForwardDifference first second 0 2 left frequency *
+        mixedForwardDifference first second 1 0 right
+          (frequency + coordinateStep second + coordinateStep second) +
+    2 * mixedForwardDifference first second 0 1 left frequency *
+        mixedForwardDifference first second 1 1 right
+          (frequency + coordinateStep second) +
+    left frequency * mixedForwardDifference first second 1 2 right frequency
+
+theorem mixedForwardDifference_one_two_mul_eq_sixFaceReturn
+    (first second : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) :
+    mixedForwardDifference first second 1 2
+        (fun current ↦ left current * right current) frequency =
+      twoAxisSixFaceReturn first second left right frequency := by
+  simpa [twoAxisSixFaceReturn] using
+    mixedForwardDifference_one_two_mul_eq first second left right frequency
+
+/-- One of the three staged `(1,1,2)` slices, now expanded into four commuting allocation
+faces. -/
+def stagedHodge112FourFaceReturn
+    (thirdAllocation : Fin 3)
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  (secondOrderBinomialWeight thirdAllocation : ℂ) *
+    twoAxisFourFaceReturn 0 1
+      ((fwdDiff (coordinateStep 2))^[thirdAllocation.val] left)
+      (fun current ↦
+        (fwdDiff (coordinateStep 2))^[2 - thirdAllocation.val] right
+          (current + thirdAllocation.val • coordinateStep 2)) frequency
+
+/-- The twelve-face `(1,1,2)` commuting allocation return. -/
+def stagedHodge112AllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  stagedHodge112FourFaceReturn 2 left right frequency +
+    stagedHodge112FourFaceReturn 1 left right frequency +
+      stagedHodge112FourFaceReturn 0 left right frequency
+
+/-- One of the three staged `(1,2,2)` slices, expanded into six commuting allocation faces. -/
+def stagedHodge122SixFaceReturn
+    (thirdAllocation : Fin 3)
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  (secondOrderBinomialWeight thirdAllocation : ℂ) *
+    twoAxisSixFaceReturn 0 1
+      ((fwdDiff (coordinateStep 2))^[thirdAllocation.val] left)
+      (fun current ↦
+        (fwdDiff (coordinateStep 2))^[2 - thirdAllocation.val] right
+          (current + thirdAllocation.val • coordinateStep 2)) frequency
+
+/-- The eighteen-face `(1,2,2)` commuting allocation return. -/
+def stagedHodge122AllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) : ℂ :=
+  stagedHodge122SixFaceReturn 2 left right frequency +
+    stagedHodge122SixFaceReturn 1 left right frequency +
+      stagedHodge122SixFaceReturn 0 left right frequency
+
+theorem stagedThirdSecondOrderSlice_one_one_eq_fourFaceReturn
+    (thirdAllocation : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) :
+    stagedThirdSecondOrderSlice 1 1 thirdAllocation left right frequency =
+      stagedHodge112FourFaceReturn thirdAllocation left right frequency := by
+  unfold stagedThirdSecondOrderSlice stagedHodge112FourFaceReturn
+  rw [mixedForwardDifference_one_one_mul_eq_fourFaceReturn]
+
+theorem stagedThirdSecondOrderSlice_one_two_eq_sixFaceReturn
+    (thirdAllocation : Fin 3) (left right : SpatialFrequency → ℂ)
+    (frequency : SpatialFrequency) :
+    stagedThirdSecondOrderSlice 1 2 thirdAllocation left right frequency =
+      stagedHodge122SixFaceReturn thirdAllocation left right frequency := by
+  unfold stagedThirdSecondOrderSlice stagedHodge122SixFaceReturn
+  rw [mixedForwardDifference_one_two_mul_eq_sixFaceReturn]
+
+/-- The `(1,1,2)` product difference factors through the exact twelve-face commuting receiver. -/
+theorem threeAxisMixedForwardDifference_one_one_two_mul_eq_stagedAllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    threeAxisMixedForwardDifference 0 1 2 1 1 2
+        (fun current ↦ left current * right current) frequency =
+      stagedHodge112AllocationReturn left right frequency := by
+  rw [threeAxisMixedForwardDifference_mul_eq_stagedThirdSecondOrderReturn]
+  unfold stagedThirdSecondOrderReturn stagedHodge112AllocationReturn
+  rw [stagedThirdSecondOrderSlice_one_one_eq_fourFaceReturn,
+    stagedThirdSecondOrderSlice_one_one_eq_fourFaceReturn,
+    stagedThirdSecondOrderSlice_one_one_eq_fourFaceReturn]
+
+/-- The `(1,2,2)` product difference factors through the exact eighteen-face commuting receiver. -/
+theorem threeAxisMixedForwardDifference_one_two_two_mul_eq_stagedAllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    threeAxisMixedForwardDifference 0 1 2 1 2 2
+        (fun current ↦ left current * right current) frequency =
+      stagedHodge122AllocationReturn left right frequency := by
+  rw [threeAxisMixedForwardDifference_mul_eq_stagedThirdSecondOrderReturn]
+  unfold stagedThirdSecondOrderReturn stagedHodge122AllocationReturn
+  rw [stagedThirdSecondOrderSlice_one_two_eq_sixFaceReturn,
+    stagedThirdSecondOrderSlice_one_two_eq_sixFaceReturn,
+    stagedThirdSecondOrderSlice_one_two_eq_sixFaceReturn]
+
+/-- The sixteen chronological occurrences and twelve commuting faces have the same scalar
+return. -/
+theorem hodge112OccurrenceReturn_eq_stagedAllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    hodge112OccurrenceReturn left right frequency =
+      stagedHodge112AllocationReturn left right frequency := by
+  rw [← threeAxisMixedForwardDifference_one_one_two_mul_eq_occurrenceReturn,
+    threeAxisMixedForwardDifference_one_one_two_mul_eq_stagedAllocationReturn]
+
+/-- The thirty-two chronological occurrences and eighteen commuting faces have the same scalar
+return. -/
+theorem hodge122OccurrenceReturn_eq_stagedAllocationReturn
+    (left right : SpatialFrequency → ℂ) (frequency : SpatialFrequency) :
+    hodge122OccurrenceReturn left right frequency =
+      stagedHodge122AllocationReturn left right frequency := by
+  rw [← threeAxisMixedForwardDifference_one_two_two_mul_eq_occurrenceReturn,
+    threeAxisMixedForwardDifference_one_two_two_mul_eq_stagedAllocationReturn]
+
+/-- The actual `(1,1,2)` Hodge entry is exactly its twelve-face numerator/reciprocal return. -/
+theorem hodgeJacobianMultiplierEntry_threeAxisMixedForwardDifference_one_one_two_eq
+    (frequency : SpatialFrequency) (component coordinate input : Fin 3) :
+    threeAxisMixedForwardDifference 0 1 2 1 1 2
+        (fun current ↦ hodgeJacobianMultiplierEntry current component coordinate input)
+        frequency =
+      stagedHodge112AllocationReturn
+        (fun current ↦ hodgeJacobianRatioNumerator current component coordinate input)
+        hodgeReciprocal frequency := by
+  rw [show (fun current ↦ hodgeJacobianMultiplierEntry current component coordinate input) =
+      fun current ↦ hodgeJacobianRatioNumerator current component coordinate input *
+        hodgeReciprocal current by
+    funext current
+    rw [hodgeJacobianMultiplierEntry_eq_ratio]
+    simp [hodgeJacobianRatioNumerator, hodgeReciprocal, hodgeCrossBasisFactor,
+      div_eq_mul_inv]]
+  exact threeAxisMixedForwardDifference_one_one_two_mul_eq_stagedAllocationReturn _ _ _
+
+/-- The actual `(1,2,2)` Hodge entry is exactly its eighteen-face numerator/reciprocal return. -/
+theorem hodgeJacobianMultiplierEntry_threeAxisMixedForwardDifference_one_two_two_eq
+    (frequency : SpatialFrequency) (component coordinate input : Fin 3) :
+    threeAxisMixedForwardDifference 0 1 2 1 2 2
+        (fun current ↦ hodgeJacobianMultiplierEntry current component coordinate input)
+        frequency =
+      stagedHodge122AllocationReturn
+        (fun current ↦ hodgeJacobianRatioNumerator current component coordinate input)
+        hodgeReciprocal frequency := by
+  rw [show (fun current ↦ hodgeJacobianMultiplierEntry current component coordinate input) =
+      fun current ↦ hodgeJacobianRatioNumerator current component coordinate input *
+        hodgeReciprocal current by
+    funext current
+    rw [hodgeJacobianMultiplierEntry_eq_ratio]
+    simp [hodgeJacobianRatioNumerator, hodgeReciprocal, hodgeCrossBasisFactor,
+      div_eq_mul_inv]]
+  exact threeAxisMixedForwardDifference_one_two_two_mul_eq_stagedAllocationReturn _ _ _
+
 /-- The actual `(1,1,1)` Hodge-entry envelope. -/
 def hodgeJacobianEntryThreeAxis111Envelope (lower bound : ℝ) : ℝ :=
   3 * bound ^ 2 * hodgeReciprocal111Envelope lower bound +
@@ -532,6 +900,20 @@ theorem hodgeJacobianEntryThreeAxis122Envelope_dyadic_le
 section Audit
 
 #print axioms threeAxisMixedForwardDifference_one_one_one_mul_eq_allocationReturn
+#print axioms hodge112OccurrenceLedger_length
+#print axioms hodge122OccurrenceLedger_length
+#print axioms threeAxisMixedForwardDifference_one_one_two_mul_eq_occurrenceReturn
+#print axioms threeAxisMixedForwardDifference_one_two_two_mul_eq_occurrenceReturn
+#print axioms hodge112Allocation_card
+#print axioms hodge122Allocation_card
+#print axioms hodge112AllocationAddressLedger_length
+#print axioms hodge122AllocationAddressLedger_length
+#print axioms threeAxisMixedForwardDifference_one_one_two_mul_eq_stagedAllocationReturn
+#print axioms threeAxisMixedForwardDifference_one_two_two_mul_eq_stagedAllocationReturn
+#print axioms hodge112OccurrenceReturn_eq_stagedAllocationReturn
+#print axioms hodge122OccurrenceReturn_eq_stagedAllocationReturn
+#print axioms hodgeJacobianMultiplierEntry_threeAxisMixedForwardDifference_one_one_two_eq
+#print axioms hodgeJacobianMultiplierEntry_threeAxisMixedForwardDifference_one_two_two_eq
 #print axioms norm_hodgeJacobianMultiplierEntry_threeAxisMixedForwardDifference_one_one_one_le
 #print axioms hodgeJacobianEntryThreeAxis111Envelope_dyadic_le
 #print axioms hodgeJacobianEntryThreeAxis112Envelope_dyadic_le
