@@ -37,18 +37,18 @@ quartic-amplitude receiver audit, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 472 |
-| theorem or lemma declarations | 6,022 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,536 |
-| modules below `ElementaryHolonics/Millennium/` | 425 |
-| theorem or lemma declarations below `Millennium/` | 5,624 |
-| broad declarations below `Millennium/` | 7,874 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,670 |
+| Lean modules below `ElementaryHolonics/` | 475 |
+| theorem or lemma declarations | 6,040 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,564 |
+| modules below `ElementaryHolonics/Millennium/` | 428 |
+| theorem or lemma declarations below `Millennium/` | 5,642 |
+| broad declarations below `Millennium/` | 7,902 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,684 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 425 Millennium modules.  Search prefixes
-inside the Millennium band include 212 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
-`Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
+modules, 8 Geometry modules, 20 dedicated RH modules, and 428 Millennium modules.  Search prefixes
+inside the Millennium band include 214 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+`Hilbert*`, 2 `Hodge*`, and 14 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
 [definition] The reproducible inventory receiver is:
@@ -73,6 +73,7 @@ returns that matter.
 |---|---|---|---|---|
 | `proved-derived; formal-checked` | `Foundation/Lineage.lean`, `AddressedBoundary.lean`, `ComparisonCell.lean` | additive algebra, pullbacks, quotients | addressed passages retain occurrence populations, boundary lineage, joined cancellation, and parallel-route defects | the full swing/connection/holonomy/receiver composition remains ordered by the active exterior blueprint |
 | `proved-derived; formal-checked` | `Millennium/Swing.lean`, `SwingBridges.lean`, `HolonicDifferenceCalculus.lean` | additive groups, projective ratios, complex exponential | swing reverses an anchored difference; additive receivers commute with iterated differences; finite integration telescopes to the exterior boundary | individual instance bridges do not identify every physical transport with an affine swing |
+| `proved-derived; formal-checked` | `Millennium/HolonicTerminalCurrent.lean` | complete uniform spaces, Cauchy filters, exact finite telescoping | an oriented interval current reverses by negation, every finite addressed partition glues to its exterior difference, terminal nullity is exactly eventual vanishing of pairwise receiver currents, and in a complete separated receiver it reconstructs one unique incoming terminal trace | each source theory must prove that its actual current enters this null cone; finite partition cancellation alone supplies no constitutive law |
 | `proved-derived; formal-checked` | `Foundation/MeasuredDifferenceReceiver.lean` | normed additive groups and `Real.exp` from Mathlib | a receiver scalar factors through an addressed chart difference; even readings retain a two-orientation fibre; ratios ignore chart-zero shifts; binary normalized exponentials factor through one potential difference | injectivity and physical constitutive laws require their own hypotheses |
 | `proved-derived; formal-checked` | `Foundation/PrimeValuationRadixAtlas.lean`, `Millennium/PrimeRadixAtlas.lean` | unique factorization of naturals and Mathlib's `Nat.factorization` | the complete prime-valuation face reconstructs every nonzero population; an exact radix chart returns a unique maximal depth and terminal residual; all prime coordinates balance; equal-depth additive valuation caustics transport through common scale | radix notation never licenses rounding, and the atlas does not turn an unproved analytic bound into a theorem |
 | `proved-derived; formal-checked` | `Foundation/TransportLift.lean`, `ReceiverQuotient.lean`, `ExactPartition.lean`, `LatticeTransport.lean`; `Geometry/DivisorAtlas.lean`; `Millennium/ValuationDivisorLatticeAtlas.lean` | additive kernels and quotients, integer modules, finitely supported functions, unique factorization | a general transport request returns an empty/singleton/kernel-coset fibre; partitions reconstruct as dependent sums with paired oriented boundaries; scalar divisibility is isolated as a multiplication lift; signed codimension-one ledgers turn inversion into negation and ratios into differences; Cartier transitions glue local ledgers; lattice maps return kernel, image, cokernel, finite index, torsion witnesses, and saturation | every specialization still owes its geometric locus, chart cover, constitutive transport, and official local-to-global theorem; no scalar factorization is promoted to a source-holon product |
@@ -185,6 +186,8 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | absorbed Hodge interaction enters the signed enstrophy receiver | `NavierStokesDissipationHodgeEnstrophy.lean` integrates the exact finite dyadic word, pays the scale-zero strain by `26244π√(2E)·Enstrophy`, sends the addressed Fourier reconstruction fibre to zero, transports absolute torus stretching through the unit-cube chart to the signed physical vortex-stretching term, and proves `EnstrophyRate ≤ -(ν/2)D_ω + 26244π√(2E)·Enstrophy + C(ν,M₁)‖ω‖₄⁴ + CurlForcingWork` | exact finite reconstruction/gluing, Fubini at each addressed band, compact torus integration, weighted-`H³` tail decay, Haar/cube chart transport, and the periodic enstrophy identity | derive a source-specific time law for the exact spatial `L⁴` population, sharpen it through another oriented difference/scale receiver, or prove that the presently conserved energy and integrated dissipation receivers are insufficient |
 | `counterexample; formal-checked` | quartic-amplitude receiver insufficiency | `NavierStokesVorticityFourthPowerAmplitude.lean` proves that the literal scalar action on an actual velocity world-sheet transports curl linearly, kinetic energy, enstrophy, and vorticity dissipation quadratically, the energy/enstrophy base cubically on a positive ray, and torus fourth-power vorticity mass quartically; whenever the source slice has positive fourth-power mass, no fixed pair of coefficients factors every positive-amplitude quartic occurrence through only the quadratic dissipation and cubic energy/enstrophy faces | exact scalar transport through `fderiv`, curl, gradient, compact Haar integration, and an Archimedean quartic-versus-lower-degree separator | this does not preserve the fixed Navier--Stokes equation data under amplitude rebase and does not refute regularity; it proves that a purely algebraic, amplitude-blind receiver cannot close the exposed `L⁴` term, so the next carrier must retain PDE evolution together with scale/time/orientation |
 | `proved-derived; formal-checked` | exact parabolic PDE rebase | `NavierStokesParabolicRebase.lean` constructs `uλ(x,t)=λu(λx,λ²t)`, `pλ=λ²p(λx,λ²t)`, `fλ=λ³f(λx,λ²t)`, and the transported initial face; it derives the actual time derivative, spatial derivative, advection, divergence, pressure-gradient, and Laplacian laws and proves that every positive-time official smooth-solution momentum occurrence returns under one common cubic factor while incompressibility returns on all nonnegative times | exact chain-rule transport through `deriv`, `fderiv`, the second iterated derivative, the canonical-covariant-tensor Laplacian, and the official `SmoothSolution` fields | package the positive-time constitutive return into a complete official solution carrier by transporting half-cylinder smoothness and the time-zero within derivative; periodic descendants additionally require the exact integer spatial-cover law |
+| `conditional; formal-checked` | critical accumulation terminal current | `NavierStokesTerminalCurrent.lean` turns the genuine nonnegative torus critical-vorticity rate into an oriented accumulated current, proves every finite time partition glues exactly, and proves that an `OpenAccumulatedCriticalVorticityBudget` makes the clipped accumulation monotone and bounded and therefore returns one unique finite terminal accumulated mass and a null terminal current | exact interval integration, monotone left-limit reconstruction, and the existing genuine critical-vorticity budget carrier | the budget is still a hypothesis, and its scalar terminal mass is not a terminal velocity or `H³` state; prove the PDE-owned budget and transport that return through the high-order reconstruction and restart seam |
+| `conditional; formal-checked` | signed enstrophy terminal current | `NavierStokesEnstrophyTerminalCurrent.lean` proves on every strand-integrable interior interval that `ΔEnstrophy + ν∫D = ∫Stretching + ∫CurlForcing`; it retains the signed stretching/forcing side as the exterior current, and proves that terminal returns of the three actual accumulated strands reconstruct the exact terminal enstrophy value and put enstrophy in the terminal null cone | exact periodic enstrophy derivative, fundamental theorem of calculus, signed viscous/stretching/forcing decomposition, and the generic terminal-current reconstruction law | construct the terminal strand-return receipt from the PDE.  In particular, the signed scalar vortex-stretching current is not forced null by the scalar critical accumulation theorem, and its source fibre still retains amplitude, orientation, and scale; after that return, lift the enstrophy trace to the source state and compatible restart |
 | `counterexample; formal-checked` | interior continuity versus terminal integrability | `strictInteriorContinuousNonnegative_not_sufficient_for_terminalIntegrability` exhibits the nonnegative population `‖(t-1)⁻¹‖`, continuous on `(0,1)` but not interval-integrable on `[0,1]` | Mathlib's exact inverse nonintegrability theorem composed with the norm receiver | any terminal continuation argument must exclude this pole class by a source-specific PDE estimate; no continuity-only promotion is lawful |
 | `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
@@ -219,6 +222,24 @@ missing scale face exactly: the complete actual vorticity translation difference
 `3‖d‖²` times the physical vorticity dissipation.  The next estimate must carry this L² difference
 through the reciprocal direction/Hodge stretching receiver without replacing it by a uniform
 derivative norm.
+
+[proved-derived; formal-checked] `HolonicTerminalCurrent.lean` now supplies the common
+local-to-global law which this worktrack had repeatedly approached indirectly.  The primary object
+is the oriented interval current `U(t)-U(s)`.  Finite gluing cancels every internal time face.  Its
+terminal null cone is the exact Cauchy condition on the incoming filter, equivalently eventual
+vanishing of every sufficiently late pairwise current in a normed receiver.  Completeness and
+separation reconstruct one unique terminal receiver value.  This law is reusable by every
+Millennium worktrack, but it becomes a problem solution only after the problem's constitutive
+current is proved null.
+
+[conditional; formal-checked] The Navier--Stokes attachment now distinguishes two different
+terminal returns.  A finite genuine critical-vorticity budget returns the unique terminal value of
+its accumulated scalar mass.  The exact signed enstrophy passage instead returns
+`ΔEnstrophy + ν∫D = ∫Stretching + ∫CurlForcing`; terminal traces of those three actual strands
+return terminal enstrophy.  The first result does not prove the second.  The shortest open passage
+is therefore a PDE-owned factorization from the critical accumulation carrier—or a sharper
+orientation/scale carrier—into the signed stretching/dissipation strand return, followed by the
+already exposed high-order state reconstruction and compatible restart.
 
 ## 8. Yang--Mills and mass gap
 
@@ -660,12 +681,13 @@ is no longer the constitutive equation itself, but its complete half-cylinder sm
 time-zero within-derivative packaging, followed by a receiver law strong enough to control the
 quartic population along that PDE-preserving family.
 
-1. **Navier--Stokes:** the amplitude-blind quadratic/cubic factorization of the exact spatial `L⁴`
-   receiver has been refuted, and the actual parabolic momentum/incompressibility transport is now
-   proved.  Complete that transport as an official solution carrier, then use the resulting
-   PDE-preserving scale family either to prove a maximal-time law or to return the stronger
-   concentration/separation theorem.  The next inequality may not discard the scale address
-   exposed by the quartic-versus-lower-degree separator.
+1. **Navier--Stokes:** the generic terminal null-cone/reconstruction law and the genuine critical
+   accumulation attachment are now proved, and the exact signed enstrophy exterior current is
+   isolated.  Construct from the PDE either the accumulated critical-vorticity budget itself or a
+   sharper orientation/scale carrier, then prove that it returns the dissipation,
+   vortex-stretching, and forcing strands at maximal time.  Transport that terminal return through
+   the high-order state reconstruction and compatible restart.  The passage may not discard the
+   scale address exposed by the quartic-versus-lower-degree separator.
 2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
    ternary coefficient and analytic theta lineages.
 3. **Hodge:** construct an official surface realization and transport the quotient difference and
