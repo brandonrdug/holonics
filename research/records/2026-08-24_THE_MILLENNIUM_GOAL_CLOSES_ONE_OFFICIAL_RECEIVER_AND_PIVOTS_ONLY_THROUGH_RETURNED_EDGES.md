@@ -155,6 +155,33 @@ strictly on the complementary Hodge side: the value, one-axis, two-axis, `111`, 
 bounds exist, while pointwise `112` and `122` entry bounds remain to be derived from their exact
 allocation ledgers and reciprocal scale descent.
 
+## Fourth returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisThirdTwoSlice.lean` closes the
+nine allocation faces whose scalar third-axis order is two.  Their complementary Hodge third order
+is zero, so the complete three-axis support witness descends exactly to the existing first/second
+two-axis stencil.  The all-orders scalar chart identifies the other hand with the natural tensor
+variation, and exact finite Fubini assembly retains each face's binomial occurrence weight.
+
+[proved-derived; formal-checked] Each of the nine actual allocation-face masses has inverse-cubic
+radial decay, and their complete weighted slab returns the uniform theorem
+
+```text
+directDyadicHodgeThreeAxisThirdTwoAllocationSlabMass
+  <= 12416369280072 / R^3
+```
+
+for every scale at least three.  The numeral is the exact sum of the nine proved face numerators
+with weights `[1,2,1] x [1,2,1]`; it is not rounded or enlarged.  The promoted axiom audit contains
+only propositional extensionality, classical choice, and quotient soundness, and contains no
+`sorryAx`.
+
+[open] This slab closes nine of the 27 allocation addresses.  Axis-addressed transport of the same
+two-axis theorem will close the two other slabs with a scalar order two.  After overlap, those
+three slabs cover 19 faces.  The scalar `(1,1,1)` face can use the existing pointwise `111` Hodge
+bound and the `(0,0,0)` face is already closed; the six residual faces are exactly those whose
+complementary Hodge orders are permutations of `112` or `122`.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
