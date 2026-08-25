@@ -6,14 +6,19 @@ Lean remains the authority for parsing, elaboration, proof terms, and kernel che
 executable `derivation_atlas` exports a versioned JSON bundle containing:
 
 - the elaborated `Expr` DAG;
+- exact multiplicity-weighted expression-use edges, including root uses and child fanout;
 - current-file declaration types and theorem/definition bodies;
 - source-linked term occurrences;
 - before/after proof-state events from Lean's `InfoTree`.
 
 The Rust tool validates the bundle's exact population and previously-interned-child invariant,
 then emits receiver-facing summaries of recurring expression faces, goal targets, theorem-body
-roots, and elaborator events. `extract` also writes a companion manifest binding the source and
-bundle SHA-256 identities.
+roots, elaborator events, literal integers, multiplication-factor candidates, and algebraic figure
+heads. `extract` also writes a companion manifest binding the source and bundle SHA-256 identities.
+
+The derived factor and figure rows are candidates with exact graph witnesses. They do not claim
+commutativity, associativity, definitional equality, or a geometric interpretation unless a later
+receiver proves that relation.
 
 From the repository root:
 

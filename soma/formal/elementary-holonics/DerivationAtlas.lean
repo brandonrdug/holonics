@@ -86,9 +86,17 @@ structure ExpressionNode where
   children : Array Nat
   deriving Inhabited, ToJson
 
+structure ExpressionUse where
+  node : Nat
+  parentNode : Option Nat
+  childPosition : Option Nat
+  count : Nat
+  deriving Inhabited, ToJson
+
 structure ExpressionInterner where
   byExpression : ExprMap Nat := {}
   nodes : Array ExpressionNode := #[]
+  rootCounts : Array Nat := #[]
   deriving Inhabited
 
 structure LocalStanding where
@@ -145,6 +153,7 @@ structure AtlasBundle where
   moduleExterior : String
   declarationModulePrefixExterior : String
   expressionNodes : Array ExpressionNode
+  expressionUses : Array ExpressionUse
   declarationOperations : Array DeclarationOperation
   termOccurrences : Array TermOccurrence
   proofEvents : Array ProofEvent
@@ -217,18 +226,62 @@ private partial def internExpressionNode (standing : IO.Ref ExpressionInterner)
     children
   }
   standing.set {
+    held with
     byExpression := held.byExpression.insert expression index
     nodes := held.nodes.push node
+    rootCounts := held.rootCounts.push 0
   }
   return index
+
+private def recordRootOccurrence (standing : IO.Ref ExpressionInterner)
+    (nodeIndex : Nat) : IO Unit := do
+  let held ← standing.get
+  standing.set {
+    held with
+    rootCounts := held.rootCounts.set! nodeIndex (held.rootCounts[nodeIndex]! + 1)
+  }
+
+private def materializeExpressionUses (standing : IO.Ref ExpressionInterner)
+    : IO (Array ExpressionUse) := do
+  let held ← standing.get
+  let mut counts := held.rootCounts
+  let mut returned := #[]
+  let mut remaining := held.nodes.size
+  while remaining > 0 do
+    let nodeIndex := remaining - 1
+    let count := counts[nodeIndex]!
+    let rootCount := held.rootCounts[nodeIndex]!
+    if rootCount > 0 then
+      returned := returned.push {
+        node := nodeIndex
+        parentNode := none
+        childPosition := none
+        count := rootCount
+      }
+    if count > 0 then
+      let node := held.nodes[nodeIndex]!
+      let mut position := 0
+      for child in node.children do
+        returned := returned.push {
+          node := child
+          parentNode := some nodeIndex
+          childPosition := some position
+          count
+        }
+        counts := counts.set! child (counts[child]! + count)
+        position := position + 1
+    remaining := nodeIndex
+  return returned
 
 private def expressionFace (standing : IO.Ref ExpressionInterner)
     (expression : Expr) : MetaM ExpressionFace := do
   let expression ← instantiateMVars expression
+  let rootNode ← internExpressionNode standing expression
+  recordRootOccurrence standing rootNode
   return {
     renderedExterior := toString (← Meta.ppExpr expression)
     leanStructuralHashExterior := reprStr expression.hash
-    rootNode := ← internExpressionNode standing expression
+    rootNode
   }
 
 private def goalFace (standing : IO.Ref ExpressionInterner)
@@ -368,12 +421,14 @@ def run (args : List String) : IO UInt32 := do
       events := returned.2
   let declarations ← declarationOperations interner processed.environment modulePrefix
   let expressionNodes := (← interner.get).nodes
+  let expressionUses ← materializeExpressionUses interner
   let bundle : AtlasBundle := {
-    schema := "holonics.derivation-atlas.v1"
+    schema := "holonics.derivation-atlas.v2"
     sourcePathExterior := input
     moduleExterior := processed.moduleName
     declarationModulePrefixExterior := modulePrefix
     expressionNodes
+    expressionUses
     declarationOperations := declarations
     termOccurrences := terms
     proofEvents := events
