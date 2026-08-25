@@ -1551,6 +1551,54 @@ receiver factorization and identify the scale address that the next carrier must
 All thirteen printed audits depend only on propositional extensionality, classical choice, and
 quotient soundness, with no `sorryAx`.
 
+## Thirty-sixth returned deed
+
+[counterexample; formal-checked]
+`NavierStokesVorticityFourthPowerAmplitude.lean` audits the amplitude direction which the exposed
+`L⁴` receiver had suppressed.  On the literal scalar action `u_a = a u`, curl and every component
+vorticity gradient commute with the action exactly.  Consequently the actual physical receivers
+return, for every real `a`,
+
+```text
+E(u_a) = a² E(u),       Enstrophy(u_a) = a² Enstrophy(u),
+D_omega(u_a) = a² D_omega(u),
+FourthPowerMass(a omega) = a⁴ FourthPowerMass(omega).
+```
+
+For `a >= 0`, the combined kinetic-energy/enstrophy base has exact cubic homogeneity:
+
+```text
+sqrt(2 E(u_a)) * Enstrophy(u_a)
+  = a³ * sqrt(2 E(u)) * Enstrophy(u).
+```
+
+[counterexample; formal-checked]
+If one admitted solution slice has positive fourth-power vorticity mass, then for every two fixed
+real coefficients `A,B` an exact positive amplitude separates the quartic occurrence from the
+quadratic/cubic receiver:
+
+```text
+a⁴ * FourthPowerMass
+  > A * a² * D_omega + B * a³ * sqrt(2 E) * Enstrophy.
+```
+
+The theorem is also stated directly with all four receiver faces evaluated after the same
+amplitude transport of the physical velocity world-sheet.  Thus no amplitude-independent
+algebraic factorization through only those lower-degree faces can close the nonlinear remainder.
+The separator is exact and uses no estimate, rounding, random value, or asymptotic notation.
+
+[open]
+Scalar amplitude transport need not preserve the fixed force, pressure, viscosity, and initial
+data of the original Navier--Stokes solution.  Therefore this is not a counterexample to regularity
+and does not exclude an inequality founded in the PDE evolution.  It excludes the amplitude-blind
+receiver alone.  The next carrier must retain the equation's scale address, chronology, and
+oriented interaction—or exhibit a PDE-preserving concentration family—before it can return the
+maximal-time `L⁴` law required by the signed enstrophy passage.
+
+[counterexample; formal-checked]
+All ten printed audits depend only on propositional extensionality, classical choice, and quotient
+soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
