@@ -1349,6 +1349,66 @@ constant would reopen the edge just closed.
 All fourteen printed audits depend only on propositional extensionality, classical choice, and
 quotient soundness, with no `sorryAx`.
 
+## Thirty-third returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesPhysicalTranslationDissipation.lean` closes the inverse chart which the coefficient
+law left open. Translation by an addressed torus occurrence acts diagonally on the complete
+Fourier receiver:
+
+```text
+FourierCoeff(translate(field,y),k)
+  = character(k,y) * FourierCoeff(field,k).
+```
+
+Haar translation invariance proves this identity on the genuine quotient torus, and Parseval
+therefore reconstructs the entire coefficient difference population as the literal physical
+square integral. Applied componentwise to the real vorticity field through its complex Fourier
+chart, the returned equality is
+
+```text
+integral_q norm(omega(t,q+euclideanToTorus(d)) - omega(t,q))^2
+  = sum_component translationDifferenceMass(actualVorticityComponent(t),d).
+```
+
+[proved-derived; formal-checked]
+Composing that equality with the preceding coefficient-space dissipation theorem gives the exact
+physical constitutive law
+
+```text
+integral_q norm(omega(t,q+euclideanToTorus(d)) - omega(t,q))^2
+  <= 3 * norm(d)^2 * periodicVorticityDissipation(t).
+```
+
+The centered Euclidean representative of an arbitrary torus displacement has norm at most three
+times its torus distance from zero. The same theorem consequently returns the intrinsic chart:
+
+```text
+integral_q norm(omega(t,q+y) - omega(t,q))^2
+  <= 27 * dist(y,0)^2 * periodicVorticityDissipation(t).
+```
+
+No cutoff, sampled receiver, asymptotic estimate, rounded coefficient, selected anchor, or global
+vorticity Lipschitz constant occurs in this reconstruction.
+
+[interpretation]
+The holonic action residue is no longer merely visible in the coefficient ledger. One addressed
+translation word returns an oriented physical difference current; its complete receiver square is
+preserved by the Fourier chart transition; and the PDE's gradient-square dissipation pays for that
+current exactly. The interpretation names the reusable composition, while the promoted content is
+the checked equality and inequalities above.
+
+[open]
+The immediate residual is to use the existing aligned Hodge-kernel cancellation before any
+pointwise supremum collapse. Pairing its spatial difference factor with this `L²` current should
+return a Cauchy--Schwarz receiver involving dissipation and the spatial fourth-power vorticity
+population (or a sharper oriented replacement). That receiver must then either be absorbed by
+viscosity or be shown terminal-time integrable before it can inhabit the continuation theorem.
+
+[proved-derived; formal-checked]
+All eight printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
