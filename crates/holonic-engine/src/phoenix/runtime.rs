@@ -21,15 +21,15 @@ use crate::embedding_fiber::{AlignedMaterial, ResidentReadout};
 use crate::exact_work::ExactWork;
 use crate::front_passage::{ApparatusPrediction, DeedAdmission};
 use crate::phoenix::native_streamed::NativeMaterialSource;
+use crate::phoenix::session_factor_complex::{
+    FactorMutationReceipt, ResidentFactorCurrentReturn, SessionFactorComplex,
+    SessionFactorComplexIdentity, SessionFactorComplexRest, TowerFactorRealization,
+};
 use crate::phoenix::streamed::streamed_cultivation::{ExecutionReceipt, OverlayExecutionIdentity};
 use crate::phoenix::streamed::{self, ApparatusCensus, CultivatedCirculated, MaterialSource};
 use crate::phoenix::tower;
 use crate::resident_section::{ResidentGrain, ResidentSurface, SeriesAperture};
 use crate::streamed_standing::StreamedCensus;
-use crate::phoenix::session_factor_complex::{
-    FactorMutationReceipt, ResidentFactorCurrentReturn, SessionFactorComplex,
-    SessionFactorComplexIdentity, SessionFactorComplexRest, TowerFactorRealization,
-};
 
 /// The source-detached runtime's returned semantic face and its complete resident receipt.
 pub struct RuntimeReturn {
@@ -309,7 +309,9 @@ impl ProductSession {
         open_factor_addresses: Vec<String>,
     ) -> Result<SessionFactorComplexIdentity, String> {
         if self.factor_complex.is_some() {
-            return Err("the product session already carries a deposited factor complex".to_owned());
+            return Err(
+                "the product session already carries a deposited factor complex".to_owned(),
+            );
         }
         let complex = SessionFactorComplex::found(
             cover,
@@ -324,9 +326,7 @@ impl ProductSession {
             .ok_or_else(|| "the factor complex disappeared after deposit".to_owned())
     }
 
-    pub fn factor_complex_identity(
-        &self,
-    ) -> Result<Option<SessionFactorComplexIdentity>, String> {
+    pub fn factor_complex_identity(&self) -> Result<Option<SessionFactorComplexIdentity>, String> {
         self.factor_complex
             .as_ref()
             .map(SessionFactorComplex::identity)
@@ -354,7 +354,9 @@ impl ProductSession {
     /// The rest itself carries no product tensors, transcript, sibling response or source payload.
     pub fn mount_factor_complex_rest(&mut self, bytes: &[u8]) -> Result<(), String> {
         if self.factor_complex.is_some() {
-            return Err("the product session already carries a deposited factor complex".to_owned());
+            return Err(
+                "the product session already carries a deposited factor complex".to_owned(),
+            );
         }
         self.factor_complex = Some(
             SessionFactorComplex::remount(bytes, self.factor.clone())
@@ -368,7 +370,9 @@ impl ProductSession {
         rest: SessionFactorComplexRest,
     ) -> Result<(), String> {
         if self.factor_complex.is_some() {
-            return Err("the product session already carries a deposited factor complex".to_owned());
+            return Err(
+                "the product session already carries a deposited factor complex".to_owned(),
+            );
         }
         self.factor_complex = Some(
             SessionFactorComplex::remount_rest(rest, self.factor.clone())
@@ -378,7 +382,9 @@ impl ProductSession {
     }
 
     pub fn factor_cover(&self) -> Option<&crate::derived_factor_cover::DerivedFactorCover> {
-        self.factor_complex.as_ref().map(SessionFactorComplex::cover)
+        self.factor_complex
+            .as_ref()
+            .map(SessionFactorComplex::cover)
     }
 
     /// The caused realization word after the cover owner has ordered it by the first addressed
@@ -513,10 +519,7 @@ impl ProductSession {
         entering_role: &str,
         content: &str,
     ) -> Result<ExteriorTurnPresentation, String> {
-        if entering_role.is_empty()
-            || entering_role.contains(['\n', '\r'])
-            || content.is_empty()
-        {
+        if entering_role.is_empty() || entering_role.contains(['\n', '\r']) || content.is_empty() {
             return Err("the exterior turn face is empty or malformed".to_owned());
         }
         self.present_exterior_exchange(&[(entering_role, content)])
@@ -654,11 +657,7 @@ impl ProductSession {
         let mut previous_group = 0usize;
         for (token, (start, end)) in encoding.get_offsets().iter().copied().enumerate() {
             let group = if start == end {
-                if token == 0 {
-                    0
-                } else {
-                    previous_group
-                }
+                if token == 0 { 0 } else { previous_group }
             } else {
                 byte_boundaries[1..]
                     .iter()
@@ -819,6 +818,10 @@ impl ProductSession {
     }
     pub fn native_extent(&self) -> u32 {
         self.mounted.predecessor().codebook().vocabulary_extent
+    }
+    /// The exact resident carrier grain authenticated by this product's runtime law.
+    pub fn resident_grain(&self) -> u32 {
+        self.runtime_law.grain
     }
     pub fn unresolved_source_ids(&self) -> Vec<u32> {
         self.source_native_correspondence().unresolved_source
@@ -1040,6 +1043,38 @@ impl ProductSession {
         site: streamed::InterventionSite,
         intervention: &tower::Intervention,
     ) -> Result<RuntimeReturn, String> {
+        self.infer_native_partitioned_with_receiver(
+            rows,
+            site,
+            intervention,
+            streamed::ReceiverOption::Complete,
+        )
+    }
+
+    /// Capture the exact terminal carrier row of every foreign layer for plural independently
+    /// addressed native histories in one resident partition. This is a construction receiver for
+    /// enlarging a descended coefficient lattice; it is never the frozen inference fallback.
+    pub fn capture_native_partitioned_layer_sections_with_intervention(
+        &self,
+        rows: &[Vec<u32>],
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+    ) -> Result<RuntimeReturn, String> {
+        self.infer_native_partitioned_with_receiver(
+            rows,
+            site,
+            intervention,
+            streamed::ReceiverOption::LayerTerminalSections,
+        )
+    }
+
+    fn infer_native_partitioned_with_receiver(
+        &self,
+        rows: &[Vec<u32>],
+        site: streamed::InterventionSite,
+        intervention: &tower::Intervention,
+        receiver: streamed::ReceiverOption,
+    ) -> Result<RuntimeReturn, String> {
         if rows.is_empty() || rows.iter().any(Vec::is_empty) {
             return Err("the native occurrence partition is empty".to_owned());
         }
@@ -1094,7 +1129,7 @@ impl ProductSession {
             presentation,
             site,
             intervention,
-            streamed::ReceiverOption::Complete,
+            receiver,
         )
     }
 
@@ -1145,25 +1180,27 @@ impl ProductSession {
             })
             .transpose()?;
         let factor_complex_identity = self.factor_complex_identity()?;
-        let receiver_rows = match receiver {
-            streamed::ReceiverOption::Terminal => 1,
-            streamed::ReceiverOption::Complete => presentation.received_rows,
+        let partitioned = matches!(
+            presentation.kind.as_str(),
+            "addressed-causal-partition" | "independent-native-causal-partition"
+        );
+        let receiver_rows = match (partitioned, receiver) {
+            (true, _) => presentation.received_rows,
+            (false, streamed::ReceiverOption::Complete) => presentation.received_rows,
+            (false, _) => 1,
         };
         let prepared = self.prepare_with_rows(&native_ids, receiver_rows)?;
         let request = prepared.request()?;
         let mut source = prepared.source();
-        let surface = ResidentSurface::on(&self.readout)
-            .map_err(|e| format!("resident surface: {e:?}"))?;
+        let surface =
+            ResidentSurface::on(&self.readout).map_err(|e| format!("resident surface: {e:?}"))?;
         let runtime_law = self.runtime_law.clone();
         let chart = match runtime_law.chart {
             RuntimeChart::Midpoint => tower::Chart::Midpoint,
             RuntimeChart::Interval => tower::Chart::Interval,
         };
         let token_rows = native_ids.iter().map(|id| *id as usize).collect::<Vec<_>>();
-        let cultivated = if matches!(
-            presentation.kind.as_str(),
-            "addressed-causal-partition" | "independent-native-causal-partition"
-        ) {
+        let cultivated = if partitioned {
             streamed::circulate_cultivated_with_partitioned_intervention(
                 &surface,
                 &self.readout,
@@ -1673,10 +1710,9 @@ fn factor_runtime(
     {
         return Err("product factors disagree with the authenticated derivation".to_owned());
     }
-    let supported = crate::exact_linear::ExactRatMatrix::new(vec![right_values
-        .iter()
-        .map(|v| &left_value * v)
-        .collect()])
+    let supported = crate::exact_linear::ExactRatMatrix::new(vec![
+        right_values.iter().map(|v| &left_value * v).collect(),
+    ])
     .map_err(|e| e.to_string())?;
     let zero =
         crate::exact_linear::ExactRatMatrix::zero(1, columns.len()).map_err(|e| e.to_string())?;

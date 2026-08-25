@@ -1,4 +1,5 @@
 import Mathlib.Logic.Relation
+import Mathlib.Data.Set.Operations
 
 /-!
 # Receivers and receiver-exact compression
@@ -100,5 +101,89 @@ theorem Compression.receiver_eq_of_quotient_eq
   intro i
   rw [← c.exact i x, ← c.exact i y, h]
 
-end Soma.Holonics
+/-! ## One receiver transforms into another only through its retained fibre -/
 
+/--
+The relation presented by two receivers over the same situated occurrence population.
+
+It is deliberately a relation before any single-valuedness claim: one entering face may still
+carry several returned faces when the entering receiver forgot a distinction needed later.
+-/
+def receiverToReceiverRelation {X : Type u} {Entering : Type v} {Returned : Type w}
+    (entering : X → Entering) (returned : X → Returned) : Rel Entering Returned :=
+  fun enteringFace returnedFace ↦
+    ∃ occurrence, entering occurrence = enteringFace ∧ returned occurrence = returnedFace
+
+/--
+A functional receiver-to-receiver transformer on the actually presented entering face.
+
+The domain is `Set.range entering`, not the whole exterior carrier: an unpresented foreign
+coordinate owes no invented returned value.
+-/
+structure ReceiverTransformer {X : Type u} {Entering : Type v} {Returned : Type w}
+    (entering : X → Entering) (returned : X → Returned) where
+  transform : Set.range entering → Returned
+  exact : ∀ occurrence,
+    transform ⟨entering occurrence, ⟨occurrence, rfl⟩⟩ = returned occurrence
+
+/-- The complete situated population behind one actually presented entering face. -/
+def receiverReconstructionFibre {X : Type u} {Entering : Type v}
+    (entering : X → Entering) (face : Set.range entering) : Type u :=
+  { occurrence : X // entering occurrence = face.1 }
+
+/--
+The exact descent criterion: an entering receiver determines the returned receiver precisely when
+every pair it identifies is also identified by the returned receiver.
+-/
+theorem receiverTransformer_exists_iff
+    {X : Type u} {Entering : Type v} {Returned : Type w}
+    (entering : X → Entering) (returned : X → Returned) :
+    Nonempty (ReceiverTransformer entering returned) ↔
+      ∀ left right, entering left = entering right → returned left = returned right := by
+  constructor
+  · rintro ⟨transformer⟩ left right sameEntering
+    let leftFace : Set.range entering := ⟨entering left, ⟨left, rfl⟩⟩
+    let rightFace : Set.range entering := ⟨entering right, ⟨right, rfl⟩⟩
+    have sameFace : leftFace = rightFace := Subtype.ext sameEntering
+    exact calc
+      returned left = transformer.transform leftFace := (transformer.exact left).symm
+      _ = transformer.transform rightFace := congrArg transformer.transform sameFace
+      _ = returned right := transformer.exact right
+  · intro identified
+    classical
+    refine ⟨{
+      transform := fun face ↦ returned (Classical.choose face.property)
+      exact := ?_
+    }⟩
+    intro occurrence
+    exact identified _ occurrence (Classical.choose_spec
+      (show entering occurrence ∈ Set.range entering from ⟨occurrence, rfl⟩))
+
+/-- A returned distinction inside one entering fibre is an exact insufficiency witness. -/
+structure ReceiverInsufficiency {X : Type u} {Entering : Type v} {Returned : Type w}
+    (entering : X → Entering) (returned : X → Returned) where
+  left : X
+  right : X
+  sameEntering : entering left = entering right
+  differentReturned : returned left ≠ returned right
+
+/-- A functional transformer and an insufficiency witness cannot inhabit the same receiver span. -/
+theorem ReceiverTransformer.excludesInsufficiency
+    {X : Type u} {Entering : Type v} {Returned : Type w}
+    {entering : X → Entering} {returned : X → Returned}
+    (transformer : ReceiverTransformer entering returned)
+    (insufficiency : ReceiverInsufficiency entering returned) : False := by
+  exact insufficiency.differentReturned
+    ((receiverTransformer_exists_iff entering returned).mp ⟨transformer⟩
+      insufficiency.left insufficiency.right insufficiency.sameEntering)
+
+/-- Distinct entering faces may lawfully condense into one returned face. -/
+structure ReceiverCondensation {X : Type u} {Entering : Type v} {Returned : Type w}
+    {entering : X → Entering} {returned : X → Returned}
+    (transformer : ReceiverTransformer entering returned) where
+  left : Set.range entering
+  right : Set.range entering
+  distinctEntering : left ≠ right
+  sameReturned : transformer.transform left = transformer.transform right
+
+end Soma.Holonics

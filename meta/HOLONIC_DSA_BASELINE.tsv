@@ -33,7 +33,7 @@ crates/holonic-engine/src/corpus_census.rs	.clone()=1	.collect()=15	.into_iter()
 crates/holonic-engine/src/coupled_informant.rs	.clone()=22	.collect()=21	.flat_map()=1	.into_iter()=1	BTreeMap=18	BTreeSet=15	Vec=38
 crates/holonic-engine/src/cross_chart.rs	.clone()=32	.collect()=1	Vec=24
 crates/holonic-engine/src/cuda_aperture.rs	.clone()=21	.collect()=10	.into_iter()=9	BTreeMap=11	BTreeSet=12	Vec=12
-crates/holonic-engine/src/cuda_refine.rs	.collect()=13	.flat_map()=1	.into_iter()=1	BTreeMap=13	BTreeSet=2	Vec=139
+crates/holonic-engine/src/cuda_refine.rs	.clone()=7	.collect()=18	.flat_map()=2	.into_iter()=3	BTreeMap=13	BTreeSet=3	Vec=156
 crates/holonic-engine/src/cuda_relation.rs	.clone()=9	.collect()=3	.into_iter()=3	Vec=10
 crates/holonic-engine/src/cultivated_rest/directory.rs	.clone()=7	.collect()=1	BTreeSet=2	Vec=5
 crates/holonic-engine/src/cultivated_rest/mod.rs	Vec=4
@@ -136,16 +136,19 @@ crates/holonic-engine/src/phoenix/cultivation_overlay.rs	.clone()=13	.collect()=
 crates/holonic-engine/src/phoenix/cultivation_overlay_tests.rs	.clone()=2	.collect()=2
 crates/holonic-engine/src/phoenix/alpha_rest.rs	.clone()=1	Vec=4
 crates/holonic-engine/src/phoenix/emanative.rs	.clone()=7	.collect()=3	BTreeSet=2	Vec=11
+crates/holonic-engine/src/phoenix/foreign_potential_rest.rs	.clone()=17	.collect()=13	.flat_map()=3	.into_iter()=1	BTreeMap=6	BTreeSet=8	Vec=56
+crates/holonic-engine/src/phoenix/foreign_section_descent.rs	.clone()=31	.collect()=57	.into_iter()=8	BTreeMap=3	BTreeSet=7	Vec=97
 crates/holonic-engine/src/phoenix/heterogeneous_fusion.rs	.clone()=11	.collect()=4	.flat_map()=2	.into_iter()=1	BTreeMap=2	BTreeSet=3	Vec=22
 crates/holonic-engine/src/phoenix/inference_ecology.rs	.clone()=3	.collect()=1	.flat_map()=2	.into_iter()=1	Vec=3
 crates/holonic-engine/src/phoenix/native_streamed.rs	.clone()=1	.collect()=2	Vec=2
 crates/holonic-engine/src/phoenix/recurrent.rs	.clone()=21	.collect()=13	.flat_map()=1	BTreeMap=5	BTreeSet=4	Vec=28
 crates/holonic-engine/src/phoenix/recurrent_condensation.rs	.clone()=8	.collect()=5	BTreeSet=2	Vec=16
 crates/holonic-engine/src/phoenix/recurrent_return.rs	.clone()=9	.collect()=7	Vec=19
-crates/holonic-engine/src/phoenix/runtime.rs	.clone()=40	.collect()=28	.flat_map()=2	.into_iter()=2	BTreeSet=3	Vec=49
-crates/holonic-engine/src/phoenix/session_factor_complex.rs	.clone()=22	.collect()=16	.into_iter()=2	BTreeMap=3	BTreeSet=10	Vec=24
+crates/holonic-engine/src/phoenix/receiver_restricted_transport.rs	.clone()=29	.collect()=38	.flat_map()=3	.into_iter()=6	BTreeMap=14	BTreeSet=45	Vec=57
+crates/holonic-engine/src/phoenix/runtime.rs	.clone()=40	.collect()=28	.flat_map()=2	.into_iter()=2	BTreeSet=3	Vec=51
+crates/holonic-engine/src/phoenix/session_factor_complex.rs	.clone()=26	.collect()=18	.into_iter()=2	BTreeMap=3	BTreeSet=16	Vec=25
 crates/holonic-engine/src/phoenix/site.rs	.clone()=8	BTreeMap=2	Vec=6
-crates/holonic-engine/src/phoenix/streamed.rs	.clone()=38	.collect()=7	.flat_map()=2	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=66
+crates/holonic-engine/src/phoenix/streamed.rs	.clone()=38	.collect()=7	.flat_map()=2	.into_iter()=1	BTreeMap=10	BTreeSet=4	Vec=71
 crates/holonic-engine/src/phoenix/streamed_cultivation.rs	.clone()=9	BTreeMap=2	Vec=4
 crates/holonic-engine/src/phoenix/tower.rs	.clone()=10	.collect()=3	BTreeMap=3	Vec=11
 crates/holonic-engine/src/phoenix/w5.rs	.clone()=37	.collect()=16	.into_iter()=4	BTreeMap=3	BTreeSet=23	Vec=55
@@ -171,7 +174,7 @@ crates/holonic-engine/src/receiver.rs	.clone()=110	.collect()=27	.into_iter()=4	
 crates/holonic-engine/src/receiver_current.rs	.clone()=14	.collect()=1	Vec=12
 crates/holonic-engine/src/receiver_ecology.rs	.clone()=18	.collect()=16	.into_iter()=1	BTreeMap=10	BTreeSet=10	Vec=28
 crates/holonic-engine/src/receiver_exact_compression.rs	.clone()=3	.collect()=19	.into_iter()=4	BTreeMap=11	BTreeSet=9	Vec=45	VecDeque=2
-crates/holonic-engine/src/receiver_history_compression.rs	.clone()=3	.collect()=6	BTreeMap=9	BTreeSet=13	Vec=23
+crates/holonic-engine/src/receiver_history_compression.rs	.clone()=5	.collect()=22	BTreeMap=15	BTreeSet=30	Vec=42
 crates/holonic-engine/src/receiver_history_cultivation.rs	.clone()=14	.collect()=4	Vec=20
 crates/holonic-engine/src/receiver_phase_atlas.rs	.clone()=22	.collect()=14	.flat_map()=2	.into_iter()=1	BTreeMap=14	BTreeSet=18	Vec=25
 crates/holonic-engine/src/reduction_junction.rs	.clone()=26	.collect()=10	Vec=57

@@ -1859,6 +1859,12 @@ pub struct Contact {
     /// Addressed independent-section boundaries.  When present, contact cannot cross from one
     /// partition into another even though the apparatus carries the rows in one flat allocation.
     pub partition: Option<String>,
+    /// The greatest causal span of one declared partition, derived from its exact boundaries.
+    /// `None` means the ordinary unpartitioned `min(rows, window)` reach.
+    pub partition_reach: Option<usize>,
+    /// Sum of the enacted causal spans over every addressed terminal row. It prices exact work
+    /// without charging contacts which cross a partition boundary.
+    pub partition_reach_sum: Option<u64>,
 }
 
 impl ResidentLaw for Contact {
@@ -1905,7 +1911,34 @@ impl ResidentLaw for Contact {
         let (rows, q_width, q_octaves) = shape_at(inputs, 0);
         let (_, k_width, k_octaves) = shape_at(inputs, 1);
         let (_, v_width, v_octaves) = shape_at(inputs, 2);
-        surface.shape_contact(
+        match (
+            self.partition.as_ref(),
+            self.partition_reach,
+            self.partition_reach_sum,
+        ) {
+            (None, None, None) => {}
+            (Some(_), Some(reach), Some(sum))
+                if reach > 0
+                    && sum >= rows as u64
+                    && sum <= (rows as u64).saturating_mul(reach as u64) => {}
+            _ => {
+                return Err(ResidentRefusal::Declaration {
+                    operation: "contact",
+                    what: "partition contact lacks a receiver-derived reach and exact reach sum"
+                        .to_owned(),
+                });
+            }
+        }
+        let reach = self
+            .partition_reach
+            .unwrap_or_else(|| rows.min(self.window.max(1)))
+            .min(self.window.max(1));
+        let reach_sum = self.partition_reach_sum.unwrap_or_else(|| {
+            (0..rows)
+                .map(|at| (at + 1).min(self.window.max(1)) as u64)
+                .sum()
+        });
+        surface.shape_contact_with_declared_reach(
             rows,
             q_width,
             k_width,
@@ -1913,7 +1946,8 @@ impl ResidentLaw for Contact {
             self.heads,
             self.kv_heads,
             self.head_width,
-            self.window,
+            reach,
+            reach_sum,
             self.terms,
             grain,
             q_octaves,

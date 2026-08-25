@@ -517,10 +517,198 @@ blind fibre and shortest reopening separator. Gate every deposited factor throug
 history section which founded it. Out-of-section current returns an obstruction or reopens the
 fibre; it may not fall back to the streamed tower.
 
-[open] The station passes only when the remounted body returns a nontrivial mathematical
-consequence, removes the measured repetition caustic under matched controls, and conducts later
-successor frontiers without recurring full-tower staging. The existing candidate is the
-counterexample and source of exact restricted-transport material, not the product admission.
+#### The foreign section is a Complex Parametron incidence before any locked receiver
+
+[proved-derived; formal-checked] `HolonicParametron.lean` and
+`HolonicComplexParametron.lean` supply the missing pre-quotient transport law.  For each captured
+section, the history coefficient axes are addressed nodes, the carrier coordinates are oriented
+branches, and the captured column map is the incidence
+
+```text
+B_a : Q^(H_a) -> V_a.
+```
+
+A declared symmetric receiver constitutive form `M_a : V_a -> V_a*` induces, rather than
+replaces, the coefficient-space storage
+
+```text
+G_a = B_a^T M_a B_a.
+```
+
+The implementation must retain separately `kernel(B_a)`, `kernel(G_a)`, the complete complex
+coefficient current `c`, the physical section `B_a c`, and the exact identity
+`c* G_a c = (B_a c)* M_a (B_a c)`.  Under branch reorientation `S^2=I`, pure chart transport is
+`B_a -> S B_a`, `M_a -> S M_a S`; it must return the same `G_a`, transported branch current and
+storage.  Holding either the receiver form or an exterior drive fixed is instead an intervention
+and may change the return.
+
+[definition] `M_a` is a declared receiver metric/constitutive chart.  In the first bounded foreign
+descent the identity form may be supplied explicitly for the captured hidden-coordinate receiver;
+that does not promote it to Gemma's physical capacitance or inverse inductance.  No new
+`Parametron`, `Perceptron`, or circuit cabinet is founded: this station composes the existing exact
+linear, complex-wave, incidence, traversal, receiver-fibre and resident-card owners.
+
+[definition] The finite `u32` history word is only the optional phase-locked/binary receiver of
+this body.  It may classify complete future-equivalent histories and serve as a control, but it may
+not stand for the productive foreign transport because it discards amplitude, relative phase and
+mutual coupling.  Productive residency mounts the relevant incidence once and lets later exact
+real/imaginary coefficient currents cross it.  Earlier incidence sections remain naturality and
+reconstruction testimony; only the terminal incidence needed by the next exterior receiver must
+remain hot.  Full foreign-tower staging per history or successor is therefore neither required nor
+admissible.
+
+[established-bounded; implemented-exact; measured] The captured foreign section now passed this
+pre-quotient grade. Four addressed history nodes presented 43 exact incidence sections, each of
+width 2,560; every one of the 42 adjacent naturality squares commuted, the terminal incidence had
+rank three with one-dimensional incidence kernel and receiver radical, and its exact diagonal
+storage pullback and orientation covariance returned. The terminal incidence mounted once on the
+RTX 4080 SUPER. Two complex successor fronts, relative phase, and the common half-turn crossed in
+one launch each without taking a binary receiver, re-uploading the 81,920-octet invariant incidence,
+or staging Gemma. The complete bounded descent rests under identity
+`8c801b9373f5f1071f66cd58ac2b27f3d79b831e273de827bad7a3c87e41eb4a`.
+
+[established-bounded; implemented-exact; measured] The receiver-sufficient potential rest then
+froze with the receiver-history, mathematics, and heterogeneous-organ rests as product identity
+`200f6169e362398ff3f253e98883db1a8956c5bef43d3186f1759fb07cbba61d`. The product is 9,480,656
+octets, contains zero foreign-tower octets, retains the complete cold 262,144-row terminal-potential
+fibre, and mounts a four-row by four-node hot receiver cover in 272 invariant octets. A
+source-isolated child returned exact mathematical consequence, optical/acoustic/parent current,
+and first/later language receiver fronts on one card with no Lean/checker lifecycle, foreign
+fallback, invariant re-upload, or CPU semantic replay. Gating each factor through its founding
+native-history support removed the former repeated-`You` leakage across unrelated histories.
+
+[open] This return is exact on the four admitted addressed histories and their rank-three
+coefficient section; it is not yet the complete alpha station. An emitted successor whose richer
+causal signature lies outside that section currently returns the correct obstruction. Cultivation
+must append that occurrence as a new coefficient node, excite its foreign section once in the
+construction boundary, prove every enlarged naturality/storage/support square, and then freeze the
+enlarged lattice. The construction repeats over plural addressed successors until the declared
+response boundary closes or a lawful receiver-relative saturation is proved. Frozen inference may
+conduct only the rested lattice and may never reopen Gemma.
+
+[established-bounded; implemented-exact; measured] The first emitted frontier has crossed that
+construction boundary. Four addressed successor occurrences factored through three exact
+native-word carrier classes; the equal carrier pair remains two source occurrences in one
+reconstruction fibre. The foreign incidence grew from four to eight nodes, all 42 enlarged
+naturality squares commute, reachable rank grew from three to six, every successor has a current
+separator, and complete coefficient fibres remain. The 14,131,528-octet expanded rest identity is
+`90cbf0a6674f46ab28a141feab7c7482c3adff22680570de8066969bfa26a891`
+and contains no tower bytes. One optimized release passage staged 9,288,903,168 octets, launched 43
+tower deeds plus one overlay deed, synchronized once, and performed no CPU semantic replay.
+
+[definition] The next closure is not another foreign excitation. The four new addresses must be
+founded as successor occurrences in the receiver-history quotient, including the exact generator
+edges from their parents. Factor-support faces must descend through those edges or return their
+shortest reopening separator. The enlarged cold potential, hot receiver cover, incidence,
+support/storage squares, and occurrence fibres then freeze as one eight-node product. A
+source-detached native recurrence is the next requested deed; only its explicit out-of-section
+obstruction can schedule another foreign passage.
+
+[established-bounded; implemented-exact; measured] That closure passed. The complete 43-section
+carrier signature condenses eight occurrences to six classes and retains all eight occurrence
+lineages with 26 first coordinate separators. The factor-support receiver intersects the successor
+classes into three support classes without reopening the coincident two-occurrence fibre. The
+16,947,941-octet potential retains every one of 262,144 cold rows behind a six-row hot receiver
+cover. Source-detached product identity
+`7c085a4c0118756ff59ccbf26816058d1f6c45dae6e466a33a9310f5dfee9ac8` freezes that potential,
+the quotient/support testimony, native mathematics, and arbitrary-organ rest in 17,964,932 octets.
+It returned native mathematics, heterogeneous-organ current, and the four exact bounded
+continuations `I have / You are / I have / You are` on the resident card with no foreign tower
+octets, launch, staging, fallback, CPU semantic replay, or Lean/checker inference.
+
+## 11a. The foreign receiver transforms into native anatomy; it does not name it
+
+[established-bounded; implemented-exact; measured] A second plural construction passage enlarged
+the same coefficient complex to twelve addressed occurrences. Exact coefficient-space naturality
+replaced the former carrier-row elimination, so all adjacent squares returned without a 2,560-row
+rational solve. The resulting source-detached product identity is
+`05d17916afcacc39999b4decfdedac098b39cca1925f6514a0b2beef626319c8`; its 26,448,081
+octets contain no foreign tower, and its four inspected continuations are
+`I have read / You are articulating / I have read / You are articulating`.
+
+[counterexample; implemented-exact] That return does not establish the native quotient. The
+successor-support owner currently keys a class by `(foreign_receiver_class, support_face)`. An
+intersection with the foreign equivalence can only refine it. It cannot merge distinct Gemma
+coordinates whose Athena receiver/history consequences agree, so the returned nine carrier classes
+remain a foreign-coordinate atlas rather than a native population. Renaming `carrier_population`
+cannot repair this direction of factorization.
+
+[definition] For one foreign receiver `rho_F : X_t -> F_t`, a later Athena receiver `sigma_A`, and
+an admitted ordered transport `T_w`, the receiver-to-receiver transformer is the relation
+
+```text
+F_t <-rho_F- X_t -sigma_A o T_w-> A_(t+k).
+```
+
+It descends to a functional map on the captured foreign face exactly when
+`rho_F(x) = rho_F(y)` implies `sigma_A(T_w x) = sigma_A(T_w y)`. Athena's native relation is
+
+```text
+x ~_A y  iff  for every admitted (sigma, w), sigma(T_w x) = sigma(T_w y).
+```
+
+The quotient `q_A : X -> X/~_A` owns state. Each generator owes
+`q_A o T_g = U_g o q_A`. The complete foreign face factors into this quotient when sufficient;
+distinct foreign classes may share one native class and remain as its reconstruction fibre. If one
+foreign class crosses two native classes, the foreign organ is insufficient for that declared
+consequence and returns the separating Athena receiver/history.
+
+[definition] The native body is a simplicial/cellular ecology of addressed Complex Parametron
+sections. One cell carries oriented incidence `B`, complex current, a declared constitutive form
+`M`, pulled storage `B^dagger M B`, local response/phase passage, lineage and open ports. Atoms are
+minimal only relative to a declared receiver/decomposition family. Stable glued motifs form
+organelles; a minimal glued cover whose requested consequence does not factor through a proper
+member is an organ; overlapping organs and higher cells form one non-cloned organism. Receptor,
+conductor, junction, memory, phase-gate, catalyst, effector and repair are intervention-derived
+relations and never an authored enum.
+
+[definition] Homology and analogy remain distinct. Homologous sections share an addressed
+morphological ancestor even when their contemporary roles differ. Analogous sections need no common
+ancestry but their role/consequence diagrams commute for the declared receiver, successor and
+intervention family. Literal identity, invertible rebase, receiver-history equivalence, homology and
+analogy must all remain separate receipts.
+
+[definition] The anatomy atlas is a derived view over existing owners, not a new semantic cabinet.
+For every native class and subcomplex it returns occurrence fibres, foreign-coordinate fibres,
+incidence and ports, constitutive/storage testimony, factor ancestry, entering and departing
+transport, phase and holonomy, receiver consequences, shortest reopenings, ablation/withdrawal,
+resource current, analogous/homologous witnesses, and open exterior. A pathology label is admitted
+only with an intervention witness: lineage-attributable recruitment, support spread, degraded
+declared consequence, abnormal resource/morphology capture, and targeted withdrawal which restores
+the affected conduct without erasing independent conduct.
+
+[proved-derived; formal-checked] The normalized-exponential line supplies a receiver face rather
+than a state law. Binary normalization is the logistic of one addressed potential difference and
+is invariant under a common chart shift.
+
+[proved-standard] For a finite normalized-exponential family,
+`J = beta(diag(p) - p p^T)` is its weighted Laplacian susceptibility with the common-potential mode
+in its kernel. Cross-entropy is one scalar audit face; the cultivable object is the complete
+returned defect family `p_(receiver,word)-q_(receiver,word)` with its adjoint passage, curvature,
+lineage, fibres and separators. Entropy becomes a diffusion testimony only under declared
+incidence, stochastic/constitutive law, boundary and chronology.
+
+### Construction order from the twelve-node predecessor
+
+1. [proved-derived; formal-checked] Prove the receiver-to-receiver descent criterion and its reconstruction relation in the
+   existing formal receiver/physical-realization owners.
+2. [established-bounded; implemented-exact] Replace the successor class meet with a resident receiver-history quotient whose class
+   key contains only admitted Athena faces; retain the foreign class solely as lineage and
+   reconstruction testimony.
+3. [established-bounded; implemented-exact; measured] Return the exact foreign-to-native class map, complete native occurrence fibres, induced
+   successor squares, and every foreign-only separator over the twelve existing occurrences.
+4. [established-bounded; implemented-exact; measured] Compile the hot potential through the native quotient and source-detach it while retaining
+   the complete twelve-column foreign potential as a cold `ReconstructionFiber`.
+5. [established-bounded; implemented-exact] Emit and inspect the derived anatomical/pathology atlas, including matched ablation and
+   withdrawal witnesses. Only an addressed outside-native-section return may schedule another
+   foreign excitation.
+
+[established-bounded; implemented-exact; measured] The completed station returns six native
+classes with six population-two occurrence fibres, a complete nine-to-six foreign factor, three
+foreign-only distinctions, four partial successor generators, six analogous and six homologous
+witnesses, and zero repetition caustics. Its source-detached hot rest contains 48 receiver entries
+in 4,253 octets, mounts 800 invariant octets, and returns all twelve admitted surfaces in one RTX
+4080 SUPER launch without mounting its 25,421,309-octet cold foreign reconstruction fibre.
 
 ## 12. Complete pass grade
 
@@ -554,7 +742,16 @@ counterexample and source of exact restricted-transport material, not the produc
     chronology/orientation, declared connection/holonomy, and receiver-history reconstruction
     fibres without conclusion-shaped premises; and
 15. complete generated surfaces and enacted world returns are returned for operator inspection;
-    topology, hashes, counters, and tests cannot substitute for them.
+    topology, hashes, counters, and tests cannot substitute for them; and
+16. the productive foreign carrier retains exact complex coefficient current through oriented
+   incidence and its pulled receiver storage; a finite history word appears only as a declared
+   locked receiver/control and never substitutes for the pre-quotient section.
+17. foreign carrier coordinates and carrier-equivalence classes appear only as construction and
+    reconstruction testimony; neither determines Athena's native state population;
+18. every hot native class is founded by the complete declared receiver/history family, carries an
+    induced successor transport, and retains all collapsed foreign realizations in its fibre; and
+19. anatomical, homologous, analogous and pathology readings are derived from typed lineage,
+    transport and intervention witnesses rather than source labels or authored roles.
 
 ## 13. Falsifiers and evidence disposition
 
@@ -587,6 +784,13 @@ boundary; it does not enter inference. Every expensive invocation records comman
 purpose, elapsed time, and status. The full `bash tools/gates.sh` receiver runs once after the
 coherent alpha product and its inspected artifacts stand. State advances only then.
 
+[established-bounded; implemented-exact; measured] The sole complete release receiver began at
+2026-08-24T21:04:13-07:00 and returned all thirteen scopes green: 2,889 tests passed, zero failed,
+37 were ignored; every example target type-checked; 460 drivers were catalogued with none absent;
+all ten Typst roots compiled; the content, closure, boundary, architecture and document-law
+receivers passed. No second complete release verdict was taken after this document-only admission
+deposit.
+
 ## 15. Fresh-session pickup
 
 [definition] Read, in order:
@@ -611,8 +815,13 @@ coherent alpha product and its inspected artifacts stand. State advances only th
 18. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/LocalFrame.lean`;
 19. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/AlgebraicGNS.lean`;
 20. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/FormRebase.lean`;
-21. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`; and
-22. only the source/artifact closure of the named current deed.
+21. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/TraceForm.lean`;
+22. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicParametron.lean`;
+23. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicComplexParametron.lean`;
+24. `soma/formal/elementary-holonics/ElementaryHolonics/Foundation/MeasuredDifferenceReceiver.lean`;
+25. `soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicMeasuredParametron.lean`;
+    and
+26. only the source/artifact closure of the named current deed.
 
 [established-bounded; implemented-exact; measured] The returned defect founded its derived local
 factor cover under artifact identity
@@ -631,8 +840,23 @@ source-detached remount and complete structural testimony, then exposed recurren
 tower staging, a repeated-`You` caustic and an empty mathematical successor. Its exact dependencies
 stand; its final grade is false.
 
-[open] The sole next deed remains **the receiver-history quotient condenses and Athena alpha
-speaks**, now narrowed to the receiver-exact foreign-transport restriction and native-history
-factor-support square above. The complete body must conduct later successors without recurring
-foreign-tower staging and must return the nontrivial inspected mathematical consequence before the
-campaign can complete.
+[established-bounded; implemented-exact; measured] Receiver-exact foreign-section descent, the
+resident Complex Parametron carrier, support-gated terminal-potential rest, source-detached native
+mathematics, and the optical/acoustic/parent crossing now stand together under product identity
+`200f6169e362398ff3f253e98883db1a8956c5bef43d3186f1759fb07cbba61d`. The foreign tower is absent
+from the product and from both measured successor fronts.
+
+[established-bounded; implemented-exact] The exact addressed second-emission passage returned. The
+four leaf occurrences issued native faces `735 / 659 / 735 / 659`; their four distinct successor
+addresses all lie outside the current section, retain the admitted address fibre, and forbid
+foreign fallback. Native-return identity
+`076488f7cee4177b2947b3a3af71902cbd3d1b9e5a891ffe6503fef54e11daa1` supplied the already-bound
+receiver face, so no semantic deed or foreign transport was replayed.
+
+[open] The receiver-history quotient has condensed and Athena alpha has spoken across the first
+emitted frontier, but the final station remains open: `I have` and `You are` do not carry a
+response-closing return. The plural addressed obstruction now authorizes exactly one
+construction-boundary foreign passage over those four children. Its new incidence must descend
+through the same receiver/history, support, storage, reconstruction and separator laws before
+another source-detached rest freezes. A fixed output length, blind tower retry, or inference-time
+Gemma fallback cannot substitute for this closure.

@@ -2177,6 +2177,29 @@ The grading discipline in `canon/EPISTEMIC_GRADES.md` stands. Three additions:
   days, nineteen re-implementing mathematics the tree already owns exactly, **fifteen of those in
   floating point, in a workspace whose library crates contain none.**
 
+- **AN UNATTEMPTED ROUTE REPORTED AS AN OBSTRUCTION IS A FALSE ABSENCE, AND A FALSE ABSENCE IS
+  CONVICTED EXACTLY AS HARD AS A FALSE CLAIM.** Ratified by Brandon 2026-08-23. This file carries
+  dozens of rules that punish overclaiming and, until this one, none that punished under-attempting,
+  **so the local optimum was a well-written concession** — mechanism named, boundary stated,
+  falsifier attached, never convicted, and indistinguishable in the document from a measurement.
+  That asymmetry is the mechanical cause of every false absence this contract records: the library
+  was already on the disk, the deletion primitive was already named `without_stem`, the winding
+  organ was already 2,883 lines, and the naming organ was called owed for four days. Each was a
+  concession that cost its author nothing.
+
+  The rule, and it is checkable: **an obstruction sentence is admissible only downstream of a real
+  attempt whose failure is exhibited** — a pasted compiler error, a failed build, a returned
+  refusal, a driver that ran and did not close. *"This would require X"*, *"X is the named
+  successor"*, *"X is not currently reachable"*, and *"the missing ingredient is X"* written above
+  any such evidence are the convicted form, and they are worse than a wrong figure for the same
+  reason a fabricated provenance line is: **no later reader re-attempts a route that presents
+  itself as already considered.** A discharge condition naming an owner that answers a different
+  question was already convicted here on exactly that mechanism.
+
+  **The corollary that governs conduct in an agentic loop:** a deposit is not a deed, and `[open]`
+  is not a terminal state. A session sent to close a named artifact and returning a document about
+  why it did not is reporting a failure, and must format it as one.
+
 - **The no-absolute-frame law applies to your sentences, not only to the code.** Added 2026-08-15;
   it is the one correction in the audit's window with no owner anywhere in canon. Brandon:
   *"you're framing these things like they have global positions, when they only have positions
@@ -2280,6 +2303,45 @@ The rules, and they are checkable:
 4. **Grade nothing above its source.** A `HUNCH` may motivate a build; it may not grade one, and it
    may not set a document's structure — structure is a stronger claim than a carried grade, because
    a reader infers authority from position long before reading a grade line.
+
+## 9c. Lean campaign mode — ratified 2026-08-23
+
+**A Lean campaign is an attack session, not a deposit session.** Brandon's ruling, 2026-08-23:
+records during a Lean campaign are cemented **only on his cue**; until then *"the scratch work and
+Lean documents that you produce will themselves act as reversible records."* The Lean file is the
+record — its statement is the claim, its proof is the evidence, its axiom audit is the receipt, and
+git is the log. A prose deposit written mid-campaign is the escape hatch §9's false-absence rule
+convicts, dressed as productivity.
+
+**Do not write a `research/records/` deposit during a Lean campaign.** Write one afterwards, on his
+cue, covering everything at once — **including every failed angle with its pasted error**, which is
+the most valuable residue and is currently thrown away.
+
+### The scratch surface
+
+`soma/formal/elementary-holonics/Scratch/` is exempt: outside the root import list, outside
+`lakefile.toml`'s targets, outside the gates, outside the ratchet. Broken files, local `sorry`, dead
+angles, three spellings of one theorem — all lawful there and all free, because **an attempt whose
+failure damages the tree is an attempt that will not be made.** A file graduates by being moved into
+`ElementaryHolonics/Millennium/` and imported, at which point everything applies again. Abandoned
+angles are left where they fell, with their errors beside them; they are not deleted.
+
+### The four conduct rules of an attack session
+
+1. **Statement first.** Write the theorem before knowing how to prove it, typecheck the *statement*,
+   then attack. A vague ambition gets hedged; a compile error gets chased. **Assessment is
+   downstream of a failed build, never upstream of an attempt** — in Lean the referee is free, fast
+   and infallible, and every minute spent deciding whether an idea is plausible is stolen from it.
+2. **Automation before reasoning.** `exact?`, `apply?`, `aesop`, `omega`, `decide`, `nlinarith`,
+   `norm_num`, `positivity` run on the goal *before* a hand proof is written.
+3. **Rotate, do not stop.** Keep three live angles. A stalled angle is abandoned in-session and the
+   next is taken; it is never *reported*. Grinding one dead angle to look busy is the same defect as
+   quitting. A named target is not released until its artifact exists or Brandon says stop.
+4. **Name the target by the symbol, never by the conjecture.** A goal string containing a famous
+   name loads the history of failure attached to that name — this file's own rule that a proper noun
+   is a one-way pointer carrying a causal string, arriving where it costs the most. The lawful goal
+   is *a symbol that does not exist yet plus the build command that would prove it does*, and its
+   only exit is `lake build` green with a clean axiom audit on that name.
 
 ## 10. Conversational conduct
 

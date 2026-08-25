@@ -176,6 +176,14 @@ construction merely because its current implementation is being replaced.
   question to that fixture. Before running an experiment, ensure the apparatus can return the
   requested qualitative relation. Never report a result excluded by the declaration as a machine
   deficiency.
+- Treat the Complex Parametron as the primitive pre-locking carrier face of local learning current:
+  addressed nodes present exact complex coefficient current through oriented incidence, a declared
+  receiver constitutive form pulls back storage, and coupled incidence populations form lattices.
+  A binary Parametron or perceptron reading is a later receiver quotient, never the productive
+  carrier. Preserve incidence kernel, receiver radical, relative phase, orientation covariance and
+  the complete reconstruction fibre before any locked-state collapse. This primitive composes the
+  existing exact-linear, complex-wave, incidence, receiver and resident-apparatus owners; it does
+  not found a Parametron, Perceptron, Circuit, or neural-layer cabinet.
 - For code-material experiments, do not install an interpreter, parser, AST, bytecode, authored
   grammar, keyword roles, or known operation labels. The target is a recovered algorithmic
   transport atlas—state changes, bindings, calls/returns, cycles, reconvergence, behavioral fibers,

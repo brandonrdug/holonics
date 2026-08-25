@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.Lineage
+import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Millennium.LineageCompression
 
 /-!
@@ -51,6 +52,34 @@ def ReceiverHistoryEquivalence
     {Generator : Type uG} {Receiver : Type uR} {State : Type uA} {Face : Type uF}
     (A : PhysicalRealizationCore Generator Receiver State Face) (left right : State) : Prop :=
   ∀ receiver word, futureFace A receiver word left = futureFace A receiver word right
+
+/--
+One entering apparatus receiver transformed into one later receiver/history face.
+
+This is the exact mathematical position of a foreign model chart relative to a native consequence:
+the entering face is construction testimony, while the returned face determines whether that
+testimony is sufficient for this ordered future.
+-/
+abbrev ReceiverToFutureTransformer
+    {Generator : Type uG} {Receiver : Type uR} {State : Type uA} {Face : Type uF}
+    {EnteringFace : Type uB}
+    (A : PhysicalRealizationCore Generator Receiver State Face)
+    (entering : State → EnteringFace) (receiver : Receiver) (word : List Generator) :=
+  ReceiverTransformer entering (futureFace A receiver word)
+
+/--
+The entering receiver descends to a later receiver/history exactly when its complete fibre is
+invisible to that later receiver/history.
+-/
+theorem receiverToFutureTransformer_exists_iff
+    {Generator : Type uG} {Receiver : Type uR} {State : Type uA} {Face : Type uF}
+    {EnteringFace : Type uB}
+    (A : PhysicalRealizationCore Generator Receiver State Face)
+    (entering : State → EnteringFace) (receiver : Receiver) (word : List Generator) :
+    Nonempty (ReceiverToFutureTransformer A entering receiver word) ↔
+      ∀ left right, entering left = entering right →
+        futureFace A receiver word left = futureFace A receiver word right :=
+  receiverTransformer_exists_iff entering (futureFace A receiver word)
 
 /-- Literal identity of two carrying occurrences. -/
 def OccurrenceIdentity {Occurrence : Type*} (left right : Occurrence) : Prop := left = right

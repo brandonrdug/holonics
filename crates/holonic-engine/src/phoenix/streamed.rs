@@ -155,6 +155,10 @@ impl InterventionSite {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ReceiverOption {
     Terminal,
+    /// Preserve the exact terminal row of every layer return and the terminal final face. The
+    /// unrequested row populations remain resident reconstruction fibres and are never copied to
+    /// the host.
+    LayerTerminalSections,
     Complete,
 }
 
@@ -168,6 +172,7 @@ pub struct LayerReceiverFaces {
     pub ple: Vec<(i64, i64)>,
     pub contact: Vec<(i64, i64)>,
     pub layer_return: Vec<(i64, i64)>,
+    pub layer_terminal: Vec<(i64, i64)>,
 }
 
 pub type LayerFaces = LayerReceiverFaces;
@@ -519,7 +524,7 @@ fn discharge_window<'chart>(
     deeds: &mut Vec<BoundDeed<'chart>>,
     receipts: &mut [SegmentReceipt],
     receiver_option: ReceiverOption,
-    read_complete_layer_faces: bool,
+    read_layer_faces: bool,
     cultivation_present: bool,
     obstructions: &mut Vec<(usize, String, usize, usize)>,
     receiver_layers: &mut Vec<LayerReceiverFaces>,
@@ -559,28 +564,51 @@ fn discharge_window<'chart>(
                 }
             }
         }
-        if receiver_option == ReceiverOption::Complete && read_complete_layer_faces {
+        if receiver_option != ReceiverOption::Terminal && read_layer_faces {
             if let Some(layer) = receipt.layer {
-                let ple = bound
-                    .read_section(&returned, named[tower::PLE_SECTION])
-                    .map_err(|obstruction| {
-                        format!("layer {layer} PLE receiver: {}", describe(&obstruction))
-                    })?;
-                let contact = bound
-                    .read_section(&returned, named[tower::CONTACT])
-                    .map_err(|obstruction| {
-                        format!("layer {layer} contact receiver: {}", describe(&obstruction))
-                    })?;
-                let layer_return = bound
-                    .read_section(&returned, named[tower::LAYER_ENCLOSURE])
-                    .map_err(|obstruction| {
-                        format!("layer {layer} return receiver: {}", describe(&obstruction))
-                    })?;
+                let (ple, contact, layer_return, layer_terminal) = match receiver_option {
+                    ReceiverOption::Complete => (
+                        bound
+                            .read_section(&returned, named[tower::PLE_SECTION])
+                            .map_err(|obstruction| {
+                                format!("layer {layer} PLE receiver: {}", describe(&obstruction))
+                            })?,
+                        bound
+                            .read_section(&returned, named[tower::CONTACT])
+                            .map_err(|obstruction| {
+                                format!(
+                                    "layer {layer} contact receiver: {}",
+                                    describe(&obstruction)
+                                )
+                            })?,
+                        bound
+                            .read_section(&returned, named[tower::LAYER_ENCLOSURE])
+                            .map_err(|obstruction| {
+                                format!("layer {layer} return receiver: {}", describe(&obstruction))
+                            })?,
+                        Vec::new(),
+                    ),
+                    ReceiverOption::LayerTerminalSections => (
+                        Vec::new(),
+                        Vec::new(),
+                        Vec::new(),
+                        bound
+                            .read_section(&returned, named[tower::LAYER_TERMINAL_ROW])
+                            .map_err(|obstruction| {
+                                format!(
+                                    "layer {layer} terminal-row receiver: {}",
+                                    describe(&obstruction)
+                                )
+                            })?,
+                    ),
+                    ReceiverOption::Terminal => unreachable!("terminal receiver was excluded"),
+                };
                 receiver_layers.push(LayerReceiverFaces {
                     layer,
                     ple,
                     contact,
                     layer_return,
+                    layer_terminal,
                 });
             }
         }
@@ -1179,7 +1207,7 @@ fn circulate_inner<'chart, 'request>(
     let (mut overlay_material, pre_admission) = if let Some(request) = cultivation {
         let receiver_rows = match (partition_groups, receiver_option) {
             (Some(groups), _) => groups,
-            (None, ReceiverOption::Terminal) => 1,
+            (None, ReceiverOption::Terminal | ReceiverOption::LayerTerminalSections) => 1,
             (None, ReceiverOption::Complete) => model_rows,
         };
         let (material, receipt) = streamed_cultivation::prepare(
@@ -1396,22 +1424,35 @@ fn circulate_inner<'chart, 'request>(
             applied,
             model_rows,
             match partition_boundaries {
-                Some(boundaries) => {
-                    tower::InputSectionReceiver::IndependentPartitions(boundaries)
-                }
+                Some(boundaries) => tower::InputSectionReceiver::IndependentPartitions(boundaries),
                 None => tower::InputSectionReceiver::SourceRows,
+            },
+            match (partition_boundaries, receiver_option) {
+                (Some(boundaries), ReceiverOption::LayerTerminalSections) => {
+                    tower::LayerSectionReceiver::PartitionTerminalRows(boundaries)
+                }
+                (None, ReceiverOption::LayerTerminalSections) => {
+                    tower::LayerSectionReceiver::TerminalRow
+                }
+                _ => tower::LayerSectionReceiver::Whole,
             },
         )?;
         let terminal = founded.returns[tower::LAYER_RETURN];
         let mut declared = BTreeSet::new();
-        if receiver_option == ReceiverOption::Complete && partition_boundaries.is_none() {
-            declared.insert(founded.returns[tower::PLE_SECTION]);
-            declared.insert(founded.returns[tower::CONTACT]);
-            // The enclosure is the receiver-visible layer-return face.  The later
-            // `LAYER_RETURN` is the standing transferred to the next deed and is released as
-            // ownership crosses the layer boundary.
-            declared.insert(founded.returns[tower::LAYER_ENCLOSURE]);
-            declared.insert(founded.returns[tower::LAYER_RETURN]);
+        match (partition_boundaries, receiver_option) {
+            (None, ReceiverOption::Complete) => {
+                declared.insert(founded.returns[tower::PLE_SECTION]);
+                declared.insert(founded.returns[tower::CONTACT]);
+                // The enclosure is the receiver-visible layer-return face.  The later
+                // `LAYER_RETURN` is the standing transferred to the next deed and is released
+                // as ownership crosses the layer boundary.
+                declared.insert(founded.returns[tower::LAYER_ENCLOSURE]);
+                declared.insert(founded.returns[tower::LAYER_RETURN]);
+            }
+            (_, ReceiverOption::LayerTerminalSections) => {
+                declared.insert(founded.returns[tower::LAYER_TERMINAL_ROW]);
+            }
+            _ => {}
         }
         let (fusable, refused) = if fuse {
             factored_seals(&founded.complex, &founded.realization, terminal, &declared)
@@ -1441,7 +1482,8 @@ fn circulate_inner<'chart, 'request>(
                     &mut bound_deeds,
                     &mut receipts,
                     receiver_option,
-                    partition_boundaries.is_none(),
+                    partition_boundaries.is_none()
+                        || receiver_option == ReceiverOption::LayerTerminalSections,
                     cultivation.is_some(),
                     &mut obstructions,
                     &mut receiver_layers,
@@ -1584,7 +1626,7 @@ fn circulate_inner<'chart, 'request>(
         &mut bound_deeds,
         &mut receipts,
         receiver_option,
-        partition_boundaries.is_none(),
+        partition_boundaries.is_none() || receiver_option == ReceiverOption::LayerTerminalSections,
         cultivation.is_some(),
         &mut obstructions,
         &mut receiver_layers,
@@ -1637,10 +1679,10 @@ fn circulate_inner<'chart, 'request>(
         &no_intervention
     };
     let output_receiver = match (partition_boundaries, receiver_option) {
-        (Some(boundaries), _) => {
-            tower::OutputSectionReceiver::PartitionTerminalRows(boundaries)
+        (Some(boundaries), _) => tower::OutputSectionReceiver::PartitionTerminalRows(boundaries),
+        (None, ReceiverOption::Terminal | ReceiverOption::LayerTerminalSections) => {
+            tower::OutputSectionReceiver::TerminalRow
         }
-        (None, ReceiverOption::Terminal) => tower::OutputSectionReceiver::TerminalRow,
         (None, ReceiverOption::Complete) => tower::OutputSectionReceiver::Whole,
     };
     let mut founded = tower::found_final(chart, applied_final, &scales, output_receiver)?;
@@ -1683,7 +1725,8 @@ fn circulate_inner<'chart, 'request>(
                 &mut bound_deeds,
                 &mut receipts,
                 receiver_option,
-                partition_boundaries.is_none(),
+                partition_boundaries.is_none()
+                    || receiver_option == ReceiverOption::LayerTerminalSections,
                 cultivation.is_some(),
                 &mut obstructions,
                 &mut receiver_layers,
@@ -1873,7 +1916,7 @@ fn circulate_inner<'chart, 'request>(
         &mut bound_deeds,
         &mut receipts,
         receiver_option,
-        partition_boundaries.is_none(),
+        partition_boundaries.is_none() || receiver_option == ReceiverOption::LayerTerminalSections,
         cultivation.is_some(),
         &mut obstructions,
         &mut receiver_layers,
@@ -1919,7 +1962,7 @@ fn circulate_inner<'chart, 'request>(
             .map_err(|error| format!("W3 cultivated potential return: {}", describe(&error)))?;
     }
 
-    let receiver_faces = (receiver_option == ReceiverOption::Complete).then(|| ReceiverFaces {
+    let receiver_faces = (receiver_option != ReceiverOption::Terminal).then(|| ReceiverFaces {
         layers: receiver_layers,
         final_normed: final_normed.clone(),
         potential: potential.clone(),
@@ -1952,7 +1995,7 @@ fn circulate_inner<'chart, 'request>(
                 "potential section".to_owned(),
                 match (partition_groups, receiver_option) {
                     (Some(groups), _) => groups,
-                    (None, ReceiverOption::Terminal) => 1,
+                    (None, ReceiverOption::Terminal | ReceiverOption::LayerTerminalSections) => 1,
                     (None, ReceiverOption::Complete) => model_rows,
                 },
                 tower::VOCABULARY,
@@ -1967,6 +2010,10 @@ fn circulate_inner<'chart, 'request>(
             ),
             (None, ReceiverOption::Terminal) => format!(
                 "the declared terminal of each segment ({} layer returns and one potential section); no other face was declared, which is why every seal factored",
+                receipts.len() - 1
+            ),
+            (None, ReceiverOption::LayerTerminalSections) => format!(
+                "the descended-section receiver: the exact terminal row of every layer return and the final terminal section ({} layer sections); every unrequested row remains in its reconstruction fibre",
                 receipts.len() - 1
             ),
             (None, ReceiverOption::Complete) => format!(

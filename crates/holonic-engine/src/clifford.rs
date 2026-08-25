@@ -631,8 +631,16 @@ impl Arrow {
 pub struct AreaSquared {
     /// From the blade's own coordinates. Always available.
     pub value: Rat,
-    /// From Lagrange's identity — **only in the Euclidean signature**, where it holds. `None`
-    /// elsewhere, so a caller cannot quote a cross-check that was never taken.
+    /// From Lagrange's identity, **on every diagonal signature**. Cauchy–Binet gives
+    /// `‖a‖²‖b‖² − (a·b)² = Σ_{i<j} qᵢqⱼ (aᵢbⱼ − aⱼbᵢ)²` for any diagonal `q`, so once the blade
+    /// carries the metric the two frames agree off Euclidean as well —
+    /// `the_two_frames_agree_off_euclidean_once_the_blade_carries_the_metric` measures it on the
+    /// committed Minkowski fixture, where **both frames return `−1`**. Positivity of this quantity
+    /// is a property of the *signature*, never of the identity: the identity is the invariant and
+    /// the sign is a hand.
+    ///
+    /// The field stays an `Option` only because the type is public and a caller may hold a value
+    /// built before the metric reached the blade. Every path in this module sets it to `Some`.
     pub lagrange: Option<Rat>,
 }
 

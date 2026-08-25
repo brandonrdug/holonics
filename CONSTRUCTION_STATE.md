@@ -4,15 +4,14 @@
 admitted right now. It is not a log, not a plan, and not a history; git is the log and
 `blueprint/THE_ROADMAP.md` is the plan.
 
-**Currency:** 2026-08-24 after the receiver-history congruence, sealed-candidate/later-return,
-derived-rank local-factor-cover and same-body factor-complex stations passed and the first final-rest
-candidate returned a decisive residency/quality counterexample; receiver-exact foreign-transport
-restriction inside that same final station is now the sole construction frontier.
+**Currency:** 2026-08-24 after the twelve foreign occurrences descended into six native anatomical
+classes and a source-detached GPU return conducted from the condensed native hot potential without
+accessing its complete cold foreign reconstruction fibre.
 **Body:** the root Rust workspace with the resident CUDA apparatus; the C++/CUDA
 engine under `archive/cpp-engine/` governs nothing.
 
-**CURRENT FRONTIER — THE FOREIGN TRANSPORT MUST DESCEND THROUGH THE RECEIVER-HISTORY QUOTIENT
-BEFORE ATHENA ALPHA CAN SPEAK FROM RESIDENT TERRAIN.**
+**CURRENT FRONTIER — THE NATIVE ANATOMY AND HOT POTENTIAL RETURNED; THE NEXT ADDRESSED NATIVE
+SUCCESSOR MUST TEST THE SIX-CLASS APERTURE BEFORE ANY FOREIGN CONSTRUCTION MAY REOPEN.**
 
 [counterexample; implemented-exact] The former alpha path assigns semantic roles from prompt-hash
 equality, uses a three-codeword state and two-codeword-overlap traversal, exposes recorded sibling
@@ -112,13 +111,102 @@ growth from the missing compression. Resident peak grew from 6,733,494,016 to 6,
 factor rest is only 205,892 octets; qualified unknotting correctly retained nontrivial holonomy and
 cannot cancel foreign maps whose receiver-exact restriction has not been compiled.
 
-[open] The sole next deed is **the receiver-history quotient condenses and Athena alpha speaks**.
-For every foreign local map, compile its exact descent on the cultivated reachable section modulo
-the complete future receiver/history blind population, retain the complete fibre and shortest
-reopening separator, and gate every factor through its founding native-history support. The
-remounted body must return a nontrivial mathematical consequence and later successors without
-recurring full-tower staging; out-of-section current returns an obstruction rather than falling
-back to the foreign tower.
+[established-bounded; implemented-exact; measured] Four addressed histories now present 43 exact
+foreign incidence sections of width 2,560. All 42 adjacent naturality squares commute; the terminal
+incidence has rank three, a one-dimensional kernel and receiver radical; storage pullback,
+orientation covariance, relative phase and half-turn negation returned exactly. The terminal
+incidence mounted once on the RTX 4080 SUPER, and two complex fronts crossed without binary
+collapse, invariant re-upload, foreign staging or CPU semantic replay. The descended rest identity
+is `8c801b9373f5f1071f66cd58ac2b27f3d79b831e273de827bad7a3c87e41eb4a`.
+
+[established-bounded; implemented-exact; measured] The support-gated terminal potential froze with
+the receiver-history, mathematics and heterogeneous-organ rests as 9,480,656-octet product identity
+`200f6169e362398ff3f253e98883db1a8956c5bef43d3186f1759fb07cbba61d`. It contains no Gemma tower,
+retains the complete 262,144-row cold terminal-potential fibre, and mounts only a four-row by
+four-node receiver cover in 272 invariant octets. A source-isolated process returned exact native
+mathematics, optical/acoustic/parent current, and first/later language fronts on one card without
+Lean/checker inference, foreign fallback, invariant re-upload or CPU semantic replay. Support
+gating removed the prior repeated-`You` leakage across unrelated histories.
+
+[established-bounded; implemented-exact; measured] The first emitted successor frontier now grows
+the foreign incidence from four to eight addressed nodes. Four successor occurrences factored
+through three exact native-word carrier classes while both coincident occurrences retained their
+distinct lineages. All 42 enlarged naturality squares commute; the reachable rank is six; complete
+coefficient fibres and a current separator for every new node remain. Rest identity
+`90cbf0a6674f46ab28a141feab7c7482c3adff22680570de8066969bfa26a891`
+contains zero tower octets. One optimized release passage staged 9,288,903,168 octets rather than
+the prior serial 37,155,612,672, issued 43 tower deeds plus one overlay deed, synchronized once,
+and returned in 595.983343582 seconds without CPU semantic replay. Cold product authentication fell
+from the debug-path minutes-long caustic to 16.691951785 seconds after the cryptographic apparatus
+was correctly optimized.
+
+[established-bounded; implemented-exact; measured] The eight-node receiver/support square and its
+source-detached product now pass. Eight addressed occurrences condense to six complete foreign
+receiver classes with 26 shortest separators; the two coincident predecessor occurrences and two
+coincident successor occurrences remain distinct inside their respective fibres. Three
+support-refined successor classes returned with no reopening. The 16,947,941-octet complete cold
+potential retains all 262,144 rows behind a six-row hot receiver cover. Product identity
+`7c085a4c0118756ff59ccbf26816058d1f6c45dae6e466a33a9310f5dfee9ac8` contains 17,964,932
+octets and zero foreign-tower octets. Its source-isolated remount returned native mathematics,
+heterogeneous-organ current, and `I have / You are / I have / You are` on the RTX 4080 SUPER with
+zero foreign launches or staging, no invariant re-upload, no CPU semantic replay, and no
+Lean/checker inference lifecycle.
+
+[established-bounded; implemented-exact] The four leaf occurrences issued native faces `735 / 659
+/ 735 / 659` through the already-bound GPU return. Their four distinct addressed children all lie
+outside the eight-node coefficient section, forbid foreign fallback, and retain the complete
+admitted address family. The receipt reused native-return identity
+`076488f7cee4177b2947b3a3af71902cbd3d1b9e5a891ffe6503fef54e11daa1`; it replayed no semantic
+deed and staged or launched no foreign transport.
+
+[established-bounded; implemented-exact; measured] The second plural construction passage and its
+twelve-node source-detached product returned. The coefficient section carries twelve addressed
+occurrences in nine foreign-coordinate classes at rank nine. Product identity
+`05d17916afcacc39999b4decfdedac098b39cca1925f6514a0b2beef626319c8` contains 26,448,081
+octets and zero foreign-tower octets. Its inspected continuations are
+`I have read / You are articulating / I have read / You are articulating`; remount launched or
+staged no foreign transport and performed no CPU semantic replay or Lean/checker inference.
+
+[counterexample; implemented-exact] The successor-support class key is presently
+`(foreign_receiver_class, support_face)`. That meet cannot merge foreign coordinates which every
+declared Athena receiver/history identifies. The nine carrier classes are therefore exact foreign
+reconstruction testimony, not an admitted native population; no third foreign passage is
+authorized from that class structure.
+
+[proved-derived; formal-checked] The receiver-to-receiver descent criterion and reconstruction
+relation now stand in the existing receiver and physical-realization formal owners. Equality at an
+entering receiver descends to a later receiver exactly when every entering fibre has one later
+face; failure returns the separated pair. This is an exterior Lean receipt, not an inference phase.
+
+[established-bounded; implemented-exact; measured] The native-anatomy station passed. Twelve
+addressed occurrences descended from nine foreign carrier classes to six native classes, each with
+a complete population-two occurrence fibre. The foreign-to-native map is complete and functional;
+three foreign-only distinctions remain in reconstruction; four partial successor generators keep
+true termini open; six analogous and six homologous pairs are witnessed; and zero repetition
+caustics returned. The 17,050-octet anatomy rest has identity
+`5698f08ec6a335df77b7e85d3e7e08f7a87dce5b5e60d6cfdd519484eb42138a`.
+
+[established-bounded; implemented-exact; measured] The hot-potential station passed. The foreign
+receiver's 96 entries condensed to 48 native entries in 4,253 octets. A source-isolated process
+mounted only that rest and the anatomy rest, placed 800 invariant octets on the RTX 4080 SUPER, and
+returned the twelve exact surfaces in one plural launch and one synchronization. It did not access
+the 25,421,309-octet cold foreign potential, stage or launch the foreign tower, replay semantics on
+CPU, or invoke Lean/checker apparatus. Complete product identity:
+`960a3dfbd771b8a42bfe7deea83ec0e7b81a15c94a8c6f64d3a7848650c86446`.
+
+[established-bounded; implemented-exact; measured] The complete release receiver passed. It
+returned 2,889 passing tests, zero failures and 37 ignores; every example target type-checked; all
+460 drivers were catalogued; all ten Typst roots compiled; and every one of thirteen release scopes
+returned green. The release began at 2026-08-24T21:04:13-07:00 and had completed by
+2026-08-24T21:11:30-07:00. No second complete release verdict was taken after the document-only
+admission deposit. Record:
+[`research/records/2026-08-24_THE_NATIVE_ANATOMY_RELEASE_RECEIVER_PASSED_AND_ATHENA_CONTINUES_FROM_SIX_CLASSES_WITH_ITS_FOREIGN_FIBRE_COLD.md`](research/records/2026-08-24_THE_NATIVE_ANATOMY_RELEASE_RECEIVER_PASSED_AND_ATHENA_CONTINUES_FROM_SIX_CLASSES_WITH_ITS_FOREIGN_FIBRE_COLD.md).
+
+[open] The next deed issues the next requested successor from the six-class native rest through
+its partial native action. A factoring consequence cultivates the same ecology locally; an
+outside-section consequence must return the exact insufficiency witness and shortest separator.
+Only that obstruction may schedule a bounded foreign construction passage. Foreign carrier width,
+foreign classes and cold reconstruction may not govern native population or hot residency.
 
 [established-bounded] The completed construction contract is
 [`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md).

@@ -1680,6 +1680,35 @@ impl<'chart> ResidentSurface<'chart> {
         k_octaves: u32,
         v_octaves: u32,
     ) -> Result<LawShape, ResidentRefusal> {
+        let reach = rows.min(window.max(1));
+        let reach_sum = (0..rows).map(|at| (at + 1).min(window.max(1)) as u64).sum();
+        self.shape_contact_with_declared_reach(
+            rows, q_width, k_width, v_width, heads, kv_heads, head_width, reach, reach_sum, terms,
+            grain, q_octaves, k_octaves, v_octaves,
+        )
+    }
+
+    /// The same exact contact shape under a receiver-founded maximum causal reach. A partitioned
+    /// contact law derives this reach from its addressed boundaries; using the total flat row
+    /// population would charge impossible cross-partition paths which the kernel never enacts.
+    #[allow(clippy::too_many_arguments)]
+    pub fn shape_contact_with_declared_reach(
+        &self,
+        rows: usize,
+        q_width: usize,
+        k_width: usize,
+        v_width: usize,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        reach: usize,
+        reach_sum: u64,
+        terms: SeriesAperture,
+        grain: ResidentGrain,
+        q_octaves: u32,
+        k_octaves: u32,
+        v_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
         const OPERATION: &str = "contact";
         if q_width != heads * head_width {
             return Err(ResidentRefusal::WidthDisagrees {
@@ -1702,7 +1731,7 @@ impl<'chart> ResidentSurface<'chart> {
             });
         }
         let f = grain.0;
-        let reach = rows.min(window.max(1));
+        let reach = rows.min(reach.max(1));
         // The bracket sum is SELF-SCALED on the card from the block's own widest octave, so its
         // term is bounded by the carrier whatever the words; the carried construction and the
         // series are not, and decide the admission.
@@ -1734,7 +1763,6 @@ impl<'chart> ResidentSurface<'chart> {
                 width: q_width,
             });
         }
-        let reach_sum: u64 = (0..rows).map(|t| (t + 1).min(window.max(1)) as u64).sum();
         let brackets = 2 * reach_sum * heads as u64 * head_width as u64;
         let series = reach_sum * heads as u64 * 2 * (u64::from(terms.0) + 1);
         let carried = reach_sum * heads as u64 * head_width as u64;
@@ -7082,6 +7110,49 @@ mod tests {
             surface.read_out(&out).expect("read"),
             vec![(unit, unit), (4 * unit, 4 * unit)]
         );
+    }
+
+    #[test]
+    fn partition_reach_removes_cross_section_accumulation_from_the_carrier_bound() {
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let rows = 1024;
+        let full = surface.shape_contact(
+            rows,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            rows,
+            SeriesAperture(2),
+            ResidentGrain(20),
+            20,
+            20,
+            100,
+        );
+        assert!(matches!(full, Err(ResidentRefusal::CarrierRange { .. })));
+        let partitioned = surface
+            .shape_contact_with_declared_reach(
+                rows,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                rows as u64,
+                SeriesAperture(2),
+                ResidentGrain(20),
+                20,
+                20,
+                100,
+            )
+            .expect("one-row partition reach fits the physical carrier");
+        assert_eq!(partitioned.needed, 122);
     }
 
     #[test]

@@ -50,8 +50,7 @@ pub struct SessionFactorComplexIdentity {
     pub complete_sha256: String,
 }
 
-const FACTOR_COMPLEX_REST_SCHEMA: &str =
-    "holonic-engine.phoenix.session-factor-complex-rest.v1";
+const FACTOR_COMPLEX_REST_SCHEMA: &str = "holonic-engine.phoenix.session-factor-complex-rest.v1";
 
 /// Canonical source-detached standing for one cultivated local morphology word.
 ///
@@ -139,10 +138,8 @@ impl SessionFactorComplex {
     ) -> Result<Self, SessionFactorRefusal> {
         if cover.schema != "holonic-engine.derived-factor-cover.v1"
             || predecessor.rank == 0
-            || predecessor.left.len()
-                != predecessor.rows as usize * predecessor.rank as usize
-            || predecessor.right.len()
-                != predecessor.rank as usize * predecessor.columns as usize
+            || predecessor.left.len() != predecessor.rows as usize * predecessor.rank as usize
+            || predecessor.right.len() != predecessor.rank as usize * predecessor.columns as usize
         {
             return Err(SessionFactorRefusal::Shape);
         }
@@ -163,12 +160,9 @@ impl SessionFactorComplex {
                 || realization.selector_entry == 0
                 || realization.target_row >= predecessor.rows
                 || realization.selector_coordinate >= predecessor.columns
-                || realization
-                    .source_factor_addresses
-                    .iter()
-                    .any(|address| {
-                        !known.contains(address.as_str()) || !claimed.insert(address.as_str())
-                    })
+                || realization.source_factor_addresses.iter().any(|address| {
+                    !known.contains(address.as_str()) || !claimed.insert(address.as_str())
+                })
             {
                 return Err(SessionFactorRefusal::Address);
             }
@@ -226,10 +220,37 @@ impl SessionFactorComplex {
     pub fn current_factor(
         &self,
     ) -> Result<(AlignedFactor, FactorDerivationReceipt), SessionFactorRefusal> {
-        let mut entries = BTreeMap::<(usize, usize), Rat>::new();
-        let has_active_realization = self.realizations[..self.active_prefix]
+        let active = self.realizations[..self.active_prefix]
             .iter()
-            .any(|realization| !self.ablated.contains(&realization.address));
+            .filter(|realization| !self.ablated.contains(&realization.address))
+            .map(|realization| realization.address.clone())
+            .collect::<BTreeSet<_>>();
+        self.current_factor_for_addresses(&active)
+    }
+
+    /// Reconstruct the exact contemporary factor only on one addressed receiver-history section.
+    ///
+    /// The retained predecessor remains common standing. Cultivated realizations enter only when
+    /// the descended support atlas returned their address for the current native history state.
+    /// Asking for an inactive, withdrawn, ablated, or unknown realization is a typed refusal; it
+    /// never silently widens back to the global cultivated word.
+    pub fn current_factor_for_addresses(
+        &self,
+        selected: &BTreeSet<String>,
+    ) -> Result<(AlignedFactor, FactorDerivationReceipt), SessionFactorRefusal> {
+        let available = self.realizations[..self.active_prefix]
+            .iter()
+            .filter(|realization| !self.ablated.contains(&realization.address))
+            .map(|realization| realization.address.as_str())
+            .collect::<BTreeSet<_>>();
+        if selected
+            .iter()
+            .any(|address| !available.contains(address.as_str()))
+        {
+            return Err(SessionFactorRefusal::Address);
+        }
+        let mut entries = BTreeMap::<(usize, usize), Rat>::new();
+        let has_active_realization = !selected.is_empty();
         let rows = self.predecessor.rows as usize;
         let columns = self.predecessor.columns as usize;
         let inherited_rank = self.predecessor.rank as usize;
@@ -253,9 +274,10 @@ impl SessionFactorComplex {
                 }
             }
         }
-        for realization in self.realizations[..self.active_prefix].iter().filter(|realization| {
-            !self.ablated.contains(&realization.address)
-        }) {
+        for realization in self.realizations[..self.active_prefix]
+            .iter()
+            .filter(|realization| selected.contains(&realization.address))
+        {
             let value = scale(realization.delta_entry, self.predecessor.left_exponent)
                 * scale(realization.selector_entry, self.predecessor.right_exponent);
             *entries
@@ -414,10 +436,7 @@ impl SessionFactorComplex {
     }
 
     /// Remount a cultivated morphology against the exact authenticated predecessor it names.
-    pub fn remount(
-        bytes: &[u8],
-        predecessor: AlignedFactor,
-    ) -> Result<Self, SessionFactorRefusal> {
+    pub fn remount(bytes: &[u8], predecessor: AlignedFactor) -> Result<Self, SessionFactorRefusal> {
         let rested = SessionFactorComplexRest::read(bytes)?;
         Self::remount_rest(rested, predecessor)
     }
@@ -438,7 +457,9 @@ impl SessionFactorComplex {
             .map(|realization| realization.address.as_str())
             .collect::<BTreeSet<_>>();
         if ablated.len() != rested.ablated_realizations.len()
-            || ablated.iter().any(|address| !active.contains(address.as_str()))
+            || ablated
+                .iter()
+                .any(|address| !active.contains(address.as_str()))
         {
             return Err(SessionFactorRefusal::RestIdentity);
         }
@@ -595,14 +616,7 @@ pub fn conduct_factor_current(
         .open(1, &[0])
         .map_err(|error| SessionFactorRefusal::Apparatus(error.to_string()))?;
     surface
-        .record_factorized_contract(
-            &contracting,
-            &input,
-            &left,
-            &right,
-            &factor_shape,
-            &output,
-        )
+        .record_factorized_contract(&contracting, &input, &left, &right, &factor_shape, &output)
         .map_err(|error| SessionFactorRefusal::Apparatus(error.to_string()))?;
     builder
         .close(1, &output, factor_shape.needed)
@@ -631,15 +645,18 @@ pub fn conduct_factor_current(
         })
         .collect::<Result<Vec<_>, _>>()?;
     let exact_expected = local.section.supported.apply(&input_exact)?;
-    let exact_reconstruction = returned_intervals
+    let exact_reconstruction =
+        returned_intervals
+            .iter()
+            .zip(&exact_expected)
+            .all(|((lower, upper), expected)| {
+                expected.denom() == &BigInt::one()
+                    && expected.numer().to_i64() == Some(*lower)
+                    && lower == upper
+            });
+    let coarse_total_after = exact_expected
         .iter()
-        .zip(&exact_expected)
-        .all(|((lower, upper), expected)| {
-            expected.denom() == &BigInt::one()
-                && expected.numer().to_i64() == Some(*lower)
-                && lower == upper
-        });
-    let coarse_total_after = exact_expected.iter().fold(Rat::zero(), |sum, value| sum + value);
+        .fold(Rat::zero(), |sum, value| sum + value);
     let after = surface.census();
     Ok(ResidentFactorCurrentReturn {
         factor_parent: local.section.address.clone(),
@@ -751,8 +768,8 @@ fn dyadic_entries(matrix: &ExactRatMatrix) -> Result<(Vec<i64>, i32), SessionFac
 }
 
 fn digest_json(value: &impl Serialize) -> Result<String, SessionFactorRefusal> {
-    let bytes = serde_json::to_vec(value)
-        .map_err(|error| SessionFactorRefusal::Wire(error.to_string()))?;
+    let bytes =
+        serde_json::to_vec(value).map_err(|error| SessionFactorRefusal::Wire(error.to_string()))?;
     Ok(format!("{:x}", Sha256::digest(bytes)))
 }
 
@@ -862,9 +879,7 @@ mod tests {
         let full = complex.identity().expect("full").complete_sha256;
         complex.ablate("realization-b").expect("ablate");
         assert_eq!(complex.identity().expect("ablated").derived_rank, 2);
-        complex
-            .restore_ablation("realization-b")
-            .expect("restore");
+        complex.restore_ablation("realization-b").expect("restore");
         assert_eq!(complex.identity().expect("restored").complete_sha256, full);
         complex.withdraw_to_prefix(1).expect("withdraw suffix");
         assert_eq!(complex.identity().expect("prefix one").derived_rank, 2);
@@ -909,5 +924,49 @@ mod tests {
         let remounted = SessionFactorComplex::remount(&bytes, predecessor).expect("remount");
         assert_eq!(remounted.identity().expect("remounted identity"), expected);
         assert_eq!(remounted.canonical_rest_bytes().expect("rest again"), bytes);
+    }
+
+    #[test]
+    fn receiver_history_section_selects_only_its_addressed_realization() {
+        let cover = cover();
+        let addresses = cover.factor_order.clone();
+        let complex = SessionFactorComplex::found(
+            cover,
+            predecessor(),
+            vec![
+                TowerFactorRealization {
+                    address: "realization-a".to_owned(),
+                    source_factor_addresses: vec![addresses[0].clone()],
+                    target_row: 1,
+                    selector_coordinate: 0,
+                    delta_entry: 1,
+                    selector_entry: 1,
+                },
+                TowerFactorRealization {
+                    address: "realization-b".to_owned(),
+                    source_factor_addresses: vec![addresses[1].clone()],
+                    target_row: 2,
+                    selector_coordinate: 2,
+                    delta_entry: 1,
+                    selector_entry: 1,
+                },
+            ],
+            Vec::new(),
+        )
+        .expect("factor complex");
+        let only_a = BTreeSet::from(["realization-a".to_owned()]);
+        let (factor, _) = complex
+            .current_factor_for_addresses(&only_a)
+            .expect("supported factor");
+        assert_eq!(factor.rank, 2);
+        let none = BTreeSet::new();
+        let (predecessor, _) = complex
+            .current_factor_for_addresses(&none)
+            .expect("unsupported section keeps predecessor");
+        assert_eq!(predecessor, complex.predecessor);
+        assert!(matches!(
+            complex.current_factor_for_addresses(&BTreeSet::from(["unknown".to_owned()])),
+            Err(SessionFactorRefusal::Address)
+        ));
     }
 }

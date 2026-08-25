@@ -63,3 +63,11 @@ thiserror = "2"
 [profile.release]
 opt-level = 3
 lto = true
+
+# Native-rest admission authenticates multi-gigabyte exterior occurrences before any resident
+# deed.  Leaving the cryptographic apparatus in Cargo's unoptimized development profile turns a
+# bounded integrity receiver into a minutes-long host foreman and hides the actual CUDA
+# circulation.  This changes no semantic bit and widens no aperture; it only realizes SHA-256 on
+# the CPU at its intended apparatus grade during owner-local iteration.
+[profile.dev.package.sha2]
+opt-level = 3

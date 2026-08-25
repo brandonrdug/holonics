@@ -44,8 +44,8 @@ use crate::causal::EventId;
 use crate::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
 use crate::front_passage::{
     Chronology, Contact, Contract, Enter, GeluTanh, Hadamard, MidpointQuotient, PartitionMean,
-    PartitionTerminalRows, PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale, Standing,
-    TerminalRow, WithdrawColumns, WithdrawRows,
+    PartitionTerminalRows, PermuteColumns, ReEntry, ResidentRealization, RmsRebase, Scale,
+    Standing, TerminalRow, WithdrawColumns, WithdrawRows,
 };
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex};
 use crate::resident_section::{Dyadic, DyadicEnclosure, SeriesAperture};
@@ -90,6 +90,8 @@ pub const SHARED_V_FULL: &str = "shared V, full (stored by layer 23)";
 /// Named returns a caller may read or release.
 pub const X0: &str = "x0";
 pub const LAYER_RETURN: &str = "layer";
+/// The receiver-directed terminal-row restriction of the carried layer return.
+pub const LAYER_TERMINAL_ROW: &str = "layer terminal row";
 /// The layer scalar's own enclosure, before the terminal quotient under the midpoint chart.
 pub const LAYER_ENCLOSURE: &str = "layer enclosure";
 pub const K_STANDING: &str = "k standing";
@@ -392,6 +394,18 @@ pub enum InputSectionReceiver<'a> {
     PartitionMeans(&'a [u32]),
 }
 
+/// Which receiver consequence of a layer's carried standing enters the returned atlas.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LayerSectionReceiver<'a> {
+    /// The layer return is carried whole and no additional receiver branch is constructed.
+    Whole,
+    /// Retain only the exact terminal row while the whole carried standing continues on device.
+    TerminalRow,
+    /// Retain the terminal row of every independently addressed section while the complete
+    /// block-diagonal standing continues on device.
+    PartitionTerminalRows(&'a [u32]),
+}
+
 /// **The matched sibling's intervention, at one declared site of one layer.** Every variant is
 /// realized as an occurrence typed as the caller's intervention (quotient or intervention-only
 /// transport), never as source law; the base deed carries `None`. Remove / replace / permute /
@@ -509,6 +523,7 @@ pub fn found_layer(
     sibling: &Intervention,
     tokens: usize,
     input_receiver: InputSectionReceiver<'_>,
+    output_receiver: LayerSectionReceiver<'_>,
 ) -> Result<Founded, String> {
     let species = Species::of(layer);
     let role = KvRole::of(layer);
@@ -1480,6 +1495,39 @@ pub fn found_layer(
         }
         Species::Full => tokens.max(1),
     };
+    let (partition, partition_reach, partition_reach_sum) = match input_receiver {
+        InputSectionReceiver::IndependentPartitions(boundaries) => {
+            if boundaries.len() < 2
+                || boundaries[0] != 0
+                || boundaries.last().copied() != Some(tokens as u32)
+                || boundaries.windows(2).any(|pair| pair[0] >= pair[1])
+            {
+                return Err(format!(
+                    "the independent contact partition does not cover {tokens} rows exactly: {boundaries:?}"
+                ));
+            }
+            let reach = boundaries
+                .windows(2)
+                .map(|pair| (pair[1] - pair[0]) as usize)
+                .max()
+                .ok_or("the independent contact partition has no causal section")?;
+            let reach_sum = boundaries
+                .windows(2)
+                .map(|pair| (pair[1] - pair[0]) as usize)
+                .map(|span| {
+                    (0..span)
+                        .map(|at| (at + 1).min(window.max(1)) as u64)
+                        .sum::<u64>()
+                })
+                .sum();
+            (
+                Some(INPUT_PARTITION.to_owned()),
+                Some(reach),
+                Some(reach_sum),
+            )
+        }
+        _ => (None, None, None),
+    };
     let contact = law(
         &mut complex,
         "contact and carried construction",
@@ -1497,8 +1545,9 @@ pub fn found_layer(
             head_width: head,
             window,
             terms,
-            partition: matches!(input_receiver, InputSectionReceiver::IndependentPartitions(_))
-                .then(|| INPUT_PARTITION.to_owned()),
+            partition,
+            partition_reach,
+            partition_reach_sum,
         },
     );
     bond(&mut complex, "contact receiver", receivers, qr, contact, 0)?;
@@ -1997,6 +2046,54 @@ pub fn found_layer(
     returns.insert(LAYER_ENCLOSURE, out);
     let out = seal(chart, &mut complex, &mut realization, out, standing, "out")?;
     returns.insert(LAYER_RETURN, out);
+    if let Some((received, operation)) = match output_receiver {
+        LayerSectionReceiver::Whole => None,
+        LayerSectionReceiver::TerminalRow => Some((
+            law(
+                &mut complex,
+                "layer terminal row received",
+                OperationSpecies::Quotient,
+                vec![standing],
+                vec![standing],
+                None,
+                vec![intervention(
+                    "declared receiver restriction: retain the exact terminal row of this layer return; the whole standing continues to the next layer as its reconstruction fibre",
+                )],
+            )?,
+            None,
+        )),
+        LayerSectionReceiver::PartitionTerminalRows(boundaries) => Some((
+            law(
+                &mut complex,
+                "addressed partition layer terminal rows received",
+                OperationSpecies::Quotient,
+                vec![standing],
+                vec![standing],
+                None,
+                vec![intervention(
+                    "declared partition receiver restriction: retain each independently addressed section's exact terminal row; every earlier row remains in its reconstruction fibre and no contact crosses a partition boundary",
+                )],
+            )?,
+            Some(PartitionTerminalRows {
+                boundaries: boundaries.to_vec(),
+                mounted: INPUT_PARTITION.to_owned(),
+            }),
+        )),
+    } {
+        match operation {
+            Some(operation) => realization.bind(received, operation),
+            None => realization.bind(received, TerminalRow),
+        };
+        bond(
+            &mut complex,
+            "layer return restricts to its receiver-visible terminal section",
+            standing,
+            out,
+            received,
+            0,
+        )?;
+        returns.insert(LAYER_TERMINAL_ROW, received);
+    }
 
     Ok(Founded {
         complex,

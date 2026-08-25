@@ -35,11 +35,15 @@
 //! the device's own `MAX_GRID_DIM_X`.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::ffi::{c_char, c_void, CStr};
+use std::ffi::{CStr, c_char, c_void};
 use std::ptr;
 
+use num_bigint::BigInt;
+use num_traits::{One, Signed, ToPrimitive, Zero};
+use relational_geometry::Rat;
 use thiserror::Error;
 
+use crate::ExactComplexWaveCurrent;
 use crate::corpus_census::{CorpusCensus, SurfaceId};
 use crate::token_invariance::ConductAtlas;
 
@@ -77,7 +81,7 @@ unsafe extern "C" {
     fn cuModuleLoadData(module: *mut CuModule, image: *const c_void) -> i32;
     fn cuModuleUnload(module: CuModule) -> i32;
     fn cuModuleGetFunction(function: *mut CuFunction, module: CuModule, name: *const c_char)
-        -> i32;
+    -> i32;
     fn cuMemAlloc_v2(pointer: *mut CuDevicePtr, bytes: usize) -> i32;
     fn cuMemFree_v2(pointer: CuDevicePtr) -> i32;
     fn cuMemcpyHtoD_v2(destination: CuDevicePtr, source: *const c_void, bytes: usize) -> i32;
@@ -131,6 +135,26 @@ pub enum CudaRefineError {
     NativeActionTooWide,
     #[error("native recurrence {at} did not close inside its finite state population")]
     NativeRecurrenceDidNotClose { at: usize },
+    #[error("the oriented complex incidence section is empty, ragged, or exceeds the device wire")]
+    ComplexIncidenceShape,
+    #[error("the complex coefficient fronts are empty, ragged, or carry a zero scale")]
+    ComplexCurrentShape,
+    #[error(
+        "an exact complex coefficient front cannot be represented by the signed-word/common-denominator apparatus chart"
+    )]
+    ComplexCurrentOutsideApparatus,
+    #[error("the exact complex incidence accumulation exceeds the signed-word apparatus carrier")]
+    ComplexIncidenceAccumulationOverflow,
+    #[error(
+        "the interval potential incidence is empty, ragged, reversed, or exceeds the device wire"
+    )]
+    IntervalPotentialShape,
+    #[error(
+        "the interval potential coefficient front cannot enter the signed-word apparatus chart"
+    )]
+    IntervalPotentialCurrentOutsideApparatus,
+    #[error("the interval potential contraction exceeds the signed-word apparatus carrier")]
+    IntervalPotentialAccumulationOverflow,
     #[error(
         "the contact coordinate wire has {lower} lower words and {upper} upper words; both must be equal multiples of three"
     )]
@@ -163,19 +187,31 @@ pub enum CudaRefineError {
     OpticalIncidenceAperture { term_gap: u64, line_gap: u64 },
     #[error("the material-operation world-tube arrays do not form one exact addressed passage")]
     MaterialOperationPassageShape,
-    #[error("the returned-constraint incidence, covector, and native action do not form one dynamic morphology passage")]
+    #[error(
+        "the returned-constraint incidence, covector, and native action do not form one dynamic morphology passage"
+    )]
     DynamicMorphologyShape,
-    #[error("the ragged native words, offsets, and starting occurrences do not form one addressed front")]
+    #[error(
+        "the ragged native words, offsets, and starting occurrences do not form one addressed front"
+    )]
     RaggedNativePassageShape,
-    #[error("the media candidates, anchors, typed ports, action, and decoder do not form one joint passage")]
+    #[error(
+        "the media candidates, anchors, typed ports, action, and decoder do not form one joint passage"
+    )]
     JointMediaPassageShape,
-    #[error("the retained context, derivation, media sections, and receiver reduction do not form one production aperture")]
+    #[error(
+        "the retained context, derivation, media sections, and receiver reduction do not form one production aperture"
+    )]
     ProductionApertureShape,
     #[error("the quadratic sections and chart maps do not form one exact resident transport")]
     QuadraticTransportShape,
-    #[error("the exact section families, actions, constraints, moduli, and cultivation standing do not form one resident passage")]
+    #[error(
+        "the exact section families, actions, constraints, moduli, and cultivation standing do not form one resident passage"
+    )]
     FixedSectionFamilyShape,
-    #[error("the native oriented constraint, factor, carrier charts, and sections do not form one resident passage")]
+    #[error(
+        "the native oriented constraint, factor, carrier charts, and sections do not form one resident passage"
+    )]
     NativeFixedSectionFamilyShape,
 }
 
@@ -347,6 +383,8 @@ pub struct CudaRefineExecutor {
     /// The LAW: the material-free quotient every organ with a front shares.
     claim: CuFunction,
     native_word: CuFunction,
+    complex_incidence: CuFunction,
+    interval_potential_receiver: CuFunction,
     native_trace: CuFunction,
     native_ragged_trace: CuFunction,
     returned_recurrence: CuFunction,
@@ -429,6 +467,8 @@ impl CudaRefineExecutor {
             let mut claimed = ptr::null_mut();
             let mut claim = ptr::null_mut();
             let mut native_word = ptr::null_mut();
+            let mut complex_incidence = ptr::null_mut();
+            let mut interval_potential_receiver = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
             let mut native_ragged_trace = ptr::null_mut();
             let mut returned_recurrence = ptr::null_mut();
@@ -468,6 +508,16 @@ impl CudaRefineExecutor {
                     &mut native_word as *mut CuFunction,
                     c"conduct_native_word",
                     "cuModuleGetFunction(conduct_native_word)",
+                ),
+                (
+                    &mut complex_incidence as *mut CuFunction,
+                    c"conduct_complex_incidence",
+                    "cuModuleGetFunction(conduct_complex_incidence)",
+                ),
+                (
+                    &mut interval_potential_receiver as *mut CuFunction,
+                    c"receive_interval_potential_incidence",
+                    "cuModuleGetFunction(receive_interval_potential_incidence)",
                 ),
                 (
                     &mut native_trace as *mut CuFunction,
@@ -583,6 +633,8 @@ impl CudaRefineExecutor {
                 claimed,
                 claim,
                 native_word,
+                complex_incidence,
+                interval_potential_receiver,
                 native_trace,
                 native_ragged_trace,
                 returned_recurrence,
@@ -619,6 +671,8 @@ impl CudaRefineExecutor {
                 claimed,
                 claim,
                 native_word,
+                complex_incidence,
+                interval_potential_receiver,
                 native_trace,
                 native_ragged_trace,
                 returned_recurrence,
@@ -829,6 +883,733 @@ pub struct DeviceNativeWord {
     pub host_ingress_octets: u64,
     pub host_egress_octets: u64,
     pub resident_octets: u64,
+}
+
+/// One native action and ordered word retained on the card across successor occurrences.
+///
+/// Unlike [`DeviceNativeWord`], this is a continuing apparatus owner rather than the receipt of
+/// one call.  The generator table and word cross exactly once at mount.  Every later conduct
+/// crosses only its addressed starting population and reads only the terminal population; no
+/// invariant transport is re-uploaded between successor occurrences.
+pub struct ResidentNativeWord {
+    // Device allocations must be released before the context which owns them. Rust drops fields
+    // in declaration order, so these precede `card` deliberately.
+    generator_table: Buffer,
+    word: Buffer,
+    card: CudaRefineExecutor,
+    states: u32,
+    word_length: u32,
+    resident_invariant_octets: u64,
+    mount_host_ingress_octets: u64,
+}
+
+/// One terminal return from an already-resident native word.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentNativeWordReturn {
+    pub native_end: Vec<u32>,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub host_ingress_octets: u64,
+    pub host_egress_octets: u64,
+    pub resident_invariant_octets: u64,
+    pub resident_working_octets: u64,
+    pub invariant_transport_reuploaded: bool,
+}
+
+/// One real incidence section retained on the card while exact complex coefficient currents cross
+/// it.  In the Complex Parametron reading, rows are oriented carrier branches, columns are the
+/// addressed coefficient nodes, and the two current coordinates retain relative phase before any
+/// binary receiver is taken.  The owner is singular and deliberately not `Clone`.
+pub struct ResidentComplexIncidence {
+    // Released before the context which owns it.
+    incidence: Buffer,
+    card: CudaRefineExecutor,
+    address: String,
+    grain: u32,
+    branches: u32,
+    nodes: u32,
+    greatest_row_mass: u128,
+    mount_host_ingress_octets: u64,
+}
+
+/// One terminal exact complex section returned from the resident incidence map.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct ResidentComplexIncidenceReturn {
+    pub address: String,
+    /// Physical values are these exact coordinates multiplied by `2^-grain`.
+    pub grain: u32,
+    pub sections: Vec<Vec<ExactComplexWaveCurrent>>,
+    pub device: String,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub mount_host_ingress_octets: u64,
+    pub successor_host_ingress_octets: u64,
+    pub successor_host_egress_octets: u64,
+    pub resident_invariant_octets: u64,
+    pub resident_working_octets: u64,
+    pub invariant_transport_reuploaded: bool,
+    pub cpu_semantic_replay_after_device: bool,
+    pub binary_receiver_taken: bool,
+}
+
+impl ResidentComplexIncidence {
+    /// Mount one exact oriented incidence map. Its extents and row-mass aperture are read from the
+    /// material; no hidden width or phase population is authored.
+    pub fn mount(
+        card: CudaRefineExecutor,
+        address: impl Into<String>,
+        grain: u32,
+        branches: usize,
+        nodes: usize,
+        incidence: &[i64],
+    ) -> Result<Self, CudaRefineError> {
+        let expected = branches
+            .checked_mul(nodes)
+            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
+        if branches == 0
+            || nodes == 0
+            || incidence.len() != expected
+            || branches > u32::MAX as usize
+            || nodes > u32::MAX as usize
+        {
+            return Err(CudaRefineError::ComplexIncidenceShape);
+        }
+        let greatest_row_mass = incidence
+            .chunks_exact(nodes)
+            .map(|row| {
+                row.iter().fold(0u128, |mass, entry| {
+                    mass.saturating_add(u128::from(entry.unsigned_abs()))
+                })
+            })
+            .max()
+            .unwrap_or(0);
+        let mount_host_ingress_octets = u64::try_from(std::mem::size_of_val(incidence))
+            .map_err(|_| CudaRefineError::ComplexIncidenceShape)?;
+        driver(unsafe { cuCtxSetCurrent(card.context) }, "cuCtxSetCurrent")?;
+        let incidence = Buffer::of(incidence)?;
+        Ok(Self {
+            incidence,
+            card,
+            address: address.into(),
+            grain,
+            branches: branches as u32,
+            nodes: nodes as u32,
+            greatest_row_mass,
+            mount_host_ingress_octets,
+        })
+    }
+
+    pub fn device_name(&self) -> &str {
+        self.card.device_name()
+    }
+
+    pub fn address(&self) -> &str {
+        &self.address
+    }
+
+    pub fn grain(&self) -> u32 {
+        self.grain
+    }
+
+    /// Carry arbitrary exact rational phase pairs through the already-mounted real incidence map.
+    /// Each front is rebased to its own common positive denominator at the apparatus mouth and
+    /// reconstructed exactly after the terminal read. The card performs both contractions; the
+    /// host neither selects a phase nor replays the product.
+    pub fn conduct(
+        &mut self,
+        fronts: &[Vec<ExactComplexWaveCurrent>],
+    ) -> Result<ResidentComplexIncidenceReturn, CudaRefineError> {
+        let nodes = self.nodes as usize;
+        if fronts.is_empty() || fronts.iter().any(|front| front.len() != nodes) {
+            return Err(CudaRefineError::ComplexCurrentShape);
+        }
+        if fronts.len() > u32::MAX as usize {
+            return Err(CudaRefineError::ComplexCurrentShape);
+        }
+
+        let mut real = Vec::with_capacity(fronts.len() * nodes);
+        let mut imaginary = Vec::with_capacity(fronts.len() * nodes);
+        let mut denominators = Vec::with_capacity(fronts.len());
+        let mut greatest_numerator = 0u128;
+        for front in fronts {
+            let denominator = common_complex_denominator(front)?;
+            for current in front {
+                let re = current.real.numer() * (&denominator / current.real.denom());
+                let im = current.imaginary.numer() * (&denominator / current.imaginary.denom());
+                let re = re
+                    .to_i64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
+                let im = im
+                    .to_i64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
+                greatest_numerator = greatest_numerator
+                    .max(u128::from(re.unsigned_abs()))
+                    .max(u128::from(im.unsigned_abs()));
+                real.push(re);
+                imaginary.push(im);
+            }
+            denominators.push(
+                denominator
+                    .to_u64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?,
+            );
+        }
+        if self
+            .greatest_row_mass
+            .checked_mul(greatest_numerator)
+            .filter(|bound| *bound <= i64::MAX as u128)
+            .is_none()
+        {
+            return Err(CudaRefineError::ComplexIncidenceAccumulationOverflow);
+        }
+
+        driver(
+            unsafe { cuCtxSetCurrent(self.card.context) },
+            "cuCtxSetCurrent",
+        )?;
+        let coefficient_real = Buffer::of(&real)?;
+        let coefficient_imaginary = Buffer::of(&imaginary)?;
+        let output_count = fronts
+            .len()
+            .checked_mul(self.branches as usize)
+            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
+        let section_real = Buffer::alloc(output_count * std::mem::size_of::<i64>())?;
+        let section_imaginary = Buffer::alloc(output_count * std::mem::size_of::<i64>())?;
+        if output_count > 0 {
+            let grid = self.card.grid_for(output_count as u64)?;
+            let mut incidence_pointer = self.incidence.pointer;
+            let mut real_pointer = coefficient_real.pointer;
+            let mut imaginary_pointer = coefficient_imaginary.pointer;
+            let mut section_real_pointer = section_real.pointer;
+            let mut section_imaginary_pointer = section_imaginary.pointer;
+            let mut branch_count = self.branches;
+            let mut node_count = self.nodes;
+            let mut front_count = fronts.len() as u32;
+            let mut arguments: [*mut c_void; 8] = [
+                &mut incidence_pointer as *mut u64 as *mut c_void,
+                &mut real_pointer as *mut u64 as *mut c_void,
+                &mut imaginary_pointer as *mut u64 as *mut c_void,
+                &mut section_real_pointer as *mut u64 as *mut c_void,
+                &mut section_imaginary_pointer as *mut u64 as *mut c_void,
+                &mut branch_count as *mut u32 as *mut c_void,
+                &mut node_count as *mut u32 as *mut c_void,
+                &mut front_count as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.card.complex_incidence,
+                        grid,
+                        1,
+                        1,
+                        self.card.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(conduct_complex_incidence)",
+            )?;
+            driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+            self.card.launches += 1;
+        }
+        let mut returned_real = vec![0i64; output_count];
+        let mut returned_imaginary = vec![0i64; output_count];
+        section_real.read(&mut returned_real)?;
+        section_imaginary.read(&mut returned_imaginary)?;
+        let branches = self.branches as usize;
+        let sections = denominators
+            .iter()
+            .enumerate()
+            .map(|(front, denominator)| {
+                (0..branches)
+                    .map(|branch| {
+                        let at = front * branches + branch;
+                        ExactComplexWaveCurrent::new(
+                            Rat::new(BigInt::from(returned_real[at]), BigInt::from(*denominator)),
+                            Rat::new(
+                                BigInt::from(returned_imaginary[at]),
+                                BigInt::from(*denominator),
+                            ),
+                        )
+                    })
+                    .collect()
+            })
+            .collect();
+        let coefficient_octets = std::mem::size_of_val(real.as_slice())
+            .checked_add(std::mem::size_of_val(imaginary.as_slice()))
+            .and_then(|octets| octets.checked_add(std::mem::size_of_val(denominators.as_slice())))
+            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
+        let output_octets = output_count
+            .checked_mul(2 * std::mem::size_of::<i64>())
+            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
+        Ok(ResidentComplexIncidenceReturn {
+            address: self.address.clone(),
+            grain: self.grain,
+            sections,
+            device: self.card.device_name().to_owned(),
+            launches: u64::from(output_count > 0),
+            synchronizations: u64::from(output_count > 0),
+            block_threads: self.card.block_threads(),
+            mount_host_ingress_octets: self.mount_host_ingress_octets,
+            successor_host_ingress_octets: coefficient_octets,
+            successor_host_egress_octets: output_octets,
+            resident_invariant_octets: self.mount_host_ingress_octets,
+            resident_working_octets: coefficient_octets + output_octets,
+            invariant_transport_reuploaded: false,
+            cpu_semantic_replay_after_device: false,
+            binary_receiver_taken: false,
+        })
+    }
+}
+
+/// One exact interval-valued potential incidence with its declared receiver-sufficient row cover
+/// retained on the card. The complete omitted fibre belongs to the resting causal section; this
+/// apparatus owner mounts only the rows through which the declared exterior receiver factors.
+pub struct ResidentIntervalPotentialReceiver {
+    lower_incidence: Buffer,
+    upper_incidence: Buffer,
+    row_addresses: Buffer,
+    card: CudaRefineExecutor,
+    address: String,
+    rows: u32,
+    nodes: u32,
+    greatest_row_mass: u128,
+    mount_host_ingress_octets: u64,
+}
+
+/// One exact receiver projection from an already-resident interval potential complex.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct ResidentIntervalPotentialReturn {
+    pub address: String,
+    pub selected_native_addresses: Vec<u32>,
+    pub selected_lower: Vec<String>,
+    pub selected_upper: Vec<String>,
+    pub plural_population: Vec<u32>,
+    pub device: String,
+    pub launches: u64,
+    pub synchronizations: u64,
+    pub block_threads: u32,
+    pub mount_host_ingress_octets: u64,
+    pub successor_host_ingress_octets: u64,
+    pub successor_host_egress_octets: u64,
+    pub resident_invariant_octets: u64,
+    pub resident_working_octets: u64,
+    pub invariant_transport_reuploaded: bool,
+    pub cpu_semantic_replay_after_device: bool,
+}
+
+impl ResidentIntervalPotentialReceiver {
+    pub fn mount(
+        card: CudaRefineExecutor,
+        address: impl Into<String>,
+        rows: usize,
+        nodes: usize,
+        row_addresses: &[u32],
+        lower_incidence: &[i64],
+        upper_incidence: &[i64],
+    ) -> Result<Self, CudaRefineError> {
+        let expected = rows
+            .checked_mul(nodes)
+            .ok_or(CudaRefineError::IntervalPotentialShape)?;
+        let unique_addresses = row_addresses.iter().copied().collect::<BTreeSet<_>>();
+        if rows == 0
+            || nodes == 0
+            || rows > u32::MAX as usize
+            || nodes > u32::MAX as usize
+            || row_addresses.len() != rows
+            || unique_addresses.len() != rows
+            || lower_incidence.len() != expected
+            || upper_incidence.len() != expected
+            || lower_incidence
+                .iter()
+                .zip(upper_incidence)
+                .any(|(lower, upper)| lower > upper)
+        {
+            return Err(CudaRefineError::IntervalPotentialShape);
+        }
+        let greatest_row_mass = lower_incidence
+            .chunks_exact(nodes)
+            .zip(upper_incidence.chunks_exact(nodes))
+            .map(|(lower, upper)| {
+                lower.iter().zip(upper).fold(0u128, |mass, (from, until)| {
+                    mass.saturating_add(
+                        u128::from(from.unsigned_abs()).max(u128::from(until.unsigned_abs())),
+                    )
+                })
+            })
+            .max()
+            .unwrap_or(0);
+        let mount_host_ingress_octets = std::mem::size_of_val(lower_incidence)
+            .checked_add(std::mem::size_of_val(upper_incidence))
+            .and_then(|octets| octets.checked_add(std::mem::size_of_val(row_addresses)))
+            .and_then(|octets| u64::try_from(octets).ok())
+            .ok_or(CudaRefineError::IntervalPotentialShape)?;
+        driver(unsafe { cuCtxSetCurrent(card.context) }, "cuCtxSetCurrent")?;
+        Ok(Self {
+            lower_incidence: Buffer::of(lower_incidence)?,
+            upper_incidence: Buffer::of(upper_incidence)?,
+            row_addresses: Buffer::of(row_addresses)?,
+            card,
+            address: address.into(),
+            rows: rows as u32,
+            nodes: nodes as u32,
+            greatest_row_mass,
+            mount_host_ingress_octets,
+        })
+    }
+
+    /// Cross exact real coefficient currents and take the declared interval-order receiver on the
+    /// card. A plural return remains explicit; this method never lets the host break a tie.
+    pub fn conduct(
+        &mut self,
+        fronts: &[Vec<Rat>],
+    ) -> Result<ResidentIntervalPotentialReturn, CudaRefineError> {
+        let nodes = self.nodes as usize;
+        if fronts.is_empty()
+            || fronts.len() > u32::MAX as usize
+            || fronts.iter().any(|front| front.len() != nodes)
+        {
+            return Err(CudaRefineError::IntervalPotentialShape);
+        }
+        let mut coefficients = Vec::with_capacity(fronts.len() * nodes);
+        let mut denominators = Vec::with_capacity(fronts.len());
+        let mut greatest_numerator = 0u128;
+        for front in fronts {
+            let denominator = common_real_denominator(front)?;
+            for coefficient in front {
+                let numerator = coefficient.numer() * (&denominator / coefficient.denom());
+                let numerator = numerator
+                    .to_i64()
+                    .ok_or(CudaRefineError::IntervalPotentialCurrentOutsideApparatus)?;
+                greatest_numerator = greatest_numerator.max(u128::from(numerator.unsigned_abs()));
+                coefficients.push(numerator);
+            }
+            denominators.push(
+                denominator
+                    .to_u64()
+                    .ok_or(CudaRefineError::IntervalPotentialCurrentOutsideApparatus)?,
+            );
+        }
+        if self
+            .greatest_row_mass
+            .checked_mul(greatest_numerator)
+            .filter(|bound| *bound <= i64::MAX as u128)
+            .is_none()
+        {
+            return Err(CudaRefineError::IntervalPotentialAccumulationOverflow);
+        }
+
+        driver(
+            unsafe { cuCtxSetCurrent(self.card.context) },
+            "cuCtxSetCurrent",
+        )?;
+        let coefficient = Buffer::of(&coefficients)?;
+        let front_count = fronts.len();
+        let selected_address = Buffer::alloc(front_count * std::mem::size_of::<u32>())?;
+        let selected_lower = Buffer::alloc(front_count * std::mem::size_of::<i64>())?;
+        let selected_upper = Buffer::alloc(front_count * std::mem::size_of::<i64>())?;
+        let plural_count = Buffer::alloc(front_count * std::mem::size_of::<u32>())?;
+        let mut lower_pointer = self.lower_incidence.pointer;
+        let mut upper_pointer = self.upper_incidence.pointer;
+        let mut address_pointer = self.row_addresses.pointer;
+        let mut coefficient_pointer = coefficient.pointer;
+        let mut selected_address_pointer = selected_address.pointer;
+        let mut selected_lower_pointer = selected_lower.pointer;
+        let mut selected_upper_pointer = selected_upper.pointer;
+        let mut plural_pointer = plural_count.pointer;
+        let mut rows = self.rows;
+        let mut nodes = self.nodes;
+        let mut arguments: [*mut c_void; 10] = [
+            &mut lower_pointer as *mut u64 as *mut c_void,
+            &mut upper_pointer as *mut u64 as *mut c_void,
+            &mut address_pointer as *mut u64 as *mut c_void,
+            &mut coefficient_pointer as *mut u64 as *mut c_void,
+            &mut selected_address_pointer as *mut u64 as *mut c_void,
+            &mut selected_lower_pointer as *mut u64 as *mut c_void,
+            &mut selected_upper_pointer as *mut u64 as *mut c_void,
+            &mut plural_pointer as *mut u64 as *mut c_void,
+            &mut rows as *mut u32 as *mut c_void,
+            &mut nodes as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    self.card.interval_potential_receiver,
+                    front_count as u32,
+                    1,
+                    1,
+                    self.card.warp,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(receive_interval_potential_incidence)",
+        )?;
+        driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+        self.card.launches += 1;
+        let mut returned_address = vec![0u32; front_count];
+        let mut returned_lower = vec![0i64; front_count];
+        let mut returned_upper = vec![0i64; front_count];
+        let mut returned_plural = vec![0u32; front_count];
+        selected_address.read(&mut returned_address)?;
+        selected_lower.read(&mut returned_lower)?;
+        selected_upper.read(&mut returned_upper)?;
+        plural_count.read(&mut returned_plural)?;
+        if returned_plural.iter().any(|plural| *plural == 0)
+            || returned_lower
+                .iter()
+                .zip(&returned_upper)
+                .any(|(lower, upper)| lower > upper)
+        {
+            return Err(CudaRefineError::IntervalPotentialShape);
+        }
+        let lower = returned_lower
+            .into_iter()
+            .zip(&denominators)
+            .map(|(numerator, denominator)| {
+                Rat::new(BigInt::from(numerator), BigInt::from(*denominator)).to_string()
+            })
+            .collect();
+        let upper = returned_upper
+            .into_iter()
+            .zip(&denominators)
+            .map(|(numerator, denominator)| {
+                Rat::new(BigInt::from(numerator), BigInt::from(*denominator)).to_string()
+            })
+            .collect();
+        let ingress = std::mem::size_of_val(coefficients.as_slice()) as u64;
+        let egress = front_count
+            .checked_mul(2 * std::mem::size_of::<u32>() + 2 * std::mem::size_of::<i64>())
+            .ok_or(CudaRefineError::IntervalPotentialShape)? as u64;
+        Ok(ResidentIntervalPotentialReturn {
+            address: self.address.clone(),
+            selected_native_addresses: returned_address,
+            selected_lower: lower,
+            selected_upper: upper,
+            plural_population: returned_plural,
+            device: self.card.device_name().to_owned(),
+            launches: 1,
+            synchronizations: 1,
+            block_threads: self.card.warp,
+            mount_host_ingress_octets: self.mount_host_ingress_octets,
+            successor_host_ingress_octets: ingress,
+            successor_host_egress_octets: egress,
+            resident_invariant_octets: self.mount_host_ingress_octets,
+            resident_working_octets: ingress + egress,
+            invariant_transport_reuploaded: false,
+            cpu_semantic_replay_after_device: false,
+        })
+    }
+}
+
+fn common_real_denominator(front: &[Rat]) -> Result<BigInt, CudaRefineError> {
+    let mut common = BigInt::one();
+    for denominator in front.iter().map(Rat::denom) {
+        if denominator.is_zero() {
+            return Err(CudaRefineError::IntervalPotentialCurrentOutsideApparatus);
+        }
+        let gcd = integer_gcd(common.clone(), denominator.clone());
+        common = (common / gcd) * denominator;
+    }
+    Ok(common)
+}
+
+fn common_complex_denominator(
+    front: &[ExactComplexWaveCurrent],
+) -> Result<BigInt, CudaRefineError> {
+    let mut common = BigInt::one();
+    for denominator in front
+        .iter()
+        .flat_map(|current| [current.real.denom(), current.imaginary.denom()])
+    {
+        if denominator.is_zero() {
+            return Err(CudaRefineError::ComplexCurrentShape);
+        }
+        let divisor = integer_gcd(common.clone(), denominator.clone());
+        common = (common / divisor) * denominator;
+    }
+    Ok(common.abs())
+}
+
+fn integer_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+    left = left.abs();
+    right = right.abs();
+    while !right.is_zero() {
+        let remainder = left % &right;
+        left = right;
+        right = remainder;
+    }
+    if left.is_zero() { BigInt::one() } else { left }
+}
+
+impl ResidentNativeWord {
+    /// Mount one finite native action and its complete ordered word as continuing device standing.
+    pub fn mount(
+        card: CudaRefineExecutor,
+        states: usize,
+        generators: usize,
+        generator_table: &[u32],
+        word: &[u32],
+    ) -> Result<Self, CudaRefineError> {
+        let expected = states
+            .checked_mul(generators)
+            .ok_or(CudaRefineError::NativeActionTooWide)?;
+        if generator_table.len() != expected {
+            return Err(CudaRefineError::NativeTableExtentDisagrees {
+                table_entries: generator_table.len(),
+                generators,
+                states,
+            });
+        }
+        if states > u32::MAX as usize
+            || generators > u32::MAX as usize
+            || word.len() > u32::MAX as usize
+        {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = generator_table
+            .iter()
+            .copied()
+            .find(|state| *state as usize >= states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation { state, states });
+        }
+        if let Some(generator) = word
+            .iter()
+            .copied()
+            .find(|generator| *generator as usize >= generators)
+        {
+            return Err(CudaRefineError::NativeGeneratorOutsideFamily {
+                generator,
+                generators,
+            });
+        }
+        driver(unsafe { cuCtxSetCurrent(card.context) }, "cuCtxSetCurrent")?;
+        let word_length = word.len();
+        let generator_table = Buffer::of(generator_table)?;
+        let word = Buffer::of(word)?;
+        let resident_invariant_octets = expected
+            .checked_mul(std::mem::size_of::<u32>())
+            .and_then(|octets| octets.checked_add(word_length * std::mem::size_of::<u32>()))
+            .ok_or(CudaRefineError::NativeActionTooWide)?
+            as u64;
+        Ok(Self {
+            generator_table,
+            word,
+            card,
+            states: states as u32,
+            word_length: word_length as u32,
+            resident_invariant_octets,
+            mount_host_ingress_octets: resident_invariant_octets,
+        })
+    }
+
+    pub fn device_name(&self) -> &str {
+        self.card.device_name()
+    }
+
+    pub fn block_threads(&self) -> u32 {
+        self.card.block_threads()
+    }
+
+    pub fn mount_host_ingress_octets(&self) -> u64 {
+        self.mount_host_ingress_octets
+    }
+
+    pub fn resident_invariant_octets(&self) -> u64 {
+        self.resident_invariant_octets
+    }
+
+    /// Carry a later addressed population through the already-resident action and word.
+    pub fn conduct(
+        &mut self,
+        native_start: &[u32],
+    ) -> Result<ResidentNativeWordReturn, CudaRefineError> {
+        if native_start.len() > u32::MAX as usize {
+            return Err(CudaRefineError::NativeActionTooWide);
+        }
+        if let Some(state) = native_start
+            .iter()
+            .copied()
+            .find(|state| *state >= self.states)
+        {
+            return Err(CudaRefineError::NativeStateOutsidePopulation {
+                state,
+                states: self.states as usize,
+            });
+        }
+
+        driver(
+            unsafe { cuCtxSetCurrent(self.card.context) },
+            "cuCtxSetCurrent",
+        )?;
+        let start = Buffer::of(native_start)?;
+        let end = Buffer::alloc(std::mem::size_of_val(native_start))?;
+        let count = native_start.len();
+        if count > 0 {
+            let grid = self.card.grid_for(count as u64)?;
+            let mut table_pointer = self.generator_table.pointer;
+            let mut word_pointer = self.word.pointer;
+            let mut start_pointer = start.pointer;
+            let mut end_pointer = end.pointer;
+            let mut cell_count = count as u32;
+            let mut state_count = self.states;
+            let mut word_length = self.word_length;
+            let mut arguments: Vec<*mut c_void> = vec![
+                &mut table_pointer as *mut u64 as *mut c_void,
+                &mut word_pointer as *mut u64 as *mut c_void,
+                &mut start_pointer as *mut u64 as *mut c_void,
+                &mut end_pointer as *mut u64 as *mut c_void,
+                &mut cell_count as *mut u32 as *mut c_void,
+                &mut state_count as *mut u32 as *mut c_void,
+                &mut word_length as *mut u32 as *mut c_void,
+            ];
+            driver(
+                unsafe {
+                    cuLaunchKernel(
+                        self.card.native_word,
+                        grid,
+                        1,
+                        1,
+                        self.card.block_x,
+                        1,
+                        1,
+                        0,
+                        ptr::null_mut(),
+                        arguments.as_mut_ptr(),
+                        ptr::null_mut(),
+                    )
+                },
+                "cuLaunchKernel(conduct_native_word)",
+            )?;
+            driver(unsafe { cuCtxSynchronize() }, "cuCtxSynchronize")?;
+            self.card.launches += 1;
+        }
+        let mut native_end = vec![0u32; count];
+        if count > 0 {
+            end.read(&mut native_end)?;
+        }
+        let state_octets = std::mem::size_of_val(native_start) as u64;
+        Ok(ResidentNativeWordReturn {
+            native_end,
+            launches: u64::from(count > 0),
+            synchronizations: u64::from(count > 0),
+            host_ingress_octets: state_octets,
+            host_egress_octets: state_octets,
+            resident_invariant_octets: self.resident_invariant_octets,
+            resident_working_octets: state_octets * 2,
+            invariant_transport_reuploaded: false,
+        })
+    }
 }
 
 /// One complete native ordered-word trace returned from the card after one terminal read.
@@ -5167,6 +5948,106 @@ mod tests {
         }
     }
 
+    /// Mounting separates invariant transport ingress from later addressed-state ingress.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_resident_native_word_is_not_reuploaded_between_successors() {
+        let card = CudaRefineExecutor::new().expect("the card mounts");
+        // One generator carries the two hands through three boundaries and then rests.
+        let table = [2, 3, 4, 5, 4, 5];
+        let mut word = ResidentNativeWord::mount(card, 6, 1, &table, &[0, 0])
+            .expect("the native word mounts once");
+        assert_eq!(word.mount_host_ingress_octets(), 32);
+        let first = word.conduct(&[0, 1]).expect("the first successor returns");
+        let second = word.conduct(&[1]).expect("the later successor returns");
+        assert_eq!(first.native_end, vec![4, 5]);
+        assert_eq!(second.native_end, vec![5]);
+        assert_eq!(first.host_ingress_octets, 8);
+        assert_eq!(second.host_ingress_octets, 4);
+        assert!(!first.invariant_transport_reuploaded);
+        assert!(!second.invariant_transport_reuploaded);
+        assert_eq!(
+            first.resident_invariant_octets,
+            second.resident_invariant_octets
+        );
+    }
+
+    /// The pre-quotient receiver keeps both phase coordinates and mounts its incidence only once.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_resident_complex_incidence_carries_phase_without_binary_collapse() {
+        let card = CudaRefineExecutor::new().expect("the card mounts");
+        let mut incidence =
+            ResidentComplexIncidence::mount(card, "test/incidence", 0, 3, 2, &[1, 0, 2, 1, 0, 3])
+                .expect("incidence mounts");
+        let current = vec![
+            ExactComplexWaveCurrent::one(),
+            ExactComplexWaveCurrent::new(Rat::zero(), Rat::one()),
+        ];
+        let half_turn = current
+            .iter()
+            .map(ExactComplexWaveCurrent::negated)
+            .collect::<Vec<_>>();
+        let first = incidence
+            .conduct(&[current.clone(), half_turn])
+            .expect("complex fronts return");
+        let later = incidence
+            .conduct(&[current])
+            .expect("later current returns");
+        assert_eq!(
+            first.sections[1],
+            first.sections[0]
+                .iter()
+                .map(ExactComplexWaveCurrent::negated)
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(later.sections[0], first.sections[0]);
+        assert_eq!(first.launches, 1);
+        assert_eq!(later.launches, 1);
+        assert!(!first.binary_receiver_taken);
+        assert!(!first.invariant_transport_reuploaded);
+        assert!(!later.invariant_transport_reuploaded);
+        assert_eq!(
+            first.resident_invariant_octets,
+            later.resident_invariant_octets
+        );
+    }
+
+    /// The exterior order receiver acts on a declared sufficient row cover and leaves a plural
+    /// interval fibre unresolved rather than asking the host to select a row.
+    #[test]
+    #[ignore = "requires the RTX CUDA device"]
+    fn the_resident_interval_potential_receiver_selects_and_retains_plurality_on_card() {
+        let card = CudaRefineExecutor::new().expect("the card mounts");
+        let mut receiver = ResidentIntervalPotentialReceiver::mount(
+            card,
+            "test/potential-cover",
+            3,
+            2,
+            &[7, 11, 13],
+            &[
+                4, 0, // row 7
+                0, 6, // row 11
+                3, 3, // row 13
+            ],
+            &[
+                5, 1, // row 7
+                1, 7, // row 11
+                4, 4, // row 13
+            ],
+        )
+        .expect("receiver cover mounts");
+        let returned = receiver
+            .conduct(&[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), Rat::one()]])
+            .expect("receiver returns");
+        assert_eq!(returned.selected_native_addresses, vec![7, 11]);
+        assert_eq!(returned.selected_lower, vec!["4", "6"]);
+        assert_eq!(returned.selected_upper, vec!["5", "7"]);
+        assert_eq!(returned.plural_population, vec![2, 1]);
+        assert!(!returned.invariant_transport_reuploaded);
+        assert!(!returned.cpu_semantic_replay_after_device);
+    }
+
     /// The cpu law is exact on its own terms, without a card. A partition is an equivalence, so
     /// this checks the property rather than the numbering.
     #[test]
@@ -5388,10 +6269,12 @@ mod tests {
             .expect("the compact joint-media passage returns");
         assert_eq!(returned.joint_anchor, vec![1, 1, 1]);
         assert_eq!(returned.shared_ablated_joint_anchor, vec![0, 0, 0]);
-        assert!(returned
-            .local_ablated_joint_anchor
-            .iter()
-            .all(|value| *value == 0));
+        assert!(
+            returned
+                .local_ablated_joint_anchor
+                .iter()
+                .all(|value| *value == 0)
+        );
         assert_eq!(returned.predecessor_consequence, vec![0, 2, 4, 6, 8, 10]);
         assert_eq!(returned.successor_consequence, vec![1, 3, 5, 7, 9, 11]);
         assert_eq!(returned.shared_ablated_consequence, vec![0, 2, 4, 6, 8, 10]);

@@ -448,6 +448,46 @@ hypergeometry of the live interaction complex.
 Complete derivation, sensory-coupling example, source audit and construction boundary:
 `research/records/2026-08-23_THE_POTENTIAL_COMPLEX_CROSSES_ARBITRARY_ORGAN_APERTURES_AND_CODEC_LINEAGES_MEET_ONLY_THROUGH_RETURNED_CONSEQUENCE.md`.
 
+## 8d. The Complex Parametron is the primitive carrier before a locked receiver
+
+`proved-derived; formal-checked`: `HolonicParametron.lean` proves that a parametrically driven
+phase carrier has two half-turn-related locked sheets: the pump-storage receiver identifies the
+sheets while the complex carrier changes sign. The binary sign face is therefore an exact quotient
+only on the declared locked population. A full turn already exhibits a nontrivial source fibre, and
+cosine coupling descends to an Ising pairing only after the locked-phase restriction.
+
+`proved-derived; formal-checked`: `HolonicComplexParametron.lean` presents a finite coupled body by
+an oriented incidence `B` from node variables to branch current. A receiver constitutive form `M`
+pulls back to node storage `G = B^T M B`. Pure branch reorientation transports both incidence and
+the constitutive chart and preserves storage and generalized LC response; holding the drive or
+mutual coupling fixed is an intervention. Exact complex phase superposition exists before the
+binary quotient.
+
+`definition`: in the reasoning cycle, the **Complex Parametron carrier** is this pre-quotient role:
+
+```text
+(addressed coefficient nodes,
+ oriented carrier incidence B,
+ exact complex current c,
+ declared receiver form M,
+ pulled storage G = B^T M B,
+ kernel(B), kernel(G), lineage, open exterior).
+```
+
+Its realized section is `B c`; its receiver storage obeys
+`c* G c = (B c)* M (B c)`. A population of such carriers forms a lattice through typed shared
+incidence, and each member may itself present a further internal lattice. The receiver sees a
+projection of that coupled current, not an intrinsic flat layer. Apparatus width, branch count, or
+a two-state lock does not determine the carrier's semantic capacity.
+
+`project-postulate`: this carrier is imported as a primitive composition of the existing
+exact-linear, complex-wave, incidence, receiver-fibre, morphology, and resident-apparatus owners.
+It does not authorize a Parametron, Perceptron, Circuit, Layer, or Scheduler subsystem. A
+perceptron is an exterior machine-learning comparison for a locked receiver face. Cultivation acts
+on incidence and constitutive morphology; inference is later current through that rested body.
+Condensation may remove a direction only when every declared future receiver factors through the
+result, with the complete reconstruction fibre and shortest reopening separator retained.
+
 ## 9. Construction discipline and falsifiers
 
 `project-postulate`: composition precedes new organs. Before naming a new subsystem, route the

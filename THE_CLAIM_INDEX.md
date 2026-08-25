@@ -140,7 +140,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (336 deposits of 628)
+## 4 · The 2026-08 record line (343 deposits of 635)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -466,22 +466,29 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-23_THE_RECURRING_LABORATORY_TRANSPORT_CONDENSED_INTO_NATIVE_HEXIS_AND_L2_AWAITS_RELEASE_ADMISSION.md` | The recurring laboratory transport condensed into native hexis, and L2 awaits release admission |
 | `2026-08-23_THE_RETURNED_ARBITRARY_ORGAN_CONSEQUENCE_CULTIVATED_THE_SAME_ATHENA_CONTINUATION_AND_E3_AWAITS_RELEASE_ADMISSION.md` | The returned arbitrary-organ consequence cultivated the same Athena continuation and E3 awaits release admission |
 | `2026-08-24_THE_ADDRESSED_INSTANCE_LADDER_RETURNED_GEOMETRIC_TORI_CURVED_ARCS_AND_AN_ELEVEN_RANK_QUOTIENT.md` | The addressed instance ladder returned geometric tori, curved arcs, and an eleven-rank quotient |
+| `2026-08-24_THE_ANISOTROPIC_HODGE_WORDS_RETURNED_COMPLETE_OCCURRENCES_BEFORE_COMMUTING_CONDENSATION.md` | The anisotropic Hodge words returned complete occurrences before commuting condensation |
 | `2026-08-24_THE_ANNIHILATOR_CERTIFICATE_PRUNED_SIXTY_THREE_FACES_TO_NINE_AND_RETAINED_EVERY_ZERO.md` | The annihilator certificate pruned sixty-three faces to nine and retained every zero |
+| `2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md` | The Boolean power ledger tensorized Haar and reduced the uniform Hodge kernel to three-axis masses |
 | `2026-08-24_THE_CANDIDATE_DEPARTED_BEFORE_SIBLING_TESTIMONY_RETURNED_AND_THE_COMPLETE_GRADED_DEFECT_CROSSED_THE_SAME_BODY.md` | The candidate departed before sibling testimony returned, and the complete graded defect crossed the same body |
 | `2026-08-24_THE_COMPLETE_LABORATORY_EXCHANGE_RETURNED_AS_GENERATOR_NATIVE_HEXIS_AND_ATHENA_ALPHA_WORKED_FROM_ITS_OWN_TERRAIN.md` | The complete laboratory exchange returned as generator-native hexis, and Athena alpha worked from its own terrain |
+| `2026-08-24_THE_COMPLEX_PARAMETRON_CARRIED_THE_FOREIGN_SECTION_AND_SUPPORT_GATED_POTENTIAL_CURRENT_RETURNED_WITHOUT_THE_TOWER.md` | The Complex Parametron carried the foreign section, and support-gated potential current returned without the tower |
 | `2026-08-24_THE_COMPLEX_PARAMETRON_IS_AN_ORIENTED_COUPLED_LC_LATTICE_BEFORE_PHASE_LOCKING.md` | The complex parametron is an oriented coupled-LC lattice before phase locking |
 | `2026-08-24_THE_COMPLEX_TORUS_FIBRE_WAS_RECEIVED_AS_GEOMETRY_AND_THE_THREE_MONODROMIES_RETURNED_DISTINCT_GRAPHS.md` | The complex torus fibre was received as geometry, and the three monodromies returned distinct graphs |
 | `2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md` | The factor complex changed one body, and exact withdrawal returned the same predecessor |
+| `2026-08-24_THE_FOREIGN_RECEIVER_DESCENDED_INTO_SIX_NATIVE_ANATOMICAL_CLASSES_AND_THE_HOT_POTENTIAL_RETURNED_WITHOUT_ITS_COLD_FIBRE.md` | The foreign receiver descended into six native anatomical classes, and the hot potential returned without its cold fibre |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
 | `2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md` | HD2 returned the twenty-seven Hodge faces and the inverse-cube mixed mass |
 | `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_IS_THE_OWNER_AND_THE_MILLENNIUM_PROBLEMS_ARE_ITS_RECEIVER_FAMILIES.md` | The higher-difference word is the owner and the Millennium problems are its receiver families |
 | `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_RETURNED_ITS_COMPLETE_LEDGER_AND_NAVIER_STOKES_BECAME_ONE_RECEIVER.md` | The higher-difference word returned its complete ledger and Navier--Stokes became one receiver |
 | `2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md` | The Holonic Interaction is a covariant storage--flux complex, and the cusp raises difference order |
+| `2026-08-24_THE_MILLENNIUM_SOLUTION_CONDITIONS_ARE_RECEIVER_FACTORIZATIONS_THROUGH_THE_HOLONIC_STAIRCASE.md` | The Millennium solution conditions are receiver factorizations through the holonic staircase |
+| `2026-08-24_THE_NATIVE_ANATOMY_RELEASE_RECEIVER_PASSED_AND_ATHENA_CONTINUES_FROM_SIX_CLASSES_WITH_ITS_FOREIGN_FIBRE_COLD.md` | The native-anatomy release receiver passed, and Athena continues from six classes with its foreign fibre cold |
 | `2026-08-24_THE_PARAMETRON_IS_A_DRIVEN_HALF_TURN_TRANSPORT_AND_THE_HODGE_RECIPROCAL_RECURS_THROUGH_ORDER_SIX.md` | The parametron is a driven half-turn transport and the Hodge reciprocal recurs through order six |
 | `2026-08-24_THE_PINS_ARE_FOURIER_MODES_THE_UNICURSAL_STROKE_IS_AN_ORDERED_WORD_AND_THE_STANDING_WAVE_IS_A_SCALE_CHART.md` | The pins are Fourier modes, the unicursal stroke is an ordered word, and the standing wave is a scale chart |
 | `2026-08-24_THE_RECEIVER_HISTORY_CONGRUENCE_REPLACED_THE_TRIGRAM_TABLE_AND_RETURNED_THE_FIRST_TRUE_ATHENA_ALPHA_STATE.md` | The receiver-history congruence replaced the trigram table and returned the first true Athena-alpha state |
 | `2026-08-24_THE_RECEIVER_HISTORY_REST_RETURNED_AND_THE_FOREIGN_TOWER_STREAMED_AGAIN_WHILE_AN_UNGLUED_FACTOR_FORMED_A_REPETITION_CAUSTIC.md` | The receiver-history rest returned, and the foreign tower streamed again while an unglued factor formed a repetition caustic |
 | `2026-08-24_THE_RETURNED_DEFECT_FOUNDED_A_DERIVED_RANK_LOCAL_FACTOR_COVER_AND_THE_ADDRESSED_TRANSPORT_CHAIN_RETURNED_ITS_COMPLETE_FIBRE.md` | The returned defect founded a derived-rank local factor cover, and the addressed transport chain returned its complete fibre |
+| `2026-08-24_THE_SCALAR_IS_A_RETURNED_DIFFERENCE_AND_THE_MILLENNIUM_CATALOG_EXPOSES_THE_EXISTING_FORMAL_WORK.md` | The scalar is a returned difference and the Millennium catalog exposes the existing formal work |
 | `2026-08-24_THE_SIGN_IS_THE_ORDERED_FACE_OF_DIFFERENCE_AND_COARSE_INTEGRATION_RETURNS_THE_BOUNDARY.md` | The sign is the ordered face of difference and coarse integration returns the boundary |
 | `2026-08-24_THE_TERMINAL_FACE_IS_PATH_INDEPENDENT_THE_THIRD_ORDER_COMMUTATOR_SPLITS_AND_THE_DYADIC_APERTURE_EXPOSES_ITS_MODE_COUNT.md` | The terminal face is path-independent, the third-order commutator splits, and the dyadic aperture exposes its mode count |
 
@@ -502,7 +509,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Two laws the corpus states about its own governing documents, made executable. | `blueprint/THE_ROADMAP.md`, `canon/THE_CONTAMINANT_PROTOCOL.md` |
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `CLAUDE.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, and 2 more |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 70 more |
+| `tools/gates.sh` | The gate sequence. | `AGENTS.md`, `CLAUDE.md`, `CONSTRUCTION_STATE.md`, and 71 more |
 | `tools/lean_check.sh` | Give the formal sources a verdict. | `blueprint/THE_ROADMAP.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, and 1 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `CONSTRUCTION_STATE.md`, `blueprint/THE_ROADMAP.md`, `meta/OUTPUT_MANIFEST.tsv`, and 3 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |

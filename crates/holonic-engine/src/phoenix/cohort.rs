@@ -940,6 +940,7 @@ pub fn circulate_cohort(
                 applied,
                 tokens.len(),
                 tower::InputSectionReceiver::SourceRows,
+                tower::LayerSectionReceiver::Whole,
             )?;
             if let Some(shared) = entering_over {
                 let mut legs = Vec::with_capacity(shared.len());

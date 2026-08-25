@@ -171,6 +171,137 @@ extern "C" __global__ void conduct_native_word(
     native_end[at] = state;
 }
 
+/// **One oriented incidence section carrying exact complex coefficient current.**
+///
+/// `incidence` is the row-major real map `B : Node -> Branch` presented by one captured
+/// receiver section.  Every lane owns one `(front, branch)` output and accumulates both local
+/// phase coordinates through the same incidence row.  The host admits the complete row-mass
+/// bound before launch, so the wide accumulator and returned signed word are exact.  Relative
+/// phase remains present; this kernel performs no sign, winner, or finite-state quotient.
+extern "C" __global__ void conduct_complex_incidence(
+    const int64_t *incidence,
+    const int64_t *coefficient_real,
+    const int64_t *coefficient_imaginary,
+    int64_t *section_real,
+    int64_t *section_imaginary,
+    uint32_t branch_count,
+    uint32_t node_count,
+    uint32_t front_count)
+{
+    const uint64_t at = (uint64_t)blockIdx.x * (uint64_t)blockDim.x
+                      + (uint64_t)threadIdx.x;
+    const uint64_t extent = (uint64_t)front_count * (uint64_t)branch_count;
+    if (at >= extent) {
+        return;
+    }
+    const uint32_t front = (uint32_t)(at / (uint64_t)branch_count);
+    const uint32_t branch = (uint32_t)(at % (uint64_t)branch_count);
+    const uint64_t incidence_at = (uint64_t)branch * (uint64_t)node_count;
+    const uint64_t coefficient_at = (uint64_t)front * (uint64_t)node_count;
+    __int128 real = 0;
+    __int128 imaginary = 0;
+    for (uint32_t node = 0; node < node_count; ++node) {
+        const __int128 entry = (__int128)incidence[incidence_at + (uint64_t)node];
+        real += entry * (__int128)coefficient_real[coefficient_at + (uint64_t)node];
+        imaginary += entry * (__int128)coefficient_imaginary[coefficient_at + (uint64_t)node];
+    }
+    section_real[at] = (int64_t)real;
+    section_imaginary[at] = (int64_t)imaginary;
+}
+
+/// **One real receiver of an interval-valued potential incidence.**
+///
+/// Rows are the exact receiver-sufficient vocabulary cover and columns are addressed Parametron
+/// coefficient nodes.  A block owns one coefficient front.  Its lanes contract signed interval
+/// endpoints, reduce the greatest lower endpoint, and count the complete plural population whose
+/// upper endpoint still meets that lower bound.  The returned address is the least row address at
+/// the greatest lower endpoint; `plural_count != 1` preserves the unresolved receiver fibre.
+/// Negative coefficients reverse the endpoint contribution rather than silently treating an
+/// interval as a point.
+extern "C" __global__ void receive_interval_potential_incidence(
+    const int64_t *lower_incidence,
+    const int64_t *upper_incidence,
+    const uint32_t *row_address,
+    const int64_t *coefficient,
+    uint32_t *selected_address,
+    int64_t *selected_lower,
+    int64_t *selected_upper,
+    uint32_t *plural_count,
+    uint32_t row_count,
+    uint32_t node_count)
+{
+    const uint32_t front = blockIdx.x;
+    const uint32_t lane = threadIdx.x;
+    __shared__ int64_t best_lower[1024];
+    __shared__ uint32_t best_row[1024];
+    __shared__ uint32_t plural;
+
+    int64_t local_lower = INT64_MIN;
+    uint32_t local_row = UINT32_MAX;
+    const uint64_t coefficient_at = (uint64_t)front * (uint64_t)node_count;
+    for (uint32_t row = lane; row < row_count; row += blockDim.x) {
+        const uint64_t incidence_at = (uint64_t)row * (uint64_t)node_count;
+        __int128 lower = 0;
+        for (uint32_t node = 0; node < node_count; ++node) {
+            const int64_t scale = coefficient[coefficient_at + (uint64_t)node];
+            const int64_t from = scale >= 0
+                ? lower_incidence[incidence_at + (uint64_t)node]
+                : upper_incidence[incidence_at + (uint64_t)node];
+            lower += (__int128)scale * (__int128)from;
+        }
+        const int64_t value = (int64_t)lower;
+        if (value > local_lower
+            || (value == local_lower && row_address[row] < local_row)) {
+            local_lower = value;
+            local_row = row_address[row];
+        }
+    }
+    best_lower[lane] = local_lower;
+    best_row[lane] = local_row;
+    __syncthreads();
+    for (uint32_t reach = blockDim.x / 2U; reach > 0U; reach >>= 1U) {
+        if (lane < reach) {
+            const int64_t right_lower = best_lower[lane + reach];
+            const uint32_t right_row = best_row[lane + reach];
+            if (right_lower > best_lower[lane]
+                || (right_lower == best_lower[lane] && right_row < best_row[lane])) {
+                best_lower[lane] = right_lower;
+                best_row[lane] = right_row;
+            }
+        }
+        __syncthreads();
+    }
+    if (lane == 0U) {
+        plural = 0U;
+        selected_address[front] = best_row[0];
+        selected_lower[front] = best_lower[0];
+        selected_upper[front] = INT64_MIN;
+    }
+    __syncthreads();
+    for (uint32_t row = lane; row < row_count; row += blockDim.x) {
+        const uint64_t incidence_at = (uint64_t)row * (uint64_t)node_count;
+        __int128 upper = 0;
+        for (uint32_t node = 0; node < node_count; ++node) {
+            const int64_t scale = coefficient[coefficient_at + (uint64_t)node];
+            const int64_t until = scale >= 0
+                ? upper_incidence[incidence_at + (uint64_t)node]
+                : lower_incidence[incidence_at + (uint64_t)node];
+            upper += (__int128)scale * (__int128)until;
+        }
+        const int64_t value = (int64_t)upper;
+        if (value >= best_lower[0]) {
+            atomicAdd(&plural, 1U);
+        }
+        if (row_address[row] == best_row[0]) {
+            selected_upper[front] = value;
+        }
+    }
+    __syncthreads();
+    if (lane == 0U) {
+        plural_count[front] = plural;
+    }
+}
+
 /// **The same quotient action with every intermediate boundary retained for one terminal read.**
 ///
 /// Each lane owns one starting occurrence and writes its complete ordered trace. The word, total
