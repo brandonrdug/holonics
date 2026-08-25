@@ -1241,6 +1241,49 @@ or construct a weaker source rate which still majorizes the critical receiver an
 integrability follows from a proved energy, viscosity, direction-coherence, or other constitutive
 law.
 
+## Thirty-first returned deed
+
+[counterexample; formal-checked]
+`NavierStokesTerminalEnergySeparation.lean` tests the simplest proposed terminal factorization
+before any further construction: can the derivative-bearing population be reconstructed from
+kinetic energy by one uniform scalar law?  For each natural frequency `n`, the file constructs the
+literal singleton Fourier occurrence at `(n,0,0)`, proves that it belongs to every finite Sobolev
+coefficient carrier, and computes its complete receivers exactly:
+
+```text
+orderZeroMass(n) = 1,
+orderTwoMass(n) = (1 + (2*pi)^2*n^2)^2.
+```
+
+No limit estimate or asymptotic notation occurs.  For every real candidate constant `C`, the
+Archimedean property returns a natural `n > C`; the exact Stokes-scale calculation then proves
+
+```text
+C * orderZeroMass(n) < orderTwoMass(n).
+```
+
+Consequently no uniform scalar factor reconstructs the order-two population from the order-zero
+population even on the one-occurrence subfamily.
+
+[interpretation]
+This is the precise frequency-chart version of the holonic warning that a scalar is a collapsed
+receiver, not the continuing morphology.  All singleton occurrences have the same order-zero
+reading, while their retained addresses produce different returned action under the Stokes and
+derivative receivers.  Equal energy does not identify the scale-bearing source population.
+
+[open]
+This counterexample does not rule out a PDE time-integrated estimate and does not itself assert a
+Navier--Stokes solution.  It removes only the direct energy-only factorization.  The next lawful
+terminal carrier must retain at least one scale-sensitive source face: viscous dissipation,
+oriented vorticity-direction transport, an exact heat-semigroup return, or a stronger conserved
+population.  The immediate construction target is to keep the existing direction/Hodge remainder
+paired with viscous dissipation instead of collapsing it first to the full derivative Lipschitz
+coefficient.
+
+[proved-derived; formal-checked]
+All nine printed audits depend only on propositional extensionality, classical choice, and quotient
+soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
