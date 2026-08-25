@@ -32,22 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after gluing the direction
-remainder to the actual finite Jacobian band, the station contains:
+[established-bounded; measured] On the 2026-08-25 source closure after adjoining the addressed
+Fourier tail to the actual direction-depleted strain band, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 448 |
-| theorem or lemma declarations | 5,747 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,168 |
-| modules below `ElementaryHolonics/Millennium/` | 402 |
-| theorem or lemma declarations below `Millennium/` | 5,355 |
-| broad declarations below `Millennium/` | 7,513 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,428 |
+| Lean modules below `ElementaryHolonics/` | 449 |
+| theorem or lemma declarations | 5,752 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,174 |
+| modules below `ElementaryHolonics/Millennium/` | 403 |
+| theorem or lemma declarations below `Millennium/` | 5,360 |
+| broad declarations below `Millennium/` | 7,519 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,433 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 402 Millennium modules.  Search prefixes
-inside the Millennium band include 189 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 403 Millennium modules.  Search prefixes
+inside the Millennium band include 190 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -162,6 +162,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | canonical direction projection | `NavierStokesVorticityDirectionProjection.lean` defines the unique receiver-aligned amplitude and bilinearly orthogonal remainder, proves exact reconstruction and uniqueness, discharges the nonzero projection denominator for the complexification of every nonzero real vorticity vector, handles zero-vorticity receivers separately, and factors the actual finite Hodge-strain return through the canonical projected remainder | source-specific composition of the returned direction-difference carrier with the actual real pointwise vorticity and transported torus modes | prove a uniform scale-correct norm/coherence bound for the canonical remainder and descend it through the full Fourier reconstruction |
 | `proved-derived; formal-checked` | uniform finite direction-remainder bound | `NavierStokesVorticityDirectionRemainderBound.lean` proves exact three-coordinate `L¹` dot and cross transport bounds, proves `|k|₁² ≤ 3|k|₂²`, cancels the complete nonzero-frequency modulus, and bounds every actual finite Hodge-strain return by `3 |r|₁²` times the sum of canonical direction-remainder norms | source-specific norm composition of the scalar-triple-product law, integer lattice geometry, canonical projection, and actual periodic finite population | control the exact finite direction-remainder mass uniformly across scale and descend the result through full Fourier reconstruction and terminal time |
 | `proved-derived; formal-checked` | actual finite-band gluing | `NavierStokesVorticityDirectionFiniteBandBridge.lean` proves Hodge ascent is complex-linear, symmetrization and the quadratic receiver commute with finite addressed sums, identifies the direction-remainder scalar exactly with the symmetric Hodge-band reading, then transports it through `openPeriodicHodgeJacobianBandProjector_eq_actual` to the actual finite Jacobian band | exact reconstruction/gluing of the modewise direction carrier with the existing solution derivative projector | pass the actual finite-band estimate to the full smooth Jacobian via a proved cofinal Fourier convergence mode, while retaining the remainder-mass limit |
+| `proved-derived; formal-checked` | full strain reconstruction with addressed tail | `NavierStokesVorticityDirectionFullStrain.lean` proves that the complete symmetric Jacobian stretching receiver is exactly the finite direction-depleted band plus its complementary Fourier tail, controls the tail action by the complete nine-face coefficient mass, and on every frequency cube supplies the explicit `sqrt(jacobianTailScale radius * jacobianTailLatticeMass)` weighted-`H³` return | exact composition of complete coordinate Fourier reconstruction, actual finite-band Hodge gluing, canonical direction projection, and the proved coefficient-tail decay law | the Fourier limit seam is closed as an exact remainder-carrying inequality; prove uniform control of the direction-remainder population and connect the complexified receiver to the real local stretching/integrability passage |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
 
