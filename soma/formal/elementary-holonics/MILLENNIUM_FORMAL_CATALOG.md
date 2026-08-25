@@ -32,22 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after the complete eight-face
-dyadic Hodge return, the station contains:
+[established-bounded; measured] On the 2026-08-25 source closure after the strain-difference
+receiver counterexample, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 443 |
-| theorem or lemma declarations | 5,699 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,099 |
-| modules below `ElementaryHolonics/Millennium/` | 397 |
-| theorem or lemma declarations below `Millennium/` | 5,307 |
-| broad declarations below `Millennium/` | 7,444 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,393 |
+| Lean modules below `ElementaryHolonics/` | 444 |
+| theorem or lemma declarations | 5,711 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,116 |
+| modules below `ElementaryHolonics/Millennium/` | 398 |
+| theorem or lemma declarations below `Millennium/` | 5,319 |
+| broad declarations below `Millennium/` | 7,461 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,402 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 397 Millennium modules.  Search prefixes
-inside the Millennium band include 184 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 398 Millennium modules.  Search prefixes
+inside the Millennium band include 185 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -144,7 +144,7 @@ the same object rather than compared by prose.
 | `definition` | official boundary | `NavierStokes.lean`: three-dimensional fields, derivatives, viscosity, pressure, forcing, decay/periodicity, energy, and the four Clay alternatives | local pose checked against the external statement geometry | no Clay alternative is proved by the pose |
 | `proved-derived; formal-checked` | exact fluid calculus | periodic energy/enstrophy/flux, curl and vorticity, Kelvin/moving-loop/material-polygon laws, Hodge/Leray projectors, Fourier triads, heat transport, Duhamel returns, scaling, and overlap uniqueness across the `NavierStokes*` family | project-specific composition of Mathlib analysis, measure, Fourier, and finite combinatorics | each theorem retains its declared regularity, periodic, finite-frequency, or conditional aperture |
 | `conditional; formal-checked` | continuation | `NavierStokesCriticalContinuation.lean` and the weighted path/reconstruction tower return compatible continuation from named high-order, integrability, restart, and reconstruction hypotheses | local conditional derivation | the hypotheses are not hidden global-regularity proofs |
-| `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from the now-inhabited uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | the coefficient interface is closed; downstream continuation still retains critical-vorticity integrability and terminal restart supply |
+| `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from the now-inhabited uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | the coefficient and kernel interfaces are closed; downstream continuation retains critical-vorticity integrability |
 | `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
 | `proved-derived; formal-checked` | full three-axis coefficient passage | `NavierStokesDyadicHodgeThreeAxisAllocation.lean` constructs the complete three-axis backward-padded chart, proves all six aperture flanks reconstruct the finite cube, carries each coordinate difference through the chart, identifies the actual full zero-padded coefficient with the `64 -> 27` allocation return, and identifies the official full-coordinate subset mass with its finite norm population | source-specific composition of the direct dyadic coefficient, zero-extension, higher-difference, and subset-receiver owners | closed through the exact full-mass and Boolean-reconstruction owners below |
 | `proved-derived; formal-checked` | all scalar allocation charts | `NavierStokesDyadicHodgeThreeAxisScalarChart.lean` proves the direct scalar band equals its triple delayed finite cube on the complete padded lattice, proves arbitrary-order chart naturality, and identifies every admitted `(a,b,c) in {0,1,2}^3` global face at its complementary shift with the existing natural tensor variation | source-specific reconstruction from the scalar band, delayed zero extension, natural forward transport, and tensor separation | compose each scalar face with its addressed complementary Hodge-entry bound |
@@ -157,8 +157,9 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | complete full-coordinate mass | `NavierStokesDyadicHodgeThreeAxisFullMass.lean` proves the staged `3 × 9` return equals the complete addressed 27-face sum, proves the norm and six-axis finite Fubini passages, assigns every face its exact integer numerator, proves their sum is `4119133228099520072`, and transports the resulting inverse-cubic bound to the official `univ` subset receiver for every scale at least three | source-specific composition of exact Leibniz reconstruction, address-retaining triangle inequality, proved common-chart gluing, all 27 face bounds, and exact finite arithmetic | construct the other seven Boolean subset receiver bounds and assemble one common constant for `UniformLargeScaleDyadicHodgeSubsetMassReturn` |
 | `proved-derived; formal-checked` | complete Boolean reconstruction and uniform physical carrier | `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves exact prefix reconstruction from zero-padded first and second differences, lifts the law through all three coordinate axes, uses the boundary-preserving interchange cell to reconstruct all seven residual Boolean faces, proves their cubic/linear/inverse-linear scale laws, inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn`, and constructs `UniformDyadicHodgeJacobianKernelBound` | source-specific composition of finite boundary gluing, coordinate Fubini/interchange, the full 27-face mass, the existing two-axis mass, and the Haar receiver | transport the now-unconditional kernel carrier through the logarithmic law; continuation still owes critical-vorticity integrability and terminal restart supply |
 | `proved-derived; formal-checked` | completed kernel/logarithmic/continuation passage | `NavierStokesDyadicHodgeCompletedKernelPassage.lean` inhabits the existential uniform-kernel interface, removes the kernel premise from the actual periodic BKM logarithmic Jacobian and lifespan high-order laws, and composes the already constructed weighted classical restart supply; for positive viscosity its continuation constructor now accepts only interval integrability of the critical vorticity rate | exact composition of the completed Boolean receiver, coordinate-Haar kernel return, dyadic logarithmic law, and native weighted restart carrier | prove the critical-vorticity rate is interval-integrable on every finite maximal open lifespan, or return a source-specific obstruction to the current rate receiver |
+| `receiver-insufficiency; formal-checked` | sign-bearing strain difference | `NavierStokesVorticityStrainDifference.lean` proves that the canonical skew jet reconstructed from vorticity annihilates that same vorticity, so the signed stretching reading is carried exactly by symmetric strain; explicit trace-free jets have equal curl and divergence but stretching readings `+1` and `-1` | source-specific composition of the actual `Matrix3` curl, divergence, Hodge jet split, and inner-product action owners | curl, divergence, and vorticity magnitude cannot factor the remaining integral; construct the symmetric Hodge/Biot--Savart strain passage with its vorticity-direction difference retained |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
-| `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess receiver is closed; the next differences are the continuation integrability and restart defects |
+| `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
 
 [proved-derived; formal-checked] The immediate coefficient target is closed.  The exact
 zero-exterior prefix gluing reconstructs each removed coordinate with cost `N(N+1) ≤ 72R²`; the
@@ -166,11 +167,13 @@ full and `{0,1}` source faces therefore generate all eight scale-correct receive
 common returned constant is `72·72·4119133228099520072`, and the named large-scale subset return
 and uniform physical dyadic kernel carrier are inhabited without analytic hypotheses.
 
-[open] The kernel premise and restart-supply premise are both removed.  The exact remaining
-Navier--Stokes continuation fibre is interval integrability of `criticalVorticityRate` on every
-finite maximal open lifespan.  The next source deed must work on the surviving vortex-stretching
-receiver—especially its strain/direction geometry and viscous direction-curvature return—or prove
-that the current magnitude-only receiver has collapsed a distinction required for integrability.
+[receiver-insufficiency; formal-checked] The magnitude-only alternative has now been falsified on
+the actual local jet carrier: equal curl and divergence do not determine even the sign of vortex
+stretching.  The exact remaining Navier--Stokes continuation fibre is interval integrability of
+`criticalVorticityRate` on every finite maximal open lifespan.  The next source deed must construct
+the nonlocal symmetric-strain reconstruction from vorticity and expose its cancellation through
+direction differences, then test that geometric receiver against the viscous direction-curvature
+return.
 
 ## 8. Yang--Mills and mass gap
 
@@ -412,27 +415,29 @@ any local receiver that fails to see it.
 
 ### 12.4 Navier--Stokes
 
-[definition] The present periodic smoothness route closes only if all three visible continuation
-ports return for every admitted maximal open periodic solution:
+[definition] The periodic smoothness route was factored through three visible continuation ports
+for every admitted maximal open periodic solution:
 
 1. one `massConstant` inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn` across every scale
    `>= 3`, all twenty-seven Hodge entries, and all eight coordinate faces;
 2. the actual `criticalVorticityRate` is interval-integrable on every finite lifespan; and
 3. the uniform coordinate `H^3` receiver supplies the terminal restart seam.
 
-The checked composition then produces `CompatibleOpenPeriodicExtension`; a maximal-lifespan
-argument must turn universal extendibility into global existence and hence `StatementB`.
+The checked composition produces `CompatibleOpenPeriodicExtension`; the first and third ports are
+now constructed.  A maximal-lifespan argument must turn universal extendibility into global
+existence and hence `StatementB` after the second port is returned.
 
-[conditional] The first port constructs the uniform physical Jacobian-kernel bound with explicit
-constant `804357 + 216 * massConstant`.  It does not by itself prove the second or third port.  The
-complete candidate NS closure therefore includes the missing theorem from the dyadic Hodge subset
-receiver to critical-vorticity integrability/restart, followed by the maximal-time globalization.
+[proved-derived; formal-checked] The Boolean dyadic passage constructs the first port and its
+physical Jacobian-kernel bound with explicit constant `804357 + 216 * massConstant`; the native
+weighted classical restart owner constructs the third.  Their composition leaves only the second
+port before maximal-time globalization.
 
-[open] The immediate coefficient gate is the common subset-mass return.  The deeper analytic gate
-is proving that its graded receiver controls the stretching current strongly enough to return the
-critical integral and restart supply.  A decisive falsifier is a sequence of admitted solutions or
-frequency populations with identical subset-mass faces but different critical-vorticity or restart
-faces; this would prove that the current coefficient receiver must be enriched.
+[receiver-insufficiency; formal-checked] The coefficient gate is closed, while the local
+curl/divergence receiver has been proved too coarse: two admitted trace-free jets with the same
+curl return opposite stretching signs.  The deeper analytic gate is now the exact periodic
+Hodge/Biot--Savart strain reconstruction and its direction-difference cancellation.  That enriched
+receiver must either yield critical-rate integrability or return a source-specific obstruction;
+the maximal-time globalization follows only after such a return.
 
 ### 12.5 Yang--Mills existence and mass gap
 
