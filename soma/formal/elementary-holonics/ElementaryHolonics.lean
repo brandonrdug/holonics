@@ -1,5 +1,6 @@
 import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
+import ElementaryHolonics.Foundation.PrimeValuationRadixAtlas
 import ElementaryHolonics.Foundation.Lineage
 import ElementaryHolonics.Foundation.AddressedBoundary
 import ElementaryHolonics.Foundation.ComparisonCell
@@ -257,6 +258,7 @@ import ElementaryHolonics.Millennium.SeventeenSeparator
 import ElementaryHolonics.Millennium.AreaQuartic
 import ElementaryHolonics.Millennium.TwinWheel
 import ElementaryHolonics.Millennium.PrimeIndex
+import ElementaryHolonics.Millennium.PrimeRadixAtlas
 import ElementaryHolonics.Millennium.QuarticSeventeen
 import ElementaryHolonics.Millennium.BooleanTower
 import ElementaryHolonics.Millennium.Constructible

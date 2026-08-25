@@ -37,16 +37,16 @@ composition, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 424 |
-| theorem or lemma declarations | 5,459 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,751 |
-| modules below `ElementaryHolonics/Millennium/` | 384 |
-| theorem or lemma declarations below `Millennium/` | 5,102 |
-| broad declarations below `Millennium/` | 7,175 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,275 |
+| Lean modules below `ElementaryHolonics/` | 426 |
+| theorem or lemma declarations | 5,512 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,840 |
+| modules below `ElementaryHolonics/Millennium/` | 385 |
+| theorem or lemma declarations below `Millennium/` | 5,144 |
+| broad declarations below `Millennium/` | 7,243 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,297 |
 
-[established-bounded; measured] The principal module bands are 11 Foundation modules, 2 Algorithm
-modules, 7 Geometry modules, 20 dedicated RH modules, and 384 Millennium modules.  Search prefixes
+[established-bounded; measured] The principal module bands are 12 Foundation modules, 2 Algorithm
+modules, 7 Geometry modules, 20 dedicated RH modules, and 385 Millennium modules.  Search prefixes
 inside the Millennium band include 173 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
@@ -74,6 +74,7 @@ returns that matter.
 | `proved-derived; formal-checked` | `Foundation/Lineage.lean`, `AddressedBoundary.lean`, `ComparisonCell.lean` | additive algebra, pullbacks, quotients | addressed passages retain occurrence populations, boundary lineage, joined cancellation, and parallel-route defects | the full swing/connection/holonomy/receiver composition remains ordered by the active exterior blueprint |
 | `proved-derived; formal-checked` | `Millennium/Swing.lean`, `SwingBridges.lean`, `HolonicDifferenceCalculus.lean` | additive groups, projective ratios, complex exponential | swing reverses an anchored difference; additive receivers commute with iterated differences; finite integration telescopes to the exterior boundary | individual instance bridges do not identify every physical transport with an affine swing |
 | `proved-derived; formal-checked` | `Foundation/MeasuredDifferenceReceiver.lean` | normed additive groups and `Real.exp` from Mathlib | a receiver scalar factors through an addressed chart difference; even readings retain a two-orientation fibre; ratios ignore chart-zero shifts; binary normalized exponentials factor through one potential difference | injectivity and physical constitutive laws require their own hypotheses |
+| `proved-derived; formal-checked` | `Foundation/PrimeValuationRadixAtlas.lean`, `Millennium/PrimeRadixAtlas.lean` | unique factorization of naturals and Mathlib's `Nat.factorization` | the complete prime-valuation face reconstructs every nonzero population; an exact radix chart returns a unique maximal depth and terminal residual; all prime coordinates balance; equal-depth additive valuation caustics transport through common scale | radix notation never licenses rounding, and the atlas does not turn an unproved analytic bound into a theorem |
 | `proved-derived; formal-checked` | `Millennium/HolonicParametron.lean`, `HolonicComplexParametron.lean`, `HolonicMeasuredParametron.lean` | exact real/complex algebra, finite sums, trigonometric identities | the two locked phase sheets, oriented incidence, diagonal and mutual storage, generalized coupled-LC modes, and measured `ΔQ/ΔV`, `ΔI/ΔΦ`, `ΔV/ΔI`, `Δθ/Δt` coefficient fields compose; coordinated branch reorientation preserves the mode | damping, passivity, Floquet theory, device calibration, and continuum realization remain outside these theorems |
 | `proved-derived; formal-checked` | `HolonicTorusFlow.lean`, `HolonicTorusKnots.lean`, `HolonicUnknotting.lean` | Mathlib paths, tori, gcd/prime facts, racks and quandles | Fourier receiver passages, triad boundary closure, multiplier/interactor route defects, coprime torus-slope embeddings, rack swing cancellation, irreducible factor law, and finite phase-collapse counterexamples | no ambient three-manifold torus-knot owner, Reidemeister quotient, or complete unknot fibre exists yet |
 
@@ -112,6 +113,7 @@ fixed locus are already checked.
 | `proved-derived; formal-checked` | analytic instance | `HeckeTheta.lean`, `HeckeEuler.lean`, `HeckeWitness.lean`: theta construction, entire completed function, Euler coefficients, complete `LDatum 1`, analytic rank zero, algebraic rank zero, and `theRankClauseHoldsAtOne` | local derivation built from Mathlib analysis/number theory and classical Gaussian/Hecke ingredients | the complete rank-zero leading coefficient at one still requires its ledger identity |
 | `proved-derived; formal-checked` | universal instance | `MillenniumInstance.theMillenniumRankClauseIsProvedAtOne` and `theUniversalRankClauseIsSatisfiedSomewhere` | project-specific composition of the family witness with the universal pose | one satisfied curve is not the universal theorem |
 | `proved-derived; formal-checked` | prime family analytic/arithmetic gate | `FamilyWaldspurgerGate.lean` and `FamilyThetaWaldspurgerBridge.lean`: canonical signed ternary populations, exact coefficient identities, and the scalar Waldspurger--Tunnell defect whose vanishing implies the positive-sign prime-family rank clause | local finite census plus analytic theta composition | vanishing of the displayed defect is the named unreturned port |
+| `proved-derived; formal-checked` | exact prime/radix face | `PrimeIndex.lean` and `PrimeRadixAtlas.lean`: `17 = P 6`; the maximal binary charts `34 = 2^1*17` and `2 = 2^1*1`; subtracting the normalized branch equations returns `v^2 - 17*u^2 = 1` | project-specific composition of prime indexing, exact factorization, and the existing congruent-seventeen descent | the prime index is an ordering receiver; the arithmetic load is carried by the valuation/residual face, and this normalization alone does not prove the BSD rank or ledger clauses |
 | `proved-derived; formal-checked` | measured differences | `MillenniumDifferenceAtlas`: finite rank equality is zero integer difference after finiteness; the rank-zero ledger is zero complex central-value difference | project-specific composition | the rank carrier remains `ℕ∞` until finiteness is supplied, and the ledger zero is still a theorem obligation |
 
 [open] The sharp BSD pressure is two-pronged: close the displayed Waldspurger--Tunnell defect on
@@ -143,6 +145,7 @@ the same object rather than compared by prose.
 | `conditional; formal-checked` | continuation | `NavierStokesCriticalContinuation.lean` and the weighted path/reconstruction tower return compatible continuation from named high-order, integrability, restart, and reconstruction hypotheses | local conditional derivation | the hypotheses are not hidden global-regularity proofs |
 | `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from a uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | `UniformLargeScaleDyadicHodgeSubsetMassReturn constant` is uninhabited |
 | `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
+| `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |
 
 [open] The immediate Navier--Stokes theorem target is now sharply exposed: inhabit
@@ -151,7 +154,8 @@ subset identities, partial scale estimates, and the complete `(1,1,2)`/`(1,2,2)`
 product populations together with their exact scalar-preserving 12/18-face binomial groupings.
 The common three-dimensional padded/reindexed coefficient comparison, the pointwise norm bounds
 by the declared anisotropic Hodge envelopes, and the remaining finite face assembly have not
-returned.  Even after this
+returned.  That assembly must derive its constant from the complete coefficient population; an
+arbitrary decimal enlargement is not an admissible substitute.  Even after this
 coefficient port closes, the continuation theorem visibly retains its critical-vorticity
 integrability and terminal restart hypotheses.
 
@@ -196,6 +200,32 @@ local transported data return a global zero, positive separator, quotient class,
 under a declared receiver.  The formal atlas proves the displayed maps and equivalences.  It does
 not assert that all six source theories are identical, and the next derivation is always the named
 open fibre in the source carrier rather than another analogy.
+
+## 10a. Exact prime/radix faces and caustics
+
+[proved-derived; formal-checked] `Foundation/PrimeValuationRadixAtlas.lean` makes the radix gesture
+exact.  For every nonzero natural population, `primeValuationAtlas` is its finitely supported
+prime-exponent face and its prime-power product reconstructs the source.  An
+`ExactRadixChart b n` returns `n = b^k*rho`, proves `k` maximal among the exponents whose radix
+power divides `n`, and consequently proves that `b` does not divide `rho`.  Two such charts of the
+same source are equal in both depth and residual.
+
+[proved-derived; formal-checked] The chart balance is equality of complete atlases:
+
+```text
+valuationAtlas(n) = k * valuationAtlas(b) + valuationAtlas(rho).
+```
+
+For `42*10^17`, the returned face is exactly `2^18*3*5^17*7`, the maximal decimal depth is `17`,
+and the terminal residual is `42`.  This statement concerns that exact integer occurrence only; it
+does not rehabilitate the withdrawn Navier--Stokes rounding.
+
+[proved-derived; formal-checked] `AdditivePrimeCaustic p a b d` records that the incoming
+valuations agree at depth `d` while the valuation of `a+b` is strictly larger.  The displayed
+intermediate bound arithmetic has incoming faces `396000` and `411840000 = 1040*396000`; their return is
+`1041*396000 = 3*347*396000`.  Thus `347` appears by exact additive cancellation in that prime
+chart, and multiplying the whole occurrence by any positive common scale transports the caustic
+by adding precisely the scale's `347`-valuation.
 
 ## 11. Holonics is the source catalog: the common closure staircase
 

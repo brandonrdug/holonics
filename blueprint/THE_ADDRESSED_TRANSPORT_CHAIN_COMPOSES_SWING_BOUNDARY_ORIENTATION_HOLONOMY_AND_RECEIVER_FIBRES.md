@@ -829,9 +829,14 @@ the exact `(1,1,2)` and `(1,2,2)` product differences now return their complete 
 32-occurrence ledgers and their exact scalar-preserving 12- and 18-face binomial returns. Genuine
 Hodge entries instantiate both allocation identities. Their candidate Hodge envelopes scale as
 `(46 * 10^9)/R^4` and `(12 * 10^12)/R^5`, while the pointwise norm bounds by those envelopes and
-finite Fubini assembly remain to be returned. Their current arithmetic gives `42 * 10^17` as a
-coarse candidate common magnitude, not
-yet as a theorem. No singular character factor may be divided. After this
+finite Fubini assembly remain to be returned. [historical] The former `42 * 10^17`
+common-magnitude proposal is withdrawn because no complete coefficient assembly returned it.
+[counterexample; formal-checked] Independently, the intermediate envelope replaced the exact declared bound-face sum
+`2*198000 + 11*24*1560000 = 412236000` by the rounded `420000000`.
+`PrimeRadixAtlas.lean` now records that sum as `2^5 * 3^3 * 5^3 * 11 * 347`; `347` is an additive
+valuation caustic of those declared bound faces. The remaining finite assembly must derive its
+constant from the complete coefficient population and prove the receiver inequality; no rounded
+enlargement may stand in for either object. No singular character factor may be divided. After this
 coefficient witness and the already named restart passage are supplied, finiteness of the
 critical-vorticity time integral for arbitrary smooth periodic data remains the official
 global-regularity obstruction.
@@ -1019,9 +1024,21 @@ composition, and the coordinatewise three-axis support-pin theorem. The exact po
 remaining coefficient-mass interface are recorded in
 [`../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md`](../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md).
 
+[proved-derived; formal-checked] `PrimeValuationRadixAtlas.lean` and `PrimeRadixAtlas.lean` now
+return the exact arithmetic face which the coefficient station had blurred. A nonzero natural
+population is reconstructed from its complete prime-valuation atlas; an exact radix chart has a
+unique maximal depth and terminal residual; and additive prime caustics transport through common
+scale. The checked anchors are `42*10^17 = 2^18*3*5^17*7`, the maximal decimal chart
+`(depth,residual) = (17,42)`, the BSD binary normalization `(34,2) -> (17,1)` and its Pell
+difference, and the exact coefficient return
+`412236000 = 2^5*3^3*5^3*11*347`. The former unsupported `42*10^17` Navier--Stokes candidate is
+withdrawn rather than promoted; separately, `412236000` exposes the rounded intermediate
+`420000000`. The correction and complete theorem receipt are deposited in
+[`../research/records/2026-08-24_THE_RADIX_FACE_RETURNED_ITS_MAXIMAL_DEPTH_AND_ADDITION_CREATED_AN_EXACT_PRIME_CAUSTIC.md`](../research/records/2026-08-24_THE_RADIX_FACE_RETURNED_ITS_MAXIMAL_DEPTH_AND_ADDITION_CREATED_AN_EXACT_PRIME_CAUSTIC.md).
+
 [open] The exact next fluid receiver is the uniform large-scale coefficient-mass return behind the
 eight already constructed subset Haar receivers.  Equivalently, the newly checked difference
-atlas asks for one nonnegative constant whose returned mass excess is nonpositive for every scale
+atlas asks for one derived nonnegative constant whose returned mass excess is nonpositive for every scale
 at least three, all twenty-seven Hodge entries, and all eight Boolean coordinate faces. The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
