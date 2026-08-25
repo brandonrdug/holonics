@@ -32,22 +32,23 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after returning summable actual
-distance-weighted dyadic Hodge-kernel moments, the station contains:
+[established-bounded; measured] On the 2026-08-25 source/enstrophy closure after returning the
+physical vorticity distance modulus and composing it through the actual unit-cube receiver, the
+station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 460 |
-| theorem or lemma declarations | 5,869 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,327 |
-| modules below `ElementaryHolonics/Millennium/` | 413 |
-| theorem or lemma declarations below `Millennium/` | 5,471 |
-| broad declarations below `Millennium/` | 7,665 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,534 |
+| Lean modules below `ElementaryHolonics/` | 462 |
+| theorem or lemma declarations | 5,893 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,357 |
+| modules below `ElementaryHolonics/Millennium/` | 415 |
+| theorem or lemma declarations below `Millennium/` | 5,495 |
+| broad declarations below `Millennium/` | 7,695 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,548 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 413 Millennium modules.  Search prefixes
-inside the Millennium band include 200 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 415 Millennium modules.  Search prefixes
+inside the Millennium band include 202 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -157,7 +158,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | complete full-coordinate mass | `NavierStokesDyadicHodgeThreeAxisFullMass.lean` proves the staged `3 × 9` return equals the complete addressed 27-face sum, proves the norm and six-axis finite Fubini passages, assigns every face its exact integer numerator, proves their sum is `4119133228099520072`, and transports the resulting inverse-cubic bound to the official `univ` subset receiver for every scale at least three | source-specific composition of exact Leibniz reconstruction, address-retaining triangle inequality, proved common-chart gluing, all 27 face bounds, and exact finite arithmetic | construct the other seven Boolean subset receiver bounds and assemble one common constant for `UniformLargeScaleDyadicHodgeSubsetMassReturn` |
 | `proved-derived; formal-checked` | complete Boolean reconstruction and uniform physical carrier | `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves exact prefix reconstruction from zero-padded first and second differences, lifts the law through all three coordinate axes, uses the boundary-preserving interchange cell to reconstruct all seven residual Boolean faces, proves their cubic/linear/inverse-linear scale laws, inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn`, and constructs `UniformDyadicHodgeJacobianKernelBound` | source-specific composition of finite boundary gluing, coordinate Fubini/interchange, the full 27-face mass, the existing two-axis mass, and the Haar receiver | transport the now-unconditional kernel carrier through the logarithmic law; continuation still owes critical-vorticity integrability and terminal restart supply |
 | `proved-derived; formal-checked` | completed kernel/logarithmic/continuation passage | `NavierStokesDyadicHodgeCompletedKernelPassage.lean` inhabits the existential uniform-kernel interface, removes the kernel premise from the actual periodic BKM logarithmic Jacobian and lifespan high-order laws, and composes the already constructed weighted classical restart supply; for positive viscosity its continuation constructor now accepts only interval integrability of the critical vorticity rate | exact composition of the completed Boolean receiver, coordinate-Haar kernel return, dyadic logarithmic law, and native weighted restart carrier | prove the critical-vorticity rate is interval-integrable on every finite maximal open lifespan, or return a source-specific obstruction to the current rate receiver |
-| `receiver-insufficiency; formal-checked` | sign-bearing strain difference | `NavierStokesVorticityStrainDifference.lean` proves that the canonical skew jet reconstructed from vorticity annihilates that same vorticity, so the signed stretching reading is carried exactly by symmetric strain; explicit trace-free jets have equal curl and divergence but stretching readings `+1` and `-1` | source-specific composition of the actual `Matrix3` curl, divergence, Hodge jet split, and inner-product action owners | curl, divergence, and vorticity magnitude cannot factor the remaining integral; construct the symmetric Hodge/Biot--Savart strain passage with its vorticity-direction difference retained |
+| `counterexample; formal-checked` | sign-bearing strain difference | `NavierStokesVorticityStrainDifference.lean` proves that the canonical skew jet reconstructed from vorticity annihilates that same vorticity, so the signed stretching reading is carried exactly by symmetric strain; explicit trace-free jets have equal curl and divergence but stretching readings `+1` and `-1` | source-specific composition of the actual `Matrix3` curl, divergence, Hodge jet split, and inner-product action owners | curl, divergence, and vorticity magnitude cannot factor the remaining integral; construct the symmetric Hodge/Biot--Savart strain passage with its vorticity-direction difference retained |
 | `proved-derived; formal-checked` | exact Fourier direction remainder | `NavierStokesVorticityDirectionCancellation.lean` takes the symmetric face of the genuine-torus Hodge reconstruction, proves its nonzero-mode stretching reading is an exact scalar triple product, proves every receiver-aligned source component vanishes, and factors every finite actual-solution population through character-transported vorticity after arbitrary aligned subtraction | source-specific composition of actual periodic vorticity coefficients, nonzero-mode Hodge/Biot--Savart ascent, symmetric strain, torus characters, and finite addressed sums | bound the returned direction remainder by a scale-correct angular/coherence receiver and compose it with viscous direction-curvature damping |
 | `proved-derived; formal-checked` | canonical direction projection | `NavierStokesVorticityDirectionProjection.lean` defines the unique receiver-aligned amplitude and bilinearly orthogonal remainder, proves exact reconstruction and uniqueness, discharges the nonzero projection denominator for the complexification of every nonzero real vorticity vector, handles zero-vorticity receivers separately, and factors the actual finite Hodge-strain return through the canonical projected remainder | source-specific composition of the returned direction-difference carrier with the actual real pointwise vorticity and transported torus modes | prove a uniform scale-correct norm/coherence bound for the canonical remainder and descend it through the full Fourier reconstruction |
 | `proved-derived; formal-checked` | uniform finite direction-remainder bound | `NavierStokesVorticityDirectionRemainderBound.lean` proves exact three-coordinate `L¹` dot and cross transport bounds, proves `|k|₁² ≤ 3|k|₂²`, cancels the complete nonzero-frequency modulus, and bounds every actual finite Hodge-strain return by `3 |r|₁²` times the sum of canonical direction-remainder norms | source-specific norm composition of the scalar-triple-product law, integer lattice geometry, canonical projection, and actual periodic finite population | control the exact finite direction-remainder mass uniformly across scale and descend the result through full Fourier reconstruction and terminal time |
@@ -173,7 +174,9 @@ the same object rather than compared by prose.
 | `conditional; formal-checked` | modulus-to-kernel-moment constitutive passage | `NavierStokesVorticityDirectionKernelMoment.lean` defines a continuous nonnegative receiver-relative spatial cross modulus, constructs the matching physical Hodge kernel moments, proves the actual cross mass at every scale is bounded by `constant × moment`, and proves summable moments construct both the full cross-coherence summability carrier and a full-mass bound; integer powers of torus distance instantiate the modulus interface | exact spatial integral transport through the positive kernel-point-mass receiver, continuous compact integration, nonnegative comparison, and `tsum` gluing | the linear-distance kernel moments are inhabited below; prove the solution's oriented vorticity cross difference obeys that modulus with a terminal-time-integrable coefficient |
 | `proved-derived; formal-checked` | distance-weighted Hodge-kernel localization | `Foundation/CoordinateHaarMomentReceiver.lean` proves the exact one-circle second-moment bound `1/(8R)`, interpolates it with Haar mass to obtain first moment `5/(8√R)`, and composes the three geometric fibre coordinates into distance moment `15/(2√R)`; `NavierStokesVorticityDirectionKernelMomentDecay.lean` transports all 27 actual Hodge entries through that receiver, proves their physical distance moments decay like `2^{-scale/2}`, proves the full scale population summable including the three low scales, and constructs cross-coherence summability from any source linear-distance law | source-specific composition of the eight exact Abel subset returns, centered circle geometry, product Haar/Fubini transport, dyadic-radius arithmetic, geometric-series summation, and the actual kernel point-mass owner | apparatus-side localization is closed; construct and time-control the source coefficient in `|omega(x) cross omega(x-y)|₁ ≤ C(t,x) dist(y,0)` |
 | `proved-derived; formal-checked` | non-circular scale-zero energy descent | `NavierStokesVorticityDirectionBaseEnergy.lean` uses Parseval to bound every actual velocity coefficient by its component cube energy, transports the fixed unit-frequency population through exact curl and Hodge ascent, bounds the 27-mode base low pass by `1458π·sqrt(2E(t))`, and rebuilds the finite, infinite-depth, and literal physical vortex-stretching returns with ordinary periodic kinetic energy in place of the critical-vorticity payment | exact composition of componentwise Parseval, unit-cube lattice incidence, curl multiplier, modewise Hodge ascent, kinetic-energy inclusion, finite scale gluing, dyadic tail convergence, and the spatial cross receiver | the circular base term and apparatus kernel moments are removed; prove a terminal-time-integrable source direction-modulus coefficient, then integrate the resulting physical bound through the enstrophy/continuation receiver |
-| `receiver-insufficiency; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
+| `proved-derived; formal-checked` | physical source distance modulus | `NavierStokesVorticityDirectionSourceModulus.lean` constructs an exact centered Euclidean representative of every torus displacement, proves its norm is at most `3·dist(y,0)`, obtains a finite vorticity Lipschitz coefficient on the common radius-three compact chart from the actual `C¹` slice, and proves `|omega(x) cross omega(x-y)|₁ ≤ 9|omega(x)|₁ K(t) dist(y,0)`; this inhabits the infinite-depth spatial coherence carrier and removes the summability hypothesis from the physical stretching theorem | exact torus quotient transport, compact local Lipschitz extraction, cross-product difference cancellation, and the inhabited Hodge distance-moment population | the selected coefficient is finite for each `t<T`; terminal-time measurability and integrability are not consequences of strict-interior smoothness |
+| `proved-derived; formal-checked` | unit-cube enstrophy closure | `NavierStokesVorticityDirectionEnstrophyClosure.lean` proves the reciprocal direction receiver cancels the fourth coordinate-`L¹` power by `‖(dot(omega,omega))⁻¹‖·|omega|₁⁴ ≤ 81‖omega‖²`, packages the complete Hodge distance-moment `tsum`, derives a spatially uniform pointwise enstrophy-density bound, integrates it over the actual periodic cube, and replaces the former uniform-Jacobian premise in the exact enstrophy-rate inequality by one constructed time coefficient | exact composition of the physical direction reconstruction, source modulus, summable kernel moment, real/complex chart, compact spatial integral, and periodic enstrophy identity | prove the constructed rate interval-integrable up to the maximal time or replace its full vorticity Lipschitz face by a sharper direction-only/scale-critical receiver and then connect the resulting enstrophy control to terminal restart |
+| `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
 
@@ -187,10 +190,12 @@ and uniform physical dyadic kernel carrier are inhabited without analytic hypoth
 surviving fibre is retained through two exact receivers.  The complete Fourier receiver removes
 the finite aperture.  The sharper spatial receiver reconstructs each dyadic strain band as a
 convolution, cancels the aligned source at every displacement, retains the lossless oriented cross
-difference, pays for its fixed base only through ordinary kinetic energy, and now returns a
-summable physical distance moment for the actual Hodge kernel.  The remaining local-to-global edge
-is entirely source-side: construct and integrate the coefficient of the linear torus-distance law
-for the oriented vorticity cross difference.
+difference, pays for its fixed base only through ordinary kinetic energy, and returns a summable
+physical distance moment for the actual Hodge kernel.  The physical solution now supplies the
+linear torus-distance law itself, and the complete scale population has been integrated into the
+unit-cube enstrophy receiver.  The remaining local-to-global edge is temporal: control the returned
+vorticity-gradient coefficient up to the maximal face, or sharpen the source law to a
+direction-only critical coefficient whose time receiver already composes with continuation.
 
 ## 8. Yang--Mills and mass gap
 
@@ -449,12 +454,30 @@ physical Jacobian-kernel bound with explicit constant `804357 + 216 * massConsta
 weighted classical restart owner constructs the third.  Their composition leaves only the second
 port before maximal-time globalization.
 
-[receiver-insufficiency; formal-checked] The coefficient gate is closed, while the local
+[counterexample; formal-checked] The coefficient gate is closed, while the local
 curl/divergence receiver has been proved too coarse: two admitted trace-free jets with the same
 curl return opposite stretching signs.  The deeper analytic gate is now the exact periodic
 Hodge/Biot--Savart strain reconstruction and its direction-difference cancellation.  That enriched
 receiver must either yield critical-rate integrability or return a source-specific obstruction;
 the maximal-time globalization follows only after such a return.
+
+[proved-derived; formal-checked] That enriched spatial passage is now complete.  The actual smooth
+vorticity slice supplies a linear torus-distance cross modulus, the exact Hodge distance moments
+are summable over every dyadic scale, the reciprocal direction chart cancels into vorticity square,
+and the result reaches both `periodicVortexStretching` and `periodicEnstrophyRate` with no spatial
+summability or uniform-Jacobian premise.  The returned coefficient is
+
+```text
+(13122*pi)*sqrt(2*kineticEnergy(t))
+  + 729*vorticityLipschitzConstant(t)*totalDyadicHodgeDistanceMoment.
+```
+
+[open] Strict-interior smoothness proves this coefficient finite separately at every `t<T`; it
+does not prove a measurable or interval-integrable terminal-time section, and the current
+choice-extracted Lipschitz witness is not itself a canonical time-continuous chart.  The next exact
+deed must construct a canonical derivative-supremum/direction-coherence rate with its time
+regularity, then either prove its integral finite and connect enstrophy control to terminal restart,
+or return a source-specific failure showing that this full-gradient receiver is still too coarse.
 
 ### 12.5 Yang--Mills existence and mass gap
 
@@ -586,28 +609,18 @@ official passage, when a counterexample proves the present receiver insufficient
 dependency audit identifies a strictly shorter open fibre.  A catalog rewrite, a new analogy, a
 conditional wrapper which merely renames its conclusion, or a numerical fit returns no such edge.
 
-[proved-derived; formal-checked] The first deed returned the complete three-axis dyadic Hodge
-allocation/reconstruction passage for the actual Navier--Stokes coefficient.  All left and right
-aperture residues remain in the chart, the three coordinate operators commute with their natural
-addresses, and the official full-coordinate subset mass is exactly the norm population of the
-twenty-seven-face allocation return.  The subsequent frontier is selected by the returned
-dependency:
+[proved-derived; formal-checked] The Navier--Stokes sequence has now crossed all of the spatial
+owners which originally separated the physical source from the enstrophy receiver: complete
+three-axis allocation, all eight Boolean faces, uniform Hodge-kernel control, non-circular
+scale-zero energy, distance-weighted kernel summability, the actual source distance modulus,
+reciprocal direction cancellation, and unit-cube integration.  The latest returned theorem is the
+exact variable-coefficient enstrophy-rate law.  It does not yet inhabit a Clay alternative because
+the constructed coefficient has no maximal-time integral or terminal restart theorem.
 
-[proved-derived; formal-checked] The fourth deed has now returned the first complete nine-face
-allocation slab.  Its exact weighted numerator is `12416369280072`, every term has inverse-cubic
-radial scale, and no mode-count estimate or rounded enlargement enters the proof.  This closes a
-uniform scale theorem admitted by the active goal; it does not yet inhabit a Clay alternative.
-
-[proved-derived; formal-checked] The fifth deed transports that result through proved `(1,2)` and
-`(0,2)` stencil projections and returns the other two coordinate slabs with the same exact
-numerator.  The three slabs cover all 19 addresses having at least one scalar order two.  The open
-pointwise population is therefore no longer “the other 26 faces”: it is the six explicit
-permutations of complementary Hodge orders `112` and `122`; the central `111` face is now composed
-and uniformly bounded as an actual weighted allocation face.
-
-1. **Navier--Stokes:** carry the 27 allocation faces into
-   `UniformLargeScaleDyadicHodgeSubsetMassReturn`, then test whether that receiver factors the
-   critical-vorticity and restart receivers.
+1. **Navier--Stokes:** replace the per-slice choice of vorticity Lipschitz witness by a canonical
+   derivative-supremum or direction-coherence rate, prove its temporal regularity, and test exact
+   interval-integrability/absorption and terminal restart.  A sharper direction-only modulus is
+   preferred if the full-gradient rate returns a continuation-equivalent obstruction.
 2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
    ternary coefficient and analytic theta lineages.
 3. **Hodge:** construct an official surface realization and transport the quotient difference and

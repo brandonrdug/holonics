@@ -403,7 +403,7 @@ receiver; another magnitude-only estimate cannot close the now-exposed integral 
 
 ## Twelfth returned deed
 
-[receiver-insufficiency; formal-checked] `NavierStokesVorticityStrainDifference.lean` constructs
+[counterexample; formal-checked] `NavierStokesVorticityStrainDifference.lean` constructs
 the missing local sign separator on the actual `Matrix3` Navier--Stokes jet carrier.  Matrix action
 is proved additive and difference-preserving.  The canonical skew chart reconstructed from a
 vorticity vector annihilates that same vector, and consequently
@@ -413,7 +413,7 @@ vorticity vector annihilates that same vector, and consequently
   = ⟨curl J, symmetricJacobianPart(J)(curl J)⟩.
 ```
 
-[receiver-insufficiency; formal-checked] The explicit polarized pair adds or subtracts the
+[counterexample; formal-checked] The explicit polarized pair adds or subtracts the
 trace-free strain `diag(1,-1,0)` from the same canonical skew jet.  Both returned jets have unit
 first-axis curl and zero divergence, but their local vortex-stretching readings are exactly `+1`
 and `-1`.  Thus no receiver factoring only through curl, divergence, or vorticity magnitude can
@@ -431,7 +431,7 @@ integrability receiver.
 
 ## Thirteenth returned deed
 
-[external-source] Constantin and Fefferman's 1993 direction-of-vorticity theorem identifies
+[proved-standard] Constantin and Fefferman's 1993 direction-of-vorticity theorem identifies
 geometric coherence of the vorticity direction as a regularity mechanism for three-dimensional
 Navier--Stokes.  The source is *Direction of Vorticity and the Problem of Global Regularity for the
 Navier-Stokes Equations*, Indiana University Mathematics Journal 42 (1993), 775--789:
@@ -919,7 +919,7 @@ modulus coefficient times the complete moment `tsum`.  Integer powers of torus d
 one concrete modulus family; fractional Hölder weights can enter through the same continuous
 modulus carrier without changing the passage.
 
-[receiver-insufficiency; formal-checked]
+[counterexample; formal-checked]
 The module also returns a counterexample to a tempting false closure: the constant scale
 population `1` is nonnegative and uniformly bounded by `1` at every scale but is not summable.
 Therefore the already completed uniform dyadic kernel `L¹` theorem cannot imply the required
@@ -1049,26 +1049,114 @@ integrals compose with the non-circular base-energy stretching bound and the exi
 continuation theorem.  Failure must return the precise coefficient or terminal-time receiver that
 does not factor.
 
+## Twenty-eighth returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesVorticityDirectionSourceModulus.lean` constructs the missing source passage on the
+actual three-torus.  Subtracting the nearest integral lattice occurrence gives a centered
+Euclidean representative which projects back to the same torus point, has every coordinate equal
+in magnitude to the circle metric face, and obeys the exact bounds
+
+```text
+norm(centered(y)) <= 3 * dist(y,0),
+norm(centered(y)) <= 3/2.
+```
+
+The receiver and every translated source therefore lie in one radius-three Euclidean chart.  The
+actual strict-interior `C¹` vorticity slice is Lipschitz on that compact chart with a returned
+finite coefficient `K(t)`.  Cross bilinearity and self-annihilation then prove
+
+```text
+|omega(t,x) cross omega(t,x-y)|₁
+  <= 9 * |omega(t,x)|₁ * K(t) * dist(y,0).
+```
+
+This is the source law requested by the twenty-seventh deed.  Composing it with the already
+inhabited distance-moment theorem constructs
+`OpenPeriodicDyadicSpatialCrossCoherenceSummable` for every strict-interior physical solution
+occurrence, bounds the complete cross-coherence mass by the actual Hodge moment `tsum`, and removes
+the spatial summability hypothesis from the literal physical vortex-stretching theorem.
+
+[proved-derived; formal-checked]
+`NavierStokesVorticityDirectionEnstrophyClosure.lean` carries that result through the remaining
+receiver faces.  On the real vorticity locus the reciprocal direction chart satisfies
+
+```text
+norm((dot(omega,omega))⁻¹) * |omega|₁⁴ <= 81 * norm(omega)².
+```
+
+Consequently all spatial scales and all source displacements collapse into the exact
+space-independent coefficient
+
+```text
+C_dir(t) =
+  (13122*pi) * sqrt(2*periodicKineticEnergy(t))
+  + 729*K(t)*totalDyadicHodgeDistanceMoment.
+```
+
+The pointwise physical law is `|stretch(t,x)| <= C_dir(t)*|omega(t,x)|²`.  Compact integration
+over the actual periodic unit cube returns
+
+```text
+periodicVortexStretching(t) <= 2*C_dir(t)*periodicEnstrophy(t),
+```
+
+and nonnegative viscosity replaces the former uniform-Jacobian hypothesis in the exact enstrophy
+rate inequality by the totalized time chart of `C_dir`.
+
+[proved-derived; formal-checked]
+The seven source audits and seven enstrophy-closure audits contain only propositional
+extensionality, classical choice, and quotient soundness, with no `sorryAx`.  The source file and
+the enstrophy-closure file both pass focused kernel checking.  The named module builds and complete
+umbrella receipt are recorded with the coherent commit below.
+
+[open]
+This deed isolates rather than assumes the terminal face.  Compactness proves `K(t)` finite for
+each separate `t<T`; it does not prove that the choice-extracted section is measurable or
+interval-integrable on `[0,T]`, much less uniformly controlled by energy or dissipation.  The next
+source-specific passage must replace it by a canonical derivative-supremum or direction-coherence
+rate, prove that rate's temporal regularity, and either establish its maximal-time integral plus a
+terminal restart consequence or return an exact obstruction showing that full vorticity
+Lipschitz control is still the wrong receiver.
+
 ## Action-transport graph pivot
 
-[external-source] The supplied Rubik references describe a finite group action generated by legal
-turns, its Cayley/Rubik graph, conjugation as cycle-structure-preserving rebase, commutators as
-localized support interactions, stabilizers as receiver-relative fixed populations, and God's
-number as the graph diameter.  The `2×2×2` half-turn state graph is the 24-vertex Nauru graph; a
-multiway graph retains all branches of evolution and asks for reconvergence of branches.
+[historical] The supplied Rubik and graph references were consulted as research prompts for finite
+action transport.  They present legal turns as generators, states as vertices of a Cayley/Rubik
+graph, conjugation and commutators as word operations, stabilizers as fixed populations, and
+multiway graphs as branch-retaining evolution diagrams.  The `2×2×2` half-turn convention is
+reported through the 24-vertex Nauru graph.  A quoted God's number is a diameter only after the
+generating set and move metric have been fixed; it is not a basis-free six-degrees law.  The ACM
+page supplied metadata for Bowen Zuo and Hongyu Lai's 2023 article, but its full text was not
+available to this audit, so no theorem is imported from that paper.
 
 [interpretation] These are exact candidate models for holonic action transport: a state is an
 occurrence, a generator is a local swing, a word is a chronological passage, conjugation is a
-chart transport, a stabilizer is a reconstruction fibre, a commutator records the residue of two
-interacting routes, and graph diameter is a uniform word-scale theorem.  This is especially useful
-for the P-versus-NP track because witness verification and shortest construction words can be
-placed on the same addressed action graph without identifying equal endpoints with equal lineage.
+chart transport, a stabilizer is a receiver-relative reconstruction fibre, a commutator records
+the residue of two interacting routes, and a declared graph diameter is a uniform word-scale
+theorem.  The preserved diagram is ordered source transport followed by the receiver quotient
+versus quotient transport followed by the factored receiver.  The first derivation target is the
+shortest receiver/history word separating two occurrences in one proposed quotient fibre; a pair
+which no admitted successor separates falsifies that proposed distinction, while one separating
+word reopens the quotient.  A scalable family with no uniform diameter falsifies any attempted
+uniform word-scale promotion.
+
+[proved-derived; formal-checked] The reusable group-action core is already present locally, so the
+links do not license a Rubik-specific subsystem.  `HolonicComposition.reversal_holonomy` proves
+that reversed, orientation-inverted words return inverse transport;
+`changeOfBasepoint_holonomy` returns conjugation; the finite controls prove noncommuting words and
+their commutator loop retain nontrivial return.  `LineageCompression.quotientCommutesWithEveryOrderedWord`
+extends one generator-equivariant quotient law to every ordered successor word, and
+`separatingSuccessorReopensTheProposedQuotient` is the exact receiver-insufficiency theorem.
+`HigherDifferenceTransport.productLedger_retains_word` separately proves that occurrence ledgers
+retain the original generator chronology.  Endpoint Cayley graphs are therefore receiver shadows;
+lineage-bearing multiway passages retain the information needed by the holonic theorem surface.
 
 [open] No Rubik or multiway theorem is promoted into a Millennium result by this record.  The
-formal pivot is admitted only when it returns a shared edge: an exact action-word carrier, a
-generator-equivariant quotient/reconstruction theorem, a uniform diameter law for a scalable
-family, or a receiver-insufficiency counterexample separating endpoint reachability from retained
-word complexity.  Sources: <https://dl.acm.org/doi/10.1145/3631908.3631933>,
+remaining shared edge is narrower: construct a reusable shortest-separator/stabilizer-residue
+receiver only when an official Millennium passage consumes it.  Rubik enumeration, a fixed finite
+diameter, or a graph drawing is not such a return.  Sources:
+<https://dl.acm.org/doi/10.1145/3631908.3631933>,
 <https://math.utoledo.edu/~niverso/algs.html>, <https://mathworld.wolfram.com/RubiksGroup.html>,
 <https://mathworld.wolfram.com/CayleyGraph.html>, <https://mathworld.wolfram.com/RubiksGraph.html>,
 <https://mathworld.wolfram.com/GodsNumber.html>, <https://mathworld.wolfram.com/NauruGraph.html>,
