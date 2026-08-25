@@ -37,17 +37,17 @@ dyadic Hodge return, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 442 |
-| theorem or lemma declarations | 5,697 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,094 |
-| modules below `ElementaryHolonics/Millennium/` | 396 |
-| theorem or lemma declarations below `Millennium/` | 5,305 |
-| broad declarations below `Millennium/` | 7,439 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,388 |
+| Lean modules below `ElementaryHolonics/` | 443 |
+| theorem or lemma declarations | 5,699 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,099 |
+| modules below `ElementaryHolonics/Millennium/` | 397 |
+| theorem or lemma declarations below `Millennium/` | 5,307 |
+| broad declarations below `Millennium/` | 7,444 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,393 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 396 Millennium modules.  Search prefixes
-inside the Millennium band include 183 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 397 Millennium modules.  Search prefixes
+inside the Millennium band include 184 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -156,6 +156,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | six residual masses and 27-face common-chart gluing | `NavierStokesDyadicHodgeThreeAxisResidualFaces.lean` composes all three `110/112` and all three `100/122` faces, proves their exact weighted six-face mass `23095748198400000 / R^3`, proves coordinatewise vanishing before every complementary offset, and consequently reindexes every one of the 27 actual weighted face masses exactly from the common doubly padded population to its natural translated population | source-specific composition of strict Hodge-entry descent, scalar support causation, tensor Fubini mass, exact occurrence weights, and complete prefix-fibre elimination | apply the 27-face triangle inequality on the common population, sum the already proved face constants without overlap, and transport that return to the official full-coordinate subset mass |
 | `proved-derived; formal-checked` | complete full-coordinate mass | `NavierStokesDyadicHodgeThreeAxisFullMass.lean` proves the staged `3 × 9` return equals the complete addressed 27-face sum, proves the norm and six-axis finite Fubini passages, assigns every face its exact integer numerator, proves their sum is `4119133228099520072`, and transports the resulting inverse-cubic bound to the official `univ` subset receiver for every scale at least three | source-specific composition of exact Leibniz reconstruction, address-retaining triangle inequality, proved common-chart gluing, all 27 face bounds, and exact finite arithmetic | construct the other seven Boolean subset receiver bounds and assemble one common constant for `UniformLargeScaleDyadicHodgeSubsetMassReturn` |
 | `proved-derived; formal-checked` | complete Boolean reconstruction and uniform physical carrier | `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves exact prefix reconstruction from zero-padded first and second differences, lifts the law through all three coordinate axes, uses the boundary-preserving interchange cell to reconstruct all seven residual Boolean faces, proves their cubic/linear/inverse-linear scale laws, inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn`, and constructs `UniformDyadicHodgeJacobianKernelBound` | source-specific composition of finite boundary gluing, coordinate Fubini/interchange, the full 27-face mass, the existing two-axis mass, and the Haar receiver | transport the now-unconditional kernel carrier through the logarithmic law; continuation still owes critical-vorticity integrability and terminal restart supply |
+| `proved-derived; formal-checked` | completed kernel/logarithmic/continuation passage | `NavierStokesDyadicHodgeCompletedKernelPassage.lean` inhabits the existential uniform-kernel interface, removes the kernel premise from the actual periodic BKM logarithmic Jacobian and lifespan high-order laws, and composes the already constructed weighted classical restart supply; for positive viscosity its continuation constructor now accepts only interval integrability of the critical vorticity rate | exact composition of the completed Boolean receiver, coordinate-Haar kernel return, dyadic logarithmic law, and native weighted restart carrier | prove the critical-vorticity rate is interval-integrable on every finite maximal open lifespan, or return a source-specific obstruction to the current rate receiver |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess receiver is closed; the next differences are the continuation integrability and restart defects |
 
@@ -165,11 +166,11 @@ full and `{0,1}` source faces therefore generate all eight scale-correct receive
 common returned constant is `72·72·4119133228099520072`, and the named large-scale subset return
 and uniform physical dyadic kernel carrier are inhabited without analytic hypotheses.
 
-[open] The next Navier--Stokes passage is no longer a coefficient estimate.  It is to compose this
-carrier through the checked dyadic logarithmic law, thereby removing its kernel premise, and then
-separate the two genuine continuation fibres: interval integrability of the critical vorticity
-rate and a restart supply from the terminal coordinate `H³` receiver.  Neither is silently implied
-by the completed kernel theorem.
+[open] The kernel premise and restart-supply premise are both removed.  The exact remaining
+Navier--Stokes continuation fibre is interval integrability of `criticalVorticityRate` on every
+finite maximal open lifespan.  The next source deed must work on the surviving vortex-stretching
+receiver—especially its strain/direction geometry and viscous direction-curvature return—or prove
+that the current magnitude-only receiver has collapsed a distinction required for integrability.
 
 ## 8. Yang--Mills and mass gap
 
