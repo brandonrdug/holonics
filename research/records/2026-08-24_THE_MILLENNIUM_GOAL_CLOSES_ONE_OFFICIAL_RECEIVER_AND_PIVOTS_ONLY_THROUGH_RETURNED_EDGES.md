@@ -263,6 +263,39 @@ new laws must next be multiplied by their exact scalar `110` or `100` tensor-mas
 their occurrence weights, and their natural face populations must be reindexed into the one common
 official allocation population before the full-coordinate subset mass can be summed.
 
+## Eighth returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisResidualFaces.lean` closes the
+six strict residual masses.  The three scalar-`110` hands carry scalar mass `256R` and pair with
+the `112` Hodge envelope; the three scalar-`100` hands carry scalar mass `512R²` and pair with the
+`122` Hodge envelope.  Their exact unweighted and actual weighted returns are
+
+```text
+110/112 natural = 8833433600000 / R^3
+110/112 actual  = 35333734400000 / R^3
+100/122 natural = 3831624499200000 / R^3
+100/122 actual  = 7663248998400000 / R^3
+six-face actual = 23095748198400000 / R^3.
+```
+
+[proved-derived; formal-checked] The same owner removes the common-chart reconstruction fibre for
+all 27 faces.  For scalar order `a ≤ 2`, the scalar hand is exactly zero at every global address
+before the complementary offset `2-a`.  Three applications of the exact finite translation theorem
+therefore delete precisely the prefix fibres in the first, second, and third axes, while retaining
+every translated receiver.  Consequently every actual weighted face has equality—not merely an
+inequality—between its common doubly padded mass and its natural translated mass.
+
+[proved-derived; formal-checked] This gives an exact generator/history-to-receiver quotient law:
+the translated face charts are condensed only after their complete boundary fibres are proved
+zero.  It does not identify paths from equal endpoint data alone.  The promoted axiom audits
+contain only propositional extensionality, classical choice, and quotient soundness, and contain no
+`sorryAx`.
+
+[open] The remaining full-coordinate coefficient deed is finite: prove the pointwise triangle law
+from the 27 addressed allocation faces, interchange the finite index and address sums on the common
+population, insert the already proved 27 face constants once each, and transport the result through
+`dyadicHodgeSubsetMass_univ_eq_allocationReturnMass`.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
