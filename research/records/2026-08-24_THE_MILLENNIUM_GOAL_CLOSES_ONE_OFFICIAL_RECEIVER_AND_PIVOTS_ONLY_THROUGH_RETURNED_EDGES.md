@@ -108,6 +108,33 @@ complementary Hodge envelope, sum the complete finite population, and derive the
 constant. The other seven Boolean faces then require the corresponding lower-dimensional bounded
 composition before `UniformLargeScaleDyadicHodgeSubsetMassReturn` can be inhabited.
 
+## Second returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisCornerMass.lean` closes the
+zero-scalar/full-Hodge corner of that population.  It identifies the actual allocation owner's
+`(0,0,0)` face with its global product chart, removes all three two-address left residues through an
+exact three-axis finite-sum translation, and identifies the surviving scalar value with the
+natural undifferentiated tensor-band face.
+
+[proved-derived; formal-checked] A nonzero scalar corner now causes the complete complementary
+`(2,2,2)` Hodge stencil; the already derived Hodge scale descent bounds that stencil by
+`4000000000000000 / R^6`, while exact tensor Fubini bounds the scalar population by `1024 R^3`.
+Their composition proves
+
+```text
+directDyadicHodgeThreeAxisCornerAllocationMass
+  <= 4096000000000000000 / R^3
+```
+
+uniformly at every scale at least three.  The promoted axiom audit contains only propositional
+extensionality, classical choice, and quotient soundness, and contains no `sorryAx`.
+
+[open] The remaining 26 faces require the same exact chart translation plus the complementary
+Hodge derivative selected by their address.  The non-permuted `111`, `112`, `122`, and `222`
+envelopes already exist.  The next shared missing edge is an axis-addressed form of the three-axis
+`112` and `122` Hodge-entry bounds; without that transport, their current fixed-axis statements do
+not cover every allocation permutation.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
