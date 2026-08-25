@@ -32,21 +32,21 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-24 source closure after the measured-difference
+[established-bounded; measured] On the 2026-08-24 source closure after the valuation--divisor--lattice
 composition, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 426 |
-| theorem or lemma declarations | 5,512 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,840 |
-| modules below `ElementaryHolonics/Millennium/` | 385 |
-| theorem or lemma declarations below `Millennium/` | 5,144 |
-| broad declarations below `Millennium/` | 7,243 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,297 |
+| Lean modules below `ElementaryHolonics/` | 432 |
+| theorem or lemma declarations | 5,538 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,901 |
+| modules below `ElementaryHolonics/Millennium/` | 386 |
+| theorem or lemma declarations below `Millennium/` | 5,146 |
+| broad declarations below `Millennium/` | 7,246 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,300 |
 
-[established-bounded; measured] The principal module bands are 12 Foundation modules, 2 Algorithm
-modules, 7 Geometry modules, 20 dedicated RH modules, and 385 Millennium modules.  Search prefixes
+[established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
+modules, 8 Geometry modules, 20 dedicated RH modules, and 386 Millennium modules.  Search prefixes
 inside the Millennium band include 173 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
@@ -75,6 +75,7 @@ returns that matter.
 | `proved-derived; formal-checked` | `Millennium/Swing.lean`, `SwingBridges.lean`, `HolonicDifferenceCalculus.lean` | additive groups, projective ratios, complex exponential | swing reverses an anchored difference; additive receivers commute with iterated differences; finite integration telescopes to the exterior boundary | individual instance bridges do not identify every physical transport with an affine swing |
 | `proved-derived; formal-checked` | `Foundation/MeasuredDifferenceReceiver.lean` | normed additive groups and `Real.exp` from Mathlib | a receiver scalar factors through an addressed chart difference; even readings retain a two-orientation fibre; ratios ignore chart-zero shifts; binary normalized exponentials factor through one potential difference | injectivity and physical constitutive laws require their own hypotheses |
 | `proved-derived; formal-checked` | `Foundation/PrimeValuationRadixAtlas.lean`, `Millennium/PrimeRadixAtlas.lean` | unique factorization of naturals and Mathlib's `Nat.factorization` | the complete prime-valuation face reconstructs every nonzero population; an exact radix chart returns a unique maximal depth and terminal residual; all prime coordinates balance; equal-depth additive valuation caustics transport through common scale | radix notation never licenses rounding, and the atlas does not turn an unproved analytic bound into a theorem |
+| `proved-derived; formal-checked` | `Foundation/TransportLift.lean`, `ReceiverQuotient.lean`, `ExactPartition.lean`, `LatticeTransport.lean`; `Geometry/DivisorAtlas.lean`; `Millennium/ValuationDivisorLatticeAtlas.lean` | additive kernels and quotients, integer modules, finitely supported functions, unique factorization | a general transport request returns an empty/singleton/kernel-coset fibre; partitions reconstruct as dependent sums with paired oriented boundaries; scalar divisibility is isolated as a multiplication lift; signed codimension-one ledgers turn inversion into negation and ratios into differences; Cartier transitions glue local ledgers; lattice maps return kernel, image, cokernel, finite index, torsion witnesses, and saturation | every specialization still owes its geometric locus, chart cover, constitutive transport, and official local-to-global theorem; no scalar factorization is promoted to a source-holon product |
 | `proved-derived; formal-checked` | `Millennium/HolonicParametron.lean`, `HolonicComplexParametron.lean`, `HolonicMeasuredParametron.lean` | exact real/complex algebra, finite sums, trigonometric identities | the two locked phase sheets, oriented incidence, diagonal and mutual storage, generalized coupled-LC modes, and measured `ΔQ/ΔV`, `ΔI/ΔΦ`, `ΔV/ΔI`, `Δθ/Δt` coefficient fields compose; coordinated branch reorientation preserves the mode | damping, passivity, Floquet theory, device calibration, and continuum realization remain outside these theorems |
 | `proved-derived; formal-checked` | `HolonicTorusFlow.lean`, `HolonicTorusKnots.lean`, `HolonicUnknotting.lean` | Mathlib paths, tori, gcd/prime facts, racks and quandles | Fourier receiver passages, triad boundary closure, multiplier/interactor route defects, coprime torus-slope embeddings, rack swing cancellation, irreducible factor law, and finite phase-collapse counterexamples | no ambient three-manifold torus-knot owner, Reidemeister quotient, or complete unknot fibre exists yet |
 
@@ -226,6 +227,56 @@ intermediate bound arithmetic has incoming faces `396000` and `411840000 = 1040*
 `1041*396000 = 3*347*396000`.  Thus `347` appears by exact additive cancellation in that prime
 chart, and multiplying the whole occurrence by any positive common scale transports the caustic
 by adding precisely the scale's `347`-valuation.
+
+## 10b. Transport lifts, partitions, divisor ledgers, and lattice quotients
+
+[proved-derived; formal-checked] The word `divisor` is now split into typed owners rather than
+allowed to act as one universal operation:
+
+| Typed owner | Exact object | Returned inverse information |
+|---|---|---|
+| `TransportLift` | solutions of `transport source = target` | empty obstruction, singleton, or complete fibre |
+| additive transport lift | one inhabited fibre | an explicit equivalence with a translate of the kernel |
+| `PartitionReceipt` | occurrence-to-piece address plus paired oriented cut sides | equivalence of the source population with the dependent sum of piece fibres; paired hand cancels |
+| `NatFactorWitness d n` | `n = d*k` with `k` retained | equivalence with `d ∣ n`; uniqueness only when `d > 0` |
+| `ReceiverQuotient` | every declared receiver factors through `q` | complete predecessor fibre; a section is separately declared structure |
+| `WeilDivisorLedger` | finite signed population of declared codimension-one loci | inversion negates coefficients; a function quotient subtracts ledgers |
+| `CartierDivisorAtlas` | local equations joined by admitted unit transitions | overlap cocycle, reverse transition, and equality of local divisor ledgers |
+| `LatticeIndexReceipt` | integer-linear transport with finite cokernel | kernel, image, complete lift fibre, cokernel, exact index, torsion witness, saturation |
+
+[proved-derived; formal-checked] The existing binary normalized-exponential adaptation is now an
+instance of `ReceiverQuotient`, not a newly invented softmax theory.  Its quotient is the oriented
+potential difference, its factor is the existing logistic-difference chart, and every common
+potential shift is exhibited in one reconstruction fibre.  This composes the Lean owner with the
+engine's established `RatioFamily`/receiver-exact-compression doctrine while leaving the engine's
+full exact cocycle strictly richer than the binary formal instance.
+
+[proved-derived; formal-checked] The rational finite-place ledger in `PlaceLedger.lean` now lands
+in one finitely supported signed divisor population.  Every occupied natural address is proved
+prime, every coefficient returns the established local ledger, and inversion negates the complete
+ledger simultaneously.  This is the first checked bridge from the place atlas into the geometric
+signed-divisor carrier.
+
+[definition] These owners refine the common staircase.  The generic operation is now
+
+```text
+source occurrence
+  -> typed transport or partition
+  -> receiver face
+  -> complete lift / reconstruction fibre
+  -> kernel, boundary, signed locus, or cokernel obstruction
+  -> chart gluing and scale/place transport
+  -> official problem receiver.
+```
+
+[open] RH still needs the complete prime/zero/archimedean divisor passage and positive Weil
+receiver. BSD needs genuine elliptic-curve divisor classes, local heights, Selmer--`Sha`, and the
+analytic ledger. Hodge needs an official variety whose codimension-one Cartier/Weil divisors and
+higher cycles enter its cycle-class map. Yang--Mills needs bundle-transition and continuum
+reconstruction owners. Knot and three-manifold routes need the geometric connected-sum and
+Reidemeister quotient rather than arithmetic factorization. Fluid routes use the partition,
+lift, boundary, and lattice owners but acquire divisor language only after a genuine zero, pole,
+or defect locus is founded.
 
 ## 11. Holonics is the source catalog: the common closure staircase
 

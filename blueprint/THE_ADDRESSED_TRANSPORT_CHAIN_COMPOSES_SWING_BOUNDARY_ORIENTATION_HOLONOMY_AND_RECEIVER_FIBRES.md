@@ -849,6 +849,48 @@ valuation currents to telescope with every bad-place storage remainder retained.
 target is the missing positive global constitutive return, not another fixed-locus or local
 conservation theorem already owned.
 
+## 5f. The valuation--divisor--lattice atlas returns division as a typed lifting problem
+
+[proved-derived; formal-checked] `Foundation/TransportLift.lean`, `ReceiverQuotient.lean`,
+`ExactPartition.lean`, `LatticeTransport.lean`, `Geometry/DivisorAtlas.lean`, and
+`Millennium/ValuationDivisorLatticeAtlas.lean` close the untyped-divisor gap exposed by the exact
+prime/radix deed. A general request now returns the complete fibre of `transport source = target`;
+for additive transport every inhabited fibre is equivalent to a kernel translate. An exact
+partition reconstructs the source occurrence population as the dependent sum of its addressed
+piece fibres, while paired cut boundaries retain their opposite hands and cancel on gluing. No
+equal-piece premise is smuggled into that construction.
+
+[proved-derived; formal-checked] Natural divisibility is isolated as the special lift
+`k |-> d*k`: `d divides n` exactly when a `NatFactorWitness d n` exists, and the cofactor is unique
+only after `d > 0` is returned. This scalar theorem supplies no factorization of an arbitrary
+source holon. Integer-lattice transport instead returns kernel, image, cokernel, finite index,
+complete predecessor fibre, torsion witness, and saturation. Thus matrix/tensor-shaped inversion
+questions remain lifting and reconstruction questions rather than acquiring an untyped quotient.
+
+[proved-derived; formal-checked] `WeilDivisorLedger` is a finite signed population over a locus type
+whose irreducible codimension-one meaning must be declared by the specialization. A principal
+system sends multiplication to ledger addition, inversion to negation, and a function quotient to
+ledger difference. A `CartierDivisorAtlas` carries local equations, admitted unit transitions,
+overlap cocycles, and the theorem that local ledgers agree on overlaps. The established rational
+place ledger now enters this carrier as one prime-supported finite divisor, and inversion negates
+the complete ledger simultaneously.
+
+[proved-derived; formal-checked] The normalization instance composes existing work rather than
+restarting it. The binary normalized-exponential theorem in
+`Foundation/MeasuredDifferenceReceiver.lean` is now a `ReceiverQuotient` whose quotient is the
+oriented potential difference and whose common-shift population is exhibited in one reconstruction
+fibre. The Rust engine's `exponentiated_ratio::RatioFamily` remains the richer exact cocycle owner,
+and `receiver_exact_compression` remains the dynamic successor-history owner; neither is replaced by
+the binary Lean instance.
+
+[open] The atlas supplies common types, not terminal Millennium hypotheses. RH still owes its
+global prime/zero/archimedean divisor passage and positive Weil receiver; BSD owes elliptic divisor
+classes, local heights, Selmer--`Sha`, and the analytic ledger; Hodge owes an official variety and
+higher cycle-class carrier beyond codimension one; Yang--Mills owes bundle and continuum transport;
+knot/three-manifold routes owe geometric connected-sum/Reidemeister quotients; and fluid routes use
+the lift, partition, boundary, and lattice owners without calling a locus a divisor until a genuine
+zero, pole, or codimension-one defect has been founded.
+
 ## 6. Core pass grade
 
 [definition] The formal gap is closed only when:

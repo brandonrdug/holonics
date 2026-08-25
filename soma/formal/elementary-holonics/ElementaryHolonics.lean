@@ -1,5 +1,9 @@
 import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
+import ElementaryHolonics.Foundation.TransportLift
+import ElementaryHolonics.Foundation.ReceiverQuotient
+import ElementaryHolonics.Foundation.ExactPartition
+import ElementaryHolonics.Foundation.LatticeTransport
 import ElementaryHolonics.Foundation.PrimeValuationRadixAtlas
 import ElementaryHolonics.Foundation.Lineage
 import ElementaryHolonics.Foundation.AddressedBoundary
@@ -14,6 +18,7 @@ import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
 import ElementaryHolonics.Geometry.Telescoping
 import ElementaryHolonics.Geometry.CrossRatio
+import ElementaryHolonics.Geometry.DivisorAtlas
 import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.Geometry.SixSphereMonodromy
 import ElementaryHolonics.Geometry.SixSpherePeriods
@@ -47,6 +52,7 @@ import ElementaryHolonics.Millennium.Swing
 import ElementaryHolonics.Millennium.SwingBridges
 import ElementaryHolonics.Millennium.Chronology
 import ElementaryHolonics.Millennium.LineageCompression
+import ElementaryHolonics.Millennium.ValuationDivisorLatticeAtlas
 import ElementaryHolonics.Millennium.AthenaReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.HolonicComposition
