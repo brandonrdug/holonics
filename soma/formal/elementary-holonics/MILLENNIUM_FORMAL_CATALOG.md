@@ -37,17 +37,17 @@ composition, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 434 |
-| theorem or lemma declarations | 5,571 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,945 |
-| modules below `ElementaryHolonics/Millennium/` | 388 |
-| theorem or lemma declarations below `Millennium/` | 5,179 |
-| broad declarations below `Millennium/` | 7,290 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,315 |
+| Lean modules below `ElementaryHolonics/` | 435 |
+| theorem or lemma declarations | 5,582 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,957 |
+| modules below `ElementaryHolonics/Millennium/` | 389 |
+| theorem or lemma declarations below `Millennium/` | 5,190 |
+| broad declarations below `Millennium/` | 7,302 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,320 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 388 Millennium modules.  Search prefixes
-inside the Millennium band include 175 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 389 Millennium modules.  Search prefixes
+inside the Millennium band include 176 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -147,6 +147,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from a uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | `UniformLargeScaleDyadicHodgeSubsetMassReturn constant` is uninhabited |
 | `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
 | `proved-derived; formal-checked` | full three-axis coefficient passage | `NavierStokesDyadicHodgeThreeAxisAllocation.lean` constructs the complete three-axis backward-padded chart, proves all six aperture flanks reconstruct the finite cube, carries each coordinate difference through the chart, identifies the actual full zero-padded coefficient with the `64 -> 27` allocation return, and identifies the official full-coordinate subset mass with its finite norm population | source-specific composition of the direct dyadic coefficient, zero-extension, higher-difference, and subset-receiver owners | bound the finite allocation-return mass uniformly by the full-face radial scale and repeat the bounded composition on the other seven Boolean faces |
+| `proved-derived; formal-checked` | all scalar allocation charts | `NavierStokesDyadicHodgeThreeAxisScalarChart.lean` proves the direct scalar band equals its triple delayed finite cube on the complete padded lattice, proves arbitrary-order chart naturality, and identifies every admitted `(a,b,c) in {0,1,2}^3` global face at its complementary shift with the existing natural tensor variation | source-specific reconstruction from the scalar band, delayed zero extension, natural forward transport, and tensor separation | compose each scalar face with its addressed complementary Hodge-entry bound |
 | `proved-derived; formal-checked` | zero-scalar / full-Hodge corner | `NavierStokesDyadicHodgeThreeAxisCornerMass.lean` identifies the actual `(0,0,0)` allocation face with its global product chart, removes all three pairs of left aperture residues exactly, obtains the complete `222` Hodge stencil from a nonzero scalar pin, and proves its global mass is at most `4096000000000000000 / R^3` for every scale at least three | source-specific composition of scalar support, controlled Hodge scale descent, tensor Fubini mass, and exact three-axis reindexing | transport the same proof through the remaining 26 allocation addresses, using axis-addressed variants for the permuted `112` and `122` complements |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |

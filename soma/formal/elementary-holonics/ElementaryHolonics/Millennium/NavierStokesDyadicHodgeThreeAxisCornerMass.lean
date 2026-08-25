@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.NavierStokesDyadicHodgeThreeAxisAllocation
+import ElementaryHolonics.Millennium.NavierStokesDyadicHodgeThreeAxisScalarChart
 import ElementaryHolonics.Millennium.NavierStokesThreeAxisDyadicHodgeSupportStencil
 import ElementaryHolonics.Millennium.NavierStokesThreeAxisHodgeDyadicMass
 
@@ -41,17 +41,7 @@ open Soma.Holonics.Millennium.NavierStokesThreeAxisHodgeDyadicMass
 open Soma.Holonics.Millennium.NavierStokesThreeAxisScalarSubsetVariation
 open Soma.Holonics.Millennium.NavierStokesThreeAxisDyadicHodgeSupportStencil
 open Soma.Holonics.Millennium.NavierStokesDyadicHodgeThreeAxisAllocation
-
-/-- The natural subset address whose scalar face ends at `(firstIndex, secondIndex, thirdIndex)`.
-The three left residues are retained by shifting the global doubly padded address by the
-complementary scalar orders. -/
-def dyadicHodgeThreeAxisSubsetPaddedFrequency
-    (scale firstOrder secondOrder thirdOrder : ℕ)
-    (firstIndex secondIndex thirdIndex : ℕ) : SpatialFrequency :=
-  dyadicHodgeThreeAxisBackwardPaddedFrequency scale
-    (firstIndex + (2 - firstOrder))
-    (secondIndex + (2 - secondOrder))
-    (thirdIndex + (2 - thirdOrder))
+open Soma.Holonics.Millennium.NavierStokesDyadicHodgeThreeAxisScalarChart
 
 /-- The unweighted product face in the global doubly padded chart. -/
 def dyadicHodgeThreeAxisGlobalProductFace

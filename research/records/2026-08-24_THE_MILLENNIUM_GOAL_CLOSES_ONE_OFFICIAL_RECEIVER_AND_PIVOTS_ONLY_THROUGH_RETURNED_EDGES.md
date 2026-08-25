@@ -130,10 +130,30 @@ uniformly at every scale at least three.  The promoted axiom audit contains only
 extensionality, classical choice, and quotient soundness, and contains no `sorryAx`.
 
 [open] The remaining 26 faces require the same exact chart translation plus the complementary
-Hodge derivative selected by their address.  The non-permuted `111`, `112`, `122`, and `222`
-envelopes already exist.  The next shared missing edge is an axis-addressed form of the three-axis
-`112` and `122` Hodge-entry bounds; without that transport, their current fixed-axis statements do
-not cover every allocation permutation.
+Hodge derivative selected by their address.  The `111`, `112`, `122`, and `222` envelope formulas
+already exist, but only `111` and `222` presently have a proved pointwise Hodge-entry inequality.
+The next shared missing edge is therefore the pointwise, axis-addressed three-axis `112` and `122`
+Hodge-entry bound, not merely another envelope definition.
+
+## Third returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisScalarChart.lean` removes the
+scalar-chart obstruction for every allocation at once.  It proves the global direct scalar band
+equals its triple second-previous zero extension on the complete three-axis padded lattice,
+including all six flanks; arbitrary iterated coordinate differences commute with that chart; and
+each order cancels exactly its complementary address delay.
+
+[proved-derived; formal-checked] The terminal theorem
+`threeAxisMixedForwardDifference_directDyadicScalarCoefficient_subsetPadded_eq` identifies every
+admitted global mixed face `(a,b,c) in {0,1,2}^3`, at its exact shifted address, with
+`dyadicTensorBandThreeAxisVariation scale a b c`.  It is one reconstruction theorem covering all
+27 scalar hands rather than 27 case-specific assertions.  Its axiom audit contains only
+propositional extensionality, classical choice, and quotient soundness, and contains no `sorryAx`.
+
+[open] Every allocation now reaches the scalar Fubini-mass receiver.  The analytic open fibre is
+strictly on the complementary Hodge side: the value, one-axis, two-axis, `111`, and `222` pointwise
+bounds exist, while pointwise `112` and `122` entry bounds remain to be derived from their exact
+allocation ledgers and reciprocal scale descent.
 
 ## Assumption discipline
 
