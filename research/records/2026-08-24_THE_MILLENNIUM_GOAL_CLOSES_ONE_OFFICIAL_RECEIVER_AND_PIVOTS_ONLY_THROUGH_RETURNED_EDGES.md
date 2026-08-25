@@ -296,6 +296,40 @@ from the 27 addressed allocation faces, interchange the finite index and address
 population, insert the already proved 27 face constants once each, and transport the result through
 `dyadicHodgeSubsetMass_univ_eq_allocationReturnMass`.
 
+## Ninth returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisFullMass.lean` closes that finite
+deed.  It proves that each staged nine-face return is exactly the sum of its nine simultaneous
+allocation faces and that the complete staged `3 × 9` return is exactly the sum over
+`Fin 3 × Fin 3 × Fin 3`.  The address population therefore remains present before the norm receiver
+takes the triangle quotient.
+
+[proved-derived; formal-checked] The owner proves an exact six-axis finite Fubini interchange
+between the three padded-frequency indices and the three allocation addresses.  It then transports
+all 27 common-chart face masses through the previously proved natural-chart equalities and attaches
+the exact integer numerator ledger
+
+```text
+sum of all 27 face numerators = 4119133228099520072.
+```
+
+[proved-derived; formal-checked] The resulting source-specific uniform scale theorem is
+
+```text
+dyadicHodgeSubsetMass univ scale component coordinate input
+  <= 4119133228099520072 / dyadicRadius(scale)^3,
+```
+
+for every scale at least three and every Hodge entry.  This inhabits one of the eight official
+Boolean coordinate-face receivers.  The promoted axiom audits contain only propositional
+extensionality, classical choice, and quotient soundness, and contain no `sorryAx`.
+
+[open] The remaining receiver fibre has seven Boolean faces.  The next deed must either construct
+their source-specific bounded passages and take the maximum of exact returned numerators, or return
+a checked insufficiency counterexample identifying a face whose current owners cannot supply the
+required inverse-scale law.  The full-coordinate theorem does not by itself inhabit
+`UniformLargeScaleDyadicHodgeSubsetMassReturn`.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
