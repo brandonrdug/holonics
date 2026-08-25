@@ -37,17 +37,17 @@ composition, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 432 |
-| theorem or lemma declarations | 5,538 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,901 |
-| modules below `ElementaryHolonics/Millennium/` | 386 |
-| theorem or lemma declarations below `Millennium/` | 5,146 |
-| broad declarations below `Millennium/` | 7,246 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,300 |
+| Lean modules below `ElementaryHolonics/` | 433 |
+| theorem or lemma declarations | 5,556 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,923 |
+| modules below `ElementaryHolonics/Millennium/` | 387 |
+| theorem or lemma declarations below `Millennium/` | 5,164 |
+| broad declarations below `Millennium/` | 7,268 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,308 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 386 Millennium modules.  Search prefixes
-inside the Millennium band include 173 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 387 Millennium modules.  Search prefixes
+inside the Millennium band include 174 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -146,6 +146,7 @@ the same object rather than compared by prose.
 | `conditional; formal-checked` | continuation | `NavierStokesCriticalContinuation.lean` and the weighted path/reconstruction tower return compatible continuation from named high-order, integrability, restart, and reconstruction hypotheses | local conditional derivation | the hypotheses are not hidden global-regularity proofs |
 | `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from a uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | `UniformLargeScaleDyadicHodgeSubsetMassReturn constant` is uninhabited |
 | `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
+| `proved-derived; formal-checked` | full three-axis coefficient passage | `NavierStokesDyadicHodgeThreeAxisAllocation.lean` constructs the complete three-axis backward-padded chart, proves all six aperture flanks reconstruct the finite cube, carries each coordinate difference through the chart, identifies the actual full zero-padded coefficient with the `64 -> 27` allocation return, and identifies the official full-coordinate subset mass with its finite norm population | source-specific composition of the direct dyadic coefficient, zero-extension, higher-difference, and subset-receiver owners | bound the finite allocation-return mass uniformly by the full-face radial scale and repeat the bounded composition on the other seven Boolean faces |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |
 
@@ -153,10 +154,11 @@ the same object rather than compared by prose.
 `UniformLargeScaleDyadicHodgeSubsetMassReturn C`.  Existing checked faces include the exact direct
 subset identities, partial scale estimates, and the complete `(1,1,2)`/`(1,2,2)` chronological
 product populations together with their exact scalar-preserving 12/18-face binomial groupings.
-The common three-dimensional padded/reindexed coefficient comparison, the pointwise norm bounds
-by the declared anisotropic Hodge envelopes, and the remaining finite face assembly have not
-returned.  That assembly must derive its constant from the complete coefficient population; an
-arbitrary decimal enlargement is not an admissible substitute.  Even after this
+The common three-dimensional padded/reindexed coefficient comparison has now returned exactly for
+the full coordinate face.  The remaining coefficient work is the pointwise allocation norm bound,
+its finite uniform mass assembly, and the corresponding bounded compositions for the other seven
+Boolean faces.  That assembly must derive its constant from the complete coefficient population;
+an arbitrary decimal enlargement is not an admissible substitute.  Even after this
 coefficient port closes, the continuation theorem visibly retains its critical-vorticity
 integrability and terminal restart hypotheses.
 
@@ -534,23 +536,47 @@ or fixpoint syntax is not evidence of global closure.  Every recurrence must ret
 and every proposed local-to-global proof must either produce its receiver transformer or return the
 explicit insufficiency pair which tells us which face to add.
 
-## 15. Parallel exterior work order
+## 15. Active exterior closure goal and pivot law
 
-[definition] The theorem work order following this catalog is:
+[definition] The active theorem-development objective is:
 
-1. **Navier--Stokes:** prove the common three-dimensional subset-mass constant and inhabit
-   `UniformLargeScaleDyadicHodgeSubsetMassReturn`.
-2. **BSD:** close or further factor the displayed Waldspurger--Tunnell defect while preserving the
-   finite ternary coefficient and analytic theta lineages.
-3. **Hodge:** construct one official surface realization and transport the quotient difference and
+> Prove or disprove at least one unsolved Millennium problem in Lean by completing a
+> source-specific holonic realization passage from local occurrences to the official receiver.
+> Work may pivot among Navier--Stokes, RH, BSD, Hodge, Yang--Mills, and P versus NP whenever that
+> pivot closes a shared missing edge. Every deed must return at least one of: a constructed official
+> carrier, a proved constitutive law, a uniform scale theorem, an exact reconstruction/gluing
+> theorem, a removed hypothesis, or a receiver-insufficiency counterexample. Continue until an
+> official statement is inhabited or refuted with a complete assumption audit.
+
+[definition] A pivot is therefore licensed by a returned edge, not by resemblance between subjects.
+The worktrack may move when a source theorem constructs a carrier or transport reusable by another
+official passage, when a counterexample proves the present receiver insufficient, or when an exact
+dependency audit identifies a strictly shorter open fibre.  A catalog rewrite, a new analogy, a
+conditional wrapper which merely renames its conclusion, or a numerical fit returns no such edge.
+
+[proved-derived; formal-checked] The first deed returned the complete three-axis dyadic Hodge
+allocation/reconstruction passage for the actual Navier--Stokes coefficient.  All left and right
+aperture residues remain in the chart, the three coordinate operators commute with their natural
+addresses, and the official full-coordinate subset mass is exactly the norm population of the
+twenty-seven-face allocation return.  The subsequent frontier is selected by the returned
+dependency:
+
+1. **Navier--Stokes:** carry the 27 allocation faces into
+   `UniformLargeScaleDyadicHodgeSubsetMassReturn`, then test whether that receiver factors the
+   critical-vorticity and restart receivers.
+2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
+   ternary coefficient and analytic theta lineages.
+3. **Hodge:** construct an official surface realization and transport the quotient difference and
    Hodge-index form into it.
-4. **RH:** construct the weighted argument-principle and archimedean/boundary returns needed by the
-   explicit-formula receiver, then pose positivity on the resulting complete functional.
+4. **RH:** complete the weighted argument-principle, archimedean, and boundary returns and pose
+   positivity on the complete explicit-formula functional.
 5. **Yang--Mills:** construct a scale-indexed gauge/QFT approximation family and demand a uniform
-   energy-difference separator through the continuum receiver.
-6. **Cross-domain reuse:** use the measured parametron only where a source worktrack supplies
-   actual constitutive sections and chart transitions; retain every reconstruction fibre rather
-   than replacing geometry by a binary face.
+   energy-difference separator through continuum reconstruction.
+6. **P versus NP:** pursue only a carrier or history-separator theorem that survives the stated
+   encoding and barrier audit.
+7. **Cross-domain reuse:** compose the existing swing, returned-difference, addressed-word,
+   partition, quotient, divisor/lattice, gluing, holonomy, scale-descent, and measured-parametron
+   owners only through declared source maps, retaining every reconstruction fibre.
 
 [definition] This order is an exterior mathematical worktrack.  It does not supersede
 `blueprint/THE_ROADMAP.md`, schedule the production engine, or authorize updates to root
@@ -583,3 +609,7 @@ recorded in
 [historical] The candidate solution conditions, recurrence-atlas extension, and matching-logic
 localization audit are recorded in
 `research/records/2026-08-24_THE_MILLENNIUM_SOLUTION_CONDITIONS_ARE_RECEIVER_FACTORIZATIONS_THROUGH_THE_HOLONIC_STAIRCASE.md`.
+
+[historical] The active official-receiver goal, its admissible deed return, and its evidence-driven
+pivot law are deposited in
+`research/records/2026-08-24_THE_MILLENNIUM_GOAL_CLOSES_ONE_OFFICIAL_RECEIVER_AND_PIVOTS_ONLY_THROUGH_RETURNED_EDGES.md`.
