@@ -611,6 +611,23 @@ or mutual table fixed while reversing incidence returns the corresponding sign-p
 intervention.  Arbitrary complex branch phases and their superposition remain present before the
 half-turn receiver.
 
+[proved-derived; formal-checked] The scalar-provenance correction returned in
+`Foundation/MeasuredDifferenceReceiver.lean` and `HolonicMeasuredParametron.lean`.  An addressed
+pair first returns its oriented chart difference and only then a possibly non-injective scalar
+face, with the complete pair fibre retained.  Capacitance, inductance, inverse inductance,
+impedance, and angular frequency now enter the coupled lattice as `ΔQ/ΔV`, `ΔΦ/ΔI`, `ΔI/ΔΦ`,
+`ΔV/ΔI`, and `Δθ/Δt`; independently shifting either chart zero changes none of these coefficients.
+The binary normalized exponential face is proved to factor through one action difference, while
+the complex pre-locking body remains uncollapsed.
+
+[proved-derived; formal-checked] `MillenniumDifferenceAtlas.lean` poses the same correction on the
+existing open-problem carriers.  The Riemann seam is a zero real-part difference; a finite BSD rank
+comparison and the rank-zero ledger are zero integer/complex differences; a Hodge class returns a
+quotient difference modulo the algebraic span; a Yang--Mills gap is a positive lower bound on
+energy differences from vacuum; and the present Navier--Stokes coefficient port is a nonpositive
+subset-mass excess on every scale, Hodge entry, and coordinate face.  These are exact
+reformulations and preserve every named open fibre.
+
 [interpretation] A lattice-constrained or noncircular parametron therefore enters this station by
 its measured self/mutual capacitance, inverse-inductance, resistance/loss, pump chronology, and
 receiver maps, not by turn count alone.  A passive linear lattice supplies a generalized modal map;
@@ -979,6 +996,14 @@ generalized normal modes, exact orientation covariance, and the incidence-only i
 changes mutual signs.  It leaves geometry-to-coefficient field solving, dissipation, nonlinear pump
 stability, and engine realization open.
 
+[proved-derived; formal-checked] `MeasuredDifferenceReceiver.lean`,
+`HolonicMeasuredParametron.lean`, and `MillenniumDifferenceAtlas.lean` now close the scalar-return
+gap.  Scalars are receiver readings of addressed differences; measured LC and frequency fields
+feed the existing generalized mode; and the RH, BSD, Hodge, Yang--Mills, and Navier--Stokes
+applications preserve their distinct source carriers.  The maintained surface catalog of checked
+returns, external substrate, local compositions, conditions, and exact residuals is
+[`../soma/formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md`](../soma/formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md).
+
 [proved-derived; formal-checked] HD2 returned the generic well-founded scale descent, the exact
 twenty-seven-face Hodge product law, the ten-face quadratic annihilator reduction, and the explicit
 dyadic inverse-cube mixed-mass theorem. The return is recorded in
@@ -992,7 +1017,9 @@ remaining coefficient-mass interface are recorded in
 [`../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md`](../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md).
 
 [open] The exact next fluid receiver is the uniform large-scale coefficient-mass return behind the
-eight already constructed subset Haar receivers. The other
+eight already constructed subset Haar receivers.  Equivalently, the newly checked difference
+atlas asks for one nonnegative constant whose returned mass excess is nonpositive for every scale
+at least three, all twenty-seven Hodge entries, and all eight Boolean coordinate faces. The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
 optical and dynamical-metric constitutive specializations.  These are receiver families of the

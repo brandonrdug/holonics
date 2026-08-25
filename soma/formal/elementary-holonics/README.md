@@ -3,6 +3,11 @@
 This package is the kernel-checked companion to the first dependency spine in
 `src/soma/PAPERS/synopsis/`.
 
+[definition] The maintained surface of the Millennium work, including external dependencies,
+project-specific formal compositions, conditional bridges, and exact open fibres, is
+[`MILLENNIUM_FORMAL_CATALOG.md`](MILLENNIUM_FORMAL_CATALOG.md).  `ElementaryHolonics.lean` remains
+the complete Lean import face.
+
 It presently checks:
 
 - typed relations, identity, and associative composition;
