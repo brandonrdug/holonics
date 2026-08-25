@@ -730,14 +730,23 @@ recurrence and its norm ledger now factor through only those nine faces.  The ea
 denominator type is their commuting quotient after adjoining the principal value face.  No
 promoted theorem contains `sorryAx`.
 
-[definition] **HD2 -- the annihilator-pruned recurrence descends its scale envelope -- is next.**
-It turns the active recurrence into a well-founded order ledger: every reciprocal derivative is
-bounded from strictly lower reciprocal orders, denominator degrees, and the local inverse aperture;
-the returned certificate records the accumulated power of the lower quadratic scale and every
-shifted successor window.  Polynomial actions, nilpotent monodromy, exterior `d^2=0`, local-height
-corrections, and covariant commutator filtrations can supply different degree ledgers to the same
-descent owner.  The first fluid specialization must derive the inverse-cube full mixed mass rather
-than accept a bound for each of the nine active faces as an input.
+[proved-derived; formal-checked] **HD2 PASSED 2026-08-24.**
+`Foundation/HigherDifferenceScaleDescent.lean` defines the generic strict-order face and proves its
+predecessor index decreases. `NavierStokesThreeAxisHodgeScaleDescent.lean` derives the complete
+`11 -> 111 -> 112 -> 122 -> 222` reciprocal envelope from the local quadratic inverse law on every
+shifted successor window. `NavierStokesThreeAxisHodgeProductMass.lean` expands the actual
+`(2,2,2)` Hodge product into twenty-seven commuting allocation faces; quadratic numerator
+annihilation leaves the exact `6 + 3 + 1` population, and their ten bounds use only the descended
+`112`, `122`, `22`, and `222` envelopes. `NavierStokesThreeAxisHodgeDyadicMass.lean` then proves
+orders `111`, `112`, `122`, and `222` scale respectively as `R^-5`, `R^-6`, `R^-7`, and `R^-8`,
+and the full mixed Hodge mass is at most `4000000000000000 / R^6` for every dyadic scale at least
+three. This is inverse cube in the quadratic frequency scale `q = |k|^2`; no independent active-face
+bound is an input and no promoted theorem contains `sorryAx`.
+
+[interpretation] The same generic descent owner is now available to degree-filtered polynomial
+actions, nilpotent monodromy, exterior `d^2=0`, local-height corrections, and covariant commutator
+filtrations. Each specialization still owes its own typed transport, annihilator, positive receiver,
+and falsifier; HD2 supplies the well-founded composition law rather than those constitutive inputs.
 
 [definition] The HD0 specialization atlas is the reason the deed is mathematical rather than
 fluid-specific:
@@ -763,18 +772,18 @@ fluid-specific:
    higher-difference orbit order, coupled phase transport, half-turn deck action, and the binary
    receiver with its winding fibre retained.
 
-[definition] Navier--Stokes is therefore the first analytic specialization after HD0.  Its ordered
-receiver remains:
+[definition] Navier--Stokes is therefore the first analytic specialization after HD0. Its ordered
+receiver now stands at item four:
 
-1. the already returned low-scale `s=0,1,2` physical-kernel bound;
-2. HD0 and its sparse three-axis quadratic reciprocal specialization;
-3. all twenty-seven three-axis Leibniz faces and the inverse-cube full mixed mass;
+1. the returned low-scale `s=0,1,2` physical-kernel bound;
+2. the returned HD0/HD1/HD2 higher-difference and sparse reciprocal descent;
+3. the returned twenty-seven three-axis Leibniz faces and inverse-cube full mixed mass;
 4. all eight subset receivers: empty, three single axes, three axis pairs, and all three;
 5. the one-circle near/far Haar estimate and its coordinate-face tensorization around `z_i=1`;
 6. an explicit `UniformDyadicHodgeJacobianKernelBound`; and
 7. composition with the returned restart supply and terminal-half continuation theorem.
 
-[open] After HD0, triple finite Abel/Fubini is already checked, but Haar integration is not yet
+[open] After HD2, triple finite Abel/Fubini is already checked, but Haar integration is not yet
 formalized.
 The top mixed difference alone cannot be divided globally by
 `∏_i |1-exp(2πix_i)|²`, because the reciprocal factors are singular. The eight subset bounds and
@@ -945,10 +954,13 @@ generalized normal modes, exact orientation covariance, and the incidence-only i
 changes mutual signs.  It leaves geometry-to-coefficient field solving, dissipation, nonlinear pump
 stability, and engine realization open.
 
-[open] The exact next I9 return is HD2: the well-founded scale-envelope descent of the pruned HD1
-recurrence and its quadratic Hodge specialization deriving the inverse-cube mixed mass rather than
-assuming nine independent face bounds.  The later fluid receiver remains the uniform physical Navier--Stokes Hodge-kernel witness
-through all eight subset Haar receivers at scales at least three.  The other
+[proved-derived; formal-checked] HD2 returned the generic well-founded scale descent, the exact
+twenty-seven-face Hodge product law, the ten-face quadratic annihilator reduction, and the explicit
+dyadic inverse-cube mixed-mass theorem. The return is recorded in
+[`../research/records/2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md`](../research/records/2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md).
+
+[open] The exact next fluid receiver is the uniform physical Navier--Stokes Hodge-kernel witness
+through all eight subset Haar receivers at scales at least three. The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
 optical and dynamical-metric constitutive specializations.  These are receiver families of the

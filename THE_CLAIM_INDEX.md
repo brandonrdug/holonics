@@ -140,7 +140,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (335 deposits of 627)
+## 4 · The 2026-08 record line (336 deposits of 628)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -473,6 +473,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-24_THE_COMPLEX_TORUS_FIBRE_WAS_RECEIVED_AS_GEOMETRY_AND_THE_THREE_MONODROMIES_RETURNED_DISTINCT_GRAPHS.md` | The complex torus fibre was received as geometry, and the three monodromies returned distinct graphs |
 | `2026-08-24_THE_FACTOR_COMPLEX_CHANGED_ONE_BODY_AND_EXACT_WITHDRAWAL_RETURNED_THE_SAME_PREDECESSOR.md` | The factor complex changed one body, and exact withdrawal returned the same predecessor |
 | `2026-08-24_THE_FORTY_FACE_FLUID_RECEIVER_ENTERS_ONE_COMPLETE_RESTART_CIRCULATION.md` | The forty-face fluid receiver enters one complete restart circulation |
+| `2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md` | HD2 returned the twenty-seven Hodge faces and the inverse-cube mixed mass |
 | `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_IS_THE_OWNER_AND_THE_MILLENNIUM_PROBLEMS_ARE_ITS_RECEIVER_FAMILIES.md` | The higher-difference word is the owner and the Millennium problems are its receiver families |
 | `2026-08-24_THE_HIGHER_DIFFERENCE_WORD_RETURNED_ITS_COMPLETE_LEDGER_AND_NAVIER_STOKES_BECAME_ONE_RECEIVER.md` | The higher-difference word returned its complete ledger and Navier--Stokes became one receiver |
 | `2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md` | The Holonic Interaction is a covariant storage--flux complex, and the cusp raises difference order |
