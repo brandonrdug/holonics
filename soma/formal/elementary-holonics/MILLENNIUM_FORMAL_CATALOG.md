@@ -1,6 +1,6 @@
 # Millennium formal catalog
 
-**Date:** 2026-08-24
+**Date:** 2026-08-25
 **Scope:** exterior Lean theorem station under `ElementaryHolonics`; this document schedules no
 Rust/CUDA construction and does not alter `CONSTRUCTION_STATE.md`.
 **Catalog owner:** `soma/formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md`
@@ -32,22 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-24 source closure after the first complete
-three-axis Hodge allocation slab, the station contains:
+[established-bounded; measured] On the 2026-08-25 source closure after the strict Hodge-entry
+scale descent, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 438 |
-| theorem or lemma declarations | 5,610 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 7,993 |
-| modules below `ElementaryHolonics/Millennium/` | 392 |
-| theorem or lemma declarations below `Millennium/` | 5,218 |
-| broad declarations below `Millennium/` | 7,338 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,340 |
+| Lean modules below `ElementaryHolonics/` | 439 |
+| theorem or lemma declarations | 5,629 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,018 |
+| modules below `ElementaryHolonics/Millennium/` | 393 |
+| theorem or lemma declarations below `Millennium/` | 5,237 |
+| broad declarations below `Millennium/` | 7,363 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,347 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 392 Millennium modules.  Search prefixes
-inside the Millennium band include 179 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 393 Millennium modules.  Search prefixes
+inside the Millennium band include 180 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -151,7 +151,8 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | zero-scalar / full-Hodge corner | `NavierStokesDyadicHodgeThreeAxisCornerMass.lean` identifies the actual `(0,0,0)` allocation face with its global product chart, removes all three pairs of left aperture residues exactly, obtains the complete `222` Hodge stencil from a nonzero scalar pin, and proves its global mass is at most `4096000000000000000 / R^3` for every scale at least three | source-specific composition of scalar support, controlled Hodge scale descent, tensor Fubini mass, and exact three-axis reindexing | transport the same proof through the remaining 26 allocation addresses, using axis-addressed variants for the permuted `112` and `122` complements |
 | `proved-derived; formal-checked` | scalar-third-order-two allocation slab | `NavierStokesDyadicHodgeThreeAxisThirdTwoSlice.lean` descends the complementary third-order-zero Hodge stencil to the genuine first/second two-axis stencil, bounds all nine natural product faces, retains their exact binomial weights, and proves the complete actual slab mass is at most `12416369280072 / R^3` at every scale at least three | source-specific composition of the all-orders scalar chart, controlled support, two-axis pointwise Hodge bounds, tensor Fubini mass, and exact weighted allocation faces | the other coordinate slabs are now closed by the generic axis-addressed owner; compose the `111` face and derive the six residual `112`/`122` pointwise laws |
 | `proved-derived; formal-checked` | other scalar-order-two allocation slabs | `NavierStokesDyadicHodgeThreeAxisOtherTwoSlices.lean` proves the two-axis complementary Hodge law for arbitrary distinct coordinate axes, constructs a generic natural mass for every actual weighted allocation address, and bounds both the scalar-first-order-two and scalar-second-order-two slabs by the same exact `12416369280072 / R^3` numerator | axis-addressed composition of the support-stencil projections, generic weighted face factorization, tensor Fubini envelopes, and the established two-axis Hodge laws | among the eight addresses in `{0,1}^3`, compose the existing `111` and `222` pointwise laws and derive the six permuted `112`/`122` pointwise laws |
-| `proved-derived; formal-checked` | central scalar/Hodge `111` face | `NavierStokesDyadicHodgeThreeAxisOneFace.lean` composes the pointwise three-axis `111` Hodge-entry theorem with the exact central scalar chart and support stencil; its unweighted natural mass is at most `28928000000 / R^3`, and its actual multiplicity-eight allocation mass is at most `231424000000 / R^3` | source-specific composition of the complete `111` product ledger, dyadic Hodge scale descent, scalar tensor Fubini mass, and the generic weighted allocation owner | derive the six permuted pointwise `112`/`122` laws and the common-chart reindexing of all natural face masses |
+| `proved-derived; formal-checked` | central scalar/Hodge `111` face | `NavierStokesDyadicHodgeThreeAxisOneFace.lean` composes the pointwise three-axis `111` Hodge-entry theorem with the exact central scalar chart and support stencil; its unweighted natural mass is at most `28928000000 / R^3`, and its actual multiplicity-eight allocation mass is at most `231424000000 / R^3` | source-specific composition of the complete `111` product ledger, dyadic Hodge scale descent, scalar tensor Fubini mass, and the generic weighted allocation owner | compose and reindex the six residual natural face masses into the common official allocation population |
+| `proved-derived; formal-checked` | strict `112`/`122` Hodge-entry descent | `NavierStokesHodgeEntryScaleDescent.lean` proves a quotient recurrence for every right section whose denominator product is annihilated, proves that every axis-addressed `112` and `122` word annihilates the genuine quadratic Hodge numerator, condenses their complete product ledgers to five and seven translated predecessor occurrences, and derives pointwise Hodge-entry bounds for all six permutations with exact dyadic envelopes `34505600000 / R^4` and `7483641600000 / R^5` | source-specific composition of the addressed product rule, quadratic numerator annihilation, controlled-stencil rebase, lower-order Hodge-entry laws, and exact dyadic aperture descent | compose the six pointwise laws with their complementary scalar faces and reindex every natural face mass into the common official allocation population |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |
 
@@ -162,10 +163,11 @@ product populations together with their exact scalar-preserving 12/18-face binom
 The common three-dimensional padded/reindexed coefficient comparison has now returned exactly for
 the full coordinate face.  The actual corner and the complete nine-face scalar-third-order-two
 slab have returned their uniform inverse-cubic masses with exact occurrence weights.  Axis
-transport of that slab covers 19 addresses after overlap; together with the corner and the existing
-`111` pointwise theorem, this leaves exactly six complementary `112`/`122` faces before the finite
-full-allocation assembly and the corresponding bounded compositions for the other seven Boolean
-faces.  That assembly must derive its constant from the complete coefficient population;
+transport of that slab covers 19 addresses after overlap; the corner and central `111` mass are
+closed; and the pointwise laws for all six complementary `112`/`122` Hodge faces are now proved by
+strict scale descent.  Their scalar/Hodge mass compositions and common-chart reindexing remain
+before the finite full-allocation assembly and the corresponding bounded compositions for the
+other seven Boolean faces.  That assembly must derive its constant from the complete coefficient population;
 an arbitrary decimal enlargement is not an admissible substitute.  Even after this
 coefficient port closes, the continuation theorem visibly retains its critical-vorticity
 integrability and terminal restart hypotheses.

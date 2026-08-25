@@ -226,6 +226,43 @@ permutations of `112` and the three permutations of `122`.  Closing their existi
 envelopes and reindexing every natural face back to the common official allocation population are
 the next analytic and reconstruction edges.
 
+## Seventh returned deed
+
+[proved-derived; formal-checked] `NavierStokesHodgeEntryScaleDescent.lean` removes the last
+pointwise Hodge-entry hypotheses from the 27-face allocation cube.  Its general quotient theorem
+starts with an arbitrary right section `h`, the exact quadratic denominator `D`, and an addressed
+word annihilating `D*h`; the complete nonprincipal product ledger then forces
+
+```text
+D(frequency) * differenceWord(word, h, frequency)
+  = -complete shifted predecessor ledger.
+```
+
+[proved-derived; formal-checked] For the genuine Hodge-Jacobian entry, multiplication by `D`
+returns its quadratic numerator.  Every axis permutation of the `112` and `122` words annihilates
+that numerator exactly.  Their complete product ledgers condense respectively to five translated
+predecessor occurrences (`2·111 + 2·12 + 11`) and seven translated predecessor occurrences
+(`22 + 4·112 + 4·12`).  Rebase of the same controlled three-axis stencil supplies every predecessor;
+no multiplier-variation field, coordinate symmetry, or nonvanishing hypothesis is admitted.
+
+[proved-derived; formal-checked] The resulting pointwise envelopes are exact uniform scale
+theorems:
+
+```text
+HodgeEntry112 <= 34505600000 / R^4
+HodgeEntry122 <= 7483641600000 / R^5
+```
+
+[proved-derived; formal-checked] The second numerator is exactly
+`11*32000000000 + 4*11*34505600000 + 4*166000000 = 1870910400000`, followed by the proved
+controlled-aperture factor `4/R^2`.  The promoted axiom audits contain only propositional
+extensionality, classical choice, and quotient soundness, and contain no `sorryAx`.
+
+[open] All 27 allocation addresses now have a proved pointwise complementary Hodge law.  The six
+new laws must next be multiplied by their exact scalar `110` or `100` tensor-mass faces, retaining
+their occurrence weights, and their natural face populations must be reindexed into the one common
+official allocation population before the full-coordinate subset mass can be summed.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
