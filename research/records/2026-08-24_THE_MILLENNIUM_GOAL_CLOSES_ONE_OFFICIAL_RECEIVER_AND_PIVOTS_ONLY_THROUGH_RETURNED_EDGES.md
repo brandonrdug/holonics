@@ -182,6 +182,32 @@ three slabs cover 19 faces.  The scalar `(1,1,1)` face can use the existing poin
 bound and the `(0,0,0)` face is already closed; the six residual faces are exactly those whose
 complementary Hodge orders are permutations of `112` or `122`.
 
+## Fifth returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisOtherTwoSlices.lean` transports
+the slab proof through the actual `(1,2)` and `(0,2)` coordinate-plane stencil owners.  Its generic
+two-axis theorem accepts any distinct coordinate pair, and its generic natural face-mass owner
+factors every actual allocation mass into the complete product of its three binomial occurrence
+weights and its unweighted scalar/Hodge product population.
+
+[proved-derived; formal-checked] The scalar-first-order-two and scalar-second-order-two slabs each
+return the exact uniform theorem
+
+```text
+slab mass <= 12416369280072 / R^3
+```
+
+at every scale at least three.  Together with the previous third-order-two slab, the checked
+theorems control all 19 addresses having at least one scalar order two.  This is coverage by proved
+axis-addressed constitutive laws; no coordinate symmetry was silently assumed.  The axiom audits
+contain only propositional extensionality, classical choice, and quotient soundness, and contain no
+`sorryAx`.
+
+[open] The remaining address cube is exactly `{0,1}^3`.  The `(0,0,0)` corner is closed by the
+pointwise `222` Hodge bound, and `(1,1,1)` has the existing pointwise `111` Hodge bound.  The six
+strict residual addresses require the pointwise Hodge-entry laws for the three permutations of
+`112` and the three permutations of `122`.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
