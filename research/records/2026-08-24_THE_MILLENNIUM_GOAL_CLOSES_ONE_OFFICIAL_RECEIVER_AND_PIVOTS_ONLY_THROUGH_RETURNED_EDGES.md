@@ -1599,6 +1599,43 @@ maximal-time `L⁴` law required by the signed enstrophy passage.
 All ten printed audits depend only on propositional extensionality, classical choice, and quotient
 soundness, with no `sorryAx`.
 
+## Thirty-seventh returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesParabolicRebase.lean` closes the constitutive gap explicitly left by
+`NavierStokesScaling.lean`.  It constructs the complete addressed transport
+
+```text
+uλ(x,t) = λ u(λx,λ²t),       pλ(x,t) = λ² p(λx,λ²t),
+fλ(x,t) = λ³ f(λx,λ²t),      u₀λ(x) = λ u₀(λx),
+```
+
+and derives every weight from the actual differential owner.  The time derivative and nonlinear
+advection carry `λ³`; divergence carries `λ²`; the pressure gradient carries `λ³`; and the
+Laplacian first receives two spatial chart factors before the velocity amplitude supplies the
+third.  The Laplacian proof passes through the second iterated Fréchet derivative and the standard
+orthonormal-basis/canonical-covariant-tensor receiver rather than assuming a symbolic exponent.
+
+[proved-derived; formal-checked]
+Consequently, if the unscaled momentum occurrence returns at `(λx,λ²t)`, scalar transport of
+that equality proves the complete scaled momentum occurrence at `(x,t)`.  Attached to the official
+`SmoothSolution` owner, every nonzero scale and strictly positive time returns the transformed
+momentum equation, and every scale on every nonnegative time returns incompressibility.  The
+initial velocity face at time zero is exact.  No dimensional estimate, asymptotic notation,
+rounding, or declared-but-unproved scaling weight enters this passage.
+
+[open]
+The file does not yet construct a new `SmoothSolution` or `PeriodicSolution` structure.  That full
+carrier still owes transport of joint smoothness on the nonnegative half-cylinder and the official
+time-zero `derivWithin` momentum face.  A periodic descendant additionally owes the integer
+spatial-cover law: arbitrary real dilation does not preserve one-periodicity on the same torus.
+Thus the constitutive PDE edge is closed, while the official-carrier gluing edge remains named and
+strictly smaller.
+
+[proved-derived; formal-checked]
+All eleven printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite

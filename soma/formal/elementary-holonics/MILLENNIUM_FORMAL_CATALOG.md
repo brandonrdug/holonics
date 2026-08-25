@@ -32,22 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 quartic-amplitude receiver audit after the
-absorbed Hodge-to-enstrophy closure, the station contains:
+[established-bounded; measured] On the 2026-08-25 parabolic PDE-rebase closure after the
+quartic-amplitude receiver audit, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 471 |
-| theorem or lemma declarations | 6,009 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,518 |
-| modules below `ElementaryHolonics/Millennium/` | 424 |
-| theorem or lemma declarations below `Millennium/` | 5,611 |
-| broad declarations below `Millennium/` | 7,856 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,659 |
+| Lean modules below `ElementaryHolonics/` | 472 |
+| theorem or lemma declarations | 6,022 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,536 |
+| modules below `ElementaryHolonics/Millennium/` | 425 |
+| theorem or lemma declarations below `Millennium/` | 5,624 |
+| broad declarations below `Millennium/` | 7,874 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,670 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 424 Millennium modules.  Search prefixes
-inside the Millennium band include 211 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 425 Millennium modules.  Search prefixes
+inside the Millennium band include 212 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -184,6 +184,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | dissipation enters the complete dyadic Hodge interaction | `NavierStokesDissipationHodgeInteraction.lean` inserts `ω(q-y)-ω(q)` by exact aligned cancellation, bounds the actual absolute kernel-reading population at every scale, glues it through the summable first-distance Hodge moment, and for every `ε>0` proves `Σ_s∫_y∫_q |H_s(y;ω(q),ω(q-y))| ≤ 27 M₁(27D_ω+ε²‖ω‖₄⁴)/(2ε)`; the explicit positive choice `ε=1+729M₁/ν` absorbs the dissipation branch by `(ν/2)D_ω` | source-specific composition of the physical translation current, parameterized Young square completion, exact aligned Hodge cancellation, real/complex coordinate comparison, nonnegative `tsum` gluing, and the complete first-distance kernel moment | attach this integrated high-frequency population and the already energy-paid scale-zero face to the signed physical enstrophy identity; the exposed nonlinear remainder is the exact spatial `L⁴` vorticity mass |
 | `proved-derived; formal-checked` | absorbed Hodge interaction enters the signed enstrophy receiver | `NavierStokesDissipationHodgeEnstrophy.lean` integrates the exact finite dyadic word, pays the scale-zero strain by `26244π√(2E)·Enstrophy`, sends the addressed Fourier reconstruction fibre to zero, transports absolute torus stretching through the unit-cube chart to the signed physical vortex-stretching term, and proves `EnstrophyRate ≤ -(ν/2)D_ω + 26244π√(2E)·Enstrophy + C(ν,M₁)‖ω‖₄⁴ + CurlForcingWork` | exact finite reconstruction/gluing, Fubini at each addressed band, compact torus integration, weighted-`H³` tail decay, Haar/cube chart transport, and the periodic enstrophy identity | derive a source-specific time law for the exact spatial `L⁴` population, sharpen it through another oriented difference/scale receiver, or prove that the presently conserved energy and integrated dissipation receivers are insufficient |
 | `counterexample; formal-checked` | quartic-amplitude receiver insufficiency | `NavierStokesVorticityFourthPowerAmplitude.lean` proves that the literal scalar action on an actual velocity world-sheet transports curl linearly, kinetic energy, enstrophy, and vorticity dissipation quadratically, the energy/enstrophy base cubically on a positive ray, and torus fourth-power vorticity mass quartically; whenever the source slice has positive fourth-power mass, no fixed pair of coefficients factors every positive-amplitude quartic occurrence through only the quadratic dissipation and cubic energy/enstrophy faces | exact scalar transport through `fderiv`, curl, gradient, compact Haar integration, and an Archimedean quartic-versus-lower-degree separator | this does not preserve the fixed Navier--Stokes equation data under amplitude rebase and does not refute regularity; it proves that a purely algebraic, amplitude-blind receiver cannot close the exposed `L⁴` term, so the next carrier must retain PDE evolution together with scale/time/orientation |
+| `proved-derived; formal-checked` | exact parabolic PDE rebase | `NavierStokesParabolicRebase.lean` constructs `uλ(x,t)=λu(λx,λ²t)`, `pλ=λ²p(λx,λ²t)`, `fλ=λ³f(λx,λ²t)`, and the transported initial face; it derives the actual time derivative, spatial derivative, advection, divergence, pressure-gradient, and Laplacian laws and proves that every positive-time official smooth-solution momentum occurrence returns under one common cubic factor while incompressibility returns on all nonnegative times | exact chain-rule transport through `deriv`, `fderiv`, the second iterated derivative, the canonical-covariant-tensor Laplacian, and the official `SmoothSolution` fields | package the positive-time constitutive return into a complete official solution carrier by transporting half-cylinder smoothness and the time-zero within derivative; periodic descendants additionally require the exact integer spatial-cover law |
 | `counterexample; formal-checked` | interior continuity versus terminal integrability | `strictInteriorContinuousNonnegative_not_sufficient_for_terminalIntegrability` exhibits the nonnegative population `‖(t-1)⁻¹‖`, continuous on `(0,1)` but not interval-integrable on `[0,1]` | Mathlib's exact inverse nonintegrability theorem composed with the norm receiver | any terminal continuation argument must exclude this pole class by a source-specific PDE estimate; no continuity-only promotion is lawful |
 | `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
@@ -652,14 +653,19 @@ fourth-power vorticity population, beside the kinetic-energy/enstrophy base and 
 amplitude audit now proves that no fixed algebraic coefficients can factor every positive scalar
 rebase of that quartic population through only the quadratic dissipation and cubic
 energy/enstrophy faces.  Because a scalar rebase need not preserve the fixed Navier--Stokes data,
-this is a receiver-insufficiency theorem rather than a Clay alternative; the unresolved passage
-must use the PDE's scale/time evolution rather than those magnitude faces alone.
+this is a receiver-insufficiency theorem rather than a Clay alternative.  The exact parabolic
+transport now supplies the missing PDE-owned scale/time passage: all momentum terms carry the
+same cubic factor and official incompressibility is preserved.  The unresolved carrier boundary
+is no longer the constitutive equation itself, but its complete half-cylinder smoothness and
+time-zero within-derivative packaging, followed by a receiver law strong enough to control the
+quartic population along that PDE-preserving family.
 
 1. **Navier--Stokes:** the amplitude-blind quadratic/cubic factorization of the exact spatial `L⁴`
-   receiver has been refuted.  Construct its sharper oriented carrier from the PDE, viscosity,
-   retained scale transport, and time evolution, then either prove a maximal-time law or return a
-   PDE-preserving concentration/separation family.  The next inequality may not discard the scale
-   address exposed by the quartic-versus-lower-degree separator.
+   receiver has been refuted, and the actual parabolic momentum/incompressibility transport is now
+   proved.  Complete that transport as an official solution carrier, then use the resulting
+   PDE-preserving scale family either to prove a maximal-time law or to return the stronger
+   concentration/separation theorem.  The next inequality may not discard the scale address
+   exposed by the quartic-versus-lower-degree separator.
 2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
    ternary coefficient and analytic theta lineages.
 3. **Hodge:** construct an official surface realization and transport the quotient difference and
