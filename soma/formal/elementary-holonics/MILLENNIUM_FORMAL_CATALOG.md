@@ -32,23 +32,23 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 anchor-free critical-receiver closure after
-returning the zero curl mode, centered Haar reconstruction, and canonical derivative-rate bridge, the
+[established-bounded; measured] On the 2026-08-25 translation-to-dissipation closure after
+identifying the actual vorticity Stokes population with the physical gradient-square receiver, the
 station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 466 |
-| theorem or lemma declarations | 5,946 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,424 |
-| modules below `ElementaryHolonics/Millennium/` | 419 |
-| theorem or lemma declarations below `Millennium/` | 5,548 |
-| broad declarations below `Millennium/` | 7,762 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,599 |
+| Lean modules below `ElementaryHolonics/` | 467 |
+| theorem or lemma declarations | 5,961 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,444 |
+| modules below `ElementaryHolonics/Millennium/` | 420 |
+| theorem or lemma declarations below `Millennium/` | 5,563 |
+| broad declarations below `Millennium/` | 7,782 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,613 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 419 Millennium modules.  Search prefixes
-inside the Millennium band include 206 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 420 Millennium modules.  Search prefixes
+inside the Millennium band include 207 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -180,6 +180,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | strict-interior time transport | `NavierStokesVorticityCanonicalTime.lean` proves joint space--time smoothness of actual vorticity on `ℝ³×(0,T)`, identifies each slice derivative with the joint derivative restricted to the spatial inclusion, curries the compact chart, and proves both the canonical derivative norm and complete enstrophy coefficient continuous on `(0,T)` and interval-integrable on every ordered `[a,b]⊂(0,T)` | exact joint derivative restriction, compact-open currying, norm transport, and compact-interval integration | obtain a terminal quantitative estimate; strict-interior continuity cannot close `[0,T]` |
 | `proved-derived; formal-checked` | anchor-free critical-receiver reconstruction | `NavierStokesVorticityCanonicalCriticalBridge.lean` proves the zero Fourier mode of actual periodic vorticity vanishes by the exact curl multiplier, returns zero Haar mean in the real Euclidean carrier, transports every torus pair through one centered displacement of norm at most `3/2`, and proves `criticalVorticityRate(t) ≤ (3/2)·canonicalVorticityDerivativeRate(t)`; terminal integrability of that derivative rate constructs the exact critical integral and the compatible continuation carrier | source-specific composition of curl incidence, probability-Haar reconstruction, centered quotient transport, canonical Lipschitz control, and the completed BKM/Hodge restart owner | prove the canonical derivative rate interval-integrable through the maximal terminal time, or replace it by a weaker source rate whose terminal integral follows from the PDE |
 | `counterexample; formal-checked` | energy-to-derivative scale separation | `NavierStokesTerminalEnergySeparation.lean` constructs one exact Fourier occurrence at each axial frequency, proves its order-zero mass is always `1`, proves its order-two mass is exactly `(1+(2π)²n²)²`, and separates every proposed scalar order-zero-to-order-two bound by an Archimedean choice of `n` | exact singleton `ℓ²` population, Sobolev weight, Stokes eigenvalue, and complete `tsum` receiver | kinetic energy alone cannot reconstruct the derivative-bearing scale population; the terminal deed must retain viscosity/dissipation, direction transport, or another scale-sensitive constitutive return |
+| `proved-derived; formal-checked` | translation difference factors through physical vorticity dissipation | `NavierStokesTranslationDissipation.lean` proves `Σ_i ‖(χ_k(d)-1)ω̂_i(k)‖²_{ℓ²_k} ≤ 3‖d‖² D_ω(t)`: the actual vorticity components enter the complete H¹ coefficient carrier, the Stokes-weighted coefficient sum is identified exactly by Parseval with `periodicVorticityDissipation`, and the translated character difference is controlled through its derivative rather than a global Lipschitz supremum | source-specific composition of exact torus-character differentiation, three-coordinate frequency geometry, smooth-slice Parseval, genuine vorticity descent, and the physical enstrophy-dissipation receiver | insert this L² difference carrier before the reciprocal direction/Hodge collapse and prove the resulting stretching work can be absorbed by the viscous term or controlled by an integrable lower-order coefficient |
 | `counterexample; formal-checked` | interior continuity versus terminal integrability | `strictInteriorContinuousNonnegative_not_sufficient_for_terminalIntegrability` exhibits the nonnegative population `‖(t-1)⁻¹‖`, continuous on `(0,1)` but not interval-integrable on `[0,1]` | Mathlib's exact inverse nonintegrability theorem composed with the norm receiver | any terminal continuation argument must exclude this pole class by a source-specific PDE estimate; no continuity-only promotion is lawful |
 | `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
@@ -209,8 +210,11 @@ The remaining local-to-global edge is a PDE estimate excluding terminal concentr
 canonical derivative rate, or a weaker direction-only source rate whose terminal receiver already
 composes with continuation.  The exact single-frequency separator proves that kinetic energy by
 itself cannot supply this scale-sensitive return: its order-zero reading stays `1` while the
-order-two population escapes every uniform scalar factor.  The next estimate must retain viscous
-dissipation, oriented direction transport, or another receiver which sees frequency scale.
+order-two population escapes every uniform scalar factor.  The new translation law now retains the
+missing scale face exactly: the complete actual vorticity translation difference is bounded by
+`3‖d‖²` times the physical vorticity dissipation.  The next estimate must carry this L² difference
+through the reciprocal direction/Hodge stretching receiver without replacing it by a uniform
+derivative norm.
 
 ## 8. Yang--Mills and mass gap
 

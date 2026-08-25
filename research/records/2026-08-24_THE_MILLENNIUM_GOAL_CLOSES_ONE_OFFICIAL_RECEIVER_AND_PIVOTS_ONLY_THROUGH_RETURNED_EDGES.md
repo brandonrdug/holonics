@@ -1284,6 +1284,71 @@ coefficient.
 All nine printed audits depend only on propositional extensionality, classical choice, and quotient
 soundness, with no `sorryAx`.
 
+## Thirty-second returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesTranslationDissipation.lean` retains the spatial difference which the former source
+modulus collapsed to a global Lipschitz scalar.  For one Fourier character and one exact spatial
+displacement `d`, the mean-value passage and the three-coordinate frequency identity prove
+
+```text
+norm(character(k,d) - 1)^2 <= 3 * norm(d)^2 * stokesEigenvalue(k).
+```
+
+Multiplying by one coefficient and summing the complete frequency population gives, for every
+order-one Sobolev coefficient carrier,
+
+```text
+translationDifferenceMass(coeff,d)
+  <= 3 * norm(d)^2 * stokesDissipationMass(coeff).
+```
+
+This is an exact `tsum` theorem.  It uses no cutoff, asymptotic estimate, rounded constant, mode
+count, global derivative supremum, or order-zero energy reconstruction.
+
+[proved-derived; formal-checked]
+The same owner then attaches the abstract coefficient law to the actual solution.  Joint
+strict-interior vorticity smoothness is restricted to one spatial slice; each of its three scalar
+components enters the genuine torus Fourier `H^1` carrier; and coefficientwise the returned scalar
+is exactly the matching component of `openPeriodicVorticityFourierMode`.  Smooth-slice Parseval and
+the metric-gradient coordinate identity prove
+
+```text
+sum_component stokesDissipationMass(actualVorticityComponent(t))
+  = periodicVorticityDissipation(velocity,t).
+```
+
+Consequently the source-specific constitutive return is
+
+```text
+sum_component translationDifferenceMass(actualVorticityComponent(t),d)
+  <= 3 * norm(d)^2 * periodicVorticityDissipation(velocity,t).
+```
+
+The coefficient on the right is the literal physical gradient-square population already present
+with sign `-nu` in the enstrophy identity.  Thus the difference/current intuition has returned a
+PDE-facing law: translation action factors through viscosity scale, while the earlier
+single-frequency counterexample proves it cannot factor through kinetic energy alone.
+
+[interpretation]
+At the holonic receiver, `character(k,d)-1` is the signed residue of one translation word, its
+frequency address records how much action the word carries, and Parseval rebases the complete
+coefficient ledger into physical current.  The useful content is the commuting exact diagram; no
+identification of Fourier analysis with circuitry, gravity, or a finite Cayley graph is required by
+the proof.
+
+[open]
+This theorem does not by itself bound vortex stretching or inhabit the Clay alternative.  The
+immediate residual is now smaller and source-specific: preserve the L2 translation-difference
+population through the existing reciprocal direction/Hodge cancellation, and derive a stretching
+receiver that can be absorbed by `nu * periodicVorticityDissipation` or paid by an independently
+integrable lower-order coefficient.  Replacing the new population by the full vorticity Lipschitz
+constant would reopen the edge just closed.
+
+[proved-derived; formal-checked]
+All fourteen printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
