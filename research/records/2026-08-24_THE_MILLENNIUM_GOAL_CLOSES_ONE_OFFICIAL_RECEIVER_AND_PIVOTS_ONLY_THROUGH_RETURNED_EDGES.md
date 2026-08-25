@@ -1169,6 +1169,78 @@ additional low-order/enstrophy population required by that comparison, or derive
 terminal estimate which makes the canonical coefficient integrable through `T`.  If neither
 comparison factors, the returned defect determines the next lawful direction-only modulus.
 
+## Thirtieth returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesVorticityCanonicalCriticalBridge.lean` closes that comparison without retaining an
+additional anchor.  The actual Fourier law already proved for every admitted periodic solution is
+
+```text
+vorticityMode(k) = 2*pi*i * (k cross velocityMode(k)).
+```
+
+At `k = 0` its right side is exactly zero.  The new owner identifies this coefficient with the
+probability-Haar integral of the descended complex vorticity slice, transports the equality
+coordinatewise through Bochner integration, and returns zero Haar mean in the original real
+Euclidean vorticity carrier.  The missing fixed mode is therefore removed by the source curl law,
+not by an arbitrary normalization hypothesis.
+
+[proved-derived; formal-checked]
+For arbitrary torus occurrences `q` and `y`, set the source chart to the centered representative of
+`q` and the addressed displacement to the centered representative of `y-q`.  The displacement has
+norm at most `3/2`; the source has norm at most `3/2`; and their sum has norm at most `3`.  Both
+endpoints therefore lie in the canonical radius-three derivative chart, while their quotient
+projections are exactly `q` and `y`.  The canonical Lipschitz law gives
+
+```text
+norm(omega(t,q) - omega(t,y))
+  <= (3/2) * canonicalVorticityDerivativeRate(t).
+```
+
+Probability-Haar reconstruction then uses the proved zero mean to write
+
+```text
+omega(t,q) = integral_y (omega(t,q) - omega(t,y)),
+```
+
+so the same bound holds pointwise and on the complete torus sup receiver:
+
+```text
+criticalVorticityRate(t)
+  <= (3/2) * canonicalVorticityDerivativeRate(t).
+```
+
+No rounding, asymptotic comparison, norm-equivalence placeholder, selected anchor, or assumed
+Poincare inequality occurs in this passage.
+
+[proved-derived; formal-checked]
+The canonical derivative rate is totalized by zero outside `(0,T)`.  If this one explicit source
+population is interval-integrable on `[0,T]`, the new theorem constructs the actual critical
+vorticity integral consumed by the completed BKM/Hodge passage, and the final constructor returns
+`CompatibleOpenPeriodicExtension solution` for positive viscosity.  The former anchored majorant
+remains as an audited intermediate factorization, but it is no longer the strongest route.
+
+[interpretation]
+The supplied Rubik/Cayley references exposed the exact finite-action analogue of this proof.  A
+Cayley diameter bounds every state by anchor plus word radius times one-generator cost, while a
+difference receiver cannot see a globally fixed mode.  Here the centered torus displacement is the
+continuous action word, `3/2` is its exact receiver radius, and the curl zero-mode theorem kills the
+fixed population.  This analogy led to a source theorem; the formal result itself depends only on
+the typed periodic curl, Haar, quotient, and derivative owners.
+
+[proved-derived; formal-checked]
+All twenty printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.  Focused checking, the named module build, and the complete
+umbrella receipt are recorded with the coherent commit below.
+
+[open]
+The next Navier--Stokes edge is now exactly terminal integrability of the canonical vorticity
+derivative rate.  The source-to-critical comparison, low mode, spatial quotient transport, and
+restart consumer are closed.  A lawful next deed must derive this terminal integral from the PDE
+or construct a weaker source rate which still majorizes the critical receiver and whose terminal
+integrability follows from a proved energy, viscosity, direction-coherence, or other constitutive
+law.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
