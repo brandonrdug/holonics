@@ -32,23 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after constructing the complete
-absolutely summable two-point coherence carrier and eliminating its finite Fourier aperture, the
-station contains:
+[established-bounded; measured] On the 2026-08-25 source closure after transporting the dyadic
+Hodge strain into an exact spatial-kernel direction-cancellation carrier, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 453 |
-| theorem or lemma declarations | 5,791 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,226 |
-| modules below `ElementaryHolonics/Millennium/` | 407 |
-| theorem or lemma declarations below `Millennium/` | 5,399 |
-| broad declarations below `Millennium/` | 7,571 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,470 |
+| Lean modules below `ElementaryHolonics/` | 454 |
+| theorem or lemma declarations | 5,810 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,254 |
+| modules below `ElementaryHolonics/Millennium/` | 408 |
+| theorem or lemma declarations below `Millennium/` | 5,418 |
+| broad declarations below `Millennium/` | 7,599 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,485 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 407 Millennium modules.  Search prefixes
-inside the Millennium band include 194 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 408 Millennium modules.  Search prefixes
+inside the Millennium band include 195 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -168,6 +167,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | geometric cross-difference reconstruction | `NavierStokesVorticityDirectionCrossReconstruction.lean` proves the receiver/source cross annihilates exactly the aligned projection face, reconstructs the complete canonical orthogonal remainder by the vector triple product on every nonzero real receiver chart, proves cross vanishing iff remainder vanishing, and transports the full physical stretching estimate through the finite addressed cross-direction mass; zero-vorticity points close separately without an inverse | source-specific composition of the swing-derived cross owner, canonical projection, exact vector triple product, physical stretching bridge, and Fourier-tail reconstruction | identify the cross population as Fourier transport of the two-point spatial vorticity-direction difference, then prove the required spatial/scale/time coherence return rather than estimating it by coefficient count |
 | `proved-derived; formal-checked` | two-point coherence Fourier carrier | `NavierStokesVorticityDirectionCoherenceFourier.lean` bundles fixed-receiver cross as a complex continuous-linear map, proves it commutes with the genuine-torus Bochner Fourier integral, identifies every actual cross coefficient with the coefficient of `y ↦ omega(x) × omega(y)`, proves character transport preserves the exact `L¹` mass, and rewrites the complete physical stretching inequality through that literal coherence-field coefficient population | exact quotient/Fourier composition of actual torus vorticity, continuous-linear cross transport, addressed character return, cross reconstruction, and physical strain | the coefficient interpretation is closed; construct a spatial norm/singular-kernel receiver for the coherence field and prove a uniform scale/time law strong enough for the enstrophy integral |
 | `proved-derived; formal-checked` | complete coherence summability and aperture removal | `NavierStokesVorticityDirectionCoherenceSummability.lean` proves the six addressed Jacobian entries majorize every curl coefficient, proves absolute summability of the complete vorticity and two-point cross populations, constructs their full `ℓ¹` masses, proves every finite aperture is bounded by the same full carrier, proves the fixed-receiver capacitance law `coherenceMass(x) ≤ |omega(x)|₁·vorticityCoefficientMass`, sends the explicit Jacobian reconstruction fibre to zero, and concludes a radius-free pointwise bound of physical vortex stretching by the complete coherence mass | exact composition of curl incidence, smooth-slice `H³` coefficient summability, continuous-linear cross/Fourier transport, finite-to-infinite `tsum` gluing, and the proved reciprocal tail scale | the spatial-scale aperture is closed; prove a terminal-time-uniform or space-time-integrable bound for this full coherence carrier, preferably through a geometric difference/Besov or singular-kernel receiver that composes with viscous direction-curvature dissipation |
+| `proved-derived; formal-checked` | physical-space dyadic direction cancellation | `NavierStokesVorticityDirectionKernelCancellation.lean` constructs the exact finite Fourier kernel of each dyadic symmetric Hodge band, identifies its convolution with the actual dyadic strain, proves that an independently varying source component aligned with the fixed receiver annihilates pointwise at every displacement, rewrites the band reading as the Bochner integral of the canonical receiver-relative remainder, and bounds it by both the kernel-weighted direction-remainder mass and its exact cross-coherence reconstruction | source-specific composition of the dyadic Hodge multiplier, torus-character transport, Bochner convolution, symmetric stretching receiver, canonical direction projection, and cross-product reconstruction | assemble these spatial dyadic returns through the complete Hodge scale word and prove a uniform or space-time-integrable geometric coherence law that couples to direction curvature and viscous dissipation |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
 
@@ -178,15 +178,13 @@ common returned constant is `72·72·4119133228099520072`, and the named large-s
 and uniform physical dyadic kernel carrier are inhabited without analytic hypotheses.
 
 [proved-derived; formal-checked] The magnitude-only alternative has been falsified, and the
-surviving fibre is now retained canonically through the complete Fourier receiver: symmetric Hodge
-strain factors through the receiver-orthogonal vorticity-direction remainder, the remainder is
-losslessly reconstructed from the oriented cross difference on the nonzero physical chart, the
-cross population is the actual Fourier chart of `y ↦ omega(x) × omega(y)`, and its complete
-absolute coefficient mass is summable.  Every finite frequency cube factors through that one mass,
-and the explicit reconstruction tail tends to zero, so the final physical stretching estimate is
-radius-free.  The remaining Navier--Stokes continuation fibre is no longer a Fourier gluing seam:
-it is a source-specific terminal-time estimate proving enough space-time integrability of the full
-coherence carrier to close the enstrophy/critical-vorticity return.
+surviving fibre is retained through two exact receivers.  The complete Fourier receiver proves
+absolute summability and removes the finite aperture.  The sharper spatial receiver reconstructs
+each dyadic strain band as a convolution, cancels the aligned source at every displacement before
+integration, and retains only the kernel-weighted direction difference or its lossless oriented
+cross reconstruction.  The next local-to-global edge is therefore the complete dyadic scale
+assembly followed by a source-specific terminal-time estimate proving enough space-time
+integrability of that geometric carrier to close the enstrophy/critical-vorticity return.
 
 ## 8. Yang--Mills and mass gap
 
