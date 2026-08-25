@@ -739,7 +739,7 @@ shifted successor window. `NavierStokesThreeAxisHodgeProductMass.lean` expands t
 annihilation leaves the exact `6 + 3 + 1` population, and their ten bounds use only the descended
 `112`, `122`, `22`, and `222` envelopes. `NavierStokesThreeAxisHodgeDyadicMass.lean` then proves
 orders `111`, `112`, `122`, and `222` scale respectively as `R^-5`, `R^-6`, `R^-7`, and `R^-8`,
-and the full mixed Hodge mass is at most `4000000000000000 / R^6` for every dyadic scale at least
+and the full mixed Hodge mass is at most `(4 * 10^15) / R^6` for every dyadic scale at least
 three. This is inverse cube in the quadratic frequency scale `q = |k|^2`; no independent active-face
 bound is an input and no promoted theorem contains `sorryAx`.
 
@@ -773,23 +773,48 @@ fluid-specific:
    receiver with its winding fibre retained.
 
 [definition] Navier--Stokes is therefore the first analytic specialization after HD0. Its ordered
-receiver now stands at item four:
+receiver now stands at the coefficient-mass return between items four and six:
 
 1. the returned low-scale `s=0,1,2` physical-kernel bound;
 2. the returned HD0/HD1/HD2 higher-difference and sparse reciprocal descent;
 3. the returned twenty-seven three-axis Leibniz faces and inverse-cube full mixed mass;
-4. all eight subset receivers: empty, three single axes, three axis pairs, and all three;
-5. the one-circle near/far Haar estimate and its coordinate-face tensorization around `z_i=1`;
-6. an explicit `UniformDyadicHodgeJacobianKernelBound`; and
-7. composition with the returned restart supply and terminal-half continuation theorem.
+4. the returned exact Abel identities for all eight subset receivers: empty, three single axes,
+   three axis pairs, and all three;
+5. the returned one-circle near/far Haar estimate and its coordinate-face tensorization around
+   `z_i=1`;
+6. a checked construction of `UniformDyadicHodgeJacobianKernelBound (804357 + 216 C)` from one
+   still-required uniform constant `C` for the eight large-scale coefficient masses; and
+7. the returned conditional composition of that constructed witness with the terminal-half
+   continuation theorem.
 
-[open] After HD2, triple finite Abel/Fubini is already checked, but Haar integration is not yet
-formalized.
-The top mixed difference alone cannot be divided globally by
-`∏_i |1-exp(2πix_i)|²`, because the reciprocal factors are singular. The eight subset bounds and
-near/far coordinate partition are therefore part of the theorem, not a technical afterthought. Once
-the uniform kernel witness returns, the remaining official Navier--Stokes obstruction is finiteness
-of the critical-vorticity time integral for arbitrary smooth periodic data.
+[proved-derived; formal-checked] `Foundation/CoordinateSubsetReceiver.lean` constructs the Boolean
+coordinate cube and proves the exact exponent balance. `Foundation/CoordinateHaarReceiver.lean`
+proves the totalized one-circle penalty has Haar integral at most `pi/2`, hence at most `2`, and its
+three-torus tensor product at most `8`. `NavierStokesDyadicHodgeSubsetReceivers.lean` supplies all
+eight exact Abel identities without dividing a singular character. The Haar specialization then
+proves that a common coefficient constant `C` bounds the twenty-seven-entry physical kernel by
+`216 C`, and joins this with the exact low-scale constant `804357`.
+
+[proved-derived; formal-checked] The apparent six-step danger in the full `2 x 2 x 2` word has also
+been closed. `NavierStokesThreeAxisDyadicHodgeSupportStencil.lean` proves that the coordinate which
+witnesses departure from the inner cube moves by at most two, because the three axes remain typed.
+The complete complementary Hodge stencil therefore retains the existing `(2^s-3)^2` lower
+denominator; replacing the addressed word by an untyped path length would have lost this bound.
+
+[open] The exact remaining coefficient-side return is an inhabitant of
+`UniformLargeScaleDyadicHodgeSubsetMassReturn C`. The undifferenced, one-axis, two-axis, and
+three-axis populations must be joined in one zero-padded finite theorem with scales
+`R^3`, `R`, `R^-1`, and `R^-3`. The empty face already has the checked `512 R^3` ingredients and
+the addressed pair `{0,1}` already has checked mass `(34 * 10^12)/R`; their six companion faces
+still require a common three-coordinate padded/reindex owner rather than an unproved coordinate
+permutation. The checked `(1,1,1)` Hodge envelope supplies the first genuinely three-axis face;
+exact `(1,1,2)` and `(1,2,2)` allocation ledgers now scale as
+`(46 * 10^9)/R^4` and `(12 * 10^12)/R^5`, while their pointwise Hodge identities and finite Fubini
+assembly remain to be returned. Their current arithmetic gives `42 * 10^17` as a coarse candidate
+common magnitude, not yet as a theorem. No singular character factor may be divided. After this
+coefficient witness and the already named restart passage are supplied, finiteness of the
+critical-vorticity time integral for arbitrary smooth periodic data remains the official
+global-regularity obstruction.
 
 [definition] The same positive-form obstruction becomes the next squeeze into the other Millennium
 lines. Hodge requires chart-glued `d/partial` and positive primitive storage; Yang--Mills requires a
@@ -959,8 +984,15 @@ twenty-seven-face Hodge product law, the ten-face quadratic annihilator reductio
 dyadic inverse-cube mixed-mass theorem. The return is recorded in
 [`../research/records/2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md`](../research/records/2026-08-24_THE_HD2_SCALE_DESCENT_RETURNED_THE_TWENTY_SEVEN_HODGE_FACES_AND_THE_INVERSE_CUBE_MIXED_MASS.md).
 
-[open] The exact next fluid receiver is the uniform physical Navier--Stokes Hodge-kernel witness
-through all eight subset Haar receivers at scales at least three. The other
+[proved-derived; formal-checked] The coordinate-subset/Haar station returned the complete Boolean
+receiver, the normalized one-circle and three-torus penalty integrals, all eight exact direct Hodge
+Abel identities, the conditional `804357 + 216 C` uniform physical-kernel witness, its continuation
+composition, and the coordinatewise three-axis support-pin theorem. The exact power ledger and the
+remaining coefficient-mass interface are recorded in
+[`../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md`](../research/records/2026-08-24_THE_BOOLEAN_POWER_LEDGER_TENSORIZED_HAAR_AND_REDUCED_THE_UNIFORM_HODGE_KERNEL_TO_THREE_AXIS_MASSES.md).
+
+[open] The exact next fluid receiver is the uniform large-scale coefficient-mass return behind the
+eight already constructed subset Haar receivers. The other
 remaining I9 returns are the transported-capacitance block/Kron theorem, the complete cubical torus
 exterior complex, exact source-lifted receiver interaction populations, and the thermo-electro-
 optical and dynamical-metric constitutive specializations.  These are receiver families of the
