@@ -32,23 +32,23 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 physical translation-to-dissipation closure after
-returning the complete Fourier difference population to the spatial torus receiver, the
+[established-bounded; measured] On the 2026-08-25 absorbed Hodge-to-enstrophy closure after finite
+dyadic gluing, reconstruction-fibre removal, and transport to the signed physical receiver, the
 station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 469 |
-| theorem or lemma declarations | 5,984 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,478 |
-| modules below `ElementaryHolonics/Millennium/` | 422 |
-| theorem or lemma declarations below `Millennium/` | 5,586 |
-| broad declarations below `Millennium/` | 7,816 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,636 |
+| Lean modules below `ElementaryHolonics/` | 470 |
+| theorem or lemma declarations | 5,997 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,499 |
+| modules below `ElementaryHolonics/Millennium/` | 423 |
+| theorem or lemma declarations below `Millennium/` | 5,599 |
+| broad declarations below `Millennium/` | 7,837 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,649 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 422 Millennium modules.  Search prefixes
-inside the Millennium band include 209 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 423 Millennium modules.  Search prefixes
+inside the Millennium band include 210 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -183,6 +183,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | translation difference factors through physical vorticity dissipation | `NavierStokesTranslationDissipation.lean` proves `Σ_i ‖(χ_k(d)-1)ω̂_i(k)‖²_{ℓ²_k} ≤ 3‖d‖² D_ω(t)`: the actual vorticity components enter the complete H¹ coefficient carrier, the Stokes-weighted coefficient sum is identified exactly by Parseval with `periodicVorticityDissipation`, and the translated character difference is controlled through its derivative rather than a global Lipschitz supremum | source-specific composition of exact torus-character differentiation, three-coordinate frequency geometry, smooth-slice Parseval, genuine vorticity descent, and the physical enstrophy-dissipation receiver | insert this L² difference carrier before the reciprocal direction/Hodge collapse and prove the resulting stretching work can be absorbed by the viscous term or controlled by an integrable lower-order coefficient |
 | `proved-derived; formal-checked` | physical translation current reconstructed from dissipation | `NavierStokesPhysicalTranslationDissipation.lean` proves translation acts diagonally on the genuine torus Fourier receiver, uses Parseval and the real/complex component chart to identify the complete coefficient mass with `∫|ω(q+y)-ω(q)|²dq`, and returns the centered bound `≤ 27 dist(y,0)² D_ω(t)` | source-specific composition of Haar translation invariance, torus characters, complete Fourier reconstruction, Euclidean component geometry, the centered quotient representative, and the preceding dissipation law | compose this physical `L²` difference current with aligned Hodge-kernel cancellation; the expected remaining receiver is a spatial fourth-power vorticity population or a sharper oriented replacement, not the discarded global Lipschitz scalar |
 | `proved-derived; formal-checked` | dissipation enters the complete dyadic Hodge interaction | `NavierStokesDissipationHodgeInteraction.lean` inserts `ω(q-y)-ω(q)` by exact aligned cancellation, bounds the actual absolute kernel-reading population at every scale, glues it through the summable first-distance Hodge moment, and for every `ε>0` proves `Σ_s∫_y∫_q |H_s(y;ω(q),ω(q-y))| ≤ 27 M₁(27D_ω+ε²‖ω‖₄⁴)/(2ε)`; the explicit positive choice `ε=1+729M₁/ν` absorbs the dissipation branch by `(ν/2)D_ω` | source-specific composition of the physical translation current, parameterized Young square completion, exact aligned Hodge cancellation, real/complex coordinate comparison, nonnegative `tsum` gluing, and the complete first-distance kernel moment | attach this integrated high-frequency population and the already energy-paid scale-zero face to the signed physical enstrophy identity; the exposed nonlinear remainder is the exact spatial `L⁴` vorticity mass |
+| `proved-derived; formal-checked` | absorbed Hodge interaction enters the signed enstrophy receiver | `NavierStokesDissipationHodgeEnstrophy.lean` integrates the exact finite dyadic word, pays the scale-zero strain by `26244π√(2E)·Enstrophy`, sends the addressed Fourier reconstruction fibre to zero, transports absolute torus stretching through the unit-cube chart to the signed physical vortex-stretching term, and proves `EnstrophyRate ≤ -(ν/2)D_ω + 26244π√(2E)·Enstrophy + C(ν,M₁)‖ω‖₄⁴ + CurlForcingWork` | exact finite reconstruction/gluing, Fubini at each addressed band, compact torus integration, weighted-`H³` tail decay, Haar/cube chart transport, and the periodic enstrophy identity | derive a source-specific time law for the exact spatial `L⁴` population, sharpen it through another oriented difference/scale receiver, or prove that the presently conserved energy and integrated dissipation receivers are insufficient |
 | `counterexample; formal-checked` | interior continuity versus terminal integrability | `strictInteriorContinuousNonnegative_not_sufficient_for_terminalIntegrability` exhibits the nonnegative population `‖(t-1)⁻¹‖`, continuous on `(0,1)` but not interval-integrable on `[0,1]` | Mathlib's exact inverse nonintegrability theorem composed with the norm receiver | any terminal continuation argument must exclude this pole class by a source-specific PDE estimate; no continuity-only promotion is lawful |
 | `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
@@ -643,24 +644,19 @@ official passage, when a counterexample proves the present receiver insufficient
 dependency audit identifies a strictly shorter open fibre.  A catalog rewrite, a new analogy, a
 conditional wrapper which merely renames its conclusion, or a numerical fit returns no such edge.
 
-[proved-derived; formal-checked] The Navier--Stokes sequence has now crossed all of the spatial
-owners which originally separated the physical source from the enstrophy receiver: complete
-three-axis allocation, all eight Boolean faces, uniform Hodge-kernel control, non-circular
-scale-zero energy, distance-weighted kernel summability, the actual source distance modulus,
-reciprocal direction cancellation, and unit-cube integration.  The latest returned theorem is the
-anchor-free critical-receiver bound: the zero curl mode and centered Haar transport prove the
-critical vorticity rate at most `3/2` times the canonical compact derivative-chart norm.  If that
-one rate is interval-integrable through the terminal time, Lean now constructs the compatible
-periodic continuation immediately.  It does not yet inhabit a Clay alternative: the terminal-pole
-counterexample proves that strict-interior continuity alone does not supply this maximal-time
-integral.
+[proved-derived; formal-checked] The Navier--Stokes sequence now carries the physical translation
+difference through aligned Hodge cancellation, every dyadic scale, the vanishing reconstruction
+fibre, the unit-cube chart, and the signed enstrophy identity.  Positive viscosity absorbs one half
+of the actual vorticity dissipation.  The exact remaining nonlinear receiver is the spatial
+fourth-power vorticity population, beside the kinetic-energy/enstrophy base and forcing work.  This
+does not yet inhabit a Clay alternative: neither strict-interior smoothness nor the currently
+conserved energy receiver supplies the required maximal-time `L⁴` law.
 
-1. **Navier--Stokes:** derive a terminal PDE estimate for the canonical vorticity-derivative rate.
-   Its transport into the existing critical-vorticity continuation receiver is now complete and
-   anchor-free.  A weaker direction-only source rate is a lawful pivot only if it still majorizes
-   the critical receiver and its terminal integral follows from a proved constitutive law.  The
-   single-frequency separation has removed an energy-only scalar bound from the admissible routes;
-   viscosity/dissipation or oriented scale transport must remain in the next carrier.
+1. **Navier--Stokes:** close or refute the exact spatial `L⁴` receiver now exposed in the signed
+   enstrophy inequality.  A valid closure must derive its time law from the PDE, viscosity,
+   dissipation, and retained scale transport; an energy/enstrophy-only claim must survive a
+   source-specific concentration test.  If it fails, return the insufficiency pair and use the
+   separating scale face to construct the sharper oriented receiver.
 2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
    ternary coefficient and analytic theta lineages.
 3. **Hodge:** construct an official surface realization and transport the quotient difference and

@@ -1490,6 +1490,67 @@ it by another oriented difference passage, or return a source-specific insuffici
 All fifteen printed audits depend only on propositional extensionality, classical choice, and
 quotient soundness, with no `sorryAx`.
 
+## Thirty-fifth returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesDissipationHodgeEnstrophy.lean` closes the finite-to-infinite gluing seam between the
+absorbed all-scale Hodge interaction and the actual signed enstrophy receiver.  At every finite
+depth the full physical strain is reconstructed as the fixed dyadic base, the ordered raw Hodge
+bands, and the addressed Fourier reconstruction fibre.  The proof integrates this exact word
+before taking the limit: Fubini identifies each raw band with the previously controlled global
+interaction mass, the weighted-`H³` tail estimate sends the reconstruction fibre to zero, and
+summability sends the finite band word to its complete `tsum`.
+
+[proved-derived; formal-checked]
+The scale-zero term is not silently discarded.  Componentwise complexification costs at most
+three Euclidean norms, so its coordinate-`L¹` square population is at most eighteen times periodic
+enstrophy.  Composed with the existing low-pass kinetic-energy return, the integrated base obeys
+
+```text
+baseStrainTorusMass
+  <= 26244*pi*sqrt(2*periodicKineticEnergy)*periodicEnstrophy.
+```
+
+The unit-cube/Haar chart then transports the absolute torus population to the literal signed
+`periodicVortexStretching` occurrence.  For every positive viscosity, the complete physical return
+is
+
+```text
+periodicVortexStretching
+  <= 26244*pi*sqrt(2*E)*Enstrophy
+     + (nu/2)*periodicVorticityDissipation
+     + (27*M1*hodgeDissipationAbsorptionParameter(nu)/2)
+         * openPeriodicVorticityFourthPowerMass.
+```
+
+[proved-derived; formal-checked]
+Substitution into the exact periodic enstrophy identity preserves the negative orientation of the
+viscous current and returns
+
+```text
+periodicEnstrophyRate
+  <= -(nu/2)*periodicVorticityDissipation
+     + 26244*pi*sqrt(2*E)*Enstrophy
+     + (27*M1*hodgeDissipationAbsorptionParameter(nu)/2)
+         * openPeriodicVorticityFourthPowerMass
+     + periodicCurlForcingWork.
+```
+
+No pointwise infinite-sum interchange, Fourier cutoff, asymptotic estimate, numerical rounding,
+global vorticity Lipschitz coefficient, or hidden reconstruction fibre occurs in this passage.
+
+[open]
+The remaining analytic face is now exact: the spatial `L⁴` vorticity population.  The next deed
+must either derive a source-specific maximal-time law for that population, sharpen it through a
+further oriented difference/scale passage, or construct a concentration family proving that the
+currently conserved energy and integrated dissipation receivers cannot determine it.  Such a
+counterexample would not refute Navier--Stokes regularity; it would refute only this proposed
+receiver factorization and identify the scale address that the next carrier must retain.
+
+[proved-derived; formal-checked]
+All thirteen printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
