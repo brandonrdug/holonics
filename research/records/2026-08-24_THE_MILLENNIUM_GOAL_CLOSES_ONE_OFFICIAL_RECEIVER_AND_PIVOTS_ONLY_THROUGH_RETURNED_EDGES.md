@@ -1409,6 +1409,87 @@ viscosity or be shown terminal-time integrable before it can inhabit the continu
 All eight printed audits depend only on propositional extensionality, classical choice, and
 quotient soundness, with no `sorryAx`.
 
+## Thirty-fourth returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesDissipationHodgeInteraction.lean` composes the physical translation current with the
+actual Hodge interaction before any pointwise supremum collapse. For one displacement `y`, define
+the complete physical product population
+
+```text
+I(y) = integral_q norm(omega(q+y)-omega(q)) * norm(omega(q))^2.
+```
+
+For every positive receiver parameter `epsilon`, exact square completion, rather than a rounded
+estimate, gives
+
+```text
+I(y)
+  <= dist(y,0) *
+       (27*periodicVorticityDissipation
+         + epsilon^2*integral_q norm(omega(q))^4)
+       / (2*epsilon).
+```
+
+The factor `27` is inherited from the checked centered torus translation theorem. The parameter is
+retained because its two orientations have distinct later consequences: one branch is eligible for
+viscous absorption and the other records the fourth-power reconstruction remainder.
+
+[proved-derived; formal-checked]
+The source inserted into each dyadic Hodge kernel is not an analogy or a replacement field. Exact
+aligned cancellation proves that the genuine reading at source `omega(q-y)` equals the reading at
+source `omega(q-y)-omega(q)`. The real-to-complex coordinate chart then costs exactly
+`3 * 3^2 = 27`, so the actual absolute kernel population at one scale is bounded by the
+kernel-weighted physical interaction above.
+
+[proved-derived; formal-checked]
+The previously constructed first-distance Hodge moment is summable over every dyadic scale. The
+new file consequently returns the complete infinite-scale constitutive law
+
+```text
+sum_scale integral_y integral_q
+  norm(HodgeStretchingKernelReading(scale,y,omega(q),omega(q-y)))
+  <= 27 * totalDyadicHodgeDistanceMoment *
+       (27*periodicVorticityDissipation
+         + epsilon^2*openPeriodicVorticityFourthPowerMass)
+       / (2*epsilon).
+```
+
+This theorem retains the actual source, displacement, receiver, Hodge kernel, scale address, and
+complete nonnegative occurrence population. It uses no Fourier cutoff, global derivative
+supremum, direction reciprocal, sampled chart, asymptotic notation, or numerical rounding.
+
+[proved-derived; formal-checked]
+For positive viscosity, the explicit exact chart
+
+```text
+epsilon = 1 + 729*totalDyadicHodgeDistanceMoment/nu
+```
+
+is positive even if the moment population vanishes and proves that the all-scale dissipation
+coefficient is at most `nu/2`. Hence
+
+```text
+completeDyadicHodgeStretchingMass
+  <= (nu/2)*periodicVorticityDissipation
+     + (27*totalMoment*epsilon/2)*openPeriodicVorticityFourthPowerMass.
+```
+
+The high-frequency difference current can therefore be absorbed by physical viscosity while
+returning one exact nonlinear remainder.
+
+[open]
+The immediate edge is no longer a vague direction-coherence coefficient. It is the attachment of
+this integrated high-frequency absolute population, together with the already energy-paid
+scale-zero standing, to the signed physical vortex-stretching term in the enstrophy identity. Once
+that gluing is explicit, the remaining analytic receiver is exactly the spatial `L^4` vorticity
+mass: either control its time integral from the presently conserved/dissipated populations, refine
+it by another oriented difference passage, or return a source-specific insufficiency witness.
+
+[proved-derived; formal-checked]
+All fifteen printed audits depend only on propositional extensionality, classical choice, and
+quotient soundness, with no `sorryAx`.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
