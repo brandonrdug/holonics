@@ -9,6 +9,11 @@ name = "m6_lean_causal_return"
 root = "M6CausalReturn"
 supportInterpreter = true
 
+[[lean_exe]]
+name = "derivation_atlas"
+root = "DerivationAtlas"
+supportInterpreter = true
+
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"

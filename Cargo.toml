@@ -29,6 +29,7 @@ members = [
   "soma/life",
   "soma/mount",
   "soma/tools/record-index",
+  "soma/tools/derivation-atlas",
   "soma/tools/standing-deposit",
   "soma/tools/holon-plate",
 ]
