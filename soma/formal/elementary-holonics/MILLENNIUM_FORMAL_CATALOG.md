@@ -32,22 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after the full-coordinate
-twenty-seven-face mass return, the station contains:
+[established-bounded; measured] On the 2026-08-25 source closure after the complete eight-face
+dyadic Hodge return, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 441 |
-| theorem or lemma declarations | 5,662 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,058 |
-| modules below `ElementaryHolonics/Millennium/` | 395 |
-| theorem or lemma declarations below `Millennium/` | 5,270 |
-| broad declarations below `Millennium/` | 7,403 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,366 |
+| Lean modules below `ElementaryHolonics/` | 442 |
+| theorem or lemma declarations | 5,697 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,094 |
+| modules below `ElementaryHolonics/Millennium/` | 396 |
+| theorem or lemma declarations below `Millennium/` | 5,305 |
+| broad declarations below `Millennium/` | 7,439 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,388 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 395 Millennium modules.  Search prefixes
-inside the Millennium band include 182 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 396 Millennium modules.  Search prefixes
+inside the Millennium band include 183 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -144,9 +144,9 @@ the same object rather than compared by prose.
 | `definition` | official boundary | `NavierStokes.lean`: three-dimensional fields, derivatives, viscosity, pressure, forcing, decay/periodicity, energy, and the four Clay alternatives | local pose checked against the external statement geometry | no Clay alternative is proved by the pose |
 | `proved-derived; formal-checked` | exact fluid calculus | periodic energy/enstrophy/flux, curl and vorticity, Kelvin/moving-loop/material-polygon laws, Hodge/Leray projectors, Fourier triads, heat transport, Duhamel returns, scaling, and overlap uniqueness across the `NavierStokes*` family | project-specific composition of Mathlib analysis, measure, Fourier, and finite combinatorics | each theorem retains its declared regularity, periodic, finite-frequency, or conditional aperture |
 | `conditional; formal-checked` | continuation | `NavierStokesCriticalContinuation.lean` and the weighted path/reconstruction tower return compatible continuation from named high-order, integrability, restart, and reconstruction hypotheses | local conditional derivation | the hypotheses are not hidden global-regularity proofs |
-| `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from a uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | `UniformLargeScaleDyadicHodgeSubsetMassReturn constant` is uninhabited |
+| `proved-derived; formal-checked` | dyadic Hodge faces | exact zero-padded second differences, all eight Boolean coordinate-face Abel identities, Haar penalties, low-scale bounds, and the composition from the now-inhabited uniform subset-mass return to a physical kernel bound and continuation | project-specific composition | the coefficient interface is closed; downstream continuation still retains critical-vorticity integrability and terminal restart supply |
 | `proved-derived; formal-checked` | anisotropic Hodge product words | the `(1,1,2)` and `(1,2,2)` differences equal their complete 16/32-occurrence ledgers and exact 12/18-face binomial returns; occurrence sums equal the commuting returns, and genuine Hodge entries instantiate both identities | local derivation from the addressed higher-difference owner | prove the Hodge-specific pointwise norm bounds and finite mass assembly |
-| `proved-derived; formal-checked` | full three-axis coefficient passage | `NavierStokesDyadicHodgeThreeAxisAllocation.lean` constructs the complete three-axis backward-padded chart, proves all six aperture flanks reconstruct the finite cube, carries each coordinate difference through the chart, identifies the actual full zero-padded coefficient with the `64 -> 27` allocation return, and identifies the official full-coordinate subset mass with its finite norm population | source-specific composition of the direct dyadic coefficient, zero-extension, higher-difference, and subset-receiver owners | bound the finite allocation-return mass uniformly by the full-face radial scale and repeat the bounded composition on the other seven Boolean faces |
+| `proved-derived; formal-checked` | full three-axis coefficient passage | `NavierStokesDyadicHodgeThreeAxisAllocation.lean` constructs the complete three-axis backward-padded chart, proves all six aperture flanks reconstruct the finite cube, carries each coordinate difference through the chart, identifies the actual full zero-padded coefficient with the `64 -> 27` allocation return, and identifies the official full-coordinate subset mass with its finite norm population | source-specific composition of the direct dyadic coefficient, zero-extension, higher-difference, and subset-receiver owners | closed through the exact full-mass and Boolean-reconstruction owners below |
 | `proved-derived; formal-checked` | all scalar allocation charts | `NavierStokesDyadicHodgeThreeAxisScalarChart.lean` proves the direct scalar band equals its triple delayed finite cube on the complete padded lattice, proves arbitrary-order chart naturality, and identifies every admitted `(a,b,c) in {0,1,2}^3` global face at its complementary shift with the existing natural tensor variation | source-specific reconstruction from the scalar band, delayed zero extension, natural forward transport, and tensor separation | compose each scalar face with its addressed complementary Hodge-entry bound |
 | `proved-derived; formal-checked` | zero-scalar / full-Hodge corner | `NavierStokesDyadicHodgeThreeAxisCornerMass.lean` identifies the actual `(0,0,0)` allocation face with its global product chart, removes all three pairs of left aperture residues exactly, obtains the complete `222` Hodge stencil from a nonzero scalar pin, and proves its global mass is at most `4096000000000000000 / R^3` for every scale at least three | source-specific composition of scalar support, controlled Hodge scale descent, tensor Fubini mass, and exact three-axis reindexing | transport the same proof through the remaining 26 allocation addresses, using axis-addressed variants for the permuted `112` and `122` complements |
 | `proved-derived; formal-checked` | scalar-third-order-two allocation slab | `NavierStokesDyadicHodgeThreeAxisThirdTwoSlice.lean` descends the complementary third-order-zero Hodge stencil to the genuine first/second two-axis stencil, bounds all nine natural product faces, retains their exact binomial weights, and proves the complete actual slab mass is at most `12416369280072 / R^3` at every scale at least three | source-specific composition of the all-orders scalar chart, controlled support, two-axis pointwise Hodge bounds, tensor Fubini mass, and exact weighted allocation faces | the other coordinate slabs are now closed by the generic axis-addressed owner; compose the `111` face and derive the six residual `112`/`122` pointwise laws |
@@ -155,25 +155,21 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | strict `112`/`122` Hodge-entry descent | `NavierStokesHodgeEntryScaleDescent.lean` proves a quotient recurrence for every right section whose denominator product is annihilated, proves that every axis-addressed `112` and `122` word annihilates the genuine quadratic Hodge numerator, condenses their complete product ledgers to five and seven translated predecessor occurrences, and derives pointwise Hodge-entry bounds for all six permutations with exact dyadic envelopes `34505600000 / R^4` and `7483641600000 / R^5` | source-specific composition of the addressed product rule, quadratic numerator annihilation, controlled-stencil rebase, lower-order Hodge-entry laws, and exact dyadic aperture descent | compose the six pointwise laws with their complementary scalar faces and reindex every natural face mass into the common official allocation population |
 | `proved-derived; formal-checked` | six residual masses and 27-face common-chart gluing | `NavierStokesDyadicHodgeThreeAxisResidualFaces.lean` composes all three `110/112` and all three `100/122` faces, proves their exact weighted six-face mass `23095748198400000 / R^3`, proves coordinatewise vanishing before every complementary offset, and consequently reindexes every one of the 27 actual weighted face masses exactly from the common doubly padded population to its natural translated population | source-specific composition of strict Hodge-entry descent, scalar support causation, tensor Fubini mass, exact occurrence weights, and complete prefix-fibre elimination | apply the 27-face triangle inequality on the common population, sum the already proved face constants without overlap, and transport that return to the official full-coordinate subset mass |
 | `proved-derived; formal-checked` | complete full-coordinate mass | `NavierStokesDyadicHodgeThreeAxisFullMass.lean` proves the staged `3 × 9` return equals the complete addressed 27-face sum, proves the norm and six-axis finite Fubini passages, assigns every face its exact integer numerator, proves their sum is `4119133228099520072`, and transports the resulting inverse-cubic bound to the official `univ` subset receiver for every scale at least three | source-specific composition of exact Leibniz reconstruction, address-retaining triangle inequality, proved common-chart gluing, all 27 face bounds, and exact finite arithmetic | construct the other seven Boolean subset receiver bounds and assemble one common constant for `UniformLargeScaleDyadicHodgeSubsetMassReturn` |
+| `proved-derived; formal-checked` | complete Boolean reconstruction and uniform physical carrier | `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves exact prefix reconstruction from zero-padded first and second differences, lifts the law through all three coordinate axes, uses the boundary-preserving interchange cell to reconstruct all seven residual Boolean faces, proves their cubic/linear/inverse-linear scale laws, inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn`, and constructs `UniformDyadicHodgeJacobianKernelBound` | source-specific composition of finite boundary gluing, coordinate Fubini/interchange, the full 27-face mass, the existing two-axis mass, and the Haar receiver | transport the now-unconditional kernel carrier through the logarithmic law; continuation still owes critical-vorticity integrability and terminal restart supply |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
-| `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; the uniform return is the same law over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | prove one common constant and all of those nonpositive excess returns |
+| `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess receiver is closed; the next differences are the continuation integrability and restart defects |
 
-[open] The immediate Navier--Stokes theorem target is now sharply exposed: inhabit
-`UniformLargeScaleDyadicHodgeSubsetMassReturn C`.  Existing checked faces include the exact direct
-subset identities, partial scale estimates, and the complete `(1,1,2)`/`(1,2,2)` chronological
-product populations together with their exact scalar-preserving 12/18-face binomial groupings.
-The common three-dimensional padded/reindexed coefficient comparison has now returned exactly for
-the full coordinate face.  The actual corner and the complete nine-face scalar-third-order-two
-slab have returned their uniform inverse-cubic masses with exact occurrence weights.  Axis
-transport of that slab covers 19 addresses after overlap; the corner and central `111` mass are
-closed; and the pointwise laws for all six complementary `112`/`122` Hodge faces are now proved by
-strict scale descent.  Their scalar/Hodge masses are closed, all 27 actual weighted face
-populations reindex exactly into the one common chart, and their finite triangle/Fubini assembly
-now inhabits the official full-coordinate receiver with exact numerator
-`4119133228099520072`.  The corresponding bounded compositions for the other seven Boolean faces
-remain before one common uniform subset return can be constructed.  Even after this
-coefficient port closes, the continuation theorem visibly retains its critical-vorticity
-integrability and terminal restart hypotheses.
+[proved-derived; formal-checked] The immediate coefficient target is closed.  The exact
+zero-exterior prefix gluing reconstructs each removed coordinate with cost `N(N+1) ≤ 72R²`; the
+full and `{0,1}` source faces therefore generate all eight scale-correct receiver faces.  The
+common returned constant is `72·72·4119133228099520072`, and the named large-scale subset return
+and uniform physical dyadic kernel carrier are inhabited without analytic hypotheses.
+
+[open] The next Navier--Stokes passage is no longer a coefficient estimate.  It is to compose this
+carrier through the checked dyadic logarithmic law, thereby removing its kernel premise, and then
+separate the two genuine continuation fibres: interval integrability of the critical vorticity
+rate and a restart supply from the terminal coordinate `H³` receiver.  Neither is silently implied
+by the completed kernel theorem.
 
 ## 8. Yang--Mills and mass gap
 
