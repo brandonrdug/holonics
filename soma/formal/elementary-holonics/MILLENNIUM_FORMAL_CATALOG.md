@@ -32,23 +32,22 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source closure after identifying the complete
-direction-depleted strain chart with the physical real vortex-stretching occurrence, the station
-contains:
+[established-bounded; measured] On the 2026-08-25 source closure after reconstructing the canonical
+direction remainder from its oriented cross-difference carrier, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 450 |
-| theorem or lemma declarations | 5,760 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,183 |
-| modules below `ElementaryHolonics/Millennium/` | 404 |
-| theorem or lemma declarations below `Millennium/` | 5,368 |
-| broad declarations below `Millennium/` | 7,528 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,441 |
+| Lean modules below `ElementaryHolonics/` | 451 |
+| theorem or lemma declarations | 5,770 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,196 |
+| modules below `ElementaryHolonics/Millennium/` | 405 |
+| theorem or lemma declarations below `Millennium/` | 5,378 |
+| broad declarations below `Millennium/` | 7,541 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,451 |
 
 [established-bounded; measured] The principal module bands are 16 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 404 Millennium modules.  Search prefixes
-inside the Millennium band include 191 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 405 Millennium modules.  Search prefixes
+inside the Millennium band include 192 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -165,6 +164,7 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | actual finite-band gluing | `NavierStokesVorticityDirectionFiniteBandBridge.lean` proves Hodge ascent is complex-linear, symmetrization and the quadratic receiver commute with finite addressed sums, identifies the direction-remainder scalar exactly with the symmetric Hodge-band reading, then transports it through `openPeriodicHodgeJacobianBandProjector_eq_actual` to the actual finite Jacobian band | exact reconstruction/gluing of the modewise direction carrier with the existing solution derivative projector | pass the actual finite-band estimate to the full smooth Jacobian via a proved cofinal Fourier convergence mode, while retaining the remainder-mass limit |
 | `proved-derived; formal-checked` | full strain reconstruction with addressed tail | `NavierStokesVorticityDirectionFullStrain.lean` proves that the complete symmetric Jacobian stretching receiver is exactly the finite direction-depleted band plus its complementary Fourier tail, controls the tail action by the complete nine-face coefficient mass, and on every frequency cube supplies the explicit `sqrt(jacobianTailScale radius * jacobianTailLatticeMass)` weighted-`H³` return | exact composition of complete coordinate Fourier reconstruction, actual finite-band Hodge gluing, canonical direction projection, and the proved coefficient-tail decay law | the Fourier limit seam is closed as an exact remainder-carrying inequality; prove uniform control of the direction-remainder population and connect the complexified receiver to the real local stretching/integrability passage |
 | `proved-derived; formal-checked` | physical vortex-stretching bridge | `NavierStokesVorticityDirectionPhysicalBridge.lean` proves real continuous-linear action and Euclidean inner product commute exactly with coordinatewise complexification, constructs the quotient-descended real stretching occurrence, proves its pullback is the literal periodic-enstrophy integrand, and identifies its absolute value exactly with the norm of the complete Fourier strain chart | exact chart transition from the real torus Jacobian/vorticity owners through the complex Hodge/Fourier receiver back to the physical integrand | the receiver identity is closed; uniformly control the explicit direction-remainder population strongly enough to integrate it in space and time and absorb or continue the enstrophy law |
+| `proved-derived; formal-checked` | geometric cross-difference reconstruction | `NavierStokesVorticityDirectionCrossReconstruction.lean` proves the receiver/source cross annihilates exactly the aligned projection face, reconstructs the complete canonical orthogonal remainder by the vector triple product on every nonzero real receiver chart, proves cross vanishing iff remainder vanishing, and transports the full physical stretching estimate through the finite addressed cross-direction mass; zero-vorticity points close separately without an inverse | source-specific composition of the swing-derived cross owner, canonical projection, exact vector triple product, physical stretching bridge, and Fourier-tail reconstruction | identify the cross population as Fourier transport of the two-point spatial vorticity-direction difference, then prove the required spatial/scale/time coherence return rather than estimating it by coefficient count |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
 
