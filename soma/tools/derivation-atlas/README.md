@@ -14,7 +14,12 @@ executable `derivation_atlas` exports a versioned JSON bundle containing:
 The Rust tool validates the bundle's exact population and previously-interned-child invariant,
 then emits receiver-facing summaries of recurring expression faces, goal targets, theorem-body
 roots, elaborator events, literal integers, multiplication-factor candidates, and algebraic figure
-heads. `extract` also writes a companion manifest binding the source and bundle SHA-256 identities.
+heads. It also returns exact operation-to-operation argument transitions and structural recurrence
+towers. A recurrence tower removes the partial application nodes introduced by Lean's curried
+encoding, counts complete nested occurrences of one operation, and takes successive finite
+differences of that order profile. These are derived receivers over the elaborated expression DAG:
+they do not identify syntactic nesting with semantic recursion or a mathematical derivative.
+`extract` also writes a companion manifest binding the source and bundle SHA-256 identities.
 
 The derived factor and figure rows are candidates with exact graph witnesses. They do not claim
 commutativity, associativity, definitional equality, or a geometric interpretation unless a later
@@ -39,3 +44,8 @@ cargo run -p soma-derivation-atlas -- corpus \
 Names, source ranges, syntax, and elaborator labels are exterior lineage. They do not route the
 analysis or become semantic categories. Domain-specific algebraic, arithmetic, and geometric
 views should be derived from the exact bundle as separate receivers.
+
+For the category-like reading, complete operation heads are objects and the reported weighted
+argument transitions are generating arrows. Composable transition words can be analyzed by later
+receivers; the current report stops at exact one-step arrows and same-head nesting so it does not
+silently promote a quotient cycle into a theorem about the source declaration.

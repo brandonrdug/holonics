@@ -193,7 +193,263 @@ under a declared receiver.  The formal atlas proves the displayed maps and equiv
 not assert that all six source theories are identical, and the next derivation is always the named
 open fibre in the source carrier rather than another analogy.
 
-## 11. Parallel exterior work order
+## 11. Holonics is the source catalog: the common closure staircase
+
+[definition] A **candidate solution condition** in this catalog is a typed sufficient theorem
+family, not a prediction that its hypotheses are already available.  It must name the official
+target receiver, the local entering receiver, every composition and limit needed between them, and
+an insufficiency witness which can refute the route.  Merely restating the official conjecture under
+a new name is not a candidate route.
+
+[definition] The shared staircase is composed from the existing holonics arsenal in this order:
+
+```text
+situated occurrence
+  -> swing / oriented returned difference
+  -> addressed transport word and complete occurrence ledger
+  -> annihilator, boundary cancellation, and retained remainder
+  -> receiver quotient with its complete reconstruction fibre
+  -> chart rebase, route comparison, and holonomy
+  -> scale descent / recurrence tower
+  -> compactness, tightness, or local-to-global gluing
+  -> official Millennium receiver.
+```
+
+[proved-derived; formal-checked] The early and middle stairs already have generic Lean owners:
+`Swing`, `Lineage`, `HigherDifferenceTransport`, `HigherDifferenceAnnihilator`,
+`MeasuredDifferenceReceiver`, chart/rebase and holonomy owners, and
+`HigherDifferenceScaleDescent`.  Their exact consequences include oriented differences, `2^n`
+shifted-Leibniz occurrence ledgers, sparse zero-certified quotients, complete reconstruction fibres,
+noncommuting route defects, and strict predecessor descent.
+
+[definition] The receiver criterion is the common closure test.  For a source population `X`, a
+local receiver `entering : X -> Entering`, and the official or later receiver
+`returned : X -> Returned`, a transformer exists on the actually presented range exactly when
+
+```text
+entering left = entering right  ->  returned left = returned right
+```
+
+for every source pair.  A pair with equal entering faces and unequal returned faces is the exact
+counterexample: the local atlas has collapsed a distinction the problem still needs.  Enlarging the
+receiver by the shortest such separator is the next constructive move.
+
+[interpretation] The staircase repeats across the problems because it is a calculus of local-to-
+global factorization, not because the source theories are identified.  RH uses prime/Mellin
+transport and a positivity receiver; BSD uses local-place and height transport with an arithmetic-
+analytic ledger; Hodge uses cycle-class quotient transport; Navier--Stokes uses dyadic Hodge and
+critical continuation; Yang--Mills uses noncommuting gauge holonomy and continuum spectral
+reconstruction; Poincare supplies a solved flow/surgery regression; and P versus NP asks whether a
+history quotient preserves all complexity-visible successors.
+
+## 12. Candidate solution conditions for all seven worktracks
+
+### 12.1 Riemann hypothesis
+
+[definition] The candidate RH closure theorem is the following composite, over the actual completed
+Riemann zeta function and a full admissible Weil test family:
+
+1. construct `HasWeightedArgumentPrinciple` on a cofinal contour family;
+2. construct the exact prime plus archimedean residual identity on the same tests;
+3. prove the contour/boundary remainder vanishes in the cofinal return;
+4. identify the resulting global functional with the classical Weil explicit-formula form;
+5. prove that form nonnegative on every admitted test; and
+6. import or derive the full positivity equivalence which sends that nonnegativity to
+   `RiemannHypothesis`.
+
+[conditional] Those six returns are sufficient because they turn every nontrivial zero into a
+source occurrence separated by the complete test family and force its
+`criticalSeamDifference = Re(s)-1/2` to vanish.  The present Lean tree owns the symmetry, zero-count,
+test-vector, and truncated explicit-formula components; it does not own items 1--6 as one complete
+unconditional passage.
+
+[open] The shortest present RH gate is the complete positive Weil carrier, including the
+archimedean and boundary returns.  A decisive route falsifier is either a negative value of the
+assembled form on an admitted test or two admissible spectral populations with the same complete
+entering receiver and different seam placement.
+
+### 12.2 Birch--Swinnerton--Dyer
+
+[definition] The candidate BSD closure has two nested scales.  On the congruent-number family it
+requires: an actual `LDatum`; vanishing of the Waldspurger--Tunnell defect on the addressed sign
+branch; a finite Mordell--Weil/Selmer descent returning the algebraic rank; equality with analytic
+order; and the leading-coefficient ledger with period, regulator, Tamagawa, torsion, and Tate--
+Shafarevich factors.  On the universal scale it additionally requires a transport from arbitrary
+elliptic curves or abelian varieties into those arithmetic and analytic receivers without erasing
+bad-place or `Sha` fibres.
+
+[conditional] A family theorem that the displayed defect vanishes closes the currently typed
+positive-sign prime-family rank gate.  A universal theorem still requires the complete analytic
+continuation, Mordell--Weil/height, Selmer--`Sha`, and leading-coefficient passages; the checked
+witness at one and prime rank bounds do not supply that quantifier change.
+
+[open] The immediate family gate remains `waldspurgerTunnellDefect = 0`; the universal gate is a
+receiver-exact adelic arithmetic/analytic ledger for every admitted curve.  A decisive falsifier is
+a pair of curves or local histories identified by the proposed entering receiver but separated by
+analytic rank, Mordell--Weil rank, regulator, or `Sha` in the official ledger.
+
+### 12.3 Hodge conjecture
+
+[definition] The terminal Hodge condition is already exact in the library:
+
+```text
+for every official datum D,
+  every class in D.rationalHodgeClasses has zero image in
+    D.Cohomology / D.algebraicSpan,
+```
+
+equivalently `OpenHodgeClasses Official = empty`.  A constructive holonic route must first build
+the real smooth-projective carrier, singular rational cohomology, Hodge decomposition, cycle-class
+map, Lefschetz/primitive transport, and intersection receiver.  It must then construct compatible
+local sections of the cycle-class map on the rational `(p,p)` population and prove that chart
+transport, primitive decomposition, and gluing preserve those sections globally.
+
+[conditional] Such a compatible section sends every rational Hodge class to an algebraic cycle and
+therefore kills `hodgeQuotientDifference`.  Hodge--Riemann positivity and the Hodge-index shell are
+useful separation/coercivity stairs, but positivity alone does not construct the missing cycle.
+
+[open] The first honest carrier is still one official surface realization in which divisor cycles,
+`H^2`, `(1,1)` classes, an ample class, and the intersection form coexist.  A nonzero official
+quotient class is both the exact falsifier of the conjecture and the exact insufficiency witness for
+any local receiver that fails to see it.
+
+### 12.4 Navier--Stokes
+
+[definition] The present periodic smoothness route closes only if all three visible continuation
+ports return for every admitted maximal open periodic solution:
+
+1. one `massConstant` inhabits `UniformLargeScaleDyadicHodgeSubsetMassReturn` across every scale
+   `>= 3`, all twenty-seven Hodge entries, and all eight coordinate faces;
+2. the actual `criticalVorticityRate` is interval-integrable on every finite lifespan; and
+3. the uniform coordinate `H^3` receiver supplies the terminal restart seam.
+
+The checked composition then produces `CompatibleOpenPeriodicExtension`; a maximal-lifespan
+argument must turn universal extendibility into global existence and hence `StatementB`.
+
+[conditional] The first port constructs the uniform physical Jacobian-kernel bound with explicit
+constant `804357 + 216 * massConstant`.  It does not by itself prove the second or third port.  The
+complete candidate NS closure therefore includes the missing theorem from the dyadic Hodge subset
+receiver to critical-vorticity integrability/restart, followed by the maximal-time globalization.
+
+[open] The immediate coefficient gate is the common subset-mass return.  The deeper analytic gate
+is proving that its graded receiver controls the stretching current strongly enough to return the
+critical integral and restart supply.  A decisive falsifier is a sequence of admitted solutions or
+frequency populations with identical subset-mass faces but different critical-vorticity or restart
+faces; this would prove that the current coefficient receiver must be enriched.
+
+### 12.5 Yang--Mills existence and mass gap
+
+[definition] A sufficient Yang--Mills route requires, for every compact simple gauge group:
+
+1. a gauge-covariant lattice/current family with exact plaquette curvature and Wilson/loop
+   receivers;
+2. reflection positivity and compatible finite-volume measures;
+3. uniform renormalized estimates giving tightness as lattice spacing tends to zero and volume to
+   infinity;
+4. Osterwalder--Schrader or equivalently strong continuum reconstruction into a nontrivial physical
+   Hilbert space and Hamiltonian; and
+5. one positive spectral separator `Delta` uniform in scale and volume whose law descends through
+   that reconstruction.
+
+[conditional] Those returns inhabit the fields of `YangMills.Problem` and prove
+`TheYangMillsExistenceAndMassGap`.  Finite chain-Laplacian positivity supplies a bounded spectral
+model for item 5, while `YangMillsLimit.theShrinkingFamilyHasNoUniformMassGap` proves that a positive
+gap at every finite scale is insufficient without a uniform separator and limit-preservation law.
+
+[open] The exact gate is therefore not another finite diagonalization but a genuine gauge scaling
+family with continuum reconstruction and a uniform gap.  A shrinking positive spectrum is the
+existing formal falsifier of the weaker route.
+
+### 12.6 Poincare conjecture
+
+[proved-standard] Poincare is solved, so its candidate conditions are a regression target for the
+holonic staircase: Ricci flow on the actual three-manifold carrier, monotone entropy/noncollapsing,
+classification of singularity models, addressed surgery with topology lineage, continuation across
+every surgery time, finite extinction in the simply connected closed case, and identification of
+the initial manifold with `S^3`.
+
+[open] The local Lean project currently imports the proposition but not a kernel-checked Perelman
+proof.  The regression fails exactly if a local flow/surgery receiver forgets a topology-changing
+neck or cannot reconstruct the pre-surgery manifold from its returned pieces.  This makes Poincare
+a calibration of the staircase's local-to-global discipline, not an open prize target.
+
+### 12.7 P versus NP
+
+[definition] Holonics admits two exact terminal routes.  A `P = NP` route must uniformly transform
+every polynomial-time verifier and polynomial certificate bound into a polynomial-time decider,
+with a checked polynomial cost receipt.  A `P != NP` route must construct one NP language and an
+encoding-invariant history separator which every polynomial-time deterministic decider obeys but
+the language provably violates; it must survive polynomial many-one transport and the relevant
+relativization/natural-proof/algebrization barrier audit.
+
+[conditional] Either terminal construction settles the local `PEqualsNP`/`PNotEqualsNP` pose.  An
+endpoint Boolean receiver is insufficient for lower bounds because equal answers can carry
+different causal histories, branching, and resource fronts; the proposed separator must factor
+through complete computation histories and still return a polynomially invariant consequence.
+
+[open] No such uniform verifier-to-decider transformer or universal lower-bound separator exists in
+the Lean tree.  A faster decider falsifies a proposed separating invariant; a proved superpolynomial
+lower bound falsifies a proposed universal collapse construction.
+
+## 13. Recurrence of recurrence and the derivation atlas
+
+[definition] Repetition and differentiation coincide only after an additive difference receiver
+is declared.  If `R_n` is the face returned at recurrence depth `n`, then
+
+```text
+Delta R_n = R_(n+1) - R_n,
+Delta^k R_n = Delta (Delta^(k-1) R_n).
+```
+
+For a discrete transport `T`, the same operator is `T - I` and its `k`th finite difference is
+`(T-I)^k`.  Powers `T^n` count repeated transport; they are not derivatives by themselves.  In an
+additively enriched category the subtraction occurs in a hom-group; an arbitrary category does not
+provide that operation merely because its arrows compose.
+
+[established-bounded; implemented-exact] `soma/tools/derivation-atlas` now returns two additional
+receivers without changing the Lean export schema: exact complete-operation argument transitions,
+and same-head structural recurrence towers with the finite-difference rows of their occurrence
+profiles.  Function-side partial applications introduced by Lean's curried encoding are removed per
+use edge rather than by deleting interned nodes.
+
+[established-bounded; measured] On the addressed
+`Foundation/HigherDifferenceTransport.lean` bundle, the atlas returned 69,058 expression nodes,
+174 declarations, 75 theorem bodies, 1,392 proof events, and 20,078,103 multiplicity-weighted
+expression uses.  Its structural receiver found complete `fwdDiff` nesting through order six and
+`HSub.hSub` nesting through order six, agreeing with the owner's bounded higher-difference surface.
+
+[definition] These counts are exterior proof-term morphology.  A weighted face-transition matrix
+may be composed to count length-`n` expression routes, and its quotient cycles may suggest reusable
+proof shapes, but neither a cycle nor a finite-difference row is promoted into a theorem about the
+mathematical carrier until a typed source receiver proves that identification.
+
+## 14. The matching-logic supplement: localization is a load-bearing stair
+
+[historical] Chen and Rosu's 2026 preprint, [*Completeness and incompleteness of basic matching
+logic*](https://arxiv.org/abs/2608.13306), proves a one-sorted, fixpoint-free global-completeness
+result by composing both semantics and derivability through a localization `Delta_Gamma`.  That
+localization boxes every hypothesis along every composable coordinate word and denotes the largest
+backward-closed core.  A two-sheet cover replaces the unreachable exterior while preserving what
+the local language can observe.
+
+[interpretation] This supplies a rigorous audit pattern for the holonic staircase.  Each
+Millennium route must exhibit the typed word from its local hypothesis sort to its official
+conclusion sort, localize along every admitted word, and return a reconstruction that preserves the
+official receiver.  The new receiver-factorization criterion is the set-level form of that last
+test; it is not a claim that holonics and matching logic are the same theory.
+
+[historical] The same paper proves that the route is sharp: many-sorted global completeness can
+fail when no symbol-input chain carries the hypothesis sort to the conclusion sort, and adding
+least fixpoints makes validity non-recursively-enumerable in a very small fragment.  It also states
+an open mechanization ladder: the structural/double-cover lemmas, then global completeness assuming
+local completeness and soundness, then discharge of local completeness.
+
+[interpretation] The consequence for this project is constructive.  More recursion, tower depth,
+or fixpoint syntax is not evidence of global closure.  Every recurrence must retain sort/port flow,
+and every proposed local-to-global proof must either produce its receiver transformer or return the
+explicit insufficiency pair which tells us which face to add.
+
+## 15. Parallel exterior work order
 
 [definition] The theorem work order following this catalog is:
 
@@ -215,7 +471,7 @@ open fibre in the source carrier rather than another analogy.
 `blueprint/THE_ROADMAP.md`, schedule the production engine, or authorize updates to root
 `CONSTRUCTION_STATE.md`.
 
-## 12. Maintenance rule
+## 16. Maintenance rule
 
 [project-postulate] A Millennium theorem is not considered surfaced merely because its file exists.
 Whenever a worktrack gains a stronger unconditional theorem, loses a hypothesis, constructs a
@@ -226,7 +482,7 @@ row in the same exterior formal station.
 one provenance class, and one remaining fibre.  A locally authored proof is recorded as a local
 derivation; historical novelty remains `open` until separately audited.
 
-## 13. Evidence records
+## 17. Evidence records
 
 [historical] The initial seven-object import and DeepMind `formal-conjectures` comparison is
 recorded in
@@ -238,3 +494,7 @@ recorded in
 
 [historical] The coupled-LC and complex-parametron source audit is recorded in
 `research/records/2026-08-24_THE_COMPLEX_PARAMETRON_IS_AN_ORIENTED_COUPLED_LC_LATTICE_BEFORE_PHASE_LOCKING.md`.
+
+[historical] The candidate solution conditions, recurrence-atlas extension, and matching-logic
+localization audit are recorded in
+`research/records/2026-08-24_THE_MILLENNIUM_SOLUTION_CONDITIONS_ARE_RECEIVER_FACTORIZATIONS_THROUGH_THE_HOLONIC_STAIRCASE.md`.

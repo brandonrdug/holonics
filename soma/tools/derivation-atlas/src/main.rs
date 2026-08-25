@@ -183,6 +183,30 @@ struct FigureFace {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+struct OperationTransitionFace {
+    module_exterior: String,
+    parent_operation: String,
+    child_operation: String,
+    argument_position: usize,
+    distinct_edges: usize,
+    occurrence_uses: usize,
+    witness_edges: Vec<[usize; 2]>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RecurrenceTowerFace {
+    module_exterior: String,
+    operation: String,
+    max_self_nesting_order: usize,
+    exact_order_distinct_nodes: Vec<usize>,
+    exact_order_occurrence_uses: Vec<usize>,
+    finite_difference_rows_of_occurrence_profile: Vec<Vec<i128>>,
+    witness_nodes: Vec<usize>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct AtlasReport {
     schema: String,
     source_path_exterior: String,
@@ -204,6 +228,8 @@ struct AtlasReport {
     literal_integer_faces: Vec<IntegerFace>,
     factor_candidates: Vec<FactorFace>,
     algebraic_figures: Vec<FigureFace>,
+    operation_transitions: Vec<OperationTransitionFace>,
+    recurrence_towers: Vec<RecurrenceTowerFace>,
     recurring_goal_targets: Vec<CountFace>,
     proof_event_elaborators: Vec<CountFace>,
     theorem_body_roots: Vec<CountFace>,
@@ -228,6 +254,8 @@ struct CorpusReport {
     literal_integer_faces: Vec<IntegerFace>,
     factor_candidates: Vec<FactorFace>,
     algebraic_figures: Vec<FigureFace>,
+    operation_transitions: Vec<OperationTransitionFace>,
+    recurrence_towers: Vec<RecurrenceTowerFace>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -840,6 +868,196 @@ fn algebraic_figures(bundle: &AtlasBundle, top: usize) -> Vec<FigureFace> {
     returned
 }
 
+fn application_spines(bundle: &AtlasBundle) -> Vec<Option<(String, Vec<usize>)>> {
+    (0..bundle.expression_nodes.len())
+        .map(|index| application_spine(index, &bundle.expression_nodes))
+        .collect()
+}
+
+/// Count only complete operation occurrences, excluding the function-side nodes introduced by
+/// Lean's curried application encoding. An interned node may occur both as a partial application
+/// and as a complete argument elsewhere, so the distinction is made per use edge rather than per
+/// node.
+fn semantic_operation_uses(
+    bundle: &AtlasBundle,
+    spines: &[Option<(String, Vec<usize>)>],
+) -> Vec<usize> {
+    let mut returned = vec![0; bundle.expression_nodes.len()];
+    for usage in &bundle.expression_uses {
+        let partial_application = match (usage.parent_node, usage.child_position) {
+            (Some(parent), Some(0)) => match (&spines[usage.node], &spines[parent]) {
+                (Some((child_operation, _)), Some((parent_operation, _))) => {
+                    child_operation == parent_operation
+                }
+                _ => false,
+            },
+            _ => false,
+        };
+        if !partial_application && spines[usage.node].is_some() {
+            returned[usage.node] += usage.count;
+        }
+    }
+    returned
+}
+
+fn operation_transitions(bundle: &AtlasBundle, top: usize) -> Vec<OperationTransitionFace> {
+    let spines = application_spines(bundle);
+    let semantic_uses = semantic_operation_uses(bundle, &spines);
+    let mut grouped = BTreeMap::<(String, String, usize), (usize, usize, Vec<[usize; 2]>)>::new();
+    for (parent_node, spine) in spines.iter().enumerate() {
+        if semantic_uses[parent_node] == 0 {
+            continue;
+        }
+        let Some((parent_operation, arguments)) = spine else {
+            continue;
+        };
+        for (argument_position, child_node) in arguments.iter().copied().enumerate() {
+            let Some((child_operation, _)) = &spines[child_node] else {
+                continue;
+            };
+            let entry = grouped
+                .entry((
+                    parent_operation.clone(),
+                    child_operation.clone(),
+                    argument_position,
+                ))
+                .or_insert_with(|| (0, 0, Vec::new()));
+            entry.0 += 1;
+            entry.1 += semantic_uses[parent_node];
+            if entry.2.len() < 8 {
+                entry.2.push([parent_node, child_node]);
+            }
+        }
+    }
+    let mut returned = grouped
+        .into_iter()
+        .map(
+            |(
+                (parent_operation, child_operation, argument_position),
+                (distinct_edges, occurrence_uses, witness_edges),
+            )| OperationTransitionFace {
+                module_exterior: bundle.module_exterior.clone(),
+                parent_operation,
+                child_operation,
+                argument_position,
+                distinct_edges,
+                occurrence_uses,
+                witness_edges,
+            },
+        )
+        .collect::<Vec<_>>();
+    returned.sort_by(|left, right| {
+        right
+            .occurrence_uses
+            .cmp(&left.occurrence_uses)
+            .then_with(|| left.parent_operation.cmp(&right.parent_operation))
+            .then_with(|| left.child_operation.cmp(&right.child_operation))
+            .then_with(|| left.argument_position.cmp(&right.argument_position))
+    });
+    returned.truncate(top);
+    returned
+}
+
+fn finite_difference_rows(values: &[usize]) -> Vec<Vec<i128>> {
+    let mut rows = Vec::new();
+    if values.is_empty() {
+        return rows;
+    }
+    rows.push(values.iter().map(|value| *value as i128).collect());
+    while rows.last().is_some_and(|row| row.len() > 1) {
+        let previous = rows.last().expect("the row population is nonempty");
+        rows.push(previous.windows(2).map(|pair| pair[1] - pair[0]).collect());
+    }
+    rows
+}
+
+fn recurrence_towers(bundle: &AtlasBundle, top: usize) -> Vec<RecurrenceTowerFace> {
+    let spines = application_spines(bundle);
+    let semantic_uses = semantic_operation_uses(bundle, &spines);
+    let mut self_orders = vec![0; bundle.expression_nodes.len()];
+    let mut grouped = BTreeMap::<String, (Vec<usize>, Vec<usize>, Vec<usize>)>::new();
+
+    // Expression children are previously interned, so argument recurrence orders are available
+    // when their parent is visited. This is a structural nesting receiver, not a claim about Lean
+    // recursion or a mathematical derivative.
+    for (node, spine) in spines.iter().enumerate() {
+        let Some((operation, arguments)) = spine else {
+            continue;
+        };
+        let nested_order = arguments
+            .iter()
+            .filter_map(|argument| {
+                spines[*argument].as_ref().and_then(|(child_operation, _)| {
+                    (child_operation == operation).then_some(self_orders[*argument])
+                })
+            })
+            .max()
+            .unwrap_or(0);
+        self_orders[node] = nested_order + 1;
+        if semantic_uses[node] == 0 {
+            continue;
+        }
+        let entry = grouped
+            .entry(operation.clone())
+            .or_insert_with(|| (Vec::new(), Vec::new(), Vec::new()));
+        let order_index = self_orders[node] - 1;
+        if entry.0.len() <= order_index {
+            entry.0.resize(order_index + 1, 0);
+            entry.1.resize(order_index + 1, 0);
+        }
+        entry.0[order_index] += 1;
+        entry.1[order_index] += semantic_uses[node];
+        if self_orders[node] > 1 && entry.2.len() < 8 {
+            entry.2.push(node);
+        }
+    }
+
+    let mut returned = grouped
+        .into_iter()
+        .filter_map(
+            |(
+                operation,
+                (exact_order_distinct_nodes, exact_order_occurrence_uses, witness_nodes),
+            )| {
+                let max_self_nesting_order = exact_order_distinct_nodes.len();
+                (max_self_nesting_order > 1).then(|| RecurrenceTowerFace {
+                    module_exterior: bundle.module_exterior.clone(),
+                    operation,
+                    max_self_nesting_order,
+                    finite_difference_rows_of_occurrence_profile: finite_difference_rows(
+                        &exact_order_occurrence_uses,
+                    ),
+                    exact_order_distinct_nodes,
+                    exact_order_occurrence_uses,
+                    witness_nodes,
+                })
+            },
+        )
+        .collect::<Vec<_>>();
+    returned.sort_by(|left, right| {
+        right
+            .max_self_nesting_order
+            .cmp(&left.max_self_nesting_order)
+            .then_with(|| {
+                right
+                    .exact_order_occurrence_uses
+                    .iter()
+                    .skip(1)
+                    .sum::<usize>()
+                    .cmp(
+                        &left
+                            .exact_order_occurrence_uses
+                            .iter()
+                            .skip(1)
+                            .sum::<usize>(),
+                    )
+            })
+            .then_with(|| left.operation.cmp(&right.operation))
+    });
+    returned.truncate(top);
+    returned
+}
+
 fn report(bundle: &AtlasBundle, top: usize) -> AtlasReport {
     let (uses, roots, _) = usage_counts(bundle);
     let mut expression_kinds = BTreeMap::new();
@@ -904,6 +1122,8 @@ fn report(bundle: &AtlasBundle, top: usize) -> AtlasReport {
         literal_integer_faces: literal_integer_faces(bundle, top),
         factor_candidates: factor_candidates(bundle, top),
         algebraic_figures: algebraic_figures(bundle, top),
+        operation_transitions: operation_transitions(bundle, top),
+        recurrence_towers: recurrence_towers(bundle, top),
         recurring_goal_targets: top_faces(recurring_goal_targets, top),
         proof_event_elaborators: top_faces(proof_event_elaborators, top),
         theorem_body_roots: top_faces(theorem_body_roots, top),
@@ -916,6 +1136,8 @@ fn corpus_report(bundles: &[AtlasBundle], top: usize) -> CorpusReport {
     let mut corpus_literals = Vec::new();
     let mut corpus_factors = Vec::new();
     let mut corpus_figures = Vec::new();
+    let mut corpus_transitions = Vec::new();
+    let mut corpus_towers = Vec::new();
     let mut expression_nodes = 0;
     let mut declaration_operations = 0;
     let mut theorem_bodies = 0;
@@ -958,6 +1180,8 @@ fn corpus_report(bundles: &[AtlasBundle], top: usize) -> CorpusReport {
         corpus_literals.extend(literal_integer_faces(bundle, usize::MAX));
         corpus_factors.extend(factor_candidates(bundle, usize::MAX));
         corpus_figures.extend(algebraic_figures(bundle, usize::MAX));
+        corpus_transitions.extend(operation_transitions(bundle, usize::MAX));
+        corpus_towers.extend(recurrence_towers(bundle, usize::MAX));
     }
     modules.sort();
     let recurring_expression_usage = top_usage(usage_grouped, top);
@@ -982,6 +1206,22 @@ fn corpus_report(bundles: &[AtlasBundle], top: usize) -> CorpusReport {
             .then_with(|| left.operation.cmp(&right.operation))
     });
     corpus_figures.truncate(top);
+    corpus_transitions.sort_by(|left, right| {
+        right
+            .occurrence_uses
+            .cmp(&left.occurrence_uses)
+            .then_with(|| left.module_exterior.cmp(&right.module_exterior))
+            .then_with(|| left.parent_operation.cmp(&right.parent_operation))
+    });
+    corpus_transitions.truncate(top);
+    corpus_towers.sort_by(|left, right| {
+        right
+            .max_self_nesting_order
+            .cmp(&left.max_self_nesting_order)
+            .then_with(|| left.module_exterior.cmp(&right.module_exterior))
+            .then_with(|| left.operation.cmp(&right.operation))
+    });
+    corpus_towers.truncate(top);
     CorpusReport {
         schema: SCHEMA.to_owned(),
         bundles: bundles.len(),
@@ -999,6 +1239,8 @@ fn corpus_report(bundles: &[AtlasBundle], top: usize) -> CorpusReport {
         literal_integer_faces: corpus_literals,
         factor_candidates: corpus_factors,
         algebraic_figures: corpus_figures,
+        operation_transitions: corpus_transitions,
+        recurrence_towers: corpus_towers,
     }
 }
 
@@ -1200,5 +1442,97 @@ mod tests {
             parse_literal("Lean.Literal.intVal (Int.negSucc 2)"),
             Some(("integer", "(Int.negSucc 2)".to_owned()))
         );
+    }
+
+    #[test]
+    fn finite_difference_rows_iterate_the_adjacent_difference_receiver() {
+        assert_eq!(
+            finite_difference_rows(&[1, 4, 9, 16]),
+            vec![vec![1, 4, 9, 16], vec![3, 5, 7], vec![2, 2], vec![0],]
+        );
+    }
+
+    #[test]
+    fn semantic_operation_uses_exclude_curried_function_side_nodes() {
+        let bundle = AtlasBundle {
+            schema: SCHEMA.to_owned(),
+            source_path_exterior: "fixture.lean".to_owned(),
+            module_exterior: "Fixture".to_owned(),
+            declaration_module_prefix_exterior: "Fixture".to_owned(),
+            expression_nodes: vec![
+                ExpressionNode {
+                    index: 0,
+                    kind_exterior: "constant".to_owned(),
+                    face_exterior: "f".to_owned(),
+                    children: vec![],
+                },
+                ExpressionNode {
+                    index: 1,
+                    kind_exterior: "constant".to_owned(),
+                    face_exterior: "x".to_owned(),
+                    children: vec![],
+                },
+                ExpressionNode {
+                    index: 2,
+                    kind_exterior: "application".to_owned(),
+                    face_exterior: "f".to_owned(),
+                    children: vec![0, 1],
+                },
+                ExpressionNode {
+                    index: 3,
+                    kind_exterior: "constant".to_owned(),
+                    face_exterior: "y".to_owned(),
+                    children: vec![],
+                },
+                ExpressionNode {
+                    index: 4,
+                    kind_exterior: "application".to_owned(),
+                    face_exterior: "f".to_owned(),
+                    children: vec![2, 3],
+                },
+            ],
+            expression_uses: vec![
+                ExpressionUse {
+                    node: 4,
+                    parent_node: None,
+                    child_position: None,
+                    count: 3,
+                },
+                ExpressionUse {
+                    node: 2,
+                    parent_node: Some(4),
+                    child_position: Some(0),
+                    count: 3,
+                },
+                ExpressionUse {
+                    node: 3,
+                    parent_node: Some(4),
+                    child_position: Some(1),
+                    count: 3,
+                },
+                ExpressionUse {
+                    node: 0,
+                    parent_node: Some(2),
+                    child_position: Some(0),
+                    count: 3,
+                },
+                ExpressionUse {
+                    node: 1,
+                    parent_node: Some(2),
+                    child_position: Some(1),
+                    count: 3,
+                },
+            ],
+            declaration_operations: vec![],
+            term_occurrences: vec![],
+            proof_events: vec![],
+            syntax_and_names_are_exterior: true,
+            kernel_checked: true,
+            truth_status: "established-bounded".to_owned(),
+        };
+        let spines = application_spines(&bundle);
+        let uses = semantic_operation_uses(&bundle, &spines);
+        assert_eq!(uses[2], 0);
+        assert_eq!(uses[4], 3);
     }
 }
