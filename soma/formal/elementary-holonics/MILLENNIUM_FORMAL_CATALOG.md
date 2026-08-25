@@ -32,21 +32,21 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 parabolic PDE-rebase closure after the
-quartic-amplitude receiver audit, the station contains:
+[established-bounded; measured] On the 2026-08-25 directed-passage and Snell--Euler interaction
+closure, the station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 475 |
-| theorem or lemma declarations | 6,040 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,564 |
-| modules below `ElementaryHolonics/Millennium/` | 428 |
-| theorem or lemma declarations below `Millennium/` | 5,642 |
-| broad declarations below `Millennium/` | 7,902 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,684 |
+| Lean modules below `ElementaryHolonics/` | 477 |
+| theorem or lemma declarations | 6,068 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,609 |
+| modules below `ElementaryHolonics/Millennium/` | 430 |
+| theorem or lemma declarations below `Millennium/` | 5,670 |
+| broad declarations below `Millennium/` | 7,947 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,705 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 428 Millennium modules.  Search prefixes
+modules, 8 Geometry modules, 20 dedicated RH modules, and 430 Millennium modules.  Search prefixes
 inside the Millennium band include 214 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 14 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
@@ -73,7 +73,9 @@ returns that matter.
 |---|---|---|---|---|
 | `proved-derived; formal-checked` | `Foundation/Lineage.lean`, `AddressedBoundary.lean`, `ComparisonCell.lean` | additive algebra, pullbacks, quotients | addressed passages retain occurrence populations, boundary lineage, joined cancellation, and parallel-route defects | the full swing/connection/holonomy/receiver composition remains ordered by the active exterior blueprint |
 | `proved-derived; formal-checked` | `Millennium/Swing.lean`, `SwingBridges.lean`, `HolonicDifferenceCalculus.lean` | additive groups, projective ratios, complex exponential | swing reverses an anchored difference; additive receivers commute with iterated differences; finite integration telescopes to the exterior boundary | individual instance bridges do not identify every physical transport with an affine swing |
+| `proved-derived; formal-checked` | `Millennium/HolonicDirectedPassage.lean` | additive groups, arbitrary filters, Cauchy filters, complete separated uniform spaces | an arbitrary addressed current returns an exact finite ledger `local population = exterior current + composition defects`; a closed-path return is exactly the accumulated defect ledger; state-induced currents are defect-free; additive receiver maps commute with the local population and every defect; filter-directed null currents reconstruct one unique return and survive cofinal reindexing, paired receivers, and uniformly continuous chart changes | every source still owes its occurrence type, directed filter, constitutive local current, complete receiver, and proof that the required defect/current enters the reconstructible fibre |
 | `proved-derived; formal-checked` | `Millennium/HolonicTerminalCurrent.lean` | complete uniform spaces, Cauchy filters, exact finite telescoping | an oriented interval current reverses by negation, every finite addressed partition glues to its exterior difference, terminal nullity is exactly eventual vanishing of pairwise receiver currents, and in a complete separated receiver it reconstructs one unique incoming terminal trace | each source theory must prove that its actual current enters this null cone; finite partition cancellation alone supplies no constitutive law |
+| `proved-derived; formal-checked` | `Millennium/HolonicSnellInteraction.lean` | Euler phase and exact real/complex trigonometry | Euler turns compose multiplicatively; paired normal/tangential receivers reconstruct the weighted complex phase exactly; Snell compatibility is zero tangential interface current; every finite path in a compatible multiway graph preserves that receiver; an explicit half-turn keeps zero tangential current while returning a nonzero normal remainder | positivity, material refraction, interface calibration, and selection among the retained outgoing phase fibre require source-specific constitutive and apparatus laws |
 | `proved-derived; formal-checked` | `Foundation/MeasuredDifferenceReceiver.lean` | normed additive groups and `Real.exp` from Mathlib | a receiver scalar factors through an addressed chart difference; even readings retain a two-orientation fibre; ratios ignore chart-zero shifts; binary normalized exponentials factor through one potential difference | injectivity and physical constitutive laws require their own hypotheses |
 | `proved-derived; formal-checked` | `Foundation/PrimeValuationRadixAtlas.lean`, `Millennium/PrimeRadixAtlas.lean` | unique factorization of naturals and Mathlib's `Nat.factorization` | the complete prime-valuation face reconstructs every nonzero population; an exact radix chart returns a unique maximal depth and terminal residual; all prime coordinates balance; equal-depth additive valuation caustics transport through common scale | radix notation never licenses rounding, and the atlas does not turn an unproved analytic bound into a theorem |
 | `proved-derived; formal-checked` | `Foundation/TransportLift.lean`, `ReceiverQuotient.lean`, `ExactPartition.lean`, `LatticeTransport.lean`; `Geometry/DivisorAtlas.lean`; `Millennium/ValuationDivisorLatticeAtlas.lean` | additive kernels and quotients, integer modules, finitely supported functions, unique factorization | a general transport request returns an empty/singleton/kernel-coset fibre; partitions reconstruct as dependent sums with paired oriented boundaries; scalar divisibility is isolated as a multiplication lift; signed codimension-one ledgers turn inversion into negation and ratios into differences; Cartier transitions glue local ledgers; lattice maps return kernel, image, cokernel, finite index, torsion witnesses, and saturation | every specialization still owes its geometric locus, chart cover, constitutive transport, and official local-to-global theorem; no scalar factorization is promoted to a source-holon product |
@@ -90,6 +92,27 @@ exp(y) / (exp(x) + exp(y)) = exp(y-x) / (1 + exp(y-x)),
 ```
 
 so the common potential is an exact null direction of that receiver.
+
+### 3.1 The shared directed-passage target across the official worktracks
+
+[definition] The table below is a source-allocation blueprint for the checked carrier in
+`HolonicDirectedPassage.lean`.  It does not assert that the listed nullity or constitutive laws
+already hold.
+
+| Worktrack | Directed occurrences/course | Receiver current or returned defect | Exact closure condition |
+|---|---|---|---|
+| Riemann hypothesis | admissible contour and test-function refinements, directed cofinally | explicit-formula boundary return together with the Weil quadratic-form receiver | the boundary current is null, the reconstructed form is nonnegative on the admitted family, and the existing Weil receiver puts every nontrivial zero on the seam |
+| Birch--Swinnerton-Dyer | prime localization, descent, height, and model-refinement passages | the paired algebraic-rank and analytic-order state, followed by the leading-coefficient ledger | the discrete rank pair is eventually identical and the complete arithmetic/analytic ledger reconstructs with zero defect for every official elliptic curve |
+| Hodge conjecture | chart-cover, cycle, and cohomology refinement | the class in `H² / algebraicSpan`, with every overlap composition defect retained | the reconstructed quotient class is zero for every rational Hodge class on every admitted smooth projective carrier |
+| Navier--Stokes | the incoming finite-time filter and spatial/scale refinement filters | the high-order state together with signed stretching, dissipation, and forcing currents | the source-specific current is null in a continuation-complete receiver and the reconstructed trace satisfies the PDE compatibility/restart law |
+| Yang--Mills and mass gap | lattice spacing, volume, gauge, and continuum reconstruction refinements | gauge-invariant state transport plus the vacuum-quotient spectral separator | the continuum current reconstructs while one exact positive lower separator is uniform over the complete scaling course |
+| P versus NP | addressed computation/reduction passages ordered by instance families and resource aperture | successor/interchange defects together with a receiver separating accepting witnesses from bounded deterministic realization | either a uniform polynomial realization is constructed or a receiver-insufficiency/lower-bound separator survives every admitted polynomial passage |
+| Poincaré theorem | triangulation, surgery, and chart-refinement passages | loop return and gluing defects in the simply-connected closed-three-manifold carrier | this row is a transport target for the already solved theorem, not an unsolved official obligation |
+
+[open] The shared law removes repeated filter, telescoping, and reconstruction work.  It does not
+make source currents null.  The scientifically decisive deed in each unsolved row is therefore a
+source-owned constitutive or uniform-scale theorem that enters the checked common carrier without
+discarding its reconstruction fibre.
 
 ## 4. Riemann hypothesis
 
@@ -223,14 +246,14 @@ missing scale face exactly: the complete actual vorticity translation difference
 through the reciprocal direction/Hodge stretching receiver without replacing it by a uniform
 derivative norm.
 
-[proved-derived; formal-checked] `HolonicTerminalCurrent.lean` now supplies the common
-local-to-global law which this worktrack had repeatedly approached indirectly.  The primary object
-is the oriented interval current `U(t)-U(s)`.  Finite gluing cancels every internal time face.  Its
-terminal null cone is the exact Cauchy condition on the incoming filter, equivalently eventual
-vanishing of every sufficiently late pairwise current in a normed receiver.  Completeness and
-separation reconstruct one unique terminal receiver value.  This law is reusable by every
-Millennium worktrack, but it becomes a problem solution only after the problem's constitutive
-current is proved null.
+[proved-derived; formal-checked] `HolonicDirectedPassage.lean` now carries the common law at its
+correct grain, and `HolonicTerminalCurrent.lean` is its incoming-real-time instance.  An arbitrary
+local current returns its exterior current plus the complete composition-defect population; on a
+closed path the loop return is exactly that defect ledger.  A state-induced current has zero defect.
+Along any declared filter, null current is the exact Cauchy condition; completeness and separation
+reconstruct one unique receiver return.  This law is reusable by every Millennium worktrack, but it
+becomes a problem solution only after the problem's constitutive current is proved null and its
+official receiver consequence is returned.
 
 [conditional; formal-checked] The Navier--Stokes attachment now distinguishes two different
 terminal returns.  A finite genuine critical-vorticity budget returns the unique terminal value of

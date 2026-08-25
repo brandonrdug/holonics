@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
+import ElementaryHolonics.Millennium.HolonicDirectedPassage
 import Mathlib.Topology.Order.DenselyOrdered
 import Mathlib.Topology.UniformSpace.CompleteSeparated
 
@@ -22,6 +22,8 @@ open Filter Set
 open scoped BigOperators Topology
 
 namespace Soma.Holonics.Millennium.HolonicTerminalCurrent
+
+open Soma.Holonics.Millennium.HolonicDirectedPassage
 
 /-! ## Oriented interval current and finite gluing -/
 
@@ -62,7 +64,7 @@ def incomingTerminalFilter (terminal : ℝ) : Filter ℝ :=
 the incoming terminal filter, expressed exactly as the Cauchy condition. -/
 def HasNullTerminalCurrentAt {X : Type*} [UniformSpace X]
     (terminal : ℝ) (state : ℝ → X) : Prop :=
-  Cauchy ((incomingTerminalFilter terminal).map state)
+  HasNullCurrentAlong (incomingTerminalFilter terminal) state
 
 /-- [proved-derived; formal-checked] For a normed additive receiver, terminal nullity says exactly
 that every sufficiently late pair of incoming occurrences carries an arbitrarily small oriented
