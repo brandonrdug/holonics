@@ -208,6 +208,24 @@ pointwise `222` Hodge bound, and `(1,1,1)` has the existing pointwise `111` Hodg
 strict residual addresses require the pointwise Hodge-entry laws for the three permutations of
 `112` and the three permutations of `122`.
 
+## Sixth returned deed
+
+[proved-derived; formal-checked] `NavierStokesDyadicHodgeThreeAxisOneFace.lean` composes the
+existing pointwise `111` Hodge-entry law with the exact scalar chart and caused support stencil at
+the central allocation address.  The unweighted natural face mass returns
+`28928000000 / R^3`; retaining its exact multiplicity eight returns the actual allocation-face
+bound `231424000000 / R^3` at every scale at least three.
+
+[proved-derived; formal-checked] This closes the central address by a source-specific constitutive
+law and uniform scale theorem.  The constants are the exact products `128 * 226 * 10^6` and
+`8 * 128 * 226 * 10^6`.  The axiom audit contains only propositional extensionality, classical
+choice, and quotient soundness, and contains no `sorryAx`.
+
+[open] Exactly six natural allocation faces now lack a pointwise Hodge-entry theorem: the three
+permutations of `112` and the three permutations of `122`.  Closing their existing exact ledger
+envelopes and reindexing every natural face back to the common official allocation population are
+the next analytic and reconstruction edges.
+
 ## Assumption discipline
 
 [project-postulate] Every promoted theorem records its source carrier, imported dependencies,
