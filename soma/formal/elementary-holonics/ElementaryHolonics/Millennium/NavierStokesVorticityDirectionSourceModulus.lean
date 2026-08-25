@@ -212,19 +212,21 @@ theorem receiverCrossDifference_eq_cross_sub_self
 
 /-! ## The returned distance law and infinite-depth carrier -/
 
-/-- **[proved-derived; formal-checked]** The actual source cross difference is linearly bounded by
-torus distance.  The coefficient is constructed from the receiving vorticity and the compact
-Lipschitz carrier of the same strict-interior physical slice. -/
-theorem openPeriodic_receiverCrossDifference_le_distance
+/-- The source cross-difference law transported from any declared Lipschitz coefficient on the
+common radius-three chart. -/
+theorem openPeriodic_receiverCrossDifference_le_distance_of_lipschitzOn
     {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
     {pressure : PressureField}
     (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
-    (t : Set.Ioo 0 T) (q y : SpatialTorus) :
+    (t : Set.Ioo 0 T) (K : ℝ≥0)
+    (hK : LipschitzOnWith K
+      (fun x ↦ vorticityField velocity x t.1) (Metric.closedBall 0 3))
+    (q y : SpatialTorus) :
     complexVectorL1
         (receiverCrossDifference (openPeriodicComplexVorticityAt solution t q)
           (complexTorusVorticitySlice solution t (q - y))) ≤
       (9 * complexVectorL1 (openPeriodicComplexVorticityAt solution t q) *
-          (openPeriodicVorticityLipschitzConstant solution t : ℝ)) * dist y 0 := by
+          (K : ℝ)) * dist y 0 := by
   let x : Space := centeredEuclideanRepresentative q
   let displacement : Space := centeredEuclideanRepresentative y
   have hxnorm : ‖x‖ ≤ (3 : ℝ) / 2 :=
@@ -236,13 +238,11 @@ theorem openPeriodic_receiverCrossDifference_le_distance
   have hxsubmem : x - displacement ∈ Metric.closedBall (0 : Space) 3 := by
     rw [Metric.mem_closedBall, dist_zero_right]
     exact (norm_sub_le x displacement).trans (by linarith)
-  have hlipschitz :=
-    (openPeriodicVorticityLipschitzOn_closedBall solution t).dist_le_mul
-      (x - displacement) hxsubmem x hxmem
+  have hlipschitz := hK.dist_le_mul (x - displacement) hxsubmem x hxmem
   have hvorticityDifference :
       ‖vorticityField velocity (x - displacement) t.1 -
           vorticityField velocity x t.1‖ ≤
-        (openPeriodicVorticityLipschitzConstant solution t : ℝ) * ‖displacement‖ := by
+        (K : ℝ) * ‖displacement‖ := by
     simpa [dist_eq_norm] using hlipschitz
   have hdisplacementDistance : ‖displacement‖ ≤ 3 * dist y 0 :=
     norm_centeredEuclideanRepresentative_le_three_mul_dist y
@@ -263,7 +263,7 @@ theorem openPeriodic_receiverCrossDifference_le_distance
       complexVectorL1
           (complexTorusVorticitySlice solution t (q - y) -
             openPeriodicComplexVorticityAt solution t q) ≤
-        9 * (openPeriodicVorticityLipschitzConstant solution t : ℝ) * dist y 0 := by
+        9 * (K : ℝ) * dist y 0 := by
     rw [openPeriodicComplexVorticityAt_eq_torusComplexification]
     change
       complexVectorL1
@@ -279,14 +279,14 @@ theorem openPeriodic_receiverCrossDifference_le_distance
             vorticityField velocity x t.1‖ :=
         complexVectorL1_complexOfRealSpace_le_three_norm _
       _ ≤ 3 *
-          ((openPeriodicVorticityLipschitzConstant solution t : ℝ) *
+          ((K : ℝ) *
             ‖displacement‖) :=
         mul_le_mul_of_nonneg_left hvorticityDifference (by norm_num)
       _ ≤ 3 *
-          ((openPeriodicVorticityLipschitzConstant solution t : ℝ) *
+          ((K : ℝ) *
             (3 * dist y 0)) := by
         gcongr
-      _ = 9 * (openPeriodicVorticityLipschitzConstant solution t : ℝ) * dist y 0 := by
+      _ = 9 * (K : ℝ) * dist y 0 := by
         ring
   rw [receiverCrossDifference_eq_cross_sub_self]
   calc
@@ -300,12 +300,29 @@ theorem openPeriodic_receiverCrossDifference_le_distance
             openPeriodicComplexVorticityAt solution t q) :=
       complexVectorL1_cross_le_mul _ _
     _ ≤ complexVectorL1 (openPeriodicComplexVorticityAt solution t q) *
-        (9 * (openPeriodicVorticityLipschitzConstant solution t : ℝ) * dist y 0) :=
+        (9 * (K : ℝ) * dist y 0) :=
       mul_le_mul_of_nonneg_left hsourceDifference
         (complexVectorL1_nonneg _)
     _ = (9 * complexVectorL1 (openPeriodicComplexVorticityAt solution t q) *
-          (openPeriodicVorticityLipschitzConstant solution t : ℝ)) * dist y 0 := by
+          (K : ℝ)) * dist y 0 := by
       ring
+
+/-- **[proved-derived; formal-checked]** The actual source cross difference is linearly bounded by
+torus distance.  The coefficient is constructed from the receiving vorticity and the compact
+Lipschitz carrier of the same strict-interior physical slice. -/
+theorem openPeriodic_receiverCrossDifference_le_distance
+    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
+    (t : Set.Ioo 0 T) (q y : SpatialTorus) :
+    complexVectorL1
+        (receiverCrossDifference (openPeriodicComplexVorticityAt solution t q)
+          (complexTorusVorticitySlice solution t (q - y))) ≤
+      (9 * complexVectorL1 (openPeriodicComplexVorticityAt solution t q) *
+          (openPeriodicVorticityLipschitzConstant solution t : ℝ)) * dist y 0 := by
+  exact openPeriodic_receiverCrossDifference_le_distance_of_lipschitzOn
+    solution t (openPeriodicVorticityLipschitzConstant solution t)
+      (openPeriodicVorticityLipschitzOn_closedBall solution t) q y
 
 /-- The physical strict-interior slice packaged as the exact distance-modulus carrier consumed by
 the dyadic Hodge moment theorem. -/
@@ -382,6 +399,7 @@ section Audit
 #print axioms euclideanToSpatialTorus_centeredEuclideanRepresentative
 #print axioms norm_centeredEuclideanRepresentative_le_three_mul_dist
 #print axioms openPeriodicVorticityLipschitzOn_closedBall
+#print axioms openPeriodic_receiverCrossDifference_le_distance_of_lipschitzOn
 #print axioms openPeriodic_receiverCrossDifference_le_distance
 #print axioms openPeriodicDyadicSpatialCrossCoherenceSummable_inhabited
 #print axioms openPeriodicFullSpatialCrossCoherenceMass_le_distanceMoments

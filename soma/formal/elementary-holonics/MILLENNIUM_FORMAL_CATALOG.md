@@ -32,23 +32,23 @@ unless a separate literature audit is deposited.
 
 ## 2. Measured station inventory
 
-[established-bounded; measured] On the 2026-08-25 source/enstrophy closure after returning the
-physical vorticity distance modulus and composing it through the actual unit-cube receiver, the
+[established-bounded; measured] On the 2026-08-25 canonical time closure after returning the
+compact-open vorticity derivative chart and its strict-interior time transport, the
 station contains:
 
 | Receiver | Returned count |
 |---|---:|
-| Lean modules below `ElementaryHolonics/` | 462 |
-| theorem or lemma declarations | 5,893 |
-| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,357 |
-| modules below `ElementaryHolonics/Millennium/` | 415 |
-| theorem or lemma declarations below `Millennium/` | 5,495 |
-| broad declarations below `Millennium/` | 7,695 |
-| explicit `#print axioms` audit commands below `Millennium/` | 1,548 |
+| Lean modules below `ElementaryHolonics/` | 464 |
+| theorem or lemma declarations | 5,916 |
+| theorem, lemma, definition, abbreviation, structure, class, or inductive declarations | 8,386 |
+| modules below `ElementaryHolonics/Millennium/` | 417 |
+| theorem or lemma declarations below `Millennium/` | 5,518 |
+| broad declarations below `Millennium/` | 7,724 |
+| explicit `#print axioms` audit commands below `Millennium/` | 1,570 |
 
 [established-bounded; measured] The principal module bands are 17 Foundation modules, 2 Algorithm
-modules, 8 Geometry modules, 20 dedicated RH modules, and 415 Millennium modules.  Search prefixes
-inside the Millennium band include 202 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
+modules, 8 Geometry modules, 20 dedicated RH modules, and 417 Millennium modules.  Search prefixes
+inside the Millennium band include 204 `NavierStokes*`, 30 `Family*`, 15 `General*`, 10 `Five*`, 6
 `Hilbert*`, 2 `Hodge*`, and 13 `Holonic*` modules.  These prefixes overlap thematic work and are not
 a partition of the library.
 
@@ -176,6 +176,9 @@ the same object rather than compared by prose.
 | `proved-derived; formal-checked` | non-circular scale-zero energy descent | `NavierStokesVorticityDirectionBaseEnergy.lean` uses Parseval to bound every actual velocity coefficient by its component cube energy, transports the fixed unit-frequency population through exact curl and Hodge ascent, bounds the 27-mode base low pass by `1458π·sqrt(2E(t))`, and rebuilds the finite, infinite-depth, and literal physical vortex-stretching returns with ordinary periodic kinetic energy in place of the critical-vorticity payment | exact composition of componentwise Parseval, unit-cube lattice incidence, curl multiplier, modewise Hodge ascent, kinetic-energy inclusion, finite scale gluing, dyadic tail convergence, and the spatial cross receiver | the circular base term and apparatus kernel moments are removed; prove a terminal-time-integrable source direction-modulus coefficient, then integrate the resulting physical bound through the enstrophy/continuation receiver |
 | `proved-derived; formal-checked` | physical source distance modulus | `NavierStokesVorticityDirectionSourceModulus.lean` constructs an exact centered Euclidean representative of every torus displacement, proves its norm is at most `3·dist(y,0)`, obtains a finite vorticity Lipschitz coefficient on the common radius-three compact chart from the actual `C¹` slice, and proves `|omega(x) cross omega(x-y)|₁ ≤ 9|omega(x)|₁ K(t) dist(y,0)`; this inhabits the infinite-depth spatial coherence carrier and removes the summability hypothesis from the physical stretching theorem | exact torus quotient transport, compact local Lipschitz extraction, cross-product difference cancellation, and the inhabited Hodge distance-moment population | the selected coefficient is finite for each `t<T`; terminal-time measurability and integrability are not consequences of strict-interior smoothness |
 | `proved-derived; formal-checked` | unit-cube enstrophy closure | `NavierStokesVorticityDirectionEnstrophyClosure.lean` proves the reciprocal direction receiver cancels the fourth coordinate-`L¹` power by `‖(dot(omega,omega))⁻¹‖·|omega|₁⁴ ≤ 81‖omega‖²`, packages the complete Hodge distance-moment `tsum`, derives a spatially uniform pointwise enstrophy-density bound, integrates it over the actual periodic cube, and replaces the former uniform-Jacobian premise in the exact enstrophy-rate inequality by one constructed time coefficient | exact composition of the physical direction reconstruction, source modulus, summable kernel moment, real/complex chart, compact spatial integral, and periodic enstrophy identity | prove the constructed rate interval-integrable up to the maximal time or replace its full vorticity Lipschitz face by a sharper direction-only/scale-critical receiver and then connect the resulting enstrophy control to terminal restart |
+| `proved-derived; formal-checked` | canonical derivative modulus | `NavierStokesVorticityCanonicalModulus.lean` replaces the arbitrary slice-wise Lipschitz witness by the norm of the actual continuous spatial-vorticity derivative population on the compact radius-three chart; it reconstructs the source distance law, all-scale coherence, pointwise stretching, cube-integrated stretching, and enstrophy-rate law with that canonical coefficient | exact compact-open receiver over the actual `fderiv`, mean-value transport, and the completed spatial Hodge passage | the coefficient is canonical and finite at every `t<T`; its terminal integral is not supplied by this spatial theorem |
+| `proved-derived; formal-checked` | strict-interior time transport | `NavierStokesVorticityCanonicalTime.lean` proves joint space--time smoothness of actual vorticity on `ℝ³×(0,T)`, identifies each slice derivative with the joint derivative restricted to the spatial inclusion, curries the compact chart, and proves both the canonical derivative norm and complete enstrophy coefficient continuous on `(0,T)` and interval-integrable on every ordered `[a,b]⊂(0,T)` | exact joint derivative restriction, compact-open currying, norm transport, and compact-interval integration | obtain a terminal quantitative estimate; strict-interior continuity cannot close `[0,T]` |
+| `counterexample; formal-checked` | interior continuity versus terminal integrability | `strictInteriorContinuousNonnegative_not_sufficient_for_terminalIntegrability` exhibits the nonnegative population `‖(t-1)⁻¹‖`, continuous on `(0,1)` but not interval-integrable on `[0,1]` | Mathlib's exact inverse nonintegrability theorem composed with the norm receiver | any terminal continuation argument must exclude this pole class by a source-specific PDE estimate; no continuity-only promotion is lawful |
 | `counterexample; formal-checked` | uniform scale bound versus summability | `NavierStokesVorticityDirectionKernelMoment.uniform_nonnegative_scale_bound_does_not_imply_summable` exhibits the constant nonnegative scale population `1`, uniformly bounded by `1` but not summable | exact real-series counterexample | the completed uniform kernel `L¹` law cannot close the infinite-depth direction carrier without a genuinely decaying localization/moment return |
 | `counterexample; formal-checked` | coarse coefficient magnitude | `PrimeRadixAtlas.lean`: the declared intermediate bound faces sum to `412236000 = 2^5*3^3*5^3*11*347`; `347` is absent from both incoming terms and appears after addition | exact natural arithmetic and prime valuation | `420000000` is a rounded enlargement of this intermediate return; the separate `42*10^17` common-magnitude proposal is withdrawn because no complete assembly returns it |
 | `proved-derived; formal-checked` | measured difference | `MillenniumDifferenceAtlas.dyadicHodgeSubsetMassExcess`: each subset obligation is exactly `mass - constant·scale ≤ 0`; `NavierStokesDyadicHodgeRemainingSubsetMasses.lean` proves one common constant and all those nonpositive excess returns over every scale `≥3`, all 27 Hodge entries, and all 8 faces | project-specific composition | the excess and restart receivers are closed; the next difference is the critical-vorticity integrability defect |
@@ -193,9 +196,12 @@ convolution, cancels the aligned source at every displacement, retains the lossl
 difference, pays for its fixed base only through ordinary kinetic energy, and returns a summable
 physical distance moment for the actual Hodge kernel.  The physical solution now supplies the
 linear torus-distance law itself, and the complete scale population has been integrated into the
-unit-cube enstrophy receiver.  The remaining local-to-global edge is temporal: control the returned
-vorticity-gradient coefficient up to the maximal face, or sharpen the source law to a
-direction-only critical coefficient whose time receiver already composes with continuation.
+unit-cube enstrophy receiver.  The coefficient is now the canonical norm of the actual compact
+spatial derivative chart; joint smoothness makes it continuous, and hence integrable, on every
+strict compact time window.  The formal terminal-pole separator proves that this cannot be promoted
+to `[0,T]` from interior regularity alone.  The remaining local-to-global edge is a PDE estimate
+which excludes terminal concentration, or a sharper direction-only critical coefficient whose
+terminal receiver already composes with continuation.
 
 ## 8. Yang--Mills and mass gap
 
@@ -614,13 +620,17 @@ owners which originally separated the physical source from the enstrophy receive
 three-axis allocation, all eight Boolean faces, uniform Hodge-kernel control, non-circular
 scale-zero energy, distance-weighted kernel summability, the actual source distance modulus,
 reciprocal direction cancellation, and unit-cube integration.  The latest returned theorem is the
-exact variable-coefficient enstrophy-rate law.  It does not yet inhabit a Clay alternative because
-the constructed coefficient has no maximal-time integral or terminal restart theorem.
+exact variable-coefficient enstrophy-rate law with the arbitrary Lipschitz witness replaced by the
+norm of the actual compact derivative chart.  That coefficient is continuous and integrable on
+every strict compact time window.  It does not yet inhabit a Clay alternative: the terminal-pole
+counterexample proves that these interior facts alone do not supply the maximal-time integral or a
+terminal continuation estimate.
 
-1. **Navier--Stokes:** replace the per-slice choice of vorticity Lipschitz witness by a canonical
-   derivative-supremum or direction-coherence rate, prove its temporal regularity, and test exact
-   interval-integrability/absorption and terminal restart.  A sharper direction-only modulus is
-   preferred if the full-gradient rate returns a continuation-equivalent obstruction.
+1. **Navier--Stokes:** derive a terminal PDE estimate for the now-canonical vorticity-derivative
+   rate, or transport it into the existing critical-vorticity continuation receiver and identify
+   the exact additional population needed to exclude the formal terminal pole.  A sharper
+   direction-only modulus remains preferred if the full-gradient rate is strictly stronger than
+   the official continuation criterion.
 2. **BSD:** close or further factor the Waldspurger--Tunnell defect while preserving the finite
    ternary coefficient and analytic theta lineages.
 3. **Hodge:** construct an official surface realization and transport the quotient difference and

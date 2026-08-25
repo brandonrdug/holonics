@@ -1119,6 +1119,56 @@ rate, prove that rate's temporal regularity, and either establish its maximal-ti
 terminal restart consequence or return an exact obstruction showing that full vorticity
 Lipschitz control is still the wrong receiver.
 
+## Twenty-ninth returned deed
+
+[proved-derived; formal-checked]
+`NavierStokesVorticityCanonicalModulus.lean` removes the arbitrary choice from the source
+coefficient.  The source occurrence is now the actual spatial `fderiv` of the strict-interior
+vorticity slice on the complete compact radius-three chart, and its receiver is the norm of that
+continuous-map population.  The mean-value theorem makes this norm a canonical Lipschitz
+constant.  Replacing the former witness with it preserves the exact torus-distance cross law, the
+infinite-depth Hodge coherence carrier, the pointwise physical stretching inequality, the
+unit-cube stretching bound, and the enstrophy-rate law.
+
+[proved-derived; formal-checked]
+`NavierStokesVorticityCanonicalTime.lean` then closes the strict-interior time transport.  From the
+solution's admitted joint space--time smoothness it proves that actual vorticity is jointly smooth
+on `Space × (0,T)`, identifies every slice derivative with the joint derivative restricted to the
+fixed spatial inclusion, and curries the radius-three compact chart.  Therefore the
+continuous-map-valued derivative population, its norm, the periodic kinetic-energy face, and the
+complete canonical enstrophy coefficient are continuous on `(0,T)`.  For every ordered
+`0 < a ≤ b < T`, the totalized coefficient is interval-integrable on `[a,b]`.
+
+[counterexample; formal-checked]
+The same owner proves the terminal receiver cannot be inferred from those facts alone.  The exact
+nonnegative population
+
+```text
+t ↦ ‖(t - 1)⁻¹‖
+```
+
+is continuous on `(0,1)` but is not interval-integrable on `[0,1]`.  Thus the missing edge has
+been reduced from an ambiguous regularity premise to a falsifiable source-specific demand: a PDE
+estimate must exclude terminal pole concentration, or a sharper direction-only/critical receiver
+must replace the full vorticity-gradient coefficient.  No continuity-only passage can inhabit the
+terminal continuation receiver.
+
+[proved-derived; formal-checked]
+The source audit now includes the generic Lipschitz-to-distance transport theorem.  Its eight
+printed audits, the ten canonical-modulus audits, and the eleven canonical-time audits depend only
+on propositional extensionality, classical choice, and quotient soundness, with no `sorryAx`.
+Focused checking, both named module builds, and the complete `ElementaryHolonics.lean` umbrella
+pass.  The measured station now contains 464 Lean modules, 5,916 theorem/lemma declarations,
+8,386 broad declarations, 417 Millennium modules, 5,518 Millennium theorem/lemma declarations,
+7,724 Millennium broad declarations, and 1,570 explicit Millennium axiom audits.
+
+[open]
+The next exact passage is not more strict-interior smoothness.  It must compare the canonical
+gradient coefficient with the existing critical-vorticity continuation receiver, retaining the
+additional low-order/enstrophy population required by that comparison, or derive a viscous
+terminal estimate which makes the canonical coefficient integrable through `T`.  If neither
+comparison factors, the returned defect determines the next lawful direction-only modulus.
+
 ## Action-transport graph pivot
 
 [historical] The supplied Rubik and graph references were consulted as research prompts for finite
