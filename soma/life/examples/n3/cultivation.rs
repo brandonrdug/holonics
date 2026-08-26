@@ -113,7 +113,9 @@ impl NativeCultivatedMathematicalRest {
             || held_out_family_occurrences.is_empty()
             || disjoint_control_occurrences.is_empty()
         {
-            return Err("the native world return does not found the declared cultivation".to_owned());
+            return Err(
+                "the native world return does not found the declared cultivation".to_owned(),
+            );
         }
         let predecessor_flags = vec![0; families];
         let successor_flags = vec![1; families];
@@ -170,8 +172,8 @@ impl NativeCultivatedMathematicalRest {
             predecessor_fibres,
         )
         .map_err(|error| error.to_string())?;
-        let standing = serde_json::from_slice(cultivation_standing)
-            .map_err(|error| error.to_string())?;
+        let standing =
+            serde_json::from_slice(cultivation_standing).map_err(|error| error.to_string())?;
         let rest = Self {
             predecessor,
             standing,
@@ -267,9 +269,7 @@ impl NativeCultivatedMathematicalRest {
     ) -> Result<NativeRouteReturn, String> {
         let families = self.predecessor.standing().carrier_charts.len();
         let dimension = self.predecessor.standing().generator.dimension as usize;
-        if sections.len() != families
-            || sections.iter().any(|section| section.len() != dimension)
-        {
+        if sections.len() != families || sections.iter().any(|section| section.len() != dimension) {
             return Err("the cultivated section family leaves the native boundary".to_owned());
         }
         let returned = card
@@ -295,7 +295,9 @@ impl NativeCultivatedMathematicalRest {
     }
 
     fn validate(&self) -> Result<(), String> {
-        self.predecessor.validate().map_err(|error| error.to_string())?;
+        self.predecessor
+            .validate()
+            .map_err(|error| error.to_string())?;
         let predecessor = self
             .predecessor
             .canonical_identity()
@@ -304,18 +306,13 @@ impl NativeCultivatedMathematicalRest {
         if self.standing.schema != "holonics.n3.native-cultivation-standing.v1"
             || self.standing.predecessor_rest_sha256 != predecessor
             || self.standing.delta.predecessor_rest_sha256 != predecessor
-            || self.standing.delta.world_return_occurrence
-                != self.standing.world_return.occurrence
+            || self.standing.delta.world_return_occurrence != self.standing.world_return.occurrence
             || self.standing.delta.predecessor_flags != vec![0; families]
             || self.standing.delta.successor_flags != vec![1; families]
             || self.standing.delta.exact_support_families
                 != (0..families as u32).collect::<Vec<_>>()
             || self.standing.delta.metric_adjoint_orientation
-                != self
-                    .predecessor
-                    .standing()
-                    .generator
-                    .constraint_orientation
+                != self.predecessor.standing().generator.constraint_orientation
             || self.standing.delta.exact_rank != 1
             || self.standing.delta.open_exterior.is_empty()
         {
@@ -325,10 +322,7 @@ impl NativeCultivatedMathematicalRest {
     }
 }
 
-fn route_return(
-    returned: DeviceNativeFixedSectionFamilies,
-    device: String,
-) -> NativeRouteReturn {
+fn route_return(returned: DeviceNativeFixedSectionFamilies, device: String) -> NativeRouteReturn {
     NativeRouteReturn {
         transported_sections: returned.transported_sections,
         constraint_residuals: returned.constraint_residuals,

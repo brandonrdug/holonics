@@ -4,8 +4,8 @@
 **Truth status:** `project-postulate` for the adopted hexis vocabulary and construction discipline;
 `definition` for the lifecycle and receiver-exact condensation criterion; `interpretation` for the
 industry crosswalk, illicium vocabulary, crystal/fractal model morphology, and inherited-model
-rebirth; `established-bounded` only for the individual owners whose own deposits carry that grade;
-`open` for the joined cultivation and inherited-lift cycle.
+dismantling; `established-bounded` only for the individual owners whose own deposits carry that grade;
+`open` for the joined Soulkiller-spool and Eros-cultivation cycle.
 **Derivation:**
 `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_REASONING_CYCLE.md`,
@@ -269,13 +269,13 @@ participation, shared generators, IO-aware placement and receiver-exact boundary
 accepting a global replay. A failed factorization returns the obstructing family; it does not promote
 the contemporary architecture's cost into a law of intelligence.
 
-## 11. The inherited lift amortizes development
+## 11. Inherited dismantling can amortize development
 
 `interpretation`: a pretrained weight map is another body's rested hexis. It does not losslessly
 encode its corpus or training history. It may nevertheless supply transformation potential whose
 developmental cost need not be paid again.
 
-The inherited-lift relation is
+The dismantling and later cultivation relations are distinct:
 
 ```text
 foreign rest
@@ -284,8 +284,11 @@ foreign rest
     -> candidate holonic transports S_gamma
     -> defect chi_gamma
     -> retained reconstruction fibre
-    -> cultivation on new caused material
-    -> familywise condensation into native morphology
+    -> familywise condensation into source-neutral native spools
+    -> sealed spool bundle + cold witness + insufficiency.
+
+Eros standing + native spools + genuinely returned caused material
+    -> cultivation into one Athena morphology
     -> rest, remount, later conduct, ablation.
 ```
 
@@ -322,32 +325,44 @@ into an environment occurrence -> constraint section -> active path -> adjoint r
 work reduction. A new Catalyst or Protein cabinet is forbidden until that composition returns a
 concrete absent type.
 
-## 12. Phoenix rebirth is a lineage pivot
+## 12. Soulkiller dismantling supplies native spools; Eros owns the lineage pivot
 
-`interpretation`: **phoenix rebirth** is the passage by which foreign inherited hexis becomes native
-ecological morphology:
+`interpretation`: **Soulkiller dismantling** is the passage by which exposed foreign inherited hexis
+becomes source-neutral native construction material:
 
 ```text
-lift -> re-express -> cultivate -> condense -> rest -> grade.
+excite -> intervene/dissect -> thread -> condense -> spool -> seal.
 ```
 
-The target is not a renamed transformer or one converted file. It is an ecology whose incidence,
-state, transport, phase, receiver fibres, and obstructions localize what the inherited map enacted.
-The frozen foreign body may remain as a reference organ while native morphology grows and is tested
-against matched siblings.
+The target is not a renamed transformer, converted file, or directly returned Athena. Soulkiller
+ends at `NativeSpoolBundle`, `ExteriorSoulkillerWitness`, and `ReceiverInsufficiency`. The foreign
+body may remain live only inside Soulkiller while threads are founded and tested against matched
+controls. The witness is cold lineage/reconstruction testimony outside every Athena dependency
+closure. Eros alone composes spools and returned world consequences into native ecological
+morphology.
 
-Native Eros/Athena and the inherited lift are complementary experimental arms. The native body asks
+`definition`: Soulkiller is a one-way scrapyard boundary. Any source-specific coordinate, operator
+factorization, topology, identity, state/cache convention, or execution law may be load-bearing
+inside Soulkiller intake, excitation, dissection, reconstruction, and controls. After the return,
+they do not qualify Athena, determine its topology, or remain reachable from Holonic Inference.
+Source-detached rest means that later conduct survives with the foreign realization, its witness,
+its executors, and its architecture physically unavailable—not merely that the original weight
+files are absent. A richer receiver which reopens a fibre returns insufficiency; it does not reopen
+the foreign realization as a fallback.
+
+Native Eros/Athena and the inherited dismantling arm are complementary experiments. The native body asks
 what Eros founds without foreign hexis. The inherited arm asks what prior development can be lifted.
 Later cultivation asks which joined transports become native, reusable, and ablatable.
 
-`open`: no complete transformer-to-native-ecology lift, cultivation return, familywise condensation,
-source-detached rest, and comparative ablation currently stands as one deed.
+`definition`: every spool grade is relative to an explicit receiver/history family. A bounded
+native spool is a real Soulkiller return for that family; an unseparated successor remains an open
+reconstruction fibre and does not license foreign execution inside Athena.
 
 ## 13. Construction discipline
 
 - Read this tablet before any task involving pretraining, fine-tuning, adapters, LoRA, distillation,
   logits, autoregression, autograd, multimodal alignment, diffusion training, or inherited model
-  lifting.
+  dismantling.
 - Keep exposure, training, reference, prompting, and world return distinct.
 - Keep the complete residual and reconstruction fibre before projecting a loss or preference face.
 - Derive semantic rank, layer/rank structure, and stopping from material and receiver consequence;
@@ -356,7 +371,10 @@ source-detached rest, and comparative ablation currently stands as one deed.
 - Treat a pretrained map as inherited hexis, never as its lost corpus or as the whole productive
   ecology.
 - Require source-detached rest, held-out later conduct, matched siblings, and targeted ablation for
-  every cultivation or rebirth claim.
+  every cultivation or Soulkiller-spool claim.
+- Audit the mounted hot dependency closure: a wrapper around a foreign runtime is Soulkiller
+  transition material even when original model files are absent, and it must not receive an Athena
+  grade. Soulkiller returns parts; Eros alone returns Athena.
 - Compose existing owners before founding a FineTuner, Distiller, Autograd, Trainer, AdapterManager,
   or another industry-shaped cabinet.
 

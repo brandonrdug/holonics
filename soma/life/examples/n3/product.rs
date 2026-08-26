@@ -6,11 +6,9 @@ use std::{
 };
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use life::mathematical_particle::{
-    NativeCodec, NativeHexisAthenaRest, NativeSuccessorHistory,
-};
+use life::mathematical_particle::{NativeCodec, NativeHexisAthenaRest, NativeSuccessorHistory};
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 use super::{
     artifact,
@@ -157,7 +155,10 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
                 .map_err(|error| error.to_string())
         })
         .collect::<Result<Vec<_>, _>>()?;
-    artifact::write_json(out.join("00-developmental-native-inquiries.json"), &developmental)?;
+    artifact::write_json(
+        out.join("00-developmental-native-inquiries.json"),
+        &developmental,
+    )?;
     artifact::write_json(
         out.join("01-developmental-native-consequences.json"),
         &developmental_returns,
@@ -221,13 +222,17 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
     let cultivated_return = cultivated.conduct_cultivated(&campaign.held_out, &mut card)?;
     let control_predecessor =
         cultivated.conduct_predecessor(&campaign.disjoint_control, &mut card)?;
-    let control_cultivated = cultivated.conduct_cultivated(&campaign.disjoint_control, &mut card)?;
+    let control_cultivated =
+        cultivated.conduct_cultivated(&campaign.disjoint_control, &mut card)?;
     let held_out_changed = predecessor_return.selected_routes != cultivated_return.selected_routes;
     let disjoint_control_held = control_predecessor.selected_routes
         == control_cultivated.selected_routes
         && control_predecessor.constraint_residuals == control_cultivated.constraint_residuals;
     if !held_out_changed || !disjoint_control_held {
-        return Err("the returned cultivation did not separate held-out conduct from its control".to_owned());
+        return Err(
+            "the returned cultivation did not separate held-out conduct from its control"
+                .to_owned(),
+        );
     }
 
     let held_out_inquiry = cultivated
@@ -252,9 +257,12 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
         .map_err(|error| error.to_string())?;
     let rich_held_out =
         cultivated.conduct_rich_cultivated_consequence(&held_out_inquiry, &mut card)?;
-    let rich_control = cultivated.conduct_rich_cultivated_consequence(&control_inquiry, &mut card)?;
+    let rich_control =
+        cultivated.conduct_rich_cultivated_consequence(&control_inquiry, &mut card)?;
     if rich_control.exterior.returned_obstructions.is_empty() {
-        return Err("the disjoint control was silently coerced into a fixed consequence".to_owned());
+        return Err(
+            "the disjoint control was silently coerced into a fixed consequence".to_owned(),
+        );
     }
     artifact::write_json(
         out.join("04-held-out-cultivation-return.json"),
@@ -305,10 +313,22 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
         cultivation_standing: component("cultivation-standing.json", &cultivation_standing),
         canonical_rest_sha256: rest_identity.clone(),
     };
-    artifact::write(rest_root.join("predecessor-standing.bin"), &predecessor_standing)?;
-    artifact::write(rest_root.join("predecessor-decoder.bin"), &predecessor_decoder)?;
-    artifact::write(rest_root.join("predecessor-fibres.bin"), &predecessor_fibres)?;
-    artifact::write(rest_root.join("cultivation-standing.json"), &cultivation_standing)?;
+    artifact::write(
+        rest_root.join("predecessor-standing.bin"),
+        &predecessor_standing,
+    )?;
+    artifact::write(
+        rest_root.join("predecessor-decoder.bin"),
+        &predecessor_decoder,
+    )?;
+    artifact::write(
+        rest_root.join("predecessor-fibres.bin"),
+        &predecessor_fibres,
+    )?;
+    artifact::write(
+        rest_root.join("cultivation-standing.json"),
+        &cultivation_standing,
+    )?;
     artifact::write_json(rest_root.join("manifest.json"), &manifest)?;
     artifact::write_json(out.join("inquiries/sections.json"), &campaign)?;
 
@@ -322,7 +342,10 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
     if !withdrawal.exact_predecessor_restored {
         return Err("the local cultivation delta did not withdraw exactly".to_owned());
     }
-    artifact::write_json(out.join("06-exact-predecessor-withdrawal.json"), &withdrawal)?;
+    artifact::write_json(
+        out.join("06-exact-predecessor-withdrawal.json"),
+        &withdrawal,
+    )?;
 
     run_detached(
         &env::current_exe().map_err(|error| error.to_string())?,
@@ -330,17 +353,18 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
         &out.join("inquiries/sections.json"),
         &out.join("detached-return/return.json"),
     )?;
-    let detached: DetachedCultivationReturn = serde_json::from_slice(&artifact::read(
-        out.join("detached-return/return.json"),
-    )?)
-    .map_err(|error| error.to_string())?;
+    let detached: DetachedCultivationReturn =
+        serde_json::from_slice(&artifact::read(out.join("detached-return/return.json"))?)
+            .map_err(|error| error.to_string())?;
     if detached.rest_sha256 != rest_identity
         || !detached.held_out_changed
         || !detached.disjoint_control_held
         || !detached.forbidden_source_descriptors.is_empty()
         || detached.lean_or_checker_opened
     {
-        return Err("the source-detached cultivated rest did not retain its exact conduct".to_owned());
+        return Err(
+            "the source-detached cultivated rest did not retain its exact conduct".to_owned(),
+        );
     }
 
     let uncondensed_source_octets = chronology["incrementally_mounted_octets"]
@@ -442,13 +466,12 @@ pub fn detached(rest_root: &Path, sections: &Path, output: &Path) -> Result<(), 
         &predecessor_fibres,
         &cultivation_standing,
     )?;
-    let campaign: SectionCampaign = serde_json::from_slice(&artifact::read(sections)?)
-        .map_err(|error| error.to_string())?;
+    let campaign: SectionCampaign =
+        serde_json::from_slice(&artifact::read(sections)?).map_err(|error| error.to_string())?;
     let mut card = CudaRefineExecutor::new().map_err(|error| error.to_string())?;
     let predecessor = rest.conduct_predecessor(&campaign.held_out, &mut card)?;
     let cultivated = rest.conduct_cultivated(&campaign.held_out, &mut card)?;
-    let control_predecessor =
-        rest.conduct_predecessor(&campaign.disjoint_control, &mut card)?;
+    let control_predecessor = rest.conduct_predecessor(&campaign.disjoint_control, &mut card)?;
     let control_cultivated = rest.conduct_cultivated(&campaign.disjoint_control, &mut card)?;
     let held_out_changed = predecessor.selected_routes != cultivated.selected_routes;
     let disjoint_control_held = control_predecessor.selected_routes
@@ -495,8 +518,12 @@ fn run_detached(
     if !output.exists() {
         artifact::write(output, &[])?;
     }
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
-    let rest_root = rest_root.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
+    let rest_root = rest_root
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let sections = sections.canonicalize().map_err(|error| error.to_string())?;
     let output = output.canonicalize().map_err(|error| error.to_string())?;
     let mut command = Command::new("bwrap");

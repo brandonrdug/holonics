@@ -11,8 +11,10 @@ use std::path::Path;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
-use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
-use holonic_engine::phoenix::heterogeneous_fusion::{SourcePortResponse, tokenize_exterior_occurrence};
+use holonic_engine::foreign_map::{manifest_safetensors, ForeignContainer};
+use holonic_engine::native_ecology::heterogeneous_fusion::{
+    tokenize_exterior_occurrence, SourcePortResponse,
+};
 use image::RgbImage;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

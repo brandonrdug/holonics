@@ -17,12 +17,8 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = FamilyCultivatedAthenaRest::read(
-        &read(standing)?,
-        &read(decoder)?,
-        &read(fibres)?,
-    )
-    .map_err(|error| error.to_string())?;
+    let rest = FamilyCultivatedAthenaRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
+        .map_err(|error| error.to_string())?;
     let inquiry: FamilyInquiry = serde_json::from_slice(&read(inquiry)?)
         .map_err(|error| format!("read L1 inquiry: {error}"))?;
     rest.admit_inquiry(&inquiry)
@@ -78,22 +74,19 @@ pub fn conduct(
     if !rest.predecessor_is_committed()
         || returned.local_ablated_joint != vec![0; rest.cultivations().len()]
         || targeted.iter().any(|receipt| {
-            receipt["joint_cultivated"] != false
-                || receipt["unwithdrawn_family_retained"] != true
+            receipt["joint_cultivated"] != false || receipt["unwithdrawn_family_retained"] != true
         })
     {
         return Err("the L0 control or L1 targeted family ablations moved".to_owned());
     }
     let all_constraints_held = returned.constraint_held.iter().all(|value| *value == 1);
     if all_constraints_held
-        && (!returned.joint_cultivated
-            || returned.selected_route.iter().any(|route| *route != 1))
+        && (!returned.joint_cultivated || returned.selected_route.iter().any(|route| *route != 1))
     {
         return Err("the independently cultivated theorem families did not compose".to_owned());
     }
     if !all_constraints_held
-        && (returned.joint_cultivated
-            || returned.selected_route.iter().all(|route| *route == 1))
+        && (returned.joint_cultivated || returned.selected_route.iter().all(|route| *route == 1))
     {
         return Err("a constraint defect entered the composed theorem route".to_owned());
     }
@@ -163,7 +156,11 @@ pub fn conduct(
     ];
     let forbidden_source_access = open_descriptors
         .iter()
-        .filter(|target| forbidden_needles.iter().any(|needle| target.contains(needle)))
+        .filter(|target| {
+            forbidden_needles
+                .iter()
+                .any(|needle| target.contains(needle))
+        })
         .cloned()
         .collect::<Vec<_>>();
     if !forbidden_source_access.is_empty() {
@@ -270,8 +267,12 @@ fn nvidia_sample() -> Value {
         ])
         .output();
     match returned {
-        Ok(output) if output.status.success() => json!({"available": true, "raw": String::from_utf8_lossy(&output.stdout).trim()}),
-        Ok(output) => json!({"available": false, "status": output.status.code(), "stderr": String::from_utf8_lossy(&output.stderr).trim()}),
+        Ok(output) if output.status.success() => {
+            json!({"available": true, "raw": String::from_utf8_lossy(&output.stdout).trim()})
+        }
+        Ok(output) => {
+            json!({"available": false, "status": output.status.code(), "stderr": String::from_utf8_lossy(&output.stderr).trim()})
+        }
         Err(error) => json!({"available": false, "error": error.to_string()}),
     }
 }

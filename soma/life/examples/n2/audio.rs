@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use holonic_engine::category::BoundaryId;
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
 use holonic_engine::foreign_map::manifest_safetensors;
-use holonic_engine::phoenix::heterogeneous_fusion::SourcePortResponse;
+use holonic_engine::native_ecology::heterogeneous_fusion::SourcePortResponse;
 use life::mathematical_source::ExactAcousticOccurrence;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

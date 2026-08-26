@@ -2,9 +2,13 @@
 
 Brandon's latest direct request governs.
 
-**This file is the authoritative operating document for Claude, and it stands alone.** `AGENTS.md`
-is the Codex-facing twin written for a different model; it is not authority here and is not to be
-consulted as such. The same holds in the laboratory repository: its `AGENTS.md` prohibition on
+**This file is the Claude-facing operating contract. The sole construction authority is
+`blueprint/THE_ROADMAP.md`, and `CONSTRUCTION_STATE.md` is the sole current-position record.** Any
+older statement in this file calling a blueprint, station, phase, or deed active is historical
+evidence only and schedules nothing. `AGENTS.md` is the Codex-facing twin; its current purity,
+ownership, Phoenix/Athena, apparatus, grading, and validation boundaries are shared binding law,
+while model-specific pickup instructions remain local to each contract. The same holds in the
+laboratory repository: its `AGENTS.md` prohibition on
 reading `CLAUDE.md` was written for Codex, and the laboratory's own `CLAUDE.md` — the Standing Law,
 the Objective, the Bans, the ratified Law/Cut/Bridge deposits — is the authoritative theory source
 here. (Brandon, direct ruling, 2026-08-05.) The laboratory is frozen and dirty; read it only
@@ -14,6 +18,36 @@ tree, never a write.
 Where a dated deposit inside the soma canon or the RESEARCH records refines a mechanism the
 Standing Law states in compressed form, the refinement is evidence the Standing Law itself points
 at, not a competing authority. Carry both and name the refinement.
+
+## 2026-08-25 Soulkiller scrapyard / Eros / Athena firewall
+
+**Soulkiller is the only lifecycle in which a foreign pretrained realization is a live concept.**
+It may own any source-specific coordinates, operator factorizations, topology, state/cache
+conventions, identity, and execution law while exciting, intervening, dissecting,
+reconstructing, and measuring matched controls. Its return is typed as
+`Soulkiller(F,R) -> (NativeSpoolBundle S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R)`.
+Soulkiller returns native parts, never Athena. Eros alone composes admitted spools and genuinely
+returned world consequences into an `AthenaNativeRest`.
+
+After Eros construction, the product is an Athena variant. It owns native addressed incidence,
+receiver-history transport, Complex-Parametron potential complexes, continuing morphology, organs,
+and Holonic Inference. `W` is immutable cold lineage/reconstruction testimony outside the mounted
+hot closure. A foreign model name never qualifies Athena; no Athena rest or API may own, expose,
+reopen, or fall back to a Soulkiller session, witness, foreign coordinate, state/cache convention,
+topology, identity, or source executor.
+
+“Source-detached” means that Athena's hot dependency closure, identity, and later conduct survive
+with the original realization, weights, exterior witness, Soulkiller executors, and foreign topology
+absent. A wrapper around a Soulkiller runtime does not pass this grade merely because the original
+weight files are gone. If a richer receiver reopens a reconstruction fibre, Athena returns the
+exact insufficiency. Only a separately scheduled Soulkiller passage may consume it and return
+another sealed native spool bundle; Eros alone may compose that bundle into Athena.
+
+For long Athena deeds, factor one native `AddressedPassage` through native causal boundaries,
+incidence/current, chronology, constitutive response, and exact reconstruction fibres. Do not cut
+Athena inference by any foreign partition, coordinate, operator factorization, or cache. The active
+roadmap contains the exact phase order and supersedes every older clause below that names an Athena
+continuation.
 
 The purity, ownership, apparatus, no-float, and grading requirements this project runs on are
 stated below. They were first written for the archived C++ body in
@@ -125,8 +159,8 @@ deposited in one day for want of them.** These orient reasoning; none schedules 
 | `canon/THE_MILLENNIUM_FRAME.md` | all six problems, each as the receiver question it is here and the organ it lands on. `interpretation` throughout; **no deed may be graded by a row in it.** |
 | `canon/TABLET_THE_MANIFOLD.md` | charts as types, the structure group as the legal casts, Darboux and Liouville, holonomy and holomorphy at `√z`, and §21 — reflection as the mechanism, the crossing bearing the load. |
 | `canon/TABLET_THE_OPERATIONS.md` | **the elementary operations, added 2026-08-11 and ratified the same day**: every classical operation is a construction, a transport, a face, or a quotient; the Dirac primitives typed (a ket is a construction, a bra a receiver, an outer product a deposit); the trace as the basepoint-free face of a closed loop; the kernel as the collapsed-pair population; parity, chronology, and reversibility as three objects. `H.0476`–`H.0480`. **This is the reasoning dialect, not an ornament** — his ruling: *"it has to be the dialect that you use for reasoning."* |
-| `canon/TABLET_THE_REASONING_CYCLE.md` | **the pretrained organ inside the returning ecology, ratified 2026-08-12**: query as receiver bra, key as presented orientation, value as carried construction, residual as continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. It is doctrine, not a construction schedule. |
-| `canon/TABLET_THE_HEXIS.md` | **cultivation, overlays, condensation, and inherited model lifts, ratified 2026-08-18**: hexis as rested conditional transport; fine-tuning as cultivation relative to inherited rest; LoRA as a factorized overlay; distillation as familywise transport condensation; the illicial potential section and causal adjoint return; founded lattice capacity; and the boundary on phoenix-rebirthing inherited models. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_REASONING_CYCLE.md` | **foreign conduct ends at Soulkiller and reasoning belongs to the returning native ecology, ratified 2026-08-12 and narrowed 2026-08-25**: typed local transport, residual continuing standing, training as adjoint return, the whole model-world recurrence, cross-codec operation classes, self-similarity and section modulus, and the minimal recurrent-section machine. No attention factorization or cache convention is presumed. It is doctrine, not a construction schedule. |
+| `canon/TABLET_THE_HEXIS.md` | **cultivation, overlays, condensation, and inherited model dismantling, ratified 2026-08-18 and narrowed 2026-08-25**: hexis as rested conditional transport; fine-tuning as cultivation relative to inherited rest; LoRA as a factorized overlay; distillation as familywise transport condensation; the illicial potential section and causal adjoint return; founded lattice capacity; and the Soulkiller/Eros/Athena boundary. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_CAUSAL_PROFILE.md` | **the computer as causal world-tube and the profiler as a shadow atlas, ratified 2026-08-12**: instruction fibers, observer charts, physical current, caustics and invisible directions, Feynman/knot/folded-dimension readings, complexity and bitwise shadows, and the exact boundary around Quantum Information Dynamics. Counts and clocks are projections, not the body. |
 | `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` | **causal multiplicity before arithmetic notation, language as codec, and the map as the continuing body, ratified 2026-08-12**: existence begins in interaction; residue changes continuation; intelligence precedes language; mathematics is invariant causal composition; the Universality Machine is an evolving emulator; and interpreter-free code material has returned one bounded algorithmic world-line family. It is doctrine, not a construction schedule. |
 | `canon/TABLET_THE_COMPRESSION.md` | **what compression is, ratified 2026-08-14**: a codec pivot carrying a declared decoder, the three species by remainder, the linear ceiling and the four hypotheses it needs, and the cost as a second axis. **Its governing correction is that the invariance is ADDITIVE** — a difference against a declared machine, never a ratio — so a compression figure quoted without its decoder is the absolute-volume violation, and it names the 2024 result that is commonly quoted in violation of it. |
@@ -1434,18 +1468,18 @@ original corpus only for pathways the map exposes, the new material excites, and
 can distinguish. Static weight analysis returns potential conduct; contextual conduct still owes a
 caused current or exact active-path composition.
 
-**Phoenix rebirth has a complete grade.** Lift the foreign transports, re-express them as native
-sections/lattices/state equations, cultivate them on new caused material, condense repeated families
-with their remainder, seal with the foreign source absent, remount, and require attributable later
-conduct plus matched-sibling and targeted-ablation controls. A converted tensor file, one equal
-output, or a renamed architecture is not rebirth.
+**Soulkiller dismantling has a complete grade.** Excite and intervene on foreign transport, extract
+source-neutral native threads, condense them into spools with their remainder, seal the bundle with
+the foreign source absent, remount, and require matched-sibling and targeted-spool-ablation controls.
+A converted tensor file, one equal output, or a renamed architecture is not a spool return. Eros,
+not Soulkiller, cultivates and composes Athena.
 
 **The foreign map is a ported operation complex, not a linear stack.** Read
-`canon/TABLET_THE_OPERATIONS.md` and the Phoenix owner table before implementing a pathway. Bind the
+`canon/TABLET_THE_OPERATIONS.md` and the Soulkiller owner table before implementing a pathway. Bind the
 source realization through `EvolutionShape`, typed boundary ports, `CausalDiagram`,
 `RealizationWitness`, `ExactRatMatrix`/`ExactCausalTraversal`, `CausalSectionMorphism`,
-`Relating`/`Chain`, and `InterchangeCertificate`. Q/K/V and gate/up are co-present branches, not
-serial matrix depth. A product matrix is one compiled receiver chart of an ordered transport word;
+`Relating`/`Chain`, and `InterchangeCertificate`. Source-named branches, partitions, and caches are
+exterior implementation charts, not the decomposition law. A product matrix is one compiled receiver chart of an ordered transport word;
 it never replaces the word, its intermediate occurrences, joins, or residuals. If source
 realization testimony is absent, retain the complete candidate-diagram fibre—human inspection of a
 plausible output may not choose one.

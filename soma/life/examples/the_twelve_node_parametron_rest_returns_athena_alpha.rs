@@ -11,7 +11,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
 const GLUE: &str =
@@ -45,7 +45,10 @@ struct FileReceipt {
 fn main() -> Result<(), String> {
     let output = PathBuf::from(OUTPUT);
     if output.exists() {
-        return Err(format!("preserve existing station output {}", output.display()));
+        return Err(format!(
+            "preserve existing station output {}",
+            output.display()
+        ));
     }
     let started = Instant::now();
     let product = output.join("product");

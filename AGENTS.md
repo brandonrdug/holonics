@@ -148,6 +148,42 @@ construction merely because its current implementation is being replaced.
   this hardware that surface is the GPU; CUDA is an apparatus chart, not an ontology, and refusal
   may not fall back to a host semantic replay.
 
+## Experiments are receivers, never substitute machines
+
+- A requested experiment, prompt, named subject, output comparison, ablation, or capability probe
+  authorizes a new exterior occurrence and receiver question. It does **not** authorize a new
+  semantic store, training architecture, indexing scheme, inference law, authored ontology, or
+  example-local machine. First pass the occurrence through the standing ecology and inspect the
+  returned consequence or obstruction.
+- Before changing code for an experiment, write the standing-reuse receipt: the one continuing
+  body, its exact rested identity, the ingress port, the hot conduct owner, the return port, the
+  receiver, and the requested artifact. Search the claim index and source owners and run the
+  smallest existing deed. Construction begins only when that composition returns a concrete absent
+  type, port, constitutive relation, or consequence.
+- Exterior codec faces—including words, glyphs, tokens, filenames, speaker labels, model labels,
+  prompts, names, and expected answers—may carry lineage and receiver testimony. They may not
+  become native state classes, routing features, morphology keys, causal addresses, cultivation
+  selectors, or generated templates. Internal equality and contact come from complete admitted
+  causal signatures, typed incidence, transport, return, and receiver consequence.
+- The measurement target must be causally downstream of cultivation. A query, name, desired answer,
+  test assertion, or receiver aperture may not select the developmental population, choose its
+  factors, author its associations, or determine its surface. If removing or renaming the target
+  before cultivation changes the cultivated body, the experiment is contaminated and must return
+  as a counterexample.
+- An example or driver is narrow apparatus: it mounts occurrences, invokes public source owners,
+  writes receipts, and inspects returned artifacts. It may not implement lexical association,
+  semantic routing, candidate selection, scoring, morphology, continuation, or another inference
+  algorithm. Logic substantial enough to determine the requested answer belongs to an already
+  admitted source owner or proves that the proposed experiment is not yet using the machine.
+- GPU residency, exact bytes, deterministic hashes, nonempty output, and a passing self-authored
+  test do not establish the requested deed. Grade the user-requested qualitative consequence first;
+  topology and apparatus receipts support that grade but never substitute for it. Never advance the
+  roadmap or construction state from a proxy whose declaration excluded the requested capability.
+- When an experiment fails, preserve the last admitted body and return the shortest obstruction.
+  Do not widen the corpus scan, add a fixture-specific index, create another example, enumerate
+  alternatives, or rewrite the machine around the expected surface. Repair the missing composition
+  at its owning relation, then rerun the original receiver unchanged.
+
 ## Causal arithmetic and the Universality Machine
 
 - `canon/TABLET_THE_UNIVERSALITY_MACHINE.md` governs this ontology. Existence begins in situated
@@ -195,15 +231,74 @@ construction merely because its current implementation is being replaced.
   or kernel verdict may supply exterior testimony but may not become the map or the machine's
   ontology. These clauses constrain future design and schedule nothing.
 
+## Typed physical theory and the common force carrier
+
+- [project-postulate] A physical quantity is an addressed one-dimensional quantity line carrying
+  dimension, origin when affine, scale/basis, orientation, domain, and receiver. A displayed scalar
+  is a coordinate returned after those choices, not the quantity itself. Every physical equality
+  must type-check across a declared unit/chart transport; a theorem over bare numbers proves only
+  its algebraic statement.
+- [project-postulate] Quantity multiplication is tensor product of quantity lines, division is
+  transport through the dual line, and powers are tensor powers. Addition is admitted only after an
+  exact rebase into the same typed line. Distinct causal factors may not be silently identified:
+  `L/T²` may be the conventional receiver shadow of
+  `L ⊗ T_source⁻¹ ⊗ T_receiver⁻¹`, and that receiver must retain its complete origin
+  reconstruction fibre.
+- [project-postulate] Keep dimensional product, tensor rank, exterior degree, and internal
+  representation as different types. `α ⊗ α` can be nonzero while `α ∧ α = 0`; geometric
+  area or flux requires independent oriented directions, while a scalar magnitude additionally
+  requires a metric, Hodge/constitutive map, or declared receiver pairing.
+- [project-postulate] `∂² = 0`, Stokes, divergence, Bianchi, and exterior-degree identities are
+  kinematic. Conservation additionally owes storage, current, source, constitutive, boundary, and
+  chronology laws. Parallel execution additionally owes exact independence/interchange: neither a
+  boundary-flux form alone proves parallelism nor a local non-flux term alone proves a global
+  barrier.
+- [proved-derived; formal-checked] The current Lean carrier has four addressed integral cycle
+  directions and six alternating coordinate planes; a chosen `3 + 1` receiver splits them into
+  `3 + 3`. [project-postulate] These counts never identify force species. A physical sector is a
+  dependent internal fibre/representation with its own connection, curvature, Hodge or
+  constitutive law, action/current, matter content, scale passage, calibration, and receiver over
+  the shared base incidence.
+- [project-postulate] Electromagnetism supplies a `U(1)` phase fibre; the weak sector requires
+  chiral `SU(2)_L × U(1)_Y` representations, Higgs vacuum quotient, mixing, Yukawa maps, and anomaly
+  control; the strong sector requires `SU(3)` color, ordered Wilson/line receivers and continuum
+  reconstruction; gravity requires frame/Spin transport, metric/Hodge constitution, curvature
+  contraction, Bianchi/Noether return, and stress--energy coupling. Force names or equal finite
+  counts supply none of those passages.
+- [project-postulate] Keep relativistic invariant mass, Higgs mass-operator eigenvalues, Yukawa
+  masses, composite QCD energy, material inertia, project receiver/cost mass, and the Yang--Mills
+  spectral gap as distinct typed faces. A bridge between any two is a theorem obligation and must
+  preserve its representation, dynamics, scale, receiver, and reconstruction fibre.
+- [proved-standard] In a dimensionless-metric convention the cosmological constant has curvature
+  dimension `L⁻²`, so `Λg`, the Einstein tensor, and the coupled stress--energy source occupy the
+  same typed tensor line. [project-postulate] Moving `Λ` to a vacuum-energy or mass-density chart
+  requires the declared gravitational coupling; winding, nullity, or a degree-four notation alone
+  does not determine its value or dynamics.
+- [established-bounded; implemented-exact; measured] Eros and Athena have returned productive
+  bounded consequences from the same incidence, transport, receiver, fibre, holonomy, compression,
+  and returned-morphology discipline. Treat that success as positive internal evidence for
+  prioritizing these laws and for designing sharper experiments and theorem passages. Physical
+  calibration still enters through the sector-specific ports above, rather than through a second
+  ontology.
+- [project-postulate] A newer direct articulation which supplies stricter types, preserved diagrams,
+  exact derivations, or firing falsifiers narrows stale interpretation prose. Preserve every exact
+  earlier theorem, record counterexamples and reconstruction fibres, and retire only the overclaim;
+  repetition of a generic interpretation warning is never a substitute for attempting its next
+  derivation.
+
 ## Pretrained organs and cross-codec reasoning
 
-- `canon/TABLET_THE_REASONING_CYCLE.md` governs the model ontology. A pretrained transformer is one
-  inherited transport organ; the productive model is the complete recurrence of mount, conduct,
-  emission, world consequence, genuine return, reflection, and changed continuation.
-- Use the typed Dirac reading when analyzing transformer-like mechanisms: a query is a receiver
-  bra, a key a presented contact orientation, a value a transported construction, a bracket one
-  compatibility face, and the residual continuing standing. This notation types information
-  transport; it does not assert quantum physical identity.
+- `canon/TABLET_THE_REASONING_CYCLE.md` governs the model ontology. Inside Soulkiller, a pretrained
+  realization is inherited transport testimony and scrapyard material. Soulkiller returns only
+  source-neutral native spools plus separate cold witness and insufficiency; Eros composes spools
+  and returned consequences into Athena. The productive model is the complete recurrence of mount,
+  conduct, emission, world consequence, genuine return, reflection, and changed continuation.
+- When a foreign realization exposes any factorization into a receiver-like probe, presented
+  contact orientation, and transported construction, the typed Dirac reading may analyze that
+  particular foreign chart. No such factorization is presumed to define a transformer, Soulkiller,
+  or Holonic Inference, and its names, axes, cache conventions, and storage law remain exterior
+  testimony. This notation types information transport; it does not assert quantum physical
+  identity.
 - `attention`, `token`, `embedding`, `layer`, `expert`, `router`, `reasoner`, and `conversation` are
   exterior implementation or application charts. Admit an internal phase or organ only when
   intervention, transport, and returned consequence exhibit it.
@@ -257,18 +352,41 @@ construction merely because its current implementation is being replaced.
   restriction/rebase while its population grows; lightning founds its local path while current
   travels. Layers and stacks are apparatus charts over that topology, not authored semantic depth.
 - A pretrained map is inherited hexis and not a lossless encoding of its corpus or the complete
-  productive ecology. An inherited lift avoids the original dataset only for transport families
+  productive ecology. Inherited dismantling avoids the original dataset only for transport families
   actually exposed by the weights, excited by the new material, and separated by the declared
   receivers. Unexcited capability remains an open reconstruction fibre.
-- A phoenix-rebirth claim requires lift, native re-expression, cultivation on new caused material,
-  receiver-exact or remainder-carrying condensation, source-detached rest, later conduct, matched
-  siblings, and targeted ablation. A renamed tensor container or equal output on one corpus does not
-  grade it.
-- Athena variants are products of Eros. A foreign model name is ancestry and source testimony,
-  never native topology. Plural lifted organs may fuse only after a successor-equivariant common
-  transport subcomplex has been founded by addressed correspondence, natural generator squares and
-  matched intervention. The fused ecology is the pushout through that subcomplex; apparent
-  agreement remains a defect-bearing span, and modality-specific ports remain plural.
+- A Soulkiller claim requires excitation, intervention, native thread extraction, receiver/history
+  condensation, explicit insufficiency, a sealed source-neutral spool bundle, source-detached
+  remount, matched siblings, and targeted spool ablation. A renamed tensor container or equal
+  output on one corpus does not grade it.
+- **Soulkiller is the one-way foreign-realization scrapyard boundary.** Any source-specific
+  coordinate, operator factorization, state/cache convention, topology, identity, or execution law
+  may be load-bearing only inside its intake, excitation, dissection, reconstruction, and
+  matched controls. Its return is
+  `Soulkiller(F,R) -> (NativeSpoolBundle S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R)`.
+  `S_R` owns only source-neutral native addressed threads, generator families, exact composition
+  receipts, receiver/history factors, and complete fibres. `W` owns immutable ancestry and
+  reconstruction testimony and is outside every Athena dependency closure. Soulkiller never
+  returns, runs, qualifies, or cultivates Athena.
+- Athena variants are products of Eros. After the Soulkiller return, a foreign model ceases to be a
+  concept in the product. A foreign name is cold lineage only, never an Athena qualifier, organ,
+  topology, state population, continuation address, capacity, or inference route. No Athena type may
+  own, expose, reopen, or fall back to a Soulkiller session, witness, or foreign executor. A rest
+  which still mounts a foreign tower or whose hot law depends on source architecture is scrapyard
+  transition material, regardless of its filename, wrapper type, detached original files, or
+  advertised product name; it must not receive an Athena grade.
+- Source-detached means that the complete hot dependency closure, identity, and later conduct are
+  independent of the foreign realization—not merely that the original weight files are absent.
+  Remove the foreign realization, exterior witness, original weights, Soulkiller executors, and source
+  topology before the remount control. If later current needs any of them, the scrapyard seal has
+  not crossed its boundary. If a richer receiver reopens the retained fibre, Athena returns the exact
+  `ReceiverInsufficiency`; only a separately scheduled later Soulkiller passage may consume that
+  obstruction and return another sealed native spool bundle. Eros alone may compose it into Athena.
+- Plural native spools may fuse only after a successor-equivariant common transport subcomplex has
+  been founded by addressed correspondence, natural generator squares and matched intervention.
+  The fused ecology is the pushout through that subcomplex; apparent agreement remains a
+  defect-bearing span, modality-specific ports remain plural, and the sealed product again contains
+  no foreign hot path.
 - Dialogue and agent rollouts are addressed world-tubes, not prompt/answer tables. Visible text is
   one codec face beside tool deeds, world returns, branches, later corrections, code/artifact
   closure and open exterior. Provider identity never crowns a candidate; cultivation follows a
@@ -278,7 +396,8 @@ construction merely because its current implementation is being replaced.
   the live operation complex—incidence, ordered transport words, event readings, and open exterior—
   not a universal numeric wrapper or tensor stack. Bind foreign realization testimony through the
   existing evolution/category/causal/realization, exact-linear/traversal, chain, morphism, and
-  interchange owners. Q/K/V and gate/up are co-present branches, not serial matrix depth.
+  interchange owners. A foreign implementation's named branches or caches are exterior testimony;
+  they do not determine Soulkiller decomposition or name Athena anatomy or continuation.
 - Matrix inversion is only the rebase case and owes both identity compositions. Singular or
   rectangular maps return kernel, image, cokernel and affine reconstruction fibre. A pseudoinverse
   requires declared receiver metrics; cultivation uses the metric adjoint, not inversion.
@@ -381,6 +500,27 @@ return is absent.
 
 The complete gate is a **release receiver**, never an edit-loop command. Validation is proportional
 to the closure which changed:
+
+**Absolute process aperture, ratified 2026-08-25:** no process started by an agent may run longer
+than 180 seconds wall time. This is an exterior apparatus limit, never a semantic capacity, batch
+size, context bound, or stopping law. Wrap every potentially nontrivial invocation in an outer hard
+180-second boundary. If the requested deed cannot return an atomic addressed artifact inside that
+aperture, first factor it into complete, independently authenticated, resumable sections through the
+existing partition/interchange/rest owners. A timeout or forced kill is a counterexample and never
+a partial pass. Do not immediately retry the same source/input/executable closure; name the new
+falsifier first. This rule includes build, test, gate, driver, profiler and audit processes: a
+release receiver which cannot obey it must be made resumable before invocation.
+
+For a long resident deed, section its native causal operator—not its exterior word or a foreign
+implementation chart. A lawful front is an exact factorization of one native `AddressedPassage`:
+it retains occurrence lineage, both boundary maps, native incidence/current, chronology,
+constitutive standing, open exterior, and the complete reconstruction fibre. Parallel fronts also
+owe exact independence/interchange. Front boundaries derive from native causal extent, contact and
+  boundary flux; no foreign coordinate, partition, state/cache convention, or execution factor may
+  determine them after Soulkiller. Never reinterpret a timeout as permission for windows, independent
+histories, shortened contact, fixed counts, repeated prefixes, or a host-side cache. Every finer
+front owes gap-free and nonoverlapping cover, unchanged predecessor reach, durable rest/remount, and
+an unsplit matched control.
 
 1. During owner-local iteration, run `cargo check` for the affected package/library, the changed
    owner's focused tests, the exact driver or device deed being repaired, and only the named cheap

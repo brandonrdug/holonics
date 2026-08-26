@@ -151,7 +151,7 @@ pub struct AthenaRest {
     /// alone — the classes whose longest string crosses a path boundary — so the array is not
     /// derivable from what P0 carried and is carried here instead.
     ///
-    /// Emitting it is opt-in ([`crate::phoenix_rest::seal`]), so every standing container's octets
+    /// Emitting it through an exterior rest codec is opt-in, so every standing container's octets
     /// are unmoved.
     pub extent: Vec<u64>,
     pub vocabulary: Vec<String>,
@@ -487,7 +487,7 @@ pub fn emit_rest(
         target,
         standing,
         suffix,
-        // The emission is P0's face exactly. `phoenix_rest::seal` attaches the extents.
+        // The emission is P0's face exactly. An exterior rest codec attaches the extents.
         extent: Vec::new(),
         vocabulary: ordered,
         height: chart.height,
@@ -1209,7 +1209,7 @@ pub fn commit(
         suffix,
         // A commit derives the germ side by replay. A class extent is not among the rows the delta
         // carries — `ExtendEvent` records what was founded, not how long it is — so the successor's
-        // extents come from the transport that deposited, and `phoenix_rest::cultivate` attaches
+        // extents come from the transport that deposited, and the exterior rest passage attaches
         // them there and says so.
         extent: Vec::new(),
         vocabulary,
@@ -1485,7 +1485,7 @@ pub fn surfaces_of(path: &[ResonanceGerm]) -> Result<Vec<String>, CultivationRef
 /// [`withdraw`] is the delta ablation (a deletion inside the standing body), the cultivation itself
 /// is the pre-versus-post intervention, and clearing [`AthenaRest::extent`] before
 /// [`AthenaRest::write_container`] is the region withdrawal whose refusal
-/// [`crate::phoenix_rest::mount_atlas`] already names. On the resident side,
+/// the exterior rest's declared atlas mount already names. On the resident side,
 /// `holonic_engine::resident_law`'s `WithdrawRows` and `PermuteColumns` are Station D's two
 /// intervention laws — but they act on a dense device section of BF16 words addressed by row and
 /// column, and this arm's material is a **sparse integer transport addressed by (class, germ)**.

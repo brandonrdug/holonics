@@ -53,6 +53,30 @@ const PROTECTED_ROOTS: &[&str] = &[
     "soma/life/src",
 ];
 
+/// The mounted Athena product cone. A root here is a live product owner, not a historical label:
+/// every local module it owns and every Rust module it reaches is inside the structural firewall.
+/// Cold Phoenix/Soulkiller evidence remains lawful elsewhere in the repository while it has no
+/// live dependency edge from this cone.
+const ATHENA_HOT_ROOTS: &[&str] = &[
+    "soma/life/src/mathematical_particle/production_aperture.rs",
+    "soma/life/src/mathematical_particle/production_aperture",
+    "soma/life/src/athena_receiver_history.rs",
+    "soma/life/src/athena_receiver_history",
+    "soma/life/src/athena_native",
+];
+
+/// Rust crate roots visible to the bounded structural traversal. The lint follows source-level
+/// module dependencies; it does not execute Cargo, load build artifacts, or infer a semantic edge
+/// from mere co-membership in the workspace.
+const PROTECTED_CRATES: &[(&str, &str)] = &[
+    ("crates/holonic-engine/src", "holonic_engine"),
+    ("crates/holonic-language/src", "holonic_language"),
+    ("crates/holonic-structure/src", "holonic_structure"),
+    ("soma/body/src", "body"),
+    ("soma/membrane/src", "membrane"),
+    ("soma/life/src", "life"),
+];
+
 // These files are explicitly classified as historical evidence or reference-only test material
 // in the ownership ledger. They must be migrated or retired deliberately, but they are not a
 // lawful source for new production code and therefore do not define the production ratchet.
@@ -137,7 +161,677 @@ pub fn check_repository(root: &Path) -> Result<ArchitectureReport, String> {
             });
         }
     }
+    report
+        .violations
+        .extend(athena_hot_dependency_violations(root)?);
     Ok(report)
+}
+
+/// Return only the live Athena foreign-boundary violations. This focused receiver is used during
+/// owner-local refactors before the one permitted release-time ownership-ledger regeneration; it
+/// does not weaken or replace [`check_repository`].
+pub fn check_athena_hot_boundary(root: &Path) -> Result<Vec<ArchitectureViolation>, String> {
+    athena_hot_dependency_violations(root)
+}
+
+/// Focused K2 receiver for the one-way Soulkiller boundary. Soulkiller may own exterior
+/// realization testimony, but it may not expose a foreign product runtime, an architecture-
+/// specific operator/cache ontology, or a retired Phoenix route. Athena's transitive firewall is
+/// composed into the same return.
+pub fn check_soulkiller_boundary(root: &Path) -> Result<Vec<ArchitectureViolation>, String> {
+    let mut violations = athena_hot_dependency_violations(root)?;
+    let soulkiller_root = root.join("crates/holonic-engine/src/soulkiller");
+    let expected = BTreeSet::from([
+        "foreign_potential_rest.rs".to_owned(),
+        "foreign_section_descent.rs".to_owned(),
+        "mod.rs".to_owned(),
+        "receiver_restricted_transport.rs".to_owned(),
+        "scrapyard.rs".to_owned(),
+    ]);
+    let mut observed = BTreeSet::new();
+    if soulkiller_root.is_dir() {
+        for entry in fs::read_dir(&soulkiller_root)
+            .map_err(|error| format!("read {}: {error}", soulkiller_root.display()))?
+        {
+            let entry = entry.map_err(|error| error.to_string())?;
+            if entry
+                .file_type()
+                .map_err(|error| error.to_string())?
+                .is_file()
+            {
+                observed.insert(entry.file_name().to_string_lossy().into_owned());
+            }
+        }
+    }
+    for unexpected in observed.difference(&expected) {
+        violations.push(ArchitectureViolation {
+            path: format!("crates/holonic-engine/src/soulkiller/{unexpected}"),
+            construct: "soulkiller:unexpected-live-owner".to_owned(),
+            allowed: 0,
+            observed: 1,
+        });
+    }
+    for missing in expected.difference(&observed) {
+        violations.push(ArchitectureViolation {
+            path: format!("crates/holonic-engine/src/soulkiller/{missing}"),
+            construct: "soulkiller:missing-boundary-owner".to_owned(),
+            allowed: 1,
+            observed: 0,
+        });
+    }
+
+    let forbidden_identifiers = BTreeSet::from([
+        "ProductSession",
+        "RuntimeReturn",
+        "TowerReturn",
+        "LayerFace",
+        "ForeignInferenceOwner",
+        "ForeignHotState",
+        "InferenceCache",
+    ]);
+    let forbidden_literals = [
+        "holonic-engine.phoenix",
+        "crate::phoenix",
+        "holonic_engine::phoenix",
+        "foreign_inference_owner",
+        "foreign_hot_state",
+        "inference_cache",
+        "gemma",
+    ];
+    for file in expected
+        .iter()
+        .filter(|file| observed.contains(file.as_str()))
+    {
+        let relative = format!("crates/holonic-engine/src/soulkiller/{file}");
+        let source = fs::read_to_string(root.join(&relative))
+            .map_err(|error| format!("read {relative}: {error}"))?;
+        let tokens = firewall_tokens(&without_cfg_test_items(&source));
+        let mut count = 0usize;
+        for token in tokens {
+            match token {
+                FirewallToken::Identifier(identifier)
+                    if forbidden_identifiers.contains(identifier.as_str()) =>
+                {
+                    count += 1;
+                }
+                FirewallToken::StringLiteral(value)
+                    if forbidden_literals
+                        .iter()
+                        .any(|forbidden| value.to_ascii_lowercase().contains(forbidden)) =>
+                {
+                    count += 1;
+                }
+                _ => {}
+            }
+        }
+        if count > 0 {
+            violations.push(ArchitectureViolation {
+                path: relative,
+                construct: "soulkiller:architecture-or-cache-specific-positive-dependency"
+                    .to_owned(),
+                allowed: 0,
+                observed: count,
+            });
+        }
+    }
+
+    for relative in [
+        "crates/holonic-engine/src/lib.rs",
+        "soma/life/src/lib.rs",
+        "soma/life/src/bin/eros.rs",
+    ] {
+        let source = fs::read_to_string(root.join(relative))
+            .map_err(|error| format!("read {relative}: {error}"))?;
+        let live = without_cfg_test_items(&source).to_ascii_lowercase();
+        for forbidden in [
+            "pub mod phoenix",
+            "holonic_engine::phoenix",
+            "soulkiller_active_transport",
+            "phoenix_returned_defect",
+            "eros phoenix",
+        ] {
+            let count = live.matches(forbidden).count();
+            if count > 0 {
+                violations.push(ArchitectureViolation {
+                    path: relative.to_owned(),
+                    construct: format!("soulkiller:retired-live-route:{forbidden}"),
+                    allowed: 0,
+                    observed: count,
+                });
+            }
+        }
+    }
+    violations
+        .sort_by(|left, right| (&left.path, &left.construct).cmp(&(&right.path, &right.construct)));
+    violations.dedup();
+    Ok(violations)
+}
+
+fn athena_hot_dependency_violations(root: &Path) -> Result<Vec<ArchitectureViolation>, String> {
+    let sources = firewall_sources(root)?;
+    let by_path = sources
+        .iter()
+        .enumerate()
+        .map(|(at, source)| (source.path.clone(), at))
+        .collect::<BTreeMap<_, _>>();
+    let by_module = sources
+        .iter()
+        .enumerate()
+        .map(|(at, source)| ((source.crate_name.clone(), source.module.clone()), at))
+        .collect::<BTreeMap<_, _>>();
+    let mut direct = BTreeSet::new();
+    for hot_root in ATHENA_HOT_ROOTS {
+        let absolute = root.join(hot_root);
+        if absolute.is_file() {
+            if let Some(at) = by_path.get(*hot_root) {
+                direct.insert(*at);
+            }
+        } else if absolute.is_dir() {
+            let prefix = format!("{}/", hot_root.trim_end_matches('/'));
+            direct.extend(
+                sources
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, source)| source.path.starts_with(&prefix))
+                    .map(|(at, _)| at),
+            );
+        }
+    }
+    let mut pending = direct.iter().copied().collect::<Vec<_>>();
+    let mut reached = BTreeSet::new();
+    let mut violations = Vec::new();
+    while let Some(at) = pending.pop() {
+        if !reached.insert(at) {
+            continue;
+        }
+        let source = &sources[at];
+        let disposition = if direct.contains(&at) {
+            "direct"
+        } else {
+            "transitive"
+        };
+        let foreign = athena_hot_source_violations(&source.source, disposition);
+        let foreign_owner = foreign_namespace_in_path(&source.path);
+        for (construct, observed) in foreign {
+            violations.push(ArchitectureViolation {
+                path: source.path.clone(),
+                construct,
+                allowed: 0,
+                observed,
+            });
+        }
+        if let Some(namespace) = foreign_owner {
+            violations.push(ArchitectureViolation {
+                path: source.path.clone(),
+                construct: format!("athena-hot:{disposition}:{namespace}-namespace-owner"),
+                allowed: 0,
+                observed: 1,
+            });
+        }
+
+        // Crossing a foreign namespace already returns the shortest structural obstruction. Do
+        // not turn the report into a census of the whole foreign realization behind that edge.
+        if foreign_owner.is_some()
+            || athena_hot_source_violations(&source.source, disposition)
+                .iter()
+                .any(|(construct, _)| construct.contains("-namespace"))
+        {
+            continue;
+        }
+        for dependency in source_dependencies(source, &by_module) {
+            if !reached.contains(&dependency) {
+                pending.push(dependency);
+            }
+        }
+    }
+    violations
+        .sort_by(|left, right| (&left.path, &left.construct).cmp(&(&right.path, &right.construct)));
+    violations.dedup();
+    Ok(violations)
+}
+
+#[derive(Clone, Debug)]
+struct FirewallSource {
+    path: String,
+    crate_name: String,
+    module: Vec<String>,
+    source: String,
+}
+
+fn athena_hot_source_violations(source: &str, disposition: &str) -> Vec<(String, usize)> {
+    let source = without_cfg_test_items(source);
+    let tokens = firewall_tokens(&source);
+    let mut counts = BTreeMap::<String, usize>::new();
+    for token in &tokens {
+        if let FirewallToken::Identifier(identifier) = token {
+            if let Some(namespace) = foreign_namespace(identifier) {
+                *counts
+                    .entry(format!("athena-hot:{disposition}:{namespace}-namespace"))
+                    .or_default() += 1;
+            }
+        }
+    }
+
+    let mut schema_context = 0usize;
+    for token in &tokens {
+        match token {
+            FirewallToken::Identifier(identifier)
+                if identifier.to_ascii_lowercase().contains("schema")
+                    || identifier.eq_ignore_ascii_case("serde") =>
+            {
+                schema_context = 16;
+            }
+            FirewallToken::StringLiteral(value) if schema_context > 0 => {
+                if let Some(namespace) = foreign_namespace(value) {
+                    *counts
+                        .entry(format!("athena-hot:{disposition}:{namespace}-schema"))
+                        .or_default() += 1;
+                }
+                schema_context = 0;
+            }
+            FirewallToken::Semi | FirewallToken::Comma => schema_context = 0,
+            _ if schema_context > 0 => schema_context -= 1,
+            _ => {}
+        }
+    }
+    counts.into_iter().collect()
+}
+
+fn firewall_sources(root: &Path) -> Result<Vec<FirewallSource>, String> {
+    let mut sources = Vec::new();
+    for (crate_root, crate_name) in PROTECTED_CRATES {
+        let absolute_root = root.join(crate_root);
+        if !absolute_root.is_dir() {
+            continue;
+        }
+        let mut files = Vec::new();
+        collect_rust_files(&absolute_root, &mut files)?;
+        files.sort();
+        for file in files {
+            if !is_live_rust_file(&file) {
+                continue;
+            }
+            let module_relative = file.strip_prefix(&absolute_root).map_err(|_| {
+                format!("{} is outside {}", file.display(), absolute_root.display())
+            })?;
+            let module = module_segments(module_relative)?;
+            let path = file
+                .strip_prefix(root)
+                .map_err(|_| format!("{} is outside repository root", file.display()))?
+                .to_string_lossy()
+                .replace('\\', "/");
+            let source = fs::read_to_string(&file)
+                .map_err(|error| format!("failed to read {}: {error}", file.display()))?;
+            sources.push(FirewallSource {
+                path,
+                crate_name: (*crate_name).to_owned(),
+                module,
+                source,
+            });
+        }
+    }
+    sources.sort_by(|left, right| left.path.cmp(&right.path));
+    Ok(sources)
+}
+
+fn is_live_rust_file(path: &Path) -> bool {
+    let file = path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or_default();
+    file != "tests.rs"
+        && !file.ends_with("_tests.rs")
+        && !path
+            .components()
+            .any(|component| component.as_os_str() == "tests")
+}
+
+fn module_segments(relative: &Path) -> Result<Vec<String>, String> {
+    let mut components = relative
+        .components()
+        .map(|component| component.as_os_str().to_string_lossy().into_owned())
+        .collect::<Vec<_>>();
+    let file = components
+        .pop()
+        .ok_or_else(|| format!("{} has no Rust filename", relative.display()))?;
+    if file == "lib.rs" || file == "main.rs" {
+        return Ok(Vec::new());
+    }
+    if file != "mod.rs" {
+        let stem = file
+            .strip_suffix(".rs")
+            .ok_or_else(|| format!("{} is not a Rust source", relative.display()))?;
+        components.push(stem.to_owned());
+    }
+    Ok(components)
+}
+
+fn source_dependencies(
+    source: &FirewallSource,
+    modules: &BTreeMap<(String, Vec<String>), usize>,
+) -> BTreeSet<usize> {
+    let live = without_cfg_test_items(&source.source);
+    let tokens = firewall_tokens(&live);
+    let mut references = qualified_paths(&tokens);
+    references.extend(use_paths(&tokens));
+    references
+        .into_iter()
+        .filter_map(|reference| resolve_module(source, &reference, modules))
+        .collect()
+}
+
+fn resolve_module(
+    source: &FirewallSource,
+    reference: &[String],
+    modules: &BTreeMap<(String, Vec<String>), usize>,
+) -> Option<usize> {
+    if reference.is_empty() {
+        return None;
+    }
+    let mut candidates = Vec::<(String, Vec<String>)>::new();
+    match reference[0].as_str() {
+        "crate" => candidates.push((source.crate_name.clone(), reference[1..].to_vec())),
+        "self" => {
+            let mut path = source.module.clone();
+            path.extend_from_slice(&reference[1..]);
+            candidates.push((source.crate_name.clone(), path));
+        }
+        "super" => {
+            let mut path = source.module.clone();
+            let mut at = 0usize;
+            while reference.get(at).is_some_and(|segment| segment == "super") {
+                path.pop();
+                at += 1;
+            }
+            path.extend_from_slice(&reference[at..]);
+            candidates.push((source.crate_name.clone(), path));
+        }
+        first
+            if PROTECTED_CRATES
+                .iter()
+                .any(|(_, crate_name)| first == *crate_name) =>
+        {
+            candidates.push((first.to_owned(), reference[1..].to_vec()));
+        }
+        _ => {
+            let mut relative = source.module.clone();
+            relative.extend_from_slice(reference);
+            candidates.push((source.crate_name.clone(), relative));
+            candidates.push((source.crate_name.clone(), reference.to_vec()));
+        }
+    }
+    for (crate_name, path) in candidates {
+        for extent in (1..=path.len()).rev() {
+            if let Some(module) = modules.get(&(crate_name.clone(), path[..extent].to_vec())) {
+                return Some(*module);
+            }
+        }
+    }
+    None
+}
+
+fn qualified_paths(tokens: &[FirewallToken]) -> Vec<Vec<String>> {
+    let mut paths = Vec::new();
+    let mut at = 0usize;
+    while at < tokens.len() {
+        let FirewallToken::Identifier(first) = &tokens[at] else {
+            at += 1;
+            continue;
+        };
+        let mut path = vec![first.clone()];
+        let mut until = at + 1;
+        while matches!(tokens.get(until), Some(FirewallToken::PathSeparator)) {
+            let Some(FirewallToken::Identifier(next)) = tokens.get(until + 1) else {
+                break;
+            };
+            path.push(next.clone());
+            until += 2;
+        }
+        if path.len() > 1 {
+            paths.push(path);
+            at = until;
+        } else {
+            at += 1;
+        }
+    }
+    paths
+}
+
+fn use_paths(tokens: &[FirewallToken]) -> Vec<Vec<String>> {
+    let mut paths = Vec::new();
+    let mut at = 0usize;
+    while at < tokens.len() {
+        if !matches!(tokens.get(at), Some(FirewallToken::Identifier(identifier)) if identifier == "use")
+        {
+            at += 1;
+            continue;
+        }
+        at += 1;
+        parse_use_tree(tokens, &mut at, Vec::new(), &mut paths);
+        while at < tokens.len() && !matches!(tokens[at], FirewallToken::Semi) {
+            at += 1;
+        }
+    }
+    paths
+}
+
+fn parse_use_tree(
+    tokens: &[FirewallToken],
+    at: &mut usize,
+    prefix: Vec<String>,
+    paths: &mut Vec<Vec<String>>,
+) {
+    let mut path = prefix;
+    while *at < tokens.len() {
+        match &tokens[*at] {
+            FirewallToken::Identifier(identifier) if identifier == "as" => {
+                *at += 1;
+                if matches!(tokens.get(*at), Some(FirewallToken::Identifier(_))) {
+                    *at += 1;
+                }
+                if !path.is_empty() {
+                    paths.push(path);
+                }
+                return;
+            }
+            FirewallToken::Identifier(identifier) => {
+                path.push(identifier.clone());
+                *at += 1;
+            }
+            FirewallToken::PathSeparator => *at += 1,
+            FirewallToken::OpenBrace => {
+                *at += 1;
+                while *at < tokens.len() && !matches!(tokens[*at], FirewallToken::CloseBrace) {
+                    parse_use_tree(tokens, at, path.clone(), paths);
+                    if matches!(tokens.get(*at), Some(FirewallToken::Comma)) {
+                        *at += 1;
+                    }
+                }
+                if matches!(tokens.get(*at), Some(FirewallToken::CloseBrace)) {
+                    *at += 1;
+                }
+                return;
+            }
+            FirewallToken::Star => {
+                if !path.is_empty() {
+                    paths.push(path);
+                }
+                *at += 1;
+                return;
+            }
+            FirewallToken::Comma | FirewallToken::CloseBrace | FirewallToken::Semi => {
+                if !path.is_empty() {
+                    paths.push(path);
+                }
+                return;
+            }
+            _ => *at += 1,
+        }
+    }
+    if !path.is_empty() {
+        paths.push(path);
+    }
+}
+
+fn foreign_namespace(value: &str) -> Option<&'static str> {
+    let value = value.to_ascii_lowercase();
+    if value.contains("phoenix") {
+        Some("phoenix")
+    } else if value.contains("soulkiller") {
+        Some("soulkiller")
+    } else {
+        None
+    }
+}
+
+fn foreign_namespace_in_path(path: &str) -> Option<&'static str> {
+    path.split('/').find_map(foreign_namespace)
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum FirewallToken {
+    Identifier(String),
+    StringLiteral(String),
+    PathSeparator,
+    OpenBrace,
+    CloseBrace,
+    Comma,
+    Semi,
+    Star,
+    Other,
+}
+
+fn firewall_tokens(source: &str) -> Vec<FirewallToken> {
+    let bytes = source.as_bytes();
+    let mut tokens = Vec::new();
+    let mut at = 0usize;
+    while at < bytes.len() {
+        match bytes[at] {
+            b'/' if bytes.get(at + 1) == Some(&b'/') => {
+                at += 2;
+                while at < bytes.len() && bytes[at] != b'\n' {
+                    at += 1;
+                }
+            }
+            b'/' if bytes.get(at + 1) == Some(&b'*') => {
+                at += 2;
+                let mut depth = 1usize;
+                while at < bytes.len() && depth > 0 {
+                    if bytes.get(at) == Some(&b'/') && bytes.get(at + 1) == Some(&b'*') {
+                        depth += 1;
+                        at += 2;
+                    } else if bytes.get(at) == Some(&b'*') && bytes.get(at + 1) == Some(&b'/') {
+                        depth -= 1;
+                        at += 2;
+                    } else {
+                        at += 1;
+                    }
+                }
+            }
+            b'"' => {
+                let start = at + 1;
+                let end = skip_quoted(bytes, start, b'"');
+                let content_end = end.saturating_sub(1).max(start);
+                tokens.push(FirewallToken::StringLiteral(
+                    source
+                        .get(start..content_end)
+                        .unwrap_or_default()
+                        .to_owned(),
+                ));
+                at = end;
+            }
+            b'\'' if character_literal_starts(bytes, at) => {
+                at = skip_quoted(bytes, at + 1, b'\'');
+            }
+            b':' if bytes.get(at + 1) == Some(&b':') => {
+                tokens.push(FirewallToken::PathSeparator);
+                at += 2;
+            }
+            b'{' => {
+                tokens.push(FirewallToken::OpenBrace);
+                at += 1;
+            }
+            b'}' => {
+                tokens.push(FirewallToken::CloseBrace);
+                at += 1;
+            }
+            b',' => {
+                tokens.push(FirewallToken::Comma);
+                at += 1;
+            }
+            b';' => {
+                tokens.push(FirewallToken::Semi);
+                at += 1;
+            }
+            b'*' => {
+                tokens.push(FirewallToken::Star);
+                at += 1;
+            }
+            byte if identifier_start(byte) => {
+                let start = at;
+                at += 1;
+                while at < bytes.len() && identifier_continue(bytes[at]) {
+                    at += 1;
+                }
+                tokens.push(FirewallToken::Identifier(source[start..at].to_owned()));
+            }
+            byte if byte.is_ascii_whitespace() => at += 1,
+            _ => {
+                tokens.push(FirewallToken::Other);
+                at += 1;
+            }
+        }
+    }
+    tokens
+}
+
+/// Remove ordinary `#[cfg(test)]` items before dependency traversal. Test fixture files are also
+/// excluded by path, so foreign matched controls do not become production reachability.
+fn without_cfg_test_items(source: &str) -> String {
+    const MARKER: &str = "#[cfg(test)]";
+    let mut bytes = source.as_bytes().to_vec();
+    let mut search = 0usize;
+    while let Some(offset) = source[search..].find(MARKER) {
+        let start = search + offset;
+        let mut at = start + MARKER.len();
+        while at < bytes.len() && bytes[at].is_ascii_whitespace() {
+            at += 1;
+        }
+        let mut end = at;
+        while end < bytes.len() && bytes[end] != b'{' && bytes[end] != b';' {
+            end += 1;
+        }
+        if bytes.get(end) == Some(&b'{') {
+            let mut depth = 1usize;
+            end += 1;
+            while end < bytes.len() && depth > 0 {
+                match bytes[end] {
+                    b'"' => end = skip_quoted(&bytes, end + 1, b'"'),
+                    b'\'' if character_literal_starts(&bytes, end) => {
+                        end = skip_quoted(&bytes, end + 1, b'\'')
+                    }
+                    b'{' => {
+                        depth += 1;
+                        end += 1;
+                    }
+                    b'}' => {
+                        depth -= 1;
+                        end += 1;
+                    }
+                    _ => end += 1,
+                }
+            }
+        } else if bytes.get(end) == Some(&b';') {
+            end += 1;
+        }
+        for byte in &mut bytes[start..end] {
+            if *byte != b'\n' {
+                *byte = b' ';
+            }
+        }
+        search = end.max(start + MARKER.len());
+    }
+    String::from_utf8(bytes).expect("blanking complete Rust items preserves UTF-8")
 }
 
 pub fn emit_baseline(root: &Path) -> Result<String, String> {
@@ -432,6 +1126,107 @@ mod tests {
         assert_eq!(census.get(".into_iter()"), Some(&1));
         assert_eq!(census.get(".collect()"), Some(&1));
         assert_eq!(census.get("VecDeque"), None);
+    }
+
+    #[test]
+    fn athena_hot_cone_refuses_foreign_execution_even_when_a_wrapper_calls_it_native() {
+        let safe = "use crate::receiver_history_compression::ReceiverHistoryCompression;";
+        assert!(athena_hot_source_violations(safe, "direct").is_empty());
+
+        let contaminated = r#"
+            use holonic_engine::phoenix::runtime::ProductSession;
+            struct NativeWrapper(ProductSession);
+        "#;
+        let violations = athena_hot_source_violations(contaminated, "direct");
+        assert!(
+            violations
+                .iter()
+                .any(|(kind, _)| kind == "athena-hot:direct:phoenix-namespace")
+        );
+    }
+
+    #[test]
+    fn athena_hot_cone_refuses_foreign_schema_but_ignores_test_only_code() {
+        let source = r#"
+            const REST_SCHEMA: &str = "holonics.soulkiller.native-rest.v1";
+            #[cfg(test)]
+            mod tests {
+                use holonic_engine::phoenix::runtime::ProductSession;
+            }
+        "#;
+        let violations = athena_hot_source_violations(source, "direct");
+        assert!(
+            violations
+                .iter()
+                .any(|(kind, _)| kind == "athena-hot:direct:soulkiller-schema")
+        );
+        assert!(!violations.iter().any(|(kind, _)| kind.contains("phoenix")));
+    }
+
+    #[test]
+    fn athena_hot_roots_do_not_bless_foreign_namespace_owners() {
+        assert!(
+            ATHENA_HOT_ROOTS
+                .iter()
+                .all(|root| foreign_namespace_in_path(root).is_none())
+        );
+    }
+
+    #[test]
+    fn athena_hot_cone_follows_a_transitive_foreign_import_but_leaves_cold_evidence_alone() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time advances")
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "holonic-architecture-lint-{}-{nonce}",
+            std::process::id()
+        ));
+        let life = root.join("soma/life/src");
+        let engine = root.join("crates/holonic-engine/src/phoenix");
+        std::fs::create_dir_all(life.join("athena_native")).expect("athena fixture");
+        std::fs::create_dir_all(&engine).expect("engine fixture");
+        std::fs::write(
+            life.join("athena_native/mod.rs"),
+            "use crate::bridge::Native; pub struct Rest(Native);",
+        )
+        .expect("hot source");
+        std::fs::write(
+            life.join("bridge.rs"),
+            "use holonic_engine::phoenix::runtime::ProductSession; pub struct Native(ProductSession);",
+        )
+        .expect("bridge source");
+        std::fs::write(
+            life.join("cold_exterior.rs"),
+            "pub const WITNESS_SCHEMA: &str = \"holonics.phoenix.witness.v1\";",
+        )
+        .expect("cold evidence");
+        std::fs::write(
+            life.join("lib.rs"),
+            "mod bridge; mod cold_exterior; pub mod athena_native;",
+        )
+        .expect("life root");
+        std::fs::write(engine.join("mod.rs"), "pub mod runtime;").expect("phoenix root");
+        std::fs::write(engine.join("runtime.rs"), "pub struct ProductSession;")
+            .expect("phoenix runtime");
+        std::fs::write(
+            root.join("crates/holonic-engine/src/lib.rs"),
+            "pub mod phoenix;",
+        )
+        .expect("engine root");
+
+        let violations = athena_hot_dependency_violations(&root).expect("firewall traversal");
+        assert!(violations.iter().any(|violation| {
+            violation.path == "soma/life/src/bridge.rs"
+                && violation.construct == "athena-hot:transitive:phoenix-namespace"
+        }));
+        assert!(
+            !violations
+                .iter()
+                .any(|violation| violation.path.ends_with("cold_exterior.rs"))
+        );
+
+        std::fs::remove_dir_all(&root).expect("remove exact firewall fixture");
     }
 
     /// The control that would have caught the laboratory frame, and the one that catches the next

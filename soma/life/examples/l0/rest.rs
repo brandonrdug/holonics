@@ -26,8 +26,8 @@ pub fn found(root: &Path) -> Result<LaboratoryAthenaRest, String> {
     let cultivated_bytes = read(root.join(
         "output/the_native_codec_is_cultivated_and_returns_complete_mathematics/cultivated-receiver-history-rest.json",
     ))?;
-    let cultivated_history: CultivatedReceiverHistoryRest = serde_json::from_slice(&cultivated_bytes)
-        .map_err(|error| error.to_string())?;
+    let cultivated_history: CultivatedReceiverHistoryRest =
+        serde_json::from_slice(&cultivated_bytes).map_err(|error| error.to_string())?;
     CultivatedReceiverHistoryRest::mount(&cultivated_bytes, &native_bytes)
         .map_err(|error| error.to_string())?;
     LaboratoryAthenaRest::found(

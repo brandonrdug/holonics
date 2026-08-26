@@ -97,13 +97,15 @@ fn compatible_commuting_noncommuting_and_disjoint_overlaps_remain_distinct() {
         commuting.kind,
         OverlapKind::CommutingCocycle { .. }
     ));
-    assert!(commuting
-        .patch
-        .expect("overlap")
-        .cocycle
-        .entries()
-        .iter()
-        .any(|entry| !entry.is_zero()));
+    assert!(
+        commuting
+            .patch
+            .expect("overlap")
+            .cocycle
+            .entries()
+            .iter()
+            .any(|entry| !entry.is_zero())
+    );
     let noncommuting =
         compare_sections(&noncommuting_left, &noncommuting_right).expect("noncommuting");
     let OverlapKind::PathOrderedHolonomy { commutator, .. } = noncommuting.kind else {
@@ -127,4 +129,35 @@ fn a_nonidentity_metric_changes_the_returned_adjoint() {
     let bare = section.supported.transpose().expect("transpose");
     let receipt = section.derive().expect("metric return");
     assert_ne!(receipt.metric_adjoint, bare);
+}
+
+#[test]
+fn a_column_disjoint_population_returns_one_exact_interchange_family() {
+    let sections = (0..4)
+        .map(|column| SupportedDefectSection {
+            address: format!("local-{column}"),
+            parent_candidate: format!("candidate-{column}"),
+            receiver: "one-common-receiver-family".to_owned(),
+            successor_word: vec!["generator-family".to_owned()],
+            chart: "rectangular-free-module".to_owned(),
+            ambient_rows: 3,
+            ambient_columns: 4,
+            support_rows: vec![0, 1],
+            support_columns: vec![column],
+            supported: matrix(&[&[-1], &[1]]),
+            metrics: DefectMetrics {
+                domain: ExactRatMatrix::identity(1).expect("domain metric"),
+                codomain: ExactRatMatrix::identity(2).expect("codomain metric"),
+            },
+        })
+        .collect();
+    let cover = DerivedFactorCover::derive(sections).expect("compact cover");
+    assert_eq!(cover.complete_pair_population, 6);
+    assert!(cover.overlaps.is_empty());
+    assert_eq!(cover.compact_interchange_families.len(), 1);
+    let family = &cover.compact_interchange_families[0];
+    assert_eq!(family.pair_population, 6);
+    assert_eq!(family.disjoint_support_axis, "columns");
+    assert_eq!(family.interchange_law, "additive-local-delta-interchange");
+    cover.validate().expect("reopened compact cover");
 }

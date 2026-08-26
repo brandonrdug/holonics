@@ -103,6 +103,8 @@ impl DeviceAttribute {
     pub const MAX_GRID_DIM_Y: DeviceAttribute = DeviceAttribute(6);
     pub const MAX_GRID_DIM_Z: DeviceAttribute = DeviceAttribute(7);
     pub const MULTIPROCESSOR_COUNT: DeviceAttribute = DeviceAttribute(16);
+    pub const CONCURRENT_KERNELS: DeviceAttribute = DeviceAttribute(31);
+    pub const MAX_BLOCKS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(106);
     pub const VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED: DeviceAttribute = DeviceAttribute(102);
 
     pub const fn from_raw(value: i32) -> DeviceAttribute {

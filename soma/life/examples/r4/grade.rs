@@ -7,7 +7,10 @@ use holonic_engine::receiver_exact_compression::ItemId;
 use life::mathematical_particle::LongHorizonRetainedBoundary;
 use serde_json::{json, Value};
 
-use super::{detached::DetachedBoundaryReturn, source::{InquiryFront, PassageInputs}};
+use super::{
+    detached::DetachedBoundaryReturn,
+    source::{InquiryFront, PassageInputs},
+};
 
 pub fn endpoint(returned: &DeviceRaggedNativeTrace, front: usize) -> Result<u32, String> {
     let after = returned
@@ -42,7 +45,9 @@ pub fn verify_factorization(
             .map_err(|error| error.to_string())?;
         let compact_native = endpoint(compact, front)?;
         if source_native != uncondensed_native || source_native.0 as u32 != compact_native {
-            return Err(format!("front {front} does not factor through the retained boundary"));
+            return Err(format!(
+                "front {front} does not factor through the retained boundary"
+            ));
         }
         factors.push(json!({
             "front": front,
@@ -67,8 +72,12 @@ pub fn certify_interchange(
     if returned.front_count < 3 || returned.trace_offsets.len() != returned.front_count + 1 {
         return Err("the independent front family is incomplete".to_owned());
     }
-    let table_end = table_entries.checked_mul(4).ok_or("table address overflow")?;
-    let output_base = table_end.checked_add(4096).ok_or("output address overflow")?;
+    let table_end = table_entries
+        .checked_mul(4)
+        .ok_or("table address overflow")?;
+    let output_base = table_end
+        .checked_add(4096)
+        .ok_or("output address overflow")?;
     let footprints = (0..3)
         .map(|front| {
             let from = output_base + u64::from(returned.trace_offsets[front]) * 4;
@@ -81,7 +90,9 @@ pub fn certify_interchange(
         .collect::<Vec<_>>();
     let certificate = certify_footprints(&footprints);
     if !certificate.is_interchangeable() {
-        return Err("the independent inquiry fronts share a mutable apparatus footprint".to_owned());
+        return Err(
+            "the independent inquiry fronts share a mutable apparatus footprint".to_owned(),
+        );
     }
     Ok(certificate)
 }
@@ -115,7 +126,11 @@ pub fn complete_cost(
         .map(|((first, after), front)| after - first + front.word.len())
         .max()
         .unwrap_or(0) as u64;
-    let compact_span = fronts.iter().map(|front| front.word.len()).max().unwrap_or(0) as u64;
+    let compact_span = fronts
+        .iter()
+        .map(|front| front.word.len())
+        .max()
+        .unwrap_or(0) as u64;
     let source_transfer = source.host_ingress_octets + source.host_egress_octets;
     let uncondensed_transfer = uncondensed.host_ingress_octets + uncondensed.host_egress_octets;
     let compact_transfer = compact.host_ingress_octets + compact.host_egress_octets;
@@ -147,7 +162,9 @@ pub fn complete_cost(
         "transfer_octets": compact_transfer,
     });
     let fell = |coordinate: &str| {
-        source_cost[coordinate].as_u64().zip(compact_cost[coordinate].as_u64())
+        source_cost[coordinate]
+            .as_u64()
+            .zip(compact_cost[coordinate].as_u64())
             .is_some_and(|(source, compact)| compact < source)
     };
     let coordinates = [

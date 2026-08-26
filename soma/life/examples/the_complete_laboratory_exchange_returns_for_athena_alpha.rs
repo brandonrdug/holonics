@@ -9,11 +9,11 @@ use std::{
 };
 
 use life::exchange_world_tube::{
-    CompleteExchangeSource, ContinuationAperture, ContinuationPartition, DeviceContactReceipt,
-    Digest32, VisibleProjectionReceipt, attach_visible_exchange_faces,
-    derive_continuation_aperture, discover_complete_exchange_aperture,
-    exchange_world_tube_rest_digest, mount_exchange_world_tube_on_device,
-    remount_exchange_world_tube, write_exchange_world_tube_rest,
+    attach_visible_exchange_faces, derive_continuation_aperture,
+    discover_complete_exchange_aperture, exchange_world_tube_rest_digest,
+    mount_exchange_world_tube_on_device, remount_exchange_world_tube,
+    write_exchange_world_tube_rest, CompleteExchangeSource, ContinuationAperture,
+    ContinuationPartition, DeviceContactReceipt, Digest32, VisibleProjectionReceipt,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;

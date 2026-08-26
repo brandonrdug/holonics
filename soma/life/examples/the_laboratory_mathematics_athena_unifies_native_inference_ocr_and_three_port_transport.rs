@@ -5,12 +5,12 @@ mod artifact;
 #[allow(dead_code)]
 #[path = "n3/cultivation.rs"]
 mod cultivation;
-#[path = "n3/world_return.rs"]
-mod world_return;
 #[path = "n4/product.rs"]
 mod product;
 #[path = "n4/rest.rs"]
 mod rest;
+#[path = "n3/world_return.rs"]
+mod world_return;
 
 use std::path::Path;
 
@@ -20,14 +20,15 @@ fn main() {
         [flag, input, output] if flag == "--optical-return" => {
             world_return::recover(Path::new(input), Path::new(output))
         }
-        [flag, rest, applications, output] if flag == "--detached" => product::detached(
-            Path::new(rest),
-            Path::new(applications),
-            Path::new(output),
-        ),
+        [flag, rest, applications, output] if flag == "--detached" => {
+            product::detached(Path::new(rest), Path::new(applications), Path::new(output))
+        }
         [] => product::construct(&product::root(), Path::new(product::DEFAULT_OUT)),
         [output] => product::construct(&product::root(), Path::new(output)),
-        _ => Err("usage: [OUTPUT] | --optical-return INPUT OUTPUT | --detached REST APPLICATIONS OUTPUT".to_owned()),
+        _ => Err(
+            "usage: [OUTPUT] | --optical-return INPUT OUTPUT | --detached REST APPLICATIONS OUTPUT"
+                .to_owned(),
+        ),
     };
     if let Err(error) = result {
         eprintln!("N4 refused: {error}");

@@ -43,6 +43,10 @@ pub enum MorphologicalConditionCudaError {
         at: usize,
         paths: usize,
     },
+    MemoryAperture {
+        required_bytes: u64,
+        free_bytes: u64,
+    },
     Extent,
     DeviceRefused(&'static str),
     InvalidDeviceReturn(&'static str),
@@ -59,6 +63,16 @@ impl PartialEq for MorphologicalConditionCudaError {
             }
             (Self::Suffix(left), Self::Suffix(right)) => left == right,
             (Self::EmptyChart, Self::EmptyChart) | (Self::Extent, Self::Extent) => true,
+            (
+                Self::MemoryAperture {
+                    required_bytes: left_required,
+                    free_bytes: left_free,
+                },
+                Self::MemoryAperture {
+                    required_bytes: right_required,
+                    free_bytes: right_free,
+                },
+            ) => left_required == right_required && left_free == right_free,
             (Self::DeviceRefused(left), Self::DeviceRefused(right))
             | (Self::InvalidDeviceReturn(left), Self::InvalidDeviceReturn(right)) => left == right,
             _ => false,
@@ -88,6 +102,13 @@ impl std::fmt::Display for MorphologicalConditionCudaError {
             Self::ChartPathIsEmpty { chart, at, paths } => write!(
                 formatter,
                 "the {chart} chart carries an empty path at {at} of {paths}"
+            ),
+            Self::MemoryAperture {
+                required_bytes,
+                free_bytes,
+            } => write!(
+                formatter,
+                "one exact recurrent front requires {required_bytes} device bytes but the mounted path reports {free_bytes} free bytes"
             ),
             Self::Extent => write!(
                 formatter,
@@ -167,12 +188,17 @@ pub struct MorphologicalConditionSemanticReceipt {
     pub prefix_shadow: MorphologicalPrefixShadowReceipt,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct MorphologicalConditionApparatusReceipt {
     pub device_name: String,
     pub suffix_launches: u64,
     pub prefix_launches: u64,
     pub resident_words: u64,
+    /// Driver-reported upper aperture for co-present one-block charts on the mounted card.
+    pub concurrent_block_aperture: u64,
+    /// Greatest number of independent suffix charts actually co-present in one wave.
+    pub peak_concurrent_suffix_charts: u64,
+    pub suffix_waves: u64,
     pub route_launches: u64,
     pub route_contact_launches: u64,
 }
@@ -219,6 +245,91 @@ struct StagedSuffix {
     scratch: DeviceBuffer<u32>,
     output: DeviceBuffer<u32>,
     stream: Stream,
+}
+
+#[derive(Clone, Copy)]
+struct SuffixDeviceExtents {
+    inputs: usize,
+    state_capacity: usize,
+    transition_capacity: usize,
+    scratch_words: usize,
+    input_words: usize,
+    occurrence_words: usize,
+}
+
+impl SuffixDeviceExtents {
+    fn for_population(
+        material_occurrences: usize,
+        boundary_count: usize,
+    ) -> Result<Self, MorphologicalConditionCudaError> {
+        let inputs = material_occurrences
+            .checked_add(boundary_count)
+            .ok_or(MorphologicalConditionCudaError::Extent)?;
+        let state_capacity = inputs
+            .checked_mul(2)
+            .ok_or(MorphologicalConditionCudaError::Extent)?;
+        let transition_capacity = inputs
+            .checked_mul(3)
+            .and_then(|value| value.checked_add(1))
+            .ok_or(MorphologicalConditionCudaError::Extent)?;
+        let scratch_words = inputs
+            .checked_add(1)
+            .and_then(|value| {
+                state_capacity
+                    .checked_mul(6)
+                    .and_then(|states| value.checked_add(states))
+            })
+            .ok_or(MorphologicalConditionCudaError::Extent)?;
+        let input_words = inputs
+            .checked_mul(wire::SUFFIX_INPUT_WORDS)
+            .ok_or(MorphologicalConditionCudaError::Extent)?;
+        Ok(Self {
+            inputs,
+            state_capacity,
+            transition_capacity,
+            scratch_words,
+            input_words,
+            occurrence_words: material_occurrences,
+        })
+    }
+
+    fn buffer_words(self) -> Result<[usize; 7], MorphologicalConditionCudaError> {
+        Ok([
+            wire::SUFFIX_CONTROL_WORDS,
+            self.input_words,
+            self.state_capacity
+                .checked_mul(wire::SUFFIX_STATE_WORDS)
+                .ok_or(MorphologicalConditionCudaError::Extent)?,
+            self.transition_capacity
+                .checked_mul(wire::SUFFIX_TRANSITION_WORDS)
+                .ok_or(MorphologicalConditionCudaError::Extent)?,
+            self.occurrence_words,
+            self.scratch_words,
+            wire::SUFFIX_OUTPUT_WORDS,
+        ])
+    }
+
+    fn allocation_bytes(
+        self,
+        allocation_grain: usize,
+    ) -> Result<u64, MorphologicalConditionCudaError> {
+        let grain = allocation_grain.max(core::mem::size_of::<u32>());
+        self.buffer_words()?
+            .into_iter()
+            .try_fold(0u64, |sum, words| {
+                let bytes = words
+                    .checked_mul(core::mem::size_of::<u32>())
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                let charged = bytes
+                    .checked_add(grain - 1)
+                    .map(|value| value / grain * grain)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                sum.checked_add(
+                    u64::try_from(charged).map_err(|_| MorphologicalConditionCudaError::Extent)?,
+                )
+                .ok_or(MorphologicalConditionCudaError::Extent)
+            })
+    }
 }
 
 impl StagedSuffix {
@@ -293,6 +404,196 @@ impl CudaMorphologicalConditioner {
         self.last_apparatus.as_ref()
     }
 
+    /// Condition one architecture-neutral recurrent chart on the resident surface.
+    ///
+    /// The original entry point below batches five morphology charts because that exterior deed
+    /// presents five.  The resident suffix law itself has no five-chart ontology.  This method is
+    /// the exact one-chart composition required by Athena's ordinary-material bridge; it stages,
+    /// launches, decodes, and retains the same owner without manufacturing four dummy charts or a
+    /// host replay.
+    pub fn condition_one(
+        &mut self,
+        name: &'static str,
+        paths: &[Vec<ResonanceGerm>],
+        labels: &[ReceiverFiberIdentity],
+    ) -> Result<
+        (
+            ExactLabeledSuffixEcology,
+            MorphologicalConditionSemanticReceipt,
+            MorphologicalConditionApparatusReceipt,
+        ),
+        MorphologicalConditionCudaError,
+    > {
+        self.route.context.make_current()?;
+        let staged = stage_suffix(name, paths, labels)?;
+        self.route.context.synchronize()?;
+        let function = self.route.module.function(wire::SUFFIX_ENTRY_SYMBOL)?;
+        launch_suffix(&function, &staged)?;
+        staged.stream.synchronize()?;
+        let route_launches = self.route.launches();
+        let route_contact_launches = self.route.contact_launches();
+        let resident_words = u64::try_from(staged.resident_words())
+            .map_err(|_| MorphologicalConditionCudaError::Extent)?;
+        let (ecology, semantic, shadow) = decode_suffix(&staged)?;
+        let semantic = MorphologicalConditionSemanticReceipt {
+            suffix_shadows: vec![shadow],
+            ..semantic
+        };
+        let apparatus = MorphologicalConditionApparatusReceipt {
+            device_name: self.route.device_name().to_owned(),
+            suffix_launches: 1,
+            prefix_launches: 0,
+            resident_words,
+            concurrent_block_aperture: 1,
+            peak_concurrent_suffix_charts: 1,
+            suffix_waves: 1,
+            route_launches,
+            route_contact_launches,
+        };
+        self.suffix_launches = self.suffix_launches.saturating_add(1);
+        self.last_semantic = Some(semantic.clone());
+        self.last_apparatus = Some(apparatus.clone());
+        self.suffix_resident = vec![staged];
+        self.prefix_resident = None;
+        Ok((ecology, semantic, apparatus))
+    }
+
+    /// Condition one independent local recurrence per addressed path, in apparatus-sized waves.
+    ///
+    /// A path is already one H3N factor world-line. Cross-factor contact is owned by the native
+    /// Complex-Parametron support pullback, so a global serial concatenation is neither required
+    /// nor lawful. Every local extension remains chronological; independent path owners occupy one
+    /// device-reported resident block aperture, additionally bounded by the exact rounded buffer
+    /// charge against contemporary free device memory, and return before the next wave reuses the
+    /// apparatus surface.
+    pub fn condition_independent_paths(
+        &mut self,
+        name: &'static str,
+        paths: &[Vec<ResonanceGerm>],
+        labels: &[ReceiverFiberIdentity],
+    ) -> Result<
+        (
+            Vec<ExactLabeledSuffixEcology>,
+            MorphologicalConditionSemanticReceipt,
+            MorphologicalConditionApparatusReceipt,
+        ),
+        MorphologicalConditionCudaError,
+    > {
+        if paths.is_empty() || paths.len() != labels.len() {
+            return Err(MorphologicalConditionCudaError::EmptyChart);
+        }
+        self.route.context.make_current()?;
+        let block_aperture = if self.route.concurrent_kernels() {
+            self.route
+                .multiprocessor_count()
+                .checked_mul(self.route.max_blocks_per_multiprocessor())
+                .ok_or(MorphologicalConditionCudaError::Extent)?
+        } else {
+            1
+        };
+        let wave_extent = usize::try_from(block_aperture)
+            .map_err(|_| MorphologicalConditionCudaError::Extent)?
+            .max(1);
+        let function = self.route.module.function(wire::SUFFIX_ENTRY_SYMBOL)?;
+        let allocation_grain = self.route.context.allocation_grain_bytes()?;
+        let mut ecologies = Vec::with_capacity(paths.len());
+        let mut semantic = MorphologicalConditionSemanticReceipt::default();
+        let mut peak_resident_words = 0usize;
+        let mut launches = 0u64;
+        let mut waves = 0u64;
+        let mut peak_concurrent = 0usize;
+        let mut from = 0usize;
+        while from < paths.len() {
+            let free_bytes = u64::try_from(self.route.context.memory_info()?.free_bytes)
+                .map_err(|_| MorphologicalConditionCudaError::Extent)?;
+            let mut predicted_bytes = 0u64;
+            let mut until = from;
+            while until < paths.len() && until - from < wave_extent {
+                let required = SuffixDeviceExtents::for_population(paths[until].len(), 1)?
+                    .allocation_bytes(allocation_grain)?;
+                let next = predicted_bytes
+                    .checked_add(required)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                if next >= free_bytes {
+                    if until == from {
+                        return Err(MorphologicalConditionCudaError::MemoryAperture {
+                            required_bytes: required,
+                            free_bytes,
+                        });
+                    }
+                    break;
+                }
+                predicted_bytes = next;
+                until += 1;
+            }
+            let mut wave = Vec::with_capacity(until - from);
+            for at in from..until {
+                wave.push(stage_suffix(
+                    name,
+                    core::slice::from_ref(&paths[at]),
+                    core::slice::from_ref(&labels[at]),
+                )?);
+            }
+            self.route.context.synchronize()?;
+            waves = waves
+                .checked_add(1)
+                .ok_or(MorphologicalConditionCudaError::Extent)?;
+            peak_concurrent = peak_concurrent.max(wave.len());
+            peak_resident_words = peak_resident_words
+                .max(wave.iter().map(StagedSuffix::resident_words).sum::<usize>());
+            for chart in &wave {
+                launch_suffix(&function, chart)?;
+                launches = launches
+                    .checked_add(1)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+            }
+            for chart in &wave {
+                chart.stream.synchronize()?;
+            }
+            for chart in &wave {
+                let (ecology, receipt, shadow) = decode_suffix(chart)?;
+                semantic.suffix_extensions = semantic
+                    .suffix_extensions
+                    .checked_add(receipt.suffix_extensions)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                semantic.suffix_clones = semantic
+                    .suffix_clones
+                    .checked_add(receipt.suffix_clones)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                semantic.suffix_crosses = semantic
+                    .suffix_crosses
+                    .checked_add(receipt.suffix_crosses)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                semantic.suffix_transition_reads = semantic
+                    .suffix_transition_reads
+                    .checked_add(receipt.suffix_transition_reads)
+                    .ok_or(MorphologicalConditionCudaError::Extent)?;
+                semantic.suffix_shadows.push(shadow);
+                ecologies.push(ecology);
+            }
+            from = until;
+        }
+        let apparatus = MorphologicalConditionApparatusReceipt {
+            device_name: self.route.device_name().to_owned(),
+            suffix_launches: launches,
+            prefix_launches: 0,
+            resident_words: u64::try_from(peak_resident_words)
+                .map_err(|_| MorphologicalConditionCudaError::Extent)?,
+            concurrent_block_aperture: u64::from(block_aperture),
+            peak_concurrent_suffix_charts: u64::try_from(peak_concurrent)
+                .map_err(|_| MorphologicalConditionCudaError::Extent)?,
+            suffix_waves: waves,
+            route_launches: self.route.launches(),
+            route_contact_launches: self.route.contact_launches(),
+        };
+        self.suffix_launches = self.suffix_launches.saturating_add(launches);
+        self.last_semantic = Some(semantic.clone());
+        self.last_apparatus = Some(apparatus.clone());
+        self.suffix_resident.clear();
+        self.prefix_resident = None;
+        Ok((ecologies, semantic, apparatus))
+    }
+
     pub(crate) fn condition_charts(
         &mut self,
         suffixes: [(
@@ -357,6 +658,11 @@ impl CudaMorphologicalConditioner {
             prefix_launches: 1,
             resident_words: u64::try_from(resident_words)
                 .map_err(|_| MorphologicalConditionCudaError::Extent)?,
+            concurrent_block_aperture: u64::try_from(staged.len())
+                .map_err(|_| MorphologicalConditionCudaError::Extent)?,
+            peak_concurrent_suffix_charts: u64::try_from(staged.len())
+                .map_err(|_| MorphologicalConditionCudaError::Extent)?,
+            suffix_waves: 1,
             route_launches,
             route_contact_launches,
         };
@@ -490,14 +796,8 @@ fn stage_suffix(
     canonical.sort();
     let material_count = checked_u32(material_symbols.len())?;
     let material_occurrences = canonical.iter().map(|(path, _)| path.len()).sum::<usize>();
-    let inputs = material_occurrences
-        .checked_add(canonical.len())
-        .ok_or(MorphologicalConditionCudaError::Extent)?;
-    let mut input_words = Vec::with_capacity(
-        inputs
-            .checked_mul(wire::SUFFIX_INPUT_WORDS)
-            .ok_or(MorphologicalConditionCudaError::Extent)?,
-    );
+    let extents = SuffixDeviceExtents::for_population(material_occurrences, canonical.len())?;
+    let mut input_words = Vec::with_capacity(extents.input_words);
     for (path_at, (path, source)) in canonical.iter().enumerate() {
         for symbol in path {
             input_words.extend([*symbol, *source, 1]);
@@ -510,31 +810,16 @@ fn stage_suffix(
             0,
         ]);
     }
-    let state_capacity = inputs
-        .checked_mul(2)
-        .ok_or(MorphologicalConditionCudaError::Extent)?;
     // A suffix automaton of a string of length n has at most 2n states and fewer than 3n
     // transitions. The unique path boundaries make the generalized ecology one such string.
-    let transition_capacity = inputs
-        .checked_mul(3)
-        .and_then(|value| value.checked_add(1))
-        .ok_or(MorphologicalConditionCudaError::Extent)?;
-    let scratch_words = inputs
-        .checked_add(1)
-        .and_then(|value| {
-            state_capacity
-                .checked_mul(6)
-                .and_then(|states| value.checked_add(states))
-        })
-        .ok_or(MorphologicalConditionCudaError::Extent)?;
     let control_words = [
         wire::LAYOUT_VERSION,
-        checked_u32(inputs)?,
+        checked_u32(extents.inputs)?,
         material_count,
-        checked_u32(state_capacity)?,
-        checked_u32(transition_capacity)?,
+        checked_u32(extents.state_capacity)?,
+        checked_u32(extents.transition_capacity)?,
         checked_u32(material_occurrences)?,
-        checked_u32(scratch_words)?,
+        checked_u32(extents.scratch_words)?,
     ];
     let control = DeviceBuffer::alloc(control_words.len())?;
     control.copy_from_slice(&control_words)?;
@@ -547,12 +832,12 @@ fn stage_suffix(
         boundary_count: canonical.len(),
         control,
         input,
-        states: DeviceBuffer::alloc_zeroed(state_capacity * wire::SUFFIX_STATE_WORDS)?,
+        states: DeviceBuffer::alloc_zeroed(extents.state_capacity * wire::SUFFIX_STATE_WORDS)?,
         transitions: DeviceBuffer::alloc_zeroed(
-            transition_capacity * wire::SUFFIX_TRANSITION_WORDS,
+            extents.transition_capacity * wire::SUFFIX_TRANSITION_WORDS,
         )?,
         occurrence_sources: DeviceBuffer::alloc_zeroed(material_occurrences)?,
-        scratch: DeviceBuffer::alloc_zeroed(scratch_words)?,
+        scratch: DeviceBuffer::alloc_zeroed(extents.scratch_words)?,
         output: DeviceBuffer::alloc_zeroed(wire::SUFFIX_OUTPUT_WORDS)?,
         stream: Stream::create()?,
     })
@@ -611,12 +896,12 @@ fn decode_suffix(
     match output[wire::SUFFIX_OUTPUT_STATUS] {
         wire::STATUS_COMPLETE => {}
         wire::STATUS_INVALID => {
-            return Err(MorphologicalConditionCudaError::DeviceRefused(chart.name))
+            return Err(MorphologicalConditionCudaError::DeviceRefused(chart.name));
         }
         _ => {
             return Err(MorphologicalConditionCudaError::InvalidDeviceReturn(
                 "suffix status",
-            ))
+            ));
         }
     }
     if output[wire::SUFFIX_OUTPUT_VERSION] != wire::LAYOUT_VERSION {
@@ -878,12 +1163,12 @@ fn decode_prefix(
         wire::STATUS_INVALID => {
             return Err(MorphologicalConditionCudaError::DeviceRefused(
                 "question-prefix",
-            ))
+            ));
         }
         _ => {
             return Err(MorphologicalConditionCudaError::InvalidDeviceReturn(
                 "prefix status",
-            ))
+            ));
         }
     }
     let node_count = output[wire::PREFIX_OUTPUT_NODE_COUNT] as usize;

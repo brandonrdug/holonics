@@ -148,10 +148,7 @@ impl MorphologicalLanguagePassage {
         self
     }
 
-    pub fn with_routing_features(
-        mut self,
-        features: impl IntoIterator<Item = String>,
-    ) -> Self {
+    pub fn with_routing_features(mut self, features: impl IntoIterator<Item = String>) -> Self {
         self.routing_features.extend(features);
         self
     }

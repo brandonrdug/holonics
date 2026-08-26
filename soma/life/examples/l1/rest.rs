@@ -48,12 +48,9 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened = FamilyCultivatedAthenaRest::read(
-        &read(&standing)?,
-        &read(&decoder)?,
-        &read(&fibres)?,
-    )
-    .map_err(|error| error.to_string())?;
+    let reopened =
+        FamilyCultivatedAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+            .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

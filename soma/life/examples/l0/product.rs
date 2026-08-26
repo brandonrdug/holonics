@@ -23,7 +23,10 @@ pub fn construct(root: &Path) -> Result<(), String> {
     let predecessor_identity = ecology
         .canonical_identity()
         .map_err(|error| error.to_string())?;
-    artifact::write_json(output.join("00-frozen-laboratory-chronology.json"), &ecology.chronology)?;
+    artifact::write_json(
+        output.join("00-frozen-laboratory-chronology.json"),
+        &ecology.chronology,
+    )?;
     artifact::write_json(
         output.join("01-causal-family-partitions-and-incremental-incidence.json"),
         &json!({
@@ -96,7 +99,9 @@ pub fn construct(root: &Path) -> Result<(), String> {
     if declined_primary["cultivation_committed"] != false
         || declined_heldout["selected_route"] != json!([0, 1, 2])
     {
-        return Err("the matched declined laboratory passages did not retain the expanded route".to_owned());
+        return Err(
+            "the matched declined laboratory passages did not retain the expanded route".to_owned(),
+        );
     }
 
     let proof_path = declined_primary_output.join("02-returned-proof.lean");
@@ -113,7 +118,10 @@ pub fn construct(root: &Path) -> Result<(), String> {
         exact_difference_octets: lean_bytes.len() as u64,
     };
     let delta = LaboratoryMorphologyDelta {
-        occurrence: format!("l0/morphology/{}", artifact::digest(world_occurrence.as_bytes())),
+        occurrence: format!(
+            "l0/morphology/{}",
+            artifact::digest(world_occurrence.as_bytes())
+        ),
         returned_occurrence: world_occurrence,
         support_coordinates: vec![0, 1, 2],
         expanded_transport_word: vec![0, 1, 2],
@@ -189,7 +197,9 @@ pub fn construct(root: &Path) -> Result<(), String> {
         || separated["selected_route"] != json!([4])
         || separated["entered_coefficients"] == separated["returned_coefficients"]
     {
-        return Err("cultivated held-out conduct or the shortest separator did not return".to_owned());
+        return Err(
+            "cultivated held-out conduct or the shortest separator did not return".to_owned(),
+        );
     }
 
     let targeted_ablation = json!({
@@ -206,7 +216,9 @@ pub fn construct(root: &Path) -> Result<(), String> {
     if targeted_ablation["attributable_condensed_route_removed"] != true
         || targeted_ablation["same_exact_receiver_consequence"] != true
     {
-        return Err("the targeted L0 ablation did not remove exactly the condensed route".to_owned());
+        return Err(
+            "the targeted L0 ablation did not remove exactly the condensed route".to_owned(),
+        );
     }
     artifact::write_json(output.join("08-targeted-ablation.json"), &targeted_ablation)?;
 
@@ -219,11 +231,24 @@ pub fn construct(root: &Path) -> Result<(), String> {
     {
         return Err("L0 withdrawal did not restore its exact immediate predecessor".to_owned());
     }
-    artifact::write_json(output.join("09-exact-predecessor-withdrawal.json"), &withdrawal)?;
+    artifact::write_json(
+        output.join("09-exact-predecessor-withdrawal.json"),
+        &withdrawal,
+    )?;
 
-    let dissection: Value = read_json(&committed_heldout_output.join("05-complete-dissection.json"))?;
-    artifact::write_json(output.join("10-complete-laboratory-dissection.json"), &dissection)?;
-    let cost = cost_receipt(&declined_heldout, &later, &native_standing, &native_decoder, &native_fibres)?;
+    let dissection: Value =
+        read_json(&committed_heldout_output.join("05-complete-dissection.json"))?;
+    artifact::write_json(
+        output.join("10-complete-laboratory-dissection.json"),
+        &dissection,
+    )?;
+    let cost = cost_receipt(
+        &declined_heldout,
+        &later,
+        &native_standing,
+        &native_decoder,
+        &native_fibres,
+    )?;
     artifact::write_json(output.join("11-complete-product-cost.json"), &cost)?;
     fs::write(
         output.join("12-CAPABILITY_REPORT.md"),
@@ -299,7 +324,9 @@ fn run_detached(
     inquiry: &Path,
     output: &Path,
 ) -> Result<(), String> {
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let standing = standing.canonicalize().map_err(|error| error.to_string())?;
     let decoder = decoder.canonicalize().map_err(|error| error.to_string())?;
     let fibres = fibres.canonicalize().map_err(|error| error.to_string())?;
@@ -480,18 +507,70 @@ fn grade(
     cost: &Value,
 ) -> Result<Value, String> {
     let checks = vec![
-        ("content-addressed committed prefix and predecessor", prefix["exact"] == true),
-        ("seven complete causal-family partitions", prefix["partitions"] == 7),
-        ("incremental incidence without repository materialization", prefix["whole_materializations"] == 0),
-        ("new inquiry outside developmental closure", declined_primary["inquiry_occurrence"].as_str().is_some_and(|value| value.starts_with("l0/inquiry/"))),
-        ("M1-M4 I/R and R6 compose as one rest", dissection["passages"]["l0_component_identities"].as_array().is_some_and(|rows| rows.len() == 6)),
-        ("complete emitted mathematical product", declined_primary["proof_sha256"].as_str().is_some() && declined_primary["language"].as_str().is_some()),
-        ("genuine Lean return and attributable delta", lean["accepted"] == true && later["cultivation_committed"] == true),
-        ("changed held-out later conduct", declined_heldout["selected_route"] != later["selected_route"]),
-        ("detached remount source audit withdrawal and ablation", later["source_corpus_exchange_proof_and_repository_mounted"] == false && ablation["attributable_condensed_route_removed"] == true && withdrawal.exact_predecessor_restored),
-        ("complete dissection family", dissection["fibres"].as_array().is_some_and(|rows| !rows.is_empty()) && dissection["caustics"].as_array().is_some_and(|rows| !rows.is_empty())),
-        ("resident plural fronts exact join", later["resident_passage"]["exact_interchange"]["pairwise_disjoint"] == true && later["resident_passage"]["total_launches"].as_u64().is_some_and(|value| value >= 4)),
-        ("candidate capability and cost receipt", cost["local_transport"]["strict_fall"]["semantic_work"] == true && separated["selected_route"] == json!([4])),
+        (
+            "content-addressed committed prefix and predecessor",
+            prefix["exact"] == true,
+        ),
+        (
+            "seven complete causal-family partitions",
+            prefix["partitions"] == 7,
+        ),
+        (
+            "incremental incidence without repository materialization",
+            prefix["whole_materializations"] == 0,
+        ),
+        (
+            "new inquiry outside developmental closure",
+            declined_primary["inquiry_occurrence"]
+                .as_str()
+                .is_some_and(|value| value.starts_with("l0/inquiry/")),
+        ),
+        (
+            "M1-M4 I/R and R6 compose as one rest",
+            dissection["passages"]["l0_component_identities"]
+                .as_array()
+                .is_some_and(|rows| rows.len() == 6),
+        ),
+        (
+            "complete emitted mathematical product",
+            declined_primary["proof_sha256"].as_str().is_some()
+                && declined_primary["language"].as_str().is_some(),
+        ),
+        (
+            "genuine Lean return and attributable delta",
+            lean["accepted"] == true && later["cultivation_committed"] == true,
+        ),
+        (
+            "changed held-out later conduct",
+            declined_heldout["selected_route"] != later["selected_route"],
+        ),
+        (
+            "detached remount source audit withdrawal and ablation",
+            later["source_corpus_exchange_proof_and_repository_mounted"] == false
+                && ablation["attributable_condensed_route_removed"] == true
+                && withdrawal.exact_predecessor_restored,
+        ),
+        (
+            "complete dissection family",
+            dissection["fibres"]
+                .as_array()
+                .is_some_and(|rows| !rows.is_empty())
+                && dissection["caustics"]
+                    .as_array()
+                    .is_some_and(|rows| !rows.is_empty()),
+        ),
+        (
+            "resident plural fronts exact join",
+            later["resident_passage"]["exact_interchange"]["pairwise_disjoint"] == true
+                && later["resident_passage"]["total_launches"]
+                    .as_u64()
+                    .is_some_and(|value| value >= 4),
+        ),
+        (
+            "candidate capability and cost receipt",
+            cost["local_transport"]["strict_fall"]["semantic_work"] == true
+                && separated["selected_route"] == json!([4]),
+        ),
     ];
     if checks.iter().any(|check| !check.1) {
         return Err(format!("L0 twelve-part grade refused: {checks:?}"));

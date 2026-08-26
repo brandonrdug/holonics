@@ -29,5 +29,7 @@ pub fn digest(bytes: impl AsRef<[u8]>) -> String {
 }
 
 pub fn value_digest(value: &impl Serialize) -> Result<String, String> {
-    serde_json::to_vec(value).map(digest).map_err(|error| error.to_string())
+    serde_json::to_vec(value)
+        .map(digest)
+        .map_err(|error| error.to_string())
 }

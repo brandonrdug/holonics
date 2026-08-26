@@ -5,7 +5,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
-use holonic_engine::{category::BoundaryId, phoenix::inference_ecology::InferenceEcologyRest};
+use holonic_engine::{
+    category::BoundaryId, native_ecology::inference_ecology::InferenceEcologyRest,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -672,7 +674,7 @@ fn code_closure() -> String {
     for bytes in [
         include_bytes!("../the_athena_gemma_ecology_infers_returns_and_remounts.rs").as_slice(),
         include_bytes!("product.rs").as_slice(),
-        include_bytes!("../../../../crates/holonic-engine/src/phoenix/inference_ecology.rs")
+        include_bytes!("../../../../crates/holonic-engine/src/native_ecology/inference_ecology.rs")
             .as_slice(),
         include_bytes!("../../../../crates/holonic-engine/src/cuda_refine.rs").as_slice(),
         include_bytes!("../../../../crates/holonic-engine/kernels/refine_shell.cu").as_slice(),

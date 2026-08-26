@@ -30,6 +30,116 @@ pub fn remount_exchange_world_tube(path: &Path) -> Result<ExchangeWorldTube, Str
     decode(&bytes)
 }
 
+/// The smallest exact exterior projection needed by a later codec cultivation deed.
+///
+/// This reader validates and skips the complete rest wire without allocating its 24-million-node
+/// and 10-million-site interior.  It returns only situated visible-message occurrences.  The
+/// projection is exterior testimony, not a replacement runtime topology.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisibleMessageProjection {
+    pub source_occurrence_sha256: Digest32,
+    pub content_law_sha256: Digest32,
+    pub messages: Vec<VisibleMessageFace>,
+}
+
+pub fn remount_visible_message_projection(path: &Path) -> Result<VisibleMessageProjection, String> {
+    let bytes = fs::read(path).map_err(|error| format!("read {}: {error}", path.display()))?;
+    let mut input = Reader {
+        bytes: &bytes,
+        at: 0,
+    };
+    if input.take(EXCHANGE_REST_PREFIX.len())? != EXCHANGE_REST_PREFIX {
+        return Err("the exchange rest carries the wrong schema prefix".to_owned());
+    }
+    let _schema = input.string()?;
+    let source_occurrence_sha256 = input.digest()?;
+    let content_law_sha256 = input.digest()?;
+
+    for _ in 0..input.len()? {
+        input.take(4 + 8 + 32 + 8 + 8)?;
+        if input.boolean()? {
+            input.take(16)?;
+        }
+        let blanks = input.len()?;
+        input.take(
+            blanks
+                .checked_mul(16)
+                .ok_or_else(|| "blank-record extent overflowed".to_owned())?,
+        )?;
+        input.bytes()?;
+        input.bytes()?;
+        input.bytes()?;
+    }
+
+    let records = input.len()?;
+    input.take(
+        records
+            .checked_mul(116)
+            .ok_or_else(|| "record extent overflowed".to_owned())?,
+    )?;
+
+    for _ in 0..input.len()? {
+        input.take(8)?;
+        if input.boolean()? {
+            input.take(4)?;
+        }
+        input.take(4 + 1 + 32)?;
+    }
+
+    for _ in 0..input.len()? {
+        input.take(8 + 4 + 4)?;
+        input.bytes()?;
+        input.take(32)?;
+    }
+
+    let scalar_sites = input.len()?;
+    input.take(
+        scalar_sites
+            .checked_mul(44)
+            .ok_or_else(|| "scalar-site extent overflowed".to_owned())?,
+    )?;
+
+    let mut messages = Vec::new();
+    for _ in 0..input.len()? {
+        let face = VisibleMessageFace {
+            container: input.u32()?,
+            record: input.u64()?,
+            raw_range: input.range()?,
+            occurrence: input.string()?,
+            text_sha256: input.digest()?,
+            text: input.string()?,
+            provider_face: input.string()?,
+            speaker_face: input.string()?,
+            phase_face: input.string()?,
+        };
+        if Digest32::of(face.text.as_bytes()) != face.text_sha256 {
+            return Err(format!(
+                "visible message {} changed under its content receiver",
+                face.occurrence
+            ));
+        }
+        messages.push(face);
+    }
+
+    input.take(8 + 8 + 8)?;
+    input.boolean()?;
+    input.bytes()?;
+    input.bytes()?;
+    input.take(8 + 8 + 8 + 4 + 4)?;
+    input.boolean()?;
+    if input.at != bytes.len() {
+        return Err(format!(
+            "the exchange rest carries {} trailing octets",
+            bytes.len() - input.at
+        ));
+    }
+    Ok(VisibleMessageProjection {
+        source_occurrence_sha256,
+        content_law_sha256,
+        messages,
+    })
+}
+
 /// Re-encode a remounted atlas and address the complete deterministic rest testimony. This is the
 /// detached-process equality receiver: it covers every retained population, not only the native
 /// content-law face.

@@ -1,4 +1,4 @@
-use holonic_engine::phoenix::inference_ecology::InferenceEcologyRest;
+use holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest;
 
 use super::super::{DynamicMorphologyRest, LongHorizonRetainedBoundary, MultimodalTransportRest};
 use super::types::{ProductionAthenaError, ProductionComponentIdentity};

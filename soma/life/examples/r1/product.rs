@@ -264,7 +264,7 @@ fn cross_codec_receipt(world: &life::mathematical_particle::MaterialOperationWor
 
 fn continuation_receipt(
     world: &life::mathematical_particle::MaterialOperationWorldTube,
-    rest: &holonic_engine::phoenix::inference_ecology::InferenceEcologyRest,
+    rest: &holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest,
     returned: &DeviceMaterialOperationWorldTube,
     recurrent_cells_per_branch: usize,
 ) -> Result<Value, String> {
@@ -342,7 +342,7 @@ fn continuation_receipt(
 
 fn resident_receipt(
     world: &life::mathematical_particle::MaterialOperationWorldTube,
-    rest: &holonic_engine::phoenix::inference_ecology::InferenceEcologyRest,
+    rest: &holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest,
     returned: &DeviceMaterialOperationWorldTube,
     face_branch: &[u32],
     physical_wall_microseconds: u128,

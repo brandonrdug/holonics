@@ -3,9 +3,6 @@
 //! ```text
 //! eros mouth    --directory D [--extension E] [--radius N] [--scales N]
 //! eros atlas    --directory D [--extension E]
-//! eros phoenix infer     --rest R --text "..." [--text ...] [--export-manifest]
-//! eros phoenix infer     --product D --text "..." --card
-//! eros phoenix cultivate --rest R --material F --out S
 //! eros stations
 //! ```
 //!
@@ -36,16 +33,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::lean_development::{join, read_development, DeclarationGrain};
-use holonic_engine::phoenix::runtime;
-use life::atlas_cultivation::{conduct, MetricDeclaration};
 use life::causal_language::{lexical_tokens, lexical_tokens_under, LexicalAperture};
 use life::exposure_codec::{ladder, ExposureApertures, LadderStop, UnitRole};
 use life::material_incidence::{
     face_quotient, lean_atlas, prose_atlas, rust_atlas, rust_items_of_section,
-};
-use life::phoenix_rest::{
-    content_bar, cultivate, forbidden_open, lineage_metadata, loss_digest, open_descriptors,
-    read_rest, regions,
 };
 
 fn main() {
@@ -73,19 +64,6 @@ usage:
                 found terrain on two materials at once and ask what the JOIN reads that
                 neither half can, then ablate each half and require the reading back
 
-  eros phoenix infer     --rest R --text \"...\" [--text ...] [--export-manifest]
-                mount a sealed native rest ALONE and conduct each prompt through the rest's
-                own declared walk, future and depth laws; the plural section is returned and
-                the rest is left octet-identical
-
-  eros phoenix infer     --product DIR --text \"...\" --card
-                mount the cultivated product directory and addressed W1 predecessor, then
-                conduct unseen runtime text on the resident card and return its plural face
-
-  eros phoenix cultivate --rest R --material F --out S
-                expose one material to a sealed rest under the cultivation law and write a
-                DISTINCT successor rest; the predecessor is not touched
-
   eros stations which stations of the cycle this binary reaches, and which it does not
 ";
 
@@ -104,46 +82,14 @@ fn run() -> Result<(), String> {
     let mut against: Option<PathBuf> = None;
     let mut with_directory: Option<PathBuf> = None;
     let mut with_extension = String::from("rs");
-    // The phoenix station carries a deed word and two valueless flags, so the loop reads a flag
-    // before it reaches for a value. Every other station's parse is unmoved.
-    let mut deed: Option<String> = None;
-    let mut rest: Option<PathBuf> = None;
-    let mut product: Option<PathBuf> = None;
-    let mut material: Option<PathBuf> = None;
-    let mut out: Option<PathBuf> = None;
-    let mut texts: Vec<String> = Vec::new();
-    let mut export_manifest = false;
-    let mut card = false;
     while let Some(named) = arguments.next() {
-        match named.as_str() {
-            "--export-manifest" => {
-                export_manifest = true;
-                continue;
-            }
-            "--card" => {
-                card = true;
-                continue;
-            }
-            _ => {}
-        }
         if !named.starts_with("--") {
-            if station == "phoenix" && deed.is_none() {
-                deed = Some(named);
-                continue;
-            }
             return Err(format!("unknown argument {named}\n\n{USAGE}"));
         }
         let value = arguments
             .next()
             .ok_or_else(|| format!("{named} requires a value"))?;
         match named.as_str() {
-            "--rest" => rest = Some(PathBuf::from(value)),
-            "--product" => product = Some(PathBuf::from(value)),
-            "--material" => material = Some(PathBuf::from(value)),
-            "--out" => out = Some(PathBuf::from(value)),
-            // Repeatable: the material is the argument, and a station that took one prompt would
-            // be asking the caller to run it once per prompt in a different process each time.
-            "--text" => texts.push(value),
             "--directory" => directory = Some(PathBuf::from(value)),
             "--against" => against = Some(PathBuf::from(value)),
             "--with-directory" => with_directory = Some(PathBuf::from(value)),
@@ -190,39 +136,6 @@ fn run() -> Result<(), String> {
             let directory = directory.ok_or("supersede requires --directory")?;
             let against = against.ok_or("supersede requires --against <deposited atlas tsv>")?;
             supersede(&directory, &against)
-        }
-        "phoenix" => {
-            let deed = deed.ok_or("phoenix requires a deed: infer or cultivate")?;
-            match deed.as_str() {
-                "infer" => {
-                    if card {
-                        let product = product.ok_or(
-                            "phoenix infer --card requires --product <cultivated directory>",
-                        )?;
-                        if rest.is_some() {
-                            return Err(
-                                "phoenix infer --card accepts --product and rejects --rest"
-                                    .to_owned(),
-                            );
-                        }
-                        phoenix_card_infer(&product, &texts)
-                    } else {
-                        let rest = rest.ok_or("phoenix requires --rest <sealed native rest>")?;
-                        phoenix_infer(&rest, &texts, export_manifest)
-                    }
-                }
-                "cultivate" => {
-                    let rest =
-                        rest.ok_or("phoenix cultivate requires --rest <sealed native rest>")?;
-                    let material =
-                        material.ok_or("phoenix cultivate requires --material <file>")?;
-                    let out = out.ok_or("phoenix cultivate requires --out <successor path>")?;
-                    phoenix_cultivate(&rest, &material, &out)
-                }
-                other => Err(format!(
-                    "phoenix has two deeds, infer and cultivate; {other} is neither\n\n{USAGE}"
-                )),
-            }
         }
         other => Err(format!("unknown station {other}\n\n{USAGE}")),
     }
@@ -942,434 +855,6 @@ fn supersede(root: &Path, against: &Path) -> Result<(), String> {
 }
 
 // -------------------------------------------------------------------------------------------------
-// phoenix — a sealed native rest, mounted alone
-// -------------------------------------------------------------------------------------------------
-
-/// The W4 application deed: one authenticated cultivated directory, one unseen runtime material,
-/// and one resident card circulation. The generated section is returned without ranking or
-/// sampling; all admission/work/apparatus coordinates are read from the resident return.
-fn phoenix_card_infer(product: &Path, texts: &[String]) -> Result<(), String> {
-    if texts.len() != 1 || texts[0].trim().is_empty() {
-        return Err("phoenix infer --card requires exactly one unseen non-empty --text".to_owned());
-    }
-    let text = &texts[0];
-    let returned = runtime::infer(product, text)?;
-    let receipt = serde_json::to_string(&returned.receipt).map_err(|error| error.to_string())?;
-    println!("EROS · PHOENIX · INFER · CARD · SOURCE-DETACHED");
-    println!("  product directory {}", product.display());
-    println!(
-        "  input addresses {} · terminal position {} · plural {} · separated {}",
-        returned.receipt.input.native_ids.len(),
-        returned.receipt.generated.terminal_position,
-        returned.receipt.generated.plural.len(),
-        returned.receipt.generated.separated,
-    );
-    println!("PHOENIX_RETURN {receipt}");
-    Ok(())
-}
-
-/// How much of a plural section is exhibited. The section itself is returned whole and its
-/// population is printed beside the exhibit, exactly as the atlas station's chain is: a cap applied
-/// to the *reading* would read as the reading's size.
-const SECTION_EXHIBIT: usize = 24;
-
-/// **CONDUCT a sealed native rest, alone.**
-///
-/// # What this mounts, and what it does not
-///
-/// One file is opened: the rest. There is no corpus behind it, no source model, no development
-/// material and no second place to look — the container carries the transport, the standings, the
-/// suffix links, the vocabulary and, in its own metadata, the statement of every law that reads it.
-/// The process prints its own open descriptors so the claim is a measurement rather than an
-/// assertion.
-///
-/// # The surface this conducts on, stated because it is a reliance and not a result
-///
-/// This arm is the independent ARM N control. Its conduct is CPU-exact and integral throughout;
-/// the lifted Phoenix card path is the distinct `--product ... --card` application entry above.
-/// Keeping the two entries explicit prevents an ARM N answer from being reported as Gemma lift.
-fn phoenix_infer(rest_path: &Path, texts: &[String], export_manifest: bool) -> Result<(), String> {
-    println!("EROS · PHOENIX · INFER");
-    if texts.is_empty() {
-        return Err("infer requires at least one --text; the material is the argument".to_owned());
-    }
-    let named = rest_path.display().to_string();
-    let (octets, rest) = read_rest(rest_path).map_err(|refusal| refusal.to_string())?;
-    println!("  the rest        {named}");
-    println!(
-        "    {} octets · {} classes · {} transitions · {} vocabulary germs · tree height {}",
-        octets.len(),
-        rest.classes(),
-        rest.transitions(),
-        rest.vocabulary.len(),
-        rest.height
-    );
-    println!(
-        "    class extents   {}",
-        if rest.extent.is_empty() {
-            "NOT CARRIED — this rest conducts and cannot be deposited into".to_owned()
-        } else {
-            format!(
-                "{} carried, so this rest can also be cultivated",
-                rest.extent.len()
-            )
-        }
-    );
-    let before = loss_digest(&octets);
-    println!("    sha256 before   {before}");
-    println!(
-        "    (a digest here DETECTS LOSS and addresses nothing: a rest is its path and its lineage)"
-    );
-    println!();
-
-    println!("  THE LAWS, AS THE REST ITSELF DECLARES THEM");
-    for law in ["law.walk", "law.future", "law.depth"] {
-        match rest.metadata.get(law) {
-            Some(statement) => println!("    {law}\n      {statement}"),
-            None => println!("    {law}   ABSENT — the rest declares no such law"),
-        }
-    }
-    println!(
-        "    its declared material (a LINEAGE, not a corpus)\n      {}",
-        rest.metadata
-            .get("material")
-            .cloned()
-            .unwrap_or_else(|| "(none declared)".to_owned())
-    );
-    println!();
-
-    print_source_audit();
-
-    for text in texts {
-        let section = conduct(&rest, text, &lexical_tokens(text));
-        let mut by_depth: BTreeMap<usize, Vec<&(String, u64, usize)>> = BTreeMap::new();
-        for offer in &section.offered {
-            by_depth.entry(offer.2).or_default().push(offer);
-        }
-        println!("  PROMPT {text:?}");
-        println!("    the walk            {}", section.trace.join(" · "));
-        println!(
-            "    landed class        {}   standing {}",
-            section.class, section.standing
-        );
-        println!(
-            "    the plural future   {} germs over {} ladder depth(s)",
-            section.offered.len(),
-            by_depth.len()
-        );
-        for (depth, offers) in &by_depth {
-            println!(
-                "      depth {depth:<3} {:>6} germs{}",
-                offers.len(),
-                if offers.len() > SECTION_EXHIBIT {
-                    format!("   (first {SECTION_EXHIBIT} exhibited, the rest counted)")
-                } else {
-                    String::new()
-                }
-            );
-            let shown: Vec<String> = offers
-                .iter()
-                .take(SECTION_EXHIBIT)
-                .map(|(surface, standing, _)| format!("{surface:?}×{standing}"))
-                .collect();
-            println!("        {}", shown.join(" "));
-        }
-        println!(
-            "    NO WINNER IS TAKEN. The section is the whole family the landed class's ladder \
-             offers, each germ with the standing of the class it reaches and the depth it was \
-             found at; nothing here ranks them and nothing here samples."
-        );
-        println!();
-    }
-
-    if export_manifest {
-        println!("  THE REALIZATION MANIFEST — the container's own regions, read off its header");
-        println!(
-            "    {:<28} {:>7} {:>12} {:>12}",
-            "region", "dtype", "octets", "offset"
-        );
-        for region in regions(&octets) {
-            println!(
-                "    {:<28} {:>7} {:>12} {:>12}",
-                region.name,
-                region.dtype,
-                region.octets(),
-                region.start
-            );
-        }
-        println!(
-            "    metadata keys  {:?}",
-            rest.metadata.keys().collect::<Vec<_>>()
-        );
-        println!();
-        println!(
-            "  THE CONTENT BAR — what the rest is required NOT to carry, measured on its octets"
-        );
-        for row in content_bar(&octets, &rest) {
-            println!(
-                "    [{}] {}",
-                if row.held { "held" } else { "BROKEN" },
-                row.claim
-            );
-            println!("        {}", row.evidence);
-        }
-        println!();
-    }
-
-    // The rest is re-read from the disk rather than re-hashed from memory: the question is whether
-    // the FILE moved, and a digest of octets this process is still holding could not answer it.
-    let after_octets = fs::read(rest_path).map_err(|error| format!("{named}: {error}"))?;
-    let after = loss_digest(&after_octets);
-    println!("  THE FROZEN REST, RE-READ FROM THE DISK");
-    println!("    sha256 after    {after}");
-    println!(
-        "    {}",
-        if after == before {
-            "the inference deposited nothing: the rest is octet-identical"
-        } else {
-            "THE REST MOVED — a frozen inference has written, which it may not"
-        }
-    );
-    if after != before {
-        return Err("the rest moved under an inference".to_owned());
-    }
-    Ok(())
-}
-
-/// The process asking of itself what it has open, and whether any of it is forbidden.
-///
-/// A rest is opened, read whole and closed, so what remains is this process's own stdio; the audit
-/// is the set at this instant and the forbidden line is a search over it.
-fn print_source_audit() {
-    let audit = open_descriptors();
-    println!("  THE SOURCE AUDIT — every descriptor this process holds, asked of itself");
-    for target in &audit {
-        println!("    {target}");
-    }
-    let forbidden = forbidden_open(&audit);
-    println!(
-        "    forbidden targets open ({:?}): {}",
-        life::phoenix_rest::FORBIDDEN_DESCRIPTORS,
-        if forbidden.is_empty() {
-            "none".to_owned()
-        } else {
-            forbidden.join(" ")
-        }
-    );
-    println!();
-}
-
-/// **CULTIVATE a sealed native rest with one material, writing a DISTINCT successor.**
-///
-/// The predecessor's atlas is *mounted from the rest*, never rebuilt from a corpus, which is the
-/// whole difference between a frozen runtime and a driver. The law is
-/// [`life::atlas_cultivation`]'s: predict the continuation family at every position and record the
-/// four-state relation (the structured residual), deposit, derive the structural rows from the
-/// refusals the residual named and the standings through the declared metrics, and commit by
-/// replay. Nothing about it is restated here.
-fn phoenix_cultivate(
-    rest_path: &Path,
-    material_path: &Path,
-    out_path: &Path,
-) -> Result<(), String> {
-    println!("EROS · PHOENIX · CULTIVATE");
-    let named = rest_path.display().to_string();
-    let material_named = material_path.display().to_string();
-    let out_named = out_path.display().to_string();
-    if out_path == rest_path {
-        return Err(format!(
-            "the successor {out_named} is the predecessor. A cultivation founds a DISTINCT rest; \
-             the predecessor is not touched"
-        ));
-    }
-    let (octets, rest) = read_rest(rest_path).map_err(|refusal| refusal.to_string())?;
-    let before = loss_digest(&octets);
-    let material = fs::read_to_string(material_path)
-        .map_err(|error| format!("the material {material_named}: {error}"))?;
-    println!("  the predecessor {named}");
-    println!(
-        "    {} octets · {} classes · {} transitions · {} vocabulary   sha256 {before}",
-        octets.len(),
-        rest.classes(),
-        rest.transitions(),
-        rest.vocabulary.len()
-    );
-    println!(
-        "  the material    {material_named}   {} octets",
-        material.len()
-    );
-    println!("  the successor   {out_named}");
-    println!();
-    print_source_audit();
-
-    let metric = MetricDeclaration::identity();
-    let grown = cultivate(&rest, &named, &material_named, &material, &metric)
-        .map_err(|refusal| refusal.to_string())?;
-
-    println!("  THE STRUCTURED RESIDUAL — the prediction, taken before anything moved");
-    println!(
-        "    {} germ occurrences carried into the standing rest",
-        grown.germs
-    );
-    for (relation, count) in grown.residual.census() {
-        println!("      {relation:<28} {count:>8}");
-    }
-    print!("    the depth the carried germ was first offered at:");
-    for (depth, count) in grown.residual.depth_census() {
-        match depth {
-            None => print!("  offered-nowhere {count}"),
-            Some(depth) => print!("  depth-{depth} {count}"),
-        }
-    }
-    println!();
-    println!();
-
-    println!("  THE DELTA — plural, and every row names the position that caused it");
-    println!(
-        "    germs founded               {:>8}",
-        grown.delta.germs_founded.len()
-    );
-    println!(
-        "    classes founded             {:>8}   of which {} are SPLITS of a class that stood",
-        grown.delta.classes_after - grown.delta.classes_before,
-        grown.delta.classes_split()
-    );
-    // **The sharp face of a founding, and the one that says whether the material's own transport
-    // was touched at all.** A transition founded at a class that already offered a nonempty family
-    // is a founding *inside* what the body could already say; one founded at a class that offered
-    // nothing is a terminus — a class whose longest string ends in a previous path's separator —
-    // and the deposit is crossing the chronology's seam rather than changing the transport.
-    let inside = grown
-        .delta
-        .transitions_founded
-        .iter()
-        .filter(|row| row.on_standing_class && !rest.row(row.class).is_empty())
-        .count();
-    println!(
-        "    transitions founded         {:>8}   of which {} on classes that stood, and {} at a \
-         class that already offered a nonempty family",
-        grown.delta.transitions_founded.len(),
-        grown.delta.transitions_founded_on_standing(),
-        inside
-    );
-    println!(
-        "    transitions rebased         {:>8}",
-        grown.delta.transitions_rebased.len()
-    );
-    println!(
-        "    suffix links rebased        {:>8}   of which {} on classes that stood",
-        grown.delta.suffix_rebased.len(),
-        grown
-            .delta
-            .suffix_rebased
-            .iter()
-            .filter(|row| row.on_standing_class)
-            .count()
-    );
-    println!(
-        "    classes whose standing moved{:>8}   total deposited {}",
-        grown.delta.standing_increments.len(),
-        grown
-            .delta
-            .standing_increments
-            .values()
-            .map(|increment| u128::from(*increment))
-            .sum::<u128>()
-    );
-    println!("    the declared metric         {}", metric.name);
-    let founded: Vec<String> = grown
-        .delta
-        .germs_founded
-        .iter()
-        .take(SECTION_EXHIBIT)
-        .map(|germ| format!("{germ:?}"))
-        .collect();
-    if !founded.is_empty() {
-        println!(
-            "    the germs the material founded{}: {}",
-            if grown.delta.germs_founded.len() > SECTION_EXHIBIT {
-                format!(
-                    " (first {SECTION_EXHIBIT} of {} exhibited)",
-                    grown.delta.germs_founded.len()
-                )
-            } else {
-                String::new()
-            },
-            founded.join(" ")
-        );
-    }
-    println!(
-        "    the committed container against the container the transport itself emits: {}",
-        if grown.germ_side_identical {
-            "OCTET-IDENTICAL on the germ side"
-        } else {
-            "DIFFERENT — the commit is not the derivation"
-        }
-    );
-    println!(
-        "    (the extents are the transport's on both sides, so that region is not a falsifier \
-         here and is not counted as one; the germ side is.)"
-    );
-    if !grown.germ_side_identical {
-        return Err("the committed delta is not the container the transport emits".to_owned());
-    }
-    println!();
-
-    let mut successor = grown.successor.clone();
-    successor.metadata = lineage_metadata(&rest, &named, &material_named, &grown, &metric);
-    let successor_octets = successor
-        .write_container()
-        .map_err(|refusal| refusal.to_string())?;
-    if let Some(parent) = out_path.parent() {
-        fs::create_dir_all(parent).map_err(|error| format!("{}: {error}", parent.display()))?;
-    }
-    fs::write(out_path, &successor_octets).map_err(|error| format!("{out_named}: {error}"))?;
-
-    println!("  THE SUCCESSOR — a distinct rest, sealed with its own lineage");
-    println!(
-        "    {} octets · {} classes · {} transitions · {} vocabulary · extents {}",
-        successor_octets.len(),
-        successor.classes(),
-        successor.transitions(),
-        successor.vocabulary.len(),
-        successor.extent.len()
-    );
-    println!("    sha256          {}", loss_digest(&successor_octets));
-    for key in [
-        "cultivation.law",
-        "cultivation.metric",
-        "cultivation.predecessor",
-        "cultivation.material",
-        "cultivation.delta",
-    ] {
-        if let Some(value) = successor.metadata.get(key) {
-            println!("    {key}\n      {value}");
-        }
-    }
-    println!();
-
-    let predecessor_after = fs::read(rest_path).map_err(|error| format!("{named}: {error}"))?;
-    let after = loss_digest(&predecessor_after);
-    println!("  THE PREDECESSOR, RE-READ FROM THE DISK");
-    println!("    sha256 after    {after}");
-    println!(
-        "    {}",
-        if after == before {
-            "untouched: a cultivation founds a successor and does not overwrite what it grew from"
-        } else {
-            "THE PREDECESSOR MOVED — a cultivation has overwritten what it grew from"
-        }
-    );
-    if after != before {
-        return Err("the predecessor moved under a cultivation".to_owned());
-    }
-    Ok(())
-}
-
-// -------------------------------------------------------------------------------------------------
-// stations
-// -------------------------------------------------------------------------------------------------
-
 fn stations() {
     println!("EROS · STATIONS");
     println!();
@@ -1403,21 +888,6 @@ fn stations() {
             "supersede",
             "WIRED",
             "the superseded parser's deposited atlas against the incidence route on one corpus",
-        ),
-        (
-            "phoenix infer",
-            "WIRED",
-            "the independent ARM N rest mounted alone; retained as the CPU control",
-        ),
-        (
-            "phoenix cultivate",
-            "WIRED",
-            "one material exposed to that rest, and a DISTINCT successor sealed with its lineage",
-        ),
-        (
-            "phoenix --card",
-            "WIRED",
-            "a cultivated lifted product mounted source-detached and conducted on the card",
         ),
         (
             "compress",

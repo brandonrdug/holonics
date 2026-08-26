@@ -73,8 +73,7 @@ impl FixedSectionPlate {
                 let equal = if self.modulus == 0 {
                     action_difference == factored
                 } else {
-                    action_difference.rem_euclid(self.modulus)
-                        == factored.rem_euclid(self.modulus)
+                    action_difference.rem_euclid(self.modulus) == factored.rem_euclid(self.modulus)
                 };
                 if !equal {
                     return Err(FamilyCultivationError::Plate);
@@ -412,12 +411,14 @@ impl FamilyCultivatedAthenaRest {
             return Err(FamilyCultivationError::WorldReturn);
         }
         let predecessor_identity = self.canonical_identity()?;
-        self.standing.cultivations.push(FamilyCultivationOccurrence {
-            decision_occurrence,
-            predecessor_identity,
-            world_return,
-            plate,
-        });
+        self.standing
+            .cultivations
+            .push(FamilyCultivationOccurrence {
+                decision_occurrence,
+                predecessor_identity,
+                world_return,
+                plate,
+            });
         self.validate()?;
         Ok(self)
     }
@@ -430,9 +431,7 @@ impl FamilyCultivatedAthenaRest {
                 .sections
                 .iter()
                 .zip(&self.standing.cultivations)
-                .any(|(section, cultivation)| {
-                    section.len() != cultivation.plate.dimension as usize
-                })
+                .any(|(section, cultivation)| section.len() != cultivation.plate.dimension as usize)
             || self
                 .reconstruction
                 .developmental_occurrence_sha256
@@ -541,7 +540,10 @@ impl FamilyCultivatedAthenaRest {
             || self.decoder.obstruction_transport_word.is_empty()
             || self.decoder.composed_transport_word.is_empty()
             || self.reconstruction.schema != FAMILY_CULTIVATION_FIBRES_SCHEMA
-            || self.reconstruction.developmental_occurrence_sha256.is_empty()
+            || self
+                .reconstruction
+                .developmental_occurrence_sha256
+                .is_empty()
             || self
                 .reconstruction
                 .developmental_occurrence_sha256
@@ -559,8 +561,7 @@ impl FamilyCultivatedAthenaRest {
             if cultivation.decision_occurrence.is_empty()
                 || !is_digest(&cultivation.predecessor_identity)
                 || cultivation.predecessor_identity != self.identity_at(at)?
-                || cultivation.world_return.occurrence
-                    != cultivation.plate.returned_occurrence
+                || cultivation.world_return.occurrence != cultivation.plate.returned_occurrence
                 || !cultivation.world_return.accepted
                 || cultivation.world_return.lean_exit_status != 0
                 || cultivation.world_return.exact_difference_octets == 0

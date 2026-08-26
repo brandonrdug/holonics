@@ -18,21 +18,22 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub use continuation::{
-    derive_continuation_aperture, ContinuationAperture, ContinuationExclusion,
-    ContinuationFamily, ContinuationPartition, ContinuationWorldWindow, MessageAddress,
-    ShortestHistorySeparator,
+    ContinuationAperture, ContinuationExclusion, ContinuationFamily, ContinuationPartition,
+    ContinuationWorldWindow, MessageAddress, ShortestHistorySeparator,
+    derive_continuation_aperture,
 };
-pub use mount::{mount_exchange_world_tube_on_device, ExchangeContainerSpec, ExchangeMountError};
+pub use mount::{ExchangeContainerSpec, ExchangeMountError, mount_exchange_world_tube_on_device};
 pub use receiver::{
     BranchPermutationReceipt, ExactJoinPopulation, LineageAblationReceipt, ScalarJoinWitness,
 };
 pub use rest::{
-    exchange_world_tube_rest_digest, remount_exchange_world_tube, write_exchange_world_tube_rest,
-    EXCHANGE_REST_PREFIX,
+    EXCHANGE_REST_PREFIX, VisibleMessageProjection, exchange_world_tube_rest_digest,
+    remount_exchange_world_tube, remount_visible_message_projection,
+    write_exchange_world_tube_rest,
 };
 pub use source::{
-    attach_visible_exchange_faces, discover_complete_exchange_aperture,
-    CompleteExchangeSource, VisibleProjectionReceipt,
+    CompleteExchangeSource, VisibleProjectionReceipt, attach_visible_exchange_faces,
+    discover_complete_exchange_aperture,
 };
 
 /// One exact SHA-256 content address. It is not an occurrence identity.

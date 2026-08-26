@@ -6,15 +6,14 @@ use std::{
 };
 
 use holonic_engine::{
-    cuda_refine::CudaRefineExecutor,
-    phoenix::heterogeneous_fusion::HeterogeneousFusionRest,
+    cuda_refine::CudaRefineExecutor, native_ecology::heterogeneous_fusion::HeterogeneousFusionRest,
 };
 use life::{
     mathematical_particle::{NativeCodec, NativeSuccessorHistory},
     mathematical_source::OpticalPassage,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 use super::{
     artifact,
@@ -27,7 +26,8 @@ pub const DEFAULT_OUT: &str =
     "output/the_laboratory_mathematics_athena_unifies_native_inference_ocr_and_three_port_transport";
 const N3_REST: &str =
     "output/the_returned_native_mathematical_world_cultivates_the_laboratory_hexis/native-rest";
-const N1_REST: &str = "output/n1_raw_optical_mathematical_recovery_complete/native-rest/standing.json";
+const N1_REST: &str =
+    "output/n1_raw_optical_mathematical_recovery_complete/native-rest/standing.json";
 const N2_REST: &str = "output/the_acoustic_section_crosses_the_inherited_projection_and_three_ports_share_one_native_ecology/native-rest";
 const N0_GRADE: &str =
     "output/native_mathematical_consequence_precedes_every_codec/00-N0-grade.json";
@@ -75,7 +75,8 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
     let predecessor_standing = artifact::read(root.join(N3_REST).join("predecessor-standing.bin"))?;
     let predecessor_decoder = artifact::read(root.join(N3_REST).join("predecessor-decoder.bin"))?;
     let predecessor_fibres = artifact::read(root.join(N3_REST).join("predecessor-fibres.bin"))?;
-    let cultivation_standing = artifact::read(root.join(N3_REST).join("cultivation-standing.json"))?;
+    let cultivation_standing =
+        artifact::read(root.join(N3_REST).join("cultivation-standing.json"))?;
     let mathematics = NativeCultivatedMathematicalRest::read(
         &predecessor_standing,
         &predecessor_decoder,
@@ -127,7 +128,10 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
         mathematics.conduct_rich_cultivated_consequence(&seed_inquiry, &mut card)?;
     let emitted_path = output.join("00-later-emitted-native-geometry.png");
     let emitted = world_return::emit_geometry(&seed_consequence, &emitted_path)?;
-    artifact::write_json(output.join("00-later-emitted-native-geometry.json"), &emitted)?;
+    artifact::write_json(
+        output.join("00-later-emitted-native-geometry.json"),
+        &emitted,
+    )?;
     let returned_path = output.join("01-later-returned-optical-world.json");
     let status = Command::new(env::current_exe().map_err(|error| error.to_string())?)
         .arg("--optical-return")
@@ -166,12 +170,8 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
         separately_addressed_after_emission: true,
     };
     let continuation = AthenaContinuationStanding::found(&mathematics, returned_world)?;
-    let product = LaboratoryAthenaProduct::found(
-        mathematics,
-        optical,
-        heterogeneous,
-        continuation,
-    )?;
+    let product =
+        LaboratoryAthenaProduct::found(mathematics, optical, heterogeneous, continuation)?;
     let product_identity = product.canonical_identity()?;
     let application_occurrences = vec![
         ApplicationOccurrence {
@@ -211,7 +211,10 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
         ],
     };
     artifact::write_json(output.join("native-rest/MANIFEST.json"), &manifest)?;
-    artifact::write_json(output.join("application-occurrences.json"), &application_occurrences)?;
+    artifact::write_json(
+        output.join("application-occurrences.json"),
+        &application_occurrences,
+    )?;
 
     // Inspect several product returns before the source-detached repetition.
     let direct = conduct_application(&product, &application_occurrences)?;
@@ -224,10 +227,9 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
         &output.join("application-occurrences.json"),
         &output.join("detached-return/return.json"),
     )?;
-    let detached: Value = serde_json::from_slice(&artifact::read(
-        output.join("detached-return/return.json"),
-    )?)
-    .map_err(|error| error.to_string())?;
+    let detached: Value =
+        serde_json::from_slice(&artifact::read(output.join("detached-return/return.json"))?)
+            .map_err(|error| error.to_string())?;
     if detached["product_sha256"] != product_identity
         || detached["passed"] != true
         || detached["forbidden_source_descriptors"] != json!([])
@@ -239,7 +241,11 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
     let source_model_octets = fs::metadata("/home/b/models/gemma-4-E4B-it/model.safetensors")
         .map(|metadata| metadata.len())
         .unwrap_or(0);
-    let product_octets = manifest.components.iter().map(|part| part.octets).sum::<u64>();
+    let product_octets = manifest
+        .components
+        .iter()
+        .map(|part| part.octets)
+        .sum::<u64>();
     let capability = json!({
         "schema": "holonics.n4.capability-atlas.v1",
         "truth_status": "established-bounded",
@@ -303,12 +309,14 @@ pub fn construct(root: &Path, output: &Path) -> Result<(), String> {
         "continued_history": product.continuation(),
         "open_exterior": manifest.open_exterior,
     });
-    artifact::write_json(output.join("04-complete-product-dissection.json"), &dissection)?;
+    artifact::write_json(
+        output.join("04-complete-product-dissection.json"),
+        &dissection,
+    )?;
 
     let readback = read_product(&output.join("native-rest"))?;
     let withdrawal = readback.withdraw()?;
-    if !withdrawal.exact_component_owners_returned
-        || withdrawal.product_sha256 != product_identity
+    if !withdrawal.exact_component_owners_returned || withdrawal.product_sha256 != product_identity
     {
         return Err("N4 exact component withdrawal refused".to_owned());
     }
@@ -410,29 +418,32 @@ fn conduct_application(
             sources.clone(),
             occurrence.sections.clone(),
             occurrence.histories.clone(),
-            vec!["the requested occurrence remains bounded by the frozen native decoder".to_owned()],
+            vec![
+                "the requested occurrence remains bounded by the frozen native decoder".to_owned(),
+            ],
         )?;
         let prior = product.found_precontinuation_inquiry(
             sources,
             occurrence.sections.clone(),
             occurrence.histories.clone(),
-            vec!["the requested occurrence remains bounded by the frozen native decoder".to_owned()],
+            vec![
+                "the requested occurrence remains bounded by the frozen native decoder".to_owned(),
+            ],
         )?;
         let returned = product.conduct(&inquiry, &mut card)?;
         let prior_returned = product.conduct(&prior, &mut card)?;
         let exact_faces_preserved = returned.complex.exact_consequence_faces
             == prior_returned.complex.exact_consequence_faces;
         let continuation_changes_rich_identity = returned.occurrence != prior_returned.occurrence
-            && returned
-                .derivational_transport
-                .iter()
-                .all(|transport| {
-                    transport
-                        .prior_history_occurrences
-                        .contains(&product.continuation().returned_world.occurrence)
-                });
+            && returned.derivational_transport.iter().all(|transport| {
+                transport
+                    .prior_history_occurrences
+                    .contains(&product.continuation().returned_world.occurrence)
+            });
         if !exact_faces_preserved || !continuation_changes_rich_identity {
-            return Err("the continuation either moved the exact face or vanished from lineage".to_owned());
+            return Err(
+                "the continuation either moved the exact face or vanished from lineage".to_owned(),
+            );
         }
         returns.push(json!({
             "requested_occurrence": occurrence,
@@ -476,7 +487,9 @@ fn conduct_application(
         || fusion.shared_ablated_consequence != before
         || !local_withdrawals_exact
     {
-        return Err("the three-port product circulation lost an attributable withdrawal".to_owned());
+        return Err(
+            "the three-port product circulation lost an attributable withdrawal".to_owned(),
+        );
     }
     Ok(json!({
         "native_returns": returns,
@@ -527,7 +540,10 @@ fn emit_projections(
         consequence.exterior.returned_obstructions.len(),
         consequence.occurrence,
     );
-    artifact::write(output.join("projections/02-explanation.txt"), explanation.as_bytes())?;
+    artifact::write(
+        output.join("projections/02-explanation.txt"),
+        explanation.as_bytes(),
+    )?;
     let lean_data = format!(
         "-- Exterior data projection only; not checked and never used by inference.\ndef nativeConsequenceOccurrence : String := {:?}\ndef returnedSections : List (List Int) := {:?}\n",
         consequence.occurrence,
@@ -538,7 +554,10 @@ fn emit_projections(
             .map(|face| face.returned_section.clone())
             .collect::<Vec<_>>()
     );
-    artifact::write(output.join("projections/03-returned-data.lean"), lean_data.as_bytes())?;
+    artifact::write(
+        output.join("projections/03-returned-data.lean"),
+        lean_data.as_bytes(),
+    )?;
     let rust_data = format!(
         "// Exterior data projection only; not used by inference.\npub const NATIVE_CONSEQUENCE: &str = {:?};\npub const RETURNED_SECTIONS: &[&[i64]] = &{:?};\n",
         consequence.occurrence,
@@ -549,9 +568,14 @@ fn emit_projections(
             .map(|face| face.returned_section.as_slice())
             .collect::<Vec<_>>()
     );
-    artifact::write(output.join("projections/04-returned-data.rs"), rust_data.as_bytes())?;
-    let diagram =
-        world_return::emit_geometry(&consequence, &output.join("projections/05-native-raster.png"))?;
+    artifact::write(
+        output.join("projections/04-returned-data.rs"),
+        rust_data.as_bytes(),
+    )?;
+    let diagram = world_return::emit_geometry(
+        &consequence,
+        &output.join("projections/05-native-raster.png"),
+    )?;
     artifact::write_json(output.join("projections/05-native-raster.json"), &diagram)?;
     let mesh = json!({
         "schema": "holonics.n4.exact-native-mesh.v1",
@@ -653,10 +677,22 @@ fn freeze_components(
     product: &LaboratoryAthenaProduct,
 ) -> Result<Vec<ProductComponent>, String> {
     let names = [
-        ("mathematical-predecessor-standing", "mathematical-predecessor-standing.bin"),
-        ("mathematical-predecessor-decoder", "mathematical-predecessor-decoder.bin"),
-        ("mathematical-predecessor-fibres", "mathematical-predecessor-fibres.bin"),
-        ("mathematical-cultivation-standing", "mathematical-cultivation-standing.json"),
+        (
+            "mathematical-predecessor-standing",
+            "mathematical-predecessor-standing.bin",
+        ),
+        (
+            "mathematical-predecessor-decoder",
+            "mathematical-predecessor-decoder.bin",
+        ),
+        (
+            "mathematical-predecessor-fibres",
+            "mathematical-predecessor-fibres.bin",
+        ),
+        (
+            "mathematical-cultivation-standing",
+            "mathematical-cultivation-standing.json",
+        ),
         ("optical-standing", "optical-standing.json"),
         ("heterogeneous-standing", "heterogeneous-standing.json"),
         ("heterogeneous-decoder", "heterogeneous-decoder.json"),
@@ -690,7 +726,10 @@ fn read_product(rest: &Path) -> Result<LaboratoryAthenaProduct, String> {
     for component in &manifest.components {
         let bytes = artifact::read(rest.join(&component.path))?;
         if bytes.len() as u64 != component.octets || artifact::digest(&bytes) != component.sha256 {
-            return Err(format!("the frozen product component {} moved", component.name));
+            return Err(format!(
+                "the frozen product component {} moved",
+                component.name
+            ));
         }
         by_name.insert(component.name.as_str(), bytes);
     }
@@ -726,9 +765,13 @@ fn run_detached(
     if !output.exists() {
         artifact::write(output, &[])?;
     }
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let rest = rest.canonicalize().map_err(|error| error.to_string())?;
-    let applications = applications.canonicalize().map_err(|error| error.to_string())?;
+    let applications = applications
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let output = output.canonicalize().map_err(|error| error.to_string())?;
     let mut command = Command::new("bwrap");
     command

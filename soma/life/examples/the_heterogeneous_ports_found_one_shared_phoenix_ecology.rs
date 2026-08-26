@@ -19,7 +19,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use holonic_engine::phoenix::heterogeneous_fusion::{
+use holonic_engine::native_ecology::heterogeneous_fusion::{
     HeterogeneousFusionRest, PortDeclaration, SharedWorldGenerator,
 };
 use serde::{Deserialize, Serialize};
@@ -139,7 +139,7 @@ struct SourceDecoderProduct<'a> {
 
 #[derive(Serialize)]
 struct SourceFibreProduct<'a> {
-    responses: &'a [holonic_engine::phoenix::heterogeneous_fusion::SourcePortResponse],
+    responses: &'a [holonic_engine::native_ecology::heterogeneous_fusion::SourcePortResponse],
     text_complete_sections: &'a [source::TextSourceConduct],
     vision_complete_sections: &'a [source::VisionSourceConduct],
 }
@@ -882,7 +882,7 @@ fn code_closure() -> String {
         include_bytes!("the_heterogeneous_ports_found_one_shared_phoenix_ecology.rs"),
         include_bytes!("i4/source.rs"),
         include_bytes!("i4/product.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/heterogeneous_fusion.rs"),
+        include_bytes!("../../../crates/holonic-engine/src/native_ecology/heterogeneous_fusion.rs"),
         include_bytes!("../../../crates/holonic-engine/src/cuda_refine.rs"),
         include_bytes!("../../../crates/holonic-engine/kernels/refine_shell.cu"),
         include_bytes!("../../../crates/holonic-engine/src/embedding_fiber.rs"),

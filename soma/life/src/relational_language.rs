@@ -55,9 +55,12 @@ pub use types::{
 };
 
 mod codec;
-pub use codec::{relational_deliberation_frontier, relational_question_regions};
+pub use codec::{
+    relational_deliberation_frontier, relational_passage_clauses, relational_question_regions,
+};
 
 mod transport;
+pub use transport::realize_relational_clauses;
 
 mod ecology;
 pub use ecology::{ClausePairDelayLaw, ExactRelationalLanguageEcology};

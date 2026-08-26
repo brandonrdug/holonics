@@ -360,6 +360,17 @@ pub(super) fn realize_clauses(
     })
 }
 
+/// Project a native oriented clause section through the inherited English surface codec.
+/// `inherited_surfaces` is optional exterior testimony used only to report whether the returned
+/// wording was contiguous in supplied material; it never selects the relation section.
+pub fn realize_relational_clauses(
+    clauses: &[RelationalClause],
+    inherited_surfaces: &[Vec<String>],
+    voice_dual: bool,
+) -> Result<RelationalRealization, RelationalLanguageError> {
+    realize_clauses(clauses, inherited_surfaces, voice_dual)
+}
+
 pub(super) fn dual_clause_tokens(clause: &RelationalClause) -> Vec<String> {
     match clause.witnessed_voice {
         RelationalClauseVoice::Active => passive_tokens(clause),

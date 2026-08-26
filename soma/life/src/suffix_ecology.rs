@@ -625,6 +625,55 @@ pub struct ExactLabeledSuffixEcology {
     source_incidence: SourceIncidence,
 }
 
+/// One transition row exported for an exact addressed compactification.  This is not another
+/// recurrence law: it is the private ecology's state incidence with its local indices exposed long
+/// enough for a containing owner to factor repeated germ faces once.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ExactSuffixCompactSymbol {
+    Germ(ResonanceGerm),
+    Boundary(u64),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSuffixCompactTransition {
+    pub symbol: ExactSuffixCompactSymbol,
+    pub target: u32,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSuffixCompactState {
+    pub maximum_length: u32,
+    pub suffix: Option<u32>,
+    pub material_end_multiplicity: u64,
+    pub transitions: Vec<ExactSuffixCompactTransition>,
+}
+
+/// Source-neutral receiver-history rows emitted by a labeled suffix ecology.
+///
+/// The source labels are reduced to a canonical support catalogue before this value is returned.
+/// No caused-occurrence array, path boundary, or decoder crosses this export.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSuffixReceiverHistory {
+    pub source_catalogue: Vec<SuffixSourceLabel>,
+    pub supports: Vec<Vec<u32>>,
+    pub states: Vec<ExactSuffixReceiverState>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSuffixReceiverState {
+    pub maximum_length: u32,
+    pub suffix: Option<u32>,
+    pub material_end_multiplicity: u64,
+    pub support: u32,
+    pub transitions: Vec<ExactSuffixReceiverTransition>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSuffixReceiverTransition {
+    pub germ: ResonanceGerm,
+    pub target: u32,
+}
+
 /// Card-returned suffix state at the execution membrane. This is an owner-local construction
 /// part, not a second public ecology representation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1846,6 +1895,265 @@ impl ExactLabeledSuffixEcology {
         &self.ecology
     }
 
+    /// Export the generalized suffix carrier once, together with the exact source fibre of every
+    /// state, so a containing native owner can descend source labels into its own receiver faces
+    /// and then discard the occurrence-labelled apparatus.  Boundary transitions are deliberately
+    /// omitted: their states and folded source incidence remain available, while a later material
+    /// current never traverses a path-unique separator.
+    pub fn compact_labeled_states(
+        &self,
+    ) -> Result<
+        (
+            Vec<ExactSuffixCompactState>,
+            Vec<LocalSet<SuffixSourceLabel>>,
+        ),
+        ExactSuffixEcologyError,
+    > {
+        self.source_incidence
+            .validate(&self.ecology.states, self.source_catalogue.len())?;
+        let mut states = Vec::with_capacity(self.ecology.states.len());
+        let mut sources = Vec::with_capacity(self.ecology.states.len());
+        for (at, state) in self.ecology.states.iter().enumerate() {
+            let maximum_length = u32::try_from(state.maximum_length)
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let suffix = state
+                .suffix
+                .map(u32::try_from)
+                .transpose()
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let transitions = self
+                .ecology
+                .transitions
+                .iter(state.transitions)?
+                .filter_map(|(symbol, target)| match symbol {
+                    SuffixSymbol::Germ(germ) => Some(
+                        germ.germ().and_then(|germ| {
+                            Ok(ExactSuffixCompactTransition {
+                                symbol: ExactSuffixCompactSymbol::Germ(germ),
+                                target: u32::try_from(*target)
+                                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                            })
+                        })),
+                    SuffixSymbol::Boundary(_) => None,
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            states.push(ExactSuffixCompactState {
+                maximum_length,
+                suffix,
+                material_end_multiplicity: state.material_end_multiplicity,
+                transitions,
+            });
+            sources.push(
+                self.source_incidence
+                    .labels(at, &self.source_catalogue)?,
+            );
+        }
+        Ok((states, sources))
+    }
+
+    /// Factor a one-source recurrence into its exact local state rows.  Every state-source span is
+    /// checked before the repeated label is removed; the returned source owns the complete local
+    /// interval in the containing addressed complex.
+    pub fn compact_single_source(
+        &self,
+    ) -> Result<(SuffixSourceLabel, Vec<ExactSuffixCompactState>), ExactSuffixEcologyError> {
+        self.source_incidence
+            .validate(&self.ecology.states, self.source_catalogue.len())?;
+        if self.source_catalogue.len() != 1
+            || self
+                .source_incidence
+                .occurrence_sources
+                .iter()
+                .any(|source| *source != 0)
+        {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        let mut states = Vec::with_capacity(self.ecology.states.len());
+        for state in &self.ecology.states {
+            let maximum_length = u32::try_from(state.maximum_length)
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let suffix = state
+                .suffix
+                .map(u32::try_from)
+                .transpose()
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let transitions = self
+                .ecology
+                .transitions
+                .iter(state.transitions)?
+                .map(|(symbol, target)| {
+                    Ok(ExactSuffixCompactTransition {
+                        symbol: match symbol {
+                            SuffixSymbol::Germ(germ) => {
+                                ExactSuffixCompactSymbol::Germ(germ.germ()?)
+                            }
+                            SuffixSymbol::Boundary(boundary) => {
+                                ExactSuffixCompactSymbol::Boundary(*boundary)
+                            }
+                        },
+                        target: u32::try_from(*target)
+                            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                    })
+                })
+                .collect::<Result<Vec<_>, ExactSuffixEcologyError>>()?;
+            states.push(ExactSuffixCompactState {
+                maximum_length,
+                suffix,
+                material_end_multiplicity: state.material_end_multiplicity,
+                transitions,
+            });
+        }
+        Ok((self.source_catalogue[0].clone(), states))
+    }
+
+    /// Consume the labeled construction into its exact receiver-history action and canonical
+    /// source-support observations.
+    ///
+    /// Source occurrence indices are used only while folding the suffix-link tree. The returned
+    /// rows contain one interned support identifier per state and sparse material-generator edges;
+    /// unique path separators and the occurrence array are dropped with `self`.
+    pub fn into_receiver_history(
+        self,
+    ) -> Result<ExactSuffixReceiverHistory, ExactSuffixEcologyError> {
+        self.source_incidence
+            .validate(&self.ecology.states, self.source_catalogue.len())?;
+        let state_count = self.ecology.states.len();
+        let open = u32::MAX;
+        let mut first_child = vec![open; state_count];
+        let mut next_sibling = vec![open; state_count];
+        for state in 1..state_count {
+            let parent = self.ecology.states[state]
+                .suffix
+                .filter(|parent| *parent < state_count && *parent != state)
+                .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+            let state_u32 =
+                u32::try_from(state).map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let parent_child = first_child[parent];
+            next_sibling[state] = parent_child;
+            first_child[parent] = state_u32;
+        }
+
+        // Iterative postorder avoids imposing a host-stack context bound on the suffix tree.
+        let mut order = Vec::with_capacity(state_count);
+        let mut stack = vec![(0u32, false)];
+        while let Some((state, closing)) = stack.pop() {
+            if closing {
+                order.push(state);
+                continue;
+            }
+            stack.push((state, true));
+            let mut child = first_child[state as usize];
+            while child != open {
+                stack.push((child, false));
+                child = next_sibling[child as usize];
+            }
+        }
+        if order.len() != state_count {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+
+        let mut supports = vec![Vec::<u32>::new()];
+        let mut support_lookup = BTreeMap::<Vec<u32>, u32>::from([(Vec::new(), 0)]);
+        let mut state_support = vec![open; state_count];
+        for state in order {
+            let state_at = state as usize;
+            let span = self.source_incidence.state_spans[state_at];
+            let mut child_extent = 0u64;
+            let mut members = BTreeSet::<u32>::new();
+            let mut child = first_child[state_at];
+            while child != open {
+                let child_at = child as usize;
+                child_extent = child_extent
+                    .checked_add(self.source_incidence.state_spans[child_at].len)
+                    .ok_or(ExactSuffixEcologyError::CarrierExtent)?;
+                let support = *state_support
+                    .get(child_at)
+                    .filter(|support| **support != open)
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+                members.extend(
+                    supports
+                        .get(support as usize)
+                        .ok_or(ExactSuffixEcologyError::InvalidWire)?
+                        .iter()
+                        .copied(),
+                );
+                child = next_sibling[child_at];
+            }
+            let direct = span
+                .len
+                .checked_sub(child_extent)
+                .filter(|direct| *direct <= 1)
+                .ok_or(ExactSuffixEcologyError::InvalidWire)?;
+            if direct == 1 {
+                let occurrence = usize::try_from(span.start)
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                members.insert(
+                    *self
+                        .source_incidence
+                        .occurrence_sources
+                        .get(occurrence)
+                        .ok_or(ExactSuffixEcologyError::InvalidWire)?,
+                );
+            }
+            let members = members.into_iter().collect::<Vec<_>>();
+            let support = match support_lookup.get(&members) {
+                Some(support) => *support,
+                None => {
+                    let support = u32::try_from(supports.len())
+                        .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                    support_lookup.insert(members.clone(), support);
+                    supports.push(members);
+                    support
+                }
+            };
+            state_support[state_at] = support;
+        }
+
+        let mut states = Vec::with_capacity(state_count);
+        for (state_at, state) in self.ecology.states.iter().enumerate() {
+            let maximum_length = u32::try_from(state.maximum_length)
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let suffix = state
+                .suffix
+                .map(u32::try_from)
+                .transpose()
+                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+            let transitions = self
+                .ecology
+                .transitions
+                .iter(state.transitions)?
+                .filter_map(|(symbol, target)| match symbol {
+                    SuffixSymbol::Boundary(_) => None,
+                    SuffixSymbol::Germ(germ) => Some(
+                        u32::try_from(*target)
+                            .map_err(|_| ExactSuffixEcologyError::CarrierExtent)
+                            .and_then(|target| {
+                                Ok(ExactSuffixReceiverTransition {
+                                    germ: germ.germ()?,
+                                    target,
+                                })
+                            }),
+                    ),
+                })
+                .collect::<Result<Vec<_>, ExactSuffixEcologyError>>()?;
+            states.push(ExactSuffixReceiverState {
+                maximum_length,
+                suffix,
+                material_end_multiplicity: state.material_end_multiplicity,
+                support: *state_support
+                    .get(state_at)
+                    .filter(|support| **support != open)
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?,
+                transitions,
+            });
+        }
+        Ok(ExactSuffixReceiverHistory {
+            source_catalogue: self.source_catalogue,
+            supports,
+            states,
+        })
+    }
+
     pub fn state_sources(&self, state: u32) -> Option<LocalSet<SuffixSourceLabel>> {
         self.source_incidence
             .labels(usize::try_from(state).ok()?, &self.source_catalogue)
@@ -1968,6 +2276,124 @@ impl ExactLabeledSuffixEcology {
         Ok(ExactLabeledSuffixEmanation {
             emanation,
             branches,
+        })
+    }
+
+    /// Return the complete branch population at the finest reached context which can actually
+    /// continue.  This is the receiver-factorized face of [`Self::emanate_current`]: that broader
+    /// method retains every coarser suffix restriction, while this one performs the exact first
+    /// quotient used by a receiver whose ordering compares context grain before every later
+    /// constitutive coordinate.  No context at the returned grain and no source fibre on its
+    /// outgoing transports is discarded.
+    pub fn emanate_greatest_productive_current(
+        &self,
+        current: ExactSuffixCurrent,
+    ) -> Result<ExactLabeledSuffixEmanation, ExactSuffixEcologyError> {
+        let state =
+            usize::try_from(current.state).map_err(|_| ExactSuffixEcologyError::InvalidWire)?;
+        let matched_length = usize::try_from(current.matched_length)
+            .map_err(|_| ExactSuffixEcologyError::InvalidWire)?;
+        if state >= self.ecology.states.len()
+            || matched_length > self.ecology.states[state].maximum_length
+        {
+            return Err(ExactSuffixEcologyError::InvalidWire);
+        }
+        let mut context_state = state;
+        let mut context_length = matched_length;
+        while context_state != 0 {
+            let context = SuffixContext {
+                state: u32::try_from(context_state)
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                matched_length: u32::try_from(context_length)
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+            };
+            let mut branches = Vec::new();
+            for (symbol, target) in self
+                .ecology
+                .transitions
+                .iter(self.ecology.states[context_state].transitions)?
+            {
+                let SuffixSymbol::Germ(germ) = symbol else {
+                    continue;
+                };
+                let recurrence_multiplicity = self
+                    .ecology
+                    .states
+                    .get(*target)
+                    .ok_or(ExactSuffixEcologyError::InvalidWire)?
+                    .material_end_multiplicity;
+                if recurrence_multiplicity == 0 {
+                    return Err(ExactSuffixEcologyError::InvalidWire);
+                }
+                let support = SuffixBranchSupport {
+                    state: context.state,
+                    matched_length: context.matched_length,
+                    target_state: u32::try_from(*target)
+                        .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                    recurrence_multiplicity,
+                };
+                let sources = self
+                    .source_incidence
+                    .labels(*target, &self.source_catalogue)?;
+                let context_sources = self
+                    .source_incidence
+                    .labels(context_state, &self.source_catalogue)?;
+                let mut support_sources = LocalRelations::new();
+                support_sources
+                    .try_insert(support, sources.clone())
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                let mut support_context_sources = LocalRelations::new();
+                support_context_sources
+                    .try_insert(support, context_sources)
+                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?;
+                branches.push(ExactLabeledSuffixBranch {
+                    branch: ExactSuffixBranch {
+                        germ: germ.germ()?,
+                        supports: BTreeSet::from([support]),
+                    },
+                    sources,
+                    support_sources,
+                    support_context_sources,
+                });
+            }
+            if !branches.is_empty() {
+                branches.sort_by(|left, right| {
+                    (
+                        left.branch.germ.identity(),
+                        left.branch.germ.phase().words(),
+                    )
+                        .cmp(&(
+                            right.branch.germ.identity(),
+                            right.branch.germ.phase().words(),
+                        ))
+                });
+                return Ok(ExactLabeledSuffixEmanation {
+                    emanation: ExactSuffixEmanation {
+                        longest_state: current.state,
+                        longest_matched_length: current.matched_length,
+                        contexts: vec![context],
+                        branches: branches
+                            .iter()
+                            .map(|branch| branch.branch.clone())
+                            .collect(),
+                    },
+                    branches,
+                });
+            }
+            let Some(suffix) = self.ecology.states[context_state].suffix else {
+                break;
+            };
+            context_state = suffix;
+            context_length = context_length.min(self.ecology.states[context_state].maximum_length);
+        }
+        Ok(ExactLabeledSuffixEmanation {
+            emanation: ExactSuffixEmanation {
+                longest_state: current.state,
+                longest_matched_length: current.matched_length,
+                contexts: Vec::new(),
+                branches: Vec::new(),
+            },
+            branches: Vec::new(),
         })
     }
 
@@ -2333,11 +2759,13 @@ mod tests {
             ecology.emanate_current(after).unwrap(),
             ecology.emanate(&[germ(9), germ(2), germ(3)]).unwrap()
         );
-        assert!(ecology
-            .emanate_current(after)
-            .unwrap()
-            .branches()
-            .is_empty());
+        assert!(
+            ecology
+                .emanate_current(after)
+                .unwrap()
+                .branches()
+                .is_empty()
+        );
     }
 
     #[test]
@@ -2580,9 +3008,11 @@ mod tests {
         let emanation = ecology.emanate(&[germ(1), germ(2), germ(3)]).unwrap();
         assert_eq!(emanation.longest_matched_length(), 3);
         assert_eq!(emanation.greatest_productive_matched_length(), Some(1));
-        assert!(emanation
-            .branches()
-            .iter()
-            .any(|branch| branch.germ().identity() == germ(4).identity()));
+        assert!(
+            emanation
+                .branches()
+                .iter()
+                .any(|branch| branch.germ().identity() == germ(4).identity())
+        );
     }
 }

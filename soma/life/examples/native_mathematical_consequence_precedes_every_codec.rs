@@ -10,7 +10,7 @@ use life::mathematical_particle::{
     NativeCodec, NativeHexisAthenaRest, NativeMathematicalInquiry, NativeSuccessorHistory,
 };
 use serde::Serialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 const REST: &str = "output/recurring_laboratory_transport_condenses_into_native_hexis/native-rest";
 

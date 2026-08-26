@@ -113,7 +113,9 @@ pub enum FamilyCultivationError {
     Chronology,
     #[error("the fixed-section plate lacks an exact support or factorization")]
     Plate,
-    #[error("the L1 inquiry is malformed, belongs to development, or leaves the cultivated family")]
+    #[error(
+        "the L1 inquiry is malformed, belongs to development, or leaves the cultivated family"
+    )]
     Inquiry,
     #[error("the exterior family return is absent or malformed")]
     WorldReturn,

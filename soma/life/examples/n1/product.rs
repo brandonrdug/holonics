@@ -67,10 +67,8 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         raw.background,
     )
     .map_err(|error| error.to_string())?;
-    let (organ_version, glyphs) = tesseract_makebox(
-        &root.join(PRODUCTIVE_RAW),
-        raw.exact.extent.height,
-    )?;
+    let (organ_version, glyphs) =
+        tesseract_makebox(&root.join(PRODUCTIVE_RAW), raw.exact.extent.height)?;
     bind_optical_glyph_testimony(
         &mut native,
         "tesseract-makebox-exterior-optical-mouth",
@@ -85,7 +83,10 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         &directory.join("01-card-resident-optical-passage.json"),
         &native,
     )?;
-    let glyph_testimony = native.glyph_testimony.as_ref().ok_or("glyph testimony absent")?;
+    let glyph_testimony = native
+        .glyph_testimony
+        .as_ref()
+        .ok_or("glyph testimony absent")?;
     artifact::write_json(
         &directory.join("01a-inherited-optical-glyph-testimony.json"),
         glyph_testimony,
@@ -197,7 +198,11 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn control_campaign(root: &Path, out: &Path, card: &mut CudaRefineExecutor) -> Result<Value, String> {
+fn control_campaign(
+    root: &Path,
+    out: &Path,
+    card: &mut CudaRefineExecutor,
+) -> Result<Value, String> {
     let controls = [
         ("born-digital-pdf-render", "output/m0_mathematical_source_circulation/faces/synthetic/harmonic-baseline-pdf.png"),
         ("vector-clean-render", "output/m0_mathematical_source_circulation/faces/synthetic/harmonic-baseline-source.png"),
@@ -225,35 +230,82 @@ fn control_campaign(root: &Path, out: &Path, card: &mut CudaRefineExecutor) -> R
     }
     let control_root = out.join("control-material");
     fs::create_dir_all(&control_root).map_err(|error| error.to_string())?;
-    let index_above = synthetic_passage(card, &control_root, "index-above", &[
-        (10,25,25,45), (21,13,29,23)])?;
-    let index_below = synthetic_passage(card, &control_root, "index-below", &[
-        (10,15,25,35), (21,37,29,47)])?;
-    let fraction = synthetic_passage(card, &control_root, "fraction", &[
-        (30,12,40,20), (20,22,50,24), (30,26,40,34)])?;
-    let inline = synthetic_passage(card, &control_root, "inline", &[
-        (10,20,18,28), (25,20,33,28), (40,20,48,28)])?;
-    let diagram = synthetic_passage(card, &control_root, "diagram", &[
-        (28,20,36,28), (10,45,18,53), (46,45,54,53), (15,30,49,32)])?;
-    let decoration = synthetic_passage(card, &control_root, "decoration", &[
-        (28,20,36,28), (10,45,18,53), (46,45,54,53)])?;
+    let index_above = synthetic_passage(
+        card,
+        &control_root,
+        "index-above",
+        &[(10, 25, 25, 45), (21, 13, 29, 23)],
+    )?;
+    let index_below = synthetic_passage(
+        card,
+        &control_root,
+        "index-below",
+        &[(10, 15, 25, 35), (21, 37, 29, 47)],
+    )?;
+    let fraction = synthetic_passage(
+        card,
+        &control_root,
+        "fraction",
+        &[(30, 12, 40, 20), (20, 22, 50, 24), (30, 26, 40, 34)],
+    )?;
+    let inline = synthetic_passage(
+        card,
+        &control_root,
+        "inline",
+        &[(10, 20, 18, 28), (25, 20, 33, 28), (40, 20, 48, 28)],
+    )?;
+    let diagram = synthetic_passage(
+        card,
+        &control_root,
+        "diagram",
+        &[
+            (28, 20, 36, 28),
+            (10, 45, 18, 53),
+            (46, 45, 54, 53),
+            (15, 30, 49, 32),
+        ],
+    )?;
+    let decoration = synthetic_passage(
+        card,
+        &control_root,
+        "decoration",
+        &[(28, 20, 36, 28), (10, 45, 18, 53), (46, 45, 54, 53)],
+    )?;
     let comparison =
         |left: usize, right: usize| compare_optical_controls(&returns[left].1, &returns[right].1);
     let operator_separator = first_glyph_face_separator(&returns[1].1, &returns[3].1);
-    let index_separator = first_kind_separator(&index_above, &index_below, &[
-        OpticalRelationKind::SuperscriptAttachmentCandidate,
-        OpticalRelationKind::SubscriptAttachmentCandidate]);
-    let fraction_separator = first_kind_separator(&fraction, &inline, &[
-        OpticalRelationKind::FractionNumeratorCandidate,
-        OpticalRelationKind::FractionDenominatorCandidate]);
-    let diagram_separator = first_kind_separator(&diagram, &decoration, &[
-        OpticalRelationKind::DiagramIncidenceCandidate]);
-    if operator_separator.is_none() || index_separator.is_none()
-        || fraction_separator.is_none() || diagram_separator.is_none() {
+    let index_separator = first_kind_separator(
+        &index_above,
+        &index_below,
+        &[
+            OpticalRelationKind::SuperscriptAttachmentCandidate,
+            OpticalRelationKind::SubscriptAttachmentCandidate,
+        ],
+    );
+    let fraction_separator = first_kind_separator(
+        &fraction,
+        &inline,
+        &[
+            OpticalRelationKind::FractionNumeratorCandidate,
+            OpticalRelationKind::FractionDenominatorCandidate,
+        ],
+    );
+    let diagram_separator = first_kind_separator(
+        &diagram,
+        &decoration,
+        &[OpticalRelationKind::DiagramIncidenceCandidate],
+    );
+    if operator_separator.is_none()
+        || index_separator.is_none()
+        || fraction_separator.is_none()
+        || diagram_separator.is_none()
+    {
         return Err(format!(
             "required separators: operator={} index={} fraction={} diagram={}",
-            operator_separator.is_some(), index_separator.is_some(),
-            fraction_separator.is_some(), diagram_separator.is_some()
+            operator_separator.is_some(),
+            index_separator.is_some(),
+            fraction_separator.is_some(),
+            diagram_separator.is_some()
         ));
     }
     Ok(json!({
@@ -289,39 +341,78 @@ fn control_campaign(root: &Path, out: &Path, card: &mut CudaRefineExecutor) -> R
     }))
 }
 
-fn tesseract_makebox(path: &Path, height: u32) -> Result<(String, Vec<ExteriorOpticalGlyph>), String> {
-    let version_return = Command::new("/usr/bin/tesseract").arg("--version").output()
+fn tesseract_makebox(
+    path: &Path,
+    height: u32,
+) -> Result<(String, Vec<ExteriorOpticalGlyph>), String> {
+    let version_return = Command::new("/usr/bin/tesseract")
+        .arg("--version")
+        .output()
         .map_err(|error| error.to_string())?;
     if !version_return.status.success() {
         return Err("the inherited exterior optical organ did not report its version".to_owned());
     }
-    let version = String::from_utf8_lossy(&version_return.stdout).lines().next()
-        .unwrap_or("tesseract-version-open").trim().to_owned();
+    let version = String::from_utf8_lossy(&version_return.stdout)
+        .lines()
+        .next()
+        .unwrap_or("tesseract-version-open")
+        .trim()
+        .to_owned();
     let returned = Command::new("/usr/bin/tesseract")
-        .arg(path).arg("stdout").arg("--psm").arg("6").arg("makebox")
-        .output().map_err(|error| error.to_string())?;
+        .arg(path)
+        .arg("stdout")
+        .arg("--psm")
+        .arg("6")
+        .arg("makebox")
+        .output()
+        .map_err(|error| error.to_string())?;
     if !returned.status.success() {
-        return Err(format!("the inherited optical mouth refused {}: {}",
-            path.display(), String::from_utf8_lossy(&returned.stderr)));
+        return Err(format!(
+            "the inherited optical mouth refused {}: {}",
+            path.display(),
+            String::from_utf8_lossy(&returned.stderr)
+        ));
     }
     let text = String::from_utf8(returned.stdout).map_err(|error| error.to_string())?;
-    let glyphs = text.lines().enumerate().map(|(ordinal,line)| {
-        let fields = line.split_whitespace().collect::<Vec<_>>();
-        if fields.len() != 6 { return Err(format!("malformed makebox row {ordinal}")); }
-        let left = fields[1].parse::<i64>().map_err(|error| error.to_string())?;
-        let bottom = fields[2].parse::<i64>().map_err(|error| error.to_string())?;
-        let right = fields[3].parse::<i64>().map_err(|error| error.to_string())?;
-        let top = fields[4].parse::<i64>().map_err(|error| error.to_string())?;
-        let page = fields[5].parse::<u32>().map_err(|error| error.to_string())?;
-        Ok(ExteriorOpticalGlyph {
-            ordinal: u32::try_from(ordinal).map_err(|_| "glyph population exceeds u32")?,
-            utf8_face: fields[0].to_owned(),
-            bounds: OpticalBounds { left, top: i64::from(height) - top,
-                right, bottom: i64::from(height) - bottom },
-            page,
+    let glyphs = text
+        .lines()
+        .enumerate()
+        .map(|(ordinal, line)| {
+            let fields = line.split_whitespace().collect::<Vec<_>>();
+            if fields.len() != 6 {
+                return Err(format!("malformed makebox row {ordinal}"));
+            }
+            let left = fields[1]
+                .parse::<i64>()
+                .map_err(|error| error.to_string())?;
+            let bottom = fields[2]
+                .parse::<i64>()
+                .map_err(|error| error.to_string())?;
+            let right = fields[3]
+                .parse::<i64>()
+                .map_err(|error| error.to_string())?;
+            let top = fields[4]
+                .parse::<i64>()
+                .map_err(|error| error.to_string())?;
+            let page = fields[5]
+                .parse::<u32>()
+                .map_err(|error| error.to_string())?;
+            Ok(ExteriorOpticalGlyph {
+                ordinal: u32::try_from(ordinal).map_err(|_| "glyph population exceeds u32")?,
+                utf8_face: fields[0].to_owned(),
+                bounds: OpticalBounds {
+                    left,
+                    top: i64::from(height) - top,
+                    right,
+                    bottom: i64::from(height) - bottom,
+                },
+                page,
+            })
         })
-    }).collect::<Result<Vec<_>,String>>()?;
-    if glyphs.is_empty() { return Err("the inherited optical mouth returned no glyph face".to_owned()); }
+        .collect::<Result<Vec<_>, String>>()?;
+    if glyphs.is_empty() {
+        return Err("the inherited optical mouth returned no glyph face".to_owned());
+    }
     Ok((version, glyphs))
 }
 
@@ -329,13 +420,24 @@ fn synthetic_passage(
     card: &mut CudaRefineExecutor,
     directory: &Path,
     name: &str,
-    rectangles: &[(u32,u32,u32,u32)],
+    rectangles: &[(u32, u32, u32, u32)],
 ) -> Result<OpticalPassage, String> {
-    let extent = ImageExtent { width: 64, height: 64 };
-    let white = ExactRgb { red: 255, green: 255, blue: 255 };
-    let black = ExactRgb { red: 0, green: 0, blue: 0 };
+    let extent = ImageExtent {
+        width: 64,
+        height: 64,
+    };
+    let white = ExactRgb {
+        red: 255,
+        green: 255,
+        blue: 255,
+    };
+    let black = ExactRgb {
+        red: 0,
+        green: 0,
+        blue: 0,
+    };
     let mut samples = vec![white; extent.sample_count().map_err(|error| error.to_string())?];
-    for (left,top,right,bottom) in rectangles {
+    for (left, top, right, bottom) in rectangles {
         for y in *top..*bottom {
             for x in *left..*right {
                 samples[(y * extent.width + x) as usize] = black;
@@ -346,34 +448,50 @@ fn synthetic_passage(
     let encoded = exact.ppm_bytes();
     let path = directory.join(format!("{name}.ppm"));
     fs::write(&path, &encoded).map_err(|error| error.to_string())?;
-    recover_optical_passage(card, format!("n1/control/{name}/{}", artifact::digest(&encoded)),
-        "content-addressed-synthetic-control", &encoded, &exact, white)
-        .map_err(|error| error.to_string())
+    recover_optical_passage(
+        card,
+        format!("n1/control/{name}/{}", artifact::digest(&encoded)),
+        "content-addressed-synthetic-control",
+        &encoded,
+        &exact,
+        white,
+    )
+    .map_err(|error| error.to_string())
 }
 
 fn first_glyph_face_separator(left: &OpticalPassage, right: &OpticalPassage) -> Option<Value> {
     let left = left.glyph_testimony.as_ref()?;
     let right = right.glyph_testimony.as_ref()?;
     let is_changed_hand = |left: &str, right: &str| {
-        (left == "+" && matches!(right, "-" | "—"))
-            || (right == "+" && matches!(left, "-" | "—"))
+        (left == "+" && matches!(right, "-" | "—")) || (right == "+" && matches!(left, "-" | "—"))
     };
-    left.glyphs.iter().enumerate().find_map(|(at,a)| {
-        right.glyphs.iter().filter(|b| is_changed_hand(&a.utf8_face, &b.utf8_face)
-            && optical_bounds_overlap(a.bounds,b.bounds))
-            .min_by_key(|b| (a.bounds.left + a.bounds.right - b.bounds.left - b.bounds.right).abs()
-                + (a.bounds.top + a.bounds.bottom - b.bounds.top - b.bounds.bottom).abs())
-            .map(|b| json!({
-                "history_ordinal": at, "left_face": a.utf8_face, "right_face": b.utf8_face,
-                "left_bounds": a.bounds, "right_bounds": b.bounds,
-                "same_situated_box_overlap": true,
-            }))
+    left.glyphs.iter().enumerate().find_map(|(at, a)| {
+        right
+            .glyphs
+            .iter()
+            .filter(|b| {
+                is_changed_hand(&a.utf8_face, &b.utf8_face)
+                    && optical_bounds_overlap(a.bounds, b.bounds)
+            })
+            .min_by_key(|b| {
+                (a.bounds.left + a.bounds.right - b.bounds.left - b.bounds.right).abs()
+                    + (a.bounds.top + a.bounds.bottom - b.bounds.top - b.bounds.bottom).abs()
+            })
+            .map(|b| {
+                json!({
+                    "history_ordinal": at, "left_face": a.utf8_face, "right_face": b.utf8_face,
+                    "left_bounds": a.bounds, "right_bounds": b.bounds,
+                    "same_situated_box_overlap": true,
+                })
+            })
     })
 }
 
 fn optical_bounds_overlap(left: OpticalBounds, right: OpticalBounds) -> bool {
-    left.left < right.right && right.left < left.right
-        && left.top < right.bottom && right.top < left.bottom
+    left.left < right.right
+        && right.left < left.right
+        && left.top < right.bottom
+        && right.top < left.bottom
 }
 
 fn first_kind_separator(
@@ -381,17 +499,33 @@ fn first_kind_separator(
     right: &OpticalPassage,
     kinds: &[OpticalRelationKind],
 ) -> Option<Value> {
-    let left = left.relations.iter().filter(|relation| kinds.contains(&relation.kind))
-        .cloned().collect::<std::collections::BTreeSet<_>>();
-    let right = right.relations.iter().filter(|relation| kinds.contains(&relation.kind))
-        .cloned().collect::<std::collections::BTreeSet<_>>();
-    left.symmetric_difference(&right).next().map(|relation| json!(relation))
+    let left = left
+        .relations
+        .iter()
+        .filter(|relation| kinds.contains(&relation.kind))
+        .cloned()
+        .collect::<std::collections::BTreeSet<_>>();
+    let right = right
+        .relations
+        .iter()
+        .filter(|relation| kinds.contains(&relation.kind))
+        .cloned()
+        .collect::<std::collections::BTreeSet<_>>();
+    left.symmetric_difference(&right)
+        .next()
+        .map(|relation| json!(relation))
 }
 
 fn verify_native(passage: &OpticalPassage) -> Result<(), String> {
-    let glyph_testimony = passage.glyph_testimony.as_ref().ok_or("glyph testimony absent")?;
-    let glyph_faces = glyph_testimony.glyphs.iter()
-        .map(|glyph| glyph.utf8_face.as_str()).collect::<std::collections::BTreeSet<_>>();
+    let glyph_testimony = passage
+        .glyph_testimony
+        .as_ref()
+        .ok_or("glyph testimony absent")?;
+    let glyph_faces = glyph_testimony
+        .glyphs
+        .iter()
+        .map(|glyph| glyph.utf8_face.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
     if passage.components.is_empty()
         || passage.relations.is_empty()
         || passage.ambiguity_fibres.is_empty()
@@ -405,7 +539,9 @@ fn verify_native(passage: &OpticalPassage) -> Result<(), String> {
         || glyph_testimony.glyphs.is_empty()
         || !glyph_testimony.complete_overlap_fibre
         || glyph_testimony.labels_route_spatial_law
-        || !["=", "+", "-"].into_iter().all(|face| glyph_faces.contains(face))
+        || !["=", "+", "-"]
+            .into_iter()
+            .all(|face| glyph_faces.contains(face))
     {
         return Err("the raw optical passage lost a required bounded consequence".to_owned());
     }

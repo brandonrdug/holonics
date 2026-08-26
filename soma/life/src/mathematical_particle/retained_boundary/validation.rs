@@ -20,15 +20,25 @@ pub(super) fn validate_standing(
         || !is_digest(&standing.boundary_identity)
         || !is_digest(&standing.source_compression_sha256)
         || states < 2
-        || standing.native_states.iter().enumerate().any(|(at, state)| state.0 != at as u64)
+        || standing
+            .native_states
+            .iter()
+            .enumerate()
+            .any(|(at, state)| state.0 != at as u64)
         || standing.generator_table.is_empty()
         || standing.generator_table.len() % states != 0
-        || standing.generator_table.iter().any(|state| *state as usize >= states)
+        || standing
+            .generator_table
+            .iter()
+            .any(|state| *state as usize >= states)
         || standing.source_physical_states < 2
         || standing.source_physical_action.is_empty()
         || standing.source_physical_action.len() % standing.source_physical_states as usize != 0
         || standing.physical_to_native.len() != standing.source_physical_states as usize
-        || standing.physical_to_native.iter().any(|state| state.0 as usize >= states)
+        || standing
+            .physical_to_native
+            .iter()
+            .any(|state| state.0 as usize >= states)
         || standing.receiver_ids.is_empty()
         || standing.open_exterior.is_empty()
         || !is_digest(&standing.cultivation.dynamic_rest_sha256)
@@ -63,7 +73,11 @@ pub(super) fn validate_standing(
             }
         }
     }
-    let receiver_set = standing.receiver_ids.iter().copied().collect::<BTreeSet<_>>();
+    let receiver_set = standing
+        .receiver_ids
+        .iter()
+        .copied()
+        .collect::<BTreeSet<_>>();
     let factor_keys = standing
         .receiver_factors
         .iter()
@@ -101,7 +115,9 @@ pub(super) fn validate_decoder(
         if interior.occurrence.is_empty()
             || !is_digest(&interior.payload_sha256)
             || digest(&interior.payload) != interior.payload_sha256
-            || occurrences.insert(interior.occurrence.as_str(), at).is_some()
+            || occurrences
+                .insert(interior.occurrence.as_str(), at)
+                .is_some()
             || interior
                 .predecessor
                 .as_deref()
@@ -160,10 +176,14 @@ pub(super) fn validate_fibres(
             let member = members.get(item).ok_or(LongHorizonBoundaryError::Fibre)?;
             if !union.insert(*item)
                 || standing.physical_to_native[member.physical_state as usize] != *native
-                || standing.receiver_ids.iter().enumerate().any(|(receiver_at, receiver)| {
-                    factor.get(&(*native, *receiver))
-                        != member.base_observations.get(receiver_at)
-                })
+                || standing
+                    .receiver_ids
+                    .iter()
+                    .enumerate()
+                    .any(|(receiver_at, receiver)| {
+                        factor.get(&(*native, *receiver))
+                            != member.base_observations.get(receiver_at)
+                    })
             {
                 return Err(LongHorizonBoundaryError::Fibre);
             }
@@ -195,10 +215,8 @@ pub(super) fn validate_fibres(
         if !fibre.1.contains(&reopening.left_item)
             || !fibre.1.contains(&reopening.right_item)
             || left.interior == right.interior
-            || reopening.left_occurrence
-                != decoder.interiors[left.interior as usize].occurrence
-            || reopening.right_occurrence
-                != decoder.interiors[right.interior as usize].occurrence
+            || reopening.left_occurrence != decoder.interiors[left.interior as usize].occurrence
+            || reopening.right_occurrence != decoder.interiors[right.interior as usize].occurrence
             || reopening.left_reading_sha256
                 != decoder.interiors[left.interior as usize].payload_sha256
             || reopening.right_reading_sha256

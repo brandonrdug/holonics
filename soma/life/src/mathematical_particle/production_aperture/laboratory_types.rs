@@ -5,9 +5,7 @@ use holonic_engine::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use super::types::{
-    ProductionAthenaRest, ProductionInquiryPresentation, ProductionReceiver,
-};
+use super::types::{ProductionAthenaRest, ProductionInquiryPresentation, ProductionReceiver};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

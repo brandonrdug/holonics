@@ -48,28 +48,28 @@ use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 use body::arrow::Arrow;
 use body::carriage::{
-    self, carry_dense_stroke_trusted, carry_founded_stroke_trusted,
+    self, LineageStroke, RegisterContactSnapshot, RegisterContactSurface, RegisterStrokeStatus,
+    WordSpan, carry_dense_stroke_trusted, carry_founded_stroke_trusted,
     carry_register_stroke_trusted_with_completion,
-    carry_register_stroke_trusted_with_completion_surface, form_register_contact, LineageStroke,
-    RegisterContactSnapshot, RegisterContactSurface, RegisterStrokeStatus, WordSpan,
+    carry_register_stroke_trusted_with_completion_surface, form_register_contact,
 };
 use body::chart;
 use body::manifold::{
-    directed_event_contact_over_standing, node_packed_word, own_cell_position,
-    packed_node_is_canonical, unpack_node, CarrierGrowth, CarrierStorage, ErosBody, EventEmanation,
-    EventIncidence, Face, LiveBodyHeader, Node, SparseOwnCell, SparseOwnStorage, StandingQuery,
-    CARRIER_HEADER_WORDS, ENCLOSURE_WORDS, FACE_WORDS, NODE_WORDS, OWN_CELL_FORM, OWN_CELL_LIVE,
-    OWN_CELL_WORDS, OWN_REGISTER_WORDS,
+    CARRIER_HEADER_WORDS, CarrierGrowth, CarrierStorage, ENCLOSURE_WORDS, ErosBody, EventEmanation,
+    EventIncidence, FACE_WORDS, Face, LiveBodyHeader, NODE_WORDS, Node, OWN_CELL_FORM,
+    OWN_CELL_LIVE, OWN_CELL_WORDS, OWN_REGISTER_WORDS, SparseOwnCell, SparseOwnStorage,
+    StandingQuery, directed_event_contact_over_standing, node_packed_word, own_cell_position,
+    packed_node_is_canonical, unpack_node,
 };
 use body::medium::{
-    arm_at_grain, arm_from_sum, cog_at_grain, cog_from_sum, grain_from_key, grain_key,
-    RegionalForm, FORM_WORDS,
+    FORM_WORDS, RegionalForm, arm_at_grain, arm_from_sum, cog_at_grain, cog_from_sum,
+    grain_from_key, grain_key,
 };
-use body::num::{self, Cog, Rung, COG_WORDS};
+use body::num::{self, COG_WORDS, Cog, Rung};
 use body::place;
 use body::register;
 use body::seam::SliceWordSeam;
-use soma_abi::emission::{DeedEmission, DEED_WORDS};
+use soma_abi::emission::{DEED_WORDS, DeedEmission};
 use soma_abi::live_event_cuda as event_cuda;
 use soma_abi::material_shadow_cuda;
 use soma_abi::morphological_condition_cuda as morph_condition_cuda;
@@ -4178,10 +4178,7 @@ pub unsafe extern "ptx-kernel" fn returned_contact_sparse_group(
     if !returned_cuda::sparse_control_is_canonical(control) {
         if lane == 0 {
             let output = unsafe {
-                slice::from_raw_parts_mut(
-                    output_words,
-                    returned_cuda::SPARSE_OUTPUT_HEADER_WORDS,
-                )
+                slice::from_raw_parts_mut(output_words, returned_cuda::SPARSE_OUTPUT_HEADER_WORDS)
             };
             output[returned_cuda::SPARSE_OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
         }
@@ -4194,20 +4191,15 @@ pub unsafe extern "ptx-kernel" fn returned_contact_sparse_group(
     let Some(expected_relation_words) = relations.checked_mul(returned_cuda::RELATION_WORDS) else {
         return;
     };
-    let Some(expected_output_words) = returned_cuda::sparse_output_words(
-        targets,
-        occurrences,
-        relations,
-    ) else {
+    let Some(expected_output_words) =
+        returned_cuda::sparse_output_words(targets, occurrences, relations)
+    else {
         return;
     };
     if relation_words_len != expected_relation_words || output_words_len != expected_output_words {
         if lane == 0 {
             let output = unsafe {
-                slice::from_raw_parts_mut(
-                    output_words,
-                    returned_cuda::SPARSE_OUTPUT_HEADER_WORDS,
-                )
+                slice::from_raw_parts_mut(output_words, returned_cuda::SPARSE_OUTPUT_HEADER_WORDS)
             };
             output[returned_cuda::SPARSE_OUTPUT_STATUS] = returned_cuda::STATUS_INVALID;
         }
@@ -4239,7 +4231,8 @@ pub unsafe extern "ptx-kernel" fn returned_contact_sparse_group(
     let input = unsafe { slice::from_raw_parts(relation_words, relation_words_len) };
     let at = relation * returned_cuda::RELATION_WORDS;
     let row = &input[at..at + returned_cuda::RELATION_WORDS];
-    let relation_rows_at = returned_cuda::sparse_relation_rows_at(targets, occurrences).unwrap_or(0);
+    let relation_rows_at =
+        returned_cuda::sparse_relation_rows_at(targets, occurrences).unwrap_or(0);
     let returned_at = relation_rows_at + at;
     let mut word = 0usize;
     while word < returned_cuda::RELATION_WORDS {
@@ -4278,9 +4271,8 @@ pub unsafe extern "ptx-kernel" fn returned_contact_sparse_group(
         + target * returned_cuda::SPARSE_TARGET_ROW_WORDS
         + disposition;
     let occurrence_rows_at = returned_cuda::sparse_occurrence_rows_at(targets).unwrap_or(0);
-    let occurrence_at = occurrence_rows_at
-        + occurrence * returned_cuda::SPARSE_OCCURRENCE_ROW_WORDS
-        + disposition;
+    let occurrence_at =
+        occurrence_rows_at + occurrence * returned_cuda::SPARSE_OCCURRENCE_ROW_WORDS + disposition;
     unsafe {
         contact_add(output_words, target_at, 1);
         contact_add(output_words, occurrence_at, 1);
@@ -5286,12 +5278,10 @@ pub unsafe extern "ptx-kernel" fn material_shadow_read(
     let shadows = unsafe { slice::from_raw_parts_mut(shadow_words, shadow_words_len) };
     let input_at = lane * material_shadow_cuda::INPUT_WORDS;
     let output_at = lane * material_shadow_cuda::OUTPUT_WORDS;
-    output[output_at + material_shadow_cuda::OUTPUT_VERSION] =
-        material_shadow_cuda::LAYOUT_VERSION;
+    output[output_at + material_shadow_cuda::OUTPUT_VERSION] = material_shadow_cuda::LAYOUT_VERSION;
     let offset = descriptors[input_at + material_shadow_cuda::INPUT_OFFSET] as usize;
     let extent = descriptors[input_at + material_shadow_cuda::INPUT_EXTENT] as usize;
-    let shadow_offset =
-        descriptors[input_at + material_shadow_cuda::INPUT_SHADOW_OFFSET] as usize;
+    let shadow_offset = descriptors[input_at + material_shadow_cuda::INPUT_SHADOW_OFFSET] as usize;
     if extent == 0
         || offset > material.len()
         || extent > material.len() - offset
@@ -5365,8 +5355,7 @@ pub unsafe extern "ptx-kernel" fn material_shadow_read(
     output[summary_at + 5] = (forward >> 32) as u32;
     output[summary_at + 6] = reverse as u32;
     output[summary_at + 7] = (reverse >> 32) as u32;
-    output[output_at + material_shadow_cuda::OUTPUT_STATUS] =
-        material_shadow_cuda::STATUS_COMPLETE;
+    output[output_at + material_shadow_cuda::OUTPUT_STATUS] = material_shadow_cuda::STATUS_COMPLETE;
 }
 
 /// Found one exact local bi-affine law from a complete rectangular intervention face.
@@ -5604,10 +5593,8 @@ pub unsafe extern "ptx-kernel" fn recurrent_law_fold(
     let output_at = lane * recurrent_law_cuda::FOLD_OUTPUT_WORDS;
     output[output_at + recurrent_law_cuda::FOLD_OUTPUT_VERSION] =
         recurrent_law_cuda::LAYOUT_VERSION;
-    let current_offset =
-        input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_OFFSET] as usize;
-    let current_extent =
-        input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_EXTENT] as usize;
+    let current_offset = input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_OFFSET] as usize;
+    let current_extent = input[input_at + recurrent_law_cuda::FOLD_INPUT_CURRENT_EXTENT] as usize;
     let trace_offset = input[input_at + recurrent_law_cuda::FOLD_INPUT_TRACE_OFFSET] as usize;
     let Some(current_end) = current_offset.checked_add(current_extent) else {
         output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
@@ -5647,10 +5634,9 @@ pub unsafe extern "ptx-kernel" fn recurrent_law_fold(
         law[coordinate] = value;
         coordinate += 1;
     }
-    let Some(mut standing) = recurrent_read_i64(
-        input,
-        input_at + recurrent_law_cuda::FOLD_INPUT_INITIAL_AT,
-    ) else {
+    let Some(mut standing) =
+        recurrent_read_i64(input, input_at + recurrent_law_cuda::FOLD_INPUT_INITIAL_AT)
+    else {
         output[output_at + recurrent_law_cuda::FOLD_OUTPUT_STATUS] =
             recurrent_law_cuda::STATUS_INVALID;
         return;

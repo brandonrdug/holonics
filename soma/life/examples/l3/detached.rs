@@ -130,7 +130,11 @@ pub fn conduct(
     ];
     let forbidden_source_access = open_descriptors
         .iter()
-        .filter(|target| forbidden_needles.iter().any(|needle| target.contains(needle)))
+        .filter(|target| {
+            forbidden_needles
+                .iter()
+                .any(|needle| target.contains(needle))
+        })
         .cloned()
         .collect::<Vec<_>>();
     if !forbidden_source_access.is_empty() {
@@ -236,8 +240,11 @@ fn write_visuals(
     });
     let mesh_bytes = artifact::write_json(output.join("07-native-terrain.mesh.json"), &mesh)?;
     let html = "<!doctype html><meta charset=\"utf-8\"><title>L3 native terrain</title><style>body{margin:0;background:#0b1320;color:#f5f7fa;font:16px system-ui;display:grid;grid-template-columns:2fr 1fr;min-height:100vh}object{width:100%;height:100vh}aside{padding:30px}code{color:#efb847}</style><object data=\"06-native-terrain-complex.svg\" type=\"image/svg+xml\"></object><aside><h1>Returned native terrain</h1><p>Three carrier charts meet one oriented generator. The chart added by the Lean/world return is load-bearing only for later current which enters its fixed locus.</p><p>The junction preserves the integer-reduction square, the finite-carrier obstruction, and the exact local withdrawal face.</p></aside>\n";
-    fs::write(output.join("08-interactive-terrain-atlas.html"), html.as_bytes())
-        .map_err(|error| error.to_string())?;
+    fs::write(
+        output.join("08-interactive-terrain-atlas.html"),
+        html.as_bytes(),
+    )
+    .map_err(|error| error.to_string())?;
     Ok(json!({
         "schema": "holonics.l3.rendering-receipt.v1",
         "truth_status": "implemented-exact",
@@ -261,7 +268,9 @@ fn nvidia_sample() -> Value {
         Ok(output) if output.status.success() => {
             json!({"available": true, "raw": String::from_utf8_lossy(&output.stdout).trim()})
         }
-        Ok(output) => json!({"available": false, "status": output.status.code(), "stderr": String::from_utf8_lossy(&output.stderr).trim()}),
+        Ok(output) => {
+            json!({"available": false, "status": output.status.code(), "stderr": String::from_utf8_lossy(&output.stderr).trim()})
+        }
         Err(error) => json!({"available": false, "error": error.to_string()}),
     }
 }

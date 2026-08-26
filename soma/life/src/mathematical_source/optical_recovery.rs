@@ -807,9 +807,10 @@ pub fn bind_optical_glyph_testimony(
     passage.native_consequence.open_exterior.retain(|boundary| {
         !boundary.starts_with("glyph identity and same-layout/different-operator")
     });
-    passage.native_consequence.open_exterior.push(
-        "glyph alternatives beyond the inherited makebox receiver remain open".to_owned(),
-    );
+    passage
+        .native_consequence
+        .open_exterior
+        .push("glyph alternatives beyond the inherited makebox receiver remain open".to_owned());
     passage.glyph_testimony = Some(OpticalGlyphTestimony {
         organ: organ.into(),
         organ_version: organ_version.into(),

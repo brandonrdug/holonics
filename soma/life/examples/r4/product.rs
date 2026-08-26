@@ -26,15 +26,22 @@ const R3: &str = "output/the_returned_constraints_found_dynamic_local_morphology
 
 pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     let directory = root.join(out);
-    fs::create_dir(&directory).map_err(|error| format!("create {}: {error}", directory.display()))?;
+    fs::create_dir(&directory)
+        .map_err(|error| format!("create {}: {error}", directory.display()))?;
     for child in ["source-replay", "uncondensed-history", "native-rest"] {
         fs::create_dir(directory.join(child)).map_err(|error| error.to_string())?;
     }
 
     let mounted = source::mount(root)?;
-    artifact::write_json(&directory.join("00-source-and-predecessor-closure.json"), &mounted.source_closure)?;
-    let r3_rest_bytes = fs::read(root.join(R3).join("04-source-detached-dynamic-morphology-rest.json"))
-        .map_err(|error| error.to_string())?;
+    artifact::write_json(
+        &directory.join("00-source-and-predecessor-closure.json"),
+        &mounted.source_closure,
+    )?;
+    let r3_rest_bytes = fs::read(
+        root.join(R3)
+            .join("04-source-detached-dynamic-morphology-rest.json"),
+    )
+    .map_err(|error| error.to_string())?;
     let r3 = DynamicMorphologyRest::read(&r3_rest_bytes).map_err(|error| error.to_string())?;
     let predecessor_action = r3.predecessor_action().to_vec();
     let successor_action = r3.successor_action().to_vec();
@@ -61,9 +68,7 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     let exact = compress_on_device(&system, &mut card).map_err(|error| error.to_string())?;
     let quotient_wall_microseconds = quotient_began.elapsed().as_micros();
     let quotient_launches = card.launches() - launches_before;
-    if exact.conduct.len() >= exact.one_shot.items_in_order().len()
-        || exact.collapsed.is_empty()
-    {
+    if exact.conduct.len() >= exact.one_shot.items_in_order().len() || exact.collapsed.is_empty() {
         return Err("the future-receiver quotient returned no lawful historical compactification or separator".to_owned());
     }
     let compression_bytes = artifact::write_json(
@@ -72,15 +77,25 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     )?;
     let predecessor_identity = artifact::digest(&r3_rest_bytes);
     let boundary_identity = artifact::digest(
-        &[predecessor_identity.as_bytes(), artifact::digest(&compression_bytes).as_bytes()].concat(),
+        &[
+            predecessor_identity.as_bytes(),
+            artifact::digest(&compression_bytes).as_bytes(),
+        ]
+        .concat(),
     );
     let cultivation = CultivatedActionLineage {
         dynamic_rest_sha256: predecessor_identity.clone(),
         predecessor_action_sha256: artifact::digest(
-            &predecessor_action.iter().flat_map(|state| state.to_le_bytes()).collect::<Vec<_>>(),
+            &predecessor_action
+                .iter()
+                .flat_map(|state| state.to_le_bytes())
+                .collect::<Vec<_>>(),
         ),
         successor_action_sha256: artifact::digest(
-            &successor_action.iter().flat_map(|state| state.to_le_bytes()).collect::<Vec<_>>(),
+            &successor_action
+                .iter()
+                .flat_map(|state| state.to_le_bytes())
+                .collect::<Vec<_>>(),
         ),
         returned_occurrences: r3
             .returned_constraints
@@ -101,12 +116,25 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     let standing_path = directory.join("native-rest/standing.json");
     let decoder_path = directory.join("native-rest/decoder.json");
     let fibre_path = directory.join("native-rest/fibres.json");
-    fs::write(&standing_path, boundary.standing_bytes().map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
-    fs::write(&decoder_path, boundary.decoder_bytes().map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
-    fs::write(&fibre_path, boundary.fibre_bytes().map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    fs::write(
+        &standing_path,
+        boundary
+            .standing_bytes()
+            .map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    fs::write(
+        &decoder_path,
+        boundary
+            .decoder_bytes()
+            .map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    fs::write(
+        &fibre_path,
+        boundary.fibre_bytes().map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
 
     let fronts = source::inquiry_fronts(&mounted.occurrences);
     let passages = source::passages(&boundary, &system, &fronts)?;
@@ -179,7 +207,10 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         "source_native_compact_factorization": factorization,
         "no_summary_string_or_kv_array": true,
     });
-    artifact::write_json(&directory.join("04-boundary-factorization-recurrence-and-fibres.json"), &boundary_return)?;
+    artifact::write_json(
+        &directory.join("04-boundary-factorization-recurrence-and-fibres.json"),
+        &boundary_return,
+    )?;
     let card_return = json!({
         "schema": "holonics.r4.three-realization-card-passages.v1",
         "truth_status": "measured",
@@ -196,13 +227,20 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         "cpu_semantic_callbacks_between_fronts": 0,
         "invariant_action_uploaded_once_per_matched_realization": true,
     });
-    artifact::write_json(&directory.join("05-source-uncondensed-and-compact-card-passages.json"), &card_return)?;
+    artifact::write_json(
+        &directory.join("05-source-uncondensed-and-compact-card-passages.json"),
+        &card_return,
+    )?;
 
-    let interchange = certify_interchange(&compact_return, boundary.standing.generator_table.len() as u64)?;
+    let interchange = certify_interchange(
+        &compact_return,
+        boundary.standing.generator_table.len() as u64,
+    )?;
     let holonomy = &boundary.standing.ordered_holonomy;
     let left_gpu = endpoint(&compact_return, 0)?;
     let right_gpu = endpoint(&compact_return, 2)?;
-    if left_gpu != holonomy.left_endpoint.0 as u32 || right_gpu != holonomy.right_endpoint.0 as u32 {
+    if left_gpu != holonomy.left_endpoint.0 as u32 || right_gpu != holonomy.right_endpoint.0 as u32
+    {
         return Err("the card reordered or lost the noncommuting boundary words".to_owned());
     }
     let interchange_and_holonomy = json!({
@@ -219,7 +257,10 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
             "commutator_rank": holonomy.commutator_rank,
         },
     });
-    artifact::write_json(&directory.join("06-interchange-and-ordered-holonomy.json"), &interchange_and_holonomy)?;
+    artifact::write_json(
+        &directory.join("06-interchange-and-ordered-holonomy.json"),
+        &interchange_and_holonomy,
+    )?;
 
     let reopening = boundary
         .fibres
@@ -242,12 +283,22 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         "complete_fibre_reopened_without_source_lookup": true,
         "later_receiver_enlargement_reopens_prior_quotient": true,
     });
-    artifact::write_json(&directory.join("07-richer-later-receiver-reopens-the-interior.json"), &richer_return)?;
+    artifact::write_json(
+        &directory.join("07-richer-later-receiver-reopens-the-interior.json"),
+        &richer_return,
+    )?;
 
-    let reconstructed_occurrence = fronts[0].occurrence
+    let reconstructed_occurrence = fronts[0]
+        .occurrence
         .rsplit('/')
         .next()
-        .and_then(|suffix| boundary.decoder.interiors.iter().find(|interior| interior.occurrence.ends_with(suffix)))
+        .and_then(|suffix| {
+            boundary
+                .decoder
+                .interiors
+                .iter()
+                .find(|interior| interior.occurrence.ends_with(suffix))
+        })
         .map(|interior| interior.occurrence.clone())
         .ok_or("later proof interior absent")?;
     let reconstruction = boundary
@@ -256,7 +307,10 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
     let detached_inquiry = detached::DetachedInquiry {
         schema: "holonics.r4.detached-inquiry.v1".to_owned(),
         boundary_identity: boundary_identity.clone(),
-        occurrence: format!("r4/detached/later-revisit/{}", artifact::digest(&reconstruction)),
+        occurrence: format!(
+            "r4/detached/later-revisit/{}",
+            artifact::digest(&reconstruction)
+        ),
         words: passages.compact_words.clone(),
         word_offsets: passages.compact_word_offsets.clone(),
         native_starts: passages.compact_starts.clone(),
@@ -314,7 +368,9 @@ pub fn construct(root: &Path, out: &str) -> Result<(), String> {
         &compact_return,
     )?;
     if cost["strict_coordinate_fall"]["every_coordinate_strictly_falls"] != true {
-        return Err(format!("the complete compactification product did not strictly descend: {cost}"));
+        return Err(format!(
+            "the complete compactification product did not strictly descend: {cost}"
+        ));
     }
     artifact::write_json(&directory.join("10-complete-product-descent.json"), &cost)?;
     write_product_faces(&directory, &boundary, &fronts, &detached)?;

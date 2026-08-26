@@ -20,7 +20,7 @@ use std::time::Instant;
 use holonic_engine::{
     category::BoundaryId,
     cuda_refine::CudaRefineExecutor,
-    phoenix::{
+    native_ecology::{
         heterogeneous_fusion::HeterogeneousFusionRest,
         inference_ecology::InferenceEcologyRest,
         recurrent_condensation::{CondensedRecurrentRest, CondensedRoute},

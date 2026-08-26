@@ -73,10 +73,12 @@ fn source_clauses_found_a_connected_thought_with_source_absent_wording() {
         selected.text,
         "Those exact suffix currents are advanced by one returned token. The advanced currents themselves form the next emanation."
     );
-    assert!(selected
-        .clauses
-        .iter()
-        .all(|clause| !clause.inherited_contiguous));
+    assert!(
+        selected
+            .clauses
+            .iter()
+            .all(|clause| !clause.inherited_contiguous)
+    );
 }
 
 #[test]
@@ -195,14 +197,16 @@ fn a_separated_junction_opens_then_recurring_phase_conducts_as_a_ride() {
         .unwrap()
         .unwrap();
     assert!(returned.is_closed());
-    assert!(returned
-        .currents
-        .iter()
-        .flat_map(|current| &current.joins)
-        .any(|join| {
-            join.conduct == RelationalChannelConduct::Ride
-                && join.recurrence_population >= BigUint::from(2u8)
-        }));
+    assert!(
+        returned
+            .currents
+            .iter()
+            .flat_map(|current| &current.joins)
+            .any(|join| {
+                join.conduct == RelationalChannelConduct::Ride
+                    && join.recurrence_population >= BigUint::from(2u8)
+            })
+    );
 
     let mut reversed = first;
     reversed.extend(later);
@@ -291,10 +295,12 @@ fn the_same_relation_body_has_two_distinct_surface_realizations() {
 #[test]
 fn a_missing_entity_region_remains_open_instead_of_reusing_prior_language() {
     let ecology = ExactRelationalLanguageEcology::condition(&passages()).unwrap();
-    assert!(ecology
-        .closed_thought_at_declared_horizon("What is photosynthesis?")
-        .unwrap()
-        .is_none());
+    assert!(
+        ecology
+            .closed_thought_at_declared_horizon("What is photosynthesis?")
+            .unwrap()
+            .is_none()
+    );
 }
 
 #[test]
@@ -425,10 +431,12 @@ fn parse_products_remain_factorized_while_each_local_alternative_is_visible() {
     )])
     .unwrap();
     assert_eq!(ecology.clauses.len(), 20);
-    assert!(ecology
-        .parse_fibers
-        .iter()
-        .all(|fiber| fiber.alternatives.len() == 2));
+    assert!(
+        ecology
+            .parse_fibers
+            .iter()
+            .all(|fiber| fiber.alternatives.len() == 2)
+    );
 
     let population = parse_fiber_population(&ecology.clauses, &ecology.parse_fibers);
     assert_eq!(population, BigUint::from(1u64 << 20));
@@ -465,12 +473,14 @@ fn a_deictic_clause_retains_its_caused_predecessor() {
         .unwrap()
         .unwrap();
     assert_eq!(thought.clauses.len(), 2, "{:#?}", thought.clauses);
-    assert!(thought
-        .selected()
-        .unwrap()
-        .text
-        .to_lowercase()
-        .contains("function"));
+    assert!(
+        thought
+            .selected()
+            .unwrap()
+            .text
+            .to_lowercase()
+            .contains("function")
+    );
 }
 
 #[test]
@@ -553,10 +563,12 @@ fn modal_coordinate_ellipsis_preserves_two_relations_and_lawful_passive_case() {
         "We could up the scale of training and condition the machine on our conversation log history.",
     )];
     let ecology = ExactRelationalLanguageEcology::condition(&passages).unwrap();
-    assert!(ecology
-        .clauses()
-        .iter()
-        .any(|clause| clause.relation == "up" && clause.modality.as_deref() == Some("could")));
+    assert!(
+        ecology
+            .clauses()
+            .iter()
+            .any(|clause| clause.relation == "up" && clause.modality.as_deref() == Some("could"))
+    );
     assert!(ecology.clauses().iter().any(|clause| {
         clause.relation == "condition" && clause.modality.as_deref() == Some("could")
     }));
@@ -587,6 +599,20 @@ fn modal_coordinate_ellipsis_preserves_two_relations_and_lawful_passive_case() {
         .expect("the modal question retains its subject and object regions");
     assert!(modal_question.is_closed());
     assert_eq!(modal_question.required_entity_regions.len(), 2);
+}
+
+#[test]
+fn nominal_coordinate_does_not_become_a_carried_modal_relation() {
+    let passage = MorphologicalLanguagePassage::new(
+        "nominal-coordinate",
+        "nominal-coordinate-source",
+        42,
+        "I would like you to combine group structures, hypergeometry, and manifold usage.",
+    );
+    let clauses = relational_passage_clauses(&passage).unwrap();
+    assert_eq!(clauses.len(), 1);
+    assert_eq!(clauses[0].relation, "like");
+    assert!(!clauses.iter().any(|clause| clause.relation == "manifold"));
 }
 
 #[test]
@@ -739,13 +765,15 @@ fn one_to_one_junction_returns_preserve_successors_across_later_histories() {
     let receipt = boundary.execution_receipt();
     assert_eq!(receipt.pending_junctions, 0);
     assert!(boundary.current_passages.is_empty());
-    assert!(boundary
-        .junction_returns
-        .iter()
-        .all(|(_, returned)| matches!(
-            returned.conduct(),
-            ResonanceOccurrenceConduct::Open { .. }
-        )));
+    assert!(
+        boundary
+            .junction_returns
+            .iter()
+            .all(|(_, returned)| matches!(
+                returned.conduct(),
+                ResonanceOccurrenceConduct::Open { .. }
+            ))
+    );
 
     // A later occurrence recurs through the retained receptor while every exact candidate
     // retains its own source identity.
@@ -803,11 +831,13 @@ fn plural_junction_candidates_return_one_to_one_without_a_phase_representative()
         .receive_configuration(&candidates, action)
         .unwrap();
     assert_eq!(returned.reads().len(), candidates.len());
-    assert!(returned
-        .reads()
-        .iter()
-        .zip(&candidates)
-        .all(|(read, candidate)| read.occurrence() == candidate.identity()));
+    assert!(
+        returned
+            .reads()
+            .iter()
+            .zip(&candidates)
+            .all(|(read, candidate)| read.occurrence() == candidate.identity())
+    );
     for (read, candidate) in returned.reads().iter().zip(&candidates) {
         let returned_germ = candidate
             .germs()

@@ -5,7 +5,7 @@
 
 use holonic_engine::{
     category::BoundaryId,
-    phoenix::heterogeneous_fusion::{
+    native_ecology::heterogeneous_fusion::{
         HeterogeneousFusionRest, PortDeclaration, SharedWorldGenerator, SourcePortResponse,
     },
 };
@@ -19,21 +19,24 @@ fn the_same_owner_admits_an_audio_port_without_changing_the_fusion_law() {
     let ports = [BoundaryId(11), BoundaryId(29), BoundaryId(47)];
     let responses = (0..2)
         .flat_map(|family| {
-            ports.into_iter().enumerate().flat_map(move |(boundary_at, boundary)| {
-                (0..2).map(move |state| {
-                    let mark = 1 + family * 6 + boundary_at as u32 * 2 + state;
-                    SourcePortResponse {
-                        family,
-                        state,
-                        boundary,
-                        occurrence: format!("family-{family}/state-{state}/{boundary:?}"),
-                        occurrence_sha256: sha(mark),
-                        consequence_sha256: sha(mark + 32),
-                        incidence_sha256: sha(mark + 64),
-                        semantic_units: 1,
-                    }
+            ports
+                .into_iter()
+                .enumerate()
+                .flat_map(move |(boundary_at, boundary)| {
+                    (0..2).map(move |state| {
+                        let mark = 1 + family * 6 + boundary_at as u32 * 2 + state;
+                        SourcePortResponse {
+                            family,
+                            state,
+                            boundary,
+                            occurrence: format!("family-{family}/state-{state}/{boundary:?}"),
+                            occurrence_sha256: sha(mark),
+                            consequence_sha256: sha(mark + 32),
+                            incidence_sha256: sha(mark + 64),
+                            semantic_units: 1,
+                        }
+                    })
                 })
-            })
         })
         .collect();
     let rest = HeterogeneousFusionRest::found(

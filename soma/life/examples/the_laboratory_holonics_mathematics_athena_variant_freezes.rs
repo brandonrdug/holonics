@@ -33,7 +33,10 @@ fn main() -> Result<(), String> {
         }
     }
     if !arguments.is_empty() {
-        return Err("usage: L4 Athena [--infer STANDING DECODER FIBRES INQUIRY OUTPUT | --manifest OUTPUT]".to_owned());
+        return Err(
+            "usage: L4 Athena [--infer STANDING DECODER FIBRES INQUIRY OUTPUT | --manifest OUTPUT]"
+                .to_owned(),
+        );
     }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../..")

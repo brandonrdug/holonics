@@ -13,9 +13,9 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use super::{
-    json_record::parse_record, ContainerLineageFaces, CorrespondenceFibres, DeviceContactReceipt,
-    Digest32, ExchangeContainer, ExchangeRecord, ExchangeWorldTube, ExcludedPopulation,
-    GlobalFieldFace, GlobalNode, ScalarContactSite,
+    ContainerLineageFaces, CorrespondenceFibres, DeviceContactReceipt, Digest32, ExchangeContainer,
+    ExchangeRecord, ExchangeWorldTube, ExcludedPopulation, GlobalFieldFace, GlobalNode,
+    ScalarContactSite, json_record::parse_record,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

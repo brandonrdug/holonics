@@ -64,8 +64,12 @@ pub fn construct(root: &Path) -> Result<(), String> {
     fs::write(&f2_path, f2_proof.as_bytes()).map_err(|error| error.to_string())?;
     let flux_lean = run_lean(root, &flux_path, "oriented-face")?;
     let f2_lean = run_lean(root, &f2_path, "f2-coordinate")?;
-    let flux_lean_bytes = artifact::write_json(output.join("04-oriented-face-world-return.json"), &flux_lean)?;
-    let f2_lean_bytes = artifact::write_json(output.join("05-f2-coordinate-world-return.json"), &f2_lean)?;
+    let flux_lean_bytes = artifact::write_json(
+        output.join("04-oriented-face-world-return.json"),
+        &flux_lean,
+    )?;
+    let f2_lean_bytes =
+        artifact::write_json(output.join("05-f2-coordinate-world-return.json"), &f2_lean)?;
     let flux_occurrence = format!("l1/world/lean/{}", artifact::digest(&flux_lean_bytes));
     let f2_occurrence = format!("l1/world/lean/{}", artifact::digest(&f2_lean_bytes));
     let flux_plate = plate(
@@ -120,7 +124,10 @@ pub fn construct(root: &Path) -> Result<(), String> {
     if midpoint.selected_route != vec![1, 0] || midpoint.joint_cultivated {
         return Err("one returned family incorrectly reached the composed route".to_owned());
     }
-    artifact::write_json(output.join("06-one-family-midpoint.json"), &device_receipt(&midpoint))?;
+    artifact::write_json(
+        output.join("06-one-family-midpoint.json"),
+        &device_receipt(&midpoint),
+    )?;
     let cultivated = one_family
         .commit_return(
             f2_return,
@@ -164,8 +171,22 @@ pub fn construct(root: &Path) -> Result<(), String> {
     fs::create_dir_all(&heldout_output).map_err(|error| error.to_string())?;
     fs::create_dir_all(&separator_output).map_err(|error| error.to_string())?;
     let executable = std::env::current_exe().map_err(|error| error.to_string())?;
-    run_detached(&executable, &standing, &decoder, &fibres, &heldout_path, &heldout_output)?;
-    run_detached(&executable, &standing, &decoder, &fibres, &separator_path, &separator_output)?;
+    run_detached(
+        &executable,
+        &standing,
+        &decoder,
+        &fibres,
+        &heldout_path,
+        &heldout_output,
+    )?;
+    run_detached(
+        &executable,
+        &standing,
+        &decoder,
+        &fibres,
+        &separator_path,
+        &separator_output,
+    )?;
     let later: Value = read_json(&heldout_output.join("00-return.json"))?;
     let separated: Value = read_json(&separator_output.join("00-return.json"))?;
     if later["joint_cultivated"] != true
@@ -180,7 +201,10 @@ pub fn construct(root: &Path) -> Result<(), String> {
         &heldout_output.join("02-returned-proof.lean"),
         "composed-heldout",
     )?;
-    artifact::write_json(output.join("09-composed-theorem-world-return.json"), &composed_lean)?;
+    artifact::write_json(
+        output.join("09-composed-theorem-world-return.json"),
+        &composed_lean,
+    )?;
 
     let controls = json!({
         "schema": "holonics.l1.route-separation-controls.v1",
@@ -358,7 +382,9 @@ fn run_detached(
     inquiry: &Path,
     output: &Path,
 ) -> Result<(), String> {
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let standing = standing.canonicalize().map_err(|error| error.to_string())?;
     let decoder = decoder.canonicalize().map_err(|error| error.to_string())?;
     let fibres = fibres.canonicalize().map_err(|error| error.to_string())?;
@@ -382,18 +408,43 @@ fn run_detached(
         }
     }
     command
-        .arg("--ro-bind").arg(executable).arg("/athena")
-        .arg("--ro-bind").arg(standing).arg("/rest/standing.bin")
-        .arg("--ro-bind").arg(decoder).arg("/rest/decoder.bin")
-        .arg("--ro-bind").arg(fibres).arg("/rest/fibres.bin")
-        .arg("--ro-bind").arg(inquiry).arg("/input/inquiry.json")
-        .arg("--bind").arg(output).arg("/return")
-        .args(["--chdir", "/tmp", "/athena", "--infer", "/rest/standing.bin", "/rest/decoder.bin", "/rest/fibres.bin", "/input/inquiry.json", "/return"])
+        .arg("--ro-bind")
+        .arg(executable)
+        .arg("/athena")
+        .arg("--ro-bind")
+        .arg(standing)
+        .arg("/rest/standing.bin")
+        .arg("--ro-bind")
+        .arg(decoder)
+        .arg("/rest/decoder.bin")
+        .arg("--ro-bind")
+        .arg(fibres)
+        .arg("/rest/fibres.bin")
+        .arg("--ro-bind")
+        .arg(inquiry)
+        .arg("/input/inquiry.json")
+        .arg("--bind")
+        .arg(output)
+        .arg("/return")
+        .args([
+            "--chdir",
+            "/tmp",
+            "/athena",
+            "--infer",
+            "/rest/standing.bin",
+            "/rest/decoder.bin",
+            "/rest/fibres.bin",
+            "/input/inquiry.json",
+            "/return",
+        ])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     let returned = command.output().map_err(|error| error.to_string())?;
     if !returned.status.success() {
-        return Err(format!("fresh-process L1 inference refused: {}", String::from_utf8_lossy(&returned.stderr)));
+        return Err(format!(
+            "fresh-process L1 inference refused: {}",
+            String::from_utf8_lossy(&returned.stderr)
+        ));
     }
     Ok(())
 }
@@ -406,9 +457,17 @@ fn cost_receipt(
     fibres: &Path,
 ) -> Result<Value, String> {
     let cultivated_work = later["resident_passage"]["semantic_work"]
-        .as_str().and_then(|value| value.parse::<u64>().ok()).ok_or("cultivated work absent")?;
-    let cultivated_span = later["resident_passage"]["semantic_span"].as_u64().ok_or("cultivated span absent")?;
-    let cultivated_route = if later["joint_cultivated"] == true { 1 } else { 6 };
+        .as_str()
+        .and_then(|value| value.parse::<u64>().ok())
+        .ok_or("cultivated work absent")?;
+    let cultivated_span = later["resident_passage"]["semantic_span"]
+        .as_u64()
+        .ok_or("cultivated span absent")?;
+    let cultivated_route = if later["joint_cultivated"] == true {
+        1
+    } else {
+        6
+    };
     if !(cultivated_work < expanded.semantic_work as u64
         && cultivated_span < expanded.semantic_span
         && cultivated_route < 6)
@@ -433,7 +492,12 @@ fn cost_receipt(
     }))
 }
 
-fn capability_report(inquiry: &FamilyInquiry, _later: &Value, separated: &Value, cost: &Value) -> String {
+fn capability_report(
+    inquiry: &FamilyInquiry,
+    _later: &Value,
+    separated: &Value,
+    cost: &Value,
+) -> String {
     format!(
         "# L1 capability report\n\n[established-bounded] Two causally distinct theorem families now cultivate one continuing Athena rest through the same label-free fixed-section law. The integer oriented-face family and F₂ additive-coordinate family each carry `A`, `C`, `L`, an identity receiver metric and the exact certificate `(A-I)=L·C`. Their disjoint supports commute by an exact interchange receipt.\n\n[measured] The source-detached held-out inquiry `{}` returned both local condensed routes and newly reached composed route `[5]`; Lean accepted its combined successor theorem. Removing either plate reopens only the composed route while the other local route remains cultivated. The residual control returned routes `{}`.\n\n[implemented-exact] The local complete route descends from six edges/work 46/span 8 to one edge/work 16/span 5. The exact aperture is `{}`.\n\n[open] L2 remains responsible for condensing the recurring family ecology into a smaller generator-native complete product.\n",
         inquiry.occurrence,
@@ -455,14 +519,54 @@ fn grade(
     first_withdrawal: &life::mathematical_particle::FamilyWithdrawalReceipt,
 ) -> Result<Value, String> {
     let checks = vec![
-        ("multiple causally distinct Lean theorem families returned", composed_lean["accepted"] == true && later["rest_sha256"] == cultivated_identity),
-        ("deltas have exact disjoint local support and typed interchange", later["resident_passage"]["exact_interchange"]["supports_disjoint"] == true),
-        ("later inquiry revisits retained chronology", later["inquiry_occurrence"].as_str().is_some_and(|value| value.starts_with("l1/inquiry/"))),
-        ("later composed theorem route became newly reachable", !expanded.joint_cultivated && !midpoint.joint_cultivated && later["joint_cultivated"] == true),
-        ("equal-answer/different-route and future controls stay separate", controls["equal_total_different_oriented_sections"]["source_and_section_equal"] == false && separated["selected_routes"] == json!([2,2])),
-        ("source-detached remount preserves familywise conduct", later["source_repository_proof_and_exchange_mounted"] == false && later["forbidden_source_access"].as_array().is_some_and(Vec::is_empty)),
-        ("targeted family ablations remove only attributable consequences", later["targeted_ablations"].as_array().is_some_and(|rows| rows.len() == 2 && rows.iter().all(|row| row["unwithdrawn_family_retained"] == true && row["joint_cultivated"] == false))),
-        ("one continuing owner and exact withdrawal throughout", second_withdrawal.exact_immediate_predecessor_restored && first_withdrawal.exact_immediate_predecessor_restored),
+        (
+            "multiple causally distinct Lean theorem families returned",
+            composed_lean["accepted"] == true && later["rest_sha256"] == cultivated_identity,
+        ),
+        (
+            "deltas have exact disjoint local support and typed interchange",
+            later["resident_passage"]["exact_interchange"]["supports_disjoint"] == true,
+        ),
+        (
+            "later inquiry revisits retained chronology",
+            later["inquiry_occurrence"]
+                .as_str()
+                .is_some_and(|value| value.starts_with("l1/inquiry/")),
+        ),
+        (
+            "later composed theorem route became newly reachable",
+            !expanded.joint_cultivated
+                && !midpoint.joint_cultivated
+                && later["joint_cultivated"] == true,
+        ),
+        (
+            "equal-answer/different-route and future controls stay separate",
+            controls["equal_total_different_oriented_sections"]["source_and_section_equal"]
+                == false
+                && separated["selected_routes"] == json!([2, 2]),
+        ),
+        (
+            "source-detached remount preserves familywise conduct",
+            later["source_repository_proof_and_exchange_mounted"] == false
+                && later["forbidden_source_access"]
+                    .as_array()
+                    .is_some_and(Vec::is_empty),
+        ),
+        (
+            "targeted family ablations remove only attributable consequences",
+            later["targeted_ablations"].as_array().is_some_and(|rows| {
+                rows.len() == 2
+                    && rows.iter().all(|row| {
+                        row["unwithdrawn_family_retained"] == true
+                            && row["joint_cultivated"] == false
+                    })
+            }),
+        ),
+        (
+            "one continuing owner and exact withdrawal throughout",
+            second_withdrawal.exact_immediate_predecessor_restored
+                && first_withdrawal.exact_immediate_predecessor_restored,
+        ),
     ];
     if checks.iter().any(|check| !check.1) {
         return Err(format!("L1 eight-part grade refused: {checks:?}"));

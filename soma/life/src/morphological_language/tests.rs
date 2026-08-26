@@ -244,12 +244,10 @@ fn a_native_organ_face_opens_an_obligation_without_transcription() {
     let charge = ecology
         .charge_with_native_features("What changes?", &face)
         .unwrap();
-    assert!(
-        charge
-            .obligations
-            .iter()
-            .any(|obligation| obligation.features.contains("native-face-a"))
-    );
+    assert!(charge
+        .obligations
+        .iter()
+        .any(|obligation| obligation.features.contains("native-face-a")));
     assert!(!charge.prompt.contains("native-face-a"));
 }
 
@@ -323,11 +321,9 @@ fn exact_recurrent_edges_deposit_only_across_distinct_exterior_sources() {
         panic!("the same exact transport across two sources must deposit");
     };
     assert!(conducting.deposit_count() > 0);
-    assert!(
-        conducting
-            .deposits()
-            .all(|deposit| deposit.exterior_sources().len() >= 2)
-    );
+    assert!(conducting
+        .deposits()
+        .all(|deposit| deposit.exterior_sources().len() >= 2));
 
     let one_source = MorphologicalLanguageEcology::condition(
         &[
@@ -511,12 +507,10 @@ fn plural_terminal_witnesses_return_without_semantic_truncation() {
         generation.reflection.terminal_return_materializations,
         generation.outputs.len()
     );
-    assert!(
-        generation
-            .outputs
-            .iter()
-            .all(|output| !output.tokens.is_empty())
-    );
+    assert!(generation
+        .outputs
+        .iter()
+        .all(|output| !output.tokens.is_empty()));
 }
 
 #[test]
@@ -652,11 +646,9 @@ fn recurring_question_initial_phase_is_conditioned_as_operator_morphology() {
         .collect::<BTreeSet<_>>();
     assert!(!obligated.contains("how"));
     assert!(!obligated.contains("does"));
-    assert!(
-        ["training", "morphology", "uncertainty"]
-            .into_iter()
-            .all(|feature| obligated.contains(feature))
-    );
+    assert!(["training", "morphology", "uncertainty"]
+        .into_iter()
+        .all(|feature| obligated.contains(feature)));
 }
 
 #[test]
@@ -683,11 +675,9 @@ fn question_operator_recurrence_is_not_forced_to_the_source_file_scale() {
         charge.operator_features,
         ["does", "how"].into_iter().map(str::to_owned).collect()
     );
-    assert!(
-        ecology
-            .question_operator_regions()
-            .contains(&vec!["how".to_owned(), "does".to_owned()])
-    );
+    assert!(ecology
+        .question_operator_regions()
+        .contains(&vec!["how".to_owned(), "does".to_owned()]));
 
     let (anchored, legacy, legacy_cloned_tokens) = ecology.question_prefix_audit();
     assert_eq!(

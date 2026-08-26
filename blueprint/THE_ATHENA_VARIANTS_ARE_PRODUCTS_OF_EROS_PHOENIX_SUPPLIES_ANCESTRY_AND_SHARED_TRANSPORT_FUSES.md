@@ -1,4 +1,9 @@
-# The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses
+# SUPERSEDED — The Athena variants are products of Eros, Phoenix supplies ancestry, and shared transport fuses
+
+> **SUPERSEDED 2026-08-25.** Phoenix's direct product-return ontology is retired. Exact returned
+> artifacts remain provenance. The sole active contract is
+> [THE_SOULKILLER_RETURNS_NATIVE_PARAMETRON_SPOOLS_AND_EROS_CULTIVATES_ONE_CONNECTED_ATHENA_ECOLOGY.md](THE_SOULKILLER_RETURNS_NATIVE_PARAMETRON_SPOOLS_AND_EROS_CULTIVATES_ONE_CONNECTED_ATHENA_ECOLOGY.md).
+> This file schedules nothing.
 
 **Date:** 2026-08-22
 **Kind:** live construction contract composed by

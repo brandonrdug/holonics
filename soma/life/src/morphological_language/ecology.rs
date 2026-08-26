@@ -2019,121 +2019,122 @@ impl MorphologicalLanguageEcology {
         let mut returned_at = 0usize;
         let mut expanded = Vec::with_capacity(prepared.len());
         for cell in prepared {
-            let opened = match cell.expansion {
-                PreparedExpansion::Events {
-                    mut state,
-                    candidates,
-                } => {
-                    let witness_population = state.population.witnesses.len();
-                    let mut opened = Vec::with_capacity(candidates.len());
-                    let mut withheld_candidates = LocalSequence::new();
-                    for mut event in candidates {
-                        let returned = returned_candidates.get(returned_at).ok_or(
+            let opened =
+                match cell.expansion {
+                    PreparedExpansion::Events {
+                        mut state,
+                        candidates,
+                    } => {
+                        let witness_population = state.population.witnesses.len();
+                        let mut opened = Vec::with_capacity(candidates.len());
+                        let mut withheld_candidates = LocalSequence::new();
+                        for mut event in candidates {
+                            let returned = returned_candidates.get(returned_at).ok_or(
                             MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "the card returned fewer candidate rows than the front shipped",
                             },
                         )?;
-                        if returned.candidate as usize != returned_at {
-                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-                                at: "a returned candidate ordinal is out of order",
+                            if returned.candidate as usize != returned_at {
+                                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                    at: "a returned candidate ordinal is out of order",
+                                }
+                                .into());
                             }
-                            .into());
-                        }
-                        if returned.face != cell.site {
-                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                            if returned.face != cell.site {
+                                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
                                 at: "a returned candidate face is not the site it was opened at",
                             }
                             .into());
-                        }
-                        if returned.key_rows as usize != event.conduct_candidates.len() {
-                            return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
-                                at: "the card read a different number of keys for a candidate \
-                                     than the front shipped for it",
                             }
-                            .into());
-                        }
-                        let candidate_edges = event
-                            .conduct_candidates
-                            .iter()
-                            .cloned()
-                            .collect::<LocalSequence<_>>();
-                        let mut attached = LocalSequence::new();
-                        let mut attached_set = LocalSet::new();
-                        let mut conducting_sources = BTreeSet::new();
-                        for deposit_at in &returned.active_deposits {
-                            let (edge, sources) = deposit_projection
+                            if returned.key_rows as usize != event.conduct_candidates.len() {
+                                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                    at: "the card read a different number of keys for a candidate \
+                                     than the front shipped for it",
+                                }
+                                .into());
+                            }
+                            let candidate_edges = event
+                                .conduct_candidates
+                                .iter()
+                                .cloned()
+                                .collect::<LocalSequence<_>>();
+                            let mut attached = LocalSequence::new();
+                            let mut attached_set = LocalSet::new();
+                            let mut conducting_sources = BTreeSet::new();
+                            for deposit_at in &returned.active_deposits {
+                                let (edge, sources) = deposit_projection
                                 .get(*deposit_at as usize)
                                 .ok_or(MorphologicalConductCudaError::InvalidDeviceReturn {
                                     at: "a returned deposit ordinal is outside the shipped sheet",
                                 })?;
-                            if !event.conduct_candidates.contains(edge)
-                                || !attached_set.insert(edge.clone())
-                            {
-                                return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
+                                if !event.conduct_candidates.contains(edge)
+                                    || !attached_set.insert(edge.clone())
+                                {
+                                    return Err(MorphologicalConductCudaError::InvalidDeviceReturn {
                                     at: "the card attached a deposit this candidate did not carry, \
                                          or attached one twice",
                                 }
                                 .into());
+                                }
+                                attached.push(edge.clone());
+                                conducting_sources.extend(sources.iter().cloned());
                             }
-                            attached.push(edge.clone());
-                            conducting_sources.extend(sources.iter().cloned());
+                            let candidate = runtime.next_candidate;
+                            runtime.next_candidate = runtime
+                                .next_candidate
+                                .checked_add(1)
+                                .ok_or(MorphologicalLanguageError::CarrierExtent)?;
+                            runtime
+                                .dispositions
+                                .push(MorphologicalConductTransitionDisposition {
+                                    chronology,
+                                    candidate,
+                                    surface: event.token.clone(),
+                                    witness_population,
+                                    candidate_edges,
+                                    attached_deposits: attached,
+                                });
+                            returned_at += 1;
+                            if attached_set.is_empty() {
+                                // Withheld, retained, never emitted. The complete fiber is a real
+                                // object and is not a return.
+                                withheld_candidates.push(candidate);
+                                continue;
+                            }
+                            event.conducting_supports = attached_set;
+                            event.conducting_sources = conducting_sources;
+                            let mut successor = state.fork();
+                            self.enact_event(
+                                charge,
+                                &mut successor,
+                                event,
+                                MorphologicalTransport::RecurrentLexical,
+                            )?;
+                            opened.push(ExpandedCurrent::forked(successor));
                         }
-                        let candidate = runtime.next_candidate;
-                        runtime.next_candidate = runtime
-                            .next_candidate
-                            .checked_add(1)
-                            .ok_or(MorphologicalLanguageError::CarrierExtent)?;
-                        runtime
-                            .dispositions
-                            .push(MorphologicalConductTransitionDisposition {
-                                chronology,
-                                candidate,
-                                surface: event.token.clone(),
-                                witness_population,
-                                candidate_edges,
-                                attached_deposits: attached,
+                        if opened.is_empty() {
+                            // **Where nothing conducts, the return is the obstruction with its
+                            // address.** This cell's whole current used to be dropped here — it entered
+                            // neither the pending front nor the rested population, so a receiver could
+                            // not tell a branch the deposits refused from one that never existed. It
+                            // now comes to rest as `Obstructed` and is returned among the outputs, and
+                            // the candidates it withheld are named by ordinal in the receipt.
+                            self.finish_active_phase(charge, &mut state, None)?;
+                            state.current.rest = Some(MorphologicalResponseRest::Obstructed {
+                                open_obligations: open_face_indices(&state.current.open_faces),
                             });
-                        returned_at += 1;
-                        if attached_set.is_empty() {
-                            // Withheld, retained, never emitted. The complete fiber is a real
-                            // object and is not a return.
-                            withheld_candidates.push(candidate);
-                            continue;
+                            runtime.obstructions.push(MorphologicalConductObstruction {
+                                chronology,
+                                site: cell.site,
+                                witness_population,
+                                withheld_candidates,
+                            });
+                            opened.push(ExpandedCurrent::carried(state));
                         }
-                        event.conducting_supports = attached_set;
-                        event.conducting_sources = conducting_sources;
-                        let mut successor = state.fork();
-                        self.enact_event(
-                            charge,
-                            &mut successor,
-                            event,
-                            MorphologicalTransport::RecurrentLexical,
-                        )?;
-                        opened.push(ExpandedCurrent::forked(successor));
+                        opened
                     }
-                    if opened.is_empty() {
-                        // **Where nothing conducts, the return is the obstruction with its
-                        // address.** This cell's whole current used to be dropped here — it entered
-                        // neither the pending front nor the rested population, so a receiver could
-                        // not tell a branch the deposits refused from one that never existed. It
-                        // now comes to rest as `Obstructed` and is returned among the outputs, and
-                        // the candidates it withheld are named by ordinal in the receipt.
-                        self.finish_active_phase(charge, &mut state, None)?;
-                        state.current.rest = Some(MorphologicalResponseRest::Obstructed {
-                            open_obligations: open_face_indices(&state.current.open_faces),
-                        });
-                        runtime.obstructions.push(MorphologicalConductObstruction {
-                            chronology,
-                            site: cell.site,
-                            witness_population,
-                            withheld_candidates,
-                        });
-                        opened.push(ExpandedCurrent::carried(state));
-                    }
-                    opened
-                }
-                other => self.materialize_complete(charge, other)?,
-            };
+                    other => self.materialize_complete(charge, other)?,
+                };
             expanded.push(ExpandedCell {
                 site: cell.site,
                 co_present: cell.branch_population.saturating_mul(opened.len() as u64),

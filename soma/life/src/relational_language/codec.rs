@@ -59,7 +59,15 @@ pub(super) fn split_coordinated_clause_words(
         let left_clause = parse_clause("coordination-left".to_owned(), passage, &left)?;
         let mut right_clause = parse_clause("coordination-right".to_owned(), passage, &right)?;
         let mut carried_right = right.clone();
-        if right_clause.is_none() && left_clause.is_some() {
+        // Subject/modal ellipsis is admitted only when the right limb already presents a founded
+        // predicate. Otherwise a nominal list such as `families, hypergeometry, and manifold
+        // usage` is falsely turned into `I would manifold usage` merely because the carried modal
+        // lets any following word occupy a verb slot. Unknown right limbs remain inside the
+        // original object's open reconstruction fibre.
+        let right_begins_with_founded_predicate = lower
+            .get(at + 1)
+            .is_some_and(|word| is_be(word) || is_likely_finite_relation(word));
+        if right_clause.is_none() && left_clause.is_some() && right_begins_with_founded_predicate {
             if let Some(prefix) = coordinated_subject_prefix(&left) {
                 carried_right = prefix;
                 carried_right.extend(right.iter().cloned());
@@ -179,8 +187,11 @@ pub(super) fn parse_clause(
             let subject_end = if modality.is_some() { be_at - 1 } else { be_at };
             let relation_at = be_at + 1;
             if is_participle(&lower[relation_at]) {
-                if let Some(preposition_at) =
-                    (relation_at + 1..lower.len()).find(|at| is_relational_preposition(&lower[*at]))
+                // `to` opens an infinitive complement in `authorized to prune` and `encouraged to
+                // think`; it does not present a passive agent. Other witnessed passive transports
+                // (`formed from`, `carried through`, `built by`) retain the inherited relation.
+                if let Some(preposition_at) = (relation_at + 1..lower.len())
+                    .find(|at| lower[*at] != "to" && is_relational_preposition(&lower[*at]))
                 {
                     if preposition_at + 1 < words.len() {
                         let passive_subject = entity(&words[..subject_end]);
@@ -330,6 +341,19 @@ pub(super) fn question_entity_regions(
         {
             let region = entity_identity(&words[be_at + 1..]);
             return (!region.is_empty()).then_some(region).into_iter().collect();
+        }
+    }
+    // An imperative relation opens the same receiver as its interrogative paraphrase.  The
+    // leading predicate is apparatus phase ("describe X", "infer X"), not part of the entity
+    // region whose native incidence must return.
+    if words.len() > 1 {
+        let leading = verb_lemma(&lower[0]);
+        if predicate_lexicon.contains(&leading) || inherited_predicate_lexicon().contains(&leading)
+        {
+            let region = entity_identity(&words[1..]);
+            if !region.is_empty() {
+                return vec![region];
+            }
         }
     }
     let auxiliary_at = lower.iter().position(|word| is_auxiliary(word));
@@ -488,6 +512,15 @@ pub(super) fn question_requested_relations(
 /// need to collapse the visible question into one opaque search string.
 pub fn relational_question_regions(question: &str) -> Vec<BTreeSet<String>> {
     question_entity_regions(question, &inherited_predicate_lexicon())
+}
+
+/// Transduce one exterior delivery into oriented relational incidence without admitting the
+/// delivery surface into the continuing ecology.  Callers which cultivate another native owner
+/// must consume these clauses immediately and discard their passage/source testimony.
+pub fn relational_passage_clauses(
+    passage: &MorphologicalLanguagePassage,
+) -> Result<Vec<RelationalClause>, RelationalLanguageError> {
+    Ok(propose_relational_passage(passage)?.clauses.into_inner())
 }
 
 /// Form the simultaneous higher- and lower-grain receiver frontier for open deliberation.
@@ -1284,6 +1317,7 @@ pub(super) fn inherited_predicate_lexicon() -> LocalSet<String> {
         "construct",
         "define",
         "derive",
+        "describe",
         "emit",
         "falsify",
         "form",
@@ -1291,6 +1325,7 @@ pub(super) fn inherited_predicate_lexicon() -> LocalSet<String> {
         "generate",
         "have",
         "invoke",
+        "infer",
         "make",
         "mean",
         "open",

@@ -2,8 +2,8 @@ use holonic_engine::receiver_exact_compression::{compress, Observation};
 use sha2::{Digest, Sha256};
 
 use super::{
-    AddressedHistorySystem, CultivatedActionLineage, HistoricalInterior,
-    LongHorizonBoundaryError, LongHorizonRetainedBoundary,
+    AddressedHistorySystem, CultivatedActionLineage, HistoricalInterior, LongHorizonBoundaryError,
+    LongHorizonRetainedBoundary,
 };
 
 fn digest(bytes: &[u8]) -> String {
@@ -62,19 +62,17 @@ fn every_future_factors_while_the_richer_receiver_reopens_the_interior() {
     assert_eq!(boundary.standing.native_states.len(), 3);
     assert_eq!(boundary.fibres.fibres.len(), 3);
     assert!(!boundary.fibres.shortest_separators.is_empty());
-    assert_eq!(
-        boundary.standing.ordered_holonomy.left_endpoint.0,
-        2
-    );
-    assert_eq!(
-        boundary.standing.ordered_holonomy.right_endpoint.0,
-        0
-    );
+    assert_eq!(boundary.standing.ordered_holonomy.left_endpoint.0, 2);
+    assert_eq!(boundary.standing.ordered_holonomy.right_endpoint.0, 0);
     let reconstructed = boundary
         .reconstruct_history("later")
         .expect("the remote predecessor reopens");
-    assert!(reconstructed.windows(19).any(|window| window == b"remote construction"));
-    assert!(reconstructed.windows(11).any(|window| window == b"later proof"));
+    assert!(reconstructed
+        .windows(19)
+        .any(|window| window == b"remote construction"));
+    assert!(reconstructed
+        .windows(11)
+        .any(|window| window == b"later proof"));
 
     let standing = boundary.standing_bytes().expect("standing");
     let decoder = boundary.decoder_bytes().expect("decoder");

@@ -4,9 +4,8 @@ use std::path::Path;
 use std::time::Instant;
 
 use holonic_engine::{
-    category::BoundaryId,
-    cuda_refine::CudaRefineExecutor,
-    phoenix::inference_ecology::InferenceEcologyRest,
+    category::BoundaryId, cuda_refine::CudaRefineExecutor,
+    native_ecology::inference_ecology::InferenceEcologyRest,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

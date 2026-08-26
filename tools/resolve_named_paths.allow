@@ -21,26 +21,9 @@ canon/THE_DOCUMENT_LAW.md :: evidence/observations/ :: named as the archived loc
 # is not a claim about this tree.
 
 # --- Named permanent losses. These resolve at no commit in either repository. ---
-CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/morphology-atlas/ :: same loss, recorded in the verified-position section as the third of its kind; the parent now holds a distinct later return
 canon/THE_RECOVERED_LAW.md :: src/soma/runs/ :: the untracked laboratory directory that took the tiger figures and the semantics theorem with it; the citation is the point
 
 # --- Current-position runtime receipts under the gitignored output root ---
-# These are addressed executable returns, not files shipped in a clean clone.  The resolver must
-# classify them independently of whether this machine has run the deed or a release worktree has
-# mounted the ignored output root through a symlink.
-CONSTRUCTION_STATE.md :: output/the_deposit_licenses_the_re_emission :: gitignored runtime grade directory named by the admitted-position record
-CONSTRUCTION_STATE.md :: output/arithmetic-dimensional-receiver/ :: gitignored later runtime return explicitly distinguished from the permanently lost morphology atlas above
-
-# --- The roadmap's own diagnosis of this movement's defect ---
-# THE_ROADMAP.md's table has one column of bare C++ header names and one column showing
-# where each actually resolves. The bare names are the DEFECT BEING REPORTED. Rewriting
-# them would erase the finding.
-blueprint/THE_ROADMAP.md :: body/live_machine.hpp :: left column of the roadmap's own table of headers named as live by an authority file
-blueprint/THE_ROADMAP.md :: body/spine_execute.hpp :: same table
-blueprint/THE_ROADMAP.md :: structure/transition_invariants.hpp :: same table
-blueprint/THE_ROADMAP.md :: event/checker_return_schema.hpp :: same table
-blueprint/THE_ROADMAP.md :: structure/chi_pair.hpp :: same table
-blueprint/THE_ROADMAP.md :: exact/enclosure.hpp :: same table
 
 # --- Owners removed by an excision, recoverable only from git history ---
 # CLAUDE.md §13 names each with the commit that deleted it, so a reader can check with
@@ -50,17 +33,7 @@ canon/THE_CONTRACT_PROVENANCE.md :: conditioning_law.hpp :: deleted at 2b562c8; 
 canon/THE_CONTRACT_PROVENANCE.md :: conditioning_schema.hpp :: deleted at 2b562c8; same
 canon/THE_CONTRACT_PROVENANCE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; same
 
-# --- Runtime artifact names, not repository paths ---
-# A driver writes or reads these at run time; they are outputs under a gitignored directory.
-blueprint/THE_ROADMAP.md :: source-sha256.tsv :: read at run time by mms_reconnection_traversal.rs:1443
-blueprint/THE_ROADMAP.md :: summary.tsv :: written at run time by whole_receiver_holonic_complex.rs:74-87
-blueprint/THE_ROADMAP.md :: causal_layers.tsv :: same driver
-blueprint/THE_ROADMAP.md :: grain_cells.tsv :: same driver
-blueprint/THE_ROADMAP.md :: quotients.tsv :: same driver
-blueprint/THE_ROADMAP.md :: overlap_nerve.tsv :: same driver
-
 # --- A path a movement proposes to create ---
-blueprint/THE_ROADMAP.md :: crates/holonic-engine/src/homology.rs :: the integer-homology movement's target; absent by design until it is built
 blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md :: soma/tools/eros/ :: the Phoenix blueprint's named exterior application target; absent by design until its construction station
 
 # --- Genre filename in a section stating the genre is empty ---
@@ -89,8 +62,6 @@ canon/THE_QUOTE_NETWORK.md :: target/holonic-engine/curved-receiver-phase-atlas-
 # pattern or a directory KIND ("generated `.lake/` build output is ignored"), never as a path a
 # reader should open. It cannot resolve here even where it physically exists, because its only
 # contents are `build/` and `packages/` — both in this checker's own PRUNED set.
-CONSTRUCTION_STATE.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
-blueprint/THE_ROADMAP.md :: .lake/ :: Lake's generated-artifact directory, quoted as an ignore pattern; its contents are inside the checker's PRUNED set
 canon/THE_QUOTE_NETWORK.md :: target/debug/deps :: gitignored Cargo test-binary directory quoted as measured runtime provenance
 
 # --- Laboratory owners deleted BY the pinned commit, and one permanent loss ---
@@ -107,7 +78,6 @@ canon/THE_DIALECT.md :: tool-results/ :: same — the other Claude Code runtime 
 
 # --- The laboratory's deleted fluid solver, named to be superseded (2026-08-08) ---
 canon/TABLET_THE_FLOW.md :: holo_fluid.rs :: deliberately absent from the live tree. A complete exact-rational Navier-Stokes body, Brandon's own commit 2026-06-25, surviving ONLY at laboratory commit b3d83376 -- not at a07ff376 and not at its parent. The tablet names it to record its Kelvin-circulation thesis and to state Brandon's 2026-08-08 ruling that it be LIFTED AND SUPERSEDED rather than restored. Naming an absent partial in order to supersede it is the conduct the tablet is documenting.
-blueprint/THE_ROADMAP.md :: holo_fluid.rs :: the same deliberately-absent laboratory partial the tablet names, cited here in the movement that lifts its Kelvin-circulation thesis. Survives only at laboratory commit b3d83376; Brandon ruled 2026-08-08 that it be lifted and superseded, never restored.
 canon/THE_MEASURED_CAPABILITIES.md :: runs/dialogue-distractor-scaling/REPORT.json :: unrecoverable by design -- this file names it inside its own do-not-cite table. `runs/` was never tracked in either repository and resolves at no commit; naming it is how a reader is stopped from citing it again.
 
 # --- Build and driver artifacts: gitignored, so present only where a driver has been run ---
@@ -116,7 +86,6 @@ canon/THE_MEASURED_CAPABILITIES.md :: runs/dialogue-distractor-scaling/REPORT.js
 # whether a driver had been run locally would be a property of the machine, not of the commit.
 canon/THE_MEASURED_CAPABILITIES.md :: target/ :: the cargo build directory; named to say where the 96 driver binaries land
 canon/THE_MEASURED_CAPABILITIES.md :: runs/ :: the untracked laboratory directory whose figures are unrecoverable; naming it is how a reader is stopped from citing them
-blueprint/THE_ROADMAP.md :: target/ :: the cargo build directory, named as where a driver's binary is found
 
 
 # --- Struck by direct ruling, named so the striking is legible ---
@@ -126,5 +95,10 @@ canon/THE_CONTAMINANT_PROTOCOL.md :: tools/verify_quotes.py :: deleted 2026-08-0
 canon/THE_TIMELINE.md :: conditioning_law.hpp :: deleted at 2b562c8; §2 names that commit
 canon/THE_TIMELINE.md :: conditioning_schema.hpp :: deleted at 2b562c8; §2 names that commit
 canon/THE_TIMELINE.md :: returned_fiber_exclusion_law.hpp :: deleted at 2b562c8; §2 names that commit
-blueprint/THE_ROADMAP.md :: runs/eros-two-theorem-deed/ :: the laboratory's empty run directory for the two-theorem deed, named because its EMPTINESS is the evidence that neither body had run it. It does not resolve here because `runs/` is the laboratory's and is gitignored there.
 blueprint/THE_MACHINE.md :: crates/holonic-engine/src/lean_mathematics.rs :: named 2026-08-15 as the file a stale row asks about; the file no longer exists, which IS the measurement -- the row cannot be re-run because its subject is gone
+
+# --- H4 qualitative returns: gitignored, regenerated by the named native circulation deed ---
+CONSTRUCTION_STATE.md :: output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/06-grade.json :: gitignored structural apparatus grade produced by the admitted H4 driver; cited only as supporting evidence
+CONSTRUCTION_STATE.md :: output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/07-primary-qualitative-grade.json :: gitignored governing qualitative grade produced by the admitted H4 driver
+blueprint/THE_ROADMAP.md :: output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/06-grade.json :: gitignored structural apparatus grade produced by the admitted H4 driver; cited only as supporting evidence
+blueprint/THE_ROADMAP.md :: output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/07-primary-qualitative-grade.json :: gitignored governing qualitative grade produced by the admitted H4 driver

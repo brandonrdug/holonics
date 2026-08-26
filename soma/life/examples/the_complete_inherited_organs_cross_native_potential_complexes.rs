@@ -19,7 +19,7 @@ use std::time::Instant;
 
 use holonic_engine::category::BoundaryId;
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceJointMediaTransport};
-use holonic_engine::phoenix::heterogeneous_fusion::{
+use holonic_engine::native_ecology::heterogeneous_fusion::{
     HeterogeneousFusionRest, PortDeclaration, SharedWorldGenerator, SourcePortResponse,
 };
 use serde::{Deserialize, Serialize};
@@ -33,8 +33,7 @@ const IMPLEMENTED_ROOT: &str = "output/native_mathematical_consequence_precedes_
 const CULTIVATED_ROOT: &str = "output/recurring_laboratory_transport_condenses_into_native_hexis";
 const E1_OPTICAL_REST: &str =
     "output/the_optical_holons_grow_across_scales/native-rest/standing.json";
-const DEFAULT_OUT: &str =
-    "output/the_complete_inherited_organs_cross_native_potential_complexes";
+const DEFAULT_OUT: &str = "output/the_complete_inherited_organs_cross_native_potential_complexes";
 const PYTHON: &str = "/home/b/scratch/huggingface/.venv/bin/python";
 
 const OPTICAL_BOUNDARY: BoundaryId = BoundaryId(101);
@@ -192,14 +191,8 @@ struct DetachedReturn {
 }
 
 enum Args {
-    Produce {
-        model: PathBuf,
-        output: PathBuf,
-    },
-    Detached {
-        rest: PathBuf,
-        output: PathBuf,
-    },
+    Produce { model: PathBuf, output: PathBuf },
+    Detached { rest: PathBuf, output: PathBuf },
 }
 
 fn main() -> Result<(), String> {
@@ -236,7 +229,10 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
     .chain(audio.iter().cloned())
     {
         if !required.is_file() {
-            return Err(format!("required E2 occurrence {} is absent", required.display()));
+            return Err(format!(
+                "required E2 occurrence {} is absent",
+                required.display()
+            ));
         }
     }
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
@@ -253,13 +249,19 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
     for path in &audio {
         command.arg(path);
     }
-    let status = command.arg("--output").arg(&foreign_root).status().map_err(|error| error.to_string())?;
+    let status = command
+        .arg("--output")
+        .arg(&foreign_root)
+        .status()
+        .map_err(|error| error.to_string())?;
     let foreign_elapsed = began.elapsed();
     if !status.success() {
         return Err(format!("complete foreign tower conduct exited {status}"));
     }
-    let foreign_bytes = fs::read(foreign_root.join("receipt.json")).map_err(|error| error.to_string())?;
-    let foreign: ForeignReceipt = serde_json::from_slice(&foreign_bytes).map_err(|error| error.to_string())?;
+    let foreign_bytes =
+        fs::read(foreign_root.join("receipt.json")).map_err(|error| error.to_string())?;
+    let foreign: ForeignReceipt =
+        serde_json::from_slice(&foreign_bytes).map_err(|error| error.to_string())?;
     validate_foreign(&foreign, &foreign_root)?;
 
     let boundaries = [
@@ -388,11 +390,31 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
     let rest_root = output.join("native-rest");
     fs::create_dir(&rest_root).map_err(|error| error.to_string())?;
     let components = [
-        ("standing", "standing.json", rest.standing_bytes().map_err(|error| error.to_string())?),
-        ("decoder", "decoder.json", rest.decoder_bytes().map_err(|error| error.to_string())?),
-        ("fibres", "fibres.json", rest.fibre_bytes().map_err(|error| error.to_string())?),
-        ("continuation", "continuation.json", canonical_json(&continuation)?),
-        ("provisional-codec", "provisional-codec.json", canonical_json(&provisional)?),
+        (
+            "standing",
+            "standing.json",
+            rest.standing_bytes().map_err(|error| error.to_string())?,
+        ),
+        (
+            "decoder",
+            "decoder.json",
+            rest.decoder_bytes().map_err(|error| error.to_string())?,
+        ),
+        (
+            "fibres",
+            "fibres.json",
+            rest.fibre_bytes().map_err(|error| error.to_string())?,
+        ),
+        (
+            "continuation",
+            "continuation.json",
+            canonical_json(&continuation)?,
+        ),
+        (
+            "provisional-codec",
+            "provisional-codec.json",
+            canonical_json(&provisional)?,
+        ),
     ];
     let mut component_map = BTreeMap::new();
     for (role, path, bytes) in components {
@@ -403,8 +425,13 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         schema: "holonics.e2.native-rest-directory.v1".to_owned(),
         components: component_map,
     };
-    fs::write(rest_root.join("manifest.json"), canonical_json(&manifest)?).map_err(|error| error.to_string())?;
-    fs::write(output.join("01-native-joint.json"), canonical_json(&join_receipt(&joint))?).map_err(|error| error.to_string())?;
+    fs::write(rest_root.join("manifest.json"), canonical_json(&manifest)?)
+        .map_err(|error| error.to_string())?;
+    fs::write(
+        output.join("01-native-joint.json"),
+        canonical_json(&join_receipt(&joint))?,
+    )
+    .map_err(|error| error.to_string())?;
     fs::write(
         output.join("00-native-potential-instances.json"),
         serde_json::to_vec_pretty(&serde_json::json!({
@@ -417,7 +444,11 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         .map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    fs::write(output.join("02-provisional-codec-candidate.json"), canonical_json(&provisional)?).map_err(|error| error.to_string())?;
+    fs::write(
+        output.join("02-provisional-codec-candidate.json"),
+        canonical_json(&provisional)?,
+    )
+    .map_err(|error| error.to_string())?;
     fs::write(
         output.join("02a-chronology-and-interaction-controls.json"),
         serde_json::to_vec_pretty(&controls).map_err(|error| error.to_string())?,
@@ -434,8 +465,9 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
     if !detached_status.success() {
         return Err(format!("E2 detached remount exited {detached_status}"));
     }
-    let detached: DetachedReturn = serde_json::from_slice(&fs::read(&detached_path).map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    let detached: DetachedReturn =
+        serde_json::from_slice(&fs::read(&detached_path).map_err(|error| error.to_string())?)
+            .map_err(|error| error.to_string())?;
     let grade = serde_json::json!({
         "schema": "holonics.e2.complete-inherited-organs-grade.v1",
         "truth_status": "established-bounded; measured",
@@ -471,8 +503,11 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         "open_exterior": rest.standing.open_exterior,
         "passed": true,
     });
-    fs::write(output.join("03-grade.json"), serde_json::to_vec_pretty(&grade).map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    fs::write(
+        output.join("03-grade.json"),
+        serde_json::to_vec_pretty(&grade).map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
     let invocation = serde_json::json!({
         "command": format!("{PYTHON} {} --model {} --image {DEFAULT_IMAGE} --audio <four addressed PCM occurrences> --output {}", script.display(), model.display(), foreign_root.display()),
         "purpose": "complete authenticated 16-layer vision and 12-layer audio conduct on CUDA",
@@ -480,15 +515,19 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         "exit_status": status.code(),
         "code_closure": [script.display().to_string(), file!().to_owned()],
     });
-    fs::write(output.join("04-expensive-invocation.json"), serde_json::to_vec_pretty(&invocation).map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    fs::write(
+        output.join("04-expensive-invocation.json"),
+        serde_json::to_vec_pretty(&invocation).map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
     Ok(())
 }
 
 fn detached(rest_root: &Path, output: &Path) -> Result<(), String> {
     let manifest_path = rest_root.join("manifest.json");
-    let manifest: NativeRestManifest = serde_json::from_slice(&fs::read(&manifest_path).map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    let manifest: NativeRestManifest =
+        serde_json::from_slice(&fs::read(&manifest_path).map_err(|error| error.to_string())?)
+            .map_err(|error| error.to_string())?;
     let mut bytes = BTreeMap::new();
     let mut identities = BTreeMap::new();
     for (role, identity) in &manifest.components {
@@ -500,22 +539,47 @@ fn detached(rest_root: &Path, output: &Path) -> Result<(), String> {
         identities.insert(role.clone(), identity.sha256.clone());
         bytes.insert(role.clone(), value);
     }
-    let get = |role: &str| bytes.get(role).map(Vec::as_slice).ok_or_else(|| format!("E2 component {role} absent"));
+    let get = |role: &str| {
+        bytes
+            .get(role)
+            .map(Vec::as_slice)
+            .ok_or_else(|| format!("E2 component {role} absent"))
+    };
     let rest = HeterogeneousFusionRest::read(get("standing")?, get("decoder")?, get("fibres")?)
         .map_err(|error| error.to_string())?;
-    let continuation: NativeContinuation = serde_json::from_slice(get("continuation")?).map_err(|error| error.to_string())?;
-    let provisional: ProvisionalCodecCandidate = serde_json::from_slice(get("provisional-codec")?).map_err(|error| error.to_string())?;
+    let continuation: NativeContinuation =
+        serde_json::from_slice(get("continuation")?).map_err(|error| error.to_string())?;
+    let provisional: ProvisionalCodecCandidate =
+        serde_json::from_slice(get("provisional-codec")?).map_err(|error| error.to_string())?;
     if continuation.returned_occurrence_sha256 != provisional.returned_occurrence_sha256
-        || continuation.boundary_order.iter().copied().collect::<Vec<_>>()
-            != rest.standing.ports.iter().map(|port| port.boundary).collect::<Vec<_>>()
+        || continuation
+            .boundary_order
+            .iter()
+            .copied()
+            .collect::<Vec<_>>()
+            != rest
+                .standing
+                .ports
+                .iter()
+                .map(|port| port.boundary)
+                .collect::<Vec<_>>()
     {
-        return Err("E2 continuation and provisional morphology do not share one boundary lineage".to_owned());
+        return Err(
+            "E2 continuation and provisional morphology do not share one boundary lineage"
+                .to_owned(),
+        );
     }
     let mut card = CudaRefineExecutor::new().map_err(|error| error.to_string())?;
-    let joint = conduct_join(&rest, &continuation.candidate_counts, continuation.anchors, &mut card)?;
+    let joint = conduct_join(
+        &rest,
+        &continuation.candidate_counts,
+        continuation.anchors,
+        &mut card,
+    )?;
     validate_join(&joint)?;
     let local_directional = (0..joint.ports).all(|withdrawn| {
-        joint.local_ablated_joint_anchor
+        joint
+            .local_ablated_joint_anchor
             .chunks_exact(joint.ports)
             .all(|row| row[withdrawn] == 0)
             && joint
@@ -560,15 +624,25 @@ fn detached(rest_root: &Path, output: &Path) -> Result<(), String> {
         rest_component_sha256: identities,
         candidate_counts: continuation.candidate_counts,
         joint: join_receipt(&joint),
-        all_naturality_squares_commute: rest.fibres.naturality_squares.iter().all(|square| square.commutes),
-        shared_withdrawal_removes_the_joint: joint.shared_ablated_joint_anchor.iter().all(|value| *value == 0),
+        all_naturality_squares_commute: rest
+            .fibres
+            .naturality_squares
+            .iter()
+            .all(|square| square.commutes),
+        shared_withdrawal_removes_the_joint: joint
+            .shared_ablated_joint_anchor
+            .iter()
+            .all(|value| *value == 0),
         every_local_withdrawal_is_directional: local_directional,
         generic_boundary_order_survives_remount: true,
         source_accessed_paths: accessed,
         forbidden_source_access: forbidden,
     };
-    fs::write(output, serde_json::to_vec_pretty(&returned).map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())
+    fs::write(
+        output,
+        serde_json::to_vec_pretty(&returned).map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())
 }
 
 fn validate_foreign(receipt: &ForeignReceipt, root: &Path) -> Result<(), String> {
@@ -579,8 +653,12 @@ fn validate_foreign(receipt: &ForeignReceipt, root: &Path) -> Result<(), String>
         || receipt.audio.tensor_count != 751
         || receipt.vision.returns.len() != 4
         || receipt.audio.returns.len() != 4
-        || receipt.vision.returns.iter().any(|returning| returning.complete_layer_count != 16 || returning.layer_frontier_sha256.len() != 16)
-        || receipt.audio.returns.iter().any(|returning| returning.complete_layer_count != 12 || returning.layer_frontier_sha256.len() != 12)
+        || receipt.vision.returns.iter().any(|returning| {
+            returning.complete_layer_count != 16 || returning.layer_frontier_sha256.len() != 16
+        })
+        || receipt.audio.returns.iter().any(|returning| {
+            returning.complete_layer_count != 12 || returning.layer_frontier_sha256.len() != 12
+        })
         || receipt.model.source_implementations.len() != 5
         || receipt.model.source_implementations.values().any(|source| {
             source.path.is_empty()
@@ -591,7 +669,8 @@ fn validate_foreign(receipt: &ForeignReceipt, root: &Path) -> Result<(), String>
         return Err("the authenticated foreign towers did not return every frontier".to_owned());
     }
     for returning in receipt.vision.returns.iter().chain(&receipt.audio.returns) {
-        let bytes = fs::read(root.join(&returning.returned_bf16)).map_err(|error| error.to_string())?;
+        let bytes =
+            fs::read(root.join(&returning.returned_bf16)).map_err(|error| error.to_string())?;
         if sha(&bytes) != returning.returned_sha256 || bytes.is_empty() {
             return Err(format!("foreign return {} moved", returning.returned_bf16));
         }
@@ -782,9 +861,17 @@ fn acoustic_native_instances(paths: &[PathBuf; 4]) -> Result<Vec<serde_json::Val
             let butterfly = exact_pcm::ButterflyAtlas::new(&wave.samples)?;
             let (forward, reverse) = butterfly.reconstructs(&wave.samples)?;
             if !forward || !reverse {
-                return Err(format!("{} did not reconstruct through both butterflies", path.display()));
+                return Err(format!(
+                    "{} did not reconstruct through both butterflies",
+                    path.display()
+                ));
             }
-            let values = wave.samples.iter().copied().map(i64::from).collect::<Vec<_>>();
+            let values = wave
+                .samples
+                .iter()
+                .copied()
+                .map(i64::from)
+                .collect::<Vec<_>>();
             let path_chart = exact_pcm::ExactPathChart::new(&values)?;
             let mut instance = serde_json::json!({
                 "family": at / 2,
@@ -824,7 +911,11 @@ fn bind_instance_incidence(
     Ok(())
 }
 
-fn codec_responses(boundary: BoundaryId, paths: &[PathBuf; 4], lineage: &str) -> Result<Vec<SourcePortResponse>, String> {
+fn codec_responses(
+    boundary: BoundaryId,
+    paths: &[PathBuf; 4],
+    lineage: &str,
+) -> Result<Vec<SourcePortResponse>, String> {
     paths
         .iter()
         .enumerate()
@@ -832,11 +923,8 @@ fn codec_responses(boundary: BoundaryId, paths: &[PathBuf; 4], lineage: &str) ->
             let bytes = fs::read(path).map_err(|error| error.to_string())?;
             let occurrence_sha256 = sha(&bytes);
             let incidence_sha256 = digest_many(&[path.display().to_string().as_bytes(), &bytes]);
-            let consequence_sha256 = digest_many(&[
-                lineage.as_bytes(),
-                &(at as u64).to_le_bytes(),
-                &bytes,
-            ]);
+            let consequence_sha256 =
+                digest_many(&[lineage.as_bytes(), &(at as u64).to_le_bytes(), &bytes]);
             Ok(SourcePortResponse {
                 family: at as u32 / 2,
                 state: at as u32 % 2,
@@ -851,7 +939,12 @@ fn codec_responses(boundary: BoundaryId, paths: &[PathBuf; 4], lineage: &str) ->
         .collect()
 }
 
-fn declaration(boundary: BoundaryId, source_boundary: &str, source_extent: u32, incidence: &str) -> PortDeclaration {
+fn declaration(
+    boundary: BoundaryId,
+    source_boundary: &str,
+    source_extent: u32,
+    incidence: &str,
+) -> PortDeclaration {
     PortDeclaration {
         boundary,
         source_boundary: source_boundary.to_owned(),
@@ -865,11 +958,25 @@ fn candidate_pairs(foreign: &ForeignReceipt) -> Result<(Vec<u32>, Vec<u32>), Str
     let mut anchors = Vec::new();
     let mut boundaries = Vec::new();
     for anchor in 0..4_u32 {
-        let vision = foreign.vision.returns.get(anchor as usize).ok_or("vision anchor absent")?;
-        let audio = foreign.audio.returns.get(anchor as usize).ok_or("audio anchor absent")?;
+        let vision = foreign
+            .vision
+            .returns
+            .get(anchor as usize)
+            .ok_or("vision anchor absent")?;
+        let audio = foreign
+            .audio
+            .returns
+            .get(anchor as usize)
+            .ok_or("audio anchor absent")?;
         let populations = [
             vision.text_space_shape.first().copied().unwrap_or(0),
-            audio.text_space_shape.iter().rev().nth(1).copied().unwrap_or(0),
+            audio
+                .text_space_shape
+                .iter()
+                .rev()
+                .nth(1)
+                .copied()
+                .unwrap_or(0),
             1,
             1,
         ];
@@ -908,7 +1015,10 @@ fn validate_join(joint: &DeviceJointMediaTransport) -> Result<(), String> {
     if joint.launches != 1
         || joint.synchronizations != 1
         || joint.joint_anchor.iter().any(|value| *value != 1)
-        || joint.shared_ablated_joint_anchor.iter().any(|value| *value != 0)
+        || joint
+            .shared_ablated_joint_anchor
+            .iter()
+            .any(|value| *value != 0)
         || joint.predecessor_consequence == joint.successor_consequence
     {
         return Err("the E2 founded joint or its shared withdrawal refused".to_owned());
@@ -968,11 +1078,18 @@ fn digest_many(parts: &[&[u8]]) -> String {
 }
 
 fn u32_bytes(values: &[u32]) -> Vec<u8> {
-    values.iter().flat_map(|value| value.to_le_bytes()).collect()
+    values
+        .iter()
+        .flat_map(|value| value.to_le_bytes())
+        .collect()
 }
 
 fn hex(bytes: impl AsRef<[u8]>) -> String {
-    bytes.as_ref().iter().map(|byte| format!("{byte:02x}")).collect()
+    bytes
+        .as_ref()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
 }
 
 fn arguments() -> Result<Args, String> {

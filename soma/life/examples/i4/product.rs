@@ -2,8 +2,8 @@
 
 use std::collections::BTreeMap;
 
-use holonic_engine::phoenix::heterogeneous_fusion::HeterogeneousFusionRest;
-use serde_json::{Value, json};
+use holonic_engine::native_ecology::heterogeneous_fusion::HeterogeneousFusionRest;
+use serde_json::{json, Value};
 
 use super::source::SourceConduct;
 use super::{CostProduct, DetachedReturn};

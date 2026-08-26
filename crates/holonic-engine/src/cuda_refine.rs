@@ -904,7 +904,7 @@ pub struct ResidentNativeWord {
 }
 
 /// One terminal return from an already-resident native word.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct ResidentNativeWordReturn {
     pub native_end: Vec<u32>,
     pub launches: u64,
@@ -1183,7 +1183,7 @@ pub struct ResidentIntervalPotentialReceiver {
 }
 
 /// One exact receiver projection from an already-resident interval potential complex.
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ResidentIntervalPotentialReturn {
     pub address: String,
     pub selected_native_addresses: Vec<u32>,

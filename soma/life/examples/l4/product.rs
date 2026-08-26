@@ -70,14 +70,24 @@ pub fn construct(root: &Path) -> Result<(), String> {
     )?;
 
     let history = vec![
-        terrain.standing().cultivation.world_return.occurrence.clone(),
+        terrain
+            .standing()
+            .cultivation
+            .world_return
+            .occurrence
+            .clone(),
         terrain
             .standing()
             .cultivation
             .carrier_chart
             .source_plate_occurrence
             .clone(),
-        terrain.predecessor().standing().generator.occurrence.clone(),
+        terrain
+            .predecessor()
+            .standing()
+            .generator
+            .occurrence
+            .clone(),
     ];
     let revisited = vec![
         NativeSuccessorHistory::FixedSection,
@@ -260,9 +270,15 @@ pub fn construct(root: &Path) -> Result<(), String> {
     artifact::write_json(output.join("06-complete-product-compression.json"), &cost)?;
 
     let visual_receipt = rasterize_visual(&output)?;
-    artifact::write_json(output.join("07-vector-raster-rendering.json"), &visual_receipt)?;
+    artifact::write_json(
+        output.join("07-vector-raster-rendering.json"),
+        &visual_receipt,
+    )?;
     let taxonomy = complete_taxonomy(&terrain, &heldout_return, &rebase_return, &separator_return);
-    artifact::write_json(output.join("08-complete-transport-taxonomy.json"), &taxonomy)?;
+    artifact::write_json(
+        output.join("08-complete-transport-taxonomy.json"),
+        &taxonomy,
+    )?;
     let purity = purity_receipt(root)?;
     artifact::write_json(output.join("09-purity-and-source-access.json"), &purity)?;
     let capability = capability_atlas(&terrain_identity, &cost);
@@ -376,7 +392,9 @@ fn run_detached(
     inquiry: &Path,
     output: &Path,
 ) -> Result<(), String> {
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let standing = standing.canonicalize().map_err(|error| error.to_string())?;
     let decoder = decoder.canonicalize().map_err(|error| error.to_string())?;
     let fibres = fibres.canonicalize().map_err(|error| error.to_string())?;
@@ -471,9 +489,7 @@ fn run_lean(
     }))
 }
 
-fn dense_source_controls(
-    sections: [&[i64]; 4],
-) -> Result<Vec<DeviceFixedSectionFamilies>, String> {
+fn dense_source_controls(sections: [&[i64]; 4]) -> Result<Vec<DeviceFixedSectionFamilies>, String> {
     let action = [0, -1, 1, -1, 0, 1, 1, 1, 0];
     let actions = action.repeat(3);
     let constraint = [1, 1, -1, 0, 0, 0, 0, 0, 0];
@@ -506,9 +522,18 @@ fn complete_cost(
     );
     let source_extents = rest_extents(&l1)?;
     let target_extents = rest_extents(target_rest)?;
-    let source_work = source.iter().map(|receipt| receipt.semantic_work).sum::<u128>();
-    let source_span = source.iter().map(|receipt| receipt.semantic_span).sum::<u64>();
-    let source_resident = source.iter().map(|receipt| receipt.resident_octets).sum::<u64>();
+    let source_work = source
+        .iter()
+        .map(|receipt| receipt.semantic_work)
+        .sum::<u128>();
+    let source_span = source
+        .iter()
+        .map(|receipt| receipt.semantic_span)
+        .sum::<u64>();
+    let source_resident = source
+        .iter()
+        .map(|receipt| receipt.resident_octets)
+        .sum::<u64>();
     let source_transfer = source
         .iter()
         .map(|receipt| receipt.host_ingress_octets + receipt.host_egress_octets)
@@ -530,7 +555,9 @@ fn complete_cost(
         .as_object()
         .is_none_or(|checks| checks.values().any(|value| value != true))
     {
-        return Err(format!("L4 complete product did not strictly descend: {strict}"));
+        return Err(format!(
+            "L4 complete product did not strictly descend: {strict}"
+        ));
     }
     let inherited = root.join("output/the_whole_foreign_map_crosses_into_native_rest");
     Ok(json!({
@@ -619,7 +646,9 @@ fn complete_taxonomy(
 fn purity_receipt(root: &Path) -> Result<Value, String> {
     let files = [
         root.join("soma/life/src/mathematical_particle/production_aperture/native_terrain.rs"),
-        root.join("soma/life/src/mathematical_particle/production_aperture/native_terrain_types.rs"),
+        root.join(
+            "soma/life/src/mathematical_particle/production_aperture/native_terrain_types.rs",
+        ),
         root.join("crates/holonic-engine/kernels/refine_shell.cu"),
     ];
     let mut float_hits = Vec::new();
@@ -637,7 +666,9 @@ fn purity_receipt(root: &Path) -> Result<Value, String> {
         }
     }
     if !float_hits.is_empty() {
-        return Err(format!("floating point entered the L4 semantic cone: {float_hits:?}"));
+        return Err(format!(
+            "floating point entered the L4 semantic cone: {float_hits:?}"
+        ));
     }
     Ok(json!({
         "schema": "holonics.l4.purity.v1",
@@ -727,9 +758,7 @@ fn all_charts(terrain: &NativeTerrainAthenaRest) -> Value {
 }
 
 fn exact_return(output: &Path, name: &str) -> Result<Value, String> {
-    read_json(&output.join(format!(
-        "application-{name}/03-exact-terrain-return.json"
-    )))
+    read_json(&output.join(format!("application-{name}/03-exact-terrain-return.json")))
 }
 
 fn return_receipt(output: &Path, name: &str) -> Result<Value, String> {
@@ -760,7 +789,9 @@ fn rest_extents(directory: &Path) -> Result<Value, String> {
     let fibres = fs::metadata(directory.join("fibres.bin"))
         .map_err(|error| error.to_string())?
         .len();
-    Ok(json!({"standing": standing, "decoder": decoder, "fibres": fibres, "total": standing + decoder + fibres}))
+    Ok(
+        json!({"standing": standing, "decoder": decoder, "fibres": fibres, "total": standing + decoder + fibres}),
+    )
 }
 
 fn sum_target(targets: &[Value], field: &str) -> Result<u64, String> {

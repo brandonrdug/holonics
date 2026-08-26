@@ -16,11 +16,11 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Instant;
 
-use holonic_engine::cuda_refine::CudaRefineExecutor;
 use holonic_engine::category::BoundaryId;
-use holonic_engine::phoenix::heterogeneous_fusion::{
-    BoundaryReconstructionFibre, HeterogeneousFusionRest, PortDeclaration,
-    SharedWorldGenerator, SourcePortResponse,
+use holonic_engine::cuda_refine::CudaRefineExecutor;
+use holonic_engine::native_ecology::heterogeneous_fusion::{
+    BoundaryReconstructionFibre, HeterogeneousFusionRest, PortDeclaration, SharedWorldGenerator,
+    SourcePortResponse,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -110,7 +110,8 @@ struct N2Dissection<'a> {
     truth_status: &'static str,
     modality_entry_paths: Vec<Value>,
     shared_junction: &'a SharedWorldGenerator,
-    naturality_squares: &'a [holonic_engine::phoenix::heterogeneous_fusion::NaturalitySquare],
+    naturality_squares:
+        &'a [holonic_engine::native_ecology::heterogeneous_fusion::NaturalitySquare],
     reconstruction_fibres: &'a [BoundaryReconstructionFibre],
     shared_and_local_withdrawals: &'a DetachedReturn,
     open_exterior: &'a [String],
@@ -176,10 +177,7 @@ fn produce(model: &Path, output: &Path) -> Result<(), String> {
         .map(|response| response.boundary)
         .collect::<BTreeSet<_>>();
     if prior.responses.len() != 8
-        || prior_ports
-            != [CODEWORD_BOUNDARY, OPTICAL_BOUNDARY]
-                .into_iter()
-                .collect()
+        || prior_ports != [CODEWORD_BOUNDARY, OPTICAL_BOUNDARY].into_iter().collect()
     {
         return Err(
             "the admitted I4 source receipt is not its complete two-port family".to_owned(),

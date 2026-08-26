@@ -1,10 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use holonic_engine::receiver_exact_compression::ObservedSystem;
 use life::mathematical_particle::{
     AddressedHistorySystem, HistoricalInterior, LongHorizonRetainedBoundary,
 };
-use holonic_engine::receiver_exact_compression::ObservedSystem;
 use serde::Serialize;
 use serde_json::{json, Value};
 
@@ -63,11 +63,23 @@ pub fn mount(root: &Path) -> Result<MountedHistory, String> {
     }
 
     let materials: Vec<(PathBuf, Option<usize>)> = vec![
-        (root.join("research/fixtures/r0_rich_inquiry/inquiry.md"), None),
-        (root.join("research/fixtures/r0_rich_inquiry/inquiry.lean"), Some(0)),
+        (
+            root.join("research/fixtures/r0_rich_inquiry/inquiry.md"),
+            None,
+        ),
+        (
+            root.join("research/fixtures/r0_rich_inquiry/inquiry.lean"),
+            Some(0),
+        ),
         (r2.join("06-returned-constraint.lean"), Some(1)),
-        (r2.join("15-complete-derivation-and-obstruction.md"), Some(2)),
-        (root.join("research/fixtures/r0_rich_inquiry/support-route-a.svg"), None),
+        (
+            r2.join("15-complete-derivation-and-obstruction.md"),
+            Some(2),
+        ),
+        (
+            root.join("research/fixtures/r0_rich_inquiry/support-route-a.svg"),
+            None,
+        ),
         (r2.join("08-derivation-complex.svg"), Some(4)),
         (r0.join("02-receiver-basis-and-controls.json"), Some(0)),
         (r3.join("02-local-morphology-delta.json"), Some(3)),
@@ -285,9 +297,11 @@ fn chain_indices(interiors: &[HistoricalInterior], final_at: usize) -> Result<Ve
         let interior = interiors.get(at).ok_or("history interior absent")?;
         chain.push(at);
         match interior.predecessor.as_deref() {
-            Some(predecessor) => at = *by_occurrence
-                .get(predecessor)
-                .ok_or("history predecessor absent")?,
+            Some(predecessor) => {
+                at = *by_occurrence
+                    .get(predecessor)
+                    .ok_or("history predecessor absent")?
+            }
             None => break,
         }
     }

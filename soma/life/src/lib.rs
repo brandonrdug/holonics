@@ -14,11 +14,8 @@ pub mod athena_alpha;
 // Athena alpha's corrected native state: a receiver/history quotient of addressed causal
 // sections. The superseded trigram condensation remains isolated in `athena_alpha` as a measured
 // counterexample fixture; this owner never imports its global partition or token-window law.
+pub mod athena_native;
 pub mod athena_receiver_history;
-// The next causal cut: a history-only Phoenix passage is sealed before later sibling material is
-// mounted, then the returned testimony forms a graded defect without treating a scalar delta as
-// the object.
-pub mod athena_returned_defect;
 pub mod atlas_cultivation;
 pub mod causal_language;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
@@ -78,7 +75,6 @@ pub mod morphological_language;
 // Deed P4: the rest is mounted alone — conducted, deposited into, and re-sealed — with the
 // corpus and the source absent from the path. It composes `atlas_cultivation`'s law with
 // `suffix_ecology`'s new return edge and founds no organ of its own.
-pub mod phoenix_rest;
 pub mod presentation_quotient;
 pub mod relational_language;
 // The receiver-relative preimage population of a presented token occurrence. It lives here because

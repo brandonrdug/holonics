@@ -1,4 +1,4 @@
-use holonic_engine::phoenix::inference_ecology::InferenceEcologyRest;
+use holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest;
 use sha2::{Digest, Sha256};
 
 use super::super::{DynamicMorphologyRest, LongHorizonRetainedBoundary, MultimodalTransportRest};
@@ -81,7 +81,7 @@ impl ProductionAthenaRest {
                 predecessor_identity: None,
                 world_return: None,
                 open_exterior: vec![
-                    "unexcited inherited Gemma transport remains an open reconstruction fibre"
+                    "transport outside the declared native receiver/history family remains an open reconstruction fibre"
                         .to_owned(),
                     "mathematical operations outside the R0--R5 receiver/history basis remain open"
                         .to_owned(),

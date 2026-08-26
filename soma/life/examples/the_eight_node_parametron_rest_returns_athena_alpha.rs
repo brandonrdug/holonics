@@ -11,7 +11,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
 const POTENTIAL: &str = concat!(
@@ -55,7 +55,10 @@ struct FileReceipt {
 fn main() -> Result<(), String> {
     let output = PathBuf::from(OUTPUT);
     if output.exists() {
-        return Err(format!("preserve existing station output {}", output.display()));
+        return Err(format!(
+            "preserve existing station output {}",
+            output.display()
+        ));
     }
     let started = Instant::now();
     let product = output.join("product");
@@ -126,7 +129,9 @@ fn main() -> Result<(), String> {
         && class_population == 6
         && occurrence_population == 8
         && support_reopenings == 0
-        && continuations.iter().all(|surface| surface.split_whitespace().count() >= 2);
+        && continuations
+            .iter()
+            .all(|surface| surface.split_whitespace().count() >= 2);
     let grade = json!({
         "schema":"holonics.eight-node-parametron-athena-alpha-grade.v1",
         "truth_status":"established-bounded; implemented-exact; measured",
@@ -178,9 +183,8 @@ fn run_source_detached(product: &Path, output: &Path) -> Result<(), String> {
         .parent()
         .ok_or("release example has no parent directory")?
         .join(REMOUNT_EXECUTABLE);
-    let executable = fs::canonicalize(executable).map_err(|error| {
-        format!("the existing Athena remount executable is absent: {error}")
-    })?;
+    let executable = fs::canonicalize(executable)
+        .map_err(|error| format!("the existing Athena remount executable is absent: {error}"))?;
     let product = fs::canonicalize(product).map_err(display)?;
     let output = fs::canonicalize(output).map_err(display)?;
     let mut command = Command::new("bwrap");

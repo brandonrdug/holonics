@@ -15,7 +15,7 @@ use std::time::Instant;
 
 use holonic_engine::{
     cuda_refine::CudaRefineExecutor,
-    phoenix::{
+    native_ecology::{
         recurrent::RetainedContinuationPassage,
         recurrent_condensation::{CondensedRecurrentRest, CondensedRoute},
         recurrent_return::ReturnedRecurrentRest,
@@ -1074,9 +1074,11 @@ fn sha256(bytes: &[u8]) -> String {
 fn code_closure() -> String {
     let members: &[&[u8]] = &[
         include_bytes!("the_recurrent_realizations_condense_into_a_phoenix_ecology.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/recurrent_condensation.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/recurrent_return.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/recurrent.rs"),
+        include_bytes!(
+            "../../../crates/holonic-engine/src/native_ecology/recurrent_condensation.rs"
+        ),
+        include_bytes!("../../../crates/holonic-engine/src/native_ecology/recurrent_return.rs"),
+        include_bytes!("../../../crates/holonic-engine/src/native_ecology/recurrent.rs"),
         include_bytes!("../../../crates/holonic-engine/src/cuda_refine.rs"),
         include_bytes!("../../../crates/holonic-engine/kernels/refine_shell.cu"),
     ];

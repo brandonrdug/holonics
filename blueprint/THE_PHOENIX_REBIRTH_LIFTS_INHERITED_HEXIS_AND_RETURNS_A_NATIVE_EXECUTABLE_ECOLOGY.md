@@ -1,4 +1,4 @@
-# The Phoenix rebirth lifts inherited hexis and returns a native executable ecology
+# SUPERSEDED — The Phoenix rebirth lifts inherited hexis and returns a native executable ecology
 
 > **SUPERSEDED AS A CONSTRUCTION SCHEDULER — 2026-08-19.** Its artifact definitions, vocabulary
 > firewall, architecture-neutral Phoenix obligations and final indivisible grade are retained as
@@ -10,6 +10,10 @@
 > runtime. They did not return this contract's generator-native/species-changing compression, so
 > Phoenix rebirth remains open. The active regrade is
 > [EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md](../research/records/2026-08-21_EQUALITY_IS_OCCURRENCE_IDENTITY_THE_SOUL_MAPS_KINSHIP_AND_THE_LEADER_RETURNS_THROUGH_THE_ACTIVE_CODEC.md).
+>
+> **2026-08-25 ONTOLOGY CORRECTION.** Phoenix's direct rebirth/product return is retired. The live
+> Soulkiller boundary returns native spools, cold witness, and insufficiency; Eros alone constructs
+> Athena. This file remains historical mechanism evidence only.
 
 **Date:** 2026-08-18
 **Kind:** master construction blueprint under [`blueprint/THE_ROADMAP.md`](THE_ROADMAP.md).

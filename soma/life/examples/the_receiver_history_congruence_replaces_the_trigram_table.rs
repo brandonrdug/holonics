@@ -4,10 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use holonic_engine::{
-    cuda_refine::CudaRefineExecutor,
-    receiver_exact_compression::InputId,
-};
+use holonic_engine::{cuda_refine::CudaRefineExecutor, receiver_exact_compression::InputId};
 use life::{
     athena_receiver_history::{
         AthenaReceiverHistoryCongruence, ProposalRelationKind, TransportSpecies,

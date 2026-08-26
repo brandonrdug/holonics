@@ -574,6 +574,150 @@ impl ResidentSection<'_> {
     }
 }
 
+const RESIDENT_SECTION_REST_MAGIC: &[u8; 8] = b"HRSRST\0\x01";
+
+fn resident_section_rest_header_octets() -> usize {
+    RESIDENT_SECTION_REST_MAGIC.len()
+        + std::mem::size_of::<u64>()
+        + std::mem::size_of::<u64>()
+        + std::mem::size_of::<u32>()
+        + std::mem::size_of::<u32>()
+        + std::mem::size_of::<u64>()
+}
+
+/// Exact detachable testimony for one resident section at an apparatus boundary.
+///
+/// This is not a second semantic carrier. It is the exterior rest of the same interval section:
+/// shape, grain, admitted octave bound, and every directed endpoint. A later surface may remount
+/// it and continue the original typed transport without recomputing the predecessor passage.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentSectionRest {
+    pub rows: usize,
+    pub width: usize,
+    pub grain: ResidentGrain,
+    pub bound_octaves: u32,
+    pub intervals: Vec<(i64, i64)>,
+}
+
+impl ResidentSectionRest {
+    pub fn found(
+        rows: usize,
+        width: usize,
+        grain: ResidentGrain,
+        bound_octaves: u32,
+        intervals: Vec<(i64, i64)>,
+    ) -> Result<Self, String> {
+        let rest = Self {
+            rows,
+            width,
+            grain,
+            bound_octaves,
+            intervals,
+        };
+        rest.validate()?;
+        Ok(rest)
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        let population = self
+            .rows
+            .checked_mul(self.width)
+            .ok_or_else(|| "resident section rest extent overflow".to_owned())?;
+        if self.rows == 0
+            || self.width == 0
+            || population != self.intervals.len()
+            || self.intervals.iter().any(|(lower, upper)| lower > upper)
+        {
+            return Err("resident section rest does not reconstruct its exact section".to_owned());
+        }
+        Ok(())
+    }
+
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, String> {
+        self.validate()?;
+        let rows = u64::try_from(self.rows)
+            .map_err(|_| "resident section row extent left the canonical carrier")?;
+        let width = u64::try_from(self.width)
+            .map_err(|_| "resident section width left the canonical carrier")?;
+        let population = u64::try_from(self.intervals.len())
+            .map_err(|_| "resident section population left the canonical carrier")?;
+        let body_octets = self
+            .intervals
+            .len()
+            .checked_mul(16)
+            .ok_or_else(|| "resident section rest byte extent overflow".to_owned())?;
+        let mut bytes = Vec::with_capacity(
+            resident_section_rest_header_octets().saturating_add(body_octets),
+        );
+        bytes.extend_from_slice(RESIDENT_SECTION_REST_MAGIC);
+        bytes.extend_from_slice(&rows.to_le_bytes());
+        bytes.extend_from_slice(&width.to_le_bytes());
+        bytes.extend_from_slice(&self.grain.0.to_le_bytes());
+        bytes.extend_from_slice(&self.bound_octaves.to_le_bytes());
+        bytes.extend_from_slice(&population.to_le_bytes());
+        for (lower, upper) in &self.intervals {
+            bytes.extend_from_slice(&lower.to_le_bytes());
+            bytes.extend_from_slice(&upper.to_le_bytes());
+        }
+        Ok(bytes)
+    }
+
+    pub fn read(bytes: &[u8]) -> Result<Self, String> {
+        let header_octets = resident_section_rest_header_octets();
+        if bytes.len() < header_octets || &bytes[..8] != RESIDENT_SECTION_REST_MAGIC {
+            return Err("resident section rest magic is absent".to_owned());
+        }
+        let word = |from: usize| -> Result<[u8; 8], String> {
+            bytes
+                .get(from..from + 8)
+                .ok_or_else(|| "resident section rest header is truncated".to_owned())?
+                .try_into()
+                .map_err(|_| "resident section rest header word is malformed".to_owned())
+        };
+        let rows = usize::try_from(u64::from_le_bytes(word(8)?))
+            .map_err(|_| "resident section row extent left this apparatus")?;
+        let width = usize::try_from(u64::from_le_bytes(word(16)?))
+            .map_err(|_| "resident section width left this apparatus")?;
+        let grain = u32::from_le_bytes(
+            bytes[24..28]
+                .try_into()
+                .map_err(|_| "resident section grain is malformed")?,
+        );
+        let bound_octaves = u32::from_le_bytes(
+            bytes[28..32]
+                .try_into()
+                .map_err(|_| "resident section bound is malformed")?,
+        );
+        let population = usize::try_from(u64::from_le_bytes(word(32)?))
+            .map_err(|_| "resident section population left this apparatus")?;
+        let body_octets = population
+            .checked_mul(16)
+            .ok_or_else(|| "resident section rest body extent overflow".to_owned())?;
+        if bytes.len() != header_octets.saturating_add(body_octets) {
+            return Err("resident section rest byte extent does not reconstruct".to_owned());
+        }
+        let mut intervals = Vec::with_capacity(population);
+        for pair in bytes[header_octets..].chunks_exact(16) {
+            let lower = i64::from_le_bytes(
+                pair[..8]
+                    .try_into()
+                    .map_err(|_| "resident section lower endpoint is malformed")?,
+            );
+            let upper = i64::from_le_bytes(
+                pair[8..]
+                    .try_into()
+                    .map_err(|_| "resident section upper endpoint is malformed")?,
+            );
+            intervals.push((lower, upper));
+        }
+        Self::found(rows, width, ResidentGrain(grain), bound_octaves, intervals)
+    }
+
+    pub fn sha256(&self) -> Result<String, String> {
+        Ok(format!("{:x}", Sha256::digest(self.canonical_bytes()?)))
+    }
+}
+
 impl Drop for ResidentSection<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
@@ -1095,6 +1239,52 @@ impl<'chart> ResidentSurface<'chart> {
             width,
             grain,
             octets: 2 * (count.max(1) * 8) as u64,
+        })
+    }
+
+    /// Remount one exact detached section. Both endpoint populations cross once; no law is
+    /// replayed and no midpoint is reconstructed from an exterior approximation.
+    pub fn mount_section_rest(
+        &'chart self,
+        rest: &ResidentSectionRest,
+    ) -> Result<ResidentSection<'chart>, ResidentRefusal> {
+        rest.validate()
+            .map_err(|what| ResidentRefusal::Declaration {
+                operation: "mount-section-rest",
+                what,
+            })?;
+        let section = self.fresh_section(rest.rows, rest.width, rest.grain)?;
+        let mut lower = Vec::with_capacity(rest.intervals.len());
+        let mut upper = Vec::with_capacity(rest.intervals.len());
+        for (lo, hi) in &rest.intervals {
+            lower.push(*lo);
+            upper.push(*hi);
+        }
+        self.context.make_current()?;
+        section.lo.copy_from_slice(&lower)?;
+        section.hi.copy_from_slice(&upper)?;
+        self.census.borrow_mut().ingress_octets += (rest.intervals.len() * 16) as u64;
+        Ok(section)
+    }
+
+    /// Detach one exact resident section after its passage has returned. This is one explicit
+    /// apparatus egress and is counted by [`read_out`].
+    pub fn detach_section(
+        &self,
+        section: &ResidentSection<'chart>,
+        bound_octaves: u32,
+    ) -> Result<ResidentSectionRest, ResidentRefusal> {
+        let intervals = self.read_out(section)?;
+        ResidentSectionRest::found(
+            section.rows(),
+            section.width(),
+            section.grain(),
+            bound_octaves,
+            intervals,
+        )
+        .map_err(|what| ResidentRefusal::Declaration {
+            operation: "detach-section-rest",
+            what,
         })
     }
 
@@ -5070,6 +5260,31 @@ mod tests {
 
     fn rat(n: i64, d: i64) -> Rat {
         Rat::new(BigInt::from(n), BigInt::from(d))
+    }
+
+    #[test]
+    fn an_exact_section_rest_round_trips_and_remounts_without_replaying_its_law() {
+        let rest = ResidentSectionRest::found(
+            2,
+            2,
+            ResidentGrain(20),
+            7,
+            vec![(-3, -1), (0, 0), (2, 5), (9, 9)],
+        )
+        .expect("rest");
+        let bytes = rest.canonical_bytes().expect("canonical");
+        assert_eq!(ResidentSectionRest::read(&bytes).expect("read"), rest);
+
+        let Some((_, surface)) = surface() else {
+            return;
+        };
+        let mounted = surface.mount_section_rest(&rest).expect("mount");
+        let returned = surface.detach_section(&mounted, 7).expect("detach");
+        assert_eq!(returned, rest);
+        assert_eq!(
+            returned.sha256().expect("identity"),
+            rest.sha256().expect("identity")
+        );
     }
 
     /// A one-occurrence passage entering `words` at `grain`, launched, and read out.

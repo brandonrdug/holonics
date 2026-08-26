@@ -841,8 +841,13 @@ impl AgenticLanguageEcology {
         let formal_return_receives = !self
             .reflective_codec_answers(question, &question.text, &BTreeSet::new(), true)?
             .is_empty();
+        // A reply to a returned clarification is current through the retained alternative
+        // capability fibre. It must reach that fibre before an already cultivated local answer
+        // can close on the same surface words; otherwise the clarification occurrence is emitted
+        // and then causally ignored by the very next question.
+        let resolving_clarification = self.pending_clarification.is_some();
 
-        if !formal_return_receives {
+        if !formal_return_receives && !resolving_clarification {
             let grounded =
                 self.grounded_episode_answers(question, &question.text, &BTreeSet::new())?;
             let grounded =
@@ -887,7 +892,7 @@ impl AgenticLanguageEcology {
         } else {
             Vec::new()
         };
-        if !formal_return_receives && !contextual_grounded.is_empty() {
+        if !formal_return_receives && !resolving_clarification && !contextual_grounded.is_empty() {
             let prepared = self.prepare_answer_with_executor(
                 question.clone(),
                 None,

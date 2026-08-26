@@ -3,7 +3,7 @@
 
 use holonic_engine::{
     cuda_refine::{CudaRefineExecutor, DeviceHeterogeneousFusion},
-    phoenix::heterogeneous_fusion::HeterogeneousFusionRest,
+    native_ecology::heterogeneous_fusion::HeterogeneousFusionRest,
 };
 use life::{
     mathematical_particle::{
@@ -14,9 +14,7 @@ use life::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use super::cultivation::{
-    NativeCultivatedMathematicalRest, NativeMathematicalWorldReturn,
-};
+use super::cultivation::{NativeCultivatedMathematicalRest, NativeMathematicalWorldReturn};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -307,11 +305,15 @@ impl LaboratoryAthenaProduct {
                 != self.continuation.retained_history_suffix[1]
             || self.optical.components.is_empty()
             || self.optical.relations.is_empty()
-            || self.optical.glyph_testimony.as_ref().is_none_or(|testimony| {
-                testimony.glyphs.is_empty()
-                    || !testimony.complete_overlap_fibre
-                    || testimony.labels_route_spatial_law
-            })
+            || self
+                .optical
+                .glyph_testimony
+                .as_ref()
+                .is_none_or(|testimony| {
+                    testimony.glyphs.is_empty()
+                        || !testimony.complete_overlap_fibre
+                        || testimony.labels_route_spatial_law
+                })
             || self.optical.productive_transcript_present
             || self.optical.productive_text_layer_present
             || self.heterogeneous.standing.ports.len() != 3

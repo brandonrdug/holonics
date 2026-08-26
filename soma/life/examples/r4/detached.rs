@@ -66,10 +66,9 @@ pub fn conduct(
     let fibres = fs::read(fibre_path).map_err(|error| error.to_string())?;
     let boundary = LongHorizonRetainedBoundary::read(&standing, &decoder, &fibres)
         .map_err(|error| error.to_string())?;
-    let inquiry: DetachedInquiry = serde_json::from_slice(
-        &fs::read(inquiry_path).map_err(|error| error.to_string())?,
-    )
-    .map_err(|error| error.to_string())?;
+    let inquiry: DetachedInquiry =
+        serde_json::from_slice(&fs::read(inquiry_path).map_err(|error| error.to_string())?)
+            .map_err(|error| error.to_string())?;
     if inquiry.schema != "holonics.r4.detached-inquiry.v1"
         || inquiry.boundary_identity != boundary.standing.boundary_identity
         || inquiry.occurrence.is_empty()
@@ -116,7 +115,9 @@ pub fn conduct(
     if returned.native_trace != inquiry.expected_trace
         || returned.trace_offsets != inquiry.expected_trace_offsets
     {
-        return Err("the resident later revisit disagrees with the exact retained boundary".to_owned());
+        return Err(
+            "the resident later revisit disagrees with the exact retained boundary".to_owned(),
+        );
     }
     let endpoint = |front: usize| -> Result<u32, String> {
         let end = returned
@@ -130,8 +131,8 @@ pub fn conduct(
             .copied()
             .ok_or("front endpoint absent".to_owned())
     };
-    let cultivated_revisit_changed_the_boundary = endpoint(inquiry.cultivated_front)?
-        != endpoint(inquiry.predecessor_control_front)?;
+    let cultivated_revisit_changed_the_boundary =
+        endpoint(inquiry.cultivated_front)? != endpoint(inquiry.predecessor_control_front)?;
     let holonomy = &boundary.standing.ordered_holonomy;
     let ordered_holonomy_preserved = holonomy.left_endpoint != holonomy.right_endpoint
         && holonomy.commutator_rank == boundary.standing.cultivation.commutator_rank;

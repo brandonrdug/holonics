@@ -2,8 +2,8 @@ use std::path::Path;
 use std::process::Command;
 
 use life::mathematical_particle::{
-    LaboratoryChronology, LaboratoryCommitOccurrence, LaboratoryPartition,
-    LaboratoryPartitionKind, LaboratorySourceChange, LABORATORY_CHRONOLOGY_SCHEMA,
+    LaboratoryChronology, LaboratoryCommitOccurrence, LaboratoryPartition, LaboratoryPartitionKind,
+    LaboratorySourceChange, LABORATORY_CHRONOLOGY_SCHEMA,
 };
 
 use super::artifact;
@@ -41,8 +41,11 @@ pub fn mount(root: &Path) -> Result<LaboratoryChronology, String> {
             revisions.len()
         ));
     }
-    let actual_tree = String::from_utf8(git(root, &["rev-parse", &format!("{PREFIX_COMMIT}^{{tree}}")])?)
-        .map_err(|error| error.to_string())?;
+    let actual_tree = String::from_utf8(git(
+        root,
+        &["rev-parse", &format!("{PREFIX_COMMIT}^{{tree}}")],
+    )?)
+    .map_err(|error| error.to_string())?;
     if actual_tree.trim() != PREFIX_TREE {
         return Err("the frozen L0 prefix tree moved".to_owned());
     }
@@ -52,18 +55,31 @@ pub fn mount(root: &Path) -> Result<LaboratoryChronology, String> {
     for revision in revisions {
         let metadata = git(
             root,
-            &["show", "-s", "--format=%H%x00%P%x00%T%x00%ct%x00%s", &revision],
+            &[
+                "show",
+                "-s",
+                "--format=%H%x00%P%x00%T%x00%ct%x00%s",
+                &revision,
+            ],
         )?;
         let fields = metadata
             .split(|byte| *byte == 0)
             .map(|field| String::from_utf8_lossy(field).trim().to_owned())
             .collect::<Vec<_>>();
         if fields.len() != 5 {
-            return Err(format!("commit metadata for {revision} did not return five fields"));
+            return Err(format!(
+                "commit metadata for {revision} did not return five fields"
+            ));
         }
         let changes_text = String::from_utf8(git(
             root,
-            &["diff-tree", "--no-commit-id", "--name-status", "-r", &revision],
+            &[
+                "diff-tree",
+                "--no-commit-id",
+                "--name-status",
+                "-r",
+                &revision,
+            ],
         )?)
         .map_err(|error| error.to_string())?;
         let mut changes = Vec::new();

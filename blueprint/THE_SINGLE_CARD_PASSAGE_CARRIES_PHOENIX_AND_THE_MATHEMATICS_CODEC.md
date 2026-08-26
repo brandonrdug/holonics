@@ -1,4 +1,8 @@
-# The single-card passage carries Phoenix and the mathematics codec
+# SUPERSEDED — The single-card passage carries Phoenix and the mathematics codec
+
+> **SUPERSEDED 2026-08-25.** Its bounded single-card mechanisms remain provenance. Phoenix is no
+> longer a live lifecycle; the active Soulkiller/Eros/Athena contract is named by
+> [THE_ROADMAP.md](THE_ROADMAP.md). This file schedules nothing.
 
 **Date:** 2026-08-19
 **Kind:** integrated construction blueprint, subordinate to

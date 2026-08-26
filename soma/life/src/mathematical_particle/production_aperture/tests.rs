@@ -1,9 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
-use holonic_engine::phoenix::{
-    heterogeneous_fusion::HeterogeneousFusionRest,
-    inference_ecology::InferenceEcologyRest,
+use holonic_engine::native_ecology::{
+    heterogeneous_fusion::HeterogeneousFusionRest, inference_ecology::InferenceEcologyRest,
     recurrent_condensation::CondensedRecurrentRest,
 };
 
@@ -28,9 +27,8 @@ fn component_rest() -> ProductionAthenaRest {
         &fs::read(i5.join("recurrent-fibres.json")).expect("I5 recurrent fibres"),
     )
     .expect("I5 recurrent rest");
-    let e2 = root.join(
-        "output/the_complete_inherited_organs_cross_native_potential_complexes/native-rest",
-    );
+    let e2 = root
+        .join("output/the_complete_inherited_organs_cross_native_potential_complexes/native-rest");
     let heterogeneous = HeterogeneousFusionRest::read(
         &fs::read(e2.join("standing.json")).expect("E2 heterogeneous standing"),
         &fs::read(e2.join("decoder.json")).expect("E2 heterogeneous decoder"),

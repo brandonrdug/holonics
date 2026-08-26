@@ -150,12 +150,32 @@ pub struct OverlapReceipt {
     pub kind: OverlapKind,
 }
 
+/// An exact family receipt for pairwise-independent local sections.
+///
+/// Listing every pair in a disjoint cover is an exterior quadratic expansion of one support law.
+/// This receipt retains the complete member population and the proof-bearing coordinate axis on
+/// which supports are pairwise disjoint.  The pair population is derived, never caller supplied.
+/// Addition of the corresponding local deltas is therefore an exact interchange law even when the
+/// common ambient chart is rectangular and endomorphism composition is not defined.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CompactInterchangeFamilyReceipt {
+    pub chart: String,
+    pub ambient_rows: usize,
+    pub ambient_columns: usize,
+    pub members: Vec<String>,
+    pub disjoint_support_axis: String,
+    pub pair_population: u64,
+    pub interchange_law: String,
+}
+
 /// One exact local morphology cover. Its order is source order and therefore remains causal data.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DerivedFactorCover {
     pub schema: String,
     pub locals: Vec<LocalFactorReceipt>,
     pub overlaps: Vec<OverlapReceipt>,
+    pub compact_interchange_families: Vec<CompactInterchangeFamilyReceipt>,
+    pub complete_pair_population: u64,
     pub factor_order: Vec<String>,
     pub withdrawal_word: Vec<WithdrawalStep>,
     pub exact_work: ExactWork,
@@ -174,13 +194,19 @@ impl DerivedFactorCover {
             exact_work = exact_work.then(&local.work);
             locals.push(local);
         }
+        let complete_pair_population = pair_population(locals.len())?;
         let mut overlaps = Vec::new();
-        for left in 0..locals.len() {
-            for right in left + 1..locals.len() {
-                overlaps.push(compare_sections(
-                    &locals[left].section,
-                    &locals[right].section,
-                )?);
+        let mut compact_interchange_families = Vec::new();
+        if let Some(family) = compact_column_interchange_family(&locals)? {
+            compact_interchange_families.push(family);
+        } else {
+            for left in 0..locals.len() {
+                for right in left + 1..locals.len() {
+                    overlaps.push(compare_sections(
+                        &locals[left].section,
+                        &locals[right].section,
+                    )?);
+                }
             }
         }
         let factor_order = locals
@@ -192,15 +218,163 @@ impl DerivedFactorCover {
             .rev()
             .flat_map(|local| local.withdrawal_word.iter().cloned())
             .collect();
-        Ok(Self {
-            schema: "holonic-engine.derived-factor-cover.v1".to_owned(),
+        let cover = Self {
+            schema: "holonic-engine.derived-factor-cover.v2".to_owned(),
             locals,
             overlaps,
+            compact_interchange_families,
+            complete_pair_population,
             factor_order,
             withdrawal_word,
             exact_work,
-        })
+        };
+        cover.validate()?;
+        Ok(cover)
     }
+
+    /// Reopen the complete cover from its local receipts and compact pair-family testimony.
+    pub fn validate(&self) -> Result<(), FactorCoverError> {
+        if self.schema != "holonic-engine.derived-factor-cover.v2" {
+            return Err(FactorCoverError::CoverSchema(self.schema.clone()));
+        }
+        let expected_pairs = pair_population(self.locals.len())?;
+        if self.complete_pair_population != expected_pairs {
+            return Err(FactorCoverError::PairPopulation);
+        }
+        let mut reconstructed_work = ExactWork::nothing();
+        for local in &self.locals {
+            let reconstructed = local.section.clone().derive()?;
+            if reconstructed != *local {
+                return Err(FactorCoverError::LocalReceipt(
+                    local.section.address.clone(),
+                ));
+            }
+            reconstructed_work = reconstructed_work.then(&local.work);
+        }
+        if reconstructed_work != self.exact_work {
+            return Err(FactorCoverError::CoverWork);
+        }
+        let local_addresses = self
+            .locals
+            .iter()
+            .map(|local| local.section.address.as_str())
+            .collect::<BTreeSet<_>>();
+        if local_addresses.len() != self.locals.len() {
+            return Err(FactorCoverError::PairPopulation);
+        }
+        let factor_order = self
+            .locals
+            .iter()
+            .flat_map(|local| local.factors.iter().map(|factor| factor.address.clone()))
+            .collect::<Vec<_>>();
+        let withdrawal_word = self
+            .locals
+            .iter()
+            .rev()
+            .flat_map(|local| local.withdrawal_word.iter().cloned())
+            .collect::<Vec<_>>();
+        if self.factor_order != factor_order || self.withdrawal_word != withdrawal_word {
+            return Err(FactorCoverError::CoverOrder);
+        }
+        let compact_pairs =
+            self.compact_interchange_families
+                .iter()
+                .try_fold(0_u64, |sum, family| {
+                    validate_compact_family(family, &self.locals)?;
+                    sum.checked_add(family.pair_population)
+                        .ok_or(FactorCoverError::PairPopulation)
+                })?;
+        let explicit_pairs =
+            u64::try_from(self.overlaps.len()).map_err(|_| FactorCoverError::PairPopulation)?;
+        if explicit_pairs
+            .checked_add(compact_pairs)
+            .ok_or(FactorCoverError::PairPopulation)?
+            != expected_pairs
+        {
+            return Err(FactorCoverError::PairPopulation);
+        }
+        Ok(())
+    }
+}
+
+fn compact_column_interchange_family(
+    locals: &[LocalFactorReceipt],
+) -> Result<Option<CompactInterchangeFamilyReceipt>, FactorCoverError> {
+    if locals.len() < 2 {
+        return Ok(None);
+    }
+    let first = &locals[0].section;
+    if locals.iter().any(|local| {
+        local.section.chart != first.chart
+            || local.section.ambient_rows != first.ambient_rows
+            || local.section.ambient_columns != first.ambient_columns
+    }) {
+        return Ok(None);
+    }
+    let mut occupied = BTreeSet::new();
+    for local in locals {
+        for column in &local.section.support_columns {
+            if !occupied.insert(*column) {
+                return Ok(None);
+            }
+        }
+    }
+    Ok(Some(CompactInterchangeFamilyReceipt {
+        chart: first.chart.clone(),
+        ambient_rows: first.ambient_rows,
+        ambient_columns: first.ambient_columns,
+        members: locals
+            .iter()
+            .map(|local| local.section.address.clone())
+            .collect(),
+        disjoint_support_axis: "columns".to_owned(),
+        pair_population: pair_population(locals.len())?,
+        interchange_law: "additive-local-delta-interchange".to_owned(),
+    }))
+}
+
+fn validate_compact_family(
+    family: &CompactInterchangeFamilyReceipt,
+    locals: &[LocalFactorReceipt],
+) -> Result<(), FactorCoverError> {
+    if family.disjoint_support_axis != "columns"
+        || family.interchange_law != "additive-local-delta-interchange"
+        || family.members.len() < 2
+        || family.pair_population != pair_population(family.members.len())?
+    {
+        return Err(FactorCoverError::CompactInterchange);
+    }
+    let by_address = locals
+        .iter()
+        .map(|local| (local.section.address.as_str(), &local.section))
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut members = BTreeSet::new();
+    let mut occupied = BTreeSet::new();
+    for address in &family.members {
+        let section = by_address
+            .get(address.as_str())
+            .ok_or(FactorCoverError::CompactInterchange)?;
+        if !members.insert(address.as_str())
+            || section.chart != family.chart
+            || section.ambient_rows != family.ambient_rows
+            || section.ambient_columns != family.ambient_columns
+            || section
+                .support_columns
+                .iter()
+                .any(|column| !occupied.insert(*column))
+        {
+            return Err(FactorCoverError::CompactInterchange);
+        }
+    }
+    Ok(())
+}
+
+fn pair_population(population: usize) -> Result<u64, FactorCoverError> {
+    let population = u64::try_from(population).map_err(|_| FactorCoverError::PairPopulation)?;
+    population
+        .checked_mul(population.saturating_sub(1))
+        .and_then(|value| value.checked_div(2))
+        .ok_or(FactorCoverError::PairPopulation)
 }
 
 impl SupportedDefectSection {
@@ -606,6 +780,18 @@ fn union(left: &[usize], right: &[usize]) -> Vec<usize> {
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum FactorCoverError {
+    #[error("derived factor cover has unknown schema {0}")]
+    CoverSchema(String),
+    #[error("derived factor cover has an incomplete or overflowing pair population")]
+    PairPopulation,
+    #[error("derived factor cover does not retain its causal factor/withdrawal order")]
+    CoverOrder,
+    #[error("local factor receipt {0} does not reconstruct from its supported defect")]
+    LocalReceipt(String),
+    #[error("derived factor cover has incorrect exact-work testimony")]
+    CoverWork,
+    #[error("compact interchange testimony does not reconstruct from pairwise-disjoint support")]
+    CompactInterchange,
     #[error("a local defect section lacks addressed parent/receiver/chart lineage")]
     UnaddressedSection,
     #[error("duplicate local defect address {0}")]

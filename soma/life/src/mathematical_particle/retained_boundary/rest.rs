@@ -1,19 +1,19 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::receiver_exact_compression::{ItemId, ObservedSystem, ReceiverExactCompression};
-use holonic_engine::receiver_history_compression::{
-    NativeStateId, ReceiverHistoryCompression,
+use holonic_engine::receiver_exact_compression::{
+    ItemId, ObservedSystem, ReceiverExactCompression,
 };
+use holonic_engine::receiver_history_compression::{NativeStateId, ReceiverHistoryCompression};
 use sha2::{Digest, Sha256};
 
 use super::{
     system::AddressedHistorySystem,
     types::{
-        BoundaryRecurrence, CultivatedActionLineage, HistoricalInterior,
-        HistoricalSourceMember, LongHorizonBoundaryError, LongHorizonRetainedBoundary,
-        OrderedBoundaryHolonomy, RetainedBoundaryDecoder, RetainedBoundaryFibres,
-        RetainedBoundaryStanding, RicherReceiverReopening, LONG_HORIZON_DECODER_SCHEMA,
-        LONG_HORIZON_FIBRES_SCHEMA, LONG_HORIZON_STANDING_SCHEMA,
+        BoundaryRecurrence, CultivatedActionLineage, HistoricalInterior, HistoricalSourceMember,
+        LongHorizonBoundaryError, LongHorizonRetainedBoundary, OrderedBoundaryHolonomy,
+        RetainedBoundaryDecoder, RetainedBoundaryFibres, RetainedBoundaryStanding,
+        RicherReceiverReopening, LONG_HORIZON_DECODER_SCHEMA, LONG_HORIZON_FIBRES_SCHEMA,
+        LONG_HORIZON_STANDING_SCHEMA,
     },
     validation::{validate_decoder, validate_fibres, validate_standing},
 };
@@ -349,8 +349,12 @@ pub(super) fn derive_holonomy(
                 let right_word = vec![right as u32, left as u32];
                 let left_trace = trace(states, table, *entering, &left_word)?;
                 let right_trace = trace(states, table, *entering, &right_word)?;
-                let left_endpoint = *left_trace.last().ok_or(LongHorizonBoundaryError::Holonomy)?;
-                let right_endpoint = *right_trace.last().ok_or(LongHorizonBoundaryError::Holonomy)?;
+                let left_endpoint = *left_trace
+                    .last()
+                    .ok_or(LongHorizonBoundaryError::Holonomy)?;
+                let right_endpoint = *right_trace
+                    .last()
+                    .ok_or(LongHorizonBoundaryError::Holonomy)?;
                 if left_endpoint != right_endpoint && commutator_rank > 0 {
                     return Ok(OrderedBoundaryHolonomy {
                         entering: *entering,
@@ -377,16 +381,16 @@ fn trace(
 ) -> Result<Vec<NativeStateId>, LongHorizonBoundaryError> {
     let generators = table.len() / states.len();
     if start.0 as usize >= states.len()
-        || word.iter().any(|generator| *generator as usize >= generators)
+        || word
+            .iter()
+            .any(|generator| *generator as usize >= generators)
     {
         return Err(LongHorizonBoundaryError::Standing);
     }
     let mut state = start;
     let mut returned = vec![state];
     for generator in word {
-        state = NativeStateId(
-            table[*generator as usize * states.len() + state.0 as usize] as u64,
-        );
+        state = NativeStateId(table[*generator as usize * states.len() + state.0 as usize] as u64);
         returned.push(state);
     }
     Ok(returned)

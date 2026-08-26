@@ -31,7 +31,11 @@ pub fn conduct(
     let production = card
         .conduct_production_aperture_on_device(
             &rest.production.retained_boundary.standing.generator_table,
-            rest.production.retained_boundary.standing.native_states.len(),
+            rest.production
+                .retained_boundary
+                .standing
+                .native_states
+                .len(),
             &[0, 1, 0, 1],
             &rest
                 .production
@@ -77,13 +81,19 @@ pub fn conduct(
         }]
         || route.len()
             != if invariant {
-                if rest.committed() { 1 } else { 3 }
+                if rest.committed() {
+                    1
+                } else {
+                    3
+                }
             } else {
                 1
             }
         || native.native_end != vec![rest.cultivated_history.leader_endpoint.0 as u32]
     {
-        return Err("the resident laboratory passages disagreed with their continuing rest".to_owned());
+        return Err(
+            "the resident laboratory passages disagreed with their continuing rest".to_owned(),
+        );
     }
 
     let returned = [
@@ -145,11 +155,8 @@ pub fn conduct(
             "chart_determinant": inquiry.chart_map[0] * inquiry.chart_map[3] - inquiry.chart_map[1] * inquiry.chart_map[2],
         }),
     )?;
-    let rendering = render::exact_quadratic_faces(
-        inquiry.quadratic_section,
-        inquiry.chart_map,
-        output,
-    )?;
+    let rendering =
+        render::exact_quadratic_faces(inquiry.quadratic_section, inquiry.chart_map, output)?;
     artifact::write_json(output.join("10-rendering-receipt.json"), &rendering)?;
     artifact::write_json(
         output.join("05-complete-dissection.json"),
@@ -167,7 +174,11 @@ pub fn conduct(
     ];
     let forbidden_source_access = open_descriptors
         .iter()
-        .filter(|target| forbidden_needles.iter().any(|needle| target.contains(needle)))
+        .filter(|target| {
+            forbidden_needles
+                .iter()
+                .any(|needle| target.contains(needle))
+        })
         .cloned()
         .collect::<Vec<_>>();
     if !forbidden_source_access.is_empty() {
@@ -263,7 +274,8 @@ fn native_passage(rest: &LaboratoryAthenaRest) -> Result<(Vec<u32>, Vec<u32>, Ve
     for generator in &rest.native.generators {
         let mut row = vec![u32::MAX; states];
         for edge in &generator.transport {
-            row[edge.from.0 as usize] = u32::try_from(edge.to.0).map_err(|error| error.to_string())?;
+            row[edge.from.0 as usize] =
+                u32::try_from(edge.to.0).map_err(|error| error.to_string())?;
         }
         if row.contains(&u32::MAX) {
             return Err("the M3 generator left a partial device row".to_owned());

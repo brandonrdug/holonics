@@ -42,10 +42,10 @@
 //!
 //! # Fronts are not serial chains
 //!
-//! Q/K/V are co-present branches of one predecessor; gate and up are co-present branches of
-//! another. [`Front`] reads them off [`crate::causal::CausalDiagram::layers`] rather than counting
-//! contractions, because **contraction count is not dependency span** and the apparatus consequence
-//! follows the second.
+//! Any co-present foreign branches which share one predecessor form one front, independent of the
+//! names an exterior implementation gives them. [`Front`] reads this from
+//! [`crate::causal::CausalDiagram::layers`] rather than counting contractions, because
+//! **contraction count is not dependency span** and the apparatus consequence follows the second.
 //!
 //! # Nothing here selects a representative
 //!
@@ -548,8 +548,8 @@ fn compose_in_causal_order(word: &[ExactRatMatrix]) -> Result<ExactRatMatrix, Po
 
 /// **A co-present front: occurrences that share a predecessor and no dependency.**
 ///
-/// Read off the diagram's own layering, never from a count of contractions. Q/K/V form one front;
-/// gate and up form another. The apparatus consequence follows this and not the arithmetic volume.
+/// Read off the diagram's own layering, never from foreign operator names or a count of
+/// contractions. The apparatus consequence follows causal dependency, not arithmetic volume.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Front {
     pub depth: usize,

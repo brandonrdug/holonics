@@ -63,6 +63,8 @@ pub struct CudaLiveCurrentExecutor {
     /// population mouth hands it to `Function::linear_launch`, which derives grid and block from it
     /// together with the function's own attribute. No launch geometry is authored anywhere.
     launch_census: Option<::mount::cuda::LaunchCensus>,
+    max_blocks_per_multiprocessor: u32,
+    concurrent_kernels: bool,
     pub(crate) context: Context,
 }
 
@@ -71,6 +73,19 @@ impl CudaLiveCurrentExecutor {
         ::mount::cuda::init()?;
         let device = Device::get(device_ordinal)?;
         let launch_census = Some(device.launch_census()?);
+        let max_blocks_per_multiprocessor = u32::try_from(
+            device.attribute(::mount::DeviceAttribute::MAX_BLOCKS_PER_MULTIPROCESSOR)?,
+        )
+        .ok()
+        .filter(|value| *value > 0)
+        .ok_or_else(|| ::mount::CudaError {
+            code: -1,
+            name: String::from("LIVE_EVENT_BLOCK_RESIDENCY"),
+            message: String::from("the device reported no resident block aperture"),
+            context: "CudaLiveCurrentExecutor::new",
+        })?;
+        let concurrent_kernels =
+            device.attribute(::mount::DeviceAttribute::CONCURRENT_KERNELS)? != 0;
         let context = Context::create(&device)?;
         let module = Module::load_ptx(SOMA_PTX)?;
         let local = module.lineage_event()?.local_size_bytes()?;
@@ -106,6 +121,8 @@ impl CudaLiveCurrentExecutor {
             resident_lineages: BTreeMap::new(),
             staged: None,
             launch_census,
+            max_blocks_per_multiprocessor,
+            concurrent_kernels,
             context,
         })
     }

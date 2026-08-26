@@ -9,7 +9,7 @@ use holonic_engine::{
 use image::{ImageReader, Rgb, RgbImage};
 use life::{
     mathematical_particle::NativeMathematicalConsequence,
-    mathematical_source::{OpticalPassage, recover_optical_passage},
+    mathematical_source::{recover_optical_passage, OpticalPassage},
 };
 use serde::Serialize;
 
@@ -116,7 +116,9 @@ pub fn recover(input: &Path, output: &Path) -> Result<(), String> {
         || passage.device.synchronizations != 1
         || passage.device.cpu_semantic_fallback
     {
-        return Err("the emitted geometry did not return a resident optical consequence".to_owned());
+        return Err(
+            "the emitted geometry did not return a resident optical consequence".to_owned(),
+        );
     }
     artifact::write_json(output, &passage)?;
     Ok(())
@@ -128,7 +130,11 @@ pub fn read_passage(path: &Path) -> Result<OpticalPassage, String> {
 
 fn offset(base: u32, value: i64) -> u32 {
     let magnitude = value.unsigned_abs().min(9) as u32;
-    if value < 0 { base + magnitude } else { base.saturating_sub(magnitude) }
+    if value < 0 {
+        base + magnitude
+    } else {
+        base.saturating_sub(magnitude)
+    }
 }
 
 fn draw_grain(image: &mut RgbImage, left: u32, top: u32, color: Rgb<u8>) {

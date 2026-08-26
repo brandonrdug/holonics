@@ -25,8 +25,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
-const DEFECTS: &str =
-    "output/the_candidate_departs_before_sibling_testimony_returns/02-returned-sibling-defects.json";
+const DEFECTS: &str = "output/the_candidate_departs_before_sibling_testimony_returns/02-returned-sibling-defects.json";
 const OUTPUT: &str = "output/the_returned_defect_founds_a_derived_local_factor_cover";
 const ONE: u16 = 0x3f80;
 
@@ -560,7 +559,11 @@ fn write_inspection(
         "# The returned defect founded a derived local factor cover\n\n- Returned defect sections: {}.\n- Derived source factors: {}.\n- First source rank: {}.\n- Rank-zero control: {}.\n- Rank-one control: {}.\n- Singular higher-rank control: rank {}, radical {}, open exterior {}.\n- Resident device: {}.\n- Resident derived-rank front: {} factors, {} deed launch, exact reconstruction {}.\n- Compatible glue, commuting cocycle, noncommuting holonomy and disjoint interchange are retained in 01-exact-controls.json.\n- Station grade: {passed}.\n",
         source.cover.locals.len(),
         source.cover.factor_order.len(),
-        source.cover.locals.first().map_or(0, |local| local.derived_rank),
+        source
+            .cover
+            .locals
+            .first()
+            .map_or(0, |local| local.derived_rank),
         controls.rank_zero.derived_rank,
         controls.rank_one.derived_rank,
         controls.rank_higher_singular.derived_rank,

@@ -5,6 +5,20 @@ impl CudaLiveCurrentExecutor {
         &self.device_name
     }
 
+    pub(crate) fn multiprocessor_count(&self) -> u32 {
+        self.launch_census
+            .as_ref()
+            .map_or(1, |census| census.multiprocessor_count.max(1))
+    }
+
+    pub(crate) const fn max_blocks_per_multiprocessor(&self) -> u32 {
+        self.max_blocks_per_multiprocessor
+    }
+
+    pub(crate) const fn concurrent_kernels(&self) -> bool {
+        self.concurrent_kernels
+    }
+
     pub const fn stack_limit_bytes(&self) -> usize {
         self.stack_limit_bytes
     }

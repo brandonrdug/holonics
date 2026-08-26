@@ -83,8 +83,7 @@ impl AddressedHistorySystem {
 
     pub fn coordinates(&self, item: ItemId) -> Option<(usize, u32)> {
         let at = usize::try_from(item.0).ok()?;
-        (at < self.interiors * self.states)
-            .then_some((at / self.states, (at % self.states) as u32))
+        (at < self.interiors * self.states).then_some((at / self.states, (at % self.states) as u32))
     }
 
     pub fn base_observations(&self, state: u32) -> Option<Vec<Observation>> {

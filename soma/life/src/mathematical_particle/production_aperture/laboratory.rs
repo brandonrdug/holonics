@@ -8,9 +8,8 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use super::laboratory_types::{
-    LaboratoryAthenaError, LaboratoryAthenaRest, LaboratoryChronology,
-    LaboratoryComponentIdentity, LaboratoryDecision, LaboratoryInquiry,
-    LaboratoryMorphologyDelta, LaboratoryPartitionKind,
+    LaboratoryAthenaError, LaboratoryAthenaRest, LaboratoryChronology, LaboratoryComponentIdentity,
+    LaboratoryDecision, LaboratoryInquiry, LaboratoryMorphologyDelta, LaboratoryPartitionKind,
     LaboratoryReconstructionBoundary, LaboratoryRouteDecoder, LaboratoryStandingJunction,
     LaboratoryWithdrawalReceipt, LaboratoryWorldReturn,
 };
@@ -91,7 +90,10 @@ impl LaboratoryChronology {
             || self.occurrences.is_empty()
             || self.incrementally_mounted_octets == 0
             || self.whole_repository_semantic_materializations != 0
-            || self.occurrences.first().map(|commit| commit.parent.as_str())
+            || self
+                .occurrences
+                .first()
+                .map(|commit| commit.parent.as_str())
                 != Some(self.predecessor_commit.as_str())
             || self.occurrences.last().map(|commit| commit.commit.as_str())
                 != Some(self.prefix_commit.as_str())
@@ -268,12 +270,8 @@ impl LaboratoryAthenaRest {
         if decision_occurrence.is_empty() {
             return Err(LaboratoryAthenaError::Decision);
         }
-        let component_identities = identities(
-            &production,
-            &native,
-            &cultivated_history,
-            &chronology,
-        )?;
+        let component_identities =
+            identities(&production, &native, &cultivated_history, &chronology)?;
         let mut developmental_occurrence_sha256 = chronology
             .occurrences
             .iter()
@@ -351,8 +349,9 @@ impl LaboratoryAthenaRest {
             .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?;
         let native = GeneratorNativeRest::read(&standing[1])
             .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?;
-        let cultivated_history: CultivatedReceiverHistoryRest = serde_json::from_slice(&standing[2])
-            .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?;
+        let cultivated_history: CultivatedReceiverHistoryRest =
+            serde_json::from_slice(&standing[2])
+                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?;
         CultivatedReceiverHistoryRest::mount(&standing[2], &standing[1])
             .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
         let rest = Self {
@@ -570,12 +569,16 @@ impl LaboratoryAthenaRest {
             || self.junction.decision_occurrence.is_empty()
             || self.junction.open_exterior.is_empty()
             || self.decoder.schema != LABORATORY_DECODER_SCHEMA
-            || self.decoder.expanded_transport_word.len() <= self.decoder.condensed_transport_word.len()
+            || self.decoder.expanded_transport_word.len()
+                <= self.decoder.condensed_transport_word.len()
             || self.decoder.condensed_transport_word.is_empty()
             || self.decoder.obstruction_transport_word.is_empty()
             || self.decoder.coefficient_basis.len() != 3
             || self.reconstruction.schema != LABORATORY_FIBRES_SCHEMA
-            || self.reconstruction.developmental_occurrence_sha256.is_empty()
+            || self
+                .reconstruction
+                .developmental_occurrence_sha256
+                .is_empty()
             || self
                 .reconstruction
                 .developmental_occurrence_sha256

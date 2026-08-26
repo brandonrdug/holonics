@@ -29,10 +29,15 @@ and
 
 ## 1. The organ and the ecology
 
-`definition`: a pretrained transformer is inherited morphology implementing a population of local
-transports. It is one organ. The productive reasoning machine is the returning ecology in which
-mounted material, that morphology, exterior ports, world consequences, reflection, and later
-conduct form one continuing causal cycle:
+`definition`: within Soulkiller, a pretrained transformer is a foreign realization of inherited
+morphology implementing a population of local transports. It is scrapyard material, not an organ
+which remains foreign inside Athena. Soulkiller returns a source-neutral native spool bundle, a
+separate cold exterior witness, and explicit receiver insufficiency. Eros alone composes admitted
+spools and returned consequences into Athena; foreign model identity and execution have ended.
+
+The productive reasoning machine is the returning ecology in which mounted material, native
+morphology, exterior ports, world consequences, reflection, and later conduct form one continuing
+causal cycle:
 
 ```text
 mount -> conduct -> radiate -> world -> return -> reflect -> changed continuation
@@ -59,38 +64,42 @@ the declared ports, and `Chi_t` the returned comparison: retained and departed a
 distinguishing histories, obstruction, lineage, and any attributable morphological delta. An
 emission privately copied back into an input buffer is not a world return.
 
+`definition`: Soulkiller owns no inference mechanism or retained-state convention. A foreign
+realization's internal factorization remains opaque apparatus conduct unless a declared exterior
+reconstruction receiver asks about it. Soulkiller neither requires nor reproduces that
+factorization. An Athena front is an addressed factorization of native incidence, current,
+constitutive response, chronology, receiver consequence, and reconstruction fibre.
+
 ## 2. The bra-ket anatomy of local transport
 
-The Dirac notation is typed, not decorative. Let `|x_i^ell>` be a situated construction at one
-depth. One attention chart presents
+The Dirac notation is typed, not decorative. Let `|x>` be a situated construction, `T_f` a declared
+local transport, and `<rho|` a receiver covector. The complete typed face is
 
 ```text
-<q_i^(ell,h)| = <x_i^ell| Q_(ell,h)^dagger     event-conditioned receiver
-|k_j^(ell,h)> = K_(ell,h) |x_j^ell>            presented contact orientation
-|v_j^(ell,h)> = V_(ell,h) |x_j^ell>            construction available to carry
-
-b_ij^(ell,h) = <q_i^(ell,h) | k_j^(ell,h)>     one compatibility face
+|x> --T_f--> |y>
+<rho|y> = <rho|T_f|x>
 ```
 
-and, under the chart's declared chronology, mask, and normalization `Gamma`,
+If several caused contacts `c_j` present carried constructions `|u_j>` through a declared local
+constitutive law `Gamma`, one possible finite chart is
 
 ```text
-a_ij = Gamma(b_i1, ..., b_in)_j,
-|delta x_i> = sum_j a_ij |v_j>.
+alpha_j = Gamma(<rho|c_1>, ..., <rho|c_n>)_j,
+|delta x> = sum_j alpha_j |u_j>.
 ```
 
-`proved-standard`: this is an ordinary finite linear-algebra factorization. When `Gamma` is
-softmax, the coefficients are barycentric over the admitted value population. The bracket is not
-meaning, truth, attention-as-a-faculty, or the entire cause. It is one receiver face over one
-event-local population.
+`proved-standard`: this is an ordinary finite linear-algebra presentation. When `Gamma` is softmax,
+the coefficients are barycentric over the admitted carried population. The bracket is not meaning,
+truth, a named inference faculty, or the entire cause. It is one receiver face over one event-local
+population.
 
 The local return joins the continuing standing:
 
 ```text
-|X_(ell+1)> = N_ell(
-    |X_ell>
-    + O_ell (direct-sum_h |delta X_ell^h>)
-    + |delta X_ell^constitutive>
+|X_(t+1)> = N_t(
+    |X_t>
+    + O_t |delta X_t>
+    + |delta X_t^constitutive>
 ).
 ```
 
@@ -111,7 +120,7 @@ conduct rather than by the inherited label.
 | position or relative encoding | chronological and relative-incidence transport |
 | weights | inherited morphology and constitutive transport |
 | activation | situated current standing during one passage |
-| query / key / value | receiver bra / presented orientation / carried construction |
+| a foreign probe / contact / carried-section factorization, when present | receiver bra / presented orientation / carried construction |
 | attention head | bounded interaction chart |
 | residual stream | continuing standing receiving returned local differences |
 | MLP | local nonlinear constitutive reaction |

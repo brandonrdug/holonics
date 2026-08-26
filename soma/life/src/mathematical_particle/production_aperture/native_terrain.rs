@@ -47,7 +47,11 @@ fn value_digest<T: Serialize>(value: &T) -> Result<String, NativeTerrainError> {
 }
 
 fn route(residual: i64) -> u32 {
-    if residual == 0 { 1 } else { 2 }
+    if residual == 0 {
+        1
+    } else {
+        2
+    }
 }
 
 fn added_histories(family: u32) -> Vec<NativeSuccessorHistory> {
@@ -481,10 +485,9 @@ impl NativeTerrainAthenaRest {
             || inquiry.predecessor_rest_sha256 != self.canonical_identity()?
             || inquiry_receivers != declared_receivers
             || inquiry.sections.len() != self.chart_count()
-            || inquiry
-                .sections
-                .iter()
-                .any(|section| section.len() != self.predecessor.standing().generator.dimension as usize)
+            || inquiry.sections.iter().any(|section| {
+                section.len() != self.predecessor.standing().generator.dimension as usize
+            })
             || inquiry.presentation.natural_language.is_empty()
             || inquiry.presentation.notation.is_empty()
             || !is_digest(&inquiry.presentation.vector_face_sha256)
@@ -558,7 +561,9 @@ impl NativeTerrainAthenaRest {
         self.predecessor.decoder().factorizations.len() + self.decoder.added_factorizations.len()
     }
 
-    pub fn withdraw(self) -> Result<(NativeHexisAthenaRest, NativeTerrainWithdrawalReceipt), NativeTerrainError> {
+    pub fn withdraw(
+        self,
+    ) -> Result<(NativeHexisAthenaRest, NativeTerrainWithdrawalReceipt), NativeTerrainError> {
         let cultivated_identity = self.canonical_identity()?;
         let restored_identity = self
             .predecessor

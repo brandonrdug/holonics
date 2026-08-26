@@ -31,8 +31,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
         .canonical_identity()
         .map_err(|error| error.to_string())?;
     let developmental_return = provisional_development(&predecessor)?;
-    if developmental_return.selected_route != vec![1, 1, 0]
-        || developmental_return.joint_cultivated
+    if developmental_return.selected_route != vec![1, 1, 0] || developmental_return.joint_cultivated
     {
         return Err("the provisional returned chart was already continuing morphology".to_owned());
     }
@@ -56,7 +55,10 @@ pub fn construct(root: &Path) -> Result<(), String> {
     let proof_path = output.join("01-development-returned-proof.lean");
     fs::write(&proof_path, proof.as_bytes()).map_err(|error| error.to_string())?;
     let lean_return = run_lean(root, &proof_path)?;
-    artifact::write_json(output.join("02-genuine-lean-world-return.json"), &lean_return)?;
+    artifact::write_json(
+        output.join("02-genuine-lean-world-return.json"),
+        &lean_return,
+    )?;
     let emitted = serde_json::to_vec(&json!({
         "entered_sections": DEVELOPMENT.chunks(3).collect::<Vec<_>>(),
         "equation": "T(s)=s+L(C(s))",
@@ -95,22 +97,38 @@ pub fn construct(root: &Path) -> Result<(), String> {
         .map_err(|error| error.to_string())?;
     let native_rest = output.join("native-rest");
     let (standing, decoder, fibres) = rest::write(&terrain, &native_rest)?;
-    artifact::write_json(output.join("03-native-terrain-standing.json"), terrain.standing())?;
-    artifact::write_json(output.join("04-native-terrain-decoder.json"), terrain.decoder())?;
+    artifact::write_json(
+        output.join("03-native-terrain-standing.json"),
+        terrain.standing(),
+    )?;
+    artifact::write_json(
+        output.join("04-native-terrain-decoder.json"),
+        terrain.decoder(),
+    )?;
     artifact::write_json(
         output.join("05-native-terrain-reconstruction.json"),
         terrain.reconstruction(),
     )?;
 
     let histories = vec![
-        terrain.standing().cultivation.world_return.occurrence.clone(),
+        terrain
+            .standing()
+            .cultivation
+            .world_return
+            .occurrence
+            .clone(),
         terrain
             .standing()
             .cultivation
             .carrier_chart
             .source_plate_occurrence
             .clone(),
-        terrain.predecessor().standing().generator.occurrence.clone(),
+        terrain
+            .predecessor()
+            .standing()
+            .generator
+            .occurrence
+            .clone(),
     ];
     let revisited = vec![
         NativeSuccessorHistory::ComposedJoint,
@@ -349,7 +367,9 @@ fn run_detached(
     inquiry: &Path,
     output: &Path,
 ) -> Result<(), String> {
-    let executable = executable.canonicalize().map_err(|error| error.to_string())?;
+    let executable = executable
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
     let standing = standing.canonicalize().map_err(|error| error.to_string())?;
     let decoder = decoder.canonicalize().map_err(|error| error.to_string())?;
     let fibres = fibres.canonicalize().map_err(|error| error.to_string())?;

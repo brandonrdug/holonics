@@ -17,7 +17,7 @@ use std::time::Instant;
 
 use holonic_engine::{
     cuda_refine::CudaRefineExecutor,
-    phoenix::{
+    native_ecology::{
         recurrent::RetainedContinuationRest,
         recurrent_return::{
             ExteriorToolReturn, RecurrentSemanticWork, ReturnDecision, ReturnedRecurrentRest,
@@ -783,8 +783,8 @@ fn sha256(bytes: &[u8]) -> String {
 fn code_closure() -> String {
     let members: &[&[u8]] = &[
         include_bytes!("the_exterior_return_changes_the_later_current.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/recurrent_return.rs"),
-        include_bytes!("../../../crates/holonic-engine/src/phoenix/recurrent.rs"),
+        include_bytes!("../../../crates/holonic-engine/src/native_ecology/recurrent_return.rs"),
+        include_bytes!("../../../crates/holonic-engine/src/native_ecology/recurrent.rs"),
         include_bytes!("../../../crates/holonic-engine/src/cuda_refine.rs"),
         include_bytes!("../../../crates/holonic-engine/kernels/refine_shell.cu"),
     ];

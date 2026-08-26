@@ -22,7 +22,10 @@ fn main() {
         }
         [] => product::construct(&product::root(), Path::new(product::DEFAULT_OUT)),
         [output] => product::construct(&product::root(), Path::new(output)),
-        _ => Err("usage: [OUTPUT] | --optical-return INPUT OUTPUT | --detached REST SECTIONS OUTPUT".to_owned()),
+        _ => Err(
+            "usage: [OUTPUT] | --optical-return INPUT OUTPUT | --detached REST SECTIONS OUTPUT"
+                .to_owned(),
+        ),
     };
     if let Err(error) = result {
         eprintln!("N3 refused: {error}");

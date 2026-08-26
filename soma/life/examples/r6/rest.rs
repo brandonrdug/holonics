@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::phoenix::inference_ecology::InferenceEcologyRest;
+use holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest;
 use life::mathematical_particle::{
     DynamicMorphologyRest, LongHorizonRetainedBoundary, MultimodalTransportRest,
     ProductionAthenaRest,

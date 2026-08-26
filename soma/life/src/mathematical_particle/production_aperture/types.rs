@@ -1,4 +1,4 @@
-use holonic_engine::phoenix::inference_ecology::InferenceEcologyRest;
+use holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

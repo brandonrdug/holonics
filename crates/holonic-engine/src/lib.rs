@@ -89,8 +89,8 @@ pub mod codec_system;
 pub mod cultivated_rest;
 /// Exact bounded two-coordinate W3 cultivation derivation and its receiver receipts.
 pub mod cultivation_derivation;
-/// Resident W1/W2/W3 Phoenix circulation, shared by deed drivers and the application runtime.
-pub mod phoenix;
+/// One-way dismantling boundary for inherited physical realizations.
+pub mod soulkiller;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
 // verbs in the crate root where nothing says what they read or step. `blueprint/THE_ASSEMBLY.md`.
@@ -189,6 +189,7 @@ pub mod derivation_two_cells;
 // says nothing at the crate root about which family it means.
 pub mod cross_chart;
 pub mod derivation_skein;
+pub mod derived_factor_cover;
 pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
@@ -196,7 +197,6 @@ pub mod display;
 pub mod divisor_reconstruction;
 pub mod evolution;
 pub mod exact_linear;
-pub mod derived_factor_cover;
 // The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
 // `<a|b>²/(<a|a><b|b>)`, whose dyadic frames cancel identically, so the face crosses where the
 // bracket cannot. Carried as a pair, ordered by cross-multiplication, with the hand the square
@@ -358,9 +358,17 @@ pub mod source_occurrence;
 // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
 pub mod front_passage;
 // The native arm: a rest that witnesses its own laws, and the atlas walked and read on the card.
+pub mod native_anatomical_potential;
+pub mod native_anatomy;
+/// Source-neutral native recurrence, receiver condensation, and conserved ecology junctions.
+pub mod native_ecology;
 pub mod native_law;
 pub mod native_occurrence;
 pub mod native_rest;
+/// Source-neutral addressed threads, reusable generator spools, and exact receiver insufficiency.
+pub mod native_spool;
+/// Cold exterior-realization ancestry and reconstruction testimony, physically outside native rest.
+pub mod soulkiller_witness;
 // Pooled source standing, refilled from an exterior container while the card conducts: one device
 // allocation reused across many deeds, page-locked host staging, and the events that order a
 // refill against the deed still reading the slot it replaces. The apparatus half of Deed H4; it
