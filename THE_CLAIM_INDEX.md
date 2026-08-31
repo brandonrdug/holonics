@@ -151,7 +151,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (437 deposits of 729)
+## 4 · The 2026-08 record line (438 deposits of 730)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -594,6 +594,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-30_THE_CONSERVED_PORT_CURRENT_RETURNED_RECURRENCE_BUT_ITS_PHASE_INSENSITIVE_RECEIVER_COULD_NOT_REALIZE_THE_NATIVE_COMPLEX_SECTION.md` | The conserved port current returned recurrence, but its phase-insensitive receiver could not realize the native complex section |
 | `2026-08-30_THE_NATIVE_SECTION_FOUNDED_ONE_SOURCE_NEUTRAL_BOUNDARY_CURRENT_BUT_FACTORWISE_ADJACENCY_COULD_NOT_CARRY_THE_CAUSAL_SURFACE.md` | The native section founded one source-neutral boundary current but factorwise adjacency could not carry the causal surface |
 | `2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md` | UAR R0Q session checkout — the receiver order was repaired but the site transport remained diagonal |
+| `2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` | CONS3 removed the moment-front foreman and the resident receiver now observes the committed target |
 | `2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md` | Constructive differentials keep `dx` typed and refinement does not erase the potential fibre |
 | `2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md` | Finite many-body, polarized crystal, and diffusion Lean foundation returned to the engine |
 
@@ -615,7 +616,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, `research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`, and 1 more |
 | `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on the live construction authority. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, and 71 more |
+| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, and 72 more |
 | `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `CONSTRUCTION_STATE.md`, `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, and 6 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `meta/OUTPUT_MANIFEST.tsv`, `meta/history/2026-08-30_OUTPUT_MANIFEST_PRE_CLEANUP.tsv`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
@@ -623,7 +624,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, `research/records/2026-08-16_THE_COUNT_GATED_SPEECH_NOT_ADMISSION_AND_THE_EXCISION_IS_REFUTED.md` |
 | `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
 | `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `canon/THE_DOCUMENT_LAW.md`, `canon/THE_TIMELINE.md`, and 9 more |
-| `tools/source_shape.py` | Rust/CUDA source-shape gate. | **nothing names it** |
+| `tools/source_shape.py` | Rust/CUDA source-shape gate. | `research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` |
 | `tools/tracked_authority.py` | Require the live authority and named UAR/HNN owners to exist in the Git index. | **nothing names it** |
 
 `cargo test --workspace` is the gate that is actually run alongside these.

@@ -126,14 +126,51 @@ sum_test_results() {
 gate_tests() {
     local out="$WORK/tests.out"
     local examples="$WORK/examples.out"
+    local metadata="$WORK/cargo-metadata.json"
+    local packages="$WORK/cargo-packages.txt"
     # Unit/integration/bin tests are the executable guard population. The example targets are
     # an evidence-driver corpus and are marked `test=false`; linking every one into the test profile
     # made a local library repair pay hundreds of binaries. Keep their release-boundary coverage by
     # type-checking them once, without linking or executing them all. Real deeds are still built and
     # executed explicitly by their owning phase.
-    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
-        cargo test --workspace --lib --bins --tests -j 2 >"$out" 2>&1
-    local tests_status=$?
+    # One process for the whole workspace crossed the outer boundary before Cargo emitted even one
+    # result line. Derive the exact package population from Cargo, then give every package its own
+    # bound. This preserves the complete suite and makes the obstruction attributable.
+    "${PROCESS_BOUND[@]}" env PATH="$CARGO_PATH" \
+        cargo metadata --no-deps --format-version 1 >"$metadata" 2>"$out"
+    local metadata_status=$?
+    if [ "$metadata_status" -eq 0 ]; then
+        "${PROCESS_BOUND[@]}" python3 - "$metadata" >"$packages" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    metadata = json.load(source)
+library_kinds = {"lib", "rlib", "dylib", "staticlib", "cdylib", "proc-macro"}
+for entry in sorted(metadata["packages"], key=lambda package: package["name"]):
+    has_library = any(
+        library_kinds.intersection(target["kind"])
+        for target in entry["targets"]
+    )
+    print(f'{entry["name"]}\t{int(has_library)}')
+PY
+    fi
+    local package_list_status=$?
+    local tests_status=0
+    if [ "$metadata_status" -ne 0 ] || [ "$package_list_status" -ne 0 ]; then
+        tests_status=1
+    else
+        while IFS=$'\t' read -r package has_library; do
+            local target_arguments=(--bins --tests)
+            if [ "$has_library" -eq 1 ]; then
+                target_arguments+=(--lib)
+            fi
+            "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+                cargo test -p "$package" "${target_arguments[@]}" --no-fail-fast -j 2 \
+                >>"$out" 2>&1
+            [ "$?" -eq 0 ] || tests_status=1
+        done <"$packages"
+    fi
     "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo check --workspace --examples -j 2 >"$examples" 2>&1
     local examples_status=$?

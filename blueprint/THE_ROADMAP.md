@@ -94,12 +94,12 @@ review and construction receipt are in
 
 ## Active campaign — repository consolidation before UAR resumes
 
-**Current frontier:** CONS3
+**Current frontier:** CONS5
 
-**CONS3 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
+**CONS5 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
 
-[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes at its exact source residual;
-QLT and CDB1 neither pass nor widen that Rust/CUDA residual.
+[definition] CONS0--CONS4 retain their passed grades. CONS5 is the clean release/push junction;
+QLT and CDB1 advanced no Athena capability grade.
 
 [definition] Brandon directly authorized this consolidation and the destructive removal of ignored
 `target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
@@ -165,7 +165,7 @@ epistemic-tag, claim-index, equation-atlas, driver-catalog, output/closure-manif
 boundary-artifact, Typst, architecture, document-law, and tracked-authority receivers are green.
 CUDA symbol parity traverses both the CUDA include closure and the owner-local Rust module tree.
 
-### CONS3 — split and simplify existing Rust/CUDA owners — ACTIVE
+### CONS3 — split and simplify existing Rust/CUDA owners — PASSED
 
 [definition] Preserve one non-cloneable CUDA context and one continuing ecology while separating
 source files along already-founded owners:
@@ -183,7 +183,8 @@ caller, preserve compatibility aliases, duplicate receiver equality in drivers, 
 handle which is never launched. Move substantial example-local algorithms to an admitted library
 owner or archive the example and retain its evidence.
 
-**Pass CONS3:** focused owner tests and exact direct/resident equality pass; after the committed
+**Pass CONS3:** focused owner tests and exact dense/factorized equality pass; the resident receiver
+observes and distinguishes its committed target from the pre-transition diagnostic; after the committed
 restoration snapshot establishes the newly tracked owners, the architecture gate is green without
 any later baseline increase; trace configuration is read once; digest syntax and wire hashing have
 typed owners; structural equality remains primary; and no remaining production execution method
@@ -192,7 +193,7 @@ scale; it joins the complete local current before refinement condensation; and n
 positive/standard receiver face nor a pointwise-small cell authorizes deletion of a nonzero
 dependent complex current or its reconstruction fibre.
 
-### CONS4 — consolidate the live Lean line
+### CONS4 — consolidate the live Lean line — PASSED
 
 [definition] Retain exact theorems while separating the live imported closure from independent
 Millennium/RH work and temporary Scratch experiments. Every retained production theorem belongs to
@@ -204,7 +205,11 @@ deleted as reproducible debris.
 the pinned toolchain; no archived `.olean` can satisfy a missing live import;
 no `sorry` or ungraded new axiom enters; generated `.lake` material remains ignored.
 
-### CONS5 — coherent release, commit, and push
+[established-bounded; formal-checked; measured] QLT6 made `HolonicQuantumTransport.lean` the one
+default/live umbrella and CDB1 extended it without archive fallback, `sorry`, or a new axiom. The
+umbrella built 3,765 jobs under Lean `v4.33.0`; generated `.lake` material is ignored.
+
+### CONS5 — coherent release, commit, and push — ACTIVE
 
 [definition] Run owner-local checks first, then one complete `bash tools/gates.sh` invocation on the
 coherent tree. Inspect the actual gate outputs; do not regenerate red ledgers until their producers

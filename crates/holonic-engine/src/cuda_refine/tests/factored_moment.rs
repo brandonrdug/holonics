@@ -1071,12 +1071,12 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
     let front = ResidentQuadraticMomentFront {
         contexts: vec![
             AddressedCurrentSection {
-                boundary_state: None,
+                boundary_state: Some(0),
                 quadratic_weight: BigUint::from(3_u8),
                 factor_current: vec![(0, BigUint::from(2_u8)), (1, BigUint::from(1_u8))],
             },
             AddressedCurrentSection {
-                boundary_state: None,
+                boundary_state: Some(1),
                 quadratic_weight: BigUint::from(5_u8),
                 factor_current: vec![(0, BigUint::from(1_u8))],
             },
@@ -1143,8 +1143,10 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
         returned.ports[1].receiver_action_norms,
         vec![BigUint::from(24_u8)]
     );
-    assert_eq!(returned.launches, 10);
-    assert_eq!(returned.device_dependency_edges, 9);
+    // Nine kernels enact the direct dense word: form, contract, radiate, phase, productive mark,
+    // native select, situated pairing, situated select, and balance.
+    assert_eq!(returned.launches, 9);
+    assert_eq!(returned.device_dependency_edges, 8);
     assert_eq!(returned.synchronizations, 1);
     assert_eq!(returned.intermediate_host_egress_octets, 0);
     assert!(!returned.invariant_transport_reuploaded);
@@ -1166,8 +1168,8 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
     assert!(factorized.moment_factorization_retained);
     assert_eq!(factorized.active_factor_population, 2);
     assert_eq!(factorized.native_factor_population, 2);
-    assert_eq!(factorized.launches, 10);
-    assert_eq!(factorized.device_dependency_edges, 9);
+    assert_eq!(factorized.launches, 9);
+    assert_eq!(factorized.device_dependency_edges, 8);
     assert_eq!(factorized.port_returns, returned.port_returns);
     assert_eq!(
         factorized.total_returned_current,
@@ -1250,6 +1252,29 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
         assert_eq!(sparse.receiver_action_norms, dense.receiver_action_norms);
     }
 
+    // Production resident observation retains the causal-adjoint relational coordinate beside
+    // the direct moment shadow. Mount the smallest two-row incidence needed by that complete
+    // carrier; the direct comparisons above remain the common diagnostic projection, while the
+    // resident assertions below concern the committed target occurrence.
+    resident
+        .mount_sparse_relational_current_atlas(&ResidentSparseRelationalCurrentAtlas {
+            identity_sha256: "1".repeat(64),
+            row_offsets: vec![0, 1, 2],
+            term_factors: vec![0, 1],
+            term_ingress_population: vec![0, 0],
+            term_emanation_population: vec![1, 1],
+            term_return_population: vec![0, 0],
+            row_reconstruction_addresses: vec!["2".repeat(64), "3".repeat(64)],
+        })
+        .expect("the relational reconstruction fibre mounts once");
+    resident
+        .stage_sparse_relational_current(
+            &"4".repeat(64),
+            0,
+            &[(0, BigUint::from(1_u8)), (1, BigUint::from(1_u8))],
+        )
+        .expect("the addressed relational current is staged for production observation");
+
     let resident_boundary = resident
         .conduct_quadratic_moment_front(
             &ResidentQuadraticMomentFront {
@@ -1273,27 +1298,48 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
             ),
             false,
         )
-        .expect("the resident atlas returns the direct witness's exact consequences");
+        .expect("the resident atlas returns the addressed successor's exact consequences");
     assert_eq!(resident_boundary.restriction_population, 2);
-    assert_eq!(resident_boundary.launches, 16);
-    assert_eq!(resident_boundary.device_dependency_edges, 15);
-    assert_eq!(resident_boundary.synchronizations, 3);
+    assert_eq!(resident_boundary.launches, 19);
+    assert_eq!(resident_boundary.device_dependency_edges, 18);
+    assert_eq!(resident_boundary.synchronizations, 5);
     assert!(
         resident_boundary.successor_host_ingress_octets < factorized.successor_host_ingress_octets
     );
-    assert_eq!(resident_boundary.ports, factorized.ports);
-    assert_eq!(resident_boundary.port_returns, factorized.port_returns);
-    assert_eq!(
+    // The resident passage first commits the off-diagonal target and only then observes it.  Its
+    // returned current is therefore not the pre-transition direct diagnostic shadow.
+    assert_ne!(resident_boundary.ports, factorized.ports);
+    assert_ne!(resident_boundary.port_returns, factorized.port_returns);
+    assert_ne!(
         resident_boundary.total_returned_current,
         factorized.total_returned_current
     );
-    assert_eq!(
+    assert_ne!(
         resident_boundary.stored_difference,
         factorized.stored_difference
     );
+    assert!(resident_boundary.local_balance_closes);
+    assert!(factorized.local_balance_closes);
     assert_eq!(
-        resident_boundary.local_balance_closes,
-        factorized.local_balance_closes
+        resident_boundary.ports,
+        vec![
+            ResidentQuadraticMomentPortReturn {
+                port: 0,
+                moment: [].into(),
+                reflected_family_overlaps: vec![BigInt::from(-106)],
+                family_overlaps: vec![BigInt::from(-56)],
+                receiver_overlaps: vec![BigInt::from(17)],
+                receiver_action_norms: vec![BigUint::from(10_u8)],
+            },
+            ResidentQuadraticMomentPortReturn {
+                port: 1,
+                moment: [].into(),
+                reflected_family_overlaps: vec![BigInt::from(-12)],
+                family_overlaps: vec![BigInt::from(0)],
+                receiver_overlaps: vec![BigInt::from(0)],
+                receiver_action_norms: vec![BigUint::from(0_u8)],
+            },
+        ]
     );
     let conditioned = resident_boundary
         .conditioned_current
@@ -1306,7 +1352,7 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
             .iter()
             .map(|slot| slot.boundary_state)
             .collect::<BTreeSet<_>>(),
-        BTreeSet::from([0_u32]),
+        BTreeSet::from([0_u32, 1_u32]),
         "each restriction slot carries its transition target rather than its source state",
     );
     assert_eq!(
@@ -1316,7 +1362,7 @@ fn quadratic_moment_front_equals_the_enumerated_boundary_law() {
             .iter()
             .filter_map(|section| section.boundary_state)
             .collect::<BTreeSet<_>>(),
-        BTreeSet::from([0_u32]),
+        BTreeSet::from([0_u32, 1_u32]),
         "equal current rows at distinct successor states remain distinct addressed targets",
     );
     assert!(!resident_boundary.invariant_transport_reuploaded);

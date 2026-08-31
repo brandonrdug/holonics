@@ -5,22 +5,19 @@
 Historical phase detail remains in Git, dated research records, and the campaign blueprints named
 by the roadmap.
 
-**Currency:** 2026-08-31, after CDB1 returned the bounded constructive differential boundary
-supplement through the live Lean umbrella. CONS3 resumes at its exact residual; UAR remains frozen.
-QLT and CDB1 advanced no Athena grade.
+**Currency:** 2026-08-31, after CONS3 removed the final moment-front foreman and CONS4 retained the
+single live Lean umbrella. CONS5 is the release junction; UAR remains frozen. QLT and CDB1 advanced
+no Athena grade.
 
 ## Current frontier
 
-**Current frontier:** CONS3
+**Current frontier:** CONS5
 
-**CONS3 — SPLIT AND SIMPLIFY THE REMAINING RUST/CUDA MOMENT OWNER — IS THE SOLE NEXT DEED.**
+**CONS5 — RUN THE COHERENT RELEASE GATES, COMMIT, AND PUSH — IS THE SOLE NEXT DEED.**
 
-[definition] Leave `conduct_quadratic_moment_front_inner` as a narrow coordinator over the existing
-admission/plan, workspace/contraction, and boundary-return owners. Preserve one CUDA context, one
-terminal synchronization, exact direct/resident equality, complete dependent complex current,
-target-site/port lineage, receiver order, and reconstruction testimony. Preserve operand order and
-typed scale; join complete local current before refinement condensation; and never infer carrier
-nullity from a zero positive/standard face.
+[definition] Run the release receivers on the coherent CONS3/CDB1 tree. Commit and push only after
+the tracked authority, source shape, Rust/CUDA tests, live Lean umbrella, document law, and generated
+indexes agree.
 
 [proved-derived; formal-checked] QLT returned finite occupation/CAR, the Hermitian
 particle-number-preserving Fermi--Hubbard Hamiltonian, coherent polarized crystal paths and surface
@@ -41,10 +38,9 @@ certificate. The live umbrella then built 3,765 jobs; the owner contains no `sor
 The exact source review and return are in
 [`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
 
-## Resumed consolidation position
+## Closing consolidation position
 
-[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes after CDB1 at the named
-`conduct_quadratic_moment_front_inner` contraction/receiver/readback split.
+[definition] CONS0--CONS4 retain their passed grades. CONS5 is the remaining release junction.
 
 [established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable
 Git stash `stash@{0}` / object
@@ -79,11 +75,19 @@ restored source/evidence population; `53e7890` moves formal-test scratch outside
 `pre-consolidation-2026-08-30-uar-housekeeping` stash remains intact.
 
 [established-bounded; implemented-exact; measured] The Rust CUDA owner fell from 32,809 lines to a
-4,386-line coordinator plus owner-local modules, all at most 1,389 lines. Driver/context,
+1,681-line coordinator plus owner-local modules, all at most 1,389 lines. Driver/context,
 partition refinement, membrane planning/workspace/return, receiver-history, factored transport,
-device ecology, trace configuration, and tests now have separate owners. The remaining hotspot is
-`conduct_quadratic_moment_front_inner` at 2,787 lines; splitting its contraction/receiver/readback
-phases without changing the single terminal synchronization is the shortest open CONS3 deed.
+device ecology, trace configuration, contraction, receiver formation, readback, and tests now have
+separate owners. The former 2,783-line `conduct_quadratic_moment_front_inner` is a narrow coordinator;
+the new phase owners are 23, 1,104, 765, and 1,063 lines.
+
+[established-bounded; implemented-exact; measured] The engine library returned 1,984 passed, zero
+failed, and 30 ignored tests. The repaired ignored RTX dense/factorized/resident control returned
+one passed and zero failed; CUDA symbol parity returned one passed; source shape reported 624 live
+files and zero violations. The resident control now distinguishes its committed off-diagonal target
+from the pre-transition direct diagnostic while retaining both target states and its relational
+reconstruction fibre. The exact receipt is in
+[`research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md`](research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md).
 
 [established-bounded; implemented-exact; measured] The four new Life foremen were split into
 owner-local modules: perspective emanation, membrane radiation, granular potential, and laboratory
@@ -101,6 +105,12 @@ non-test release receivers passed individually.
 population was therefore partitioned into bounded package receivers. This is process-bound evidence,
 not a code or theorem failure.
 
+[established-bounded; process-audit; measured] The release test receiver now derives Cargo packages
+and target kinds and gives each package its own 180-second boundary. It returned 2,972 passed, zero
+failed, and 49 ignored over 33 result lines; workspace examples type-checked. One complete
+`bash tools/gates.sh` invocation then returned all 17 gates passed. CONS5 now owes only the coherent
+commit, push, and final Provenance handoff before UAR resumes.
+
 ## Consolidation contract
 
 [definition] CONS1 partitions every remaining modified or untracked path into exactly one of:
@@ -115,9 +125,7 @@ not a code or theorem failure.
 raised around existing violations. No historical phase prose is copied back into this position
 record.
 
-[definition] CONS1 and CONS2 are closed. CONS3 remains active at the named moment-front execution
-owner. The Lean production umbrella already returns the CONS4 build receiver, but ordered campaign
-advancement waits for CONS3. CONS5 remains the clean release/push junction.
+[definition] CONS1--CONS4 are closed. CONS5 remains the clean release/push junction.
 
 ## Parked UAR position
 
