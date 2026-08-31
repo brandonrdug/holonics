@@ -22,12 +22,11 @@ use crate::{
     },
     causal_language::render_tokens,
     laboratory_language::{
-        continuation_fiber_receipt, LaboratoryContinuationFiberReceipt,
-        LaboratoryEmanatedCausalInformationReceipt, LaboratoryInformantPort,
-        LaboratoryLanguageError, LaboratoryResearchDeliberation, LaboratoryResearchEcology,
-        LaboratoryResearchLeader, LaboratoryResearchSpec, LaboratorySourceAtlas,
-        LaboratoryThoughtStep, LaboratoryWorldContactAttempt, LaboratoryWorldContactRequest,
-        LaboratoryWorldReturn,
+        LaboratoryContinuationFiberReceipt, LaboratoryEmanatedCausalInformationReceipt,
+        LaboratoryInformantPort, LaboratoryLanguageError, LaboratoryResearchDeliberation,
+        LaboratoryResearchEcology, LaboratoryResearchLeader, LaboratoryResearchSpec,
+        LaboratorySourceAtlas, LaboratoryThoughtStep, LaboratoryWorldContactAttempt,
+        LaboratoryWorldContactRequest, LaboratoryWorldReturn, continuation_fiber_receipt,
     },
     lean_mathematics::{
         LeanDiagnosisCurrentFace, LeanMathematicsEcology, LeanMathematicsError,
@@ -1074,10 +1073,12 @@ mod tests {
             .thought
             .as_ref()
             .expect("the deed must carry thought");
-        assert!(thought
-            .continuation_fibers
-            .iter()
-            .any(|fiber| fiber.closed_current_population > 0));
+        assert!(
+            thought
+                .continuation_fibers
+                .iter()
+                .any(|fiber| fiber.closed_current_population > 0)
+        );
         assert!(answer.answer.relational_thought.is_some());
         assert!(answer.answer.world_deed.is_some());
         assert!(
@@ -1086,10 +1087,12 @@ mod tests {
                 .conditioned_passages_after_emanated_answer
                 > thought.information.conditioned_passages_after_world
         );
-        assert!(thought
-            .information
-            .continuation_after_emanated_answer_return
-            .is_some());
+        assert!(
+            thought
+                .information
+                .continuation_after_emanated_answer_return
+                .is_some()
+        );
         let native = session.into_native_rest().unwrap();
         let (_session, native_receipt) = native.remount().unwrap();
         assert!(native_receipt.agent_native_rest_exact);
@@ -1210,32 +1213,38 @@ mod tests {
         assert!(session.agent.open_deed().is_none());
         assert!(session.has_open_deed());
         let next_question = session.next_question;
-        assert!(session
-            .converse_with_world_front(90, "A new question must not cross.", |_| {
-                panic!("an open completion cannot enact a new exterior front")
-            })
-            .is_err());
+        assert!(
+            session
+                .converse_with_world_front(90, "A new question must not cross.", |_| {
+                    panic!("an open completion cannot enact a new exterior front")
+                })
+                .is_err()
+        );
         assert_eq!(session.next_question, next_question);
 
         let native = session.into_native_rest().unwrap();
         let (mut session, receipt) = native.remount().unwrap();
         assert!(!receipt.source_replay_performed);
         let mut exterior_calls = 0usize;
-        assert!(session
-            .retry_open_with_world_front(|_| {
-                exterior_calls += 1;
-                panic!("retry after the staged agent answer cannot replay the world")
-            })
-            .is_err());
+        assert!(
+            session
+                .retry_open_with_world_front(|_| {
+                    exterior_calls += 1;
+                    panic!("retry after the staged agent answer cannot replay the world")
+                })
+                .is_err()
+        );
         assert_eq!(exterior_calls, 0);
         assert!(session.has_open_deed());
-        assert!(session
-            .open_completion
-            .as_ref()
-            .is_some_and(|open| matches!(
-                open,
-                OpenAgenticResearchCompletion::ReturningAnswer { .. }
-            )));
+        assert!(
+            session
+                .open_completion
+                .as_ref()
+                .is_some_and(|open| matches!(
+                    open,
+                    OpenAgenticResearchCompletion::ReturningAnswer { .. }
+                ))
+        );
     }
 
     #[test]
@@ -1265,13 +1274,15 @@ mod tests {
             },
         );
         session.research.refuse_next_emanated_return_for_test();
-        assert!(session
-            .converse_with_world_front(
-                90,
-                "What carries a continuity obstruction for relational morphology?",
-                glued_returned_attempt,
-            )
-            .is_err());
+        assert!(
+            session
+                .converse_with_world_front(
+                    90,
+                    "What carries a continuity obstruction for relational morphology?",
+                    glued_returned_attempt,
+                )
+                .is_err()
+        );
         let deed = session
             .open_completion
             .as_ref()
@@ -1279,13 +1290,15 @@ mod tests {
             .deed()
             .identity
             .to_owned();
-        assert!(session
-            .open_completion
-            .as_ref()
-            .is_some_and(|open| matches!(
-                open,
-                OpenAgenticResearchCompletion::ReturningAnswer { .. }
-            )));
+        assert!(
+            session
+                .open_completion
+                .as_ref()
+                .is_some_and(|open| matches!(
+                    open,
+                    OpenAgenticResearchCompletion::ReturningAnswer { .. }
+                ))
+        );
         let native = session.into_native_rest().unwrap();
         let (mut session, _) = native.remount().unwrap();
         let mut exterior_calls = 0usize;
@@ -1346,19 +1359,22 @@ mod tests {
         // package requirement, so this test elaborates against Lean core alone and never touches
         // the network. `elementary-holonics` and `rh-source-transport` both `require mathlib`;
         // pointing a test at either makes `lake env lean` clone the Mathlib package cache on
-        // every `cargo test`. Scratch goes to the repository's ignored `/output/`, never under a
-        // project's `.lake/`.
+        // every `cargo test`. Scratch is process-local temporary apparatus, never repository
+        // output and never a project's `.lake/`.
         let project_root =
             std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../formal/kernel-witness");
-        let scratch_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../output/agentic-research-kernel");
-        let kernel = LeanKernelWorld::new(&project_root, scratch_root, 2).unwrap();
+        let scratch_root = std::env::temp_dir().join(format!(
+            "holonics-agentic-research-kernel-{}",
+            std::process::id()
+        ));
+        let kernel = LeanKernelWorld::new(&project_root, scratch_root.clone(), 2).unwrap();
         let deed = lean.open_kernel_deed().unwrap();
         let deed_identity = deed.identity().to_owned();
         let returns = kernel.grade_all(deed.problem(), deed.candidates()).unwrap();
         let completion = lean
             .receive_kernel_deed_returns(&deed_identity, returns)
             .unwrap();
+        std::fs::remove_dir_all(&scratch_root).unwrap();
         assert!(completion.validates_formal_return_face());
         assert!(!completion.kernel_admitted_sources().is_empty());
         let returned = AgenticFormalReturn {
@@ -1375,21 +1391,27 @@ mod tests {
                 returned_attempt,
             )
             .unwrap();
-        assert!(blocked
-            .converse_with_world_front(90, "Which unknown quasar remains outside?", |requests| {
-                let mut outcomes = LocalSequence::with_capacity(requests.len());
-                for request in requests {
-                    outcomes.push(LaboratoryWorldContactOutcome::Obstructed {
-                        identity: request.identity.to_owned(),
-                        obstruction: "deliberately open".to_owned(),
-                    });
-                }
-                LaboratoryWorldContactAttempt {
-                    outcomes,
-                    execution: None,
-                }
-            })
-            .is_err());
+        assert!(
+            blocked
+                .converse_with_world_front(
+                    90,
+                    "Which unknown quasar remains outside?",
+                    |requests| {
+                        let mut outcomes = LocalSequence::with_capacity(requests.len());
+                        for request in requests {
+                            outcomes.push(LaboratoryWorldContactOutcome::Obstructed {
+                                identity: request.identity.to_owned(),
+                                obstruction: "deliberately open".to_owned(),
+                            });
+                        }
+                        LaboratoryWorldContactAttempt {
+                            outcomes,
+                            execution: None,
+                        }
+                    }
+                )
+                .is_err()
+        );
         assert!(blocked.has_open_deed());
         assert!(blocked.receive_formal_return(&returned).is_err());
 
@@ -1422,10 +1444,11 @@ mod tests {
             )
             .unwrap();
         assert!(world_calls > 0);
-        assert!(post
-            .answer
-            .operative_codec_versions
-            .contains(&reflective.codec_version));
+        assert!(
+            post.answer
+                .operative_codec_versions
+                .contains(&reflective.codec_version)
+        );
         assert!(post.answer.evidence_sources.contains("formal-return-1"));
         assert_ne!(post.answer.text, diagnosis_answer.answer.text);
     }
