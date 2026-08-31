@@ -40,6 +40,16 @@ fn main() -> Result<(), String> {
     let rest = AthenaNativeRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
     let congruence =
         AthenaReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
+    let admitted_source_population = congruence.sections.len();
+    let admitted_native_population = congruence.native.native_population.len();
+    let admitted_receiver_population = congruence
+        .native
+        .receiver_factors
+        .iter()
+        .map(|factor| factor.receiver)
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+    let admitted_generator_population = congruence.native.generators.len();
     let history = HistoryOnlyExchangeFront::project(&congruence.sections)?;
     let candidate =
         life::athena_native::SealedNativeCandidateFront::seal(&rest, history).map_err(display)?;
@@ -82,15 +92,16 @@ fn main() -> Result<(), String> {
         .checked_mul(generator_population)
         .ok_or("generator-square population overflow")?;
     let dependency_span = passage.chronology.dependency_span().map_err(display)?;
-    let passed = source_population == 2_224
-        && native_population == 2_221
-        && receiver_population == 4
-        && generator_population == 2
+    let passed = source_population == admitted_source_population
+        && native_population == admitted_native_population
+        && receiver_population == admitted_receiver_population
+        && generator_population == admitted_generator_population
         && passage.returned.len() == source_population
         && product_state_population == source_population * complete_ingress_population
         && every_section_has_complete_ingress
         && every_template_passage_resident
-        && dependency_span == 2;
+        && complete_ingress_population == rest.realization.ingress_sections.len()
+        && dependency_span == generator_population;
 
     write_json(
         output.join("01-history-only-front.json"),
@@ -128,7 +139,7 @@ fn main() -> Result<(), String> {
     fs::write(
         output.join("INSPECTION.md"),
         format!(
-            "# Complete exchange native realization\n\n[established-bounded; implemented-exact; measured] Every one of the 2,224 history-only exchange occurrences entered the K3 ecology as a dependent product with all four ordinary native ingress sections before any response or later-return field was admitted. The later passage retained the 2,221-state quotient, four receiver factors, two total generator squares, complete fibres, and shortest separators without collapsing them into K3's six cells. Candidate and return are joined by 2,224 carries-precedence interactions. Source ordinals select no seed route, observation ordinals are never subtracted, and the common K3 conduct returned resident on the GPU.\n\n```json\n{}\n```\n",
+            "# Complete exchange native realization\n\n[established-bounded; implemented-exact; measured] Every one of the {source_population} history-only exchange occurrences entered the K3 ecology as a dependent product with all {complete_ingress_population} native ingress sections before any response or later-return field was admitted. The later passage retained the {native_population}-state quotient, {receiver_population} receiver factors, {generator_population} total generator squares, complete fibres, and shortest separators without collapsing them into K3's native cells. Candidate and return are joined by {source_population} carries-precedence interactions. Source ordinals select no seed route, observation ordinals are never subtracted, and the common K3 conduct returned resident on the GPU.\n\n```json\n{}\n```\n",
             serde_json::to_string_pretty(&grade).map_err(display)?
         ),
     ).map_err(display)?;

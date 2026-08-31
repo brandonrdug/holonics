@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, error::Error, fs, path::PathBuf};
+use std::{collections::BTreeMap, error::Error, fs, ops::Range, path::PathBuf};
 
 use holonic_engine::{
     native_spool::NativeSpoolBundle,
@@ -7,12 +7,17 @@ use holonic_engine::{
 };
 use life::{
     dialogue_lineage::{
-        import_claude_visible_prefix, CodexDialogueImportSpec, ExactDialogueLineage,
+        import_claude_visible_prefix, CodexDialogueImportSpec, DialoguePhase, DialogueSpeaker,
+        ExactDialogueLineage,
     },
     dialogue_native_spool::{
         found_addressed_dialogue_native_spool, AddressedDialogueOccurrence,
     },
-    exchange_world_tube::discover_complete_exchange_aperture,
+    exchange_world_tube::{
+        derive_continuation_aperture, discover_complete_exchange_aperture, ContainerLineageFaces,
+        CorrespondenceFibres, DeviceContactReceipt, Digest32, ExchangeContainer, ExchangeRecord,
+        ExchangeWorldTube, ExcludedPopulation, VisibleMessageFace,
+    },
 };
 use rayon::prelude::*;
 use serde::Serialize;
@@ -33,6 +38,24 @@ struct FoundingReceipt {
     resident_word_returned: bool,
     resident_complex_current_returned: bool,
     cpu_semantic_replay_after_device: bool,
+    continuation_family_population: usize,
+    richer_world_join_receiver_open: bool,
+}
+
+struct LocalVisible {
+    raw_record: u64,
+    raw_range: Range<u64>,
+    occurrence: String,
+    text: String,
+    speaker: &'static str,
+    phase: &'static str,
+}
+
+struct StagedContainer {
+    addressed: Vec<AddressedDialogueOccurrence>,
+    visible: Vec<LocalVisible>,
+    complete_records: u64,
+    captured_extent: u64,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -51,7 +74,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .specs
         .par_iter()
         .enumerate()
-        .map(|(container, spec)| -> Result<Vec<AddressedDialogueOccurrence>, String> {
+        .map(|(container, spec)| -> Result<StagedContainer, String> {
             let extent = spec
                 .locator
                 .metadata()
@@ -76,7 +99,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         )
                     })
                     .collect::<BTreeMap<_, _>>();
-                Ok(lineage
+                let addressed = lineage
                     .occurrences()
                     .iter()
                     .map(|occurrence| AddressedDialogueOccurrence {
@@ -87,9 +110,35 @@ fn main() -> Result<(), Box<dyn Error>> {
                             .filter_map(|cause| local.get(cause.as_str()).cloned())
                             .collect(),
                     })
-                    .collect())
+                    .collect();
+                let visible = lineage
+                    .occurrences()
+                    .iter()
+                    .map(|occurrence| LocalVisible {
+                        raw_record: occurrence.raw_record,
+                        raw_range: occurrence.raw_range.clone(),
+                        occurrence: local[occurrence.identity.as_str()].clone(),
+                        text: occurrence.text.clone(),
+                        speaker: match occurrence.speaker {
+                            DialogueSpeaker::User => "user",
+                            DialogueSpeaker::Assistant => "assistant",
+                        },
+                        phase: match occurrence.phase {
+                            DialoguePhase::Received => "received",
+                            DialoguePhase::Commentary => "commentary",
+                            DialoguePhase::FinalAnswer => "final-answer",
+                            DialoguePhase::Other(_) => "other",
+                        },
+                    })
+                    .collect();
+                Ok(StagedContainer {
+                    addressed,
+                    visible,
+                    complete_records: lineage.receipt().complete_records,
+                    captured_extent: extent,
+                })
             } else {
-                let (visible, _) = import_claude_visible_prefix(&spec.locator, extent)?;
+                let (visible, receipt) = import_claude_visible_prefix(&spec.locator, extent)?;
                 let addresses = visible
                     .iter()
                     .map(|occurrence| {
@@ -99,7 +148,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         )
                     })
                     .collect::<Vec<_>>();
-                Ok(addresses
+                let addressed = addresses
                     .iter()
                     .enumerate()
                     .map(|(at, address)| AddressedDialogueOccurrence {
@@ -109,16 +158,133 @@ fn main() -> Result<(), Box<dyn Error>> {
                             .map(|prior| [addresses[prior].clone()].into_iter().collect())
                             .unwrap_or_default(),
                     })
-                    .collect())
+                    .collect();
+                let visible = visible
+                    .into_iter()
+                    .zip(&addresses)
+                    .map(|(occurrence, address)| LocalVisible {
+                        raw_record: occurrence.raw_record,
+                        raw_range: occurrence.raw_range,
+                        occurrence: address.clone(),
+                        text: occurrence.text,
+                        speaker: match occurrence.speaker {
+                            DialogueSpeaker::User => "user",
+                            DialogueSpeaker::Assistant => "assistant",
+                        },
+                        phase: "visible",
+                    })
+                    .collect();
+                Ok(StagedContainer {
+                    addressed,
+                    visible,
+                    complete_records: receipt.complete_records,
+                    captured_extent: extent,
+                })
             }
         })
         .collect::<Result<Vec<_>, _>>()?;
-    let occurrences = staged.into_iter().flatten().collect::<Vec<_>>();
+    let occurrences = staged
+        .iter()
+        .flat_map(|container| container.addressed.iter().cloned())
+        .collect::<Vec<_>>();
+    let source_occurrence = Digest32::of(&serde_json::to_vec(&occurrences)?);
+    let mut containers = Vec::with_capacity(staged.len());
+    let mut records = Vec::new();
+    let mut visible_messages = Vec::new();
+    for (container, local) in staged.iter().enumerate() {
+        let record_from = records.len() as u64;
+        for face in &local.visible {
+            let record = records.len() as u64;
+            let content = Digest32::of(face.text.as_bytes());
+            records.push(ExchangeRecord {
+                container: container as u32,
+                ordinal: face.raw_record,
+                raw_range: face.raw_range.clone(),
+                raw_sha256: content,
+                root_sha256: content,
+                node_from: 0,
+                node_extent: 0,
+                field_from: 0,
+                field_extent: 0,
+            });
+            visible_messages.push(VisibleMessageFace {
+                container: container as u32,
+                record,
+                raw_range: face.raw_range.clone(),
+                occurrence: face.occurrence.clone(),
+                text_sha256: content,
+                text: face.text.clone(),
+                provider_face: discovery.specs[container].provider_face.clone(),
+                speaker_face: face.speaker.to_owned(),
+                phase_face: face.phase.to_owned(),
+            });
+        }
+        containers.push(ExchangeContainer {
+            ordinal: container as u32,
+            captured_extent: local.captured_extent,
+            prefix_sha256: Digest32::ZERO,
+            record_from,
+            record_extent: local.complete_records,
+            incomplete_tail: None,
+            blank_records: Vec::new(),
+            lineage: ContainerLineageFaces {
+                locator: discovery.specs[container].locator.clone(),
+                provider: discovery.specs[container].provider_face.clone(),
+                material_kind: discovery.specs[container].material_kind_face.clone(),
+            },
+        });
+    }
+    let visible_world = ExchangeWorldTube {
+        schema: "soma-life.visible-continuation-world.v1".to_owned(),
+        source_occurrence_sha256: source_occurrence,
+        content_law_sha256: Digest32::ZERO,
+        containers,
+        records,
+        nodes: Vec::new(),
+        fields: Vec::new(),
+        scalar_sites: Vec::new(),
+        visible_messages,
+        fibres: CorrespondenceFibres {
+            singleton_classes: 0,
+            repeated_classes: 0,
+            repeated_sites: 0,
+            class_members: BTreeMap::new(),
+        },
+        excluded: ExcludedPopulation {
+            blank_records: 0,
+            incomplete_tails: 0,
+            visible_membrane_controls: 0,
+            unavailable_private_reasoning_required: false,
+        },
+        device: DeviceContactReceipt {
+            schema: "soma-life.visible-continuation-apparatus.v1".to_owned(),
+            device: "not-invoked".to_owned(),
+            scalar_sites: 0,
+            contact_classes: 0,
+            launches: 0,
+            block_threads: 0,
+            warp_size: 0,
+            cpu_semantic_replay: false,
+        },
+    };
+    let mut aperture = derive_continuation_aperture(&visible_world)?;
+    for container in 0..staged.len() {
+        aperture.exclusions.push(life::exchange_world_tube::ContinuationExclusion {
+            container: container as u32,
+            visible_index: None,
+            occurrence: None,
+            obstruction: "richer parent/tool/world joins remain open outside the visible-only continuation receiver".to_owned(),
+        });
+    }
     let returned = found_addressed_dialogue_native_spool(&occurrences)?;
     let wire = returned.native.canonical_bytes()?;
     let witness = serde_json::to_vec_pretty(&returned.exterior)?;
     fs::write(output.join("native-spool-bundle.rest"), &wire)?;
     fs::write(output.join("exterior-dialogue-lineage.json"), witness)?;
+    fs::write(
+        output.join("continuation-aperture.json"),
+        serde_json::to_vec_pretty(&aperture)?,
+    )?;
 
     let remounted = NativeSpoolBundle::read(&wire)?;
     let spool = remounted
@@ -153,6 +319,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         resident_word_returned: !word_return.native_end.is_empty(),
         resident_complex_current_returned: !current_return.sections.is_empty(),
         cpu_semantic_replay_after_device: current_return.cpu_semantic_replay_after_device,
+        continuation_family_population: aperture.families.len(),
+        richer_world_join_receiver_open: true,
     };
     if receipt.visible_occurrence_population == 0
         || receipt.visible_occurrence_population != receipt.reconstruction_occurrence_population
