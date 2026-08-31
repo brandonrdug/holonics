@@ -1,184 +1,90 @@
 # Construction state
 
 **The position record. One file, no historical campaign diary.**
-[`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction authority.
-Historical phase detail remains in Git, dated research records, and the campaign blueprints named
-by the roadmap.
+[`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
+authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-08-31, after CONS0--CONS5 completed and the coherent consolidation commit
-`9456a4ae` was pushed. UAR4-R0Q resumes at its exact checkout obstruction. QLT and CDB1 advanced no
-Athena grade.
+**Currency:** 2026-08-31, after the post-consolidation UAR/catalog readiness review. CONS0--CONS5
+remain complete. UAR4-R0Q0 is the exact next owner deed. QLT and CDB1 advanced no Athena grade.
 
 ## Current frontier
 
-**Current frontier:** UAR4-R0Q
+**Current frontier:** UAR4-R0Q0
 
-**UAR4-R0Q — RETURN GENUINE OFF-DIAGONAL SITE TRANSPORT AND RESIDENT DEPENDENT COMPLEX
-CONTRACTION — IS THE SOLE NEXT DEED.**
+**UAR4-R0Q0 — RETURN THE ADDRESSED RESPONSE/SOURCE/TARGET PAIR-CURRENT CARRIER — IS THE SOLE NEXT
+DEED.**
 
-[definition] Preserve response-face address, source/target realization sites, port, factor, phase,
-both boundary maps, and the complete reconstruction fibre through the target junction. Enact genuine
-ordinary `z -> z'` transport; join the dependent exact complex current on the resident GPU before
-the positive receiver; and make recurrence structural over that full complex continuation state.
+[definition] Return one consumed apparatus-neutral pair-current carrier preserving response face,
+source/target carrier/site/local port, factor, phase, complex coefficient, both boundary maps,
+orientation, chronology, zero-support complement, and complete reconstruction fibre. Record the
+exact source-neutral predecessor rebuild route, but do not rerun it before the current owners pass.
+No qualitative receiver runs in R0Q0.
 
-[proved-derived; formal-checked] QLT returned finite occupation/CAR, the Hermitian
-particle-number-preserving Fermi--Hubbard Hamiltonian, coherent polarized crystal paths and surface
-receivers, distinct real/imaginary/stochastic/physical/open evolution carriers, and exact/bounded
-simulation certificates. `AngleExcess.lean` now consumes the common crystalline diffraction owner.
+## Admitted standing
 
-[established-bounded; formal-checked; process-audit] `HolonicQuantumTransport.lean` is the single
-default/live umbrella and imports the prior HNN/HML surface. `bash tools/lean_check.sh` built 3,762
-jobs under the 180-second boundary. Document law, epistemic tags, named paths, and source shape
-passed; source shape reported 620 live files and zero violations. The full QLT receipts and
-Rust/CUDA conformance map are in
-[`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
+[established-bounded; process-audit; measured] CONS0--CONS5 are complete. Coherent consolidation
+commit `9456a4ae` and authority return `0df0e87f` are pushed. The release tree returned 2,972
+passed, zero failed, and 49 ignored Rust tests; 3,765 Lean jobs; zero source-shape and architecture
+violations; and all 17 then-current release gates.
 
-[proved-derived; formal-checked] CDB1 returned a noncommutative-order-preserving first-order jet,
-exact differential-path FTC, lower-dimensional receiver kernel, nonzero zero-faced residue,
-pointwise-zero/integrated-one refinement control, MVT witness, and residue-retaining squeeze
-certificate. The live umbrella then built 3,765 jobs; the owner contains no `sorry` or new axiom.
-The exact source review and return are in
-[`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
+[proved-derived; formal-checked] The live `HolonicQuantumTransport.lean` umbrella contains HML,
+HNN, finite fermionic/Fermi--Hubbard transport, polarized-crystal transport, separated evolution
+species, simulation certificates, and the constructive differential boundary supplement. It proves
+the oriented site-current and norm-after-linear-junction laws required by R0Q.
 
-## Completed consolidation position
+[established-bounded; implemented-exact; measured] UAR0/UAR1 and UAR2 C0--C2 retain only their
+bounded grades. C0 returned the complete generated-port ecology step; C1 returned one structural
+receiver-history quotient; C2 mounted its quotient/generator/fibre law on the existing CUDA context.
+The qualitative exterior receiver remained obstructed.
 
-[definition] CONS0--CONS5 retain their passed grades.
+## Current obstruction
 
-[established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable
-Git stash `stash@{0}` / object
-`1c73eaed51ab43be612c40a1592fdca312151dc0` under label
-`pre-consolidation-2026-08-30-uar-housekeeping`, then restored the same working population.
-The stash contains all 841 previously untracked files plus the tracked diff.
+[counterexample; source-inspected] The historical output artifacts were intentionally deleted as
+reproducible experiment output during CONS0. No `athena-sens6-cultivated.rest`,
+`athena-source-neutral.rest`, or UAR3 child rest is present. R0Q0 records the rebuild route; R0Q5
+rebuilds the admitted source-neutral predecessor chain and proves the source-bearing ALP4 rest
+unreachable afterward.
 
-[established-bounded; measured] Brandon explicitly authorized deletion of the ignored `target/`
-and `output/` trees. Both were removed. Free filesystem space increased from 199 GiB to 522 GiB.
-They are recoverable only by rebuilding or rerunning their producing deeds; their non-ignored
-source population was not removed.
+[counterexample; source-inspected] Post-consolidation inspection confirms the ordinary branch in
+`source_neutral_relational/realization.rs` still assigns
+`target_carrier = current.carrier`; only closure reads `successor_site`. The contribution
+carrier omits response-face address and the source carrier/site/local port. The complete complex
+contraction, positive receiver, selection, and successor formation still execute in `soma/life`
+after resident conduct while the earlier receipt reports no CPU semantic replay.
 
-[counterexample; measured] Before consolidation, the tree held 225 modified entries, 841
-untracked files, and a tracked diff of 59,444 insertions and 7,709 deletions. The active UAR
-blueprint, primary UAR Rust owners, HNN umbrella, oriented-site theorem owner, and current checkout
-record were not present in `HEAD`. A clean checkout could not reconstruct the claimed current body.
+[counterexample; source-inspected] `SourceNeutralContinuationState` retains oriented native
+relational pairings and the positive exterior target-current family but omits the selected
+`returned_complex_site_current`. Its structural equality is therefore not full-complex R0Q even
+though digest equality is declared unused.
 
-[counterexample; measured] The release surface was red:
+[counterexample; source-inspected] The UAR3 D1 builder still allocates representative event
+identities, leaves mutual constitutive responses empty, and supplies identity transports/charts.
+Its subsidiary mechanisms remain evidence; aggregate UAR3 requires reconstruction from the actual
+pending emission and returned occurrence.
 
-- `holonic-engine` library tests: 1,980 passed, zero failed, 31 ignored;
-- `life` library tests: 483 passed, four failed, 15 ignored;
-- architecture ratchet: 218 violations;
-- authored-level gate: 20 failures;
-- driver catalog: 19 missing targets; and
-- output manifest before authorized removal: 49 unrecorded roots and one moved root.
+[counterexample; process-audit; measured] The generated claim index, driver catalog,
+source/architecture baselines, equation atlas, registry incidence, and root manifests have current
+readers. The standing verifier refuses one unmanifested cold Gemma codebook. Identity/proposed-
+identity, owner, capability, correspondence/method, thematic research, and Millennium catalogs are
+dated snapshots. None may grade or schedule R0Q.
 
-## Returned consolidation position
+## Ordered return
 
-[established-bounded; measured] CONS1 and CONS2 passed. Commit `c905404` tracks the complete
-restored source/evidence population; `53e7890` moves formal-test scratch outside repository output;
-`7c82582` records the committed architecture baseline. The original
-`pre-consolidation-2026-08-30-uar-housekeeping` stash remains intact.
+[definition] The active UAR blueprint owns the complete order:
 
-[established-bounded; implemented-exact; measured] The Rust CUDA owner fell from 32,809 lines to a
-1,681-line coordinator plus owner-local modules, all at most 1,389 lines. Driver/context,
-partition refinement, membrane planning/workspace/return, receiver-history, factored transport,
-device ecology, trace configuration, contraction, receiver formation, readback, and tests now have
-separate owners. The former 2,783-line `conduct_quadratic_moment_front_inner` is a narrow coordinator;
-the new phase owners are 23, 1,104, 765, and 1,063 lines.
+1. R0Q0 — addressed response/source/target pair-current carrier;
+2. R0Q1 — genuine ordinary off-diagonal site transport;
+3. R0Q2 — resident dependent complex contraction before the positive receiver;
+4. R0Q3 — full-complex structural recurrence and complete semantic-replay telemetry;
+5. R0Q4 — focused apparatus-neutral/resident equality and fibre gates;
+6. R0Q5 — source-neutral predecessor rebuild, closure audit, and source detachment;
+7. R0Q6 — one unchanged smallest source-neutral qualitative receiver;
+8. actual UAR3 emission/world-return situated-difference revalidation; and
+9. one complete source-neutral UAR4 qualitative release.
 
-[established-bounded; implemented-exact; measured] The engine library returned 1,984 passed, zero
-failed, and 30 ignored tests. The repaired ignored RTX dense/factorized/resident control returned
-one passed and zero failed; CUDA symbol parity returned one passed; source shape reported 624 live
-files and zero violations. The resident control now distinguishes its committed off-diagonal target
-from the pre-transition direct diagnostic while retaining both target states and its relational
-reconstruction fibre. The exact receipt is in
-[`research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md`](research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md).
+## Validation boundary
 
-[established-bounded; implemented-exact; measured] The four new Life foremen were split into
-owner-local modules: perspective emanation, membrane radiation, granular potential, and laboratory
-cultivation. Lost `bind_occurrence` and `founded_interior_contact` owners were recovered from the
-preserved source line, and dead example-only standing/excitation storage was removed.
-
-[established-bounded; formal-checked; measured] Validation returned 1,984 engine tests plus the
-separately bounded long Mordell--Weil test, 486 Life tests, and 465 tests in the remaining workspace
-packages: 2,935 passed, zero failed, 49 ignored. Every workspace example type-checked with warnings
-denied; CUDA symbol parity passed; the Lean production umbrella built 3,181 jobs; all sixteen
-non-test release receivers passed individually.
-
-[counterexample; measured] One complete `bash tools/gates.sh` invocation reached the required
-180-second outer boundary before its first summary and is not reported as passed. The same test
-population was therefore partitioned into bounded package receivers. This is process-bound evidence,
-not a code or theorem failure.
-
-[established-bounded; process-audit; measured] The release test receiver now derives Cargo packages
-and target kinds and gives each package its own 180-second boundary. It returned 2,972 passed, zero
-failed, and 49 ignored over 33 result lines; workspace examples type-checked. One complete
-`bash tools/gates.sh` invocation then returned all 17 gates passed. At that measurement CONS5 owed
-only the coherent commit, push, and final Provenance handoff.
-
-[established-bounded; process-audit; measured] The coherent consolidation owner commit `9456a4ae`
-was pushed to `origin/main`. The release tree returned 2,972 passed, zero failed, and 49 ignored Rust
-tests; 3,765 Lean jobs; 624 live source-shape files with zero violations; 505 architecture files with
-zero violations; and all 17 release gates passed.
-
-## Consolidation contract
-
-[definition] CONS1 partitions every remaining modified or untracked path into exactly one of:
-
-1. active Rust/CUDA UAR or admitted engine mechanism;
-2. admitted Lean prerequisite or coherent independent theorem line;
-3. governance, evidence, or validation apparatus;
-4. superseded historical material to archive; or
-5. disposable generated or scratch material to delete.
-
-[definition] No ledger is regenerated merely to bless the current tree. No ownership baseline is
-raised around existing violations. No historical phase prose is copied back into this position
-record.
-
-[definition] CONS1--CONS5 are closed.
-
-## Active UAR position
-
-[open] UAR4-R0Q resumes at two exact implementation obligations recorded in
-[`research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md`](research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md):
-
-1. ordinary exterior transitions must enact genuine addressed off-diagonal `z -> z'` transport;
-2. the dependent exact complex-current contraction must execute on the resident GPU surface.
-
-[counterexample; source-inspected] The current Rust ordinary-transition branch retains
-`target_carrier = current.carrier`; only closure advances a site. The complete complex contraction,
-positive receiver, selection, and successor formation then execute in the apparatus-neutral Rust
-path after resident conduct. A current receipt hardcodes CPU semantic replay as absent outside the
-measurement cone which performs that work.
-
-[counterexample; source-inspected] Exterior recurrence may also close on a SHA-256 of the positive
-site-current shadow plus phase while the complete dependent complex realization current is absent
-from structural continuation equality. The corresponding receipt says digest equality was not
-used. The reported order-58 recurrence is therefore not an admitted full-complex recurrence.
-
-[counterexample; source-inspected] The current UAR3 D1 path checks the actual published
-emission/world return but then authors representative event identities, empty mutual-response
-families, and identity charts. UAR3's exact subsidiary mechanisms remain evidence, but its
-aggregate D1--D3 situated-world-return grade requires revalidation after consolidation.
-
-[proved-derived; formal-checked] The targeted HNN/HML umbrella, including
-`HolonicOrientedSiteTransport`, builds 3,181 jobs. It proves the required off-diagonal oriented
-site-current law and norm-after-linear-junction order. The open defect is formal-to-runtime
-conformance, not absence of that theorem.
-
-[counterexample; formal-checked] The broader research library is not the production umbrella. Its
-Lean 4.33 migration still has open compatibility clusters in the Family/Millennium line; those
-modules retain their prior exact source and focused repairs but cannot grade the live UAR closure.
-
-## Admitted standing during consolidation
-
-[established-bounded] Exact earlier theorem and mechanism returns keep only the scoped grades in
-their source records. No aggregate UAR3 or UAR4 release grade is inferred from preserved hashes,
-artifacts, prior prose, or the consolidation itself.
-
-[definition] The last body before this hold remains physically preserved in `stash@{0}` and in the
-current working population until CONS1 dispositions it. Deleting or archiving a path requires its
-replacement owner, retained evidence boundary, or explicit classification.
-
-## Process boundary
-
-[definition] Every nontrivial process has an outer hard limit of 180 seconds. Focused owner checks
-precede one complete release-gate invocation at CONS5. Build-cache or artifact deletion is performed
-only under Brandon's explicit authorization and is reported separately from source consolidation.
+[definition] Every nontrivial process retains the 180-second outer boundary. The unchanged smallest
+qualitative receiver retains its narrower 175-second ceiling at R0Q6. Run only owner-local checks
+before then; no hash, count, topology, residency receipt, generated surface, or apparatus proxy may
+advance the current frontier.

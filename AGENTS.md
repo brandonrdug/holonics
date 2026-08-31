@@ -50,6 +50,26 @@ defined in `canon/EPISTEMIC_GRADES.md`. Never promote an interpretation, visuali
 fit, generated trace, or historical assertion into a theorem. Never demote a completed exact
 construction merely because its current implementation is being replaced.
 
+## Catalog discipline
+
+- `THE_CLAIM_INDEX.md`, `meta/DRIVER_CATALOG.tsv`, `meta/AUTHORED_LEVELS.tsv`,
+  `meta/SOURCE_SHAPE_BASELINE.tsv`, `meta/HOLONIC_DSA_BASELINE.tsv`, the equation atlas, and the
+  output/closure/boundary ledgers have executable owners in `tools/` or the architecture package
+  and release-gate readers. Regenerate them only from those owners after the changed source or
+  artifact stands.
+- `canon/THE_OWNER_ATLAS.md`, `canon/THE_MEASURED_CAPABILITIES.md`,
+  `canon/THE_CORRESPONDENCE_ATLAS.md`, `blueprint/THE_METHOD_ATLAS.md`, the identity-atlas files,
+  `meta/PROPOSED_IDENTITIES.tsv`, and the Millennium catalog are dated navigation or evidence
+  snapshots. Their paths, counts, line numbers, and status language must be re-measured before use;
+  they never schedule work.
+- `research/README.md` is a thematic entry surface with a stated cutoff. The generated claim index
+  is the complete document/date router. `papers/source/holonics/registry.typ` owns mathematical
+  registry identities, and `meta/REGISTRY_INCIDENCE.tsv` is its generated current Rust-incidence
+  projection.
+- `standing/MANIFEST.txt` owns deposited standing only. A tracked file under `standing/output/`
+  which is absent from that manifest is not silently standing; disposition it as a declared cold
+  fixture or a properly founded deposit before relying on the standing verifier.
+
 ## Provenance sidecar and spatial agent protocol
 
 `/home/b/Workspaces/provenance` is the shared exterior agent memory and graph-navigation apparatus.
@@ -600,7 +620,7 @@ an unsplit matched control.
    document/architecture gates whose inputs changed.
 2. After one owner closes, run the affected package's library/tests and its directly dependent
    driver. Do not run `cargo test --workspace`, `cargo build --all-targets`, a release all-target
-   build, every example, or all twelve gates merely because one source file changed.
+   build, every example, or every release gate merely because one source file changed.
 3. Before a real deed, inspect its code/source/configuration closure. If that closure and its input
    occurrence are unchanged, reuse and inspect the existing addressed receipt; do not rerun an
    expensive deed or serial reference to reproduce a number already bound to the same closure.

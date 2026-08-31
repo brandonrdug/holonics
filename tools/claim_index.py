@@ -318,10 +318,10 @@ pickup order, `THE_MATHEMATICS_TABLET` §3's tablet list, `research/README.md` (
 genres**, so the corpus could be entered by filename or by code symbol and by nothing else — which
 is how three false absences were deposited on 2026-08-10 alone.
 
-**How to use it.** Enter by concept through `canon/THE_CORRESPONDENCE_ATLAS.md` (168 cards, what
-other fields call the same face). Enter by mathematical object through
-`papers/source/holonics/registry.typ`. Enter by document through this file. Enter by date through
-`research/README.md`.
+**How to use it.** Enter by concept through `canon/THE_CORRESPONDENCE_ATLAS.md` (168 dated cards,
+what other fields called the same face at that snapshot). Enter by mathematical object through
+`papers/source/holonics/registry.typ`. Enter by document or date through this file. The thematic
+`research/README.md` has its own stated cutoff and is not the complete date census.
 
 **Grade nothing from this file.** Every claim belongs to the document it points at and is graded
 there. Every description below is **copied** from the file it describes — its title, and the first

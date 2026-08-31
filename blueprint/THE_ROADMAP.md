@@ -28,8 +28,8 @@ Read, in order:
 8. while a `QLT` phase is current, the finite many-body and polarized-crystal contract,
    [`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
 
-Read only the smallest source, formal, and evidence closure required by the active consolidation
-deed. Completed sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
+Read only the smallest source, formal, and evidence closure required by the active deed. Completed
+sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
 are provenance, not pickup obligations.
 
 ## Completed campaign — finite many-body and polarized crystal transport
@@ -224,9 +224,9 @@ commit `9456a4ae` was pushed to `origin/main`.
 
 ## Active campaign — UAR resumes
 
-**Current frontier:** UAR4-R0Q
+**Current frontier:** UAR4-R0Q0
 
-**UAR4-R0Q IS THE SOLE NEXT DEED.**
+**UAR4-R0Q0 IS THE SOLE NEXT DEED.**
 
 [open] UAR4-R0Q resumes after CONS5. Its active blueprint is the UAR contract named in fresh
 pickup. The immediate implementation obligations are narrower than that blueprint's historical
@@ -241,6 +241,23 @@ narrative:
 5. make CPU semantic replay telemetry cover the complete post-device passage; and
 6. revalidate UAR3's actual emission/world-return situated difference without representative event
    invention before relying on its child grade.
+
+[definition] The ordered return is:
+
+1. `UAR4-R0Q0` — admit one addressed response/source/target pair-current carrier and its complete
+   reconstruction fibre;
+2. `UAR4-R0Q1` — enact and exhibit an ordinary off-diagonal `z -> z'` passage;
+3. `UAR4-R0Q2` — move the sparse dependent complex target/port contraction and later positive
+   receiver onto the resident CUDA word;
+4. `UAR4-R0Q3` — make full complex continuation structural and make telemetry cover every semantic
+   operation after device conduct;
+5. `UAR4-R0Q4` — pass the focused apparatus-neutral/resident equality and fibre falsifiers;
+6. `UAR4-R0Q5` — rebuild/audit the source-neutral predecessor and detach the source-bearing
+   transition material;
+7. `UAR4-R0Q6` — run the unchanged smallest source-neutral qualitative receiver once;
+8. revalidate the actual UAR3 emission/world-return situated difference, child, withdrawal,
+   restoration, remount, and later conduct; and
+9. run the complete source-neutral UAR4 qualitative release family once.
 
 [proved-derived; formal-checked] `HolonicOrientedSiteTransport` and the HNN/HML umbrella prove the
 oriented site-current, every-word quotient, norm-after-linear-junction, cultivation, and remount
@@ -262,7 +279,8 @@ request may refine this order; historical text may not.
 
 ## Validation cadence
 
-[definition] Every nontrivial process has an outer hard limit of 180 seconds. During CONS1--CONS4,
-run only affected package checks, focused owner tests, exact formal targets, and named cheap gates.
-At CONS5 run the complete release receiver once. A timeout is a counterexample, never a partial
-pass or permission to widen a magic bound.
+[definition] Every nontrivial process has an outer hard limit of 180 seconds. During R0Q run only
+the affected package checks, focused owner/apparatus tests, the exact formal target, and named cheap
+catalog/document gates. Run the unchanged qualitative receiver only at R0Q6 and the complete release
+receiver only after UAR3 revalidation. A timeout is a counterexample, never a partial pass or
+permission to widen a magic bound.

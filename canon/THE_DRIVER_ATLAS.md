@@ -5,7 +5,7 @@
 
 ## Current census
 
-[established-bounded; measured] `python3 tools/driver_catalog.py`, run 2026-08-30 after the
+[established-bounded; measured] `python3 tools/driver_catalog.py`, re-run 2026-08-31 after the
 repository consolidation corrected target discovery, returns 346 actual Cargo example targets.
 The prior filename census incorrectly counted 97 nested helper modules as independent drivers and
 missed 19 real targets.
@@ -15,18 +15,19 @@ sole existence census. Its current exterior projection is:
 
 ```text
 card                 6
-card + deposit      11
-deposit            107
+card + deposit      13
+deposit            105
 kernel               6
 kernel + card        1
 kernel + card + deposit 10
 kernel + deposit    27
-none                178
+none                176
 ```
 
-[established-bounded; measured] Twenty-one current targets are named in no governing document or
-dated record, and 47 carry no module documentation declaring their subject. Those are current
-classification obligations, not evidence that the target is dead.
+[established-bounded; measured] The 2026-08-31 retake returns 57 current targets named in no
+governing document or dated record and 47 carrying no module documentation which declares their
+subject. Either condition is a navigation/classification obligation, not evidence that the target
+is dead. Re-run the generator rather than carrying either count forward.
 
 ## What the ledger proves
 
@@ -57,11 +58,13 @@ establishes that the experiment is not using the machine.
 external compiler, theorem kernel, measured world return, or human receiver can return testimony the
 body did not author. Emission and return remain distinct caused occurrences with addressed lineage.
 
-## Consolidation obligations
+## Post-consolidation boundary
 
-[open] CONS3 must disposition the 21 unnamed and 47 undocumented targets and move substantial
-example-local algorithms into existing library owners or historical archive. The largest current
-drivers are implementation-sized and cannot remain examples merely because Cargo can compile them.
+[historical; measured] CONS3 moved its named production foremen and repaired driver discovery; it
+did not transform this hand-maintained interpretation file into a live semantic audit. The generated
+ledger remains the existence authority. Several historical/example drivers are still
+implementation-sized, so any one entering an active dependency closure must be inspected against
+the driver law below before it can carry a grade.
 
 [definition] Removal requires one of:
 

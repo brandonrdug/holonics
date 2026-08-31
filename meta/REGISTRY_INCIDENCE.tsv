@@ -122,7 +122,7 @@ H.0203	geometry-calculus.typ	proved-standard	0	H.0010
 H.0204	geometry-calculus.typ	proved-standard	0	H.0203;H.0101
 H.0205	geometry-calculus.typ	proved-standard	0	H.0204
 H.0206	geometry-calculus.typ	proved-standard	0	H.0105
-H.0207	geometry-calculus.typ	proved-standard	0	H.0206
+H.0207	geometry-calculus.typ	proved-standard	1	H.0206
 H.0208	geometry-calculus.typ	proved-standard	0	H.0204;H.0206
 H.0209	geometry-calculus.typ	proved-standard	0	H.0206;H.0208
 H.0210	geometry-calculus.typ	definition	0	H.0018;H.0206

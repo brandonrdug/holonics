@@ -40,8 +40,8 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 GATES=(tests formal tracked-authority source-shape authored-levels named-paths line-citations
-       epistemic-tags claim-index equation-atlas driver-catalog output-manifest closure-manifest
-       boundary-artifacts typst architecture-lint document-law)
+       epistemic-tags claim-index equation-atlas registry-incidence driver-catalog output-manifest
+       closure-manifest boundary-artifacts typst architecture-lint document-law)
 
 # ---------------------------------------------------------------------------------------------
 # 10 · the laws THE_DOCUMENT_LAW states about governing documents
@@ -313,6 +313,20 @@ gate_claim-index() {
 gate_equation-atlas() {
     local out="$WORK/equation-atlas.out"
     "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/equation_atlas.py" --check >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(tail -1 "$out")"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 4c · the mathematical registry's current Rust incidence agrees with its generated ledger
+# ---------------------------------------------------------------------------------------------
+
+gate_registry-incidence() {
+    local out="$WORK/registry-incidence.out"
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/registry_incidence.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
