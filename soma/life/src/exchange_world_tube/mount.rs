@@ -8,6 +8,7 @@ use std::{
 };
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
+use rayon::prelude::*;
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
@@ -185,6 +186,15 @@ fn stream_mount(
     specs: &[ExchangeContainerSpec],
     captured: &[u64],
 ) -> Result<StagedMount, ExchangeMountError> {
+    // Containers are disjoint addressed sources. Parse them independently, then perform one
+    // deterministic ordinal rebase of record/node/field addresses. This is the exact interchange
+    // receipt: no parser reads another container and the serial merge order is unchanged.
+    let staged = specs
+        .par_iter()
+        .zip(captured.par_iter())
+        .enumerate()
+        .map(|(container, (spec, extent))| stream_container(container, spec, *extent))
+        .collect::<Result<Vec<_>, _>>()?;
     let mut containers = Vec::with_capacity(specs.len());
     let mut records = Vec::new();
     let mut nodes = Vec::new();
@@ -193,114 +203,152 @@ fn stream_mount(
     let mut blank_records = 0u64;
     let mut incomplete_tails = 0u64;
 
-    for (container_at, (spec, extent)) in specs.iter().zip(captured).enumerate() {
-        let container = u32::try_from(container_at)
-            .map_err(|_| ExchangeMountError::Extent("container population".to_owned()))?;
-        let input = File::open(&spec.locator).map_err(|error| ExchangeMountError::Read {
-            path: spec.locator.display().to_string(),
-            message: error.to_string(),
-        })?;
-        let mut input = BufReader::new(input.take(*extent));
-        let mut prefix = Sha256::new();
-        let mut raw = Vec::new();
-        let mut raw_at = 0u64;
+    for mut local in staged {
         let record_from = records.len() as u64;
-        let mut local_record = 0u64;
-        let mut blank_ranges = Vec::new();
-        let mut incomplete_tail = None;
-        loop {
-            raw.clear();
-            let read =
-                input
-                    .read_until(b'\n', &mut raw)
-                    .map_err(|error| ExchangeMountError::Read {
-                        path: spec.locator.display().to_string(),
-                        message: error.to_string(),
-                    })?;
-            if read == 0 {
-                break;
-            }
-            prefix.update(&raw);
-            let raw_end = raw_at
-                .checked_add(read as u64)
-                .ok_or_else(|| ExchangeMountError::Extent("raw source range".to_owned()))?;
-            let range = raw_at..raw_end;
-            if raw.iter().all(u8::is_ascii_whitespace) {
-                blank_records = blank_records.checked_add(1).ok_or_else(|| {
-                    ExchangeMountError::Extent("blank record population".to_owned())
-                })?;
-                blank_ranges.push(range);
-            } else {
-                let parsed = match parse_record(&raw) {
-                    Ok(parsed) => parsed,
-                    Err(message) if raw_end == *extent && raw.last() != Some(&b'\n') => {
-                        incomplete_tails = incomplete_tails.checked_add(1).ok_or_else(|| {
-                            ExchangeMountError::Extent("incomplete tail population".to_owned())
-                        })?;
-                        incomplete_tail = Some(range);
-                        raw_at = raw_end;
-                        break;
-                    }
-                    Err(message) => {
-                        return Err(ExchangeMountError::Parse {
-                            path: spec.locator.display().to_string(),
-                            record: local_record,
-                            from: raw_at,
-                            to: raw_end,
-                            message,
-                        });
-                    }
-                };
-                let global_record = records.len() as u64;
-                let node_from = nodes.len() as u64;
-                let field_from = fields.len() as u64;
-                for (local, node) in parsed.nodes.into_iter().enumerate() {
-                    let global_node = nodes.len() as u64;
-                    if parsed.scalar_nodes.binary_search(&(local as u32)).is_ok() {
-                        scalar_nodes.push(global_node);
-                    }
-                    nodes.push(GlobalNode {
-                        record: global_record,
-                        local: node,
-                    });
-                }
-                fields.extend(parsed.fields.into_iter().map(|local| GlobalFieldFace {
-                    record: global_record,
-                    local,
-                }));
-                records.push(ExchangeRecord {
-                    container,
-                    ordinal: local_record,
-                    raw_range: range,
-                    raw_sha256: Digest32::of(&raw),
-                    root_sha256: parsed.root_digest,
-                    node_from,
-                    node_extent: u32::try_from(nodes.len() as u64 - node_from).map_err(|_| {
-                        ExchangeMountError::Extent("record node population".to_owned())
-                    })?,
-                    field_from,
-                    field_extent: u32::try_from(fields.len() as u64 - field_from).map_err(
-                        |_| ExchangeMountError::Extent("record field population".to_owned()),
-                    )?,
-                });
-                local_record = local_record
-                    .checked_add(1)
-                    .ok_or_else(|| ExchangeMountError::Extent("record population".to_owned()))?;
-            }
-            raw_at = raw_end;
+        let node_from = nodes.len() as u64;
+        let field_from = fields.len() as u64;
+        local.container.record_from = record_from;
+        for record in &mut local.records {
+            record.node_from += node_from;
+            record.field_from += field_from;
         }
-        if raw_at != *extent {
-            return Err(ExchangeMountError::Read {
+        for node in &mut local.nodes {
+            node.record += record_from;
+        }
+        for field in &mut local.fields {
+            field.record += record_from;
+        }
+        local.scalar_nodes.iter_mut().for_each(|node| *node += node_from);
+        blank_records = blank_records
+            .checked_add(local.blank_records)
+            .ok_or_else(|| ExchangeMountError::Extent("blank record population".to_owned()))?;
+        incomplete_tails = incomplete_tails
+            .checked_add(local.incomplete_tails)
+            .ok_or_else(|| ExchangeMountError::Extent("incomplete tail population".to_owned()))?;
+        containers.push(local.container);
+        records.extend(local.records);
+        nodes.extend(local.nodes);
+        fields.extend(local.fields);
+        scalar_nodes.extend(local.scalar_nodes);
+    }
+    Ok(StagedMount {
+        containers,
+        records,
+        nodes,
+        fields,
+        scalar_nodes,
+        blank_records,
+        incomplete_tails,
+    })
+}
+
+struct StagedContainer {
+    container: ExchangeContainer,
+    records: Vec<ExchangeRecord>,
+    nodes: Vec<GlobalNode>,
+    fields: Vec<GlobalFieldFace>,
+    scalar_nodes: Vec<u64>,
+    blank_records: u64,
+    incomplete_tails: u64,
+}
+
+fn stream_container(
+    container_at: usize,
+    spec: &ExchangeContainerSpec,
+    extent: u64,
+) -> Result<StagedContainer, ExchangeMountError> {
+    let container = u32::try_from(container_at)
+        .map_err(|_| ExchangeMountError::Extent("container population".to_owned()))?;
+    let input = File::open(&spec.locator).map_err(|error| ExchangeMountError::Read {
+        path: spec.locator.display().to_string(),
+        message: error.to_string(),
+    })?;
+    let mut input = BufReader::new(input.take(extent));
+    let mut prefix = Sha256::new();
+    let mut raw = Vec::new();
+    let mut raw_at = 0u64;
+    let mut records = Vec::new();
+    let mut nodes = Vec::new();
+    let mut fields = Vec::new();
+    let mut scalar_nodes = Vec::new();
+    let mut blank_ranges = Vec::new();
+    let mut incomplete_tail = None;
+    let mut blank_records = 0u64;
+    let mut incomplete_tails = 0u64;
+    loop {
+        raw.clear();
+        let read = input
+            .read_until(b'\n', &mut raw)
+            .map_err(|error| ExchangeMountError::Read {
                 path: spec.locator.display().to_string(),
-                message: format!("captured {extent} octets but read {raw_at}"),
+                message: error.to_string(),
+            })?;
+        if read == 0 { break; }
+        prefix.update(&raw);
+        let raw_end = raw_at
+            .checked_add(read as u64)
+            .ok_or_else(|| ExchangeMountError::Extent("raw source range".to_owned()))?;
+        let range = raw_at..raw_end;
+        if raw.iter().all(u8::is_ascii_whitespace) {
+            blank_records += 1;
+            blank_ranges.push(range);
+        } else {
+            let parsed = match parse_record(&raw) {
+                Ok(parsed) => parsed,
+                Err(_) if raw_end == extent && raw.last() != Some(&b'\n') => {
+                    incomplete_tails += 1;
+                    incomplete_tail = Some(range);
+                    raw_at = raw_end;
+                    break;
+                }
+                Err(message) => return Err(ExchangeMountError::Parse {
+                    path: spec.locator.display().to_string(),
+                    record: records.len() as u64,
+                    from: raw_at,
+                    to: raw_end,
+                    message,
+                }),
+            };
+            let record = records.len() as u64;
+            let node_from = nodes.len() as u64;
+            let field_from = fields.len() as u64;
+            for (local, node) in parsed.nodes.into_iter().enumerate() {
+                let global_node = nodes.len() as u64;
+                if parsed.scalar_nodes.binary_search(&(local as u32)).is_ok() {
+                    scalar_nodes.push(global_node);
+                }
+                nodes.push(GlobalNode { record, local: node });
+            }
+            fields.extend(parsed.fields.into_iter().map(|local| GlobalFieldFace { record, local }));
+            records.push(ExchangeRecord {
+                container,
+                ordinal: record,
+                raw_range: range,
+                raw_sha256: Digest32::of(&raw),
+                root_sha256: parsed.root_digest,
+                node_from,
+                node_extent: u32::try_from(nodes.len() as u64 - node_from)
+                    .map_err(|_| ExchangeMountError::Extent("record node population".to_owned()))?,
+                field_from,
+                field_extent: u32::try_from(fields.len() as u64 - field_from)
+                    .map_err(|_| ExchangeMountError::Extent("record field population".to_owned()))?,
             });
         }
-        containers.push(ExchangeContainer {
+        raw_at = raw_end;
+    }
+    if raw_at != extent {
+        return Err(ExchangeMountError::Read {
+            path: spec.locator.display().to_string(),
+            message: format!("captured {extent} octets but read {raw_at}"),
+        });
+    }
+    Ok(StagedContainer {
+        container: ExchangeContainer {
             ordinal: container,
-            captured_extent: *extent,
+            captured_extent: extent,
             prefix_sha256: Digest32::from_sha(prefix.finalize()),
-            record_from,
-            record_extent: records.len() as u64 - record_from,
+            record_from: 0,
+            record_extent: records.len() as u64,
             incomplete_tail,
             blank_records: blank_ranges,
             lineage: ContainerLineageFaces {
@@ -308,10 +356,7 @@ fn stream_mount(
                 provider: spec.provider_face.clone(),
                 material_kind: spec.material_kind_face.clone(),
             },
-        });
-    }
-    Ok(StagedMount {
-        containers,
+        },
         records,
         nodes,
         fields,

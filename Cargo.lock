@@ -956,6 +956,7 @@ dependencies = [
  "num-bigint",
  "num-rational",
  "num-traits",
+ "rayon",
  "relational-geometry",
  "ron",
  "serde",
