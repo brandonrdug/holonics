@@ -120,9 +120,11 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md` | **The Clifford lift, the phase wire, and the four untaken readings** — Every citation below was verified at the line given on the day of writing. |
 | `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md` | **The codec is recovered at every scale, and the faces are a return** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md` | **SUPERSEDED — The complete exchange returns through native Athena, and Phoenix closes before cultivation begins** — **Supersession:** this revision withdraws the 2026-08-25 interpretation which called a mounted Phoenix execution wrapper the “general Athena body” and then divided its foreign transport… |
+| `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md` | **The constructive differential boundary and receiver calculus** — **Pass CDB1:** [definition] the new owner builds through `HolonicQuantumTransport.lean` under Lean `v4.33.0`, contains no `sorry` or new axiom, prints only admitted Lean/Mathlib axioms, and… |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — This one covers instantiation. |
+| `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md` | **The finite many-body and polarized crystal transport foundation** — A receiver covector or positive effect `rho` acts only after the surface junction. |
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
 | `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
 | `blueprint/THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md` | **The holonic neural ecology returns every classical architecture as a receiver chart and Eros cultivates Athena through physical information transport** — Inference fixes `Lambda_t` during the conducting occurrence. |
@@ -149,7 +151,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (435 deposits of 727)
+## 4 · The 2026-08 record line (437 deposits of 729)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -592,6 +594,8 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-30_THE_CONSERVED_PORT_CURRENT_RETURNED_RECURRENCE_BUT_ITS_PHASE_INSENSITIVE_RECEIVER_COULD_NOT_REALIZE_THE_NATIVE_COMPLEX_SECTION.md` | The conserved port current returned recurrence, but its phase-insensitive receiver could not realize the native complex section |
 | `2026-08-30_THE_NATIVE_SECTION_FOUNDED_ONE_SOURCE_NEUTRAL_BOUNDARY_CURRENT_BUT_FACTORWISE_ADJACENCY_COULD_NOT_CARRY_THE_CAUSAL_SURFACE.md` | The native section founded one source-neutral boundary current but factorwise adjacency could not carry the causal surface |
 | `2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md` | UAR R0Q session checkout — the receiver order was repaired but the site transport remained diagonal |
+| `2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md` | Constructive differentials keep `dx` typed and refinement does not erase the potential fibre |
+| `2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md` | Finite many-body, polarized crystal, and diffusion Lean foundation returned to the engine |
 
 ---
 
@@ -612,7 +616,7 @@ outside `tools/` that names the verifier — not declared.
 | `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on the live construction authority. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
 | `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `CONSTRUCTION_STATE.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, and 71 more |
-| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `canon/THE_EXPLORATIVE_FAILURE.md`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `research/records/2026-08-14_THE_LIBRARY_WAS_ALREADY_ON_THE_DISK_AND_THE_ABSENCE_WAS_MEASURED_BY_COUNTING_ARTIFACTS.md` |
+| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `CONSTRUCTION_STATE.md`, `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, and 6 more |
 | `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `meta/OUTPUT_MANIFEST.tsv`, `meta/history/2026-08-30_OUTPUT_MANIFEST_PRE_CLEANUP.tsv`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |

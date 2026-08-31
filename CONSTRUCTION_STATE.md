@@ -5,9 +5,9 @@
 Historical phase detail remains in Git, dated research records, and the campaign blueprints named
 by the roadmap.
 
-**Currency:** 2026-08-31, after QLT1--QLT6 returned the finite many-body, polarized-crystal,
-evolution/diffusion, and simulation-certificate Lean foundation. The remaining consolidation
-residual is resumed; UAR remains frozen. QLT advanced no Athena grade.
+**Currency:** 2026-08-31, after CDB1 returned the bounded constructive differential boundary
+supplement through the live Lean umbrella. CONS3 resumes at its exact residual; UAR remains frozen.
+QLT and CDB1 advanced no Athena grade.
 
 ## Current frontier
 
@@ -18,7 +18,9 @@ residual is resumed; UAR remains frozen. QLT advanced no Athena grade.
 [definition] Leave `conduct_quadratic_moment_front_inner` as a narrow coordinator over the existing
 admission/plan, workspace/contraction, and boundary-return owners. Preserve one CUDA context, one
 terminal synchronization, exact direct/resident equality, complete dependent complex current,
-target-site/port lineage, receiver order, and reconstruction testimony.
+target-site/port lineage, receiver order, and reconstruction testimony. Preserve operand order and
+typed scale; join complete local current before refinement condensation; and never infer carrier
+nullity from a zero positive/standard face.
 
 [proved-derived; formal-checked] QLT returned finite occupation/CAR, the Hermitian
 particle-number-preserving Fermi--Hubbard Hamiltonian, coherent polarized crystal paths and surface
@@ -32,9 +34,16 @@ passed; source shape reported 620 live files and zero violations. The full QLT r
 Rust/CUDA conformance map are in
 [`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
 
+[proved-derived; formal-checked] CDB1 returned a noncommutative-order-preserving first-order jet,
+exact differential-path FTC, lower-dimensional receiver kernel, nonzero zero-faced residue,
+pointwise-zero/integrated-one refinement control, MVT witness, and residue-retaining squeeze
+certificate. The live umbrella then built 3,765 jobs; the owner contains no `sorry` or new axiom.
+The exact source review and return are in
+[`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
+
 ## Resumed consolidation position
 
-[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes at the named
+[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes after CDB1 at the named
 `conduct_quadratic_moment_front_inner` contraction/receiver/readback split.
 
 [established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable

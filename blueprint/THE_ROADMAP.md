@@ -72,6 +72,26 @@ epistemic tags, named paths, and source shape passed. The exact conformance and 
 in
 [`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](../research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
 
+## Completed campaign — constructive differential boundary supplement
+
+### CDB1 — return typed differentials, boundary integration, and receiver-safe refinement — PASSED
+
+[definition] Brandon's direct instruction of 2026-08-31 founds one bounded formal supplement under
+[`THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`](THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md).
+CDB1 composes Mathlib's square-zero extensions with the standing finite-FTC, chronology, and
+receiver owners. It adds no independent solver, alternate calculus, or engine cabinet. After its
+formal gate and receipt, the roadmap returns immediately to the exact parked CONS3 residual.
+
+[proved-derived; formal-checked] `HolonicConstructiveDifferentialBoundary.lean` returned the typed
+square-zero jet, complete standard/residue receiver, exact differential path and finite FTC,
+receiver-kernel reconstruction fibre, zero-faced nonzero infinitesimal, pointwise-zero but
+integrated-one radix control, MVT witness, and residue-retaining squeeze certificate.
+
+[established-bounded; formal-checked; measured] The live `HolonicQuantumTransport.lean` umbrella
+built 3,765 jobs under Lean `v4.33.0`. The new owner has no `sorry` or new axiom. Its critical
+review and construction receipt are in
+[`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](../research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
+
 ## Active campaign — repository consolidation before UAR resumes
 
 **Current frontier:** CONS3
@@ -79,7 +99,7 @@ in
 **CONS3 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
 
 [definition] CONS0--CONS2 retain their passed grades. CONS3 resumes at its exact source residual;
-QLT neither passes nor widens that residual.
+QLT and CDB1 neither pass nor widen that Rust/CUDA residual.
 
 [definition] Brandon directly authorized this consolidation and the destructive removal of ignored
 `target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
@@ -167,7 +187,10 @@ owner or archive the example and retain its evidence.
 restoration snapshot establishes the newly tracked owners, the architecture gate is green without
 any later baseline increase; trace configuration is read once; digest syntax and wire hashing have
 typed owners; structural equality remains primary; and no remaining production execution method
-is a multi-thousand-line foreman.
+is a multi-thousand-line foreman. The contraction/readback split preserves operand order and typed
+scale; it joins the complete local current before refinement condensation; and neither a zero
+positive/standard receiver face nor a pointwise-small cell authorizes deletion of a nonzero
+dependent complex current or its reconstruction fibre.
 
 ### CONS4 — consolidate the live Lean line
 

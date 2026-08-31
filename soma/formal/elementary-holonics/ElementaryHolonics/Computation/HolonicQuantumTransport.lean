@@ -5,6 +5,7 @@ import ElementaryHolonics.Computation.HolonicEvolutionKinds
 import ElementaryHolonics.Computation.HolonicOrientedSiteTransport
 import ElementaryHolonics.Computation.HolonicPolarizedCrystalTransport
 import ElementaryHolonics.Computation.HolonicSimulationCertificate
+import ElementaryHolonics.Computation.HolonicConstructiveDifferentialBoundary
 
 /-!
 # Holonic finite quantum transport umbrella
