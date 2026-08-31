@@ -5,13 +5,13 @@
 # `.olean` fallback and does not reinterpret missing aggregator imports as success.
 #
 #   bash tools/lean_check.sh
-#   bash tools/lean_check.sh ElementaryHolonics.Computation.HolonicMachineLearning
+#   bash tools/lean_check.sh ElementaryHolonics.Computation.HolonicQuantumTransport
 
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT/soma/formal/elementary-holonics"
-TARGET="${1:-ElementaryHolonics.Computation.HolonicMachineLearning}"
+TARGET="${1:-ElementaryHolonics.Computation.HolonicQuantumTransport}"
 
 if [ ! -f "$PROJECT/lakefile.toml" ] || [ ! -f "$PROJECT/lean-toolchain" ]; then
     printf 'formal project is incomplete: %s\n' "$PROJECT" >&2

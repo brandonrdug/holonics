@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.Complex.Exponential
+import ElementaryHolonics.Computation.HolonicPolarizedCrystalTransport
 
 /-!
 # Conservation of faces and angles: the excess decides the curvature, and positivity is finite
@@ -29,6 +30,8 @@ Curvature being positive is a *closing* condition, and closing is finite.
 -/
 
 namespace Soma.Holonics.Millennium.AngleExcess
+
+open Soma.Holonics.Computation.HolonicPolarizedCrystalTransport
 
 /-- The angle excess of a triangle group, exactly over `ℚ`. -/
 def excess (p q r : ℕ) : ℚ := 1 / (p : ℚ) + 1 / (q : ℚ) + 1 / (r : ℚ) - 1
@@ -213,9 +216,7 @@ noncomputable def crystallineHistoryPhase
       facePopulation sidesPerFace ambientDimension)
     (waveVector : Fin ambientDimension → ℝ)
     (history : FaceHistory facePopulation sidesPerFace) : ℂ :=
-  Complex.exp (Complex.I *
-    (∑ coordinate : Fin ambientDimension,
-      (waveVector coordinate * realization.position history coordinate : ℝ) : ℂ))
+  crystallinePhase realization.position waveVector history
 
 /-- The exact finite diffraction amplitude.  Interference is performed before the intensity
 receiver, so histories with the same visible endpoint may still contribute different phases. -/
@@ -224,9 +225,7 @@ noncomputable def crystallineDiffractionAmplitude
     (realization : CrystallineFaceHistoryRealization
       facePopulation sidesPerFace ambientDimension)
     (waveVector : Fin ambientDimension → ℝ) : ℂ :=
-  ∑ history : FaceHistory facePopulation sidesPerFace,
-    realization.coefficient history *
-      crystallineHistoryPhase realization waveVector history
+  crystallineAmplitude realization.coefficient realization.position waveVector
 
 /-- The intensity pattern is the real norm-square quotient of the complete complex amplitude. -/
 noncomputable def crystallineDiffractionIntensity
@@ -234,7 +233,7 @@ noncomputable def crystallineDiffractionIntensity
     (realization : CrystallineFaceHistoryRealization
       facePopulation sidesPerFace ambientDimension)
     (waveVector : Fin ambientDimension → ℝ) : ℝ :=
-  Complex.normSq (crystallineDiffractionAmplitude realization waveVector)
+  crystallineIntensity realization.coefficient realization.position waveVector
 
 /-! ## 4.  The trichotomy, completed: five, three, and infinitely many -/
 

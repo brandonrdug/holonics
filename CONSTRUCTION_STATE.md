@@ -5,15 +5,37 @@
 Historical phase detail remains in Git, dated research records, and the campaign blueprints named
 by the roadmap.
 
-**Currency:** 2026-08-31, after the restored population was committed, validation apparatus was
-repaired, and the first structural split returned. UAR is frozen. Consolidation does not advance
-an Athena grade.
+**Currency:** 2026-08-31, after QLT1--QLT6 returned the finite many-body, polarized-crystal,
+evolution/diffusion, and simulation-certificate Lean foundation. The remaining consolidation
+residual is resumed; UAR remains frozen. QLT advanced no Athena grade.
 
 ## Current frontier
 
 **Current frontier:** CONS3
 
-**CONS3 — SPLIT AND SIMPLIFY EXISTING RUST/CUDA OWNERS — IS THE SOLE NEXT DEED.**
+**CONS3 — SPLIT AND SIMPLIFY THE REMAINING RUST/CUDA MOMENT OWNER — IS THE SOLE NEXT DEED.**
+
+[definition] Leave `conduct_quadratic_moment_front_inner` as a narrow coordinator over the existing
+admission/plan, workspace/contraction, and boundary-return owners. Preserve one CUDA context, one
+terminal synchronization, exact direct/resident equality, complete dependent complex current,
+target-site/port lineage, receiver order, and reconstruction testimony.
+
+[proved-derived; formal-checked] QLT returned finite occupation/CAR, the Hermitian
+particle-number-preserving Fermi--Hubbard Hamiltonian, coherent polarized crystal paths and surface
+receivers, distinct real/imaginary/stochastic/physical/open evolution carriers, and exact/bounded
+simulation certificates. `AngleExcess.lean` now consumes the common crystalline diffraction owner.
+
+[established-bounded; formal-checked; process-audit] `HolonicQuantumTransport.lean` is the single
+default/live umbrella and imports the prior HNN/HML surface. `bash tools/lean_check.sh` built 3,762
+jobs under the 180-second boundary. Document law, epistemic tags, named paths, and source shape
+passed; source shape reported 620 live files and zero violations. The full QLT receipts and
+Rust/CUDA conformance map are in
+[`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
+
+## Resumed consolidation position
+
+[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes at the named
+`conduct_quadratic_moment_front_inner` contraction/receiver/readback split.
 
 [established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable
 Git stash `stash@{0}` / object

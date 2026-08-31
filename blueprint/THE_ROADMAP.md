@@ -25,16 +25,61 @@ Read, in order:
    [`THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md`](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md)
    and
    [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md).
+8. while a `QLT` phase is current, the finite many-body and polarized-crystal contract,
+   [`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
 
 Read only the smallest source, formal, and evidence closure required by the active consolidation
 deed. Completed sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
 are provenance, not pickup obligations.
+
+## Completed campaign — finite many-body and polarized crystal transport
+
+[definition] Brandon's direct instruction of 2026-08-31 places the ordered `QLT1--QLT6` campaign
+before further engine work. Its complete contract is
+[`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
+
+[proved-derived; formal-checked] QLT1 returned `HolonicFermionicOccupation.lean`: the power-set
+occupation carrier, signed complex-linear creation and annihilation, vacuum and number grading, all
+three CAR laws, their linear-map forms, conjugate-transpose matrix relation, and a two-mode control.
+The live `HolonicQuantumTransport` umbrella built 3,167 jobs under Lean `v4.33.0`; its axiom audit
+contains no `sorryAx` or new axiom.
+
+[proved-derived; formal-checked] QLT2 returned `HolonicFermiHubbard.lean`: directed hopping,
+adjoint-paired bonds, number and double-occupation receivers, an exact finite Fermi--Hubbard matrix,
+Hermiticity, exact particle-number-sector preservation, and a nontrivial two-site hopping/interaction
+control. The campaign umbrella built 3,171 jobs without `sorry` or a new axiom.
+
+[proved-derived; formal-checked] QLT3 returned `HolonicPolarizedCrystalTransport.lean`: retained
+path boundary fibres, coherent surface sections, polarization transport, analyzer and intensity
+receivers, ordered path composition, exact basis covariance, crystalline phase, orthogonal analyzer
+separation, and two-path cancellation/reinforcement. `AngleExcess.lean` delegates its diffraction
+definitions to the common owner, and the campaign umbrella built 3,172 jobs.
+
+[proved-derived; formal-checked] QLT4 returned `HolonicEvolutionKinds.lean`: Physlib finite-target
+real-time norm conservation and group composition, a separate imaginary-time exponential semigroup,
+fermionic worldline/diagram histories, Markov mass preservation, physical boundary balance, and a
+separate open-system carrier. The campaign umbrella built 3,745 jobs.
+
+[proved-derived; formal-checked] QLT5 returned `HolonicSimulationCertificate.lean`: typed method and
+assurance layers, decomposed error budgets, Hermitian finite eigenpair certificates, and exact plus
+bounded controls over the same observable with residual masses `0` and `1/16`. The external
+producer and Lean checker remain distinct; the campaign umbrella built 3,746 jobs.
+
+[established-bounded; formal-checked; process-audit] QLT6 made
+`HolonicQuantumTransport.lean` the single live/default Lean umbrella, including the prior HNN/HML
+surface. `bash tools/lean_check.sh` built 3,762 jobs under the 180-second boundary; document law,
+epistemic tags, named paths, and source shape passed. The exact conformance and return are recorded
+in
+[`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](../research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
 
 ## Active campaign — repository consolidation before UAR resumes
 
 **Current frontier:** CONS3
 
 **CONS3 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
+
+[definition] CONS0--CONS2 retain their passed grades. CONS3 resumes at its exact source residual;
+QLT neither passes nor widens that residual.
 
 [definition] Brandon directly authorized this consolidation and the destructive removal of ignored
 `target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
