@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub const RECEIVER_HISTORY_REALIZATION_SCHEMA: &str =
-    "soma-life.receiver-history-realization-passage.v1";
-pub const ATHENA_NATIVE_REST_SCHEMA: &str = "soma-life.athena-native-rest.v2";
+    "soma-life.receiver-history-realization-passage.v2";
+pub const ATHENA_NATIVE_REST_SCHEMA: &str = "soma-life.athena-native-rest.v3";
 
 /// The complete native address of one carrying occurrence. Equal endpoints, receiver values, or
 /// thread names cannot substitute for this three-part address.
@@ -42,6 +42,9 @@ pub struct ReceiverHistoryRealizationPassage {
     pub receiver_family: BTreeSet<ReceiverId>,
     pub generator_family: BTreeSet<InputId>,
     pub boundary_population: BTreeSet<BoundaryId>,
+    /// Exact causal components before a returned interaction glues them. Co-presence in one
+    /// owner does not manufacture contact; this is the complete reconstruction fibre.
+    pub connected_components: Vec<Vec<NativeSectionAddress>>,
     pub open_exterior: Vec<String>,
 }
 

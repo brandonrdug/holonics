@@ -44,7 +44,8 @@ impl ReceiverHistoryRealizationPassage {
             || self.receiver_family.is_empty()
             || self.generator_family.is_empty()
             || self.boundary_population.is_empty()
-            || !connected_through_native_cells(ecology, &self.sections)
+            || self.connected_components.is_empty()
+            || self.connected_components.iter().any(Vec::is_empty)
         {
             return Err(AthenaNativeError::Realization(
                 "the addressed section population is empty or disconnected".to_owned(),
@@ -87,6 +88,13 @@ impl ReceiverHistoryRealizationPassage {
         ingress_sections.sort();
         open_exterior.sort();
         open_exterior.dedup();
+        let connected_components = components_through_native_cells(ecology, &sections);
+        if connected_components.len() > 1 {
+            open_exterior.push(format!(
+                "{} causal components await a returned interaction",
+                connected_components.len()
+            ));
+        }
         Self {
             schema: RECEIVER_HISTORY_REALIZATION_SCHEMA.to_owned(),
             sections,
@@ -95,6 +103,7 @@ impl ReceiverHistoryRealizationPassage {
             receiver_family,
             generator_family,
             boundary_population,
+            connected_components,
             open_exterior,
         }
     }
@@ -141,10 +150,10 @@ impl AthenaNativeRest {
     }
 }
 
-fn connected_through_native_cells(
+fn components_through_native_cells(
     ecology: &NativeSpoolBundle,
     sections: &[NativeSectionAddress],
-) -> bool {
+) -> Vec<Vec<NativeSectionAddress>> {
     let mut native_to_sections = BTreeMap::<NativeStateId, BTreeSet<usize>>::new();
     let mut occurrence_to_section = BTreeMap::new();
     let section_positions = sections
@@ -163,7 +172,7 @@ fn connected_through_native_cells(
                     occurrence: occurrence.occurrence,
                 };
                 let Some(at) = section_positions.get(&address).copied() else {
-                    return false;
+                    return Vec::new();
                 };
                 let pair = BTreeSet::from([occurrence.entering_native, occurrence.emitting_native]);
                 for native in &pair {
@@ -191,33 +200,44 @@ fn connected_through_native_cells(
             .insert(response.left_occurrence);
     }
     if sections.is_empty() || found != sections.len() {
-        return false;
+        return Vec::new();
     }
-    let mut reached = BTreeSet::from([0usize]);
-    let mut queue = VecDeque::from([0usize]);
-    let mut expanded_natives = BTreeSet::new();
-    while let Some(at) = queue.pop_front() {
-        for native in &section_to_natives[at] {
-            if expanded_natives.insert(*native) {
-                for next in &native_to_sections[native] {
-                    if reached.insert(*next) {
-                        queue.push_back(*next);
+    let mut unreached = (0..sections.len()).collect::<BTreeSet<_>>();
+    let mut components = Vec::new();
+    while let Some(start) = unreached.first().copied() {
+        let mut reached = BTreeSet::from([start]);
+        let mut queue = VecDeque::from([start]);
+        let mut expanded_natives = BTreeSet::new();
+        while let Some(at) = queue.pop_front() {
+            for native in &section_to_natives[at] {
+                if expanded_natives.insert(*native) {
+                    for next in &native_to_sections[native] {
+                        if reached.insert(*next) {
+                            queue.push_back(*next);
+                        }
+                    }
+                }
+            }
+            let occurrence = sections[at].occurrence;
+            if let Some(neighbors) = mutual_neighbors.get(&occurrence) {
+                for other in neighbors {
+                    if let Some(next) = occurrence_to_section.get(other) {
+                        if reached.insert(*next) {
+                            queue.push_back(*next);
+                        }
                     }
                 }
             }
         }
-        let occurrence = sections[at].occurrence;
-        if let Some(neighbors) = mutual_neighbors.get(&occurrence) {
-            for other in neighbors {
-                if let Some(next) = occurrence_to_section.get(other) {
-                    if reached.insert(*next) {
-                        queue.push_back(*next);
-                    }
-                }
-            }
-        }
+        unreached.retain(|at| !reached.contains(at));
+        components.push(
+            reached
+                .into_iter()
+                .map(|at| sections[at].clone())
+                .collect(),
+        );
     }
-    reached.len() == sections.len()
+    components
 }
 
 #[cfg(test)]

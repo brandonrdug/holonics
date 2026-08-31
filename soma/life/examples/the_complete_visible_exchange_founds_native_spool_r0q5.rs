@@ -102,8 +102,12 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let addressed = lineage
                     .occurrences()
                     .iter()
-                    .map(|occurrence| AddressedDialogueOccurrence {
+                    .enumerate()
+                    .map(|(at, occurrence)| AddressedDialogueOccurrence {
                         address: local[occurrence.identity.as_str()].clone(),
+                        predecessor: at.checked_sub(1).map(|prior| {
+                            local[lineage.occurrences()[prior].identity.as_str()].clone()
+                        }),
                         caused_by: occurrence
                             .caused_by
                             .iter()
@@ -153,6 +157,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                     .enumerate()
                     .map(|(at, address)| AddressedDialogueOccurrence {
                         address: address.clone(),
+                        predecessor: at
+                            .checked_sub(1)
+                            .map(|prior| addresses[prior].clone()),
                         caused_by: at
                             .checked_sub(1)
                             .map(|prior| [addresses[prior].clone()].into_iter().collect())
