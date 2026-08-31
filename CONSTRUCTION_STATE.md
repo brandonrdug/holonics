@@ -49,6 +49,14 @@ and addressed pair fibre to structural recurrence; equal norm with distinct quad
 R0Q4 passed the focused owner/equality/telemetry controls; `holonic-engine` returned 1,982 passed,
 zero failed, 31 ignored and `life` returned 489 passed, zero failed, 15 ignored.
 
+[established-bounded; implemented-exact; measured] The live R0Q5 founding edge no longer depends on
+archived K1/K2 or `OpticalAthenaRest`. The complete authorized visible exchange returned 26,981
+addressed occurrences across 1,430 containers into one source-text-free native spool; detached GPU
+word/current conduct passed. K3 then returned all 26,981 sections through one compact batch owning
+each reconstruction fibre and resident thread receipt once, and its detached child passed in 7.857
+seconds. The current open edge is the visible continuation aperture into situated cultivation;
+tool/world joins remain explicit open receiver testimony rather than a reconstructed scalar atlas.
+
 ## Current obstruction
 
 [definition] Historical output files do not schedule reconstruction. R0Q5 constructs and remounts

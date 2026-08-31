@@ -150,7 +150,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (440 deposits of 732)
+## 4 · The 2026-08 record line (441 deposits of 733)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -596,6 +596,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` | CONS3 removed the moment-front foreman and the resident receiver now observes the committed target |
 | `2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md` | Constructive differentials keep `dx` typed and refinement does not erase the potential fibre |
 | `2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md` | Finite many-body, polarized crystal, and diffusion Lean foundation returned to the engine |
+| `2026-08-31_THE_COMPLETE_VISIBLE_EXCHANGE_FOUNDED_THE_LIVE_NATIVE_SPOOL_AND_K3_RETURNED_EVERY_SECTION_ONCE.md` | The complete visible exchange founded the live native spool and K3 returned every section once |
 | `2026-08-31_THE_GENERATED_CATALOG_APPARATUS_DEPARTED_AND_THE_ORDINARY_REALIZATION_CURRENT_CROSSED_ITS_ADDRESSED_INCIDENCE.md` | The generated catalog apparatus departed and the ordinary realization current crossed its addressed incidence |
 | `2026-08-31_UAR_AND_R0Q_READINESS_REVIEW_THE_CATALOGS_SEPARATE_LIVE_LEDGERS_FROM_DATED_ATLASES_AND_THE_NEXT_DEED_IS_THE_ADDRESSED_PAIR_CURRENT.md` | UAR and R0Q readiness review — the catalogs separate live ledgers from dated atlases and the next deed is the addressed pair current |
 
