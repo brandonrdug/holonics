@@ -206,6 +206,12 @@ it with every source-bearing driver and artifact unavailable, and audit the hot 
 **Pass R0Q5:** the source-neutral rest remounts, source surfaces and compatibility drivers are
 unreachable, and removing every historical UAR output changes no native construction consequence.
 
+[established-bounded; implemented-exact; source-inspected] The direct library entry now consumes a
+typed `OpticalAthenaRest` through its move-owned organ withdrawals and returns
+`SourceNeutralAthenaRest` without accepting a path or predecessor wire. Five output-bound UAR
+compatibility examples were deleted. This is the construction owner; the pass grade still requires
+one live owned predecessor, detached canonical remount, and measured hot-closure audit.
+
 ### UAR4-R0Q6 — unchanged smallest qualitative receiver
 
 [definition] Run the original smallest source-neutral qualitative occurrence once under its

@@ -15,9 +15,9 @@ use thiserror::Error;
 use super::source_neutral_cold;
 use super::{
     GranularNativeProjectiveCurrent, NativeAcousticProductionMorphology, NativeGranularPotential,
-    NativeOpticalProductionMorphology, SourceNeutralAcousticMorphology, SourceNeutralAthenaError,
-    SourceNeutralAthenaRest, SourceNeutralCultivationBranch, SourceNeutralOpticalMorphology,
-    SourceNeutralReturnedDeposit, SourceNeutralReturnedEcology,
+    NativeOpticalProductionMorphology, OpticalAthenaRest, SourceNeutralAcousticMorphology,
+    SourceNeutralAthenaError, SourceNeutralAthenaRest, SourceNeutralCultivationBranch,
+    SourceNeutralOpticalMorphology, SourceNeutralReturnedDeposit, SourceNeutralReturnedEcology,
 };
 
 pub const EXTERIOR_RELATIONAL_WITNESS_SCHEMA: &str = "soma-life.exterior-relational-witness.v1";
@@ -81,6 +81,20 @@ pub struct SourceNeutralSeveringReceipt {
     pub source_payload_retained_in_successor: bool,
     pub source_codec_reachable_from_successor: bool,
     pub reconstruction_method_reachable_from_successor: bool,
+}
+
+/// Receipt for the direct move-owned construction. It deliberately carries no predecessor path,
+/// predecessor wire address, output locator, or checksum registry.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceNeutralDirectConstructionReceipt {
+    pub predecessor_identity_sha256: String,
+    pub successor_identity_sha256: String,
+    pub relational_refinement_order: u64,
+    pub source_owner_consumed: bool,
+    pub predecessor_wire_read: bool,
+    pub historical_output_read: bool,
+    pub compatibility_driver_called: bool,
 }
 
 /// Cold exterior reconstruction fibre for one source-neutral ingress.  The exact bytes and their
@@ -228,6 +242,93 @@ struct DevelopmentalReturnedDeposit {
     #[serde(rename = "occurrence_population_identity_sha256")]
     _delivery_population_identity: String,
     native_receipt: NativeThreadDepositReceipt,
+}
+
+/// Consume a current typed optical Athena owner directly into its source-neutral organs. No
+/// historical output, predecessor wire, compatibility driver, or filesystem path participates.
+/// Serialization is available only after this construction through `canonical_bytes`.
+pub fn construct_source_neutral_athena_rest(
+    predecessor: OpticalAthenaRest,
+) -> Result<
+    (
+        SourceNeutralAthenaRest,
+        SourceNeutralDirectConstructionReceipt,
+    ),
+    SourceNeutralSeveringError,
+> {
+    let predecessor_identity_sha256 = predecessor.identity().to_owned();
+    let (acoustic_body, optical_withdrawal, _) = predecessor
+        .withdraw_production()
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let optical = optical_withdrawal
+        .into_source_neutral_morphology()
+        .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
+    let (granular_body, acoustic_withdrawal, _) = acoustic_body
+        .withdraw_production()
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let acoustic = acoustic_withdrawal
+        .into_source_neutral_morphology()
+        .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
+    let (affine_body, granular_withdrawal) = granular_body
+        .withdraw()
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let granular = granular_withdrawal
+        .into_source_neutral_potential()
+        .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
+    let (returned_body, potential, codec) = affine_body
+        .into_source_neutral_parts()
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let (ecology, branches, predecessor_deposit_receipt, returned_deposits) = returned_body
+        .into_source_neutral_parts()
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let (relational, realization, relational_refinement_order) =
+        source_neutral_cold::read_developmental_predecessor(
+            potential,
+            codec,
+        )
+        .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
+    let branches = branches
+        .into_iter()
+        .map(|branch| SourceNeutralCultivationBranch {
+            branch: branch.branch,
+            k3_pullback_address: branch.k3_pullback_address,
+            thread_address: branch.thread_address,
+            returned_covector: branch.returned_source_covector,
+            local_population: branch.local_population,
+            exact_fibre_population: branch.exact_fibre_population,
+            return_operator_identity_sha256: branch.return_operator_identity_sha256,
+        })
+        .collect();
+    let returned_deposits = returned_deposits
+        .into_iter()
+        .map(|deposit| SourceNeutralReturnedDeposit {
+            difference_identity_sha256: deposit.difference_identity_sha256,
+            thread_address: deposit.thread_address,
+            winding_coefficients: deposit.winding_coefficients,
+            return_operator_identity_sha256: deposit.return_operator_identity_sha256,
+            native_receipt: deposit.native_receipt,
+        })
+        .collect();
+    let body = SourceNeutralReturnedEcology::found(
+        ecology,
+        branches,
+        predecessor_deposit_receipt,
+        returned_deposits,
+    )
+    .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
+    let successor =
+        SourceNeutralAthenaRest::found(body, granular, relational, realization, acoustic, optical)
+            .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
+    let receipt = SourceNeutralDirectConstructionReceipt {
+        predecessor_identity_sha256,
+        successor_identity_sha256: successor.identity().to_owned(),
+        relational_refinement_order,
+        source_owner_consumed: true,
+        predecessor_wire_read: false,
+        historical_output_read: false,
+        compatibility_driver_called: false,
+    };
+    Ok((successor, receipt))
 }
 
 /// Consume the sole contaminated ALP5 wire and return one source-neutral successor plus cold
@@ -420,3 +521,21 @@ fn digest_octets(bytes: &[u8]) -> String {
 }
 
 use holonic_engine::is_sha256_digest as is_digest;
+
+#[cfg(test)]
+mod direct_construction_tests {
+    use super::*;
+
+    #[test]
+    fn direct_constructor_consumes_a_typed_owner_not_a_wire_or_path() {
+        let _constructor: fn(
+            OpticalAthenaRest,
+        ) -> Result<
+            (
+                SourceNeutralAthenaRest,
+                SourceNeutralDirectConstructionReceipt,
+            ),
+            SourceNeutralSeveringError,
+        > = construct_source_neutral_athena_rest;
+    }
+}

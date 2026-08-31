@@ -69,6 +69,13 @@ identities, leaves mutual constitutive responses empty, and supplies identity tr
 Its subsidiary mechanisms remain evidence; aggregate UAR3 requires reconstruction from the actual
 pending emission and returned occurrence.
 
+[established-bounded; implemented-exact; source-inspected] R0Q5 now has one move-owned typed
+`construct_source_neutral_athena_rest(OpticalAthenaRest)` entry. It consumes optical, acoustic,
+granular, affine, relational, and returned-ecology owners in memory and accepts no path or
+predecessor wire. The five output-bound UAR compatibility examples were removed. The phase remains
+current until one live typed predecessor crosses this owner, canonical bytes remount without it,
+and the source-absence closure is measured.
+
 [definition] `UNIVERSAL_CATALOG.md` is the sole Lean↔Rust/CUDA owner crosswalk. Historical ledgers,
 standing deposits, driver censuses, registry-incidence projections, and checksum manifests schedule
 nothing; their generated apparatus and release gates were removed under the direct user correction.

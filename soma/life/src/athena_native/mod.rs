@@ -60,8 +60,10 @@ pub use exchange_situated_product::{
 pub use exterior_relational_witness::{
     EXTERIOR_RELATIONAL_WITNESS_SCHEMA, ExteriorRelationalWitness,
     SOURCE_NEUTRAL_EXTERIOR_INGRESS_WITNESS_SCHEMA, SOURCE_NEUTRAL_SEVERING_RECEIPT_SCHEMA,
-    SourceNeutralExteriorIngressWitness, SourceNeutralSeveringError, SourceNeutralSeveringReceipt,
-    sever_source_bearing_athena_rest, transduce_source_neutral_exterior,
+    SourceNeutralDirectConstructionReceipt, SourceNeutralExteriorIngressWitness,
+    SourceNeutralSeveringError, SourceNeutralSeveringReceipt,
+    construct_source_neutral_athena_rest, sever_source_bearing_athena_rest,
+    transduce_source_neutral_exterior,
 };
 pub use granular_cultivation::{
     GRANULAR_ATHENA_REST_SCHEMA, GRANULAR_CULTIVATION_WITHDRAWAL_SCHEMA,

@@ -1,4 +1,36 @@
 impl RecurrentReturnedAffineLaboratoryAthenaRest {
+    pub(crate) fn into_source_neutral_parts(
+        self,
+    ) -> Result<
+        (
+            RecurrentLaboratoryCultivatedAthenaRest,
+            serde_json::Value,
+            serde_json::Value,
+        ),
+        LaboratoryCultivationError,
+    > {
+        self.validate()?;
+        let Self {
+            schema: _,
+            rest_identity_history: _,
+            origin_predecessor_rest_identity_sha256: _,
+            origin_predecessor_body_identity_sha256: _,
+            body,
+            potential,
+            codec,
+            correspondences: _,
+            affine_cells: _,
+            identity_sha256: _,
+        } = self;
+        Ok((
+            body,
+            serde_json::to_value(potential)
+                .map_err(|error| LaboratoryCultivationError::Wire(error.to_string()))?,
+            serde_json::to_value(codec)
+                .map_err(|error| LaboratoryCultivationError::Wire(error.to_string()))?,
+        ))
+    }
+
     pub fn read(bytes: &[u8]) -> Result<Self, LaboratoryCultivationError> {
         let rest: Self = serde_json::from_slice(bytes)
             .map_err(|error| LaboratoryCultivationError::Wire(error.to_string()))?;
