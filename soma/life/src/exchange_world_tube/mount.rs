@@ -189,36 +189,82 @@ fn stream_mount(
     // Containers are disjoint addressed sources. Parse them independently, then perform one
     // deterministic ordinal rebase of record/node/field addresses. This is the exact interchange
     // receipt: no parser reads another container and the serial merge order is unchanged.
-    let staged = specs
+    let mut staged = specs
         .par_iter()
         .zip(captured.par_iter())
         .enumerate()
         .map(|(container, (spec, extent))| stream_container(container, spec, *extent))
         .collect::<Result<Vec<_>, _>>()?;
+    let total = |extent: fn(&StagedContainer) -> usize, label: &'static str| {
+        staged.iter().try_fold(0usize, |sum, container| {
+            sum.checked_add(extent(container))
+                .ok_or_else(|| ExchangeMountError::Extent(label.to_owned()))
+        })
+    };
+    let record_capacity = total(|container| container.records.len(), "record population")?;
+    let node_capacity = total(|container| container.nodes.len(), "node population")?;
+    let field_capacity = total(|container| container.fields.len(), "field population")?;
+    let scalar_capacity = total(
+        |container| container.scalar_nodes.len(),
+        "scalar-node population",
+    )?;
     let mut containers = Vec::with_capacity(specs.len());
-    let mut records = Vec::new();
-    let mut nodes = Vec::new();
-    let mut fields = Vec::new();
-    let mut scalar_nodes = Vec::new();
+    let mut records = Vec::with_capacity(record_capacity);
+    let mut nodes = Vec::with_capacity(node_capacity);
+    let mut fields = Vec::with_capacity(field_capacity);
+    let mut scalar_nodes = Vec::with_capacity(scalar_capacity);
     let mut blank_records = 0u64;
     let mut incomplete_tails = 0u64;
+    let mut record_from = 0u64;
+    let mut node_from = 0u64;
+    let mut field_from = 0u64;
+    let offsets = staged
+        .iter()
+        .map(|local| {
+            let offset = (record_from, node_from, field_from);
+            record_from = record_from
+                .checked_add(u64::try_from(local.records.len()).map_err(|_| {
+                    ExchangeMountError::Extent("record population".to_owned())
+                })?)
+                .ok_or_else(|| ExchangeMountError::Extent("record population".to_owned()))?;
+            node_from = node_from
+                .checked_add(u64::try_from(local.nodes.len()).map_err(|_| {
+                    ExchangeMountError::Extent("node population".to_owned())
+                })?)
+                .ok_or_else(|| ExchangeMountError::Extent("node population".to_owned()))?;
+            field_from = field_from
+                .checked_add(u64::try_from(local.fields.len()).map_err(|_| {
+                    ExchangeMountError::Extent("field population".to_owned())
+                })?)
+                .ok_or_else(|| ExchangeMountError::Extent("field population".to_owned()))?;
+            Ok(offset)
+        })
+        .collect::<Result<Vec<_>, ExchangeMountError>>()?;
+    staged
+        .par_iter_mut()
+        .zip(offsets.par_iter())
+        .for_each(|(local, (record_from, node_from, field_from))| {
+            let record_from = *record_from;
+            let node_from = *node_from;
+            let field_from = *field_from;
+            local.container.record_from = record_from;
+            for record in &mut local.records {
+                record.node_from += node_from;
+                record.field_from += field_from;
+            }
+            for node in &mut local.nodes {
+                node.record += record_from;
+            }
+            for field in &mut local.fields {
+                field.record += record_from;
+            }
+            local
+                .scalar_nodes
+                .iter_mut()
+                .for_each(|node| *node += node_from);
+        });
 
-    for mut local in staged {
-        let record_from = records.len() as u64;
-        let node_from = nodes.len() as u64;
-        let field_from = fields.len() as u64;
-        local.container.record_from = record_from;
-        for record in &mut local.records {
-            record.node_from += node_from;
-            record.field_from += field_from;
-        }
-        for node in &mut local.nodes {
-            node.record += record_from;
-        }
-        for field in &mut local.fields {
-            field.record += record_from;
-        }
-        local.scalar_nodes.iter_mut().for_each(|node| *node += node_from);
+    for local in staged {
         blank_records = blank_records
             .checked_add(local.blank_records)
             .ok_or_else(|| ExchangeMountError::Extent("blank record population".to_owned()))?;
