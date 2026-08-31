@@ -79,5 +79,6 @@ ignored over 33 result lines. One subsequent complete `bash tools/gates.sh` invo
 17 gates passed, including the 3,765-job Lean umbrella, source shape, architecture, manifests, and
 document law.
 
-[definition] CONS3 is closed. The Lean production closure already satisfies CONS4 through the
-single `HolonicQuantumTransport.lean` umbrella; CONS5 is the remaining release junction.
+[established-bounded; process-audit; measured] CONS3 and CONS4 closed; CONS5 subsequently returned
+all 17 release gates, and coherent owner commit `9456a4ae` was pushed. UAR4-R0Q resumes without a
+remaining consolidation hotspot.

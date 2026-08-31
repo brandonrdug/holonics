@@ -92,14 +92,10 @@ built 3,765 jobs under Lean `v4.33.0`. The new owner has no `sorry` or new axiom
 review and construction receipt are in
 [`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](../research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
 
-## Active campaign — repository consolidation before UAR resumes
+## Completed campaign — repository consolidation
 
-**Current frontier:** CONS5
-
-**CONS5 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
-
-[definition] CONS0--CONS4 retain their passed grades. CONS5 is the clean release/push junction;
-QLT and CDB1 advanced no Athena capability grade.
+[definition] CONS0--CONS5 retain their passed grades. QLT and CDB1 advanced no Athena capability
+grade during the consolidation interval.
 
 [definition] Brandon directly authorized this consolidation and the destructive removal of ignored
 `target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
@@ -209,7 +205,7 @@ no `sorry` or ungraded new axiom enters; generated `.lake` material remains igno
 default/live umbrella and CDB1 extended it without archive fallback, `sorry`, or a new axiom. The
 umbrella built 3,765 jobs under Lean `v4.33.0`; generated `.lake` material is ignored.
 
-### CONS5 — coherent release, commit, and push — ACTIVE
+### CONS5 — coherent release, commit, and push — PASSED
 
 [definition] Run owner-local checks first, then one complete `bash tools/gates.sh` invocation on the
 coherent tree. Inspect the actual gate outputs; do not regenerate red ledgers until their producers
@@ -219,11 +215,22 @@ and dispositions are correct.
 return inside their process bounds; Git is clean; commits are separated by coherent owner; the
 branch is pushed; Provenance carries the exact completion/handoff. CONS5 does not advance UAR.
 
-## Parked UAR frontier
+[established-bounded; process-audit; measured] The release receiver now derives Cargo package and
+target-kind populations and gives each package its own 180-second boundary. One complete
+`bash tools/gates.sh` invocation returned all 17 gates passed: 2,972 Rust tests passed, zero failed,
+49 ignored; every workspace example type-checked; the live Lean umbrella built 3,765 jobs; source
+shape, architecture, manifests, Typst, authority, and document law were green. The coherent owner
+commit `9456a4ae` was pushed to `origin/main`.
 
-[open] UAR4-R0Q remains the next engine deed only after CONS5. Its active blueprint is the UAR
-contract named in fresh pickup. The immediate implementation obligations are narrower than that
-blueprint's historical narrative:
+## Active campaign — UAR resumes
+
+**Current frontier:** UAR4-R0Q
+
+**UAR4-R0Q IS THE SOLE NEXT DEED.**
+
+[open] UAR4-R0Q resumes after CONS5. Its active blueprint is the UAR contract named in fresh
+pickup. The immediate implementation obligations are narrower than that blueprint's historical
+narrative:
 
 1. retain response-face address, source and target realization sites, local port, factor, phase,
    both boundary maps, and complete reconstruction fibre through the target junction;
@@ -237,11 +244,11 @@ blueprint's historical narrative:
 
 [proved-derived; formal-checked] `HolonicOrientedSiteTransport` and the HNN/HML umbrella prove the
 oriented site-current, every-word quotient, norm-after-linear-junction, cultivation, and remount
-laws required by that implementation. The targeted umbrella builds 3,181 jobs.
+laws required by that implementation. The current live umbrella builds 3,765 jobs.
 
-[counterexample; measured] The current `life` package has four failing granular/source-neutral
-tests and the current architecture gate has 218 violations. No UAR qualitative receiver may run
-while either condition stands.
+[historical; measured] Before consolidation, `life` had four failing granular/source-neutral tests
+and architecture had 218 violations. CONS5 returned 2,972 passed tests with zero failures and an
+architecture population of 505 files with zero violations. Those prior obstructions are closed.
 
 ## Standing and history
 

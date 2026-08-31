@@ -5,19 +5,21 @@
 Historical phase detail remains in Git, dated research records, and the campaign blueprints named
 by the roadmap.
 
-**Currency:** 2026-08-31, after CONS3 removed the final moment-front foreman and CONS4 retained the
-single live Lean umbrella. CONS5 is the release junction; UAR remains frozen. QLT and CDB1 advanced
-no Athena grade.
+**Currency:** 2026-08-31, after CONS0--CONS5 completed and the coherent consolidation commit
+`9456a4ae` was pushed. UAR4-R0Q resumes at its exact checkout obstruction. QLT and CDB1 advanced no
+Athena grade.
 
 ## Current frontier
 
-**Current frontier:** CONS5
+**Current frontier:** UAR4-R0Q
 
-**CONS5 — RUN THE COHERENT RELEASE GATES, COMMIT, AND PUSH — IS THE SOLE NEXT DEED.**
+**UAR4-R0Q — RETURN GENUINE OFF-DIAGONAL SITE TRANSPORT AND RESIDENT DEPENDENT COMPLEX
+CONTRACTION — IS THE SOLE NEXT DEED.**
 
-[definition] Run the release receivers on the coherent CONS3/CDB1 tree. Commit and push only after
-the tracked authority, source shape, Rust/CUDA tests, live Lean umbrella, document law, and generated
-indexes agree.
+[definition] Preserve response-face address, source/target realization sites, port, factor, phase,
+both boundary maps, and the complete reconstruction fibre through the target junction. Enact genuine
+ordinary `z -> z'` transport; join the dependent exact complex current on the resident GPU before
+the positive receiver; and make recurrence structural over that full complex continuation state.
 
 [proved-derived; formal-checked] QLT returned finite occupation/CAR, the Hermitian
 particle-number-preserving Fermi--Hubbard Hamiltonian, coherent polarized crystal paths and surface
@@ -38,9 +40,9 @@ certificate. The live umbrella then built 3,765 jobs; the owner contains no `sor
 The exact source review and return are in
 [`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
 
-## Closing consolidation position
+## Completed consolidation position
 
-[definition] CONS0--CONS4 retain their passed grades. CONS5 is the remaining release junction.
+[definition] CONS0--CONS5 retain their passed grades.
 
 [established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable
 Git stash `stash@{0}` / object
@@ -108,8 +110,13 @@ not a code or theorem failure.
 [established-bounded; process-audit; measured] The release test receiver now derives Cargo packages
 and target kinds and gives each package its own 180-second boundary. It returned 2,972 passed, zero
 failed, and 49 ignored over 33 result lines; workspace examples type-checked. One complete
-`bash tools/gates.sh` invocation then returned all 17 gates passed. CONS5 now owes only the coherent
-commit, push, and final Provenance handoff before UAR resumes.
+`bash tools/gates.sh` invocation then returned all 17 gates passed. At that measurement CONS5 owed
+only the coherent commit, push, and final Provenance handoff.
+
+[established-bounded; process-audit; measured] The coherent consolidation owner commit `9456a4ae`
+was pushed to `origin/main`. The release tree returned 2,972 passed, zero failed, and 49 ignored Rust
+tests; 3,765 Lean jobs; 624 live source-shape files with zero violations; 505 architecture files with
+zero violations; and all 17 release gates passed.
 
 ## Consolidation contract
 
@@ -125,11 +132,11 @@ commit, push, and final Provenance handoff before UAR resumes.
 raised around existing violations. No historical phase prose is copied back into this position
 record.
 
-[definition] CONS1--CONS4 are closed. CONS5 remains the clean release/push junction.
+[definition] CONS1--CONS5 are closed.
 
-## Parked UAR position
+## Active UAR position
 
-[open] UAR4-R0Q remains parked at two exact implementation obligations recorded in
+[open] UAR4-R0Q resumes at two exact implementation obligations recorded in
 [`research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md`](research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md):
 
 1. ordinary exterior transitions must enact genuine addressed off-diagonal `z -> z'` transport;
