@@ -365,38 +365,6 @@ impl LaboratoryCultivatedAthenaRest {
 }
 
 impl RecurrentLaboratoryCultivatedAthenaRest {
-    pub(crate) fn into_source_neutral_parts(
-        self,
-    ) -> Result<
-        (
-            NativeSituatedSpoolBundle,
-            Vec<SituatedCultivationBranch>,
-            NativeThreadDepositBatchReceipt,
-            Vec<SituatedReturnedDifferenceDeposit>,
-        ),
-        SituatedCultivationError,
-    > {
-        self.validate()?;
-        let Self {
-            schema: _,
-            rest_identity_history: _,
-            origin_predecessor_rest_identity_sha256: _,
-            predecessor_wire_sha256: _,
-            ecology,
-            realization: _,
-            branches,
-            predecessor_deposit_receipt,
-            returned_deposits,
-            identity_sha256: _,
-        } = self;
-        Ok((
-            ecology,
-            branches,
-            predecessor_deposit_receipt,
-            returned_deposits,
-        ))
-    }
-
     pub fn read(bytes: &[u8]) -> Result<Self, SituatedCultivationError> {
         let rest: Self = serde_json::from_slice(bytes)
             .map_err(|error| SituatedCultivationError::Wire(error.to_string()))?;

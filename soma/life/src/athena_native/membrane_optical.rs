@@ -1041,19 +1041,6 @@ impl OpticalAthenaRest {
 }
 
 impl WithdrawnNativeOpticalProduction {
-    pub(crate) fn into_source_neutral_morphology(
-        self,
-    ) -> Result<super::SourceNeutralOpticalMorphology, super::SourceNeutralAthenaError> {
-        self.validate()
-            .map_err(|_| super::SourceNeutralAthenaError::Sensory)?;
-        super::SourceNeutralOpticalMorphology::found(
-            self.morphology.ordered_ports,
-            self.morphology.lattice_width,
-            self.morphology.lattice_height_per_order,
-            self.morphology.scale_spans,
-        )
-    }
-
     fn validate(&self) -> Result<(), NativeOpticalError> {
         self.morphology.validate()?;
         if self.schema != WITHDRAWN_OPTICAL_PRODUCTION_SCHEMA

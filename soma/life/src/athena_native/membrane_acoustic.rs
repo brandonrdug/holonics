@@ -1095,18 +1095,6 @@ impl AcousticAthenaRest {
 }
 
 impl WithdrawnNativeAcousticProduction {
-    pub(crate) fn into_source_neutral_morphology(
-        self,
-    ) -> Result<super::SourceNeutralAcousticMorphology, super::SourceNeutralAthenaError> {
-        self.validate()
-            .map_err(|_| super::SourceNeutralAthenaError::Sensory)?;
-        super::SourceNeutralAcousticMorphology::found(
-            self.morphology.ordered_ports,
-            self.morphology.quadrature_population,
-            self.morphology.phase_extent,
-        )
-    }
-
     fn validate(&self) -> Result<(), NativeAcousticError> {
         self.morphology.validate()?;
         if self.schema != WITHDRAWN_ACOUSTIC_PRODUCTION_SCHEMA

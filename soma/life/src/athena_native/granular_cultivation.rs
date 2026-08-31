@@ -384,13 +384,6 @@ pub struct GranularCultivationWithdrawal {
 }
 
 impl GranularCultivationWithdrawal {
-    pub(crate) fn into_source_neutral_potential(
-        self,
-    ) -> Result<NativeGranularPotential, GranularCultivationError> {
-        self.validate()?;
-        Ok(self.granular)
-    }
-
     pub fn read(bytes: &[u8]) -> Result<Self, GranularCultivationError> {
         let withdrawal: Self = serde_json::from_slice(bytes)
             .map_err(|error| GranularCultivationError::Wire(error.to_string()))?;
