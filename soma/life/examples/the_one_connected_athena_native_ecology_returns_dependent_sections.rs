@@ -22,8 +22,8 @@ use serde_json::json;
 use sha2::{Digest, Sha256};
 
 const BUNDLE: &str = concat!(
-    "output/the_soulkiller_returns_mutually_coupled_native_parametron_spools_k2/",
-    "native/native-spool-bundle.rest"
+    "output/the_complete_visible_exchange_founds_native_spool_r0q5/",
+    "native-spool-bundle.rest"
 );
 const OUTPUT: &str = "output/the_one_connected_athena_native_ecology_returns_dependent_sections_k3";
 
@@ -58,11 +58,13 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(output.join("detached-return")).map_err(display)?;
     let bundle = NativeSpoolBundle::read(&fs::read(BUNDLE).map_err(display)?).map_err(display)?;
     let rest = AthenaNativeRest::found(bundle).map_err(display)?;
+    eprintln!("k3-stage=rest-founded elapsed_ms={}", started.elapsed().as_millis());
     let canonical = rest.canonical_bytes().map_err(display)?;
     let wire_sha256 = sha(&canonical);
     let remounted = AthenaNativeRest::read(&canonical).map_err(display)?;
     let structural_round_trip = remounted == rest;
     fs::write(output.join("athena-native.rest"), &canonical).map_err(display)?;
+    eprintln!("k3-stage=round-trip elapsed_ms={}", started.elapsed().as_millis());
 
     let receiver = *rest
         .realization
@@ -71,15 +73,8 @@ fn main() -> Result<(), String> {
         .next()
         .ok_or("empty dependent receiver family")?;
     let addresses = rest.realization.sections.clone();
-    let mut passages = Vec::new();
-    for address in &addresses {
-        match rest.conduct(address, receiver).map_err(display)? {
-            AthenaNativeConsequence::Returned(passage) => passages.push(passage),
-            AthenaNativeConsequence::Insufficient(insufficiency) => {
-                return Err(format!("admitted K3 section returned {insufficiency:?}"));
-            }
-        }
-    }
+    let batch = rest.conduct_population(receiver).map_err(display)?;
+    eprintln!("k3-stage=batch-conduct elapsed_ms={}", started.elapsed().as_millis());
     let anchor = addresses.first().ok_or("empty section atlas")?;
     let outside_receiver = (0..u64::MAX)
         .map(ReceiverId)
@@ -108,6 +103,7 @@ fn main() -> Result<(), String> {
             return Err("outside section unexpectedly returned".to_owned());
         }
     };
+    eprintln!("k3-stage=insufficiency-controls elapsed_ms={}", started.elapsed().as_millis());
 
     run_detached(
         &output.join("athena-native.rest"),
@@ -115,20 +111,23 @@ fn main() -> Result<(), String> {
         anchor.occurrence,
         receiver,
     )?;
+    eprintln!("k3-stage=detached-return elapsed_ms={}", started.elapsed().as_millis());
     let detached: serde_json::Value = serde_json::from_slice(
         &fs::read(output.join("detached-return/00-return.json")).map_err(display)?,
     )
     .map_err(display)?;
-    let all_sections_resident = passages.iter().all(|passage| {
-        !passage.word_return.apparatus.invariant_transport_reuploaded
-            && !passage.current_return.invariant_transport_reuploaded
-            && !passage.current_return.cpu_semantic_replay_after_device
-            && !passage.current_return.binary_receiver_taken
-            && passage.word_return.device == "NVIDIA GeForce RTX 4080 SUPER"
-            && passage.current_return.device == "NVIDIA GeForce RTX 4080 SUPER"
+    let all_sections_resident = batch.resident_threads.iter().all(|thread| {
+        thread.word_returns.iter().all(|returned| {
+            !returned.apparatus.invariant_transport_reuploaded
+                && returned.device == "NVIDIA GeForce RTX 4080 SUPER"
+        })
+            && !thread.current_return.invariant_transport_reuploaded
+            && !thread.current_return.cpu_semantic_replay_after_device
+            && !thread.current_return.binary_receiver_taken
+            && thread.current_return.device == "NVIDIA GeForce RTX 4080 SUPER"
     });
     let passed = structural_round_trip
-        && passages.len() == addresses.len()
+        && batch.sections.len() == addresses.len()
         && all_sections_resident
         && matches!(
             receiver_insufficiency.cause,
@@ -139,7 +138,7 @@ fn main() -> Result<(), String> {
             ReceiverInsufficiencyCause::SectionOutsideFamily { .. }
         )
         && detached["passed"] == true;
-    write_json(output.join("01-conducted-sections.json"), &passages)?;
+    write_json(output.join("01-conducted-sections.json"), &batch)?;
     write_json(
         output.join("02-receiver-insufficiency.json"),
         &receiver_insufficiency,
@@ -162,7 +161,7 @@ fn main() -> Result<(), String> {
         "receiver_population":rest.realization.receiver_family.len(),
         "generator_population":rest.realization.generator_family.len(),
         "boundary_population":rest.realization.boundary_population.len(),
-        "every_section_conducted":passages.len() == addresses.len(),
+        "every_section_conducted":batch.sections.len() == addresses.len(),
         "every_section_resident":all_sections_resident,
         "dependent_receiver_insufficiency":receiver_insufficiency,
         "section_insufficiency":section_insufficiency,

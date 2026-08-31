@@ -23,6 +23,25 @@ use num_rational::BigRational as Rat;
 
 use crate::dialogue_lineage::ExactDialogueLineage;
 
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct AddressedDialogueOccurrence {
+    pub address: String,
+    pub caused_by: BTreeSet<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct DialogueNativeOccurrenceWitness {
+    pub event: EventId,
+    pub source_address: String,
+    pub caused_by: BTreeSet<String>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct DialogueNativeSpoolReturn {
+    pub native: NativeSpoolBundle,
+    pub exterior: Vec<DialogueNativeOccurrenceWitness>,
+}
+
 const ENTERING: NativeStateId = NativeStateId(0);
 const RETURNED: NativeStateId = NativeStateId(1);
 const RECEIVER: ReceiverId = ReceiverId(0);
@@ -31,7 +50,20 @@ const GENERATOR: InputId = InputId(0);
 pub fn found_dialogue_native_spool(
     lineage: &ExactDialogueLineage,
 ) -> Result<NativeSpoolBundle, NativeSpoolRefusal> {
-    let occurrences = lineage.occurrences();
+    let occurrences = lineage
+        .occurrences()
+        .iter()
+        .map(|occurrence| AddressedDialogueOccurrence {
+            address: occurrence.identity.clone(),
+            caused_by: occurrence.caused_by.clone(),
+        })
+        .collect::<Vec<_>>();
+    Ok(found_addressed_dialogue_native_spool(&occurrences)?.native)
+}
+
+pub fn found_addressed_dialogue_native_spool(
+    occurrences: &[AddressedDialogueOccurrence],
+) -> Result<DialogueNativeSpoolReturn, NativeSpoolRefusal> {
     if occurrences.len() < 2 {
         return Err(NativeSpoolRefusal::MalformedBundle(
             "dialogue/native-recurrence".to_owned(),
@@ -39,13 +71,17 @@ pub fn found_dialogue_native_spool(
     }
     let events = occurrences
         .iter()
-        .map(|occurrence| EventId(occurrence.ordinal + 1))
+        .enumerate()
+        .map(|(at, _)| EventId(at as u64 + 1))
         .collect::<Vec<_>>();
     let by_identity = occurrences
         .iter()
         .enumerate()
-        .map(|(at, occurrence)| (occurrence.identity.as_str(), at))
+        .map(|(at, occurrence)| (occurrence.address.as_str(), at))
         .collect::<BTreeMap<_, _>>();
+    if by_identity.len() != occurrences.len() {
+        return Err(NativeSpoolRefusal::DuplicateOccurrence(EventId(0)));
+    }
     let mut depth = vec![0usize; occurrences.len()];
     for (at, occurrence) in occurrences.iter().enumerate() {
         depth[at] = occurrence
@@ -140,7 +176,18 @@ pub fn found_dialogue_native_spool(
         open_exterior: vec!["additional compatible native organs".to_owned()],
     };
     bundle.validate()?;
-    Ok(bundle)
+    Ok(DialogueNativeSpoolReturn {
+        native: bundle,
+        exterior: occurrences
+            .iter()
+            .zip(events)
+            .map(|(occurrence, event)| DialogueNativeOccurrenceWitness {
+                event,
+                source_address: occurrence.address.clone(),
+                caused_by: occurrence.caused_by.clone(),
+            })
+            .collect(),
+    })
 }
 
 fn thread(

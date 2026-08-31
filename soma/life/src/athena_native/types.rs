@@ -3,8 +3,9 @@ use std::collections::BTreeSet;
 use holonic_engine::{
     cuda_refine::ResidentComplexIncidenceReturn,
     native_spool::{
-        NativeConstitutiveResponse, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
-        NativeSpoolBundle, NativeSpoolConductReturn, NativeThreadHand, ReceiverInsufficiency,
+        NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
+        NativeMutualConstitutiveResponse, NativeSpoolBundle, NativeSpoolConductReturn,
+        NativeThreadHand, ReceiverInsufficiency,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::NativeStateId,
@@ -96,6 +97,30 @@ pub struct AthenaNativePassage {
     pub section: NativeConductedSection,
     pub word_return: NativeSpoolConductReturn,
     pub current_return: ResidentComplexIncidenceReturn,
+    pub source_fallback_permitted: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct NativeBatchSectionAddress {
+    pub section: NativeSectionAddress,
+    pub reconstruction_fibre: u32,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct NativeThreadResidentBatchReturn {
+    pub spool: String,
+    pub thread: String,
+    pub word_returns: Vec<NativeSpoolConductReturn>,
+    pub current_return: ResidentComplexIncidenceReturn,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct AthenaNativeBatchPassage {
+    pub schema: String,
+    pub rest_wire_sha256: String,
+    pub sections: Vec<NativeBatchSectionAddress>,
+    pub reconstruction_fibres: Vec<NativeCollapsedFibre>,
+    pub resident_threads: Vec<NativeThreadResidentBatchReturn>,
     pub source_fallback_permitted: bool,
 }
 

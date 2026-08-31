@@ -5,11 +5,118 @@ use holonic_engine::{
 };
 
 use super::types::{
-    AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage, AthenaNativeRest,
-    NativeConductedSection, NativeSectionAddress,
+    AthenaNativeBatchPassage, AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage,
+    AthenaNativeRest, NativeBatchSectionAddress, NativeConductedSection, NativeSectionAddress,
+    NativeThreadResidentBatchReturn,
 };
 
 impl AthenaNativeRest {
+    pub fn conduct_population(
+        &self,
+        receiver: ReceiverId,
+    ) -> Result<AthenaNativeBatchPassage, AthenaNativeError> {
+        self.validate()?;
+        let mut reconstruction_fibres = Vec::new();
+        let mut fibre_addresses = BTreeMap::new();
+        for spool in &self.ecology.spools {
+            for fibre in &spool.reconstruction_fibres {
+                let address = u32::try_from(reconstruction_fibres.len()).map_err(|_| {
+                    AthenaNativeError::Conduct("the fibre atlas exceeded its address".to_owned())
+                })?;
+                fibre_addresses.insert((spool.address.as_str(), fibre.native), address);
+                reconstruction_fibres.push(fibre.clone());
+            }
+        }
+        let mut sections = Vec::with_capacity(self.realization.sections.len());
+        for spool in &self.ecology.spools {
+            for thread in &spool.threads {
+                for occurrence in &thread.occurrences {
+                    sections.push(NativeBatchSectionAddress {
+                        section: NativeSectionAddress {
+                            spool: spool.address.clone(),
+                            thread: thread.address.clone(),
+                            occurrence: occurrence.occurrence,
+                        },
+                        reconstruction_fibre: fibre_addresses
+                            [&(spool.address.as_str(), occurrence.emitting_native)],
+                    });
+                }
+            }
+        }
+        sections.sort_by(|left, right| left.section.cmp(&right.section));
+        if sections
+            .iter()
+            .zip(&self.realization.sections)
+            .any(|(section, expected)| &section.section != expected)
+            || sections.len() != self.realization.sections.len()
+        {
+            return Err(AthenaNativeError::Conduct(
+                "the batch section atlas departed from the admitted realization".to_owned(),
+            ));
+        }
+        let mut resident_threads = Vec::new();
+        for spool in &self.ecology.spools {
+            if !spool.receiver_family.contains(&receiver) {
+                return Err(AthenaNativeError::Conduct(
+                    "the batch receiver is outside one spool family".to_owned(),
+                ));
+            }
+            for thread in &spool.threads {
+                let entering = thread
+                    .occurrences
+                    .iter()
+                    .map(|occurrence| occurrence.entering_native)
+                    .collect::<BTreeSet<_>>();
+                let mut resident_word = self
+                    .ecology
+                    .mount_word(&spool.address, &thread.chronology)
+                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                let mut word_returns = Vec::new();
+                for native in entering {
+                    let returned = resident_word
+                        .conduct(&[native], receiver)
+                        .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                    if returned.apparatus.invariant_transport_reuploaded {
+                        return Err(AthenaNativeError::Conduct(
+                            "the batch word reuploaded invariant transport".to_owned(),
+                        ));
+                    }
+                    word_returns.push(returned);
+                }
+                let mut current = self
+                    .ecology
+                    .mount_thread_current(&spool.address, &thread.address)
+                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                let current_return = current
+                    .conduct()
+                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                if current_return.invariant_transport_reuploaded
+                    || current_return.cpu_semantic_replay_after_device
+                    || current_return.binary_receiver_taken
+                {
+                    return Err(AthenaNativeError::Conduct(
+                        "the batch current left the resident pre-locking path".to_owned(),
+                    ));
+                }
+                resident_threads.push(NativeThreadResidentBatchReturn {
+                    spool: spool.address.clone(),
+                    thread: thread.address.clone(),
+                    word_returns,
+                    current_return,
+                });
+            }
+        }
+        Ok(AthenaNativeBatchPassage {
+            schema: "soma-life.athena-native-batch-passage.v1".to_owned(),
+            rest_wire_sha256: self.wire_sha256()?,
+            sections,
+            reconstruction_fibres,
+            resident_threads,
+            source_fallback_permitted: false,
+        })
+    }
+
+
     /// Conduct one addressed native occurrence through the single ecology. An admitted dependent
     /// receiver returns its exact face; an unsupported receiver or section returns a concrete
     /// retained fibre. No exterior realization, lexical route, or fallback is reachable.
@@ -113,16 +220,21 @@ impl AthenaNativeRest {
         mutual_constitutive_responses
             .sort_by_key(|response| (response.left_occurrence, response.right_occurrence));
         let mut successors = self
-            .realization
-            .sections
+            .ecology
+            .spools
             .iter()
-            .filter_map(|address| {
-                let candidate = self
-                    .ecology
-                    .addressed_section(&address.spool, &address.thread, address.occurrence)
-                    .ok()?;
-                (candidate.occurrence().predecessor == Some(occurrence.occurrence))
-                    .then_some(address.clone())
+            .flat_map(|spool| {
+                spool.threads.iter().flat_map(move |thread| {
+                    thread.occurrences.iter().filter_map(move |candidate| {
+                        (candidate.predecessor == Some(occurrence.occurrence)).then(|| {
+                            NativeSectionAddress {
+                                spool: spool.address.clone(),
+                                thread: thread.address.clone(),
+                                occurrence: candidate.occurrence,
+                            }
+                        })
+                    })
+                })
             })
             .collect::<Vec<_>>();
         successors.sort();
@@ -225,3 +337,4 @@ impl AthenaNativeRest {
         }
     }
 }
+use std::collections::{BTreeMap, BTreeSet};

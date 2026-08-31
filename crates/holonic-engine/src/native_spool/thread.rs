@@ -159,9 +159,11 @@ impl NativeThread {
             return Err(NativeSpoolRefusal::MalformedThread(self.address.clone()));
         }
 
-        let mut occurrence_ids = BTreeSet::new();
+        let mut occurrence_by_id = BTreeMap::new();
         for occurrence in &self.occurrences {
-            if !occurrence_ids.insert(occurrence.occurrence)
+            if occurrence_by_id
+                .insert(occurrence.occurrence, occurrence)
+                .is_some()
                 || occurrence.predecessor == Some(occurrence.occurrence)
                 || occurrence.entering_port.event != occurrence.occurrence
                 || occurrence.entering_port.hand != PortHand::Input
@@ -173,6 +175,7 @@ impl NativeThread {
                 return Err(NativeSpoolRefusal::Occurrence(self.address.clone()));
             }
         }
+        let occurrence_ids = occurrence_by_id.keys().copied().collect::<BTreeSet<_>>();
         if occurrence_ids != self.reconstruction_fibre {
             return Err(NativeSpoolRefusal::ReconstructionFibre(
                 self.address.clone(),
@@ -181,10 +184,7 @@ impl NativeThread {
 
         let mut incidence_occurrences = BTreeSet::new();
         for incidence in &self.incidence {
-            let Some(occurrence) = self
-                .occurrences
-                .iter()
-                .find(|candidate| candidate.occurrence == incidence.occurrence)
+            let Some(occurrence) = occurrence_by_id.get(&incidence.occurrence).copied()
             else {
                 return Err(NativeSpoolRefusal::Incidence(self.address.clone()));
             };

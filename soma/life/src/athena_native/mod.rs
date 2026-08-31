@@ -233,8 +233,9 @@ pub use source_neutral_rest::{
     SourceNeutralWindingBranchFunctional, SourceNeutralWindingDifference,
 };
 pub use types::{
-    AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage, AthenaNativeRest,
-    NativeConductedSection, NativeSectionAddress, ReceiverHistoryRealizationPassage,
+    AthenaNativeBatchPassage, AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage,
+    AthenaNativeRest, NativeBatchSectionAddress, NativeConductedSection, NativeSectionAddress,
+    NativeThreadResidentBatchReturn, ReceiverHistoryRealizationPassage,
 };
 
 // K0 reachability boundary.
