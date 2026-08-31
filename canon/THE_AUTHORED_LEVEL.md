@@ -4,8 +4,8 @@
 this tree, and gives the excision per instance. It is species **2.5** and **2.6** of
 `canon/THE_CONTAMINANT_PROTOCOL.md`, which holds the reading procedure.
 
-**Truth status:** `established-bounded`. Every instance is a direct source read at the `file:line`
-given; each disposition is a reading carried per row in `meta/AUTHORED_LEVELS.tsv`.
+**Truth status:** `established-bounded`. The historical population is a dated source reading; the
+governing law is maintained at each live owner without a generated registry.
 
 **Provenance:** Brandon, 2026-08-09: *"you will keep saying things like 'that is the same law one
 level down', when the fact is that **we are not the ones meant to be pinning levels to minimums and
@@ -129,7 +129,7 @@ prime, so the fold is over a field.
 
 ## 5. The excisions
 
-Every row is in `meta/AUTHORED_LEVELS.tsv` with its plan.
+The tables below are the dated 2026-08-09 excision evidence. They are not a live census.
 
 ### 5.0 The first wave — ten excised 2026-08-09, graded by orbit
 
@@ -201,23 +201,22 @@ readings are `canon/THE_CONTAMINANT_PROTOCOL.md` §4. In one line: **a wave of e
 no movement anywhere has done bookkeeping**, and must say so rather than presenting a green suite as
 evidence.
 
-## 7. The registry
+## 7. Maintenance without a generated registry
 
-`meta/AUTHORED_LEVELS.tsv` carries one row per level — disposition, owner, name, value, and the `why`
-that is the deliverable. It is a ledger, and the reading in §3 of the protocol is what fills it.
-
-`tools/authored_levels.py` re-seeds and diffs it: `--write` seeds preserving dispositions, `--check`
-exits nonzero on an undispositioned, moved, or departed level. It is a convenience for keeping the
-ledger current, not the authority and not a precondition — **recognising a hard-coded magic number in
-a library organ takes reading**, and a level the script's regex does not match is exactly as much a
-contaminant as one it does. `Permutation5 = [u8; 5]` is the standing example.
+The former regex census and generated TSV registry were retired on 2026-08-31. They counted syntax,
+not the relation that justified a level, and accumulated a second classification system beside the
+owners themselves. A changed owner must instead state or derive each material level locally and
+exercise its boundary in focused tests. **Recognising a hard-coded magic number in a library organ
+takes reading.** `Permutation5 = [u8; 5]` remains the standing example of a type-level pin a numeric
+literal census could never settle.
 
 **Second standing example, added 2026-08-13: the byte grain of the material shadow.**
 `soma/life/src/material_shadow_cuda.rs:144` stages every passage as
 `material.extend(bytes.iter().map(|byte| u32::from(*byte)))`, so the elementary unit over which the
 whole prior-equal-distance field, its recurrence arcs, its cycle rank and its exact attachment key
 are computed is the **eight-bit byte** — an exterior encoding convention that nothing in the
-material derives. The ledger cannot see it: there is no numeric literal, only a type and a cast.
+material derives. No numeric-literal census can see it: there is no numeric literal, only a type and
+a cast.
 
 It is the harder species to catch for a second reason, which is why it belongs here beside
 `Permutation5`. A numeric pin usually *looks* arbitrary. A byte does not — it reads as the natural

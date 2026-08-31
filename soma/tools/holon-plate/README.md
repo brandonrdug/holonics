@@ -99,7 +99,7 @@ Both digests are computed before either is judged. A reader that judged the cont
 reports *"the FORM is what moved"* for a plate whose form is untouched and whose recorded digest
 drifted — that defect was live in this crate and the third row is the fix.
 
-This is `soma-standing-deposit`'s content/closure distinction carried into a single file, and the
+This is the content/binding distinction carried inside a single file, and the
 SHA-256 is that crate's: written out, zero-dependency, cross-checked against the NIST vectors and
 against the archived body's 123 CMake-computed hashes. A plate verified through a hash crate that
 nothing here verifies would have moved the trust rather than established it.

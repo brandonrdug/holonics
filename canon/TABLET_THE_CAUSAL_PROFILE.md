@@ -103,8 +103,8 @@ passing information."*
 1. **The level is authored inside the organ.** `material_shadow_cuda.rs:144` stages material as
    `u32::from(*byte)`, so the grain is the eight-bit byte — an exterior encoding convention that
    nothing in the material derives. `CLAUDE.md` §8: a level is read off the material or declared by
-   the caller, never authored inside the organ. It is absent from `meta/AUTHORED_LEVELS.tsv` because
-   it is a **type-level** pin rather than a numeric literal, which is the species
+   the caller, never authored inside the organ. It is a **type-level** pin rather than a numeric
+   literal, which is the species
    `canon/THE_CONTAMINANT_PROTOCOL.md` names as the one a regex cannot match.
 2. **Byte-bijection invariance is a symmetry of the encoding, not a residue of the transport.**
    Relabelling an alphabet is a codec gauge. A caustic in this section's sense is where a receiver
@@ -113,9 +113,8 @@ passing information."*
    pattern and therefore cannot found an operation class.
 
 **Re-measured 2026-08-15.** `sed -n '144p' soma/life/src/material_shadow_cuda.rs` returns
-`material.extend(bytes.iter().map(|byte| u32::from(*byte)));`, and
-`grep -n "material_shadow_cuda" meta/AUTHORED_LEVELS.tsv` returns six rows, all `ABI` wire-format
-positions in `soma/abi/src/material_shadow_cuda.rs` — none for this byte grain. **The claim HOLDS.**
+`material.extend(bytes.iter().map(|byte| u32::from(*byte)));`; source inspection finds no derivation
+of this byte grain. **The claim HOLDS.**
 
 **The measurement that was reported as support is in fact the falsifier.** The seven presentations
 of one fold returned shadow cycle ranks spanning `50, 68, 74, 79, 113, 141`. If the field tracked

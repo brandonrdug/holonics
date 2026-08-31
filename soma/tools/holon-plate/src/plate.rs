@@ -7,7 +7,7 @@
 
 use std::fmt;
 
-use soma_standing_deposit::sha256::{hex, Sha256};
+use sha2::{Digest, Sha256};
 
 use crate::census::{Census, CensusRefusal};
 
@@ -124,7 +124,7 @@ pub fn seal(tag: SchemaTag, schema_version: u32, census: &Census, form: &[u8]) -
     let mut binding = Sha256::new();
     binding.update(&plate[..HEAD_OCTETS + census_octets.len()]);
     binding.update(&form_sha256);
-    let plate_sha256 = binding.finish();
+    let plate_sha256: [u8; 32] = binding.finalize().into();
 
     plate.extend_from_slice(&form_sha256);
     plate.extend_from_slice(&plate_sha256);
@@ -207,7 +207,7 @@ pub fn open(octets: &[u8]) -> Result<ReadPlate, PlateRefusal> {
     let mut binding = Sha256::new();
     binding.update(&octets[..form_start]);
     binding.update(&deposited_form_sha256);
-    let recomputed_plate = binding.finish();
+    let recomputed_plate: [u8; 32] = binding.finalize().into();
     let content_holds = recomputed_form == deposited_form_sha256;
     let binding_holds = recomputed_plate == deposited_plate_sha256;
     match (content_holds, binding_holds) {
@@ -219,7 +219,7 @@ pub fn open(octets: &[u8]) -> Result<ReadPlate, PlateRefusal> {
                 deposited: hex(&deposited_form_sha256),
                 recomputed: hex(&recomputed_form),
                 form_octets: form.len(),
-            })
+            });
         }
         // The form still hashes to its recorded digest, so what moved is the declaration wrapped
         // around it: the head or the census.
@@ -227,7 +227,7 @@ pub fn open(octets: &[u8]) -> Result<ReadPlate, PlateRefusal> {
             return Err(PlateRefusal::PlateBindingDrift {
                 deposited: hex(&deposited_plate_sha256),
                 recomputed: hex(&recomputed_plate),
-            })
+            });
         }
         // Neither digest holds. The recorded content digest itself has moved -- it no longer
         // describes the form AND it no longer binds -- or more than one region moved at once.
@@ -237,7 +237,7 @@ pub fn open(octets: &[u8]) -> Result<ReadPlate, PlateRefusal> {
                 recomputed_form: hex(&recomputed_form),
                 deposited_plate: hex(&deposited_plate_sha256),
                 recomputed_plate: hex(&recomputed_plate),
-            })
+            });
         }
     }
 
@@ -387,7 +387,11 @@ fn printable(octets: &[u8; 4]) -> String {
 fn digest(octets: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(octets);
-    hasher.finish()
+    hasher.finalize().into()
+}
+
+fn hex(octets: &[u8]) -> String {
+    octets.iter().map(|octet| format!("{octet:02x}")).collect()
 }
 
 fn read_u32(octets: &[u8], at: usize) -> u32 {

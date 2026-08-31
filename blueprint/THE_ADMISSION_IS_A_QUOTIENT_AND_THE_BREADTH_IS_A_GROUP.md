@@ -10,8 +10,8 @@ theorem cited; `established-bounded` for each measurement, with its command and 
 and the surfing account of mechanically learned skill in which *"a skilled player does not necessarily
 practice the same thing over and over again… they will engage in breadth."* Four dispatches were run
 against those readings and their load-bearing claims re-verified against the tree.
-**Anti-reinvention:** every movement below was checked against `canon/THE_DRIVER_ATLAS.md` §3's
-mechanism index, `meta/DRIVER_CATALOG.tsv`, and the research records before being written. **Four of
+**Anti-reinvention:** every movement below was checked against the source owners now summarized in
+`UNIVERSAL_CATALOG.md` and the research records before being written. **Four of
 the five are joins of standing owners, not constructions**, and the atlas's own standing rule governs:
 *"A construction proposed for a row here is a rebuild, and the driver that owns the row is the thing
 to extend."*
@@ -25,7 +25,7 @@ to extend."*
 | **one** — admit by quotient closure | **built, and the excision REFUTED.** The negative front was already computed and discarded; `FiberStanding`/`FiberAdmission` now carry it. But `minimum_recurrence` turned out to gate **speech**, not admission — replacing it reddened 4 of 328 tests with a real regression, so it stands **owed, not discharged**. | `soma/life/src/holonic_training.rs` |
 | **two** — repetition against breadth | **built and measured.** Nine walk holonomies: every one repeated reaches order 4 at most, the family reaches 8, and the abelian control coincides at 4 against 4. | `crates/holonic-engine/examples/the_plaquette_carries_a_group_element.rs` |
 | **three** — the inertia organ on its own obligation | **built and run.** `In(H) = In(A) + In(H/A)` on three fixtures with the positive-definite arm labelled as the one that cannot fail; `inertia.rs` now cites the other four names and the engine document says **five**. | `the_pullback_bounds_the_inertia.rs`, `crates/holonic-engine/src/inertia.rs` |
-| **four** — a second material for the 2026-08-07 falsifier | **built and run.** 274 entries, 12 one-shot against 261 conduct blocks, 13,015 collapsed pairs, memory order 4 — a different shape on an unrelated carrier. | `tools/registry_incidence.py`, `the_registry_is_material_for_the_compression.rs` |
+| **four** — a second material for the 2026-08-07 falsifier | **historical bounded witness.** The generated registry experiment was retired with its repository census apparatus; its exact result remains in Git and the dated record. | historical evidence |
 | **five** — the section modulus | **built.** An undivided pair of exact enclosures, with the gauge control, the spread control, and the collapse priced without taking the limit. | `crates/holonic-engine/src/surprisal.rs` |
 
 **Deposit:** [`research/records/2026-08-16_THE_COUNT_GATED_SPEECH_NOT_ADMISSION_AND_THE_EXCISION_IS_REFUTED.md`](../research/records/2026-08-16_THE_COUNT_GATED_SPEECH_NOT_ADMISSION_AND_THE_EXCISION_IS_REFUTED.md).

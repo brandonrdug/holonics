@@ -44,6 +44,7 @@ mod partition_refinement;
 pub use partition_refinement::{DeviceCorpus, ReadingIdentities};
 
 mod affine_barycentric_transport;
+mod addressed_complex_junction;
 mod athena_integrated_front;
 mod complex_parametron;
 mod cuda_driver;
@@ -94,6 +95,10 @@ use crate::is_sha256_digest as is_digest;
 pub use affine_barycentric_transport::{
     ResidentAffineBarycentricTransport, ResidentAffineBarycentricTransportReturn,
 };
+pub use addressed_complex_junction::{
+    ResidentAddressedComplexJunctionGroup, ResidentAddressedComplexJunctionReturn,
+    ResidentAddressedComplexJunctionTerm,
+};
 pub use athena_integrated_front::{
     ResidentAthenaIntegratedFront, ResidentAthenaIntegratedReturn,
     ResidentSituatedCurrentCausalFrontReturn,
@@ -106,8 +111,9 @@ pub use complex_parametron::{
     ResidentCoupledComplexParametronReturn, ResidentNativeWord, ResidentNativeWordReturn,
 };
 use complex_parametron::{
-    common_real_denominator, decode_component, decode_signed_magnitude, derive_word_prime_family,
-    derive_word_prime_rank_witness, encode_component, encode_integer, encode_integral_form_factors,
+    common_complex_denominator, common_real_denominator, decode_component,
+    decode_signed_magnitude, derive_word_prime_family, derive_word_prime_rank_witness,
+    encode_component, encode_integer, encode_integral_form_factors,
     factored_moment_section_identity, lcm_positive,
 };
 pub use device_ecology_types::{

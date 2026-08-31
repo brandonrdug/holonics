@@ -9,7 +9,7 @@ loop. It is not a menu.
 ## The three structural facts that govern every step
 
 **F1 — the dependency graph forbids the obvious wiring.**
-`body · holonic-structure · relational-geometry · soma-standing-deposit` are leaves;
+`body · holonic-structure · relational-geometry` are leaves;
 `holonic-engine` sits above the first two; `soma-membrane` above `body`; `life` above both;
 `holon-plate` above `life`. **A `life` example can therefore never call `holon_plate::deposit`** —
 it is a Cargo cycle, and that, not laziness, is why the plate mouth is unfed.
@@ -76,7 +76,7 @@ identity types `local_star` uses. Three pieces are not free:
   that picks a canonical direction has invented geometry the layout did not have.**
 
 **5 · Plate I/O.** Each of the ~25 `soma/life/examples` sites keeps its hash **and** writes the
-octets under `output/<driver>/`. Then `holon-plate deposit` and `standing-deposit deposit` run from
+octets under `output/<driver>/`. Then `holon-plate deposit` runs from
 the shell. **No dependency is added anywhere**, which is what F1 requires.
 
 **Corrected 2026-08-08, and the correction is a measurement.** This said the path was
@@ -129,7 +129,7 @@ witness that a body received anything.
 **Lineage lives one level up, and the census is the wrong home for it by construction** — a resumer
 cannot derive its parent's hash from its own form, so a census carrying it would refuse every
 descendant. Write the child plate as a `return` and the parent plate as a `mount` in
-`standing-deposit`: the child's `closure_sha256` **is** its lineage, already implemented, no new
+the typed parent/body/port relation **is** the child's lineage; no checksum registry or new
 field. It inherits the right semantics too — a corrupted child REFUSES; a parent that moved on
 REPORTS, because *a standing that could not fall behind the current would not be standing.*
 

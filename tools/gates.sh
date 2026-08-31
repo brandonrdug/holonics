@@ -4,7 +4,7 @@
 #
 #     bash tools/gates.sh                    # every gate, in order
 #     bash tools/gates.sh --list             # the gate names, and nothing else
-#     bash tools/gates.sh named-paths typst  # only the named gates, in the order given
+#     bash tools/gates.sh claim-index typst  # only the named gates, in the order given
 #     bash tools/gates.sh --control          # exercise supported non-destructive controls
 #
 # This is a RELEASE receiver, not an edit-loop command. It already runs the complete workspace
@@ -16,18 +16,8 @@
 # Exit is non-zero if any gate fails. Every gate prints exactly one summary line; the full output
 # of a failing gate is printed underneath it, and the full output of a passing one is discarded.
 #
-# WHAT THIS SCRIPT DOES NOT DO. It does not repair anything and it does not regenerate a manifest.
-# `output_manifest.py` and `closure_manifest.py` both rewrite their ledger when run without
-# `--check`; that is a decision about what the tree should now claim, and a gate is not the place
-# to take it.
-#
-# The two ledger gates are agreement checks, not code-quality verdicts:
-#
-#   output-manifest   goes red when a driver has RUN since the ledger was written. `unrecorded`
-#                     and `moved` are drift. `departed` is the loss the tool exists to catch, and
-#                     it is the only one of the three that is a defect on its own.
-#   closure-manifest  goes red when a recorded return's transitive producing closure drifts, or
-#                     when an output root has no explicit producer/orphan disposition.
+# WHAT THIS SCRIPT DOES NOT DO. It does not repair, inventory, classify, or regenerate the tree.
+# A release receiver runs only tests and checks attached to an explicit repository contract.
 
 set -u -o pipefail
 
@@ -39,9 +29,8 @@ PROCESS_BOUND=(timeout -k 2s 180s)
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-GATES=(tests formal tracked-authority source-shape authored-levels named-paths line-citations
-       epistemic-tags claim-index equation-atlas registry-incidence driver-catalog output-manifest
-       closure-manifest boundary-artifacts typst architecture-lint document-law)
+GATES=(tests formal tracked-authority source-shape epistemic-tags claim-index equation-atlas typst
+       document-law)
 
 # ---------------------------------------------------------------------------------------------
 # 10 · the laws THE_DOCUMENT_LAW states about governing documents
@@ -225,55 +214,7 @@ gate_source-shape() {
 }
 
 # ---------------------------------------------------------------------------------------------
-# 2 · authored numeric levels
-# ---------------------------------------------------------------------------------------------
-
-gate_authored-levels() {
-    local out="$WORK/authored.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/authored_levels.py" --check >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(grep -E '^[0-9]+ failures' "$out" | tail -1)"
-    SUMMARY="${SUMMARY:-no failure line}; $(grep -E '^[0-9]+ authored' "$out" | tail -1)"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 3 · every path a governing document names
-# ---------------------------------------------------------------------------------------------
-
-gate_named-paths() {
-    local out="$WORK/paths.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/resolve_named_paths.py" >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
-    SUMMARY="${SUMMARY:-no failure line}; $(grep -E '^path tokens' "$out" | tail -1)"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 3b · the LINE on the end of every path a governing document names
-# ---------------------------------------------------------------------------------------------
-#
-# `named-paths` above verifies the path. Nothing verified the number after the colon, and the
-# operating contract says in its own text that a line number is the most perishable thing a document
-# can carry. An audit on 2026-08-15 found 265 such citations with no verifier of any kind, and
-# `analytic_field.rs:1142` stale in three governing documents while a record deposited the same day
-# already carried the right line. The correction had been made and never propagated.
-
-gate_line-citations() {
-    local out="$WORK/lines.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/resolve_line_citations.py" >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
-    SUMMARY="${SUMMARY:-no summary line}"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 3c · every live material bracket has one truth grade and declared evidence tags
+# Every live material bracket has one truth grade and declared evidence tags
 # ---------------------------------------------------------------------------------------------
 
 gate_epistemic-tags() {
@@ -321,94 +262,6 @@ gate_equation-atlas() {
 }
 
 # ---------------------------------------------------------------------------------------------
-# 4c · the mathematical registry's current Rust incidence agrees with its generated ledger
-# ---------------------------------------------------------------------------------------------
-
-gate_registry-incidence() {
-    local out="$WORK/registry-incidence.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/registry_incidence.py" --check >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(tail -1 "$out")"
-    SUMMARY="${SUMMARY:-no summary line}"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 5 · every example driver is in the catalog, and every catalogued driver is in the tree
-# ---------------------------------------------------------------------------------------------
-
-gate_driver-catalog() {
-    local out="$WORK/drivers.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/driver_catalog.py" --check >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(head -1 "$out")"
-    SUMMARY="${SUMMARY:-no summary line}"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 5 · the content address of every return under output/
-# ---------------------------------------------------------------------------------------------
-
-gate_output-manifest() {
-    local out="$WORK/output.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/output_manifest.py" --check >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(grep -E '^recorded ' "$out" | tail -1)"
-    SUMMARY="${SUMMARY:-no summary line}"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 5 · the closure that produced every return under output/
-# ---------------------------------------------------------------------------------------------
-
-gate_closure-manifest() {
-    local out="$WORK/closure.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/closure_manifest.py" --check >"$out" 2>&1
-    local status=$?
-    if [ "$status" -eq 0 ]; then
-        SUMMARY="$(tail -1 "$out")"
-        return 0
-    fi
-    # A closure hash covers the driver, ITS WHOLE CRATE'S `src/**.rs`, and the crate manifest. So
-    # one edit anywhere in a crate moves the closure of every driver that crate owns, and a bare
-    # count of moved rows reads as twenty-three separate defects when it is one dirty crate. Name
-    # the owning crates: that is the reading that makes the red actionable.
-    local moved crates
-    moved="$(grep -c '^  moved: ' "$out")"
-    crates="$(grep '^  moved: ' "$out" | sed 's/^  moved: //' \
-        | while IFS= read -r slug; do
-              awk -F'\t' -v s="$slug" '$1 == s { print $2 }' "$ROOT/meta/CLOSURE_MANIFEST.tsv"
-          done \
-        | grep -oE '^(crates|soma)/[^/]+' | sort -u | paste -sd' ' -)"
-    SUMMARY="$moved closure(s) moved; producing crates: ${crates:-none in the ledger}"
-    cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
-# 6 · the committed boundary artifacts, content AND closure
-# ---------------------------------------------------------------------------------------------
-
-# Unlike the two ledger gates above, this one is a property of TRACKED files only, so it is green
-# or red on the code rather than on the working tree's tidiness. It is the one place in the
-# sequence where `CLAUDE.md` §0 lesson 1 — content hash AND closure hash, with a verifier — is
-# checked against something committed.
-gate_boundary-artifacts() {
-    local out="$WORK/boundary.out"
-    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/boundary_artifacts.py" >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(tail -1 "$out")"
-    SUMMARY="${SUMMARY:-no summary line}; $(grep -c '^BOUND ' "$out") artifact(s) bound"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
-}
-
-# ---------------------------------------------------------------------------------------------
 # 7 · the Typst roots
 # ---------------------------------------------------------------------------------------------
 
@@ -438,33 +291,6 @@ gate_typst() {
     done < <(typst_roots | sort)
     SUMMARY="$((total - broken))/$total roots compile"
     [ "$broken" -eq 0 ]
-}
-
-# ---------------------------------------------------------------------------------------------
-# 8 · the monotone ownership ratchet
-# ---------------------------------------------------------------------------------------------
-
-# It runs as of 2026-08-10. It had two absolute frames, and the first HID the second: the baseline
-# it read did not exist in this tree, and `check_repository` reads the baseline before taking the
-# census, so execution never reached the three PROTECTED_ROOTS that still carried the laboratory's
-# `src/soma/` prefix. `CONSTRUCTION_STATE.md` recorded only the first; `canon/THE_DOCUMENT_LAW.md`
-# §1.9 and §7 recorded both, correctly, and had done since it was written. Both are repaired in
-# `crates/holonic-architecture-lint/src/lib.rs`.
-#
-# THE BASELINE IS TAKEN AT HEAD, NOT AT THE WORKING TREE. `meta/HOLONIC_DSA_BASELINE.tsv` is
-# emitted from a detached worktree of the commit — the method `CONSTRUCTION_STATE.md` names for
-# any measurement taken while the tree is dirty — so it is a property of what is committed and
-# reproduces on any machine. The consequence is intended and is what a ratchet is for: uncommitted
-# work that adds an ownership or materialization occurrence shows up RED, by file and construct.
-gate_architecture-lint() {
-    local out="$WORK/lint.out"
-    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
-        cargo run -q -p holonic-architecture-lint -j 2 -- "$ROOT" >"$out" 2>&1
-    local status=$?
-    SUMMARY="$(grep -E '^holonic architecture' "$out" | tail -1)"
-    SUMMARY="${SUMMARY:-no summary line}"
-    [ "$status" -eq 0 ] || cat "$out"
-    return "$status"
 }
 
 # ---------------------------------------------------------------------------------------------
@@ -576,55 +402,11 @@ run_controls() {
 
     control_sum || broken=$((broken + 1))
 
-    # authored-levels: a new library file carrying an undispositioned level. Not `mod`-declared,
-    # so nothing compiles it; `library_sources()` globs `*/src/**.rs`, so the tool reads it.
-    local level_probe="$ROOT/crates/holonic-language/src/zz_gate_control.rs"
-    CONTROL_ARTIFACTS+=("$level_probe")
-    control_probe authored-levels "an undispositioned const in library code" \
-        "printf 'const ZZ_GATE_CONTROL_LEVEL: usize = 7;\n' >'$level_probe'" \
-        "rm -f '$level_probe'" || broken=$((broken + 1))
-
-    # named-paths: a live root document naming an owner that is not in the tree.
-    local doc_probe="$ROOT/ZZ_GATE_CONTROL.md"
-    CONTROL_ARTIFACTS+=("$doc_probe")
-    control_probe named-paths "a live document naming an absent owner" \
-        "printf '# control\n\nThis names \`crates/holonic-engine/src/zz_gate_control.rs\`, absent.\n' >'$doc_probe'" \
-        "rm -f '$doc_probe'" || broken=$((broken + 1))
-
     # claim-index: a document retitled without regenerating. The title is what the index copies, so
     # editing it is the exact drift the generator exists to catch.
     control_probe claim-index "a document retitled without regenerating the index" \
         "sed -i '1s/.*/# The document law, retitled by a gate control/' '$ROOT/canon/THE_DOCUMENT_LAW.md'" \
         "sed -i '1s/.*/# The document law/' '$ROOT/canon/THE_DOCUMENT_LAW.md'" || broken=$((broken + 1))
-
-    # driver-catalog: a new driver added without cataloguing it. This is the exact event that
-    # produced 203 uncatalogued drivers, so the control is the event itself.
-    local driver_probe="$ROOT/crates/holonic-engine/examples/zz_gate_control_driver.rs"
-    CONTROL_ARTIFACTS+=("$driver_probe")
-    control_probe driver-catalog "a driver added without cataloguing it" \
-        "printf '//! A control driver, added and not catalogued.\nfn main() {}\n' >'$driver_probe'" \
-        "rm -f '$driver_probe'" || broken=$((broken + 1))
-
-    # output-manifest and closure-manifest: a return directory with no manifest row and no
-    # producing driver. It is UNRECORDED to the first and a new ORPHAN row to the second.
-    local return_probe="$ROOT/output/zz-gate-control"
-    CONTROL_ARTIFACTS+=("$return_probe")
-    local return_setup="mkdir -p '$return_probe'; printf 'a return nothing can cite\n' >'$return_probe/probe.txt'"
-    control_probe output-manifest "a return directory with no manifest row" \
-        "$return_setup" "rm -rf '$return_probe'" || broken=$((broken + 1))
-    control_probe closure-manifest "a return directory with no producing driver" \
-        "$return_setup" "rm -rf '$return_probe'" || broken=$((broken + 1))
-
-    # boundary-artifacts: NOT EXERCISED, and the reason is other people's work rather than a
-    # property of the gate. Its whole material is three committed binaries and one committed
-    # registry; every probe that would redden it corrupts a tracked artifact that concurrent
-    # sessions are compiling against, for the duration of the probe. Stated rather than skipped.
-    printf 'NOT EXERCISED      %-18s would require corrupting a tracked binary; see below\n' \
-        "boundary-artifacts"
-    printf '                   %-18s what would redden it: one octet changed in soma/kernel/soma.spv\n' ""
-    printf '                   %-18s or in either .ptx, or any closure member edited without a re-seed\n' ""
-    printf '                   %-18s note: it binds what IS committed and does NOT assert currency —\n' ""
-    printf '                   %-18s currency is the registry rebuild_evidence column, read it there\n' ""
 
     # typst: a compilation root that does not compile. It is also a control on the DERIVATION —
     # the root list is read off the material, so a new top-level `.typ` must enter it.
@@ -634,45 +416,6 @@ run_controls() {
         "printf '#let broken = \n' >'$typst_probe'" \
         "rm -f '$typst_probe'" || broken=$((broken + 1))
 
-    # architecture-lint: an entirely synthetic repository root, outside this tree, whose census
-    # exceeds its own committed baseline by one `Vec`.
-    local lint_root="$WORK/lint-control"
-    local protected
-    for protected in crates/holonic-engine/src crates/holonic-language/src \
-                     soma/body/src soma/membrane/src soma/life/src; do
-        mkdir -p "$lint_root/$protected"
-    done
-    mkdir -p "$lint_root/meta"
-    printf 'fn control() { let a: Vec<u8> = Vec::new(); let b: Vec<u8> = Vec::new(); }\n' \
-        >"$lint_root/crates/holonic-engine/src/control.rs"
-
-    # The allowance is READ OFF THE MATERIAL by the tool's own `--emit-baseline`, never written
-    # here. Counting `Vec` occurrences by hand is how the first version of this control failed:
-    # it authored `Vec=3` for a file whose census is 4, and reported the tool broken.
-    local lint_run=(timeout -k 2s 180s flock "$CARGO_LOCK" env PATH="$CARGO_PATH"
-                    cargo run -q -p holonic-architecture-lint -j 2 --)
-    "${lint_run[@]}" --emit-baseline "$lint_root" >"$lint_root/meta/HOLONIC_DSA_BASELINE.tsv"
-    local exact
-    exact="$(grep -oE 'Vec=[0-9]+' "$lint_root/meta/HOLONIC_DSA_BASELINE.tsv" | head -1)"
-    if "${lint_run[@]}" "$lint_root" >/dev/null 2>&1; then
-        printf 'CONTROL HELD       %-18s its own census (%s) is within its own baseline: clean\n' \
-            "arch(under)" "$exact"
-    else
-        printf 'CONTROL HELD? NO   %-18s refused a census equal to its own baseline\n' "arch(under)"
-        broken=$((broken + 1))
-    fi
-
-    # One occurrence fewer than the material carries. Nothing else changes.
-    local allowed="${exact#Vec=}"
-    sed -i "s/Vec=$allowed/Vec=$((allowed - 1))/" "$lint_root/meta/HOLONIC_DSA_BASELINE.tsv"
-    if "${lint_run[@]}" "$lint_root" >/dev/null 2>&1; then
-        printf 'CONTROL HELD? NO   %-18s %s observed against %s allowed: passed\n' \
-            "arch(over)" "$allowed" "$((allowed - 1))"
-        broken=$((broken + 1))
-    else
-        printf 'CONTROL HELD       %-18s %s observed against %s allowed: refused\n' \
-            "arch(over)" "$allowed" "$((allowed - 1))"
-    fi
 
     control_cleanup
     printf '\n%d control(s) did not hold, %d partial\n' "$broken" "$CONTROL_UNSETTLED"

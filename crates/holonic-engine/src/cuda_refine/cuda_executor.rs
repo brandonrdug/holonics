@@ -25,6 +25,7 @@ pub struct CudaRefineExecutor {
     pub(super) claim: CuFunction,
     pub(super) native_word: CuFunction,
     pub(super) complex_incidence: CuFunction,
+    pub(super) addressed_complex_junction: CuFunction,
     pub(super) coupled_complex_parametron: CuFunction,
     pub(super) interval_potential_receiver: CuFunction,
     pub(super) native_trace: CuFunction,
@@ -192,6 +193,7 @@ impl CudaRefineExecutor {
             let mut claim = ptr::null_mut();
             let mut native_word = ptr::null_mut();
             let mut complex_incidence = ptr::null_mut();
+            let mut addressed_complex_junction = ptr::null_mut();
             let mut coupled_complex_parametron = ptr::null_mut();
             let mut interval_potential_receiver = ptr::null_mut();
             let mut native_trace = ptr::null_mut();
@@ -315,6 +317,11 @@ impl CudaRefineExecutor {
                     &mut complex_incidence as *mut CuFunction,
                     c"conduct_complex_incidence",
                     "cuModuleGetFunction(conduct_complex_incidence)",
+                ),
+                (
+                    &mut addressed_complex_junction as *mut CuFunction,
+                    c"conduct_addressed_complex_junction",
+                    "cuModuleGetFunction(conduct_addressed_complex_junction)",
                 ),
                 (
                     &mut coupled_complex_parametron as *mut CuFunction,
@@ -853,6 +860,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 complex_incidence,
+                addressed_complex_junction,
                 coupled_complex_parametron,
                 interval_potential_receiver,
                 native_trace,
@@ -973,6 +981,7 @@ impl CudaRefineExecutor {
                 claim,
                 native_word,
                 complex_incidence,
+                addressed_complex_junction,
                 coupled_complex_parametron,
                 interval_potential_receiver,
                 native_trace,
@@ -1113,6 +1122,7 @@ impl CudaRefineExecutor {
             claim: self.claim,
             native_word: self.native_word,
             complex_incidence: self.complex_incidence,
+            addressed_complex_junction: self.addressed_complex_junction,
             coupled_complex_parametron: self.coupled_complex_parametron,
             participant_causal_front: self.participant_causal_front,
             situated_current_difference: self.situated_current_difference,

@@ -108,10 +108,14 @@ the actual pending emission and returned occurrence.
 
 ## Revised order
 
+[historical] The catalog/verifier recommendations in this record were directly rejected by Brandon
+later on 2026-08-31 as intrusive repository governance. `UNIVERSAL_CATALOG.md` supersedes that
+recommendation; Git history retains this audit as evidence only.
+
 [definition] The active blueprint now orders R0Q0 addressed carrier; R0Q1
 ordinary off-diagonal transport; R0Q2 resident dependent complex contraction; R0Q3 full-complex
-structural recurrence and complete telemetry; R0Q4 focused equality/fibre gates; R0Q5 source-neutral
-predecessor rebuild/detachment; R0Q6 the unchanged smallest qualitative receiver; actual UAR3
+structural recurrence and complete telemetry; R0Q4 focused equality/fibre gates; R0Q5 direct
+source-neutral rest/remount; R0Q6 the unchanged smallest qualitative receiver; actual UAR3
 situated-difference revalidation; and one complete source-neutral UAR4 release.
 
 [project-postulate] This is a sharpening of the existing UAR contract, not another campaign or a

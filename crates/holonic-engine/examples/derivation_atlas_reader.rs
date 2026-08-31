@@ -1,7 +1,7 @@
 //! Read the machine's own deposited derivations back, and compute their invariants.
 //!
 //! `standing/output/` holds proof artifacts the machine produced, each bound to a content hash in
-//! `standing/MANIFEST.txt`. **Nothing had ever read them back.** Every artifact this project emits
+//! a historical standing snapshot. **Nothing had ever read them back.** Every artifact this project emits
 //! goes into a directory that no organ opens, which is the gap the roadmap has carried as "the
 //! atlas reader" since the transition.
 //!

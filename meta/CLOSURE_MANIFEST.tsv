@@ -1,7 +1,0 @@
-# Closure addresses of the returns under `output/`.
-# One row per driver. `closure` covers the Cargo target, root workspace/lock/toolchain/config,
-# every transitive local path package, package manifests/build scripts, Rust sources, explicit
-# include/path-module inputs, and CUDA/kernel/include sources.
-# `producer` is `ORPHAN` when no driver in the tree bears the directory's name: that is a
-# return the tree cannot reproduce, and it is reported rather than skipped.
-driver	producer	closure	sources

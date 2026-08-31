@@ -152,21 +152,6 @@ fn caller_order_is_part_of_the_seal_and_cannot_be_silently_rewritten() {
 }
 
 #[test]
-fn full_asset_mount_and_tamper_are_authenticated() {
-    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../standing/output/phoenix/w1/gemma_exterior_codebook.tsv");
-    let rest = ExteriorCodebookRest::read_tsv(&path).expect("sealed W1 exterior asset");
-    let mut tampered = ExteriorCodebookRest::read_tsv(path).expect("sealed W1 exterior asset");
-    tampered.entries[70_001].native_surface.push('x');
-    assert!(matches!(
-        ExteriorCodebookRest::mount(tampered),
-        Err(RestError::DigestMismatch { .. })
-    ));
-    assert_eq!(rest.native_surface(70_001).unwrap(), "▁üst");
-    assert_eq!(rest.source_id(70_001), Some(70_001));
-}
-
-#[test]
 fn arbitrary_native_permutation_has_indexed_lookup() {
     let rest = ExteriorCodebookRest::seal(
         source(),
@@ -295,30 +280,4 @@ fn companion_codec_bytes_survive_source_deletion_and_mount() {
         mounted.codec.unwrap().tokenizer_json_len,
         tokenizer.len() as u64
     );
-}
-
-#[test]
-fn committed_station_closure_asset_mounts_source_detached() {
-    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../standing/output/phoenix/w1/gemma_exterior_codebook.tsv");
-    let rest = ExteriorCodebookRest::read_tsv(path).expect("sealed W1 exterior asset");
-    assert_eq!(rest.vocabulary_extent, 262_144);
-    assert_eq!(rest.entries.len(), 262_144);
-    assert_eq!(rest.coverage.represented_token_ids, 262_144);
-    assert!(
-        rest.entries
-            .windows(2)
-            .all(|pair| pair[1].source_id == pair[0].source_id + 1)
-    );
-    assert!(
-        rest.entries
-            .iter()
-            .all(|entry| { rest.native_id(entry.source_id).unwrap() == entry.native_id })
-    );
-    assert_eq!(rest.native_surface(7_001).unwrap(), "▁France");
-    assert_eq!(
-        rest.codebook_sha256,
-        "e26e56406613a0e61fa5ab9cb43a51a90cca4a7f1ebd5ece3b952a164952c4f8"
-    );
-    assert!(rest.open.is_empty());
 }

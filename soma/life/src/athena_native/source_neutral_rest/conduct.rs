@@ -222,6 +222,7 @@ impl SourceNeutralExteriorCirculation {
             .realize_native_section(
                 &self.athena.rest.relational,
                 &self.athena.realization_site_history,
+                &mut self.athena.resident,
                 &section.native_section_identity_sha256,
                 &native_current_passage_identity_sha256,
                 0,
@@ -546,6 +547,7 @@ impl SourceNeutralExteriorCirculation {
             .continue_realization(
                 &self.athena.rest.relational,
                 &self.athena.realization_site_history,
+                &mut self.athena.resident,
                 &prior,
             )
             .map_err(|error| {
@@ -584,6 +586,7 @@ impl SourceNeutralExteriorCirculation {
             || prior.selected_target_port != realization.source_port
             || prior.returned_factor_current != realization.factor_current
             || prior.returned_site_current != realization.site_current
+            || prior.returned_complex_site_current != realization.complex_site_current
             || prior.returned_phase_numerator != realization.entering_phase_numerator
             || prior.returned_phase_denominator != realization.entering_phase_denominator
             || prior.returned_realization_current_identity_sha256

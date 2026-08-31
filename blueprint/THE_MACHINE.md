@@ -235,7 +235,7 @@ of `tools/gates.sh`.
 | Hermite normal form | **zero** — Smith normal form exists in `rebase_invariants`; Hermite does not |
 | Hodge realization / cycle class | no owner. **`Hodge` in this body names the cellular-sheaf Laplacian** in `sheaf_diffusion.rs`, a discrete differential operator, **not** the supported-realization mechanism `CLAUDE.md` §2 and §11 discuss. Do not read one for the other. |
 | characteristic modules, trace-form spectral placement | `characteristic`/`trace` return zero as module names |
-| the deposit registry (content hash **and** closure hash, in code) | archived; `standing-deposit` does it for deposits but no organ binds a live return to both |
+| the historical deposit registry | retired; Git retains its evidence and no checksum registry governs the live body |
 | reflection composed into formal mathematics | `holonic_language\|Reflect` in `lean_mathematics.rs` returns **zero** |
 | a variable traversal schedule | `pop_front` returns 5 hits, **all hardcoded breadth-first** |
 | reusable exact rank | one definition, `algebraic.rs:1081`, **private**, ℚ-rank only |

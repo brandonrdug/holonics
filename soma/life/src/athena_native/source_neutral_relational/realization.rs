@@ -58,6 +58,59 @@ impl SourceNeutralExteriorRealizationMorphology {
         &source[begin..end]
     }
 
+    /// The oriented cell boundary supplies the target incidence. The exterior port chooses a
+    /// generator row only; its displayed coordinate never chooses a site. A missing successor is
+    /// the exterior boundary and therefore leaves the carrier diagonal with an explicit residual.
+    fn successor_transport_target(
+        &self,
+        relational: &SourceNeutralRelationalMorphology,
+        site_quotient: &SourceNeutralExteriorSiteHistoryQuotient,
+        source_site: &SourceNeutralExteriorRealizationSite,
+        factor: u32,
+        phase: u8,
+        transition_population: u64,
+    ) -> Result<Option<(u32, u32, BigUint)>, SourceNeutralRelationalError> {
+        let Some(successor_site) = source_site.successor_site else {
+            return Ok(None);
+        };
+        let successor = self.site(successor_site)?;
+        let cell = relational
+            .cells
+            .get(source_site.cell as usize)
+            .ok_or(SourceNeutralRelationalError::Quotient)?;
+        let positions = relational_boundary_positions(cell.oriented_boundary.len())?;
+        let source_at = positions
+            .iter()
+            .position(|position| *position == source_site.boundary_position)
+            .ok_or(SourceNeutralRelationalError::Quotient)?;
+        let expected_position = positions
+            .get(source_at + 1)
+            .copied()
+            .ok_or(SourceNeutralRelationalError::Quotient)?;
+        if successor.cell != source_site.cell || successor.boundary_position != expected_position {
+            return Err(SourceNeutralRelationalError::Quotient);
+        }
+        let face_population = phase_population(
+            &relational
+                .faces
+                .get(successor.face as usize)
+                .ok_or(SourceNeutralRelationalError::Quotient)?
+                .phase_population,
+            factor,
+            phase,
+        )
+        .ok_or(SourceNeutralRelationalError::Quotient)?;
+        let target_site = site_quotient.class(successor_site)?;
+        let target_carrier = site_quotient.carrier(target_site, factor, phase)?;
+        Ok(Some((
+            target_carrier,
+            target_site,
+            BigUint::from(transition_population)
+                * BigUint::from(successor.incidence_population)
+                * BigUint::from(face_population),
+        )))
+    }
+
     pub(super) fn site(
         &self,
         site: u32,
@@ -86,6 +139,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         &self,
         relational: &SourceNeutralRelationalMorphology,
         site_quotient: &SourceNeutralExteriorSiteHistoryQuotient,
+        resident: &mut ResidentMembraneInteriorWord,
         native_section_identity_sha256: &str,
         native_current_passage_identity_sha256: &str,
         source_port: u16,
@@ -144,6 +198,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         self.realize_site_current(
             relational,
             site_quotient,
+            resident,
             native_section_identity_sha256,
             native_current_passage_identity_sha256,
             source_port,
@@ -198,119 +253,6 @@ impl SourceNeutralExteriorRealizationMorphology {
             .collect())
     }
 
-    /// Join the exact pre-locking response faces through the device-enacted local-current rows
-    /// which precede their target-state junction.  The resident row supplies the factor
-    /// coefficient and the response face supplies the complex orientation.  Their mode axis
-    /// remains in `native_oriented_faces` as the complete reconstruction fibre; it may condense
-    /// here only because the subsequent realization incidence acts factorwise and independently
-    /// of that mode.
-    fn native_complex_factor_current(
-        &self,
-        native_sections: &[AddressedCurrentSection],
-        native_oriented_faces: &[SourceNeutralNativeOrientedFace],
-    ) -> Result<
-        Vec<SourceNeutralExteriorRealizationOrientedFactorCurrent>,
-        SourceNeutralRelationalError,
-    > {
-        if native_oriented_faces
-            .windows(2)
-            .any(|pair| pair[0].mode >= pair[1].mode)
-            || native_oriented_faces.iter().any(|face| {
-                face.target_states.is_empty()
-                    || face.target_states.windows(2).any(|pair| pair[0] >= pair[1])
-            })
-        {
-            return Err(SourceNeutralRelationalError::Quotient);
-        }
-        let mut unique_local_currents = BTreeMap::<(u32, u32, u32), Vec<(u32, BigUint)>>::new();
-        let mut joined = BTreeMap::<u32, ExactComplexWaveCurrent>::new();
-        for face in native_oriented_faces {
-            if face.local_currents.is_empty() {
-                return Err(SourceNeutralRelationalError::Quotient);
-            }
-            for local in &face.local_currents {
-                let target = native_sections
-                    .get(local.target_section as usize)
-                    .ok_or(SourceNeutralRelationalError::Quotient)?;
-                let target_state = target
-                    .boundary_state
-                    .ok_or(SourceNeutralRelationalError::Quotient)?;
-                if local.source_section as usize >= native_sections.len()
-                    || face.target_states.binary_search(&target_state).is_err()
-                    || local.factor_current.is_empty()
-                    || local
-                        .factor_current
-                        .windows(2)
-                        .any(|pair| pair[0].0 >= pair[1].0)
-                    || local.factor_current.iter().any(|(factor, coefficient)| {
-                        *factor >= self.factor_population || coefficient.is_zero()
-                    })
-                {
-                    return Err(SourceNeutralRelationalError::Quotient);
-                }
-                match unique_local_currents.insert(
-                    (
-                        local.source_section,
-                        local.selected_slot,
-                        local.target_section,
-                    ),
-                    local.factor_current.clone(),
-                ) {
-                    Some(existing) if existing != local.factor_current => {
-                        return Err(SourceNeutralRelationalError::Quotient);
-                    }
-                    _ => {}
-                }
-                if face.oriented_current.is_zero() {
-                    continue;
-                }
-                for (factor, coefficient) in &local.factor_current {
-                    let contribution = face
-                        .oriented_current
-                        .scaled(&Ratio::from_integer(BigInt::from(coefficient.clone())));
-                    let entry = joined.entry(*factor).or_default();
-                    *entry = entry.add(&contribution);
-                }
-            }
-        }
-        let mut reconstructed_targets =
-            vec![BTreeMap::<u32, BigUint>::new(); native_sections.len()];
-        for ((_, _, target_section), factor_current) in unique_local_currents {
-            let target = reconstructed_targets
-                .get_mut(target_section as usize)
-                .ok_or(SourceNeutralRelationalError::Quotient)?;
-            for (factor, coefficient) in factor_current {
-                *target.entry(factor).or_default() += coefficient;
-            }
-        }
-        if native_sections
-            .iter()
-            .zip(reconstructed_targets)
-            .any(|(expected, returned)| {
-                expected.factor_current
-                    != returned
-                        .into_iter()
-                        .filter(|(_, coefficient)| !coefficient.is_zero())
-                        .collect::<Vec<_>>()
-            })
-        {
-            return Err(SourceNeutralRelationalError::Quotient);
-        }
-        joined.retain(|_, current| !current.is_zero());
-        if joined.is_empty() {
-            return Err(SourceNeutralRelationalError::Quotient);
-        }
-        Ok(joined
-            .into_iter()
-            .map(
-                |(factor, current)| SourceNeutralExteriorRealizationOrientedFactorCurrent {
-                    factor,
-                    current,
-                },
-            )
-            .collect())
-    }
-
     /// Continue one already-founded exterior realization without remounting the emitted boundary
     /// face as semantic ingress.  The prior returned factor section and local phase are the exact
     /// joining object.  This is the boundary world-tube recurrence, not another HNN inference.
@@ -318,6 +260,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         &self,
         relational: &SourceNeutralRelationalMorphology,
         site_quotient: &SourceNeutralExteriorSiteHistoryQuotient,
+        resident: &mut ResidentMembraneInteriorWord,
         prior: &SourceNeutralExteriorRealizationPassage,
     ) -> Result<SourceNeutralExteriorRealizationPassage, SourceNeutralRelationalError> {
         // `SourceNeutralAthenaRest::read` validates this immutable morphology and its exact
@@ -334,6 +277,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         self.realize_site_current(
             relational,
             site_quotient,
+            resident,
             &prior.native_section_identity_sha256,
             &prior.native_current_passage_identity_sha256,
             prior.selected_target_port,
@@ -507,79 +451,42 @@ impl SourceNeutralExteriorRealizationMorphology {
             if transitions.is_empty() {
                 return Err(SourceNeutralRelationalError::Quotient);
             }
-            let mut row = Vec::<(u16, u32, u16, BigUint, u16)>::new();
+            let mut row = Vec::<(u16, u32, u32, u16, BigUint)>::new();
             for transition in transitions {
-                let (
-                    exterior_target_port,
-                    target_carrier,
-                    target_local_source_port,
-                    oriented_weight,
-                ) = if transition.target == 257 {
-                    if let Some(successor_site) = source_site.successor_site {
-                        let successor = self.site(successor_site)?;
-                        let positions = relational_boundary_positions(
-                            relational.cells[source_site.cell as usize]
-                                .oriented_boundary
-                                .len(),
-                        )?;
-                        let source_at = positions
-                            .iter()
-                            .position(|position| *position == source_site.boundary_position)
-                            .ok_or(SourceNeutralRelationalError::Quotient)?;
-                        let expected_position = positions
-                            .get(source_at + 1)
-                            .copied()
-                            .ok_or(SourceNeutralRelationalError::Quotient)?;
-                        if successor.cell != source_site.cell
-                            || successor.boundary_position != expected_position
-                        {
-                            return Err(SourceNeutralRelationalError::Quotient);
-                        }
-                        let face_population = phase_population(
-                            &relational.faces[successor.face as usize].phase_population,
-                            current.factor,
-                            current.phase,
-                        )
-                        .ok_or(SourceNeutralRelationalError::Quotient)?;
-                        (
-                            u16::from(b' ') + 1,
-                            site_quotient.carrier(
-                                site_quotient.class(successor_site)?,
-                                current.factor,
-                                current.phase,
-                            )?,
-                            0,
-                            BigUint::from(transition.occurrence_population)
-                                * BigUint::from(successor.incidence_population)
-                                * BigUint::from(face_population),
-                        )
+                let successor = self.successor_transport_target(
+                    relational,
+                    site_quotient,
+                    source_site,
+                    current.factor,
+                    current.phase,
+                    transition.occurrence_population,
+                )?;
+                let (target_carrier, target_site, oriented_weight) = successor.unwrap_or((
+                    current.carrier,
+                    source_site_class,
+                    BigUint::from(transition.occurrence_population),
+                ));
+                // Closure is a distinct boundary passage: an interior close crosses to the next
+                // incidence through Opening, while an exterior close returns the closure port.
+                // An ordinary generator uses the same addressed incidence map but retains its
+                // own local target port.
+                let (exterior_target_port, target_local_source_port) =
+                    if transition.target == 257 && source_site.successor_site.is_some() {
+                        (u16::from(b' ') + 1, 0)
                     } else {
-                        (
-                            257,
-                            current.carrier,
-                            257,
-                            BigUint::from(transition.occurrence_population),
-                        )
-                    }
-                } else {
-                    (
-                        transition.target,
-                        current.carrier,
-                        transition.target,
-                        BigUint::from(transition.occurrence_population),
-                    )
-                };
+                        (transition.target, transition.target)
+                    };
                 row.push((
                     exterior_target_port,
                     target_carrier,
+                    target_site,
                     target_local_source_port,
                     oriented_weight,
-                    transition.target,
                 ));
             }
             let row_total = row
                 .iter()
-                .map(|(_, _, _, weight, _)| weight.clone())
+                .map(|(_, _, _, _, weight)| weight.clone())
                 .sum::<BigUint>();
             if row.is_empty() || row_total.is_zero() {
                 return Err(SourceNeutralRelationalError::Quotient);
@@ -587,9 +494,9 @@ impl SourceNeutralExteriorRealizationMorphology {
             for (
                 exterior_target_port,
                 target_carrier,
+                target_site,
                 target_local_source_port,
                 oriented_weight,
-                _local_target_port,
             ) in row
             {
                 let transported =
@@ -600,7 +507,11 @@ impl SourceNeutralExteriorRealizationMorphology {
                 site_quotient.carrier_representative(target_carrier)?;
                 contributions.push(SourceNeutralExteriorComplexSiteTransportContribution {
                     exterior_target_port,
+                    source_carrier: current.carrier,
+                    source_site: source_site_class,
+                    source_local_port: current.local_source_port,
                     target_carrier,
+                    target_site,
                     target_local_source_port,
                     factor: current.factor,
                     phase: current.phase,
@@ -615,10 +526,59 @@ impl SourceNeutralExteriorRealizationMorphology {
         }
     }
 
+    /// Compose the retained response-face fibre with the addressed site transport before either
+    /// endpoint is projected away. The result is the sparse `c_m d_(m,z,f) A_p(z,z')`
+    /// population consumed by the target/port junction below.
+    fn addressed_realization_pair_currents(
+        contributions: &[SourceNeutralExteriorComplexSiteTransportContribution],
+        oriented_factor_current: &[SourceNeutralExteriorRealizationOrientedFactorCurrent],
+    ) -> Result<Vec<SourceNeutralAddressedRealizationPairCurrent>, SourceNeutralRelationalError>
+    {
+        let factors = oriented_factor_current
+            .iter()
+            .map(|factor| (factor.factor, factor))
+            .collect::<BTreeMap<_, _>>();
+        let mut pairs = Vec::new();
+        for contribution in contributions {
+            let factor = factors
+                .get(&contribution.factor)
+                .ok_or(SourceNeutralRelationalError::Quotient)?;
+            let coefficient = Ratio::new(
+                BigInt::from(contribution.incidence_coefficient.numer().clone()),
+                BigInt::from(contribution.incidence_coefficient.denom().clone()),
+            );
+            for response in &factor.pair_currents {
+                let current = response.current.scaled(&coefficient);
+                if current.is_zero() {
+                    return Err(SourceNeutralRelationalError::Quotient);
+                }
+                pairs.push(SourceNeutralAddressedRealizationPairCurrent {
+                    response: response.clone(),
+                    source_carrier: contribution.source_carrier,
+                    source_site: contribution.source_site,
+                    source_local_port: contribution.source_local_port,
+                    target_carrier: contribution.target_carrier,
+                    target_site: contribution.target_site,
+                    target_local_port: contribution.target_local_source_port,
+                    exterior_target_port: contribution.exterior_target_port,
+                    factor: contribution.factor,
+                    phase: contribution.phase,
+                    current,
+                });
+            }
+        }
+        pairs.sort();
+        if pairs.is_empty() || pairs.windows(2).any(|pair| pair[0] >= pair[1]) {
+            return Err(SourceNeutralRelationalError::Quotient);
+        }
+        Ok(pairs)
+    }
+
     fn realize_site_current(
         &self,
         relational: &SourceNeutralRelationalMorphology,
         site_quotient: &SourceNeutralExteriorSiteHistoryQuotient,
+        resident: &mut ResidentMembraneInteriorWord,
         native_section_identity_sha256: &str,
         native_current_passage_identity_sha256: &str,
         source_port: u16,
@@ -713,40 +673,54 @@ impl SourceNeutralExteriorRealizationMorphology {
             site_quotient,
             &complex_site_current,
         )?;
+        let pair_currents = Self::addressed_realization_pair_currents(
+            &contributions,
+            &oriented_factor_current,
+        )?;
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
-            eprintln!("oriented-realization-pair-current={}", contributions.len());
+            eprintln!("oriented-realization-pair-current={}", pair_currents.len());
         }
-        // Contract the complete target section linearly into one coefficient on each dependent
-        // factor line of each exterior port.  Only then may the constitutive receiver apply the
-        // factor norm.  Keeping a target-carrier map here and squaring each entry separately is
-        // the rejected norm-before-junction path.
-        let oriented_norm_by_factor = oriented_factor_current
-            .iter()
-            .map(|current| Ok((current.factor, positive_complex_norm(&current.current)?)))
-            .collect::<Result<BTreeMap<_, _>, SourceNeutralRelationalError>>()?;
+        // The existing resident membrane context consumes the complete pair population. It joins
+        // target subsections into `(port,factor)` complex currents and forms the positive norm only
+        // afterward, with no intermediate semantic readback.
         let port_extent = 258_usize;
         let factor_extent = self.factor_population as usize;
-        let port_factor_extent = port_extent
-            .checked_mul(factor_extent)
-            .ok_or(SourceNeutralRelationalError::Extent)?;
-        let mut port_factor_current = vec![Ratio::zero(); port_factor_extent];
-        let mut active_port_factors = vec![false; port_factor_extent];
         let mut target_witness_population = vec![0_usize; port_extent];
         for contribution in &contributions {
             let target_port = contribution.exterior_target_port as usize;
-            let factor = contribution.factor as usize;
-            if target_port == 0 || target_port >= port_extent || factor >= factor_extent {
+            if target_port == 0 || target_port >= port_extent {
                 return Err(SourceNeutralRelationalError::Quotient);
             }
-            let at = target_port * factor_extent + factor;
-            port_factor_current[at] += &contribution.incidence_coefficient;
-            active_port_factors[at] = true;
             target_witness_population[target_port] = target_witness_population[target_port]
                 .checked_add(1)
                 .ok_or(SourceNeutralRelationalError::Extent)?;
         }
-        let active_port_factor_population =
-            active_port_factors.iter().filter(|active| **active).count();
+        let resident_terms = pair_currents
+            .iter()
+            .enumerate()
+            .map(|(occurrence, pair)| {
+                Ok(ResidentAddressedComplexJunctionTerm {
+                    occurrence: u32::try_from(occurrence)
+                        .map_err(|_| SourceNeutralRelationalError::Extent)?,
+                    target_site: pair.target_site,
+                    exterior_port: u32::from(pair.exterior_target_port),
+                    factor: pair.factor,
+                    current: pair.current.clone(),
+                })
+            })
+            .collect::<Result<Vec<_>, SourceNeutralRelationalError>>()?;
+        let resident_complex_junction = resident
+            .conduct_addressed_complex_junction(&resident_terms)
+            .map_err(|_| SourceNeutralRelationalError::Quotient)?;
+        if resident_complex_junction.intermediate_semantic_egress_octets != 0
+            || resident_complex_junction.invariant_transport_reuploaded
+            || resident_complex_junction.cpu_semantic_replay_after_device
+            || resident_complex_junction.groups.is_empty()
+            || resident_complex_junction.positive_denominator.is_zero()
+        {
+            return Err(SourceNeutralRelationalError::Quotient);
+        }
+        let active_port_factor_population = resident_complex_junction.groups.len();
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
             eprintln!(
                 "oriented-realization-linear-port-factors={}",
@@ -754,19 +728,29 @@ impl SourceNeutralExteriorRealizationMorphology {
             );
         }
         let mut target_current = BTreeMap::<u16, (SourceNeutralPositiveCurrent, usize)>::new();
-        for (at, active) in active_port_factors.into_iter().enumerate() {
-            if !active {
+        for group in &resident_complex_junction.groups {
+            let target_port = group.exterior_port as usize;
+            if target_port == 0
+                || target_port >= port_extent
+                || group.factor as usize >= factor_extent
+                || group.occurrences.is_empty()
+                || group.target_sections.is_empty()
+            {
+                return Err(SourceNeutralRelationalError::Quotient);
+            }
+            if group.joined_current.is_zero() {
+                if !group.positive_numerator.is_zero() {
+                    return Err(SourceNeutralRelationalError::Quotient);
+                }
                 continue;
             }
-            let target_port = at / factor_extent;
-            let factor = (at % factor_extent) as u32;
-            let coefficient = &port_factor_current[at];
-            if coefficient.is_zero() {
-                continue;
+            let joined_norm = Ratio::new(
+                group.positive_numerator.clone(),
+                resident_complex_junction.positive_denominator.clone(),
+            );
+            if joined_norm.is_zero() {
+                return Err(SourceNeutralRelationalError::Quotient);
             }
-            let basis_norm = oriented_norm_by_factor
-                .get(&factor)
-                .ok_or(SourceNeutralRelationalError::Quotient)?;
             let target_port = target_port as u16;
             let target = target_current.entry(target_port).or_insert_with(|| {
                 (
@@ -774,7 +758,7 @@ impl SourceNeutralExteriorRealizationMorphology {
                     target_witness_population[target_port as usize],
                 )
             });
-            target.0 += basis_norm * coefficient * coefficient;
+            target.0 += joined_norm;
         }
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
             eprintln!("oriented-realization-port-mass={}", target_current.len());
@@ -917,6 +901,8 @@ impl SourceNeutralExteriorRealizationMorphology {
             native_oriented_faces,
             site_current,
             complex_site_current,
+            pair_currents,
+            resident_complex_junction,
             target_current,
             total_target_current,
             entering_realization_current_identity_sha256:
@@ -1024,5 +1010,175 @@ impl SourceNeutralExteriorRealizationMorphology {
             &self.transitions,
             self.developmental_transition_population,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn phase_population_one() -> Vec<SourceNeutralPhasePopulation> {
+        vec![SourceNeutralPhasePopulation {
+            factor: 0,
+            phase: 0,
+            occurrence_population: 1,
+        }]
+    }
+
+    fn bounded_transport_fixture() -> (
+        SourceNeutralExteriorRealizationMorphology,
+        SourceNeutralRelationalMorphology,
+        SourceNeutralExteriorSiteHistoryQuotient,
+    ) {
+        let face = |address: &str| SourceNeutralRelationalFace {
+            address: address.to_owned(),
+            factor_support: vec![0],
+            phase_population: phase_population_one(),
+            cell_incidence: Vec::new(),
+        };
+        let relational = SourceNeutralRelationalMorphology {
+            schema: String::new(),
+            factor_population: 1,
+            factor_adjacency: Vec::new(),
+            faces: vec![face("face-0"), face("face-1")],
+            cells: vec![SourceNeutralRelationalCell {
+                address: "cell-0".to_owned(),
+                oriented_boundary: vec![0, 1, 0],
+                factor_support: vec![0],
+                phase_population: phase_population_one(),
+            }],
+            obstructed_delivery_population: 0,
+            identity_sha256: String::new(),
+        };
+        let morphology = SourceNeutralExteriorRealizationMorphology {
+            schema: String::new(),
+            relational_identity_sha256: String::new(),
+            face_population: 2,
+            cell_population: 1,
+            sites: vec![
+                SourceNeutralExteriorRealizationSite {
+                    face: 0,
+                    cell: 0,
+                    boundary_position: 0,
+                    incidence_population: 1,
+                    successor_site: Some(1),
+                },
+                SourceNeutralExteriorRealizationSite {
+                    face: 1,
+                    cell: 0,
+                    boundary_position: 1,
+                    incidence_population: 1,
+                    successor_site: None,
+                },
+            ],
+            factor_population: 1,
+            transitions: vec![
+                SourceNeutralExteriorRealizationTransition {
+                    face: 0,
+                    source: 1,
+                    target: 2,
+                    occurrence_population: 1,
+                },
+                SourceNeutralExteriorRealizationTransition {
+                    face: 0,
+                    source: 1,
+                    target: 3,
+                    occurrence_population: 1,
+                },
+                SourceNeutralExteriorRealizationTransition {
+                    face: 1,
+                    source: 1,
+                    target: 4,
+                    occurrence_population: 1,
+                },
+            ],
+            developmental_transition_population: 3,
+            identity_sha256: String::new(),
+        };
+        let quotient = SourceNeutralExteriorSiteHistoryQuotient {
+            site_to_class: vec![0, 1],
+            representatives: vec![0, 1],
+            fibres: vec![vec![0], vec![1]],
+            carrier_addresses: BTreeMap::from([((0, 0, 0), 0), ((1, 0, 0), 1)]),
+            carrier_representatives: vec![(0, 0, 0), (1, 0, 0)],
+            carrier_fibres: vec![vec![(0, 0, 0)], vec![(1, 0, 0)]],
+            identity_sha256: String::new(),
+        };
+        (morphology, relational, quotient)
+    }
+
+    #[test]
+    fn ordinary_port_law_retains_diagonal_and_off_diagonal_pair_fibres() {
+        let (morphology, relational, quotient) = bounded_transport_fixture();
+        let source_currents = vec![
+            SourceNeutralExteriorRealizationComplexSiteCurrent {
+                carrier: 0,
+                site: 0,
+                factor: 0,
+                phase: 0,
+                local_source_port: 1,
+                incidence_coefficient: Ratio::one(),
+            },
+            SourceNeutralExteriorRealizationComplexSiteCurrent {
+                carrier: 1,
+                site: 1,
+                factor: 0,
+                phase: 0,
+                local_source_port: 1,
+                incidence_coefficient: Ratio::one(),
+            },
+        ];
+        let contributions = morphology
+            .complex_site_transport_contributions(&relational, &quotient, &source_currents)
+            .expect("the oriented ordinary port law returns");
+        assert!(contributions.iter().any(|current| {
+            current.source_carrier == 0
+                && current.source_site == 0
+                && current.target_carrier == 1
+                && current.target_site == 1
+        }));
+        assert!(contributions.iter().any(|current| {
+            current.source_carrier == 1
+                && current.source_site == 1
+                && current.target_carrier == 1
+                && current.target_site == 1
+        }));
+        for source in [0_u32, 1] {
+            let returned = contributions
+                .iter()
+                .filter(|current| current.source_carrier == source)
+                .fold(Ratio::zero(), |sum, current| {
+                    sum + &current.incidence_coefficient
+                });
+            assert_eq!(returned, Ratio::one());
+        }
+
+        let response = SourceNeutralAddressedResponsePairCurrent {
+            response_face: 5,
+            native_port: 7,
+            native_generator: 11,
+            source_section: 13,
+            selected_slot: 17,
+            target_section: 19,
+            factor: 0,
+            current: ExactComplexWaveCurrent::one(),
+        };
+        let oriented = vec![SourceNeutralExteriorRealizationOrientedFactorCurrent {
+            factor: 0,
+            current: ExactComplexWaveCurrent::one(),
+            pair_currents: vec![response.clone()],
+        }];
+        let pairs = SourceNeutralExteriorRealizationMorphology::addressed_realization_pair_currents(
+            &contributions,
+            &oriented,
+        )
+        .expect("response and site endpoints compose");
+        assert!(pairs.iter().all(|pair| pair.response == response));
+        assert!(pairs
+            .iter()
+            .any(|pair| pair.source_site == 0 && pair.target_site == 1));
+        assert!(pairs
+            .iter()
+            .any(|pair| pair.source_site == 1 && pair.target_site == 1));
     }
 }

@@ -750,14 +750,10 @@ dependencies = [
  "holonic-engine",
  "life",
  "num-bigint",
+ "sha2 0.10.9",
  "soma-abi",
  "soma-membrane",
- "soma-standing-deposit",
 ]
-
-[[package]]
-name = "holonic-architecture-lint"
-version = "0.1.0"
 
 [[package]]
 name = "holonic-engine"
@@ -1687,10 +1683,6 @@ dependencies = [
 
 [[package]]
 name = "soma-record-index"
-version = "0.1.0"
-
-[[package]]
-name = "soma-standing-deposit"
 version = "0.1.0"
 
 [[package]]

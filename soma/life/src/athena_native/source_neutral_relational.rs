@@ -10,25 +10,34 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    AddressedCurrentSection, cuda_refine::ResidentSparseRelationalCurrentAtlas,
+    AddressedCurrentSection,
+    cuda_refine::{
+        ResidentAddressedComplexJunctionReturn, ResidentAddressedComplexJunctionTerm,
+        ResidentMembraneInteriorWord, ResidentSparseRelationalCurrentAtlas,
+    },
     dimensional_wave::ExactComplexWaveCurrent,
 };
 
 use num_bigint::{BigInt, BigUint};
 use num_rational::Ratio;
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 mod morphology;
+mod pair_current;
 mod realization;
+pub use pair_current::{
+    SourceNeutralAddressedRealizationPairCurrent, SourceNeutralAddressedResponsePairCurrent,
+    SourceNeutralExteriorRealizationOrientedFactorCurrent,
+};
 pub const SOURCE_NEUTRAL_RELATIONAL_MORPHOLOGY_SCHEMA: &str =
     "soma-life.source-neutral-relational-morphology.v1";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_MORPHOLOGY_SCHEMA: &str =
     "soma-life.source-neutral-exterior-realization-morphology.v3";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_PASSAGE_SCHEMA: &str =
-    "soma-life.source-neutral-exterior-realization-passage.v7";
+    "soma-life.source-neutral-exterior-realization-passage.v9";
 
 /// Exact nonnegative current coordinate.  Normalization is a constitutive ratio, never a float,
 /// tolerance, sampled probability, or scalar loss replacement.
@@ -252,16 +261,6 @@ pub struct SourceNeutralExteriorRealizationMorphology {
 pub struct SourceNeutralExteriorRealizationFactorCurrent {
     pub factor: u32,
     pub current: SourceNeutralPositiveCurrent,
-}
-
-/// Exact oriented basis current retained once per native factor. Realization-site coordinates
-/// carry only the positive incidence coefficient of this basis, so the dependent complex carrier
-/// is not redundantly materialized at every site.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct SourceNeutralExteriorRealizationOrientedFactorCurrent {
-    pub factor: u32,
-    pub current: ExactComplexWaveCurrent,
 }
 
 /// One coordinate of the continuing realization current.  `site` is a stable relational
@@ -523,7 +522,11 @@ impl SourceNeutralExteriorSiteHistoryQuotient {
 #[derive(Debug)]
 struct SourceNeutralExteriorComplexSiteTransportContribution {
     exterior_target_port: u16,
+    source_carrier: u32,
+    source_site: u32,
+    source_local_port: u16,
     target_carrier: u32,
+    target_site: u32,
     target_local_source_port: u16,
     factor: u32,
     phase: u8,
@@ -563,6 +566,9 @@ pub struct SourceNeutralExteriorRealizationPassage {
     pub native_oriented_faces: Vec<SourceNeutralNativeOrientedFace>,
     pub site_current: Vec<SourceNeutralExteriorRealizationSiteCurrent>,
     pub complex_site_current: Vec<SourceNeutralExteriorRealizationComplexSiteCurrent>,
+    /// Complete response/source/target fibre consumed by the linear target/port junction.
+    pub pair_currents: Vec<SourceNeutralAddressedRealizationPairCurrent>,
+    pub resident_complex_junction: ResidentAddressedComplexJunctionReturn,
     pub target_current: Vec<SourceNeutralExteriorRealizationTargetCurrent>,
     pub total_target_current: SourceNeutralPositiveCurrent,
     pub entering_realization_current_identity_sha256: String,
@@ -639,6 +645,10 @@ impl SourceNeutralExteriorRealizationPassage {
                 )
             })?
             .1;
+        pair_current::validate_oriented_factor_currents(
+            &self.oriented_factor_current,
+            &self.native_oriented_faces,
+        )?;
         if self.schema != SOURCE_NEUTRAL_EXTERIOR_REALIZATION_PASSAGE_SCHEMA
             || !is_digest(&self.morphology_identity_sha256)
             || !is_digest(&self.native_section_identity_sha256)
@@ -710,6 +720,28 @@ impl SourceNeutralExteriorRealizationPassage {
                     || site.local_source_port >= 257
                     || site.incidence_coefficient.is_zero()
             })
+            || self.pair_currents.is_empty()
+            || self.pair_currents.windows(2).any(|pair| pair[0] >= pair[1])
+            || self.pair_currents.iter().any(|pair| {
+                pair.current.is_zero()
+                    || pair.response.factor != pair.factor
+                    || pair.source_local_port >= 257
+                    || pair.target_local_port > 257
+                    || pair.exterior_target_port == 0
+                    || pair.exterior_target_port > 257
+                    || !self.oriented_factor_current.iter().any(|factor| {
+                        factor.factor == pair.factor
+                            && factor.pair_currents.binary_search(&pair.response).is_ok()
+                    })
+            })
+            || self.resident_complex_junction.groups.is_empty()
+            || self.resident_complex_junction.intermediate_semantic_egress_octets != 0
+            || self
+                .resident_complex_junction
+                .invariant_transport_reuploaded
+            || self
+                .resident_complex_junction
+                .cpu_semantic_replay_after_device
             || self.target_current.is_empty()
             || self
                 .target_current
@@ -818,6 +850,8 @@ impl SourceNeutralExteriorRealizationPassage {
                 &self.native_oriented_faces,
                 &self.site_current,
                 &self.complex_site_current,
+                &self.pair_currents,
+                &self.resident_complex_junction,
                 &self.target_current,
                 &self.total_target_current,
                 self.entering_realization_current_identity_sha256.as_str(),
@@ -853,19 +887,6 @@ fn gcd_biguint(mut left: BigUint, mut right: BigUint) -> BigUint {
         right = remainder;
     }
     left
-}
-
-fn positive_complex_norm(
-    current: &ExactComplexWaveCurrent,
-) -> Result<SourceNeutralPositiveCurrent, SourceNeutralRelationalError> {
-    let norm = current.norm_square();
-    if norm.is_negative() || norm.denom().is_zero() {
-        return Err(SourceNeutralRelationalError::Quotient);
-    }
-    Ok(Ratio::new(
-        norm.numer().magnitude().clone(),
-        norm.denom().magnitude().clone(),
-    ))
 }
 
 fn positive_site_shadow(

@@ -12,8 +12,8 @@
 file exists to prevent."*
 
 **No generator was committed.** The file was produced by a one-off shell pipeline that is gone. That
-is precisely the shape `CLAUDE.md` §0 lesson 1 convicts and that `tools/closure_manifest.py` exists
-to detect: a return whose producer is not in the tree. An index claiming to be regenerable, with
+is precisely the shape `CLAUDE.md` §0 lesson 1 convicts: a return whose producer is not in the tree.
+An index claiming to be regenerable, with
 nothing able to regenerate it, is an orphan wearing a provenance line.
 
 # The extraction, and why the first one was wrong
@@ -39,7 +39,7 @@ Two fields are taken instead, both of which the document law already guarantees 
 Nothing is summarized. Every string in the output is copied from the file it describes. The one
 thing removed is a link **target**: a relative link copied out of `canon/` or `blueprint/` resolves
 nowhere from the repository root, so the link text is kept and the address dropped —
-`tools/resolve_named_paths.py` caught that on the first run.
+the first repository review caught that on the first run.
 
 # The gate column is measured, not declared
 
@@ -119,8 +119,8 @@ def delink(fragment: str) -> str:
 
     A gloss is copied out of a file in `canon/` or `blueprint/`, so any relative link inside it is
     written from *that* directory and resolves nowhere from the repository root. Keeping the target
-    would make this file name a path that does not exist — `tools/resolve_named_paths.py` caught
-    exactly that on the first run. The words are copied; the broken address is not.
+    would make this file name a path that does not exist. The words are copied; the broken address
+    is not.
     """
     return re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", fragment)
 

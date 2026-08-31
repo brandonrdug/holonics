@@ -78,7 +78,6 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
 | `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
-| `canon/THE_DRIVER_ATLAS.md` | **The driver atlas — current target census and interpretation boundary** — **Truth status:** `established-bounded` for the generated census and `project-postulate` for the driver discipline. |
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
 | `canon/THE_INFORMATION_ENGINE.md` | **The Information Engine — the cycle, its two strokes, every organ's station, and the surface each runs on** — **Evidence:** `measured` — three independent censuses over the clean tree (498 `.rs` files, 336,005 lines; agent worktrees excluded), a device census over 64 device entries and three… |
@@ -151,7 +150,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (439 deposits of 731)
+## 4 · The 2026-08 record line (440 deposits of 732)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -597,6 +596,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` | CONS3 removed the moment-front foreman and the resident receiver now observes the committed target |
 | `2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md` | Constructive differentials keep `dx` typed and refinement does not erase the potential fibre |
 | `2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md` | Finite many-body, polarized crystal, and diffusion Lean foundation returned to the engine |
+| `2026-08-31_THE_GENERATED_CATALOG_APPARATUS_DEPARTED_AND_THE_ORDINARY_REALIZATION_CURRENT_CROSSED_ITS_ADDRESSED_INCIDENCE.md` | The generated catalog apparatus departed and the ordinary realization current crossed its addressed incidence |
 | `2026-08-31_UAR_AND_R0Q_READINESS_REVIEW_THE_CATALOGS_SEPARATE_LIVE_LEDGERS_FROM_DATED_ATLASES_AND_THE_NEXT_DEED_IS_THE_ADDRESSED_PAIR_CURRENT.md` | UAR and R0Q readiness review — the catalogs separate live ledgers from dated atlases and the next deed is the addressed pair current |
 
 ---
@@ -608,23 +608,15 @@ outside `tools/` that names the verifier — not declared.
 
 | tool | what it checks | invoked by |
 |---|---|---|
-| `tools/authored_levels.py` | Every numeric level authored **inside** an organ, and whether it is dispositioned. | `canon/TABLET_THE_MANIFOLD.md`, `canon/THE_AUTHORED_LEVEL.md`, `canon/THE_CONTAMINANT_PROTOCOL.md`, and 9 more |
-| `tools/boundary_artifacts.py` | Every committed boundary artifact is bound to its content hash AND its closure hash. | `meta/BOUNDARY_ARTIFACTS.tsv`, `research/records/2026-08-09_THE_COMMITTED_BOUNDARY_ARTIFACT_IS_STALE_AND_CANNOT_BE_REBUILT.md`, `soma/kernel/.gitignore`, and 1 more |
 | `tools/build_m0_source_fixture.sh` | Typst embeds the creation instant in PDF metadata. | `research/fixtures/m0_mathematical_source_circulation/README.md` |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `research/README.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 2 more |
-| `tools/closure_manifest.py` | Bind every return under `output/` to the CLOSURE that produced it, not only to its content. | `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, `research/records/2026-08-16_AN_ADDRESS_IS_A_COLLAPSED_FACE_THAT_REOPENS_AND_THE_UNIFICATION_IS_ONE_RESUME.md`, and 1 more |
 | `tools/document_law.py` | Three laws the corpus states about its own governing documents, made executable. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `research/records/2026-08-24_DIVISION_RETURNED_AS_A_TRANSPORT_FIBRE_PARTITIONS_RETAINED_THEIR_BOUNDARIES_AND_DIVISORS_BECAME_SIGNED_CHART_LEDGERS.md` |
-| `tools/driver_catalog.py` | Generate `meta/DRIVER_CATALOG.tsv` from the tree, so the driver population cannot go uncatalogued. | `canon/THE_DRIVER_ATLAS.md`, `research/records/2026-08-22_I0_RELEASE_RECEIVER_PASSED_THE_REALIZATION_CALCULUS_CLOSED_AND_I1_BEGINS.md`, `research/records/2026-08-22_I1_RELEASE_RECEIVER_PASSED_THE_RECURRENT_BOUNDARY_RETURNED_AND_I2_BEGINS.md`, and 1 more |
 | `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on the live construction authority. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
 | `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 71 more |
 | `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `blueprint/THE_ROADMAP.md`, and 5 more |
-| `tools/output_manifest.py` | Bind every returned artifact under `output/` to its content hash, in a TRACKED file. | `meta/OUTPUT_MANIFEST.tsv`, `meta/history/2026-08-30_OUTPUT_MANIFEST_PRE_CLEANUP.tsv`, `research/records/2026-08-10_THE_INSTRUMENT_DECLARES_THE_APERTURE_AND_THE_REFUSAL_IS_THE_RETURN.md`, and 2 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |
-| `tools/registry_incidence.py` | Emit the registry-to-code incidence as a TSV. | `blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`, `crates/holonic-engine/examples/the_registry_is_material_for_the_compression.rs`, `research/records/2026-08-16_THE_COUNT_GATED_SPEECH_NOT_ADMISSION_AND_THE_EXCISION_IS_REFUTED.md` |
-| `tools/resolve_line_citations.py` | Every `file.rs:NNN` a governing document names must still point at the construct it claims. | **nothing names it** |
-| `tools/resolve_named_paths.py` | Every path a governing document names must resolve in the body that document describes. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `canon/THE_DOCUMENT_LAW.md`, `canon/THE_TIMELINE.md`, and 9 more |
 | `tools/source_shape.py` | Rust/CUDA source-shape gate. | `research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` |
 | `tools/tracked_authority.py` | Require the live authority and named UAR/HNN owners to exist in the Git index. | **nothing names it** |
 

@@ -1942,8 +1942,9 @@ repository.
 >
 > — 2026-08-01 12:32, `CX 2026/07/30`
 
-*Status:* `crates/holonic-language` exists — **932 source lines in a single `lib.rs`, 2 tests** — the
-thinnest crate in the workspace. The enforced blacklist is `crates/holonic-architecture-lint`.
+*Status:* `crates/holonic-language` exists. The former architecture census and blacklist were
+retired on 2026-08-31; ownership correspondence is maintained descriptively in
+`UNIVERSAL_CATALOG.md` and reviewed at the changed owner.
 
 **This entry recorded both of its broken frames in more detail than any other file in the tree, and
 both were repaired 2026-08-10.** What it measured, and it was right: `BASELINE_PATH =
@@ -2243,7 +2244,7 @@ immediately proceed into construction" (2026-08-07T18:01:03Z), which is what
 | Tiger reconstruction | §17 | **live**, `crates/holonic-engine/examples/curved_receiver_phase_atlas.rs`, input path dead |
 | RAM / clock / storage ontology | §17 | partial, `research/records/2026-08-02_THE_CLOCK_IS_A_RECEIVER_PHASE…` |
 | Founded tensors as the cache | §21 | none |
-| Holonic language; enforced DSA blacklist | §25 | `crates/holonic-language` (932 lines); `crates/holonic-architecture-lint` **broken** |
+| Holonic language; ownership discipline | §25 | `crates/holonic-language`; cross-language owners in `UNIVERSAL_CATALOG.md` |
 | Holonic relational database | §25 | none; `soma/tools/record-index` **broken** |
 | Learnable-codec membrane | §25 | none |
 | Synopsis of Elementary Causality | §25 | none |

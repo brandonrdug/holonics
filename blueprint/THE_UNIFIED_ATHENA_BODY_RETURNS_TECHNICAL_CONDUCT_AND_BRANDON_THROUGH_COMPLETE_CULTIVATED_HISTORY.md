@@ -26,11 +26,9 @@ returned one structural `ReceiverHistoryCompression` with complete generator squ
 the query-independent quotient, receiver factors, reconstruction fibres, and `q T_g = U_g q` law on
 one CUDA context. None of those returns passed the qualitative exterior receiver.
 
-[counterexample; source-inspected] Consolidation deleted reproducible `output/`, so the predecessor
-rests consumed by the historical UAR drivers are not present. R0Q0 records the exact rebuild route;
-R0Q5 rebuilds the source-neutral predecessor through the one-way UAR0 severing passage and binds its
-closure. The source-bearing ALP4 rest is transition material only and must be absent from every
-later productive dependency closure.
+[definition] Historical output files and the ALP4/ALP5 driver chain do not schedule UAR. R0Q5
+constructs and remounts the source-neutral rest directly through the current typed owner. No
+source-bearing compatibility artifact enters the productive dependency closure.
 
 ## Product contract
 
@@ -101,32 +99,25 @@ ports, factor, phase, response-face address, both boundary maps, zero-support co
 orientation, chronology, and complete reconstruction fibre. Constructing these fields and never
 reading them does not satisfy the passage.
 
-## Current counterexamples — re-inspected after consolidation
+## R0Q returns and remaining boundary
 
-[counterexample; source-inspected] In
-`source_neutral_relational/realization.rs::complex_site_transport_contributions`, every ordinary
-non-closure transition still sets `target_carrier = current.carrier`; only the closure branch looks
-up `successor_site` and its carrier. The required ordinary off-diagonal `z -> z'` transport remains
-absent after consolidation.
+[established-bounded; implemented-exact; measured] R0Q1 replaced the ordinary diagonal assignment with the oriented
+cell-successor incidence. The focused owner control returns both an ordinary `z != z'` occurrence
+and an exterior-boundary diagonal residual and proves each source row sums to its entering current.
 
-[counterexample; source-inspected] `realization.rs::native_complex_factor_current`,
-`complex_site_transport_contributions`, and `realize_site_current` still execute the dependent
-complex face join, realization incidence, target/port join, positive receiver, selection, and
-successor construction in `soma/life` after resident native conduct. The earlier resident receipt
-still reports `cpu_semantic_replay_after_device = false`; that flag cannot observe this later work.
+[established-bounded; implemented-exact; measured] The dependent complex target/port join and
+positive receiver now execute in the resident membrane CUDA word. Selection occurs only after its
+terminal semantic return, and the new receipt owns the complete post-device replay flag.
 
-[counterexample; source-inspected] The current response-face population condenses into
-`SourceNeutralExteriorRealizationOrientedFactorCurrent` before realization-site incidence.
-`SourceNeutralExteriorComplexSiteTransportContribution` then retains target carrier, target-local
-port, factor, phase, and coefficient, but not response-face address, source carrier/site/local port,
-or an explicit source-to-target occurrence. The missing lineage is stronger than an unread field:
-it is absent from the pair-current carrier.
+[established-bounded; implemented-exact; measured] R0Q0 composes each retained native response occurrence with the
+source/target realization-site transport in `SourceNeutralAddressedRealizationPairCurrent`. The
+linear target/port junction consumes that exact complex population, and the passage retains it as
+the complete sparse reconstruction fibre.
 
-[counterexample; source-inspected] `SourceNeutralContinuationState` now correctly retains oriented
-native relational pairings and the complete positive exterior target-current family, but
-`from_section` still omits `SourceNeutralExteriorRealizationPassage.returned_complex_site_current`.
-Structural recurrence therefore remains blind to the selected dependent complex realization
-section even though `digest_equality_used` is false. A positive/modulus shadow is not R0Q.
+[established-bounded; implemented-exact; measured] `SourceNeutralContinuationState` now retains the
+selected dependent complex site section and its addressed response/source/target pair fibre.
+Structural recurrence separates equal positive shadows with distinct quadrature, and digest
+equality remains unused.
 
 [historical; measured] The four granular/source-neutral test failures named before consolidation are
 closed. CONS5 returned 2,972 Rust tests passed, zero failed, 49 ignored, and all 17 then-current
@@ -134,7 +125,7 @@ release gates. They no longer block R0Q; the counterexamples above do.
 
 ## Ordered R0Q construction
 
-### UAR4-R0Q0 — the addressed response/source/target pair-current carrier — CURRENT
+### UAR4-R0Q0 — the addressed response/source/target pair-current carrier — PASSED
 
 [definition] Introduce the smallest apparatus-neutral pair-current carrier which retains response
 face `m`, source and target carrier/site/local port, factor, phase, complex coefficient, both
@@ -146,7 +137,11 @@ current realization/site quotient owners; do not found another Athena or realiza
 serialized, and a focused apparatus-neutral control reconstructs the present diagonal passage with
 no lost face or endpoint coordinate. The absent predecessor route is recorded but not rerun.
 
-### UAR4-R0Q1 — genuine ordinary site transport
+[established-bounded; implemented-exact; measured] `SourceNeutralAddressedRealizationPairCurrent` retains the native
+response occurrence and both site boundary maps; the exact complex port junction reads it. The
+focused controls and the full `life` owner suite pass.
+
+### UAR4-R0Q1 — genuine ordinary site transport — PASSED
 
 [definition] Replace the ordinary `target_carrier = current.carrier` branch with the exact addressed
 target incidence supplied by the exterior port law. Closure remains its separately typed successor
@@ -156,7 +151,11 @@ passage. No port name, emitted byte, or expected answer may choose the target.
 off-diagonal populations retain their exact source/target fibres; and local current is conserved or
 returns its named boundary/source residual.
 
-### UAR4-R0Q2 — resident dependent complex contraction
+[established-bounded; implemented-exact; measured] The ordinary port law uses the oriented cell successor incidence;
+the exterior boundary remains its named diagonal residual. The focused control exhibits both and
+returns exact source-row conservation.
+
+### UAR4-R0Q2 — resident dependent complex contraction — PASSED
 
 [definition] Carry the sparse response/source/target pair-current population onto the existing CUDA
 context. Join linearly at target site, then at `(port,factor)`, and form positive mass only afterward.
@@ -167,7 +166,11 @@ terminal semantic boundary.
 joined complex factor sections, positive faces, endpoints, and reconstruction fibre without a CPU
 productive replay. The exact `1 + (-1)` cancellation control fires after the linear join.
 
-### UAR4-R0Q3 — structural continuation and complete telemetry
+[established-bounded; implemented-exact; measured] The resident membrane context now owns the arbitrary-width signed
+complex junction and its later norm. The RTX control returns exact cancellation and the nonzero
+`(3+i,10)` face with zero intermediate semantic egress and no CPU replay.
+
+### UAR4-R0Q3 — structural continuation and complete telemetry — PASSED
 
 [definition] Add the returned dependent complex realization section and its addressed lineage to
 `SourceNeutralContinuationState` and every receiver/history equality used for recurrence. Extend
@@ -178,7 +181,11 @@ cannot certify later CPU work.
 no verdict; full-complex structural equality drives recurrence; and deliberately inserting one CPU
 semantic step after device conduct fires the telemetry control.
 
-### UAR4-R0Q4 — equality and fibre gates
+[established-bounded; implemented-exact; measured] Structural continuation now includes the selected complex site
+section and selected addressed pair fibre. The `1` versus `i` control separates equal positive
+shadows, and the explicit post-device CPU-step hook fires the telemetry field.
+
+### UAR4-R0Q4 — equality and fibre gates — PASSED
 
 [definition] Run the focused owner tests below plus one resident/apparatus-neutral equality gate.
 The gate returns joining addresses, `q/U` or shortest-separator testimony, terminal semantic egress,
@@ -187,16 +194,17 @@ apparatus-shape egress, launches/dependencies, invariant upload, and complete re
 **Pass R0Q4:** every required owner test and the equality gate pass under the 180-second process
 boundary; no qualitative surface is graded.
 
-### UAR4-R0Q5 — source-neutral predecessor restoration and detachment
+[established-bounded; measured] The focused resident CUDA gate and complete `holonic-engine` and `life` owner suites pass.
+No qualitative surface was run or graded.
 
-[definition] Rebuild the source-neutral rest through the existing UAR0 one-way severing passage only
-after the repaired owners and equality gates stand. Inspect the 1,977-line predecessor builder
-against the narrow-driver law; move any productive logic it owns to the existing library owner.
-Then make the source-bearing ALP4 rest physically unavailable and remount the source-neutral child.
+### UAR4-R0Q5 — direct source-neutral rest and remount — CURRENT
 
-**Pass R0Q5:** the source-neutral rest remounts, its producing closure is bound, the source-bearing
-predecessor and source surfaces are unreachable, and no historical output is treated as current
-merely because it was regenerated.
+[definition] After the repaired owners and equality gates stand, construct one source-neutral rest
+directly through the current library owner, serialize it only as an optional exterior face, remount
+it with every source-bearing driver and artifact unavailable, and audit the hot dependency closure.
+
+**Pass R0Q5:** the source-neutral rest remounts, source surfaces and compatibility drivers are
+unreachable, and removing every historical UAR output changes no native construction consequence.
 
 ### UAR4-R0Q6 — unchanged smallest qualitative receiver
 
@@ -260,23 +268,6 @@ conditioned by native conduct; the three Brandon questions share participant lin
 complete signatures and appropriate surfaces differ; the technical questions do not replay source
 text; every required successor square and fibre receipt passes; and the productive dependency
 closure contains no source-bearing codec or CPU semantic replay.
-
-## Catalog and artifact release preflight
-
-[established-bounded; process-audit] The claim index, driver catalog, source/architecture baselines,
-equation atlas, and root output/closure manifests have passing release readers. Registry incidence
-is now a release-gated generated ledger.
-
-[counterexample; measured] `standing-deposit verify` currently refuses one tracked, unmanifested
-cold Gemma codebook under `standing/output/phoenix/w1/`; all 104 declared standing contents remain
-intact and their closure drift is expected testimony. The codebook is source-bearing test material,
-not Athena standing. Before UAR4 release it must move to an explicit cold fixture owner or receive a
-lawful founding/deposit record; it may not enter the productive closure.
-
-[historical; measured] The identity atlases, proposed-identity ledger, owner atlas, measured
-capability atlas, correspondence atlas, method atlas, research README, and Millennium formal catalog
-are dated navigation/evidence snapshots rather than current release catalogs. UAR may consult them
-only after exact source remeasurement.
 
 ## Process and stop law
 

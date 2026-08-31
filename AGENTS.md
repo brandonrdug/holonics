@@ -52,23 +52,17 @@ construction merely because its current implementation is being replaced.
 
 ## Catalog discipline
 
-- `THE_CLAIM_INDEX.md`, `meta/DRIVER_CATALOG.tsv`, `meta/AUTHORED_LEVELS.tsv`,
-  `meta/SOURCE_SHAPE_BASELINE.tsv`, `meta/HOLONIC_DSA_BASELINE.tsv`, the equation atlas, and the
-  output/closure/boundary ledgers have executable owners in `tools/` or the architecture package
-  and release-gate readers. Regenerate them only from those owners after the changed source or
-  artifact stands.
-- `canon/THE_OWNER_ATLAS.md`, `canon/THE_MEASURED_CAPABILITIES.md`,
-  `canon/THE_CORRESPONDENCE_ATLAS.md`, `blueprint/THE_METHOD_ATLAS.md`, the identity-atlas files,
-  `meta/PROPOSED_IDENTITIES.tsv`, and the Millennium catalog are dated navigation or evidence
-  snapshots. Their paths, counts, line numbers, and status language must be re-measured before use;
-  they never schedule work.
-- `research/README.md` is a thematic entry surface with a stated cutoff. The generated claim index
-  is the complete document/date router. `papers/source/holonics/registry.typ` owns mathematical
-  registry identities, and `meta/REGISTRY_INCIDENCE.tsv` is its generated current Rust-incidence
-  projection.
-- `standing/MANIFEST.txt` owns deposited standing only. A tracked file under `standing/output/`
-  which is absent from that manifest is not silently standing; disposition it as a declared cold
-  fixture or a properly founded deposit before relying on the standing verifier.
+- [`UNIVERSAL_CATALOG.md`](UNIVERSAL_CATALOG.md) is the one maintained conceptual crosswalk from
+  Lean formal owners to Rust/CUDA realizations and exact open fibres. It is descriptive navigation,
+  never a scheduler or proof of correspondence. Update it with the owner change which moves a row.
+- Do not add a repository census, ledger, verifier, checksum registry, or release gate unless the
+  live roadmap explicitly schedules that instrument before it is introduced, names the decision it
+  can change, and gives its removal boundary. A convenient script is not repository governance.
+- Content hashes may protect a local serialized wire against accidental corruption. They may not
+  define semantic identity, recurrence, source equality, construction grade, or repository
+  authority, and no second checksum system may be founded merely to verify the first.
+- Dated atlases and research records remain evidence at their stated revision. Re-measure exact
+  source before using them; never create another generated catalog to make an old catalog current.
 
 ## Provenance sidecar and spatial agent protocol
 

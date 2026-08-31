@@ -403,7 +403,7 @@ fn run() -> Result<(), String> {
         // **A falsifier that prints and exits zero is a check that cannot fail.** The first form of
         // this driver printed `REFUTED` and returned `Ok(())`, so a refuted run and a confirmed run
         // were indistinguishable to anything reading the exit status — which is the defect
-        // `canon/THE_DRIVER_ATLAS.md` catalogues as the one to avoid, committed in the driver
+        // the universal owner catalog names as the one to avoid, committed in the driver
         // written to demonstrate a falsifier. The refusal now leaves through the same door the
         // driver's other refusals do.
         return Err(

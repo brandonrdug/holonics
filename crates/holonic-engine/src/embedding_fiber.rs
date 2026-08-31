@@ -1782,7 +1782,7 @@ pub fn score_serially(
 /// own copy** —
 /// `the_foreign_map_founds_its_axes`, `the_readout_founds_its_own_receivers`,
 /// `the_readout_returns_a_fiber_not_a_winner`, and `the_map_deposits_and_a_later_current_rides_it` —
-/// which is the duplication `canon/THE_DRIVER_ATLAS.md` was deposited to stop. A container parse is
+/// which is the duplication the universal owner catalog exists to stop. A container parse is
 /// a codec intake. Header manifestation now delegates to the architecture-neutral `foreign_map`
 /// mouth, so this module owns only the rank-2 BF16 question it asks of that manifest.
 ///

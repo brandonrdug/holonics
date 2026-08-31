@@ -278,7 +278,7 @@ and no example process becomes the application.
 The current `soma/life/src/bin/eros.rs` cannot call `holon-plate`: `life` is already below
 `soma/tools/holon-plate` in the dependency graph. Before Phoenix application work, re-home that
 binary in one concrete exterior application package above both—`soma/tools/eros/` is the named
-target—which depends on `life`, `holon-plate`, `standing-deposit`, and the admitted source codecs.
+target—which depends on `life`, `holon-plate`, and the admitted source codecs.
 This package is an apparatus boundary, not another semantic engine. Its exterior commands may
 expose the stations by their semantic names:
 
@@ -332,7 +332,7 @@ port, law, or consequence.
 | behavioral quotient | `receiver_exact_compression::{CollapsedPair,ReceiverExactCompression}`, `soma/life/src/reconstruction_fiber.rs` | taxa, receiver-minimality, shortest separators and retained reopening fibre |
 | exact dimension | `rebase_invariants::smith_normal_form`, `athena::TreeChart` | rank, invariant factors, lattice/state dimensions |
 | cultivation | `holonic_training` vocabulary plus owner-local deltas | proposal/commit/evidence; generalized beyond text templates |
-| whole-body rest | `ErosRest`, `form_mouth`, `holon-plate`, `standing-deposit` | seal, source departure, remount, model plate |
+| whole-body rest | `ErosRest`, `form_mouth`, `holon-plate` | seal, source departure, remount, model plate |
 | exact work/apparatus | `exact_work`, `cuda_aperture`, resident CUDA owners | admission before deed, device testimony |
 
 The following are not yet standing joins and may require owner-local generalization:

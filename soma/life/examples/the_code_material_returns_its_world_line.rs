@@ -51,11 +51,6 @@ const CORPUS_FAMILY: &[&str] = &[
 
 const PYTHON_FAMILY: &[&str] = &[
     "tools/claim_index.py",
-    "tools/closure_manifest.py",
-    "tools/authored_levels.py",
-    "tools/boundary_artifacts.py",
-    "tools/resolve_named_paths.py",
-    "tools/output_manifest.py",
     "soma/tools/three-arm-analysis.py",
     "soma/tools/prime-seasons.py",
     "soma/tools/genesis-chain.py",

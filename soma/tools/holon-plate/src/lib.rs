@@ -81,7 +81,7 @@
 //!
 //! # Two hashes, two species of failure
 //!
-//! This is `soma-standing-deposit`'s distinction carried into a single file, and it is why the
+//! This content/binding distinction is carried inside a single file, and it is why the
 //! seal is two digests rather than one. `plate_sha256` folds the *stored* `form_sha256` rather
 //! than the form itself, so the two species are **separable** — a corrupted form moves exactly one
 //! digest and a corrupted declaration moves exactly the other:

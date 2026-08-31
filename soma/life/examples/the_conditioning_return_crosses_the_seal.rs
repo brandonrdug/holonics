@@ -225,7 +225,7 @@ fn build(corpus_form: &Path, source_roots: Vec<PathBuf>) -> Result<(), String> {
         .ok_or_else(|| "the declared workspace root is absent".to_owned())?;
     // The expectation is read off the material, never authored beside it. This line carried
     // `if standing_artifacts != 103` until 2026-08-11 — a level pinned inside a driver, where the
-    // authored-levels regex cannot see it and no caller can vary it, and one that says nothing
+    // a numeric-literal census cannot see it and no caller can vary it, and one that says nothing
     // about *which* 103 artifacts stood. What the material itself supplies is the population and
     // its exact address; what the organ supplies is whether the mount consumed every one of them.
     // Both are carried into the deposited grade, so a moved standing is legible in the receipt

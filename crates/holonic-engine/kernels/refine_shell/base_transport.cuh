@@ -90,6 +90,56 @@ extern "C" __global__ void conduct_complex_incidence(
     section_imaginary[at] = (int64_t)imaginary;
 }
 
+/// Join one complete addressed complex target/port/factor row, then form its positive receiver.
+/// Each lane owns one row, so signed arbitrary-width addition and the two squares are ordered and
+/// exact. No norm is taken on an individual pair-current occurrence.
+extern "C" __global__ void conduct_addressed_complex_junction(
+    const uint64_t *group_offsets,
+    const uint8_t *term_real_sign,
+    const uint32_t *term_real_limbs,
+    const uint8_t *term_imaginary_sign,
+    const uint32_t *term_imaginary_limbs,
+    uint8_t *joined_real_sign,
+    uint32_t *joined_real_limbs,
+    uint8_t *joined_imaginary_sign,
+    uint32_t *joined_imaginary_limbs,
+    uint32_t *positive_limbs,
+    uint32_t *positive_scratch,
+    uint32_t group_count,
+    uint32_t input_limb_count,
+    uint32_t joined_limb_count,
+    uint32_t norm_limb_count)
+{
+    const uint32_t group = blockIdx.x * blockDim.x + threadIdx.x;
+    if (group >= group_count) return;
+    const uint64_t joined_at = (uint64_t)group * (uint64_t)joined_limb_count;
+    const uint64_t norm_at = (uint64_t)group * (uint64_t)norm_limb_count;
+    joined_real_sign[group] = 0U;
+    joined_imaginary_sign[group] = 0U;
+    zero_unsigned_limbs(joined_real_limbs + joined_at, joined_limb_count);
+    zero_unsigned_limbs(joined_imaginary_limbs + joined_at, joined_limb_count);
+    for (uint64_t term = group_offsets[group]; term < group_offsets[group + 1U]; ++term) {
+        const uint64_t term_at = term * (uint64_t)input_limb_count;
+        add_signed_magnitude_width(
+            joined_real_sign + group, joined_real_limbs + joined_at, joined_limb_count,
+            term_real_sign[term], term_real_limbs + term_at, input_limb_count);
+        add_signed_magnitude_width(
+            joined_imaginary_sign + group, joined_imaginary_limbs + joined_at,
+            joined_limb_count, term_imaginary_sign[term],
+            term_imaginary_limbs + term_at, input_limb_count);
+    }
+    multiply_unsigned_limbs(
+        joined_real_limbs + joined_at, joined_limb_count,
+        joined_real_limbs + joined_at, joined_limb_count,
+        positive_limbs + norm_at, norm_limb_count);
+    multiply_unsigned_limbs(
+        joined_imaginary_limbs + joined_at, joined_limb_count,
+        joined_imaginary_limbs + joined_at, joined_limb_count,
+        positive_scratch + norm_at, norm_limb_count);
+    add_unsigned_limbs(
+        positive_limbs + norm_at, positive_scratch + norm_at, norm_limb_count);
+}
+
 extern "C" __global__ void conduct_coupled_complex_parametron(
     const uint8_t *primary_real_sign,
     const uint32_t *primary_real_limbs,

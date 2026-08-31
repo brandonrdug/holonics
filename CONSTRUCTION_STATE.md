@@ -4,21 +4,19 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-08-31, after the post-consolidation UAR/catalog readiness review. CONS0--CONS5
-remain complete. UAR4-R0Q0 is the exact next owner deed. QLT and CDB1 advanced no Athena grade.
+**Currency:** 2026-08-31, after retirement of the generated catalog apparatus and passage of
+UAR4-R0Q0--R0Q4. CONS0--CONS5 remain complete. QLT and CDB1 advanced no Athena grade.
 
 ## Current frontier
 
-**Current frontier:** UAR4-R0Q0
+**Current frontier:** UAR4-R0Q5
 
-**UAR4-R0Q0 — RETURN THE ADDRESSED RESPONSE/SOURCE/TARGET PAIR-CURRENT CARRIER — IS THE SOLE NEXT
-DEED.**
+**UAR4-R0Q5 — DIRECTLY CONSTRUCT AND REMOUNT THE SOURCE-NEUTRAL REST — IS THE SOLE NEXT DEED.**
 
-[definition] Return one consumed apparatus-neutral pair-current carrier preserving response face,
-source/target carrier/site/local port, factor, phase, complex coefficient, both boundary maps,
-orientation, chronology, zero-support complement, and complete reconstruction fibre. Record the
-exact source-neutral predecessor rebuild route, but do not rerun it before the current owners pass.
-No qualitative receiver runs in R0Q0.
+[definition] Construct one source-neutral rest directly through the current typed library owner,
+optionally serialize it as an exterior face, and remount it with historical source-bearing drivers
+and outputs unavailable. Audit the hot dependency closure and prove those removed artifacts cannot
+change the construction consequence. No qualitative receiver runs in R0Q5.
 
 ## Admitted standing
 
@@ -37,20 +35,29 @@ bounded grades. C0 returned the complete generated-port ecology step; C1 returne
 receiver-history quotient; C2 mounted its quotient/generator/fibre law on the existing CUDA context.
 The qualitative exterior receiver remained obstructed.
 
+[established-bounded; implemented-exact; measured] R0Q0/R0Q1 now retain one consumed
+`SourceNeutralAddressedRealizationPairCurrent` population through the linear junction, including
+native response occurrence and both realization endpoint maps. Ordinary generators cross the
+oriented cell successor incidence; exterior-boundary residuals remain diagonal. The focused
+control exhibited both populations and exact row conservation, and the complete `life` library
+suite returned 488 passed, zero failed, 15 ignored.
+
+[established-bounded; implemented-exact; measured] R0Q2 joins exact addressed complex pair currents and takes their
+positive receiver on the resident membrane CUDA context. The device cancellation control passed
+with zero intermediate semantic egress and no CPU replay. R0Q3 adds the selected complex section
+and addressed pair fibre to structural recurrence; equal norm with distinct quadrature separates.
+R0Q4 passed the focused owner/equality/telemetry controls; `holonic-engine` returned 1,982 passed,
+zero failed, 31 ignored and `life` returned 489 passed, zero failed, 15 ignored.
+
 ## Current obstruction
 
-[counterexample; source-inspected] The historical output artifacts were intentionally deleted as
-reproducible experiment output during CONS0. No `athena-sens6-cultivated.rest`,
-`athena-source-neutral.rest`, or UAR3 child rest is present. R0Q0 records the rebuild route; R0Q5
-rebuilds the admitted source-neutral predecessor chain and proves the source-bearing ALP4 rest
-unreachable afterward.
+[definition] Historical output files do not schedule reconstruction. R0Q5 constructs and remounts
+the source-neutral rest directly through the current typed owner; no ALP4/ALP5 file chain or
+source-bearing compatibility driver enters the productive closure.
 
-[counterexample; source-inspected] Post-consolidation inspection confirms the ordinary branch in
-`source_neutral_relational/realization.rs` still assigns
-`target_carrier = current.carrier`; only closure reads `successor_site`. The contribution
-carrier omits response-face address and the source carrier/site/local port. The complete complex
-contraction, positive receiver, selection, and successor formation still execute in `soma/life`
-after resident conduct while the earlier receipt reports no CPU semantic replay.
+[counterexample; source-inspected] The complete complex contraction, positive receiver, selection,
+and successor formation still execute in `soma/life` after resident conduct while the earlier
+receipt reports no CPU semantic replay. This is the current R0Q2 owner boundary.
 
 [counterexample; source-inspected] `SourceNeutralContinuationState` retains oriented native
 relational pairings and the positive exterior target-current family but omits the selected
@@ -62,22 +69,20 @@ identities, leaves mutual constitutive responses empty, and supplies identity tr
 Its subsidiary mechanisms remain evidence; aggregate UAR3 requires reconstruction from the actual
 pending emission and returned occurrence.
 
-[counterexample; process-audit; measured] The generated claim index, driver catalog,
-source/architecture baselines, equation atlas, registry incidence, and root manifests have current
-readers. The standing verifier refuses one unmanifested cold Gemma codebook. Identity/proposed-
-identity, owner, capability, correspondence/method, thematic research, and Millennium catalogs are
-dated snapshots. None may grade or schedule R0Q.
+[definition] `UNIVERSAL_CATALOG.md` is the sole Lean↔Rust/CUDA owner crosswalk. Historical ledgers,
+standing deposits, driver censuses, registry-incidence projections, and checksum manifests schedule
+nothing; their generated apparatus and release gates were removed under the direct user correction.
 
 ## Ordered return
 
 [definition] The active UAR blueprint owns the complete order:
 
-1. R0Q0 — addressed response/source/target pair-current carrier;
-2. R0Q1 — genuine ordinary off-diagonal site transport;
-3. R0Q2 — resident dependent complex contraction before the positive receiver;
-4. R0Q3 — full-complex structural recurrence and complete semantic-replay telemetry;
-5. R0Q4 — focused apparatus-neutral/resident equality and fibre gates;
-6. R0Q5 — source-neutral predecessor rebuild, closure audit, and source detachment;
+1. R0Q0 — addressed response/source/target pair-current carrier — **passed**;
+2. R0Q1 — genuine ordinary off-diagonal site transport — **passed**;
+3. R0Q2 — resident dependent complex contraction before the positive receiver — **passed**;
+4. R0Q3 — full-complex structural recurrence and complete semantic-replay telemetry — **passed**;
+5. R0Q4 — focused apparatus-neutral/resident equality and fibre gates — **passed**;
+6. R0Q5 — direct source-neutral rest construction, remount, and source-absence audit;
 7. R0Q6 — one unchanged smallest source-neutral qualitative receiver;
 8. actual UAR3 emission/world-return situated-difference revalidation; and
 9. one complete source-neutral UAR4 qualitative release.

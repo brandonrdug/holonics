@@ -947,6 +947,13 @@ pub(super) struct SourceNeutralContinuationState {
     /// realization meets it.  It participates in continuation equality; the selected surface
     /// alone never does.
     pub(super) exterior_realization_target_current: Vec<(u16, num_rational::Ratio<BigUint>)>,
+    /// Selected dependent complex section and its complete addressed response/source/target
+    /// fibre. These coordinates prevent equal positive shadows with distinct quadrature from
+    /// becoming one recurrent state.
+    pub(super) returned_complex_realization_section:
+        Vec<SourceNeutralExteriorRealizationComplexSiteCurrent>,
+    pub(super) returned_complex_realization_pairs:
+        Vec<SourceNeutralAddressedRealizationPairCurrent>,
     pub(super) reconstruction_dag: Vec<GranularReconstructionNode>,
     pub(super) local_balance_closes: bool,
 }
@@ -1116,6 +1123,15 @@ impl SourceNeutralContinuationState {
                 .target_current
                 .iter()
                 .map(|target| (target.target_port, target.current.clone()))
+                .collect(),
+            returned_complex_realization_section: realization
+                .returned_complex_site_current
+                .clone(),
+            returned_complex_realization_pairs: realization
+                .pair_currents
+                .iter()
+                .filter(|pair| pair.exterior_target_port == realization.selected_target_port)
+                .cloned()
                 .collect(),
             reconstruction_dag: section.reconstruction_dag.clone(),
             local_balance_closes: section.radiation.local_balance_closes,
@@ -1298,6 +1314,8 @@ pub(super) fn found_continuation_receiver_history(
         exact_receiver_classes(&states, |state| &state.relational_projective_faces)?,
         exact_receiver_classes(&states, |state| &state.downstream_port_projection)?,
         exact_receiver_classes(&states, |state| &state.exterior_realization_target_current)?,
+        exact_receiver_classes(&states, |state| &state.returned_complex_realization_section)?,
+        exact_receiver_classes(&states, |state| &state.returned_complex_realization_pairs)?,
         exact_receiver_classes(&states, |state| &state.reconstruction_dag)?,
         exact_receiver_classes(&states, |state| &state.local_balance_closes)?,
     ];
@@ -1339,4 +1357,77 @@ pub(super) fn found_continuation_receiver_history(
         structural_equality_used: true,
         digest_equality_used: false,
     })
+}
+
+#[cfg(test)]
+mod continuation_tests {
+    use super::*;
+    use crate::athena_native::SourceNeutralAddressedResponsePairCurrent;
+
+    fn state_with_pair(current: ExactComplexWaveCurrent) -> SourceNeutralContinuationState {
+        SourceNeutralContinuationState {
+            canonical_receiver_section: vec![BigInt::from(1)],
+            complete_successor_addressed_faces: Vec::new(),
+            situated_projective_faces: Vec::new(),
+            relational_projective_faces: Vec::new(),
+            relational_oriented_pairings: Vec::new(),
+            phase_front_higher_faces: Vec::new(),
+            situated_receiver_higher_faces: Vec::new(),
+            downstream_port_projection: Vec::new(),
+            exterior_realization_target_current: vec![(
+                3,
+                num_rational::Ratio::from_integer(BigUint::from(1_u8)),
+            )],
+            returned_complex_realization_section: Vec::new(),
+            returned_complex_realization_pairs: vec![
+                SourceNeutralAddressedRealizationPairCurrent {
+                    response: SourceNeutralAddressedResponsePairCurrent {
+                        response_face: 0,
+                        native_port: 0,
+                        native_generator: 0,
+                        source_section: 0,
+                        selected_slot: 0,
+                        target_section: 0,
+                        factor: 0,
+                        current: current.clone(),
+                    },
+                    source_carrier: 0,
+                    source_site: 0,
+                    source_local_port: 0,
+                    target_carrier: 1,
+                    target_site: 1,
+                    target_local_port: 3,
+                    exterior_target_port: 3,
+                    factor: 0,
+                    phase: 0,
+                    current,
+                },
+            ],
+            reconstruction_dag: Vec::new(),
+            local_balance_closes: true,
+        }
+    }
+
+    #[test]
+    fn equal_positive_shadow_with_distinct_quadrature_does_not_recur() {
+        let real = state_with_pair(ExactComplexWaveCurrent::one());
+        let imaginary = state_with_pair(ExactComplexWaveCurrent::new(
+            Rat::zero(),
+            Rat::from_integer(BigInt::from(1)),
+        ));
+        assert_eq!(
+            real.returned_complex_realization_pairs[0]
+                .current
+                .norm_square(),
+            imaginary.returned_complex_realization_pairs[0]
+                .current
+                .norm_square()
+        );
+        assert_ne!(real, imaginary);
+        let classes = exact_receiver_classes(&[real, imaginary], |state| {
+            &state.returned_complex_realization_pairs
+        })
+        .expect("the full complex receiver separates the pair");
+        assert_ne!(classes[0], classes[1]);
+    }
 }

@@ -1147,7 +1147,7 @@ pub(super) fn common_real_denominator(front: &[Rat]) -> Result<BigInt, CudaRefin
     Ok(common)
 }
 
-fn common_complex_denominator(
+pub(super) fn common_complex_denominator(
     front: &[ExactComplexWaveCurrent],
 ) -> Result<BigInt, CudaRefineError> {
     let mut common = BigInt::one();

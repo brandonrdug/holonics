@@ -12,8 +12,8 @@ Are you just rehashing weird implementation choices of yours from past sessions 
 example experiments and acting like they somehow constrain us? … It's just fucking text."* And the
 ruling that follows it: *"Authoritatively supersede whatever the 'parser' thing you just identified
 is, it has been a contaminant that you passed off as something foundational during experiments."*
-**Anti-reinvention:** every station below was checked against `canon/THE_DRIVER_ATLAS.md` §3's
-mechanism index and `meta/DRIVER_CATALOG.tsv` before being written. **Seven of the eight stations
+**Anti-reinvention:** every station below was checked against the source owners now summarized in
+`UNIVERSAL_CATALOG.md` before being written. **Seven of the eight stations
 are wires, removals, or one type generalization of a standing organ.** The atlas's own rule governs:
 *"A construction proposed for a row here is a rebuild."*
 
@@ -446,7 +446,7 @@ supersedes it.
 | `blueprint/THE_ROADMAP.md:165` and `:1811` | the centrifuge step naming `statement_grammar` as the reader to use is superseded in place |
 | `CONSTRUCTION_STATE.md:622` | superseded in place |
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` Stage 5 | **struck** — *"the return must adjudicate"* names the Lean kernel as the adjudicating exterior on mathematics, which is the refused route |
-| `canon/THE_DRIVER_ATLAS.md` §1 grade table | repaired — **closes** currently requires an adjudicating exterior, which pulls every driver toward a kernel by vocabulary alone |
+| retired driver-grade table | historical correction — **closes** had required an adjudicating exterior, pulling drivers toward a kernel by vocabulary alone |
 | `research/records/2026-08-17_ONE_ORGAN_THREE_CODECS…md` §5 | the adjudicator row naming *"the compiler and the test suite"* for code is struck; its interpreter-free replacement stands as `soma/life/src/algorithmic_material.rs` |
 
 ---

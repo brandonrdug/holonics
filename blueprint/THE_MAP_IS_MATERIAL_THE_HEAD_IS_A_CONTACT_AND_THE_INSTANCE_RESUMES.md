@@ -251,7 +251,7 @@ Measured 2026-08-18 by `grep -rln` over `crates/*/src` and `soma/*/src`, quoted:
 `grep -rln "safetensors" --include='*.rs' crates soma`, 2026-08-18: **five private parsers in
 drivers** against one library owner, plus **six private `bfloat16` decoders**. The fifth parser is
 the only F32-capable one — needed for GPT-2 — reading a dtype the library module refuses by name
-(`ADMITTED_DTYPE = "BF16"`). `canon/THE_DRIVER_ATLAS.md:293` already convicted the pattern: *"three
+(`ADMITTED_DTYPE = "BF16"`). The later universal owner catalog retains the relevant boundary: *"three
 separately written safetensors readers are three implementations of one intake."* It is now five.
 
 ### 2.4 The material is on the disk and mostly unread
@@ -288,7 +288,7 @@ What does not exist is anything that does it habitually:
   leading magic: `OSER` 13,167 · `TSRE` 683 · `CDER` 4 · `HTEC` 2 · everything else 71. **687 of
   13,927 — 4.9% — carry a codec the plate holds**, and the two `HTEC` refuse on version because the
   codec moved to `2` and nothing re-emitted the form.
-- **`standing/MANIFEST.txt` holds 104 returns, all `.lean`/`.txt`. Zero forms. Zero plates.** Ten
+- **The retired standing-deposit snapshot held 104 `.lean`/`.txt` returns and no forms or plates.** Ten
   gigabytes of returned bodies sit in the gitignored directory `standing/README.md` names as the
   mechanism that destroyed the laboratory's tiger figures.
 - **`[[bin]] eros` is on the wrong side of a Cargo edge.** `THE_ASSEMBLY.md` fact F1: `holon-plate`
@@ -601,7 +601,7 @@ missing constitutive relation is named rather than papered over.**
 2. **`ErosRest` becomes a plate schema.** `EROS_REST_PREFIX` exists; the registry does not hold it.
    Its three controls are already specified and two have fired.
 3. **`eros seal` / `resume` / `produce` are wired**, and `eros stations` stops printing `unwired`.
-4. **Forms are deposited into `standing/`** through `soma/tools/standing-deposit`, which binds a
+4. **Historical forms were deposited into a retired standing registry.** The live body instead binds a
    content hash and a closure hash and has never been pointed at a form.
 5. **A codec-version bump re-emits its forms**, so a wire moving does not silently orphan the deposit
    — as it already has for `HTEC`.
@@ -633,9 +633,9 @@ Each is measured and each is a live error in a governing document.
 - **`soma/tools/holon-plate/tests/plate_mouth.rs` says no driver's own material is known to produce a
   canonical form.** It does — `CDER` and `ERST` both deposit, resume and take a deed, measured
   2026-08-18.
-- **`CLAUDE.md` cites 180 authored numeric levels at 2026-08-09; `meta/AUTHORED_LEVELS.tsv` carries
-  382 today**, and `canon/THE_AUTHORED_LEVEL.md`'s excision accounting is written against the smaller
-  number.
+- **Historical 2026-08-18 finding:** the generated authored-level census disagreed with the prose.
+  That census was retired on 2026-08-31; `canon/THE_AUTHORED_LEVEL.md` now keeps the law without a
+  generated registry.
 - **`canon/THE_TIMELINE.md` has no rows for 08-16, 08-17 or 08-18** — stale by exactly the three days
   that carry this line's peak.
 - **`CONSTRUCTION_STATE.md`'s 2026-08-18 row overstates** what the superseded plan achieved and is
@@ -648,9 +648,8 @@ Each is measured and each is a live error in a governing document.
 - **`tools/claim_index.py` globs `2026-08-*.md`**, so 292 July records are outside it — and **0 of
   them carry a `Truth status:` line**, using `GRADE:` / `Status:` instead. Widening the glob is not
   enough; the grade parser needs the July variants.
-- **`tools/closure_manifest.py` reports thirteen orphans and eight have a producer**, because the
-  join is keyed on the driver's stem and looks for `lean_proof_production` while the driver is
-  `eros_lean_proof_production`. A false absence in a file a gate reads.
+- **Historical 2026-08-18 finding:** the generated closure ledger reported thirteen orphans and
+  eight had a producer. The false census and its gate were retired on 2026-08-31.
 - **`canon/THE_INFORMATION_ENGINE.md`'s cycle table lists `soma/abi/src/conduct.rs` `conduct_current`
   as the **conduct** station, `WIRED`.** Measured 2026-08-18: `CurrentConduct`, `conduct_current`,
   `ConductTarget` and `EventContact` each return **0** occurrences over `crates` and `soma` outside

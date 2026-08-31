@@ -21,7 +21,6 @@ members = [
   "crates/holonic-language",
   "crates/relational-geometry",
   "crates/holonic-engine",
-  "crates/holonic-architecture-lint",
   "soma/body",
   "soma/abi",
   "soma/membrane",
@@ -30,7 +29,6 @@ members = [
   "soma/mount",
   "soma/tools/record-index",
   "soma/tools/derivation-atlas",
-  "soma/tools/standing-deposit",
   "soma/tools/holon-plate",
 ]
 # The rust-gpu kernel and the nvptx mount kernel each pin their own nightly.

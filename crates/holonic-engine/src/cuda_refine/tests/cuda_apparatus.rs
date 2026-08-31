@@ -99,6 +99,81 @@ fn the_resident_complex_incidence_carries_phase_without_binary_collapse() {
     );
 }
 
+#[test]
+#[ignore = "requires the RTX CUDA device"]
+fn addressed_complex_junction_joins_before_the_positive_receiver() {
+    let card = CudaRefineExecutor::new().expect("the card mounts");
+    let mut resident = ResidentMembraneInteriorWord::mount(
+        card,
+        &[1],
+        &[0, 1],
+        &[0],
+        &[1],
+        &[1],
+        &[1],
+        &[ExactComplexWaveCurrent::one()],
+    )
+    .expect("the membrane context mounts");
+    let current = |real: i64, imaginary: i64| {
+        ExactComplexWaveCurrent::new(
+            Rat::from_integer(BigInt::from(real)),
+            Rat::from_integer(BigInt::from(imaginary)),
+        )
+    };
+    let returned = resident
+        .conduct_addressed_complex_junction(&[
+            ResidentAddressedComplexJunctionTerm {
+                occurrence: 0,
+                target_site: 3,
+                exterior_port: 7,
+                factor: 0,
+                current: current(1, 0),
+            },
+            ResidentAddressedComplexJunctionTerm {
+                occurrence: 1,
+                target_site: 5,
+                exterior_port: 7,
+                factor: 0,
+                current: current(-1, 0),
+            },
+            ResidentAddressedComplexJunctionTerm {
+                occurrence: 2,
+                target_site: 3,
+                exterior_port: 8,
+                factor: 0,
+                current: current(1, 2),
+            },
+            ResidentAddressedComplexJunctionTerm {
+                occurrence: 3,
+                target_site: 5,
+                exterior_port: 8,
+                factor: 0,
+                current: current(2, -1),
+            },
+        ])
+        .expect("the resident junction returns");
+    assert_eq!(returned.groups.len(), 2);
+    assert_eq!(returned.groups[0].exterior_port, 7);
+    assert!(returned.groups[0].joined_current.is_zero());
+    assert!(returned.groups[0].positive_numerator.is_zero());
+    assert_eq!(returned.groups[1].exterior_port, 8);
+    assert_eq!(returned.groups[1].joined_current, current(3, 1));
+    assert_eq!(returned.groups[1].positive_numerator, BigUint::from(10_u8));
+    assert_eq!(
+        returned.groups[1].target_sections,
+        vec![(3, vec![2]), (5, vec![3])]
+    );
+    assert_eq!(returned.positive_denominator, BigUint::from(1_u8));
+    assert_eq!(returned.launches, 1);
+    assert_eq!(returned.synchronizations, 1);
+    assert_eq!(returned.intermediate_semantic_egress_octets, 0);
+    assert!(!returned.invariant_transport_reuploaded);
+    assert!(!returned.cpu_semantic_replay_after_device);
+    let mut replayed = returned.clone();
+    replayed.record_post_device_cpu_semantic_step();
+    assert!(replayed.cpu_semantic_replay_after_device);
+}
+
 /// The exact causal-adjoint receipt derives its own finite population and refuses a ragged
 /// substitute before any card is mounted.
 #[test]

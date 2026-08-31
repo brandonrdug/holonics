@@ -43,9 +43,9 @@ use crate::{
 const CUDA_SUCCESS: i32 = 0;
 /// **The launch geometry, read off the device and the kernel — never authored.**
 ///
-/// This module carried `const THREADS_PER_BLOCK: u32 = 128` until 2026-08-10, dispositioned `ABI`
-/// in `meta/AUTHORED_LEVELS.tsv` with the reason *"CUDA launch geometry, fixed by the device
-/// interface."* **That reason was false.** Launch geometry is queryable, and `soma/mount` has
+/// This module carried `const THREADS_PER_BLOCK: u32 = 128` until 2026-08-10, historically called
+/// an ABI level because launch geometry was said to be fixed by the device interface. **That reason
+/// was false.** Launch geometry is queryable, and `soma/mount` has
 /// derived it correctly all along: `min(the function's own MAX_THREADS_PER_BLOCK, the device's)`,
 /// grid from the work extent, refused rather than clipped when it exceeds the grid aperture.
 ///

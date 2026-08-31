@@ -217,21 +217,14 @@ evidence.
 The C++-era observations are at `archive/cpp-engine/evidence/observations/` — 139 directories, 118
 with a `RESULTS.md`. They are `historical` and the live genre is empty (§7).
 
-### 1.9 Ownership ledger — `HOLONIC_OWNERSHIP.md`
+### 1.9 Universal formal–executable catalog — `UNIVERSAL_CATALOG.md`
 
-**Authority:** evidence about the code layout. A dependency-direction graph, then a table:
-`owner | responsibility | must not own`.
+**Authority:** descriptive navigation over the live code layout. It connects each common
+mathematical carrier to its Lean, Rust, and CUDA owners and states the exact open fibre.
 
-**The `must not own` column is the point.** It names, per owner, the specific concrete things that
-keep getting re-implemented in the wrong place. That column is what routes a claim to a file, and
-it is the reason the ledger is a genre rather than a comment.
-
-The executable form of this ledger is `crates/holonic-architecture-lint`. Its baseline path and
-protected roots were both wrong for this layout, exactly as §7 recorded; **both were repaired
-2026-08-10** and it runs as the last gate of `tools/gates.sh`, against a census emitted from a
-detached worktree of the commit at `meta/HOLONIC_DSA_BASELINE.tsv`. The ledger and the lint must
-agree; where they disagree, the code governs and the ledger is corrected. **The ledger document
-itself is still absent** — that half of §7's row remains open.
+The catalog has no generator, checksum, census, or release gate. Correspondence is a mathematical
+and implementation judgment made in the same coherent change that moves an owner. It schedules
+nothing; `blueprint/THE_ROADMAP.md` and `CONSTRUCTION_STATE.md` retain that authority.
 
 ### 1.10 Archive — `archive/`, `reference/`
 
@@ -720,8 +713,9 @@ returns empty against 1,651 renames.
 **Rows struck through below were closed later on 2026-08-07** by the movement "The record names the
 body it has", which rewrote `CLAUDE.md` §0/§11/§13 against the Rust body, made
 `CONSTRUCTION_STATE.md` a live position record, banner-demoted eleven blueprint files, and deposited
-`tools/resolve_named_paths.py` — a permanent mechanical check that every path a live document names
-resolves in the live tree. The remaining rows are unchanged and remain `open`.
+the now-retired named-path census. It helped expose the transition damage, but was never semantic
+construction authority and was removed on 2026-08-31 in favor of coherent owner review and the
+manual `UNIVERSAL_CATALOG.md` crosswalk. The remaining historical rows are unchanged.
 
 | Defect | Measurement | Genre affected |
 |---|---|---|

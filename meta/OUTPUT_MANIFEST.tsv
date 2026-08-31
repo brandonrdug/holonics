@@ -1,8 +1,0 @@
-# Content addresses of the returns under `output/`, which git does not track.
-# One row per driver. `sha256` is taken over the sorted addresses of that driver's
-# artifacts, so it moves if any byte of any artifact moves.
-# Regenerate: python3 tools/output_manifest.py
-# Verify:     python3 tools/output_manifest.py --check
-# Listing:    python3 tools/output_manifest.py --files
-# 0 drivers, 0 returns, 0 bytes.
-sha256	returns	bytes	driver

@@ -7,13 +7,8 @@ publish = false
 # The plate is a container and a mouth, not a codec. Every octet it holds is
 # produced by a form codec that already exists in this body, so the dependency
 # list is exactly: the two codecs whose schemas it holds, and the deposit
-# ledger whose SHA-256 it reuses.
-#
-# `soma-standing-deposit` carries its own written-out, three-way cross-checked
-# SHA-256 for the reason its README gives -- a registry that verified deposits
-# through a crate it did not itself verify would have moved the trust rather
-# than established it. The plate inherits that verification rather than adding
-# a second hash dependency beside it.
+# container seal. The seal is an internal wire-integrity field, never repository
+# authority or semantic identity.
 #
 # `holonic-engine` is the third codec's owner: `graded_complex_form` writes the
 # canonical octets of a `GradedCausalComplex` and `rebase_invariants` takes the
@@ -22,7 +17,7 @@ publish = false
 # carried -- `blueprint/THE_ASSEMBLY.md` F1 is about a `life` example calling
 # UP into the plate, which nothing here does.
 [dependencies]
-soma-standing-deposit = { path = "../standing-deposit" }
+sha2 = "0.10"
 soma-membrane = { path = "../../membrane" }
 soma-abi = { path = "../../abi" }
 body = { path = "../../body" }

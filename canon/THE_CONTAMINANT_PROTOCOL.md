@@ -392,7 +392,8 @@ vary the property under test"* applied to the repair.
 
 - Every figure taken by running, carrying its commit; a gate figure carries its clock time.
 - Every grade quoted verbatim from the line that carries it.
-- `python3 tools/resolve_named_paths.py` returns zero failures.
+- Every live owner address introduced or moved by the deposit is reviewed against the tree in that
+  same coherent change.
 - No authored level introduced; if one was, it is dispositioned in the same commit.
 - The record exists, the canon points at it, the owners point back (`canon/THE_DOCUMENT_LAW.md` §4.5).
 
@@ -454,6 +455,7 @@ figure — one route, no second reading.
 - **Its own completeness.** Eight species because eight have verified instances. A ninth will be found
   the way these were, and §1 law 2 governs what happens next.
 
-**It has no gate.** `tools/authored_levels.py --check` and `tools/resolve_named_paths.py` exist and
-are useful; neither is a precondition of following this document, and **neither being unable to see a
-class of defect is ever a reason to leave one standing.**
+**It has no gate.** The former authored-level registry and path-census scripts were retired on
+2026-08-31 because their regex populations were neither semantic owners nor construction
+authority. Reading, derivation, focused tests, and review of the changed owner remain the required
+work; the absence of a census is never a reason to leave a defect standing.

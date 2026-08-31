@@ -556,8 +556,8 @@ The corpus grows, so every row carries its clock.
 
 **The last row is a repair, not corpus growth.** `saturation_horizon` returned `last_split.max(1)`,
 so a surface no shell ever split — each of the 10,676 occurs exactly once, and has nothing to
-separate — reported a least final radius of `1`. The floor was invisible to
-`tools/authored_levels.py` because it is not a `const`, and its unit test was guarded
+separate — reported a least final radius of `1`. The floor was invisible to a numeric-literal
+census because it is not a `const`, and its unit test was guarded
 `if horizon > 1`, excluding exactly the case the floor decided. The card carried the identical floor
 in `cuda_refine.rs`; both now return `0`, and `the_card_refines_the_front` re-run on an RTX 4080
 SUPER agrees with the CPU on every surface it reads — **18,911 of 18,911** at the first re-run and

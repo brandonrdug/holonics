@@ -52,8 +52,8 @@
 //!
 //! What IS a contaminant, and it is in the engine's own device path: `cuda_aperture.rs:44` carries
 //! `const THREADS_PER_BLOCK: u32 = 128` and `cuda_relation.rs` carries `128` and `256`, all three
-//! dispositioned `ABI` in `meta/AUTHORED_LEVELS.tsv` with the reason *"CUDA launch geometry, fixed
-//! by the device interface."* **That reason is false**, and `soma/mount` proves it by deriving the
+//! historically called ABI levels because launch geometry was said to be fixed by the device
+//! interface. **That reason is false**, and `soma/mount` proves it by deriving the
 //! same quantity from the driver. Those two engine modules declare no device-attribute call at all,
 //! so they know the card's *name* and nothing about its shape — while a sibling stack in the same
 //! repository does it correctly.

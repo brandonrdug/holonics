@@ -2096,8 +2096,8 @@ pub struct SaturationHorizon {
     /// were never separated by the cone at any radius the material admits, either because there is
     /// at most one of them or because they are indistinguishable to this receiver at every depth.
     /// The field carried `last_split.max(1)` until 2026-08-11, which reported a radius of one for a
-    /// surface whose least final radius is zero — an authored floor, invisible to
-    /// `tools/authored_levels.py` because it is not a `const`, and shielded from its own unit test
+    /// surface whose least final radius is zero — an authored floor, invisible to a numeric-literal
+    /// census because it is not a `const`, and shielded from its own unit test
     /// by an `if horizon > 1` guard that excluded exactly the case the floor decided.
     pub horizon: usize,
     /// **This surface's own ceiling**, from [`surface_horizon_bound`] — the furthest shell any of

@@ -12,20 +12,22 @@ Read, in order:
 3. this file in full;
 4. [`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md) and
    [`canon/EPISTEMIC_GRADES.md`](../canon/EPISTEMIC_GRADES.md);
-5. [`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
+5. [`UNIVERSAL_CATALOG.md`](../UNIVERSAL_CATALOG.md), the descriptive Lean–Rust–CUDA owner
+   crosswalk;
+6. [`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
    [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
    [`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
    [`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md), and
    [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md);
-6. the active UAR contract,
+7. the active UAR contract,
    [`THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md`](THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md),
    and its exact checkout obstruction,
    [`research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md`](../research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md); and
-7. the completed formal prerequisites,
+8. the completed formal prerequisites,
    [`THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md`](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md)
    and
    [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md).
-8. while a `QLT` phase is current, the finite many-body and polarized-crystal contract,
+9. while a `QLT` phase is current, the finite many-body and polarized-crystal contract,
    [`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
@@ -161,6 +163,10 @@ epistemic-tag, claim-index, equation-atlas, driver-catalog, output/closure-manif
 boundary-artifact, Typst, architecture, document-law, and tracked-authority receivers are green.
 CUDA symbol parity traverses both the CUDA include closure and the owner-local Rust module tree.
 
+[historical] The driver census, registry-incidence ledger, standing-deposit verifier, and
+checksum-manifest gates were retired after CONS5 by Brandon's direct correction. Their old receipts
+remain historical evidence; they are not current repository policy or UAR prerequisites.
+
 ### CONS3 — split and simplify existing Rust/CUDA owners — PASSED
 
 [definition] Preserve one non-cloneable CUDA context and one continuing ecology while separating
@@ -224,36 +230,41 @@ commit `9456a4ae` was pushed to `origin/main`.
 
 ## Active campaign — UAR resumes
 
-**Current frontier:** UAR4-R0Q0
+**Current frontier:** UAR4-R0Q5
 
-**UAR4-R0Q0 IS THE SOLE NEXT DEED.**
+**UAR4-R0Q5 IS THE SOLE NEXT DEED.**
 
 [open] UAR4-R0Q resumes after CONS5. Its active blueprint is the UAR contract named in fresh
 pickup. The immediate implementation obligations are narrower than that blueprint's historical
 narrative:
 
-1. retain response-face address, source and target realization sites, local port, factor, phase,
-   both boundary maps, and complete reconstruction fibre through the target junction;
-2. enact genuine ordinary off-diagonal `z -> z'` transport rather than retaining the same carrier;
-3. linearly join the dependent exact complex current on the resident GPU before any positive
-   constitutive receiver;
-4. make recurrence structural over the full complex continuation state; SHA-256 is receipt only;
-5. make CPU semantic replay telemetry cover the complete post-device passage; and
+1. [implemented-exact; measured] retain response-face address, source and target realization sites,
+   local port, factor, phase, both boundary maps, and complete reconstruction fibre through the
+   target junction;
+2. [implemented-exact; measured] enact genuine ordinary off-diagonal `z -> z'` transport rather
+   than retaining the same carrier;
+3. [implemented-exact; measured] linearly join the dependent exact complex current on the resident
+   GPU before any positive constitutive receiver;
+4. [implemented-exact; measured] make recurrence structural over the full complex continuation
+   state; SHA-256 is receipt only;
+5. [implemented-exact; measured] make CPU semantic replay telemetry cover the complete post-device
+   passage; and
 6. revalidate UAR3's actual emission/world-return situated difference without representative event
    invention before relying on its child grade.
 
 [definition] The ordered return is:
 
-1. `UAR4-R0Q0` — admit one addressed response/source/target pair-current carrier and its complete
-   reconstruction fibre;
-2. `UAR4-R0Q1` — enact and exhibit an ordinary off-diagonal `z -> z'` passage;
-3. `UAR4-R0Q2` — move the sparse dependent complex target/port contraction and later positive
-   receiver onto the resident CUDA word;
-4. `UAR4-R0Q3` — make full complex continuation structural and make telemetry cover every semantic
-   operation after device conduct;
-5. `UAR4-R0Q4` — pass the focused apparatus-neutral/resident equality and fibre falsifiers;
-6. `UAR4-R0Q5` — rebuild/audit the source-neutral predecessor and detach the source-bearing
-   transition material;
+1. `UAR4-R0Q0` — **passed**: admit one addressed response/source/target pair-current carrier and its
+   complete reconstruction fibre;
+2. `UAR4-R0Q1` — **passed**: enact and exhibit an ordinary off-diagonal `z -> z'` passage;
+3. `UAR4-R0Q2` — **passed**: move the sparse dependent complex target/port contraction and later
+   positive receiver onto the resident CUDA word;
+4. `UAR4-R0Q3` — **passed**: make full complex continuation structural and make telemetry cover
+   every semantic operation after device conduct;
+5. `UAR4-R0Q4` — **passed**: pass the focused apparatus-neutral/resident equality and fibre
+   falsifiers;
+6. `UAR4-R0Q5` — directly construct/remount the source-neutral rest with no historical
+   source-bearing file chain;
 7. `UAR4-R0Q6` — run the unchanged smallest source-neutral qualitative receiver once;
 8. revalidate the actual UAR3 emission/world-return situated difference, child, withdrawal,
    restoration, remount, and later conduct; and

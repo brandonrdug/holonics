@@ -66,8 +66,7 @@ A document escapes the law by carrying an archive or supersession banner, which 
 superseded plan is supposed to carry.
 
 WHAT IS SCANNED. The operating contract, the position record, all of `canon/`, all of `blueprint/`.
-Not `research/records/` — a record is dated evidence whose absence claims are their own provenance,
-the same boundary `resolve_named_paths.py` and `resolve_line_citations.py` draw.
+Not `research/records/` — a record is dated evidence whose absence claims are their own provenance.
 
 LAW THREE — THE POSITION RECORD AND ROADMAP NAME ONE IDENTICAL SOLE NEXT DEED.
 
