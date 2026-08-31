@@ -32,9 +32,9 @@ are provenance, not pickup obligations.
 
 ## Active campaign — repository consolidation before UAR resumes
 
-**Current frontier:** CONS1
+**Current frontier:** CONS3
 
-**CONS1 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
+**CONS3 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
 
 [definition] Brandon directly authorized this consolidation and the destructive removal of ignored
 `target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
@@ -54,7 +54,7 @@ applied without dropping it, restoring the working population.
 `/home/b/Workspaces/holonics/output` were deleted under the direct authorization. Filesystem free
 space increased from 199 GiB to 522 GiB. Neither path was tracked.
 
-### CONS1 — partition and restore one durable authority — ACTIVE
+### CONS1 — partition and restore one durable authority — PASSED
 
 [definition] Classify every remaining modified and untracked path as active implementation,
 admitted formal work, governance/evidence, historical archive material, or disposable generated
@@ -72,7 +72,11 @@ wholesale.
   as live schedule; and
 - coherent commit groups are identified before staging.
 
-### CONS2 — repair the validation and closure apparatus
+[established-bounded; measured] The complete restored source/evidence population is tracked by
+commit `c905404`; ignored build/output material is absent; the pre-consolidation stash remains
+recoverable; document law reports one frontier and no subordinate scheduler.
+
+### CONS2 — repair the validation and closure apparatus — PASSED
 
 [definition] Make the repository reject the failure modes exposed by the audit rather than merely
 describe them.
@@ -91,7 +95,12 @@ describe them.
 - the Lean receiver builds one declared umbrella from the live tree without archive fallback; and
 - every invoked nontrivial process carries its own 180-second outer boundary.
 
-### CONS3 — split and simplify existing Rust/CUDA owners
+[established-bounded; measured] Source-shape, authored-level, named-path, line-citation,
+epistemic-tag, claim-index, equation-atlas, driver-catalog, output/closure-manifest,
+boundary-artifact, Typst, architecture, document-law, and tracked-authority receivers are green.
+CUDA symbol parity traverses both the CUDA include closure and the owner-local Rust module tree.
+
+### CONS3 — split and simplify existing Rust/CUDA owners — ACTIVE
 
 [definition] Preserve one non-cloneable CUDA context and one continuing ecology while separating
 source files along already-founded owners:
@@ -109,9 +118,11 @@ caller, preserve compatibility aliases, duplicate receiver equality in drivers, 
 handle which is never launched. Move substantial example-local algorithms to an admitted library
 owner or archive the example and retain its evidence.
 
-**Pass CONS3:** focused owner tests and exact direct/resident equality pass; the architecture
-ratchet is green without increasing a violation baseline; trace configuration is read once; digest
-syntax and wire hashing have typed owners; structural equality remains primary.
+**Pass CONS3:** focused owner tests and exact direct/resident equality pass; after the committed
+restoration snapshot establishes the newly tracked owners, the architecture gate is green without
+any later baseline increase; trace configuration is read once; digest syntax and wire hashing have
+typed owners; structural equality remains primary; and no remaining production execution method
+is a multi-thousand-line foreman.
 
 ### CONS4 — consolidate the live Lean line
 

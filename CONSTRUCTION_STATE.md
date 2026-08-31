@@ -5,15 +5,15 @@
 Historical phase detail remains in Git, dated research records, and the campaign blueprints named
 by the roadmap.
 
-**Currency:** 2026-08-30, after Brandon directly authorized a repository-wide consolidation and
-housekeeping pass. UAR is frozen. Consolidation does not advance an Athena grade.
+**Currency:** 2026-08-31, after the restored population was committed, validation apparatus was
+repaired, and the first structural split returned. UAR is frozen. Consolidation does not advance
+an Athena grade.
 
 ## Current frontier
 
-**Current frontier:** CONS1
+**Current frontier:** CONS3
 
-**CONS1 — PARTITION THE PRESERVED WORKING POPULATION AND RESTORE ONE DURABLE AUTHORITY — IS THE
-SOLE NEXT DEED.**
+**CONS3 — SPLIT AND SIMPLIFY EXISTING RUST/CUDA OWNERS — IS THE SOLE NEXT DEED.**
 
 [established-bounded; measured] CONS0 preserved the complete non-ignored dirty tree in recoverable
 Git stash `stash@{0}` / object
@@ -40,6 +40,36 @@ record were not present in `HEAD`. A clean checkout could not reconstruct the cl
 - driver catalog: 19 missing targets; and
 - output manifest before authorized removal: 49 unrecorded roots and one moved root.
 
+## Returned consolidation position
+
+[established-bounded; measured] CONS1 and CONS2 passed. Commit `c905404` tracks the complete
+restored source/evidence population; `53e7890` moves formal-test scratch outside repository output;
+`7c82582` records the committed architecture baseline. The original
+`pre-consolidation-2026-08-30-uar-housekeeping` stash remains intact.
+
+[established-bounded; implemented-exact; measured] The Rust CUDA owner fell from 32,809 lines to a
+4,386-line coordinator plus owner-local modules, all at most 1,389 lines. Driver/context,
+partition refinement, membrane planning/workspace/return, receiver-history, factored transport,
+device ecology, trace configuration, and tests now have separate owners. The remaining hotspot is
+`conduct_quadratic_moment_front_inner` at 2,787 lines; splitting its contraction/receiver/readback
+phases without changing the single terminal synchronization is the shortest open CONS3 deed.
+
+[established-bounded; implemented-exact; measured] The four new Life foremen were split into
+owner-local modules: perspective emanation, membrane radiation, granular potential, and laboratory
+cultivation. Lost `bind_occurrence` and `founded_interior_contact` owners were recovered from the
+preserved source line, and dead example-only standing/excitation storage was removed.
+
+[established-bounded; formal-checked; measured] Validation returned 1,984 engine tests plus the
+separately bounded long Mordell--Weil test, 486 Life tests, and 465 tests in the remaining workspace
+packages: 2,935 passed, zero failed, 49 ignored. Every workspace example type-checked with warnings
+denied; CUDA symbol parity passed; the Lean production umbrella built 3,181 jobs; all sixteen
+non-test release receivers passed individually.
+
+[counterexample; measured] One complete `bash tools/gates.sh` invocation reached the required
+180-second outer boundary before its first summary and is not reported as passed. The same test
+population was therefore partitioned into bounded package receivers. This is process-bound evidence,
+not a code or theorem failure.
+
 ## Consolidation contract
 
 [definition] CONS1 partitions every remaining modified or untracked path into exactly one of:
@@ -54,9 +84,9 @@ record were not present in `HEAD`. A clean checkout could not reconstruct the cl
 raised around existing violations. No historical phase prose is copied back into this position
 record.
 
-[definition] The ordered later consolidation deeds are CONS2 through CONS5 in the live roadmap:
-repair the gates; split and simplify existing Rust/CUDA owners; consolidate the Lean line; then
-validate, commit, and push the coherent tree.
+[definition] CONS1 and CONS2 are closed. CONS3 remains active at the named moment-front execution
+owner. The Lean production umbrella already returns the CONS4 build receiver, but ordered campaign
+advancement waits for CONS3. CONS5 remains the clean release/push junction.
 
 ## Parked UAR position
 
