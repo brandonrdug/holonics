@@ -37,6 +37,7 @@ pub mod current_world;
 // engine's `receiver_exact_compression`, and only `life` depends on both.
 pub mod decomposing_codec;
 pub mod dialogue_lineage;
+pub mod dialogue_native_spool;
 pub mod exact_world;
 // The codec of a real material, recovered from exposure alone. `holonic-engine`'s `codec_recovery`
 // recovers a tokenizer from an oracle it may call; this recovers one from octets that merely
