@@ -3,7 +3,8 @@
 use std::{
     collections::BTreeMap,
     ffi::OsString,
-    fs,
+    fs::{self, File},
+    io::{BufReader, Read, Seek, SeekFrom},
     os::unix::ffi::{OsStrExt, OsStringExt},
     path::{Path, PathBuf},
 };
@@ -43,12 +44,17 @@ pub struct VisibleMessageProjection {
 }
 
 pub fn remount_visible_message_projection(path: &Path) -> Result<VisibleMessageProjection, String> {
-    let bytes = fs::read(path).map_err(|error| format!("read {}: {error}", path.display()))?;
-    let mut input = Reader {
-        bytes: &bytes,
+    let file = File::open(path).map_err(|error| format!("open {}: {error}", path.display()))?;
+    let extent = file
+        .metadata()
+        .map_err(|error| format!("inspect {}: {error}", path.display()))?
+        .len();
+    let mut input = StreamingReader {
+        input: BufReader::new(file),
         at: 0,
+        extent,
     };
-    if input.take(EXCHANGE_REST_PREFIX.len())? != EXCHANGE_REST_PREFIX {
+    if input.array::<8>()? != EXCHANGE_REST_PREFIX {
         return Err("the exchange rest carries the wrong schema prefix".to_owned());
     }
     let _schema = input.string()?;
@@ -56,44 +62,44 @@ pub fn remount_visible_message_projection(path: &Path) -> Result<VisibleMessageP
     let content_law_sha256 = input.digest()?;
 
     for _ in 0..input.len()? {
-        input.take(4 + 8 + 32 + 8 + 8)?;
+        input.skip(4 + 8 + 32 + 8 + 8)?;
         if input.boolean()? {
-            input.take(16)?;
+            input.skip(16)?;
         }
         let blanks = input.len()?;
-        input.take(
+        input.skip(
             blanks
                 .checked_mul(16)
                 .ok_or_else(|| "blank-record extent overflowed".to_owned())?,
         )?;
-        input.bytes()?;
-        input.bytes()?;
-        input.bytes()?;
+        input.skip_bytes()?;
+        input.skip_bytes()?;
+        input.skip_bytes()?;
     }
 
     let records = input.len()?;
-    input.take(
+    input.skip(
         records
             .checked_mul(116)
             .ok_or_else(|| "record extent overflowed".to_owned())?,
     )?;
 
     for _ in 0..input.len()? {
-        input.take(8)?;
+        input.skip(8)?;
         if input.boolean()? {
-            input.take(4)?;
+            input.skip(4)?;
         }
-        input.take(4 + 1 + 32)?;
+        input.skip(4 + 1 + 32)?;
     }
 
     for _ in 0..input.len()? {
-        input.take(8 + 4 + 4)?;
-        input.bytes()?;
-        input.take(32)?;
+        input.skip(8 + 4 + 4)?;
+        input.skip_bytes()?;
+        input.skip(32)?;
     }
 
     let scalar_sites = input.len()?;
-    input.take(
+    input.skip(
         scalar_sites
             .checked_mul(44)
             .ok_or_else(|| "scalar-site extent overflowed".to_owned())?,
@@ -121,16 +127,16 @@ pub fn remount_visible_message_projection(path: &Path) -> Result<VisibleMessageP
         messages.push(face);
     }
 
-    input.take(8 + 8 + 8)?;
+    input.skip(8 + 8 + 8)?;
     input.boolean()?;
-    input.bytes()?;
-    input.bytes()?;
-    input.take(8 + 8 + 8 + 4 + 4)?;
+    input.skip_bytes()?;
+    input.skip_bytes()?;
+    input.skip(8 + 8 + 8 + 4 + 4)?;
     input.boolean()?;
-    if input.at != bytes.len() {
+    if input.at != input.extent {
         return Err(format!(
             "the exchange rest carries {} trailing octets",
-            bytes.len() - input.at
+            input.extent - input.at
         ));
     }
     Ok(VisibleMessageProjection {
@@ -442,6 +448,122 @@ fn put_option_u32(out: &mut Vec<u8>, value: Option<u32>) {
     out.push(u8::from(value.is_some()));
     if let Some(value) = value {
         put_u32(out, value);
+    }
+}
+
+/// Seekable exterior-rest reader used by the narrow visible-message mouth. Fixed populations and
+/// unrelated variable payloads are validated and skipped in place; the 2.4 GB serialized chart is
+/// never copied into one host allocation merely to reach its message section.
+struct StreamingReader {
+    input: BufReader<File>,
+    at: u64,
+    extent: u64,
+}
+
+impl StreamingReader {
+    fn array<const N: usize>(&mut self) -> Result<[u8; N], String> {
+        let end = self
+            .at
+            .checked_add(N as u64)
+            .filter(|end| *end <= self.extent)
+            .ok_or_else(|| "the exchange rest is truncated".to_owned())?;
+        let mut out = [0u8; N];
+        self.input
+            .read_exact(&mut out)
+            .map_err(|error| format!("read exchange rest at {}: {error}", self.at))?;
+        self.at = end;
+        Ok(out)
+    }
+
+    fn skip(&mut self, extent: usize) -> Result<(), String> {
+        let end = self
+            .at
+            .checked_add(u64::try_from(extent).map_err(|_| "a rest range exceeds u64".to_owned())?)
+            .filter(|end| *end <= self.extent)
+            .ok_or_else(|| "the exchange rest is truncated".to_owned())?;
+        // Keep short advances inside `BufReader`'s already-mounted window.  The former absolute
+        // seek discarded that window for every fixed field of every node (tens of millions of
+        // syscalls on the admitted world tube), even though no causal boundary was crossed.
+        // This is an apparatus correction only: the same exact byte extent and wire position are
+        // validated.  Large advances still become one ordinary file seek.
+        match i64::try_from(extent) {
+            Ok(relative) => self
+                .input
+                .seek_relative(relative)
+                .map_err(|error| format!("seek exchange rest forward by {extent}: {error}"))?,
+            Err(_) => {
+                self.input
+                    .seek(SeekFrom::Start(end))
+                    .map_err(|error| format!("seek exchange rest to {end}: {error}"))?;
+            }
+        }
+        self.at = end;
+        Ok(())
+    }
+
+    fn boolean(&mut self) -> Result<bool, String> {
+        match self.array::<1>()?[0] {
+            0 => Ok(false),
+            1 => Ok(true),
+            other => Err(format!("a rest boolean carries {other}")),
+        }
+    }
+
+    fn u32(&mut self) -> Result<u32, String> {
+        Ok(u32::from_le_bytes(self.array()?))
+    }
+
+    fn u64(&mut self) -> Result<u64, String> {
+        Ok(u64::from_le_bytes(self.array()?))
+    }
+
+    fn usize(&mut self) -> Result<usize, String> {
+        usize::try_from(self.u64()?).map_err(|_| "a rest extent exceeds usize".to_owned())
+    }
+
+    fn len(&mut self) -> Result<usize, String> {
+        let extent = self.usize()?;
+        if u64::try_from(extent).map_or(true, |extent| extent > self.extent - self.at) {
+            return Err("a rest population exceeds the remaining wire".to_owned());
+        }
+        Ok(extent)
+    }
+
+    fn digest(&mut self) -> Result<Digest32, String> {
+        Ok(Digest32::from_sha(self.array::<32>()?))
+    }
+
+    fn skip_bytes(&mut self) -> Result<(), String> {
+        let extent = self.len()?;
+        self.skip(extent)
+    }
+
+    fn bytes(&mut self) -> Result<Vec<u8>, String> {
+        let extent = self.len()?;
+        let end = self
+            .at
+            .checked_add(extent as u64)
+            .filter(|end| *end <= self.extent)
+            .ok_or_else(|| "the exchange rest is truncated".to_owned())?;
+        let mut out = vec![0u8; extent];
+        self.input
+            .read_exact(&mut out)
+            .map_err(|error| format!("read exchange rest at {}: {error}", self.at))?;
+        self.at = end;
+        Ok(out)
+    }
+
+    fn string(&mut self) -> Result<String, String> {
+        String::from_utf8(self.bytes()?).map_err(|_| "a rest string is not UTF-8".to_owned())
+    }
+
+    fn range(&mut self) -> Result<std::ops::Range<u64>, String> {
+        let start = self.u64()?;
+        let end = self.u64()?;
+        if start > end {
+            return Err("a rest range is reversed".to_owned());
+        }
+        Ok(start..end)
     }
 }
 

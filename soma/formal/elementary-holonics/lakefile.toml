@@ -1,5 +1,5 @@
 name = "soma_elementary_holonics"
-defaultTargets = ["ElementaryHolonics"]
+defaultTargets = ["ElementaryHolonics.Computation.HolonicMachineLearning"]
 
 [[lean_lib]]
 name = "ElementaryHolonics"
@@ -17,4 +17,14 @@ supportInterpreter = true
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
-rev = "v4.27.0"
+rev = "v4.33.0"
+
+[[require]]
+name = "cslib"
+git = "https://github.com/leanprover/cslib"
+rev = "v4.33.0"
+
+[[require]]
+name = "physlib"
+git = "https://github.com/leanprover-community/physlib"
+rev = "686d93d28dedc7ecb238ea7b3568b812fd7065c6"

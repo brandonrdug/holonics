@@ -94,11 +94,15 @@ def zeroOpenPeriodicSolution (T nu : ℝ) (hT : 0 < T) :
     simp [divergence]
   initial x := rfl
   velocitySmooth := by
-    simpa only [Function.uncurry_apply_pair, Pi.zero_apply] using
-      (contDiff_const : ContDiff ℝ ∞ (fun _ : Space × ℝ => (0 : Space))).contDiffOn
+    change ContDiffOn ℝ ∞ (fun _ : Space × ℝ => (0 : Space))
+      (NavierStokesOpenLifespan.openSpaceTimeSlab T)
+    exact (contDiff_const : ContDiff ℝ ∞
+      (fun _ : Space × ℝ => (0 : Space))).contDiffOn
   pressureSmooth := by
-    simpa only [Function.uncurry_apply_pair, Pi.zero_apply] using
-      (contDiff_const : ContDiff ℝ ∞ (fun _ : Space × ℝ => (0 : ℝ))).contDiffOn
+    change ContDiffOn ℝ ∞ (fun _ : Space × ℝ => (0 : ℝ))
+      (NavierStokesOpenLifespan.openSpaceTimeSlab T)
+    exact (contDiff_const : ContDiff ℝ ∞
+      (fun _ : Space × ℝ => (0 : ℝ))).contDiffOn
   velocityPeriodic t ht := by
     intro x i
     rfl

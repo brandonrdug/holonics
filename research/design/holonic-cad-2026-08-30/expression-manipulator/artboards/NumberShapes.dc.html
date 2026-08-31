@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .card { background: #fbf8f2; border: 1px solid #d9d0bf; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; min-height: 0; }
+    .card-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a7060; margin: 0; }
+    .nchip { min-width: 34px; min-height: 30px; padding: 3px 6px; border-radius: 7px; cursor: pointer; background: #fffdf8; border: 1.5px solid #b8ad97; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: inherit; }
+    .nchip-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .cell { position: absolute; width: 15px; height: 15px; border-radius: 3px; }
+    .ret { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 3px 7px; color: #fbf8f2; display: inline-block; }
+    .ret-carried { background: #3e7d57; }
+    .ret-obstructed { background: #9c5480; }
+    .bar { position: absolute; height: 15px; border-radius: 3px; background: #a8996f; }
+  </style>
+</helmet>
+
+<div style="width: 1340px; height: 720px; box-sizing: border-box; padding: 22px 26px; overflow: hidden; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">Shapes of the naturals</div>
+      <div style="font-size: 12px; color: #7a7060">surface = the measurable face &middot; volume = the microstate partition &middot; primality = the rectangle refusal</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Scratch/HolonicShellNumbering.lean — every identity below is kernel-checked</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 12px; flex: 1; min-height: 0">
+
+    <div class="card">
+      <p class="card-title">the rectangle solver — a volume partition question</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 9px">
+        <sc-for list="{{nums}}" as="n" hint-placeholder-count="12">
+          <button class="{{n.cls}}" onClick="{{n.pick}}">{{n.t}}</button>
+        </sc-for>
+      </div>
+      <div style="margin-top: 10px">
+        <span class="ret {{rq.cls}}">{{rq.kind}}</span>
+        <span style="font-size: 12px; margin-left: 6px">{{rq.t}}</span>
+      </div>
+      <div style="position: relative; flex: 1; min-height: 150px; margin-top: 10px">
+        <sc-for list="{{rcells}}" as="c" hint-placeholder-count="12">
+          <div class="cell" style="left: {{c.x}}px; top: {{c.y}}px; background: {{c.c}}"></div>
+        </sc-for>
+      </div>
+      <div class="mono" style="font-size: 10px; color: #7a7060">prime_iff_no_rectangle — the refusal is the return; the lone apex + line is the only arrangement</div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">two triangles make a square</p>
+      <div style="display: flex; gap: 4px; margin-top: 9px">
+        <sc-for list="{{tks}}" as="k" hint-placeholder-count="5">
+          <button class="{{k.cls}}" onClick="{{k.pick}}">{{k.t}}</button>
+        </sc-for>
+      </div>
+      <div style="position: relative; flex: 1; min-height: 150px; margin-top: 10px">
+        <sc-for list="{{tcells}}" as="c" hint-placeholder-count="12">
+          <div class="cell" style="left: {{c.x}}px; top: {{c.y}}px; background: {{c.c}}"></div>
+        </sc-for>
+      </div>
+      <div class="mono" style="font-size: 11px; margin-top: 6px">{{tIdent}}</div>
+      <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 3px">two_triangles_make_a_square — the diagonal seam is the declared cut; nothing is lost across it</div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">the pyramid and its apex</p>
+      <div style="display: flex; gap: 4px; margin-top: 9px">
+        <sc-for list="{{pks}}" as="k" hint-placeholder-count="4">
+          <button class="{{k.cls}}" onClick="{{k.pick}}">{{k.t}}</button>
+        </sc-for>
+      </div>
+      <div style="position: relative; flex: 1; min-height: 130px; margin-top: 10px">
+        <sc-for list="{{pbars}}" as="b" hint-placeholder-count="5">
+          <div class="bar" style="left: {{b.x}}px; top: {{b.y}}px; width: {{b.w}}px; background: {{b.c}}"></div>
+        </sc-for>
+        <sc-for list="{{plabs}}" as="b" hint-placeholder-count="5">
+          <div class="mono" style="position: absolute; left: {{b.x}}px; top: {{b.y}}px; font-size: 10px; color: #56503f">{{b.t}}</div>
+        </sc-for>
+      </div>
+      <div class="mono" style="font-size: 11px; margin-top: 6px">{{pIdent}}</div>
+      <div style="font-size: 11.5px; margin-top: 5px; line-height: 1.45">Each layer is a factored modulus; the apex is the lone asymmetric unit. 6&middot;P&#8342; = k(k+1)(2k+1) and 6&middot;Te&#8342; = k(k+1)(k+2) — six_square_pyramids &middot; six_tetrahedra. Cannonball: P&#8322;&#8324; = 4900 = 70&sup2;.</div>
+      <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 5px">Gauss–Wantzel: the regular n-gon is constructible iff n = 2&#7491;&middot;(distinct Fermat primes 2^(2^k)+1) — the quadratic tower reaches exactly those apexes (Constructible.lean)</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1340,"height":720}}'>
+const INK = '#56503f', AMBER = '#c9a35a', BLUE = '#7d9cbb', ROSE = '#b57f92', APEX = '#b45309';
+
+class Component extends DCLogic {
+  state = { n: 12, tk: 4, pk: 4 };
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+
+    const nums = [];
+    for (let n = 2; n <= 37; n++) {
+      (function (n) {
+        nums.push({ t: String(n), cls: 'nchip' + (st.n === n ? ' nchip-on' : ''), pick: function () { self.setState({ n: n }); } });
+      })(n);
+    }
+    const n = st.n;
+    const pairs = [];
+    for (let a = 2; a * a <= n; a++) if (n % a === 0) pairs.push([a, n / a]);
+    let rq, rcells = [];
+    if (pairs.length === 0) {
+      rq = { kind: 'obstructed', cls: 'ret-obstructed', t: n + ' refuses every rectangle — prime. Witness population: empty over 2 ≤ a ≤ b.' };
+      for (let i = 0; i < n; i++) rcells.push({ x: (i % 14) * 17, y: Math.floor(i / 14) * 17, c: i === 0 ? APEX : INK });
+    } else {
+      const ab = pairs[0];
+      rq = { kind: 'carried', cls: 'ret-carried', t: n + ' = ' + ab[0] + ' · ' + ab[1] + (pairs.length > 1 ? '  (also: ' + pairs.slice(1).map(function (p) { return p[0] + '·' + p[1]; }).join(', ') + ')' : '') };
+      for (let i = 0; i < ab[0]; i++) for (let j = 0; j < ab[1]; j++)
+        rcells.push({ x: j * 17, y: i * 17, c: (i + j) % 2 ? AMBER : INK });
+    }
+
+    const tks = [];
+    for (let k = 2; k <= 7; k++) {
+      (function (k) {
+        tks.push({ t: String(k), cls: 'nchip' + (st.tk === k ? ' nchip-on' : ''), pick: function () { self.setState({ tk: k }); } });
+      })(k);
+    }
+    const k = st.tk;
+    const tcells = [];
+    for (let i = 0; i < k; i++) for (let j = 0; j < k; j++)
+      tcells.push({ x: j * 17, y: i * 17, c: (i + j <= k - 2) ? BLUE : ROSE });
+    const trim1 = (k - 1) * k / 2, trik = k * (k + 1) / 2;
+    const tIdent = 'T' + (k - 1) + ' + T' + k + ' = ' + trim1 + ' + ' + trik + ' = ' + (k * k) + ' = ' + k + '²';
+
+    const pks = [];
+    for (let kk = 2; kk <= 6; kk++) {
+      (function (kk) {
+        pks.push({ t: String(kk), cls: 'nchip' + (st.pk === kk ? ' nchip-on' : ''), pick: function () { self.setState({ pk: kk }); } });
+      })(kk);
+    }
+    const pk = st.pk;
+    const pbars = [], plabs = [];
+    let total = 0;
+    for (let i = 1; i <= pk; i++) {
+      total += i * i;
+      const w = i * 22;
+      pbars.push({ x: 130 - w / 2, y: (i - 1) * 20, w: w, c: i === 1 ? APEX : (i % 2 ? '#a8996f' : '#8f9a76') });
+      plabs.push({ x: 140 + pk * 11, y: (i - 1) * 20, t: i + '² = ' + (i * i) });
+    }
+    const pIdent = 'P' + pk + ' = ' + total + '   ·   6·P' + pk + ' = ' + (6 * total) + ' = ' + pk + '·' + (pk + 1) + '·' + (2 * pk + 1);
+
+    return { nums: nums, rq: rq, rcells: rcells, tks: tks, tcells: tcells, tIdent: tIdent, pks: pks, pbars: pbars, plabs: plabs, pIdent: pIdent };
+  }
+}
+</script>
+</body>
+</html>

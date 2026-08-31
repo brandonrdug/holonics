@@ -101,7 +101,13 @@ theorem continuous_periodicWeightedHeat_orbit
         ‖periodicWeightedHeat order nu (nndist tau tau₀) state - state‖)
       (nhds tau₀) (nhds (0 : ℝ)) := by
     have hsub := hzero.sub_const state
-    simpa only [Function.comp_apply, sub_self, norm_zero] using tendsto_norm.comp hsub
+    change Tendsto
+      ((fun value : PeriodicWeightedSobolev order ↦ ‖value‖) ∘
+        fun tau : ℝ≥0 ↦
+          (((fun elapsed : ℝ≥0 ↦ periodicWeightedHeat order nu elapsed state) ∘
+            fun point : ℝ≥0 ↦ nndist point tau₀) tau) - state)
+      (nhds tau₀) (nhds (0 : ℝ))
+    simpa only [sub_self, norm_zero] using tendsto_norm.comp hsub
   simpa only [dist_eq_norm] using squeeze_zero
     (fun tau ↦ norm_nonneg
       (periodicWeightedHeat order nu tau state - periodicWeightedHeat order nu tau₀ state))
@@ -227,7 +233,12 @@ theorem continuous_periodicWeightedHeatTwoToThreeJoint
           (pair.1.1 - delta, fixedSmooth pair.2)) :=
       htime.prodMk hsource
     have hjoint := continuous_periodicWeightedHeat_joint 3 nu
-    simpa only [factored, Function.comp_apply] using hjoint.comp hpair
+    change Continuous
+      ((fun pair : ℝ≥0 × PeriodicWeightedSobolev 3 ↦
+          periodicWeightedHeat 3 nu pair.1 pair.2) ∘
+        fun pair : PositiveElapsedTime × PeriodicWeightedSobolev 2 ↦
+          (pair.1.1 - delta, fixedSmooth pair.2))
+    exact hjoint.comp hpair
   have heventually : ∀ᶠ pair : PositiveElapsedTime × PeriodicWeightedSobolev 2 in
       nhds (⟨⟨tau₀, htau₀⟩, state₀⟩ : PositiveElapsedTime × PeriodicWeightedSobolev 2),
       delta ≤ pair.1.1 := by
@@ -291,9 +302,9 @@ theorem continuousOn_weightedDuhamelIntegrand_Ioo
     (u : ℝ → PeriodicVectorWeightedSobolev 3)
     (hu : ContinuousOn u (Icc (0 : ℝ) t)) :
     ContinuousOn (weightedDuhamelIntegrand nu hnu t u) (Ioo (0 : ℝ) t) := by
-  rw [continuousOn_iff_continuous_restrict]
+  rw [continuousOn_iff_continuous_domRestrict]
   have huInterior : Continuous (fun s : Ioo (0 : ℝ) t ↦ u s.1) :=
-    continuousOn_iff_continuous_restrict.mp (hu.mono Ioo_subset_Icc_self)
+    continuousOn_iff_continuous_domRestrict.mp (hu.mono Ioo_subset_Icc_self)
   have hsource : Continuous
       (fun s : Ioo (0 : ℝ) t ↦ weightedLerayQuadratic (u s.1)) :=
     continuous_weightedLerayQuadratic.comp huInterior
@@ -330,7 +341,7 @@ theorem aestronglyMeasurable_weightedDuhamelIntegrand
     (hu : ContinuousOn u (Icc (0 : ℝ) t)) :
     AEStronglyMeasurable (weightedDuhamelIntegrand nu hnu t u)
       (volume.restrict (Ioc (0 : ℝ) t)) := by
-  letI : SecondCountableTopologyEither ℝ (PeriodicVectorWeightedSobolev 3) :=
+  let : SecondCountableTopologyEither ℝ (PeriodicVectorWeightedSobolev 3) :=
     ⟨Or.inl (by infer_instance)⟩
   rw [← restrict_Ioo_eq_restrict_Ioc]
   exact (continuousOn_weightedDuhamelIntegrand_Ioo nu hnu u hu).aestronglyMeasurable

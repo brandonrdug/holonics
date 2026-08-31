@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1400px; height: 860px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Program → lattice</div>
+      <div class="sub">parse · evaluate · materialize · grow · optimize · normalize · geometry · project — one deterministic tower</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: openscad 1c9ee2b (node.h, CSGTreeNormalizer, customizer) · morpho dc8dd2e (compiler.js materialize, grower.js)</div>
+  </div>
+<div class="row" style="gap:10px; flex: 1 1 auto; min-height: 0"><div class="panel" style="flex: 1 1 auto"><div class="panel-t"><span>OpenSCAD's tower × MorphoHDL's growth, as one deterministic evaluation</span></div><svg width="1340" height="150" viewBox="0 0 1340 150" style="display:block; width:100%; height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c6ea5"/></marker><marker id="ahk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#292418"/></marker></defs><rect x="10.0" y="20" width="142.25" height="100" rx="6" class="ink" fill="#fffdf8"/><text x="18.0" y="40" class="svgtxt" font-weight="500">parse</text><text x="18.0" y="62" class="svgtxt" >AST with Location</text><text x="18.0" y="80" class="svgtxt" >every node carries its span</text><line x1="152.25" y1="70" x2="176.25" y2="70" class="wire" marker-end="url(#ah)"/><rect x="178.25" y="20" width="142.25" height="100" rx="6" class="ink" fill="#e4ecf5"/><text x="186.25" y="40" class="svgtxt" font-weight="500">evaluate</text><text x="186.25" y="62" class="svgtxt" >AST → node tree</text><text x="186.25" y="80" class="svgtxt" >from scratch per compile; $-vars dynamic</text><text x="186.25" y="108" class="svgtxt" fill="#7a7060">TRANSPORT</text><line x1="320.5" y1="70" x2="344.5" y2="70" class="wire" marker-end="url(#ah)"/><rect x="346.5" y="20" width="142.25" height="100" rx="6" class="ink" fill="#e6efe6"/><text x="354.5" y="40" class="svgtxt" font-weight="500">materialize</text><text x="354.5" y="62" class="svgtxt" >name:[signature] registry</text><text x="354.5" y="80" class="svgtxt" >widths inferred, memoized</text><text x="354.5" y="108" class="svgtxt" fill="#7a7060">CONSTRUCTION</text><line x1="488.75" y1="70" x2="512.75" y2="70" class="wire" marker-end="url(#ah)"/><rect x="514.75" y="20" width="142.25" height="100" rx="6" class="ink" fill="#e6efe6"/><text x="522.75" y="40" class="svgtxt" font-weight="500">grow</text><text x="522.75" y="62" class="svgtxt" >local rewrite per step</text><text x="522.75" y="80" class="svgtxt" >fallback on boundary</text><text x="522.75" y="108" class="svgtxt" fill="#7a7060">CONSTRUCTION</text><line x1="657.0" y1="70" x2="681.0" y2="70" class="wire" marker-end="url(#ah)"/><rect x="683.0" y="20" width="142.25" height="100" rx="6" class="ink" fill="#f3e6ec"/><text x="691.0" y="40" class="svgtxt" font-weight="500">optimize</text><text x="691.0" y="62" class="svgtxt" >const-prop · DCE · fanout</text><text x="691.0" y="80" class="svgtxt" >worklists, self-invalidating</text><text x="691.0" y="108" class="svgtxt" fill="#7a7060">QUOTIENT</text><line x1="825.25" y1="70" x2="849.25" y2="70" class="wire" marker-end="url(#ah)"/><rect x="851.25" y="20" width="142.25" height="100" rx="6" class="ink" fill="#f3e6ec"/><text x="859.25" y="40" class="svgtxt" font-weight="500">normalize</text><text x="859.25" y="62" class="svgtxt" >Goldfeather → Σ products</text><text x="859.25" y="80" class="svgtxt" >canonical before rendering</text><text x="859.25" y="108" class="svgtxt" fill="#7a7060">QUOTIENT</text><line x1="993.5" y1="70" x2="1017.5" y2="70" class="wire" marker-end="url(#ah)"/><rect x="1019.5" y="20" width="142.25" height="100" rx="6" class="ink" fill="#f3ead9"/><text x="1027.5" y="40" class="svgtxt" font-weight="500">geometry</text><text x="1027.5" y="62" class="svgtxt" >exact lattice / mesh</text><text x="1027.5" y="80" class="svgtxt" >cache key = subtree dump</text><text x="1027.5" y="108" class="svgtxt" fill="#7a7060">FACE</text><line x1="1161.75" y1="70" x2="1185.75" y2="70" class="wire" marker-end="url(#ah)"/><rect x="1187.75" y="20" width="142.25" height="100" rx="6" class="ink" fill="#f3ead9"/><text x="1195.75" y="40" class="svgtxt" font-weight="500">project</text><text x="1195.75" y="62" class="svgtxt" >chart → 2D/3D face</text><text x="1195.75" y="80" class="svgtxt" >$preview vs exact</text><text x="1195.75" y="108" class="svgtxt" fill="#7a7060">FACE</text></svg><table class="tb2" style=""><thead><tr><th>stage</th><th>OpenSCAD</th><th>MorphoHDL</th><th>the CAD</th></tr></thead><tbody><tr><td>identity</td><td>idx reset per compile; modinst → syntax</td><td>append-only index; active flag; parent</td><td>occurrence id = (birth moment, rank); parent lineage; never reset</td></tr><tr><td>parameters</td><td>top-level literals + comment annotations → customizer; presets JSON</td><td>signature = input widths</td><td>customizer inferred from the Lean def's explicit args + attributes; presets as parameter sets</td></tr><tr><td>control flow</td><td>if/for/let are modules; no state</td><td>fallback is the only control flow</td><td>boundary → fallback; branch = plural continuation, never a chooser</td></tr><tr><td>modifiers</td><td>! # % * per node</td><td>—</td><td>same four, propagated through the term</td></tr><tr><td>canonical form</td><td>CSG sum of products</td><td>netlist after DCE</td><td>the normalized complex; digest is a receipt only</td></tr><tr><td>cache</td><td>GeometryCache by getIdString</td><td>registry by name:[sig]</td><td>both; keyed by content, invalidated by content</td></tr><tr><td>order</td><td>postfix visitor</td><td>BFS / largest-first / traced, order-independent result</td><td>schedule is aesthetic and placement only; receipt: equal digest under all schedules</td></tr></tbody></table></div><div class="panel" style="flex: 0 0 360px"><div class="panel-t"><span>boundary</span></div><div class="box box-lean" style="">the program is Lean; the attribute marks a rewrite rule with a fallback; the lattice is <span class='mono'>eval(program, chart)</span> — no persistent geometry state, reproducibility free</div><div class="box box-obstructed" style="">OpenSCAD's doubles and MorphoHDL's JS numbers are refused: coordinates and coefficients are exact; a float may not determine an index or topology</div><div class="box box-refused" style="">no Interpreter / Scheduler cabinet: evaluation and growth compose existing owners (evolution, category, exact_linear, lattice_gauge); the schedule is a receiver shadow</div><div class="box box-hyp" style=""><span class="grade">interpretation</span> the tower is proposed; the OpenSCAD and MorphoHDL stages are source-inspected</div></div></div>
+</div>
+</x-dc>
+</body>
+</html>

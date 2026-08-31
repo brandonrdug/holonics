@@ -49,19 +49,19 @@ def E (a b : ℚ) : WeierstrassCurve.Affine ℚ := ⟨0, -(a + b), 0, a * b, 0�
 coordinate. -/
 def slotOne (a b : ℚ) : (E a b).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 0 then a * b else x
+  | .some x _ _ => if x = 0 then a * b else x
 
 /-- The second slot: `x − a`, with the convention `(a−0)(a−b) = a(a−b)` at its
 vanishing coordinate. -/
 def slotTwo (a b : ℚ) : (E a b).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = a then a * (a - b) else x - a
+  | .some x _ _ => if x = a then a * (a - b) else x - a
 
 lemma slotOne_some {a b x y : ℚ} (h : (E a b).Nonsingular x y) :
-    slotOne a b (.some h) = if x = 0 then a * b else x := rfl
+    slotOne a b (.some _ _ h) = if x = 0 then a * b else x := rfl
 
 lemma slotTwo_some {a b x y : ℚ} (h : (E a b).Nonsingular x y) :
-    slotTwo a b (.some h) = if x = a then a * (a - b) else x - a := rfl
+    slotTwo a b (.some _ _ h) = if x = a then a * (a - b) else x - a := rfl
 
 lemma onCurve {a b x y : ℚ} (h : (E a b).Nonsingular x y) :
     y ^ 2 = x * (x - a) * (x - b) := by
@@ -111,12 +111,14 @@ theorem theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve
     Descent.SqCls (slotOne a b (Q + Q)) 1 ∧ Descent.SqCls (slotTwo a b (Q + Q)) 1 := by
   rcases Q with _ | @⟨x, y, h⟩
   · rw [← Point.zero_def, add_zero]
-    exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
+    simpa [slotOne, slotTwo] using
+      (And.intro (Descent.sqClsRefl (1 : ℚ)) (Descent.sqClsRefl (1 : ℚ)))
   · by_cases hy : y = 0
-    · have hzero : (Point.some h : (E a b).Point) + Point.some h = 0 :=
+    · have hzero : (Point.some _ _ h : (E a b).Point) + Point.some _ _ h = 0 :=
         Point.add_self_of_Y_eq (by rw [negY_eq, hy]; norm_num)
       rw [hzero]
-      exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
+      simpa [slotOne, slotTwo] using
+        (And.intro (Descent.sqClsRefl (1 : ℚ)) (Descent.sqClsRefl (1 : ℚ)))
     · have hcurve := onCurve h
       have hyne : y ≠ (E a b).negY x y := by
         rw [negY_eq]
@@ -187,4 +189,3 @@ theorem theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve
             linarith)
 
 end Soma.Holonics.Millennium.GeneralFace
-

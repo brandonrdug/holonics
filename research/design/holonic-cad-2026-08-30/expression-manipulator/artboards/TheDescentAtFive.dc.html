@@ -1,0 +1,303 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .col { display: flex; flex-direction: column; gap: 7px; min-height: 0; overflow-y: auto; }
+    .box { border-radius: 8px; padding: 8px 11px; box-sizing: border-box; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; font-size: 11.5px; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .tac { display: flex; align-items: center; gap: 8px; padding: 2px 4px; }
+    .tac-line { flex: 0 0 14px; height: 18px; border-left: 1.5px solid #8a8071; margin-left: 12px; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; flex: 0 0 auto; }
+    .sp-transport { background: #3c6ea5; }
+    .sp-face { background: #a67a2e; }
+    .sp-construction { background: #3e7d57; }
+    .sp-quotient { background: #9c5480; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; margin-bottom: 3px; }
+    .tag-carried { background: #3e7d57; }
+    .tag-obstructed { background: #9c5480; }
+    .tag-refused { background: #56503f; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .st { font-size: 11.5px; line-height: 1.45; margin-top: 2px; }
+    .goal-t { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 15px; }
+    .chip { min-height: 30px; padding: 3px 9px; border-radius: 7px; cursor: pointer; background: #fffdf8; border: 1.5px solid #8a8071; font: inherit; color: inherit; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+    .chip-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .tri { position: absolute; }
+    .tri-up { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+    .tri-dn { clip-path: polygon(0 0, 100% 0, 50% 100%); }
+    .fun { height: 16px; background: #b3a27d; border-radius: 3px; }
+    table.tb { border-collapse: collapse; font-size: 11px; }
+    table.tb td, table.tb th { border: 1px solid #ddd5c5; padding: 2px 6px; text-align: left; }
+    table.tb th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; }
+    .tile { position: absolute; box-sizing: border-box; }
+    .tile-h { outline: 2px solid #b45309; outline-offset: -1px; z-index: 2; }
+  </style>
+</helmet>
+
+<div style="width: 1560px; height: 1070px; box-sizing: border-box; padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; gap: 10px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">The descent at five</div>
+      <div style="font-size: 12px; color: #7a7060"><span class="math">y&sup2; = x&sup3; &minus; 25x</span> &middot; is 5 a congruent number? &middot; every box is a kernel-checked declaration in this tree — the whole proof at once, paperproof-shaped</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Millennium/: 66 files &middot; 1,010 theorems &middot; axioms propext/Classical.choice/Quot.sound &middot; 0 sorry</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 505px 465px minmax(0, 1fr); gap: 12px; flex: 1; min-height: 0">
+
+    <div class="col">
+      <div class="box box-hyp"><b>pose</b> &middot; carrier E&#8325;(&#8474;), curve <span class="math">y&sup2; = x&sup3; &minus; 25x</span> &middot; candidate: rank &ge; 1 &middot; receiver: the rank clause (both faces of one number)</div>
+      <div class="tac"><span class="sp sp-transport">transport</span><span style="font-size: 12px">descend through the doubling kernel — the face map to the slot classes (the coset tower G &rarr; G/2G)</span></div>
+      <div class="box box-lean">
+        <div class="ln">FaceImageFive.theFaceImageAtFiveIsTheRealizedEight &middot; theRealizedEightAreInTheImage</div>
+        <div class="st">Every point&#39;s face lies among the realized eight, and the eight are realized; the kernel of the face is the doubles. Three candidate cosets refused by name: <span class="ln">theFirst/Second/ThirdCanonicalCosetIsRefusedAtFive</span>.</div>
+      </div>
+      <div class="tac"><span class="sp sp-face">face</span><span style="font-size: 12px">count the classes against the torsion trio — nine against eight</span></div>
+      <div class="box box-lean">
+        <div class="ln">theAlgebraicRankIsOneAtFive : AlgebraicRankIs 5 1</div>
+        <div class="st">Torsion trio {0, (0,0), (5,0)}; two free directions would give nine classes pairwise not differing by doubles, against the eight-class face image — so rank &le; 1. And &ge; 1:</div>
+      </div>
+      <div class="tac"><span class="sp sp-construction">construction</span><span style="font-size: 12px">exhibit the realizer</span></div>
+      <div class="box box-carried"><span class="tag tag-carried">carried</span>
+        <div class="goal-t">(&minus;4, 6) &isin; E&#8325;</div>
+        <div class="st mono" style="font-size: 11px">(&minus;4)&sup3; &minus; 25&middot;(&minus;4) = &minus;64 + 100 = 36 = 6&sup2; &#10003;</div>
+        <div class="st">a point outside the torsion trio&#39;s doubles — infinite order; rank exactly one.</div>
+      </div>
+      <div class="tac"><span class="sp sp-quotient">quotient</span><span style="font-size: 12px">squeeze by the height — the energy that makes the search finite</span></div>
+      <div class="box box-lean">
+        <div class="ln">FiveHeight.theDuplicationGrowsTheHeight &middot; theMordellWeilGroupIsFinitelyGenerated</div>
+        <div class="st">Duplication grows quartically: hgt(u)&#8308; &le; 250000&middot;hgt(x(2Q)). Above height 163000 every point is Q+Q+R with R among eight bounded representatives — strong descent; the bounded points are finite and generate. <b>E&#8325;(&#8474;) is finitely generated, with no imported Mordell–Weil.</b></div>
+      </div>
+      <div class="box box-hyp" style="margin-top: 4px"><b>the analytic face of the same number</b></div>
+      <div class="tac"><span class="sp sp-face">face</span><span style="font-size: 12px">read the hand of the reflection: sign &minus;1 — parity kills the value before any magnitude</span></div>
+      <div class="box box-lean">
+        <div class="ln">theOddHandForcesTheCentralVanishingAtFive</div>
+        <div class="st"><span class="math">&Lambda;&#8325;(1) = 0</span> by the sign-(&minus;1) functional equation alone — the root number is the spin.</div>
+      </div>
+      <div class="tac"><span class="sp sp-transport">transport</span><span style="font-size: 12px">fold t &#8614; 1/t at the Mellin level — one fundamental domain</span></div>
+      <div class="box box-lean">
+        <div class="ln">theDerivativeIsTheOddSectorFirstMoment</div>
+        <div class="st"><span class="math">&Lambda;&#8325;&prime;(1) = 2&middot;&int;&#8321;^&infin; &theta;&#8325;(t)&middot;log t dt</span> — the derivative as one odd-sector moment.</div>
+      </div>
+      <div class="tac"><span class="sp sp-face">face</span><span style="font-size: 12px">certify the moment positive — exact rational arithmetic, no float anywhere</span></div>
+      <div class="box box-carried"><span class="tag tag-carried">carried</span>
+        <div class="ln">theDerivativeDoesNotVanishAtFive</div>
+        <div class="st">analytic order exactly one — no Gross–Zagier input.</div>
+      </div>
+      <div class="box box-carried" style="border-width: 2px">
+        <div class="ln">theRankClauseHoldsWholeAtFive : TheRankClause 5 theWitnessAtFive</div>
+        <div class="st"><b>algebraic 1 = analytic 1</b> — the complete rank clause of the posed conjecture at the rank-one instance. And <b>&#1064;(E&#8325;)[2] = 0</b>: the obstruction population is empty at five.</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="box box-obstructed"><span class="tag tag-obstructed">obstructed</span>
+        <div class="ln">SeventeenObstruction.theSeventeenFaceLiesInTheSelmerSixteen</div>
+        <div class="st">17 &equiv; 1 (mod 8): the governing characters vanish — nothing grips. The squeeze, class by class:</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px">
+          <div style="display: flex; align-items: center; gap: 8px"><div class="fun" style="width: 320px"></div><span class="mono" style="font-size: 10px">64 candidate classes</span></div>
+          <div style="display: flex; align-items: center; gap: 8px"><div class="fun" style="width: 160px; background: #a8917a"></div><span class="mono" style="font-size: 10px">32 die in the real frame</span></div>
+          <div style="display: flex; align-items: center; gap: 8px"><div class="fun" style="width: 80px; background: #9c8a95"></div><span class="mono" style="font-size: 10px">16 refused at two &rarr; the Selmer sixteen</span></div>
+          <div style="display: flex; align-items: center; gap: 8px"><div class="fun" style="width: 40px; background: #3e7d57"></div><div class="fun" style="width: 120px; background: #9c5480"></div><span class="mono" style="font-size: 10px">4 realized torsion + 12 invisible (3 cosets)</span></div>
+        </div>
+        <div class="st" style="margin-top: 6px"><b>The twelve pass every local frame and nothing realizes them</b> — the phase-object at BSD: a defect no magnitude receiver sees, in the exact sense of the aperture law. The second descent stands as one named-open proposition.</div>
+      </div>
+      <div class="box box-refused"><span class="tag tag-refused">refused — an infinite family</span>
+        <div class="ln">Congruum.theHalfTurnPrimesAreNotCongruent (p &equiv; 3 mod 8)</div>
+        <div class="st">the chain: <span class="ln">theTwoIsInvisible</span> (2 is no square mod p) &rarr; <span class="ln">theSumOfSquaresForcesBothZero</span> &rarr; <span class="ln">theCongruumNeverForms</span> &rarr; no half-turn prime is congruent. One descent refuses an infinite twist family. <span class="mono" style="font-size: 10px; color: #7a7060">Genocchi 1855, cited</span></div>
+      </div>
+      <div class="box box-hyp">
+        <b>the mapping is literal, not analogy</b>
+        <table class="tb" style="margin-top: 5px">
+          <tr><th>BSD object</th><th>solver object</th></tr>
+          <tr><td>Selmer group (passes every local condition)</td><td>LocallyAdmissible</td></tr>
+          <tr><td>image of E(&#8474;) under the face</td><td>Realized</td></tr>
+          <tr><td>&#1064; = admissible / realized</td><td><b>ObstructionGroup — the definitions coincide</b> (Gluing.lean)</td></tr>
+          <tr><td>N&eacute;ron–Tate height pairing</td><td>PayingPairing; regulator = its determinant; separates = nondegeneracy</td></tr>
+          <tr><td>local solubility per place</td><td>the waves — the band law over places</td></tr>
+          <tr><td>2-descent</td><td>the coset tower G &rarr; G/2G</td></tr>
+          <tr><td>local points lifting, gluing globally</td><td>the lightning strike — locally attained, chained (gluing.rs &delta;)</td></tr>
+        </table>
+      </div>
+      <div class="box box-hyp">
+        <b>the particle chart of the curve</b> <span class="mono" style="font-size: 9.5px; color: #7a7060">(interpretation)</span>
+        <table class="tb" style="margin-top: 5px">
+          <tr><th>particle face</th><th>curve face</th></tr>
+          <tr><td>spin / hand</td><td>root number &epsilon; = &minus;1 — parity forces &Lambda;(1) = 0 before any magnitude (a selection rule)</td></tr>
+          <tr><td>energy / action</td><td>canonical height; the squeeze bound 163000</td></tr>
+          <tr><td>mass</td><td>conductor — weighs, never gates</td></tr>
+          <tr><td>charge</td><td>torsion class {0, (0,0), (5,0)} — discrete, conserved</td></tr>
+          <tr><td>wavelength</td><td>the &theta;&#8325; oscillation scale under the t &#8614; 1/t fold</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="box box-hyp" style="display: flex; flex-direction: column; gap: 6px">
+        <div><b>heat through the simplex — the squeeze as diffusion</b></div>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap; align-items: center">
+          <span class="mono" style="font-size: 9.5px; color: #7a7060">constraint stage:</span>
+          <sc-for list="{{stages}}" as="s" hint-placeholder-count="4">
+            <button class="{{s.cls}}" onClick="{{s.pick}}">{{s.t}}</button>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap; align-items: center">
+          <span class="mono" style="font-size: 9.5px; color: #7a7060">telescope:</span>
+          <sc-for list="{{scopes}}" as="s" hint-placeholder-count="3">
+            <button class="{{s.cls}}" onClick="{{s.pick}}">{{s.t}}</button>
+          </sc-for>
+          <button class="chip" onClick="{{step1}}">step</button>
+          <button class="chip" onClick="{{step25}}">step &times;25</button>
+          <button class="chip" onClick="{{resetHeat}}">reset</button>
+          <span class="mono" style="font-size: 10px">{{iterT}}</span>
+        </div>
+        <div style="position: relative; height: {{simH}}px">
+          <sc-for list="{{cells}}" as="c" hint-placeholder-count="16">
+            <div class="tri {{c.q}}" style="left: {{c.x}}px; top: {{c.y}}px; width: {{c.w}}px; height: {{c.h}}px; background: {{c.bg}}"></div>
+          </sc-for>
+        </div>
+        <div style="font-size: 11px; line-height: 1.45; color: #56503f">Deterministic discrete updates on triangular cells — the quantum of the triangle; each stage masks the inadmissible region (the frame kills of the descent, rendered); the front converges into what survives. Telescoping refines the mesh under the SAME law: smoothness is the receiver&#39;s interpolation over the scale axis, never the substrate. <span class="mono" style="font-size: 9.5px; color: #7a7060">engine owner for the exact form: diffusion.rs (Rat, certified Schur boundary)</span></div>
+      </div>
+      <div class="box box-hyp" style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; align-items: center; gap: 8px"><b>the tilemaps, relative to each other</b>
+          <sc-for list="{{grips}}" as="g" hint-placeholder-count="3">
+            <button class="{{g.cls}}" onClick="{{g.pick}}">{{g.t}}</button>
+          </sc-for>
+          <span class="mono" style="font-size: 10px; color: #7a7060">{{cycleT}}</span>
+        </div>
+        <div style="position: relative; height: 208px">
+          <sc-for list="{{tiles}}" as="t" hint-placeholder-count="24">
+            <div class="tile {{t.hcls}}" style="left: {{t.x}}px; top: {{t.y}}px; width: 20px; height: 20px; background: {{t.bg}}"></div>
+          </sc-for>
+        </div>
+        <div style="font-size: 11px; color: #56503f; line-height: 1.4">A grip transports one tile band across four face tilemaps — the highlighted band is the wave; every face is a hypergraph of triangular cells (each tile carries its diagonal seam); the surface family looks, exactly, like a specific Rubik&#39;s group.</div>
+      </div>
+      <div class="box box-hyp" style="font-size: 11.5px; line-height: 1.5"><b>The lightning line.</b> Solutions are attained locally and chain: each local frame kills its cosets (the waves), the survivors glue through the connecting map, the realizer lands as one strike — and what passes every local frame yet is realized by nothing is the obstruction &#1064;, the phase no magnitude receiver sees. <span class="mono" style="font-size: 9.5px; color: #7a7060">records: 2026-08-22 descent-complete &middot; analytic-order-at-five &middot; obstruction-at-seventeen &middot; 2026-08-21 half-turn-primes &middot; solver: Scratch/HolonicSolver.lean &middot; HolonicActionSolver.lean &middot; HolonicBandLaw.lean</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1560,"height":1070}}'>
+const STAGENAMES = ['no constraint', 'the real frame', 'at two', 'the Selmer squeeze'];
+const SCOPES = [8, 16, 24];
+
+function admissible(stage, k, r, c) {
+  if (stage >= 1 && !(c <= r)) return false;
+  if (stage >= 2 && !(c >= Math.floor(r / 2))) return false;
+  if (stage >= 3 && !(r >= Math.floor(2 * k / 3))) return false;
+  return true;
+}
+function runHeat(k, stage, iters) {
+  const rows = [];
+  for (let r = 0; r < k; r++) rows.push(new Array(2 * r + 1).fill(0));
+  for (let it = 0; it < iters; it++) {
+    rows[0][0] = 1;
+    const next = rows.map(function (row) { return row.slice(); });
+    for (let r = 0; r < k; r++) for (let c = 0; c <= 2 * r; c++) {
+      if (!admissible(stage, k, r, c)) { next[r][c] = 0; continue; }
+      const u = rows[r][c];
+      let acc = 0, deg = 0;
+      const nb = [];
+      if (c > 0) nb.push([r, c - 1]);
+      if (c < 2 * r) nb.push([r, c + 1]);
+      if (c % 2 === 0) { if (r + 1 < k) nb.push([r + 1, c + 1]); }
+      else { nb.push([r - 1, c - 1]); }
+      for (const [rr, cc] of nb) if (admissible(stage, k, rr, cc)) { acc += rows[rr][cc] - u; deg++; }
+      next[r][c] = u + 0.125 * acc;
+    }
+    next[0][0] = 1;
+    for (let r = 0; r < k; r++) rows[r] = next[r];
+  }
+  return rows;
+}
+
+const NETPOS = { U: [1, 0], L: [0, 1], F: [1, 1], R: [2, 1], B: [3, 1], D: [1, 2] };
+const FCOL = { U: '#f2ead2', D: '#d9b545', F: '#3e7d57', B: '#3c6ea5', R: '#a04848', L: '#c07a3a' };
+const BANDS = {
+  U: { cyc: 'U turns: F → L → B → R (top rows)', sel: { F: 'r0', L: 'r0', B: 'r0', R: 'r0', U: 'all' } },
+  R: { cyc: 'R turns: F → U → B → D (right columns; B mirrored)', sel: { F: 'c2', U: 'c2', B: 'c0', D: 'c2', R: 'all' } },
+  F: { cyc: 'F turns: U → R → D → L (the seam ring)', sel: { U: 'r2', R: 'c0', D: 'r0', L: 'c2', F: 'all' } }
+};
+function inBand(sel, r, c) {
+  if (!sel) return false;
+  if (sel === 'all') return true;
+  if (sel[0] === 'r') return r === Number(sel[1]);
+  return c === Number(sel[1]);
+}
+
+class Component extends DCLogic {
+  state = { stage: 0, k: 16, iters: 0, grip: 'U' };
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+    const k = st.k;
+
+    const stages = STAGENAMES.map(function (name, i) {
+      return { t: i + ' · ' + name, cls: 'chip' + (st.stage === i ? ' chip-on' : ''), pick: function () { self.setState({ stage: i, iters: 0 }); } };
+    });
+    const scopes = SCOPES.map(function (kk) {
+      return { t: 'k = ' + kk, cls: 'chip' + (st.k === kk ? ' chip-on' : ''), pick: function () { self.setState({ k: kk, iters: 0 }); } };
+    });
+
+    const w = Math.floor(430 / k), h = Math.round(w * 0.87);
+    const rows = runHeat(k, st.stage, Math.min(st.iters, 600));
+    let mx = 0;
+    for (let r = 0; r < k; r++) for (let c = 0; c <= 2 * r; c++) if (rows[r][c] > mx) mx = rows[r][c];
+    const cells = [];
+    for (let r = 0; r < k; r++) for (let c = 0; c <= 2 * r; c++) {
+      const adm = admissible(st.stage, k, r, c);
+      const x = (k - 1 - r) * (w / 2) + c * (w / 2);
+      const y = r * h;
+      let bg;
+      if (!adm) bg = '#e3ddd0';
+      else {
+        const a = mx > 0 ? rows[r][c] / mx : 0;
+        bg = 'rgba(180, 83, 9, ' + (0.06 + 0.94 * a).toFixed(3) + ')';
+      }
+      cells.push({ x: x, y: y, w: w, h: h, q: c % 2 === 0 ? 'tri-up' : 'tri-dn', bg: bg });
+    }
+
+    const grips = ['U', 'R', 'F'].map(function (g) {
+      return { t: g, cls: 'chip' + (st.grip === g ? ' chip-on' : ''), pick: function () { self.setState({ grip: g }); } };
+    });
+    const band = BANDS[st.grip];
+    const tiles = [];
+    Object.keys(NETPOS).forEach(function (f) {
+      const fx = NETPOS[f][0] * 70 + 6, fy = NETPOS[f][1] * 70 + 2;
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+        tiles.push({ x: fx + c * 21, y: fy + r * 21, bg: FCOL[f], hcls: inBand(band.sel[f], r, c) ? 'tile-h' : '' });
+      }
+    });
+
+    return {
+      stages: stages, scopes: scopes,
+      step1: function () { self.setState({ iters: self.state.iters + 1 }); },
+      step25: function () { self.setState({ iters: self.state.iters + 25 }); },
+      resetHeat: function () { self.setState({ iters: 0 }); },
+      iterT: 't = ' + st.iters,
+      simH: k * h + 4, cells: cells,
+      grips: grips, cycleT: band.cyc, tiles: tiles
+    };
+  }
+}
+</script>
+</body>
+</html>

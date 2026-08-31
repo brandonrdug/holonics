@@ -19,7 +19,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::Cog;
 use life::causal_language::{
-    fiber_bytes, lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
+    CausalLanguageEcology, CausalLanguagePassage, fiber_bytes, lexical_tokens, token_germs_public,
 };
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;
@@ -56,7 +56,6 @@ struct Body {
     target: Vec<u32>,
     suffix: Vec<u32>,
     extent: Vec<u32>,
-    standing: Vec<u32>,
     surfaces: Vec<String>,
     index_of: BTreeMap<String, u16>,
 }
@@ -152,7 +151,6 @@ fn run() -> Result<(), String> {
     let mut target: Vec<u32> = Vec::new();
     let mut suffix: Vec<u32> = Vec::with_capacity(classes);
     let mut extent: Vec<u32> = Vec::with_capacity(classes);
-    let mut standing: Vec<u32> = Vec::with_capacity(classes);
     for state in 0..classes as u32 {
         let mut rows: Vec<(u16, u32)> = atlas
             .outgoing(state)
@@ -167,7 +165,6 @@ fn run() -> Result<(), String> {
         indptr.push(germ.len() as u32);
         suffix.push(atlas.suffix_link(state).unwrap_or(0));
         extent.push(atlas.class_extent(state).unwrap_or(0) as u32);
-        standing.push(atlas.standing_at(state).unwrap_or(0) as u32);
     }
     let body = Body {
         indptr,
@@ -175,7 +172,6 @@ fn run() -> Result<(), String> {
         target,
         suffix,
         extent,
-        standing,
         surfaces,
         index_of,
     };

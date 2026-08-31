@@ -74,9 +74,14 @@ theorem continuous_higherOrderLerayQuadratic
           (base + 1) (by omega) state state) :=
     (periodicVectorWeightedLerayDivergenceConvolutionContinuous
       (base + 1) (by omega)).continuous.clm_apply continuous_id
-  simpa only [higherOrderLerayQuadratic,
-    periodicVectorWeightedLerayDivergenceConvolutionContinuous_apply] using
-    hcontinuous
+  have horder : base + 1 - 1 = base := by omega
+  rw [horder] at hcontinuous
+  apply hcontinuous.congr
+  intro state
+  funext component
+  apply Subtype.ext
+  funext k
+  rfl
 
 /-- Every continuous high-order path therefore has a continuous predecessor-scale nonlinear
 source path; this is the analytic port previously left explicit. -/
@@ -216,8 +221,13 @@ theorem continuous_periodicWeightedHeatSuccJoint
         (fun pair : PositiveElapsedTime × PeriodicWeightedSobolev base ↦
           (pair.1.1 - delta, fixedSmooth pair.2)) :=
       htime.prodMk hsource
-    simpa only [factored, Function.comp_apply] using
-      (continuous_periodicWeightedHeat_joint (base + 1) nu).comp hpair
+    have hjoint := continuous_periodicWeightedHeat_joint (base + 1) nu
+    change Continuous
+      ((fun pair : ℝ≥0 × PeriodicWeightedSobolev (base + 1) ↦
+          periodicWeightedHeat (base + 1) nu pair.1 pair.2) ∘
+        fun pair : PositiveElapsedTime × PeriodicWeightedSobolev base ↦
+          (pair.1.1 - delta, fixedSmooth pair.2))
+    exact hjoint.comp hpair
   have heventually : ∀ᶠ pair : PositiveElapsedTime × PeriodicWeightedSobolev base in
       nhds (⟨⟨tau₀, htau₀⟩, state₀⟩ :
         PositiveElapsedTime × PeriodicWeightedSobolev base),

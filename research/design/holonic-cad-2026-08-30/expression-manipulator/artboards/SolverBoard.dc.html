@@ -1,0 +1,327 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Avenir', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', 'Consolas', monospace; }
+    .card { background: #fbf8f2; border: 1px solid #d9d0bf; border-radius: 10px; }
+    .card-title { font-family: 'IBM Plex Mono', 'Menlo', 'Consolas', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a7060; margin: 0; }
+    .tri { position: absolute; width: 44px; height: 22px; cursor: pointer; }
+    .tri-n { clip-path: polygon(50% 0, 100% 50%, 50% 50%); }
+    .tri-e { clip-path: polygon(100% 50%, 50% 100%, 50% 50%); }
+    .tri-s { clip-path: polygon(50% 100%, 0 50%, 50% 50%); }
+    .tri-w { clip-path: polygon(0 50%, 50% 0, 50% 50%); }
+    .body-chip { position: absolute; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; box-sizing: border-box; background: #292418; color: #fbf8f2; display: flex; align-items: center; justify-content: center; font-family: 'STIX Two Text', 'Georgia', serif; font-size: 13px; font-weight: 600; transition: left 0.35s ease, top 0.35s ease; z-index: 6; }
+    .body-sel { outline: 3px solid #b45309; outline-offset: 2px; }
+    .body-anchor { outline: 3px solid #3c6ea5; outline-offset: 2px; }
+    .cand-chip { position: absolute; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; box-sizing: border-box; border: 2px dashed #b45309; background: rgba(255,253,248,0.85); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #b45309; z-index: 5; }
+    .ghost { position: absolute; width: 16px; height: 16px; border-radius: 50%; box-sizing: border-box; border: 1.5px solid #3c6ea5; background: rgba(255,253,248,0.7); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #3c6ea5; pointer-events: none; z-index: 5; }
+    .ray { position: absolute; height: 1.5px; transform-origin: 0 0; pointer-events: none; z-index: 4; }
+    .target-mark { position: absolute; width: 18px; height: 18px; border-radius: 3px; border: 2px solid #9c5480; box-sizing: border-box; transform: rotate(45deg); pointer-events: none; z-index: 5; }
+    .layer-lab { position: absolute; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; pointer-events: none; z-index: 1; }
+    .rec-row { display: flex; gap: 10px; padding: 3px 0; align-items: baseline; }
+    .rec-k { flex: 0 0 82px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #7a7060; }
+    .rec-v { flex: 1; font-size: 12px; line-height: 1.45; }
+    .chip { min-height: 36px; padding: 5px 12px; border-radius: 8px; cursor: pointer; background: #fffdf8; border: 1.5px solid #8a8071; font: inherit; color: inherit; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; }
+    .ret { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 3px 7px; color: #fbf8f2; display: inline-block; }
+    .ret-carried { background: #3e7d57; }
+    .ret-obstructed { background: #9c5480; }
+    .ret-open { background: #a67a2e; }
+    .ret-refused { background: #56503f; }
+    .swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+  </style>
+</helmet>
+
+<div style="width: 1400px; height: 900px; box-sizing: border-box; padding: 22px 26px; overflow: hidden; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">Solver board</div>
+      <div style="font-size: 12px; color: #7a7060">&#8484;&sup3; in four layers &middot; oriented cells &middot; the swing alphabet and its pantograph family &middot; the three-way return</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Scratch/HolonicSolver.lean &middot; Swing.lean &middot; HolonicPantographicSwingJets.lean</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 720px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="position: relative; width: 720px; height: 720px; box-sizing: border-box; border: 1.5px solid #b8ad97; border-radius: 6px; overflow: hidden; background: #fbf8f2">
+        <sc-for list="{{labels}}" as="lb" hint-placeholder-count="4">
+          <div class="layer-lab" style="left: {{lb.x}}px; top: {{lb.y}}px">{{lb.t}}</div>
+        </sc-for>
+        <sc-for list="{{tris}}" as="t" hint-placeholder-count="16">
+          <div class="tri {{t.q}}" style="left: {{t.x}}px; top: {{t.y}}px; background: {{t.c}}" onClick="{{t.pick}}"></div>
+        </sc-for>
+        <sc-if value="{{hasTarget}}" hint-placeholder-val="{{ true }}">
+          <div class="target-mark" style="left: {{tgt.x}}px; top: {{tgt.y}}px"></div>
+        </sc-if>
+        <sc-for list="{{rays}}" as="r" hint-placeholder-count="2">
+          <div class="ray" style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.len}}px; transform: rotate({{r.ang}}deg); background: {{r.c}}; opacity: {{r.o}}"></div>
+        </sc-for>
+        <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="4">
+          <div class="ghost" style="left: {{g.x}}px; top: {{g.y}}px">{{g.t}}</div>
+        </sc-for>
+        <sc-for list="{{cands}}" as="q" hint-placeholder-count="2">
+          <div class="cand-chip" style="left: {{q.x}}px; top: {{q.y}}px" onClick="{{q.pick}}">{{q.t}}</div>
+        </sc-for>
+        <sc-for list="{{bodies}}" as="b" hint-placeholder-count="3">
+          <div class="{{b.cls}}" style="left: {{b.x}}px; top: {{b.y}}px" onClick="{{b.pick}}">{{b.id}}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; color: #56503f; flex-wrap: wrap">
+        <span class="card-title">parity (x,y)</span>
+        <span class="swatch" style="background: #d9c48a"></span><span class="mono" style="font-size: 10px">(0,0)</span>
+        <span class="swatch" style="background: #9fb6cc"></span><span class="mono" style="font-size: 10px">(1,0)</span>
+        <span class="swatch" style="background: #b3c39a"></span><span class="mono" style="font-size: 10px">(0,1)</span>
+        <span class="swatch" style="background: #cfa3ae"></span><span class="mono" style="font-size: 10px">(1,1)</span>
+        <span style="margin-left: 6px">odd layers darker &middot; quartet shading = orientation about the cell&#39;s affine centre &middot; selected body lights its (&#8484;/2)&sup3; class</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; min-height: 0">
+
+      <div class="card" style="padding: 11px 14px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <p class="card-title" style="flex: 1">passages</p>
+          <button class="chip" onClick="{{reset}}">reset</button>
+        </div>
+        <div style="font-size: 12px; color: #56503f; margin-top: 7px; line-height: 1.45">{{instruction}}</div>
+      </div>
+
+      <div class="card" style="padding: 11px 14px">
+        <p class="card-title">pantograph family at this anchor</p>
+        <sc-if value="{{noFamily}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 12px; color: #7a7060; margin-top: 7px">choose a body, then an anchor body</div>
+        </sc-if>
+        <sc-if value="{{hasFamily}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 7px">
+            <sc-for list="{{family}}" as="f" hint-placeholder-count="5">
+              <div class="rec-row"><span class="rec-k">s = {{f.s}}</span><span class="rec-v mono" style="font-size: 11px">{{f.t}}</span></div>
+            </sc-for>
+          </div>
+          <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 6px">Q &minus; O = s&middot;(P &minus; O) &middot; only s = &minus;1 stays on the lattice and unimodular &middot; scales multiply serially</div>
+        </sc-if>
+      </div>
+
+      <div class="card" style="padding: 11px 14px; flex: 1; min-height: 0; overflow-y: auto">
+        <p class="card-title">solver return at the target</p>
+        <sc-if value="{{noTarget}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 12px; color: #7a7060; margin-top: 7px">click any cell to pose it as the candidate</div>
+        </sc-if>
+        <sc-if value="{{hasTarget}}" hint-placeholder-val="{{ true }}">
+          <div class="rec-row" style="margin-top: 6px"><span class="rec-k">candidate</span><span class="rec-v mono" style="font-size: 11.5px">{{tgt.t}}</span></div>
+          <div style="margin-top: 6px; font-size: 11px; color: #7a7060" class="mono">free-anchor alphabet, parity receiver</div>
+          <sc-for list="{{freeReturns}}" as="fr" hint-placeholder-count="3">
+            <div class="rec-row"><span class="rec-k">{{fr.body}}</span><span class="rec-v"><span class="ret {{fr.cls}}">{{fr.kind}}</span> <span style="font-size: 11.5px">{{fr.t}}</span></span></div>
+          </sc-for>
+          <div style="margin-top: 8px; font-size: 11px; color: #7a7060" class="mono">body-anchored alphabet, trivial receiver, aperture depth 5</div>
+          <div class="rec-row"><span class="rec-k">return</span><span class="rec-v"><span class="ret {{search.cls}}">{{search.kind}}</span> <span style="font-size: 11.5px">{{search.t}}</span></span></div>
+          <sc-if value="{{hasWord}}" hint-placeholder-val="{{ true }}">
+            <div class="rec-row"><span class="rec-k">realizer</span><span class="rec-v mono" style="font-size: 11px">{{search.word}}</span></div>
+          </sc-if>
+          <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 8px">{{search.owner}}</div>
+        </sc-if>
+      </div>
+
+      <div class="card" style="padding: 11px 14px">
+        <p class="card-title">last passage</p>
+        <sc-if value="{{noRec}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 12px; color: #7a7060; margin-top: 7px">none yet</div>
+        </sc-if>
+        <sc-if value="{{hasRec}}" hint-placeholder-val="{{ true }}">
+          <div class="rec-row" style="margin-top: 6px"><span class="rec-k">passage</span><span class="rec-v mono" style="font-size: 11.5px">{{rec.move}}</span></div>
+          <div class="rec-row"><span class="rec-k">invariants</span><span class="rec-v">{{rec.inv}}</span></div>
+        </sc-if>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1400,"height":900}}'>
+const N = 6, ZN = 4, UX = 22, UY = 11, LZ = 70, OX = 360, OY = 300;
+function isoX(x, y) { return OX + (x - y) * UX; }
+function isoY(x, y, z) { return OY + (x + y) * UY - z * LZ; }
+function ctr(p) { return [isoX(p[0], p[1]), isoY(p[0], p[1], p[2]) + UY]; }
+const START = { P: [2, 2, 0], Q: [3, 2, 1], R: [2, 3, 2] };
+const IDS = ['P', 'Q', 'R'];
+const BASE = { '00': '#d9c48a', '10': '#9fb6cc', '01': '#b3c39a', '11': '#cfa3ae' };
+const QUART = { 'tri-n': 1.14, 'tri-e': 1.0, 'tri-s': 0.86, 'tri-w': 0.94 };
+
+function m2(n) { return ((n % 2) + 2) % 2; }
+function pcXY(p) { return '' + m2(p[0]) + m2(p[1]); }
+function pc3(p) { return '' + m2(p[0]) + m2(p[1]) + m2(p[2]); }
+function mglyph(n) { return String(n).replace(/-/g, '−'); }
+function shade(hex, f) {
+  var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+  function cl(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+  function mix(v) { return f >= 1 ? cl(v + (255 - v) * (f - 1)) : cl(v * f); }
+  return 'rgb(' + mix(r) + ',' + mix(g) + ',' + mix(b) + ')';
+}
+function inB(q) { return q[0] >= 0 && q[0] < N && q[1] >= 0 && q[1] < N && q[2] >= 0 && q[2] < ZN; }
+function eq3(a, b) { return a[0] === b[0] && a[1] === b[1] && a[2] === b[2]; }
+function rayBetween(p1, p2, c, o) {
+  var dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+  return { x: p1[0], y: p1[1], len: Math.sqrt(dx * dx + dy * dy), ang: Math.atan2(dy, dx) * 180 / Math.PI, c: c, o: o };
+}
+function fmt(p) { return '(' + p.map(mglyph).join(', ') + ')'; }
+
+function searchWord(pos, target, maxDepth) {
+  var key = function (s) { return IDS.map(function (id) { return s[id].join(','); }).join('|'); };
+  var start = { P: pos.P.slice(), Q: pos.Q.slice(), R: pos.R.slice() };
+  var seen = {}; seen[key(start)] = true;
+  var frontier = [{ s: start, w: [] }];
+  for (var d = 0; d < maxDepth; d++) {
+    var next = [];
+    for (var i = 0; i < frontier.length; i++) {
+      var st = frontier[i];
+      for (var a = 0; a < 3; a++) for (var b = 0; b < 3; b++) {
+        if (a === b) continue;
+        var m = IDS[a], an = IDS[b], p = st.s[m], o = st.s[an];
+        var q = [2 * o[0] - p[0], 2 * o[1] - p[1], 2 * o[2] - p[2]];
+        if (!inB(q)) continue;
+        var ns = { P: st.s.P, Q: st.s.Q, R: st.s.R }; ns[m] = q;
+        var k = key(ns); if (seen[k]) continue; seen[k] = true;
+        var w = st.w.concat([m + '⟲' + an]);
+        if (eq3(q, target)) return { found: true, word: w, expanded: Object.keys(seen).length };
+        next.push({ s: ns, w: w });
+      }
+    }
+    frontier = next;
+  }
+  return { found: false, expanded: Object.keys(seen).length };
+}
+
+class Component extends DCLogic {
+  state = { pos: { P: [2, 2, 0], Q: [3, 2, 1], R: [2, 3, 2] }, mover: null, anchor: null, target: null, rec: null };
+
+  renderVals() {
+    var self = this;
+    var st = this.state, pos = st.pos;
+    var moverCls = st.mover ? pc3(pos[st.mover]) : null;
+
+    var labels = [];
+    for (var z = 0; z < ZN; z++) labels.push({ x: OX - 170, y: isoY(0, 0, z) + 5 * UY - 6, t: 'z = ' + z });
+
+    var tris = [];
+    var QS = ['tri-n', 'tri-e', 'tri-s', 'tri-w'];
+    for (var z = 0; z < ZN; z++)
+      for (var y = 0; y < N; y++)
+        for (var x = 0; x < N; x++) {
+          var p = [x, y, z];
+          var base = BASE[pcXY(p)];
+          var lit = moverCls !== null && pc3(p) === moverCls;
+          var f0 = (m2(z) ? 0.86 : 1.0) * (lit ? 0.8 : 1.0);
+          var bx = isoX(x, y) - UX, by = isoY(x, y, z);
+          for (var qi = 0; qi < 4; qi++) {
+            tris.push({ x: bx, y: by, q: QS[qi], c: shade(base, f0 * QUART[QS[qi]] * (lit ? 1 : 1.08)),
+                        pick: (function (pp) { return function () { self.setState({ target: pp }); }; })(p) });
+          }
+        }
+
+    var bodies = IDS.map(function (id) {
+      var c = ctr(pos[id]);
+      return { id: id, x: c[0] - 13, y: c[1] - 13,
+               cls: 'body-chip' + (st.mover === id ? ' body-sel' : '') + (st.anchor === id ? ' body-anchor' : ''),
+               pick: function () { self.pickBody(id); } };
+    });
+
+    var cands = [], rays = [], ghosts = [], family = [];
+    if (st.mover) {
+      var p = pos[st.mover], pc0 = ctr(p);
+      IDS.forEach(function (an) {
+        if (an === st.mover) return;
+        var o = pos[an];
+        var q = [2 * o[0] - p[0], 2 * o[1] - p[1], 2 * o[2] - p[2]];
+        if (!inB(q)) return;
+        var qc = ctr(q);
+        cands.push({ x: qc[0] - 11, y: qc[1] - 11, t: an, pick: function () { self.commit(st.mover, an, q); } });
+        rays.push(rayBetween(pc0, qc, '#b45309', 0.45));
+      });
+      if (st.anchor) {
+        var o = pos[st.anchor], oc = ctr(o);
+        [[2, '2'], [0.5, '½'], [-2, '−2'], [-0.5, '−½']].forEach(function (sc) {
+          var s = sc[0];
+          var q = [o[0] + s * (p[0] - o[0]), o[1] + s * (p[1] - o[1]), o[2] + s * (p[2] - o[2])];
+          var qc = ctr(q);
+          var lattice = q.every(function (v) { return Number.isInteger(v); });
+          ghosts.push({ x: qc[0] - 8, y: qc[1] - 8, t: sc[1] });
+          rays.push(rayBetween(oc, qc, '#3c6ea5', 0.3));
+          family.push({ s: sc[1], t: fmt(q) + (lattice ? (inB(q) ? ' · on the lattice' : ' · leaves the board') : ' · leaves the lattice — refused as a passage on ℤ³') });
+        });
+        var qs = [2 * o[0] - p[0], 2 * o[1] - p[1], 2 * o[2] - p[2]];
+        family.unshift({ s: '−1', t: fmt(qs) + ' · the swing — commit it on the board' });
+      }
+    }
+
+    var tgt = null, freeReturns = [], search = null;
+    if (st.target) {
+      var T = st.target, tc = ctr(T);
+      tgt = { x: tc[0] - 9, y: tc[1] - 9, t: fmt(T) };
+      IDS.forEach(function (id) {
+        var b = pos[id];
+        if (pc3(b) === pc3(T)) {
+          var mid = [(b[0] + T[0]) / 2, (b[1] + T[1]) / 2, (b[2] + T[2]) / 2];
+          freeReturns.push({ body: id, kind: 'carried', cls: 'ret-carried', t: 'one swing about ' + fmt(mid) + ' — freeSwingPassage_glues' });
+        } else {
+          freeReturns.push({ body: id, kind: 'obstructed', cls: 'ret-obstructed', t: 'parity class ' + pc3(b) + ' ≠ ' + pc3(T) + ' — the separating invariant' });
+        }
+      });
+      var anyClass = IDS.some(function (id) { return pc3(pos[id]) === pc3(T); });
+      if (!anyClass) {
+        search = { kind: 'obstructed', cls: 'ret-obstructed', t: 'no body shares the candidate’s class; no swing moves a class', owner: 'Swing.lean · theSwingPreservesTheParityClass · HolonicSolver.fourthCorner_obstructed' };
+      } else {
+        var r = searchWord(pos, T, 5);
+        if (r.found) search = { kind: 'carried', cls: 'ret-carried', t: r.word.length + ' swings, ' + r.expanded + ' configurations visited', word: r.word.join(' · '), owner: 'HolonicSolver.SolverReturn.carried — realizer exhibited' };
+        else search = { kind: 'open', cls: 'ret-open', t: 'no word within depth 5 (' + r.expanded + ' configurations); parity does not forbid it — retained as open, never as false', owner: 'aperture is apparatus, not law — a timeout is a counterexample to the aperture, not a verdict' };
+      }
+    }
+
+    return {
+      labels: labels, tris: tris, bodies: bodies, cands: cands, rays: rays, ghosts: ghosts,
+      family: family, hasFamily: family.length > 0, noFamily: family.length === 0,
+      reset: function () { self.setState({ pos: { P: START.P.slice(), Q: START.Q.slice(), R: START.R.slice() }, mover: null, anchor: null, target: null, rec: null }); },
+      instruction: st.mover
+        ? (st.anchor
+            ? st.mover + ' about ' + st.anchor + ': the family is drawn along the ray; the dashed swing site commits'
+            : st.mover + ' in hand — its class is lit across every layer; dashed sites are its swings; click a second body to see the whole pantograph family at that anchor')
+        : 'click a body to see its potential cone and swings · click any cell to pose it as a candidate',
+      tgt: tgt, hasTarget: !!tgt, noTarget: !tgt,
+      freeReturns: freeReturns,
+      search: search || {}, hasWord: !!(search && search.word),
+      rec: st.rec, hasRec: !!st.rec, noRec: !st.rec
+    };
+  }
+
+  pickBody(id) {
+    var st = this.state;
+    if (st.mover === null) { this.setState({ mover: id, anchor: null }); return; }
+    if (st.mover === id) { this.setState({ mover: null, anchor: null }); return; }
+    this.setState({ anchor: st.anchor === id ? null : id });
+  }
+
+  commit(m, an, q) {
+    var st = this.state;
+    var p = st.pos[m];
+    var pos = { P: st.pos.P.slice(), Q: st.pos.Q.slice(), R: st.pos.R.slice() };
+    pos[m] = q;
+    var dz = q[2] - p[2];
+    this.setState({
+      pos: pos, mover: null, anchor: null,
+      rec: { move: m + ' ⟲ ' + an + ': ' + fmt(p) + ' → ' + fmt(q),
+             inv: 'parity class held · hand flipped · |span| ×1' + (dz === 0 ? ' · same layer' : ' · Δz = ' + (dz > 0 ? '+' + dz : mglyph(dz))) }
+    });
+  }
+}
+</script>
+</body>
+</html>

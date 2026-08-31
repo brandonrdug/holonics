@@ -82,9 +82,21 @@ theorem le_timeDependentGronwallBound
     have hExp : HasDerivAt (fun s => Real.exp (-A s))
         (Real.exp (-A t) * (-K t)) t := (hA t).neg.exp
     have hproduct := (hE t ht).mul hExp
-    have hdifference := hproduct.sub (hB t)
-    convert hdifference using 1
-    dsimp [G, B, weightedF]
+    have hproduct' : HasDerivAt
+        (fun s => E s * Real.exp (-A s))
+        (E' t * Real.exp (-A t) + E t * (Real.exp (-A t) * (-K t))) t :=
+      hproduct.congr_of_eventuallyEq
+        (Filter.Eventually.of_forall (fun s => rfl))
+    have hdifference := hproduct'.sub (hB t)
+    have hdifference' : HasDerivAt
+        (fun s => E s * Real.exp (-A s) - B s)
+        (E' t * Real.exp (-A t) + E t * (Real.exp (-A t) * (-K t)) - weightedF t) t :=
+      hdifference.congr_of_eventuallyEq
+        (Filter.Eventually.of_forall (fun s => rfl))
+    change HasDerivAt
+      (fun s => E s * Real.exp (-A s) - B s)
+      (Real.exp (-A t) * (E' t - K t * E t - F t)) t
+    convert hdifference' using 1
     ring
   have hGcontinuous : ContinuousOn G (Icc a b) := by
     intro t ht

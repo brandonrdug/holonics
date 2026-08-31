@@ -580,12 +580,12 @@ theorem weightedLerayDivergenceConvolution_divergenceFree
         (weightedLerayDivergenceConvolution advecting transported) =
         periodicVectorSobolevTwoUnderlying oldOutput := by
     funext component
-    simpa only [nativeVectorTwoUnderlying,
-      weightedLerayDivergenceConvolution_apply,
-      periodicVectorSobolevTwoUnderlying] using
-        congrArg Subtype.val
-          (weightedSobolevCoefficients_coefficientWeightedRealization 2
-            (oldOutput component))
+    change weightedSobolevRawCoefficients 2
+        (coefficientWeightedRealization 2 (oldOutput component)) =
+      (oldOutput component).1
+    exact congrArg Subtype.val
+      (weightedSobolevCoefficients_coefficientWeightedRealization 2
+        (oldOutput component))
   rw [hunderlying]
   exact lerayProjectedH3DivergenceConvolution_divergenceFree _ _
 

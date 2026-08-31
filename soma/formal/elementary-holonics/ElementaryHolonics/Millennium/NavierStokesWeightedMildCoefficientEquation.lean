@@ -79,10 +79,15 @@ theorem hasDerivAt_scalarMildReturn
   have hreturn :=
     (hheat.mul_const initial).sub
       (hasDerivAt_scalarHeatVolterra (E := ℂ) rate hsource t)
-  convert hreturn using 1
-  simp only [scalarMildReturn, Complex.real_smul]
-  rw [show (((-rate : ℝ) : ℂ)) = -((rate : ℝ) : ℂ) by norm_num]
-  ring
+  have hderivative :
+      (((-rate : ℝ) : ℂ) * (Real.exp (-rate * t) : ℂ) * initial -
+          (source t - rate • scalarHeatVolterra rate source t)) =
+        (((-rate : ℝ) : ℂ) * scalarMildReturn rate initial source t - source t) := by
+    simp only [scalarMildReturn, Complex.real_smul]
+    rw [show (((-rate : ℝ) : ℂ)) = -((rate : ℝ) : ℂ) by norm_num]
+    ring
+  rw [← hderivative]
+  exact hreturn
 
 /-! ## The exact coefficient of the singular heat return -/
 

@@ -4,6 +4,9 @@
 //! application scheduler. A caller mounts an explicit owner and supplies a typed occurrence at
 //! that owner's mouth. Rejected historical instruments remain recoverable from Git history.
 
+/// Runtime face of SENS0's addressed-span law. Storage fragments are exterior carriage; exact
+/// source coordinates, pullback joins, gaps, and the one moved reconstruction fibre are retained.
+pub mod addressed_span;
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod algorithmic_material;

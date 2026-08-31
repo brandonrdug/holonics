@@ -224,7 +224,7 @@ private lemma classFromEvenValuations {n : ℕ} (hn : 0 < n) {x : ℚ} (hx : x �
           omega
       · rw [Nat.factorization_eq_zero_of_not_dvd hdvd]
         omega
-    · rw [Nat.factorization_eq_zero_of_non_prime _ hℓp]
+    · rw [Nat.factorization_eq_zero_of_not_prime _ hℓp]
       omega
   -- assemble the signed class
   rcases lt_trichotomy (x.num * (x.den : ℤ)) 0 with hs | hs | hs
@@ -261,10 +261,10 @@ private lemma classFromEvenValuations {n : ℕ} (hn : 0 < n) {x : ℚ} (hx : x �
 /-! ## 3. The support theorem at every modulus -/
 
 lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotOneAt n (.some h) = if x = 0 then -n ^ 2 else x := rfl
+    slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
 
 lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotTwoAt n (.some h) = if x = n then 2 * n ^ 2 else x - n := rfl
+    slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     y ^ 2 = x ^ 3 - n ^ 2 * x := by
@@ -285,8 +285,8 @@ theorem theSlotClassesAreSupportedAtEveryModulus (n : ℕ) (hn : 0 < n)
   have hnq : ((n : ℚ)) ≠ 0 := by exact_mod_cast hn.ne'
   rcases P with _ | @⟨x, y, h⟩
   · refine ⟨1, 1, one_ne_zero, one_ne_zero, one_dvd _, one_dvd _, ?_, ?_⟩
-    · simpa using Descent.sqClsRefl (1 : ℚ)
-    · simpa using Descent.sqClsRefl (1 : ℚ)
+    · simpa [slotOneAt] using Descent.sqClsRefl (1 : ℚ)
+    · simpa [slotTwoAt] using Descent.sqClsRefl (1 : ℚ)
   · by_cases hy : y = 0
     · -- the half-turns, with their conventional classes
       have hcurve := onCurveAt h

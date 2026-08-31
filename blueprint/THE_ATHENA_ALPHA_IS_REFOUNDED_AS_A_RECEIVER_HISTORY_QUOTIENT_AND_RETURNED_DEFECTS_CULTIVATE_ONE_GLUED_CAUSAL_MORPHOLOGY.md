@@ -1,15 +1,17 @@
 # Athena alpha is refounded as a receiver-history quotient, and returned defects cultivate one glued causal morphology
 
-**Authority:** this blueprint supersedes
+**Status:** COMPLETED HISTORICAL CONSTRUCTION CONTRACT; SCHEDULES NOTHING.
+
+**Authority:** this blueprint superseded
 [`THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`](THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md)
-and is the sole active Athena-alpha construction contract composed by
+and was the Athena-alpha construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 
 **Truth statuses:** `counterexample` for the post-admission falsification of the former alpha
 interpretation; `established-bounded` for the retained source, tower, artifact, CUDA, and
 source-detachment testimony; `proved-derived` for the cited Lean theorems in their stated scopes;
 `definition` for the corrected mathematical objects and phase grade; `project-postulate` for the
-construction and placement laws; and `open` for the product which this blueprint schedules.
+construction and placement laws; and `open` for the product which this blueprint historically posed.
 
 ---
 

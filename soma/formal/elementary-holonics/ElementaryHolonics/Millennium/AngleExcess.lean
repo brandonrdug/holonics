@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.Analysis.Complex.Exponential
 
 /-!
 # Conservation of faces and angles: the excess decides the curvature, and positivity is finite
@@ -124,8 +125,14 @@ denominator does not vanish — a one-line algebraic identity, no topology neede
 **the same inequality that makes the excess positive is the one that makes the solid close.** -/
 theorem theSchlafliEulerFormula (p q : ℚ) (h : 2 * p + 2 * q - p * q ≠ 0) :
     vertices p q - edges p q + faces p q = 2 := by
-  rw [vertices, edges, faces, div_sub_div_same, div_add_div_same, div_eq_iff h]
-  ring
+  rw [vertices, edges, faces]
+  calc
+    4 * p / (2 * p + 2 * q - p * q) - 2 * p * q / (2 * p + 2 * q - p * q) +
+        4 * q / (2 * p + 2 * q - p * q) =
+      (4 * p - 2 * p * q + 4 * q) / (2 * p + 2 * q - p * q) := by ring
+    _ = 2 := by
+      apply (div_eq_iff h).2
+      ring
 
 /-- The denominator is positive exactly on the spherical side. -/
 theorem theDenominatorIsTheSphericalCondition {p q : ℚ} (hp : 0 < p) (hq : 0 < q) :
@@ -161,6 +168,73 @@ theorem theEulerCharacteristicIsTwoAtEverySolid :
     vertices 5 3 - edges 5 3 + faces 5 3 = 2 ∧
     vertices 3 5 - edges 3 5 + faces 3 5 = 2 := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;> exact theSchlafliEulerFormula _ _ (by norm_num)
+
+/-! ## 3a.  Unfolded face histories and exact crystalline receivers -/
+
+/-- An unfolded face history keeps the visible face occurrence and one independently oriented
+binary incidence at every side of that face.  This is a new receiver population, not the ordinary
+vertex set of the visible polyhedron. -/
+abbrev FaceHistory (facePopulation sidesPerFace : ℕ) :=
+  Fin facePopulation × (Fin sidesPerFace → Bool)
+
+/-- The exact population of unfolded face histories. -/
+def faceHistoryPopulation (facePopulation sidesPerFace : ℕ) : ℕ :=
+  facePopulation * 2 ^ sidesPerFace
+
+/-- [proved-derived; formal-checked] The type-level occurrence population has exactly the proposed
+`F·2^p` cardinality. -/
+theorem card_faceHistory (facePopulation sidesPerFace : ℕ) :
+    Fintype.card (FaceHistory facePopulation sidesPerFace) =
+      faceHistoryPopulation facePopulation sidesPerFace := by
+  simp [FaceHistory, faceHistoryPopulation]
+
+/-- [proved-derived; formal-checked] The five Platonic unfolded receivers, in tetrahedron, cube,
+octahedron, icosahedron, and dodecahedron order. -/
+theorem theFivePlatonicFaceHistoryPopulations :
+    faceHistoryPopulation 4 3 = 32 ∧
+    faceHistoryPopulation 6 4 = 96 ∧
+    faceHistoryPopulation 8 3 = 64 ∧
+    faceHistoryPopulation 20 3 = 160 ∧
+    faceHistoryPopulation 12 5 = 384 := by
+  norm_num [faceHistoryPopulation]
+
+/-- A crystalline realization supplies the geometric information which a Schläfli incidence
+symbol and a history count do not: exact positions and complex current carried by every retained
+history.  Positions need not lie on a circular or Euclidean-perfect lattice. -/
+structure CrystallineFaceHistoryRealization
+    (facePopulation sidesPerFace ambientDimension : ℕ) where
+  position : FaceHistory facePopulation sidesPerFace → Fin ambientDimension → ℝ
+  coefficient : FaceHistory facePopulation sidesPerFace → ℂ
+
+/-- Exact phase of one retained history at a receiver wave vector. -/
+noncomputable def crystallineHistoryPhase
+    {facePopulation sidesPerFace ambientDimension : ℕ}
+    (realization : CrystallineFaceHistoryRealization
+      facePopulation sidesPerFace ambientDimension)
+    (waveVector : Fin ambientDimension → ℝ)
+    (history : FaceHistory facePopulation sidesPerFace) : ℂ :=
+  Complex.exp (Complex.I *
+    (∑ coordinate : Fin ambientDimension,
+      (waveVector coordinate * realization.position history coordinate : ℝ) : ℂ))
+
+/-- The exact finite diffraction amplitude.  Interference is performed before the intensity
+receiver, so histories with the same visible endpoint may still contribute different phases. -/
+noncomputable def crystallineDiffractionAmplitude
+    {facePopulation sidesPerFace ambientDimension : ℕ}
+    (realization : CrystallineFaceHistoryRealization
+      facePopulation sidesPerFace ambientDimension)
+    (waveVector : Fin ambientDimension → ℝ) : ℂ :=
+  ∑ history : FaceHistory facePopulation sidesPerFace,
+    realization.coefficient history *
+      crystallineHistoryPhase realization waveVector history
+
+/-- The intensity pattern is the real norm-square quotient of the complete complex amplitude. -/
+noncomputable def crystallineDiffractionIntensity
+    {facePopulation sidesPerFace ambientDimension : ℕ}
+    (realization : CrystallineFaceHistoryRealization
+      facePopulation sidesPerFace ambientDimension)
+    (waveVector : Fin ambientDimension → ℝ) : ℝ :=
+  Complex.normSq (crystallineDiffractionAmplitude realization waveVector)
 
 /-! ## 4.  The trichotomy, completed: five, three, and infinitely many -/
 

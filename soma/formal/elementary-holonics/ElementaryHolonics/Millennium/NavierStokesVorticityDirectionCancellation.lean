@@ -50,19 +50,22 @@ theorem complexStretchingReading_symmetricComplexJacobianPart
     complexStretchingReading receiver (symmetricComplexJacobianPart J) =
       complexStretchingReading receiver J := by
   simp [complexStretchingReading, symmetricComplexJacobianPart,
-    complexMatrixAction, complexDot, Matrix.mulVec, dotProduct, Fin.sum_univ_succ]
+    complexMatrixAction, complexDot, Matrix.mulVec, dotProduct, Fin.sum_univ_succ,
+    Matrix.transpose_apply]
   ring
 
 /-- The symmetric strain coefficient reconstructed from one addressed vorticity coefficient. -/
 def hodgeStrainMode
     (frequency : SpatialFrequency) (source : ComplexVector) : ComplexMatrix3 :=
-  symmetricComplexJacobianPart (hodgeJacobianMode frequency source)
+  symmetricComplexJacobianPart
+    (Matrix.of (fun component coordinate ↦ hodgeJacobianMode frequency source component coordinate))
 
 /-- One addressed source-to-receiver stretching occurrence. -/
 def hodgeStrainModeReading
     (frequency : SpatialFrequency) (receiver source : ComplexVector) : ℂ :=
   complexStretchingReading receiver (hodgeStrainMode frequency source)
 
+set_option backward.isDefEq.respectTransparency.types true in
 /-- **Exact scalar-triple-product law.**  At a nonzero frequency, stretching is the product of
 the receiver's longitudinal frequency face and its oriented cross face with the source, divided
 by the exact squared-frequency modulus. -/
@@ -74,19 +77,24 @@ theorem hodgeStrainModeReading_eq_scalarTriple
           complexDot receiver
             (complexCross (complexFrequencyVector frequency) source)) /
         (frequencySquared frequency : ℂ) := by
-  rw [hodgeStrainModeReading, hodgeStrainMode,
-    complexStretchingReading_symmetricComplexJacobianPart]
-  have hs : (frequencySquared frequency : ℂ) ≠ 0 :=
-    Complex.ofReal_ne_zero.mpr (frequencySquared_pos hfrequency).ne'
-  have hpi : (Real.pi : ℂ) ≠ 0 :=
-    Complex.ofReal_ne_zero.mpr Real.pi_ne_zero
-  simp [complexStretchingReading, complexMatrixAction, complexDot,
-    hodgeJacobianMode, nonzeroModeHodgeReconstruction, fourierJacobianMode,
-    complexCross, complexFrequencyVector, Matrix.mulVec, dotProduct,
-    Fin.sum_univ_succ]
-  field_simp [hs, hpi]
-  rw [Complex.I_sq]
-  ring
+  unfold hodgeStrainModeReading hodgeStrainMode
+  calc
+    _ = complexStretchingReading receiver
+          (Matrix.of (fun component coordinate ↦
+            hodgeJacobianMode frequency source component coordinate)) :=
+      complexStretchingReading_symmetricComplexJacobianPart receiver _
+    _ = _ := by
+      have hs : (frequencySquared frequency : ℂ) ≠ 0 :=
+        Complex.ofReal_ne_zero.mpr (frequencySquared_pos hfrequency).ne'
+      have hpi : (Real.pi : ℂ) ≠ 0 :=
+        Complex.ofReal_ne_zero.mpr Real.pi_ne_zero
+      simp [complexStretchingReading, complexMatrixAction, complexDot,
+        hodgeJacobianMode, nonzeroModeHodgeReconstruction, fourierJacobianMode,
+        complexCross, complexFrequencyVector, Matrix.mulVec, dotProduct,
+        Fin.sum_univ_succ]
+      field_simp [hs, hpi]
+      rw [Complex.I_sq]
+      ring
 
 /-- A source vorticity component parallel to the receiving vorticity contributes no stretching. -/
 theorem hodgeStrainModeReading_aligned_eq_zero
@@ -96,7 +104,8 @@ theorem hodgeStrainModeReading_aligned_eq_zero
   · subst frequency
     rw [hodgeStrainModeReading, hodgeStrainMode, hodgeJacobianMode_zero]
     simp [symmetricComplexJacobianPart, complexStretchingReading, complexMatrixAction,
-      complexDot]
+      complexDot, Matrix.mulVec, dotProduct, Fin.sum_univ_succ,
+      Matrix.transpose_apply, Matrix.zero_apply, Pi.zero_apply]
   · rw [hodgeStrainModeReading_eq_scalarTriple hfrequency]
     have hcross : complexDot receiver
         (complexCross (complexFrequencyVector frequency) (amplitude • receiver)) = 0 := by

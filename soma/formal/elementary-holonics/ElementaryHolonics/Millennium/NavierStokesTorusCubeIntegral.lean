@@ -22,38 +22,32 @@ open Soma.Holonics.Millennium.NavierStokesPeriodicFlux
 open Soma.Holonics.Millennium.NavierStokesTorusFourier
 open Soma.Holonics.Millennium.NavierStokesTorusVorticity
 
-local instance : MeasureSpace UnitAddCircle := ⟨AddCircle.haarAddCircle⟩
-local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
-local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
-  inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
-
 /-- The coordinatewise quotient sends the half-open product cube to probability Haar measure on
 the genuine spatial torus. -/
 theorem piToSpatialTorus_measurePreserving_Ioc :
-    MeasurePreserving piToSpatialTorus
+    @MeasurePreserving (Fin 3 → ℝ) SpatialTorus
+      MeasurableSpace.pi MeasurableSpace.pi piToSpatialTorus
       (volume.restrict
         (Set.pi Set.univ (fun _ : Fin 3 ↦ Set.Ioc (0 : ℝ) 1)))
       (volume : Measure SpatialTorus) := by
   have hcoordinate : ∀ _i : Fin 3,
       MeasurePreserving ((↑) : ℝ → UnitAddCircle)
         (volume.restrict (Set.Ioc (0 : ℝ) 1))
-        (volume : Measure UnitAddCircle) :=
+    (volume : Measure UnitAddCircle) :=
     fun _i ↦ by
       have hstandard := UnitAddCircle.measurePreserving_mk 0
-      have hmeasure :
-          (@volume UnitAddCircle (AddCircle.measureSpace 1)) =
-            AddCircle.haarAddCircle := by
-        change ENNReal.ofReal 1 • Measure.addHaarMeasure ⊤ =
-          Measure.addHaarMeasure ⊤
-        simp
-      rw [hmeasure] at hstandard
       simpa only [zero_add] using hstandard
   have hpi := MeasureTheory.measurePreserving_pi
     (fun _ : Fin 3 ↦ volume.restrict (Set.Ioc (0 : ℝ) 1))
     (fun _ : Fin 3 ↦ (volume : Measure UnitAddCircle)) hcoordinate
   rw [← Measure.restrict_pi_pi] at hpi
-  simpa only [MeasureTheory.volume_pi, piToSpatialTorus] using hpi
+  change @MeasurePreserving (Fin 3 → ℝ) SpatialTorus
+      MeasurableSpace.pi MeasurableSpace.pi
+      (fun x : Fin 3 → ℝ => fun i : Fin 3 => (x i : UnitAddCircle))
+      ((Measure.pi fun _ : Fin 3 => volume).restrict
+        (Set.pi Set.univ (fun _ : Fin 3 => Set.Ioc (0 : ℝ) 1)))
+      (Measure.pi fun _ : Fin 3 => volume)
+  simpa only [MeasureTheory.volume_pi] using hpi
 
 /-- Replacing the half-open product cube by the closed product cube changes no integral. -/
 theorem integral_piToSpatialTorus_productIcc
@@ -64,7 +58,7 @@ theorem integral_piToSpatialTorus_productIcc
   rw [MeasureTheory.volume_pi,
     ← setIntegral_congr_set Measure.univ_pi_Ioc_ae_eq_Icc]
   rw [← piToSpatialTorus_measurePreserving_Ioc.map_eq]
-  simpa only [MeasureTheory.volume_pi] using
+  simpa only [MeasureTheory.volume_pi, Pi.zero_apply] using
     (MeasureTheory.integral_map
       piToSpatialTorus_measurePreserving_Ioc.aemeasurable
       field.continuous.aestronglyMeasurable).symm

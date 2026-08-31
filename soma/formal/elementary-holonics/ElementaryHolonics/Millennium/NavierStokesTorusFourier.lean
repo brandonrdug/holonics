@@ -140,6 +140,7 @@ theorem torusSpatialFourierCoeff_eq_integral_tail_fourierCoeff
   have hchange :
       (∫ x : SpatialTorus, integrand x) =
         ∫ z : UnitAddCircle × SpatialTorusTail, splitIntegrand z := by
+    rw [Measure.volume_eq_prod]
     have h := splitFirstTorus_measurePreserving.integral_comp'
       (fun z : UnitAddCircle × SpatialTorusTail ↦
         integrand (splitFirstTorus.symm z))
@@ -328,8 +329,14 @@ theorem coordinateReindexTorusMeasurableEquiv_apply
   ext i
   change (Equiv.piCongrLeft (fun _ : Fin 3 ↦ UnitAddCircle)
       (coordinateSwap coordinate) q) i = q (coordinateSwap coordinate i)
-  rw [Equiv.piCongrLeft_apply]
-  simp [coordinateSwap, Equiv.swap_apply_self]
+  let e := coordinateSwap coordinate
+  have he : e (e i) = i := by
+    simp [e, coordinateSwap]
+  calc
+    (Equiv.piCongrLeft (fun _ : Fin 3 ↦ UnitAddCircle) e q) i =
+        (Equiv.piCongrLeft (fun _ : Fin 3 ↦ UnitAddCircle) e q) (e (e i)) := by rw [he]
+    _ = q (e i) :=
+      Equiv.piCongrLeft_apply_apply (fun _ : Fin 3 ↦ UnitAddCircle) e q (e i)
 
 @[simp]
 theorem coordinateReindexTorus_self
@@ -550,8 +557,9 @@ theorem continuous_complexJacobianComponent
   have hcoordinate : Continuous (fun x ↦
       ((fderiv ℝ velocity x) (EuclideanSpace.basisFun (Fin 3) ℝ coordinate)) component) :=
     (EuclideanSpace.proj component).continuous.comp haction
-  simpa [complexJacobianComponent, velocityJacobianAt, jacobianMatrix_apply] using
-    Complex.continuous_ofReal.comp hcoordinate
+  unfold complexJacobianComponent velocityJacobianAt
+  simp_rw [jacobianMatrix_apply]
+  exact Complex.continuous_ofReal.comp hcoordinate
 
 /-- Differentiation preserves the periodic incidence of every actual Jacobian component. -/
 theorem isOnePeriodic_complexJacobianComponent
@@ -603,9 +611,14 @@ theorem coordinateLinePoint_hasDerivAt
     (fun s : ℝ ↦ base + (s - anchor) •
       EuclideanSpace.basisFun (Fin 3) ℝ coordinate)
     (EuclideanSpace.basisFun (Fin 3) ℝ coordinate) anchor
-  convert (hasDerivAt_const anchor base).add
-    (((hasDerivAt_id anchor).sub_const anchor).smul_const
-      (EuclideanSpace.basisFun (Fin 3) ℝ coordinate)) using 1 <;> simp
+  change HasDerivAt
+    ((fun _ : ℝ ↦ base) +
+      (fun s ↦ (s - anchor) • EuclideanSpace.basisFun (Fin 3) ℝ coordinate))
+    (EuclideanSpace.basisFun (Fin 3) ℝ coordinate) anchor
+  simpa only [id_eq, zero_add, one_smul] using
+    (hasDerivAt_const anchor base).add
+      (((hasDerivAt_id anchor).sub_const anchor).smul_const
+        (EuclideanSpace.basisFun (Fin 3) ℝ coordinate))
 
 /-- The quotient lifts of an actual `C¹`, one-periodic velocity component and its actual
 Jacobian entry form the selected-coordinate derivative pair required by the Fourier theorem. -/
@@ -729,8 +742,13 @@ theorem continuous_vorticityAt
     {velocity : InitialVelocity} (hvelocity : ContDiff ℝ 1 velocity) :
     Continuous (fun x ↦ vorticityAt velocity x) := by
   have hderivative := hvelocity.continuous_fderiv (by norm_num)
-  simpa [vorticityAt, velocityJacobianAt] using
-    derivativeCurlLinearMap.continuous.comp hderivative
+  have hrepresentation :
+      (fun x ↦ vorticityAt velocity x) =
+        (fun x ↦ derivativeCurlLinearMap (fderiv ℝ velocity x)) := by
+    funext x
+    exact (derivativeCurlLinearMap_apply (fderiv ℝ velocity x)).symm
+  rw [hrepresentation]
+  exact derivativeCurlLinearMap.continuous.comp hderivative
 
 /-- The actual vorticity preserves every unit-period incidence of its source velocity. -/
 theorem isOnePeriodic_vorticityAt

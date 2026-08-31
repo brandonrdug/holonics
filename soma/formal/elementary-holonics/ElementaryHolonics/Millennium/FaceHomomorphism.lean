@@ -232,14 +232,14 @@ private lemma negYOne (x y : ℚ) : Descent.E.negY x y = -y := by
 
 private lemma someEqOne {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : Descent.E.Nonsingular x₁ y₁} {h₂ : Descent.E.Nonsingular x₂ y₂} :
-    (Point.some h₁ : Descent.E.Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : Descent.E.Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma slotOne_some {x y : ℚ} (h : Descent.E.Nonsingular x y) :
-    Descent.slotOne (.some h) = if x = 0 then -1 else x := rfl
+    Descent.slotOne (.some _ _ h) = if x = 0 then -1 else x := rfl
 
 private lemma slotTwo_some {x y : ℚ} (h : Descent.E.Nonsingular x y) :
-    Descent.slotTwo (.some h) = if x = 1 then 2 else x - 1 := rfl
+    Descent.slotTwo (.some _ _ h) = if x = 1 then 2 else x - 1 := rfl
 
 private lemma slotOne_ne (P : Descent.E.Point) : Descent.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
@@ -290,7 +290,7 @@ theorem theDoublesLandInTheKernel (Q : Descent.E.Point) :
   · rw [← Point.zero_def, add_zero]
     exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
   · by_cases hy : y = 0
-    · have hzero : (Point.some h : Descent.E.Point) + Point.some h = 0 :=
+    · have hzero : (Point.some _ _ h : Descent.E.Point) + Point.some _ _ h = 0 :=
         Point.add_self_of_Y_eq (by rw [negYOne, hy]; norm_num)
       rw [hzero]
       exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
@@ -314,10 +314,10 @@ theorem theDoublesLandInTheKernel (Q : Descent.E.Point) :
 point level — `FaithfulFace`'s translation lift composed with its face-law closure. -/
 private lemma chordHalfTurnRight {x₁ y₁ x₂ : ℚ} (h₁ : Descent.E.Nonsingular x₁ y₁)
     (h₂ : Descent.E.Nonsingular x₂ 0) (hy₁ : y₁ ≠ 0) (hx : x₁ ≠ x₂) :
-    Descent.SqCls (Descent.slotOne (Point.some h₁ + Point.some h₂))
-      (Descent.slotOne (Point.some h₁) * Descent.slotOne (Point.some h₂)) ∧
-    Descent.SqCls (Descent.slotTwo (Point.some h₁ + Point.some h₂))
-      (Descent.slotTwo (Point.some h₁) * Descent.slotTwo (Point.some h₂)) := by
+    Descent.SqCls (Descent.slotOne (Point.some _ _ h₁ + Point.some _ _ h₂))
+      (Descent.slotOne (Point.some _ _ h₁) * Descent.slotOne (Point.some _ _ h₂)) ∧
+    Descent.SqCls (Descent.slotTwo (Point.some _ _ h₁ + Point.some _ _ h₂))
+      (Descent.slotTwo (Point.some _ _ h₁) * Descent.slotTwo (Point.some _ _ h₂)) := by
   have hcurve := onCurveOne h₁
   obtain ⟨hx0, hx1, hxm1⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRoots hcurve hy₁
   obtain ⟨⟨e1, e2⟩, ⟨a1, a2⟩, ⟨b1, b2⟩, ⟨c1, c2⟩⟩ := Descent.theFourFaceValues
@@ -326,28 +326,28 @@ private lemma chordHalfTurnRight {x₁ y₁ x₂ : ℚ} (h₁ : Descent.E.Nonsin
   obtain ⟨⟨t00, t01, -⟩, ⟨t10, t11, -⟩, ⟨tm0, tm1, -⟩⟩ :=
     FaithfulFace.theTranslatedPointIsNeverAHalfTurn hcurve hy₁
   rw [FaithfulFace.theTranslationIsTheGroupSum h₁ h₂ hx]
-  have hs₁ : Descent.slotOne (Point.some h₁) = x₁ := by rw [slotOne_some, if_neg hx0]
-  have ht₁ : Descent.slotTwo (Point.some h₁) = x₁ - 1 := by rw [slotTwo_some, if_neg hx1]
+  have hs₁ : Descent.slotOne (Point.some _ _ h₁) = x₁ := by rw [slotOne_some, if_neg hx0]
+  have ht₁ : Descent.slotTwo (Point.some _ _ h₁) = x₁ - 1 := by rw [slotTwo_some, if_neg hx1]
   rcases halfTurnAbscissaOne h₂ rfl with h0 | h0 | h0
   · subst h0
-    have hsQ : Descent.slotOne (Point.some h₂) = Descent.slotOne Descent.P00 := rfl
-    have htQ : Descent.slotTwo (Point.some h₂) = Descent.slotTwo Descent.P00 := rfl
+    have hsQ : Descent.slotOne (Point.some _ _ h₂) = Descent.slotOne Descent.P00 := rfl
+    have htQ : Descent.slotTwo (Point.some _ _ h₂) = Descent.slotTwo Descent.P00 := rfl
     constructor
     · rw [slotOne_some, if_neg t00, hs₁, hsQ]
       exact q0
     · rw [slotTwo_some, if_neg t01, ht₁, htQ]
       exact q1
   · subst h0
-    have hsQ : Descent.slotOne (Point.some h₂) = Descent.slotOne Descent.P10 := rfl
-    have htQ : Descent.slotTwo (Point.some h₂) = Descent.slotTwo Descent.P10 := rfl
+    have hsQ : Descent.slotOne (Point.some _ _ h₂) = Descent.slotOne Descent.P10 := rfl
+    have htQ : Descent.slotTwo (Point.some _ _ h₂) = Descent.slotTwo Descent.P10 := rfl
     constructor
     · rw [slotOne_some, if_neg t10, hs₁, hsQ]
       exact q2
     · rw [slotTwo_some, if_neg t11, ht₁, htQ]
       exact q3
   · subst h0
-    have hsQ : Descent.slotOne (Point.some h₂) = Descent.slotOne Descent.Pm10 := rfl
-    have htQ : Descent.slotTwo (Point.some h₂) = Descent.slotTwo Descent.Pm10 := rfl
+    have hsQ : Descent.slotOne (Point.some _ _ h₂) = Descent.slotOne Descent.Pm10 := rfl
+    have htQ : Descent.slotTwo (Point.some _ _ h₂) = Descent.slotTwo Descent.Pm10 := rfl
     constructor
     · rw [slotOne_some, if_neg tm0, hs₁, hsQ]
       exact q4
@@ -377,23 +377,23 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
       linear_combination hB - hA
     rcases mul_eq_zero.mp hyy with hcase | hcase
     · -- y₂ = y₁: the two points are one point, and the sum is the double
-      have heq : (Point.some h₂ : Descent.E.Point) = Point.some h₁ :=
+      have heq : (Point.some _ _ h₂ : Descent.E.Point) = Point.some _ _ h₁ :=
         someEqOne rfl (by linarith)
       rw [heq]
-      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some h₁)
+      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some _ _ h₁)
       exact ⟨sqcls_scale_sq k1 (slotOne_ne _), sqcls_scale_sq k2 (slotTwo_ne _)⟩
     · -- y₂ = −y₁: vertical inverse or repeated half-turn
       by_cases hy0 : y₁ = 0
-      · have heq : (Point.some h₂ : Descent.E.Point) = Point.some h₁ :=
+      · have heq : (Point.some _ _ h₂ : Descent.E.Point) = Point.some _ _ h₁ :=
           someEqOne rfl (by linarith)
         rw [heq]
-        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some h₁)
+        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some _ _ h₁)
         exact ⟨sqcls_scale_sq k1 (slotOne_ne _), sqcls_scale_sq k2 (slotTwo_ne _)⟩
-      · have hzero : (Point.some h₁ : Descent.E.Point) + Point.some h₂ = 0 :=
+      · have hzero : (Point.some _ _ h₁ : Descent.E.Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYOne]; linarith)
-        have hs : Descent.slotOne (Point.some h₂) = Descent.slotOne (Point.some h₁) := by
+        have hs : Descent.slotOne (Point.some _ _ h₂) = Descent.slotOne (Point.some _ _ h₁) := by
           rw [slotOne_some, slotOne_some]
-        have ht : Descent.slotTwo (Point.some h₂) = Descent.slotTwo (Point.some h₁) := by
+        have ht : Descent.slotTwo (Point.some _ _ h₂) = Descent.slotTwo (Point.some _ _ h₁) := by
           rw [slotTwo_some, slotTwo_some]
         rw [hzero, e1, e2, hs, ht]
         exact ⟨sqcls_one_mul_self (slotOne_ne _), sqcls_one_mul_self (slotTwo_ne _)⟩
@@ -408,18 +408,18 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
           rcases halfTurnAbscissaOne h₂ rfl with hB | hB | hB
         · exact absurd (hA.trans hB.symm) hx
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.P00 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.P10 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.P00 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.P10 := rfl
           rw [hP, hQ]
           exact ⟨m01a, m01b⟩
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.P00 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.Pm10 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.P00 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.Pm10 := rfl
           rw [hP, hQ]
           exact ⟨m0m1a, m0m1b⟩
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.P10 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.P00 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.P10 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.P00 := rfl
           rw [hP, hQ]
           constructor
           · rw [add_comm, mul_comm]
@@ -428,13 +428,13 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
             exact m01b
         · exact absurd (hA.trans hB.symm) hx
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.P10 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.Pm10 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.P10 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.Pm10 := rfl
           rw [hP, hQ]
           exact ⟨m1m1a, m1m1b⟩
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.Pm10 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.P00 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.Pm10 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.P00 := rfl
           rw [hP, hQ]
           constructor
           · rw [add_comm, mul_comm]
@@ -442,8 +442,8 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
           · rw [add_comm, mul_comm]
             exact m0m1b
         · subst hA; subst hB
-          have hP : (Point.some h₁ : Descent.E.Point) = Descent.Pm10 := rfl
-          have hQ : (Point.some h₂ : Descent.E.Point) = Descent.P10 := rfl
+          have hP : (Point.some _ _ h₁ : Descent.E.Point) = Descent.Pm10 := rfl
+          have hQ : (Point.some _ _ h₂ : Descent.E.Point) = Descent.P10 := rfl
           rw [hP, hQ]
           constructor
           · rw [add_comm, mul_comm]
@@ -472,11 +472,11 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
         rw [Point.add_of_X_ne hx]
         have hlam : Descent.E.slope x₁ x₂ y₁ y₂ * (x₂ - x₁) = y₂ - y₁ := slopeLineOne hx
         have hax := addXOne x₁ x₂ (Descent.E.slope x₁ x₂ y₁ y₂)
-        have hs₁ : Descent.slotOne (Point.some h₁) = x₁ := by rw [slotOne_some, if_neg ha1]
-        have hs₂ : Descent.slotOne (Point.some h₂) = x₂ := by rw [slotOne_some, if_neg hb1]
-        have ht₁ : Descent.slotTwo (Point.some h₁) = x₁ - 1 := by
+        have hs₁ : Descent.slotOne (Point.some x₁ y₁ h₁) = x₁ := by rw [slotOne_some, if_neg ha1]
+        have hs₂ : Descent.slotOne (Point.some x₂ y₂ h₂) = x₂ := by rw [slotOne_some, if_neg hb1]
+        have ht₁ : Descent.slotTwo (Point.some x₁ y₁ h₁) = x₁ - 1 := by
           rw [slotTwo_some, if_neg ha2]
-        have ht₂ : Descent.slotTwo (Point.some h₂) = x₂ - 1 := by
+        have ht₂ : Descent.slotTwo (Point.some x₂ y₂ h₂) = x₂ - 1 := by
           rw [slotTwo_some, if_neg hb2]
         rw [hs₁, hs₂, ht₁, ht₂]
         by_cases hX0 : Descent.E.slope x₁ x₂ y₁ y₂ ^ 2 - x₁ - x₂ = 0
@@ -518,14 +518,14 @@ private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
 
 private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : RankOne.E5.Nonsingular x₁ y₁} {h₂ : RankOne.E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : RankOne.E5.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : RankOne.E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some h) = if x = 0 then -25 else x := rfl
+    RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
 
 private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some h) = if x = 5 then 50 else x - 5 := rfl
+    RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
@@ -603,7 +603,7 @@ theorem theDoublesLandInTheKernelOnTheFiveCurve (Q : RankOne.E5.Point) :
   · rw [← Point.zero_def, add_zero]
     exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
   · by_cases hy : y = 0
-    · have hzero : (Point.some h : RankOne.E5.Point) + Point.some h = 0 :=
+    · have hzero : (Point.some x y h : RankOne.E5.Point) + Point.some x y h = 0 :=
         Point.add_self_of_Y_eq (by rw [negYFive, hy]; norm_num)
       rw [hzero]
       exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
@@ -629,10 +629,10 @@ theorem theDoublesLandInTheKernelOnTheFiveCurve (Q : RankOne.E5.Point) :
 five-curve, at point level. -/
 private lemma chordHalfTurnRightFive {x₁ y₁ x₂ : ℚ} (h₁ : RankOne.E5.Nonsingular x₁ y₁)
     (h₂ : RankOne.E5.Nonsingular x₂ 0) (hy₁ : y₁ ≠ 0) (hx : x₁ ≠ x₂) :
-    RankOne.SqCls (RankOne.slotOne (Point.some h₁ + Point.some h₂))
-      (RankOne.slotOne (Point.some h₁) * RankOne.slotOne (Point.some h₂)) ∧
-    RankOne.SqCls (RankOne.slotTwo (Point.some h₁ + Point.some h₂))
-      (RankOne.slotTwo (Point.some h₁) * RankOne.slotTwo (Point.some h₂)) := by
+    RankOne.SqCls (RankOne.slotOne (Point.some x₁ y₁ h₁ + Point.some x₂ 0 h₂))
+      (RankOne.slotOne (Point.some x₁ y₁ h₁) * RankOne.slotOne (Point.some x₂ 0 h₂)) ∧
+    RankOne.SqCls (RankOne.slotTwo (Point.some x₁ y₁ h₁ + Point.some x₂ 0 h₂))
+      (RankOne.slotTwo (Point.some x₁ y₁ h₁) * RankOne.slotTwo (Point.some x₂ 0 h₂)) := by
   have hcurve := onCurveFive h₁
   obtain ⟨hx0, hx5, hxm5⟩ :=
     FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy₁
@@ -642,8 +642,8 @@ private lemma chordHalfTurnRightFive {x₁ y₁ x₂ : ℚ} (h₁ : RankOne.E5.N
     theTranslatedPointIsNeverAHalfTurnOnTheFiveCurve hcurve hy₁
   -- the translation lift, transported to the five-curve through mathlib's `addX`
   have hsum : ∀ (hxe : x₁ ≠ x₂),
-      (Point.some h₁ : RankOne.E5.Point) + Point.some h₂ =
-        Point.some (nonsingular_add h₁ h₂ fun hc => hxe hc.1) := fun hxe =>
+      (Point.some x₁ y₁ h₁ : RankOne.E5.Point) + Point.some x₂ 0 h₂ =
+        Point.some _ _ (nonsingular_add h₁ h₂ fun hc => hxe hc.1) := fun hxe =>
     Point.add_of_X_ne hxe
   rw [hsum hx]
   have haxT : RankOne.E5.addX x₁ x₂ (RankOne.E5.slope x₁ x₂ y₁ 0) =
@@ -652,28 +652,28 @@ private lemma chordHalfTurnRightFive {x₁ y₁ x₂ : ℚ} (h₁ : RankOne.E5.N
     have h : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr hx
     field_simp
     ring
-  have hs₁ : RankOne.slotOne (Point.some h₁) = x₁ := by rw [slotOne5_some, if_neg hx0]
-  have ht₁ : RankOne.slotTwo (Point.some h₁) = x₁ - 5 := by rw [slotTwo5_some, if_neg hx5]
+  have hs₁ : RankOne.slotOne (Point.some x₁ y₁ h₁) = x₁ := by rw [slotOne5_some, if_neg hx0]
+  have ht₁ : RankOne.slotTwo (Point.some x₁ y₁ h₁) = x₁ - 5 := by rw [slotTwo5_some, if_neg hx5]
   rcases halfTurnAbscissaFive h₂ rfl with h0 | h0 | h0
   · subst h0
-    have hsQ : RankOne.slotOne (Point.some h₂) = RankOne.slotOne RankOne.T0 := rfl
-    have htQ : RankOne.slotTwo (Point.some h₂) = RankOne.slotTwo RankOne.T0 := rfl
+    have hsQ : RankOne.slotOne (Point.some _ _ h₂) = RankOne.slotOne RankOne.T0 := rfl
+    have htQ : RankOne.slotTwo (Point.some _ _ h₂) = RankOne.slotTwo RankOne.T0 := rfl
     constructor
     · rw [slotOne5_some, haxT, if_neg t00, hs₁, hsQ]
       exact q0
     · rw [slotTwo5_some, haxT, if_neg t01, ht₁, htQ]
       exact q1
   · subst h0
-    have hsQ : RankOne.slotOne (Point.some h₂) = RankOne.slotOne RankOne.T5 := rfl
-    have htQ : RankOne.slotTwo (Point.some h₂) = RankOne.slotTwo RankOne.T5 := rfl
+    have hsQ : RankOne.slotOne (Point.some _ _ h₂) = RankOne.slotOne RankOne.T5 := rfl
+    have htQ : RankOne.slotTwo (Point.some _ _ h₂) = RankOne.slotTwo RankOne.T5 := rfl
     constructor
     · rw [slotOne5_some, haxT, if_neg t10, hs₁, hsQ]
       exact q2
     · rw [slotTwo5_some, haxT, if_neg t11, ht₁, htQ]
       exact q3
   · subst h0
-    have hsQ : RankOne.slotOne (Point.some h₂) = RankOne.slotOne RankOne.Tm5 := rfl
-    have htQ : RankOne.slotTwo (Point.some h₂) = RankOne.slotTwo RankOne.Tm5 := rfl
+    have hsQ : RankOne.slotOne (Point.some _ _ h₂) = RankOne.slotOne RankOne.Tm5 := rfl
+    have htQ : RankOne.slotTwo (Point.some _ _ h₂) = RankOne.slotTwo RankOne.Tm5 := rfl
     constructor
     · rw [slotOne5_some, haxT, if_neg tm0, hs₁, hsQ]
       exact q4
@@ -703,22 +703,22 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
       have hB := onCurveFive h₂
       linear_combination hB - hA
     rcases mul_eq_zero.mp hyy with hcase | hcase
-    · have heq : (Point.some h₂ : RankOne.E5.Point) = Point.some h₁ :=
+    · have heq : (Point.some _ _ h₂ : RankOne.E5.Point) = Point.some _ _ h₁ :=
         someEqFive rfl (by linarith)
       rw [heq]
-      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some h₁)
+      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some _ _ h₁)
       exact ⟨sqcls_scale_sq k1 (slotOne5_ne _), sqcls_scale_sq k2 (slotTwo5_ne _)⟩
     · by_cases hy0 : y₁ = 0
-      · have heq : (Point.some h₂ : RankOne.E5.Point) = Point.some h₁ :=
+      · have heq : (Point.some _ _ h₂ : RankOne.E5.Point) = Point.some _ _ h₁ :=
           someEqFive rfl (by linarith)
         rw [heq]
-        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some h₁)
+        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some _ _ h₁)
         exact ⟨sqcls_scale_sq k1 (slotOne5_ne _), sqcls_scale_sq k2 (slotTwo5_ne _)⟩
-      · have hzero : (Point.some h₁ : RankOne.E5.Point) + Point.some h₂ = 0 :=
+      · have hzero : (Point.some _ _ h₁ : RankOne.E5.Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYFive]; linarith)
-        have hs : RankOne.slotOne (Point.some h₂) = RankOne.slotOne (Point.some h₁) := by
+        have hs : RankOne.slotOne (Point.some _ _ h₂) = RankOne.slotOne (Point.some _ _ h₁) := by
           rw [slotOne5_some, slotOne5_some]
-        have ht : RankOne.slotTwo (Point.some h₂) = RankOne.slotTwo (Point.some h₁) := by
+        have ht : RankOne.slotTwo (Point.some _ _ h₂) = RankOne.slotTwo (Point.some _ _ h₁) := by
           rw [slotTwo5_some, slotTwo5_some]
         rw [hzero, e1, e2, hs, ht]
         exact ⟨sqcls_one_mul_self (slotOne5_ne _), sqcls_one_mul_self (slotTwo5_ne _)⟩
@@ -814,11 +814,11 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
         rw [Point.add_of_X_ne hx]
         have hlam : RankOne.E5.slope x₁ x₂ y₁ y₂ * (x₂ - x₁) = y₂ - y₁ := slopeLineFive hx
         have hax := addXFive x₁ x₂ (RankOne.E5.slope x₁ x₂ y₁ y₂)
-        have hs₁ : RankOne.slotOne (Point.some h₁) = x₁ := by rw [slotOne5_some, if_neg ha1]
-        have hs₂ : RankOne.slotOne (Point.some h₂) = x₂ := by rw [slotOne5_some, if_neg hb1]
-        have ht₁ : RankOne.slotTwo (Point.some h₁) = x₁ - 5 := by
+        have hs₁ : RankOne.slotOne (Point.some _ _ h₁) = x₁ := by rw [slotOne5_some, if_neg ha1]
+        have hs₂ : RankOne.slotOne (Point.some _ _ h₂) = x₂ := by rw [slotOne5_some, if_neg hb1]
+        have ht₁ : RankOne.slotTwo (Point.some _ _ h₁) = x₁ - 5 := by
           rw [slotTwo5_some, if_neg ha2]
-        have ht₂ : RankOne.slotTwo (Point.some h₂) = x₂ - 5 := by
+        have ht₂ : RankOne.slotTwo (Point.some _ _ h₂) = x₂ - 5 := by
           rw [slotTwo5_some, if_neg hb2]
         rw [hs₁, hs₂, ht₁, ht₂]
         by_cases hX0 : RankOne.E5.slope x₁ x₂ y₁ y₂ ^ 2 - x₁ - x₂ = 0

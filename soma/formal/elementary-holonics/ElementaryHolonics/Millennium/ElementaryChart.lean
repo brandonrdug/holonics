@@ -312,7 +312,7 @@ theorem theRealizerDifferentiatesBackThroughTheExponential (a g : ℝ[X]) (x : �
     HasDerivAt (fun t : ℝ => a.eval t * Real.exp (g.eval t))
       ((derivative a + a * derivative g).eval x * Real.exp (g.eval x)) x := by
   have h := (a.hasDerivAt x).mul ((g.hasDerivAt x).exp)
-  convert h using 1
+  convert h using 1 <;> try rfl
   simp only [eval_add, eval_mul]
   ring
 
@@ -328,14 +328,14 @@ theorem theSquareExponentialCarriesTheDoubledLinear (x : ℝ) :
 theorem theHalvedSquareExponentialCarriesTheLinear (x : ℝ) :
     HasDerivAt (fun t : ℝ => Real.exp (t ^ 2) / 2) (x * Real.exp (x ^ 2)) x := by
   have h := (theSquareExponentialCarriesTheDoubledLinear x).div_const 2
-  convert h using 1
+  convert h using 1 <;> try rfl
   ring
 
 /-- The degree-one realizer, analytically: `d/dx (x·e^{x²}) = (1 + 2x²)·e^{x²}`. -/
 theorem theLinearRealizerCarriesTheQuadraticAnalytically (x : ℝ) :
     HasDerivAt (fun t : ℝ => t * Real.exp (t ^ 2)) ((1 + 2 * x ^ 2) * Real.exp (x ^ 2)) x := by
   have h := (hasDerivAt_id x).mul (theSquareExponentialCarriesTheDoubledLinear x)
-  convert h using 1
+  convert h using 1 <;> try rfl
   simp only [id_eq]
   ring
 

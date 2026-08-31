@@ -308,8 +308,10 @@ theorem CoherentWeightedSmoothPathTower.fixedPoint_hasDerivAt_realClassicalMomen
   have hspace :=
     (EuclideanSpace.equiv (Fin 3) ℝ).symm.hasFDerivAt.comp_hasDerivAt
       t hcoordinates
-  simpa [weightedClassicalRestartVelocity, Function.comp_def,
-    vectorOfCoordinates] using hspace
+  change HasDerivAt
+    (fun tau : ℝ ↦ weightedReconstructedVelocity hT base tau x)
+    (weightedClassicalMomentumRHS hT (nu : ℝ) base t x) t
+  exact hspace
 
 /-! ## Physical pressure gradient and spatial receipts -/
 
@@ -385,7 +387,7 @@ theorem CoherentWeightedSmoothPathTower.continuous_time_laplacian_component
       (continuous_id.prodMk
         (continuous_const : Continuous (fun _ : Icc (0 : ℝ) T ↦
           euclideanToSpatialTorus x)))
-    simpa only [reconstructedFiniteOrderComplexComponent] using htime
+    exact htime.congr (fun _ ↦ rfl)
   exact hsum.congr (fun t ↦
     (laplacian_weightedReconstructedVelocity_component_eq_secondWords
       hT tower hreal t component x).symm)
@@ -412,7 +414,7 @@ theorem CoherentWeightedSmoothPathTower.continuous_time_fderiv_component_apply_s
       (continuous_id.prodMk
         (continuous_const : Continuous (fun _ : Icc (0 : ℝ) T ↦
           euclideanToSpatialTorus x)))
-    simpa only [reconstructedFiniteOrderComplexComponent] using htime
+    exact htime.congr (fun _ ↦ rfl)
   apply hword.congr
   intro t
   have hzero :
@@ -533,9 +535,11 @@ theorem continuous_weightedClassicalRestartVelocity_time
           (euclideanToSpatialTorus x)) :=
       hnative.eval continuous_const
     have hre := Complex.continuous_re.comp heval
-    simpa only [weightedClassicalRestartVelocity,
-      weightedReconstructedVelocity,
-      reconstructedTorusComplexComponentCLM_apply] using hre
+    change Continuous (Complex.re ∘ fun t : ℝ ↦
+      reconstructedTorusComplexComponent
+        (weightedPathExtension hT path t) component
+          (euclideanToSpatialTorus x))
+    exact hre
   have hcoordinates : Continuous (fun t : ℝ ↦
       fun component : Fin 3 ↦
         weightedClassicalRestartVelocity hT path x t component) :=
@@ -828,13 +832,15 @@ noncomputable def weightedClassicalRestartCarrierOfNative
       pressurePeriodic := ?_ }
   · intro x t ht
     simpa only [weightedClassicalRestartVelocity,
-      weightedClassicalRestartPressure, Real.coe_toNNReal _ hnu.le] using
+      weightedClassicalRestartPressure, weightedClassicalMomentumRHS,
+      Real.coe_toNNReal _ hnu.le] using
       CoherentWeightedSmoothPathTower.fixedPoint_hasDerivAt_realClassicalMomentum
         hT tower (Real.toNNReal nu) (real_toNNReal_pos hnu) initial
         hfixed restart.fourierReal restart.divergenceFree x ht
   · intro x
     simpa only [weightedClassicalRestartVelocity,
-      weightedClassicalRestartPressure, Real.coe_toNNReal _ hnu.le] using
+      weightedClassicalRestartPressure, weightedClassicalMomentumRHS,
+      Real.coe_toNNReal _ hnu.le] using
       CoherentWeightedSmoothPathTower.fixedPoint_hasDerivWithinAt_zero_realClassicalMomentum
         (weightedRestartTimeFromCap_pos hnu hcap) tower
         (Real.toNNReal nu) (real_toNNReal_pos hnu) initial hfixed

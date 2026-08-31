@@ -303,9 +303,10 @@ theorem openPeriodicVorticityAnchorRateOn_continuous
   have hvalue : Continuous (fun t : Set.Ioo (0 : ℝ) T ↦
       torusVorticityEvolution solution t
         (euclideanToSpatialTorus (0 : Space))) := by
-    simpa [torusVorticityEvolution] using
-      (torusVorticityWorldTube solution).continuous.comp
-        (continuous_id.prodMk continuous_const)
+    apply ((torusVorticityWorldTube solution).continuous.comp
+      (continuous_id.prodMk continuous_const)).congr
+    intro t
+    rfl
   exact continuous_norm.comp hvalue
 
 /-- The complete geometric majorant is continuous on the strict-interior lifespan. -/

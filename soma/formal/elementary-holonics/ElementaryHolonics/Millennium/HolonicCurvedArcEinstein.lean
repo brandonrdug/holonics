@@ -74,16 +74,11 @@ theorem orientedArc_connectionTransport {Position Fibre : Type*}
 
 /-- The return obtained by following the right route and reversing the left route. -/
 def routeCurvatureReturn {Fibre : Type*} (left right : Equiv.Perm Fibre) : Equiv.Perm Fibre :=
-  right * left⁻¹
+  routeComparisonReturn left right
 
 theorem routeCurvatureReturn_eq_one_iff {Fibre : Type*} (left right : Equiv.Perm Fibre) :
-    routeCurvatureReturn left right = 1 ↔ right = left := by
-  constructor
-  · intro h
-    have hright := congrArg (fun e : Equiv.Perm Fibre ↦ e * left) h
-    simpa [routeCurvatureReturn, mul_assoc] using hright
-  · rintro rfl
-    simp [routeCurvatureReturn]
+    routeCurvatureReturn left right = 1 ↔ right = left :=
+  routeComparisonReturn_eq_one_iff left right
 
 /-! ## Gyrotransport is a connection-return instance -/
 
@@ -107,23 +102,17 @@ theorem gyrationCurvatureReturn_nontrivial_of_moves
 /-! ## Discrete Gauss--Bonnet as phase holonomy -/
 
 /-- Translation of the receiver's oriented phase line. -/
-def phaseShift (angle : ℝ) : Equiv.Perm ℝ where
-  toFun x := x + angle
-  invFun x := x - angle
-  left_inv x := by simp
-  right_inv x := by simp
+def phaseShift (angle : ℝ) : Equiv.Perm ℝ :=
+  additiveTranslation angle
 
 @[simp] theorem phaseShift_apply (angle x : ℝ) : phaseShift angle x = x + angle := rfl
 
-theorem phaseShift_mul (a b : ℝ) : phaseShift a * phaseShift b = phaseShift (a + b) := by
-  ext x
-  simp [add_comm, add_left_comm]
+theorem phaseShift_mul (a b : ℝ) : phaseShift a * phaseShift b = phaseShift (a + b) :=
+  additiveTranslation_mul a b
 
 theorem parallelTransport_phaseShift (angles : List ℝ) :
-    parallelTransport (angles.map phaseShift) = phaseShift angles.sum := by
-  induction angles with
-  | nil => ext x; simp [phaseShift]
-  | cons a angles ih => simp [parallelTransport, ih, phaseShift_mul]
+    parallelTransport (angles.map phaseShift) = phaseShift angles.sum :=
+  parallelTransport_additiveTranslation angles
 
 /-- The ordered phase word retains every bulk-curvature and boundary-turn occurrence. -/
 def gaussBonnetAngleWord

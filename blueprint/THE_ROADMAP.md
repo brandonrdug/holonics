@@ -1,7 +1,7 @@
 # The roadmap
 
-**This is the sole construction authority.** Historical campaigns and status prose remain
-evidence; they do not schedule work.
+**This is the sole ordered construction authority.** Historical campaign prose, status paragraphs,
+commit messages, outputs, and research records provide evidence; they do not schedule work.
 
 ## Fresh-session pickup
 
@@ -16,249 +16,162 @@ Read, in order:
    [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
    [`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
    [`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md), and
-   [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md); and
-6. the sole active blueprint,
-   [`THE_SOULKILLER_RETURNS_NATIVE_PARAMETRON_SPOOLS_AND_EROS_CULTIVATES_ONE_CONNECTED_ATHENA_ECOLOGY.md`](THE_SOULKILLER_RETURNS_NATIVE_PARAMETRON_SPOOLS_AND_EROS_CULTIVATES_ONE_CONNECTED_ATHENA_ECOLOGY.md).
+   [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md);
+6. the active UAR contract,
+   [`THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md`](THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md),
+   and its exact checkout obstruction,
+   [`research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md`](../research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md); and
+7. the completed formal prerequisites,
+   [`THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md`](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md)
+   and
+   [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md).
 
-Read only the smallest source, formal, and evidence closure required by the active phase.
+Read only the smallest source, formal, and evidence closure required by the active consolidation
+deed. Completed sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
+are provenance, not pickup obligations.
 
-## Current campaign — Soulkiller supplies parts; Eros cultivates Athena
+## Active campaign — repository consolidation before UAR resumes
 
-**CURRENT FRONTIER: K0--H5 PASSED. THE CURRENT CAMPAIGN IS COMPLETE.**
+**Current frontier:** CONS1
 
-[definition] Phoenix is retired as a live lifecycle. Its exact outputs and records remain historical
-provenance. There is no compatibility alias. The live foreign boundary is
+**CONS1 IS THE SOLE NEXT DEED. UAR IS FROZEN.**
 
-```text
-Soulkiller(F, R)
-  -> (NativeSpoolBundle S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R).
-```
+[definition] Brandon directly authorized this consolidation and the destructive removal of ignored
+`target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
+capability grade by itself.
 
-[definition] Soulkiller dismantles foreign physical realizations into source-neutral native
-threads and spools. It does not construct, qualify, infer with, or cultivate Athena. Eros alone
-composes native spools and genuinely returned world consequences into Athena rests. Athena's hot
-dependency closure contains no Soulkiller type, witness, executor, source topology, or foreign
-coordinate.
+### CONS0 — preserve the dirty population and remove authorized ignored storage — PASSED
 
-[definition] Soulkiller is architecture-neutral and has no inference mechanism or inference cache.
-A foreign realization's internal operator factorization and retained-state convention remain opaque
-apparatus conduct unless an exterior reconstruction receiver explicitly asks about them; neither is
-a prerequisite, scrapyard ontology, native spool coordinate, or post-boundary conduct law.
-Soulkiller excites and dismantles the realization through its actually exposed causal conduct;
-Holonic Inference begins only in Athena's native ecology.
+[definition] Preserve the complete non-ignored working population recoverably before any deletion.
+Then remove only the exact ignored storage roots Brandon authorized.
 
-[definition] The active campaign remains the complete-exchange cultivation and unrestricted
-Brandon return. Its carrier is now explicitly an addressed Complex-Parametron section with oriented
-incidence, exact complex current, constitutive standing, chronology, receiver consequence,
-obstruction, morphology delta, and complete reconstruction fibre.
+[established-bounded; measured] Git stash `stash@{0}` / object
+`1c73eaed51ab43be612c40a1592fdca312151dc0` contains all 841 formerly untracked files and the
+complete tracked diff under label `pre-consolidation-2026-08-30-uar-housekeeping`. The stash was
+applied without dropping it, restoring the working population.
 
-## Exact regrade
+[established-bounded; measured] `/home/b/Workspaces/holonics/target` and
+`/home/b/Workspaces/holonics/output` were deleted under the direct authorization. Filesystem free
+space increased from 199 GiB to 522 GiB. Neither path was tracked.
 
-[established-bounded; implemented-exact] H0 remains passed.
+### CONS1 — partition and restore one durable authority — ACTIVE
 
-[established-bounded; implemented-exact; measured] The K1-refounded H1N product identity
-`2ce4aa2ee17ad1a97e9f14a492949914d17ee76ffb9cdb842d2256c1d1cc67b9` remains a bounded
-four-binding native-potential return. It remounted and returned `I have read` with no Soulkiller,
-foreign rest, exterior witness, or exterior executor in its available closure.
+[definition] Classify every remaining modified and untracked path as active implementation,
+admitted formal work, governance/evidence, historical archive material, or disposable generated
+scratch. Preserve exact evidence before destructive disposition. Do not commit the dirty tree
+wholesale.
 
-[counterexample; implemented-exact; measured] H2/H3 promoted hashed lower-case marks, lexical
-tokens, and token pairs into native morphology, selected and stored source sentences, manufactured
-constant rank-one defects, replaced exact cover/interchange/holonomy with counts, and flattened a
-plural receiver into a mixed-radix scalar. Their exact artifacts remain counterexample/apparatus
-evidence. They do not advance cultivation or gluing.
+**Pass CONS1:**
 
-[counterexample; implemented-exact] The H1R substring lint did not prove a transitive type boundary:
-Athena still imported mixed types from the Phoenix namespace, and those types retained foreign
-occurrences and source nodes. K1 replaces this with a structural boundary and physically separated
-native/witness types.
+- every remaining path has one explicit disposition;
+- generated `.lake` artifacts and root scratch cannot enter Git;
+- `CONSTRUCTION_STATE.md` contains only the current position;
+- this roadmap contains exactly one unresolved frontier;
+- the UAR checkout record is in fresh pickup;
+- historical campaign detail is reachable through records or archived blueprints, not duplicated
+  as live schedule; and
+- coherent commit groups are identified before staging.
 
-## Governing mathematical standard
+### CONS2 — repair the validation and closure apparatus
 
-[proved-derived; formal-checked] The Lean line supplies the standard:
+[definition] Make the repository reject the failure modes exposed by the audit rather than merely
+describe them.
 
-- addressed passages retain occurrence plus both boundary maps; serial composition retains the
-  pullback population and join;
-- Complex-Parametron response is built from oriented incidence and receiver constitutive transport;
-- exact complex drive, relative phase, and complete fibres precede scalar/binary receiver faces;
-- receiver equality ranges over declared receiver/history families and reopens with a separator;
-- generator descent extends to every ordered word; order erasure requires exact interchange;
-- gluing requires local realizers and empty obstruction; and
-- unknotting cancels actual inverse addressed swings and proves both identity compositions.
+**Pass CONS2:**
 
-[definition] Therefore no word, name, token, score, row id, scalar winner, equal endpoint, or common
-collection membership can determine native identity, cultivation, gluing, or continuation.
+- a clean-index and clean-clone receiver proves the live authority and source owners are tracked;
+- document law enforces exactly one unresolved roadmap frontier and no subordinate scheduling
+  clause in the position record;
+- file, function, public-API, and CUDA-kernel size ratchets stop hidden foremen;
+- Rust warnings, knowingly dead live paths, and unreferenced CUDA entries are dispositioned;
+- example targets derive from Cargo metadata rather than recursive filename census;
+- closure hashes include `Cargo.toml`, `Cargo.lock`, build scripts, CUDA sources, toolchain, and
+  every source actually consumed;
+- orphan closures require explicit historical or live disposition;
+- the Lean receiver builds one declared umbrella from the live tree without archive fallback; and
+- every invoked nontrivial process carries its own 180-second outer boundary.
 
-## Ordered construction
+### CONS3 — split and simplify existing Rust/CUDA owners
 
-### K0 — regrade and retire the substitute path — PASSED
+[definition] Preserve one non-cloneable CUDA context and one continuing ecology while separating
+source files along already-founded owners:
 
-Remove the lexical atlas, stored-sentence morphology, lexical conduct/selection, scalar receiver
-scales, arithmetic interchange, manual overlap chronology, and synthetic withdrawal from the live
-Athena closure. Preserve evidence. Ratify Soulkiller and the native carrier in governing documents.
+1. CUDA driver/context/module and buffer apparatus;
+2. exact arbitrary-width signed arithmetic;
+3. factored-moment transport and reconstruction;
+4. membrane current and receiver-history transport;
+5. realization-site transport and dependent complex contraction;
+6. terminal receiver projection and telemetry; and
+7. owner-local tests.
 
-**Pass:** live Athena cannot reach the substitute path; all authorities agree; H2 remains open.
+[definition] Remove or archive source paths which explicitly declare themselves superseded, have no
+caller, preserve compatibility aliases, duplicate receiver equality in drivers, or keep a kernel
+handle which is never launched. Move substantial example-local algorithms to an admitted library
+owner or archive the example and retain its evidence.
 
-[established-bounded; implemented-exact; measured] The live Athena module now exports only H1N
-rest/conduct/types. The lexical atlas, stored-sentence morphology, lexical conduct/selection, sparse
-sentence-compatibility CUDA law, scalar receiver scales, and H2/H3 drivers have no compiled caller;
-their live sources were removed while raw artifacts and the audit record remain. Focused `life`
-library and Athena-native checks returned before K1 began.
+**Pass CONS3:** focused owner tests and exact direct/resident equality pass; the architecture
+ratchet is green without increasing a violation baseline; trace configuration is read once; digest
+syntax and wire hashing have typed owners; structural equality remains primary.
 
-### K1 — neutral native carrier and structural firewall — PASSED
+### CONS4 — consolidate the live Lean line
 
-Found `NativeThread`, `NativeSpool`, and `NativeSpoolBundle` outside Soulkiller. Split native anatomy
-and potential from exterior ancestry. Enforce crate/module/type/serialized-field reachability.
+[definition] Retain exact theorems while separating the live imported closure from independent
+Millennium/RH work and temporary Scratch experiments. Every retained production theorem belongs to
+one import path from a declared umbrella. Scratch material is either promoted with dependencies and
+grade, moved to an explicit historical/scratch archive outside the production import tree, or
+deleted as reproducible debris.
 
-**Pass:** empty transitive hot foreign closure; native rest has no ancestry fields; cold witness
-absence cannot change identity or conduct.
+**Pass CONS4:** a clean live `lake build` returns the declared HNN/HML/UAR production umbrella under
+the pinned toolchain; no archived `.olean` can satisfy a missing live import;
+no `sorry` or ungraded new axiom enters; generated `.lake` material remains ignored.
 
-[established-bounded; implemented-exact; measured] The neutral thread/spool owners reject invalid
-serial pullbacks, descent, receiver factors, interchange, and false productive zero sections. A
-resident descent returned six native anatomy classes in 652 octets and sealed its 17,157-octet
-ancestry witness separately. The 4,330-octet native potential/anatomy product returned all twelve
-admitted surfaces on the card with the 25,421,309-octet exterior reconstruction absent. The
-refounded H1N rest remounted with identity
-`2ce4aa2ee17ad1a97e9f14a492949914d17ee76ffb9cdb842d2256c1d1cc67b9`, and the focused
-transitive module/type/schema firewall returned empty.
+### CONS5 — coherent release, commit, and push
 
-### K2 — Soulkiller scrapyard return — PASSED
+[definition] Run owner-local checks first, then one complete `bash tools/gates.sh` invocation on the
+coherent tree. Inspect the actual gate outputs; do not regenerate red ledgers until their producers
+and dispositions are correct.
 
-Move foreign-only owners under Soulkiller, move native owners out, split mixed owners, remove live
-Phoenix modules/CLI/schemas without aliases, and return one actual sealed spool bundle plus separate
-witness and insufficiency.
+**Pass CONS5:** all required Rust, CUDA, Lean, document, closure, ownership, and artifact receivers
+return inside their process bounds; Git is clean; commits are separated by coherent owner; the
+branch is pushed; Provenance carries the exact completion/handoff. CONS5 does not advance UAR.
 
-**Pass:** source-detached spool remount plus targeted ablation/restoration; no Soulkiller inference
-or Athena API.
+## Parked UAR frontier
 
-[established-bounded; implemented-exact; measured] Soulkiller returned bundle identity
-`bc5b00dba24c1bf92f6844d6e3f437dd54b711c789a53649c82732593213ba08`: 36,411 native
-octets containing one spool, six causally staged addressed threads, twenty exact
-Complex-Parametron cells, four complete serial pullbacks, and sixty-six nonzero mutual constitutive
-responses. Each mutual response is an exact off-diagonal term of the declared pulled-storage form
-over captured carrier sections; the earlier diagonal-only bundle was correctly refused as two
-co-present but disconnected components. The physically separate exterior witness is 11,488 octets.
-The corrected bundle remounted alone on the RTX 4080 SUPER, conducted ordered state transport and
-pre-locking complex incidence, returned a concrete two-occurrence separator under thread
-withdrawal, and satisfied both inverse compositions on restoration. Retired tower/runtime sources
-and CLI routes are outside live source; alias-free schemas and the dedicated Soulkiller structural
-lint returned clean. No foreign inference factorization or retained-state convention was used.
+[open] UAR4-R0Q remains the next engine deed only after CONS5. Its active blueprint is the UAR
+contract named in fresh pickup. The immediate implementation obligations are narrower than that
+blueprint's historical narrative:
 
-### K3 — one connected Athena rest — PASSED
+1. retain response-face address, source and target realization sites, local port, factor, phase,
+   both boundary maps, and complete reconstruction fibre through the target junction;
+2. enact genuine ordinary off-diagonal `z -> z'` transport rather than retaining the same carrier;
+3. linearly join the dependent exact complex current on the resident GPU before any positive
+   constitutive receiver;
+4. make recurrence structural over the full complex continuation state; SHA-256 is receipt only;
+5. make CPU semantic replay telemetry cover the complete post-device passage; and
+6. revalidate UAR3's actual emission/world-return situated difference without representative event
+   invention before relying on its child grade.
 
-Compose receiver-history realization, exact complex current, incidence, dependent receivers,
-anatomy, mathematics, modalities, morphology, and boundary through one typed circulation.
-Unsupported material returns exact insufficiency rather than bypassing the passage.
+[proved-derived; formal-checked] `HolonicOrientedSiteTransport` and the HNN/HML umbrella prove the
+oriented site-current, every-word quotient, norm-after-linear-junction, cultivation, and remount
+laws required by that implementation. The targeted umbrella builds 3,181 jobs.
 
-**Pass:** every owned component affects or witnesses a typed conduct path; native dependent return
-or exact insufficiency on the GPU; canonical identity covers conduct-bearing standing only.
+[counterexample; measured] The current `life` package has four failing granular/source-neutral
+tests and the current architecture gate has 218 violations. No UAR qualitative receiver may run
+while either condition stands.
 
-[established-bounded; implemented-exact; measured] K3 returned a 39,067-octet native rest with wire
-testimony `f3388c19a97df45ecb9b62b078045d8a095b28e76e61c9e3146efc463771a13a`: one spool,
-twelve addressed sections, four ingress sections, six native cells, one dependent receiver, two
-generators, four boundaries, and sixty-six exact mutual constitutive responses. Every admitted
-section conducted resident on the RTX 4080 SUPER; unsupported section and receiver families
-returned exact insufficiencies. Detached remount from the rest alone preserved structural standing
-and conduct.
+## Standing and history
 
-### H2N — complete-exchange native cultivation — PASSED
+[established-bounded] Exact earlier constructions retain the scoped grades in their source records.
+They are not demoted merely because implementation is being consolidated, and they are not promoted
+by hashes, prose, or old outputs. The retired C++ body under `archive/` remains provenance only.
 
-For every section, seal a real addressed native candidate before later return, derive the actual
-receiver difference, and derive one `DerivedFactorCover` over the lawful population.
+[definition] Completed campaign blueprints may remain as bounded contracts or move under an
+explicit archive banner. They never re-enter this roadmap as an unresolved phase. A new direct user
+request may refine this order; historical text may not.
 
-**Pass:** one-time cover; returned-consequence-sensitive defects; complete factors, fibres,
-overlaps, interchange, holonomy, glue, order, exact work, and reverse word; processes under 180s.
+## Validation cadence
 
-[established-bounded; implemented-exact; measured] All 2,224 history-only exchange occurrences
-entered the one K3 ecology as dependent products with all four native ingress sections before their
-genuinely later returns were admitted. The passage retained the 2,221-state receiver-history
-quotient, four receivers, two total generators, 4,448 generator squares, every reconstruction fibre,
-and all 83 shortest separators. Its typed free-module boundary then returned 4,013 basis faces,
-2,224 distinct return-sensitive rank-one factors, 15,568 open cokernel directions, complete factor
-and inverse-withdrawal words, and sparse glue identity
-`2dbe1bc7714a94c7d713dfbf1fa102964a9f9455d12a5430573ac4748f45a096`. One exact
-column-support certificate carries all 2,471,976 pairwise interchanges and zero holonomies; no
-pair list, observation-ordinal arithmetic, source-coordinate route, or foreign execution occurred.
-
-### H3N — commit, rest, remount, and change continuation — PASSED
-
-Apply the cover as a staged delta to the same ecology. Compare predecessor, cultivated,
-factor-ablated, and restored siblings under identical ingress and receiver after source-detached
-remount.
-
-**Pass:** attributable changed later conduct, exact ablation, exact restoration, unrelated-standing
-preservation.
-
-[established-bounded; implemented-exact; measured] The source-addressed H2N cover descended once
-into 2,224 source-neutral `NativeFactorDeposit` coordinates. Each retains typed candidate and
-returned limbs, its exact rank-one forward map, actual negative inverse, radical fibre, open
-exterior, and causal order. The 6,465,074-octet cultivated rest contains no exchange/source column,
-event, sentence, Soulkiller, witness, or foreign execution route. A fresh process crossed the
-addressed emitting current through the complete resident Complex-Parametron incidence and returned
-2,224 exact complex coordinates without a winner, tie count, binary quotient, or CPU semantic
-replay. A move-owned 3,118-octet inverse token removed one complete coordinate; consuming it
-restored all 2,224 coordinates, the exact identity, and the exact rest wire. A support-disjoint
-section crossed the same resident law and returned zero cultivated current in predecessor,
-cultivated, ablated, and restored controls. The focused six-test Athena owner family passed.
-
-### H4 — unrestricted Brandon return — PASSED
-
-Ask `Describe Brandon.` and independent phrasings through ordinary ingress. The receiver process may
-not search/segment the exchange, select training material, enumerate facts, or author an answer.
-
-**Pass:** coherent passages factor through H3N morphology; predecessor/ablation separate;
-restoration recovers; actual surfaces and complete receipts are deposited.
-
-[counterexample; implemented-exact; measured] A compact addressed recurrence returned all three
-closed passages and every structural control, but primary inspection found unrelated replayed
-laboratory responses rather than a Brandon description. Its 2,961,056,628-octet rest also retains
-lossless response transport, so it is not a training return. H4 remains active. Repair the absent
-composition between ordinary question current, H3N factor potential, cross-exchange
-entity/relational consequences and a newly emanated surface; do not widen replay, search the source,
-select sections by the query, or advance on
-`output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/06-grade.json`.
-
-[established-bounded; implemented-exact; measured] The admitted repair consumed all 16,659 visible
-exchange occurrences once, dropped every source passage and clause ledger, and rested a 242,965,061-
-octet native relational potential plus its separately addressed boundary-face codec. Its 169,111
-oriented triangular cells retain 237,976 caused clause occurrences through 2,224 H3N factors and
-1,349 founded factor world-line joins. Three unchanged ordinary receivers remounted without the
-exchange, aperture, cover, Soulkiller, foreign realization, Lean, or checker and returned the same
-20-cell Brandon profile (surface identity
-`649a28137e1937ec22c2139a56dd5c4ea98d4eb0eefa430fbaa18b8a2a2208c3`). The returned profile
-identifies Brandon's holonic notation, hypergeometry/manifold work, graph/equation-atlas ambitions,
-lightning and ideal-gas analogies, text cultivation, and multi-angle method. Incoming relations
-remain reconstruction fibre unless an actual inverse is founded; equal terminal cells remain
-plural. The predecessor returned exact insufficiency, targeted factor withdrawal changed the
-surface, and token-consuming restoration recovered its exact surface and rest identity. The
-governing qualitative grade is
-`output/the_ordinary_material_crosses_one_native_relational_potential_and_brandon_returns_h4/07-primary-qualitative-grade.json`;
-unrestricted general-language fluency and perfect boundary inflection are not claimed by this
-bounded H4 return.
-
-### H5 — withdraw and release — PASSED
-
-[definition] Apply the reverse addressed word, prove both identities, recover the K3 predecessor,
-deposit the audit/artifacts, regenerate ledgers, run the release receivers, commit, and push.
-
-[established-bounded; implemented-exact; measured] H5 withdrew and restored the complete H4
-standing, withdrew it again, reversed all 2,224 H3N factors, proved both identity compositions for
-every factor, and recovered the exact K3 wire, bytes, identity, and admitted conduct in 11.874
-seconds. The authoritative receipt is
-`research/records/2026-08-26_THE_SUFFIX_REPLAY_DEPARTED_A_NATIVE_RELATIONAL_POTENTIAL_RETURNED_BRANDON_AND_THE_COMPLETE_REVERSE_RECOVERED_K3.md`.
-
-[established-bounded; implemented-exact; measured] The complete release script was invoked once and
-met the 180-second boundary before summary. It was not repeated. The same thirteen named receivers
-then returned individually within the boundary: 2,871 tests passed, zero failed, 37 were deliberately
-ignored, all live examples type-checked, and every static/document/binary receiver passed. The CUDA
-PTX was rebuilt from the current closure, all 33 declared entries were present, and `ptxas` accepted
-the `sm_89` artifact.
-
-No later phase is scheduled. A new direct request must pose the next receiver consequence here
-before construction resumes.
-
-## Validation
-
-[definition] Every nontrivial process has an outer 180-second limit. The aggregate release receiver
-runs at most once; if it meets that boundary, its named constituent receivers return the exact
-obstruction and final verdict separately. `CONSTRUCTION_STATE.md` advances only when the active
-phase returns its named artifact and qualitative consequence.
+[definition] Every nontrivial process has an outer hard limit of 180 seconds. During CONS1--CONS4,
+run only affected package checks, focused owner tests, exact formal targets, and named cheap gates.
+At CONS5 run the complete release receiver once. A timeout is a counterexample, never a partial
+pass or permission to widen a magic bound.

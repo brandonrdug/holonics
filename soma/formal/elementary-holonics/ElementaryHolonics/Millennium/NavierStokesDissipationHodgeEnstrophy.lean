@@ -54,6 +54,25 @@ local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
 local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (IsProbabilityMeasure AddCircle.haarAddCircle)
 
+private theorem volume_spatialTorus_eq_pi_haarAddCircle :
+    (volume : Measure SpatialTorus) =
+      Measure.pi (fun _ : Fin 3 ↦ AddCircle.haarAddCircle) := by
+  rw [MeasureTheory.volume_pi]
+  rfl
+
+/-- The continuous torus vorticity carrier and the pointwise direction receiver retain the same
+complexified physical occurrence.  Keeping this bridge explicit prevents proof-carrying chart
+arguments from becoming accidental distinctions after elaborator changes. -/
+@[simp]
+theorem complexTorusVorticitySlice_eq_openPeriodicComplexVorticityAt
+    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
+    (t : Ioo 0 T) (q : SpatialTorus) :
+    complexTorusVorticitySlice solution t q =
+      openPeriodicComplexVorticityAt solution t q := by
+  rfl
+
 /-! ## Continuous torus carriers for the finite depth word -/
 
 /-- One raw dyadic band after the receiver and displacement populations have been retained. -/
@@ -89,7 +108,8 @@ theorem openPeriodicDyadicRawHodgeStretchingCarrier_eq_directionCoherenceMass
   apply integral_congr_ae
   filter_upwards [] with y
   apply congrArg norm
-  simpa using (dyadicHodgeStretchingKernelReading_directionRemainder scale y
+  simpa [openPeriodicSpatialDirectionRemainderField] using
+    (dyadicHodgeStretchingKernelReading_directionRemainder scale y
     (openPeriodicComplexVorticityAt solution t q)
     (complexTorusVorticitySlice solution t (q - y))).symm
 
@@ -217,6 +237,8 @@ theorem abs_openPeriodicPhysicalVortexStretchingAt_le_rawWord_add_fiber
     solution t q depth
   simpa [openPeriodicDyadicBaseStrainNormCarrier,
     openPeriodicDyadicReconstructionFiberNormCarrier,
+    openPeriodicDyadicBaseStrainReading,
+    openPeriodicDyadicReconstructionFiberStrainReading,
     openPeriodicDyadicSpatialDirectionCoherenceWord,
     openPeriodicDyadicRawHodgeStretchingCarrier_eq_directionCoherenceMass]
     using hsource
@@ -303,10 +325,13 @@ theorem integral_norm_sq_torusVorticityEvolution_eq_two_enstrophy
     toFun := fun q ↦ ‖torusVorticityEvolution solution t q‖ ^ 2
     continuous_toFun := by fun_prop }
   have hchart := integral_euclideanToSpatialTorus_unitCube squareField
+  simp only [MeasureTheory.volume_pi, AddCircle.volume_eq_smul_haarAddCircle,
+    ENNReal.ofReal_one, one_smul] at hchart
   calc
     (∫ q : SpatialTorus, ‖torusVorticityEvolution solution t q‖ ^ 2) =
         ∫ x in unitCube,
           squareField (euclideanToSpatialTorus x) := by
+      rw [volume_spatialTorus_eq_pi_haarAddCircle]
       simpa [squareField] using hchart.symm
     _ = ∫ x in unitCube, ‖vorticityField velocity x t.1‖ ^ 2 := by
       apply setIntegral_congr_fun
@@ -396,7 +421,8 @@ theorem openPeriodicDyadicBaseStrainTorusMass_le_kineticEnergy_enstrophy
         coefficient * complexVectorL1 (complexTorusVorticitySlice solution t q) ^ 2 := by
       apply integral_mono hleft hright
       intro q
-      simpa [coefficient, openPeriodicDyadicBaseStrainNormCarrier] using
+      simpa [coefficient, openPeriodicDyadicBaseStrainNormCarrier,
+        openPeriodicDyadicBaseStrainReading] using
         norm_openPeriodicDyadicBaseStrainReading_le_kineticEnergy solution t q
     _ = coefficient * ∫ q : SpatialTorus,
         complexVectorL1 (complexTorusVorticitySlice solution t q) ^ 2 := by
@@ -474,7 +500,8 @@ theorem openPeriodicDyadicReconstructionFiberTorusMass_le_upper
           (2 * openPeriodicJacobianCoefficientTailMass solution t
             (frequencyCube (dyadicHodgeInnerCutoff depth))) *
               complexVectorL1 (complexTorusVorticitySlice solution t q) ^ 2 := by
-          simpa [openPeriodicDyadicReconstructionFiberNormCarrier] using hfiber
+          simpa [openPeriodicDyadicReconstructionFiberNormCarrier,
+            openPeriodicDyadicReconstructionFiberStrainReading] using hfiber
         _ ≤ (2 * explicit) *
               complexVectorL1 (complexTorusVorticitySlice solution t q) ^ 2 := by
           apply mul_le_mul_of_nonneg_right _ (sq_nonneg _)
@@ -506,7 +533,8 @@ theorem tendsto_openPeriodicIntegratedDyadicFiberUpper_atTop
   have hscale := tendsto_jacobianTailScale_atTop.comp
     tendsto_dyadicHodgeInnerCutoff_atTop
   have htransport := hresponse.continuousAt.tendsto.comp hscale
-  simpa [response, openPeriodicIntegratedDyadicFiberUpper] using htransport
+  unfold openPeriodicIntegratedDyadicFiberUpper
+  simpa [Function.comp_def, response] using htransport
 
 /-! ## Infinite-depth and signed physical returns -/
 
@@ -559,6 +587,8 @@ theorem periodicVortexStretching_le_absoluteTorusMass
   let absoluteField : C(SpatialTorus, ℝ) :=
     openPeriodicAbsoluteVortexStretchingCarrier solution t
   have hchart := integral_euclideanToSpatialTorus_unitCube absoluteField
+  simp only [MeasureTheory.volume_pi, AddCircle.volume_eq_smul_haarAddCircle,
+    ENNReal.ofReal_one, one_smul] at hchart
   have hcubeCompact : IsCompact unitCube := by
     unfold unitCube
     exact (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isCompact_preimage.mpr

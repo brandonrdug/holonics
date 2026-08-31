@@ -112,8 +112,6 @@ theorem zeroPaddedSecondPreviousCoefficient_add_one
   · subst index
     simp [zeroPaddedSecondPreviousCoefficient, zeroPaddedPreviousCoefficient]
   · simp [zeroPaddedSecondPreviousCoefficient, zeroPaddedPreviousCoefficient, hzero]
-    congr 1
-    omega
 
 theorem zeroPaddedCoefficient_secondCombination
     (first middle last : ℕ → ℂ) (count index : ℕ) :
@@ -267,7 +265,8 @@ theorem directDyadicScalarCoefficient_backwardPadded_eq_secondPrevious
                 dyadicHodgeApertureFrequency, centeredFrequency] <;>
               omega
           rw [hfrequency]
-          simpa [zeroPaddedSecondPreviousCoefficient, hfirstSmall, hsecondSmall,
+          simpa [directDyadicScalarCoefficient,
+            zeroPaddedSecondPreviousCoefficient, hfirstSmall, hsecondSmall,
             zeroPaddedCoefficient, hfirstInside, hsecondInside] using
             (dyadicTensorBandCubeCoefficient_eq_actual scale
               (firstIndex - 2) (secondIndex - 2) thirdIndex).symm

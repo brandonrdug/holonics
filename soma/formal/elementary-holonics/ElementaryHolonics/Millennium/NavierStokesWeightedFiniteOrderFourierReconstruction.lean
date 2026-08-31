@@ -51,8 +51,9 @@ def periodicWeightedSobolevDerivativeIntoPredCLM
         apply Subtype.ext
         funext k
         simp only [periodicWeightedSobolevDerivativeIntoPred,
-          coefficientWeightedRealization_apply,
-          periodicSobolevDerivativeIntoPred_apply,
+          coefficientWeightedRealization,
+          periodicSobolevDerivativeIntoPred,
+          periodicSobolevDerivativeFourier,
           weightedSobolevCoefficients, weightedSobolevRawCoefficients,
           lp.coeFn_add, Pi.add_apply]
         ring
@@ -61,8 +62,9 @@ def periodicWeightedSobolevDerivativeIntoPredCLM
         apply Subtype.ext
         funext k
         simp only [periodicWeightedSobolevDerivativeIntoPred,
-          coefficientWeightedRealization_apply,
-          periodicSobolevDerivativeIntoPred_apply,
+          coefficientWeightedRealization,
+          periodicSobolevDerivativeIntoPred,
+          periodicSobolevDerivativeFourier,
           weightedSobolevCoefficients, weightedSobolevRawCoefficients,
           lp.coeFn_smul, Pi.smul_apply, RingHom.id_apply, smul_eq_mul]
         ring }
@@ -119,16 +121,18 @@ theorem weightedSobolevCoefficients_orderedDerivativeToThree_apply :
       intro word state k
       rw [orderedDerivativeToThree, ContinuousLinearMap.comp_apply,
         ih (Fin.tail word), periodicWeightedSobolevDerivativeIntoPredCLM_apply]
+      have horder : r + 1 + 3 - 1 = r + 3 := by omega
+      have hderivativeRaw :=
+        weightedSobolevCoefficients_periodicWeightedSobolevDerivativeIntoPred_apply
+          (r + 1 + 3) (by omega) (word 0) state k
+      rw [horder] at hderivativeRaw
       have hderivative :
           (weightedSobolevCoefficients (r + 3)
             (periodicWeightedSobolevDerivativeIntoPred
               (r + 1 + 3) (by omega) (word 0) state)).1 k =
             coordinateFourierMultiplier (word 0) k *
               (weightedSobolevCoefficients (r + 1 + 3) state).1 k := by
-        simpa only [coordinateFourierMultiplier,
-          show r + 1 + 3 - 1 = r + 3 by omega] using
-            weightedSobolevCoefficients_periodicWeightedSobolevDerivativeIntoPred_apply
-              (r + 1 + 3) (by omega) (word 0) state k
+        simpa only [coordinateFourierMultiplier] using hderivativeRaw
       rw [hderivative]
       simp only [orderedDerivativeMultiplier, Fin.prod_univ_succ, Fin.tail]
       unfold coordinateFourierMultiplier
@@ -468,12 +472,17 @@ theorem weightedSobolevCoefficients_periodicVectorWeightedSobolevDerivativeSuccT
       coordinateFourierMultiplier coordinate k *
         (weightedSobolevCoefficients (m + 1 + 3)
           (state component)).1 k := by
-  simpa only [periodicVectorWeightedSobolevDerivativeSuccThreeCLM,
-    periodicWeightedSobolevDerivativeIntoPredCLM_apply,
-    coordinateFourierMultiplier,
-    show m + 1 + 3 - 1 = m + 3 by omega] using
-      weightedSobolevCoefficients_periodicWeightedSobolevDerivativeIntoPred_apply
-        (m + 1 + 3) (by omega) coordinate (state component) k
+  change
+    (weightedSobolevCoefficients (m + 3)
+      (periodicWeightedSobolevDerivativeIntoPredCLM
+        (m + 1 + 3) (by omega) coordinate (state component))).1 k = _
+  rw [periodicWeightedSobolevDerivativeIntoPredCLM_apply]
+  have horder : m + 1 + 3 - 1 = m + 3 := by omega
+  have hderivative :=
+    weightedSobolevCoefficients_periodicWeightedSobolevDerivativeIntoPred_apply
+      (m + 1 + 3) (by omega) coordinate (state component) k
+  rw [horder] at hderivative
+  simpa only [coordinateFourierMultiplier] using hderivative
 
 /-- The primary complex reconstruction from native order `m+3`. -/
 def reconstructedHigherOrderComplexComponent
@@ -650,9 +659,10 @@ theorem contDiff_reconstructedHigherOrderVelocity
     ContDiff ℝ (m + 1) (reconstructedHigherOrderVelocity m state) := by
   rw [contDiff_piLp]
   intro component
-  simpa [reconstructedHigherOrderVelocity, vectorOfCoordinates_apply] using
-    Complex.reCLM.contDiff.comp
-      (contDiff_reconstructedHigherOrderComplexComponent m state component)
+  change ContDiff ℝ (m + 1)
+    (Complex.reCLM ∘ reconstructedHigherOrderComplexComponent m state component)
+  exact Complex.reCLM.contDiff.comp
+    (contDiff_reconstructedHigherOrderComplexComponent m state component)
 
 /-- In particular, the requested finite aperture `C^m` follows without an assumed regularity
 interface. -/

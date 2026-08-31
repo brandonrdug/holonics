@@ -883,7 +883,7 @@ lemma isBigO_atTop_heckeTheta :
 
 /-- The strong FE-pair of the congruent-number curve at one: `f = g = heckeTheta`,
 weight `2`, sign `+1`, no constant terms. -/
-def heckeFEPair : StrongFEPair ℂ where
+def heckeFEPair : WeakFEPair ℂ where
   f := Complex.ofReal ∘ heckeTheta
   g := Complex.ofReal ∘ heckeTheta
   k := 2
@@ -892,8 +892,6 @@ def heckeFEPair : StrongFEPair ℂ where
   hε := one_ne_zero
   f₀ := 0
   g₀ := 0
-  hf₀ := rfl
-  hg₀ := rfl
   hf_int := (Complex.continuous_ofReal.comp_continuousOn
     continuousOn_heckeTheta).locallyIntegrableOn measurableSet_Ioi
   hg_int := (Complex.continuous_ofReal.comp_continuousOn
@@ -913,6 +911,9 @@ def heckeFEPair : StrongFEPair ℂ where
     simpa using isBigO_ofReal_left.mpr <|
       hp'.trans (isLittleO_exp_neg_mul_rpow_atTop hp r).isBigO
 
+private lemma heckeFEPair_isStrong : IsStrongFEPair heckeFEPair :=
+  ⟨rfl, rfl⟩
+
 /-- **The completed L-function of the congruent-number curve at one**, defined as the
 Mellin transform of its theta function — the integral the classical
 `Λ(s) = (√32/2π)^s Γ(s) L(E₁,s)` equals, constructed with no convergence region. -/
@@ -921,13 +922,13 @@ def heckeLambda : ℂ → ℂ := heckeFEPair.Λ
 /-- **The completed L-function is entire.**  No pole, no continuation step: the strong
 FE-pair machinery returns differentiability on all of `ℂ` at once. -/
 theorem theCompletedLFunctionIsEntire : Differentiable ℂ heckeLambda :=
-  heckeFEPair.differentiable_Λ
+  heckeFEPair_isStrong.differentiable_Λ
 
 /-- The Mellin representation: `heckeLambda s` is the convergent Mellin transform of the
 theta function at every `s`. -/
 theorem theCompletedLFunctionHasMellin (s : ℂ) :
     HasMellin (Complex.ofReal ∘ heckeTheta) s (heckeLambda s) :=
-  heckeFEPair.hasMellin s
+  heckeFEPair_isStrong.hasMellin s
 
 /-- **The functional equation of the completed L-function**: `Λ(2 − s) = Λ(s)`.
 Weight two, sign `+1` — the analytic reflection of the congruent-number curve at one,
@@ -935,7 +936,11 @@ kernel-checked with no analytic continuation argument. -/
 theorem theCompletedLFunctionalEquation (s : ℂ) : heckeLambda (2 - s) = heckeLambda s := by
   have h := heckeFEPair.functional_equation s
   rw [show heckeFEPair.k = (2 : ℝ) from rfl, show heckeFEPair.ε = (1 : ℂ) from rfl] at h
-  simpa [heckeLambda, StrongFEPair.Λ_eq, StrongFEPair.symm_Λ_eq, one_smul] using h
+  have hsymm : heckeFEPair.symm.Λ = heckeFEPair.Λ := by
+    ext z
+    simp [WeakFEPair.Λ, WeakFEPair.Λ₀, WeakFEPair.f_modif, heckeFEPair]
+  rw [hsymm] at h
+  simpa [heckeLambda, one_smul] using h
 
 /-! ## 14. Positivity: every kernel factor is positive
 
@@ -1050,19 +1055,23 @@ private lemma oddKernel_quarter_pos_of_four_le {X : ℝ} (hX : 4 ≤ X) :
     rw [Real.norm_eq_abs, abs_of_nonneg hr0]
     exact hrlt
   have hshift : HasSum (fun k : ℕ => (((k + 1 : ℕ)) : ℝ) * r ^ (k + 1)) (r / (1 - r) ^ 2) := by
-    refine (hasSum_nat_add_iff (f := fun n : ℕ => (n : ℝ) * r ^ n) 1).mpr ?_
-    convert hgeo using 1
-    rw [Finset.sum_range_one]
-    norm_num
+    simpa only [Finset.sum_range_one, Nat.cast_zero, zero_mul, sub_zero] using
+      ((hasSum_nat_add_iff' (g := r / (1 - r) ^ 2)
+        (f := fun n : ℕ => (n : ℝ) * r ^ n) 1).mpr hgeo)
   have hmaj : Summable (fun k : ℕ => 8 * a 0 * ((((k + 1 : ℕ)) : ℝ) * r ^ (k + 1))) :=
     hshift.summable.mul_left _
   have hb1 : HasSum (fun n : ℕ => a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))
       (oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X - a 0) := by
-    refine (hasSum_nat_add_iff (f := fun n : ℕ => a (n : ℤ) + a (-(n : ℤ))) 1).mpr ?_
-    convert hb using 1
-    rw [Finset.sum_range_one]
-    simp only [Nat.cast_zero, neg_zero]
-    ring
+    have h := (hasSum_nat_add_iff'
+      (g := oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X + a 0)
+      (f := fun n : ℕ => a (n : ℤ) + a (-(n : ℤ))) 1).mpr hb
+    rw [Finset.sum_range_one] at h
+    simp only [Nat.cast_zero, neg_zero] at h
+    have hsum : oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X + a 0 -
+        (a 0 + a 0) = oddKernel ((1 / 4 : ℝ) : UnitAddCircle) X - a 0 := by
+      ring
+    rw [hsum] at h
+    exact h
   have hTabs : Summable fun n : ℕ => |a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ))| :=
     Summable.of_nonneg_of_le (fun n => abs_nonneg _) hterm hmaj
   have htail : |∑' n : ℕ, (a ((n + 1 : ℕ) : ℤ) + a (-((n + 1 : ℕ) : ℤ)))|

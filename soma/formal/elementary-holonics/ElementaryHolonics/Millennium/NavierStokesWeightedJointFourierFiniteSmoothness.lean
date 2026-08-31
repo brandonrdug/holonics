@@ -99,8 +99,12 @@ theorem hasFDerivAt_reconstructedHighOrderComplexEvaluationCLM
     (summable_highOrderFourierEvaluationModeCLM
       (by omega : 6 ≤ r + 6) component x)
     x
-  simpa only [reconstructedHighOrderComplexEvaluationCLM,
-    reconstructedHighOrderComplexEvaluationFDeriv] using h
+  change HasFDerivAt
+    (fun y : Space ↦ ∑' k : SpatialFrequency,
+      highOrderFourierEvaluationModeCLM (r + 6) component k y)
+    (∑' k : SpatialFrequency,
+      highOrderFourierEvaluationModeFDeriv (r + 6) component k x) x
+  exact h
 
 /-! ## Adjacent-order form of the complete derivative -/
 
@@ -296,11 +300,10 @@ theorem contDiffOn_joint_reconstructedHigherOrderVelocity
       (Set.univ ×ˢ s) := by
   rw [contDiffOn_piLp]
   intro component
-  simpa only [reconstructedHigherOrderVelocity,
-    vectorOfCoordinates_apply] using
-      Complex.reCLM.contDiff.comp_contDiffOn
-        (contDiffOn_joint_reconstructedHighOrderComplexComponent
-          r component path hpath)
+  have hreal := Complex.reCLM.contDiff.comp_contDiffOn
+    (contDiffOn_joint_reconstructedHighOrderComplexComponent
+      r component path hpath)
+  exact hreal.congr (fun _ _ ↦ rfl)
 
 /-! ## The coherent mild-tower velocity -/
 

@@ -41,7 +41,7 @@ variable {n : ℕ}
 /-- The naive height of a point at modulus `n`. -/
 def pheightAt (n : ℕ) : (FamilyFace.E ((n : ℚ))).Point → ℕ
   | .zero => 0
-  | .some (x := x) _ => hgt x
+  | .some x _ _ => hgt x
 
 private lemma onCurveAt {m x y : ℚ} (h : (FamilyFace.E m).Nonsingular x y) :
     y ^ 2 = x ^ 3 - m ^ 2 * x := by
@@ -55,7 +55,7 @@ private lemma negYAt (m x y : ℚ) : (FamilyFace.E m).negY x y = -y := by
 
 private lemma someEqAt {m x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (FamilyFace.E m).Nonsingular x₁ y₁} {h₂ : (FamilyFace.E m).Nonsingular x₂ y₂} :
-    (Point.some h₁ : (FamilyFace.E m).Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : (FamilyFace.E m).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
@@ -173,7 +173,7 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
           rw [← hcastm] at h4
           simp only [Int.natAbs_neg, Int.natAbs_natCast, Int.natAbs_one] at h4
           omega
-      have hp : pheightAt n (Point.some hQns) = hgt u := rfl
+      have hp : pheightAt n (Point.some _ _ hQns) = hgt u := rfl
       omega
     · have hu0 : u ≠ 0 := by
         intro hc
@@ -192,8 +192,8 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
         rw [negYAt]
         intro hc
         exact hv (by linarith)
-      have hQQ : (Point.some hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some hQns =
-          Point.some (nonsingular_add hQns hQns fun hxy => hyne hxy.right) :=
+      have hQQ : (Point.some _ _ hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some _ _ hQns =
+          Point.some _ _ (nonsingular_add hQns hQns fun hxy => hyne hxy.right) :=
         Point.add_self_of_Y_ne hyne
       have hs : (FamilyFace.E ((n : ℚ))).slope u u v v
           = (3 * u ^ 2 - ((n : ℚ)) ^ 2) / (2 * v) := by
@@ -224,7 +224,7 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
                 (-36 * u ^ 4 + 24 * ((n : ℚ)) ^ 2 * u ^ 2 - 4 * ((n : ℚ)) ^ 4)
                   * hcurveQ
       have hpQQ : pheightAt n
-            ((Point.some hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some hQns)
+            ((Point.some _ _ hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some _ _ hQns)
           = hgt ((u ^ 2 + ((n : ℚ)) ^ 2) ^ 2 / (4 * u * (u ^ 2 - ((n : ℚ)) ^ 2))) := by
         rw [hQQ]
         show hgt ((FamilyFace.E ((n : ℚ))).addX u u
@@ -233,7 +233,7 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
       have hdup := FamilyHeight.theDuplicationGrowsTheHeightAtEveryModulus n hn u
         hu0 hu25
       have hlink : pheightAt n
-            ((Point.some hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some hQns)
+            ((Point.some _ _ hQns : (FamilyFace.E ((n : ℚ))).Point) + Point.some _ _ hQns)
           = pheightAt n (X - R) := congrArg (pheightAt n) hQ
       have hchain : hgt u ^ 4 ≤ 16 * n ^ 6 * (C * pheightAt n X ^ 2) := by
         calc hgt u ^ 4
@@ -243,7 +243,7 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
           _ = 16 * n ^ 6 * pheightAt n (X - R) := by rw [← hpQQ, hlink]
           _ ≤ 16 * n ^ 6 * (C * pheightAt n X ^ 2) :=
               Nat.mul_le_mul_left _ hb
-      have hp : pheightAt n (Point.some hQns) = hgt u := rfl
+      have hp : pheightAt n (Point.some _ _ hQns) = hgt u := rfl
       rw [hp]
       by_contra hge
       push_neg at hge
@@ -343,7 +343,7 @@ private lemma descent_step (hn : 0 < n) (X : (FamilyFace.E ((n : ℚ))).Point)
         have h1 : hgt x ≤ hgt x ^ 2 := Nat.le_self_pow two_ne_zero _
         have h2 : hgt x ^ 2 ≤ CC hn * hgt x ^ 2 :=
           Nat.le_mul_of_pos_left _ (CC_pos hn)
-        have hpx' : pheightAt n (Point.some hXns) = hgt x := rfl
+        have hpx' : pheightAt n (Point.some _ _ hXns) = hgt x := rfl
         rw [hpx']
         omega
       · -- the finite representative: the family chord bound
@@ -359,17 +359,17 @@ private lemma descent_step (hn : 0 < n) (X : (FamilyFace.E ((n : ℚ))).Point)
         have hNk : (FamilyFace.E ((n : ℚ))).Nonsingular xR (-yR) := by
           have h := (nonsingular_neg (x := xR) (y := yR)).mpr hRns
           rwa [negYAt] at h
-        have hNeg : -(Point.some hRns : (FamilyFace.E ((n : ℚ))).Point)
-            = Point.some hNk := by
+        have hNeg : -(Point.some _ _ hRns : (FamilyFace.E ((n : ℚ))).Point)
+            = Point.some _ _ hNk := by
           rw [Point.neg_some]
           exact someEqAt rfl (negYAt ((n : ℚ)) xR yR)
-        have hsub : (Point.some hXns : (FamilyFace.E ((n : ℚ))).Point)
-            - Point.some hRns = Point.some hXns + Point.some hNk := by
+        have hsub : (Point.some _ _ hXns : (FamilyFace.E ((n : ℚ))).Point)
+            - Point.some _ _ hRns = Point.some _ _ hXns + Point.some _ _ hNk := by
           rw [sub_eq_add_neg, hNeg]
         rw [hsub, Point.add_of_X_ne hxne]
         show hgt ((FamilyFace.E ((n : ℚ))).addX x xR
           ((FamilyFace.E ((n : ℚ))).slope x xR y (-yR)))
-          ≤ CC hn * pheightAt n (Point.some hXns) ^ 2
+          ≤ CC hn * pheightAt n (Point.some _ _ hXns) ^ 2
         have harg : (FamilyFace.E ((n : ℚ))).addX x xR
             ((FamilyFace.E ((n : ℚ))).slope x xR y (-yR))
             = ((y + yR) / (x - xR)) ^ 2 - x - xR := by
@@ -399,9 +399,9 @@ private lemma descent_step (hn : 0 < n) (X : (FamilyFace.E ((n : ℚ))).Point)
           _ ≤ 2 * ((1 + n ^ 2) * (H0 hn + 1)) ^ 2 * hgt x ^ 2 :=
               Nat.mul_le_mul (Nat.mul_le_mul (le_refl 2)
                 (Nat.pow_le_pow_left hL 2)) (le_refl _)
-          _ = CC hn * pheightAt n (Point.some hXns) ^ 2 := by
+          _ = CC hn * pheightAt n (Point.some _ _ hXns) ^ 2 := by
               unfold CC
-              rw [show pheightAt n (Point.some hXns) = hgt x from rfl]
+              rw [show pheightAt n (Point.some _ _ hXns) = hgt x from rfl]
   obtain ⟨Q, hQeq, hQlt⟩ := contract_core hn (CC_pos hn) X R hdouble hb (by omega)
   exact ⟨Q, R, hRh, hQeq, hQlt⟩
 
@@ -409,7 +409,7 @@ private lemma descent_step (hn : 0 < n) (X : (FamilyFace.E ((n : ℚ))).Point)
 
 private def coordsAt : (FamilyFace.E ((n : ℚ))).Point → Option (ℚ × ℚ)
   | .zero => none
-  | .some (x := x) (y := y) _ => some (x, y)
+  | .some x y _ => some (x, y)
 
 private lemma coordsAt_injective : Function.Injective (coordsAt (n := n)) := by
   intro P Q h

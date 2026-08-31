@@ -438,11 +438,13 @@ def reconstructedRealPressure
 theorem contDiff_one_reconstructedRealPressure
     (state : PeriodicWeightedSobolev 3) :
     ContDiff ℝ 1 (reconstructedRealPressure state) := by
-  simpa [reconstructedRealPressure, reconstructedScalarTorusComplex,
-    Function.comp_def] using
-      Complex.reCLM.contDiff.comp
-        (contDiff_one_reconstructedComplexComponent
-          (scalarNativeDiagonalVector state) 0)
+  change ContDiff ℝ 1 (fun x : Space ↦
+    ((reconstructedTorusComplexComponent
+      (scalarNativeDiagonalVector state) 0)
+        (euclideanToSpatialTorus x)).re)
+  exact Complex.reCLM.contDiff.comp
+    (contDiff_one_reconstructedComplexComponent
+      (scalarNativeDiagonalVector state) 0)
 
 theorem continuous_reconstructedRealPressure
     (state : PeriodicWeightedSobolev 3) :
@@ -670,8 +672,11 @@ theorem fderiv_reconstructedRealPressure_apply_single
       (Complex.reCLM.comp
         (reconstructedComplexComponentFDeriv
           (scalarNativeDiagonalVector state) 0 x)) x := by
-    simpa [reconstructedRealPressure, reconstructedScalarTorusComplex,
-      Function.comp_def] using hreal
+    change HasFDerivAt (fun y : Space ↦
+      ((reconstructedTorusComplexComponent
+        (scalarNativeDiagonalVector state) 0)
+          (euclideanToSpatialTorus y)).re) _ x
+    exact hreal
   rw [hreal'.fderiv]
   change
     (reconstructedComplexComponentFDeriv

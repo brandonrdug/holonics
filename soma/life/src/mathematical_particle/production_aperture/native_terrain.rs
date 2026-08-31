@@ -26,9 +26,7 @@ const STANDING_MAGIC: &[u8; 8] = b"HLT3S001";
 const DECODER_MAGIC: &[u8; 8] = b"HLT3D001";
 const FIBRES_MAGIC: &[u8; 8] = b"HLT3F001";
 
-fn is_digest(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
+use holonic_engine::is_sha256_digest as is_digest;
 
 fn receivers() -> Vec<ProductionReceiver> {
     vec![

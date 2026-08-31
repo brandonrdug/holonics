@@ -114,6 +114,21 @@ pub struct OverlapPatch {
     pub cocycle: ExactRatMatrix,
 }
 
+/// Both receiver-constitutive restrictions on a shared support.
+///
+/// Equal transport coordinates do not imply equal physical response.  When the section cocycle
+/// vanishes but either pulled metric differs, the overlap retains this constitutive cocycle rather
+/// than forcing a false glue or returning an untyped metric error.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ConstitutiveOverlapPatch {
+    pub left_domain: ExactRatMatrix,
+    pub right_domain: ExactRatMatrix,
+    pub domain_cocycle: ExactRatMatrix,
+    pub left_codomain: ExactRatMatrix,
+    pub right_codomain: ExactRatMatrix,
+    pub codomain_cocycle: ExactRatMatrix,
+}
+
 /// The returned relation between two local sections.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OverlapKind {
@@ -128,6 +143,11 @@ pub enum OverlapKind {
     CommutingCocycle {
         right_after_left: ExactRatMatrix,
         left_after_right: ExactRatMatrix,
+    },
+    /// The transported section agrees but the receiver constitutive forms differ on the overlap.
+    /// Both restrictions and their oriented difference remain available to the later return.
+    ConstitutiveCocycle {
+        constitutive: ConstitutiveOverlapPatch,
     },
     /// Order remains causal data. The commutator is the loop return/holonomy.
     PathOrderedHolonomy {
@@ -219,7 +239,7 @@ impl DerivedFactorCover {
             .flat_map(|local| local.withdrawal_word.iter().cloned())
             .collect();
         let cover = Self {
-            schema: "holonic-engine.derived-factor-cover.v2".to_owned(),
+            schema: "holonic-engine.derived-factor-cover.v3".to_owned(),
             locals,
             overlaps,
             compact_interchange_families,
@@ -234,7 +254,7 @@ impl DerivedFactorCover {
 
     /// Reopen the complete cover from its local receipts and compact pair-family testimony.
     pub fn validate(&self) -> Result<(), FactorCoverError> {
-        if self.schema != "holonic-engine.derived-factor-cover.v2" {
+        if self.schema != "holonic-engine.derived-factor-cover.v3" {
             return Err(FactorCoverError::CoverSchema(self.schema.clone()));
         }
         let expected_pairs = pair_population(self.locals.len())?;
@@ -534,8 +554,8 @@ fn compare_sections(
         let left_restriction = restrict(left, &overlap_rows, &overlap_columns)?;
         let right_restriction = restrict(right, &overlap_rows, &overlap_columns)?;
         Some(OverlapPatch {
-            rows: overlap_rows,
-            columns: overlap_columns,
+            rows: overlap_rows.clone(),
+            columns: overlap_columns.clone(),
             cocycle: left_restriction.subtract(&right_restriction)?,
             left: left_restriction,
             right: right_restriction,
@@ -545,13 +565,24 @@ fn compare_sections(
         .as_ref()
         .is_some_and(|patch| patch.cocycle.entries().iter().all(Rat::is_zero))
     {
+        let constitutive = constitutive_overlap(left, right, &overlap_rows, &overlap_columns)?;
+        let constitutive_agrees = constitutive
+            .domain_cocycle
+            .entries()
+            .iter()
+            .chain(constitutive.codomain_cocycle.entries())
+            .all(Rat::is_zero);
         return Ok(OverlapReceipt {
             left: left.address.clone(),
             right: right.address.clone(),
             chart_transition,
             patch,
-            kind: OverlapKind::CompatibleGlue {
-                glued: glue(left, right)?,
+            kind: if constitutive_agrees {
+                OverlapKind::CompatibleGlue {
+                    glued: glue(left, right)?,
+                }
+            } else {
+                OverlapKind::ConstitutiveCocycle { constitutive }
             },
         });
     }
@@ -599,6 +630,74 @@ fn compare_sections(
         patch,
         kind,
     })
+}
+
+fn constitutive_overlap(
+    left: &SupportedDefectSection,
+    right: &SupportedDefectSection,
+    rows: &[usize],
+    columns: &[usize],
+) -> Result<ConstitutiveOverlapPatch, FactorCoverError> {
+    let left_domain = restrict_metric(
+        &left.metrics.domain,
+        &left.support_columns,
+        columns,
+        &left.address,
+    )?;
+    let right_domain = restrict_metric(
+        &right.metrics.domain,
+        &right.support_columns,
+        columns,
+        &right.address,
+    )?;
+    let left_codomain = restrict_metric(
+        &left.metrics.codomain,
+        &left.support_rows,
+        rows,
+        &left.address,
+    )?;
+    let right_codomain = restrict_metric(
+        &right.metrics.codomain,
+        &right.support_rows,
+        rows,
+        &right.address,
+    )?;
+    Ok(ConstitutiveOverlapPatch {
+        domain_cocycle: left_domain.subtract(&right_domain)?,
+        codomain_cocycle: left_codomain.subtract(&right_codomain)?,
+        left_domain,
+        right_domain,
+        left_codomain,
+        right_codomain,
+    })
+}
+
+fn restrict_metric(
+    metric: &ExactRatMatrix,
+    local_support: &[usize],
+    overlap_support: &[usize],
+    address: &str,
+) -> Result<ExactRatMatrix, FactorCoverError> {
+    ExactRatMatrix::new(
+        overlap_support
+            .iter()
+            .map(|ambient_row| {
+                let local_row = local_support
+                    .binary_search(ambient_row)
+                    .map_err(|_| FactorCoverError::SupportShape(address.to_owned()))?;
+                overlap_support
+                    .iter()
+                    .map(|ambient_column| {
+                        let local_column = local_support
+                            .binary_search(ambient_column)
+                            .map_err(|_| FactorCoverError::SupportShape(address.to_owned()))?;
+                        Ok(metric.get(local_row, local_column)?.clone())
+                    })
+                    .collect::<Result<Vec<_>, FactorCoverError>>()
+            })
+            .collect::<Result<Vec<_>, FactorCoverError>>()?,
+    )
+    .map_err(Into::into)
 }
 
 fn restrict(

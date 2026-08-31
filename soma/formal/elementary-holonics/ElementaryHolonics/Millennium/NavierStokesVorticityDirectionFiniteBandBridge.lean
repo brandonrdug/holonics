@@ -31,10 +31,24 @@ theorem hodgeJacobianMode_smul
     (frequency : SpatialFrequency) (amplitude : ℂ) (source : ComplexVector) :
     hodgeJacobianMode frequency (amplitude • source) =
       amplitude • hodgeJacobianMode frequency source := by
+  have hreconstruction :
+      nonzeroModeHodgeReconstruction frequency (amplitude • source) =
+        amplitude • nonzeroModeHodgeReconstruction frequency source := by
+    unfold nonzeroModeHodgeReconstruction complexCross
+    rw [map_smul]
+    simp only [smul_smul]
+    congr 1
+    ring
   funext component coordinate
-  fin_cases component <;> fin_cases coordinate <;>
-    simp [hodgeJacobianMode, nonzeroModeHodgeReconstruction, fourierJacobianMode,
-      complexCross, complexFrequencyVector, crossProduct] <;> ring
+  let multiplier : ℂ :=
+    2 * (Real.pi : ℂ) * Complex.I * (frequency coordinate : ℂ)
+  change multiplier *
+      nonzeroModeHodgeReconstruction frequency (amplitude • source) component =
+    amplitude *
+      (multiplier * nonzeroModeHodgeReconstruction frequency source component)
+  rw [hreconstruction]
+  change multiplier * (amplitude * _) = amplitude * (multiplier * _)
+  ring
 
 /-- Symmetrization preserves the zero matrix. -/
 @[simp]
@@ -88,6 +102,9 @@ theorem symmetricComplexJacobianPart_smul_hodgeJacobianMode
     symmetricComplexJacobianPart (amplitude • hodgeJacobianMode frequency source) =
       hodgeStrainMode frequency (amplitude • source) := by
   rw [hodgeStrainMode, hodgeJacobianMode_smul]
+  apply congrArg symmetricComplexJacobianPart
+  ext component coordinate
+  rfl
 
 /-- **Exact finite-band bridge.**  The modewise direction carrier is the symmetric-strain
 quadratic reading of the existing Hodge-reconstructed finite Jacobian projector. -/
@@ -110,15 +127,36 @@ theorem openPeriodicFiniteHodgeStrainReading_eq_symmetricHodgeBand
           openPeriodicVorticityFourierMode solution t frequency)) =
       complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
         (symmetricComplexJacobianPart
-          (∑ frequency ∈ modes,
-            UnitAddTorus.mFourier frequency q •
+          (Matrix.of fun component coordinate ↦
+            (∑ frequency ∈ modes,
+              UnitAddTorus.mFourier frequency q •
+                hodgeJacobianMode frequency
+                  (openPeriodicVorticityFourierMode solution t frequency))
+              component coordinate))
+  have hmatrixSum :
+      (Matrix.of fun component coordinate ↦
+        (∑ frequency ∈ modes,
+          UnitAddTorus.mFourier frequency q •
+            hodgeJacobianMode frequency
+              (openPeriodicVorticityFourierMode solution t frequency))
+          component coordinate) =
+        ∑ frequency ∈ modes,
+          Matrix.of fun component coordinate ↦
+            (UnitAddTorus.mFourier frequency q •
               hodgeJacobianMode frequency
-                (openPeriodicVorticityFourierMode solution t frequency)))
-  rw [complexStretchingReading_symmetric_sum]
+                (openPeriodicVorticityFourierMode solution t frequency))
+              component coordinate := by
+    ext component coordinate
+    simp only [Matrix.of_apply, Matrix.sum_apply, Finset.sum_apply]
+  rw [hmatrixSum, complexStretchingReading_symmetric_sum]
   apply Finset.sum_congr rfl
   intro frequency _hfrequency
   rw [hodgeStrainModeReading]
-  rw [symmetricComplexJacobianPart_smul_hodgeJacobianMode]
+  apply congrArg (complexStretchingReading (openPeriodicComplexVorticityAt solution t q))
+  rw [← symmetricComplexJacobianPart_smul_hodgeJacobianMode]
+  apply congrArg symmetricComplexJacobianPart
+  ext component coordinate
+  rfl
 
 /-- **[proved-derived; formal-checked]** The same scalar is the symmetric-strain reading of the
 actual finite Jacobian band, using the checked equality between Hodge reconstruction and the

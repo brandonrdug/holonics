@@ -1,3 +1,4 @@
+import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
 import ElementaryHolonics.Millennium.NavierStokesSmoothHodgeJacobianBand
 import Mathlib.Algebra.BigOperators.Module
 
@@ -419,3 +420,55 @@ section Audit
 end Audit
 
 end Soma.Holonics.Millennium.NavierStokesAnnularHodgeKernelDifference
+
+/-! ## The annular attachment to the generic oriented-difference carrier
+
+This section deliberately lives on the Navier--Stokes side of the dependency boundary.  The
+generic difference calculus owns `OrientedEdge`; this analytic owner supplies the zero-padded
+coefficient current attached to it.
+-/
+
+namespace Soma.Holonics.Millennium.HolonicDifferenceCalculus.AnnularHodge
+
+open Soma.Holonics.Millennium.NavierStokesAnnularHodgeKernelDifference
+
+/-- One zero-padded annular-coefficient difference with both endpoint values retained. -/
+def backwardDifferenceEdge
+    (coefficient : ℕ → ℂ) (count index : ℕ) : OrientedEdge ℂ :=
+  ⟨if index = 0 then 0 else zeroPaddedCoefficient coefficient count (index - 1),
+    zeroPaddedCoefficient coefficient count index⟩
+
+/-- The analytic first backward difference is exactly the generic oriented-edge difference. -/
+theorem backwardDifference_isEdgeDifference
+    (coefficient : ℕ → ℂ) (count index : ℕ) :
+    zeroPaddedBackwardDifference coefficient count index =
+      (backwardDifferenceEdge coefficient count index).difference := by
+  rfl
+
+/-- One second-difference edge is an edge in the already differentiated population. -/
+def secondDifferenceEdge
+    (coefficient : ℕ → ℂ) (count index : ℕ) : OrientedEdge ℂ :=
+  backwardDifferenceEdge
+    (zeroPaddedBackwardDifference coefficient count) (count + 1) index
+
+/-- The annular owner's second difference is carried by the generic second edge. -/
+theorem secondDifference_isEdgeDifference
+    (coefficient : ℕ → ℂ) (count index : ℕ) :
+    zeroPaddedSecondDifference coefficient count index =
+      (secondDifferenceEdge coefficient count index).difference := by
+  rfl
+
+/-- Two Abel passages integrate the actual second-difference edge population through the
+character receiver. -/
+theorem characterWeightedSecondEdges_integrate
+    (coefficient : ℕ → ℂ) (z : ℂ) (count : ℕ) :
+    (∑ index ∈ Finset.range (count + 2),
+        (secondDifferenceEdge coefficient count index).difference * z ^ index) =
+      (1 - z) ^ 2 *
+        ∑ index ∈ Finset.range count, coefficient index * z ^ index := by
+  simpa only [← secondDifference_isEdgeDifference] using
+    finiteCharacterSynthesis_zeroPaddedSecondDifference coefficient z count
+
+#print axioms characterWeightedSecondEdges_integrate
+
+end Soma.Holonics.Millennium.HolonicDifferenceCalculus.AnnularHodge

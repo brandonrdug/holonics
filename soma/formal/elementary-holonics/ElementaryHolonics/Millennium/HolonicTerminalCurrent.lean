@@ -1,3 +1,4 @@
+import ElementaryHolonics.Foundation.Holon
 import ElementaryHolonics.Millennium.HolonicDirectedPassage
 import Mathlib.Topology.Order.DenselyOrdered
 import Mathlib.Topology.UniformSpace.CompleteSeparated
@@ -52,6 +53,48 @@ theorem finitePartitionCurrent_eq_exterior
       intervalCurrent state (time 0) (time pieces) := by
   simpa [intervalCurrent] using
     (Soma.Holonics.finite_telescoping (fun piece ↦ state (time piece)) pieces)
+
+/-! ## The interval current as an elementary boundary holon -/
+
+/-- [definition] An addressed occurrence population carrying one receiver-valued state through
+its source and target times.  The returned current is the oriented receiver difference, and the
+identity boundary map exposes that difference as the outgoing-minus-incoming face. -/
+def intervalBoundaryHolon {Occurrence : Type*} (state : ℝ → G)
+    (sourceTime targetTime : Occurrence → ℝ) :
+    Soma.Holonics.BoundaryHolon G G where
+  Occurrence := Occurrence
+  source occurrence := state (sourceTime occurrence)
+  target occurrence := state (targetTime occurrence)
+  receive occurrence :=
+    intervalCurrent state (sourceTime occurrence) (targetTime occurrence)
+  boundary := AddMonoidHom.id G
+  returnsBoundary := by
+    intro occurrence
+    rfl
+
+/-- [proved-derived; formal-checked] The elementary holon's returned face is exactly the
+addressed interval current; no scalar or subject-specific current is inserted by the carrier. -/
+@[simp]
+theorem intervalBoundaryHolon_receive {Occurrence : Type*} (state : ℝ → G)
+    (sourceTime targetTime : Occurrence → ℝ) (occurrence : Occurrence) :
+    (intervalBoundaryHolon state sourceTime targetTime).receive occurrence =
+      intervalCurrent state (sourceTime occurrence) (targetTime occurrence) := rfl
+
+/-- [proved-derived; formal-checked] Every finite interval occurrence population returns its
+complete exterior receiver difference through the generic boundary-holon law.  This is the
+operation-complex form of telescoping and applies independently of the attached Millennium
+receiver. -/
+theorem intervalBoundaryHolon_total_returns_exterior
+    {Occurrence : Type*} [Fintype Occurrence] (state : ℝ → G)
+    (sourceTime targetTime : Occurrence → ℝ) :
+    (∑ occurrence, intervalCurrent state
+        (sourceTime occurrence) (targetTime occurrence)) =
+      (∑ occurrence, state (targetTime occurrence)) -
+        ∑ occurrence, state (sourceTime occurrence) := by
+  simpa only [intervalCurrent] using
+    (Finset.sum_sub_distrib (s := Finset.univ)
+      (fun occurrence ↦ state (targetTime occurrence))
+      (fun occurrence ↦ state (sourceTime occurrence)))
 
 /-! ## Terminal null cone and reconstruction -/
 
@@ -151,6 +194,8 @@ section Audit
 #print axioms intervalCurrent_reverse
 #print axioms intervalCurrent_glue
 #print axioms finitePartitionCurrent_eq_exterior
+#print axioms intervalBoundaryHolon_receive
+#print axioms intervalBoundaryHolon_total_returns_exterior
 #print axioms hasNullTerminalCurrentAt_iff_eventually_intervalCurrent
 #print axioms exists_terminalTrace_of_hasNullTerminalCurrentAt
 #print axioms hasNullTerminalCurrentAt_iff_existsUnique_terminalTrace

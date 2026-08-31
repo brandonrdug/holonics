@@ -12,7 +12,7 @@ use life::{
         CompleteExchangeCultivationCover, CultivatedAthenaRest, NativeCirculationConsequence,
         NativeCirculationPassage, NativeCirculationRest,
     },
-    exchange_world_tube::{ContinuationAperture, remount_visible_message_projection},
+    exchange_world_tube::{remount_visible_message_projection, ContinuationAperture},
 };
 use serde::Serialize;
 use serde_json::json;

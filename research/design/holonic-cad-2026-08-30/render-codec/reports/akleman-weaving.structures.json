@@ -1,0 +1,600 @@
+[
+  {
+    "source": "siggraph09",
+    "name": "graph rotation system",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "structure": "a graph rotation system assigns a cyclic ordering of edge-ends at each vertex",
+      "consequence": "uniquely determines a graph embedding on an orientable or non-orientable surface, hence the surface",
+      "attribution": "Edmonds 1960, developed in Gross and Tucker 1987"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "a graph rotation system uniquely determines a graph embedding on an orientable or non-orientable surface, and thus uniquely determines the surface"
+  },
+  {
+    "source": "siggraph09",
+    "name": "edge twisting / extended graph rotation system",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "typing": "an edge has type 0 if untwisted, type 1 if twisted",
+      "mechanism": "edge is a flat paper strip; twisting one end 180 degrees clockwise changes the face boundary walks in the rotation system",
+      "effect": "induces a new link projected on the surface"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "An important concept in graph rotation systems is edge twisting. An edge has type 0 if it is untwisted and type 1 if it is twisted"
+  },
+  {
+    "source": "siggraph09",
+    "name": "cyclic plain-weaving (formal definition)",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "carrier": "link L projected onto orientable surface S",
+      "condition1": "no triple intersections at a single point on S",
+      "condition2": "traversal of each component alternates over and under at every crossing"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "a cyclic plain-weaving on an orientable surface S is a projection of a link L on S, such that (1) there are no triple intersections at a single point"
+  },
+  {
+    "source": "siggraph09",
+    "name": "over/under alternation guarantee (Theorem 2.1)",
+    "kind": "theorem",
+    "dimension": 1,
+    "data": {
+      "hypothesis": "rho_0(G) untwisted rotation system embedding G on orientable surface S_h; A an arbitrary subset of edges",
+      "conclusion": "twisting all edges in A yields a rotation system inducing a cyclic plain-weaving on S_h",
+      "proof_location": "deferred to companion technical report Akleman et al. 2009"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "If we twist all edges in A, then the resulting graph rotation system induces a cyclic plain-weaving on Sh"
+  },
+  {
+    "source": "siggraph09",
+    "name": "Face-Tracing Algorithm",
+    "kind": "construction",
+    "dimension": 1,
+    "data": {
+      "purpose": "extract the boundary-walk cycles (the link) from a graph rotation system",
+      "step1": "trace initial oriented edge <u0,w0>",
+      "step2": "update trace type t = t0 + type(edge) mod 2",
+      "step3": "advance to Next(<w0,u0>,t)",
+      "step4": "loop tracing and advancing until returning to start edge and type",
+      "outer_loop": "Trace-All-Faces calls FaceTrace on every untraced face corner in rho(G)",
+      "result": "collection of graph cycles that are the boundary-walks of the faces, i.e. a link projected on S"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "A fundamental algorithm on graph rotation systems, known as face-tracing, is given immediately above. This algorithm applied to a graph rotation system ρ(G) on a surface S returns a collection of graph cycles that are the boundary-walks of the faces"
+  },
+  {
+    "source": "siggraph09",
+    "name": "projection method (PR) for twisted-edge weaving",
+    "kind": "construction",
+    "dimension": 2,
+    "data": {
+      "precondition": "all edges of the mesh are twisted",
+      "step1": "Construct PR Control Polygons: trace face walks; displace each half-edge to p_i,j = (p1+p2)/2 + (-1)^j h e_i n_i; substitute into walk",
+      "step2": "Construct PR Control Ribbons: assign a plane per half-edge; build non-planar edge-region quad (2 endpoints + 2 face centers); project onto both planes; take bilinear fractional sub-quad via parameters c,w; connect two pieces with quadrilateral connectors in face-trace order",
+      "step3": "Construct PR Control Yarn: define an ellipsoid per internal edge; sample into n-sided convex polygon; connect polygons into a generalized toroid",
+      "step4": "Construct Smooth Ribbons/Yarns: cubic Bezier smoothing of control ribbons (G1 continuous); offline Catmull-Clark subdivision of control yarns",
+      "gap_control": "dense weaving at c~1, w~1, small h; sparse weaving at small c,w; gap closing improves as dihedral angle theta between adjacent faces approaches 180 degrees"
+    },
+    "equations": [
+      "p_i,j = (p1_i,j + p2_i,j)/2 + (-1)^j h e_i n_i",
+      "n_i . (p - p_i,j) = 0"
+    ],
+    "page": 3,
+    "quote": "The algorithm of the projection method consists of four main steps. The first step is to construct a control polygon which we call the PR control polygon"
+  },
+  {
+    "source": "siggraph09",
+    "name": "gap valence / Schlafli-like weaving notation",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "gap": "each quadrilateral ribbon piece is surrounded by four gaps corresponding to the edge's two endpoints and two adjacent faces",
+      "gap_valence": "number of ribbons around a gap",
+      "notation": "four-tuple (d0,d1,d2,d3) giving the two endpoint valences and two adjacent-face side counts"
+    },
+    "equations": [],
+    "page": 5,
+    "quote": "The number of ribbons around a gap defines the shape of the gap. We call this the valence of the gap"
+  },
+  {
+    "source": "siggraph09",
+    "name": "Figure 3: twisting an edge of a mesh",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "panels": "an untwisted edge vs. a twisted edge, shown as a paper strip",
+      "role": "canonical illustration of the edge-twist operation underlying the whole theory"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "Figure 3: Twisting an edge of a mesh on a surface S."
+  },
+  {
+    "source": "siggraph09",
+    "name": "Figure 5: steps of the projection method on a twisted cube",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "panels_a_to_i": "initial cube with all edges twisted; projection planes; edge-region quads; one projected region; all projected edge-regions; planar piece pairs; pink connector quads; colored control mesh (one color per cycle); final smooth ribbon"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "The steps of the projection method (PR). (a) The initial mesh, a cube, with all its edges twisted, to create a cyclic plain-weaving"
+  },
+  {
+    "source": "siggraph09",
+    "name": "Figure 1: woven objects with distinct cycle counts",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "models": "Venus (5 cycles), bunny (8 cycles), rocker arm (2 cycles), genus-3 object (16 cycles)",
+      "rendering": "constructed with extruded ribbons on the mesh surface"
+    },
+    "equations": [],
+    "page": 1,
+    "quote": "Venus consists of five distinct cycles. The bunny has eight cycles, the rocker arm has only two cycles, and the genus-three object has 16 cycles"
+  },
+  {
+    "source": "candg12",
+    "name": "Hamiltonian cycle",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "path_def": "a Hamiltonian path visits each vertex of an undirected graph exactly once",
+      "cycle_def": "a Hamiltonian cycle is a Hamiltonian path that closes into a cycle",
+      "existence": "not every graph has a Hamiltonian cycle"
+    },
+    "equations": [],
+    "page": 1,
+    "quote": "A Hamiltonian cycle (or Hamiltonian circuit) is a Hamiltonian path that is a cycle. Note that not every graph has a Hamiltonian cycle"
+  },
+  {
+    "source": "candg12",
+    "name": "single covering curve construction",
+    "kind": "construction",
+    "dimension": 1,
+    "data": {
+      "core_rule": "connect the centers of every two neighboring triangles in the Hamiltonian triangle strip",
+      "property": "curve follows the mesh surface, meandering like a river",
+      "smoothing": "the resulting control polygon is turned into a smooth curve with a parametric curve such as B-Spline"
+    },
+    "equations": [],
+    "page": 1,
+    "quote": "These curves are constructed by connecting the centers of every two neighboring triangles in the Hamiltonian triangle strips"
+  },
+  {
+    "source": "candg12",
+    "name": "Hamiltonian triangle strip existence (Taubin)",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "claim": "any quadrilateral manifold mesh without boundary can be re-triangulated so its dual has a Hamiltonian cycle",
+      "algorithm": "split each quad along a diagonal, then flip edges until triangles form one strip",
+      "complexity": "linear time and space"
+    },
+    "equations": [],
+    "page": 1,
+    "quote": "every connected manifold quadrilateral mesh without boundary can be represented as a single Hamiltonian generalized triangle strip cycle"
+  },
+  {
+    "source": "candg12",
+    "name": "surface covering curve construction (6 steps)",
+    "kind": "construction",
+    "dimension": 1,
+    "data": {
+      "step1": "Initial Mesh: any manifold mesh, convex faces preferred",
+      "step2": "Quadrangulation: apply a quad-conversion subdivision (dual of Simplest) if not already quad",
+      "step3": "Initial Triangulation: insert a red diagonal into every quad, giving each triangle two black edges and one red edge",
+      "step4": "Control Vertex Position Computation: weighted average per triangle p_cv = (2p0,0+p1,0+p1,1)/4, favoring the shared vertex",
+      "step5": "Initial Curves: connect control points across shared black edges, one closed curve per original face",
+      "step6": "Combining Curves: flip red diagonals lying between two separate curves to merge them, until one curve remains"
+    },
+    "equations": [
+      "p_cv = (p0,0 + p0,1 + p1,1 + p0,1) / 4 = (2 p0,0 + p1,0 + p1,1) / 4"
+    ],
+    "page": 5,
+    "quote": "Our approach can be considered a 2-step process: (1) identify an Hamiltonian cycle that connects vertices of the dual of a given mesh"
+  },
+  {
+    "source": "candg12",
+    "name": "duotone surface",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "basis": "vertex-insertion schemes like Catmull-Clark subdivision leave the quadrilateral mesh vertices always two-colorable",
+      "result": "a single surface covering curve serves as boundary separating the surface into two paintable regions",
+      "implementation": "Truchet-tile textures per quadrilateral, consistent with diagonal colors"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "it is always possible to create a single curve that covers the whole surface such that all vertices in the first group are on one side"
+  },
+  {
+    "source": "candg12",
+    "name": "Jordan curve theorem and genus limitation",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "planar_case": "any simple closed curve in the plane separates it into an inside and an outside region",
+      "surface_case": "only correct for genus-0 surfaces; a positive-genus surface curve need not separate it"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "Jordan's theorem is only correct for genus-0 surfaces. Any single curve on a surface with positive genus does not necessarily separate the surface"
+  },
+  {
+    "source": "candg12",
+    "name": "Theorem 1: bipartite Yellow/Blue graph connectivity",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "setup": "U0,U1 edge-disjoint vertex sets of a bipartite graph; Y,B the Yellow and Blue graphs",
+      "claim": "it is always possible to make Y and B each connected"
+    },
+    "equations": [],
+    "page": 12,
+    "quote": "For a bipartite graph, say U0 and U1 are the two edge disjoint vertex sets and Y, B are Yellow and Blue graphs respectively. Then, we can make Y and B connected"
+  },
+  {
+    "source": "candg12",
+    "name": "Lemma 1: genus-0 tree/tree duality",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "surface": "genus-0 embedded bipartite graph",
+      "claim": "if one of the Yellow/Blue graphs is a spanning tree, the other is necessarily also a spanning tree"
+    },
+    "equations": [],
+    "page": 11,
+    "quote": "If one of the Y/B graphs is a tree, then the other is also a tree."
+  },
+  {
+    "source": "candg12",
+    "name": "duotone-surface algorithm",
+    "kind": "construction",
+    "dimension": 2,
+    "data": {
+      "step1": "convert input mesh to a 2-colorable quad mesh via Catmull-Clark or dual-of-Simplest subdivision",
+      "step2": "2-color vertices Blue/Yellow so no edge joins same-colored vertices",
+      "step3": "triangulate each quad along a same-colored diagonal, choosing between two Truchet-tile textures",
+      "step4": "flip diagonals between two separate same-color curve components, swapping that diagonal's color, until",
+      "step5": "one closed curve remains, pure-yellow on one side and pure-blue on the other"
+    },
+    "equations": [],
+    "page": 12,
+    "quote": "Choose a diagonal edge and flip it if it is between two separate curves. After the flip, reconstruct the curve."
+  },
+  {
+    "source": "candg12",
+    "name": "Figure 6: Hamiltonian cycle construction and curve generation walkthrough",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "panels": "initial mesh; dual-of-Simplest quadrangulation; red-diagonal triangulation; curve control vertices; per-face curve loops; all loops; a selected diagonal; flipped diagonal with recomputed vertices; merged curve; final single curve"
+    },
+    "equations": [],
+    "page": 5,
+    "quote": "Visual presentation of the Hamiltonian cycle construction and curve generation algorithm"
+  },
+  {
+    "source": "candg12",
+    "name": "Figure 15-17: 2-colorable quad mesh and Truchet texture assignment",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "fig15": "Catmull-Clark vertex insertion producing a 2-colored quad mesh (vertex-vertices vs edge-vertices)",
+      "fig16": "the two possible diagonal triangulations of one quadrilateral",
+      "fig17": "the paired Truchet-tile textures assigned to each triangulation choice"
+    },
+    "equations": [],
+    "page": 10,
+    "quote": "Conversion of a given mesh into a 2-colorable quadrilateral mesh by using Catmull-Clark subdivision"
+  },
+  {
+    "source": "gmp06a",
+    "name": "piecewise linear mesh",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "condition": "every edge is a straight line segment and every face is planar",
+      "generalization": "includes non-triangular faces of varying valence, not only triangular meshes"
+    },
+    "equations": [],
+    "page": 1,
+    "quote": "We say that a mesh M is piecewise linear if every edge of M is a straight line segment, and every face of M is planar"
+  },
+  {
+    "source": "gmp06a",
+    "name": "Gauss-Bonnet theorem (smooth statement)",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "statement": "the integral of Gaussian curvature over a closed smooth surface equals 2 pi times the Euler characteristic",
+      "euler_characteristic": "2 - 2g for genus g",
+      "limitation": "requires a smooth surface; motivates the discrete version proved in this paper"
+    },
+    "equations": [
+      "integral_S K dA = 2 pi (2 - 2g)"
+    ],
+    "page": 1,
+    "quote": "the integral of the Gaussian curvature over a closed smooth surface is equal to 2π× the Euler characteristic of the surface which is 2 − 2g"
+  },
+  {
+    "source": "gmp06a",
+    "name": "Euler equation and Lemma 2.1 (v,e,f from average valence and genus)",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "euler": "v - e + f = 2 - 2g",
+      "lemma_2_1": "expresses e, v, f of any piecewise linear mesh in terms of average vertex valence m-bar, average face valence n-bar, and genus g",
+      "proof_basis": "each edge counted twice in vertex valences and twice in face boundaries, so sum(m_i) = sum(n_j) = 2e"
+    },
+    "equations": [
+      "v - e + f = 2 - 2g",
+      "e = n_bar m_bar (2 - 2g) / (2 n_bar + 2 m_bar - n_bar m_bar)",
+      "v = 2 n_bar (2 - 2g) / (2 n_bar + 2 m_bar - n_bar m_bar)",
+      "f = 2 m_bar (2 - 2g) / (2 n_bar + 2 m_bar - n_bar m_bar)"
+    ],
+    "page": 2,
+    "quote": "Let M be a piecewise linear mesh. Suppose that M has v vertices, e edges, f faces, and genus g. Let m and n be the average vertex valence and average face valence"
+  },
+  {
+    "source": "gmp06a",
+    "name": "angle deflection at a vertex",
+    "kind": "definition",
+    "dimension": 0,
+    "data": {
+      "formula_role": "discrete angle-deficit at a single vertex, generalizing angle deficit to non-regular meshes",
+      "sign_reading_positive": "vertex is convex or concave",
+      "sign_reading_zero": "vertex is planar",
+      "sign_reading_negative": "vertex is a saddle point"
+    },
+    "equations": [
+      "theta_bar(mu_i) = 2 pi - sum_{j=1}^{m_i} theta_j"
+    ],
+    "page": 2,
+    "quote": "The angle deflection at vertex µi is defined as θ̄(µi) = 2π − ∑ θ j where θ j is the internal angle of the j-th corner"
+  },
+  {
+    "source": "gmp06a",
+    "name": "Calladine discrete Gaussian curvature",
+    "kind": "definition",
+    "dimension": 0,
+    "data": {
+      "role": "prior discrete Gaussian curvature definition, cited and distinguished from the paper's own SAD quantity",
+      "distinction": "unlike SAD, the sum of Calladine curvature over a mesh need not equal 2 pi (2-2g)"
+    },
+    "equations": [
+      "Gaussian curvature = Angular Deflection / Area Associated with Vertex"
+    ],
+    "page": 2,
+    "quote": "the most popular discrete version of Gaussian curvature introduced by Calladine for triangular meshes uses angular deflection"
+  },
+  {
+    "source": "gmp06a",
+    "name": "Sum of Angle Deflections (SAD)",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "formula_role": "mesh-wide sum of the per-vertex angle deflection",
+      "invariance": "closely related to mesh geometric shape but proved to be a topological invariant in Theorem 2.2"
+    },
+    "equations": [
+      "theta_bar(M) = sum_{i=1}^{v} theta_bar(mu_i)"
+    ],
+    "page": 3,
+    "quote": "The sum of angle deflections (SAD) of the mesh M is defined as θ̄(M) = ∑ θ̄(µi)"
+  },
+  {
+    "source": "gmp06a",
+    "name": "discrete Gauss-Bonnet theorem (Theorem 2.2)",
+    "kind": "theorem",
+    "dimension": 2,
+    "data": {
+      "claim": "the SAD of any piecewise linear mesh of genus g equals 2 pi (2 - 2g)",
+      "proof_route": "sum interior face angles (n_j - 2) pi per face; sum 2 pi - theta_bar(mu_i) per vertex; combine via Euler equation",
+      "consequence": "SAD is independent of vertex/edge/face counts and average valences, depends only on genus"
+    },
+    "equations": [
+      "theta_bar(M) = 2 pi (v - e + f)",
+      "theta_bar(M) = 2 pi (2 - 2g)"
+    ],
+    "page": 3,
+    "quote": "Let M be a piecewise linear mesh of genus g. Then the SAD θ̄(M) of the mesh M is equal to 2π(2 − 2g)"
+  },
+  {
+    "source": "gmp06a",
+    "name": "fixed-genus subdivision valence limit",
+    "kind": "equation",
+    "dimension": 2,
+    "data": {
+      "derivation": "from Euler equation and Lemma 2.1 in the limit of arbitrarily many faces at fixed genus",
+      "consequence": "average face valence cannot exceed 6 without introducing valence-2 vertices or bigons; explains why (3,6), (4,4), (6,3) regions dominate common subdivision schemes"
+    },
+    "equations": [
+      "2/m_bar + 2/n_bar - 1 ~= 0",
+      "m_bar ~= 2 n_bar / (n_bar - 2)",
+      "3 <= n_bar <= 6"
+    ],
+    "page": 4,
+    "quote": "This result says that the average face valence cannot exceed 6 regardless of what we do"
+  },
+  {
+    "source": "gmp06a",
+    "name": "branch construction via paired critical points",
+    "kind": "construction",
+    "dimension": 2,
+    "data": {
+      "principle": "since SAD is a fixed topological invariant, any local angle-deflection gain must be balanced by an equal loss elsewhere",
+      "extrusion_step": "extruding a 4-valent quad face yields 4 vertices at valence 5 and 4 vertices at valence 3 (net-zero average change)",
+      "wrinkle_step": "wrinkle operation yields 4 vertices at valence 4, 2 at valence 3, 2 at valence 5",
+      "quad_modeling_rule": "minima/maxima require 3-valent vertices; saddles require valence greater than 4"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "if we gain angle deflections in some vertices, we will lose some angle deflections in some other vertices"
+  },
+  {
+    "source": "gmp06a",
+    "name": "Figure 3: Morse-theory critical point sum",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "sequence": "genus-0, genus-0, genus-1, genus-1, genus-2 object sequence",
+      "marking": "+1 at each minima/maxima (convex/concave) critical point, -1 at each saddle point",
+      "claim": "the marked total equals 2 - 2g in every case"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "The total adds up to (2−2g) if we assign minima/maxima points +1 and saddles −1"
+  },
+  {
+    "source": "smi10",
+    "name": "rotation at a vertex",
+    "kind": "definition",
+    "dimension": 0,
+    "data": {
+      "definition": "a cyclic ordering of the set of edge-ends incident at that vertex",
+      "theorem_cited": "a rotation system specifies a graph embedding and every graph embedding can be specified by a rotation system (Theorem 3.2.2 of Gross and Tucker 1987)"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "A rotation at a vertex of a graph is a cyclic ordering of the set of the edge-ends that are incident at that vertex"
+  },
+  {
+    "source": "smi10",
+    "name": "extended graph rotation system (EGRS) with signed helical twists",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "model": "each edge is a paper strip that can be twisted clockwise or counter-clockwise in a helical sense",
+      "untwisted_strands": "parallel to the mesh edge",
+      "twisted_strands": "both strands cross over the edge and over each other",
+      "states": "exactly two twisted states, +1 (counter-clockwise) and -1 (clockwise), plus the 0 (untwisted) state"
+    },
+    "equations": [],
+    "page": 2,
+    "quote": "In extended graph rotation systems, an edge is viewed as a paper strip that can be twisted clockwise or counter-clockwise in helical sense"
+  },
+  {
+    "source": "smi10",
+    "name": "single-cycle twist condition (Theorem 2.1)",
+    "kind": "theorem",
+    "dimension": 1,
+    "data": {
+      "setup": "rho(G) obtained from a mesh by possibly twisting some edges, inducing a weaving with at least two distinct cycles",
+      "operation": "if edge e's two sides belong to two different cycles c1,c2, twisting e merges c1 and c2 into one cycle",
+      "consequence": "repeated application always reduces the number of cycles to exactly one",
+      "mechanism": "twisting an edge at the intersection of two faces merges those two faces into one face; cycles are face boundaries"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "If we twist e, then we combine the two cycles c1 and c2 into one cycle and reduce the number of cycles in the weaving by one"
+  },
+  {
+    "source": "smi10",
+    "name": "single-cycle weaving via dual spanning tree",
+    "kind": "construction",
+    "dimension": 1,
+    "data": {
+      "step1": "build the dual mesh M* of the original mesh M",
+      "step2": "compute any spanning tree T of M*",
+      "step3": "twist every primal edge of M whose dual edge lies in T",
+      "step4": "this merges all faces of M into one face, i.e. one cycle, using the minimum possible number of twists (|T| = F-1 edges)"
+    },
+    "equations": [
+      "F - 1 = 2E/mu - 1"
+    ],
+    "page": 6,
+    "quote": "if we construct a spanning tree T in the dual mesh M, then twisting all the primal edges in M would merge all the faces in the original mesh M into a single face"
+  },
+  {
+    "source": "smi10",
+    "name": "minimum twisted-edge count and spanning-tree counting",
+    "kind": "equation",
+    "dimension": null,
+    "data": {
+      "mu_bound": "average face valence mu is at least 3 and at most a little more than 6 for large polyhedral meshes of any genus",
+      "twist_range": "minimum twisted edges lies between 0.33E and 0.66E depending on mesh type",
+      "cayley": "for a complete dual graph, the number of spanning trees follows Cayley's formula",
+      "recursion": "deletion-contraction recursion for the number of spanning trees of a general graph",
+      "probability_result": "with probability 1 a random graph has 2^(F-1) single-cycle embeddings"
+    },
+    "equations": [
+      "F - 1 = 2E/mu - 1",
+      "tau(G) = F^(F-2)",
+      "tau(G) = tau(G - e) + tau(G / e)"
+    ],
+    "page": 7,
+    "quote": "with probability 1, there are 2^{F−1} single cycle embeddings of G"
+  },
+  {
+    "source": "smi10",
+    "name": "extended projection method for untwisted edges",
+    "kind": "construction",
+    "dimension": 2,
+    "data": {
+      "step1": "project the initial mesh to a local plane",
+      "step2": "connect each face center to its vertices, forming a radial-graph edge-region quadrilateral per edge",
+      "step3a": "for twisted edges, project the edge-region to two small planar regions slightly above and below the plane",
+      "step3b": "for untwisted edges, instead create two side-by-side quadrilaterals within the original plane",
+      "step4": "form strips via bilinear interpolation with width w and length/steepness c; twisted edges yield a crossing '×' shape, untwisted edges yield two parallel non-crossing strips",
+      "step5": "connect strips into a control-strip ring; smooth via B-Spline/Bezier for ribbons or convert to toroidal control yarn and subdivide for yarns"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "For every twisted edge, project the corresponding edge-region to two small planar regions, one slightly above and the other slightly below the original plane"
+  },
+  {
+    "source": "smi10",
+    "name": "Figure 3: canonical edge twist-state legend",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "panel_a": "plain undirected edge drawing, not considered twisted",
+      "panel_b": "0-twisted (untwisted) visual interpretation",
+      "panel_c": "+1 counter-clockwise twisted",
+      "panel_d": "-1 clockwise twisted"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "twisted edges can only be in one of two possible states. These states are shown in (c) +1 (i.e. counter-clockwise) twisted or (d) −1"
+  },
+  {
+    "source": "smi10",
+    "name": "Figure 4: octahedron before/after twisting demonstrating Theorem 2.1",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "before": "an octahedron with all-untwisted edges has 8 unlinked face-boundary-walk cycles in 3D",
+      "after": "twisting some edges links the cycles together into fewer, crossing cycles"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "the eight face-boundary walks of the octahedron are unlinked in 3D. However, if some edges are twisted as shown in (d), then the cycles represented by the boundary walks become linked, as in (f)"
+  },
+  {
+    "source": "smi10",
+    "name": "single-cycle color convention",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "uniform_color_use": "proves single-cycle-ness visually since only one color is theoretically needed for one thread",
+      "rainbow_color_use": "hue changes continuously along the cycle to make the winding, self-crossing path legible"
+    },
+    "equations": [],
+    "page": 5,
+    "quote": "For single-cycle woven objects, we changed the hue of the ribbon color (rainbow coloring) along the cycle to show the structure"
+  }
+]

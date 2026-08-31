@@ -160,10 +160,10 @@ theorem theTrivialSolutionMeetsTheSecondBranch :
 GCD monoid `ℕ`, in the form the descent needs. -/
 theorem theCoprimeFactorsOfASquareAreSquares {a b c : ℕ} (h : Nat.Coprime a b)
     (hab : a * b = c ^ 2) : (∃ u, a = u ^ 2) ∧ (∃ v, b = v ^ 2) := by
-  have hu : IsUnit (gcd a b) := by
+  have hu : IsUnit (Nat.gcd a b) := by
     rw [Nat.isUnit_iff]
     simpa [Nat.Coprime] using h
-  have hu' : IsUnit (gcd b a) := by
+  have hu' : IsUnit (Nat.gcd b a) := by
     rw [Nat.isUnit_iff]
     simpa [Nat.Coprime] using h.symm
   exact ⟨exists_eq_pow_of_mul_eq_pow hu hab,
@@ -616,7 +616,7 @@ theorem theUntwistedCaseGivesAConicCondition (x y : ℤ) :
   have hsq : ((⟨x, y⟩ : ℤ√2) ^ 2) = ⟨x ^ 2 + 2 * y ^ 2, 2 * x * y⟩ := by
     ext <;> simp [Zsqrtd.ext_iff, pow_two] <;> ring
   rw [hsq]
-  simp [Zsqrtd.mul_im]
+  simp [Zsqrtd.im_mul]
   ring
 
 /-- **AND THE CONIC COMPLETES TO A DIFFERENCE OF SQUARES WITH DISCRIMINANT SEVENTEEN.**
@@ -691,7 +691,7 @@ theorem theRealPartOfTheLift (x y : ℤ) :
   have hsq : ((⟨x, y⟩ : ℤ√2) ^ 2) = ⟨x ^ 2 + 2 * y ^ 2, 2 * x * y⟩ := by
     ext <;> simp [Zsqrtd.ext_iff, pow_two] <;> ring
   rw [hsq]
-  simp [Zsqrtd.mul_re]
+  simp [Zsqrtd.re_mul]
   ring
 
 /-- **THE LIFT DEMANDS TWO SQUARES FROM TWO FORMS.**  Matching `α = π·u²` against

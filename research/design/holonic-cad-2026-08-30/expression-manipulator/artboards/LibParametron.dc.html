@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1400px; height: 820px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Complex Parametron</div>
+      <div class="sub">the primitive computational component: exact complex current through oriented incidence with a receiver form</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: canon/TABLET_THE_REASONING_CYCLE.md §8d · Millennium/HolonicComplexParametron.lean · HolonicParametron.lean · MorphoHDL rule/fallback · KiCad symbol/footprint/model triple</div>
+  </div>
+<div class="row" style="gap:10px; flex: 1 1 auto; min-height: 0"><div class="col" style="gap:8px; flex: 0 0 470px"><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>symbol · schematic glyph with named anchors (circuitikz / KiCad symbol)</span></div><svg width="430" height="170" viewBox="0 0 430 170" style="display:block; " xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c6ea5"/></marker><marker id="ahk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#292418"/></marker></defs><line x1="120.0" y1="51.0" x2="149.44486372867092" y2="102.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="149.44486372867092" y1="102.0" x2="90.55513627132909" y2="102.00000000000001" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="90.55513627132909" y1="102.00000000000001" x2="120.0" y2="51.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><circle cx="120.0" cy="51.0" r="5" class="ink" fill="#fffdf8"/><text x="127.0" y="45.0" class="svgtxt" >n0</text><circle cx="149.44486372867092" cy="102.0" r="5" class="ink" fill="#fffdf8"/><text x="156.44486372867092" y="96.0" class="svgtxt" >n1</text><circle cx="90.55513627132909" cy="102.00000000000001" r="5" class="ink" fill="#fffdf8"/><text x="97.55513627132909" y="96.00000000000001" class="svgtxt" >n2</text><rect x="60" y="30" width="130" height="120" rx="8" class="ink" stroke-dasharray="4 3"/><line x1="120.0" y1="51.0" x2="120.0" y2="13.599999999999994" class="ink" /><circle cx="120.0" cy="13.599999999999994" r="3" class="ink" fill="#292418"/><text x="125.0" y="17.599999999999994" class="svgtxt" >.n0</text><line x1="149.44486372867092" y1="102.0" x2="181.83421383020894" y2="120.7" class="ink" /><circle cx="181.83421383020894" cy="120.7" r="3" class="ink" fill="#292418"/><text x="186.83421383020894" y="124.7" class="svgtxt" >.n1</text><line x1="90.55513627132909" y1="102.00000000000001" x2="58.16578616979108" y2="120.70000000000003" class="ink" /><circle cx="58.16578616979108" cy="120.70000000000003" r="3" class="ink" fill="#292418"/><text x="63.16578616979108" y="124.70000000000003" class="svgtxt" >.n2</text><line x1="125" y1="30" x2="125" y2="8" class="ink" /><text x="130" y="12" class="svgtxt" >.pump ω</text><text x="230" y="50" class="svgtxt" >anchors: .n0 .n1 .n2 .pump .center</text><text x="230" y="70" class="svgtxt" >label: CP₁ · B 3×3 · M(L,C,R)</text><text x="230" y="90" class="svgtxt" >path-style: to[CP, n=3, l=$CP_1$]</text><text x="230" y="110" class="svgtxt" >node-style: node[cp](cp1){} · cp1.n0</text></svg></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>footprint · lattice occupancy in ℤⁿ (KiCad footprint / OpenSCAD leaf)</span></div><svg width="430" height="170" viewBox="0 0 430 170" style="display:block; " xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c6ea5"/></marker><marker id="ahk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#292418"/></marker></defs><defs><marker id="ahf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c6ea5"/></marker><marker id="ahkf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#292418"/></marker></defs><circle cx="60" cy="110" r="2.5" class="grey" fill="#8a8071"/><line x1="60" y1="110" x2="90" y2="125" class="grey" /><line x1="60" y1="110" x2="30" y2="125" class="grey" /><circle cx="30" cy="125" r="2.5" class="grey" fill="#8a8071"/><line x1="30" y1="125" x2="60" y2="140" class="grey" /><line x1="30" y1="125" x2="0" y2="140" class="grey" /><circle cx="0" cy="140" r="2.5" class="grey" fill="#8a8071"/><line x1="0" y1="140" x2="30" y2="155" class="grey" /><circle cx="90" cy="125" r="2.5" class="grey" fill="#8a8071"/><line x1="90" y1="125" x2="120" y2="140" class="grey" /><line x1="90" y1="125" x2="60" y2="140" class="grey" /><circle cx="60" cy="140" r="2.5" class="grey" fill="#8a8071"/><line x1="60" y1="140" x2="90" y2="155" class="grey" /><line x1="60" y1="140" x2="30" y2="155" class="grey" /><circle cx="30" cy="155" r="2.5" class="grey" fill="#8a8071"/><line x1="30" y1="155" x2="60" y2="170" class="grey" /><circle cx="120" cy="140" r="2.5" class="grey" fill="#8a8071"/><line x1="120" y1="140" x2="90" y2="155" class="grey" /><circle cx="90" cy="155" r="2.5" class="grey" fill="#8a8071"/><line x1="90" y1="155" x2="60" y2="170" class="grey" /><circle cx="60" cy="170" r="2.5" class="grey" fill="#8a8071"/><line x1="60" y1="110" x2="90" y2="125" class="wire" marker-end="url(#ahf)" stroke-width="2"/><line x1="90" y1="125" x2="30" y2="125" class="wire" marker-end="url(#ahf)" stroke-width="2"/><line x1="30" y1="125" x2="60" y2="110" class="wire" marker-end="url(#ahf)" stroke-width="2"/><circle cx="60" cy="110" r="5" class="ink" fill="#3c6ea5"/><circle cx="90" cy="125" r="5" class="ink" fill="#3c6ea5"/><circle cx="30" cy="125" r="5" class="ink" fill="#3c6ea5"/><text x="230" y="50" class="svgtxt" >occupies 3 sites · 3 oriented edges</text><text x="230" y="70" class="svgtxt" >keep-out: none · shared nodes allowed</text><text x="230" y="90" class="svgtxt" >nD: any 3 sites with a 2-cell between</text><text x="230" y="110" class="svgtxt" >param n → n sites on an oriented n-cycle</text></svg></div><div class="panel" style="flex: 1 1 auto"><div class="panel-t"><span>model · Lean structure and constitutive law (the third linked projection)</span></div><div class="code" style="">-- Millennium/HolonicComplexParametron.lean (owner of the law; names per that file)
+carrier : (nodes : Fin n) (branches : Fin m)
+  B : Matrix (Fin m) (Fin n) ℤ           -- oriented incidence, entries -1/0/1
+  c : Fin n → K                          -- K = ℚ(i) or a cyclotomic/multiquadratic tower
+  M : Matrix (Fin m) (Fin m) K           -- receiver constitutive form, Hermitian
+  G := Bᵀ M B                            -- pulled storage (derived)
+law  : star c ⬝ G ⬝ c = star (B c) ⬝ M ⬝ (B c)
+reorient (σ : branch → ±1) : B ↦ σB, M ↦ σMσ ; G unchanged
+lock : Quotient (locked population) → sign face   -- HolonicParametron.lean</div></div></div><div class="col" style="gap:8px; flex: 1 1 auto"><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>parameters · customizer-inferred, exact</span></div><table class="tb2" style=""><thead><tr><th>name</th><th>type</th><th>default</th><th>note</th></tr></thead><tbody><tr><td>n</td><td>int [1:64]</td><td>3</td><td>node count (oriented cycle)</td></tr><tr><td>B</td><td>incidence</td><td>cycle n</td><td>editable oriented graph</td></tr><tr><td>M</td><td>exact Hermitian</td><td>L=1/2, C=3, R=0 per branch</td><td>mutual coupling off-diagonal</td></tr><tr><td>ω</td><td>exact phase</td><td>2π/12 ∈ ℚ(ζ₁₂)</td><td>pump drive</td></tr><tr><td>lock</td><td>bool</td><td>off</td><td>binary quotient is a receiver, not state</td></tr><tr><td>internal</td><td>lattice?</td><td>none</td><td>member may present an internal lattice</td></tr></tbody></table></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>ports</span></div><table class="tb2" style=""><thead><tr><th>port</th><th>kind</th><th>orientation</th><th>note</th></tr></thead><tbody><tr><td>.n0 … .n{n−1}</td><td>shared</td><td>shared</td><td>typed shared incidence with the lattice</td></tr><tr><td>.pump</td><td>pump</td><td>in</td><td>intervention channel</td></tr><tr><td>.probe</td><td>shared</td><td>shared</td><td>a site a receiver ⟨ρ| may attach to</td></tr><tr><td>(exterior)</td><td>exterior</td><td>—</td><td>undeclared nodes stay visible</td></tr></tbody></table></div><div class="panel" style="flex: 1 1 auto"><div class="panel-t"><span>rule · rewrite body + fallback (MorphoHDL); constraints (SolveSpace)</span></div><div class="code" style="">@[holon fallback := site]           -- base case: one site, no branch
+def parametron (n : Bus) : Carrier :=
+  let (n0, n1) := SPLIT n            -- boundary if |n| &lt; 2 → fallback
+  couple (parametron n0) (parametron n1)   -- shared node = junction
+constraints:  |n_i n_{i+1}| = 1 (ref)  ·  cycle closes  ·  B c ∈ range(B)</div></div></div><div class="col" style="gap:8px; flex: 0 0 330px"><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>receipts and grade</span></div><div class="box box-carried" style=""><span class="grade">proved-derived</span> <span class="tag">formal-checked</span> storage pullback and reorientation covariance (HolonicComplexParametron.lean)</div><div class="box box-carried" style=""><span class="grade">proved-derived</span> two locked sheets; sign face exact only on the locked population (HolonicParametron.lean)</div><div class="box box-obstructed" style=""><span class="grade">open</span> runtime conformance of an exact GPU tick to the formal law — the roadmap's UAR obligation, frozen</div></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>what it is not</span></div><div class="box box-refused" style="">a perceptron, a neuron, a layer: those are locked receiver faces</div><div class="box box-refused" style="">a float circuit: coefficients are exact</div><div class="box box-refused" style="">a SPICE model: the law is the Lean structure, SPICE would be an exterior codec</div></div></div></div>
+</div>
+</x-dc>
+</body>
+</html>

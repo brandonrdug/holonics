@@ -105,7 +105,7 @@ theorem pressureExactOneForm_eq_loweredGradient
     (ofSubsingleton ℝ Space ℝ (0 : Fin 1)) (innerSL ℝ (gradient pressure x))
   apply congrArg (ofSubsingleton ℝ Space ℝ (0 : Fin 1))
   ext v
-  exact (inner_gradient_left hpressure).symm
+  exact inner_gradient_left.symm
 
 /-- **Exact pressure is closed.**  The second exterior derivative of every `C²` pressure zero-form
 vanishes at the addressed event. -/

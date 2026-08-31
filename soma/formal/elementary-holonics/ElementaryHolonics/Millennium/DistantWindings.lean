@@ -36,19 +36,25 @@ open WeierstrassCurve.Affine
 open RankOne (E5)
 open FrameDescent
 
+/-! A small explicit constructor for the 4.33 point API.  Keeping the
+coordinate and nonsingularity proof together makes the carrier equality
+independent of proof-term elaboration. -/
+private abbrev pointOf {x y : ℚ} (h : E5.Nonsingular x y) : E5.Point :=
+  Point.some x y h
+
 /-! ## 1. Coordinate faces and small instruments -/
 
 private def abscissa : E5.Point → ℚ
   | .zero => 0
-  | .some (x := x) _ => x
+  | .some x _ _ => x
 
 private def ordinate : E5.Point → ℚ
   | .zero => 0
-  | .some (y := y) _ => y
+  | .some _ y _ => y
 
 private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : E5.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma negY_eq (x y : ℚ) : E5.negY x y = -y := by
@@ -77,10 +83,10 @@ private lemma chord_estimate {K : ℕ} (hK : 1 ≤ K)
     {x₁ y₁ x₂ y₂ x₃ y₃ : ℚ}
     {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} {h₃ : E5.Nonsingular x₃ y₃}
     (hy₁ : y₁ ≠ 0) (hy₂ : y₂ ≠ 0) (hy₃ : y₃ ≠ 0) (hx : x₁ ≠ x₂)
-    (hsum : Point.some h₁ + Point.some h₂ = Point.some h₃)
+    (hsum : Point.some x₁ y₁ h₁ + Point.some x₂ y₂ h₂ = Point.some x₃ y₃ h₃)
     (ht₁ : Deep (K : ℤ) (x₁ / y₁)) (hs₁ : Deep (3 * (K : ℤ)) (1 / y₁))
     (ht₂ : Deep (K : ℤ) (x₂ / y₂)) (hs₂ : Deep (3 * (K : ℤ)) (1 / y₂)) :
-    Point.some h₃ = -Point.some h₁ ∨ Point.some h₃ = -Point.some h₂ ∨
+    Point.some x₃ y₃ h₃ = -Point.some x₁ y₁ h₁ ∨ Point.some x₃ y₃ h₃ = -Point.some x₂ y₂ h₂ ∨
       (Deep ((K : ℤ) + 1) (x₃ / y₃ - x₁ / y₁ - x₂ / y₂) ∧
         Deep (K : ℤ) (x₃ / y₃) ∧ Deep (3 * (K : ℤ)) (1 / y₃)) := by
   have hK1 : (1 : ℤ) ≤ (K : ℤ) := by exact_mod_cast hK
@@ -321,9 +327,9 @@ private lemma tangent_estimate {K : ℕ} (hK : 1 ≤ K)
     {x₁ y₁ x₃ y₃ : ℚ}
     {h₁ : E5.Nonsingular x₁ y₁} {h₃ : E5.Nonsingular x₃ y₃}
     (hy₁ : y₁ ≠ 0) (hy₃ : y₃ ≠ 0)
-    (hsum : Point.some h₁ + Point.some h₁ = Point.some h₃)
+    (hsum : Point.some x₁ y₁ h₁ + Point.some x₁ y₁ h₁ = Point.some x₃ y₃ h₃)
     (ht₁ : Deep (K : ℤ) (x₁ / y₁)) (hs₁ : Deep (3 * (K : ℤ)) (1 / y₁)) :
-    Point.some h₃ = -Point.some h₁ ∨
+    Point.some x₃ y₃ h₃ = -Point.some x₁ y₁ h₁ ∨
       (Deep ((K : ℤ) + 1) (x₃ / y₃ - 2 * (x₁ / y₁)) ∧
         Deep (K : ℤ) (x₃ / y₃) ∧ Deep (3 * (K : ℤ)) (1 / y₃)) := by
   have hK1 : (1 : ℤ) ≤ (K : ℤ) := by exact_mod_cast hK
@@ -512,7 +518,7 @@ private lemma tangent_estimate {K : ℕ} (hK : 1 ≤ K)
 refuses both the identity and the half-turns. -/
 private lemma multiple_affine {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) {R : E5.Point}
     (hord : addOrderOf R = p) {m : ℕ} (hm0 : 0 < m) (hmp : m < p) :
-    ∃ (x y : ℚ) (h : E5.Nonsingular x y), m • R = Point.some h ∧ y ≠ 0 := by
+    ∃ (x y : ℚ) (h : E5.Nonsingular x y), m • R = Point.some x y h ∧ y ≠ 0 := by
   have hne : m • R ≠ 0 := by
     intro h0
     have hdvd := addOrderOf_dvd_of_nsmul_eq_zero h0
@@ -525,7 +531,7 @@ private lemma multiple_affine {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) {R : E5.P
     refine ⟨x, y, h, rfl, ?_⟩
     intro hy0
     subst hy0
-    have hhalf : (Point.some h : E5.Point) + Point.some h = 0 :=
+    have hhalf : pointOf h + pointOf h = 0 :=
       Point.add_self_of_Y_eq (by rw [negY_eq]; norm_num)
     have h2m : (2 * m) • R = 0 := by
       rw [Nat.mul_comm 2 m, mul_nsmul, two_nsmul, hQ]
@@ -543,7 +549,7 @@ kernel level, or its double is — the integral forcing of the frame at three. -
 private lemma exists_kernel_multiple {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) {R : E5.Point}
     (hord : addOrderOf R = p) :
     ∃ (n : ℕ) (x y : ℚ) (h : E5.Nonsingular x y) (K : ℕ),
-      0 < n ∧ n < p ∧ n • R = Point.some h ∧ 1 ≤ K ∧
+      0 < n ∧ n < p ∧ n • R = pointOf h ∧ 1 ≤ K ∧
       Sharp (-(2 * (K : ℤ))) x ∧ Sharp (-(3 * (K : ℤ))) y := by
   obtain ⟨x, y, h, hQ, hy⟩ := multiple_affine hp hp5 hord (m := 1) one_pos (by omega)
   have hx : x ≠ 0 := x_ne_zero h hy
@@ -559,9 +565,12 @@ private lemma exists_kernel_multiple {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) {R
       rw [negY_eq]
       intro heq
       exact hy (by linarith)
-    have hR1 : R = Point.some h := by rw [← hQ, one_smul]
-    have hsum : Point.some h + Point.some h = Point.some h₂ := by
-      rw [← hQ₂, two_nsmul, hR1]
+    have hR1 : R = pointOf h := by
+      simpa [pointOf] using (show R = Point.some x y h by rw [← hQ, one_smul])
+    have hsum : pointOf h + pointOf h = pointOf h₂ := by
+      simpa [pointOf] using
+        (show Point.some x y h + Point.some x y h = Point.some x₂ y₂ h₂ by
+          rw [← hQ₂, two_nsmul, hR1])
     set lam : ℚ := (3 * x ^ 2 - 25) / (2 * y) with hlam
     have hslopedef : E5.slope x x y y = lam := by
       rw [slope_of_Y_ne rfl hyneg, negY_eq, hlam]
@@ -634,10 +643,10 @@ transport coordinate accumulates `t(m•R) ≡ m·t(R)` one level deep, and the 
 walk forces `p·t(R)` deeper than its exact level. -/
 private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
     {xR yR : ℚ} {hRns : E5.Nonsingular xR yR}
-    (hord : addOrderOf (Point.some hRns : E5.Point) = p)
+    (hord : addOrderOf (pointOf hRns : E5.Point) = p)
     {K : ℕ} (hK : 1 ≤ K)
     (hxR : Sharp (-(2 * (K : ℤ))) xR) (hyRs : Sharp (-(3 * (K : ℤ))) yR) : False := by
-  set R : E5.Point := Point.some hRns with hRdef
+  set R : E5.Point := pointOf hRns with hRdef
   have hyR : yR ≠ 0 := hyRs.1
   have htR : Sharp ((K : ℤ)) (xR / yR) := by
     have h := hxR.mul hyRs.inv
@@ -664,7 +673,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
   -- the walk
   have main : ∀ m : ℕ, 1 ≤ m → m ≤ p - 1 →
       ∃ (x y : ℚ) (h : E5.Nonsingular x y),
-        m • R = Point.some h ∧ y ≠ 0 ∧
+        m • R = pointOf h ∧ y ≠ 0 ∧
         Deep ((K : ℤ)) (x / y) ∧ Deep (3 * (K : ℤ)) (1 / y) ∧
         Deep ((K : ℤ) + 1) (x / y - (m : ℚ) * (xR / yR)) := by
     intro m hm1
@@ -681,8 +690,10 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
       obtain ⟨xm, ym, hm', hQm, hym, htm, hsm, hCm⟩ := ih (by omega)
       obtain ⟨x₃, y₃, h₃, hQ₃, hy₃⟩ :=
         multiple_affine hp hp5 hord (m := m + 1) (by omega) (by omega)
-      have hsum : Point.some hm' + R = Point.some h₃ := by
-        rw [← hQm, ← hQ₃, succ_nsmul]
+      have hsum : pointOf hm' + R = pointOf h₃ := by
+        simpa [pointOf] using
+          (show pointOf hm' + R = Point.some x₃ y₃ h₃ by
+            rw [← hQm, ← hQ₃, succ_nsmul])
       -- exclusions from the order
       have hmR_ne : ∀ j : ℕ, 0 < j → j < p → j • R ≠ 0 := by
         intro j hj0 hjp hj
@@ -702,7 +713,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
           · exact Or.inr (by linarith)
         rcases hy2 with hyy | hyy
         · -- the multiple is the point: m = 1, tangent step
-          have hmeq : Point.some hm' = R := by
+          have hmeq : pointOf hm' = R := by
             rw [hRdef]
             exact some_eq_some hxeq hyy
           have hm1' : m = 1 := by
@@ -717,7 +728,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
               add_right_cancel (b := R) (c := 0) (by rw [hsub, zero_add])
             exact hmR_ne (m - 1) (by omega) (by omega) h1
           subst hm1'
-          have hsum' : Point.some hRns + Point.some hRns = Point.some h₃ := by
+          have hsum' : pointOf hRns + pointOf hRns = pointOf h₃ := by
             rw [← hsum, hmeq, hRdef]
           rcases tangent_estimate hK hyR hy₃ hsum' htR.deep hsR.deep with hco | ⟨hd1, hd2, hd3⟩
           · -- 2R = −R would close the third winding
@@ -740,7 +751,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
             exact hd1
         · -- the multiple is the negation: the next multiple would vanish
           exfalso
-          have hmeq : Point.some hm' = -R := by
+          have hmeq : pointOf hm' = -R := by
             rw [hRdef, Point.neg_some]
             exact some_eq_some hxeq (by rw [negY_eq]; linarith [hyy])
           have : (m + 1) • R = 0 := by
@@ -776,9 +787,9 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
             have h0 := h2m1
             rw [this] at h0
             exact eq_neg_of_add_eq_zero_left h0
-          have hsum2 : Point.some hm' + Point.some hm' =
-              Point.some ((E5.nonsingular_neg ..).mpr hRns) := by
-            have hh : Point.some hm' + Point.some hm' = (2 * m) • R := by
+          have hsum2 : pointOf hm' + pointOf hm' =
+              pointOf ((E5.nonsingular_neg ..).mpr hRns) := by
+            have hh : pointOf hm' + pointOf hm' = (2 * m) • R := by
               rw [Nat.mul_comm 2 m, mul_nsmul, two_nsmul, hQm]
             rw [hh, h2mR, hRdef, Point.neg_some]
           have hyneg' : E5.negY xR yR ≠ 0 := by
@@ -786,10 +797,10 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
             exact neg_ne_zero.mpr hyR
           rcases tangent_estimate hK hym hyneg' hsum2 htm hsm with hco2 | ⟨he1, _, _⟩
           · -- `−R = −(m•R)` would force `m = 1` and `p = 3`
-            have hco2' : -Point.some hRns = -Point.some hm' := by
+            have hco2' : -pointOf hRns = -pointOf hm' := by
               rw [Point.neg_some]
               exact hco2
-            have hmeq : Point.some hm' = R := by
+            have hmeq : pointOf hm' = R := by
               have hneg := congrArg (fun P => -P) hco2'
               simp only [neg_neg] at hneg
               rw [hRdef]
@@ -850,19 +861,19 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
             have h0 := hm2
             rw [hsplit] at h0
             exact eq_neg_of_add_eq_zero_left h0
-          have hsum2 : Point.some hRns + Point.some hRns =
-              Point.some ((E5.nonsingular_neg ..).mpr hm') := by
-            have hh : Point.some hRns + Point.some hRns = (2 : ℕ) • R := by
+          have hsum2 : pointOf hRns + pointOf hRns =
+              pointOf ((E5.nonsingular_neg ..).mpr hm') := by
+            have hh : pointOf hRns + pointOf hRns = (2 : ℕ) • R := by
               rw [two_nsmul, hRdef]
             rw [hh, h2R, hQm, Point.neg_some]
           have hyneg' : E5.negY xm ym ≠ 0 := by
             rw [negY_eq]
             exact neg_ne_zero.mpr hym
           rcases tangent_estimate hK hyR hyneg' hsum2 htR.deep hsR.deep with hco2 | ⟨he1, _, _⟩
-          · have hco2' : -Point.some hm' = -Point.some hRns := by
+          · have hco2' : -pointOf hm' = -pointOf hRns := by
               rw [Point.neg_some]
               exact hco2
-            have hmeq : Point.some hm' = R := by
+            have hmeq : pointOf hm' = R := by
               have hneg := congrArg (fun P => -P) hco2'
               simp only [neg_neg] at hneg
               rw [hRdef]
@@ -913,7 +924,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
       omega
     rw [hsplit, one_smul] at hpR
     exact eq_neg_of_add_eq_zero_left hpR
-  have hfeq : Point.some hf = Point.some ((E5.nonsingular_neg ..).mpr hRns) := by
+  have hfeq : pointOf hf = pointOf ((E5.nonsingular_neg ..).mpr hRns) := by
     rw [← hQf, hfin, hRdef, Point.neg_some]
   have hxf : xf = xR := congrArg abscissa hfeq
   have hyf' : yf = E5.negY xR yR := congrArg ordinate hfeq
@@ -950,7 +961,7 @@ theorem theDistantPrimeWindingsNeverCloseHolds :
     have hcop : Nat.gcd q n = 1 :=
       Nat.Coprime.gcd_eq_one ((Nat.Prime.coprime_iff_not_dvd hq).mpr
         (fun hd => by have := Nat.le_of_dvd (by omega) hd; omega))
-    have hordn : addOrderOf (Point.some h : E5.Point) = q := by
+    have hordn : addOrderOf (pointOf h : E5.Point) = q := by
       rw [← hQn, addOrderOf_nsmul' _ (by omega : n ≠ 0), hord, hcop, Nat.div_one]
     exact kernel_point_refuses hq hq5 hordn hK1 hxs hys
 

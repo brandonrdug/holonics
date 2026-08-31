@@ -66,9 +66,10 @@ theorem openPeriodicSolutionOn_hasDerivAt_coordinateLogH3Receiver
     {t : ℝ} (ht : t ∈ Ioo 0 T) :
     HasDerivAt (coordinateLogH3Receiver velocity)
       (coordinateH3TimeWork velocity t) t := by
+  change HasDerivAt (fun τ ↦ Real.exp 1 + coordinateH3Energy velocity τ)
+    (coordinateH3TimeWork velocity t) t
   have henergy := openPeriodicSolutionOn_hasDerivAt_coordinateH3Energy solution ht
-  simpa [coordinateLogH3Receiver] using
-    (hasDerivAt_const t (Real.exp 1)).add henergy
+  exact henergy.const_add (Real.exp 1)
 
 /-! ## The comb re-indexed by the coordinate receiver -/
 

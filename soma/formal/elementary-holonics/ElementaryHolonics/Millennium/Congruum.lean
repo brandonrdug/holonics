@@ -503,7 +503,6 @@ theorem theCongruumNeverForms (hp : p.Prime) (h8 : p % 8 = 3) :
       -- odd scale dies at the frame of eight
       have hz₁ := congrArg (fun t : ℤ => (t : ZMod 8)) h₁
       have hz₂ := congrArg (fun t : ℤ => (t : ZMod 8)) h₂
-      simp only at hz₁ hz₂
       push_cast at hz₁ hz₂
       rw [pcast8 h8] at hz₁ hz₂
       refine theOddScaleDiesAtEight (u₁ : ZMod 8) (u₂ : ZMod 8) (u₃ : ZMod 8) (k : ZMod 8)

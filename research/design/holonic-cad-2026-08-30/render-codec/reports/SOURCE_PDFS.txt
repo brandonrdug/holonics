@@ -1,0 +1,16 @@
+akleman-candg12.pdf
+akleman-gmp06a.pdf
+akleman-ijsm99.pdf
+akleman-siggraph09.pdf
+akleman-smi10.pdf
+arxiv-0904.2805.pdf
+arxiv-2208.13758.pdf
+arxiv-2312.00429.pdf
+arxiv-math-0106240.pdf
+arxiv-math-0109021.pdf
+arxiv-math-0306223.pdf
+arxiv-physics-0607223.pdf
+openrelativity-ajp-2016.pdf
+semanticscholar-a36a.pdf
+unizar-transient.pdf
+weiskopf-mit-8033.pdf

@@ -67,10 +67,10 @@ private lemma avoid5 {x y : ℚ} (h : y ^ 2 = x ^ 3 - 25 * x) (hy : y ≠ 0) :
     (n := 5) (by linear_combination h) hy
 
 private lemma slot5One_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some h) = if x = 0 then -25 else x := rfl
+    RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
 
 private lemma slot5Two_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some h) = if x = 5 then 50 else x - 5 := rfl
+    RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma notSquareTen : ¬ IsSquare (10 : ℚ) := by
   rw [show (10 : ℚ) = ((10 : ℕ) : ℚ) by norm_num, Rat.isSquare_natCast_iff]
@@ -773,10 +773,10 @@ private lemma face_T0 :
     Descent.SqCls (RankOne.slotOne RankOne.T0) (-1) ∧
     Descent.SqCls (RankOne.slotTwo RankOne.T0) (-5) := by
   constructor
-  · rw [show RankOne.T0 = Point.some RankOne.nonsingular00 from rfl,
+  · rw [show RankOne.T0 = Point.some 0 0 RankOne.nonsingular00 from rfl,
       slot5One_some, if_pos rfl]
     exact ⟨5, by norm_num, by norm_num⟩
-  · rw [show RankOne.T0 = Point.some RankOne.nonsingular00 from rfl,
+  · rw [show RankOne.T0 = Point.some 0 0 RankOne.nonsingular00 from rfl,
       slot5Two_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
 
@@ -784,10 +784,10 @@ private lemma face_T5 :
     Descent.SqCls (RankOne.slotOne RankOne.T5) 5 ∧
     Descent.SqCls (RankOne.slotTwo RankOne.T5) 2 := by
   constructor
-  · rw [show RankOne.T5 = Point.some RankOne.nonsingular50 from rfl,
+  · rw [show RankOne.T5 = Point.some 5 0 RankOne.nonsingular50 from rfl,
       slot5One_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
-  · rw [show RankOne.T5 = Point.some RankOne.nonsingular50 from rfl,
+  · rw [show RankOne.T5 = Point.some 5 0 RankOne.nonsingular50 from rfl,
       slot5Two_some, if_pos rfl]
     exact ⟨5, by norm_num, by norm_num⟩
 
@@ -795,10 +795,10 @@ private lemma face_P :
     Descent.SqCls (RankOne.slotOne RankOne.P) (-1) ∧
     Descent.SqCls (RankOne.slotTwo RankOne.P) (-1) := by
   constructor
-  · rw [show RankOne.P = Point.some RankOne.nonsingularP from rfl,
+  · rw [show RankOne.P = Point.some (-4) 6 RankOne.nonsingularP from rfl,
       slot5One_some, if_neg (by norm_num)]
     exact ⟨2, by norm_num, by norm_num⟩
-  · rw [show RankOne.P = Point.some RankOne.nonsingularP from rfl,
+  · rw [show RankOne.P = Point.some (-4) 6 RankOne.nonsingularP from rfl,
       slot5Two_some, if_neg (by norm_num)]
     exact ⟨3, by norm_num, by norm_num⟩
 
@@ -898,10 +898,10 @@ theorem theFaceImageAtFiveIsTheRealizedEight (P : RankOne.E5.Point) :
       obtain ⟨⟨d₁, hd₁, hc₁⟩, ⟨d₂, hd₂, hc₂⟩⟩ :=
         theSlotClassesAreSupportedOnTheDiscriminantAtFive hcurve hy
       have hsig := theSignsAgreeAcrossTheFaceAtFive hcurve hy hc₁ hc₂
-      have hs1 : Descent.SqCls (RankOne.slotOne (Point.some hP)) d₁ := by
+      have hs1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hP)) d₁ := by
         rw [slot5One_some, if_neg hx0]
         exact hc₁
-      have hs2 : Descent.SqCls (RankOne.slotTwo (Point.some hP)) d₂ := by
+      have hs2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hP)) d₂ := by
         rw [slot5Two_some, if_neg hx5]
         exact hc₂
       clear hc₁ hc₂

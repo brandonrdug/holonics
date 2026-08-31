@@ -214,17 +214,18 @@ theorem norm_openPeriodicJacobianFourierTail_le
   unfold openPeriodicJacobianFourierTail
   have hfull :=
     summable_norm_openPeriodicJacobianFourierMode_entry solution t component coordinate
-  have hsubtype := hfull.subtype
-    {frequency : SpatialFrequency | frequency ∉ modes}
+  have hsubtype : Summable (fun frequency :
+      {frequency : SpatialFrequency // frequency ∉ modes} ↦
+        ‖openPeriodicJacobianFourierMode solution t frequency.1 component coordinate‖) := by
+    exact hfull.subtype {frequency : SpatialFrequency | frequency ∉ modes}
   have hcharacter (frequency : SpatialFrequency) :
       ‖UnitAddTorus.mFourier frequency q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
   have hterms : Summable fun frequency :
       {frequency : SpatialFrequency // frequency ∉ modes} ↦
       ‖openPeriodicJacobianFourierMode solution t frequency.1 component coordinate *
         UnitAddTorus.mFourier frequency.1 q‖ := by
-    simpa only [Function.comp_apply, norm_mul, hcharacter, mul_one]
-      using hsubtype
+    simpa only [norm_mul, hcharacter, mul_one] using hsubtype
   calc
     ‖∑' frequency : {frequency : SpatialFrequency // frequency ∉ modes},
         openPeriodicJacobianFourierMode solution t frequency.1 component coordinate *

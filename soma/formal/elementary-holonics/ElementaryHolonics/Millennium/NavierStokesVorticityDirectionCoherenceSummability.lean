@@ -73,8 +73,14 @@ theorem summable_openPeriodicVorticityCurlEntryMass
   have h20 := summable_norm_openPeriodicJacobianFourierMode_entry solution t 2 0
   have h10 := summable_norm_openPeriodicJacobianFourierMode_entry solution t 1 0
   have h01 := summable_norm_openPeriodicJacobianFourierMode_entry solution t 0 1
-  simpa only [openPeriodicVorticityCurlEntryMass, complexCurlEntryMass] using
-    (((((h21.add h12).add h02).add h20).add h10).add h01)
+  change Summable (fun frequency : SpatialFrequency ↦
+    (((((‖openPeriodicJacobianFourierMode solution t frequency 2 1‖ +
+        ‖openPeriodicJacobianFourierMode solution t frequency 1 2‖) +
+      ‖openPeriodicJacobianFourierMode solution t frequency 0 2‖) +
+      ‖openPeriodicJacobianFourierMode solution t frequency 2 0‖) +
+      ‖openPeriodicJacobianFourierMode solution t frequency 1 0‖) +
+      ‖openPeriodicJacobianFourierMode solution t frequency 0 1‖))
+  exact (((((h21.add h12).add h02).add h20).add h10).add h01)
 
 /-- Exact curl descent from the actual vorticity coefficient to its addressed Jacobian array. -/
 theorem openPeriodicVorticityFourierMode_eq_complexCurl
@@ -312,8 +318,11 @@ theorem tendsto_openPeriodicCoherenceFourierTail_atTop
   have hresponse : Continuous response := by
     dsimp [response]
     fun_prop
+  have hzero : response 0 = 0 := by
+    simp [response]
   have htransport := hresponse.continuousAt.tendsto.comp tendsto_jacobianTailScale_atTop
-  simpa [response, openPeriodicCoherenceFourierTail] using htransport
+  change Tendsto (response ∘ jacobianTailScale) atTop (nhds 0)
+  simpa only [hzero] using htransport
 
 /-- **Complete-frequency physical receiver.**  Passing through the vanishing reconstruction
 fibre removes the radius entirely: physical vortex stretching is bounded directly by the full

@@ -543,7 +543,7 @@ theorem openPeriodicSolutionOn_integral_secondCoordinateTransport_eq_zero
       inner ℝ
         (fderiv ℝ (fun y ↦ secondCoordinateJet velocity i j y t) x (velocity x t))
         (secondCoordinateJet velocity i j x t) = 0 := by
-  simpa [secondCoordinateJet, secondCoordinateWord] using
+  simpa [secondCoordinateJet, secondCoordinateWord, coordinateJetField] using
     openPeriodicSolutionOn_integral_coordinateJetTransport_eq_zero
       solution ht 2 (secondCoordinateWord i j)
 
@@ -768,9 +768,8 @@ theorem openPeriodicSolutionOn_unforced_coordinateH2TimeWork_eq_production
       funext k
       fin_cases k <;> rfl
     rw [hwordEq]
-    simpa [secondCoordinateJet] using
-      openPeriodicSolutionOn_unforced_integral_secondCoordinateProduction
-        solution ht (word 0) (word 1)
+    convert openPeriodicSolutionOn_unforced_integral_secondCoordinateProduction
+      solution ht (word 0) (word 1) using 1 <;> rfl
   unfold coordinateH2TimeWork coordinateH2Dissipation coordinateH2LowerWork
   calc
     (∑ word : Fin 2 → Fin 3,

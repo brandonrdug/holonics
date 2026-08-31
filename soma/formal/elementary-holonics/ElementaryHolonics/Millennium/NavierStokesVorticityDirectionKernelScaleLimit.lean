@@ -127,7 +127,10 @@ theorem tendsto_openPeriodicDyadicSpatialAssemblyTail_atTop
         (dyadicHodgeInnerCutoff depth)) atTop (nhds ((2 : ℝ) * 0)) :=
     tendsto_const_nhds.mul
       (tendsto_openPeriodicCoherenceFourierTail_dyadic_atTop solution t q)
-  simpa [openPeriodicDyadicSpatialAssemblyTail] using htail
+  change Tendsto (fun depth : ℕ ↦
+    (2 : ℝ) * openPeriodicCoherenceFourierTail solution t q
+      (dyadicHodgeInnerCutoff depth)) atTop (nhds 0)
+  simpa only [mul_zero] using htail
 
 /-- The literal coefficient reconstruction term is bounded by the vanishing named dyadic tail. -/
 theorem openPeriodicDyadicCoefficientTailTerm_le_spatialAssemblyTail

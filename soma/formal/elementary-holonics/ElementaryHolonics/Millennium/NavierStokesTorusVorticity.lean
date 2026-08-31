@@ -40,8 +40,8 @@ theorem piToSpatialTorus_isOpenQuotientMap :
   have hcoordinate : ∀ _i : Fin 3,
       IsOpenQuotientMap ((↑) : ℝ → UnitAddCircle) :=
     fun _i => QuotientAddGroup.isOpenQuotientMap_mk
-  simpa [piToSpatialTorus, Pi.map_apply] using
-    (IsOpenQuotientMap.piMap hcoordinate)
+  change IsOpenQuotientMap (Pi.map (fun _i : Fin 3 => ((↑) : ℝ → UnitAddCircle)))
+  exact IsOpenQuotientMap.piMap hcoordinate
 
 /-- The quotient projection in the repository's Euclidean-space presentation. -/
 def euclideanToSpatialTorus (x : Space) : SpatialTorus :=
@@ -53,8 +53,9 @@ theorem euclideanToSpatialTorus_isOpenQuotientMap :
   have hcoordinates := piToSpatialTorus_isOpenQuotientMap
   have heuclidean :=
     (EuclideanSpace.equiv (Fin 3) ℝ).toHomeomorph.isOpenQuotientMap
-  simpa [euclideanToSpatialTorus, Function.comp_def] using
-    hcoordinates.comp heuclidean
+  change IsOpenQuotientMap
+    (piToSpatialTorus ∘ (EuclideanSpace.equiv (Fin 3) ℝ))
+  exact hcoordinates.comp heuclidean
 
 /-- Every torus point has a Euclidean representative. -/
 theorem euclideanToSpatialTorus_surjective :

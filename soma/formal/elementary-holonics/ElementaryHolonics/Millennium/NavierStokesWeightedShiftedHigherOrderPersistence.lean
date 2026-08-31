@@ -183,19 +183,46 @@ theorem higherOrderRestrictionPathToThree_concat
   apply ContinuousMap.ext
   intro t
   by_cases htA : t.1 ≤ A
-  · rw [higherOrderRestrictionPathToThree_apply,
-      weightedIntervalPathConcat_apply_left hA hB left right hjoin t htA,
-      weightedIntervalPathConcat_apply_left hA hB
-        (higherOrderRestrictionPathToThree base hbase left)
-        (higherOrderRestrictionPathToThree base hbase right) _ t htA]
-    rfl
+  · let tLeft : Icc (0 : ℝ) A := ⟨t.1, ⟨t.2.1, htA⟩⟩
+    have hsource := weightedIntervalPathConcat_apply_left
+      hA hB left right hjoin t htA
+    have htarget := weightedIntervalPathConcat_apply_left hA hB
+      (higherOrderRestrictionPathToThree base hbase left)
+      (higherOrderRestrictionPathToThree base hbase right)
+      (congrArg
+        (periodicVectorWeightedRestrictToThree (base + 1) (by omega)) hjoin)
+      t htA
+    change periodicVectorWeightedRestrictToThree (base + 1) (by omega)
+        (weightedIntervalPathConcat hA hB left right hjoin t) = _
+    calc
+      _ = periodicVectorWeightedRestrictToThree (base + 1) (by omega)
+          (left tLeft) := by
+        exact congrArg
+          (periodicVectorWeightedRestrictToThree (base + 1) (by omega))
+          (by simpa only [tLeft] using hsource)
+      _ = higherOrderRestrictionPathToThree base hbase left tLeft := rfl
+      _ = _ := by simpa only [tLeft] using htarget.symm
   · have hAt : A ≤ t.1 := le_of_not_ge htA
-    rw [higherOrderRestrictionPathToThree_apply,
-      weightedIntervalPathConcat_apply_right hA hB left right hjoin t hAt,
-      weightedIntervalPathConcat_apply_right hA hB
-        (higherOrderRestrictionPathToThree base hbase left)
-        (higherOrderRestrictionPathToThree base hbase right) _ t hAt]
-    rfl
+    let tRight : Icc (0 : ℝ) B :=
+      ⟨t.1 - A, ⟨sub_nonneg.mpr hAt, by linarith [t.2.2]⟩⟩
+    have hsource := weightedIntervalPathConcat_apply_right
+      hA hB left right hjoin t hAt
+    have htarget := weightedIntervalPathConcat_apply_right hA hB
+      (higherOrderRestrictionPathToThree base hbase left)
+      (higherOrderRestrictionPathToThree base hbase right)
+      (congrArg
+        (periodicVectorWeightedRestrictToThree (base + 1) (by omega)) hjoin)
+      t hAt
+    change periodicVectorWeightedRestrictToThree (base + 1) (by omega)
+        (weightedIntervalPathConcat hA hB left right hjoin t) = _
+    calc
+      _ = periodicVectorWeightedRestrictToThree (base + 1) (by omega)
+          (right tRight) := by
+        exact congrArg
+          (periodicVectorWeightedRestrictToThree (base + 1) (by omega))
+          (by simpa only [tRight] using hsource)
+      _ = higherOrderRestrictionPathToThree base hbase right tRight := rfl
+      _ = _ := by simpa only [tRight] using htarget.symm
 
 /-- Adjacent translations of one native path have the same addressed value at their common
 face. -/

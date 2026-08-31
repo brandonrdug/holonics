@@ -1,16 +1,16 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use holonic_engine::{
-    BoundaryId,
     native_spool::NativeSpoolBundle,
     receiver_exact_compression::{InputId, ReceiverId},
     receiver_history_compression::NativeStateId,
+    BoundaryId, EventId,
 };
 use sha2::{Digest, Sha256};
 
 use super::types::{
-    ATHENA_NATIVE_REST_SCHEMA, AthenaNativeError, AthenaNativeRest, NativeSectionAddress,
-    RECEIVER_HISTORY_REALIZATION_SCHEMA, ReceiverHistoryRealizationPassage,
+    AthenaNativeError, AthenaNativeRest, NativeSectionAddress, ReceiverHistoryRealizationPassage,
+    ATHENA_NATIVE_REST_SCHEMA, RECEIVER_HISTORY_REALIZATION_SCHEMA,
 };
 
 impl ReceiverHistoryRealizationPassage {
@@ -37,11 +37,6 @@ impl ReceiverHistoryRealizationPassage {
             return Err(AthenaNativeError::Realization(
                 "the section atlas is not the exact projection of the owned ecology".to_owned(),
             ));
-        }
-        for address in &self.sections {
-            ecology
-                .addressed_section(&address.spool, &address.thread, address.occurrence)
-                .map_err(|error| AthenaNativeError::Realization(error.to_string()))?;
         }
         if self.sections.is_empty()
             || self.ingress_sections.is_empty()
@@ -152,53 +147,72 @@ fn connected_through_native_cells(
 ) -> bool {
     let mut native_to_sections = BTreeMap::<NativeStateId, BTreeSet<usize>>::new();
     let mut occurrence_to_section = BTreeMap::new();
-    let mut section_to_natives = Vec::with_capacity(sections.len());
-    for (at, address) in sections.iter().enumerate() {
-        let Ok(section) =
-            ecology.addressed_section(&address.spool, &address.thread, address.occurrence)
-        else {
-            return false;
-        };
-        let pair = BTreeSet::from([
-            section.occurrence().entering_native,
-            section.occurrence().emitting_native,
-        ]);
-        for native in &pair {
-            native_to_sections.entry(*native).or_default().insert(at);
+    let section_positions = sections
+        .iter()
+        .enumerate()
+        .map(|(at, address)| (address, at))
+        .collect::<BTreeMap<_, _>>();
+    let mut section_to_natives = vec![BTreeSet::new(); sections.len()];
+    let mut found = 0usize;
+    for spool in &ecology.spools {
+        for thread in &spool.threads {
+            for occurrence in &thread.occurrences {
+                let address = NativeSectionAddress {
+                    spool: spool.address.clone(),
+                    thread: thread.address.clone(),
+                    occurrence: occurrence.occurrence,
+                };
+                let Some(at) = section_positions.get(&address).copied() else {
+                    return false;
+                };
+                let pair = BTreeSet::from([occurrence.entering_native, occurrence.emitting_native]);
+                for native in &pair {
+                    native_to_sections.entry(*native).or_default().insert(at);
+                }
+                occurrence_to_section.insert(occurrence.occurrence, at);
+                section_to_natives[at] = pair;
+                found += 1;
+            }
         }
-        occurrence_to_section.insert(section.occurrence().occurrence, at);
-        section_to_natives.push(pair);
     }
-    if sections.is_empty() {
+    let mut mutual_neighbors = BTreeMap::<EventId, BTreeSet<EventId>>::new();
+    for response in ecology
+        .spools
+        .iter()
+        .flat_map(|spool| &spool.mutual_constitutive_responses)
+    {
+        mutual_neighbors
+            .entry(response.left_occurrence)
+            .or_default()
+            .insert(response.right_occurrence);
+        mutual_neighbors
+            .entry(response.right_occurrence)
+            .or_default()
+            .insert(response.left_occurrence);
+    }
+    if sections.is_empty() || found != sections.len() {
         return false;
     }
     let mut reached = BTreeSet::from([0usize]);
     let mut queue = VecDeque::from([0usize]);
+    let mut expanded_natives = BTreeSet::new();
     while let Some(at) = queue.pop_front() {
         for native in &section_to_natives[at] {
-            for next in &native_to_sections[native] {
-                if reached.insert(*next) {
-                    queue.push_back(*next);
+            if expanded_natives.insert(*native) {
+                for next in &native_to_sections[native] {
+                    if reached.insert(*next) {
+                        queue.push_back(*next);
+                    }
                 }
             }
         }
         let occurrence = sections[at].occurrence;
-        for response in ecology
-            .spools
-            .iter()
-            .flat_map(|spool| &spool.mutual_constitutive_responses)
-            .filter(|response| {
-                response.left_occurrence == occurrence || response.right_occurrence == occurrence
-            })
-        {
-            let other = if response.left_occurrence == occurrence {
-                response.right_occurrence
-            } else {
-                response.left_occurrence
-            };
-            if let Some(next) = occurrence_to_section.get(&other) {
-                if reached.insert(*next) {
-                    queue.push_back(*next);
+        if let Some(neighbors) = mutual_neighbors.get(&occurrence) {
+            for other in neighbors {
+                if let Some(next) = occurrence_to_section.get(other) {
+                    if reached.insert(*next) {
+                        queue.push_back(*next);
+                    }
                 }
             }
         }

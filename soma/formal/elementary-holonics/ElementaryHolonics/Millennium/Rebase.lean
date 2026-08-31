@@ -52,8 +52,9 @@ change the static picture cannot represent, because it holds the former block in
 def fillTheFace : PassageRebase hollowPassage filledPassage where
   transport := AddMonoidHom.id Cells
   realized_maps := by
-    simp only [hollowPassage, filledPassage, AddSubgroup.map_bot]
-    exact bot_le
+    change AddSubgroup.map (AddMonoidHom.id Cells) (⊥ : AddSubgroup Cells) ≤ boundary.ker
+    rw [AddSubgroup.map_bot]
+    exact (bot_le : (⊥ : AddSubgroup Cells) ≤ boundary.ker)
   admissible_maps := by
     intro x hx
     obtain ⟨y, hy, rfl⟩ := hx
@@ -63,8 +64,9 @@ def fillTheFace : PassageRebase hollowPassage filledPassage where
 theorem theHollowPassageDoesNotGlue : ¬ hollowPassage.Glues := by
   intro h
   have h2 : ((1, 1, 1) : Cells) ∈ hollowPassage.Realized := h theLoopIsInhabited
-  rw [show hollowPassage.Realized = ⊥ from rfl, AddSubgroup.mem_bot] at h2
-  exact one_ne_zero (congrArg Prod.fst h2)
+  change ((1, 1, 1) : Cells) ∈ (⊥ : AddSubgroup Cells) at h2
+  have hzero : ((1, 1, 1) : Cells) = 0 := AddSubgroup.mem_bot.mp h2
+  exact one_ne_zero (congrArg Prod.fst hzero)
 
 /-- **The filled passage glues.** -/
 theorem theFilledPassageGlues : filledPassage.Glues := le_rfl

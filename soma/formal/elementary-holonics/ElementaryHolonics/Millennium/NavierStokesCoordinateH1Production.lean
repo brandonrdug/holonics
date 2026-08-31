@@ -89,7 +89,9 @@ theorem divergence_spatialDirectionalJet_eq_zero
   have hjetFDeriv :
       fderiv ℝ (spatialDirectionalJet u i) x =
         (fderiv ℝ (fderiv ℝ u) x).flip e := by
-    simpa [spatialDirectionalJet, e] using happly
+    change fderiv ℝ (fun y ↦ fderiv ℝ u y e) x =
+      (fderiv ℝ (fderiv ℝ u) x).flip e
+    simpa using happly
   have hdivfun : divergence u = 0 := by
     funext y
     exact hdiv y
@@ -125,9 +127,9 @@ theorem divergence_spatialDirectionalJet_eq_zero
     have hprojectFDeriv := hproject.fderiv
     have hprojectApply := congrArg (fun L : Space →L[ℝ] ℝ ↦ L e) hprojectFDeriv
     rw [happlyB] at hprojectApply
-    simpa [b] using hprojectApply
+    simpa [b, Function.comp_def] using hprojectApply
   rw [hdivCoordinates, fderiv_fun_sum (fun j _hj ↦ htermDiff j)] at hdivDerivative
-  simp only [ContinuousLinearMap.sum_apply] at hdivDerivative
+  simp only [sum_apply] at hdivDerivative
   simp_rw [htermApply] at hdivDerivative
   rw [← sum_coordinate_fderiv_eq_divergence (spatialDirectionalJet u i) x,
     hjetFDeriv]
@@ -162,14 +164,17 @@ theorem gradient_pressureDirectionalJet_eq_fderiv_gradient
   have hjetFDeriv :
       fderiv ℝ (pressureDirectionalJet p i) x =
         (fderiv ℝ (fderiv ℝ p) x).flip e := by
-    simpa [pressureDirectionalJet, e] using happly
+    change fderiv ℝ (fun y ↦ fderiv ℝ p y e) x =
+      (fderiv ℝ (fderiv ℝ p) x).flip e
+    simpa using happly
   have hgradient :
       fderiv ℝ (gradient p) x =
         (InnerProductSpace.toDual ℝ Space).symm.toContinuousLinearMap.comp
           (fderiv ℝ (fderiv ℝ p) x) := by
     change fderiv ℝ
       ((InnerProductSpace.toDual ℝ Space).symm ∘ fun y ↦ fderiv ℝ p y) x = _
-    simpa using (InnerProductSpace.toDual ℝ Space).symm.comp_fderiv
+    convert (InnerProductSpace.toDual ℝ Space).symm.comp_fderiv using 1
+    · rfl
   have hsymm : IsSymmSndFDerivAt ℝ p x :=
     hp.contDiffAt.isSymmSndFDerivAt (by norm_num)
   change (InnerProductSpace.toDual ℝ Space).symm
@@ -437,7 +442,6 @@ theorem openPeriodicSolutionOn_unforced_firstCoordinateProductionIdentity
       solution ht y i
   have hjetpoint : firstCoordinateJet velocity i x t =
       spatialDirectionalJet u i x := congrFun hjetfun x
-  dsimp [u, p] at hm htime ⊢
   rw [hadvection, hviscous, ← hpressure] at hm
   rw [hjetfun, hjetpoint, htime]
   apply eq_sub_iff_add_eq.mpr
@@ -549,7 +553,7 @@ theorem openPeriodicSolutionOn_integral_firstCoordinateTransport_eq_zero
       inner ℝ
         (fderiv ℝ (fun y ↦ firstCoordinateJet velocity i y t) x (velocity x t))
         (firstCoordinateJet velocity i x t) = 0 := by
-  simpa [firstCoordinateJet, firstCoordinateWord] using
+  simpa [firstCoordinateJet, firstCoordinateWord, coordinateJetField] using
     openPeriodicSolutionOn_integral_coordinateJetTransport_eq_zero
       solution ht 1 (firstCoordinateWord i)
 
@@ -736,9 +740,8 @@ theorem openPeriodicSolutionOn_unforced_coordinateH1TimeWork_eq_production
       fin_cases k
       rfl
     rw [hwordEq]
-    simpa [firstCoordinateJet] using
-      openPeriodicSolutionOn_unforced_integral_firstCoordinateProduction
-        solution ht (word 0)
+    convert openPeriodicSolutionOn_unforced_integral_firstCoordinateProduction
+      solution ht (word 0) using 1 <;> rfl
   unfold coordinateH1TimeWork coordinateH1Dissipation coordinateH1StretchingWork
   calc
     (∑ word : Fin 1 → Fin 3,

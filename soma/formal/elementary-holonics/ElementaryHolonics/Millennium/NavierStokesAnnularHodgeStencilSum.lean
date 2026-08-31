@@ -251,7 +251,7 @@ theorem norm_adjacentTensorSlice_terminal_le
   have hscale : 0 ≤ 1 / (radius + 2 : ℝ) := by positivity
   have hmul := mul_le_mul_of_nonneg_left
     (norm_tensorCoordinateComplement_le_one (radius + 1) axis base) hscale
-  convert hmul using 1 <;> push_cast <;> ring
+  simpa only [Nat.cast_add, Nat.cast_ofNat, mul_one] using hmul
 
 /-- Penultimate adjacent tensor mass is at most two reciprocal scale units. -/
 theorem norm_adjacentTensorSlice_penultimate_le

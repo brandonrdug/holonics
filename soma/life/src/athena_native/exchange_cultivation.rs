@@ -16,11 +16,11 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    EventId,
     derived_factor_cover::{DefectMetrics, DerivedFactorCover, SupportedDefectSection},
     exact_linear::ExactRatMatrix,
     receiver_exact_compression::{ItemId, Observation, ReceiverId},
     receiver_history_compression::NativeStateId,
+    EventId,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;

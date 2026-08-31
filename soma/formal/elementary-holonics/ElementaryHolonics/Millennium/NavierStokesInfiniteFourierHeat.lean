@@ -18,7 +18,7 @@ local solution, fixed point, Galerkin limit, or continuation theorem is asserted
 
 noncomputable section
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ENNReal NNReal lp
 open MeasureTheory
 
 namespace Soma.Holonics.Millennium.NavierStokesInfiniteFourierHeat

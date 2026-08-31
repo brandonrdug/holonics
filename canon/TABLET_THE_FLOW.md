@@ -282,9 +282,10 @@ So four names denote one missing organ:
 | §2b's *"name the windings instead"* | `CLAUDE.md` §2b, standing obligation | 2026-08-08 |
 
 **And one half of it now exists.** `RayCrossings`, built today in
-`crates/relational-geometry/src/exact_analysis.rs:1079`, is exactly this datatype for one carrier: it
-retains the crossing population *by address* and offers `winding()` (`:1088`) as a reading. `total()`
-(`:1093`) is the ant's count; `winding()` is the spider's integer; `cancels()` (`:1101`) is the case
+`crates/relational-geometry/src/exact_analysis/winding.rs:28`, is exactly this datatype for one
+carrier: it retains the crossing population *by address* and offers `winding()` (`:37`) as a
+reading. `total()` (`:42`) is the ant's count; `winding()` is the spider's integer; `cancels()`
+(`:50`) is the case
 where the ant walked and the spider deposited nothing.
 
 **This section then read *"the pattern is built and driven for the η boundary and for nothing else."*
@@ -296,7 +297,7 @@ The sentence is withdrawn and replaced by the reach, taken by reading the owners
 
 | carrier | the two arms | driven by |
 |---|---|---|
-| `RayCrossings` — the η boundary | crossing addresses (`total`) ; `winding()` | `polygon_winding`, `crates/relational-geometry/src/exact_analysis.rs:1526`, with its declared control at `:1440` |
+| `RayCrossings` — the η boundary | crossing addresses (`total`) ; `winding()` | `polygon_winding`, `crates/relational-geometry/src/exact_analysis/winding.rs:150`, with its declared control at `crates/relational-geometry/src/exact_analysis.rs:113` |
 | `HingeHolonomy::Exact` — `crates/holonic-engine/src/contact_gluing.rs:1470` | `cosine`/`sine` as an exact point on the unit circle (the position) ; `half_turns: u32` (the winding) | `crates/holonic-engine/examples/the_hinge_carries_the_curvature.rs`, six declared gates, of which two are the §8 gauge orbit in both directions — a similarity must move nothing (`:436`), a non-similar metric must move the population (`:464`) |
 | `ReceiverPhaseAtlasStanding::germ_populations` — `crates/holonic-engine/src/receiver_phase_atlas.rs:348` | germ **addresses** by signature ; the count demoted to a reading | its own doc at `:347` cites `RayCrossings`' shape as the form it was rebuilt into |
 

@@ -21,11 +21,11 @@
 //!   cargo run --release -p life --example the_hankel_rank_is_the_width_athena_can_have
 //! ```
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 use body::num::Cog;
 use life::causal_language::{
-    lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
+    CausalLanguageEcology, CausalLanguagePassage, lexical_tokens, token_germs_public,
 };
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;

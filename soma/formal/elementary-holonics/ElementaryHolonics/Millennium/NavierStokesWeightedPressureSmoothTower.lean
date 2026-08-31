@@ -98,7 +98,8 @@ def pressureDiagonalSmoothPathTower
     change periodicWeightedSobolevRestrict 3 (m + 3) (by omega)
         (CoherentWeightedSmoothPathTower.nativePressurePathAtOrder tower m t) =
       CoherentWeightedSmoothPathTower.nativePressurePathAtOrder tower 0 t
-    simpa only [Nat.zero_add] using
+    simpa only [Nat.zero_add, periodicWeightedSobolevRestrictCLM,
+      LinearMap.mkContinuous_apply, LinearMap.coe_mk, AddHom.coe_mk] using
       CoherentWeightedSmoothPathTower.restrict_nativePressurePathAtOrder
         tower 0 m (Nat.zero_le m) t
 

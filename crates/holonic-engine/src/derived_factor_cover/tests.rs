@@ -132,6 +132,38 @@ fn a_nonidentity_metric_changes_the_returned_adjoint() {
 }
 
 #[test]
+fn equal_transport_with_distinct_receiver_metrics_returns_a_constitutive_cocycle() {
+    let left = section("metric-left", vec![0, 1], &[&[1, 0], &[0, 2]]);
+    let mut right = section("metric-right", vec![0, 1], &[&[1, 0], &[0, 2]]);
+    right.metrics = DefectMetrics {
+        domain: matrix(&[&[2, 0], &[0, 3]]),
+        codomain: matrix(&[&[5, 0], &[0, 7]]),
+    };
+    let receipt = compare_sections(&left, &right).expect("constitutive overlap");
+    let OverlapKind::ConstitutiveCocycle { constitutive } = receipt.kind else {
+        panic!("a constitutive cocycle was required");
+    };
+    assert!(
+        constitutive
+            .domain_cocycle
+            .entries()
+            .iter()
+            .any(|entry| !entry.is_zero())
+    );
+    assert!(
+        constitutive
+            .codomain_cocycle
+            .entries()
+            .iter()
+            .any(|entry| !entry.is_zero())
+    );
+    assert_eq!(
+        receipt.patch.expect("transport overlap").cocycle,
+        ExactRatMatrix::zero(2, 2).expect("zero cocycle")
+    );
+}
+
+#[test]
 fn a_column_disjoint_population_returns_one_exact_interchange_family() {
     let sections = (0..4)
         .map(|column| SupportedDefectSection {

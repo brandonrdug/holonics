@@ -32,7 +32,7 @@
 use std::time::Instant;
 
 use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
-use holonic_engine::exact_contact::{ContactError, ExactContact, RatioFace};
+use holonic_engine::exact_contact::{ContactError, ExactContact};
 use holonic_engine::exact_value::{CertifiedSeries, ExactOrdering, SeriesTailCertificate};
 use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;

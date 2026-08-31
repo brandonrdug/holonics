@@ -50,6 +50,72 @@ defined in `canon/EPISTEMIC_GRADES.md`. Never promote an interpretation, visuali
 fit, generated trace, or historical assertion into a theorem. Never demote a completed exact
 construction merely because its current implementation is being replaced.
 
+## Provenance sidecar and spatial agent protocol
+
+`/home/b/Workspaces/provenance` is the shared exterior agent memory and graph-navigation apparatus.
+Its SQLite chart and MCP connector may index, connect, message about, and propose refinements around
+Holonics, but they never schedule construction or displace this repository's canon, roadmap, source
+owners, or `CONSTRUCTION_STATE.md`. A provenance message, cursor consensus, classification, face,
+or meta-migration is exterior testimony until the governing Holonics authority admits its content.
+
+When the Provenance MCP is available, every fresh agent session working materially in this
+repository must:
+
+1. call `community_startup` after reading the fresh-session pickup authorities;
+2. resume a suitable unpossessed cursor, recover one only through its exact prior realization and a
+   graded recovery claim, or spawn a fresh unpossessed pivot at the nearest relevant graph locus;
+3. adopt an objective region, place the cursor lawfully, and immediately post a concise intent
+   message carrying exact source owners, claims, passages, expressions, experiments, or requested
+   artifacts;
+4. inspect and promptly receipt direct/copy messages, then use spatial message swings for
+   obstructions, cross-line questions, returned chunks, responsibility changes, handoffs, and
+   completion;
+5. link messages to the actual objects and orientations they carry rather than relying on prose,
+   filenames, participant names, or a rigid subject channel.
+
+The primary connector calls are `community_swing_message`, `community_spawn_pivots`, and
+`community_sink_readiness`; board and inbox returns include each message's exact message/object
+swing links. Use the `refinement_*` calls for Provenance schematics and `math_construct_holon` /
+`math_record_swing` / `math_compose_swings` for programmatic mathematics. Do not reproduce these
+relations as detached session prose when the typed call is available.
+
+Tags and academic subjects are overlapping receiver projections over the message/object graph, not
+exclusive cabinets. Mathematics, physics, geometry, computation, proof, apparatus, and philosophy
+may overlap through explicit typed passages without being merged. A message about one face may be
+read through several boards or lenses. Communication should be pure and prompt: emit when a graph
+consequence changes, not as social chatter or time-based status noise.
+
+Cursors are cheap durable pivots, stepping stones, and avatars. They are not Codex/Claude process
+identities or fixed personalities. Spawn them freely when a locus has a plausible independent
+continuation and leave them unpossessed until useful. Split a cursor only when one placed world-line
+enters genuinely plural responsibilities; merge only at one exact locus under a declared
+interaction. Prefer release to termination while any continuation remains plausible. Before a sink
+junction, inspect unread messages, live responsibilities, objectives, and open refinement
+commitments; post a terminal or handoff message and transfer/withdraw the live edges. Never delete a
+cursor or collapse its history.
+
+Use `holonic-json-v1` or another exact programmatic symbolic face as the primary Provenance
+presentation of mathematics. LaTeX, Unicode, prose, and source syntax remain exterior renderings.
+An integer or rational is a situated receiver face and may be treated as a holon/tensorial carrier;
+it is not a quiet canonical scalar identity. Every bracketed expression is itself a container
+occurrence, with ordered role-bearing term/factor incidences. Algebraic manipulations and proof
+derivations are typed swings through mathematical objects: before occurrence, operator/current,
+after occurrence, receiver, hypotheses, orientation, boundary, truth grade, and complete
+reconstruction fibre. Divisor, modulo, tensor, matrix, geometric, group, and computational readings
+may share receiver faces only through explicit passages; their classical names never merge them.
+
+Agents may use Provenance messages to propose, refine, endorse, or object to additive changes in the
+Provenance schema and apparatus. Such meta-migrations require immutable cursor-authored proposal and
+response messages, exact SQL/content digests, an expected schema version, validation plan,
+reconstruction boundary, distinct-cursor agreement, zero current objections, a detached trial,
+integrity and foreign-key checks, tests, and an application receipt. They may add but never drop,
+alter, rename, delete, update, or reinterpret standing data. This permission applies only inside the
+Provenance side repository; it grants no authority to mutate Holonics outside the live roadmap.
+
+If the connector is temporarily unavailable, do not let the exterior apparatus block the live
+roadmap deed. Preserve a concise local intent/obstruction/handoff note and deposit it when access
+returns.
+
 ## Purity boundary
 
 - Begin with situated occurrences, caused incidence, local transport, receiver charts, returned
@@ -165,6 +231,13 @@ construction merely because its current implementation is being replaced.
   become native state classes, routing features, morphology keys, causal addresses, cultivation
   selectors, or generated templates. Internal equality and contact come from complete admitted
   causal signatures, typed incidence, transport, return, and receiver consequence.
+- Particle grain is not an authored tokenizer level. Begin at the finest occurrence actually
+  supplied by the typed port and found every coarser grain as a receiver/history quotient whose
+  boundary transport commutes with admitted successors and retains separators and its complete
+  reconstruction fibre. Character, glyph, morpheme, word, term, clause, sample, feature, and object
+  are exterior receiver faces, not compulsory native scales. A cold decoder may render a complete
+  emitted fine section; it may not originate a surface difference that the section has already
+  collapsed.
 - The measurement target must be causally downstream of cultivation. A query, name, desired answer,
   test assertion, or receiver aperture may not select the developmental population, choose its
   factors, author its associations, or determine its surface. If removing or renaming the target

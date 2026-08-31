@@ -80,7 +80,8 @@ theorem summable_norm_scalarFourierPassage
   apply (summable_norm_periodicSobolevThreeCoefficient coeff).congr
   intro k
   have hcharacter : ‖UnitAddTorus.mFourier k q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+      fourier_apply, Circle.norm_coe, Finset.prod_const_one]
   rw [scalarFourierPassage, norm_mul, hcharacter, mul_one]
 
 theorem summable_scalarFourierPassage

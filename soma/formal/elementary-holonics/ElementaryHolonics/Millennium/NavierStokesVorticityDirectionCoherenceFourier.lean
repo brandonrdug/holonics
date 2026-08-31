@@ -175,7 +175,8 @@ theorem openPeriodicFiniteCrossDirectionMass_eq_coherenceCoefficientMass
   rw [receiverCrossDifference_openPeriodicTransportedVorticityMode,
     complexVectorL1_smul]
   have hcharacter : ‖UnitAddTorus.mFourier frequency q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+      fourier_apply, Circle.norm_coe, Finset.prod_const_one]
   rw [hcharacter, one_mul]
 
 /-- The complete physical stretching inequality now consumes the literal Fourier coefficient

@@ -64,6 +64,7 @@ theorem theLogarithmicDerivativeSplits {a z : ℂ} (n : ℕ) (hn : 0 < n) {g : �
     deriv (fun w => (w - a) ^ n * g w) z / ((z - a) ^ n * g z)
       = (n : ℂ) / (z - a) + g' / g z := by
   have hp : HasDerivAt (fun w : ℂ => (w - a) ^ n) ((n : ℂ) * (z - a) ^ (n - 1)) z := by
+    change HasDerivAt ((fun w : ℂ => w - a) ^ n) ((n : ℂ) * (z - a) ^ (n - 1)) z
     simpa using (((hasDerivAt_id z).sub_const a).pow n)
   have hf : HasDerivAt (fun w => (w - a) ^ n * g w)
       ((n : ℂ) * (z - a) ^ (n - 1) * g z + (z - a) ^ n * g') z := hp.mul hg

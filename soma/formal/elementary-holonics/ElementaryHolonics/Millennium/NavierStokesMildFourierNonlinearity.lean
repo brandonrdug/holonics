@@ -25,7 +25,7 @@ carrier.  No local-existence, fixed-point, Duhamel, or continuation conclusion i
 
 noncomputable section
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ENNReal NNReal lp
 
 namespace Soma.Holonics.Millennium.NavierStokesMildFourierNonlinearity
 
@@ -58,8 +58,13 @@ def translatePeriodicFourierL2
         (by norm_num : 0 < (2 : ℝ≥0∞).toReal)
       simpa using h
     have htranslated := (frequencyTranslation p).summable_iff.mpr hcoeff
-    simpa only [Function.comp_apply, frequencyTranslation_apply, Real.rpow_two] using
-      htranslated⟩
+    have hfun :
+        ((fun k : SpatialFrequency => ‖(coeff k : ℂ)‖ ^ 2) ∘
+            (frequencyTranslation p)) =
+          (fun i => ‖(coeff (i - p) : ℂ)‖ ^ 2) := by
+      funext i
+      simp [frequencyTranslation, sub_eq_add_neg]
+    simpa only [Real.rpow_two] using (hfun ▸ htranslated)⟩
 
 @[simp]
 theorem translatePeriodicFourierL2_apply
@@ -118,7 +123,10 @@ def periodicFourierL2Evaluation (k : SpatialFrequency) : PeriodicFourierL2 →L[
       map_add' := fun _ _ ↦ rfl
       map_smul' := fun _ _ ↦ rfl }
     1 (fun coeff ↦ by
-      simpa using lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) coeff k)
+      change ‖(coeff k : ℂ)‖ ≤ (1 : ℝ) * ‖coeff‖
+      simpa only [ContinuousLinearMap.coe_mk, LinearMap.coe_mk,
+        LinearMap.mkContinuous_apply, one_mul] using
+        (lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) coeff k))
 
 @[simp]
 theorem periodicFourierL2Evaluation_apply

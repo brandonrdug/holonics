@@ -388,11 +388,7 @@ pub(super) fn semantic_clause_tokens(clause: &RelationalClause) -> Vec<String> {
                 tokens.push(modality.clone());
                 tokens.push("be".to_owned());
             } else {
-                tokens.push(if entity_is_plural(&clause.subject) {
-                    "are".to_owned()
-                } else {
-                    "is".to_owned()
-                });
+                tokens.push(present_relation_for_entity("be", &clause.subject));
             }
             tokens.extend(clause.object.surface.iter().cloned());
             capitalize_first(tokens)
@@ -406,13 +402,34 @@ pub(super) fn active_tokens(clause: &RelationalClause) -> Vec<String> {
         tokens.push(modality.clone());
         tokens.push(clause.relation.clone());
     } else {
-        tokens.push(present_relation(
+        tokens.push(present_relation_for_entity(
             &clause.relation,
-            entity_is_plural(&clause.subject),
+            &clause.subject,
         ));
     }
     tokens.extend(clause.object.surface.iter().cloned());
     capitalize_first(tokens)
+}
+
+/// English agreement belongs to the cold exterior chart.  The native clause is unchanged when a
+/// participant is transported between proper-name, first-person, and second-person faces.
+pub(super) fn present_relation_for_entity(relation: &str, entity: &RelationalEntity) -> String {
+    let deictic = entity
+        .surface
+        .first()
+        .map(|word| word.to_lowercase())
+        .unwrap_or_default();
+    match deictic.as_str() {
+        "i" => match relation {
+            "be" => "am".to_owned(),
+            _ => relation.to_owned(),
+        },
+        "you" | "we" | "they" => match relation {
+            "be" => "are".to_owned(),
+            _ => relation.to_owned(),
+        },
+        _ => present_relation(relation, entity_is_plural(entity)),
+    }
 }
 
 pub(super) fn passive_tokens(clause: &RelationalClause) -> Vec<String> {

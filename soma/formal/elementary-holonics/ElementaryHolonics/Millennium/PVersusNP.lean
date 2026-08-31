@@ -1,5 +1,5 @@
 import Mathlib.Computability.Language
-import Mathlib.Computability.TMComputable
+import Mathlib.Computability.TuringMachine.Computable
 
 /-!
 # P versus NP — the actual decision-language and polynomial-time object
@@ -28,12 +28,10 @@ abbrev DecisionLanguage := Language Bool
 
 /-- The fixed identity encoding of a binary word. The encoding is part of the complexity receipt;
 it is not selected by a later existential or an arbitrary default. -/
-def wordEncoding : FinEncoding Word where
-  Γ := Bool
+def wordEncoding : Encoding Word Bool where
   encode := id
   decode := some
   decode_encode := by intro input; rfl
-  ΓFin := Bool.fintype
 
 private def leftBit : Bool ⊕ Bool → Option Bool
   | .inl bit => some bit
@@ -44,15 +42,13 @@ private def rightBit : Bool ⊕ Bool → Option Bool
   | .inr bit => some bit
 
 /-- The fixed tagged encoding of an instance/certificate pair. -/
-def instanceCertificateEncoding : FinEncoding (Word × Word) where
-  Γ := Bool ⊕ Bool
+def instanceCertificateEncoding : Encoding (Word × Word) (Bool ⊕ Bool) where
   encode := fun pair => pair.1.map Sum.inl ++ pair.2.map Sum.inr
   decode := fun encoded => some (encoded.filterMap leftBit, encoded.filterMap rightBit)
   decode_encode := by
     rintro ⟨input, certificate⟩
     simp only [List.filterMap_append, List.filterMap_map]
     simp [Function.comp_def, leftBit, rightBit]
-  ΓFin := inferInstance
 
 /-- The tagged pair encoding charges exactly the input and certificate populations. -/
 theorem instanceCertificateEncoding_length (input certificate : Word) :
@@ -68,19 +64,19 @@ def Decides (decider : Word → Bool) (language : DecisionLanguage) : Prop :=
 def WordFunctionInPolynomialTime (f : Word → Word) : Prop :=
   Nonempty
     (Turing.TM2ComputableInPolyTime
-      wordEncoding wordEncoding f)
+      wordEncoding.encode wordEncoding.encode f)
 
 /-- A Boolean-valued function on binary words is computed in polynomial time. -/
 def BooleanFunctionInPolynomialTime (f : Word → Bool) : Prop :=
   Nonempty
     (Turing.TM2ComputableInPolyTime
-      wordEncoding finEncodingBoolBool f)
+      wordEncoding.encode encodingBoolBool.encode f)
 
 /-- A verifier on an input/certificate pair is computed in polynomial time. -/
 def VerifierInPolynomialTime (verify : Word × Word → Bool) : Prop :=
   Nonempty
     (Turing.TM2ComputableInPolyTime
-      instanceCertificateEncoding finEncodingBoolBool verify)
+      instanceCertificateEncoding.encode encodingBoolBool.encode verify)
 
 /-- **The class P.** Membership has a polynomial-time decider. -/
 def InP (language : DecisionLanguage) : Prop :=

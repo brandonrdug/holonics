@@ -58,8 +58,7 @@ theorem theWeilCircleIsAFixedLocus (q : ℝ) (al : ℂ) (hal : al ≠ 0) :
     exact_mod_cast h
   · intro h
     have hp := (eq_div_iff hconj).1 h
-    have hr := congrArg Complex.re hp
-    simpa using hr
+    simpa [Complex.mul_conj] using hp
 
 /-- **Complementary positive powers multiply to the base.**
 

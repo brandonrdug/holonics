@@ -713,11 +713,12 @@ pub use correspondence::{
 };
 pub use optical_holons::{
     grow_optical_holons, DeviceOpticalHolonReceipt, EquationGlyphFibre,
-    ExactOpticalIncidenceReceipt, ExactOpticalScale, HierarchicalOpticalPassage,
-    NativeEquationConstraintSection, NativeHierarchicalOpticalConsequence, OpticalAlternativeCover,
-    OpticalFormMember, OpticalHolon, OpticalHolonGrain, OpticalHolonIncidence,
-    OpticalHolonIncidenceKind, OpticalHolonIntervention, OpticalLocalRelation, OpticalObjectClass,
-    OpticalObjectClassFace, RepeatedOpticalFormFibre, OPTICAL_HOLON_SCHEMA,
+    ExactOpticalIncidenceReceipt, ExactOpticalOccurrence, ExactOpticalScale,
+    HierarchicalOpticalPassage, NativeEquationConstraintSection,
+    NativeHierarchicalOpticalConsequence, OpticalAlternativeCover, OpticalFormMember, OpticalHolon,
+    OpticalHolonGrain, OpticalHolonIncidence, OpticalHolonIncidenceKind, OpticalHolonIntervention,
+    OpticalLocalRelation, OpticalObjectClass, OpticalObjectClassFace, RepeatedOpticalFormFibre,
+    OPTICAL_HOLON_SCHEMA,
 };
 pub use optical_recovery::{
     ablate_optical_relation, bind_optical_glyph_testimony, compare_optical_controls,

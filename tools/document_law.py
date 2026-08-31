@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Two laws the corpus states about its own governing documents, made executable.
+"""Three laws the corpus states about its own governing documents, made executable.
 
     python3 tools/document_law.py            the failures
     python3 tools/document_law.py --all      also every absence claim that passes
@@ -68,6 +68,14 @@ superseded plan is supposed to carry.
 WHAT IS SCANNED. The operating contract, the position record, all of `canon/`, all of `blueprint/`.
 Not `research/records/` — a record is dated evidence whose absence claims are their own provenance,
 the same boundary `resolve_named_paths.py` and `resolve_line_citations.py` draw.
+
+LAW THREE — THE POSITION RECORD AND ROADMAP NAME ONE IDENTICAL SOLE NEXT DEED.
+
+`CONSTRUCTION_STATE.md` is the sole current-position record and `THE_ROADMAP.md` is the sole ordered
+construction authority. Each must contain exactly one explicit declaration of the form
+`<PHASE> ... IS THE SOLE NEXT DEED`, and the phase identifiers must agree. No subordinate live
+blueprint may contain that declaration. Historical evidence can say what was once next only after it
+has been moved under an archive/supersession banner or rewritten without live scheduling language.
 """
 
 from __future__ import annotations
@@ -125,6 +133,22 @@ REPO_OBJECT = re.compile(
 
 BANNERED = re.compile(
     r"\*\*SUPERSEDED\b|\bARCHIVE BANNER\b|\*\*ARCHIVED\b|\bARCHIVED-BODY PROVENANCE\b"
+)
+
+CURRENT_FRONTIER = re.compile(
+    r"^\*\*Current frontier:\*\*\s+(?P<phase>[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*)\s*$",
+    re.MULTILINE,
+)
+
+SUBORDINATE_SCHEDULING = re.compile(
+    r"\b(sole active|active\s+(?:corrective\s+)?construction\s+authority|"
+    r"sole\s+(?:current\s+)?frontier|sole\s+next\s+deed|current\s+deed|next\s+deed)\b",
+    re.IGNORECASE,
+)
+
+NON_SCHEDULING_STATUS = re.compile(
+    r"\*\*Status:\*\*[^\n]*(PARKED|COMPLETED|SUPERSEDED|ARCHIVED)\b",
+    re.IGNORECASE,
 )
 
 
@@ -201,9 +225,10 @@ def paragraphs(text: str) -> list[tuple[int, str]]:
     return out
 
 
-def read() -> tuple[list[Claim], list[str]]:
+def read() -> tuple[list[Claim], list[str], list[str]]:
     claims: list[Claim] = []
     active: list[str] = []
+    subordinate_frontiers: list[str] = []
 
     for document in scanned_documents():
         body = document.read_text(errors="replace")
@@ -239,8 +264,36 @@ def read() -> tuple[list[Claim], list[str]]:
                 if ACTIVE_PLAN.search(block) and "THE_ROADMAP" not in block:
                     active.append(relative)
                     break
+            if (
+                not NON_SCHEDULING_STATUS.search(body[:1000])
+                and SUBORDINATE_SCHEDULING.search(body)
+            ):
+                subordinate_frontiers.append(relative)
 
-    return claims, active
+    expected_frontiers: dict[str, list[str]] = {}
+    for relative in ("CONSTRUCTION_STATE.md", "blueprint/THE_ROADMAP.md"):
+        body = (ROOT / relative).read_text(errors="replace")
+        expected_frontiers[relative] = [
+            match.group("phase").upper() for match in CURRENT_FRONTIER.finditer(body)
+        ]
+
+    frontier_failures = list(subordinate_frontiers)
+    state = expected_frontiers["CONSTRUCTION_STATE.md"]
+    roadmap = expected_frontiers["blueprint/THE_ROADMAP.md"]
+    if len(state) != 1:
+        frontier_failures.append(
+            f"CONSTRUCTION_STATE.md declares {len(state)} sole next deeds: {state}"
+        )
+    if len(roadmap) != 1:
+        frontier_failures.append(
+            f"blueprint/THE_ROADMAP.md declares {len(roadmap)} sole next deeds: {roadmap}"
+        )
+    if len(state) == 1 and len(roadmap) == 1 and state[0] != roadmap[0]:
+        frontier_failures.append(
+            f"position/roadmap frontier mismatch: {state[0]} != {roadmap[0]}"
+        )
+
+    return claims, active, frontier_failures
 
 
 def main() -> int:
@@ -249,12 +302,21 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="machine-readable")
     arguments = parser.parse_args()
 
-    claims, active = read()
+    claims, active, frontier_failures = read()
     unmeasured = [c for c in claims if not c.passes]
 
     if arguments.json:
-        print(json.dumps({"claims": [c.__dict__ for c in claims], "active_plans": active}, indent=2))
-        return 1 if unmeasured or active else 0
+        print(
+            json.dumps(
+                {
+                    "claims": [c.__dict__ for c in claims],
+                    "active_plans": active,
+                    "frontier_failures": frontier_failures,
+                },
+                indent=2,
+            )
+        )
+        return 1 if unmeasured or active or frontier_failures else 0
 
     for claim in unmeasured:
         missing = ", ".join(
@@ -272,6 +334,14 @@ def main() -> int:
                 "blueprint/THE_ROADMAP.md as what it is active under"
             )
 
+    if frontier_failures:
+        print()
+        for failure in frontier_failures:
+            if failure.startswith("blueprint/"):
+                print(f"SUBORDINATE-FRONTIER {failure} declares a sole next deed")
+            else:
+                print(f"FRONTIER {failure}")
+
     if arguments.all:
         for claim in (c for c in claims if c.passes):
             mark = "retired" if claim.retired else "measured"
@@ -279,11 +349,13 @@ def main() -> int:
 
     print(
         f"FAILURES (a governing document asserts an absence it cannot re-measure, or "
-        f"a subordinate plan does not name the roadmap): {len(unmeasured) + len(active)}; "
+        f"a subordinate plan does not name the roadmap, or frontier declarations disagree): "
+        f"{len(unmeasured) + len(active) + len(frontier_failures)}; "
         f"absence claims {len(claims)}: {len(claims) - len(unmeasured)} carry command and date, "
-        f"{len(unmeasured)} do not; unsubordinated plans {len(active)}"
+        f"{len(unmeasured)} do not; unsubordinated plans {len(active)}; "
+        f"frontier failures {len(frontier_failures)}"
     )
-    return 1 if unmeasured or active else 0
+    return 1 if unmeasured or active or frontier_failures else 0
 
 
 if __name__ == "__main__":

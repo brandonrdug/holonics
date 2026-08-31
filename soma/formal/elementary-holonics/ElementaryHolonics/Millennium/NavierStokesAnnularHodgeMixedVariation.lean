@@ -736,7 +736,8 @@ theorem norm_adjacentHodgeJacobianKernelEntry_firstAbel_le
   rw [adjacentHodgeJacobianKernelEntry_firstAbel, norm_mul]
   have hbase :
       ‖UnitAddTorus.mFourier (adjacentApertureBaseFrequency radius) q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+      fourier_apply, Circle.norm_coe, Finset.prod_const_one]
   rw [hbase, one_mul]
   exact (norm_finiteCharacterSynthesisThree_le_mass
     (annularHodgeCubeSecondDifferenceFirst radius component coordinate input)
@@ -799,7 +800,8 @@ theorem norm_adjacentHodgeJacobianKernelEntry_tripleAbel_le_mixedMass
   rw [adjacentHodgeJacobianKernelEntry_tripleAbel, norm_mul]
   have hbase :
       ‖UnitAddTorus.mFourier (adjacentApertureBaseFrequency radius) q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+      fourier_apply, Circle.norm_coe, Finset.prod_const_one]
   rw [hbase, one_mul]
   apply norm_finiteCharacterSynthesisThree_le_mass
   all_goals rw [fourier_apply]

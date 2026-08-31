@@ -89,7 +89,11 @@ theorem reconstructedFiniteOrderComplexComponent_zero_eq_weightedVelocity
   have hcomplex := congrFun
     (complexifySpace_reconstructedTorusReal
       (hreal t) (euclideanToSpatialTorus x)) component
-  simpa only [reconstructedTorusComplex_apply] using hcomplex.symm
+  change
+    ((reconstructedTorusReal (base t) (euclideanToSpatialTorus x) component : ℝ) : ℂ) =
+      reconstructedTorusComplex (base t) (euclideanToSpatialTorus x) component at hcomplex
+  rw [reconstructedTorusComplex_apply] at hcomplex
+  exact hcomplex.symm
 
 /-- Two actual diagonal Fréchet derivatives of the lift's empty-word reconstruction are exactly
 the reconstructed length-two diagonal word. -/
@@ -114,9 +118,10 @@ theorem secondFDeriv_reconstructedFiniteOrderComplexComponent_zero
     2 1 (by omega) oneWord (tower.lift 2 t) component
   let e : Space := EuclideanSpace.single coordinate 1
   have hf₀ : ContDiff ℝ 3 f₀ := by
-    simpa only [f₀, reconstructedHigherOrderComplexComponent] using
-      contDiff_reconstructedHigherOrderComplexComponent
-        2 (tower.lift 2 t) component
+    change ContDiff ℝ (2 + 1)
+      (reconstructedHigherOrderComplexComponent 2 (tower.lift 2 t) component)
+    exact contDiff_reconstructedHigherOrderComplexComponent
+      2 (tower.lift 2 t) component
   have hDf₀ : DifferentiableAt ℝ (fderiv ℝ f₀) x :=
     (hf₀.fderiv_right (m := 2) (by norm_num)).differentiable
       (by norm_num) x

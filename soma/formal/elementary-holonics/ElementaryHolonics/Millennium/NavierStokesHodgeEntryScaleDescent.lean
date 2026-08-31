@@ -119,7 +119,7 @@ theorem hodgeEntry112_remainderLedgerSum_eq_groupedReturn
       hodgeEntry112GroupedActiveReturn, oneOneTwoRemoveOne,
       oneOneTwoFirstMultiplicity, oneEachAxisRemoveOne, Fin.sum_univ_succ,
       difference_shift_of_interchange coordinateTransport coordinateTransport_interchange,
-      difference, shift, coordinateTransport, coordinateStep, frequencySquared] <;> ring
+      difference, shift, fwdDiff, coordinateTransport, coordinateStep, frequencySquared] <;> ring
 
 /-- Every `112` word annihilates the quadratic Hodge numerator. -/
 theorem differenceWord_hodgeJacobianRatioNumerator_oneOneTwo_eq_zero
@@ -600,7 +600,7 @@ theorem hodgeEntry122_remainderLedgerSum_eq_groupedReturn
       hodgeEntry122GroupedActiveReturn, oneTwoTwoRemoveOne, oneTwoTwoRemoveTwo,
       oneTwoTwoFirstMultiplicity, Fin.sum_univ_succ,
       difference_shift_of_interchange coordinateTransport coordinateTransport_interchange,
-      difference, shift, coordinateTransport, coordinateStep, frequencySquared] <;> ring
+      difference, shift, fwdDiff, coordinateTransport, coordinateStep, frequencySquared] <;> ring
 
 /-- Every `122` word annihilates the quadratic Hodge numerator. -/
 theorem differenceWord_hodgeJacobianRatioNumerator_oneTwoTwo_eq_zero
@@ -809,7 +809,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 2 (threeAxisStencilPoint 0 1 2 frequency 0 1 0)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
         · have hsub := hstencil'.rebase
               (firstOffset := 0) (secondOffset := 0) (thirdOffset := 1)
@@ -818,7 +818,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 1 (threeAxisStencilPoint 0 1 2 frequency 0 0 1)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
       · intro axis haxis
         fin_cases axis
@@ -859,7 +859,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 2 (threeAxisStencilPoint 0 1 2 frequency 1 0 0)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
         · have hraw := norm_hodgeJacobianMultiplierEntry_pairWord_two_two_le
             hlower hbound 0 2 (by decide)
@@ -875,7 +875,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 0 (threeAxisStencilPoint 0 1 2 frequency 0 0 1)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
       · intro axis haxis
         fin_cases axis
@@ -916,7 +916,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 1 (threeAxisStencilPoint 0 1 2 frequency 1 0 0)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
         · have hsub := hstencil'.rebase
               (firstOffset := 0) (secondOffset := 1) (thirdOffset := 0)
@@ -925,7 +925,7 @@ theorem norm_hodgeJacobianMultiplierEntry_oneTwoTwo_le_of_controlled
           have hraw := norm_hodgeJacobianMultiplierEntry_oneOneTwo_le_of_controlled
             hlower hbound 0 (threeAxisStencilPoint 0 1 2 frequency 0 1 0)
             component coordinate input hsub
-          simpa [entry, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+          simpa [entry, oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
             coordinateTransport] using hraw
         · have hraw := norm_hodgeJacobianMultiplierEntry_pairWord_two_two_le
             hlower hbound 0 1 (by decide)

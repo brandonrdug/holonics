@@ -1,0 +1,524 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 920,
+      "title": "Atlas — one native complex, four faces",
+      "page": "page-atlas"
+    },
+    {
+      "file": "AtlasMatrix.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1560,
+      "h": 1100,
+      "title": "Atlas 2 — the ten references and what each lends",
+      "page": "page-atlas"
+    },
+    {
+      "file": "ViewTrace.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 1040,
+      "title": "View 1 — Trace: the proof as a debugger",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewGrowth.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1560,
+      "h": 980,
+      "title": "View 5 — Growth: program → lattice",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewLattice.dc.html",
+      "x": 0,
+      "y": 1200,
+      "w": 1560,
+      "h": 1000,
+      "title": "View 3 — Lattice: nD geometry with a projection chart",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewTransport.dc.html",
+      "x": 1660,
+      "y": 1200,
+      "w": 1560,
+      "h": 1000,
+      "title": "View 4 — Transport: action over the lattice, exactly",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewNotation.dc.html",
+      "x": 0,
+      "y": 2360,
+      "w": 1400,
+      "h": 900,
+      "title": "View 7 — Notation: typed Dirac primitives",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewInteraction.dc.html",
+      "x": 1500,
+      "y": 2360,
+      "w": 1400,
+      "h": 900,
+      "title": "View 8 — Interaction: the Feynman vertex as a typed component",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewConstraints.dc.html",
+      "x": 0,
+      "y": 3420,
+      "w": 1400,
+      "h": 860,
+      "title": "View 9 — Constraint and DOF inspector",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewProvenance.dc.html",
+      "x": 1500,
+      "y": 3420,
+      "w": 1400,
+      "h": 860,
+      "title": "View 10 — Provenance and grades",
+      "page": "page-views"
+    },
+    {
+      "file": "LibPortKinds.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 900,
+      "title": "Library 0 — port kinds and the contact rules (ERC)",
+      "page": "page-library"
+    },
+    {
+      "file": "LibParametron.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1400,
+      "h": 820,
+      "title": "Library 1 — Complex Parametron",
+      "page": "page-library"
+    },
+    {
+      "file": "LibReceiver.dc.html",
+      "x": 0,
+      "y": 1060,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 2 — Receiver ⟨ρ|",
+      "page": "page-library"
+    },
+    {
+      "file": "LibTransport.dc.html",
+      "x": 1500,
+      "y": 1060,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 3 — Transport X",
+      "page": "page-library"
+    },
+    {
+      "file": "LibDeposit.dc.html",
+      "x": 0,
+      "y": 1980,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 4 — Deposit |a⟩⟨a|",
+      "page": "page-library"
+    },
+    {
+      "file": "LibJunction.dc.html",
+      "x": 1500,
+      "y": 1980,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 5 — Junction (+/−)",
+      "page": "page-library"
+    },
+    {
+      "file": "LibVertex.dc.html",
+      "x": 0,
+      "y": 2900,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 6 — Interaction vertex",
+      "page": "page-library"
+    },
+    {
+      "file": "LibMembrane.dc.html",
+      "x": 1500,
+      "y": 2900,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 7 — Membrane",
+      "page": "page-library"
+    },
+    {
+      "file": "LibSite.dc.html",
+      "x": 0,
+      "y": 3820,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 8 — Site and oriented edge",
+      "page": "page-library"
+    },
+    {
+      "file": "LibPump.dc.html",
+      "x": 1500,
+      "y": 3820,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 9 — Pump / drive",
+      "page": "page-library"
+    },
+    {
+      "file": "LibCoupling.dc.html",
+      "x": 0,
+      "y": 4740,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 10 — Coupling",
+      "page": "page-library"
+    },
+    {
+      "file": "LibQuotient.dc.html",
+      "x": 1500,
+      "y": 4740,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 11 — Quotient / lock",
+      "page": "page-library"
+    },
+    {
+      "file": "LibChart.dc.html",
+      "x": 0,
+      "y": 5660,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 12 — Chart / projection receiver",
+      "page": "page-library"
+    },
+    {
+      "file": "LibTactic.dc.html",
+      "x": 1500,
+      "y": 5660,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 13 — Tactic swing",
+      "page": "page-library"
+    },
+    {
+      "file": "LibHypGoal.dc.html",
+      "x": 0,
+      "y": 6580,
+      "w": 1400,
+      "h": 760,
+      "title": "Library 14 — Hypothesis and goal",
+      "page": "page-library"
+    },
+    {
+      "file": "ViewSchematic.dc.html",
+      "x": 0,
+      "y": 4440,
+      "w": 1560,
+      "h": 1000,
+      "title": "View 2 — Schematic: components and nets",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewLibraryBrowser.dc.html",
+      "x": 1660,
+      "y": 4440,
+      "w": 1400,
+      "h": 900,
+      "title": "View 6 — Component library browser",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewWorkspace.dc.html",
+      "x": 0,
+      "y": 5600,
+      "w": 1560,
+      "h": 1000,
+      "title": "View 11 — Workspace: one selection, four faces",
+      "page": "page-views"
+    },
+    {
+      "file": "ViewAutoformalize.dc.html",
+      "x": 1660,
+      "y": 5600,
+      "w": 1560,
+      "h": 1000,
+      "title": "View 12 — Auto-formalization: an agent proposes swings, no chooser",
+      "page": "page-views"
+    },
+    {
+      "file": "TypesOntology.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 1060,
+      "title": "Types 1 — the ontology every face is drawn from",
+      "page": "page-ontology"
+    },
+    {
+      "file": "TypesTrace.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1560,
+      "h": 980,
+      "title": "Types 2 — the trace: what paperproof emits and what the CAD keeps",
+      "page": "page-ontology"
+    },
+    {
+      "file": "TypesCarrier.dc.html",
+      "x": 0,
+      "y": 1220,
+      "w": 1560,
+      "h": 960,
+      "title": "Types 3 — the Complex Parametron carrier as a computational object",
+      "page": "page-ontology"
+    },
+    {
+      "file": "MachExtract.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1400,
+      "h": 860,
+      "title": "Machinery 1 — Lean → trace: extraction as a receiver",
+      "page": "page-machinery"
+    },
+    {
+      "file": "MachGrow.dc.html",
+      "x": 1500,
+      "y": 0,
+      "w": 1400,
+      "h": 860,
+      "title": "Machinery 2 — program → lattice: evaluate, grow, normalize",
+      "page": "page-machinery"
+    },
+    {
+      "file": "MachSolve.dc.html",
+      "x": 0,
+      "y": 1020,
+      "w": 1400,
+      "h": 820,
+      "title": "Machinery 4 — constraints: request → entity → param → equation → solve",
+      "page": "page-machinery"
+    },
+    {
+      "file": "MachIdentity.dc.html",
+      "x": 1500,
+      "y": 1020,
+      "w": 1400,
+      "h": 820,
+      "title": "Machinery 7 — identity, history and the file",
+      "page": "page-machinery"
+    },
+    {
+      "file": "MachNets.dc.html",
+      "x": 0,
+      "y": 2000,
+      "w": 1400,
+      "h": 820,
+      "title": "Machinery 3 — schematic → nets: the connection graph",
+      "page": "page-machinery"
+    },
+    {
+      "file": "MachRecompute.dc.html",
+      "x": 1500,
+      "y": 2000,
+      "w": 1400,
+      "h": 820,
+      "title": "Machinery 6 — the document DAG and recompute",
+      "page": "page-machinery"
+    },
+    {
+      "file": "CratesComposition.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 1060,
+      "title": "Crates 1 — what already exists, face by face",
+      "page": "page-crates"
+    },
+    {
+      "file": "CratesBranch.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1560,
+      "h": 1000,
+      "title": "Crates 2 — the branch, its absent types, and what must not be founded",
+      "page": "page-crates"
+    },
+    {
+      "file": "TheDescentAtFive.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1560,
+      "h": 1070,
+      "title": "The descent at five (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    },
+    {
+      "file": "TheBands.dc.html",
+      "x": 1660,
+      "y": 0,
+      "w": 1520,
+      "h": 1000,
+      "title": "The bands (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    },
+    {
+      "file": "RubikBoard.dc.html",
+      "x": 0,
+      "y": 1230,
+      "w": 1180,
+      "h": 780,
+      "title": "The held cube (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    },
+    {
+      "file": "AlgebraGeometry.dc.html",
+      "x": 1280,
+      "y": 1230,
+      "w": 1400,
+      "h": 800,
+      "title": "Solving trees (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    },
+    {
+      "file": "NumberShapes.dc.html",
+      "x": 0,
+      "y": 2190,
+      "w": 1340,
+      "h": 720,
+      "title": "Shapes of the naturals (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    },
+    {
+      "file": "SolverBoard.dc.html",
+      "x": 1440,
+      "y": 2190,
+      "w": 1400,
+      "h": 900,
+      "title": "Solver board (archived)",
+      "page": "page-archive",
+      "is_interactive": true
+    }
+  ],
+  "annotations": [
+    {
+      "id": "n-atlas-1",
+      "x": 1680,
+      "y": 0,
+      "w": 300,
+      "text": "Reading order: Atlas → Ontology → Views → Library → Machinery → Crates. Each artboard names its sources (canon path or reference repo + commit). Nothing here schedules construction; the roadmap is CONS1 and UAR is frozen.",
+      "page": "page-atlas"
+    },
+    {
+      "id": "n-atlas-2",
+      "x": 1680,
+      "y": 200,
+      "w": 300,
+      "text": "Starred references (paperproof, MorphoHDL, OpenSCAD, SolveSpace, KiCad) each own at least one Views artboard and one Machinery artboard; the five others contribute rows to Library 0, Machinery 3/6/7 and this matrix.",
+      "page": "page-atlas"
+    },
+    {
+      "id": "n-views-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "Twelve faces of one workspace. Each artboard is a low-fidelity wireframe: boxes and labels are real (types, ids, receipts), positions are not. Species colour tells you what a control does; a dashed border is an obstruction that stays visible.",
+      "page": "page-views"
+    },
+    {
+      "id": "n-ontology-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "Type sheets are readings of canon definitions with path:line citations. The Crate page says which existing Rust/Lean owner already carries each one.",
+      "page": "page-ontology"
+    },
+    {
+      "id": "n-library-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "Every component is a KiCad-style triple (symbol · footprint · model) plus a MorphoHDL rule with a fallback and SolveSpace-style constraints. Library 0 is the contact-rule matrix every net is checked against.",
+      "page": "page-library"
+    },
+    {
+      "id": "n-machinery-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "Pipelines lifted from the references and retyped: each stage carries its species; the boundary panel says what canon refuses.",
+      "page": "page-machinery"
+    },
+    {
+      "id": "n-archive-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "The previous draft (The descent at five) and the cached prototypes, unchanged. Their vocabulary — species colours, box kinds, STIX/Plex faces — is what the new pages inherit.",
+      "page": "page-archive"
+    },
+    {
+      "id": "n-crates-1",
+      "x": 1680,
+      "y": 0,
+      "w": 320,
+      "text": "Grade of this page: interpretation. It names existing owners by exact path and the absent types by exact field; it schedules nothing. The roadmap's CONS2 size ratchets would govern any of these modules.",
+      "page": "page-crates"
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-atlas"
+  },
+  "pages": [
+    {
+      "id": "page-atlas",
+      "name": "Atlas"
+    },
+    {
+      "id": "page-ontology",
+      "name": "Ontology and types"
+    },
+    {
+      "id": "page-views",
+      "name": "Views"
+    },
+    {
+      "id": "page-library",
+      "name": "Component library"
+    },
+    {
+      "id": "page-machinery",
+      "name": "Machinery"
+    },
+    {
+      "id": "page-crates",
+      "name": "Crate branch"
+    },
+    {
+      "id": "page-archive",
+      "name": "Archive"
+    }
+  ]
+}

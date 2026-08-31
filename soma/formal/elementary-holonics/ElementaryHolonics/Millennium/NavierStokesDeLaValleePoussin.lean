@@ -179,6 +179,8 @@ def tensorValleePoussinKernel (radius : ℕ) : C(SpatialTorus, ℂ) where
 theorem integral_fourier_neg_mul_fourier (first second : ℤ) :
     ∫ q : UnitAddCircle, fourier (-first) q * fourier second q =
       if first = second then 1 else 0 := by
+  change (∫ q : UnitAddCircle, fourier (-first) q * fourier second q
+      ∂AddCircle.haarAddCircle) = if first = second then 1 else 0
   simpa only [ContinuousMap.inner_toLp, ← fourier_neg, ← fourier_add, add_comm] using
     (orthonormal_iff_ite.mp (@orthonormal_fourier 1 ⟨by norm_num⟩)) first second
 
@@ -391,6 +393,8 @@ theorem integral_norm_coordinateHatKernel (radius : ℕ) :
     _ = (∫ q : UnitAddCircle, coordinateHatKernel radius q).re :=
       integral_re hkernelIntegrable
     _ = 1 := by
+      change (∫ q : UnitAddCircle, coordinateHatKernel radius q
+        ∂AddCircle.haarAddCircle).re = 1
       simpa using congrArg Complex.re hcoefficient
 
 /-- A coordinate de la Vallée Poussin factor has `L1` norm at most `2 + 1 = 3`, uniformly in

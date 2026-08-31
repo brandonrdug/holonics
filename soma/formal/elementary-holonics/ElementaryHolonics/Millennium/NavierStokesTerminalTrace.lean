@@ -126,7 +126,7 @@ theorem terminalApproachTailTime_cauchy
   have hreal : CauchySeq (terminalApproachTime a T) :=
     (terminalApproachTime_tendsto a T).cauchySeq
   rw [Metric.cauchySeq_iff'] at hreal ⊢
-  simpa [terminalApproachTailTime] using hreal
+  simpa [terminalApproachTailTime, Subtype.dist_eq] using hreal
 
 /-- A strict-interior velocity slice descended to the genuine compact spatial torus. -/
 def tailTorusVelocitySlice
@@ -180,7 +180,8 @@ theorem UniformTorusVelocityTailControl.closedPreterminal_lipschitz
     LipschitzWith control.timeLipschitzConstant
       (closedPreterminalTorusVelocitySlice solution control.base_pos) := by
   intro s t
-  simpa [closedPreterminalTorusVelocitySlice, closedPreterminalToTailTime] using
+  simpa [closedPreterminalTorusVelocitySlice, closedPreterminalToTailTime,
+    Subtype.edist_eq] using
     control.timeLipschitz (closedPreterminalToTailTime s) (closedPreterminalToTailTime t)
 
 /-- Canonical full-tail extension to the terminal face. -/
@@ -221,8 +222,9 @@ theorem UniformTorusVelocityTailControl.tendsto_fullTailTrace_dyadic
       atTop (𝓝 control.fullTailTrace) := by
   have h := control.tendsto_fullTailTrace.comp
     (terminalApproachClosedPreterminalTime_tendsto control.base_lt_terminal)
-  simpa [closedPreterminalTorusVelocitySlice, closedPreterminalToTailTime,
-    terminalApproachClosedPreterminalTime, terminalApproachTailTime] using h
+  convert h using 1
+  funext n
+  rfl
 
 /-- A continuous genuine-torus field reached as the uniform limit of the addressed interior
 velocity slices. -/

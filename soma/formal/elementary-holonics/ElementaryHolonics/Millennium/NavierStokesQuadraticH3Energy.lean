@@ -119,8 +119,13 @@ theorem openPeriodicSolutionOn_coordinateJetField_contDiffOn
     evaluate.contDiff.contDiffAt.comp z hjet
   have hfinal : ContDiffAt ℝ ∞
       (Function.uncurry (coordinateJetField velocity n word)) z := by
-    simpa [coordinateJetField, coordinateJet, evaluate, Function.comp_def,
-      Function.uncurry] using hevaluate
+    have hfun : Function.uncurry (coordinateJetField velocity n word) =
+        (fun z ↦ (iteratedFDeriv ℝ n (Function.uncurry velocity) z)
+          (coordinateWordDirections word)) := by
+      funext z
+      rfl
+    rw [hfun]
+    exact hevaluate
   exact hfinal.contDiffWithinAt
 
 /-- Every individual coordinate square is integrable on one periodic cube at an interior time. -/
@@ -240,7 +245,15 @@ theorem openPeriodicSolutionOn_hasDerivAt_coordinateH3Energy
     exact HasDerivAt.fun_sum fun word _hword ↦ hword n word
   have houter := HasDerivAt.fun_sum (u := Finset.univ)
     (fun n _hn ↦ hinner n)
-  simpa [coordinateH3Energy, coordinateH3TimeWork] using houter
+  change HasDerivAt
+    (fun τ ↦ ∑ n : Fin 4, ∑ word : Fin (n : ℕ) → Fin 3,
+      periodicKineticEnergy (coordinateJetField velocity n word) τ)
+    (∑ n : Fin 4, ∑ word : Fin (n : ℕ) → Fin 3,
+      ∫ x in unitCube,
+        inner ℝ
+          (eulerianTimeJet (coordinateJetField velocity n word) x t)
+          (coordinateJet velocity n word x t)) t
+  exact houter
 
 /-! ## Periodic top-transport cancellation -/
 

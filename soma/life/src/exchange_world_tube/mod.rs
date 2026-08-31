@@ -18,22 +18,21 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub use continuation::{
-    ContinuationAperture, ContinuationExclusion, ContinuationFamily, ContinuationPartition,
-    ContinuationWorldWindow, MessageAddress, ShortestHistorySeparator,
-    derive_continuation_aperture,
+    derive_continuation_aperture, ContinuationAperture, ContinuationExclusion, ContinuationFamily,
+    ContinuationPartition, ContinuationWorldWindow, MessageAddress, ShortestHistorySeparator,
 };
-pub use mount::{ExchangeContainerSpec, ExchangeMountError, mount_exchange_world_tube_on_device};
+pub use mount::{mount_exchange_world_tube_on_device, ExchangeContainerSpec, ExchangeMountError};
 pub use receiver::{
     BranchPermutationReceipt, ExactJoinPopulation, LineageAblationReceipt, ScalarJoinWitness,
 };
 pub use rest::{
-    EXCHANGE_REST_PREFIX, VisibleMessageProjection, exchange_world_tube_rest_digest,
-    remount_exchange_world_tube, remount_visible_message_projection,
-    write_exchange_world_tube_rest,
+    exchange_world_tube_rest_digest, remount_exchange_world_tube,
+    remount_visible_message_projection, write_exchange_world_tube_rest, VisibleMessageProjection,
+    EXCHANGE_REST_PREFIX,
 };
 pub use source::{
-    CompleteExchangeSource, VisibleProjectionReceipt, attach_visible_exchange_faces,
-    discover_complete_exchange_aperture,
+    attach_visible_exchange_faces, discover_complete_exchange_aperture, CompleteExchangeSource,
+    VisibleProjectionReceipt,
 };
 
 /// One exact SHA-256 content address. It is not an occurrence identity.
@@ -346,6 +345,13 @@ mod tests {
         let rest = root.join("rest.ewtb");
         write_exchange_world_tube_rest(&world, &rest).unwrap();
         assert_eq!(remount_exchange_world_tube(&rest).unwrap(), world);
+        let projection = remount_visible_message_projection(&rest).unwrap();
+        assert_eq!(
+            projection.source_occurrence_sha256,
+            world.source_occurrence_sha256
+        );
+        assert_eq!(projection.content_law_sha256, world.content_law_sha256);
+        assert_eq!(projection.messages, world.visible_messages);
         std::fs::remove_dir_all(root).unwrap();
     }
 }

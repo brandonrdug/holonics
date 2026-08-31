@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.Calculus.Deriv.Add
 import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
 
 /-!
@@ -118,7 +119,7 @@ theorem solutionMaterialPolygon_deriv_velocityAlongVertex_eq_time_add_advection
   have hvertexDerivative := materialPolygon_deriv_vertex_eq_velocity_positive body.polygon i ht
   have hpair : HasDerivAt (fun τ => (body.polygon.vertex τ i, τ))
       (velocity x t, 1) t := by
-    have := hvertex.hasDerivAt.prodMk (hasDerivAt_id t)
+    have := (hvertex.hasFDerivAt.prodMk (hasDerivAt_id t).hasFDerivAt).hasDerivAt
     simpa [x, hvertexDerivative] using this
   have hcomposition := hvelocity.hasFDerivAt.comp_hasDerivAt_of_eq t hpair (by simp [x])
   calc
@@ -211,7 +212,7 @@ theorem solutionMaterialPolygon_deriv_symmetricVelocityCirculation
     have hvertexDerivative := materialPolygon_deriv_vertex_eq_velocity_positive body.polygon i ht
     have hpair : HasDerivAt (fun τ => (body.polygon.vertex τ i, τ))
         (velocity (body.polygon.vertex t i) t, 1) t := by
-      have h := hvertex.hasDerivAt.prodMk (hasDerivAt_id t)
+      have h := (hvertex.hasFDerivAt.prodMk (hasDerivAt_id t).hasFDerivAt).hasDerivAt
       simpa [hvertexDerivative] using h
     have hcomposition := hvelocity.hasFDerivAt.comp_hasDerivAt_of_eq t hpair (by simp)
     have hpath : HasDerivAt (fun τ => velocity (body.polygon.vertex τ i) τ)
@@ -222,20 +223,37 @@ theorem solutionMaterialPolygon_deriv_symmetricVelocityCirculation
     rw [← hpath.deriv,
       solutionMaterialPolygon_deriv_velocityAlongVertex_eq_momentumReturn body i ht]
     rfl
+  have hspanSub (a b : Space) :
+      (ContinuousLinearMap.toSpanSingleton ℝ a -
+        ContinuousLinearMap.toSpanSingleton ℝ b) 1 = a - b := by
+    rw [ContinuousLinearMap.sub_apply,
+      ContinuousLinearMap.toSpanSingleton_apply_one,
+      ContinuousLinearMap.toSpanSingleton_apply_one]
+  have hspanAvg (a b : Space) :
+      ((2 : ℝ)⁻¹ • (ContinuousLinearMap.toSpanSingleton ℝ a +
+        ContinuousLinearMap.toSpanSingleton ℝ b)) 1 =
+        (2 : ℝ)⁻¹ • a + (2 : ℝ)⁻¹ • b := by
+    rw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.add_apply,
+      ContinuousLinearMap.toSpanSingleton_apply_one,
+      ContinuousLinearMap.toSpanSingleton_apply_one]
+    rw [smul_add]
   have hedge : ∀ i : PolygonIndex extra,
       HasDerivAt (fun τ => body.polygon.edgeAt τ i)
         (current (cyclicSuccessor extra i) - current i) t := by
     intro i
-    simpa [MaterialPolygon.edgeAt, MaterialPolygon.snapshot, edge] using
-      (hvertex (cyclicSuccessor extra i)).sub (hvertex i)
+    convert (((hvertex (cyclicSuccessor extra i)).hasFDerivAt.sub
+      (hvertex i).hasFDerivAt).hasDerivAt) using 1 <;> try rfl
+    exact (hspanSub _ _).symm
   have hsymmetricCurrent : ∀ i : PolygonIndex extra,
       HasDerivAt
         (fun τ => symmetricEdgeCurrent
           (fun j => velocity (body.polygon.vertex τ j) τ) i)
         (symmetricEdgeCurrent acceleration i) t := by
     intro i
-    simpa [symmetricEdgeCurrent] using
-      ((hcurrent i).add (hcurrent (cyclicSuccessor extra i))).const_smul ((2 : ℝ)⁻¹)
+    convert ((((hcurrent i).hasFDerivAt.add
+      (hcurrent (cyclicSuccessor extra i)).hasFDerivAt).const_smul ((2 : ℝ)⁻¹)).hasDerivAt) using 1 <;>
+      try rfl
+    simpa [symmetricEdgeCurrent] using (hspanAvg _ _).symm
   have hedgeTerm : ∀ i : PolygonIndex extra,
       HasDerivAt
         (fun τ => inner ℝ
@@ -252,8 +270,10 @@ theorem solutionMaterialPolygon_deriv_symmetricVelocityCirculation
         ∑ i, (inner ℝ (symmetricEdgeCurrent current i)
               (current (cyclicSuccessor extra i) - current i) +
             inner ℝ (symmetricEdgeCurrent acceleration i) (body.polygon.edgeAt t i)) := by
-      simpa [MaterialPolygon.symmetricVelocityCirculation, symmetricPolygonalCirculation,
-        MaterialPolygon.edgeAt, MaterialPolygon.snapshot] using hsum.deriv
+      change deriv (fun y => ∑ i, inner ℝ
+          (symmetricEdgeCurrent (fun j => velocity (body.polygon.vertex y j) y) i)
+          (edge (body.polygon.vertex y) i)) t = _
+      exact hsum.deriv
     _ = symmetricEdgeMotionReturn current +
         symmetricEdgePairing acceleration (body.polygon.snapshot t) := by
       rw [Finset.sum_add_distrib]

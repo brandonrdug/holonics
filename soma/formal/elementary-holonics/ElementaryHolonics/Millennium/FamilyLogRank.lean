@@ -119,10 +119,10 @@ theorem theAlgebraicRankIsLogarithmicallyBoundedAtEveryModulus (n r : ℕ)
       intro hc
       nlinarith [hc, hnq]
   set T : Fin 3 → (FamilyFace.E ((n : ℚ))).Point :=
-    ![0, Point.some h00, Point.some hn0] with hT
+    ![0, Point.some 0 0 h00, Point.some (n : ℚ) 0 hn0] with hT
   have hT0 : T 0 = 0 := rfl
-  have hT1 : T 1 = Point.some h00 := rfl
-  have hT2 : T 2 = Point.some hn0 := rfl
+  have hT1 : T 1 = Point.some 0 0 h00 := rfl
+  have hT2 : T 2 = Point.some (n : ℚ) 0 hn0 := rfl
   have htrio2 : ∀ b : Fin 3, T b + T b = 0 := by
     intro b
     rcases FamilyRankFin3.fin3_cases b with rfl | rfl | rfl

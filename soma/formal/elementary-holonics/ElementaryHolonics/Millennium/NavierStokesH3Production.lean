@@ -519,7 +519,7 @@ theorem openPeriodicSolutionOn_unforced_iteratedDeriv_three_componentLine_moment
         pressureGradientComponentLine p x direction component s) 0 at hthird
   rw [iteratedDeriv_fun_add htime.contDiffAt hadvection.contDiffAt,
     iteratedDeriv_fun_sub (contDiff_const.mul hviscous).contDiffAt hpressure.contDiffAt,
-    iteratedDeriv_const_mul hviscous.contDiffAt nu] at hthird
+    iteratedDeriv_const_mul nu hviscous.contDiffAt] at hthird
   simpa [u, p] using hthird
 
 /-- **Exact third-directional production law for the actual unforced solution.**  The leading

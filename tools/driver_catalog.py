@@ -3,6 +3,7 @@
 
     python3 tools/driver_catalog.py            # rewrite meta/DRIVER_CATALOG.tsv
     python3 tools/driver_catalog.py --check    # exit 1 if the ledger disagrees with the tree
+    python3 tools/driver_catalog.py --self-test # synthetic Cargo-target/helper control
 
 # Why this exists
 
@@ -52,20 +53,19 @@ its own gate column.
 from __future__ import annotations
 
 import argparse
+import json
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "meta" / "DRIVER_CATALOG.tsv"
 
-# Where drivers live. Discovery is a RECURSIVE walk for any `examples/` directory under `crates/` or
-# `soma/`, not a fixed-depth glob. The first draft of this tool used `*/examples/*.rs` and missed
-# three drivers on its first run — `soma/life/examples/audio_inscription/exact_pcm.rs` and
-# `.../exact_algorithm_ecology/algorithm_organ.rs` sit one directory deeper, and
-# `soma/tools/holon-plate/examples/emit_form.rs` sits under a nested crate. A catalog whose own
-# discovery can miss a driver is the defect it exists to prevent, one level down.
-DRIVER_ROOTS = ("crates", "soma")
+# Cargo metadata owns driver discovery. A recursive `examples/**/*.rs` walk confuses target roots
+# with their nested modules; a fixed-depth glob misses explicitly declared nested targets. Both
+# defects are eliminated by consuming Cargo's target graph.
 
 # Where a driver may be NAMED. `tools/` is included because a gate that runs a driver names it.
 NAMING_ROOTS = ("canon", "blueprint", "research", "meta", "tools", "papers")
@@ -90,6 +90,7 @@ OWNER_ROOTS = (
 
 FIELDS = (
     "driver",
+    "target",
     "crate",
     "lines",
     "owners",
@@ -100,6 +101,77 @@ FIELDS = (
     "named_in",
     "subject",
 )
+
+METADATA_TIMEOUT_SECONDS = 175
+
+
+def cargo_metadata(root: Path) -> dict[str, object]:
+    """Return Cargo's target graph without compiling a target.
+
+    Cargo, rather than a recursive filename walk, owns the distinction between an example target
+    and a Rust module stored below ``examples/``.  ``--no-deps`` is sufficient here because the
+    catalog needs target declarations, not the dependency closure.
+    """
+
+    try:
+        completed = subprocess.run(
+            [
+                "cargo",
+                "metadata",
+                "--format-version",
+                "1",
+                "--no-deps",
+            ],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=METADATA_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise RuntimeError(
+            f"cargo metadata exceeded {METADATA_TIMEOUT_SECONDS} seconds"
+        ) from error
+    if completed.returncode != 0:
+        detail = completed.stderr.strip() or completed.stdout.strip()
+        raise RuntimeError(f"cargo metadata failed: {detail}")
+    try:
+        payload = json.loads(completed.stdout)
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f"cargo metadata returned invalid JSON: {error}") from error
+    if not isinstance(payload, dict):
+        raise RuntimeError("cargo metadata did not return a JSON object")
+    return payload
+
+
+def example_targets(root: Path = ROOT) -> list[tuple[str, Path, Path]]:
+    """Return ``(target name, source, crate root)`` for every real Cargo example target."""
+
+    root = root.resolve()
+    targets: list[tuple[str, Path, Path]] = []
+    for package in cargo_metadata(root).get("packages", []):
+        if not isinstance(package, dict):
+            continue
+        manifest = Path(str(package["manifest_path"])).resolve()
+        crate = manifest.parent
+        for target in package.get("targets", []):
+            if not isinstance(target, dict) or "example" not in target.get("kind", []):
+                continue
+            source = Path(str(target["src_path"])).resolve()
+            try:
+                source.relative_to(root)
+                crate.relative_to(root)
+            except ValueError as error:
+                raise RuntimeError(
+                    f"Cargo example target {target.get('name')!r} is outside {root}"
+                ) from error
+            if not source.is_file():
+                raise RuntimeError(
+                    f"Cargo example target {target.get('name')!r} has no source at {source}"
+                )
+            targets.append((str(target["name"]), source, crate))
+    targets.sort(key=lambda item: (str(item[1]), item[0]))
+    return targets
 
 
 def strip_comments(source: str) -> str:
@@ -205,40 +277,74 @@ def naming_corpus() -> list[str]:
     return texts
 
 
-def rows() -> list[dict[str, str]]:
+def rows(root: Path = ROOT) -> list[dict[str, str]]:
     output_names, closure_names = manifest_membership()
     corpus = naming_corpus()
     collected = []
-    discovered = set()
-    for root in DRIVER_ROOTS:
-        base = ROOT / root
-        if not base.is_dir():
-            continue
-        for examples in base.rglob("examples"):
-            if not examples.is_dir():
-                continue
-            for path in examples.rglob("*.rs"):
-                discovered.add(path)
-    for path in sorted(discovered):
+    for target_name, path, crate in example_targets(root):
         source = path.read_text(errors="ignore")
         code = strip_comments(source)
         stem = path.stem
-        named = sum(1 for text in corpus if stem in text)
+        named = sum(1 for text in corpus if stem in text or target_name in text)
         collected.append(
             {
-                "driver": str(path.relative_to(ROOT)),
-                "crate": str(path.relative_to(ROOT)).split("/examples/")[0],
+                "driver": str(path.relative_to(root)),
+                "target": target_name,
+                "crate": str(crate.relative_to(root)),
                 "lines": str(len(source.splitlines())),
                 "owners": ";".join(owners_of(code)) or "-",
                 "declared_source": takes_declared_source(code),
                 "exterior": exterior_of(code),
-                "output_manifest": "yes" if stem in output_names else "no",
-                "closure_manifest": "yes" if stem in closure_names else "no",
+                "output_manifest": (
+                    "yes" if stem in output_names or target_name in output_names else "no"
+                ),
+                "closure_manifest": (
+                    "yes" if stem in closure_names or target_name in closure_names else "no"
+                ),
                 "named_in": str(named),
                 "subject": subject_of(source) or "-",
             }
         )
     return collected
+
+
+def self_test() -> None:
+    """Prove that Cargo targets enter while nested helper modules do not become drivers."""
+
+    with tempfile.TemporaryDirectory(prefix="holonics-driver-catalog-") as temporary:
+        root = Path(temporary)
+        (root / "src").mkdir()
+        (root / "examples" / "support").mkdir(parents=True)
+        (root / "examples" / "nested").mkdir(parents=True)
+        (root / "Cargo.toml").write_text(
+            """[package]
+name = "catalog-control"
+version = "0.0.0"
+edition = "2021"
+
+[[example]]
+name = "nested-target"
+path = "examples/nested/main.rs"
+""",
+            encoding="utf-8",
+        )
+        (root / "src" / "lib.rs").write_text("pub fn standing() {}\n", encoding="utf-8")
+        (root / "examples" / "visible.rs").write_text("fn main() {}\n", encoding="utf-8")
+        (root / "examples" / "nested" / "main.rs").write_text(
+            "fn main() {}\n", encoding="utf-8"
+        )
+        (root / "examples" / "support" / "helper.rs").write_text(
+            "pub fn helper() {}\n", encoding="utf-8"
+        )
+        returned = example_targets(root)
+        names = [name for name, _, _ in returned]
+        paths = [str(path.relative_to(root)) for _, path, _ in returned]
+        assert names == ["nested-target", "visible"], names
+        assert "examples/support/helper.rs" not in paths, paths
+        print(
+            "driver-catalog self-test: 2 Cargo example targets; "
+            "nested helper is not a driver"
+        )
 
 
 def render(collected: list[dict[str, str]]) -> str:
@@ -251,9 +357,20 @@ def render(collected: list[dict[str, str]]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="exit 1 if the ledger has drifted")
+    parser.add_argument(
+        "--self-test", action="store_true", help="run the synthetic Cargo-target control"
+    )
     arguments = parser.parse_args()
 
-    collected = rows()
+    if arguments.self_test:
+        self_test()
+        return 0
+
+    try:
+        collected = rows()
+    except RuntimeError as error:
+        print(f"driver-catalog: {error}", file=sys.stderr)
+        return 2
     rendered = render(collected)
 
     if arguments.check:

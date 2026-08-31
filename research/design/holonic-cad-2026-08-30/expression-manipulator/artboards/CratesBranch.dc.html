@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1560px; height: 1000px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Crate branch — absences, the branch, and refusals</div>
+      <div class="sub">five graded absences justify five small owner-local modules; the UI is apparatus; nothing is scheduled</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: AGENTS.md construction grade / circulation / apparatus · blueprint/THE_ROADMAP.md CONS1–CONS5 · reports/holonics-types.md</div>
+  </div>
+<div class="row" style="gap:10px; flex: 1 1 auto; min-height: 0"><div class="panel" style="flex: 1 1 auto"><div class="panel-t"><span>the concrete absences that would justify an owner (each graded open)</span></div><div class="col" style="gap:8px; "><div class="box box-obstructed" style=""><span class="grade">open</span> <b>assignment fibre in the trace.</b> <span class='mono'>DerivationAtlas.lean ProofEvent</span> carries before/after <span class='mono'>GoalFace</span> arrays but not the mvar assignment, the mctx delta, the rewrite locus or the elaboration trace. Owner: a Lean-side extension of the exporter (schema v3), consumed by <span class='mono'>lean_development.rs</span>. Not a Rust interpreter of Lean.</div><div class="box box-obstructed" style=""><span class="grade">open</span> <b>PortKind on ports.</b> <span class='mono'>interaction.rs OccurrencePort</span> has hand and ordinal, no kind; the contact matrix (Library 0) has no owner. Owner: a kind enum on the existing port and a pairwise rule as a receiver over <span class='mono'>InteractionPattern</span>.</div><div class="box box-obstructed" style=""><span class="grade">open</span> <b>rule with fallback, signature-keyed materialization.</b> <span class='mono'>relational-geometry model.rs Construction</span> has frames/relations/entities/constraints, no rewrite rule; the engine's <span class='mono'>evolution.rs</span> has laws but no boundary-triggered fallback. Owner: one small module composing <span class='mono'>EvolutionShape</span> laws with a registry keyed by <span class='mono'>name:[signature]</span>.</div><div class="box box-obstructed" style=""><span class="grade">open</span> <b>constraint residuals over exact params.</b> <span class='mono'>ConstraintKind {SharedVertex, PointOnConic, Declared}</span> has no equation generator and <span class='mono'>ExactValue::Expression</span> has no total derivative; rank/DOF already exist in <span class='mono'>LinearFactorization</span>. Owner: residual + partial on the existing expression type; the solve is a face of the factorization.</div><div class="box box-obstructed" style=""><span class="grade">open</span> <b>holonic-json-v1 document codec.</b> No schema exists in canon or blueprint (AGENTS.md:97 only). Owner: a codec in <span class='mono'>holonic-language</span> terms, never a runtime topology.</div></div></div><div class="panel" style="flex: 0 0 720px"><div class="panel-t"><span>the branch · one workspace member, owner-local modules, no foreman</span></div><div class="code" style="font-size: 9.5px">crates/holonic-cad/                 -- workspace member; depends on holonic-structure, relational-geometry,
+  src/lib.rs                        --   holonic-engine, holonic-language; no float in any semantic path
+  src/trace.rs        (≤ 400 lines)  -- ProofEvent(v3) → TacticSwing; alias union; t index         [composes lean_development, DerivationAtlas]
+  src/port_kind.rs    (≤ 200)        -- PortKind + contact receiver over InteractionPattern       [composes interaction.rs]
+  src/rule.rs         (≤ 400)        -- rule + fallback + signature registry                       [composes evolution.rs laws]
+  src/residual.rs     (≤ 300)        -- constraint → residual, partial on ExactValue::Expression   [composes exact_linear LinearFactorization]
+  src/document.rs     (≤ 300)        -- holonic-json-v1 codec: occurrences, passages, components, swings, receipts
+  src/faces/{trace,schematic,lattice,transport}.rs   -- projections only; each returns a PresentationFace-shaped value
+  examples/           -- drivers: mount a .holon, invoke owners, write receipts (narrow apparatus, THE_DRIVER_ATLAS)
+apparatus (separate crate, outside the semantic cone): holonic-cad-ui — egui/wgpu window,
+  keyboard map, docks; consumes faces, emits swing proposals through one projection port</div><div class="note" style="">size ratchets from CONS2 apply (file, function, public-API); every module names the owner it composes; the UI crate is an exterior chart and may hold floats only for pixels, never for identity.</div></div></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>what must not be founded</span></div><div class="row" style="gap:10px; "><div class="box box-refused" style=""><span class='mono'>Interpreter</span>, <span class='mono'>Scheduler</span>, <span class='mono'>ControlFlow</span>, <span class='mono'>Planner</span> — branch/loop/call/stack are receiver shadows (AGENTS.md circulation)</div><div class="box box-refused" style=""><span class='mono'>Circuit</span>, <span class='mono'>Parametron</span>, <span class='mono'>Layer</span> cabinets — the carrier composes existing owners (canon §8d)</div><div class="box box-refused" style="">a Lean AST/bytecode/grammar owner — Lean is an exterior codec port; the derivation atlas is testimony (AGENTS.md causal arithmetic)</div><div class="box box-refused" style="">any construction from this page: the repository's live roadmap governs when anything is built — this page is design testimony, graded interpretation</div></div></div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -69,7 +69,7 @@ def torusFourierCoefficientCLM (n : SpatialFrequency) :
         filter_upwards [] with q
         rw [norm_smul]
         have hcharacter : ‖UnitAddTorus.mFourier (-n) q‖ = 1 := by
-          simp [UnitAddTorus.mFourier, norm_prod]
+          simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
         rw [hcharacter, one_mul]
         exact field.norm_coe_le_norm q
       have hintegral := MeasureTheory.norm_integral_le_of_norm_le_const hpoint
@@ -175,8 +175,9 @@ theorem summable_fractionalFirstMomentWeight :
     Summable fractionalFirstMomentWeight := by
   have htranslated := frequencyTripleEquiv.summable_iff.mpr
     summable_triple_fractionalCoordinateWeight
-  simpa only [Function.comp_apply, frequencyTripleEquiv,
-    fractionalFirstMomentWeight] using htranslated
+  exact htranslated.congr (fun k ↦ by
+    simp [Function.comp_apply, frequencyTripleEquiv,
+      fractionalFirstMomentWeight])
 
 /-- One addressed coordinate square divided by the exact `H³` weight is dominated by the
 summable fractional receiver.  No coordinate or lattice mode is discarded. -/
@@ -234,7 +235,6 @@ theorem coordinate_sq_div_periodicSobolevWeight_three_le_fractional
     rw [← Real.rpow_natCast]
     rw [← Real.rpow_mul (le_of_lt htotal)]
     norm_num [Real.rpow_neg_ofNat]
-    rfl
   have hproductRpow :
       product ^ (-(2 / 3 : ℝ)) = fractionalFirstMomentWeight k := by
     rw [fractionalFirstMomentWeight]
@@ -365,7 +365,7 @@ theorem hasFDerivAt_euclideanFourierFactor
   have h := (hasDerivAt_fourier (1 : ℝ) (k coordinate)
     (x coordinate : ℝ)).hasFDerivAt.comp x
       (EuclideanSpace.proj coordinate : Space →L[ℝ] ℝ).hasFDerivAt
-  convert h using 1
+  convert h using 1 <;> try rfl
   · ext direction
     simp [euclideanFourierFactor, euclideanFourierFactorFDeriv,
       ContinuousLinearMap.toSpanSingleton_apply,
@@ -384,11 +384,11 @@ theorem hasFDerivAt_euclideanFourierCharacter
     (k : SpatialFrequency) (x : Space) :
     HasFDerivAt (euclideanFourierCharacter k)
       (euclideanFourierCharacterFDeriv k x) x := by
-  simpa only [euclideanFourierCharacter,
-    euclideanFourierCharacterFDeriv, Finset.sum_filter] using
-      (HasFDerivAt.finset_prod (u := Finset.univ)
-        (fun coordinate _ ↦
-          hasFDerivAt_euclideanFourierFactor k coordinate x))
+  have h := HasFDerivAt.finsetProd (u := Finset.univ)
+    (fun coordinate _ ↦
+      hasFDerivAt_euclideanFourierFactor k coordinate x)
+  unfold euclideanFourierCharacter euclideanFourierCharacterFDeriv
+  exact h
 
 /-- Operator-norm bound for one addressed character-factor derivative. -/
 theorem norm_euclideanFourierFactorFDeriv_le
@@ -450,10 +450,10 @@ theorem euclideanFourierCharacterFDeriv_apply_single
       2 * Real.pi * Complex.I * (k coordinate) *
         euclideanFourierCharacter k x := by
   unfold euclideanFourierCharacterFDeriv euclideanFourierFactorFDeriv
-  simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.smul_apply,
+  simp only [sum_apply, smul_apply,
     ContinuousLinearMap.smulRight_apply]
   rw [Finset.sum_eq_single coordinate]
-  · simp [EuclideanSpace.single_apply]
+  · simp
     unfold euclideanFourierCharacter
     rw [← Finset.prod_erase_mul Finset.univ _ (Finset.mem_univ coordinate)]
     ring
@@ -480,10 +480,10 @@ theorem hasFDerivAt_euclideanNativeFourierPassage
     (k : SpatialFrequency) (x : Space) :
     HasFDerivAt (euclideanNativeFourierPassage state component k)
       (euclideanNativeFourierPassageFDeriv state component k x) x := by
-  simpa only [euclideanNativeFourierPassage,
-    euclideanNativeFourierPassageFDeriv] using
-      (hasFDerivAt_euclideanFourierCharacter k x).const_mul
-        (nativeUnweightedComponent state component k)
+  have h := (hasFDerivAt_euclideanFourierCharacter k x).const_mul
+    (nativeUnweightedComponent state component k)
+  unfold euclideanNativeFourierPassage euclideanNativeFourierPassageFDeriv
+  exact h
 
 /-- A differentiated native passage in one basis direction has exactly the addressed Fourier
 multiplier. -/
@@ -496,7 +496,7 @@ theorem euclideanNativeFourierPassageFDeriv_apply_single
         nativeUnweightedComponent state component k *
           euclideanFourierCharacter k x := by
   rw [euclideanNativeFourierPassageFDeriv,
-    ContinuousLinearMap.smul_apply,
+    smul_apply,
     euclideanFourierCharacterFDeriv_apply_single]
   simp only [smul_eq_mul]
   ring
@@ -955,8 +955,10 @@ theorem fderiv_reconstructedVelocity_apply_component
   have heq := hproject.unique
     (hasFDerivAt_reconstructedVelocity_component state component x)
   have happ := congrArg (fun L : Space →L[ℝ] ℝ ↦ L direction) heq
+  change (fderiv ℝ (reconstructedVelocity state) x direction) component =
+    reconstructedRealComponentFDeriv state component x direction at happ
   rw [fderiv_reconstructedVelocity_component_apply]
-  simpa only [ContinuousLinearMap.comp_apply] using happ
+  exact happ
 
 /-- Adding one standard coordinate period does not change the genuine quotient point. -/
 theorem euclideanToSpatialTorus_add_single_one
@@ -966,9 +968,8 @@ theorem euclideanToSpatialTorus_add_single_one
   funext component
   by_cases hcomponent : component = coordinate
   · subst component
-    simp [euclideanToSpatialTorus, piToSpatialTorus, EuclideanSpace.single_apply]
-  · simp [euclideanToSpatialTorus, piToSpatialTorus,
-      EuclideanSpace.single_apply, hcomponent]
+    simp [euclideanToSpatialTorus, piToSpatialTorus]
+  · simp [euclideanToSpatialTorus, piToSpatialTorus, hcomponent]
 
 /-- The reconstructed Euclidean velocity is one-periodic in every spatial coordinate. -/
 theorem isOnePeriodic_reconstructedVelocity

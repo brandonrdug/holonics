@@ -1,0 +1,361 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .card { background: #fbf8f2; border: 1px solid #d9d0bf; border-radius: 10px; }
+    .card-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a7060; margin: 0; }
+    .stage { perspective: 900px; }
+    .cube3d { position: relative; width: 200px; height: 200px; transform-style: preserve-3d; transition: transform 0.3s ease; }
+    .face3d { position: absolute; width: 200px; height: 200px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; padding: 6px; box-sizing: border-box; background: #292418; border-radius: 8px; }
+    .stk { border-radius: 6px; }
+    .chip { min-height: 38px; padding: 5px 11px; border-radius: 8px; cursor: pointer; background: #fffdf8; border: 1.5px solid #8a8071; font: inherit; color: inherit; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+    .chip:hover { border-color: #b45309; }
+    .chip-warn { border-style: dashed; border-color: #9c5480; color: #9c5480; }
+    .orb { width: 34px; height: 34px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .net-stk { width: 22px; height: 22px; border-radius: 4px; display: inline-block; box-sizing: border-box; border: 1px solid rgba(41,36,24,0.35); }
+    .ret { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 3px 7px; color: #fbf8f2; display: inline-block; }
+    .ret-carried { background: #3e7d57; }
+    .ret-open { background: #a67a2e; }
+    .ret-refused { background: #56503f; }
+    .hist-chip { font-family: 'IBM Plex Mono', monospace; font-size: 11px; background: #fffdf8; border: 1px solid #d9d0bf; border-radius: 6px; padding: 3px 8px; }
+    .word-chip { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #eef3ee; border: 1.5px solid #3e7d57; border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+  </style>
+</helmet>
+
+<div style="width: 1180px; height: 780px; box-sizing: border-box; padding: 22px 26px; overflow: hidden; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">The held cube</div>
+      <div style="font-size: 12px; color: #7a7060">reorient = receiver transport (conjugates the alphabet, moves no sticker) &middot; twist = passage &middot; the surface is the measurement</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Scratch/HolonicActionSolver.lean &middot; cube = calibration, never ontology</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 430px 330px minmax(0,1fr); gap: 16px; flex: 1; min-height: 0">
+
+    <div class="card" style="padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+      <p class="card-title" style="align-self: flex-start">the body, held</p>
+      <div style="display: grid; grid-template-columns: 44px 260px 44px; grid-template-rows: 44px 240px 44px; align-items: center; justify-items: center">
+        <div></div><button class="chip orb" onClick="{{pitchUp}}">&#8593;</button><div></div>
+        <button class="chip orb" onClick="{{yawLeft}}">&#8592;</button>
+        <div class="stage" style="width: 240px; height: 240px; display: flex; align-items: center; justify-content: center">
+          <div class="cube3d" style="transform: {{viewT}}">
+            <sc-for list="{{faces3d}}" as="f" hint-placeholder-count="6">
+              <div class="face3d" style="transform: {{f.t}}">
+                <div class="stk" style="background: {{f.c0}}"></div>
+                <div class="stk" style="background: {{f.c1}}"></div>
+                <div class="stk" style="background: {{f.c2}}"></div>
+                <div class="stk" style="background: {{f.c3}}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <button class="chip orb" onClick="{{yawRight}}">&#8594;</button>
+        <div></div><button class="chip orb" onClick="{{pitchDown}}">&#8595;</button><div></div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button class="chip orb" onClick="{{rollCCW}}">&#10226;</button>
+        <button class="chip orb" onClick="{{rollCW}}">&#10227;</button>
+        <span style="font-size: 11px; color: #7a7060; align-self: center">turn the held body — no sticker moves</span>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 2px">
+        <span class="mono" style="font-size: 10px; color: #7a7060">hand frame:</span>
+        <span class="mono" style="font-size: 11px">top = {{oU}} &middot; right = {{oR}} &middot; front = {{oF}}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; min-height: 0">
+      <div class="card" style="padding: 12px 14px">
+        <p class="card-title">torque — twist the layer under the hand</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px">
+          <button class="chip" onClick="{{twistTopCW}}">top &#10227;</button><button class="chip" onClick="{{twistTopCCW}}">top &#10226;</button>
+          <button class="chip" onClick="{{twistRightCW}}">right &#10227;</button><button class="chip" onClick="{{twistRightCCW}}">right &#10226;</button>
+          <button class="chip" onClick="{{twistFrontCW}}">front &#10227;</button><button class="chip" onClick="{{twistFrontCCW}}">front &#10226;</button>
+        </div>
+        <div style="display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap">
+          <button class="chip" onClick="{{scramble}}">scramble 7</button>
+          <button class="chip" onClick="{{solveBtn}}">solve</button>
+          <button class="chip chip-warn" onClick="{{illegal}}">twist one corner in place</button>
+          <button class="chip" onClick="{{reset}}">reset</button>
+        </div>
+      </div>
+      <div class="card" style="padding: 12px 14px; flex: 1; min-height: 0; overflow-y: auto">
+        <p class="card-title">chronology — hand move &rarr; intrinsic generator</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px">
+          <sc-for list="{{hist}}" as="h" hint-placeholder-count="4">
+            <span class="hist-chip">{{h.t}}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; min-height: 0">
+      <div class="card" style="padding: 12px 14px">
+        <p class="card-title">the face — the measurement</p>
+        <div style="display: grid; grid-template-columns: repeat(8, 24px); grid-auto-rows: 24px; gap: 2px; margin-top: 10px">
+          <sc-for list="{{net}}" as="n" hint-placeholder-count="12">
+            <div class="net-stk" style="background: {{n.c}}; grid-column: {{n.gc}}; grid-row: {{n.gr}}"></div>
+          </sc-for>
+        </div>
+        <div class="mono" style="font-size: 11px; margin-top: 9px; letter-spacing: 0.06em">{{faceWord}}</div>
+        <div style="font-size: 11px; color: #7a7060; margin-top: 4px">exact on the reachable population — one face value, one state</div>
+      </div>
+      <div class="card" style="padding: 12px 14px">
+        <p class="card-title">invariant the local receiver reads</p>
+        <div style="display: flex; gap: 12px; align-items: baseline; margin-top: 8px">
+          <span class="mono" style="font-size: 13px">twist class = <b>{{twistCls}}</b> (mod 3)</span>
+          <span style="font-size: 11px; color: #7a7060">{{twistNote}}</span>
+        </div>
+      </div>
+      <div class="card" style="padding: 12px 14px">
+        <p class="card-title">the storm — natural identities from the null</p>
+        <div style="display: flex; gap: 7px; margin-top: 8px; align-items: center">
+          <button class="chip" onClick="{{stormZero}}">n := 0</button>
+          <button class="chip" onClick="{{stormNext}}">n + 1</button>
+          <span class="mono" style="font-size: 12px">{{stormT}}</span>
+        </div>
+        <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 6px">BFS from the solved null under {U,R,F}± in declared order — identity = (birth moment, rank); the wavefront counts</div>
+      </div>
+      <div class="card" style="padding: 12px 14px; flex: 1; min-height: 0; overflow-y: auto">
+        <p class="card-title">solver return</p>
+        <sc-if value="{{noRet}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 12px; color: #7a7060; margin-top: 8px">scramble, then solve</div>
+        </sc-if>
+        <sc-if value="{{hasRet}}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top: 8px"><span class="ret {{ret.cls}}">{{ret.kind}}</span> <span style="font-size: 11.5px">{{ret.t}}</span></div>
+          <sc-if value="{{hasWord}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px">
+              <sc-for list="{{retWord}}" as="w" hint-placeholder-count="4">
+                <span class="hist-chip">{{w.t}}</span>
+              </sc-for>
+            </div>
+            <sc-if value="{{hasStep}}" hint-placeholder-val="{{ true }}">
+              <button class="word-chip" style="margin-top: 9px" onClick="{{stepWord}}">{{stepLabel}}</button>
+            </sc-if>
+          </sc-if>
+          <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 8px">{{ret.owner}}</div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1180,"height":780}}'>
+const U0=0, D0=4, F0=8, B0=12, R0=16, L0=20;
+const COLORS = ['#f2ead2', '#d9b545', '#3e7d57', '#3c6ea5', '#a04848', '#c07a3a'];
+const FLETTER = 'UDFBRL';
+function cyc(p, idx) { const a=idx[0],b=idx[1],c=idx[2],d=idx[3]; const t=p[d]; p[d]=p[c]; p[c]=p[b]; p[b]=p[a]; p[a]=t; }
+const MOVES = {
+  U: [[U0,U0+1,U0+3,U0+2],[F0,L0,B0,R0],[F0+1,L0+1,B0+1,R0+1]],
+  R: [[R0,R0+1,R0+3,R0+2],[U0+3,B0,D0+3,F0+3],[F0+1,U0+1,B0+2,D0+1]],
+  F: [[F0,F0+1,F0+3,F0+2],[U0+2,R0,D0+1,L0+3],[L0+1,U0+3,R0+2,D0]],
+  D: [[D0,D0+1,D0+3,D0+2],[L0+3,F0+3,R0+3,B0+3],[F0+2,R0+2,B0+2,L0+2]],
+  L: [[L0,L0+1,L0+3,L0+2],[U0,F0,D0,B0+3],[B0+1,U0+2,F0+2,D0+2]],
+  B: [[B0,B0+1,B0+3,B0+2],[U0+1,L0,D0+2,R0+3],[R0+1,U0,L0+2,D0+3]]
+};
+function applyMove(state, m) {
+  const face = m[0], inv = m.length > 1;
+  const n = state.slice();
+  for (let r = 0; r < (inv ? 3 : 1); r++) for (const c of MOVES[face]) cyc(n, c);
+  return n;
+}
+function solvedState() { const s=[]; for (let f=0; f<6; f++) for (let i=0;i<4;i++) s.push(f); return s; }
+function isSolved(s) { for (let f=0; f<6; f++) { const c=s[f*4]; for (let i=1;i<4;i++) if (s[f*4+i]!==c) return false; } return true; }
+const CORNERS=[[U0+3,R0,F0+1],[U0+2,F0,L0+1],[U0,L0,B0+1],[U0+1,B0,R0+1],[D0+1,F0+3,R0+2],[D0,L0+3,F0+2],[D0+2,B0+3,L0+2],[D0+3,R0+3,B0+2]];
+function twistClass(s) {
+  let sum=0;
+  for (const tri of CORNERS) { let k=-1; for (let i=0;i<3;i++) { const col=s[tri[i]]; if (col===0||col===1) { k=i; break; } } if (k<0) return null; sum+=k; }
+  return sum % 3;
+}
+function solve(state, maxDepth, budget) {
+  if (isSolved(state)) return { found: true, word: [], nodes: 0 };
+  const gens=["U","U'","R","R'","F","F'"];
+  let nodes=0;
+  function inverseOf(m) { return m.length > 1 ? m[0] : m[0] + "'"; }
+  function dfs(s, depth, limit, lastMove, sameCount, word) {
+    if (nodes > budget) return null;
+    if (depth === limit) return isSolved(s) ? word.slice() : null;
+    for (const m of gens) {
+      if (lastMove && m === inverseOf(lastMove)) continue;
+      const same = lastMove && m[0] === lastMove[0] ? sameCount + 1 : 1;
+      if (same > 2) continue;
+      nodes++;
+      const n = applyMove(s, m);
+      word.push(m);
+      const r = dfs(n, depth + 1, limit, m, same, word);
+      if (r) return r;
+      word.pop();
+    }
+    return null;
+  }
+  for (let limit = 1; limit <= maxDepth; limit++) {
+    const r = dfs(state, 0, limit, null, 0, []);
+    if (r) return { found: true, word: r, nodes: nodes };
+    if (nodes > budget) return { found: false, nodes: nodes };
+  }
+  return { found: false, nodes: nodes };
+}
+const OPP = { U: 'D', D: 'U', R: 'L', L: 'R', F: 'B', B: 'F' };
+const FACE3D = [
+  { f: 'F', t: 'translateZ(100px)' },
+  { f: 'B', t: 'rotateY(180deg) translateZ(100px)' },
+  { f: 'R', t: 'rotateY(90deg) translateZ(100px)' },
+  { f: 'L', t: 'rotateY(-90deg) translateZ(100px)' },
+  { f: 'U', t: 'rotateX(90deg) translateZ(100px)' },
+  { f: 'D', t: 'rotateX(-90deg) translateZ(100px)' }
+];
+const FBASE = { U: U0, D: D0, F: F0, B: B0, R: R0, L: L0 };
+const NETPOS = { U: [3, 1], L: [1, 3], F: [3, 3], R: [5, 3], B: [7, 3], D: [3, 5] };
+const TILT = 'scale(0.72) rotateX(-22deg) rotateY(-32deg)';
+let STORM = null;
+function buildStorm(cap) {
+  const gens = ['U', "U'", 'R', "R'", 'F', "F'"];
+  const list = [], index = {};
+  const seed = solvedState();
+  const k0 = seed.join('');
+  list.push({ key: k0, s: seed, w: [] });
+  index[k0] = 0;
+  let head = 0;
+  while (head < list.length && list.length < cap) {
+    const cur = list[head++];
+    for (const m of gens) {
+      const ns = applyMove(cur.s, m);
+      const key = ns.join('');
+      if (index[key] === undefined) {
+        index[key] = list.length;
+        list.push({ key: key, s: ns, w: cur.w.concat([m]) });
+        if (list.length >= cap) break;
+      }
+    }
+  }
+  return { list: list, index: index };
+}
+function storm() { if (!STORM) STORM = buildStorm(2400); return STORM; }
+
+class Component extends DCLogic {
+  state = { s: solvedState(), o: { u: 'U', r: 'R', f: 'F' }, viewT: '', hist: [], ret: null, pending: [] };
+
+  reorient(rot, next) {
+    const st = this.state;
+    this.setState({ viewT: rot + ' ' + st.viewT, o: next(st.o) });
+  }
+  handTwist(which, ccw) {
+    const st = this.state;
+    const intr = which === 'top' ? st.o.u : which === 'right' ? st.o.r : st.o.f;
+    const m = ccw ? intr + "'" : intr;
+    const label = (which === 'top' ? 'T' : which === 'right' ? 'R' : 'F') + (ccw ? '⟲' : '⟳') + '→' + m;
+    this.setState({ s: applyMove(st.s, m), hist: st.hist.concat([{ t: label }]).slice(-14), ret: null, pending: [] });
+  }
+
+  renderVals() {
+    const self = this;
+    const st = this.state, s = st.s, o = st.o;
+
+    const faces3d = FACE3D.map(function (fd) {
+      const b = FBASE[fd.f];
+      return { t: fd.t, c0: COLORS[s[b]], c1: COLORS[s[b + 1]], c2: COLORS[s[b + 2]], c3: COLORS[s[b + 3]] };
+    });
+
+    const net = [];
+    Object.keys(NETPOS).forEach(function (f) {
+      const b = FBASE[f], gc = NETPOS[f][0], gr = NETPOS[f][1];
+      net.push({ c: COLORS[s[b]], gc: gc, gr: gr });
+      net.push({ c: COLORS[s[b + 1]], gc: gc + 1, gr: gr });
+      net.push({ c: COLORS[s[b + 2]], gc: gc, gr: gr + 1 });
+      net.push({ c: COLORS[s[b + 3]], gc: gc + 1, gr: gr + 1 });
+    });
+
+    const tc = twistClass(s);
+    let ret = st.ret;
+
+    return {
+      viewT: TILT + ' ' + st.viewT,
+      faces3d: faces3d, net: net,
+      faceWord: s.map(function (c) { return FLETTER[c]; }).join(''),
+      oU: o.u, oR: o.r, oF: o.f,
+      twistCls: tc === null ? '?' : String(tc),
+      twistNote: tc === 0 ? 'held by every twist — invariant_wordAct' : 'moved — no twist did this; the local receiver refuses the question',
+      hist: st.hist,
+      ret: ret, hasRet: !!ret, noRet: !ret,
+      hasWord: !!(ret && ret.word), hasStep: st.pending.length > 0,
+      retWord: (ret && ret.word ? ret.word : []).map(function (m) { return { t: m }; }),
+      stepLabel: st.pending.length ? ('apply next: ' + st.pending[0] + ' (' + st.pending.length + ' left)') : '',
+      stepWord: function () {
+        const p = self.state.pending;
+        if (!p.length) return;
+        self.setState({ s: applyMove(self.state.s, p[0]), pending: p.slice(1), hist: self.state.hist.concat([{ t: '·→' + p[0] }]).slice(-14) });
+      },
+      stormT: (function () {
+        if (tc !== 0) return 'outside the reachable population — no enumeration reaches it (twist class ≠ 0)';
+        const sm = storm();
+        const idx = sm.index[s.join('')];
+        if (idx === undefined) return 'beyond the computed horizon (' + sm.list.length + ' births)';
+        const born = sm.list[idx];
+        return 'n = ' + idx + ' · moment ' + born.w.length + (born.w.length ? ' · word ' + born.w.join(' ') : ' · the null');
+      })(),
+      stormZero: function () { self.setState({ s: solvedState(), ret: null, pending: [], hist: self.state.hist.concat([{ t: 'storm → n = 0 (null)' }]).slice(-14) }); },
+      stormNext: function () {
+        const sm = storm();
+        const idx = sm.index[self.state.s.join('')];
+        if (idx === undefined) return;
+        const nxt = idx + 1;
+        if (nxt >= sm.list.length) return;
+        const born = sm.list[nxt];
+        self.setState({ s: born.s.slice(), ret: null, pending: [], hist: self.state.hist.concat([{ t: 'storm → n = ' + nxt }]).slice(-14) });
+      },
+      pitchUp: function () { self.reorient('rotateX(90deg)', function (o) { return { u: o.f, r: o.r, f: OPP[o.u] }; }); },
+      pitchDown: function () { self.reorient('rotateX(-90deg)', function (o) { return { u: OPP[o.f], r: o.r, f: o.u }; }); },
+      yawLeft: function () { self.reorient('rotateY(-90deg)', function (o) { return { u: o.u, r: OPP[o.f], f: o.r }; }); },
+      yawRight: function () { self.reorient('rotateY(90deg)', function (o) { return { u: o.u, r: o.f, f: OPP[o.r] }; }); },
+      rollCW: function () { self.reorient('rotateZ(90deg)', function (o) { return { u: OPP[o.r], r: o.u, f: o.f }; }); },
+      rollCCW: function () { self.reorient('rotateZ(-90deg)', function (o) { return { u: o.r, r: OPP[o.u], f: o.f }; }); },
+      twistTopCW: function () { self.handTwist('top', false); },
+      twistTopCCW: function () { self.handTwist('top', true); },
+      twistRightCW: function () { self.handTwist('right', false); },
+      twistRightCCW: function () { self.handTwist('right', true); },
+      twistFrontCW: function () { self.handTwist('front', false); },
+      twistFrontCCW: function () { self.handTwist('front', true); },
+      scramble: function () {
+        const gens = ['U', "U'", 'R', "R'", 'F', "F'", 'D', "D'", 'L', "L'", 'B', "B'"];
+        let ns = self.state.s, w = [];
+        for (let i = 0; i < 7; i++) { const m = gens[Math.floor(Math.random() * 12)]; w.push(m); ns = applyMove(ns, m); }
+        self.setState({ s: ns, hist: self.state.hist.concat([{ t: 'scramble: ' + w.join(' ') }]).slice(-14), ret: null, pending: [] });
+      },
+      illegal: function () {
+        const ns = self.state.s.slice();
+        const tri = CORNERS[0]; const t = ns[tri[0]]; ns[tri[0]] = ns[tri[2]]; ns[tri[2]] = ns[tri[1]]; ns[tri[1]] = t;
+        self.setState({ s: ns, hist: self.state.hist.concat([{ t: 'deposit: URF twisted in place' }]).slice(-14), ret: null, pending: [] });
+      },
+      solveBtn: function () {
+        const cs = self.state.s;
+        const cls = twistClass(cs);
+        if (cls !== 0) {
+          self.setState({ ret: { kind: 'refused', cls: 'ret-refused', t: 'twist class ' + cls + ' ≠ 0 — no word over the twist alphabet reaches this arrangement; decided by the invariant, without search', owner: 'HolonicActionSolver.refused_of_invariant_moved · invariant_wordAct' }, pending: [] });
+          return;
+        }
+        const r = solve(cs, 11, 400000);
+        if (r.found) {
+          self.setState({ ret: { kind: 'carried', cls: 'ret-carried', t: r.word.length + ' quarter-turns over {U,R,F}±, ' + r.nodes + ' nodes', word: r.word, owner: 'realizer exhibited — wordAct_reverse_inv gives the fibre back' }, pending: r.word.slice() });
+        } else {
+          self.setState({ ret: { kind: 'open', cls: 'ret-open', t: 'no word within the aperture (' + r.nodes + ' nodes) — retained as open, never as false', owner: 'the aperture is apparatus, not law' }, pending: [] });
+        }
+      },
+      reset: function () { self.setState({ s: solvedState(), o: { u: 'U', r: 'R', f: 'F' }, viewT: '', hist: [], ret: null, pending: [] }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -226,25 +226,45 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
           (1 - fourier 1 (q 2)) ^ 2 := by
       simp [dyadicHodgeSubsetGap, Finset.prod_insert]
       ring
-    rw [hgap]
-    simpa [dyadicHodgeCubeSubsetDifference, dyadicHodgeSubsetCount,
-      dyadicHodgeCubeSecondDifferenceAll] using
-        dyadicHodgeJacobianKernelEntry_tripleAbel
-          scale component coordinate input q
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({0, 1, 2} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceAll scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hgap, hpopulation]
+    simpa [dyadicHodgeSubsetCount] using
+      dyadicHodgeJacobianKernelEntry_tripleAbel
+        scale component coordinate input q
   · have hface : face = ({0, 1} : Finset (Fin 3)) := by
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, Finset.prod_insert] using
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({0, 1} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceFirstSecond
+            scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
+      Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_firstSecondAbel
           scale component coordinate input q
   · have hface : face = ({0, 2} : Finset (Fin 3)) := by
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, dyadicHodgeCubeSecondDifferenceFirstThird,
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({0, 2} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceFirstThird
+            scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
       Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_firstThirdAbel
           scale component coordinate input q
@@ -252,8 +272,14 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, dyadicHodgeCubeSecondDifferenceFirst,
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({0} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceFirst scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
       Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_firstAbel
           scale component coordinate input q
@@ -261,8 +287,15 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, dyadicHodgeCubeSecondDifferenceSecondThird,
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({1, 2} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceSecondThird
+            scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
       Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_secondThirdAbel
           scale component coordinate input q
@@ -270,8 +303,14 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, dyadicHodgeCubeSecondDifferenceSecond,
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({1} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceSecond scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
       Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_secondAbel
           scale component coordinate input q
@@ -279,8 +318,14 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
       ext axis
       fin_cases axis <;> simp [hzero, hone, htwo]
     subst face
-    simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
-      dyadicHodgeSubsetCount, dyadicHodgeCubeSecondDifferenceThird,
+    have hpopulation :
+        dyadicHodgeCubeSubsetDifference ({2} : Finset (Fin 3))
+            scale component coordinate input =
+          dyadicHodgeCubeSecondDifferenceThird scale component coordinate input := by
+      funext firstIndex secondIndex thirdIndex
+      rfl
+    rw [hpopulation]
+    simpa [dyadicHodgeSubsetGap, dyadicHodgeSubsetCount,
       Finset.prod_insert] using
         dyadicHodgeJacobianKernelEntry_thirdAbel
           scale component coordinate input q
@@ -334,7 +379,7 @@ theorem norm_dyadicHodgeSubsetGap_mul_kernelEntry_le_mass
   rw [dyadicHodgeJacobianKernelEntry_subsetAbel, norm_mul]
   have hbase :
       ‖UnitAddTorus.mFourier (dyadicHodgeApertureBaseFrequency scale) q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
   rw [hbase, one_mul]
   unfold dyadicHodgeSubsetMass
   apply norm_finiteCharacterSynthesisThree_le_mass

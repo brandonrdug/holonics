@@ -395,7 +395,9 @@ theorem CoherentWeightedSmoothPathTower.unprojectedQuadraticPathAtOrder_coeffici
                 (tower.lift m t coordinate)).1 p *
               (weightedSobolevCoefficients (m + 3)
                 (tower.lift m t output)).1 (k - p)) := by
-    simpa only [show m + 3 - 1 = m + 2 by omega] using hsource
+    have horder : m + 3 - 1 = m + 2 := by omega
+    rw [horder] at hsource
+    exact hsource
   rw [hsource', h3DivergenceConvolution_apply]
   apply Finset.sum_congr rfl
   intro coordinate _

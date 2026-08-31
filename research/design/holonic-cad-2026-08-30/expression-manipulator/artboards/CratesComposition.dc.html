@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1560px; height: 1060px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Crate branch — what already exists, face by face</div>
+      <div class="sub">the CAD composes existing owners; a large new subsystem would be a hidden foreman</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: reports/holonics-types.md (read-only census) · AGENTS.md circulation before new organs · canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md</div>
+  </div>
+<div class="col" style="gap:8px; flex: 1 1 auto; min-height: 0; overflow: hidden"><table class="tb2" style=""><thead><tr><th>CAD face / need</th><th>existing owner (exact)</th><th>what it already carries</th><th>the CAD adds only</th></tr></thead><tbody><tr><td>passage, both boundary maps</td><td><span class='mono'>L/Foundation/Lineage.lean AddressedPassage</span> · <span class='mono'>holonic-engine addressed_current.rs AddressedCurrentPassage</span></td><td>occurrence population, source/target maps, pullback join, serial comp; exact weighted current, generator population, fibre</td><td>a projection to a drawn edge</td></tr><tr><td>holon / composite</td><td><span class='mono'>L/Foundation/Holon.lean Holon, BoundaryHolon</span></td><td>occurrences, ports, receive face, reconstruction fibre, comp/cartesian/diagonal bodies</td><td>nothing</td></tr><tr><td>Complex Parametron</td><td><span class='mono'>Millennium/HolonicComplexParametron.lean complexParametronHolon</span> · <span class='mono'>native_spool.rs NativeParametronCell, NativeThread</span> · CUDA <span class='mono'>conduct_coupled_complex_parametron</span></td><td>B, M, G=BᵀMB, reorientation covariance, complex current, relative phase, hand; resident tick</td><td>a component sheet (symbol · footprint) around the existing model</td></tr><tr><td>lattice / plaquettes</td><td><span class='mono'>lattice_gauge.rs Lattice {links, plaquettes}, GaugeConfiguration</span> · <span class='mono'>HolonicFourTorusCarrier.lean Vertex/Edge/Face/Chain</span></td><td>oriented links, plaquette walks, connection, exact spectrum; ℤ⁴ cellular carrier with boundaries</td><td>site placement through a chart</td></tr><tr><td>transport tick</td><td><span class='mono'>diffusion.rs DiffusionComplex, DiffusionCurrent</span> · <span class='mono'>HolonicDiscreteInduction.lean InductionGrain, ContinuityGrain</span> · <span class='mono'>HolonicDiscreteMaxwellOperator.lean MidpointMaxwellHistory</span></td><td>implicit exact transport M φ = n + s + τ∂j; Faraday/continuity grains; Poynting balance</td><td>the scrubber and probes</td></tr><tr><td>exact algebra, DOF</td><td><span class='mono'>exact_linear.rs ExactRatMatrix, LinearFactorization {rank, kernel, image, cokernel}</span>, <span class='mono'>RebaseReceipt</span> · <span class='mono'>L/Foundation/LatticeTransport.lean LatticeIndexReceipt</span></td><td>rank, kernel, image, cokernel, refused rebase — DOF = n − rank is a face of this</td><td>constraint → residual generation (absent, below)</td></tr><tr><td>receiver, chart, projection</td><td><span class='mono'>relational-geometry projection.rs Receiver {frame, orientation, projection, gauge, route_overrides}, ProjectionLaw</span> · <span class='mono'>model.rs LocalChart, LocalFrame, FrameRelation</span></td><td>orthographic / perspective / stereographic / isometric exact projection; crossings with orientation sign</td><td>the 3+1 split as a chart choice</td></tr><tr><td>diagram topology</td><td><span class='mono'>receiver_topology.rs ReceiverTopology, DiagramNode/Edge/Face, IharaSignature</span> · <span class='mono'>decorated_path.rs JointDecoratedPathOperator</span></td><td>planar diagram of a projected construction with faces and crossing marks</td><td>nothing</td></tr><tr><td>swing</td><td><span class='mono'>receiver_atlas.rs SwingCell {pivot[3], witness}, ReceivedSwing {cross_ratio}, JointSwing</span> · Provenance <span class='mono'>math_record_swing</span></td><td>the cross-ratio swing under a receiver; recorded swings</td><td>the tactic-swing reading (species, fibre)</td></tr><tr><td>scene, moments, archive</td><td><span class='mono'>scene.rs LabScene, SceneMoment, SceneArchive</span></td><td>construction + receivers + bookmarks; ordinal moments; cursor</td><td>the time scrubber over moments</td></tr><tr><td>Lean → trace</td><td><span class='mono'>LR/DerivationAtlas.lean AtlasBundle {expressionNodes, termOccurrences, proofEvents {before, after : GoalFace[]}}</span> · <span class='mono'>lean_development.rs DeclaredForm, ProofStep</span> · <span class='mono'>derivation_atlas.rs DerivationCircuit</span></td><td>kernel-checked expression graph, term occurrences, before/after goal faces; source reader; recruitment circuit (0/1-cells)</td><td>assignment fibre and t-index (absent, below)</td></tr><tr><td>ports / interaction</td><td><span class='mono'>interaction.rs OccurrencePort {event, hand, ordinal}, InteractionBond, InteractionPattern {temporality}</span></td><td>ports with hand and ordinal; bonds; co-present vs precedence</td><td>PortKind (absent, below)</td></tr><tr><td>chain, face, hand, junction</td><td><span class='mono'>holonic-structure chain.rs Chain {head, tail, unconnected}, face.rs Face, relating.rs Hand {Cohere, Anti, Ortho}, junction.rs CountedCrossing</span></td><td>both-ends-open chains retaining failures; scalar face with askable relation; hand that gates</td><td>nothing</td></tr><tr><td>causal body / evolution</td><td><span class='mono'>causal_body.rs CausalBodyStanding</span> · <span class='mono'>evolution.rs EvolutionShape</span> · <span class='mono'>category.rs CategoryPresentation</span></td><td>graded complex, openings, connections, holonomy generators, receivers; boundaries as a category</td><td>nothing</td></tr><tr><td>presentation / display</td><td><span class='mono'>presentation.rs ExactSurfacePresentation</span> · <span class='mono'>display.rs DisplayFace</span> · <span class='mono'>live_presentation.rs LiveCpuPresenter</span></td><td>exact cells → octets; caused receiver faces realized</td><td>the editor chrome (apparatus)</td></tr><tr><td>reflective codec runtime</td><td><span class='mono'>holonic-language ReflectiveRuntime, CodecStep, CodecObstruction</span></td><td>mount/open/receive/revise codecs with lineage refusals</td><td>Lean and the agent as mounted codecs</td></tr></tbody></table><div class="note" style="">Every row was confirmed against the type census of 2026-08-30 (reports/holonics-types.md); paths are <span class='mono'>crates/…/src</span> and <span class='mono'>soma/formal/elementary-holonics/…</span>. Search before founding: these owners are rotated into typed contact first; only the five absences on the next board justify any new owner (AGENTS.md, circulation before new organs).</div></div>
+</div>
+</x-dc>
+</body>
+</html>

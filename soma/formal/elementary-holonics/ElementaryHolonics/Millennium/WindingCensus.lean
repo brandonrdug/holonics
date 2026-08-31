@@ -65,11 +65,11 @@ theorem theThreeIsNotASquare : ¬ IsSquare (3 : ℚ) := by
 point equality onto its `x`-coordinate. -/
 private def abscissa : E5.Point → ℚ
   | .zero => 0
-  | .some (x := x) _ => x
+  | .some x _ _ => x
 
 private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : E5.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 /-- On this curve the negation face is the plain sign flip: `negY x y = −y`. -/

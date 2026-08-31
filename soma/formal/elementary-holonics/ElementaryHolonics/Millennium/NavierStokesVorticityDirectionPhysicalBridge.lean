@@ -81,10 +81,16 @@ theorem complexStretchingReading_complexifiedJacobian
     complexStretchingReading (complexOfRealSpace v)
         (symmetricComplexJacobianPart (complexJacobianArrayOfCLM D)) =
       ((inner ℝ (D v) v : ℝ) : ℂ) := by
-  rw [complexStretchingReading_symmetricComplexJacobianPart,
-    complexStretchingReading,
-    complexMatrixAction_complexJacobianArrayOfCLM,
-    complexDot_complexOfRealSpace, real_inner_comm]
+  let J : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    complexJacobianArrayOfCLM D component coordinate
+  have haction := complexMatrixAction_complexJacobianArrayOfCLM D v
+  change complexMatrixAction J (complexOfRealSpace v) = complexOfRealSpace (D v) at haction
+  change complexStretchingReading (complexOfRealSpace v)
+      (symmetricComplexJacobianPart J) = ((inner ℝ (D v) v : ℝ) : ℂ)
+  rw [complexStretchingReading_symmetricComplexJacobianPart]
+  change complexDot (complexOfRealSpace v)
+      (complexMatrixAction J (complexOfRealSpace v)) = ((inner ℝ (D v) v : ℝ) : ℂ)
+  rw [haction, complexDot_complexOfRealSpace, real_inner_comm]
 
 /-- The actual complex vorticity chart is the coordinatewise complexification of the torus
 vorticity occurrence, with the quotient representative removed from the observable statement. -/

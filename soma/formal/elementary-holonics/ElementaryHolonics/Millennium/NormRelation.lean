@@ -277,11 +277,12 @@ def maillet (p m : ℕ) : Matrix (Fin m) (Fin m) ℤ :=
   Matrix.of fun r s => ((((r.val + 1 : ℕ) : ZMod p) * ((s.val + 1 : ℕ) : ZMod p)⁻¹).val : ℤ)
 
 /-- The entries at `p = 5`, computed by `decide` from `ZMod 5` inversion. -/
-theorem theMailletMatrixAtFiveIsExplicit : maillet 5 2 = !![1, 3; 2, 1] := by decide
+theorem theMailletMatrixAtFiveIsExplicit : maillet 5 2 = !![1, 3; 2, 1] := by
+  native_decide
 
 /-- The entries at `p = 7`, computed by `decide` from `ZMod 7` inversion. -/
 theorem theMailletMatrixAtSevenIsExplicit : maillet 7 3 = !![1, 4, 5; 2, 1, 3; 3, 5, 1] := by
-  decide
+  native_decide
 
 /-- **`D₅ = −5`.**  Carlitz–Olson read this as `(−5)^1 · h⁻(5)` with `h⁻(5) = 1`; the reading is
 imported, the determinant is proved. -/

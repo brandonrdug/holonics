@@ -42,6 +42,7 @@
 
 use std::ops::Range;
 
+use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
@@ -265,6 +266,9 @@ impl ExactRatMatrix {
         if !self.is_square() {
             return Err(ExactLinearError::NonsquareMatrix);
         }
+        if self.entries.iter().all(|entry| entry.denom().is_one()) {
+            return self.inverse_integral_fraction_free();
+        }
         let extent = self.rows;
         let mut left = (0..extent)
             .map(|row| self.row(row).map(ToOwned::to_owned))
@@ -314,6 +318,90 @@ impl ExactRatMatrix {
             }
         }
         let inverse = Self::new(right)?;
+        let identity = Self::identity(extent)?;
+        if self.multiply(&inverse)? != identity || inverse.multiply(self)? != identity {
+            return Err(ExactLinearError::InverseCertificateFailure);
+        }
+        Ok(inverse)
+    }
+
+    /// Fraction-free Gauss--Jordan (Montante/Bareiss) for an integral presentation.  The
+    /// augmented word remains in `BigInt` until its terminal diagonal is reached, so a large
+    /// common physical scale cannot trigger rational normalization at every intermediate pivot.
+    /// The returned inverse is still checked in both directions against the original operator.
+    fn inverse_integral_fraction_free(&self) -> Result<Self, ExactLinearError> {
+        let extent = self.rows;
+        if extent == 0 {
+            return Self::identity(0);
+        }
+        let width = extent
+            .checked_mul(2)
+            .ok_or(ExactLinearError::ExtentOverflow)?;
+        let mut augmented = Vec::with_capacity(extent);
+        for row in 0..extent {
+            let mut values = Vec::with_capacity(width);
+            for column in 0..extent {
+                values.push(self.get(row, column)?.numer().clone());
+            }
+            values.extend((0..extent).map(|column| {
+                if row == column {
+                    BigInt::one()
+                } else {
+                    BigInt::zero()
+                }
+            }));
+            augmented.push(values);
+        }
+
+        let mut previous_pivot = BigInt::one();
+        for pivot_at in 0..extent {
+            let pivot_row = (pivot_at..extent)
+                .find(|row| !augmented[*row][pivot_at].is_zero())
+                .ok_or(ExactLinearError::SingularMatrix)?;
+            if pivot_row != pivot_at {
+                augmented.swap(pivot_row, pivot_at);
+            }
+            let pivot = augmented[pivot_at][pivot_at].clone();
+            if pivot.is_zero() {
+                return Err(ExactLinearError::SingularMatrix);
+            }
+            let pivot_row_values = augmented[pivot_at].clone();
+            for row in 0..extent {
+                if row == pivot_at {
+                    continue;
+                }
+                let eliminated = augmented[row][pivot_at].clone();
+                for column in 0..width {
+                    if column == pivot_at {
+                        continue;
+                    }
+                    let numerator =
+                        &pivot * &augmented[row][column] - &eliminated * &pivot_row_values[column];
+                    if &numerator % &previous_pivot != BigInt::zero() {
+                        return Err(ExactLinearError::InverseCertificateFailure);
+                    }
+                    augmented[row][column] = numerator / &previous_pivot;
+                }
+                augmented[row][pivot_at] = BigInt::zero();
+            }
+            previous_pivot = pivot;
+        }
+
+        let inverse = Self::new(
+            (0..extent)
+                .map(|row| {
+                    let diagonal = augmented[row][row].clone();
+                    if diagonal.is_zero() {
+                        return Err(ExactLinearError::SingularMatrix);
+                    }
+                    Ok((0..extent)
+                        .map(|column| {
+                            Rat::new(augmented[row][extent + column].clone(), diagonal.clone())
+                        })
+                        .collect::<Vec<_>>())
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        )?;
         let identity = Self::identity(extent)?;
         if self.multiply(&inverse)? != identity || inverse.multiply(self)? != identity {
             return Err(ExactLinearError::InverseCertificateFailure);
@@ -973,8 +1061,6 @@ mod tests {
             "the dependency span is the pivot count: {coordinates:?}"
         );
     }
-
-    use super::*;
 
     #[test]
     fn exact_inverse_returns_identity_without_tolerance() {

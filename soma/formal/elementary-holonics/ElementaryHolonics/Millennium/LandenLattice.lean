@@ -306,6 +306,7 @@ reflection is the sign — and the even cell carries the signed lattice at doubl
 scale. -/
 theorem theProductFaceIsTheDoubledSignedCell {t : ℝ} (ht : 0 < t) :
     T3 t * T4 t = T4 (2 * t) ^ 2 := by
+  classical
   have h2t : 0 < 2 * t := by linarith
   set g : ℤ × ℤ → ℝ := fun p =>
     (-1 : ℝ) ^ p.2 * rexp (-π * t * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) with hg
@@ -353,11 +354,22 @@ theorem theProductFaceIsTheDoubledSignedCell {t : ℝ} (ht : 0 < t) :
   have hodd_zero : ∑' p : ℤ × ℤ, go p = 0 := by
     have hswap : ∀ p : ℤ × ℤ, go ((Equiv.prodComm ℤ ℤ) p) = - go p := by
       intro p
-      rw [hgo]
-      simp only [Equiv.prodComm_apply, Prod.swap]
       by_cases hp : Even (p.1 + p.2)
-      · rw [if_pos (by rwa [add_comm] at hp), if_pos hp, neg_zero]
-      · rw [if_neg (by rwa [add_comm] at hp), if_neg hp]
+      · have hp' : Even (((Equiv.prodComm ℤ ℤ) p).1 + ((Equiv.prodComm ℤ ℤ) p).2) := by
+          simpa [Equiv.prodComm_apply, add_comm] using hp
+        rw [hgo]
+        change (if Even (((Equiv.prodComm ℤ ℤ) p).1 + ((Equiv.prodComm ℤ ℤ) p).2)
+            then 0 else g ((Equiv.prodComm ℤ ℤ) p)) =
+          -(if Even (p.1 + p.2) then 0 else g p)
+        rw [if_pos hp', if_pos hp, neg_zero]
+      · have hp' : ¬ Even (((Equiv.prodComm ℤ ℤ) p).1 + ((Equiv.prodComm ℤ ℤ) p).2) := by
+          simpa [Equiv.prodComm_apply, add_comm] using hp
+        rw [hgo]
+        change (if Even (((Equiv.prodComm ℤ ℤ) p).1 + ((Equiv.prodComm ℤ ℤ) p).2)
+            then 0 else g ((Equiv.prodComm ℤ ℤ) p)) =
+          -(if Even (p.1 + p.2) then 0 else g p)
+        rw [if_neg hp', if_neg hp]
+        simp only [Equiv.prodComm_apply, Prod.swap]
         rw [hg]
         simp only
         have hprod : (-1 : ℝ) ^ p.1 * (-1) ^ p.2 = -1 := by
@@ -391,8 +403,8 @@ theorem theProductFaceIsTheDoubledSignedCell {t : ℝ} (ht : 0 < t) :
     intro q
     rw [hge]
     simp only [D]
-    rw [if_pos (show Even (q.1 + q.2 + (q.1 - q.2)) from ⟨q.1, by ring⟩), hg]
-    simp only
+    have hq : Even (q.1 + q.2 + (q.1 - q.2)) := ⟨q.1, by ring⟩
+    simp only [if_pos hq, hg]
     have hsub : ((-1 : ℝ)) ^ (q.1 - q.2) = (-1) ^ q.1 * (-1) ^ q.2 := by
       have h1 : ((-1 : ℝ)) ^ (q.1 - q.2) * (-1) ^ q.2 = (-1) ^ q.1 := by
         rw [← zpow_add₀ (by norm_num : (-1 : ℝ) ≠ 0)]

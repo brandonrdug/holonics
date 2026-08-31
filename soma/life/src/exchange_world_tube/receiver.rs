@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::interchange::{
-    EnactedFace, EnactsInOrder, Interchange, all_orders, certify_front,
+    all_orders, certify_front, EnactedFace, EnactsInOrder, Interchange,
 };
 use num_bigint::BigUint;
 use serde::Serialize;

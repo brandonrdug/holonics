@@ -3,9 +3,9 @@ use std::fs;
 use std::path::Path;
 
 use life::mathematical_source::{
-    correspond, correspondence_demand, derive_layout, exact_decimal, layout_demand,
     ArtifactIdentity, CoTestimonyFiber, ExactBox, ExactExtent, PlacedCarrier,
-    SourceLayoutTestimony, SourceLayoutWorkCover, TestimonyChart,
+    SourceLayoutTestimony, SourceLayoutWorkCover, TestimonyChart, correspond,
+    correspondence_demand, derive_layout, exact_decimal, layout_demand,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -31,7 +31,6 @@ pub struct RemountedM0 {
     pub equation_atlas: SourceLayoutTestimony,
     pub baseline_words: Vec<Vec<u8>>,
     pub reflow_words: Vec<Vec<u8>>,
-    pub natural_page5_words: Vec<Vec<u8>>,
 }
 
 pub fn remount(root: &Path) -> Result<RemountedM0, String> {
@@ -67,7 +66,7 @@ pub fn remount(root: &Path) -> Result<RemountedM0, String> {
     )?;
     let (baseline, baseline_words) = remount_bbox(root, baseline_artifact)?;
     let (reflow, reflow_words) = remount_bbox(root, reflow_artifact)?;
-    let (natural_page5, natural_page5_words) = remount_bbox(root, page5_artifact)?;
+    let (natural_page5, _) = remount_bbox(root, page5_artifact)?;
     let equation_atlas = remount_lines(root, atlas_artifact)?;
     let demand = correspondence_demand(&baseline, &reflow).map_err(|error| error.to_string())?;
     let presentation = correspond(&baseline, &reflow, &SourceLayoutWorkCover::exactly(&demand))
@@ -81,7 +80,6 @@ pub fn remount(root: &Path) -> Result<RemountedM0, String> {
         equation_atlas,
         baseline_words,
         reflow_words,
-        natural_page5_words,
     })
 }
 

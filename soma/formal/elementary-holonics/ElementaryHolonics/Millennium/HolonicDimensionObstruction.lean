@@ -41,7 +41,12 @@ inductive RedundantMode where
   | gauge
   | closure
   | reparameterization
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+instance : Fintype RedundantMode :=
+  Fintype.ofList [.fixedBoard, .gauge, .closure, .reparameterization] (by
+    intro mode
+    cases mode <;> simp)
 
 /-- The complete source mode population before receiver condensation. -/
 abbrev RawMode := VisibleMode ⊕ RedundantMode
@@ -81,7 +86,8 @@ def visibleImpulse (m : VisibleMode) : SuccessorFace := Pi.single m 1
 /-- The eleven returned coordinate directions are genuinely independent. -/
 theorem visibleImpulses_independent :
     LinearIndependent ℚ visibleImpulse := by
-  simpa [visibleImpulse] using Pi.linearIndependent_single_one VisibleMode ℚ
+  change LinearIndependent ℚ (fun m : VisibleMode => Pi.single m (1 : ℚ))
+  exact Pi.linearIndependent_single_one VisibleMode ℚ
 
 /-- Every visible source impulse is transported to the corresponding receiver impulse. -/
 theorem successorReceiver_visibleImpulse (m : VisibleMode) :

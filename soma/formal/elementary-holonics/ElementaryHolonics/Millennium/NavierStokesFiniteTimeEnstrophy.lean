@@ -159,13 +159,13 @@ theorem hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_openSlab
     apply hasDerivAt_kineticEnergyDensity_time_of_contDiffOn_openSlab field hfield x
     · exact lt_trans hlower0 hτ.1
     · exact lt_trans hτ.2 hupperT
-  simpa [periodicKineticEnergy] using
-    (hasDerivAt_integral_of_dominated_loc_of_deriv_le
+  convert (hasDerivAt_integral_of_dominated_loc_of_deriv_le
       (F := fun τ x => kineticEnergyDensity (fun y => field y τ) x)
       (F' := fun τ x => inner ℝ (eulerianTimeJet field x τ) (field x τ))
       (bound := fun _ : Space => C) (x₀ := t) (s := timeSet)
       (μ := volume.restrict unitCube)
-      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2
+      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2 using 1 <;>
+    rfl
 
 /-! ## Periodic finite-slab attachments -/
 
@@ -236,11 +236,11 @@ theorem periodicSolutionOn_hasDerivAt_periodicEnstrophy_eq_timeWork
       (∫ x in unitCube,
         inner ℝ (eulerianTimeJet (vorticityField velocity) x t)
           (vorticityField velocity x t)) t := by
-  simpa [periodicEnstrophy] using
-    hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_openSlab
+  convert hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_openSlab
       (vorticityField velocity)
       (smoothSolutionOn_vorticityField_contDiffOn_interior
-        solution.toSmoothSolutionOn) ht0 htT
+        solution.toSmoothSolutionOn) ht0 htT using 1 <;>
+    rfl
 
 /-- The finite-slab pointwise balance read against the actual vorticity. -/
 theorem smoothSolutionOn_pointwiseVorticityBalance_inner

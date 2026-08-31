@@ -248,6 +248,7 @@ theorem hasPeriodicSobolevCoefficients_one_openPeriodicVorticityComponent
   have hrestricted :=
     (periodicSobolevCoefficientsRestrict 1 3 (by omega) source).2
   simpa [source, omega, homega, hperiodic,
+    smoothSliceSobolevCoefficients,
     periodicSobolevCoefficientsRestrict,
     openPeriodicVorticityComponentFourierL2] using hrestricted
 

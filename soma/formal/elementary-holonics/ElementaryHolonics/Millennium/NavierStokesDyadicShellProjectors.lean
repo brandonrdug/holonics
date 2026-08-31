@@ -190,7 +190,9 @@ theorem norm_finiteFourierSynthesis_le_sum_norm
       apply Finset.sum_congr rfl
       intro k _hk
       rw [norm_smul]
-      simp [UnitAddTorus.mFourier, norm_prod]
+      simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+        fourier_apply, Circle.norm_coe, Finset.prod_const_one]
+      simp only [one_mul]
 
 /-- Synthesis respects an exact nested-population split. -/
 theorem finiteFourierSynthesis_eq_add_sdiff
@@ -272,7 +274,8 @@ theorem norm_openPeriodicVorticityFourierMode_le_criticalVorticityRate
     intro q
     rw [norm_smul]
     have hchar : ‖UnitAddTorus.mFourier (-k) q‖ = 1 := by
-      simp [UnitAddTorus.mFourier, norm_prod]
+      simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+        fourier_apply, Circle.norm_coe, Finset.prod_const_one]
     rw [hchar, one_mul]
     exact (norm_complexifySpace_le (torusVorticityEvolution solution t q)).trans
       ((torusVorticityEvolution solution t).norm_coe_le_norm q)

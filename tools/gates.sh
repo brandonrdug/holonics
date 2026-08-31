@@ -1,20 +1,11 @@
 #!/usr/bin/env bash
 #
-# The gate sequence. One script, every verifier this repository owns, in order.
-#
-# `THE_CLAIM_INDEX.md` §5 said it plainly on 2026-08-10: *"A verifier nobody invokes detects
-# nothing."* Of the six tools it lists, it measured only two — `resolve_named_paths.py` and
-# `authored_levels.py` — as run as gates in practice. `output_manifest.py`, `closure_manifest.py`,
-# `boundary_artifacts.py` and `crates/holonic-architecture-lint` were built and had no reader.
-#
-# Two of those four were ALREADY RED the first time they were invoked, before this script existed:
-# at 17:19 on 2026-08-10 `output_manifest.py --check` reported one moved and four unrecorded
-# return directories, and the lint reported a baseline file that has never existed in this tree.
+# The release gate sequence. Every owned verifier has one named entry here.
 #
 #     bash tools/gates.sh                    # every gate, in order
 #     bash tools/gates.sh --list             # the gate names, and nothing else
 #     bash tools/gates.sh named-paths typst  # only the named gates, in the order given
-#     bash tools/gates.sh --control          # make each gate FAIL on purpose, then restore
+#     bash tools/gates.sh --control          # exercise supported non-destructive controls
 #
 # This is a RELEASE receiver, not an edit-loop command. It already runs the complete workspace
 # suite. During construction invoke only named gates whose inputs changed and focused Cargo tests
@@ -30,66 +21,34 @@
 # `--check`; that is a decision about what the tree should now claim, and a gate is not the place
 # to take it.
 #
-# WHAT THE TWO LEDGER GATES ACTUALLY ASSERT, measured on the first run rather than assumed. Both
-# are *agreement* checks between a tracked ledger and an untracked tree, so both are red under any
-# ordinary working session, for two different and non-interchangeable reasons:
+# The two ledger gates are agreement checks, not code-quality verdicts:
 #
 #   output-manifest   goes red when a driver has RUN since the ledger was written. `unrecorded`
 #                     and `moved` are drift. `departed` is the loss the tool exists to catch, and
 #                     it is the only one of the three that is a defect on its own.
-#   closure-manifest  goes red when any `src/**.rs` in a crate that owns drivers is EDITED, because
-#                     a closure covers the whole crate. One dirty crate reddens every driver it
-#                     owns at once — 3 rows for `crates/holonic-engine`, 20 for `soma/life`, on the
-#                     first run of this script. That is one edit reported twenty-three times, so
-#                     the gate names the producing crates instead of counting rows.
-#
-# Neither can be green on a dirty tree, and neither should be read as a claim about the *code*.
-# `git status` is the companion reading for both.
+#   closure-manifest  goes red when a recorded return's transitive producing closure drifts, or
+#                     when an output root has no explicit producer/orphan disposition.
 
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CARGO_LOCK=/tmp/holonics-cargo.lock
 CARGO_PATH=/opt/cuda/bin:$PATH   # holonic-engine's build script shells out to nvcc.
+PROCESS_BOUND=(timeout -k 2s 180s)
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-GATES=(tests authored-levels named-paths line-citations claim-index equation-atlas driver-catalog
-       output-manifest closure-manifest boundary-artifacts typst architecture-lint document-law)
-
-# THIRTEEN. The driver catalog was added 2026-08-16 because its population had no catalog of
-# any kind. Measured that morning: **203 example drivers, 163,332 lines — 42% the size of every
-# library crate combined — accrued over ten days**, of which 0 appeared in `THE_CLAIM_INDEX.md`, 39
-# were named in no governing document or research record, and 40 carried no module doc at all.
-# Brandon: *"I thought that at the least we'd have some records of references to these drivers, yet
-# you are showing me that we simply do not have a catalog for them."*
-#
-# A driver nobody can find is a capability nobody can cite, so the mechanism gets rebuilt beside its
-# own prior implementation — the explorative failure with the driver population as its habitat. This
-# gate does not judge a driver; it asserts only that every driver in the tree is in the ledger and
-# every ledger row is in the tree, which is the condition under which the atlas that DOES judge them
-# can stay true.
-
-# The thirteenth was added 2026-08-21 after the M0 cooling audit found that all 72 equation-atlas
-# rows appended the prior day parsed, hashed and joined without dangling endpoints while violating
-# the atlas's own JSON Schema. A content manifest cannot detect a malformed content contract.
-
-# EIGHT, and the sixth was not requested. `tools/boundary_artifacts.py` is the third verifier this
-# repository owns that nothing invoked, and its own header states the exposure: *"Nothing in `cargo
-# test` recompiles any of them, so source and artifact drift SILENTLY"* — which is how `soma.spv`
-# drifted for twenty-six days across two repositories. It belongs in the sequence.
-#
-# `tools/lean_check.sh` is DELIBERATELY NOT HERE, on its own authority. Its header, verbatim:
-# *"THIS IS NOT A GATE AND NOT AN ORGAN. The kernel is an external receiver whose verdict is a
-# RETURN... `CLAUDE.md` §13 rule 2: a foreign process deciding what the body may construct is
-# `G_authored`."* Wiring it in would make an external kernel a governor. Run it on its own.
+GATES=(tests formal tracked-authority source-shape authored-levels named-paths line-citations
+       epistemic-tags claim-index equation-atlas driver-catalog output-manifest closure-manifest
+       boundary-artifacts typst architecture-lint document-law)
 
 # ---------------------------------------------------------------------------------------------
 # 10 · the laws THE_DOCUMENT_LAW states about governing documents
 # ---------------------------------------------------------------------------------------------
 #
-# Two laws the corpus already states and nothing enforced.
+# Three laws the corpus states and now enforces: measured absence, subordinate plans, and one
+# identical current frontier in the position record and roadmap.
 #
 # An ABSENCE CLAIM must carry the command that measured it and the date it was measured.
 # `canon/THE_OWNER_ATLAS.md` states the discipline — *"A measured absence decays and carries its
@@ -103,7 +62,7 @@ GATES=(tests authored-levels named-paths line-citations claim-index equation-atl
 
 gate_document-law() {
     local out="$WORK/doclaw.out"
-    python3 "$ROOT/tools/document_law.py" >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/document_law.py" >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
     SUMMARY="${SUMMARY:-no summary line}"
@@ -172,10 +131,10 @@ gate_tests() {
     # made a local library repair pay hundreds of binaries. Keep their release-boundary coverage by
     # type-checking them once, without linking or executing them all. Real deeds are still built and
     # executed explicitly by their owning phase.
-    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo test --workspace --lib --bins --tests -j 2 >"$out" 2>&1
     local tests_status=$?
-    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo check --workspace --examples -j 2 >"$examples" 2>&1
     local examples_status=$?
     local status=0
@@ -191,12 +150,50 @@ gate_tests() {
 }
 
 # ---------------------------------------------------------------------------------------------
+# 1a · the live formal umbrella builds without archived dependency fallback
+# ---------------------------------------------------------------------------------------------
+
+gate_formal() {
+    local out="$WORK/formal.out"
+    "${PROCESS_BOUND[@]}" bash "$ROOT/tools/lean_check.sh" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(grep -E 'Build completed successfully|build completed successfully|error:|timed out' "$out" | tail -1)"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || tail -80 "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 1b · the live authority and source owners exist in the Git index
+# ---------------------------------------------------------------------------------------------
+
+gate_tracked-authority() {
+    local out="$WORK/tracked-authority.out"
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/tracked_authority.py" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(tail -1 "$out")"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+gate_source-shape() {
+    local out="$WORK/source-shape.out"
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/source_shape.py" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(tail -1 "$out")"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
 # 2 · authored numeric levels
 # ---------------------------------------------------------------------------------------------
 
 gate_authored-levels() {
     local out="$WORK/authored.out"
-    python3 "$ROOT/tools/authored_levels.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/authored_levels.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^[0-9]+ failures' "$out" | tail -1)"
     SUMMARY="${SUMMARY:-no failure line}; $(grep -E '^[0-9]+ authored' "$out" | tail -1)"
@@ -210,7 +207,7 @@ gate_authored-levels() {
 
 gate_named-paths() {
     local out="$WORK/paths.out"
-    python3 "$ROOT/tools/resolve_named_paths.py" >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/resolve_named_paths.py" >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
     SUMMARY="${SUMMARY:-no failure line}; $(grep -E '^path tokens' "$out" | tail -1)"
@@ -230,9 +227,23 @@ gate_named-paths() {
 
 gate_line-citations() {
     local out="$WORK/lines.out"
-    python3 "$ROOT/tools/resolve_line_citations.py" >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/resolve_line_citations.py" >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^FAILURES' "$out" | tail -1)"
+    SUMMARY="${SUMMARY:-no summary line}"
+    [ "$status" -eq 0 ] || cat "$out"
+    return "$status"
+}
+
+# ---------------------------------------------------------------------------------------------
+# 3c · every live material bracket has one truth grade and declared evidence tags
+# ---------------------------------------------------------------------------------------------
+
+gate_epistemic-tags() {
+    local out="$WORK/epistemic.out"
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/epistemic_tags.py" >"$out" 2>&1
+    local status=$?
+    SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
     [ "$status" -eq 0 ] || cat "$out"
     return "$status"
@@ -250,7 +261,7 @@ gate_line-citations() {
 
 gate_claim-index() {
     local out="$WORK/claim.out"
-    python3 "$ROOT/tools/claim_index.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/claim_index.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
@@ -264,7 +275,7 @@ gate_claim-index() {
 
 gate_equation-atlas() {
     local out="$WORK/equation-atlas.out"
-    python3 "$ROOT/tools/equation_atlas.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/equation_atlas.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
@@ -278,7 +289,7 @@ gate_equation-atlas() {
 
 gate_driver-catalog() {
     local out="$WORK/drivers.out"
-    python3 "$ROOT/tools/driver_catalog.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/driver_catalog.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(head -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}"
@@ -292,7 +303,7 @@ gate_driver-catalog() {
 
 gate_output-manifest() {
     local out="$WORK/output.out"
-    python3 "$ROOT/tools/output_manifest.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/output_manifest.py" --check >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^recorded ' "$out" | tail -1)"
     SUMMARY="${SUMMARY:-no summary line}"
@@ -306,7 +317,7 @@ gate_output-manifest() {
 
 gate_closure-manifest() {
     local out="$WORK/closure.out"
-    python3 "$ROOT/tools/closure_manifest.py" --check >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/closure_manifest.py" --check >"$out" 2>&1
     local status=$?
     if [ "$status" -eq 0 ]; then
         SUMMARY="$(tail -1 "$out")"
@@ -338,7 +349,7 @@ gate_closure-manifest() {
 # checked against something committed.
 gate_boundary-artifacts() {
     local out="$WORK/boundary.out"
-    python3 "$ROOT/tools/boundary_artifacts.py" >"$out" 2>&1
+    "${PROCESS_BOUND[@]}" python3 "$ROOT/tools/boundary_artifacts.py" >"$out" 2>&1
     local status=$?
     SUMMARY="$(tail -1 "$out")"
     SUMMARY="${SUMMARY:-no summary line}; $(grep -c '^BOUND ' "$out") artifact(s) bound"
@@ -367,7 +378,7 @@ gate_typst() {
     while IFS= read -r root; do
         total=$((total + 1))
         stem="$(printf '%s' "${root#"$ROOT/papers/source/"}" | tr '/' '-')"
-        if ! typst compile --root "$ROOT/papers/source" "$root" "$rendered/$stem.pdf" \
+        if ! "${PROCESS_BOUND[@]}" typst compile --root "$ROOT/papers/source" "$root" "$rendered/$stem.pdf" \
              >"$WORK/typst-$stem.err" 2>&1; then
             broken=$((broken + 1))
             printf '=== %s\n' "${root#"$ROOT/"}"
@@ -396,7 +407,7 @@ gate_typst() {
 # work that adds an ownership or materialization occurrence shows up RED, by file and construct.
 gate_architecture-lint() {
     local out="$WORK/lint.out"
-    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo run -q -p holonic-architecture-lint -j 2 -- "$ROOT" >"$out" 2>&1
     local status=$?
     SUMMARY="$(grep -E '^holonic architecture' "$out" | tail -1)"
@@ -408,8 +419,9 @@ gate_architecture-lint() {
 # ---------------------------------------------------------------------------------------------
 # The controls
 #
-# A gate that cannot be made to fail has not been shown to gate anything. `--control` perturbs the
-# material each gate reads, asserts the gate turns RED, and restores. Every perturbation is either
+# A gate control perturbs the material it reads, asserts the gate turns RED, and restores. The
+# command exercises only the safe controls implemented below; it does not claim coverage for every
+# gate. Every perturbation is either
 # a new file this script created (removed on the way out, including on a signal) or lives entirely
 # outside the repository; no tracked file is edited.
 #
@@ -586,7 +598,7 @@ run_controls() {
     # The allowance is READ OFF THE MATERIAL by the tool's own `--emit-baseline`, never written
     # here. Counting `Vec` occurrences by hand is how the first version of this control failed:
     # it authored `Vec=3` for a file whose census is 4, and reported the tool broken.
-    local lint_run=(flock "$CARGO_LOCK" env PATH="$CARGO_PATH"
+    local lint_run=(timeout -k 2s 180s flock "$CARGO_LOCK" env PATH="$CARGO_PATH"
                     cargo run -q -p holonic-architecture-lint -j 2 --)
     "${lint_run[@]}" --emit-baseline "$lint_root" >"$lint_root/meta/HOLONIC_DSA_BASELINE.tsv"
     local exact

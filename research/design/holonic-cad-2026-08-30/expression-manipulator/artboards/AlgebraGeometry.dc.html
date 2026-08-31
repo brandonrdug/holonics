@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .col { background: #fbf8f2; border: 1px solid #d9d0bf; border-radius: 10px; padding: 12px 13px; display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+    .col-title { font-size: 13px; font-weight: 600; }
+    .box { border-radius: 8px; padding: 8px 11px; box-sizing: border-box; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; font-size: 11.5px; color: #56503f; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-note { background: transparent; border: none; padding: 2px 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .goal-t { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 17px; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; margin-bottom: 4px; }
+    .tag-carried { background: #3e7d57; }
+    .tag-obstructed { background: #9c5480; }
+    .tag-goal { background: #a67a2e; }
+    .sw { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 6px 10px; box-sizing: border-box; background: #fffdf8; border: 1px solid #d9d0bf; border-radius: 8px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+    .sw:hover { border-color: #b45309; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; flex: 0 0 auto; }
+    .sp-transport { background: #3c6ea5; }
+    .sp-quotient { background: #9c5480; }
+    .branchrow { display: flex; gap: 8px; }
+    .branchrow > div { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  </style>
+</helmet>
+
+<div style="width: 1400px; height: 800px; box-sizing: border-box; padding: 22px 26px; overflow: hidden; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">Solving trees</div>
+      <div style="font-size: 12px; color: #7a7060">a goal is a candidate &middot; a tactic is a typed swing &middot; branches are retained fibres &middot; the tree is the route space</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Scratch/HolonicSolver.lean &middot; kernel/SMT acceptance is a later world event</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; flex: 1; min-height: 0">
+
+    <div class="col">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span class="col-title">Carried</span>
+        <button class="sw" style="width: auto; min-height: 28px; padding: 3px 9px; font-size: 11px" onClick="{{r1}}">reset</button>
+      </div>
+      <div class="box box-hyp">carrier: <b>&#8474;</b> (field) &middot; alphabet: pantographic links &middot; receiver: equality in &#8474;</div>
+      <sc-for list="{{c1}}" as="b" hint-placeholder-count="3">
+        <div class="{{b.cls}}">
+          <span class="{{b.tagCls}}" hidden="{{b.noTag}}">{{b.tag}}</span>
+          <div class="goal-t" hidden="{{b.noGoal}}">{{b.goal}}</div>
+          <div style="font-size: 11.5px; margin-top: 3px" hidden="{{b.noNote}}">{{b.note}}</div>
+          <sc-for list="{{b.chips}}" as="c" hint-placeholder-count="1">
+            <button class="sw" style="margin-top: 6px" onClick="{{c.pick}}"><span class="sp {{c.spCls}}">{{c.sp}}</span><span style="flex: 1; font-size: 12px">{{c.t}}</span></button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+
+    <div class="col">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span class="col-title">Obstructed</span>
+        <button class="sw" style="width: auto; min-height: 28px; padding: 3px 9px; font-size: 11px" onClick="{{r2}}">reset</button>
+      </div>
+      <div class="box box-hyp">carrier: <b>&#8484;</b> (ring, not a field) &middot; same alphabet &middot; receiver: equality in &#8484;</div>
+      <sc-for list="{{c2}}" as="b" hint-placeholder-count="3">
+        <div class="{{b.cls}}">
+          <span class="{{b.tagCls}}" hidden="{{b.noTag}}">{{b.tag}}</span>
+          <div class="goal-t" hidden="{{b.noGoal}}">{{b.goal}}</div>
+          <div style="font-size: 11.5px; margin-top: 3px" hidden="{{b.noNote}}">{{b.note}}</div>
+          <sc-for list="{{b.chips}}" as="c" hint-placeholder-count="1">
+            <button class="sw" style="margin-top: 6px" onClick="{{c.pick}}"><span class="sp {{c.spCls}}">{{c.sp}}</span><span style="flex: 1; font-size: 12px">{{c.t}}</span></button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+
+    <div class="col">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span class="col-title">The fibre splits</span>
+        <button class="sw" style="width: auto; min-height: 28px; padding: 3px 9px; font-size: 11px" onClick="{{r3}}">reset</button>
+      </div>
+      <div class="box box-hyp">carrier: <b>&#8474;</b> &middot; the squaring face forgets the half-turn</div>
+      <div class="box box-goal">
+        <span class="tag tag-goal">goal</span>
+        <div class="goal-t">x&sup2; = 9</div>
+        <sc-if value="{{s3closed}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 11px; color: #7a7060; margin-top: 4px">the root rung was taken — both members retained, no chooser</div>
+        </sc-if>
+        <sc-if value="{{s3open}}" hint-placeholder-val="{{ true }}">
+          <button class="sw" style="margin-top: 6px" onClick="{{takeRoot}}"><span class="sp sp-quotient">quotient</span><span style="flex: 1; font-size: 12px">take the root rung — the fibre is a swing orbit</span></button>
+        </sc-if>
+      </div>
+      <sc-if value="{{s3closed}}" hint-placeholder-val="{{ true }}">
+        <div class="branchrow">
+          <div>
+            <div class="box box-carried"><span class="tag tag-carried">carried</span><div class="goal-t">x = 3</div></div>
+          </div>
+          <div>
+            <div class="box box-carried"><span class="tag tag-carried">carried</span><div class="goal-t">x = &#10226;&#8320;3 = &minus;3</div></div>
+          </div>
+        </div>
+        <div class="box box-note">squaringFace_fibre_is_swing_orbit &middot; the &plusmn; is the half-turn squaring erased &middot; both branches stand in the route space</div>
+      </sc-if>
+    </div>
+
+    <div class="col">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span class="col-title">Geometry, same passage</span>
+        <button class="sw" style="width: auto; min-height: 28px; padding: 3px 9px; font-size: 11px" onClick="{{r4}}">reset</button>
+      </div>
+      <div class="box box-hyp">similar triangles &middot; the side is a face configured by the same pivots</div>
+      <svg viewBox="0 0 300 110" width="100%" height="104">
+        <polygon points="14,96 134,96 134,36" fill="none" stroke="#292418" stroke-width="1.6"/>
+        <polygon points="164,96 254,96 254,51" fill="none" stroke="#3c6ea5" stroke-width="1.6"/>
+        <text x="70" y="92" font-family="STIX Two Text, Georgia, serif" font-style="italic" font-size="13" fill="#292418">8</text>
+        <text x="140" y="70" font-family="STIX Two Text, Georgia, serif" font-style="italic" font-size="13" fill="#292418">4</text>
+        <text x="205" y="92" font-family="STIX Two Text, Georgia, serif" font-style="italic" font-size="13" fill="#3c6ea5">a</text>
+        <text x="259" y="76" font-family="STIX Two Text, Georgia, serif" font-style="italic" font-size="13" fill="#3c6ea5">3</text>
+        <text x="34" y="34" font-family="IBM Plex Mono, monospace" font-size="10" fill="#7a7060">s = 3/4</text>
+      </svg>
+      <div class="box box-goal">
+        <span class="tag tag-goal">goal</span>
+        <div class="goal-t">a / 8 = 3 / 4</div>
+        <sc-if value="{{s4open}}" hint-placeholder-val="{{ true }}">
+          <button class="sw" style="margin-top: 6px" onClick="{{dilate}}"><span class="sp sp-transport">transport</span><span style="flex: 1; font-size: 12px">pantograph s = 3/4 about 0 — one link, a gear ratio</span></button>
+        </sc-if>
+      </div>
+      <sc-if value="{{s4closed}}" hint-placeholder-val="{{ true }}">
+        <div class="box box-carried"><span class="tag tag-carried">carried</span><div class="goal-t">a = 6</div>
+          <div style="font-size: 11px; color: #7a7060; margin-top: 4px">realizer: [dilate 3/4] &middot; fibre: a point (rebase, zero remainder)</div>
+        </div>
+        <div class="box box-note">affine_is_one_link &middot; the side length and the cube sticker are both faces reached by pivot words</div>
+      </sc-if>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1400,"height":800}}'>
+function goalBox(goal) { return { cls: 'box box-goal', tag: 'goal', tagCls: 'tag tag-goal', noTag: false, goal: goal, noGoal: false, note: '', noNote: true, chips: [] }; }
+function carriedBox(goal, note) { return { cls: 'box box-carried', tag: 'carried', tagCls: 'tag tag-carried', noTag: false, goal: goal, noGoal: false, note: note, noNote: !note, chips: [] }; }
+function obstructedBox(note) { return { cls: 'box box-obstructed', tag: 'obstructed', tagCls: 'tag tag-obstructed', noTag: false, goal: '', noGoal: true, note: note, noNote: false, chips: [] }; }
+function noteBox(t) { return { cls: 'box box-note', tag: '', tagCls: 'tag', noTag: true, goal: '', noGoal: true, note: t, noNote: false, chips: [] }; }
+
+class Component extends DCLogic {
+  state = { s1: 0, s2: 0, s2ref: false, s2ext: false, s3: 0, s4: 0 };
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+
+    var c1 = [];
+    var g0 = goalBox('3·x + 5 = 11');
+    if (st.s1 === 0) g0.chips = [{ sp: 'transport', spCls: 'sp-transport', t: 'cross the junction: +(−5) both sides — a translation, two swings', pick: function () { self.setState({ s1: 1 }); } }];
+    c1.push(g0);
+    if (st.s1 >= 1) {
+      var g1 = goalBox('3·x = 6');
+      if (st.s1 === 1) g1.chips = [{ sp: 'transport', spCls: 'sp-transport', t: 'dilate s = 1/3 about 0 — one link', pick: function () { self.setState({ s1: 2 }); } }];
+      c1.push(g1);
+    }
+    if (st.s1 === 2) {
+      c1.push(carriedBox('x = 2', 'realizer: [translate −5] · [dilate 1/3] — scales multiply; fibre: a point (rebase, zero remainder)'));
+      c1.push(noteBox('affine_is_one_link · translation_is_two_swings · linear fibre = kernel torsor'));
+    }
+
+    var c2 = [];
+    var h0 = goalBox('2·x = 3');
+    if (st.s2 === 0 && !st.s2ext) {
+      h0.chips = [];
+      if (!st.s2ref) h0.chips.push({ sp: 'transport', spCls: 'sp-transport', t: 'dilate s = 1/2 about 0', pick: function () { self.setState({ s2ref: true }); } });
+      h0.chips.push({ sp: 'quotient', spCls: 'sp-quotient', t: 'descend to the parity face (mod 2)', pick: function () { self.setState({ s2: 1 }); } });
+    }
+    c2.push(h0);
+    if (st.s2ref) c2.push(obstructedBox('refused — 1/2 is not in the carrier: the link leaves ℤ. The alphabet is carrier-relative. (retained)'));
+    if (st.s2 >= 1) {
+      c2.push(goalBox('0 ≡ 1 (mod 2)'));
+      c2.push(obstructedBox('obstructed over ℤ — the image of ×2 is even, the candidate 3 is odd. Separating invariant: parity. The cokernel witness is the return (preimage_obstruction: w with wᵀT = 0, ⟨w, y⟩ ≠ 0).'));
+    }
+    if ((st.s2ref || st.s2 >= 1) && !st.s2ext) {
+      var ext = noteBox('');
+      ext.cls = 'box box-goal'; ext.noNote = true; ext.noTag = true;
+      ext.chips = [{ sp: 'transport', spCls: 'sp-transport', t: 'the obstruction names its cure: extend the carrier — rebase into ℚ', pick: function () { self.setState({ s2ext: true }); } }];
+      c2.push(ext);
+    }
+    if (st.s2ext) {
+      c2.push(carriedBox('x = 3/2 over ℚ', 'the finer chart carries it — the obstruction was carrier-relative, and the extension is a passage, not a failure'));
+      c2.push(noteBox('linearPassage · obstruction group = cokernel ℤ/2 · the fractional coefficient lands in the finer chart'));
+    }
+
+    return {
+      c1: c1, r1: function () { self.setState({ s1: 0 }); },
+      c2: c2, r2: function () { self.setState({ s2: 0, s2ref: false, s2ext: false }); },
+      s3open: st.s3 === 0, s3closed: st.s3 === 1,
+      takeRoot: function () { self.setState({ s3: 1 }); },
+      r3: function () { self.setState({ s3: 0 }); },
+      s4open: st.s4 === 0, s4closed: st.s4 === 1,
+      dilate: function () { self.setState({ s4: 1 }); },
+      r4: function () { self.setState({ s4: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

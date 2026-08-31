@@ -33,9 +33,6 @@ pub fn grow_optical_holons(
     predecessor: &OpticalPassage,
     intervention: OpticalHolonIntervention,
 ) -> Result<(HierarchicalOpticalPassage, DeviceOpticalHolonReceipt), SourceLayoutError> {
-    let testimony = predecessor.glyph_testimony.as_ref().ok_or_else(|| {
-        SourceLayoutError::OpticalHolon("inherited glyph testimony is absent".into())
-    })?;
     let intervention_sha = digest_json(&intervention)?;
     let occurrence = format!(
         "e1/optical-holons/{}/{intervention_sha}",
@@ -79,69 +76,71 @@ pub fn grow_optical_holons(
         component_holons.insert(ordinal, at);
     }
 
-    let bindings = testimony
-        .bindings
-        .iter()
-        .map(|binding| (binding.glyph_ordinal, binding))
-        .collect::<BTreeMap<_, _>>();
     let mut components_claimed_by_glyph = BTreeSet::<u32>::new();
     let mut atoms = Vec::<Atom>::new();
-    for glyph in &testimony.glyphs {
-        if matches!(
-            intervention,
-            OpticalHolonIntervention::WithoutInheritedGlyph { glyph_ordinal }
-                if glyph_ordinal == glyph.ordinal
-        ) || !admitted(glyph.bounds, &intervention)
-        {
-            continue;
-        }
-        let bounds = transformed(glyph.bounds, &intervention)?;
-        let binding = bindings.get(&glyph.ordinal).ok_or_else(|| {
-            SourceLayoutError::OpticalHolon(format!("glyph {} has no binding", glyph.ordinal))
-        })?;
-        let children = binding
-            .component_candidates
+    if let Some(testimony) = predecessor.glyph_testimony.as_ref() {
+        let bindings = testimony
+            .bindings
             .iter()
-            .filter_map(|component| component_holons.get(component).copied())
-            .collect::<Vec<_>>();
-        components_claimed_by_glyph.extend(
-            binding
+            .map(|binding| (binding.glyph_ordinal, binding))
+            .collect::<BTreeMap<_, _>>();
+        for glyph in &testimony.glyphs {
+            if matches!(
+                intervention,
+                OpticalHolonIntervention::WithoutInheritedGlyph { glyph_ordinal }
+                    if glyph_ordinal == glyph.ordinal
+            ) || !admitted(glyph.bounds, &intervention)
+            {
+                continue;
+            }
+            let bounds = transformed(glyph.bounds, &intervention)?;
+            let binding = bindings.get(&glyph.ordinal).ok_or_else(|| {
+                SourceLayoutError::OpticalHolon(format!("glyph {} has no binding", glyph.ordinal))
+            })?;
+            let children = binding
                 .component_candidates
                 .iter()
-                .filter(|component| component_holons.contains_key(component))
-                .copied(),
-        );
-        let component_ordinals = children
-            .iter()
-            .flat_map(|child| holons[*child].component_ordinals.iter().copied())
-            .collect::<BTreeSet<_>>()
-            .into_iter()
-            .collect::<Vec<_>>();
-        let form_members = children
-            .iter()
-            .map(|child| OpticalFormMember {
-                child_form_sha256: holons[*child].form_sha256.clone(),
-                relative_bounds: relative(bounds, holons[*child].bounds),
-                inherited_face: None,
-            })
-            .collect::<Vec<_>>();
-        let at = push_holon(
-            &occurrence,
-            OpticalHolonGrain::GlyphOrSubfigure,
-            bounds,
-            children,
-            vec![glyph.ordinal],
-            component_ordinals,
-            Some(glyph.utf8_face.clone()),
-            form_members,
-            &mut holons,
-            &mut incidences,
-        )?;
-        atoms.push(Atom {
-            holon: at,
-            bounds,
-            glyph_ordinal: Some(glyph.ordinal),
-        });
+                .filter_map(|component| component_holons.get(component).copied())
+                .collect::<Vec<_>>();
+            components_claimed_by_glyph.extend(
+                binding
+                    .component_candidates
+                    .iter()
+                    .filter(|component| component_holons.contains_key(component))
+                    .copied(),
+            );
+            let component_ordinals = children
+                .iter()
+                .flat_map(|child| holons[*child].component_ordinals.iter().copied())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>();
+            let form_members = children
+                .iter()
+                .map(|child| OpticalFormMember {
+                    child_form_sha256: holons[*child].form_sha256.clone(),
+                    relative_bounds: relative(bounds, holons[*child].bounds),
+                    inherited_face: None,
+                })
+                .collect::<Vec<_>>();
+            let at = push_holon(
+                &occurrence,
+                OpticalHolonGrain::GlyphOrSubfigure,
+                bounds,
+                children,
+                vec![glyph.ordinal],
+                component_ordinals,
+                Some(glyph.utf8_face.clone()),
+                form_members,
+                &mut holons,
+                &mut incidences,
+            )?;
+            atoms.push(Atom {
+                holon: at,
+                bounds,
+                glyph_ordinal: Some(glyph.ordinal),
+            });
+        }
     }
     for (component, child) in &component_holons {
         if components_claimed_by_glyph.contains(component) {

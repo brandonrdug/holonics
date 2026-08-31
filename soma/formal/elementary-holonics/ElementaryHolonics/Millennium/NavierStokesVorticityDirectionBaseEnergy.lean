@@ -368,9 +368,14 @@ theorem norm_openPeriodicDyadicBaseStrainReading_le_baseEnergy
       ((486 * Real.pi) * openPeriodicVelocityL2RootReceiver solution t) *
         complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
   unfold openPeriodicDyadicBaseStrainReading
+  let base : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianLowPass solution t 0 q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart base)‖ ≤ _
   rw [complexStretchingReading_symmetricComplexJacobianPart]
   refine (norm_complexStretchingReading_le _ _).trans ?_
   apply mul_le_mul_of_nonneg_right _ (sq_nonneg _)
+  change ‖openPeriodicDyadicHodgeJacobianLowPass solution t 0 q‖ ≤ _
   rw [openPeriodicDyadicHodgeJacobianLowPass_zero]
   exact norm_openPeriodicSmoothHodgeJacobianLowPass_zero_apply_le_baseEnergy solution t q
 
@@ -386,9 +391,14 @@ theorem norm_openPeriodicDyadicBaseStrainReading_le_kineticEnergy
         Real.sqrt (2 * periodicKineticEnergy velocity t.1)) *
           complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
   unfold openPeriodicDyadicBaseStrainReading
+  let base : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianLowPass solution t 0 q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart base)‖ ≤ _
   rw [complexStretchingReading_symmetricComplexJacobianPart]
   refine (norm_complexStretchingReading_le _ _).trans ?_
   apply mul_le_mul_of_nonneg_right _ (sq_nonneg _)
+  change ‖openPeriodicDyadicHodgeJacobianLowPass solution t 0 q‖ ≤ _
   rw [openPeriodicDyadicHodgeJacobianLowPass_zero]
   exact norm_openPeriodicSmoothHodgeJacobianLowPass_zero_apply_le_kineticEnergy solution t q
 
@@ -418,10 +428,8 @@ theorem norm_openPeriodicFullStrainReading_le_dyadicSpatialCrossCoherence_kineti
   have hband :=
     norm_openPeriodicDyadicHodgeStrainWord_le_spatialCrossCoherenceWord
       solution t q depth hvorticity
-  rw [openPeriodicFullStrainReading,
-    openPeriodicTorusJacobianArraySlice_eq_base_add_sum_dyadicBands_add_fiber]
-  rw [symmetricComplexJacobianPart_add, complexStretchingReading_add,
-    symmetricComplexJacobianPart_add, complexStretchingReading_add]
+  rw [openPeriodicDyadicHodgeStrainWord_eq_spatialDirectionRemainderWord] at hband
+  rw [openPeriodicFullStrainReading_eq_dyadicSpatialDirectionWord_add_fiber]
   exact (norm_add_le _ _).trans
     (add_le_add
       ((norm_add_le _ _).trans

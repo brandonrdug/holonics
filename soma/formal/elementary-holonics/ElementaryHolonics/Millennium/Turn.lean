@@ -1,5 +1,7 @@
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.Real.Pi.Bounds
+import Mathlib.Data.Fintype.BigOperators
 
 /-!
 # The turn — what the exponential deletes, and what each chart can still store
@@ -20,6 +22,7 @@ Every `theorem` here is discharged.
 namespace Soma.Holonics.Millennium.Turn
 
 open Real Complex
+open scoped BigOperators
 
 /-! ## 1. The complex chart stores the deleted turn in its kernel -/
 
@@ -65,7 +68,121 @@ theorem theRealExponentialMissesNegativeInputs {x : ℝ} (hx : x < 0) :
   rw [theRealExponentialHasPositiveImage]
   exact not_lt.mpr hx.le
 
-/-! ## 3. The two branch maps of a nested radical of two are the half-angle laws
+/-! ## 3. Intrinsic turn calibration from a finite arc partition
+
+The scalar normally written as `π` is not taken as the definition of an arbitrary turn.  A
+finite family of addressed arc occurrences first returns its integrated length.  A positive
+radial calibration then supplies the numerical half- and full-turn receivers.  Only a separate
+Euclidean-circle witness identifies those receivers with `π` and `2π`.
+
+This is deliberately the metric calibration layer, not yet a polygonal adjacency or solid-torus
+cellulation.  In particular, the finite index records distinct arc occurrences but does not claim
+that they have been ordered into a closed path.
+-/
+
+/-- Exact metric testimony attached to a finite population of arc occurrences. -/
+structure ArcPartition (ι : Type*) [Fintype ι] where
+  arcLength : ι → ℝ
+  arcLength_nonneg : ∀ i, 0 ≤ arcLength i
+
+namespace ArcPartition
+
+/-- The integrated length is the exact finite sum of the addressed arc lengths. -/
+def integratedLength {ι : Type*} [Fintype ι] (partition : ArcPartition ι) : ℝ :=
+  ∑ i, partition.arcLength i
+
+/-- A finite partition with nonnegative local lengths has nonnegative integrated length. -/
+theorem integratedLength_nonneg {ι : Type*} [Fintype ι] (partition : ArcPartition ι) :
+    0 ≤ partition.integratedLength :=
+  Finset.sum_nonneg fun i _ => partition.arcLength_nonneg i
+
+end ArcPartition
+
+/-- A numerical turn receiver formed from an exact arc partition and a positive radial scale. -/
+structure TurnCalibration (ι : Type*) [Fintype ι] where
+  partition : ArcPartition ι
+  radialScale : ℝ
+  radialScale_pos : 0 < radialScale
+
+namespace TurnCalibration
+
+/-- The circumference receiver retains the integrated arc population rather than postulating
+`2πr`. -/
+def circumference {ι : Type*} [Fintype ι] (calibration : TurnCalibration ι) : ℝ :=
+  calibration.partition.integratedLength
+
+/-- The half-turn receiver `C/(2r)`. -/
+noncomputable def halfTurn {ι : Type*} [Fintype ι] (calibration : TurnCalibration ι) : ℝ :=
+  calibration.circumference / (2 * calibration.radialScale)
+
+/-- The full-turn receiver `C/r`. -/
+noncomputable def fullTurn {ι : Type*} [Fintype ι] (calibration : TurnCalibration ι) : ℝ :=
+  calibration.circumference / calibration.radialScale
+
+/-- The full-turn receiver is exactly twice the half-turn receiver. -/
+theorem fullTurn_eq_two_mul_halfTurn {ι : Type*} [Fintype ι]
+    (calibration : TurnCalibration ι) :
+    calibration.fullTurn = 2 * calibration.halfTurn := by
+  rw [fullTurn, halfTurn]
+  field_simp [ne_of_gt calibration.radialScale_pos]
+
+/-- The additional constitutive witness that the integrated arcs calibrate one Euclidean circle.
+It is a property of the carrier, not a definition of every finite loop. -/
+def IsEuclideanCircle {ι : Type*} [Fintype ι] (calibration : TurnCalibration ι) : Prop :=
+  calibration.circumference = 2 * Real.pi * calibration.radialScale
+
+/-- A Euclidean-circle witness decodes the intrinsic half-turn receiver to `π`. -/
+theorem halfTurn_eq_pi_of_isEuclideanCircle {ι : Type*} [Fintype ι]
+    (calibration : TurnCalibration ι) (hcircle : calibration.IsEuclideanCircle) :
+    calibration.halfTurn = Real.pi := by
+  rw [halfTurn, hcircle]
+  field_simp [ne_of_gt calibration.radialScale_pos]
+
+/-- A Euclidean-circle witness decodes the intrinsic full-turn receiver to `2π`. -/
+theorem fullTurn_eq_two_pi_of_isEuclideanCircle {ι : Type*} [Fintype ι]
+    (calibration : TurnCalibration ι) (hcircle : calibration.IsEuclideanCircle) :
+    calibration.fullTurn = 2 * Real.pi := by
+  rw [calibration.fullTurn_eq_two_mul_halfTurn,
+    calibration.halfTurn_eq_pi_of_isEuclideanCircle hcircle]
+
+end TurnCalibration
+
+/-- Four unit arc occurrences at unit radial scale.  This is an exact finite calibration fixture;
+it makes no circularity claim. -/
+def fourUnitArcCalibration : TurnCalibration (Fin 4) where
+  partition := {
+    arcLength := fun _ => 1
+    arcLength_nonneg := by simp
+  }
+  radialScale := 1
+  radialScale_pos := by norm_num
+
+/-- The fixture's integrated circumference is exactly four. -/
+@[simp] theorem fourUnitArcCalibration_circumference :
+    fourUnitArcCalibration.circumference = 4 := by
+  simp [fourUnitArcCalibration, TurnCalibration.circumference,
+    ArcPartition.integratedLength]
+
+/-- The fixture's intrinsic half-turn receiver is exactly two. -/
+@[simp] theorem fourUnitArcCalibration_halfTurn :
+    fourUnitArcCalibration.halfTurn = 2 := by
+  rw [TurnCalibration.halfTurn, fourUnitArcCalibration_circumference]
+  norm_num [fourUnitArcCalibration]
+
+/-- A finite arc partition and radial scale do not by themselves force `C/(2r) = π`. -/
+theorem finiteArcCalibrationDoesNotForcePi :
+    fourUnitArcCalibration.halfTurn ≠ Real.pi := by
+  rw [fourUnitArcCalibration_halfTurn]
+  nlinarith [Real.pi_gt_three]
+
+/-- Consequently the finite calibration fixture cannot carry a Euclidean-circle witness. -/
+theorem fourUnitArcCalibration_isNotEuclideanCircle :
+    ¬ fourUnitArcCalibration.IsEuclideanCircle := by
+  intro hcircle
+  exact finiteArcCalibrationDoesNotForcePi
+    (fourUnitArcCalibration.halfTurn_eq_pi_of_isEuclideanCircle hcircle)
+
+/-! ## 4. The two branch maps of a nested radical of two are the half-angle laws
 
 Working in the coordinate `x = 2 cos θ`, the two nested-radical branches are contractions of
 ratio one half on the turn.  The plus branch preserves orientation; the minus branch reverses
@@ -102,7 +219,7 @@ theorem theMinusBranchIsThePlusBranchReflected (θ : ℝ) :
     Real.sin (θ / 2) = Real.cos ((Real.pi - θ) / 2) := by
   rw [show (Real.pi - θ) / 2 = Real.pi / 2 - θ / 2 by ring, Real.cos_pi_div_two_sub]
 
-/-! ## 4. The first value the crystallographic filter refuses
+/-! ## 5. The first value the crystallographic filter refuses
 
 The rational values of `2 cos` at a rational turn form a five-element table.  The first turn
 outside it that a periodic sign word reaches is the fifth, and its value is the golden ratio. -/
@@ -142,5 +259,14 @@ theorem thePeriodTwoValuesDifferByOne :
     2 * Real.cos (Real.pi / 5) - 2 * Real.cos (2 * Real.pi / 5) = 1 := by
   rw [theGoldenRatioIsTwiceACosineOfTheFifthTurn, theDoubledFifthTurnIsTheOtherRoot]
   ring
+
+/-! ## Audit -/
+
+#print axioms ArcPartition.integratedLength_nonneg
+#print axioms TurnCalibration.fullTurn_eq_two_mul_halfTurn
+#print axioms TurnCalibration.halfTurn_eq_pi_of_isEuclideanCircle
+#print axioms TurnCalibration.fullTurn_eq_two_pi_of_isEuclideanCircle
+#print axioms finiteArcCalibrationDoesNotForcePi
+#print axioms fourUnitArcCalibration_isNotEuclideanCircle
 
 end Soma.Holonics.Millennium.Turn

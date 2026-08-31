@@ -254,11 +254,8 @@ is the obstruction, and here it is inhabited, finite, and named. -/
 theorem theBoardDoesNotGlue : ¬ boardPassage.Glues := by
   intro h
   have hmem : fourthCorner ∈ boardPassage.LocallyAdmissible := trivial
-  have := h hmem
-  simp only [boardPassage, reachedDisplacements, AddMonoidHom.mem_ker, parityHom,
-    AddMonoidHom.coe_mk, ZeroHom.coe_mk, parityClass, fourthCorner, Prod.mk.injEq] at this
-  revert this
-  decide
+  have hzero : parityHom fourthCorner = 0 := h hmem
+  norm_num [parityHom, parityClass, fourthCorner] at hzero
 
 /-- **Therefore its obstruction group is not trivial**, by the general theorem in `Gluing.lean`.
 The abstract statement now has a witness, which is what keeps it from being an untested gauge. -/

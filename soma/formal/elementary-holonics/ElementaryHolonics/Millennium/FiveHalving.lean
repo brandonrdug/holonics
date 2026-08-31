@@ -42,14 +42,14 @@ private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
 
 private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : RankOne.E5.Nonsingular x₁ y₁} {h₂ : RankOne.E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : RankOne.E5.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : RankOne.E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some h) = if x = 0 then -25 else x := rfl
+    RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
 
 private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some h) = if x = 5 then 50 else x - 5 := rfl
+    RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 /-! ## 2. The halving at coordinates -/
 
@@ -59,7 +59,7 @@ point `(u, v) = ((r+s)(r−t), (r+s)(r−t)(s−t))` lies on the curve and doubl
 private lemma halving {x₀ y₀ r s t : ℚ} (hr0 : r ≠ 0) (hs0 : s ≠ 0)
     (hs2 : s ^ 2 = r ^ 2 - 5) (ht2 : t ^ 2 = r ^ 2 + 5) (hx : x₀ = r ^ 2)
     (hy : y₀ = -(r * s * t)) (hP : RankOne.E5.Nonsingular x₀ y₀) :
-    ∃ Q : RankOne.E5.Point, Q + Q = Point.some hP := by
+    ∃ Q : RankOne.E5.Point, Q + Q = Point.some x₀ y₀ hP := by
   have ht0 : t ≠ 0 := by
     intro hc
     rw [hc] at ht2
@@ -102,7 +102,7 @@ private lemma halving {x₀ y₀ r s t : ℚ} (hr0 : r ≠ 0) (hs0 : s ≠ 0)
       intro hc
       apply hv0
       linarith
-  refine ⟨Point.some hQns, ?_⟩
+  refine ⟨Point.some u v hQns, ?_⟩
   have hyne : v ≠ RankOne.E5.negY u v := by
     rw [negYFive]
     intro hc

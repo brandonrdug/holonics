@@ -238,7 +238,7 @@ theorem theIntegralOrdinateIsDivisible {x y : ℚ} (hcurve : y ^ 2 = x ^ 3 - 25 
     exact (theFermatCubeIsDeep hx hxv).add h24
   rcases hdeep with h0 | hd
   · exact absurd (pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0) |>.mp h0) hy
-  · rw [padicValRat.pow hy] at hd
+  · rw [padicValRat.pow] at hd
     omega
 
 /-- **The kernel level is classified**: negative abscissa depth on the curve comes in exact
@@ -249,7 +249,7 @@ theorem theKernelLevelIsClassified {x y : ℚ} (hcurve : y ^ 2 = x ^ 3 - 25 * x)
   set w : ℤ := padicValRat 3 x with hw
   have hx3 : Sharp (3 * w) (x ^ 3) := by
     refine ⟨pow_ne_zero 3 hx, ?_⟩
-    rw [padicValRat.pow hx, ← hw]
+    rw [padicValRat.pow, ← hw]
     push_cast
     ring
   have h25x : Sharp w ((-25 : ℚ) * x) := by
@@ -267,7 +267,7 @@ theorem theKernelLevelIsClassified {x y : ℚ} (hcurve : y ^ 2 = x ^ 3 - 25 * x)
     have hyv : padicValRat 3 (y ^ 2) = 3 * w := by
       rw [hcurve]
       exact hrhs.2
-    rw [padicValRat.pow hy] at hyv
+    rw [padicValRat.pow] at hyv
     push_cast at hyv
     omega
   obtain ⟨m, hm⟩ : ∃ m : ℤ, w = 2 * m := ⟨padicValRat 3 y - w, by omega⟩

@@ -1,9 +1,10 @@
-//! Repository architecture ratchet for continuing holonic machinery.
+//! Repository architecture gate for continuing holonic machinery.
 //!
 //! This is an observer and build tool, so it may use cpu collections internally.  Its output is
-//! never machine standing.  Production modules are checked against a committed per-file census:
-//! an inherited dependency may disappear, but no file may add another occurrence and a new file
-//! begins with zero allowance.
+//! never machine standing. Production owners are checked against a committed census: an inherited
+//! dependency may disappear, but an owner may not add another occurrence. Splitting `owner.rs`
+//! into `owner/*.rs` conserves one aggregate allowance across the whole subtree; a genuinely new
+//! top-level owner begins with zero allowance.
 
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -11,39 +12,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-/// Where the committed census lives, relative to the repository root handed to
-/// [`check_repository`]. It sits in `meta/` beside the other tracked ledgers —
-/// `AUTHORED_LEVELS.tsv`, `BOUNDARY_ARTIFACTS.tsv`, `OUTPUT_MANIFEST.tsv`,
-/// `CLOSURE_MANIFEST.tsv` — because it is the same species of object: a tracked address for
-/// something the tree would otherwise be unable to say it had lost.
-///
-/// It read `HOLONIC_DSA_BASELINE.tsv` at the repository root until 2026-08-10, and no such file
-/// has ever existed in this tree; the only copy is `reference/engine-a07ff376/`, which is archive
-/// material for a body with a different layout.
+/// Committed census beside the other tracked ledgers.
 pub const BASELINE_PATH: &str = "meta/HOLONIC_DSA_BASELINE.tsv";
 
-/// The aperture: five roots inherited from the laboratory, plus `crates/holonic-structure/src`
-/// added 2026-08-15.
-///
-/// The inherited five are the engine, the reflective runtime, and soma's body, membrane and life.
-/// The laboratory kept soma under `src/soma/`; this repository keeps it at `soma/`, and three of
-/// those five entries still carried the laboratory prefix. That is `CLAUDE.md` §0 lesson 2 — *no
-/// absolute frame in a lineage* — and it was invisible because the missing baseline aborted
-/// [`check_repository`] one statement earlier.
-///
-/// **`crates/holonic-structure/src` is the sixth, and the earlier refusal to add it was wrong on
-/// its own terms.** This comment read *"adding them would author a scope the source never
-/// declared"*, which is the correct rule applied to the wrong crate: `holonic-structure` is the
-/// substrate-container owner, the crate whose declared purpose is holding the ordinal and relation
-/// atlases *so that a `BTreeMap` does not become ontology*. A ratchet on ownership constructs that
-/// does not watch the ownership crate is watching every consumer of the substrate and not the
-/// substrate. The scope was declared by the crate, not authored here. It went unwatched long
-/// enough for four modules — `chain.rs`, `face.rs`, `junction.rs`, `relating.rs` — to land there
-/// on 2026-08-15 outside the ratchet's view, and `meta/HOLONIC_DSA_BASELINE.tsv` carried zero rows
-/// for the crate.
-///
-/// Still outside, and still for the original reason: `soma/{abi,surface,mount}` and
-/// `crates/relational-geometry/src`.
+/// Production roots whose ownership/materialization debt is ratcheted. Apparatus-only
+/// `soma/{abi,surface,mount}` and `crates/relational-geometry` remain outside this policy.
 const PROTECTED_ROOTS: &[&str] = &[
     "crates/holonic-engine/src",
     "crates/holonic-language/src",
@@ -57,12 +30,21 @@ const PROTECTED_ROOTS: &[&str] = &[
 /// every local module it owns and every Rust module it reaches is inside the structural firewall.
 /// Cold Phoenix/Soulkiller evidence remains lawful elsewhere in the repository while it has no
 /// live dependency edge from this cone.
-const ATHENA_HOT_ROOTS: &[&str] = &[
-    "soma/life/src/mathematical_particle/production_aperture.rs",
-    "soma/life/src/mathematical_particle/production_aperture",
-    "soma/life/src/athena_receiver_history.rs",
-    "soma/life/src/athena_receiver_history",
-    "soma/life/src/athena_native",
+const ATHENA_HOT_ROOTS: &[&str] = &["soma/life/src/athena_native/source_neutral_rest.rs"];
+
+/// Source-bearing names which may not cross into the productive Athena dependency closure.
+///
+/// These are deliberately named structural obstructions rather than a broad ban on words such
+/// as `source` or `surface`: cold lineage and receiver prose may still be discussed outside the
+/// hot cone.  The UAR0 boundary is narrower and exact.  A source-bearing codec, its persisted
+/// surface atlas or occurrence identity, and the exterior participant/relation receiver charts
+/// cannot be fields or dependencies of a serializable rest or public hot inference path.
+const ATHENA_HOT_FORBIDDEN_SOURCE_BEARING_IDENTIFIERS: &[&str] = &[
+    "NativeRelationalCodec",
+    "surface_variants",
+    "source_occurrence_identity_sha256",
+    "ExteriorParticipantReceiverChart",
+    "ExteriorRelationReceiverChart",
 ];
 
 /// Rust crate roots visible to the bounded structural traversal. The lint follows source-level
@@ -125,7 +107,8 @@ impl ArchitectureReport {
 
 pub fn check_repository(root: &Path) -> Result<ArchitectureReport, String> {
     let baseline = read_baseline(&root.join(BASELINE_PATH))?;
-    let observed = census_repository(root)?;
+    let observed_files = census_repository(root)?;
+    let observed = aggregate_split_owners(&baseline, &observed_files);
     // `observed` is keyed by (path, construct), so its length is a count of PAIRS. Reporting it
     // as `protected_files` overstated the file count by roughly five to one — 971 against 193 on
     // this tree — in the one line the gate prints. Count the distinct paths.
@@ -165,6 +148,53 @@ pub fn check_repository(root: &Path) -> Result<ArchitectureReport, String> {
         .violations
         .extend(athena_hot_dependency_violations(root)?);
     Ok(report)
+}
+
+/// Charge a mechanically split module tree to its nearest committed owner.
+///
+/// Rust convention maps `a/b.rs` to descendants under `a/b/`. A child file may therefore spend
+/// only the allowance already owned by `a/b.rs`; the parent and every child are summed before the
+/// comparison. The deepest committed ancestor wins, so an already committed child owner retains
+/// its own independent budget. Paths with no committed ancestor remain exact and start at zero.
+fn aggregate_split_owners(
+    baseline: &BTreeMap<(String, String), usize>,
+    observed: &BTreeMap<(String, String), usize>,
+) -> BTreeMap<(String, String), usize> {
+    let inherited_paths = baseline
+        .keys()
+        .map(|(path, _)| path.clone())
+        .collect::<BTreeSet<_>>();
+    let mut aggregate = BTreeMap::<(String, String), usize>::new();
+    for ((path, construct), count) in observed {
+        let owner = nearest_inherited_owner(path, &inherited_paths).unwrap_or(path);
+        *aggregate
+            .entry((owner.to_owned(), construct.clone()))
+            .or_default() += count;
+    }
+    aggregate
+}
+
+fn nearest_inherited_owner<'a>(
+    path: &'a str,
+    inherited_paths: &'a BTreeSet<String>,
+) -> Option<&'a str> {
+    if let Some(exact) = inherited_paths.get(path) {
+        return Some(exact);
+    }
+    inherited_paths
+        .iter()
+        .filter(|candidate| {
+            let file_module = candidate.strip_suffix(".rs").map(|stem| format!("{stem}/"));
+            let directory_module = candidate
+                .strip_suffix("/mod.rs")
+                .map(|directory| format!("{directory}/"));
+            file_module
+                .iter()
+                .chain(directory_module.iter())
+                .any(|prefix| path.starts_with(prefix))
+        })
+        .max_by_key(|candidate| candidate.len())
+        .map(String::as_str)
 }
 
 /// Return only the live Athena foreign-boundary violations. This focused receiver is used during
@@ -404,6 +434,16 @@ fn athena_hot_source_violations(source: &str, disposition: &str) -> Vec<(String,
     let mut counts = BTreeMap::<String, usize>::new();
     for token in &tokens {
         if let FirewallToken::Identifier(identifier) = token {
+            if ATHENA_HOT_FORBIDDEN_SOURCE_BEARING_IDENTIFIERS
+                .iter()
+                .any(|forbidden| *forbidden == identifier)
+            {
+                *counts
+                    .entry(format!(
+                        "athena-hot:{disposition}:forbidden-source-bearing:{identifier}"
+                    ))
+                    .or_default() += 1;
+            }
             if let Some(namespace) = foreign_namespace(identifier) {
                 *counts
                     .entry(format!("athena-hot:{disposition}:{namespace}-namespace"))
@@ -1112,6 +1152,89 @@ mod tests {
     use super::*;
 
     #[test]
+    fn a_split_module_conserves_the_parent_owners_total_allowance() {
+        let baseline = BTreeMap::from([
+            (("soma/life/src/owner.rs".to_owned(), "Vec".to_owned()), 3),
+            (
+                (
+                    "soma/life/src/owner/existing.rs".to_owned(),
+                    ".clone()".to_owned(),
+                ),
+                2,
+            ),
+        ]);
+        let observed = BTreeMap::from([
+            (("soma/life/src/owner.rs".to_owned(), "Vec".to_owned()), 1),
+            (
+                ("soma/life/src/owner/moved.rs".to_owned(), "Vec".to_owned()),
+                2,
+            ),
+            (
+                (
+                    "soma/life/src/owner/existing/deeper.rs".to_owned(),
+                    ".clone()".to_owned(),
+                ),
+                2,
+            ),
+        ]);
+
+        let aggregate = aggregate_split_owners(&baseline, &observed);
+        assert_eq!(
+            aggregate.get(&("soma/life/src/owner.rs".to_owned(), "Vec".to_owned())),
+            Some(&3)
+        );
+        assert_eq!(
+            aggregate.get(&(
+                "soma/life/src/owner/existing.rs".to_owned(),
+                ".clone()".to_owned()
+            )),
+            Some(&2)
+        );
+    }
+
+    #[test]
+    fn an_established_mod_file_owns_its_split_sibling_modules() {
+        let baseline = BTreeMap::from([(
+            (
+                "soma/life/src/athena_native/mod.rs".to_owned(),
+                "Vec".to_owned(),
+            ),
+            2,
+        )]);
+        let observed = BTreeMap::from([(
+            (
+                "soma/life/src/athena_native/new_owner.rs".to_owned(),
+                "Vec".to_owned(),
+            ),
+            2,
+        )]);
+
+        let aggregate = aggregate_split_owners(&baseline, &observed);
+        assert_eq!(
+            aggregate.get(&(
+                "soma/life/src/athena_native/mod.rs".to_owned(),
+                "Vec".to_owned()
+            )),
+            Some(&2)
+        );
+    }
+
+    #[test]
+    fn a_new_top_level_owner_still_begins_with_zero_allowance() {
+        let baseline =
+            BTreeMap::from([(("soma/life/src/owner.rs".to_owned(), "Vec".to_owned()), 1)]);
+        let observed =
+            BTreeMap::from([(("soma/life/src/other.rs".to_owned(), "Vec".to_owned()), 1)]);
+
+        let aggregate = aggregate_split_owners(&baseline, &observed);
+        assert_eq!(
+            aggregate.get(&("soma/life/src/other.rs".to_owned(), "Vec".to_owned())),
+            Some(&1)
+        );
+        assert!(!baseline.contains_key(&("soma/life/src/other.rs".to_owned(), "Vec".to_owned())));
+    }
+
+    #[test]
     fn lexer_ignores_comments_and_literals_but_counts_owned_operations() {
         let source = r#"
             // BTreeMap and value.clone() are prose.
@@ -1164,6 +1287,83 @@ mod tests {
     }
 
     #[test]
+    fn athena_hot_cone_refuses_each_uar0_source_bearing_name() {
+        let source = r#"
+            // These mentions are not source-bearing structure.
+            const NOTE: &str = "NativeRelationalCodec surface_variants source_occurrence_identity_sha256";
+
+            #[derive(Serialize)]
+            pub struct ProductRest {
+                codec: NativeRelationalCodec,
+                surface_variants: Vec<String>,
+                source_occurrence_identity_sha256: [u8; 32],
+                participant: ExteriorParticipantReceiverChart,
+                relation: ExteriorRelationReceiverChart,
+            }
+
+            pub fn infer(codec: NativeRelationalCodec) -> ProductRest {
+                let _ = codec;
+                unimplemented!()
+            }
+
+            #[cfg(test)]
+            mod tests {
+                use super::{NativeRelationalCodec, surface_variants};
+            }
+        "#;
+        let violations = athena_hot_source_violations(source, "direct");
+        for forbidden in ATHENA_HOT_FORBIDDEN_SOURCE_BEARING_IDENTIFIERS {
+            let construct = format!("athena-hot:direct:forbidden-source-bearing:{forbidden}");
+            assert_eq!(
+                violations
+                    .iter()
+                    .find(|(kind, _)| kind == &construct)
+                    .map(|(_, count)| *count),
+                Some(if *forbidden == "NativeRelationalCodec" {
+                    2
+                } else {
+                    1
+                }),
+                "missing exact UAR0 obstruction for {forbidden}"
+            );
+        }
+        assert!(!violations.iter().any(|(kind, _)| kind.contains("NOTE")));
+    }
+
+    #[test]
+    fn athena_hot_dependency_report_keeps_the_precise_source_path() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time advances")
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "holonic-architecture-lint-uar0-{}-{nonce}",
+            std::process::id()
+        ));
+        let hot = root.join("soma/life/src/athena_native");
+        std::fs::create_dir_all(&hot).expect("hot fixture");
+        std::fs::write(
+            hot.join("source_neutral_rest.rs"),
+            "pub struct Rest { codec: NativeRelationalCodec, surface_variants: Vec<u8> }",
+        )
+        .expect("hot source");
+
+        let violations = athena_hot_dependency_violations(&root).expect("firewall traversal");
+        assert!(violations.iter().any(|violation| {
+            violation.path == "soma/life/src/athena_native/source_neutral_rest.rs"
+                && violation.construct
+                    == "athena-hot:direct:forbidden-source-bearing:NativeRelationalCodec"
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.path == "soma/life/src/athena_native/source_neutral_rest.rs"
+                && violation.construct
+                    == "athena-hot:direct:forbidden-source-bearing:surface_variants"
+        }));
+
+        std::fs::remove_dir_all(&root).expect("remove exact UAR0 fixture");
+    }
+
+    #[test]
     fn athena_hot_roots_do_not_bless_foreign_namespace_owners() {
         assert!(
             ATHENA_HOT_ROOTS
@@ -1187,7 +1387,7 @@ mod tests {
         std::fs::create_dir_all(life.join("athena_native")).expect("athena fixture");
         std::fs::create_dir_all(&engine).expect("engine fixture");
         std::fs::write(
-            life.join("athena_native/mod.rs"),
+            life.join("athena_native/source_neutral_rest.rs"),
             "use crate::bridge::Native; pub struct Rest(Native);",
         )
         .expect("hot source");

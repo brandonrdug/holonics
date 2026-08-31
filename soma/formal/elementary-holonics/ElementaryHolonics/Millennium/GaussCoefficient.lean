@@ -705,8 +705,8 @@ theorem jac_one_mod_eight (hp2 : p ≠ 2) (hp1 : p % 4 = 1) :
       show S.filter (fun x => ¬f x = -1) = N from (hN_def).symm, hM1, hN1]
     ring
   have hcardMN : M.card + N.card = p - 5 := by
-    have h := Finset.filter_card_add_filter_neg_card_eq_card
-      (s := S) (p := fun x => f x = -1)
+    have h := Finset.card_filter_add_card_filter_not
+      (s := S) (fun x => f x = -1)
     rw [show S.filter (fun x => f x = -1) = M from (hM_def).symm] at h
     rw [show S.filter (fun x => ¬f x = -1) = N from (hN_def).symm] at h
     rw [hcardS] at h

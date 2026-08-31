@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1560px; height: 1000px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Schematic — components and nets</div>
+      <div class="sub">KiCad's schematic capture retyped: symbol · footprint · model triple, typed pins, derived nets, hierarchical sheets as membranes, ERC as contact rules</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: KiCad master (kicad_sch 20250114): sch_symbol.h SCH_SYMBOL_INSTANCE {KIID_PATH, Reference, Unit}, sch_sheet_path.h, sch_connection.h CONNECTION_TYPE, connection_graph.h CONNECTION_SUBGRAPH · GElectrical networkmodel.py · QET link types · canon ports/junction/membrane</div>
+  </div>
+<div class="tb" style=""><div class="btn" style="">sheet: root / membrane M₁ (instance path /a1b2/)</div><div class="btn" style="">place component</div><div class="btn" style="">wire</div><div class="btn" style="">bus</div><div class="btn" style="">junction</div><div class="btn" style="">label</div><div class="btn" style="">hier. label</div><div class="btn" style="">sheet (membrane)</div><div class="btn" style="">no-connect</div><span class="lbl" style="margin-left:8px">check</span><div class="btn" style="">ERC ✓ 0 refusals · 1 open exterior</div><div class="btn" style="">net navigator</div><div class="btn" style="">→ lattice</div><div class="btn" style="">→ transport</div><div class="btn" style="">→ trace</div></div><div class="row" style="gap:10px; flex: 1 1 auto; min-height: 0"><div class="panel" style="flex: 1 1 auto"><div class="panel-t"><span>canvas · symbols with typed ports; nets are derived from wire geometry + labels by the connection graph, never authored</span></div><svg width="900" height="380" viewBox="0 0 900 380" style="display:block; width:100%; height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c6ea5"/></marker><marker id="ahk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#292418"/></marker></defs><line x1="220.0" y1="174.0" x2="242.5166604983954" y2="213.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="242.5166604983954" y1="213.0" x2="197.4833395016046" y2="213.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="197.4833395016046" y1="213.0" x2="220.0" y2="174.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><circle cx="220.0" cy="174.0" r="5" class="ink" fill="#fffdf8"/><text x="227.0" y="168.0" class="svgtxt" ></text><circle cx="242.5166604983954" cy="213.0" r="5" class="ink" fill="#fffdf8"/><text x="249.5166604983954" y="207.0" class="svgtxt" ></text><circle cx="197.4833395016046" cy="213.0" r="5" class="ink" fill="#fffdf8"/><text x="204.4833395016046" y="207.0" class="svgtxt" ></text><rect x="178" y="160" width="84" height="80" rx="8" class="ink" stroke-dasharray="4 3"/><text x="180" y="154" class="svgtxt" >CP₁ · B 3×3 · M(1/2,3,0)</text><line x1="470.0" y1="174.0" x2="492.5166604983954" y2="213.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="492.5166604983954" y1="213.0" x2="447.4833395016046" y2="213.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><line x1="447.4833395016046" y1="213.0" x2="470.0" y2="174.0" class="wire" marker-end="url(#ah)" stroke-width="2"/><circle cx="470.0" cy="174.0" r="5" class="ink" fill="#fffdf8"/><text x="477.0" y="168.0" class="svgtxt" ></text><circle cx="492.5166604983954" cy="213.0" r="5" class="ink" fill="#fffdf8"/><text x="499.5166604983954" y="207.0" class="svgtxt" ></text><circle cx="447.4833395016046" cy="213.0" r="5" class="ink" fill="#fffdf8"/><text x="454.4833395016046" y="207.0" class="svgtxt" ></text><rect x="428" y="160" width="84" height="80" rx="8" class="ink" stroke-dasharray="4 3"/><text x="430" y="154" class="svgtxt" >CP₂ · B 3×3 · M(1/2,3,0)</text><line x1="242.5166604983954" y1="213.0" x2="340" y2="213.0" class="wire" stroke-width="2"/><line x1="340" y1="213.0" x2="447.4833395016046" y2="213.0" class="wire" stroke-width="2"/><circle cx="340" cy="213.0" r="5" class="ink" fill="#292418"/><text x="330" y="203.0" class="svgtxt" >J₁ (+,+,−)</text><line x1="340" y1="213.0" x2="340" y2="300" class="wire" stroke-width="2"/><text x="346" y="300" class="svgtxt" >N₃ · shared</text><circle cx="120" cy="90" r="18" class="ink" /><path d="M 105 90 q 7 -12 15 0 t 15 0" class="ink" /><text x="100" y="60" class="svgtxt" >P₁ ω=2π/12</text><line x1="138" y1="90" x2="220" y2="90" class="wire" /><line x1="220" y1="90" x2="220" y2="160" class="wire" marker-end="url(#ah)"/><text x="150" y="84" class="svgtxt" >.pump</text><path d="M 400 300 L 380 320 L 400 340" class="ink" stroke-width="2"/><line x1="340" y1="300" x2="380" y2="320" class="grey" /><text x="404" y="326" class="svgtxt" >⟨ρ₁| probe</text><rect x="600" y="120" width="170" height="150" rx="10" class="ink" stroke-dasharray="6 4" stroke-width="2" fill="#fbf8f2"/><text x="608" y="138" class="svgtxt" >M₁ membrane sheet</text><text x="608" y="154" class="svgtxt" >file: sheet4.holon · 2 instances</text><rect x="596" y="190" width="8" height="10" rx="2" class="ink" fill="#3c6ea5"/><text x="560" y="198" class="svgtxt" >in</text><line x1="492.5166604983954" y1="213.0" x2="596" y2="195" class="wire" stroke-width="2"/><rect x="766" y="230" width="8" height="10" rx="2" class="ink" fill="#b04e4e"/><text x="778" y="238" class="svgtxt" >out (radiation)</text><line x1="774" y1="235" x2="840" y2="235" class="wire" marker-end="url(#ah)"/><text x="300" y="150" class="svgtxt" >N₁</text><rect x="292" y="138" width="24" height="16" rx="3" class="ink" fill="#efece4" stroke="none"/><text x="297" y="150" class="svgtxt" >N₁</text><text x="860" y="240" class="svgtxt" >global label: RAD_1</text><circle cx="220.0" cy="174.0" r="9" class="grey" stroke="#9c5480" stroke-width="2" stroke-dasharray="3 2"/><text x="60" y="330" class="svgtxt" >ERC: CP₁.n0 exterior — open, visible (dashed ring)</text></svg><div class="note" style="">a wire is a passage with both boundary maps (Library 3); a junction is a component with hands (Library 5); a hierarchical sheet is a membrane whose interior is instanced per path (Library 7) — the same file placed twice gives two instances with per-path identity (KiCad sheet-path instances)</div></div><div class="col" style="gap:8px; flex: 0 0 420px"><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>properties · CP₂</span></div><div class="kv"><div class="k">lib_id</div><div>holonic:ComplexParametron</div><div class="k">at</div><div>(470, 200, 0) · chart z4 / 3+1</div><div class="k">unit</div><div>1 of 1</div><div class="k">uuid</div><div>occurrence (born 12, rank 3)</div><div class="k">params</div><div>n=3 · M=(1/2,3,0) · ω=2π/12 · lock=off</div><div class="k">symbol</div><div>holonic-sym: cp3 · anchors .n0 .n1 .n2 .pump</div><div class="k">footprint</div><div>lattice: oriented_cycle 3 · placed at (1,1,1,0)</div><div class="k">model</div><div>Millennium/HolonicComplexParametron.lean · complexParametronHolon</div><div class="k">grade</div><div>model <span class="grade">proved-derived</span> <span class="tag">formal-checked</span> (HolonicComplexParametron.lean); this instance: unchecked</div></div></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>net navigator · connection graph result</span></div><table class="tb2" style=""><thead><tr><th>net</th><th>members</th><th>kind</th><th>check</th></tr></thead><tbody><tr><td>N₁</td><td>P₁.out → CP₁.pump</td><td>pump</td><td>ok</td></tr><tr><td>N₂</td><td>CP₂.n1 → M₁.in</td><td>shared → return</td><td>ok</td></tr><tr><td>N₃</td><td>CP₁.n1 · J₁ · CP₂.n2 · ⟨ρ₁|</td><td>shared + receiver</td><td>ok</td></tr><tr><td>RAD_1</td><td>M₁.out → global label</td><td>emission</td><td>ok</td></tr><tr><td>—</td><td>CP₁.n0</td><td>exterior</td><td><span class='sp sp-quotient'>open</span> stays visible</td></tr></tbody></table></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>ERC · pairwise contact rules (Library 0)</span></div><div class="box box-obstructed" style="">1 open exterior · 0 refusals · 0 warnings — a refusal would be a returned obstruction drawn on the net, never a dialog that blocks</div></div></div></div>
+</div>
+</x-dc>
+</body>
+</html>

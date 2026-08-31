@@ -518,6 +518,12 @@ theorem ThreeAxisStencilControlled.firstSecond
   exact hstencil i hi j hj thirdOffset hthird
 
 /-- The native difference word and the three-axis forward-difference chart are the same owner. -/
+@[simp] theorem difference_coordinateTransport_eq_fwdDiff
+    (axis : Fin 3) (observable : SpatialFrequency → ℂ) :
+    difference coordinateTransport axis observable =
+      fwdDiff (coordinateStep axis) observable := by
+  rfl
+
 theorem differenceWord_eq_threeAxisMixedForwardDifference
     (first second third : Fin 3) (firstOrder secondOrder thirdOrder : ℕ)
     (observable : SpatialFrequency → ℂ) :
@@ -533,21 +539,16 @@ theorem differenceWord_eq_threeAxisMixedForwardDifference
           induction thirdOrder with
           | zero => rfl
           | succ thirdOrder ih =>
-              simp only [List.replicate_succ, List.nil_append, List.cons_append,
-                differenceWord_cons, threeAxisMixedForwardDifference,
-                Function.iterate_succ_apply', Function.iterate_zero_apply]
-              simpa [difference, shift, coordinateTransport, fwdDiff] using
+              simpa [List.replicate_succ, threeAxisMixedForwardDifference,
+                Function.iterate_succ_apply'] using
                 congrArg (fwdDiff (coordinateStep third)) ih
       | succ secondOrder ih =>
-          simp only [List.replicate_succ, List.nil_append, List.cons_append,
-            differenceWord_cons, threeAxisMixedForwardDifference,
-            Function.iterate_succ_apply']
-          simpa [difference, shift, coordinateTransport, fwdDiff] using
+          simpa [List.replicate_succ, threeAxisMixedForwardDifference,
+            Function.iterate_succ_apply'] using
             congrArg (fwdDiff (coordinateStep second)) ih
   | succ firstOrder ih =>
-      simp only [List.replicate_succ, List.cons_append, differenceWord_cons,
-        threeAxisMixedForwardDifference, Function.iterate_succ_apply']
-      simpa [difference, shift, coordinateTransport, fwdDiff] using
+      simpa [List.replicate_succ, threeAxisMixedForwardDifference,
+        Function.iterate_succ_apply'] using
         congrArg (fwdDiff (coordinateStep first)) ih
 
 /-- The two-axis forward-difference chart is the corresponding addressed replicate word. -/
@@ -1279,7 +1280,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 2 (threeAxisStencilPoint 0 1 2 frequency 0 1 0) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
         · have hsub := hstencil'.rebase
               (firstOffset := 0) (secondOffset := 0) (thirdOffset := 1)
               (firstOrder := 1) (secondOrder := 2) (thirdOrder := 1)
@@ -1291,7 +1293,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 1 (threeAxisStencilPoint 0 1 2 frequency 0 0 1) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
       · intro axis haxis
         fin_cases axis
         · simp at haxis
@@ -1333,7 +1336,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 2 (threeAxisStencilPoint 0 1 2 frequency 1 0 0) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
         · have hraw := norm_hodgeReciprocal_pairWord_two_two_le
             hlower hbound 0 2 (by decide)
             (threeAxisStencilPoint 0 1 2 frequency 0 1 0)
@@ -1350,7 +1354,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 0 (threeAxisStencilPoint 0 1 2 frequency 0 0 1) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
       · intro axis haxis
         fin_cases axis
         · have hraw := norm_hodgeReciprocal_pairWord_one_two_le
@@ -1392,7 +1397,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 1 (threeAxisStencilPoint 0 1 2 frequency 1 0 0) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
         · have hsub := hstencil'.rebase
               (firstOffset := 0) (secondOffset := 1) (thirdOffset := 0)
               (firstOrder := 2) (secondOrder := 1) (thirdOrder := 1)
@@ -1404,7 +1410,8 @@ theorem norm_hodgeReciprocal_oneTwoTwo_le_of_controlled
             simpa [oneOneTwoWord] using hsub.successor_nonzero hlower
           have hraw := norm_hodgeReciprocal_oneOneTwo_le_of_controlled
             hlower hbound 0 (threeAxisStencilPoint 0 1 2 frequency 0 1 0) hsub hsubNonzero
-          simpa [oneTwoTwoRemoveOne, threeAxisStencilPoint, coordinateTransport] using hraw
+          simpa [oneOneTwoWord, oneTwoTwoRemoveOne, threeAxisStencilPoint,
+            coordinateTransport] using hraw
         · have hraw := norm_hodgeReciprocal_pairWord_two_two_le
             hlower hbound 0 1 (by decide)
             (threeAxisStencilPoint 0 1 2 frequency 0 0 1)
@@ -1669,6 +1676,7 @@ end Soma.Holonics.Millennium.NavierStokesThreeAxisHodgeScaleDescent
 
 section Audit
 open Soma.Holonics.Millennium.NavierStokesThreeAxisHodgeScaleDescent
+#print axioms difference_coordinateTransport_eq_fwdDiff
 #print axioms hodgeQuadratic_activeLedgerSum_eq_groupedReturn
 #print axioms hodge222StrictOrderReturn_eq_groupedActiveReturn
 #print axioms hodgeReciprocal_secondEachAxis_groupedRecurrence

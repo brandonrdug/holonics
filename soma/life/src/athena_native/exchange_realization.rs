@@ -10,10 +10,10 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    EventId, OccurrencePort,
     ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony},
     receiver_exact_compression::{ItemId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor, ReceiverHistoryCompression},
+    EventId, OccurrencePort,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -532,9 +532,7 @@ fn digest_json(value: &impl Serialize) -> Result<String, String> {
         .collect())
 }
 
-fn is_digest(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
+use holonic_engine::is_sha256_digest as is_digest;
 
 #[cfg(test)]
 mod tests {

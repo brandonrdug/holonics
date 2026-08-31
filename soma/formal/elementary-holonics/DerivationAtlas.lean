@@ -58,6 +58,7 @@ private def processFile (fileName : String) : IO ProcessedFile := do
       importArts := setupInfo.importArts
       plugins := setupInfo.plugins
     }
+  unsafe enableInitializersExecution
   let snap ← Language.Lean.process setup none ctx
   let snapshots := Language.toSnapshotTree snap
   let wait ← snapshots.waitAll
@@ -373,6 +374,16 @@ private def bodyReferencesExterior (info : ConstantInfo) : Array String :=
     | none => {}
   references.map (·.toString) |>.qsort fun left right => left < right
 
+/-- Run one metadata extraction against the environment returned by the frontend.  Lean 4.33
+removed the former `Environment.unsafeRunMetaM` convenience field; the explicit `MetaM.toIO`
+boundary retains the same environment while returning all updated states to the exterior
+apparatus instead of hiding them behind an unsafe evaluator. -/
+private def runMetaAgainstEnvironment (environment : Environment) (action : MetaM α) : IO α := do
+  let (result, _coreState, _metaState) ← action.toIO
+    { fileName := "derivation-atlas", fileMap := default, maxHeartbeats := 0 }
+    { env := environment }
+  return result
+
 private def declarationOperations (standing : IO.Ref ExpressionInterner)
     (environment : Environment) (modulePrefix : String) : IO (Array DeclarationOperation) := do
     let mut returned := #[]
@@ -383,13 +394,16 @@ private def declarationOperations (standing : IO.Ref ExpressionInterner)
       let admittedByPrefix :=
         moduleExterior == modulePrefix || moduleExterior.startsWith (modulePrefix ++ ".")
       unless moduleExterior == "current-module" || admittedByPrefix do continue
+      let typeFace ← runMetaAgainstEnvironment environment (expressionFace standing info.type)
+      let definingValueFace ← match definingValue info with
+        | some value => some <$> runMetaAgainstEnvironment environment (expressionFace standing value)
+        | none => pure none
       returned := returned.push {
         declarationExterior := name.toString
         moduleExterior
         kindExterior := constantKind info
-        type := environment.unsafeRunMetaM (expressionFace standing info.type)
-        definingValue := (definingValue info).map fun value =>
-          environment.unsafeRunMetaM (expressionFace standing value)
+        type := typeFace
+        definingValue := definingValueFace
         bodyReferencesExterior := bodyReferencesExterior info
       }
     return returned.qsort (·.declarationExterior < ·.declarationExterior)
@@ -408,7 +422,7 @@ def run (args : List String) : IO UInt32 := do
     match parseArgs args with
     | .ok value => pure value
     | .error message => IO.eprintln message; return 2
-  initSearchPath "/usr"
+  initSearchPath (← findSysroot)
   let processed ← processFile input
   let modulePrefix := requestedPrefix.getD processed.moduleName
   let interner ← IO.mkRef ({} : ExpressionInterner)

@@ -1,3 +1,4 @@
+import ElementaryHolonics.Foundation.Holon
 import ElementaryHolonics.Millennium.HolonicParametron
 
 /-!
@@ -383,11 +384,254 @@ theorem phaseSuperposition_halfTurn [Fintype Branch]
   intro branch hbranch
   exact phaseDrive_halfTurn amplitude phase branch
 
+/-! ## The Complex Parametron as a holonic occurrence body -/
+
+/-- Exact signed incidence of an oriented branch between two addressed nodes. -/
+def endpointIncidence [DecidableEq Node] (source target : Branch → Node) :
+    Branch → Node → ℝ :=
+  fun branch node ↦
+    (if node = target branch then 1 else 0) -
+      (if node = source branch then 1 else 0)
+
+/-- Endpoint incidence differentiates a real node section exactly along the oriented branch. -/
+theorem branchDrop_endpointIncidence [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (state : Node → ℝ) (branch : Branch) :
+    branchDrop (endpointIncidence source target) state branch =
+      state (target branch) - state (source branch) := by
+  unfold branchDrop endpointIncidence
+  rw [show
+      (∑ node,
+        ((if node = target branch then 1 else 0) -
+          (if node = source branch then 1 else 0)) * state node) =
+        (∑ node, (if node = target branch then 1 else 0) * state node) -
+          (∑ node, (if node = source branch then 1 else 0) * state node) by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro node hnode
+      ring]
+  simp
+
+/-- Endpoint incidence differentiates a complex node section without collapsing phase. -/
+theorem complexBranchDrop_endpointIncidence [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (state : Node → ℂ) (branch : Branch) :
+    complexBranchDrop (endpointIncidence source target) state branch =
+      state (target branch) - state (source branch) := by
+  unfold complexBranchDrop endpointIncidence
+  rw [show
+      (∑ node,
+        (((if node = target branch then 1 else 0) -
+          (if node = source branch then 1 else 0) : ℝ) : ℂ) * state node) =
+        (∑ node, ((if node = target branch then 1 else 0 : ℝ) : ℂ) * state node) -
+          (∑ node, ((if node = source branch then 1 else 0 : ℝ) : ℂ) * state node) by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro node hnode
+      push_cast
+      ring]
+  have h₁ : ∀ node, ((if node = target branch then 1 else 0 : ℝ) : ℂ) * state node =
+      if node = target branch then state node else 0 := by
+    intro node
+    split_ifs <;> norm_num
+  have h₂ : ∀ node, ((if node = source branch then 1 else 0 : ℝ) : ℂ) * state node =
+      if node = source branch then state node else 0 := by
+    intro node
+    split_ifs <;> norm_num
+  simp_rw [h₁, h₂]
+  simp
+
+/-- One branch receiver retains both its complex current and its diagonal storage contribution. -/
+structure ParametronReceiverFace where
+  complexCurrent : ℂ
+  diagonalContribution : ℝ
+
+/--
+The pre-locking Complex Parametron as a holon.  Branches are the occurrence population, endpoint
+maps are its oriented ports, and the paired receiver retains complex phase current together with
+the diagonal constitutive contribution.
+-/
+def complexParametronHolon [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (weight : Branch → ℝ) (drive : Branch → ℂ)
+    (realState : Node → ℝ) (complexState : Node → ℂ) :
+    Soma.Holonics.Holon Node Node ParametronReceiverFace where
+  Occurrence := Branch
+  source := source
+  target := target
+  receive branch :=
+    { complexCurrent := drive branch *
+        complexBranchDrop (endpointIncidence source target) complexState branch
+      diagonalContribution := (1 / 2 : ℝ) * weight branch *
+        branchDrop (endpointIncidence source target) realState branch ^ 2 }
+
+/-- The complex current receiver is exactly an endpoint difference weighted by its drive. -/
+theorem complexParametronHolon_receive_complexCurrent
+    [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (weight : Branch → ℝ) (drive : Branch → ℂ)
+    (realState : Node → ℝ) (complexState : Node → ℂ) (branch : Branch) :
+    ((complexParametronHolon source target weight drive realState complexState).receive branch).complexCurrent =
+      drive branch * (complexState (target branch) - complexState (source branch)) := by
+  simp only [complexParametronHolon]
+  rw [complexBranchDrop_endpointIncidence]
+
+/-- Summing the complex receiver population returns the existing complex-drive action exactly. -/
+theorem complexParametronHolon_totalComplexCurrent
+    [Fintype Node] [Fintype Branch] [DecidableEq Node]
+    (source target : Branch → Node) (weight : Branch → ℝ) (drive : Branch → ℂ)
+    (realState : Node → ℝ) (complexState : Node → ℂ) :
+    ∑ branch : Branch,
+        ((complexParametronHolon source target weight drive realState complexState).receive branch).complexCurrent =
+      complexDriveAction drive (endpointIncidence source target) complexState := rfl
+
+/-- Summing the diagonal receiver population returns the existing diagonal storage exactly. -/
+theorem complexParametronHolon_totalDiagonalContribution
+    [Fintype Node] [Fintype Branch] [DecidableEq Node]
+    (source target : Branch → Node) (weight : Branch → ℝ) (drive : Branch → ℂ)
+    (realState : Node → ℝ) (complexState : Node → ℂ) :
+    ∑ branch : Branch,
+        ((complexParametronHolon source target weight drive realState complexState).receive branch).diagonalContribution =
+      diagonalStorage weight (endpointIncidence source target) realState := by
+  unfold complexParametronHolon diagonalStorage
+  rw [Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro branch hbranch
+  ring
+
+/-- Off-diagonal and diagonal constitutive pairs form their own interacting occurrence body. -/
+def mutualBranchContribution [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) (pair : Branch × Branch) : ℝ :=
+  (1 / 2 : ℝ) * coupling pair.1 pair.2 *
+    branchDrop (endpointIncidence source target) state pair.1 *
+      branchDrop (endpointIncidence source target) state pair.2
+
+/-- Off-diagonal and diagonal constitutive pairs form their own interacting occurrence body. -/
+def mutualParametronHolon [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) : Soma.Holonics.Holon (Node × Node) (Node × Node) ℝ where
+  Occurrence := Branch × Branch
+  source pair := (source pair.1, source pair.2)
+  target pair := (target pair.1, target pair.2)
+  receive := mutualBranchContribution source target coupling state
+
+/--
+The diagonal of the mutual branch-pair body is itself an addressed holon.  It uses one occurrence
+on both incidence axes; it is therefore not an independently chosen pair and not a serial chain.
+-/
+def diagonalMutualParametronHolon [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) : Soma.Holonics.Holon (Node × Node) (Node × Node) ℝ where
+  Occurrence := Branch
+  source branch := (source branch, source branch)
+  target branch := (target branch, target branch)
+  receive branch := mutualBranchContribution source target coupling state (branch, branch)
+
+/--
+The complementary off-diagonal interaction body.  Its occurrence is an addressed ordered pair
+together with the retained proof that the two branch occurrences differ; no symmetry quotient is
+taken, because `(first, second)` and `(second, first)` need not carry the same orientation.
+-/
+def offDiagonalMutualParametronHolon [Fintype Node] [DecidableEq Node]
+    [Fintype Branch] [DecidableEq Branch]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) : Soma.Holonics.Holon (Node × Node) (Node × Node) ℝ where
+  Occurrence := { pair : Branch × Branch // pair.1 ≠ pair.2 }
+  source pair := (source pair.1.1, source pair.1.2)
+  target pair := (target pair.1.1, target pair.1.2)
+  receive pair := mutualBranchContribution source target coupling state pair.1
+
+/-- Every retained off-diagonal occurrence is the corresponding face of the full mutual body. -/
+theorem offDiagonalMutualParametronHolon_receive
+    [Fintype Node] [Fintype Branch] [DecidableEq Node] [DecidableEq Branch]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ)
+    (pair : { pair : Branch × Branch // pair.1 ≠ pair.2 }) :
+    (offDiagonalMutualParametronHolon source target coupling state).receive pair =
+      (mutualParametronHolon source target coupling state).receive pair.1 := rfl
+
+/-- The explicit diagonal holon is exactly the same-branch face inside the complete mutual body. -/
+theorem diagonalMutualParametronHolon_receive
+    [Fintype Node] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) (branch : Branch) :
+    (diagonalMutualParametronHolon source target coupling state).receive branch =
+      (mutualParametronHolon source target coupling state).receive (branch, branch) := by
+  unfold diagonalMutualParametronHolon mutualParametronHolon
+  ring
+
+/-- The complete diagonal receiver retains every self-coupling contribution exactly. -/
+theorem diagonalMutualParametronHolon_totalReceiver
+    [Fintype Node] [Fintype Branch] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) :
+    ∑ branch : Branch,
+        (diagonalMutualParametronHolon source target coupling state).receive branch =
+      (1 / 2 : ℝ) * ∑ branch : Branch, coupling branch branch *
+        branchDrop (endpointIncidence source target) state branch ^ 2 := by
+  unfold diagonalMutualParametronHolon mutualBranchContribution
+  rw [Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro branch hbranch
+  ring
+
+/-- The complete pair receiver is the full mutual storage, including its diagonal. -/
+theorem mutualParametronHolon_totalReceiver
+    [Fintype Node] [Fintype Branch] [DecidableEq Node]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) :
+    ∑ pair : Branch × Branch,
+        (mutualParametronHolon source target coupling state).receive pair =
+      coupledStorage coupling (endpointIncidence source target) state := by
+  unfold mutualParametronHolon mutualBranchContribution coupledStorage
+  rw [Fintype.sum_prod_type, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro first hfirst
+  rw [Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro second hsecond
+  ring
+
+/--
+The complete mutual current separates exactly into the one-occurrence diagonal and the genuinely
+two-occurrence off-diagonal body.  This is a partition of the occurrence population, not a
+matrix-level erasure of either interaction geometry.
+-/
+theorem mutualParametronHolon_totalReceiver_diagonal_offDiagonal
+    [Fintype Node] [Fintype Branch] [DecidableEq Node] [DecidableEq Branch]
+    (source target : Branch → Node) (coupling : Branch → Branch → ℝ)
+    (state : Node → ℝ) :
+    (∑ pair : Branch × Branch,
+        (mutualParametronHolon source target coupling state).receive pair) =
+      (∑ branch : Branch,
+        (diagonalMutualParametronHolon source target coupling state).receive branch) +
+      ∑ pair ∈ (Finset.univ : Finset Branch).offDiag,
+        (mutualParametronHolon source target coupling state).receive pair := by
+  change
+    (∑ pair ∈ (Finset.univ : Finset (Branch × Branch)),
+      mutualBranchContribution source target coupling state pair) =
+      (∑ branch ∈ (Finset.univ : Finset Branch),
+        mutualBranchContribution source target coupling state (branch, branch)) +
+      ∑ pair ∈ (Finset.univ : Finset Branch).offDiag,
+        mutualBranchContribution source target coupling state pair
+  rw [show (Finset.univ : Finset (Branch × Branch)) =
+      (Finset.univ : Finset Branch).diag ∪
+        (Finset.univ : Finset Branch).offDiag by
+    rw [Finset.diag_union_offDiag]
+    exact Finset.univ_product_univ.symm]
+  rw [Finset.sum_union (Finset.disjoint_diag_offDiag (Finset.univ : Finset Branch)),
+    Finset.sum_diag]
+
 end Soma.Holonics.Millennium.HolonicComplexParametron
 
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.diagonalStorage_reorient
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.isGeneralizedMode_reorient_iff
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.driveAction_reorientBoth
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.branchDrop_endpointIncidence
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.complexBranchDrop_endpointIncidence
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.complexParametronHolon_totalComplexCurrent
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.complexParametronHolon_totalDiagonalContribution
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.mutualParametronHolon_totalReceiver
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.diagonalMutualParametronHolon_receive
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.diagonalMutualParametronHolon_totalReceiver
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.mutualParametronHolon_totalReceiver_diagonal_offDiagonal
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.coupledResponse_reorient
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.isCoupledGeneralizedMode_reorient_iff
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.phaseSuperposition_halfTurn

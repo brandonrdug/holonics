@@ -105,7 +105,25 @@ theorem trilinearValue_thirdFDerivAt_swap_first
       exact WithTop.coe_le_coe.mpr le_top)
   have h := hsymm.iteratedFDeriv_cons (v := a) (w := b)
   have hc := congrArg (fun L : E →L[ℝ] ℝ ↦ L c) h
-  simpa [trilinearValue, thirdFDerivAt, iteratedFDeriv_succ_apply_right] using hc
+  have habc : Fin.init ![a, b, c] = ![a, b] := by
+    funext i
+    fin_cases i <;> rfl
+  have hbac : Fin.init ![b, a, c] = ![b, a] := by
+    funext i
+    fin_cases i <;> rfl
+  have hleft :
+      trilinearValue (thirdFDerivAt f x) a b c =
+        ((iteratedFDeriv ℝ 2 (fderiv ℝ f) x) ![a, b]) c := by
+    unfold trilinearValue thirdFDerivAt
+    rw [iteratedFDeriv_succ_apply_right, habc]
+    rfl
+  have hright :
+      trilinearValue (thirdFDerivAt f x) b a c =
+        ((iteratedFDeriv ℝ 2 (fderiv ℝ f) x) ![b, a]) c := by
+    unfold trilinearValue thirdFDerivAt
+    rw [iteratedFDeriv_succ_apply_right, hbac]
+    rfl
+  exact hleft.trans (hc.trans hright.symm)
 
 /-- Smooth third derivatives are symmetric under exchange of the last two inputs. -/
 theorem trilinearValue_thirdFDerivAt_swap_last

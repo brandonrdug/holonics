@@ -390,7 +390,7 @@ theorem norm_dyadicHodgeJacobianKernelEntry_tripleAbel_le_directMixedMass
   rw [dyadicHodgeJacobianKernelEntry_tripleAbel, norm_mul]
   have hbase :
       ‖UnitAddTorus.mFourier (dyadicHodgeApertureBaseFrequency scale) q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
   rw [hbase, one_mul]
   apply norm_finiteCharacterSynthesisThree_le_mass
   all_goals rw [fourier_apply]

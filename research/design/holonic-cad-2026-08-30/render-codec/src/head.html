@@ -1,0 +1,62 @@
+<meta charset="utf-8">
+<title>Holonic Render Codec</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root { --paper:#f6f7f4; --ground:#eef0ec; --panel:#e5e8e3; --line:#cfd4cd; --ink:#101214; --ink2:#3d434b; --mute:#6a717b; --blue:#1d3f6e; --plum:#8a4b6a; --ok:#2f6f4e; --warn:#8a6a1e; --bad:#8a2f3a; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground:#17191c; --panel:#1f2226; --line:#33373d; --ink:#e7e9e4; --ink2:#c2c6c0; --mute:#8b929c; --blue:#8fb2e6; --plum:#d29ab8; --ok:#7fc39e; --warn:#d9b45c; --bad:#e08a95; color-scheme: dark; } }
+:root[data-theme="dark"] { --ground:#17191c; --panel:#1f2226; --line:#33373d; --ink:#e7e9e4; --ink2:#c2c6c0; --mute:#8b929c; --blue:#8fb2e6; --plum:#d29ab8; --ok:#7fc39e; --warn:#d9b45c; --bad:#e08a95; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--ground); color:var(--ink); font-family:'Instrument Sans', system-ui, sans-serif; font-size:13px; line-height:1.45; }
+header { display:flex; align-items:baseline; gap:18px; padding:14px 22px 10px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+header h1 { font-family:'STIX Two Text', Georgia, serif; font-weight:600; font-size:22px; margin:0; letter-spacing:-0.01em; }
+header .thesis { color:var(--mute); font-size:12.5px; max-width:70ch; }
+.mono { font-family:'IBM Plex Mono', Menlo, monospace; }
+.shell { display:grid; grid-template-columns: 200px 1fr 360px; gap:0; min-height: 72vh; }
+#tabs { display:flex; flex-direction:column; gap:4px; padding:14px 12px; border-right:1px solid var(--line); }
+#tabs button, .btn { font:inherit; font-family:'IBM Plex Mono', monospace; font-size:11.5px; text-align:left; padding:8px 10px; border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:3px; cursor:pointer; }
+#tabs button.on { background:var(--ink); color:var(--ground); border-color:var(--ink); }
+#tabs button:focus-visible, .btn:focus-visible, textarea:focus-visible { outline:2px solid var(--blue); outline-offset:1px; }
+.stage { position:sticky; top:0; align-self:start; max-height:100vh; padding:14px; min-height:560px; display:flex; flex-direction:column; gap:8px; }
+.sheet { flex:1 1 auto; min-height:520px; background:#f6f7f4; border:1px solid var(--line); position:relative; overflow:hidden; }
+.sheet canvas { display:block; position:absolute; inset:0; }
+.controls { display:flex; gap:6px; align-items:center; }
+.controls .lbl { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--mute); margin-left:auto; }
+aside { border-left:1px solid var(--line); padding:14px; display:flex; flex-direction:column; gap:12px; min-width:0; }
+aside h2 { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--mute); margin:0 0 6px; font-weight:500; }
+#doc, #svgout { width:100%; height:300px; font-family:'IBM Plex Mono', monospace; font-size:10.5px; line-height:1.4; background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:3px; padding:8px; resize:vertical; }
+:root[data-theme="dark"] #doc, :root:not([data-theme="light"]) #doc { background:var(--panel); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) #doc { background:var(--paper); } }
+.docstate { font-family:'IBM Plex Mono', monospace; font-size:10.5px; margin-top:6px; word-break:break-all; }
+.docstate.ok { color:var(--ok); } .docstate.bad { color:var(--bad); }
+#receipts { display:grid; grid-template-columns: max-content 1fr; gap:3px 10px; font-size:11.5px; }
+#receipts .rk { font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--mute); }
+#receipts .rv { font-variant-numeric: tabular-nums; min-width:0; overflow-wrap:anywhere; }
+#receipts .rv.ok { color:var(--ok); } #receipts .rv.warn { color:var(--warn); } #receipts .rv.bad { color:var(--bad); }
+.notes { padding:24px 22px 40px; border-top:1px solid var(--line); display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:22px 34px; max-width: 1500px; }
+.notes h2 { font-family:'STIX Two Text', Georgia, serif; font-weight:600; font-size:17px; margin:0 0 6px; text-wrap:balance; }
+.notes h3 { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--mute); margin:14px 0 4px; font-weight:500; }
+.notes p, .notes li { max-width:66ch; color:var(--ink2); }
+.notes ul { padding-left:18px; margin:4px 0; }
+.notes code, .notes pre { font-family:'IBM Plex Mono', monospace; font-size:11px; }
+.notes pre { background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:8px 10px; overflow-x:auto; white-space:pre; }
+.grade { font-family:'IBM Plex Mono', monospace; font-size:9.5px; background:var(--ink); color:var(--ground); border-radius:3px; padding:1px 6px; }
+.eq { font-family:'STIX Two Text', Georgia, serif; font-style:italic; }
+@media (max-width: 1100px) { .shell { grid-template-columns: 1fr; } #tabs { flex-direction:row; flex-wrap:wrap; border-right:0; border-bottom:1px solid var(--line); } aside { border-left:0; border-top:1px solid var(--line); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<header>
+  <h1>Holonic Render Codec</h1>
+  <div class="thesis">A document of generators renders a schematic, a field, or a model exactly as a receiver reads it — and the receivers go all the way down: the monitor, the window, each element, and the sheet an object is mounted in are charts of discrete cells bound by declared exact relations. Rational topology, colour formed by the receiver's own transduction of the currents it meets, traces only where the causality is, no arrowheads, no arbitrary line. Float64 appears only where it is declared a face.</div>
+</header>
+<div class="shell">
+  <nav id="tabs" aria-label="scenes"></nav>
+  <section class="stage">
+    <div class="controls"><button class="btn" id="play">play</button><button class="btn" id="stepbtn">tick</button><span class="lbl">presentation face · device grain · 1 px hairlines</span></div>
+    <div class="sheet"><canvas id="canvas" aria-label="rendering"></canvas></div>
+  </section>
+  <aside>
+    <div><h2>document · holonic-render-v2</h2><textarea id="doc" spellcheck="false" aria-label="codec document"></textarea><div class="controls" style="margin-top:6px"><button class="btn" id="apply">apply</button><button class="btn" id="reset">reset</button></div><div id="docstate" class="docstate"></div></div>
+    <div><h2>receipts</h2><div id="receipts"></div></div>
+    <div><h2>vector face · svg with exact source values</h2><div class="controls"><button class="btn" id="showsvg">show svg</button></div><textarea id="svgout" spellcheck="false" aria-label="svg export" style="height:120px;margin-top:6px" readonly></textarea></div>
+  </aside>
+</div>

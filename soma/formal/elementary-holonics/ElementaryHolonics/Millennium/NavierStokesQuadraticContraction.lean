@@ -95,7 +95,9 @@ theorem QuadraticContractionData.contractingWith_restartBall
         exact mul_le_mul_of_nonneg_right
           (mul_le_mul_of_nonneg_left hsum data.coefficient_nonneg) (norm_nonneg _)
       _ = (K : ℝ) * ‖(u : X) - (v : X)‖ := by
-        dsimp [K]
+        have hK : (K : ℝ) = 2 * A * R := by
+          rfl
+        rw [hK]
         ring
 
 /-- **Actual fixed-point return.**  The declared quadratic estimates construct a point in the

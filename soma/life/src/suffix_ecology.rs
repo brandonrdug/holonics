@@ -1926,14 +1926,13 @@ impl ExactLabeledSuffixEcology {
                 .transitions
                 .iter(state.transitions)?
                 .filter_map(|(symbol, target)| match symbol {
-                    SuffixSymbol::Germ(germ) => Some(
-                        germ.germ().and_then(|germ| {
-                            Ok(ExactSuffixCompactTransition {
-                                symbol: ExactSuffixCompactSymbol::Germ(germ),
-                                target: u32::try_from(*target)
-                                    .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
-                            })
-                        })),
+                    SuffixSymbol::Germ(germ) => Some(germ.germ().and_then(|germ| {
+                        Ok(ExactSuffixCompactTransition {
+                            symbol: ExactSuffixCompactSymbol::Germ(germ),
+                            target: u32::try_from(*target)
+                                .map_err(|_| ExactSuffixEcologyError::CarrierExtent)?,
+                        })
+                    })),
                     SuffixSymbol::Boundary(_) => None,
                 })
                 .collect::<Result<Vec<_>, _>>()?;
@@ -1943,10 +1942,7 @@ impl ExactLabeledSuffixEcology {
                 material_end_multiplicity: state.material_end_multiplicity,
                 transitions,
             });
-            sources.push(
-                self.source_incidence
-                    .labels(at, &self.source_catalogue)?,
-            );
+            sources.push(self.source_incidence.labels(at, &self.source_catalogue)?);
         }
         Ok((states, sources))
     }
@@ -2759,13 +2755,11 @@ mod tests {
             ecology.emanate_current(after).unwrap(),
             ecology.emanate(&[germ(9), germ(2), germ(3)]).unwrap()
         );
-        assert!(
-            ecology
-                .emanate_current(after)
-                .unwrap()
-                .branches()
-                .is_empty()
-        );
+        assert!(ecology
+            .emanate_current(after)
+            .unwrap()
+            .branches()
+            .is_empty());
     }
 
     #[test]
@@ -3008,11 +3002,9 @@ mod tests {
         let emanation = ecology.emanate(&[germ(1), germ(2), germ(3)]).unwrap();
         assert_eq!(emanation.longest_matched_length(), 3);
         assert_eq!(emanation.greatest_productive_matched_length(), Some(1));
-        assert!(
-            emanation
-                .branches()
-                .iter()
-                .any(|branch| branch.germ().identity() == germ(4).identity())
-        );
+        assert!(emanation
+            .branches()
+            .iter()
+            .any(|branch| branch.germ().identity() == germ(4).identity()));
     }
 }

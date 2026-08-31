@@ -1685,13 +1685,13 @@ lemma isBigO_atTop_theta5 (r : ℝ) :
           (oddKernel (((4 * (e : ℝ) + 1) / 20 : ℝ) : UnitAddCircle) (20 * Real.sqrt 2 * x) *
            evenKernel (((d : ℝ) / 10 : ℝ) : UnitAddCircle) (20 * Real.sqrt 2 * x)))
         =O[Filter.atTop] fun x : ℝ => x ^ r := fun e _ =>
-      Asymptotics.IsBigO.sum fun d _ => isBigO_term_rpow e d r
+      Asymptotics.IsBigO.sum (s := Finset.range 10) (fun d _ => isBigO_term_rpow e d r)
     exact Asymptotics.IsBigO.sum h1
   exact hsum.const_mul_left 20
 
 /-- The strong FE-pair of the congruent-number curve at five: `f = g = θ₅`, weight `2`,
 **sign `−1`**, no constant terms. -/
-def fiveFEPair : StrongFEPair ℂ where
+def fiveFEPair : WeakFEPair ℂ where
   f := Complex.ofReal ∘ theta5
   g := Complex.ofReal ∘ theta5
   k := 2
@@ -1700,8 +1700,6 @@ def fiveFEPair : StrongFEPair ℂ where
   hε := by norm_num
   f₀ := 0
   g₀ := 0
-  hf₀ := rfl
-  hg₀ := rfl
   hf_int := (Complex.continuous_ofReal.comp_continuousOn
     continuousOn_theta5).locallyIntegrableOn measurableSet_Ioi
   hg_int := (Complex.continuous_ofReal.comp_continuousOn
@@ -1717,6 +1715,9 @@ def fiveFEPair : StrongFEPair ℂ where
   hg_top r := by
     simpa using isBigO_ofReal_left.mpr (isBigO_atTop_theta5 r)
 
+private lemma fiveFEPair_isStrong : IsStrongFEPair fiveFEPair :=
+  ⟨rfl, rfl⟩
+
 /-- **The completed L-function of the congruent-number curve at five**: the Mellin
 transform of `θ₅`, with no convergence region. -/
 def lambda5 : ℂ → ℂ := fiveFEPair.Λ
@@ -1724,12 +1725,12 @@ def lambda5 : ℂ → ℂ := fiveFEPair.Λ
 /-- **`Λ₅` is entire** — the strong FE-pair machinery returns differentiability on all
 of `ℂ` at once, no continuation step. -/
 theorem theCompletedLFunctionAtFiveIsEntire : Differentiable ℂ lambda5 :=
-  fiveFEPair.differentiable_Λ
+  fiveFEPair_isStrong.differentiable_Λ
 
 /-- The Mellin representation of `Λ₅` at every `s`. -/
 theorem theCompletedLFunctionAtFiveHasMellin (s : ℂ) :
     HasMellin (Complex.ofReal ∘ theta5) s (lambda5 s) :=
-  fiveFEPair.hasMellin s
+  fiveFEPair_isStrong.hasMellin s
 
 /-- **The functional equation at five**: `Λ₅(2−s) = −Λ₅(s)`.  Weight two, sign `−1` —
 the odd hand of the reflection, kernel-checked. -/
@@ -1738,7 +1739,8 @@ theorem theCompletedLFunctionalEquationAtFive (s : ℂ) :
   have h := fiveFEPair.functional_equation s
   rw [show fiveFEPair.k = (2 : ℝ) from rfl, show fiveFEPair.ε = (-1 : ℂ) from rfl] at h
   have hsymm : fiveFEPair.symm.Λ = fiveFEPair.Λ := by
-    rfl
+    ext z
+    simp [WeakFEPair.Λ, WeakFEPair.Λ₀, WeakFEPair.f_modif, fiveFEPair]
   rw [hsymm] at h
   simpa [lambda5, neg_smul, one_smul] using h
 

@@ -88,6 +88,3 @@ pub const PRODUCTION_INQUIRY_SCHEMA: &str = "holonics.r6.production-inquiry.v1";
 pub(super) const STANDING_MAGIC: &[u8; 8] = b"HPA6S001";
 pub(super) const DECODER_MAGIC: &[u8; 8] = b"HPA6D001";
 pub(super) const FIBRES_MAGIC: &[u8; 8] = b"HPA6F001";
-
-#[cfg(test)]
-mod tests;

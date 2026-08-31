@@ -74,13 +74,13 @@ theorem nonsingularNeg10 : E.Nonsingular (-1) 0 := by
   rw [nonsingular_iff, equation_iff]; norm_num [E]
 
 /-- The point `(0, 0)`. -/
-def P00 : E.Point := .some nonsingular00
+def P00 : E.Point := .some 0 0 nonsingular00
 
 /-- The point `(1, 0)`. -/
-def P10 : E.Point := .some nonsingular10
+def P10 : E.Point := .some 1 0 nonsingular10
 
 /-- The point `(−1, 0)`. -/
-def Pm10 : E.Point := .some nonsingularNeg10
+def Pm10 : E.Point := .some (-1) 0 nonsingularNeg10
 
 /-! ## 2. Each is a half-turn, by the group law itself -/
 
@@ -94,7 +94,7 @@ theorem theThreePointsAreHalfTurns : P00 + P00 = 0 ∧ P10 + P10 = 0 ∧ Pm10 + 
 
 private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : E.Nonsingular x₁ y₁} {h₂ : E.Nonsingular x₂ y₂} :
-    (Point.some h₁ : E.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : E.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 /-- **The chord through two half-turns lands on the third.**  All three sums computed through
@@ -110,15 +110,21 @@ theorem theChordThroughTwoLandsOnTheThird :
   have h3 : E.slope 1 (-1) 0 0 = 0 := by
     rw [slope_of_X_ne (by norm_num)]; norm_num
   refine ⟨?_, ?_, ?_⟩
-  · show Point.some nonsingular00 + Point.some nonsingular10 = Point.some nonsingularNeg10
+  · show Point.some 0 0 nonsingular00 + Point.some 1 0 nonsingular10 =
+      Point.some (-1) 0 nonsingularNeg10
     rw [Point.add_of_X_ne (by norm_num : (0 : ℚ) ≠ 1)]
-    exact some_eq_some (by rw [h1]; norm_num [E]) (by rw [h1]; norm_num [E])
-  · show Point.some nonsingular00 + Point.some nonsingularNeg10 = Point.some nonsingular10
+    exact some_eq_some (by rw [h1]; norm_num [E, addX])
+      (by rw [h1]; norm_num [E, addY, negY, negAddY, addX])
+  · show Point.some 0 0 nonsingular00 + Point.some (-1) 0 nonsingularNeg10 =
+      Point.some 1 0 nonsingular10
     rw [Point.add_of_X_ne (by norm_num : (0 : ℚ) ≠ -1)]
-    exact some_eq_some (by rw [h2]; norm_num [E]) (by rw [h2]; norm_num [E])
-  · show Point.some nonsingular10 + Point.some nonsingularNeg10 = Point.some nonsingular00
+    exact some_eq_some (by rw [h2]; norm_num [E, addX])
+      (by rw [h2]; norm_num [E, addY, negY, negAddY, addX])
+  · show Point.some 1 0 nonsingular10 + Point.some (-1) 0 nonsingularNeg10 =
+      Point.some 0 0 nonsingular00
     rw [Point.add_of_X_ne (by norm_num : (1 : ℚ) ≠ -1)]
-    exact some_eq_some (by rw [h3]; norm_num [E]) (by rw [h3]; norm_num [E])
+    exact some_eq_some (by rw [h3]; norm_num [E, addX])
+      (by rw [h3]; norm_num [E, addY, negY, negAddY, addX])
 
 /-! ## 3. The descent face
 
@@ -130,12 +136,12 @@ slot at `x = 1` is `(1 − 0)(1 − (−1)) = 2`.  The identity goes to `(1, 1)`
 /-- The first slot of the descent face. -/
 def slotOne : E.Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 0 then -1 else x
+  | .some x _ _ => if x = 0 then -1 else x
 
 /-- The second slot of the descent face. -/
 def slotTwo : E.Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 1 then 2 else x - 1
+  | .some x _ _ => if x = 1 then 2 else x - 1
 
 /-- The four descent-face values, computed: `0 ↦ (1,1)`, `(0,0) ↦ (−1,−1)`, `(1,0) ↦ (1,2)`,
 `(−1,0) ↦ (−1,−2)`. -/

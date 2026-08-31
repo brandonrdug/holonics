@@ -47,20 +47,23 @@ open Real
 theorem theSineSolvesThePositiveDeviation (k t : ℝ) :
     HasDerivAt (fun u : ℝ => k * Real.cos (k * u)) (-(k ^ 2) * Real.sin (k * t)) t := by
   have h : HasDerivAt (fun u : ℝ => Real.cos (k * u)) (-Real.sin (k * t) * k) t := by
-    simpa using (Real.hasDerivAt_cos (k * t)).comp t ((hasDerivAt_id t).const_mul k)
+    simpa [Function.comp_def] using
+      (Real.hasDerivAt_cos (k * t)).comp t ((hasDerivAt_id t).const_mul k)
   simpa [mul_comm, mul_assoc, mul_left_comm, pow_two] using h.const_mul k
 
 /-- Its first derivative, for the record. -/
 theorem theSineHasTheExpectedFirstDerivative (k t : ℝ) :
     HasDerivAt (fun u : ℝ => Real.sin (k * u)) (k * Real.cos (k * t)) t := by
-  simpa [mul_comm] using (Real.hasDerivAt_sin (k * t)).comp t ((hasDerivAt_id t).const_mul k)
+  simpa [Function.comp_def, mul_comm] using
+    (Real.hasDerivAt_sin (k * t)).comp t ((hasDerivAt_id t).const_mul k)
 
 /-- **NEGATIVE CURVATURE: the deviation is a hyperbolic sine.**  `J = sinh(kt)` satisfies
 `J'' = +k²J` — the sign flip is the whole difference. -/
 theorem theHyperbolicSineSolvesTheNegativeDeviation (k t : ℝ) :
     HasDerivAt (fun u : ℝ => k * Real.cosh (k * u)) (k ^ 2 * Real.sinh (k * t)) t := by
   have h : HasDerivAt (fun u : ℝ => Real.cosh (k * u)) (Real.sinh (k * t) * k) t := by
-    simpa using (Real.hasDerivAt_cosh (k * t)).comp t ((hasDerivAt_id t).const_mul k)
+    simpa [Function.comp_def] using
+      (Real.hasDerivAt_cosh (k * t)).comp t ((hasDerivAt_id t).const_mul k)
   simpa [mul_comm, mul_assoc, mul_left_comm, pow_two] using h.const_mul k
 
 /-! ## 2.  The sharp difference: a focus exists, or it does not -/

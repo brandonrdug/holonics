@@ -139,6 +139,8 @@ theorem openPeriodicSolutionOn_unforced_mixedThirdProductionIdentity
           a b c := by
   let u : InitialVelocity := fun y ↦ velocity y t
   let p : Space → ℝ := fun y ↦ pressure y t
+  have huDef : (fun y ↦ velocity y t) = u := rfl
+  have hpDef : (fun y ↦ pressure y t) = p := rfl
   have hu : ContDiff ℝ ∞ u :=
     openPeriodicSolutionOn_velocitySlice_contDiff solution ht
   have hp : ContDiff ℝ ∞ p :=
@@ -172,7 +174,8 @@ theorem openPeriodicSolutionOn_unforced_mixedThirdProductionIdentity
         6 * trilinearValue
           (thirdFDerivAt (fun y ↦ eulerianTimeJet velocity y t component) base)
           a b c := by
-    simpa [eulerianTimeJetComponentLine, affineSpatialLine] using htimePolar
+    unfold eulerianTimeJetComponentLine affineSpatialLine
+    exact htimePolar
   have hviscousPolar' :
       cubicFacePolarization
           (fun direction ↦ iteratedDeriv 3
@@ -182,7 +185,9 @@ theorem openPeriodicSolutionOn_unforced_mixedThirdProductionIdentity
         6 * trilinearValue
           (thirdFDerivAt (fun y ↦ (Δ (fun q ↦ velocity q t)) y component) base)
           a b c := by
-    simpa [laplacianComponentLine, affineSpatialLine, u] using hviscousPolar
+    rw [huDef]
+    unfold laplacianComponentLine affineSpatialLine
+    exact hviscousPolar
   have hpressurePolar' :
       cubicFacePolarization
           (fun direction ↦ iteratedDeriv 3
@@ -193,7 +198,9 @@ theorem openPeriodicSolutionOn_unforced_mixedThirdProductionIdentity
           (thirdFDerivAt
             (fun y ↦ gradient (fun q ↦ pressure q t) y component) base)
           a b c := by
-    simpa [pressureGradientComponentLine, affineSpatialLine, p] using hpressurePolar
+    rw [hpDef]
+    unfold pressureGradientComponentLine affineSpatialLine
+    exact hpressurePolar
   rw [htimePolar', hviscousPolar', hpressurePolar'] at hpolar
   exact hpolar
 

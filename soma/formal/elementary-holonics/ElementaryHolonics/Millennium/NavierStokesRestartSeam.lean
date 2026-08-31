@@ -12,7 +12,7 @@ strict common local lifespan.  Exact piecewise gluing is kept separate from that
 noncomputable section
 
 open ContDiff Filter InnerProductSpace Set Topology
-open scoped Laplacian
+open scoped Laplacian ENNReal
 
 namespace Soma.Holonics.Millennium.NavierStokesRestartSeam
 
@@ -20,6 +20,17 @@ open Soma.Holonics.Millennium.NavierStokes
 open Soma.Holonics.Millennium.NavierStokesOpenLifespan
 open Soma.Holonics.Millennium.NavierStokesUniformRestart
 open Soma.Holonics.Millennium.NavierStokesOverlapUniqueness
+
+/- Lean 4.33 exposes both the `WithLp` and `PiLp` presentations of the
+Euclidean-space instances.  The analytic API used by `scomp` returns the
+`PiLp` presentation, so keep this file's derivative chart on that exact
+presentation rather than asking elaboration to identify two instance
+records extensionally. -/
+local instance restartSpaceNormedAddCommGroup : NormedAddCommGroup Space :=
+  PiLp.normedAddCommGroup 2 fun _ : Fin 3 => ℝ
+
+local instance restartSpaceNormedSpace : NormedSpace ℝ Space :=
+  PiLp.normedSpace 2 ℝ fun _ : Fin 3 => ℝ
 
 /-- An absolute-time pressure field rebased to the local restart clock. -/
 def shiftPressureField (field : PressureField) (t₀ : ℝ) : PressureField :=
@@ -69,7 +80,8 @@ theorem derivWithin_shiftVelocityField_eq
   have htranslated : HasDerivWithinAt (shiftVelocityField velocity t₀ x)
       (derivWithin (velocity x) (openTimeSlab T) (t₀ + τ))
       (openTimeSlab (T - t₀)) τ := by
-    simpa [shiftVelocityField, Function.comp_def] using hcomp
+    convert hcomp using 1 <;> try rfl
+    simp
   exact htranslated.derivWithin
     ((uniqueDiffOn_Ico 0 (T - t₀)).uniqueDiffWithinAt hτ)
 
@@ -103,8 +115,10 @@ def OpenPeriodicSolutionOn.shiftFromInterior
           add_mem_openTimeSlab_of_mem_remaining ht₀ hxτ.2⟩
       have hcomp := solution.velocitySmooth.comp
         (restartClockEmbedding_contDiff t₀).contDiffOn hmaps
-      simpa [shiftVelocityField, restartClockEmbedding, Function.comp_def,
-        Function.uncurry] using hcomp
+      change ContDiffOn ℝ ∞
+        (fun z : Space × ℝ => velocity z.1 (t₀ + z.2))
+        (openSpaceTimeSlab (T - t₀))
+      exact hcomp
     pressureSmooth := by
       have hmaps : MapsTo (restartClockEmbedding t₀)
           (openSpaceTimeSlab (T - t₀)) (openSpaceTimeSlab T) := by
@@ -113,8 +127,10 @@ def OpenPeriodicSolutionOn.shiftFromInterior
           add_mem_openTimeSlab_of_mem_remaining ht₀ hxτ.2⟩
       have hcomp := solution.pressureSmooth.comp
         (restartClockEmbedding_contDiff t₀).contDiffOn hmaps
-      simpa [shiftPressureField, restartClockEmbedding, Function.comp_def,
-        Function.uncurry] using hcomp }
+      change ContDiffOn ℝ ∞
+        (fun z : Space × ℝ => pressure z.1 (t₀ + z.2))
+        (openSpaceTimeSlab (T - t₀))
+      exact hcomp }
   velocityPeriodic := fun τ hτ => by
     simpa [shiftVelocityField] using solution.velocityPeriodic (t₀ + τ)
       (add_mem_openTimeSlab_of_mem_remaining ht₀ hτ)
@@ -175,7 +191,8 @@ theorem anchored_eq_of_gradient_eq
       exact (toDual ℝ Space).symm.injective (hgradient x)
     have hsub := fderiv_sub (hpDiff x) (hqDiff x)
     rw [hfrechet, sub_self] at hsub
-    simpa only [Pi.sub_apply] using hsub
+    change fderiv ℝ (fun x => p x - q x) x = 0 at hsub
+    exact hsub
   intro x
   have hconstant := is_const_of_fderiv_eq_zero hdifference hderivative x 0
   dsimp [difference] at hconstant
@@ -377,8 +394,10 @@ theorem OpenPeriodicSolutionOn.anchoredPressureSmooth
     simpa [Function.comp_def, Function.uncurry] using
       solution.pressureSmooth.comp
         (contDiffOn_const.prodMk contDiffOn_snd) hmaps
-  simpa [anchoredPressure, Function.uncurry] using
-    solution.pressureSmooth.sub hreference
+  change ContDiffOn ℝ ∞
+    (fun z : Space × ℝ => pressure z.1 z.2 - pressure 0 z.2)
+    (openSpaceTimeSlab T)
+  exact solution.pressureSmooth.sub hreference
 
 /-- The restarted velocity branch is jointly smooth on its absolute-time carrier. -/
 theorem InteriorPeriodicRestart.absoluteVelocitySmooth

@@ -585,9 +585,7 @@ pub fn digest_native_ids(ids: &[u32]) -> String {
     format!("{:x}", digest.finalize())
 }
 
-fn is_digest(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
+use crate::is_sha256_digest as is_digest;
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum RecurrentRefusal {

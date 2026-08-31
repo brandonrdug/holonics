@@ -175,9 +175,13 @@ theorem hasFDerivAt_velocitySpacetimeFourierPassage
   have htime := hcoefficient.hasFDerivAt.comp z hasFDerivAt_snd
   have hspace :=
     (hasFDerivAt_euclideanFourierCharacter k z.1).comp z hasFDerivAt_fst
-  simpa only [velocitySpacetimeFourierPassage,
-    velocitySpacetimeFourierPassageFDeriv,
-    Function.comp_apply] using htime.mul hspace
+  change HasFDerivAt
+    (((fun tau : ℝ ↦ (weightedSobolevCoefficients 3
+      (weightedPathExtension hT base tau component)).1 k) ∘ Prod.snd) *
+        (euclideanFourierCharacter k ∘ Prod.fst))
+    (velocitySpacetimeFourierPassageFDeriv
+      hT base nu component k z) z
+  exact htime.mul hspace
 
 /-- The derivative field of every individual spacetime mode is continuous. -/
 theorem continuous_velocitySpacetimeFourierPassageFDeriv
@@ -208,7 +212,8 @@ theorem continuous_velocitySpacetimeFourierPassageFDeriv
       ContinuousLinearMap.toSpanSingleton ℝ
         (projectedModalTimeDerivativeCoefficient
           hT base nu component k z.2)) := by
-    convert (ContinuousLinearMap.smulRightL ℝ ℝ ℂ 1).continuous.comp htime using 1
+    exact ((ContinuousLinearMap.smulRightL ℝ ℝ ℂ 1).continuous.comp htime).congr
+      (fun _ ↦ rfl)
   unfold velocitySpacetimeFourierPassageFDeriv
   fun_prop
 
@@ -571,7 +576,7 @@ theorem CoherentWeightedSmoothPathTower.contDiffOn_one_joint_reconstructedVeloci
     CoherentWeightedSmoothPathTower.contDiffOn_one_joint_complexVelocityComponent
       hT tower nu hnu initial hfixed hreal component
   have hrealComponent := Complex.reCLM.contDiff.comp_contDiffOn hcomplex
-  convert hrealComponent using 1
+  exact hrealComponent.congr (fun _ _ ↦ rfl)
 
 /-! ## Cap-selected carrier receipt and the exact next elliptic port -/
 
@@ -592,8 +597,12 @@ theorem WeightedClassicalRestartCarrier.velocityJointC1
     CoherentWeightedSmoothPathTower.contDiffOn_one_joint_reconstructedVelocity
       hT carrier.tower (Real.toNNReal nu) (real_toNNReal_pos hnu) initial
     carrier.fixed carrier.fourierReal
-  simpa only [weightedClassicalRestartVelocity,
-    weightedMildRestartMap, Function.uncurry] using h
+  change ContDiffOn ℝ 1
+    (fun z : Space × ℝ ↦
+      weightedReconstructedVelocity hT carrier.path z.2 z.1)
+    ((univ : Set Space) ×ˢ
+      Ioo (0 : ℝ) (weightedRestartTimeFromCap nu cap))
+  exact h
 
 /-! ## The native first time jet forced by higher spatial persistence -/
 
@@ -687,9 +696,13 @@ theorem CoherentWeightedSmoothPathTower.weightedSobolevCoefficients_nativeProjec
       (∑ coordinate : Fin 3,
         orderedDerivativeMultiplier 2 (fun _ : Fin 2 ↦ coordinate) k) =
         -(torusStokesEigenvalue k : ℂ) := by
-    simpa only [
-      Soma.Holonics.Millennium.NavierStokesWeightedSmoothClassicalMomentum.diagonalSecondWord]
-      using Soma.Holonics.Millennium.NavierStokesWeightedSmoothClassicalMomentum.sum_orderedDerivativeMultiplier_diagonalSecondWord k
+    have h :=
+      Soma.Holonics.Millennium.NavierStokesWeightedSmoothClassicalMomentum.sum_orderedDerivativeMultiplier_diagonalSecondWord k
+    change
+      (∑ coordinate : Fin 3,
+        orderedDerivativeMultiplier 2 (fun _ : Fin 2 ↦ coordinate) k) =
+          -(torusStokesEigenvalue k : ℂ) at h
+    exact h
   have hviscous :
       (weightedSobolevCoefficients 3
         ((∑ coordinate : Fin 3,
@@ -840,11 +853,19 @@ def CoherentWeightedSmoothPathTower.nativeProjectedTimeDerivativePath
     have hsource : Continuous (fun t : Icc (0 : ℝ) T ↦
         periodicVectorWeightedLerayDivergenceConvolution
           4 (by norm_num) (tower.lift 1 t) (tower.lift 1 t)) := by
-      simpa only [periodicVectorWeightedLerayDivergenceConvolutionContinuous_apply] using
-        ((periodicVectorWeightedLerayDivergenceConvolutionContinuous
-          4 (by norm_num)).continuous.comp (tower.lift 1).continuous).clm_apply
-            (tower.lift 1).continuous
-    exact (continuous_const.smul hviscous).sub hsource
+      exact (((periodicVectorWeightedLerayDivergenceConvolutionContinuous
+        4 (by norm_num)).continuous.comp (tower.lift 1).continuous).clm_apply
+          (tower.lift 1).continuous).congr (fun _ ↦ rfl)
+    change Continuous (fun t : Icc (0 : ℝ) T ↦
+      (nu : ℂ) •
+          (∑ coordinate : Fin 3,
+            finiteOrderVectorDerivativeToThree
+              2 2 (by omega) (fun _ : Fin 2 ↦ coordinate)
+                (tower.lift 2 t)) -
+        periodicVectorWeightedLerayDivergenceConvolution
+          4 (by norm_num) (tower.lift 1 t) (tower.lift 1 t))
+    exact ((continuous_const : Continuous
+      (fun _ : Icc (0 : ℝ) T ↦ (nu : ℂ))).smul hviscous).sub hsource
 
 @[simp]
 theorem CoherentWeightedSmoothPathTower.nativeProjectedTimeDerivativePath_apply
@@ -1010,18 +1031,16 @@ def CoherentWeightedSmoothPathTower.ellipticPressureFirstTimePort
             (CoherentWeightedSmoothPathTower.nativeProjectedTimeDerivativePath
               tower nu) t)
           (weightedPathExtension hT base t)) := by
-      simpa only [weightedUnprojectedDivergenceConvolutionContinuous_apply] using
-        (weightedUnprojectedDivergenceConvolutionContinuous.continuous.comp
-          hvelocity).clm_apply hbase
+      exact ((weightedUnprojectedDivergenceConvolutionContinuous.continuous.comp
+        hvelocity).clm_apply hbase).congr (fun _ ↦ rfl)
     have hright : Continuous (fun t ↦
         weightedUnprojectedDivergenceConvolution
           (weightedPathExtension hT base t)
           (weightedPathExtension hT
             (CoherentWeightedSmoothPathTower.nativeProjectedTimeDerivativePath
               tower nu) t)) := by
-      simpa only [weightedUnprojectedDivergenceConvolutionContinuous_apply] using
-        (weightedUnprojectedDivergenceConvolutionContinuous.continuous.comp
-          hbase).clm_apply hvelocity
+      exact ((weightedUnprojectedDivergenceConvolutionContinuous.continuous.comp
+        hbase).clm_apply hvelocity).congr (fun _ ↦ rfl)
     exact (hleft.add hright).continuousOn
   velocityHasDerivAt := fun {_t} ht ↦
     CoherentWeightedSmoothPathTower.hasDerivAt_weightedPathExtension_nativeProjectedTimeDerivative
@@ -1047,9 +1066,12 @@ theorem EllipticPressureFirstTimePort.hasDerivAt_weightedNativePressure
   have hoperator : HasDerivAt
       (fun tau ↦ B (weightedPathExtension hT base tau))
       (B (port.velocityTimeDerivative t)) t := by
-    simpa only [Function.comp_apply, ContinuousLinearMap.comp_apply,
-      ContinuousLinearMap.toSpanSingleton_apply, one_smul] using
-        ((B.hasFDerivAt.comp t hu.hasFDerivAt).hasDerivAt)
+    change HasDerivAt
+      (B ∘ fun tau ↦ weightedPathExtension hT base tau)
+      (B (port.velocityTimeDerivative t)) t
+    simpa only [ContinuousLinearMap.comp_apply,
+      ContinuousLinearMap.toSpanSingleton_apply_one] using
+        (B.hasFDerivAt.comp t hu.hasFDerivAt).hasDerivAt
   have hsource : HasDerivAt
       (fun tau ↦ B (weightedPathExtension hT base tau)
         (weightedPathExtension hT base tau))
@@ -1067,13 +1089,19 @@ theorem EllipticPressureFirstTimePort.hasDerivAt_weightedNativePressure
   have hpressure :=
     (nativePressureFromH2.restrictScalars ℝ).hasFDerivAt.comp t
       hsource'.hasFDerivAt
-  simpa only [weightedNativePressure,
-    weightedUnprojectedDivergenceState_eq_quadratic,
-    weightedUnprojectedQuadratic,
-    B, ContinuousLinearMap.bilinearRestrictScalars_apply_apply,
-    weightedUnprojectedDivergenceConvolutionContinuous_apply,
-    Function.comp_apply, ContinuousLinearMap.comp_apply,
-    ContinuousLinearMap.toSpanSingleton_apply, one_smul] using hpressure.hasDerivAt
+  have hpressureFunction :
+      (fun tau ↦ weightedNativePressure hT base tau) =
+        ((nativePressureFromH2.restrictScalars ℝ) ∘
+          fun tau ↦ weightedUnprojectedQuadratic
+            (weightedPathExtension hT base tau)) := by
+    funext tau
+    simp only [weightedNativePressure, Function.comp_apply,
+      weightedUnprojectedDivergenceState_eq_quadratic,
+      ContinuousLinearMap.coe_restrictScalars']
+  rw [hpressureFunction]
+  simpa only [ContinuousLinearMap.comp_apply,
+    ContinuousLinearMap.toSpanSingleton_apply_one,
+    ContinuousLinearMap.coe_restrictScalars'] using hpressure.hasDerivAt
 
 /-- The elliptic port returns a continuously varying native pressure time jet. -/
 theorem EllipticPressureFirstTimePort.continuousOn_nativePressureTimeDerivative
@@ -1105,7 +1133,7 @@ theorem EllipticPressureFirstTimePort.contDiffOn_one_weightedNativePressure
     have hcontinuous :=
       (ContinuousLinearMap.smulRightL ℝ ℝ
         (PeriodicWeightedSobolev 3) 1).continuous.comp_continuousOn hD
-    convert hcontinuous using 1
+    exact hcontinuous.congr (fun _ _ ↦ rfl)
   · intro s hs
     exact (port.hasDerivAt_weightedNativePressure hs).hasFDerivAt
 

@@ -1,7 +1,7 @@
 use holonic_engine::{
-    EventId,
     native_spool::{ReceiverInsufficiency, ReceiverInsufficiencyCause},
     receiver_exact_compression::ReceiverId,
+    EventId,
 };
 
 use super::types::{

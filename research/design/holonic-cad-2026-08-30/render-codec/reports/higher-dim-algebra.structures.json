@@ -1,0 +1,694 @@
+[
+  {
+    "source": "brown-porter",
+    "name": "category",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "objects": "class Ob(C) of 'objects'",
+      "morphisms": "arrows/morphisms f: X -> Y for objects X, Y",
+      "composition": "f g : X -> Z given f: X->Y, g: Y->Z",
+      "identity": "1_X at each object X",
+      "associativity_axiom": "f(gh) = (fg)h when both sides defined",
+      "identity_axiom": "1_X f = f = f 1_Y"
+    },
+    "equations": ["f(gh) = (fg)h", "1X f = f = f 1Y"],
+    "page": 3,
+    "quote": "a class Ob(C) of 'objects', a set of 'arrows', or 'morphisms' f : X → Y for any two objects X, Y, and a composition"
+  },
+  {
+    "source": "brown-porter",
+    "name": "composite diagram (chain and triangle)",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "eq1_form": "linear chain X --f--> Y --g--> Z",
+      "eq2_form": "triangle: X to Y by f, X to Z by fg, Y to Z by g",
+      "labels": "objects X, Y, Z; arrows f, g, fg"
+    },
+    "equations": ["X --f--> Y --g--> Z  (1)", "fg : X -> Z  (2, triangle form)"],
+    "page": 3,
+    "quote": "This composite is represented by the diagram"
+  },
+  {
+    "source": "brown-porter",
+    "name": "colimit, diagram D, and cocone",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "diagram_D": "a collection of some objects in C and some arrows between them",
+      "cocone": "base D, vertex object C, one arrow from C to (or from) each object of D",
+      "commutativity": "each triangular face of the cocone is commutative",
+      "colimit_cocone": "colim(D): any cocone on D factors uniquely through it",
+      "universal_map": "Phi: colim(D) -> C constructed from the other data"
+    },
+    "equations": ["Φ : colim(D) → C"],
+    "page": 4,
+    "quote": "any cocone on D factors uniquely through the colimit cocone"
+  },
+  {
+    "source": "brown-porter",
+    "name": "colimit as gluing (\"local-to-global\")",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "own_phrase": "gluing or amalgamating complex structures",
+      "section_title": "Category theory and colimits: gluing and structure",
+      "local_to_global_note": "the phrase 'local-to-global' occurs only in cited reference [7]'s title, not in Brown-Porter's own running prose",
+      "parts_statement": "describe the behaviour of a big object in terms of the behaviour of its parts"
+    },
+    "equations": [],
+    "page": 3,
+    "quote": "This notion of colimit gives a very general setting in which to describe the process of gluing or amalgamating complex structures"
+  },
+  {
+    "source": "brown-porter",
+    "name": "algebraic inverse to subdivision",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "picture": "a line subdivided by dots into segments labelled a, b, c, d",
+      "algebra": "the composite word abcd",
+      "slogan": "composition is an algebraic inverse to subdivision"
+    },
+    "equations": ["abcd"],
+    "page": 7,
+    "quote": "composition is an algebraic inverse to subdivision"
+  },
+  {
+    "source": "brown-porter",
+    "name": "grid of filled squares (motivating double categories)",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "layout": "dots joined by horizontal and vertical directed arrows forming a 2-D grid",
+      "cells": "the enclosed unit squares are 'supposed filled and labelled'",
+      "role": "motivates moving from categories (1-dim arrows) to double categories (directed squares)"
+    },
+    "equations": [],
+    "page": 7,
+    "quote": "where the squares are supposed filled and labelled?"
+  },
+  {
+    "source": "brown-porter",
+    "name": "commutative square",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "corners": "4 points arranged as a square",
+      "top_edge": "a",
+      "left_edge": "c",
+      "right_edge": "b",
+      "bottom_edge": "d"
+    },
+    "equations": ["ab = cd", "a = cdb⁻¹"],
+    "page": 8,
+    "quote": "is easily translated into mathematics as ab = cd, or a = cdb−1"
+  },
+  {
+    "source": "brown-porter",
+    "name": "double category",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "elements": "squares",
+      "comp1": "x ∘1 z (vertical), defined iff bottom edge of x = top edge of z",
+      "comp2": "x ∘2 y (horizontal), defined iff right edge of x = left edge of y",
+      "geometric_rules": "'we have to impose all the obvious geometric rules' — the paper's own name for the interchange law",
+      "terminology_note": "the words 'interchange' and 'double groupoid' never occur in this paper; only 'double category' and 'double category with connections'"
+    },
+    "equations": [
+      "x ◦1 z",
+      "x ◦2 y",
+      "(a ◦2 b) ◦1 (c ◦2 d) = (a ◦1 c) ◦2 (b ◦1 d)  — standard interchange law in the paper's ◦1/◦2 notation; supplied here, not written out by Brown–Porter"
+    ],
+    "page": 8,
+    "quote": "So we get a notion of a double category, whose elements are squares"
+  },
+  {
+    "source": "brown-porter",
+    "name": "commutative cube face-composition problem",
+    "kind": "axiom",
+    "dimension": 3,
+    "data": {
+      "faces": "a cube has six faces, which divide into two groups of three",
+      "attempted_equality": "eq.(6): equate two composites of ∂-boundary faces arranged as a would-be rectangular array",
+      "failure_reason": "the little squares do not form a rectangular array; edges of each block are not correct for equality",
+      "fix": "new corner-filling elements needed; expanded equality eq.(7)"
+    },
+    "equations": [
+      "∂²0 ∂³1 | ∂¹0  vs.  ∂¹1 | ∂³0 ∂²1   (eq. 6, fails to equate)",
+      "eq. (7): same faces with extra corner cells inserted, now equal"
+    ],
+    "page": 9,
+    "quote": "Unfortunately, this does not make sense because the little squares do not form a rectangular array"
+  },
+  {
+    "source": "brown-porter",
+    "name": "thin squares and connections",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "identities": "three thin squares filled with 1's and one edge a: horizontal/vertical identities",
+      "connections": "Γa and Γ′a: squares split by a diagonal into two triangles labelled a and 1, for 'turning left or right'",
+      "rules_note": "rules (i)-(iv) relate identities and connections; the pdftotext 2-D layout of these square-grid equations is partly garbled",
+      "legible_fragments": "[Γ′a Γa] = ε1a (rule i, partial); rule (iii) gives Γ′(ab); rule (iv) gives Γ(ab)"
+    },
+    "equations": ["[Γ′a Γa] = ε1a", "(iii) ... = Γ′(ab)", "(iv) [Γa ε1b; ε2b Γb] = Γ(ab)"],
+    "page": 9,
+    "quote": "We need some special squares called thin squares"
+  },
+  {
+    "source": "brown-porter",
+    "name": "cubical vs globular (absent argument)",
+    "kind": "convention",
+    "dimension": null,
+    "data": {
+      "status": "\"cubical\" and \"globular\" never occur in the body text",
+      "only_occurrence": "bibliography item [2] (Al-Agl, Brown, Steiner): 'the equivalence between a globular and cubical approach'",
+      "paper_practice": "the whole paper is built on the cubical (squares/cubes) side without naming or arguing that comparison"
+    },
+    "equations": [],
+    "page": 12,
+    "quote": "Multiple categories: the equivalence between a globular and cubical approach"
+  },
+  {
+    "source": "brown-porter",
+    "name": "2-dimensional rewriting calculation",
+    "kind": "example",
+    "dimension": 2,
+    "data": {
+      "input": "a labelled figure with edges a, b, c, d",
+      "process": "rewritten by the connection rules into two differently-routed but equal simplified diagrams",
+      "extension": "analogous rewriting carried out in three dimensions in [2], not easy to handle"
+    },
+    "equations": [],
+    "page": 10,
+    "quote": "2-dimensional rewriting looks like a new kind of manipulation"
+  },
+  {
+    "source": "brown-porter",
+    "name": "email server colimit example",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "document": "email E broken into parts Ei by server S",
+      "relabelling": "parts relabelled Ei′",
+      "routing": "Ei′ sent to servers Si, forwarded as Ei′′ to receiver server SC",
+      "output": "SC combines the Ei′′ to produce the received message ME at C, independent of routing choices"
+    },
+    "equations": [],
+    "page": 6,
+    "quote": "consider the process of sending an email document, call it E. To send this we need a server S"
+  },
+  {
+    "source": "brown-porter",
+    "name": "distributivity picture",
+    "kind": "figure",
+    "dimension": null,
+    "data": {
+      "equation_form": "2 × (5+3) = 2×5 + 2×3",
+      "picture_form": "two stacked rows of tally marks (a 5-block and a 3-block), doubled",
+      "general_law": "a × (b+c) = a×b + a×c offered as a further picture-vs-formula exercise"
+    },
+    "equations": ["2 × (5 + 3) = 2 × 5 + 2 × 3", "a × (b + c) = a × b + a × c"],
+    "page": 6,
+    "quote": "is more clearly shown by the figure"
+  },
+  {
+    "source": "brown-porter",
+    "name": "cocone figure (functional controls)",
+    "kind": "figure",
+    "dimension": null,
+    "data": {
+      "apex": "object C",
+      "base": "diagram D, several objects joined by arrows",
+      "arrows": "one arrow from C to each object of D",
+      "condition": "each triangular face of the cocone is commutative"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "a cocone with base D and vertex an object C"
+  },
+  {
+    "source": "brown-porter",
+    "name": "colim(D) universal cocone figure",
+    "kind": "figure",
+    "dimension": null,
+    "data": {
+      "apex": "object C",
+      "mediator": "colim(D), drawn between C and D with dotted new morphisms",
+      "broken_arrow": "Φ, constructed from the other information",
+      "commutativity": "all triangular faces of the combined picture are commutative"
+    },
+    "equations": ["Φ : colim(D) → C"],
+    "page": 5,
+    "quote": "the dotted arrows represent new morphisms which combine to make the colimit cocone"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "n-category (informal 'Definition')",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "cells": "0-cells/objects; 1-cells/morphisms; 2-cells (morphisms between morphisms); 3-cells (Γ drawn perpendicular to the page); ... up to n-cells",
+      "composition": "various kinds of composition at each dimension, and identities",
+      "fit_together": "compositions required to 'all fit together nicely — a phrase hiding many subtleties'",
+      "infinity": "∞-categories (ω-categories): defined similarly, going up the dimensions forever"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "Let n ≥ 0. An n-category consists of • 0-cells or objects, A, B, . . . • 1-cells or morphisms"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "weak vs strict n-category",
+    "kind": "convention",
+    "dimension": null,
+    "data": {
+      "weak": "'fitting together nicely' holds only up to some kind of equivalence",
+      "strict": "associativity etc. hold in the strict sense",
+      "dim2_result": "every weak 2-category is equivalent to some strict one",
+      "dim3_counterexample": "there exist spaces X such that the weak 3-category Π3(X) is not equivalent to any strict 3-category",
+      "running_convention": "from now on 'n-category' means 'weak n-category'"
+    },
+    "equations": [],
+    "page": 7,
+    "quote": "From now on, 'n-category' will mean 'weak n-category'. The strict ones hardly arise in nature."
+  },
+  {
+    "source": "leinster-rough",
+    "name": "vertical and horizontal 2-cell composition notation",
+    "kind": "notation",
+    "dimension": 2,
+    "data": {
+      "vertical": "β∘α, composite of 2-cells sharing a 1-cell",
+      "horizontal": "α′∗α, composite of 2-cells along a shared object",
+      "note": "the ∗ notation is traditional but not particularly well-chosen"
+    },
+    "equations": ["β∘α", "α′∗α"],
+    "page": 5,
+    "quote": "the ∗ notation is traditional but not particularly well-chosen"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "cubical 2-cell alternative (not an n-category)",
+    "kind": "convention",
+    "dimension": 2,
+    "data": {
+      "shape": "square 2-cell: •→• over •→•, filled with a double arrow ⇓",
+      "status": "'one of the zoo of structures' mentioned earlier; something other than an n-category"
+    },
+    "equations": [],
+    "page": 5,
+    "quote": "This is one of the 'zoo of structures' mentioned earlier, but is something other than an n-category."
+  },
+  {
+    "source": "leinster-rough",
+    "name": "fundamental ∞-groupoid Π∞(X) and Πn(X)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "0-cells": "points of X",
+      "1-cells": "paths in X, i.e. maps [0,1] -> X",
+      "2-cells": "homotopies of paths, relative to endpoints",
+      "3-cells": "homotopies of homotopies of paths, i.e. suitable maps [0,1]^3 -> X",
+      "composition": "pasting paths and homotopies",
+      "truncation": "Πn(X) obtained by truncating Π∞(X) after n steps; Π1(X) is the familiar fundamental groupoid",
+      "groupoid_property": "'groupoid' means all cells of dimension > 0 are invertible"
+    },
+    "equations": [],
+    "page": 6,
+    "quote": "Any topological space X gives rise to an ∞-category Π∞ (X) (its fundamental ∞-groupoid)"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "∞-category Top",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "0-cells": "topological spaces",
+      "1-cells": "continuous maps",
+      "2-cells": "homotopies between f and g",
+      "3-cells": "homotopies between homotopies, i.e. suitable maps [0,1]^2 x X -> Y",
+      "composition": "as expected"
+    },
+    "equations": [],
+    "page": 7,
+    "quote": "Top has: • 0-cells: topological spaces • 1-cells: continuous maps"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "∞-category ChCx",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "0-cells": "chain complexes (of abelian groups, say)",
+      "1-cells": "chain maps",
+      "2-cells": "chain homotopies",
+      "3-cells": "homotopies between homotopies: maps Γ: A -> B of degree 2 with dΓ − Γd = β − α",
+      "composition": "more or less as expected, but choices involved; composite of two chain homotopies is 'left-handed' or 'right-handed'"
+    },
+    "equations": ["dΓ − Γd = β − α"],
+    "page": 7,
+    "quote": "maps Γ : A → B of degree 2 such that dΓ − Γd = β − α"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "∞-category Bord",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "0-cells": "0-manifolds (compact, smooth, oriented); typical 0-cell is 4 points",
+      "1-cells": "1-manifolds with corners (cobordisms between 0-manifolds)",
+      "2-cells": "2-manifolds with corners",
+      "higher_cells": "3-cells, 4-cells, ... defined similarly",
+      "composition": "gluing of manifolds",
+      "no_quotient": "unlike Atiyah-Segal TQFT and Khovanov's 2-categorical approach, isomorphism classes are NOT taken at any stage; dimensions keep going up"
+    },
+    "equations": [],
+    "page": 8,
+    "quote": "This is an ∞-category of (co?)bordisms."
+  },
+  {
+    "source": "leinster-rough",
+    "name": "Bord 1-cell cobordism figure",
+    "kind": "figure",
+    "dimension": 1,
+    "data": {
+      "slab": "none — no dotted parallel planes are drawn for this figure",
+      "top_boundary": "2 endpoint dots (target 0-manifold), implied by the caption; no ruled top edge is drawn",
+      "bottom_boundary": "4 endpoint dots (source 0-manifold), implied by the caption; no ruled bottom edge is drawn",
+      "corners": "6 endpoint dots total across 3 open arcs (a cup, a hook-shaped arc, a diagonal arc); the closed loop has none",
+      "orientation": "every arc and the closed loop carries its own small arrowhead",
+      "cell_notation": "captioned as 'a 1-cell from the 4-point 0-manifold to the 2-point 0-manifold'; no algebraic label given"
+    },
+    "equations": [],
+    "page": 8,
+    "quote": "this being a 1-cell from the 4-point 0-manifold to the 2-point 0-manifold"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "Bord 2-cell figure: pair-of-pants surface",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "slab": "two parallel parallelogram planes, dotted outlines, oblique perspective, one lower and one upper",
+      "top_boundary": "two closed loops (circles) resting side by side on the upper dotted plane",
+      "bottom_boundary": "one closed loop (circle) resting on the lower dotted plane, with a dashed arc marking its hidden rear half",
+      "corners": "none — every boundary curve is a smooth circle; the cornerless alternative",
+      "orientation": "not drawn; text states orientations are left off the pictures",
+      "cell_notation": "unlabelled; offered as the 'or' alternative to the N figure"
+    },
+    "equations": [],
+    "page": 8,
+    "quote": "2-cells: 2-manifolds with corners, such as"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "Bord 2-cell figure: N, the surface with corners",
+    "kind": "figure",
+    "dimension": 2,
+    "data": {
+      "slab": "the same two dotted parallelogram planes, lower and upper, with a dashed vertical segment and dashed hidden portions of the lower plane",
+      "top_boundary": "curve M, a cup-over-cap pair of arcs, labelled M, meeting the top plane at 2 corner points",
+      "bottom_boundary": "curve M′, two straight parallel vertical strokes, labelled M′, meeting the bottom plane at 2 corner points",
+      "corners": "4 total (2 on the top plane, 2 on the bottom plane) where the wavy sheet meets the straight vertical edges",
+      "orientation": "left off the drawing; N stated in prose to agree with the orientations of M and M′",
+      "cell_notation": "N is a 2-cell L ⇒ L′, drawn as a lens/eye diagram, with L = L′ = two points and N : M ⇒ M′"
+    },
+    "equations": ["L = L′ = • •", "N : M ⇒ M′"],
+    "page": 8,
+    "quote": "Here N is a 2-cell L ⇒ L′, where"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "one-object category = monoid",
+    "kind": "example",
+    "dimension": 0,
+    "data": {
+      "degeneracy": "a category C with only one object * is the same thing as a monoid M",
+      "correspondence": "morphism in C = element of M; ◦ in C = · in M"
+    },
+    "equations": ["morphism in C = element of M", "◦ in C = · in M"],
+    "page": 9,
+    "quote": "A category C with only one object is the same thing as a monoid (= semigroup with unit) M"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "one-0-cell 2-category = monoidal category",
+    "kind": "example",
+    "dimension": 1,
+    "data": {
+      "degeneracy": "a 2-category C with only one 0-cell is the same thing as a monoidal category M",
+      "correspondence_1": "1-cell in C = object of M; 2-cell in C = morphism of M",
+      "correspondence_2": "composition of 1-cells in C = ⊗ of objects in M; horizontal composition of 2-cells in C = ◦ of morphisms in M"
+    },
+    "equations": [
+      "1-cell in C = object of M",
+      "2-cell in C = morphism of M",
+      "composition •→•→• in C = ⊗ of objects in M",
+      "horizontal 2-cell composition in C = ◦ of morphisms in M"
+    ],
+    "page": 10,
+    "quote": "A 2-category C with only one 0-cell is the same thing as a monoidal category M"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "one-object monoidal category = commutative monoid (Eckmann-Hilton)",
+    "kind": "theorem",
+    "dimension": 0,
+    "data": {
+      "setup": "one-object monoidal category C has morphisms forming a set M with two monoid structures: composition and tensor",
+      "result": "Eckmann-Hilton argument: the two multiplications are in fact equal and commutative",
+      "corollary": "π2(X, x0) is abelian, via the one-0-cell-one-1-cell sub-2-category of Π2(X) at the basepoint"
+    },
+    "equations": [],
+    "page": 10,
+    "quote": "the two multiplications are in fact equal and commutative. So: a one-object monoidal category is a commutative monoid"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "one-0-cell-one-1-cell 3-category = braided monoidal category",
+    "kind": "definition",
+    "dimension": 1,
+    "data": {
+      "degeneracy": "a 3-category with only one 0-cell and one 1-cell is the same thing as a braided monoidal category",
+      "braiding": "map βA,B : A⊗B -> B⊗A for each pair of objects A, B",
+      "excluded_axiom": "axioms do NOT include (A⊗B -> B⊗A -> A⊗B) = 1, i.e. symmetry is not assumed",
+      "canonical_example": "Braid, the braided monoidal category freely generated by a single object"
+    },
+    "equations": ["A⊗B →(βA,B) B⊗A", "(A⊗B →βA,B B⊗A →βB,A A⊗B) ≠ 1 in general"],
+    "page": 10,
+    "quote": "a braided monoidal category is a monoidal category equipped with a map (a braiding) A⊗B → B⊗A"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "Braid (canonical braided monoidal category)",
+    "kind": "example",
+    "dimension": 1,
+    "data": {
+      "objects": "natural numbers 0, 1, ...",
+      "morphisms": "braids (taken up to deformation); no morphisms m -> n when m ≠ n",
+      "tensor": "placing side by side (addition on objects)",
+      "braiding": "left over right",
+      "non_symmetry": "βn,m ◦ βm,n is not the identity braid"
+    },
+    "equations": ["βn,m ◦ βm,n ≠ identity"],
+    "page": 11,
+    "quote": "Notice how βn,m ◦βm,n is not the identity braid."
+  },
+  {
+    "source": "leinster-rough",
+    "name": "symmetric monoidal category stabilisation (r ≥ 4)",
+    "kind": "theorem",
+    "dimension": 1,
+    "data": {
+      "claim": "for r ≥ 4, an r-category with only one i-cell for each i < r−1 is the same as a symmetric monoidal category",
+      "symmetric_condition": "βB,A ◦ βA,B = 1 for all A, B",
+      "reading": "'the situation's stabilized' — foreshadows the stabilisation hypothesis of Section 3"
+    },
+    "equations": ["βB,A ◦ βA,B = 1"],
+    "page": 11,
+    "quote": "an r-category with only one i-cell for each i < r − 1 is (people think) the same as a symmetric monoidal category"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "k-monoidal n-category",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "definition": "a (k+n)-category with only one i-cell for each i < k",
+      "k0_row": "0-monoidal n-category = n-category (not monoidal at all)",
+      "k1_row": "1-monoidal n-category = monoidal n-category, tensor associative/unital up to equivalence"
+    },
+    "equations": ["k-monoidal n-category := (k + n)-category with only one i-cell for each i < k"],
+    "page": 11,
+    "quote": "Define a k-monoidal n-category to be a (k + n)-category with only one i-cell for each i < k"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "periodic table of k-monoidal n-categories",
+    "kind": "table",
+    "dimension": null,
+    "data": {
+      "columns": "n = 0, 1, 2, 3",
+      "rows": "k = 0, 1, 2, 3, 4, 5, 6",
+      "row_k0": "set | category | 2-category | 3-category",
+      "row_k1": "monoid | monoidal category | monoidal 2-category | monoidal 3-category",
+      "row_k2": "commutative monoid | braided mon cat | braided mon 2-cat | braided mon 3-cat",
+      "row_k3": ",, (ditto) | symmetric mon cat | X | X",
+      "row_k4": ",, | ,, | symmetric mon 2-cat | X",
+      "row_k5": ",, | ,, | ,, | symmetric mon 3-cat",
+      "row_k6": ",, | ,, | ,, | ,,",
+      "ditto_convention": "',,' marks the same entry as the cell above it (the column has stabilized)",
+      "x_convention": "X marks an unnamed entry; e.g. the first X is sometimes 'sylleptic monoidal 2-category'",
+      "legend_arrow": "↙ labelled 'take just one-object things', the direction of increasing k",
+      "stabilization_rule": "the table stabilizes for k ≥ n + 2"
+    },
+    "equations": ["table stabilizes for k ≥ n + 2, cf. π_(k+n)(S^k)"],
+    "page": 12,
+    "quote": "Here's what k-monoidal n-categories are for some low values of k and n, laid out in the so-called 'periodic table'"
+  },
+  {
+    "source": "leinster-rough",
+    "name": "stabilisation hypothesis",
+    "kind": "theorem",
+    "dimension": null,
+    "data": {
+      "claim": "the periodic table stabilizes for k ≥ n + 2",
+      "analogy": "just like the homotopy groups of spheres π_(k+n)(S^k) stabilize",
+      "geometric_reason": "Braid is not symmetric because you can't usually translate two 1-dim affine subspaces of 3-space past each other — the same kind of dimensional calculation as sphere-homotopy stabilization"
+    },
+    "equations": ["table stabilizes for k ≥ n + 2, cf. π_(k+n)(S^k)"],
+    "page": 13,
+    "quote": "The main point is that the table stabilizes for k ≥ n + 2—just like πk+n (S k )"
+  },
+  {
+    "source": "mathworld",
+    "name": "hypergraph",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "notation": "H = (V, E)",
+      "V": "set of vertices",
+      "E": "family of subsets of V called hyperedges"
+    },
+    "equations": ["H = (V, E)"],
+    "page": null,
+    "quote": "A hypergraph is an ordered pair H=(V,E) consisting of a set V of vertices and a family E of subsets of V called hyperedges"
+  },
+  {
+    "source": "mathworld",
+    "name": "hyperedge",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "membership": "a member of the family of vertex subsets that defines a hypergraph",
+      "size": "its cardinality",
+      "special_case": "a hyperedge of two distinct vertices is an ordinary graph edge"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "A hyperedge is a member of the family of vertex subsets that defines a hypergraph. Its size is its cardinality"
+  },
+  {
+    "source": "mathworld",
+    "name": "k-uniform hypergraph",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "condition": "every hyperedge has size k",
+      "special_case": "an ordinary simple graph is a 2-uniform hypergraph"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "A hypergraph is k-uniform if every hyperedge has size k"
+  },
+  {
+    "source": "mathworld",
+    "name": "vertex degree (hypergraph)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "definition": "the number of hyperedges containing v"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "The degree of a vertex v is the number of hyperedges containing v"
+  },
+  {
+    "source": "mathworld",
+    "name": "hypergraph incidence matrix",
+    "kind": "notation",
+    "dimension": null,
+    "data": {
+      "entries": "M_ij = 1 if v_i in e_j, else 0",
+      "rows": "vertices",
+      "columns": "hyperedges",
+      "bipartite_link": "equals the incidence matrix of the bipartite graph with vertices in one part, hyperedges in the other"
+    },
+    "equations": ["M_ij = 1 if v_i ∈ e_j; 0 otherwise"],
+    "page": null,
+    "quote": "M_(ij)={1 if v_i in e_j; 0 otherwise"
+  },
+  {
+    "source": "mathworld",
+    "name": "vertex-vertex adjacency matrix",
+    "kind": "notation",
+    "dimension": null,
+    "data": {
+      "formula": "A = M M^T minus its own diagonal",
+      "information_loss": "loses information about which collections of more than two vertices belong to the same hyperedge"
+    },
+    "equations": ["A = MM^T − diag(MM^T)"],
+    "page": null,
+    "quote": "Such a matrix representation generally loses information about which collections of more than two vertices belong to the same hyperedge"
+  },
+  {
+    "source": "mathworld",
+    "name": "Levi graph (incidence graph)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "notation": "L(P,B)",
+      "points": "P = {p1, ..., pv}",
+      "lines": "B = (B1, ..., Bb), the 'blocks'",
+      "structure": "bipartite graph, 'black' vertices P, 'white' vertices B",
+      "edge_rule": "edge between pi in P and Bj in B iff pi in Bj",
+      "regular_case": "for symmetric n_k configurations, k-regular bipartite graph on 2n vertices, nk edges",
+      "duality": "dual configurations share the same Levi graph with the two vertex classes interchanged",
+      "incidence_graph_page": "the separate MathWorld 'Incidence Graph' page is a stub with only 'See also -> Levi Graph'"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "The Levi graph L(P,B), also called the incidence graph, of a configuration (P,B) ... is a bipartite graph"
+  },
+  {
+    "source": "mathworld",
+    "name": "bipartite graph",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "structure": "vertex set decomposed into two disjoint sets",
+      "condition": "no two vertices within the same set are adjacent"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "A bipartite graph, also called a bigraph, is a set of graph vertices decomposed into two disjoint sets"
+  },
+  {
+    "source": "mathworld",
+    "name": "graph incidence matrix (generic)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "structure": "(0,1)-matrix, one row per vertex, one column per edge",
+      "entry": "(v,e) = 1 iff v is incident upon e",
+      "line_graph_identity": "relates it to the line graph's adjacency matrix L"
+    },
+    "equations": ["L = CᵀC − 2I"],
+    "page": null,
+    "quote": "The incidence matrix of a graph gives the (0,1)-matrix which has a row for each vertex and column for each edge"
+  }
+]

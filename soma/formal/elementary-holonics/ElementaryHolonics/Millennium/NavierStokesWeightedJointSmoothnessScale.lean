@@ -96,7 +96,9 @@ theorem higherLeraySourceAtOrder_coefficient_eq_base
                   (tower.lift (m + 1) t coordinate)).1 p *
                 (weightedSobolevCoefficients (m + 4)
                   (tower.lift (m + 1) t output)).1 (k - p))) component := by
-    simpa only [show m + 4 - 1 = m + 3 by omega] using hhigh
+    have horder : m + 4 - 1 = m + 3 := by omega
+    rw [horder] at hhigh
+    exact hhigh
   change
     vectorCoefficientAt
       (nativeVectorUnderlyingAtOrder (m + 3)
@@ -272,13 +274,20 @@ def nativeProjectedTimeDerivativePathAtOrder
         periodicVectorWeightedLerayDivergenceConvolution
           (m + 4) (by omega) (tower.lift (m + 1) t)
             (tower.lift (m + 1) t)) := by
-      simpa only [periodicVectorWeightedLerayDivergenceConvolutionContinuous_apply,
-        show m + 4 - 1 = m + 3 by omega] using
-        ((periodicVectorWeightedLerayDivergenceConvolutionContinuous
-          (m + 4) (by omega)).continuous.comp
-            (tower.lift (m + 1)).continuous).clm_apply
-              (tower.lift (m + 1)).continuous
-    exact (continuous_const.smul hviscous).sub hsource
+      exact (((periodicVectorWeightedLerayDivergenceConvolutionContinuous
+        (m + 4) (by omega)).continuous.comp
+          (tower.lift (m + 1)).continuous).clm_apply
+            (tower.lift (m + 1)).continuous).congr (fun _ ↦ rfl)
+    change Continuous (fun t : Icc (0 : ℝ) T ↦
+      (nu : ℂ) •
+        (∑ coordinate : Fin 3,
+          diagonalSecondDerivativeAtOrder m coordinate
+            (tower.lift (m + 2) t)) -
+      periodicVectorWeightedLerayDivergenceConvolution
+        (m + 4) (by omega) (tower.lift (m + 1) t)
+          (tower.lift (m + 1) t))
+    exact ((continuous_const : Continuous
+      (fun _ : Icc (0 : ℝ) T ↦ (nu : ℂ))).smul hviscous).sub hsource
 
 @[simp]
 theorem nativeProjectedTimeDerivativePathAtOrder_apply
@@ -645,8 +654,10 @@ theorem contDiffOn_smoothTowerLiftExtension_allFiniteOrders
   induction n with
   | zero =>
       intro m
-      simpa only using (contDiffOn_zero.mpr
-        (smoothTowerLiftExtension hT tower m).continuous.continuousOn)
+      change ContDiffOn ℝ 0
+        (smoothTowerLiftExtension hT tower m) (Ioo (0 : ℝ) T)
+      exact contDiffOn_zero.mpr
+        (smoothTowerLiftExtension hT tower m).continuous.continuousOn
   | succ n ih =>
       intro m
       rw [show ((↑(n + 1) : WithTop ℕ∞)) =
@@ -700,8 +711,10 @@ theorem contDiffOn_smoothTowerLiftExtension_Ico_allFiniteOrders
   induction n with
   | zero =>
       intro m
-      simpa only using (contDiffOn_zero.mpr
-        (smoothTowerLiftExtension hT tower m).continuous.continuousOn)
+      change ContDiffOn ℝ 0
+        (smoothTowerLiftExtension hT tower m) (Ico (0 : ℝ) T)
+      exact contDiffOn_zero.mpr
+        (smoothTowerLiftExtension hT tower m).continuous.continuousOn
   | succ n ih =>
       intro m
       rw [show ((↑(n + 1) : WithTop ℕ∞)) =

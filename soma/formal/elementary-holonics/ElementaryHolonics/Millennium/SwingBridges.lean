@@ -32,9 +32,12 @@ theorem harmonicConjugate_satisfies {a b d : K} (hden : 2 * a - b - d ≠ 0) :
     HarmonicEquation a (harmonicConjugate b d a) b d := by
   have hden' : -b + (a * 2 - d) ≠ 0 := by
     convert hden using 1 <;> ring
+  have hden2 : -b + a * 2 - d ≠ 0 := by
+    convert hden using 1 <;> ring
+  have hden3 : a * 2 - b - d ≠ 0 := by
+    convert hden using 1 <;> ring
   unfold HarmonicEquation swingPair harmonicConjugate
-  ring_nf
-  field_simp [hden, hden']
+  field_simp [hden, hden2, hden3]
   ring
 
 /-- The harmonic equation determines that conjugate whenever its linear coefficient is nonzero. -/

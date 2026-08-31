@@ -49,7 +49,9 @@ theorem openPeriodicSolutionOn_vorticityField_contDiffOn_interior
   have hjoint : ContDiffOn ℝ ∞ (Function.uncurry (jointVorticityField velocity))
       interiorCylinder := by
     have hcurl := jointSpatialCurlLinearMap.contDiff.comp_contDiffOn hderivative
-    simpa [interiorCylinder, jointVorticityField, Function.uncurry] using hcurl
+    apply hcurl.congr
+    rintro ⟨x, t⟩ hxt
+    rfl
   apply hjoint.congr
   rintro ⟨x, t⟩ hxt
   have hvelocityAt : ContDiffAt ℝ 1 (Function.uncurry velocity) (x, t) :=

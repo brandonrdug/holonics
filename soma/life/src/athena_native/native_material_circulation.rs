@@ -9,8 +9,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    ExactComplexWaveCurrent,
     receiver_exact_compression::{Observation, ReceiverId},
+    ExactComplexWaveCurrent,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -26,14 +26,14 @@ use crate::{
 };
 
 use super::{
-    AthenaCultivationMutation, CompleteExchangeCultivationCover, CultivatedAthenaConsequence,
-    CultivatedAthenaPassage, CultivatedAthenaRest, NativeFactorReturnedLimb, NativeSectionAddress,
-    ResidentCultivatedAthena, WithdrawnNativeFactor,
     native_relational_potential::{
         NativeDeliveryPhase, NativeRelationalCodec, NativeRelationalConditionReceipt,
         NativeRelationalContact, NativeRelationalPotentialBuilder,
         NativeRelationalPotentialComplex,
     },
+    AthenaCultivationMutation, CompleteExchangeCultivationCover, CultivatedAthenaConsequence,
+    CultivatedAthenaPassage, CultivatedAthenaRest, NativeFactorReturnedLimb, NativeSectionAddress,
+    ResidentCultivatedAthena, WithdrawnNativeFactor,
 };
 
 const REST_MAGIC: [u8; 8] = *b"ATHCIRC7";
@@ -307,12 +307,14 @@ impl NativeCirculationRest {
             builder.receive(
                 causal_ordinal,
                 NativeDeliveryPhase::Ingress,
+                &family.prompt.occurrence,
                 checked_message(world, &family.prompt)?,
             )?;
             for response in &family.response {
                 builder.receive(
                     causal_ordinal,
                     NativeDeliveryPhase::Emanation,
+                    &response.occurrence,
                     checked_message(world, response)?,
                 )?;
             }

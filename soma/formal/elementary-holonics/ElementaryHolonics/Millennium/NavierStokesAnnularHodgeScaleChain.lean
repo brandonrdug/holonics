@@ -447,7 +447,7 @@ theorem norm_openPeriodicJacobianScaleTransition_le_tailMass
         obtain ⟨hweightNonneg, hweightOne⟩ :=
           tensorValleePoussinWeight_mem_unitInterval radius frequency
         have hcharacter : ‖UnitAddTorus.mFourier frequency q‖ = 1 := by
-          simp [UnitAddTorus.mFourier, norm_prod]
+          simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
         rw [norm_mul, hcharacter, one_mul, norm_mul,
           Complex.norm_real, Real.norm_eq_abs,
           abs_of_nonneg (sub_nonneg.mpr hweightOne)]

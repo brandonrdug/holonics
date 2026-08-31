@@ -36,7 +36,8 @@ coordinate `L¹` receiver. -/
 theorem norm_complexMatrixAction_apply_le
     (J : ComplexJacobianArray) (v : ComplexVector) (component : Fin 3) :
     ‖complexMatrixAction J v component‖ ≤ ‖J‖ * complexVectorL1 v := by
-  rw [complexMatrixAction, Matrix.mulVec, dotProduct]
+  change ‖∑ coordinate : Fin 3, J component coordinate * v coordinate‖ ≤
+    ‖J‖ * complexVectorL1 v
   calc
     ‖∑ coordinate : Fin 3, J component coordinate * v coordinate‖ ≤
         ∑ coordinate : Fin 3, ‖J component coordinate * v coordinate‖ := norm_sum_le _ _
@@ -60,14 +61,20 @@ theorem norm_complexStretchingReading_le
     (receiver : ComplexVector) (J : ComplexJacobianArray) :
     ‖complexStretchingReading receiver J‖ ≤
       ‖J‖ * complexVectorL1 receiver ^ 2 := by
-  rw [complexStretchingReading, complexDot, dotProduct]
+  change ‖∑ component : Fin 3,
+      receiver component *
+        (∑ coordinate : Fin 3, J component coordinate * receiver coordinate)‖ ≤
+    ‖J‖ * complexVectorL1 receiver ^ 2
   calc
     ‖∑ component : Fin 3,
-        receiver component * complexMatrixAction J receiver component‖ ≤
+        receiver component *
+          (∑ coordinate : Fin 3, J component coordinate * receiver coordinate)‖ ≤
       ∑ component : Fin 3,
-        ‖receiver component * complexMatrixAction J receiver component‖ := norm_sum_le _ _
+        ‖receiver component *
+          (∑ coordinate : Fin 3, J component coordinate * receiver coordinate)‖ := norm_sum_le _ _
     _ = ∑ component : Fin 3,
-        ‖receiver component‖ * ‖complexMatrixAction J receiver component‖ := by
+        ‖receiver component‖ *
+          ‖∑ coordinate : Fin 3, J component coordinate * receiver coordinate‖ := by
       apply Finset.sum_congr rfl
       intro component _hcomponent
       rw [norm_mul]
@@ -75,8 +82,11 @@ theorem norm_complexStretchingReading_le
         ‖receiver component‖ * (‖J‖ * complexVectorL1 receiver) := by
       apply Finset.sum_le_sum
       intro component _hcomponent
-      exact mul_le_mul_of_nonneg_left
-        (norm_complexMatrixAction_apply_le J receiver component) (norm_nonneg _)
+      have haction := norm_complexMatrixAction_apply_le J receiver component
+      change ‖∑ coordinate : Fin 3,
+          J component coordinate * receiver coordinate‖ ≤
+        ‖J‖ * complexVectorL1 receiver at haction
+      exact mul_le_mul_of_nonneg_left haction (norm_nonneg _)
     _ = ‖J‖ * complexVectorL1 receiver ^ 2 := by
       simp [complexVectorL1, Fin.sum_univ_succ]
       ring
@@ -103,10 +113,27 @@ theorem openPeriodicFullStrainReading_eq_finite_add_tail
         complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
           (symmetricComplexJacobianPart
             (openPeriodicJacobianArrayFourierTail solution t modes q)) := by
-  rw [openPeriodicFullStrainReading,
-    openPeriodicTorusJacobianArraySlice_eq_band_add_arrayTail,
-    symmetricComplexJacobianPart_add, complexStretchingReading_add,
-    ← openPeriodicFiniteHodgeStrainReading_eq_symmetricActualJacobianBand]
+  let receiver : ComplexVector := openPeriodicComplexVorticityAt solution t q
+  let full : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicTorusJacobianArraySlice solution t q component coordinate
+  let band : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicJacobianBandProjector solution t modes q component coordinate
+  let tail : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicJacobianArrayFourierTail solution t modes q component coordinate
+  have hsplit : full = band + tail := by
+    ext component coordinate
+    exact congrFun (congrFun
+      (openPeriodicTorusJacobianArraySlice_eq_band_add_arrayTail
+        solution t modes q) component) coordinate
+  have hfinite :=
+    openPeriodicFiniteHodgeStrainReading_eq_symmetricActualJacobianBand
+      solution t q modes
+  change openPeriodicFiniteHodgeStrainReading solution t q modes =
+      complexStretchingReading receiver (symmetricComplexJacobianPart band) at hfinite
+  change complexStretchingReading receiver (symmetricComplexJacobianPart full) =
+    openPeriodicFiniteHodgeStrainReading solution t q modes +
+      complexStretchingReading receiver (symmetricComplexJacobianPart tail)
+  rw [hsplit, symmetricComplexJacobianPart_add, complexStretchingReading_add, ← hfinite]
 
 /-- The full strain is bounded by the exact finite direction-remainder population plus the exact
 coefficient reconstruction fibre. -/
@@ -126,13 +153,28 @@ theorem norm_openPeriodicFullStrainReading_le_remainder_add_tail
   refine (norm_add_le _ _).trans (add_le_add
     (norm_openPeriodicFiniteHodgeStrainReading_le_directionRemainderMass
       solution t q modes) ?_)
-  rw [complexStretchingReading_symmetricComplexJacobianPart]
-  exact (norm_complexStretchingReading_le
-      (openPeriodicComplexVorticityAt solution t q)
-      (openPeriodicJacobianArrayFourierTail solution t modes q)).trans
-    (mul_le_mul_of_nonneg_right
-      (norm_openPeriodicJacobianArrayFourierTail_le solution t modes q)
-      (sq_nonneg _))
+  let receiver : ComplexVector := openPeriodicComplexVorticityAt solution t q
+  let tailArray : ComplexJacobianArray :=
+    openPeriodicJacobianArrayFourierTail solution t modes q
+  let tailMatrix : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicJacobianArrayFourierTail solution t modes q component coordinate
+  have htail := norm_openPeriodicJacobianArrayFourierTail_le solution t modes q
+  change ‖tailArray‖ ≤ openPeriodicJacobianCoefficientTailMass solution t modes at htail
+  have hreading := norm_complexStretchingReading_le receiver tailArray
+  change ‖complexStretchingReading receiver tailMatrix‖ ≤
+      ‖tailArray‖ * complexVectorL1 receiver ^ 2 at hreading
+  change ‖complexStretchingReading receiver (symmetricComplexJacobianPart tailMatrix)‖ ≤
+    openPeriodicJacobianCoefficientTailMass solution t modes *
+      complexVectorL1 receiver ^ 2
+  calc
+    ‖complexStretchingReading receiver (symmetricComplexJacobianPart tailMatrix)‖ =
+        ‖complexStretchingReading receiver tailMatrix‖ :=
+      congrArg norm
+        (complexStretchingReading_symmetricComplexJacobianPart receiver tailMatrix)
+    _ ≤ ‖tailArray‖ * complexVectorL1 receiver ^ 2 := hreading
+    _ ≤ openPeriodicJacobianCoefficientTailMass solution t modes *
+          complexVectorL1 receiver ^ 2 :=
+      mul_le_mul_of_nonneg_right htail (sq_nonneg _)
 
 /-- **[proved-derived; formal-checked]** On a frequency cube, the complete reconstruction tail
 has the explicit reciprocal weighted-`H³` scale already proved for the actual solution slice. -/

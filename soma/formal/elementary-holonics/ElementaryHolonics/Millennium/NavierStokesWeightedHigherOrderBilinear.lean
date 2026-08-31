@@ -290,9 +290,8 @@ private theorem vectorCoefficientAt_higherOrderLerayDivergenceConvolution
             order horder advecting transported)) k =
       lerayProjectMode k
         (higherOrderDivergenceMode order advecting transported k) := by
-  simpa only [higherOrderDivergenceMode] using
-    vectorCoefficientAt_periodicVectorWeightedLerayDivergenceConvolution
-      order horder advecting transported k
+  rw [vectorCoefficientAt_periodicVectorWeightedLerayDivergenceConvolution]
+  congr 1
 
 /-! ## Bilinearity on the native carriers -/
 

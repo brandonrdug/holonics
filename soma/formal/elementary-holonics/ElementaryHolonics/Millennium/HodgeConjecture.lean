@@ -9,11 +9,12 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 contain a smooth projective complex variety, its rational cohomology, Hodge classes, or the
 cycle-class map. This file imports those missing *problem objects* as a typed boundary.
 
-Mathlib does not presently provide the complete comparison package from smooth projective complex
-varieties to singular cohomology with Hodge decomposition and algebraic cycle classes. Therefore
-`Official` remains an explicit admission predicate on a `Datum`; it is not silently replaced by a
-lattice model. Once that exterior realization is supplied, `TheHodgeConjectureIn` is the classical
-statement that every rational Hodge class belongs to the rational span of algebraic cycle classes.
+The complete comparison from smooth projective complex varieties to singular cohomology, Hodge
+decomposition, and algebraic cycle classes is a construction target of the source-specific files.
+`Official` retains the typed admission boundary while those objects and comparison laws are built;
+it is not a substitute lattice model. Absence of a prepackaged library theorem is never a stopping
+condition. Once that realization is constructed, `TheHodgeConjectureIn` is the classical statement
+that every rational Hodge class belongs to the rational span of algebraic cycle classes.
 
 No theorem here asserts the conjecture.
 -/

@@ -125,7 +125,7 @@ theorem chiRead_of_sqcls {z : ℚ} {d : ℤ} (hz : z ≠ 0) (hv : padicValRat p 
   have hvc : padicValRat p c = 0 := by
     have hsq : padicValRat p z
         = 2 * padicValRat p c + padicValRat p ((d : ℤ) : ℚ) := by
-      rw [hcv, padicValRat.mul (pow_ne_zero 2 hc) hdq, padicValRat.pow hc]
+      rw [hcv, padicValRat.mul (pow_ne_zero 2 hc) hdq, padicValRat.pow c]
       ring
     omega
   obtain ⟨hcn, hcd⟩ := val_zero_parts hc hvc
@@ -254,7 +254,7 @@ lemma sqcls_val_parity {z : ℚ} {d : ℤ} (hz : z ≠ 0) (hd : d ≠ 0)
   obtain ⟨c, hc, hcv⟩ := h
   have hdq : ((d : ℤ) : ℚ) ≠ 0 := by exact_mod_cast hd
   refine ⟨padicValRat p c, ?_⟩
-  rw [hcv, padicValRat.mul (pow_ne_zero 2 hc) hdq, padicValRat.pow hc]
+  rw [hcv, padicValRat.mul (pow_ne_zero 2 hc) hdq, padicValRat.pow c]
   ring
 
 /-- A positive square-class member has a positive class. -/
@@ -525,7 +525,7 @@ theorem theSlotClassesCollapseOnTheThreeModEightBranch
       omega
     have hppow : ((p : ℚ)) ^ k ≠ 0 := pow_ne_zero _ hpq0
     have hvpow : padicValRat p (((p : ℕ) : ℚ) ^ k) = k := by
-      rw [padicValRat.pow hpq0, hvp]
+      rw [padicValRat.pow ((p : ℕ) : ℚ), hvp]
       ring
     set x₁ : ℚ := x * ((p : ℕ) : ℚ) ^ k with hx₁
     set x₂ : ℚ := (x - ((p : ℕ) : ℚ)) * ((p : ℕ) : ℚ) ^ k with hx₂
@@ -565,14 +565,14 @@ theorem theSlotClassesCollapseOnTheThreeModEightBranch
       have hd : x₁ - x₂ = ((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₂]
         ring
-      rw [hd, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.pow ((p : ℕ) : ℚ), hvp]
       omega
     have hc₁₃ : chiRead p x₁ = chiRead p x₃ := by
       refine chiRead_congr hx₁0 hx₃0 hvx₁ hvx₃ ?_
       have hd : x₁ - x₃ = -((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₃]
         ring
-      rw [hd, padicValRat.neg, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.neg, padicValRat.pow ((p : ℕ) : ℚ), hvp]
       omega
     have hmul : quadraticChar (ZMod p) (((d₁ * d₂ : ℤ)) : ZMod p)
         = quadraticChar (ZMod p) ((d₁ : ZMod p)) *
@@ -1029,7 +1029,7 @@ lemma unit_sq_diff_val {τ σ : ℚ} (hτ : τ ≠ 0) (hσ : σ ≠ 0)
     · exact h
   have hvden : padicValRat 2 (((τ.den : ℚ)) ^ 2 * ((σ.den : ℚ)) ^ 2) = 0 := by
     rw [padicValRat.mul (pow_ne_zero 2 hden1) (pow_ne_zero 2 hden2),
-      padicValRat.pow hden1, padicValRat.pow hden2,
+      padicValRat.pow (τ.den : ℚ), padicValRat.pow (σ.den : ℚ),
       nat_den_val_zero (p := 2) hτd, nat_den_val_zero (p := 2) hσd]
     ring
   have heq : τ ^ 2 - σ ^ 2
@@ -1109,10 +1109,10 @@ theorem theCosetCellIsRefusedAtTwo (hpodd : p % 2 = 1) {x y : ℚ}
   set cw : ℤ := padicValRat 2 w with hcw
   have hv2s : padicValRat 2 (2 * s ^ 2) = 1 + 2 * a := by
     rw [padicValRat.mul two_ne_zero (pow_ne_zero 2 hs0), hv2,
-      padicValRat.pow hs0]
+      padicValRat.pow s]
     ring
   have hvw2 : padicValRat 2 (w ^ 2) = 2 * cw := by
-    rw [padicValRat.pow hw0]
+    rw [padicValRat.pow w]
     ring
   -- the second equation forces `w` a unit and `s` integral
   have h2s0 : (2 : ℚ) * s ^ 2 ≠ 0 := mul_ne_zero two_ne_zero (pow_ne_zero 2 hs0)
@@ -1151,7 +1151,7 @@ theorem theCosetCellIsRefusedAtTwo (hpodd : p % 2 = 1) {x y : ℚ}
     have hτ0 : τ ≠ 0 := div_ne_zero ht0 h2k
     have hσ0 : σ ≠ 0 := div_ne_zero hs0 h2k
     have hv2k : padicValRat 2 (((2 : ℚ)) ^ k) = k := by
-      rw [padicValRat.pow two_ne_zero, hv2]
+      rw [padicValRat.pow (2 : ℚ), hv2]
       ring
     have hvτ : padicValRat 2 τ = 0 := by
       rw [hτ, padicValRat.div ht0 h2k, hv2k]
@@ -1171,17 +1171,17 @@ theorem theCosetCellIsRefusedAtTwo (hpodd : p % 2 = 1) {x y : ℚ}
     have hvsplit : padicValRat 2 (t ^ 2 - s ^ 2)
         = 2 * k + padicValRat 2 (τ ^ 2 - σ ^ 2) := by
       rw [hsplit, padicValRat.mul (pow_ne_zero _ two_ne_zero) hτσ0,
-        padicValRat.pow two_ne_zero, hv2]
+        padicValRat.pow (2 : ℚ), hv2]
       push_cast
       ring
     rw [hvdiff] at hvsplit
     omega
   · -- distinct valuations: the parity of the minimum refuses
     have hvt2 : padicValRat 2 (t ^ 2) = 2 * b := by
-      rw [padicValRat.pow ht0]
+      rw [padicValRat.pow t]
       ring
     have hvs2 : padicValRat 2 (-(s ^ 2)) = 2 * a := by
-      rw [padicValRat.neg, padicValRat.pow hs0]
+      rw [padicValRat.neg, padicValRat.pow s]
       ring
     have hns0 : -(s ^ 2) ≠ 0 := neg_ne_zero.mpr (pow_ne_zero 2 hs0)
     rcases lt_or_gt_of_ne (show 2 * b ≠ 2 * a from by omega) with h | h
@@ -1246,14 +1246,14 @@ private lemma nonsingMP (hp : p.Prime) :
 
 private lemma double_zero_of_Y_zero {x : ℚ}
     (h : (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular x 0) :
-    Point.some h + Point.some h = 0 :=
+    Point.some x 0 h + Point.some x 0 h = 0 :=
   Point.add_self_of_Y_eq (by simp [negY, FamilyFace.E])
 
 private lemma affine_not_two_torsion {x y : ℚ}
     (h : (FamilyFace.E (((p : ℕ) : ℚ))).Nonsingular x y) (hy : y ≠ 0) :
-    Point.some h + Point.some h ≠ 0 := by
+    Point.some x y h + Point.some x y h ≠ 0 := by
   intro h0
-  have h1 : Point.some h = -(Point.some h) := eq_neg_of_add_eq_zero_left h0
+  have h1 : Point.some x y h = -(Point.some x y h) := eq_neg_of_add_eq_zero_left h0
   rw [Point.neg_some] at h1
   simp only [Point.some.injEq] at h1
   have hyy := h1.2
@@ -1286,29 +1286,29 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
       ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩
   · -- cell (2, 2p): translate by (0, 0)
     have hT0 := nonsing00 hp
-    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    have hT2 : Point.some 0 0 hT0 + Point.some 0 0 hT0 = 0 := double_zero_of_Y_zero hT0
     obtain ⟨hom1, hom2⟩ :=
       FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-        (Point.some h) (Point.some hT0)
+        (Point.some x y h) (Point.some 0 0 hT0)
     rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_pos rfl] at hom1
     rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_neg hnq.ne] at hom2
-    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
-    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+    rcases hPT : Point.some x y h + Point.some 0 0 hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some x y h = -(Point.some 0 0 hT0) := eq_neg_of_add_eq_zero_left hPT
       rw [neg_eq_of_add_eq_zero_left hT2] at h1
       simp only [Point.some.injEq] at h1
       exact hx0 h1.1
     · rw [hPT] at hom1 hom2
       by_cases hy' : y' = 0
       · subst hy'
-        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
-        have hPP : Point.some h + Point.some h = 0 := by
-          have he : Point.some h = Point.some h' - Point.some hT0 := by
+        have hP'2 : Point.some x' 0 h' + Point.some x' 0 h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some x y h + Point.some x y h = 0 := by
+          have he : Point.some x y h = Point.some x' 0 h' - Point.some 0 0 hT0 := by
             rw [← hPT]
             abel
-          rw [he, show Point.some h' - Point.some hT0 +
-              (Point.some h' - Point.some hT0)
-              = Point.some h' + Point.some h' -
-                (Point.some hT0 + Point.some hT0) from by abel,
+          rw [he, show Point.some x' 0 h' - Point.some 0 0 hT0 +
+              (Point.some x' 0 h' - Point.some 0 0 hT0)
+              = Point.some x' 0 h' + Point.some x' 0 h' -
+                (Point.some 0 0 hT0 + Point.some 0 0 hT0) from by abel,
             hP'2, hT2, sub_zero]
         exact affine_not_two_torsion h hy hPP
       · obtain ⟨hx'0, hx'n, -⟩ :=
@@ -1324,32 +1324,32 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
               rw [hv₂]; push_cast; ring⟩)
   · -- cell (2p, p): translate by (−p, 0)
     have hT0 := nonsingMP hp
-    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    have hT2 : Point.some (-((p : ℕ) : ℚ)) 0 hT0 + Point.some (-((p : ℕ) : ℚ)) 0 hT0 = 0 := double_zero_of_Y_zero hT0
     obtain ⟨hom1, hom2⟩ :=
       FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-        (Point.some h) (Point.some hT0)
+        (Point.some x y h) (Point.some (-((p : ℕ) : ℚ)) 0 hT0)
     rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0,
       if_neg (neg_ne_zero.mpr hpq0)] at hom1
     rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn,
       if_neg (show ¬(-((p : ℕ) : ℚ)) = ((p : ℕ) : ℚ) from fun hc =>
         hpq0 (by linarith))] at hom2
-    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
-    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+    rcases hPT : Point.some x y h + Point.some (-((p : ℕ) : ℚ)) 0 hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some x y h = -(Point.some (-((p : ℕ) : ℚ)) 0 hT0) := eq_neg_of_add_eq_zero_left hPT
       rw [neg_eq_of_add_eq_zero_left hT2] at h1
       simp only [Point.some.injEq] at h1
       exact hxmn h1.1
     · rw [hPT] at hom1 hom2
       by_cases hy' : y' = 0
       · subst hy'
-        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
-        have hPP : Point.some h + Point.some h = 0 := by
-          have he : Point.some h = Point.some h' - Point.some hT0 := by
+        have hP'2 : Point.some x' 0 h' + Point.some x' 0 h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some x y h + Point.some x y h = 0 := by
+          have he : Point.some x y h = Point.some x' 0 h' - Point.some (-((p : ℕ) : ℚ)) 0 hT0 := by
             rw [← hPT]
             abel
-          rw [he, show Point.some h' - Point.some hT0 +
-              (Point.some h' - Point.some hT0)
-              = Point.some h' + Point.some h' -
-                (Point.some hT0 + Point.some hT0) from by abel,
+          rw [he, show Point.some x' 0 h' - Point.some (-((p : ℕ) : ℚ)) 0 hT0 +
+              (Point.some x' 0 h' - Point.some (-((p : ℕ) : ℚ)) 0 hT0)
+              = Point.some x' 0 h' + Point.some x' 0 h' -
+                (Point.some (-((p : ℕ) : ℚ)) 0 hT0 + Point.some (-((p : ℕ) : ℚ)) 0 hT0) from by abel,
             hP'2, hT2, sub_zero]
         exact affine_not_two_torsion h hy hPP
       · obtain ⟨hx'0, hx'n, -⟩ :=
@@ -1365,29 +1365,29 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
               rw [hv₂]; push_cast; ring⟩)
   · -- cell (−2p, −1): translate by (p, 0)
     have hT0 := nonsingP hp
-    have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+    have hT2 : Point.some ((p : ℕ) : ℚ) 0 hT0 + Point.some ((p : ℕ) : ℚ) 0 hT0 = 0 := double_zero_of_Y_zero hT0
     obtain ⟨hom1, hom2⟩ :=
       FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-        (Point.some h) (Point.some hT0)
+        (Point.some x y h) (Point.some ((p : ℕ) : ℚ) 0 hT0)
     rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_neg hpq0] at hom1
     rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_pos rfl] at hom2
-    rcases hPT : Point.some h + Point.some hT0 with _ | @⟨x', y', h'⟩
-    · have h1 : Point.some h = -(Point.some hT0) := eq_neg_of_add_eq_zero_left hPT
+    rcases hPT : Point.some x y h + Point.some ((p : ℕ) : ℚ) 0 hT0 with _ | @⟨x', y', h'⟩
+    · have h1 : Point.some x y h = -(Point.some ((p : ℕ) : ℚ) 0 hT0) := eq_neg_of_add_eq_zero_left hPT
       rw [neg_eq_of_add_eq_zero_left hT2] at h1
       simp only [Point.some.injEq] at h1
       exact hxn h1.1
     · rw [hPT] at hom1 hom2
       by_cases hy' : y' = 0
       · subst hy'
-        have hP'2 : Point.some h' + Point.some h' = 0 := double_zero_of_Y_zero h'
-        have hPP : Point.some h + Point.some h = 0 := by
-          have he : Point.some h = Point.some h' - Point.some hT0 := by
+        have hP'2 : Point.some x' 0 h' + Point.some x' 0 h' = 0 := double_zero_of_Y_zero h'
+        have hPP : Point.some x y h + Point.some x y h = 0 := by
+          have he : Point.some x y h = Point.some x' 0 h' - Point.some ((p : ℕ) : ℚ) 0 hT0 := by
             rw [← hPT]
             abel
-          rw [he, show Point.some h' - Point.some hT0 +
-              (Point.some h' - Point.some hT0)
-              = Point.some h' + Point.some h' -
-                (Point.some hT0 + Point.some hT0) from by abel,
+          rw [he, show Point.some x' 0 h' - Point.some ((p : ℕ) : ℚ) 0 hT0 +
+              (Point.some x' 0 h' - Point.some ((p : ℕ) : ℚ) 0 hT0)
+              = Point.some x' 0 h' + Point.some x' 0 h' -
+                (Point.some ((p : ℕ) : ℚ) 0 hT0 + Point.some ((p : ℕ) : ℚ) 0 hT0) from by abel,
             hP'2, hT2, sub_zero]
         exact affine_not_two_torsion h hy hPP
       · obtain ⟨hx'0, hx'n, -⟩ :=
@@ -1419,12 +1419,12 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
   · exact ⟨0, 0, by rw [add_zero], by rw [add_zero, add_zero, ← Point.zero_def]⟩
   · by_cases hy : y = 0
     · subst hy
-      exact ⟨0, Point.some h, double_zero_of_Y_zero h, by rw [add_zero, zero_add]⟩
+      exact ⟨0, Point.some x 0 h, double_zero_of_Y_zero h, by rw [add_zero, zero_add]⟩
     · obtain ⟨hx0, hxn, hxmn⟩ :=
         FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (onCurveAt h) hy
       obtain ⟨d₁, d₂, h₁0, h₂0, h₁v, h₂v, h₁s, h₂s⟩ :=
         FamilySupport.theSlotClassesAreSupportedAtEveryModulus p hp.pos
-          (Point.some h)
+          (Point.some x y h)
       rw [slotOneAt_some h, if_neg hx0] at h₁s
       rw [slotTwoAt_some h, if_neg hxn] at h₂s
       have hcells := theSlotClassesCollapseOnTheThreeModEightBranch hp8
@@ -1435,7 +1435,7 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
         ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
       · -- cell (1, 1): the point is already a double
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
-          (Point.some h)
+          (Point.some x y h)
           (by rw [slotOneAt_some h, if_neg hx0, hv₁]
               exact ⟨c₁, hc₁, by push_cast; ring⟩)
           (by rw [slotTwoAt_some h, if_neg hxn, hv₂]
@@ -1445,36 +1445,36 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
           ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inl ⟨rfl, rfl⟩)).elim
       · -- cell (−1, −p): strip the point (0, 0)
         have hT0 := nonsing00 hp
-        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        have hT2 : Point.some 0 0 hT0 + Point.some 0 0 hT0 = 0 := double_zero_of_Y_zero hT0
         obtain ⟨hom1, hom2⟩ :=
           FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-            (Point.some h) (Point.some hT0)
+            (Point.some x y h) (Point.some 0 0 hT0)
         rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_pos rfl] at hom1
         rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_neg hnq.ne]
           at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
-          (Point.some h + Point.some hT0)
+          (Point.some x y h + Point.some 0 0 hT0)
           (FamilyCollision.sqcls_trans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
           (FamilyCollision.sqcls_trans hom2
             ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
               rw [hv₂]; push_cast; ring⟩)
-        refine ⟨Q, Point.some hT0, hT2, ?_⟩
-        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        refine ⟨Q, Point.some 0 0 hT0, hT2, ?_⟩
+        have h1 : Point.some x y h = Q + Q - Point.some 0 0 hT0 := eq_sub_of_add_eq hQ.symm
         rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
       · exact (coset_refused hp8 h hy
           ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inl ⟨rfl, rfl⟩))).elim
       · -- cell (p, 2): strip the point (p, 0)
         have hT0 := nonsingP hp
-        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        have hT2 : Point.some ((p : ℕ) : ℚ) 0 hT0 + Point.some ((p : ℕ) : ℚ) 0 hT0 = 0 := double_zero_of_Y_zero hT0
         obtain ⟨hom1, hom2⟩ :=
           FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-            (Point.some h) (Point.some hT0)
+            (Point.some x y h) (Point.some ((p : ℕ) : ℚ) 0 hT0)
         rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0, if_neg hpq0] at hom1
         rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_pos rfl] at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
-          (Point.some h + Point.some hT0)
+          (Point.some x y h + Point.some ((p : ℕ) : ℚ) 0 hT0)
           (FamilyCollision.sqcls_trans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
@@ -1482,8 +1482,8 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
             ⟨2 * c₂ * ((p : ℕ) : ℚ),
               mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
               rw [hv₂]; push_cast; ring⟩)
-        refine ⟨Q, Point.some hT0, hT2, ?_⟩
-        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        refine ⟨Q, Point.some ((p : ℕ) : ℚ) 0 hT0, hT2, ?_⟩
+        have h1 : Point.some x y h = Q + Q - Point.some ((p : ℕ) : ℚ) 0 hT0 := eq_sub_of_add_eq hQ.symm
         rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
       · exact (coset_refused hp8 h hy
           ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inr (Or.inr ⟨rfl, rfl⟩)))).elim
@@ -1491,17 +1491,17 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
           ⟨c₁, hc₁, hv₁⟩ ⟨c₂, hc₂, hv₂⟩ (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)))).elim
       · -- cell (−p, −2p): strip the point (−p, 0)
         have hT0 := nonsingMP hp
-        have hT2 : Point.some hT0 + Point.some hT0 = 0 := double_zero_of_Y_zero hT0
+        have hT2 : Point.some (-((p : ℕ) : ℚ)) 0 hT0 + Point.some (-((p : ℕ) : ℚ)) 0 hT0 = 0 := double_zero_of_Y_zero hT0
         obtain ⟨hom1, hom2⟩ :=
           FamilyHom.theFaceIsAHomomorphismAtEveryModulus (((p : ℕ) : ℚ)) hnq
-            (Point.some h) (Point.some hT0)
+            (Point.some x y h) (Point.some (-((p : ℕ) : ℚ)) 0 hT0)
         rw [slotOneAt_some h, slotOneAt_some hT0, if_neg hx0,
           if_neg (neg_ne_zero.mpr hpq0)] at hom1
         rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn,
           if_neg (show ¬(-((p : ℕ) : ℚ)) = ((p : ℕ) : ℚ) from fun hc =>
             hpq0 (by linarith))] at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
-          (Point.some h + Point.some hT0)
+          (Point.some x y h + Point.some (-((p : ℕ) : ℚ)) 0 hT0)
           (FamilyCollision.sqcls_trans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
@@ -1509,8 +1509,8 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
             ⟨2 * c₂ * ((p : ℕ) : ℚ),
               mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
               rw [hv₂]; push_cast; ring⟩)
-        refine ⟨Q, Point.some hT0, hT2, ?_⟩
-        have h1 : Point.some h = Q + Q - Point.some hT0 := eq_sub_of_add_eq hQ.symm
+        refine ⟨Q, Point.some (-((p : ℕ) : ℚ)) 0 hT0, hT2, ?_⟩
+        have h1 : Point.some x y h = Q + Q - Point.some (-((p : ℕ) : ℚ)) 0 hT0 := eq_sub_of_add_eq hQ.symm
         rw [h1, sub_eq_add_neg, neg_eq_of_add_eq_zero_left hT2]
 
 open DirectSum in
@@ -1616,4 +1616,3 @@ theorem theGenocchiLawHoldsOnTheThreeModEightBranch (hp8 : p % 8 = 3) :
     simpa using h⟩
 
 end Soma.Holonics.Millennium.FamilyGenocchi
-

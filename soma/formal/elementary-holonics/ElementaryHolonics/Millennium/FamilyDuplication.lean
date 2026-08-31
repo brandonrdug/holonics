@@ -1008,13 +1008,18 @@ private def resEquivP (p : ℕ) (hp : 0 < p) :
     simp only [Prod.mk.injEq]
     constructor
     · have h1 := Int.emod_nonneg k hp0.ne'
-      have h2 := Int.ediv_add_emod k (p : ℤ)
+      have h2 := Int.ediv_mul_add_emod k (p : ℤ)
+      have h2' : (p : ℤ) * (k / (p : ℤ)) + k % (p : ℤ) = k := by
+        simpa [mul_comm] using h2
       rw [Int.toNat_of_nonneg h1]
       omega
     · have h1 := Int.emod_nonneg l hp2.ne'
-      have h2 := Int.ediv_add_emod l ((2 * p : ℕ) : ℤ)
+      have h2 := Int.ediv_mul_add_emod l ((2 * p : ℕ) : ℤ)
+      have h2' : ((2 * p : ℕ) : ℤ) * (l / ((2 * p : ℕ) : ℤ)) +
+          l % ((2 * p : ℕ) : ℤ) = l := by
+        simpa [mul_comm] using h2
       rw [Int.toNat_of_nonneg h1]
-      push_cast at h2 ⊢
+      push_cast at h2 h2' ⊢
       omega
 
 /-- The `oddKernel` summand at scale `32p²y`, coerced whole. -/
@@ -1123,7 +1128,8 @@ private lemma hFinalP_land (p : ℕ) [Fact p.Prime] (hp : 0 < p) (y : ℝ)
   obtain ⟨n', m'⟩ := q
   have hp' : (0 : ℝ) < p := by exact_mod_cast hp
   have hres : resEquivP p hp ((e, d), (n', m'))
-      = ((p : ℤ) * n' + ((e : ℕ) : ℤ), (2 * p : ℤ) * m' + ((d : ℕ) : ℤ)) := rfl
+      = ((p : ℤ) * n' + ((e : ℕ) : ℤ), (2 * p : ℤ) * m' + ((d : ℕ) : ℤ)) := by
+    simp [resEquivP]
   have hgrid : gridEmb ((p : ℤ) * n' + ((e : ℕ) : ℤ), (2 * p : ℤ) * m' + ((d : ℕ) : ℤ))
       = (4 * ((p : ℤ) * n' + ((e : ℕ) : ℤ)) + 1,
          2 * ((2 * p : ℤ) * m' + ((d : ℕ) : ℤ))) := rfl

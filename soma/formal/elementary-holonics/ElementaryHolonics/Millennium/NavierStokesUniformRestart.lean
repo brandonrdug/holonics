@@ -92,7 +92,7 @@ theorem RestartSplice.velocity_at_restart
   have hzero : (0 : ℝ) ∈ openTimeSlab radius :=
     ⟨le_rfl, restart.radius_pos⟩
   exact (by
-    simpa using (splice.velocityAfter x 0 hzero).trans
+    simpa [velocityTrace] using (splice.velocityAfter x 0 hzero).trans
       (restart.restartSolution.initial x))
 
 /-! ## Independent supply and uniqueness interfaces -/

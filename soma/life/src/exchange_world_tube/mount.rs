@@ -4,7 +4,6 @@ use std::{
     collections::BTreeMap,
     fs::File,
     io::{BufRead, BufReader, Read},
-    ops::Range,
     path::PathBuf,
 };
 
@@ -13,9 +12,9 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use super::{
-    ContainerLineageFaces, CorrespondenceFibres, DeviceContactReceipt, Digest32, ExchangeContainer,
-    ExchangeRecord, ExchangeWorldTube, ExcludedPopulation, GlobalFieldFace, GlobalNode,
-    ScalarContactSite, json_record::parse_record,
+    json_record::parse_record, ContainerLineageFaces, CorrespondenceFibres, DeviceContactReceipt,
+    Digest32, ExchangeContainer, ExchangeRecord, ExchangeWorldTube, ExcludedPopulation,
+    GlobalFieldFace, GlobalNode, ScalarContactSite,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -334,6 +333,3 @@ fn source_occurrence_digest(containers: &[ExchangeContainer]) -> Digest32 {
     }
     Digest32::from_sha(digest.finalize())
 }
-
-#[allow(dead_code)]
-fn _range_is_typed(_: Range<u64>) {}

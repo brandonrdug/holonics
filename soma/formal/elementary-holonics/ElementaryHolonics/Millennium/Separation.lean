@@ -371,6 +371,7 @@ theorem theClassIsWhatSurvives {F G d : ℝ → ℝ}
     F x - G x = F y - G y := by
   have hH : ∀ z, HasDerivAt (fun w => F w - G w) 0 z := by
     intro z
+    change HasDerivAt (F - G) 0 z
     simpa using (hF z).sub (hG z)
   have hdiff : Differentiable ℝ (fun w => F w - G w) := fun z => (hH z).differentiableAt
   have hzero : ∀ z, deriv (fun w => F w - G w) z = 0 := fun z => (hH z).deriv

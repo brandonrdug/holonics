@@ -1,4 +1,5 @@
 import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 import ElementaryHolonics.Millennium.HilbertTransportRefinement
 
 /-!
@@ -28,7 +29,7 @@ namespace Soma.Holonics.Millennium.Coupling
 universe u
 
 /-- The exact finite chain `V --id--> V --0--> V`. -/
-def identityZeroComplex (V : Type u)
+abbrev identityZeroComplex (V : Type u)
     [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] :
     FiniteHilbertTransportComplex where
   Left := V
@@ -49,12 +50,34 @@ def identityZeroRefinement
   left := f
   middle := f
   right := f
-  into_natural := by simp [identityZeroComplex]
-  outOf_natural := by simp [identityZeroComplex]
+  into_natural := by
+    intro a
+    change (ContinuousLinearMap.id ℝ W) (f a) = f ((ContinuousLinearMap.id ℝ V) a)
+    change f a = f a
+    rfl
+  outOf_natural := by
+    intro b
+    change (0 : W) = f (0 : V)
+    simp only [ContinuousLinearMap.zero_apply, map_zero]
   incomingAdjoint_natural := by
-    simp [identityZeroComplex, HilbertTransportChain.incomingAdjoint]
+    intro b
+    change (ContinuousLinearMap.adjoint (ContinuousLinearMap.id ℝ W)) (f b) =
+      f ((ContinuousLinearMap.adjoint (ContinuousLinearMap.id ℝ V)) b)
+    rw [ContinuousLinearMap.adjoint_id, ContinuousLinearMap.adjoint_id]
+    change f b = f b
+    rfl
   outgoingAdjoint_natural := by
-    simp [identityZeroComplex, HilbertTransportChain.outgoingAdjoint]
+    intro c
+    change (ContinuousLinearMap.adjoint (0 : W →L[ℝ] W)) (f c) =
+      f ((ContinuousLinearMap.adjoint (0 : V →L[ℝ] V)) c)
+    rw [show ContinuousLinearMap.adjoint (0 : W →L[ℝ] W) = 0 by
+      ext x y
+      simp [ContinuousLinearMap.adjoint_inner_left],
+      show ContinuousLinearMap.adjoint (0 : V →L[ℝ] V) = 0 by
+        ext x y
+        simp [ContinuousLinearMap.adjoint_inner_left]]
+    change (0 : W) = f (0 : V)
+    rw [map_zero]
 
 /-- The two admitted refinement scales. -/
 inductive TwoHilbertScale where
@@ -84,7 +107,7 @@ instance : Preorder TwoHilbertScale where
 end TwoHilbertScale
 
 /-- The coarse line and fine plane as actual identity--zero Hilbert complexes. -/
-def twoScaleObject : TwoHilbertScale → FiniteHilbertTransportComplex
+abbrev twoScaleObject : TwoHilbertScale → FiniteHilbertTransportComplex
   | .coarse => identityZeroComplex ℝ
   | .fine => identityZeroComplex (EuclideanSpace ℝ (Fin 2))
 
@@ -139,7 +162,7 @@ private theorem refinement_ext
     exact hright x
 
 /-- The concrete dimension-changing two-scale directed system. -/
-def twoScaleSystem : DirectedHilbertTransportSystem TwoHilbertScale where
+abbrev twoScaleSystem : DirectedHilbertTransportSystem TwoHilbertScale where
   object := twoScaleObject
   refinement := twoScaleRefinement
   directed := by
@@ -198,7 +221,8 @@ theorem identityZeroComplex_laplacianEnergy_self
     (x : V) :
     (identityZeroComplex V).chain.laplacianEnergyForm x x = ‖x‖ ^ 2 := by
   rw [HilbertTransportChain.laplacianEnergyForm_self]
-  simp [identityZeroComplex, HilbertTransportChain.incomingAdjoint]
+  simp [identityZeroComplex, HilbertTransportChain.incomingAdjoint,
+    HilbertTransportChain.outgoingAdjoint, ContinuousLinearMap.adjoint_id]
 
 /-- Every occurrence in an identity--zero complex is non-harmonic: it arrives through the
 identity incoming differential. -/
@@ -222,13 +246,14 @@ theorem twoScaleSystem_hasUniformNonharmonicGap :
   | coarse =>
       change 1 * ‖(x.val : ℝ)‖ ^ 2 ≤
         (identityZeroComplex ℝ).chain.laplacianEnergyForm x.val x.val
-      rw [identityZeroComplex_laplacianEnergy_self]
-      rw [one_mul, Real.norm_eq_abs, sq_abs]
+      have henergy := identityZeroComplex_laplacianEnergy_self ℝ (x.val : ℝ)
+      rw [henergy, one_mul]
   | fine =>
       change 1 * ‖(x.val : EuclideanSpace ℝ (Fin 2))‖ ^ 2 ≤
         (identityZeroComplex (EuclideanSpace ℝ (Fin 2))).chain.laplacianEnergyForm x.val x.val
-      rw [identityZeroComplex_laplacianEnergy_self]
-      simp
+      have henergy := identityZeroComplex_laplacianEnergy_self
+        (EuclideanSpace ℝ (Fin 2)) (x.val : EuclideanSpace ℝ (Fin 2))
+      rw [henergy, one_mul]
 
 /-- No lower-bound constant larger than one can hold on this family.  Together with
 `twoScaleSystem_hasUniformNonharmonicGap`, this identifies one as the optimal uniform gap. -/

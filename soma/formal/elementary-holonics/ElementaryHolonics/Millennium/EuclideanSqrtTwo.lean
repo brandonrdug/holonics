@@ -32,7 +32,7 @@ namespace Soma.Holonics.Millennium.EuclideanSqrtTwo
 
 /-- Rounding to the nearest multiple, positive modulus. -/
 theorem theNearestMultipleOfPos (p N : ℤ) (hN : 0 < N) : ∃ m : ℤ, 2 * |p - m * N| ≤ N := by
-  have hdm := Int.ediv_add_emod p N
+  have hdm := Int.ediv_mul_add_emod p N
   have hcomm : (p / N) * N = N * (p / N) := mul_comm _ _
   have hr0 : 0 ≤ p % N := Int.emod_nonneg p (by omega)
   have hrN : p % N < N := Int.emod_lt_of_pos p hN
@@ -133,7 +133,7 @@ theorem theEuclideanStep (α β : ℤ√2) (hβ : β ≠ 0) :
   refine ⟨⟨m, n⟩, ?_⟩
   have h1 : (α - (⟨m, n⟩ : ℤ√2) * β).norm
       = (α.re - (m * β.re + 2 * n * β.im)) ^ 2 - 2 * (α.im - (m * β.im + n * β.re)) ^ 2 := by
-    simp only [Zsqrtd.norm, Zsqrtd.sub_re, Zsqrtd.sub_im, Zsqrtd.mul_re, Zsqrtd.mul_im]
+    simp only [Zsqrtd.norm, Zsqrtd.re_sub, Zsqrtd.im_sub, Zsqrtd.re_mul, Zsqrtd.im_mul]
     ring
   have h2 : β.norm = β.re ^ 2 - 2 * β.im ^ 2 := by simp only [Zsqrtd.norm]; ring
   rw [h1, h2]
@@ -230,7 +230,7 @@ theorem theFourUnitCases (x y : ℤ) :
     (((⟨5, 2⟩ : ℤ√2) * (⟨x, y⟩ : ℤ√2) ^ 2).im = 2 * x ^ 2 + 4 * y ^ 2 + 10 * (x * y)) ∧
     (((⟨9, 7⟩ : ℤ√2) * (⟨x, y⟩ : ℤ√2) ^ 2).im = 7 * x ^ 2 + 14 * y ^ 2 + 18 * (x * y)) := by
   rw [theSquareInCoordinates]
-  constructor <;> simp [Zsqrtd.mul_im] <;> ring
+  constructor <;> simp [Zsqrtd.im_mul] <;> ring
 
 /-- **AND THE TWISTED CASES FORCE `x` EVEN.**  `7x² + 14y² + 18xy` is even exactly when `x` is. -/
 theorem theTwistedCaseForcesAnEvenCoordinate (x y : ℤ) :
@@ -331,7 +331,7 @@ theorem theEuclideanStepAtMinusTwo (α β : ℤ√(-2)) (hβ : β ≠ 0) :
   have h1 : (α - (⟨m, n⟩ : ℤ√(-2)) * β).norm
       = (α.re - (m * β.re + (-2) * (n * β.im))) ^ 2
         - (-2) * (α.im - (m * β.im + n * β.re)) ^ 2 := by
-    simp only [Zsqrtd.norm, Zsqrtd.sub_re, Zsqrtd.sub_im, Zsqrtd.mul_re, Zsqrtd.mul_im]
+    simp only [Zsqrtd.norm, Zsqrtd.re_sub, Zsqrtd.im_sub, Zsqrtd.re_mul, Zsqrtd.im_mul]
     ring
   have h2 : β.norm = β.re ^ 2 - (-2) * β.im ^ 2 := by simp only [Zsqrtd.norm]; ring
   rw [h1, h2]

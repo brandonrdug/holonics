@@ -545,7 +545,8 @@ theorem norm_tensorHatKernel_convolution_le
     {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (radius : ℕ) (field : C(SpatialTorus, E)) (q : SpatialTorus) :
     ‖∫ y : SpatialTorus, tensorHatKernel radius y • field (q - y)‖ ≤ ‖field‖ := by
-  simpa only [tensorHatKernel_eq_averagedTensorFejerKernel] using
+  simpa only [tensorHatKernel_eq_averagedTensorFejerKernel,
+    averagedTensorFejerConvolution, torusKernelConvolution] using
     norm_averagedTensorFejerConvolution_le radius field q
 
 section Audit

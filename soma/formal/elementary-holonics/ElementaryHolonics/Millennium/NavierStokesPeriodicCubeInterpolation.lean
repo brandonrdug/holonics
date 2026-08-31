@@ -65,8 +65,8 @@ theorem divergence_coordinateScalarFlux
   have hfluxDerivative :
       fderiv ℝ (coordinateScalarFlux direction f) x =
         (fderiv ℝ f x).smulRight (spatialBasisVector direction) := by
-    simpa [coordinateScalarFlux] using
-      fderiv_smul_const hdiff (spatialBasisVector direction)
+    change fderiv ℝ (fun y ↦ f y • spatialBasisVector direction) x = _
+    exact fderiv_smul_const hdiff (spatialBasisVector direction)
   rw [hfluxDerivative]
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.smulRight_apply]
   simp [spatialBasisVector]
@@ -103,12 +103,12 @@ theorem integral_fourth_power_eq_neg_three_mul
     have hgpowdiff : DifferentiableAt ℝ (fun y ↦ g y ^ 3) x := hgdiff.pow 3
     have hmul := fderiv_fun_mul hfdiff hgpowdiff
     have hgpow := fderiv_pow 3 hgdiff
+    change fderiv ℝ (fun y ↦ g y ^ 3) x = _ at hgpow
     have hmulApply := congrArg
       (fun L : Space →L[ℝ] ℝ ↦ L (spatialBasisVector direction)) hmul
     have hgpowApply := congrArg
       (fun L : Space →L[ℝ] ℝ ↦ L (spatialBasisVector direction)) hgpow
-    simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,
-      smul_eq_mul] at hmulApply hgpowApply
+    simp only [add_apply, smul_apply, smul_eq_mul] at hmulApply hgpowApply
     rw [hfg x] at hmulApply
     rw [hgh x] at hgpowApply
     dsimp [density] at hmulApply ⊢
@@ -213,7 +213,7 @@ theorem fderiv_component_apply
     (hw.differentiable (by norm_num) x).hasFDerivAt
   have hprojectApply := congrArg
     (fun L : Space →L[ℝ] ℝ ↦ L direction) hproject.fderiv
-  simpa only [Function.comp_apply, ContinuousLinearMap.comp_apply] using hprojectApply
+  simpa [Function.comp_def] using hprojectApply
 
 /-- A component of every ordered second spatial jet satisfies the exact periodic `L⁴`
 interpolation inequality.  The repeated third word `(i,i,j)` is one member of the existing
@@ -323,7 +323,7 @@ theorem integral_norm_secondSpatialCoordinateJet_fourth_le
   have hrightIntegrable : IntegrableOn
       (fun x ↦ 3 * ∑ component : Fin 3, (second x component) ^ 4) unitCube := by
     exact (Integrable.const_mul
-      (integrable_finset_sum Finset.univ
+      (integrable_finsetSum Finset.univ
         (fun component _hcomponent ↦ hcomponentFourthIntegrable component)) 3)
   have hpoint : ∀ x ∈ unitCube,
       ‖second x‖ ^ 4 ≤ 3 * ∑ component : Fin 3, (second x component) ^ 4 := by
@@ -339,7 +339,7 @@ theorem integral_norm_secondSpatialCoordinateJet_fourth_le
     _ = 3 * ∑ component : Fin 3,
         ∫ x in unitCube, (second x component) ^ 4 := by
       rw [integral_const_mul,
-        integral_finset_sum Finset.univ
+        integral_finsetSum Finset.univ
           (fun component _hcomponent ↦ hcomponentFourthIntegrable component)]
     _ ≤ 3 * ∑ component : Fin 3,
         (9 * cubeGradientSup u ^ 2 *

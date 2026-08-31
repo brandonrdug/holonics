@@ -118,8 +118,10 @@ def coefficientWeightedRealization
   ⟨fun k ↦ (Real.sqrt (periodicSobolevWeight order k) : ℂ) * coeff.1 k, by
     apply memℓp_gen
     norm_num only [ENNReal.toReal_ofNat]
-    simpa only [ENNReal.toReal_ofNat, Real.rpow_two,
-      norm_weightedCoefficient_sq] using coeff.2⟩
+    apply Summable.congr coeff.2
+    intro k
+    simpa only [Real.rpow_two] using
+      (norm_weightedCoefficient_sq order k (coeff.1 k)).symm⟩
 
 @[simp]
 theorem coefficientWeightedRealization_apply

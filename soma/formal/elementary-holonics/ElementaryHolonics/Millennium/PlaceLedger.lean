@@ -365,7 +365,7 @@ three theorems say the carrying is a bijection; the cardinalities are then kerne
 eleven heights and proved in general. -/
 
 /-- The coprime integer pairs of height `H`. -/
-def heightPairs (H : ℕ) : Finset (ℤ × ℤ) :=
+noncomputable def heightPairs (H : ℕ) : Finset (ℤ × ℤ) :=
   ((Finset.Icc (-(H : ℤ)) (H : ℤ)) ×ˢ (Finset.Icc (1 : ℤ) (H : ℤ))).filter
     (fun ab => Int.gcd ab.1 ab.2 = 1 ∧ max ab.1.natAbs ab.2.natAbs = H)
 

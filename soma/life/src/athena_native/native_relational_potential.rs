@@ -14,17 +14,18 @@ use sha2::{Digest, Sha256};
 use crate::{
     morphological_language::MorphologicalLanguagePassage,
     relational_language::{
-        RelationalClause, RelationalClauseVoice, RelationalEntity,
-        relational_deliberation_frontier, relational_passage_clauses,
+        relational_deliberation_frontier, relational_passage_clauses, RelationalClause,
+        RelationalClauseVoice, RelationalEntity,
     },
 };
 
 use super::NativeCirculationError;
 
-const POTENTIAL_SCHEMA: &str = "soma-life.athena-native-relational-potential.v3";
-const CODEC_SCHEMA: &str = "soma-life.athena-native-relational-boundary-codec.v1";
-const FACE_ADDRESS_DOMAIN: &[u8] = b"soma-life.athena-native-relational-face.v3";
-const CELL_ADDRESS_DOMAIN: &[u8] = b"soma-life.athena-native-relational-cell.v3";
+const POTENTIAL_SCHEMA: &str = "soma-life.athena-native-relational-potential.v4";
+const CODEC_SCHEMA: &str = "soma-life.athena-native-relational-boundary-codec.v2";
+const FACE_ADDRESS_DOMAIN: &[u8] = b"soma-life.athena-native-relational-face.v4";
+const CELL_ADDRESS_DOMAIN: &[u8] = b"soma-life.athena-native-relational-cell.v4";
+const SOURCE_OCCURRENCE_DOMAIN: &[u8] = b"soma-life.athena-native-relational-source-occurrence.v1";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -51,6 +52,7 @@ pub(super) enum NativeRelationalRole {
 pub(super) enum NativeDeliveryPhase {
     Ingress,
     Emanation,
+    Return,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -59,6 +61,10 @@ pub(super) struct NativeRelationalFaceOccurrence {
     pub factor: u32,
     pub phase: NativeDeliveryPhase,
     pub role: NativeRelationalRole,
+    /// Content-addressed exterior occurrence lineage.  The surface does not become native
+    /// identity, but changing one caused source occurrence must change the descended section even
+    /// when every global count and grammatical role is unchanged.
+    pub source_occurrence_identity_sha256: String,
     pub first_delivery_order: u64,
     pub last_delivery_order: u64,
     pub occurrence_population: u64,
@@ -82,6 +88,7 @@ pub(super) struct NativeRelationalFace {
 pub(super) struct NativeRelationalCellOccurrence {
     pub factor: u32,
     pub phase: NativeDeliveryPhase,
+    pub source_occurrence_identity_sha256: String,
     pub first_delivery_order: u64,
     pub last_delivery_order: u64,
     pub occurrence_population: u64,
@@ -94,6 +101,7 @@ struct TempFaceOccurrence {
     delivery_order: u64,
     clause_order: u64,
     role: NativeRelationalRole,
+    source_occurrence_identity_sha256: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -102,6 +110,7 @@ struct TempCellOccurrence {
     phase: NativeDeliveryPhase,
     pub delivery_order: u64,
     pub clause_order: u64,
+    source_occurrence_identity_sha256: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
@@ -258,11 +267,17 @@ impl NativeRelationalPotentialBuilder {
         &mut self,
         factor: usize,
         phase: NativeDeliveryPhase,
+        source_occurrence: &str,
         text: &str,
     ) -> Result<(), NativeCirculationError> {
-        if factor >= self.factor_addresses.len() {
+        if factor >= self.factor_addresses.len() || source_occurrence.is_empty() {
             return Err(NativeCirculationError::Standing);
         }
+        let source_occurrence_identity_sha256 = digest(&(
+            SOURCE_OCCURRENCE_DOMAIN,
+            source_occurrence,
+            Sha256::digest(text.as_bytes()).as_slice(),
+        ))?;
         let delivery_order = self.delivery_order;
         self.delivery_order = self
             .delivery_order
@@ -286,7 +301,13 @@ impl NativeRelationalPotentialBuilder {
             }
         };
         for clause in clauses {
-            self.receive_clause(factor, phase, delivery_order, clause)?;
+            self.receive_clause(
+                factor,
+                phase,
+                delivery_order,
+                &source_occurrence_identity_sha256,
+                clause,
+            )?;
         }
         Ok(())
     }
@@ -296,6 +317,7 @@ impl NativeRelationalPotentialBuilder {
         factor: usize,
         phase: NativeDeliveryPhase,
         delivery_order: u64,
+        source_occurrence_identity_sha256: &str,
         clause: RelationalClause,
     ) -> Result<(), NativeCirculationError> {
         let factor = u32::try_from(factor).map_err(|_| NativeCirculationError::Standing)?;
@@ -313,6 +335,7 @@ impl NativeRelationalPotentialBuilder {
                 delivery_order,
                 clause_order,
                 role: NativeRelationalRole::Subject,
+                source_occurrence_identity_sha256: source_occurrence_identity_sha256.to_owned(),
             },
         )?;
         let relation_surface = vec![clause.relation.clone()];
@@ -328,6 +351,7 @@ impl NativeRelationalPotentialBuilder {
                 delivery_order,
                 clause_order,
                 role: NativeRelationalRole::Relation,
+                source_occurrence_identity_sha256: source_occurrence_identity_sha256.to_owned(),
             },
         )?;
         let modality = clause
@@ -345,6 +369,8 @@ impl NativeRelationalPotentialBuilder {
                         delivery_order,
                         clause_order,
                         role: NativeRelationalRole::Modality,
+                        source_occurrence_identity_sha256: source_occurrence_identity_sha256
+                            .to_owned(),
                     },
                 )
             })
@@ -358,6 +384,7 @@ impl NativeRelationalPotentialBuilder {
                 delivery_order,
                 clause_order,
                 role: NativeRelationalRole::Object,
+                source_occurrence_identity_sha256: source_occurrence_identity_sha256.to_owned(),
             },
         )?;
         let key = (
@@ -372,6 +399,7 @@ impl NativeRelationalPotentialBuilder {
             phase,
             delivery_order,
             clause_order,
+            source_occurrence_identity_sha256: source_occurrence_identity_sha256.to_owned(),
         };
         if let Some(cell) = self.cell_index.get(&key).copied() {
             self.cells[cell as usize].occurrences.push(occurrence);
@@ -611,6 +639,32 @@ impl NativeRelationalPotentialBuilder {
 }
 
 impl NativeRelationalPotentialComplex {
+    /// The addressed dialogue participant port itself.  A copular cell is a carried relation, not
+    /// an identity proof: transitively closing `entity -> be -> participant` would turn unrelated
+    /// existential or predicative subjects into the participant everywhere that merged face
+    /// recurs.  Exterior names and richer aliases therefore remain receiver charts rather than
+    /// native participant classes.
+    pub fn addressed_participant_subject_faces(
+        &self,
+    ) -> Result<BTreeSet<u32>, NativeCirculationError> {
+        let faces = self
+            .faces
+            .iter()
+            .enumerate()
+            .filter_map(|(at, face)| {
+                (face.kind == NativeRelationalFaceKind::Participant)
+                    .then(|| u32::try_from(at).ok())
+                    .flatten()
+            })
+            .collect::<BTreeSet<_>>();
+        if faces.is_empty() {
+            return Err(NativeCirculationError::Correspondence(
+                "the cultivated ecology has no addressed participant port".to_owned(),
+            ));
+        }
+        Ok(faces)
+    }
+
     pub fn validate(&self) -> Result<(), NativeCirculationError> {
         if self.schema != POTENTIAL_SCHEMA
             || self.factor_addresses.is_empty()
@@ -645,6 +699,7 @@ impl NativeRelationalPotentialComplex {
             if face.occurrences.is_empty()
                 || face.occurrences.iter().any(|section| {
                     section.occurrence_population == 0
+                        || !is_digest(&section.source_occurrence_identity_sha256)
                         || section.first_delivery_order > section.last_delivery_order
                 })
                 || face.occurrences.windows(2).any(|pair| pair[0] >= pair[1])
@@ -698,6 +753,7 @@ impl NativeRelationalPotentialComplex {
             if cell.occurrences.is_empty()
                 || cell.occurrences.iter().any(|section| {
                     section.occurrence_population == 0
+                        || !is_digest(&section.source_occurrence_identity_sha256)
                         || section.first_delivery_order > section.last_delivery_order
                 })
                 || cell.occurrences.windows(2).any(|pair| pair[0] >= pair[1])
@@ -733,7 +789,7 @@ impl NativeRelationalPotentialComplex {
         Ok(())
     }
 
-    fn participant_closure(
+    pub(super) fn participant_closure(
         &self,
         seeds: &BTreeSet<u32>,
     ) -> Result<(BTreeSet<u32>, Option<(u32, u32)>), NativeCirculationError> {
@@ -758,10 +814,13 @@ impl NativeRelationalPotentialComplex {
                 closure.insert(cell.object);
                 alias.get_or_insert((cell.object, cell.subject));
             } else if seeds.contains(&cell.object)
-                && subject_kind == NativeRelationalFaceKind::Participant
+                && matches!(
+                    subject_kind,
+                    NativeRelationalFaceKind::Entity | NativeRelationalFaceKind::Participant
+                )
             {
                 closure.insert(cell.subject);
-                alias.get_or_insert((cell.subject, cell.object));
+                alias.get_or_insert((cell.object, cell.subject));
             }
         }
         Ok((closure, alias))
@@ -922,6 +981,67 @@ impl NativeRelationalCodec {
         })
     }
 
+    /// Freeze every exterior entity chart which is joined by a witnessed copular cell to an
+    /// addressed participant port. The exterior region remains a receiver coordinate; the pair
+    /// records which participant face must be rendered through which witnessed alias after native
+    /// radiation has already returned.
+    pub(super) fn participant_alias_charts(
+        &self,
+        potential: &NativeRelationalPotentialComplex,
+        participants: &BTreeSet<u32>,
+    ) -> Result<Vec<(Vec<String>, (u32, u32))>, NativeCirculationError> {
+        let mut aliases = BTreeSet::new();
+        for cell in &potential.cells {
+            if !cell.copular {
+                continue;
+            }
+            let subject_kind = potential
+                .faces
+                .get(cell.subject as usize)
+                .ok_or(NativeCirculationError::Standing)?
+                .kind;
+            let object_kind = potential
+                .faces
+                .get(cell.object as usize)
+                .ok_or(NativeCirculationError::Standing)?
+                .kind;
+            let alias = if participants.contains(&cell.subject)
+                && object_kind == NativeRelationalFaceKind::Entity
+            {
+                Some((cell.subject, cell.object))
+            } else if participants.contains(&cell.object)
+                && subject_kind == NativeRelationalFaceKind::Entity
+            {
+                Some((cell.object, cell.subject))
+            } else {
+                None
+            };
+            let Some(alias) = alias else { continue };
+            for face in self.faces.iter().filter(|face| {
+                face.native_face == alias.1 && face.key.kind == NativeRelationalFaceKind::Entity
+            }) {
+                aliases.insert((face.key.identity.clone(), alias));
+            }
+        }
+        if aliases.is_empty() {
+            return Err(NativeCirculationError::Correspondence(
+                "the participant port has no exterior alias chart".to_owned(),
+            ));
+        }
+        Ok(aliases.into_iter().collect())
+    }
+
+    /// Return every witnessed exterior relation face and its native occurrence address. This is
+    /// a cold chart atlas: later contact may transport current through a matching face, but the
+    /// surface never becomes a native factor or morphology key.
+    pub(super) fn relation_face_charts(&self) -> Vec<(Vec<String>, u32)> {
+        self.faces
+            .iter()
+            .filter(|face| face.key.kind == NativeRelationalFaceKind::Relation)
+            .map(|face| (face.key.identity.clone(), face.native_face))
+            .collect()
+    }
+
     pub fn surface_for(
         &self,
         face: u32,
@@ -1051,7 +1171,10 @@ fn situated_entity_key(entity: &RelationalEntity, phase: NativeDeliveryPhase) ->
         .collect::<BTreeSet<_>>();
     let addressed_participant = !identity.is_empty()
         && (identity == BTreeSet::from(["user"])
-            || (phase == NativeDeliveryPhase::Ingress && identity.is_subset(&first_person))
+            || (matches!(
+                phase,
+                NativeDeliveryPhase::Ingress | NativeDeliveryPhase::Return
+            ) && identity.is_subset(&first_person))
             || (phase == NativeDeliveryPhase::Emanation && identity.is_subset(&second_person)));
     BoundaryFaceKey {
         kind: if addressed_participant {
@@ -1071,10 +1194,16 @@ fn aggregate_face_occurrences(
     occurrences: &[TempFaceOccurrence],
 ) -> Result<Vec<NativeRelationalFaceOccurrence>, NativeCirculationError> {
     let mut sections =
-        BTreeMap::<(u32, NativeDeliveryPhase, NativeRelationalRole), (u64, u64, u64)>::new();
+        BTreeMap::<(u32, NativeDeliveryPhase, NativeRelationalRole, String), (u64, u64, u64)>::new(
+        );
     for occurrence in occurrences {
         let section = sections
-            .entry((occurrence.factor, occurrence.phase, occurrence.role))
+            .entry((
+                occurrence.factor,
+                occurrence.phase,
+                occurrence.role,
+                occurrence.source_occurrence_identity_sha256.clone(),
+            ))
             .or_insert((occurrence.delivery_order, occurrence.delivery_order, 0));
         section.0 = section.0.min(occurrence.delivery_order);
         section.1 = section.1.max(occurrence.delivery_order);
@@ -1087,13 +1216,14 @@ fn aggregate_face_occurrences(
         .into_iter()
         .map(
             |(
-                (factor, phase, role),
+                (factor, phase, role, source_occurrence_identity_sha256),
                 (first_delivery_order, last_delivery_order, occurrence_population),
             )| {
                 NativeRelationalFaceOccurrence {
                     factor,
                     phase,
                     role,
+                    source_occurrence_identity_sha256,
                     first_delivery_order,
                     last_delivery_order,
                     occurrence_population,
@@ -1106,10 +1236,14 @@ fn aggregate_face_occurrences(
 fn aggregate_cell_occurrences(
     occurrences: &[TempCellOccurrence],
 ) -> Result<Vec<NativeRelationalCellOccurrence>, NativeCirculationError> {
-    let mut sections = BTreeMap::<(u32, NativeDeliveryPhase), (u64, u64, u64)>::new();
+    let mut sections = BTreeMap::<(u32, NativeDeliveryPhase, String), (u64, u64, u64)>::new();
     for occurrence in occurrences {
         let section = sections
-            .entry((occurrence.factor, occurrence.phase))
+            .entry((
+                occurrence.factor,
+                occurrence.phase,
+                occurrence.source_occurrence_identity_sha256.clone(),
+            ))
             .or_insert((occurrence.delivery_order, occurrence.delivery_order, 0));
         section.0 = section.0.min(occurrence.delivery_order);
         section.1 = section.1.max(occurrence.delivery_order);
@@ -1122,12 +1256,13 @@ fn aggregate_cell_occurrences(
         .into_iter()
         .map(
             |(
-                (factor, phase),
+                (factor, phase, source_occurrence_identity_sha256),
                 (first_delivery_order, last_delivery_order, occurrence_population),
             )| {
                 NativeRelationalCellOccurrence {
                     factor,
                     phase,
+                    source_occurrence_identity_sha256,
                     first_delivery_order,
                     last_delivery_order,
                     occurrence_population,
@@ -1178,6 +1313,8 @@ fn digest(value: &impl Serialize) -> Result<String, NativeCirculationError> {
     Ok(render_hex(&Sha256::digest(bytes)))
 }
 
+use holonic_engine::is_sha256_digest as is_digest;
+
 fn render_hex(value: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut out = String::with_capacity(value.len() * 2);
@@ -1189,92 +1326,5 @@ fn render_hex(value: &[u8]) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn source_passages_descend_to_triangular_native_incidence() {
-        let mut builder =
-            NativeRelationalPotentialBuilder::new(vec!["a".repeat(64), "b".repeat(64)]).unwrap();
-        builder
-            .receive(0, NativeDeliveryPhase::Ingress, "Brandon founds Athena.")
-            .unwrap();
-        builder
-            .receive(
-                0,
-                NativeDeliveryPhase::Emanation,
-                "Athena carries exact holonic transport.",
-            )
-            .unwrap();
-        builder
-            .receive(
-                1,
-                NativeDeliveryPhase::Emanation,
-                "Brandon cultivates the holonic laboratory.",
-            )
-            .unwrap();
-        let (codec, potential, receipt) = builder.finish().unwrap();
-        assert_eq!(receipt.triangular_boundary_defect_population, 0);
-        assert!(!potential.cells.is_empty());
-        let contact = codec.contact(&potential, "Describe Brandon.").unwrap();
-        assert!(!contact.faces.is_empty());
-        assert_eq!(contact.factor_support, vec![0, 1]);
-        let wire = potential.canonical_bytes().unwrap();
-        assert!(!String::from_utf8_lossy(&wire).contains("Brandon founds Athena"));
-        assert_eq!(
-            NativeRelationalPotentialComplex::read(&wire).unwrap(),
-            potential
-        );
-    }
-
-    #[test]
-    fn identical_reading_does_not_replace_the_exact_causal_signature() {
-        let mut builder =
-            NativeRelationalPotentialBuilder::new(vec!["a".repeat(64), "b".repeat(64)]).unwrap();
-        builder
-            .receive(0, NativeDeliveryPhase::Emanation, "Alpha carries beta.")
-            .unwrap();
-        builder
-            .receive(1, NativeDeliveryPhase::Emanation, "Alpha carries beta.")
-            .unwrap();
-        let (codec, potential, _) = builder.finish().unwrap();
-        let alpha = codec.contact(&potential, "Describe alpha.").unwrap();
-        assert_eq!(alpha.factor_support, vec![0, 1]);
-        assert!(
-            potential
-                .faces
-                .iter()
-                .any(|face| face.factor_support == vec![0, 1] && face.occurrences.len() == 2)
-        );
-    }
-
-    #[test]
-    fn addressed_dialogue_lineage_glues_deictic_faces_without_naming_native_state() {
-        let mut builder = NativeRelationalPotentialBuilder::new(vec!["a".repeat(64)]).unwrap();
-        builder
-            .receive(0, NativeDeliveryPhase::Ingress, "I cultivate Athena.")
-            .unwrap();
-        builder
-            .receive(
-                0,
-                NativeDeliveryPhase::Emanation,
-                "Brandon is the user. You require exact holonic transport.",
-            )
-            .unwrap();
-        let (codec, potential, _) = builder.finish().unwrap();
-        let contact = codec.contact(&potential, "Describe Brandon.").unwrap();
-        let (participant, alias) = contact.participant_alias.unwrap();
-        assert!(contact.faces.contains(&participant));
-        assert!(contact.faces.contains(&alias));
-        assert_eq!(
-            potential.faces[participant as usize].kind,
-            NativeRelationalFaceKind::Participant
-        );
-        assert!(
-            codec
-                .canonical_bytes(&potential)
-                .map(|wire| !String::from_utf8_lossy(&wire).contains("native-brandon"))
-                .unwrap()
-        );
-    }
-}
+#[path = "native_relational_potential_tests.rs"]
+mod tests;

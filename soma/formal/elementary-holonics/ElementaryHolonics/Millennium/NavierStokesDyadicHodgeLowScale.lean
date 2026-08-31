@@ -49,7 +49,8 @@ theorem norm_dyadicHodgeJacobianKernelEntry_le_count_cube
   rw [dyadicHodgeJacobianKernelEntry_eq_centeredSynthesis, norm_mul]
   have hbase :
       ‖UnitAddTorus.mFourier (dyadicHodgeApertureBaseFrequency scale) q‖ = 1 := by
-    simp [UnitAddTorus.mFourier, norm_prod]
+    simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, norm_prod,
+      fourier_apply, Circle.norm_coe, Finset.prod_const_one]
   rw [hbase, one_mul]
   refine (norm_finiteCharacterSynthesisThree_le_mass
     (dyadicHodgeCubeCoefficient scale component coordinate input)

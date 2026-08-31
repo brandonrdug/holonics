@@ -80,7 +80,9 @@ theorem contractingWith_invariantRestartSet
         exact mul_le_mul_of_nonneg_right
           (mul_le_mul_of_nonneg_left hsum data.coefficient_nonneg) (norm_nonneg _)
       _ = (K : ℝ) * ‖(u : X) - (v : X)‖ := by
-        dsimp [K]
+        simp [K]
+        left
+        change A * (2 * R) = 2 * A * R
         ring
 
 /-- **Actual invariant fixed-point return.**  A closed fibre preserved by the quadratic map and

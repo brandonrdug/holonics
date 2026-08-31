@@ -122,8 +122,8 @@ theorem norm_hodgeStrainModeReading_le_directionRemainder
   · subst frequency
     rw [hodgeStrainModeReading, hodgeStrainMode, hodgeJacobianMode_zero]
     simp [symmetricComplexJacobianPart, complexStretchingReading, complexMatrixAction,
-      complexDot]
-    exact mul_nonneg (mul_nonneg (by norm_num) (sq_nonneg _))
+      complexDot, Matrix.mulVec, dotProduct, Matrix.transpose_apply]
+    exact mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 3) (sq_nonneg _))
       (complexVectorL1_nonneg remainder)
   · rw [hodgeStrainModeReading_eq_scalarTriple hfrequency, norm_div, norm_neg,
       norm_mul, Complex.norm_real, Real.norm_eq_abs,

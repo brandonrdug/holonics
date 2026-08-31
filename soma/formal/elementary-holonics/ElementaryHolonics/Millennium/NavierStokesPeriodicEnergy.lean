@@ -48,7 +48,7 @@ theorem divergence_pressureFlux
       (p x • (fderiv ℝ u x).toLinearMap +
         (fderiv ℝ p x).toLinearMap.smulRight (u x)) = _
   rw [LinearMap.map_add, LinearMap.map_smul, LinearMap.trace_smulRight]
-  rw [inner_gradient_left hp]
+  rw [inner_gradient_left]
   simp only [smul_eq_mul]
   rw [add_comm]
   rfl
@@ -126,7 +126,7 @@ theorem inner_gradient_kineticEnergyDensity
   have hnorm : DifferentiableAt ℝ (fun y ↦ ‖u y‖ ^ 2) x := hu.norm_sq ℝ
   have henergy : DifferentiableAt ℝ (kineticEnergyDensity u) x := by
     exact hnorm.const_mul (1 / 2 : ℝ)
-  rw [inner_gradient_left henergy]
+  rw [inner_gradient_left]
   unfold kineticEnergyDensity
   rw [fderiv_const_mul hnorm (1 / 2 : ℝ)]
   rw [(hu.hasFDerivAt.norm_sq).fderiv]
@@ -269,7 +269,7 @@ theorem divergence_gradient_eq_laplacian
   have hcoord : (fun y ↦ gradient f y i) = (fun y ↦ fderiv ℝ f y e) := by
     funext y
     rw [← EuclideanSpace.inner_basisFun_real (Fin 3) (gradient f y : Space) i]
-    simpa [e] using (inner_gradient_left (hfDiff y) :
+    simpa [e] using (inner_gradient_left :
       inner ℝ (gradient f y) e = fderiv ℝ f y e)
   have hleft := ((EuclideanSpace.proj i).hasFDerivAt.comp x
     (hgradDiff x).hasFDerivAt).fderiv
@@ -285,7 +285,7 @@ theorem divergence_gradient_eq_laplacian
     (EuclideanSpace.proj i).comp (fderiv ℝ (gradient f) x)
         ((EuclideanSpace.equiv (Fin 3) ℝ).symm (Pi.single i 1)) =
         fderiv ℝ (fun y ↦ gradient f y i) x e := by
-          simpa [e, equiv_symm_single_eq_basisFun] using hleftApply.symm
+          simpa [e, Function.comp_def, equiv_symm_single_eq_basisFun] using hleftApply.symm
     _ = fderiv ℝ (fun y ↦ fderiv ℝ f y e) x e := by rw [hcoord]
     _ = fderiv ℝ (fderiv ℝ f) x e e := by
           simpa using hrightApply
@@ -764,7 +764,9 @@ theorem periodicSolution_hasDerivAt_periodicKineticEnergy_eq_timeWork
   let positiveCylinder : Set (Space × ℝ) := Set.univ ×ˢ Ioi (0 : ℝ)
   let compactCylinder : Set (Space × ℝ) := unitCube ×ˢ timeCompact
   have htimeSet : timeSet ∈ nhds t := by
-    apply Ioo_mem_nhds <;> dsimp [timeSet] <;> linarith
+    apply Ioo_mem_nhds
+    · linarith
+    · linarith
   have hpositiveOpen : IsOpen positiveCylinder := by
     exact isOpen_univ.prod isOpen_Ioi
   have hpositiveSmooth : ContDiffOn ℝ ∞ (Function.uncurry velocity) positiveCylinder := by
@@ -845,13 +847,13 @@ theorem periodicSolution_hasDerivAt_periodicKineticEnergy_eq_timeWork
     intro τ hτ
     apply periodicSolution_hasDerivAt_kineticEnergyDensity_time solution x τ
     exact lt_trans (half_pos ht) hτ.1
-  simpa [periodicKineticEnergy] using
-    (hasDerivAt_integral_of_dominated_loc_of_deriv_le
+  convert (hasDerivAt_integral_of_dominated_loc_of_deriv_le
       (F := fun τ x ↦ kineticEnergyDensity (fun y ↦ velocity y τ) x)
       (F' := fun τ x ↦ inner ℝ (eulerianTimeJet velocity x τ) (velocity x τ))
       (bound := fun _ : Space ↦ C) (x₀ := t) (s := timeSet)
       (μ := volume.restrict unitCube)
-      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2
+      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2 using 1 <;>
+    rfl
 
 /-- **The complete forced periodic kinetic-energy equality at positive time.** -/
 theorem periodicSolution_hasDerivAt_periodicKineticEnergy

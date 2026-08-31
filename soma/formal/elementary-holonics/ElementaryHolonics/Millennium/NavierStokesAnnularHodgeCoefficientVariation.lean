@@ -982,7 +982,9 @@ theorem norm_annularHodgeCoefficientMixedSecondDifference_le_sixteen
     ‖annularHodgeCoefficientMixedSecondDifference radius first second base
         component coordinate input firstIndex secondIndex‖ ≤ 16 := by
   unfold annularHodgeCoefficientMixedSecondDifference
-  simpa using norm_zeroPaddedMixedSecondDifference_le (bound := (1 : ℝ))
+  simpa using norm_zeroPaddedMixedSecondDifference_le
+    (coefficient := annularHodgeCoefficientDoubleSlice radius first second base
+      component coordinate input) (bound := (1 : ℝ))
     (by norm_num)
     (fun firstIndex secondIndex ↦
       norm_annularHodgeMultiplierCoefficient_le_one radius _ component coordinate input)

@@ -150,10 +150,9 @@ theorem summable_const_div_sqrt_dyadicRadius (constant : ℝ) :
     exact inv_lt_one_of_one_lt₀ honeLtRoot
   have hgeometric : Summable (fun scale : ℕ ↦ (Real.sqrt 2)⁻¹ ^ scale) :=
     summable_geometric_of_norm_lt_one hratio
-  convert hgeometric.mul_left constant using 1
-  funext scale
-  rw [show (dyadicRadius scale : ℝ) = (2 : ℝ) ^ scale by
-    simp [dyadicRadius], sqrt_two_pow, div_eq_mul_inv, inv_pow]
+  exact (hgeometric.mul_left constant).congr fun scale ↦ by
+    rw [show (dyadicRadius scale : ℝ) = (2 : ℝ) ^ scale by
+      simp [dyadicRadius], sqrt_two_pow, div_eq_mul_inv, inv_pow]
 
 /-- **Uniform-scale theorem.** The actual distance-weighted dyadic Hodge-kernel moments are
 summable across all scales.  The first three scales form a retained finite prefix; every later

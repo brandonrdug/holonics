@@ -54,7 +54,7 @@ def splitFirstInclusion (V : Type u)
     exact WithLp.norm_toLp_fst 2 V V x
 
 /-- The split exact Hilbert chain `V → V ⊕₂ V → V`. -/
-def splitIncidenceComplex (V : Type u)
+abbrev splitIncidenceComplex (V : Type u)
     [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] :
     FiniteHilbertTransportComplex where
   Left := V
@@ -75,9 +75,15 @@ theorem splitIncidenceComplex_incomingAdjoint
     (splitIncidenceComplex V).chain.incomingAdjoint x = x.fst := by
   apply ext_inner_left ℝ
   intro y
-  rw [HilbertTransportChain.incomingAdjoint,
-    ContinuousLinearMap.adjoint_inner_right]
-  simp [splitIncidenceComplex, splitFirstInclusion, WithLp.prod_inner_apply]
+  change V at y
+  change inner ℝ y ((splitIncidenceComplex V).chain.into.adjoint x) = inner ℝ y x.fst
+  calc
+    _ = inner ℝ ((splitIncidenceComplex V).chain.into y) x :=
+      ContinuousLinearMap.adjoint_inner_right (splitIncidenceComplex V).chain.into y x
+    _ = _ := by
+      change inner ℝ (WithLp.toLp 2 ((y : V), 0)) x = inner ℝ y x.fst
+      rw [← WithLp.ofLp_toLp 2 x, WithLp.prod_inner_apply]
+      simp
 
 /-- The outgoing adjoint inserts into the second summand. -/
 theorem splitIncidenceComplex_outgoingAdjoint
@@ -87,9 +93,16 @@ theorem splitIncidenceComplex_outgoingAdjoint
     (splitIncidenceComplex V).chain.outgoingAdjoint x = WithLp.toLp 2 (0, x) := by
   apply ext_inner_right ℝ
   intro y
-  rw [HilbertTransportChain.outgoingAdjoint,
-    ContinuousLinearMap.adjoint_inner_left]
-  simp [splitIncidenceComplex, WithLp.prod_inner_apply]
+  change WithLp 2 (V × V) at y
+  change inner ℝ ((splitIncidenceComplex V).chain.outOf.adjoint x) y =
+    inner ℝ (WithLp.toLp 2 (0, x)) y
+  calc
+    _ = inner ℝ x ((splitIncidenceComplex V).chain.outOf y) :=
+      ContinuousLinearMap.adjoint_inner_left (splitIncidenceComplex V).chain.outOf y x
+    _ = _ := by
+      change inner ℝ x y.snd = inner ℝ (WithLp.toLp 2 (0, x)) y
+      rw [← WithLp.ofLp_toLp 2 y, WithLp.prod_inner_apply]
+      simp
 
 /-- The split chain's middle Hodge Laplacian is exactly the identity. -/
 theorem splitIncidenceComplex_middleLaplacian
@@ -97,10 +110,16 @@ theorem splitIncidenceComplex_middleLaplacian
     [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
     (x : WithLp 2 (V × V)) :
     (splitIncidenceComplex V).chain.middleLaplacian x = x := by
-  rw [HilbertTransportChain.middleLaplacian]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply]
-  rw [splitIncidenceComplex_incomingAdjoint,
-    splitIncidenceComplex_outgoingAdjoint]
+  change (splitIncidenceComplex V).chain.into
+      ((splitIncidenceComplex V).chain.incomingAdjoint x) +
+      (splitIncidenceComplex V).chain.outgoingAdjoint
+        ((splitIncidenceComplex V).chain.outOf x) = x
+  rw [splitIncidenceComplex_incomingAdjoint V x]
+  change (splitIncidenceComplex V).chain.into x.fst +
+      (splitIncidenceComplex V).chain.outgoingAdjoint x.snd = x
+  rw [splitIncidenceComplex_outgoingAdjoint V x.snd]
+  change WithLp.toLp 2 ((x.fst : V), 0) +
+      WithLp.toLp 2 ((0 : V), x.snd) = x
   apply WithLp.ofLp_injective
   ext <;> simp [splitIncidenceComplex, splitFirstInclusion]
 
@@ -210,7 +229,7 @@ def finSuccInclusion (n : ℕ) :
     simp [finSuccLinearMap]
 
 /-- The incidence-bearing object at scale `n`. -/
-def incidenceScaleObject (n : ℕ) : FiniteHilbertTransportComplex :=
+abbrev incidenceScaleObject (n : ℕ) : FiniteHilbertTransportComplex :=
   splitIncidenceComplex (incidenceCarrier n)
 
 /-- The adjacent scale passage, commuting with both differentials and both adjoints. -/

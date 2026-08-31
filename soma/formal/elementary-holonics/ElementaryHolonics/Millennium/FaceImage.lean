@@ -86,10 +86,10 @@ private lemma avoid34 {x y : ℚ} (h : y ^ 2 = x ^ 3 - 1156 * x) (hy : y ≠ 0) 
     (n := 34) (by linear_combination h) hy
 
 private lemma slot34One_some {x y : ℚ} (h : (FamilyFace.E 34).Nonsingular x y) :
-    FamilyFace.slotOne 34 (.some h) = if x = 0 then -34 ^ 2 else x := rfl
+    FamilyFace.slotOne 34 (.some x y h) = if x = 0 then -34 ^ 2 else x := rfl
 
 private lemma slot34Two_some {x y : ℚ} (h : (FamilyFace.E 34).Nonsingular x y) :
-    FamilyFace.slotTwo 34 (.some h) = if x = 34 then 2 * 34 ^ 2 else x - 34 := rfl
+    FamilyFace.slotTwo 34 (.some x y h) = if x = 34 then 2 * 34 ^ 2 else x - 34 := rfl
 
 /-! ## 3. The sign law: thirty-two classes die in the real frame -/
 
@@ -558,10 +558,10 @@ private lemma face_T0 :
     Descent.SqCls (FamilyFace.slotOne 34 FamilyFace.torsionZero) (-1) ∧
     Descent.SqCls (FamilyFace.slotTwo 34 FamilyFace.torsionZero) (-34) := by
   constructor
-  · rw [show FamilyFace.torsionZero = Point.some FamilyFace.nonsingular00 from rfl,
+  · rw [show FamilyFace.torsionZero = Point.some 0 0 FamilyFace.nonsingular00 from rfl,
       slot34One_some, if_pos rfl]
     exact ⟨34, by norm_num, by norm_num⟩
-  · rw [show FamilyFace.torsionZero = Point.some FamilyFace.nonsingular00 from rfl,
+  · rw [show FamilyFace.torsionZero = Point.some 0 0 FamilyFace.nonsingular00 from rfl,
       slot34Two_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
 
@@ -569,10 +569,10 @@ private lemma face_T34 :
     Descent.SqCls (FamilyFace.slotOne 34 FamilyFace.torsionRight) 34 ∧
     Descent.SqCls (FamilyFace.slotTwo 34 FamilyFace.torsionRight) 2 := by
   constructor
-  · rw [show FamilyFace.torsionRight = Point.some FamilyFace.nonsingular340 from rfl,
+  · rw [show FamilyFace.torsionRight = Point.some 34 0 FamilyFace.nonsingular340 from rfl,
       slot34One_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
-  · rw [show FamilyFace.torsionRight = Point.some FamilyFace.nonsingular340 from rfl,
+  · rw [show FamilyFace.torsionRight = Point.some 34 0 FamilyFace.nonsingular340 from rfl,
       slot34Two_some, if_pos rfl]
     exact ⟨34, by norm_num, by norm_num⟩
 
@@ -580,10 +580,10 @@ private lemma face_P1 :
     Descent.SqCls (FamilyFace.slotOne 34 FamilyFace.firstDirection) (-2) ∧
     Descent.SqCls (FamilyFace.slotTwo 34 FamilyFace.firstDirection) (-1) := by
   constructor
-  · rw [show FamilyFace.firstDirection = Point.some FamilyFace.nonsingularP1 from rfl,
+  · rw [show FamilyFace.firstDirection = Point.some (-2) 48 FamilyFace.nonsingularP1 from rfl,
       slot34One_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
-  · rw [show FamilyFace.firstDirection = Point.some FamilyFace.nonsingularP1 from rfl,
+  · rw [show FamilyFace.firstDirection = Point.some (-2) 48 FamilyFace.nonsingularP1 from rfl,
       slot34Two_some, if_neg (by norm_num)]
     exact ⟨6, by norm_num, by norm_num⟩
 
@@ -591,10 +591,10 @@ private lemma face_P2 :
     Descent.SqCls (FamilyFace.slotOne 34 FamilyFace.secondDirection) (-1) ∧
     Descent.SqCls (FamilyFace.slotTwo 34 FamilyFace.secondDirection) (-2) := by
   constructor
-  · rw [show FamilyFace.secondDirection = Point.some FamilyFace.nonsingularP2 from rfl,
+  · rw [show FamilyFace.secondDirection = Point.some (-16) 120 FamilyFace.nonsingularP2 from rfl,
       slot34One_some, if_neg (by norm_num)]
     exact ⟨4, by norm_num, by norm_num⟩
-  · rw [show FamilyFace.secondDirection = Point.some FamilyFace.nonsingularP2 from rfl,
+  · rw [show FamilyFace.secondDirection = Point.some (-16) 120 FamilyFace.nonsingularP2 from rfl,
       slot34Two_some, if_neg (by norm_num)]
     exact ⟨5, by norm_num, by norm_num⟩
 
@@ -750,10 +750,10 @@ theorem theFaceImageIsTheRealizedSixteen (P : (FamilyFace.E 34).Point) :
       obtain ⟨⟨d₁, hd₁, hc₁⟩, ⟨d₂, hd₂, hc₂⟩⟩ :=
         theSlotClassesAreSupportedOnTheDiscriminant hcurve hy
       have hsig := theSignsAgreeAcrossTheFace hcurve hy hc₁ hc₂
-      have hs1 : Descent.SqCls (FamilyFace.slotOne 34 (Point.some hP)) d₁ := by
+      have hs1 : Descent.SqCls (FamilyFace.slotOne 34 (Point.some _ _ hP)) d₁ := by
         rw [slot34One_some, if_neg hx0]
         exact hc₁
-      have hs2 : Descent.SqCls (FamilyFace.slotTwo 34 (Point.some hP)) d₂ := by
+      have hs2 : Descent.SqCls (FamilyFace.slotTwo 34 (Point.some _ _ hP)) d₂ := by
         rw [slot34Two_some, if_neg hx34]
         exact hc₂
       clear hc₁ hc₂

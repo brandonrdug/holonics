@@ -40,10 +40,10 @@ theorem inClass_mul {z w : ℤ[i]} (hz : inClass z) (hw : inClass w) : inClass (
   obtain ⟨hz1, hz2⟩ := hz
   obtain ⟨hw1, hw2⟩ := hw
   have hre : (z * w).re = z.re * w.re - z.im * w.im := by
-    rw [Zsqrtd.mul_re]
+    rw [Zsqrtd.re_mul]
     ring
   have him : (z * w).im = z.re * w.im + z.im * w.re := by
-    rw [Zsqrtd.mul_im]
+    rw [Zsqrtd.im_mul]
   constructor
   · rw [hre, him]
     have key : ∀ a b c d : ZMod 4, a + b = 1 → (b = 0 ∨ b = 2) → c + d = 1 →
@@ -127,11 +127,11 @@ theorem inClass_rigid {z u : ℤ[i]} (hu : IsUnit u) (hodd : z.norm % 2 = 1)
   · rfl
   · exfalso
     have hre : ((-1 : ℤ[i]) * z).re = -z.re := by
-      rw [Zsqrtd.mul_re]
+      rw [Zsqrtd.re_mul]
       show (-1 : ℤ[i]).re * z.re + (-1) * (-1 : ℤ[i]).im * z.im = -z.re
       norm_num
     have him : ((-1 : ℤ[i]) * z).im = -z.im := by
-      rw [Zsqrtd.mul_im]
+      rw [Zsqrtd.im_mul]
       show (-1 : ℤ[i]).re * z.im + (-1 : ℤ[i]).im * z.re = -z.im
       norm_num
     rw [hre] at hu1
@@ -139,13 +139,13 @@ theorem inClass_rigid {z u : ℤ[i]} (hu : IsUnit u) (hodd : z.norm % 2 = 1)
     omega
   · exfalso
     have him : ((⟨0, 1⟩ : ℤ[i]) * z).im = z.re := by
-      rw [Zsqrtd.mul_im]
+      rw [Zsqrtd.im_mul]
       norm_num
     rw [him] at hu2
     omega
   · exfalso
     have him : ((⟨0, -1⟩ : ℤ[i]) * z).im = -z.re := by
-      rw [Zsqrtd.mul_im]
+      rw [Zsqrtd.im_mul]
       norm_num
     rw [him] at hu2
     omega
@@ -212,7 +212,8 @@ theorem norm_gcd_eq {z : ℤ[i]} {m n : ℕ} (hmn : Nat.Coprime m n)
   exact Int.dvd_antisymm hnn (Int.natCast_nonneg m) h3 h4
 
 /-- The Gaussian shell: the image of the plane shell in `ℤ[i]`. -/
-def gShell (m : ℕ) : Finset GaussianInt := (heckeShell m).image fun q => ⟨q.1, q.2⟩
+noncomputable def gShell (m : ℕ) : Finset GaussianInt :=
+  (heckeShell m).image fun q => ⟨q.1, q.2⟩
 
 /-- A class element has odd norm. -/
 theorem inClass_norm_odd {z : ℤ[i]} (hz : inClass z) : z.norm % 2 = 1 := by
@@ -252,11 +253,11 @@ lemma mem_gShell {m : ℕ} {z : ℤ[i]} :
 
 private lemma isUnit_I : IsUnit (⟨0, 1⟩ : ℤ[i]) := by
   refine isUnit_iff_exists_inv.mpr ⟨⟨0, -1⟩, ?_⟩
-  ext <;> simp [Zsqrtd.mul_re, Zsqrtd.mul_im]
+  ext <;> simp [Zsqrtd.re_mul, Zsqrtd.im_mul]
 
 private lemma isUnit_negI : IsUnit (⟨0, -1⟩ : ℤ[i]) := by
   refine isUnit_iff_exists_inv.mpr ⟨⟨0, 1⟩, ?_⟩
-  ext <;> simp [Zsqrtd.mul_re, Zsqrtd.mul_im]
+  ext <;> simp [Zsqrtd.re_mul, Zsqrtd.im_mul]
 
 /-- Every odd-norm Gaussian integer has a class-normalized unit associate. -/
 theorem exists_class_unit {z : ℤ[i]} (hodd : z.norm % 2 = 1) :
@@ -283,11 +284,11 @@ theorem exists_class_unit {z : ℤ[i]} (hodd : z.norm % 2 = 1) :
     · exact ⟨1, isUnit_one, by rw [one_mul]; exact ⟨hc, h2⟩⟩
     · refine ⟨-1, isUnit_one.neg, ?_⟩
       have hre : ((-1 : ℤ[i]) * z).re = -z.re := by
-        rw [Zsqrtd.mul_re]
+        rw [Zsqrtd.re_mul]
         show (-1 : ℤ[i]).re * z.re + (-1) * (-1 : ℤ[i]).im * z.im = -z.re
         norm_num
       have him : ((-1 : ℤ[i]) * z).im = -z.im := by
-        rw [Zsqrtd.mul_im]
+        rw [Zsqrtd.im_mul]
         show (-1 : ℤ[i]).re * z.im + (-1 : ℤ[i]).im * z.re = -z.im
         norm_num
       rw [inClass, hre, him]
@@ -295,16 +296,16 @@ theorem exists_class_unit {z : ℤ[i]} (hodd : z.norm % 2 = 1) :
       · omega
       · omega
   · have hreI : ((⟨0, 1⟩ : ℤ[i]) * z).re = -z.im := by
-      rw [Zsqrtd.mul_re]
+      rw [Zsqrtd.re_mul]
       norm_num
     have himI : ((⟨0, 1⟩ : ℤ[i]) * z).im = z.re := by
-      rw [Zsqrtd.mul_im]
+      rw [Zsqrtd.im_mul]
       norm_num
     have hreNI : ((⟨0, -1⟩ : ℤ[i]) * z).re = z.im := by
-      rw [Zsqrtd.mul_re]
+      rw [Zsqrtd.re_mul]
       norm_num
     have himNI : ((⟨0, -1⟩ : ℤ[i]) * z).im = -z.re := by
-      rw [Zsqrtd.mul_im]
+      rw [Zsqrtd.im_mul]
       norm_num
     by_cases hc : (-z.im + z.re) % 4 = 1
     · refine ⟨⟨0, 1⟩, isUnit_I, ?_⟩
@@ -442,7 +443,7 @@ theorem existsUnique_class_factor {m n : ℕ} (hmn : Nat.Coprime m n) {z : ℤ[i
   exact Prod.ext_iff.mpr ⟨hz1w1.symm, (mul_left_cancel₀ hz1ne hmul).symm⟩
 
 /-- The Gaussian shell sum. -/
-def gSum (m : ℕ) : GaussianInt := ∑ z ∈ gShell m, z
+noncomputable def gSum (m : ℕ) : GaussianInt := ∑ z ∈ gShell m, z
 
 private lemma sum_components {α : Type*} (s : Finset α) (f : α → GaussianInt) :
     (∑ z ∈ s, f z) = ⟨∑ z ∈ s, (f z).re, ∑ z ∈ s, (f z).im⟩ := by
@@ -534,7 +535,7 @@ theorem heckeCoeff_mul {a b : ℕ} (hab : Nat.Coprime a b) :
   have h := gSum_mul hab
   rw [gSum_eq, gSum_eq, gSum_eq] at h
   have hre := congrArg Zsqrtd.re h
-  rw [Zsqrtd.mul_re] at hre
+  rw [Zsqrtd.re_mul] at hre
   show heckeCoeff (a * b) = heckeCoeff a * heckeCoeff b
   have : heckeCoeff (a * b) = heckeCoeff a * heckeCoeff b + -1 * 0 * 0 := hre
   linarith [this]
@@ -696,7 +697,7 @@ theorem heckeCoeff_prime_pow_inert {p : ℕ} [Fact p.Prime] (hp3 : p % 4 = 3) (k
     exact hsum
   rw [gSum_eq, gSum_eq, ht_def] at hgs
   have hre := congrArg Zsqrtd.re hgs
-  rw [Zsqrtd.mul_re] at hre
+  rw [Zsqrtd.re_mul] at hre
   dsimp only at hre
   linear_combination hre
 
@@ -761,14 +762,14 @@ theorem heckeCoeff_prime_pow_split {p : ℕ} [Fact p.Prime] (hp1 : p % 4 = 1) (k
     rw [← Zsqrtd.norm_eq_mul_conj, hπn]
   have hpc : inClass (((p : ℤ)) : GaussianInt) := by
     constructor
-    · rw [Zsqrtd.intCast_re, Zsqrtd.intCast_im]
+    · rw [Zsqrtd.re_intCast, Zsqrtd.im_intCast]
       omega
-    · rw [Zsqrtd.intCast_im]
+    · rw [Zsqrtd.im_intCast]
       omega
   have hpelt0 : (((p : ℤ)) : GaussianInt) ≠ 0 := by
     intro h
     have h2 := congrArg Zsqrtd.re h
-    rw [Zsqrtd.intCast_re] at h2
+    rw [Zsqrtd.re_intCast] at h2
     exact hp0 h2
   have hcp : heckeCoeff p = 2 * π.re := by
     refine shell_eq hp2 ?_ hπ1 hπ2 hB0
@@ -928,7 +929,7 @@ theorem heckeCoeff_prime_pow_split {p : ℕ} [Fact p.Prime] (hp1 : p % 4 = 1) (k
     linear_combination hkey
   rw [gSum_eq, gSum_eq, gSum_eq, gSum_eq] at hfinal
   have hre := congrArg Zsqrtd.re hfinal
-  rw [Zsqrtd.add_re, Zsqrtd.mul_re, Zsqrtd.mul_re, Zsqrtd.intCast_re, Zsqrtd.intCast_im]
+  rw [Zsqrtd.re_add, Zsqrtd.re_mul, Zsqrtd.re_mul, Zsqrtd.re_intCast, Zsqrtd.im_intCast]
     at hre
   dsimp only at hre
   linear_combination hre

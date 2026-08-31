@@ -646,9 +646,8 @@ impl ResidentSectionRest {
             .len()
             .checked_mul(16)
             .ok_or_else(|| "resident section rest byte extent overflow".to_owned())?;
-        let mut bytes = Vec::with_capacity(
-            resident_section_rest_header_octets().saturating_add(body_octets),
-        );
+        let mut bytes =
+            Vec::with_capacity(resident_section_rest_header_octets().saturating_add(body_octets));
         bytes.extend_from_slice(RESIDENT_SECTION_REST_MAGIC);
         bytes.extend_from_slice(&rows.to_le_bytes());
         bytes.extend_from_slice(&width.to_le_bytes());

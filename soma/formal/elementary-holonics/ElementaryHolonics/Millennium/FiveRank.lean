@@ -33,10 +33,10 @@ open Soma.Holonics.Millennium
 /-! ## 1. Local plumbing -/
 
 private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some h) = if x = 0 then -25 else x := rfl
+    RankOne.slotOne (.some _ _ h) = if x = 0 then -25 else x := rfl
 
 private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some h) = if x = 5 then 50 else x - 5 := rfl
+    RankOne.slotTwo (.some _ _ h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩

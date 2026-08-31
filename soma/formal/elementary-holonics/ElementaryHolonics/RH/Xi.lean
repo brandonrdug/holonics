@@ -155,6 +155,8 @@ theorem theDigammaRecurrence {s : ℂ} (hs : ∀ m : ℕ, s ≠ -m) (hs0 : s ≠
   have h1 : HasDerivAt (fun z : ℂ => Complex.Gamma (z + 1))
       (deriv Complex.Gamma (s + 1)) s := by
     have hbase := (Complex.differentiableAt_Gamma (s + 1) hs1).hasDerivAt
+    change HasDerivAt (Complex.Gamma ∘ (fun z : ℂ => z + 1))
+      (deriv Complex.Gamma (s + 1)) s
     simpa using hbase.comp s ((hasDerivAt_id s).add_const 1)
   have h2 : HasDerivAt (fun z : ℂ => z * Complex.Gamma z)
       (1 * Complex.Gamma s + s * deriv Complex.Gamma s) s :=

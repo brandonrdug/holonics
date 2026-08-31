@@ -348,7 +348,7 @@ theorem radius_add_two_sq_le_frequencySquared_of_not_mem_inner
   have habs : (radius + 2 : ℝ) ≤ |(frequency axis : ℝ)| := by
     have hcast : (radius + 2 : ℝ) ≤ ((frequency axis).natAbs : ℝ) := by
       exact_mod_cast haxis
-    simpa only [Int.cast_natAbs, Int.cast_abs] using hcast
+    simpa only [Nat.cast_natAbs, Int.cast_abs] using hcast
   have hsquare : (radius + 2 : ℝ) ^ 2 ≤ (frequency axis : ℝ) ^ 2 := by
     have hsquareAbs := pow_le_pow_left₀ (by positivity) habs 2
     simpa only [sq_abs] using hsquareAbs
@@ -885,7 +885,12 @@ theorem abs_reciprocal_frequencySquared_secondDifference_le
   have hlastChange : |lastDenominator - middleDenominator| ≤ 2 * bound + 3 := by
     have hraw := abs_frequencySquared_increment_sub_le (bound := bound + 1)
       (by positivity) middleFrequency hmiddleCoordinate axis
-    convert hraw using 1 <;> ring
+    calc
+      |lastDenominator - middleDenominator| =
+          |frequencySquared (incrementFrequencyCoordinate axis middleFrequency) -
+            frequencySquared middleFrequency| := by rfl
+      _ ≤ 2 * (bound + 1) + 1 := hraw
+      _ = 2 * bound + 3 := by ring
   have hspanChange : |lastDenominator - firstDenominator| ≤ 4 * bound + 4 := by
     calc
       |lastDenominator - firstDenominator| =
@@ -1005,7 +1010,12 @@ theorem norm_hodgeJacobianMultiplierEntry_secondDifference_le
       |lastDenominator - middleDenominator| ≤ 2 * bound + 3 := by
     have hraw := abs_frequencySquared_increment_sub_le (bound := bound + 1)
       (by positivity) middleFrequency hmiddleCoordinate axis
-    convert hraw using 1 <;> ring
+    calc
+      |lastDenominator - middleDenominator| =
+          |frequencySquared (incrementFrequencyCoordinate axis middleFrequency) -
+            frequencySquared middleFrequency| := by rfl
+      _ ≤ 2 * (bound + 1) + 1 := hraw
+      _ = 2 * bound + 3 := by ring
   have hlastReciprocalDifferenceReal :
       |1 / lastDenominator - 1 / middleDenominator| ≤
         (2 * bound + 3) / lower ^ 2 :=

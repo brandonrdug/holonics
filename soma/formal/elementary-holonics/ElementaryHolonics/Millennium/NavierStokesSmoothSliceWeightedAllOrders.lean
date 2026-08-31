@@ -260,9 +260,14 @@ theorem unweighted_smoothSliceVectorWeighted_apply
     (weightedSobolevCoefficients order
       (smoothSliceVectorWeighted u hu hperiodic order component)).1 k =
         vectorSpatialFourierCoeff u hu.continuous hperiodic k component := by
-  rw [smoothSliceVectorWeighted, smoothSliceWeightedComponent,
-    weightedSobolevCoefficients_coefficientWeightedRealization]
-  exact smoothSliceFourierL2_apply u hu hperiodic component k
+  unfold smoothSliceVectorWeighted smoothSliceWeightedComponent
+  have hreconstruct := weightedSobolevCoefficients_coefficientWeightedRealization order
+    (⟨smoothSliceFourierL2 u hu hperiodic component,
+      hasPeriodicSobolevCoefficients_smoothSlice
+        u hu hperiodic component order⟩ : PeriodicSobolevCoefficients order)
+  have hcoefficient := congrArg
+    (fun coeff : PeriodicSobolevCoefficients order ↦ coeff.1 k) hreconstruct
+  exact hcoefficient.trans (smoothSliceFourierL2_apply u hu hperiodic component k)
 
 section Audit
 

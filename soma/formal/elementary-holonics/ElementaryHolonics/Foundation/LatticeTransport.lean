@@ -122,7 +122,9 @@ theorem cokernelClass_mem_torsion_iff_saturated
   constructor
   · rintro ⟨scale, hzero⟩
     apply (receipt.saturated_iff_cokernelClass_has_torsionWitness target).mpr
-    exact ⟨scale.1, (mem_nonZeroDivisors_iff_ne_zero.mp scale.2), by simpa using hzero⟩
+    exact ⟨scale.1, (mem_nonZeroDivisors_iff_ne_zero.mp scale.2), by
+      change (scale.1 : ℤ) • receipt.cokernelClass target = 0
+      exact hzero⟩
   · intro hsaturated
     obtain ⟨scale, hscale, hzero⟩ :=
       (receipt.saturated_iff_cokernelClass_has_torsionWitness target).mp hsaturated

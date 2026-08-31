@@ -114,8 +114,9 @@ theorem theBsdBranchDifferenceIsTheNormalizedResidual {X u v : ℤ}
     (h1 : X ^ 2 = 34 * u ^ 2 + 1) (h2 : X ^ 2 + 1 = 2 * v ^ 2) :
     v ^ 2 - (theThirtyFourBinaryChart.residual : ℤ) * u ^ 2 =
       (theTwoBinaryChart.residual : ℤ) := by
-  simpa [theThirtyFourBinaryChart, theTwoBinaryChart] using
-    CongruentSeventeen.thePellRelation h1 h2
+  rw [theBsdCoefficientPairReturnsSeventeenAndOne.1,
+    theBsdCoefficientPairReturnsSeventeenAndOne.2]
+  exact CongruentSeventeen.thePellRelation h1 h2
 
 /-- [proved-derived; formal-checked] The residual prime is the sixth indexed prime, hence the
 seventh member of the zero-indexed prime basis. -/

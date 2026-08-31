@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::dialogue_lineage::{
-    CodexDialogueImportSpec, DialoguePhase, DialogueSpeaker, ExactDialogueLineage,
-    import_claude_visible_prefix,
+    import_claude_visible_prefix, CodexDialogueImportSpec, DialoguePhase, DialogueSpeaker,
+    ExactDialogueLineage,
 };
 
 use super::{Digest32, ExchangeContainerSpec, ExchangeWorldTube, VisibleMessageFace};

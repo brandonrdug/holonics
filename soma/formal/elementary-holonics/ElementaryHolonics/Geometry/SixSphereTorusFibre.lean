@@ -47,8 +47,10 @@ abbrev RealFourSpace := Fin 4 → ℝ
 def latticeCast (v : Lattice) : RealFourSpace := fun i ↦ (v i : ℝ)
 
 theorem latticeCast_isClosedEmbedding : Topology.IsClosedEmbedding latticeCast := by
-  simpa [latticeCast] using
-    (Topology.IsClosedEmbedding.piMap (fun _ : Fin 4 ↦ Int.isClosedEmbedding_coe_real))
+  change Topology.IsClosedEmbedding
+    (fun v : Fin 4 → ℤ => fun i => (v i : ℝ))
+  exact Topology.IsClosedEmbedding.piMap
+    (fun _ : Fin 4 ↦ Int.isClosedEmbedding_coe_real)
 
 /-- The receiver reassembles four real coordinates into two genuinely complex coordinates. -/
 def realFourEquivComplexTwo : RealFourSpace ≃ₗ[ℝ] ComplexTwoSpace where
@@ -125,7 +127,7 @@ theorem periodLattice_isDiscrete (p : PeriodPoint)
     (hτ : 0 < p.τ.im) (hD : D p < 0) :
     IsDiscrete (periodLattice p : Set ComplexTwoSpace) := by
   simpa [periodLattice, periodColumnAddHom] using
-    IsEmbedding.isDiscrete_range (periodColumnVector_isClosedEmbedding p hτ hD).isEmbedding
+    ((periodColumnVector_isClosedEmbedding p hτ hD).isEmbedding.isInducing.isDiscrete_range)
 
 /-- The same embedded period subgroup is closed, so the quotient has the expected separation
 gate whenever these hypotheses are installed. -/

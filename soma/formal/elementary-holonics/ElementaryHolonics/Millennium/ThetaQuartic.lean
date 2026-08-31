@@ -153,8 +153,9 @@ theorem theShiftedProductFace {t : ℝ} (ht : 0 < t) :
         * rexp (-π * (q.2 : ℝ) ^ 2 * (2 * t)) := by
     intro q
     rw [hge]
+    change (if Even ((D q).1 + (D q).2) then g (D q) else 0) = _
+    rw [if_pos (show Even ((D q).1 + (D q).2) from by simp [D]), hg]
     simp only [D]
-    rw [if_pos ⟨q.1, by ring⟩, hg]
     rw [← Real.exp_add]
     congr 1
     push_cast
@@ -182,8 +183,12 @@ theorem theShiftedProductFace {t : ℝ} (ht : 0 < t) :
         * rexp (-π * ((q.2 : ℝ) + 1 / 2) ^ 2 * (2 * t)) := by
     intro q
     rw [hgo]
+    change (if Even ((Do q).1 + (Do q).2) then 0 else g (Do q)) = _
+    rw [if_neg (show ¬ Even ((Do q).1 + (Do q).2) from by
+      simp only [Do]
+      rw [Int.even_iff]
+      omega), hg]
     simp only [Do]
-    rw [if_neg (by rw [Int.even_iff]; omega), hg]
     rw [← Real.exp_add]
     congr 1
     push_cast

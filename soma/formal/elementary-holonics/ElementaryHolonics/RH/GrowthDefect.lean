@@ -1,5 +1,6 @@
 import ElementaryHolonics.RH.Jensen
 import ElementaryHolonics.RH.Growth
+import Mathlib.Analysis.Complex.Liouville
 
 /-!
 # The named growth input was mis-shaped, and the hypothesis was vacuous
@@ -98,7 +99,7 @@ already supplies the pointwise ingredient (`theCompletedZetaHasGammaGrowth`), an
 `MellinHorizon.theCompletedZetaIsBoundedOnAStrip` covers the middle. -/
 theorem theGrowthPropForcesAConstant (hG : TheOrderOneGrowthOfXi) (z w : ℂ) :
     completedRiemannZeta₀ z = completedRiemannZeta₀ w := by
-  refine differentiable_completedZeta₀.apply_eq_apply_of_bounded ?_ z w
+  refine Differentiable.apply_eq_apply_of_bounded differentiable_completedZeta₀ ?_ z w
   refine Bornology.IsBounded.subset (Metric.isBounded_closedBall (x := (0:ℂ)) (r := 1)) ?_
   rintro _ ⟨u, rfl⟩
   simpa [Metric.mem_closedBall, Complex.dist_eq] using theGrowthPropBoundsEverywhere hG u

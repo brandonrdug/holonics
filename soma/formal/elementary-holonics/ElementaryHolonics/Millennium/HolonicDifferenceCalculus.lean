@@ -1,6 +1,5 @@
 import ElementaryHolonics.Geometry.Telescoping
 import ElementaryHolonics.Millennium.Horizon
-import ElementaryHolonics.Millennium.NavierStokesAnnularHodgeKernelDifference
 import ElementaryHolonics.Millennium.Polarisation
 import ElementaryHolonics.Millennium.Swing
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
@@ -114,7 +113,52 @@ theorem swingDifference_isEulerHalfTurn (anchor body : ℂ) :
       Complex.exp (Real.pi * Complex.I) * (anchoredEdge anchor body).difference := by
   rw [swing_reversesDifference, eulerHalfTurn_actsByNegation]
 
-/-! ## 3. Differences of differences -/
+/-! ## 3. The finite Leibniz swing retains the interaction face -/
+
+section FiniteLeibniz
+
+variable {R : Type*} [CommRing R]
+
+/-- Change the left coordinate first while the right coordinate is held at its source occurrence,
+then change the right coordinate while the left coordinate is held at its target occurrence.  This
+is one exact two-swing path across the product face. -/
+theorem productDifference_leftThenRight (left₀ left₁ right₀ right₁ : R) :
+    left₁ * right₁ - left₀ * right₀ =
+      (left₁ - left₀) * right₀ + left₁ * (right₁ - right₀) := by
+  ring
+
+/-- Change the right coordinate first and the left coordinate second.  The intermediate pivot is
+different, but the complete returned product difference is the same. -/
+theorem productDifference_rightThenLeft (left₀ left₁ right₀ right₁ : R) :
+    left₁ * right₁ - left₀ * right₀ =
+      left₀ * (right₁ - right₀) + (left₁ - left₀) * right₁ := by
+  ring
+
+/-- The two ordered swing paths allocate the mixed interaction face differently while returning
+the same exterior difference. -/
+theorem productDifference_pathInterchange (left₀ left₁ right₀ right₁ : R) :
+    (left₁ - left₀) * right₀ + left₁ * (right₁ - right₀) =
+      left₀ * (right₁ - right₀) + (left₁ - left₀) * right₁ := by
+  ring
+
+/-- If both coordinate differences are evaluated at the source pivot, the exact remainder is the
+mixed face.  Dropping it is precisely the first-order linearization quotient. -/
+theorem productDifference_sourceLinearizationWithRemainder
+    (left₀ left₁ right₀ right₁ : R) :
+    left₁ * right₁ - left₀ * right₀ =
+      (left₁ - left₀) * right₀ + left₀ * (right₁ - right₀) +
+        (left₁ - left₀) * (right₁ - right₀) := by
+  ring
+
+/-- The pair-annihilation departure used by the Boltzmann collision receiver is itself one
+oriented difference multiplied by its returned population sum. -/
+theorem squareDifference_isDifferenceTimesSum (source target : R) :
+    target ^ 2 - source ^ 2 = (target - source) * (target + source) := by
+  ring
+
+end FiniteLeibniz
+
+/-! ## 4. Differences of differences -/
 
 variable {G : Type*} [AddCommGroup G]
 
@@ -172,7 +216,7 @@ theorem secondDifference_affinePath (origin step : G) (time : ℕ) :
     secondDifference (affinePath origin step) time = 0 := by
   simp [secondDifference, firstDifference_affinePath]
 
-/-! ## 4. Galois/monodromy transport is measured by its returned difference -/
+/-! ## 5. Galois/monodromy transport is measured by its returned difference -/
 
 /-- The additive defect returned by an automorphism acting on one state.  Field automorphisms,
 monodromy actions, gyrations, and chart-return maps enter this carrier through their underlying
@@ -210,7 +254,7 @@ theorem firstDifference_transportOrbit
       transportDifference transport (transportOrbit transport state time) := by
   simp [firstDifference, transportOrbit, transportDifference]
 
-/-! ## 5. Exact integration and coarse-graining -/
+/-! ## 6. Exact integration and coarse-graining -/
 
 /-- Discrete integration of every local action returns the one exterior difference. -/
 theorem localDifferences_integrateToBoundary (path : ℕ → G) (steps : ℕ) :
@@ -240,7 +284,7 @@ theorem coarseDifference_isIntegratedWindow
   rw [windowDifferences_integrateToBoundary]
   simp [firstDifference, coarsePath, Nat.add_mul]
 
-/-! ## 6. Modulo is a quotient of the oriented difference -/
+/-! ## 7. Modulo is a quotient of the oriented difference -/
 
 /-- The integral difference as seen by the modulus-`n` receiver. -/
 def modularDifference (n : ℕ) (source target : ℤ) : ZMod n :=
@@ -275,7 +319,7 @@ theorem modularReceiver_reopensIntegralDifference :
   · decide
   · norm_num
 
-/-! ## 7. Euler/Stokes faces of the same difference calculus -/
+/-! ## 8. Euler/Stokes faces of the same difference calculus -/
 
 /-- The minimal Stokes theorem is the adjointness of the local difference and boundary maps. -/
 theorem localDifference_globalBoundary_areAdjoint
@@ -289,57 +333,15 @@ theorem eulerReturn_survivesLocalEdgeFacePair (vertices edges faces : ℤ) :
     vertices - (edges + 1) + (faces + 1) = vertices - edges + faces :=
   Horizon.theCharacteristicIsInvariantUnderAddingAChord vertices edges faces
 
-/-! ## 8. The actual annular Hodge differences are addressed edges -/
-
-namespace AnnularHodge
-
-open NavierStokesAnnularHodgeKernelDifference
-
-/-- One zero-padded annular-coefficient difference with both of its endpoint values retained. -/
-def backwardDifferenceEdge
-    (coefficient : ℕ → ℂ) (count index : ℕ) : OrientedEdge ℂ :=
-  ⟨if index = 0 then 0 else zeroPaddedCoefficient coefficient count (index - 1),
-    zeroPaddedCoefficient coefficient count index⟩
-
-/-- The fluid owner's first backward difference is exactly the oriented-edge difference. -/
-theorem backwardDifference_isEdgeDifference
-    (coefficient : ℕ → ℂ) (count index : ℕ) :
-    zeroPaddedBackwardDifference coefficient count index =
-      (backwardDifferenceEdge coefficient count index).difference := by
-  rfl
-
-/-- One second-difference edge is an edge in the already differentiated coefficient population. -/
-def secondDifferenceEdge
-    (coefficient : ℕ → ℂ) (count index : ℕ) : OrientedEdge ℂ :=
-  backwardDifferenceEdge
-    (zeroPaddedBackwardDifference coefficient count) (count + 1) index
-
-/-- The annular Hodge owner's second difference is the difference carried by that second edge. -/
-theorem secondDifference_isEdgeDifference
-    (coefficient : ℕ → ℂ) (count index : ℕ) :
-    zeroPaddedSecondDifference coefficient count index =
-      (secondDifferenceEdge coefficient count index).difference := by
-  rfl
-
-/-- Two Abel passages integrate the actual second-difference edge population through the character
-receiver.  The right side is the same original coefficient population multiplied by the squared
-character difference. -/
-theorem characterWeightedSecondEdges_integrate
-    (coefficient : ℕ → ℂ) (z : ℂ) (count : ℕ) :
-    (∑ index ∈ Finset.range (count + 2),
-        (secondDifferenceEdge coefficient count index).difference * z ^ index) =
-      (1 - z) ^ 2 *
-        ∑ index ∈ Finset.range count, coefficient index * z ^ index := by
-  simpa only [← secondDifference_isEdgeDifference] using
-    finiteCharacterSynthesis_zeroPaddedSecondDifference coefficient z count
-
-end AnnularHodge
-
 end Soma.Holonics.Millennium.HolonicDifferenceCalculus
 
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.OrientedEdge.difference_reverse
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.OrientedEdge.nonzeroReceiverDifference_isPolarized
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.swingDifference_isEulerHalfTurn
+#print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.productDifference_leftThenRight
+#print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.productDifference_pathInterchange
+#print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.productDifference_sourceLinearizationWithRemainder
+#print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.squareDifference_isDifferenceTimesSum
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.receiver_commutes_iteratedDifference
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.secondDifference_affinePath
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.transportDifference_eq_zero_iff_fixed
@@ -349,4 +351,3 @@ end Soma.Holonics.Millennium.HolonicDifferenceCalculus
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.modularDifference_eq_zero_iff_modEq
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.modularReceiver_reopensIntegralDifference
 #print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.localDifference_globalBoundary_areAdjoint
-#print axioms Soma.Holonics.Millennium.HolonicDifferenceCalculus.AnnularHodge.characterWeightedSecondEdges_integrate

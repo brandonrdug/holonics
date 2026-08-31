@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1560px; height: 1100px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">The ten references and what each lends</div>
+      <div class="sub">data types and machinery conventions extracted, then retyped as holonic faces</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: paperproof · MorphoHDL · OpenSCAD · SolveSpace · KiCad · FreeCAD · LibreCAD · GElectrical · QElectroTech · circuitikz (reports 2026-08-30)</div>
+  </div>
+<div class="col" style="gap:8px; flex: 1 1 auto; min-height: 0"><table class="tb2" style=""><thead><tr><th>reference</th><th>primary objects</th><th>identity</th><th>pipeline</th><th>lifted into the CAD as</th><th>not modelled (we add)</th></tr></thead><tbody><tr><td><b>paperproof</b> (69401f7)</td><td>ProofStep {goalBefore, goalsAfter, spawnedGoals, tacticDependsOn}; Box/Tactic; equivalentIds</td><td>Lean fvarId/mvarId, alias union</td><td>InfoTree walk → mctx diff → semantic edges → flat steps → pure converter</td><td>the trace face: boxes, read-towards-the-middle, assignment-driven edges, orphan = side quest</td><td>term mode, assignment history, elaboration order, rewrite locus</td></tr><tr><td><b>MorphoHDL</b> (dc8dd2e)</td><td>cellDef {ssa, fallback}; SoA cells/pins/nets; registry name:[sig]</td><td>append-only index, active flag, parent lineage</td><td>materialize on demand → local rewrite per step → const-prop/DCE worklists → force layout</td><td>component = rule + fallback; width inferred; geometry co-grows by division; order-independent growth</td><td>timing, physical law, 3D, cycles/state, exact arithmetic</td></tr><tr><td><b>OpenSCAD</b> (1c9ee2b)</td><td>AST (Expression, ModuleInstantiation, LocalScope); AbstractNode tree; CSG term; Value variants</td><td>idx reset per compile; modinst → syntax</td><td>parse → evaluate → CSG → Goldfeather normalize → geometry (Manifold/CGAL) → preview/render</td><td>program-as-model; ! # % * modifiers; customizer from top-level literals + comments; $preview split; text dump is the interchange</td><td>state, constraints, assemblies, stable topology names, doubles only</td></tr><tr><td><b>SolveSpace</b> (3297d9a)</td><td>Request → Entity → Param; Constraint → Equation{Expr}; Group; SolveResult</td><td>handles: request&lt;&lt;16 | idx; persisted remap</td><td>requests generate; equations; substitution; symbolic Jacobian; rank/DOF; leave-one-out; free params</td><td>declared vs generated; sequential groups; type-blind solver; four result states; soft drag; charts as entities</td><td>doubles; 2048 unknowns; no exact carrier</td></tr><tr><td><b>KiCad</b> (master, kicad_sch 20250114)</td><td>SCH_SYMBOL/LIB_SYMBOL/SCH_PIN with ELECTRICAL_PINTYPE; SCH_LINE wire/bus; SCH_LABEL kinds; SCH_SHEET + sheet pins; CONNECTION_GRAPH; BOARD/FOOTPRINT/PAD/NET</td><td>KIID uuid per item; sheet-path instance references</td><td>geometry + labels → connection graph → nets → ERC matrix; netlist; SPICE via Sim.* fields; DRC rules language</td><td>symbol · footprint · 3D triple; typed pins + PIN_ERROR matrix + drive lattice make contact checkable; per-path identity (KIID_PATH, SCH_SYMBOL_INSTANCE); nets derived by a PRIORITY driver lattice; netclass attributes carry their source; COMMIT stages pre-images</td><td>no dynamics (only SPICE export), no solver, undirected nets, fields are strings, 2.5D</td></tr><tr><td><b>FreeCAD</b> (main 3b2c969)</td><td>DocumentObject + typed Property catalogue; DepEdge; ExpressionEngine; Sketcher Constraint (22 types) → planegcs (37); TopoShape names</td><td>Name vs Label; topological naming (IndexedName / MappedName)</td><td>buildDependencyList → topological sort → expressions(non-output) → execute → expressions(output); DogLeg/LM/BFGS; diagnose DOF/conflicting/redundant</td><td>everything is a node with typed properties in a recomputed DAG; expressions with units; links with scope; errors as data on the node</td><td>exactness; provenance-stable names are the hard problem</td></tr><tr><td><b>LibreCAD</b> (master a05b426)</td><td>RS_Entity hierarchy (50 types) with Data structs; RS_EntityContainer; RS_Layer; RS_Block/RS_Insert; RS_Pen ByLayer/ByBlock</td><td>immortal undoables with a deleted flag</td><td>action = state machine on coordinate/command events; snapper bitmask; RS_Information intersections; RS_Modification statics</td><td>actions resumable and scriptable; snapping as nearest-candidate with evidence; blocks as parameterless instancing</td><td>3D, constraints, semantics</td></tr><tr><td><b>GElectrical</b> (47082c7)</td><td>ElementModel {ports, fields{value,type}, schem_model, text_model, res_fields}; get_nodes; get_power_model</td><td>code registry; gnodes derived</td><td>port coincidence → connected components → networkx graph → pandapower → results as elements</td><td>element = glyph + terminals + typed record + projections; results typed like inputs; rules as data over the derived graph</td><td>exactness; schema lives in code</td></tr><tr><td><b>QElectroTech</b> (899f105)</td><td>element XML (primitives, terminals, kindInformations, link_type); Conductor between terminal uuids; Diagram folio grid; CrossRefItem</td><td>QUuid per element/terminal/conductor; master/slave, next/previous report</td><td>potential by DFS at query time; formula autonumbering propagated over the potential; %f-%l%c grid addresses</td><td>link types = identity across folios; cross-reference glyphs from grid addresses; collections common:// custom:// embed://</td><td>simulation; semantics beyond documentation</td></tr><tr><td><b>circuitikz</b> (b882b15)</td><td>\pgfcircdeclarebipolescaled {class, anchors, extents, drawing}; node shapes with named anchors; v/i/f decorations</td><td>names per path (random if absent)</td><td>to-path: midpoint node rotated to the path, leads to .left/.right, decorations in the local frame; subcircuit anchors pre-measured</td><td>path-style vs node-style; typed oriented decorations; style as a key hierarchy separate from geometry; subcircuits placed by any anchor</td><td>no model at all — a codec</td></tr></tbody></table><div class="note" style="">Grades: every cell is <span class='mono'>source-inspected</span> testimony from sparse read-only clones taken 2026-08-30 (commits in parentheses); KiCad cells cite common/pin_type.h, erc_settings.cpp, connection_graph.h, kiid.h and the dev-docs s-expression pages. The right two columns are <span class='mono'>interpretation</span>: what this design lifts, and what it must add because the reference stops there.</div></div>
+</div>
+</x-dc>
+</body>
+</html>

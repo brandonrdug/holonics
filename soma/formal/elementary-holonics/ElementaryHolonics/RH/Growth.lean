@@ -165,7 +165,7 @@ theorem theWeightHasGammaGrowth :
   · -- the tail is Euler's integral
     have hint : IntegrableOn (fun t : ℝ => t ^ (σ - 1) * Real.exp (-(p * t))) (Ioi 0) := by
       have h := integrableOn_rpow_mul_exp_neg_mul_rpow (p := 1) (s := σ - 1) (b := p)
-        (by linarith) le_rfl hp
+        (by linarith) (by norm_num) hp
       simpa using h
     have hsub : Ici (1:ℝ) ⊆ Ioi (0:ℝ) := by
       intro t ht

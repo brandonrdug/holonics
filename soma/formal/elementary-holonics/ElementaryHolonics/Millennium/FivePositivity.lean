@@ -275,8 +275,8 @@ private lemma integral_linear_expNeg {β : ℝ} (hβ : 0 < β) :
     have h3 : HasDerivAt (fun t : ℝ => t / β + 1 / β ^ 2) (1 / β) x := by
       simpa using ((hasDerivAt_id x).div_const β).add_const (1 / β ^ 2)
     have h4 := (h3.mul h2).neg
-    convert h4 using 1
-    field_simp
+    convert h4 using 1 <;> try rfl
+    field_simp [ne_of_gt hβ]
     ring
   have htend : Filter.Tendsto (fun t : ℝ => -((t / β + 1 / β ^ 2) * rexp (-β * t)))
       Filter.atTop (nhds 0) := by

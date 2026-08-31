@@ -219,14 +219,21 @@ noncomputable def jointSpacetimeSmoothnessUpgradeOfWeightedClassicalRestartCarri
   refine
     { velocitySmooth := ?_
       pressureSmooth := ?_ }
-  · simpa only [Function.uncurry, weightedClassicalRestartVelocity] using
-      contDiffOn_infty_joint_weightedReconstructedVelocity
-        hT carrier.tower (Real.toNNReal nu) (real_toNNReal_pos hnu)
-        initial hfixed carrier.fourierReal
-  · simpa only [Function.uncurry, weightedClassicalRestartPressure] using
-      contDiffOn_infty_joint_weightedReconstructedPressure
-        hT carrier.tower (Real.toNNReal nu) (real_toNNReal_pos hnu)
-        initial hfixed carrier.fourierReal
+  · change ContDiffOn ℝ ((↑(⊤ : ℕ∞)) : WithTop ℕ∞)
+      (fun z : Space × ℝ ↦
+        NavierStokesWeightedMildSpacetimeMomentum.weightedReconstructedVelocity
+          hT carrier.path z.2 z.1)
+      (openSpaceTimeSlab (weightedRestartTimeFromCap nu cap))
+    exact contDiffOn_infty_joint_weightedReconstructedVelocity
+      hT carrier.tower (Real.toNNReal nu) (real_toNNReal_pos hnu)
+      initial hfixed carrier.fourierReal
+  · change ContDiffOn ℝ ((↑(⊤ : ℕ∞)) : WithTop ℕ∞)
+      (fun z : Space × ℝ ↦
+        weightedReconstructedPressure hT carrier.path z.2 z.1)
+      (openSpaceTimeSlab (weightedRestartTimeFromCap nu cap))
+    exact contDiffOn_infty_joint_weightedReconstructedPressure
+      hT carrier.tower (Real.toNNReal nu) (real_toNNReal_pos hnu)
+      initial hfixed carrier.fourierReal
 
 /-! ## The official one-face restart adapter -/
 
@@ -265,7 +272,11 @@ noncomputable def interiorPeriodicRestartOfUniformCoordinateBound
       restartSolution := ?_ }
   have hinitial := weightedClassicalRestartInitial_interiorSliceWeightedH3
     solution hinterior
-  simpa only [hinitial, shiftVelocityField, Pi.zero_apply] using hlocal
+  have hforce : shiftVelocityField (0 : VelocityField) t = 0 := by
+    funext x τ
+    rfl
+  rw [hforce]
+  simpa only [hinitial] using hlocal
 
 /-- A single uniform coordinate bound therefore supplies one common cap-selected restart radius
 at every controlled tail face. -/

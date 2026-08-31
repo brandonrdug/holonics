@@ -292,7 +292,13 @@ theorem tendsto_infinitePeriodicHeatEvolution_zero_time
         (periodicFourierRepresentation field))) :=
     periodicFourierRepresentation.symm.continuous.tendsto _
   have hreturn := houter.comp hcoeff
-  simpa [infinitePeriodicHeatEvolution] using hreturn
+  rw [periodicFourierRepresentation.symm_apply_apply] at hreturn
+  change Tendsto
+    (periodicFourierRepresentation.symm ∘
+      (fun t : ℝ≥0 ↦
+        infiniteHeatCoefficientEvolution nu t (periodicFourierRepresentation field)))
+    (𝓝 0) (𝓝 field)
+  exact hreturn
 
 #print axioms periodicSobolevThreeSquaredEnergy_infiniteHeat_le
 #print axioms infiniteHeatPeriodicSobolevThreeEvolution_add

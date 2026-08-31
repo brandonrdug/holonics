@@ -1,0 +1,517 @@
+[
+  {
+    "name": "globular set",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "underlying_diagram": "sequence Xn of sets, n in N, with s,t: X(n+1) -> X(n)",
+      "category": "presheaf category [G^op, Set], cartesian",
+      "used_for": "underlying graph of a strict omega-category (I.1.3(h))"
+    },
+    "equations": ["ss = st", "ts = tt : X(n+1) -> X(n-1)"],
+    "page": 15,
+    "quote": "A globular set is a diagram ... in Set satisfying the 'globularity equations' ss = st and ts = tt : Xn+1 → Xn−1."
+  },
+  {
+    "name": "strict omega-category (informal structure)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "underlying": "globular set X",
+      "composition": "binary composition X(n) x_{X(k)} X(n) -> X(n) for each n>=k",
+      "identity": "X(k) -> X(n)",
+      "laws": "strict associativity, identity, interchange"
+    },
+    "equations": [],
+    "page": 34,
+    "quote": "a strict ω-category consists of a globular set X and for each n ≥ k a binary composition function X(n) ×X(k) X(n) → X(n) and an identity function X(k) → X(n)"
+  },
+  {
+    "name": "n-stage tree",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "shape_category": "Delta (finite ordinals)",
+      "diagram": "tau(n) -> tau(n-1) -> ... -> tau(1) -> tau(0) = 1",
+      "boundary": "d(tau) obtained by truncating/removing top-stage nodes",
+      "role": "combinatorial presentation of n-globs, indexes Batanin-style composition"
+    },
+    "equations": [],
+    "page": 38,
+    "quote": "we may define an n-stage tree (n∈N) to be a diagram τ(n) ✲ τ(n − 1) ✲ ··· ✲ τ(1) ✲ τ(0) = 1 in the category ∆ of all finite ordinals."
+  },
+  {
+    "name": "cubical set (n-cubical set)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "index_category_Cuben": "objects: subsets D of {0,...,n-1}; maps D->D': inclusion plus function D'\\D -> {0,1} (0=source,1=target)",
+      "definition": "n-cubical set = functor Cube_n^op -> Set",
+      "2d_unpacking": "X_empty=0-cells, X{0}=horizontal 1-cells, X{1}=vertical 1-cells, X{0,1}=2-cells",
+      "faces_degeneracies": "coded by inclusions D subset D' with {0,1}-labelled complement, i.e. face/coface data; no degeneracy or connection maps are separately axiomatized",
+      "connections": "not present; survey states the cubical contraction/lax theory 'has not, as far as I know, been carried out'"
+    },
+    "equations": [],
+    "page": 45,
+    "quote": "we define an n-cubical set to be a functor Cuben op ✲ Set."
+  },
+  {
+    "name": "simplicial structure (nerve / simplicial category, not independently axiomatized)",
+    "kind": "notation",
+    "dimension": null,
+    "data": {
+      "role_1": "category = finite-limit-preserving functor Delta^op -> Set (nerve correspondence)",
+      "role_2": "Delta arises as free (Set/S1,T1)-structured category on the terminal multicategory 1",
+      "caveat": "no simplicial identities or simplicial-set axioms are transcribed anywhere in the source"
+    },
+    "equations": [],
+    "page": 29,
+    "quote": "A category is a finite-limit-preserving functor ∆op ✲ Set. In [Tam], a lax n-category is a functor (∆n)op ✲ Set satisfying three axioms."
+  },
+  {
+    "name": "opetope",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "S0": "1 (unique 0-opetope, drawn as a dot)",
+      "S1": "1 (unique 1-opetope, dot to dot)",
+      "S2": "N (2-opetopes indexed by natural numbers, k-fold pasting)",
+      "recursion": "(S(n+1) -> S(n)) = T_n(S(n) ->id S(n)); T(n+1) = free (Set/Sn,Tn)-operad monad on Set/S(n+1)",
+      "convention": "top edges of an n-opetope are inputs, bottom edge is output"
+    },
+    "equations": [],
+    "page": 64,
+    "quote": "In a nutshell, there is one 0-opetope and an (n + 1)-opetope is a pasting of n-opetopes."
+  },
+  {
+    "name": "opetope set construction Sn, Tn",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "S0_T0": "S0 = 1, T0 = id, the identity monad on Set ≅ Set/S0",
+      "inductive_step": "given (Sn,Tn) cartesian satisfying I.5 conditions, define Sn+1 via the terminal object construction and Tn+1 as free (Set/Sn,Tn)-operad monad",
+      "outputs": "sequence (Set/Sn, Tn) of cartesian monads, one per dimension"
+    },
+    "equations": [],
+    "page": 65,
+    "quote": "Start with S0 = 1 and T0 = id , the identity monad on Set∼=Set/S0"
+  },
+  {
+    "name": "pasting diagram (n-pasting diagrams, PDn / pdn)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "PDn": "free (Set/Sn,Tn)-structured category on the terminal (Set/Sn,Tn)-multicategory",
+      "pdn": "image of PDn under forgetful functor (Set/Sn,Tn)-Struc -> Cat",
+      "objects_of_pdn": "S(n+1), the (n+1)-opetopes / n-pasting diagrams",
+      "morphisms": "removal of (n-1)-dimensional interior faces (replacement of sub-diagrams by their bounding opetope)",
+      "special_cases": "pd0 = 1, pd1 = Delta, pd2 = category of trees"
+    },
+    "equations": [],
+    "page": 70,
+    "quote": "The structured category of n-pasting diagrams, PDn , is the free (Set/Sn , Tn )-structured category on the terminal (Set/Sn , Tn )-multicategory."
+  },
+  {
+    "name": "category of trees (pd2)",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "objects": "trees = members of S3 = 2-pasting diagrams",
+      "morphisms": "contraction of internal (non-leaf) edges",
+      "identification": "tree defined as 2-pasting diagram, isomorphic to the free-multicategory tree set 1* of I.1.3(f)"
+    },
+    "equations": [],
+    "page": 71,
+    "quote": "We may define a tree to be a 2-pasting diagram: that is, a member of S3."
+  },
+  {
+    "name": "bicategory (basic notation)",
+    "kind": "notation",
+    "dimension": 2,
+    "data": {
+      "0-cells": "A, B, ... drawn as dots",
+      "1-cells": "f, g, ... drawn as arrows between 0-cells",
+      "2-cells": "alpha, beta, ... drawn as double arrows between parallel 1-cells",
+      "vertical_composite": "beta-circ-alpha or beta-alpha",
+      "horizontal_composite": "alpha'-star-alpha",
+      "coherence_note": "pentagon and triangle diagrams are never displayed; basic definitions cited to Benabou and Gray without restatement"
+    },
+    "equations": [],
+    "page": 6,
+    "quote": "We will typically denote 0-cells of a bicategory B by A, B, . . . , 1-cells by f , g, . . . and 2-cells by α, β, . . ."
+  },
+  {
+    "name": "bicategory pentagon axiom",
+    "kind": "axiom",
+    "dimension": 2,
+    "data": {
+      "status": "not displayed in this survey",
+      "citation": "basic bicategory definitions attributed to [Ben] and [Gray] without restating pentagon"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "The basic definitions are taken from [Bén] and [Gray], and the outline of the coherence theorem from [St2] and [GPS]."
+  },
+  {
+    "name": "bicategory triangle axiom",
+    "kind": "axiom",
+    "dimension": 2,
+    "data": {
+      "status": "not displayed in this survey",
+      "citation": "basic bicategory definitions attributed to [Ben] and [Gray] without restating triangle/unit law"
+    },
+    "equations": [],
+    "page": null,
+    "quote": "The basic definitions are taken from [Bén] and [Gray], and the outline of the coherence theorem from [St2] and [GPS]."
+  },
+  {
+    "name": "unbiased category / bicategory coherence axiom",
+    "kind": "axiom",
+    "dimension": null,
+    "data": {
+      "data_cA": "function cA: C(An-1,An) x ... x C(A0,A1) -> C(A0,An) for each sequence of objects",
+      "1-terms": "class of functions generated from the cA's by binary/nullary products and composition",
+      "axiom": "any two parallel 1-terms are equal",
+      "purpose": "survey's unbiased substitute for finite pentagon/triangle axiomatization"
+    },
+    "equations": ["s = t : C(An-1,An) x ... x C(A0,A1) -> C(A0,An), for any two 1-terms s,t"],
+    "page": 9,
+    "quote": "The axioms are that if ... s, t: C(An−1 , An ) × · · · × C(A0 , A1 ) ✲ C(A0 , An ) are two 1-terms, then s = t."
+  },
+  {
+    "name": "monad in a bicategory",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "data": "0-cell A, 1-cell t: A->A, 2-cells eta: 1 -> t, mu: t.t -> t",
+      "axioms": "unit and associativity squares for eta, mu commute",
+      "role": "the general definitional device used to define (S,*)-multicategories"
+    },
+    "equations": ["t∘1 ≅ t∘t ≅ 1∘t via tη, ηt (unit law)", "t∘(t∘t) ≅ (t∘t)∘t → t∘t → t via tµ, µt, µ (associativity)"],
+    "page": 8,
+    "quote": "A monad in a bicategory consists of a 0-cell A, a 1-cell A ✲ A, and 2-cells [η,µ] ... such that the diagrams [unit, associativity] commute."
+  },
+  {
+    "name": "tricategory (biased, GPS-style)",
+    "kind": "definition",
+    "dimension": 3,
+    "data": {
+      "objects": "collection T0",
+      "hom_bicategories": "T(A,B) for each pair A,B",
+      "composition": "homomorphisms T(B,C) x T(A,B) -> T(A,C) and 1 -> T(A,A)",
+      "coherence": "various coherence cells satisfying axioms (not transcribed, deferred to [GPS])"
+    },
+    "equations": [],
+    "page": 56,
+    "quote": "A tricategory T consists of a collection T0 of objects, a bicategory T (A, B) for each pair (A, B) of objects, composition and identity homomorphisms"
+  },
+  {
+    "name": "Gray-category",
+    "kind": "definition",
+    "dimension": 3,
+    "data": {
+      "definition": "algebras for the 3-operad Gy",
+      "Gy_construction": "Gy(tau) = Ssq(tau) for n in {0,1,2}; Gy(tau) = Ssq(d tau) x Ssq(d tau) for n=3",
+      "underlying_graph": "3-globular set",
+      "non_canonical_step": "turning Gray-category into tricategory requires choosing one of two horizontal composites for 2-cells"
+    },
+    "equations": ["β∗α := βf′∘gα  (chosen horizontal composite, non-canonical)"],
+    "page": 53,
+    "quote": "Gray-categories are defined to be algebras for the 3-operad Gy. This in turn is defined to be the 3-operad got by taking the 2-operad Ssq and contracting from dimension 2 to dimension 3."
+  },
+  {
+    "name": "sesquicategory",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "data": "category C and factorization C^op x C -> Cat over ob: Set (Hom)",
+      "0-cells": "objects of C",
+      "1-cells": "morphisms of C",
+      "2-cells": "morphisms of C(A,B)",
+      "missing_structure": "no specified horizontal composite of 2-cells (unlike a 2-category)"
+    },
+    "equations": [],
+    "page": 49,
+    "quote": "for each pair of objects A, B∈C0 there is a category C(A, B) whose objects are the morphisms from A to B."
+  },
+  {
+    "name": "cartesian monad",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "cartesian_category": "has all finite limits (Def I.1.1)",
+      "cartesian_monad_condition_a": "eta and mu are cartesian natural transformations (naturality squares are pullbacks)",
+      "cartesian_monad_condition_b": "(-)* preserves pullbacks",
+      "role": "the (S,*) machine underlying globular sets, cubical sets and opetope sets alike"
+    },
+    "equations": [],
+    "page": 12,
+    "quote": "A monad (( )∗ , η, µ) on a category S is called cartesian if a. η and µ are cartesian natural transformations ... and b. ( )∗ preserves pullbacks."
+  },
+  {
+    "name": "(S,*)-multicategory (generalized/T-multicategory)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "input": "cartesian pair (S, *) (a cartesian category and cartesian monad)",
+      "kleisli_bicategory_B": "0-cells: objects of S; 1-cells R->S: spans R* <- A -> S; composed via chosen pullbacks (Construction I.2.1)",
+      "definition": "an (S,*)-multicategory is a monad in B",
+      "concrete_data": "diagram C0* <-d C1 ->c C0 in S plus maps ids: C0->C1, comp: C1 o C1 -> C1",
+      "one_object_case": "(S,*)-operad",
+      "terminology_note": "the term 'T-multicategory' does not occur in this survey; its own uniform name is (S,*)-multicategory"
+    },
+    "equations": [],
+    "page": 17,
+    "quote": "an (S, ∗ )-multicategory is a monad in the associated bicategory B of Construction I.2.1."
+  },
+  {
+    "name": "fc-multicategory (not present in this survey)",
+    "kind": "notation",
+    "dimension": null,
+    "data": {
+      "status": "the term 'fc-multicategory' does not occur anywhere in this text",
+      "closest_analogue": "the general (S,*)-multicategory of Definition I.2.2, instantiated at various (S,*) including (Cat, free strict monoidal category)"
+    },
+    "equations": [],
+    "page": 17,
+    "quote": "an (S, ∗ )-multicategory is a monad in the associated bicategory B of Construction I.2.1."
+  },
+  {
+    "name": "plain multicategory",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "objects": "collection C0",
+      "arrows": "s1,...,sn -> s for s1,...,sn,s in C0",
+      "laws": "composition functions and identity elements obeying associativity and unit laws",
+      "identified_as": "(Set, free monoid)-multicategory"
+    },
+    "equations": [],
+    "page": 11,
+    "quote": "The simplest kind of multicategory consists of a collection C0 of objects, and arrows like s1 , . . . , sn ✲ s, together with composition functions and identity elements obeying associativity and unit laws."
+  },
+  {
+    "name": "plain operad",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "data": "sequence of sets C(0), C(1), ... plus identity element of C(1)",
+      "composition": "C(n1) x ... x C(nk) x C(k) -> C(n1+...+nk)",
+      "laws": "associativity and identity",
+      "identified_as": "one-object plain multicategory"
+    },
+    "equations": [],
+    "page": 11,
+    "quote": "The simplest kind of operad—a plain operad —consists of a sequence C(0), C(1), . . . of sets together with an 'identity' element of C(1) and 'composition' functions"
+  },
+  {
+    "name": "Batanin operad (as (S,*)-operad on globular sets)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "S": "globular sets",
+      "star": "free strict omega-category monad",
+      "identification": "Batanin's operads and algebras are exactly (S,*)-operads/algebras for this (S,*)"
+    },
+    "equations": [],
+    "page": 40,
+    "quote": "if S is the category of globular sets and ∗ the free strict ω-category monad, then (S, ∗ )-operads and their algebras are what Batanin calls operads and algebras."
+  },
+  {
+    "name": "contraction on a collection",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "matching_pair": "(f,f') for tree sigma with s(f)=s(f') and t(f)=t(f')",
+      "contraction_function": "psi assigning to each tau in Tr(n), n>=1, and matching pair (f,f') for d(tau), an element psi(f,f') in C(tau)",
+      "role": "formalizes the 'contraction principle' of II.1 generating operad K"
+    },
+    "equations": ["s(ψ(f,f′)) = f", "t(ψ(f,f′)) = f′"],
+    "page": 44,
+    "quote": "A contraction ψ on C is a function assigning to each τ ∈Tr(n) and matching pair (f, f ′ ) for ∂τ , an element ψ(f, f ′ )∈C(τ )..."
+  },
+  {
+    "name": "lax (weak) n-category / lax omega-category, Batanin-style (Leinster's variant)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "operad_K": "the initial operad-with-contraction on globular sets",
+      "lax_omega_category": "an algebra for K",
+      "lax_n_category": "a lax omega-category whose underlying globular set is n-dimensional",
+      "n_dimensional_condition": "for all m>=n, s=t: X(m+1)->X(m) is an isomorphism",
+      "note": "author now prefers the term 'weak n-category' (preface, 2001)"
+    },
+    "equations": [],
+    "page": 44,
+    "quote": "A lax ω-category is an algebra for K. A lax n-category is a lax ω-category whose underlying globular set is n-dimensional."
+  },
+  {
+    "name": "Tamsamani-Simpson weak n-category (described, not fully defined)",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "shape": "functor (Delta^n)^op -> Set",
+      "axiom_1": "truncatability",
+      "axiom_2": "generalization of the finite-limit-preserving condition",
+      "axiom_3": "a degeneracy condition analogous to a 2-category being a double category with degenerate graph",
+      "status": "described only in prose; formal statement not given, per the survey's own admission"
+    },
+    "equations": [],
+    "page": 29,
+    "quote": "In [Tam], a lax n-category is a functor (∆n )op ✲ Set satisfying three axioms. ... The present author's ignorance prevents further discussion."
+  },
+  {
+    "name": "opetopic (Baez-Dolan/Hermida-Makkai-Power) weak n-category approach",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "status": "the survey builds only the supporting combinatorics (opetopes, pasting diagrams, trees, slicing) and declines to restate the n-category definition itself",
+      "components_built": "Sn/Tn opetope sets, PDn/pdn pasting-diagram categories, slice multicategory C+"
+    },
+    "equations": [],
+    "page": 4,
+    "quote": "There is no attempt to describe the opetopic approach as a whole; the theory of Chapter I seems less well suited to this style than to Batanin's."
+  },
+  {
+    "name": "slicing / slice multicategory C+",
+    "kind": "definition",
+    "dimension": null,
+    "data": {
+      "input": "a multicategory C (Baez-Dolan operad)",
+      "output_C_plus": "multicategory whose algebras are multicategories on C0 over C",
+      "two_step_construction": "1. slice a multicategory D by an algebra E to get D_E with Alg(D_E) = Alg(D)/E; 2. build the S-multicategory-multicategory whose algebras are multicategories on S",
+      "level_shift": "C an (S,*)-multicategory implies C+ is an (S',#)-multicategory one level up (unlike Baez-Dolan's same-level C+, which needs symmetric group actions)"
+    },
+    "equations": [],
+    "page": 73,
+    "quote": "Given a multicategory C, they construct a multicategory C + whose algebras are multicategories on C0 over C."
+  },
+  {
+    "name": "interchange law",
+    "kind": "axiom",
+    "dimension": 2,
+    "data": {
+      "context": "two ways of composing a square built from do-nothing (0-cells) and ordinary composition (1-cells) operations",
+      "statement": "the two composites of a 2x2 square of 2-cells (compose rows then columns, or columns then rows) agree"
+    },
+    "equations": [],
+    "page": 33,
+    "quote": "putting these together gives two different ways of composing ... familiar from the interchange law."
+  },
+  {
+    "name": "double category",
+    "kind": "definition",
+    "dimension": 2,
+    "data": {
+      "definition": "a category object in Cat",
+      "cells": "0-cells A, horizontal 1-cells f, vertical 1-cells p, 2-cells alpha",
+      "laws": "strict associativity, identity, interchange for both 1-cell compositions and 2-cell composition",
+      "degeneracy": "a 2-category is a double category in which all vertical 1-cells are identities"
+    },
+    "equations": [],
+    "page": 44,
+    "quote": "A double category may be defined as a category object in Cat."
+  },
+  {
+    "name": "1* : free strict omega-category on the terminal globular set 1",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "n_glob": "a globular diagram representing an element of 1*(n)",
+      "typical_2_glob": "a labelled 2-dimensional pasting shape (diagram II.C)",
+      "correspondence": "elements of 1*(n) correspond one-to-one with n-stage trees"
+    },
+    "equations": [],
+    "page": 36,
+    "quote": "Having described 1∗ as a globular set, we next turn to its strict ω-category structure: in other words, how globs may be composed."
+  },
+  {
+    "name": "terminal multicategory / operad 1 and free monoidal category Delta",
+    "kind": "example",
+    "dimension": null,
+    "data": {
+      "terminal_multicategory_1": "one object, and for each n in N one arrow of arity n",
+      "free_monoidal_category": "the free strict monoidal category on the terminal multicategory 1 is Delta, the category of finite ordinals, with + as tensor"
+    },
+    "equations": [],
+    "page": 26,
+    "quote": "the 'free' monoidal category on the multicategory 1 is ∆, the category of finite ordinals (including 0), with addition as ⊗."
+  },
+  {
+    "name": "operad Ssq for sesquicategories",
+    "kind": "example",
+    "dimension": 2,
+    "data": {
+      "generators": "one element of Ssq(tau) for each 1-stage tree and each 2-stage tree",
+      "relations": "the sesquicategory axioms of Figure III.a",
+      "role": "worked example of specifying an n-operad by generators and relations"
+    },
+    "equations": [],
+    "page": 51,
+    "quote": "The 2-operad Ssq, whose algebras are sesquicategories, is generated by a single element of Ssq(τ) for the tree τ taking any one of the values [1-stage and 2-stage trees]"
+  },
+  {
+    "name": "operad Gy for Gray-categories (worked example)",
+    "kind": "example",
+    "dimension": 3,
+    "data": {
+      "Gy_tau_low_dim": "Gy(tau) = Ssq(tau) for n in {0,1,2}",
+      "Gy_tau_dim3": "Gy(tau) = Ssq(d tau) x Ssq(d tau) for n=3"
+    },
+    "equations": ["Gy(τ) = Ssq(τ), n∈{0,1,2}", "Gy(τ) = Ssq(∂τ) × Ssq(∂τ), n = 3"],
+    "page": 53,
+    "quote": "for τ ∈Tr(n), Gy(τ) = Ssq(τ), n∈{0, 1, 2}, Gy(τ) = Ssq(∂τ) × Ssq(∂τ), n = 3."
+  },
+  {
+    "name": "periodic table of degenerate n-categories (not present in this survey)",
+    "kind": "table",
+    "dimension": null,
+    "data": {
+      "status": "no such table appears anywhere in this text; it is not a Leinster-0109021 construction",
+      "closest_statement": "prose remark that a lax n-category is a lax omega-category all of whose m-cells are identities when m>n"
+    },
+    "equations": [],
+    "page": 33,
+    "quote": "a lax n-category is a lax ω-category all of whose m-cells are identities when m > n."
+  },
+  {
+    "name": "small Gray(n)-category tower",
+    "kind": "table",
+    "dimension": null,
+    "data": {
+      "Gray0": "a set",
+      "Gray1": "a small category (subcategory of Set)",
+      "Gray2": "a small 2-category (sub-bicategory of Cat)",
+      "Gray3": "a small Gray-category (sub-tricategory of 2-Cat)",
+      "recursive_definition": "Gray(n+1)-category = small lax (n+1)-category strictly isomorphic to a sub-lax-(n+1)-category of Gray(n)-Cat"
+    },
+    "equations": [],
+    "page": 62,
+    "quote": "A small Gray(0) -category is a set. A small Gray(n+1) -category is a small lax (n + 1)-category strictly isomorphic to a sub-lax-(n + 1)-category of Gray(n) -Cat."
+  },
+  {
+    "name": "relation between globular and cubical shapes",
+    "kind": "convention",
+    "dimension": null,
+    "data": {
+      "structural_parallel": "cubical (S,*)-operads relate to cuboids exactly as Batanin (S,*)-operads relate to trees",
+      "unfinished_part": "no cubical analogue of 'contraction' (hence no lax n-tuple category) has been carried out"
+    },
+    "equations": [],
+    "page": 47,
+    "quote": "A Batanin operad associates to each tree a set... a cubical operad associates to each cuboid a set, and has composition functions corresponding to the composition of cuboids."
+  },
+  {
+    "name": "relation between trees, pasting diagrams, and opetopes",
+    "kind": "convention",
+    "dimension": 2,
+    "data": {
+      "trees_to_pasting_diagrams": "one-to-one correspondence between 2-pasting diagrams and trees (Figure IV.a)",
+      "3-opetope_to_2-pasting-diagram": "a 3-opetope is formally just a 2-pasting diagram",
+      "caveat": "the trees of pd2 are explicitly not the Batanin trees of Chapter II"
+    },
+    "equations": [],
+    "page": 71,
+    "quote": "there is a one-to-one correspondence between 2-pasting diagrams and trees ... The present trees are not the Batanin trees of Chapter II."
+  }
+]

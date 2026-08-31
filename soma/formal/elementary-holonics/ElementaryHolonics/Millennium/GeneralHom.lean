@@ -270,7 +270,7 @@ theorem theSecondFaceIsConservedAlongAChord (ha : a ≠ 0) (hab : a - b ≠ 0)
 
 private lemma someEq {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (E a b).Nonsingular x₁ y₁} {h₂ : (E a b).Nonsingular x₂ y₂} :
-    (Point.some h₁ : (E a b).Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : (E a b).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 lemma slotOne_ne (ha : a ≠ 0) (hb : b ≠ 0) (P : (E a b).Point) :
@@ -345,29 +345,29 @@ theorem theFaceIsAHomomorphismOnEveryFullTwoTorsionCurve
     have hc₁ := onCurve h₁
     have hc₂ := onCurve h₂
     have hyy : (y₂ - y₁) * (y₂ + y₁) = 0 := by linear_combination hc₂ - hc₁
-    have hsame : slotOne a b (Point.some h₂) = slotOne a b (Point.some h₁) := by
+    have hsame : slotOne a b (Point.some _ _ h₂) = slotOne a b (Point.some _ _ h₁) := by
       rw [slotOne_some, slotOne_some]
-    have hsame2 : slotTwo a b (Point.some h₂) = slotTwo a b (Point.some h₁) := by
+    have hsame2 : slotTwo a b (Point.some _ _ h₂) = slotTwo a b (Point.some _ _ h₁) := by
       rw [slotTwo_some, slotTwo_some]
     rcases mul_eq_zero.mp hyy with hcase | hcase
     · -- equal points: the double
-      have heq : (Point.some h₂ : (E a b).Point) = Point.some h₁ :=
+      have heq : (Point.some _ _ h₂ : (E a b).Point) = Point.some _ _ h₁ :=
         someEq rfl (by linarith)
       rw [hsame, hsame2, heq]
       obtain ⟨k1, k2⟩ :=
-        theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some h₁)
+        theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some _ _ h₁)
       exact ⟨sqcls_scale_sq k1 (slotOne_ne ha hb _),
         sqcls_scale_sq k2 (slotTwo_ne ha hab _)⟩
     · by_cases hy0 : y₁ = 0
-      · have heq : (Point.some h₂ : (E a b).Point) = Point.some h₁ :=
+      · have heq : (Point.some _ _ h₂ : (E a b).Point) = Point.some _ _ h₁ :=
           someEq rfl (by linarith)
         rw [hsame, hsame2, heq]
         obtain ⟨k1, k2⟩ :=
-          theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some h₁)
+          theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some _ _ h₁)
         exact ⟨sqcls_scale_sq k1 (slotOne_ne ha hb _),
           sqcls_scale_sq k2 (slotTwo_ne ha hab _)⟩
       · -- opposite points: the sum is the identity
-        have hzero : (Point.some h₁ : (E a b).Point) + Point.some h₂ = 0 :=
+        have hzero : (Point.some _ _ h₁ : (E a b).Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negY_eq]; linarith)
         rw [hsame, hsame2, hzero]
         exact ⟨sqcls_one_mul_self (slotOne_ne ha hb _),
@@ -384,11 +384,11 @@ theorem theFaceIsAHomomorphismOnEveryFullTwoTorsionCurve
     constructor
     · rw [slotOne_some, hX]
       rw [slotOne_some, slotOne_some] at *
-      exact sqcls_of_triple (slotOne_ne ha hb (Point.some h₁))
-        (slotOne_ne ha hb (Point.some h₂)) ht₁ hcons₁
+      exact sqcls_of_triple (slotOne_ne ha hb (Point.some _ _ h₁))
+        (slotOne_ne ha hb (Point.some _ _ h₂)) ht₁ hcons₁
     · rw [slotTwo_some, hX]
       rw [slotTwo_some, slotTwo_some] at *
-      exact sqcls_of_triple (slotTwo_ne ha hab (Point.some h₁))
-        (slotTwo_ne ha hab (Point.some h₂)) ht₂ hcons₂
+      exact sqcls_of_triple (slotTwo_ne ha hab (Point.some _ _ h₁))
+        (slotTwo_ne ha hab (Point.some _ _ h₂)) ht₂ hcons₂
 
 end Soma.Holonics.Millennium.GeneralHom

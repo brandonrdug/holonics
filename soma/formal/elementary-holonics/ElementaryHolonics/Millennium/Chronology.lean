@@ -199,7 +199,8 @@ theorem theGapCollapses {lo hi : β → ℝ} {l : Filter β} {L : ℝ}
     (hlo : Filter.Tendsto lo l (nhds L)) (hhi : Filter.Tendsto hi l (nhds L)) :
     Filter.Tendsto (constraintGap lo hi) l (nhds 0) := by
   have := hhi.sub hlo
-  simpa [constraintGap, sub_self] using this
+  change Filter.Tendsto (fun x => hi x - lo x) l (nhds 0)
+  simpa [sub_self] using this
 
 /-! ## 6. A closed triple forces its third transport
 

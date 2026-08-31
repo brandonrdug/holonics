@@ -45,7 +45,7 @@ theorem hasDerivAt_pressure_comp_curve
   apply hcomp.congr_deriv
   change fderiv ℝ pressure (curve s) (deriv curve s) =
     inner ℝ (gradient pressure (curve s)) (deriv curve s)
-  exact (inner_gradient_left hpressure).symm
+  exact inner_gradient_left.symm
 
 /-- **Exact pressure transport along an interval.**  The pressure-gradient integral along every
 admitted differentiable parameterization is exactly its endpoint pressure difference.  The
@@ -274,9 +274,14 @@ theorem hasDerivAt_half_normSq_velocityAlongLoop
     (loop.position t s) t ht
   have hcurrent := hvelocity.hasFDerivAt.comp_hasDerivAt s (loop.parameterized t ht s)
   have hnorm := (hcurrent.inner ℝ hcurrent).const_mul (2 : ℝ)⁻¹
-  convert hnorm using 1
-  simp only [movingGeometricIntegrand]
-  simp only [Function.comp_apply]
+  convert hnorm using 1 <;> try rfl
+  change inner ℝ (velocity (loop.position t s) t)
+      (fderiv ℝ (fun x ↦ velocity x t) (loop.position t s) (loop.tangent t s)) =
+    (2 : ℝ)⁻¹ *
+      (inner ℝ (velocity (loop.position t s) t)
+          (fderiv ℝ (fun x ↦ velocity x t) (loop.position t s) (loop.tangent t s)) +
+        inner ℝ (fderiv ℝ (fun x ↦ velocity x t) (loop.position t s)
+          (loop.tangent t s)) (velocity (loop.position t s) t))
   rw [real_inner_comm
     (velocity (loop.position t s) t)
     (fderiv ℝ (fun x ↦ velocity x t) (loop.position t s) (loop.tangent t s))]
@@ -316,7 +321,8 @@ theorem intervalIntegral_movingPressureIntegrand_eq_zero
     intro s
     have hcomp := hasDerivAt_pressure_comp_curve (fun x ↦ pressure x t)
       (loop.position t) s (hpressure s) (loop.parameterized t ht s).differentiableAt
-    simpa [movingPressureIntegrand, (loop.parameterized t ht s).deriv] using hcomp
+    simpa [movingPressureIntegrand, pressureGradientOneForm,
+      (loop.parameterized t ht s).deriv] using hcomp
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt
     (fun s _hs ↦ hderiv s) hintegrable]
   rw [loop.closed t]

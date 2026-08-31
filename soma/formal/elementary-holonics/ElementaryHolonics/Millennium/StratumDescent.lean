@@ -105,10 +105,10 @@ private lemma avoidP {x y : ℚ} (h : y ^ 2 = x ^ 3 - (p : ℚ) ^ 2 * x) (hy : y
   FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots (n := (p : ℚ)) h hy
 
 private lemma slotPOne_some {x y : ℚ} (h : (FamilyFace.E p).Nonsingular x y) :
-    FamilyFace.slotOne p (.some h) = if x = 0 then -(p : ℚ) ^ 2 else x := rfl
+    FamilyFace.slotOne p (.some x y h) = if x = 0 then -(p : ℚ) ^ 2 else x := rfl
 
 private lemma slotPTwo_some {x y : ℚ} (h : (FamilyFace.E p).Nonsingular x y) :
-    FamilyFace.slotTwo p (.some h) = if x = (p : ℚ) then 2 * (p : ℚ) ^ 2 else x - p := rfl
+    FamilyFace.slotTwo p (.some x y h) = if x = (p : ℚ) then 2 * (p : ℚ) ^ 2 else x - p := rfl
 
 /-! ## 3. The sign law on the stratum -/
 
@@ -1527,10 +1527,11 @@ private lemma nonsingularRightP (hp : p.Prime) :
   nlinarith [hppos]
 
 /-- The half-turn at zero on the stratum twist. -/
-def torsionZeroP (hp : p.Prime) : (FamilyFace.E p).Point := .some (nonsingularZeroP hp)
+def torsionZeroP (hp : p.Prime) : (FamilyFace.E p).Point := .some 0 0 (nonsingularZeroP hp)
 
 /-- The half-turn at the prime. -/
-def torsionRightP (hp : p.Prime) : (FamilyFace.E p).Point := .some (nonsingularRightP hp)
+def torsionRightP (hp : p.Prime) : (FamilyFace.E p).Point :=
+  .some p 0 (nonsingularRightP hp)
 
 private lemma face_zeroP (_hp : p.Prime) :
     Descent.SqCls (FamilyFace.slotOne p (0 : (FamilyFace.E p).Point)) 1 ∧
@@ -1541,10 +1542,10 @@ private lemma face_T0 (hp : p.Prime) :
     Descent.SqCls (FamilyFace.slotOne p (torsionZeroP hp)) (-1) ∧
     Descent.SqCls (FamilyFace.slotTwo p (torsionZeroP hp)) (-(p : ℚ)) := by
   constructor
-  · rw [show torsionZeroP hp = Point.some (nonsingularZeroP hp) from rfl,
+  · rw [show torsionZeroP hp = Point.some 0 0 (nonsingularZeroP hp) from rfl,
       slotPOne_some, if_pos rfl]
     exact ⟨(p : ℚ), pQ_ne hp, by ring⟩
-  · rw [show torsionZeroP hp = Point.some (nonsingularZeroP hp) from rfl,
+  · rw [show torsionZeroP hp = Point.some 0 0 (nonsingularZeroP hp) from rfl,
       slotPTwo_some, if_neg (fun hc => pQ_ne hp hc.symm), zero_sub]
     exact ⟨1, one_ne_zero, by ring⟩
 
@@ -1552,10 +1553,10 @@ private lemma face_Tp (hp : p.Prime) :
     Descent.SqCls (FamilyFace.slotOne p (torsionRightP hp)) (p : ℚ) ∧
     Descent.SqCls (FamilyFace.slotTwo p (torsionRightP hp)) 2 := by
   constructor
-  · rw [show torsionRightP hp = Point.some (nonsingularRightP hp) from rfl,
+  · rw [show torsionRightP hp = Point.some (p : ℚ) 0 (nonsingularRightP hp) from rfl,
       slotPOne_some, if_neg (pQ_ne hp)]
     exact ⟨1, one_ne_zero, by ring⟩
-  · rw [show torsionRightP hp = Point.some (nonsingularRightP hp) from rfl,
+  · rw [show torsionRightP hp = Point.some (p : ℚ) 0 (nonsingularRightP hp) from rfl,
       slotPTwo_some, if_pos rfl]
     exact ⟨(p : ℚ), pQ_ne hp, by ring⟩
 
@@ -1642,10 +1643,10 @@ theorem theStratumDescentIsComplete (hp : p.Prime) (h8 : p % 8 = 3) [Fact p.Prim
       obtain ⟨⟨d₁, hd₁, hc₁⟩, ⟨d₂, hd₂, hc₂⟩⟩ :=
         theSlotClassesAreSupportedOnTheStratum hp (by omega) hcurve hy
       have hsig := theSignsAgreeOnTheStratum hp hcurve hy hc₁ hc₂
-      have hs1 : Descent.SqCls (FamilyFace.slotOne p (Point.some hP)) d₁ := by
+      have hs1 : Descent.SqCls (FamilyFace.slotOne p (Point.some _ _ hP)) d₁ := by
         rw [slotPOne_some, if_neg hx0]
         exact hc₁
-      have hs2 : Descent.SqCls (FamilyFace.slotTwo p (Point.some hP)) d₂ := by
+      have hs2 : Descent.SqCls (FamilyFace.slotTwo p (Point.some _ _ hP)) d₂ := by
         rw [slotPTwo_some, if_neg hxp]
         exact hc₂
       clear hc₁ hc₂

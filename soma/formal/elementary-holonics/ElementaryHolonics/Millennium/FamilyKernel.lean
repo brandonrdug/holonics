@@ -36,19 +36,19 @@ open Soma.Holonics.Millennium.FamilyHalving
 vanishing coordinate. -/
 def slotOneAt (n : ℚ) : (FamilyFace.E n).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 0 then -n ^ 2 else x
+  | .some x _ _ => if x = 0 then -n ^ 2 else x
 
 /-- The second slot at modulus `n`: `x − n`, with the convention `(n−0)(n+n) = 2n²`
 at its vanishing coordinate. -/
 def slotTwoAt (n : ℚ) : (FamilyFace.E n).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = n then 2 * n ^ 2 else x - n
+  | .some x _ _ => if x = n then 2 * n ^ 2 else x - n
 
 private lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotOneAt n (.some h) = if x = 0 then -n ^ 2 else x := rfl
+    slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
 
 private lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotTwoAt n (.some h) = if x = n then 2 * n ^ 2 else x - n := rfl
+    slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 /-! ## 2. Point-level plumbing at every modulus -/
 
@@ -64,7 +64,7 @@ private lemma negYAt (n x y : ℚ) : (FamilyFace.E n).negY x y = -y := by
 
 private lemma someEqAt {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (FamilyFace.E n).Nonsingular x₁ y₁} {h₂ : (FamilyFace.E n).Nonsingular x₂ y₂} :
-    (Point.some h₁ : (FamilyFace.E n).Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 /-! ## 3. The halving, assembled through the group law -/
@@ -75,7 +75,7 @@ square-roots, the point `(u, v)` lies on the curve and doubles to `(r², −rst)
 private lemma halvingAt {n x₀ y₀ r s t : ℚ} (hn : 0 < n) (hr0 : r ≠ 0) (hs0 : s ≠ 0)
     (hs2 : s ^ 2 = r ^ 2 - n) (ht2 : t ^ 2 = r ^ 2 + n) (hx : x₀ = r ^ 2)
     (hy : y₀ = -(r * s * t)) (hP : (FamilyFace.E n).Nonsingular x₀ y₀) :
-    ∃ Q : (FamilyFace.E n).Point, Q + Q = Point.some hP := by
+    ∃ Q : (FamilyFace.E n).Point, Q + Q = Point.some _ _ hP := by
   have ht0 : t ≠ 0 := by
     intro hc
     rw [hc] at ht2
@@ -100,7 +100,7 @@ private lemma halvingAt {n x₀ y₀ r s t : ℚ} (hn : 0 < n) (hr0 : r ≠ 0) (
       intro hc
       apply hv0
       linarith
-  refine ⟨Point.some hQns, ?_⟩
+  refine ⟨Point.some _ _ hQns, ?_⟩
   have hyne : v ≠ (FamilyFace.E n).negY u v := by
     rw [negYAt]
     intro hc

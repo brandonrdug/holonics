@@ -59,7 +59,7 @@ theorem theAlternatingNondegenerateSpaceHasEvenDimension :
       rw [← Module.finrank_pos_iff (R := K)]
       omega
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
-    have hex : ¬ ∀ w, B v w = 0 := fun hall => hv (hnd v hall)
+    have hex : ¬ ∀ w, B v w = 0 := fun hall => hv (hnd.1 v hall)
     push_neg at hex
     obtain ⟨w0, hw0⟩ := hex
     obtain ⟨w, hvw⟩ : ∃ w, B v w = 1 :=
@@ -105,7 +105,7 @@ theorem theAlternatingNondegenerateSpaceHasEvenDimension :
       rw [hΦapp] at hx
       exact ⟨congrArg Prod.fst hx, congrArg Prod.snd hx⟩
     have halt' : B'.IsAlt := fun x => halt (x : V)
-    have hnd' : B'.Nondegenerate := by
+    have hleft' : ∀ x : W, (∀ z : W, B' x z = 0) → x = 0 := by
       intro x hx
       have hzero : ∀ z : V, B (x : V) z = 0 := by
         intro z
@@ -127,7 +127,16 @@ theorem theAlternatingNondegenerateSpaceHasEvenDimension :
         have hxy : B (x : V) (z - (B v z) • w - (-(B w z)) • v) = 0 := hx ⟨_, hy⟩
         simp only [map_sub, map_smul, smul_eq_mul] at hxy
         linear_combination hxy + (B v z) * hxw + (-(B w z)) * hxv
-      exact Subtype.ext (hnd (x : V) hzero)
+      exact Subtype.ext (hnd.1 (x : V) hzero)
+    have hskew' : ∀ x y : W, B' x y = -B' y x := by
+      intro x y
+      exact hskew (x : V) (y : V)
+    have hright' : ∀ y : W, (∀ x : W, B' x y = 0) → y = 0 := by
+      intro y hy
+      apply hleft' y
+      intro x
+      rw [hskew' y x, hy x, neg_zero]
+    have hnd' : B'.Nondegenerate := ⟨hleft', hright'⟩
     -- induct on the complement
     have hWrank : Module.finrank K W = n - 2 := by omega
     have hlt : n - 2 < n := by omega

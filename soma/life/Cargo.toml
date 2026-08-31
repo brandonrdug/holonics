@@ -28,9 +28,9 @@ libc = "0.2"
 hound = "3.5"
 num-bigint = "0.4"
 num-rational = "0.4"
+num-traits = "0.2"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
 
 [dev-dependencies]
-image = { version = "0.25.10", default-features = false, features = ["png"] }
-num-traits = "0.2"
 relational-geometry = { path = "../../crates/relational-geometry" }
 ron = "0.12"

@@ -266,6 +266,9 @@ impl ExactPathChart {
         self.incidences.len()
     }
 
+    // Shared by the inscription binaries that enact the exact event complex; some narrower
+    // receivers import this chart module only for its path measurements.
+    #[allow(dead_code)]
     pub(crate) fn complex(&self) -> EventComplex<'_> {
         EventComplex::new(&self.cells, &self.incidences, &self.ports)
             .expect("an immutable exact path retains its validated incidence")

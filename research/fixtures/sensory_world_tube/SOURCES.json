@@ -1,0 +1,60 @@
+{
+  "schema": "holonics-exterior-source-manifest-v1",
+  "truth_status": "measured",
+  "retrieved_at": "2026-08-28",
+  "purpose": "Bounded exterior acoustic and optical material for the Athena sensory world-tube campaign; dataset rows, transcripts, and labels are lineage and receiver controls, never native state classes or routing keys.",
+  "storage_root": "data/athena-sensory-world-tube",
+  "redistribution": "not_authorized_by_this_manifest",
+  "sources": [
+    {
+      "dataset": "hf-internal-testing/librispeech_asr_dummy",
+      "repository_uri": "https://huggingface.co/datasets/hf-internal-testing/librispeech_asr_dummy",
+      "revision": "5be91486e11a2d616f4ec5db8d3fd248585ac07a",
+      "split": "clean/validation",
+      "declared_rows": 73,
+      "declared_sampling_rate_hz": 16000,
+      "declared_modalities": ["audio", "text"],
+      "license_testimony": "absent_from_downloaded_dataset_card",
+      "local_files": [
+        {
+          "path": "librispeech_asr_dummy/clean/validation-00000-of-00001.parquet",
+          "bytes": 9192059,
+          "sha256": "4e69a06fa5edc90921e5e7e39a7084881f8b3ed9c805c574f4f39c6fde27c603"
+        },
+        {
+          "path": "librispeech_asr_dummy/README.md",
+          "bytes": 520
+        }
+      ]
+    },
+    {
+      "dataset": "uoft-cs/cifar10",
+      "repository_uri": "https://huggingface.co/datasets/uoft-cs/cifar10",
+      "revision": "0b2714987fa478483af9968de7c934580d0bb9a2",
+      "split": "plain_text/test",
+      "declared_rows": 10000,
+      "declared_image_extent": [32, 32],
+      "declared_modalities": ["image"],
+      "license_testimony": "unknown_on_dataset_card",
+      "local_files": [
+        {
+          "path": "cifar10-test/plain_text/test-00000-of-00001.parquet",
+          "bytes": 23940850,
+          "sha256": "841389e6f2d64f28bf17310e430aebac20ec3ba611a3c5e231dc93c645ce84de"
+        },
+        {
+          "path": "cifar10-test/README.md",
+          "bytes": 5157
+        }
+      ]
+    }
+  ],
+  "admission_boundary": {
+    "research_use_only": true,
+    "raw_payloads_git_ignored": true,
+    "row_boundaries_are_apparatus": true,
+    "labels_are_cold_testimony": true,
+    "transcripts_are_cold_testimony": true,
+    "target_receiver_may_not_select_cultivation": true
+  }
+}

@@ -1,5 +1,7 @@
 import ElementaryHolonics.Millennium.HolonicTerminalCurrent
+import ElementaryHolonics.Millennium.NavierStokesOpenLifespan
 import ElementaryHolonics.Millennium.NavierStokesVorticityThreeStrands
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 
 /-!
 # Exact terminal enstrophy current and its surviving exterior strand
@@ -97,6 +99,31 @@ theorem intervalEnstrophyCurrent_add_dissipation_eq_exterior
   unfold intervalCurrent stretchingForcingExteriorCurrent
   linear_combination -hfundamental
 
+/-- [definition] The periodic enstrophy receiver attached to the elementary interval boundary
+holon.  Its occurrence is an addressed time pair; the underlying carrier remains the same generic
+operation complex used by every receiver-valued interval current. -/
+def enstrophyIntervalHolon (velocity : VelocityField) :
+    Soma.Holonics.BoundaryHolon ℝ ℝ :=
+  intervalBoundaryHolon (periodicEnstrophy velocity) Prod.fst Prod.snd
+
+/-- [proved-derived; formal-checked] The Navier--Stokes constitutive law is an attachment to the
+elementary boundary holon's returned current.  Viscous storage and signed exterior forcing remain
+separate returned faces; the carrier itself contributes only the exact oriented endpoint
+difference. -/
+theorem enstrophyIntervalHolon_constitutive
+    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
+    {source target : ℝ} (hsource : 0 < source) (hst : source ≤ target)
+    (htT : target < T)
+    (receipt : EnstrophyStrandIntervalReceipt force velocity source target) :
+    (enstrophyIntervalHolon velocity).receive (source, target) +
+        nu * (∫ time in source..target, periodicVorticityDissipation velocity time) =
+      stretchingForcingExteriorCurrent force velocity source target := by
+  simpa only [enstrophyIntervalHolon, intervalBoundaryHolon_receive] using
+    intervalEnstrophyCurrent_add_dissipation_eq_exterior
+      solution hsource hst htT receipt
+
 /-- [definition] Accumulated viscous population from one addressed base time. -/
 def accumulatedVorticityDissipation
     (velocity : VelocityField) (base time : ℝ) : ℝ :=
@@ -178,6 +205,7 @@ theorem hasNullTerminalEnstrophyCurrentAt_of_strandReturns
 section Audit
 
 #print axioms intervalEnstrophyCurrent_add_dissipation_eq_exterior
+#print axioms enstrophyIntervalHolon_constitutive
 #print axioms terminalEnstrophyTrace_of_strandReturns
 #print axioms hasNullTerminalEnstrophyCurrentAt_of_strandReturns
 

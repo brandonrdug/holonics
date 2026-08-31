@@ -59,12 +59,12 @@ theorem thirdCoordinateJet_eq_nestedSecond_of_contDiffAt
     ContinuousMultilinearMap.apply ℝ (fun _ : Fin 2 ↦ Space × ℝ) Space directions
   have hD2 : DifferentiableAt ℝ (iteratedFDeriv ℝ 2 F) (x, t) :=
     hfield.differentiableAt_iteratedFDeriv
-      (WithTop.coe_lt_coe.mpr (ENat.coe_lt_top 2))
+      (WithTop.coe_lt_coe.mpr (ENat.natCast_lt_top 2))
   have hevaluate :
-      fderiv ℝ (evaluate ∘ iteratedFDeriv ℝ 2 F) (x, t) =
+      fderiv ℝ (fun z ↦ evaluate (iteratedFDeriv ℝ 2 F z)) (x, t) =
         evaluate.comp (fderiv ℝ (iteratedFDeriv ℝ 2 F) (x, t)) := by
     simpa only [ContinuousLinearMap.fderiv] using
-      fderiv_comp' (x, t) evaluate.differentiableAt hD2
+      fderiv_fun_comp (x, t) evaluate.differentiableAt hD2
   have hevaluateApply := congrArg
     (fun L : (Space × ℝ) →L[ℝ] Space ↦ L ei) hevaluate
   have htail :
@@ -81,7 +81,8 @@ theorem thirdCoordinateJet_eq_nestedSecond_of_contDiffAt
       (fun z ↦ iteratedFDeriv ℝ 2 F z directions) (x, t)
       (coordinateWordDirections (firstCoordinateWord i))
   rw [iteratedFDeriv_succ_apply_left, iteratedFDeriv_one_apply, htail, hfirst]
-  simpa [evaluate, Function.comp_def] using hevaluateApply.symm
+  simpa [evaluate, Function.comp_def, thirdCoordinateWord,
+    coordinateWordDirections, jointSpatialBasisDirection, ei] using hevaluateApply.symm
 
 /-- On an admitted interior slab, the actual three-letter word is the spatial derivative of its
 actual two-letter suffix. -/
@@ -462,7 +463,7 @@ theorem openPeriodicSolutionOn_fderiv_secondCoordinateLowerCommutator_eq
       (htermThree.differentiable (by simp) x),
     fderiv_fun_add (htermOne.differentiable (by simp) x)
       (htermTwo.differentiable (by simp) x)]
-  simp only [ContinuousLinearMap.add_apply]
+  simp only [add_apply]
   rw [hfirstActual, hsecondActual, hthirdActual]
   dsimp [u, wi, wj, wk, Wij, Wik, Wjk, V]
   abel
@@ -651,7 +652,7 @@ theorem openPeriodicSolutionOn_integral_thirdCoordinateTransport_eq_zero
       inner ℝ
         (fderiv ℝ (fun y ↦ thirdCoordinateJet velocity i j k y t) x (velocity x t))
         (thirdCoordinateJet velocity i j k x t) = 0 := by
-  simpa [thirdCoordinateJet, thirdCoordinateWord] using
+  simpa [thirdCoordinateJet, thirdCoordinateWord, coordinateJetField] using
     openPeriodicSolutionOn_integral_coordinateJetTransport_eq_zero
       solution ht 3 (thirdCoordinateWord i j k)
 
@@ -908,9 +909,8 @@ theorem openPeriodicSolutionOn_unforced_coordinateH3OrderTimeWork_eq_production
       funext q
       fin_cases q <;> rfl
     rw [hwordEq]
-    simpa [thirdCoordinateJet] using
-      openPeriodicSolutionOn_unforced_integral_thirdCoordinateProduction
-        solution ht (word 0) (word 1) (word 2)
+    convert openPeriodicSolutionOn_unforced_integral_thirdCoordinateProduction
+      solution ht (word 0) (word 1) (word 2) using 1 <;> rfl
   unfold coordinateH3OrderTimeWork coordinateH3OrderDissipation
     coordinateH3OrderLowerWork
   calc

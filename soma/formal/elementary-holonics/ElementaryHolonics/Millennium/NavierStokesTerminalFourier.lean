@@ -61,7 +61,8 @@ theorem norm_continuousTorusVectorFourierCoeff_sub_le
     filter_upwards [] with q
     rw [norm_smul]
     have hcharacter : ‖UnitAddTorus.mFourier (-k) q‖ = 1 := by
-      simp [UnitAddTorus.mFourier, norm_prod]
+      simp only [UnitAddTorus.mFourier, fourier_apply, ContinuousMap.coe_mk,
+        norm_prod, Circle.norm_coe, Finset.prod_const_one]
     rw [hcharacter, one_mul]
     change ‖complexTorusVelocityComponent field₁ component q -
       complexTorusVelocityComponent field₂ component q‖ ≤ ‖field₁ - field₂‖

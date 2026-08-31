@@ -206,8 +206,9 @@ theorem hasDerivAt_weightedEnergy
   have hexp : HasDerivAt (fun s : ℝ => Real.exp (rate * s))
       (Real.exp (rate * t) * rate) t := by
     simpa using ((hasDerivAt_id t).const_mul rate).exp
-  simpa only [weightedEnergy] using
-    (hexp.mul hE).congr_deriv (by ring)
+  unfold weightedEnergy
+  apply (hexp.mul hE).congr_deriv
+  ring
 
 /-- Under an unforced gap, the integrating-factor receiver is antitone. -/
 theorem unforced_weightedEnergy_antitoneOn

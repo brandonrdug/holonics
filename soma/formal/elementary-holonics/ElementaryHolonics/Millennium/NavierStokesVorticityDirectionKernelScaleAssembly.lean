@@ -143,6 +143,11 @@ theorem openPeriodicDyadicHodgeStrainWord_eq_spatialDirectionRemainderWord
           dyadicHodgeStretchingKernelReading scale y
             (openPeriodicComplexVorticityAt solution t q)
             (openPeriodicSpatialDirectionRemainderField solution t q y) := by
+  let bands : ℕ → ComplexMatrix3 := fun scale ↦ Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianBand solution t scale q component coordinate
+  change complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart
+      (∑ scale ∈ Finset.range depth, bands scale)) = _
   rw [complexStretchingReading_symmetric_finset_sum]
   apply Finset.sum_congr rfl
   intro scale _hscale
@@ -167,9 +172,23 @@ theorem openPeriodicFullStrainReading_eq_dyadicSpatialDirectionWord_add_fiber
         openPeriodicDyadicReconstructionFiberStrainReading solution t q depth := by
   rw [openPeriodicFullStrainReading,
     openPeriodicTorusJacobianArraySlice_eq_base_add_sum_dyadicBands_add_fiber]
+  let receiver := openPeriodicComplexVorticityAt solution t q
+  let base : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianLowPass solution t 0 q component coordinate
+  let bands : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    (∑ scale ∈ Finset.range depth,
+      openPeriodicDyadicHodgeJacobianBand solution t scale q) component coordinate
+  let fiber : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianReconstructionFiber solution t depth q component coordinate
+  change complexStretchingReading receiver
+    (symmetricComplexJacobianPart (base + bands + fiber)) = _
   rw [symmetricComplexJacobianPart_add, complexStretchingReading_add,
     symmetricComplexJacobianPart_add, complexStretchingReading_add]
-  rw [openPeriodicDyadicHodgeStrainWord_eq_spatialDirectionRemainderWord]
+  have hword :=
+    openPeriodicDyadicHodgeStrainWord_eq_spatialDirectionRemainderWord
+      solution t q depth
+  change complexStretchingReading receiver (symmetricComplexJacobianPart bands) = _ at hword
+  rw [hword]
   rfl
 
 /-- The norm of the complete finite dyadic band population is bounded by the sum of its literal
@@ -184,11 +203,18 @@ theorem norm_openPeriodicDyadicHodgeStrainWord_le_spatialDirectionCoherenceWord
           (∑ scale ∈ Finset.range depth,
             openPeriodicDyadicHodgeJacobianBand solution t scale q))‖ ≤
       openPeriodicDyadicSpatialDirectionCoherenceWord solution t q depth := by
+  let bands : ℕ → ComplexMatrix3 := fun scale ↦ Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianBand solution t scale q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart
+      (∑ scale ∈ Finset.range depth, bands scale))‖ ≤ _
   rw [complexStretchingReading_symmetric_finset_sum]
   refine (norm_sum_le _ _).trans ?_
   unfold openPeriodicDyadicSpatialDirectionCoherenceWord
   apply Finset.sum_le_sum
   intro scale _hscale
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart (bands scale))‖ ≤ _
   exact norm_openPeriodicDyadicHodgeStrainReading_le_spatialDirectionCoherenceMass
     solution t q scale
 
@@ -222,9 +248,14 @@ theorem norm_openPeriodicDyadicBaseStrainReading_le
       (81 * criticalVorticityRate solution t.1) *
         complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
   unfold openPeriodicDyadicBaseStrainReading
+  let base : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianLowPass solution t 0 q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart base)‖ ≤ _
   rw [complexStretchingReading_symmetricComplexJacobianPart]
   refine (norm_complexStretchingReading_le _ _).trans ?_
   apply mul_le_mul_of_nonneg_right _ (sq_nonneg _)
+  change ‖openPeriodicDyadicHodgeJacobianLowPass solution t 0 q‖ ≤ _
   rw [openPeriodicDyadicHodgeJacobianLowPass_zero]
   exact norm_openPeriodicSmoothHodgeJacobianLowPass_zero_apply_le solution t q
 
@@ -239,8 +270,14 @@ theorem norm_openPeriodicDyadicReconstructionFiberStrainReading_le
           (frequencyCube (dyadicHodgeInnerCutoff depth))) *
         complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
   unfold openPeriodicDyadicReconstructionFiberStrainReading
+  let fiber : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianReconstructionFiber solution t depth q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart fiber)‖ ≤ _
   rw [complexStretchingReading_symmetricComplexJacobianPart]
   refine (norm_complexStretchingReading_le _ _).trans ?_
+  change ‖openPeriodicDyadicHodgeJacobianReconstructionFiber solution t depth q‖ *
+    complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 ≤ _
   exact mul_le_mul_of_nonneg_right
     (norm_openPeriodicDyadicHodgeJacobianReconstructionFiber_le_two_mul_tailMass
       solution t depth q) (sq_nonneg _)
@@ -283,6 +320,11 @@ theorem norm_openPeriodicDyadicHodgeStrainWord_le_spatialCrossCoherenceWord
         complexVectorL1 (openPeriodicComplexVorticityAt solution t q) *
           openPeriodicDyadicSpatialCrossCoherenceWord solution t q depth) *
         complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
+  let bands : ℕ → ComplexMatrix3 := fun scale ↦ Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianBand solution t scale q component coordinate
+  change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+    (symmetricComplexJacobianPart
+      (∑ scale ∈ Finset.range depth, bands scale))‖ ≤ _
   rw [complexStretchingReading_symmetric_finset_sum]
   refine (norm_sum_le _ _).trans ?_
   calc
@@ -298,6 +340,8 @@ theorem norm_openPeriodicDyadicHodgeStrainWord_le_spatialCrossCoherenceWord
           complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 := by
       apply Finset.sum_le_sum
       intro scale _hscale
+      change ‖complexStretchingReading (openPeriodicComplexVorticityAt solution t q)
+        (symmetricComplexJacobianPart (bands scale))‖ ≤ _
       exact norm_openPeriodicDyadicHodgeStrainReading_le_spatialCrossCoherenceMass
         solution t q scale hvorticity
     _ = (‖(complexDot (openPeriodicComplexVorticityAt solution t q)
@@ -337,8 +381,19 @@ theorem norm_openPeriodicFullStrainReading_le_dyadicSpatialCrossCoherence
   have hband :=
     norm_openPeriodicDyadicHodgeStrainWord_le_spatialCrossCoherenceWord
       solution t q depth hvorticity
+  let receiver := openPeriodicComplexVorticityAt solution t q
+  let base : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianLowPass solution t 0 q component coordinate
+  let bands : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    (∑ scale ∈ Finset.range depth,
+      openPeriodicDyadicHodgeJacobianBand solution t scale q) component coordinate
+  let fiber : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    openPeriodicDyadicHodgeJacobianReconstructionFiber solution t depth q component coordinate
+  change ‖complexStretchingReading receiver (symmetricComplexJacobianPart bands)‖ ≤ _ at hband
   rw [openPeriodicFullStrainReading,
     openPeriodicTorusJacobianArraySlice_eq_base_add_sum_dyadicBands_add_fiber]
+  change ‖complexStretchingReading receiver
+    (symmetricComplexJacobianPart (base + bands + fiber))‖ ≤ _
   rw [symmetricComplexJacobianPart_add, complexStretchingReading_add,
     symmetricComplexJacobianPart_add, complexStretchingReading_add]
   exact (norm_add_le _ _).trans

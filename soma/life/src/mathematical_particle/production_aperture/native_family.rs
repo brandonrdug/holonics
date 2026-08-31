@@ -19,9 +19,7 @@ pub const NATIVE_HEXIS_DECODER_SCHEMA: &str = "holonics.l2.native-hexis-decoder.
 pub const NATIVE_HEXIS_FIBRES_SCHEMA: &str = "holonics.l2.native-hexis-fibres.v1";
 pub const NATIVE_HEXIS_INQUIRY_SCHEMA: &str = "holonics.l2.native-hexis-inquiry.v1";
 
-fn is_digest(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
+use holonic_engine::is_sha256_digest as is_digest;
 
 fn receivers() -> Vec<ProductionReceiver> {
     vec![

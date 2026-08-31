@@ -489,6 +489,21 @@ theorem tsum_sq_smoothSliceFourierL2_eq_integral_unitCube
         ∫ q : SpatialTorus,
           ‖smoothSliceComponentLift u hu hperiodic component q‖ ^ 2 := hparseval
     _ = ∫ x in unitCube, squareLift (euclideanToSpatialTorus x) := by
+      have hvolume :
+          @volume SpatialTorus
+              (@MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun _ ↦ UnitAddCircle)
+                (fun _ ↦ instMeasureSpaceUnitAddCircle_elementaryHolonics)) =
+            @volume SpatialTorus
+              (@MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun _ ↦ UnitAddCircle)
+                (fun _ ↦ AddCircle.measureSpace 1)) := by
+        simp only [MeasureTheory.volume_pi]
+        congr 1
+        funext i
+        change AddCircle.haarAddCircle =
+          @volume UnitAddCircle (AddCircle.measureSpace 1)
+        rw [AddCircle.volume_eq_smul_haarAddCircle]
+        simp
+      rw [hvolume]
       simpa [squareLift] using hchart.symm
     _ = ∫ x in unitCube, (u x component) ^ 2 := by
       apply setIntegral_congr_fun
@@ -575,7 +590,9 @@ theorem hasSum_smoothSliceDerivativeSquarePopulation
       (thirdSpatialCoordinateJet_contDiff u hu i j l)
       (thirdSpatialCoordinateJet_isOnePeriodic u hperiodic i j l) component).summable.hasSum
   have htotal := ((hzero.add hone).add htwo).add hthree
-  convert htotal using 1
+  unfold smoothSliceDerivativeSquarePopulation
+  unfold smoothSliceDerivativeCubeSquarePopulation
+  exact htotal
 
 /-- The native scalar H³ norm is explicitly controlled by the actual complete derivative
 population in the cube chart. -/
@@ -675,7 +692,7 @@ theorem openPeriodicSolutionOn_smoothSliceDerivativeCubeSquarePopulation_le
         2 * coordinateH3Energy velocity t := by
     have hbound := openPeriodicSolutionOn_integral_coordinateJet_component_sq_le_two_energy
       solution ht (⟨0, by norm_num⟩ : Fin 4) zeroWord component
-    convert hbound using 1
+    simpa only [u, coordinateJet_zero_eq_velocity] using hbound
   have hone : ∀ i : Fin 3,
       (∫ x in unitCube, (spatialDirectionalJet u i x component) ^ 2) ≤
         2 * coordinateH3Energy velocity t := by
@@ -694,7 +711,7 @@ theorem openPeriodicSolutionOn_smoothSliceDerivativeCubeSquarePopulation_le
           rw [openPeriodicSolutionOn_firstCoordinateJet_eq_spatialDirectionalJet
             solution ht x i]
       _ ≤ 2 * coordinateH3Energy velocity t := by
-        simpa [firstCoordinateJet] using hbound
+        simpa [firstCoordinateJet, coordinateJetField] using hbound
   have htwo : ∀ i j : Fin 3,
       (∫ x in unitCube, (secondSpatialCoordinateJet u i j x component) ^ 2) ≤
         2 * coordinateH3Energy velocity t := by
@@ -713,7 +730,7 @@ theorem openPeriodicSolutionOn_smoothSliceDerivativeCubeSquarePopulation_le
           rw [openPeriodicSolutionOn_secondCoordinateJet_eq_secondSpatialCoordinateJet
             solution ht x i j]
       _ ≤ 2 * coordinateH3Energy velocity t := by
-        simpa [secondCoordinateJet] using hbound
+        simpa [secondCoordinateJet, coordinateJetField] using hbound
   have hthree : ∀ i j l : Fin 3,
       (∫ x in unitCube, (thirdSpatialCoordinateJet u i j l x component) ^ 2) ≤
         2 * coordinateH3Energy velocity t := by
@@ -732,7 +749,7 @@ theorem openPeriodicSolutionOn_smoothSliceDerivativeCubeSquarePopulation_le
           rw [openPeriodicSolutionOn_thirdCoordinateJet_eq_thirdSpatialCoordinateJet
             solution ht x i j l]
       _ ≤ 2 * coordinateH3Energy velocity t := by
-        simpa [thirdCoordinateJet] using hbound
+        simpa [thirdCoordinateJet, coordinateJetField] using hbound
   have honeSum :
       (∑ i : Fin 3, ∫ x in unitCube,
         (spatialDirectionalJet u i x component) ^ 2) ≤

@@ -17,7 +17,7 @@ The result is the quantitative analytic attachment needed to balance the exact s
 noncomputable section
 
 open Set
-open scoped BigOperators ENNReal
+open scoped BigOperators ENNReal lp
 open Filter
 
 namespace Soma.Holonics.Millennium.NavierStokesCoordinateJacobianTailDecay
@@ -115,8 +115,7 @@ theorem summable_jacobianTailLatticeWeight :
     Summable jacobianTailLatticeWeight := by
   have htranslated := frequencyTripleEquiv.summable_iff.mpr
     summable_triple_jacobianTailCoordinateWeight
-  simpa only [Function.comp_apply, frequencyTripleEquiv,
-    jacobianTailLatticeWeight] using htranslated
+  exact htranslated.congr (fun frequency ↦ by rfl)
 
 /-- The finite lattice constant left after extracting the reciprocal scale. -/
 def jacobianTailLatticeMass : ℝ := ∑' frequency, jacobianTailLatticeWeight frequency
@@ -381,10 +380,12 @@ def coordinateReciprocalSobolevThreeSqrtTail
       Real.sqrt (periodicSobolevWeight 3 frequency.1) : ℝ) : ℂ)), by
     apply memℓp_gen
     norm_num only [ENNReal.toReal_ofNat]
-    simpa only [Real.rpow_two,
-      norm_coordinateReciprocalSobolevThreeSqrtTail_sq] using
-        (summable_coordinate_sq_div_periodicSobolevWeight_three coordinate).subtype
-          {frequency : SpatialFrequency | frequency ∉ frequencyCube radius}⟩
+    apply Summable.congr
+      ((summable_coordinate_sq_div_periodicSobolevWeight_three coordinate).subtype
+        {frequency : SpatialFrequency | frequency ∉ frequencyCube radius})
+    intro frequency
+    simpa only [Function.comp_apply, Real.rpow_two,
+      norm_coordinateReciprocalSobolevThreeSqrtTail_sq]⟩
 
 private theorem norm_weightedSobolevThreeCoefficientTail_sq
     (coeff : PeriodicSobolevCoefficients 3) (radius : ℕ)
@@ -405,10 +406,12 @@ def weightedSobolevThreeCoefficientTail
         coeff.1 frequency.1, by
     apply memℓp_gen
     norm_num only [ENNReal.toReal_ofNat]
-    simpa only [Real.rpow_two,
-      norm_weightedSobolevThreeCoefficientTail_sq] using
-        coeff.2.subtype
-          {frequency : SpatialFrequency | frequency ∉ frequencyCube radius}⟩
+    apply Summable.congr
+      (coeff.2.subtype
+        {frequency : SpatialFrequency | frequency ∉ frequencyCube radius})
+    intro frequency
+    simpa only [Function.comp_apply, Real.rpow_two,
+      norm_weightedSobolevThreeCoefficientTail_sq]⟩
 
 /-- The reciprocal tail carrier has exactly the quantitative square bound proved above. -/
 theorem norm_coordinateReciprocalSobolevThreeSqrtTail_sq_le
@@ -483,7 +486,13 @@ theorem norm_weightedSobolevThreeCoefficientTail_le
           periodicSobolevWeight 3 frequency.1 * ‖coeff.1 frequency.1‖ ^ 2) ≤
         ∑' frequency : SpatialFrequency,
           periodicSobolevWeight 3 frequency * ‖coeff.1 frequency‖ ^ 2 := by
-    simpa only [Function.comp_apply] using hsum
+    change
+      (∑' frequency : {frequency : SpatialFrequency //
+          frequency ∉ frequencyCube radius},
+        periodicSobolevWeight 3 frequency.1 * ‖coeff.1 frequency.1‖ ^ 2) ≤
+          ∑' frequency : SpatialFrequency,
+            periodicSobolevWeight 3 frequency * ‖coeff.1 frequency‖ ^ 2
+    exact hsum
   rw [← hleftSq, ← hrightSq] at hsum'
   nlinarith [norm_nonneg (weightedSobolevThreeCoefficientTail coeff radius),
     norm_nonneg (weightedSobolevThreeCoefficient coeff), hsum']

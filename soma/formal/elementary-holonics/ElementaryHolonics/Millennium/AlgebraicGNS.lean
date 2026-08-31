@@ -154,8 +154,11 @@ particular annihilates itself, and then the quotient's anisotropy finishes.  (Ma
 used, because the direction needed here is the cheap one.) -/
 theorem theGnsFormIsNondegenerate (hs : ∀ x, 0 ≤ B x x) (hB : B.IsSymm) :
     (gnsForm B hB).Nondegenerate := by
-  intro q hq
-  exact theGnsFormIsAnisotropicOnClasses B hs hB q (hq q)
+  constructor
+  · intro q hq
+    exact theGnsFormIsAnisotropicOnClasses B hs hB q (hq q)
+  · intro q hq
+    exact theGnsFormIsAnisotropicOnClasses B hs hB q (hq q)
 
 /-! ### Descent of a non-increasing endomorphism
 

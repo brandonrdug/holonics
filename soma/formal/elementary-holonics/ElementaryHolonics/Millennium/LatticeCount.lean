@@ -176,12 +176,12 @@ theorem sum_eq_two_mul_filter (g : α → α) (f : α → ℤ) (P : α → Prop)
 
 
 /-- The solution set of `2x² + y² + 8z² = p` inside a symmetric box. -/
-def SolF (p B : ℕ) : Finset (ℤ × ℤ × ℤ) :=
+noncomputable def SolF (p B : ℕ) : Finset (ℤ × ℤ × ℤ) :=
   ((Icc (-(B : ℤ)) B) ×ˢ (Icc (-(B : ℤ)) B) ×ˢ (Icc (-(B : ℤ)) B)).filter
     (fun t => 2 * t.1 ^ 2 + t.2.1 ^ 2 + 8 * t.2.2 ^ 2 = (p : ℤ))
 
 /-- The signed count over that box. -/
-def SF (p B : ℕ) : ℤ := ∑ t ∈ SolF p B, (-1 : ℤ) ^ (t.2.2).natAbs
+noncomputable def SF (p B : ℕ) : ℤ := ∑ t ∈ SolF p B, (-1 : ℤ) ^ (t.2.2).natAbs
 
 private def flipY : ℤ × ℤ × ℤ → ℤ × ℤ × ℤ := fun t => (t.1, -t.2.1, t.2.2)
 private def flipXZ : ℤ × ℤ × ℤ → ℤ × ℤ × ℤ := fun t => (-t.1, t.2.1, -t.2.2)
@@ -823,12 +823,12 @@ theorem theReducibleBoxIsTheInterval (B : ℕ) : boxZ B = Icc (-(B : ℤ)) (B : 
     exact ⟨(x + (B : ℤ)).toNat, by omega, by omega⟩
 
 /-- The solution set over the reducible box. -/
-def SolFr (p B : ℕ) : Finset (ℤ × ℤ × ℤ) :=
+noncomputable def SolFr (p B : ℕ) : Finset (ℤ × ℤ × ℤ) :=
   ((boxZ B) ×ˢ (boxZ B) ×ˢ (boxZ B)).filter
     (fun t => 2 * t.1 ^ 2 + t.2.1 ^ 2 + 8 * t.2.2 ^ 2 = (p : ℤ))
 
 /-- The signed count over the reducible box. -/
-def SFr (p B : ℕ) : ℤ := ∑ t ∈ SolFr p B, (-1 : ℤ) ^ (t.2.2).natAbs
+noncomputable def SFr (p B : ℕ) : ℤ := ∑ t ∈ SolFr p B, (-1 : ℤ) ^ (t.2.2).natAbs
 
 /-- **THE REDUCIBLE COUNT IS THE STRUCTURAL COUNT** — so the kernel can
 evaluate the very object the orbit theorems are about. -/

@@ -100,7 +100,12 @@ inductive A2CellOrbit
   | edgeDiagonal
   | lowerFace
   | upperFace
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+instance : Fintype A2CellOrbit :=
+  Fintype.ofList [.vertex, .edgeE1, .edgeE2, .edgeDiagonal, .lowerFace, .upperFace] (by
+    intro cell
+    cases cell <;> simp)
 
 def A2CellOrbit.dimension : A2CellOrbit → Fin 3
   | .vertex => 0
@@ -119,7 +124,12 @@ theorem A2CellOrbit_census :
 inductive EllipticFilling
   | orderThree
   | orderFour
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+instance : Fintype EllipticFilling :=
+  Fintype.ofList [.orderThree, .orderFour] (by
+    intro filling
+    cases filling <;> simp)
 
 def multiplicity : EllipticFilling → ℕ
   | .orderThree => 3

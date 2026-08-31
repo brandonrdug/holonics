@@ -232,7 +232,16 @@ def main() -> int:
     for owner, name in departed:
         print(f"DEPARTED         {owner}  {name}")
 
-    bad = [d for d in by_disposition if d not in DISPOSITIONS]
+    # `UNDISPOSITIONED` is a derived report bucket, not a registry value. Only invalid values
+    # actually carried by the registry are unknown dispositions; otherwise every missing row is
+    # counted twice (once above and once here).
+    bad = sorted(
+        {
+            disposition
+            for disposition, _, _ in carried.values()
+            if disposition not in DISPOSITIONS
+        }
+    )
     for disposition in bad:
         print(f"UNKNOWN DISPOSITION  {disposition}")
 

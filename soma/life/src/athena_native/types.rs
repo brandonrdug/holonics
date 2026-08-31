@@ -1,7 +1,6 @@
 use std::collections::BTreeSet;
 
 use holonic_engine::{
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
     cuda_refine::ResidentComplexIncidenceReturn,
     native_spool::{
         NativeConstitutiveResponse, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
@@ -9,6 +8,7 @@ use holonic_engine::{
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::NativeStateId,
+    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
 };
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -59,7 +59,7 @@ pub struct AthenaNativeRest {
 /// incidence/current relation; modality is the typed boundary/port pair; morphology is the
 /// receiver-indexed constitutive response; anatomy is the carried native transition; receiver
 /// history is the ordered word and retained occurrence fibre. None is a detached side cabinet.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NativeConductedSection {
     pub address: NativeSectionAddress,

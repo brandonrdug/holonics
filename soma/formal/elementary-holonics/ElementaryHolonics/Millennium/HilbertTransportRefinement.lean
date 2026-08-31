@@ -171,6 +171,7 @@ non-harmonic population. -/
 theorem maps_nonharmonic {x : source.Middle} (hx : x ∈ source.chain.nonharmonic) :
     R.middle x ∈ target.chain.nonharmonic := by
   obtain ⟨e, he, c, hc, rfl⟩ := Submodule.mem_sup.mp hx
+  change R.middle (e + c) ∈ target.chain.exact ⊔ target.chain.coexact
   simpa only [map_add] using
     (Submodule.add_mem_sup (R.maps_exact he) (R.maps_coexact hc))
 
@@ -245,9 +246,9 @@ end HilbertTransportRefinement
 
 /-- A coherent directed family of actual finite Hilbert transport complexes. -/
 structure DirectedHilbertTransportSystem (Scale : Type v) [Preorder Scale] [Nonempty Scale] where
-  object : Scale → FiniteHilbertTransportComplex
+  object : Scale → FiniteHilbertTransportComplex.{u}
   refinement : ∀ {coarse fine : Scale}, coarse ≤ fine →
-    HilbertTransportRefinement (object coarse) (object fine)
+    HilbertTransportRefinement.{u, u} (object coarse) (object fine)
   directed : ∀ (left right : Scale), ∃ common : Scale, left ≤ common ∧ right ≤ common
   refinement_refl : ∀ scale : Scale,
     refinement (le_refl scale) = HilbertTransportRefinement.id (object scale)
@@ -259,7 +260,7 @@ structure DirectedHilbertTransportSystem (Scale : Type v) [Preorder Scale] [None
 namespace DirectedHilbertTransportSystem
 
 variable {Scale : Type v} [Preorder Scale] [Nonempty Scale]
-variable (system : DirectedHilbertTransportSystem Scale)
+variable (system : DirectedHilbertTransportSystem.{u, v} Scale)
 
 /-- One positive lower bound valid on the non-harmonic receiver at every admitted scale. -/
 def HasUniformNonharmonicGap : Prop :=

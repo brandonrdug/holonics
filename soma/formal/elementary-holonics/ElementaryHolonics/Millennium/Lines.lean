@@ -115,8 +115,10 @@ at a scale nothing here formalizes. -/
 theorem theResidueFamilyIsBlindToTheHand :
     residueFamily.Blind (fun n => Hand.hand n = 1) := by
   have h4 : Hand.factorDepth 4 = 2 := by
-    simpa using ArithmeticFunction.cardFactors_apply_prime_pow (p := 2) (k := 2) Nat.prime_two
-  have h2 : Hand.factorDepth 2 = 1 := ArithmeticFunction.cardFactors_apply_prime Nat.prime_two
+    simpa [Hand.factorDepth] using
+      ArithmeticFunction.cardFactors_apply_prime_pow (p := 2) (k := 2) Nat.prime_two
+  have h2 : Hand.factorDepth 2 = 1 := by
+    simpa [Hand.factorDepth] using ArithmeticFunction.cardFactors_apply_prime Nat.prime_two
   refine ⟨4, 2, ?_, ?_, fun _ => rfl⟩
   · simp [Hand.hand, h4]
   · simp [Hand.hand, h2]

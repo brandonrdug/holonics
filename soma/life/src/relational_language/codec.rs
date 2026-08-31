@@ -338,6 +338,7 @@ pub(super) fn question_entity_regions(
             .iter()
             .any(|word| matches!(word.as_str(), "what" | "who" | "which"))
             && be_at + 1 < words.len()
+            && !is_participle(&lower[be_at + 1])
         {
             let region = entity_identity(&words[be_at + 1..]);
             return (!region.is_empty()).then_some(region).into_iter().collect();
@@ -429,6 +430,25 @@ pub(super) fn question_entity_regions(
     }
     let object_start = predicate_at + 1;
     if object_start < words.len() {
+        if is_relational_preposition(&lower[object_start]) {
+            let direct_start = object_start + 1;
+            let direct_end = (direct_start..lower.len())
+                .find(|at| is_relational_preposition(&lower[*at]))
+                .unwrap_or(lower.len());
+            let direct = entity_identity(&words[direct_start..direct_end]);
+            if !direct.is_empty() {
+                regions.push(direct);
+            }
+            if direct_end < lower.len() {
+                let relative = entity_identity(&words[direct_end + 1..]);
+                if !relative.is_empty() {
+                    regions.push(relative);
+                }
+            }
+            regions.sort();
+            regions.dedup();
+            return regions;
+        }
         let relative_at = (object_start..lower.len()).find(|at| {
             is_participle(&lower[*at])
                 && lower
@@ -512,6 +532,23 @@ pub(super) fn question_requested_relations(
 /// need to collapse the visible question into one opaque search string.
 pub fn relational_question_regions(question: &str) -> Vec<BTreeSet<String>> {
     question_entity_regions(question, &inherited_predicate_lexicon())
+}
+
+/// Return the exterior relation-phase faces carried by one question occurrence.
+///
+/// This remains a boundary-codec chart: the returned spellings may witness how an English
+/// surface presented its action, but they are never native addresses, morphology keys, or
+/// response selectors.  The complete octet population still crosses the membrane separately.
+pub fn relational_question_phase_words(question: &str) -> Vec<String> {
+    let predicate_lexicon = inherited_predicate_lexicon();
+    let mut phases = word_tokens(question)
+        .into_iter()
+        .map(|word| verb_lemma(&word.to_lowercase()))
+        .filter(|word| predicate_lexicon.contains(word))
+        .collect::<Vec<_>>();
+    phases.sort();
+    phases.dedup();
+    phases
 }
 
 /// Transduce one exterior delivery into oriented relational incidence without admitting the
@@ -1096,6 +1133,7 @@ pub(super) fn verb_lemma(word: &str) -> String {
         "made" => "make".to_owned(),
         "built" => "build".to_owned(),
         "written" | "wrote" => "write".to_owned(),
+        "inferred" => "infer".to_owned(),
         _ if word.ends_with("ies") && word.len() > 3 => {
             format!("{}y", &word[..word.len() - 3])
         }
@@ -1237,7 +1275,7 @@ pub(super) fn is_auxiliary(word: &str) -> bool {
 pub(super) fn is_relational_preposition(word: &str) -> bool {
     matches!(
         word,
-        "by" | "from" | "through" | "with" | "into" | "over" | "as" | "to"
+        "about" | "by" | "from" | "through" | "with" | "into" | "over" | "as" | "to"
     )
 }
 
@@ -1314,16 +1352,19 @@ pub(super) fn inherited_predicate_lexicon() -> LocalSet<String> {
         "check",
         "close",
         "condition",
+        "compress",
         "construct",
         "define",
         "derive",
         "describe",
         "emit",
+        "expand",
         "falsify",
         "form",
         "found",
         "generate",
         "have",
+        "identify",
         "invoke",
         "infer",
         "make",
@@ -1343,6 +1384,8 @@ pub(super) fn inherited_predicate_lexicon() -> LocalSet<String> {
         "restrict",
         "retain",
         "return",
+        "revoice",
+        "rewrite",
         "transform",
         "use",
     ]

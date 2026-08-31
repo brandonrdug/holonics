@@ -16,7 +16,7 @@ No Fourier cutoff, local-existence premise, or conclusion-shaped continuation as
 
 noncomputable section
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ENNReal NNReal lp
 
 namespace Soma.Holonics.Millennium.NavierStokesH3LerayBilinearNorm
 
@@ -54,8 +54,10 @@ def weightedAbsoluteCoefficientTwo
     have hnonneg (k : SpatialFrequency) :
         0 ≤ sobolevTwoAmplitude k * ‖coeff.1 k‖ :=
       mul_nonneg (sobolevTwoAmplitude_nonneg k) (norm_nonneg _)
+    have hcoeff := coeff.property
+    unfold HasPeriodicSobolevCoefficients at hcoeff
     simpa only [Real.rpow_two, Real.norm_eq_abs,
-      abs_of_nonneg (hnonneg _), mul_pow, sobolevTwoAmplitude_sq] using coeff.2⟩
+      abs_of_nonneg (hnonneg _), mul_pow, sobolevTwoAmplitude_sq] using hcoeff⟩
 
 /-- The scalar weighted `H²` norm, literally the norm of the preceding complete `ℓ²` carrier. -/
 def periodicH2CoefficientNorm

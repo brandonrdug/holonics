@@ -272,9 +272,14 @@ lemma isBigO_atTop_thetaP (p : ℕ) [Fact p.Prime] (r : ℝ) :
               (4 * p * Real.sqrt 2 * x) *
            evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle)
               (4 * p * Real.sqrt 2 * x)))
-        =O[Filter.atTop] fun x : ℝ => x ^ r := fun e _ =>
-      Asymptotics.IsBigO.sum fun d _ => isBigO_term_rpow p e d r
-    exact Asymptotics.IsBigO.sum h1
+        =O[Filter.atTop] fun x : ℝ => x ^ r := fun e _ => by
+      convert (Asymptotics.IsBigO.sum (s := Finset.range (2 * p))
+          (fun d _ => isBigO_term_rpow p e d r)) using 1 <;> try rfl
+      funext x
+      rw [Finset.sum_apply]
+    convert (Asymptotics.IsBigO.sum (s := Finset.range p) h1) using 1 <;> try rfl
+    funext x
+    rw [Finset.sum_apply]
   exact hsum.const_mul_left (4 * p)
 
 /-! ## 5. The strong FE-pair and the completed L-function -/
@@ -296,7 +301,7 @@ private lemma XP_two_ne_zero (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) :
 
 /-- The strong FE-pair of the congruent-number family at the split prime `p`:
 `f = g = θ_p`, weight `2`, **sign `χ_p(2)`**, no constant terms. -/
-def familyFEPair (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) : StrongFEPair ℂ where
+def familyFEPair (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) : WeakFEPair ℂ where
   f := Complex.ofReal ∘ thetaP p
   g := Complex.ofReal ∘ thetaP p
   k := 2
@@ -305,8 +310,6 @@ def familyFEPair (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) : StrongFEPair ℂ w
   hε := XP_two_ne_zero p hp1
   f₀ := 0
   g₀ := 0
-  hf₀ := rfl
-  hg₀ := rfl
   hf_int := (Complex.continuous_ofReal.comp_continuousOn
     (continuousOn_thetaP p)).locallyIntegrableOn measurableSet_Ioi
   hg_int := (Complex.continuous_ofReal.comp_continuousOn
@@ -322,6 +325,10 @@ def familyFEPair (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) : StrongFEPair ℂ w
   hg_top r := by
     simpa using isBigO_ofReal_left.mpr (isBigO_atTop_thetaP p r)
 
+private lemma familyFEPair_isStrong (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) :
+    IsStrongFEPair (familyFEPair p hp1) :=
+  ⟨rfl, rfl⟩
+
 /-- **The completed L-function of the congruent-number family at the split prime `p`**:
 the Mellin transform of `θ_p`, with no convergence region. -/
 def lambdaP (p : ℕ) [Fact p.Prime] (hp1 : p % 4 = 1) : ℂ → ℂ := (familyFEPair p hp1).Λ
@@ -331,13 +338,13 @@ differentiability on all of `ℂ` at once, no continuation step, with the modulu
 parameter. -/
 theorem theCompletedLFunctionIsEntireAtEverySplitPrime (p : ℕ) [Fact p.Prime]
     (hp1 : p % 4 = 1) : Differentiable ℂ (lambdaP p hp1) :=
-  (familyFEPair p hp1).differentiable_Λ
+  (familyFEPair_isStrong p hp1).differentiable_Λ
 
 /-- The Mellin representation of `Λ_p` at every `s`. -/
 theorem theCompletedLFunctionHasMellinAtEverySplitPrime (p : ℕ) [Fact p.Prime]
-    (hp1 : p % 4 = 1) (s : ℂ) :
+  (hp1 : p % 4 = 1) (s : ℂ) :
     HasMellin (Complex.ofReal ∘ thetaP p) s (lambdaP p hp1 s) :=
-  (familyFEPair p hp1).hasMellin s
+  (familyFEPair_isStrong p hp1).hasMellin s
 
 /-- **THE COMPLETED FUNCTIONAL EQUATION AT EVERY SPLIT PRIME**:
 `Λ_p(2−s) = χ_p(2)·Λ_p(s)`.  Weight two, sign the second supplement — the reflection
@@ -348,7 +355,9 @@ theorem theCompletedFunctionalEquationAtEverySplitPrime (p : ℕ) [Fact p.Prime]
   have h := (familyFEPair p hp1).functional_equation s
   rw [show (familyFEPair p hp1).k = (2 : ℝ) from rfl,
     show (familyFEPair p hp1).ε = ((XP p 2 : ℤ) : ℂ) from rfl] at h
-  have hsymm : (familyFEPair p hp1).symm.Λ = (familyFEPair p hp1).Λ := rfl
+  have hsymm : (familyFEPair p hp1).symm.Λ = (familyFEPair p hp1).Λ := by
+    ext z
+    simp [WeakFEPair.Λ, WeakFEPair.Λ₀, WeakFEPair.f_modif, familyFEPair]
   rw [hsymm] at h
   simpa [lambdaP, smul_eq_mul] using h
 
@@ -667,7 +676,7 @@ private lemma sign_ne_zero (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
 
 /-- The strong FE-pair at every odd prime: `f = g = θ_p`, weight `2`, sign the
 classical root number `(−1)^{(p−1)/2}·χ_p(2)`. -/
-def familyFEPairOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : StrongFEPair ℂ where
+def familyFEPairOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : WeakFEPair ℂ where
   f := Complex.ofReal ∘ thetaP p
   g := Complex.ofReal ∘ thetaP p
   k := 2
@@ -676,8 +685,6 @@ def familyFEPairOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : StrongFEPair ℂ 
   hε := sign_ne_zero p hp2
   f₀ := 0
   g₀ := 0
-  hf₀ := rfl
-  hg₀ := rfl
   hf_int := (Complex.continuous_ofReal.comp_continuousOn
     (continuousOn_thetaP p)).locallyIntegrableOn measurableSet_Ioi
   hg_int := (Complex.continuous_ofReal.comp_continuousOn
@@ -694,6 +701,10 @@ def familyFEPairOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : StrongFEPair ℂ 
   hg_top r := by
     simpa using isBigO_ofReal_left.mpr (isBigO_atTop_thetaP p r)
 
+private lemma familyFEPairOdd_isStrong (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) :
+    IsStrongFEPair (familyFEPairOdd p hp2) :=
+  ⟨rfl, rfl⟩
+
 /-- **The completed L-function at every odd prime**: the Mellin transform of `θ_p`. -/
 def lambdaPOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : ℂ → ℂ :=
   (familyFEPairOdd p hp2).Λ
@@ -701,13 +712,13 @@ def lambdaPOdd (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) : ℂ → ℂ :=
 /-- **`Λ_p` is entire at every odd prime.** -/
 theorem theCompletedLFunctionIsEntireAtEveryOddPrime (p : ℕ) [Fact p.Prime]
     (hp2 : p ≠ 2) : Differentiable ℂ (lambdaPOdd p hp2) :=
-  (familyFEPairOdd p hp2).differentiable_Λ
+  (familyFEPairOdd_isStrong p hp2).differentiable_Λ
 
 /-- The Mellin representation at every odd prime. -/
 theorem theCompletedLFunctionHasMellinAtEveryOddPrime (p : ℕ) [Fact p.Prime]
-    (hp2 : p ≠ 2) (s : ℂ) :
+  (hp2 : p ≠ 2) (s : ℂ) :
     HasMellin (Complex.ofReal ∘ thetaP p) s (lambdaPOdd p hp2 s) :=
-  (familyFEPairOdd p hp2).hasMellin s
+  (familyFEPairOdd_isStrong p hp2).hasMellin s
 
 /-- **THE COMPLETED FUNCTIONAL EQUATION AT EVERY ODD PRIME**:
 `Λ_p(2−s) = (−1)^{(p−1)/2}·χ_p(2)·Λ_p(s)` — the classical root number, at both
@@ -720,7 +731,9 @@ theorem theCompletedFunctionalEquationAtEveryOddPrime (p : ℕ) [Fact p.Prime]
   rw [show (familyFEPairOdd p hp2).k = (2 : ℝ) from rfl,
     show (familyFEPairOdd p hp2).ε
       = ((((-1 : ℤ)) ^ ((p - 1) / 2) * XP p 2 : ℤ) : ℂ) from rfl] at h
-  have hsymm : (familyFEPairOdd p hp2).symm.Λ = (familyFEPairOdd p hp2).Λ := rfl
+  have hsymm : (familyFEPairOdd p hp2).symm.Λ = (familyFEPairOdd p hp2).Λ := by
+    ext z
+    simp [WeakFEPair.Λ, WeakFEPair.Λ₀, WeakFEPair.f_modif, familyFEPairOdd]
   rw [hsymm] at h
   simpa [lambdaPOdd, smul_eq_mul] using h
 
@@ -747,4 +760,3 @@ theorem theOddHandForcesTheCentralVanishingOnTheOddSignBranches
   linear_combination h / 2
 
 end Soma.Holonics.Millennium.FamilyThetaFE
-

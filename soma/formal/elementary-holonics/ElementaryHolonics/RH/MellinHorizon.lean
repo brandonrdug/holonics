@@ -130,7 +130,10 @@ open HurwitzZeta in
 /-- Its integrand converges at every point of the plane. -/
 theorem theEvenKernelConverges (w : ℂ) :
     MellinConvergent (hurwitzEvenFEPair 0).f_modif w :=
-  ((hurwitzEvenFEPair 0).toStrongFEPair.hasMellin w).1
+  let P := hurwitzEvenFEPair 0
+  mellinConvergent_of_isBigO_rpow P.hf_modif_int
+    ((P.isStrongFEPair_toStrongFEPair).hf_top (-(w.re + 1))) (by norm_num)
+    ((P.isStrongFEPair_toStrongFEPair).hf_zero (-(w.re - 1))) (by norm_num)
 
 open HurwitzZeta in
 /-- **`Λ₀` IS BOUNDED ON EVERY VERTICAL STRIP, AND THE BOUND DOES NOT MENTION THE HEIGHT.**  The

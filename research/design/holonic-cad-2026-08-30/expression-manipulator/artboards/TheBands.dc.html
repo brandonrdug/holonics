@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .card { background: #fbf8f2; border: 1px solid #d9d0bf; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; min-height: 0; }
+    .card-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a7060; margin: 0; }
+    .ncell { width: 44px; height: 30px; box-sizing: border-box; border: 1px solid #ddd5c5; background: #fbf8f2; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center; padding: 0; color: inherit; position: relative; }
+    .ncell-prime { background: #efe4c2; font-weight: 600; }
+    .ncell-sq { border-left: 3px solid #56503f; }
+    .ncell-null { background: #e7e2d6; color: #7a7060; }
+    .ncell-sel { outline: 2.5px solid #b45309; outline-offset: -1px; z-index: 2; }
+    .bcell { width: 30px; height: 26px; box-sizing: border-box; border: 1px solid #ddd5c5; background: #fffdf8; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .chip { min-height: 32px; padding: 4px 10px; border-radius: 7px; cursor: pointer; background: #fffdf8; border: 1.5px solid #8a8071; font: inherit; color: inherit; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; }
+    .chip-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ret { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; padding: 3px 7px; color: #fbf8f2; display: inline-block; }
+    .ret-carried { background: #3e7d57; }
+    .ret-obstructed { background: #9c5480; }
+    .ret-null { background: #56503f; }
+    .rec-row { display: flex; gap: 8px; padding: 2px 0; align-items: baseline; }
+    .rec-k { flex: 0 0 66px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .rec-v { flex: 1; font-size: 12px; line-height: 1.4; }
+    .grip { font-family: 'IBM Plex Mono', monospace; font-size: 11px; border: 1px solid #b8ad97; border-radius: 5px; padding: 2px 7px; background: #fffdf8; }
+    .grip-hit { border-color: #3e7d57; background: #eef3ee; font-weight: 600; }
+    .grip-ref { border-color: #9c5480; color: #9c5480; }
+    table.tb { border-collapse: collapse; font-size: 11.5px; }
+    table.tb td, table.tb th { border: 1px solid #ddd5c5; padding: 3px 7px; text-align: left; }
+    table.tb th { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: #7a7060; }
+    tr.cur { background: #efe4c2; }
+  </style>
+</helmet>
+
+<div style="width: 1520px; height: 1000px; box-sizing: border-box; padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; gap: 10px">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <div style="font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px">The bands</div>
+      <div style="font-size: 12px; color: #7a7060">0 is null &middot; the band of n is its square-root area &middot; the band&#39;s grips decide n &middot; a different group per band, not one shape for all of &#8469;</div>
+    </div>
+    <div class="mono" style="font-size: 10px; color: #7a7060">Scratch/HolonicBandLaw.lean &middot; band boundaries are the perfect squares (band_sq_le &middot; lt_next_band_sq)</div>
+  </div>
+
+  <div class="card" style="padding: 10px 14px">
+    <div style="display: flex; align-items: baseline; gap: 14px">
+      <p class="card-title">the number line, banded at the squares</p>
+      <span style="font-size: 11px; color: #7a7060">thick left edge = a new band opens (a perfect square) &middot; tinted = prime (a refusal) &middot; click to pose</span>
+      <span style="margin-left: auto; display: flex; gap: 4px; align-items: center">
+        <sc-for list="{{digits}}" as="d" hint-placeholder-count="10">
+          <button class="chip" style="min-height: 26px; padding: 2px 8px" onClick="{{d.pick}}">{{d.t}}</button>
+        </sc-for>
+        <span class="mono" style="font-size: 11.5px; min-width: 90px">{{bigT}}</span>
+      </span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; margin-top: 8px">
+      <sc-for list="{{line}}" as="c" hint-placeholder-count="30">
+        <button class="{{c.cls}}" onClick="{{c.pick}}">{{c.t}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 430px 560px minmax(0, 1fr); gap: 12px; flex: 1; min-height: 0">
+
+    <div class="card" style="overflow-y: auto">
+      <p class="card-title">the solve of n — tried by its own band&#39;s grips</p>
+      <div class="rec-row" style="margin-top: 8px"><span class="rec-k">n</span><span class="rec-v mono" style="font-size: 13px">{{selT}}</span></div>
+      <div class="rec-row"><span class="rec-k">band</span><span class="rec-v mono" style="font-size: 11.5px">{{bandT}}</span></div>
+      <div class="rec-row"><span class="rec-k">grips</span><span class="rec-v"><span style="display: inline-flex; flex-wrap: wrap; gap: 4px">
+        <sc-for list="{{grips}}" as="g" hint-placeholder-count="6"><span class="{{g.cls}}">{{g.t}}</span></sc-for>
+      </span> <span class="mono" style="font-size: 10px; color: #7a7060">{{gripNote}}</span></span></div>
+      <div style="margin-top: 8px"><span class="ret {{ret.cls}}">{{ret.kind}}</span> <span style="font-size: 12px; margin-left: 4px">{{ret.t}}</span></div>
+      <sc-if value="{{hasWord}}" hint-placeholder-val="{{ true }}">
+        <div class="rec-row" style="margin-top: 7px"><span class="rec-k">word</span><span class="rec-v mono" style="font-size: 12.5px">{{word}}</span></div>
+        <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 2px">
+          <sc-for list="{{descent}}" as="s" hint-placeholder-count="4">
+            <div class="mono" style="font-size: 11px; color: #56503f">{{s.t}}</div>
+          </sc-for>
+        </div>
+        <div style="font-size: 11px; color: #7a7060; margin-top: 5px">each step is taken by a grip of the current band; the word ends when the remainder&#39;s own band refuses</div>
+      </sc-if>
+      <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: auto; padding-top: 8px">composite_has_grip &middot; band_decides_primality &middot; factor_word — kernel-checked</div>
+    </div>
+
+    <div class="card" style="overflow-y: auto">
+      <p class="card-title">the sieve storm inside the band — waves through one channel</p>
+      <sc-if value="{{noStorm}}" hint-placeholder-val="{{ true }}">
+        <div style="font-size: 12px; color: #7a7060; margin-top: 8px">{{stormNote}}</div>
+      </sc-if>
+      <sc-if value="{{hasStorm}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; align-items: center">
+          <span class="mono" style="font-size: 10px; color: #7a7060">waves:</span>
+          <sc-for list="{{waveChips}}" as="w" hint-placeholder-count="4">
+            <button class="{{w.cls}}" onClick="{{w.pick}}">{{w.t}}</button>
+          </sc-for>
+          <button class="chip" onClick="{{allWaves}}">all</button>
+          <button class="chip" onClick="{{resetWaves}}">reset</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; margin-top: 8px">
+          <sc-for list="{{bcells}}" as="c" hint-placeholder-count="15">
+            <div class="bcell" style="background: {{c.bg}}; font-weight: {{c.fw}}">{{c.t}}</div>
+          </sc-for>
+        </div>
+        <div style="font-size: 11.5px; color: #56503f; margin-top: 8px; line-height: 1.45">Each wave has wavelength p — the same channel, different periods. {{survT}}</div>
+      </sc-if>
+      <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: auto; padding-top: 8px">the zero wave carries the prime current — research/records/2026-07-17 (primorial wheel recurrence &middot; finite Ramanujan spectrum &middot; log prime-power transport &middot; completed zeta self-dual Smith)</div>
+    </div>
+
+    <div class="card" style="overflow-y: auto">
+      <p class="card-title">the ladder — a different group per band (declared)</p>
+      <table class="tb" style="margin-top: 8px">
+        <tr><th>band</th><th>surface</th><th>faces</th><th>integers</th></tr>
+        <sc-for list="{{ladder}}" as="r" hint-placeholder-count="8">
+          <tr class="{{r.cls}}"><td class="mono">{{r.k}}</td><td>{{r.shape}}</td><td class="mono">{{r.faces}}</td><td class="mono">{{r.range}}</td></tr>
+        </sc-for>
+      </table>
+      <div class="mono" style="font-size: 10px; color: #7a7060; margin-top: 5px">the band index is law (perfect-square boundaries); the shape assignment is a declared receiver ladder</div>
+      <p class="card-title" style="margin-top: 12px">the pieces — coupling valences, different grips</p>
+      <table class="tb" style="margin-top: 6px">
+        <tr><th>species</th><th>couples</th><th>3&times;3&times;3</th><th>2&times;2&times;2</th><th>pyraminx</th></tr>
+        <tr><td>centre</td><td>1 face — turns in place</td><td class="mono">6</td><td class="mono">0</td><td class="mono">4 axial</td></tr>
+        <tr><td>edge</td><td>2 faces along a seam</td><td class="mono">12</td><td class="mono">0</td><td class="mono">6</td></tr>
+        <tr><td>corner</td><td>3+ faces — the widest constraint</td><td class="mono">8</td><td class="mono">8</td><td class="mono">4 tips</td></tr>
+      </table>
+      <div style="font-size: 11.5px; margin-top: 6px; line-height: 1.45">A piece&#39;s coupling valence is its transport arity: the species are different characteristics of effect a pivot can recruit — the constraint taxonomy a learner&#39;s alphabet is made of. <span class="mono" style="font-size: 10px; color: #7a7060">(interpretation)</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 10px 14px">
+    <div style="font-size: 11.5px; line-height: 1.5"><b>The refusal current at scale.</b> Primes are the refusal population along the bands, thinning as 1/log n; the landmark law reads RH as the unbiasedness of this refusal current at every scale — the half-rank error term lives exactly at the &radic;-band scale. <span class="mono" style="font-size: 10px; color: #7a7060">interpretation &middot; owners: research/records/2026-07-17 (zero wave / prime current, ratified) &middot; 2026-08-09 (a prime is a primitive closed string) &middot; 2026-08-20 LANDMARKS_AND_MODULI &middot; the contract&#39;s landmark law</span></div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1520,"height":1000}}'>
+const LIMIT = 1300;
+const SIEVE = (function () {
+  const s = new Array(LIMIT).fill(true); s[0] = s[1] = false;
+  for (let p = 2; p * p < LIMIT; p++) if (s[p]) for (let q = p * p; q < LIMIT; q += p) s[q] = false;
+  return s;
+})();
+function isqrt(n) { let k = Math.floor(Math.sqrt(n)); while ((k + 1) * (k + 1) <= n) k++; while (k * k > n) k--; return k; }
+function primesUpTo(k) { const r = []; for (let p = 2; p <= k && p < LIMIT; p++) if (SIEVE[p]) r.push(p); return r; }
+function isPrimeBig(n) {
+  if (n < LIMIT) return SIEVE[n];
+  if (n % 2 === 0 || n % 3 === 0) return false;
+  for (let p = 5; p * p <= n; p += 6) { if (n % p === 0 || n % (p + 2) === 0) return false; }
+  return true;
+}
+function factorize(n) {
+  const w = []; let m = n;
+  for (let p = 2; p * p <= m; p = p === 2 ? 3 : p + 2) while (m % p === 0) { w.push(p); m = Math.floor(m / p); }
+  if (m > 1) w.push(m);
+  return w;
+}
+const LADDER = [
+  { k: '0', shape: 'null — no surface', faces: '0', lo: 0, hi: 0 },
+  { k: '1', shape: 'two-sided surface', faces: '2', lo: 1, hi: 3 },
+  { k: '2', shape: 'tetrahedron', faces: '4', lo: 4, hi: 8 },
+  { k: '3', shape: 'cube', faces: '6', lo: 9, hi: 15 },
+  { k: '4', shape: 'octahedron', faces: '8', lo: 16, hi: 24 },
+  { k: '5', shape: 'dodecahedron', faces: '12', lo: 25, hi: 35 },
+  { k: '6', shape: 'icosahedron', faces: '20', lo: 36, hi: 48 },
+  { k: '≥7', shape: 'layered lifts (N-layer solids)', faces: '…', lo: 49, hi: -1 }
+];
+
+class Component extends DCLogic {
+  state = { n: 12, big: '', waves: {} };
+
+  pose(n) { this.setState({ n: n, big: '', waves: {} }); }
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+    const n = st.big.length ? parseInt(st.big, 10) : st.n;
+    const k = n > 0 ? isqrt(n) : 0;
+
+    const line = [];
+    for (let i = 0; i < 120; i++) {
+      (function (i) {
+        const r = isqrt(Math.max(i, 0));
+        let cls = 'ncell';
+        if (i === 0 || i === 1) cls += ' ncell-null';
+        else if (SIEVE[i]) cls += ' ncell-prime';
+        if (i > 0 && r * r === i) cls += ' ncell-sq';
+        if (i === n) cls += ' ncell-sel';
+        line.push({ t: String(i), cls: cls, pick: function () { self.pose(i); } });
+      })(i);
+    }
+
+    const digits = [];
+    for (let d = 0; d <= 9; d++) {
+      (function (d) {
+        digits.push({ t: String(d), pick: function () { const b = (self.state.big + String(d)).slice(0, 12); self.setState({ big: b, waves: {} }); } });
+      })(d);
+    }
+    digits.push({ t: '⌫', pick: function () { self.setState({ big: self.state.big.slice(0, -1), waves: {} }); } });
+
+    const gripsArr = n >= 1 ? primesUpTo(Math.min(k, LIMIT - 1)) : [];
+    const tooManyGrips = k >= LIMIT;
+    const shown = gripsArr.slice(0, 16);
+    let hitP = 0;
+    if (n >= 2) for (const p of gripsArr) { if (n % p === 0) { hitP = p; break; } }
+    if (!hitP && n >= 2 && !isPrimeBig(n)) { const w = factorize(n); hitP = w[0]; }
+    const grips = shown.map(function (p) {
+      return { t: String(p), cls: 'grip ' + (n % p === 0 ? 'grip-hit' : 'grip-ref') };
+    });
+    const gripNote = (gripsArr.length > 16 ? ('+' + (gripsArr.length - 16) + ' more · ') : '') + 'π(' + k + ') = ' + (tooManyGrips ? '>' + primesUpTo(LIMIT - 1).length : gripsArr.length);
+
+    let ret, word = '', descent = [], hasWord = false;
+    if (n === 0) ret = { kind: 'null', cls: 'ret-null', t: 'no surface, no grips — the null' };
+    else if (n === 1) ret = { kind: 'carried', cls: 'ret-carried', t: 'the unit: the empty word — band 1, the two-sided surface' };
+    else if (isPrimeBig(n)) {
+      ret = { kind: 'obstructed', cls: 'ret-obstructed', t: gripsArr.length === 0 ? 'band ' + k + ' has no grips: prime by emptiness — nothing to turn' : 'every grip of band ' + k + ' refuses (' + gripsArr.length + ' refusals witnessed)' };
+    } else {
+      const w = factorize(n);
+      hasWord = true;
+      const exp = {}; w.forEach(function (p) { exp[p] = (exp[p] || 0) + 1; });
+      word = w.join('·') + '   =   ' + Object.keys(exp).map(function (p) { return exp[p] > 1 ? p + '^' + exp[p] : p; }).join(' · ');
+      let m = n;
+      for (let i = 0; i < w.length - 1 && i < 9; i++) {
+        descent.push({ t: m + ' = ' + w[i] + ' · ' + (m / w[i]) + '   (grip ' + w[i] + ' ≤ √' + m + ')' });
+        m = m / w[i];
+      }
+      if (w.length - 1 > 9) descent.push({ t: '…' });
+      ret = { kind: 'carried', cls: 'ret-carried', t: w.length + '-letter factor word — the descent through shrinking bands' };
+    }
+
+    const bandLo = k * k, bandHi = (k + 1) * (k + 1) - 1;
+    const stormOK = n >= 1 && bandHi < LIMIT && (2 * k + 1) <= 45;
+    let waveChips = [], bcells = [], survT = '';
+    if (stormOK) {
+      const wps = primesUpTo(k);
+      waveChips = wps.map(function (p) {
+        const on = !!st.waves[p];
+        return { t: 'p = ' + p, cls: 'chip' + (on ? ' chip-on' : ''), pick: function () { const w = Object.assign({}, self.state.waves); if (w[p]) delete w[p]; else w[p] = true; self.setState({ waves: w }); } };
+      });
+      let surv = 0, marked = 0;
+      for (let i = bandLo; i <= bandHi; i++) {
+        let hits = 0;
+        for (const p of wps) if (st.waves[p] && i % p === 0) hits++;
+        const isP = SIEVE[i];
+        if (hits) marked++;
+        if (!hits && isP) surv++;
+        bcells.push({ t: String(i), bg: hits ? (hits > 1 ? '#c8a2ae' : '#dfc7cd') : (isP && Object.keys(st.waves).length === wps.length && wps.length > 0 ? '#efe4c2' : '#fffdf8'), fw: isP ? '600' : '400' });
+      }
+      const allOn = wps.length > 0 && wps.every(function (p) { return st.waves[p]; });
+      survT = allOn ? 'All waves applied: the ' + surv + ' unmarked survivors are exactly the band’s primes — refusals of every wave (band_decides_primality).' : (Object.keys(st.waves).length ? marked + ' cells landed on so far.' : 'Apply the waves.');
+    }
+
+    const ladder = LADDER.map(function (r) {
+      const cur = (r.hi === -1 ? k >= r.lo && n >= 49 : n >= r.lo && n <= r.hi);
+      return { k: r.k, shape: r.shape, faces: r.faces, range: r.hi === -1 ? r.lo + '…' : (r.lo === r.hi ? String(r.lo) : r.lo + '–' + r.hi), cls: cur ? 'cur' : '' };
+    });
+
+    return {
+      line: line, digits: digits, bigT: st.big.length ? ('n = ' + st.big) : '',
+      selT: String(n),
+      bandT: 'k = ' + k + '   ·   ' + (k * k) + ' ≤ ' + n + ' < ' + ((k + 1) * (k + 1)),
+      grips: grips, gripNote: n >= 1 ? gripNote : '—',
+      ret: ret, hasWord: hasWord, word: word, descent: descent,
+      hasStorm: stormOK, noStorm: !stormOK,
+      stormNote: n < 1 ? 'the null has no band to sieve' : 'band ' + k + ' spans ' + (2 * k + 1) + ' integers — too wide to draw here; the law is unchanged',
+      waveChips: waveChips, bcells: bcells, survT: survT,
+      allWaves: function () { const w = {}; primesUpTo(isqrt(self.state.big.length ? parseInt(self.state.big, 10) : self.state.n)).forEach(function (p) { w[p] = true; }); self.setState({ waves: w }); },
+      resetWaves: function () { self.setState({ waves: {} }); },
+      ladder: ladder
+    };
+  }
+}
+</script>
+</body>
+</html>

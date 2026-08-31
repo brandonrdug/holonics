@@ -7,8 +7,11 @@ lose."* The repository knew, said so, and lost evidence to that sink anyway — 
 atlas is under `output/` on disk right now with no commit behind it, and the tiger phase atlas went
 the same way through `target/`.
 
-This does not track the artifacts. Tracking 210 MB of driver returns would be wrong. It tracks the
-one thing that makes a loss *detectable and reportable*: the address.
+This does not track the artifacts. It tracks the one thing that makes a loss *detectable and
+reportable*: the address. Brandon authorized removal of the accumulated ignored output population
+on 2026-08-30; its last pre-clean content inventory is preserved under
+`meta/history/2026-08-30_OUTPUT_MANIFEST_PRE_CLEANUP.tsv`. The live manifest is intentionally empty
+until a later driver returns new material.
 
     python3 tools/output_manifest.py           # rewrite meta/OUTPUT_MANIFEST.tsv
     python3 tools/output_manifest.py --check    # exit 1 if the tree disagrees with the manifest
@@ -25,8 +28,9 @@ removed; `sha256` is taken over the sorted per-artifact addresses, so it moves i
 artifact changes. `--files` reconstructs the full listing on demand. There is no threshold and no
 aperture: every driver directory is rolled up, uniformly.
 
-`CLAUDE.md` §0 lesson 1: *"Bind every deposit to its content hash AND its closure hash, with a
-verifier."* This is the content half. The closure half still has no owner.
+`CLAUDE.md`'s retained deposit law is: bind every deposit to its content hash and its closure hash,
+with a verifier. This is the content half; `tools/closure_manifest.py` owns the transitive Cargo,
+build-script, CUDA, toolchain, and path-dependency closure half.
 """
 
 from __future__ import annotations

@@ -12,7 +12,7 @@ use holonic_engine::exact_owner_testimony::ExactOwnerLicense;
 use life::mathematical_particle::{
     AnalyticBranch, BinderId, BinderScope, BranchId, CarrierId, CarrierOccurrence, HypothesisId,
     HypothesisLicense, MathematicalParticle, MathematicalParticleInput, ParticleAdmissionInput,
-    PassageBranchId, RelationWitness, TypedOperation, TypedPort,
+    RelationWitness, TypedOperation, TypedPort,
 };
 use serde::Serialize;
 
@@ -58,27 +58,6 @@ pub struct Construction {
     pub rigidity_lineage: BTreeSet<String>,
     pub sameness: SamenessReceipt,
     pub proposal_source_spans: BTreeMap<String, BTreeSet<String>>,
-    pub excitation_generators: Vec<ExcitationGenerator>,
-}
-
-#[derive(Clone, Debug)]
-pub struct ExcitationGenerator {
-    pub occurrence: String,
-    pub source_occurrences: BTreeSet<String>,
-    pub words: Vec<Vec<u8>>,
-    pub branch: PassageBranchId,
-}
-
-fn selected_words(words: &[Vec<u8>], ordinals: &[usize]) -> Result<Vec<Vec<u8>>, String> {
-    ordinals
-        .iter()
-        .map(|ordinal| {
-            words
-                .get(*ordinal)
-                .cloned()
-                .ok_or_else(|| format!("excitation ordinal {ordinal} left the M0 word population"))
-        })
-        .collect()
 }
 
 fn source_marks(
@@ -142,12 +121,6 @@ pub fn construct(root: &Path) -> Result<Construction, String> {
         source_material::atlas_sha256(),
         &[RIGIDITY_LINEAGE_ORDINAL],
     )?;
-    let affine_baseline_words = selected_words(&remounted.baseline_words, &AFFINE_ORDINALS)?;
-    let affine_reflow_words = selected_words(&remounted.reflow_words, &AFFINE_ORDINALS)?;
-    let heat_positive_time_words =
-        selected_words(&remounted.natural_page5_words, &HEAT_POSITIVE_TIME_ORDINALS)?;
-    let heat_euclidean_words =
-        selected_words(&remounted.natural_page5_words, &HEAT_EUCLIDEAN_ORDINALS)?;
     let affine_sources = baseline_span
         .iter()
         .chain(&reflow_span)
@@ -356,37 +329,5 @@ pub fn construct(root: &Path) -> Result<Construction, String> {
             ("heat-positive-time".to_owned(), heat_time_span.clone()),
             ("heat-euclidean".to_owned(), heat_euclidean_span.clone()),
         ]),
-        excitation_generators: vec![
-            ExcitationGenerator {
-                occurrence: "affine-baseline-excitation".to_owned(),
-                source_occurrences: baseline_span.clone(),
-                words: affine_baseline_words.clone(),
-                branch: PassageBranchId(0),
-            },
-            ExcitationGenerator {
-                occurrence: "affine-reflow-excitation".to_owned(),
-                source_occurrences: reflow_span,
-                words: affine_reflow_words,
-                branch: PassageBranchId(0),
-            },
-            ExcitationGenerator {
-                occurrence: "quantity-on-affine-presentation-excitation".to_owned(),
-                source_occurrences: baseline_span,
-                words: affine_baseline_words,
-                branch: PassageBranchId(2),
-            },
-            ExcitationGenerator {
-                occurrence: "heat-positive-time-excitation".to_owned(),
-                source_occurrences: heat_time_span,
-                words: heat_positive_time_words,
-                branch: PassageBranchId(1),
-            },
-            ExcitationGenerator {
-                occurrence: "heat-euclidean-excitation".to_owned(),
-                source_occurrences: heat_euclidean_span,
-                words: heat_euclidean_words,
-                branch: PassageBranchId(1),
-            },
-        ],
     })
 }

@@ -56,7 +56,8 @@ pub use types::{
 
 mod codec;
 pub use codec::{
-    relational_deliberation_frontier, relational_passage_clauses, relational_question_regions,
+    relational_deliberation_frontier, relational_passage_clauses, relational_question_phase_words,
+    relational_question_regions,
 };
 
 mod transport;

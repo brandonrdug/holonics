@@ -42,14 +42,14 @@ private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
 
 private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : RankOne.E5.Nonsingular x₁ y₁} {h₂ : RankOne.E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : RankOne.E5.Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : RankOne.E5.Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some h) = if x = 0 then -25 else x := rfl
+    RankOne.slotOne (.some _ _ h) = if x = 0 then -25 else x := rfl
 
 private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some h) = if x = 5 then 50 else x - 5 := rfl
+    RankOne.slotTwo (.some _ _ h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
@@ -90,12 +90,12 @@ private lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b �
 /-- The naive height of a point: the height of its abscissa, zero at the identity. -/
 def pheight : RankOne.E5.Point → ℕ
   | .zero => 0
-  | .some (x := x) _ => hgt x
+  | .some x _ _ => hgt x
 
 private lemma pheight_zero : pheight (0 : RankOne.E5.Point) = 0 := rfl
 
 private lemma pheight_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    pheight (Point.some h) = hgt x := rfl
+    pheight (Point.some _ _ h) = hgt x := rfl
 
 /-- A rational presented as an integer fraction inherits the fraction's height bound. -/
 private lemma hgt_le_of_eq_div {q : ℚ} (A B : ℤ) (hB : B ≠ 0)
@@ -137,7 +137,7 @@ private lemma contract_core (X R : RankOne.E5.Point)
         · exact hgt_le_of_eq_div 0 1 one_ne_zero (by norm_num) (by decide)
         · exact hgt_le_of_eq_div 5 1 one_ne_zero (by norm_num) (by decide)
         · exact hgt_le_of_eq_div (-5) 1 one_ne_zero (by norm_num) (by decide)
-      have hp : pheight (Point.some hQns) = hgt u := rfl
+      have hp : pheight (Point.some _ _ hQns) = hgt u := rfl
       omega
     · -- the tangent case: duplication growth meets the translation bound
       have hu0 : u ≠ 0 := by
@@ -156,8 +156,8 @@ private lemma contract_core (X R : RankOne.E5.Point)
         rw [negYFive]
         intro hc
         exact hv (by linarith)
-      have hQQ : (Point.some hQns : RankOne.E5.Point) + Point.some hQns =
-          Point.some (nonsingular_add hQns hQns fun hxy => hyne hxy.right) :=
+      have hQQ : (Point.some _ _ hQns : RankOne.E5.Point) + Point.some _ _ hQns =
+          Point.some _ _ (nonsingular_add hQns hQns fun hxy => hyne hxy.right) :=
         Point.add_self_of_Y_ne hyne
       have hs : RankOne.E5.slope u u v v = (3 * u ^ 2 - 25) / (2 * v) := by
         rw [slope_of_Y_ne rfl hyne, negYFive]
@@ -182,13 +182,13 @@ private lemma contract_core (X R : RankOne.E5.Point)
                 rw [sub_div, mul_div_assoc, div_self (pow_ne_zero 2 h2v), mul_one]
               rw [e2, div_eq_div_iff (pow_ne_zero 2 h2v) hden]
               linear_combination (-36 * u ^ 4 + 600 * u ^ 2 - 2500) * hcurveQ
-      have hpQQ : pheight ((Point.some hQns : RankOne.E5.Point) + Point.some hQns)
+      have hpQQ : pheight ((Point.some _ _ hQns : RankOne.E5.Point) + Point.some _ _ hQns)
           = hgt ((u ^ 2 + 25) ^ 2 / (4 * u * (u ^ 2 - 25))) := by
         rw [hQQ]
         show hgt (RankOne.E5.addX u u (RankOne.E5.slope u u v v)) = _
         rw [hxdup]
       have hdup := theDuplicationGrowsTheHeight u hu0 hu25
-      have hlink : pheight ((Point.some hQns : RankOne.E5.Point) + Point.some hQns)
+      have hlink : pheight ((Point.some _ _ hQns : RankOne.E5.Point) + Point.some _ _ hQns)
           = pheight (X - R) := congrArg pheight hQ
       -- the assembled chain
       have hchain : hgt u ^ 4 ≤ 26450000000 * pheight X ^ 2 := by
@@ -197,7 +197,7 @@ private lemma contract_core (X R : RankOne.E5.Point)
           _ = 250000 * pheight (X - R) := by rw [← hpQQ, hlink]
           _ ≤ 250000 * (105800 * pheight X ^ 2) := Nat.mul_le_mul_left _ hb
           _ = 26450000000 * pheight X ^ 2 := by ring
-      have hp : pheight (Point.some hQns) = hgt u := rfl
+      have hp : pheight (Point.some _ _ hQns) = hgt u := rfl
       rw [hp]
       by_contra hge
       push_neg at hge
@@ -221,14 +221,14 @@ private lemma descent_finite_rep {x y xk yk d₁ d₂ : ℚ}
     (hX : RankOne.E5.Nonsingular x y) (hRk : RankOne.E5.Nonsingular xk yk)
     (α β : ℤ) (hβ : 0 < β) (hxkv : xk = (α : ℚ) / (β : ℚ))
     (hLb : α.natAbs + 25 * β.natAbs ≤ 230) (hhk : hgt xk ≤ 45)
-    (hfX1 : Descent.SqCls (RankOne.slotOne (Point.some hX)) d₁)
-    (hfX2 : Descent.SqCls (RankOne.slotTwo (Point.some hX)) d₂)
-    (hfR1 : Descent.SqCls (RankOne.slotOne (Point.some hRk)) d₁)
-    (hfR2 : Descent.SqCls (RankOne.slotTwo (Point.some hRk)) d₂)
-    (hbig : 163000 < pheight (Point.some hX)) :
-    ∃ Q, (Point.some hX : RankOne.E5.Point) = Q + Q + Point.some hRk ∧
-      pheight Q < pheight (Point.some hX) := by
-  have hpx : pheight (Point.some hX) = hgt x := rfl
+    (hfX1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hX)) d₁)
+    (hfX2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hX)) d₂)
+    (hfR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hRk)) d₁)
+    (hfR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hRk)) d₂)
+    (hbig : 163000 < pheight (Point.some _ _ hX)) :
+    ∃ Q, (Point.some _ _ hX : RankOne.E5.Point) = Q + Q + Point.some _ _ hRk ∧
+      pheight Q < pheight (Point.some _ _ hX) := by
+  have hpx : pheight (Point.some _ _ hX) = hgt x := rfl
   have hxne : x ≠ xk := by
     intro hc
     have h1 : hgt x ≤ 45 := hc ▸ hhk
@@ -237,35 +237,35 @@ private lemma descent_finite_rep {x y xk yk d₁ d₂ : ℚ}
   have hNk : RankOne.E5.Nonsingular xk (-yk) := by
     have h := (nonsingular_neg (x := xk) (y := yk)).mpr hRk
     rwa [negYFive] at h
-  have hNeg : -(Point.some hRk : RankOne.E5.Point) = Point.some hNk := by
+  have hNeg : -(Point.some _ _ hRk : RankOne.E5.Point) = Point.some _ _ hNk := by
     rw [Point.neg_some]
     exact someEqFive rfl (negYFive xk yk)
-  have hsub : (Point.some hX : RankOne.E5.Point) - Point.some hRk =
-      Point.some hX + Point.some hNk := by
+  have hsub : (Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk =
+      Point.some _ _ hX + Point.some _ _ hNk := by
     rw [sub_eq_add_neg, hNeg]
   -- the face of the translate is trivial
-  have hslN1 : RankOne.slotOne (Point.some hNk) = RankOne.slotOne (Point.some hRk) := rfl
-  have hslN2 : RankOne.slotTwo (Point.some hNk) = RankOne.slotTwo (Point.some hRk) := rfl
+  have hslN1 : RankOne.slotOne (Point.some _ _ hNk) = RankOne.slotOne (Point.some _ _ hRk) := rfl
+  have hslN2 : RankOne.slotTwo (Point.some _ _ hNk) = RankOne.slotTwo (Point.some _ _ hRk) := rfl
   have hd₁ : d₁ ≠ 0 := sqcls_ne hfR1 (slotOne5_ne _)
   have hd₂ : d₂ ≠ 0 := sqcls_ne hfR2 (slotTwo5_ne _)
   obtain ⟨hom1, hom2⟩ :=
     FaceHomomorphism.theRankOneFaceIsAHomomorphismEverywhereHolds
-      (Point.some hX) (Point.some hNk)
+      (Point.some _ _ hX) (Point.some _ _ hNk)
   have h1' : Descent.SqCls
-      (RankOne.slotOne ((Point.some hX : RankOne.E5.Point) - Point.some hRk)) 1 := by
+      (RankOne.slotOne ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)) 1 := by
     rw [hsub]
     refine sqcls_trans hom1 ?_
     rw [hslN1]
     exact sqcls_trans (sqcls_mul hfX1 hfR1) ⟨d₁, hd₁, by ring⟩
   have h2' : Descent.SqCls
-      (RankOne.slotTwo ((Point.some hX : RankOne.E5.Point) - Point.some hRk)) 1 := by
+      (RankOne.slotTwo ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)) 1 := by
     rw [hsub]
     refine sqcls_trans hom2 ?_
     rw [hslN2]
     exact sqcls_trans (sqcls_mul hfX2 hfR2) ⟨d₂, hd₂, by ring⟩
   -- the chord bound on the translate's height
-  have hb : pheight ((Point.some hX : RankOne.E5.Point) - Point.some hRk)
-      ≤ 105800 * pheight (Point.some hX) ^ 2 := by
+  have hb : pheight ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)
+      ≤ 105800 * pheight (Point.some _ _ hX) ^ 2 := by
     rw [hsub, Point.add_of_X_ne hxne, hpx]
     show hgt (RankOne.E5.addX x xk (RankOne.E5.slope x xk y (-yk)))
       ≤ 105800 * hgt x ^ 2
@@ -283,7 +283,7 @@ private lemma descent_finite_rep {x y xk yk d₁ d₂ : ℚ}
           Nat.mul_le_mul (Nat.mul_le_mul (le_refl 2) (Nat.pow_le_pow_left hLb 2))
             (le_refl _)
       _ = 105800 * hgt x ^ 2 := by norm_num
-  exact contract_core (Point.some hX) (Point.some hRk) h1' h2' hb hbig
+  exact contract_core (Point.some _ _ hX) (Point.some _ _ hRk) h1' h2' hb hbig
 
 set_option maxHeartbeats 2000000 in
 /-- **THE DESCENT STEP**: every point of height above the threshold is `Q + Q + R`
@@ -297,115 +297,115 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
   · have h0 : pheight (Point.zero : RankOne.E5.Point) = 0 := rfl
     omega
   obtain ⟨d₁, d₂, hreal, hf1, hf2⟩ :=
-    FaceImageFive.theFaceImageAtFiveIsTheRealizedEight (Point.some hX)
+    FaceImageFive.theFaceImageAtFiveIsTheRealizedEight (Point.some _ _ hX)
   rcases hreal with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
     ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
   · -- class (1, 1): the identity representative
-    have hb : pheight ((Point.some hX : RankOne.E5.Point) - 0)
-        ≤ 105800 * pheight (Point.some hX) ^ 2 := by
+    have hb : pheight ((Point.some _ _ hX : RankOne.E5.Point) - 0)
+        ≤ 105800 * pheight (Point.some _ _ hX) ^ 2 := by
       rw [sub_zero]
-      have h1 : pheight (Point.some hX) ≤ pheight (Point.some hX) ^ 2 :=
+      have h1 : pheight (Point.some _ _ hX) ≤ pheight (Point.some _ _ hX) ^ 2 :=
         Nat.le_self_pow two_ne_zero _
-      have h2 : pheight (Point.some hX) ^ 2 ≤ 105800 * pheight (Point.some hX) ^ 2 :=
+      have h2 : pheight (Point.some _ _ hX) ^ 2 ≤ 105800 * pheight (Point.some _ _ hX) ^ 2 :=
         Nat.le_mul_of_pos_left _ (by norm_num)
       omega
-    obtain ⟨Q, hQeq, hQlt⟩ := contract_core (Point.some hX) 0
+    obtain ⟨Q, hQeq, hQlt⟩ := contract_core (Point.some _ _ hX) 0
       (by rw [sub_zero]; exact hf1) (by rw [sub_zero]; exact hf2) hb hbig
     exact ⟨Q, 0, Nat.zero_le 45, hQeq, hQlt⟩
   · -- class (1, 5): the representative (25/4, 75/8)
     have hns : RankOne.E5.Nonsingular (25/4) (75/8) := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) 1 := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 1 := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨5/2, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) 5 := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 5 := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1/2, by norm_num, by norm_num⟩
     have hhk : hgt ((25 : ℚ)/4) ≤ 45 :=
       hgt_le_of_eq_div 25 4 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns 25 4 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (5, 2): the representative (5, 0)
     have hns : RankOne.E5.Nonsingular 5 0 := RankOne.nonsingular50
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) 5 := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 5 := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) 2 := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 2 := by
       rw [slotTwo5_some, if_pos rfl]
       exact ⟨5, by norm_num, by norm_num⟩
     have hhk : hgt ((5 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 5 1 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns 5 1 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (5, 10): the representative (45, 300)
     have hns : RankOne.E5.Nonsingular 45 300 := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) 5 := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 5 := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨3, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) 10 := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 10 := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨2, by norm_num, by norm_num⟩
     have hhk : hgt ((45 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 45 1 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns 45 1 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (−1, −1): the representative (−4, 6)
     have hns : RankOne.E5.Nonsingular (-4) 6 := RankOne.nonsingularP
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) (-1) := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-1) := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨2, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) (-1) := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-1) := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨3, by norm_num, by norm_num⟩
     have hhk : hgt ((-4 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div (-4) 1 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns (-4) 1 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (−1, −5): the representative (0, 0)
     have hns : RankOne.E5.Nonsingular 0 0 := RankOne.nonsingular00
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) (-1) := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-1) := by
       rw [slotOne5_some, if_pos rfl]
       exact ⟨5, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) (-5) := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-5) := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hhk : hgt ((0 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 0 1 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns 0 1 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (−5, −2): the representative (−5/9, 100/27)
     have hns : RankOne.E5.Nonsingular (-5/9) (100/27) := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) (-5) := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-5) := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨1/3, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) (-2) := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-2) := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨5/3, by norm_num, by norm_num⟩
     have hhk : hgt ((-5 : ℚ)/9) ≤ 45 :=
       hgt_le_of_eq_div (-5) 9 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns (-5) 9 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
   · -- class (−5, −10): the representative (−5, 0)
     have hns : RankOne.E5.Nonsingular (-5) 0 := RankOne.nonsingularNeg50
-    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some hns)) (-5) := by
+    have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-5) := by
       rw [slotOne5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
-    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some hns)) (-10) := by
+    have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-10) := by
       rw [slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hhk : hgt ((-5 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div (-5) 1 (by norm_num) (by norm_num) (by decide)
     obtain ⟨Q, hQeq, hQlt⟩ := descent_finite_rep hX hns (-5) 1 (by norm_num)
       (by norm_num) (by decide) hhk hf1 hf2 hR1 hR2 hbig
-    exact ⟨Q, Point.some hns, hhk, hQeq, hQlt⟩
+    exact ⟨Q, Point.some _ _ hns, hhk, hQeq, hQlt⟩
 
 /-! ## 4. The bounded-height points are finite -/
 

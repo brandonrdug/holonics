@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f6f2ea; color: #292418; font-family: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+    a { color: #8a5a1c; } a:hover { color: #6d4614; }
+    .mono { font-family: 'IBM Plex Mono', 'Menlo', monospace; }
+    .math { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; }
+    .serif { font-family: 'STIX Two Text', 'Georgia', serif; }
+    .h1 { font-family: 'STIX Two Text', 'Georgia', serif; font-weight: 600; font-size: 22px; white-space: nowrap; flex: 0 0 auto; }
+    .sub { font-size: 12px; color: #7a7060; flex: 1 1 auto; min-width: 0; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7a7060; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7060; }
+    .panel { background: #fffdf8; border: 1.5px solid #8a8071; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+    .panel-t { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #56503f; border-bottom: 1px solid #ddd5c5; padding-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .tb { background: #efece4; border: 1px solid #d9d0bf; border-radius: 6px; padding: 5px 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn { min-height: 26px; padding: 3px 9px; border-radius: 6px; background: #fffdf8; border: 1.5px solid #8a8071; font-family: 'IBM Plex Mono', monospace; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-on { background: #292418; color: #fbf8f2; border-color: #292418; }
+    .ph { background: repeating-linear-gradient(135deg, #efece4 0 6px, #f6f2ea 6px 12px); border: 1px dashed #b3a27d; border-radius: 4px; }
+    .box { border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11.5px; line-height: 1.4; }
+    .box-hyp { background: #efece4; border: 1px solid #d9d0bf; }
+    .box-goal { background: #fffdf8; border: 1.5px solid #a67a2e; }
+    .box-lean { background: #fffdf8; border: 1.5px solid #8a8071; }
+    .box-carried { background: #eef3ee; border: 1.5px solid #3e7d57; }
+    .box-obstructed { background: #f5ecef; border: 1.5px dashed #9c5480; }
+    .box-refused { background: #eeece7; border: 1.5px dashed #56503f; }
+    .box-type { background: #fffdf8; border: 1.5px solid #29426b; }
+    .sp { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; color: #fbf8f2; display: inline-block; white-space: nowrap; }
+    .sp-transport { background: #3c6ea5; } .sp-warn { background: #b3a27d; color: #292418; } .sp-face { background: #a67a2e; } .sp-construction { background: #3e7d57; } .sp-quotient { background: #9c5480; } .sp-refused { background: #56503f; } .sp-deposit { background: #29426b; } .sp-receiver { background: #7a7060; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; border-radius: 4px; padding: 1px 6px; display: inline-block; border: 1px solid #b3a27d; color: #56503f; background: #f6f2ea; white-space: nowrap; }
+    .grade { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 4px; padding: 1px 6px; display: inline-block; background: #292418; color: #fbf8f2; white-space: nowrap; }
+    .ln { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #29426b; }
+    .code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.5; white-space: pre; background: #fbf8f2; border: 1px solid #ddd5c5; border-radius: 4px; padding: 6px 8px; overflow: hidden; }
+    table.tb2 { border-collapse: collapse; font-size: 10.5px; width: 100%; }
+    table.tb2 td, table.tb2 th { border: 1px solid #ddd5c5; padding: 3px 6px; text-align: left; vertical-align: top; }
+    table.tb2 th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: #7a7060; background: #efece4; }
+    .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 11px; }
+    .kv .k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #56503f; }
+    .kv > div { min-width: 0; overflow-wrap: anywhere; }
+    .row { display: flex; gap: 10px; min-height: 0; min-width: 0; }
+    .row > * { min-width: 0; }
+    .col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+    .note { font-size: 11px; color: #56503f; line-height: 1.45; }
+    .typ { background: #fffdf8; border: 1.5px solid #29426b; border-radius: 6px; padding: 6px 9px; box-sizing: border-box; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+    .typ .tn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #29426b; }
+    .typ .tf { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #292418; padding-left: 10px; line-height: 1.45; }
+    .typ .tm { font-size: 10.5px; color: #7a7060; }
+    .arrow { font-family: 'IBM Plex Mono', monospace; color: #3c6ea5; }
+    .wire { stroke: #3c6ea5; stroke-width: 1.5; fill: none; }
+    .ink { stroke: #292418; stroke-width: 1.5; fill: none; }
+    .grey { stroke: #8a8071; stroke-width: 1; fill: none; }
+    .fill-paper { fill: #fffdf8; }
+    .svgtxt { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: #56503f; }
+    .svgmath { font-family: 'STIX Two Text', 'Georgia', serif; font-style: italic; font-size: 11px; fill: #292418; }
+
+  </style>
+</helmet>
+<div style="width: 1560px; height: 980px; box-sizing: border-box; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; background: #f6f2ea">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
+      <div class="h1">Trace types — what paperproof emits and what the CAD keeps</div>
+      <div class="sub">the deterministic debugger needs the fibre paperproof drops: Expr, assignment history, elaboration order, rewrite locus</div>
+    </div>
+    <div class="meta" style="text-align: right; flex: 0 1 520px; max-width: 520px">sources: Paper-Proof/paperproof 69401f7 · AGENTS.md:99 typed swings · AGENTS.md mathematical production boundary</div>
+  </div>
+<div class="row" style="gap:10px; flex: 1 1 auto; min-height: 0"><div class="panel" style="flex: 1 1 0"><div class="panel-t"><span>paperproof wire format (verbatim, lean/Services/BetterParser.lean · app/types/LeanProofTree.ts)</span></div><div class="code" style="">structure Hypothesis where            -- id = fvarId (_uniq.N)
+  username type : String ; value : Option String ; id : String ; isProof : String  -- "proof"|"universe"|"data"
+structure GoalInfo where              -- id = mvarId ; BEq by id only
+  username type : String ; hyps : List Hypothesis ; id : MVarId
+structure ProofStep where
+  tacticString : String ; goalBefore : GoalInfo ; goalsAfter : List GoalInfo
+  tacticDependsOn : List String         -- fvarIds, from collectFVars on the assignment
+  spawnedGoals : List GoalInfo          -- orphan mvars: have / by / calc bodies
+  position : ProofStepPosition ; theorems : List TheoremSignature
+-- TS render model: Box {id, parentId ∈ {box, "haveBox", "byBox"}, goalNodes, hypLayers, hypTables}
+--                  Tactic {goalArrows, hypArrows, successGoalId, haveBoxIds, byBoxIds, dependsOnIds}
+--                  equivalentIds : { displayedId ↦ inferiorId[] }   -- one-level alias table</div><div class="note" style="">edges are semantic: goal parent/child from <span class='mono'>Meta.collectMVars</span> on <span class='mono'>eAssignment</span>; hypothesis use from <span class='mono'>collectFVars</span>; no-op tactics vanish by <span class='mono'>commonGoals</span> removal; authored steps are those with <span class='mono'>stx.getSubstring?</span></div></div><div class="panel" style="flex: 1 1 0"><div class="panel-t"><span>the CAD's trace types — the same objects, retyped as swings, with the dropped fibre retained</span></div><div class="col" style="gap:8px; "><div class="typ"><div class="tn">TacticSwing : Swing (AGENTS.md:99 · paperproof ProofStep)</div><div class="tf">before: GoalOccurrence (mvarId, lctx snapshot t)</div><div class="tf">operator: TacticInfo {syntax, elaborated Expr, theorems: TheoremSignature[]}</div><div class="tf">after: GoalOccurrence[] (owed) · spawned: GoalOccurrence[] (side quests)</div><div class="tf">receiver: goal type printed at mctxAfter</div><div class="tf">hypotheses: HypOccurrence[] used (fvarId)</div><div class="tf">orientation: rewrite hand ← / →, case hand</div><div class="tf">boundary: box parent (tacticSeq | have | by | calc)</div><div class="tf">grade: Grade (proved-derived · formal-checked pending until kernel event)</div><div class="tf">fibre: {assignment Expr, dAssignment, mctx delta, rewrite locus, unification trace, instance trace}</div><div class="tm">one authored tactic = one swing; t indexes the world-tube; the assignment is the reconstruction fibre</div></div><div class="typ"><div class="tn">HypOccurrence / GoalOccurrence (paperproof Hypothesis, GoalInfo · DerivationAtlas GoalFace)</div><div class="tf">id: fvarId | mvarId (Lean-minted, never invented)</div><div class="tf">alias: EquivalentIds union (same object, new id)</div><div class="tf">born: t · changed: t[] · cleared: t? (retained, drawn refused — not dropped)</div><div class="tf">isProof: proof | data | universe</div><div class="tf">type: Expr (binder info, universes kept) + pretty face</div><div class="tm">two-key identity: id first, name second, alias table for rewrites</div></div><div class="typ"><div class="tn">Frame (stack) (paperproof Box.parentId · AGENTS.md circulation)</div><div class="tf">kind: tacticSeq | have | by | calc | case</div><div class="tf">goal owed, hyps in scope, depth</div><div class="tf">children: Frame[]</div><div class="tm">the call/return stack is a receiver shadow of nested boundary transport — drawn, never an owner</div></div><div class="typ"><div class="tn">WorldEvent (AGENTS.md mathematical production boundary)</div><div class="tf">kind: kernel-accepted | kernel-refused | sorry-open | timeout</div><div class="tf">attached_to: projected passage id</div><div class="tf">receipt: toolchain, imports, axioms</div><div class="tm">kernel acceptance is a later world occurrence attached to one projected passage, never a phase or gate</div></div></div></div></div><div class="panel" style="flex: 0 0 auto"><div class="panel-t"><span>what a lower-level trace must add (paperproof stops at strings)</span></div><table class="tb2" style=""><thead><tr><th>level</th><th>paperproof</th><th>CAD retains</th><th>why it matters for auto-formalization</th></tr></thead><tbody><tr><td>term-mode proofs</td><td>one opaque step</td><td>TermInfo tree as swings</td><td>an LLM's `exact ⟨p, hp⟩` must be inspectable step by step</td></tr><tr><td>mvar assignment history</td><td>before/after only</td><td>every mctx snapshot, delayed assignments</td><td>replay is deterministic only with the full history</td></tr><tr><td>elaboration order</td><td>dropped</td><td>unification + synthInstance trace, postponed problems</td><td>the shortest separating intervention lives here</td></tr><tr><td>universe levels / implicits</td><td>dropped</td><td>Expr + Level kept</td><td>universe errors are the commonest auto-formalizer failure</td></tr><tr><td>rewrite locus</td><td>whole-type string diff</td><td>subterm path, motive, at-* fan-out</td><td>a rewrite is a transport with an address</td></tr><tr><td>disappeared hypotheses</td><td>opacity</td><td>refused occurrence with t</td><td>nothing leaves the route space silently</td></tr></tbody></table></div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -322,7 +322,6 @@ theorem theSquaredLemniscaticRelation :
       = Complex.Gamma (1/4) ^ 4 := by
   have hrel := theLemniscaticRelationWithTheHalf
   have hsq := congrArg (fun z : ℂ => z ^ 2) hrel
-  simp only at hsq
   have hpi : ((Real.sqrt Real.pi : ℝ) : ℂ) ^ 2 = (Real.pi : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt Real.pi_nonneg]
   have h2 : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
@@ -368,4 +367,3 @@ theorem theRealPeriodSquareIsPositive : 0 < (realPeriod 1) ^ 2 := by
   nlinarith [pow_pos hg 4, hcf]
 
 end Soma.Holonics.Millennium.FamilyPeriod
-

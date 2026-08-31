@@ -294,10 +294,12 @@ theorem theTwoClassIsRefusedWhenThePrimeTwoIsRemoved :
     QuotientGroup.map_mk' (G := ℚˣ) (N := MonoidHom.range (powMonoidHom 2)),
     theValuationOfTwoAtThePrimeTwoIsTheInverseUniformizer] at h
   have h2 := (map_eq_one_iff _ (MulEquiv.injective _)).mp h
-  rw [QuotientGroup.eq_one_iff] at h2
+  have h2' : (Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) ∈
+      (AddSubgroup.zmultiples (2 : ℤ)).toSubgroup := by
+    exact (QuotientGroup.eq_one_iff _).mp h2
+  have h2 : (-1 : ℤ) ∈ AddSubgroup.zmultiples (2 : ℤ) := h2'
   simp only [Multiplicative.mem_toSubgroup, AddSubgroup.mem_zmultiples_iff, smul_eq_mul] at h2
   obtain ⟨k, hk⟩ := h2
-  simp only [toAdd_ofAdd, Nat.cast_ofNat] at hk
   omega
 
 /-! ## 7. The bridge: `Descent`'s hand-rolled relation is the library quotient -/

@@ -53,6 +53,8 @@
 //! A display codec or a Vulkan executor may consume these receipts.  Neither
 //! is permitted to redefine their mathematics.
 
+mod addressed_current;
+pub use addressed_current::*;
 pub mod algebraic;
 pub mod analytic_field;
 pub mod approach_front;
@@ -125,12 +127,22 @@ pub mod coupled_informant;
 #[cfg(target_os = "linux")]
 pub mod cuda_aperture;
 #[cfg(target_os = "linux")]
+mod cuda_eta_head;
+#[cfg(target_os = "linux")]
+pub use cuda_eta_head::{EtaHeadError, ResidentEtaHead};
+mod cuda_realizer_search;
+pub use cuda_realizer_search::{
+    RealizerSearchError, ReceiverFamily as CudaRealizerReceiverFamily, ResidentRealizerSearch,
+    SearchReturn, SurfaceReturn, WheelReceiver, exact_square_root, homogeneous_value,
+};
 pub mod cuda_refine;
 #[cfg(target_os = "linux")]
 pub mod cuda_relation;
 pub mod derivation_atlas;
 pub mod device;
 pub mod diffusion;
+mod digest;
+pub use digest::is_sha256_digest;
 // Whether an exponential integrand closes in the elementary chart, decided as the consistency of
 // one exact rational linear system. The candidate realizer's degree is forced a priori, so the
 // candidate population is finite and exhaustible and non-elementarity returns as a rank deficiency
@@ -197,6 +209,8 @@ pub mod display;
 pub mod divisor_reconstruction;
 pub mod evolution;
 pub mod exact_linear;
+mod factored_moment;
+pub use factored_moment::*;
 // The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
 // `<a|b>²/(<a|a><b|b>)`, whose dyadic frames cancel identically, so the face crosses where the
 // bracket cannot. Carried as a pair, ordered by cross-multiplication, with the hand the square
@@ -401,6 +415,8 @@ pub mod skein;
 // says nothing at the crate root about which surface it belongs to, and `recover` would collide
 // with `codec_recovery::recover`.
 pub mod contact_gluing;
+mod mordell_weil_realizers;
+pub use mordell_weil_realizers::*;
 pub mod multiquadratic;
 pub mod spine_cut;
 pub mod statement_composition;

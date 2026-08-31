@@ -16,7 +16,7 @@ local-existence premise, or fixed-point conclusion is introduced.
 
 noncomputable section
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ENNReal NNReal lp
 open Filter
 
 namespace Soma.Holonics.Millennium.NavierStokesH3Bilinear
@@ -97,8 +97,9 @@ private theorem summable_triple_separable :
 theorem summable_separableReciprocalWeight :
     Summable separableReciprocalWeight := by
   have htranslated := frequencyTripleEquiv.summable_iff.mpr summable_triple_separable
-  simpa only [Function.comp_apply, frequencyTripleEquiv, separableReciprocalWeight] using
-    htranslated
+  refine htranslated.congr ?_
+  intro k
+  rfl
 
 /-- [proved-derived] The true reciprocal periodic `H³` weight is pointwise dominated by the
 separable population. -/
@@ -183,7 +184,9 @@ def weightedSobolevThreeCoefficient
   ⟨fun k ↦ (Real.sqrt (periodicSobolevWeight 3 k) : ℂ) * coeff.1 k, by
     apply memℓp_gen
     norm_num only [ENNReal.toReal_ofNat]
-    simpa only [Real.rpow_two, norm_weighted_sobolev_three_sq] using coeff.2⟩
+    have hcoeff := coeff.2
+    unfold HasPeriodicSobolevCoefficients at hcoeff
+    simpa only [Real.rpow_two, norm_weighted_sobolev_three_sq] using hcoeff⟩
 
 /-- [proved-derived] Every weighted `H³` coefficient population is absolutely summable. -/
 theorem summable_norm_periodicSobolevThreeCoefficient
@@ -230,8 +233,12 @@ def translatePeriodicRealFourierL2
         (by norm_num : 0 < (2 : ℝ≥0∞).toReal)
       simpa using h
     have htranslated := (frequencyTranslation p).summable_iff.mpr hcoeff
-    simpa only [Function.comp_apply, frequencyTranslation_apply, Real.rpow_two] using
-      htranslated⟩
+    have hfun :
+        ((fun k : SpatialFrequency ↦ ‖coeff k‖ ^ 2) ∘ frequencyTranslation p) =
+          (fun i ↦ ‖coeff (i - p)‖ ^ 2) := by
+      funext i
+      simp only [Function.comp_apply, frequencyTranslation_apply]
+    simpa only [Real.rpow_two] using (hfun ▸ htranslated)⟩
 
 @[simp]
 theorem translatePeriodicRealFourierL2_apply
@@ -284,7 +291,9 @@ private def periodicRealFourierL2Evaluation
       map_add' := fun _ _ ↦ rfl
       map_smul' := fun _ _ ↦ rfl }
     1 (fun coeff ↦ by
-      simpa using lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) coeff k)
+      change ‖coeff k‖ ≤ 1 * ‖coeff‖
+      simpa only [one_mul] using
+        lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) coeff k)
 
 @[simp]
 private theorem periodicRealFourierL2Evaluation_apply
@@ -434,8 +443,10 @@ def weightedAbsoluteCoefficient
     have hnonneg (k : SpatialFrequency) :
         0 ≤ sobolevThreeAmplitude k * ‖coeff.1 k‖ :=
       mul_nonneg (sobolevThreeAmplitude_nonneg k) (norm_nonneg _)
+    have hcoeff := coeff.2
+    unfold HasPeriodicSobolevCoefficients at hcoeff
     simpa only [Real.rpow_two, Real.norm_eq_abs,
-      abs_of_nonneg (hnonneg _), mul_pow, sobolevThreeAmplitude_sq] using coeff.2⟩
+      abs_of_nonneg (hnonneg _), mul_pow, sobolevThreeAmplitude_sq] using hcoeff⟩
 
 /-- [definition] The positive real `ℓ²` envelope for the weighted product convolution. -/
 def scalarProductEnvelope

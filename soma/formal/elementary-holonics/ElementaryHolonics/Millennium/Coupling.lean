@@ -107,7 +107,10 @@ theorem theCollapseIsTheFailureToSupplyFaithfully :
     (∀ a : A, a ∈ T.collapsed → a = 0) ↔ Function.Injective T.into :=
   ⟨fun h => (AddMonoidHom.ker_eq_bot_iff T.into).mp
       (AddSubgroup.eq_bot_iff_forall _ |>.mpr h),
-   fun h a ha => h (by simpa using ha)⟩
+   fun h a ha => by
+     apply h
+     change T.into a = 0 at ha
+     simpa using ha⟩
 
 /-- **A chain whose incoming transport is onto its retained population glues.**  The converse of
 the containment, stated so the gluing condition has a supply-side reading as well as a quotient

@@ -1109,7 +1109,10 @@ theorem restrict_higherOrderLerayQuadratic_to_weightedLerayQuadratic
               (weightedSobolevCoefficients (base + 1) (state coordinate)).1 p *
                 (weightedSobolevCoefficients (base + 1)
                   (state out)).1 (k - p))) output := by
-      simpa only [higherOrderLerayQuadratic, Nat.add_sub_cancel] using hgeneric
+      have horder : base + 1 - 1 = base := by omega
+      rw [horder] at hgeneric
+      convert hgeneric using 1
+      rfl
     _ = lerayProjectMode k
         (fun out ↦
           (h3DivergenceConvolution

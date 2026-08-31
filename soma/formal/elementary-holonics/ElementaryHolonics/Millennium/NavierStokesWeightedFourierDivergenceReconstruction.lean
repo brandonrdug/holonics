@@ -157,10 +157,10 @@ theorem divergence_reconstructedVelocity_eq_zero
     (hstate : IsModewiseDivergenceFree state) (x : Space) :
     divergence (reconstructedVelocity state) x = 0 := by
   rw [← sum_coordinate_fderiv_eq_divergence]
-  simpa only [equiv_symm_single_eq_basisFun,
-    EuclideanSpace.basisFun_apply,
-    ContinuousLinearMap.comp_apply] using
-    sum_fderiv_reconstructedVelocity_coordinate_eq_zero hstate x
+  change (∑ coordinate : Fin 3,
+      ((fderiv ℝ (reconstructedVelocity state) x)
+        (EuclideanSpace.single coordinate 1)).ofLp coordinate) = 0
+  exact sum_fderiv_reconstructedVelocity_coordinate_eq_zero hstate x
 
 /-- The complete reconstruction consequence: the field is real-valued by construction, `C¹`,
 one-periodic, and pointwise incompressible. -/

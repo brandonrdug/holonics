@@ -644,8 +644,8 @@ half-turn the group sum really is the point whose abscissa is `translatedX`. -/
 
 private lemma someEqSome {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : Descent.E.Nonsingular x₁ y₁} {h₂ : Descent.E.Nonsingular x₂ y₂} :
-    (WeierstrassCurve.Affine.Point.some h₁ : Descent.E.Point) =
-      WeierstrassCurve.Affine.Point.some h₂ := by
+    (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁ : Descent.E.Point) =
+      WeierstrassCurve.Affine.Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 /-- **The translated coordinates are a point of the curve.**  Mathlib's `nonsingular_add`
@@ -667,9 +667,11 @@ stays open because its quantifier ranges over *all* pairs, and the general chord
 family that remains. -/
 theorem theTranslationIsTheGroupSum {x y e : ℚ} (hP : Descent.E.Nonsingular x y)
     (hT : Descent.E.Nonsingular e 0) (hxe : x ≠ e) :
-    (WeierstrassCurve.Affine.Point.some hP + WeierstrassCurve.Affine.Point.some hT :
+    (WeierstrassCurve.Affine.Point.some x y hP + WeierstrassCurve.Affine.Point.some e 0 hT :
         Descent.E.Point)
-      = WeierstrassCurve.Affine.Point.some (theTranslatedCoordinatesAreNonsingular hP hT hxe) := by
+      = WeierstrassCurve.Affine.Point.some (translatedX x y e)
+        (Descent.E.addY x e y (Descent.E.slope x e y 0))
+        (theTranslatedCoordinatesAreNonsingular hP hT hxe) := by
   rw [WeierstrassCurve.Affine.Point.add_of_X_ne hxe]
   exact someEqSome (theChordCoordinateIsMathlibsAddX x y e hxe) rfl
 

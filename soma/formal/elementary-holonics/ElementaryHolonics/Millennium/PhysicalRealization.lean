@@ -30,7 +30,7 @@ namespace Soma.Holonics.Millennium.PhysicalRealization
 open Soma.Holonics
 open Soma.Holonics.Millennium.Chronology
 
-universe uG uR uA uB uC uF
+universe uG uR uA uB uC uF uOcc
 
 /-- The causal-algebraic core of one physical realization. -/
 structure PhysicalRealizationCore
@@ -85,7 +85,8 @@ theorem receiverToFutureTransformer_exists_iff
 def OccurrenceIdentity {Occurrence : Type*} (left right : Occurrence) : Prop := left = right
 
 /-- Addressed passage equivalence preserves occurrence population and both boundary maps. -/
-abbrev PassageEquivalence {X Y : Type*} (P Q : AddressedPassage X Y) :=
+abbrev PassageEquivalence {X : Type uA} {Y : Type uB}
+    (P Q : AddressedPassage.{uA, uB, uOcc} X Y) :=
   AddressedPassage.PassageEquiv P Q
 
 /--
@@ -99,7 +100,7 @@ structure RealizationSpan
     {Source : Type uA} {Target : Type uB}
     (A : PhysicalRealizationCore Generator Receiver Source Face)
     (B : PhysicalRealizationCore Generator Receiver Target Face) where
-  addressed : AddressedPassage Source Target
+  addressed : AddressedPassage.{uA, uB, uOcc} Source Target
   chart : Source → Target
   carries : ∀ source, Nonempty (addressed.Fibre source (chart source))
   receiverExact : ∀ receiver source, B.receiver receiver (chart source) = A.receiver receiver source
@@ -167,7 +168,7 @@ structure RealizationPassage
     {Source : Type uA} {Target : Type uB}
     (A : PhysicalRealizationCore Generator Receiver Source Face)
     (B : PhysicalRealizationCore Generator Receiver Target Face) where
-  span : RealizationSpan A B
+  span : RealizationSpan.{uG, uR, uA, uB, uF, uOcc} A B
   generatorExact : ∀ generator source,
     span.chart (A.transport generator source) = B.transport generator (span.chart source)
 
@@ -219,7 +220,7 @@ structure SeparatingReceiverHistory (P : RealizationPassage A B) (left right : S
 
 /-- A rebase owes a passage back and both literal identity compositions. -/
 structure Rebase (P : RealizationPassage A B) where
-  inverse : RealizationPassage B A
+  inverse : RealizationPassage.{uG, uR, uB, uA, uF, uOcc} B A
   forwardIdentity : ∀ source, inverse.span.chart (P.span.chart source) = source
   backwardIdentity : ∀ target, P.span.chart (inverse.span.chart target) = target
 

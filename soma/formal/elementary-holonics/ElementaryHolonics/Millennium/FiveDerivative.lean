@@ -60,7 +60,8 @@ private lemma hasDerivAt_lambda5_one :
     have h := isBigO_atTop_theta5 (-(2 : ℝ))
     exact isBigO_ofReal_left.mpr h
   have hf_bot : f5 =O[nhdsWithin 0 (Ioi 0)] (· ^ (-(0 : ℝ))) := by
-    have h := fiveFEPair.hf_zero' (-(0 : ℝ))
+    have hstrong : IsStrongFEPair fiveFEPair := ⟨rfl, rfl⟩
+    have h := hstrong.hf_zero (-(0 : ℝ))
     exact h
   exact mellin_hasDerivAt_of_isBigO_rpow hfc hf_top (by norm_num) hf_bot (by norm_num)
 

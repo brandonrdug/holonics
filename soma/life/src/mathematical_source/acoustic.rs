@@ -5,7 +5,7 @@
 //! returns one exact signed section for an inherited acoustic projection. The section is a
 //! receiver quotient: the complete PCM population remains beside it as the reconstruction fibre.
 
-use std::path::Path;
+use std::{io::Cursor, path::Path};
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -54,21 +54,48 @@ impl ExactAcousticOccurrence {
         section_width: usize,
     ) -> Result<Self, ExactAcousticRefusal> {
         let occurrence = occurrence.into();
+        let locator = path.display().to_string();
+        let source = std::fs::read(path).map_err(|error| ExactAcousticRefusal::Io {
+            path: locator.clone(),
+            message: error.to_string(),
+        })?;
+        Self::from_wav_bytes(
+            &source,
+            occurrence,
+            locator,
+            frame_length,
+            frame_hop,
+            section_width,
+        )
+    }
+
+    /// Recover the same exact mono signed-PCM occurrence from an already addressed memory span.
+    ///
+    /// `locator` is cold delivery lineage only. The encoded body is borrowed during decoding and
+    /// does not survive as a second morphology copy; exact PCM samples remain the reconstruction
+    /// fibre beside their receiver section.
+    pub fn from_wav_bytes(
+        source: &[u8],
+        occurrence: impl Into<String>,
+        locator: impl Into<String>,
+        frame_length: u32,
+        frame_hop: u32,
+        section_width: usize,
+    ) -> Result<Self, ExactAcousticRefusal> {
+        let occurrence = occurrence.into();
+        let locator = locator.into();
         if occurrence.is_empty() {
             return Err(ExactAcousticRefusal::Occurrence);
         }
         if frame_length == 0 || frame_hop == 0 || section_width == 0 {
             return Err(ExactAcousticRefusal::Aperture);
         }
-        let source = std::fs::read(path).map_err(|error| ExactAcousticRefusal::Io {
-            path: path.display().to_string(),
-            message: error.to_string(),
-        })?;
-        let mut reader =
-            hound::WavReader::open(path).map_err(|error| ExactAcousticRefusal::Codec {
-                path: path.display().to_string(),
+        let mut reader = hound::WavReader::new(Cursor::new(source)).map_err(|error| {
+            ExactAcousticRefusal::Codec {
+                path: locator.clone(),
                 message: error.to_string(),
-            })?;
+            }
+        })?;
         let spec = reader.spec();
         if spec.channels != 1
             || spec.bits_per_sample != 16
@@ -85,7 +112,7 @@ impl ExactAcousticOccurrence {
             .samples::<i16>()
             .collect::<Result<Vec<_>, _>>()
             .map_err(|error| ExactAcousticRefusal::Codec {
-                path: path.display().to_string(),
+                path: locator.clone(),
                 message: error.to_string(),
             })?;
         if samples.is_empty() || samples.len() > u32::MAX as usize {
@@ -97,8 +124,8 @@ impl ExactAcousticOccurrence {
         let section_sha256 = signed_identity(&section);
         Ok(Self {
             occurrence,
-            locator: path.display().to_string(),
-            source_sha256: hex(Sha256::digest(&source)),
+            locator,
+            source_sha256: hex(Sha256::digest(source)),
             source_octets: source.len() as u64,
             sample_rate: spec.sample_rate,
             frame_length,
@@ -257,5 +284,36 @@ mod tests {
         let section = fold_section(&samples, 3).expect("bounded exact fold");
         assert_eq!(section.len(), 3);
         assert_ne!(section, vec![0; 3]);
+    }
+
+    #[test]
+    fn memory_backed_wav_and_file_backed_wav_return_the_same_occurrence() {
+        let mut wav = Vec::new();
+        {
+            let specification = hound::WavSpec {
+                channels: 1,
+                sample_rate: 8_000,
+                bits_per_sample: 16,
+                sample_format: hound::SampleFormat::Int,
+            };
+            let cursor = Cursor::new(&mut wav);
+            let mut writer = hound::WavWriter::new(cursor, specification).expect("memory WAV");
+            for sample in [1_i16, -2, 3, -4, 5] {
+                writer.write_sample(sample).expect("sample");
+            }
+            writer.finalize().expect("finalize memory WAV");
+        }
+        let occurrence = ExactAcousticOccurrence::from_wav_bytes(
+            &wav,
+            "acoustic/memory",
+            "memory://test",
+            3,
+            2,
+            3,
+        )
+        .expect("memory-backed occurrence");
+        assert_eq!(occurrence.samples, vec![1, -2, 3, -4, 5]);
+        assert_eq!(occurrence.source_sha256, hex(Sha256::digest(&wav)));
+        assert_eq!(occurrence.frames.len(), 2);
     }
 }

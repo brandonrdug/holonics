@@ -58,11 +58,11 @@ theorem nonsingular2P : E5.Nonsingular (1681/144) (-62279/1728) := by
   rw [nonsingular_iff, equation_iff]; norm_num [E5]
 
 /-- The identity-adjacent torsion candidates and the new chain. -/
-def T0 : E5.Point := .some nonsingular00
-def T5 : E5.Point := .some nonsingular50
-def Tm5 : E5.Point := .some nonsingularNeg50
-def P : E5.Point := .some nonsingularP
-def P2 : E5.Point := .some nonsingular2P
+def T0 : E5.Point := .some 0 0 nonsingular00
+def T5 : E5.Point := .some 5 0 nonsingular50
+def Tm5 : E5.Point := .some (-5) 0 nonsingularNeg50
+def P : E5.Point := .some (-4) 6 nonsingularP
+def P2 : E5.Point := .some (1681 / 144) (-62279 / 1728) nonsingular2P
 
 /-! ## 2. The half-turns, and the doubling of the new point -/
 
@@ -74,7 +74,7 @@ theorem theThreePointsAreHalfTurns : T0 + T0 = 0 ∧ T5 + T5 = 0 ∧ Tm5 + Tm5 =
 
 private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
-    (Point.some h₁ : E5.Point) = Point.some h₂ := by
+    (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl
 
 /-- **The double of the new point, computed through the tangent case**: the tangent at
@@ -85,9 +85,11 @@ theorem theDoubleIsComputed : P + P = P2 := by
   have hy : (6 : ℚ) ≠ E5.negY (-4) 6 := by norm_num [E5]
   have hs : E5.slope (-4) (-4) 6 6 = 23/12 := by
     rw [slope_of_Y_ne rfl hy]; norm_num [E5]
-  show Point.some nonsingularP + Point.some nonsingularP = Point.some nonsingular2P
+  show Point.some (-4) 6 nonsingularP + Point.some (-4) 6 nonsingularP =
+    Point.some (1681 / 144) (-62279 / 1728) nonsingular2P
   rw [Point.add_self_of_Y_ne hy]
-  exact some_eq_some (by rw [hs]; norm_num [E5]) (by rw [hs]; norm_num [E5])
+  exact some_eq_some (by rw [hs]; norm_num [E5, addX])
+    (by rw [hs]; norm_num [E5, addY, negY, negAddY, addX])
 
 /-! ## 3. The descent face on this curve -/
 
@@ -95,13 +97,13 @@ theorem theDoubleIsComputed : P + P = P2 := by
 coordinate. -/
 def slotOne : E5.Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 0 then -25 else x
+  | .some x _ _ => if x = 0 then -25 else x
 
 /-- The second slot: `x − 5`, with the convention `(5−0)(5+5) = 50` at its vanishing
 coordinate. -/
 def slotTwo : E5.Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 5 then 50 else x - 5
+  | .some x _ _ => if x = 5 then 50 else x - 5
 
 /-- The face values on the five points: `0 ↦ (1,1)`, `(0,0) ↦ (−25,−5)`, `(5,0) ↦ (5,50)`,
 `(−5,0) ↦ (−5,−10)`, `P ↦ (−4,−9)`, `2P ↦ ((41/12)², (31/12)²)`. -/

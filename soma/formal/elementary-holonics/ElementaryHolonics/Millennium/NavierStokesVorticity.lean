@@ -205,7 +205,11 @@ theorem matrixAction_jacobianMatrix (D : Space →L[ℝ] Space) (u : Space) :
   have h := LinearMap.toMatrix_mulVec_repr
     (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis
     (EuclideanSpace.basisFun (Fin 3) ℝ).toBasis D.toLinearMap u
-  simpa [matrixAction, jacobianMatrix] using congrFun h i
+  have hrepr : (⇑((EuclideanSpace.basisFun (Fin 3) ℝ).toBasis.repr u)) =
+      (fun j : Fin 3 => u j) := by
+    funext j
+    rfl
+  simpa [matrixAction, jacobianMatrix, hrepr] using congrFun h i
 
 /-- Coordinate expansion of a continuous-linear action in the Euclidean basis. -/
 theorem continuousLinearMap_apply_coordinate (D : Space →L[ℝ] Space) (u : Space)
@@ -323,7 +327,8 @@ theorem gradientJacobian_symmetric_of_contDiffAtTwo (p : Space → ℝ) (x : Spa
         (InnerProductSpace.toDual ℝ Space).symm.toContinuousLinearMap.comp
           (fderiv ℝ (fderiv ℝ p) x) := by
     change fderiv ℝ ((InnerProductSpace.toDual ℝ Space).symm ∘ fun y => fderiv ℝ p y) x = _
-    simpa using (InnerProductSpace.toDual ℝ Space).symm.comp_fderiv
+    convert (InnerProductSpace.toDual ℝ Space).symm.comp_fderiv using 1
+    · rfl
   intro i j
   rw [velocityJacobianAt, jacobianMatrix_apply, jacobianMatrix_apply, hgradient]
   change

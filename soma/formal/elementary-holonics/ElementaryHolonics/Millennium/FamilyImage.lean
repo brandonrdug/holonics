@@ -42,10 +42,10 @@ private lemma negYAt (n x y : ℚ) : (FamilyFace.E n).negY x y = -y := by
   simp [negY, FamilyFace.E]
 
 private lemma slotOneAt_some' {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotOneAt n (.some h) = if x = 0 then -n ^ 2 else x := rfl
+    slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
 
 private lemma slotTwoAt_some' {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotTwoAt n (.some h) = if x = n then 2 * n ^ 2 else x - n := rfl
+    slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 set_option maxHeartbeats 1000000 in
 /-- **THE DOUBLES LAND IN THE KERNEL AT EVERY MODULUS**: both slots of a doubled
@@ -58,7 +58,7 @@ theorem theDoublesLandInTheKernelAtEveryModulus (n : ℚ) (hn : 0 < n)
   · rw [← Point.zero_def, add_zero]
     exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
   · by_cases hy : y = 0
-    · have hzero : (Point.some h : (FamilyFace.E n).Point) + Point.some h = 0 :=
+    · have hzero : (Point.some x y h : (FamilyFace.E n).Point) + Point.some x y h = 0 :=
         Point.add_self_of_Y_eq (by rw [negYAt, hy]; norm_num)
       rw [hzero]
       exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩

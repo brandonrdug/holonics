@@ -314,7 +314,12 @@ theorem isFixedPt_higherOrderMildMap_concat
     change higherOrderLinearHeatPath base nu hA initial ⟨t.1, htLeft⟩ -
         higherOrderDuhamelReturn base hbase nu hnu t.1
           (weightedHigherOrderPathExtension hA left) = left ⟨t.1, htLeft⟩ at hleftAt
-    simpa only [joined, hreturn, hjoined] using hleftAt
+    dsimp only [joined]
+    rw [hreturn, hjoined]
+    change higherOrderLinearHeatPath base nu hA initial ⟨t.1, htLeft⟩ -
+        higherOrderDuhamelReturn base hbase nu hnu t.1
+          (weightedHigherOrderPathExtension hA left) = left ⟨t.1, htLeft⟩
+    exact hleftAt
   · have hAt : A ≤ t.1 := (lt_of_not_ge htA).le
     let tau : ℝ := t.1 - A
     have htau : tau ∈ Icc (0 : ℝ) B := by

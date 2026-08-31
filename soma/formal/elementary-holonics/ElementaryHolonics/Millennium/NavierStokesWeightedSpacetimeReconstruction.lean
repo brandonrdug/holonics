@@ -87,13 +87,11 @@ theorem continuous_joint_reconstructedVelocity
       (z.2, euclideanToSpatialTorus z.1)) :=
     continuous_snd.prodMk
       (euclideanToSpatialTorus_isOpenQuotientMap.continuous.comp continuous_fst)
-  have hcomposition : Continuous
-      ((fun z : Icc (0 : ℝ) T × SpatialTorus ↦
-        reconstructedTorusReal (path z.1) z.2) ∘
-        (fun z : Space × Icc (0 : ℝ) T ↦
-          (z.2, euclideanToSpatialTorus z.1))) :=
+  have hcomposition :=
     (continuous_joint_reconstructedTorusReal path).comp hrebase
-  simpa only [Function.comp_apply] using hcomposition
+  change Continuous (fun z : Space × Icc (0 : ℝ) T ↦
+    reconstructedTorusReal (path z.2) (euclideanToSpatialTorus z.1)) at hcomposition
+  exact hcomposition
 
 /-- On a Fourier-real native path, complexification of the joint real return recovers every
 complex Fourier passage at every addressed spacetime face. -/

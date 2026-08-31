@@ -144,7 +144,9 @@ theorem smoothSolutionOn_jointVorticityField_contDiffOn_interior
       (fderiv ℝ (Function.uncurry velocity)) (openSpaceTimeSlab T) :=
     hvelocity.fderiv_of_isOpen hopen (by simp)
   have hcurl := jointSpatialCurlLinearMap.contDiff.comp_contDiffOn hderivative
-  simpa [openSpaceTimeSlab, jointVorticityField, Function.uncurry] using hcurl
+  apply hcurl.congr
+  rintro ⟨x, t⟩ hxt
+  rfl
 
 /-- Slice-defined vorticity is jointly smooth on the slab interior. -/
 theorem smoothSolutionOn_vorticityField_contDiffOn_interior
@@ -200,7 +202,9 @@ theorem smoothSolutionOn_eulerianTimeJet_contDiff_two
       (openSpaceTimeSlab T) := hderivative.clm_apply contDiffOn_const
   have htimeField : ContDiffOn ℝ ∞
       (Function.uncurry (eulerianTimeJet velocity)) (openSpaceTimeSlab T) := by
-    simpa [openSpaceTimeSlab, eulerianTimeJet, timeDirection, Function.uncurry] using htimeJoint
+    change ContDiffOn ℝ ∞
+      (fun z => fderiv ℝ (Function.uncurry velocity) z (0, 1)) (openSpaceTimeSlab T)
+    simpa [timeDirection] using htimeJoint
   rw [contDiff_iff_contDiffAt]
   intro x
   have hjoint : ContDiffAt ℝ ∞

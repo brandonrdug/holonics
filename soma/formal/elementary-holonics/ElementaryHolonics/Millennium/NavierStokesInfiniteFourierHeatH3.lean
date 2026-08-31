@@ -22,7 +22,7 @@ existence theorem is asserted.
 
 noncomputable section
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ENNReal NNReal lp
 
 namespace Soma.Holonics.Millennium.NavierStokesInfiniteFourierHeatH3
 

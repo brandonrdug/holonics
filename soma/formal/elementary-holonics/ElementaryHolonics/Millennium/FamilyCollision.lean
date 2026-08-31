@@ -202,7 +202,7 @@ set_option maxHeartbeats 1000000 in
 theorem theTorsionTrioDoesNotCollideAtEveryModulus (hn : 0 < n)
     (T : Fin 3 → (FamilyFace.E ((n : ℚ))).Point)
     (hT0 : T 0 = 0)
-    (hT1 : T 1 = Point.some (show (FamilyFace.E ((n : ℚ))).Nonsingular 0 0 from by
+    (hT1 : T 1 = Point.some 0 0 (show (FamilyFace.E ((n : ℚ))).Nonsingular 0 0 from by
       rw [nonsingular_iff, equation_iff]
       constructor
       · simp [FamilyFace.E]
@@ -211,7 +211,8 @@ theorem theTorsionTrioDoesNotCollideAtEveryModulus (hn : 0 < n)
         have h1 : (0 : ℚ) < (n : ℚ) := by exact_mod_cast hn
         intro hc
         nlinarith [hc, h1]))
-    (hT2 : T 2 = Point.some (show (FamilyFace.E ((n : ℚ))).Nonsingular ((n : ℚ)) 0 from by
+    (hT2 : T 2 = Point.some (n : ℚ) 0
+      (show (FamilyFace.E ((n : ℚ))).Nonsingular ((n : ℚ)) 0 from by
       rw [nonsingular_iff, equation_iff]
       constructor
       · simp only [FamilyFace.E]

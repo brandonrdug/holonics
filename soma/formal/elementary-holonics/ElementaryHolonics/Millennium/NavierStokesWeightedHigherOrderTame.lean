@@ -144,9 +144,11 @@ def weightedAbsoluteCoefficientAtOrder
     have hnonneg (k : SpatialFrequency) :
         0 ≤ sobolevAmplitudeAtOrder order k * ‖coeff.1 k‖ :=
       mul_nonneg (sobolevAmplitudeAtOrder_nonneg order k) (norm_nonneg _)
+    have hcoeff := coeff.2
+    unfold HasPeriodicSobolevCoefficients at hcoeff
     simpa only [Real.rpow_two, Real.norm_eq_abs,
       abs_of_nonneg (hnonneg _), mul_pow,
-      sobolevAmplitudeAtOrder_sq] using coeff.2⟩
+      sobolevAmplitudeAtOrder_sq] using hcoeff⟩
 
 /-- The exact scalar order-`m` coefficient norm. -/
 def periodicSobolevCoefficientNorm
@@ -809,6 +811,7 @@ def periodicSobolevDerivativeIntoPred
     (coeff : PeriodicSobolevCoefficients order) :
     PeriodicSobolevCoefficients (order - 1) :=
   ⟨periodicSobolevDerivativeFourier order hpositive coordinate coeff, by
+    unfold HasPeriodicSobolevCoefficients
     simpa only [periodicSobolevDerivativeFourier] using
       summable_periodicSobolevDerivative_weighted_pred
         order hpositive coordinate coeff⟩
@@ -1240,6 +1243,12 @@ theorem vectorCoefficientAt_nativeVectorUnderlyingAtOrder_lerayProject
     (((Real.sqrt (periodicSobolevWeight order k))⁻¹ : ℝ) : ℂ)
   have hsmul := congrFun
     (lerayProjectMode_smul_native scale k (fun component ↦ state component k)) output
+  have hmode :
+      scale • (fun component ↦ state component k) =
+        (fun component ↦ scale * state component k) := by
+    funext component
+    simp only [Pi.smul_apply, smul_eq_mul]
+  rw [hmode] at hsmul
   change scale * lerayProjectMode k (fun component ↦ state component k) output =
     lerayProjectMode k (fun component ↦ scale * state component k) output
   simpa only [Pi.smul_apply, smul_eq_mul] using hsmul.symm

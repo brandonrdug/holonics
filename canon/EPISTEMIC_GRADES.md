@@ -37,6 +37,9 @@ the next claim; it does not silently upgrade the rest of the correspondence.
 | `implemented-exact` | A bounded construction returned exact invariant/equality receipts. | Source, declared input family, receiver boundary, and exact grade. |
 | `measured` | A calibrated experiment returned receiver testimony. | Apparatus, aperture, calibration/bounds, inputs, and raw or summarized receipt. |
 | `computational-witness` | A finite computation witnesses a stated instance. | Reproducible construction and boundary; no silent generalization. |
+| `source-inspected` | Direct inspection of a named source revision supports the claim without executing it. | Exact revision, path, line/construct anchors, dependency boundary, and the inference drawn from them. |
+| `source-audit` | A declared source or dependency closure was searched for presence, absence, reachability, or contamination. | Exact revision, complete aperture, reproducible command or traversal, and every excluded root. |
+| `process-audit` | Process chronology, repetition, timeout, exit, or validation cadence supports the claim. | Exact command, source/input closure, start/end or elapsed time, exit status, and disposition. |
 
 ## Imported synopsis crosswalk
 

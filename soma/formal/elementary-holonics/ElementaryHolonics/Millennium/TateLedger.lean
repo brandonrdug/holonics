@@ -108,7 +108,7 @@ theorem theResidualCubicSplitsAtFive :
 
 private def abscissa : Descent.E.Point → ℚ
   | .zero => 2
-  | .some (x := x) _ => x
+  | .some x _ _ => x
 
 /-- **The torsion order at one is four**: the four members of the population are pairwise
 distinct — with completeness from the descent, `|T| = 4` exactly. -/

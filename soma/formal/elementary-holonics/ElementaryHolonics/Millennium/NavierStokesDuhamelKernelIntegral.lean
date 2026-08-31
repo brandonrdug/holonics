@@ -75,7 +75,7 @@ theorem intervalIntegrable_duhamelHeatKernelMajorant
   have hbound : IntervalIntegrable
       (fun tau : ℝ ↦ 1 + (Real.sqrt (2 * nu))⁻¹ * tau ^ (-(1 / 2 : ℝ)))
       volume 0 T :=
-    intervalIntegral.intervalIntegrable_const.add
+    intervalIntegrable_const.add
       (hrpow.const_mul (Real.sqrt (2 * nu))⁻¹)
   apply hbound.mono_fun'
   · unfold duhamelHeatKernelMajorant heatOneStepSquaredConstant
@@ -107,7 +107,7 @@ theorem intervalIntegral_duhamelHeatKernelMajorant_le
   have hrpow : IntervalIntegrable (fun tau : ℝ ↦ tau ^ (-(1 / 2 : ℝ))) volume 0 T :=
     intervalIntegral.intervalIntegrable_rpow' (by norm_num)
   have hone : IntervalIntegrable (fun _ : ℝ ↦ (1 : ℝ)) volume 0 T :=
-    intervalIntegral.intervalIntegrable_const
+    intervalIntegrable_const
   have hscaled : IntervalIntegrable
       (fun tau : ℝ ↦ (Real.sqrt (2 * nu))⁻¹ * tau ^ (-(1 / 2 : ℝ)))
       volume 0 T :=

@@ -41,7 +41,7 @@ def wordPassage (T : ι → X → X) : List ι → AddressedPassage X X
 def wordOccurrence (T : ι → X → X) :
     (word : List ι) → (x : X) → (wordPassage T word).Occurrence
   | [], x => x
-  | i :: word, x =>
+  | _ :: word, x =>
       let left := wordOccurrence T word x
       ⟨left, (wordPassage T word).target left, rfl⟩
 
@@ -196,6 +196,210 @@ theorem joinedConnectionTransport_is_serialComposition
       connectionTransport rightConnection joined.right *
         connectionTransport leftConnection joined.left := rfl
 
+/-! ## Two addressed routes return one curvature defect -/
+
+/-- Transport an invertible fibre action through an exact change of fibre chart. -/
+def rebaseTransport {Fibre Fibre' : Type*} (chart : Fibre ≃ Fibre')
+    (transport : Equiv.Perm Fibre) : Equiv.Perm Fibre' :=
+  (chart.symm.trans transport).trans chart
+
+@[simp] theorem rebaseTransport_apply {Fibre Fibre' : Type*} (chart : Fibre ≃ Fibre')
+    (transport : Equiv.Perm Fibre) (state : Fibre') :
+    rebaseTransport chart transport state = chart (transport (chart.symm state)) := rfl
+
+/-- Exact chart transport respects serial composition of fibre actions. -/
+theorem rebaseTransport_mul {Fibre Fibre' : Type*} (chart : Fibre ≃ Fibre')
+    (left right : Equiv.Perm Fibre) :
+    rebaseTransport chart (left * right) =
+      rebaseTransport chart left * rebaseTransport chart right := by
+  ext state
+  simp [rebaseTransport]
+
+/-- Exact chart transport respects reversal of a fibre action. -/
+theorem rebaseTransport_inv {Fibre Fibre' : Type*} (chart : Fibre ≃ Fibre')
+    (transport : Equiv.Perm Fibre) :
+    rebaseTransport chart transport⁻¹ = (rebaseTransport chart transport)⁻¹ := by
+  ext state
+  simp [rebaseTransport]
+
+/-- The returned connection defect between two routes: follow the right route and reverse the
+left.  This is defined only after both route transports have been retained. -/
+def routeComparisonReturn {Fibre : Type*}
+    (left right : Equiv.Perm Fibre) : Equiv.Perm Fibre :=
+  right * left⁻¹
+
+/-- A route comparison is flat exactly when its two complete transports agree. -/
+theorem routeComparisonReturn_eq_one_iff {Fibre : Type*}
+    (left right : Equiv.Perm Fibre) :
+    routeComparisonReturn left right = 1 ↔ right = left := by
+  constructor
+  · intro h
+    have transported := congrArg (fun action : Equiv.Perm Fibre ↦ action * left) h
+    simpa [routeComparisonReturn, mul_assoc] using transported
+  · rintro rfl
+    simp [routeComparisonReturn]
+
+/-- A comparison of two addressed route occurrences together with the connection on each route.
+The route occurrences remain available through `cell`; equal endpoints or equal transports do not
+identify them. -/
+structure AddressedConnectionComparison (Fibre : Type*) {X Y : Type*}
+    (P Q : AddressedPassage X Y) where
+  cell : AddressedPassage.ComparisonCell P Q
+  leftConnection : AddressedConnection Fibre P
+  rightConnection : AddressedConnection Fibre Q
+
+namespace AddressedConnectionComparison
+
+variable {Fibre X Y : Type*} {P Q : AddressedPassage X Y}
+
+/-- The complete left occurrence in its addressed source/target fibre. -/
+def leftFibre (comparison : AddressedConnectionComparison Fibre P Q) :
+    P.Fibre (P.source comparison.cell.left) (P.target comparison.cell.left) :=
+  ⟨comparison.cell.left, rfl, rfl⟩
+
+/-- The complete right occurrence, rebased only at the common source proved by the comparison
+cell.  Its target remains its own returned boundary face. -/
+def rightFibre (comparison : AddressedConnectionComparison Fibre P Q) :
+    Q.Fibre (P.source comparison.cell.left) (Q.target comparison.cell.right) :=
+  ⟨comparison.cell.right, comparison.cell.source_exact.symm, rfl⟩
+
+/-- The retained transport of the left route occurrence. -/
+def leftTransport (comparison : AddressedConnectionComparison Fibre P Q) : Equiv.Perm Fibre :=
+  connectionTransport comparison.leftConnection comparison.cell.left
+
+/-- The retained transport of the right route occurrence. -/
+def rightTransport (comparison : AddressedConnectionComparison Fibre P Q) : Equiv.Perm Fibre :=
+  connectionTransport comparison.rightConnection comparison.cell.right
+
+/-- Curvature/holonomy returned by the two addressed connection routes. -/
+def returnedCurvature (comparison : AddressedConnectionComparison Fibre P Q) : Equiv.Perm Fibre :=
+  routeComparisonReturn comparison.leftTransport comparison.rightTransport
+
+/-- The addressed comparison is connection-flat exactly when its two route transports agree. -/
+theorem returnedCurvature_eq_one_iff
+    (comparison : AddressedConnectionComparison Fibre P Q) :
+    comparison.returnedCurvature = 1 ↔
+      comparison.rightTransport = comparison.leftTransport :=
+  routeComparisonReturn_eq_one_iff comparison.leftTransport comparison.rightTransport
+
+end AddressedConnectionComparison
+
+/-- Fibre-chart rebase conjugates the complete route return; it cannot change whether the face is
+flat. -/
+theorem routeComparisonReturn_rebase {Fibre Fibre' : Type*} (chart : Fibre ≃ Fibre')
+    (left right : Equiv.Perm Fibre) :
+    routeComparisonReturn (rebaseTransport chart left) (rebaseTransport chart right) =
+      rebaseTransport chart (routeComparisonReturn left right) := by
+  rw [routeComparisonReturn, routeComparisonReturn, rebaseTransport_mul,
+    rebaseTransport_inv]
+
+/-! ## Receiver/scale descent of a two-route connection return -/
+
+/-- A possibly noninvertible scale or receiver map which intertwines both complete route actions.
+Unlike `rebaseTransport`, this passage permits a genuine quotient and therefore retains the
+possibility that the coarse receiver loses curvature. -/
+structure RouteScalePassage (Fine Coarse : Type*) where
+  fibreMap : Fine → Coarse
+  fineLeft : Equiv.Perm Fine
+  fineRight : Equiv.Perm Fine
+  coarseLeft : Equiv.Perm Coarse
+  coarseRight : Equiv.Perm Coarse
+  left_natural : ∀ state, fibreMap (fineLeft state) = coarseLeft (fibreMap state)
+  right_natural : ∀ state, fibreMap (fineRight state) = coarseRight (fibreMap state)
+
+namespace RouteScalePassage
+
+variable {Fine Coarse : Type*} (passage : RouteScalePassage Fine Coarse)
+
+/-- Intertwining an invertible route also intertwines its exact reversal. -/
+theorem left_inv_natural (state : Fine) :
+    passage.fibreMap (passage.fineLeft⁻¹ state) =
+      passage.coarseLeft⁻¹ (passage.fibreMap state) := by
+  have forward := passage.left_natural (passage.fineLeft⁻¹ state)
+  have returned := congrArg passage.coarseLeft.symm forward
+  simpa using returned.symm
+
+/-- The complete curvature/holonomy return descends through every map which intertwines both
+routes.  No injectivity, surjectivity, or choice of inverse is used. -/
+theorem returnedCurvature_natural (state : Fine) :
+    passage.fibreMap
+        (routeComparisonReturn passage.fineLeft passage.fineRight state) =
+      routeComparisonReturn passage.coarseLeft passage.coarseRight
+        (passage.fibreMap state) := by
+  change passage.fibreMap (passage.fineRight (passage.fineLeft⁻¹ state)) =
+    passage.coarseRight (passage.coarseLeft⁻¹ (passage.fibreMap state))
+  rw [passage.right_natural, passage.left_inv_natural]
+
+/-- A coarse flat reading reconstructs fine flatness when the receiver retains all fine states. -/
+theorem fineFlat_of_coarseFlat (hinjective : Function.Injective passage.fibreMap)
+    (hcoarse : routeComparisonReturn passage.coarseLeft passage.coarseRight = 1) :
+    routeComparisonReturn passage.fineLeft passage.fineRight = 1 := by
+  ext state
+  apply hinjective
+  calc
+    passage.fibreMap
+        (routeComparisonReturn passage.fineLeft passage.fineRight state) =
+      routeComparisonReturn passage.coarseLeft passage.coarseRight
+        (passage.fibreMap state) := passage.returnedCurvature_natural state
+    _ = passage.fibreMap state := by rw [hcoarse]; rfl
+
+/-- Fine flatness fills the whole coarse receiver when every coarse state has a fine antecedent. -/
+theorem coarseFlat_of_fineFlat (hsurjective : Function.Surjective passage.fibreMap)
+    (hfine : routeComparisonReturn passage.fineLeft passage.fineRight = 1) :
+    routeComparisonReturn passage.coarseLeft passage.coarseRight = 1 := by
+  ext coarseState
+  obtain ⟨fineState, rfl⟩ := hsurjective coarseState
+  calc
+    routeComparisonReturn passage.coarseLeft passage.coarseRight
+        (passage.fibreMap fineState) =
+      passage.fibreMap
+        (routeComparisonReturn passage.fineLeft passage.fineRight fineState) :=
+          (passage.returnedCurvature_natural fineState).symm
+    _ = passage.fibreMap fineState := by rw [hfine]; rfl
+
+/-- An exact fibre equivalence makes flatness invariant across scale; a quotient needs the stronger
+one-way hypotheses above and may erase the defect. -/
+theorem flat_iff_of_bijective (hbijective : Function.Bijective passage.fibreMap) :
+    routeComparisonReturn passage.fineLeft passage.fineRight = 1 ↔
+      routeComparisonReturn passage.coarseLeft passage.coarseRight = 1 := by
+  exact ⟨passage.coarseFlat_of_fineFlat hbijective.2,
+    passage.fineFlat_of_coarseFlat hbijective.1⟩
+
+end RouteScalePassage
+
+/-- The group commutator is the two-route return comparing the two orders around one addressed
+two-direction face. -/
+def commutatorRouteReturn {Fibre : Type*}
+    (first second : Equiv.Perm Fibre) : Equiv.Perm Fibre :=
+  routeComparisonReturn (second * first) (first * second)
+
+/-- The commutator return is flat exactly when the two face directions commute. -/
+theorem commutatorRouteReturn_eq_one_iff {Fibre : Type*}
+    (first second : Equiv.Perm Fibre) :
+    commutatorRouteReturn first second = 1 ↔ Commute first second := by
+  rw [commutatorRouteReturn, routeComparisonReturn_eq_one_iff]
+  rfl
+
+/-! ## Additive connection specialization -/
+
+/-- Exact translation of an additive fibre.  This is the abelian connection action used by
+cellular circulation and phase transport; no metric or constitutive law is inserted. -/
+def additiveTranslation {A : Type*} [AddGroup A] (increment : A) : Equiv.Perm A where
+  toFun state := state + increment
+  invFun state := state - increment
+  left_inv state := by simp
+  right_inv state := by simp
+
+@[simp] theorem additiveTranslation_apply {A : Type*} [AddGroup A]
+    (increment state : A) : additiveTranslation increment state = state + increment := rfl
+
+/-- In an abelian fibre, serial translations add their oriented increments. -/
+theorem additiveTranslation_mul {A : Type*} [AddCommGroup A] (left right : A) :
+    additiveTranslation left * additiveTranslation right =
+      additiveTranslation (left + right) := by
+  ext state
+  simp [add_comm, add_left_comm]
+
 /-- Parallel transport composes the declared invertible elementary passages in word order. -/
 def parallelTransport {X : Type*} : List (Equiv.Perm X) → Equiv.Perm X
   | [] => 1
@@ -203,6 +407,16 @@ def parallelTransport {X : Type*} : List (Equiv.Perm X) → Equiv.Perm X
 
 @[simp] theorem parallelTransport_nil {X : Type*} :
     parallelTransport ([] : List (Equiv.Perm X)) = 1 := rfl
+
+/-- Abelian connection holonomy is translation by the exact sum of the retained increments. -/
+theorem parallelTransport_additiveTranslation {A : Type*} [AddCommGroup A]
+    (increments : List A) :
+    parallelTransport (increments.map additiveTranslation) =
+      additiveTranslation increments.sum := by
+  induction increments with
+  | nil => ext state; simp [additiveTranslation]
+  | cons increment increments ih =>
+      simp [parallelTransport, ih, additiveTranslation_mul]
 
 theorem parallelTransport_append {X : Type*} (left right : List (Equiv.Perm X)) :
     parallelTransport (left ++ right) = parallelTransport left * parallelTransport right := by
@@ -256,6 +470,36 @@ theorem noncommutingTransport_is_wordSensitive :
 theorem noncommutingTransport_has_nontrivialLoopReturn :
     parallelTransport [swapZeroOne, swapOneTwo, swapZeroOne⁻¹, swapOneTwo⁻¹] ≠ 1 := by
   decide
+
+/-- The previous finite commutator control is exactly the generic two-route curvature return, not
+merely a noncommuting word with no face comparison. -/
+theorem noncommutingTransport_loop_eq_routeReturn :
+    parallelTransport [swapZeroOne, swapOneTwo, swapZeroOne⁻¹, swapOneTwo⁻¹] =
+      commutatorRouteReturn swapZeroOne swapOneTwo := by
+  simp [parallelTransport, commutatorRouteReturn, routeComparisonReturn, mul_assoc]
+
+/-- A finite receiver-insufficiency control: collapsing both fine states makes a nontrivial route
+return look flat. -/
+def boolToUnitRouteScale : RouteScalePassage Bool Unit where
+  fibreMap _ := ()
+  fineLeft := 1
+  fineRight := Equiv.swap false true
+  coarseLeft := 1
+  coarseRight := 1
+  left_natural _ := rfl
+  right_natural _ := rfl
+
+theorem boolToUnit_coarseReturn_is_flat :
+    routeComparisonReturn boolToUnitRouteScale.coarseLeft
+      boolToUnitRouteScale.coarseRight = 1 := by
+  rfl
+
+theorem boolToUnit_fineReturn_is_not_flat :
+    routeComparisonReturn boolToUnitRouteScale.fineLeft
+      boolToUnitRouteScale.fineRight ≠ 1 := by
+  intro h
+  have pointwise := DFunLike.congr_fun h false
+  simp [boolToUnitRouteScale, routeComparisonReturn] at pointwise
 
 /-- A noninvertible route remains a function and is refused as a connection element. -/
 def collapsedBool (_ : Bool) : Bool := false
@@ -405,6 +649,16 @@ open Soma.Holonics.Millennium.HolonicComposition
 #print axioms chronology_discard_iff_commuting
 #print axioms reversal_holonomy
 #print axioms joinedConnectionTransport_is_serialComposition
+#print axioms routeComparisonReturn_eq_one_iff
+#print axioms AddressedConnectionComparison.returnedCurvature_eq_one_iff
+#print axioms routeComparisonReturn_rebase
+#print axioms RouteScalePassage.returnedCurvature_natural
+#print axioms RouteScalePassage.flat_iff_of_bijective
+#print axioms boolToUnit_coarseReturn_is_flat
+#print axioms boolToUnit_fineReturn_is_not_flat
+#print axioms commutatorRouteReturn_eq_one_iff
+#print axioms noncommutingTransport_loop_eq_routeReturn
+#print axioms parallelTransport_additiveTranslation
 #print axioms changeOfBasepoint_holonomy
 #print axioms noncommutingTransport_is_wordSensitive
 #print axioms collapsedBool_is_not_invertible

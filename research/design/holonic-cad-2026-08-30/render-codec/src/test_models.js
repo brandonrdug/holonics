@@ -1,0 +1,10 @@
+const HR = require('./core.js'); require('./colour.js'); require('./models.js');
+const t0 = Date.now();
+const L = HR.Models.Lattice4(2, { wrap: false }); console.log('lattice V/E/F', L.V.length, L.E.length, L.F.length);
+const ch = HR.Models.Chart({ shown: [0, 1, 2], folded: 3, fold: ['1/3', '1/5', '1/4'], law: { kind: 'oblique', a: '1/2', b: '1/3' } });
+const plan = HR.Models.renderPlan(L, ch, { delta: '1/4' });
+console.log('map nodes/edges/faces', plan.map.nodes.length, plan.map.edges.length, plan.map.faces.length, 'crossings', plan.map.crossings.length, 'disc', plan.map.discriminants.length);
+console.log('visible faces', plan.visible.size, 'hidden pieces', plan.edgePieces.filter(e => e.hidden).length, '/', plan.edgePieces.length, 'traces', plan.traces.length);
+console.log('colour', plan.classes.chromatic, plan.classes.exact, 'ms', Date.now() - t0);
+const t1 = Date.now(); const L3 = HR.Models.Lattice4(3, { wrap: false }); const ch2 = HR.Models.Chart({ law: { kind: 'perspective', distance: '8' } }); const plan3 = HR.Models.renderPlan(L3, ch2, { delta: '1/3' });
+console.log('g=3 perspective: V/E/F', L3.V.length, L3.E.length, L3.F.length, 'map faces', plan3.map.faces.length, 'crossings', plan3.map.crossings.length, 'traces', plan3.traces.length, 'colour', plan3.classes.chromatic, plan3.classes.exact, 'ms', Date.now() - t1);

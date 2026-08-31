@@ -24,12 +24,7 @@
 # beside them are tracked. Kernel scratch written by a driver belongs under `/output/`, which is
 # ignored above; it must not be written under `.lake/`, where a tracked file would match this
 # pattern and the repository's only formal artifacts would be generated fixtures.
-**/.lake/build/
-**/.lake/packages/
-**/.lake/*.olean
-**/.lake/*.ilean
-**/.lake/*.trace
-**/.lake/*.hash
+**/.lake/
 
 # Python bytecode from `tools/`. The tools are sources; their caches are not.
 __pycache__/

@@ -256,6 +256,76 @@ pub struct HierarchicalOpticalPassage {
     pub productive_anchor_labels_present: bool,
 }
 
+/// One exact optical source body beside its already-founded multi-scale potential complex.
+///
+/// The encoded raster is retained as the complete source fibre; the hierarchy retains the
+/// alternative covers and local incidence derived from it.  Delivery lineage is cold and neither
+/// OCR testimony nor a source label is admitted as a transport selector.
+#[derive(Debug, PartialEq, Eq)]
+pub struct ExactOpticalOccurrence {
+    pub occurrence: String,
+    pub locator: String,
+    pub source_sha256: String,
+    pub source_octets: u64,
+    pub encoded_raster: Vec<u8>,
+    pub hierarchy: HierarchicalOpticalPassage,
+    pub open_exterior: Vec<String>,
+}
+
+impl ExactOpticalOccurrence {
+    pub fn found(
+        occurrence: impl Into<String>,
+        locator: impl Into<String>,
+        encoded_raster: Vec<u8>,
+        hierarchy: HierarchicalOpticalPassage,
+    ) -> Result<Self, SourceLayoutError> {
+        let occurrence = occurrence.into();
+        if occurrence.is_empty() || encoded_raster.is_empty() {
+            return Err(SourceLayoutError::OpticalHolon(
+                "the exact optical occurrence or raster fibre is empty".to_owned(),
+            ));
+        }
+        hierarchy.validate()?;
+        let source_sha256 = digest_bytes(&encoded_raster);
+        if source_sha256 != hierarchy.predecessor_source_sha256 {
+            return Err(SourceLayoutError::OpticalHolon(
+                "the exact raster body does not found the inherited optical hierarchy".to_owned(),
+            ));
+        }
+        let source_octets =
+            u64::try_from(encoded_raster.len()).map_err(|_| SourceLayoutError::Extent)?;
+        let mut open_exterior = hierarchy.native_consequence.open_exterior.clone();
+        open_exterior.push(
+            "the encoded raster is retained as the complete source fibre; its delivery segmentation does not enter native transport"
+                .to_owned(),
+        );
+        Ok(Self {
+            occurrence,
+            locator: locator.into(),
+            source_sha256,
+            source_octets,
+            encoded_raster,
+            hierarchy,
+            open_exterior,
+        })
+    }
+
+    pub fn validate(&self) -> Result<(), SourceLayoutError> {
+        self.hierarchy.validate()?;
+        if self.occurrence.is_empty()
+            || self.encoded_raster.is_empty()
+            || self.source_octets != self.encoded_raster.len() as u64
+            || self.source_sha256 != digest_bytes(&self.encoded_raster)
+            || self.source_sha256 != self.hierarchy.predecessor_source_sha256
+        {
+            return Err(SourceLayoutError::OpticalHolon(
+                "the exact optical source fibre does not reconstruct".to_owned(),
+            ));
+        }
+        Ok(())
+    }
+}
+
 impl HierarchicalOpticalPassage {
     pub fn read(bytes: &[u8]) -> Result<Self, SourceLayoutError> {
         let passage: Self = serde_json::from_slice(bytes)
@@ -519,4 +589,13 @@ fn require_digest(value: &str) -> Result<(), SourceLayoutError> {
         ));
     }
     Ok(())
+}
+
+fn digest_bytes(bytes: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+
+    Sha256::digest(bytes)
+        .iter()
+        .map(|octet| format!("{octet:02x}"))
+        .collect()
 }

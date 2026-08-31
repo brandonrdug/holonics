@@ -156,7 +156,9 @@ theorem smoothSolution_eulerianTimeJet_contDiff_two
     hderivative.clm_apply contDiffOn_const
   have htimeField : ContDiffOn ℝ ∞
       (Function.uncurry (eulerianTimeJet velocity)) positiveCylinder := by
-    simpa [eulerianTimeJet, timeDirection, Function.uncurry] using htimeJoint
+    change ContDiffOn ℝ ∞
+      (fun z => fderiv ℝ (Function.uncurry velocity) z (0, 1)) positiveCylinder
+    simpa [timeDirection] using htimeJoint
   rw [contDiff_iff_contDiffAt]
   intro x
   exact (positiveTimeSpatialSlice_contDiffAt

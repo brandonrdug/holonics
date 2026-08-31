@@ -49,13 +49,13 @@ def E (n : ℚ) : WeierstrassCurve.Affine ℚ := ⟨0, 0, 0, -n ^ 2, 0⟩
 coordinate. -/
 def slotOne (n : ℚ) : (E n).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = 0 then -n ^ 2 else x
+  | .some x _ _ => if x = 0 then -n ^ 2 else x
 
 /-- The second slot: `x − n`, with the convention `(n−0)(n+n) = 2n²` at the vanishing
 coordinate. -/
 def slotTwo (n : ℚ) : (E n).Point → ℚ
   | .zero => 1
-  | .some (x := x) _ => if x = n then 2 * n ^ 2 else x - n
+  | .some x _ _ => if x = n then 2 * n ^ 2 else x - n
 
 /-! ## 2. Coordinate plumbing, family-wise -/
 
@@ -111,14 +111,14 @@ private lemma negYE (n x y : ℚ) : (E n).negY x y = -y := by
 
 private lemma someEqE {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (E n).Nonsingular x₁ y₁} {h₂ : (E n).Nonsingular x₂ y₂} :
-    (Point.some h₁ : (E n).Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : (E n).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma slotOneE_some {n x y : ℚ} (h : (E n).Nonsingular x y) :
-    slotOne n (.some h) = if x = 0 then -n ^ 2 else x := rfl
+    slotOne n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
 
 private lemma slotTwoE_some {n x y : ℚ} (h : (E n).Nonsingular x y) :
-    slotTwo n (.some h) = if x = n then 2 * n ^ 2 else x - n := rfl
+    slotTwo n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 private lemma slotOneE_ne {n : ℚ} (hn : n ≠ 0) (P : (E n).Point) : slotOne n P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
@@ -404,10 +404,10 @@ theorem theTranslationClosesTheFaceOnEveryTwist {n x y : ℚ} (hn : n ≠ 0)
 private lemma chordHalfTurnRightE {n x₁ y₁ x₂ : ℚ} (hn : n ≠ 0)
     (h₁ : (E n).Nonsingular x₁ y₁) (h₂ : (E n).Nonsingular x₂ 0)
     (hy₁ : y₁ ≠ 0) (hx : x₁ ≠ x₂) :
-    Descent.SqCls (slotOne n (Point.some h₁ + Point.some h₂))
-      (slotOne n (Point.some h₁) * slotOne n (Point.some h₂)) ∧
-    Descent.SqCls (slotTwo n (Point.some h₁ + Point.some h₂))
-      (slotTwo n (Point.some h₁) * slotTwo n (Point.some h₂)) := by
+    Descent.SqCls (slotOne n (Point.some _ _ h₁ + Point.some _ _ h₂))
+      (slotOne n (Point.some _ _ h₁) * slotOne n (Point.some _ _ h₂)) ∧
+    Descent.SqCls (slotTwo n (Point.some _ _ h₁ + Point.some _ _ h₂))
+      (slotTwo n (Point.some _ _ h₁) * slotTwo n (Point.some _ _ h₂)) := by
   have hcurve := onCurve h₁
   obtain ⟨hx0, hxn, hxm⟩ := avoidRoots hcurve hy₁
   obtain ⟨q0, q1, q2, q3, q4, q5⟩ := theTranslationClosesTheFaceOnEveryTwist hn hcurve hy₁
@@ -420,13 +420,13 @@ private lemma chordHalfTurnRightE {n x₁ y₁ x₂ : ℚ} (hn : n ≠ 0)
     have h : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr hx
     field_simp
     ring
-  have hs₁ : slotOne n (Point.some h₁) = x₁ := by rw [slotOneE_some, if_neg hx0]
-  have ht₁ : slotTwo n (Point.some h₁) = x₁ - n := by rw [slotTwoE_some, if_neg hxn]
+  have hs₁ : slotOne n (Point.some _ _ h₁) = x₁ := by rw [slotOneE_some, if_neg hx0]
+  have ht₁ : slotTwo n (Point.some _ _ h₁) = x₁ - n := by rw [slotTwoE_some, if_neg hxn]
   rcases halfTurnAbscissaE h₂ rfl with h0 | h0 | h0
   · subst h0
-    have hsQ : slotOne n (Point.some h₂) = -n ^ 2 := by
+    have hsQ : slotOne n (Point.some _ _ h₂) = -n ^ 2 := by
       rw [slotOneE_some, if_pos rfl]
-    have htQ : slotTwo n (Point.some h₂) = -n := by
+    have htQ : slotTwo n (Point.some _ _ h₂) = -n := by
       rw [slotTwoE_some, if_neg (fun hc => hn hc.symm), zero_sub]
     constructor
     · rw [slotOneE_some, haxT, if_neg t00, hs₁, hsQ]
@@ -434,9 +434,9 @@ private lemma chordHalfTurnRightE {n x₁ y₁ x₂ : ℚ} (hn : n ≠ 0)
     · rw [slotTwoE_some, haxT, if_neg t01, ht₁, htQ]
       exact q1
   · replace h0 := h0.symm; subst h0
-    have hsQ : slotOne n (Point.some h₂) = n := by
+    have hsQ : slotOne n (Point.some _ _ h₂) = n := by
       rw [slotOneE_some, if_neg hn]
-    have htQ : slotTwo n (Point.some h₂) = 2 * n ^ 2 := by
+    have htQ : slotTwo n (Point.some _ _ h₂) = 2 * n ^ 2 := by
       rw [slotTwoE_some, if_pos rfl]
     constructor
     · rw [slotOneE_some, haxT, if_neg t10, hs₁, hsQ]
@@ -444,9 +444,9 @@ private lemma chordHalfTurnRightE {n x₁ y₁ x₂ : ℚ} (hn : n ≠ 0)
     · rw [slotTwoE_some, haxT, if_neg t11, ht₁, htQ]
       exact q3
   · subst h0
-    have hsQ : slotOne n (Point.some h₂) = -n := by
+    have hsQ : slotOne n (Point.some _ _ h₂) = -n := by
       rw [slotOneE_some, if_neg (neg_ne_zero.mpr hn)]
-    have htQ : slotTwo n (Point.some h₂) = -2 * n := by
+    have htQ : slotTwo n (Point.some _ _ h₂) = -2 * n := by
       rw [slotTwoE_some, if_neg (fun hc => hn (by linarith))]
       ring
     constructor
@@ -465,7 +465,7 @@ theorem theDoublesLandInTheKernelOnEveryTwist {n : ℚ} (hn : n ≠ 0) (Q : (E n
   · rw [← Point.zero_def, add_zero]
     exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
   · by_cases hy : y = 0
-    · have hzero : (Point.some h : (E n).Point) + Point.some h = 0 :=
+    · have hzero : (Point.some _ _ h : (E n).Point) + Point.some _ _ h = 0 :=
         Point.add_self_of_Y_eq (by rw [negYE, hy]; norm_num)
       rw [hzero]
       exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
@@ -502,13 +502,13 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
     Descent.SqCls (slotTwo n (P + Q)) (slotTwo n P * slotTwo n Q) := by
   rcases P with _ | @⟨x₁, y₁, h₁⟩
   · rw [← Point.zero_def, zero_add,
-      show slotOne n (0 : (E n).Point) = 1 from rfl,
-      show slotTwo n (0 : (E n).Point) = 1 from rfl, one_mul, one_mul]
+      show slotOne n (0 : (E n).Point) = 1 by simp [slotOne],
+      show slotTwo n (0 : (E n).Point) = 1 by simp [slotTwo], one_mul, one_mul]
     exact ⟨Descent.sqClsRefl _, Descent.sqClsRefl _⟩
   rcases Q with _ | @⟨x₂, y₂, h₂⟩
   · rw [← Point.zero_def, add_zero,
-      show slotOne n (0 : (E n).Point) = 1 from rfl,
-      show slotTwo n (0 : (E n).Point) = 1 from rfl, mul_one, mul_one]
+      show slotOne n (0 : (E n).Point) = 1 by simp [slotOne],
+      show slotTwo n (0 : (E n).Point) = 1 by simp [slotTwo], mul_one, mul_one]
     exact ⟨Descent.sqClsRefl _, Descent.sqClsRefl _⟩
   by_cases hx : x₁ = x₂
   · subst hx
@@ -517,25 +517,25 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
       have hB := onCurve h₂
       linear_combination hB - hA
     rcases mul_eq_zero.mp hyy with hcase | hcase
-    · have heq : (Point.some h₂ : (E n).Point) = Point.some h₁ :=
+    · have heq : (Point.some _ _ h₂ : (E n).Point) = Point.some _ _ h₁ :=
         someEqE rfl (by linarith)
       rw [heq]
-      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some h₁)
+      obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some _ _ h₁)
       exact ⟨sqcls_scale_sq k1 (slotOneE_ne hn _), sqcls_scale_sq k2 (slotTwoE_ne hn _)⟩
     · by_cases hy0 : y₁ = 0
-      · have heq : (Point.some h₂ : (E n).Point) = Point.some h₁ :=
+      · have heq : (Point.some _ _ h₂ : (E n).Point) = Point.some _ _ h₁ :=
           someEqE rfl (by linarith)
         rw [heq]
-        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some h₁)
+        obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some _ _ h₁)
         exact ⟨sqcls_scale_sq k1 (slotOneE_ne hn _), sqcls_scale_sq k2 (slotTwoE_ne hn _)⟩
-      · have hzero : (Point.some h₁ : (E n).Point) + Point.some h₂ = 0 :=
+      · have hzero : (Point.some _ _ h₁ : (E n).Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYE]; linarith)
-        have hs : slotOne n (Point.some h₂) = slotOne n (Point.some h₁) := by
+        have hs : slotOne n (Point.some _ _ h₂) = slotOne n (Point.some _ _ h₁) := by
           rw [slotOneE_some, slotOneE_some]
-        have ht : slotTwo n (Point.some h₂) = slotTwo n (Point.some h₁) := by
+        have ht : slotTwo n (Point.some _ _ h₂) = slotTwo n (Point.some _ _ h₁) := by
           rw [slotTwoE_some, slotTwoE_some]
-        rw [hzero, show slotOne n (0 : (E n).Point) = 1 from rfl,
-          show slotTwo n (0 : (E n).Point) = 1 from rfl, hs, ht]
+        rw [hzero, show slotOne n (0 : (E n).Point) = 1 by simp [slotOne],
+          show slotTwo n (0 : (E n).Point) = 1 by simp [slotTwo], hs, ht]
         exact ⟨sqcls_one_mul_self (slotOneE_ne hn _), sqcls_one_mul_self (slotTwoE_ne hn _)⟩
   · by_cases hy1 : y₁ = 0
     · by_cases hy2 : y₂ = 0
@@ -646,11 +646,11 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
         rw [Point.add_of_X_ne hx]
         have hlam : (E n).slope x₁ x₂ y₁ y₂ * (x₂ - x₁) = y₂ - y₁ := slopeLineE hx
         have hax := addXE n x₁ x₂ ((E n).slope x₁ x₂ y₁ y₂)
-        have hs₁ : slotOne n (Point.some h₁) = x₁ := by rw [slotOneE_some, if_neg ha1]
-        have hs₂ : slotOne n (Point.some h₂) = x₂ := by rw [slotOneE_some, if_neg hb1]
-        have ht₁ : slotTwo n (Point.some h₁) = x₁ - n := by
+        have hs₁ : slotOne n (Point.some _ _ h₁) = x₁ := by rw [slotOneE_some, if_neg ha1]
+        have hs₂ : slotOne n (Point.some _ _ h₂) = x₂ := by rw [slotOneE_some, if_neg hb1]
+        have ht₁ : slotTwo n (Point.some _ _ h₁) = x₁ - n := by
           rw [slotTwoE_some, if_neg ha2]
-        have ht₂ : slotTwo n (Point.some h₂) = x₂ - n := by
+        have ht₂ : slotTwo n (Point.some _ _ h₂) = x₂ - n := by
           rw [slotTwoE_some, if_neg hb2]
         rw [hs₁, hs₂, ht₁, ht₂]
         by_cases hX0 : (E n).slope x₁ x₂ y₁ y₂ ^ 2 - x₁ - x₂ = 0
@@ -704,19 +704,19 @@ theorem nonsingularP2 : (E 34).Nonsingular (-16) 120 := by
   norm_num [E]
 
 /-- The half-turn at zero on the thirty-four twist. -/
-def torsionZero : (E 34).Point := .some nonsingular00
+def torsionZero : (E 34).Point := .some 0 0 nonsingular00
 
 /-- The half-turn at thirty-four. -/
-def torsionRight : (E 34).Point := .some nonsingular340
+def torsionRight : (E 34).Point := .some 34 0 nonsingular340
 
 /-- The half-turn at minus thirty-four. -/
-def torsionLeft : (E 34).Point := .some nonsingularNeg340
+def torsionLeft : (E 34).Point := .some (-34) 0 nonsingularNeg340
 
 /-- The first realized direction, `P₁ = (−2, 48)`. -/
-def firstDirection : (E 34).Point := .some nonsingularP1
+def firstDirection : (E 34).Point := .some (-2) 48 nonsingularP1
 
 /-- The second realized direction, `P₂ = (−16, 120)`. -/
-def secondDirection : (E 34).Point := .some nonsingularP2
+def secondDirection : (E 34).Point := .some (-16) 120 nonsingularP2
 
 private lemma h34ne : (34 : ℚ) ≠ 0 := by norm_num
 
@@ -764,7 +764,7 @@ theorem theFirstDirectionEscapes :
   rw [slotP1_one] at habs1
   rw [slotP1_two] at habs2
   rcases hT with rfl | rfl | rfl | rfl
-  · rw [show slotOne 34 (0 : (E 34).Point) = 1 from rfl] at habs1
+  · rw [show slotOne 34 (0 : (E 34).Point) = 1 by simp [slotOne]] at habs1
     obtain ⟨c, hc, hcv⟩ := habs1
     nlinarith [sq_nonneg c]
   · rw [slotT0_two] at habs2
@@ -799,7 +799,7 @@ theorem theSecondDirectionEscapes :
   rw [slotP2_one] at habs1
   rw [slotP2_two] at habs2
   rcases hT with rfl | rfl | rfl | rfl
-  · rw [show slotOne 34 (0 : (E 34).Point) = 1 from rfl] at habs1
+  · rw [show slotOne 34 (0 : (E 34).Point) = 1 by simp [slotOne]] at habs1
     obtain ⟨c, hc, hcv⟩ := habs1
     nlinarith [sq_nonneg c]
   · rw [slotT0_two] at habs2
@@ -838,7 +838,7 @@ theorem theSumDirectionEscapes :
   have hcls1 := sqcls_trans (sqcls_symm g1) habs1
   have hcls2 := sqcls_trans (sqcls_symm g2) habs2
   rcases hT with rfl | rfl | rfl | rfl
-  · rw [show slotOne 34 (0 : (E 34).Point) = 1 from rfl] at hcls1
+  · rw [show slotOne 34 (0 : (E 34).Point) = 1 by simp [slotOne]] at hcls1
     obtain ⟨c, hc, hcv⟩ := hcls1
     refine Descent.notSquareTwo ⟨c / 4, ?_⟩
     field_simp

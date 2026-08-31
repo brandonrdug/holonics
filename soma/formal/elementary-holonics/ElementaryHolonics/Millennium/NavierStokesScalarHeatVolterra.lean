@@ -50,9 +50,8 @@ theorem scalarHeatVolterra_eq_currentTransport_primitive
 theorem hasDerivAt_negativeRateExp (rate t : ℝ) :
     HasDerivAt (fun τ : ℝ ↦ Real.exp (-rate * τ))
       (-rate * Real.exp (-rate * t)) t := by
-  convert (Real.hasDerivAt_exp (-rate * t)).comp t
-    ((hasDerivAt_const t (-rate)).mul (hasDerivAt_id t)) using 1
-  all_goals ring_nf
+  have h := ((hasDerivAt_id t).const_mul (-rate)).exp
+  convert h using 1 <;> simp [Function.comp_def] <;> ring
 
 /-- The weighted source primitive differentiates to its presented current face. -/
 theorem hasDerivAt_scalarHeatPrimitive
@@ -63,7 +62,10 @@ theorem hasDerivAt_scalarHeatPrimitive
   have hweighted : Continuous weightedSource :=
     (Real.continuous_exp.comp
       (continuous_const.mul continuous_id)).smul hsource
-  simpa only [scalarHeatPrimitive, weightedSource] using
+  change HasDerivAt
+    (fun u ↦ ∫ s in (0 : ℝ)..u, Real.exp (rate * s) • source s)
+    (Real.exp (rate * t) • source t) t
+  simpa only [weightedSource] using
     (hweighted.integral_hasStrictDerivAt (0 : ℝ) t).hasDerivAt
 
 /-- **Exact ordered-time return.**  The scalar heat Volterra passage satisfies the inhomogeneous
@@ -84,7 +86,11 @@ theorem hasDerivAt_scalarHeatVolterra
             (Real.exp (rate * t) • source t) +
           (-rate * Real.exp (-rate * t)) •
             scalarHeatPrimitive rate source t) t := by
-    simpa only [Pi.smul_apply] using hproduct
+    change HasDerivAt
+      (fun τ : ℝ ↦ Real.exp (-rate * τ) • scalarHeatPrimitive rate source τ)
+      (Real.exp (-rate * t) • (Real.exp (rate * t) • source t) +
+        (-rate * Real.exp (-rate * t)) • scalarHeatPrimitive rate source t) t at hproduct
+    exact hproduct
   convert hproduct' using 1
   · funext τ
     exact scalarHeatVolterra_eq_currentTransport_primitive rate source τ

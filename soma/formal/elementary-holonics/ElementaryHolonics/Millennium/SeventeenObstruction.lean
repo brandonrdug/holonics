@@ -73,10 +73,10 @@ private lemma avoid17 {x y : ℚ} (h : y ^ 2 = x ^ 3 - 289 * x) (hy : y ≠ 0) :
     exact hy (pow_eq_zero_iff two_ne_zero |>.mp (by rw [h]; ring))
 
 private lemma slot17One_some {x y : ℚ} (h : (FamilyFace.E (17 : ℕ)).Nonsingular x y) :
-    FamilyFace.slotOne (17 : ℕ) (.some h) = if x = 0 then -((17 : ℕ) : ℚ) ^ 2 else x := rfl
+    FamilyFace.slotOne (17 : ℕ) (.some x y h) = if x = 0 then -((17 : ℕ) : ℚ) ^ 2 else x := rfl
 
 private lemma slot17Two_some {x y : ℚ} (h : (FamilyFace.E (17 : ℕ)).Nonsingular x y) :
-    FamilyFace.slotTwo (17 : ℕ) (.some h) =
+    FamilyFace.slotTwo (17 : ℕ) (.some x y h) =
       if x = ((17 : ℕ) : ℚ) then 2 * ((17 : ℕ) : ℚ) ^ 2 else x - ((17 : ℕ) : ℚ) := rfl
 
 /-! ## 1. The four refusal kernels at the frame of eight -/
@@ -681,26 +681,26 @@ private lemma ns17 : (FamilyFace.E (17 : ℕ)).Nonsingular ((17 : ℕ) : ℚ) 0 
     push_cast
     norm_num
 
-private def T0' : (FamilyFace.E (17 : ℕ)).Point := .some ns00
+private def T0' : (FamilyFace.E (17 : ℕ)).Point := .some 0 0 ns00
 
-private def T17' : (FamilyFace.E (17 : ℕ)).Point := .some ns17
+private def T17' : (FamilyFace.E (17 : ℕ)).Point := .some 17 0 ns17
 
 private lemma face_T0' :
     Descent.SqCls (FamilyFace.slotOne (17 : ℕ) T0') (-1) ∧
     Descent.SqCls (FamilyFace.slotTwo (17 : ℕ) T0') (-17) := by
   constructor
-  · rw [show T0' = Point.some ns00 from rfl, slot17One_some, if_pos rfl]
+  · rw [show T0' = Point.some 0 0 ns00 from rfl, slot17One_some, if_pos rfl]
     exact ⟨17, by norm_num, by push_cast; ring⟩
-  · rw [show T0' = Point.some ns00 from rfl, slot17Two_some, if_neg (by norm_num), zero_sub]
+  · rw [show T0' = Point.some 0 0 ns00 from rfl, slot17Two_some, if_neg (by norm_num), zero_sub]
     exact ⟨1, one_ne_zero, by push_cast; ring⟩
 
 private lemma face_T17' :
     Descent.SqCls (FamilyFace.slotOne (17 : ℕ) T17') 17 ∧
     Descent.SqCls (FamilyFace.slotTwo (17 : ℕ) T17') 2 := by
   constructor
-  · rw [show T17' = Point.some ns17 from rfl, slot17One_some, if_neg (by norm_num)]
+  · rw [show T17' = Point.some 17 0 ns17 from rfl, slot17One_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by push_cast; ring⟩
-  · rw [show T17' = Point.some ns17 from rfl, slot17Two_some, if_pos rfl]
+  · rw [show T17' = Point.some 17 0 ns17 from rfl, slot17Two_some, if_pos (by norm_num)]
     exact ⟨17, by norm_num, by push_cast; ring⟩
 
 private lemma hom17 (P Q : (FamilyFace.E (17 : ℕ)).Point) :
@@ -785,10 +785,10 @@ theorem theSeventeenFaceLiesInTheSelmerSixteen (P : (FamilyFace.E (17 : ℕ)).Po
       have hsig := StratumDescent.theSignsAgreeOnTheStratum (p := 17) (x := x) (y := y)
         hp17 (by push_cast; linear_combination hcurve) hy hc₁
         (by rw [show ((17 : ℕ) : ℚ) = 17 from by norm_num]; exact hc₂)
-      have hs1 : Descent.SqCls (FamilyFace.slotOne (17 : ℕ) (Point.some hP)) d₁ := by
+      have hs1 : Descent.SqCls (FamilyFace.slotOne (17 : ℕ) (Point.some x y hP)) d₁ := by
         rw [slot17One_some, if_neg hx0]
         exact hc₁
-      have hs2 : Descent.SqCls (FamilyFace.slotTwo (17 : ℕ) (Point.some hP)) d₂ := by
+      have hs2 : Descent.SqCls (FamilyFace.slotTwo (17 : ℕ) (Point.some x y hP)) d₂ := by
         rw [slot17Two_some, if_neg (by exact_mod_cast hxp),
           show ((17 : ℕ) : ℚ) = 17 from by norm_num]
         exact hc₂

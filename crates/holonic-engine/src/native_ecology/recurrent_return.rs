@@ -605,9 +605,7 @@ fn sha256(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
 
-fn is_digest(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
+use crate::is_sha256_digest as is_digest;
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum RecurrentReturnRefusal {

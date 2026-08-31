@@ -141,7 +141,9 @@ theorem smoothSolution_jointVorticityField_contDiffOn_positiveTime
       (fderiv ℝ (Function.uncurry velocity)) positiveCylinder :=
     hvelocity.fderiv_of_isOpen hopen (by simp)
   have hcurl := jointSpatialCurlLinearMap.contDiff.comp_contDiffOn hderivative
-  simpa [positiveCylinder, jointVorticityField, Function.uncurry] using hcurl
+  apply hcurl.congr
+  intro z hz
+  rfl
 
 /-- The actual slice-defined vorticity field is jointly smooth at positive time.  The proof uses
 the exact equality of the joint-derivative and slice-derivative realizations, not a new curl
@@ -200,7 +202,7 @@ theorem inner_gradient_kineticEnergyDensity_direction
     hcarried.norm_sq ℝ
   have henergy : DifferentiableAt ℝ (kineticEnergyDensity carried) x :=
     hnorm.const_mul (1 / 2 : ℝ)
-  rw [inner_gradient_left henergy]
+  rw [inner_gradient_left]
   unfold kineticEnergyDensity
   rw [fderiv_const_mul hnorm (1 / 2 : ℝ)]
   rw [(hcarried.hasFDerivAt.norm_sq).fderiv]
@@ -361,7 +363,8 @@ theorem hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_positiveTime
   let positiveCylinder : Set (Space × ℝ) := Set.univ ×ˢ Ioi (0 : ℝ)
   let compactCylinder : Set (Space × ℝ) := unitCube ×ˢ timeCompact
   have htimeSet : timeSet ∈ nhds t := by
-    apply Ioo_mem_nhds <;> dsimp [timeSet] <;> linarith
+    simpa [timeSet] using (Ioo_mem_nhds (by linarith : t / 2 < t)
+      (by linarith : t < 3 * t / 2))
   have hjointJetContinuous : ContinuousOn
       (fun z : Space × ℝ =>
         fderiv ℝ (Function.uncurry field) z (0, 1)) positiveCylinder := by
@@ -436,13 +439,13 @@ theorem hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_positiveTime
     apply hasDerivAt_kineticEnergyDensity_time_of_contDiffOn_positiveTime
       field hfield x τ
     exact lt_trans (half_pos ht) hτ.1
-  simpa [periodicKineticEnergy] using
-    (hasDerivAt_integral_of_dominated_loc_of_deriv_le
+  convert (hasDerivAt_integral_of_dominated_loc_of_deriv_le
       (F := fun τ x => kineticEnergyDensity (fun y => field y τ) x)
       (F' := fun τ x => inner ℝ (eulerianTimeJet field x τ) (field x τ))
       (bound := fun _ : Space => C) (x₀ := t) (s := timeSet)
       (μ := volume.restrict unitCube)
-      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2
+      htimeSet hFmeas hFint hF'meas hbound hboundIntegrable hdiff).2 using 1 <;>
+    rfl
 
 /-- The unit-cube receiver for half the squared vorticity.  It is a one-period enstrophy only when
 paired with the periodicity testimony supplied by `PeriodicSolution`. -/
@@ -459,10 +462,10 @@ theorem periodicSolution_hasDerivAt_periodicEnstrophy_eq_timeWork
       (∫ x in unitCube,
         inner ℝ (eulerianTimeJet (vorticityField velocity) x t)
           (vorticityField velocity x t)) t := by
-  simpa [periodicEnstrophy] using
-    hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_positiveTime
+  convert hasDerivAt_periodicKineticEnergy_eq_timeWork_of_contDiffOn_positiveTime
       (vorticityField velocity)
       (smoothSolution_vorticityField_contDiffOn_positiveTime solution.toSmoothSolution) t ht
+    using 1 <;> rfl
 
 /-! ## The vorticity equation port and its integrated consequence -/
 

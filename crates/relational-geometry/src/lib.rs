@@ -5,6 +5,7 @@
 //! receiver maps, projection fibers, crossings, and discrete event history.
 
 pub mod decorated_path;
+pub mod eta_atlas;
 pub mod exact;
 pub mod exact_analysis;
 pub mod model;
@@ -14,6 +15,7 @@ pub mod receiver_topology;
 pub mod scene;
 
 pub use decorated_path::*;
+pub use eta_atlas::*;
 pub use exact::*;
 pub use exact_analysis::*;
 pub use model::*;

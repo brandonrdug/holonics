@@ -86,7 +86,7 @@ def ladder (Δ : ℝ) : Set ℝ := {0} ∪ Set.Ici Δ
 /-- **A LADDER HAS A MASS GAP, AND THE GAP IS ITS FIRST RUNG.** -/
 theorem theLadderHasAGapEqualToItsFirstRung {Δ : ℝ} (hΔ : 0 < Δ) :
     SpectrumHasMassGap (ladder Δ) := by
-  refine ⟨Or.inl rfl, ?_, ⟨Δ, Or.inr (Set.left_mem_Ici), hΔ⟩, Δ, hΔ, ?_⟩
+  refine ⟨Or.inl rfl, ?_, ⟨Δ, Or.inr (Set.mem_Ici.2 le_rfl), hΔ⟩, Δ, hΔ, ?_⟩
   · rintro μ (rfl | hμ)
     · exact le_refl 0
     · exact le_trans hΔ.le hμ

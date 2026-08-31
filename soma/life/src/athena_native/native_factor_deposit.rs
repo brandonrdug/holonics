@@ -404,9 +404,9 @@ fn is_sha256(address: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use holonic_engine::{
-        EventId,
         receiver_exact_compression::{Observation, ReceiverId},
         receiver_history_compression::NativeStateId,
+        EventId,
     };
     use num_bigint::BigInt;
 

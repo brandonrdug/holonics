@@ -14,11 +14,11 @@
 use std::collections::BTreeSet;
 
 use holonic_engine::{
-    ExactComplexWaveCurrent,
     cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn},
     exact_linear::ExactRatMatrix,
     native_spool::ReceiverInsufficiency,
     receiver_exact_compression::ReceiverId,
+    ExactComplexWaveCurrent,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;

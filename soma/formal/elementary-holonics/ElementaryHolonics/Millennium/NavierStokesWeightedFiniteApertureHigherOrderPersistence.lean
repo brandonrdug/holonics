@@ -282,8 +282,8 @@ theorem HigherOrderPartialPersistence.extend_of_le_uniformStep
       (fun path : WeightedH3Path A ↦
         path ⟨A, ⟨prior.time_nonneg, le_rfl⟩⟩)
       prior.controlled
-    simpa only [lowPartial, weightedH3PathTimeShift_apply, zero_add]
-      using hreceiverAt
+    simpa only [endpoint, higherOrderRestrictionPathToThree_apply,
+      lowPartial, weightedH3PathTimeShift_apply, zero_add] using hreceiverAt
   obtain ⟨right, hrightFixed, _hrightNorm, hrightControlled, hrightZero⟩ :=
     exists_shiftedHigherOrderPersistenceStep_of_le
       base hbase hnu hT lowInitial native hnativeFixed

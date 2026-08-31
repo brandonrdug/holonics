@@ -25,6 +25,7 @@ use body::{
 };
 use num_bigint::BigInt;
 use num_rational::BigRational;
+use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, LiveBoundaryTransition,
@@ -356,6 +357,73 @@ pub struct SynchronizedOccurrenceRadiation {
     pub local_sequence_relations: u64,
 }
 
+/// One exact moved source fibre whose heterogeneous local-clock sections have been charted into
+/// synchronized contacts. The encoded exterior body is retained for reconstruction; neither it
+/// nor a modality name participates in contact or later membrane transport.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactSynchronizedOccurrenceFibre {
+    pub occurrence_address: String,
+    pub predecessor_occurrence: Option<String>,
+    pub locator: String,
+    pub encoded_source: Vec<u8>,
+    pub source_identity_sha256: String,
+    pub synchronized: ExactSynchronizedOccurrence,
+    pub contacts: Vec<SynchronizedContactOccurrence>,
+    pub incidence_identity_sha256: String,
+    pub open_exterior: Vec<String>,
+}
+
+impl ExactSynchronizedOccurrenceFibre {
+    pub fn found(
+        occurrence_address: impl Into<String>,
+        predecessor_occurrence: Option<String>,
+        locator: impl Into<String>,
+        encoded_source: Vec<u8>,
+        synchronized: ExactSynchronizedOccurrence,
+        open_exterior: Vec<String>,
+    ) -> Result<Self, SynchronizedOccurrenceError> {
+        synchronized.validate()?;
+        let contacts = SynchronizedOccurrenceChart::new().contacts(&synchronized)?;
+        let mut fibre = Self {
+            occurrence_address: occurrence_address.into(),
+            predecessor_occurrence,
+            locator: locator.into(),
+            source_identity_sha256: hex_sha256(&encoded_source),
+            encoded_source,
+            incidence_identity_sha256: synchronized_contacts_sha256(&contacts),
+            synchronized,
+            contacts,
+            open_exterior,
+        };
+        fibre.validate()?;
+        // Recompute after complete assembly so the constructor cannot accidentally admit stale
+        // derived testimony.
+        fibre.incidence_identity_sha256 = synchronized_contacts_sha256(&fibre.contacts);
+        Ok(fibre)
+    }
+
+    pub fn validate(&self) -> Result<(), SynchronizedOccurrenceError> {
+        self.synchronized.validate()?;
+        let derived = SynchronizedOccurrenceChart::new().contacts(&self.synchronized)?;
+        if self.occurrence_address.is_empty()
+            || self.locator.is_empty()
+            || self.encoded_source.is_empty()
+            || self.contacts.is_empty()
+            || self.source_identity_sha256 != hex_sha256(&self.encoded_source)
+            || self.incidence_identity_sha256 != synchronized_contacts_sha256(&derived)
+            || self.contacts != derived
+            || self
+                .predecessor_occurrence
+                .as_ref()
+                .is_some_and(String::is_empty)
+            || self.open_exterior.iter().any(String::is_empty)
+        {
+            return Err(SynchronizedOccurrenceError::MalformedOccurrence);
+        }
+        Ok(())
+    }
+}
+
 mod chart;
 mod ecology;
 #[cfg(test)]
@@ -406,6 +474,57 @@ impl From<LiveCurrentError> for SynchronizedOccurrenceError {
 
 fn rational_zero() -> BigRational {
     BigRational::from_integer(BigInt::from(0))
+}
+
+fn synchronized_contacts_sha256(contacts: &[SynchronizedContactOccurrence]) -> String {
+    let mut digest = Sha256::new();
+    digest.update(b"soma-life.exact-synchronized-contact-population.v1");
+    for contact in contacts {
+        digest.update(contact.occurrence.to_le_bytes());
+        update_rational(&mut digest, &contact.interval_begin);
+        update_rational(&mut digest, &contact.interval_end);
+        for cell in &contact.left_cells {
+            digest.update(cell.0.to_le_bytes());
+        }
+        digest.update([0xff]);
+        for cell in &contact.right_cells {
+            digest.update(cell.0.to_le_bytes());
+        }
+        digest.update(contact.signature.left_receiver.0.to_le_bytes());
+        digest.update(contact.signature.right_receiver.0.to_le_bytes());
+        for facet in contact
+            .signature
+            .left_face
+            .0
+            .iter()
+            .chain(&contact.signature.right_face.0)
+        {
+            digest.update(facet.chart.to_le_bytes());
+            for word in facet.material.0 {
+                digest.update(word.to_le_bytes());
+            }
+            digest.update(facet.stage.to_le_bytes());
+        }
+        digest.update(contact.signature.horizon_chart.to_le_bytes());
+    }
+    render_hex(&digest.finalize())
+}
+
+fn update_rational(digest: &mut Sha256, value: &BigRational) {
+    let numerator = value.numer().to_signed_bytes_be();
+    let denominator = value.denom().to_signed_bytes_be();
+    digest.update((numerator.len() as u64).to_le_bytes());
+    digest.update(numerator);
+    digest.update((denominator.len() as u64).to_le_bytes());
+    digest.update(denominator);
+}
+
+fn hex_sha256(bytes: &[u8]) -> String {
+    render_hex(&Sha256::digest(bytes))
+}
+
+fn render_hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
 pub fn relation_atom(value: i64) -> Result<RelationAtom, SynchronizedOccurrenceError> {

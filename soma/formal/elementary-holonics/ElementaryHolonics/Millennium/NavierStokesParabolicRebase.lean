@@ -1,6 +1,7 @@
 import ElementaryHolonics.Millennium.NavierStokesScaling
 import ElementaryHolonics.Millennium.NavierStokesVorticity
 import Mathlib.Analysis.Calculus.Deriv.CompMul
+import Mathlib.Algebra.Order.Field.Pointwise
 
 /-!
 # The Navier--Stokes parabolic rebase is an exact constitutive transport
@@ -22,7 +23,7 @@ the momentum equation returns multiplied by the common oriented factor `λ³`.
 noncomputable section
 
 open ContDiff InnerProductSpace Set
-open scoped Laplacian
+open scoped Laplacian Pointwise
 
 namespace Soma.Holonics.Millennium.NavierStokesParabolicRebase
 
@@ -39,6 +40,34 @@ def parabolicSpaceMap (scale : ℝ) : Space →L[ℝ] Space :=
 theorem parabolicSpaceMap_apply (scale : ℝ) (x : Space) :
     parabolicSpaceMap scale x = scale • x := by
   simp [parabolicSpaceMap]
+
+/-- The time chart carries the quadratic parabolic weight. -/
+def parabolicTimeMap (scale : ℝ) : ℝ →L[ℝ] ℝ :=
+  scale ^ 2 • ContinuousLinearMap.id ℝ ℝ
+
+@[simp]
+theorem parabolicTimeMap_apply (scale t : ℝ) :
+    parabolicTimeMap scale t = scale ^ 2 * t := by
+  simp [parabolicTimeMap, smul_eq_mul]
+
+/-- The complete space--time chart transition, with spatial and chronological addresses kept
+separate until their product is returned. -/
+def parabolicSpacetimeMap (scale : ℝ) : Space × ℝ →L[ℝ] Space × ℝ :=
+  (parabolicSpaceMap scale).prodMap (parabolicTimeMap scale)
+
+@[simp]
+theorem parabolicSpacetimeMap_apply (scale : ℝ) (event : Space × ℝ) :
+    parabolicSpacetimeMap scale event =
+      (scale • event.1, scale ^ 2 * event.2) := by
+  rcases event with ⟨x, t⟩
+  simp [parabolicSpacetimeMap]
+
+/-- The parabolic chart preserves the admitted nonnegative-time half-cylinder. -/
+theorem parabolicSpacetimeMap_mapsTo_nonnegativeTime (scale : ℝ) :
+    MapsTo (parabolicSpacetimeMap scale)
+      (Set.univ ×ˢ Set.Ici (0 : ℝ)) (Set.univ ×ˢ Set.Ici (0 : ℝ)) := by
+  rintro ⟨x, t⟩ ⟨_hx, ht⟩
+  exact ⟨Set.mem_univ _, mul_nonneg (sq_nonneg scale) ht⟩
 
 /-- Initial data transported through the parabolic chart. -/
 def parabolicInitialVelocity (scale : ℝ) (initial : InitialVelocity) : InitialVelocity :=
@@ -69,6 +98,30 @@ theorem deriv_parabolicVelocity
   rw [deriv_comp_mul_left]
   rw [smul_smul]
   ring_nf
+
+/-- A nonzero quadratic time rebase maps the whole nonnegative chronology onto itself. -/
+theorem sq_smul_nonnegativeTime
+    {scale : ℝ} (hscale : scale ≠ 0) :
+    scale ^ 2 • Set.Ici (0 : ℝ) = Set.Ici (0 : ℝ) := by
+  rw [LinearOrderedField.smul_Ici (sq_pos_of_ne_zero hscale)]
+  simp
+
+/-- The one-sided time derivative, including the initial boundary occurrence, carries the same
+cubic weight as the ordinary positive-time derivative. -/
+theorem derivWithin_parabolicVelocity
+    (scale : ℝ) (hscale : scale ≠ 0)
+    (velocity : VelocityField) (x : Space) (t : ℝ) :
+    derivWithin (parabolicVelocity scale velocity x) (Set.Ici 0) t =
+      scale ^ 3 •
+        derivWithin (velocity (scale • x)) (Set.Ici 0) (scale ^ 2 * t) := by
+  unfold parabolicVelocity
+  change derivWithin
+      (scale • fun s ↦ velocity (scale • x) (scale ^ 2 * s)) (Set.Ici 0) t = _
+  rw [derivWithin_const_smul']
+  rw [derivWithin_comp_mul_left]
+  rw [sq_smul_nonnegativeTime hscale, smul_smul]
+  congr 1
+  ring
 
 /-- The spatial derivative of velocity carries weight two. -/
 theorem fderiv_parabolicVelocity
@@ -226,6 +279,25 @@ theorem parabolicVelocity_momentum
 
 /-! ## Attachment to the official source carrier -/
 
+/-- Every nonnegative-time spatial slice is globally smooth in its spatial argument.  At time
+zero this uses the half-cylinder smoothness directly instead of replacing the one-sided time chart
+by an interior chart. -/
+theorem SmoothSolution.velocitySlice_contDiff_nonnegativeTime
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution nu initial force velocity pressure)
+    (t : ℝ) (ht : 0 ≤ t) :
+    ContDiff ℝ ∞ (fun x ↦ velocity x t) := by
+  rw [← contDiffOn_univ]
+  have hinclusion : ContDiffOn ℝ ∞ (fun x : Space ↦ (x, t)) Set.univ :=
+    (contDiff_id.prodMk contDiff_const).contDiffOn
+  have hmaps : MapsTo (fun x : Space ↦ (x, t)) Set.univ
+      (Set.univ ×ˢ Set.Ici (0 : ℝ)) := by
+    intro x _hx
+    exact ⟨Set.mem_univ x, ht⟩
+  have hcomp := solution.velocitySmooth.comp hinclusion hmaps
+  simpa [Function.comp_def, Function.uncurry] using hcomp
+
 /-- The transported initial face is exact at time zero. -/
 theorem parabolicVelocity_zero
     (scale : ℝ) (velocity : VelocityField) (x : Space) :
@@ -272,6 +344,163 @@ theorem SmoothSolution.parabolicVelocity_momentum_positiveTime
     exact smoothSolution_velocitySlice_contDiffAtTwo solution y (scale ^ 2 * t) hscaledTime
   exact parabolicVelocity_momentum nu scale force velocity pressure x t hsmooth hmomentum
 
+/-- The official one-sided momentum equation is preserved on the complete nonnegative-time
+half-cylinder, including `t = 0`. -/
+theorem SmoothSolution.parabolicVelocity_momentum_nonnegativeTime
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution nu initial force velocity pressure)
+    (scale : ℝ) (hscale : scale ≠ 0) (x : Space) (t : ℝ) (ht : 0 ≤ t) :
+    derivWithin (parabolicVelocity scale velocity x) (Set.Ici 0) t +
+          fderiv ℝ (fun y ↦ parabolicVelocity scale velocity y t) x
+            (parabolicVelocity scale velocity x t) =
+        nu • Δ (fun y ↦ parabolicVelocity scale velocity y t) x -
+          gradient (fun y ↦ parabolicPressure scale pressure y t) x +
+          parabolicForce scale force x t := by
+  have hscaledTime : 0 ≤ scale ^ 2 * t := mul_nonneg (sq_nonneg scale) ht
+  have hmomentum := solution.momentum (scale • x) (scale ^ 2 * t) hscaledTime
+  have hsmooth : ContDiff ℝ 2 (fun y ↦ velocity y (scale ^ 2 * t)) :=
+    (Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.velocitySlice_contDiff_nonnegativeTime
+      solution (scale ^ 2 * t) hscaledTime).of_le
+      (by
+        show ((2 : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞)
+        exact WithTop.coe_le_coe.mpr le_top)
+  rw [derivWithin_parabolicVelocity scale hscale,
+    advection_parabolicVelocity,
+    laplacian_parabolicVelocity scale velocity x t hsmooth,
+    gradient_parabolicPressure]
+  unfold parabolicForce
+  have hscaled := congrArg (fun value : Space ↦ scale ^ 3 • value) hmomentum
+  simpa [smul_add, smul_sub, smul_smul, mul_comm, mul_left_comm, mul_assoc] using hscaled
+
+/-- Smoothness of the transported velocity on the complete official half-cylinder. -/
+theorem SmoothSolution.parabolicVelocity_smooth
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution nu initial force velocity pressure)
+    (scale : ℝ) :
+    ContDiffOn ℝ ∞ (Function.uncurry (parabolicVelocity scale velocity))
+      (Set.univ ×ˢ Set.Ici 0) := by
+  have hcomp := solution.velocitySmooth.comp
+    (parabolicSpacetimeMap scale).contDiff.contDiffOn
+    (parabolicSpacetimeMap_mapsTo_nonnegativeTime scale)
+  have hscaled := ContDiffOn.const_smul scale hcomp
+  convert hscaled using 1 <;> rfl
+
+/-- Smoothness of the transported pressure on the complete official half-cylinder. -/
+theorem SmoothSolution.parabolicPressure_smooth
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution nu initial force velocity pressure)
+    (scale : ℝ) :
+    ContDiffOn ℝ ∞ (Function.uncurry (parabolicPressure scale pressure))
+      (Set.univ ×ˢ Set.Ici 0) := by
+  have hcomp := solution.pressureSmooth.comp
+    (parabolicSpacetimeMap scale).contDiff.contDiffOn
+    (parabolicSpacetimeMap_mapsTo_nonnegativeTime scale)
+  have hscaled := ContDiffOn.const_smul (scale ^ 2) hcomp
+  convert hscaled using 1 <;> rfl
+
+/-- **[proved-derived; formal-checked]** The complete official `SmoothSolution` carrier is closed
+under every nonzero parabolic rebase.  The returned occurrence includes the initial boundary,
+half-cylinder smoothness, incompressibility, and the one-sided `t = 0` momentum equation. -/
+def SmoothSolution.parabolic
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : SmoothSolution nu initial force velocity pressure)
+    (scale : ℝ) (hscale : scale ≠ 0) :
+    SmoothSolution nu (parabolicInitialVelocity scale initial)
+      (parabolicForce scale force) (parabolicVelocity scale velocity)
+      (parabolicPressure scale pressure) where
+  momentum :=
+    Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.parabolicVelocity_momentum_nonnegativeTime
+      solution scale hscale
+  incompressible :=
+    Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.parabolicVelocity_incompressible
+      solution scale
+  initial := by
+    intro x
+    simp [parabolicVelocity, parabolicInitialVelocity, solution.initial]
+  velocitySmooth :=
+    Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.parabolicVelocity_smooth
+      solution scale
+  pressureSmooth :=
+    Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.parabolicPressure_smooth
+      solution scale
+
+/-! ## The exact periodic cover -/
+
+/-- Unit periodicity iterates through every natural cover degree. -/
+theorem IsOnePeriodic.add_nat_single
+    {alpha : Sort*} {field : Space → alpha}
+    (hperiodic : IsOnePeriodic field) (cover : ℕ) (x : Space) (coordinate : Fin 3) :
+    field (x + (cover : ℝ) • EuclideanSpace.single coordinate 1) = field x := by
+  induction cover with
+  | zero => simp
+  | succ cover ih =>
+      calc
+        field (x + (Nat.succ cover : ℝ) • EuclideanSpace.single coordinate 1) =
+            field ((x + (cover : ℝ) • EuclideanSpace.single coordinate 1) +
+              EuclideanSpace.single coordinate 1) := by
+          congr 1
+          rw [Nat.cast_succ, add_smul, one_smul, add_assoc]
+        _ = field (x + (cover : ℝ) • EuclideanSpace.single coordinate 1) :=
+          hperiodic _ coordinate
+        _ = field x := ih
+
+/-- A natural-degree spatial parabolic cover preserves unit periodicity of velocity. -/
+theorem parabolicVelocity_isOnePeriodic_nat
+    (cover : ℕ) (velocity : VelocityField) (t : ℝ)
+    (hperiodic : IsOnePeriodic (fun x ↦ velocity x ((cover : ℝ) ^ 2 * t))) :
+    IsOnePeriodic (fun x ↦ parabolicVelocity (cover : ℝ) velocity x t) := by
+  intro x coordinate
+  unfold parabolicVelocity
+  change (cover : ℝ) •
+      velocity ((cover : ℝ) • (x + EuclideanSpace.single coordinate 1))
+        ((cover : ℝ) ^ 2 * t) =
+    (cover : ℝ) • velocity ((cover : ℝ) • x) ((cover : ℝ) ^ 2 * t)
+  rw [smul_add]
+  rw [IsOnePeriodic.add_nat_single hperiodic cover ((cover : ℝ) • x) coordinate]
+
+/-- A natural-degree spatial parabolic cover preserves unit periodicity of pressure. -/
+theorem parabolicPressure_isOnePeriodic_nat
+    (cover : ℕ) (pressure : PressureField) (t : ℝ)
+    (hperiodic : IsOnePeriodic (fun x ↦ pressure x ((cover : ℝ) ^ 2 * t))) :
+    IsOnePeriodic (fun x ↦ parabolicPressure (cover : ℝ) pressure x t) := by
+  intro x coordinate
+  unfold parabolicPressure
+  change (cover : ℝ) ^ 2 *
+      pressure ((cover : ℝ) • (x + EuclideanSpace.single coordinate 1))
+        ((cover : ℝ) ^ 2 * t) =
+    (cover : ℝ) ^ 2 * pressure ((cover : ℝ) • x) ((cover : ℝ) ^ 2 * t)
+  rw [smul_add]
+  rw [IsOnePeriodic.add_nat_single hperiodic cover ((cover : ℝ) • x) coordinate]
+
+/-- **[proved-derived; formal-checked]** Every positive natural cover degree transports a complete
+official periodic solution to another complete official periodic solution.  The cover index is
+retained because a generic real dilation does not preserve the unit torus chart. -/
+def PeriodicSolution.parabolicNat
+    {nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (solution : PeriodicSolution nu initial force velocity pressure)
+    (cover : ℕ) (hcover : 0 < cover) :
+    PeriodicSolution nu (parabolicInitialVelocity (cover : ℝ) initial)
+      (parabolicForce (cover : ℝ) force) (parabolicVelocity (cover : ℝ) velocity)
+      (parabolicPressure (cover : ℝ) pressure) where
+  toSmoothSolution :=
+    Soma.Holonics.Millennium.NavierStokesParabolicRebase.SmoothSolution.parabolic
+      solution.toSmoothSolution (cover : ℝ) (Nat.cast_ne_zero.mpr hcover.ne')
+  velocityPeriodic := by
+    intro t ht
+    apply parabolicVelocity_isOnePeriodic_nat
+    exact solution.velocityPeriodic ((cover : ℝ) ^ 2 * t)
+      (mul_nonneg (sq_nonneg (cover : ℝ)) ht)
+  pressurePeriodic := by
+    intro t ht
+    apply parabolicPressure_isOnePeriodic_nat
+    exact solution.pressurePeriodic ((cover : ℝ) ^ 2 * t)
+      (mul_nonneg (sq_nonneg (cover : ℝ)) ht)
+
 section Audit
 
 #print axioms deriv_parabolicVelocity
@@ -285,6 +514,16 @@ section Audit
 #print axioms parabolicVelocity_momentum
 #print axioms SmoothSolution.parabolicVelocity_incompressible
 #print axioms SmoothSolution.parabolicVelocity_momentum_positiveTime
+#print axioms derivWithin_parabolicVelocity
+#print axioms SmoothSolution.velocitySlice_contDiff_nonnegativeTime
+#print axioms SmoothSolution.parabolicVelocity_momentum_nonnegativeTime
+#print axioms SmoothSolution.parabolicVelocity_smooth
+#print axioms SmoothSolution.parabolicPressure_smooth
+#print axioms SmoothSolution.parabolic
+#print axioms IsOnePeriodic.add_nat_single
+#print axioms parabolicVelocity_isOnePeriodic_nat
+#print axioms parabolicPressure_isOnePeriodic_nat
+#print axioms PeriodicSolution.parabolicNat
 
 end Audit
 

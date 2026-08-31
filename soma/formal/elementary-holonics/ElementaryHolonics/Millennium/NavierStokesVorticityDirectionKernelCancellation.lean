@@ -123,7 +123,7 @@ def complexStretchingReadingCLM (receiver : ComplexVector) :
     { toFun := complexStretchingReading receiver
       map_add' := complexStretchingReading_add receiver
       map_smul' := fun amplitude J ↦ by
-        simpa only [smul_eq_mul] using
+        simpa only [RingHom.id_apply, smul_eq_mul] using
           complexStretchingReading_smul receiver amplitude J }
 
 @[simp]
@@ -354,8 +354,13 @@ theorem complexStretchingReading_symmetric_kernelConvolution_eq_integral
           (dyadicHodgeJacobianKernelConvolution scale field q)) =
       ∫ y : SpatialTorus,
         dyadicHodgeStretchingKernelReading scale y receiver (field (q - y)) := by
-  rw [complexStretchingReading_symmetricComplexJacobianPart,
-    dyadicHodgeJacobianKernelConvolution_eq_integral_action]
+  let J : ComplexMatrix3 := Matrix.of fun component coordinate ↦
+    dyadicHodgeJacobianKernelConvolution scale field q component coordinate
+  change complexStretchingReading receiver (symmetricComplexJacobianPart J) = _
+  rw [complexStretchingReading_symmetricComplexJacobianPart]
+  change complexStretchingReadingCLM receiver
+    (dyadicHodgeJacobianKernelConvolution scale field q) = _
+  rw [dyadicHodgeJacobianKernelConvolution_eq_integral_action]
   let integrand := dyadicHodgeJacobianKernelActionField scale field q
   let L := complexStretchingReadingCLM receiver
   have hintegrable : Integrable integrand :=
@@ -441,8 +446,8 @@ theorem openPeriodicDyadicSpatialDirectionCoherenceMass_le_remainderMass
       ‖dyadicHodgeStretchingKernelReading scale y
         (openPeriodicComplexVorticityAt solution t q)
         (openPeriodicSpatialDirectionRemainderField solution t q y)‖) := by
-    simpa only [dyadicHodgeStretchingKernelReading,
-      complexStretchingReadingCLM_apply] using hleft'
+    change Integrable (fun y : SpatialTorus ↦ ‖L (actionField y)‖)
+    exact hleft'
   have hright : Integrable (fun y : SpatialTorus ↦
       (dyadicHodgeJacobianKernelPointMass scale y *
         complexVectorL1 (openPeriodicSpatialDirectionRemainderField solution t q y)) *

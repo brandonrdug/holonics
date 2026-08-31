@@ -85,6 +85,9 @@ use thiserror::Error;
 
 use crate::exact_value::{AlgebraicRoot, ExactInterval, IntegerPolynomial};
 
+mod root_separation;
+pub use root_separation::{RootSeparation, RootSeparationBound};
+
 /// One exact polynomial over `Q` in a single variable.
 ///
 /// Coefficients ascend in degree. The empty vector is the zero polynomial; a nonzero polynomial
@@ -574,71 +577,6 @@ pub fn integer_discriminant(
     Ok((value.to_integer(), steps))
 }
 
-/// The exact material Mahler's bound is read off, and the bound itself.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RootSeparationBound {
-    pub degree: usize,
-    /// `disc(f)`, nonzero exactly because `f` is squarefree.
-    pub discriminant: BigInt,
-    /// `||f||_2^2 = sum a_i^2`.
-    pub coefficient_norm_squared: BigInt,
-    /// `3 |disc(f)| / ( n^(n+2) (||f||_2^2)^(n-1) )`, which is strictly below `sep(f)^2`.
-    pub squared_lower_bound: Rat,
-    /// Exact work of the Euclidean resultant, in division steps. Never a clock.
-    pub euclidean_steps: u64,
-}
-
-/// What the material says about how close two of its roots may be.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum RootSeparation {
-    /// Degree below two. There is no pair of roots, so no interval can hold two of them and no
-    /// split can ever be required. This is a statement about the polynomial, not a missing bound.
-    NothingToSeparate {
-        degree: usize,
-    },
-    Bounded(RootSeparationBound),
-}
-
-impl RootSeparation {
-    pub fn squared_lower_bound(&self) -> Option<&Rat> {
-        match self {
-            Self::NothingToSeparate { .. } => None,
-            Self::Bounded(bound) => Some(&bound.squared_lower_bound),
-        }
-    }
-
-    /// Whether an interval of this width provably holds at most one root.
-    ///
-    /// `width^2 <= S < sep(f)^2` forces `width < sep(f)`, and two distinct roots inside one open
-    /// interval are closer than its width.
-    pub fn holds_at_most_one_root(&self, width: &Rat) -> bool {
-        match self.squared_lower_bound() {
-            None => true,
-            Some(square) => &(width * width) <= square,
-        }
-    }
-
-    /// How many splits at a retained fraction of `retained` bring an interval of width
-    /// `initial_width` down to one that provably holds at most one root.
-    ///
-    /// `retained` is the largest fraction of an interval that one child of a split may keep — a
-    /// property of the declared split schedule, obtained from [`worst_retained_fraction`]. Nothing
-    /// here is chosen: the width comes from the caller, the schedule from the organ, and the floor
-    /// from the discriminant.
-    pub fn splitting_depth(
-        &self,
-        initial_width: &Rat,
-        retained: &Rat,
-    ) -> Result<u64, ExactPolynomialError> {
-        match self.squared_lower_bound() {
-            None => Ok(0),
-            Some(square) => {
-                squared_shrinking_steps(&(initial_width * initial_width), retained, square)
-            }
-        }
-    }
-}
-
 /// Mahler's root separation bound, exactly, for a squarefree integer polynomial.
 ///
 /// ```text
@@ -860,6 +798,235 @@ pub struct CensusWork {
     /// the depth is read off the material: the bound is what the discriminant permits, and this is
     /// what the polynomial asked for.
     pub isolation_depth_reached: u64,
+}
+
+/// Every rational root of a polynomial over `Q`, reconstructed from one prime receiver by lifting.
+///
+/// [`rational_root_census`] answers the same question by Sturm bisection on half-integer endpoints
+/// from an absolute Cauchy bound. That is complete and needs no factoring, but its descent runs
+/// from the bound down to unit width, and the bound is a coefficient of the monic companion
+/// `c^(n-1) A(z/c)` — for a degree-eight polynomial whose coefficients carry fifty digits it is
+/// three hundred and fifty digits wide, so the descent is a thousand Sturm evaluations on
+/// three-hundred-digit rationals per root. Measured 2026-08-27: the section solver of
+/// `mordell_weil_realizers` did not return in 175 seconds on the first published family.
+///
+/// This route reads the root off a **local face and lifts it**. Let `F` be the primitive integer
+/// form of the squarefree part, degree `n`, leading `F_n`, constant `F_0 != 0` (a zero root is
+/// divided out first). A rational root `a/b` in lowest terms has `b | F_n` and `a | F_0`, so
+/// `|a| <= |F_0|` and `b <= |F_n|`. At a prime `p` not dividing `F_n`, the residue `a b^-1` is a
+/// root of `F mod p`; when that residue is simple (`F'(r) != 0 mod p`) Newton's step lifts it
+/// uniquely to every `p^k`, and once `p^k > 2 |F_0| |F_n|` rational reconstruction recovers
+/// `a/b` from the lift uniquely. Every candidate is then **verified by exact evaluation**, so the
+/// return is a certificate, not a heuristic; and every simple residue is lifted, so the return is
+/// complete at any prime at which every residue root is simple. A prime at which some residue root
+/// is not simple divides the discriminant; it is refused by name and the next prime is taken, and
+/// there are finitely many such primes.
+///
+/// Reading: a rational number is a global object seen through one prime receiver as a residue;
+/// the lift is transport along the `p`-adic direction, and the reconstruction is the return to the
+/// global chart. The exact evaluation is the receiver's check that the returned object is the one
+/// the question asked for.
+pub fn rational_roots_by_lifting(
+    polynomial: &RationalPolynomial,
+) -> Result<Vec<Rat>, ExactPolynomialError> {
+    let degree = polynomial
+        .degree()
+        .ok_or(ExactPolynomialError::ZeroPolynomial)?;
+    if degree == 0 {
+        return Err(ExactPolynomialError::ConstantPolynomial);
+    }
+    let squarefree = polynomial.squarefree_part()?.primitive_integer_form()?;
+    let mut coefficients: Vec<BigInt> = squarefree.coefficients.clone();
+    let mut roots: Vec<Rat> = Vec::new();
+    while coefficients.first().is_some_and(|c| c.is_zero()) {
+        roots.push(Rat::zero());
+        coefficients.remove(0);
+    }
+    if coefficients.len() <= 1 {
+        roots.sort();
+        roots.dedup();
+        return Ok(roots);
+    }
+    let leading = coefficients.last().cloned().unwrap_or_else(BigInt::one);
+    let constant = coefficients.first().cloned().unwrap_or_else(BigInt::one);
+    let numerator_bound = constant.abs();
+    let denominator_bound = leading.abs();
+    let reconstruction_modulus = BigInt::from(2) * &numerator_bound * &denominator_bound;
+    let derivative: Vec<BigInt> = coefficients
+        .iter()
+        .enumerate()
+        .skip(1)
+        .map(|(index, c)| c * BigInt::from(index))
+        .collect();
+
+    let mut prime: u64 = 1009;
+    let mut primes_tried = 0usize;
+    'primes: loop {
+        while !is_small_prime(prime) {
+            prime += 2;
+        }
+        primes_tried += 1;
+        if primes_tried > 64 {
+            return Err(ExactPolynomialError::LiftingPrimesExhausted);
+        }
+        let modulus = BigInt::from(prime);
+        if (&leading % &modulus).is_zero() {
+            prime += 2;
+            continue;
+        }
+        // residue roots, by exhausting the receiver
+        let reduced: Vec<u64> = coefficients.iter().map(|c| residue_u64(c, prime)).collect();
+        let reduced_derivative: Vec<u64> =
+            derivative.iter().map(|c| residue_u64(c, prime)).collect();
+        let mut residues = Vec::new();
+        for r in 0..prime {
+            if evaluate_mod_u64(&reduced, r, prime) == 0 {
+                if evaluate_mod_u64(&reduced_derivative, r, prime) == 0 {
+                    // a non-simple residue: this prime divides the discriminant; take the next
+                    prime += 2;
+                    continue 'primes;
+                }
+                residues.push(r);
+            }
+        }
+        // lift each simple residue quadratically until reconstruction is unique
+        for residue in residues {
+            let mut lifted = BigInt::from(residue);
+            let mut lift_modulus = modulus.clone();
+            while lift_modulus <= reconstruction_modulus {
+                let next_modulus = &lift_modulus * &lift_modulus;
+                let value = evaluate_mod_big(&coefficients, &lifted, &next_modulus);
+                let slope = evaluate_mod_big(&derivative, &lifted, &lift_modulus);
+                let Some(inverse) = inverse_mod_big(&slope, &lift_modulus) else {
+                    // cannot happen for a simple residue; refuse rather than guess
+                    return Err(ExactPolynomialError::LiftingPrimesExhausted);
+                };
+                lifted = floor_mod(&(&lifted - value * inverse), &next_modulus);
+                lift_modulus = next_modulus;
+            }
+            if let Some((a, b)) = rational_reconstruction(
+                &lifted,
+                &lift_modulus,
+                &numerator_bound,
+                &denominator_bound,
+            ) {
+                let candidate = Rat::new(a, b);
+                if polynomial.evaluate(&candidate).is_zero() {
+                    roots.push(candidate);
+                }
+            }
+        }
+        break;
+    }
+    roots.sort();
+    roots.dedup();
+    Ok(roots)
+}
+
+/// The representative of `value` in `[0, modulus)`, for a positive modulus.
+fn floor_mod(value: &BigInt, modulus: &BigInt) -> BigInt {
+    let residue = value % modulus;
+    if residue.is_negative() {
+        residue + modulus
+    } else {
+        residue
+    }
+}
+
+fn is_small_prime(value: u64) -> bool {
+    if value < 2 {
+        return false;
+    }
+    let mut divisor = 2u64;
+    while divisor * divisor <= value {
+        if value % divisor == 0 {
+            return false;
+        }
+        divisor += 1;
+    }
+    true
+}
+
+fn residue_u64(value: &BigInt, prime: u64) -> u64 {
+    let modulus = BigInt::from(prime);
+    let residue = floor_mod(value, &modulus);
+    residue.to_u64_digits().1.first().copied().unwrap_or(0)
+}
+
+fn evaluate_mod_u64(coefficients: &[u64], point: u64, prime: u64) -> u64 {
+    let mut accumulated: u128 = 0;
+    for c in coefficients.iter().rev() {
+        accumulated = (accumulated * u128::from(point) + u128::from(*c)) % u128::from(prime);
+    }
+    accumulated as u64
+}
+
+fn evaluate_mod_big(coefficients: &[BigInt], point: &BigInt, modulus: &BigInt) -> BigInt {
+    let mut accumulated = BigInt::zero();
+    for c in coefficients.iter().rev() {
+        accumulated = floor_mod(&(accumulated * point + c), modulus);
+    }
+    accumulated
+}
+
+fn inverse_mod_big(value: &BigInt, modulus: &BigInt) -> Option<BigInt> {
+    let (mut old_r, mut r): (BigInt, BigInt) = (floor_mod(value, modulus), modulus.clone());
+    let (mut old_t, mut t) = (BigInt::one(), BigInt::zero());
+    while !r.is_zero() {
+        let quotient = &old_r / &r;
+        let next_r = &old_r - &quotient * &r;
+        old_r = std::mem::replace(&mut r, next_r);
+        let next_t = &old_t - &quotient * &t;
+        old_t = std::mem::replace(&mut t, next_t);
+    }
+    if old_r.is_one() {
+        Some(floor_mod(&old_t, modulus))
+    } else {
+        None
+    }
+}
+
+/// Wang's rational reconstruction: the unique `a/b` with `|a| <= numerator_bound`,
+/// `0 < b <= denominator_bound`, `a = u b (mod m)`, provided `m > 2 · numerator_bound ·
+/// denominator_bound`. `None` when no such pair exists, which is itself a return: the lifted
+/// residue is not the image of any rational inside the declared bounds.
+fn rational_reconstruction(
+    u: &BigInt,
+    m: &BigInt,
+    numerator_bound: &BigInt,
+    denominator_bound: &BigInt,
+) -> Option<(BigInt, BigInt)> {
+    let (mut r0, mut r1) = (m.clone(), floor_mod(u, m));
+    let (mut t0, mut t1) = (BigInt::zero(), BigInt::one());
+    while r1 > *numerator_bound {
+        let quotient = &r0 / &r1;
+        let next_r = &r0 - &quotient * &r1;
+        r0 = std::mem::replace(&mut r1, next_r);
+        let next_t = &t0 - &quotient * &t1;
+        t0 = std::mem::replace(&mut t1, next_t);
+    }
+    if t1.is_zero() {
+        return None;
+    }
+    let (a, b) = if t1.is_negative() {
+        (-r1, -t1)
+    } else {
+        (r1, t1)
+    };
+    if b > *denominator_bound {
+        return None;
+    }
+    let mut x = a.abs();
+    let mut y = b.clone();
+    while !y.is_zero() {
+        let t = &x % &y;
+        x = y;
+        y = t;
+    }
+    if !x.is_one() {
+        return None;
+    }
+    Some((a, b))
 }
 
 /// Count and isolate the real roots and return every rational root, exactly.
@@ -1437,6 +1604,148 @@ pub fn monic_from_power_sums(
     Ok(RationalPolynomial::new(coefficients))
 }
 
+/// The monic gcd of two polynomials over `Q`, computed modulo word primes.
+///
+/// The Euclidean remainder sequence over `Q` grows its coefficients exponentially in the
+/// degree, which is why `monic_gcd` is unusable past a few dozen degrees with large
+/// coefficients. The image of the sequence modulo a prime does not grow at all. For every prime
+/// dividing neither leading coefficient of the primitive integer forms, the gcd of the images has
+/// degree **at least** that of the true gcd, with equality except at finitely many unlucky
+/// primes; the minimal-degree rule discards the unlucky ones as soon as a luckier prime appears.
+/// Each monic image is scaled by the gcd of the two leading coefficients — which the true gcd's
+/// leading coefficient divides — so the integer combination is well defined, combined by the
+/// Chinese remainder theorem in the symmetric range, and **admitted only when its primitive part
+/// divides both inputs exactly**. A candidate that does not divide is refused by the division,
+/// never returned; the return is bit-identical to `monic_gcd`.
+pub fn modular_monic_gcd(
+    left: &RationalPolynomial,
+    right: &RationalPolynomial,
+) -> Result<RationalPolynomial, ExactPolynomialError> {
+    if left.is_zero() {
+        return Ok(right.made_monic());
+    }
+    if right.is_zero() {
+        return Ok(left.made_monic());
+    }
+    let a = left.primitive_integer_form()?.coefficients;
+    let b = right.primitive_integer_form()?.coefficients;
+    if a.len() == 1 || b.len() == 1 {
+        return Ok(RationalPolynomial::one());
+    }
+    let lead = integer_gcd(a.last().unwrap(), b.last().unwrap());
+    let lead_product = a.last().unwrap() * b.last().unwrap();
+    let mut prime: u64 = 0x7fff_ffff;
+    let mut best_degree = usize::MAX;
+    let mut modulus = BigInt::one();
+    let mut combined: Vec<BigInt> = Vec::new();
+    let mut previous: Option<Vec<BigInt>> = None;
+    for _ in 0..4096 {
+        while !is_small_prime(prime) || residue_u64(&lead_product, prime) == 0 {
+            prime -= 2;
+        }
+        let image = gcd_mod_prime(
+            a.iter().map(|c| residue_u64(c, prime)).collect(),
+            b.iter().map(|c| residue_u64(c, prime)).collect(),
+            prime,
+        );
+        let degree = image.len() - 1;
+        if degree == 0 {
+            return Ok(RationalPolynomial::one());
+        }
+        if degree > best_degree {
+            prime -= 2;
+            continue;
+        }
+        if degree < best_degree {
+            best_degree = degree;
+            modulus = BigInt::one();
+            combined = vec![BigInt::zero(); degree + 1];
+            previous = None;
+        }
+        let lead_p = residue_u64(&lead, prime);
+        let scaled: Vec<u64> = image
+            .iter()
+            .map(|c| ((u128::from(*c) * u128::from(lead_p)) % u128::from(prime)) as u64)
+            .collect();
+        let prime_big = BigInt::from(prime);
+        let inverse = inverse_mod_big(&modulus, &prime_big).expect("coprime moduli");
+        let next_modulus = &modulus * &prime_big;
+        let half = &next_modulus / 2;
+        for (c, r) in combined.iter_mut().zip(scaled.iter()) {
+            let residue = floor_mod(c, &prime_big);
+            let step = floor_mod(&((BigInt::from(*r) - residue) * &inverse), &prime_big);
+            let mut lifted = floor_mod(&(&*c + &modulus * step), &next_modulus);
+            if lifted > half {
+                lifted -= &next_modulus;
+            }
+            *c = lifted;
+        }
+        modulus = next_modulus;
+        if previous.as_ref() == Some(&combined) {
+            let candidate = RationalPolynomial::from_integers(&combined).made_monic();
+            let (_, ra) = left.divided_by(&candidate)?;
+            let (_, rb) = right.divided_by(&candidate)?;
+            if ra.is_zero() && rb.is_zero() {
+                return Ok(candidate);
+            }
+        }
+        previous = Some(combined.clone());
+        prime -= 2;
+    }
+    Err(ExactPolynomialError::LiftingPrimesExhausted)
+}
+
+/// The monic gcd of two polynomials over `F_p`, ascending coefficients, for a word prime.
+fn gcd_mod_prime(mut a: Vec<u64>, mut b: Vec<u64>, prime: u64) -> Vec<u64> {
+    fn trim(v: &mut Vec<u64>) {
+        while v.last() == Some(&0) {
+            v.pop();
+        }
+    }
+    fn power_mod(mut base: u64, mut exponent: u64, prime: u64) -> u64 {
+        let mut result: u64 = 1;
+        base %= prime;
+        while exponent > 0 {
+            if exponent & 1 == 1 {
+                result = ((u128::from(result) * u128::from(base)) % u128::from(prime)) as u64;
+            }
+            base = ((u128::from(base) * u128::from(base)) % u128::from(prime)) as u64;
+            exponent >>= 1;
+        }
+        result
+    }
+    trim(&mut a);
+    trim(&mut b);
+    while !b.is_zero_poly() {
+        // a ← a mod b
+        let inverse = power_mod(*b.last().unwrap(), prime - 2, prime);
+        while a.len() >= b.len() && !a.is_empty() {
+            let shift = a.len() - b.len();
+            let factor =
+                ((u128::from(*a.last().unwrap()) * u128::from(inverse)) % u128::from(prime)) as u64;
+            for (k, c) in b.iter().enumerate() {
+                let sub = ((u128::from(*c) * u128::from(factor)) % u128::from(prime)) as u64;
+                a[shift + k] = (a[shift + k] + prime - sub) % prime;
+            }
+            trim(&mut a);
+        }
+        std::mem::swap(&mut a, &mut b);
+    }
+    let inverse = power_mod(*a.last().unwrap(), prime - 2, prime);
+    a.iter()
+        .map(|c| ((u128::from(*c) * u128::from(inverse)) % u128::from(prime)) as u64)
+        .collect()
+}
+
+trait ZeroPoly {
+    fn is_zero_poly(&self) -> bool;
+}
+impl ZeroPoly for Vec<u64> {
+    fn is_zero_poly(&self) -> bool {
+        self.is_empty()
+    }
+}
+
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ExactPolynomialError {
     #[error("the zero polynomial has no degree, no primitive form, and no root census")]
@@ -1459,6 +1768,8 @@ pub enum ExactPolynomialError {
     MalformedInterval,
     #[error("the Sturm count refused at this interval")]
     SturmRefused,
+    #[error("no prime among the first sixty-four tried left every residue root simple")]
+    LiftingPrimesExhausted,
     #[error("Sturm counts on the two halves did not sum to the count on the whole")]
     SturmCountsDisagree,
     #[error("bisection produced a midpoint outside its own interval")]
@@ -1500,467 +1811,5 @@ pub enum ExactPolynomialError {
 }
 
 #[cfg(test)]
-mod tests {
-    use relational_geometry::{integer, rat};
-
-    use super::*;
-
-    fn polynomial(values: &[i64]) -> RationalPolynomial {
-        RationalPolynomial::new(values.iter().map(|value| integer(*value)).collect())
-    }
-
-    #[test]
-    fn exact_division_refuses_rather_than_truncating() {
-        let dividend = polynomial(&[1, 0, 1]);
-        let divisor = polynomial(&[1, 1]);
-        assert_eq!(
-            dividend.divided_exactly_by(&divisor),
-            Err(ExactPolynomialError::NonExactPolynomialDivision)
-        );
-        let square = divisor.times(&divisor);
-        assert_eq!(square.divided_exactly_by(&divisor).unwrap(), divisor);
-    }
-
-    #[test]
-    fn the_rational_census_is_complete_where_a_divisor_search_would_have_to_factor() {
-        // 6x^2 - 5x + 1 = (3x - 1)(2x - 1): both roots rational, neither an integer, and the
-        // leading coefficient is not one. This is the case a naive "integer roots" search misses.
-        let census = rational_root_census(&polynomial(&[1, -5, 6])).unwrap();
-        assert_eq!(census.rational_roots, vec![rat(1, 3), rat(1, 2)]);
-        assert_eq!(census.distinct_real_roots, 2);
-    }
-
-    #[test]
-    fn a_real_root_that_is_not_rational_is_retained_with_its_certificate() {
-        // x^2 - 2 has two real roots and no rational root. The refusal is a population of two
-        // certified irrationals, not a bool.
-        let census = rational_root_census(&polynomial(&[-2, 0, 1])).unwrap();
-        assert!(census.rational_roots.is_empty());
-        assert_eq!(census.distinct_real_roots, 2);
-        assert_eq!(census.irrational_real_roots().len(), 2);
-        for root in census.irrational_real_roots() {
-            assert_eq!(
-                root.isolating.certificate.variations_at_lower
-                    - root.isolating.certificate.variations_at_upper,
-                1
-            );
-        }
-    }
-
-    #[test]
-    fn a_polynomial_with_no_real_root_returns_an_empty_population_not_an_error() {
-        let census = rational_root_census(&polynomial(&[1, 0, 1])).unwrap();
-        assert_eq!(census.distinct_real_roots, 0);
-        assert!(census.rational_roots.is_empty());
-        assert!(census.roots.is_empty());
-    }
-
-    #[test]
-    fn a_large_constant_term_costs_a_logarithm_and_never_a_factorisation() {
-        // x^2 - 1000003x + 1000002 = (x - 1)(x - 1000002). The constant term is the product of two
-        // primes; a divisor enumeration would have to factor it. The bisection does not.
-        let census = rational_root_census(&polynomial(&[1_000_002, -1_000_003, 1])).unwrap();
-        assert_eq!(census.rational_roots, vec![integer(1), integer(1_000_002)]);
-        assert!(
-            census.work.bisection_steps < 64,
-            "bisection is logarithmic in the bound, not linear: {} steps",
-            census.work.bisection_steps
-        );
-    }
-
-    #[test]
-    fn newton_identities_round_trip_through_the_power_sums() {
-        // (x-1)(x-2)(x-3)(x-4)(x-5) has power sums 5, 15, 55, 225, 979, 4425.
-        let roots = [1_i64, 2, 3, 4, 5];
-        let quintic = roots.iter().fold(RationalPolynomial::one(), |value, root| {
-            value.times(&polynomial(&[-root, 1]))
-        });
-        let sums = newton_power_sums(&quintic, 5).unwrap();
-        assert_eq!(
-            sums,
-            vec![
-                integer(5),
-                integer(15),
-                integer(55),
-                integer(225),
-                integer(979),
-                integer(4425)
-            ]
-        );
-        assert_eq!(monic_from_power_sums(&sums, 5).unwrap(), quintic);
-    }
-
-    #[test]
-    fn power_sums_run_past_the_degree_by_the_linear_recurrence() {
-        // x^2 - x - 1: the power sums are the Lucas numbers 2, 1, 3, 4, 7, 11, 18.
-        let sums = newton_power_sums(&polynomial(&[-1, -1, 1]), 6).unwrap();
-        assert_eq!(
-            sums,
-            vec![
-                integer(2),
-                integer(1),
-                integer(3),
-                integer(4),
-                integer(7),
-                integer(11),
-                integer(18)
-            ]
-        );
-    }
-
-    #[test]
-    fn the_polynomial_resultant_eliminates_a_variable_exactly() {
-        // Res_v(v - t, v^2 - 2) = t^2 - 2: substituting the first into the second.
-        let first = BivariatePolynomial::new(vec![
-            RationalPolynomial::new(vec![Rat::zero(), -Rat::one()]),
-            RationalPolynomial::one(),
-        ]);
-        let second = BivariatePolynomial::new(vec![
-            RationalPolynomial::constant(integer(-2)),
-            RationalPolynomial::zero(),
-            RationalPolynomial::one(),
-        ]);
-        let (resultant, work) = resultant_in_eliminated_variable(&first, &second).unwrap();
-        assert_eq!(resultant, polynomial(&[-2, 0, 1]));
-        assert_eq!(work.matrix_extent, 3);
-    }
-
-    #[test]
-    fn the_resultant_vanishes_identically_when_the_two_curves_share_a_component() {
-        // Both carry the factor (v - t); the elimination is degenerate and says so by returning
-        // the zero polynomial rather than a spurious finite root set.
-        let shared = BivariatePolynomial::new(vec![
-            RationalPolynomial::new(vec![Rat::zero(), -Rat::one()]),
-            RationalPolynomial::one(),
-        ]);
-        let left = shared.times(&BivariatePolynomial::new(vec![
-            RationalPolynomial::constant(integer(1)),
-            RationalPolynomial::one(),
-        ]));
-        let right = shared.times(&BivariatePolynomial::new(vec![
-            RationalPolynomial::constant(integer(2)),
-            RationalPolynomial::one(),
-        ]));
-        let (resultant, _) = resultant_in_eliminated_variable(&left, &right).unwrap();
-        assert!(resultant.is_zero());
-    }
-
-    #[test]
-    fn composition_and_reduction_agree_with_direct_evaluation() {
-        let outer = polynomial(&[1, 2, 3]);
-        let inner = polynomial(&[-1, 1]);
-        let composed = outer.composed_with(&inner);
-        for point in [-3_i64, 0, 1, 7] {
-            assert_eq!(
-                composed.evaluate(&integer(point)),
-                outer.evaluate(&inner.evaluate(&integer(point)))
-            );
-        }
-    }
-
-    // -------------------------------------------------------------------------------------
-    // the root separation bound
-
-    fn constant_bivariate(polynomial: &RationalPolynomial) -> BivariatePolynomial {
-        BivariatePolynomial::new(
-            polynomial
-                .coefficients()
-                .iter()
-                .map(|value| RationalPolynomial::constant(value.clone()))
-                .collect(),
-        )
-    }
-
-    /// Two independent routes to `Res(f, f')`: the Euclidean recurrence used by the bound, and the
-    /// Sylvester determinant by fraction-free Bareiss elimination. §2.3 — a figure deposited from
-    /// one route is a figure with no second reading.
-    #[test]
-    fn the_two_resultant_routes_agree_and_reproduce_the_classical_discriminants() {
-        // disc(x^n + a) = (-1)^(n(n-1)/2) n^n a^(n-1), plus the two textbook small cases.
-        let family: [(Vec<i64>, i64); 6] = [
-            (vec![-2, 0, 1], 8),        // x^2 - 2
-            (vec![-1, -1, 1], 5),       // x^2 - x - 1
-            (vec![-2, 0, 0, 1], -108),  // x^3 - 2
-            (vec![-6, 11, -6, 1], 4),   // (x-1)(x-2)(x-3)
-            (vec![1, 0, 0, 0, 1], 256), // x^4 + 1
-            (vec![-8, 12, -6, 1], 0),   // (x-2)^3, not squarefree
-        ];
-        let mut saw_a_vanishing_discriminant = false;
-        let mut saw_both_signs = (false, false);
-        for (coefficients, expected) in family {
-            let rational = polynomial(&coefficients);
-            let integral = rational.primitive_integer_form().unwrap();
-            let (discriminant, steps) = integer_discriminant(&integral).unwrap();
-            assert_eq!(
-                discriminant,
-                BigInt::from(expected),
-                "disc of {}",
-                rational.written("x")
-            );
-            assert!(steps > 0, "the Euclidean route took no step");
-
-            // Route two: the Sylvester determinant, then the same normalisation.
-            let derivative = rational.derivative();
-            let (sylvester, _) = resultant_in_eliminated_variable(
-                &constant_bivariate(&rational),
-                &constant_bivariate(&derivative),
-            )
-            .unwrap();
-            let degree = integral.degree();
-            let mut by_sylvester = sylvester.coefficient(0) / rational.leading().unwrap().clone();
-            if (degree * (degree - 1) / 2) % 2 == 1 {
-                by_sylvester = -by_sylvester;
-            }
-            assert_eq!(
-                by_sylvester,
-                Rat::from_integer(discriminant.clone()),
-                "the Euclidean and Sylvester routes disagree on {}",
-                rational.written("x")
-            );
-
-            saw_a_vanishing_discriminant |= discriminant.is_zero();
-            saw_both_signs.0 |= discriminant.is_positive();
-            saw_both_signs.1 |= discriminant.is_negative();
-        }
-        assert!(
-            saw_a_vanishing_discriminant && saw_both_signs.0 && saw_both_signs.1,
-            "a family without a vanishing discriminant and both signs cannot exercise the sign rule"
-        );
-    }
-
-    /// Mahler's bound, held against separations that are known exactly. The orbit is wide on
-    /// purpose: `sep^2` runs from `8` down to `1`, and a wrong exponent anywhere in
-    /// `3 |disc| / (n^(n+2) (||f||_2^2)^(n-1))` breaks one of these.
-    #[test]
-    fn the_separation_bound_lies_strictly_below_every_separation_known_exactly() {
-        // (coefficients, exact sep^2)
-        let family: [(Vec<i64>, Rat); 5] = [
-            // x^2 - 2: roots +-sqrt2, gap 2 sqrt2.
-            (vec![-2, 0, 1], integer(8)),
-            // x^2 - x - 1: roots (1 +- sqrt5)/2, gap sqrt5.
-            (vec![-1, -1, 1], integer(5)),
-            // (x-1)(x-2)(x-3): gap 1.
-            (vec![-6, 11, -6, 1], integer(1)),
-            // (2x-1)(2x-3) = 4x^2 - 8x + 3: roots 1/2 and 3/2, gap 1.
-            (vec![3, -8, 4], integer(1)),
-            // x^2 + 1: roots +-i, gap 2 — the bound is over the COMPLEX roots, so a real-only
-            // reading of it would fail here.
-            (vec![1, 0, 1], integer(4)),
-        ];
-        let mut ratios = Vec::new();
-        for (coefficients, squared_separation) in family {
-            let integral = polynomial(&coefficients).primitive_integer_form().unwrap();
-            let RootSeparation::Bounded(bound) = root_separation(&integral).unwrap() else {
-                panic!("degree two and above is bounded");
-            };
-            assert!(
-                bound.squared_lower_bound < squared_separation,
-                "Mahler's bound {} is not below sep^2 = {squared_separation} for {}",
-                bound.squared_lower_bound,
-                polynomial(&coefficients).written("x")
-            );
-            ratios.push(squared_separation / bound.squared_lower_bound);
-        }
-        assert!(
-            ratios.iter().any(|ratio| ratio > &integer(1000)),
-            "every fixture sat within a factor of a thousand of the bound, so the check could not \
-             distinguish a correct exponent from a mildly wrong one"
-        );
-    }
-
-    /// The bound is a property of the root set, so it may not move when the polynomial is scaled:
-    /// `disc(cf) = c^(2n-2) disc(f)` and `||cf||_2^2 = c^2 ||f||_2^2` cancel exactly.
-    ///
-    /// This is the control with the non-trivial orbit: the *discriminant* moves by `c^(2n-2)` and
-    /// the *norm* by `c^2`, both exhibited below, and only their combination stands still.
-    #[test]
-    fn the_separation_bound_does_not_move_when_the_polynomial_is_scaled() {
-        let base = polynomial(&[-6, 11, -6, 1]);
-        let RootSeparation::Bounded(unscaled) =
-            root_separation(&base.primitive_integer_form().unwrap()).unwrap()
-        else {
-            panic!("a cubic is bounded")
-        };
-        let mut moved_discriminants = 0;
-        for factor in [2_i64, 3, 5] {
-            let scaled = IntegerPolynomial::new(
-                base.coefficients()
-                    .iter()
-                    .map(|value| (value * integer(factor)).to_integer())
-                    .collect(),
-            )
-            .unwrap();
-            let RootSeparation::Bounded(moved) = root_separation(&scaled).unwrap() else {
-                panic!("a cubic is bounded")
-            };
-            // `2n - 2 = 4` and `n - 1 = 2` here, so both inputs really do move.
-            assert_eq!(
-                moved.discriminant,
-                &unscaled.discriminant * BigInt::from(factor).pow(4)
-            );
-            assert_eq!(
-                moved.coefficient_norm_squared,
-                &unscaled.coefficient_norm_squared * BigInt::from(factor).pow(2)
-            );
-            assert_ne!(moved.discriminant, unscaled.discriminant);
-            moved_discriminants += 1;
-            // And the bound they compose to does not move at all.
-            assert_eq!(moved.squared_lower_bound, unscaled.squared_lower_bound);
-        }
-        assert_eq!(moved_discriminants, 3);
-    }
-
-    #[test]
-    fn a_polynomial_that_is_not_squarefree_is_refused_by_its_own_vanishing_discriminant() {
-        let repeated = polynomial(&[-8, 12, -6, 1]) // (x - 2)^3
-            .primitive_integer_form()
-            .unwrap();
-        assert_eq!(
-            root_separation(&repeated),
-            Err(ExactPolynomialError::VanishingDiscriminant)
-        );
-        // A linear polynomial has one root and therefore no pair to separate. That is a statement
-        // about the polynomial, not a missing bound.
-        let linear = polynomial(&[-1, 2]).primitive_integer_form().unwrap();
-        assert_eq!(
-            root_separation(&linear).unwrap(),
-            RootSeparation::NothingToSeparate { degree: 1 }
-        );
-        assert!(
-            root_separation(&linear)
-                .unwrap()
-                .holds_at_most_one_root(&integer(1_000_000))
-        );
-    }
-
-    /// The split schedule's size is read off the degree by pigeonhole, so it cannot run out — which
-    /// the hand-written list of thirteen fractions it replaces silently could, from degree thirteen.
-    #[test]
-    fn the_split_schedule_carries_one_more_candidate_than_the_degree_admits_roots() {
-        for degree in [0_usize, 1, 5, 6, 13, 40] {
-            let schedule = interior_split_schedule(degree);
-            assert_eq!(schedule.len(), degree + 1);
-            let distinct: std::collections::BTreeSet<_> = schedule.iter().cloned().collect();
-            assert_eq!(
-                distinct.len(),
-                degree + 1,
-                "the candidates must be distinct"
-            );
-            for fraction in &schedule {
-                assert!(fraction.is_positive() && fraction < &Rat::one());
-            }
-            assert_eq!(
-                worst_retained_fraction(&schedule).unwrap(),
-                Rat::new(BigInt::from(degree + 1), BigInt::from(degree + 2))
-            );
-        }
-        // The first candidate is the midpoint whenever the degree admits one exactly.
-        assert_eq!(interior_split_schedule(6)[0], rat(1, 2));
-        assert_eq!(interior_split_schedule(0)[0], rat(1, 2));
-        // A degree-13 polynomial has fourteen candidates; the list this replaced had thirteen.
-        assert_eq!(interior_split_schedule(13).len(), 14);
-        assert_eq!(
-            worst_retained_fraction(&[]),
-            Err(ExactPolynomialError::EmptySplitSchedule)
-        );
-        assert_eq!(
-            worst_retained_fraction(&[Rat::one()]),
-            Err(ExactPolynomialError::InvalidSplitFraction)
-        );
-    }
-
-    #[test]
-    fn the_shrinking_count_is_exact_and_logarithmic() {
-        let half = rat(1, 2);
-        // width 1 down to 1/1024 is ten halvings, and the count is taken on squares throughout.
-        assert_eq!(
-            squared_shrinking_steps(&integer(1), &half, &rat(1, 1_048_576)).unwrap(),
-            10
-        );
-        assert_eq!(
-            squared_shrinking_steps(&integer(1), &half, &integer(1)).unwrap(),
-            0
-        );
-        assert_eq!(
-            squared_shrinking_steps(&integer(1), &half, &integer(4)).unwrap(),
-            0
-        );
-        // A retained fraction nearer one costs proportionally more steps, which is exactly why the
-        // schedule's worst case has to be read off rather than assumed to be a half.
-        let slow = squared_shrinking_steps(&integer(1), &rat(6, 7), &rat(1, 1_048_576)).unwrap();
-        assert_eq!(slow, 45);
-        assert_eq!(
-            squared_shrinking_steps(&integer(1), &Rat::one(), &rat(1, 2)),
-            Err(ExactPolynomialError::InvalidShrinkingStep)
-        );
-    }
-
-    /// **The orbit.** Mignotte's `x^6 - 2(a x - 1)^2` has two roots about `sqrt2 * a^(-4)` apart, so
-    /// the isolation depth it demands is set by `a` and by nothing else. At `a = 10^12` it is under
-    /// the authored two hundred this replaced; at `a = 10^16` it is over, and the census now returns
-    /// where the authored depth refused.
-    #[test]
-    fn mignottes_family_pushes_the_isolation_past_the_depth_that_was_authored() {
-        /// The level this excised. Carried here as history, never consulted by library code.
-        const THE_EXCISED_DEPTH: u64 = 200;
-        let mignotte = |power: u32| {
-            let scale = BigInt::from(10).pow(power);
-            RationalPolynomial::new(vec![
-                integer(-2),
-                Rat::from_integer(&scale * BigInt::from(4)),
-                Rat::from_integer(-(&scale * &scale) * BigInt::from(2)),
-                Rat::zero(),
-                Rat::zero(),
-                Rat::zero(),
-                Rat::one(),
-            ])
-        };
-        let mut under = 0;
-        let mut over = 0;
-        for power in [12_u32, 16] {
-            let census = rational_root_census(&mignotte(power)).unwrap();
-            assert_eq!(census.distinct_real_roots, 4);
-            assert!(census.rational_roots.is_empty());
-            // The bound is derived and the descent is inside it: that is the soundness statement,
-            // and a bound that came out too small would have refused rather than returned.
-            assert!(
-                census.work.isolation_depth_reached < census.isolation_depth_bound,
-                "10^{power}: reached {} of a permitted {}",
-                census.work.isolation_depth_reached,
-                census.isolation_depth_bound
-            );
-            if census.work.isolation_depth_reached < THE_EXCISED_DEPTH {
-                under += 1;
-            } else {
-                over += 1;
-            }
-        }
-        assert_eq!(
-            (under, over),
-            (1, 1),
-            "the family must straddle the excised depth, or it separates nothing"
-        );
-    }
-
-    #[test]
-    fn the_written_form_carries_no_decimal_expansion() {
-        let written = RationalPolynomial::new(vec![rat(1, 3), rat(-2, 7), Rat::one()]).written("t");
-        assert!(
-            !written.contains('.'),
-            "a float reached a presented row: {written}"
-        );
-        assert_eq!(written, "t^2 - (2/7)*t + (1/3)");
-        assert_eq!(
-            RationalPolynomial::new(vec![
-                -Rat::one(),
-                -Rat::one(),
-                Rat::zero(),
-                Rat::zero(),
-                Rat::zero(),
-                Rat::one()
-            ])
-            .written("x"),
-            "x^5 - x - 1"
-        );
-    }
-}
+#[path = "rational_polynomial/tests.rs"]
+mod tests;
