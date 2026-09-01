@@ -30,6 +30,8 @@ pub struct CompleteExchangeSource {
     pub specs: Vec<ExchangeContainerSpec>,
     pub excluded_codex_other_workspace: u64,
     pub excluded_non_jsonl: u64,
+    pub source_octet_aperture: Option<u64>,
+    pub excluded_by_octet_aperture: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -120,7 +122,90 @@ pub fn discover_complete_exchange_aperture(
         specs,
         excluded_codex_other_workspace,
         excluded_non_jsonl: codex_non_jsonl.saturating_add(claude_non_jsonl),
+        source_octet_aperture: None,
+        excluded_by_octet_aperture: 0,
     })
+}
+
+/// Restrict discovery to a uniform chronology cover inside one declared exterior octet aperture.
+/// The aperture is recorded in the source receipt; no container is truncated and no query,
+/// speaker, provider, or content face participates in admission.
+pub fn restrict_exchange_aperture_chronology_cover(
+    source: &mut CompleteExchangeSource,
+    maximum_octets: u64,
+) -> Result<(), String> {
+    if maximum_octets == 0 {
+        return Err("the exchange octet aperture is empty".to_owned());
+    }
+    let mut candidates = source
+        .specs
+        .drain(..)
+        .map(|spec| {
+            let metadata = spec
+                .locator
+                .metadata()
+                .map_err(|error| format!("inspect {}: {error}", spec.locator.display()))?;
+            let modified = metadata
+                .modified()
+                .ok()
+                .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|duration| duration.as_nanos())
+                .unwrap_or(0);
+            Ok((modified, metadata.len(), spec))
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    candidates.sort_by(|left, right| {
+        left.0
+            .cmp(&right.0)
+            .then_with(|| left.2.locator.cmp(&right.2.locator))
+    });
+    let bucket_count = candidates.len().min(64);
+    let bucket_aperture = maximum_octets / bucket_count as u64;
+    if bucket_aperture == 0 {
+        return Err("the exchange chronology buckets have no octet extent".to_owned());
+    }
+    let candidate_count = candidates.len();
+    let mut buckets = (0..bucket_count).map(|_| Vec::new()).collect::<Vec<_>>();
+    for (at, candidate) in candidates.into_iter().enumerate() {
+        let bucket = at.saturating_mul(bucket_count) / candidate_count;
+        buckets[bucket.min(bucket_count - 1)].push(candidate);
+    }
+    let mut admitted = Vec::new();
+    let mut extent = 0u64;
+    let mut excluded = 0u64;
+    for bucket in &mut buckets {
+        bucket.sort_by(|left, right| {
+            right
+                .0
+                .cmp(&left.0)
+                .then_with(|| left.1.cmp(&right.1))
+                .then_with(|| right.2.locator.cmp(&left.2.locator))
+        });
+        let mut bucket_extent = 0u64;
+        for (_, octets, spec) in bucket.drain(..) {
+            if bucket_extent
+                .checked_add(octets)
+                .is_some_and(|next| next <= bucket_aperture)
+                && extent
+                    .checked_add(octets)
+                    .is_some_and(|next| next <= maximum_octets)
+            {
+                bucket_extent += octets;
+                extent += octets;
+                admitted.push(spec);
+            } else {
+                excluded = excluded.saturating_add(1);
+            }
+        }
+    }
+    admitted.sort_by(|left, right| left.locator.cmp(&right.locator));
+    if admitted.is_empty() {
+        return Err("the exchange octet aperture admitted no complete container".to_owned());
+    }
+    source.specs = admitted;
+    source.source_octet_aperture = Some(maximum_octets);
+    source.excluded_by_octet_aperture = excluded;
+    Ok(())
 }
 
 /// Project visible user/assistant faces through exact `(container, raw range)` incidence. The

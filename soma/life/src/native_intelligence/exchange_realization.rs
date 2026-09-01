@@ -16,7 +16,6 @@ use holonic_engine::{
     EventId, OccurrencePort,
 };
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 
 use crate::receiver_history::{CausalSectionAddress, ReceiverHistoryCongruence};
 
@@ -94,7 +93,6 @@ pub struct NativeCandidateProductState {
     pub emitting_native: NativeStateId,
     pub receiver: ReceiverId,
     pub observation: Observation,
-    pub candidate_occurrence_sha256: String,
 }
 
 /// One history paired with the complete K3 ingress potential before any later-return face exists.
@@ -102,8 +100,7 @@ pub struct NativeCandidateProductState {
 #[serde(deny_unknown_fields)]
 pub struct SealedNativeCandidateSection {
     pub history: HistoryOnlyExchangeOccurrence,
-    pub product_states: Vec<NativeCandidateProductState>,
-    pub seal_sha256: String,
+    pub candidate_occurrence: String,
 }
 
 /// The common K3 conduct is retained once.  Per-history members own only their local product
@@ -113,7 +110,8 @@ pub struct SealedNativeCandidateSection {
 pub struct SealedNativeCandidateFront {
     pub schema: String,
     pub predecessor_rest_wire_sha256: String,
-    pub ingress_template: Vec<NativeConductPassage>,
+    pub ingress_template: Vec<NativeCandidateProductState>,
+    pub resident_return: NativeConductPassage,
     pub sections: Vec<SealedNativeCandidateSection>,
     pub open_exterior: Vec<String>,
 }
@@ -133,32 +131,38 @@ impl SealedNativeCandidateFront {
             .iter()
             .next()
             .ok_or_else(|| NativeEcologyError::Realization("empty K3 receiver family".into()))?;
-        let mut ingress_template = Vec::with_capacity(rest.realization.ingress_sections.len());
-        for address in &rest.realization.ingress_sections {
-            match rest.conduct(address, receiver)? {
-                NativeConductConsequence::Returned(passage) => ingress_template.push(passage),
-                NativeConductConsequence::Insufficient(insufficiency) => {
-                    return Err(NativeEcologyError::Conduct(format!(
-                        "an admitted K3 ingress returned {insufficiency:?}"
-                    )));
-                }
-            }
-        }
+        let ingress_template = template_states(rest, receiver)?;
+        eprintln!("h2n-stage=template states={}", ingress_template.len());
         if ingress_template.is_empty() {
             return Err(NativeEcologyError::Realization(
                 "the K3 predecessor returned no ingress potential".into(),
             ));
         }
-        ingress_template.sort_by(|left, right| left.section.address.cmp(&right.section.address));
+        let anchor = rest
+            .realization
+            .ingress_sections
+            .first()
+            .ok_or_else(|| NativeEcologyError::Realization("empty K3 ingress family".into()))?;
+        let resident_return = match rest.conduct(anchor, receiver)? {
+            NativeConductConsequence::Returned(returned) => returned,
+            NativeConductConsequence::Insufficient(insufficiency) => {
+                return Err(NativeEcologyError::Conduct(format!(
+                    "the admitted K3 anchor returned {insufficiency:?}"
+                )));
+            }
+        };
+        eprintln!("h2n-stage=resident-anchor-return");
         let sections = history
             .occurrences
             .into_iter()
             .map(|history| seal_section(history, &ingress_template))
             .collect::<Result<Vec<_>, _>>()?;
+        eprintln!("h2n-stage=factorized-sections sections={}", sections.len());
         let front = Self {
             schema: SEALED_NATIVE_CANDIDATE_FRONT_SCHEMA.to_owned(),
             predecessor_rest_wire_sha256: rest.wire_sha256()?,
             ingress_template,
+            resident_return,
             sections,
             open_exterior: vec![
                 "later exchange returns are sealed outside this candidate front".to_owned(),
@@ -167,6 +171,7 @@ impl SealedNativeCandidateFront {
             ],
         };
         front.validate()?;
+        eprintln!("h2n-stage=front-validated");
         Ok(front)
     }
 
@@ -174,6 +179,21 @@ impl SealedNativeCandidateFront {
         if self.schema != SEALED_NATIVE_CANDIDATE_FRONT_SCHEMA
             || !is_digest(&self.predecessor_rest_wire_sha256)
             || self.ingress_template.is_empty()
+            || self.resident_return.source_fallback_permitted
+            || self
+                .resident_return
+                .word_return
+                .apparatus
+                .invariant_transport_reuploaded
+            || self
+                .resident_return
+                .current_return
+                .invariant_transport_reuploaded
+            || self
+                .resident_return
+                .current_return
+                .cpu_semantic_replay_after_device
+            || self.resident_return.current_return.binary_receiver_taken
             || self.sections.is_empty()
             || self.open_exterior.is_empty()
             || self.open_exterior.iter().any(String::is_empty)
@@ -182,25 +202,25 @@ impl SealedNativeCandidateFront {
                 "the sealed native candidate front is malformed".into(),
             ));
         }
-        let template = template_states(&self.ingress_template)?;
+        let template = &self.ingress_template;
+        let admitted_addresses = self
+            .ingress_template
+            .iter()
+            .map(|state| &state.seed_section)
+            .collect::<BTreeSet<_>>();
+        if template
+            .iter()
+            .any(|state| !admitted_addresses.contains(&state.seed_section))
+        {
+            return Err(NativeEcologyError::Realization(
+                "the compact ingress template departed from its admitted address family".into(),
+            ));
+        }
         let mut sources = BTreeSet::new();
         for section in &self.sections {
             if !sources.insert(section.history.source)
-                || section.product_states.len() != template.len()
-                || section
-                    .product_states
-                    .iter()
-                    .zip(&template)
-                    .any(|(actual, expected)| {
-                        actual.seed_section != expected.seed_section
-                            || actual.entering_native != expected.entering_native
-                            || actual.emitting_native != expected.emitting_native
-                            || actual.receiver != expected.receiver
-                            || actual.observation != expected.observation
-                            || actual.candidate_occurrence_sha256
-                                != candidate_occurrence(&section.history, expected)
-                    })
-                || section.seal_sha256 != section_seal(&section.history, &section.product_states)?
+                || section.candidate_occurrence.is_empty()
+                || section.candidate_occurrence != section.history.prompt_occurrence
             {
                 return Err(NativeEcologyError::Realization(
                     "a candidate section does not reconstruct from history-only material and K3 conduct"
@@ -321,7 +341,7 @@ impl CompleteExchangeNativeRealizationPassage {
                 .carries_precedence(
                     format!(
                         "candidate-return/{}",
-                        candidate_by_source[source].seal_sha256
+                        candidate_by_source[source].candidate_occurrence
                     ),
                     emission_boundary,
                     OccurrencePort::output(candidate_event, 0),
@@ -465,73 +485,69 @@ impl CompleteExchangeNativeRealizationPassage {
 
 fn seal_section(
     history: HistoryOnlyExchangeOccurrence,
-    template: &[NativeConductPassage],
+    template: &[NativeCandidateProductState],
 ) -> Result<SealedNativeCandidateSection, NativeEcologyError> {
-    let mut product_states = template_states(template)?;
-    for state in &mut product_states {
-        state.candidate_occurrence_sha256 = candidate_occurrence(&history, state);
+    if template.is_empty() {
+        return Err(NativeEcologyError::Realization(
+            "the factorized candidate template is empty".into(),
+        ));
     }
-    let seal_sha256 = section_seal(&history, &product_states)?;
+    let candidate_occurrence = history.prompt_occurrence.clone();
     Ok(SealedNativeCandidateSection {
         history,
-        product_states,
-        seal_sha256,
+        candidate_occurrence,
     })
 }
 
 fn template_states(
-    template: &[NativeConductPassage],
+    rest: &NativeEcologyRest,
+    receiver: ReceiverId,
 ) -> Result<Vec<NativeCandidateProductState>, NativeEcologyError> {
-    template
-        .iter()
-        .map(|passage| {
-            if passage.source_fallback_permitted {
-                return Err(NativeEcologyError::Conduct(
-                    "the candidate template permits a foreign fallback".into(),
-                ));
+    let mut template = Vec::with_capacity(rest.realization.ingress_sections.len());
+    for spool in &rest.ecology.spools {
+        for thread in &spool.threads {
+            for occurrence in thread
+                .occurrences
+                .iter()
+                .filter(|occurrence| occurrence.predecessor.is_none())
+            {
+                let observation = thread
+                    .receiver_consequences
+                    .iter()
+                    .find(|face| {
+                        face.native == occurrence.emitting_native && face.receiver == receiver
+                    })
+                    .map(|face| face.observation)
+                    .ok_or_else(|| {
+                        NativeEcologyError::Conduct(
+                            "the compact ingress template has no emitted receiver face".into(),
+                        )
+                    })?;
+                template.push(NativeCandidateProductState {
+                    seed_section: NativeSectionAddress {
+                        spool: spool.address.clone(),
+                        thread: thread.address.clone(),
+                        occurrence: occurrence.occurrence,
+                    },
+                    entering_native: occurrence.entering_native,
+                    emitting_native: occurrence.emitting_native,
+                    receiver,
+                    observation,
+                });
             }
-            Ok(NativeCandidateProductState {
-                seed_section: passage.section.address.clone(),
-                entering_native: passage.section.entering_native,
-                emitting_native: passage.section.emitting_native,
-                receiver: passage.section.receiver,
-                observation: passage.section.observation,
-                candidate_occurrence_sha256: String::new(),
-            })
-        })
-        .collect()
-}
-
-fn candidate_occurrence(
-    history: &HistoryOnlyExchangeOccurrence,
-    state: &NativeCandidateProductState,
-) -> String {
-    digest_json(&(
-        "complete-exchange-native-product-occurrence/v1",
-        history,
-        &state.seed_section,
-        state.entering_native,
-        state.emitting_native,
-        state.receiver,
-        state.observation,
-    ))
-    .expect("serializable candidate occurrence")
-}
-
-fn section_seal(
-    history: &HistoryOnlyExchangeOccurrence,
-    states: &[NativeCandidateProductState],
-) -> Result<String, NativeEcologyError> {
-    digest_json(&("sealed-native-candidate-section/v1", history, states))
-        .map_err(NativeEcologyError::Wire)
-}
-
-fn digest_json(value: &impl Serialize) -> Result<String, String> {
-    let bytes = serde_json::to_vec(value).map_err(|error| error.to_string())?;
-    Ok(Sha256::digest(bytes)
+        }
+    }
+    template.sort_by(|left, right| left.seed_section.cmp(&right.seed_section));
+    if template
         .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect())
+        .map(|state| &state.seed_section)
+        .ne(rest.realization.ingress_sections.iter())
+    {
+        return Err(NativeEcologyError::Realization(
+            "the one-pass ingress template departed from the admitted realization".into(),
+        ));
+    }
+    Ok(template)
 }
 
 use holonic_engine::is_sha256_digest as is_digest;

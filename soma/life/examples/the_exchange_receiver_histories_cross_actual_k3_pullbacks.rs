@@ -294,14 +294,14 @@ fn read_exchange_material(path: &Path) -> Result<ExchangeProductMaterial, String
                 .pointer("/history/source")
                 .and_then(Value::as_u64)
                 .ok_or("one sealed candidate lacks its source lineage")?;
-            let seal_sha256 = section
-                .get("seal_sha256")
+            let candidate_occurrence = section
+                .get("candidate_occurrence")
                 .and_then(Value::as_str)
                 .ok_or("one sealed candidate lacks its seal")?
                 .to_owned();
             Ok(ExchangeCandidateLineage {
                 source: ItemId(source),
-                seal_sha256,
+                candidate_occurrence,
             })
         })
         .collect::<Result<Vec<_>, String>>()?;

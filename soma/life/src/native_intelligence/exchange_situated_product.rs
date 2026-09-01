@@ -30,9 +30,9 @@ use support::{generator_receipts, mixed_interactions, situated_local, validate_m
 
 use super::{
     CausalAdjointStepInput, CompleteExchangeNativeRealizationPassage, ComplexParametronDifference,
-    DependentDifferenceChart, ExchangeDefectBasisFace, NativeConductConsequence,
-    NativeConductedSection, NativeEcologyRest, NativeSectionAddress, ReturnedExchangeSection,
-    SituatedDifferenceInput, SituatedDifferenceSection,
+    DependentDifferenceChart, ExchangeDefectBasisFace, NativeConductedSection, NativeEcologyRest,
+    NativeSectionAddress, ReturnedExchangeSection, SituatedDifferenceInput,
+    SituatedDifferenceSection,
 };
 
 pub const EXCHANGE_SITUATED_PRODUCT_SCHEMA: &str = "soma-life.exchange-situated-product.v2";
@@ -43,7 +43,7 @@ pub const EXCHANGE_SITUATED_PRODUCT_SCHEMA: &str = "soma-life.exchange-situated-
 #[serde(deny_unknown_fields)]
 pub struct ExchangeCandidateLineage {
     pub source: ItemId,
-    pub seal_sha256: String,
+    pub candidate_occurrence: String,
 }
 
 /// The source-neutral material face accepted by the L1 owner.
@@ -71,7 +71,7 @@ impl ExchangeProductMaterial {
                 .iter()
                 .map(|section| ExchangeCandidateLineage {
                     source: section.history.source,
-                    seal_sha256: section.seal_sha256.clone(),
+                    candidate_occurrence: section.candidate_occurrence.clone(),
                 })
                 .collect(),
             returned: passage.returned.clone(),
@@ -112,7 +112,7 @@ impl ExchangeProductMaterial {
             || self
                 .candidate_lineage
                 .iter()
-                .any(|entry| !is_digest(&entry.seal_sha256))
+                .any(|entry| entry.candidate_occurrence.is_empty())
             || self.returned.iter().any(|entry| {
                 entry.candidate_event == entry.return_event
                     || entry.receiver_faces.is_empty()
@@ -507,7 +507,7 @@ impl ExchangeSituatedProduct {
         let seals = material
             .candidate_lineage
             .iter()
-            .map(|entry| (entry.source, entry.seal_sha256.clone()))
+            .map(|entry| (entry.source, entry.candidate_occurrence.clone()))
             .collect::<BTreeMap<_, _>>();
         let mut native_covers = Vec::with_capacity(material.native.native_population.len());
         for fibre in &material.native.reconstruction_fibres {
@@ -798,7 +798,7 @@ impl ExchangeSituatedProduct {
         let seals = self
             .candidate_lineage
             .iter()
-            .map(|entry| (entry.source, entry.seal_sha256.clone()))
+            .map(|entry| (entry.source, entry.candidate_occurrence.clone()))
             .collect::<BTreeMap<_, _>>();
         let basis = self
             .codomain_basis
@@ -964,36 +964,39 @@ fn k3_pullback_branches(
         .iter()
         .next()
         .ok_or_else(|| ExchangeSituatedProductError::K3("K3 has no receiver".to_owned()))?;
+    let mut successors_by_occurrence = BTreeMap::<EventId, Vec<NativeSectionAddress>>::new();
+    for spool in &rest.ecology.spools {
+        for thread in &spool.threads {
+            for occurrence in &thread.occurrences {
+                if let Some(predecessor) = occurrence.predecessor {
+                    successors_by_occurrence
+                        .entry(predecessor)
+                        .or_default()
+                        .push(NativeSectionAddress {
+                            spool: spool.address.clone(),
+                            thread: thread.address.clone(),
+                            occurrence: occurrence.occurrence,
+                        });
+                }
+            }
+        }
+    }
+    for successors in successors_by_occurrence.values_mut() {
+        successors.sort();
+    }
     let mut branches = Vec::new();
     for ingress in &rest.realization.ingress_sections {
-        let candidate = match rest
-            .conduct(ingress, receiver)
-            .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?
-        {
-            NativeConductConsequence::Returned(passage) => passage.section,
-            NativeConductConsequence::Insufficient(insufficiency) => {
-                return Err(ExchangeSituatedProductError::K3(format!(
-                    "an admitted ingress returned {insufficiency:?}"
-                )));
-            }
+        let mut candidate = rest
+            .project_admitted_section(ingress, receiver)
+            .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
+        let Some(successors) = successors_by_occurrence.get(&ingress.occurrence) else {
+            continue;
         };
-        if candidate.successor_sections.is_empty() {
-            return Err(ExchangeSituatedProductError::K3(
-                "an ingress has no actual successor section".to_owned(),
-            ));
-        }
-        for successor in &candidate.successor_sections {
-            let returned = match rest
-                .conduct(successor, receiver)
-                .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?
-            {
-                NativeConductConsequence::Returned(passage) => passage.section,
-                NativeConductConsequence::Insufficient(insufficiency) => {
-                    return Err(ExchangeSituatedProductError::K3(format!(
-                        "an admitted successor returned {insufficiency:?}"
-                    )));
-                }
-            };
+        candidate.successor_sections = successors.clone();
+        for successor in successors {
+            let returned = rest
+                .project_admitted_section(successor, receiver)
+                .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
             let pullback = rest
                 .ecology
                 .spools

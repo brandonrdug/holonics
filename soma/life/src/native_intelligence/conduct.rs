@@ -174,79 +174,17 @@ impl NativeEcologyRest {
             .map_err(|error| NativeEcologyError::Conduct(error.to_string()));
         }
 
-        let occurrence = section.occurrence().clone();
-        let incidence = section.incidence().clone();
-        let entering_parametron = section.entering_parametron().clone();
-        let emitting_parametron = section.emitting_parametron().clone();
-        let constitutive_response = section
-            .thread()
-            .constitutive_responses
-            .iter()
-            .find(|response| {
-                response.native == occurrence.emitting_native && response.receiver == receiver
-            })
-            .cloned()
-            .ok_or_else(|| {
-                NativeEcologyError::Conduct(
-                    "the admitted receiver has no constitutive response at the emitted native"
-                        .to_owned(),
-                )
-            })?;
-        let observation = section
-            .thread()
-            .receiver_consequences
-            .iter()
-            .find(|consequence| {
-                consequence.native == occurrence.emitting_native && consequence.receiver == receiver
-            })
-            .map(|consequence| consequence.observation)
-            .ok_or_else(|| {
-                NativeEcologyError::Conduct(
-                    "the admitted receiver has no consequence at the emitted native".to_owned(),
-                )
-            })?;
-        let reconstruction_fibre = section.reconstruction_fibre().occurrences.clone();
-        let mut mutual_constitutive_responses = section
-            .spool()
-            .mutual_constitutive_responses
-            .iter()
-            .filter(|response| {
-                response.left_occurrence == occurrence.occurrence
-                    || response.right_occurrence == occurrence.occurrence
-            })
-            .cloned()
-            .collect::<Vec<_>>();
-        mutual_constitutive_responses
-            .sort_by_key(|response| (response.left_occurrence, response.right_occurrence));
-        let mut successors = self
-            .ecology
-            .spools
-            .iter()
-            .flat_map(|spool| {
-                spool.threads.iter().flat_map(move |thread| {
-                    thread.occurrences.iter().filter_map(move |candidate| {
-                        (candidate.predecessor == Some(occurrence.occurrence)).then(|| {
-                            NativeSectionAddress {
-                                spool: spool.address.clone(),
-                                thread: thread.address.clone(),
-                                occurrence: candidate.occurrence,
-                            }
-                        })
-                    })
-                })
-            })
-            .collect::<Vec<_>>();
-        successors.sort();
-
+        let mut conducted = self.project_admitted_section(requested, receiver)?;
+        conducted.successor_sections = self.successor_sections(requested.occurrence);
         let mut resident_word = self
             .ecology
-            .mount_word(&requested.spool, &word)
+            .mount_word(&requested.spool, &conducted.ordered_word)
             .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
         let word_return = resident_word
-            .conduct(&[occurrence.entering_native], receiver)
+            .conduct(&[conducted.entering_native], receiver)
             .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
-        if word_return.native_end.as_slice() != [occurrence.emitting_native]
-            || word_return.observations.as_slice() != [observation]
+        if word_return.native_end.as_slice() != [conducted.emitting_native]
+            || word_return.observations.as_slice() != [conducted.observation]
             || word_return.apparatus.invariant_transport_reuploaded
         {
             return Err(NativeEcologyError::Conduct(
@@ -268,11 +206,86 @@ impl NativeEcologyRest {
                 "the Complex-Parametron current left the resident pre-locking path".to_owned(),
             ));
         }
+        Ok(NativeConductConsequence::Returned(NativeConductPassage {
+            schema: "soma-life.native-conduct-passage.v1".to_owned(),
+            rest_wire_sha256: self.wire_sha256()?,
+            section: conducted,
+            word_return,
+            current_return,
+            source_fallback_permitted: false,
+        }))
+    }
+
+    /// Project one already-admitted section from the native topology without launching apparatus.
+    /// This is the shared structural owner used by both resident conduct and factorized product
+    /// formation; it performs no source lookup and no receiver condensation beyond the named face.
+    pub fn project_admitted_section(
+        &self,
+        requested: &NativeSectionAddress,
+        receiver: ReceiverId,
+    ) -> Result<NativeConductedSection, NativeEcologyError> {
+        let section = self
+            .ecology
+            .addressed_section(&requested.spool, &requested.thread, requested.occurrence)
+            .map_err(|error| NativeEcologyError::Realization(error.to_string()))?;
+        if !section.spool().receiver_family.contains(&receiver) {
+            return Err(NativeEcologyError::Conduct(
+                "the projected section or receiver is outside the admitted family".to_owned(),
+            ));
+        }
+        let word = section.ordered_generator_word().to_vec();
+        if word
+            .iter()
+            .any(|generator| !section.spool().generator_family.contains(generator))
+        {
+            return Err(NativeEcologyError::Conduct(
+                "the projected section leaves the admitted successor family".to_owned(),
+            ));
+        }
+        let occurrence = section.occurrence().clone();
+        let entering_parametron = section.entering_parametron().clone();
+        let emitting_parametron = section.emitting_parametron().clone();
+        let constitutive_response = section
+            .thread()
+            .constitutive_responses
+            .iter()
+            .find(|response| {
+                response.native == occurrence.emitting_native && response.receiver == receiver
+            })
+            .cloned()
+            .ok_or_else(|| {
+                NativeEcologyError::Conduct(
+                    "the projected section has no emitted constitutive face".to_owned(),
+                )
+            })?;
+        let observation = section
+            .thread()
+            .receiver_consequences
+            .iter()
+            .find(|face| face.native == occurrence.emitting_native && face.receiver == receiver)
+            .map(|face| face.observation)
+            .ok_or_else(|| {
+                NativeEcologyError::Conduct(
+                    "the projected section has no emitted receiver consequence".to_owned(),
+                )
+            })?;
+        let mut mutual_constitutive_responses = section
+            .spool()
+            .mutual_constitutive_responses
+            .iter()
+            .filter(|response| {
+                response.left_occurrence == occurrence.occurrence
+                    || response.right_occurrence == occurrence.occurrence
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+        mutual_constitutive_responses
+            .sort_by_key(|response| (response.left_occurrence, response.right_occurrence));
         let mut open_exterior = section.thread().open_exterior.clone();
         open_exterior.extend(self.realization.open_exterior.iter().cloned());
         open_exterior.sort();
         open_exterior.dedup();
-        let conducted = NativeConductedSection {
+        Ok(NativeConductedSection {
             address: requested.clone(),
             predecessor: occurrence.predecessor,
             entering_boundary: section.thread().entering_boundary,
@@ -281,7 +294,7 @@ impl NativeEcologyRest {
             emitting_port: occurrence.emitting_port,
             entering_native: occurrence.entering_native,
             emitting_native: occurrence.emitting_native,
-            incidence,
+            incidence: section.incidence().clone(),
             entering_section: entering_parametron.section,
             entering_current: entering_parametron.current,
             emitting_section: emitting_parametron.section,
@@ -293,18 +306,31 @@ impl NativeEcologyRest {
             ordered_word: word,
             receiver,
             observation,
-            reconstruction_fibre,
-            successor_sections: successors,
+            reconstruction_fibre: section.reconstruction_fibre().occurrences.clone(),
+            successor_sections: Vec::new(),
             open_exterior,
-        };
-        Ok(NativeConductConsequence::Returned(NativeConductPassage {
-            schema: "soma-life.native-conduct-passage.v1".to_owned(),
-            rest_wire_sha256: self.wire_sha256()?,
-            section: conducted,
-            word_return,
-            current_return,
-            source_fallback_permitted: false,
-        }))
+        })
+    }
+
+    pub fn successor_sections(&self, occurrence: EventId) -> Vec<NativeSectionAddress> {
+        let mut successors = self
+            .ecology
+            .spools
+            .iter()
+            .flat_map(|spool| {
+                spool.threads.iter().flat_map(move |thread| {
+                    thread.occurrences.iter().filter_map(move |candidate| {
+                        (candidate.predecessor == Some(occurrence)).then(|| NativeSectionAddress {
+                            spool: spool.address.clone(),
+                            thread: thread.address.clone(),
+                            occurrence: candidate.occurrence,
+                        })
+                    })
+                })
+            })
+            .collect::<Vec<_>>();
+        successors.sort();
+        successors
     }
 
     /// Ask the open boundary about an occurrence without inventing a state for absent material.

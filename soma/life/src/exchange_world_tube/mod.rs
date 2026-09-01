@@ -31,8 +31,8 @@ pub use rest::{
     EXCHANGE_REST_PREFIX,
 };
 pub use source::{
-    attach_visible_exchange_faces, discover_complete_exchange_aperture, CompleteExchangeSource,
-    VisibleProjectionReceipt,
+    attach_visible_exchange_faces, discover_complete_exchange_aperture,
+    restrict_exchange_aperture_chronology_cover, CompleteExchangeSource, VisibleProjectionReceipt,
 };
 
 /// One exact SHA-256 content address. It is not an occurrence identity.

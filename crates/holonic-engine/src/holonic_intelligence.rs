@@ -6,6 +6,8 @@
 
 #[path = "holonic_intelligence/circulation.rs"]
 mod circulation;
+#[path = "holonic_intelligence/contact_chart.rs"]
+mod contact_chart;
 #[path = "holonic_intelligence/cultivation.rs"]
 mod cultivation;
 #[path = "holonic_intelligence/dimensions.rs"]
@@ -26,6 +28,7 @@ mod source_neutral;
 mod weight;
 
 pub use circulation::*;
+pub use contact_chart::*;
 pub use cultivation::*;
 pub use dimensions::*;
 pub use foreign_json::*;

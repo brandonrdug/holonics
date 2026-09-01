@@ -64,29 +64,41 @@ fn main() -> Result<(), String> {
         .collect::<std::collections::BTreeSet<_>>()
         .len();
     let generator_population = passage.native.generators.len();
+    let complete_ingress_population = passage.candidate.ingress_template.len();
     let product_state_population = passage
         .candidate
         .sections
-        .iter()
-        .map(|section| section.product_states.len())
-        .sum::<usize>();
-    let complete_ingress_population = passage.candidate.ingress_template.len();
-    let every_section_has_complete_ingress = passage
-        .candidate
-        .sections
-        .iter()
-        .all(|section| section.product_states.len() == complete_ingress_population);
-    let every_template_passage_resident =
-        passage.candidate.ingress_template.iter().all(|candidate| {
-            !candidate.source_fallback_permitted
-                && !candidate
-                    .word_return
-                    .apparatus
-                    .invariant_transport_reuploaded
-                && !candidate.current_return.invariant_transport_reuploaded
-                && !candidate.current_return.cpu_semantic_replay_after_device
-                && !candidate.current_return.binary_receiver_taken
+        .len()
+        .checked_mul(complete_ingress_population)
+        .ok_or("factorized product population overflow")?;
+    let every_section_has_complete_ingress = !passage.candidate.sections.is_empty()
+        && passage.candidate.sections.iter().all(|section| {
+            !section.history.history_occurrences.is_empty()
+                && !section.candidate_occurrence.is_empty()
         });
+    let every_template_passage_resident =
+        !passage.candidate.resident_return.source_fallback_permitted
+            && !passage
+                .candidate
+                .resident_return
+                .word_return
+                .apparatus
+                .invariant_transport_reuploaded
+            && !passage
+                .candidate
+                .resident_return
+                .current_return
+                .invariant_transport_reuploaded
+            && !passage
+                .candidate
+                .resident_return
+                .current_return
+                .cpu_semantic_replay_after_device
+            && !passage
+                .candidate
+                .resident_return
+                .current_return
+                .binary_receiver_taken;
     let generator_square_population = source_population
         .checked_mul(generator_population)
         .ok_or("generator-square population overflow")?;

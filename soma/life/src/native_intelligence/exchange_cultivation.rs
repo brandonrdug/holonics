@@ -66,7 +66,7 @@ pub struct SourceColumnAddress {
 pub struct ExchangeDefectSectionReceipt {
     pub source: ItemId,
     pub native: NativeStateId,
-    pub candidate_seal_sha256: String,
+    pub candidate_occurrence: String,
     pub candidate_event: EventId,
     pub return_event: EventId,
     pub support_rows: Vec<usize>,
@@ -120,13 +120,19 @@ impl CompleteExchangeCultivationCover {
 
         let mut basis_set = BTreeSet::new();
         for source in &passage.native.source_population {
-            let candidate = candidates
-                .get(source)
-                .ok_or_else(|| format!("source {source:?} has no sealed candidate"))?;
+            if !candidates.contains_key(source) {
+                return Err(format!("source {source:?} has no sealed candidate"));
+            }
             let later = returned
                 .get(source)
                 .ok_or_else(|| format!("source {source:?} has no later return"))?;
-            basis_set.extend(candidate.product_states.iter().map(candidate_face));
+            basis_set.extend(
+                passage
+                    .candidate
+                    .ingress_template
+                    .iter()
+                    .map(candidate_face),
+            );
             basis_set.extend(later.receiver_faces.iter().map(|factor| {
                 ExchangeDefectBasisFace::ReturnedReceiver {
                     receiver: factor.receiver,
@@ -169,8 +175,9 @@ impl CompleteExchangeCultivationCover {
         for coordinate in &source_columns {
             let candidate = candidates[&coordinate.source];
             let later = returned[&coordinate.source];
-            let candidate_faces = candidate
-                .product_states
+            let candidate_faces = passage
+                .candidate
+                .ingress_template
                 .iter()
                 .map(candidate_face)
                 .collect::<Vec<_>>();
@@ -186,7 +193,7 @@ impl CompleteExchangeCultivationCover {
                 boundary_column(&candidate_faces, &returned_faces, &basis_index)?;
             let defect_address = digest_json(&(
                 "complete-exchange-defect-section/v1",
-                &candidate.seal_sha256,
+                &candidate.candidate_occurrence,
                 later.native,
                 later.candidate_event,
                 later.return_event,
@@ -196,7 +203,7 @@ impl CompleteExchangeCultivationCover {
             ))?;
             defects.push(SupportedDefectSection {
                 address: format!("defect:{defect_address}"),
-                parent_candidate: candidate.seal_sha256.clone(),
+                parent_candidate: candidate.candidate_occurrence.clone(),
                 receiver: format!("receiver-family:{receiver_family}"),
                 successor_word: successor_word.clone(),
                 chart: FREE_MODULE_CHART.to_owned(),
@@ -213,7 +220,7 @@ impl CompleteExchangeCultivationCover {
             receipts.push(ExchangeDefectSectionReceipt {
                 source: coordinate.source,
                 native: later.native,
-                candidate_seal_sha256: candidate.seal_sha256.clone(),
+                candidate_occurrence: candidate.candidate_occurrence.clone(),
                 candidate_event: later.candidate_event,
                 return_event: later.return_event,
                 support_rows,
@@ -359,7 +366,7 @@ impl CompleteExchangeCultivationCover {
                 || receipt.support_column != coordinate.column
                 || receipt.candidate_event == receipt.return_event
                 || receipt.defect_address != local.section.address
-                || receipt.candidate_seal_sha256 != local.section.parent_candidate
+                || receipt.candidate_occurrence != local.section.parent_candidate
                 || local.section.chart != self.free_module_chart
                 || local.section.ambient_rows != self.codomain_basis.len()
                 || local.section.ambient_columns != self.source_columns.len()

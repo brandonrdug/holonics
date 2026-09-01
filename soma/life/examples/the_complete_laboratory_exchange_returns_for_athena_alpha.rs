@@ -12,8 +12,9 @@ use life::exchange_world_tube::{
     attach_visible_exchange_faces, derive_continuation_aperture,
     discover_complete_exchange_aperture, exchange_world_tube_rest_digest,
     mount_exchange_world_tube_on_device, remount_exchange_world_tube,
-    write_exchange_world_tube_rest, CompleteExchangeSource, ContinuationAperture,
-    ContinuationPartition, DeviceContactReceipt, Digest32, VisibleProjectionReceipt,
+    restrict_exchange_aperture_chronology_cover, write_exchange_world_tube_rest,
+    CompleteExchangeSource, ContinuationAperture, ContinuationPartition, DeviceContactReceipt,
+    Digest32, VisibleProjectionReceipt,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -28,6 +29,7 @@ enum Args {
         codex_root: PathBuf,
         claude_root: PathBuf,
         workspace: PathBuf,
+        source_octets: Option<u64>,
     },
     Detached {
         rest: PathBuf,
@@ -59,7 +61,14 @@ fn main() -> Result<(), String> {
             codex_root,
             claude_root,
             workspace,
-        } => produce(&output, &codex_root, &claude_root, &workspace),
+            source_octets,
+        } => produce(
+            &output,
+            &codex_root,
+            &claude_root,
+            &workspace,
+            source_octets,
+        ),
         Args::Detached { rest, output } => detached(&rest, &output),
         Args::Resume { output } => resume(&output),
     }
@@ -70,6 +79,7 @@ fn produce(
     codex_root: &Path,
     claude_root: &Path,
     workspace: &Path,
+    source_octets: Option<u64>,
 ) -> Result<(), String> {
     if output.exists() {
         return Err(format!("AA0 output {} already exists", output.display()));
@@ -80,7 +90,10 @@ fn produce(
         .map_err(|error| error.to_string())?
         .as_nanos();
     let elapsed = Instant::now();
-    let discovery = discover_complete_exchange_aperture(codex_root, claude_root, workspace)?;
+    let mut discovery = discover_complete_exchange_aperture(codex_root, claude_root, workspace)?;
+    if let Some(maximum) = source_octets {
+        restrict_exchange_aperture_chronology_cover(&mut discovery, maximum)?;
+    }
     write_json(output.join("00-source-aperture.json"), &discovery)?;
 
     let mount_started = Instant::now();
@@ -120,6 +133,8 @@ fn produce(
         "blank_records": world.excluded.blank_records,
         "incomplete_tails": world.excluded.incomplete_tails,
         "visible_controls": world.excluded.visible_membrane_controls,
+        "source_octet_aperture": discovery.source_octet_aperture,
+        "excluded_by_octet_aperture": discovery.excluded_by_octet_aperture,
     });
     write_json(output.join("01-semantic-work.json"), &semantic)?;
     write_json(output.join("02-apparatus.json"), &apparatus)?;
@@ -175,7 +190,8 @@ fn produce(
     let grade = json!({
         "schema": "holonics.athena-alpha.aa0-grade.v1",
         "truth_status": "established-bounded; implemented-exact; measured",
-        "complete_authorized_exchange_discovered": containers == discovery.specs.len(),
+        "complete_authorized_exchange_discovered": discovery.source_octet_aperture.is_none() && containers == discovery.specs.len(),
+        "declared_chronology_cover_complete_container_aperture_returned": discovery.source_octet_aperture.is_some() && containers == discovery.specs.len(),
         "all_extents_captured_before_stream_mount": true,
         "visible_faces_factor_through_richer_records": projection.every_face_factors_through_one_richer_record,
         "every_eligible_user_to_assistant_continuation_addressed": continuation_families > 0,
@@ -470,16 +486,24 @@ fn arguments() -> Result<Args, String> {
     let mut codex_root = dirs_home()?.join(".codex/sessions");
     let mut claude_root = dirs_home()?.join(".claude/projects/-home-b-Workspaces-holonics");
     let mut workspace = env::current_dir().map_err(|error| error.to_string())?;
+    let mut source_octets = None;
     let mut args = env::args().skip(1);
     while let Some(flag) = args.next() {
         let value = args
             .next()
-            .ok_or_else(|| format!("{flag} carries no path"))?;
+            .ok_or_else(|| format!("{flag} carries no value"))?;
         match flag.as_str() {
             "--output" => output = value.into(),
             "--codex-root" => codex_root = value.into(),
             "--claude-root" => claude_root = value.into(),
             "--workspace" => workspace = value.into(),
+            "--source-octets" => {
+                source_octets = Some(
+                    value
+                        .parse::<u64>()
+                        .map_err(|error| format!("invalid source octet aperture: {error}"))?,
+                )
+            }
             _ => return Err(format!("unknown argument {flag}")),
         }
     }
@@ -488,6 +512,7 @@ fn arguments() -> Result<Args, String> {
         codex_root,
         claude_root,
         workspace,
+        source_octets,
     })
 }
 

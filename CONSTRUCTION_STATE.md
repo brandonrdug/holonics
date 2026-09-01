@@ -100,6 +100,21 @@ the HIF7 qualitative receiver family. Fixed, hybrid, recurrent, and current-foun
 need a common comparison return, and the unchanged UAR qualitative surfaces require direct
 inspection rather than a topology or telemetry proxy.
 
+[established-bounded; implemented-exact; measured] The HIF7 neutral contact comparison now returns
+fixed-window, periodic-hybrid, recurrent-linear, and current-founded edge families with active
+causal extent, exact pair work, reconstruction fibres, and richer-receiver reopenings. It advances
+no qualitative grade by itself.
+
+[counterexample; source-inspected; measured] The rich qualitative rebuild exposed and repaired two
+accidental products. The exchange mount now accepts an explicit content-blind chronology-cover
+octet aperture and returned 808 complete containers inside the process bound. H2N replaced 27,020
+linear address scans and 891 × 1,411 materialized candidate structs with one linear ingress
+projection, one common resident return, and a factorized product; the unchanged H2N receiver then
+passed in 8.165 seconds. L1 still materializes the native-fibre × K3-pullback local matrix family
+inside `ExchangeSituatedProduct::found` and crossed 180 seconds twice before returning the product.
+That factorization, followed by the unchanged qualitative surface inspection, is the current HIF7
+obstruction.
+
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
 drivers, and records remain evidence only.
