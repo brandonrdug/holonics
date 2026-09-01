@@ -8,6 +8,21 @@ pub struct SourceNeutralExteriorRealizationOrientedFactorCurrent {
     pub factor: u32,
     pub current: ExactComplexWaveCurrent,
     pub pair_currents: Vec<SourceNeutralAddressedResponsePairCurrent>,
+    pub ingress_face_currents: Vec<SourceNeutralIngressFaceFactorCurrent>,
+}
+
+/// Exact query current carried into one anonymous realization face and then descended through
+/// that face's already-founded factor incidence. The exterior spelling and complete source path
+/// are absent; local transition contact, face, factor, and complex current reconstruct the join.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceNeutralIngressFaceFactorCurrent {
+    pub face: u32,
+    pub realization_state: u32,
+    pub phase: u8,
+    pub factor: u32,
+    pub contact_incidence: BigUint,
+    pub current: ExactComplexWaveCurrent,
 }
 
 /// One response-face current before response faces join on their dependent factor line.
@@ -51,6 +66,7 @@ pub(super) fn join_response_pair_currents(
                     .filter(|pair| pair.factor == factor)
                     .cloned()
                     .collect(),
+                ingress_face_currents: Vec::new(),
             },
         )
         .collect())
@@ -61,9 +77,13 @@ pub(super) fn validate_oriented_factor_currents(
     faces: &[SourceNeutralNativeOrientedFace],
 ) -> Result<(), SourceNeutralRelationalError> {
     for factor in factors {
-        if factor.pair_currents.is_empty()
+        if (factor.pair_currents.is_empty() && factor.ingress_face_currents.is_empty())
             || factor
                 .pair_currents
+                .windows(2)
+                .any(|pair| pair[0] >= pair[1])
+            || factor
+                .ingress_face_currents
                 .windows(2)
                 .any(|pair| pair[0] >= pair[1])
         {
@@ -89,6 +109,16 @@ pub(super) fn validate_oriented_factor_currents(
                 return Err(SourceNeutralRelationalError::Quotient);
             }
             joined = joined.add(&pair.current);
+        }
+        for ingress in &factor.ingress_face_currents {
+            if ingress.factor != factor.factor
+                || ingress.phase > 1
+                || ingress.contact_incidence.is_zero()
+                || ingress.current.is_zero()
+            {
+                return Err(SourceNeutralRelationalError::Quotient);
+            }
+            joined = joined.add(&ingress.current);
         }
         if joined != factor.current {
             return Err(SourceNeutralRelationalError::Quotient);

@@ -238,6 +238,7 @@ impl SourceNeutralExteriorCirculation {
                         GranularExteriorPort::Closure => 257,
                     })
                     .collect::<Vec<_>>(),
+                &self.current_projective.entering_current,
                 &self.realization_current_identity_sha256,
                 self.realization_current.clone(),
             )

@@ -91,7 +91,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         &self.transitions[begin..end]
     }
 
-    fn state_source_transitions(
+    pub(super) fn state_source_transitions(
         &self,
         state: u32,
         source_port: u16,
@@ -107,55 +107,6 @@ impl SourceNeutralExteriorRealizationMorphology {
             .get(face as usize)
             .copied()
             .ok_or(SourceNeutralRelationalError::Quotient)
-    }
-
-    fn ingress_substring_closure_population(
-        &self,
-        ingress_ports: &[u16],
-    ) -> Result<BTreeMap<u32, u64>, SourceNeutralRelationalError> {
-        let Some(first) = ingress_ports.first().copied() else {
-            return Ok(BTreeMap::new());
-        };
-        let mut candidates = self
-            .transitions
-            .iter()
-            .filter(|transition| transition.target == first)
-            .filter_map(|transition| {
-                transition
-                    .target_state
-                    .map(|state| (transition.face, state))
-            })
-            .collect::<BTreeSet<_>>();
-        let mut source = first;
-        for target in ingress_ports.iter().copied().skip(1) {
-            let mut next = BTreeSet::new();
-            for (face, state) in candidates {
-                for transition in self.state_source_transitions(state, source) {
-                    if transition.face == face && transition.target == target {
-                        if let Some(target_state) = transition.target_state {
-                            next.insert((face, target_state));
-                        }
-                    }
-                }
-            }
-            if next.is_empty() {
-                return Ok(BTreeMap::new());
-            }
-            candidates = next;
-            source = target;
-        }
-        let mut closures = BTreeMap::<u32, u64>::new();
-        for (face, state) in candidates {
-            for transition in self.state_source_transitions(state, source) {
-                if transition.face == face && transition.target == 257 {
-                    let population = closures.entry(face).or_default();
-                    *population = population
-                        .checked_add(transition.occurrence_population)
-                        .ok_or(SourceNeutralRelationalError::Extent)?;
-                }
-            }
-        }
-        Ok(closures)
     }
 
     /// The oriented cell boundary supplies the target incidence. The exterior port chooses a
@@ -329,6 +280,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         native_sections: &[AddressedCurrentSection],
         native_oriented_faces: &[SourceNeutralNativeOrientedFace],
         ingress_ports: &[u16],
+        entering_complex_current: &ExactComplexWaveCurrent,
         entering_realization_current_identity_sha256: &str,
         entering_realization_current: BigUint,
     ) -> Result<SourceNeutralExteriorRealizationPassage, SourceNeutralRelationalError> {
@@ -339,6 +291,7 @@ impl SourceNeutralExteriorRealizationMorphology {
             || source_port >= 257
             || native_sections.is_empty()
             || native_oriented_faces.is_empty()
+            || entering_complex_current.is_zero()
         {
             return Err(SourceNeutralRelationalError::Quotient);
         }
@@ -350,8 +303,62 @@ impl SourceNeutralExteriorRealizationMorphology {
                 factor_current.len()
             );
         }
-        let oriented_factor_current =
+        let native_oriented_factor_current =
             self.native_complex_factor_current(native_sections, native_oriented_faces)?;
+        let ingress_face_current = if source_port == 0 && !ingress_ports.is_empty() {
+            self.phase_face_contact_current(relational, ingress_ports, 0)?
+        } else {
+            PhaseFaceContactCurrent::default()
+        };
+        let mut response_face_current = if source_port == 0 && !ingress_ports.is_empty() {
+            self.phase_face_contact_current(relational, ingress_ports, 1)?
+        } else {
+            PhaseFaceContactCurrent::default()
+        };
+        let entity_query_sections = ingress_face_current
+            .current
+            .keys()
+            .filter(|(face, _)| {
+                relational.faces.get(*face as usize).is_some_and(|held| {
+                    held.cell_incidence.iter().any(|incidence| {
+                        incidence.boundary_position == 0 || incidence.boundary_position == 3
+                    })
+                })
+            })
+            .flat_map(|presentation| {
+                ingress_face_current
+                    .query_sections
+                    .get(presentation)
+                    .into_iter()
+                    .flatten()
+                    .copied()
+            })
+            .collect::<BTreeSet<_>>();
+        response_face_current
+            .current
+            .retain(|presentation @ (face, _), _| {
+                relational.faces.get(*face as usize).is_some_and(|held| {
+                    held.cell_incidence.iter().any(|incidence| {
+                        incidence.boundary_position == 0 || incidence.boundary_position == 3
+                    })
+                }) && response_face_current
+                    .query_sections
+                    .get(presentation)
+                    .is_some_and(|sections| !sections.is_disjoint(&entity_query_sections))
+            });
+        response_face_current
+            .query_sections
+            .retain(|presentation, _| response_face_current.current.contains_key(presentation));
+        if !ingress_face_current.current.is_empty() && response_face_current.current.is_empty() {
+            return Err(SourceNeutralRelationalError::Quotient);
+        }
+        let oriented_factor_current = self.join_ingress_face_factor_current(
+            relational,
+            native_oriented_factor_current,
+            &ingress_face_current.current,
+            &response_face_current.current,
+            entering_complex_current,
+        )?;
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
             eprintln!(
                 "oriented-realization-complex-factors={}",
@@ -364,7 +371,7 @@ impl SourceNeutralExteriorRealizationMorphology {
             source_port,
             &factor_current,
             &oriented_factor_current,
-            ingress_ports,
+            &response_face_current.current,
         )?;
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
             eprintln!(
@@ -494,7 +501,7 @@ impl SourceNeutralExteriorRealizationMorphology {
         source_port: u16,
         positive_factor_current: &[SourceNeutralExteriorRealizationFactorCurrent],
         factor_current: &[SourceNeutralExteriorRealizationOrientedFactorCurrent],
-        ingress_ports: &[u16],
+        ingress_contacts: &BTreeMap<(u32, u32), BigUint>,
     ) -> Result<
         (
             Vec<SourceNeutralExteriorRealizationComplexSiteCurrent>,
@@ -525,21 +532,43 @@ impl SourceNeutralExteriorRealizationMorphology {
             .collect::<BTreeSet<_>>();
         let mut lifted = BTreeMap::<(u32, u32, u8, u16, u32), BigUint>::new();
         let mut projective_scale = BigUint::zero();
-        let ingress_closures = if source_port == 0 && !ingress_ports.is_empty() {
-            self.ingress_substring_closure_population(ingress_ports)?
-        } else {
-            BTreeMap::new()
-        };
-        let ingress_path_matched = !ingress_closures.is_empty();
+        let ingress_contact_returned = !ingress_contacts.is_empty();
+        let ingress_factors = factor_current
+            .iter()
+            .filter(|current| !current.ingress_face_currents.is_empty())
+            .map(|current| current.factor)
+            .collect::<BTreeSet<_>>();
+        let contacted_faces = ingress_contacts
+            .keys()
+            .map(|(face, _)| *face)
+            .collect::<BTreeSet<_>>();
+        let subject_contact_exists = ingress_contact_returned
+            && self.sites.iter().any(|site| {
+                site.boundary_position == 0
+                    && contacted_faces.contains(&site.face)
+                    && relational
+                        .cells
+                        .get(site.cell as usize)
+                        .is_some_and(|cell| {
+                            cell.phase_population.iter().any(|population| {
+                                population.phase == 1
+                                    && ingress_factors.contains(&population.factor)
+                            })
+                        })
+            });
         if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
             eprintln!(
-                "oriented-realization-ingress-path matched={} faces={}",
-                ingress_path_matched,
-                ingress_closures.len(),
+                "oriented-realization-ingress-contact returned={} faces={}",
+                ingress_contact_returned,
+                ingress_contacts.len(),
             );
         }
         for (site_at, site) in self.sites.iter().enumerate() {
-            if site.boundary_position != 0 || !active_faces.contains(&site.face) {
+            if !active_faces.contains(&site.face)
+                || (ingress_contact_returned && !contacted_faces.contains(&site.face))
+                || (subject_contact_exists && site.boundary_position != 0)
+                || (!ingress_contact_returned && site.boundary_position != 0)
+            {
                 continue;
             }
             let face = relational
@@ -550,15 +579,35 @@ impl SourceNeutralExteriorRealizationMorphology {
                 .cells
                 .get(site.cell as usize)
                 .ok_or(SourceNeutralRelationalError::Quotient)?;
-            let ingress_closure_population = ingress_closures.get(&site.face).copied();
-            if source_port == 0
-                && !ingress_ports.is_empty()
-                && ingress_path_matched
-                && ingress_closure_population.is_none()
-            {
-                continue;
-            }
+            let (rendering_site_at, rendering_site, contact_weight) = if ingress_contact_returned {
+                let positions = relational_boundary_positions(cell.oriented_boundary.len())?;
+                let opening_position = *positions
+                    .first()
+                    .ok_or(SourceNeutralRelationalError::Quotient)?;
+                let (rendering_site_at, rendering_site) = self
+                    .sites
+                    .iter()
+                    .enumerate()
+                    .find(|(_, candidate)| {
+                        candidate.cell == site.cell
+                            && candidate.boundary_position == opening_position
+                    })
+                    .ok_or(SourceNeutralRelationalError::Quotient)?;
+                let contact_weight = ingress_contacts
+                    .iter()
+                    .filter(|((face, _), _)| *face == site.face)
+                    .fold(BigUint::zero(), |sum, (_, current)| sum + current);
+                (rendering_site_at, rendering_site, contact_weight)
+            } else {
+                (site_at, site, BigUint::from(1_u8))
+            };
             for cell_population in &cell.phase_population {
+                if ingress_contact_returned
+                    && (cell_population.phase != 1
+                        || !ingress_factors.contains(&cell_population.factor))
+                {
+                    continue;
+                }
                 let Some(_current) = by_factor.get(&cell_population.factor) else {
                     continue;
                 };
@@ -583,46 +632,18 @@ impl SourceNeutralExteriorRealizationMorphology {
                 )
                 .ok_or(SourceNeutralRelationalError::Quotient)?;
                 let site_class = site_quotient.class(
-                    u32::try_from(site_at).map_err(|_| SourceNeutralRelationalError::Extent)?,
+                    u32::try_from(rendering_site_at)
+                        .map_err(|_| SourceNeutralRelationalError::Extent)?,
                 )?;
                 let source_carrier = site_quotient.carrier(
                     site_class,
                     cell_population.factor,
                     cell_population.phase,
                 )?;
-                let (carrier, local_source_port, realization_state, incidence_scale) =
-                    if let Some(closure_population) = ingress_closure_population {
-                        let Some((carrier, target_site, oriented_weight)) = self
-                            .successor_transport_target(
-                                relational,
-                                site_quotient,
-                                site,
-                                cell_population.factor,
-                                cell_population.phase,
-                                closure_population,
-                            )?
-                        else {
-                            continue;
-                        };
-                        let successor = self.site(site_quotient.representative(target_site)?)?;
-                        (
-                            carrier,
-                            0,
-                            self.face_root_state(successor.face)?,
-                            BigUint::from(cell_population.occurrence_population)
-                                * BigUint::from(face_population)
-                                * oriented_weight,
-                        )
-                    } else {
-                        (
-                            source_carrier,
-                            source_port,
-                            self.face_root_state(site.face)?,
-                            BigUint::from(cell_population.occurrence_population)
-                                * BigUint::from(face_population)
-                                * BigUint::from(site.incidence_population),
-                        )
-                    };
+                let incidence_scale = BigUint::from(cell_population.occurrence_population)
+                    * BigUint::from(face_population)
+                    * BigUint::from(site.incidence_population)
+                    * &contact_weight;
                 let positive_contribution =
                     (*positive).clone() * Ratio::from_integer(incidence_scale.clone());
                 if positive_contribution.denom() != &BigUint::one() {
@@ -631,11 +652,11 @@ impl SourceNeutralExteriorRealizationMorphology {
                 projective_scale += positive_contribution.numer();
                 *lifted
                     .entry((
-                        carrier,
+                        source_carrier,
                         cell_population.factor,
                         cell_population.phase,
-                        local_source_port,
-                        realization_state,
+                        source_port,
+                        self.face_root_state(rendering_site.face)?,
                     ))
                     .or_default() += incidence_scale;
             }
@@ -1150,9 +1171,20 @@ impl SourceNeutralExteriorRealizationMorphology {
             .iter()
             .filter(|contribution| contribution.exterior_target_port == selected_target_port)
         {
+            // Ordinary byte radiation observes the off-diagonal physical target retained in
+            // `transport_contributions`, while the exterior presentation current remains on its
+            // face until that face closes. A closure-to-opening passage alone advances the live
+            // presentation carrier to the next relational site.
+            let presentation_carrier = if contribution.target_local_source_port != 0
+                && contribution.exterior_target_port != 257
+            {
+                contribution.source_carrier
+            } else {
+                contribution.target_carrier
+            };
             *selected_target_complex
                 .entry((
-                    contribution.target_carrier,
+                    presentation_carrier,
                     contribution.factor,
                     contribution.phase,
                     contribution.target_local_source_port,
@@ -1308,6 +1340,20 @@ impl SourceNeutralExteriorRealizationMorphology {
                 .any(|(face, state)| {
                     *state as usize != face || *state >= self.realization_state_population
                 })
+            || self.presentation_roots.is_empty()
+            || self
+                .presentation_roots
+                .windows(2)
+                .any(|pair| pair[0] >= pair[1])
+            || self.presentation_roots.iter().any(|(face, root)| {
+                *face >= self.face_population || *root >= self.realization_state_population
+            })
+            || (0..self.face_population).any(|face| {
+                self.presentation_roots
+                    .iter()
+                    .find(|(held, _)| *held == face)
+                    .is_none_or(|(_, root)| self.face_root_states.get(face as usize) != Some(root))
+            })
             || self.transitions.is_empty()
             || self.developmental_transition_population == 0
             || self.sites.windows(2).any(|pair| {
@@ -1380,6 +1426,7 @@ impl SourceNeutralExteriorRealizationMorphology {
             &self.sites,
             self.factor_population,
             &self.face_root_states,
+            &self.presentation_roots,
             self.realization_state_population,
             &self.transitions,
             self.developmental_transition_population,

@@ -38,15 +38,20 @@ use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
 use num_traits::{Signed, Zero};
 
+use crate::exchange_world_tube::{ContinuationAperture, VisibleMessageProjection};
 use crate::native_intelligence::granular_potential::{
     GranularAddressedHigherBoundaryFace, GranularBoundaryBranch, GranularBoundaryEmanation,
     GranularExteriorPort, GranularHigherBoundaryFace, GranularNativeProjectiveCurrent,
     GranularReconstructionNode, NativeGranularPotential,
 };
+use crate::native_intelligence::native_relational_potential::{
+    NativeDeliveryPhase, NativeRelationalPotentialBuilder,
+};
 use crate::native_intelligence::returned_difference_deposit::derive_returned_difference_deposit_from_history;
 use crate::native_intelligence::situated_difference::{
     CausalAdjointStepInput, SituatedDifferenceInput, SituatedDifferenceSection,
 };
+use crate::native_intelligence::source_neutral_cold::source_neutralize_native_relational;
 use crate::native_intelligence::source_neutral_relational::{
     SourceNeutralExteriorRealizationComplexSiteCurrent, SourceNeutralExteriorRealizationMorphology,
     SourceNeutralExteriorRealizationOrientedFactorCurrent, SourceNeutralExteriorRealizationPassage,
@@ -56,17 +61,20 @@ use crate::native_intelligence::source_neutral_relational::{
     SourceNeutralRelationalMorphology,
 };
 use crate::native_intelligence::types::{NativeConductedSection, NativeSectionAddress};
+use crate::receiver_history::ReceiverHistoryCongruence;
 use std::collections::{BTreeMap, BTreeSet};
 
 mod ablation_wire;
 mod conduct;
 mod cultivation;
 mod exterior_wire;
+mod recultivation;
 mod resident;
 mod wire;
 
 pub use ablation_wire::*;
 pub use exterior_wire::*;
+pub use recultivation::*;
 pub use wire::*;
 use wire::{
     found_continuation_receiver_history, native_oriented_realization_faces,
