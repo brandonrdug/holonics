@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF1.
+**Current frontier:** HIF2.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -238,7 +238,7 @@ umbrella built 3,769 jobs. Every named control passed without `sorryAx`; authori
 claim-index, source-shape, and equation-atlas receivers are green. The exact return is recorded in
 [`../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).
 
-### HIF1 — generic Rust carriers and package surface — CURRENT
+### HIF1 — generic Rust carriers and package surface — PASSED
 
 [definition] Establish Rust counterparts to the HIF0 contracts over the existing addressed span,
 native spool, receiver history, exact current, morphology delta, rest/remount, and apparatus owners.
@@ -249,7 +249,14 @@ duplicated behind Athena-named methods.
 and Rust catalog rows name the same carrier and open fibre; no compatibility alias, cloneable
 ecology, digest identity, or second implementation is introduced.
 
-### HIF2 — exact foreign charts and profiled Soulkiller return
+[established-bounded; implemented-exact; measured] HIF1 returned the neutral
+`native_ecology::holonic_intelligence` package. `NativeSpoolBundle` itself implements the rested
+surface; borrowed profiles retain every native facet; neutral and direct resident word conduct are
+structurally equal. The engine suite returned 1,984 passed, zero failed, 32 ignored; `life`
+type-checked and source-shape remained green. The exact return is recorded in
+[`../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
+
+### HIF2 — exact foreign charts and profiled Soulkiller return — CURRENT
 
 [definition] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
 conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual

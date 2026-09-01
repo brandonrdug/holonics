@@ -18,6 +18,7 @@ REQUIRED = [
     "blueprint/THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md",
     "research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md",
     "research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md",
+    "research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md",
     "crates/holonic-engine/src/addressed_current.rs",
     "crates/holonic-engine/src/factored_moment.rs",
     "soma/life/src/athena_native/source_neutral_relational.rs",
@@ -27,6 +28,11 @@ REQUIRED = [
     "soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicIntelligenceLifecycle.lean",
     "soma/formal/elementary-holonics/ElementaryHolonics/Computation/ExactForeignWeight.lean",
     "soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicIntelligenceFramework.lean",
+    "crates/holonic-engine/src/holonic_intelligence.rs",
+    "crates/holonic-engine/src/holonic_intelligence/dimensions.rs",
+    "crates/holonic-engine/src/holonic_intelligence/lifecycle.rs",
+    "crates/holonic-engine/src/holonic_intelligence/profile.rs",
+    "crates/holonic-engine/src/holonic_intelligence/rested.rs",
     "soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean",
 ]
 

@@ -1,5 +1,11 @@
 use super::*;
-use crate::{BoundaryId, ExactUnitConicPhase, OccurrencePort};
+use crate::{
+    native_ecology::holonic_intelligence::{
+        CarrierRank, CycleRank, DimensionFace, DimensionObstruction, IncidenceNullity,
+        IncidenceRank, NativeTransportRequest, RestedTransportEcology,
+    },
+    BoundaryId, ExactUnitConicPhase, OccurrencePort,
+};
 use num_bigint::BigInt;
 use relational_geometry::Rat;
 
@@ -751,4 +757,75 @@ fn insufficiency_exhibits_the_reopened_native_fibre() {
         open_exterior: vec!["successor outside the admitted section".to_owned()],
     };
     insufficiency.validate().expect("exact insufficiency");
+}
+
+#[test]
+fn intrinsic_profile_borrows_every_native_facet_and_keeps_dimensions_typed() {
+    let bundle = bundle();
+    let profile = bundle.intrinsic_holon_profile().expect("intrinsic profile");
+    assert_eq!(profile.bundle_address, bundle.address);
+    assert_eq!(profile.holons.len(), 2);
+    assert!(std::ptr::eq(
+        profile.holons[0].morphology,
+        &bundle.spools[0].threads[0]
+    ));
+    let holon = &profile.holons[0];
+    assert_eq!(
+        holon.dimensions.incidence_rank,
+        DimensionFace::Exact(IncidenceRank(1))
+    );
+    assert_eq!(
+        holon.dimensions.incidence_nullity,
+        DimensionFace::Exact(IncidenceNullity(0))
+    );
+    assert_eq!(
+        holon.dimensions.cycle_rank,
+        DimensionFace::Exact(CycleRank(0))
+    );
+    assert_eq!(
+        holon.dimensions.carrier_rank,
+        DimensionFace::Exact(CarrierRank(2))
+    );
+    assert_eq!(
+        holon.dimensions.scale_extent,
+        DimensionFace::Open(DimensionObstruction::ScaleChartOutsideNativeThread)
+    );
+    assert_eq!(holon.incidence.terms.len(), 1);
+    assert_eq!(holon.carrier.parametrons.len(), 2);
+    assert_eq!(holon.transport.generator_descents.len(), 1);
+    assert_eq!(holon.transport.serial_pullbacks.len(), 2);
+    assert_eq!(holon.constitutive.local.len(), 2);
+    assert_eq!(holon.receiver.factors.len(), 2);
+    assert_eq!(holon.reconstruction.collapsed_fibres.len(), 2);
+    assert_eq!(holon.open_obligations.len(), 3);
+}
+
+#[test]
+fn neutral_rested_surface_round_trips_the_existing_native_owner() {
+    let bundle = bundle();
+    RestedTransportEcology::validate_rest(&bundle).expect("neutral validation");
+    let bytes = RestedTransportEcology::canonical_rest_bytes(&bundle).expect("neutral rest");
+    assert_eq!(bytes, bundle.canonical_bytes().expect("owner rest"));
+    assert_eq!(NativeSpoolBundle::read(&bytes).expect("remount"), bundle);
+}
+
+#[test]
+#[ignore = "requires the resident CUDA native-word entry"]
+fn neutral_rested_surface_conducts_the_existing_resident_word() {
+    let bundle = bundle();
+    let request = NativeTransportRequest {
+        spool: "spool/native-turn".to_owned(),
+        word: vec![InputId(7)],
+        native_start: vec![NativeStateId(0), NativeStateId(1)],
+        receiver: ReceiverId(9),
+    };
+    let neutral = RestedTransportEcology::conduct(&bundle, &request).expect("neutral conduct");
+    let mut direct = bundle
+        .mount_word(&request.spool, &request.word)
+        .expect("direct mount");
+    let direct = direct
+        .conduct(&request.native_start, request.receiver)
+        .expect("direct conduct");
+    assert_eq!(neutral, direct);
+    assert!(!neutral.apparatus.invariant_transport_reuploaded);
 }

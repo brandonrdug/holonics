@@ -244,18 +244,23 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF1
+**Current frontier:** HIF2
 
-**HIF1 — GENERIC RUST CARRIERS AND PACKAGE SURFACE — IS THE SOLE NEXT DEED.**
+**HIF2 — EXACT FOREIGN CHARTS AND PROFILED DISMANTLING RETURN — IS THE SOLE NEXT DEED.**
 
-[open] Establish Rust counterparts to the HIF0 contracts over the existing addressed span, native
-spool, receiver-history, exact current, morphology delta, rest/remount, and apparatus owners.
-Campaign/product types may implement or contain the neutral contracts; generic behavior may not be
-duplicated behind Athena-named methods.
+[open] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
+conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
+excitation/intervention testimony and return profiled native holons through the one-way dismantling
+boundary.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
 [`research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).
+
+[established-bounded; implemented-exact; measured] HIF1 passed. The neutral Rust profile/rested
+surface conducts the existing native owner without a wrapper or clone; direct and neutral resident
+returns agree. Its exact return is
+[`research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
 
 [definition] The complete HIF order is:
 

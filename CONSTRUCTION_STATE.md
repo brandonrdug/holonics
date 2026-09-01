@@ -10,14 +10,14 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF1
+**Current frontier:** HIF2
 
-**HIF1 — GENERIC RUST CARRIERS AND PACKAGE SURFACE — IS THE SOLE NEXT DEED.**
+**HIF2 — EXACT FOREIGN CHARTS AND PROFILED DISMANTLING RETURN — IS THE SOLE NEXT DEED.**
 
-[definition] Establish Rust counterparts to the HIF0 contracts over the existing addressed span,
-native spool, receiver-history, exact current, morphology delta, rest/remount, and apparatus owners.
-Campaign/product types may implement or contain the neutral contracts; generic behavior may not be
-duplicated behind Athena-named methods.
+[definition] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
+conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
+excitation/intervention testimony and return profiled native holons through the one-way dismantling
+boundary.
 
 ## Admitted standing
 
@@ -36,6 +36,12 @@ species, current-founded contact separation, `RestedTransportEcology`, `Dismantl
 `InferenceCirculationReturn`, `CultivationPassage`, and `ExactForeignWeightPassage`. The focused
 closure built 3,164 jobs and the live umbrella built 3,769 jobs without `sorryAx`; all named formal
 and authority receivers passed.
+
+[established-bounded; implemented-exact; measured] HIF1 returned distinct Rust dimension types,
+typed open faces, borrowed intrinsic native profiles, neutral lifecycle traits, and a
+`RestedTransportEcology` implementation on `NativeSpoolBundle` itself. Neutral profile/rest/remount
+controls and resident CUDA equality passed; the engine suite returned 1,984 passed, zero failed, 32
+ignored, dependent `life` type-checked, and source-shape remained green.
 
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
@@ -60,10 +66,10 @@ cold exterior witness, and insufficiency, but the productive holons have no firs
 profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
 chronology, receiver, morphology, reconstruction, and open dimensions.
 
-[counterexample; source-inspected] Rust retains the newly formalized profile and lifecycle facets
-across `native_spool`, `native_ecology`, `soulkiller`, `athena_native`, receiver-history,
-cultivation, and apparatus owners, but no singular neutral executable surface joins them. Generic
-conduct remains exposed through campaign-qualified rests and passages.
+[counterexample; source-inspected] Safetensors manifestation, secondary BF16 intake, hand-written
+container emission, vendor configuration/shard indexes, and foreign operation graphs have no one
+lossless exterior chart. ONNX intake is absent, tensor path names could be mistaken for intrinsic
+roles, and the productive dismantling return does not yet carry its derived intrinsic profile.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -84,7 +90,7 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF1 advances only
-after one public neutral Rust surface conducts the existing bounded native controls and its Lean--
-Rust catalog rows name the same carriers and open fibres. No compatibility alias, cloneable ecology,
-digest identity, or second implementation can substitute for that grade.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF2 advances only
+after representative dense, sparse/MoE, hybrid-contact, quantized, and ONNX controls retain complete
+exterior reconstruction while source names cannot change native profile or conduct; the productive
+hot closure has no foreign executor or source topology.

@@ -8,6 +8,9 @@ pub mod continuation;
 pub mod cultivation_overlay;
 pub mod factor_complex;
 pub mod heterogeneous_fusion;
+/// Neutral intrinsic profiles and lifecycle traits over existing native intelligence owners.
+#[path = "../holonic_intelligence.rs"]
+pub mod holonic_intelligence;
 pub mod inference_ecology;
 pub mod inference_membrane;
 pub mod recurrent;
