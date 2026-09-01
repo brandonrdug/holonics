@@ -30,16 +30,15 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** CONS1
+**Current frontier:** NONE
 
-[definition] The repository is under the CONS0--CONS5 consolidation campaign. UAR is frozen through
-CONS5. The complete non-ignored pre-consolidation tree is preserved in `stash@{0}`; Brandon
-authorized removal of ignored `target/` and `output/`, and both were removed.
+[established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
+scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
+`CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the complete current receipt.
 
-[open] The parked UAR implementation must eventually enact genuine ordinary off-diagonal
-realization-site transport and perform the dependent exact complex-current contraction on the
-resident GPU surface. Re-read the state, roadmap, parked UAR contract, and exact checkout record;
-this summary schedules nothing.
+[definition] No construction phase is active after HIF7. “Describe Brandon” and the related frozen
+language questions are exterior experiments, not release gates or standing capability debts. This
+summary schedules nothing; a later direct request founds the next deed.
 
 ## Claude-specific conduct
 
@@ -73,9 +72,10 @@ or subsystem is presumptively a missing abstraction or hidden foreman. Stop and 
 extending it.
 
 [definition] Every nontrivial process has an outer hard limit of 180 seconds. Run focused owner
-checks during construction and one complete release gate at the coherent boundary. A timeout,
-failed qualitative receiver, red ownership gate, untracked authority, or non-reproducible clean
-checkout is a counterexample and cannot advance construction state.
+checks during construction and one complete release gate at the coherent boundary. A timeout, red
+exact owner gate, untracked authority, or non-reproducible clean checkout is a counterexample and
+cannot advance construction state. A qualitative probe schedules nothing unless Brandon directly
+declares it to be the acceptance boundary.
 
 [definition] Do not delete build caches, ignored output, source, or evidence without Brandon's
 authorization. When authorization is given, resolve exact targets first, preserve any required

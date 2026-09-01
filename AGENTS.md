@@ -230,6 +230,16 @@ returns.
 
 ## Experiments are receivers, never substitute machines
 
+- A probe remains a probe. Freezing its inputs, repeating it across campaigns, or preserving it as
+  a regression control does not promote it into a construction phase, release gate, or standing
+  capability obligation. Only Brandon's latest direct request or an explicitly admitted exact
+  contract may do that. Human inspection of an output may be recorded as interpretation or
+  measured testimony; it is not an executable pass condition unless Brandon directly names it as
+  the acceptance boundary.
+- “Unchanged” means only that the same declared input, apparatus aperture, and receiver were held
+  fixed across interventions. It says nothing about correctness, quality, semantic relevance, or
+  generality. A changed or restored surface can witness dependence while remaining an incorrect
+  answer.
 - A requested experiment, prompt, named subject, output comparison, ablation, or capability probe
   authorizes a new exterior occurrence and receiver question. It does **not** authorize a new
   semantic store, training architecture, indexing scheme, inference law, authored ontology, or

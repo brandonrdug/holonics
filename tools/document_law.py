@@ -68,12 +68,13 @@ superseded plan is supposed to carry.
 WHAT IS SCANNED. The operating contract, the position record, all of `canon/`, all of `blueprint/`.
 Not `research/records/` — a record is dated evidence whose absence claims are their own provenance.
 
-LAW THREE — THE POSITION RECORD AND ROADMAP NAME ONE IDENTICAL SOLE NEXT DEED.
+LAW THREE — THE POSITION RECORD AND ROADMAP NAME ONE IDENTICAL CURRENT POSITION.
 
 `CONSTRUCTION_STATE.md` is the sole current-position record and `THE_ROADMAP.md` is the sole ordered
-construction authority. Each must contain exactly one explicit declaration of the form
-`<PHASE> ... IS THE SOLE NEXT DEED`, and the phase identifiers must agree. No subordinate live
-blueprint may contain that declaration. Historical evidence can say what was once next only after it
+construction authority. Each must contain exactly one `Current frontier` declaration and the phase
+identifiers must agree. `NONE` is lawful after a campaign closes: a verifier may preserve authority
+consistency, but it may not invent another deed merely to keep a slot populated. No subordinate live
+blueprint may claim a sole next deed. Historical evidence can say what was once next only after it
 has been moved under an archive/supersession banner or rewritten without live scheduling language.
 """
 
@@ -281,11 +282,11 @@ def read() -> tuple[list[Claim], list[str], list[str]]:
     roadmap = expected_frontiers["blueprint/THE_ROADMAP.md"]
     if len(state) != 1:
         frontier_failures.append(
-            f"CONSTRUCTION_STATE.md declares {len(state)} sole next deeds: {state}"
+            f"CONSTRUCTION_STATE.md declares {len(state)} current positions: {state}"
         )
     if len(roadmap) != 1:
         frontier_failures.append(
-            f"blueprint/THE_ROADMAP.md declares {len(roadmap)} sole next deeds: {roadmap}"
+            f"blueprint/THE_ROADMAP.md declares {len(roadmap)} current positions: {roadmap}"
         )
     if len(state) == 1 and len(roadmap) == 1 and state[0] != roadmap[0]:
         frontier_failures.append(

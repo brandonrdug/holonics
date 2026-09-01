@@ -4,21 +4,17 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-08-31, after Brandon deprecated UAR/R0Q and founded the Holonic Intelligence
-Framework. CONS0--CONS5, QLT1--QLT6, CDB1, and the exact bounded R0Q0--R0Q4 mechanisms retain their
-grades.
+**Currency:** 2026-09-01, after HIF7's invalid qualitative-probe gate was removed and the exact
+Holonic Intelligence Framework release closed. CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and
+the exact bounded R0Q0--R0Q4 mechanisms retain their grades.
 
 ## Current frontier
 
-**Current frontier:** HIF7
+**Current frontier:** NONE
 
-**HIF7 — INTEROPERABILITY AND QUALITATIVE FRAMEWORK RELEASE — IS THE SOLE NEXT DEED.**
-
-[definition] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact
-charts over declared receiver families. Run the unchanged qualitative receivers plus held-out
-technical, cross-codec, generation-reentry, silence/radiation, withdrawal, restoration, and
-source-access controls through the neutral package. Release only after direct qualitative
-inspection accepts the surfaces and richer receivers reopen every unlawful condensation.
+[established-bounded] No construction deed is active. HIF0--HIF7 are complete at their declared
+scopes. A later direct user request, not a preserved experiment or historical status sentence,
+founds the next deed.
 
 ## Admitted standing
 
@@ -93,12 +89,12 @@ source-text-free dialogue incidence, exact independent causal components, linear
 receiver-history families, and compact resident native batch conduct. These mechanisms may be
 reused by HIF owners; the interrupted H2N/UAR-specific factorization was unadmitted and removed.
 
-## Current obstruction
+## Closed HIF7 boundary
 
 [established-bounded; implemented-exact; measured] The HIF7 neutral contact comparison now returns
 fixed-window, periodic-hybrid, recurrent-linear, and current-founded edge families with active
 causal extent, exact pair work, reconstruction fibres, and richer-receiver reopenings. It advances
-no qualitative grade by itself.
+no natural-language capability grade, because none is part of this exact framework release.
 
 [established-bounded; implemented-exact; source-inspected; measured] The rich HIF7 foundation now
 returns the complete visible-exchange product without its former Cartesian products; one physical
@@ -107,23 +103,29 @@ resident generated-port target, physical port quotient, two-order silence/radiat
 acoustic room return, optical return, source-detached remount, withdrawal, restoration, and
 generation-reentry controls return inside their process bounds.
 
-[counterexample; source-inspected; measured] Exact path state prevents corrupted per-character
-recombination, but the unchanged qualitative family remains rejected. A proposal-relative
-presentation-contact implementation returned mechanically exact source-detached conduct, yet
-direct inspection found unrelated technical and participant surfaces.
+[counterexample; source-inspected; measured] A proposal-relative presentation-contact
+implementation returned mechanically exact source-detached conduct, yet parser-derived cells and
+maximal presentation overlap made it lexical lookup. The implementation was reverted. This
+counterexample constrains any later language experiment; it is not an open HIF7 relation.
 
-[counterexample; source-inspected] The presentation-contact implementation was reverted. Its relational
-cells were parser-derived, its rested presentation paths remained load-bearing, and maximal
-query/response byte-edge overlap selected factors. That is lexical lookup behind source-neutral
-types, not native semantic cross-occurrence inference. `agentic_language`, `holonic_training`, and
-`recurrent_section` do not lawfully close the gap.
+[historical; source-inspected; process-audit] “Describe Brandon” was an exterior experiment. H4
+wrongly promoted it into a pass condition even though its executable returned only structural
+closure and explicitly required undeclared primary-agent inspection. UAR and HIF7 inherited that
+error, and a persistent agent-authored goal amplified it across compactions. “Unchanged” meant only
+that the same prompt/aperture was held fixed; “qualitative” meant ad hoc human judgment. Neither is
+a reproducible gate.
 
-[open; source-inspected] The shortest HIF7 obstruction is the absent native-cell-to-later-query
-correspondence preserving response role, actual causal return, native factor current, and complete
-reconstruction fibre. Presentation may act only after native consequence selection. HIF7 remains
-current until that relation and the unchanged qualitative/held-out/revisit/rebase/control,
-withdrawal/restoration, and foreign-interchange gates return. The exact refutation is recorded in
-[`research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
+[established-bounded; implemented-exact; source-inspected; measured] HIF7 closes on four exact
+obligations: common-population contact-chart comparison, active extent and exact work, explicit
+richer-receiver reopening, and composition of HIF2's cold foreign boundary with HIF6's direct
+source-neutral resident lifecycle. The forensic correction and release receipt are recorded in
+[`research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
+
+[established-bounded; process-audit; measured] The coherent HIF7 release returned 2,922 tests
+passed, zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768
+jobs; and tracked authority, source shape, epistemic tags, claim index, equation atlas, Typst, and
+document law passed. The CUDA parity owner compares actual symbol sets and the two explicit
+quarantines without a stale population constant.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -131,7 +133,7 @@ drivers, and records remain evidence only.
 
 ## Ordered return
 
-[definition] The active HIF blueprint owns the complete order:
+[definition] The completed HIF blueprint owns the admitted order:
 
 1. HIF0 — formal intrinsic profiles and lifecycle contracts;
 2. HIF1 — generic Rust carriers and package surface;
@@ -140,12 +142,12 @@ drivers, and records remain evidence only.
 5. HIF4 — packaged cultivation and hexis;
 6. HIF5 — migrate products and remove campaign ontology;
 7. HIF6 — resident and source-neutral closure; and
-8. HIF7 — interoperability and qualitative framework release.
+8. HIF7 — exact contact/interoperability framework release.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF7 advances only
-when direct inspection accepts the qualitative surfaces; every contact chart reports active causal
-extent and exact work beside apparatus telemetry; richer receivers reopen unlawful condensations;
-foreign formats interchange without becoming native ontology; Git is clean and pushed; and
-reproducible outputs are absent from the release tree.
+[definition] Every nontrivial process retains the 180-second outer boundary. A phase advances only
+on its declared exact artifact and grade. Frozen prompts, generated surfaces, direct human
+inspection, telemetry, hashes, and counts may support a declared receiver but cannot silently
+become gates. Git must be clean and pushed, and reproducible outputs remain absent from the release
+tree.

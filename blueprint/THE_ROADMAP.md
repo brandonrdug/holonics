@@ -19,7 +19,7 @@ Read, in order:
    [`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
    [`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md), and
    [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md);
-7. the active Holonic Intelligence Framework contract,
+7. the completed Holonic Intelligence Framework contract,
    [`THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md`](THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md),
    and its derivation,
    [`research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md`](../research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md); and
@@ -237,30 +237,35 @@ off-diagonal transport, resident complex contraction before the positive receive
 recurrence, complete reconstruction fibre, and semantic-replay telemetry remain implementation
 standing. UAR3, R0Q5, R0Q6, and the UAR4 release no longer schedule work.
 
-[definition] The active HIF contract folds every unfinished UAR intention into neutral lifecycle
+[definition] The completed HIF contract folded every unfinished UAR intention into neutral lifecycle
 gates: direct source-neutral construction, actual emission/world-return difference, source-detached
-remount, targeted withdrawal, exact restoration, qualitative inspection, and productive
-source/apparatus absence. Historical UAR blueprints and records remain evidence only.
+remount, targeted withdrawal, exact restoration, contact-chart comparison, and productive
+source/apparatus absence. The inherited Brandon language family remains an exterior experiment.
+Historical UAR blueprints and records remain evidence only.
 
-## Active campaign — Holonic Intelligence Framework
+## Completed campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF7
+**Current frontier:** NONE
 
-**HIF7 — INTEROPERABILITY AND QUALITATIVE FRAMEWORK RELEASE — IS THE SOLE NEXT DEED.**
+[established-bounded; implemented-exact; source-inspected; measured] HIF0--HIF7 are complete at
+their declared scopes. No construction deed is active; the next deed requires a new direct request.
 
-[open] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact charts
-over declared receiver families. Run the unchanged qualitative receivers plus held-out technical,
-cross-codec, generation-reentry, silence/radiation, withdrawal, restoration, and source-access
-controls through the neutral package. Release only after direct qualitative inspection accepts the
-surfaces and richer receivers reopen every unlawful condensation.
+[established-bounded; implemented-exact; measured] HIF7 returned fixed-window, periodic-hybrid,
+recurrent-linear, and current-founded contact charts over one native population, with active causal
+extent, exact pair work, complete coarse receiver fibres, and explicit richer-receiver reopenings.
+HIF2 supplies the lossless cold foreign-chart boundary and HIF6 supplies the direct source-neutral
+resident inference/cultivation, remount, withdrawal, and restoration boundary.
 
-[counterexample; implemented-exact; source-inspected; measured] Exact contact comparison,
-factorized resident and sensory return, and source-detached realization mechanics return. A
-proposal-relative presentation-contact implementation was constructed, measured, and reverted:
-parser-derived cells plus maximal presentation overlap were lexical lookup rather than native
-semantic inference. The remaining type is a native-cell-to-later-query correspondence carrying
-response role, actual return, factor current, and reconstruction fibre. The exact refutation is in
-[`research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
+[established-bounded; process-audit; measured] The coherent release returned 2,922 tests passed,
+zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768 jobs;
+and all nine repository release gates passed inside the 180-second outer boundary.
+
+[historical; source-inspected; process-audit] “Describe Brandon” and the inherited natural-language
+questions were experiments, not HIF7 gates. The agent-authored H4 contract promoted them without a
+rubric, then UAR and HIF copied the error. The reverted presentation-contact path remains a valid
+counterexample to parser-derived lexical lookup; it schedules no replacement inference organ. The
+forensic audit and exact HIF7 release receipt are in
+[`research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -308,7 +313,7 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 5. `HIF4` — packaged cultivation and hexis;
 6. `HIF5` — migrate products and remove campaign ontology;
 7. `HIF6` — resident and source-neutral closure; and
-8. `HIF7` — interoperability and qualitative framework release.
+8. `HIF7` — exact contact/interoperability framework release.
 
 ## Standing and history
 
@@ -322,8 +327,8 @@ request may refine this order; historical text may not.
 
 ## Validation cadence
 
-[definition] Every nontrivial process has an outer hard limit of 180 seconds. During HIF
+[definition] Every nontrivial process has an outer hard limit of 180 seconds. During an admitted
 construction run only the affected package checks, focused owner/apparatus tests, the exact formal
-target, and named cheap catalog/document gates. Run the complete qualitative and interoperability
-release only at HIF7. A timeout is a counterexample, never a partial pass or permission to widen a
-magic bound.
+target, and named cheap catalog/document gates. Run one complete exact release receiver at the
+declared release boundary. A timeout is a counterexample, never a partial pass or permission to
+widen a magic bound. A probe schedules nothing unless Brandon directly promotes it.

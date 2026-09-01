@@ -2,9 +2,9 @@
 # cultivation, and generation
 
 **Date:** 2026-08-31
-**Kind:** active construction contract composed by
+**Kind:** completed construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF7.
+**Current frontier:** none.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -185,7 +185,7 @@ weights are exact only for receiver families which factor through their modulus.
 
 ## 7. UAR intentions folded into this framework
 
-[definition] UAR and R0Q schedule nothing after this contract becomes active. Their unfinished
+[definition] UAR and R0Q schedule nothing after this contract took effect. Their unfinished
 intentions survive as follows:
 
 | UAR/R0Q intention | HIF owner |
@@ -196,7 +196,7 @@ intentions survive as follows:
 | full-complex recurrence and no CPU semantic replay | admitted standing used by HIF3/HIF6 |
 | actual emission/world-return situated difference | HIF4 cultivation passage and HIF6 actual-return gate |
 | source-detached remount, targeted withdrawal, exact restoration | HIF4 and HIF6 |
-| unchanged qualitative receiver and complete source-neutral release | HIF7 framework release family |
+| complete source-neutral release and contact-chart comparison | HIF7 exact framework release |
 
 [definition] Historical `OpticalAthenaRest`, ALP, SENS, UAR, and output-file chains remain bounded
 controls and provenance. They cannot instantiate the productive generic framework unless they pass
@@ -354,32 +354,46 @@ contact; the actual emission and later return founded source-detached hexis; hel
 withdrawal, and restoration passed. The exact return is
 [`../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md`](../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md).
 
-### HIF7 — interoperability and qualitative framework release — CURRENT
+### HIF7 — exact interoperability and framework release — PASSED
 
 [definition] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact
-charts over declared receiver families. Run the unchanged qualitative receivers inherited from UAR
-plus held-out technical, cross-codec, generation-reentry, silence/radiation, withdrawal,
-restoration, and source-access controls through the neutral package.
+charts over one declared native population and receiver family. Retain active causal extent, exact
+pair work, receiver fibres, and every coarse pair reopened by the richer receiver. Revalidate the
+lossless foreign configuration, shard-index, ONNX, and exact-weight charts at the cold boundary and
+the direct source-neutral resident inference/cultivation lifecycle at the hot boundary.
 
-**Pass HIF7:** direct inspection accepts the qualitative surfaces; active causal extent and exact
-work are reported beside apparatus telemetry; richer receivers reopen every unlawful condensation;
-foreign formats interchange through Soulkiller without becoming native ontology; Git is clean,
-committed, pushed, and reproducible outputs are absent from the release tree.
+**Pass HIF7:** all four contact charts return over the common native population; their active extent
+and exact pair work are explicit; the richer receiver returns a nonempty reopening family; foreign
+charts remain complete exterior testimony and cannot alter productive native identity; the direct
+source-neutral cycle remounts, conducts, cultivates, withdraws, and restores without source,
+foreign, filesystem, environment, or historical-output intake; Git is clean and pushed; and
+reproducible outputs are absent from the release tree.
 
-[counterexample; implemented-exact; source-inspected; measured] Resident radiation, sensory
-return, factorized realization, and source-detached controls return, but direct inspection rejects
-the qualitative family. A proposal-relative presentation-contact route was reverted because its
-parser-derived cells and maximal byte-edge overlap were lexical lookup. The remaining exact
-obstruction is a native-cell-to-later-query correspondence carrying response role, actual causal
-return, factor current, and reconstruction fibre. Its evidence and firing boundary are recorded in
-[`../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
+[historical; source-inspected; process-audit] The frozen “Describe Brandon” family was an exterior
+experiment. It was wrongly promoted from a structural probe into H4, UAR, and then HIF7 scheduling.
+“Unchanged” meant only that the prompt/aperture was held fixed; “qualitative” meant undeclared
+primary-agent inspection. Neither supplied a reproducible pass criterion. The failed
+presentation-contact construction remains a useful counterexample to lexical lookup, but the
+absent natural-language answer relation is not a HIF7 framework debt.
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF7 returned the four exact
+contact-chart families, active extent and pair-work receipts, receiver fibres, and richer-receiver
+reopenings in `holonic_intelligence/contact_chart.rs`. HIF2 retains the exact cold foreign charts;
+HIF6 retains the direct source-neutral resident lifecycle. The factorized resident/radiation/path
+repairs constructed during the invalid probe campaign remain admitted only at their own exact
+scopes. The audit and correction are recorded in
+[`../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
+
+[established-bounded; process-audit; measured] The coherent release returned 2,922 tests passed,
+zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768 jobs;
+and all nine repository release gates passed inside the 180-second outer boundary.
 
 ## 9. Process law
 
 [definition] Every nontrivial process retains the 180-second outer boundary. Owner-local tests and
-the exact active formal target run during construction; the complete release receiver runs only at
-HIF7. A timeout, digest, count, topology census, residency receipt, or generated surface cannot
-advance a phase by itself.
+the exact active formal target run during construction; a complete release receiver runs only at a
+declared release boundary. A timeout, digest, count, topology census, residency receipt, human-read
+surface, or generated surface cannot advance a phase by itself.
 
 [definition] `CONSTRUCTION_STATE.md` advances only after the named phase returns its complete
 artifact and grade. `UNIVERSAL_CATALOG.md` changes with the actual formal/Rust owner, never in

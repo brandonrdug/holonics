@@ -98,6 +98,10 @@ counts and what was ruled out, and the current construction position.
 **May not contain:** a running log of turns, a history of what was tried, a plan document, or a
 narrative. Git is the log. The laboratory paid 899,497 bytes to learn this (§6.1).
 
+**Closed-position law.** The position and roadmap may both declare `NONE` after the admitted
+campaign closes. A consistency check must not manufacture a new phase merely to keep a frontier
+slot occupied.
+
 ### 1.5 Claim index — `THE_CLAIM_INDEX.md`
 
 **Authority:** index. Routes; asserts nothing of its own. **This is the single most important

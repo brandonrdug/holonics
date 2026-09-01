@@ -11,7 +11,7 @@ fn source_passages_descend_to_triangular_native_incidence() {
             0,
             NativeDeliveryPhase::Ingress,
             "message/0",
-            "Brandon founds Athena.",
+            "The operator founds the ecology.",
         )
         .unwrap();
     builder
@@ -27,17 +27,17 @@ fn source_passages_descend_to_triangular_native_incidence() {
             1,
             NativeDeliveryPhase::Emanation,
             "message/2",
-            "Brandon cultivates the holonic laboratory.",
+            "The operator cultivates the holonic laboratory.",
         )
         .unwrap();
     let (codec, potential, receipt) = builder.finish().unwrap();
     assert_eq!(receipt.triangular_boundary_defect_population, 0);
     assert!(!potential.cells.is_empty());
-    let contact = codec.contact(&potential, "Describe Brandon.").unwrap();
+    let contact = codec.contact(&potential, "Map the operator.").unwrap();
     assert!(!contact.faces.is_empty());
     assert_eq!(contact.factor_support, vec![0, 1]);
     let wire = potential.canonical_bytes().unwrap();
-    assert!(!String::from_utf8_lossy(&wire).contains("Brandon founds Athena"));
+    assert!(!String::from_utf8_lossy(&wire).contains("The operator founds the ecology"));
     assert_eq!(
         NativeRelationalPotentialComplex::read(&wire).unwrap(),
         potential
@@ -89,11 +89,11 @@ fn addressed_dialogue_lineage_glues_deictic_faces_without_naming_native_state() 
             0,
             NativeDeliveryPhase::Emanation,
             "message/1",
-            "Brandon is the user. You require exact holonic transport.",
+            "Ada is the user. You require exact holonic transport.",
         )
         .unwrap();
     let (codec, potential, _) = builder.finish().unwrap();
-    let contact = codec.contact(&potential, "Describe Brandon.").unwrap();
+    let contact = codec.contact(&potential, "Map Ada.").unwrap();
     let (participant, alias) = contact.participant_alias.unwrap();
     assert!(contact.faces.contains(&participant));
     assert!(contact.faces.contains(&alias));
@@ -103,7 +103,7 @@ fn addressed_dialogue_lineage_glues_deictic_faces_without_naming_native_state() 
     );
     assert!(codec
         .canonical_bytes(&potential)
-        .map(|wire| !String::from_utf8_lossy(&wire).contains("native-brandon"))
+        .map(|wire| !String::from_utf8_lossy(&wire).contains("native-ada"))
         .unwrap());
 }
 
@@ -189,13 +189,13 @@ fn participant_subject_is_exact_and_existential_copulas_remain_outside_its_chart
     for (_, clause, _) in direct {
         let mut clause = clause.clone();
         clause.subject = RelationalEntity {
-            surface: vec!["Brandon".to_owned()],
-            identity: BTreeSet::from(["brandon".to_owned()]),
+            surface: vec!["Ada".to_owned()],
+            identity: BTreeSet::from(["ada".to_owned()]),
         };
         let surface = crate::relational_language::realize_relational_clauses(&[clause], &[], false)
             .unwrap()
             .text;
-        assert!(surface.starts_with("Brandon "));
-        assert!(!surface.contains("Brandon is elliptic curves"));
+        assert!(surface.starts_with("Ada "));
+        assert!(!surface.contains("Ada is elliptic curves"));
     }
 }

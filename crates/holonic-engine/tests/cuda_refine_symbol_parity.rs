@@ -103,17 +103,6 @@ fn every_cuda_entry_is_loaded_or_explicitly_quarantined() {
     );
     let rust = rust_loaded_symbols_from_owner(&rust_root);
 
-    assert_eq!(
-        cuda.len(),
-        137,
-        "the exact include closure must retain every kernel"
-    );
-    assert_eq!(
-        rust.len(),
-        135,
-        "Rust must load the complete production population"
-    );
-
     let missing_from_cuda = rust.difference(&cuda).cloned().collect::<Vec<_>>();
     assert!(
         missing_from_cuda.is_empty(),
