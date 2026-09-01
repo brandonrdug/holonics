@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC1.
+**Current frontier:** AAC2.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -223,7 +223,7 @@ boundary, parented commit and decline, exact snapshot/remount, and constituted d
 laws. The focused closure built 3,187 jobs and the live umbrella built 3,771 jobs. Its receipt is
 [`../research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](../research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
 
-### AAC1 — neutral Rust circulation-session API
+### AAC1 — neutral Rust circulation-session API — PASSED
 
 [definition] Add the move-owned session and owned boundary types over the existing public owners.
 Refactor only the smallest private deposit/conduct functions required for composition. No second
@@ -232,6 +232,12 @@ inference algorithm or application-specific generic type is admitted.
 **Pass AAC1:** [definition] one session mounts a package, returns an owned boundary with complete
 fibres and actual successors, continues only through an admitted address, refuses false/stale
 continuation, and supports both commit and decline without cloning the ecology.
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC1 returned the move-owned
+`NativeCirculationSession`, complete owned future fibres, exact actual-successor continuation,
+false/stale refusal, and decline invariance. The focused owner returned three passed tests. Its
+receipt is
+[`../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
 
 ### AAC2 — parented morphology commits and snapshot/remount storage
 

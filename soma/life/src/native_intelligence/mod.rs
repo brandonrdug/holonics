@@ -4,6 +4,7 @@
 //! quotient, and terminal potential through exact shared occurrence lineage. No foreign executor
 //! or source coordinate is present in its conduct closure.
 
+mod circulation_session;
 mod conduct;
 mod cultivated;
 mod exchange_cultivation;
@@ -39,6 +40,12 @@ mod source_neutral_relational;
 mod source_neutral_rest;
 mod types;
 
+pub use circulation_session::{
+    NativeCirculationBoundary, NativeCirculationConfiguration, NativeCirculationSession,
+    NativeDeclineReceipt, NativeOwnedFutureReconstruction, NativeOwnedInferenceAddress,
+    NativeOwnedInferenceLineage, NativeOwnedInferenceRequest, NativeOwnedOpenObligation,
+    NativeOwnedOpenScope, NativeSessionError, NATIVE_CIRCULATION_SESSION_SCHEMA,
+};
 pub use cultivated::{
     CultivatedConductConsequence, CultivatedConductPassage, CultivatedEcologyRest,
     CultivationMutation, CultivationWithdrawal, NativeCultivatedPotentialComplex,

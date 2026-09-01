@@ -424,7 +424,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Active campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC1
+**Current frontier:** AAC2
 
 **AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -441,9 +441,15 @@ and constituted diffusion through the common boundary. The focused closure built
 the live umbrella built 3,771 jobs. Its receipt is
 [`research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](../research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
 
-[definition] The current deed is AAC1 only: the move-owned neutral Rust circulation-session API.
-No parented storage, diffusion adapter, ABI, application, or later phase receives a grade until
-AAC1 returns its exact boundary and ownership controls.
+[established-bounded; implemented-exact; source-inspected; measured] AAC1 passed. One move-owned
+session returns complete owned future fibres, exact lineage and actual successors, refuses stale
+and false continuation, and declines without changing or cloning the package. Its focused owner
+returned three passed tests. The receipt is
+[`research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
+
+[definition] The current deed is AAC2 only: parented morphology commits, successive local
+cultivation, commit journal, and exact snapshot/remount storage. Diffusion, ABI, application, and
+release remain unscheduled until their predecessors pass.
 
 [definition] The complete order is:
 

@@ -10,20 +10,26 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** AAC1
+**Current frontier:** AAC2
 
-**AAC0 PASSED. AAC1 IS ACTIVE. AAC2--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+**AAC0--AAC1 PASSED. AAC2 IS ACTIVE. AAC3--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-AAC0 returned the live-session, commit/decline, parented successor, snapshot/remount, and exact
-diffusive-circulation laws. AAC1 now owns only the move-owned neutral Rust circulation-session API.
+AAC0 returned the formal laws. AAC1 returned the move-owned neutral Rust session and exact owned
+boundary. AAC2 now owns only parented commits, successive local cultivation, journal, and
+snapshot/remount storage.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
 diffusion through that boundary. The focused closure built 3,187 jobs and the live umbrella built
 3,771 jobs. The exact receipt is
 [`research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC1 returned one
+non-cloneable package-owning session, complete owned future fibres, actual addressed continuation,
+stale/false refusal, and decline invariance. Three focused tests passed. The exact receipt is
+[`research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
 
 ## Admitted standing
 
