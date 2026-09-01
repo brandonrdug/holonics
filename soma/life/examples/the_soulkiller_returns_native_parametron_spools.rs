@@ -16,9 +16,10 @@ use holonic_engine::{
     native_anatomy::NativeAnatomyRest,
     native_spool::{NativeTransportScaffold, ReceiverInsufficiencyCause},
     soulkiller::{
+        dismantle,
         foreign_section_descent::ForeignReachableSectionRest,
         receiver_restricted_transport::ExteriorNativeAnatomyWitness,
-        scrapyard::{admitted_receiver, dismantle_reachable_section},
+        scrapyard::{admitted_receiver, ReachableSectionDismantling},
     },
     soulkiller_witness::{
         ExteriorArtifactIdentity, ForeignExecutionTestimony, ForeignRealizationTestimony,
@@ -71,11 +72,11 @@ fn main() -> Result<(), String> {
     let anatomy_witness =
         ExteriorNativeAnatomyWitness::read(&anatomy_witness_bytes, &anatomy).map_err(display)?;
     let receiver = admitted_receiver(&section);
-    let returned = dismantle_reachable_section(
-        &section,
-        &anatomy,
-        &anatomy_witness,
-        ForeignRealizationTestimony {
+    let returned = dismantle(ReachableSectionDismantling {
+        section: &section,
+        anatomy: &anatomy,
+        exterior_anatomy: &anatomy_witness,
+        realization: ForeignRealizationTestimony {
             name: "admitted-inherited-reachable-section".to_owned(),
             format: "exact-addressed-carrier-section".to_owned(),
             artifact: ExteriorArtifactIdentity::measure(&section_bytes),
@@ -89,18 +90,18 @@ fn main() -> Result<(), String> {
                 "returned-potential".to_owned(),
             ],
         },
-        ForeignExecutionTestimony {
+        execution: ForeignExecutionTestimony {
             runtime: "closed-admitted-excitation-session".to_owned(),
             device: "NVIDIA GeForce RTX 4080 SUPER".to_owned(),
             apparatus: ExteriorArtifactIdentity::measure(&apparatus_bytes),
             admitted_receiver_family: BTreeSet::from([receiver]),
             session_closed: true,
         },
-        BTreeSet::from([
+        unexcited_capability: BTreeSet::from([
             "receiver histories outside the admitted excitation family".to_owned(),
             "foreign conduct not separated by the admitted interventions".to_owned(),
         ]),
-    )
+    })
     .map_err(display)?;
 
     let native_dir = output.join("native");

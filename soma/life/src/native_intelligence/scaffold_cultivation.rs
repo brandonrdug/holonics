@@ -551,10 +551,11 @@ mod tests {
     use super::*;
     use holonic_engine::{
         native_ecology::holonic_intelligence::{
-            conduct_native_inference, lift_bf16_excitations, ExteriorModality,
+            conduct_native_inference, Bf16ExcitationDismantling, ExteriorModality,
             ForeignBf16Excitation,
         },
         receiver_exact_compression::ReceiverId,
+        soulkiller::dismantle,
     };
     use num_bigint::BigInt;
     use relational_geometry::Rat;
@@ -576,10 +577,10 @@ mod tests {
 
     #[test]
     fn returned_current_survives_scaffold_withdrawal_and_targeted_ablation() {
-        let lifted = lift_bf16_excitations(
-            ReceiverId(7),
-            vec![excitation(1, 0x3f80, 0x4000), excitation(2, 0x4040, 0x4080)],
-        )
+        let lifted = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![excitation(1, 0x3f80, 0x4000), excitation(2, 0x4040, 0x4080)],
+        })
         .expect("lift");
         let (predecessor, departed) =
             super::super::consume_dismantling_return(lifted).expect("move-owned handoff");

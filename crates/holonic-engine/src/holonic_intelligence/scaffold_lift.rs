@@ -14,9 +14,10 @@ use crate::native_spool::{
 };
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
+use crate::soulkiller::{SoulkillerDismantlingInput, SoulkillerDismantlingReturn};
 use crate::{BoundaryId, EventId, ExactUnitConicPhase, OccurrencePort};
 
-use super::{DismantlingBoundaryReturn, ExteriorModality, IntoDismantlingBoundaryReturn};
+use super::ExteriorModality;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -41,62 +42,31 @@ pub struct Bf16ExcitationColdWitness {
     pub open_exterior: Vec<String>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct MultimodalScaffoldLiftReturn {
-    pub native: NativeTransportScaffold,
-    pub exterior: Bf16ExcitationColdWitness,
-    pub insufficiency: ReceiverInsufficiency,
-}
-
-impl DismantlingBoundaryReturn for MultimodalScaffoldLiftReturn {
-    type Productive = NativeTransportScaffold;
-    type ColdWitness = Bf16ExcitationColdWitness;
-    type Insufficiency = ReceiverInsufficiency;
-
-    fn productive(&self) -> &Self::Productive {
-        &self.native
-    }
-
-    fn cold_witness(&self) -> &Self::ColdWitness {
-        &self.exterior
-    }
-
-    fn insufficiency(&self) -> &Self::Insufficiency {
-        &self.insufficiency
-    }
-}
-
-impl IntoDismantlingBoundaryReturn for MultimodalScaffoldLiftReturn {
-    fn into_lanes(self) -> (Self::Productive, Self::ColdWitness, Self::Insufficiency) {
-        (self.native, self.exterior, self.insufficiency)
-    }
-}
-
-impl MultimodalScaffoldLiftReturn {
-    /// Reconstruct every productive factorized section from the exact cold BF16 codeword lane.
-    ///
-    /// The cold codewords remain source-codec testimony; the hot lane retains their exact decoded
-    /// local values and block incidence. This receipt proves the two physical lanes still join at
-    /// every occurrence without making BF16 a native state type.
-    pub fn validate_section_reconstruction(&self) -> Result<(), ScaffoldLiftError> {
-        self.native.validate()?;
-        for excitation in &self.exterior.excitations {
-            let section = self
-                .native
-                .spools
-                .iter()
-                .flat_map(|spool| &spool.threads)
-                .flat_map(|thread| &thread.sections)
-                .find(|section| section.occurrence == excitation.event)
-                .ok_or(ScaffoldLiftError::Excitation)?;
-            if section.entering != factorize_bf16(&excitation.entering_codewords)?
-                || section.returned != factorize_bf16(&excitation.returned_codewords)?
-            {
-                return Err(ScaffoldLiftError::Excitation);
-            }
+/// Reconstruct every productive factorized section from the exact cold BF16 codeword lane.
+///
+/// The cold codewords remain source-codec testimony; the hot lane retains their exact decoded
+/// local values and block incidence. This receipt proves the two physical lanes still join at
+/// every occurrence without making BF16 a native state type.
+pub fn validate_bf16_section_reconstruction(
+    returned: &SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>,
+) -> Result<(), ScaffoldLiftError> {
+    returned.native.validate()?;
+    for excitation in &returned.exterior.excitations {
+        let section = returned
+            .native
+            .spools
+            .iter()
+            .flat_map(|spool| &spool.threads)
+            .flat_map(|thread| &thread.sections)
+            .find(|section| section.occurrence == excitation.event)
+            .ok_or(ScaffoldLiftError::Excitation)?;
+        if section.entering != factorize_bf16(&excitation.entering_codewords)?
+            || section.returned != factorize_bf16(&excitation.returned_codewords)?
+        {
+            return Err(ScaffoldLiftError::Excitation);
         }
-        Ok(())
     }
+    Ok(())
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -111,6 +81,20 @@ pub enum ScaffoldLiftError {
     Scaffold(#[from] NativeSpoolRefusal),
 }
 
+pub struct Bf16ExcitationDismantling {
+    pub receiver: ReceiverId,
+    pub excitations: Vec<ForeignBf16Excitation>,
+}
+
+impl SoulkillerDismantlingInput for Bf16ExcitationDismantling {
+    type ColdWitness = Bf16ExcitationColdWitness;
+    type Error = ScaffoldLiftError;
+
+    fn dismantle(self) -> Result<SoulkillerDismantlingReturn<Self::ColdWitness>, Self::Error> {
+        dismantle_bf16_excitations(self.receiver, self.excitations)
+    }
+}
+
 #[derive(Clone, Debug)]
 struct NativeExcitation {
     event: EventId,
@@ -123,10 +107,10 @@ struct NativeExcitation {
 
 const NATIVE_SECTION_BLOCK_WORDS: usize = 4096;
 
-pub fn lift_bf16_excitations(
+fn dismantle_bf16_excitations(
     receiver: ReceiverId,
     excitations: Vec<ForeignBf16Excitation>,
-) -> Result<MultimodalScaffoldLiftReturn, ScaffoldLiftError> {
+) -> Result<SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>, ScaffoldLiftError> {
     if excitations.is_empty() {
         return Err(ScaffoldLiftError::Excitation);
     }
@@ -353,7 +337,7 @@ pub fn lift_bf16_excitations(
         open_exterior: vec!["a richer receiver must return another excitation".to_owned()],
     };
     insufficiency.validate()?;
-    let returned = MultimodalScaffoldLiftReturn {
+    let returned = SoulkillerDismantlingReturn {
         native,
         exterior: Bf16ExcitationColdWitness {
             schema: "holonic-engine.bf16-excitation-cold-witness.v1".to_owned(),
@@ -362,7 +346,7 @@ pub fn lift_bf16_excitations(
         },
         insufficiency,
     };
-    returned.validate_section_reconstruction()?;
+    validate_bf16_section_reconstruction(&returned)?;
     Ok(returned)
 }
 
@@ -390,6 +374,16 @@ fn section_key(section: &NativeFactorizedSection) -> Vec<String> {
 mod tests {
     use super::*;
 
+    fn lift(
+        receiver: ReceiverId,
+        excitations: Vec<ForeignBf16Excitation>,
+    ) -> Result<SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>, ScaffoldLiftError> {
+        crate::soulkiller::dismantle(Bf16ExcitationDismantling {
+            receiver,
+            excitations,
+        })
+    }
+
     fn excitation(
         event: u64,
         modality: ExteriorModality,
@@ -412,7 +406,7 @@ mod tests {
 
     #[test]
     fn source_names_and_modalities_remain_cold_while_exact_currents_found_the_scaffold() {
-        let returned = lift_bf16_excitations(
+        let returned = lift(
             ReceiverId(7),
             vec![
                 excitation(1, ExteriorModality::Text, vec![0x3f80], vec![0x4000]),
@@ -443,7 +437,7 @@ mod tests {
 
     #[test]
     fn nonfinite_bf16_and_false_predecessor_join_are_refused() {
-        let nonfinite = lift_bf16_excitations(
+        let nonfinite = lift(
             ReceiverId(7),
             vec![excitation(
                 1,
@@ -455,7 +449,7 @@ mod tests {
         assert!(matches!(nonfinite, Err(ScaffoldLiftError::Codeword)));
         let mut later = excitation(2, ExteriorModality::Text, vec![0x4040], vec![0x4080]);
         later.predecessor = Some(EventId(1));
-        let false_join = lift_bf16_excitations(
+        let false_join = lift(
             ReceiverId(7),
             vec![
                 excitation(1, ExteriorModality::Text, vec![0x3f80], vec![0x4000]),
@@ -479,7 +473,7 @@ mod tests {
             vec![0x0000, 0x3f80, 0x3f80, 0x0000],
             vec![0x4040],
         );
-        let returned = lift_bf16_excitations(ReceiverId(7), vec![left, right]).expect("lift");
+        let returned = lift(ReceiverId(7), vec![left, right]).expect("lift");
         let left = &returned.native.spools[0].threads[0];
         let right = &returned.native.spools[0].threads[1];
         assert_eq!(
@@ -498,7 +492,7 @@ mod tests {
 
     #[test]
     fn exterior_occurrence_order_survives_without_event_resorting() {
-        let returned = lift_bf16_excitations(
+        let returned = lift(
             ReceiverId(7),
             vec![
                 excitation(20, ExteriorModality::Audio, vec![0x3f80], vec![0x4000]),

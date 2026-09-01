@@ -30,7 +30,7 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** MVF2
+**Current frontier:** MVF3
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
@@ -44,8 +44,9 @@ Lean jobs, all nine gates, pushed Git, and absent reproducible artifacts. Brando
 MVF0--MVF6 to replace the coarse section projection with a faithful local lift, unify Soulkiller,
 return reciprocal local cultivation, derive variant/package anatomy, add exact export lenses, and
 index evaluation by complete inference configuration. MVF0 returned its exact Lean foundation;
-MVF1 returned the faithful factorized lift and SCF evidence correction. MVF2 one neutral Soulkiller
-dismantling boundary is the sole next deed.
+MVF1 returned the faithful factorized lift and SCF evidence correction; MVF2 returned one neutral
+Soulkiller dismantling boundary. MVF3 reciprocal local causal-cone cultivation is the sole next
+deed.
 
 ## Claude-specific conduct
 

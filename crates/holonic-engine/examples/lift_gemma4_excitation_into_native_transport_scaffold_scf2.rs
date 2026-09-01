@@ -2,9 +2,11 @@ use std::{env, error::Error, path::PathBuf};
 
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
-        lift_bf16_excitations, profile_dismantling_return, read_complete_gemma4_excitation_receipt,
+        Bf16ExcitationDismantling, profile_dismantling_return,
+        read_complete_gemma4_excitation_receipt,
     },
     receiver_exact_compression::ReceiverId,
+    soulkiller::dismantle,
 };
 use serde_json::json;
 
@@ -20,7 +22,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         .into_iter()
         .flat_map(|family| family.excitations)
         .collect();
-    let returned = lift_bf16_excitations(ReceiverId(1), excitations)?;
+    let returned = dismantle(Bf16ExcitationDismantling {
+        receiver: ReceiverId(1),
+        excitations,
+    })?;
     let profile = profile_dismantling_return(&returned)?;
     let native_wire = returned.native.canonical_bytes()?;
     let native_text = String::from_utf8(native_wire.clone())?.to_ascii_lowercase();

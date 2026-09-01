@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF2.
+**Current frontier:** MVF3.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -236,7 +236,7 @@ occurrence-founded boundaries survive; non-temporal video remains open; and SCF 
 narrowed. A fresh actual lift retained 976,896 coordinates in 248 blocks. Its receipt is
 [`../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`](../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md).
 
-### MVF2 — one Soulkiller dismantling boundary — CURRENT
+### MVF2 — one Soulkiller dismantling boundary — PASSED
 
 [definition] Compose the generic reachable-section scrapyard and Gemma excitation path behind one
 architecture-neutral dismantling return. Delete duplicated lift policy. The returned type remains
@@ -246,7 +246,14 @@ productive native morphology, cold witness, and insufficiency; foreign execution
 charts differ; the hot rest cannot name or execute either source; and exact old source-owner tests
 continue through the unified path without compatibility aliases.
 
-### MVF3 — reciprocal local causal-cone cultivation
+[established-bounded; implemented-exact; source-inspected; measured] MVF2 passed. Generic
+reachable-section and faithful BF16 charts now enter `soulkiller::dismantle` through one input trait
+and one three-lane return. The duplicate public functions and return classes departed without
+aliases. Engine returned 2,006 passed with 32 ignored; life returned 468 passed with 14 ignored. Its
+receipt is
+[`../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md`](../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md).
+
+### MVF3 — reciprocal local causal-cone cultivation — CURRENT
 
 [definition] Replace the whole-population cultivated support control with an actual returned
 interaction whose delta is derived on the activated causal cone. Retain local and mutual

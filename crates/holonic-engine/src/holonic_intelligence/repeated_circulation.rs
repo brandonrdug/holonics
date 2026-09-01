@@ -255,9 +255,10 @@ mod tests {
 
     use crate::BoundaryId;
     use crate::native_ecology::holonic_intelligence::{
-        ExteriorModality, ForeignBf16Excitation, lift_bf16_excitations,
+        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
     };
     use crate::receiver_exact_compression::ReceiverId;
+    use crate::soulkiller::dismantle;
 
     use super::*;
 
@@ -283,14 +284,14 @@ mod tests {
 
     #[test]
     fn actual_successors_form_a_repeated_variable_grain_circulation() {
-        let returned = lift_bf16_excitations(
-            ReceiverId(7),
-            vec![
+        let returned = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![
                 excitation(1, None, 0x3f80, 0x4000),
                 excitation(2, Some(1), 0x4000, 0x4040),
                 excitation(3, Some(2), 0x4040, 0x4080),
             ],
-        )
+        })
         .expect("lift");
         let first = NativeInferenceRequest {
             address: NativeInferenceAddress {
@@ -343,9 +344,11 @@ mod tests {
 
     #[test]
     fn receiver_can_return_cultivation_without_a_length_or_surface_gate() {
-        let returned =
-            lift_bf16_excitations(ReceiverId(7), vec![excitation(1, None, 0x3f80, 0x4000)])
-                .expect("lift");
+        let returned = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![excitation(1, None, 0x3f80, 0x4000)],
+        })
+        .expect("lift");
         let first = NativeInferenceRequest {
             address: NativeInferenceAddress {
                 spool: returned.native.spools[0].address.clone(),
@@ -364,14 +367,14 @@ mod tests {
 
     #[test]
     fn a_plural_actual_successor_family_obstructs_without_selecting_a_surface_branch() {
-        let returned = lift_bf16_excitations(
-            ReceiverId(7),
-            vec![
+        let returned = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![
                 excitation(1, None, 0x3f80, 0x4000),
                 excitation(2, Some(1), 0x4000, 0x4040),
                 excitation(3, Some(1), 0x4000, 0x4080),
             ],
-        )
+        })
         .expect("branch lift");
         let first = NativeInferenceRequest {
             address: NativeInferenceAddress {

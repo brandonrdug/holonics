@@ -303,9 +303,10 @@ mod tests {
 
     use holonic_engine::{
         native_ecology::holonic_intelligence::{
-            lift_bf16_excitations, ExteriorModality, ForeignBf16Excitation,
+            Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
         },
         receiver_exact_compression::ReceiverId,
+        soulkiller::dismantle,
         BoundaryId, EventId,
     };
 
@@ -317,9 +318,9 @@ mod tests {
     #[test]
     fn dismantling_handoff_consumes_productive_scaffold_and_keeps_cold_testimony_outside_hot_rest()
     {
-        let returned = lift_bf16_excitations(
-            ReceiverId(7),
-            vec![ForeignBf16Excitation {
+        let returned = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![ForeignBf16Excitation {
                 event: EventId(1),
                 predecessor: None,
                 entering_boundary: BoundaryId(10),
@@ -331,7 +332,7 @@ mod tests {
                 interventions: BTreeSet::from(["cold/intervention".to_owned()]),
                 receiver_consequences: BTreeSet::from(["cold/consequence".to_owned()]),
             }],
-        )
+        })
         .expect("lift");
         let (hot, departed) = consume_dismantling_return(returned).expect("handoff");
         hot.validate().expect("hot rest");

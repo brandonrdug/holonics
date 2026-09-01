@@ -10,15 +10,16 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** MVF2
+**Current frontier:** MVF3
 
-**MVF2 — ONE ARCHITECTURE-NEUTRAL SOULKILLER DISMANTLING BOUNDARY — IS THE SOLE NEXT DEED.**
+**MVF3 — RECIPROCAL LOCAL CAUSAL-CONE CULTIVATION — IS THE SOLE NEXT DEED.**
 
-[definition] Compose the generic reachable-section scrapyard and faithful Gemma excitation lift
-behind one architecture-neutral dismantling return under
+[definition] Replace the whole-population returned-current cultivation control with an actual
+returned interaction whose morphology delta is supported on the activated causal cone under
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Only cold input charts may differ. The hot rest must be unable to name or execute either source,
-and duplicated lift policy must depart without compatibility aliases.
+Retain reciprocal local/mutual constitutive response, the actual emission/world return, causal
+adjoint, outside-cone equality, independent-region interchange, remount, targeted ablation, and
+exact restoration. Inactive morphology may not be traversed or materialized.
 
 ## Admitted standing
 
@@ -92,6 +93,11 @@ endpoint identity with complete exact factorized sections, retained exact cold r
 preserved supplied occurrence order, founded boundaries from occurrences, and left non-temporal
 video open. A fresh actual text/vision/audio lift retained 976,896 coordinates in 248 blocks; engine
 returned 2,005 passed with 32 ignored and life returned 468 passed with 14 ignored.
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF2 unified generic
+reachable-section and BF16 excitation charts behind `soulkiller::dismantle`, one input trait, and
+one generic three-lane return. Duplicate public functions/classes departed without aliases. Engine
+returned 2,006 passed with 32 ignored; life returned 468 passed with 14 ignored.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

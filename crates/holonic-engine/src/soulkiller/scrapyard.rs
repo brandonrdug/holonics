@@ -37,47 +37,12 @@ use crate::{
 };
 
 use super::{
+    SoulkillerDismantlingInput, SoulkillerDismantlingReturn,
     foreign_section_descent::ForeignReachableSectionRest,
     receiver_restricted_transport::{
         ExteriorNativeAnatomyWitness, ReceiverRestrictedFactorRefusal,
     },
 };
-
-/// The one-way boundary return. None of its members contains a callable exterior executor.
-#[derive(Debug, PartialEq, Eq)]
-pub struct SoulkillerScrapyardReturn {
-    pub native: NativeTransportScaffold,
-    pub exterior: ExteriorSoulkillerWitness,
-    pub insufficiency: ReceiverInsufficiency,
-}
-
-impl crate::native_ecology::holonic_intelligence::DismantlingBoundaryReturn
-    for SoulkillerScrapyardReturn
-{
-    type Productive = NativeTransportScaffold;
-    type ColdWitness = ExteriorSoulkillerWitness;
-    type Insufficiency = ReceiverInsufficiency;
-
-    fn productive(&self) -> &Self::Productive {
-        &self.native
-    }
-
-    fn cold_witness(&self) -> &Self::ColdWitness {
-        &self.exterior
-    }
-
-    fn insufficiency(&self) -> &Self::Insufficiency {
-        &self.insufficiency
-    }
-}
-
-impl crate::native_ecology::holonic_intelligence::IntoDismantlingBoundaryReturn
-    for SoulkillerScrapyardReturn
-{
-    fn into_lanes(self) -> (Self::Productive, Self::ColdWitness, Self::Insufficiency) {
-        (self.native, self.exterior, self.insufficiency)
-    }
-}
 
 #[derive(Debug, Error)]
 pub enum SoulkillerScrapyardRefusal {
@@ -95,6 +60,32 @@ pub enum SoulkillerScrapyardRefusal {
     AddressCollision,
 }
 
+/// The generic reachable-section chart admitted by the sole Soulkiller boundary.
+pub struct ReachableSectionDismantling<'a> {
+    pub section: &'a ForeignReachableSectionRest,
+    pub anatomy: &'a NativeAnatomyRest,
+    pub exterior_anatomy: &'a ExteriorNativeAnatomyWitness,
+    pub realization: ForeignRealizationTestimony,
+    pub execution: ForeignExecutionTestimony,
+    pub unexcited_capability: BTreeSet<String>,
+}
+
+impl SoulkillerDismantlingInput for ReachableSectionDismantling<'_> {
+    type ColdWitness = ExteriorSoulkillerWitness;
+    type Error = SoulkillerScrapyardRefusal;
+
+    fn dismantle(self) -> Result<SoulkillerDismantlingReturn<Self::ColdWitness>, Self::Error> {
+        dismantle_reachable_section(
+            self.section,
+            self.anatomy,
+            self.exterior_anatomy,
+            self.realization,
+            self.execution,
+            self.unexcited_capability,
+        )
+    }
+}
+
 /// The admitted terminal receiver address is derived from the exterior section identity, never
 /// from a source operator name, source width, operator factorization, or retained-state convention.
 pub fn admitted_receiver(section: &ForeignReachableSectionRest) -> ReceiverId {
@@ -110,14 +101,14 @@ pub fn admitted_receiver(section: &ForeignReachableSectionRest) -> ReceiverId {
 /// native anatomy class in the present bounded realization. They are plural occurrence populations,
 /// not authored layers. A richer or differently populated witness returns `Generator` instead of
 /// silently choosing representatives or padding a caller capacity.
-pub fn dismantle_reachable_section(
+fn dismantle_reachable_section(
     section: &ForeignReachableSectionRest,
     anatomy: &NativeAnatomyRest,
     exterior_anatomy: &ExteriorNativeAnatomyWitness,
     realization: ForeignRealizationTestimony,
     execution: ForeignExecutionTestimony,
     unexcited_capability: BTreeSet<String>,
-) -> Result<SoulkillerScrapyardReturn, SoulkillerScrapyardRefusal> {
+) -> Result<SoulkillerDismantlingReturn<ExteriorSoulkillerWitness>, SoulkillerScrapyardRefusal> {
     section
         .validate()
         .map_err(|error| SoulkillerScrapyardRefusal::Section(error.to_string()))?;
@@ -581,7 +572,7 @@ pub fn dismantle_reachable_section(
         open_exterior: vec!["the richer receiver reopens the retained occurrence fibre".to_owned()],
     };
     insufficiency.validate()?;
-    Ok(SoulkillerScrapyardReturn {
+    Ok(SoulkillerDismantlingReturn {
         native: scaffold,
         exterior,
         insufficiency,

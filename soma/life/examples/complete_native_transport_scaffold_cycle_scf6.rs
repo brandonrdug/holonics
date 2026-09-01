@@ -2,13 +2,14 @@ use std::{env, error::Error, path::PathBuf};
 
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
-        compare_contact_charts, conduct_repeated_inference, lift_bf16_excitations,
-        read_complete_gemma4_excitation_receipt, ContactEdge, ExteriorModality,
-        ForeignBf16Excitation, NativeContinuationDecision, NativeContinuationReceiver,
-        NativeCycleDisposition, NativeInferenceAddress, NativeInferenceRequest,
-        NativeVariableGrainEmission,
+        compare_contact_charts, conduct_repeated_inference,
+        read_complete_gemma4_excitation_receipt, Bf16ExcitationDismantling, ContactEdge,
+        ExteriorModality, ForeignBf16Excitation, NativeContinuationDecision,
+        NativeContinuationReceiver, NativeCycleDisposition, NativeInferenceAddress,
+        NativeInferenceRequest, NativeVariableGrainEmission,
     },
     receiver_exact_compression::{Observation, ReceiverId},
+    soulkiller::dismantle,
     EventId,
 };
 use life::native_intelligence::{
@@ -118,7 +119,10 @@ fn run(
         return Err("an SCF6 experiment requires an intervention-separated return".into());
     }
     let receiver = ReceiverId(100 + ordinal);
-    let lifted = lift_bf16_excitations(receiver, excitations.clone())?;
+    let lifted = dismantle(Bf16ExcitationDismantling {
+        receiver,
+        excitations: excitations.clone(),
+    })?;
     let native_wire = lifted.native.canonical_bytes()?;
     let native_text = String::from_utf8(native_wire.clone())?.to_ascii_lowercase();
     let cold_coordinates_absent = ["text", "image", "audio", "video", "source-sha256"]
@@ -130,7 +134,10 @@ fn run(
         excitation.source_occurrence = format!("renamed-cold-occurrence/{at}");
         excitation.exterior_modality = ExteriorModality::Text;
     }
-    let relabeled_native = lift_bf16_excitations(receiver, relabeled)?;
+    let relabeled_native = dismantle(Bf16ExcitationDismantling {
+        receiver,
+        excitations: relabeled,
+    })?;
     let cold_label_mutation_preserved_native_routing =
         relabeled_native.native.canonical_bytes()? == native_wire;
 

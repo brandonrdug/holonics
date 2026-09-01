@@ -340,9 +340,9 @@ no successor phase is scheduled.
 
 ## Active campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF2
+**Current frontier:** MVF3
 
-**MVF2 — ONE ARCHITECTURE-NEUTRAL SOULKILLER DISMANTLING BOUNDARY — IS THE SOLE NEXT DEED.**
+**MVF3 — RECIPROCAL LOCAL CAUSAL-CONE CULTIVATION — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -364,6 +364,12 @@ supplied occurrence order, founded boundaries from occurrences, left non-tempora
 narrowed SCF evidence. A fresh actual text/vision/audio lift retained 976,896 exact coordinates in
 248 blocks. Its receipt is
 [`research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`](../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF2 returned one public
+Soulkiller dismantling boundary over generic reachable-section and faithful BF16 input charts. Only
+their cold witness types differ; duplicate public functions and return classes departed without
+aliases. Its receipt is
+[`research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md`](../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md).
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a
