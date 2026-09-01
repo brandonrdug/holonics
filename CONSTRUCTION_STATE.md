@@ -4,19 +4,16 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after Brandon founded the Native Transport Scaffold and repeated
-circulation campaign. CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded
-R0Q0--R0Q4 mechanisms retain their grades.
+**Currency:** 2026-09-01, after SCF0--SCF6 completed. CONS0--CONS5, QLT1--QLT6, CDB1,
+HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their grades.
 
 ## Current frontier
 
-**Current frontier:** SCF6
+**Current frontier:** NONE
 
-**SCF6 — COHERENT COMPARATIVE EXPERIMENT AND EXACT RELEASE — IS THE SOLE NEXT DEED.**
+**SCF0--SCF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
-[definition] Close the five returned multimodal experiments through the complete repository
-release, push the exact identity, and remove reproducible build/experiment artifacts. Generated
-surfaces remain probes and contact charts remain exterior receivers. The complete contract is
+[definition] A later construction deed requires a new direct request. The completed SCF contract is
 [`blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 
 ## Admitted standing
@@ -63,8 +60,11 @@ native wire unchanged, all five source-detached consequences survived, and forei
 autoregressive/KV, fixed-window, periodic, recurrent, and current-founded charts remained exterior
 receiver comparisons.
 
-[open; process-audit] SCF6 remains current only for the coherent repository gates, pushed clean
-identity, and removal of reproducible `target/` and experiment output.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+SCF6 passed. The coherent release returned 2,931 tests passed, zero failed, and 50 ignored over 29
+result lines; every example type-checked; the Lean umbrella built 3,769 jobs; and all nine release
+gates passed. Commit `d49c55c1` is pushed. The 33 GiB reproducible `target/` tree, root `output/`,
+and temporary actual-experiment return are absent. No successor phase was invented.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built
@@ -197,7 +197,7 @@ drivers, and records remain evidence only.
 7. HIF6 — resident and source-neutral closure; and
 8. HIF7 — exact contact/interoperability framework release.
 
-[definition] The active scaffold campaign order is SCF0 formal foundation, SCF1 Rust owner
+[definition] The completed scaffold campaign order is SCF0 formal foundation, SCF1 Rust owner
 migration, SCF2 exact Gemma multimodal lift, SCF3 productive Athena handoff, SCF4 repeated
 circulation, SCF5 native condensation/scaffold withdrawal, and SCF6 comparative experiment/release.
 

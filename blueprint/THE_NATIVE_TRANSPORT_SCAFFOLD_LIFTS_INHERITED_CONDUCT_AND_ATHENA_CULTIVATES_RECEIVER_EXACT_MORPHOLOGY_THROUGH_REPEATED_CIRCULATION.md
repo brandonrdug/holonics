@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** SCF6.
+**Current frontier:** NONE.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -239,7 +239,7 @@ the final hot body retains only cultivated morphology beside a departed reconstr
 receipt is
 [`../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md`](../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md).
 
-### SCF6 — comparative experiment and exact release — CURRENT
+### SCF6 — comparative experiment and exact release — PASSED
 
 [definition] Run text-to-text, image-to-text, audio-to-text, sampled-video-to-text, and interleaved
 multimodal experiments through the same public cycle. Compare foreign autoregression/KV, fixed
@@ -253,8 +253,11 @@ fixed, periodic, recurrent, and current-founded contact charts remained exterior
 experiment receipt is
 [`../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md`](../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md).
 
-[open; process-audit] Only the coherent repository release, pushed clean identity, and reproducible
-output removal remain before SCF6 passes.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+SCF6 passed. The coherent release returned 2,931 tests passed, zero failed, and 50 ignored; every
+example type-checked; the Lean umbrella built 3,769 jobs; and all nine release gates passed. Commit
+`d49c55c1` is pushed, the 33 GiB reproducible `target/` tree and experiment output are absent, and
+no successor phase was invented.
 
 **Pass SCF6:** [definition] exact manifest/lift/handoff/circulation/cultivation/withdrawal receipts
 return; the experiment family changes no native routing law; no foreign executor or cold witness is

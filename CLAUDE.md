@@ -30,7 +30,7 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** SCF6
+**Current frontier:** NONE
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
@@ -39,8 +39,9 @@ scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bound
 [definition] SCF0--SCF5 returned the formal laws, neutral scaffold migration, complete actual Gemma
 multimodal lift, move-owned hot handoff, repeated actual-successor circulation, returned-current
 cultivation, source-detached remount, inherited-scaffold withdrawal, attributable ablation, and
-exact restoration. SCF6's five experiments have returned; only the coherent pushed release and
-reproducible-artifact removal remain. The roadmap and construction state own the exact position.
+exact restoration. SCF6 returned all five experiments and the coherent release: 2,931 tests, 3,769
+Lean jobs, all nine gates, pushed Git, and absent reproducible artifacts. No successor deed is
+scheduled. The roadmap and construction state own the exact position.
 
 ## Claude-specific conduct
 

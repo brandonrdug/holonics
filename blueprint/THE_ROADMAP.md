@@ -269,11 +269,11 @@ counterexample to parser-derived lexical lookup; it schedules no replacement inf
 forensic audit and exact HIF7 release receipt are in
 [`research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
 
-## Active campaign — Native Transport Scaffold and repeated circulation
+## Completed campaign — Native Transport Scaffold and repeated circulation
 
-**Current frontier:** SCF6
+**Current frontier:** NONE
 
-**SCF6 — COHERENT COMPARATIVE EXPERIMENT AND EXACT RELEASE — IS THE SOLE NEXT DEED.**
+**SCF0--SCF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `SCF0--SCF6` campaign
 under
@@ -283,7 +283,7 @@ SCF0 returned the neutral formal laws. SCF1 replaced the whole-object Rust vocab
 compatibility decoder. SCF2 returned complete actual Gemma excitation and a source-neutral lift;
 SCF3 moved that productive lane into one hot rest; SCF4 returned repeated actual-successor
 circulation; and SCF5 returned source-detached cultivation and inherited-scaffold withdrawal.
-SCF6 has returned all five actual experiments and now closes on the coherent pushed release.
+SCF6 returned all five actual experiments and the coherent pushed release.
 
 [proved-derived; formal-checked; measured] SCF0 passed. The live umbrella built 3,769 jobs; document
 law, epistemic tags, and source shape remained green. Its exact receipt is
@@ -320,8 +320,11 @@ source-detached body retained one cultivated thread; and all five exterior conta
 complete fibres and richer reopenings. Its experiment receipt is
 [`research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md`](../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md).
 
-[open; process-audit] SCF6 remains current only for the coherent repository release, pushed clean
-identity, and removal of reproducible `target/` and experiment output.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+SCF6 passed. The coherent release returned 2,931 tests passed, zero failed, and 50 ignored; every
+example type-checked; the Lean umbrella built 3,769 jobs; and all nine release gates passed. Commit
+`d49c55c1` is pushed, the 33 GiB reproducible `target/` tree and experiment output are absent, and
+no successor phase is scheduled.
 
 [definition] The complete order is:
 

@@ -25,4 +25,7 @@ cultivation. Generated media/text surfaces remained probes and supplied no gate.
 
 [established-bounded; implemented-exact; measured] Focused Rust suites returned 2,001 engine tests
 passed with 32 ignored and 468 life tests passed with 14 ignored. The coherent release receipts and
-remaining repository-wide gate results are recorded in the live construction authorities.
+repository-wide release returned 2,931 tests passed, zero failed, and 50 ignored over 29 result
+lines; every example type-checked; the Lean umbrella built 3,769 jobs; and all nine gates passed.
+Commit `d49c55c1` was pushed before the terminal authority return. The 33 GiB reproducible
+`target/`, root `output/`, and temporary actual-experiment return were removed.
