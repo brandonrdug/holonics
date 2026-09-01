@@ -389,6 +389,16 @@ returns, and explicit receiver/cultivation/world refusals. Official Safetensors 
 artifact; ONNX IR/domain/opset testimony passed the lossless parser. Its receipt is
 [`research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md`](../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md).
 
+[established-bounded; implemented-exact; source-inspected; measured] MVF6's matched proposition
+returned five complete configurations with preserved chronology, local cultivation, disjoint
+invariance, source-detached hot conduct, and non-routing surface probes. All ten cross-configuration
+receiver/history pairs remained separated; no qualitative or perfect-resonance claim was promoted.
+Its experiment receipt is
+[`research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md`](../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md).
+
+[open; process-audit] MVF6 remains current only for the coherent release, terminal authority
+return, pushed clean identity, and reproducible-artifact removal.
+
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a
 proved receiver-exact reconstruction of foreign tensor incidence. Nominal modality boundaries,

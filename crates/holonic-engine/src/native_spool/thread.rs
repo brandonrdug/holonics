@@ -11,6 +11,8 @@ use super::refusal::NativeSpoolRefusal;
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use num_bigint::BigInt;
+use num_traits::Zero;
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 
@@ -205,17 +207,34 @@ impl NativeOccurrenceSection {
 }
 
 fn section_current(values: &[Rat]) -> ExactComplexWaveCurrent {
-    let zero = Rat::from_integer(0.into());
-    let mut real = zero.clone();
-    let mut imaginary = zero;
-    for (coordinate, value) in values.iter().enumerate() {
-        if coordinate % 2 == 0 {
-            real += value;
-        } else {
-            imaginary += value;
-        }
+    ExactComplexWaveCurrent::new(coordinate_sum(values, 0), coordinate_sum(values, 1))
+}
+
+/// Sum one alternating coordinate family with one normalization rather than normalizing a growing
+/// rational after every term. BF16 values are dyadic, so their greatest denominator is a common
+/// denominator; arbitrary non-nested rational denominators fall back to the general exact sum.
+fn coordinate_sum(values: &[Rat], parity: usize) -> Rat {
+    let family = values
+        .iter()
+        .enumerate()
+        .filter_map(|(coordinate, value)| (coordinate % 2 == parity).then_some(value))
+        .collect::<Vec<_>>();
+    let Some(common) = family.iter().map(|value| value.denom()).max().cloned() else {
+        return Rat::from_integer(BigInt::zero());
+    };
+    if family
+        .iter()
+        .all(|value| (&common % value.denom()).is_zero())
+    {
+        let numerator = family.iter().fold(BigInt::zero(), |sum, value| {
+            sum + value.numer() * (&common / value.denom())
+        });
+        Rat::new(numerator, common)
+    } else {
+        family
+            .into_iter()
+            .fold(Rat::from_integer(BigInt::zero()), |sum, value| sum + value)
     }
-    ExactComplexWaveCurrent::new(real, imaginary)
 }
 
 /// One receiver-indexed constitutive response.  The relation is retained as an exact presented

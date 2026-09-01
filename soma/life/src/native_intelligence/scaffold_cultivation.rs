@@ -18,9 +18,9 @@ use holonic_engine::{
         NativeMutualConstitutiveResponse, NativeOccurrenceSection, NativeOrderedConsequence,
         NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
         NativeSerialPullback, NativeSituatedThreadWithdrawal, NativeThread, NativeThreadDeposit,
-        NativeThreadDepositReceipt, NativeThreadHand, NativeThreadOccurrence,
-        NativeTransportScaffold, SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA,
-        NATIVE_THREAD_SCHEMA,
+        NativeThreadDepositReceipt, NativeThreadHand, NativeThreadObstruction,
+        NativeThreadOccurrence, NativeTransportScaffold, SituatedNativeTransportScaffold,
+        NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
     receiver_exact_compression::{InputId, Observation},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -343,7 +343,7 @@ impl ScaffoldCultivatedRest {
 fn outside_cone_threads(
     ecology: &NativeTransportScaffold,
     causal_cone: &BTreeSet<NativeStateId>,
-) -> Result<Vec<(String, String, Vec<u8>)>, ScaffoldCultivationError> {
+) -> Result<Vec<OutsideThreadSnapshot>, ScaffoldCultivationError> {
     let mut faces = ecology
         .spools
         .iter()
@@ -352,15 +352,59 @@ fn outside_cone_threads(
                 .threads
                 .iter()
                 .filter(|thread| thread.native_support.is_disjoint(causal_cone))
-                .map(move |thread| {
-                    serde_json::to_vec(thread)
-                        .map(|wire| (spool.address.clone(), thread.address.clone(), wire))
-                        .map_err(|error| ScaffoldCultivationError::Ecology(error.to_string()))
-                })
+                .map(move |thread| OutsideThreadSnapshot::from_thread(&spool.address, thread))
         })
-        .collect::<Result<Vec<_>, _>>()?;
-    faces.sort_by(|left, right| (&left.0, &left.1).cmp(&(&right.0, &right.1)));
+        .collect::<Vec<_>>();
+    faces.sort_by(|left, right| {
+        (&left.spool_address, &left.thread_address)
+            .cmp(&(&right.spool_address, &right.thread_address))
+    });
     Ok(faces)
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct OutsideThreadSnapshot {
+    spool_address: String,
+    thread_address: String,
+    entering_boundary: BoundaryId,
+    emitting_boundary: BoundaryId,
+    entering_carrier: String,
+    emitting_carrier: String,
+    occurrences: Vec<NativeThreadOccurrence>,
+    native_support: BTreeSet<NativeStateId>,
+    incidence: Vec<NativeIncidenceTerm>,
+    parametrons: Vec<NativeParametronCell>,
+    sections: Vec<NativeOccurrenceSection>,
+    constitutive_responses: Vec<NativeConstitutiveResponse>,
+    chronology: Vec<InputId>,
+    receiver_consequences: Vec<NativeReceiverConsequence>,
+    obstruction: Option<NativeThreadObstruction>,
+    open_exterior: Vec<String>,
+    reconstruction_fibre: BTreeSet<EventId>,
+}
+
+impl OutsideThreadSnapshot {
+    fn from_thread(spool_address: &str, thread: &NativeThread) -> Self {
+        Self {
+            spool_address: spool_address.to_owned(),
+            thread_address: thread.address.clone(),
+            entering_boundary: thread.entering_boundary,
+            emitting_boundary: thread.emitting_boundary,
+            entering_carrier: thread.entering_carrier.clone(),
+            emitting_carrier: thread.emitting_carrier.clone(),
+            occurrences: thread.occurrences.clone(),
+            native_support: thread.native_support.clone(),
+            incidence: thread.incidence.clone(),
+            parametrons: thread.parametrons.clone(),
+            sections: thread.sections.clone(),
+            constitutive_responses: thread.constitutive_responses.clone(),
+            chronology: thread.chronology.clone(),
+            receiver_consequences: thread.receiver_consequences.clone(),
+            obstruction: thread.obstruction.clone(),
+            open_exterior: thread.open_exterior.clone(),
+            reconstruction_fibre: thread.reconstruction_fibre.clone(),
+        }
+    }
 }
 
 fn returned_current_deposit(

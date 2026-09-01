@@ -137,6 +137,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md` | **The mathematics codec recovers the operation complex, and every result returns as a receiver face** — **Doctrine:** TABLET_THE_OPERATIONS.md, TABLET_THE_CIRCULATING_CARTOGRAPHER.md,… |
 | `blueprint/THE_METHOD_ATLAS.md` | **The method atlas** — This one covers the atlas itself. |
 | `blueprint/THE_NATIVE_MATHEMATICAL_CONSEQUENCE_PRECEDES_EVERY_CODEC.md` | **The native mathematical consequence precedes every codec** — **Scope:** [definition] This enacted contract keeps every language and checker face downstream of one already-returned native mathematical consequence. |
+| `blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md` | **The native morphology variant foundation returns faithful local lifts, parented cultivation,** — **Governing doctrine:** `../canon/TABLET_THE_HEXIS.md`, `../canon/TABLET_THE_REASONING_CYCLE.md`,… |
 | `blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md` | **The native transport scaffold lifts inherited conduct and Athena cultivates receiver-exact** — **Governing doctrine:** `../canon/TABLET_THE_REASONING_CYCLE.md`, `../canon/TABLET_THE_HEXIS.md`,… |
 | `blueprint/THE_ONE_ATHENA_MEMBRANE_TRANSDUCES_ARBITRARY_CURRENT_AND_INFERRED_RESPONSE_RETURNS_AS_DURABLE_MORPHOLOGY.md` | **The one Athena membrane transduces arbitrary current and inferred response returns as durable morphology** — **Binding MEM6 correction:**… |
 | `blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md` | **SUPERSEDED — The Phoenix rebirth lifts inherited hexis and returns a native executable ecology** — **Truth status:** construction contract. |
@@ -152,7 +153,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 753)
+## 4 · The 2026-08 record line (450 deposits of 760)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:

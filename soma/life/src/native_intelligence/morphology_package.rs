@@ -590,6 +590,13 @@ fn anatomy_projection(
     })
 }
 
+pub fn derive_morphology_anatomy(
+    hot: &RestedMorphology,
+) -> Result<MorphologyAnatomyManifest, MorphologyPackageError> {
+    hot.validate()?;
+    anatomy_projection(hot)
+}
+
 fn greatest_local_valence(threads: &[&NativeThread]) -> usize {
     let mut valence = BTreeMap::new();
     for term in threads.iter().flat_map(|thread| &thread.incidence) {

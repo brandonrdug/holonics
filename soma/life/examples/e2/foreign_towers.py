@@ -81,7 +81,78 @@ def profiler_events(session: profile) -> int:
     return sum(1 for event in session.events() if str(event.device_type).endswith("CUDA"))
 
 
-def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config, container: safe_open) -> dict:
+def conduct_vision_section(
+    model: Gemma4VisionModel,
+    projection: torch.Tensor,
+    pixels: np.ndarray,
+    output: Path,
+    prefix: str,
+    config: Gemma4Config,
+) -> dict:
+    if pixels.shape != (144, 144, 3):
+        raise RuntimeError(f"{prefix} is not one exact 144x144 RGB occurrence")
+    raw_pixels = torch.from_numpy(pixels.copy()).to(device="cuda")
+    channels = raw_pixels.permute(2, 0, 1)
+    patches = (
+        channels.reshape(3, 9, 16, 9, 16)
+        .permute(1, 3, 2, 4, 0)
+        .reshape(1, 81, 768)
+        .to(torch.bfloat16)
+        / 255
+    )
+    positions = torch.stack(
+        torch.meshgrid(
+            torch.arange(9, device="cuda"),
+            torch.arange(9, device="cuda"),
+            indexing="xy",
+        ),
+        dim=-1,
+    ).reshape(1, 81, 2)
+    layers: list[torch.Tensor] = []
+    hooks = [
+        layer.register_forward_hook(
+            lambda _m, _i, value, sink=layers: sink.append(value)
+        )
+        for layer in model.encoder.layers
+    ]
+    with torch.inference_mode(), profile(
+        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]
+    ) as prof:
+        tower = model(pixel_values=patches, pixel_position_ids=positions).last_hidden_state
+        projected = project_without_gain(
+            tower, projection, config.vision_config.rms_norm_eps
+        )
+    for hook in hooks:
+        hook.remove()
+    torch.cuda.synchronize()
+    entering = bf16_bytes(layers[0])
+    entering_name = f"{prefix}-entering.bf16"
+    (output / entering_name).write_bytes(entering)
+    final = bf16_bytes(projected)
+    final_name = f"{prefix}-text-space.bf16"
+    (output / final_name).write_bytes(final)
+    return {
+        "patch_shape": [81, 768],
+        "tower_shape": list(tower.shape),
+        "text_space_shape": list(projected.shape),
+        "layer_frontier_sha256": [sha(bf16_bytes(value)) for value in layers],
+        "complete_layer_count": len(layers),
+        "entering_bf16": entering_name,
+        "entering_sha256": sha(entering),
+        "returned_bf16": final_name,
+        "returned_sha256": sha(final),
+        "cuda_kernel_events": profiler_events(prof),
+    }
+
+
+def run_vision(
+    root: Path,
+    image_path: Path,
+    video_frames: list[Path],
+    output: Path,
+    config: Gemma4Config,
+    container: safe_open,
+) -> tuple[dict, dict]:
     model = Gemma4VisionModel(config.vision_config)
     tensor_count = load_prefixed(model, container, VISION_PREFIX)
     projection = container.get_tensor(VISION_PROJECTION).to(device="cuda", dtype=torch.bfloat16)
@@ -96,36 +167,9 @@ def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config,
     began = time.perf_counter_ns()
     for occurrence_at, (left, top) in enumerate(crops):
         crop = raw[top : top + 144, left : left + 144]
-        if crop.shape != (144, 144, 3):
-            raise RuntimeError(f"vision restriction {occurrence_at} left the raw page")
-        raw_crop = torch.from_numpy(crop.copy()).to(device="cuda")
-        channels = raw_crop.permute(2, 0, 1)
-        patches = (
-            channels.reshape(3, 9, 16, 9, 16)
-            .permute(1, 3, 2, 4, 0)
-            .reshape(1, 81, 768)
-            .to(torch.bfloat16)
-            / 255
+        section = conduct_vision_section(
+            model, projection, crop, output, f"vision-{occurrence_at}", config
         )
-        positions = torch.stack(
-            torch.meshgrid(torch.arange(9, device="cuda"), torch.arange(9, device="cuda"), indexing="xy"),
-            dim=-1,
-        ).reshape(1, 81, 2)
-        layers: list[torch.Tensor] = []
-        hooks = [layer.register_forward_hook(lambda _m, _i, value, sink=layers: sink.append(value)) for layer in model.encoder.layers]
-        with torch.inference_mode(), profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
-            tower = model(pixel_values=patches, pixel_position_ids=positions).last_hidden_state
-            projected = project_without_gain(tower, projection, config.vision_config.rms_norm_eps)
-        for hook in hooks:
-            hook.remove()
-        torch.cuda.synchronize()
-        layer_hashes = [sha(bf16_bytes(value)) for value in layers]
-        entering = bf16_bytes(layers[0])
-        entering_name = f"vision-{occurrence_at}-entering.bf16"
-        (output / entering_name).write_bytes(entering)
-        final = bf16_bytes(projected)
-        final_name = f"vision-{occurrence_at}-text-space.bf16"
-        (output / final_name).write_bytes(final)
         crop_bytes = crop.tobytes()
         returns.append(
             {
@@ -140,20 +184,31 @@ def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config,
                     + crop_bytes
                 ),
                 "crop": [left, top, 144, 144],
-                "patch_shape": [81, 768],
-                "tower_shape": list(tower.shape),
-                "text_space_shape": list(projected.shape),
-                "layer_frontier_sha256": layer_hashes,
-                "complete_layer_count": len(layer_hashes),
-                "entering_bf16": entering_name,
-                "entering_sha256": sha(entering),
-                "returned_bf16": final_name,
-                "returned_sha256": sha(final),
-                "cuda_kernel_events": profiler_events(prof),
+                **section,
+            }
+        )
+    frame_returns = []
+    for frame_ordinal, frame_path in enumerate(video_frames):
+        pixels = np.asarray(Image.open(frame_path).convert("RGB"), dtype=np.uint8)
+        section = conduct_vision_section(
+            model, projection, pixels, output, f"video-{frame_ordinal}", config
+        )
+        pixel_bytes = pixels.tobytes()
+        frame_returns.append(
+            {
+                "family": 0,
+                "state": frame_ordinal,
+                "frame_ordinal": frame_ordinal,
+                "occurrence": f"{frame_path}#frame({frame_ordinal})",
+                "source_sha256": sha(pixel_bytes),
+                "source_incidence_sha256": sha(
+                    frame_ordinal.to_bytes(4, "little") + pixel_bytes
+                ),
+                **section,
             }
         )
     elapsed = time.perf_counter_ns() - began
-    receipt = {
+    vision_receipt = {
         "organ": "inherited-organ-at-nominal-boundary",
         "source_lineage": "Gemma4VisionModel",
         "tensor_count": tensor_count,
@@ -163,10 +218,21 @@ def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config,
         "elapsed_nanoseconds": elapsed,
         "returns": returns,
     }
+    video_receipt = {
+        "organ": "temporally-ordered-video-through-inherited-vision-organ",
+        "source_lineage": "Gemma4VisionModel",
+        "tensor_count": tensor_count,
+        "complete_layer_count": len(model.encoder.layers),
+        "temporal_frame_lineage": True,
+        "sampled_frame_count": len(frame_returns),
+        "processor_frame_aperture": 32,
+        "returns": frame_returns,
+        "frame_returns": frame_returns,
+    }
     del model, projection
     gc.collect()
     torch.cuda.empty_cache()
-    return receipt
+    return vision_receipt, video_receipt
 
 
 def raw_pcm(path: Path) -> tuple[np.ndarray, int]:
@@ -264,14 +330,14 @@ def run_audio(root: Path, audio_paths: list[Path], output: Path, config: Gemma4C
     return receipt
 
 
-def run_text(root: Path, output: Path, container: safe_open) -> dict:
+def run_text(root: Path, proposition: str, output: Path, container: safe_open) -> dict:
     """Run two intervention-separated text occurrences through all 42 decoder layers on CPU.
 
     E4B's per-layer embedding table cannot coexist with the full body on the 16 GiB card. CPU
     placement is exterior apparatus testimony; the same BF16 weights and model law are used, KV
     caching is disabled, and every layer frontier is returned.
     """
-    prompts = ["The scaffold channels current.", "The scaffold releases current."]
+    prompts = [proposition, f"{proposition} Returned under a second exterior occurrence."]
     model = AutoModelForMultimodalLM.from_pretrained(
         root,
         dtype=torch.bfloat16,
@@ -346,31 +412,12 @@ def run_text(root: Path, output: Path, container: safe_open) -> dict:
     return receipt
 
 
-def video_from_vision(vision: dict) -> dict:
-    """Read the four ordered vision restrictions as four sampled video frames.
-
-    Gemma 4 owns no separate video tower. The processor's larger frame aperture remains open; the
-    admitted occurrence is exactly the four frames actually conducted through the vision tower.
-    """
-    frame_hashes = [returned["returned_sha256"] for returned in vision["returns"]]
-    return {
-        "organ": "sampled-video-through-inherited-vision-organ",
-        "temporal_frame_lineage": False,
-        "source_lineage": "Gemma4VisionModel",
-        "tensor_count": vision["tensor_count"],
-        "complete_layer_count": vision["complete_layer_count"],
-        "sampled_frame_count": len(frame_hashes),
-        "processor_frame_aperture": 32,
-        "ordered_frame_return_sha256": frame_hashes,
-        "returned_sha256": sha("".join(frame_hashes).encode()),
-        "frame_returns": vision["returns"],
-    }
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--proposition", required=True)
     parser.add_argument("--image", type=Path, required=True)
+    parser.add_argument("--video-frame", type=Path, nargs=4, required=True)
     parser.add_argument("--audio", type=Path, nargs=4, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -381,10 +428,11 @@ def main() -> None:
     torch.set_grad_enabled(False)
     config = Gemma4Config.from_pretrained(args.model)
     container = safe_open(args.model / "model.safetensors", framework="pt", device="cpu")
-    vision = run_vision(args.model, args.image, args.output, config, container)
+    vision, video = run_vision(
+        args.model, args.image, args.video_frame, args.output, config, container
+    )
     audio = run_audio(args.model, args.audio, args.output, config, container)
-    text = run_text(args.model, args.output, container)
-    video = video_from_vision(vision)
+    text = run_text(args.model, args.proposition, args.output, container)
     receipt = {
         "schema": "holonics.scf2.complete-gemma4-excitation.v2",
         "truth_status": "implemented-exact-source-binding; measured-foreign-bfloat16-conduct",

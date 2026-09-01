@@ -321,6 +321,16 @@ repetition and cross-config comparison remain distinct; cross-codec equivalence 
 where every declared receiver/history commutes; the package and export controls pass; the complete
 release passes; Git is clean and pushed; and reproducible outputs are absent.
 
+[established-bounded; implemented-exact; source-inspected; measured] The actual matched-proposition
+matrix returned text, rendered-image, spoken-audio, true temporal-video, and mixed chronological
+configurations. Every supplied occurrence order survived; every local cultivation preserved its
+disjoint exterior; and all ten cross-configuration receiver/history pairs remained separated.
+Surfaces routed nothing and were not graded. Its experiment receipt is
+[`../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md`](../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md).
+
+[open; process-audit] MVF6 remains current only for the complete release receiver, terminal
+authority return, pushed clean identity, and reproducible artifact removal.
+
 ## 8. Scope and process boundary
 
 [definition] MVF schedules only the seven phases above. It does not reopen UAR, HIF, R0Q,

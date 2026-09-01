@@ -21,6 +21,7 @@ mod membrane_interior;
 mod membrane_optical;
 mod membrane_radiation;
 mod membrane_transport;
+mod morphology_evaluation;
 mod morphology_export;
 mod morphology_package;
 mod native_factor_deposit;
@@ -163,6 +164,10 @@ pub use membrane_transport::{
     NativeCausalMembrane, NativeMembraneBindingInsufficiency, NativeMembraneDefect,
     NativeMembraneInsufficiency, ReturnedMembraneDifference, MEMBRANE_CROSSING_SCHEMA,
 };
+pub use morphology_evaluation::{
+    evaluate_morphology_configuration, MorphologyEvaluationError, MorphologyExperimentInput,
+    MorphologyExperimentReceipt, StableMorphologyExperimentConsequence,
+};
 pub use morphology_export::{
     export_morphology, import_exact_export, project_common_anatomy, ConfigurationSeparator,
     ExactMorphologyExport, ExportPurpose, MorphologyExportArtifact, MorphologyExportError,
@@ -170,10 +175,10 @@ pub use morphology_export::{
     ProjectedMorphologyExport,
 };
 pub use morphology_package::{
-    ApparatusRealization, ConfigurationEvaluationReceipt, ExportCodecKind, ExportRealization,
-    InferenceConfigurationAddress, MorphologyAnatomyManifest, MorphologyLineage,
-    MorphologyPackageError, MorphologyReconstructionLane, MorphologyVariantManifest,
-    MorphologyWireSchemas, NativeMorphologyPackage, RealizationManifest,
+    derive_morphology_anatomy, ApparatusRealization, ConfigurationEvaluationReceipt,
+    ExportCodecKind, ExportRealization, InferenceConfigurationAddress, MorphologyAnatomyManifest,
+    MorphologyLineage, MorphologyPackageError, MorphologyReconstructionLane,
+    MorphologyVariantManifest, MorphologyWireSchemas, NativeMorphologyPackage, RealizationManifest,
     ReceiverCapabilityManifest, RestedMorphology, NATIVE_MORPHOLOGY_PACKAGE_SCHEMA,
 };
 pub use native_factor_deposit::{

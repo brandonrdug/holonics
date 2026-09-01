@@ -118,6 +118,16 @@ configuration, and explicit refusal of unsupported receiver/cultivation/world ex
 Safetensors 0.7.0 opened the artifact; ONNX IR 14 and `org.holonics` opset 1 passed the lossless
 parser. Life returns 476 passed with 14 ignored.
 
+[established-bounded; implemented-exact; source-inspected; measured] MVF6's matched proposition
+returned text, rendered-image, spoken-audio, four-frame temporal-video, and mixed chronological
+configurations. Every occurrence order survived; structural termination and returned-interaction
+cultivation each used one cut; each local cone preserved disjoint morphology and released one hot
+thread; surfaces were non-routing probes; and all ten cross-configuration receiver/history pairs
+remained separated. No qualitative or perfect-resonance grade was claimed.
+
+[open; process-audit] MVF6 remains current only for the complete release receiver, terminal
+authority return, pushed clean identity, and reproducible `target/`/experiment-output removal.
+
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built
 3,769 jobs and all eight non-test release receivers passed. These checks advance no SCF2 capability
