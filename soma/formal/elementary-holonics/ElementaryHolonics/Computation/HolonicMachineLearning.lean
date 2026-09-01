@@ -11,6 +11,7 @@ import ElementaryHolonics.Computation.HolonicArchitectureCharts
 import ElementaryHolonics.Computation.HolonicDiffusionCharts
 import ElementaryHolonics.Computation.HolonicCultivationCharts
 import ElementaryHolonics.Computation.HolonicIntelligenceFramework
+import ElementaryHolonics.Computation.NativeMorphologyVariant
 
 /-!
 # Formal holonic machine-learning closure

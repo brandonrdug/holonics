@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** NONE.
+**Terminal frontier:** NONE.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),

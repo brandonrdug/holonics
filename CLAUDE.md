@@ -30,7 +30,7 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** NONE
+**Current frontier:** MVF1
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
@@ -40,8 +40,11 @@ scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bound
 multimodal lift, move-owned hot handoff, repeated actual-successor circulation, returned-current
 cultivation, source-detached remount, inherited-scaffold withdrawal, attributable ablation, and
 exact restoration. SCF6 returned all five experiments and the coherent release: 2,931 tests, 3,769
-Lean jobs, all nine gates, pushed Git, and absent reproducible artifacts. No successor deed is
-scheduled. The roadmap and construction state own the exact position.
+Lean jobs, all nine gates, pushed Git, and absent reproducible artifacts. Brandon then founded
+MVF0--MVF6 to replace the coarse section projection with a faithful local lift, unify Soulkiller,
+return reciprocal local cultivation, derive variant/package anatomy, add exact export lenses, and
+index evaluation by complete inference configuration. MVF0 returned its exact Lean foundation;
+MVF1 faithful factorized lift and SCF evidence correction is the sole next deed.
 
 ## Claude-specific conduct
 

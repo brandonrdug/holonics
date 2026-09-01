@@ -4,17 +4,21 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after SCF0--SCF6 completed. CONS0--CONS5, QLT1--QLT6, CDB1,
-HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their grades.
+**Currency:** 2026-09-01, after Brandon founded the Native Morphology Variant Foundation.
+SCF0--SCF6, CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4
+mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** NONE
+**Current frontier:** MVF1
 
-**SCF0--SCF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
+**MVF1 — FAITHFUL FACTORIZED GEMMA SECTION LIFT AND SCF EVIDENCE CORRECTION — IS THE SOLE NEXT DEED.**
 
-[definition] A later construction deed requires a new direct request. The completed SCF contract is
-[`blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
+[definition] Replace the coarse productive section projection under
+[`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
+Retain exact factorized codeword/block incidence and receiver-history fibres without dense
+whole-checkpoint residency; make boundaries occurrence-founded; retain actual chronology; refuse
+non-temporal video and false interleaving; and narrow SCF status prose to the returned artifact.
 
 ## Admitted standing
 
@@ -65,6 +69,23 @@ SCF6 passed. The coherent release returned 2,931 tests passed, zero failed, and 
 result lines; every example type-checked; the Lean umbrella built 3,769 jobs; and all nine release
 gates passed. Commit `d49c55c1` is pushed. The 33 GiB reproducible `target/` tree, root `output/`,
 and temporary actual-experiment return are absent. No successor phase was invented.
+
+[counterexample; source-inspected] The SCF Gemma productive lift reduces each complete BF16 section
+to one alternating real/imaginary current and has no broad receiver-exact factorization theorem.
+Its actual multimodal driver used modality-numbered nominal boundaries, one-cut predecessor-free
+excitations, still-image restrictions as video frames, event sorting after exterior interleaving,
+and an already-lifted current as the cultivation return. These facts narrow the lift and experiment
+interpretation; they do not invalidate SCF's exact bounded lifecycle mechanisms.
+
+[definition] MVF0--MVF6 now own the ordered repair: formal foundation, faithful factorized lift,
+one Soulkiller boundary, local reciprocal cultivation, derived variant package, export lenses, and
+configuration-indexed multimodal release. No UAR, HIF, R0Q, Millennium, UI, or unrestricted-learning
+item is scheduled by this campaign.
+
+[proved-derived; formal-checked; measured] MVF0 returned `FaithfulLocalSectionLift`,
+`LocalCausalConeCultivation`, `MorphologyVariantManifest`, `VariantPackageSeparation`, exact and
+projected export lenses, complete inference configurations, and cross-codec resonance. The focused
+owner and live machine-learning closure built 3,186 jobs without `sorryAx` or a new axiom.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

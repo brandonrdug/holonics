@@ -29,8 +29,10 @@ Read, in order:
    [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md),
    including the finite many-body/polarized-crystal and constructive-differential contracts named
    in their completed campaign sections below.
-9. the active Native Transport Scaffold contract,
-   [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
+9. the completed Native Transport Scaffold contract,
+   [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md); and
+10. the active Native Morphology Variant Foundation contract,
+    [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -271,7 +273,7 @@ forensic audit and exact HIF7 release receipt are in
 
 ## Completed campaign — Native Transport Scaffold and repeated circulation
 
-**Current frontier:** NONE
+**Terminal frontier:** NONE
 
 **SCF0--SCF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
@@ -335,6 +337,44 @@ no successor phase is scheduled.
 5. `SCF4` — repeated actual-successor inference circulation;
 6. `SCF5` — Athena condensation and inherited-scaffold withdrawal; and
 7. `SCF6` — comparative multimodal experiments and exact release.
+
+## Active campaign — Native Morphology Variant Foundation
+
+**Current frontier:** MVF1
+
+**MVF1 — FAITHFUL FACTORIZED GEMMA SECTION LIFT AND SCF EVIDENCE CORRECTION — IS THE SOLE NEXT DEED.**
+
+[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
+under
+[`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
+MVF0 formalizes the exact foundation before engine revision. The remaining order is faithful local
+section lift, one Soulkiller dismantling boundary, reciprocal causal-cone cultivation, derived
+variant anatomy and package storage, ONNX/Safetensors export lenses, and a configuration-indexed
+multimodal release.
+
+[proved-derived; formal-checked; measured] MVF0 returned faithful local lift, causal-cone
+cultivation, descriptive version/variant/package, exact/projected/refused export, complete
+configuration, and cross-codec resonance laws. The focused owner and machine-learning closure built
+3,186 jobs without `sorryAx` or a new axiom. Its receipt is
+[`research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md`](../research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md).
+
+[counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
+mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a
+proved receiver-exact reconstruction of foreign tensor incidence. Nominal modality boundaries,
+one-cut actual experiments, still-image video reuse, event resorting after exterior interleaving,
+and a driver-selected already-lifted cultivation current cannot carry broader multimodal training
+or qualitative capability claims. MVF narrows those interpretations and repairs the owning
+relations; it does not demote the exact SCF handoff/circulation/withdrawal mechanisms.
+
+[definition] The complete order is:
+
+1. `MVF0` — formal faithful lift, local cultivation, variant, export, and evaluation laws;
+2. `MVF1` — faithful factorized Gemma section lift and SCF evidence correction;
+3. `MVF2` — one architecture-neutral Soulkiller dismantling boundary;
+4. `MVF3` — reciprocal local causal-cone cultivation;
+5. `MVF4` — derived anatomy manifest and backend-independent morphology package;
+6. `MVF5` — Safetensors and ONNX export lenses; and
+7. `MVF6` — multimodal configuration matrix and exact foundry release.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
