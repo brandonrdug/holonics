@@ -10,8 +10,9 @@ import ElementaryHolonics.Computation.HolonicConstructiveDifferentialBoundary
 /-!
 # Holonic finite quantum transport umbrella
 
-This is the live import surface for the finite many-body and polarized-crystal campaign.  QLT1
-exports the standing HNN/HML production surface together with the finite occupation/CAR owner, the
-finite Fermi--Hubbard Hamiltonian, coherent polarized crystal paths, separated evolution species,
-and simulation certificates.  It is one import closure, not a second formal machine.
+This is the live formal import surface.  It exports the standing HNN/HML and Holonic Intelligence
+Framework surface together with the finite occupation/CAR owner, finite Fermi--Hubbard Hamiltonian,
+coherent polarized crystal paths, separated evolution species, simulation certificates, and
+constructive differential boundary calculus.  It is one import closure, not a second formal
+machine.
 -/

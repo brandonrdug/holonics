@@ -39,6 +39,16 @@ test result never upgrades a correspondence.
 | Eros cultivation and Athena rest | `Computation/ErosAthenaNeuralObjects.lean`; `Computation/HolonicCultivationCharts.lean` | `cultivation_derivation.rs`; `receiver_history_cultivation.rs`; `native_ecology/cultivation_overlay.rs`; `soma/life/src/athena_native/source_neutral_rest/`; `situated_cultivation/` | `athena_integrated_front.rs`; `complex_parametron.rs`; `membrane_moment_*` | **UAR-open:** direct source-neutral remount, attributable child, withdrawal, and later conduct |
 | Evolution species and open exterior | `Computation/HolonicEvolutionKinds.lean` | `evolution.rs`; `world.rs`; `causal_body.rs` | `device_inference_world.rs`; `device_recurrence.rs` | **partial:** real, imaginary, Markov, physical-boundary, and open species are not one Rust enum by design |
 
+## Holonic Intelligence Framework
+
+| Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
+|---|---|---|---|---|
+| Intrinsic holon dimensions and profile | `Computation/IntrinsicHolonProfile.lean` | partial facets in `native_spool/thread.rs`, `native_spool/deposits.rs`, `native_anatomy.rs` | apparatus work remains separate under `resident_section.rs` | **formal-checked; partial:** Rust retains the facets but has no singular neutral profile; HIF1 owns the join |
+| Rested transport, inference cut, and cultivation lifecycle | `Computation/HolonicIntelligenceLifecycle.lean` | partial owners in `native_ecology/`, `native_spool/`, `soma/life/src/athena_native/`, and `holonic_training.rs` | `device_recurrence.rs`; `complex_parametron.rs`; `athena_integrated_front.rs` | **formal-checked; partial:** no common Rust lifecycle surface; actual resident/source-neutral closure is HIF6 |
+| Foreign dismantling return and cold-witness independence | `HolonicIntelligenceLifecycle.DismantlingReturn` | `soulkiller/scrapyard.rs`; `soulkiller_witness.rs` | none at the cold boundary | **formal-checked; partial:** existing three-lane return lacks the intrinsic productive profile and exact format adapters scheduled by HIF2 |
+| Exact foreign weight, residual, and preimage fibre | `Computation/ExactForeignWeight.lean` | `foreign_map.rs`; partial BF16 precedent in `athena.rs`; `embedding_fiber.rs` | format-specific resident mouths only | **formal-checked; partial:** manifestation exists; one generic exact codeword-to-native passage and ONNX/config intake remain HIF1/HIF2 |
+| Current-founded versus fixed contact chart | `IntrinsicHolonProfile.ContactScheduleChart` | partial incidence owners in `native_spool`, `native_ecology`, `physical_constraint_complex`, and `soma/life/src/athena_native/source_neutral_relational.rs` | `complex_parametron.rs`; addressed junction owners | **formal-checked; partial:** fixed and current-founded controls share no packaged executable chart; HIF3 owns generation comparison |
+
 ## Active R0Q correspondence
 
 | Formal relation | Lean theorem owner | Rust/CUDA realization | Current status |

@@ -2,8 +2,9 @@
 
 ## Authority and immediate consequence
 
-**Status:** COMPLETED FORMAL CONSTRUCTION AUTHORITY; HML0--HML4 RETURNED ON 2026-08-29. UAR2 MAY
-RESUME ONLY THROUGH THE ENGINE CONFORMANCE MAP BELOW.
+**Status:** COMPLETED FORMAL EVIDENCE; HML0--HML4 RETURNED ON 2026-08-29. The UAR2 resumption
+language below records the historical boundary. UAR was deprecated on 2026-08-31; only the active
+HIF roadmap schedules work.
 
 [definition] This campaign is `HML0--HML4`. It formalizes when an ordinary machine-learning
 realization is an exact receiver chart of holonic transport, when that chart is only a forward
@@ -209,15 +210,15 @@ Only after this holds may the engine derive `U_g` on the presented quotient rang
 the shortest separating reconstruction fibre and requires enlarging `Theta`; it is not repaired by
 renumbering a factor, selecting another receiver, or coercing the source state.
 
-## Return to UAR
+## Historical return to UAR
 
-[definition] HML0--HML4 have passed. UAR2's resumed first repair is not an output tweak.
+[historical] HML0--HML4 passed. UAR2's subsequently resumed first repair was not an output tweak.
 The full source-neutral transition is `T_g`, the compact continuation is `U_g`, and the only
 admitted bridge is one implemented `q` for which the generated-port, target-state, restriction,
 and returned-morphology owners jointly witness `q T_g = U_g q`. If that equation is false, the
 compact carrier is enlarged by the shortest separating fibre; the source state is never coerced
 into the existing compact dimension.
 
-**Terminal gate:** one unchanged UAR2 receiver passes only after the theorem-backed engine receipt
-shows the same addressed generator, quotient, successor, receiver, and reconstruction fibre on host
-and GPU. The 175-second process bound remains binding.
+**Historical terminal gate:** one unchanged UAR2 receiver was to pass only after the theorem-backed
+engine receipt showed the same addressed generator, quotient, successor, receiver, and
+reconstruction fibre on host and GPU. HIF7 now owns every surviving qualitative obligation.

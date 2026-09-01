@@ -2,12 +2,12 @@
 
 ## Authority and immediate consequence
 
-**Status:** COMPLETED FORMAL CONSTRUCTION AUTHORITY. HNN0--HNN7 RETURNED THEIR LEAN ARTIFACTS AND
-ENGINE CONFORMANCE MAP. BRANDON'S LATER EXPLICIT RELEASE RESUMED UAR UNDER ITS OWN ACTIVE BLUEPRINT;
-THIS COMPLETED FORMAL BLUEPRINT SCHEDULES NO ENGINE DEED.
+**Status:** COMPLETED FORMAL EVIDENCE. HNN0--HNN7 RETURNED THEIR LEAN ARTIFACTS AND ENGINE
+CONFORMANCE MAP. Every reference below to resuming UAR describes the historical 2026-08-29
+boundary. UAR was deprecated on 2026-08-31; only the active HIF roadmap schedules work.
 
 [definition] This campaign is `HNN0--HNN7`. It extends the completed HML receiver-quotient bridge
-into the architecture-neutral formal theory required before UAR2 may resume. It neither creates
+into the architecture-neutral formal theory historically required before UAR2 resumed. It neither creates
 architecture-named engine cabinets nor treats a theorem prover, tensor library, foreign model, or
 serialized parameter file as the machine.
 
@@ -19,9 +19,8 @@ autoregressive inference, probability, cross-entropy, and gradients to one neura
 predominantly `interpretation`, standard mathematics, or bounded implementation evidence rather
 than one compiled Lean dependency closure.
 
-[definition] UAR0 and UAR1 retain their existing grades. UAR2 remains the live engine predecessor
-but schedules no code while HNN is active. HML0--HML4 remain proved prerequisites and are not
-repeated.
+[historical] UAR0 and UAR1 retained their existing grades, and UAR2 was the engine predecessor
+while HNN was active. HML0--HML4 remain proved evidence and are not repeated.
 
 ## Governing native object
 
@@ -321,7 +320,7 @@ define reverse generation.
 **Pass HNN6:** deterministic and stochastic diffusion are explicitly distinct configurations with
 their common transport boundary proved.
 
-### HNN7 -- Eros/Athena conformance and return to UAR
+### HNN7 -- Eros/Athena conformance and historical return to UAR
 
 Formalize Eros cultivation and Athena rest/remount/ablation roles over the common ecology. Map the
 actual Rust/CUDA source owners into the formal fields and return concrete absent relations rather
@@ -372,5 +371,5 @@ conformance map are deposited in
 [`research/records/2026-08-29_THE_MAJOR_MACHINE_LEARNING_ARCHITECTURES_RETURNED_AS_RECEIVER_CHARTS_OF_ONE_HOLONIC_NEURAL_ECOLOGY_AND_EROS_CULTIVATES_ATHENA.md`](../research/records/2026-08-29_THE_MAJOR_MACHINE_LEARNING_ARCHITECTURES_RETURNED_AS_RECEIVER_CHARTS_OF_ONE_HOLONIC_NEURAL_ECOLOGY_AND_EROS_CULTIVATES_ATHENA.md).
 
 [historical] Completion of this formal prerequisite did not itself release the UAR2 engine pause.
-Brandon's later direct instruction supplied that release; the active UAR blueprint and roadmap now
-schedule the engine deed.
+Brandon's later direct instruction supplied that historical release. UAR is now deprecated and the
+active HIF blueprint alone schedules construction.

@@ -19,16 +19,16 @@ Read, in order:
    [`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
    [`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md), and
    [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md);
-7. the active UAR contract,
-   [`THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md`](THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md),
-   and its exact checkout obstruction,
-   [`research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md`](../research/records/2026-08-30_UAR_R0Q_SESSION_CHECKOUT_THE_RECEIVER_ORDER_WAS_REPAIRED_BUT_THE_SITE_TRANSPORT_REMAINED_DIAGONAL.md); and
+7. the active Holonic Intelligence Framework contract,
+   [`THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md`](THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md),
+   and its derivation,
+   [`research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md`](../research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md); and
 8. the completed formal prerequisites,
    [`THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md`](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md)
    and
-   [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md).
-9. while a `QLT` phase is current, the finite many-body and polarized-crystal contract,
-   [`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
+   [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md),
+   including the finite many-body/polarized-crystal and constructive-differential contracts named
+   in their completed campaign sections below.
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -130,7 +130,7 @@ wholesale.
 - generated `.lake` artifacts and root scratch cannot enter Git;
 - `CONSTRUCTION_STATE.md` contains only the current position;
 - this roadmap contains exactly one unresolved frontier;
-- the UAR checkout record is in fresh pickup;
+- the then-current UAR checkout obstruction is preserved as historical evidence;
 - historical campaign detail is reachable through records or archived blueprints, not duplicated
   as live schedule; and
 - coherent commit groups are identified before staging.
@@ -165,7 +165,7 @@ CUDA symbol parity traverses both the CUDA include closure and the owner-local R
 
 [historical] The driver census, registry-incidence ledger, standing-deposit verifier, and
 checksum-manifest gates were retired after CONS5 by Brandon's direct correction. Their old receipts
-remain historical evidence; they are not current repository policy or UAR prerequisites.
+remain historical evidence; they are not current repository policy or active prerequisites.
 
 ### CONS3 — split and simplify existing Rust/CUDA owners — PASSED
 
@@ -203,7 +203,7 @@ one import path from a declared umbrella. Scratch material is either promoted wi
 grade, moved to an explicit historical/scratch archive outside the production import tree, or
 deleted as reproducible debris.
 
-**Pass CONS4:** a clean live `lake build` returns the declared HNN/HML/UAR production umbrella under
+**Pass CONS4:** a clean live `lake build` returns the then-declared HNN/HML/UAR production umbrella under
 the pinned toolchain; no archived `.olean` can satisfy a missing live import;
 no `sorry` or ungraded new axiom enters; generated `.lake` material remains ignored.
 
@@ -219,7 +219,8 @@ and dispositions are correct.
 
 **Pass CONS5:** all required Rust, CUDA, Lean, document, closure, ownership, and artifact receivers
 return inside their process bounds; Git is clean; commits are separated by coherent owner; the
-branch is pushed; Provenance carries the exact completion/handoff. CONS5 does not advance UAR.
+branch is pushed; Provenance carries the exact completion/handoff. CONS5 advanced no engine
+capability grade.
 
 [established-bounded; process-audit; measured] The release receiver now derives Cargo package and
 target-kind populations and gives each package its own 180-second boundary. One complete
@@ -228,55 +229,44 @@ target-kind populations and gives each package its own 180-second boundary. One 
 shape, architecture, manifests, Typst, authority, and document law were green. The coherent owner
 commit `9456a4ae` was pushed to `origin/main`.
 
-## Active campaign — UAR resumes
+## Deprecated campaign — UAR/R0Q
 
-**Current frontier:** UAR4-R0Q5
+[definition] Brandon's direct instruction of 2026-08-31 deprecates UAR/R0Q as a construction
+campaign. R0Q0--R0Q4 retain their exact bounded grades: addressed source/target current,
+off-diagonal transport, resident complex contraction before the positive receiver, full-complex
+recurrence, complete reconstruction fibre, and semantic-replay telemetry remain implementation
+standing. UAR3, R0Q5, R0Q6, and the UAR4 release no longer schedule work.
 
-**UAR4-R0Q5 IS THE SOLE NEXT DEED.**
+[definition] The active HIF contract folds every unfinished UAR intention into neutral lifecycle
+gates: direct source-neutral construction, actual emission/world-return difference, source-detached
+remount, targeted withdrawal, exact restoration, qualitative inspection, and productive
+source/apparatus absence. Historical UAR blueprints and records remain evidence only.
 
-[open] UAR4-R0Q resumes after CONS5. Its active blueprint is the UAR contract named in fresh
-pickup. The immediate implementation obligations are narrower than that blueprint's historical
-narrative:
+## Active campaign — Holonic Intelligence Framework
 
-1. [implemented-exact; measured] retain response-face address, source and target realization sites,
-   local port, factor, phase, both boundary maps, and complete reconstruction fibre through the
-   target junction;
-2. [implemented-exact; measured] enact genuine ordinary off-diagonal `z -> z'` transport rather
-   than retaining the same carrier;
-3. [implemented-exact; measured] linearly join the dependent exact complex current on the resident
-   GPU before any positive constitutive receiver;
-4. [implemented-exact; measured] make recurrence structural over the full complex continuation
-   state; SHA-256 is receipt only;
-5. [implemented-exact; measured] make CPU semantic replay telemetry cover the complete post-device
-   passage; and
-6. revalidate UAR3's actual emission/world-return situated difference without representative event
-   invention before relying on its child grade.
+**Current frontier:** HIF1
 
-[definition] The ordered return is:
+**HIF1 — GENERIC RUST CARRIERS AND PACKAGE SURFACE — IS THE SOLE NEXT DEED.**
 
-1. `UAR4-R0Q0` — **passed**: admit one addressed response/source/target pair-current carrier and its
-   complete reconstruction fibre;
-2. `UAR4-R0Q1` — **passed**: enact and exhibit an ordinary off-diagonal `z -> z'` passage;
-3. `UAR4-R0Q2` — **passed**: move the sparse dependent complex target/port contraction and later
-   positive receiver onto the resident CUDA word;
-4. `UAR4-R0Q3` — **passed**: make full complex continuation structural and make telemetry cover
-   every semantic operation after device conduct;
-5. `UAR4-R0Q4` — **passed**: pass the focused apparatus-neutral/resident equality and fibre
-   falsifiers;
-6. `UAR4-R0Q5` — directly construct/remount the source-neutral rest with no historical
-   source-bearing file chain;
-7. `UAR4-R0Q6` — run the unchanged smallest source-neutral qualitative receiver once;
-8. revalidate the actual UAR3 emission/world-return situated difference, child, withdrawal,
-   restoration, remount, and later conduct; and
-9. run the complete source-neutral UAR4 qualitative release family once.
+[open] Establish Rust counterparts to the HIF0 contracts over the existing addressed span, native
+spool, receiver-history, exact current, morphology delta, rest/remount, and apparatus owners.
+Campaign/product types may implement or contain the neutral contracts; generic behavior may not be
+duplicated behind Athena-named methods.
 
-[proved-derived; formal-checked] `HolonicOrientedSiteTransport` and the HNN/HML umbrella prove the
-oriented site-current, every-word quotient, norm-after-linear-junction, cultivation, and remount
-laws required by that implementation. The current live umbrella builds 3,765 jobs.
+[proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
+3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
+[`research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).
 
-[historical; measured] Before consolidation, `life` had four failing granular/source-neutral tests
-and architecture had 218 violations. CONS5 returned 2,972 passed tests with zero failures and an
-architecture population of 505 files with zero violations. Those prior obstructions are closed.
+[definition] The complete HIF order is:
+
+1. `HIF0` — formal intrinsic profiles and lifecycle contracts;
+2. `HIF1` — generic Rust carriers and package surface;
+3. `HIF2` — exact foreign charts and profiled Soulkiller return;
+4. `HIF3` — packaged Holonic Inference and generation;
+5. `HIF4` — packaged cultivation and hexis;
+6. `HIF5` — migrate products and remove campaign ontology;
+7. `HIF6` — resident and source-neutral closure; and
+8. `HIF7` — interoperability and qualitative framework release.
 
 ## Standing and history
 
@@ -290,8 +280,8 @@ request may refine this order; historical text may not.
 
 ## Validation cadence
 
-[definition] Every nontrivial process has an outer hard limit of 180 seconds. During R0Q run only
-the affected package checks, focused owner/apparatus tests, the exact formal target, and named cheap
-catalog/document gates. Run the unchanged qualitative receiver only at R0Q6 and the complete release
-receiver only after UAR3 revalidation. A timeout is a counterexample, never a partial pass or
-permission to widen a magic bound.
+[definition] Every nontrivial process has an outer hard limit of 180 seconds. During HIF
+construction run only the affected package checks, focused owner/apparatus tests, the exact formal
+target, and named cheap catalog/document gates. Run the complete qualitative and interoperability
+release only at HIF7. A timeout is a counterexample, never a partial pass or permission to widen a
+magic bound.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify paragraph-leading epistemic brackets on the live construction authority.
+"""Verify paragraph-leading epistemic brackets on live HIF authority and formal prerequisites.
 
 The vocabulary is read from `canon/EPISTEMIC_GRADES.md`; this tool owns no parallel list. A
 material bracket must contain exactly one truth-status grade and may contain only evidence tags
@@ -19,13 +19,17 @@ LIVE = [
     ROOT / "blueprint" / "THE_ROADMAP.md",
     ROOT
     / "blueprint"
-    / "THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md",
+    / "THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md",
     ROOT
     / "blueprint"
     / "THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md",
     ROOT
     / "blueprint"
     / "THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md",
+    ROOT
+    / "research"
+    / "records"
+    / "2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md",
 ]
 
 LEADING = re.compile(r"^\[([a-z0-9-]+(?:;\s*[a-z0-9-]+)*)\](?:\s|$)")

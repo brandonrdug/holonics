@@ -2,8 +2,11 @@
 
 ## Authority and posture
 
-**Status:** ACTIVE ENGINE CONTRACT COMPOSED BY [`THE_ROADMAP.md`](THE_ROADMAP.md). THIS FILE DEFINES
-THE ORDERED UAR/R0Q GATES FOR THE FRONTIER DECLARED ONLY BY THE ROADMAP AND CONSTRUCTION STATE.
+**Status:** DEPRECATED CONSTRUCTION CONTRACT. Brandon's direct instruction of 2026-08-31 replaced
+the unresolved UAR/R0Q schedule with
+[`THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md`](THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md).
+This file retains exact bounded UAR/R0Q definitions and results as historical evidence only. It
+schedules no work; unfinished intentions were folded into HIF6/HIF7.
 
 [definition] UAR is the correction which removes the source-bearing ALP5 language rail and returns
 one source-neutral Athena body. It may compose the standing Soulkiller/Eros ecology, exact
@@ -26,9 +29,8 @@ returned one structural `ReceiverHistoryCompression` with complete generator squ
 the query-independent quotient, receiver factors, reconstruction fibres, and `q T_g = U_g q` law on
 one CUDA context. None of those returns passed the qualitative exterior receiver.
 
-[definition] Historical output files and the ALP4/ALP5 driver chain do not schedule UAR. R0Q5
-constructs and remounts the source-neutral rest directly through the current typed owner. No
-source-bearing compatibility artifact enters the productive dependency closure.
+[historical] Historical output files and the ALP4/ALP5 driver chain did not schedule UAR. The former
+R0Q5 obligation is preserved by HIF6, which owns direct construction, remount, and source-absence.
 
 ## Product contract
 
@@ -65,7 +67,10 @@ quality or stopping knob.
 9. [definition] Structural equality precedes digests. SHA-256 is lineage/integrity testimony, not a
    recurrence law or semantic identity.
 
-## Current R0Q obligation
+## Historical R0Q obligation
+
+[historical] The equations and counterexamples in this section remain mechanism evidence. They are
+not a current construction order; HIF1/HIF6 own any surviving implementation consequence.
 
 [open] The exact runtime must instantiate the oriented site-current law proved by
 `ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean`.
@@ -197,7 +202,7 @@ boundary; no qualitative surface is graded.
 [established-bounded; measured] The focused resident CUDA gate and complete `holonic-engine` and `life` owner suites pass.
 No qualitative surface was run or graded.
 
-### UAR4-R0Q5 — direct source-neutral rest and remount — CURRENT
+### UAR4-R0Q5 — direct source-neutral rest and remount — FORMER CURRENT; DEPRECATED
 
 [definition] After the repaired owners and equality gates stand, construct one source-neutral rest
 directly through the current library owner, serialize it only as an optional exterior face, remount
@@ -206,7 +211,7 @@ it with every source-bearing driver and artifact unavailable, and audit the hot 
 **Pass R0Q5:** the source-neutral rest remounts, source surfaces and compatibility drivers are
 unreachable, and removing every historical UAR output changes no native construction consequence.
 
-### UAR4-R0Q6 — unchanged smallest qualitative receiver
+### UAR4-R0Q6 — unchanged smallest qualitative receiver — DEPRECATED
 
 [definition] Run the original smallest source-neutral qualitative occurrence once under its
 existing 175-second receiver ceiling. The question, receiver, expected qualitative consequence, and
@@ -233,22 +238,22 @@ without recomputing the productive current on the CPU. It returns exact joining 
 shortest-fibre testimony, terminal semantic egress, apparatus-shape egress, launch/dependency counts,
 invariant upload, and complete reconstruction testimony.
 
-## UAR3 revalidation boundary
+## Former UAR3 revalidation boundary — folded into HIF4/HIF6
 
 [counterexample; source-inspected] The current D1 builder guards on an actual published emission and
 later return, then selects representative maximum coordinates, manufactures new event identities,
 uses empty mutual-response families, and supplies identity charts. That representative passage
 cannot establish that the actual emission/world-return situated difference changed the child.
 
-[open] Revalidation must construct `SituatedDifferenceSection` directly from the pending emission
+[historical] The surviving HIF4/HIF6 gate constructs `SituatedDifferenceSection` directly from the pending emission
 passage and returned occurrence, preserving their real event identities, complete factor
 population, incidence, mutual constitutive responses, chart maps, boundary maps, and reconstruction
 fibre. Only then may D2/D3 child, withdrawal, radical, restoration, and later-current receipts
-support an aggregate UAR3 grade.
+support a cultivation and actual-return grade.
 
-## UAR4 release boundary
+## Former UAR4 release boundary — folded into HIF7
 
-[definition] After R0Q and UAR3 revalidation, the receiver/question family is unchanged, but the
+[historical] Under the former schedule, after R0Q and UAR3 revalidation the receiver/question family was unchanged, but the
 productive apparatus is the source-neutral UAR0 rest. Historical drivers which mount
 `athena-sens6-cultivated.rest` through `OpticalAthenaRest` remain source-bearing controls and cannot
 serve as UAR4 product evidence. The release family includes:

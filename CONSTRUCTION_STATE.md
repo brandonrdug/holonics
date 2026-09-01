@@ -4,19 +4,20 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-08-31, after retirement of the generated catalog apparatus and passage of
-UAR4-R0Q0--R0Q4. CONS0--CONS5 remain complete. QLT and CDB1 advanced no Athena grade.
+**Currency:** 2026-08-31, after Brandon deprecated UAR/R0Q and founded the Holonic Intelligence
+Framework. CONS0--CONS5, QLT1--QLT6, CDB1, and the exact bounded R0Q0--R0Q4 mechanisms retain their
+grades.
 
 ## Current frontier
 
-**Current frontier:** UAR4-R0Q5
+**Current frontier:** HIF1
 
-**UAR4-R0Q5 — DIRECTLY CONSTRUCT AND REMOUNT THE SOURCE-NEUTRAL REST — IS THE SOLE NEXT DEED.**
+**HIF1 — GENERIC RUST CARRIERS AND PACKAGE SURFACE — IS THE SOLE NEXT DEED.**
 
-[definition] Construct one source-neutral rest directly through the current typed library owner,
-optionally serialize it as an exterior face, and remount it with historical source-bearing drivers
-and outputs unavailable. Audit the hot dependency closure and prove those removed artifacts cannot
-change the construction consequence. No qualitative receiver runs in R0Q5.
+[definition] Establish Rust counterparts to the HIF0 contracts over the existing addressed span,
+native spool, receiver-history, exact current, morphology delta, rest/remount, and apparatus owners.
+Campaign/product types may implement or contain the neutral contracts; generic behavior may not be
+duplicated behind Athena-named methods.
 
 ## Admitted standing
 
@@ -25,79 +26,65 @@ commit `9456a4ae` and authority return `0df0e87f` are pushed. The release tree r
 passed, zero failed, and 49 ignored Rust tests; 3,765 Lean jobs; zero source-shape and architecture
 violations; and all 17 then-current release gates.
 
-[proved-derived; formal-checked] The live `HolonicQuantumTransport.lean` umbrella contains HML,
-HNN, finite fermionic/Fermi--Hubbard transport, polarized-crystal transport, separated evolution
-species, simulation certificates, and the constructive differential boundary supplement. It proves
-the oriented site-current and norm-after-linear-junction laws required by R0Q.
+[proved-derived; formal-checked] The live `HolonicQuantumTransport.lean` umbrella contains the HML
+and HNN foundations, finite fermionic/Fermi--Hubbard transport, polarized-crystal transport,
+separated evolution species, simulation certificates, and constructive differential boundary
+calculus.
 
-[established-bounded; implemented-exact; measured] UAR0/UAR1 and UAR2 C0--C2 retain only their
-bounded grades. C0 returned the complete generated-port ecology step; C1 returned one structural
-receiver-history quotient; C2 mounted its quotient/generator/fibre law on the existing CUDA context.
-The qualitative exterior receiver remained obstructed.
+[proved-derived; formal-checked; measured] HIF0 returned `IntrinsicHolonProfile`, indexed dimension
+species, current-founded contact separation, `RestedTransportEcology`, `DismantlingReturn`,
+`InferenceCirculationReturn`, `CultivationPassage`, and `ExactForeignWeightPassage`. The focused
+closure built 3,164 jobs and the live umbrella built 3,769 jobs without `sorryAx`; all named formal
+and authority receivers passed.
 
-[established-bounded; implemented-exact; measured] R0Q0/R0Q1 now retain one consumed
-`SourceNeutralAddressedRealizationPairCurrent` population through the linear junction, including
-native response occurrence and both realization endpoint maps. Ordinary generators cross the
-oriented cell successor incidence; exterior-boundary residuals remain diagonal. The focused
-control exhibited both populations and exact row conservation, and the complete `life` library
-suite returned 488 passed, zero failed, 15 ignored.
+[established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
+target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
+the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
+post-device semantic-replay telemetry. These are standing mechanisms, not an active UAR schedule.
 
-[established-bounded; implemented-exact; measured] R0Q2 joins exact addressed complex pair currents and takes their
-positive receiver on the resident membrane CUDA context. The device cancellation control passed
-with zero intermediate semantic egress and no CPU replay. R0Q3 adds the selected complex section
-and addressed pair fibre to structural recurrence; equal norm with distinct quadrature separates.
-R0Q4 passed the focused owner/equality/telemetry controls; `holonic-engine` returned 1,982 passed,
-zero failed, 31 ignored and `life` returned 489 passed, zero failed, 15 ignored.
-
-[established-bounded; implemented-exact; measured] The live R0Q5 founding edge no longer depends on
-archived K1/K2 or `OpticalAthenaRest`. The complete authorized visible exchange returned 26,981
-addressed occurrences across 1,430 containers into one source-text-free native spool; detached GPU
-word/current conduct passed. K3 then returned all 26,981 sections through one compact batch owning
-each reconstruction fibre and resident thread receipt once, and its detached child passed in 7.857
-seconds. The current open edge is the visible continuation aperture into situated cultivation;
-tool/world joins remain explicit open receiver testimony rather than a reconstructed scalar atlas.
+[established-bounded; implemented-exact; measured] The pushed direct visible-exchange work retains
+source-text-free dialogue incidence, exact independent causal components, linear serial pullbacks,
+receiver-history families, and compact resident native batch conduct. These mechanisms may be
+reused by HIF owners; the interrupted H2N/UAR-specific factorization was unadmitted and removed.
 
 ## Current obstruction
 
-[definition] Historical output files do not schedule reconstruction. R0Q5 constructs and remounts
-the source-neutral rest directly through the current typed owner; no ALP4/ALP5 file chain or
-source-bearing compatibility driver enters the productive closure.
+[counterexample; source-inspected] The executable intelligence surface lacks one generic public
+lifecycle corresponding to the formal ecology. `soma/life/src/athena_native/` contains 74 Rust
+files and roughly 47,400 lines; Athena names generic rests, passages, membranes, cultivation,
+resident conduct, sensory products, and application variants. Several generation and cultivation
+families have no common neutral interface.
 
-[counterexample; source-inspected] The complete complex contraction, positive receiver, selection,
-and successor formation still execute in `soma/life` after resident conduct while the earlier
-receipt reports no CPU semantic replay. This is the current R0Q2 owner boundary.
+[counterexample; source-inspected] Soulkiller returns the correct physical split of native bundle,
+cold exterior witness, and insufficiency, but the productive holons have no first-class intrinsic
+profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
+chronology, receiver, morphology, reconstruction, and open dimensions.
 
-[counterexample; source-inspected] `SourceNeutralContinuationState` retains oriented native
-relational pairings and the positive exterior target-current family but omits the selected
-`returned_complex_site_current`. Its structural equality is therefore not full-complex R0Q even
-though digest equality is declared unused.
+[counterexample; source-inspected] Rust retains the newly formalized profile and lifecycle facets
+across `native_spool`, `native_ecology`, `soulkiller`, `athena_native`, receiver-history,
+cultivation, and apparatus owners, but no singular neutral executable surface joins them. Generic
+conduct remains exposed through campaign-qualified rests and passages.
 
-[counterexample; source-inspected] The UAR3 D1 builder still allocates representative event
-identities, leaves mutual constitutive responses empty, and supplies identity transports/charts.
-Its subsidiary mechanisms remain evidence; aggregate UAR3 requires reconstruction from the actual
-pending emission and returned occurrence.
-
-[definition] `UNIVERSAL_CATALOG.md` is the sole Lean↔Rust/CUDA owner crosswalk. Historical ledgers,
-standing deposits, driver censuses, registry-incidence projections, and checksum manifests schedule
-nothing; their generated apparatus and release gates were removed under the direct user correction.
+[definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
+It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
+drivers, and records remain evidence only.
 
 ## Ordered return
 
-[definition] The active UAR blueprint owns the complete order:
+[definition] The active HIF blueprint owns the complete order:
 
-1. R0Q0 — addressed response/source/target pair-current carrier — **passed**;
-2. R0Q1 — genuine ordinary off-diagonal site transport — **passed**;
-3. R0Q2 — resident dependent complex contraction before the positive receiver — **passed**;
-4. R0Q3 — full-complex structural recurrence and complete semantic-replay telemetry — **passed**;
-5. R0Q4 — focused apparatus-neutral/resident equality and fibre gates — **passed**;
-6. R0Q5 — direct source-neutral rest construction, remount, and source-absence audit;
-7. R0Q6 — one unchanged smallest source-neutral qualitative receiver;
-8. actual UAR3 emission/world-return situated-difference revalidation; and
-9. one complete source-neutral UAR4 qualitative release.
+1. HIF0 — formal intrinsic profiles and lifecycle contracts;
+2. HIF1 — generic Rust carriers and package surface;
+3. HIF2 — exact foreign charts and profiled Soulkiller return;
+4. HIF3 — packaged Holonic Inference and generation;
+5. HIF4 — packaged cultivation and hexis;
+6. HIF5 — migrate products and remove campaign ontology;
+7. HIF6 — resident and source-neutral closure; and
+8. HIF7 — interoperability and qualitative framework release.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. The unchanged smallest
-qualitative receiver retains its narrower 175-second ceiling at R0Q6. Run only owner-local checks
-before then; no hash, count, topology, residency receipt, generated surface, or apparatus proxy may
-advance the current frontier.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF1 advances only
+after one public neutral Rust surface conducts the existing bounded native controls and its Lean--
+Rust catalog rows name the same carriers and open fibres. No compatibility alias, cloneable ecology,
+digest identity, or second implementation can substitute for that grade.

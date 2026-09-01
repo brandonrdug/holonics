@@ -126,6 +126,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md` | **The finite many-body and polarized crystal transport foundation** — A receiver covector or positive effect `rho` acts only after the surface junction. |
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
 | `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
+| `blueprint/THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md` | **The Holonic Intelligence Framework returns intrinsic holons and packages dismantling, inference,** — **Governing doctrine:** `../canon/TABLET_THE_REASONING_CYCLE.md`, `../canon/TABLET_THE_HEXIS.md`,… |
 | `blueprint/THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md` | **The holonic neural ecology returns every classical architecture as a receiver chart and Eros cultivates Athena through physical information transport** — Inference fixes `Lambda_t` during the conducting occurrence. |
 | `blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md` | **The horizon is a coordinate, not a gate, and the emission keeps its cross** — **Evidence:** `measured`. |
 | `blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md` | **The laboratory Athena unifies native mathematical inference, real OCR, and heterogeneous transport** — This file schedules no next deed. |
@@ -150,7 +151,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (441 deposits of 733)
+## 4 · The 2026-08 record line (443 deposits of 735)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -596,6 +597,8 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` | CONS3 removed the moment-front foreman and the resident receiver now observes the committed target |
 | `2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md` | Constructive differentials keep `dx` typed and refinement does not erase the potential fibre |
 | `2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md` | Finite many-body, polarized crystal, and diffusion Lean foundation returned to the engine |
+| `2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md` | HIF0 intrinsic holon profiles and neutral lifecycle contracts returned |
+| `2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md` | Holonic intelligence requires intrinsic profiles and neutral lifecycle interfaces |
 | `2026-08-31_THE_COMPLETE_VISIBLE_EXCHANGE_FOUNDED_THE_LIVE_NATIVE_SPOOL_AND_K3_RETURNED_EVERY_SECTION_ONCE.md` | The complete visible exchange founded the live native spool and K3 returned every section once |
 | `2026-08-31_THE_GENERATED_CATALOG_APPARATUS_DEPARTED_AND_THE_ORDINARY_REALIZATION_CURRENT_CROSSED_ITS_ADDRESSED_INCIDENCE.md` | The generated catalog apparatus departed and the ordinary realization current crossed its addressed incidence |
 | `2026-08-31_UAR_AND_R0Q_READINESS_REVIEW_THE_CATALOGS_SEPARATE_LIVE_LEDGERS_FROM_DATED_ATLASES_AND_THE_NEXT_DEED_IS_THE_ADDRESSED_PAIR_CURRENT.md` | UAR and R0Q readiness review — the catalogs separate live ledgers from dated atlases and the next deed is the addressed pair current |
@@ -612,14 +615,14 @@ outside `tools/` that names the verifier — not declared.
 | `tools/build_m0_source_fixture.sh` | Typst embeds the creation instant in PDF metadata. | `research/fixtures/m0_mathematical_source_circulation/README.md` |
 | `tools/claim_index.py` | Generate `THE_CLAIM_INDEX.md` from the tree, so the table of contents cannot drift. | `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`, `research/README.md`, `research/records/2026-08-13_THE_DOCUMENTS_DESCRIBED_A_BODY_THEY_HAD_NOT_OPENED_AND_THE_OPERAND_HAD_NO_RESIDENCY.md`, and 2 more |
 | `tools/document_law.py` | Three laws the corpus states about its own governing documents, made executable. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `research/records/2026-08-24_DIVISION_RETURNED_AS_A_TRANSPORT_FIBRE_PARTITIONS_RETAINED_THEIR_BOUNDARIES_AND_DIVISORS_BECAME_SIGNED_CHART_LEDGERS.md` |
-| `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on the live construction authority. | **nothing names it** |
+| `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on live HIF authority and formal prerequisites. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
 | `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 71 more |
 | `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `blueprint/THE_ROADMAP.md`, and 5 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |
 | `tools/source_shape.py` | Rust/CUDA source-shape gate. | `research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md` |
-| `tools/tracked_authority.py` | Require the live authority and named UAR/HNN owners to exist in the Git index. | **nothing names it** |
+| `tools/tracked_authority.py` | Require the live HIF authority and its named formal owners to exist in the Git index. | **nothing names it** |
 
 `cargo test --workspace` is the gate that is actually run alongside these.
 
