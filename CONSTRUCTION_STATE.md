@@ -10,17 +10,17 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** MVF5
+**Current frontier:** MVF6
 
-**MVF5 — SAFETENSORS AND ONNX EXPORT LENSES — IS THE SOLE NEXT DEED.**
+**MVF6 — MULTIMODAL CONFIGURATION MATRIX AND EXACT FOUNDRY RELEASE — IS THE SOLE NEXT DEED.**
 
-[definition] Implement exterior Safetensors and ONNX projections over the neutral morphology
-package under
+[definition] Run matched proposition families through distinct text, rendered-image, spoken-audio,
+actual temporal-video, and mixed chronological apertures under
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Safetensors must use an explicit holonic tensor/companion schema; ONNX must declare IR, opset,
-domain, fixed receiver/boundary, and custom operations where required. Exact controls round-trip;
-projected controls retain full fibres and separators; cultivation/world-return export requests
-refuse; and no digest becomes a capability or route.
+Every claim must name complete configuration; same-config repetition and cross-config comparison
+remain distinct; cross-codec equivalence requires every declared receiver/history; route/current/
+fibre/anatomy differences precede qualitative surfaces. Close the package/export controls, complete
+release, pushed clean identity, and reproducible-output removal without inventing another phase.
 
 ## Admitted standing
 
@@ -111,6 +111,12 @@ anatomy, separate version axes, native/situated hot packages, reconstruction/eva
 export lanes, exact base and cultivated package round-trip, departed-withdrawal retention, and
 apparatus/export invariance. Engine returned 2,007 passed with 32 ignored; life returned 473 passed
 with 14 ignored.
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF5 returned exact
+Safetensors/ONNX package round-trip, projected common-anatomy fibres with a separating
+configuration, and explicit refusal of unsupported receiver/cultivation/world export. Official
+Safetensors 0.7.0 opened the artifact; ONNX IR 14 and `org.holonics` opset 1 passed the lossless
+parser. Life returns 476 passed with 14 ignored.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

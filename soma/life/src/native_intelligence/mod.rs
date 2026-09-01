@@ -21,6 +21,7 @@ mod membrane_interior;
 mod membrane_optical;
 mod membrane_radiation;
 mod membrane_transport;
+mod morphology_export;
 mod morphology_package;
 mod native_factor_deposit;
 mod native_material_circulation;
@@ -161,6 +162,12 @@ pub use membrane_transport::{
     MembraneReturn, MembraneStanding, MembraneTransductionError, MorphologyDerivedCurrentSection,
     NativeCausalMembrane, NativeMembraneBindingInsufficiency, NativeMembraneDefect,
     NativeMembraneInsufficiency, ReturnedMembraneDifference, MEMBRANE_CROSSING_SCHEMA,
+};
+pub use morphology_export::{
+    export_morphology, import_exact_export, project_common_anatomy, ConfigurationSeparator,
+    ExactMorphologyExport, ExportPurpose, MorphologyExportArtifact, MorphologyExportError,
+    MorphologyExportRefusal, MorphologyExportRequest, MorphologyExportReturn,
+    ProjectedMorphologyExport,
 };
 pub use morphology_package::{
     ApparatusRealization, ConfigurationEvaluationReceipt, ExportCodecKind, ExportRealization,

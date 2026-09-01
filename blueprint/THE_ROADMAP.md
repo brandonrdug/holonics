@@ -340,9 +340,9 @@ no successor phase is scheduled.
 
 ## Active campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF5
+**Current frontier:** MVF6
 
-**MVF5 — SAFETENSORS AND ONNX EXPORT LENSES — IS THE SOLE NEXT DEED.**
+**MVF6 — MULTIMODAL CONFIGURATION MATRIX AND EXACT FOUNDRY RELEASE — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -382,6 +382,12 @@ separated schema/lineage/capability/realization axes, base and situated hot pack
 reconstruction/evaluation/apparatus/export lanes, exact package round-trip, and apparatus/export
 replacement invariance. Its receipt is
 [`research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md`](../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF5 returned exact and
+projected Safetensors/ONNX lenses, complete package round-trip, common-anatomy fibre/separator
+returns, and explicit receiver/cultivation/world refusals. Official Safetensors 0.7.0 opened the
+artifact; ONNX IR/domain/opset testimony passed the lossless parser. Its receipt is
+[`research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md`](../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md).
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a

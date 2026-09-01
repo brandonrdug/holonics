@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF5.
+**Current frontier:** MVF6.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -291,7 +291,7 @@ apparatus/export leaves hot morphology and capability equal; and base/cultivated
 round-trips are exact. Its receipt is
 [`../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md`](../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md).
 
-### MVF5 — Safetensors and ONNX export lenses — CURRENT
+### MVF5 — Safetensors and ONNX export lenses — PASSED
 
 [definition] Implement exterior Safetensors and ONNX projections over the package. Safetensors
 uses a declared holonic tensor schema and companion manifest. ONNX uses standard operators where
@@ -302,7 +302,14 @@ collapsed controls return projected status, complete fibres, and a separating re
 unsupported cultivation/world-return requests refuse; ONNX version/opset/domain and Safetensors
 dtype/shape/offset testimony are complete; and no checksum becomes a capability or routing key.
 
-### MVF6 — multimodal configuration matrix and foundry release
+[established-bounded; implemented-exact; source-inspected; measured] MVF5 passed. Exact
+Safetensors and ONNX artifacts round-trip complete packages; anatomy projections retain both
+collapsed packages and a separating configuration; unsupported receiver/cultivation/world requests
+refuse. The Safetensors artifact opened in the official runtime; ONNX returned IR 14 and
+`org.holonics` opset 1 through the lossless parser. Its receipt is
+[`../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md`](../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md).
+
+### MVF6 — multimodal configuration matrix and foundry release — CURRENT
 
 [definition] Run matched proposition families through text, rendered-image, spoken-audio, actual
 temporal-video, and mixed chronological apertures. Vary continuation receiver and emission codec
