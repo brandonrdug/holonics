@@ -3,8 +3,8 @@
 use std::{collections::BTreeSet, env, fs};
 
 use holonic_engine::native_ecology::holonic_intelligence::{
-    BinaryEmissionCodec, ExteriorEmissionCodec, InferenceCirculation, NativeInferenceRequest,
-    Utf8InspectionCodec, conduct_native_inference,
+    BinaryEmissionCodec, ExteriorEmissionCodec, InferenceCirculation, NativeInferenceAddress,
+    NativeInferenceRequest, Utf8InspectionCodec, conduct_native_inference,
 };
 use holonic_engine::native_spool::NativeTransportScaffold;
 use serde_json::json;
@@ -52,9 +52,11 @@ fn main() -> Result<(), String> {
     let circulation = conduct_native_inference(
         &scaffold,
         NativeInferenceRequest {
-            spool: spool.address.clone(),
-            thread: thread.address.clone(),
-            occurrence: occurrence.occurrence,
+            address: NativeInferenceAddress {
+                spool: spool.address.clone(),
+                thread: thread.address.clone(),
+                occurrence: occurrence.occurrence,
+            },
             receiver,
         },
     )

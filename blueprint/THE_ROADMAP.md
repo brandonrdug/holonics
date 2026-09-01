@@ -271,17 +271,19 @@ forensic audit and exact HIF7 release receipt are in
 
 ## Active campaign — Native Transport Scaffold and repeated circulation
 
-**Current frontier:** SCF2
+**Current frontier:** SCF6
 
-**SCF2 — EXACT MULTIMODAL GEMMA LIFT INTO SCAFFOLD FACETS — IS THE SOLE NEXT DEED.**
+**SCF6 — COHERENT COMPARATIVE EXPERIMENT AND EXACT RELEASE — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `SCF0--SCF6` campaign
 under
 [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 SCF0 returned the neutral formal laws. SCF1 replaced the whole-object Rust vocabulary with
 `NativeTransportScaffold` across Soulkiller, profiles, Athena rest, and conduct without an alias or
-compatibility decoder. SCF2 now composes exact Gemma configuration, Safetensors, codeword,
-processor, and modality-excitation testimony while keeping every source role cold.
+compatibility decoder. SCF2 returned complete actual Gemma excitation and a source-neutral lift;
+SCF3 moved that productive lane into one hot rest; SCF4 returned repeated actual-successor
+circulation; and SCF5 returned source-detached cultivation and inherited-scaffold withdrawal.
+SCF6 has returned all five actual experiments and now closes on the coherent pushed release.
 
 [proved-derived; formal-checked; measured] SCF0 passed. The live umbrella built 3,769 jobs; document
 law, epistemic tags, and source shape remained green. Its exact receipt is
@@ -298,6 +300,28 @@ five complete cold transport families with zero unclassified tensors. It verifie
 shared carrier and text-only output without executing the model. Its exact return and open
 excitation boundary are in
 [`research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md`](../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF2 completed actual text,
+vision, sampled-video, and audio excitation; exact BF16 return admission; and the source-neutral
+scaffold lift. Its completion receipt is
+[`research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`](../research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md).
+
+[established-bounded; implemented-exact; measured] SCF3--SCF5 returned the move-owned hot handoff,
+typed repeated circulation, actual returned-current cultivation, source-detached remount,
+inherited-scaffold withdrawal, attributable ablation, and exact restoration. Their receipts are
+[`research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md`](../research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md),
+[`research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md`](../research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md),
+and
+[`research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md`](../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF6's five experiment
+families passed one public lifecycle; cold label mutation did not change native routing; every
+source-detached body retained one cultivated thread; and all five exterior contact charts returned
+complete fibres and richer reopenings. Its experiment receipt is
+[`research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md`](../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md).
+
+[open; process-audit] SCF6 remains current only for the coherent repository release, pushed clean
+identity, and removal of reproducible `target/` and experiment output.
 
 [definition] The complete order is:
 

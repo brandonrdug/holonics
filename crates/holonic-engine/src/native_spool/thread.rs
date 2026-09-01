@@ -21,7 +21,7 @@ use crate::{
 };
 
 pub const NATIVE_THREAD_SCHEMA: &str = "holonic-engine.native-thread.v1";
-pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v2";
+pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v3";
 pub const NATIVE_THREAD_DEPOSIT_SCHEMA: &str = "holonic-engine.native-thread-deposit.v1";
 pub const NATIVE_THREAD_DEPOSIT_RECEIPT_SCHEMA: &str =
     "holonic-engine.native-thread-deposit-receipt.v1";
@@ -302,6 +302,8 @@ pub struct NativeGeneratorStep {
 pub struct NativeGeneratorDescent {
     pub generator: InputId,
     pub steps: Vec<NativeGeneratorStep>,
+    /// Native states at which this bounded excitation returns through the open exterior.
+    pub open_domain: BTreeSet<NativeStateId>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -441,7 +443,14 @@ impl NativeSpool {
                     return Err(NativeSpoolRefusal::GeneratorDescent(descent.generator));
                 }
             }
-            if domain != self.native_population {
+            if !descent.open_domain.is_subset(&self.native_population)
+                || !domain.is_disjoint(&descent.open_domain)
+                || domain
+                    .union(&descent.open_domain)
+                    .copied()
+                    .collect::<BTreeSet<_>>()
+                    != self.native_population
+            {
                 return Err(NativeSpoolRefusal::GeneratorDescent(descent.generator));
             }
         }

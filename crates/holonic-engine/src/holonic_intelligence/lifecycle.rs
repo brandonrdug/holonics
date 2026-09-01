@@ -9,6 +9,11 @@ pub trait DismantlingBoundaryReturn {
     fn insufficiency(&self) -> &Self::Insufficiency;
 }
 
+/// A move-owned dismantling return can physically separate its productive, cold, and open lanes.
+pub trait IntoDismantlingBoundaryReturn: DismantlingBoundaryReturn + Sized {
+    fn into_lanes(self) -> (Self::Productive, Self::ColdWitness, Self::Insufficiency);
+}
+
 /// One inference cut through which reusable morphology remains fixed.
 pub trait InferenceCirculation {
     type Morphology: PartialEq;

@@ -13,11 +13,16 @@ use crate::{EventId, OccurrencePort};
 
 use super::{InferenceCirculation, OpenObligation, OpenScope};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NativeInferenceRequest {
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct NativeInferenceAddress {
     pub spool: String,
     pub thread: String,
     pub occurrence: EventId,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeInferenceRequest {
+    pub address: NativeInferenceAddress,
     pub receiver: ReceiverId,
 }
 
@@ -199,8 +204,11 @@ pub fn conduct_native_inference(
     request: NativeInferenceRequest,
 ) -> Result<NativeInferenceCirculation<'_>, NativeInferenceError> {
     morphology.validate()?;
-    let entering =
-        morphology.addressed_section(&request.spool, &request.thread, request.occurrence)?;
+    let entering = morphology.addressed_section(
+        &request.address.spool,
+        &request.address.thread,
+        request.address.occurrence,
+    )?;
     if !entering.spool().receiver_family.contains(&request.receiver) {
         return Err(NativeInferenceError::ReceiverOutsideFamily(
             request.receiver,
@@ -212,8 +220,21 @@ pub fn conduct_native_inference(
         .native_population
         .iter()
         .copied()
+        .filter(|native| {
+            ordered_word.iter().all(|generator| {
+                entering
+                    .spool()
+                    .generator_descents
+                    .iter()
+                    .find(|descent| descent.generator == *generator)
+                    .is_some_and(|descent| !descent.open_domain.contains(native))
+            })
+        })
         .collect::<Vec<_>>();
-    let mut resident = morphology.mount_word(&request.spool, &ordered_word)?;
+    if native_start.is_empty() || !native_start.contains(&entering.occurrence().entering_native) {
+        return Err(NativeInferenceError::EnteringOccurrenceOutsideActiveDomain);
+    }
+    let mut resident = morphology.mount_word(&request.address.spool, &ordered_word)?;
     let conducted = resident.conduct(&native_start, request.receiver)?;
     if conducted.native_start != native_start
         || conducted.native_end.len() != native_start.len()
@@ -237,7 +258,7 @@ pub fn conduct_native_inference(
         .position(|future| future.from == entering.occurrence().entering_native)
         .ok_or(NativeInferenceError::MalformedEmission)?;
     let face = NativeEmissionSection {
-        entering_occurrence: request.occurrence,
+        entering_occurrence: request.address.occurrence,
         receiver: request.receiver,
         ordered_word: ordered_word.clone(),
         plural_futures,
@@ -245,27 +266,29 @@ pub fn conduct_native_inference(
     };
     face.validate()?;
     let emitted = NativeEmissionAddress {
-        entering_occurrence: request.occurrence,
+        entering_occurrence: request.address.occurrence,
         receiver: request.receiver,
         ordered_word: ordered_word.clone(),
         emitted: face
             .emitted()
             .ok_or(NativeInferenceError::MalformedEmission)?,
     };
-    let fibres = face
-        .plural_futures
-        .iter()
-        .map(|future| {
+    let mut fibres = Vec::new();
+    for future in &face.plural_futures {
+        let before = fibres.len();
+        fibres.extend(
             entering
                 .spool()
                 .reconstruction_fibres
                 .iter()
-                .find(|fibre| fibre.native == future.to)
-                .ok_or(NativeInferenceError::MissingReconstructionFibre(future.to))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+                .filter(|fibre| fibre.native == future.to),
+        );
+        if fibres.len() == before {
+            return Err(NativeInferenceError::MissingReconstructionFibre(future.to));
+        }
+    }
     let lineage = NativeInferenceLineage {
-        entering_occurrence: request.occurrence,
+        entering_occurrence: request.address.occurrence,
         predecessor: entering.occurrence().predecessor,
         entering_port: entering.occurrence().entering_port,
         emitting_port: entering.occurrence().emitting_port,
@@ -281,17 +304,24 @@ pub fn conduct_native_inference(
         emitted: emitted.clone(),
         reconstruction_fibre_population: reconstruction.fibres.len(),
     };
+    // A bare `EventId` predecessor is meaningful only inside its owning spool. Cross-spool
+    // continuation additionally owes a declared scaffold composition, so equal event numbers in
+    // two winding families can never manufacture a successor here.
     let successor_requests = morphology
         .spools
         .iter()
+        .find(|spool| spool.address == request.address.spool)
+        .into_iter()
         .flat_map(|spool| {
             spool.threads.iter().flat_map(|thread| {
                 thread.occurrences.iter().filter_map(|occurrence| {
-                    (occurrence.predecessor == Some(request.occurrence)).then(|| {
+                    (occurrence.predecessor == Some(request.address.occurrence)).then(|| {
                         NativeInferenceRequest {
-                            spool: spool.address.clone(),
-                            thread: thread.address.clone(),
-                            occurrence: occurrence.occurrence,
+                            address: NativeInferenceAddress {
+                                spool: spool.address.clone(),
+                                thread: thread.address.clone(),
+                                occurrence: occurrence.occurrence,
+                            },
                             receiver: request.receiver,
                         }
                     })
@@ -451,6 +481,8 @@ pub enum NativeInferenceError {
     MalformedEmission,
     #[error("future state {0:?} has no complete reconstruction fibre")]
     MissingReconstructionFibre(NativeStateId),
+    #[error("the entering occurrence lies outside the active generator domain")]
+    EnteringOccurrenceOutsideActiveDomain,
     #[error("exterior emission codec refused: {0}")]
     Codec(String),
 }

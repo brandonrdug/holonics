@@ -70,6 +70,14 @@ impl crate::native_ecology::holonic_intelligence::DismantlingBoundaryReturn
     }
 }
 
+impl crate::native_ecology::holonic_intelligence::IntoDismantlingBoundaryReturn
+    for SoulkillerScrapyardReturn
+{
+    fn into_lanes(self) -> (Self::Productive, Self::ColdWitness, Self::Insufficiency) {
+        (self.native, self.exterior, self.insufficiency)
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SoulkillerScrapyardRefusal {
     #[error("the admitted exterior section refused: {0}")]
@@ -388,6 +396,7 @@ pub fn dismantle_reachable_section(
         generator_descents.push(NativeGeneratorDescent {
             generator: *generator,
             steps,
+            open_domain: BTreeSet::new(),
         });
     }
     let mut fibres = BTreeMap::<NativeStateId, BTreeSet<EventId>>::new();

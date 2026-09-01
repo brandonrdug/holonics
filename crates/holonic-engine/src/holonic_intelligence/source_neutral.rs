@@ -23,8 +23,8 @@ use crate::{BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, O
 
 use super::{
     CultivationPackagingError, ExteriorReturnOccurrence, InferenceCirculation,
-    NativeInferenceError, NativeInferenceRequest, SourceDetachedCultivatedRecurrence,
-    SourceNeutralCultivationClosure, conduct_native_inference,
+    NativeInferenceAddress, NativeInferenceError, NativeInferenceRequest,
+    SourceDetachedCultivatedRecurrence, SourceNeutralCultivationClosure, conduct_native_inference,
 };
 
 const DIRECT_SOURCE_NEUTRAL_SCHEMA: &str = "holonic-engine.direct-source-neutral-closure.v1";
@@ -183,6 +183,7 @@ pub fn direct_source_neutral_rest() -> Result<NativeTransportScaffold, NativeSpo
                     thread: "thread/return".to_owned(),
                 },
             ],
+            open_domain: BTreeSet::new(),
         }],
         receiver_factors: vec![
             ReceiverFactor {
@@ -305,9 +306,11 @@ pub fn close_direct_source_neutral_cycle()
     let rest_wire = rest.canonical_bytes()?;
     let remounted = NativeTransportScaffold::read(&rest_wire)?;
     let request = NativeInferenceRequest {
-        spool: "spool/direct-cycle".to_owned(),
-        thread: "thread/outward".to_owned(),
-        occurrence: EventId(1),
+        address: NativeInferenceAddress {
+            spool: "spool/direct-cycle".to_owned(),
+            thread: "thread/outward".to_owned(),
+            occurrence: EventId(1),
+        },
         receiver: ReceiverId(9),
     };
     let circulation = conduct_native_inference(&remounted, request)?;

@@ -478,6 +478,7 @@ mod tests {
                         to: native,
                         thread: "thread/native-loop".to_owned(),
                     }],
+                    open_domain: BTreeSet::new(),
                 }],
                 receiver_factors: vec![ReceiverFactor {
                     native,

@@ -28,6 +28,7 @@ mod perspective_emanation;
 mod product_receiver;
 mod rest;
 mod returned_difference_deposit;
+mod scaffold_cultivation;
 mod situated_cultivation;
 mod situated_difference;
 mod source_neutral_cold;
@@ -180,6 +181,11 @@ pub use perspective_emanation::{
 };
 pub use product_receiver::{
     ProductSituatedCurrentEmanation, ProductTechnicalHistoryEmanation, ResidentProductEcology,
+};
+pub use rest::{consume_dismantling_return, DepartedDismantlingLanes};
+pub use scaffold_cultivation::{
+    ReleasedScaffoldCultivation, ReturnedScaffoldCurrent, ScaffoldCultivatedConsequence,
+    ScaffoldCultivatedRest, ScaffoldCultivationError, ScaffoldReleaseReceipt,
 };
 pub use situated_cultivation::{
     CompleteSituatedCultivationWithdrawal, LaboratoryCultivatedRest,

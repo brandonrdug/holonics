@@ -22,8 +22,14 @@ mod foreign_onnx;
 mod lifecycle;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
+#[path = "holonic_intelligence/repeated_circulation.rs"]
+mod repeated_circulation;
 #[path = "holonic_intelligence/rested.rs"]
 mod rested;
+#[path = "holonic_intelligence/scaffold_excitation_receipt.rs"]
+mod scaffold_excitation_receipt;
+#[path = "holonic_intelligence/scaffold_lift.rs"]
+mod scaffold_lift;
 #[path = "holonic_intelligence/source_neutral.rs"]
 mod source_neutral;
 #[path = "holonic_intelligence/weight.rs"]
@@ -38,6 +44,9 @@ pub use foreign_multimodal::*;
 pub use foreign_onnx::*;
 pub use lifecycle::*;
 pub use profile::*;
+pub use repeated_circulation::*;
 pub use rested::*;
+pub use scaffold_excitation_receipt::*;
+pub use scaffold_lift::*;
 pub use source_neutral::*;
 pub use weight::*;

@@ -10,14 +10,13 @@ R0Q0--R0Q4 mechanisms retain their grades.
 
 ## Current frontier
 
-**Current frontier:** SCF2
+**Current frontier:** SCF6
 
-**SCF2 — EXACT MULTIMODAL GEMMA LIFT INTO SCAFFOLD FACETS — IS THE SOLE NEXT DEED.**
+**SCF6 — COHERENT COMPARATIVE EXPERIMENT AND EXACT RELEASE — IS THE SOLE NEXT DEED.**
 
-[definition] Compose exact Gemma configuration, Safetensors, codeword, processor, and text/vision/
-video/audio excitation testimony into one cold multimodal transport chart. Found source-neutral
-scaffold facets only from declared active consequence/intervention passages; tensor paths and
-modality names remain exterior. The complete contract is
+[definition] Close the five returned multimodal experiments through the complete repository
+release, push the exact identity, and remove reproducible build/experiment artifacts. Generated
+surfaces remain probes and contact charts remain exterior receivers. The complete contract is
 [`blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 
 ## Admitted standing
@@ -37,9 +36,35 @@ declarations into 719 language, 658 vision, 751 audio, and two projection entrie
 unclassified tensors. The chart verifies the 2,560-wide shared carrier and text-only output without
 executing the model. Cross-family excitation is refused.
 
-[open; source-inspected] SCF2 remains current for actual modality excitation/intervention return,
-complete codeword testimony at that aperture, and the source-neutral passage from returned foreign
-consequence into scaffold facets. The cold family chart cannot found native identity or conduct.
+[established-bounded; implemented-exact; source-inspected; measured] SCF2 returned actual complete
+42-layer language, 16-layer vision, sampled-video-through-vision, and 12-layer audio excitation for
+14 occurrences. Exact BF16 codewords founded a 20-state, 14-thread source-neutral transport
+scaffold with 266 open generator faces while all modality/source/intervention coordinates remained
+cold.
+
+[established-bounded; implemented-exact; measured] SCF3 moved the productive scaffold by value
+into one hot `NativeEcologyRest`; cold witness and insufficiency departed in separate lanes, and no
+foreign executor or coordinate is representable by the hot rest.
+
+[established-bounded; implemented-exact; measured] SCF4 returned typed same-spool repeated
+actual-successor circulation with variable-grain complete fibres and receiver-founded continue,
+terminate, cultivate, and obstruct dispositions. It owns no token, retry, response-length, surface,
+or KV governor.
+
+[established-bounded; implemented-exact; measured] SCF5 returned one source-neutral
+returned-current cultivation. Declared exact native conduct survived inherited-scaffold departure
+and source-detached remount; targeted cultivated-thread ablation removed it; restoration recovered
+the exact successor; and the final hot body retained only cultivated morphology beside the moved
+reconstruction lane.
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF6's text, image, audio,
+sampled-video, and interleaved experiments passed one public lifecycle. Cold label mutation left
+native wire unchanged, all five source-detached consequences survived, and foreign
+autoregressive/KV, fixed-window, periodic, recurrent, and current-founded charts remained exterior
+receiver comparisons.
+
+[open; process-audit] SCF6 remains current only for the coherent repository gates, pushed clean
+identity, and removal of reproducible `target/` and experiment output.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

@@ -30,16 +30,17 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** SCF2
+**Current frontier:** SCF6
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
 `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the complete current receipt.
 
-[definition] SCF0 returned the formal scaffold laws and SCF1 returned the Rust whole-object
-migration. SCF2 composes exact Gemma configuration, Safetensors, codeword, processor, and active
-text/vision/video/audio testimony into cold lift charts before any source-neutral scaffold facet is
-founded. The roadmap and construction state own its exact order.
+[definition] SCF0--SCF5 returned the formal laws, neutral scaffold migration, complete actual Gemma
+multimodal lift, move-owned hot handoff, repeated actual-successor circulation, returned-current
+cultivation, source-detached remount, inherited-scaffold withdrawal, attributable ablation, and
+exact restoration. SCF6's five experiments have returned; only the coherent pushed release and
+reproducible-artifact removal remain. The roadmap and construction state own the exact position.
 
 ## Claude-specific conduct
 

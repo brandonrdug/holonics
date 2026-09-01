@@ -11,6 +11,7 @@ use crate::receiver_history_compression::NativeStateId;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum ContactScheduleChart {
+    ForeignAutoregressiveKv { retained: usize },
     FixedWindow { radius: usize },
     PeriodicHybrid { radius: usize, period: usize },
     RecurrentLinear,
@@ -64,6 +65,9 @@ pub fn compare_contact_charts(
         return Err(ContactChartError::Malformed);
     }
     let charts = [
+        ContactScheduleChart::ForeignAutoregressiveKv {
+            retained: states.len(),
+        },
         ContactScheduleChart::FixedWindow { radius: 1 },
         ContactScheduleChart::PeriodicHybrid {
             radius: 1,
@@ -75,6 +79,9 @@ pub fn compare_contact_charts(
     let mut returns = Vec::with_capacity(charts.len());
     for chart in charts {
         let contacts = match chart {
+            ContactScheduleChart::ForeignAutoregressiveKv { retained } => {
+                causal_prefix(states, retained)
+            }
             ContactScheduleChart::FixedWindow { radius } => window(states, radius, None),
             ContactScheduleChart::PeriodicHybrid { radius, period } => {
                 window(states, radius, Some(period))
@@ -87,6 +94,10 @@ pub fn compare_contact_charts(
             chart,
             active_causal_extent: contacts.len(),
             exact_pair_tests: match chart {
+                ContactScheduleChart::ForeignAutoregressiveKv { .. } => {
+                    u64::try_from(states.len().saturating_mul(states.len().saturating_add(1)) / 2)
+                        .map_err(|_| ContactChartError::Extent)?
+                }
                 ContactScheduleChart::FixedWindow { .. }
                 | ContactScheduleChart::PeriodicHybrid { .. } => {
                     u64::try_from(states.len().saturating_mul(states.len()))
@@ -117,6 +128,18 @@ pub fn compare_contact_charts(
         richer_receiver_reopenings: reopenings,
         schedules_are_receiver_charts: true,
     })
+}
+
+fn causal_prefix(states: &[NativeStateId], retained: usize) -> Vec<ContactEdge> {
+    let mut contacts = Vec::new();
+    for (to_at, to) in states.iter().enumerate() {
+        let from_at = to_at.saturating_add(1).saturating_sub(retained);
+        contacts.extend(states[from_at..=to_at].iter().map(|from| ContactEdge {
+            from: *from,
+            to: *to,
+        }));
+    }
+    contacts
 }
 
 fn window(

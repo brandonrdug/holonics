@@ -24,6 +24,8 @@ from PIL import Image
 from safetensors import safe_open
 from torch.profiler import ProfilerActivity, profile
 from transformers import (
+    AutoModelForMultimodalLM,
+    AutoTokenizer,
     Gemma4AudioFeatureExtractor,
     Gemma4AudioModel,
     Gemma4Config,
@@ -118,6 +120,9 @@ def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config,
             hook.remove()
         torch.cuda.synchronize()
         layer_hashes = [sha(bf16_bytes(value)) for value in layers]
+        entering = bf16_bytes(layers[0])
+        entering_name = f"vision-{occurrence_at}-entering.bf16"
+        (output / entering_name).write_bytes(entering)
         final = bf16_bytes(projected)
         final_name = f"vision-{occurrence_at}-text-space.bf16"
         (output / final_name).write_bytes(final)
@@ -140,6 +145,8 @@ def run_vision(root: Path, image_path: Path, output: Path, config: Gemma4Config,
                 "text_space_shape": list(projected.shape),
                 "layer_frontier_sha256": layer_hashes,
                 "complete_layer_count": len(layer_hashes),
+                "entering_bf16": entering_name,
+                "entering_sha256": sha(entering),
                 "returned_bf16": final_name,
                 "returned_sha256": sha(final),
                 "cuda_kernel_events": profiler_events(prof),
@@ -205,6 +212,9 @@ def run_audio(root: Path, audio_paths: list[Path], output: Path, config: Gemma4C
             hook.remove()
         torch.cuda.synchronize()
         layer_hashes = [sha(bf16_bytes(value)) for value in layers]
+        entering = bf16_bytes(layers[0])
+        entering_name = f"audio-{occurrence_at}-entering.bf16"
+        (output / entering_name).write_bytes(entering)
         final = bf16_bytes(projected)
         final_name = f"audio-{occurrence_at}-text-space.bf16"
         (output / final_name).write_bytes(final)
@@ -223,6 +233,8 @@ def run_audio(root: Path, audio_paths: list[Path], output: Path, config: Gemma4C
                 "text_space_shape": list(projected.shape),
                 "layer_frontier_sha256": layer_hashes,
                 "complete_layer_count": len(layer_hashes),
+                "entering_bf16": entering_name,
+                "entering_sha256": sha(entering),
                 "returned_bf16": final_name,
                 "returned_sha256": sha(final),
                 "cuda_kernel_events": profiler_events(prof),
@@ -252,6 +264,108 @@ def run_audio(root: Path, audio_paths: list[Path], output: Path, config: Gemma4C
     return receipt
 
 
+def run_text(root: Path, output: Path, container: safe_open) -> dict:
+    """Run two intervention-separated text occurrences through all 42 decoder layers on CPU.
+
+    E4B's per-layer embedding table cannot coexist with the full body on the 16 GiB card. CPU
+    placement is exterior apparatus testimony; the same BF16 weights and model law are used, KV
+    caching is disabled, and every layer frontier is returned.
+    """
+    prompts = ["The scaffold channels current.", "The scaffold releases current."]
+    model = AutoModelForMultimodalLM.from_pretrained(
+        root,
+        dtype=torch.bfloat16,
+        device_map={"": "cpu"},
+        low_cpu_mem_usage=True,
+    ).eval()
+    tokenizer = AutoTokenizer.from_pretrained(root)
+    encoded = tokenizer(prompts, return_tensors="pt", padding=True, add_special_tokens=True)
+    per_layer: list[list[torch.Tensor]] = [[] for _ in prompts]
+    hooks = []
+
+    def retain_frontier(_module, _inputs, value) -> None:
+        section = value[0] if isinstance(value, tuple) else value
+        for at in range(len(prompts)):
+            per_layer[at].append(section[at].detach())
+
+    for layer in model.model.language_model.layers:
+        hooks.append(layer.register_forward_hook(retain_frontier))
+    began = time.perf_counter_ns()
+    with torch.inference_mode():
+        returned = model(
+            input_ids=encoded["input_ids"],
+            attention_mask=encoded["attention_mask"],
+            use_cache=False,
+            return_dict=True,
+        )
+    elapsed = time.perf_counter_ns() - began
+    for hook in hooks:
+        hook.remove()
+    returns = []
+    for at, prompt in enumerate(prompts):
+        last = int(encoded["attention_mask"][at].sum()) - 1
+        logits = returned.logits[at, last]
+        entering = bf16_bytes(per_layer[at][0])
+        entering_name = f"text-{at}-entering.bf16"
+        (output / entering_name).write_bytes(entering)
+        final = bf16_bytes(logits)
+        final_name = f"text-{at}-logits.bf16"
+        (output / final_name).write_bytes(final)
+        returns.append(
+            {
+                "family": 0,
+                "state": at,
+                "occurrence": f"text-occurrence/{at}",
+                "source_sha256": sha(prompt.encode()),
+                "source_incidence_sha256": sha(at.to_bytes(4, "little") + prompt.encode()),
+                "input_token_count": int(encoded["attention_mask"][at].sum()),
+                "layer_frontier_sha256": [sha(bf16_bytes(value)) for value in per_layer[at]],
+                "complete_layer_count": len(per_layer[at]),
+                "entering_bf16": entering_name,
+                "entering_sha256": sha(entering),
+                "returned_bf16": final_name,
+                "returned_sha256": sha(final),
+                "text_space_shape": list(logits.shape),
+                "top5": torch.topk(logits.float(), 5).indices.tolist(),
+                "kv_cache_used": False,
+            }
+        )
+    receipt = {
+        "organ": "inherited-organ-at-nominal-boundary",
+        "source_lineage": "Gemma4ForConditionalGeneration.language_model",
+        "tensor_count": sum(1 for name in container.keys() if name.startswith("model.language_model.")),
+        "complete_layer_count": len(model.model.language_model.layers),
+        "resident_weight_parameters": sum(parameter.numel() for parameter in model.parameters()),
+        "peak_cuda_allocated_octets": 0,
+        "elapsed_nanoseconds": elapsed,
+        "apparatus": "cpu-bfloat16-complete-tower",
+        "returns": returns,
+    }
+    del model
+    gc.collect()
+    return receipt
+
+
+def video_from_vision(vision: dict) -> dict:
+    """Read the four ordered vision restrictions as four sampled video frames.
+
+    Gemma 4 owns no separate video tower. The processor's larger frame aperture remains open; the
+    admitted occurrence is exactly the four frames actually conducted through the vision tower.
+    """
+    frame_hashes = [returned["returned_sha256"] for returned in vision["returns"]]
+    return {
+        "organ": "sampled-video-through-inherited-vision-organ",
+        "source_lineage": "Gemma4VisionModel",
+        "tensor_count": vision["tensor_count"],
+        "complete_layer_count": vision["complete_layer_count"],
+        "sampled_frame_count": len(frame_hashes),
+        "processor_frame_aperture": 32,
+        "ordered_frame_return_sha256": frame_hashes,
+        "returned_sha256": sha("".join(frame_hashes).encode()),
+        "frame_returns": vision["returns"],
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=Path, required=True)
@@ -268,8 +382,10 @@ def main() -> None:
     container = safe_open(args.model / "model.safetensors", framework="pt", device="cpu")
     vision = run_vision(args.model, args.image, args.output, config, container)
     audio = run_audio(args.model, args.audio, args.output, config, container)
+    text = run_text(args.model, args.output, container)
+    video = video_from_vision(vision)
     receipt = {
-        "schema": "holonics.e2.complete-foreign-organ-conduct.v1",
+        "schema": "holonics.scf2.complete-gemma4-excitation.v2",
         "truth_status": "implemented-exact-source-binding; measured-foreign-bfloat16-conduct",
         "model": {
             "container": (args.model / "model.safetensors").as_posix(),
@@ -301,6 +417,8 @@ def main() -> None:
         },
         "vision": vision,
         "audio": audio,
+        "text": text,
+        "video": video,
     }
     (args.output / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
 

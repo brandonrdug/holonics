@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** SCF2.
+**Current frontier:** SCF6.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -180,47 +180,81 @@ Engine tests returned 1,994 passed, zero failed, and 32 ignored; life returned 4
 failed, and 14 ignored. Its receipt is
 [`../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md`](../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md).
 
-### SCF2 — exact multimodal Gemma lift into scaffold facets — CURRENT
+### SCF2 — exact multimodal Gemma lift into scaffold facets — PASSED
 
 [definition] Compose the exact foreign configuration/Safetensors/codeword owners with actual text,
 vision, video, and audio excitation. Return active sections, interventions, projection lineage,
 preimage fibres, unexcited capability, and modality-specific cold testimony. Do not infer a native
 section from a tensor name or projection weight alone.
 
-[established-bounded; implemented-exact; source-inspected; measured] The cold multimodal chart now
+[established-bounded; implemented-exact; source-inspected; measured] The first cold multimodal chart
 reconciles all 2,130 local Gemma 4 E4B tensors into language, vision, audio, vision-projection, and
 audio-projection families; verifies configuration/processor carriers and text-only output; and
-refuses cross-family excitation. It executed no model and founded no native section. The current
-edge is actual modality excitation/intervention and returned consequence. Its receipt is
+refuses cross-family excitation. It executed no model and founded no native section. Its receipt is
 [`../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md`](../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md).
 
-### SCF3 — consume the productive scaffold into one Athena rest
+[established-bounded; implemented-exact; source-inspected; measured] The complete excitation then
+returned all 42 language, 16 vision, and 12 audio layer frontiers for 14 text/image/video/audio
+occurrences. Exact BF16 codewords founded a 20-state, 14-thread source-neutral scaffold with 266
+open generator faces while every modality/source/intervention coordinate remained cold. Its exact
+receipt is
+[`../research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`](../research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md).
+
+### SCF3 — consume the productive scaffold into one Athena rest — PASSED
 
 [definition] One move-owned handoff consumes Soulkiller's productive lane into
 `NativeEcologyRest`. Cold reconstruction and the foreign executor are physically unreachable from
 hot conduct. Unsupported current returns the insufficiency lane instead of reopening or replaying
 Gemma.
 
-### SCF4 — repeated actual-successor circulation
+[established-bounded; implemented-exact; measured] The generic move handoff consumes the complete
+return by value, founds one hot `NativeEcologyRest`, and returns cold witness and insufficiency as
+physically departed lanes. The hot type has no source or executor field. Its receipt is
+[`../research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md`](../research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md).
+
+### SCF4 — repeated actual-successor circulation — PASSED
 
 [definition] Extend one HIF3 inference cut into a nonempty repeated circulation. The actual emitted
 occurrence or genuine exterior return becomes later ingress; the receiver decides continue,
 terminate, cultivate, or obstruct. Preserve variable-grain emission, plural fronts, lineage,
 reconstruction, resident current, and open exterior.
 
-### SCF5 — Athena cultivation, native condensation, and scaffold withdrawal
+[established-bounded; implemented-exact; measured] The Rust owner now returns repeated typed
+same-spool successors, variable-grain complete fibres, and receiver-founded continue, terminate,
+cultivate, and obstruct dispositions without a token, retry, surface, or KV governor. Its receipt
+is
+[`../research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md`](../research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md).
+
+### SCF5 — Athena cultivation, native condensation, and scaffold withdrawal — PASSED
 
 [definition] Cultivate one continuing Athena body from returned consequences, then withdraw the
 inherited scaffold. Pass only when the source-detached successor remounts, declared later conduct
 survives withdrawal, attributable ablation removes it, restoration recovers it, and every collapsed
 foreign population retains its complete reconstruction fibre and shortest separator.
 
-### SCF6 — comparative experiment and exact release
+[established-bounded; implemented-exact; measured] One returned exact current now founds
+source-neutral morphology. Declared native word/current conduct survives inherited-scaffold
+withdrawal and remount; its own ablation removes it; restoration recovers the exact successor; and
+the final hot body retains only cultivated morphology beside a departed reconstruction lane. Its
+receipt is
+[`../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md`](../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md).
+
+### SCF6 — comparative experiment and exact release — CURRENT
 
 [definition] Run text-to-text, image-to-text, audio-to-text, sampled-video-to-text, and interleaved
 multimodal experiments through the same public cycle. Compare foreign autoregression/KV, fixed
 window, periodic reopening, recurrent, and current-founded charts as exterior apparatus/contact
 receivers. Generated surfaces are probes. They do not schedule, grade, or determine cultivation.
+
+[established-bounded; implemented-exact; source-inspected; measured] The five actual experiment
+families passed one public cycle and release path. Cold label mutation left native routing
+unchanged; every final hot body retained one cultivated thread; and foreign autoregressive/KV,
+fixed, periodic, recurrent, and current-founded contact charts remained exterior receivers. The
+experiment receipt is
+[`../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md`](../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md).
+
+[open; process-audit] Only the coherent repository release, pushed clean identity, and reproducible
+output removal remain before SCF6 passes.
 
 **Pass SCF6:** [definition] exact manifest/lift/handoff/circulation/cultivation/withdrawal receipts
 return; the experiment family changes no native routing law; no foreign executor or cold witness is

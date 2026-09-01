@@ -230,6 +230,7 @@ pub fn found_addressed_dialogue_native_spool(
         generator_descents: vec![NativeGeneratorDescent {
             generator: GENERATOR,
             steps: generator_steps,
+            open_domain: BTreeSet::new(),
         }],
         receiver_factors: states
             .iter()

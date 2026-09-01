@@ -147,6 +147,7 @@ fn spool() -> NativeSpool {
                     thread: "thread/turn-back".to_owned(),
                 },
             ],
+            open_domain: BTreeSet::new(),
         }],
         receiver_factors: vec![
             ReceiverFactor {

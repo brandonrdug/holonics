@@ -363,16 +363,29 @@ impl NativeTransportScaffold {
                 .map(|step| (step.from, step.to))
                 .collect::<BTreeMap<_, _>>();
             for state in &states {
-                let returned = steps
-                    .get(state)
-                    .ok_or(NativeSpoolRefusal::UnknownNative(*state))?;
+                let returned = match steps.get(state) {
+                    Some(returned) => *returned,
+                    None if descent.open_domain.contains(state) => *state,
+                    None => return Err(NativeSpoolRefusal::UnknownNative(*state)),
+                };
                 generator_table.push(
                     *state_index
-                        .get(returned)
-                        .ok_or(NativeSpoolRefusal::UnknownNative(*returned))?,
+                        .get(&returned)
+                        .ok_or(NativeSpoolRefusal::UnknownNative(returned))?,
                 );
             }
         }
+        let active_states = states
+            .iter()
+            .copied()
+            .filter(|state| {
+                word.iter().all(|generator| {
+                    descents
+                        .get(generator)
+                        .is_some_and(|descent| !descent.open_domain.contains(state))
+                })
+            })
+            .collect();
         let card = CudaRefineExecutor::new()
             .map_err(|error| NativeSpoolRefusal::Apparatus(error.to_string()))?;
         let device = card.device_name().to_owned();
@@ -394,6 +407,7 @@ impl NativeTransportScaffold {
             spool_address: spool.address.clone(),
             states,
             state_index,
+            active_states,
             receiver_factors,
             device,
             block_threads,

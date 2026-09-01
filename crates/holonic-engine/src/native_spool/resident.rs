@@ -49,6 +49,8 @@ pub struct ResidentNativeSpoolWord {
     pub(crate) spool_address: String,
     pub(crate) states: Vec<NativeStateId>,
     pub(crate) state_index: BTreeMap<NativeStateId, u32>,
+    /// States on which the mounted ordered word has a realized descent rather than an open face.
+    pub(crate) active_states: BTreeSet<NativeStateId>,
     pub(crate) receiver_factors: BTreeMap<(NativeStateId, ReceiverId), Observation>,
     pub(crate) device: String,
     pub(crate) block_threads: u32,
@@ -76,6 +78,18 @@ impl ResidentNativeSpoolWord {
         native_start: &[NativeStateId],
         receiver: ReceiverId,
     ) -> Result<NativeSpoolConductReturn, NativeSpoolRefusal> {
+        if native_start
+            .iter()
+            .any(|native| !self.active_states.contains(native))
+        {
+            return Err(NativeSpoolRefusal::UnknownNative(
+                native_start
+                    .iter()
+                    .find(|native| !self.active_states.contains(native))
+                    .copied()
+                    .unwrap_or(NativeStateId(0)),
+            ));
+        }
         let start = native_start
             .iter()
             .map(|native| {

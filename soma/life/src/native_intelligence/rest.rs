@@ -2,7 +2,8 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
-        NativeEcologyProfile, NativeTransportRequest, RestedTransportEcology,
+        IntoDismantlingBoundaryReturn, NativeEcologyProfile, NativeTransportRequest,
+        RestedTransportEcology,
     },
     native_spool::NativeSpoolConductReturn,
     native_spool::NativeTransportScaffold,
@@ -16,6 +17,37 @@ use super::types::{
     NativeEcologyError, NativeEcologyRest, NativeSectionAddress, ReceiverHistoryRealizationPassage,
     NATIVE_ECOLOGY_REST_SCHEMA, RECEIVER_HISTORY_REALIZATION_SCHEMA,
 };
+
+/// Cold reconstruction and open testimony physically departed from one hot native ecology rest.
+#[derive(Debug, PartialEq, Eq)]
+pub struct DepartedDismantlingLanes<ColdWitness, Insufficiency> {
+    pub cold_witness: ColdWitness,
+    pub insufficiency: Insufficiency,
+}
+
+/// Consume a three-lane dismantling return into one hot rest plus physically separate testimony.
+pub fn consume_dismantling_return<Returned>(
+    returned: Returned,
+) -> Result<
+    (
+        NativeEcologyRest,
+        DepartedDismantlingLanes<Returned::ColdWitness, Returned::Insufficiency>,
+    ),
+    NativeEcologyError,
+>
+where
+    Returned: IntoDismantlingBoundaryReturn<Productive = NativeTransportScaffold>,
+{
+    let (productive, cold_witness, insufficiency) = returned.into_lanes();
+    let hot = NativeEcologyRest::found(productive)?;
+    Ok((
+        hot,
+        DepartedDismantlingLanes {
+            cold_witness,
+            insufficiency,
+        },
+    ))
+}
 
 impl ReceiverHistoryRealizationPassage {
     pub fn found(ecology: &NativeTransportScaffold) -> Result<Self, NativeEcologyError> {
@@ -269,8 +301,52 @@ fn components_through_native_cells(
 mod tests {
     use super::*;
 
+    use holonic_engine::{
+        native_ecology::holonic_intelligence::{
+            lift_bf16_excitations, ExteriorModality, ForeignBf16Excitation,
+        },
+        receiver_exact_compression::ReceiverId,
+        BoundaryId, EventId,
+    };
+
     #[test]
     fn wire_digest_is_testimony_not_the_structural_identity_operator() {
         assert_ne!(NATIVE_ECOLOGY_REST_SCHEMA, "sha256");
+    }
+
+    #[test]
+    fn dismantling_handoff_consumes_productive_scaffold_and_keeps_cold_testimony_outside_hot_rest()
+    {
+        let returned = lift_bf16_excitations(
+            ReceiverId(7),
+            vec![ForeignBf16Excitation {
+                event: EventId(1),
+                predecessor: None,
+                entering_boundary: BoundaryId(10),
+                emitting_boundary: BoundaryId(11),
+                source_occurrence: "cold/source/text".to_owned(),
+                exterior_modality: ExteriorModality::Text,
+                entering_codewords: vec![0x3f80],
+                returned_codewords: vec![0x4000],
+                interventions: BTreeSet::from(["cold/intervention".to_owned()]),
+                receiver_consequences: BTreeSet::from(["cold/consequence".to_owned()]),
+            }],
+        )
+        .expect("lift");
+        let (hot, departed) = consume_dismantling_return(returned).expect("handoff");
+        hot.validate().expect("hot rest");
+        let wire = String::from_utf8(hot.canonical_bytes().expect("wire"))
+            .expect("JSON")
+            .to_ascii_lowercase();
+        for cold in [
+            "cold/source",
+            "cold/intervention",
+            "cold/consequence",
+            "text",
+        ] {
+            assert!(!wire.contains(cold));
+        }
+        assert_eq!(departed.cold_witness.excitations.len(), 1);
+        assert_eq!(departed.insufficiency.retained_fibre.len(), 1);
     }
 }
